@@ -42,9 +42,11 @@ interface LayersTreeProps {
     ) => TreeWebmapItem[];
     showLegend?: boolean;
     showDropdown?: boolean;
+    expandable?: boolean;
     checkable?: boolean;
     draggable?: boolean;
     selectable?: boolean;
+    showLine?: boolean;
 }
 
 export const LayersTree = observer(
@@ -58,11 +60,12 @@ export const LayersTree = observer(
         showLegend = true,
         showDropdown = true,
         checkable = true,
+        expandable = true,
         draggable = true,
         selectable = true,
+        showLine = true,
     }: LayersTreeProps) => {
         const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
-        const [autoExpandParent, setAutoExpandParent] = useState(true);
         const [moreClickId, setMoreClickId] = useState<number>();
         const [update, setUpdate] = useState(false);
         const webmapItems = store.webmapItems;
@@ -77,14 +80,10 @@ export const LayersTree = observer(
             return _webmapItems;
         }, [webmapItems]);
 
-        const hasGroups = useMemo(() => {
-            for (const itm of webmapItems) {
-                if (itm.type === "group") {
-                    return true;
-                }
-            }
-            return false;
-        }, [webmapItems]);
+        const hasGroups = useMemo(
+            () => webmapItems.some((item) => item.type === "group"),
+            [webmapItems]
+        );
 
         useEffect(() => {
             if (onReady) {
@@ -93,8 +92,8 @@ export const LayersTree = observer(
         }, [onReady]);
 
         const onExpand = (expandedKeysValue: React.Key[]) => {
+            if (!expandable) return;
             store.setExpanded(expandedKeysValue.map(Number));
-            setAutoExpandParent(false);
         };
 
         const onCheck: TreeProps<TreeWebmapItem>["onCheck"] = (
@@ -192,20 +191,22 @@ export const LayersTree = observer(
             );
         };
 
+        const shouldShowLine = showLine && hasGroups;
+
         return (
             <Tree
                 className={
-                    "ngw-webmap-layers-tree" + (!hasGroups ? " flat" : "")
+                    "ngw-webmap-layers-tree" + (!shouldShowLine ? " flat" : "")
                 }
                 virtual={false}
                 motion={false}
                 checkable={checkable}
                 selectable={selectable}
                 showIcon
-                showLine={hasGroups}
+                showLine={shouldShowLine}
                 onExpand={onExpand}
                 expandedKeys={store.expanded}
-                autoExpandParent={autoExpandParent}
+                autoExpandParent={false}
                 onCheck={onCheck}
                 checkedKeys={store.checked}
                 onSelect={_onSelect}

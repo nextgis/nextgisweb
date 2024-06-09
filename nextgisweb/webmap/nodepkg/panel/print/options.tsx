@@ -1,6 +1,6 @@
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import type { PrintMapSettings } from "../../print-map/PrintMap";
+import type { PrintMapSettings } from "../../print-map/type";
 
 import {
     FileImageOutlined,
@@ -21,6 +21,16 @@ export interface Scale {
 }
 
 export const pageFormats: PageFormat[] = [];
+
+export interface LegendColumn {
+    label: string;
+    value: number;
+}
+
+export const legendColumns: LegendColumn[] = Array.from(
+    { length: 5 },
+    (_, i) => ({ label: `${i + 1}`, value: i + 1 })
+);
 
 function addPageFormat(label: string, width: number, height: number) {
     pageFormats.push({
@@ -72,8 +82,8 @@ const parseNumber = (v: string) => {
 type SettingKey = keyof PrintMapSettings;
 
 interface PrintParam<T> {
-    fromParam: (val: string) => T | undefined;
-    setting: SettingKey;
+    setting: SettingKey | undefined;
+    fromParam?: (val: string) => T | undefined;
     toParam?: (val: T) => string | undefined;
 }
 
@@ -109,5 +119,7 @@ export const urlPrintParams: UrlPrintParams<PrintMapSettings> = {
     },
     print_arrow: { fromParam: (v) => v === "true", setting: "arrow" },
     print_title: { fromParam: (v) => v === "true", setting: "title" },
+    print_titleText: { setting: undefined },
     print_legend: { fromParam: (v) => v === "true", setting: "legend" },
+    print_legendColumns: { fromParam: parseNumber, setting: "legendColumns" },
 };

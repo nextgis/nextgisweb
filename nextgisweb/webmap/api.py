@@ -2,10 +2,10 @@ from pathlib import Path
 from shutil import which
 from subprocess import check_call
 from tempfile import TemporaryDirectory
-from typing import Literal, Optional
+from typing import List, Literal, Optional, Union
 
 from geoalchemy2.shape import to_shape
-from msgspec import Meta, Struct
+from msgspec import UNSET, Meta, Struct, UnsetType
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.renderers import render
 from pyramid.response import Response
@@ -160,12 +160,77 @@ def get_webmap_extent(resource, request) -> JSONType:
 PrintFormat = Annotated[Literal["png", "jpeg", "tiff", "pdf"], TSExport("PrintFormat")]
 
 
+class ElementSize(Struct):
+    x: Annotated[float, Meta()]
+    y: Annotated[float, Meta()]
+    width: Annotated[float, Meta(gt=0)]
+    height: Annotated[float, Meta(gt=0)]
+
+
+class ElementContent(ElementSize):
+    content: str
+
+
+class LegendTreeNode(Struct):
+    title: str
+    isGroup: bool
+    isLegend: bool
+    children: List["LegendTreeNode"]
+    icon: Union[str, UnsetType] = UNSET
+
+
+class LegendElement(ElementSize):
+    legendColumns: Annotated[int, Meta()]
+    legendItems: Union[List[LegendTreeNode], UnsetType] = UNSET
+
+
+class MapContent(ElementSize):
+    content: bytes
+
+
 class PrintBody(Struct):
     width: Annotated[float, Meta(gt=0, le=500)]
     height: Annotated[float, Meta(gt=0, le=500)]
     margin: Annotated[float, Meta(ge=0, le=100)]
-    map_image: bytes
+    map: MapContent
     format: PrintFormat
+    legend: Union[LegendElement, UnsetType] = UNSET
+    title: Union[ElementContent, UnsetType] = UNSET
+
+
+class LegendViewModel(Struct):
+    title: str
+    level: int
+    group: bool
+    legend: bool
+    icon: Union[str, UnsetType] = UNSET
+
+
+def to_legend_view_model(legend_node: LegendTreeNode, level: int) -> LegendViewModel:
+    if legend_node.isLegend:
+        level = level - 1
+    return LegendViewModel(
+        title=legend_node.title,
+        level=level,
+        group=legend_node.isGroup,
+        legend=legend_node.isLegend,
+        icon=legend_node.icon,
+    )
+
+
+def handle_legend_node(
+    node: LegendTreeNode, level: int, legend_tree: List[LegendViewModel]
+) -> None:
+    legend_tree.append(to_legend_view_model(node, level))
+    for child in node.children:
+        handle_legend_node(child, level + 1, legend_tree)
+
+
+def handle_legend_tree(nodes: List[LegendTreeNode]) -> List[LegendViewModel]:
+    legend_tree: List[LegendViewModel] = []
+    for node in nodes:
+        handle_legend_node(node, 0, legend_tree)
+    return legend_tree
 
 
 def print(request, *, body: PrintBody) -> Response:
@@ -173,17 +238,28 @@ def print(request, *, body: PrintBody) -> Response:
         temp_dir = Path(temp_name)
 
         map_image_file = temp_dir / "img.png"
-        map_image_file.write_bytes(body.map_image)
+        map_image_file.write_bytes(body.map.content)
+
+        legend = body.legend
+        legend_info = None
+        if legend is not None:
+            legend_info = handle_legend_tree(legend.legendItems)
+            if not legend.legendColumns:
+                legend.legendColumns = 1
 
         index_html = temp_dir / "index.html"
         index_html.write_text(
             render(
                 "template/print.mako",
                 {
-                    "map_image": map_image_file.relative_to(temp_dir),
                     "width": int(body.width),
                     "height": int(body.height),
                     "margin": int(body.margin),
+                    "map": body.map,
+                    "map_image": map_image_file.relative_to(temp_dir),
+                    "legend": legend,
+                    "legend_info": legend_info,
+                    "title": body.title,
                 },
                 request,
             )
@@ -321,6 +397,7 @@ def setup_pyramid(comp, config):
 
     config.add_route(
         "webmap.print",
-        "/api/component/webmap/print",
+        "/api/component/{id}/webmap/print",
+        factory=webmap_factory,
         post=print,
     )

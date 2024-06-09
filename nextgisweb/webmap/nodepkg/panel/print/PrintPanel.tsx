@@ -1,35 +1,31 @@
-import { toPng } from "html-to-image";
 import debounce from "lodash-es/debounce";
 import type { Coordinate } from "ol/coordinate";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 
 import {
-    Button,
     Divider,
-    Dropdown,
+    Input,
     InputNumber,
     Select,
     Space,
     Switch,
 } from "@nextgisweb/gui/antd";
-import type { MenuProps } from "@nextgisweb/gui/antd";
 import { CopyToClipboardButton } from "@nextgisweb/gui/buttons";
 import reactApp from "@nextgisweb/gui/react-app";
-import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import PrintMap from "@nextgisweb/webmap/print-map";
-import type { PrintBody, PrintFormat } from "@nextgisweb/webmap/type/api";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Import URL parser module
 import URL from "ngw-webmap/utils/URL";
 
-import type { PrintMapSettings } from "../../print-map/PrintMap";
+import type { PrintMapSettings } from "../../print-map/type";
 import type { DojoDisplay } from "../../type";
 import { PanelHeader } from "../header";
 
+import PrintMapExport from "./PrintMapExport";
 import {
-    exportFormats,
+    legendColumns,
     pageFormats,
     scaleToLabel,
     scalesList,
@@ -37,10 +33,12 @@ import {
 } from "./options";
 import type { Scale, UrlPrintParams } from "./options";
 
-import { DownOutlined, ShareAltOutlined } from "@ant-design/icons";
+import { ShareAltOutlined } from "@ant-design/icons";
 
 import "../styles/panels.less";
 import "./PrintPanel.less";
+
+const { TextArea } = Input;
 
 interface PrintMapCompProps {
     settings: PrintMapSettings;
@@ -94,67 +92,20 @@ const updatePrintMapComp = (comp: Comp, settings: PrintMapSettings) => {
     comp.update({ settings });
 };
 
-const runExport = ({
-    format,
-    element,
-    settings,
-    setLoadingFile,
-}: {
-    format: PrintFormat;
-    element: HTMLElement;
-    settings: PrintMapSettings;
-    setLoadingFile: (loading: boolean) => void;
-}) => {
-    setLoadingFile(true);
-
-    let toPngPromise;
-    try {
-        toPngPromise = toPng(element);
-    } catch {
-        setLoadingFile(false);
-        return;
-    }
-
-    toPngPromise
-        .then((dataUrl) => {
-            const { width, height, margin } = settings;
-            const body: PrintBody = {
-                width,
-                height,
-                margin,
-                map_image: dataUrl.substring("data:image/png;base64,".length),
-                format: format,
-            };
-
-            route("webmap.print")
-                .post({ json: body })
-                .then((blob) => {
-                    const file = window.URL.createObjectURL(blob as Blob);
-                    const tab = window.open();
-                    if (tab) {
-                        tab.location.href = file;
-                        setLoadingFile(false);
-                    }
-                })
-                .finally(() => {
-                    setLoadingFile(false);
-                });
-        })
-        .catch(() => {
-            setLoadingFile(false);
-        });
-};
-
-const defaultPanelMapSettings: PrintMapSettings = {
-    height: 297,
-    width: 210,
-    margin: 10,
-    scale: undefined,
-    scaleLine: false,
-    scaleValue: false,
-    legend: false,
-    arrow: false,
-    title: undefined,
+const defaultPanelMapSettings = (initTitleText: string): PrintMapSettings => {
+    return {
+        height: 297,
+        width: 210,
+        margin: 10,
+        scale: undefined,
+        scaleLine: false,
+        scaleValue: false,
+        legend: false,
+        legendColumns: 1,
+        arrow: false,
+        title: undefined,
+        titleText: initTitleText,
+    };
 };
 
 const getPrintUrlSettings = (): Partial<PrintMapSettings> => {
@@ -172,6 +123,11 @@ const getPrintUrlSettings = (): Partial<PrintMapSettings> => {
             continue;
         }
         const { fromParam, setting } = urlPrintParams[urlParam];
+
+        if (setting === undefined || !fromParam) {
+            continue;
+        }
+
         const value = fromParam(urlValue);
         if (value === undefined) {
             continue;
@@ -186,6 +142,10 @@ const getPrintMapLink = (mapSettings: PrintMapSettings): string => {
 
     for (const [urlParam, settingInfo] of Object.entries(urlPrintParams)) {
         const { setting } = settingInfo;
+        if (setting === undefined) {
+            continue;
+        }
+
         const mapSettingValue = mapSettings[setting];
         parsed[urlParam] = settingInfo.toParam
             ? settingInfo.toParam(mapSettingValue as never)
@@ -301,9 +261,6 @@ export const PrintPanel = ({
     close,
     visible,
 }: PrintPanelProps) => {
-    const [mapSettings, setMapSettings] = useState<PrintMapSettings>(
-        defaultPanelMapSettings
-    );
     const [urlParsed, setUrlParsed] = useState(false);
     const [mapInit, setMapInit] = useState(false);
     const [paperFormat, setPaperFormat] = useState("210_297");
@@ -313,7 +270,13 @@ export const PrintPanel = ({
     const [printMapScale, setPrintMapScale] = useState<number>();
     const [printMapComp, setPrintMapComp] = useState<Comp>();
     const [printMapEl, setPrintMapEl] = useState<HTMLElement>();
-    const [loadingFile, setLoadingFile] = useState(false);
+
+    const defaultSettings = useMemo(
+        () => defaultPanelMapSettings(display.config.webmapTitle),
+        [display.config.webmapTitle]
+    );
+    const [mapSettings, setMapSettings] =
+        useState<PrintMapSettings>(defaultSettings);
 
     const resizeObserver = useRef<ResizeObserver>();
 
@@ -439,26 +402,6 @@ export const PrintPanel = ({
         updateMapSettings({ scale: printMapScale });
     }, [printMapScale]);
 
-    const exportToFormat = (format: PrintFormat) => {
-        if (!printMapEl) {
-            return;
-        }
-        const [viewport] = printMapEl.getElementsByClassName("print-olmap");
-        runExport({
-            format,
-            element: viewport as HTMLElement,
-            settings: mapSettings,
-            setLoadingFile,
-        });
-    };
-
-    const exportFormatsProps: MenuProps = {
-        items: exportFormats,
-        onClick: (item) => {
-            exportToFormat(item.key as PrintFormat);
-        },
-    };
-
     const validate = (value: unknown) => {
         return typeof value === "number";
     };
@@ -515,8 +458,7 @@ export const PrintPanel = ({
                     <InputNumber
                         style={{ width: "100%" }}
                         onChange={(v) =>
-                            validate(v) &&
-                            updateMapSettings({ margin: v || undefined })
+                            validate(v) && updateMapSettings({ margin: v || 0 })
                         }
                         value={mapSettings.margin}
                         min={0}
@@ -536,12 +478,40 @@ export const PrintPanel = ({
                     <span className="checkbox__label">{gettext("Legend")}</span>
                 </div>
                 <div className="input-group">
+                    <Select
+                        onChange={(v) =>
+                            updateMapSettings({ legendColumns: v })
+                        }
+                        value={mapSettings.legendColumns}
+                        options={legendColumns}
+                        size="small"
+                        disabled={!mapSettings.legend}
+                    ></Select>
+                    <span className="checkbox__label">
+                        {gettext("Number of legend columns")}
+                    </span>
+                </div>
+
+                <div className="input-group">
                     <Switch
                         checked={mapSettings.title}
                         onChange={(v) => updateMapSettings({ title: v })}
                     />
                     <span className="checkbox__label">{gettext("Title")}</span>
                 </div>
+                <div className="input-group column">
+                    <label>{gettext("Map title text")}</label>
+                    <TextArea
+                        onChange={(e) =>
+                            updateMapSettings({ titleText: e.target.value })
+                        }
+                        rows={2}
+                        value={mapSettings.titleText}
+                        size="small"
+                        disabled={!mapSettings.title}
+                    ></TextArea>
+                </div>
+
                 <div className="input-group">
                     <Switch
                         checked={mapSettings.arrow}
@@ -586,28 +556,11 @@ export const PrintPanel = ({
 
             <section>
                 <div className="actions">
-                    <Space.Compact>
-                        <Button
-                            type="primary"
-                            onClick={() => {
-                                window.print();
-                            }}
-                        >
-                            {gettext("Print")}
-                        </Button>
-                        <Dropdown
-                            menu={exportFormatsProps}
-                            disabled={loadingFile}
-                        >
-                            <Button loading={loadingFile}>
-                                <Space>
-                                    {gettext("Save as")}
-                                    <DownOutlined />
-                                </Space>
-                            </Button>
-                        </Dropdown>
-                    </Space.Compact>
-
+                    <PrintMapExport
+                        display={display}
+                        mapSettings={mapSettings}
+                        printMapEl={printMapEl}
+                    />
                     <Space.Compact>
                         <CopyToClipboardButton
                             type="link"
