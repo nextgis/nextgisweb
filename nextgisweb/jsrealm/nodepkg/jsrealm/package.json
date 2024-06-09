@@ -10,6 +10,7 @@
         "@babel/preset-env": "^7.23.6",
         "@babel/preset-react": "^7.23.3",
         "@babel/preset-typescript": "^7.23.3",
+        "@ngneat/falso": "^7.2.0",
         "@types/chai": "^4.3.11",
         "@types/lodash-es": "^4.17.12",
         "@types/mocha": "^10.0.6",
