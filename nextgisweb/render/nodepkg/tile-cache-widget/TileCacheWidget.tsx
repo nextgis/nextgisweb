@@ -1,13 +1,12 @@
 import { observer } from "mobx-react-lite";
 
-import { Checkbox, InputNumber } from "@nextgisweb/gui/antd";
+import { CheckboxValue, InputNumber } from "@nextgisweb/gui/antd";
+import { Area, Lot } from "@nextgisweb/gui/mayout";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type {
     EditorWidgetComponent,
     EditorWidgetProps,
 } from "@nextgisweb/resource/type";
-
-import "./TileCacheWidget.less";
 
 import type { TileCacheStore } from "./TileCacheStore";
 
@@ -15,78 +14,88 @@ export const TileCacheWidget: EditorWidgetComponent<
     EditorWidgetProps<TileCacheStore>
 > = observer(({ store }) => {
     return (
-        <div className="ngw-render-tile-cache-widget">
-            <Checkbox
-                checked={store.enabled || undefined}
-                onChange={(e) => {
-                    const enabled = e.target.checked;
-                    const data: Partial<TileCacheStore> = { enabled };
-                    if (
-                        enabled &&
-                        !store.imageCompose &&
-                        store.maxZ === null &&
-                        store.ttl === null
-                    ) {
-                        data.imageCompose = true;
-                        data.maxZ = 6;
-                        data.ttl = 2630000;
-                    }
-                    store.update(data);
-                }}
-            >
-                {gettext("Enabled")}
-            </Checkbox>
-
-            <Checkbox
-                checked={!!store.imageCompose}
-                onChange={(e) =>
-                    store.update({ imageCompose: e.target.checked })
-                }
-            >
-                {gettext("Allow using tiles in non-tile requests")}
-            </Checkbox>
-
-            {store.featureTrackChanges && (
-                <Checkbox
-                    checked={!!store.trackChanges}
-                    onChange={(e) => {
-                        store.update({ trackChanges: e.target.checked });
+        <Area pad>
+            <Lot label={false}>
+                <CheckboxValue
+                    value={!!store.enabled}
+                    onChange={(v) => {
+                        const data: Partial<TileCacheStore> = { enabled: v };
+                        if (
+                            v &&
+                            !store.imageCompose &&
+                            store.maxZ === null &&
+                            store.ttl === null
+                        ) {
+                            data.imageCompose = true;
+                            data.maxZ = 6;
+                            data.ttl = 2630000;
+                        }
+                        store.update(data);
                     }}
                 >
-                    {gettext("Track changes")}
-                </Checkbox>
+                    {gettext("Enabled")}
+                </CheckboxValue>
+            </Lot>
+
+            <Lot label={false}>
+                <CheckboxValue
+                    value={!!store.imageCompose}
+                    onChange={(v) => store.update({ imageCompose: v })}
+                >
+                    {gettext("Allow using tiles in non-tile requests")}
+                </CheckboxValue>
+            </Lot>
+
+            {store.featureTrackChanges && (
+                <Lot label={false}>
+                    <CheckboxValue
+                        value={!!store.trackChanges}
+                        onChange={(v) => store.update({ trackChanges: v })}
+                    >
+                        {gettext("Track changes")}
+                    </CheckboxValue>
+                </Lot>
             )}
 
-            <label>{gettext("Max zoom level")}</label>
-            <InputNumber
-                value={store.maxZ}
-                onChange={(v) => store.update({ maxZ: v })}
-                min={0}
-                max={18}
-            />
+            <Lot label={gettext("Max zoom level")}>
+                <InputNumber
+                    value={store.maxZ}
+                    onChange={(v) => store.update({ maxZ: v })}
+                    min={0}
+                    max={18}
+                />
+            </Lot>
 
             {store.featureSeed && (
-                <>
-                    <label>{gettext("Seed zoom level")}</label>
+                <Lot label={gettext("Seed zoom level")}>
                     <InputNumber
                         value={store.seedZ}
                         onChange={(v) => store.update({ seedZ: v })}
                         min={0}
                         max={18}
                     />
-                </>
+                </Lot>
             )}
 
-            <label>{gettext("TTL, sec.")}</label>
-            <InputNumber
-                value={store.ttl}
-                onChange={(v) => store.update({ ttl: v })}
-                min={0}
-                max={315360000}
-                step={86400}
-            />
-            <Checkbox>{gettext("Flush")}</Checkbox>
-        </div>
+            <Lot label={gettext("TTL, sec.")}>
+                <InputNumber
+                    value={store.ttl}
+                    onChange={(v) => store.update({ ttl: v })}
+                    min={0}
+                    max={315360000}
+                    step={86400}
+                />
+            </Lot>
+
+            <Lot label={false}>
+                <CheckboxValue
+                    value={!!store.flush}
+                    onChange={(v) => store.update({ flush: v })}
+                >
+                    {gettext("Flush")}
+                </CheckboxValue>
+            </Lot>
+        </Area>
     );
 });
 

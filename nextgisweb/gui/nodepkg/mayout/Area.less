@@ -1,0 +1,38 @@
+.ngw-gui-mayout-area {
+    display: grid;
+    gap: 1em;
+
+    &.pad {
+        padding: 1em;
+    }
+
+    > div.lot {
+        > label {
+            display: inline-flex;
+            gap: 0.5ex;
+
+            > div.error {
+                color: var(--error);
+            }
+        }
+    }
+
+    &.label-left > div.lot {
+        display: contents;
+
+        > label {
+            align-self: center;
+            margin-right: -0.33em;
+            min-width: 4em;
+
+            > div:first-child {
+                flex: 1;
+            }
+        }
+    }
+
+    &.label-top > div.lot {
+        display: flex;
+        flex-direction: column;
+    }
+}

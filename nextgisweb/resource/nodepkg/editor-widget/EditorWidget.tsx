@@ -1,7 +1,8 @@
 import { observer } from "mobx-react-lite";
 
 import { PrincipalSelect } from "@nextgisweb/auth/component";
-import { Input } from "@nextgisweb/gui/antd";
+import { InputValue } from "@nextgisweb/gui/antd";
+import { Area, Lot } from "@nextgisweb/gui/mayout";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { ResourceSelect } from "@nextgisweb/resource/component";
 
@@ -9,58 +10,58 @@ import type { EditorWidgetComponent, EditorWidgetProps } from "../type";
 
 import type { EditorStore } from "./EditorStore";
 
-import "./EditorWidget.less";
+const msgKeynameHelp = gettext("Identifier for API integration (optional)");
 
 export const EditorWidget: EditorWidgetComponent<
     EditorWidgetProps<EditorStore>
 > = observer(({ store }) => {
     return (
-        <div className="ngw-resource-editor-widget">
-            <label>{gettext("Display name")}</label>
-            <Input
-                value={store.displayName || undefined}
-                placeholder={store.sdnDynamic || store.sdnBase || undefined}
-                onChange={(e) => {
-                    store.update({ displayName: e.target.value });
-                }}
-                status={store.displayNameIsValid ? undefined : "error"}
-            />
+        <Area pad>
+            <Lot label={gettext("Display name")}>
+                <InputValue
+                    value={store.displayName || ""}
+                    onChange={(v) => store.update({ displayName: v })}
+                    status={store.displayNameIsValid ? undefined : "error"}
+                    placeholder={store.sdnDynamic || store.sdnBase || undefined}
+                />
+            </Lot>
 
-            <label>{gettext("Parent")}</label>
-            <ResourceSelect
-                value={store.parent || undefined}
-                onChange={(v) => {
-                    store.parent = typeof v === "number" ? v : null;
-                }}
-                allowClear={false}
-                disabled={store.operation === "create"}
-            />
+            <Lot label={gettext("Parent")}>
+                <ResourceSelect
+                    value={store.parent !== null ? store.parent : undefined}
+                    onChange={(v) =>
+                        store.update({
+                            parent: typeof v === "number" ? v : null,
+                        })
+                    }
+                    allowClear={false}
+                    disabled={store.operation === "create"}
+                    style={{ width: "100%" }}
+                />
+            </Lot>
 
-            <label>{gettext("Owner")}</label>
-            <PrincipalSelect
-                model={"user"}
-                systemUsers={["guest"]}
-                value={store.ownerUser || undefined}
-                onChange={(v) => {
-                    store.ownerUser = v as number;
-                }}
-                allowClear={false}
-                disabled={!ngwConfig.isAdministrator}
-            />
+            <Lot label={gettext("Owner")}>
+                <PrincipalSelect
+                    model={"user"}
+                    systemUsers={["guest"]}
+                    value={store.ownerUser || undefined}
+                    onChange={(v) => store.update({ ownerUser: v as number })}
+                    allowClear={false}
+                    disabled={!ngwConfig.isAdministrator}
+                    style={{ width: "100%" }}
+                />
+            </Lot>
 
-            <label>{gettext("Keyname")}</label>
-            <Input
-                value={store.keyname || ""}
-                status={store.keynameIsValid ? undefined : "error"}
-                placeholder={gettext(
-                    "Identifier for API integration (optional)"
-                )}
-                onChange={(e) => {
-                    store.keyname = e.target.value;
-                }}
-                allowClear
-            />
-        </div>
+            <Lot label={gettext("Keyname")}>
+                <InputValue
+                    value={store.keyname || ""}
+                    onChange={(v) => store.update({ keyname: v })}
+                    status={store.keynameIsValid ? undefined : "error"}
+                    placeholder={msgKeynameHelp}
+                    allowClear
+                />
+            </Lot>
+        </Area>
     );
 });
 

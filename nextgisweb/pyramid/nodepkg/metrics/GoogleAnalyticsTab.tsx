@@ -1,6 +1,7 @@
 import { useState } from "react";
 
-import { Input } from "@nextgisweb/gui/antd";
+import { InputValue } from "@nextgisweb/gui/antd";
+import { Area, Lot } from "@nextgisweb/gui/mayout";
 import type { Metrics } from "@nextgisweb/pyramid/type/api";
 
 import { gettext } from "../i18n";
@@ -25,17 +26,18 @@ export default function GoogleAnalyticsTab({
     };
 
     return (
-        <div className="grid">
-            <label>{gettext("Measurement ID")}</label>
-            <Input
-                value={ivalue.id}
-                onChange={(evt) => {
-                    if (readonly) return;
-                    update("id", evt.target.value);
-                }}
-                placeholder="G-XXXXXXXXXX"
-                allowClear
-            />
-        </div>
+        <Area>
+            <Lot label={gettext("Measurement ID")}>
+                <InputValue
+                    value={ivalue.id}
+                    onChange={(v) => {
+                        if (readonly) return;
+                        update("id", v);
+                    }}
+                    placeholder="G-XXXXXXXXXX"
+                    allowClear
+                />
+            </Lot>
+        </Area>
     );
 }

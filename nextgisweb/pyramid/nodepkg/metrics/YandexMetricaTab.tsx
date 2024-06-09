@@ -1,6 +1,7 @@
 import { useState } from "react";
 
-import { Checkbox, Input } from "@nextgisweb/gui/antd";
+import { CheckboxValue, InputValue } from "@nextgisweb/gui/antd";
+import { Area, Lot } from "@nextgisweb/gui/mayout";
 import type { Metrics } from "@nextgisweb/pyramid/type/api";
 
 import { gettext } from "../i18n";
@@ -26,27 +27,30 @@ export default function YandexMetricaTab({
     };
 
     return (
-        <div className="grid">
-            <label>{gettext("Tag number")}</label>
-            <Input
-                value={ivalue.id}
-                onChange={(evt) => {
-                    if (readonly) return;
-                    update("id", evt.target.value);
-                }}
-                placeholder="00000000"
-                allowClear
-            />
+        <Area>
+            <Lot label={gettext("Tag number")}>
+                <InputValue
+                    value={ivalue.id}
+                    onChange={(v) => {
+                        if (readonly) return;
+                        update("id", v);
+                    }}
+                    placeholder="00000000"
+                    allowClear
+                />
+            </Lot>
 
-            <Checkbox
-                checked={ivalue.webvisor}
-                onChange={(evt) => {
-                    if (readonly) return;
-                    update("webvisor", evt.target.checked);
-                }}
-            >
-                {gettext("Webvisor")}
-            </Checkbox>
-        </div>
+            <Lot>
+                <CheckboxValue
+                    value={ivalue.webvisor}
+                    onChange={(v) => {
+                        if (readonly) return;
+                        update("webvisor", v);
+                    }}
+                >
+                    {gettext("Webvisor")}
+                </CheckboxValue>
+            </Lot>
+        </Area>
     );
 }
