@@ -4,6 +4,7 @@ import { observer } from "mobx-react-lite";
 import { useCallback, useMemo, useState } from "react";
 
 import { Button, Table } from "@nextgisweb/gui/antd";
+import type { TableProps } from "@nextgisweb/gui/antd";
 import { sorterFactory } from "@nextgisweb/gui/util";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
@@ -20,7 +21,7 @@ import type {
 
 import FolderOpenIcon from "@nextgisweb/icon/material/arrow_forward";
 
-const { Column } = Table;
+import "./ResourcePickerChildren.less";
 
 const msgDislpayName = gettext("Display name");
 
@@ -76,33 +77,56 @@ function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
         [allowMoveInside, getResourceClasses, traverseClasses]
     );
 
-    const renderActions: ColumnProps<PickerResource>["render"] = (
-        _,
-        record
-    ) => {
-        if (!canTraverse(record)) {
-            return <></>;
-        }
-        return (
-            <Button
-                shape="circle"
-                icon={<FolderOpenIcon />}
-                onClick={(e) => {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    resourceStore.changeParentTo(record.id);
-                }}
-            />
-        );
-    };
+    const renderActions = useCallback<
+        NonNullable<ColumnProps<PickerResource>["render"]>
+    >(
+        (_, record) => {
+            if (!canTraverse(record)) {
+                return <></>;
+            }
+            return (
+                <Button
+                    type="text"
+                    shape="circle"
+                    icon={<FolderOpenIcon />}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        resourceStore.changeParentTo(record.id);
+                    }}
+                />
+            );
+        },
+        [canTraverse, resourceStore]
+    );
+
+    const columns = useMemo<TableProps["columns"]>(
+        () => [
+            {
+                title: msgDislpayName,
+                className: "displayName",
+                dataIndex: "display_name",
+                sorter: sorterFactory("display_name"),
+                render: (value, { cls }: PickerResource) =>
+                    renderResourceCls({ name: value, cls }),
+            },
+            {
+                className: "actions",
+                dataIndex: "actions",
+                render: renderActions,
+            },
+        ],
+        [renderActions]
+    );
 
     return (
         <Table
-            style={{ height: "100%" }}
-            className=""
+            className="ngw-resource-component-resource-picker-children"
+            parentHeight
             showHeader={false}
             expandable={{ childrenColumnName: "children_" }}
             dataSource={dataSource}
+            columns={columns}
             rowKey="id"
             size="middle"
             loading={resourcesLoading}
@@ -153,23 +177,7 @@ function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
                     }, 150),
                 };
             }}
-        >
-            <Column
-                title={msgDislpayName}
-                className="displayName"
-                dataIndex="display_name"
-                sorter={sorterFactory("display_name")}
-                render={(value, record: PickerResource) =>
-                    renderResourceCls({ name: value, cls: record.cls })
-                }
-            />
-            <Column
-                width={30}
-                className="actions"
-                dataIndex="actions"
-                render={renderActions}
-            />
-        </Table>
+        />
     );
 }
 export const ResourcePickerChildren = observer(ResourcePickerChildrenInner);

@@ -31,25 +31,17 @@ export const ResourcePickerTitle = observer(
         function SearchPanel() {
             return (
                 <Space.Compact>
-                    <Row>
-                        <Col>
-                            <Button
-                                icon={<ArrowBack />}
-                                onClick={() => setSearchMode(false)}
-                            ></Button>
-                        </Col>
-                        <Col flex="auto">
-                            <ResourcesFilter
-                                cls={resourceStore.requireClass || undefined}
-                                onChange={(v, opt) => {
-                                    resourceStore.changeParentTo(
-                                        Number(opt.key)
-                                    );
-                                    setSearchMode(false);
-                                }}
-                            />
-                        </Col>
-                    </Row>
+                    <Button
+                        icon={<ArrowBack />}
+                        onClick={() => setSearchMode(false)}
+                    />
+                    <ResourcesFilter
+                        cls={resourceStore.requireClass || undefined}
+                        onChange={(v, opt) => {
+                            resourceStore.changeParentTo(Number(opt.key));
+                            setSearchMode(false);
+                        }}
+                    />
                 </Space.Compact>
             );
         }

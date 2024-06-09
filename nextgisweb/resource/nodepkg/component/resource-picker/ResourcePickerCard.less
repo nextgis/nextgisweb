@@ -12,22 +12,20 @@
         padding: 0 12px;
     }
 
-    .ant-table td.ant-table-cell.actions {
-        vertical-align: middle;
-        padding-top: 0;
-        padding-bottom: 0;
-    }
-
     .ant-modal-footer .ant-input {
         text-align: left;
     }
-    .resource-breadcrumb .ant-breadcrumb-link {
-        display: inline-flex;
-    }
-    .resource-breadcrumb .ant-breadcrumb-link .resource-breadcrumb-item {
-        max-width: 160px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+
+    .resource-breadcrumb {
+        .ant-breadcrumb-link {
+            display: inline-flex;
+
+            .resource-breadcrumb-item {
+                max-width: 160px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+        }
     }
 }

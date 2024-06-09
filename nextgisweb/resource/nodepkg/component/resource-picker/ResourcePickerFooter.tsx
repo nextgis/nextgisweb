@@ -63,37 +63,29 @@ const CreateControl = observer(
         }, []);
 
         return (
-            <Space.Compact>
-                <Row>
-                    <Col>
-                        <Button
-                            icon={<ArrowBack />}
-                            onClick={() => {
-                                if (setCreateMode) {
-                                    setCreateMode(false);
-                                }
-                            }}
-                        />
-                    </Col>
-                    <Col flex="auto">
-                        <Input
-                            value={resourceName}
-                            onChange={(e) => {
-                                setResourceName(e.target.value);
-                            }}
-                            ref={resourceNameInput}
-                        />
-                    </Col>
-                    <Col>
-                        <Button
-                            type="primary"
-                            icon={<DoneIcon />}
-                            loading={resourcesLoading}
-                            disabled={!resourceName}
-                            onClick={onSave}
-                        />
-                    </Col>
-                </Row>
+            <Space.Compact block>
+                <Button
+                    icon={<ArrowBack />}
+                    onClick={() => {
+                        if (setCreateMode) {
+                            setCreateMode(false);
+                        }
+                    }}
+                />
+                <Input
+                    value={resourceName}
+                    onChange={(e) => {
+                        setResourceName(e.target.value);
+                    }}
+                    ref={resourceNameInput}
+                />
+                <Button
+                    type="primary"
+                    icon={<DoneIcon />}
+                    loading={resourcesLoading}
+                    disabled={!resourceName}
+                    onClick={onSave}
+                />
             </Space.Compact>
         );
     }
