@@ -76,6 +76,12 @@ export type { TabsProps } from "./tabs";
 export type { InputIntegerProps } from "./input-integer";
 export type { InputBigIntegerProps } from "./input-big-integer";
 
+export { InputValue } from "./InputValue";
+export { CheckboxValue } from "./CheckboxValue";
+
+export type { InputValueProps } from "./InputValue";
+export type { CheckboxValueProps } from "./CheckboxValue";
+
 export type { DefaultOptionType as OptionType } from "antd/es/select";
 
 export type * from "antd";
