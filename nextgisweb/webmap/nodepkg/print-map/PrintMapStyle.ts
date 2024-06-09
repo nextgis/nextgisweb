@@ -44,6 +44,13 @@ export const buildPrintStyle = (params: PrintStyleParams): string => {
         left: 0;
     }
 
+    .print-olmap {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100%;
+        height: 100%;
+    }
+
     @page {
         size: ${params.widthPage}px ${params.heightPage}px;
         margin: ${params.margin}px;

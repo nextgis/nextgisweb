@@ -2,7 +2,14 @@
     display: flex;
     row-gap: 2px;
     flex-direction: column;
-    margin-left: -22px;
+
+    &.checkable {
+        margin-left: -22px;
+    }
+
+    &.uncheckable {
+        margin-left: 0px;
+    }
 
     > .legend-symbol {
         display: flex;

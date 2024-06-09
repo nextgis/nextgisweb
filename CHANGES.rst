@@ -10,6 +10,7 @@ Changes
 - Switch to nearest neighbor resampling for raster pyramids.
 - Show feature attachment descriptions in the viewer.
 - Support for upper-case placeholders in TMS connections.
+- Customizable print layout including legend.
 
 
 4.7.0

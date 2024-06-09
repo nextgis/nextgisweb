@@ -36,8 +36,15 @@ interface LayersTreeProps {
     setLayerZIndex: (id: number, zIndex: number) => void;
     getWebmapPlugins: () => Record<string, WebmapPlugin>;
     onReady?: () => void;
+    onFilterItems?: (
+        store: WebmapStore,
+        layersItems: TreeWebmapItem[]
+    ) => TreeWebmapItem[];
     showLegend?: boolean;
     showDropdown?: boolean;
+    checkable?: boolean;
+    draggable?: boolean;
+    selectable?: boolean;
 }
 
 export const LayersTree = observer(
@@ -47,10 +54,13 @@ export const LayersTree = observer(
         setLayerZIndex,
         getWebmapPlugins,
         onReady,
+        onFilterItems,
         showLegend = true,
         showDropdown = true,
+        checkable = true,
+        draggable = true,
+        selectable = true,
     }: LayersTreeProps) => {
-        const [draggable] = useState(true);
         const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
         const [autoExpandParent, setAutoExpandParent] = useState(true);
         const [moreClickId, setMoreClickId] = useState<number>();
@@ -59,10 +69,13 @@ export const LayersTree = observer(
 
         const { onDrop, allowDrop } = useDrag({ store, setLayerZIndex });
 
-        const treeItems = useMemo(
-            () => prepareWebMapItems(webmapItems),
-            [webmapItems]
-        );
+        const treeItems = useMemo(() => {
+            let _webmapItems = prepareWebMapItems(webmapItems);
+            if (onFilterItems) {
+                _webmapItems = onFilterItems(store, _webmapItems);
+            }
+            return _webmapItems;
+        }, [webmapItems]);
 
         const hasGroups = useMemo(() => {
             for (const itm of webmapItems) {
@@ -169,7 +182,11 @@ export const LayersTree = observer(
                         {actions}
                     </Row>
                     {showLegend && (
-                        <Legend nodeData={nodeData.treeItem} store={store} />
+                        <Legend
+                            checkable={checkable}
+                            nodeData={nodeData.treeItem}
+                            store={store}
+                        />
                     )}
                 </>
             );
@@ -182,7 +199,8 @@ export const LayersTree = observer(
                 }
                 virtual={false}
                 motion={false}
-                checkable
+                checkable={checkable}
+                selectable={selectable}
                 showIcon
                 showLine={hasGroups}
                 onExpand={onExpand}
