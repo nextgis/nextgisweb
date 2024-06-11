@@ -729,6 +729,7 @@ class TableInfo:
                             % fid
                         )
                         continue
+                gtype = geom.GetGeometryType()
 
             if transform is not None:
                 if geom.Transform(transform) != 0:
@@ -753,6 +754,23 @@ class TableInfo:
                 is_single = GEOM_TYPE_OGR_2_GEOM_TYPE[gtype] not in GEOM_TYPE.is_multi
                 is_point = GEOM_TYPE_OGR_2_GEOM_TYPE[gtype] in GEOM_TYPE.points
                 is_polygon = GEOM_TYPE_OGR_2_GEOM_TYPE[gtype] in GEOM_TYPE.polygons
+
+                # Check for empty rings, which are not valid for PostGIS.
+                if is_polygon:
+                    _ok_empty_ring = True
+                    for poly in (geom,) if is_single else geom:
+                        for i in range(poly.GetGeometryCount() - 1, 0, -1):
+                            if poly.GetGeometryRef(i).IsEmpty():
+                                if fix_errors == ERROR_FIX.NONE:
+                                    errors.append(_("Feature #%d has empty rings.") % fid)
+                                    _ok_empty_ring = False
+                                    break
+                                else:
+                                    poly.RemoveGeometry(i)
+                        if not _ok_empty_ring:
+                            break
+                    if not _ok_empty_ring:
+                        continue
 
                 if not is_point and not geom.IsValid():
                     # Close rings for polygons: GDAL doesn't provide a method for

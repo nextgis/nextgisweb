@@ -131,6 +131,12 @@ CREATE_TEST_PARAMS = (
         dict(feature_count=1),
     ),
     (
+        # The empty ring must be skipped in SAFE mode.
+        "empty-ring.geojson",
+        dict(fix_errors="SAFE"),
+        dict(feature_count=2),
+    ),
+    (
         # Just check loading of POINTZ layers.
         "pointz.geojson",
         dict(geometry_type="POINT"),
