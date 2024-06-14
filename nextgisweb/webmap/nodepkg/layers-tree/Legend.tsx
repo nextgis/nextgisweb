@@ -44,19 +44,23 @@ export function Legend({ nodeData, store, checkable }: LegendProps) {
 
                     let checkbox;
                     if (checkable) {
-                        checkbox = (
-                            <Checkbox
-                                defaultChecked={render}
-                                onChange={(e) => {
-                                    store.setLayerLegendSymbol(
-                                        id,
-                                        s.index,
-                                        e.target.checked
-                                    );
-                                }}
-                                onClick={(evt) => evt.stopPropagation()}
-                            />
-                        );
+                        checkbox =
+                            s.render !== null ? (
+                                <Checkbox
+                                    style={{ width: "16px" }}
+                                    defaultChecked={render}
+                                    onChange={(e) => {
+                                        store.setLayerLegendSymbol(
+                                            id,
+                                            s.index,
+                                            e.target.checked
+                                        );
+                                    }}
+                                    onClick={(evt) => evt.stopPropagation()}
+                                />
+                            ) : (
+                                <div style={{ width: "16px" }} />
+                            );
                     }
 
                     return (
