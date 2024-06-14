@@ -23,7 +23,7 @@ from .ogrdriver import MVT_DRIVER_EXIST
 class FeatureLayerFieldsWidget(Widget):
     interface = IFeatureLayer
     operation = ("update",)
-    amdmod = "ngw-feature-layer/FieldsWidget"
+    amdmod = "@nextgisweb/feature-layer/fields-widget"
 
 
 PD_READ = DataScope.read
