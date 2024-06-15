@@ -1,22 +1,26 @@
-#: nodepkg/arm/validate.ts:6
+#: nodepkg/arm/validate.ts:5
+msgid "Value required"
+msgstr "Обязательное значение"
+
+#: nodepkg/arm/validate.ts:7
 msgid "At least {} character required"
 msgid_plural "At least {} characters required"
 msgstr[0] "Требуется как минимум {} символ"
 msgstr[1] "Требуется как минимум {} символа"
 msgstr[2] "Требуется как минимум {} символов"
 
-#: nodepkg/arm/validate.ts:12
+#: nodepkg/arm/validate.ts:13
 msgid "No more than {} character required"
 msgid_plural "No more than {} characters required"
 msgstr[0] "Требуется не более {} символа"
 msgstr[1] "Требуется не более {} символов"
 msgstr[2] "Требуется не более {} символов"
 
-#: nodepkg/arm/validate.ts:17
+#: nodepkg/arm/validate.ts:18
 msgid "Ivalid value"
 msgstr "Некорректное значение"
 
-#: nodepkg/arm/validate.ts:18
+#: nodepkg/arm/validate.ts:19
 msgid "Value not unique"
 msgstr "Значение не уникально"
 

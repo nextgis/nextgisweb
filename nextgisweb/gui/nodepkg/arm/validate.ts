@@ -2,6 +2,7 @@ import { gettext, ngettext } from "@nextgisweb/pyramid/i18n";
 
 import type { Validator } from "./type";
 
+const msgRequired = gettext("Value required");
 const msgMinLength = (value: number) =>
     ngettext(
         "At least {} character required",
@@ -16,6 +17,16 @@ const msgMaxLength = (value: number) =>
     );
 const msgPattern = gettext("Ivalid value");
 const msgNotUnique = gettext("Value not unique");
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function required<V = any>(): Validator<V> {
+    return (value: V) => {
+        if (value === undefined || value === null) {
+            return [false, gettext(msgRequired)];
+        }
+        return [true, undefined];
+    };
+}
 
 export function string<V = string>({
     minLength,
