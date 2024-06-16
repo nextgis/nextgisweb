@@ -1,19 +1,30 @@
+from typing import List, Union
+
+from msgspec import UNSET, Meta, Struct, UnsetType
+from msgspec.structs import asdict
 from sqlalchemy import inspect
 from sqlalchemy.exc import NoResultFound, NoSuchTableError, SQLAlchemyError
+from typing_extensions import Annotated
 
 from nextgisweb.env import _
+from nextgisweb.lib.apitype import AsJSON
 
 from nextgisweb.core.exception import ValidationError
-from nextgisweb.pyramid import JSONType
 from nextgisweb.resource import ConnectionScope, DataStructureScope, ResourceFactory
 
-from .diagnostics import Checker
+from .diagnostics import Checker, StatusEnum
 from .exception import ExternalDatabaseError
 from .model import PostgisConnection, PostgisLayer
 from .util import coltype_as_str
 
 
-def inspect_connection(request) -> JSONType:
+class SchemaObject(Struct, kw_only=True):
+    schema: str
+    views: List[str]
+    tables: List[str]
+
+
+def inspect_connection(request) -> AsJSON[List[SchemaObject]]:
     request.resource_permission(ConnectionScope.connect)
 
     connection = request.context
@@ -27,7 +38,7 @@ def inspect_connection(request) -> JSONType:
     for schema_name in inspector.get_schema_names():
         if schema_name != "information_schema":
             result.append(
-                dict(
+                SchemaObject(
                     schema=schema_name,
                     views=inspector.get_view_names(schema=schema_name),
                     tables=inspector.get_table_names(schema=schema_name),
@@ -37,7 +48,12 @@ def inspect_connection(request) -> JSONType:
     return result
 
 
-def inspect_table(request) -> JSONType:
+class ColumnObject(Struct, kw_only=True):
+    name: str
+    type: str
+
+
+def inspect_table(request) -> AsJSON[List[ColumnObject]]:
     request.resource_permission(ConnectionScope.connect)
 
     connection = request.context
@@ -53,20 +69,67 @@ def inspect_table(request) -> JSONType:
     result = []
     try:
         for column in inspector.get_columns(table_name, schema):
-            result.append(dict(name=column["name"], type=coltype_as_str(column["type"])))
+            result.append(ColumnObject(name=column["name"], type=coltype_as_str(column["type"])))
     except NoSuchTableError:
         raise ValidationError(_("Table (%s) not found in schema (%s)." % (table_name, schema)))
 
     return result
 
 
-def diagnostics(request) -> JSONType:
+class ConnectionObject(Struct):
+    id: Union[Annotated[int, Meta(ge=0)], UnsetType] = UNSET
+    hostname: Union[str, UnsetType] = UNSET
+    port: Union[int, UnsetType] = UNSET
+    database: Union[str, UnsetType] = UNSET
+    username: Union[str, UnsetType] = UNSET
+    password: Union[str, UnsetType] = UNSET
+
+
+class FieldObject(Struct):
+    keyname: str
+    datatype: str
+    column_name: str
+
+
+class LayerObject(Struct):
+    id: Union[Annotated[int, Meta(ge=0)], UnsetType] = UNSET
+    schema: Union[str, UnsetType] = UNSET
+    table: Union[str, UnsetType] = UNSET
+    column_id: Union[str, UnsetType] = UNSET
+    column_geom: Union[str, UnsetType] = UNSET
+    geometry_type: Union[str, UnsetType] = UNSET
+    geometry_srid: Union[int, UnsetType] = UNSET
+    fields: Union[List[FieldObject], UnsetType] = UNSET
+
+
+class CheckBody(Struct, kw_only=True):
+    connection: Union[ConnectionObject, None] = None
+    layer: Union[LayerObject, None] = None
+
+
+class CheckMessage(Struct, kw_only=True):
+    status: Union[StatusEnum, None] = None
+    text: Union[str, UnsetType] = UNSET
+
+
+class CheckResult(Struct, kw_only=True):
+    status: StatusEnum
+    group: str
+    title: Union[str, UnsetType] = UNSET
+    messages: List[CheckMessage]
+
+
+class CheckResponse(Struct, kw_only=True):
+    status: Union[StatusEnum, None]
+    checks: List[CheckResult]
+
+
+def diagnostics(request, *, body: CheckBody) -> CheckResponse:
     # Don't allow this for guest due to security reasons.
     request.require_authenticated()
 
-    body = request.json_body
-    connection = body.get("connection")
-    layer = body.get("layer")
+    connection = None if body.connection is None else asdict(body.connection)
+    layer = None if body.layer is None else asdict(body.layer)
 
     if layer is not None:
         if lid := layer.get("id"):
@@ -105,20 +168,24 @@ def diagnostics(request) -> JSONType:
         }
 
     checker = Checker(connection=connection, layer=layer)
-    result = dict(status=checker.status.value if checker.status else None)
+
+    checks = list()
+    result = CheckResponse(
+        status=checker.status.value if checker.status else None,
+        checks=checks,
+    )
 
     tr = request.localizer.translate
-    result["checks"] = checks = list()
     for ck in checker.checks:
-        ck_result = dict(status=ck.status, group=ck.group)
+        messages = list()
+        ck_result = CheckResult(status=ck.status, group=ck.group, messages=messages)
         if title := getattr(ck, "title", None):
-            ck_result["title"] = tr(title)
+            ck_result.title = tr(title)
 
-        ck_result["messages"] = messages = list()
         for msg in ck.messages:
-            msg_result = dict(status=msg.get("status"))
+            msg_result = CheckMessage(status=msg.get("status"))
             if text := msg.get("text"):
-                msg_result["text"] = tr(text)
+                msg_result.text = tr(text)
             messages.append(msg_result)
 
         checks.append(ck_result)

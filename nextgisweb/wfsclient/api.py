@@ -1,24 +1,48 @@
-from nextgisweb.pyramid import JSONType
+from typing import List, Tuple
+
+from msgspec import Meta, Struct
+from typing_extensions import Annotated
+
 from nextgisweb.resource import ConnectionScope, ResourceFactory
 
 from .model import WFSConnection
 
+Lat = Annotated[float, Meta(ge=-90, le=90)]
+Lon = Annotated[float, Meta(ge=-180, le=180)]
 
-def inspect_connection(resource, request) -> JSONType:
+
+class LayerObject(Struct, kw_only=True):
+    name: str
+    srid: int
+    bbox: Tuple[Lon, Lat, Lon, Lat]
+
+
+class InspectResponse(Struct, kw_only=True):
+    layers: List[LayerObject]
+
+
+def inspect_connection(resource, request) -> InspectResponse:
     request.resource_permission(ConnectionScope.connect)
 
-    capabilities = resource.get_capabilities()
-
-    return capabilities["layers"]
+    return resource.get_capabilities()
 
 
-def inspect_layer(resource, request) -> JSONType:
+class FieldObject(Struct, kw_only=True):
+    name: str
+    type: str
+
+
+class InspectLayerResponse(Struct, kw_only=True):
+    fields: List[FieldObject]
+
+
+def inspect_layer(resource, request) -> InspectLayerResponse:
     request.resource_permission(ConnectionScope.connect)
 
     layer_name = request.matchdict["layer"]
     fields = resource.get_fields(layer_name)
 
-    return fields
+    return InspectLayerResponse(fields=fields)
 
 
 def setup_pyramid(comp, config):
@@ -26,14 +50,14 @@ def setup_pyramid(comp, config):
 
     config.add_route(
         "wfsclient.connection.inspect",
-        "/api/resource/{id}/wfs_connection/inspect/",
+        "/api/resource/{id}/wfsclient/inspect",
         factory=wfsconnection_factory,
         get=inspect_connection,
     )
 
     config.add_route(
         "wfsclient.connection.inspect.layer",
-        "/api/resource/{id}/wfs_connection/inspect/{layer:str}/",
+        "/api/resource/{id}/wfsclient/inspect/{layer:str}",
         factory=wfsconnection_factory,
         get=inspect_layer,
     )

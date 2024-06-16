@@ -89,11 +89,15 @@ define([
                                         "nextgis_geoservices"
                                     ) {
                                         api.route(
-                                            "tmsclient.connection.layers",
+                                            "tmsclient.connection.inspect",
                                             value
                                         )
                                             .get()
-                                            .then(this._updateStore.bind(this));
+                                            .then(
+                                                function (response) {
+                                                    this._updateStore(response.layers);
+                                                }.bind(this)
+                                            );
                                     } else {
                                         this._updateStore([]);
                                     }
