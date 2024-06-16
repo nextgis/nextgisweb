@@ -16,11 +16,15 @@ export interface LotProps {
     end?: number;
     span?: number;
     row?: true;
+    visible?: boolean;
     children?: ReactNode;
 }
 
 export function Lot({ children, ...props }: LotProps) {
     const { labelPosition: lp, columnCount: cc } = useContext(AreaContext)!;
+
+    if (props.visible === false) return <></>;
+
     const [w, o] = lp === "left" ? [2, 1] : [1, 0];
 
     let { start, end, span } = props;
