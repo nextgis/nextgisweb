@@ -250,6 +250,14 @@ class OAuthHelper:
                 logger.warning("Token verification failed: %s", exc.code)
                 return None  # TODO: Use custom exception here instead of None
 
+            if "exp" in tdata:
+                exp = int(tdata["exp"])
+            elif opt_expires_in := self.options["server.access_expires_in"]:
+                exp = current_tstamp() + opt_expires_in.total_seconds()
+            else:
+                logger.warning("Token verification failed: missing 'exp' key")
+                return None  # TODO: Use custom exception here instead of None
+
             if self.options.get("scope") is not None:
                 token_scope = set(tdata["scope"].split(" ")) if "scope" in tdata else set()
                 if not set(self.options["scope"]).issubset(token_scope):
@@ -259,7 +267,7 @@ class OAuthHelper:
                 [
                     dict(
                         id=token_id,
-                        exp=int(tdata["exp"]),
+                        exp=exp,
                         sub=str(tdata[self.options["profile.subject.attr"]]),
                         data=tdata,
                     )
@@ -369,7 +377,8 @@ class OAuthHelper:
                 params["client_id"] = client_id
             if client_secret := self.options.get("client.secret"):
                 params["client_secret"] = client_secret
-            authorization = (client_id, client_secret)
+            if "Authorization" not in headers:
+                authorization = (client_id, client_secret)
         else:
             headers["Authorization"] = f"Bearer {access_token}"
             logger.debug("Request(%s): Bearer %s", log_reqid, lf(access_token))
@@ -548,6 +557,10 @@ class OAuthHelper:
         Option("server.authorization_header", default=None, doc="Add Authorization HTTP header to requests to OAuth server."),
         Option("server.refresh_expires_in", timedelta, default=timedelta(days=7), doc=(
             "Default refresh token expiration (if not set by OAuth server).")),
+        Option("server.access_expires_in", timedelta, default=None, doc=(
+            "Default access token expiration if not present in introspection. "
+            "Insecure workaround for Blitz < 5.18. The value should cover "
+            "maximum access token lifetime due to introspection caching.")),
         Option("server.logout_endpoint", default=None, doc="OAuth logout endpoint URL."),
         Option("server.insecure", bool, default=False, doc="Skip SSL certificates validaion."),
         Option("profile.endpoint", default=None, doc="OpenID Connect endpoint URL"),
