@@ -69,18 +69,23 @@ export function FocusTable<
     const getItemActionsDetail = useActionsCallback(itemActions, "detail");
     const getItemActionsTree = useActionsCallback(itemActions, "tree");
 
+    const tableActionsArray = getTableActions(selected);
+    const itemActionsArray = selected ? getItemActionsDetail(selected) : [];
+
     return (
         <div className={mergeClasses("ngw-gui-focus-table", rootClassName)}>
             <div className="table">
-                <ActionToolbar
-                    actions={getTableActions(selected).map(
-                        ({ callback, ...props }) => ({
-                            onClick: () =>
-                                callback(selected, environmentRef.current!),
-                            ...props,
-                        })
-                    )}
-                />
+                {tableActionsArray.length > 0 && (
+                    <ActionToolbar
+                        actions={tableActionsArray.map(
+                            ({ callback, ...props }) => ({
+                                onClick: () =>
+                                    callback(selected, environmentRef.current!),
+                                ...props,
+                            })
+                        )}
+                    />
+                )}
                 <div className="items">
                     <ComplexTree<I, C, S>
                         environment={environmentRef}
@@ -105,18 +110,20 @@ export function FocusTable<
                             icon={<HideDetailIcon />}
                             onClick={hideDetail}
                         />
-                        <ActionToolbar
-                            actions={getItemActionsDetail(selected).map(
-                                ({ callback, ...props }) => ({
-                                    onClick: () =>
-                                        callback(
-                                            selected,
-                                            environmentRef.current!
-                                        ),
-                                    ...props,
-                                })
-                            )}
-                        />
+                        {itemActionsArray.length > 0 && (
+                            <ActionToolbar
+                                actions={itemActionsArray.map(
+                                    ({ callback, ...props }) => ({
+                                        onClick: () =>
+                                            callback(
+                                                selected,
+                                                environmentRef.current!
+                                            ),
+                                        ...props,
+                                    })
+                                )}
+                            />
+                        )}
                     </div>
                     <Fragment key={environmentRef.current.indexFor(selected)}>
                         {renderDetail({ item: selected })}
