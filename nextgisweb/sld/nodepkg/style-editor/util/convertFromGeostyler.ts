@@ -26,10 +26,14 @@ function convertMarkSymbolizer(gsMark: GSMarkSymbolizer): PointSymbolizer {
         graphic: {
             mark: {
                 well_known_name: gsMark.wellKnownName as WellKnownName,
-                fill: {
-                    color: gsMark.color as string,
-                    opacity: setOpacity(gsMark.fillOpacity || gsMark.opacity),
-                },
+                fill: gsMark.color
+                    ? {
+                          color: gsMark.color as string,
+                          opacity: setOpacity(
+                              gsMark.fillOpacity || gsMark.opacity
+                          ),
+                      }
+                    : {},
                 stroke: gsMark.strokeColor
                     ? {
                           color: gsMark.strokeColor as string,

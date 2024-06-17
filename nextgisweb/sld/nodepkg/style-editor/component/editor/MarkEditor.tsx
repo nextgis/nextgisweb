@@ -65,7 +65,7 @@ export function MarkEditor({ value, onChange }: EditorProps<MarkSymbolizer>) {
             {
                 label: msgFillColor,
                 name: "color",
-                formItem: <ColorInput />,
+                formItem: <ColorInput transparentInsteadEmpty />,
             },
             {
                 label: msgStrokeColor,
