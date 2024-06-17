@@ -42,6 +42,7 @@ from nextgisweb.resource import (
     DataStructureScope,
     Resource,
     ResourceGroup,
+    SColumn,
     Serializer,
 )
 from nextgisweb.resource import SerializedProperty as SP
@@ -207,15 +208,15 @@ class PostgisConnection(Base, Resource):
             conn.close()
 
 
-class PostgisConnectionSerializer(Serializer):
+class PostgisConnectionSerializer(Serializer, apitype=True):
     identity = PostgisConnection.identity
     resclass = PostgisConnection
 
-    hostname = SP(read=PC_READ, write=PC_WRITE)
-    database = SP(read=PC_READ, write=PC_WRITE)
-    username = SP(read=PC_READ, write=PC_WRITE)
-    password = SP(read=PC_READ, write=PC_WRITE)
-    port = SP(read=PC_READ, write=PC_WRITE)
+    hostname = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
+    port = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
+    username = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
+    password = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
+    database = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
 
 
 class PostgisLayerField(Base, LayerField):

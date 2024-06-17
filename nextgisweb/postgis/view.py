@@ -10,7 +10,7 @@ from .model import PostgisConnection, PostgisLayer
 class PostgisConnectionWidget(Widget):
     resource = PostgisConnection
     operation = ("create", "update")
-    amdmod = "ngw-postgis/ConnectionWidget"
+    amdmod = "@nextgisweb/postgis/connection-widget"
 
 
 class PostgisLayerWidget(Widget):

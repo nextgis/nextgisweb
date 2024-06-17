@@ -1,30 +1,6 @@
-#: amd/ngw-postgis/ConnectionWidget.js:30 model.py:128
-msgid "PostGIS connection"
-msgstr "Соединение PostGIS"
-
-#: amd/ngw-postgis/LayerWidget.js:46 model.py:243
+#: amd/ngw-postgis/LayerWidget.js:46 model.py:235
 msgid "PostGIS layer"
 msgstr "Слой PostGIS"
-
-#: amd/ngw-postgis/template/ConnectionWidget.hbs:9
-msgid "Host"
-msgstr "Сервер"
-
-#: amd/ngw-postgis/template/ConnectionWidget.hbs:14
-msgid "Port"
-msgstr "Порт"
-
-#: amd/ngw-postgis/template/ConnectionWidget.hbs:19
-msgid "Database"
-msgstr "База данных"
-
-#: amd/ngw-postgis/template/ConnectionWidget.hbs:24
-msgid "User"
-msgstr "Пользователь"
-
-#: amd/ngw-postgis/template/ConnectionWidget.hbs:29
-msgid "Password"
-msgstr "Пароль"
 
 #: amd/ngw-postgis/template/LayerWidget.hbs:8
 msgid "Select PostGIS connection"
@@ -50,7 +26,7 @@ msgstr "Поле ID"
 msgid "Geometry column"
 msgstr "Поле геометрии"
 
-#: amd/ngw-postgis/template/LayerWidget.hbs:39 model.py:418
+#: amd/ngw-postgis/template/LayerWidget.hbs:39 model.py:410
 msgid "Geometry type"
 msgstr "Тип геометрии"
 
@@ -59,51 +35,51 @@ msgstr "Тип геометрии"
 msgid "Autodetect"
 msgstr "Автоматически"
 
-#: amd/ngw-postgis/template/LayerWidget.hbs:42 model.py:67
+#: amd/ngw-postgis/template/LayerWidget.hbs:42 model.py:68
 msgid "Point"
 msgstr "Точка"
 
-#: amd/ngw-postgis/template/LayerWidget.hbs:43 model.py:68
+#: amd/ngw-postgis/template/LayerWidget.hbs:43 model.py:69
 msgid "Line"
 msgstr "Линия"
 
-#: amd/ngw-postgis/template/LayerWidget.hbs:44 model.py:69
+#: amd/ngw-postgis/template/LayerWidget.hbs:44 model.py:70
 msgid "Polygon"
 msgstr "Полигон"
 
-#: amd/ngw-postgis/template/LayerWidget.hbs:45 model.py:70
+#: amd/ngw-postgis/template/LayerWidget.hbs:45 model.py:71
 msgid "Multipoint"
 msgstr "Мультиточка"
 
-#: amd/ngw-postgis/template/LayerWidget.hbs:46 model.py:71
+#: amd/ngw-postgis/template/LayerWidget.hbs:46 model.py:72
 msgid "Multiline"
 msgstr "Мультилиния"
 
-#: amd/ngw-postgis/template/LayerWidget.hbs:47 model.py:72
+#: amd/ngw-postgis/template/LayerWidget.hbs:47 model.py:73
 msgid "Multipolygon"
 msgstr "Мультиполигон"
 
-#: amd/ngw-postgis/template/LayerWidget.hbs:48 model.py:73
+#: amd/ngw-postgis/template/LayerWidget.hbs:48 model.py:74
 msgid "Point Z"
 msgstr "Точка Z"
 
-#: amd/ngw-postgis/template/LayerWidget.hbs:49 model.py:74
+#: amd/ngw-postgis/template/LayerWidget.hbs:49 model.py:75
 msgid "Line Z"
 msgstr "Линия Z"
 
-#: amd/ngw-postgis/template/LayerWidget.hbs:50 model.py:75
+#: amd/ngw-postgis/template/LayerWidget.hbs:50 model.py:76
 msgid "Polygon Z"
 msgstr "Полигон Z"
 
-#: amd/ngw-postgis/template/LayerWidget.hbs:51 model.py:76
+#: amd/ngw-postgis/template/LayerWidget.hbs:51 model.py:77
 msgid "Multipoint Z"
 msgstr "Мультиточка Z"
 
-#: amd/ngw-postgis/template/LayerWidget.hbs:52 model.py:77
+#: amd/ngw-postgis/template/LayerWidget.hbs:52 model.py:78
 msgid "Multiline Z"
 msgstr "Мультилиния Z"
 
-#: amd/ngw-postgis/template/LayerWidget.hbs:53 model.py:78
+#: amd/ngw-postgis/template/LayerWidget.hbs:53 model.py:79
 msgid "Multipolygon Z"
 msgstr "Мультиполигон Z"
 
@@ -123,15 +99,15 @@ msgstr "Оставить"
 msgid "Reload"
 msgstr "Загрузить"
 
-#: api.py:58
+#: api.py:74
 msgid "Table (%s) not found in schema (%s)."
 msgstr "Таблица (%s) не найдена в схеме (%s)."
 
-#: api.py:76
+#: api.py:139
 msgid "PostGIS layer {} not found!"
 msgstr "Слой PostGIS {} не найден!"
 
-#: api.py:100
+#: api.py:163
 msgid "PostGIS connection {} not found!"
 msgstr "Соединение PostGIS {} не найдено!"
 
@@ -307,27 +283,31 @@ msgstr "Колонка поля '{}' найдена, тип {}."
 msgid "External database error"
 msgstr "Ошибка внешней базы данных"
 
-#: model.py:209
+#: model.py:120 nodepkg/connection-widget/ConnectionWidget.tsx:58
+msgid "PostGIS connection"
+msgstr "Соединение PostGIS"
+
+#: model.py:201
 msgid "Cannot connect to the database!"
 msgstr "Невозможно подключиться к базе данных!"
 
-#: model.py:297
+#: model.py:289
 msgid "Table '%(table)s' not found!"
 msgstr "Таблица '%(table)s' не найдена!"
 
-#: model.py:314
+#: model.py:306
 msgid "SRID missing in geometry_columns table! You should specify it manually."
 msgstr "SRID отсутствует в таблице geometry_columns! Необходимо указать SRID вручную."
 
-#: model.py:320
+#: model.py:312
 msgid "0 is an invalid SRID."
 msgstr "SRID не может быть равен 0."
 
-#: model.py:328
+#: model.py:320
 msgid "SRID in geometry_columns table does not match specified!"
 msgstr "SRID в таблице geometry_columns не соответствует указанному!"
 
-#: model.py:338
+#: model.py:330
 msgid ""
 "Geometry type missing in geometry_columns table! You should specify it "
 "manually."
@@ -335,19 +315,39 @@ msgstr ""
 "Тип геометрии отсутствует в таблице geometry_columns! Необходимо указать тип "
 "геометрии вручную."
 
-#: model.py:352
+#: model.py:344
 msgid "Geometry type in geometry_columns table does not match specified!"
 msgstr "Тип геометрии в таблице geometry_columns не соответствует указанному!"
 
-#: model.py:365
+#: model.py:357
 msgid "To use column as ID it should have integer type!"
 msgstr ""
 "Для использования поля в качестве идентификатора оно должно иметь "
 "целочисленный тип!"
 
-#: model.py:408 model.py:413
+#: model.py:400 model.py:405
 msgid "Column '%(column)s' not found!"
 msgstr "Поле '%(column)s' не найдено!"
+
+#: nodepkg/connection-widget/ConnectionWidget.tsx:21
+msgid "Host"
+msgstr "Сервер"
+
+#: nodepkg/connection-widget/ConnectionWidget.tsx:26
+msgid "Port"
+msgstr "Порт"
+
+#: nodepkg/connection-widget/ConnectionWidget.tsx:37
+msgid "User"
+msgstr "Пользователь"
+
+#: nodepkg/connection-widget/ConnectionWidget.tsx:43
+msgid "Password"
+msgstr "Пароль"
+
+#: nodepkg/connection-widget/ConnectionWidget.tsx:50
+msgid "Database"
+msgstr "База данных"
 
 #: nodepkg/diagnostics-widget/DiagnosticsWidget.js:16
 msgid "Unknown"
