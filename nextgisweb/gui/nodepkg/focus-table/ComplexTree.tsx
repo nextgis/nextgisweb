@@ -75,8 +75,8 @@ class EnvironmentAdapter<I extends FocusTableItem>
 
     get selected(): I | null {
         const state = this.target.viewState[TREE_ID] as IndividualTreeViewState;
-        const selectedItems = state.selectedItems as TreeItemIndex[];
-        return this.provider.indexer.lookup(selectedItems[0]) || null;
+        const selectedItems = state.selectedItems ?? [];
+        return this.provider.indexer.lookup(selectedItems[0]) ?? null;
     }
 
     select = (item: I | null) => {
@@ -102,7 +102,7 @@ class EnvironmentAdapter<I extends FocusTableItem>
     isExpanded = (item: I | null) => {
         if (item === null) return true;
         const state = this.target.viewState[TREE_ID] as IndividualTreeViewState;
-        const expandedItems = state.expandedItems || [];
+        const expandedItems = state.expandedItems ?? [];
         return expandedItems.indexOf(this.indexFor(item)) >= 0;
     };
 }
