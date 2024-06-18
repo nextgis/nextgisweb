@@ -15,13 +15,15 @@ class ClientWidget(Widget):
 class LayerWidget(Widget):
     resource = Layer
     operation = ("create", "update")
-    amdmod = "ngw-wmsclient/LayerWidget"
+    # amdmod = "ngw-wmsclient/LayerWidget"
+    amdmod = "@nextgisweb/wmsclient/wmsclient-layer"
+
 
 
 class LayerVendorParamsWidget(Widget):
     resource = Layer
     operation = ("create", "update")
-    amdmod = "ngw-wmsclient/LayerVendorParamsWidget"
+    amdmod = "@nextgisweb/wmsclient/wmsclient-layer"
 
 
 def setup_pyramid(comp, conf):
