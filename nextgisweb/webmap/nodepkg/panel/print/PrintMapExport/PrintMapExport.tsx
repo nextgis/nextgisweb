@@ -13,7 +13,7 @@ import type { PrintMapSettings } from "../../../print-map/type";
 import type { DojoDisplay } from "../../../type";
 import { exportFormats } from "../options";
 
-import { legendToModel } from "./legendToModel";
+import { legendItemsToModel, legendToModel } from "./legendToModel";
 
 import { DownOutlined } from "@ant-design/icons";
 
@@ -51,11 +51,10 @@ const runExport = ({
 
             let legend;
             if (printMapStore.legendCoords.displayed) {
-                const legendItems = legendToModel(printMapStore.webMapItems);
-                legend = {
-                    ...printMapStore.legendCoords,
-                    legendItems,
-                };
+                const legendItems = legendItemsToModel(
+                    printMapStore.webMapItems
+                );
+                legend = legendToModel(legendItems, printMapStore.legendCoords);
             }
 
             let title;

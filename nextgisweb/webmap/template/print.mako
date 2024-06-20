@@ -94,7 +94,7 @@
                     padding: 0;
                     width: 100%;
                     height: 100%;
-                    column-count: ${legend.legendColumns};
+                    column-count: ${legend.legend_columns};
                 }
 
                 .legend .legend-level {
@@ -154,7 +154,7 @@
                 <div class="legend-wrapper">
                     <div class="legend">
                         <div class="tree">
-                            % for legend_item in legend_info:
+                            % for legend_item in legend_tree_items:
                                 <%
                                     legend_class = 'legend-item' if legend_item.legend else '' 
                                     group_class = 'legend-group' if legend_item.group else '' 

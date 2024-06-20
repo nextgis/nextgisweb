@@ -173,15 +173,15 @@ class ElementContent(ElementSize):
 
 class LegendTreeNode(Struct):
     title: str
-    isGroup: bool
-    isLegend: bool
+    is_group: bool
+    is_legend: bool
     children: List["LegendTreeNode"]
     icon: Union[str, UnsetType] = UNSET
 
 
 class LegendElement(ElementSize):
-    legendColumns: Annotated[int, Meta()]
-    legendItems: Union[List[LegendTreeNode], UnsetType] = UNSET
+    legend_columns: Annotated[int, Meta()]
+    legend_items: Union[List[LegendTreeNode], UnsetType] = UNSET
 
 
 class MapContent(ElementSize):
@@ -207,13 +207,13 @@ class LegendViewModel(Struct):
 
 
 def to_legend_view_model(legend_node: LegendTreeNode, level: int) -> LegendViewModel:
-    if legend_node.isLegend:
+    if legend_node.is_legend:
         level = level - 1
     return LegendViewModel(
         title=legend_node.title,
         level=level,
-        group=legend_node.isGroup,
-        legend=legend_node.isLegend,
+        group=legend_node.is_group,
+        legend=legend_node.is_legend,
         icon=legend_node.icon,
     )
 
@@ -226,7 +226,10 @@ def handle_legend_node(
         handle_legend_node(child, level + 1, legend_tree)
 
 
-def handle_legend_tree(nodes: List[LegendTreeNode]) -> List[LegendViewModel]:
+def handle_legend_tree(legend: LegendElement) -> List[LegendViewModel]:
+    if legend.legend_items is UNSET:
+        return []
+    nodes: List[LegendTreeNode] = legend.legend_items
     legend_tree: List[LegendViewModel] = []
     for node in nodes:
         handle_legend_node(node, 0, legend_tree)
@@ -241,11 +244,12 @@ def print(request, *, body: PrintBody) -> Response:
         map_image_file.write_bytes(body.map.content)
 
         legend = body.legend
-        legend_info = None
-        if legend is not None:
-            legend_info = handle_legend_tree(legend.legendItems)
-            if not legend.legendColumns:
-                legend.legendColumns = 1
+        legend_tree_items = None
+        if legend is not UNSET:
+            legend_tree_items = handle_legend_tree(legend)
+            if not legend.legend_columns:
+                legend.legend_columns = 1
+        title_map = body.title if body.title is not UNSET else None
 
         index_html = temp_dir / "index.html"
         index_html.write_text(
@@ -258,8 +262,8 @@ def print(request, *, body: PrintBody) -> Response:
                     "map": body.map,
                     "map_image": map_image_file.relative_to(temp_dir),
                     "legend": legend,
-                    "legend_info": legend_info,
-                    "title": body.title,
+                    "legend_tree_items": legend_tree_items,
+                    "title": title_map,
                 },
                 request,
             )
