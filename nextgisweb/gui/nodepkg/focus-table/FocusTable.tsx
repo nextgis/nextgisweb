@@ -2,7 +2,6 @@ import { Fragment, useCallback, useRef, useState } from "react";
 import type { ReactNode } from "react";
 
 import { ActionToolbar } from "@nextgisweb/gui/action-toolbar";
-import { Button } from "@nextgisweb/gui/antd";
 import { mergeClasses } from "@nextgisweb/gui/util";
 
 import { ComplexTree } from "./ComplexTree";
@@ -15,7 +14,7 @@ import type {
     FocusTableStore,
 } from "./type";
 
-import HideDetailIcon from "@nextgisweb/icon/material/arrow_forward";
+import HideDetailIcon from "@nextgisweb/icon/material/right_panel_close";
 
 import "./FocusTable.less";
 
@@ -79,6 +78,7 @@ export function FocusTable<
                     <ActionToolbar
                         actions={tableActionsArray.map(
                             ({ callback, ...props }) => ({
+                                type: "text",
                                 onClick: () =>
                                     callback(selected, environmentRef.current!),
                                 ...props,
@@ -104,27 +104,28 @@ export function FocusTable<
             </div>
             {showDetail && selected && environmentRef.current && (
                 <div className="detail">
-                    <div className="toolbar">
-                        <Button
-                            type="default"
-                            icon={<HideDetailIcon />}
-                            onClick={hideDetail}
+                    {itemActionsArray.length > 0 && (
+                        <ActionToolbar
+                            actions={[
+                                {
+                                    type: "text",
+                                    icon: <HideDetailIcon />,
+                                    onClick: hideDetail,
+                                },
+                            ]}
+                            rightActions={itemActionsArray.map(
+                                ({ callback, ...props }) => ({
+                                    type: "text",
+                                    onClick: () =>
+                                        callback(
+                                            selected,
+                                            environmentRef.current!
+                                        ),
+                                    ...props,
+                                })
+                            )}
                         />
-                        {itemActionsArray.length > 0 && (
-                            <ActionToolbar
-                                actions={itemActionsArray.map(
-                                    ({ callback, ...props }) => ({
-                                        onClick: () =>
-                                            callback(
-                                                selected,
-                                                environmentRef.current!
-                                            ),
-                                        ...props,
-                                    })
-                                )}
-                            />
-                        )}
-                    </div>
+                    )}
                     <Fragment key={environmentRef.current.indexFor(selected)}>
                         {renderDetail({ item: selected })}
                     </Fragment>
