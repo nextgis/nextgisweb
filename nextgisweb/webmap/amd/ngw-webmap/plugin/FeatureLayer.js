@@ -14,7 +14,7 @@ define([
 
         getMenuItem: function () {
             return {
-                icon: "mdi-table-large",
+                icon: "mdi-table_large",
                 title: gettext("Feature table"),
                 onClick: () => {
                     this.openFeatureGrid();

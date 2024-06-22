@@ -199,7 +199,7 @@ def setup_pyramid(comp, config):
                         "feature_layer.feature.browse", id=args.obj.id
                     ),
                     important=True,
-                    icon="mdi-table-large",
+                    icon="mdi-table_large",
                 )
 
         if args.obj.has_export_permission(args.request.user):
