@@ -4,6 +4,7 @@ import { makeAutoObservable, toJS } from "mobx";
 import type { EditorStore } from "@nextgisweb/resource/type";
 import type { ResourceRef } from "@nextgisweb/resource/type/api";
 
+import { VendorParamsStore } from "./VendorParamsStore";
 import type { ImageFormat, StoreValue, WmsClientLayer } from "./type";
 
 export class WmsClientLayerStore
@@ -16,7 +17,7 @@ export class WmsClientLayerStore
     connection: ResourceRef | undefined = undefined;
     wmsLayers: string[] | undefined = undefined;
     imgFormat: ImageFormat | undefined = undefined;
-    vendorParams: Record<string, string> = {};
+    vendorParams: Record<string, string>  = {};
 
     constructor() {
         makeAutoObservable<WmsClientLayerStore, "_initValue">(this, {
@@ -60,7 +61,6 @@ export class WmsClientLayerStore
             const isValuesEqual = !isEqual(value, this._initValue);
             return isValuesEqual;
         }
-
         return false;
     }
 
