@@ -1,5 +1,6 @@
 import { useCallback, useMemo } from "react";
 
+import { AdministratorIcon, RegularUserIcon } from "@nextgisweb/auth/icon";
 import { Alert, Tooltip } from "@nextgisweb/gui/antd";
 import type { TableProps } from "@nextgisweb/gui/antd";
 import { utc } from "@nextgisweb/gui/dayjs";
@@ -11,9 +12,6 @@ import { makeTeamManageButton, default as oauth } from "../oauth";
 
 import { ToggleSelectedUsers } from "./component/ToggleSelectedUsers";
 import type { UserBrowseData } from "./type";
-
-import AdministratorIcon from "@nextgisweb/icon/material/local_police";
-import RegularUserIcon from "@nextgisweb/icon/material/person";
 
 type Col = NonNullable<TableProps["columns"]>[0];
 
@@ -110,7 +108,7 @@ const columns: TableProps["columns"] = [
     createStatusColumn(),
 ];
 
-export function UserBrowse({readonly}: UserBrowseProps) {
+export function UserBrowse({ readonly }: UserBrowseProps) {
     const DisableSelectedUsers = (props: ControlProps<UserBrowseData>) => {
         return ToggleSelectedUsers({ disable: true, ...props });
     };

@@ -1,9 +1,8 @@
 import { Popover } from "@nextgisweb/gui/antd";
 import { CopyToClipboardButton } from "@nextgisweb/gui/buttons";
+import { HelpIcon } from "@nextgisweb/gui/icon";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { url } from "@nextgisweb/pyramid/nextgis";
-
-import HelpOutlineIcon from "@nextgisweb/icon/material/help_outline";
 
 import "./ExternalAccess.less";
 
@@ -50,7 +49,7 @@ const Link = ({ title, help, docsUrl, url }: LinkProps) => (
                 placement="right"
                 content={<Help help={help} docsUrl={docsUrl} />}
             >
-                <HelpOutlineIcon />
+                <HelpIcon />
             </Popover>
         </div>
         <div className="url">

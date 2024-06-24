@@ -2,11 +2,9 @@ import { useContext } from "react";
 import type { CSSProperties, ReactNode } from "react";
 
 import { Tooltip } from "@nextgisweb/gui/antd";
+import { ErrorIcon, HelpIcon } from "@nextgisweb/gui/icon";
 
 import { AreaContext } from "./Area";
-
-import ErrorIcon from "@nextgisweb/icon/material/error_outline";
-import HelpIcon from "@nextgisweb/icon/material/help_outline";
 
 export interface LotProps {
     label?: string | false;

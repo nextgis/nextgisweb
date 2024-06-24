@@ -1,5 +1,6 @@
 import { Button, Dropdown, Space, Tooltip } from "@nextgisweb/gui/antd";
 import type { SizeType } from "@nextgisweb/gui/antd";
+import { ExportIcon } from "@nextgisweb/gui/icon";
 import type { ParamsOf } from "@nextgisweb/gui/type";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import settings from "@nextgisweb/pyramid/settings!feature_layer";
@@ -9,7 +10,6 @@ import type { ExportFeatureLayerOptions } from "../../hook/useExportFeatureLayer
 import type { QueryParams } from "../hook/useFeatureTable";
 
 import FilterIcon from "@nextgisweb/icon/material/filter_alt";
-import ExportIcon from "@nextgisweb/icon/material/save_alt";
 
 type MenuItems = ParamsOf<typeof Dropdown>["menu"];
 

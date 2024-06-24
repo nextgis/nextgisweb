@@ -3,10 +3,9 @@ import { useState } from "react";
 import { Button, Checkbox, Col, Row } from "@nextgisweb/gui/antd";
 import { errorModal } from "@nextgisweb/gui/error";
 import type { ApiError } from "@nextgisweb/gui/error/type";
+import { DeleteIcon } from "@nextgisweb/gui/icon";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-
-import DeleteOutlineIcon from "@nextgisweb/icon/material/delete/outline";
 
 interface DeletePageProps {
     id: number;
@@ -55,7 +54,7 @@ export function DeletePage({ id }: DeletePageProps) {
                         loading={deletingInProgress}
                         disabled={!deleteConfirmed}
                         type="primary"
-                        icon={<DeleteOutlineIcon />}
+                        icon={<DeleteIcon />}
                         onClick={onDeleteClick}
                     >
                         {gettext("Delete")}

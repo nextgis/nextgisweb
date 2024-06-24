@@ -5,6 +5,7 @@ import { PrincipalSelect } from "@nextgisweb/auth/component";
 import { Select, Space } from "@nextgisweb/gui/antd";
 import type { SelectProps } from "@nextgisweb/gui/antd";
 import { EdiTable } from "@nextgisweb/gui/edi-table";
+import { AddIcon } from "@nextgisweb/gui/icon";
 import blueprint from "@nextgisweb/pyramid/api/load!/api/component/resource/blueprint";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
@@ -13,8 +14,6 @@ import type { EditorWidgetComponent, EditorWidgetProps } from "../type";
 
 import type { PermissionStoreItem as Item } from "./PermissionStoreItem";
 import type { PermissionsStore } from "./PermissionsStore";
-
-import AddIcon from "@nextgisweb/icon/material/add_circle_outline";
 
 const { Option, OptGroup } = Select;
 

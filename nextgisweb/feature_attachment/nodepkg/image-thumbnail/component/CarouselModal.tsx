@@ -1,11 +1,10 @@
 import { Modal } from "@nextgisweb/gui/antd";
+import { CloseIcon } from "@nextgisweb/gui/icon";
 import type { ShowModalOptions } from "@nextgisweb/gui/showModal";
 
 import type { DataSource } from "../../attachment-editor/type";
 
 import { CarouselRender } from "./CarouselRender";
-
-import Close from "@nextgisweb/icon/material/close";
 
 import "./CarouselModal.less";
 
@@ -29,7 +28,7 @@ export const CarouselModal = ({
             rootClassName="ngw-feature-attachment-carousel-modal"
             open={open}
             footer={null}
-            closeIcon={<Close />}
+            closeIcon={<CloseIcon />}
             onCancel={close}
             destroyOnClose
             width="100%"

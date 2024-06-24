@@ -2,14 +2,13 @@ import type { UploadFile } from "antd";
 import { useEffect, useMemo, useState } from "react";
 
 import { Button } from "@nextgisweb/gui/antd";
+import { RemoveIcon } from "@nextgisweb/gui/icon";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { FileUploader } from "../file-uploader";
 import type { UploadProps, UploaderMeta } from "../file-uploader/type";
 
 import type { ImageUploaderProps } from "./type";
-
-import DeleteIcon from "@nextgisweb/icon/material/delete";
 
 import "./ImageUploader.less";
 
@@ -92,7 +91,7 @@ export function ImageUploader<M extends boolean = boolean>({
                         shape="round"
                         ghost
                         danger
-                        icon={<DeleteIcon />}
+                        icon={<RemoveIcon />}
                         style={{
                             position: "absolute",
                             top: "10px",

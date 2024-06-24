@@ -7,6 +7,7 @@ import { FileUploaderButton } from "@nextgisweb/file-upload/file-uploader";
 import type { UploaderMeta } from "@nextgisweb/file-upload/file-uploader/type";
 import { ActionToolbar } from "@nextgisweb/gui/action-toolbar";
 import { Button, Input, Table, Upload } from "@nextgisweb/gui/antd";
+import { RemoveIcon } from "@nextgisweb/gui/icon";
 import showModal from "@nextgisweb/gui/showModal";
 import { formatSize } from "@nextgisweb/gui/util";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -16,8 +17,6 @@ import { CarouselModal } from "../image-thumbnail/component/CarouselModal";
 
 import AttachmentEditorStore from "./AttachmentEditorStore";
 import type { DataSource } from "./type";
-
-import DeleteIcon from "@nextgisweb/icon/material/clear";
 
 import "./AttachmentEditor.less";
 
@@ -187,7 +186,7 @@ const AttachmentEditor = observer(
                                         onClick={() => handleDelete(record)}
                                         type="text"
                                         shape="circle"
-                                        icon={<DeleteIcon />}
+                                        icon={<RemoveIcon />}
                                     />
                                 ),
                             },

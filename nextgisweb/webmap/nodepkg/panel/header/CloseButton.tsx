@@ -1,7 +1,7 @@
 import { Button } from "@nextgisweb/gui/antd";
 import type { ButtonProps } from "@nextgisweb/gui/antd";
+import { CloseIcon } from "@nextgisweb/gui/icon";
 
-import CloseIcon from "@nextgisweb/icon/material/close";
 import "./CloseButton.less";
 
 interface CloseButtonProps extends ButtonProps {

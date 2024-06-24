@@ -2,6 +2,7 @@ import { observer } from "mobx-react-lite";
 import { useEffect, useState } from "react";
 
 import { Button, Col, Row, Space, Tooltip } from "@nextgisweb/gui/antd";
+import { CloseIcon, SearchIcon } from "@nextgisweb/gui/icon";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import ResourcesFilter from "../../resources-filter";
@@ -10,9 +11,7 @@ import { ResourcePickerBreadcrumb } from "./ResourcePickerBreadcrumb";
 import type { ResourcePickerTitleProps } from "./type";
 
 import ArrowBack from "@nextgisweb/icon/material/arrow_back";
-import CloseIcon from "@nextgisweb/icon/material/close";
 import StartIcon from "@nextgisweb/icon/material/first_page";
-import SearchIcon from "@nextgisweb/icon/material/search";
 import SyncIcon from "@nextgisweb/icon/material/sync";
 
 const msgGotoInitialGroup = gettext("Go to initial group");

@@ -13,6 +13,7 @@ import type {
     ComponentProps,
     EdiTableColumn,
 } from "@nextgisweb/gui/edi-table/type";
+import { ClearIcon, ExportIcon, ImportIcon } from "@nextgisweb/gui/icon";
 import { parseCsv } from "@nextgisweb/gui/util/parseCsv";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type {
@@ -27,10 +28,6 @@ import {
     recordsToLookup,
     updateItems,
 } from "./util";
-
-import DeleteIcon from "@nextgisweb/icon/material/delete";
-import ImportIcon from "@nextgisweb/icon/material/file_download";
-import ExportIcon from "@nextgisweb/icon/material/file_upload";
 
 import "./EditorWidget.less";
 
@@ -147,7 +144,7 @@ export const EditorWidget: EditorWidgetComponent<
                 rightActions={[
                     {
                         title: msgClear,
-                        icon: <DeleteIcon />,
+                        icon: <ClearIcon />,
                         danger: true,
                         disabled: !store.items.length,
                         onClick: store.clear,

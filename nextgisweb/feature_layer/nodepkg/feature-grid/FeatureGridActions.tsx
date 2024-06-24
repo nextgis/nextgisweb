@@ -8,6 +8,7 @@ import type {
 } from "@nextgisweb/gui/action-toolbar";
 import { Button, Input, Space, Tooltip } from "@nextgisweb/gui/antd";
 import { confirmDelete } from "@nextgisweb/gui/confirm";
+import { DeleteIcon, EditIcon, OpenInNewIcon } from "@nextgisweb/gui/icon";
 import showModal from "@nextgisweb/gui/showModal";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -19,11 +20,6 @@ import type { FeatureGridStore } from "./FeatureGridStore";
 import { deleteFeatures } from "./api/deleteFeatures";
 import { ExportAction } from "./component/ExportAction";
 import type { ActionProps } from "./type";
-
-import DeleteIcon from "@nextgisweb/icon/material/delete";
-import EditIcon from "@nextgisweb/icon/material/edit";
-import EditInNewpageIcon from "@nextgisweb/icon/material/launch";
-import OpenIcon from "@nextgisweb/icon/material/open_in_new";
 
 const msgOpenTitle = gettext("Open");
 const msgDeleteTitle = gettext("Delete");
@@ -98,7 +94,7 @@ export const FeatureGridActions = observer(
                 onClick: () => {
                     goTo("feature_layer.feature.show");
                 },
-                icon: <OpenIcon />,
+                icon: <OpenInNewIcon />,
                 title: msgOpenTitle,
                 disabled: !selectedIds.length,
                 size,
@@ -149,7 +145,7 @@ export const FeatureGridActions = observer(
                                                 "feature_layer.feature.update"
                                             );
                                         }}
-                                        icon={<EditInNewpageIcon />}
+                                        icon={<OpenInNewIcon />}
                                     ></Button>
                                 </Tooltip>
                             )}

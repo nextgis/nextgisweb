@@ -16,6 +16,12 @@ import {
     message,
 } from "@nextgisweb/gui/antd";
 import { errorModal } from "@nextgisweb/gui/error";
+import {
+    AddIcon,
+    DeleteIcon,
+    EditIcon,
+    SearchIcon,
+} from "@nextgisweb/gui/icon";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import type {
     KeysWithMethodAndPath,
@@ -28,10 +34,6 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import type { ApiError } from "../error/type";
 
-import AddCircleIcon from "@nextgisweb/icon/material/add_circle";
-import DeleteForeverIcon from "@nextgisweb/icon/material/delete_forever";
-import EditIcon from "@nextgisweb/icon/material/edit";
-import SearchIcon from "@nextgisweb/icon/material/search";
 import VisibilityIcon from "@nextgisweb/icon/material/visibility";
 
 type TableProps<D> = AntTAbleProps<D>;
@@ -266,7 +268,7 @@ export function ModelBrowse<Data extends ModalBrowseData = ModalBrowseData>({
                                 <Button
                                     type="text"
                                     shape="circle"
-                                    icon={<DeleteForeverIcon />}
+                                    icon={<DeleteIcon />}
                                 />
                             </Popconfirm>
                         </Tooltip>
@@ -297,7 +299,7 @@ export function ModelBrowse<Data extends ModalBrowseData = ModalBrowseData>({
                         </Fragment>
                     ))}
                     <Button
-                        icon={<AddCircleIcon />}
+                        icon={<AddIcon />}
                         onClick={goToCreatePage}
                         {...createProps}
                         type="primary"
@@ -319,7 +321,7 @@ export function ModelBrowse<Data extends ModalBrowseData = ModalBrowseData>({
 
             <Badge count={selected.length} size="small">
                 <Button
-                    icon={<DeleteForeverIcon />}
+                    icon={<DeleteIcon />}
                     onClick={onDeleteSelectedBtnClick}
                     loading={isDeleting}
                     danger

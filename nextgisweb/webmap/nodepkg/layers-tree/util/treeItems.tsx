@@ -1,11 +1,10 @@
 import type { EventDataNode } from "rc-tree/lib/interface";
 
+import { EditIcon } from "@nextgisweb/gui/icon";
 import { getChildrenDeep, getParent } from "@nextgisweb/gui/util/tree";
 
 import type { GroupItem, LayerItem, TreeItem } from "../../type/TreeItems";
 import type { TreeWebmapItem } from "../LayersTree";
-
-import EditIcon from "@nextgisweb/icon/material/edit/outline";
 
 type Node = EventDataNode<TreeWebmapItem>;
 

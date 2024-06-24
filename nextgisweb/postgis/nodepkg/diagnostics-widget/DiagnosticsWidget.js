@@ -2,13 +2,9 @@ import { useEffect, useState } from "react";
 
 import { Skeleton } from "@nextgisweb/gui/antd";
 import { errorModal } from "@nextgisweb/gui/error";
+import * as icon from "@nextgisweb/gui/icon";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-
-import CheckCircleIcon from "@nextgisweb/icon/material/check_circle";
-import ErrorIcon from "@nextgisweb/icon/material/error";
-import MessageIcon from "@nextgisweb/icon/material/message";
-import WarningIcon from "@nextgisweb/icon/material/warning";
 
 import "./DiagnosticsWidget.less";
 
@@ -23,10 +19,10 @@ const statusLength = Math.max(...Object.values(STEXT).map((v) => v.length));
 const statusStyle = { "--status-length": `${statusLength}em` };
 
 const SICON = {
-    [null]: MessageIcon,
-    success: CheckCircleIcon,
-    warning: WarningIcon,
-    error: ErrorIcon,
+    [null]: icon.InfoIcon,
+    success: icon.SuccessIcon,
+    warning: icon.WarningIcon,
+    error: icon.ErrorIcon,
 };
 
 const SIcon = ({ status, ...props }) => {

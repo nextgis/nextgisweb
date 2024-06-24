@@ -14,12 +14,12 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Button, Dropdown, Space } from "@nextgisweb/gui/antd";
 import type { MenuProps, SizeType } from "@nextgisweb/gui/antd";
+import { CloseIcon } from "@nextgisweb/gui/icon";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import type { DojoDisplay } from "../type";
 import type { MapStateControl } from "../type/MapState";
 
-import CloseIcon from "@nextgisweb/icon/material/close/outline";
 import CropFreeIcon from "@nextgisweb/icon/material/crop_free/outline";
 import DrawIcon from "@nextgisweb/icon/material/draw/outline";
 import PolyIcon from "@nextgisweb/icon/material/hexagon/outline";

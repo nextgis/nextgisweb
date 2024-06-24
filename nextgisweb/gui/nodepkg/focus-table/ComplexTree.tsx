@@ -17,6 +17,7 @@ import type {
 import { Button, Tooltip } from "@nextgisweb/gui/antd";
 import type { ButtonProps } from "@nextgisweb/gui/antd";
 import { useThemeVariables } from "@nextgisweb/gui/hook";
+import { ErrorIcon } from "@nextgisweb/gui/icon";
 import { mergeClasses } from "@nextgisweb/gui/util";
 
 import { ROOT_DATA, ROOT_ITEM, useDataProvider } from "./DataProvider";
@@ -28,7 +29,6 @@ import type {
     FocusTableStore,
 } from "./type";
 
-import ErrorIcon from "@nextgisweb/icon/material/error_outline";
 import ArrowIcon from "@nextgisweb/icon/material/keyboard_arrow_right";
 
 import "./ComplexTree.less";

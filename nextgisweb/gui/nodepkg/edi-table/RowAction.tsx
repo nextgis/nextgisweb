@@ -1,6 +1,7 @@
 import type { AnyObject } from "antd/lib/_util/type";
 import { observer } from "mobx-react-lite";
 
+import { CloneIcon, ErrorIcon, RemoveIcon } from "@nextgisweb/gui/icon";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { Button, Tooltip } from "../antd";
@@ -8,10 +9,6 @@ import type { ButtonProps } from "../antd";
 
 import type { EdiTableStore } from "./EdiTableStore";
 import type { FunctionKeys } from "./type";
-
-import DeleteIcon from "@nextgisweb/icon/material/clear";
-import CloneIcon from "@nextgisweb/icon/material/copy_all";
-import ErrorIcon from "@nextgisweb/icon/material/error";
 
 export interface RowActionConfig<T> {
     callback: T;
@@ -79,6 +76,6 @@ export const WELLKNOWN_ROW_ACTIONS: Record<
     delete: {
         callback: "deleteRow",
         title: gettext("Delete"),
-        icon: <DeleteIcon />,
+        icon: <RemoveIcon />,
     },
 };

@@ -4,13 +4,12 @@ import type {
     FocusTableItem,
     FocusTableStore,
 } from "@nextgisweb/gui/focus-table";
+import { AddIcon } from "@nextgisweb/gui/icon";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { CompositeRead } from "@nextgisweb/resource/type/api";
 
 import { showResourcePicker } from "./showResourcePicker";
 import type { ResourcePickerStoreOptions } from "./type";
-
-import AddIcon from "@nextgisweb/icon/material/add_circle_outline";
 
 interface PickToFocusTableOptions<I>
     extends Partial<Omit<FocusTableAction<I>, "callback">> {

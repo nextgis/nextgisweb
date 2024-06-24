@@ -11,6 +11,7 @@ import {
     Tooltip,
 } from "@nextgisweb/gui/antd";
 import type { TableProps } from "@nextgisweb/gui/antd";
+import { OpenInNewIcon, SearchIcon } from "@nextgisweb/gui/icon";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -18,8 +19,6 @@ import settings from "@nextgisweb/pyramid/settings!spatial_ref_sys";
 import type { SRSRead } from "@nextgisweb/spatial-ref-sys/type/api";
 
 import InputOutlineIcon from "@nextgisweb/icon/material/input";
-import OpenInNewIcon from "@nextgisweb/icon/material/open_in_new";
-import SearchIcon from "@nextgisweb/icon/material/search";
 
 interface Query {
     q?: string;

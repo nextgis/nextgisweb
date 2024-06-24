@@ -2,6 +2,7 @@ import uniq from "lodash-es/uniq";
 import { useCallback, useEffect, useState } from "react";
 
 import { Button, Space, Table } from "@nextgisweb/gui/antd";
+import { RemoveIcon } from "@nextgisweb/gui/icon";
 import type { ParamsOf } from "@nextgisweb/gui/type";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
@@ -15,7 +16,6 @@ import type { SelectValue } from "../resource-picker/type";
 
 import type { ResourceSelectProps } from "./type";
 
-import DeleteIcon from "@nextgisweb/icon/material/delete";
 import ManageSearchIcon from "@nextgisweb/icon/material/manage_search";
 
 type TableProps = ParamsOf<typeof Table>;
@@ -142,7 +142,7 @@ const ResourceSelectMultiple = ({
                         <Button
                             disabled={!selectedRowKeys.length}
                             onClick={removeSelected}
-                            icon={<DeleteIcon />}
+                            icon={<RemoveIcon />}
                         />
                         <Button onClick={onClick} icon={<ManageSearchIcon />} />
                     </Space>
