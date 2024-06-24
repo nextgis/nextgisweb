@@ -1,4 +1,3 @@
-/* eslint-disable no-use-before-define */
 import difference from "lodash-es/difference";
 import { makeObservable, observable, observe } from "mobx";
 

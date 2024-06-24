@@ -14,7 +14,6 @@ export type RouteName = keyof RouteParameters;
 export type GetRouteParam<R extends RouteName> = (RouteParameters[R] &
     [object])[0];
 
-// eslint-disable-next-line no-use-before-define
 export type RequestMethod = keyof RouteMethods<RouteName>;
 
 export type Method = RequestMethod | Uppercase<RequestMethod>;

@@ -1,4 +1,3 @@
-/* eslint-disable no-use-before-define */
 import { makeObservable } from "mobx";
 
 import { mapper, validate } from "@nextgisweb/gui/arm";

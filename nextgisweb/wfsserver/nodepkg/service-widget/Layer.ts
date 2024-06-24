@@ -1,4 +1,3 @@
-/* eslint-disable no-use-before-define */
 import { mapper, validate } from "@nextgisweb/gui/arm";
 import type { ErrorResult } from "@nextgisweb/gui/arm";
 import type { WFSServerLayer } from "@nextgisweb/wfsserver/type/api";

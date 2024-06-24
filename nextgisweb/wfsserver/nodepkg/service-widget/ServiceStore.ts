@@ -1,4 +1,3 @@
-/* eslint-disable no-use-before-define */
 import { makeObservable, observable, observe } from "mobx";
 
 import type { FocusTableStore } from "@nextgisweb/gui/focus-table";

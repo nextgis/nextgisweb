@@ -138,10 +138,12 @@ const config = {
                 "plugin:prettier/recommended",
             ],
             rules: {
+                "no-use-before-define": "off",
                 "prettier/prettier": "warn",
                 "react/prop-types": "off", // Use TypeScript instead
                 "react/jsx-no-target-blank": "off", // Unsupported browsers
                 "@typescript-eslint/no-explicit-any": "warn",
+                "@typescript-eslint/no-use-before-define": "warn",
                 "@typescript-eslint/no-unused-vars": [
                     "error",
                     {

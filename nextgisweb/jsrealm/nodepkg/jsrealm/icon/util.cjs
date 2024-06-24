@@ -1,9 +1,27 @@
-/* eslint-disable no-use-before-define */
 const fs = require("fs");
 const glob = require("glob");
 const path = require("path");
 
 const PKG_ICON = "@nextgisweb/icon/";
+
+function pkgPath(pkg, pth) {
+    const base = require.resolve(pkg + "/package.json");
+    return path.resolve(base, "..", pth);
+}
+
+const materialSymbolsBase = pkgPath("@material-symbols/svg-500", "outlined");
+const materialIconsBase = pkgPath("@material-icons/svg", "svg");
+const mdiBase = pkgPath("@mdi/svg", "svg");
+
+// Material Icons contains lots of '*_outline/baseline' icons instead of
+// '*/outline', so we need to remap them to use same names as Symbols.
+const materialIconsRemap = {};
+const stem = (fn) => fn.replace(/.*\/([^/]+\/[^/]+)\.svg$/, "$1");
+for (const fn of glob.sync(materialIconsBase + "/*_outline/outline.svg")) {
+    const fl = fn.replace(/_outline\/outline.svg$/, "/outline.svg");
+    materialIconsRemap[stem(fl)] = stem(fn);
+}
+
 const COLLECTIONS = {
     "material": (name, ctx) => {
         if (!/^[0-9a-z_]+(\/(outline|fill))?$/.test(name)) return undefined;
@@ -40,25 +58,10 @@ const COLLECTIONS = {
     },
 };
 
-function pkgPath(pkg, pth) {
-    const base = require.resolve(pkg + "/package.json");
-    return path.resolve(base, "..", pth);
-}
-
-const materialSymbolsBase = pkgPath("@material-symbols/svg-500", "outlined");
-const materialIconsBase = pkgPath("@material-icons/svg", "svg");
-const mdiBase = pkgPath("@mdi/svg", "svg");
-
-// Material Icons contains lots of '*_outline/baseline' icons instead of
-// '*/outline', so we need to remap them to use same names as Symbols.
-const materialIconsRemap = {};
-const stem = (fn) => fn.replace(/.*\/([^/]+\/[^/]+)\.svg$/, "$1");
-for (const fn of glob.sync(materialIconsBase + "/*_outline/outline.svg")) {
-    const fl = fn.replace(/_outline\/outline.svg$/, "/outline.svg");
-    materialIconsRemap[stem(fl)] = stem(fn);
-}
-
 exports.COLLECTIONS = COLLECTIONS;
+
+const iconFnToSymbolId = {};
+exports.symbolId = (fn) => iconFnToSymbolId[fn];
 
 exports.IconResolverPlugin = class IconResolverPlugin {
     apply(resolver) {
@@ -85,6 +88,3 @@ exports.IconResolverPlugin = class IconResolverPlugin {
         resolver.getHook("resolve").tapAsync("IconResolverPlugin", hook);
     }
 };
-
-const iconFnToSymbolId = {};
-exports.symbolId = (fn) => iconFnToSymbolId[fn];

@@ -1,5 +1,4 @@
 /** @testentry react */
-/* eslint-disable no-use-before-define */
 import * as falso from "@ngneat/falso";
 import { makeObservable, override } from "mobx";
 import type { IObservableArray } from "mobx";
@@ -83,7 +82,8 @@ class Group extends Base<"group", Omit<GroupPayload, "children">> {
             children.map((item) =>
                 item.type === "group"
                     ? new Group(this.store, item)
-                    : new Layer(this.store, item)
+                    : // eslint-disable-next-line @typescript-eslint/no-use-before-define
+                      new Layer(this.store, item)
             )
         );
     }
