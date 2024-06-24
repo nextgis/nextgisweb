@@ -336,7 +336,7 @@ def _get_map(obj, params, request):
                     src_ds = dst_ds = None
 
             if limg is not None:
-                img.paste(limg, (0, 0), limg)
+                img = Image.alpha_composite(img, limg)
 
     buf = BytesIO()
 
