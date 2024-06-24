@@ -253,9 +253,12 @@ class Layer(Base, Resource, SpatialLayerMixin):
         if response.status_code == 200:
             data = BytesIO(response.content)
             try:
-                return PIL.Image.open(data)
+                img = PIL.Image.open(data)
             except IOError:
                 raise ExternalServiceError("Image processing error.")
+            if img.mode != "RGBA":
+                img = img.convert("RGBA")
+            return img
         elif response.status_code in (204, 404):
             return None
         else:
