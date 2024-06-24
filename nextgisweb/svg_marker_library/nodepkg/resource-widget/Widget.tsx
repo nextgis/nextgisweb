@@ -14,8 +14,8 @@ import type {
 
 import type { File, Store } from "./Store";
 
-import ClearIcon from "@nextgisweb/icon/mdi/close";
-import ArchiveIcon from "@nextgisweb/icon/mdi/zip-box";
+import ClearIcon from "@nextgisweb/icon/material/close";
+import ArchiveIcon from "@nextgisweb/icon/material/folder_zip";
 
 import "./Widget.less";
 

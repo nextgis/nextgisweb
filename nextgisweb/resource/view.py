@@ -415,7 +415,7 @@ def setup_pyramid(comp, config):
                 _("Delete"),
                 lambda args: args.request.route_url("resource.delete", id=args.obj.id),
                 important=True,
-                icon="material-delete_forever",
+                icon="material-delete",
             )
 
         if PERM_READ in permissions:

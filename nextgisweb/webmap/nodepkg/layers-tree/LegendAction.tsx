@@ -4,8 +4,8 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import type { TreeItem } from "../type/TreeItems";
 
-import ExpandLessIcon from "@nextgisweb/icon/material/expand_less/outline";
-import ViewListIcon from "@nextgisweb/icon/material/view_list/outline";
+import CollapseIcon from "@nextgisweb/icon/material/keyboard_arrow_up/outline";
+import ExpandIcon from "@nextgisweb/icon/material/view_list/outline";
 
 const msgShowLegend = gettext("Show legend");
 const msgHideLegend = gettext("Hide legend");
@@ -23,7 +23,7 @@ export function LegendAction({
     }
 
     const { open } = nodeData.legendInfo;
-    const icon = open ? <ExpandLessIcon /> : <ViewListIcon />;
+    const icon = open ? <CollapseIcon /> : <ExpandIcon />;
 
     const click = (evt: MouseEvent) => {
         evt.stopPropagation();

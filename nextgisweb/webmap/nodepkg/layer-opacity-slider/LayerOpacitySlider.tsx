@@ -1,7 +1,7 @@
 import { Slider, Tooltip } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import Icon from "@nextgisweb/icon/mdi/circle-opacity";
+import OpacityIcon from "@nextgisweb/icon/material/opacity";
 
 import "./LayerOpacitySlider.less";
 
@@ -17,7 +17,7 @@ export function LayerOpacitySlider({
     return (
         <div className="ngw-webmap-layer-opacity-slider">
             <Tooltip title={msgTooltip}>
-                <Icon />
+                <OpacityIcon />
             </Tooltip>
             <Slider
                 defaultValue={defaultValue}

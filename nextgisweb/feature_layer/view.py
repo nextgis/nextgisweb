@@ -199,7 +199,7 @@ def setup_pyramid(comp, config):
                         "feature_layer.feature.browse", id=args.obj.id
                     ),
                     important=True,
-                    icon="mdi-table_large",
+                    icon="material-table",
                 )
 
         if args.obj.has_export_permission(args.request.user):
@@ -207,7 +207,7 @@ def setup_pyramid(comp, config):
                 "feature_layer/export",
                 _("Save as"),
                 lambda args: args.request.route_url("resource.export.page", id=args.obj.id),
-                icon="material-save_alt",
+                icon="material-download",
             )
 
     @resource_sections(title=_("Attributes"))

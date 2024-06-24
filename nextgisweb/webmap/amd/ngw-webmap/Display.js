@@ -1000,7 +1000,7 @@ define([
                         title: gettext("Description"),
                         name: "info",
                         order: 40,
-                        menuIcon: "material-info-outline",
+                        menuIcon: "material-info",
                         applyToTinyMap: true,
                     },
                 };
@@ -1071,7 +1071,7 @@ define([
                     title: gettext("Annotations"),
                     name: "annotation",
                     order: 30,
-                    menuIcon: "material-message",
+                    menuIcon: "material-chat",
                     applyToTinyMap: true,
                 },
             };

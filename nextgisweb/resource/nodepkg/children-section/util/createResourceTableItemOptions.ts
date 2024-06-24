@@ -21,7 +21,7 @@ export function createResourceTableItemOptions(
             {
                 href: "",
                 title: msgDelete,
-                icon: "material-delete_forever",
+                icon: "material-delete",
                 key: ["operation", "20-delete"],
             },
         ],

@@ -13,9 +13,9 @@ import type { ResourcePickerStore } from "./store/ResourcePickerStore";
 import type { ResourcePickerFooterProps, SelectValue } from "./type";
 
 import ArrowBack from "@nextgisweb/icon/material/arrow_back";
+import HighlightOff from "@nextgisweb/icon/material/cancel";
+import DoneIcon from "@nextgisweb/icon/material/check";
 import CreateNewFolder from "@nextgisweb/icon/material/create_new_folder";
-import DoneIcon from "@nextgisweb/icon/material/done";
-import HighlightOff from "@nextgisweb/icon/material/highlight_off";
 
 interface CreateControlProps {
     resourceStore: ResourcePickerStore;

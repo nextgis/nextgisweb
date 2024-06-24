@@ -2,8 +2,8 @@ import type { SVGProps } from "react";
 
 import { SvgIcon } from "@nextgisweb/gui/svg-icon";
 
-import MAllowIcon from "@nextgisweb/icon/material/check_circle";
-import MDenyIcon from "@nextgisweb/icon/material/remove_circle";
+import MAllowIcon from "@nextgisweb/icon/material/check_circle/fill";
+import MDenyIcon from "@nextgisweb/icon/material/do_not_disturb_on/fill";
 
 export function ResourceIcon({
     identity,

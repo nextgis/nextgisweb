@@ -13,7 +13,7 @@ define([
             this.label = i18n.gettext("Delete features");
             this.customIcon =
                 '<span class="ol-control__icon">' +
-                icon.html({ glyph: "delete_forever" }) +
+                icon.html({ glyph: "delete" }) +
                 "</span>";
         },
 

@@ -62,11 +62,11 @@ def setup_pyramid(comp, config):
                 "raster_layer/export",
                 _("Save as"),
                 lambda args: args.request.route_url("resource.export.page", id=args.obj.id),
-                icon="material-save_alt",
+                icon="material-download",
             )
             yield dm.Link(
                 "raster_layer/download",
                 _("Download"),
                 lambda args: args.request.route_url("raster_layer.download", id=args.obj.id),
-                icon="material-download",
+                icon="material-download_for_offline",
             )

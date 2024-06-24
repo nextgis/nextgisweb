@@ -1,6 +1,6 @@
 [
     "data_object",
-    "delete_forever",
+    "delete",
     "edit",
     "key",
     "search"
