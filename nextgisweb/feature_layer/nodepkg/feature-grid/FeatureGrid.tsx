@@ -67,7 +67,8 @@ export const FeatureGrid = observer(
 
         useEffect(() => {
             if (resourceData) {
-                const fields = (resourceData.feature_layer as FeatureLayer)?.fields;
+                const fields = (resourceData.feature_layer as FeatureLayer)
+                    ?.fields;
                 if (fields) {
                     store.setFields(fields);
                     store.setVisibleFields([

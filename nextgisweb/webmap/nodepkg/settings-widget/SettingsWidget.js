@@ -111,8 +111,6 @@ export const SettingsWidget = observer(({ store }) => {
                 <Option value="messages">{gettext("With messages")}</Option>
             </Select>
 
-
-
             <label>{gettext("Measurement SRS")}</label>
             <SrsSelect
                 srsId={store.measureSrs}

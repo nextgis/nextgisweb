@@ -50,7 +50,7 @@ export class PanelsManager {
         display: DojoDisplay,
         activePanelKey: string | undefined,
         allowPanels: string[] | undefined,
-        onChangePanel: (panel?: PanelDojoItem) => void,
+        onChangePanel: (panel?: PanelDojoItem) => void
     ) {
         this._display = display;
         this._activePanelKey = activePanelKey;

@@ -13,7 +13,7 @@ interface GroupBrowseProps {
     readonly: boolean;
 }
 
-export function GroupBrowse({readonly}: GroupBrowseProps) {
+export function GroupBrowse({ readonly }: GroupBrowseProps) {
     const columns: TableProps["columns"] = [
         {
             title: gettext("Full name"),

@@ -44,6 +44,5 @@ export function getRasterSymbolizerValues({
             greenChannel: symbolizer.channels.green.source_channel - 1,
             blueChannel: symbolizer.channels.blue.source_channel - 1,
         };
-
     }
 }

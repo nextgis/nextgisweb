@@ -8,8 +8,8 @@ define(function () {
                             ? "W"
                             : "S"
                         : options.lon
-                        ? "E"
-                        : "N",
+                          ? "E"
+                          : "N",
                 deg: parseInt(value < 0 ? (value = -value) : value),
                 min: parseInt((value % 1) * 60),
                 sec: parseInt(((value * 60) % 1) * 60 * 100) / 100,
@@ -36,8 +36,8 @@ define(function () {
                             ? "W"
                             : "S"
                         : options.lon
-                        ? "E"
-                        : "N",
+                          ? "E"
+                          : "N",
                 deg: parseInt(value < 0 ? (value = -value) : value),
                 min: parseInt((value % 1) * 60 * 100) / 100,
             };

@@ -95,7 +95,9 @@ define([
                                             .get()
                                             .then(
                                                 function (response) {
-                                                    this._updateStore(response.layers);
+                                                    this._updateStore(
+                                                        response.layers
+                                                    );
                                                 }.bind(this)
                                             );
                                     } else {

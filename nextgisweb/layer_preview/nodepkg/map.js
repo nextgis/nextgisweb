@@ -57,8 +57,8 @@ export default ({ target, resource, source_type, extent }) => {
         source_type === "geojson"
             ? createGeoJsonLayer(resource)
             : source_type === "geotiff"
-            ? createGeoTIFFLayer(resource)
-            : createXYZLayer(resource)
+              ? createGeoTIFFLayer(resource)
+              : createXYZLayer(resource)
     );
 
     if (extent) {

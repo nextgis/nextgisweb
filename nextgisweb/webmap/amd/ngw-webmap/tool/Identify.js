@@ -451,7 +451,7 @@ define([
                         function (i) {
                             var item =
                                 this.display._itemConfigById[
-                                this.display.itemStore.getValue(i, "id")
+                                    this.display.itemStore.getValue(i, "id")
                                 ];
                             if (
                                 !item.identifiable ||
