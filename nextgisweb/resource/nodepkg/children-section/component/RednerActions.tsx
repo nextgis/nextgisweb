@@ -4,8 +4,10 @@ import { SvgIconLink } from "@nextgisweb/gui/svg-icon";
 import type { SvgIconLink as SvgIconLinkProps } from "@nextgisweb/gui/svg-icon/type";
 import { route } from "@nextgisweb/pyramid/api";
 
-import type { ChildrenResource } from "../type";
-import type { ChildrenResourceAction as Action } from "../type";
+import type {
+    ChildrenResourceAction as Action,
+    ChildrenResource,
+} from "../type";
 import { isDeleteAction } from "../util/isDeleteAction";
 import { confirmThenDelete, notifySuccessfulDeletion } from "../util/notify";
 

@@ -66,6 +66,7 @@ const config = {
         ],
         "sort-imports": ["warn", { "ignoreDeclarationSort": true }],
         "@typescript-eslint/consistent-type-imports": "warn",
+        "import/no-duplicates": ["warn"],
         "import/consistent-type-specifier-style": ["warn", "prefer-top-level"],
         "import/first": "warn",
         "import/newline-after-import": "warn",

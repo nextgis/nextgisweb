@@ -1,6 +1,5 @@
 import type Map from "ol/Map";
-import { Control } from "ol/control";
-import { ScaleLine } from "ol/control";
+import { Control, ScaleLine } from "ol/control";
 import { getPointResolution } from "ol/proj";
 import Units from "ol/proj/Units";
 
