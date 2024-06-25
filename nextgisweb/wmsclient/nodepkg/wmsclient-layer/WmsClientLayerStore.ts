@@ -1,10 +1,9 @@
 import isEqual from "lodash-es/isEqual";
-import { makeAutoObservable, toJS } from "mobx";
+import { makeAutoObservable, toJS, action } from "mobx";
 
 import type { EditorStore } from "@nextgisweb/resource/type";
 import type { ResourceRef } from "@nextgisweb/resource/type/api";
 
-import { VendorParamsStore } from "./VendorParamsStore";
 import type { ImageFormat, StoreValue, WmsClientLayer } from "./type";
 
 export class WmsClientLayerStore

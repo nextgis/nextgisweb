@@ -77,8 +77,11 @@ export function VendorParamsModal({
     open: open_,
     ...props
 }: any & ShowModalOptions) {
-    const store = new VendorParamsStore();
-    store.load(value);
+    const [store] = useState(() => {
+        const store_ = new VendorParamsStore();
+        store_.load(value);
+        return store_;
+    });
 
     const [modal] = Modal.useModal();
     const [open, setOpen] = useState(open_);
@@ -87,20 +90,12 @@ export function VendorParamsModal({
         setOpen(false);
     };
 
-    const handleComfirm = () => {
-        const value = store.dump();
-        onChange(value);
-        close();
-    };
-
     const handleClose = () => {
         if (store.dirty) {
-            modal.confirm({
-                title: "confirm",
-                content: "are you sure",
-                onOk: handleComfirm,
-                onCancel: () => {},
-            });
+            const value = store.dump();
+            onChange(value);
+            close();
+
         } else {
             close();
         }
