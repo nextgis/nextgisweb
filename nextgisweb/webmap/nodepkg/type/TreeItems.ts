@@ -1,3 +1,4 @@
+/* eslint-disable no-use-before-define */
 interface BaseItem {
     id: number;
     key: number;
@@ -43,15 +44,15 @@ export interface LayerItem extends BaseItem {
     styleId: number;
     visibility: boolean;
     identifiable: boolean;
-    transparency: unknown;
-    minScaleDenom: unknown;
-    maxScaleDenom: unknown;
-    drawOrderPosition: unknown;
+    transparency: number | null;
+    minScaleDenom: number | null;
+    maxScaleDenom: number | null;
+    drawOrderPosition: number | null;
     legendInfo: LegendInfo;
     adapter: string;
     plugin: Record<string, unknown>;
-    minResolution: unknown;
-    maxResolution: unknown;
+    minResolution: number | null;
+    maxResolution: number | null;
     editable?: boolean;
 }
 

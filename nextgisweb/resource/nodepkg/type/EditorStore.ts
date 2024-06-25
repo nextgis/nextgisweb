@@ -15,14 +15,14 @@ export interface EditorStoreOptions {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export interface EditorStore<V = any> {
+export interface EditorStore<V = any, D = V> {
     identity?: string;
 
     uploading?: boolean;
 
     load: (value: V) => unknown;
 
-    dump: (val: DumpParams) => V;
+    dump: (val: DumpParams) => D;
 
     isValid?: boolean;
 

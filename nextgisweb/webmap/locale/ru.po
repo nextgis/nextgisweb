@@ -26,7 +26,7 @@ msgstr "Поиск"
 msgid "Print map"
 msgstr "Распечатать карту"
 
-#: amd/ngw-webmap/Display.js:982
+#: amd/ngw-webmap/Display.js:982 nodepkg/settings-widget/SettingsWidget.tsx:109
 msgid "Bookmarks"
 msgstr "Закладки"
 
@@ -38,17 +38,13 @@ msgstr "Описание"
 msgid "Share"
 msgstr "Поделиться"
 
-#: amd/ngw-webmap/Display.js:1071
+#: amd/ngw-webmap/Display.js:1071 nodepkg/settings-widget/SettingsWidget.tsx:90
 msgid "Annotations"
 msgstr "Аннотации"
 
 #: amd/ngw-webmap/Display.js:1116
 msgid "Open full map"
 msgstr "Открыть карту целиком"
-
-#: amd/ngw-webmap/ExtentWidget.js:37
-msgid "Extent and bookmarks"
-msgstr "Охват и закладки"
 
 #: amd/ngw-webmap/ItemWidget.js:97 amd/ngw-webmap/template/ItemWidget.hbs:40
 msgid "Layer order"
@@ -75,32 +71,31 @@ msgstr "Определить местоположение не удалось"
 
 #: amd/ngw-webmap/form/LegendSymbolsSelect.js:7
 #: nodepkg/panel/print/PrintPanel.tsx:478
-#: nodepkg/settings-widget/SettingsWidget.js:124
+#: nodepkg/settings-widget/SettingsWidget.tsx:78
 #: nodepkg/settings/SettingsForm.js:277
 msgid "Legend"
 msgstr "Легенда"
 
 #: amd/ngw-webmap/form/LegendSymbolsSelect.js:9
-#: nodepkg/settings-widget/SettingsWidget.js:68
-#: nodepkg/settings-widget/SettingsWidget.js:130
+#: nodepkg/settings-widget/SettingsWidget.tsx:84
 #: nodepkg/settings/select-options.js:92
 msgid "Default"
 msgstr "По умолчанию"
 
 #: amd/ngw-webmap/form/LegendSymbolsSelect.js:10
-#: nodepkg/settings-widget/SettingsWidget.js:134
+#: nodepkg/settings-widget/SettingsWidget.tsx:28
 #: nodepkg/settings/select-options.js:93
 msgid "Expand"
 msgstr "Развернуть"
 
 #: amd/ngw-webmap/form/LegendSymbolsSelect.js:11
-#: nodepkg/settings-widget/SettingsWidget.js:135
+#: nodepkg/settings-widget/SettingsWidget.tsx:29
 #: nodepkg/settings/select-options.js:94
 msgid "Collapse"
 msgstr "Свернуть"
 
 #: amd/ngw-webmap/form/LegendSymbolsSelect.js:12
-#: nodepkg/settings-widget/SettingsWidget.js:136
+#: nodepkg/settings-widget/SettingsWidget.tsx:30
 #: nodepkg/settings/select-options.js:95
 msgid "Disable"
 msgstr "Отключить"
@@ -143,62 +138,6 @@ msgstr "Редактировать"
 msgid "Zoom to layer"
 msgstr "Увеличить до слоя"
 
-#: amd/ngw-webmap/template/ExtentWidget.hbs:5
-msgid "Select vector layer"
-msgstr "Выберите векторный слой"
-
-#: amd/ngw-webmap/template/ExtentWidget.hbs:6
-msgid "Bookmark resource"
-msgstr "Ресурс закладок"
-
-#: amd/ngw-webmap/template/ExtentWidget.hbs:12
-msgid "Web map will start at this extent"
-msgstr "Веб-карта будет открываться с этим охватом"
-
-#: amd/ngw-webmap/template/ExtentWidget.hbs:12
-#: nodepkg/map-controls/map-controls.ts:107
-#: nodepkg/map-controls/map-controls.ts:110
-msgid "Initial extent"
-msgstr "Начальный охват"
-
-#: amd/ngw-webmap/template/ExtentWidget.hbs:14
-#: amd/ngw-webmap/template/ExtentWidget.hbs:41
-msgid "Set from layer"
-msgstr "Установить по слою"
-
-#: amd/ngw-webmap/template/ExtentWidget.hbs:16
-#: amd/ngw-webmap/template/ExtentWidget.hbs:43
-msgid "Select layer"
-msgstr "Выберите слой"
-
-#: amd/ngw-webmap/template/ExtentWidget.hbs:21
-#: amd/ngw-webmap/template/ExtentWidget.hbs:48
-msgid "Left, deg."
-msgstr "Лево, град."
-
-#: amd/ngw-webmap/template/ExtentWidget.hbs:25
-#: amd/ngw-webmap/template/ExtentWidget.hbs:52
-msgid "Bottom, deg."
-msgstr "Низ, град."
-
-#: amd/ngw-webmap/template/ExtentWidget.hbs:29
-#: amd/ngw-webmap/template/ExtentWidget.hbs:56
-msgid "Right, deg."
-msgstr "Право, град."
-
-#: amd/ngw-webmap/template/ExtentWidget.hbs:33
-#: amd/ngw-webmap/template/ExtentWidget.hbs:60
-msgid "Top, deg."
-msgstr "Верх, град."
-
-#: amd/ngw-webmap/template/ExtentWidget.hbs:39
-msgid "Web map will not allow to move outside of this extent"
-msgstr "На веб-карте нельзя будет выйти за этот охват"
-
-#: amd/ngw-webmap/template/ExtentWidget.hbs:39
-msgid "Constraining extent"
-msgstr "Ограничивающий охват"
-
 #: amd/ngw-webmap/template/ItemWidget.hbs:14
 msgid "Add layer"
 msgstr "Добавить слой"
@@ -213,7 +152,7 @@ msgstr "Удалить"
 
 #: amd/ngw-webmap/template/ItemWidget.hbs:71
 #: amd/ngw-webmap/template/ItemWidget.hbs:128
-#: nodepkg/clone-webmap/CloneWebmap.tsx:75
+#: nodepkg/clone-webmap/CloneWebmap.tsx:84
 msgid "Display name"
 msgstr "Наименование"
 
@@ -395,7 +334,7 @@ msgstr "Не сохранять"
 msgid "Main web map"
 msgstr "Основная веб-карта"
 
-#: model.py:29 model.py:48 view.py:326 view.py:353
+#: model.py:29 model.py:48 view.py:320 view.py:347
 msgid "Web map"
 msgstr "Веб-карта"
 
@@ -419,67 +358,67 @@ msgctxt "permission"
 msgid "Manage annotations"
 msgstr "Управление аннотациями"
 
-#: nodepkg/clone-webmap/CloneWebmap.tsx:21 view.py:341
+#: nodepkg/clone-webmap/CloneWebmap.tsx:21 view.py:335
 msgid "Clone"
 msgstr "Клонировать"
 
-#: nodepkg/clone-webmap/CloneWebmap.tsx:61
+#: nodepkg/clone-webmap/CloneWebmap.tsx:77
 msgid "Resource group"
 msgstr "Группа ресурсов"
 
-#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:62
+#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:61
 msgid "Radius:"
 msgstr "Радиус"
 
-#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:63
+#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:62
 #: nodepkg/utils/format-units.tsx:13
 msgid "m"
 msgstr "м"
 
-#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:83
+#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:82
 msgid "Circle"
 msgstr "Окружность"
 
-#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:90
+#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:89
 #: nodepkg/panel/annotations/AnnotationsPanel.js:109
 msgid "Line"
 msgstr "Линия"
 
-#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:96
+#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:95
 msgid "Rectangle"
 msgstr "Прямоугольник"
 
-#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:103
+#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:102
 #: nodepkg/panel/annotations/AnnotationsPanel.js:113
 #: nodepkg/utils/geometry-types.ts:15
 msgid "Polygon"
 msgstr "Полигон"
 
-#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:121
+#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:120
 msgid "Hide"
 msgstr "Скрыть"
 
-#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:121
+#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:120
 msgid "Show"
 msgstr "Показать"
 
-#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:126
+#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:125
 msgid "Zoom to filtering geometry"
 msgstr "Увеличить"
 
-#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:131
+#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:130
 msgid "Clear filtering geometry"
 msgstr "Очистить"
 
-#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:137
+#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:136
 msgid "Draw filtering geometry"
 msgstr "Нарисовать геометрию для фильтра"
 
-#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:138
+#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:137
 msgid "Change filtering geometry"
 msgstr "Изменить геометрию для фильтра"
 
-#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:139
+#: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:138
 msgid "Stop drawing..."
 msgstr "Остановить рисование"
 
@@ -510,6 +449,12 @@ msgstr "Линейка масштаба"
 #: nodepkg/map-controls/map-controls.ts:97
 msgid "Info scale"
 msgstr "Числовой масштаб"
+
+#: nodepkg/map-controls/map-controls.ts:107
+#: nodepkg/map-controls/map-controls.ts:110
+#: nodepkg/settings-widget/SettingsWidget.tsx:54
+msgid "Initial extent"
+msgstr "Начальный охват"
 
 #: nodepkg/map-controls/map-controls.ts:120
 #: nodepkg/map-controls/map-controls.ts:123
@@ -550,22 +495,18 @@ msgid "Annotations layer"
 msgstr "Слой аннотаций"
 
 #: nodepkg/panel/annotations/AnnotationsPanel.js:138
-#: nodepkg/settings-widget/SettingsWidget.js:99
 msgid "Show annotations"
 msgstr "Показывать аннотации"
 
 #: nodepkg/panel/annotations/AnnotationsPanel.js:144
-#: nodepkg/settings-widget/SettingsWidget.js:109
 msgid "No"
 msgstr "Нет"
 
 #: nodepkg/panel/annotations/AnnotationsPanel.js:145
-#: nodepkg/settings-widget/SettingsWidget.js:110
 msgid "Yes"
 msgstr "Да"
 
 #: nodepkg/panel/annotations/AnnotationsPanel.js:148
-#: nodepkg/settings-widget/SettingsWidget.js:111
 msgid "With messages"
 msgstr "С сообщениями"
 
@@ -589,11 +530,11 @@ msgstr "Другие приватные аннотации"
 msgid "Zoom to all layers"
 msgstr "Увеличить до всех слоев"
 
-#: nodepkg/panel/print/PrintMapExport/PrintMapExport.tsx:148
+#: nodepkg/panel/print/PrintMapExport/PrintMapExport.tsx:147
 msgid "Print"
 msgstr "Печать"
 
-#: nodepkg/panel/print/PrintMapExport/PrintMapExport.tsx:153
+#: nodepkg/panel/print/PrintMapExport/PrintMapExport.tsx:152
 msgid "Save as"
 msgstr "Сохранить как"
 
@@ -779,22 +720,74 @@ msgstr "Копировать код"
 msgid "Preview"
 msgstr "Предпросмотр"
 
-#: nodepkg/settings-widget/SettingsWidget.js:85
-msgid "Enable layers editing"
-msgstr "Разрешить редактирование слоев"
+#: nodepkg/settings-widget/SettingsWidget.tsx:23
+msgid "Web map will start at this extent"
+msgstr "Веб-карта будет показана с этим охватом"
 
-#: nodepkg/settings-widget/SettingsWidget.js:95
-msgid "Enable annotations"
-msgstr "Разрешить аннотирование"
+#: nodepkg/settings-widget/SettingsWidget.tsx:24
+msgid "Web map will not allow to move outside of this extent"
+msgstr "Веб-карта не позволит выйти за пределы этого охвата"
 
-#: nodepkg/settings-widget/SettingsWidget.js:116
+#: nodepkg/settings-widget/SettingsWidget.tsx:34
+msgid "Hide by default"
+msgstr "Скрыть по умолчанию"
+
+#: nodepkg/settings-widget/SettingsWidget.tsx:35
+msgid "Show without messages"
+msgstr "Показать без сообщений"
+
+#: nodepkg/settings-widget/SettingsWidget.tsx:36
+msgid "Show with messages"
+msgstr "Показать с сообщениями"
+
+#: nodepkg/settings-widget/SettingsWidget.tsx:67
+msgid "Constraining extent"
+msgstr "Ограничивающий охват"
+
+#: nodepkg/settings-widget/SettingsWidget.tsx:104
+msgid "Select mode"
+msgstr "Выберите режим"
+
+#: nodepkg/settings-widget/SettingsWidget.tsx:116
 #: nodepkg/settings/SettingsForm.js:189
 msgid "Measurement SRS"
-msgstr "Система координат для измерений"
+msgstr "СК для измерений"
 
-#: nodepkg/settings-widget/SettingsWidget.js:142
+#: nodepkg/settings-widget/SettingsWidget.tsx:125
+msgid "Layers editing"
+msgstr "Редактирование слоев"
+
+#: nodepkg/settings-widget/SettingsWidget.tsx:138
 msgid "Settings"
 msgstr "Настройки"
+
+#: nodepkg/settings-widget/component/BookmarkResourceSelect.tsx:57
+msgid "Select resource"
+msgstr "Выберите ресурс"
+
+#: nodepkg/settings-widget/component/ExtentRow.tsx:23
+msgid "Extent updated"
+msgstr "Охват обновлен"
+
+#: nodepkg/settings-widget/component/ExtentRow.tsx:60
+msgid "From layer"
+msgstr "По слою"
+
+#: nodepkg/settings-widget/component/ExtentRow.tsx:68
+msgid "West"
+msgstr "Запад"
+
+#: nodepkg/settings-widget/component/ExtentRow.tsx:79
+msgid "South"
+msgstr "Юг"
+
+#: nodepkg/settings-widget/component/ExtentRow.tsx:88
+msgid "East"
+msgstr "Восток"
+
+#: nodepkg/settings-widget/component/ExtentRow.tsx:97
+msgid "North"
+msgstr "Север"
 
 #: nodepkg/settings/Settings.js:48
 msgid "Settings saved"
@@ -1032,19 +1025,79 @@ msgstr ""
 "Для генерации предпросмотра вернитесь на страницу веб карты и нажмите "
 "\"Предпросмотр\"."
 
-#: view.py:47
+#: view.py:41
 msgid "Web map settings"
 msgstr "Настройки веб-карты"
 
-#: view.py:267
+#: view.py:261
 msgid "Clone web map"
 msgstr "Клонировать веб-карту"
 
-#: view.py:280
+#: view.py:274
 msgid "Embedded webmap preview"
 msgstr "Просмотр встроенной веб-карты"
 
-#: view.py:331
+#: view.py:325
 msgid "Display"
 msgstr "Открыть"
+
+#~ msgid "Set from layer extent"
+#~ msgstr "Установить по слою"
+
+#~ msgid "Extent and bookmarks"
+#~ msgstr "Охват и закладки"
+
+#~ msgid "Select vector layer"
+#~ msgstr "Выберите векторный слой"
+
+#~ msgid "Web map will start at this extent"
+#~ msgstr "Веб-карта будет открываться с этим охватом"
+
+#~ msgid "Select layer"
+#~ msgstr "Выберите слой"
+
+#~ msgid "Left, deg."
+#~ msgstr "Лево, град."
+
+#~ msgid "Bottom, deg."
+#~ msgstr "Низ, град."
+
+#~ msgid "Right, deg."
+#~ msgstr "Право, град."
+
+#~ msgid "Top, deg."
+#~ msgstr "Верх, град."
+
+#~ msgid "Web map will not allow to move outside of this extent"
+#~ msgstr "На веб-карте нельзя будет выйти за этот охват"
+
+#~ msgid "Longitude"
+#~ msgstr "Долгота"
+
+#~ msgid "Latitude"
+#~ msgstr "Широта"
+
+#~ msgid "Webmap saved"
+#~ msgstr "Веб-карта сохранена"
+
+#~ msgid "Clear"
+#~ msgstr "Очистить"
+
+#~ msgid "Bookmark resource"
+#~ msgstr "Ресурс закладок"
+
+#~ msgid "Select a resource"
+#~ msgstr "Выберите ресурс"
+
+#~ msgid "Reset"
+#~ msgstr "Сброс"
+
+#~ msgid "Enable layers editing"
+#~ msgstr "Разрешить редактирование слоев"
+
+#~ msgid "Enable annotations"
+#~ msgstr "Разрешить аннотирование"
+
+#~ msgid "Set from layer"
+#~ msgstr "Задать по слою"
 

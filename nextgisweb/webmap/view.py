@@ -21,12 +21,6 @@ from .plugin import WebmapLayerPlugin, WebmapPlugin
 from .util import webmap_items_to_tms_ids_list
 
 
-class ExtentWidget(Widget):
-    resource = WebMap
-    operation = ("create", "update")
-    amdmod = "ngw-webmap/ExtentWidget"
-
-
 class ItemWidget(Widget):
     resource = WebMap
     operation = ("create", "update")
