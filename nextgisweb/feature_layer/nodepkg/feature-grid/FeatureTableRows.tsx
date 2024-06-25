@@ -11,7 +11,7 @@ import { renderFeatureFieldValue } from "./util/renderFeatureFieldValue";
 
 interface RowsProps {
     effectiveWidths: EffectiveWidths;
-    virtualItems: VirtualItem[];
+    virtualItems: VirtualItem<HTMLElement>[];
     rowMinHeight: number;
     selectedIds: number[];
     columns: FeatureLayerFieldCol[];
