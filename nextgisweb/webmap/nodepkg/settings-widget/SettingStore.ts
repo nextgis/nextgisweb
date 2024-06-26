@@ -6,8 +6,9 @@ import type {
     EditorStoreOptions,
 } from "@nextgisweb/resource/type";
 import type { Composite } from "@nextgisweb/resource/type/Composite";
+import type { ResourceRef } from "@nextgisweb/resource/type/api";
 
-import type { BookmarkResource, WebmapResource } from "../type/WebmapResource";
+import type { WebmapResource } from "../type/WebmapResource";
 
 import type { AnnotationType, Extent, SettingsValue } from "./type";
 
@@ -35,7 +36,7 @@ export class SettingStore
         bottom: null,
         top: null,
     };
-    bookmarkResource?: BookmarkResource | null = null;
+    bookmarkResource?: ResourceRef | null = null;
 
     composite: Composite;
 

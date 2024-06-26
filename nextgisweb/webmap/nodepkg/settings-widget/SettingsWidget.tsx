@@ -4,16 +4,14 @@ import { Checkbox, Select } from "@nextgisweb/gui/antd";
 import { Area, Lot } from "@nextgisweb/gui/mayout";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { annotation, editing } from "@nextgisweb/pyramid/settings!webmap";
+import { ResourceSelectRef } from "@nextgisweb/resource/component";
 import type {
     EditorWidgetComponent,
     EditorWidgetProps,
 } from "@nextgisweb/resource/type";
 import { SrsSelect } from "@nextgisweb/spatial-ref-sys/srs-select/SrsSelect";
 
-import type { BookmarkResource } from "../type/WebmapResource";
-
 import type { SettingStore } from "./SettingStore";
-import { BookmarkResourceSelect } from "./component/BookmarkResourceSelect";
 import { ExtentRow } from "./component/ExtentRow";
 import type { AnnotationType } from "./type";
 
@@ -37,14 +35,6 @@ const annotationOptions: { value: AnnotationType; label: string }[] = [
 export const SettingsWidget: EditorWidgetComponent<
     EditorWidgetProps<SettingStore>
 > = observer(({ store }) => {
-    const updateBookmarkResource = ({
-        bookmarkResource,
-    }: {
-        bookmarkResource: BookmarkResource | null;
-    }) => {
-        store.update({ bookmarkResource: bookmarkResource });
-    };
-
     return (
         <Area pad cols={["1fr", "1fr"]}>
             <Lot
@@ -105,10 +95,18 @@ export const SettingsWidget: EditorWidgetComponent<
                 />
             </Lot>
             <Lot row label={gettext("Bookmarks")}>
-                <BookmarkResourceSelect
-                    pickerOptions={{ parentId: store.composite.parent }}
+                <ResourceSelectRef
+                    pickerOptions={{
+                        parentId: store.composite.parent,
+                        requireInterface: "IFeatureLayer",
+                    }}
                     value={store.bookmarkResource}
-                    onChange={updateBookmarkResource}
+                    allowClear
+                    placeholder={gettext("Select resource")}
+                    style={{ width: "100%" }}
+                    onChange={(bookmarkResource) =>
+                        store.update({ bookmarkResource: bookmarkResource })
+                    }
                 />
             </Lot>
             <Lot row label={gettext("Measurement SRS")}>
