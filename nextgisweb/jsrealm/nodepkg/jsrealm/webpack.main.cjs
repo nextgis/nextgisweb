@@ -2,6 +2,7 @@ const fs = require("fs");
 const glob = require("glob");
 const path = require("path");
 
+const { sentryWebpackPlugin } = require("@sentry/webpack-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
 const ESLintPlugin = require("eslint-webpack-plugin");
 const ForkTsCheckerPlugin = require("fork-ts-checker-webpack-plugin");
@@ -370,6 +371,12 @@ const webpackConfig = defaults("main", (env) => ({
         plugins: [new iconUtil.IconResolverPlugin()],
     },
     plugins: [
+        sentryWebpackPlugin({
+            org: "nextgis",
+            project: "ngw-frontend",
+            authToken:
+                "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",
+        }),
         new CopyPlugin({
             // Copy @nextgisweb/jsrealm/with-chunks!entry-name loader directly
             // to the dist directly. It is written in ES5-compatible way as AMD

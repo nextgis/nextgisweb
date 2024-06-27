@@ -60,5 +60,8 @@
         "webpackConfigs": {
             "main": "webpack.main.cjs"
         }
+    },
+    "devDependencies": {
+        "@sentry/webpack-plugin": "^2.20.1"
     }
 }
