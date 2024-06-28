@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 
 import { Button, Select } from "@nextgisweb/gui/antd";
 import type { OptionType } from "@nextgisweb/gui/antd";
+import { Area, Lot } from "@nextgisweb/gui/mayout";
 import showModal from "@nextgisweb/gui/showModal";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -15,7 +16,6 @@ import type { ResourceRef } from "@nextgisweb/resource/type/api";
 
 import type { WmsClientLayerStore } from "./WmsClientLayerStore";
 import { VendorParamsModal } from "./component/VendorParamsModal";
-
 import "./WmsClientLayerWidget.less";
 import type { WMSConnectionLayer } from "./type";
 import { getConnectionResource } from "./util/getConnectionResource";
@@ -23,8 +23,6 @@ import { getConnectionResource } from "./util/getConnectionResource";
 export const WmsClientLayerWidget: EditorWidgetComponent<
     EditorWidgetProps<WmsClientLayerStore>
 > = observer(({ store }) => {
-    const [open, setOpen] = useState<boolean>(false);
-
     const [layers, setLayers] = useState<OptionType[]>();
     const [formats, setFormats] = useState<OptionType[]>();
 
@@ -43,7 +41,6 @@ export const WmsClientLayerWidget: EditorWidgetComponent<
         });
     };
 
-    // const mapLayerValue
     useEffect(() => {
         const getCapcache = async () => {
             if (store.connection) {
@@ -53,7 +50,6 @@ export const WmsClientLayerWidget: EditorWidgetComponent<
                 ).get({
                     cache: true,
                 });
-                console.log(wmsclient_connection);
                 const capcache = wmsclient_connection.capcache;
                 const options = mapLayers(capcache.layers);
                 const formats = mapFormats(capcache.formats);
@@ -65,9 +61,8 @@ export const WmsClientLayerWidget: EditorWidgetComponent<
     }, [store.connection]);
 
     return (
-        <>
-            <div className="ngw-wmsclient-layer-widget">
-                <label>{gettext("WMS Connection")}</label>
+        <Area pad cols={["1fr", "1fr"]}>
+            <Lot row label={gettext("WMS Connection")}>
                 <ResourceSelectRef
                     value={store.connection ? store.connection : null}
                     onChange={async (resourceRef: ResourceRef | null) => {
@@ -78,16 +73,20 @@ export const WmsClientLayerWidget: EditorWidgetComponent<
                         }
                     }}
                     pickerOptions={{ requireClass: "wmsclient_connection" }}
+                    style={{ width: "100%" }}
                 />
-                <label>{gettext("Image format")}</label>
+            </Lot>
+            <Lot row label={gettext("Image format")}>
                 <Select
                     value={store.imgFormat}
                     options={formats ? formats : undefined}
                     onChange={(value) => {
                         store.update({ imgFormat: value });
                     }}
+                    style={{ width: "100%" }}
                 />
-                <label>{gettext("WMS layers")}</label>
+            </Lot>
+            <Lot row label={gettext("WMS layers")}>
                 <Select
                     value={store.wmsLayers}
                     mode="multiple"
@@ -95,23 +94,27 @@ export const WmsClientLayerWidget: EditorWidgetComponent<
                     onChange={(value) => {
                         store.update({ wmsLayers: value });
                     }}
+                    style={{ width: "100%" }}
                 />
-                <label>{gettext("Vendor parameters")}</label>
+            </Lot>
+            <Lot row label={gettext("Vendor parameters")}>
                 <Button
                     onClick={() =>
                         showModal(VendorParamsModal, {
                             value: store.vendorParams,
                             destroyOnClose: true,
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
                             onChange: (value: any) => {
                                 store.update({ vendorParams: value });
                             },
                         })
                     }
+                    style={{ width: "100%" }}
                 >
                     {gettext("Edit vendor parameters")}
                 </Button>
-            </div>
-        </>
+            </Lot>
+        </Area>
     );
 });
 

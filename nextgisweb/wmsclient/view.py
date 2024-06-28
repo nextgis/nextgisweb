@@ -19,13 +19,6 @@ class LayerWidget(Widget):
     amdmod = "@nextgisweb/wmsclient/wmsclient-layer"
 
 
-
-class LayerVendorParamsWidget(Widget):
-    resource = Layer
-    operation = ("create", "update")
-    amdmod = "@nextgisweb/wmsclient/wmsclient-layer"
-
-
 def setup_pyramid(comp, conf):
     @resource_sections(
         title=_("WMS capabilities"),

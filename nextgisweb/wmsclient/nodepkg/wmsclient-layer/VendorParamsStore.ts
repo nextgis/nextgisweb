@@ -1,5 +1,3 @@
-import { runInAction } from "mobx";
-
 import { EditorStore as KeyValueEditorStore } from "@nextgisweb/gui/edi-table/store/EditorStore";
 import { RecordItem } from "@nextgisweb/gui/edi-table/store/RecordItem";
 
