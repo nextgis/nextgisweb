@@ -10,7 +10,7 @@ export interface DumpParams {
 
 export interface EditorStoreOptions {
     composite: Composite;
-    operation?: Operation;
+    operation: Operation;
     resourceId?: number;
 }
 
