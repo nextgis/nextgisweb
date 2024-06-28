@@ -70,10 +70,16 @@ class SentryComponent(Component):
         with sentry_sdk.configure_scope() as scope:
             scope.add_event_processor(add_instance_id)
 
+    @property
+    def template_include(self):
+        return ("nextgisweb:sentry/template/init.mako",)
+
     # fmt: off
     option_annotations = (
         Option("dsn"),
         Option("environment", default=None),
         Option("shutdown_timeout", int, default=30),
+
+        Option("js.dsn", default=None),
     )
     # fmt: on
