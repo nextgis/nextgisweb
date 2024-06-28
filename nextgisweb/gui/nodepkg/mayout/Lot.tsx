@@ -7,14 +7,43 @@ import { ErrorIcon, HelpIcon } from "@nextgisweb/gui/icon";
 import { AreaContext } from "./Area";
 
 export interface LotProps {
+    /** Label to display, or false to hide label cell */
     label?: string | false;
+
+    /** Show help icon and help message in tooltip */
     help?: string;
+
+    /** Show help icon and error message in tooltip */
     error?: string | boolean;
+
+    /** Starting column in grid layout
+     *
+     * It has the same meaning as the 'grid-column-start' CSS property. Negative
+     * values mean "from the end of the row".
+     */
     start?: number;
+
+    /** Ending column in grid layout
+     *
+     * It has the same meaning as the 'grid-column-end' CSS property. Negative
+     * values mean "from the end of the row".
+     */
     end?: number;
+
+    /** Number of columns to span in grid layout */
     span?: number;
+
+    /** Take entire grid row
+     *
+     * Just a shortcut for `{start: 1, end: -1}` and cannot be used together
+     * with `start` and `end` properties.
+     */
     row?: true;
+
+    /** If false nothing will be rendered */
     visible?: boolean;
+
+    /** React children property */
     children?: ReactNode;
 }
 

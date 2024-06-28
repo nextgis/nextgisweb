@@ -18,13 +18,26 @@ export const AreaContext = createContext<AreaContextProps>({
 });
 
 export interface AreaProps {
+    /** Label position, left or top */
     labelPosition?: LabelPosition;
+
+    /** Number of columns or array of their widths */
     cols?: number | string[];
+
+    /** Width of label columns */
     labelColumn?: string;
+
+    /** Add default padding around component */
     pad?: boolean;
-    children?: ReactNode;
-    className?: string;
+
+    /** Root class name */
+    rootClassName?: string;
+
+    /** Additional style */
     style?: CSSProperties;
+
+    /** Usually Lot components */
+    children?: ReactNode;
 }
 
 export function Area({
@@ -32,9 +45,9 @@ export function Area({
     cols = 1,
     labelColumn = "fit-content(25%)",
     pad = false,
-    children,
-    className,
+    rootClassName,
     style,
+    children,
 }: AreaProps) {
     if (typeof cols === "number")
         cols = new Array(cols).fill("minmax(4em, auto)");
@@ -57,7 +70,7 @@ export function Area({
                     "ngw-gui-mayout-area",
                     `label-${labelPosition}`,
                     pad && "pad",
-                    className
+                    rootClassName
                 )}
                 style={{ gridTemplateColumns, ...style }}
             >
