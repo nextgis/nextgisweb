@@ -1,104 +1,3 @@
-#: amd/ngw-postgis/LayerWidget.js:46 model.py:235
-msgid "PostGIS layer"
-msgstr "Слой PostGIS"
-
-#: amd/ngw-postgis/template/LayerWidget.hbs:8
-msgid "Select PostGIS connection"
-msgstr "Выберите соединение PostGIS"
-
-#: amd/ngw-postgis/template/LayerWidget.hbs:10
-msgid "Connection"
-msgstr "Соединение"
-
-#: amd/ngw-postgis/template/LayerWidget.hbs:16
-msgid "Schema"
-msgstr "Схема"
-
-#: amd/ngw-postgis/template/LayerWidget.hbs:22
-msgid "Table"
-msgstr "Таблица"
-
-#: amd/ngw-postgis/template/LayerWidget.hbs:28 diagnostics.py:300
-msgid "ID column"
-msgstr "Поле ID"
-
-#: amd/ngw-postgis/template/LayerWidget.hbs:34 diagnostics.py:373
-msgid "Geometry column"
-msgstr "Поле геометрии"
-
-#: amd/ngw-postgis/template/LayerWidget.hbs:39 model.py:410
-msgid "Geometry type"
-msgstr "Тип геометрии"
-
-#: amd/ngw-postgis/template/LayerWidget.hbs:41
-#: amd/ngw-postgis/template/LayerWidget.hbs:59
-msgid "Autodetect"
-msgstr "Автоматически"
-
-#: amd/ngw-postgis/template/LayerWidget.hbs:42 model.py:68
-msgid "Point"
-msgstr "Точка"
-
-#: amd/ngw-postgis/template/LayerWidget.hbs:43 model.py:69
-msgid "Line"
-msgstr "Линия"
-
-#: amd/ngw-postgis/template/LayerWidget.hbs:44 model.py:70
-msgid "Polygon"
-msgstr "Полигон"
-
-#: amd/ngw-postgis/template/LayerWidget.hbs:45 model.py:71
-msgid "Multipoint"
-msgstr "Мультиточка"
-
-#: amd/ngw-postgis/template/LayerWidget.hbs:46 model.py:72
-msgid "Multiline"
-msgstr "Мультилиния"
-
-#: amd/ngw-postgis/template/LayerWidget.hbs:47 model.py:73
-msgid "Multipolygon"
-msgstr "Мультиполигон"
-
-#: amd/ngw-postgis/template/LayerWidget.hbs:48 model.py:74
-msgid "Point Z"
-msgstr "Точка Z"
-
-#: amd/ngw-postgis/template/LayerWidget.hbs:49 model.py:75
-msgid "Line Z"
-msgstr "Линия Z"
-
-#: amd/ngw-postgis/template/LayerWidget.hbs:50 model.py:76
-msgid "Polygon Z"
-msgstr "Полигон Z"
-
-#: amd/ngw-postgis/template/LayerWidget.hbs:51 model.py:77
-msgid "Multipoint Z"
-msgstr "Мультиточка Z"
-
-#: amd/ngw-postgis/template/LayerWidget.hbs:52 model.py:78
-msgid "Multiline Z"
-msgstr "Мультилиния Z"
-
-#: amd/ngw-postgis/template/LayerWidget.hbs:53 model.py:79
-msgid "Multipolygon Z"
-msgstr "Мультиполигон Z"
-
-#: amd/ngw-postgis/template/LayerWidget.hbs:67
-msgid "Coordinate system"
-msgstr "Система координат"
-
-#: amd/ngw-postgis/template/LayerWidget.hbs:74
-msgid "Attribute definitions"
-msgstr "Описания атрибутов"
-
-#: amd/ngw-postgis/template/LayerWidget.hbs:77
-msgid "Keep"
-msgstr "Оставить"
-
-#: amd/ngw-postgis/template/LayerWidget.hbs:78
-msgid "Reload"
-msgstr "Загрузить"
-
 #: api.py:74
 msgid "Table (%s) not found in schema (%s)."
 msgstr "Таблица (%s) не найдена в схеме (%s)."
@@ -187,6 +86,10 @@ msgstr "Количество записей: {}."
 msgid "ID or geometry column isn't set."
 msgstr "Не установлена колонка ID или геометрии."
 
+#: diagnostics.py:300 nodepkg/layer-widget/LayerWidget.tsx:31
+msgid "ID column"
+msgstr "Поле ID"
+
 #: diagnostics.py:305 diagnostics.py:378
 msgid "Column not found."
 msgstr "Колонка не найдена."
@@ -247,6 +150,10 @@ msgstr "Колонка авто-инкрементируемая."
 msgid "Column isn't auto-incrementable."
 msgstr "Колонка не авто-инкрементируемая."
 
+#: diagnostics.py:373 nodepkg/layer-widget/LayerWidget.tsx:32
+msgid "Geometry column"
+msgstr "Поле геометрии"
+
 #: diagnostics.py:388
 msgid "Column found, but has an incompatible type - {}."
 msgstr "Колонка найдена, но имеет несовместимый тип - {}."
@@ -283,6 +190,54 @@ msgstr "Колонка поля '{}' найдена, тип {}."
 msgid "External database error"
 msgstr "Ошибка внешней базы данных"
 
+#: model.py:68 nodepkg/layer-widget/LayerWidget.tsx:92
+msgid "Point"
+msgstr "Точка"
+
+#: model.py:69 nodepkg/layer-widget/LayerWidget.tsx:93
+msgid "Line"
+msgstr "Линия"
+
+#: model.py:70 nodepkg/layer-widget/LayerWidget.tsx:94
+msgid "Polygon"
+msgstr "Полигон"
+
+#: model.py:71 nodepkg/layer-widget/LayerWidget.tsx:95
+msgid "Multipoint"
+msgstr "Мультиточка"
+
+#: model.py:72 nodepkg/layer-widget/LayerWidget.tsx:96
+msgid "Multiline"
+msgstr "Мультилиния"
+
+#: model.py:73 nodepkg/layer-widget/LayerWidget.tsx:97
+msgid "Multipolygon"
+msgstr "Мультиполигон"
+
+#: model.py:74 nodepkg/layer-widget/LayerWidget.tsx:98
+msgid "Point Z"
+msgstr "Точка Z"
+
+#: model.py:75 nodepkg/layer-widget/LayerWidget.tsx:99
+msgid "Line Z"
+msgstr "Линия Z"
+
+#: model.py:76 nodepkg/layer-widget/LayerWidget.tsx:100
+msgid "Polygon Z"
+msgstr "Полигон Z"
+
+#: model.py:77 nodepkg/layer-widget/LayerWidget.tsx:101
+msgid "Multipoint Z"
+msgstr "Мультиточка Z"
+
+#: model.py:78 nodepkg/layer-widget/LayerWidget.tsx:102
+msgid "Multiline Z"
+msgstr "Мультилиния Z"
+
+#: model.py:79 nodepkg/layer-widget/LayerWidget.tsx:103
+msgid "Multipolygon Z"
+msgstr "Мультиполигон Z"
+
 #: model.py:120 nodepkg/connection-widget/ConnectionWidget.tsx:58
 msgid "PostGIS connection"
 msgstr "Соединение PostGIS"
@@ -290,6 +245,10 @@ msgstr "Соединение PostGIS"
 #: model.py:201
 msgid "Cannot connect to the database!"
 msgstr "Невозможно подключиться к базе данных!"
+
+#: model.py:235 nodepkg/layer-widget/LayerWidget.tsx:244
+msgid "PostGIS layer"
+msgstr "Слой PostGIS"
 
 #: model.py:289
 msgid "Table '%(table)s' not found!"
@@ -329,6 +288,10 @@ msgstr ""
 msgid "Column '%(column)s' not found!"
 msgstr "Поле '%(column)s' не найдено!"
 
+#: model.py:410 nodepkg/layer-widget/LayerWidget.tsx:34
+msgid "Geometry type"
+msgstr "Тип геометрии"
+
 #: nodepkg/connection-widget/ConnectionWidget.tsx:21
 msgid "Host"
 msgstr "Сервер"
@@ -349,21 +312,57 @@ msgstr "Пароль"
 msgid "Database"
 msgstr "База данных"
 
-#: nodepkg/diagnostics-widget/DiagnosticsWidget.js:16
+#: nodepkg/diagnostics-widget/DiagnosticsWidget.js:12
 msgid "Unknown"
 msgstr "Неизвестно"
 
-#: nodepkg/diagnostics-widget/DiagnosticsWidget.js:17
+#: nodepkg/diagnostics-widget/DiagnosticsWidget.js:13
 msgid "Success"
 msgstr "Успех"
 
-#: nodepkg/diagnostics-widget/DiagnosticsWidget.js:18
+#: nodepkg/diagnostics-widget/DiagnosticsWidget.js:14
 msgid "Warning"
 msgstr "Предупреждение"
 
-#: nodepkg/diagnostics-widget/DiagnosticsWidget.js:19
+#: nodepkg/diagnostics-widget/DiagnosticsWidget.js:15
 msgid "Error"
 msgstr "Ошибка"
+
+#: nodepkg/layer-widget/LayerStore.ts:13
+msgid "Fields need to be updated due to autodetection"
+msgstr "Поля необходимо обновить из-за автоопределения"
+
+#: nodepkg/layer-widget/LayerWidget.tsx:28
+msgid "Connection"
+msgstr "Соединение"
+
+#: nodepkg/layer-widget/LayerWidget.tsx:29
+msgid "Schema"
+msgstr "Схема"
+
+#: nodepkg/layer-widget/LayerWidget.tsx:30
+msgid "Table"
+msgstr "Таблица"
+
+#: nodepkg/layer-widget/LayerWidget.tsx:33
+msgid "Autodetect"
+msgstr "Автоматически"
+
+#: nodepkg/layer-widget/LayerWidget.tsx:35
+msgid "SRID"
+msgstr "SRID"
+
+#: nodepkg/layer-widget/LayerWidget.tsx:36
+msgid "Fields"
+msgstr "Поля"
+
+#: nodepkg/layer-widget/LayerWidget.tsx:107
+msgid "Keep existing definitions untouched"
+msgstr "Оставить существующие определения без изменений"
+
+#: nodepkg/layer-widget/LayerWidget.tsx:108
+msgid "Update definitions from the database"
+msgstr "Обновить определения из базы данных"
 
 #: view.py:39
 msgid "Diagnostics"

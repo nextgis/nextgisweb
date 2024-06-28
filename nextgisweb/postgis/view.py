@@ -16,7 +16,7 @@ class PostgisConnectionWidget(Widget):
 class PostgisLayerWidget(Widget):
     resource = PostgisLayer
     operation = ("create", "update")
-    amdmod = "ngw-postgis/LayerWidget"
+    amdmod = "@nextgisweb/postgis/layer-widget"
 
 
 def setup_pyramid(comp, config):
