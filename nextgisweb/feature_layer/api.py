@@ -81,7 +81,12 @@ class Loader:
     def __call__(self, feature: Feature, data: Any):
         feature.geom = UNSET
         if (geom := data.get("geom", UNSET)) is not UNSET:
-            if geom is not None or self.params.geom_null:
+            if geom is None:
+                if self.params.geom_null:
+                    feature.geom = None
+                else:
+                    pass  # Don't update geom with NULL
+            else:
                 try:
                     feature.geom = self.geom_loader(geom)
                 except GeometryNotValid:

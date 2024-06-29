@@ -2,8 +2,11 @@ import re
 from contextlib import contextmanager
 
 import geoalchemy2 as ga
+from msgspec import UNSET
 from shapely.geometry import box
-from sqlalchemy import cast, func, select, sql, text
+from sqlalchemy import alias, cast, func, select, sql, text
+from sqlalchemy import and_ as sql_and
+from sqlalchemy import or_ as sql_or
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.engine.url import URL as EngineURL
 from sqlalchemy.engine.url import make_url as make_engine_url
@@ -451,11 +454,14 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
             if f.keyname in feature.fields.keys():
                 values[f.column_name] = feature.fields[f.keyname]
 
-        if feature.geom is not None:
-            values[self.column_geom] = st_transform(
-                ga.elements.WKBElement(bytearray(feature.geom.wkb), srid=self.srs_id),
-                self.geometry_srid,
-            )
+        if (geom := feature.geom) is not UNSET:
+            if geom is None:
+                values[self.column_geom] = None
+            else:
+                values[self.column_geom] = st_transform(
+                    ga.elements.WKBElement(bytearray(geom.wkb), srid=self.srs_id),
+                    self.geometry_srid,
+                )
 
         return values
 
@@ -616,7 +622,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
         self._ilike = value
 
     def __call__(self):
-        tab = self.layer._sa_table(True)
+        tab = alias(self.layer._sa_table(True), name="tab")
 
         idcol = tab.columns[self.layer.column_id]
         columns = [idcol.label("id")]
@@ -745,8 +751,16 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
             ndims = 3
         else:
             ndims = 2
-        where.append(func.geometrytype(geomcol) == gt)
-        where.append(func.st_ndims(geomcol) == ndims)
+
+        where.append(
+            sql_or(
+                geomcol.is_(None),
+                sql_and(
+                    func.geometrytype(geomcol) == text(f"'{gt}'"),
+                    func.st_ndims(geomcol) == text(str(ndims)),
+                ),
+            )
+        )
 
         order_criterion = []
         if self._order_by:
@@ -784,13 +798,14 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                         fdict = dict((keyname, row[label]) for keyname, label in selected_fields)
 
                         if self._geom:
-                            if self._geom_format == "WKB":
-                                geom_data = row["geom"].tobytes()
-                                geom = Geometry.from_wkb(geom_data, validate=False)
+                            if (geom_data := row["geom"]) is None:
+                                geom = None
+                            elif self._geom_format == "WKB":
+                                geom = Geometry.from_wkb(geom_data.tobytes(), validate=False)
                             else:
-                                geom = Geometry.from_wkt(row["geom"], validate=False)
+                                geom = Geometry.from_wkt(geom_data, validate=False)
                         else:
-                            geom = None
+                            geom = UNSET
 
                         yield Feature(
                             layer=self.layer,
