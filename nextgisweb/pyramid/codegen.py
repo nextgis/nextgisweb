@@ -1,5 +1,5 @@
 from collections import defaultdict
-from itertools import count
+from itertools import chain, count
 from typing import Any, Dict, List, Literal, Sequence, Tuple, Type, Union, cast
 
 from msgspec import NODEFAULT, Struct, UnsetType, defstruct, field
@@ -103,7 +103,7 @@ def client_codegen(self: PyramidComponent):
             op = Operation(
                 query={
                     p.name: p.type if (p.default is NODEFAULT) else Union[(p.type, UnsetType)]
-                    for p in iview.query_params.values()
+                    for p in chain(*(p.spreaded for p in iview.query_params.values()))
                 }
             )
             op.set_if_supported("body", iview.body_type)
