@@ -17,6 +17,7 @@ from ..model import Service as WFSService
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
 
 TEST_WFS_VERSIONS = ("2.0.2", "2.0.0", "1.1.0", "1.0.0")
+GDAL_VERSION = gdal.__version__.split("-")[0]
 DATA = Path(vector_layer_test.__file__).parent / "data"
 
 
@@ -232,7 +233,7 @@ for version in TEST_WFS_VERSIONS:
                 id="{}-{}".format(version, layer),
                 marks=pytest.mark.xfail(
                     version >= "2.0.0"
-                    and pkg_version.parse(gdal.__version__) < pkg_version.parse("3.2.1"),
+                    and pkg_version.parse(GDAL_VERSION) < pkg_version.parse("3.2.1"),
                     reason="GDAL doesn't work correctly with WFS 2.x",
                 ),
             )
