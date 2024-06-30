@@ -22,17 +22,27 @@ def test_crud(res, ngw_webtest_app, ngw_env):
     rurl = f"/api/resource/{res}"
     burl = f"/api/resource/{res}/feature"
     curl = f"/api/resource/{res}/feature/"
+    vcur = itertools.count(start=1)
 
+    vnext = next(vcur)
     payload = dict(feature_layer=dict(versioning=dict(enabled=True)))
     web.put_json(rurl, payload)
     resp_flv = web.get(rurl).json["feature_layer"]["versioning"]
-    vcur = itertools.count(start=1)
     assert resp_flv.pop("epoch")
-    assert resp_flv == dict(enabled=True, latest=next(vcur))
+    assert resp_flv == dict(enabled=True, latest=vnext)
 
+    resp_v1 = web.get(f"{burl}/version/{vnext}").json
+    assert resp_v1["id"] == vnext
+    assert resp_v1["user"] is not None
+
+    vnext = next(vcur)
     payload = dict(geom="POINT Z (0 0 2)", fields=dict(foo="2"))
     resp = web.post_json(curl, payload).json
-    assert resp == dict(id=1, version=next(vcur))
+    assert resp == dict(id=1, version=vnext)
+
+    resp_v2 = web.get(f"{burl}/version/{vnext}").json
+    assert resp_v2["id"] == vnext
+    assert resp_v2["tstamp"] > resp_v1["tstamp"]
 
     web.get(f"{burl}/1?version=1", status=404)
     resp_f1_v2 = web.get(f"{burl}/1?version=2").json

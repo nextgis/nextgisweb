@@ -38,7 +38,7 @@ class FVersioningMixin:
             return fversioning.vobj
         return None
 
-    def fversioning_configure(self, *, enabled=None):
+    def fversioning_configure(self, *, enabled=None, source=None):
         if enabled is not None and enabled != bool(self.fversioning):
             if enabled:
                 # Assign new epoch from sequence
@@ -52,7 +52,7 @@ class FVersioningMixin:
 
                 # Initialize first version
                 if self.fversioning_vobj is None:
-                    self.fversioning_open()
+                    self.fversioning_open(source)
             else:
                 self.fversioning = None
 

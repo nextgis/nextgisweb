@@ -237,7 +237,7 @@ class _fversioning_attr(SP):
 
         if (enabled := value.get("enabled", None)) is not None:
             if enabled != bool(obj.fversioning):
-                obj.fversioning_configure(enabled=enabled)
+                obj.fversioning_configure(enabled=enabled, source=srlzr)
 
 
 P_DSS_READ = DataStructureScope.read
