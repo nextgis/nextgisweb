@@ -67,8 +67,12 @@ export const FeatureGrid = observer(
 
         useEffect(() => {
             if (resourceData) {
-                const fields = (resourceData.feature_layer as FeatureLayer)
-                    ?.fields;
+                const featureLayer = resourceData.feature_layer as FeatureLayer;
+
+                const versioning = featureLayer?.versioning?.enabled ?? false;
+                if (versioning) store.setVersioning(true);
+
+                const fields = featureLayer?.fields;
                 if (fields) {
                     store.setFields(fields);
                     store.setVisibleFields([
@@ -119,13 +123,14 @@ export const FeatureGrid = observer(
                 </FeatureGridActions>
 
                 <FeatureTable
+                    resourceId={id}
+                    fields={fields}
+                    versioning={store.versioning}
                     empty={() => <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />}
                     total={totalData.total_count}
-                    fields={fields}
                     version={version}
                     selectedIds={selectedIds}
                     loadingCol={loadingCol}
-                    resourceId={id}
                     setSelectedIds={store.setSelectedIds}
                     queryParams={queryParams || undefined}
                     visibleFields={visibleFields}

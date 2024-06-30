@@ -34,10 +34,8 @@ export function fetchWrapper({
         .promiseFor(key, async () => {
             const features = await fetchFeatures({
                 fields: columns
-                    // ids that are less than one are created for
-                    // internal purposes and not used in NGW
-                    .filter((f) => f.id > 0)
-                    .map((f) => f.keyname),
+                    .filter((f) => f.keyname !== undefined)
+                    .map((f) => f.keyname!),
                 limit: pageSize,
                 cache: false,
                 offset: page,

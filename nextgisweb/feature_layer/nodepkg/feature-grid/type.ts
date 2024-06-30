@@ -5,9 +5,12 @@ import type { CompositeRead } from "@nextgisweb/resource/type/api";
 import type { NgwAttributeType } from "../type";
 import type { FeatureLayerField } from "../type/FeatureLayer";
 
+import type { $FID, $VID } from "./constant";
 import type { QueryParams } from "./hook/useFeatureTable";
 
 export type FeatureAttrs = Record<string, NgwAttributeType> & {
+    [$FID]: number;
+    [$VID]?: number;
     __rowIndex?: number;
 };
 
@@ -17,7 +20,9 @@ export type ColOrder = "asc" | "desc" | null;
 
 export type OrderBy = [keynme: string, ordering: ColOrder];
 
-export interface FeatureLayerFieldCol extends FeatureLayerField {
+export interface FeatureLayerFieldCol
+    extends Omit<FeatureLayerField, "keyname"> {
+    keyname?: string;
     flex?: string;
 }
 

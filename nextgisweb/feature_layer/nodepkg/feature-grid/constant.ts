@@ -1,2 +1,5 @@
 export const KEY_FIELD_ID = 0;
-export const KEY_FIELD_KEYNAME: string = "__id";
+export const LAST_CHANGED_FIELD_ID = -1;
+
+export const $FID: unique symbol = Symbol("$FID");
+export const $VID: unique symbol = Symbol("$VID");

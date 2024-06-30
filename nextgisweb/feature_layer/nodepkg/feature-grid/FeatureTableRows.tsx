@@ -1,6 +1,12 @@
 import type { VirtualItem } from "@tanstack/react-virtual";
+import { useMemo } from "react";
+import type { ReactNode } from "react";
 
-import { KEY_FIELD_KEYNAME } from "./constant";
+import { utc } from "@nextgisweb/gui/dayjs";
+import { mergeClasses } from "@nextgisweb/gui/util";
+import { useRouteGet } from "@nextgisweb/pyramid/hook";
+
+import { $FID, $VID, KEY_FIELD_ID, LAST_CHANGED_FIELD_ID } from "./constant";
 import type {
     EffectiveWidths,
     FeatureAttrs,
@@ -9,7 +15,37 @@ import type {
 } from "./type";
 import { renderFeatureFieldValue } from "./util/renderFeatureFieldValue";
 
+interface VersionProps {
+    resourceId: number;
+    versionId: number;
+}
+
+function VersionCell({ resourceId, versionId }: VersionProps) {
+    const { data } = useRouteGet(
+        "feature_layer.version.item",
+        {
+            id: resourceId,
+            vid: versionId,
+        },
+        { cache: true }
+    );
+
+    const tstamp = useMemo(() => {
+        if (!data || !data.tstamp) return;
+        return utc(data.tstamp).local().format("L LTS");
+    }, [data]);
+
+    if (!data || !tstamp) return <></>;
+    return (
+        <>
+            {tstamp}
+            {data.user && <>, {data.user.display_name}</>}
+        </>
+    );
+}
+
 interface RowsProps {
+    resourceId: number;
     effectiveWidths: EffectiveWidths;
     virtualItems: VirtualItem<HTMLElement>[];
     rowMinHeight: number;
@@ -22,6 +58,7 @@ interface RowsProps {
 }
 
 export function FeatureTableRows({
+    resourceId,
     effectiveWidths,
     virtualItems,
     rowMinHeight,
@@ -42,15 +79,33 @@ export function FeatureTableRows({
         return (
             <>
                 {columns.map((f) => {
-                    const val = row && row[f.keyname];
-                    const renderValue =
-                        val !== undefined
-                            ? renderFeatureFieldValue(f, val)
-                            : loadingCol();
+                    let renderValue: ReactNode;
+                    let cellClassName;
+                    if (!row) {
+                        renderValue = loadingCol();
+                    } else if (f.id === KEY_FIELD_ID) {
+                        cellClassName = "id";
+                        renderValue = String(row[$FID]);
+                    } else if (f.id === LAST_CHANGED_FIELD_ID) {
+                        cellClassName = "last-changed";
+                        renderValue = (
+                            <VersionCell
+                                resourceId={resourceId}
+                                versionId={row[$VID]!}
+                            />
+                        );
+                    } else if (f.keyname) {
+                        const val = row[f.keyname];
+                        renderValue =
+                            val !== undefined
+                                ? renderFeatureFieldValue(f, val)
+                                : loadingCol();
+                    }
+
                     return (
                         <div
                             key={f.id}
-                            className="td"
+                            className={mergeClasses("td", cellClassName)}
                             style={{
                                 width: `${effectiveWidths[f.id]}px`,
                             }}
@@ -71,9 +126,7 @@ export function FeatureTableRows({
 
                 const row = data.find((d) => d.__rowIndex === virtualRow.index);
                 if (row) {
-                    selectedKey = selectedIds.find(
-                        (s) => s === row[KEY_FIELD_KEYNAME]
-                    );
+                    selectedKey = selectedIds.find((s) => s === row[$FID]);
                 }
 
                 if (selectedKey) {
@@ -102,9 +155,7 @@ export function FeatureTableRows({
                                 if (selectedKey) {
                                     return old.filter((o) => o !== selectedKey);
                                 } else if (row) {
-                                    const newId = row[
-                                        KEY_FIELD_KEYNAME
-                                    ] as number;
+                                    const newId = row[$FID];
                                     return [newId];
                                 }
                                 return old;

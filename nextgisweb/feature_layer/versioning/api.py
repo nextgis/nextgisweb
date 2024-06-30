@@ -12,6 +12,7 @@ from typing_extensions import Annotated
 from nextgisweb.env import DBSession
 from nextgisweb.lib.apitype import AnyOf, AsJSON, StatusCode
 
+from nextgisweb.auth.api import UserReadBrief, serialize_principal
 from nextgisweb.resource import DataScope, resource_factory
 
 from ..interface import IVersionableFeatureLayer
@@ -24,6 +25,8 @@ from .exception import (
     FVersioningOutOfRange,
 )
 from .model import FeatureCreate, FeatureDelete, FeatureUpdate, FVersioningObj, registry
+
+VersionID = Annotated[int, Meta(ge=0, description="Version ID")]
 
 
 class FieldSummary(Struct, kw_only=True):
@@ -254,6 +257,32 @@ def change_fetch(
     return operations
 
 
+class VersionRead(Struct, kw_only=True):
+    id: VersionID
+    tstamp: datetime
+    user: Union[UserReadBrief, None]
+
+
+def version_iget(resource, request, vid: VersionID) -> VersionRead:
+    """Read version metadata"""
+
+    request.resource_permission(DataScope.read)
+
+    FVersioningOutOfRange.disprove(resource, vid, allow_zero=False)
+
+    obj = FVersioningObj.filter_by(resource_id=resource.id, version_id=vid).one()
+
+    return VersionRead(
+        id=obj.version_id,
+        tstamp=obj.tstamp,
+        user=(
+            serialize_principal(obj_user, UserReadBrief, tr=request.translate)
+            if (obj_user := obj.user)
+            else None
+        ),
+    )
+
+
 def setup_pyramid(comp, config):
     config.add_route(
         "feature_layer.changes_check",
@@ -266,3 +295,10 @@ def setup_pyramid(comp, config):
         "/api/resource/{id:uint}/feature/changes/fetch",
         factory=resource_factory,
     ).get(change_fetch, context=IVersionableFeatureLayer)
+
+    config.add_route(
+        "feature_layer.version.item",
+        "/api/resource/{id}/feature/version/{vid}",
+        types=dict(vid=int),
+        factory=resource_factory,
+    ).get(version_iget, context=IVersionableFeatureLayer)

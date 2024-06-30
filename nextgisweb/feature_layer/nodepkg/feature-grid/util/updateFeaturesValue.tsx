@@ -2,8 +2,12 @@ import { route } from "@nextgisweb/pyramid/api";
 
 import type { FeatureLayer, NgwAttributeType } from "../../type";
 import { getFeatureFieldValue } from "../../util/getFeatureFieldValue";
+import { $FID, $VID } from "../constant";
 
-type Item = Record<string, NgwAttributeType>;
+type Item = Record<string, NgwAttributeType> & {
+    [$FID]: number;
+    [$VID]?: number;
+};
 
 interface UpdateFeaturesValue {
     resourceId: number;
@@ -25,7 +29,11 @@ export async function updateFeaturesValue({
     }
     const newData: Item[] = [];
     for (const item of data) {
-        const newItem: Item = {};
+        const newItem: Item = { [$FID]: item[$FID] };
+
+        const vid = item[$VID];
+        if (vid) newItem[$VID] = vid;
+
         for (const [key, value] of Object.entries(item)) {
             const field = featureLayer.fields.find((f) => f.keyname === key);
             if (field) {

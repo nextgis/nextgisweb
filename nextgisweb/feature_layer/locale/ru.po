@@ -11,15 +11,15 @@ msgstr "Н/Д"
 msgid "Geometry"
 msgstr "Геометрия"
 
-#: api.py:88
+#: api.py:93
 msgid "Geometry is not valid."
 msgstr "Невалидная геометрия"
 
-#: api.py:326
+#: api.py:335
 msgid "Unknown spatial reference system"
 msgstr "Неизвестная система координат"
 
-#: api.py:399 api_export.py:121
+#: api.py:408 api_export.py:121
 msgid "Parameter 'intersects' geometry is not valid."
 msgstr "Параметр 'intersects' содержит невалидную геометрию."
 
@@ -204,6 +204,11 @@ msgstr "Редактировать на новой странице"
 #: nodepkg/feature-grid/FeatureGridActions.tsx:29
 msgid "Search..."
 msgstr "Поиск..."
+
+#: nodepkg/feature-grid/FeatureTable.tsx:95
+#: nodepkg/feature-grid/component/TableConfigModal.tsx:53
+msgid "Last changed"
+msgstr "Последнее изменение"
 
 #: nodepkg/feature-grid/component/ExportAction.tsx:30 view.py:117 view.py:128
 #: view.py:217

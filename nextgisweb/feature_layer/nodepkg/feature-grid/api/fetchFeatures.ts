@@ -1,7 +1,7 @@
 import { route } from "@nextgisweb/pyramid/api";
 
 import type { FeatureItem } from "../../type";
-import { KEY_FIELD_KEYNAME } from "../constant";
+import { $FID, $VID } from "../constant";
 import type { OrderBy } from "../type";
 
 interface FeatureLayerQuery {
@@ -87,8 +87,9 @@ export function fetchFeaturesItems({
 export function fetchFeatures(options: FetchFeaturesOptions) {
     return fetchFeaturesItems(options).then((items) => {
         return items.map((item) => ({
+            [$FID]: item.id,
+            [$VID]: item.vid,
             ...item.fields,
-            [KEY_FIELD_KEYNAME]: item.id,
         }));
     });
 }

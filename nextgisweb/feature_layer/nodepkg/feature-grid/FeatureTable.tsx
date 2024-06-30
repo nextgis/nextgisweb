@@ -5,12 +5,13 @@ import type { ReactNode } from "react";
 import Draggable from "react-draggable";
 
 import { useThemeVariables } from "@nextgisweb/gui/hook";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import type { FeatureLayerField } from "../type/FeatureLayer";
 
 import { FeatureTableRows } from "./FeatureTableRows";
 import SortIcon from "./component/SortIcon";
-import { KEY_FIELD_ID, KEY_FIELD_KEYNAME } from "./constant";
+import { $FID, KEY_FIELD_ID, LAST_CHANGED_FIELD_ID } from "./constant";
 import { useFeatureTable } from "./hook/useFeatureTable";
 import type { QueryParams } from "./hook/useFeatureTable";
 import type {
@@ -25,11 +26,12 @@ import { scrollbarWidth } from "./util/scrollbarWidth";
 import "./FeatureTable.less";
 
 interface FeatureTableProps {
-    total: number;
+    resourceId: number;
+    versioning: boolean;
     fields: FeatureLayerField[];
+    total: number;
     version?: number;
     selectedIds: number[];
-    resourceId: number;
     queryParams?: QueryParams;
     visibleFields?: number[];
     queryIntersects?: string;
@@ -44,10 +46,11 @@ const RESIZE_HANDLE_WIDTH = 6;
 
 const FeatureTable = observer(
     ({
-        total,
-        fields,
-        version,
         resourceId,
+        versioning,
+        fields,
+        total,
+        version,
         selectedIds,
         queryParams,
         visibleFields = [],
@@ -80,18 +83,27 @@ const FeatureTable = observer(
             const fields_: FeatureLayerFieldCol[] = [
                 {
                     id: KEY_FIELD_ID,
-                    keyname: KEY_FIELD_KEYNAME, // keyname for toggleSorting
                     display_name: "#",
                     datatype: "INTEGER",
                 },
                 ...fields,
             ];
 
+            if (versioning) {
+                fields_.push({
+                    id: LAST_CHANGED_FIELD_ID,
+                    display_name: gettext("Last changed"),
+                    datatype: "STRING",
+                });
+            }
+
             for (const field of fields_) {
                 const { id, datatype } = field;
                 let flex;
                 if (id === KEY_FIELD_ID) {
-                    flex = "0 0 5em";
+                    flex = "0 0 6em";
+                } else if (id === LAST_CHANGED_FIELD_ID) {
+                    flex = "1 1 18em";
                 } else if (datatype === "INTEGER" || datatype === "REAL") {
                     flex = "1 1 6em";
                 } else {
@@ -106,7 +118,7 @@ const FeatureTable = observer(
                 }
             }
             return cols;
-        }, [fields, visibleFields]);
+        }, [versioning, fields, visibleFields]);
 
         const {
             data,
@@ -142,8 +154,11 @@ const FeatureTable = observer(
 
         const scrollBarSize = useMemo<number>(() => scrollbarWidth(), []);
 
-        const toggleSorting = (keyname: string, curOrder: ColOrder = null) => {
-            if (keyname === KEY_FIELD_KEYNAME) {
+        const toggleSorting = (
+            field: string | typeof $FID,
+            curOrder: ColOrder = null
+        ) => {
+            if (field === $FID) {
                 setOrderBy(undefined);
                 return;
             }
@@ -151,7 +166,7 @@ const FeatureTable = observer(
             setOrderBy((old) => {
                 if (old) {
                     const [oldSortKey, oldSortOrder] = old;
-                    if (oldSortKey === keyname) {
+                    if (oldSortKey === field) {
                         curOrder = oldSortOrder;
                     }
                 }
@@ -159,7 +174,7 @@ const FeatureTable = observer(
                 const nextOrderIndex =
                     (curOrderIndex + 1) % sortOrderSeq.length;
                 const nextOrder = sortOrderSeq[nextOrderIndex];
-                return [keyname, nextOrder];
+                return [field, nextOrder];
             });
         };
 
@@ -221,6 +236,13 @@ const FeatureTable = observer(
                                 ? { flex: `0 0 ${userDefinedWidths[id]}px` }
                                 : { flex };
 
+                            const onClick =
+                                id === KEY_FIELD_ID
+                                    ? () => toggleSorting($FID)
+                                    : keyname
+                                      ? () => toggleSorting(keyname)
+                                      : undefined;
+
                             return (
                                 <div
                                     key={id}
@@ -231,7 +253,7 @@ const FeatureTable = observer(
                                     }}
                                     className="th"
                                     style={style}
-                                    onClick={() => toggleSorting(keyname)}
+                                    onClick={onClick}
                                 >
                                     <div className="label">{label}</div>
                                     {colSort && (
@@ -323,6 +345,7 @@ const FeatureTable = observer(
                             {effectiveWidths && (
                                 <FeatureTableRows
                                     {...{
+                                        resourceId,
                                         effectiveWidths,
                                         virtualItems,
                                         rowMinHeight,

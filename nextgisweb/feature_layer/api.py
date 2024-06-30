@@ -193,6 +193,10 @@ class Dumper:
 
     def __call__(self, feature: Feature) -> Any:
         result = dict(id=feature.id)
+
+        if (vid := feature.version) is not None:
+            result["vid"] = vid
+
         if self.params.label:
             result["label"] = feature.label
 

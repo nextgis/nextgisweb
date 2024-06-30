@@ -24,6 +24,7 @@ export interface FeatureLayerField {
 
 export interface FeatureLayer {
     fields: FeatureLayerField[];
+    versioning?: { enabled: boolean };
 }
 
 export interface FeatureLayerCount {

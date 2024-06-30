@@ -106,12 +106,14 @@ def test_basic(versioning, fdict, mkres, ngw_webtest_app):
     assert len(resp_c) == 2
 
     resp_1 = web.get(f"{furl}/1?extensions=", status=200).json
+    assert not versioning or resp_1.pop("vid")
     assert resp_1 == dict(id=1, geom="POINT Z (1 1 1)", fields=dict(foo="Updated"))
 
     resp_2 = web.get(f"{furl}/2?extensions=", status=404).json
     assert "title" in resp_2 and "message" in resp_2
 
     resp_3 = web.get(f"{furl}/3?extensions=", status=200).json
+    assert not versioning or resp_3.pop("vid")
     assert resp_3 == dict(id=3, geom="POINT Z (0 0 3)", fields=dict(foo="Inserted"))
 
     # Dispose transaction
@@ -135,7 +137,7 @@ def test_basic(versioning, fdict, mkres, ngw_webtest_app):
         ]
 
         resp = web.get(f"{furl}/2?extensions=", status=200).json
-        assert resp == dict(id=2, geom="POINT Z (0 0 2)", fields=dict(foo="Restored"))
+        assert resp == dict(id=2, vid=3, geom="POINT Z (0 0 2)", fields=dict(foo="Restored"))
 
 
 @pytest.mark.parametrize(
@@ -197,6 +199,7 @@ def test_errors(versioning, fdict, mkres, ngw_webtest_app):
 
     # Validate
     resp_1 = web.get(f"{furl}/1?extensions=", status=200).json
+    assert not versioning or resp_1.pop("vid")
     assert resp_1 == dict(id=1, geom="POINT Z (0 0 1)", fields=dict(foo="Updated"))
 
     # Dispose transaction
