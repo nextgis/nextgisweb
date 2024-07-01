@@ -8,7 +8,7 @@ const expcomp = (pattern) => [
 /** @type {import("eslint").Linter.Config } */
 const config = {
     root: true,
-    plugins: ["requirejs", "react", "prettier", "import"],
+    plugins: ["requirejs", "react", "import"],
     extends: [
         "eslint:recommended",
         "plugin:requirejs/recommended",
