@@ -1,37 +1,68 @@
-import { makeObservable } from "mobx";
+import {
+    action,
+    computed,
+    isComputed,
+    makeObservable,
+    observable,
+    observe,
+    runInAction,
+} from "mobx";
 
 import type { ErrorResult, Validator } from "./type";
+import * as validate from "./validate";
 
 type ValidateIf<O> = (obj: O) => boolean;
 type OnChange<O> = (obj: O) => void;
 
-export interface MapperOpts<O> {
-    validateIf?: ValidateIf<O>;
-    onChange?: OnChange<O>;
+interface FieldProps {
+    type?: "string" | "number";
+    required?: boolean;
+}
+interface NumberFieldProps {
+    min?: number;
+    max?: number;
 }
 
+interface StringFieldProps {
+    maxLength?: number;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type ExtraProps = Record<string, any>;
+type ValidationProps<V> = FieldProps &
+    (V extends number
+        ? NumberFieldProps
+        : V extends string
+          ? StringFieldProps
+          : FieldProps);
+
+export type MapperOpts<O> = {
+    validateIf?: ValidateIf<O>;
+    onChange?: OnChange<O>;
+};
+
 const MappedValueSymbol: unique symbol = Symbol("MappedValue");
+
+export type CProps<V, E = ExtraProps> = {
+    value?: V;
+    onChange?: OnChange<V>;
+    status?: "error";
+    extraProps?: E;
+} & ValidationProps<V>;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export class MappedValue<V = any, O = any, P extends string = string> {
     [MappedValueSymbol] = true;
 
-    private _value: V;
     private readonly owner: O;
-    private readonly validators: Validator<V, O>[];
-
-    private readonly validateIf?: ValidateIf<O>;
-    private readonly onChange?: OnChange<O>;
-
-    public readonly property: P;
+    private _value: V;
+    prop: MappedProperty<V, O, P>;
 
     constructor(value: V, owner: O, prop: MappedProperty<V, O, P>) {
         this._value = value;
         this.owner = owner;
-        this.validateIf = prop.validateIf;
-        this.onChange = prop.onChange;
-        this.property = prop.property;
-        this.validators = prop.validators;
+        this.prop = prop;
+
         makeObservable<typeof this, "_value">(this, {
             _value: true,
             value: true,
@@ -44,8 +75,10 @@ export class MappedValue<V = any, O = any, P extends string = string> {
     }
 
     set value(value: V) {
-        this._value = value;
-        this.onChange?.(this.owner);
+        runInAction(() => {
+            this._value = value;
+        });
+        this.prop.onChange?.(this.owner);
     }
 
     setter = (value: V): void => {
@@ -53,9 +86,11 @@ export class MappedValue<V = any, O = any, P extends string = string> {
     };
 
     get error(): ErrorResult {
-        if (this.validateIf?.(this.owner) === false) return undefined;
+        if (this.prop.validateIf?.(this.owner) === false) {
+            return undefined;
+        }
 
-        for (const v of this.validators) {
+        for (const v of this.prop.validators) {
             const [ok, err] = v(this._value, this.owner);
             if (!ok) return err;
         }
@@ -63,33 +98,79 @@ export class MappedValue<V = any, O = any, P extends string = string> {
     }
 
     jsonPart(): { [K in P]: V } {
-        if (!this.property) throw new TypeError("Property not set!");
-        return { [this.property]: this._value } as { [K in P]: V };
+        if (!this.prop.property) throw new TypeError("Property not set!");
+        return { [this.prop.property]: this._value } as { [K in P]: V };
     }
 
-    cprops(): {
-        value: V;
-        onChange: (value: V) => void;
-        status?: "error";
-    } {
-        return {
+    cprops(): CProps<V> {
+        const cprops: CProps<V> = {
             value: this._value,
             onChange: this.setter,
             status: this.error ? "error" : undefined,
+            ...this.prop.validationProps,
         };
+        if (this.prop.extraProps) {
+            cprops.extraProps = this.prop.extraProps;
+        }
+        return cprops;
     }
 }
-
 class MappedProperty<V, O, P extends string = string> {
     property: P;
-    validators: Validator<V, O>[] = [];
+    readonly validators: Validator<V, O>[] = [];
     validateIf?: ValidateIf<O>;
     onChange?: OnChange<O>;
+    readonly validationProps = {} as ValidationProps<V>;
+    readonly extraProps?: ExtraProps;
 
-    constructor(property: P, opts: MapperOpts<O>) {
+    constructor(property: P, opts: FieldOpts<V, O> & MapperOpts<O>) {
         this.property = property;
-        this.validateIf = opts.validateIf;
-        this.onChange = opts.onChange;
+        const {
+            validateIf,
+            onChange,
+            validators,
+            extraProps,
+            ...validationProps
+        } = opts;
+        this.validateIf = validateIf;
+        this.onChange = onChange;
+        let newValidators: Validator<V, O>[] = [];
+        this.validationProps = validationProps as ValidationProps<V>;
+        this.extraProps = extraProps;
+
+        if ("min" in validationProps || "max" in validationProps) {
+            const { min, max } = validationProps as NumberFieldProps;
+            newValidators.push((v: V) => {
+                if (typeof v === "number") {
+                    if (min !== undefined && v < min) {
+                        return [
+                            false,
+                            `Value should be greater than or equal to ${min}`,
+                        ];
+                    }
+                    if (max !== undefined && v > max) {
+                        return [
+                            false,
+                            `Value should be less than or equal to ${max}`,
+                        ];
+                    }
+                }
+                return [true, undefined];
+            });
+        }
+
+        if ("maxLength" in validationProps) {
+            const { maxLength } = validationProps as StringFieldProps;
+            newValidators.push(validate.string({ maxLength }));
+        }
+
+        if (validators) {
+            newValidators = [...newValidators, ...validators];
+        }
+
+        if (newValidators.length) {
+            this.validate(...newValidators);
+        }
     }
 
     validate(...args: Validator<V, O>[]): void {
@@ -101,21 +182,30 @@ class MappedProperty<V, O, P extends string = string> {
     }
 }
 
-export function mapper<O, D>(
-    opts?: MapperOpts<O>
-): {
+export type FieldOpts<V, O, E = ExtraProps> = ValidationProps<V> & {
+    validators?: Validator<V, O>[];
+    extraProps?: E;
+};
+
+export type MapperResult<O, D> = {
     [P in keyof D]: P extends string ? MappedProperty<D[P], O, P> : never;
 } & {
-    $load: (targеt: O, source: Partial<D>) => void;
+    $load: (target: O, source: Partial<D>) => void;
     $error: (obj: O) => ErrorResult;
-} {
+};
+
+export function mapper<O, D>(
+    opts?: {
+        [P in keyof D]?: P extends string ? FieldOpts<D[P], O> : never;
+    } & MapperOpts<O>
+): MapperResult<O, D> {
     const props: (keyof D)[] = [];
 
     function* iterMV(obj: object): Generator<[mv: MappedValue, pn: keyof D]> {
         for (const v of Object.values(obj)) {
             if (v?.[MappedValueSymbol]) {
                 const mv = v as MappedValue;
-                const pn = mv.property as keyof D;
+                const pn = mv.prop.property as keyof D;
                 if (props.includes(pn)) yield [mv, pn];
             }
         }
@@ -128,8 +218,14 @@ export function mapper<O, D>(
     };
 
     const $error = (obj: object): ErrorResult => {
+        console.log("1");
         for (const [mv] of iterMV(obj)) {
             const err = mv.error;
+            console.log("err is computed - ", isComputed(err));
+            observe(mv, () => {
+                console.log(1234);
+            });
+            // console.log("mv is observable - ", isObservable(mv));
             if (err !== false) return err;
         }
         return false;
@@ -140,7 +236,12 @@ export function mapper<O, D>(
         get: (target, prop) => {
             if (typeof prop === "string" && !prop.startsWith("$")) {
                 props.push(prop as keyof D);
-                return new MappedProperty(prop, opts || {});
+                const mappedOpts = { ...opts };
+                const fieldProps = opts && opts[prop as keyof typeof opts];
+                if (fieldProps) {
+                    Object.assign(mappedOpts, fieldProps);
+                }
+                return new MappedProperty(prop, mappedOpts);
             } else {
                 return target[prop];
             }
