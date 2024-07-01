@@ -12,7 +12,10 @@ export interface LotMVProps<V, C extends (props: any) => ReactNode>
     extends Omit<LotProps, "children"> {
     value: MappedValue<V>;
     component: C;
-    props?: Parameters<C> extends [infer P] ? P : never;
+    props?: Omit<
+        Parameters<C> extends [infer P] ? P : never,
+        "value" | "onChange"
+    >;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
