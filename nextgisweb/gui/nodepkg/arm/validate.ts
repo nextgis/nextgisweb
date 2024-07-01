@@ -15,7 +15,10 @@ const msgMaxLength = (value: number) =>
         "No more than {} characters required",
         value
     );
-const msgPattern = gettext("Ivalid value");
+const msgMinValue = gettext("Value should be at least {}");
+const msgMaxValue = gettext("Value should be no more than {}");
+
+const msgPattern = gettext("Invalid value");
 const msgNotUnique = gettext("Value not unique");
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -49,6 +52,25 @@ export function string<V = string>({
         }
         if (pattern !== undefined && !pattern.test(value))
             return [false, msgPattern];
+        return [true, undefined];
+    };
+}
+
+export function number<V = number>({
+    min,
+    max,
+}: {
+    min?: number;
+    max?: number;
+}): Validator<V> {
+    return (value: V) => {
+        if (typeof value !== "number") return [true, undefined];
+        if (min !== undefined && value < min) {
+            return [false, msgMinValue];
+        }
+        if (max !== undefined && value > max) {
+            return [false, msgMaxValue];
+        }
         return [true, undefined];
     };
 }

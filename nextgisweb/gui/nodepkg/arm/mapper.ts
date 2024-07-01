@@ -17,6 +17,7 @@ interface NumberFieldProps {
 
 interface StringFieldProps {
     maxLength?: number;
+    minLength?: number;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -126,28 +127,13 @@ class MappedProperty<V, O, P extends string = string> {
 
         if ("min" in validationProps || "max" in validationProps) {
             const { min, max } = validationProps as NumberFieldProps;
-            newValidators.push((v: V) => {
-                if (typeof v === "number") {
-                    if (min !== undefined && v < min) {
-                        return [
-                            false,
-                            `Value should be greater than or equal to ${min}`,
-                        ];
-                    }
-                    if (max !== undefined && v > max) {
-                        return [
-                            false,
-                            `Value should be less than or equal to ${max}`,
-                        ];
-                    }
-                }
-                return [true, undefined];
-            });
+            newValidators.push(validate.number({ min, max }));
         }
 
-        if ("maxLength" in validationProps) {
-            const { maxLength } = validationProps as StringFieldProps;
-            newValidators.push(validate.string({ maxLength }));
+        if ("maxLength" in validationProps || "minLength" in validationProps) {
+            const { maxLength, minLength } =
+                validationProps as StringFieldProps;
+            newValidators.push(validate.string({ maxLength, minLength }));
         }
 
         if (validators) {
