@@ -168,7 +168,9 @@ export type MapperResult<O, D> = {
 
 export function mapper<O, D>(
     opts?: {
-        [P in keyof D]?: P extends string ? FieldOpts<D[P], O> : never;
+        properties?: {
+            [P in keyof D]?: P extends string ? FieldOpts<D[P], O> : never;
+        };
     } & MapperOpts<O>
 ): MapperResult<O, D> {
     const props: (keyof D)[] = [];
@@ -204,7 +206,10 @@ export function mapper<O, D>(
             if (typeof prop === "string" && !prop.startsWith("$")) {
                 props.push(prop as keyof D);
                 const mappedOpts = { ...opts };
-                const fieldProps = opts && opts[prop as keyof typeof opts];
+                const fieldProps =
+                    opts &&
+                    opts.properties &&
+                    opts.properties[prop as keyof typeof opts.properties];
                 if (fieldProps) {
                     Object.assign(mappedOpts, fieldProps);
                 }
