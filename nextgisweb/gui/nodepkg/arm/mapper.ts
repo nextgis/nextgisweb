@@ -1,12 +1,4 @@
-import {
-    action,
-    computed,
-    isComputed,
-    makeObservable,
-    observable,
-    observe,
-    runInAction,
-} from "mobx";
+import { action, computed, observable, runInAction } from "mobx";
 
 import type { ErrorResult, Validator } from "./type";
 import * as validate from "./validate";
@@ -55,22 +47,16 @@ export class MappedValue<V = any, O = any, P extends string = string> {
     [MappedValueSymbol] = true;
 
     private readonly owner: O;
-    private _value: V;
-    prop: MappedProperty<V, O, P>;
+    @observable private accessor _value: V;
+    readonly prop: MappedProperty<V, O, P>;
 
     constructor(value: V, owner: O, prop: MappedProperty<V, O, P>) {
         this._value = value;
         this.owner = owner;
         this.prop = prop;
-
-        makeObservable<typeof this, "_value">(this, {
-            _value: true,
-            value: true,
-            error: true,
-        });
     }
 
-    get value(): V {
+    @computed get value(): V {
         return this._value;
     }
 
@@ -81,11 +67,11 @@ export class MappedValue<V = any, O = any, P extends string = string> {
         this.prop.onChange?.(this.owner);
     }
 
-    setter = (value: V): void => {
+    @action setter = (value: V): void => {
         this.value = value;
     };
 
-    get error(): ErrorResult {
+    @computed get error(): ErrorResult {
         if (this.prop.validateIf?.(this.owner) === false) {
             return undefined;
         }
@@ -218,14 +204,9 @@ export function mapper<O, D>(
     };
 
     const $error = (obj: object): ErrorResult => {
-        console.log("1");
         for (const [mv] of iterMV(obj)) {
             const err = mv.error;
-            console.log("err is computed - ", isComputed(err));
-            observe(mv, () => {
-                console.log(1234);
-            });
-            // console.log("mv is observable - ", isObservable(mv));
+
             if (err !== false) return err;
         }
         return false;
