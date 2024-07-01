@@ -205,11 +205,9 @@ export function mapper<O, D>(
         get: (target, prop) => {
             if (typeof prop === "string" && !prop.startsWith("$")) {
                 props.push(prop as keyof D);
-                const mappedOpts = { ...opts };
+                const { properties, ...mappedOpts } = opts ?? {};
                 const fieldProps =
-                    opts &&
-                    opts.properties &&
-                    opts.properties[prop as keyof typeof opts.properties];
+                    properties && properties[prop as keyof typeof properties];
                 if (fieldProps) {
                     Object.assign(mappedOpts, fieldProps);
                 }
