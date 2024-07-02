@@ -22,8 +22,7 @@ from nextgisweb.lib.ows import (
 )
 
 from nextgisweb.core.exception import ValidationError
-from nextgisweb.feature_layer import FIELD_TYPE, GEOM_TYPE, Feature
-from nextgisweb.feature_layer.api import versioning
+from nextgisweb.feature_layer import FIELD_TYPE, GEOM_TYPE, Feature, IVersionableFeatureLayer
 from nextgisweb.layer import IBboxLayer
 from nextgisweb.resource import DataScope
 from nextgisweb.spatial_ref_sys import SRS
@@ -1183,118 +1182,119 @@ class WFSHandler:
             transformer = transformer_cache[geom.srid][srs_to.id]
             return transformer.transform(geom)
 
-        for _operation in self.root_body:
-            operation_tag = ns_trim(_operation.tag)
-            if operation_tag == "Insert":
-                _layer = _operation[0]
-                keyname = ns_trim(_layer.tag)
+        def gml_geom_for_flayer(el, flayer):
+            try:
+                geom = geom_from_gml(el)
+            except GeometryNotValid:
+                raise ValidationError("Geometry is not valid.")
+            if geom.srid is not None and geom.srid != flayer.srs_id:
+                geom = transform(geom, flayer.srs)
+            return geom
+
+        fversioning_flayers = set()
+
+        try:
+            for _operation in self.root_body:
+                operation = ns_trim(_operation.tag)
+                if operation not in ("Insert", "Update", "Delete"):
+                    raise ValidationError("Unknown operation: %s" % operation)
+
+                keyname = ns_trim(
+                    _operation[0].tag if operation == "Insert" else _operation.get("typeName")
+                )
                 layer = find_layer(keyname)
                 feature_layer = layer.resource
 
-                feature = Feature()
+                if (
+                    IVersionableFeatureLayer.providedBy(feature_layer)
+                    and feature_layer.fversioning
+                    and feature_layer not in fversioning_flayers
+                ):
+                    feature_layer.fversioning_open(self.request)
+                    fversioning_flayers.add(feature_layer)
 
-                geom_column = get_geom_column(feature_layer)
+                if operation == "Insert":
+                    feature = Feature()
+                    geom_column = get_geom_column(feature_layer)
 
-                for _property in _layer:
-                    key = ns_trim(_property.tag)
-                    fld_keyname = self._field_key_decode(key, feature_layer.fields)
-                    if fld_keyname == geom_column:
-                        try:
-                            geom = geom_from_gml(_property[0])
-                        except GeometryNotValid:
-                            raise ValidationError("Geometry is not valid.")
-                        if geom.srid is not None and geom.srid != feature_layer.srs_id:
-                            geom = transform(geom, feature_layer.srs)
-                        feature.geom = geom
-                    else:
-                        feature.fields[fld_keyname] = _property.text
+                    for _property in _operation[0]:
+                        key = ns_trim(_property.tag)
+                        fld_keyname = self._field_key_decode(key, feature_layer.fields)
+                        if fld_keyname == geom_column:
+                            feature.geom = gml_geom_for_flayer(_property[0], feature_layer)
+                        else:
+                            feature.fields[fld_keyname] = _property.text
 
-                # TODO: Aggregate transcactions
-                with versioning(feature_layer, self.request):
                     fid = feature_layer.feature_create(feature)
                     fid_str = fid_encode(fid, keyname)
 
-                _insert = El(
-                    "InsertResult" if self.p_version == v100 else "InsertResults",
-                    namespace=_ns_wfs,
-                    parent=_response,
-                )
-                if self.p_version >= v200:
-                    _feature = El("Feature", namespace=_ns_wfs, parent=_insert)
-                    El("ResourceId", dict(rid=fid_str), namespace=_ns_fes, parent=_feature)
-                elif self.p_version == v110:
-                    _feature = El("Feature", namespace=_ns_wfs, parent=_insert)
-                    El("FeatureId", dict(fid=fid_str), namespace=_ns_ogc, parent=_feature)
-                else:
-                    El("FeatureId", dict(fid=fid_str), namespace=_ns_ogc, parent=_insert)
-
-                if show_summary:
-                    summary["totalInserted"] += 1
-            else:
-                keyname = ns_trim(_operation.get("typeName"))
-                layer = find_layer(keyname)
-                feature_layer = layer.resource
-
-                _filter = find_tags(_operation, "Filter")[0]
-                result = self._parse_filter(_filter, layer)
-                if result["intersects"] is not None or len(result["filter"]) != 0:
-                    raise ValidationError("Only feature ID filter is supported in transaction.")
-                fids = result["fids"]
-                if len(fids) == 0:
-                    raise ValidationError("Feature ID filter must be specified.")
-
-                if operation_tag == "Update":
-                    query = feature_layer.feature_query()
-
-                    if len(fids) != 1:
-                        raise ValidationError(
-                            "Multiple features not supported in update transaction"
-                        )
-                    # query.filter(('id', 'in', ','.join((str(fid) for fid in fids))))
-                    query.filter_by(id=fids[0])
-
-                    feature = query().one()
-
-                    geom_column = get_geom_column(feature_layer)
-
-                    for _property in find_tags(_operation, "Property"):
-                        key = find_tags(_property, "Name")[0].text
-                        fld_keyname = self._field_key_decode(key, feature_layer.fields)
-                        _values = find_tags(_property, "Value")
-                        _value = None if len(_values) == 0 else _values[0]
-
-                        if fld_keyname == geom_column:
-                            try:
-                                geom = geom_from_gml(_value[0])
-                            except GeometryNotValid:
-                                raise ValidationError("Geometry is not valid.")
-                            if geom.srid is not None and geom.srid != feature_layer.srs_id:
-                                geom = transform(geom, feature_layer.srs)
-                            feature.geom = geom
-                        else:
-                            if _value is None:
-                                value = None
-                            elif _value.text is None:
-                                value = ""
-                            else:
-                                value = _value.text
-                            feature.fields[fld_keyname] = value
-
-                    # TODO: Aggregate transcactions
-                    with versioning(feature_layer, self.request):
-                        feature_layer.feature_put(feature)
+                    _insert = El(
+                        "InsertResult" if self.p_version == v100 else "InsertResults",
+                        namespace=_ns_wfs,
+                        parent=_response,
+                    )
+                    if self.p_version >= v200:
+                        _feature = El("Feature", namespace=_ns_wfs, parent=_insert)
+                        El("ResourceId", dict(rid=fid_str), namespace=_ns_fes, parent=_feature)
+                    elif self.p_version == v110:
+                        _feature = El("Feature", namespace=_ns_wfs, parent=_insert)
+                        El("FeatureId", dict(fid=fid_str), namespace=_ns_ogc, parent=_feature)
+                    else:
+                        El("FeatureId", dict(fid=fid_str), namespace=_ns_ogc, parent=_insert)
 
                     if show_summary:
-                        summary["totalUpdated"] += 1
-                elif operation_tag == "Delete":
-                    # TODO: Aggregate transcactions
-                    with versioning(feature_layer, self.request):
+                        summary["totalInserted"] += 1
+                else:
+                    _filter = find_tags(_operation, "Filter")[0]
+                    result = self._parse_filter(_filter, layer)
+                    if result["intersects"] is not None or len(result["filter"]) != 0:
+                        raise ValidationError(
+                            "Only feature ID filter is supported in transaction."
+                        )
+                    fids = result["fids"]
+                    if len(fids) == 0:
+                        raise ValidationError("Feature ID filter must be specified.")
+
+                    if operation == "Update":
+                        if len(fids) != 1:
+                            raise ValidationError(
+                                "Multiple features not supported in update transaction"
+                            )
+                        query = feature_layer.feature_query()
+                        query.filter_by(id=fids[0])
+
+                        feature = query().one()
+                        geom_column = get_geom_column(feature_layer)
+
+                        for _property in find_tags(_operation, "Property"):
+                            key = find_tags(_property, "Name")[0].text
+                            fld_keyname = self._field_key_decode(key, feature_layer.fields)
+                            _values = find_tags(_property, "Value")
+                            _value = None if len(_values) == 0 else _values[0]
+
+                            if fld_keyname == geom_column:
+                                feature.geom = gml_geom_for_flayer(_value[0], feature_layer)
+                            else:
+                                if _value is None:
+                                    value = None
+                                elif _value.text is None:
+                                    value = ""
+                                else:
+                                    value = _value.text
+                                feature.fields[fld_keyname] = value
+
+                        feature_layer.feature_put(feature)
+
+                        if show_summary:
+                            summary["totalUpdated"] += 1
+                    else:  # "Delete":
                         for fid in fids:
                             feature_layer.feature_delete(fid)
                         if show_summary:
                             summary["totalDeleted"] += 1
-                else:
-                    raise ValidationError("Unknown operation: %s" % operation_tag)
+        finally:
+            for flayer in fversioning_flayers:
+                flayer.fversioning_close()
 
         if show_summary:
             for param, value in summary.items():
