@@ -376,6 +376,12 @@ const webpackConfig = defaults("main", (env) => ({
             project: "ngw-frontend",
             authToken:
                 "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",
+            telemetry: false,
+            // debug: true,
+            sourcemaps: {
+                assets: [],
+            },
+            // release: {},
         }),
         new CopyPlugin({
             // Copy @nextgisweb/jsrealm/with-chunks!entry-name loader directly
