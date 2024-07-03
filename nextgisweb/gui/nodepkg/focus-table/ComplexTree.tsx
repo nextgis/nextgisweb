@@ -81,7 +81,7 @@ class EnvironmentAdapter<I extends FocusTableItem>
 
     select = (item: I | null) => {
         if (item) {
-            const index = this.provider.indexer.indexFor(item);
+            const index = this.provider.indexer.index(item);
             this.target.selectItems([index], TREE_ID);
         } else {
             this.target.selectItems([], TREE_ID);
@@ -90,13 +90,13 @@ class EnvironmentAdapter<I extends FocusTableItem>
 
     expand = (items: I[]) => {
         items.forEach((item) => {
-            const index = this.provider.indexer.indexFor(item);
+            const index = this.provider.indexer.index(item);
             this.target.expandItem(index, TREE_ID);
         });
     };
 
     indexFor = (item: I) => {
-        return this.provider.indexer.indexFor(item);
+        return this.provider.indexer.index(item);
     };
 
     isExpanded = (item: I | null) => {

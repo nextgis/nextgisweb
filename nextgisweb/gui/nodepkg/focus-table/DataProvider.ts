@@ -15,6 +15,8 @@ import type {
     TreeItemIndex,
 } from "react-complex-tree";
 
+import { scalarSequnceIndexer } from "@nextgisweb/gui/util";
+
 import type { FocusTableItem, FocusTableStore } from "./type";
 
 export const ROOT_DATA = Symbol("root");
@@ -22,33 +24,13 @@ export const ROOT_ITEM = "root";
 
 const SHALLOW = { deep: false };
 
-class Indexer<I extends FocusTableItem> {
-    seq = 0;
-    fwd = new Map<TreeItemIndex, I>();
-    rev = new Map<I, TreeItemIndex>();
-
-    indexFor(item: I): TreeItemIndex {
-        const existing = this.rev.get(item);
-        if (existing !== undefined) return existing;
-
-        const id = ++this.seq;
-        this.fwd.set(id, item);
-        this.rev.set(item, id);
-        return id;
-    }
-
-    lookup(id: TreeItemIndex): I | undefined {
-        return this.fwd.get(id);
-    }
-}
-
 class ProviderTreeItem<I extends FocusTableItem>
     implements TreeItem<I | typeof ROOT_DATA>
 {
     index: TreeItemIndex;
     data: I | typeof ROOT_DATA;
     store: FocusTableStore<I>;
-    indexer: Indexer<I>;
+    indexer: DataProvider<I>["indexer"];
     isFolder: boolean;
     canMove: boolean = true;
 
@@ -60,7 +42,7 @@ class ProviderTreeItem<I extends FocusTableItem>
         data: I | typeof ROOT_DATA,
         opts: {
             store: FocusTableStore<I>;
-            indexer: Indexer<I>;
+            indexer: DataProvider<I>["indexer"];
             rootItem: TreeItemIndex;
         }
     ) {
@@ -78,7 +60,7 @@ class ProviderTreeItem<I extends FocusTableItem>
         if (this.childrenObservable === undefined) return undefined;
         if (this.childrenCache === undefined) {
             this.childrenCache = this.childrenObservable?.map((data) => {
-                return this.indexer.indexFor(data);
+                return this.indexer.index(data);
             });
         }
         return this.childrenCache;
@@ -94,7 +76,7 @@ export class DataProvider<I extends FocusTableItem>
     implements TreeDataProvider<I | typeof ROOT_DATA>
 {
     store: FocusTableStore<I>;
-    indexer = new Indexer<I>();
+    indexer = scalarSequnceIndexer<I, TreeItemIndex>();
     rootItem: TreeItemIndex;
 
     private treeItems = observable.map<TreeItemIndex, ProviderTreeItem<I>>();
@@ -174,8 +156,8 @@ export class DataProvider<I extends FocusTableItem>
         const children = parentItem.childrenObservable!;
 
         runInAction(() => {
-            const newChildren = childrenIds.map((i) => this.indexer.lookup(i)!);
-            children.splice(0, children.length, ...(newChildren as I[]));
+            const next = childrenIds.map((i) => this.indexer.lookup(i)!);
+            children.splice(0, children.length, ...(next as I[]));
         });
     }
 
@@ -192,7 +174,7 @@ export class DataProvider<I extends FocusTableItem>
             updated.set(id, pv === undefined ? 0 : pv);
             const touch = (arr: I[], v: number) => {
                 for (const ti of arr) {
-                    const j = this.indexer.indexFor(ti);
+                    const j = this.indexer.index(ti);
                     const c = updated.get(j);
                     updated.set(j, (c === undefined ? 0 : c) + v);
                 }
