@@ -40,6 +40,7 @@ export const ResourceSelect = <V extends SelectValue = SelectValue>({
     });
 
     const closePicker = () => {
+        setOpen(false);
         if (pickerModal.current) {
             pickerModal.current;
         }
