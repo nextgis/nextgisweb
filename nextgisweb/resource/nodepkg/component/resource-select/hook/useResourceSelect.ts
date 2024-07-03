@@ -14,7 +14,7 @@ export function useResourceSelect<V extends SelectValue = SelectValue>({
     const { makeSignal, abort } = useAbortController();
 
     const [resource, setResource] = useState<CompositeRead | null>(null);
-    const [isLoading, setIsLoading] = useState(value !== undefined);
+    const [isLoading, setIsLoading] = useState(typeof value === "number");
     const [error, setError] = useState<ApiError>();
 
     useEffect(() => {
