@@ -16,6 +16,12 @@ declare const ngwConfig: {
     logoutUrl: string;
     // Defined in @nextgisweb/jsrealm/locale-loader
     plurals: [number, { (n: number): number }];
+    // Defined by resource component
+    resourceFavorite: {
+        identity: string;
+        resource: { id: number };
+        current: number | null;
+    } | null;
 };
 
 declare const dojoConfig: {

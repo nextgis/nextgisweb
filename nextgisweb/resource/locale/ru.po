@@ -18,7 +18,7 @@ msgstr "Сохранить"
 #: amd/ngw-resource/CompositeWidget.js:110
 #: nodepkg/children-section/component/MenuDropdown.tsx:209
 #: nodepkg/children-section/util/createResourceTableItemOptions.ts:8
-#: nodepkg/delete-page/DeletePage.tsx:61 view.py:415
+#: nodepkg/delete-page/DeletePage.tsx:60 view.py:415
 msgid "Delete"
 msgstr "Удалить"
 
@@ -55,7 +55,7 @@ msgid "Cancel"
 msgstr "Отмена"
 
 #: amd/ngw-resource/form/ResourceLink.js:27 model.py:84
-#: nodepkg/editor-widget/EditorWidget.tsx:67 scope.py:12
+#: nodepkg/editor-widget/EditorWidget.tsx:68 scope.py:12
 msgid "Resource"
 msgstr "Ресурс"
 
@@ -111,14 +111,18 @@ msgid "The '{attribute}' attribute is read-only and cannot be updated."
 msgstr "Атрибут `{attribute}` - только для чтения и не может быть изменен."
 
 #: exception.py:40
+msgid "Interface not supported"
+msgstr "Интерфейс не поддерживается"
+
+#: exception.py:45
 msgid "Resource display name is not unique"
 msgstr "Наименование ресурса не уникально"
 
-#: exception.py:41
+#: exception.py:46
 msgid "Resource with same display name already exists (id = %d)."
 msgstr "Ресурс с таким наименованием уже существует (id = %d)."
 
-#: exception.py:42
+#: exception.py:47
 msgid ""
 "Within a single parent resource, each resource must have unique display name."
 " Give the resource a different display name or rename existing."
@@ -127,29 +131,37 @@ msgstr ""
 "наименование. Присвойте ресурсу другое наименование или переименуйте "
 "существующий."
 
-#: exception.py:54
+#: exception.py:59
 msgid "Hierarchy error"
 msgstr "Ошибка иерархии"
 
-#: exception.py:58
+#: exception.py:63
 msgid "Resource class '%s' disabled."
 msgstr "Класс ресурса '%s' отключен."
 
-#: exception.py:67
+#: exception.py:72
 msgid "Quota exceeded"
 msgstr "Превышена квота"
 
-#: exception.py:73
+#: exception.py:78
 msgid "Maximum number of resources exceeded. The limit is %s."
 msgstr "Превышено допустимое число ресурсов. Лимит %s."
 
-#: exception.py:75
+#: exception.py:80
 msgid "Not enough resource quota: {0} required, but only {1} available."
 msgstr "Превышена квота на количество ресурсов: {0} запрошено, доступно {1}."
 
-#: exception.py:79
+#: exception.py:84
 msgid "Resource type - {}."
 msgstr "Тип ресурса - {}."
+
+#: favorite/__init__.py:10
+msgid "Show"
+msgstr "Перейти"
+
+#: favorite/view.py:15 nodepkg/favorite/Avatar.tsx:54
+msgid "Favorites"
+msgstr "Избранное"
 
 #: home.py:23
 msgid "User resources"
@@ -194,8 +206,8 @@ msgid "Resource group"
 msgstr "Группа ресурсов"
 
 #: nodepkg/children-section/ChildrenSection.tsx:76
-#: nodepkg/component/resource-picker/ResourcePickerChildren.tsx:25
-#: nodepkg/editor-widget/EditorWidget.tsx:19
+#: nodepkg/component/resource-picker/ResourcePickerChildren.tsx:26
+#: nodepkg/editor-widget/EditorWidget.tsx:20
 msgid "Display name"
 msgstr "Наименование"
 
@@ -205,7 +217,7 @@ msgid "Type"
 msgstr "Тип"
 
 #: nodepkg/children-section/ChildrenSection.tsx:97
-#: nodepkg/editor-widget/EditorWidget.tsx:39
+#: nodepkg/editor-widget/EditorWidget.tsx:43
 #: template/resource_section_summary.mako:20
 msgid "Owner"
 msgstr "Владелец"
@@ -297,13 +309,18 @@ msgstr "Создать группу"
 msgid "Clear selection"
 msgstr "Очистить выделение"
 
-#: nodepkg/component/resource-picker/ResourcePickerTitle.tsx:18
+#: nodepkg/component/resource-picker/ResourcePickerTitle.tsx:17
 msgid "Go to initial group"
 msgstr "Вернуться в исходную группу"
 
-#: nodepkg/component/resource-picker/ResourcePickerTitle.tsx:19
+#: nodepkg/component/resource-picker/ResourcePickerTitle.tsx:18
 msgid "Refresh"
 msgstr "Обновить"
+
+#: nodepkg/component/resource-picker/pickToFocusTable.tsx:43
+#: nodepkg/permissions-widget/PermissionsWidget.tsx:25
+msgid "Add"
+msgstr "Добавить"
 
 #: nodepkg/component/resource-picker/store/ResourcePickerStore.ts:18
 msgid "Pick this group"
@@ -313,7 +330,7 @@ msgstr "Выбрать эту группу"
 msgid "Pick selected"
 msgstr "Выбрать отмеченное"
 
-#: nodepkg/delete-page/DeletePage.tsx:48
+#: nodepkg/delete-page/DeletePage.tsx:47
 msgid "Confirm deletion of the resource"
 msgstr "Подтвердить удаление ресурса"
 
@@ -321,18 +338,18 @@ msgstr "Подтвердить удаление ресурса"
 msgid "Description"
 msgstr "Описание"
 
+#: nodepkg/editor-widget/EditorWidget.tsx:13
+msgid "Identifier for API integration (optional)"
+msgstr "Идентификатор для API интеграции (необязательно)"
+
 #: nodepkg/editor-widget/EditorWidget.tsx:29
 msgid "Parent"
 msgstr "Родитель"
 
-#: nodepkg/editor-widget/EditorWidget.tsx:51
+#: nodepkg/editor-widget/EditorWidget.tsx:55
 #: template/resource_section_summary.mako:9
 msgid "Keyname"
 msgstr "Ключ"
-
-#: nodepkg/editor-widget/EditorWidget.tsx:55
-msgid "Identifier for API integration (optional)"
-msgstr "Идентификатор для API интеграции (необязательно)"
 
 #: nodepkg/effective-permissions/EffectivePermissions.tsx:15
 msgid "No"
@@ -374,13 +391,21 @@ msgstr ""
 "* Это не повлияет на REST API, который продолжит регулироваться правами "
 "доступа."
 
-#: nodepkg/external-access/ExternalAccess.tsx:11
+#: nodepkg/external-access/ExternalAccess.tsx:10
 msgid "Use these links to plug data into external applications."
 msgstr "Используйте эти ссылки для подключения данных к внешним приложениям."
 
-#: nodepkg/external-access/ExternalAccess.tsx:12
+#: nodepkg/external-access/ExternalAccess.tsx:11
 msgid "Read more"
 msgstr "Подробнее"
+
+#: nodepkg/favorite/useFavorites.tsx:33
+msgid "Added to favorites"
+msgstr "Добавлено в избранное"
+
+#: nodepkg/favorite/useFavorites.tsx:48
+msgid "Removed from favorites"
+msgstr "Удалено из избранного"
 
 #: nodepkg/permissions-widget/PermissionStoreItem.ts:13
 msgid "All fields are required"
@@ -390,47 +415,43 @@ msgstr "Необходимо заполнить все поля"
 msgid "Row conflicts with another"
 msgstr "Конфликт строк"
 
-#: nodepkg/permissions-widget/PermissionsWidget.tsx:21 view.py:360
+#: nodepkg/permissions-widget/PermissionsWidget.tsx:20 view.py:360
 msgid "Action"
 msgstr "Действие"
 
-#: nodepkg/permissions-widget/PermissionsWidget.tsx:22
+#: nodepkg/permissions-widget/PermissionsWidget.tsx:21
 msgid "Principal"
 msgstr "Субъект"
 
-#: nodepkg/permissions-widget/PermissionsWidget.tsx:23
+#: nodepkg/permissions-widget/PermissionsWidget.tsx:22
 msgid "Apply to"
 msgstr "Применить для"
 
-#: nodepkg/permissions-widget/PermissionsWidget.tsx:24
+#: nodepkg/permissions-widget/PermissionsWidget.tsx:23
 msgid "Permission"
 msgstr "Право"
 
 #: nodepkg/permissions-widget/PermissionsWidget.tsx:26
-msgid "Add"
-msgstr "Добавить"
-
-#: nodepkg/permissions-widget/PermissionsWidget.tsx:27
 msgid "Allow"
 msgstr "Разрешить"
 
-#: nodepkg/permissions-widget/PermissionsWidget.tsx:28
+#: nodepkg/permissions-widget/PermissionsWidget.tsx:27
 msgid "Deny"
 msgstr "Запретить"
 
-#: nodepkg/permissions-widget/PermissionsWidget.tsx:30
+#: nodepkg/permissions-widget/PermissionsWidget.tsx:29
 msgid "This and subresources"
 msgstr "Этого и вложенных ресурсов"
 
-#: nodepkg/permissions-widget/PermissionsWidget.tsx:31
+#: nodepkg/permissions-widget/PermissionsWidget.tsx:30
 msgid "This resource only"
 msgstr "Только этого ресурса"
 
-#: nodepkg/permissions-widget/PermissionsWidget.tsx:33
+#: nodepkg/permissions-widget/PermissionsWidget.tsx:32
 msgid "All permissions"
 msgstr "Все права"
 
-#: nodepkg/permissions-widget/PermissionsWidget.tsx:221
+#: nodepkg/permissions-widget/PermissionsWidget.tsx:220
 msgid "Permissions"
 msgstr "Права доступа"
 
@@ -550,4 +571,7 @@ msgstr "Дополнительно"
 #: view.py:402
 msgid "Update"
 msgstr "Изменить"
+
+#~ msgid "Open"
+#~ msgstr "Открыть"
 

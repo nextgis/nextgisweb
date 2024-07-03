@@ -170,11 +170,11 @@ msgstr "Ошибка длительного запроса"
 msgid "Long-running request was cancelled."
 msgstr "Длительный запрос был отменен."
 
-#: nodepkg/company-logo.js:32
+#: nodepkg/company-logo.ts:32
 msgid "Get your own Web GIS at nextgis.com"
 msgstr "Создайте свою Веб ГИС на nextgis.com"
 
-#: nodepkg/cors-settings/CORSSettings.js:19
+#: nodepkg/cors-settings/CORSSettings.tsx:24
 msgid ""
 "Enter allowed origins for cross domain requests to use HTTP API of this Web "
 "GIS on other websites. One origin per line."
@@ -183,7 +183,7 @@ msgstr ""
 "использования HTTP API этой Веб ГИС на других веб-сайтах. По одному источнику"
 " в строке."
 
-#: nodepkg/cors-settings/CORSSettings.js:20
+#: nodepkg/cors-settings/CORSSettings.tsx:25
 msgid ""
 "Please note that different protocols (HTTP and HTTPS) and subdomains "
 "(example.com and www.example.com) are different origins. Wildcards are "
@@ -193,23 +193,23 @@ msgstr ""
 " www.example.com) считаются разными источниками. Символ подстановки (*) "
 "допустим для доменов третьего уровней и выше."
 
-#: nodepkg/cors-settings/CORSSettings.js:53
+#: nodepkg/cors-settings/CORSSettings.tsx:58
 msgid "CORS settings updated"
 msgstr "Настройки CORS обновлены"
 
-#: nodepkg/cors-settings/CORSSettings.js:58
+#: nodepkg/cors-settings/CORSSettings.tsx:63
 msgid "Fix the form errors first"
 msgstr "Вначале исправьте ошибку в форме"
 
-#: nodepkg/cors-settings/CORSSettings.js:74
+#: nodepkg/cors-settings/CORSSettings.tsx:79
 msgid "The value entered is not valid"
 msgstr "Введенное значение некорректно"
 
-#: nodepkg/custom-css-form/CustomCSSForm.js:40
+#: nodepkg/custom-css-form/CustomCSSForm.tsx:41
 msgid "Custom styles saved. Reload the page to get them applied."
 msgstr "Изменения в стилях сохранены. Обновите страницу, чтобы увидеть изменения."
 
-#: nodepkg/custom-css-form/CustomCSSForm.js:62
+#: nodepkg/custom-css-form/CustomCSSForm.tsx:63
 msgid ""
 "Enter custom CSS rules here. They will be used to redefine styles, design for"
 " all pages of your Web GIS."
@@ -217,7 +217,7 @@ msgstr ""
 "Здесь можно задать стили CSS. Они будут использованы для оформления всех "
 "страниц вашей Веб ГИС."
 
-#: nodepkg/home-path/HomePath.js:4
+#: nodepkg/home-path/HomePath.tsx:4
 msgid "The home path setting is saved."
 msgstr "Настройка стартовой страницы сохранена."
 
@@ -229,31 +229,31 @@ msgstr[0] "штука"
 msgstr[1] "штуки"
 msgstr[2] "штук"
 
-#: nodepkg/layout/Avatar.js:11
+#: nodepkg/layout/Avatar.tsx:12
 msgid "Sign in"
 msgstr "Войти"
 
-#: nodepkg/layout/Avatar.js:19
+#: nodepkg/layout/Avatar.tsx:20
 msgid "Invitation session"
 msgstr "Пригласительная сессия"
 
-#: nodepkg/layout/Avatar.js:21 view.py:549
-msgid "Settings"
-msgstr "Настройки"
+#: nodepkg/layout/Avatar.tsx:23
+msgid "User settings"
+msgstr "Настройки пользователя"
 
-#: nodepkg/layout/Avatar.js:23
+#: nodepkg/layout/Avatar.tsx:25
 msgid "Sign out"
 msgstr "Выйти"
 
-#: nodepkg/layout/store.js:39
+#: nodepkg/layout/store.ts:48
 msgid "Resources"
 msgstr "Ресурсы"
 
-#: nodepkg/layout/store.js:45 view.py:169
+#: nodepkg/layout/store.ts:54 view.py:169
 msgid "Control panel"
 msgstr "Панель управления"
 
-#: nodepkg/layout/store.js:52
+#: nodepkg/layout/store.ts:61
 msgid "Help"
 msgstr "Справка"
 
@@ -265,7 +265,7 @@ msgstr "Рекомендуемая высота 45 px и ширина до 200 p
 msgid "Only PNG and SVG images are supported."
 msgstr "Поддерживаются только изображения PNG и SVG."
 
-#: nodepkg/metrics/GoogleAnalyticsTab.tsx:29
+#: nodepkg/metrics/GoogleAnalyticsTab.tsx:30
 msgid "Measurement ID"
 msgstr "Идентификатор потока данных"
 
@@ -293,11 +293,11 @@ msgstr ""
 "HTML-код этих счетчиков будет встроен в каждую страницу и позволит "
 "отслеживать активность пользователей."
 
-#: nodepkg/metrics/YandexMetricaTab.tsx:30
+#: nodepkg/metrics/YandexMetricaTab.tsx:31
 msgid "Tag number"
 msgstr "Номер счетчика"
 
-#: nodepkg/metrics/YandexMetricaTab.tsx:48
+#: nodepkg/metrics/YandexMetricaTab.tsx:51
 msgid "Webvisor"
 msgstr "Вебвизор"
 
@@ -351,7 +351,7 @@ msgstr ""
 msgid "Estimate storage"
 msgstr "Оценка хранилища"
 
-#: nodepkg/system-name-form/SystemNameForm.js:4
+#: nodepkg/system-name-form/SystemNameForm.tsx:4
 msgid "The system name setting is saved."
 msgstr "Настройка названия Веб ГИС сохранена."
 
@@ -563,4 +563,8 @@ msgstr "Метрики и аналитика"
 #: view.py:548
 msgid "Info"
 msgstr "Информация"
+
+#: view.py:549
+msgid "Settings"
+msgstr "Настройки"
 

@@ -12,6 +12,7 @@ Changes
 - Support for upper-case placeholders in TMS connections.
 - Customizable print layout including legend.
 - Experimental support for feature versioning.
+- User-defined favorite resource pages.
 
 
 4.7.0

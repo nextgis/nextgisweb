@@ -30,28 +30,36 @@
 }
 
 .ngw-pyramid-avatar-popover {
-    .ant-popover-title {
-        padding: 6px 12px;
-        font-weight: bold;
-    }
+    .ant-popover-content {
+        > .ant-popover-inner {
+            padding: 1ex;
 
-    .ant-popover-inner-content {
-        padding: 0px;
+            .ant-popover-title {
+                padding: 4px 8px;
+                font-weight: bold;
+            }
 
-        div.warning {
-            display: block;
-            background-color: var(--surface-bg-danger);
-            padding: 6px 12px;
-        }
+            .ant-popover-inner-content {
+                display: flex;
+                flex-direction: column;
+                gap: 1ex;
+                padding: 0px;
 
-        a {
-            display: block;
-            padding: 6px 12px;
-            color: var(--text-base);
-            text-decoration: none;
+                div.warning {
+                    background-color: var(--surface-bg-danger);
+                    padding: 4px 8px;
+                }
 
-            &:hover {
-                background-color: rgba(0, 0, 0, 0.04);
+                a {
+                    display: block;
+                    padding: 4px 8px;
+                    color: var(--text-base);
+                    text-decoration: none;
+
+                    &:hover {
+                        background-color: rgba(0, 0, 0, 0.04);
+                    }
+                }
             }
         }
     }

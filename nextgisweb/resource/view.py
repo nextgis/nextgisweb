@@ -449,3 +449,7 @@ def setup_pyramid(comp, config):
         from .home import on_user_login
 
         zope.event.classhandler.handler(OnUserLogin)(on_user_login)
+
+    from .favorite import view as favorite_view
+
+    favorite_view.setup_pyramid(comp, config)

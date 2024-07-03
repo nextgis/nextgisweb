@@ -15,6 +15,7 @@ import { TemplateLink } from "@nextgisweb/gui/component";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import settings from "@nextgisweb/pyramid/settings!";
+import { useFavorites } from "@nextgisweb/resource/favorite/useFavorites";
 import { getControls } from "@nextgisweb/webmap/map-controls";
 import { getPermalink } from "@nextgisweb/webmap/utils/permalink";
 
@@ -22,9 +23,10 @@ import { PanelHeader } from "../header";
 
 import CloseIcon from "@nextgisweb/icon/material/close";
 import PreviewIcon from "@nextgisweb/icon/material/preview";
+import FavoriteIcon from "@nextgisweb/icon/material/star";
 
-import "./SharePanel.less";
 import "../styles/panels.less";
+import "./SharePanel.less";
 
 // prettier-ignore
 const msgCORS = gettext("<a>CORS</a> must be enabled for the target origin when embedding a web map on a different domain.");
@@ -257,6 +259,17 @@ export const SharePanel = ({ display, title, close, visible }) => {
         );
     }
 
+    const favorites = useFavorites({ resource: { id: webmapId } });
+    const addToFavorites = useCallback(
+        (link) => {
+            favorites.add({
+                identity: "webmap.fragment",
+                query_string: link.slice(link.indexOf("?") + 1),
+            });
+        },
+        [favorites]
+    );
+
     return (
         <div className="ngw-panel ngw-webmap-share-panel">
             <PanelHeader {...{ title, close }} />
@@ -265,12 +278,23 @@ export const SharePanel = ({ display, title, close, visible }) => {
                 <div className="input-group">
                     <CodeArea value={mapLink} />
                 </div>
-                <CopyToClipboardButton
-                    getTextToCopy={() => mapLink}
-                    messageInfo={gettext("The map link copied to clipboard.")}
-                >
-                    {gettext("Copy link")}
-                </CopyToClipboardButton>
+                {favorites.contextHolder}
+                <Space.Compact>
+                    <CopyToClipboardButton
+                        getTextToCopy={() => mapLink}
+                        messageInfo={gettext(
+                            "The map link copied to clipboard."
+                        )}
+                    >
+                        {gettext("Copy link")}
+                    </CopyToClipboardButton>
+                    {!ngwConfig.isGuest && (
+                        <Button
+                            onClick={() => addToFavorites(mapLink)}
+                            icon={<FavoriteIcon />}
+                        />
+                    )}
+                </Space.Compact>
             </section>
             <section>
                 <h5 className="heading">

@@ -13,6 +13,11 @@ from .model import LegendSymbolsEnum, WebMap, WebMapItem
 
 
 class WebMapComponent(Component):
+    def __init__(self, env, settings):
+        from . import favorite  # noqa: F401
+
+        super().__init__(env, settings)
+
     def initialize(self):
         super().initialize()
         basemaps_path = Path(self.options["basemaps"])

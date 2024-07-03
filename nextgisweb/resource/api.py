@@ -556,6 +556,10 @@ def setup_pyramid(comp, config):
         post=quota_check,
     )
 
+    from .favorite import api as favorite_api
+
+    favorite_api.setup_pyramid(comp, config)
+
     # Overloaded routes
 
     config.add_route(

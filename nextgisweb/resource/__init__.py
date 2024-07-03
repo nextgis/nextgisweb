@@ -1,6 +1,7 @@
 from .component import ResourceComponent
 from .events import AfterResourceCollectionPost, AfterResourcePut
 from .exception import DisplayNameNotUnique, HierarchyError, ResourceNotFound, ValidationError
+from .favorite import ResourceFavoriteModel
 from .interface import IResourceAdapter, IResourceBase, interface_registry
 from .model import Resource, ResourceACLRule, ResourceGroup
 from .permission import Permission, Scope

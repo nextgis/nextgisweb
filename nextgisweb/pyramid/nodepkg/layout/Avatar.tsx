@@ -5,6 +5,7 @@ import { authStore } from "@nextgisweb/auth/store";
 import { Popover } from "@nextgisweb/gui/antd";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import { ResourceFavoriteAvatar } from "@nextgisweb/resource/favorite/Avatar";
 
 import "./Avatar.less";
 
@@ -18,7 +19,8 @@ export const Avatar = observer(() => {
             {invitationSession && (
                 <div className="warning">{gettext("Invitation session")}</div>
             )}
-            <a href={routeURL("auth.settings")}>{gettext("Settings")}</a>
+            <ResourceFavoriteAvatar />
+            <a href={routeURL("auth.settings")}>{gettext("User settings")}</a>
             <a href="#" onClick={() => authStore.logout()}>
                 {gettext("Sign out")}
             </a>

@@ -110,6 +110,10 @@ class ResourceComponent(Component):
         view.setup_pyramid(self, config)
         api.setup_pyramid(self, config)
 
+    @property
+    def template_include(self):
+        return ("nextgisweb:resource/template/favorite.mako",)
+
     def client_settings(self, request):
         result = dict()
         try:

@@ -1,0 +1,57 @@
+.ngw-resource-favorite-page {
+    display: grid;
+    grid-template-columns: auto 3fr minmax(min-content, 1fr);
+    gap: 1em;
+
+    > .icon {
+        grid-column-start: 1;
+        margin-top: 8px;
+
+        > .icon {
+            width: 24px;
+            height: 24px;
+        }
+    }
+
+    > .resource {
+        display: block;
+        grid-column-start: 2;
+        color: var(--text-base);
+        text-decoration: none;
+
+        &:not(.has-tail) {
+            margin-bottom: 2em;
+        }
+
+        > .path {
+            color: var(--text-secondary);
+            line-height: 16px;
+        }
+
+        > .dn {
+            font-size: 16px;
+            line-height: 24px;
+
+            &:first-child {
+                margin-top: 8px;
+            }
+        }
+    }
+
+    > .first {
+        grid-column-start: 3;
+
+        > .ant-btn {
+            text-align: left;
+        }
+    }
+
+    > .rest {
+        display: inline-flex;
+        grid-column: 2;
+        flex-wrap: wrap;
+        gap: 1em;
+        margin-top: -0.5em;
+        margin-bottom: 2em;
+    }
+}
