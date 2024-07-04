@@ -96,6 +96,7 @@ const config = {
         "prettier/prettier": "warn",
         "react/prop-types": "off", // Use TypeScript instead
         "react/jsx-no-target-blank": "off", // Unsupported browsers
+        "react/display-name": "warn",
         "requirejs/no-object-define": "error",
         "requirejs/amd-function-arity": [
             "error",
@@ -145,6 +146,7 @@ const config = {
                 "prettier/prettier": "warn",
                 "react/prop-types": "off", // Use TypeScript instead
                 "react/jsx-no-target-blank": "off", // Unsupported browsers
+                "react/display-name": "warn",
                 "@typescript-eslint/no-explicit-any": "warn",
                 "@typescript-eslint/no-use-before-define": "warn",
                 "@typescript-eslint/no-unused-vars": [
