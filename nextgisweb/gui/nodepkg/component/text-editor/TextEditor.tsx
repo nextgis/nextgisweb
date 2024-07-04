@@ -1,26 +1,72 @@
-import type { ClassicEditor } from "@ckeditor/ckeditor5-editor-classic";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
+import type { SourceEditing } from "@ckeditor/ckeditor5-source-editing";
+import { useCallback, useEffect, useRef } from "react";
 
 import { Editor } from "@nextgisweb/ckeditor";
 
-import { useSourceEditingWorkAround } from "./hook/useSourceEditingWorkAround";
-import type { TextEditorProps } from "./type";
-
 import "./TextEditor.less";
+
+export interface TextEditorProps {
+    value: string;
+    onChange?: (val: string) => void;
+    parentHeight?: boolean;
+    border?: boolean;
+}
 
 export const TextEditor = ({
     value,
-    onChange,
+    onChange: onChangeProp,
     parentHeight = true,
     border = true,
 }: TextEditorProps) => {
-    /**
-     * Without the Source Editor plugin, it would be possible to use the component just like that
-     * <CKEditor editor={Editor} data={value} onChange={onChange} />
-     * Otherwise an endless onChange call may happened by unclear circumstances.
-     * This hook is needed to solve this problem.
-     */
-    const { setEditor } = useSourceEditingWorkAround({ value, onChange });
+    const editorRef = useRef<typeof Editor>(null);
+
+    const onChange = useCallback(
+        (editor: typeof Editor) => {
+            if (onChangeProp) {
+                const editorData = editor.getData();
+                onChangeProp(editorData);
+            }
+        },
+        [onChangeProp]
+    );
+
+    useEffect(() => {
+        const editor = editorRef.current;
+        if (editor) {
+            const sourceEditingPlugin = editor.plugins.get(
+                "SourceEditing"
+            ) as SourceEditing;
+            const updateEditorData = () => {
+                onChange(editor);
+            };
+
+            // This function handles the change of source editing mode.
+            // It ensures that onChange is triggered when the source editing mode is active.
+            const handleSourceEditingModeChange = () => {
+                if (sourceEditingPlugin.isSourceEditingMode) {
+                    // When in source editing mode, we need to manually update the data
+                    // because the onChange event does not trigger automatically.
+                    editor.ui.on("update", updateEditorData);
+                } else {
+                    editor.ui.off("update", updateEditorData);
+                }
+            };
+
+            sourceEditingPlugin.on(
+                "change:isSourceEditingMode",
+                handleSourceEditingModeChange
+            );
+
+            return () => {
+                editor.ui.off("update", updateEditorData);
+                sourceEditingPlugin.off(
+                    "change:isSourceEditingMode",
+                    handleSourceEditingModeChange
+                );
+            };
+        }
+    }, [onChange]);
 
     return (
         <div
@@ -32,8 +78,12 @@ export const TextEditor = ({
         >
             <CKEditor
                 editor={Editor}
-                onReady={(editor: ClassicEditor) => {
-                    setEditor(editor);
+                data={value}
+                onReady={(editor) => {
+                    editorRef.current = editor;
+                }}
+                onChange={(s, editor) => {
+                    onChange(editor);
                 }}
             />
         </div>
