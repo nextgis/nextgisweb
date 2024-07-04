@@ -52,3 +52,4 @@ export const EditorWidget: EditorWidgetComponent<
 EditorWidget.title = gettext("Raster layer");
 EditorWidget.activateOn = { create: true };
 EditorWidget.order = -50;
+EditorWidget.displayName = "EditorWidget";

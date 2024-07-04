@@ -34,4 +34,6 @@ const DescriptionEditor = observer(
     }
 );
 
+DescriptionEditor.displayName = "DescriptionEditor";
+
 export default DescriptionEditor;

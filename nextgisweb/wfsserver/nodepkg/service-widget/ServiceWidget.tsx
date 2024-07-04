@@ -52,6 +52,7 @@ const LayerWidget = observer<{
         </Area>
     );
 });
+LayerWidget.displayName = "LayerWidget";
 
 export const ServiceWidget: EditorWidgetComponent<
     EditorWidgetProps<ServiceStore>
@@ -102,3 +103,4 @@ export const ServiceWidget: EditorWidgetComponent<
 ServiceWidget.title = gettext("WFS service");
 ServiceWidget.activateOn = { create: true };
 ServiceWidget.order = -50;
+ServiceWidget.displayName = "ServiceWidget";

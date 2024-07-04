@@ -18,7 +18,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import settings from "@nextgisweb/pyramid/settings!feature_layer";
 
 import editorWidgetRegister from "../attribute-editor";
-import type { EditorWidgetRegister } from "../type";
+import type { EditorStore, EditorWidgetRegister } from "../type";
 
 import { FeatureEditorStore } from "./FeatureEditorStore";
 import { TabLabel } from "./component/TabLabel";
@@ -35,6 +35,18 @@ const msgSave = gettext("Save");
 const msgReset = gettext("Reset");
 
 const ATTRIBUTES = "attributes";
+
+const ObserverTableLabel = observer(
+    ({
+        store,
+        label,
+    }: {
+        label: string | React.ReactNode;
+        store: EditorStore;
+    }) => <TabLabel counter={store.counter} dirty={store.dirty} label={label} />
+);
+
+ObserverTableLabel.displayName = "ObserverTableLabel";
 
 export const FeatureEditorWidget = observer(
     ({
@@ -66,17 +78,14 @@ export const FeatureEditorWidget = observer(
                     async () => await newEditorWidget.component()
                 );
 
-                const ObserverTableLabel = observer(() => (
-                    <TabLabel
-                        counter={widgetStore.counter}
-                        dirty={widgetStore.dirty}
-                        label={newEditorWidget.label}
-                    />
-                ));
-
                 const newWidget: TabItem = {
                     key,
-                    label: <ObserverTableLabel />,
+                    label: (
+                        <ObserverTableLabel
+                            store={widgetStore}
+                            label={newEditorWidget.label}
+                        />
+                    ),
                     children: (
                         <Suspense fallback={msgLoading}>
                             <Widget store={widgetStore}></Widget>
@@ -177,3 +186,5 @@ export const FeatureEditorWidget = observer(
         );
     }
 );
+
+FeatureEditorWidget.displayName = "FeatureEditorWidget";

@@ -101,3 +101,4 @@ export const TileCacheWidget: EditorWidgetComponent<
 
 TileCacheWidget.title = gettext("Tile cache");
 TileCacheWidget.order = 40;
+TileCacheWidget.displayName = "TileCacheWidget";

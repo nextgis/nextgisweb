@@ -63,3 +63,4 @@ export const SettingsWidget: EditorWidgetComponent<
 
 SettingsWidget.title = gettext("Settings");
 SettingsWidget.order = 40;
+SettingsWidget.displayName = "SettingsWidget";

@@ -124,3 +124,5 @@ export const ResourcePickerBreadcrumb = observer(
         );
     }
 );
+
+ResourcePickerBreadcrumb.displayName = "ResourcePickerBreadcrumb";

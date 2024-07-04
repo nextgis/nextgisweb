@@ -120,3 +120,5 @@ export const LoginForm = observer((props: LoginFormProps) => {
         </div>
     );
 });
+
+LoginForm.displayName = "LoginForm";

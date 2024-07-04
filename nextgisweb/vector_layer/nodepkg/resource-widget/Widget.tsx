@@ -34,9 +34,11 @@ const uploaderMessages = {
     helpText: gettext("ESRI Shapefile (zip), GeoPackage, GeoJSON, GML, KML, CSV or XLSX formats are supported. For CSV and XLSX only points are supported, coordinates must be put in lat and lot columns."),
 }
 
-const RadioGroup = (props: RadioGroupProps) => (
+const RadioGroup = observer((props: RadioGroupProps) => (
     <Radio.Group optionType="button" buttonStyle="outline" {...props} />
-);
+));
+
+RadioGroup.displayName = "RadioGroup";
 
 const SourceOptions = observer(({ store }: { store: Store }) => {
     const so = store.sourceOptions;
@@ -136,6 +138,8 @@ const SourceOptions = observer(({ store }: { store: Store }) => {
         </>
     );
 });
+
+SourceOptions.displayName = "SourceOptions";
 
 export const Widget: EditorWidgetComponent<EditorWidgetProps<Store>> = observer(
     ({ store }) => {
@@ -298,3 +302,4 @@ export const Widget: EditorWidgetComponent<EditorWidgetProps<Store>> = observer(
 Widget.title = gettext("Vector layer");
 Widget.activateOn = { create: true };
 Widget.order = -50;
+Widget.displayName = "Widget";

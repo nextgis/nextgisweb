@@ -92,3 +92,4 @@ export const Widget: EditorWidgetComponent<EditorWidgetProps<Store>> = observer(
 
 Widget.title = gettext("SVG marker library");
 Widget.activateOn = { update: true };
+Widget.displayName = "Widget";

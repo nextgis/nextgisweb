@@ -37,3 +37,4 @@ export const Widget: EditorWidgetComponent<EditorWidgetProps<Store>> = observer(
 
 Widget.title = gettext("Tileset");
 Widget.activateOn = { create: true };
+Widget.displayName = "Widget";

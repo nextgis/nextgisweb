@@ -199,3 +199,5 @@ export const AnnotationsPanel = observer(
         );
     }
 );
+
+AnnotationsPanel.displayName = "AnnotationsPanel";

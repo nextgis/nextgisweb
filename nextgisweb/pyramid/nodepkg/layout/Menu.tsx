@@ -15,6 +15,8 @@ const MenuItem = observer(({ title, ...rest }: MenuItemProps) => (
     <a {...rest}>{title}</a>
 ));
 
+MenuItem.displayName = "MenuItem";
+
 export const Menu = observer(() => {
     const [visible, setVisible] = useState(false);
 
@@ -46,3 +48,5 @@ export const Menu = observer(() => {
         </>
     );
 });
+
+Menu.displayName = "Menu";

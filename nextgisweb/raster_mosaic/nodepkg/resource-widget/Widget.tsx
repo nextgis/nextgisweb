@@ -63,3 +63,4 @@ export const Widget: EditorWidgetComponent<EditorWidgetProps<Store>> = observer(
 
 Widget.title = gettext("Rasters");
 Widget.activateOn = { update: true };
+Widget.displayName = "Widget";

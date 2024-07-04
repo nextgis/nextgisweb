@@ -67,3 +67,4 @@ export const EditorWidget: EditorWidgetComponent<
 
 EditorWidget.title = gettext("Resource");
 EditorWidget.order = -100;
+EditorWidget.displayName = "EditorWidget";

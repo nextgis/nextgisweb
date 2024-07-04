@@ -221,3 +221,5 @@ export const LayersTree = observer(
         );
     }
 );
+
+LayersTree.displayName = "LayersTree";

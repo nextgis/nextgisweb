@@ -58,3 +58,4 @@ export const EditorWidget: EditorWidgetComponent<
 
 EditorWidget.title = gettext("Social");
 EditorWidget.order = 90;
+EditorWidget.displayName = "EditorWidget";

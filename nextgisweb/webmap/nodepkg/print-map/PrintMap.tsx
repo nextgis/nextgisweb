@@ -384,3 +384,5 @@ export const PrintMap = observer(
             );
     }
 );
+
+PrintMap.displayName = "PrintMap";

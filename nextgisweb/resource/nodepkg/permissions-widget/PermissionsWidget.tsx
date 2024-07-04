@@ -36,18 +36,16 @@ const selectDefaults: Pick<SelectProps, "allowClear" | "variant"> = {
     variant: "borderless",
 };
 
-const IconText = ({
-    icon,
-    text,
-}: {
-    icon: React.ReactNode;
-    text: React.ReactNode;
-}) => (
-    <Space>
-        {icon}
-        {text}
-    </Space>
+const IconText = observer(
+    ({ icon, text }: { icon: React.ReactNode; text: React.ReactNode }) => (
+        <Space>
+            {icon}
+            {text}
+        </Space>
+    )
 );
+
+IconText.displayName = "IconText";
 
 function bindProp<T extends Item>(item: T, prop: keyof T) {
     return {
@@ -84,6 +82,8 @@ const Action = observer(({ row }: { row: Item }) => {
     );
 });
 
+Action.displayName = "Action";
+
 const Principal = observer(({ row }: { row: Item }) => {
     const { value, onChange } = bindProp(row, "principal");
 
@@ -97,6 +97,8 @@ const Principal = observer(({ row }: { row: Item }) => {
         />
     );
 });
+
+Principal.displayName = "Principal";
 
 const Apply = observer(({ row }: { row: Item }) => {
     const options = useMemo(() => {
@@ -143,6 +145,8 @@ const Apply = observer(({ row }: { row: Item }) => {
         </Select>
     );
 });
+
+Apply.displayName = "Apply";
 
 const Permission = observer(({ row }: { row: Item }) => {
     const options = useMemo(() => {
@@ -203,6 +207,8 @@ const Permission = observer(({ row }: { row: Item }) => {
     );
 });
 
+Permission.displayName = "Permission";
+
 // prettier-ignore
 const columns = [
     { key: "action", title: msgColAction, shrink: true, component: Action },
@@ -219,3 +225,4 @@ export const PermissionsWidget: EditorWidgetComponent<
 
 PermissionsWidget.title = gettext("Permissions");
 PermissionsWidget.order = 50;
+PermissionsWidget.displayName = "PermissionsWidget";

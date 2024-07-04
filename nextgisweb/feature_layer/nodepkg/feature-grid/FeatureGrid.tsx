@@ -141,3 +141,5 @@ export const FeatureGrid = observer(
         );
     }
 );
+
+FeatureGrid.displayName = "FeatureGrid";

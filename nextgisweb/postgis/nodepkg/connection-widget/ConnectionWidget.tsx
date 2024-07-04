@@ -58,3 +58,4 @@ export const ConnectionWidget: EditorWidgetComponent<
 ConnectionWidget.title = gettext("PostGIS connection");
 ConnectionWidget.activateOn = { create: true };
 ConnectionWidget.order = -50;
+ConnectionWidget.displayName = "ConnectionWidget";

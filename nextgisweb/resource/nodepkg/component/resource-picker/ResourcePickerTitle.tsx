@@ -100,3 +100,5 @@ export const ResourcePickerTitle = observer(
         );
     }
 );
+
+ResourcePickerTitle.displayName = "ResourcePickerTitle";

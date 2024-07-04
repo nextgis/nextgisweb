@@ -63,3 +63,5 @@ export const WebMapTabs = observer(({ store }: WebMapTabsProps) => {
         />
     );
 });
+
+WebMapTabs.displayName = "WebMapTabs";

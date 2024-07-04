@@ -30,21 +30,27 @@ interface RowActionsProps<R = AnyObject> {
     actions: RowAction[];
 }
 
-export function ActionButton({ title, ...buttonProps }: ButtonProps) {
-    return (
-        <Tooltip {...{ title }}>
-            <Button type="text" shape="circle" {...buttonProps} />
-        </Tooltip>
-    );
-}
+export const ActionButton = observer(
+    ({ title, ...buttonProps }: ButtonProps) => {
+        return (
+            <Tooltip {...{ title }}>
+                <Button type="text" shape="circle" {...buttonProps} />
+            </Tooltip>
+        );
+    }
+);
 
-export const ErrorButton = ({ message }: { message?: string }) => (
+ActionButton.displayName = "ActionButtonF";
+
+export const ErrorButton = observer(({ message }: { message?: string }) => (
     <ActionButton
         title={message}
         disabled={false}
         icon={<ErrorIcon style={{ color: "var(--error)" }} />}
     />
-);
+));
+
+ErrorButton.displayName = "ErrorButton";
 
 export const RowActions = observer(
     ({ row, store, actions }: RowActionsProps) => {
@@ -63,6 +69,8 @@ export const RowActions = observer(
         );
     }
 );
+
+RowActions.displayName = "RowActions";
 
 export const WELLKNOWN_ROW_ACTIONS: Record<
     string,

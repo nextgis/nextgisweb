@@ -246,3 +246,4 @@ export const LayerWidget: EditorWidgetComponent<EditorWidgetProps<LayerStore>> =
 LayerWidget.title = gettext("PostGIS layer");
 LayerWidget.activateOn = { create: true };
 LayerWidget.order = -50;
+LayerWidget.displayName = "LayerWidget";

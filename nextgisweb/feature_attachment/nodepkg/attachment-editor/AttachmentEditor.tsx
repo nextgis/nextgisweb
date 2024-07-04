@@ -201,4 +201,6 @@ const AttachmentEditor = observer(
     }
 );
 
+AttachmentEditor.displayName = "AttachmentEditor";
+
 export default AttachmentEditor;

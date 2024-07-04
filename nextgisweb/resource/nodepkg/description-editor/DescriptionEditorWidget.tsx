@@ -24,3 +24,4 @@ export const DescriptionEditorWidget: EditorWidgetComponent<
 
 DescriptionEditorWidget.title = gettext("Description");
 DescriptionEditorWidget.order = 80;
+DescriptionEditorWidget.displayName = "DescriptionEditorWidget";

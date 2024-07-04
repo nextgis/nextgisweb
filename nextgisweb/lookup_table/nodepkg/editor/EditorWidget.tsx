@@ -60,6 +60,8 @@ const InputKey = observer(
     }
 );
 
+InputKey.displayName = "InputKey";
+
 const InputValue = observer(({ row }: ComponentProps<RecordItem>) => {
     if (row.type === "string") {
         return (
@@ -75,6 +77,8 @@ const InputValue = observer(({ row }: ComponentProps<RecordItem>) => {
 
     return <></>;
 });
+
+InputValue.displayName = "InputValue";
 
 const columns: EdiTableColumn<RecordItem>[] = [
     {
@@ -163,3 +167,4 @@ export const EditorWidget: EditorWidgetComponent<
 
 EditorWidget.title = gettext("Lookup table");
 EditorWidget.order = 100;
+EditorWidget.displayName = "EditorWidget";

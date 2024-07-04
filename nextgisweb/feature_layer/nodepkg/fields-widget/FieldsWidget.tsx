@@ -167,3 +167,4 @@ export const FieldsWidget: EditorWidgetComponent<
 FieldsWidget.title = gettext("Fields");
 FieldsWidget.activateOn = { update: true };
 FieldsWidget.order = -50;
+FieldsWidget.displayName = "FieldsWidget";

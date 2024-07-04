@@ -38,3 +38,5 @@ export const NavigationMenu = observer(({ panels }: NavigationMenuProps) => {
 
     return <div className="navigation-menu">{menuItems}</div>;
 });
+
+NavigationMenu.displayName = "NavigationMenu";

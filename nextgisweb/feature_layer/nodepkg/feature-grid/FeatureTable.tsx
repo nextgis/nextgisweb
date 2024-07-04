@@ -366,4 +366,6 @@ const FeatureTable = observer(
     }
 );
 
+FeatureTable.displayName = "FeatureTable";
+
 export default FeatureTable;

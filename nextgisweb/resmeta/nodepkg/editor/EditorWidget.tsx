@@ -43,6 +43,7 @@ const InputKey = observer(
         );
     }
 );
+InputKey.displayName = "InputKey";
 
 const InputValue = observer(({ row }: ComponentProps<RecordItem>) => {
     if (row.type === "string") {
@@ -85,6 +86,8 @@ const InputValue = observer(({ row }: ComponentProps<RecordItem>) => {
     return <></>;
 });
 
+InputValue.displayName = "InputValue";
+
 const SelectType = observer(({ row }: ComponentProps<RecordItem>) => {
     return (
         <Select
@@ -102,6 +105,8 @@ const SelectType = observer(({ row }: ComponentProps<RecordItem>) => {
         </Select>
     );
 });
+
+SelectType.displayName = "SelectType";
 
 const columns: EdiTableColumn<RecordItem>[] = [
     {
@@ -134,3 +139,4 @@ export const EditorWidget: EditorWidgetComponent<
 
 EditorWidget.title = gettext("Metadata");
 EditorWidget.order = 100;
+EditorWidget.displayName = "EditorWidget";
