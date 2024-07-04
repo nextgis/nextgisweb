@@ -58,9 +58,9 @@ async function inspTabFetch(
         table_name: table,
     }).get({ query: { schema }, signal: opts.signal });
     const result = { id: new Array<string>(), geom: new Array<string>() };
-    for (const { name } of data) {
-        result.id.push(name);
-        result.geom.push(name);
+    for (const { name, type } of data) {
+        if (/^INTEGER|BIGINT$/i.test(type)) result.id.push(name);
+        if (/^GEOMETRY\(/i.test(type)) result.geom.push(name);
     }
     return result;
 }
@@ -243,6 +243,7 @@ export const LayerWidget: EditorWidgetComponent<EditorWidgetProps<LayerStore>> =
         );
     });
 
+LayerWidget.displayName = "LayerWidget";
 LayerWidget.title = gettext("PostGIS layer");
 LayerWidget.activateOn = { create: true };
 LayerWidget.order = -50;

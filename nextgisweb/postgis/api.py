@@ -34,16 +34,25 @@ def inspect_connection(request) -> AsJSON[List[SchemaObject]]:
     except SQLAlchemyError as exc:
         raise ExternalDatabaseError(message="Failed to inspect database.", sa_error=exc)
 
+    skip = {
+        "spatial_ref_sys",
+        "geometry_columns",
+        "geography_columns",
+        "raster_columns",
+        "raster_overviews",
+    }
+
     result = []
     for schema_name in inspector.get_schema_names():
-        if schema_name != "information_schema":
-            result.append(
-                SchemaObject(
-                    schema=schema_name,
-                    views=inspector.get_view_names(schema=schema_name),
-                    tables=inspector.get_table_names(schema=schema_name),
-                )
+        if schema_name == "information_schema":
+            continue
+        result.append(
+            SchemaObject(
+                schema=schema_name,
+                views=[s for s in inspector.get_view_names(schema=schema_name) if s not in skip],
+                tables=[s for s in inspector.get_table_names(schema=schema_name) if s not in skip],
             )
+        )
 
     return result
 
