@@ -564,7 +564,11 @@ class FVersioningExtensionMixin:
             assert "resource_id" not in insp.unloaded
             resource = target.resource
             assert target.resource
-            if fversioning := resource.fversioning:
+
+            if (
+                IVersionableFeatureLayer.providedBy(resource)
+                and (fversioning := resource.fversioning) is not None
+            ):
                 deleted = insp.session.deleted
                 if fversioning not in deleted and resource not in deleted:
                     raise VersioningContextRequired
