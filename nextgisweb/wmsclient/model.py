@@ -2,31 +2,36 @@ import json
 import re
 from datetime import datetime
 from io import BytesIO
+from typing import Any, Dict, Literal, Union
 from urllib.parse import parse_qsl, quote, urlencode, urlparse, urlunparse
 
 import PIL
 import requests
 from owslib.wms import WebMapService
 from requests.exceptions import RequestException
+from typing_extensions import Annotated
 from zope.interface import implementer
 
 from nextgisweb.env import Base, _, env
 from nextgisweb.lib import db
 
 from nextgisweb.core.exception import ExternalServiceError, ValidationError
+from nextgisweb.jsrealm import TSExport
 from nextgisweb.layer import IBboxLayer, SpatialLayerMixin
 from nextgisweb.render import IExtentRenderRequest, IRenderableStyle, ITileRenderRequest
 from nextgisweb.resource import (
     ConnectionScope,
+    CRUTypes,
     DataScope,
     DataStructureScope,
     Resource,
     ResourceGroup,
+    SAttribute,
+    SColumn,
     Serializer,
+    SRelationship,
+    SResource,
 )
-from nextgisweb.resource import SerializedProperty as SP
-from nextgisweb.resource import SerializedRelationship as SR
-from nextgisweb.resource import SerializedResourceRelationship as SRR
 
 Base.depends_on("resource")
 
@@ -152,39 +157,51 @@ class Connection(Base, Resource):
         return json.loads(self.capcache_json)
 
 
-class _url_attr(SP):
-    def setter(self, srlzr, value):
+class UrlAttr(SColumn, apitype=True):
+    ctypes = CRUTypes(str, str, str)
+
+    def set(self, srlzr: Serializer, value: str, *, create: bool):
         if not url_pattern.match(value):
             raise ValidationError("Service url is not valid.")
+        return super().set(srlzr, value, create=create)
 
-        super().setter(srlzr, value)
+
+VersionEnum = Annotated[
+    Union[tuple(Literal[i] for i in WMS_VERSIONS)],  # type: ignore
+    TSExport("VersionEnum"),
+]
 
 
-class _capcache_attr(SP):
-    def getter(self, srlzr):
-        return srlzr.obj.capcache_dict if srlzr.obj.capcache() else None
+class VersionAttr(SColumn, apitype=True):
+    ctypes = CRUTypes(VersionEnum, VersionEnum, VersionEnum)
 
-    def setter(self, srlzr, value):
+
+CapCacheEnum = Annotated[
+    Union[Literal["query"], Literal["clear"]],
+    TSExport("CapCacheEnum"),
+]
+
+
+class CapCacheAttr(SAttribute, apitype=True):
+    def get(self, srlzr: Serializer) -> Any:
+        return srlzr.obj.capcache_dict
+
+    def set(self, srlzr: Serializer, value: CapCacheEnum, *, create: bool):
         if value == "query":
             srlzr.obj.capcache_query()
         elif value == "clear":
             srlzr.obj.capcache_clear()
-        else:
-            raise ValidationError("Invalid capcache value!")
 
 
-class ConnectionSerializer(Serializer):
+class ConnectionSerializer(Serializer, apitype=True):
     identity = Connection.identity
     resclass = Connection
 
-    _defaults = dict(read=ConnectionScope.read, write=ConnectionScope.write)
-
-    url = _url_attr(**_defaults)
-    version = SP(**_defaults)
-    username = SP(**_defaults)
-    password = SP(**_defaults)
-
-    capcache = _capcache_attr(read=ConnectionScope.connect, write=ConnectionScope.connect)
+    url = UrlAttr(read=ConnectionScope.read, write=ConnectionScope.write)
+    version = VersionAttr(read=ConnectionScope.read, write=ConnectionScope.write)
+    username = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
+    password = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
+    capcache = CapCacheAttr(read=ConnectionScope.connect, write=ConnectionScope.write)
 
 
 @implementer(IExtentRenderRequest, ITileRenderRequest)
@@ -219,13 +236,6 @@ class Layer(Base, Resource, SpatialLayerMixin):
         foreign_keys=connection_id,
         cascade="save-update, merge",
     )
-
-    @db.validates("vendor_params")
-    def _validate_vendor_params(self, key, value):
-        for v in value.values():
-            if not isinstance(v, str):
-                raise ValidationError(message="Vendor params must be strings only.")
-        return value
 
     @classmethod
     def check_parent(cls, parent):
@@ -295,14 +305,16 @@ class Layer(Base, Resource, SpatialLayerMixin):
 DataScope.read.require(ConnectionScope.connect, attr="connection", cls=Layer)
 
 
-class LayerSerializer(Serializer):
+class VendorParamsAttr(SColumn, apitype=True):
+    ctypes = CRUTypes(Dict[str, str], Dict[str, str], Dict[str, str])
+
+
+class LayerSerializer(Serializer, apitype=True):
     identity = Layer.identity
     resclass = Layer
 
-    _defaults = dict(read=DataStructureScope.read, write=DataStructureScope.write)
-
-    connection = SRR(**_defaults)
-    wmslayers = SP(**_defaults)
-    imgformat = SP(**_defaults)
-    srs = SR(**_defaults)
-    vendor_params = SP(**_defaults)
+    connection = SResource(read=DataStructureScope.read, write=DataStructureScope.write)
+    wmslayers = SColumn(read=DataStructureScope.read, write=DataStructureScope.write)
+    imgformat = SColumn(read=DataStructureScope.read, write=DataStructureScope.write)
+    vendor_params = VendorParamsAttr(read=DataStructureScope.read, write=DataStructureScope.write)
+    srs = SRelationship(read=DataStructureScope.read, write=DataStructureScope.write)

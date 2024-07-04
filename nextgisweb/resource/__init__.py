@@ -5,7 +5,7 @@ from .favorite import ResourceFavoriteModel
 from .interface import IResourceAdapter, IResourceBase, interface_registry
 from .model import Resource, ResourceACLRule, ResourceGroup
 from .permission import Permission, Scope
-from .sattribute import SColumn, SRelationship, SResource
+from .sattribute import CRUTypes, SColumn, SRelationship, SResource
 from .sattribute import SRelationship as SerializedRelationship
 from .sattribute import SResource as SerializedResourceRelationship
 from .scope import (

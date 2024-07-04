@@ -135,12 +135,13 @@ class SAttribute:
     def __init_subclass__(cls, apitype=False) -> None:
         super().__init_subclass__()
         cls.apitype = apitype
-        mget, mset = [cls.__dict__.get(m) for m in ("get", "set")]
-        no_setup_types = "setup_types" not in cls.__dict__
-        if apitype and no_setup_types and (mget is not None or mset is not None):
-            tget = _type_from_signature(mget, "return") if mget else None
-            tset = _type_from_signature(mset, "value") if mset else None
-            cls.ctypes = CRUTypes(tset, tget, tset)
+        if apitype and cls.ctypes is None:
+            mget, mset = [cls.__dict__.get(m) for m in ("get", "set")]
+            no_setup_types = "setup_types" not in cls.__dict__
+            if apitype and no_setup_types and (mget is not None or mset is not None):
+                tget = _type_from_signature(mget, "return") if mget else None
+                tset = _type_from_signature(mset, "value") if mset else None
+                cls.ctypes = CRUTypes(tset, tget, tset)
 
     def __init__(
         self,
