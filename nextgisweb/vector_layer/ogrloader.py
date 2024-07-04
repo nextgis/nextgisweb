@@ -671,11 +671,12 @@ def _validate_geom(geom, target, *, fix_errors, fid):
 
     if wkb_type in _wkb_points:
         pass  # Points are always valid.
-    elif not geom.IsValid():
+    else:
+        invalid = not geom.IsValid()
         # Close rings for polygons: GDAL doesn't provide a method for checking
         # if a geometry has unclosed rings, but we can achieve this via
-        # comparison.
-        if wkb_type in _wkb_polygons:
+        # comparison.:
+        if invalid and wkb_type in _wkb_polygons:
             geom_closed = geom.Clone()
             geom_closed.CloseRings()
             if not geom_closed.Equals(geom):
@@ -683,25 +684,49 @@ def _validate_geom(geom, target, *, fix_errors, fid):
                     raise FeatureError(_("Feature #%d has unclosed rings.") % fid)
                 else:
                     geom = geom_closed
+                    invalid = not geom.IsValid()
 
         # Check for polygon rings with fewer than 3 points and linestrings with
         # fewer than 2 points.
-        if not geom.IsValid():
-            for part in (geom,) if (wkb_type in _wkb_single) else geom:
+        # Check for polygon empty rings, which are not valid for PostGIS.
+        if invalid or wkb_type in _wkb_polygons:
+            parts_left = geom.GetGeometryCount() if wkb_type in _wkb_multi else None
+            for part_idx, part in (
+                ((None, geom),) if (wkb_type in _wkb_single) else _iter_reversed_geom(geom)
+            ):
                 if wkb_type in _wkb_polygons:
-                    for ring in part:
-                        if ring.GetPointCount() < 4:
-                            # TODO: Invalid parts can be removed from multipart
-                            # geometries in LOSSY mode.
-                            raise FeatureError(
-                                _("Feature #%d has less than 3 points in a polygon ring.") % fid
-                            )
+                    for ring_idx, ring in _iter_reversed_geom(part):
+                        if ring_idx > 0 and ring.IsEmpty():
+                            if fix_errors == FIX_ERRORS.NONE:
+                                raise FeatureError(_("Feature #%d has empty rings.") % fid)
+                            part.RemoveGeometry(ring_idx)
+                        elif invalid and ring.GetPointCount() < 4:
+                            if fix_errors == FIX_ERRORS.LOSSY and ring_idx > 0:
+                                part.RemoveGeometry(ring_idx)
+                            elif (
+                                fix_errors == FIX_ERRORS.LOSSY
+                                and wkb_type in _wkb_multi
+                                and parts_left > 1
+                            ):
+                                geom.RemoveGeometry(part_idx)
+                                parts_left -= 1
+                            else:
+                                raise FeatureError(
+                                    _("Feature #%d has less than 3 points in a polygon ring.")
+                                    % fid
+                                )
                 elif part.GetPointCount() < 2:
-                    # TODO: Invalid parts can be removed from multipart
-                    # geometries in LOSSY mode.
-                    raise FeatureError(
-                        _("Feature #%d has less than 2 points in a linestring.") % fid
-                    )
+                    if (
+                        fix_errors == FIX_ERRORS.LOSSY
+                        and wkb_type in _wkb_multi
+                        and parts_left > 1
+                    ):
+                        geom.RemoveGeometry(part_idx)
+                        parts_left -= 1
+                    else:
+                        raise FeatureError(
+                            _("Feature #%d has less than 2 points in a linestring.") % fid
+                        )
 
         # NOTE: Disabled for better times.
         # Check for topology errors and fix them as possible.
@@ -729,3 +754,8 @@ def _validate_string(value, fname, *, fix_errors, fid):
                 _("Feature #%d contains a broken encoding of field '%s'.") % (fid, fname)
             )
     return value
+
+
+def _iter_reversed_geom(geom):
+    for i in range(geom.GetGeometryCount() - 1, -1, -1):
+        yield i, geom.GetGeometryRef(i)

@@ -1,0 +1,18 @@
+{
+    "type": "FeatureCollection",
+    "name": "Incomplete multilinestring",
+    "features": [
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "MultiLineString",
+                "coordinates": [[
+                    [0, 0]
+                ], [
+                    [0, 0],
+                    [1, 1]
+                ]]
+            }
+        }
+    ]
+}

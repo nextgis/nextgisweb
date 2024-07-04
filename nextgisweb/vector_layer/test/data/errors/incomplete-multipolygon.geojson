@@ -1,0 +1,44 @@
+{
+    "type": "FeatureCollection",
+    "name": "Incomplete multipolygon",
+    "features": [
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "MultiPolygon",
+                "properties": {
+                    "name": "Incomplete inner ring"
+                },
+                "coordinates": [
+                    [
+                        [
+                            [0, 0], [1, 0], [1, 1], [0, 0]
+                        ],
+                        [
+                            [0, 0], [1, 0], [0, 0]
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "MultiPolygon",
+                "properties": {
+                    "name": "Incomplete exterior ring"
+                },
+                "coordinates": [
+                    [
+                        [
+                            [0, 0], [1, 0], [0, 0]
+                        ],
+                        [
+                            [0, 0], [1, 0], [1, 1], [0, 0]
+                        ]
+                    ]
+                ]
+            }
+        }
+    ]
+}

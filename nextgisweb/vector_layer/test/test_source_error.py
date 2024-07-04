@@ -27,16 +27,50 @@ CREATE_TEST_PARAMS = (
         dict(fix_errors="LOSSY"),
         dict(exception=ValidationError),
     ),
-    ("incomplete-linestring.geojson", dict(skip_errors=True), dict(feature_count=1)),
+    (
+        "incomplete-linestring.geojson",
+        dict(skip_errors=True),
+        dict(feature_count=1),
+    ),
+    (
+        "incomplete-multilinestring.geojson",
+        dict(fix_errors="SAFE"),
+        dict(exception=ValidationError),
+    ),
+    (
+        "incomplete-multilinestring.geojson",
+        dict(fix_errors="LOSSY"),
+        dict(feature_count=1),
+    ),
     (
         "incomplete-polygon.geojson",
         dict(fix_errors="LOSSY"),
         dict(exception=ValidationError),
     ),
     (
+        "incomplete-multipolygon.geojson",
+        dict(fix_errors="SAFE"),
+        dict(exception=ValidationError),
+    ),
+    (
+        "incomplete-multipolygon.geojson",
+        dict(fix_errors="LOSSY", skip_errors=True),
+        dict(feature_count=1),
+    ),
+    (
         "mixed-feature-geom.geojson",
         dict(cast_geometry_type="POINT", skip_other_geometry_types=True),
         dict(geometry_type="MULTIPOINT", feature_count=2),
+    ),
+    (
+        "empty-ring.geojson",
+        dict(),
+        dict(exception=ValidationError),
+    ),
+    (
+        "empty-ring.geojson",
+        dict(fix_errors="LOSSY"),
+        dict(feature_count=1),
     ),
     (
         # The second MULTIPOINT geometry must be converted to a SINGLE geometry.
