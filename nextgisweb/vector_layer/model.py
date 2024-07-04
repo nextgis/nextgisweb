@@ -45,7 +45,6 @@ from nextgisweb.spatial_ref_sys import SRS
 from .feature_query import FeatureQueryBase, calculate_extent
 from .kind_of_data import VectorLayerData
 from .ogrloader import FID_SOURCE, FIX_ERRORS, TOGGLE, LoaderParams, OGRLoader
-from .table_info import TableInfo  # noqa: F401
 from .util import DRIVERS, FIELD_TYPE_2_DB, FIELD_TYPE_SIZE, SCHEMA, read_dataset_vector, uuid_hex
 from .vlschema import VLSchema
 
