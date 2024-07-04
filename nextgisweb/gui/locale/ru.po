@@ -17,10 +17,18 @@ msgstr[1] "Требуется не более {} символов"
 msgstr[2] "Требуется не более {} символов"
 
 #: nodepkg/arm/validate.ts:18
-msgid "Ivalid value"
-msgstr "Некорректное значение"
+msgid "Value should be at least {}"
+msgstr "Значение должно быть больше или равно {}"
 
 #: nodepkg/arm/validate.ts:19
+msgid "Value should be no more than {}"
+msgstr "Значение должно быть меньше или равно {}"
+
+#: nodepkg/arm/validate.ts:21
+msgid "Invalid value"
+msgstr "Некорректное значение"
+
+#: nodepkg/arm/validate.ts:22
 msgid "Value not unique"
 msgstr "Значение не уникально"
 
@@ -60,9 +68,9 @@ msgstr "OK"
 msgid "Please confirm the deletion."
 msgstr "Пожалуйста, подтвердите удаление."
 
-#: nodepkg/confirm.ts:44 nodepkg/edi-table/RowAction.tsx:81
-#: nodepkg/focus-table/action.tsx:29 nodepkg/model-browse/ModelBrowse.tsx:260
-#: nodepkg/model-browse/ModelBrowse.tsx:327 nodepkg/model-form/ModelForm.tsx:48
+#: nodepkg/confirm.ts:44 nodepkg/edi-table/RowAction.tsx:78
+#: nodepkg/focus-table/action.tsx:27 nodepkg/model-browse/ModelBrowse.tsx:262
+#: nodepkg/model-browse/ModelBrowse.tsx:329 nodepkg/model-form/ModelForm.tsx:48
 msgid "Delete"
 msgstr "Удалить"
 
@@ -70,7 +78,7 @@ msgstr "Удалить"
 msgid "Failed to delete."
 msgstr "Ошибка удаления."
 
-#: nodepkg/edi-table/RowAction.tsx:76
+#: nodepkg/edi-table/RowAction.tsx:73
 msgid "Clone"
 msgstr "Клонировать"
 
@@ -110,47 +118,47 @@ msgstr "Необходимо указать значение"
 msgid "The value entered is not valid"
 msgstr "Введенное значение некорректно"
 
-#: nodepkg/focus-table/action.tsx:15
+#: nodepkg/focus-table/action.tsx:13
 msgid "Add"
 msgstr "Добавить"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:107 nodepkg/model-form/ModelForm.tsx:68
+#: nodepkg/model-browse/ModelBrowse.tsx:109 nodepkg/model-form/ModelForm.tsx:68
 msgid "Confirmation"
 msgstr "Подтверждение"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:108
+#: nodepkg/model-browse/ModelBrowse.tsx:110
 msgid "Item deleted"
 msgstr "Элемент удален"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:110
+#: nodepkg/model-browse/ModelBrowse.tsx:112
 msgid "Items deleted"
 msgstr "Элементы удалены"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:183
+#: nodepkg/model-browse/ModelBrowse.tsx:185
 msgid "The errors occurred during execution"
 msgstr "Во время выполнения возникли ошибки"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:187
+#: nodepkg/model-browse/ModelBrowse.tsx:189
 msgid "Failed to delete items:"
 msgstr "Не удалось удалить элементы:"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:210
+#: nodepkg/model-browse/ModelBrowse.tsx:212
 msgid "Do you want to delete these items?"
 msgstr "Вы хотите удалить эти элементы?"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:250
+#: nodepkg/model-browse/ModelBrowse.tsx:252
 msgid "Edit"
 msgstr "Изменить"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:250
+#: nodepkg/model-browse/ModelBrowse.tsx:252
 msgid "View"
 msgstr "Просмотр"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:283
+#: nodepkg/model-browse/ModelBrowse.tsx:285
 msgid "Search"
 msgstr "Поиск"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:305 nodepkg/model-form/ModelForm.tsx:46
+#: nodepkg/model-browse/ModelBrowse.tsx:307 nodepkg/model-form/ModelForm.tsx:46
 msgid "Create"
 msgstr "Создать"
 
