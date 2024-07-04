@@ -8,7 +8,7 @@ const expcomp = (pattern) => [
 /** @type {import("eslint").Linter.Config } */
 const config = {
     root: true,
-    plugins: ["requirejs", "react", "import", "mobx"],
+    plugins: ["requirejs", "react", "import"],
     extends: [
         "eslint:recommended",
         "plugin:requirejs/recommended",
@@ -16,7 +16,6 @@ const config = {
         "plugin:react/jsx-runtime",
         "plugin:react-hooks/recommended",
         "plugin:prettier/recommended",
-        "plugin:mobx/recommended",
     ],
     globals: {
         dojoConfig: "readonly",
@@ -131,7 +130,7 @@ const config = {
                 ...expcomp("nodepkg/**/*.tsx"),
             ],
             parser: "@typescript-eslint/parser",
-            plugins: ["react", "@typescript-eslint", "mobx"],
+            plugins: ["react", "@typescript-eslint"],
             extends: [
                 "eslint:recommended",
                 "plugin:@typescript-eslint/recommended",
@@ -139,7 +138,6 @@ const config = {
                 "plugin:react/jsx-runtime",
                 "plugin:react-hooks/recommended",
                 "plugin:prettier/recommended",
-                "plugin:mobx/recommended",
             ],
             rules: {
                 "no-use-before-define": "off",
