@@ -1,12 +1,16 @@
+import Papa from "papaparse";
+
 import type { RecordOption } from "@nextgisweb/gui/edi-table/store/RecordItem";
 import { downloadCsv } from "@nextgisweb/gui/util";
 
 import type { LookupTableResource } from "../type/LookupTableResource";
 
 export function exportToCsv(items: RecordOption[]) {
-    const csvContent = items
-        .map((item) => `"${item.key}","${item.value}"`)
-        .join("\n");
+    const serializedItems = items.map((item) => {
+        return [item.key as string, item.value as string];
+    });
+
+    const csvContent = Papa.unparse<string[]>(serializedItems);
 
     downloadCsv(csvContent, "lookup_table.csv");
 }
