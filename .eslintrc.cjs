@@ -8,7 +8,7 @@ const expcomp = (pattern) => [
 /** @type {import("eslint").Linter.Config } */
 const config = {
     root: true,
-    plugins: ["requirejs", "react", "prettier", "import"],
+    plugins: ["requirejs", "react", "import"],
     extends: [
         "eslint:recommended",
         "plugin:requirejs/recommended",
@@ -129,7 +129,7 @@ const config = {
                 ...expcomp("nodepkg/**/*.tsx"),
             ],
             parser: "@typescript-eslint/parser",
-            plugins: ["react", "@typescript-eslint", "prettier"],
+            plugins: ["react", "@typescript-eslint"],
             extends: [
                 "eslint:recommended",
                 "plugin:@typescript-eslint/recommended",
