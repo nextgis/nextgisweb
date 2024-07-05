@@ -70,18 +70,19 @@ class Connection(Base, Resource):
 
 class _url_template_attr(SP):
     def setter(self, srlzr, value):
-        if value is not None and not url_template_pattern.match(value):
-            raise ValidationError("Invalid url template.")
+        if value is not None:
+            if not url_template_pattern.match(value):
+                raise ValidationError("Invalid url template.")
 
-        for c in "qxyz":
-            tmplt_lower = f"{{{c}}}"
-            if (tmplt_upper := f"{{{c.upper()}}}") in value:
-                value = value.replace(tmplt_upper, tmplt_lower)
-            if tmplt_lower not in value:
-                if c != "q":
-                    raise ValidationError("'{{{}}}' parameter missing.".format(c))
-            elif c == "q":
-                break
+            for c in "qxyz":
+                tmplt_lower = f"{{{c}}}"
+                if (tmplt_upper := f"{{{c.upper()}}}") in value:
+                    value = value.replace(tmplt_upper, tmplt_lower)
+                if tmplt_lower not in value:
+                    if c != "q":
+                        raise ValidationError("'{{{}}}' parameter missing.".format(c))
+                elif c == "q":
+                    break
 
         super().setter(srlzr, value)
 
