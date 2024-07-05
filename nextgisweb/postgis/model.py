@@ -1,5 +1,6 @@
 import re
 from contextlib import contextmanager
+from typing import Literal, Union
 
 import geoalchemy2 as ga
 from msgspec import UNSET
@@ -41,16 +42,17 @@ from nextgisweb.feature_layer import (
 from nextgisweb.layer import IBboxLayer, SpatialLayerMixin
 from nextgisweb.resource import (
     ConnectionScope,
+    CRUTypes,
     DataScope,
     DataStructureScope,
     Resource,
     ResourceGroup,
+    SAttribute,
     SColumn,
     Serializer,
+    SRelationship,
+    SResource,
 )
-from nextgisweb.resource import SerializedProperty as SP
-from nextgisweb.resource import SerializedRelationship as SR
-from nextgisweb.resource import SerializedResourceRelationship as SRR
 from nextgisweb.spatial_ref_sys import SRS
 
 from .exception import ExternalDatabaseError
@@ -81,10 +83,6 @@ GEOM_TYPE_DISPLAY = (
     _("Multiline Z"),
     _("Multipolygon Z"),
 )
-
-PC_READ = ConnectionScope.read
-PC_WRITE = ConnectionScope.write
-PC_CONNECT = ConnectionScope.connect
 
 
 def calculate_extent(layer, where=None, geomcol=None):
@@ -523,39 +521,43 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 DataScope.read.require(ConnectionScope.connect, attr="connection", cls=PostgisLayer)
 
 
-class _fields_action(SP):
-    """Special write-only attribute that allows updating
-    list of fields from the server"""
+class GeometryTypeAttr(SAttribute, apitype=True):
+    ctypes = CRUTypes(Union[str, None], str, Union[str, None])
 
-    def setter(self, srlzr, value):
+
+class GeometrySridAttr(SAttribute, apitype=True):
+    ctypes = CRUTypes(Union[int, None], int, Union[int, None])
+
+
+class FieldsAttr(SAttribute, apitype=True):
+    def set(
+        self,
+        srlzr: Serializer,
+        value: Union[Literal["update"], Literal["keep"]],
+        *,
+        create: bool,
+    ):
         if value == "update":
-            if srlzr.obj.connection.has_permission(PC_CONNECT, srlzr.user):
+            if srlzr.obj.connection.has_permission(ConnectionScope.connect, srlzr.user):
                 srlzr.obj.setup()
             else:
                 raise ForbiddenError()
-        elif value != "keep":
-            raise ValidationError("Invalid 'fields' parameter.")
 
 
-class PostgisLayerSerializer(Serializer):
+class PostgisLayerSerializer(Serializer, apitype=True):
     identity = PostgisLayer.identity
     resclass = PostgisLayer
 
-    __defaults = dict(read=DataStructureScope.read, write=DataStructureScope.write)
+    connection = SResource(read=DataStructureScope.read, write=DataStructureScope.write)
+    schema = SColumn(read=DataStructureScope.read, write=DataStructureScope.write)
+    table = SColumn(read=DataStructureScope.read, write=DataStructureScope.write)
+    column_id = SColumn(read=DataStructureScope.read, write=DataStructureScope.write)
+    column_geom = SColumn(read=DataStructureScope.read, write=DataStructureScope.write)
+    geometry_type = GeometryTypeAttr(read=DataStructureScope.read, write=DataStructureScope.write)
+    geometry_srid = GeometrySridAttr(read=DataStructureScope.read, write=DataStructureScope.write)
+    srs = SRelationship(read=DataStructureScope.read, write=DataStructureScope.write)
 
-    connection = SRR(**__defaults)
-
-    schema = SP(**__defaults)
-    table = SP(**__defaults)
-    column_id = SP(**__defaults)
-    column_geom = SP(**__defaults)
-
-    geometry_type = SP(**__defaults)
-    geometry_srid = SP(**__defaults)
-
-    srs = SR(**__defaults)
-
-    fields = _fields_action(write=DataStructureScope.write)
+    fields = FieldsAttr(read=None, write=DataStructureScope.write)
 
 
 @implementer(
