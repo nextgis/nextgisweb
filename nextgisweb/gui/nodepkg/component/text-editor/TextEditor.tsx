@@ -1,6 +1,7 @@
+import type { ClassicEditor } from "@ckeditor/ckeditor5-editor-classic";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import type { SourceEditing } from "@ckeditor/ckeditor5-source-editing";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { Editor } from "@nextgisweb/ckeditor";
 
@@ -13,33 +14,27 @@ export interface TextEditorProps {
     border?: boolean;
 }
 
-export const TextEditor = ({
+export function TextEditor({
     value,
     onChange: onChangeProp,
     parentHeight = true,
     border = true,
-}: TextEditorProps) => {
-    const editorRef = useRef<typeof Editor>(null);
+}: TextEditorProps) {
+    const [editor, setEditor] = useState<ClassicEditor>();
 
-    const onChange = useCallback(
-        (editor: typeof Editor) => {
-            if (onChangeProp) {
-                const editorData = editor.getData();
-                onChangeProp(editorData);
-            }
-        },
-        [onChangeProp]
-    );
+    const onChange = useCallback(() => {
+        if (editor && onChangeProp) {
+            const editorData = editor.getData();
+            onChangeProp(editorData);
+        }
+    }, [onChangeProp, editor]);
 
     useEffect(() => {
-        const editor = editorRef.current;
         if (editor) {
             const sourceEditingPlugin = editor.plugins.get(
                 "SourceEditing"
             ) as SourceEditing;
-            const updateEditorData = () => {
-                onChange(editor);
-            };
+            const updateEditorData = onChange;
 
             // This function handles the change of source editing mode.
             // It ensures that onChange is triggered when the source editing mode is active.
@@ -52,7 +47,6 @@ export const TextEditor = ({
                     editor.ui.off("update", updateEditorData);
                 }
             };
-
             sourceEditingPlugin.on(
                 "change:isSourceEditingMode",
                 handleSourceEditingModeChange
@@ -66,7 +60,7 @@ export const TextEditor = ({
                 );
             };
         }
-    }, [onChange]);
+    }, [onChange, editor]);
 
     return (
         <div
@@ -76,16 +70,12 @@ export const TextEditor = ({
                 (parentHeight ? " parent-height" : "")
             }
         >
-            <CKEditor
+            <CKEditor<ClassicEditor>
                 editor={Editor}
                 data={value}
-                onReady={(editor) => {
-                    editorRef.current = editor;
-                }}
-                onChange={(s, editor) => {
-                    onChange(editor);
-                }}
+                onReady={setEditor}
+                onChange={onChange}
             />
         </div>
     );
-};
+}
