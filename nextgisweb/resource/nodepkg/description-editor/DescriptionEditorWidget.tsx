@@ -1,4 +1,5 @@
 import { observer } from "mobx-react-lite";
+import { useCallback } from "react";
 
 import { TextEditor } from "@nextgisweb/gui/component/text-editor";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -10,9 +11,13 @@ import type { DescriptionEditorStore } from "./DescriptionEditorStore";
 export const DescriptionEditorWidget: EditorWidgetComponent<
     EditorWidgetProps<DescriptionEditorStore>
 > = observer(({ store }) => {
-    const onChange = (value: string) => {
-        store.setValue(value ? value : null);
-    };
+    const onChange = useCallback(
+        (value: string) => {
+            store.setValue(value ? value : null);
+        },
+        [store]
+    );
+
     return (
         <TextEditor
             value={store.value ? store.value : ""}
@@ -22,5 +27,6 @@ export const DescriptionEditorWidget: EditorWidgetComponent<
     );
 });
 
+DescriptionEditorWidget.displayName = "DescriptionEditorWidget";
 DescriptionEditorWidget.title = gettext("Description");
 DescriptionEditorWidget.order = 80;
