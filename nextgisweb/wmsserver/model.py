@@ -1,22 +1,24 @@
 import re
+from typing import List, Union
 
+import sqlalchemy as sa
+import sqlalchemy.orm as orm
+from msgspec import Meta, Struct, to_builtins
 from sqlalchemy.ext.orderinglist import ordering_list
+from typing_extensions import Annotated
 
-from nextgisweb.env import Base, _
-from nextgisweb.lib import db
+from nextgisweb.env import Base, gettext
 
-from nextgisweb.core.exception import ValidationError
-from nextgisweb.resource import Resource, ResourceGroup, Serializer, ServiceScope
-from nextgisweb.resource import SerializedProperty as SP
+from nextgisweb.resource import Resource, ResourceGroup, SAttribute, Serializer, ServiceScope
 
 Base.depends_on("resource")
 
-keyname_pattern = re.compile(r"^[A-Za-z][\w]*$")
+KEYNAME_RE = re.compile(r"^[A-Za-z][\w]*$")
 
 
 class Service(Base, Resource):
     identity = "wmsserver_service"
-    cls_display_name = _("WMS service")
+    cls_display_name = gettext("WMS service")
 
     __scope__ = ServiceScope
 
@@ -28,18 +30,18 @@ class Service(Base, Resource):
 class Layer(Base):
     __tablename__ = "wmsserver_layer"
 
-    service_id = db.Column(db.ForeignKey("wmsserver_service.id"), primary_key=True)
-    resource_id = db.Column(db.ForeignKey(Resource.id), primary_key=True)
-    keyname = db.Column(db.Unicode, nullable=False)
-    display_name = db.Column(db.Unicode, nullable=False)
-    min_scale_denom = db.Column(db.Float, nullable=True)
-    max_scale_denom = db.Column(db.Float, nullable=True)
-    position = db.Column(db.Integer, nullable=True)
+    service_id = sa.Column(sa.ForeignKey("wmsserver_service.id"), primary_key=True)
+    resource_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
+    keyname = sa.Column(sa.Unicode, nullable=False)
+    display_name = sa.Column(sa.Unicode, nullable=False)
+    min_scale_denom = sa.Column(sa.Float, nullable=True)
+    max_scale_denom = sa.Column(sa.Float, nullable=True)
+    position = sa.Column(sa.Integer, nullable=True)
 
-    service = db.relationship(
+    service = orm.relationship(
         Service,
         foreign_keys=service_id,
-        backref=db.backref(
+        backref=orm.backref(
             "layers",
             cascade="all, delete-orphan",
             order_by=position,
@@ -47,48 +49,43 @@ class Layer(Base):
         ),
     )
 
-    resource = db.relationship(
+    resource = orm.relationship(
         Resource,
         foreign_keys=resource_id,
-        backref=db.backref("_wmsserver_layers", cascade="all"),
+        backref=orm.backref("_wmsserver_layers", cascade="all"),
     )
-
-    def to_dict(self):
-        return dict(
-            keyname=self.keyname,
-            display_name=self.display_name,
-            resource_id=self.resource_id,
-            min_scale_denom=self.min_scale_denom,
-            max_scale_denom=self.max_scale_denom,
-        )
-
-    @db.validates("keyname")
-    def _validate_keyname(self, key, value):
-        if not keyname_pattern.match(value):
-            raise ValidationError("Invalid keyname: %s" % value)
-
-        return value
 
     def scale_range(self):
         return (self.min_scale_denom, self.max_scale_denom)
 
 
-class _layers_attr(SP):
-    def getter(self, srlzr):
-        return [lyr.to_dict() for lyr in srlzr.obj.layers]
-
-    def setter(self, srlzr, value):
-        srlzr.obj.layers = []
-        for lv in value:
-            lo = Layer(resource_id=lv["resource_id"])
-            srlzr.obj.layers.append(lo)
-
-            for a in ("keyname", "display_name", "min_scale_denom", "max_scale_denom"):
-                setattr(lo, a, lv[a])
+class WMSServiceLayer(Struct, kw_only=True):
+    resource_id: int
+    keyname: Annotated[str, Meta(pattern=KEYNAME_RE.pattern)]
+    display_name: Annotated[str, Meta(min_length=1)]
+    min_scale_denom: Union[float, None]
+    max_scale_denom: Union[float, None]
 
 
-class ServiceSerializer(Serializer):
+class LayersAttr(SAttribute, apitype=True):
+    def get(self, srlzr) -> List[WMSServiceLayer]:
+        return [
+            WMSServiceLayer(
+                resource_id=layer.resource_id,
+                keyname=layer.keyname,
+                display_name=layer.display_name,
+                min_scale_denom=layer.min_scale_denom,
+                max_scale_denom=layer.max_scale_denom,
+            )
+            for layer in srlzr.obj.layers
+        ]
+
+    def set(self, srlzr, value: List[WMSServiceLayer], *, create: bool):
+        srlzr.obj.layers = [Layer(**to_builtins(obj)) for obj in value]
+
+
+class ServiceSerializer(Serializer, apitype=True):
     identity = Service.identity
     resclass = Service
 
-    layers = _layers_attr(read=ServiceScope.connect, write=ServiceScope.configure)
+    layers = LayersAttr(read=ServiceScope.connect, write=ServiceScope.configure, required=True)
