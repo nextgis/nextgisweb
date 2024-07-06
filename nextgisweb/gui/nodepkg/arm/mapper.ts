@@ -160,7 +160,7 @@ export type FieldOpts<V, O, E = ExtraProps> = ValidationProps<V> & {
 };
 
 export type MapperResult<O, D> = {
-    [P in keyof D]: P extends string ? MappedProperty<D[P], O, P> : never;
+    [P in keyof D]-?: P extends string ? MappedProperty<D[P], O, P> : never;
 } & {
     $load: (target: O, source: Partial<D>) => void;
     $error: (obj: O) => ErrorResult;
