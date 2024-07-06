@@ -1,6 +1,10 @@
-from sqlalchemy.ext.orderinglist import ordering_list
+from typing import List, Union
 
-from nextgisweb.env import Base, _
+from msgspec import UNSET, Meta, Struct, UnsetType, to_builtins
+from sqlalchemy.ext.orderinglist import ordering_list
+from typing_extensions import Annotated
+
+from nextgisweb.env import Base, gettext
 from nextgisweb.lib import db
 
 from nextgisweb.resource import (
@@ -8,15 +12,16 @@ from nextgisweb.resource import (
     Resource,
     ResourceGroup,
     ResourceScope,
+    SAttribute,
+    SColumn,
     Serializer,
 )
-from nextgisweb.resource import SerializedProperty as SP
 from nextgisweb.webmap import WebMap
 
 
 class BasemapLayer(Base, Resource):
     identity = "basemap_layer"
-    cls_display_name = _("Basemap")
+    cls_display_name = gettext("Basemap")
 
     __scope__ = DataScope
 
@@ -28,6 +33,16 @@ class BasemapLayer(Base, Resource):
     @classmethod
     def check_parent(cls, parent):
         return isinstance(parent, ResourceGroup)
+
+
+class BasemapLayerSerializer(Serializer, apitype=True):
+    identity = BasemapLayer.identity
+    resclass = BasemapLayer
+
+    url = SColumn(read=DataScope.read, write=DataScope.write)
+    qms = SColumn(read=DataScope.read, write=DataScope.write)
+    copyright_text = SColumn(read=DataScope.read, write=DataScope.write)
+    copyright_url = SColumn(read=DataScope.read, write=DataScope.write)
 
 
 class BasemapWebMap(Base):
@@ -71,36 +86,41 @@ class BasemapWebMap(Base):
         )
 
 
-class BasemapLayerSerializer(Serializer):
-    identity = BasemapLayer.identity
-    resclass = BasemapLayer
-
-    url = SP(read=DataScope.read, write=DataScope.write)
-    qms = SP(read=DataScope.read, write=DataScope.write)
-    copyright_text = SP(read=DataScope.read, write=DataScope.write)
-    copyright_url = SP(read=DataScope.read, write=DataScope.write)
+OpacityFloat = Annotated[float, Meta(gt=0, le=1)]
 
 
-class _basemaps_attr(SP):
-    def getter(self, srlzr):
-        return sorted(
-            [bm.to_dict() for bm in srlzr.obj.basemaps],
-            key=lambda bm: bm["position"],
-        )
-
-    def setter(self, srlzr, value):
-        srlzr.obj.basemaps = []
-
-        for bm in value:
-            bmo = BasemapWebMap(resource_id=bm["resource_id"])
-            srlzr.obj.basemaps.append(bmo)
-
-            for a in ("display_name", "enabled", "opacity"):
-                setattr(bmo, a, bm[a])
+class BasemapWebMapItemRead(Struct, kw_only=True):
+    resource_id: int
+    display_name: Annotated[str, Meta(min_length=1)]
+    enabled: bool
+    opacity: Union[OpacityFloat, None]
 
 
-class BasemapWebMapSerializer(Serializer):
+class BasemapWebMapItemWrite(Struct, kw_only=True):
+    resource_id: int
+    display_name: Annotated[str, Meta(min_length=1)]
+    enabled: Union[bool, UnsetType] = UNSET
+    opacity: Union[OpacityFloat, None, UnsetType] = UNSET
+
+
+class BasemapsAttr(SAttribute, apitype=True):
+    def get(self, srlzr: Serializer) -> List[BasemapWebMapItemRead]:
+        return [
+            BasemapWebMapItemRead(
+                resource_id=i.resource_id,
+                display_name=i.display_name,
+                enabled=i.enabled,
+                opacity=i.opacity,
+            )
+            for i in srlzr.obj.basemaps
+        ]
+
+    def set(self, srlzr: Serializer, value: List[BasemapWebMapItemWrite], *, create: bool):
+        srlzr.obj.basemaps = [BasemapWebMap(**to_builtins(i)) for i in value]
+
+
+class BasemapWebMapSerializer(Serializer, apitype=True):
     identity = BasemapWebMap.__tablename__
     resclass = WebMap
 
-    basemaps = _basemaps_attr(read=ResourceScope.read, write=ResourceScope.update)
+    basemaps = BasemapsAttr(read=ResourceScope.read, write=ResourceScope.update)
