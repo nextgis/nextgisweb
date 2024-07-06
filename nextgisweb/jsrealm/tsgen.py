@@ -381,7 +381,7 @@ class TSExport:
         self.name = name
         if not module.startswith("@"):
             if component is None:
-                mod = module_from_stack(depth + 1, (__name__,))
+                mod = module_from_stack(depth, (__name__,))
                 component = pkginfo.component_by_module(mod)
                 if component is None:
                     raise TypeError(f"no component found for module: {mod}")
