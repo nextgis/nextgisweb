@@ -1,6 +1,26 @@
-#: amd/ngw-ogcfserver/ServiceWidget.js:55 model.py:12
+#: model.py:16 nodepkg/service-widget/ServiceWidget.tsx:103
 msgid "OGC API Features service"
 msgstr "Сервис OGC API Features"
+
+#: nodepkg/service-widget/ServiceWidget.tsx:27
+msgid "Display name"
+msgstr "Наименование"
+
+#: nodepkg/service-widget/ServiceWidget.tsx:32
+msgid "Keyname"
+msgstr "Ключ"
+
+#: nodepkg/service-widget/ServiceWidget.tsx:37
+msgid "Features per request"
+msgstr "Объектов на запрос"
+
+#: nodepkg/service-widget/ServiceWidget.tsx:42
+msgid "Not set"
+msgstr "Не заполнено"
+
+#: nodepkg/service-widget/ServiceWidget.tsx:47
+msgid "Resource"
+msgstr "Ресурс"
 
 #: view.py:16
 msgid "OGC API Features"
@@ -13,32 +33,3 @@ msgid ""
 msgstr ""
 "OGC API Features предоставляют базовые API для создания, изменения и выборки "
 "объектов."
-
-#: amd/ngw-ogcfserver/template/ServiceWidget.hbs:14
-msgid "Add"
-msgstr "Добавить"
-
-#: amd/ngw-ogcfserver/template/ServiceWidget.hbs:18
-msgid "Select layer"
-msgstr "Выберите слой"
-
-#: amd/ngw-ogcfserver/template/ServiceWidget.hbs:27
-msgid "Remove"
-msgstr "Удалить"
-
-#: amd/ngw-ogcfserver/template/ServiceWidget.hbs:62
-msgid "Keyname"
-msgstr "Ключ"
-
-#: amd/ngw-ogcfserver/template/ServiceWidget.hbs:66
-msgid "Display name"
-msgstr "Наименование"
-
-#: amd/ngw-ogcfserver/template/ServiceWidget.hbs:70
-msgid "Features per request"
-msgstr "Объектов на запрос"
-
-#: amd/ngw-ogcfserver/template/ServiceWidget.hbs:74
-msgid "Resource"
-msgstr "Ресурс"
-
