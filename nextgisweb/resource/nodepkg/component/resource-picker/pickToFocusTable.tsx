@@ -17,7 +17,7 @@ interface PickToFocusTableOptions<I>
 }
 
 export function pickToFocusTable<I extends FocusTableItem>(
-    factory: (resource: CompositeRead) => I,
+    factory: (resource: CompositeRead) => I | Promise<I>,
     options?: PickToFocusTableOptions<I | null>
 ): FocusTableAction<I | null> {
     const { pickerOptions, ...restOptions } = options || {};
@@ -30,10 +30,14 @@ export function pickToFocusTable<I extends FocusTableItem>(
             pickerOptions,
             onPick: (resources) => {
                 if (!Array.isArray(resources)) resources = [resources];
-                for (const res of resources) {
-                    base = placeItem(env.store, factory(res), base);
-                }
-                base && env.select(base);
+                Promise.all(resources.map((res) => factory(res))).then(
+                    (items) => {
+                        for (const item of items) {
+                            base = placeItem(env.store, item, base);
+                        }
+                        base && env.select(base);
+                    }
+                );
             },
         });
     };
