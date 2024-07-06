@@ -1,6 +1,7 @@
 import re
 from datetime import date, datetime, time
 from io import BytesIO
+from typing import Literal, Union
 
 import requests
 from lxml import etree
@@ -8,6 +9,7 @@ from osgeo import ogr
 from owslib.crs import Crs
 from requests.exceptions import RequestException
 from shapely.geometry import box
+from typing_extensions import Annotated
 from zope.interface import implementer
 
 from nextgisweb.env import COMP_ID, Base, _, env
@@ -31,18 +33,21 @@ from nextgisweb.feature_layer import (
     LayerField,
     LayerFieldsMixin,
 )
+from nextgisweb.jsrealm import TSExport
 from nextgisweb.layer import IBboxLayer, SpatialLayerMixin
 from nextgisweb.resource import (
     ConnectionScope,
+    CRUTypes,
     DataScope,
     DataStructureScope,
     Resource,
     ResourceGroup,
+    SAttribute,
+    SColumn,
     Serializer,
+    SRelationship,
+    SResource,
 )
-from nextgisweb.resource import SerializedProperty as SP
-from nextgisweb.resource import SerializedRelationship as SR
-from nextgisweb.resource import SerializedResourceRelationship as SRR
 from nextgisweb.spatial_ref_sys import SRS
 
 WFS_2_FIELD_TYPE = {
@@ -384,24 +389,33 @@ class WFSConnection(Base, Resource):
         return features, len(features)
 
 
-class _path_attr(SP):
-    def setter(self, srlzr, value):
+class PathAttr(SColumn, apitype=True):
+    ctypes = CRUTypes(str, str, str)
+
+    def set(self, srlzr: Serializer, value: str, *, create: bool):
         if not url_pattern.match(value):
-            raise ValidationError("Path is not a valid url.")
+            raise ValidationError("Invalid WFS service URL")
+        return super().set(srlzr, value, create=create)
 
-        super().setter(srlzr, value)
+
+VersionEnum = Annotated[
+    Union[tuple(Literal[i] for i in WFS_VERSIONS)],  # type: ignore
+    TSExport("VersionEnum"),
+]
 
 
-class WFSConnectionSerializer(Serializer):
+class VersionAttr(SColumn, apitype=True):
+    ctypes = CRUTypes(VersionEnum, VersionEnum, VersionEnum)
+
+
+class WFSConnectionSerializer(Serializer, apitype=True):
     identity = WFSConnection.identity
     resclass = WFSConnection
 
-    _defaults = dict(read=ConnectionScope.read, write=ConnectionScope.write)
-
-    path = _path_attr(**_defaults)
-    username = SP(**_defaults)
-    password = SP(**_defaults)
-    version = SP(**_defaults)
+    path = PathAttr(read=ConnectionScope.read, write=ConnectionScope.write)
+    version = VersionAttr(read=ConnectionScope.read, write=ConnectionScope.write)
+    username = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
+    password = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
 
 
 class WFSLayerField(Base, LayerField):
@@ -511,39 +525,41 @@ class WFSLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         raise ValueError(f"Layer {self.layer_name} not found in Capabilities.")
 
 
-class _fields_action(SP):
-    """Special write-only attribute that allows updating
-    list of fields from the server"""
+class GeometryTypeAttr(SAttribute, apitype=True):
+    ctypes = CRUTypes(Union[str, None], str, Union[str, None])
 
-    def setter(self, srlzr, value):
+
+class GeometrySridAttr(SAttribute, apitype=True):
+    ctypes = CRUTypes(Union[int, None], int, Union[int, None])
+
+
+class FieldsAttr(SAttribute, apitype=True):
+    def set(
+        self,
+        srlzr: Serializer,
+        value: Union[Literal["update"], Literal["keep"]],
+        *,
+        create: bool,
+    ):
         if value == "update":
             if srlzr.obj.connection.has_permission(ConnectionScope.connect, srlzr.user):
                 srlzr.obj.setup()
             else:
                 raise ForbiddenError()
-        elif value != "keep":
-            raise ValidationError("Invalid 'fields' parameter.")
 
 
-class WFSLayerSerializer(Serializer):
+class WFSLayerSerializer(Serializer, apitype=True):
     identity = WFSLayer.identity
     resclass = WFSLayer
 
-    __defaults = dict(read=DataStructureScope.read, write=DataStructureScope.write)
+    connection = SResource(read=DataStructureScope.read, write=DataStructureScope.write)
+    layer_name = SColumn(read=DataStructureScope.read, write=DataStructureScope.write)
+    column_geom = SColumn(read=DataStructureScope.read, write=DataStructureScope.write)
+    geometry_type = GeometryTypeAttr(read=DataStructureScope.read, write=DataStructureScope.write)
+    geometry_srid = GeometrySridAttr(read=DataStructureScope.read, write=DataStructureScope.write)
+    srs = SRelationship(read=DataStructureScope.read, write=DataStructureScope.write)
 
-    connection = SRR(**__defaults)
-    srs = SR(**__defaults)
-
-    layer_name = SP(**__defaults)
-    column_geom = SP(**__defaults)
-    geometry_type = SP(**__defaults)
-    geometry_srid = SP(**__defaults)
-
-    fields = _fields_action(write=DataStructureScope.write)
-
-    def deserialize(self):
-        self.data["srs"] = dict(id=3857)
-        super().deserialize()
+    fields = FieldsAttr(read=None, write=DataStructureScope.write)
 
 
 @implementer(

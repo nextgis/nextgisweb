@@ -8,6 +8,7 @@ define([
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
     "@nextgisweb/pyramid/i18n!",
+    "@nextgisweb/pyramid/settings!spatial_ref_sys",
     "ngw-resource/serialize",
     "ngw-pyramid/route",
     // resource
@@ -29,6 +30,7 @@ define([
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
     i18n,
+    srsSettings,
     serialize,
     route,
     template
@@ -51,7 +53,7 @@ define([
 
                 this.fields.set(
                     "value",
-                    this.composite.operation == "create" ? "update" : "keep"
+                    this.composite.operation === "create" ? "update" : "keep"
                 );
 
                 this.wConnection.on(
@@ -89,7 +91,7 @@ define([
 
             _ready: function () {
                 return (
-                    this.composite.operation == "create" || this._deserialized
+                    this.composite.operation === "create" || this._deserialized
                 );
             },
 
@@ -102,9 +104,18 @@ define([
                 if (data.wfsclient_layer === undefined) {
                     data.wfsclient_layer = {};
                 }
+
                 var value = data.wfsclient_layer;
                 if (value.geometry_type === "") {
                     value.geometry_type = null;
+                }
+
+                if (value.geometry_srid !== undefined) {
+                    value.geometry_srid = Number(value.geometry_srid);
+                }
+
+                if (this.composite.operation === "create") {
+                    value.srs = srsSettings.default;
                 }
             },
 
