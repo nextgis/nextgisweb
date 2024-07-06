@@ -13,4 +13,4 @@ class BasemapLayerWidget(Widget):
 class BasemapWebMapWidget(Widget):
     resource = WebMap
     operation = ("create", "update")
-    amdmod = "ngw-basemap/WebMapWidget"
+    amdmod = "@nextgisweb/basemap/webmap-widget"
