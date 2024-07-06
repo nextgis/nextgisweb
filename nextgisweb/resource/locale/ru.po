@@ -167,31 +167,31 @@ msgstr "Избранное"
 msgid "User resources"
 msgstr "Пользовательские ресурсы"
 
-#: model.py:264
+#: model.py:265
 msgid "Resource can not be a parent himself."
 msgstr "Ресурс не может быть родителем сам себе."
 
-#: model.py:277
+#: model.py:278
 msgid "Resource keyname is not unique."
 msgstr "Ключ ресурса не уникален."
 
-#: model.py:309
+#: model.py:310
 msgid "Default style"
 msgstr "Стиль по умолчанию"
 
-#: model.py:425
+#: model.py:426
 msgid "Resource can not be without a parent."
 msgstr "Ресурс не может быть без родителя"
 
-#: model.py:432
+#: model.py:433
 msgid "You are not allowed to manage children of resource with id = %d."
 msgstr "У вас нет прав для управления дочерними ресурсами для ресурса с id = %d."
 
-#: model.py:438
+#: model.py:439
 msgid "Resource can not be a child of resource id = %d."
 msgstr "Ресурс не может быть дочерним для ресурса с id = %d."
 
-#: model.py:513
+#: model.py:514
 msgid ""
 "Unable to revoke '{s}: {p}' permission for '{u}' as the user belongs to the "
 "administrators group. Administrators must always have ability to configure "
@@ -201,7 +201,7 @@ msgstr ""
 "относится к группе администраторов. Администраторы всегда должны иметь "
 "возможность настраивать права для ресурсов."
 
-#: model.py:613
+#: model.py:614
 msgid "Resource group"
 msgstr "Группа ресурсов"
 
@@ -317,7 +317,7 @@ msgstr "Вернуться в исходную группу"
 msgid "Refresh"
 msgstr "Обновить"
 
-#: nodepkg/component/resource-picker/pickToFocusTable.tsx:43
+#: nodepkg/component/resource-picker/pickToFocusTable.tsx:47
 #: nodepkg/permissions-widget/PermissionsWidget.tsx:25
 msgid "Add"
 msgstr "Добавить"
@@ -334,7 +334,7 @@ msgstr "Выбрать отмеченное"
 msgid "Confirm deletion of the resource"
 msgstr "Подтвердить удаление ресурса"
 
-#: nodepkg/description-editor/DescriptionEditorWidget.tsx:25
+#: nodepkg/description-editor/DescriptionEditorWidget.tsx:31
 msgid "Description"
 msgstr "Описание"
 
@@ -463,7 +463,7 @@ msgstr "Ресурсы не найдены"
 msgid "Search resources"
 msgstr "Поиск ресурсов"
 
-#: scope.py:14 scope.py:32 scope.py:44 scope.py:54 scope.py:67
+#: scope.py:14 scope.py:30 scope.py:40 scope.py:53
 msgctxt "permission"
 msgid "Read"
 msgstr "Чтение"
@@ -473,7 +473,7 @@ msgctxt "permission"
 msgid "Create"
 msgstr "Создание"
 
-#: scope.py:16 scope.py:33 scope.py:45 scope.py:55
+#: scope.py:16 scope.py:31 scope.py:41
 msgctxt "permission"
 msgid "Modify"
 msgstr "Изменение"
@@ -493,37 +493,33 @@ msgctxt "permission"
 msgid "Configure permissions"
 msgstr "Настройка прав доступа"
 
-#: scope.py:30
-msgid "Metadata"
-msgstr "Метаданные"
-
-#: scope.py:42
+#: scope.py:28
 msgid "Data structure"
 msgstr "Структура данных"
 
-#: scope.py:52
+#: scope.py:38
 msgid "Data"
 msgstr "Данные"
 
-#: scope.py:65
+#: scope.py:51
 msgid "Connection"
 msgstr "Соединение"
 
-#: scope.py:68 scope.py:82
+#: scope.py:54 scope.py:68
 msgctxt "permission"
 msgid "Configure"
 msgstr "Настройка"
 
-#: scope.py:69
+#: scope.py:55
 msgctxt "permission"
 msgid "Use"
 msgstr "Использование"
 
-#: scope.py:79
+#: scope.py:65
 msgid "Service"
 msgstr "Сервис"
 
-#: scope.py:81
+#: scope.py:67
 msgctxt "permission"
 msgid "Access"
 msgstr "Доступ"
@@ -571,7 +567,3 @@ msgstr "Дополнительно"
 #: view.py:402
 msgid "Update"
 msgstr "Изменить"
-
-#~ msgid "Open"
-#~ msgstr "Открыть"
-

@@ -19,20 +19,6 @@ class ResourceScope(Scope):
     change_permissions = P(pgettext("permission", "Configure permissions")).require(read)
 
 
-class MetadataScope(Scope):
-    """Set of permissions for resource metadata. Typical example of resource metadata -
-    is its description in free form. This description doesn't affect anything
-    it's change doesn't change data structure or anything else.
-    As every resource has description this set of permissions is
-    included for all resources at Resource class level."""
-
-    identity = "metadata"
-    label = _("Metadata")
-
-    read = P(pgettext("permission", "Read")).require(ResourceScope.read)
-    write = P(pgettext("permission", "Modify")).require(read)
-
-
 class DataStructureScope(Scope):
     """Set of permissions for data structure, for example fields structure
     of vector layer, its change might lead to change

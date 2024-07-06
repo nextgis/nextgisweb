@@ -21,7 +21,7 @@ from .exception import DisplayNameNotUnique, HierarchyError
 from .interface import IResourceAdapter, interface_registry
 from .permission import RequirementList
 from .sattribute import ResourceRef, SColumn, SRelationship, SResource
-from .scope import DataScope, MetadataScope, ResourceScope, Scope
+from .scope import DataScope, ResourceScope, Scope
 from .serialize import CRUTypes, SAttribute, Serializer
 
 Base.depends_on("auth")
@@ -82,7 +82,8 @@ class Resource(Base, metaclass=ResourceMeta):
 
     identity: ClassVar[str] = "resource"
     cls_display_name: ClassVar[TrStr] = gettext("Resource")
-    __scope__: ClassVar[ResourceScopeType] = (ResourceScope, MetadataScope)
+
+    __scope__: ClassVar[ResourceScopeType] = (ResourceScope,)
 
     id = db.Column(db.Integer, primary_key=True)
     cls = db.Column(db.Unicode, nullable=False)
