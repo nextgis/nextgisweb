@@ -1,6 +1,30 @@
-#: amd/ngw-wmsserver/ServiceWidget.js:57 model.py:19 view.py:16
+#: model.py:21 nodepkg/service-widget/ServiceWidget.tsx:145 view.py:16
 msgid "WMS service"
 msgstr "Сервис WMS"
+
+#: nodepkg/service-widget/ServiceWidget.tsx:24
+msgid "Not set"
+msgstr "Не установлен"
+
+#: nodepkg/service-widget/ServiceWidget.tsx:56
+msgid "Display name"
+msgstr "Наименование"
+
+#: nodepkg/service-widget/ServiceWidget.tsx:61
+msgid "Keyname"
+msgstr "Ключ"
+
+#: nodepkg/service-widget/ServiceWidget.tsx:66
+msgid "Min scale"
+msgstr "Мин. масштаб"
+
+#: nodepkg/service-widget/ServiceWidget.tsx:71
+msgid "Max scale"
+msgstr "Макс. масштаб"
+
+#: nodepkg/service-widget/ServiceWidget.tsx:76
+msgid "Resource"
+msgstr "Ресурс"
 
 #: view.py:17
 msgid ""
@@ -12,36 +36,3 @@ msgstr ""
 "Geospatial Consortium для предоставления географически привязанных "
 "изображений. Эти изображения обычно генерируются картографическим сервером из"
 " данных базы данных ГИС."
-
-#: amd/ngw-wmsserver/template/ServiceWidget.hbs:14
-msgid "Add"
-msgstr "Добавить"
-
-#: amd/ngw-wmsserver/template/ServiceWidget.hbs:18
-msgid "Select layer's style"
-msgstr "Выберите стиль слоя"
-
-#: amd/ngw-wmsserver/template/ServiceWidget.hbs:27
-msgid "Remove"
-msgstr "Удалить"
-
-#: amd/ngw-wmsserver/template/ServiceWidget.hbs:62
-msgid "Keyname"
-msgstr "Ключ"
-
-#: amd/ngw-wmsserver/template/ServiceWidget.hbs:66
-msgid "Display name"
-msgstr "Наименование"
-
-#: amd/ngw-wmsserver/template/ServiceWidget.hbs:70
-msgid "Min scale"
-msgstr "Мин. масштаб"
-
-#: amd/ngw-wmsserver/template/ServiceWidget.hbs:74
-msgid "Max scale"
-msgstr "Макс. масштаб"
-
-#: amd/ngw-wmsserver/template/ServiceWidget.hbs:78
-msgid "Resource"
-msgstr "Ресурс"
-

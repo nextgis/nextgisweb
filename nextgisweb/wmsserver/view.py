@@ -9,7 +9,7 @@ from .model import Service
 class ServiceWidget(Widget):
     resource = Service
     operation = ("create", "update")
-    amdmod = "ngw-wmsserver/ServiceWidget"
+    amdmod = "@nextgisweb/wmsserver/service-widget"
 
 
 class WMSLink(ExternalAccessLink):
