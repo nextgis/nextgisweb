@@ -8,6 +8,7 @@ from pathlib import Path
 from queue import Empty, Full, Queue
 from threading import Lock, Thread
 from time import time
+from typing import Any, Union
 from uuid import uuid4
 
 import transaction
@@ -19,12 +20,7 @@ from nextgisweb.env import Base, DBSession, env
 from nextgisweb.lib import db
 from nextgisweb.lib.logging import logger
 
-from nextgisweb.resource import (
-    Resource,
-    ResourceScope,
-    SerializedProperty,
-    Serializer,
-)
+from nextgisweb.resource import CRUTypes, Resource, ResourceScope, SAttribute, Serializer
 
 from .interface import IRenderableNonCached, IRenderableStyle
 from .util import imgcolor, pack_color, unpack_color
@@ -459,45 +455,52 @@ db.event.listen(
 )
 
 
-class ResourceTileCacheSeializedProperty(SerializedProperty):
-    def default(self):
-        column = getattr(ResourceTileCache, self.attrname)
-        return column.default.arg if column.default is not None else None
+class TileCacheFlushAttr(SAttribute, apitype=True):
+    def set(self, srlzr: Serializer, value: Union[bool, None], *, create: bool):
+        if value and srlzr.obj.tile_cache is not None:
+            srlzr.obj.tile_cache.clear()
 
-    def getter(self, srlzr):
+
+class TileCacheAttr(SAttribute, apitype=True):
+    def bind(self, srlzrcls, attrname):
+        assert not self.required
+        self.column = column = getattr(ResourceTileCache, attrname)
+        self.default = column.default.arg if column.default is not None else None
+        super().bind(srlzrcls, attrname)
+
+    def setup_types(self):
+        if self.ctypes is not None:
+            self.types = self.ctypes
+        else:
+            type = self.column.type.python_type
+            assert type in (int, bool)
+            if self.column.nullable:
+                type = Union[type, None]
+            self.types = CRUTypes(type, type, type)
+
+    def get(self, srlzr: Serializer) -> Any:
         if not env.render.tile_cache_enabled or srlzr.obj.tile_cache is None:
-            return self.default()
+            return self.default
         return getattr(srlzr.obj.tile_cache, self.attrname)
 
-    def setter(self, srlzr, value):
-        if value != self.default() or srlzr.obj.tile_cache is not None:
+    def set(self, srlzr: Serializer, value: Any, *, create: bool):
+        if value != self.default or srlzr.obj.tile_cache is not None:
             if srlzr.obj.tile_cache is None:
                 srlzr.obj.tile_cache = ResourceTileCache()
             setattr(srlzr.obj.tile_cache, self.attrname, value)
 
 
-class TileCacheFlushProperty(SerializedProperty):
-    def getter(self, srlzr):
-        return None
-
-    def setter(self, srlzr, value):
-        if srlzr.obj.tile_cache is not None:
-            srlzr.obj.tile_cache.clear()
-
-
-class TileCacheSerializer(Serializer):
+class TileCacheSerializer(Serializer, apitype=True):
     identity = "tile_cache"
     resclass = Resource
 
     # NOTE: Flush property should be deserialized at first!
-    flush = TileCacheFlushProperty(read=None, write=ResourceScope.update)
+    flush = TileCacheFlushAttr(read=None, write=ResourceScope.update)
 
-    __permissions = dict(read=ResourceScope.read, write=ResourceScope.update)
-
-    enabled = ResourceTileCacheSeializedProperty(**__permissions)
-    image_compose = ResourceTileCacheSeializedProperty(**__permissions)
-    max_z = ResourceTileCacheSeializedProperty(**__permissions)
-    ttl = ResourceTileCacheSeializedProperty(**__permissions)
+    enabled = TileCacheAttr(read=ResourceScope.read, write=ResourceScope.update)
+    image_compose = TileCacheAttr(read=ResourceScope.read, write=ResourceScope.update)
+    max_z = TileCacheAttr(read=ResourceScope.read, write=ResourceScope.update)
+    ttl = TileCacheAttr(read=ResourceScope.read, write=ResourceScope.update)
 
     def is_applicable(self):
         return IRenderableStyle.providedBy(self.obj) and not IRenderableNonCached.providedBy(

@@ -1,7 +1,10 @@
 import { observer } from "mobx-react-lite";
+import { useCallback } from "react";
 
 import { CheckboxValue, InputNumber } from "@nextgisweb/gui/antd";
-import { Area, Lot } from "@nextgisweb/gui/mayout";
+import type { CheckboxValueProps } from "@nextgisweb/gui/antd";
+import { LotMV } from "@nextgisweb/gui/arm";
+import { Area } from "@nextgisweb/gui/mayout";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type {
     EditorWidgetComponent,
@@ -13,66 +16,75 @@ import type { TileCacheStore } from "./TileCacheStore";
 export const TileCacheWidget: EditorWidgetComponent<
     EditorWidgetProps<TileCacheStore>
 > = observer(({ store }) => {
-    return (
-        <Area pad>
-            <Lot label={false}>
+    const CheckboxEnabled = useCallback(
+        ({ onChange, ...props }: CheckboxValueProps) => {
+            return (
                 <CheckboxValue
-                    value={!!store.enabled}
+                    {...props}
                     onChange={(v) => {
-                        const data: Partial<TileCacheStore> = { enabled: v };
                         if (
                             v &&
-                            !store.imageCompose &&
-                            store.maxZ === null &&
-                            store.ttl === null
+                            !store.imageCompose.value &&
+                            store.maxZ.value === null &&
+                            store.ttl.value === null
                         ) {
-                            data.imageCompose = true;
-                            data.maxZ = 6;
-                            data.ttl = 2630000;
+                            store.imageCompose.value = true;
+                            store.maxZ.value = 6;
+                            store.ttl.value = 2630000;
                         }
-                        store.update(data);
+                        onChange?.(v);
                     }}
-                >
-                    {gettext("Enabled")}
-                </CheckboxValue>
-            </Lot>
-
-            <Lot label={false}>
-                <CheckboxValue
-                    value={!!store.imageCompose}
-                    onChange={(v) => store.update({ imageCompose: v })}
-                >
-                    {gettext("Allow using tiles in non-tile requests")}
-                </CheckboxValue>
-            </Lot>
-
-            <Lot label={gettext("Max zoom level")}>
-                <InputNumber
-                    value={store.maxZ}
-                    onChange={(v) => store.update({ maxZ: v })}
-                    min={0}
-                    max={18}
                 />
-            </Lot>
+            );
+        },
+        [store]
+    );
 
-            <Lot label={gettext("TTL, sec.")}>
-                <InputNumber
-                    value={store.ttl}
-                    onChange={(v) => store.update({ ttl: v })}
-                    min={0}
-                    max={315360000}
-                    step={86400}
-                />
-            </Lot>
-
-            <Lot label={false}>
-                <CheckboxValue
-                    value={!!store.flush}
-                    onChange={(v) => store.update({ flush: v })}
-                >
-                    {gettext("Flush")}
-                </CheckboxValue>
-            </Lot>
+    return (
+        <Area pad>
+            <LotMV
+                label={false}
+                value={store.enabled}
+                component={CheckboxEnabled}
+                props={{
+                    children: gettext("Enabled"),
+                }}
+            />
+            <LotMV
+                label={false}
+                value={store.imageCompose}
+                component={CheckboxValue}
+                props={{
+                    children: gettext("Allow using tiles in non-tile requests"),
+                }}
+            />
+            <LotMV
+                label={gettext("Max zoom level")}
+                value={store.maxZ}
+                component={InputNumber}
+                props={{
+                    min: 0,
+                    max: 18,
+                }}
+            />
+            <LotMV
+                label={gettext("TTL, sec.")}
+                value={store.ttl}
+                component={InputNumber}
+                props={{
+                    min: 0,
+                    max: 315360000,
+                    step: 86400,
+                }}
+            />
+            <LotMV
+                label={false}
+                value={store.flush}
+                component={CheckboxValue}
+                props={{
+                    children: gettext("Flush"),
+                }}
+            />
         </Area>
     );
 });

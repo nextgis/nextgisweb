@@ -1,68 +1,58 @@
-import { makeAutoObservable, toJS } from "mobx";
+import { action, computed, observable } from "mobx";
 
-interface Value {
-    enabled?: boolean | null;
-    image_compose?: boolean | null;
-    max_z?: number | null;
-    ttl?: number | null;
-    flush?: boolean | null;
-}
+import { mapper } from "@nextgisweb/gui/arm";
+import type * as apitype from "@nextgisweb/render/type/api";
+import type { EditorStore } from "@nextgisweb/resource/type/EditorStore";
 
-export class TileCacheStore {
-    identity = "tile_cache";
+type Value = apitype.TileCacheUpdate;
 
-    enabled: boolean | null = null;
-    imageCompose: boolean | null = null;
-    maxZ: number | null = null;
-    ttl: number | null = null;
-    flush: boolean | null = null;
+const {
+    enabled: enabled,
+    image_compose: imageCompose,
+    max_z: maxZ,
+    ttl: ttl,
+    flush: flush,
+    $load: mapperLoad,
+    $error: mapperError,
+} = mapper<TileCacheStore, Value>({
+    onChange: (o) => o.markDirty(),
+    validateIf: (o) => o.validate,
+});
 
-    dirty = false;
+export class TileCacheStore implements EditorStore<Value> {
+    readonly identity = "tile_cache";
 
-    constructor() {
-        makeAutoObservable(this, { identity: false });
-    }
+    enabled = enabled.init(false, this);
+    imageCompose = imageCompose.init(false, this);
+    maxZ = maxZ.init(null, this);
+    ttl = ttl.init(null, this);
+    flush = flush.init(false, this);
 
-    load(value: Value) {
-        const loaded = {
-            enabled: value.enabled || null,
-            imageCompose: value.image_compose || null,
-            maxZ: value.max_z || null,
-            ttl: value.ttl || null,
-            flush: value.flush || null,
-        };
+    @observable accessor dirty = false;
+    @observable accessor validate = false;
 
-        this.enabled = loaded.enabled;
-        this.imageCompose = loaded.imageCompose;
-        this.maxZ = loaded.maxZ;
-        this.ttl = loaded.ttl;
-        this.flush = loaded.flush;
-
+    @action load(value: Value) {
+        mapperLoad(this, value);
         this.dirty = false;
     }
 
-    dump() {
-        if (!this.dirty) return;
-        const result: Value = {
-            enabled: this.enabled,
-            image_compose: this.imageCompose,
-            max_z: this.maxZ,
-            ttl: this.ttl,
-            flush: this.flush,
-        };
-        return toJS(result);
-    }
-
-    get isValid() {
-        return true;
-    }
-
-    update(source: Partial<TileCacheStore>) {
-        Object.entries(source).forEach(([key, value]) => {
-            if (key in this && key !== "isValid") {
-                (this as unknown as Record<string, unknown>)[key] = value;
-            }
-        });
+    @action markDirty() {
         this.dirty = true;
+    }
+
+    dump() {
+        if (!this.dirty) return undefined as unknown as Value;
+        return {
+            ...this.enabled.jsonPart(),
+            ...this.imageCompose.jsonPart(),
+            ...this.maxZ.jsonPart(),
+            ...this.ttl.jsonPart(),
+            ...this.flush.jsonPart(),
+        };
+    }
+
+    @computed get isValid() {
+        this.validate = true;
+        return mapperError(this) === false;
     }
 }
