@@ -330,7 +330,7 @@ msgstr "Вы хотите сохранить изменения?"
 msgid "Don't save"
 msgstr "Не сохранять"
 
-#: component.py:30
+#: component.py:31
 msgid "Main web map"
 msgstr "Основная веб-карта"
 
@@ -342,26 +342,21 @@ msgstr "Открыть"
 msgid "Fragment"
 msgstr "Фрагмент"
 
-#: model.py:29 model.py:48 view.py:320 view.py:347
+#: model.py:29 model.py:47 view.py:320 view.py:347
 msgid "Web map"
 msgstr "Веб-карта"
 
 #: model.py:31
 msgctxt "permission"
-msgid "Display"
-msgstr "Открытие"
-
-#: model.py:32
-msgctxt "permission"
 msgid "View annotations"
 msgstr "Просмотр аннотаций"
 
-#: model.py:33
+#: model.py:32
 msgctxt "permission"
 msgid "Draw annotations"
 msgstr "Рисование аннотаций"
 
-#: model.py:34
+#: model.py:33
 msgctxt "permission"
 msgid "Manage annotations"
 msgstr "Управление аннотациями"
@@ -668,11 +663,11 @@ msgstr "Активная панель"
 msgid "Map link"
 msgstr "Ссылка на карту"
 
-#: nodepkg/panel/share/SharePanel.js:284
+#: nodepkg/panel/share/SharePanel.js:285
 msgid "The map link copied to clipboard."
 msgstr "Ссылка на карту скопирована в буфер обмена."
 
-#: nodepkg/panel/share/SharePanel.js:288
+#: nodepkg/panel/share/SharePanel.js:289
 msgid "Copy link"
 msgstr "Копировать ссылку"
 
@@ -1040,4 +1035,3 @@ msgstr "Клонировать веб-карту"
 #: view.py:274
 msgid "Embedded webmap preview"
 msgstr "Просмотр встроенной веб-карты"
-

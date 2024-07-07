@@ -83,7 +83,7 @@ def display(obj, request):
     if is_valid_or_error is not True:
         return is_valid_or_error
 
-    request.resource_permission(WebMapScope.display)
+    request.resource_permission(ResourceScope.read)
 
     MID = namedtuple("MID", ["adapter", "basemap", "plugin"])
 
@@ -319,7 +319,7 @@ def setup_pyramid(comp, config):
 
         yield Label("webmap", _("Web map"))
 
-        if args.obj.has_permission(WebMapScope.display, args.request.user):
+        if args.obj.has_permission(ResourceScope.read, args.request.user):
             yield Link(
                 "webmap/display",
                 _("Display"),

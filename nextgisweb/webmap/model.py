@@ -28,7 +28,6 @@ class WebMapScope(Scope):
     identity = "webmap"
     label = _("Web map")
 
-    display = P(pgettext("permission", "Display")).require(ResourceScope.read)
     annotation_read = P(pgettext("permission", "View annotations")).require(ResourceScope.read)
     annotation_write = P(pgettext("permission", "Draw annotations")).require(ResourceScope.read)
     annotation_manage = P(pgettext("permission", "Manage annotations")).require(annotation_write)

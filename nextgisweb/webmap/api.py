@@ -17,7 +17,7 @@ from nextgisweb.jsrealm import TSExport
 from nextgisweb.layer import IBboxLayer
 from nextgisweb.pyramid import JSONType
 from nextgisweb.pyramid.api import csetting
-from nextgisweb.resource import DataScope, ResourceFactory
+from nextgisweb.resource import DataScope, ResourceFactory, ResourceScope
 
 from .model import WebMap, WebMapAnnotation, WebMapScope
 
@@ -141,7 +141,7 @@ def add_extent(e1, e2):
 
 
 def get_webmap_extent(resource, request) -> JSONType:
-    request.resource_permission(WebMapScope.display)
+    request.resource_permission(ResourceScope.read)
 
     def traverse(item, extent):
         if item.item_type == "layer":

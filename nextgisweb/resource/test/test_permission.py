@@ -5,7 +5,6 @@ import transaction
 from nextgisweb.env import DBSession
 
 from nextgisweb.auth import Group, User
-from nextgisweb.webmap import WebMap, WebMapItem, WebMapScope
 
 from ..model import Resource, ResourceACLRule, ResourceGroup
 from ..presolver import PermissionResolver
@@ -122,17 +121,6 @@ def test_permission_requirement(ngw_txn, resolve):
     ).persist()
     assert resolve(sg, guest) == {ResourceScope.read}
 
-    # Webmap has webmap.display -> resource.read -> resource.read@parent
-    # permission dependency, and these dependencies should be sorted
-    # topologically.
-    wm = WebMap(
-        parent=rg,
-        display_name="Test webmap",
-        owner_user=administrator,
-        root_item=WebMapItem(item_type="root"),
-    ).persist()
-    assert resolve(wm, guest) == {ResourceScope.read, WebMapScope.display}
-
     rg.acl.append(
         ResourceACLRule(
             action="deny",
@@ -146,7 +134,6 @@ def test_permission_requirement(ngw_txn, resolve):
 
     assert resolve(rg, guest) == set()
     assert resolve(sg, guest) == set()
-    assert resolve(wm, guest) == set()
 
 
 @pytest.fixture
