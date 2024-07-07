@@ -1,5 +1,6 @@
 from collections import defaultdict
 
+import sqlalchemy as sa
 import transaction
 from zope.sqlalchemy import mark_changed
 
@@ -200,7 +201,7 @@ class MigrationContext:
                 m(self)
             elif isinstance(mig, SQLScriptMigration):
                 s = getattr(mig, "{}_script".format(operation.opname))
-                DBSession.connection().execute(s())
+                DBSession.connection().execute(sa.text(s()))
 
         return operation.apply(state)
 
