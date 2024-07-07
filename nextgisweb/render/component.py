@@ -26,11 +26,7 @@ class TileCacheData(KindOfData):
 
 class RenderComponent(Component):
     def initialize(self):
-        opt_tcache = self.options.with_prefix("tile_cache")
-        self.tile_cache_enabled = opt_tcache["enabled"]
-        self.tile_cache_track_changes = opt_tcache["track_changes"]
-        self.tile_cache_seed = opt_tcache["seed"]
-
+        self.tile_cache_enabled = self.options["tile_cache.enabled"]
         self.tile_cache_path = os.path.join(self.env.core.gtsdir(self), "tile_cache")
         if not os.path.isdir(self.tile_cache_path):
             os.makedirs(self.tile_cache_path)
@@ -46,9 +42,7 @@ class RenderComponent(Component):
         return dict(
             tile_cache=dict(
                 enabled=self.tile_cache_enabled,
-                track_changes=self.tile_cache_track_changes,
-                seed=self.tile_cache_seed,
-            )
+            ),
         )
 
     def sys_info(self):
@@ -182,7 +176,5 @@ class RenderComponent(Component):
     option_annotations = (
         Option("check_origin", bool, default=False, doc="Check request Origin header."),
         Option("tile_cache.enabled", bool, default=True),
-        Option("tile_cache.track_changes", bool, default=False),
-        Option("tile_cache.seed", bool, default=False),
         Option("legend_symbols_section", bool, default=False),
     )

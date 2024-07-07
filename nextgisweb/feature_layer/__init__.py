@@ -1,5 +1,4 @@
 from .component import FeatureLayerComponent
-from .event import on_data_change
 from .extension import FeatureExtension
 from .feature import Feature, FeatureSet
 from .interface import (

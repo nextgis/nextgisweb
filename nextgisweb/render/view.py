@@ -20,13 +20,6 @@ class TileCacheWidget(Widget):
             and super().is_applicable()
         )
 
-    def config(self):
-        result = super().config()
-        opts = env.render.options.with_prefix("tile_cache")
-        result["featureTrackChanges"] = opts["track_changes"]
-        result["featureSeed"] = opts["seed"]
-        return result
-
 
 class TMSLink(ExternalAccessLink):
     title = _("TMS (Tile Map Service)")

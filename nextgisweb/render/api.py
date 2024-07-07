@@ -1,4 +1,3 @@
-from datetime import datetime
 from io import BytesIO
 from itertools import product
 from math import ceil, floor, log
@@ -12,7 +11,7 @@ from pyramid.response import Response
 from typing_extensions import Annotated
 
 from nextgisweb.env import _
-from nextgisweb.lib.apitype import AnyOf, AsJSON, ContentType, EmptyObject, StatusCode
+from nextgisweb.lib.apitype import AnyOf, AsJSON, ContentType, StatusCode
 
 from nextgisweb.core.exception import UserException, ValidationError
 from nextgisweb.resource import DataScope, Resource, ResourceFactory, ResourceNotFound
@@ -20,7 +19,6 @@ from nextgisweb.resource import DataScope, Resource, ResourceFactory, ResourceNo
 from .imgcodec import COMPRESSION_FAST, FORMAT_PNG, image_encoder_factory
 from .interface import ILegendableStyle, IRenderableStyle
 from .legend import ILegendSymbols
-from .model import SEED_STATUS_ENUM
 from .util import af_transform
 
 RenderResource = Annotated[
@@ -66,13 +64,6 @@ RenderResponse = AnyOf[
     Annotated[Response, StatusCode(204)],
     Annotated[Response, StatusCode(404), ContentType("application/octet-stream")],
 ]
-
-
-class TileCacheSeedStatusResponse(Struct, kw_only=True):
-    tstamp: datetime
-    status: Literal[SEED_STATUS_ENUM]  # type: ignore
-    progress: int
-    total: int
 
 
 class LegendIcon(Struct, kw_only=True):
@@ -437,20 +428,6 @@ def image(
     return image_response(aimg, nd, size)
 
 
-def tile_cache_seed_status(request) -> AnyOf[TileCacheSeedStatusResponse, EmptyObject]:
-    request.resource_permission(PD_READ)
-    tc = request.context.tile_cache
-    if tc is None:
-        return
-
-    return TileCacheSeedStatusResponse(
-        tstamp=tc.seed_tstamp,
-        status=tc.seed_status,
-        progress=tc.seed_progress,
-        total=tc.seed_total,
-    )
-
-
 def legend(request) -> Annotated[Response, ContentType("image/png")]:
     """Get resource legend image"""
     request.resource_permission(PD_READ)
@@ -487,8 +464,6 @@ def legend_symbols(request, *, icon_size: int = 24) -> AsJSON[List[LegendSymbol]
 
 
 def setup_pyramid(comp, config):
-    renderable_style_factory = ResourceFactory(context=IRenderableStyle)
-
     config.add_route(
         "render.tile",
         "/api/component/render/tile",
@@ -499,13 +474,6 @@ def setup_pyramid(comp, config):
         "render.image",
         "/api/component/render/image",
     ).get(image, http_cache=0)
-
-    config.add_route(
-        "render.tile_cache.seed_status",
-        "/api/resource/{id}/tile_cache/seed_status",
-        factory=renderable_style_factory,
-        get=tile_cache_seed_status,
-    )
 
     config.add_route(
         "render.legend",

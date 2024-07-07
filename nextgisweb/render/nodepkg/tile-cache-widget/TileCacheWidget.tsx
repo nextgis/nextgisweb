@@ -46,17 +46,6 @@ export const TileCacheWidget: EditorWidgetComponent<
                 </CheckboxValue>
             </Lot>
 
-            {store.featureTrackChanges && (
-                <Lot label={false}>
-                    <CheckboxValue
-                        value={!!store.trackChanges}
-                        onChange={(v) => store.update({ trackChanges: v })}
-                    >
-                        {gettext("Track changes")}
-                    </CheckboxValue>
-                </Lot>
-            )}
-
             <Lot label={gettext("Max zoom level")}>
                 <InputNumber
                     value={store.maxZ}
@@ -65,17 +54,6 @@ export const TileCacheWidget: EditorWidgetComponent<
                     max={18}
                 />
             </Lot>
-
-            {store.featureSeed && (
-                <Lot label={gettext("Seed zoom level")}>
-                    <InputNumber
-                        value={store.seedZ}
-                        onChange={(v) => store.update({ seedZ: v })}
-                        min={0}
-                        max={18}
-                    />
-                </Lot>
-            )}
 
             <Lot label={gettext("TTL, sec.")}>
                 <InputNumber
@@ -99,5 +77,6 @@ export const TileCacheWidget: EditorWidgetComponent<
     );
 });
 
+TileCacheWidget.displayName = "TileCacheWidget";
 TileCacheWidget.title = gettext("Tile cache");
 TileCacheWidget.order = 40;

@@ -1,13 +1,10 @@
-import logging
 from time import sleep
 
 import pytest
 import transaction
 from PIL import Image, ImageDraw
-from shapely.geometry import Point
 
 from nextgisweb.env import DBSession
-from nextgisweb.lib.geometry import Geometry
 
 from nextgisweb.raster_layer import RasterLayer
 from nextgisweb.raster_style import RasterStyle
@@ -124,30 +121,3 @@ def test_clear(frtc, img_cross_red):
     frtc.clear()
     exists, cimg = frtc.get_tile(tile)
     assert not exists
-
-
-def test_invalidate(frtc, img_cross_red, img_cross_green, img_fill, caplog):
-    caplog.set_level(logging.DEBUG)
-    tile_invalid = (4, 0, 0)
-    tile_valid = (4, 15, 15)
-
-    frtc.put_tile(tile_invalid, img_cross_red)
-    frtc.put_tile(tile_valid, img_cross_red)
-
-    frtc.invalidate(
-        Geometry.from_shape(
-            Point(*frtc.resource.srs.tile_center(tile_invalid)),
-            srid=None,
-        )
-    )
-
-    exists, cimg = frtc.get_tile(tile_invalid)
-    assert not exists
-
-    exists, cimg = frtc.get_tile(tile_valid)
-    assert exists and cimg.getextrema() == img_cross_red.getextrema()
-
-    # Update previously invalidated tile
-    frtc.put_tile(tile_invalid, img_cross_green)
-    exists, cimg = frtc.get_tile(tile_invalid)
-    assert exists and cimg.getextrema() == img_cross_green.getextrema()

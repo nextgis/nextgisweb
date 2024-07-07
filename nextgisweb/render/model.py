@@ -26,15 +26,12 @@ from nextgisweb.resource import (
     Serializer,
 )
 
-from .event import on_data_change, on_style_change
 from .interface import IRenderableNonCached, IRenderableStyle
-from .util import affine_bounds_to_tile, imgcolor, pack_color, unpack_color
+from .util import imgcolor, pack_color, unpack_color
 
 Base.depends_on("resource")
 
 TIMESTAMP_EPOCH = datetime(year=1970, month=1, day=1)
-
-SEED_STATUS_ENUM = ("started", "progress", "completed", "error")
 
 QUEUE_MAX_SIZE = 256
 QUEUE_STUCK_TIMEOUT = 5.0
@@ -294,12 +291,6 @@ class ResourceTileCache(Base):
     image_compose = db.Column(db.Boolean, nullable=False, default=False)
     max_z = db.Column(db.SmallInteger)
     ttl = db.Column(db.Integer)
-    track_changes = db.Column(db.Boolean, nullable=False, default=False)
-    seed_z = db.Column(db.SmallInteger)
-    seed_tstamp = db.Column(db.TIMESTAMP)
-    seed_status = db.Column(db.Enum(*SEED_STATUS_ENUM))
-    seed_progress = db.Column(db.Integer)
-    seed_total = db.Column(db.Integer)
 
     async_writing = False
 
@@ -452,44 +443,6 @@ class ResourceTileCache(Base):
         self.uuid = uuid4()
         self.initialize()
 
-    def invalidate(self, geom):
-        srs = self.resource.srs
-        with transaction.manager:
-            conn = DBSession.connection()
-
-            # TODO: This query uses sequnce scan and should be rewritten
-            query_z = db.sql.text('SELECT DISTINCT z FROM tile_cache."{}"'.format(self.uuid.hex))
-
-            query_delete = db.sql.text(
-                'DELETE FROM tile_cache."{0}" '
-                "WHERE z = :z "
-                "   AND x BETWEEN :xmin AND :xmax "
-                "   AND y BETWEEN :ymin AND :ymax ".format(self.uuid.hex)
-            )
-
-            zlist = [a[0] for a in conn.execute(query_z).fetchall()]
-            for z in zlist:
-                aft = affine_bounds_to_tile((srs.minx, srs.miny, srs.maxx, srs.maxy), z)
-
-                xmin, ymax = [int(a) for a in aft * geom.bounds[0:2]]
-                xmax, ymin = [int(a) for a in aft * geom.bounds[2:4]]
-
-                xmin -= 1
-                ymin -= 1
-                xmax += 1
-                ymax += 1
-
-                logger.debug("Removing tiles: z=%d x=%d..%d y=%d..%d", z, xmin, xmax, ymin, ymax)
-                conn.execute(query_delete, dict(z=z, xmin=xmin, ymin=ymin, xmax=xmax, ymax=ymax))
-
-            mark_changed(DBSession())
-
-    def update_seed_status(self, value, progress=None, total=None):
-        self.seed_status = value
-        self.seed_progress = progress
-        self.seed_total = total
-        self.seed_tstamp = datetime.utcnow()
-
 
 db.event.listen(
     ResourceTileCache.__table__,
@@ -504,27 +457,6 @@ db.event.listen(
     db.DDL("DROP SCHEMA IF EXISTS tile_cache CASCADE"),
     propagate=True,
 )
-
-
-@on_style_change.connect
-def on_style_change_handler(resource):
-    if (
-        env.render.tile_cache_track_changes
-        and resource.tile_cache is not None
-        and resource.tile_cache.track_changes
-    ):
-        resource.tile_cache.clear()
-        resource.tile_cache.initialize()
-
-
-@on_data_change.connect
-def on_data_change_handler(resource, geom):
-    if (
-        env.render.tile_cache_track_changes
-        and resource.tile_cache is not None
-        and resource.tile_cache.track_changes
-    ):
-        resource.tile_cache.invalidate(geom)
 
 
 class ResourceTileCacheSeializedProperty(SerializedProperty):
@@ -566,8 +498,6 @@ class TileCacheSerializer(Serializer):
     image_compose = ResourceTileCacheSeializedProperty(**__permissions)
     max_z = ResourceTileCacheSeializedProperty(**__permissions)
     ttl = ResourceTileCacheSeializedProperty(**__permissions)
-    track_changes = ResourceTileCacheSeializedProperty(**__permissions)
-    seed_z = ResourceTileCacheSeializedProperty(**__permissions)
 
     def is_applicable(self):
         return IRenderableStyle.providedBy(self.obj) and not IRenderableNonCached.providedBy(
