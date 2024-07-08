@@ -3,10 +3,12 @@ import shutil
 import subprocess
 from pathlib import Path
 from tempfile import NamedTemporaryFile
+from typing import List, Union
 from warnings import warn
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
+from msgspec import UNSET
 from osgeo import gdal, gdalconst, ogr, osr
 from zope.interface import implementer
 
@@ -17,11 +19,19 @@ from nextgisweb.lib.osrhelper import SpatialReferenceError, sr_from_epsg, sr_fro
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.core.util import format_size
 from nextgisweb.file_storage import FileObj
-from nextgisweb.file_upload import FileUpload
+from nextgisweb.file_upload import FileUploadRef
 from nextgisweb.layer import IBboxLayer, SpatialLayerMixin
-from nextgisweb.resource import DataScope, DataStructureScope, Resource, ResourceGroup, Serializer
-from nextgisweb.resource import SerializedProperty as SP
-from nextgisweb.resource import SerializedRelationship as SR
+from nextgisweb.resource import (
+    CRUTypes,
+    DataScope,
+    DataStructureScope,
+    Resource,
+    ResourceGroup,
+    SAttribute,
+    SColumn,
+    Serializer,
+    SRelationship,
+)
 
 from .kind_of_data import RasterLayerData
 from .util import calc_overviews_levels, raster_size
@@ -345,47 +355,55 @@ def estimate_raster_layer_data(resource):
     return fn.stat().st_size + (0 if resource.cog else fn.with_suffix(".ovr").stat().st_size)
 
 
-class _source_attr(SP):
-    def setter(self, srlzr, value):
-        cur_size = 0 if srlzr.obj.id is None else estimate_raster_layer_data(srlzr.obj)
+class SourceAttr(SAttribute, apitype=True):
+    ctypes = CRUTypes(FileUploadRef, FileUploadRef, FileUploadRef)
 
-        cog = srlzr.data.get("cog", env.raster_layer.cog_enabled)
-        srlzr.obj.load_file(FileUpload(id=value["id"]).data_path, cog=cog)
+    def set(self, srlzr: Serializer, value: FileUploadRef, *, create: bool):
+        cur_size = 0 if create else estimate_raster_layer_data(srlzr.obj)
+
+        cog = srlzr.data.cog
+        if cog is UNSET or cog is None:
+            cog = env.raster_layer.cog_enabled if cog is None or create else srlzr.obj.cog
+        srlzr.obj.load_file(value().data_path, cog=cog)
 
         new_size = estimate_raster_layer_data(srlzr.obj)
-        size = new_size - cur_size
-
-        size = estimate_raster_layer_data(srlzr.obj)
         env.core.reserve_storage(
-            COMP_ID, RasterLayerData, value_data_volume=size, resource=srlzr.obj
+            COMP_ID,
+            RasterLayerData,
+            value_data_volume=new_size - cur_size,
+            resource=srlzr.obj,
         )
 
 
-class _cog_attr(SP):
-    def setter(self, srlzr, value):
-        if (
-            srlzr.data.get("source") is None
-            and srlzr.obj.id is not None
-            and value != srlzr.obj.cog
-        ):
-            cur_size = estimate_raster_layer_data(srlzr.obj)
+class CogAttr(SColumn, apitype=True):
+    ctypes = CRUTypes(Union[bool, None], bool, Union[bool, None])
 
-            fn = env.raster_layer.workdir_path(srlzr.obj.fileobj)
-            srlzr.obj.load_file(fn, cog=value)
+    def set(self, srlzr: Serializer, value: Union[bool, None], *, create: bool):
+        if srlzr.data.source is not UNSET or create:
+            return  # Just do nothing, SourceAttr will set the cog attribute
 
-            new_size = estimate_raster_layer_data(srlzr.obj)
-            size = new_size - cur_size
+        if value is None:
+            value = env.raster_layer.cog_enabled
+        if srlzr.obj.cog == value:
+            return
 
-            env.core.reserve_storage(
-                COMP_ID, RasterLayerData, value_data_volume=size, resource=srlzr.obj
-            )
-        else:
-            # Just do nothing, _source_attr serializer will handle the value.
-            pass
+        cur_size = estimate_raster_layer_data(srlzr.obj)
+        fn = env.raster_layer.workdir_path(srlzr.obj.fileobj)
+        srlzr.obj.load_file(fn, cog=value)
+
+        new_size = estimate_raster_layer_data(srlzr.obj)
+        env.core.reserve_storage(
+            COMP_ID,
+            RasterLayerData,
+            value_data_volume=new_size - cur_size,
+            resource=srlzr.obj,
+        )
 
 
-class _color_interpretation(SP):
-    def getter(self, srlzr):
+class ColorInterpretation(SAttribute, apitype=True):
+    ctypes = CRUTypes(List[str], List[str], List[str])
+
+    def get(self, srlzr: Serializer) -> List[str]:
         fdata = env.raster_layer.workdir_path(srlzr.obj.fileobj)
         ds = gdal.OpenEx(str(fdata))
         return [
@@ -394,23 +412,17 @@ class _color_interpretation(SP):
         ]
 
 
-P_DSS_READ = DataStructureScope.read
-P_DSS_WRITE = DataStructureScope.write
-P_DS_READ = DataScope.read
-P_DS_WRITE = DataScope.write
-
-
-class RasterLayerSerializer(Serializer):
+class RasterLayerSerializer(Serializer, apitype=True):
     identity = RasterLayer.identity
     resclass = RasterLayer
 
-    srs = SR(read=P_DSS_READ, write=P_DSS_WRITE)
+    srs = SRelationship(read=DataStructureScope.read, write=DataStructureScope.write)
 
-    xsize = SP(read=P_DSS_READ)
-    ysize = SP(read=P_DSS_READ)
-    band_count = SP(read=P_DSS_READ)
-    dtype = SP(read=P_DSS_READ)
-    color_interpretation = _color_interpretation(read=P_DSS_READ)
+    xsize = SColumn(read=DataStructureScope.read)
+    ysize = SColumn(read=DataStructureScope.read)
+    band_count = SColumn(read=DataStructureScope.read)
+    dtype = SColumn(read=DataStructureScope.read)
+    color_interpretation = ColorInterpretation(read=DataStructureScope.read)
 
-    source = _source_attr(write=P_DS_WRITE)
-    cog = _cog_attr(read=P_DSS_READ, write=P_DS_WRITE)
+    source = SourceAttr(write=DataScope.write, required=True)
+    cog = CogAttr(read=DataStructureScope.read, write=DataStructureScope.write)
