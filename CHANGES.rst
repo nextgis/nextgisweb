@@ -14,6 +14,12 @@ Changes
 - Experimental support for feature versioning.
 - User-defined favorite resource pages.
 - Sentry client-side JavaScript integrations.
+- Most of resource widgets migrated to Antd and React.
+- Cache seeding and invalidation removed, use NextGIS Geoservices.
+- Metadata permision scope and webmap display permission removed.
+- Better handling of incomplete geometry parts.
+- Experimental support for NULL geometries.
+- Improved PostGIS connection and layer diagnostic tools.
 
 
 4.7.0
