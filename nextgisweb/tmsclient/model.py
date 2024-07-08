@@ -1,6 +1,8 @@
 import re
 from io import BytesIO
+from typing import Literal, Union
 
+from msgspec import UNSET
 from osgeo import ogr, osr
 from PIL import Image
 from zope.interface import implementer
@@ -14,15 +16,16 @@ from nextgisweb.layer import IBboxLayer, SpatialLayerMixin
 from nextgisweb.render import IExtentRenderRequest, IRenderableStyle, ITileRenderRequest
 from nextgisweb.resource import (
     ConnectionScope,
+    CRUTypes,
     DataScope,
     DataStructureScope,
     Resource,
     ResourceGroup,
+    SColumn,
     Serializer,
+    SRelationship,
+    SResource,
 )
-from nextgisweb.resource import SerializedProperty as SP
-from nextgisweb.resource import SerializedRelationship as SR
-from nextgisweb.resource import SerializedResourceRelationship as SRR
 
 from .tile_fetcher import TileFetcher
 from .util import SCHEME, crop_box, render_zoom
@@ -68,12 +71,13 @@ class Connection(Base, Resource):
         return tile_fetcher.get_tiles(self, layer_name, zoom, xmin, xmax, ymin, ymax)
 
 
-class _url_template_attr(SP):
-    def setter(self, srlzr, value):
+class UrlTemplateAttr(SColumn, apitype=True):
+    ctypes = CRUTypes(Union[str, None], str, Union[str, None])
+
+    def set(self, srlzr: Serializer, value: str, *, create: bool):
         if value is not None:
             if not url_template_pattern.match(value):
                 raise ValidationError("Invalid url template.")
-
             for c in "qxyz":
                 tmplt_lower = f"{{{c}}}"
                 if (tmplt_upper := f"{{{c.upper()}}}") in value:
@@ -84,42 +88,45 @@ class _url_template_attr(SP):
                 elif c == "q":
                     break
 
-        super().setter(srlzr, value)
+        super().set(srlzr, value, create=create)
 
 
-class _capmode_attr(SP):
-    def setter(self, srlzr, value):
-        if value is None:
-            pass
-        elif value == NEXTGIS_GEOSERVICES:
+Capmode = Union[Literal["nextgis_geoservices"], None]
+Scheme = Union[tuple(Literal[i] for i in SCHEME.enum)]  # type: ignore
+
+
+class CapmodeAttr(SColumn, apitype=True):
+    ctypes = CRUTypes(Capmode, Capmode, Capmode)
+
+    def set(self, srlzr: Serializer, value: Capmode, *, create: bool):
+        if value == NEXTGIS_GEOSERVICES:
             if srlzr.obj.id is None or srlzr.obj.capmode != NEXTGIS_GEOSERVICES:
-                apikey = srlzr.data.get("apikey")
-                if apikey is None or len(apikey) == 0:
+                apikey = srlzr.data.apikey
+                if apikey is UNSET or apikey is None or len(apikey) == 0:
                     raise ValidationError(message=_("API key required."))
             srlzr.obj.url_template = env.tmsclient.options["nextgis_geoservices.url_template"]
             srlzr.obj.apikey_param = "apikey"
             srlzr.obj.scheme = SCHEME.XYZ
-        else:
-            raise ValidationError(message="Invalid capmode value!")
 
-        super().setter(srlzr, value)
+        super().set(srlzr, value, create=create)
 
 
-class ConnectionSerializer(Serializer):
+class SchemeAttr(SColumn, apitype=True):
+    ctypes = CRUTypes(Union[Scheme, None], Scheme, Union[Scheme, None])
+
+
+class ConnectionSerializer(Serializer, apitype=True):
     identity = Connection.identity
     resclass = Connection
 
-    _defaults = dict(read=ConnectionScope.read, write=ConnectionScope.write)
-
-    url_template = _url_template_attr(**_defaults)
-    apikey = SP(**_defaults)
-    apikey_param = SP(**_defaults)
-    username = SP(**_defaults)
-    password = SP(**_defaults)
-    scheme = SP(**_defaults)
-    insecure = SP(**_defaults)
-
-    capmode = _capmode_attr(**_defaults)
+    capmode = CapmodeAttr(read=ConnectionScope.read, write=ConnectionScope.write)
+    url_template = UrlTemplateAttr(read=ConnectionScope.read, write=ConnectionScope.write)
+    apikey = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
+    apikey_param = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
+    username = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
+    password = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
+    scheme = SchemeAttr(read=ConnectionScope.read, write=ConnectionScope.write)
+    insecure = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
 
 
 @implementer(IExtentRenderRequest, ITileRenderRequest)
@@ -282,30 +289,30 @@ DataScope.read.require(
 )
 
 
-class _layer_name_attr(SP):
-    def setter(self, srlzr, value):
+class LayerNameAttr(SColumn, apitype=True):
+    ctypes = CRUTypes(Union[str, None], Union[str, None], Union[str, None])
+
+    def set(self, srlzr: Serializer, value: Union[str, None], *, create: bool):
         if srlzr.obj.id is None or srlzr.obj.layer_name != value:
             if (
                 value is None or len(value) == 0
             ) and r"{layer}" in srlzr.obj.connection.url_template:
                 raise ValidationError(message=_("Layer name required."))
 
-        super().setter(srlzr, value)
+        super().set(srlzr, value, create=create)
 
 
-class LayerSerializer(Serializer):
+class LayerSerializer(Serializer, apitype=True):
     identity = Layer.identity
     resclass = Layer
 
-    _defaults = dict(read=DataStructureScope.read, write=DataStructureScope.write)
-
-    connection = SRR(**_defaults)
-    srs = SR(**_defaults)
-    layer_name = _layer_name_attr(**_defaults)
-    tilesize = SP(**_defaults)
-    minzoom = SP(**_defaults)
-    maxzoom = SP(**_defaults)
-    extent_left = SP(**_defaults)
-    extent_right = SP(**_defaults)
-    extent_bottom = SP(**_defaults)
-    extent_top = SP(**_defaults)
+    connection = SResource(read=DataStructureScope.read, write=DataStructureScope.write)
+    layer_name = LayerNameAttr(read=DataStructureScope.read, write=DataStructureScope.write)
+    tilesize = SColumn(read=DataStructureScope.read, write=DataStructureScope.write)
+    minzoom = SColumn(read=DataStructureScope.read, write=DataStructureScope.write)
+    maxzoom = SColumn(read=DataStructureScope.read, write=DataStructureScope.write)
+    extent_left = SColumn(read=DataStructureScope.read, write=DataStructureScope.write)
+    extent_right = SColumn(read=DataStructureScope.read, write=DataStructureScope.write)
+    extent_bottom = SColumn(read=DataStructureScope.read, write=DataStructureScope.write)
+    extent_top = SColumn(read=DataStructureScope.read, write=DataStructureScope.write)
+    srs = SRelationship(read=DataStructureScope.read, write=DataStructureScope.write)
