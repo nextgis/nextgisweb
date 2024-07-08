@@ -5,7 +5,7 @@ from pathlib import Path
 
 from msgspec import UNSET
 from osgeo import gdal, ogr
-from sqlalchemy import event, func, inspect, text
+from sqlalchemy import event, inspect, select, text
 from sqlalchemy.orm import validates
 from zope.interface import implementer
 from zope.sqlalchemy import mark_changed
@@ -662,18 +662,21 @@ VectorLayerSession.listen(DBSession)
 def estimate_vector_layer_data(resource):
     ctab = resource.vlschema().ctab
 
-    def fnull(expr):
-        return func.coalesce(expr, text("0"))
+    # NOTE: Without SQL manipulations it will hit Python recursion limit on 400+
+    # columns. Columns name aren't user generated, so it's safe to use them here
+    # without escaping.
 
     fixed = FIELD_TYPE_SIZE[FIELD_TYPE.INTEGER]  # ID field size
-    dynamic = fnull(func.length(func.ST_AsBinary(ctab.c.geom)))
+    dynamic = [f"coalesce(length(ST_AsBinary({ctab.c.geom.name})), 0)"]
     for f in resource.fields:
         if f.datatype == FIELD_TYPE.STRING:
-            dynamic += fnull(func.octet_length(ctab.fields[f.keyname]))
+            dynamic.append(f"coalesce(octet_length({ctab.fields[f.keyname].name}), 0)")
         else:
             fixed += FIELD_TYPE_SIZE[f.datatype]
 
-    return inspect(resource).session.scalar(func.sum(dynamic + fixed))
+    dynamic.insert(0, str(fixed))
+    query = select(text(" + ".join(dynamic))).select_from(ctab)
+    return inspect(resource).session.scalar(query)
 
 
 class _source_attr(SP):
