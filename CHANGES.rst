@@ -13,6 +13,7 @@ Changes
 - Customizable print layout including legend.
 - Experimental support for feature versioning.
 - User-defined favorite resource pages.
+- Sentry client-side JavaScript integrations.
 
 
 4.7.0
