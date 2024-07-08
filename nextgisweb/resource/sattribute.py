@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 from datetime import date, datetime
-from typing import Any, Dict, Union
+from typing import Any, Dict, Literal, Union
 
+import sqlalchemy as sa
 from msgspec import Struct
 from typing_extensions import Annotated
 
@@ -25,6 +26,10 @@ class SColumn(SAttribute, apitype=True):
             type = self.column.type.python_type
             if type not in (str, int, float, bool, date, datetime):
                 raise NotImplementedError(f"{self.column} has unsupported type: {type}")
+
+            col_type = self.column.type
+            if isinstance(col_type, sa.Enum):
+                type = Union[tuple(Literal[i] for i in col_type.enums)]  # type: ignore
 
             if self.column.nullable:
                 type = Union[type, None]
