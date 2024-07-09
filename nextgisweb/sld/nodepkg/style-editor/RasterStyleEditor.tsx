@@ -72,7 +72,7 @@ export function RasterStyleEditor({
                     }))
                 );
                 const dtype = rasterRes.raster_layer.dtype;
-                const bandRange_ = getRasterBandRange(dtype);
+                const bandRange_ = getRasterBandRange(dtype!);
                 setBandRange(bandRange_);
                 setInitialValues(
                     getRasterSymbolizerValues({

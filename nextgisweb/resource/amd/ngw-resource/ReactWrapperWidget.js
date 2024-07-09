@@ -43,7 +43,9 @@ define([
 
             if (props.composite.operation === "create") {
                 const suggests = Object.prototype.hasOwnProperty.call(
-                    this.store,
+                    // MobX @computed annotations aren't visible via
+                    // hasOwnProperty, so we need to dig deeper.
+                    Object.getPrototypeOf(this.store),
                     "suggestedDisplayName"
                 );
                 if (suggests) {

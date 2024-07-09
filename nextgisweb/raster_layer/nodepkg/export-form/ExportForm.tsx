@@ -11,10 +11,7 @@ import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import settings from "@nextgisweb/pyramid/settings!raster_layer";
-import type { CompositeRead } from "@nextgisweb/resource/type/api";
 import type { SRSRead } from "@nextgisweb/spatial-ref-sys/type/api";
-
-type RasterLayerRead = CompositeRead["raster_layer"];
 
 interface ExporFormValues {
     format: string;
@@ -31,27 +28,12 @@ const srsListToOptions = (srsList: SRSRead[]): OptionType[] => {
     });
 };
 
-const bandListToOptions = (
-    bandList: RasterLayerRead["color_interpretation"]
-) => {
-    return bandList.map((band: string, idx: number) => {
-        return {
-            label:
-                gettext("Band") +
-                " " +
-                (idx + 1) +
-                (band !== "Undefined" ? " (" + band + ")" : ""),
-            value: idx + 1,
-        };
-    });
-};
-
 export function ExportForm({ id }: { id: number }) {
     const [status, setStatus] = useState("loading");
     const { makeSignal, abort } = useAbortController();
     const [srsOptions, setSrsOptions] = useState<OptionType[]>([]);
     const [bandOptions, setBandOptions] = useState<OptionType[]>([]);
-    const [defaultSrs, setDefaultSrs] = useState();
+    const [defaultSrs, setDefaultSrs] = useState<number>();
     const form = Form.useForm<ExporFormValues>()[0];
 
     const load = useCallback(async () => {
@@ -62,12 +44,23 @@ export function ExportForm({ id }: { id: number }) {
                 signal,
             });
             const itemInfo = await route("resource.item", id).get({ signal });
+            const rasterLayer = itemInfo.raster_layer!;
+            const srs = rasterLayer.srs!;
 
             setSrsOptions(srsListToOptions(srsInfo));
             setBandOptions(
-                bandListToOptions(itemInfo.raster_layer.color_interpretation)
+                rasterLayer.color_interpretation!.map(
+                    (band: string, idx: number) => ({
+                        label:
+                            gettext("Band") +
+                            " " +
+                            (idx + 1) +
+                            (band !== "Undefined" ? " (" + band + ")" : ""),
+                        value: idx + 1,
+                    })
+                )
             );
-            setDefaultSrs(itemInfo.raster_layer.srs.id);
+            setDefaultSrs(srs.id);
         } catch (err) {
             errorModal(err as ApiError);
         } finally {

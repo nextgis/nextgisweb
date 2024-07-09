@@ -1,8 +1,9 @@
-import { makeAutoObservable, runInAction, toJS } from "mobx";
+import { action, computed, observable } from "mobx";
 
-import type { FileMeta } from "@nextgisweb/file-upload/file-uploader";
+import type { FileUploadObject } from "@nextgisweb/file-upload/type/api";
 import settings from "@nextgisweb/pyramid/settings!raster_layer";
 import srsSettings from "@nextgisweb/pyramid/settings!spatial_ref_sys";
+import type * as apitype from "@nextgisweb/raster-layer/type/api";
 import type { Composite } from "@nextgisweb/resource/type/Composite";
 import type {
     DumpParams,
@@ -10,43 +11,33 @@ import type {
     EditorStore as IEditorStore,
     Operation,
 } from "@nextgisweb/resource/type/EditorStore";
-import type { CompositeRead } from "@nextgisweb/resource/type/api";
 
-type Value = CompositeRead["raster_layer"];
+export class EditorStore
+    implements IEditorStore<apitype.RasterLayerRead, apitype.RasterLayerUpdate>
+{
+    readonly identity = "raster_layer";
+    readonly operation: Operation;
+    readonly composite: Composite;
 
-export class EditorStore implements IEditorStore<Value> {
-    identity = "raster_layer";
+    @observable.ref accessor source: FileUploadObject | undefined = undefined;
+    @observable.ref accessor uploading = false;
+    @observable.ref accessor cog = settings.cog_enabled;
+    @observable.ref accessor cogInitial: boolean | undefined = undefined;
 
-    source: FileMeta | null = null;
-    uploading = false;
-    cog = settings.cog_enabled;
-    cogInitial: boolean | null = null;
-
-    operation?: Operation;
-    composite: Composite;
+    @observable.ref accessor dirty = false;
 
     constructor({ composite, operation }: EditorStoreOptions) {
-        makeAutoObservable(this, { identity: false });
         this.operation = operation;
         this.composite = composite;
     }
 
-    load(value: Value) {
+    @action load(value: apitype.RasterLayerRead) {
         this.cog = this.cogInitial = !!value.cog;
+        this.dirty = false;
     }
 
-    dump({ lunkwill }: DumpParams) {
-        const result: Value = {
-            cog:
-                !!this.source || this.cog !== this.cogInitial
-                    ? this.cog
-                    : undefined,
-        };
-
-        if (this.source) {
-            result.source = this.source;
-            result.srs = srsSettings.default;
-        }
+    dump({ lunkwill }: DumpParams): apitype.RasterLayerUpdate | undefined {
+        if (!this.dirty) return;
 
         lunkwill.suggest(
             this.operation === "create" ||
@@ -54,22 +45,30 @@ export class EditorStore implements IEditorStore<Value> {
                 this.cog !== this.cogInitial
         );
 
-        return toJS(result);
+        return {
+            ...(this.source || this.cog !== this.cogInitial
+                ? { cog: this.cog }
+                : {}),
+            ...(this.source
+                ? { source: this.source, srs: srsSettings.default }
+                : {}),
+        };
     }
 
-    update = (props: Partial<this>) => {
-        runInAction(() => {
-            Object.assign(this, props);
-        });
-    };
+    @action update(props: Partial<this>) {
+        Object.assign(this, props);
+        if (props.source !== undefined || props.cog !== undefined) {
+            this.dirty = true;
+        }
+    }
 
-    get isValid() {
+    @computed get isValid() {
         return (
             !this.uploading && (this.operation === "update" || !!this.source)
         );
     }
 
-    get suggestedDisplayName() {
+    @computed get suggestedDisplayName() {
         const base = this.source?.name;
         return base ? base.replace(/\.tiff?$/i, "") : undefined;
     }
