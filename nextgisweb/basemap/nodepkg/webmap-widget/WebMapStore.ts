@@ -28,7 +28,7 @@ export class WebMapStore
     }
 
     dump() {
-        if (!this.dirty) return undefined as unknown as Value;
+        if (!this.dirty) return undefined;
         return { basemaps: this.basemaps.map((i) => i.json()) };
     }
 

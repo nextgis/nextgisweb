@@ -32,7 +32,7 @@ export class ServiceStore
     }
 
     dump() {
-        if (!this.dirty) return undefined as unknown as Value;
+        if (!this.dirty) return undefined;
         return { collections: this.collections.map((i) => i.json()) };
     }
 

@@ -24,8 +24,8 @@ export class SettingStore implements EditorStore<Value> {
         this.dirty = false;
     }
 
-    dump(): Value {
-        if (!this.dirty) return undefined as unknown as Value;
+    dump(): Value | undefined {
+        if (!this.dirty) return undefined;
         const result = { versioning: { enabled: this.versioningEnabled } };
         return result;
     }

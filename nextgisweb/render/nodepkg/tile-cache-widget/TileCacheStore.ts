@@ -41,7 +41,7 @@ export class TileCacheStore implements EditorStore<Value> {
     }
 
     dump() {
-        if (!this.dirty) return undefined as unknown as Value;
+        if (!this.dirty) return undefined;
         return {
             ...this.enabled.jsonPart(),
             ...this.imageCompose.jsonPart(),

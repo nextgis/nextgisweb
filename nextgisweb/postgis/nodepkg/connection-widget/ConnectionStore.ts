@@ -49,8 +49,8 @@ export class ConnectionStore implements EditorStore<PostgisConnectionRead> {
         this.dirty = false;
     }
 
-    dump(): PostgisConnectionRead {
-        if (!this.dirty) return undefined as unknown as PostgisConnectionRead;
+    dump(): PostgisConnectionRead | undefined {
+        if (!this.dirty) return undefined;
         return {
             ...this.hostname.jsonPart(),
             ...this.port.jsonPart(),

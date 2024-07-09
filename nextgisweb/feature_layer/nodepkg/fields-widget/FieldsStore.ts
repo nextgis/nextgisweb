@@ -138,7 +138,7 @@ export class FieldsStore implements EditorStore<Value>, FocusTableStore<Field> {
     }
 
     dump() {
-        if (!this.dirty) return undefined as unknown as Value;
+        if (!this.dirty) return undefined;
 
         const fields = this.fields.map((i) => i.json());
 

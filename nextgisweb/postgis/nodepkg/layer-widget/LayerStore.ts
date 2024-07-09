@@ -83,8 +83,8 @@ export class LayerStore implements EditorStore<Value> {
         this.dirty = false;
     }
 
-    dump(): Value {
-        if (!this.dirty) return undefined as unknown as Value;
+    dump(): Value | undefined {
+        if (!this.dirty) return undefined;
         return {
             ...this.connection.jsonPart(),
             ...this.schema.jsonPart(),

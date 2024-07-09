@@ -22,7 +22,7 @@ export interface EditorStore<V = any, D = V> {
 
     load: (value: V) => unknown;
 
-    dump: (val: DumpParams) => D;
+    dump: (val: DumpParams) => D | undefined;
 
     isValid?: boolean;
 

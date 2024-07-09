@@ -37,7 +37,7 @@ export class ServiceStore
     }
 
     dump() {
-        if (!this.dirty) return undefined as unknown as Value;
+        if (!this.dirty) return undefined;
         return { layers: this.layers.map((i) => i.json()) };
     }
 
