@@ -119,7 +119,6 @@ class ConnectionSerializer(Serializer, apitype=True):
     identity = Connection.identity
     resclass = Connection
 
-    capmode = CapmodeAttr(read=ConnectionScope.read, write=ConnectionScope.write)
     url_template = UrlTemplateAttr(read=ConnectionScope.read, write=ConnectionScope.write)
     apikey = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
     apikey_param = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
@@ -127,6 +126,10 @@ class ConnectionSerializer(Serializer, apitype=True):
     password = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
     scheme = SchemeAttr(read=ConnectionScope.read, write=ConnectionScope.write)
     insecure = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
+
+    # NOTE: The 'capmode' attribute overrides url_template and others, so it
+    # must be the last. Otherwise 'url_template' can be NULL.
+    capmode = CapmodeAttr(read=ConnectionScope.read, write=ConnectionScope.write)
 
 
 @implementer(IExtentRenderRequest, ITileRenderRequest)
