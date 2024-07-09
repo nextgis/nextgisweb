@@ -130,7 +130,7 @@ body > .webmap-wrapper {
     box-shadow: 0 3px 7px rgba(2, 34, 60, 0.16);
     border-radius: 2px;
     background-color: #fff;
-    padding-top: 2px;
+    padding-top: 0px;
     width: 30px;
     height: 30px;
     line-height: 30px;
