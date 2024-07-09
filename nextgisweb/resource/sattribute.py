@@ -7,6 +7,7 @@ import sqlalchemy as sa
 from msgspec import Struct
 from typing_extensions import Annotated
 
+from nextgisweb.lib.apitype.util import is_enum
 from nextgisweb.lib.msext import DEPRECATED
 
 from .serialize import CRUTypes, SAttribute
@@ -24,12 +25,15 @@ class SColumn(SAttribute, apitype=True):
             self.types = self.ctypes
         else:
             type = self.column.type.python_type
-            if type not in (str, int, float, bool, date, datetime):
-                raise NotImplementedError(f"{self.column} has unsupported type: {type}")
+            if is_enum(type):
+                pass
+            else:
+                if type not in (str, int, float, bool, date, datetime):
+                    raise NotImplementedError(f"{self.column} has unsupported type: {type}")
 
-            col_type = self.column.type
-            if isinstance(col_type, sa.Enum):
-                type = Union[tuple(Literal[i] for i in col_type.enums)]  # type: ignore
+                col_type = self.column.type
+                if isinstance(col_type, sa.Enum):
+                    type = Union[tuple(Literal[i] for i in col_type.enums)]  # type: ignore
 
             if self.column.nullable:
                 type = Union[type, None]
@@ -58,7 +62,7 @@ class SRelationship(SAttribute, apitype=True):
     def setup_types(self):
         vtype = RelationshipRef
         if self.column.nullable:
-            vtype = Union[type, None]
+            vtype = Union[vtype, None]
         self.types = CRUTypes(vtype, vtype, vtype)
 
     def get(self, srlzr) -> Any:
