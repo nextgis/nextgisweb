@@ -10,10 +10,12 @@ import type {
     EditorWidgetProps,
 } from "@nextgisweb/resource/type";
 import { SrsSelect } from "@nextgisweb/spatial-ref-sys/srs-select/SrsSelect";
+import type { WebMapRead } from "@nextgisweb/webmap/type/api";
 
 import type { SettingStore } from "./SettingStore";
 import { ExtentRow } from "./component/ExtentRow";
-import type { AnnotationType } from "./type";
+
+type AnnotationType = WebMapRead["annotation_default"];
 
 const msgInitExtent = gettext("Initial extent");
 const msgConstrExtent = gettext("Constraining extent");
@@ -136,5 +138,6 @@ export const SettingsWidget: EditorWidgetComponent<
     );
 });
 
+SettingsWidget.displayName = "SettingWidget";
 SettingsWidget.title = gettext("Settings");
 SettingsWidget.order = 40;

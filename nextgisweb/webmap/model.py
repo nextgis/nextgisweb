@@ -1,6 +1,9 @@
 from enum import Enum
+from typing import List, Literal, Union
 
 import geoalchemy2 as ga
+from msgspec import Struct
+from msgspec.structs import asdict as struct_asdict
 from sqlalchemy import event, text
 from sqlalchemy.ext.orderinglist import ordering_list
 from sqlalchemy.orm import validates
@@ -11,10 +14,17 @@ from nextgisweb.lib import db
 
 from nextgisweb.auth import User
 from nextgisweb.resource import Permission as P
-from nextgisweb.resource import Resource, ResourceGroup, ResourceScope, Scope, Serializer
-from nextgisweb.resource import SerializedProperty as SP
-from nextgisweb.resource import SerializedRelationship as SR
-from nextgisweb.resource import SerializedResourceRelationship as SRR
+from nextgisweb.resource import (
+    Resource,
+    ResourceGroup,
+    ResourceScope,
+    SAttribute,
+    SColumn,
+    Scope,
+    Serializer,
+    SRelationship,
+    SResource,
+)
 from nextgisweb.spatial_ref_sys import SRS
 
 from .adapter import WebMapAdapter
@@ -207,41 +217,6 @@ class WebMapItem(Base):
 
         return data
 
-    def from_dict(self, data):
-        assert data["item_type"] == self.item_type
-
-        for a in (
-            "display_name",
-            "group_expanded",
-            "group_exclusive",
-            "layer_enabled",
-            "layer_identifiable",
-            "layer_adapter",
-            "layer_style_id",
-            "layer_transparency",
-            "layer_min_scale_denom",
-            "layer_max_scale_denom",
-            "draw_order_position",
-            "legend_symbols",
-        ):
-            if a in data:
-                setattr(self, a, data[a])
-
-        if self.item_type in ("root", "group") and "children" in data:
-            self.children.clear()
-            for i in data["children"]:
-                child = WebMapItem(parent=self, item_type=i["item_type"])
-                child.from_dict(i)
-
-            if self.item_type == "group" and self.group_exclusive:
-                found_enabled = False
-                for child in reversed(self.children):
-                    if child.item_type == "layer" and child.layer_enabled:
-                        if not found_enabled:
-                            found_enabled = True
-                        else:
-                            child.layer_enabled = False
-
     def from_children(self, children, *, defaults=dict()):
         assert self.item_type in ("root", "group")
 
@@ -320,52 +295,165 @@ class WebMapAnnotation(Base):
         return value
 
 
-PR_READ = ResourceScope.read
-PR_UPDATE = ResourceScope.update
-
-_mdargs = dict(read=PR_READ, write=PR_UPDATE)
-
-
-class _root_item_attr(SP):
-    def getter(self, srlzr):
-        return srlzr.obj.root_item.to_dict()
-
-    def setter(self, srlzr, value):
-        children = list(srlzr.obj.root_item.children)
-        srlzr.obj.root_item.children = []
-        for child in children:
-            DBSession.delete(child)
-
-        srlzr.obj.root_item.from_dict(value)
+def _children_from_model(obj):
+    result: List[Union["WebMapItemGroupRead", "WebMapItemLayerRead"]] = []
+    for c in obj.children:
+        if c.item_type == "layer":
+            s = WebMapItemLayerRead.from_model(c)
+        elif c.item_type == "group":
+            s = WebMapItemGroupRead.from_model(c)
+        else:
+            raise NotImplementedError
+        result.append(s)
+    return result
 
 
-class WebMapSerializer(Serializer):
+class WebMapItemLayerRead(Struct, kw_only=True, tag="layer", tag_field="item_type"):
+    display_name: str
+    layer_enabled: bool
+    layer_identifiable: bool
+    layer_transparency: Union[float, None]
+    layer_style_id: int
+    style_parent_id: Union[int, None]
+    layer_min_scale_denom: Union[int, None]
+    layer_max_scale_denom: Union[int, None]
+    layer_adapter: str
+    draw_order_position: Union[int, None]
+    legend_symbols: Union[LegendSymbolsEnum, None]
+
+    @classmethod
+    def from_model(cls, obj):
+        style_parent_id = None
+        if (style := obj.style) and (style_parent := style.parent):
+            style_parent_id = style_parent.id
+
+        return WebMapItemLayerRead(
+            display_name=obj.display_name,
+            layer_enabled=obj.layer_enabled,
+            layer_identifiable=obj.layer_identifiable,
+            layer_transparency=obj.layer_transparency,
+            layer_style_id=obj.layer_style_id,
+            layer_min_scale_denom=obj.layer_min_scale_denom,
+            layer_max_scale_denom=obj.layer_max_scale_denom,
+            layer_adapter=obj.layer_adapter,
+            draw_order_position=obj.draw_order_position,
+            legend_symbols=obj.legend_symbols,
+            style_parent_id=style_parent_id,
+        )
+
+
+class WebMapItemLayerWrite(Struct, kw_only=True, tag="layer", tag_field="item_type"):
+    display_name: str
+    layer_enabled: bool = False
+    layer_identifiable: bool = True
+    layer_transparency: Union[float, None] = None
+    layer_style_id: int
+    layer_min_scale_denom: Union[int, None] = None
+    layer_max_scale_denom: Union[int, None] = None
+    layer_adapter: str
+    draw_order_position: Union[int, None] = None
+    legend_symbols: Union[LegendSymbolsEnum, None] = None
+
+    def to_model(self):
+        return WebMapItem(item_type="layer", **struct_asdict(self))
+
+
+class WebMapItemGroupRead(Struct, kw_only=True, tag="group", tag_field="item_type"):
+    display_name: str
+    group_expanded: bool
+    group_exclusive: bool
+    children: List[Union["WebMapItemGroupRead", "WebMapItemLayerRead"]]
+
+    @classmethod
+    def from_model(cls, obj):
+        return WebMapItemGroupRead(
+            display_name=obj.display_name,
+            group_expanded=obj.group_expanded,
+            group_exclusive=obj.group_exclusive,
+            children=_children_from_model(obj),
+        )
+
+
+class WebMapItemGroupWrite(Struct, kw_only=True, tag="group", tag_field="item_type"):
+    display_name: str
+    group_expanded: bool = False
+    group_exclusive: bool = False
+    children: List[Union["WebMapItemGroupWrite", "WebMapItemLayerWrite"]] = []
+
+    def to_model(self):
+        asdict = struct_asdict(self)
+        children = [i.to_model() for i in asdict.pop("children")]
+        result = WebMapItem(item_type="group", **asdict)
+        if result.group_exclusive:
+            enabled_child_found = False
+            for child in reversed(children):
+                if child.item_type == "layer" and child.layer_enabled:
+                    if not enabled_child_found:
+                        enabled_child_found = True
+                    else:
+                        child.layer_enabled = False
+        result.children = children
+        return result
+
+
+class WebMapItemRootRead(Struct, kw_only=True):
+    item_type: Literal["root"]
+    children: List[Union["WebMapItemGroupRead", "WebMapItemLayerRead"]]
+
+    @classmethod
+    def from_model(cls, obj):
+        return WebMapItemRootRead(
+            item_type="root",
+            children=_children_from_model(obj),
+        )
+
+
+class WebMapItemRootWrite(Struct, kw_only=True):
+    item_type: Literal["root"] = "root"
+    children: List[Union["WebMapItemGroupWrite", "WebMapItemLayerWrite"]] = []
+
+    def to_model(self, obj):
+        assert obj.item_type == self.item_type
+        existing = list(obj.children)
+        obj.children = [i.to_model() for i in self.children]
+        for e in existing:
+            DBSession.delete(e)
+
+
+class RootItemAttr(SAttribute, apitype=True):
+    def get(self, srlzr: Serializer) -> WebMapItemRootRead:
+        return WebMapItemRootRead.from_model(srlzr.obj.root_item)
+
+    def set(self, srlzr: Serializer, value: WebMapItemRootWrite, *, create: bool):
+        value.to_model(srlzr.obj.root_item)
+
+
+class WebMapSerializer(Serializer, apitype=True):
     identity = WebMap.identity
     resclass = WebMap
 
-    extent_left = SP(**_mdargs)
-    extent_right = SP(**_mdargs)
-    extent_bottom = SP(**_mdargs)
-    extent_top = SP(**_mdargs)
+    extent_left = SColumn(read=ResourceScope.read, write=ResourceScope.update)
+    extent_right = SColumn(read=ResourceScope.read, write=ResourceScope.update)
+    extent_bottom = SColumn(read=ResourceScope.read, write=ResourceScope.update)
+    extent_top = SColumn(read=ResourceScope.read, write=ResourceScope.update)
 
-    extent_const_left = SP(**_mdargs)
-    extent_const_right = SP(**_mdargs)
-    extent_const_bottom = SP(**_mdargs)
-    extent_const_top = SP(**_mdargs)
+    extent_const_left = SColumn(read=ResourceScope.read, write=ResourceScope.update)
+    extent_const_right = SColumn(read=ResourceScope.read, write=ResourceScope.update)
+    extent_const_bottom = SColumn(read=ResourceScope.read, write=ResourceScope.update)
+    extent_const_top = SColumn(read=ResourceScope.read, write=ResourceScope.update)
 
-    draw_order_enabled = SP(**_mdargs)
-    editable = SP(**_mdargs)
+    draw_order_enabled = SColumn(read=ResourceScope.read, write=ResourceScope.update)
+    editable = SColumn(read=ResourceScope.read, write=ResourceScope.update)
 
-    annotation_enabled = SP(**_mdargs)
-    annotation_default = SP(**_mdargs)
+    annotation_enabled = SColumn(read=ResourceScope.read, write=ResourceScope.update)
+    annotation_default = SColumn(read=ResourceScope.read, write=ResourceScope.update)
 
-    legend_symbols = SP(**_mdargs)
+    legend_symbols = SColumn(read=ResourceScope.read, write=ResourceScope.update)
 
-    measure_srs = SR(**_mdargs)
+    measure_srs = SRelationship(read=ResourceScope.read, write=ResourceScope.update)
+    bookmark_resource = SResource(read=ResourceScope.read, write=ResourceScope.update)
 
-    bookmark_resource = SRR(**_mdargs)
-
-    root_item = _root_item_attr(**_mdargs)
+    root_item = RootItemAttr(read=ResourceScope.read, write=ResourceScope.update)
 
 
 @event.listens_for(SRS, "after_delete")

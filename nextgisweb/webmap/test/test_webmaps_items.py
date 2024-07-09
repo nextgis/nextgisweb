@@ -1,12 +1,14 @@
 import pytest
 import transaction
+from msgspec import convert
 
 from nextgisweb.env import DBSession
 
 from nextgisweb.raster_layer import RasterLayer
 from nextgisweb.raster_style import RasterStyle
 
-from .. import WebMap, WebMapItem
+from .. import WebMap
+from ..model import WebMapItemRootWrite
 from ..util import webmap_items_to_tms_ids_list
 
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults")
@@ -16,7 +18,9 @@ def make_webmap_item_layer(layer_style):
     layer_id, style_id, draw_order_position = layer_style
     return {
         "item_type": "layer",
+        "display_name": str(style_id),
         "layer_style_id": style_id,
+        "layer_adapter": "image",
         "draw_order_position": draw_order_position,
     }
 
@@ -33,11 +37,13 @@ def make_webmap_items(layers_styles):
             make_webmap_item_layer(layers_styles_sort[0]),
             {
                 "item_type": "group",
-                "children": map(lambda ls: make_webmap_item_layer(ls), layers_styles_sort[1:3]),
+                "display_name": "Group 1",
+                "children": [make_webmap_item_layer(ls) for ls in layers_styles_sort[1:3]],
             },
             {
                 "item_type": "group",
-                "children": map(lambda ls: make_webmap_item_layer(ls), layers_styles_sort[3:5]),
+                "display_name": "Group 2",
+                "children": [make_webmap_item_layer(ls) for ls in layers_styles_sort[3:5]],
             },
             make_webmap_item_layer(layers_styles_sort[5]),
         ],
@@ -72,7 +78,8 @@ def fixt_layers_styles(ngw_env, ngw_resource_group):
 def webmap_with_items(fixt_layers_styles):
     with transaction.manager:
         webmap = WebMap()
-        webmap.root_item.from_dict(make_webmap_items(fixt_layers_styles))
+        root_item_struct = convert(make_webmap_items(fixt_layers_styles), WebMapItemRootWrite)
+        root_item_struct.to_model(webmap.root_item)
         webmap.persist()
 
     yield webmap, fixt_layers_styles

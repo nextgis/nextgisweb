@@ -7,40 +7,29 @@ import type {
 } from "@nextgisweb/resource/type";
 import type { Composite } from "@nextgisweb/resource/type/Composite";
 import type { ResourceRef } from "@nextgisweb/resource/type/api";
+import type * as apitype from "@nextgisweb/webmap/type/api";
 
-import type { WebmapResource } from "../type/WebmapResource";
+import type { Extent } from "./type";
 
-import type { AnnotationType, Extent, SettingsValue } from "./type";
-
-type DumpValue = Omit<WebmapResource, "root_item">;
+type WithoutItems<T> = Omit<T, "root_item" | "draw_order_enabled">;
 
 export class SettingStore
-    implements EditorStore<WebmapResource, DumpValue | undefined>
+    implements
+        EditorStore<apitype.WebMapRead, WithoutItems<apitype.WebMapUpdate>>
 {
     readonly identity = "webmap";
+    readonly composite: Composite;
 
     editable = false;
     annotationEnabled = false;
-    annotationDefault: AnnotationType = "no";
-    legendSymbols: string | null = null;
+    annotationDefault: apitype.WebMapRead["annotation_default"] = "no";
+    legendSymbols: apitype.WebMapRead["legend_symbols"] = null;
     measureSrs: null | number = null;
-    extent: Extent = {
-        left: -180,
-        right: 180,
-        bottom: -90,
-        top: 90,
-    };
-    extentConst: Extent = {
-        left: null,
-        right: null,
-        bottom: null,
-        top: null,
-    };
+    extent: Extent = { left: -180, right: 180, bottom: -90, top: 90 };
+    extentConst: Extent = { left: null, right: null, bottom: null, top: null };
     bookmarkResource?: ResourceRef | null = null;
 
-    composite: Composite;
-
-    private _initValue: DumpValue | null = null;
+    private _initValue: WithoutItems<apitype.WebMapRead> | null = null;
 
     constructor({ composite }: EditorStoreOptions) {
         this.composite = composite;
@@ -51,7 +40,7 @@ export class SettingStore
         });
     }
 
-    load(val: WebmapResource) {
+    load(val: apitype.WebMapRead) {
         const { root_item, draw_order_enabled, ...value } = val;
         this._initValue = value;
         this.editable = value.editable;
@@ -74,8 +63,8 @@ export class SettingStore
         this.bookmarkResource = value.bookmark_resource;
     }
 
-    get deserializeValue(): WebmapResource {
-        const result = {
+    get deserializeValue(): WithoutItems<apitype.WebMapUpdate> {
+        return toJS({
             editable: this.editable,
             annotation_enabled: this.annotationEnabled,
             annotation_default: this.annotationDefault,
@@ -90,15 +79,11 @@ export class SettingStore
             extent_const_top: this.extentConst.top,
             measure_srs: this.measureSrs ? { id: this.measureSrs } : undefined,
             bookmark_resource: this.bookmarkResource,
-        } as WebmapResource;
-
-        return toJS(result);
+        });
     }
 
     dump() {
-        if (this.dirty) {
-            return this.deserializeValue;
-        }
+        return this.dirty ? this.deserializeValue : undefined;
     }
 
     get isValid() {
@@ -124,11 +109,12 @@ export class SettingStore
     setExtent(value: Extent) {
         this.extent = value;
     }
+
     setConstrainedExtent(value: Extent) {
         this.extentConst = value;
     }
 
-    update(source: Partial<SettingsValue>) {
+    update(source: Partial<this>) {
         Object.entries(source).forEach(
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             ([key, value]) => ((this as any)[key] = value)

@@ -22,37 +22,3 @@ export interface GroupItem {
     item_type: "group";
     children?: TreeItem[];
 }
-
-interface RootItem {
-    item_type: "root";
-    children: TreeItem[];
-}
-
-export type AnnotationType = "yes" | "no";
-
-export interface BookmarkResource {
-    id: number;
-    parent: {
-        id: number;
-    };
-}
-
-export interface WebmapResource {
-    legend_syion_default?: string;
-    extent_left: number;
-    extent_right: number;
-    extent_bottom: number;
-    extent_top: number;
-    extent_const_left?: number | null;
-    extent_const_right?: number | null;
-    extent_const_bottom?: number | null;
-    extent_const_top?: number | null;
-    draw_order_enabled?: boolean | null;
-    editable: boolean;
-    annotation_enabled: boolean;
-    annotation_default: AnnotationType;
-    legend_symbols: string;
-    bookmark_resource?: BookmarkResource | null;
-    root_item: RootItem;
-    measure_srs?: { id: number } | null;
-}
