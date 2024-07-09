@@ -15,7 +15,15 @@ pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administ
 
 @pytest.mark.parametrize("srs_id", [3857, 4326])
 @inject()
-def test_cog(srs_id, ngw_data_path, ngw_webtest_app, ngw_env, *, comp: RasterLayerComponent):
+def test_cog(
+    srs_id,
+    ngw_data_path,
+    ngw_webtest_app,
+    ngw_env,
+    ngw_httptest_app,
+    *,
+    comp: RasterLayerComponent,
+):
     with transaction.manager:
         res = RasterLayer(srs=SRS.filter_by(id=srs_id).one()).persist()
         res.load_file(ngw_data_path / "sochi-aster-dem.tif", cog=False)
@@ -40,7 +48,10 @@ def test_cog(srs_id, ngw_data_path, ngw_webtest_app, ngw_env, *, comp: RasterLay
     assert cog_wd != fwork and cog_wd.is_symlink()
     assert not cog_wd.with_suffix(".ovr").is_file()
 
-    warnings, errors, _ = validate(str(cog_wd), full_check=True)
+    warnings, errors, _ = validate(
+        "/vsicurl/{}/api/resource/{}/cog".format(ngw_httptest_app.base_url, res.id),
+        full_check=True,
+    )
     assert len(errors) == 0 and len(warnings) == 0
 
     ngw_webtest_app.put_json(
