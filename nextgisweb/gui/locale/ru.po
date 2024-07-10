@@ -110,6 +110,26 @@ msgstr "Написать в поддержку"
 msgid "Back to home"
 msgstr "На главную"
 
+#: nodepkg/extent-row/component/ExtentRow.tsx:57
+msgid "From layer"
+msgstr "По слою"
+
+#: nodepkg/extent-row/component/ExtentRow.tsx:65
+msgid "West"
+msgstr "Запад"
+
+#: nodepkg/extent-row/component/ExtentRow.tsx:76
+msgid "South"
+msgstr "Юг"
+
+#: nodepkg/extent-row/component/ExtentRow.tsx:85
+msgid "East"
+msgstr "Восток"
+
+#: nodepkg/extent-row/component/ExtentRow.tsx:94
+msgid "North"
+msgstr "Север"
+
 #: nodepkg/fields-form/FormItem.tsx:11
 msgid "This value is required"
 msgstr "Необходимо указать значение"
