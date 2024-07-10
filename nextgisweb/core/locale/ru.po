@@ -18,27 +18,35 @@ msgstr "Процессор"
 msgid "RAM"
 msgstr "ОЗУ"
 
-#: exception.py:87
+#: component.py:316
+msgid "Last backup"
+msgstr "Последняя резервная копия"
+
+#: component.py:320
+msgid "Last maintenance"
+msgstr "Последнее обслуживание"
+
+#: exception.py:116
 msgid "Validation error"
 msgstr "Ошибка валидации"
 
-#: exception.py:92
+#: exception.py:121
 msgid "Forbidden"
 msgstr "Запрещено"
 
-#: exception.py:97
+#: exception.py:126
 msgid "Insufficient permissions"
 msgstr "Недостаточно прав"
 
-#: exception.py:102
+#: exception.py:131
 msgid "Operational error"
 msgstr "Операционная ошибка"
 
-#: exception.py:107
+#: exception.py:136
 msgid "External service error"
 msgstr "Ошибка внешнего сервиса"
 
-#: exception.py:111
+#: exception.py:145
 msgid "Not configured"
 msgstr "Не сконфигурировано"
 

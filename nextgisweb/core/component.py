@@ -311,6 +311,14 @@ class CoreComponent(StorageComponentMixin, Component):
         if gdal_version is not None:
             result.append(("GDAL", gdal_version))
 
+        if (lb := self.settings_get(self.identity, "last_backup", None)) is not None:
+            lb_dt = datetime.fromisoformat(lb).replace(microsecond=0)
+            result.append((_("Last backup"), lb_dt.strftime("%Y-%m-%d %H:%M UTC")))
+
+        if (lm := self.settings_get(self.identity, "last_maintenance", None)) is not None:
+            lm_dt = datetime.fromisoformat(lm).replace(microsecond=0)
+            result.append((_("Last maintenance"), lm_dt.strftime("%Y-%m-%d %H:%M UTC")))
+
         return result
 
     def check_update(self):
