@@ -44,6 +44,26 @@ msgstr "Копировать в буфер обмена"
 msgid "Save"
 msgstr "Сохранить"
 
+#: nodepkg/component/extent-row/ExtentRow.tsx:79
+msgid "From layer"
+msgstr "По слою"
+
+#: nodepkg/component/extent-row/ExtentRow.tsx:87
+msgid "West"
+msgstr "Запад"
+
+#: nodepkg/component/extent-row/ExtentRow.tsx:98
+msgid "South"
+msgstr "Юг"
+
+#: nodepkg/component/extent-row/ExtentRow.tsx:107
+msgid "East"
+msgstr "Восток"
+
+#: nodepkg/component/extent-row/ExtentRow.tsx:116
+msgid "North"
+msgstr "Север"
+
 #: nodepkg/component/language-select/LanguageSelect.tsx:15
 msgid "Improve or add new translation"
 msgstr "Уточнить перевод или добавить новый"

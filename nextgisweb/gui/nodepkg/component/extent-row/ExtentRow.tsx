@@ -2,21 +2,43 @@ import { observer } from "mobx-react-lite";
 import { useCallback, useState } from "react";
 
 import { Button, InputNumber, Space } from "@nextgisweb/gui/antd";
+import { route } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { showResourcePicker } from "@nextgisweb/resource/component/resource-picker";
 import type { ResourcePickerStoreOptions } from "@nextgisweb/resource/component/resource-picker/type";
 
-import type { Extent } from "../type";
-import { getExtentFromLayer } from "../util/getExtentFromLayer";
-
 import LayersIconOutlined from "@nextgisweb/icon/material/layers";
 
 import "./ExtentRow.less";
 
+export async function getExtentFromLayer({
+    resourceId,
+    signal,
+}: {
+    resourceId: number;
+    signal?: AbortSignal;
+}) {
+    const { extent } = await route("layer.extent", resourceId).get({
+        cache: true,
+        signal,
+    });
+    const result = {
+        left: extent.minLon,
+        right: extent.maxLon,
+        bottom: extent.maxLat,
+        top: extent.minLat,
+    } as ExtentRowValue;
+
+    return result;
+}
+
+type ExtentKeys = "top" | "left" | "right" | "bottom";
+export type ExtentRowValue = Partial<Record<ExtentKeys, number | null>>;
+
 interface ExtentRow {
-    value: Extent;
-    onChange: (val: Extent) => void;
+    value: ExtentRowValue;
+    onChange: (val: ExtentRowValue) => void;
     pickerOptions?: ResourcePickerStoreOptions;
 }
 
@@ -48,7 +70,7 @@ export const ExtentRow = observer(
         }, [makeSignal, onChange, pickerOptions]);
 
         return (
-            <div className="ngw-webmap-settings-widget-extent-row">
+            <div className="ngw-gui-extent-row">
                 <Button
                     loading={loading}
                     icon={<LayersIconOutlined />}
@@ -102,3 +124,5 @@ export const ExtentRow = observer(
         );
     }
 );
+
+ExtentRow.displayName = "ExtentRow";

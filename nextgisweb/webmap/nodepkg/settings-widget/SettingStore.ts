@@ -1,6 +1,7 @@
 import isEqual from "lodash-es/isEqual";
 import { makeAutoObservable, toJS } from "mobx";
 
+import type { ExtentRowValue } from "@nextgisweb/gui/component";
 import type {
     EditorStore,
     EditorStoreOptions,
@@ -8,8 +9,6 @@ import type {
 import type { Composite } from "@nextgisweb/resource/type/Composite";
 import type { ResourceRef } from "@nextgisweb/resource/type/api";
 import type * as apitype from "@nextgisweb/webmap/type/api";
-
-import type { Extent } from "./type";
 
 type WithoutItems<T> = Omit<T, "root_item" | "draw_order_enabled">;
 
@@ -25,8 +24,18 @@ export class SettingStore
     annotationDefault: apitype.WebMapRead["annotation_default"] = "no";
     legendSymbols: apitype.WebMapRead["legend_symbols"] = null;
     measureSrs: null | number = null;
-    extent: Extent = { left: -180, right: 180, bottom: -90, top: 90 };
-    extentConst: Extent = { left: null, right: null, bottom: null, top: null };
+    extent: ExtentRowValue = {
+        left: -180,
+        right: 180,
+        bottom: -90,
+        top: 90,
+    };
+    extentConst: ExtentRowValue = {
+        left: null,
+        right: null,
+        bottom: null,
+        top: null,
+    };
     bookmarkResource?: ResourceRef | null = null;
 
     private _initValue: WithoutItems<apitype.WebMapRead> | null = null;
@@ -106,11 +115,11 @@ export class SettingStore
         return false;
     }
 
-    setExtent(value: Extent) {
+    setExtent(value: ExtentRowValue) {
         this.extent = value;
     }
 
-    setConstrainedExtent(value: Extent) {
+    setConstrainedExtent(value: ExtentRowValue) {
         this.extentConst = value;
     }
 
