@@ -102,3 +102,5 @@ export const ExtentRow = observer(
         );
     }
 );
+
+ExtentRow.displayName = "ExtentRow";

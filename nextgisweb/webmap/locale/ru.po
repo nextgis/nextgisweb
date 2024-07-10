@@ -764,29 +764,9 @@ msgstr "Показать без сообщений"
 msgid "Show with messages"
 msgstr "Показать с сообщениями"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:139
+#: nodepkg/settings-widget/SettingsWidget.tsx:140
 msgid "Settings"
 msgstr "Настройки"
-
-#: nodepkg/settings-widget/component/ExtentRow.tsx:57
-msgid "From layer"
-msgstr "По слою"
-
-#: nodepkg/settings-widget/component/ExtentRow.tsx:65
-msgid "West"
-msgstr "Запад"
-
-#: nodepkg/settings-widget/component/ExtentRow.tsx:76
-msgid "South"
-msgstr "Юг"
-
-#: nodepkg/settings-widget/component/ExtentRow.tsx:85
-msgid "East"
-msgstr "Восток"
-
-#: nodepkg/settings-widget/component/ExtentRow.tsx:94
-msgid "North"
-msgstr "Север"
 
 #: nodepkg/settings/Settings.js:48
 msgid "Settings saved"
@@ -1035,3 +1015,19 @@ msgstr "Клонировать веб-карту"
 #: view.py:274
 msgid "Embedded webmap preview"
 msgstr "Просмотр встроенной веб-карты"
+
+#~ msgid "From layer"
+#~ msgstr "По слою"
+
+#~ msgid "West"
+#~ msgstr "Запад"
+
+#~ msgid "South"
+#~ msgstr "Юг"
+
+#~ msgid "East"
+#~ msgstr "Восток"
+
+#~ msgid "North"
+#~ msgstr "Север"
+

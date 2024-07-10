@@ -1,6 +1,7 @@
 import { observer } from "mobx-react-lite";
 
 import { Checkbox, Select } from "@nextgisweb/gui/antd";
+import { ExtentRow } from "@nextgisweb/gui/extent-row";
 import { Area, Lot } from "@nextgisweb/gui/mayout";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { annotation, editing } from "@nextgisweb/pyramid/settings!webmap";
@@ -12,7 +13,6 @@ import type {
 import { SrsSelect } from "@nextgisweb/spatial-ref-sys/srs-select/SrsSelect";
 
 import type { SettingStore } from "./SettingStore";
-import { ExtentRow } from "./component/ExtentRow";
 import type { AnnotationType } from "./type";
 
 const msgInitExtent = gettext("Initial extent");
@@ -136,5 +136,6 @@ export const SettingsWidget: EditorWidgetComponent<
     );
 });
 
+SettingsWidget.displayName = "SettingsWidget";
 SettingsWidget.title = gettext("Settings");
 SettingsWidget.order = 40;
