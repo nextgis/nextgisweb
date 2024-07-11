@@ -394,8 +394,8 @@ define([
                         {
                             display_name: i18n.gettext("Add group"),
                             item_type: "group",
-                            group_expanded: null,
-                            group_exclusive: null,
+                            group_expanded: false,
+                            group_exclusive: false,
                         },
                         {
                             parent: widget.getAddParent(),
