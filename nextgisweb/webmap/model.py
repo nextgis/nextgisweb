@@ -329,8 +329,8 @@ class WebMapItemLayerRead(Struct, kw_only=True, tag="layer", tag_field="item_typ
 
         return WebMapItemLayerRead(
             display_name=obj.display_name,
-            layer_enabled=obj.layer_enabled,
-            layer_identifiable=obj.layer_identifiable,
+            layer_enabled=bool(obj.layer_enabled),
+            layer_identifiable=bool(obj.layer_identifiable),
             layer_transparency=obj.layer_transparency,
             layer_style_id=obj.layer_style_id,
             layer_min_scale_denom=obj.layer_min_scale_denom,
@@ -368,8 +368,8 @@ class WebMapItemGroupRead(Struct, kw_only=True, tag="group", tag_field="item_typ
     def from_model(cls, obj):
         return WebMapItemGroupRead(
             display_name=obj.display_name,
-            group_expanded=obj.group_expanded,
-            group_exclusive=obj.group_exclusive,
+            group_expanded=bool(obj.group_expanded),
+            group_exclusive=bool(obj.group_exclusive),
             children=_children_from_model(obj),
         )
 
