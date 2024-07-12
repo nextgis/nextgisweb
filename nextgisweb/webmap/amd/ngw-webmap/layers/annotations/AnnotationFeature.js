@@ -172,6 +172,12 @@ define([
                 jsonStyle = json.parse(jsonStyle);
             }
 
+            if (jsonStyle.circle.fill && jsonStyle.circle.fill.color) {
+                const color = jsonStyle.circle.fill.color;
+                const [r, g, b] = Array.from(ol.color.asArray(color));
+                jsonStyle.circle.fill.color = ol.color.asString([r, g, b, 0.3]);
+            }
+
             return new ol.style.Style({
                 image: new ol.style.Circle({
                     radius: jsonStyle.circle.radius,
