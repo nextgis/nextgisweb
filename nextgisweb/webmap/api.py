@@ -278,6 +278,7 @@ def print(request, *, body: PrintBody) -> Response:
                 "--disable-gpu",
                 "--run-all-compositor-stages-before-draw",
                 "--virtual-time-budget=10000",
+                "--disable-dev-shm-usage",
                 "--no-pdf-header-footer",
                 f"--print-to-pdf={output_pdf}",
                 f"{index_html}",
