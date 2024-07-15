@@ -145,7 +145,7 @@ export function QMSSelect({
                 if (option) {
                     return (
                         <>
-                            {option.result.name}
+                            {option.result.id} - {option.result.name}
                             <a
                                 style={{ paddingLeft: "3px" }}
                                 href={`${settings.qms_url}/geoservices/${option.result.id}`}

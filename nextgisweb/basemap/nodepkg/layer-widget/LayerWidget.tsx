@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { useMemo, useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { InputValue } from "@nextgisweb/gui/antd";
 import { LotMV } from "@nextgisweb/gui/arm";
@@ -13,7 +13,7 @@ import type {
 
 import type { LayerStore } from "./LayerStore";
 import { QMSSelect } from "./component/QMSSelect";
-import { QMSService } from "./type";
+import type { QMSService } from "./type";
 
 const msgPickQms = gettext("Pick from QMS");
 // eslint-disable-next-line prettier/prettier
@@ -107,5 +107,5 @@ export const LayerWidget: EditorWidgetComponent<EditorWidgetProps<LayerStore>> =
         );
     });
 
-LayerWidget.displayName = "Basemaps";
+LayerWidget.displayName = "LayerWidget";
 LayerWidget.title = gettext("Basemaps");

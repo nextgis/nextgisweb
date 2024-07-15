@@ -1,3 +1,4 @@
+import isEqual from "lodash-es/isEqual";
 import { action, computed, observable } from "mobx";
 
 import type {
@@ -6,7 +7,6 @@ import type {
     BasemapLayerUpdate,
 } from "@nextgisweb/basemap/type/api";
 import { mapper } from "@nextgisweb/gui/arm";
-import type { ErrorResult } from "@nextgisweb/gui/arm";
 import type { EditorStore } from "@nextgisweb/resource/type/EditorStore";
 
 const {
@@ -33,32 +33,37 @@ export class LayerStore
 
     @observable accessor loaded = false;
 
-    @observable accessor dirty = false;
+    private _initValue?: BasemapLayerRead | undefined;
 
     @action load(value: BasemapLayerRead) {
         layerLoad(this, value);
+        this._initValue = { ...value };
         this.loaded = true;
     }
 
-    dump(): BasemapLayerCreate | BasemapLayerUpdate | undefined {
-        const result: Partial<BasemapLayerCreate | BasemapLayerUpdate> = {
+    @computed get deserializeValue(): Partial<
+        BasemapLayerCreate | BasemapLayerUpdate
+    > {
+        return {
             ...this.copyright_text.jsonPart(),
             ...this.copyright_url.jsonPart(),
             ...this.url.jsonPart(),
             ...this.qms.jsonPart(),
         };
-        return result;
     }
 
-    get error(): ErrorResult {
-        return mapperError(this);
+    dump(): BasemapLayerCreate | BasemapLayerUpdate | undefined {
+        return this.dirty ? this.deserializeValue : undefined;
     }
 
-    @action markDirty() {
-        this.dirty = true;
+    @computed get dirty(): boolean {
+        if (this.deserializeValue && this._initValue) {
+            return !isEqual(this.deserializeValue, this._initValue);
+        }
+        return false;
     }
 
-    @computed get isValid(): boolean {
-        return true;
+    @computed get isValid() {
+        return !mapperError(this);
     }
 }
