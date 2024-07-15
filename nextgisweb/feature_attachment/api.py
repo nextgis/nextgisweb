@@ -209,6 +209,8 @@ def export(resource, request):
                 metadata_item = metadata_items[arcname] = dict(
                     id=obj.id, feature_id=obj.feature_id, name=obj.name, mime_type=obj.mime_type
                 )
+                if obj.keyname is not None:
+                    metadata_item["keyname"] = obj.keyname
                 if obj.description is not None:
                     metadata_item["description"] = obj.description
 

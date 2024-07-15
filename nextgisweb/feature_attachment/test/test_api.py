@@ -62,8 +62,7 @@ def clear(layer_id):
         (
             [
                 dict(name="00001/test_A", size=1),
-                dict(name="00001/test_B", size=1),
-                dict(name="AAAA2/test_C", size=2),
+                dict(name="AAAA2/test_B", size=2),
             ],
             dict(error=True),
         ),
@@ -124,6 +123,37 @@ def clear(layer_id):
             ],
             dict(error=True),
         ),
+        (
+            [
+                dict(name="test_A", size=1),
+                dict(name="test_B", size=1),
+                dict(name="test_C", size=1),
+                dict(
+                    name="metadata.json",
+                    content=dumpb(
+                        dict(
+                            items={
+                                "test_A": dict(
+                                    name="test_A",
+                                    keyname="A",
+                                    feature_id=1,
+                                ),
+                                "test_B": dict(
+                                    name="test_B",
+                                    keyname="B",
+                                    feature_id=1,
+                                ),
+                                "test_C": dict(
+                                    name="test_C",
+                                    feature_id=2,
+                                ),
+                            }
+                        )
+                    ),
+                ),
+            ],
+            dict(features=[1, 1, 2]),
+        ),
     ),
 )
 def test_import(files, result, layer_id, clear, ngw_file_upload, ngw_webtest_app):
@@ -161,7 +191,7 @@ def test_import(files, result, layer_id, clear, ngw_file_upload, ngw_webtest_app
         attachment = attachments[att_idx]
         assert attachment["size"] == size
 
-    assert import_result["imported"] == imported
+    assert import_result == dict(imported=imported, skipped=0)
 
 
 def test_import_multiple(layer_id, ngw_file_upload, ngw_webtest_app):

@@ -55,17 +55,24 @@ def attachments_import(resource, filename, *, replace):
                         message=_("File '{}' isn't found in metadata.").format(info_fn)
                     )
 
-                file_name = file_md.get("name")
-                if file_name is not None and not isinstance(file_name, str):
-                    raise ValidationError(message=_("Invalid name for file '{}'.").format(info_fn))
-                src["name"] = file_name
-
                 file_fid = file_md.get("feature_id")
                 if not isinstance(file_fid, int):
                     raise ValidationError(
                         message=_("Invalid feature ID for file '{}'.").format(info_fn)
                     )
                 src["feature_id"] = file_fid
+
+                file_keyname = file_md.get("keyname")
+                if file_keyname is not None and not isinstance(file_keyname, str):
+                    raise ValidationError(
+                        message=_("Invalid keyname for file '{}'.").format(info_fn)
+                    )
+                src["keyname"] = file_keyname
+
+                file_name = file_md.get("name")
+                if file_name is not None and not isinstance(file_name, str):
+                    raise ValidationError(message=_("Invalid name for file '{}'.").format(info_fn))
+                src["name"] = file_name
 
                 file_mime = file_md.get("mime_type")
                 if file_mime is not None and not isinstance(file_mime, str):
@@ -94,6 +101,7 @@ def attachments_import(resource, filename, *, replace):
                     )
 
                 src["feature_id"] = file_fid
+                src["keyname"] = None
                 src["name"] = file_name
                 src["mime_type"] = None
                 src["description"] = None
@@ -125,6 +133,7 @@ def attachments_import(resource, filename, *, replace):
                     for att_cmp in FeatureAttachment.filter_by(
                         resource_id=resource.id,
                         feature_id=src["feature_id"],
+                        keyname=src["keyname"],
                         size=src["info"].file_size,
                     ):
                         fn_new = fileobj.filename()
@@ -137,6 +146,7 @@ def attachments_import(resource, filename, *, replace):
                     obj = FeatureAttachment(
                         resource=resource,
                         feature_id=src["feature_id"],
+                        keyname=src["keyname"],
                         name=src["name"],
                         mime_type=src["mime_type"],
                         description=src["description"],
