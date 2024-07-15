@@ -5,7 +5,7 @@ from tempfile import TemporaryDirectory
 from typing import List, Literal, Optional, Union
 
 from geoalchemy2.shape import to_shape
-from msgspec import UNSET, Meta, Struct, UnsetType
+from msgspec import UNSET, Meta, Struct, UnsetType, ValidationError
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.renderers import render
 from pyramid.response import Response
@@ -189,9 +189,9 @@ class MapContent(ElementSize):
 
 
 class PrintBody(Struct):
-    width: Annotated[float, Meta(gt=0, le=500)]
-    height: Annotated[float, Meta(gt=0, le=500)]
-    margin: Annotated[float, Meta(ge=0, le=100)]
+    width: Annotated[int, Meta(gt=0)]
+    height: Annotated[int, Meta(gt=0)]
+    margin: Annotated[int, Meta(gt=0)]
     map: MapContent
     format: PrintFormat
     legend: Union[LegendElement, UnsetType] = UNSET
@@ -236,7 +236,20 @@ def handle_legend_tree(legend: LegendElement) -> List[LegendViewModel]:
     return legend_tree
 
 
+def check_page_max_size(request, body: PrintBody):
+    max_size = request.env.webmap.options["print.max_size"]
+    if body.height > max_size:
+        raise ValidationError(
+            f"Height must be less than or equal to S{max_size}. Provided height: {body.height}"
+        )
+    if body.width > max_size:
+        raise ValidationError(
+            f"Width must be less than or equal to {max_size}. Provided width: {body.width}"
+        )
+
+
 def print(request, *, body: PrintBody) -> Response:
+    check_page_max_size(request, body)
     with TemporaryDirectory() as temp_name:
         temp_dir = Path(temp_name)
 

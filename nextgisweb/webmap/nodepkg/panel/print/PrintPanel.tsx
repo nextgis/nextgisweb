@@ -271,6 +271,10 @@ export const PrintPanel = ({
     const [printMapComp, setPrintMapComp] = useState<Comp>();
     const [printMapEl, setPrintMapEl] = useState<HTMLElement>();
 
+    const printMaxSize = useMemo(() => {
+        return display.config.printMaxSize;
+    }, [display]);
+
     const defaultSettings = useMemo(
         () => defaultPanelMapSettings(display.config.webmapTitle),
         [display.config.webmapTitle]
@@ -431,7 +435,7 @@ export const PrintPanel = ({
                         }
                         value={mapSettings.height}
                         min={5}
-                        max={1000}
+                        max={printMaxSize}
                         step={1}
                         disabled={disableChangeSize}
                     ></InputNumber>
@@ -447,7 +451,7 @@ export const PrintPanel = ({
                         }
                         value={mapSettings.width}
                         min={5}
-                        max={1000}
+                        max={printMaxSize}
                         step={1}
                         disabled={disableChangeSize}
                     ></InputNumber>
@@ -462,7 +466,6 @@ export const PrintPanel = ({
                         }
                         value={mapSettings.margin}
                         min={0}
-                        max={1000}
                         step={1}
                     ></InputNumber>
                 </div>

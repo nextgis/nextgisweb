@@ -43,4 +43,5 @@ export interface DisplayConfig {
     drawOrderEnabled?: any;
     annotations: Annotations;
     units: string;
+    printMaxSize: number;
 }

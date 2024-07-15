@@ -230,6 +230,7 @@ def display(obj, request):
         webmapLegendVisible=obj.legend_symbols,
         drawOrderEnabled=obj.draw_order_enabled,
         measureSrsId=obj.measure_srs_id,
+        printMaxSize=request.env.webmap.options["print.max_size"],
     )
 
     if request.env.webmap.options["annotation"]:

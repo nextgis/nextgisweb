@@ -79,5 +79,6 @@ class WebMapComponent(Component):
         Option("editing", bool, default=True),
         Option("check_origin", bool, default=False, doc="Check iframe Referer header."),
         Option("legend_symbols", LegendSymbolsEnum, default=LegendSymbolsEnum.COLLAPSE),
+        Option("print.max_size", int, default=500, doc="Maximum paper size for printing web map in mm"),
     )
     # fmt: on
