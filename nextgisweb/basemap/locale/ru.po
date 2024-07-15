@@ -1,44 +1,59 @@
-#: amd/ngw-basemap/LayerWidget.js:39 model.py:24
+#: model.py:24
 msgid "Basemap"
 msgstr "Подложка веб-карты"
 
-#: amd/ngw-basemap/LayerWidget.js:60
-msgid "Search"
-msgstr "Поиск"
+#: nodepkg/layer-widget/LayerWidget.tsx:18
+msgid "Pick from QMS"
+msgstr "Выбрать из QMS"
 
-#: amd/ngw-basemap/LayerWidget.js:67
-msgid "Use options from QMS"
-msgstr "Использовать настройки из QMS"
+#: nodepkg/layer-widget/LayerWidget.tsx:20
+msgid "Search for geoservices provided by "
+msgstr "Искать геосервисы, предоставленные "
 
-#: amd/ngw-basemap/template/LayerWidget.hbs:11
+#: nodepkg/layer-widget/LayerWidget.tsx:21
+msgid "You can search by name or ID"
+msgstr "Можно искать по имени или по ID"
+
+#: nodepkg/layer-widget/LayerWidget.tsx:24
+msgid "As long as a service from QMS is selected, editing these fields is disabled."
+msgstr "Пока выбран сервис из QMS, редактирование этих полей отключено."
+
+#: nodepkg/layer-widget/LayerWidget.tsx:82
 msgid "URL"
 msgstr "URL"
 
-#: amd/ngw-basemap/template/LayerWidget.hbs:17
+#: nodepkg/layer-widget/LayerWidget.tsx:90
 msgid "Copyright text"
 msgstr "Текст для копирайта"
 
-#: amd/ngw-basemap/template/LayerWidget.hbs:23
+#: nodepkg/layer-widget/LayerWidget.tsx:99
 msgid "Copyright URL"
 msgstr "Ссылка на копирайт"
 
-#: nodepkg/webmap-widget/WebMapWidget.tsx:56
+#: nodepkg/layer-widget/LayerWidget.tsx:111
+#: nodepkg/webmap-widget/WebMapWidget.tsx:125
+msgid "Basemaps"
+msgstr "Подложки"
+
+#: nodepkg/webmap-widget/WebMapWidget.tsx:54
 msgid "Display name"
 msgstr "Наименование"
 
-#: nodepkg/webmap-widget/WebMapWidget.tsx:63
+#: nodepkg/webmap-widget/WebMapWidget.tsx:61
 msgid "Default basemap"
 msgstr "Подложка по умолчанию"
 
-#: nodepkg/webmap-widget/WebMapWidget.tsx:66
+#: nodepkg/webmap-widget/WebMapWidget.tsx:64
 msgid "Opacity"
 msgstr "Непрозрачность"
 
-#: nodepkg/webmap-widget/WebMapWidget.tsx:71
+#: nodepkg/webmap-widget/WebMapWidget.tsx:69
 msgid "Resource"
 msgstr "Ресурс"
 
-#: nodepkg/webmap-widget/WebMapWidget.tsx:127
-msgid "Basemaps"
-msgstr "Подложки"
+#~ msgid "Search"
+#~ msgstr "Поиск"
+
+#~ msgid "Use options from QMS"
+#~ msgstr "Использовать настройки из QMS"
 
