@@ -9,9 +9,9 @@ export function useAbortController() {
         return abortHelper.current!.makeSignal();
     });
 
-    const abort = useRef(() => {
+    const abort = useRef((reason?: string) => {
         if (abortHelper.current) {
-            abortHelper.current.abort();
+            abortHelper.current.abort(reason);
         }
     });
 
