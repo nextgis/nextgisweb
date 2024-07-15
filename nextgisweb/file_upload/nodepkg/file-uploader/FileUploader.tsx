@@ -87,7 +87,13 @@ export function FileUploader<M extends boolean = false>({
                 <p className="ant-upload-text">{progressText}</p>
             </span>
             <span>
-                <Button shape="round" icon={<CancelIcon />} onClick={abort}>
+                <Button
+                    shape="round"
+                    icon={<CancelIcon />}
+                    onClick={() => {
+                        abort();
+                    }}
+                >
                     {msgStop}
                 </Button>
             </span>
