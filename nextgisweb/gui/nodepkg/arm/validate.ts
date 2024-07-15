@@ -20,6 +20,7 @@ const msgMaxValue = gettext("Value should be no more than {}");
 
 const msgPattern = gettext("Invalid value");
 const msgNotUnique = gettext("Value not unique");
+const msgInvalidURL = gettext("Invalid URL");
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function required<V = any>(): Validator<V> {
@@ -31,27 +32,42 @@ export function required<V = any>(): Validator<V> {
     };
 }
 
+export function isValidURL(value: string): boolean {
+    try {
+        new URL(value);
+        return true;
+    } catch {
+        return false;
+    }
+}
+
 export function string<V = string>({
     minLength,
     maxLength,
     pattern,
+    url,
 }: {
     minLength?: number;
     maxLength?: number;
     pattern?: RegExp;
+    url?: boolean;
 }): Validator<V> {
     return (value: V) => {
         if (typeof value !== "string") return [true, undefined];
-        if (minLength !== undefined && value.length < minLength) {
+        if (typeof minLength === "number" && value.length < minLength) {
             const m = msgMinLength(minLength).replace("{}", String(minLength));
             return [false, m];
         }
-        if (maxLength !== undefined && value.length > maxLength) {
+        if (typeof maxLength === "number" && value.length > maxLength) {
             const m = msgMaxLength(maxLength).replace("{}", String(maxLength));
             return [false, m];
         }
-        if (pattern !== undefined && !pattern.test(value))
+        if (pattern !== undefined && !pattern.test(value)) {
             return [false, msgPattern];
+        }
+        if (url && value && !isValidURL(value)) {
+            return [false, msgInvalidURL];
+        }
         return [true, undefined];
     };
 }
@@ -66,10 +82,10 @@ export function number<V = number>({
     return (value: V) => {
         if (typeof value !== "number") return [true, undefined];
         if (min !== undefined && value < min) {
-            return [false, msgMinValue];
+            return [false, msgMinValue.replace("{}", String(value))];
         }
         if (max !== undefined && value > max) {
-            return [false, msgMaxValue];
+            return [false, msgMaxValue.replace("{}", String(value))];
         }
         return [true, undefined];
     };
