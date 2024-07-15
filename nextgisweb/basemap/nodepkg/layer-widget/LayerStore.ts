@@ -60,7 +60,7 @@ export class LayerStore
         if (this.deserializeValue && this._initValue) {
             return !isEqual(this.deserializeValue, this._initValue);
         }
-        return false;
+        return true;
     }
 
     @computed get isValid() {
