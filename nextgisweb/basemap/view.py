@@ -7,7 +7,7 @@ from .model import BasemapLayer
 class BasemapLayerWidget(Widget):
     resource = BasemapLayer
     operation = ("create", "update")
-    amdmod = "ngw-basemap/LayerWidget"
+    amdmod = "@nextgisweb/basemap/layer-widget"
 
 
 class BasemapWebMapWidget(Widget):

@@ -14,10 +14,12 @@ class BasemapComponent(Component):
         return dict(
             qms_geoservices_url=self.options["qms_geoservices_url"],
             qms_icons_url=self.options["qms_icons_url"],
+            qms_url=self.options["qms_url"],
         )
 
     # fmt: off
     option_annotations = (
+        Option("qms_url", default="https://qms.nextgis.com"),
         Option("qms_geoservices_url", default="https://qms.nextgis.com/api/v1/geoservices/"),
         Option("qms_icons_url", default="https://qms.nextgis.com/api/v1/icons/"),
     )
