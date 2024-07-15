@@ -158,18 +158,19 @@ export function QMSSelect({
             allowClear
             filterOption={false}
             style={{ width: "100%" }}
-            labelRender={({ value }) => {
-                const option = options.find((o) => o.value === value);
-                if (option) {
-                    return (
-                        <QMSLabel
-                            name={option.result.name}
-                            id={option.result.id}
-                        />
-                    );
-                }
-                return "";
-            }}
+            // TODO: use custom labelRender with antd more than 5.14.2 version
+            // labelRender={({ value }) => {
+            //     const option = options.find((o) => o.value === value);
+            //     if (option) {
+            //         return (
+            //             <QMSLabel
+            //                 name={option.result.name}
+            //                 id={option.result.id}
+            //             />
+            //         );
+            //     }
+            //     return "";
+            // }}
             options={options.map((option) => {
                 return {
                     value: option.value,
