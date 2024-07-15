@@ -15,22 +15,22 @@ msgid "You can search by name or ID"
 msgstr "Можно искать по имени или по ID"
 
 #: nodepkg/layer-widget/LayerWidget.tsx:24
-msgid "As long as a service from QMS is selected, editing these fields is disabled."
+msgid "If a service from QMS is selected, this field cannot be edited."
 msgstr "Пока выбран сервис из QMS, редактирование этих полей отключено."
 
-#: nodepkg/layer-widget/LayerWidget.tsx:82
+#: nodepkg/layer-widget/LayerWidget.tsx:80
 msgid "URL"
 msgstr "URL"
 
-#: nodepkg/layer-widget/LayerWidget.tsx:90
+#: nodepkg/layer-widget/LayerWidget.tsx:88
 msgid "Copyright text"
 msgstr "Текст для копирайта"
 
-#: nodepkg/layer-widget/LayerWidget.tsx:99
+#: nodepkg/layer-widget/LayerWidget.tsx:97
 msgid "Copyright URL"
 msgstr "Ссылка на копирайт"
 
-#: nodepkg/layer-widget/LayerWidget.tsx:111
+#: nodepkg/layer-widget/LayerWidget.tsx:109
 #: nodepkg/webmap-widget/WebMapWidget.tsx:125
 msgid "Basemaps"
 msgstr "Подложки"
@@ -51,9 +51,5 @@ msgstr "Непрозрачность"
 msgid "Resource"
 msgstr "Ресурс"
 
-#~ msgid "Search"
-#~ msgstr "Поиск"
 
-#~ msgid "Use options from QMS"
-#~ msgstr "Использовать настройки из QMS"
 

@@ -1,7 +1,7 @@
 import debounce from "lodash-es/debounce";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { Select, Space, Spin } from "@nextgisweb/gui/antd";
+import { Select, Spin } from "@nextgisweb/gui/antd";
 import type { SelectProps } from "@nextgisweb/gui/antd";
 import { useAbortController } from "@nextgisweb/pyramid/hook";
 import settings from "@nextgisweb/pyramid/settings!basemap";
@@ -26,6 +26,24 @@ interface SearchOption {
     value: number;
     label: string;
     result: QMSSearch;
+}
+
+function QMSLabel({ name, id }: { name: string; id: number }) {
+    return (
+        <>
+            {name}
+            <a
+                style={{ paddingLeft: "3px" }}
+                href={`${settings.qms_url}/geoservices/${id}`}
+                target="_blank"
+                onClick={(e) => e.stopPropagation()}
+                onMouseDown={(e) => e.stopPropagation()}
+            >
+                {id}
+                <LaunchIcon />
+            </a>
+        </>
+    );
 }
 
 export function QMSSelect({
@@ -144,18 +162,10 @@ export function QMSSelect({
                 const option = options.find((o) => o.value === value);
                 if (option) {
                     return (
-                        <>
-                            {option.result.id} - {option.result.name}
-                            <a
-                                style={{ paddingLeft: "3px" }}
-                                href={`${settings.qms_url}/geoservices/${option.result.id}`}
-                                target="_blank"
-                                onClick={(e) => e.stopPropagation()}
-                                onMouseDown={(e) => e.stopPropagation()}
-                            >
-                                <LaunchIcon />
-                            </a>
-                        </>
+                        <QMSLabel
+                            name={option.result.name}
+                            id={option.result.id}
+                        />
                     );
                 }
                 return "";
@@ -163,12 +173,7 @@ export function QMSSelect({
             options={options.map((option) => {
                 return {
                     value: option.value,
-
-                    label: (
-                        <Space>
-                            {option.result.id} - {option.label}
-                        </Space>
-                    ),
+                    label: <QMSLabel name={option.label} id={option.value} />,
                 };
             })}
             {...restSelectProps}
