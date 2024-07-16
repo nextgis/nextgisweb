@@ -15,7 +15,7 @@ from time import sleep
 from attr import asdict, attrib, attrs
 from babel.messages.catalog import Catalog
 from babel.messages.mofile import write_mo
-from babel.messages.pofile import read_po, write_po
+from babel.messages.pofile import read_po
 from poeditor import POEditorAPI
 
 from nextgisweb.env import Env, env
@@ -24,7 +24,7 @@ from nextgisweb.env.package import pkginfo
 from nextgisweb.lib.config import load_config
 from nextgisweb.lib.logging import logger
 
-from .util import to_gettext_locale, to_http_locale
+from .util import to_gettext_locale, to_http_locale, write_po
 
 
 def compare_catalogs(ca, cb):
@@ -117,8 +117,7 @@ def cmd_extract(args):
         outfn = catalog_filename(cident, None, ext="pot", mkdir=True)
         logger.debug("Writing POT-file to %s", outfn)
 
-        with io.open(outfn, "wb") as outfd:
-            write_po(outfd, catalog, ignore_obsolete=True, omit_header=True)
+        write_po(outfn, catalog, ignore_obsolete=True)
 
 
 def cmd_update(args):
@@ -147,9 +146,7 @@ def cmd_update(args):
                     continue
 
                 logger.info("Creating component [%s] locale [%s]...", comp_id, locale)
-
-                with io.open(po_path, "wb") as fd:
-                    write_po(fd, pot, width=80, omit_header=True)
+                write_po(po_path, pot)
 
                 continue
 
@@ -176,8 +173,7 @@ def cmd_update(args):
                 for key in [key for key, msg in po.obsolete.items() if msg.string == ""]:
                     del po.obsolete[key]
 
-                with io.open(po_path, "wb") as fd:
-                    write_po(fd, po, width=80, omit_header=True)
+                write_po(po_path, po)
 
 
 def cmd_compile(args):
@@ -454,8 +450,7 @@ def cmd_poeditor_sync(args):
                         break
 
             if updated != 0:
-                with io.open(po_path, "wb") as fd:
-                    write_po(fd, po, width=80, omit_header=True)
+                write_po(po_path, po)
 
                 logger.info(
                     "%d messages translated for component [%s] locale [%s]",
@@ -529,8 +524,7 @@ def cmd_poeditor_sync(args):
             wait_for_rate_limit = False
             for locale, catalog in reference_catalogs.items():
                 with NamedTemporaryFile(suffix=".po") as fd:
-                    write_po(fd, catalog, width=80, omit_header=True)
-                    fd.flush()
+                    write_po(fd.name, catalog)
                     logger.debug("Uploading %s reference translation...", locale)
 
                     # Free account allows doing 1 upload per 20 seconds
