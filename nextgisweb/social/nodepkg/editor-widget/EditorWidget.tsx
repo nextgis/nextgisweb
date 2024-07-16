@@ -42,6 +42,12 @@ export const EditorWidget: EditorWidgetComponent<
                         imageUpdated: value === undefined ? null : value,
                     });
                 }}
+                onClean={() => {
+                    store.update({
+                        imageExisting: null,
+                        imageUpdated: undefined,
+                    });
+                }}
                 {...msgImageUploader}
             />
             <TextArea
@@ -58,3 +64,4 @@ export const EditorWidget: EditorWidgetComponent<
 
 EditorWidget.title = gettext("Social");
 EditorWidget.order = 90;
+EditorWidget.displayName = "SocialEditorWidget";
