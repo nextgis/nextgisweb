@@ -18,42 +18,42 @@ msgstr "СК #{} уже существует."
 msgid "Spatial reference systems"
 msgstr "Системы координат"
 
-#: nodepkg/catalog-browse/CatalogBrowse.tsx:88
-#: nodepkg/catalog-import/CatalogImport.tsx:30 nodepkg/srs-browse/SrsBrowse.tsx:38
+#: nodepkg/catalog-browse/CatalogBrowse.tsx:87
+#: nodepkg/catalog-import/CatalogImport.tsx:31 nodepkg/srs-browse/SrsBrowse.tsx:38
 #: nodepkg/srs-widget/SRSWidget.tsx:31
 msgid "Display name"
 msgstr "Наименование"
 
-#: nodepkg/catalog-browse/CatalogBrowse.tsx:95
+#: nodepkg/catalog-browse/CatalogBrowse.tsx:94
 msgid "Show in catalog"
 msgstr "Показать в каталоге"
 
-#: nodepkg/catalog-browse/CatalogBrowse.tsx:108 nodepkg/srs-widget/SRSWidget.tsx:36
+#: nodepkg/catalog-browse/CatalogBrowse.tsx:107 nodepkg/srs-widget/SRSWidget.tsx:37
 msgid "Authority and code"
 msgstr "Источник и код"
 
-#: nodepkg/catalog-browse/CatalogBrowse.tsx:120
-#: nodepkg/catalog-import/CatalogImport.tsx:91
+#: nodepkg/catalog-browse/CatalogBrowse.tsx:119
+#: nodepkg/catalog-import/CatalogImport.tsx:88
 msgid "Import"
 msgstr "Импорт"
 
-#: nodepkg/catalog-browse/CatalogBrowse.tsx:137
+#: nodepkg/catalog-browse/CatalogBrowse.tsx:136
 msgid "Search"
 msgstr "Поиск"
 
-#: nodepkg/catalog-browse/CatalogBrowse.tsx:154
+#: nodepkg/catalog-browse/CatalogBrowse.tsx:153
 msgid "Latitude"
 msgstr "Широта"
 
-#: nodepkg/catalog-browse/CatalogBrowse.tsx:166
+#: nodepkg/catalog-browse/CatalogBrowse.tsx:165
 msgid "Longitude"
 msgstr "Долгота"
 
-#: nodepkg/catalog-import/CatalogImport.tsx:37 nodepkg/srs-widget/SRSWidget.tsx:44
+#: nodepkg/catalog-import/CatalogImport.tsx:36 nodepkg/srs-widget/SRSWidget.tsx:46
 msgid "OGC WKT definition"
 msgstr "OGC WKT определение"
 
-#: nodepkg/catalog-import/CatalogImport.tsx:82
+#: nodepkg/catalog-import/CatalogImport.tsx:79
 msgid "View details"
 msgstr "Подробнее"
 
@@ -61,7 +61,7 @@ msgstr "Подробнее"
 msgid "Import from catalog"
 msgstr "Импортировать из каталога"
 
-#: nodepkg/srs-widget/SRSImportForm.tsx:58
+#: nodepkg/srs-widget/SRSImportForm.tsx:59
 msgid "Format"
 msgstr "Формат"
 
@@ -69,7 +69,7 @@ msgstr "Формат"
 msgid "Definition"
 msgstr "Определение"
 
-#: nodepkg/srs-widget/SRSWidget.tsx:85 nodepkg/srs-widget/SRSWidget.tsx:113
+#: nodepkg/srs-widget/SRSWidget.tsx:86 nodepkg/srs-widget/SRSWidget.tsx:114
 msgid "Import definition"
 msgstr "Импортировать определение"
 

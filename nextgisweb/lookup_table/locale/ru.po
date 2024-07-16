@@ -1,24 +1,24 @@
-#: model.py:23 nodepkg/editor/EditorWidget.tsx:165 view.py:16
+#: model.py:23 nodepkg/editor/EditorWidget.tsx:168 view.py:16
 msgid "Lookup table"
 msgstr "Справочник"
 
-#: nodepkg/editor/EditorWidget.tsx:37
+#: nodepkg/editor/EditorWidget.tsx:34
 msgid "Type here to add a new item..."
 msgstr "Введите новый ключ здесь..."
 
-#: nodepkg/editor/EditorWidget.tsx:38
+#: nodepkg/editor/EditorWidget.tsx:35
 msgid "Export"
 msgstr "Экспорт"
 
-#: nodepkg/editor/EditorWidget.tsx:39
+#: nodepkg/editor/EditorWidget.tsx:36
 msgid "Import"
 msgstr "Импорт"
 
-#: nodepkg/editor/EditorWidget.tsx:40
+#: nodepkg/editor/EditorWidget.tsx:37
 msgid "Clear"
 msgstr "Очистить"
 
-#: nodepkg/editor/EditorWidget.tsx:43
+#: nodepkg/editor/EditorWidget.tsx:40
 msgid ""
 "All existing records will be deleted after import. Are you sure you want to "
 "proceed?"
@@ -26,15 +26,14 @@ msgstr ""
 "Все существующие записи будут удалены после импорта. Вы уверены, что хотите "
 "продолжить?"
 
-#: nodepkg/editor/EditorWidget.tsx:87 template/resource_section.mako:8
+#: nodepkg/editor/EditorWidget.tsx:86 template/resource_section.mako:8
 msgid "Key"
 msgstr "Ключ"
 
-#: nodepkg/editor/EditorWidget.tsx:93 template/resource_section.mako:9
+#: nodepkg/editor/EditorWidget.tsx:92 template/resource_section.mako:9
 msgid "Value"
 msgstr "Значение"
 
 #: template/resource_section.mako:3
 msgid "Items"
 msgstr "Элементы справочника"
-

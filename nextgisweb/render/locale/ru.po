@@ -1,8 +1,8 @@
-#: api.py:91
+#: api.py:82
 msgid "Invalid origin"
 msgstr "Недопустимый источник"
 
-#: api.py:92
+#: api.py:83
 msgid ""
 "Origin validation is enabled for rendering requests, but the given origin "
 "doesn't match with the CORS origins list."
@@ -10,51 +10,43 @@ msgstr ""
 "Для запросов рендеринга включена проверка источника, однако указанный "
 "источник не совпадает со списком допустимых источников CORS."
 
-#: api.py:167
+#: api.py:158
 msgid "Invalid symbols sequence"
 msgstr "Некорректная последовательность символов"
 
-#: component.py:24 nodepkg/tile-cache-widget/TileCacheWidget.js:86
+#: component.py:24 nodepkg/tile-cache-widget/TileCacheWidget.tsx:93
 msgid "Tile cache"
 msgstr "Тайловый кэш"
 
-#: component.py:57 nodepkg/tile-cache-widget/TileCacheWidget.js:29
+#: component.py:51 nodepkg/tile-cache-widget/TileCacheWidget.tsx:50
 msgid "Enabled"
 msgstr "Включен"
 
-#: component.py:57
+#: component.py:51
 msgid "Disabled"
 msgstr "Отключен"
 
-#: nodepkg/tile-cache-widget/TileCacheWidget.js:38
+#: nodepkg/tile-cache-widget/TileCacheWidget.tsx:58
 msgid "Allow using tiles in non-tile requests"
 msgstr "Разрешить тайлы для запросов изображений"
 
-#: nodepkg/tile-cache-widget/TileCacheWidget.js:48
-msgid "Track changes"
-msgstr "Отслеживать изменения"
-
-#: nodepkg/tile-cache-widget/TileCacheWidget.js:52
+#: nodepkg/tile-cache-widget/TileCacheWidget.tsx:62
 msgid "Max zoom level"
 msgstr "Максимальный масштабный уровень"
 
-#: nodepkg/tile-cache-widget/TileCacheWidget.js:62
-msgid "Seed zoom level"
-msgstr "Заполнить масштабный уровень"
-
-#: nodepkg/tile-cache-widget/TileCacheWidget.js:72
+#: nodepkg/tile-cache-widget/TileCacheWidget.tsx:71
 msgid "TTL, sec."
 msgstr "TTL, сек."
 
-#: nodepkg/tile-cache-widget/TileCacheWidget.js:81
+#: nodepkg/tile-cache-widget/TileCacheWidget.tsx:85
 msgid "Flush"
 msgstr "Очистить"
 
-#: view.py:32
+#: view.py:25
 msgid "TMS (Tile Map Service)"
 msgstr "TMS (Tile Map Service)"
 
-#: view.py:33
+#: view.py:26
 msgid ""
 "TMS (Tile Map Service) is a specification for tiled web maps. Tiled web map "
 "is a map displayed in a browser by seamlessly joining dozens of individually "
@@ -64,7 +56,6 @@ msgstr ""
 "это карта, отображаемая в браузере путем бесшовного соединения десятков "
 "индивидуально запрашиваемых изображений (тайлов)."
 
-#: view.py:49
+#: view.py:42
 msgid "Legend symbols"
 msgstr "Символы легенды"
-

@@ -101,4 +101,3 @@ msgstr "Звезда"
 #: nodepkg/style-editor/util/constant.ts:10
 msgid "Cross"
 msgstr "Крест"
-

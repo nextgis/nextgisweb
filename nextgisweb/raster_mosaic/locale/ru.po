@@ -6,19 +6,19 @@ msgstr "id элемента растровой мозаики не указан.
 msgid "Raster mosaic item not found."
 msgstr "Элемент растровой мозаики не найден."
 
-#: model.py:35
+#: model.py:36
 msgid "Raster mosaic"
 msgstr "Мозаика растров"
 
-#: model.py:124
+#: model.py:121
 msgid "GDAL library was unable to open the file."
 msgstr "Библиотеке GDAL не удалось открыть файл."
 
-#: model.py:127
+#: model.py:124
 msgid "Only RGB and RGBA rasters are supported."
 msgstr "Поддерживаются только RGB и RGBA растры."
 
-#: model.py:135
+#: model.py:132
 msgid ""
 "Raster has format '%(format)s', however only following formats are supported:"
 " %(all_formats)s."
@@ -26,23 +26,22 @@ msgstr ""
 "Формат загруженного растра '%(format)s', однако поддерживаются только "
 "следующие типы: %(all_formats)s."
 
-#: model.py:140
+#: model.py:139
 msgid "Raster files without projection info are not supported."
 msgstr "Растровые файлы без информации о проекции не поддерживаются."
 
-#: model.py:151
+#: model.py:150
 msgid "Complex data types are not supported."
 msgstr "Комплексные типы данных не поддерживаются."
 
-#: nodepkg/resource-widget/Store.js:55
+#: nodepkg/resource-widget/Store.ts:73
 msgid "File '{}' has an invalid extension."
 msgstr "У файла '{}' неправильное расширение."
 
-#: nodepkg/resource-widget/Widget.js:34
+#: nodepkg/resource-widget/Widget.tsx:43
 msgid "Upload"
 msgstr "Загрузить"
 
-#: nodepkg/resource-widget/Widget.js:53
+#: nodepkg/resource-widget/Widget.tsx:64
 msgid "Rasters"
 msgstr "Растры"
-

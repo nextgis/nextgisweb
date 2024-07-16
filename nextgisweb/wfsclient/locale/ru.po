@@ -1,8 +1,8 @@
-#: amd/ngw-wfsclient/WFSConnectionWidget.js:26 model.py:114
+#: amd/ngw-wfsclient/WFSConnectionWidget.js:34 model.py:127
 msgid "WFS connection"
 msgstr "Соединение WFS"
 
-#: amd/ngw-wfsclient/WFSLayerWidget.js:37 model.py:379
+#: amd/ngw-wfsclient/WFSLayerWidget.js:46 model.py:434
 msgid "WFS layer"
 msgstr "Слой WFS"
 
@@ -82,4 +82,3 @@ msgstr "Оставить"
 #: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:54
 msgid "Reload"
 msgstr "Загрузить"
-

@@ -32,6 +32,10 @@ msgstr "Некорректное значение"
 msgid "Value not unique"
 msgstr "Значение не уникально"
 
+#: nodepkg/arm/validate.ts:23
+msgid "Invalid URL"
+msgstr "Некорректный URL"
+
 #: nodepkg/buttons/CopyToClipboardButton.tsx:23
 msgid "Copied to clipboard"
 msgstr "Скопиривано в буфер обмена"
@@ -205,4 +209,3 @@ msgstr "Настройка сохранена."
 #: nodepkg/single-setting-form/SingleSettingForm.tsx:26
 msgid "Reload the page to get them applied."
 msgstr "Обновите страницу, чтобы настройки вступили в силу."
-

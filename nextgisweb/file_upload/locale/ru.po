@@ -2,16 +2,16 @@
 msgid "Uploaded file too large"
 msgstr "Загруженный файл слишком большой"
 
-#: model.py:112
+#: model.py:137
 msgid "Uploaded file not found"
 msgstr "Загруженный файл не найден"
 
-#: model.py:116
+#: model.py:141
 msgid "Upload is not completed"
 msgstr "Загрузка не завершена"
 
 #: nodepkg/file-uploader/FileUploader.tsx:19
-#: nodepkg/image-uploader/ImageUploader.tsx:18
+#: nodepkg/image-uploader/ImageUploader.tsx:17
 msgid "Select a file"
 msgstr "Выберите файл"
 
@@ -35,7 +35,6 @@ msgstr "Загрузить"
 msgid "{} uploaded..."
 msgstr "{} загружено..."
 
-#: nodepkg/image-uploader/ImageUploader.tsx:19
+#: nodepkg/image-uploader/ImageUploader.tsx:18
 msgid "Delete"
 msgstr "Удалить"
-

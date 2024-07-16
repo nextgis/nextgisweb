@@ -81,4 +81,3 @@ msgstr "Процесс оценки хранилища уже запущен"
 #: test/test_exception.py:76
 msgid "The answer is %d"
 msgstr "Ответ %d"
-

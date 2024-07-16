@@ -1,4 +1,3 @@
-#: model.py:41
+#: model.py:40
 msgid "Raster style"
 msgstr "Растровый стиль"
-

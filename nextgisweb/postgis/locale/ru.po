@@ -1,12 +1,12 @@
-#: api.py:74
+#: api.py:83
 msgid "Table (%s) not found in schema (%s)."
 msgstr "Таблица (%s) не найдена в схеме (%s)."
 
-#: api.py:139
+#: api.py:148
 msgid "PostGIS layer {} not found!"
 msgstr "Слой PostGIS {} не найден!"
 
-#: api.py:163
+#: api.py:172
 msgid "PostGIS connection {} not found!"
 msgstr "Соединение PostGIS {} не найдено!"
 
@@ -190,83 +190,83 @@ msgstr "Колонка поля '{}' найдена, тип {}."
 msgid "External database error"
 msgstr "Ошибка внешней базы данных"
 
-#: model.py:68 nodepkg/layer-widget/LayerWidget.tsx:92
+#: model.py:73 nodepkg/layer-widget/LayerWidget.tsx:92
 msgid "Point"
 msgstr "Точка"
 
-#: model.py:69 nodepkg/layer-widget/LayerWidget.tsx:93
+#: model.py:74 nodepkg/layer-widget/LayerWidget.tsx:93
 msgid "Line"
 msgstr "Линия"
 
-#: model.py:70 nodepkg/layer-widget/LayerWidget.tsx:94
+#: model.py:75 nodepkg/layer-widget/LayerWidget.tsx:94
 msgid "Polygon"
 msgstr "Полигон"
 
-#: model.py:71 nodepkg/layer-widget/LayerWidget.tsx:95
+#: model.py:76 nodepkg/layer-widget/LayerWidget.tsx:95
 msgid "Multipoint"
 msgstr "Мультиточка"
 
-#: model.py:72 nodepkg/layer-widget/LayerWidget.tsx:96
+#: model.py:77 nodepkg/layer-widget/LayerWidget.tsx:96
 msgid "Multiline"
 msgstr "Мультилиния"
 
-#: model.py:73 nodepkg/layer-widget/LayerWidget.tsx:97
+#: model.py:78 nodepkg/layer-widget/LayerWidget.tsx:97
 msgid "Multipolygon"
 msgstr "Мультиполигон"
 
-#: model.py:74 nodepkg/layer-widget/LayerWidget.tsx:98
+#: model.py:79 nodepkg/layer-widget/LayerWidget.tsx:98
 msgid "Point Z"
 msgstr "Точка Z"
 
-#: model.py:75 nodepkg/layer-widget/LayerWidget.tsx:99
+#: model.py:80 nodepkg/layer-widget/LayerWidget.tsx:99
 msgid "Line Z"
 msgstr "Линия Z"
 
-#: model.py:76 nodepkg/layer-widget/LayerWidget.tsx:100
+#: model.py:81 nodepkg/layer-widget/LayerWidget.tsx:100
 msgid "Polygon Z"
 msgstr "Полигон Z"
 
-#: model.py:77 nodepkg/layer-widget/LayerWidget.tsx:101
+#: model.py:82 nodepkg/layer-widget/LayerWidget.tsx:101
 msgid "Multipoint Z"
 msgstr "Мультиточка Z"
 
-#: model.py:78 nodepkg/layer-widget/LayerWidget.tsx:102
+#: model.py:83 nodepkg/layer-widget/LayerWidget.tsx:102
 msgid "Multiline Z"
 msgstr "Мультилиния Z"
 
-#: model.py:79 nodepkg/layer-widget/LayerWidget.tsx:103
+#: model.py:84 nodepkg/layer-widget/LayerWidget.tsx:103
 msgid "Multipolygon Z"
 msgstr "Мультиполигон Z"
 
-#: model.py:120 nodepkg/connection-widget/ConnectionWidget.tsx:58
+#: model.py:121 nodepkg/connection-widget/ConnectionWidget.tsx:58
 msgid "PostGIS connection"
 msgstr "Соединение PostGIS"
 
-#: model.py:201
+#: model.py:202
 msgid "Cannot connect to the database!"
 msgstr "Невозможно подключиться к базе данных!"
 
-#: model.py:235 nodepkg/layer-widget/LayerWidget.tsx:244
+#: model.py:236 nodepkg/layer-widget/LayerWidget.tsx:247
 msgid "PostGIS layer"
 msgstr "Слой PostGIS"
 
-#: model.py:289
+#: model.py:290
 msgid "Table '%(table)s' not found!"
 msgstr "Таблица '%(table)s' не найдена!"
 
-#: model.py:306
+#: model.py:307
 msgid "SRID missing in geometry_columns table! You should specify it manually."
 msgstr "SRID отсутствует в таблице geometry_columns! Необходимо указать SRID вручную."
 
-#: model.py:312
+#: model.py:313
 msgid "0 is an invalid SRID."
 msgstr "SRID не может быть равен 0."
 
-#: model.py:320
+#: model.py:321
 msgid "SRID in geometry_columns table does not match specified!"
 msgstr "SRID в таблице geometry_columns не соответствует указанному!"
 
-#: model.py:330
+#: model.py:331
 msgid ""
 "Geometry type missing in geometry_columns table! You should specify it "
 "manually."
@@ -274,21 +274,21 @@ msgstr ""
 "Тип геометрии отсутствует в таблице geometry_columns! Необходимо указать тип "
 "геометрии вручную."
 
-#: model.py:344
+#: model.py:345
 msgid "Geometry type in geometry_columns table does not match specified!"
 msgstr "Тип геометрии в таблице geometry_columns не соответствует указанному!"
 
-#: model.py:357
+#: model.py:358
 msgid "To use column as ID it should have integer type!"
 msgstr ""
 "Для использования поля в качестве идентификатора оно должно иметь "
 "целочисленный тип!"
 
-#: model.py:400 model.py:405
+#: model.py:401 model.py:406
 msgid "Column '%(column)s' not found!"
 msgstr "Поле '%(column)s' не найдено!"
 
-#: model.py:410 nodepkg/layer-widget/LayerWidget.tsx:34
+#: model.py:411 nodepkg/layer-widget/LayerWidget.tsx:34
 msgid "Geometry type"
 msgstr "Тип геометрии"
 

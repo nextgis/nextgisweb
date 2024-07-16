@@ -1,4 +1,3 @@
-#: model.py:11
+#: model.py:10
 msgid "Spatial reference system"
 msgstr "Система координат"
-

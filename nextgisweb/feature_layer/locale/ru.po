@@ -63,6 +63,10 @@ msgstr "Объект не удален"
 msgid "Unable to restore the #{} feature as it is not deleted."
 msgstr "Невозможно восстановить объект #{} поскольку он не удален."
 
+#: favorite.py:5 nodepkg/fields-widget/FieldsWidget.tsx:27 view.py:56
+msgid "Feature table"
+msgstr "Таблица объектов"
+
 #: model.py:163
 msgid "Field not found (ID=%d)."
 msgstr "Поле не найдено (ID=%d)."
@@ -247,10 +251,6 @@ msgstr "Тип"
 msgid "Lookup table"
 msgstr "Справочник"
 
-#: nodepkg/fields-widget/FieldsWidget.tsx:27 view.py:56
-msgid "Feature table"
-msgstr "Таблица объектов"
-
 #: nodepkg/fields-widget/FieldsWidget.tsx:28
 msgid "Text search"
 msgstr "Текстовый поиск"
@@ -425,4 +425,3 @@ msgstr ""
 #: view.py:200
 msgid "Features"
 msgstr "Объекты"
-

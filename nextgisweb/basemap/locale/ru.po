@@ -22,23 +22,22 @@ msgstr "Текст для копирайта"
 msgid "Copyright URL"
 msgstr "Ссылка на копирайт"
 
-#: nodepkg/webmap-widget/WebMapWidget.tsx:56
+#: nodepkg/webmap-widget/WebMapWidget.tsx:54
 msgid "Display name"
 msgstr "Наименование"
 
-#: nodepkg/webmap-widget/WebMapWidget.tsx:63
+#: nodepkg/webmap-widget/WebMapWidget.tsx:61
 msgid "Default basemap"
 msgstr "Подложка по умолчанию"
 
-#: nodepkg/webmap-widget/WebMapWidget.tsx:66
+#: nodepkg/webmap-widget/WebMapWidget.tsx:64
 msgid "Opacity"
 msgstr "Непрозрачность"
 
-#: nodepkg/webmap-widget/WebMapWidget.tsx:71
+#: nodepkg/webmap-widget/WebMapWidget.tsx:69
 msgid "Resource"
 msgstr "Ресурс"
 
-#: nodepkg/webmap-widget/WebMapWidget.tsx:127
+#: nodepkg/webmap-widget/WebMapWidget.tsx:125
 msgid "Basemaps"
 msgstr "Подложки"
-

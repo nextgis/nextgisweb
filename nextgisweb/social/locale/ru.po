@@ -1,8 +1,8 @@
-#: nodepkg/editor-widget/EditorWidget.js:12
+#: nodepkg/editor-widget/EditorWidget.tsx:20
 msgid "Select a preview image"
 msgstr "Выберите изображение для предпросмотра"
 
-#: nodepkg/editor-widget/EditorWidget.js:13
+#: nodepkg/editor-widget/EditorWidget.tsx:21
 msgid ""
 "The image will be converted to PNG format and downscaled to 1600x630 pixels "
 "if it's bigger."
@@ -10,11 +10,10 @@ msgstr ""
 "Изображение будет сконвертировано в формат PNG и уменьшен размер до 1600x630"
 "  пикселей, если оно больше."
 
-#: nodepkg/editor-widget/EditorWidget.js:31
+#: nodepkg/editor-widget/EditorWidget.tsx:58
 msgid "Preview description"
 msgstr "Описание для предпросмотра"
 
-#: nodepkg/editor-widget/EditorWidget.js:38
+#: nodepkg/editor-widget/EditorWidget.tsx:65
 msgid "Social"
 msgstr "Соцсети"
-

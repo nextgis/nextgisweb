@@ -1,40 +1,39 @@
-#: model.py:23 nodepkg/resource-widget/Widget.js:83 view.py:18 view.py:30
+#: model.py:26 nodepkg/resource-widget/Widget.tsx:93 view.py:22 view.py:30
 msgid "SVG marker library"
 msgstr "Библиотека маркеров SVG"
 
-#: model.py:91
+#: model.py:87
 msgid "File '{}' has an insecure name."
 msgstr "Небезопасное имя файла: '{}'."
 
-#: model.py:96 nodepkg/resource-widget/Store.js:60
+#: model.py:92 nodepkg/resource-widget/Store.ts:75
 msgid "File '{}' has an invalid extension."
 msgstr "Некорректное расширение у файла '{}'."
 
-#: model.py:102
+#: model.py:98
 msgid "File '{}' has a format different from SVG."
 msgstr "Формат файла '{}' отличается от SVG."
 
-#: nodepkg/resource-widget/Store.js:77
+#: nodepkg/resource-widget/Store.ts:92
 msgid "ZIP archive required"
 msgstr "Требуется ZIP-архив"
 
-#: nodepkg/resource-widget/Widget.js:37
+#: nodepkg/resource-widget/Widget.tsx:45
 msgid "Add SVG files"
 msgstr "Добавить SVG-файлы"
 
-#: nodepkg/resource-widget/Widget.js:46
+#: nodepkg/resource-widget/Widget.tsx:54
 msgid "Import from ZIP archive"
 msgstr "Импортировать из ZIP-архива"
 
-#: nodepkg/resource-widget/Widget.js:57
+#: nodepkg/resource-widget/Widget.tsx:65
 msgid "SVG markers will be imported from:"
 msgstr "SVG маркеры будут импортированы из:"
 
-#: template/resource_section.mako:5
+#: template/resource_section.mako:8
 msgid "Name"
 msgstr "Имя"
 
-#: view.py:22
+#: view.py:26
 msgid "Export"
 msgstr "Экспорт"
-

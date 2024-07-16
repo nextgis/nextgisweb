@@ -1,7 +1,7 @@
 #: amd/ngw-feature-attachment/DisplayWidget.js:9
 #: nodepkg/attachment-bundle/ol-control/control.js:14
 #: nodepkg/attachment-bundle/ol-control/control.js:30
-#: nodepkg/attachment-bundle/plugin/plugin.ts:14
+#: nodepkg/attachment-bundle/plugin/plugin.ts:15
 #: nodepkg/attachment-editor/index.ts:8
 msgid "Attachments"
 msgstr "Вложения"
@@ -46,22 +46,22 @@ msgstr "Нет вложений"
 msgid "Download all attachments"
 msgstr "Скачать все вложения"
 
-#: nodepkg/attachment-editor/AttachmentEditor.tsx:167
+#: nodepkg/attachment-editor/AttachmentEditor.tsx:166
 #: nodepkg/attachment-table/AttachmentTable.tsx:45
 msgid "File name"
 msgstr "Имя файла"
 
-#: nodepkg/attachment-editor/AttachmentEditor.tsx:173
+#: nodepkg/attachment-editor/AttachmentEditor.tsx:172
 #: nodepkg/attachment-table/AttachmentTable.tsx:63
 msgid "Size"
 msgstr "Размер"
 
-#: nodepkg/attachment-editor/AttachmentEditor.tsx:179
+#: nodepkg/attachment-editor/AttachmentEditor.tsx:178
 #: nodepkg/attachment-table/AttachmentTable.tsx:78
 msgid "Description"
 msgstr "Описание"
 
-#: nodepkg/attachment-form/AttachmentForm.js:49
+#: nodepkg/attachment-form/AttachmentForm.tsx:56
 msgid ""
 "Use export to copy feature attachments between different layers or to create "
 "a backup. The resulting ZIP archive will contain all of the attachments put "
@@ -73,27 +73,27 @@ msgstr ""
 " директориях с именами объектов. Метаданные вложений сохраняются в отдельном "
 "JSON-файле."
 
-#: nodepkg/attachment-form/AttachmentForm.js:59
+#: nodepkg/attachment-form/AttachmentForm.tsx:66
 msgid "Export attachments to ZIP archive"
 msgstr "Экспортировать вложения в ZIP-архив"
 
-#: nodepkg/attachment-form/AttachmentForm.js:74
+#: nodepkg/attachment-form/AttachmentForm.tsx:84
 msgid "Back to resource"
 msgstr "Назад к ресурсу"
 
-#: nodepkg/attachment-form/AttachmentForm.js:76
+#: nodepkg/attachment-form/AttachmentForm.tsx:86
 msgid "Close"
 msgstr "Закрыть"
 
-#: nodepkg/attachment-form/AttachmentForm.js:79
+#: nodepkg/attachment-form/AttachmentForm.tsx:89
 msgid "The archive has been successfully imported."
 msgstr "Импорт архива выполнен успешно."
 
-#: nodepkg/attachment-form/AttachmentForm.js:81
+#: nodepkg/attachment-form/AttachmentForm.tsx:91
 msgid "Attachments imported - {i}, skipped - {s}."
 msgstr "Импортировано вложений - {i}, пропущено - {s}."
 
-#: nodepkg/attachment-form/AttachmentForm.js:115
+#: nodepkg/attachment-form/AttachmentForm.tsx:125
 msgid ""
 "Upload a ZIP archive to batch append attachments to existing features. An "
 "archive must contain directories named after feature IDs. Each folder can "
@@ -104,19 +104,19 @@ msgstr ""
 "объектов. Каждая директория может содержать одно или несколько вложений. "
 "Дубликаты будут пропущены."
 
-#: nodepkg/attachment-form/AttachmentForm.js:124
+#: nodepkg/attachment-form/AttachmentForm.tsx:134
 msgid "Delete existing attachments"
 msgstr "Удалить существующие вложения"
 
-#: nodepkg/attachment-form/AttachmentForm.js:145
+#: nodepkg/attachment-form/AttachmentForm.tsx:159
 msgid "Import attachments from ZIP archive"
 msgstr "Импортировать вложения из ZIP-архива."
 
-#: nodepkg/attachment-form/AttachmentForm.js:157
+#: nodepkg/attachment-form/AttachmentForm.tsx:171
 msgid "Export"
 msgstr "Экспорт"
 
-#: nodepkg/attachment-form/AttachmentForm.js:162
+#: nodepkg/attachment-form/AttachmentForm.tsx:176
 msgid "Import"
 msgstr "Импорт"
 
@@ -136,31 +136,34 @@ msgstr "Некорректный ZIP-архив."
 msgid "File '{}' isn't found in metadata."
 msgstr "Файл '{}' не найден в метаданных."
 
-#: util.py:60
-msgid "Invalid name for file '{}'."
-msgstr "Некорректное имя для файла '{}'."
-
-#: util.py:66
+#: util.py:61
 msgid "Invalid feature ID for file '{}'."
 msgstr "Некорректный идентификатор объекта для файла '{}'."
 
-#: util.py:73
+#: util.py:68
+msgid "Invalid keyname for file '{}'."
+msgstr "Некорректный ключ для файла '{}'."
+
+#: util.py:74
+msgid "Invalid name for file '{}'."
+msgstr "Некорректное имя для файла '{}'."
+
+#: util.py:80
 msgid "Invalid MIME type for file '{}'."
 msgstr "Некорректный MIME-тип для файла '{}'."
 
-#: util.py:80
+#: util.py:87
 msgid "Invalid description for file '{}'."
 msgstr "Некорректное описание для файла '{}'."
 
-#: util.py:93
+#: util.py:100
 msgid "Could not determine feature ID for file '{}'."
 msgstr "Не удалось определить идентификатор объекта для файла '{}'."
 
-#: util.py:110
+#: util.py:118
 msgid "File '{}' isn't found in the archive."
 msgstr "Файл '{}' не найден в архиве."
 
 #: view.py:20 view.py:43
 msgid "Manage attachments"
 msgstr "Управление вложениями"
-

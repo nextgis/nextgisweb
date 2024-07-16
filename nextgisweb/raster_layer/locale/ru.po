@@ -1,22 +1,20 @@
-#: api.py:47
+#: api.py:46
 msgid "Output format is not provided."
 msgstr "Выходной формат не указан."
 
-#: api.py:50
-#, python-format
+#: api.py:49
 msgid "Format '%s' is not supported."
 msgstr "Формат '%s' не поддерживается."
 
-#: api.py:101
+#: api.py:94
 msgid "Requested raster is not COG."
 msgstr "Запрошенный растр не является COG"
 
-#: api.py:105
+#: api.py:106
 msgid "Range header is missed or invalid."
 msgstr "Заголовок 'Range' пропущен или некорректен."
 
-#: api.py:109
-#, python-format
+#: api.py:110
 msgid "Range %s can not be read."
 msgstr "Диапазон %s не может быть прочитан."
 
@@ -24,16 +22,15 @@ msgstr "Диапазон %s не может быть прочитан."
 msgid "Rasters and pyramids"
 msgstr "Растры и пирамиды"
 
-#: model.py:56 nodepkg/editor-widget/EditorWidget.js:45 view.py:56
+#: model.py:69 nodepkg/editor-widget/EditorWidget.tsx:47 view.py:58
 msgid "Raster layer"
 msgstr "Растровый слой"
 
-#: model.py:77
+#: model.py:101
 msgid "GDAL library was unable to open the file."
 msgstr "Библиотеке GDAL не удалось открыть файл."
 
-#: model.py:85
-#, python-format
+#: model.py:109
 msgid ""
 "Raster has format '%(format)s', however only following formats are supported:"
 " %(all_formats)s."
@@ -41,19 +38,19 @@ msgstr ""
 "Формат загруженного растра '%(format)s', однако поддерживаются только "
 "следующие типы: %(all_formats)s."
 
-#: model.py:90
+#: model.py:116
 msgid "Raster files without projection info are not supported."
 msgstr "Растровые файлы без информации о проекции не поддерживаются."
 
-#: model.py:109
+#: model.py:135
 msgid "Mixed band data types are not supported."
 msgstr "Смешанные типы каналов не поддерживаются."
 
-#: model.py:136
+#: model.py:163
 msgid "GDAL was uanble to parse the raster coordinate system."
 msgstr "GDAL не смог обработать определение системы координат растра."
 
-#: model.py:140
+#: model.py:167
 msgid ""
 "The source raster has a local coordinate system and can't be reprojected to "
 "the target coordinate system."
@@ -61,17 +58,15 @@ msgstr ""
 "Исходный растр имеет локальную систему координат и не может быть "
 "перепроецирован в целевую."
 
-#: model.py:156
+#: model.py:184
 msgid "Failed to reproject the raster to the target coordinate system."
 msgstr "Не удалось перепроецировать растр в целевую систему координат."
 
-#: model.py:159
-#, python-format
+#: model.py:187
 msgid "GDAL error message: %s"
 msgstr "Сообщение об ошибке GDAL: %s"
 
-#: model.py:172
-#, python-format
+#: model.py:203
 msgid ""
 "The uncompressed raster size (%(size)s) exceeds the limit (%(limit)s) by "
 "%(delta)s. Reduce raster size to fit the limit."
@@ -79,15 +74,47 @@ msgstr ""
 "Размер несжатого растра (%(size)s) превышает лимит (%(limit)s) на %(delta)s. "
 "Уменьшите растр, чтобы он вписывался в лимит."
 
-#: model.py:259
+#: model.py:315
 msgid "Data type"
 msgstr "Тип данных"
 
-#: model.py:260
+#: model.py:316
 msgid "COG"
 msgstr "COG"
 
-#: view.py:25 view.py:60
+#: nodepkg/editor-widget/EditorWidget.tsx:16
+msgid "Select a dataset"
+msgstr "Выберите растровый слой"
+
+#: nodepkg/editor-widget/EditorWidget.tsx:17
+msgid "Dataset should be in GeoTIFF format."
+msgstr "Файл должен быть в формате GeoTIFF."
+
+#: nodepkg/editor-widget/EditorWidget.tsx:39
+msgid "Cloud Optimized GeoTIFF (COG)"
+msgstr "Cloud Optimized GeoTIFF (COG)"
+
+#: nodepkg/export-form/ExportForm.tsx:55
+msgid "Band"
+msgstr "Канал"
+
+#: nodepkg/export-form/ExportForm.tsx:79
+msgid "Format"
+msgstr "Формат"
+
+#: nodepkg/export-form/ExportForm.tsx:91
+msgid "SRS"
+msgstr "Система координат"
+
+#: nodepkg/export-form/ExportForm.tsx:96
+msgid "Bands"
+msgstr "Каналы"
+
+#: nodepkg/export-form/ExportForm.tsx:129
+msgid "Save"
+msgstr "Сохранить"
+
+#: view.py:25 view.py:63
 msgid "Save as"
 msgstr "Сохранить как"
 
@@ -108,39 +135,6 @@ msgstr ""
 "обращаться в HTTP запросах только к нужным частям растра, без необходимости "
 "загружать его в клиентское приложение целиком."
 
-#: view.py:66
+#: view.py:69
 msgid "Download"
 msgstr "Скачать"
-
-#: nodepkg/editor-widget/EditorWidget.js:12
-msgid "Select a dataset"
-msgstr "Выберите растровый слой"
-
-#: nodepkg/editor-widget/EditorWidget.js:13
-msgid "Dataset should be in GeoTIFF format."
-msgstr "Файл должен быть в формате GeoTIFF."
-
-#: nodepkg/editor-widget/EditorWidget.js:38
-msgid "Cloud Optimized GeoTIFF (COG)"
-msgstr "Cloud Optimized GeoTIFF (COG)"
-
-#: nodepkg/export-form/ExportForm.js:25
-msgid "Band"
-msgstr "Канал"
-
-#: nodepkg/export-form/ExportForm.js:69
-msgid "Format"
-msgstr "Формат"
-
-#: nodepkg/export-form/ExportForm.js:78
-msgid "SRS"
-msgstr "Система координат"
-
-#: nodepkg/export-form/ExportForm.js:84
-msgid "Bands"
-msgstr "Каналы"
-
-#: nodepkg/export-form/ExportForm.js:119
-msgid "Save"
-msgstr "Сохранить"
-

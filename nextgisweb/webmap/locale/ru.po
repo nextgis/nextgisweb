@@ -70,7 +70,7 @@ msgid "Your location could not be determined"
 msgstr "Определить местоположение не удалось"
 
 #: amd/ngw-webmap/form/LegendSymbolsSelect.js:7
-#: nodepkg/panel/print/PrintPanel.tsx:478
+#: nodepkg/panel/print/PrintPanel.tsx:481
 #: nodepkg/settings-widget/SettingsWidget.tsx:22
 #: nodepkg/settings/SettingsForm.js:277
 msgid "Legend"
@@ -334,15 +334,15 @@ msgstr "Не сохранять"
 msgid "Main web map"
 msgstr "Основная веб-карта"
 
-#: favorite.py:9 view.py:325
+#: favorite.py:5 view.py:326
 msgid "Display"
 msgstr "Открыть"
 
-#: favorite.py:15
+#: favorite.py:10
 msgid "Fragment"
 msgstr "Фрагмент"
 
-#: model.py:39 model.py:57 view.py:320 view.py:347
+#: model.py:39 model.py:57 view.py:321 view.py:348
 msgid "Web map"
 msgstr "Веб-карта"
 
@@ -361,7 +361,7 @@ msgctxt "permission"
 msgid "Manage annotations"
 msgstr "Управление аннотациями"
 
-#: nodepkg/clone-webmap/CloneWebmap.tsx:21 view.py:335
+#: nodepkg/clone-webmap/CloneWebmap.tsx:21 view.py:336
 msgid "Clone"
 msgstr "Клонировать"
 
@@ -545,55 +545,55 @@ msgstr "Сохранить как"
 msgid "Custom scale"
 msgstr "Произвольный масштаб"
 
-#: nodepkg/panel/print/PrintPanel.tsx:415
+#: nodepkg/panel/print/PrintPanel.tsx:419
 msgid "Paper format"
 msgstr "Формат бумаги"
 
-#: nodepkg/panel/print/PrintPanel.tsx:425
+#: nodepkg/panel/print/PrintPanel.tsx:429
 msgid "Height, mm"
 msgstr "Высота, мм"
 
-#: nodepkg/panel/print/PrintPanel.tsx:441
+#: nodepkg/panel/print/PrintPanel.tsx:445
 msgid "Width, mm"
 msgstr "Ширина, мм"
 
-#: nodepkg/panel/print/PrintPanel.tsx:457
+#: nodepkg/panel/print/PrintPanel.tsx:461
 msgid "Margin, mm"
 msgstr "Отступ, мм"
 
-#: nodepkg/panel/print/PrintPanel.tsx:472
+#: nodepkg/panel/print/PrintPanel.tsx:475
 msgid "Elements"
 msgstr "Элементы"
 
-#: nodepkg/panel/print/PrintPanel.tsx:491
+#: nodepkg/panel/print/PrintPanel.tsx:494
 msgid "Number of legend columns"
 msgstr "Количество столбцов легенды"
 
-#: nodepkg/panel/print/PrintPanel.tsx:500
+#: nodepkg/panel/print/PrintPanel.tsx:503
 msgid "Title"
 msgstr "Заголовок"
 
-#: nodepkg/panel/print/PrintPanel.tsx:503
+#: nodepkg/panel/print/PrintPanel.tsx:506
 msgid "Map title text"
 msgstr "Текст заголовка карты"
 
-#: nodepkg/panel/print/PrintPanel.tsx:521
+#: nodepkg/panel/print/PrintPanel.tsx:524
 msgid "North Arrow"
 msgstr "Указатель севера"
 
-#: nodepkg/panel/print/PrintPanel.tsx:527 nodepkg/panel/print/PrintPanel.tsx:548
+#: nodepkg/panel/print/PrintPanel.tsx:530 nodepkg/panel/print/PrintPanel.tsx:551
 msgid "Scale"
 msgstr "Масштаб"
 
-#: nodepkg/panel/print/PrintPanel.tsx:534
+#: nodepkg/panel/print/PrintPanel.tsx:537
 msgid "Scale value"
 msgstr "Значение масштаба"
 
-#: nodepkg/panel/print/PrintPanel.tsx:543
+#: nodepkg/panel/print/PrintPanel.tsx:546
 msgid "Scale bar"
 msgstr "Масштабная линейка"
 
-#: nodepkg/panel/print/PrintPanel.tsx:569
+#: nodepkg/panel/print/PrintPanel.tsx:572
 msgid "Copy link to the print map"
 msgstr "Скопировать ссылку на карту для печати"
 
@@ -1008,10 +1008,10 @@ msgstr ""
 msgid "Web map settings"
 msgstr "Настройки веб-карты"
 
-#: view.py:261
+#: view.py:262
 msgid "Clone web map"
 msgstr "Клонировать веб-карту"
 
-#: view.py:274
+#: view.py:275
 msgid "Embedded webmap preview"
 msgstr "Просмотр встроенной веб-карты"

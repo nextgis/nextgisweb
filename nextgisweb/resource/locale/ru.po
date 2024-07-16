@@ -463,7 +463,7 @@ msgstr "Только этого ресурса"
 msgid "All permissions"
 msgstr "Все права"
 
-#: nodepkg/permissions-widget/PermissionsWidget.tsx:220
+#: nodepkg/permissions-widget/PermissionsWidget.tsx:229
 msgid "Permissions"
 msgstr "Права доступа"
 
@@ -579,4 +579,3 @@ msgstr "Дополнительно"
 #: view.py:402
 msgid "Update"
 msgstr "Изменить"
-

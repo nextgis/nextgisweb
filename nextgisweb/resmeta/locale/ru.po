@@ -1,16 +1,16 @@
-#: model.py:51 nodepkg/editor/EditorWidget.tsx:98
+#: model.py:60 nodepkg/editor/EditorWidget.tsx:98
 msgid "String"
 msgstr "Строка"
 
-#: model.py:52 nodepkg/editor/EditorWidget.tsx:99
+#: model.py:61 nodepkg/editor/EditorWidget.tsx:99
 msgid "Number"
 msgstr "Число"
 
-#: model.py:53 nodepkg/editor/EditorWidget.tsx:100
+#: model.py:62 nodepkg/editor/EditorWidget.tsx:100
 msgid "Boolean"
 msgstr "Логический"
 
-#: model.py:54 nodepkg/editor/EditorWidget.tsx:101
+#: model.py:63 nodepkg/editor/EditorWidget.tsx:101
 msgid "Empty"
 msgstr "Пусто"
 
