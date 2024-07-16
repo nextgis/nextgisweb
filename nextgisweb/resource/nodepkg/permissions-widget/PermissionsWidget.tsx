@@ -6,8 +6,8 @@ import { Select, Space } from "@nextgisweb/gui/antd";
 import type { SelectProps } from "@nextgisweb/gui/antd";
 import { EdiTable } from "@nextgisweb/gui/edi-table";
 import { AddIcon } from "@nextgisweb/gui/icon";
-import blueprint from "@nextgisweb/pyramid/api/load!/api/component/resource/blueprint";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import { resources, scopes } from "@nextgisweb/resource/blueprint";
 
 import { AllowIcon, DenyIcon, ResourceIcon } from "../icon";
 import type { EditorWidgetComponent, EditorWidgetProps } from "../type";
@@ -84,6 +84,8 @@ const Action = observer(({ row }: { row: Item }) => {
     );
 });
 
+Action.displayName = "Action";
+
 const Principal = observer(({ row }: { row: Item }) => {
     const { value, onChange } = bindProp(row, "principal");
 
@@ -98,6 +100,8 @@ const Principal = observer(({ row }: { row: Item }) => {
     );
 });
 
+Principal.displayName = "Principal";
+
 const Apply = observer(({ row }: { row: Item }) => {
     const options = useMemo(() => {
         const result = [
@@ -109,7 +113,7 @@ const Apply = observer(({ row }: { row: Item }) => {
             </Option>,
         ];
 
-        for (const { identity, label } of Object.values(blueprint.resources)) {
+        for (const { identity, label } of Object.values(resources)) {
             if (identity === "resource") continue;
             result.push(
                 <Option key={identity} value={identity}>
@@ -144,6 +148,8 @@ const Apply = observer(({ row }: { row: Item }) => {
     );
 });
 
+Apply.displayName = "Apply";
+
 const Permission = observer(({ row }: { row: Item }) => {
     const options = useMemo(() => {
         const result = [
@@ -152,10 +158,10 @@ const Permission = observer(({ row }: { row: Item }) => {
             </Option>,
         ];
 
-        const scopes = [...row.scopes];
+        const rowScopes = [...row.scopes];
 
-        for (const [sid, scope] of Object.entries(blueprint.scopes)) {
-            if (!scopes.includes(sid)) continue;
+        for (const [sid, scope] of Object.entries(scopes)) {
+            if (!rowScopes.includes(sid)) continue;
             const scopeOptions = [];
 
             const label = scope.label + ": " + msgAllPermissions;
@@ -203,6 +209,8 @@ const Permission = observer(({ row }: { row: Item }) => {
     );
 });
 
+Permission.displayName = "Permission";
+
 // prettier-ignore
 const columns = [
     { key: "action", title: msgColAction, shrink: true, component: Action },
@@ -217,5 +225,6 @@ export const PermissionsWidget: EditorWidgetComponent<
     return <EdiTable store={store} columns={columns} parentHeight />;
 });
 
+PermissionsWidget.displayName = "PermissionsWidget";
 PermissionsWidget.title = gettext("Permissions");
 PermissionsWidget.order = 50;

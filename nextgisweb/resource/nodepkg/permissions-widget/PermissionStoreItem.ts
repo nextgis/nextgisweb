@@ -1,7 +1,7 @@
 import { makeAutoObservable, toJS } from "mobx";
 
-import blueprint from "@nextgisweb/pyramid/api/load!/api/component/resource/blueprint";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import { resources, scopes } from "@nextgisweb/resource/blueprint";
 import type {
     ACLRule,
     ACLRuleAction,
@@ -13,8 +13,8 @@ import type { PermissionsStore } from "./PermissionsStore";
 const msgAllRequired = gettext("All fields are required");
 const msgConflict = gettext("Row conflicts with another");
 
-const resourceScopes = (i: ResourceCls) => blueprint.resources[i].scopes;
-const baseClasses = (i: ResourceCls) => blueprint.resources[i].base_classes;
+const resourceScopes = (i: ResourceCls) => resources[i].scopes;
+const baseClasses = (i: ResourceCls) => resources[i].base_classes;
 
 const isSameOrSubclass = (child: ResourceCls, parent: ResourceCls) =>
     child === parent || baseClasses(child).includes(parent);
@@ -76,7 +76,7 @@ export class PermissionStoreItem {
         } else if (this.propagate === false) {
             return resourceScopes(this.store.resourceClass);
         } else if (this.propagate === true) {
-            return Object.keys(blueprint.scopes);
+            return Object.keys(scopes);
         }
         return resourceScopes("resource");
     }
