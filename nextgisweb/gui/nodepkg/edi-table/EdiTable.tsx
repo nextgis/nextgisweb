@@ -32,6 +32,7 @@ function EdiTableComponent<R extends AnyObject = AnyObject>({
     rowActions = DEFAULT_ROW_ACTIONS,
     className,
     size = "small",
+    rowKey,
     ...tableProps
 }: EdiTableProps<EdiTableStore<R>, R>) {
     className = (className ? className + " " : "") + "ngw-gui-edi-table";
@@ -134,6 +135,7 @@ function EdiTableComponent<R extends AnyObject = AnyObject>({
             columns={tableColumns}
             className={className}
             size={size}
+            rowKey={rowKey}
             {...tableProps}
         />
     );

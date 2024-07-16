@@ -1,29 +1,33 @@
-#: amd/ngw-wmsclient/ConnectionWidget.js:34
-#: amd/ngw-wmsclient/template/LayerWidget.hbs:16 model.py:42
+#: amd/ngw-wmsclient/ConnectionWidget.js:42
+#: amd/ngw-wmsclient/template/LayerWidget.hbs:16 model.py:43
 msgid "WMS connection"
 msgstr "Соединение WMS"
 
 #: amd/ngw-wmsclient/LayerVendorParamsWidget.js:44
+#: nodepkg/wmsclient-layer/component/VendorParamsModal.tsx:62
 msgid "Key"
 msgstr "Ключ"
 
 #: amd/ngw-wmsclient/LayerVendorParamsWidget.js:53
+#: nodepkg/wmsclient-layer/component/VendorParamsModal.tsx:68
 msgid "Value"
 msgstr "Значение"
 
-#: amd/ngw-wmsclient/LayerVendorParamsWidget.js:64
+#: amd/ngw-wmsclient/LayerVendorParamsWidget.js:63
+#: nodepkg/wmsclient-layer/WmsClientLayerWidget.tsx:100
+#: nodepkg/wmsclient-layer/component/VendorParamsModal.tsx:110
 msgid "Vendor parameters"
 msgstr "Вендор параметры"
 
-#: amd/ngw-wmsclient/LayerVendorParamsWidget.js:90
+#: amd/ngw-wmsclient/LayerVendorParamsWidget.js:94
 msgid "Add"
 msgstr "Добавить"
 
-#: amd/ngw-wmsclient/LayerVendorParamsWidget.js:96
+#: amd/ngw-wmsclient/LayerVendorParamsWidget.js:102
 msgid "Delete"
 msgstr "Удалить"
 
-#: amd/ngw-wmsclient/LayerWidget.js:45 model.py:185
+#: amd/ngw-wmsclient/LayerWidget.js:52 model.py:208
 msgid "WMS layer"
 msgstr "Слой WMS"
 
@@ -67,17 +71,35 @@ msgstr "Выберите соединение WMS"
 msgid "Coordinate system"
 msgstr "Система координат"
 
-#: amd/ngw-wmsclient/template/LayerWidget.hbs:29 model.py:108
+#: amd/ngw-wmsclient/template/LayerWidget.hbs:29 model.py:138
+#: nodepkg/wmsclient-layer/WmsClientLayerWidget.tsx:79
 msgid "Image format"
 msgstr "Формат изображения"
 
 #: amd/ngw-wmsclient/template/LayerWidget.hbs:35
+#: nodepkg/wmsclient-layer/WmsClientLayerWidget.tsx:89
 msgid "WMS layers"
 msgstr "Слои WMS"
 
-#: model.py:107 view.py:28
+#: model.py:137 view.py:24
 msgid "WMS capabilities"
 msgstr "Возможности WMS"
+
+#: nodepkg/wmsclient-layer/WmsClientLayerWidget.tsx:65
+msgid "WMS Connection"
+msgstr "WMS Соединение"
+
+#: nodepkg/wmsclient-layer/WmsClientLayerWidget.tsx:114
+msgid "Edit vendor parameters"
+msgstr "Изменить вендор параметры"
+
+#: nodepkg/wmsclient-layer/WmsClientLayerWidget.tsx:121
+msgid "WMS Layer"
+msgstr "Слой WMS"
+
+#: nodepkg/wmsclient-layer/component/VendorParamsModal.tsx:20
+msgid "Type to add a new vendor parameter"
+msgstr "Введите новый ключ здесь"
 
 #: template/section_connection.mako:10
 msgid "Layer"
