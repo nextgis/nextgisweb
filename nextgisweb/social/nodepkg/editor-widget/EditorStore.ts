@@ -56,9 +56,15 @@ export class EditorStore implements IEditorStore<Value | null> {
         const result: Value = {
             preview_description: this.description ? this.description : null,
         };
-        if (this.imageUpdated !== undefined) {
+
+        if (this.imageUpdated && this.imageUpdated !== null) {
             result.preview_file_upload = this.imageUpdated;
         }
+
+        if (this.imageExisting === null && this.imageUpdated === null) {
+            result.preview_file_upload = null;
+        }
+
         return toJS(result);
     }
 

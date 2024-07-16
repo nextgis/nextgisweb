@@ -19,6 +19,7 @@ const msgDelete = gettext("Delete");
 
 export function ImageUploader<M extends boolean = boolean>({
     inputProps: inputPropsParam,
+    onClean = () => {},
     file,
     image,
     ...rest
@@ -52,6 +53,7 @@ export function ImageUploader<M extends boolean = boolean>({
     const clean = () => {
         setFileMeta(undefined);
         setBackgroundImage(undefined);
+        onClean();
     };
 
     const readImage = (image_: File | Blob | (File | Blob)[]) => {
