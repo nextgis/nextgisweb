@@ -1,13 +1,8 @@
 from nextgisweb.env import gettext
 
-from nextgisweb.resource.favorite import Field, ResourceFavorite
+from nextgisweb.resource.favorite import Field, ResourceFavorite, from_route
 
-
-class WebMapDisplayFavorite(ResourceFavorite):
-    kind = "display"
-    route = "webmap.display"
-    label = gettext("Display")
-    icon = "webmap-display"
+from_route("webmap.display", gettext("Display"), icon="webmap-display")
 
 
 class WebMapFragmentFavorite(ResourceFavorite):

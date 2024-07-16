@@ -7,6 +7,11 @@ from .ogrdriver import OGR_DRIVER_NAME_2_EXPORT_FORMATS
 
 
 class FeatureLayerComponent(Component):
+    def __init__(self, env, settings):
+        from . import favorite  # noqa: F401
+
+        super().__init__(env, settings)
+
     def initialize(self):
         self.FeatureExtension = FeatureExtension
         self.export_limit = self.options["export.limit"]

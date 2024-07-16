@@ -155,9 +155,13 @@ msgstr "Превышена квота на количество ресурсов
 msgid "Resource type - {}."
 msgstr "Тип ресурса - {}."
 
-#: favorite/__init__.py:10
+#: favorite/__init__.py:6
 msgid "Go to"
 msgstr "Перейти"
+
+#: favorite/__init__.py:7
+msgid "Edit"
+msgstr "Изменить"
 
 #: favorite/view.py:15 nodepkg/favorite/Avatar.tsx:54
 msgid "Favorites"

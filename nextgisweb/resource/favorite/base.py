@@ -1,3 +1,4 @@
+import re
 from typing import ClassVar, Mapping, Type, TypeVar, Union
 
 from msgspec import Struct, defstruct
@@ -58,7 +59,7 @@ class ResourceFavorite(metaclass=ResourceFavoriteMeta):
     icon: ClassVar[str]
 
     def __init_subclass__(cls) -> None:
-        mod = module_from_stack(depth=1)
+        mod = module_from_stack(depth=1, skip=(__name__,))
         cid = pkginfo.component_by_module(mod)
         assert cid is not None
 
@@ -69,3 +70,19 @@ class ResourceFavorite(metaclass=ResourceFavoriteMeta):
     def url(cls, instance, *, request):
         assert cls.route is not None
         return request.route_url(cls.route, id=instance.resource.id)
+
+
+def from_route(route: str, label: TrStr, *, icon: str):
+    class_name = re.sub(r"(?:^|[._])(.)", lambda m: m.group(1).upper(), route) + "Favorite"
+    _, kind = route.split(".", 1)
+
+    type(
+        class_name,
+        (ResourceFavorite,),
+        dict(
+            kind=kind,
+            route=route,
+            label=label,
+            icon=icon,
+        ),
+    )
