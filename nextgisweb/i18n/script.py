@@ -168,10 +168,14 @@ def cmd_update(args):
                 for m in po:
                     m.flags = set()
 
-                # Remove obsolete untranslated strings but keep translated ones.
-                # They might be useful during small changes in message ids.
-                for key in [key for key, msg in po.obsolete.items() if msg.string == ""]:
-                    del po.obsolete[key]
+                # Remove obsolete untranslated messages, but keep translated
+                # ones. If the --no-obsolete flag is set, remove all obsolete
+                # messages.
+
+                no_obsolete = args.no_obsolete
+                for key, msg in list(po.obsolete.items()):
+                    if no_obsolete or msg.string == "":
+                        del po.obsolete[key]
 
                 write_po(po_path, po)
 
@@ -583,6 +587,7 @@ def main(argv=sys.argv):
     pupdate.add_argument("--locale", default=[], action="append")
     pupdate.add_argument("--force", action="store_true", default=False)
     pupdate.add_argument("--extract", action="store_true", default=False)
+    pupdate.add_argument("--no-obsolete", action="store_true", default=False)
     pupdate.set_defaults(func=cmd_update)
 
     pcompile = subparsers.add_parser("compile")
