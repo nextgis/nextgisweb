@@ -19,7 +19,7 @@ const msgDelete = gettext("Delete");
 
 export function ImageUploader<M extends boolean = boolean>({
     inputProps: inputPropsParam,
-    onClean,
+    onClean = () => {},
     file,
     image,
     ...rest
