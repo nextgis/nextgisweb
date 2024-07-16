@@ -1,4 +1,5 @@
 import { action, computed, observable, runInAction } from "mobx";
+import type { InputHTMLAttributes } from "react";
 
 import type { ErrorResult, Validator } from "./type";
 import * as validate from "./validate";
@@ -18,6 +19,7 @@ interface NumberFieldProps {
 interface StringFieldProps {
     maxLength?: number;
     minLength?: number;
+    url?: boolean;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -41,7 +43,7 @@ export type CProps<V, E = ExtraProps> = {
     onChange?: OnChange<V>;
     status?: "error";
     extraProps?: E;
-} & ValidationProps<V>;
+} & Omit<InputHTMLAttributes<V>, "value" | "onChange">;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export class MappedValue<V = any, O = any, P extends string = string> {
@@ -90,11 +92,17 @@ export class MappedValue<V = any, O = any, P extends string = string> {
     }
 
     cprops(): CProps<V> {
+        const { max, maxLength, min, minLength } = this.prop
+            .validationProps as StringFieldProps & NumberFieldProps;
         const cprops: CProps<V> = {
             value: this._value,
             onChange: this.setter,
             status: this.error ? "error" : undefined,
-            ...this.prop.validationProps,
+            // HTML validation props
+            max,
+            min,
+            maxLength,
+            minLength,
         };
         if (this.prop.extraProps) {
             cprops.extraProps = this.prop.extraProps;
@@ -125,15 +133,23 @@ class MappedProperty<V, O, P extends string = string> {
         this.validationProps = validationProps as ValidationProps<V>;
         this.extraProps = extraProps;
 
+        if (validationProps.required) {
+            newValidators.push(validate.required());
+        }
+
         if ("min" in validationProps || "max" in validationProps) {
             const { min, max } = validationProps as NumberFieldProps;
             newValidators.push(validate.number({ min, max }));
         }
 
-        if ("maxLength" in validationProps || "minLength" in validationProps) {
-            const { maxLength, minLength } =
+        if (
+            "maxLength" in validationProps ||
+            "minLength" in validationProps ||
+            "url" in validationProps
+        ) {
+            const { maxLength, minLength, url } =
                 validationProps as StringFieldProps;
-            newValidators.push(validate.string({ maxLength, minLength }));
+            newValidators.push(validate.string({ maxLength, minLength, url }));
         }
 
         if (validators) {
@@ -187,7 +203,9 @@ export function mapper<O, D>(
 
     const $load = (obj: object, source: Partial<D>) => {
         for (const [mv, pn] of iterMV(obj)) {
-            mv.setter(source[pn]);
+            if (pn in source) {
+                mv.setter(source[pn]);
+            }
         }
     };
 
