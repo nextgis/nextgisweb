@@ -4,22 +4,22 @@ Changes
 4.8.0
 -----
 
-- Per-webmap measurement SRS configuration.
-- Exclusive layers groups on webmaps.
-- Extent information in PostGIS layer diagnostics.
-- Switch to nearest neighbor resampling for raster pyramids.
-- Show feature attachment descriptions in the viewer.
-- Support for upper-case placeholders in TMS connections.
 - Customizable print layout including legend.
-- Experimental support for feature versioning.
+- Exclusive layer groups on webmaps.
 - User-defined favorite resource pages.
-- Sentry client-side JavaScript integrations.
-- Most of resource widgets migrated to Antd and React.
-- Cache seeding and invalidation removed, use NextGIS Geoservices.
-- Metadata permision scope and webmap display permission removed.
+- Measurement SRS configuration per-webmap.
+- Experimental support for feature versioning.
 - Better handling of incomplete geometry parts.
+- Show feature attachment descriptions in the viewer.
+- Extent information in PostGIS layer diagnostics.
+- Transparent annotation polygons for better visibility.
+- Switch to nearest neighbor resampling for raster pyramids.
 - Experimental support for NULL geometries.
-- Improved PostGIS connection and layer diagnostic tools.
+- Support for upper-case placeholders in TMS connections.
+- Metadata permission scope and webmap display permission removed.
+- Sentry client-side JavaScript integrations.
+- Cache seeding and invalidation removed, use NextGIS Geoservices instead.
+- Most of resource widgets migrated to Antd and React.
 
 
 4.7.0
