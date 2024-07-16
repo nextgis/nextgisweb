@@ -25,7 +25,7 @@ const msgInvalidURL = gettext("Invalid URL");
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function required<V = any>(): Validator<V> {
     return (value: V) => {
-        if (value === undefined || value === null) {
+        if (value === undefined || value === null || value === "") {
             return [false, gettext(msgRequired)];
         }
         return [true, undefined];
