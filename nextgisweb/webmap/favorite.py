@@ -13,7 +13,7 @@ class WebMapDisplayFavorite(ResourceFavorite):
 class WebMapFragmentFavorite(ResourceFavorite):
     kind = "fragment"
     label = gettext("Fragment")
-    icon = "material-select"
+    icon = "material-crop_free"
 
     query_string: Field[str]
 

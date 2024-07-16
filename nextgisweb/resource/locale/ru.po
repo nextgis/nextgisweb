@@ -156,7 +156,7 @@ msgid "Resource type - {}."
 msgstr "Тип ресурса - {}."
 
 #: favorite/__init__.py:10
-msgid "Show"
+msgid "Go to"
 msgstr "Перейти"
 
 #: favorite/view.py:15 nodepkg/favorite/Avatar.tsx:54
@@ -399,6 +399,14 @@ msgstr "Используйте эти ссылки для подключения
 msgid "Read more"
 msgstr "Подробнее"
 
+#: nodepkg/favorite/FavoritePage.tsx:29
+msgid ""
+"No favorite resources have been added yet. Use the star icon ({}) in the "
+"user's context menu to add items here."
+msgstr ""
+"Избранные ресурсы пока не были добавлены. Используйте значок звездочки ({}) в"
+" контекстном меню пользователя, чтобы добавить сюда элементы."
+
 #: nodepkg/favorite/useFavorites.tsx:33
 msgid "Added to favorites"
 msgstr "Добавлено в избранное"
@@ -567,3 +575,4 @@ msgstr "Дополнительно"
 #: view.py:402
 msgid "Update"
 msgstr "Изменить"
+

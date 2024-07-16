@@ -1,57 +1,98 @@
 .ngw-resource-favorite-page {
-    display: grid;
-    grid-template-columns: auto 3fr minmax(min-content, 1fr);
-    gap: 1em;
-
-    > .icon {
-        grid-column-start: 1;
-        margin-top: 8px;
-
-        > .icon {
-            width: 24px;
-            height: 24px;
-        }
+    .empty {
+        max-width: 40em;
+        font-size: 16px;
     }
 
-    > .resource {
-        display: block;
-        grid-column-start: 2;
-        color: var(--text-base);
-        text-decoration: none;
+    table {
+        border-collapse: collapse;
+        width: 100%;
 
-        &:not(.has-tail) {
-            margin-bottom: 2em;
-        }
+        > tbody:not(.space) > tr {
+            &.click {
+                cursor: pointer;
+            }
 
-        > .path {
-            color: var(--text-secondary);
-            line-height: 16px;
-        }
+            &:not(.path):hover > td {
+                background-color: var(--color-alter);
+            }
 
-        > .dn {
-            font-size: 16px;
-            line-height: 24px;
+            > td {
+                vertical-align: top;
+                border: 1px solid var(--color-border);
+                padding: 0.75rem;
 
-            &:first-child {
-                margin-top: 8px;
+                &:not(&:first-child) {
+                    border-left: none;
+                }
+
+                &:not(&:last-child) {
+                    border-right: none;
+                }
+
+                &.dn > input {
+                    margin-top: -4px;
+                    margin-bottom: -4px;
+                }
+
+                &.type {
+                    width: 25%;
+                    overflow: hidden;
+                    white-space: nowrap;
+                }
+
+                &.action {
+                    width: 0;
+                    overflow: hidden;
+                    white-space: nowrap;
+
+                    div {
+                        display: flex;
+                        flex-direction: row;
+                        justify-content: flex-end;
+                        gap: 0.5rem;
+
+                        a {
+                            line-height: 1;
+                        }
+
+                        .icon {
+                            width: 1.5rem;
+                            height: 1.5rem;
+                        }
+                    }
+                }
+            }
+
+            &.resource > td,
+            &.item > td {
+                font-size: 16px;
+            }
+
+            &.path {
+                color: var(--text-secondary);
+                > td {
+                    background-color: var(--color-alter);
+                    padding: 0.25rem;
+                }
+            }
+
+            &.resource > td.dn {
+                > div {
+                    display: flex;
+                    gap: 0.75em;
+                    font-size: 16px;
+
+                    & > .icon {
+                        min-width: 1.5rem;
+                        min-height: 1.5rem;
+                    }
+                }
+            }
+
+            &.item > td.dn {
+                padding-left: 3rem;
             }
         }
-    }
-
-    > .first {
-        grid-column-start: 3;
-
-        > .ant-btn {
-            text-align: left;
-        }
-    }
-
-    > .rest {
-        display: inline-flex;
-        grid-column: 2;
-        flex-wrap: wrap;
-        gap: 1em;
-        margin-top: -0.5em;
-        margin-bottom: 2em;
     }
 }

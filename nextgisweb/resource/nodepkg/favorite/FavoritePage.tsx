@@ -1,10 +1,13 @@
 /** @entrypoint */
 import groupBy from "lodash-es/groupBy";
+import partition from "lodash-es/partition";
 import sortBy from "lodash-es/sortBy";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
+import { Balancer } from "react-wrap-balancer";
 
-import { Button, InputValue } from "@nextgisweb/gui/antd";
+import { Button, InputValue, Tooltip } from "@nextgisweb/gui/antd";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
+import { useThemeVariables } from "@nextgisweb/gui/hook";
 import { DeleteIcon, EditIcon, SuccessIcon } from "@nextgisweb/gui/icon";
 import { SvgIcon } from "@nextgisweb/gui/svg-icon";
 import { mergeClasses } from "@nextgisweb/gui/util";
@@ -14,53 +17,57 @@ import {
     useRoute,
     useRouteGet,
 } from "@nextgisweb/pyramid/hook";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 import { PageTitle } from "@nextgisweb/pyramid/layout";
+import { resources } from "@nextgisweb/resource/blueprint";
 import type * as apitype from "@nextgisweb/resource/type/api";
+
+import IconFavoriteOutline from "@nextgisweb/icon/material/star";
 
 import "./FavoritePage.less";
 
+const msgEmpty = gettext(
+    "No favorite resources have been added yet. Use the star icon ({}) " +
+        "in the user's context menu to add items here."
+);
+
 type Schema = Record<string, apitype.ResourceFavoriteSchemaItem>;
 
-type ResourceInfo = { id: number; cls: string; path: string[]; dn: string };
+type ResourceInfo = {
+    id: number;
+    cls: string;
+    path: string[];
+    pstr: string;
+    dn: string;
+};
+
 type Item = Omit<apitype.ResourceFavoriteRead, "resource"> & {
     resource: ResourceInfo;
 };
 
 interface EditorProps {
     id: number;
-    label: string | null;
-    icon: string;
-    schemaItem: apitype.ResourceFavoriteSchemaItem;
-    block: boolean;
-    deleteItem: () => Promise<unknown>;
-    relabelItem: (value: string | null) => Promise<unknown>;
+    value: string | null;
+    placeholder: string;
+    schema: Schema;
+    relabelItem: (id: number, value: string | null) => Promise<unknown>;
 }
 
 function Editor(props: EditorProps) {
-    const [label, setLabel] = useState(props.label || "");
+    const [value, setValue] = useState(props.value || "");
     const [dirty, setDirty] = useState(false);
 
     return (
         <InputValue
-            size="large"
-            value={label || ""}
-            placeholder={props.schemaItem.label}
-            htmlSize={label && label.length > 8 ? label.length : 8}
-            style={props.block ? {} : { width: "auto" }}
-            addonBefore={<SvgIcon icon={props.icon} />}
-            addonAfter={
-                <DeleteIcon
-                    style={{ cursor: "pointer" }}
-                    onClick={() => props.deleteItem()}
-                />
-            }
+            value={value || ""}
+            placeholder={props.placeholder}
             onChange={(value) => {
-                setLabel(value);
+                setValue(value);
                 setDirty(true);
             }}
             onBlur={() => {
                 if (dirty) {
-                    props.relabelItem(label === "" ? null : label);
+                    props.relabelItem(props.id, value === "" ? null : value);
                     setDirty(false);
                 }
             }}
@@ -68,99 +75,32 @@ function Editor(props: EditorProps) {
     );
 }
 
-interface ResourceProps {
-    resource: ResourceInfo;
-    items: Item[];
+interface ItemLinkProps {
+    item: Item;
     schema: Schema;
     editing: boolean;
     deleteItem: (id: number) => Promise<unknown>;
-    relabelItem: (id: number, label: string | null) => Promise<unknown>;
 }
 
-function Resource({
-    resource,
-    items,
-    schema,
-    editing,
-    deleteItem,
-    relabelItem,
-}: ResourceProps) {
-    const [first, rest] = useMemo(() => {
-        const sorted = sortBy(
-            items,
-            (i) => schema[i.identity].route,
-            (i) => i.created
+function ItemLink({ item, schema, editing, deleteItem }: ItemLinkProps) {
+    if (editing) {
+        return (
+            <a onClick={() => deleteItem(item.id)}>
+                <DeleteIcon />
+            </a>
         );
-
-        const firstIdentity = sorted.at(0)?.identity;
-        return sorted.length === 1 ||
-            (firstIdentity && schema[firstIdentity].route)
-            ? [sorted[0], sorted.slice(1)]
-            : [undefined, sorted];
-    }, [items, schema]);
-
-    const Item = useCallback(
-        ({ item, block }: { item: (typeof items)[number]; block: boolean }) => {
-            const schemaItem = schema[item.identity];
-            return editing ? (
-                <Editor
-                    id={item.id}
-                    label={item.label}
-                    icon={schemaItem.icon}
-                    schemaItem={schemaItem}
-                    block={block}
-                    deleteItem={() => deleteItem(item.id)}
-                    relabelItem={(label) => relabelItem(item.id, label)}
-                />
-            ) : (
-                <Button
-                    type="default"
-                    size="large"
-                    href={item.url}
-                    style={block ? { display: "block", width: "100%" } : {}}
-                    icon={
-                        <SvgIcon icon={schemaItem.icon} fill="currentColor" />
-                    }
-                >
-                    {item.label || schemaItem.label}
-                </Button>
-            );
-        },
-        [editing, deleteItem, relabelItem, schema]
-    );
-
-    const path = resource.path;
-
-    return (
-        <>
-            <div className="icon">
-                <SvgIcon icon={`rescls-${resource.cls}`} />
-            </div>
-            <div
-                className={mergeClasses(
-                    "resource",
-                    rest.length > 0 && "has-tail"
-                )}
-            >
-                {path.length > 0 && (
-                    <div className="path">{path.join(" > ")}</div>
-                )}
-                <div className="dn">{resource.dn}</div>
-            </div>
-            {first && (
-                <div className="first">
-                    <Item item={first} block={true} />
-                </div>
-            )}
-            {rest.length > 0 && (
-                <div className="rest">
-                    {rest.map((item) => (
-                        <Item key={item.id} item={item} block={false} />
-                    ))}
-                </div>
-            )}
-        </>
-    );
+    } else {
+        return (
+            <Tooltip title={schema[item.identity].label}>
+                <a href={item.url}>
+                    <SvgIcon
+                        icon={schema[item.identity].icon}
+                        fill="currentColor"
+                    />
+                </a>
+            </Tooltip>
+        );
+    }
 }
 
 export default function FavoritePage() {
@@ -184,14 +124,13 @@ export default function FavoritePage() {
                         p = p.parent ? rm.get(p.parent.id) ?? null : null;
                     }
 
-                    if (path.slice(-1)[0] === res.display_name) path.splice(-1);
-
                     return [
                         res.id,
                         {
                             id: res.id,
                             cls: res.cls,
                             path: path,
+                            pstr: path.join("\0"),
                             dn: res.display_name,
                         },
                     ];
@@ -207,14 +146,55 @@ export default function FavoritePage() {
         })();
     }, [routeCollection]);
 
-    const entries = useMemo(() => {
+    const data = useMemo(() => {
         if (!schema || !items) return undefined;
-        const grp = groupBy(items, (i) => i.resource.id);
-        const vals = Object.values(grp).map((items) => {
-            const resource = items[0].resource;
-            return { resource, items };
-        });
-        return sortBy(vals, ({ resource }) => resource.path.join("\0"));
+        const grpPath = groupBy(items, ({ resource }) => resource.pstr);
+        const sortPath = sortBy(
+            Object.values(grpPath),
+            (items) => items[0].resource.pstr
+        );
+
+        const result = [];
+        for (const items of sortPath) {
+            const path = items[0].resource.path;
+
+            const grpResource = groupBy(items, ({ resource }) => resource.id);
+            const srtResource = sortBy(
+                Object.values(grpResource),
+                (items) => items[0].resource.dn
+            );
+
+            const rows = [];
+            for (const ritem of srtResource) {
+                const res = ritem[0].resource;
+
+                const [aitems, bitems] = partition(
+                    ritem,
+                    ({ identity }) => !!schema[identity].route
+                );
+
+                rows.push({
+                    key: `resource-${res.id}`,
+                    type: "resource",
+                    resource: res,
+                    items: aitems,
+                });
+
+                let idx = 0;
+                for (const item of bitems) {
+                    const label = schema[item.identity].label;
+                    rows.push({
+                        key: `item-${item.id}`,
+                        type: "item",
+                        item: item,
+                        placeholder: label + " " + String(++idx),
+                    });
+                }
+            }
+
+            result.push({ path, rows });
+        }
+        return result;
     }, [items, schema]);
 
     const deleteItem = useCallback(
@@ -242,35 +222,165 @@ export default function FavoritePage() {
         [makeSignal]
     );
 
+    const PathRow = useCallback(({ path }: { path: string[] }) => {
+        return (
+            path.length > 0 && (
+                <tr className="path">
+                    <td colSpan={3}>{path.join(" > ")}</td>
+                </tr>
+            )
+        );
+    }, []);
+
+    const ResourceRow = useCallback(
+        ({ resource, items }: { resource: ResourceInfo; items: Item[] }) => {
+            const onClick =
+                items.length === 1 && !editing
+                    ? () => (window.location.href = items[0].url)
+                    : undefined;
+            return (
+                <tr
+                    className={mergeClasses("resource", onClick && "click")}
+                    onClick={onClick}
+                >
+                    <td className="dn">
+                        <div>
+                            <SvgIcon icon={`rescls-${resource.cls}`} />
+                            {resource.dn}
+                        </div>
+                    </td>
+                    <td className="type">{resources[resource.cls].label}</td>
+                    <td className="action">
+                        <div>
+                            {items.map((item, idx) => (
+                                <ItemLink
+                                    key={idx}
+                                    item={item}
+                                    schema={schema!}
+                                    editing={editing}
+                                    deleteItem={deleteItem}
+                                />
+                            ))}
+                        </div>
+                    </td>
+                </tr>
+            );
+        },
+        [deleteItem, editing, schema]
+    );
+
+    const ItemRow = useCallback(
+        ({ item, placeholder }: { item: Item; placeholder: string }) => (
+            <tr
+                className="item click"
+                onClick={
+                    !editing
+                        ? () => (window.location.href = item.url)
+                        : undefined
+                }
+            >
+                <td className="dn">
+                    {editing ? (
+                        <Editor
+                            id={item.id}
+                            value={item.label}
+                            placeholder={placeholder}
+                            relabelItem={relabelItem}
+                            schema={schema!}
+                        />
+                    ) : (
+                        item.label || placeholder
+                    )}
+                </td>
+                <td className="type">{schema![item.identity].label}</td>
+                <td className="action">
+                    <div>
+                        <ItemLink
+                            item={item}
+                            schema={schema!}
+                            editing={editing}
+                            deleteItem={deleteItem}
+                        />
+                    </div>
+                </td>
+            </tr>
+        ),
+        [relabelItem, deleteItem, editing, schema]
+    );
+
+    const themeVariables = useThemeVariables({
+        "color-alter": "colorFillAlter",
+        "color-border": "colorBorderSecondary",
+        "border-radius": "borderRadius",
+    });
+
+    let body;
+    if (!data || !schema) {
+        body = <LoadingWrapper />;
+    } else if (data.length === 0) {
+        const [pre, post] = msgEmpty.split("{}", 2);
+        body = (
+            <div className="empty">
+                <Balancer>
+                    {pre}
+                    <IconFavoriteOutline />
+                    {post}
+                </Balancer>
+            </div>
+        );
+    } else {
+        body = (
+            <table>
+                {data.map(({ path, rows }, idx) => {
+                    return (
+                        <Fragment key={idx}>
+                            {idx !== 0 && (
+                                <tbody className="space">
+                                    <tr>
+                                        <td colSpan={3}>&nbsp;</td>
+                                    </tr>
+                                </tbody>
+                            )}
+                            <tbody>
+                                <PathRow path={path} />
+                                {rows.map(({ key, type, ...rest }) =>
+                                    type === "resource" ? (
+                                        <ResourceRow
+                                            key={key}
+                                            resource={rest.resource!}
+                                            items={rest.items!}
+                                        />
+                                    ) : (
+                                        <ItemRow
+                                            key={key}
+                                            item={rest.item!}
+                                            placeholder={rest.placeholder!}
+                                        />
+                                    )
+                                )}
+                            </tbody>
+                        </Fragment>
+                    );
+                })}
+            </table>
+        );
+    }
+
     return (
         <>
             <PageTitle>
                 {" "}
-                <Button
-                    type="text"
-                    size="large"
-                    icon={editing ? <SuccessIcon /> : <EditIcon />}
-                    onClick={() => {
-                        setEditing(!editing);
-                    }}
-                />
-            </PageTitle>
-            <div className="ngw-resource-favorite-page">
-                {!entries || !schema ? (
-                    <LoadingWrapper />
-                ) : (
-                    entries.map(({ resource, items }) => (
-                        <Resource
-                            key={resource.id}
-                            resource={resource}
-                            items={items}
-                            schema={schema}
-                            editing={editing}
-                            deleteItem={deleteItem}
-                            relabelItem={relabelItem}
-                        />
-                    ))
+                {items && items.length > 0 && (
+                    <Button
+                        type="text"
+                        size="large"
+                        icon={editing ? <SuccessIcon /> : <EditIcon />}
+                        onClick={() => setEditing(!editing)}
+                    />
                 )}
+            </PageTitle>
+            <div className="ngw-resource-favorite-page" style={themeVariables}>
+                {body}
             </div>
         </>
     );

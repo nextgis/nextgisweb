@@ -50,6 +50,7 @@ def cpost(request, body: ResourceFavoriteCreate) -> ResourceFavoriteRef:
 
     data = to_builtins(body)
     component, kind = data.pop("identity").split(".", maxsplit=1)
+    label = data.pop("label", None)
     del data["resource"]
 
     kwargs = dict(
@@ -57,6 +58,7 @@ def cpost(request, body: ResourceFavoriteCreate) -> ResourceFavoriteRef:
         user_id=request.user.id,
         component=component,
         kind=kind,
+        label=label,
         data=data,
     )
 

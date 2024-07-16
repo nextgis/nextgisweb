@@ -18,6 +18,7 @@ Field = Annotated[T, FM]
 
 class ResourceFavoriteMeta(type):
     identity: str
+    route: Union[str, None]
 
     @property
     def ctype(self) -> Type[Struct]:
@@ -25,15 +26,17 @@ class ResourceFavoriteMeta(type):
             return result
 
         fields = [("resource", ResourceRef)]
+        if self.route is None:
+            fields.append(("label", Union[str, None], None))  # type: ignore
+
         for k, v in ms_utils.get_class_annotations(self).items():
             _, extras = disannotate(v)
-            if FM not in extras:
-                continue
-
-            fields.append((k, v))
+            if FM in extras:
+                fields.append((k, v))
 
         result = defstruct(
             *[self.__name__, fields],
+            kw_only=True,
             tag_field="identity",
             tag=self.identity,
             module=self.__module__,
