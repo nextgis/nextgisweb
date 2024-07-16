@@ -1,69 +1,84 @@
-import { makeAutoObservable, toJS } from "mobx";
+import isEqual from "lodash-es/isEqual";
+import { action, computed, observable, toJS } from "mobx";
 
+import { mapper } from "@nextgisweb/gui/arm";
 import type { EditorStore } from "@nextgisweb/resource/type";
-import type { ResourceRef } from "@nextgisweb/resource/type/api";
-import type { SRSRef } from "@nextgisweb/spatial-ref-sys/type/api";
+import type { RelationshipRef } from "@nextgisweb/resource/type/api";
+import type { LayerCreate, LayerRead } from "@nextgisweb/wmsclient/type/api";
 
-import type { ImageFormat, StoreValue, WmsClientLayer } from "./type";
+type MapperLayerCreate = Omit<
+    LayerCreate,
+    "connection" | "imgformat" | "vendor_params"
+> &
+    Nullable<Pick<LayerCreate, "connection" | "imgformat" | "vendor_params">>;
+
+const {
+    connection,
+    wmslayers,
+    imgformat,
+    vendor_params,
+    $load: mapperLoad,
+    $error: mapperError,
+} = mapper<WmsClientLayerStore, MapperLayerCreate>({
+    validateIf: (o) => o.validate,
+    properties: {
+        connection: { required: true },
+        imgformat: { required: true },
+        wmslayers: { required: true },
+    },
+});
 
 export class WmsClientLayerStore
-    implements EditorStore<WmsClientLayer, WmsClientLayer | undefined>
+    implements EditorStore<LayerRead, LayerCreate>
 {
     readonly identity = "wmsclient_layer";
 
-    connection: ResourceRef | undefined = undefined;
-    wmsLayers: string[] = [];
-    imgFormat: ImageFormat | undefined = undefined;
-    vendorParams: Record<string, string> = {};
-    srs: SRSRef = { id: 3857 };
-    dirty = false;
+    connection = connection.init(null, this);
+    wmslayers = wmslayers.init("", this);
+    imgformat = imgformat.init(null, this);
+    vendor_params = vendor_params.init({}, this);
+    @observable accessor srs: RelationshipRef | undefined = { id: 3857 };
 
-    constructor() {
-        makeAutoObservable<WmsClientLayerStore>(this, {
-            identity: false,
-        });
-    }
+    private _initValue?: LayerRead;
+    @observable accessor validate = false;
 
-    load(val: WmsClientLayer) {
-        this.connection = val.connection;
-        this.wmsLayers = val.wmslayers.split(",");
-        this.imgFormat = val.imgformat;
-        this.vendorParams = val.vendor_params;
+    @action load(val: LayerRead) {
+        mapperLoad(this, val);
         this.srs = val.srs;
+        this._initValue = { ...val };
     }
 
-    get deserializeValue(): WmsClientLayer {
+    @computed get deserializeValue(): LayerCreate {
         const result = {
-            connection: this.connection,
-            wmslayers: this.wmsLayers?.join(","),
-            imgformat: this.imgFormat,
-            vendor_params: this.vendorParams,
+            ...this.connection.jsonPart(),
+            ...this.wmslayers.jsonPart(),
+            ...this.imgformat.jsonPart(),
+            ...this.vendor_params.jsonPart(),
             srs: this.srs,
-        } as WmsClientLayer;
+        } as LayerCreate;
 
         return toJS(result);
     }
 
+    @computed get dirty(): boolean {
+        if (this.deserializeValue && this._initValue) {
+            return !isEqual(this.deserializeValue, this._initValue);
+        }
+        return true;
+    }
+
     dump() {
-        if (this.dirty && this.allFieldsFilled) {
+        if (this.dirty) {
             return this.deserializeValue;
         }
     }
 
-    get isValid() {
-        return true;
+    @computed get error() {
+        return mapperError(this);
     }
 
-    get allFieldsFilled(): boolean {
-        // eslint-disable-next-line
-        return Object.values(this).every((val: any) => val != undefined);
-    }
-
-    update(source: Partial<StoreValue>) {
-        Object.entries(source).forEach(
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            ([key, value]) => ((this as any)[key] = value)
-        );
-        this.dirty = true;
+    @computed get isValid() {
+        this.validate = true;
+        return !this.error;
     }
 }

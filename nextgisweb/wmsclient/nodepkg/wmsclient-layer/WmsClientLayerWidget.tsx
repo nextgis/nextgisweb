@@ -3,26 +3,47 @@ import { useEffect, useState } from "react";
 
 import { Button, Select } from "@nextgisweb/gui/antd";
 import type { OptionType } from "@nextgisweb/gui/antd";
+import { LotMV } from "@nextgisweb/gui/arm";
 import { Area, Lot } from "@nextgisweb/gui/mayout";
 import showModal from "@nextgisweb/gui/showModal";
 import { route } from "@nextgisweb/pyramid/api";
+import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { ResourceSelectRef } from "@nextgisweb/resource/component";
 import type {
     EditorWidgetComponent,
     EditorWidgetProps,
 } from "@nextgisweb/resource/type";
-import type { ResourceRef } from "@nextgisweb/resource/type/api";
 
 import type { WmsClientLayerStore } from "./WmsClientLayerStore";
 import { VendorParamsModal } from "./component/VendorParamsModal";
 import type { WMSConnectionLayer } from "./type";
+
+function LayersSelect({
+    value,
+    onChange,
+    ...rest
+}: {
+    value: string;
+    onChange: (val: string) => void;
+}) {
+    return (
+        <Select
+            mode="multiple"
+            value={value ? value.split(",") : []}
+            onChange={(val) => onChange(val?.join(","))}
+            {...rest}
+        />
+    );
+}
 
 export const WmsClientLayerWidget: EditorWidgetComponent<
     EditorWidgetProps<WmsClientLayerStore>
 > = observer(({ store }) => {
     const [layers, setLayers] = useState<OptionType[]>();
     const [formats, setFormats] = useState<OptionType[]>();
+
+    const { makeSignal } = useAbortController();
 
     const mapLayers = (value: WMSConnectionLayer[]) => {
         return value.map((item: WMSConnectionLayer) => {
@@ -41,12 +62,13 @@ export const WmsClientLayerWidget: EditorWidgetComponent<
 
     useEffect(() => {
         const getCapcache = async () => {
-            if (store.connection) {
+            if (store.connection.value) {
                 const { wmsclient_connection } = await route(
                     "resource.item",
-                    store.connection.id
+                    store.connection.value.id
                 ).get({
                     cache: true,
+                    signal: makeSignal(),
                 });
                 const capcache = wmsclient_connection?.capcache;
                 const options = mapLayers(capcache.layers);
@@ -56,55 +78,53 @@ export const WmsClientLayerWidget: EditorWidgetComponent<
             }
         };
         getCapcache();
-    }, [store.connection]);
+    }, [store.connection.value, makeSignal]);
 
     return (
         <Area pad cols={["1fr", "1fr"]}>
-            <Lot row label={gettext("WMS Connection")}>
-                <ResourceSelectRef
-                    value={store.connection ? store.connection : null}
-                    onChange={async (resourceRef: ResourceRef | null) => {
-                        if (resourceRef) {
-                            store.update({ connection: resourceRef });
-                        }
-                    }}
-                    pickerOptions={{ requireClass: "wmsclient_connection" }}
-                    style={{ width: "100%" }}
-                />
-            </Lot>
-            <Lot row label={gettext("Image format")}>
-                <Select
-                    value={store.imgFormat}
-                    options={formats ? formats : undefined}
-                    onChange={(value) => {
-                        store.update({ imgFormat: value });
-                    }}
-                    style={{ width: "100%" }}
-                />
-            </Lot>
-            <Lot row label={gettext("WMS layers")}>
-                <Select
-                    value={store.wmsLayers}
-                    mode="multiple"
-                    options={layers}
-                    onChange={(value) => {
-                        store.update({ wmsLayers: value });
-                    }}
-                    style={{ width: "100%" }}
-                />
-            </Lot>
+            <LotMV
+                row
+                label={gettext("WMS Connection")}
+                value={store.connection}
+                component={ResourceSelectRef}
+                props={{
+                    pickerOptions: { requireClass: "wmsclient_connection" },
+                    style: { width: "100%" },
+                }}
+            />
+            <LotMV
+                row
+                label={gettext("Image format")}
+                value={store.imgformat}
+                component={Select}
+                props={{
+                    style: { width: "100%" },
+                    options: formats ? formats : undefined,
+                }}
+            />
+
+            <LotMV
+                row
+                label={gettext("WMS layers")}
+                value={store.wmslayers}
+                component={LayersSelect}
+                props={{
+                    style: { width: "100%" },
+                    options: layers,
+                }}
+            />
+
             <Lot row label={gettext("Vendor parameters")}>
                 <Button
-                    onClick={() =>
+                    onClick={() => {
                         showModal(VendorParamsModal, {
-                            value: store.vendorParams,
+                            value: store.vendor_params.value || undefined,
                             destroyOnClose: true,
-                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                            onChange: (value: any) => {
-                                store.update({ vendorParams: value });
+                            onChange: (value?: Record<string, string>) => {
+                                store.vendor_params.value = value;
                             },
-                        })
-                    }
+                        });
+                    }}
                     style={{ width: "100%" }}
                 >
                     {gettext("Edit vendor parameters")}

@@ -5,12 +5,12 @@ type StoreValue = Record<string, string>;
 export class VendorParamsStore extends KeyValueEditorStore<StoreValue> {
     identity = "";
 
-    constructor(value: StoreValue) {
+    constructor(value?: StoreValue) {
         super();
         this.load(value);
     }
 
-    load(val: StoreValue) {
+    load(val?: StoreValue) {
         if (val) {
             this.items = Object.entries(val).map(
                 ([key, value]) => new RecordItem(this, { key, value })

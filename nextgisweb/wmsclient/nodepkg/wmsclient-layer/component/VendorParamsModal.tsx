@@ -81,7 +81,7 @@ export function VendorParamsModal({
     open: open_,
     ...props
 }: {
-    value: Record<string, string>;
+    value?: Record<string, string>;
     onChange: (value?: Record<string, string>) => void;
 } & ShowModalOptions) {
     const [store] = useState(new VendorParamsStore(value));
