@@ -5,6 +5,7 @@ const path = require("path");
 const CopyPlugin = require("copy-webpack-plugin");
 const ESLintPlugin = require("eslint-webpack-plugin");
 const ForkTsCheckerPlugin = require("fork-ts-checker-webpack-plugin");
+const { DefinePlugin } = require("webpack");
 const WebpackAssetsManifest = require("webpack-assets-manifest");
 
 const babelOptions = require("./babelrc.cjs");
@@ -380,6 +381,11 @@ const webpackConfig = defaults("main", (env) => ({
                     to: "@nextgisweb/jsrealm/",
                 },
             ],
+        }),
+        new DefinePlugin({
+            COMP_ID: DefinePlugin.runtimeValue(({ module }) => {
+                return JSON.stringify(config.pathToComponent(module.context));
+            }),
         }),
         ...(config.jsrealm.tscheck || env.tscheck
             ? [new ForkTsCheckerPlugin()]

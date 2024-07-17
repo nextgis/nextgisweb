@@ -13,3 +13,6 @@ declare module "@nextgisweb/jsrealm/locale-loader!" {
 }
 
 declare type Nullable<T> = { [K in keyof T]: T[K] | null };
+
+/** Current component identity like "jsrealm" or "pyramid" */
+declare const COMP_ID: string;

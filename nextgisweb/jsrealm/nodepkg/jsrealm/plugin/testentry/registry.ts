@@ -10,7 +10,7 @@ export const registry = new PluginRegistry<PluginType, MetadataType>(
 );
 
 registry.register({
-    component: "jsrealm",
+    component: COMP_ID,
     operation: "create",
     import: () => import("./plugin/foo"),
 });

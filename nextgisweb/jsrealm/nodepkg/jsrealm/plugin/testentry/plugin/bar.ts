@@ -2,7 +2,7 @@
 import { registry } from "../registry";
 
 registry.register({
-    component: "jsrealm",
+    component: COMP_ID,
     operation: "update",
     value: (what: string) => `bar:${what}`,
 });

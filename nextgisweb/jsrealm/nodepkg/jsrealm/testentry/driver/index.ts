@@ -11,7 +11,7 @@ export const registry = new PluginRegistry<PluginType, PluginMeta>(
 );
 
 registry.register({
-    component: "jsrealm",
+    component: COMP_ID,
     identity: "mocha",
     import: () => import("./mocha"),
 });

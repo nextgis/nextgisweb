@@ -26,14 +26,14 @@ export const registry = new PluginRegistry<Plugin, MetadataType>(
 );
 
 registry.register({
-    component: "pyramid",
+    component: COMP_ID,
     key: "google_analytics",
     label: gettext("Google Analytics"),
     import: () => import("./GoogleAnalyticsTab"),
 });
 
 registry.register({
-    component: "pyramid",
+    component: COMP_ID,
     key: "yandex_metrica",
     label: gettext("Yandex.Metrica"),
     import: () => import("./YandexMetricaTab"),

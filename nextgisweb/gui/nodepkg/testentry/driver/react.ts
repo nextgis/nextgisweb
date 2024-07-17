@@ -3,7 +3,7 @@ import entrypoint from "@nextgisweb/jsrealm/entrypoint";
 import { registry } from "@nextgisweb/jsrealm/testentry/driver";
 
 registry.register({
-    component: "gui",
+    component: COMP_ID,
     identity: "react",
     loader: async () => {
         const { default: reactApp } = await import("@nextgisweb/gui/react-app");

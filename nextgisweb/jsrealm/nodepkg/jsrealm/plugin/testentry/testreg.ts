@@ -7,7 +7,7 @@ describe("Test registry", () => {
     it("throws error on register", () => {
         expect(() => {
             registry.register({
-                component: "jsrealm",
+                component: COMP_ID,
                 operation: "create",
                 value: (what) => what,
             });
