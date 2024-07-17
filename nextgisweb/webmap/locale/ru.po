@@ -671,67 +671,71 @@ msgstr "Ссылка на карту скопирована в буфер обм
 msgid "Copy link"
 msgstr "Копировать ссылку"
 
-#: nodepkg/panel/share/SharePanel.js:305
-msgid "Save to favorite"
+#: nodepkg/panel/share/SharePanel.js:302
+msgid "To favorite"
+msgstr "В избранное"
+
+#: nodepkg/panel/share/SharePanel.js:307
+msgid "Save to favorЫite"
 msgstr "Сохранить в избранное"
 
-#: nodepkg/panel/share/SharePanel.js:315
+#: nodepkg/panel/share/SharePanel.js:317
 msgid "Favorite label (not required)"
 msgstr "Название (необязательно)"
 
-#: nodepkg/panel/share/SharePanel.js:317
+#: nodepkg/panel/share/SharePanel.js:319
 msgid "Favorite label"
 msgstr "Название (необязательно)"
 
-#: nodepkg/panel/share/SharePanel.js:327
+#: nodepkg/panel/share/SharePanel.js:329
 msgid "Embed code for your site"
 msgstr "Вставить карту на сайт"
 
-#: nodepkg/panel/share/SharePanel.js:331
+#: nodepkg/panel/share/SharePanel.js:333
 msgid "Map size:"
 msgstr "Размер карты:"
 
-#: nodepkg/panel/share/SharePanel.js:333 nodepkg/settings/SettingsForm.js:81
+#: nodepkg/panel/share/SharePanel.js:335 nodepkg/settings/SettingsForm.js:81
 msgid "Width, px"
 msgstr "Ширина, пикс."
 
-#: nodepkg/panel/share/SharePanel.js:339 nodepkg/settings/SettingsForm.js:94
+#: nodepkg/panel/share/SharePanel.js:341 nodepkg/settings/SettingsForm.js:94
 msgid "Height, px"
 msgstr "Высота, пикс."
 
-#: nodepkg/panel/share/SharePanel.js:343
+#: nodepkg/panel/share/SharePanel.js:345
 msgid "px"
 msgstr "px"
 
-#: nodepkg/panel/share/SharePanel.js:346
+#: nodepkg/panel/share/SharePanel.js:348
 msgid "Map tools"
 msgstr "Инструменты карты"
 
-#: nodepkg/panel/share/SharePanel.js:350
+#: nodepkg/panel/share/SharePanel.js:352
 msgid "Panels"
 msgstr "Панели"
 
-#: nodepkg/panel/share/SharePanel.js:365
+#: nodepkg/panel/share/SharePanel.js:367
 msgid "Link to main map"
 msgstr "Ссылка на основную карту"
 
-#: nodepkg/panel/share/SharePanel.js:374
+#: nodepkg/panel/share/SharePanel.js:376
 msgid "Generate events"
 msgstr "Генерация событий"
 
-#: nodepkg/panel/share/SharePanel.js:378
+#: nodepkg/panel/share/SharePanel.js:380
 msgid "Embed code"
 msgstr "Код для встраивания"
 
-#: nodepkg/panel/share/SharePanel.js:391
+#: nodepkg/panel/share/SharePanel.js:393
 msgid "The embed code copied to clipboard."
 msgstr "Код для встраивания скопирован в буфер обмена."
 
-#: nodepkg/panel/share/SharePanel.js:395
+#: nodepkg/panel/share/SharePanel.js:397
 msgid "Copy code"
 msgstr "Копировать код"
 
-#: nodepkg/panel/share/SharePanel.js:398
+#: nodepkg/panel/share/SharePanel.js:400
 msgid "Preview"
 msgstr "Предпросмотр"
 

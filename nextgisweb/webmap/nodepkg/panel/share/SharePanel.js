@@ -298,7 +298,9 @@ export const SharePanel = ({ display, title, close, visible }) => {
                                 setModalOpened(true);
                             }}
                             icon={<FavoriteIcon />}
-                        />
+                        >
+                            {gettext("To favorite")}
+                        </Button>
                     )}
                 </Space.Compact>
                 <Modal
