@@ -1,14 +1,16 @@
 import orderBy from "lodash-es/orderBy";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import {
     Alert,
     Button,
     Input,
     InputNumber,
+    Modal,
     Select,
     Space,
     Switch,
+    Tooltip,
 } from "@nextgisweb/gui/antd";
 import { CopyToClipboardButton } from "@nextgisweb/gui/buttons";
 import { TemplateLink } from "@nextgisweb/gui/component";
@@ -30,6 +32,7 @@ import "./SharePanel.less";
 
 // prettier-ignore
 const msgCORS = gettext("<a>CORS</a> must be enabled for the target origin when embedding a web map on a different domain.");
+const msgAddFragmentToFavorites = gettext("Add web map fragment to favorites");
 
 const makeIframeTag = (iframeSrc, height, width) => {
     return (
@@ -150,6 +153,10 @@ export const SharePanel = ({ display, title, close, visible }) => {
     const [panels, setPanels] = useState([]);
     const [activePanel, setActivePanel] = useState(DEFAULT_ACTIVE_PANEL);
 
+    const [favLabelModalOpen, setFavLabelModalOpen] = useState(false);
+    const favLabelRef = useRef();
+    const [favLabelValue, setFavlabelValue] = useState("");
+
     const updatePermalinkUrl = () => {
         display.getVisibleItems().then((visibleItems) => {
             const permalink = getPermalink(display, visibleItems);
@@ -261,10 +268,11 @@ export const SharePanel = ({ display, title, close, visible }) => {
 
     const favorites = useFavorites({ resource: { id: webmapId } });
     const addToFavorites = useCallback(
-        (link) => {
+        (link, name) => {
             favorites.add({
                 identity: "webmap.fragment",
                 query_string: link.slice(link.indexOf("?") + 1),
+                label: name || undefined,
             });
         },
         [favorites]
@@ -289,12 +297,44 @@ export const SharePanel = ({ display, title, close, visible }) => {
                         {gettext("Copy link")}
                     </CopyToClipboardButton>
                     {!ngwConfig.isGuest && (
-                        <Button
-                            onClick={() => addToFavorites(mapLink)}
-                            icon={<FavoriteIcon />}
-                        />
+                        <Tooltip title={msgAddFragmentToFavorites}>
+                            <Button
+                                onClick={() => setFavLabelModalOpen(true)}
+                                icon={<FavoriteIcon />}
+                            />
+                        </Tooltip>
                     )}
                 </Space.Compact>
+                {!ngwConfig.isGuest && (
+                    <Modal
+                        title={msgAddFragmentToFavorites}
+                        closeIcon={false}
+                        open={favLabelModalOpen}
+                        afterOpenChange={(open) => {
+                            if (open && favLabelRef.current) {
+                                favLabelRef.current.focus();
+                            }
+                        }}
+                        onCancel={() => {
+                            setFavLabelModalOpen(false);
+                            setFavlabelValue("");
+                        }}
+                        onOk={() => {
+                            addToFavorites(mapLink, favLabelValue);
+                            setFavLabelModalOpen(false);
+                            setFavlabelValue("");
+                        }}
+                    >
+                        <Input
+                            ref={favLabelRef}
+                            value={favLabelValue}
+                            placeholder={gettext("Optional fragment label")}
+                            onChange={(e) => {
+                                setFavlabelValue(e.target.value);
+                            }}
+                        ></Input>
+                    </Modal>
+                )}
             </section>
             <section>
                 <h5 className="heading">
