@@ -20,7 +20,7 @@
         "@types/react": "18.2.20",
         "@types/react-dom": "18.2.7",
         "@types/papaparse": "^5.3.14",
-        "antd": "5.14.2",
+        "antd": "5.19.1",
         "dayjs": "^1.11.9",
         "mobx": "^6.10.0",
         "mobx-react-lite": "^4.0.5",
