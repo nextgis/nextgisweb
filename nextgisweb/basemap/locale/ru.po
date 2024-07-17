@@ -1,26 +1,39 @@
-#: amd/ngw-basemap/LayerWidget.js:39 model.py:24
+#: model.py:24
 msgid "Basemap"
 msgstr "Подложка веб-карты"
 
-#: amd/ngw-basemap/LayerWidget.js:60
-msgid "Search"
-msgstr "Поиск"
+#: nodepkg/layer-widget/LayerWidget.tsx:18
+msgid "Pick from QMS"
+msgstr "Выбрать из QMS"
 
-#: amd/ngw-basemap/LayerWidget.js:67
-msgid "Use options from QMS"
-msgstr "Использовать настройки из QMS"
+#: nodepkg/layer-widget/LayerWidget.tsx:20
+msgid "Search for geoservices provided by "
+msgstr "Искать геосервисы, предоставленные "
 
-#: amd/ngw-basemap/template/LayerWidget.hbs:11
+#: nodepkg/layer-widget/LayerWidget.tsx:21
+msgid "You can search by name or ID"
+msgstr "Можно искать по имени или по ID"
+
+#: nodepkg/layer-widget/LayerWidget.tsx:24
+msgid "If a service from QMS is selected, this field cannot be edited."
+msgstr "Пока выбран сервис из QMS, редактирование этих полей отключено."
+
+#: nodepkg/layer-widget/LayerWidget.tsx:80
 msgid "URL"
 msgstr "URL"
 
-#: amd/ngw-basemap/template/LayerWidget.hbs:17
+#: nodepkg/layer-widget/LayerWidget.tsx:88
 msgid "Copyright text"
 msgstr "Текст для копирайта"
 
-#: amd/ngw-basemap/template/LayerWidget.hbs:23
+#: nodepkg/layer-widget/LayerWidget.tsx:97
 msgid "Copyright URL"
 msgstr "Ссылка на копирайт"
+
+#: nodepkg/layer-widget/LayerWidget.tsx:109
+#: nodepkg/webmap-widget/WebMapWidget.tsx:125
+msgid "Basemaps"
+msgstr "Подложки"
 
 #: nodepkg/webmap-widget/WebMapWidget.tsx:54
 msgid "Display name"
@@ -37,7 +50,3 @@ msgstr "Непрозрачность"
 #: nodepkg/webmap-widget/WebMapWidget.tsx:69
 msgid "Resource"
 msgstr "Ресурс"
-
-#: nodepkg/webmap-widget/WebMapWidget.tsx:125
-msgid "Basemaps"
-msgstr "Подложки"
