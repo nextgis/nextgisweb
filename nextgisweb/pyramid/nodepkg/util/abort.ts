@@ -11,9 +11,9 @@ export class AbortControllerHelper {
         return controller.signal;
     }
 
-    abort() {
+    abort(reason?: string) {
         for (const controller of this._controllers) {
-            controller.abort();
+            controller.abort(reason);
         }
         this._controllers = [];
     }
