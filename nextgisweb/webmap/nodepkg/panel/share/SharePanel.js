@@ -6,6 +6,7 @@ import {
     Button,
     Input,
     InputNumber,
+    Modal,
     Select,
     Space,
     Switch,
@@ -149,6 +150,8 @@ export const SharePanel = ({ display, title, close, visible }) => {
     const [panelsOptions, setPanelsOptions] = useState([]);
     const [panels, setPanels] = useState([]);
     const [activePanel, setActivePanel] = useState(DEFAULT_ACTIVE_PANEL);
+    const [modalOpened, setModalOpened] = useState(false);
+    const [favLabelValue, setFavlabelValue] = useState("");
 
     const updatePermalinkUrl = () => {
         display.getVisibleItems().then((visibleItems) => {
@@ -261,10 +264,11 @@ export const SharePanel = ({ display, title, close, visible }) => {
 
     const favorites = useFavorites({ resource: { id: webmapId } });
     const addToFavorites = useCallback(
-        (link) => {
+        (link, name) => {
             favorites.add({
                 identity: "webmap.fragment",
                 query_string: link.slice(link.indexOf("?") + 1),
+                label: name || undefined,
             });
         },
         [favorites]
@@ -290,11 +294,33 @@ export const SharePanel = ({ display, title, close, visible }) => {
                     </CopyToClipboardButton>
                     {!ngwConfig.isGuest && (
                         <Button
-                            onClick={() => addToFavorites(mapLink)}
+                            onClick={() => {
+                                setModalOpened(true);
+                            }}
                             icon={<FavoriteIcon />}
                         />
                     )}
                 </Space.Compact>
+                <Modal
+                    title={gettext("Save to favorite")}
+                    closeIcon={false}
+                    open={modalOpened}
+                    onCancel={() => setModalOpened(false)}
+                    onOk={() => {
+                        addToFavorites(mapLink, favLabelValue);
+                        setModalOpened(false);
+                        setFavlabelValue("");
+                    }}
+                >
+                    <label>{gettext("Favorite label (not required)")}</label>
+                    <Input
+                        title={gettext("Favorite label")}
+                        value={favLabelValue}
+                        onChange={(e) => {
+                            setFavlabelValue(e.target.value);
+                        }}
+                    ></Input>
+                </Modal>
             </section>
             <section>
                 <h5 className="heading">
