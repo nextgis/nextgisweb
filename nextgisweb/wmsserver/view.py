@@ -1,4 +1,4 @@
-from nextgisweb.env import _
+from nextgisweb.env import gettext
 
 from nextgisweb.resource import Widget
 from nextgisweb.resource.extaccess import ExternalAccessLink
@@ -13,8 +13,8 @@ class ServiceWidget(Widget):
 
 
 class WMSLink(ExternalAccessLink):
-    title = _("WMS service")
-    help = _(
+    title = gettext("WMS service")
+    help = gettext(
         "Web Map Service (WMS) is a standard protocol developed by the Open Geospatial Consortium for serving georeferenced map images. These images are typically produced by a map server from data provided by a GIS database."
     )
     docs_url = "docs_ngweb/source/layers.html#using-wms-service-connection"

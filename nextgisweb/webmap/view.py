@@ -4,7 +4,7 @@ from urllib.parse import unquote, urljoin, urlparse
 
 from pyramid.renderers import render_to_response
 
-from nextgisweb.env import _
+from nextgisweb.env import gettext
 from nextgisweb.lib.dynmenu import Label, Link
 
 from nextgisweb.pyramid import viewargs
@@ -38,7 +38,7 @@ def settings(request):
     request.require_administrator()
     return dict(
         entrypoint="@nextgisweb/webmap/settings",
-        title=_("Web map settings"),
+        title=gettext("Web map settings"),
         dynmenu=request.env.pyramid.control_panel,
     )
 
@@ -259,7 +259,7 @@ def clone(request):
         entrypoint="@nextgisweb/webmap/clone-webmap",
         props=dict(id=request.context.id),
         obj=request.context,
-        title=_("Clone web map"),
+        title=gettext("Clone web map"),
     )
 
 
@@ -272,7 +272,7 @@ def preview_embedded(request):
 
     return dict(
         iframe=iframe,
-        title=_("Embedded webmap preview"),
+        title=gettext("Embedded webmap preview"),
         limit_width=False,
     )
 
@@ -318,12 +318,12 @@ def setup_pyramid(comp, config):
         if not isinstance(args.obj, WebMap):
             return
 
-        yield Label("webmap", _("Web map"))
+        yield Label("webmap", gettext("Web map"))
 
         if args.obj.has_permission(ResourceScope.read, args.request.user):
             yield Link(
                 "webmap/display",
-                _("Display"),
+                gettext("Display"),
                 lambda args: args.request.route_url("webmap.display", id=args.obj.id),
                 important=True,
                 target="_blank",
@@ -333,7 +333,7 @@ def setup_pyramid(comp, config):
         if args.obj.has_permission(ResourceScope.read, args.request.user):
             yield Link(
                 "webmap/clone",
-                _("Clone"),
+                gettext("Clone"),
                 lambda args: args.request.route_url("webmap.clone", id=args.obj.id),
                 important=False,
                 target="_self",
@@ -345,6 +345,6 @@ def setup_pyramid(comp, config):
         if args.request.user.is_administrator:
             yield Link(
                 "settings.webmap",
-                _("Web map"),
+                gettext("Web map"),
                 lambda args: (args.request.route_url("webmap.control_panel.settings")),
             )

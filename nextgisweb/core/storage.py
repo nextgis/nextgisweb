@@ -6,7 +6,7 @@ import sqlalchemy as sa
 import transaction
 from zope.sqlalchemy import mark_changed
 
-from nextgisweb.env import DBSession, _
+from nextgisweb.env import DBSession, gettext
 from nextgisweb.lib.i18n import TrStr
 from nextgisweb.lib.logging import logger
 from nextgisweb.lib.registry import dict_registry
@@ -286,8 +286,8 @@ class StorageLimitExceeded(UserException):
         if requested == 0 or limit < total:
             # TODO: Humanize output of sizes
             super().__init__(
-                title=_("Storage full"),
-                message=_(
+                title=gettext("Storage full"),
+                message=gettext(
                     "This operation can't be performed because the storage "
                     "limit (%s) has been already exceeded by %s."
                 )
@@ -297,8 +297,8 @@ class StorageLimitExceeded(UserException):
         else:
             # TODO: Humanize output of sizes
             super().__init__(
-                title=_("Not enough storage"),
-                message=_(
+                title=gettext("Not enough storage"),
+                message=gettext(
                     "This operation requires %s of storage and can't be "
                     "performed because only %s available."
                 )
@@ -308,5 +308,5 @@ class StorageLimitExceeded(UserException):
 
 
 class EstimationAlreadyRunning(UserException):
-    title = _("Estimation is already running")
+    title = gettext("Estimation is already running")
     http_status_code = 503

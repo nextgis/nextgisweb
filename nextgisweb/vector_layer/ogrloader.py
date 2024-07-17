@@ -7,7 +7,7 @@ from typing import Dict, List, Optional
 import sqlalchemy as sa
 from osgeo import ogr, osr
 
-from nextgisweb.env import _
+from nextgisweb.env import gettext
 from nextgisweb.lib.json import dumps
 from nextgisweb.lib.ogrhelper import FIELD_GETTER
 from nextgisweb.lib.registry import DictRegistry
@@ -308,9 +308,11 @@ class OGRLoader:
                 geometry_type = geom_filter.pop()
 
         if geometry_type is None:
-            err_msg = _("Could not determine a geometry type.")
+            err_msg = gettext("Could not determine a geometry type.")
             if len(geom_filter) == 0:
-                err_msg += " " + _("Source layer contains no features satisfying the conditions.")
+                err_msg += " " + gettext(
+                    "Source layer contains no features satisfying the conditions."
+                )
             raise VE(message=err_msg)
 
         # FID field
@@ -326,7 +328,9 @@ class OGRLoader:
                 if not range_explorer.result_ok:
                     fid_field_ok = False
                     if params.fix_errors == FIX_ERRORS.NONE:
-                        raise VE(message=_("Field '%s' is out of int32 range.") % fid_field_name)
+                        raise VE(
+                            message=gettext("Field '%s' is out of int32 range.") % fid_field_name
+                        )
 
             if UniquenessExplorer.identity in explorer_registry:
                 uniqueness_explorer = explorer_registry[UniquenessExplorer.identity]
@@ -334,7 +338,7 @@ class OGRLoader:
                     fid_field_ok = False
                     if params.fix_errors == FIX_ERRORS.NONE:
                         raise VE(
-                            message=_("Field '%s' contains non-unique or empty values.")
+                            message=gettext("Field '%s' contains non-unique or empty values.")
                             % fid_field_name
                         )
 
@@ -351,12 +355,12 @@ class OGRLoader:
             and params.fix_errors == FIX_ERRORS.NONE
         ):
             if len(params.fid_field) == 0:
-                raise VE(message=_("Parameter 'fid_field' is missing."))
+                raise VE(message=gettext("Parameter 'fid_field' is missing."))
             else:
                 if not fid_field_found:
-                    raise VE(message=_("Fields %s not found.") % params.fid_field)
+                    raise VE(message=gettext("Fields %s not found.") % params.fid_field)
                 else:
-                    raise VE(message=_("None of fields %s are integer.") % params.fid_field)
+                    raise VE(message=gettext("None of fields %s are integer.") % params.fid_field)
 
         # Fields
 
@@ -371,12 +375,14 @@ class OGRLoader:
             fixed_fld_name = fix_encoding(fld_name)
 
             if fld_name != fixed_fld_name and params.fix_errors != FIX_ERRORS.LOSSY:
-                raise VE(message=_("Field '%s(?)' encoding is broken.") % fixed_fld_name)
+                raise VE(message=gettext("Field '%s(?)' encoding is broken.") % fixed_fld_name)
 
             if fixed_fld_name.lower() in FIELD_FORBIDDEN_NAME:
                 if params.fix_errors == FIX_ERRORS.NONE:
                     raise VE(
-                        message=_("Field name is forbidden: '%s'. Please remove or rename it.")
+                        message=gettext(
+                            "Field name is forbidden: '%s'. Please remove or rename it."
+                        )
                         % fld_name
                     )
                 else:
@@ -409,7 +415,9 @@ class OGRLoader:
                 try:
                     fld_type = FIELD_TYPE_2_ENUM[fld_type_ogr]
                 except KeyError:
-                    raise VE(message=_("Unsupported field type: %r.") % fld_defn.GetTypeName())
+                    raise VE(
+                        message=gettext("Unsupported field type: %r.") % fld_defn.GetTypeName()
+                    )
 
             fields[i] = LoaderField(i, fld_name, fld_type_ogr, fld_type)
 
@@ -506,7 +514,7 @@ class OGRLoader:
 
                 if transform and geom.Transform(transform) != 0:
                     raise FeatureError(
-                        _(
+                        gettext(
                             "Feature #%d has a geometry that can't be "
                             "reprojected to target coordinate system"
                         )
@@ -551,7 +559,9 @@ class OGRLoader:
                 if detail != "":
                     detail += "\n"
                 detail += "* " + err
-            raise VE(message=_("Vector layer cannot be written due to errors."), detail=detail)
+            raise VE(
+                message=gettext("Vector layer cannot be written due to errors."), detail=detail
+            )
 
         insert_feature(flush=True)
         size = static_size * feature_count + dynamic_size
@@ -576,10 +586,12 @@ class FeatureGeometryTypeInvalid(FeatureError):
 def _fid_fget(feature, ogr_fid, *, fget, fidx, fname):
     if not feature.IsFieldSet(fidx):
         raise FeatureError(
-            _("Feature (seq. #%d) doesn't have a FID field '%s'.") % (ogr_fid, fname)
+            gettext("Feature (seq. #%d) doesn't have a FID field '%s'.") % (ogr_fid, fname)
         )
     if feature.IsFieldNull(fidx):
-        raise FeatureError(_("Feature (seq. #%d) FID field '%s' is null.") % (ogr_fid, fname))
+        raise FeatureError(
+            gettext("Feature (seq. #%d) FID field '%s' is null.") % (ogr_fid, fname)
+        )
     return fget(feature)
 
 
@@ -600,7 +612,7 @@ _wkb_supported = _wkb_points + _wkb_linestrings + _wkb_polygons
 
 def _validate_geom(geom, target, *, fix_errors, fid):
     if geom is None:
-        raise FeatureGeometryTypeInvalid(_("Feature #%d doesn't have geometry.") % fid)
+        raise FeatureGeometryTypeInvalid(gettext("Feature #%d doesn't have geometry.") % fid)
 
     if geom.IsMeasured() and fix_errors == FIX_ERRORS.LOSSY:
         geom.SetMeasured(False)
@@ -628,7 +640,8 @@ def _validate_geom(geom, target, *, fix_errors, fid):
                         break
                 else:
                     raise FeatureError(
-                        _("Feature #%d has multiple geometries satisfying the conditions.") % fid
+                        gettext("Feature #%d has multiple geometries satisfying the conditions.")
+                        % fid
                     )
         if geom_candidate is not None:
             geom = geom_candidate
@@ -637,7 +650,7 @@ def _validate_geom(geom, target, *, fix_errors, fid):
     # Check geometry type
     if wkb_type not in _wkb_supported:
         raise FeatureGeometryTypeInvalid(
-            _("Feature #%d has unknown geometry type: %d (%s).")
+            gettext("Feature #%d has unknown geometry type: %d (%s).")
             % (fid, wkb_type, ogr.GeometryTypeToName(wkb_type))
         )
     elif not (
@@ -646,7 +659,7 @@ def _validate_geom(geom, target, *, fix_errors, fid):
         or (target in _wkb_polygons and wkb_type in _wkb_polygons)
     ):
         raise FeatureGeometryTypeInvalid(
-            _("Feature #%d has unsuitable geometry type: %d (%s).")
+            gettext("Feature #%d has unsuitable geometry type: %d (%s).")
             % (fid, wkb_type, ogr.GeometryTypeToName(wkb_type))
         )
 
@@ -666,7 +679,7 @@ def _validate_geom(geom, target, *, fix_errors, fid):
             geom = geom.GetGeometryRef(0)
         else:
             raise FeatureError(
-                _("Feature #%d has multiple geometries satisfying the conditions.") % fid
+                gettext("Feature #%d has multiple geometries satisfying the conditions.") % fid
             )
 
     if wkb_type in _wkb_points:
@@ -681,7 +694,7 @@ def _validate_geom(geom, target, *, fix_errors, fid):
             geom_closed.CloseRings()
             if not geom_closed.Equals(geom):
                 if fix_errors == FIX_ERRORS.NONE:
-                    raise FeatureError(_("Feature #%d has unclosed rings.") % fid)
+                    raise FeatureError(gettext("Feature #%d has unclosed rings.") % fid)
                 else:
                     geom = geom_closed
                     invalid = not geom.IsValid()
@@ -698,7 +711,7 @@ def _validate_geom(geom, target, *, fix_errors, fid):
                     for ring_idx, ring in _iter_reversed_geom(part):
                         if ring_idx > 0 and ring.IsEmpty():
                             if fix_errors == FIX_ERRORS.NONE:
-                                raise FeatureError(_("Feature #%d has empty rings.") % fid)
+                                raise FeatureError(gettext("Feature #%d has empty rings.") % fid)
                             part.RemoveGeometry(ring_idx)
                         elif invalid and ring.GetPointCount() < 4:
                             if fix_errors == FIX_ERRORS.LOSSY and ring_idx > 0:
@@ -712,7 +725,9 @@ def _validate_geom(geom, target, *, fix_errors, fid):
                                 parts_left -= 1
                             else:
                                 raise FeatureError(
-                                    _("Feature #%d has less than 3 points in a polygon ring.")
+                                    gettext(
+                                        "Feature #%d has less than 3 points in a polygon ring."
+                                    )
                                     % fid
                                 )
                 elif part.GetPointCount() < 2:
@@ -725,7 +740,7 @@ def _validate_geom(geom, target, *, fix_errors, fid):
                         parts_left -= 1
                     else:
                         raise FeatureError(
-                            _("Feature #%d has less than 2 points in a linestring.") % fid
+                            gettext("Feature #%d has less than 2 points in a linestring.") % fid
                         )
 
         # NOTE: Disabled for better times.
@@ -751,7 +766,7 @@ def _validate_string(value, fname, *, fix_errors, fid):
             value = fixed
         else:
             raise FeatureError(
-                _("Feature #%d contains a broken encoding of field '%s'.") % (fid, fname)
+                gettext("Feature #%d contains a broken encoding of field '%s'.") % (fid, fname)
             )
     return value
 

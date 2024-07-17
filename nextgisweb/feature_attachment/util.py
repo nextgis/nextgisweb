@@ -4,7 +4,7 @@ from zipfile import BadZipFile, ZipFile
 
 from magic import from_buffer as magic_from_buffer
 
-from nextgisweb.env import DBSession, _
+from nextgisweb.env import DBSession, gettext
 from nextgisweb.lib.json import loadb
 
 from nextgisweb.core.exception import ValidationError
@@ -23,7 +23,7 @@ def attachments_import(resource, filename, *, replace):
             with ZipFile(filename, mode="r") as zf:
                 yield zf
         except BadZipFile:
-            raise ValidationError(message=_("Invalid ZIP archive."))
+            raise ValidationError(message=gettext("Invalid ZIP archive."))
 
     with open_zip_file() as z:
         try:
@@ -52,39 +52,41 @@ def attachments_import(resource, filename, *, replace):
                     file_md = metadata_items.pop(info_fn)
                 except KeyError:
                     raise ValidationError(
-                        message=_("File '{}' isn't found in metadata.").format(info_fn)
+                        message=gettext("File '{}' isn't found in metadata.").format(info_fn)
                     )
 
                 file_fid = file_md.get("feature_id")
                 if not isinstance(file_fid, int):
                     raise ValidationError(
-                        message=_("Invalid feature ID for file '{}'.").format(info_fn)
+                        message=gettext("Invalid feature ID for file '{}'.").format(info_fn)
                     )
                 src["feature_id"] = file_fid
 
                 file_keyname = file_md.get("keyname")
                 if file_keyname is not None and not isinstance(file_keyname, str):
                     raise ValidationError(
-                        message=_("Invalid keyname for file '{}'.").format(info_fn)
+                        message=gettext("Invalid keyname for file '{}'.").format(info_fn)
                     )
                 src["keyname"] = file_keyname
 
                 file_name = file_md.get("name")
                 if file_name is not None and not isinstance(file_name, str):
-                    raise ValidationError(message=_("Invalid name for file '{}'.").format(info_fn))
+                    raise ValidationError(
+                        message=gettext("Invalid name for file '{}'.").format(info_fn)
+                    )
                 src["name"] = file_name
 
                 file_mime = file_md.get("mime_type")
                 if file_mime is not None and not isinstance(file_mime, str):
                     raise ValidationError(
-                        message=_("Invalid MIME type for file '{}'.").format(info_fn)
+                        message=gettext("Invalid MIME type for file '{}'.").format(info_fn)
                     )
                 src["mime_type"] = file_mime
 
                 file_desc = file_md.get("description")
                 if file_desc is not None and not isinstance(file_desc, str):
                     raise ValidationError(
-                        message=_("Invalid description for file '{}'.").format(info_fn)
+                        message=gettext("Invalid description for file '{}'.").format(info_fn)
                     )
                 src["description"] = file_desc
 
@@ -97,7 +99,9 @@ def attachments_import(resource, filename, *, replace):
                         raise ValueError
                 except ValueError:
                     raise ValidationError(
-                        message=_("Could not determine feature ID for file '{}'.").format(info_fn)
+                        message=gettext("Could not determine feature ID for file '{}'.").format(
+                            info_fn
+                        )
                     )
 
                 src["feature_id"] = file_fid
@@ -115,7 +119,7 @@ def attachments_import(resource, filename, *, replace):
         if metadata_items is not None:
             for missing in metadata_items.keys():
                 raise ValidationError(
-                    message=_("File '{}' isn't found in the archive.").format(missing)
+                    message=gettext("File '{}' isn't found in the archive.").format(missing)
                 )
 
         if replace:

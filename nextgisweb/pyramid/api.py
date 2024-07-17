@@ -8,7 +8,7 @@ from msgspec import UNSET, Meta, Struct, UnsetType, convert, defstruct, to_built
 from pyramid.response import Response
 from typing_extensions import Annotated
 
-from nextgisweb.env import COMP_ID, Component, DBSession, _, env, inject
+from nextgisweb.env import COMP_ID, Component, DBSession, env, gettext, inject
 from nextgisweb.env.package import pkginfo
 from nextgisweb.lib.apitype import AnyOf, AsJSON, EmptyObject, Gap, StatusCode, fillgap
 from nextgisweb.lib.imptool import module_from_stack
@@ -193,7 +193,7 @@ def statistics(request) -> AsJSON[Dict[str, Dict[str, Any]]]:
 
 
 class StorageNotConfigured(NotConfigured):
-    message = _("Storage management is not enabled on this server.")
+    message = gettext("Storage management is not enabled on this server.")
 
 
 @inject()
@@ -403,7 +403,7 @@ def setup_pyramid_csettings(comp, config):
             if "all" in attrs:
                 if len(attrs) > 1:
                     raise ValidationError(
-                        message=_(
+                        message=gettext(
                             "The '{}' query parameter should not contain "
                             "additional values if 'all' is specified."
                         ).format(cid)
@@ -531,10 +531,10 @@ class header_logo(csetting):
         try:
             mime_type = LogoMimeType(fupload.mime_type)
         except ValueError:
-            msg = _("Got an unsupported MIME type: '{}'.").format(fupload.mime_type)
+            msg = gettext("Got an unsupported MIME type: '{}'.").format(fupload.mime_type)
             raise ValidationError(msg)
         if fupload.size > 64 * 1024:
-            raise ValidationError(message=_("64K should be enough for a logo."))
+            raise ValidationError(message=gettext("64K should be enough for a logo."))
         return mime_type, value().data_path.read_bytes()
 
 
@@ -666,7 +666,7 @@ def setup_pyramid(comp, config):
 
     comp.preview_link_default_view = lambda request: dict(
         image=request.static_url("asset/pyramid/webgis-for-social.png"),
-        description=_("Your Web GIS at nextgis.com"),
+        description=gettext("Your Web GIS at nextgis.com"),
     )
 
     comp.preview_link_view = preview_link_view

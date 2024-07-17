@@ -8,7 +8,7 @@ from msgspec import UNSET, Meta, Struct
 from sqlalchemy.orm.exc import NoResultFound
 from typing_extensions import Annotated
 
-from nextgisweb.env import _
+from nextgisweb.env import gettext
 from nextgisweb.lib.apitype import Query
 from nextgisweb.lib.geometry import Geometry, GeometryNotValid, Transformer, geom_area, geom_length
 
@@ -90,7 +90,7 @@ class Loader:
                 try:
                     feature.geom = self.geom_loader(geom)
                 except GeometryNotValid:
-                    raise ValidationError(_("Geometry is not valid."))
+                    raise ValidationError(gettext("Geometry is not valid."))
 
         ftarget = feature.fields
         ftarget.clear()
@@ -332,7 +332,7 @@ def geometry_info(resource, request, fid: FeatureID) -> JSONType:
         srs = SRS.filter_by(id=srs_id).one()
     except NoResultFound:
         raise ValidationError(
-            message=_("Unknown spatial reference system"), data={"srs.id": srs_id}
+            message=gettext("Unknown spatial reference system"), data={"srs.id": srs_id}
         )
     query.srs(srs)
 
@@ -405,7 +405,7 @@ def apply_intersect_filter(query, request, resource):
         try:
             geom = Geometry.from_wkt(wkt_intersects, srid=resource.srs.id)
         except GeometryNotValid:
-            raise ValidationError(_("Parameter 'intersects' geometry is not valid."))
+            raise ValidationError(gettext("Parameter 'intersects' geometry is not valid."))
         query.intersects(geom)
 
 

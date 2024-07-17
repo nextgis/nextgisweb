@@ -1,4 +1,4 @@
-from nextgisweb.env import _
+from nextgisweb.env import gettext
 
 from nextgisweb.resource import Widget
 from nextgisweb.resource.extaccess import ExternalAccessLink
@@ -13,8 +13,8 @@ class ServiceWidget(Widget):
 
 
 class OGCFServerLink(ExternalAccessLink):
-    title = _("OGC API Features")
-    help = _(
+    title = gettext("OGC API Features")
+    help = gettext(
         "OGC API Features provides API building blocks to create, modify and query features on the Web."
     )
     docs_url = "docs_ngweb/source/layers.html#ogcfserver-service"

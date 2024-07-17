@@ -1,4 +1,4 @@
-from nextgisweb.env import _
+from nextgisweb.env import gettext
 
 from nextgisweb.resource import Widget
 from nextgisweb.resource.view import resource_sections
@@ -13,7 +13,7 @@ class Widget(Widget):
 
 
 def setup_pyramid(comp, config):
-    @resource_sections(title=_("Lookup table"), priority=10)
+    @resource_sections(title=gettext("Lookup table"), priority=10)
     def resource_section(obj):
         if isinstance(obj, LookupTable):
             return dict(lookup_value=obj.val)

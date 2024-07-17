@@ -2,7 +2,7 @@ import re
 
 from sqlalchemy.orm.exc import NoResultFound
 
-from nextgisweb.env import Component, DBSession, _, require
+from nextgisweb.env import Component, DBSession, gettext, require
 from nextgisweb.lib import db
 from nextgisweb.lib.config import Option
 from nextgisweb.lib.logging import logger
@@ -91,7 +91,7 @@ class ResourceComponent(Component):
             obj = ResourceGroup(
                 id=0,
                 owner_user=adminusr,
-                display_name=self.env.core.localizer().translate(_("Main resource group")),
+                display_name=self.env.core.localizer().translate(gettext("Main resource group")),
             )
 
             obj.acl.append(ACLRule(principal=admingrp, action="allow"))

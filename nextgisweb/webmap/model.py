@@ -9,7 +9,7 @@ from sqlalchemy.ext.orderinglist import ordering_list
 from sqlalchemy.orm import validates
 from sqlalchemy.orm.attributes import set_committed_value
 
-from nextgisweb.env import COMP_ID, Base, DBSession, _, pgettext
+from nextgisweb.env import COMP_ID, Base, DBSession, gettext, pgettext
 from nextgisweb.lib import db
 
 from nextgisweb.auth import User
@@ -36,7 +36,7 @@ ANNOTATIONS_DEFAULT_VALUES = ("no", "yes", "messages")
 
 class WebMapScope(Scope):
     identity = "webmap"
-    label = _("Web map")
+    label = gettext("Web map")
 
     annotation_read = P(pgettext("permission", "View annotations")).require(ResourceScope.read)
     annotation_write = P(pgettext("permission", "Draw annotations")).require(ResourceScope.read)
@@ -54,7 +54,7 @@ class LegendSymbolsEnum(Enum):
 
 class WebMap(Base, Resource):
     identity = "webmap"
-    cls_display_name = _("Web map")
+    cls_display_name = gettext("Web map")
 
     __scope__ = WebMapScope
 

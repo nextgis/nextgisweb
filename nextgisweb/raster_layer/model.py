@@ -12,7 +12,7 @@ from msgspec import UNSET
 from osgeo import gdal, gdalconst, ogr, osr
 from zope.interface import implementer
 
-from nextgisweb.env import COMP_ID, Base, _, env
+from nextgisweb.env import COMP_ID, Base, env, gettext
 from nextgisweb.lib.logging import logger
 from nextgisweb.lib.osrhelper import SpatialReferenceError, sr_from_epsg, sr_from_wkt
 
@@ -66,7 +66,7 @@ COLOR_INTERPRETATION = {
 @implementer(IBboxLayer)
 class RasterLayer(Base, Resource, SpatialLayerMixin):
     identity = "raster_layer"
-    cls_display_name = _("Raster layer")
+    cls_display_name = gettext("Raster layer")
 
     __scope__ = (DataStructureScope, DataScope)
 
@@ -98,7 +98,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
 
         ds = gdal.Open(filename, gdalconst.GA_ReadOnly)
         if not ds:
-            raise ValidationError(_("GDAL library was unable to open the file."))
+            raise ValidationError(gettext("GDAL library was unable to open the file."))
 
         dsdriver = ds.GetDriver()
         dsproj = ds.GetProjection()
@@ -106,14 +106,16 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
 
         if dsdriver.ShortName not in SUPPORTED_DRIVERS:
             raise ValidationError(
-                _(
+                gettext(
                     "Raster has format '%(format)s', however only following formats are supported: %(all_formats)s."
                 )
                 % dict(format=dsdriver.ShortName, all_formats=", ".join(SUPPORTED_DRIVERS))
             )
 
         if not dsproj or not dsgtran:
-            raise ValidationError(_("Raster files without projection info are not supported."))
+            raise ValidationError(
+                gettext("Raster files without projection info are not supported.")
+            )
 
         # Workaround for broken encoding in WKT. Otherwise, it'll cause SWIG
         # TypeError (not a string) while passing to GDAL.
@@ -132,7 +134,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
             if data_type is None:
                 data_type = band.DataType
             elif data_type != band.DataType:
-                raise ValidationError(_("Mixed band data types are not supported."))
+                raise ValidationError(gettext("Mixed band data types are not supported."))
 
             mask_flags.append(band.GetMaskFlags())
 
@@ -160,11 +162,13 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         try:
             src_osr = sr_from_wkt(dsproj)
         except SpatialReferenceError:
-            raise ValidationError(_("GDAL was uanble to parse the raster coordinate system."))
+            raise ValidationError(
+                gettext("GDAL was uanble to parse the raster coordinate system.")
+            )
 
         if src_osr.IsLocal():
             raise ValidationError(
-                _(
+                gettext(
                     "The source raster has a local coordinate system and can't be "
                     "reprojected to the target coordinate system."
                 )
@@ -181,10 +185,12 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
                 cmd.append("-dstalpha")
             ds_measure = gdal.AutoCreateWarpedVRT(ds, src_osr.ExportToWkt(), dst_osr.ExportToWkt())
             if ds_measure is None:
-                message = _("Failed to reproject the raster to the target coordinate system.")
+                message = gettext(
+                    "Failed to reproject the raster to the target coordinate system."
+                )
                 gdal_err = gdal.GetLastErrorMsg().strip()
                 if gdal_err != "":
-                    message += " " + _("GDAL error message: %s") % gdal_err
+                    message += " " + gettext("GDAL error message: %s") % gdal_err
                 raise ValidationError(message=message)
         else:
             cmd = ["gdal_translate", "-of", "GTiff"]
@@ -200,7 +206,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         size_limit = comp.options["size_limit"]
         if size_limit is not None and size_expected > size_limit:
             raise ValidationError(
-                message=_(
+                message=gettext(
                     "The uncompressed raster size (%(size)s) exceeds the limit "
                     "(%(limit)s) by %(delta)s. Reduce raster size to fit the limit."
                 )
@@ -312,8 +318,8 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
     def get_info(self):
         s = super()
         return (s.get_info() if hasattr(s, "get_info") else ()) + (
-            (_("Data type"), self.dtype),
-            (_("COG"), self.cog),
+            (gettext("Data type"), self.dtype),
+            (gettext("COG"), self.cog),
         )
 
     # IBboxLayer implementation:

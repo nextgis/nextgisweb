@@ -12,7 +12,7 @@ from shapely.geometry import box
 from typing_extensions import Annotated
 from zope.interface import implementer
 
-from nextgisweb.env import COMP_ID, Base, _, env
+from nextgisweb.env import COMP_ID, Base, env, gettext
 from nextgisweb.lib import db
 from nextgisweb.lib.geometry import Geometry
 from nextgisweb.lib.ows import FIELD_TYPE_WFS
@@ -124,7 +124,7 @@ def fid_str(fid, layer_name):
 
 class WFSConnection(Base, Resource):
     identity = COMP_ID + "_connection"
-    cls_display_name = _("WFS connection")
+    cls_display_name = gettext("WFS connection")
 
     __scope__ = ConnectionScope
 
@@ -431,7 +431,7 @@ class WFSLayerField(Base, LayerField):
 @implementer(IFeatureLayer, IBboxLayer)
 class WFSLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     identity = layer_identity
-    cls_display_name = _("WFS layer")
+    cls_display_name = gettext("WFS layer")
 
     __scope__ = DataScope
 

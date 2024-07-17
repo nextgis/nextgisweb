@@ -1,7 +1,7 @@
 from pyramid.response import FileResponse
 from sqlalchemy.orm.exc import NoResultFound
 
-from nextgisweb.env import _
+from nextgisweb.env import gettext
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.resource import DataScope
@@ -15,13 +15,13 @@ def export(resource, request):
     item_id = request.GET.get("item_id")
 
     if item_id is None:
-        raise ValidationError(_("Raster mosaic item id not provided."))
+        raise ValidationError(gettext("Raster mosaic item id not provided."))
 
     try:
         item_id = int(item_id)
         item = RasterMosaicItem.filter_by(id=item_id, resource_id=resource.id).one()
     except NoResultFound:
-        raise ValidationError(_("Raster mosaic item not found."))
+        raise ValidationError(gettext("Raster mosaic item not found."))
 
     response = FileResponse(item.fileobj.filename(), request=request)
     response.content_disposition = "attachment; filename=%d_%d.tif" % (

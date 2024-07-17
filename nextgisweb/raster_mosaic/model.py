@@ -6,7 +6,7 @@ from sqlalchemy import func
 from sqlalchemy.ext.orderinglist import ordering_list
 from zope.interface import implementer
 
-from nextgisweb.env import COMP_ID, Base, DBSession, _, env
+from nextgisweb.env import COMP_ID, Base, DBSession, env, gettext
 from nextgisweb.lib import db
 from nextgisweb.lib.geometry import Geometry
 from nextgisweb.lib.osrhelper import sr_from_wkt
@@ -33,7 +33,7 @@ SUPPORTED_DRIVERS = ("GTiff",)
 @implementer(IBboxLayer)
 class RasterMosaic(Base, Resource, SpatialLayerMixin):
     identity = "raster_mosaic"
-    cls_display_name = _("Raster mosaic")
+    cls_display_name = gettext("Raster mosaic")
 
     __scope__ = (DataStructureScope, DataScope)
 
@@ -118,10 +118,10 @@ class RasterMosaicItem(Base):
 
         ds = gdal.Open(filename, gdal.GA_ReadOnly)
         if not ds:
-            raise ValidationError(_("GDAL library was unable to open the file."))
+            raise ValidationError(gettext("GDAL library was unable to open the file."))
 
         if ds.RasterCount not in (3, 4):
-            raise ValidationError(_("Only RGB and RGBA rasters are supported."))
+            raise ValidationError(gettext("Only RGB and RGBA rasters are supported."))
 
         dsdriver = ds.GetDriver()
         dsproj = ds.GetProjection()
@@ -129,14 +129,16 @@ class RasterMosaicItem(Base):
 
         if dsdriver.ShortName not in SUPPORTED_DRIVERS:
             raise ValidationError(
-                _(
+                gettext(
                     "Raster has format '%(format)s', however only following formats are supported: %(all_formats)s."
                 )
                 % dict(format=dsdriver.ShortName, all_formats=", ".join(SUPPORTED_DRIVERS))
             )
 
         if not dsproj or not dsgtran:
-            raise ValidationError(_("Raster files without projection info are not supported."))
+            raise ValidationError(
+                gettext("Raster files without projection info are not supported.")
+            )
 
         data_type = None
         alpha_band = None
@@ -147,7 +149,7 @@ class RasterMosaicItem(Base):
             if data_type is None:
                 data_type = band.DataType
             elif data_type != band.DataType:
-                raise ValidationError(_("Complex data types are not supported."))
+                raise ValidationError(gettext("Complex data types are not supported."))
 
             if band.GetRasterColorInterpretation() == gdal.GCI_AlphaBand:
                 assert alpha_band is None, "Multiple alpha bands found!"

@@ -10,7 +10,7 @@ from pyramid.renderers import render_to_response
 from pyramid.security import forget, remember
 from sqlalchemy.orm.exc import NoResultFound
 
-from nextgisweb.env import DBSession, _
+from nextgisweb.env import DBSession, gettext
 from nextgisweb.lib import dynmenu as dm
 
 from nextgisweb.pyramid import SessionStore, WebSession, viewargs
@@ -29,7 +29,7 @@ def login(request):
         custom_layout=True,
         next_url=next_url,
         props=dict(reloadAfterLogin=False),
-        title=_("Sign in to Web GIS"),
+        title=gettext("Sign in to Web GIS"),
     )
 
 
@@ -54,14 +54,14 @@ def session_invite(request):
                 SessionStore.filter_by(session_id=sid, key="auth.state").one().value
             )
         except NoResultFound:
-            raise InvalidCredentialsException(message=_("Session not found."))
+            raise InvalidCredentialsException(message=gettext("Session not found."))
 
         exp = datetime.fromtimestamp(state.exp)
         if expires != exp or state.ref != 0:
-            raise InvalidCredentialsException(message=_("Invalid 'expires' parameter."))
+            raise InvalidCredentialsException(message=gettext("Invalid 'expires' parameter."))
         now = datetime.utcnow()
         if exp <= now:
-            raise InvalidCredentialsException(message=_("Session expired."))
+            raise InvalidCredentialsException(message=gettext("Session expired."))
 
         cookie_settings = WebSession.cookie_settings(request)
         cookie_name = request.env.pyramid.options["session.cookie.name"]
@@ -80,7 +80,7 @@ def alink(request):
         user = User.filter_by(alink_token=request.matchdict["token"]).one()
     except NoResultFound:
         raise ALinkException(
-            message=_(
+            message=gettext(
                 "Failed to authenticate using the given authorization link. "
                 "Please check the link and contact the administrator."
             )
@@ -91,7 +91,7 @@ def alink(request):
 
     if user.is_administrator:
         raise ALinkException(
-            message=_("Usage of authorization link is forbidden for administrators.")
+            message=gettext("Usage of authorization link is forbidden for administrators.")
         )
 
     remember(request, (user.id, None))
@@ -130,8 +130,8 @@ def oauth(request):
         message = None
 
         if oaserver.options["server.type"] == "nextgisid" and error == "invalid_scope":
-            title = _("Team membership required")
-            message = _(
+            title = gettext("Team membership required")
+            message = gettext(
                 "You are not a member of this Web GIS team. Contact Web GIS "
                 "administrator and ask to be added to the team."
             )
@@ -275,14 +275,14 @@ def settings(request):
     if request.user.keyname == "guest":
         return HTTPUnauthorized()
 
-    return dict(title=_("User settings"), entrypoint="@nextgisweb/auth/settings-form")
+    return dict(title=gettext("User settings"), entrypoint="@nextgisweb/auth/settings-form")
 
 
 @viewargs(renderer="react")
 def user_browse(request):
     request.user.require_permission(any, *permission.auth)
     return dict(
-        title=_("Users"),
+        title=gettext("Users"),
         entrypoint="@nextgisweb/auth/user-browse",
         props=dict(readonly=not request.user.has_permission(permission.manage)),
         dynmenu=request.env.pyramid.control_panel,
@@ -298,7 +298,7 @@ def user_create_or_edit(request):
 
     if "id" not in request.matchdict:
         request.user.require_permission(permission.manage)
-        result["title"] = _("Create new user")
+        result["title"] = gettext("Create new user")
     else:
         request.user.require_permission(any, *permission.auth)
         try:
@@ -316,7 +316,7 @@ def user_create_or_edit(request):
 def group_browse(request):
     request.user.require_permission(any, *permission.auth)
     return dict(
-        title=_("Groups"),
+        title=gettext("Groups"),
         entrypoint="@nextgisweb/auth/group-browse",
         props=dict(readonly=not request.user.has_permission(permission.manage)),
         dynmenu=request.env.pyramid.control_panel,
@@ -332,7 +332,7 @@ def group_create_or_edit(request):
 
     if "id" not in request.matchdict:
         request.user.require_permission(permission.manage)
-        result["title"] = _("Create new group")
+        result["title"] = gettext("Create new group")
     else:
         request.user.require_permission(any, *permission.auth)
         try:
@@ -371,17 +371,17 @@ def setup_pyramid(comp, config):
     def _control_panel(args):
         user = args.request.user
         if user.has_permission(any, *permission.auth):
-            yield dm.Label("auth", _("Groups and users"))
+            yield dm.Label("auth", gettext("Groups and users"))
 
             yield dm.Link(
                 "auth/user",
-                _("Users"),
+                gettext("Users"),
                 lambda kwargs: kwargs.request.route_url("auth.user.browse"),
             )
 
             yield dm.Link(
                 "auth/group",
-                _("Groups"),
+                gettext("Groups"),
                 lambda kwargs: kwargs.request.route_url("auth.group.browse"),
             )
 

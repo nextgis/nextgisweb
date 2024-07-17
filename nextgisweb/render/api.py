@@ -10,7 +10,7 @@ from pyramid.httpexceptions import HTTPBadRequest
 from pyramid.response import Response
 from typing_extensions import Annotated
 
-from nextgisweb.env import _
+from nextgisweb.env import gettext
 from nextgisweb.lib.apitype import AnyOf, AsJSON, ContentType, StatusCode
 
 from nextgisweb.core.exception import UserException, ValidationError
@@ -79,8 +79,8 @@ class LegendSymbol(Struct, kw_only=True):
 
 
 class InvalidOriginError(UserException):
-    title = _("Invalid origin")
-    message = _(
+    title = gettext("Invalid origin")
+    message = gettext(
         "Origin validation is enabled for rendering requests, but the given "
         "origin doesn't match with the CORS origins list."
     )
@@ -155,7 +155,7 @@ def process_symbols(value: Symbols) -> Dict[int, List[int]]:
             p = tuple(int(i) for i in v.split("-", maxsplit=1))
             f, t = p if len(p) == 2 else (p[0], p[0])
             if f <= tail:
-                raise ValidationError(_("Invalid symbols sequence"))
+                raise ValidationError(gettext("Invalid symbols sequence"))
             seq.extend(range(f, t + 1))
             tail = t
     return result

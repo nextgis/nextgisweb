@@ -1,4 +1,4 @@
-from nextgisweb.env import _, pgettext
+from nextgisweb.env import gettext, pgettext
 
 from .permission import Permission, Scope
 
@@ -9,7 +9,7 @@ class ResourceScope(Scope):
     """Base set of resource permissions"""
 
     identity = "resource"
-    label = _("Resource")
+    label = gettext("Resource")
 
     read = P(pgettext("permission", "Read"))
     create = P(pgettext("permission", "Create")).require(read)
@@ -25,7 +25,7 @@ class DataStructureScope(Scope):
     in data itself."""
 
     identity = "datastruct"
-    label = _("Data structure")
+    label = gettext("Data structure")
 
     read = P(pgettext("permission", "Read")).require(ResourceScope.read)
     write = P(pgettext("permission", "Modify")).require(read)
@@ -35,7 +35,7 @@ class DataScope(Scope):
     """Set of permissions for data access"""
 
     identity = "data"
-    label = _("Data")
+    label = gettext("Data")
 
     read = P(pgettext("permission", "Read")).require(ResourceScope.read)
     write = P(pgettext("permission", "Modify")).require(read)
@@ -48,7 +48,7 @@ class ConnectionScope(Scope):
     to access remote DB for example."""
 
     identity = "connection"
-    label = _("Connection")
+    label = gettext("Connection")
 
     read = P(pgettext("permission", "Read")).require(ResourceScope.read)
     write = P(pgettext("permission", "Configure")).require(read)
@@ -62,7 +62,7 @@ class ServiceScope(Scope):
     their permissions separately."""
 
     identity = "service"
-    label = _("Service")
+    label = gettext("Service")
 
     connect = P(pgettext("permission", "Access")).require(ResourceScope.read)
     configure = P(pgettext("permission", "Configure")).require(connect)

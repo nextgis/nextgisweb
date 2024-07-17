@@ -10,7 +10,7 @@ from sqlalchemy.orm import validates
 from zope.interface import implementer
 from zope.sqlalchemy import mark_changed
 
-from nextgisweb.env import COMP_ID, Base, DBSession, _, env
+from nextgisweb.env import COMP_ID, Base, DBSession, env, gettext
 from nextgisweb.lib import db, saext
 
 from nextgisweb.core.exception import ValidationError as VE
@@ -51,18 +51,18 @@ from .vlschema import VLSchema
 Base.depends_on("resource", "feature_layer")
 
 GEOM_TYPE_DISPLAY = (
-    _("Point"),
-    _("Line"),
-    _("Polygon"),
-    _("Multipoint"),
-    _("Multiline"),
-    _("Multipolygon"),
-    _("Point Z"),
-    _("Line Z"),
-    _("Polygon Z"),
-    _("Multipoint Z"),
-    _("Multiline Z"),
-    _("Multipolygon Z"),
+    gettext("Point"),
+    gettext("Line"),
+    gettext("Polygon"),
+    gettext("Multipoint"),
+    gettext("Multiline"),
+    gettext("Multipolygon"),
+    gettext("Point Z"),
+    gettext("Line Z"),
+    gettext("Polygon Z"),
+    gettext("Multipoint Z"),
+    gettext("Multiline Z"),
+    gettext("Multipolygon Z"),
 )
 
 
@@ -111,7 +111,7 @@ def _vlschema_autoflush(res):
 )
 class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin, FVersioningMixin):
     identity = "vector_layer"
-    cls_display_name = _("Vector layer")
+    cls_display_name = gettext("Vector layer")
 
     __scope__ = DataScope
 
@@ -131,8 +131,11 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin, FVersioni
 
     def get_info(self):
         return super().get_info() + (
-            (_("Geometry type"), dict(zip(GEOM_TYPE.enum, GEOM_TYPE_DISPLAY))[self.geometry_type]),
-            (_("Feature count"), self.feature_query()().total_count),
+            (
+                gettext("Geometry type"),
+                dict(zip(GEOM_TYPE.enum, GEOM_TYPE_DISPLAY))[self.geometry_type],
+            ),
+            (gettext("Feature count"), self.feature_query()().total_count),
         )
 
     @property
@@ -689,10 +692,10 @@ class _source_attr(SP):
         if ogrds is None:
             ogrds = ogr.Open(filename, 0)
             if ogrds is None:
-                raise VE(message=_("GDAL library failed to open file."))
+                raise VE(message=gettext("GDAL library failed to open file."))
             else:
                 drivername = ogrds.GetDriver().GetName()
-                raise VE(message=_("Unsupport OGR driver: %s.") % drivername)
+                raise VE(message=gettext("Unsupport OGR driver: %s.") % drivername)
 
         return ogrds
 
@@ -701,15 +704,15 @@ class _source_attr(SP):
             ogrlayer = ogrds.GetLayerByName(layer_name)
         else:
             if ogrds.GetLayerCount() < 1:
-                raise VE(message=_("Dataset doesn't contain layers."))
+                raise VE(message=gettext("Dataset doesn't contain layers."))
 
             if ogrds.GetLayerCount() > 1:
-                raise VE(message=_("Dataset contains more than one layer."))
+                raise VE(message=gettext("Dataset contains more than one layer."))
 
             ogrlayer = ogrds.GetLayer(0)
 
         if ogrlayer is None:
-            raise VE(message=_("Unable to open layer."))
+            raise VE(message=gettext("Unable to open layer."))
 
         # Do not trust geometry type of shapefiles
         if ogrds.GetDriver().ShortName == DRIVERS.ESRI_SHAPEFILE:
@@ -722,7 +725,7 @@ class _source_attr(SP):
             # Apparently OGR_XLSX_HEADERS is taken into account during the GetSpatialRef call
             gdal.SetConfigOption("OGR_XLSX_HEADERS", "FORCE")
             if ogrlayer.GetSpatialRef() is None:
-                raise VE(message=_("Layer doesn't contain coordinate system information."))
+                raise VE(message=gettext("Layer doesn't contain coordinate system information."))
         finally:
             gdal.SetConfigOption("OGR_XLSX_HEADERS", None)
 
@@ -745,7 +748,7 @@ class _source_attr(SP):
 
         if (val := srlzr.data.get("fix_errors", UNSET)) is not UNSET:
             if val not in FIX_ERRORS.enum:
-                raise VE(message=_("Unknown 'fix_errors' value."))
+                raise VE(message=gettext("Unknown 'fix_errors' value."))
             kwargs["fix_errors"] = val
 
         if (val := srlzr.data.get("skip_errors", UNSET)) is not UNSET:
@@ -753,22 +756,22 @@ class _source_attr(SP):
 
         if (val := srlzr.data.get("cast_geometry_type", UNSET)) is not UNSET:
             if val not in (None, "POINT", "LINESTRING", "POLYGON"):
-                raise VE(message=_("Unknown 'cast_geometry_type' value."))
+                raise VE(message=gettext("Unknown 'cast_geometry_type' value."))
             kwargs["cast_geometry_type"] = val
 
         if (val := srlzr.data.get("cast_is_multi", UNSET)) is not UNSET:
             if val not in TOGGLE.enum:
-                raise VE(message=_("Unknown 'cast_is_multi' value."))
+                raise VE(message=gettext("Unknown 'cast_is_multi' value."))
             kwargs["cast_is_multi"] = val
 
         if (val := srlzr.data.get("cast_has_z", UNSET)) is not UNSET:
             if val not in TOGGLE.enum:
-                raise VE(message=_("Unknown 'cast_has_z' value."))
+                raise VE(message=gettext("Unknown 'cast_has_z' value."))
             kwargs["cast_has_z"] = val
 
         if (val := srlzr.data.get("fid_source", UNSET)) is not UNSET:
             if val not in FID_SOURCE.enum:
-                raise VE(message=_("Unknown 'fid_source' value."))
+                raise VE(message=gettext("Unknown 'fid_source' value."))
             kwargs["fid_source"] = val
 
         if (val := srlzr.data.get("fid_field", UNSET)) is not UNSET:
@@ -791,7 +794,7 @@ class _fields_attr(SP):
 class _geometry_type_attr(SP):
     def setter(self, srlzr, value):
         if value not in GEOM_TYPE.enum:
-            raise VE(message=_("Unsupported geometry type."))
+            raise VE(message=gettext("Unsupported geometry type."))
 
         if srlzr.obj.id is None:
             srlzr.obj.geometry_type = value

@@ -15,7 +15,7 @@ from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 from pyramid.response import FileResponse, Response
 from sqlalchemy import text
 
-from nextgisweb.env import DBSession, _, env, inject
+from nextgisweb.env import DBSession, env, gettext, inject
 from nextgisweb.env.package import pkginfo
 from nextgisweb.lib import dynmenu as dm
 from nextgisweb.lib.apitype import JSONType, QueryString
@@ -154,7 +154,7 @@ def openapi_json_test(request) -> JSONType:
 @viewargs(renderer="react")
 def swagger(request):
     return dict(
-        title=_("HTTP API documentation"),
+        title=gettext("HTTP API documentation"),
         entrypoint="@nextgisweb/pyramid/swagger-ui",
         props=dict(url=request.route_url("pyramid.openapi_json")),
     )
@@ -166,7 +166,7 @@ def control_panel(request, *, comp: PyramidComponent):
     if not request.user.is_administrator and len(request.user.effective_permissions) == 0:
         raise ForbiddenError
     return dict(
-        title=_("Control panel"),
+        title=gettext("Control panel"),
         control_panel=request.env.pyramid.control_panel,
     )
 
@@ -179,7 +179,7 @@ def locale(request):
 @viewargs(renderer="mako")
 def sysinfo(request):
     request.require_administrator()
-    return dict(title=_("System information"), dynmenu=request.env.pyramid.control_panel)
+    return dict(title=gettext("System information"), dynmenu=request.env.pyramid.control_panel)
 
 
 @viewargs(renderer="react")
@@ -187,7 +187,7 @@ def storage(request):
     request.require_administrator()
     return dict(
         entrypoint="@nextgisweb/pyramid/storage-summary",
-        title=_("Storage"),
+        title=gettext("Storage"),
         dynmenu=request.env.pyramid.control_panel,
     )
 
@@ -198,7 +198,7 @@ def backup_browse(request):
         raise HTTPNotFound()
     request.require_administrator()
     items = request.env.core.get_backups()
-    return dict(title=_("Backups"), items=items, dynmenu=request.env.pyramid.control_panel)
+    return dict(title=gettext("Backups"), items=items, dynmenu=request.env.pyramid.control_panel)
 
 
 def backup_download(request):
@@ -213,7 +213,7 @@ def backup_download(request):
 def cors(request):
     request.user.require_permission(any, *permission.cors)
     return dict(
-        title=_("Cross-origin resource sharing (CORS)"),
+        title=gettext("Cross-origin resource sharing (CORS)"),
         entrypoint="@nextgisweb/pyramid/cors-settings",
         props=dict(readonly=not request.user.has_permission(permission.cors_manage)),
         dynmenu=request.env.pyramid.control_panel,
@@ -225,7 +225,7 @@ def custom_css(request):
     request.require_administrator()
     return dict(
         entrypoint="@nextgisweb/pyramid/custom-css-form",
-        title=_("Custom CSS"),
+        title=gettext("Custom CSS"),
         dynmenu=request.env.pyramid.control_panel,
     )
 
@@ -235,7 +235,7 @@ def cp_logo(request):
     request.require_administrator()
     return dict(
         entrypoint="@nextgisweb/pyramid/logo-form",
-        title=_("Custom logo"),
+        title=gettext("Custom logo"),
         dynmenu=request.env.pyramid.control_panel,
     )
 
@@ -245,7 +245,7 @@ def system_name(request):
     request.require_administrator()
     return dict(
         entrypoint="@nextgisweb/pyramid/system-name-form",
-        title=_("Web GIS name"),
+        title=gettext("Web GIS name"),
         dynmenu=request.env.pyramid.control_panel,
     )
 
@@ -255,7 +255,7 @@ def home_path(request):
     request.require_administrator()
     return dict(
         entrypoint="@nextgisweb/pyramid/home-path",
-        title=_("Home path"),
+        title=gettext("Home path"),
         dynmenu=request.env.pyramid.control_panel,
     )
 
@@ -265,7 +265,7 @@ def metrics(request):
     request.require_administrator()
     return dict(
         entrypoint="@nextgisweb/pyramid/metrics",
-        title=_("Metrics and analytics"),
+        title=gettext("Metrics and analytics"),
         dynmenu=request.env.pyramid.control_panel,
     )
 
@@ -545,8 +545,8 @@ def setup_pyramid(comp, config):
     config.add_route("pyramid.test_timeout", "/test/timeout").add_view(test_timeout)
 
     comp.control_panel = dm.DynMenu(
-        dm.Label("info", _("Info")),
-        dm.Label("settings", _("Settings")),
+        dm.Label("info", gettext("Info")),
+        dm.Label("settings", gettext("Settings")),
     )
 
     @comp.control_panel.add
@@ -556,7 +556,7 @@ def setup_pyramid(comp, config):
         if user.has_permission(any, *permission.cors):
             yield dm.Link(
                 "settings/cors",
-                _("Cross-origin resource sharing (CORS)"),
+                gettext("Cross-origin resource sharing (CORS)"),
                 lambda args: (args.request.route_url("pyramid.control_panel.cors")),
             )
 
@@ -565,51 +565,51 @@ def setup_pyramid(comp, config):
 
         yield dm.Link(
             "info/sysinfo",
-            _("System information"),
+            gettext("System information"),
             lambda args: (args.request.route_url("pyramid.control_panel.sysinfo")),
         )
 
         yield dm.Link(
             "settings/core",
-            _("Web GIS name"),
+            gettext("Web GIS name"),
             lambda args: (args.request.route_url("pyramid.control_panel.system_name")),
         )
 
         yield dm.Link(
             "settings/custom_css",
-            _("Custom CSS"),
+            gettext("Custom CSS"),
             lambda args: (args.request.route_url("pyramid.control_panel.custom_css")),
         )
 
         yield dm.Link(
             "settings/logo",
-            _("Custom logo"),
+            gettext("Custom logo"),
             lambda args: (args.request.route_url("pyramid.control_panel.logo")),
         )
 
         yield dm.Link(
             "settings/home_path",
-            _("Home path"),
+            gettext("Home path"),
             lambda args: (args.request.route_url("pyramid.control_panel.home_path")),
         )
 
         yield dm.Link(
             "settings/metrics",
-            _("Metrics and analytics"),
+            gettext("Metrics and analytics"),
             lambda args: (args.request.route_url("pyramid.control_panel.metrics")),
         )
 
         if env.core.options["storage.enabled"]:
             yield dm.Link(
                 "info/storage",
-                _("Storage"),
+                gettext("Storage"),
                 lambda args: (args.request.route_url("pyramid.control_panel.storage")),
             )
 
         if comp.options["backup.download"]:
             yield dm.Link(
                 "info/backups",
-                _("Backups"),
+                gettext("Backups"),
                 lambda args: args.request.route_url("pyramid.control_panel.backup.browse"),
             )
 

@@ -12,7 +12,7 @@ from requests.exceptions import RequestException
 from typing_extensions import Annotated
 from zope.interface import implementer
 
-from nextgisweb.env import Base, _, env
+from nextgisweb.env import Base, env, gettext
 from nextgisweb.lib import db
 
 from nextgisweb.core.exception import ExternalServiceError, ValidationError
@@ -45,7 +45,7 @@ url_pattern = re.compile(
 
 class Connection(Base, Resource):
     identity = "wmsclient_connection"
-    cls_display_name = _("WMS connection")
+    cls_display_name = gettext("WMS connection")
 
     __scope__ = ConnectionScope
 
@@ -139,8 +139,8 @@ class Connection(Base, Resource):
         result = s.get_info() if hasattr(s, "get_info") else ()
         if self.capcache_tstamp is not None:
             result += (
-                (_("WMS capabilities"), self.capcache_tstamp),
-                (_("Image format"), ", ".join(self.capcache_dict["formats"])),
+                (gettext("WMS capabilities"), self.capcache_tstamp),
+                (gettext("Image format"), ", ".join(self.capcache_dict["formats"])),
             )
         return result
 
@@ -222,7 +222,7 @@ class RenderRequest:
 @implementer(IRenderableStyle, IBboxLayer)
 class Layer(Base, Resource, SpatialLayerMixin):
     identity = "wmsclient_layer"
-    cls_display_name = _("WMS layer")
+    cls_display_name = gettext("WMS layer")
 
     __scope__ = (DataStructureScope, DataScope)
 

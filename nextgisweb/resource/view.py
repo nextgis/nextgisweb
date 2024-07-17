@@ -10,7 +10,7 @@ from sqlalchemy.orm import joinedload, with_polymorphic
 from sqlalchemy.orm.exc import NoResultFound
 from typing_extensions import Annotated
 
-from nextgisweb.env import DBSession, _
+from nextgisweb.env import DBSession, gettext
 from nextgisweb.lib.dynmenu import DynMenu, Label, Link
 
 from nextgisweb.auth import OnUserLogin
@@ -121,7 +121,7 @@ def json_view(request):
     return dict(
         entrypoint="@nextgisweb/resource/json-view",
         props=dict(id=request.context.id),
-        title=_("JSON view"),
+        title=gettext("JSON view"),
         obj=request.context,
         maxheight=True,
     )
@@ -133,7 +133,7 @@ def effective_permisssions(request):
     return dict(
         entrypoint="@nextgisweb/resource/effective-permissions",
         props=dict(resourceId=request.context.id),
-        title=_("User permissions"),
+        title=gettext("User permissions"),
         obj=request.context,
     )
 
@@ -178,7 +178,7 @@ def create(request):
     zope.event.notify(OnResourceCreateView(cls=cls, parent=request.context))
     return dict(
         obj=request.context,
-        title=_("Create resource"),
+        title=gettext("Create resource"),
         maxheight=True,
         query=dict(operation="create", cls=cls, parent=request.context.id),
     )
@@ -189,7 +189,7 @@ def update(request):
     request.resource_permission(PERM_UPDATE)
     return dict(
         obj=request.context,
-        title=_("Update resource"),
+        title=gettext("Update resource"),
         maxheight=True,
         query=dict(operation="update", id=request.context.id),
     )
@@ -201,7 +201,7 @@ def delete(request):
     return dict(
         entrypoint="@nextgisweb/resource/delete-page",
         props=dict(id=request.context.id),
-        title=_("Delete resource"),
+        title=gettext("Delete resource"),
         obj=request.context,
         maxheight=True,
     )
@@ -258,7 +258,7 @@ def resource_export(request):
     request.require_administrator()
     return dict(
         entrypoint="@nextgisweb/resource/export-settings",
-        title=_("Resource export"),
+        title=gettext("Resource export"),
         dynmenu=request.env.pyramid.control_panel,
     )
 
@@ -282,7 +282,7 @@ def setup_pyramid(comp, config):
 
         if not resource.has_permission(permission, request.user):
             raise InsufficientPermissions(
-                message=_("Insufficient '%s' permission in scope '%s' on resource id = %d.")
+                message=gettext("Insufficient '%s' permission in scope '%s' on resource id = %d.")
                 % (permission.name, permission.scope.identity, resource.id),
                 data=dict(
                     resource=dict(id=resource.id),
@@ -356,9 +356,9 @@ def setup_pyramid(comp, config):
 
     # Actions
     Resource.__dynmenu__ = DynMenu(
-        Label("create", _("Create resource")),
-        Label("operation", _("Action")),
-        Label("extra", _("Extra")),
+        Label("create", gettext("Create resource")),
+        Label("operation", gettext("Action")),
+        Label("extra", gettext("Extra")),
     )
 
     @Resource.__dynmenu__.add
@@ -399,7 +399,7 @@ def setup_pyramid(comp, config):
         if PERM_UPDATE in permissions:
             yield Link(
                 "operation/10-update",
-                _("Update"),
+                gettext("Update"),
                 lambda args: args.request.route_url("resource.update", id=args.obj.id),
                 important=True,
                 icon="material-edit",
@@ -412,7 +412,7 @@ def setup_pyramid(comp, config):
         ):
             yield Link(
                 "operation/20-delete",
-                _("Delete"),
+                gettext("Delete"),
                 lambda args: args.request.route_url("resource.delete", id=args.obj.id),
                 important=True,
                 icon="material-delete",
@@ -421,14 +421,14 @@ def setup_pyramid(comp, config):
         if PERM_READ in permissions:
             yield Link(
                 "extra/json",
-                _("JSON view"),
+                gettext("JSON view"),
                 lambda args: args.request.route_url("resource.json", id=args.obj.id),
                 icon="material-data_object",
             )
 
             yield Link(
                 "extra/effective-permissions",
-                _("User permissions"),
+                gettext("User permissions"),
                 lambda args: args.request.route_url(
                     "resource.effective_permissions",
                     id=args.obj.id,
@@ -441,7 +441,7 @@ def setup_pyramid(comp, config):
         if args.request.user.is_administrator:
             yield Link(
                 "settings/resource_export",
-                _("Resource export"),
+                gettext("Resource export"),
                 lambda args: (args.request.route_url("resource.control_panel.resource_export")),
             )
 

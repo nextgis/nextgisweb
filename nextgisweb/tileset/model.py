@@ -14,7 +14,7 @@ from osgeo import ogr, osr
 from PIL import Image
 from zope.interface import implementer
 
-from nextgisweb.env import COMP_ID, Base, _, env
+from nextgisweb.env import COMP_ID, Base, env, gettext
 from nextgisweb.lib.osrhelper import sr_from_epsg
 from nextgisweb.lib.registry import list_registry
 
@@ -85,7 +85,7 @@ Base.depends_on("resource")
 
 class TilesetData(KindOfData):
     identity = "tileset"
-    display_name = _("Tilesets")
+    display_name = gettext("Tilesets")
 
 
 @implementer(IExtentRenderRequest, ITileRenderRequest)
@@ -115,7 +115,7 @@ def get_tile_db(db_path):
 @implementer(IRenderableStyle, IRenderableNonCached, IBboxLayer)
 class Tileset(Base, Resource, SpatialLayerMixin):
     identity = "tileset"
-    cls_display_name = _("Tileset")
+    cls_display_name = gettext("Tileset")
 
     __scope__ = (DataStructureScope, DataScope)
 
@@ -200,10 +200,12 @@ class Tileset(Base, Resource, SpatialLayerMixin):
     def get_info(self):
         s = super()
         return (s.get_info() if hasattr(s, "get_info") else ()) + (
-            (_("Number of tiles"), sum(self.tileset_ntiles)),
+            (gettext("Number of tiles"), sum(self.tileset_ntiles)),
             (
-                _("Zoom levels"),
-                _("From {min} to {max}").format(min=self.tileset_zmin, max=self.tileset_zmax),
+                gettext("Zoom levels"),
+                gettext("From {min} to {max}").format(
+                    min=self.tileset_zmin, max=self.tileset_zmax
+                ),
             ),
         )
 
@@ -235,13 +237,13 @@ class FileFormat:
         if match := self.pattern.match(filename):
             if match["prefix"] != self.prefix:
                 raise ValidationError(
-                    message=_(
+                    message=gettext(
                         "Tiles '{}' and '{}' are located in different subdirectories."
                     ).format(self.filename, filename)
                 )
             if self.ext is not None and match["ext"].lower() not in self.ext:
                 raise ValidationError(
-                    message=_("Tiles '{}' and '{}' have different extensions.").format(
+                    message=gettext("Tiles '{}' and '{}' have different extensions.").format(
                         self.filename, filename
                     )
                 )
@@ -298,7 +300,7 @@ def read_file(fn):
                 try:
                     Image.open(BytesIO(row[3]))
                 except IOError:
-                    raise ValidationError(message=_("Unsupported data format."))
+                    raise ValidationError(message=gettext("Unsupported data format."))
 
             try:
                 for z, x, y, data in cursor.execute(sql_tiles):
@@ -307,7 +309,7 @@ def read_file(fn):
             except sqlite3.OperationalError:
                 raise ValidationError(message="Error reading SQLite DB.")
 
-    raise ValidationError(message=_("Unsupported data format."))
+    raise ValidationError(message=gettext("Unsupported data format."))
 
 
 class SourceAttr(SAttribute, apitype=True):
@@ -340,7 +342,9 @@ class SourceAttr(SAttribute, apitype=True):
                 for z, x, y, img_data in read_file(value().data_path):
                     img = Image.open(BytesIO(img_data))
                     if img.size != (256, 256):
-                        raise ValidationError(message=_("Only 256x256 px tiles are supported."))
+                        raise ValidationError(
+                            message=gettext("Only 256x256 px tiles are supported.")
+                        )
                     color = imgcolor(img)
                     data = img_data if color is None else COLOR_MAGIC + bytes(color)
                     cursor.execute("INSERT INTO tile VALUES (?, ?, ?, ?)", (z, x, y, data))
@@ -360,7 +364,7 @@ class SourceAttr(SAttribute, apitype=True):
                         stat_zoom[4] += 1
 
                 if len(stat) == 0:
-                    raise ValidationError(message=_("No tiles found in source."))
+                    raise ValidationError(message=gettext("No tiles found in source."))
 
                 connection.commit()
                 cursor.execute("VACUUM")

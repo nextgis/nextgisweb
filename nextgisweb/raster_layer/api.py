@@ -5,7 +5,7 @@ from io import DEFAULT_BUFFER_SIZE
 from osgeo import gdal
 from pyramid.response import FileIter, FileResponse, Response
 
-from nextgisweb.env import _, env
+from nextgisweb.env import env, gettext
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.pyramid.util import set_output_buffering
@@ -43,10 +43,10 @@ def export(resource, request):
     bands = request.GET["bands"].split(",") if "bands" in request.GET else None
 
     if format is None:
-        raise ValidationError(_("Output format is not provided."))
+        raise ValidationError(gettext("Output format is not provided."))
 
     if format not in EXPORT_FORMAT_GDAL:
-        raise ValidationError(_("Format '%s' is not supported.") % (format,))
+        raise ValidationError(gettext("Format '%s' is not supported.") % (format,))
 
     driver = EXPORT_FORMAT_GDAL[format]
 
@@ -91,7 +91,7 @@ def cog(resource: RasterLayer, request):
     request.resource_permission(PERM_READ)
 
     if not resource.cog:
-        raise ValidationError(_("Requested raster is not COG."))
+        raise ValidationError(gettext("Requested raster is not COG."))
 
     if request.method == "HEAD":
         return Response(
@@ -103,11 +103,11 @@ def cog(resource: RasterLayer, request):
     if request.method == "GET":
         range = request.range
         if range is None:
-            raise ValidationError(_("Range header is missed or invalid."))
+            raise ValidationError(gettext("Range header is missed or invalid."))
 
         content_range = range.content_range(resource.fileobj.size)
         if content_range is None:
-            raise ValidationError(_("Range %s can not be read." % range))
+            raise ValidationError(gettext("Range %s can not be read." % range))
 
         content_length = content_range.stop - content_range.start
         response = Response(

@@ -1,4 +1,4 @@
-from nextgisweb.env import _
+from nextgisweb.env import gettext
 
 from nextgisweb.resource import Widget
 from nextgisweb.resource.view import resource_sections
@@ -21,7 +21,7 @@ class LayerWidget(Widget):
 
 def setup_pyramid(comp, conf):
     @resource_sections(
-        title=_("WMS capabilities"),
+        title=gettext("WMS capabilities"),
         template="section_connection.mako",
         priority=50,
     )

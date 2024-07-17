@@ -1,12 +1,12 @@
-from nextgisweb.env import _
+from nextgisweb.env import gettext
 
 from nextgisweb.core.exception import UserException
 
 
 class AttachmentNotFound(UserException):
-    title = _("Attachment not found")
-    message = _("Attachment with id = %d was not found in feature with id = %d.")
-    detail = _("The attachment may have been deleted or an error in the address.")
+    title = gettext("Attachment not found")
+    message = gettext("Attachment with id = %d was not found in feature with id = %d.")
+    detail = gettext("The attachment may have been deleted or an error in the address.")
     http_status_code = 404
 
     def __init__(self, resource_id, feature_id, attachment_id):

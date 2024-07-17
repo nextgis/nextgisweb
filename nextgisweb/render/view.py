@@ -1,4 +1,4 @@
-from nextgisweb.env import _, env
+from nextgisweb.env import env, gettext
 
 from nextgisweb.resource import Resource, Widget
 from nextgisweb.resource.extaccess import ExternalAccessLink
@@ -22,8 +22,8 @@ class TileCacheWidget(Widget):
 
 
 class TMSLink(ExternalAccessLink):
-    title = _("TMS (Tile Map Service)")
-    help = _(
+    title = gettext("TMS (Tile Map Service)")
+    help = gettext(
         "TMS (Tile Map Service) is a specification for tiled web maps. Tiled web map is a map displayed in a browser by seamlessly joining dozens of individually requested image."
     )
     docs_url = "docs_ngweb_dev/doc/developer/misc.html#render"
@@ -39,6 +39,6 @@ class TMSLink(ExternalAccessLink):
 
 
 def setup_pyramid(comp, config):
-    @resource_sections(title=_("Legend symbols"))
+    @resource_sections(title=gettext("Legend symbols"))
     def resource_section_legend_symbols(obj):
         return env.render.options["legend_symbols_section"] and ILegendSymbols.providedBy(obj)

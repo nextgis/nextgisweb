@@ -1,6 +1,6 @@
 from pyramid.httpexceptions import HTTPNotFound
 
-from nextgisweb.env import _
+from nextgisweb.env import gettext
 from nextgisweb.lib import dynmenu as dm
 
 from nextgisweb.pyramid import viewargs
@@ -22,7 +22,7 @@ def export(request):
         raise HTTPNotFound()
     return dict(
         obj=request.context,
-        title=_("Save as"),
+        title=gettext("Save as"),
         props=dict(id=request.context.id),
         entrypoint="@nextgisweb/raster-layer/export-form",
         maxheight=True,
@@ -30,8 +30,8 @@ def export(request):
 
 
 class COGLink(ExternalAccessLink):
-    title = _("Cloud Optimized GeoTIFF")
-    help = _(
+    title = gettext("Cloud Optimized GeoTIFF")
+    help = gettext(
         "A Cloud Optimized GeoTIFF (COG) is a regular GeoTIFF file, aimed at being hosted on a HTTP file server, with an internal organization that enables more efficient workflows on the cloud. It does this by leveraging the ability of clients issuing ​HTTP GET range requests to ask for just the parts of a file they need."
     )
 
@@ -55,18 +55,18 @@ def setup_pyramid(comp, config):
         if not isinstance(args.obj, RasterLayer):
             return
 
-        yield dm.Label("raster_layer", _("Raster layer"))
+        yield dm.Label("raster_layer", gettext("Raster layer"))
 
         if args.obj.has_export_permission(args.request.user):
             yield dm.Link(
                 "raster_layer/export",
-                _("Save as"),
+                gettext("Save as"),
                 lambda args: args.request.route_url("resource.export.page", id=args.obj.id),
                 icon="material-download",
             )
             yield dm.Link(
                 "raster_layer/download",
-                _("Download"),
+                gettext("Download"),
                 lambda args: args.request.route_url("raster_layer.download", id=args.obj.id),
                 icon="material-download_for_offline",
             )

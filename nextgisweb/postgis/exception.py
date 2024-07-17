@@ -1,12 +1,12 @@
 from sqlalchemy.exc import StatementError
 
-from nextgisweb.env import _
+from nextgisweb.env import gettext
 
 from nextgisweb.core.exception import ExternalServiceError
 
 
 class ExternalDatabaseError(ExternalServiceError):
-    title = _("External database error")
+    title = gettext("External database error")
 
     def __init__(self, *args, sa_error=None, **kwargs):
         super().__init__(*args, **kwargs)

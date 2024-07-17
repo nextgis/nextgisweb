@@ -1,6 +1,6 @@
 from pyramid.httpexceptions import HTTPNotFound
 
-from nextgisweb.env import _
+from nextgisweb.env import gettext
 from nextgisweb.lib import dynmenu as dm
 
 from nextgisweb.feature_layer import IFeatureLayer
@@ -17,7 +17,7 @@ def attachment(request):
 
     return dict(
         obj=request.context,
-        title=_("Manage attachments"),
+        title=gettext("Manage attachments"),
         props=dict(id=request.context.id),
         entrypoint="@nextgisweb/feature-attachment/attachment-form",
         maxheight=True,
@@ -40,7 +40,7 @@ def setup_pyramid(comp, config):
         if args.obj.has_export_permission(args.request.user):
             yield dm.Link(
                 "feature_layer/feature_attachment",
-                _("Manage attachments"),
+                gettext("Manage attachments"),
                 lambda args: args.request.route_url("feature_attachment.page", id=args.obj.id),
                 icon="material-attach_file",
             )

@@ -1,7 +1,7 @@
 from pyramid.httpexceptions import HTTPNotFound
 from sqlalchemy.orm.exc import NoResultFound
 
-from nextgisweb.env import _
+from nextgisweb.env import gettext
 from nextgisweb.lib import dynmenu as dm
 
 from nextgisweb.pyramid import viewargs
@@ -15,7 +15,7 @@ def srs_browse(request):
     request.user.require_permission(any, *SRS.permissions.all)
 
     return dict(
-        title=_("Spatial reference systems"),
+        title=gettext("Spatial reference systems"),
         entrypoint="@nextgisweb/spatial-ref-sys/srs-browse",
         props=dict(readonly=not request.user.has_permission(SRS.permissions.manage)),
         dynmenu=request.env.pyramid.control_panel,
@@ -31,7 +31,7 @@ def srs_create_or_edit(request):
 
     if "id" not in request.matchdict:
         request.user.require_permission(SRS.permissions.manage)
-        result["title"] = _("Create new Spatial reference system")
+        result["title"] = gettext("Create new Spatial reference system")
     else:
         request.user.require_permission(any, *SRS.permissions.all)
         try:
@@ -51,7 +51,7 @@ def catalog_browse(request):
     require_catalog_configured()
 
     return dict(
-        title=_("Spatial reference system catalog"),
+        title=gettext("Spatial reference system catalog"),
         entrypoint="@nextgisweb/spatial-ref-sys/catalog-browse",
         dynmenu=request.env.pyramid.control_panel,
     )
@@ -66,7 +66,7 @@ def catalog_import(request):
     catalog_url = request.env.spatial_ref_sys.options["catalog.url"]
     item_url = catalog_url + "/srs/" + str(catalog_id)
     return dict(
-        title=_("Spatial reference system") + " #%d" % catalog_id,
+        title=gettext("Spatial reference system") + " #%d" % catalog_id,
         entrypoint="@nextgisweb/spatial-ref-sys/catalog-import",
         props=dict(url=item_url, id=catalog_id),
         dynmenu=request.env.pyramid.control_panel,
@@ -88,39 +88,39 @@ def setup_pyramid(comp, config):
         if not any_permission:
             return
 
-        yield dm.Label("spatial_ref_sys", _("Spatial reference systems"))
+        yield dm.Label("spatial_ref_sys", gettext("Spatial reference systems"))
 
         yield dm.Link(
             "spatial_ref_sys/browse",
-            _("List"),
+            gettext("List"),
             lambda kwargs: kwargs.request.route_url("srs.browse"),
         )
 
         if has_permissions(SRS.permissions.manage):
             yield dm.Link(
                 "spatial_ref_sys/create",
-                _("Create"),
+                gettext("Create"),
                 lambda kwargs: kwargs.request.route_url("srs.create"),
             )
 
             if comp.options["catalog.enabled"]:
                 yield dm.Link(
                     "spatial_ref_sys/catalog/browse",
-                    _("Catalog"),
+                    gettext("Catalog"),
                     lambda kwargs: kwargs.request.route_url("srs.catalog"),
                 )
 
             if (obj := getattr(kwargs, "obj", None)) and isinstance(obj, SRS):
                 yield dm.Link(
                     "spatial_ref_sys/edit",
-                    _("Edit"),
+                    gettext("Edit"),
                     lambda kwargs: kwargs.request.route_url("srs.edit", id=kwargs.obj.id),
                 )
 
                 if not obj.disabled:
                     yield dm.Link(
                         "spatial_ref_sys/delete",
-                        _("Delete"),
+                        gettext("Delete"),
                         lambda kwargs: kwargs.request.route_url("srs.delete", id=kwargs.obj.id),
                     )
 

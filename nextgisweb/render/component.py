@@ -7,7 +7,7 @@ import transaction
 from sqlalchemy.dialects import postgresql, sqlite
 from zope.sqlalchemy import mark_changed
 
-from nextgisweb.env import Component, DBSession, _, require
+from nextgisweb.env import Component, DBSession, gettext, require
 from nextgisweb.lib.config import Option
 from nextgisweb.lib.logging import logger
 
@@ -21,7 +21,7 @@ vacuum_freepage_coeff = 0.5
 
 class TileCacheData(KindOfData):
     identity = "tile_cache"
-    display_name = _("Tile cache")
+    display_name = gettext("Tile cache")
 
 
 class RenderComponent(Component):
@@ -48,7 +48,7 @@ class RenderComponent(Component):
     def sys_info(self):
         from .imgcodec import has_fpng
 
-        yield ("Fast PNG", _("Enabled") if has_fpng else _("Disabled"))
+        yield ("Fast PNG", gettext("Enabled") if has_fpng else gettext("Disabled"))
 
     def maintenance(self):
         self.cleanup()

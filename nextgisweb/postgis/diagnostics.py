@@ -18,7 +18,7 @@ from sqlalchemy.types import (
     Time,
 )
 
-from nextgisweb.env import _
+from nextgisweb.env import gettext
 from nextgisweb.lib.logging import logger
 
 from nextgisweb.feature_layer import FIELD_TYPE
@@ -96,7 +96,7 @@ class Check:
         try:
             self.handler(**deps)
         except Exception:
-            self.error(_("Got an unexpected error."))
+            self.error(gettext("Got an unexpected error."))
             logger.exception("Unexpected check exception")
 
     def cleanup(self):
@@ -153,13 +153,13 @@ class LayerCheck(Check):
 
 
 class PostgresCheck(ConnectionCheck):
-    title = _("PostgreSQL connection")
+    title = gettext("PostgreSQL connection")
 
     def handler(self):
         try:
             gethostbyname(self.hostname)
         except gaierror as exc:
-            self.error(_("Host name resolution failed: {}.").format(exc.strerror.lower()))
+            self.error(gettext("Host name resolution failed: {}.").format(exc.strerror.lower()))
             return
 
         url = EngineURL.create(
@@ -177,17 +177,17 @@ class PostgresCheck(ConnectionCheck):
         try:
             conn = self._conn = engine.connect()
         except OperationalError:
-            self.error(_("Failed to connect to the database."))
+            self.error(gettext("Failed to connect to the database."))
             return
 
         self.inject(conn)
-        self.success(_("Connected to the database."))
+        self.success(gettext("Connected to the database."))
 
         conn.execute(sql.text("SELECT 1"))
-        self.success(_("Executed {} query.").format("SELECT 1"))
+        self.success(gettext("Executed {} query.").format("SELECT 1"))
 
         ver = conn.execute(sql.text("SHOW server_version")).scalar().split(" ")[0]
-        self.success(_("PostgreSQL version {}.").format(ver))
+        self.success(gettext("PostgreSQL version {}.").format(ver))
 
     def cleanup(self):
         if conn := getattr(self, "_conn", None):
@@ -196,7 +196,7 @@ class PostgresCheck(ConnectionCheck):
 
 
 class PostgisCheck(ConnectionCheck):
-    title = _("PostGIS extension")
+    title = gettext("PostGIS extension")
 
     def handler(self, conn: Connection):
         # fmt: off
@@ -206,15 +206,15 @@ class PostgisCheck(ConnectionCheck):
         """)).scalar()
         # fmt: on
         if ver is None:
-            self.error(_("PostGIS extension not found."))
+            self.error(gettext("PostGIS extension not found."))
         else:
-            self.success(_("PostGIS extension version {}.").format(ver))
+            self.success(gettext("PostGIS extension version {}.").format(ver))
 
         gcol_count = conn.execute(sql.text("SELECT COUNT(*) FROM geometry_columns")).scalar()
-        self.say(_("Number of geometry columns: {}.").format(gcol_count))
+        self.say(gettext("Number of geometry columns: {}.").format(gcol_count))
 
         srs_count = conn.execute(sql.text("SELECT COUNT(*) FROM spatial_ref_sys")).scalar()
-        self.say(_("Number of spatial reference systems: {}.").format(srs_count))
+        self.say(gettext("Number of spatial reference systems: {}.").format(srs_count))
 
 
 class TableNotExists(Exception):
@@ -254,15 +254,15 @@ class TableInspector:
 
 
 class TableCheck(LayerCheck):
-    title = _("Layer table")
+    title = gettext("Layer table")
 
     def handler(self, conn: Connection):
         try:
             tins = TableInspector(conn, self.schema, self.table)
         except TableNotExists:
-            self.error(_("Table not found."))
+            self.error(gettext("Table not found."))
             return
-        self.success(_("Table found, table type is {}.").format(tins.table_type))
+        self.success(gettext("Table found, table type is {}.").format(tins.table_type))
 
         sql_has_privilege = """
             SELECT has_table_privilege(
@@ -280,44 +280,44 @@ class TableCheck(LayerCheck):
                 dict(schema=self.schema, table=self.table, privilege=priv),
             ).scalar()
             if has_privilege:
-                self.success(_("{} privilege is present.").format(priv))
+                self.success(gettext("{} privilege is present.").format(priv))
             elif not req:
-                self.warning(_("{} privilege is absent.").format(priv))
+                self.warning(gettext("{} privilege is absent.").format(priv))
             else:
-                self.error(_("{} privilege is absent.").format(priv))
+                self.error(gettext("{} privilege is absent.").format(priv))
 
         count = conn.execute(select(func.count("*")).select_from(self.sa_table)).scalar()
-        self.say(_("Number of records: {}.").format(count))
+        self.say(gettext("Number of records: {}.").format(count))
 
         if self.column_id is None or self.column_geom is None:
-            self.error(_("ID or geometry column isn't set."))
+            self.error(gettext("ID or geometry column isn't set."))
             return
 
         self.inject(tins)
 
 
 class IdColumnCheck(LayerCheck):
-    title = _("ID column")
+    title = gettext("ID column")
 
     def handler(self, conn: Connection, tins: TableInspector):
         cinfo = tins.columns.get(self.column_id)
         if cinfo is None:
-            self.error(_("Column not found."))
+            self.error(gettext("Column not found."))
             return
 
         ctype_repr = coltype_as_str(cinfo["type"])
         if not isinstance(cinfo["type"], Integer):
-            self.error(_("Column found, but has non-integer type - {}.").format(ctype_repr))
+            self.error(gettext("Column found, but has non-integer type - {}.").format(ctype_repr))
 
-        self.success(_("Column found, type is {}.").format(ctype_repr))
+        self.success(gettext("Column found, type is {}.").format(ctype_repr))
 
         is_table = tins.table_type == "BASE TABLE"
 
         if is_table and tins.is_column_primary_key(self.column_id):
-            self.success(_("Column is the primary key."))
+            self.success(gettext("Column is the primary key."))
         else:
             if is_table:
-                self.say(_("Column is not the primary key."))
+                self.say(gettext("Column is not the primary key."))
 
             nullable = cinfo["nullable"]
             has_unique_index = is_table and tins.has_unique_index_on(self.column_id)
@@ -326,22 +326,22 @@ class IdColumnCheck(LayerCheck):
 
             if nullable:
                 if is_table:
-                    self.warning(_("Column can be NULL."))
+                    self.warning(gettext("Column can be NULL."))
 
                 expr = self.sa_table.select().where(column_id.is_(None)).exists().select()
                 has_null_values = conn.execute(expr).scalar()
                 if has_null_values:
-                    self.error(_("NULL values in the column."))
+                    self.error(gettext("NULL values in the column."))
                 else:
-                    self.success(_("No NULL values in the column."))
+                    self.success(gettext("No NULL values in the column."))
             else:
-                self.success(_("Column cannot be NULL."))
+                self.success(gettext("Column cannot be NULL."))
 
             if is_table:
                 if not has_unique_index:
-                    self.warning(_("Unique index not found."))
+                    self.warning(gettext("Unique index not found."))
                 else:
-                    self.success(_("Unique index found."))
+                    self.success(gettext("Unique index found."))
 
             if not has_unique_index:
                 fcount = func.count("*")
@@ -357,25 +357,25 @@ class IdColumnCheck(LayerCheck):
                 not_unique = conn.execute(expr).scalar()
 
                 if not_unique:
-                    self.error(_("Non-unique values in the column."))
+                    self.error(gettext("Non-unique values in the column."))
                 else:
-                    self.success(_("All values are unique."))
+                    self.success(gettext("All values are unique."))
 
         if is_table:
             ai = cinfo["autoincrement"]
             if (isinstance(ai, bool) and ai) or (ai == "auto"):
-                self.success(_("Column is auto-incrementable."))
+                self.success(gettext("Column is auto-incrementable."))
             else:
-                self.warning(_("Column isn't auto-incrementable."))
+                self.warning(gettext("Column isn't auto-incrementable."))
 
 
 class GeomColumnCheck(LayerCheck):
-    title = _("Geometry column")
+    title = gettext("Geometry column")
 
     def handler(self, conn: Connection, postgis: PostgisCheck, tins: TableInspector):
         cinfo = tins.columns.get(self.column_geom)
         if cinfo is None:
-            self.error(_("Column not found."))
+            self.error(gettext("Column not found."))
             return
 
         ctype = cinfo["type"]
@@ -385,12 +385,14 @@ class GeomColumnCheck(LayerCheck):
             "GEOMETRY",
             self.geometry_type,
         ):
-            self.error(_("Column found, but has an incompatible type - {}.").format(ctype_repr))
+            self.error(
+                gettext("Column found, but has an incompatible type - {}.").format(ctype_repr)
+            )
         else:
-            self.success(_("Column found, type is {}.").format(ctype_repr))
+            self.success(gettext("Column found, type is {}.").format(ctype_repr))
 
         if ctype.srid != self.geometry_srid:
-            self.error(_("Geometry SRID mismatch."))
+            self.error(gettext("Geometry SRID mismatch."))
 
         for srid in (ctype.srid, *(s for s in (3857, 4326) if s != ctype.srid)):
             expr = sql.column(self.column_geom)
@@ -405,21 +407,21 @@ class GeomColumnCheck(LayerCheck):
             except SQLAlchemyError:
                 if ctype.srid == srid:
                     raise
-                self.error(_("Failed to reproject extent to SRID {}.").format(srid))
+                self.error(gettext("Failed to reproject extent to SRID {}.").format(srid))
                 continue
 
             extent_str = ", ".join("{:.4f}".format(c) for c in extent)
-            self.say(_("Extent (SRID {}): {}.").format(srid, extent_str))
+            self.say(gettext("Extent (SRID {}): {}.").format(srid, extent_str))
 
 
 class ColumnsCheck(LayerCheck):
-    title = _("Field columns")
+    title = gettext("Field columns")
 
     def handler(self, conn: Connection, tins: TableInspector):
         for field in self.fields:
             cinfo = tins.columns.get(field.column_name)
             if cinfo is None:
-                self.error(_("Column of field '{}' not found.").format(field.keyname))
+                self.error(gettext("Column of field '{}' not found.").format(field.keyname))
                 return
 
             ctype = cinfo["type"]
@@ -428,13 +430,15 @@ class ColumnsCheck(LayerCheck):
             type_expected = _FIELD_TYPE_2_DB[field.datatype]
             if not isinstance(ctype, type_expected):
                 self.error(
-                    _("Column of field '{}' found, but has an incompatible type - {}.").format(
-                        field.keyname, ctype_repr
-                    )
+                    gettext(
+                        "Column of field '{}' found, but has an incompatible type - {}."
+                    ).format(field.keyname, ctype_repr)
                 )
             else:
                 self.success(
-                    _("Column of field '{}' found, type is {}.").format(field.keyname, ctype_repr)
+                    gettext("Column of field '{}' found, type is {}.").format(
+                        field.keyname, ctype_repr
+                    )
                 )
 
 

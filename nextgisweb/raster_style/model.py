@@ -5,7 +5,7 @@ import PIL
 from osgeo import gdal, gdal_array, gdalconst
 from zope.interface import implementer
 
-from nextgisweb.env import Base, _
+from nextgisweb.env import Base, gettext
 from nextgisweb.lib.imptool import module_path
 
 from nextgisweb.render import (
@@ -37,7 +37,7 @@ class RenderRequest:
 @implementer(IRenderableStyle, ILegendableStyle)
 class RasterStyle(Base, Resource):
     identity = "raster_style"
-    cls_display_name = _("Raster style")
+    cls_display_name = gettext("Raster style")
 
     __scope__ = DataScope
 

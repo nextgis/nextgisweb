@@ -6,7 +6,7 @@ import transaction
 from babel import Locale
 from babel.core import UnknownLocaleError
 
-from nextgisweb.env import Component, _, require
+from nextgisweb.env import Component, gettext, require
 from nextgisweb.lib.config import Option, OptionAnnotations
 from nextgisweb.lib.imptool import module_path
 from nextgisweb.lib.logging import logger
@@ -160,10 +160,10 @@ class PyramidComponent(Component):
             pass
 
         if t := self.options["request_timeout"]:
-            yield (_("Request timeout"), t)
+            yield (gettext("Request timeout"), t)
 
         lunkwill = self.options["lunkwill.enabled"]
-        yield ("Lunkwill", _("Enabled") if lunkwill else _("Disabled"))
+        yield ("Lunkwill", gettext("Enabled") if lunkwill else gettext("Disabled"))
 
     def backup_configure(self, config):
         super().backup_configure(config)

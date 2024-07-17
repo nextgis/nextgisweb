@@ -1,4 +1,4 @@
-from nextgisweb.env import _
+from nextgisweb.env import gettext
 from nextgisweb.lib.dynmenu import Link
 
 from nextgisweb.feature_layer import IFeatureLayer
@@ -34,7 +34,7 @@ def preview_map(resource, request):
         obj=resource,
         extent=extent,
         source_type=source_type,
-        title=_("Preview"),
+        title=gettext("Preview"),
         maxheight=True,
     )
 
@@ -59,7 +59,7 @@ def setup_pyramid(comp, config):
         ) and (args.obj.has_permission(DataScope.read, args.request.user)):
             yield Link(
                 "extra/preview",
-                _("Preview"),
+                gettext("Preview"),
                 lambda args: args.request.route_url("layer_preview.map", id=args.obj.id),
                 important=True,
                 icon="material-preview",

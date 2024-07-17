@@ -1,4 +1,4 @@
-from nextgisweb.env import _
+from nextgisweb.env import gettext
 from nextgisweb.lib.registry import dict_registry
 
 
@@ -21,7 +21,7 @@ class TileAdapter(WebMapAdapter):
 
     identity = "tile"
     mid = "ngw-webmap/TileAdapter"
-    display_name = _("Tiles")
+    display_name = gettext("Tiles")
 
 
 class ImageAdapter(WebMapAdapter):
@@ -30,4 +30,4 @@ class ImageAdapter(WebMapAdapter):
 
     identity = "image"
     mid = "ngw-webmap/ImageAdapter"
-    display_name = _("Image")
+    display_name = gettext("Image")

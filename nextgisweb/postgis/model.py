@@ -14,7 +14,7 @@ from sqlalchemy.engine.url import make_url as make_engine_url
 from sqlalchemy.exc import NoSuchTableError, OperationalError, SQLAlchemyError
 from zope.interface import implementer
 
-from nextgisweb.env import Base, _, env
+from nextgisweb.env import Base, env, gettext
 from nextgisweb.lib import db
 from nextgisweb.lib.geometry import Geometry
 from nextgisweb.lib.logging import logger
@@ -70,18 +70,18 @@ st_ymin = func.st_ymin
 
 
 GEOM_TYPE_DISPLAY = (
-    _("Point"),
-    _("Line"),
-    _("Polygon"),
-    _("Multipoint"),
-    _("Multiline"),
-    _("Multipolygon"),
-    _("Point Z"),
-    _("Line Z"),
-    _("Polygon Z"),
-    _("Multipoint Z"),
-    _("Multiline Z"),
-    _("Multipolygon Z"),
+    gettext("Point"),
+    gettext("Line"),
+    gettext("Polygon"),
+    gettext("Multipoint"),
+    gettext("Multiline"),
+    gettext("Multipolygon"),
+    gettext("Point Z"),
+    gettext("Line Z"),
+    gettext("Polygon Z"),
+    gettext("Multipoint Z"),
+    gettext("Multiline Z"),
+    gettext("Multipolygon Z"),
 )
 
 
@@ -118,7 +118,7 @@ def calculate_extent(layer, where=None, geomcol=None):
 
 class PostgisConnection(Base, Resource):
     identity = "postgis_connection"
-    cls_display_name = _("PostGIS connection")
+    cls_display_name = gettext("PostGIS connection")
 
     __scope__ = ConnectionScope
 
@@ -199,7 +199,7 @@ class PostgisConnection(Base, Resource):
         try:
             conn = self.get_engine().connect()
         except OperationalError:
-            raise ValidationError(_("Cannot connect to the database!"))
+            raise ValidationError(gettext("Cannot connect to the database!"))
 
         try:
             yield conn
@@ -233,7 +233,7 @@ class PostgisLayerField(Base, LayerField):
 @implementer(IFeatureLayer, IWritableFeatureLayer, IBboxLayer)
 class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     identity = "postgis_layer"
-    cls_display_name = _("PostGIS layer")
+    cls_display_name = gettext("PostGIS layer")
 
     __scope__ = DataScope
 
@@ -287,7 +287,8 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
                 columns = inspector.get_columns(self.table, self.schema)
             except NoSuchTableError:
                 raise ValidationError(
-                    _("Table '%(table)s' not found!") % dict(table=f"{self.schema}.{self.table}")
+                    gettext("Table '%(table)s' not found!")
+                    % dict(table=f"{self.schema}.{self.table}")
                 )
 
             # fmt: off
@@ -304,13 +305,13 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
                 if geometry_srid == 0 and self.geometry_srid is None:
                     raise ValidationError(
-                        _(
+                        gettext(
                             "SRID missing in geometry_columns table! You should specify it manually."
                         )
                     )
 
                 if self.geometry_srid == 0:
-                    raise ValidationError(_("0 is an invalid SRID."))
+                    raise ValidationError(gettext("0 is an invalid SRID."))
 
                 if (
                     self.geometry_srid is not None
@@ -318,7 +319,7 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
                     and self.geometry_srid != geometry_srid
                 ):
                     raise ValidationError(
-                        _("SRID in geometry_columns table does not match specified!")
+                        gettext("SRID in geometry_columns table does not match specified!")
                     )
 
                 if self.geometry_srid is None:
@@ -328,7 +329,7 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
                 if tab_geom_type == "GEOMETRY" and self.geometry_type is None:
                     raise ValidationError(
-                        _(
+                        gettext(
                             "Geometry type missing in geometry_columns table! You should specify it manually."
                         )
                     )
@@ -342,7 +343,9 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
                     and self.geometry_type != tab_geom_type
                 ):
                     raise ValidationError(
-                        _("Geometry type in geometry_columns table does not match specified!")
+                        gettext(
+                            "Geometry type in geometry_columns table does not match specified!"
+                        )
                     )
 
                 if self.geometry_type is None:
@@ -355,7 +358,7 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
                 if column["name"] == self.column_id:
                     if not isinstance(column["type"], db.Integer):
                         raise ValidationError(
-                            _("To use column as ID it should have integer type!")
+                            gettext("To use column as ID it should have integer type!")
                         )
                     colfound_id = True
 
@@ -398,17 +401,20 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
             if not colfound_id:
                 raise ValidationError(
-                    _("Column '%(column)s' not found!") % dict(column=self.column_id)
+                    gettext("Column '%(column)s' not found!") % dict(column=self.column_id)
                 )
 
             if not colfound_geom:
                 raise ValidationError(
-                    _("Column '%(column)s' not found!") % dict(column=self.column_geom)
+                    gettext("Column '%(column)s' not found!") % dict(column=self.column_geom)
                 )
 
     def get_info(self):
         return super().get_info() + (
-            (_("Geometry type"), dict(zip(GEOM_TYPE.enum, GEOM_TYPE_DISPLAY))[self.geometry_type]),
+            (
+                gettext("Geometry type"),
+                dict(zip(GEOM_TYPE.enum, GEOM_TYPE_DISPLAY))[self.geometry_type],
+            ),
         )
 
     # IFeatureLayer

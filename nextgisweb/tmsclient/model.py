@@ -7,7 +7,7 @@ from osgeo import ogr, osr
 from PIL import Image
 from zope.interface import implementer
 
-from nextgisweb.env import Base, _, env
+from nextgisweb.env import Base, env, gettext
 from nextgisweb.lib import db
 from nextgisweb.lib.osrhelper import sr_from_epsg
 
@@ -42,7 +42,7 @@ url_template_pattern = re.compile(
 
 class Connection(Base, Resource):
     identity = "tmsclient_connection"
-    cls_display_name = _("TMS connection")
+    cls_display_name = gettext("TMS connection")
 
     __scope__ = ConnectionScope
 
@@ -103,7 +103,7 @@ class CapmodeAttr(SColumn, apitype=True):
             if srlzr.obj.id is None or srlzr.obj.capmode != NEXTGIS_GEOSERVICES:
                 apikey = srlzr.data.apikey
                 if apikey is UNSET or apikey is None or len(apikey) == 0:
-                    raise ValidationError(message=_("API key required."))
+                    raise ValidationError(message=gettext("API key required."))
             srlzr.obj.url_template = env.tmsclient.options["nextgis_geoservices.url_template"]
             srlzr.obj.apikey_param = "apikey"
             srlzr.obj.scheme = SCHEME.XYZ
@@ -147,7 +147,7 @@ class RenderRequest:
     def render_tile(self, tile, size):
         zoom = tile[0]
         if zoom < self.style.minzoom or zoom > self.style.maxzoom:
-            raise ValidationError(message=_("Zoom is out of range."))
+            raise ValidationError(message=gettext("Zoom is out of range."))
         extent = self.srs.tile_extent(tile)
         return self.style.render_image(extent, (size, size), self.srs, zoom)
 
@@ -155,7 +155,7 @@ class RenderRequest:
 @implementer(IRenderableStyle, IBboxLayer)
 class Layer(Base, Resource, SpatialLayerMixin):
     identity = "tmsclient_layer"
-    cls_display_name = _("TMS layer")
+    cls_display_name = gettext("TMS layer")
 
     __scope__ = (DataStructureScope, DataScope)
 
@@ -300,7 +300,7 @@ class LayerNameAttr(SColumn, apitype=True):
             if (
                 value is None or len(value) == 0
             ) and r"{layer}" in srlzr.obj.connection.url_template:
-                raise ValidationError(message=_("Layer name required."))
+                raise ValidationError(message=gettext("Layer name required."))
 
         super().set(srlzr, value, create=create)
 

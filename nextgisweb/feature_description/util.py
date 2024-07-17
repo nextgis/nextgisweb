@@ -1,7 +1,7 @@
 from contextlib import contextmanager
 from zipfile import BadZipFile, ZipFile
 
-from nextgisweb.env import DBSession, _
+from nextgisweb.env import DBSession, gettext
 from nextgisweb.lib.json import loadb
 
 from nextgisweb.core.exception import ValidationError
@@ -16,7 +16,7 @@ def descriptions_import(resource, filename):
             with ZipFile(filename, mode="r") as zf:
                 yield zf
         except BadZipFile:
-            raise ValidationError(message=_("Invalid ZIP archive."))
+            raise ValidationError(message=gettext("Invalid ZIP archive."))
 
     with open_zip_file() as z:
         metadata = loadb(z.read("metadata.json"))

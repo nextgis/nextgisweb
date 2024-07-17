@@ -6,7 +6,7 @@ from osgeo import gdal
 from pyramid.response import FileResponse
 from sqlalchemy.orm.exc import NoResultFound
 
-from nextgisweb.env import _, env
+from nextgisweb.env import env, gettext
 from nextgisweb.lib.geometry import Geometry, GeometryNotValid, Transformer
 
 from nextgisweb.core.exception import ValidationError
@@ -86,9 +86,9 @@ class ExportOptions:
         **params,
     ):
         if format is None:
-            raise ValidationError(message=_("Output format is not provided."))
+            raise ValidationError(message=gettext("Output format is not provided."))
         if format not in EXPORT_FORMAT_OGR:
-            raise ValidationError(message=_("Format '%s' is not supported.") % format)
+            raise ValidationError(message=gettext("Format '%s' is not supported.") % format)
         self.driver = EXPORT_FORMAT_OGR[format]
 
         # dataset creation options (configurable by user)
@@ -118,7 +118,9 @@ class ExportOptions:
             try:
                 self.intersects_geom = Geometry.from_wkt(intersects)
             except GeometryNotValid:
-                raise ValidationError(message=_("Parameter 'intersects' geometry is not valid."))
+                raise ValidationError(
+                    message=gettext("Parameter 'intersects' geometry is not valid.")
+                )
 
             if intersects_srs is not None:
                 self.intersects_srs = SRS.filter_by(id=intersects_srs).one()
@@ -143,7 +145,7 @@ def export(resource, options, filepath):
 
         if total_count > export_limit:
             raise ValidationError(
-                message=_(
+                message=gettext(
                     "The export limit is set to {limit} features, but the layer contains {count}."
                 ).format(limit=export_limit, count=total_count)
             )
@@ -156,7 +158,9 @@ def export(resource, options, filepath):
             try:
                 intersects_geom = transformer.transform(options.intersects_geom)
             except ValueError:
-                raise ValidationError(message=_("Failed to reproject 'intersects' geometry."))
+                raise ValidationError(
+                    message=gettext("Failed to reproject 'intersects' geometry.")
+                )
         else:
             intersects_geom = options.intersects_geom
         query.intersects(intersects_geom)
@@ -298,7 +302,7 @@ def export_multi(request):
                 name = param["name"]
                 if name != os.path.basename(name):
                     raise ValidationError(
-                        message=_("File name parameter '{}' is not valid.") % name
+                        message=gettext("File name parameter '{}' is not valid.") % name
                     )
             else:
                 name = str(resource.id)

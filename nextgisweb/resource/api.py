@@ -6,7 +6,7 @@ from sqlalchemy.sql import exists
 from sqlalchemy.sql.operators import ilike_op
 from typing_extensions import Annotated
 
-from nextgisweb.env import DBSession, _
+from nextgisweb.env import DBSession, gettext
 from nextgisweb.lib import db
 from nextgisweb.lib.apitype import AnyOf, EmptyObject, StatusCode, annotate
 
@@ -137,7 +137,7 @@ def item_delete(context, request) -> EmptyObject:
         DBSession.delete(obj)
 
     if context.id == 0:
-        raise HierarchyError(message=_("Root resource could not be deleted."))
+        raise HierarchyError(message=gettext("Root resource could not be deleted."))
 
     with DBSession.no_autoflush:
         delete(context)
@@ -192,14 +192,14 @@ def collection_post(
     if parent is not UNSET:
         resource.parent = dict(id=parent)
     elif resource.parent is UNSET:
-        raise ValidationError(_("Resource parent required."))
+        raise ValidationError(gettext("Resource parent required."))
 
     resource_cls = resource.cls
 
     if resource_cls is UNSET:
-        raise ValidationError(message=_("Resource class required."))
+        raise ValidationError(message=gettext("Resource class required."))
     elif resource_cls not in Resource.registry:
-        raise ValidationError(_("Unknown resource class '%s'.") % resource_cls)
+        raise ValidationError(gettext("Unknown resource class '%s'.") % resource_cls)
     elif (
         resource_cls in request.env.resource.options["disabled_cls"]
         or request.env.resource.options["disable." + resource_cls]
@@ -300,7 +300,7 @@ def permission_explain(request) -> JSONType:
                 if req_permission is None or perm.name == req_permission:
                     permissions.append(perm)
         if len(permissions) == 0:
-            raise ValidationError(_("Permission not found"))
+            raise ValidationError(gettext("Permission not found"))
     else:
         permissions = None
 

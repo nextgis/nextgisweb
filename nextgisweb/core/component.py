@@ -22,7 +22,7 @@ from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import configure_mappers
 from sqlalchemy.orm.exc import NoResultFound
 
-from nextgisweb.env import Component, DBSession, _
+from nextgisweb.env import Component, DBSession, gettext
 from nextgisweb.env.package import enable_qualifications, pkginfo
 from nextgisweb.lib import db, json
 from nextgisweb.lib.config import Option, SizeInBytes
@@ -87,7 +87,7 @@ class CoreComponent(StorageComponentMixin, Component):
 
         # Methods for customization in components
         self.system_full_name_default = self.localizer().translate(
-            _("NextGIS geoinformation system")
+            gettext("NextGIS geoinformation system")
         )
         self.support_url_view = lambda request: self.options["support_url"]
 
@@ -266,10 +266,10 @@ class CoreComponent(StorageComponentMixin, Component):
                 msg = "Failed to get sys info with command: '%s'" % " ".join(cmd)
                 logger.error(msg, exc_info=True)
 
-        result.append((_("Linux kernel"), platform.release()))
+        result.append((gettext("Linux kernel"), platform.release()))
         os_distribution = try_check_output(["lsb_release", "-ds"])
         if os_distribution is not None:
-            result.append((_("OS distribution"), os_distribution))
+            result.append((gettext("OS distribution"), os_distribution))
 
         def get_cpu_model():
             cpuinfo = try_check_output(["cat", "/proc/cpuinfo"])
@@ -281,10 +281,10 @@ class CoreComponent(StorageComponentMixin, Component):
             return platform.processor()
 
         cpu_model = re.sub(r"\(?(TM|R)\)", "", get_cpu_model())
-        result.append((_("CPU"), "{} × {}".format(multiprocessing.cpu_count(), cpu_model)))
+        result.append((gettext("CPU"), "{} × {}".format(multiprocessing.cpu_count(), cpu_model)))
 
         mem_bytes = os.sysconf("SC_PAGE_SIZE") * os.sysconf("SC_PHYS_PAGES")
-        result.append((_("RAM"), "%d MB" % (float(mem_bytes) / 2**20)))
+        result.append((gettext("RAM"), "%d MB" % (float(mem_bytes) / 2**20)))
 
         result.append(("Python", ".".join(map(str, sys.version_info[0:3]))))
 
@@ -313,11 +313,11 @@ class CoreComponent(StorageComponentMixin, Component):
 
         if (lb := self.settings_get(self.identity, "last_backup", None)) is not None:
             lb_dt = datetime.fromisoformat(lb).replace(microsecond=0)
-            result.append((_("Last backup"), lb_dt.strftime("%Y-%m-%d %H:%M UTC")))
+            result.append((gettext("Last backup"), lb_dt.strftime("%Y-%m-%d %H:%M UTC")))
 
         if (lm := self.settings_get(self.identity, "last_maintenance", None)) is not None:
             lm_dt = datetime.fromisoformat(lm).replace(microsecond=0)
-            result.append((_("Last maintenance"), lm_dt.strftime("%Y-%m-%d %H:%M UTC")))
+            result.append((gettext("Last maintenance"), lm_dt.strftime("%Y-%m-%d %H:%M UTC")))
 
         return result
 

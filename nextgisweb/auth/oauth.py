@@ -16,7 +16,7 @@ from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.orm import defer, joinedload, load_only
 from sqlalchemy.orm.exc import NoResultFound
 
-from nextgisweb.env import DBSession, _, env
+from nextgisweb.env import DBSession, env, gettext
 from nextgisweb.lib.config import Option, OptionAnnotations
 from nextgisweb.lib.logging import lazy_str, logger
 
@@ -320,8 +320,8 @@ class OAuthHelper:
                 if user is not None and user.id != bind_user.id:
                     dn = self.options["server.display_name"]
                     raise AuthorizationException(
-                        title=_("{} binding error").format(dn),
-                        message=_(
+                        title=gettext("{} binding error").format(dn),
+                        message=gettext(
                             "This {dn} account ({sub}) is already bound to "
                             "the different user ({id}). Log in using this "
                             "account instead of binding it."
@@ -635,32 +635,32 @@ class OAuthErrorResponse(Exception):
 
 
 class AuthorizationException(UserException):
-    title = _("OAuth authorization error")
+    title = gettext("OAuth authorization error")
     http_status_code = 401
 
 
 class InvalidTokenException(UserException):
-    title = _("Invalid OAuth token")
+    title = gettext("Invalid OAuth token")
     http_status_code = 401
 
 
 class InvalidScopeException(UserException):
-    title = _("Invalid OAuth scope")
+    title = gettext("Invalid OAuth scope")
     http_status_code = 401
 
 
 class OAuthPasswordGrantTypeException(UserException):
-    title = _("OAuth password grant type failed")
+    title = gettext("OAuth password grant type failed")
     http_status_code = 401
 
 
 class OAuthATokenRefreshException(UserException):
-    title = _("OAuth token refresh failed")
+    title = gettext("OAuth token refresh failed")
     http_status_code = 401
 
 
 class OAuthAccessTokenExpiredException(UserException):
-    title = _("OAuth access token is expired")
+    title = gettext("OAuth access token is expired")
     http_status_code = 401
 
 

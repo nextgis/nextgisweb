@@ -1,6 +1,6 @@
 import transaction
 
-from nextgisweb.env import Component, _, require
+from nextgisweb.env import Component, gettext, require
 from nextgisweb.lib.config import Option
 
 from nextgisweb.core import KindOfData
@@ -10,7 +10,7 @@ from .model import FeatureAttachment
 
 class FeatureAttachmentData(KindOfData):
     identity = "feature_attachment"
-    display_name = _("Feature attachments")
+    display_name = gettext("Feature attachments")
 
 
 class FeatureAttachmentComponent(Component):

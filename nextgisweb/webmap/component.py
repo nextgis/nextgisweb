@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-from nextgisweb.env import COMP_ID, Component, DBSession, _, require
+from nextgisweb.env import COMP_ID, Component, DBSession, gettext, require
 from nextgisweb.lib import db
 from nextgisweb.lib.config import Option
 from nextgisweb.lib.imptool import module_path
@@ -28,7 +28,7 @@ class WebMapComponent(Component):
         # Create a default web-map if there are none
         # TODO: option to turn this off through settings
         if WebMap.filter_by(parent_id=0).first() is None:
-            dispname = self.env.core.localizer().translate(_("Main web map"))
+            dispname = self.env.core.localizer().translate(gettext("Main web map"))
             WebMap(
                 parent_id=0,
                 display_name=dispname,

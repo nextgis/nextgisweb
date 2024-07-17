@@ -6,7 +6,7 @@ from sqlalchemy import inspect
 from sqlalchemy.exc import NoResultFound, NoSuchTableError, SQLAlchemyError
 from typing_extensions import Annotated
 
-from nextgisweb.env import _
+from nextgisweb.env import gettext
 from nextgisweb.lib.apitype import AsJSON
 
 from nextgisweb.core.exception import ValidationError
@@ -80,7 +80,9 @@ def inspect_table(request) -> AsJSON[List[ColumnObject]]:
         for column in inspector.get_columns(table_name, schema):
             result.append(ColumnObject(name=column["name"], type=coltype_as_str(column["type"])))
     except NoSuchTableError:
-        raise ValidationError(_("Table (%s) not found in schema (%s)." % (table_name, schema)))
+        raise ValidationError(
+            gettext("Table (%s) not found in schema (%s)." % (table_name, schema))
+        )
 
     return result
 
@@ -145,7 +147,7 @@ def diagnostics(request, *, body: CheckBody) -> CheckResponse:
             try:
                 res = PostgisLayer.filter_by(id=lid).one()
             except NoResultFound:
-                raise ValidationError(message=_("PostGIS layer {} not found!").format(lid))
+                raise ValidationError(message=gettext("PostGIS layer {} not found!").format(lid))
 
             # Same permission as for reading layer parameters.
             request.resource_permission(DataStructureScope.read, res)
@@ -169,7 +171,7 @@ def diagnostics(request, *, body: CheckBody) -> CheckResponse:
         try:
             res = PostgisConnection.filter_by(id=cid).one()
         except NoResultFound:
-            raise ValidationError(message=_("PostGIS connection {} not found!").format(cid))
+            raise ValidationError(message=gettext("PostGIS connection {} not found!").format(cid))
 
         request.resource_permission(ConnectionScope.connect, res)
         connection = {

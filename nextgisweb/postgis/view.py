@@ -1,4 +1,4 @@
-from nextgisweb.env import _
+from nextgisweb.env import gettext
 from nextgisweb.lib.dynmenu import Link
 
 from nextgisweb.pyramid import viewargs
@@ -36,7 +36,7 @@ def setup_pyramid(comp, config):
         ):
             yield Link(
                 "extra/postgis-diagnostics",
-                _("Diagnostics"),
+                gettext("Diagnostics"),
                 lambda args: args.request.route_url("postgis.diagnostics_page", id=args.obj.id),
                 icon="material-flaky",
             )
@@ -56,6 +56,6 @@ def diagnostics_page(context, request):
     return dict(
         entrypoint="@nextgisweb/postgis/diagnostics-widget",
         props=dict(data=data),
-        title=_("PostGIS diagnostics"),
+        title=gettext("PostGIS diagnostics"),
         obj=request.context,
     )

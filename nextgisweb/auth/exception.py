@@ -1,23 +1,23 @@
-from nextgisweb.env import _
+from nextgisweb.env import gettext
 
 from nextgisweb.core.exception import UserException
 
 
 class InvalidAuthorizationHeader(UserException):
-    title = _("Invalid authorization header")
+    title = gettext("Invalid authorization header")
     http_status_code = 400
 
 
 class InvalidCredentialsException(UserException):
-    title = _("Invalid credentials")
+    title = gettext("Invalid credentials")
     http_status_code = 401
 
 
 class UserDisabledException(UserException):
-    title = _("User is disabled")
+    title = gettext("User is disabled")
     http_status_code = 401
 
 
 class ALinkException(UserException):
-    title = _("Invalid authorization link")
+    title = gettext("Invalid authorization link")
     http_status_code = 401

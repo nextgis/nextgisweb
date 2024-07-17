@@ -1,4 +1,4 @@
-from nextgisweb.env import _
+from nextgisweb.env import gettext
 
 from nextgisweb.resource import Widget
 from nextgisweb.resource.extaccess import ExternalAccessLink
@@ -13,8 +13,8 @@ class ServiceWidget(Widget):
 
 
 class WFSLink(ExternalAccessLink):
-    title = _("Web Feature Service (WFS)")
-    help = _(
+    title = gettext("Web Feature Service (WFS)")
+    help = gettext(
         "Web Feature Service (WFS) provides an interface allowing requests for geographical features across the web using platform-independent calls."
     )
     docs_url = "docs_ngweb/source/layers.html#wfs-service"
