@@ -1,4 +1,5 @@
 import typing
+from warnings import warn
 
 from .component import Component, load_all, require
 from .environment import Env, EnvDependency, env, inject, provide, setenv
@@ -27,6 +28,15 @@ def __getattr__(name):
 
     elif name in ("_", "gettext", "pgettext", "ngettext", "npgettext"):
         from .component import _tr_str_factory as _factory
+
+        if name == "_":
+            warn(
+                "Usage of _ from nextgisweb.env isn't encouraged since "
+                "nextgisweb >= 4.9.0.dev0 and it will be removed in 5.0.0. "
+                "Use nextgisweb.env.gettext instead.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
 
         return getattr(_factory(), "gettext" if name == "_" else name)
 
