@@ -83,12 +83,14 @@ a[class*=" icon-"]:hover:before {
             flex-grow: 1;
             justify-content: center;
             align-items: stretch;
+            min-width: 0;
 
             > .ngw-pyramid-layout-main {
                 display: flex;
                 flex-grow: 1;
                 flex-direction: column;
                 gap: 6px;
+                box-sizing: border-box;
                 padding: 24px 12px 12px 12px;
                 max-width: 1000px;
 
@@ -147,7 +149,7 @@ a[class*=" icon-"]:hover:before {
         > .ngw-pyramid-layout-crow
             > .ngw-pyramid-layout-mwrapper
             > .ngw-pyramid-layout-main {
-            max-width: none;
+            max-width: 100%;
         }
     }
 
@@ -250,6 +252,7 @@ a[class*=" icon-"]:hover:before {
 
 .ngw-pyramid-layout-sidebar {
     position: relative;
+    flex-shrink: 0.5;
     box-sizing: border-box;
     border-left: 1px solid var(--divider-color);
     background: white;
