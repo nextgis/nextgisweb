@@ -386,6 +386,10 @@ const webpackConfig = defaults("main", (env) => ({
             COMP_ID: DefinePlugin.runtimeValue(({ module }) => {
                 return JSON.stringify(config.pathToComponent(module.context));
             }),
+            MODULE_NAME: DefinePlugin.runtimeValue(({ module }) => {
+                const result = config.pathToModule(module.resource, true);
+                return JSON.stringify(result);
+            }),
         }),
         ...(config.jsrealm.tscheck || env.tscheck
             ? [new ForkTsCheckerPlugin()]

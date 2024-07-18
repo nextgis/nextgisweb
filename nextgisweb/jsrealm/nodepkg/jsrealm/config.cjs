@@ -35,10 +35,12 @@ function pathToComponent(path) {
     return null;
 }
 
-function pathToModule(path) {
+function pathToModule(path, strip = false) {
     for (const { name, path: cpath } of packages) {
         if (path.startsWith(cpath + "/") || path === cpath) {
-            return name + path.slice(cpath.length);
+            let result = name + path.slice(cpath.length);
+            if (strip) result = result.replace(/(?:\/index)?\.[tj]?sx?$/, "");
+            return result;
         }
     }
     return null;
