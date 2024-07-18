@@ -159,7 +159,7 @@ msgstr "Тип ресурса - {}."
 msgid "Go to"
 msgstr "Перейти"
 
-#: favorite/__init__.py:7
+#: favorite/__init__.py:7 nodepkg/favorite/FavoritePage.tsx:379
 msgid "Edit"
 msgstr "Изменить"
 
@@ -410,6 +410,10 @@ msgid ""
 msgstr ""
 "Избранные ресурсы пока не были добавлены. Используйте значок звездочки ({}) в"
 " контекстном меню пользователя, чтобы добавить сюда элементы."
+
+#: nodepkg/favorite/FavoritePage.tsx:379
+msgid "Done"
+msgstr "Готово"
 
 #: nodepkg/favorite/useFavorites.tsx:33
 msgid "Added to favorites"

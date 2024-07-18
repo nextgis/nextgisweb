@@ -129,6 +129,15 @@ a[class*=" icon-"]:hover:before {
                     gap: 8px;
                     margin: 0 0 12px 0;
                     min-height: 32px;
+
+                    & > * {
+                        font-weight: initial;
+                        font-size: initial;
+                    }
+
+                    &.pull-right > *:first-child {
+                        margin-left: auto;
+                    }
                 }
             }
         }

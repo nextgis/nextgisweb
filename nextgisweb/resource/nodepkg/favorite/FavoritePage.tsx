@@ -368,15 +368,16 @@ export default function FavoritePage() {
 
     return (
         <>
-            <PageTitle>
-                {" "}
+            <PageTitle pullRight>
                 {items && items.length > 0 && (
                     <Button
-                        type="text"
+                        type="default"
                         size="large"
                         icon={editing ? <SuccessIcon /> : <EditIcon />}
                         onClick={() => setEditing(!editing)}
-                    />
+                    >
+                        {editing ? gettext("Done") : gettext("Edit")}
+                    </Button>
                 )}
             </PageTitle>
             <div className="ngw-resource-favorite-page" style={themeVariables}>
