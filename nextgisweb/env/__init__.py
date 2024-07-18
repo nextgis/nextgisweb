@@ -3,7 +3,7 @@ from warnings import warn
 
 from .component import Component, load_all, require
 from .environment import Env, EnvDependency, env, inject, provide, setenv
-from .model import DBSession, declarative_base
+from .model import DBSession
 
 if typing.TYPE_CHECKING:
     from nextgisweb.lib.i18n import TrStr
