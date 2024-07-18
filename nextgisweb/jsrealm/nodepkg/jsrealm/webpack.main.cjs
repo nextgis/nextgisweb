@@ -73,16 +73,9 @@ const dynamicEntries = () => {
     const plScopeFiles = {};
 
     entrypoints
-        .filter(({ type }) => type === "plugin")
-        .forEach(({ plugin, fullname }) => {
-            if (plScopeFiles[plugin] === undefined) plScopeFiles[plugin] = [];
-            plFileScope[fullname] = plugin;
-            plScopeFiles[plugin].push(fullname);
-        });
-
-    entrypoints
         .filter(({ type }) => type === "registry")
         .forEach(({ entry, fullname, registry }) => {
+            if (!registry) registry = config.pathToModule(fullname, true);
             plRegistries.push({
                 scope: registry,
                 fullname,
@@ -91,11 +84,33 @@ const dynamicEntries = () => {
             });
         });
 
+    const plScopes = plRegistries.map((i) => i.scope);
+    const plRegExp = /\s+from\s+["](@nextgisweb\/[^"]*)["];/g;
+    entrypoints
+        .filter(({ type }) => type === "plugin")
+        .forEach(({ plugin, fullname }) => {
+            if (!plugin) {
+                const body = fs.readFileSync(fullname, { encoding: "utf-8" });
+                for (const [_, n] of body.matchAll(plRegExp)) {
+                    if (plScopes.includes(n)) {
+                        plugin = n;
+                        break;
+                    }
+                }
+            }
+            if (plScopeFiles[plugin] === undefined) plScopeFiles[plugin] = [];
+            plFileScope[fullname] = plugin;
+            plScopeFiles[plugin].push(fullname);
+        });
+
     const webpackEntries = Object.fromEntries(
         entrypoints
             .filter(({ type }) => type !== "plugin")
             .map(({ type, entry, fullname, registry }) => {
                 if (type === "registry") {
+                    if (!registry)
+                        registry = config.pathToModule(fullname, true);
+
                     const wrapper = fullname.replace(
                         /\.[tj]?sx?$/,
                         "-wrapper.js"
@@ -111,16 +126,16 @@ const dynamicEntries = () => {
                         ),
                     ];
 
-                    if (registry === "jsrealm/plugin/meta") {
+                    const metaRegistry = "@nextgisweb/jsrealm/plugin/meta";
+                    if (registry === metaRegistry) {
                         for (const itm of plRegistries) {
                             // Do not include meta registry itself
-                            if (itm.scope === "jsrealm/plugin/meta") continue;
+                            if (itm.scope === metaRegistry) continue;
                             code.push(
-                                `registry.register({`,
-                                `    component: "${itm.component}", `,
-                                `    identity: "${itm.scope}",`,
-                                `    import: () => entrypoint("${itm.entry}").then(({ registry }) => ({ default: registry }))`,
-                                `});`
+                                `registry.register(`,
+                                `    { component: "${itm.component}", identity: "${itm.scope}" },`,
+                                `    { import: () => entrypoint("${itm.entry}").then(({ registry }) => ({ default: registry })) }`,
+                                `);`
                             );
                         }
                     }

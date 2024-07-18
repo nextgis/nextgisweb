@@ -1,96 +1,88 @@
 import matches from "lodash-es/matches";
-import omit from "lodash-es/omit";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type RegisterValue = any;
+type Value = NonNullable<unknown>;
+type Metadata = NonNullable<unknown>;
 
-type Loader<V> = () => Promise<V>;
+type PromiseLoader<V extends Value> = () => Promise<V>;
+type ImportLoader<V extends Value> = PromiseLoader<{ default: V }>;
 
-type ImportLoader<V extends RegisterValue> = () => Promise<{
-    default: V;
-}>;
-
-class PluginBase<V> {
+class PluginObject<V extends Value> {
     readonly component: string;
-    private readonly loader: Loader<V>;
+    readonly #loader: PromiseLoader<V>;
 
-    private promise?: Promise<V> = undefined;
-    private value?: V = undefined;
+    #promise?: Promise<V>;
+    #value?: V;
 
-    constructor(component: string, loader: Loader<V>) {
+    constructor(component: string, loader: PromiseLoader<V>) {
         this.component = component;
-        this.loader = loader;
+        this.#loader = loader;
     }
 
     async load(): Promise<V> {
-        if (this.value !== undefined) return this.value;
-        if (this.promise === undefined) this.promise = this.loader();
-        this.value = await this.promise;
-        return this.value;
+        if (this.#value !== undefined) return this.#value;
+        if (this.#promise === undefined) this.#promise = this.#loader();
+        this.#value = await this.#promise;
+        return this.#value;
     }
 }
 
-type Plugin<V, M> = PluginBase<V> & M;
+type Plugin<
+    V extends Value,
+    M extends Metadata,
+> = keyof M extends keyof PluginObject<Value>
+    ? never /* Key conflicts guard */
+    : PluginObject<V> & Readonly<M>;
 
-type Selector<M> = { component?: string } & M;
+type RegisterValue<V extends Value> =
+    | { sync: V }
+    | { promise: PromiseLoader<V> }
+    | { import: ImportLoader<V> };
 
-type RegisterParams<V extends RegisterValue, M> = { component: string } & M &
-    ({ value: V } | { loader: Loader<V> } | { import: ImportLoader<V> });
+type Selector<M> = { component: string } & M;
 
-interface QueryParams<M> {
-    selector?: Selector<M>;
-    filter?: (selector: Selector<M>) => boolean;
-}
+type Query<M extends Metadata> =
+    | ((i: Selector<M>) => boolean)
+    | Partial<Selector<M>>;
 
-export class PluginRegistry<V extends RegisterValue, M> {
+export class PluginRegistry<
+    V extends Value = Value,
+    M extends Metadata = Metadata,
+> {
     readonly identity: string;
-    protected readonly items: Plugin<V, M>[];
-    protected _sealed: boolean = false;
-    protected _skipped: number = 0;
+    protected readonly items = new Array<Plugin<V, M>>();
+    protected _sealed = false;
+    protected _skipped = 0;
 
     constructor(identity: string) {
         this.identity = identity;
-        this.items = [];
     }
 
-    register({ component, ...rest }: RegisterParams<V, M>) {
+    register(meta: { component: string } & M, value: RegisterValue<V>) {
         if (this._sealed)
             throw new Error(`Registry '${this.identity}' already sealed`);
 
+        const { component, ...metaRest } = meta;
         if (!ngwConfig.components.includes(component)) {
             this._skipped += 1;
             return;
         }
 
-        let loader: Loader<V> | undefined = undefined;
-
-        const lerr = "Exactly one of keys expected: import, promise or sync";
-        const assertLoaderNotSet = () => {
-            if (loader !== undefined) throw new Error(lerr);
-        };
-
-        if ("loader" in rest) {
-            assertLoaderNotSet();
-            loader = rest.loader;
-        } else if ("value" in rest) {
-            assertLoaderNotSet();
-            const _value = rest.value;
-            loader = () => new Promise((resolve) => resolve(_value));
-        } else if ("import" in rest) {
-            assertLoaderNotSet();
-            const _import = rest.import;
+        let loader: PromiseLoader<V>;
+        if ("sync" in value) {
+            loader = () => new Promise((resolve) => resolve(value.sync));
+        } else if ("promise" in value) {
+            loader = value.promise;
+        } else if ("import" in value) {
             loader = () =>
                 new Promise((resolve) => {
-                    _import().then((mod) => {
+                    value.import().then((mod) => {
                         resolve(mod.default);
                     });
                 });
-        } else if (loader === undefined) {
-            throw new Error(lerr);
-        }
+        } else throw TypeError("One of keys expected: sync, promise, import");
 
-        const plugin = new PluginBase<V>(component, loader);
-        Object.assign(plugin, omit(rest, ["loader", "value", "import"]));
+        const plugin = new PluginObject<V>(component, loader);
+        Object.assign(plugin, metaRest);
         this.items.push(plugin as Plugin<V, M>);
     }
 
@@ -115,23 +107,34 @@ export class PluginRegistry<V extends RegisterValue, M> {
         return this._skipped;
     }
 
-    *query({ selector, filter }: QueryParams<M> = {}) {
+    *query(query?: Query<M>) {
         if (!this._sealed)
             throw new Error(`Registry '${this.identity}' hasn't been sealed`);
 
-        const pselector = selector ? matches(selector) : () => true;
-        const pfilter = filter ? filter : () => true;
+        if (query === undefined) query = () => true;
+        else if (typeof query !== "function") query = matches(query);
+
         for (const itm of this.items) {
-            if (pselector(itm) && pfilter(itm)) yield itm;
+            if (query(itm)) yield itm;
         }
     }
 
-    async load(selector: Selector<M>): Promise<V> {
-        const item = Array.from(this.query({ selector }))[0];
+    queryAll(query?: Query<M>) {
+        return Array.from(this.query(query));
+    }
+
+    async load(query?: Query<M>): Promise<V> {
+        const item = this.queryAll(query)[0];
         if (item === undefined)
             throw new Error(
-                `Plugin not found for selector: ${JSON.stringify(selector)}`
+                `No plugin found for selector: ${JSON.stringify(query)}`
             );
         return await item.load();
     }
+}
+
+export function pluginRegistry<V extends Value, M extends Metadata>(
+    identity: string
+): Pick<PluginRegistry<V, M>, "register" | "query" | "queryAll" | "load"> {
+    return new PluginRegistry<V, M>(identity);
 }

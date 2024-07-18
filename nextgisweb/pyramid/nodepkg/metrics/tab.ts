@@ -1,7 +1,7 @@
-/** @registry pyramid/metrics/tab */
+/** @registry */
 import type { FC } from "react";
 
-import { PluginRegistry } from "@nextgisweb/jsrealm/plugin";
+import { pluginRegistry } from "@nextgisweb/jsrealm/plugin";
 import type { Metrics } from "@nextgisweb/pyramid/type/api";
 
 import { gettext } from "../i18n";
@@ -12,29 +12,28 @@ export interface TabProps<TV> {
     readonly: boolean;
 }
 
-export interface MetadataType {
-    readonly key: keyof Metrics;
-    readonly label: string;
-}
-
 type PluginDistribute<TV> = TV extends unknown ? FC<TabProps<TV>> : never;
 type PluginValue = NonNullable<Metrics[keyof Metrics]>;
-export type Plugin = PluginDistribute<PluginValue>;
 
-export const registry = new PluginRegistry<Plugin, MetadataType>(
-    "pyramid/metrics/tab"
+export const registry = pluginRegistry<
+    PluginDistribute<PluginValue>,
+    { key: keyof Metrics; label: string }
+>(MODULE_NAME);
+
+registry.register(
+    {
+        component: COMP_ID,
+        key: "google_analytics",
+        label: gettext("Google Analytics"),
+    },
+    { import: () => import("./GoogleAnalyticsTab") }
 );
 
-registry.register({
-    component: COMP_ID,
-    key: "google_analytics",
-    label: gettext("Google Analytics"),
-    import: () => import("./GoogleAnalyticsTab"),
-});
-
-registry.register({
-    component: COMP_ID,
-    key: "yandex_metrica",
-    label: gettext("Yandex.Metrica"),
-    import: () => import("./YandexMetricaTab"),
-});
+registry.register(
+    {
+        component: COMP_ID,
+        key: "yandex_metrica",
+        label: gettext("Yandex.Metrica"),
+    },
+    { import: () => import("./YandexMetricaTab") }
+);

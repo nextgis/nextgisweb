@@ -1,10 +1,7 @@
-/** @registry jsrealm/plugin/meta */
-import { PluginRegistry } from "./registry";
+/** @registry */
+import { pluginRegistry } from "./registry";
+import type { PluginRegistry } from "./registry";
 
-type PluginType = PluginRegistry<never, never>;
-interface MetadataType {
-    readonly identity: string;
-}
-export const registry = new PluginRegistry<PluginType, MetadataType>(
-    "jsrealm/plugin/meta"
+export const registry = pluginRegistry<PluginRegistry, { identity: string }>(
+    MODULE_NAME
 );

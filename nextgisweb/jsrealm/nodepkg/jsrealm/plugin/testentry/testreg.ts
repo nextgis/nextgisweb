@@ -6,11 +6,10 @@ import { registry } from "./registry";
 describe("Test registry", () => {
     it("throws error on register", () => {
         expect(() => {
-            registry.register({
-                component: COMP_ID,
-                operation: "create",
-                value: (what) => what,
-            });
+            registry.register(
+                { component: COMP_ID, operation: "create" },
+                { sync: (what) => what }
+            );
         }).to.throw();
     });
     ["foo:create", "bar:update", "zoo:delete"].forEach((itm) => {

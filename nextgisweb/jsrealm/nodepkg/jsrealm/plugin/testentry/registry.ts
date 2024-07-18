@@ -1,16 +1,12 @@
-/** @registry jsrealm/plugin/testentry */
-import { PluginRegistry } from "../registry";
+/** @registry */
+import { pluginRegistry } from "../registry";
 
-export type PluginType = (what: string) => string;
-export interface MetadataType {
-    readonly operation: "create" | "update" | "delete";
-}
-export const registry = new PluginRegistry<PluginType, MetadataType>(
-    "jsrealm/plugin/testentry"
+export const registry = pluginRegistry<
+    (what: string) => string,
+    { operation: "create" | "update" | "delete" }
+>(MODULE_NAME);
+
+registry.register(
+    { component: COMP_ID, operation: "create" },
+    { import: () => import("./plugin/foo") }
 );
-
-registry.register({
-    component: COMP_ID,
-    operation: "create",
-    import: () => import("./plugin/foo"),
-});
