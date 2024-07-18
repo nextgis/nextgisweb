@@ -13,6 +13,8 @@ register(DBSession)
 
 
 class BaseClass:
+    __sealed = False
+
     def __init__(self, **kwargs):
         cls = type(self)
         for k, v in kwargs.items():
@@ -21,6 +23,16 @@ class BaseClass:
                 setattr(self, k, v)
 
         self.postinit(**kwargs)
+
+    def __init_subclass__(cls):
+        assert (
+            not cls.__sealed or cls.__name__ == "Base"
+        ), f"Subclassing {cls.__name__} on sealed Base"
+        return super().__init_subclass__()
+
+    @classmethod
+    def seal_base(cls):
+        cls.__sealed = True
 
     def postinit(self, **kwargs):
         sup = super()
