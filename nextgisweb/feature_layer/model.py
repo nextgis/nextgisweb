@@ -106,6 +106,7 @@ class LayerFieldsMixin:
             % (cls.__field_class__.__name__, cls.__name__),
             cascade="all",
             post_update=True,
+            backref=db.backref("_feature_label_field_backref"),
         )
 
     def to_ogr(self, ogr_ds, *, name="", fields=None, use_display_name=False, fid=None):
