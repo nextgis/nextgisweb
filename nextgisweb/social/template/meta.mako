@@ -1,19 +1,23 @@
-<%page args="title"/>
-
+<%page args="site_name, title"/>
 <%
     preview_link = request.env.pyramid.preview_link_view(request)
     image = preview_link['image']
     description = preview_link['description']
+
+    tags = {"og:site_name": site_name}
+    if title:
+        tags["og:title"] = tr(title)
+
+    tags["og:url"] = request.url
+
+    preview_link = request.env.pyramid.preview_link_view(request)
+    if description := preview_link["description"]:
+        tags["og:description"] = tr(description)
+    if image := preview_link["image"]:
+        tags["og:image"] = image
+        tags["twitter:card"] = "summary"
 %>
 
-%if image is not None or description is not None:
-    <meta property="og:title" content="${title}"/>
-    <meta property="og:url" content="${request.url}"/>
-    %if image is not None:
-        <meta property="og:image" content="${image}"/>
-    %endif
-    %if description is not None:
-        <meta property="og:description" content="${tr(description)}"/>
-    %endif
-    <meta name="twitter:card" content="summary"/>
-%endif
+%for k, v in tags.items():
+    <meta property="${k}" content="${v}" />
+%endfor
