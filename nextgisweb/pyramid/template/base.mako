@@ -28,6 +28,7 @@
 <head>
     <title>${head_title}</title>
     <meta charset="utf-8">
+    <meta property="og:site_name" content="${system_name}" />
 
     <%include file="nextgisweb:social/template/meta.mako" args="title=head_title"/>
 
