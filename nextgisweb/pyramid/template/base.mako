@@ -28,9 +28,11 @@
 <head>
     <title>${head_title}</title>
     <meta charset="utf-8">
-    <meta property="og:site_name" content="${system_name}" />
-
-    <%include file="nextgisweb:social/template/meta.mako" args="title=head_title"/>
+    
+    <%include
+        file="nextgisweb:social/template/meta.mako"
+        args="site_name=system_name, title=effective_title"
+    />
 
     <link href="${request.route_url('pyramid.asset.favicon')}" rel="shortcut icon" type="image/x-icon" />
     <link href="${request.static_url('stylesheet/layout.css')}" rel="stylesheet" type="text/css" />
