@@ -3,7 +3,7 @@ from inspect import signature
 from pathlib import Path
 from sys import _getframe
 from typing import Any, Dict, Mapping, Optional, Tuple
-from warnings import warn, warn_explicit
+from warnings import warn_explicit
 
 from msgspec import NODEFAULT, Meta
 from msgspec import ValidationError as MsgSpecValidationError
@@ -202,18 +202,8 @@ class Configurator(PyramidConfigurator):
 
         client = True
         if "client" in kwargs:
-            pclient = kwargs["client"]
-            if pclient is not False:
-                warn(
-                    "The value of 'client' predicate other than False make "
-                    "no sence since 4.5.0.dev14. You can safely remove it "
-                    "from route declarations.",
-                    DeprecationWarning,
-                    stacklevel + 1,
-                )
-            else:
-                client = False
-            del kwargs["client"]
+            client = kwargs.pop("client")
+            assert client is False, "client=False is the only valid route predicate"
 
         if pattern is not None:
             opattern = pattern
