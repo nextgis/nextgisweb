@@ -55,6 +55,7 @@ class RouteMeta(MetaPredicateBase):
     ktemplate: str
     path_params: Mapping[str, PathParam]
     path_decoders: Sequence[Tuple[str, Callable[[str], Any]]]
+    cors_headers: Optional[Tuple[str, ...]]
 
 
 class ErrorRendererPredicate:

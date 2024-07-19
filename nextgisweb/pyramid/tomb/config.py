@@ -190,9 +190,11 @@ class Configurator(PyramidConfigurator):
         self,
         name,
         pattern=None,
+        *,
         types=None,
         deprecated=False,
         openapi=True,
+        cors_headers=None,
         **kwargs,
     ) -> RouteHelper:
         stacklevel = push_stacklevel(kwargs, False, True)
@@ -269,6 +271,7 @@ class Configurator(PyramidConfigurator):
                 ktemplate=ktemplate,
                 path_params=path_params,
                 path_decoders=path_decoders,
+                cors_headers=cors_headers,
             )
 
         helper = RouteHelper(name, self, deprecated=deprecated, openapi=openapi)

@@ -65,7 +65,20 @@ def test_options(origin, match, not_found, ngw_webtest_app, override):
         assert h("Credentials") == ("true" if match else None)
         assert h("Origin") == (origin if match else None)
         assert h("Methods") == ("OPTIONS" if match else None)
-        assert not match or "Content-Type" in h("Headers").split(", ")
+        assert (match and "Content-Type" in h("Headers").split(", ")) or (
+            not match and h("Headers") is None
+        )
+
+        # TUS-specific CORS headers
+        if not not_found:
+            url = "/api/component/file_upload/"
+            headers = {"Origin": origin, "Access-Control-Request-Method": "OPTIONS"}
+            resp = ngw_webtest_app.options(url, headers=headers, status="*")
+
+            h = lambda s: resp.headers.get(f"Access-Control-Allow-{s}")
+            assert (match and "Tus-Resumable" in h("Headers").split(", ")) or (
+                not match and h("Headers") is None
+            )
 
 
 def test_wildcard(ngw_webtest_app, override):

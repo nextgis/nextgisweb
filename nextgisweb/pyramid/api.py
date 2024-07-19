@@ -5,6 +5,7 @@ from inspect import Parameter, signature
 from typing import TYPE_CHECKING, Any, ClassVar, Dict, List, Literal, Optional, Tuple, Type, Union
 
 from msgspec import UNSET, Meta, Struct, UnsetType, convert, defstruct, to_builtins
+from pyramid.interfaces import IRoutesMapper
 from pyramid.response import Response
 from typing_extensions import Annotated
 
@@ -21,6 +22,7 @@ from nextgisweb.jsrealm import TSExport
 from nextgisweb.resource import Resource, ResourceScope
 
 from .permission import cors_manage, cors_view
+from .tomb.predicate import RouteMeta
 from .util import gensecret, parse_origin
 
 
@@ -109,14 +111,27 @@ def cors_tween_factory(handler, registry):
                 hadd(response, "Access-Control-Allow-Methods", method)
                 hadd(response, "Access-Control-Allow-Credentials", "true")
 
-                # Authorization + CORS-safeist headers are allowed
+                # Authorization + CORS-safeist headers are allowed by default,
+                # additional route-specific headers may be extracted from route
+                # metadata.
 
-                hadd(
-                    response,
-                    "Access-Control-Allow-Headers",
-                    "Authorization, Accept, Accept-Language, "
-                    "Content-Language, Content-Type, Range",
-                )
+                allowed_headers = {
+                    "Authorization",
+                    "Accept",
+                    "Accept-Language",
+                    "Content-Language",
+                    "Content-Type",
+                    "Range",
+                }
+
+                if (
+                    (route := registry.getUtility(IRoutesMapper)(request)["route"])
+                    and (meta := RouteMeta.select(route.predicates))
+                    and (ch := meta.cors_headers)
+                ):
+                    allowed_headers.update(ch)
+
+                hadd(response, "Access-Control-Allow-Headers", ", ".join(allowed_headers))
 
                 return response
 

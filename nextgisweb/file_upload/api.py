@@ -333,7 +333,9 @@ def _tus_decode_upload_metadata(value):
 
 
 def setup_pyramid(comp, config):
-    # TODO: Remove legacy route: Formbuilder, Connect
+    tus_request_headers = ("Upload-Offset", "Upload-Length", "Tus-Resumable")
+
+    # TODO: Remove legacy route: Formbuilder
     config.add_route(
         "file_upload.upload",
         "/api/component/file_upload/upload",
@@ -348,6 +350,7 @@ def setup_pyramid(comp, config):
         options=collection_options,
         post=collection_post,
         put=collection_put,
+        cors_headers=tus_request_headers,
     )
 
     config.add_route(
@@ -358,4 +361,5 @@ def setup_pyramid(comp, config):
         get=item_get,
         patch=item_patch_tus,
         delete=item_delete,
+        cors_headers=tus_request_headers,
     )
