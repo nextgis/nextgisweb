@@ -27,14 +27,6 @@ from .permission import Permission, Scope
 from .scope import ResourceScope
 from .widget import CompositeWidget
 
-PERM_CREATE = ResourceScope.create
-PERM_READ = ResourceScope.read
-PERM_UPDATE = ResourceScope.update
-PERM_DELETE = ResourceScope.delete
-PERM_CPERMISSIONS = ResourceScope.change_permissions
-PERM_MCHILDREN = ResourceScope.manage_children
-
-
 ResourceID = Annotated[int, Meta(ge=0, description="Resource ID")]
 
 
@@ -107,7 +99,7 @@ def resource_breadcrumb(obj, request):
 
 @viewargs(renderer="nextgisweb:pyramid/template/psection.mako")
 def show(request):
-    request.resource_permission(PERM_READ)
+    request.resource_permission(ResourceScope.read)
     return dict(obj=request.context, sections=request.context.__psection__)
 
 
@@ -117,7 +109,7 @@ def root(request):
 
 @viewargs(renderer="react")
 def json_view(request):
-    request.resource_permission(PERM_READ)
+    request.resource_permission(ResourceScope.read)
     return dict(
         entrypoint="@nextgisweb/resource/json-view",
         props=dict(id=request.context.id),
@@ -129,7 +121,7 @@ def json_view(request):
 
 @viewargs(renderer="react")
 def effective_permisssions(request):
-    request.resource_permission(PERM_READ)
+    request.resource_permission(ResourceScope.read)
     return dict(
         entrypoint="@nextgisweb/resource/effective-permissions",
         props=dict(resourceId=request.context.id),
@@ -173,7 +165,7 @@ class OnResourceCreateView:
 
 @viewargs(renderer="composite_widget.mako")
 def create(request):
-    request.resource_permission(PERM_MCHILDREN)
+    request.resource_permission(ResourceScope.manage_children)
     cls = request.GET.get("cls")
     zope.event.notify(OnResourceCreateView(cls=cls, parent=request.context))
     return dict(
@@ -186,7 +178,7 @@ def create(request):
 
 @viewargs(renderer="composite_widget.mako")
 def update(request):
-    request.resource_permission(PERM_UPDATE)
+    request.resource_permission(ResourceScope.update)
     return dict(
         obj=request.context,
         title=gettext("Update resource"),
@@ -197,7 +189,7 @@ def update(request):
 
 @viewargs(renderer="react")
 def delete(request):
-    request.resource_permission(PERM_READ)
+    request.resource_permission(ResourceScope.read)
     return dict(
         entrypoint="@nextgisweb/resource/delete-page",
         props=dict(id=request.context.id),
@@ -373,12 +365,12 @@ def setup_pyramid(comp, config):
                 continue
 
             # Is current user has permission to manage resource children?
-            if PERM_MCHILDREN not in permissions:
+            if ResourceScope.manage_children not in permissions:
                 continue
 
             # Is current user has permission to create child resource?
             child = cls(parent=args.obj, owner_user=args.request.user)
-            if not child.has_permission(PERM_CREATE, args.request.user):
+            if not child.has_permission(ResourceScope.create, args.request.user):
                 continue
 
             # Workaround SAWarning: Object of type ... not in session,
@@ -396,7 +388,7 @@ def setup_pyramid(comp, config):
                 icon=f"rescls-{cls.identity}",
             )
 
-        if PERM_UPDATE in permissions:
+        if ResourceScope.update in permissions:
             yield Link(
                 "operation/10-update",
                 gettext("Update"),
@@ -406,9 +398,9 @@ def setup_pyramid(comp, config):
             )
 
         if (
-            PERM_DELETE in permissions
+            ResourceScope.delete in permissions
             and args.obj.id != 0
-            and args.obj.parent.has_permission(PERM_MCHILDREN, args.request.user)
+            and args.obj.parent.has_permission(ResourceScope.manage_children, args.request.user)
         ):
             yield Link(
                 "operation/20-delete",
@@ -418,7 +410,7 @@ def setup_pyramid(comp, config):
                 icon="material-delete",
             )
 
-        if PERM_READ in permissions:
+        if ResourceScope.read in permissions:
             yield Link(
                 "extra/json",
                 gettext("JSON view"),
