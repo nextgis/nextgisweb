@@ -15,9 +15,6 @@ from nextgisweb.spatial_ref_sys import SRS
 from .gdaldriver import EXPORT_FORMAT_GDAL
 from .model import RasterLayer
 
-PERM_READ = DataScope.read
-PERM_WRITE = DataScope.write
-
 
 class RangeFileWrapper(FileIter):
     def __init__(self, file, block_size=DEFAULT_BUFFER_SIZE, offset=0, length=0):
@@ -36,7 +33,7 @@ class RangeFileWrapper(FileIter):
 
 
 def export(resource, request):
-    request.resource_permission(PERM_READ)
+    request.resource_permission(DataScope.read)
 
     srs = SRS.filter_by(id=int(request.GET["srs"])).one() if "srs" in request.GET else resource.srs
     format = request.GET.get("format", "GTiff")
@@ -88,7 +85,7 @@ def export(resource, request):
 def cog(resource: RasterLayer, request):
     """Cloud optimized GeoTIFF endpoint"""
 
-    request.resource_permission(PERM_READ)
+    request.resource_permission(DataScope.read)
 
     if not resource.cog:
         raise ValidationError(gettext("Requested raster is not COG."))
@@ -129,7 +126,7 @@ def cog(resource: RasterLayer, request):
 def download(resource: RasterLayer, request):
     """Download raster in internal representation format"""
 
-    request.resource_permission(PERM_READ)
+    request.resource_permission(DataScope.read)
 
     response = FileResponse(
         resource.fileobj.filename(),

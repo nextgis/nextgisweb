@@ -30,9 +30,6 @@ from .interface import (
 )
 from .versioning import FVersioningNotEnabled, FVersioningOutOfRange
 
-PERM_DATA_READ = DataScope.read
-PERM_DATA_WRITE = DataScope.write
-
 FeatureID = Annotated[int, Meta(description="Feature ID")]
 
 ParamGeomFormat = Literal["wkt", "geojson"]
@@ -254,7 +251,7 @@ def iget(
     dumper_params: Annotated[DumperParams, Query(spread=True)],
 ) -> JSONType:
     """Read feature"""
-    request.resource_permission(PERM_DATA_READ)
+    request.resource_permission(DataScope.read)
 
     dumper = Dumper(resource, dumper_params)
     feature = query_feature_or_not_found(dumper.feature_query(), resource.id, fid)
@@ -269,7 +266,7 @@ def iput(
     loader_params: Annotated[LoaderParams, Query(spread=True)],
 ) -> JSONType:
     """Update feature"""
-    request.resource_permission(PERM_DATA_WRITE)
+    request.resource_permission(DataScope.write)
 
     query = resource.feature_query()
     feature = query_feature_or_not_found(query, resource.id, fid)
@@ -289,7 +286,7 @@ def iput(
 
 def idelete(resource, request, fid: FeatureID) -> JSONType:
     """Delete feature"""
-    request.resource_permission(PERM_DATA_WRITE)
+    request.resource_permission(DataScope.write)
 
     with versioning(resource, request) as vobj:
         resource.feature_delete(fid)
@@ -300,7 +297,7 @@ def idelete(resource, request, fid: FeatureID) -> JSONType:
 
 
 def item_extent(resource, request, fid: FeatureID) -> JSONType:
-    request.resource_permission(PERM_DATA_READ)
+    request.resource_permission(DataScope.read)
     extent = get_extent(resource, fid, 4326)
     return dict(extent=extent)
 
@@ -320,7 +317,7 @@ def get_extent(resource, feature_id, srs):
 
 
 def geometry_info(resource, request, fid: FeatureID) -> JSONType:
-    request.resource_permission(PERM_DATA_READ)
+    request.resource_permission(DataScope.read)
 
     query = resource.feature_query()
     query.geom()
@@ -419,7 +416,7 @@ def cget(
     offset: Annotated[int, Meta(ge=0)] = 0,
 ) -> JSONType:
     """Read features"""
-    request.resource_permission(PERM_DATA_READ)
+    request.resource_permission(DataScope.read)
 
     dumper = Dumper(resource, dumper_params)
     query = dumper.feature_query()
@@ -453,7 +450,7 @@ def cpost(
     loader_params: Annotated[LoaderParams, Query(spread=True)],
 ) -> JSONType:
     """Create feature"""
-    request.resource_permission(PERM_DATA_WRITE)
+    request.resource_permission(DataScope.write)
 
     loader = Loader(resource, loader_params)
     with versioning(resource, request) as vobj:
@@ -473,7 +470,7 @@ def cpatch(
     loader_params: Annotated[LoaderParams, Query(spread=True)],
 ) -> JSONType:
     """Update features"""
-    request.resource_permission(PERM_DATA_WRITE)
+    request.resource_permission(DataScope.write)
 
     loader = Loader(resource, loader_params)
 
@@ -507,7 +504,7 @@ def cpatch(
 
 def cdelete(resource, request) -> JSONType:
     """Delete features"""
-    request.resource_permission(PERM_DATA_WRITE)
+    request.resource_permission(DataScope.write)
 
     with versioning(resource, request):
         if len(request.body) > 0:
@@ -525,7 +522,7 @@ def cdelete(resource, request) -> JSONType:
 
 
 def count(resource, request) -> JSONType:
-    request.resource_permission(PERM_DATA_READ)
+    request.resource_permission(DataScope.read)
 
     query = resource.feature_query()
     total_count = query().total_count
@@ -534,7 +531,7 @@ def count(resource, request) -> JSONType:
 
 
 def feature_extent(resource, request) -> JSONType:
-    request.resource_permission(PERM_DATA_READ)
+    request.resource_permission(DataScope.read)
 
     query = resource.feature_query()
 

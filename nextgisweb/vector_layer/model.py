@@ -810,15 +810,9 @@ class _delete_all_features_attr(SP):
             srlzr.obj.feature_delete_all()
 
 
-P_DSS_READ = DataStructureScope.read
-P_DSS_WRITE = DataStructureScope.write
-P_DS_READ = DataScope.read
-P_DS_WRITE = DataScope.write
-
-
 class _source_option(SP):
     def __init__(self):
-        super().__init__(write=P_DS_WRITE)
+        super().__init__(write=DataScope.write)
 
     def setter(self, srlzr, value):
         pass
@@ -828,9 +822,9 @@ class VectorLayerSerializer(Serializer):
     identity = VectorLayer.identity
     resclass = VectorLayer
 
-    srs = SR(read=P_DSS_READ, write=P_DSS_WRITE)
+    srs = SR(read=DataStructureScope.read, write=DataStructureScope.write)
 
-    source = _source_attr(write=P_DS_WRITE)
+    source = _source_attr(write=DataScope.write)
     source_layer = _source_option()
     fix_errors = _source_option()
     skip_errors = _source_option()
@@ -841,7 +835,10 @@ class VectorLayerSerializer(Serializer):
     fid_field = _source_option()
     skip_other_geometry_types = _source_option()
 
-    geometry_type = _geometry_type_attr(read=P_DSS_READ, write=P_DSS_WRITE)
-    fields = _fields_attr(write=P_DS_WRITE)
+    geometry_type = _geometry_type_attr(
+        read=DataStructureScope.read,
+        write=DataStructureScope.write,
+    )
+    fields = _fields_attr(write=DataScope.write)
 
-    delete_all_features = _delete_all_features_attr(write=P_DS_WRITE)
+    delete_all_features = _delete_all_features_attr(write=DataScope.write)

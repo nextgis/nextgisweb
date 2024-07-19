@@ -1,7 +1,7 @@
 from pyramid.threadlocal import get_current_request
 
 from nextgisweb.feature_layer import IFeatureLayer, IWritableFeatureLayer
-from nextgisweb.feature_layer.view import PD_WRITE
+from nextgisweb.resource import DataScope
 
 from .base import WebmapLayerPlugin
 
@@ -11,7 +11,7 @@ class LayerEditorPlugin(WebmapLayerPlugin):
     def is_layer_supported(cls, layer, webmap):
         if IFeatureLayer.providedBy(layer):
             request = get_current_request()
-            write_permission = layer.has_permission(PD_WRITE, request.user)
+            write_permission = layer.has_permission(DataScope.write, request.user)
             if not write_permission:
                 return False
             return (

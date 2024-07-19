@@ -241,16 +241,12 @@ class _fversioning_attr(SP):
                 obj.fversioning_configure(enabled=enabled, source=srlzr)
 
 
-P_DSS_READ = DataStructureScope.read
-P_DSS_WRITE = DataStructureScope.write
-
-
 class FeatureLayerSerializer(Serializer):
     identity = "feature_layer"
     resclass = LayerFieldsMixin
 
-    fields = _fields_attr(read=P_DSS_READ, write=P_DSS_WRITE)
-    versioning = _fversioning_attr(read=P_DSS_READ, write=P_DSS_WRITE)
+    fields = _fields_attr(read=DataStructureScope.read, write=DataStructureScope.write)
+    versioning = _fversioning_attr(read=DataStructureScope.read, write=DataStructureScope.write)
 
 
 class FeatureQueryIntersectsMixin:

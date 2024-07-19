@@ -4,14 +4,7 @@ from nextgisweb.env import gettext
 from nextgisweb.lib.dynmenu import Label, Link
 
 from nextgisweb.pyramid import JSONType, viewargs
-from nextgisweb.resource import (
-    DataScope,
-    DataStructureScope,
-    Resource,
-    ResourceScope,
-    Widget,
-    resource_factory,
-)
+from nextgisweb.resource import DataScope, DataStructureScope, Resource, Widget, resource_factory
 from nextgisweb.resource.extaccess import ExternalAccessLink
 from nextgisweb.resource.view import resource_sections
 
@@ -35,21 +28,12 @@ class SettingsWidget(Widget):
         return IVersionableFeatureLayer.providedBy(self.obj) and super().is_applicable()
 
 
-PD_READ = DataScope.read
-PD_WRITE = DataScope.write
-
-PDS_R = DataStructureScope.read
-PDS_W = DataStructureScope.write
-
-PR_R = ResourceScope.read
-
-
 @viewargs(renderer="react")
 def feature_browse(request):
-    request.resource_permission(PD_READ)
-    request.resource_permission(PDS_R)
+    request.resource_permission(DataScope.read)
+    request.resource_permission(DataStructureScope.read)
 
-    readonly = not request.context.has_permission(PD_WRITE, request.user)
+    readonly = not request.context.has_permission(DataScope.write, request.user)
 
     return dict(
         obj=request.context,
@@ -63,8 +47,8 @@ def feature_browse(request):
 
 @viewargs(renderer="mako")
 def feature_show(request):
-    request.resource_permission(PD_READ)
-    request.resource_permission(PDS_R)
+    request.resource_permission(DataScope.read)
+    request.resource_permission(DataStructureScope.read)
 
     feature_id = int(request.matchdict["feature_id"])
 
@@ -84,7 +68,7 @@ def feature_show(request):
 
 @viewargs(renderer="react")
 def feature_update(request):
-    request.resource_permission(PD_WRITE)
+    request.resource_permission(DataScope.write)
 
     feature_id = int(request.matchdict["feature_id"])
 
@@ -99,7 +83,7 @@ def feature_update(request):
 
 
 def field_collection(request) -> JSONType:
-    request.resource_permission(PDS_R)
+    request.resource_permission(DataStructureScope.read)
     return [f.to_dict() for f in request.context.fields]
 
 
@@ -199,8 +183,8 @@ def setup_pyramid(comp, config):
 
         yield Label("feature_layer", gettext("Features"))
 
-        if args.obj.has_permission(PD_READ, args.request.user):
-            if args.obj.has_permission(PDS_R, args.request.user):
+        if args.obj.has_permission(DataScope.read, args.request.user):
+            if args.obj.has_permission(DataStructureScope.read, args.request.user):
                 yield Link(
                     "feature_layer/feature-browse",
                     gettext("Table"),

@@ -26,11 +26,6 @@ from .sattribute import ResourceRefOptional, ResourceRefWithParent
 from .scope import ResourceScope, Scope
 from .view import resource_factory
 
-PERM_READ = ResourceScope.read
-PERM_DELETE = ResourceScope.delete
-PERM_MCHILDREN = ResourceScope.manage_children
-PERM_CPERM = ResourceScope.change_permissions
-
 
 class BlueprintResource(Struct):
     identity: str
@@ -107,7 +102,7 @@ else:
 
 def item_get(context, request) -> CompositeRead:
     """Read resource"""
-    request.resource_permission(PERM_READ)
+    request.resource_permission(ResourceScope.read)
 
     serializer = CompositeSerializer(user=request.user)
     return serializer.serialize(context, CompositeRead)
@@ -115,7 +110,7 @@ def item_get(context, request) -> CompositeRead:
 
 def item_put(context, request, body: CompositeUpdate) -> EmptyObject:
     """Update resource"""
-    request.resource_permission(PERM_READ)
+    request.resource_permission(ResourceScope.read)
 
     serializer = CompositeSerializer(user=request.user)
     with DBSession.no_autoflush:
@@ -128,8 +123,8 @@ def item_delete(context, request) -> EmptyObject:
     """Delete resource"""
 
     def delete(obj):
-        request.resource_permission(PERM_DELETE, obj)
-        request.resource_permission(PERM_MCHILDREN, obj)
+        request.resource_permission(ResourceScope.delete, obj)
+        request.resource_permission(ResourceScope.manage_children, obj)
 
         for chld in obj.children:
             delete(chld)
@@ -161,11 +156,11 @@ def collection_get(
     serializer = CompositeSerializer(user=request.user)
     result = list()
     for resource in query:
-        if resource.has_permission(PERM_READ, request.user):
+        if resource.has_permission(ResourceScope.read, request.user):
             result.append(serializer.serialize(resource, CompositeRead))
 
     serializer = CompositeSerializer(user=request.user)
-    check_perm = lambda res, u=request.user: res.has_permission(PERM_READ, u)
+    check_perm = lambda res, u=request.user: res.has_permission(ResourceScope.read, u)
     return [serializer.serialize(res, CompositeRead) for res in query if check_perm(res)]
 
 
@@ -262,11 +257,11 @@ def permission(
     user: Union[UserID, None] = None,
 ) -> EffectivePermissions:
     """Get resource effective permissions"""
-    request.resource_permission(PERM_READ)
+    request.resource_permission(ResourceScope.read)
 
     user_obj = User.filter_by(id=user).one() if (user is not None) else request.user
     if user_obj.id != request.user.id:
-        request.resource_permission(PERM_CPERM)
+        request.resource_permission(ResourceScope.change_permissions)
 
     effective = resource.permissions(user_obj)
     return EffectivePermissions(
@@ -280,7 +275,7 @@ def permission(
 
 
 def permission_explain(request) -> JSONType:
-    request.resource_permission(PERM_READ)
+    request.resource_permission(ResourceScope.read)
 
     req_scope = request.params.get("scope")
     req_permission = request.params.get("permission")
@@ -289,7 +284,7 @@ def permission_explain(request) -> JSONType:
     user = User.filter_by(id=req_user_id).one() if req_user_id is not None else request.user
     other_user = user != request.user
     if other_user:
-        request.resource_permission(PERM_CPERM)
+        request.resource_permission(ResourceScope.change_permissions)
 
     resource = request.context
 
@@ -338,7 +333,7 @@ def permission_explain(request) -> JSONType:
                         n_explain.append(n_item)
                         if isinstance(item, ExplainACLRule):
                             n_item["type"] = "acl_rule"
-                            if i_res.has_permission(PERM_READ, request.user):
+                            if i_res.has_permission(ResourceScope.read, request.user):
                                 n_item["acl_rule"] = {
                                     "action": item.acl_rule.action,
                                     "principal": _jsonify_principal(item.acl_rule.principal),
@@ -350,7 +345,9 @@ def permission_explain(request) -> JSONType:
 
                         elif isinstance(item, ExplainRequirement):
                             n_item["type"] = "requirement"
-                            if i_res is None or i_res.has_permission(PERM_READ, request.user):
+                            if i_res is None or i_res.has_permission(
+                                ResourceScope.read, request.user
+                            ):
                                 n_item["requirement"] = {
                                     "scope": item.requirement.src.scope.identity,
                                     "permission": item.requirement.src.name,
@@ -419,7 +416,7 @@ def search(
 
     cs_keys = None if serialization == "full" else ("resource",)
     serializer = CompositeSerializer(keys=cs_keys, user=request.user)
-    check_perm = lambda res, u=request.user: res.has_permission(PERM_READ, u)
+    check_perm = lambda res, u=request.user: res.has_permission(ResourceScope.read, u)
     return [serializer.serialize(res, CompositeRead) for res in query if check_perm(res)]
 
 

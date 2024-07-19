@@ -87,8 +87,6 @@ class InvalidOriginError(UserException):
     http_status_code = 403
 
 
-PD_READ = DataScope.read
-
 with open(Path(__file__).parent / "empty_256x256.png", "rb") as f:
     EMPTY_TILE_256x256 = f.read()
 
@@ -188,7 +186,7 @@ def tile(
         if not IRenderableStyle.providedBy(obj):
             raise ValidationError("Resource (ID=%d) cannot be rendered." % (resid,))
 
-        request.resource_permission(PD_READ, obj)
+        request.resource_permission(DataScope.read, obj)
 
         rimg = None  # Resulting resource image
 
@@ -268,7 +266,7 @@ def image(
         if not IRenderableStyle.providedBy(obj):
             raise ValidationError("Resource (ID=%d) cannot be rendered." % (resid,))
 
-        request.resource_permission(PD_READ, obj)
+        request.resource_permission(DataScope.read, obj)
 
         rimg = None
 
@@ -430,7 +428,7 @@ def image(
 
 def legend(request) -> Annotated[Response, ContentType("image/png")]:
     """Get resource legend image"""
-    request.resource_permission(PD_READ)
+    request.resource_permission(DataScope.read)
     result = request.context.render_legend()
     return Response(body_file=result, content_type="image/png")
 
@@ -459,7 +457,7 @@ def legend_symbols_by_resource(resource, icon_size: int, tr):
 
 def legend_symbols(request, *, icon_size: int = 24) -> AsJSON[List[LegendSymbol]]:
     """Get resource legend symbols"""
-    request.resource_permission(PD_READ)
+    request.resource_permission(DataScope.read)
     return legend_symbols_by_resource(request.context, icon_size, request.translate)
 
 
