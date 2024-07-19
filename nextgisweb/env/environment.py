@@ -162,6 +162,8 @@ class Env(Container):
         """Returns object sa.MetaData that combines metadata
         of all components from this environment"""
 
+        from .model import _base
+
         metadata = sa.MetaData()
 
         for comp in self.chain("initialize"):
@@ -176,6 +178,9 @@ class Env(Container):
                         # in comments, for debug purposes.
                         sa.DDL("COMMENT ON TABLE %(fullname)s IS " + "'" + comp.identity + "'"),
                     )
+            else:
+                has_base = comp.identity not in _base.memo
+                assert has_base, f"{comp.__class__.__name__}.metadata expected"
 
         return metadata
 
