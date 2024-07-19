@@ -13,7 +13,7 @@ from nextgisweb.render.api import legend_symbols_by_resource
 from nextgisweb.render.legend import ILegendSymbols
 from nextgisweb.render.util import scale_range_intersection
 from nextgisweb.render.view import TMSLink
-from nextgisweb.resource import DataScope, Resource, ResourceScope, Widget, resource_factory
+from nextgisweb.resource import DataScope, Resource, ResourceFactory, ResourceScope, Widget
 
 from .adapter import WebMapAdapter
 from .model import LegendSymbolsEnum, WebMap, WebMapScope
@@ -31,16 +31,6 @@ class SettingsWidget(Widget):
     resource = WebMap
     operation = ("create", "update")
     amdmod = "@nextgisweb/webmap/settings-widget"
-
-
-@viewargs(renderer="react")
-def settings(request):
-    request.require_administrator()
-    return dict(
-        entrypoint="@nextgisweb/webmap/settings",
-        title=gettext("Web map settings"),
-        dynmenu=request.env.pyramid.control_panel,
-    )
 
 
 def check_origin(request):
@@ -277,6 +267,16 @@ def preview_embedded(request):
     )
 
 
+@viewargs(renderer="react")
+def settings(request):
+    request.require_administrator()
+    return dict(
+        entrypoint="@nextgisweb/webmap/settings",
+        title=gettext("Web map settings"),
+        dynmenu=request.env.pyramid.control_panel,
+    )
+
+
 class WebMapTMSLink(TMSLink):
     resource = WebMap
     interface = None
@@ -288,24 +288,35 @@ class WebMapTMSLink(TMSLink):
 
 
 def setup_pyramid(comp, config):
-    config.add_route(
-        "webmap.display", r"/resource/{id:uint}/display", factory=resource_factory
-    ).add_view(display, context=WebMap)
+    resource_factory = ResourceFactory(context=WebMap)
 
     config.add_route(
-        "webmap.display.tiny", r"/resource/{id:uint}/display/tiny", factory=resource_factory
-    ).add_view(display_tiny, context=WebMap)
+        "webmap.display",
+        r"/resource/{id:uint}/display",
+        factory=resource_factory,
+        get=display,
+    )
 
     config.add_route(
-        "webmap.preview_embedded",
-        "/webmap/embedded-preview",
-    ).add_view(preview_embedded)
+        "webmap.display.tiny",
+        r"/resource/{id:uint}/display/tiny",
+        factory=resource_factory,
+        get=display_tiny,
+    )
 
     config.add_route(
         "webmap.clone",
         r"/resource/{id:uint}/clone",
         factory=resource_factory,
-    ).add_view(clone, context=WebMap)
+        get=clone,
+    )
+
+    config.add_route(
+        "webmap.preview_embedded",
+        "/webmap/embedded-preview",
+        get=preview_embedded,
+        post=preview_embedded,
+    )
 
     config.add_route(
         "webmap.control_panel.settings",
