@@ -70,21 +70,24 @@ class ComponentMeta(type):
 
         from .model import _base
 
+        # TODO: Switch to upcoming component module slots
+        model_mod_name = f"{cls.module}.model"
+        model_mod_exists = model_mod_name in sys.modules or find_spec(model_mod_name)
+
         metadata = getattr(cls, "metadata", None)
         if metadata is not None:
             memoized = _base.memo.get(cls.identity)
             assert memoized is not None
             assert memoized.metadata is metadata
-            warn(
-                f"{name}.metadata definition can be removed starting from "
-                f"nextgisweb >= 4.5.0.dev6.",
-                DeprecationWarning,
-                2,
-            )
+            if model_mod_exists:
+                warn(
+                    f"{name}.metadata definition can be removed starting from "
+                    f"nextgisweb >= 4.5.0.dev6.",
+                    DeprecationWarning,
+                    2,
+                )
         else:
-            # TODO: Switch to upcoming component module slots
-            model_mod_name = f"{cls.module}.model"
-            if model_mod_name not in sys.modules and find_spec(model_mod_name):
+            if model_mod_exists and model_mod_name not in sys.modules:
                 __import__(model_mod_name)
 
             if memoized := _base.memo.get(cls.identity):
