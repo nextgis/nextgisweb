@@ -187,7 +187,10 @@ class MigrationContext:
         logger.info("Uninstallation for components: {}".format(", ".join(components)))
 
         metadata, tables = self._metadata_for_components(components)
-        metadata.drop_all(DBSession.connection(), tables)
+
+        # NOTE: SA tries to drop all tables if tables is an empty list
+        if len(tables) > 0:
+            metadata.drop_all(DBSession.connection(), tables)
 
         for op in operations:
             state = op.apply(state)
