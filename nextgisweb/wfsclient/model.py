@@ -39,9 +39,9 @@ from nextgisweb.resource import (
     ConnectionScope,
     CRUTypes,
     DataScope,
-    DataStructureScope,
     Resource,
     ResourceGroup,
+    ResourceScope,
     SAttribute,
     SColumn,
     Serializer,
@@ -552,14 +552,14 @@ class WFSLayerSerializer(Serializer, apitype=True):
     identity = WFSLayer.identity
     resclass = WFSLayer
 
-    connection = SResource(read=DataStructureScope.read, write=DataStructureScope.write)
-    layer_name = SColumn(read=DataStructureScope.read, write=DataStructureScope.write)
-    column_geom = SColumn(read=DataStructureScope.read, write=DataStructureScope.write)
-    geometry_type = GeometryTypeAttr(read=DataStructureScope.read, write=DataStructureScope.write)
-    geometry_srid = GeometrySridAttr(read=DataStructureScope.read, write=DataStructureScope.write)
-    srs = SRelationship(read=DataStructureScope.read, write=DataStructureScope.write)
+    connection = SResource(read=ResourceScope.read, write=ResourceScope.update)
+    layer_name = SColumn(read=ResourceScope.read, write=ResourceScope.update)
+    column_geom = SColumn(read=ResourceScope.read, write=ResourceScope.update)
+    geometry_type = GeometryTypeAttr(read=ResourceScope.read, write=ResourceScope.update)
+    geometry_srid = GeometrySridAttr(read=ResourceScope.read, write=ResourceScope.update)
+    srs = SRelationship(read=ResourceScope.read, write=ResourceScope.update)
 
-    fields = FieldsAttr(read=None, write=DataStructureScope.write)
+    fields = FieldsAttr(read=None, write=ResourceScope.update)
 
 
 @implementer(

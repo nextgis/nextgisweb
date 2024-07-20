@@ -10,7 +10,7 @@ from nextgisweb.env import gettext
 from nextgisweb.lib.apitype import AsJSON
 
 from nextgisweb.core.exception import ValidationError
-from nextgisweb.resource import ConnectionScope, DataStructureScope, ResourceFactory
+from nextgisweb.resource import ConnectionScope, ResourceFactory, ResourceScope
 
 from .diagnostics import Checker, StatusEnum
 from .exception import ExternalDatabaseError
@@ -150,7 +150,7 @@ def diagnostics(request, *, body: CheckBody) -> CheckResponse:
                 raise ValidationError(message=gettext("PostGIS layer {} not found!").format(lid))
 
             # Same permission as for reading layer parameters.
-            request.resource_permission(DataStructureScope.read, res)
+            request.resource_permission(ResourceScope.read, res)
             layer = {
                 k: getattr(res, k)
                 for k in (

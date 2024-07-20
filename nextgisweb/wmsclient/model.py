@@ -26,6 +26,7 @@ from nextgisweb.resource import (
     DataStructureScope,
     Resource,
     ResourceGroup,
+    ResourceScope,
     SAttribute,
     SColumn,
     Serializer,
@@ -313,8 +314,8 @@ class LayerSerializer(Serializer, apitype=True):
     identity = Layer.identity
     resclass = Layer
 
-    connection = SResource(read=DataStructureScope.read, write=DataStructureScope.write)
-    wmslayers = SColumn(read=DataStructureScope.read, write=DataStructureScope.write)
-    imgformat = SColumn(read=DataStructureScope.read, write=DataStructureScope.write)
-    vendor_params = VendorParamsAttr(read=DataStructureScope.read, write=DataStructureScope.write)
-    srs = SRelationship(read=DataStructureScope.read, write=DataStructureScope.write)
+    connection = SResource(read=ResourceScope.read, write=ResourceScope.update)
+    wmslayers = SColumn(read=ResourceScope.read, write=ResourceScope.update)
+    imgformat = SColumn(read=ResourceScope.read, write=ResourceScope.update)
+    vendor_params = VendorParamsAttr(read=ResourceScope.read, write=ResourceScope.update)
+    srs = SRelationship(read=ResourceScope.read, write=ResourceScope.update)

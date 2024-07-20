@@ -34,6 +34,7 @@ from nextgisweb.resource import (
     DataStructureScope,
     Resource,
     ResourceGroup,
+    ResourceScope,
     SAttribute,
     Serializer,
     SRelationship,
@@ -406,5 +407,5 @@ class TilesetSerializer(Serializer, apitype=True):
     identity = Tileset.identity
     resclass = Tileset
 
-    srs = SRelationship(read=DataStructureScope.read, write=DataStructureScope.write)
+    srs = SRelationship(read=ResourceScope.read, write=ResourceScope.update)
     source = SourceAttr(write=DataScope.write)

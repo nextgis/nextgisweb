@@ -16,7 +16,14 @@ from nextgisweb.file_storage import FileObj
 from nextgisweb.file_upload import FileUpload
 from nextgisweb.layer import IBboxLayer, SpatialLayerMixin
 from nextgisweb.raster_layer.util import calc_overviews_levels
-from nextgisweb.resource import DataScope, DataStructureScope, Resource, ResourceGroup, Serializer
+from nextgisweb.resource import (
+    DataScope,
+    DataStructureScope,
+    Resource,
+    ResourceGroup,
+    ResourceScope,
+    Serializer,
+)
 from nextgisweb.resource import SerializedProperty as SP
 from nextgisweb.resource import SerializedRelationship as SR
 
@@ -244,6 +251,6 @@ class RasterMosaicSerializer(Serializer):
     identity = RasterMosaic.identity
     resclass = RasterMosaic
 
-    srs = SR(read=DataStructureScope.read, write=DataStructureScope.write)
+    srs = SR(read=ResourceScope.read, write=ResourceScope.update)
 
     items = _items_attr(read=DataScope.read, write=DataScope.write)

@@ -27,6 +27,7 @@ from nextgisweb.resource import (
     DataStructureScope,
     Resource,
     ResourceGroup,
+    ResourceScope,
     SAttribute,
     SColumn,
     Serializer,
@@ -422,13 +423,13 @@ class RasterLayerSerializer(Serializer, apitype=True):
     identity = RasterLayer.identity
     resclass = RasterLayer
 
-    srs = SRelationship(read=DataStructureScope.read, write=DataStructureScope.write)
+    srs = SRelationship(read=ResourceScope.read, write=ResourceScope.update)
 
-    xsize = SColumn(read=DataStructureScope.read)
-    ysize = SColumn(read=DataStructureScope.read)
-    band_count = SColumn(read=DataStructureScope.read)
-    dtype = SColumn(read=DataStructureScope.read)
-    color_interpretation = ColorInterpretation(read=DataStructureScope.read)
+    xsize = SColumn(read=ResourceScope.read)
+    ysize = SColumn(read=ResourceScope.read)
+    band_count = SColumn(read=ResourceScope.read)
+    dtype = SColumn(read=ResourceScope.read)
+    color_interpretation = ColorInterpretation(read=ResourceScope.read)
 
     source = SourceAttr(write=DataScope.write, required=True)
-    cog = CogAttr(read=DataStructureScope.read, write=DataStructureScope.write)
+    cog = CogAttr(read=ResourceScope.read, write=ResourceScope.update)

@@ -37,7 +37,7 @@ from nextgisweb.feature_layer.versioning import (
 )
 from nextgisweb.file_upload import FileUpload
 from nextgisweb.layer import IBboxLayer, SpatialLayerMixin
-from nextgisweb.resource import DataScope, DataStructureScope, Resource, ResourceGroup, Serializer
+from nextgisweb.resource import DataScope, Resource, ResourceGroup, ResourceScope, Serializer
 from nextgisweb.resource import SerializedProperty as SP
 from nextgisweb.resource import SerializedRelationship as SR
 from nextgisweb.spatial_ref_sys import SRS
@@ -822,7 +822,7 @@ class VectorLayerSerializer(Serializer):
     identity = VectorLayer.identity
     resclass = VectorLayer
 
-    srs = SR(read=DataStructureScope.read, write=DataStructureScope.write)
+    srs = SR(read=ResourceScope.read, write=ResourceScope.update)
 
     source = _source_attr(write=DataScope.write)
     source_layer = _source_option()
@@ -835,10 +835,7 @@ class VectorLayerSerializer(Serializer):
     fid_field = _source_option()
     skip_other_geometry_types = _source_option()
 
-    geometry_type = _geometry_type_attr(
-        read=DataStructureScope.read,
-        write=DataStructureScope.write,
-    )
+    geometry_type = _geometry_type_attr(read=ResourceScope.read, write=ResourceScope.update)
     fields = _fields_attr(write=DataScope.write)
 
     delete_all_features = _delete_all_features_attr(write=DataScope.write)
