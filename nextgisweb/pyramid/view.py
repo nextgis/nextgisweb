@@ -307,6 +307,11 @@ def test_exception_transaction(request):
     DBSession.execute(text("SELECT 1"))
 
 
+@viewargs(renderer="mako")
+def test_exception_template(request):
+    return dict()
+
+
 def test_timeout(request):
     duration = float(request.GET.get("t", "60"))
     interval = float(request.GET["i"]) if "i" in request.GET else None
@@ -533,15 +538,30 @@ def setup_pyramid(comp, config):
     comp.test_request_handler = None
     config.add_route("pyramid.test_request", "/test/request/").add_view(test_request)
 
-    config.add_route("pyramid.test_exception_handled", "/test/exception/handled").add_view(
-        test_exception_handled
+    config.add_route(
+        "pyramid.test_exception_handled",
+        "/test/exception/handled",
+        get=test_exception_handled,
     )
-    config.add_route("pyramid.test_exception_unhandled", "/test/exception/unhandled").add_view(
-        test_exception_unhandled
+
+    config.add_route(
+        "pyramid.test_exception_unhandled",
+        "/test/exception/unhandled",
+        get=test_exception_unhandled,
     )
-    config.add_route("pyramid.test_exception_transaction", "/test/exception/transaction").add_view(
-        test_exception_transaction
+
+    config.add_route(
+        "pyramid.test_exception_transaction",
+        "/test/exception/transaction",
+        get=test_exception_transaction,
     )
+
+    config.add_route(
+        "pyramid.test_exception_template",
+        "/test/exception/template",
+        get=test_exception_template,
+    )
+
     config.add_route("pyramid.test_timeout", "/test/timeout").add_view(test_timeout)
 
     comp.control_panel = dm.DynMenu(

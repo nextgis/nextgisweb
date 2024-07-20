@@ -1,8 +1,7 @@
-import json
+import sqlalchemy as sa
+from sqlalchemy.exc import DatabaseError
 
-import sqlalchemy
-
-from nextgisweb.env import Component
+from nextgisweb.env import Component, DBSession, env
 from nextgisweb.lib.config import Option
 from nextgisweb.lib.logging import logger
 
@@ -36,31 +35,43 @@ class SentryComponent(Component):
             shutdown_timeout=self.options["shutdown_timeout"],
         )
 
-        ts = Setting.__table__
-        qs = ts.select().where(
-            sqlalchemy.and_(ts.c.component == "core", ts.c.name == "instance_id")
+        sc = Setting.__table__.columns
+        qs = sa.select(sc.value).where(
+            sc.component == "core",
+            sc.name == "instance_id",
         )
 
         event_user = None
 
         def add_instance_id(event, hint):
             nonlocal event_user
+
             if event_user is None:
                 try:
-                    row = self.env.core.DBSession.connection().execute(qs).fetchone()
-                except sqlalchemy.exc.ProgrammingError:
-                    logger.debug(
-                        "Failed to get instance_id, the database may not "
-                        "have been initialized yet"
+                    try:
+                        instance_id = DBSession.scalar(qs)
+                    except DatabaseError:
+                        # Transaction may be aborted, so can try a new
+                        # connection. Rollback doesn't fit here as it changes
+                        # the transaction state.
+                        with env.core.engine.connect() as con:
+                            instance_id = con.scalar(qs)
+                except DatabaseError:
+                    logger.warning(
+                        "Failed to get instance ID, the database may not have "
+                        "been initialized yet"
                     )
                 except Exception:
-                    logger.error("Got an exception while getting instance_id")
+                    logger.error("Got an exception while getting instance ID")
                 else:
-                    if row is not None:
-                        instance_id = json.loads(row.value)
+                    if instance_id is not None:
+                        # That's OK to cache, instance ID can't change
                         event_user = dict(id=instance_id)
                     else:
-                        logger.debug("Missing instance_id")
+                        logger.warning(
+                            "Instance ID is not set, the database may not have "
+                            "been initialized yet"
+                        )
 
             if event_user is not None:
                 event["user"] = event_user
