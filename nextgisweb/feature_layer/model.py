@@ -8,7 +8,7 @@ from nextgisweb.lib.geometry import Transformer
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.lookup_table import LookupTable
-from nextgisweb.resource import DataStructureScope, Resource, Serializer
+from nextgisweb.resource import DataStructureScope, Resource, ResourceScope, Serializer
 from nextgisweb.resource import SerializedProperty as SP
 from nextgisweb.spatial_ref_sys import SRS
 
@@ -245,8 +245,8 @@ class FeatureLayerSerializer(Serializer):
     identity = "feature_layer"
     resclass = LayerFieldsMixin
 
-    fields = _fields_attr(read=DataStructureScope.read, write=DataStructureScope.write)
-    versioning = _fversioning_attr(read=DataStructureScope.read, write=DataStructureScope.write)
+    fields = _fields_attr(read=ResourceScope.read, write=ResourceScope.update)
+    versioning = _fversioning_attr(read=ResourceScope.read, write=ResourceScope.update)
 
 
 class FeatureQueryIntersectsMixin:

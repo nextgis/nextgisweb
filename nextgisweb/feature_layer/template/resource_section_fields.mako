@@ -1,4 +1,4 @@
-<%! from nextgisweb.resource import DataStructureScope %>
+<%! from nextgisweb.resource import ResourceScope %>
 
 <%page args="section" />
 <% section.content_box = False %>
@@ -20,7 +20,7 @@
         %endif
         <th style="text-align: center; width: 20%;">${tr(_("Table"))}</th>
     </tr></thead>
-    %if DataStructureScope.read in obj.permissions(request.user):
+    %if ResourceScope.read in obj.permissions(request.user):
         %for field in obj.fields:
             <tr style="${'text-decoration: underline;' if field.id == obj.feature_label_field_id else '' | n}">
                 <td>${field.keyname}</td>

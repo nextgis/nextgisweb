@@ -4,7 +4,7 @@ from nextgisweb.env import gettext
 from nextgisweb.lib.dynmenu import Label, Link
 
 from nextgisweb.pyramid import JSONType, viewargs
-from nextgisweb.resource import DataScope, DataStructureScope, Resource, Widget, resource_factory
+from nextgisweb.resource import DataScope, Resource, ResourceScope, Widget, resource_factory
 from nextgisweb.resource.extaccess import ExternalAccessLink
 from nextgisweb.resource.view import resource_sections
 
@@ -31,7 +31,6 @@ class SettingsWidget(Widget):
 @viewargs(renderer="react")
 def feature_browse(request):
     request.resource_permission(DataScope.read)
-    request.resource_permission(DataStructureScope.read)
 
     readonly = not request.context.has_permission(DataScope.write, request.user)
 
@@ -48,7 +47,6 @@ def feature_browse(request):
 @viewargs(renderer="mako")
 def feature_show(request):
     request.resource_permission(DataScope.read)
-    request.resource_permission(DataStructureScope.read)
 
     feature_id = int(request.matchdict["feature_id"])
 
@@ -83,7 +81,7 @@ def feature_update(request):
 
 
 def field_collection(request) -> JSONType:
-    request.resource_permission(DataStructureScope.read)
+    request.resource_permission(ResourceScope.read)
     return [f.to_dict() for f in request.context.fields]
 
 
@@ -184,16 +182,15 @@ def setup_pyramid(comp, config):
         yield Label("feature_layer", gettext("Features"))
 
         if args.obj.has_permission(DataScope.read, args.request.user):
-            if args.obj.has_permission(DataStructureScope.read, args.request.user):
-                yield Link(
-                    "feature_layer/feature-browse",
-                    gettext("Table"),
-                    lambda args: args.request.route_url(
-                        "feature_layer.feature.browse", id=args.obj.id
-                    ),
-                    important=True,
-                    icon="material-table",
-                )
+            yield Link(
+                "feature_layer/feature-browse",
+                gettext("Table"),
+                lambda args: args.request.route_url(
+                    "feature_layer.feature.browse", id=args.obj.id
+                ),
+                important=True,
+                icon="material-table",
+            )
 
         if args.obj.has_export_permission(args.request.user):
             yield Link(

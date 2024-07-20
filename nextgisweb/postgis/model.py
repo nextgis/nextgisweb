@@ -44,9 +44,9 @@ from nextgisweb.resource import (
     ConnectionScope,
     CRUTypes,
     DataScope,
-    DataStructureScope,
     Resource,
     ResourceGroup,
+    ResourceScope,
     SAttribute,
     SColumn,
     Serializer,
@@ -554,16 +554,16 @@ class PostgisLayerSerializer(Serializer, apitype=True):
     identity = PostgisLayer.identity
     resclass = PostgisLayer
 
-    connection = SResource(read=DataStructureScope.read, write=DataStructureScope.write)
-    schema = SColumn(read=DataStructureScope.read, write=DataStructureScope.write)
-    table = SColumn(read=DataStructureScope.read, write=DataStructureScope.write)
-    column_id = SColumn(read=DataStructureScope.read, write=DataStructureScope.write)
-    column_geom = SColumn(read=DataStructureScope.read, write=DataStructureScope.write)
-    geometry_type = GeometryTypeAttr(read=DataStructureScope.read, write=DataStructureScope.write)
-    geometry_srid = GeometrySridAttr(read=DataStructureScope.read, write=DataStructureScope.write)
-    srs = SRelationship(read=DataStructureScope.read, write=DataStructureScope.write)
+    connection = SResource(read=ResourceScope.read, write=ResourceScope.update)
+    schema = SColumn(read=ResourceScope.read, write=ResourceScope.update)
+    table = SColumn(read=ResourceScope.read, write=ResourceScope.update)
+    column_id = SColumn(read=ResourceScope.read, write=ResourceScope.update)
+    column_geom = SColumn(read=ResourceScope.read, write=ResourceScope.update)
+    geometry_type = GeometryTypeAttr(read=ResourceScope.read, write=ResourceScope.update)
+    geometry_srid = GeometrySridAttr(read=ResourceScope.read, write=ResourceScope.update)
+    srs = SRelationship(read=ResourceScope.read, write=ResourceScope.update)
 
-    fields = FieldsAttr(read=None, write=DataStructureScope.write)
+    fields = FieldsAttr(read=None, write=ResourceScope.update)
 
 
 @implementer(
