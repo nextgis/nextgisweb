@@ -11,6 +11,12 @@ from nextgisweb.core.model import Setting
 
 
 class SentryComponent(Component):
+    def __init__(self, env, settings):
+        super().__init__(env, settings)
+        self.dsn_py = None
+        self.dsn_js = None
+        self.environment = None
+
     def initialize(self):
         super().initialize()
 
