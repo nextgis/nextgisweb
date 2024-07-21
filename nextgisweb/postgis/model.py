@@ -2,10 +2,9 @@ import re
 from contextlib import contextmanager
 from typing import Literal, Union
 
-import geoalchemy2 as ga
 from msgspec import UNSET
 from shapely.geometry import box
-from sqlalchemy import alias, cast, func, select, sql, text
+from sqlalchemy import alias, bindparam, cast, func, select, sql, text
 from sqlalchemy import and_ as sql_and
 from sqlalchemy import or_ as sql_or
 from sqlalchemy.dialects.postgresql import UUID
@@ -68,6 +67,8 @@ st_xmin = func.st_xmin
 st_ymax = func.st_ymax
 st_ymin = func.st_ymin
 
+geom_wkb_lr = text("ST_Transform(ST_GeomFromWKB(:wkb, :lsrs), :rsrs)")
+
 
 GEOM_TYPE_DISPLAY = (
     gettext("Point"),
@@ -90,14 +91,14 @@ def calculate_extent(layer, where=None, geomcol=None):
 
     where_geom_exist = not (where is None and geomcol is None) and len(where) > 0
     geomcol = geomcol if where_geom_exist else getattr(tab.columns, layer.column_geom)
-    extent_func = st_extent(
-        st_transform(st_setsrid(cast(st_force2d(geomcol), ga.Geometry), layer.geometry_srid), 4326)
-    )
+
+    # TODO: Why do we use ST_SetSRID(ST_Force2D(...), ...) here?
+    extent_fn = st_extent(st_transform(st_setsrid(st_force2d(geomcol), layer.geometry_srid), 4326))
 
     if where_geom_exist:
-        bbox = sql.select(extent_func).where(db.and_(True, *where)).label("bbox")
+        bbox = sql.select(extent_fn).where(db.and_(True, *where)).label("bbox")
     else:
-        bbox = extent_func.label("bbox")
+        bbox = extent_fn.label("bbox")
 
     sq = select(bbox).subquery()
 
@@ -462,9 +463,10 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
             if geom is None:
                 values[self.column_geom] = None
             else:
-                values[self.column_geom] = st_transform(
-                    ga.elements.WKBElement(bytearray(geom.wkb), srid=self.srs_id),
-                    self.geometry_srid,
+                values[self.column_geom] = geom_wkb_lr.bindparams(
+                    bindparam("wkb", geom.wkb, unique=True),
+                    bindparam("lsrs", self.srs_id, unique=True),
+                    bindparam("rsrs", self.geometry_srid, unique=True),
                 )
 
         return values
