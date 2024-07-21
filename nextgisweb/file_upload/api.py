@@ -177,8 +177,11 @@ def _collection_post_tus(request, *, comp: FileUploadComponent):
         size=upload_length,
         name=upload_metadata.get("name"),
         mime_type=upload_metadata.get("mime_type"),
-        incomplete=True,
+        incomplete=upload_length > 0,
     )
+
+    if upload_length == 0 and fupload.mime_type is None:
+        fupload.mime_type = "application/octet-stream"
 
     fupload.data_path.touch()
     fupload.write_meta()

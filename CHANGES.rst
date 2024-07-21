@@ -1,6 +1,12 @@
 Changes
 =======
 
+4.9.0
+-----
+
+- Fix uploading of zero-length files.
+
+
 4.8.0
 -----
 
