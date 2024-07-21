@@ -37,13 +37,10 @@ class SentryComponent(Component):
         sentry_sdk.utils.MAX_STRING_LENGTH = 8192
 
         sentry_sdk.init(
-            self.options["dsn"],
-            integrations=[
-                PyramidIntegration(),
-                SqlalchemyIntegration(),
-            ],
-            ignore_errors=[KeyboardInterrupt],
+            self.dsn_py,
             environment=self.environment,
+            integrations=[PyramidIntegration(), SqlalchemyIntegration()],
+            ignore_errors=[KeyboardInterrupt],
             shutdown_timeout=int(self.options["shutdown_timeout"].total_seconds()),
         )
 
