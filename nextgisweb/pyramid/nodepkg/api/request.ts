@@ -234,6 +234,13 @@ export async function request<
                 throw new InvalidResponseError();
             }
         } catch (e) {
+            if (
+                (e as Error).name === "AbortError" ||
+                e instanceof InvalidResponseError
+            ) {
+                throw e;
+            }
+
             throw new InvalidResponseError();
         }
 
