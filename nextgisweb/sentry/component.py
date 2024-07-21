@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 import sqlalchemy as sa
 from sqlalchemy.exc import DatabaseError
 
@@ -11,8 +13,12 @@ from nextgisweb.core.model import Setting
 class SentryComponent(Component):
     def initialize(self):
         super().initialize()
-        self.enabled = "dsn" in self.options
-        if self.enabled:
+
+        self.dsn_py = _deprecated_options(self.options, "dsn.python", "dsn")
+        self.dsn_js = _deprecated_options(self.options, "dsn.javascript", "js.dsn")
+        self.environment = self.options["environment"]
+
+        if self.dsn_py:
             self.initialize_sentry_sdk()
 
     def initialize_sentry_sdk(self):
@@ -31,8 +37,8 @@ class SentryComponent(Component):
                 SqlalchemyIntegration(),
             ],
             ignore_errors=[KeyboardInterrupt],
-            environment=self.options["environment"],
-            shutdown_timeout=self.options["shutdown_timeout"],
+            environment=self.environment,
+            shutdown_timeout=int(self.options["shutdown_timeout"].total_seconds()),
         )
 
         sc = Setting.__table__.columns
@@ -83,14 +89,28 @@ class SentryComponent(Component):
 
     @property
     def template_include(self):
-        return ("nextgisweb:sentry/template/init.mako",)
+        return ("nextgisweb:sentry/template/init.mako",) if self.dsn_js else ()
 
     # fmt: off
     option_annotations = (
-        Option("dsn"),
-        Option("environment", default=None),
-        Option("shutdown_timeout", int, default=30),
+        Option("dsn.python", default=None, doc="DSN for Python SDK."),
+        Option("dsn.javascript", default=None, doc="DSN for browser SDK."),
+        Option("environment", default="production", doc="Environment name."),
+        Option("shutdown_timeout", timedelta, default=timedelta(seconds=30), doc=(
+            "Timeout to send events in case of application shutdown.")),
 
-        Option("js.dsn", default=None),
+        Option("dsn", default=None, doc="DEPRECATED alias for dsn.python."),
+        Option("js.dsn", default=None, doc="DEPRECATED alias for dsn.javascript.")
     )
     # fmt: on
+
+
+def _deprecated_options(options, *keys):
+    for idx, key in enumerate(keys):
+        if value := options[key]:
+            if idx != 0:
+                logger.warning(
+                    f"The '{key}' setting has been deprecated in 4.9.0.dev1 "
+                    f"and will be removed in 4.5.0, use '{keys[0]}' instead."
+                )
+            return value
