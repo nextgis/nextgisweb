@@ -45,6 +45,12 @@ def test_wkt_wkb(wkt, ngw_txn):
     assert Geometry.from_wkb(wkb_ext).wkt == wkt_iso, "EWKB parsing has failed"
     assert Geometry.from_wkt(wkt_iso).wkb == wkb_ext, "WKT parsing has failed"
 
+    for srid in (None, 4326):
+        for byte_order in ("NDR", "XDR"):
+            geom_wkb = _pg_wkb(wkb_ext, None, byte_order)
+            geom_wkt = Geometry.from_wkb(geom_wkb, srid)
+            assert geom_wkt.to_ewkb() == _pg_wkb(geom_wkb, srid, byte_order)
+
 
 @pytest.mark.parametrize(
     "src, is_valid",
@@ -55,8 +61,10 @@ def test_wkt_wkb(wkt, ngw_txn):
         (dict(wkt="POINT Z (1 2 3)"), True),
         (dict(wkt="GEOMETRYCOLLECTION EMPTY"), True),
         (dict(wkt="POLYGON ((0 0, 0 1, 1 1, 1 0, 0 0))"), True),
-        (dict(wkb="000000000140000000000000004010000000000000"), True),
-        (dict(wkb="FF0000000140000000000000004010000000000000"), False),
+        # POINT(0 0) WKB and EWKT
+        (dict(wkb="010100000000000000000000000000000000000000"), True),
+        (dict(wkb="010100002000000000000000000000000000000000"), False),
+        (dict(wkb="0101000020e610000000000000000000000000000000000000"), False),
     ),
 )
 def test_valid(src, is_valid):
@@ -104,20 +112,25 @@ def test_convert(fmt_src, fmt_dst):
 
 
 def _pg_wkt_to_wkb_iso(wkt):
-    return _query_scalar_bytes(sa_func.st_asbinary(sa_func.st_geomfromtext(wkt), "NDR"))
+    return _pg_bytes(sa_func.st_asbinary(sa_func.st_geomfromtext(wkt), "NDR"))
 
 
 def _pg_wkt_to_wkb_ext(wkt):
-    return _query_scalar_bytes(sa_func.st_asewkb(sa_func.st_geomfromtext(wkt), "NDR"))
+    return _pg_bytes(sa_func.st_asewkb(sa_func.st_geomfromtext(wkt), "NDR"))
 
 
-def _pg_wkb(wkb):
+def _pg_wkb(wkb, srid=None, byte_order="NDR"):
     _wkb = wkb.hex()
-    return _query_scalar_bytes(
-        sa_func.st_asewkb(sa_func.st_geomfromwkb(sa_func.decode(_wkb, "hex")), "NDR")
+    return _pg_bytes(
+        sa_func.st_asewkb(
+            sa_func.st_geomfromwkb(
+                sa_func.decode(_wkb, "hex"),
+                *([srid] if srid else []),
+            ),
+            byte_order,
+        )
     )
 
 
-def _query_scalar_bytes(query):
-    v = DBSession.query(query).scalar()
-    return v.tobytes()
+def _pg_bytes(query):
+    return DBSession.scalar(query).tobytes()

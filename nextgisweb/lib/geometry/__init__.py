@@ -1,4 +1,4 @@
-from warnings import warn
+from struct import pack, unpack
 
 from osgeo import gdal, ogr, osr
 from pyproj import CRS
@@ -128,6 +128,22 @@ class Geometry:
     def to_geojson(self):
         # NB: srid is not considered
         return geometry_mapping(self.shape)
+
+    def to_ewkb(self):
+        wkb = self.wkb
+        if (srid := self.srid) is None:
+            return wkb
+
+        bo = wkb[0]
+        if bo == 1:
+            fi, fo = "<i", "<Bii"
+        elif bo == 0:
+            fi, fo = ">i", ">Bii"
+        else:
+            raise ValueError(f"Invalid WKB byte order: {wkb[0]=}")
+
+        wkb_type = unpack(fi, wkb[1:5])[0]
+        return pack(fo, bo, wkb_type | 0x20000000, srid) + wkb[5:]
 
     # Editors
 
