@@ -145,11 +145,6 @@ export function ModelBrowse<Data extends ModalBrowseData = ModalBrowseData>({
         return rows;
     }, [rows, search]);
 
-    const onEditClick = (id: number) => {
-        const url = routeURL(model.edit, id);
-        window.open(url, "_self");
-    };
-
     const deleteModelItem = async (id: number) => {
         try {
             await route(model.item, id).delete();
@@ -255,7 +250,7 @@ export function ModelBrowse<Data extends ModalBrowseData = ModalBrowseData>({
                             type="text"
                             shape="circle"
                             icon={!readonly ? <EditIcon /> : <VisibilityIcon />}
-                            onClick={() => onEditClick(record.id)}
+                            href={routeURL(model.edit, record.id)}
                         />
                     </Tooltip>
                     {canDelete(record as Data) && (
