@@ -8,6 +8,7 @@
 
         > .slick-arrow {
             z-index: 100;
+            margin-top: -16px;
             width: 32px;
             height: 32px;
             pointer-events: auto;
@@ -22,11 +23,13 @@
                 color: white;
             }
 
-            &::before {
+            &::after {
                 content: unset;
             }
 
             &.slick-prev {
+                // It may look wrong aligned, here is the details:
+                // https://github.com/google/material-design-icons/issues/1744
                 left: 8px;
             }
 
