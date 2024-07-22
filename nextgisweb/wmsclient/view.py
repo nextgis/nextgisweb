@@ -9,7 +9,7 @@ from .model import Connection, Layer
 class ClientWidget(Widget):
     resource = Connection
     operation = ("create", "update")
-    amdmod = "ngw-wmsclient/ConnectionWidget"
+    amdmod = "@nextgisweb/wmsclient/wmsclient-connection"
 
 
 class LayerWidget(Widget):

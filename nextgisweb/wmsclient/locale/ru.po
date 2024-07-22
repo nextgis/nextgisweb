@@ -1,51 +1,56 @@
-#: amd/ngw-wmsclient/ConnectionWidget.js:42 model.py:48
+#: model.py:49
 msgid "WMS connection"
 msgstr "Соединение WMS"
 
-#: amd/ngw-wmsclient/template/ConnectionWidget.hbs:10
-msgid "URL"
-msgstr "URL"
-
-#: amd/ngw-wmsclient/template/ConnectionWidget.hbs:16
-msgid "Username"
-msgstr "Имя пользователя"
-
-#: amd/ngw-wmsclient/template/ConnectionWidget.hbs:22
-msgid "Password"
-msgstr "Пароль"
-
-#: amd/ngw-wmsclient/template/ConnectionWidget.hbs:27
-msgid "Version"
-msgstr "Версия"
-
-#: amd/ngw-wmsclient/template/ConnectionWidget.hbs:31
-msgid "Capabilities"
-msgstr "Возможности"
-
-#: amd/ngw-wmsclient/template/ConnectionWidget.hbs:33
-msgid "Do not query"
-msgstr "Не запрашивать"
-
-#: amd/ngw-wmsclient/template/ConnectionWidget.hbs:34
-msgid "Query"
-msgstr "Запросить"
-
-#: amd/ngw-wmsclient/template/ConnectionWidget.hbs:35
-msgid "Clear"
-msgstr "Очистить"
-
-#: model.py:142 view.py:24
+#: model.py:143 view.py:24
 msgid "WMS capabilities"
 msgstr "Возможности WMS"
 
-#: model.py:143 nodepkg/wmsclient-layer/WmsClientLayerWidget.tsx:97
+#: model.py:144 nodepkg/wmsclient-layer/WmsClientLayerWidget.tsx:97
 msgid "Image format"
 msgstr "Формат изображения"
 
-#: model.py:225
+#: model.py:226
 msgid "WMS layer"
 msgstr "Слой WMS"
 
+#: nodepkg/wmsclient-connection/WmsClientConnectionWidget.tsx:15
+msgid "Query"
+msgstr "Запросить"
+
+#: nodepkg/wmsclient-connection/WmsClientConnectionWidget.tsx:16
+msgid "Clear"
+msgstr "Очистить"
+
+#: nodepkg/wmsclient-connection/WmsClientConnectionWidget.tsx:17
+msgid "Do not query"
+msgstr "Не запрашивать"
+
+#: nodepkg/wmsclient-connection/WmsClientConnectionWidget.tsx:25
+msgid "WMS Connection URL"
+msgstr "Ссылка WMS-соеденения"
+
+#: nodepkg/wmsclient-connection/WmsClientConnectionWidget.tsx:34
+msgid "URL"
+msgstr "URL"
+
+#: nodepkg/wmsclient-connection/WmsClientConnectionWidget.tsx:42
+msgid "Username"
+msgstr "Имя пользователя"
+
+#: nodepkg/wmsclient-connection/WmsClientConnectionWidget.tsx:49
+msgid "Password"
+msgstr "Пароль"
+
+#: nodepkg/wmsclient-connection/WmsClientConnectionWidget.tsx:56
+msgid "Version"
+msgstr "Версия"
+
+#: nodepkg/wmsclient-connection/WmsClientConnectionWidget.tsx:67
+msgid "Capabilities"
+msgstr "Возможности"
+
+#: nodepkg/wmsclient-connection/WmsClientConnectionWidget.tsx:76
 #: nodepkg/wmsclient-layer/WmsClientLayerWidget.tsx:87
 msgid "WMS Connection"
 msgstr "WMS Соединение"
