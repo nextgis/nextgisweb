@@ -11,38 +11,42 @@
         max-width: unset;
         height: 100%;
 
-        > .ant-modal-content {
-            box-shadow: none;
-            background-color: transparent;
-            padding: 0;
+        > div[tabIndex="-1"] {
             height: 100%;
-            overflow: hidden;
-            pointer-events: none;
 
-            > .ant-modal-close {
-                top: 8px;
-                right: 8px;
-                border-radius: 100%;
-                background: none;
-                width: 32px;
-                height: 32px;
-                pointer-events: auto;
+            > .ant-modal-content {
+                box-shadow: none;
+                background-color: transparent;
+                padding: 0;
+                height: 100%;
+                overflow: hidden;
+                pointer-events: none;
 
-                > .ant-modal-close-x {
-                    color: rgba(255, 255, 255, 0.25);
-                    font-size: 32px;
+                > .ant-modal-close {
+                    top: 8px;
+                    right: 8px;
+                    border-radius: 100%;
+                    background: none;
+                    width: 32px;
+                    height: 32px;
+                    pointer-events: auto;
 
-                    &:hover {
-                        color: white;
+                    > .ant-modal-close-x {
+                        color: rgba(255, 255, 255, 0.25);
+                        font-size: 32px;
+
+                        &:hover {
+                            color: white;
+                        }
                     }
                 }
-            }
 
-            > .ant-modal-body {
-                display: flex;
-                flex-direction: column;
-                height: 100%;
-                pointer-events: none;
+                > .ant-modal-body {
+                    display: flex;
+                    flex-direction: column;
+                    height: 100%;
+                    pointer-events: none;
+                }
             }
         }
     }
