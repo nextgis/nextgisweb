@@ -365,7 +365,7 @@ AreaUnits = Annotated[
     TSExport("AreaUnits"),
 ]
 DegreeFormat = Annotated[Literal["dd", "ddm", "dms"], TSExport("DegreeFormat")]
-AddressGeocoder = Annotated[Literal["nominatim", "yandex"], TSExport("DegreeFormat")]
+AddressGeocoder = Annotated[Literal["nominatim", "yandex"], TSExport("AddressGeocoder")]
 
 csetting("identify_radius", float, default=3)
 csetting("identify_attributes", bool, default=True)
