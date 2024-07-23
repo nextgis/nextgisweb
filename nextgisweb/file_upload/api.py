@@ -336,7 +336,16 @@ def _tus_decode_upload_metadata(value):
 
 
 def setup_pyramid(comp, config):
-    tus_request_headers = ("Upload-Offset", "Upload-Length", "Tus-Resumable")
+    tus_cors_headers = dict(
+        request=(
+            "Upload-Offset",
+            "Upload-Length",
+            "Upload-Defer-Length",
+            "Upload-Metadata",
+            "Tus-Resumable",
+        ),
+        response=("Location",),
+    )
 
     # TODO: Remove legacy route: Formbuilder
     config.add_route(
@@ -353,7 +362,7 @@ def setup_pyramid(comp, config):
         options=collection_options,
         post=collection_post,
         put=collection_put,
-        cors_headers=tus_request_headers,
+        cors_headers=tus_cors_headers,
     )
 
     config.add_route(
@@ -364,5 +373,5 @@ def setup_pyramid(comp, config):
         get=item_get,
         patch=item_patch_tus,
         delete=item_delete,
-        cors_headers=tus_request_headers,
+        cors_headers=tus_cors_headers,
     )
