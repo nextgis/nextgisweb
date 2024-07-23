@@ -63,9 +63,6 @@ def cors_tween_factory(handler, registry):
     """Tween adds Access-Control-* headers for simple and preflighted
     CORS requests"""
 
-    def hadd(response, n, v):
-        response.headerlist.append((n, v))
-
     def cors_tween(request):
         origin = request.headers.get("Origin")
 
@@ -89,17 +86,29 @@ def cors_tween_factory(handler, registry):
             # headers and terminate this set of steps.
             # http://www.w3.org/TR/cors/#resource-preflight-requests
 
+            # The Origin header can only contain a single origin as
+            # the user agent will not follow redirects.
+            # http://www.w3.org/TR/cors/#resource-preflight-requests
+
+            cors_headerlist = [
+                ("Access-Control-Allow-Origin", origin),
+                ("Access-Control-Allow-Credentials", "true"),
+            ]
+
+            if (
+                (route := registry.getUtility(IRoutesMapper)(request)["route"])
+                and (meta := RouteMeta.select(route.predicates))
+                and (ch := meta.cors_headers)
+            ):
+                route_cors_headers = ch
+            else:
+                route_cors_headers = dict()
+
             # Access-Control-Request-Method header of preflight request
             method = request.headers.get("Access-Control-Request-Method")
 
             if method is not None and request.method == "OPTIONS":
                 response = Response(content_type="text/plain")
-
-                # The Origin header can only contain a single origin as
-                # the user agent will not follow redirects.
-                # http://www.w3.org/TR/cors/#resource-preflight-requests
-
-                hadd(response, "Access-Control-Allow-Origin", origin)
 
                 # Add one or more Access-Control-Allow-Methods headers
                 # consisting of (a subset of) the list of methods.
@@ -108,8 +117,7 @@ def cors_tween_factory(handler, registry):
                 # Access-Control-Request-Method (if supported) can be enough.
                 # http://www.w3.org/TR/cors/#resource-preflight-requests
 
-                hadd(response, "Access-Control-Allow-Methods", method)
-                hadd(response, "Access-Control-Allow-Credentials", "true")
+                cors_headerlist.append(("Access-Control-Allow-Methods", method))
 
                 # Authorization + CORS-safeist headers are allowed by default,
                 # additional route-specific headers may be extracted from route
@@ -123,23 +131,23 @@ def cors_tween_factory(handler, registry):
                     "Content-Type",
                     "Range",
                 }
+                if req_ch := route_cors_headers.get("request"):
+                    allowed_headers.update(req_ch)
 
-                if (
-                    (route := registry.getUtility(IRoutesMapper)(request)["route"])
-                    and (meta := RouteMeta.select(route.predicates))
-                    and (ch := meta.cors_headers)
-                ):
-                    allowed_headers.update(ch)
+                cors_headerlist.append(
+                    ("Access-Control-Allow-Headers", ", ".join(allowed_headers))
+                )
 
-                hadd(response, "Access-Control-Allow-Headers", ", ".join(allowed_headers))
+                response.headerlist.extend(cors_headerlist)
 
                 return response
 
             else:
+                if resp_ch := route_cors_headers.get("response"):
+                    cors_headerlist.append(("Access-Control-Expose-Headers", ", ".join(resp_ch)))
 
                 def set_cors_headers(request, response):
-                    hadd(response, "Access-Control-Allow-Origin", origin)
-                    hadd(response, "Access-Control-Allow-Credentials", "true")
+                    response.headerlist.extend(cors_headerlist)
 
                 request.add_response_callback(set_cors_headers)
 

@@ -5,6 +5,7 @@ Changes
 -----
 
 - Fix uploading of zero-length files.
+- TUS uploader is available using CORS.
 
 
 4.8.0
