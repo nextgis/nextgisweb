@@ -18,6 +18,7 @@ export function load(
 // Only for types, replaced by loader at runtime
 const fake = domain("");
 export const gettext = fake.gettext;
+export const gettextf = fake.gettextf;
 export const pgettext = fake.pgettext;
 export const ngettext = fake.ngettext;
 export const npgettext = fake.npgettext;
