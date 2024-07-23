@@ -48,6 +48,13 @@ export function dngettext(domain: string, ...args: NParam): string {
     return dnpgettext(domain, "", ...args);
 }
 
+export function dngettextf(domain: string, ...args: NParam): string {
+    const [singular, plural, n] = args;
+    const translation = dnpgettext(domain, "", singular, plural, n);
+    const newTemplate = compile(translation);
+    return newTemplate(n);
+}
+
 export function domain(domain: string) {
     return {
         gettext: (...args: MParam) => dgettext(domain, ...args),
@@ -56,6 +63,9 @@ export function domain(domain: string) {
         },
         pgettext: (...args: CMParam) => dpgettext(domain, ...args),
         ngettext: (...args: NParam) => dngettext(domain, ...args),
+        ngettextf: (singular: string, plural: string, n: number) => {
+            return dngettextf(domain, singular, plural, n);
+        },
         npgettext: (...args: CNParam) => dnpgettext(domain, ...args),
     };
 }

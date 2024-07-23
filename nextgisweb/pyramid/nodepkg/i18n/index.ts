@@ -21,5 +21,6 @@ export const gettext = fake.gettext;
 export const gettextf = fake.gettextf;
 export const pgettext = fake.pgettext;
 export const ngettext = fake.ngettext;
+export const ngettextf = fake.ngettextf;
 export const npgettext = fake.npgettext;
 export default fake;
