@@ -191,7 +191,7 @@ class MapContent(ElementSize):
 class PrintBody(Struct):
     width: Annotated[int, Meta(gt=0)]
     height: Annotated[int, Meta(gt=0)]
-    margin: Annotated[int, Meta(gt=0)]
+    margin: Annotated[int, Meta(ge=0)]
     map: MapContent
     format: PrintFormat
     legend: Union[LegendElement, UnsetType] = UNSET
