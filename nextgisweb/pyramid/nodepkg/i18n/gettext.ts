@@ -44,6 +44,21 @@ export function dnpgettext(
     return nlookup(domain, context, singular, plural, pn)[pf(n)];
 }
 
+export function dnpgettextf(
+    domain: string,
+    ...[context, singular, plural, n]: CNParam
+): string {
+    if (en) {
+        const translation = [singular, plural][pf(n)];
+        const newTemplate = compile(translation);
+        return newTemplate(n);
+    }
+
+    const translation = nlookup(domain, context, singular, plural, pn)[pf(n)];
+    const newTemplate = compile(translation);
+    return newTemplate(n);
+}
+
 export function dngettext(domain: string, ...args: NParam): string {
     return dnpgettext(domain, "", ...args);
 }
@@ -61,11 +76,23 @@ export function domain(domain: string) {
         gettextf: (template: string) => {
             return (...args: MParam) => dgettextf(domain, template, ...args);
         },
+
         pgettext: (...args: CMParam) => dpgettext(domain, ...args),
+
         ngettext: (...args: NParam) => dngettext(domain, ...args),
         ngettextf: (singular: string, plural: string, n: number) => {
             return dngettextf(domain, singular, plural, n);
         },
+
         npgettext: (...args: CNParam) => dnpgettext(domain, ...args),
+        npgettextf: (
+            context: Context,
+            singular: string,
+            plural: string,
+            n: number
+        ) => {
+            // probably wrong
+            return dnpgettextf(domain, ...context, singular, plural, n);
+        },
     };
 }
