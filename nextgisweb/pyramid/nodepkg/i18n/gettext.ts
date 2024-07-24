@@ -22,6 +22,22 @@ export function dpgettext(
     return lookup(domain, context, message);
 }
 
+export function dpgettextf(
+    domain: string,
+    context: string,
+    message: string,
+    param: string
+): string {
+    if (en) {
+        const translation = message;
+        const newTemplate = compile(translation);
+        return newTemplate(translation);
+    }
+    const translation = lookup(domain, context, message);
+    const newTemplate = compile(translation);
+    return newTemplate(param);
+}
+
 export function dgettext(domain: string, ...[message]: MParam): string {
     return dpgettext(domain, "", message);
 }
@@ -78,6 +94,10 @@ export function domain(domain: string) {
         },
 
         pgettext: (...args: CMParam) => dpgettext(domain, ...args),
+        pgettextf: (context: string, message: string) => {
+            return (param: string) =>
+                dpgettextf(domain, context, message, param);
+        },
 
         ngettext: (...args: NParam) => dngettext(domain, ...args),
         ngettextf: (singular: string, plural: string, n: number) => {
