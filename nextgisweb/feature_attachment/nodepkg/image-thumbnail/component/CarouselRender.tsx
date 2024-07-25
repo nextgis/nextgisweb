@@ -14,7 +14,7 @@ import { getFeatureImage } from "../util/getFeatureImage";
 import { getFileImage } from "../util/getFileImage";
 
 import { LoadingOutlined } from "@ant-design/icons";
-import ArrowBack from "@nextgisweb/icon/material/arrow_back_ios";
+import ArrowBack from "@nextgisweb/icon/material/arrow_back_ios_new";
 import ArrowForward from "@nextgisweb/icon/material/arrow_forward_ios";
 import PhotosphereIcon from "@nextgisweb/icon/material/panorama_photosphere";
 
