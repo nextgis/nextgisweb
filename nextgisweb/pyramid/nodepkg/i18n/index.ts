@@ -23,4 +23,6 @@ export const pgettext = fake.pgettext;
 export const ngettext = fake.ngettext;
 export const ngettextf = fake.ngettextf;
 export const npgettext = fake.npgettext;
+export const npgettextf = fake.npgettextf;
+
 export default fake;
