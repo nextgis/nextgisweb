@@ -23,7 +23,6 @@ from nextgisweb.resource import (
     ConnectionScope,
     CRUTypes,
     DataScope,
-    DataStructureScope,
     Resource,
     ResourceGroup,
     ResourceScope,
@@ -225,7 +224,7 @@ class Layer(Base, Resource, SpatialLayerMixin):
     identity = "wmsclient_layer"
     cls_display_name = gettext("WMS layer")
 
-    __scope__ = (DataStructureScope, DataScope)
+    __scope__ = DataScope
 
     connection_id = db.Column(db.ForeignKey(Resource.id), nullable=False)
     wmslayers = db.Column(db.Unicode, nullable=False)

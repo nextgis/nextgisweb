@@ -8,7 +8,7 @@ from nextgisweb.lib.geometry import Transformer
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.lookup_table import LookupTable
-from nextgisweb.resource import DataStructureScope, Resource, ResourceScope, Serializer
+from nextgisweb.resource import Resource, ResourceScope, Serializer
 from nextgisweb.resource import SerializedProperty as SP
 from nextgisweb.spatial_ref_sys import SRS
 
@@ -79,7 +79,6 @@ class LayerField(Base):
 
 class LayerFieldsMixin:
     __field_class__ = LayerField
-    __scope__ = DataStructureScope
 
     @declared_attr
     def fields(cls):

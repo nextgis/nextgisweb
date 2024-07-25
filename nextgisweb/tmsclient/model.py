@@ -18,7 +18,6 @@ from nextgisweb.resource import (
     ConnectionScope,
     CRUTypes,
     DataScope,
-    DataStructureScope,
     Resource,
     ResourceGroup,
     ResourceScope,
@@ -158,7 +157,7 @@ class Layer(Base, Resource, SpatialLayerMixin):
     identity = "tmsclient_layer"
     cls_display_name = gettext("TMS layer")
 
-    __scope__ = (DataStructureScope, DataScope)
+    __scope__ = DataScope
 
     connection_id = db.Column(db.ForeignKey(Connection.id), nullable=False)
     layer_name = db.Column(db.Unicode)
