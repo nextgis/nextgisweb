@@ -31,7 +31,6 @@ from nextgisweb.render import (
 )
 from nextgisweb.resource import (
     DataScope,
-    DataStructureScope,
     Resource,
     ResourceGroup,
     ResourceScope,
@@ -118,7 +117,7 @@ class Tileset(Base, Resource, SpatialLayerMixin):
     identity = "tileset"
     cls_display_name = gettext("Tileset")
 
-    __scope__ = (DataStructureScope, DataScope)
+    __scope__ = DataScope
 
     fileobj_id = sa.Column(sa.ForeignKey(FileObj.id), nullable=False)
     tileset_zmin = sa.Column(sa.SmallInteger, nullable=False)

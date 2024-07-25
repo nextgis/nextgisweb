@@ -24,7 +24,6 @@ from nextgisweb.layer import IBboxLayer, SpatialLayerMixin
 from nextgisweb.resource import (
     CRUTypes,
     DataScope,
-    DataStructureScope,
     Resource,
     ResourceGroup,
     ResourceScope,
@@ -69,7 +68,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
     identity = "raster_layer"
     cls_display_name = gettext("Raster layer")
 
-    __scope__ = (DataStructureScope, DataScope)
+    __scope__ = DataScope
 
     fileobj_id = sa.Column(sa.ForeignKey(FileObj.id), nullable=True)
 

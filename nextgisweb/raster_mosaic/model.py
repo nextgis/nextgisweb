@@ -16,14 +16,7 @@ from nextgisweb.file_storage import FileObj
 from nextgisweb.file_upload import FileUpload
 from nextgisweb.layer import IBboxLayer, SpatialLayerMixin
 from nextgisweb.raster_layer.util import calc_overviews_levels
-from nextgisweb.resource import (
-    DataScope,
-    DataStructureScope,
-    Resource,
-    ResourceGroup,
-    ResourceScope,
-    Serializer,
-)
+from nextgisweb.resource import DataScope, Resource, ResourceGroup, ResourceScope, Serializer
 from nextgisweb.resource import SerializedProperty as SP
 from nextgisweb.resource import SerializedRelationship as SR
 
@@ -35,7 +28,7 @@ class RasterMosaic(Base, Resource, SpatialLayerMixin):
     identity = "raster_mosaic"
     cls_display_name = gettext("Raster mosaic")
 
-    __scope__ = (DataStructureScope, DataScope)
+    __scope__ = DataScope
 
     @classmethod
     def check_parent(cls, parent):
