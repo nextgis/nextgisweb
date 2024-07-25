@@ -1,4 +1,7 @@
 import { lookup, nlookup } from "@nextgisweb/jsrealm/i18n/catalog";
+
+import compile from "./string-format/compile";
+
 import "@nextgisweb/jsrealm/locale-loader!";
 
 const en = ngwConfig.locale === "en";
@@ -23,6 +26,16 @@ export function dgettext(domain: string, ...[message]: MParam): string {
     return dpgettext(domain, "", message);
 }
 
+export function dgettextf(
+    domain: string,
+    template: string,
+    ...args: MParam
+): string {
+    const translation = dgettext(domain, template);
+    const newTemplate = compile(translation);
+    return newTemplate(...args);
+}
+
 export function dnpgettext(
     domain: string,
     ...[context, singular, plural, n]: CNParam
@@ -38,6 +51,9 @@ export function dngettext(domain: string, ...args: NParam): string {
 export function domain(domain: string) {
     return {
         gettext: (...args: MParam) => dgettext(domain, ...args),
+        gettextf: (template: string) => {
+            return (...args: MParam) => dgettextf(domain, template, ...args);
+        },
         pgettext: (...args: CMParam) => dpgettext(domain, ...args),
         ngettext: (...args: NParam) => dngettext(domain, ...args),
         npgettext: (...args: CNParam) => dnpgettext(domain, ...args),
