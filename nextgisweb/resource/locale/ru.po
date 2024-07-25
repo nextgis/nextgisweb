@@ -18,7 +18,7 @@ msgstr "Сохранить"
 #: amd/ngw-resource/CompositeWidget.js:110
 #: nodepkg/children-section/component/MenuDropdown.tsx:209
 #: nodepkg/children-section/util/createResourceTableItemOptions.ts:8
-#: nodepkg/delete-page/DeletePage.tsx:60 view.py:415
+#: nodepkg/delete-page/DeletePage.tsx:60 view.py:407
 msgid "Delete"
 msgstr "Удалить"
 
@@ -59,23 +59,23 @@ msgstr "Отмена"
 msgid "Resource"
 msgstr "Ресурс"
 
-#: api.py:140
+#: api.py:135
 msgid "Root resource could not be deleted."
 msgstr "Корневой ресурс удалить невозможно."
 
-#: api.py:195
+#: api.py:190
 msgid "Resource parent required."
 msgstr "Необходимо указать ресурс-родитель."
 
-#: api.py:200
+#: api.py:195
 msgid "Resource class required."
 msgstr "Необходимо указать класс ресурса."
 
-#: api.py:202
+#: api.py:197
 msgid "Unknown resource class '%s'."
 msgstr "Неизвестный класс ресурса '%s'."
 
-#: api.py:303
+#: api.py:298
 msgid "Permission not found"
 msgstr "Право доступа не найдено"
 
@@ -431,7 +431,7 @@ msgstr "Необходимо заполнить все поля"
 msgid "Row conflicts with another"
 msgstr "Конфликт строк"
 
-#: nodepkg/permissions-widget/PermissionsWidget.tsx:20 view.py:360
+#: nodepkg/permissions-widget/PermissionsWidget.tsx:20 view.py:352
 msgid "Action"
 msgstr "Действие"
 
@@ -479,7 +479,7 @@ msgstr "Ресурсы не найдены"
 msgid "Search resources"
 msgstr "Поиск ресурсов"
 
-#: scope.py:14 scope.py:30 scope.py:40 scope.py:53
+#: scope.py:14 scope.py:28 scope.py:41
 msgctxt "permission"
 msgid "Read"
 msgstr "Чтение"
@@ -489,7 +489,7 @@ msgctxt "permission"
 msgid "Create"
 msgstr "Создание"
 
-#: scope.py:16 scope.py:31 scope.py:41
+#: scope.py:16 scope.py:29
 msgctxt "permission"
 msgid "Modify"
 msgstr "Изменение"
@@ -509,33 +509,29 @@ msgctxt "permission"
 msgid "Configure permissions"
 msgstr "Настройка прав доступа"
 
-#: scope.py:28
-msgid "Data structure"
-msgstr "Структура данных"
-
-#: scope.py:38
+#: scope.py:26
 msgid "Data"
 msgstr "Данные"
 
-#: scope.py:51
+#: scope.py:39
 msgid "Connection"
 msgstr "Соединение"
 
-#: scope.py:54 scope.py:68
+#: scope.py:42 scope.py:56
 msgctxt "permission"
 msgid "Configure"
 msgstr "Настройка"
 
-#: scope.py:55
+#: scope.py:43
 msgctxt "permission"
 msgid "Use"
 msgstr "Использование"
 
-#: scope.py:65
+#: scope.py:53
 msgid "Service"
 msgstr "Сервис"
 
-#: scope.py:67
+#: scope.py:55
 msgctxt "permission"
 msgid "Access"
 msgstr "Доступ"
@@ -548,38 +544,38 @@ msgstr "У этого ресурса нет описания."
 msgid "External access"
 msgstr "Внешний доступ"
 
-#: view.py:124 view.py:424
+#: view.py:116 view.py:416
 msgid "JSON view"
 msgstr "Представление JSON"
 
-#: view.py:136 view.py:431
+#: view.py:128 view.py:423
 msgid "User permissions"
 msgstr "Права пользователя"
 
-#: view.py:181 view.py:359
+#: view.py:173 view.py:351
 msgid "Create resource"
 msgstr "Создать ресурс"
 
-#: view.py:192
+#: view.py:184
 msgid "Update resource"
 msgstr "Обновить ресурс"
 
-#: view.py:204
+#: view.py:196
 msgid "Delete resource"
 msgstr "Удалить ресурс"
 
-#: view.py:261 view.py:444
+#: view.py:253 view.py:436
 msgid "Resource export"
 msgstr "Экспорт ресурсов"
 
-#: view.py:285
+#: view.py:277
 msgid "Insufficient '%s' permission in scope '%s' on resource id = %d."
 msgstr "Недостаточно разрешения '%s' в скоупе '%s' для идентификатора ресурса = %d."
 
-#: view.py:361
+#: view.py:353
 msgid "Extra"
 msgstr "Дополнительно"
 
-#: view.py:402
+#: view.py:394
 msgid "Update"
 msgstr "Изменить"
