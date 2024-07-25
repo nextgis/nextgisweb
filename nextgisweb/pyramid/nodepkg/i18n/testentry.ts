@@ -27,8 +27,8 @@ describe("Gettext implementation", () => {
 
     it("pgettextf implementation", () => {
         assert.equal(
-            pgettextf("test", "unit {}")("on ellipsoid"),
-            "unit on ellipsoid"
+            pgettextf("test", "units {}")("on ellipsoid"),
+            "units on ellipsoid"
         );
     });
 
