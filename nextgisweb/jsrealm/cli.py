@@ -4,7 +4,7 @@ import shutil
 from itertools import chain
 from pathlib import Path
 from subprocess import check_call
-from typing import List
+from typing import Dict
 
 from nextgisweb.env import Env
 from nextgisweb.env.cli import UninitializedEnvCommand, comp_cli, opt
@@ -19,7 +19,9 @@ from .component import JSRealmComponent
 from .util import scan_for_nodepkgs
 
 
-def create_tsconfig(npkgs: List[str], *, debug):
+def create_tsconfig(npkgs: Dict[str, Path], *, debug):
+    paths = {"react": ["./node_modules/@types/react"]}
+
     compiler_options = dict(
         target="es2015",
         lib=["dom", "dom.iterable", "esnext"],
@@ -37,14 +39,15 @@ def create_tsconfig(npkgs: List[str], *, debug):
         module="esnext",
         jsx="react-jsx",
         baseUrl=".",
-        paths={"react": ["./node_modules/@types/react"]},
+        paths=paths,
     )
 
     include = []
 
-    for pkg in npkgs:
-        include.append("{}/**/*.ts".format(pkg))
-        include.append("{}/**/*.tsx".format(pkg))
+    for pn, pp in npkgs.items():
+        include.append(f"{pp}/**/*.ts")
+        include.append(f"{pp}/**/*.tsx")
+        paths[f"{pn}/*"] = [f"{pp}/*"]
 
     tsconfig_json = dict(
         compilerOptions=compiler_options,
@@ -88,9 +91,12 @@ def install(
             continue
         cpaths[cid] = cpath
 
-    npkgs = [
-        str(p) for p in chain(*[scan_for_nodepkgs(cid, cpath) for cid, cpath in cpaths.items()])
-    ]
+    npkgs = {
+        pname: ppath
+        for pname, ppath in chain(
+            *[scan_for_nodepkgs(cid, cpath) for cid, cpath in cpaths.items()]
+        )
+    }
 
     package_json = dict(private=True)
     package_json["engines"] = dict(node=">=20.0.0")
@@ -142,7 +148,7 @@ def install(
     scripts["build"] = "webpack --progress --config {}".format(webpack_root)
     scripts["watch"] = "webpack --progress --watch --config {}".format(webpack_root)
 
-    package_json["workspaces"] = npkgs
+    package_json["workspaces"] = [str(pp) for pp in npkgs.values()]
 
     with open("package.json", "w") as fd:
         fd.write(json.dumps(package_json, indent=4))
