@@ -106,6 +106,7 @@ def subscriber(event):
         if not supported:
             hash = hash_header(ua_str)
             if request.cookies.get("ngw-uac") == hash:
+                request.environ["pyramid.uacompat_bypass"] = fam_ver
                 return
 
             raise HTTPSeeOther(

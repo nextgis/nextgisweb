@@ -2,7 +2,6 @@ from contextlib import contextmanager
 from secrets import token_hex
 from uuid import uuid4
 
-import geoalchemy2 as ga
 import pytest
 import sqlalchemy as sa
 import transaction
@@ -10,17 +9,14 @@ from osgeo import ogr
 from sqlalchemy.engine.url import URL as EngineURL
 from sqlalchemy.engine.url import make_url as make_engine_url
 
+import nextgisweb.lib.saext as saext
 from nextgisweb.env import DBSession, env
 from nextgisweb.lib.ogrhelper import FIELD_GETTER
 
 from nextgisweb.auth import User
-from nextgisweb.feature_layer import GEOM_TYPE, GEOM_TYPE_OGR_2_GEOM_TYPE
+from nextgisweb.feature_layer import GEOM_TYPE_OGR_2_GEOM_TYPE
 from nextgisweb.spatial_ref_sys import SRS
-from nextgisweb.vector_layer.util import (
-    FIELD_TYPE_2_DB,
-    FIELD_TYPE_2_ENUM,
-    GEOM_TYPE_2_DB,
-)
+from nextgisweb.vector_layer.util import FIELD_TYPE_2_DB, FIELD_TYPE_2_ENUM
 
 from .. import PostgisConnection, PostgisLayer
 
@@ -51,17 +47,10 @@ def create_feature_layer(ogrlayer, parent_id, **kwargs):
 
     column_geom = "the_geom"
     geom_type = GEOM_TYPE_OGR_2_GEOM_TYPE[ogrlayer.GetGeomType()]
-    dimension = 3 if geom_type in GEOM_TYPE.has_z else 2
-    geometry_type_db = GEOM_TYPE_2_DB[geom_type]
     osr_ = ogrlayer.GetSpatialRef()
     assert osr_.GetAuthorityName(None) == "EPSG"
     srid = int(osr_.GetAuthorityCode(None))
-    columns.append(
-        sa.Column(
-            column_geom,
-            ga.Geometry(dimension=dimension, srid=srid, geometry_type=geometry_type_db),
-        )
-    )
+    columns.append(sa.Column(column_geom, saext.Geometry(geom_type, srid)))
 
     # Make columns different from keynames
 
@@ -82,14 +71,15 @@ def create_feature_layer(ogrlayer, parent_id, **kwargs):
 
     meta.create_all(engine)
 
+    def geom_wkb(wkb, sql=sa.text(f"ST_GeomFromWKB(:wkb, {srid})")):
+        return sql.bindparams(sa.bindparam("wkb", wkb, unique=True))
+
     with engine.connect() as conn:
         with conn.begin():
             for i, feature in enumerate(ogrlayer, start=1):
                 values = dict(id=i)
-
                 geom = feature.GetGeometryRef()
-                geom_bytes = bytearray(geom.ExportToWkb(ogr.wkbNDR))
-                values[column_geom] = ga.elements.WKBElement(geom_bytes, srid=srid)
+                values[column_geom] = geom_wkb(geom.ExportToWkb(ogr.wkbNDR))
 
                 for k in range(feature.GetFieldCount()):
                     if not feature.IsFieldSet(k) or feature.IsFieldNull(k):

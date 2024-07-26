@@ -31,9 +31,9 @@ from nextgisweb.render import (
 )
 from nextgisweb.resource import (
     DataScope,
-    DataStructureScope,
     Resource,
     ResourceGroup,
+    ResourceScope,
     SAttribute,
     Serializer,
     SRelationship,
@@ -117,7 +117,7 @@ class Tileset(Base, Resource, SpatialLayerMixin):
     identity = "tileset"
     cls_display_name = gettext("Tileset")
 
-    __scope__ = (DataStructureScope, DataScope)
+    __scope__ = DataScope
 
     fileobj_id = sa.Column(sa.ForeignKey(FileObj.id), nullable=False)
     tileset_zmin = sa.Column(sa.SmallInteger, nullable=False)
@@ -406,5 +406,5 @@ class TilesetSerializer(Serializer, apitype=True):
     identity = Tileset.identity
     resclass = Tileset
 
-    srs = SRelationship(read=DataStructureScope.read, write=DataStructureScope.write)
+    srs = SRelationship(read=ResourceScope.read, write=ResourceScope.update)
     source = SourceAttr(write=DataScope.write)

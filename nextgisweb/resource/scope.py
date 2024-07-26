@@ -19,18 +19,6 @@ class ResourceScope(Scope):
     change_permissions = P(pgettext("permission", "Configure permissions")).require(read)
 
 
-class DataStructureScope(Scope):
-    """Set of permissions for data structure, for example fields structure
-    of vector layer, its change might lead to change
-    in data itself."""
-
-    identity = "datastruct"
-    label = gettext("Data structure")
-
-    read = P(pgettext("permission", "Read")).require(ResourceScope.read)
-    write = P(pgettext("permission", "Modify")).require(read)
-
-
 class DataScope(Scope):
     """Set of permissions for data access"""
 

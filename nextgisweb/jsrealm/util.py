@@ -1,7 +1,7 @@
 from itertools import chain
 from pathlib import Path
 from textwrap import indent
-from typing import Generator
+from typing import Generator, Tuple
 
 from nextgisweb.lib.json import loads
 from nextgisweb.lib.logging import logger
@@ -20,7 +20,7 @@ def validate_package_json(cid: str, package_json: Path):
     return data["name"]
 
 
-def scan_for_nodepkgs(cid: str, cpath: Path) -> Generator[Path, None, None]:
+def scan_for_nodepkgs(cid: str, cpath: Path) -> Generator[Tuple[str, Path], None, None]:
     nodepkg = cpath / "nodepkg"
     if not nodepkg.exists():
         return
@@ -32,7 +32,7 @@ def scan_for_nodepkgs(cid: str, cpath: Path) -> Generator[Path, None, None]:
         path = package_json.parent
         name = validate_package_json(cid, package_json)
         logger.debug("%s found in %s", name, path)
-        yield path
+        yield (name, path)
 
 
 def indented(lines, sep="\n"):

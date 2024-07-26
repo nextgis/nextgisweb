@@ -402,6 +402,7 @@ def cmd_poeditor_sync(args):
                 ],
                 locale=[lc for lc in locales if lc != "ru"],
                 extract=args.extract,
+                no_obsolete=True,
                 force=False,
             )
         )
@@ -528,7 +529,7 @@ def cmd_poeditor_sync(args):
             wait_for_rate_limit = False
             for locale, catalog in reference_catalogs.items():
                 with NamedTemporaryFile(suffix=".po") as fd:
-                    write_po(fd.name, catalog)
+                    write_po(Path(fd.name), catalog)
                     logger.debug("Uploading %s reference translation...", locale)
 
                     # Free account allows doing 1 upload per 20 seconds

@@ -490,6 +490,21 @@ const webpackConfig = defaults("main", (env) => ({
             chunks: "all",
             minSize: 0,
         },
+        minimizer: [
+            {
+                apply: (compiler) => {
+                    const TerserPlugin = require("terser-webpack-plugin");
+                    new TerserPlugin({
+                        terserOptions: {
+                            // Webpack default options
+                            compress: { passes: 2 },
+                            // Keep class names for exceptions and Sentry
+                            keep_classnames: true,
+                        },
+                    }).apply(compiler);
+                },
+            },
+        ],
     },
 }));
 

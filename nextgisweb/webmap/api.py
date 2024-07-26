@@ -191,7 +191,7 @@ class MapContent(ElementSize):
 class PrintBody(Struct):
     width: Annotated[int, Meta(gt=0)]
     height: Annotated[int, Meta(gt=0)]
-    margin: Annotated[int, Meta(gt=0)]
+    margin: Annotated[int, Meta(ge=0)]
     map: MapContent
     format: PrintFormat
     legend: Union[LegendElement, UnsetType] = UNSET
@@ -365,7 +365,7 @@ AreaUnits = Annotated[
     TSExport("AreaUnits"),
 ]
 DegreeFormat = Annotated[Literal["dd", "ddm", "dms"], TSExport("DegreeFormat")]
-AddressGeocoder = Annotated[Literal["nominatim", "yandex"], TSExport("DegreeFormat")]
+AddressGeocoder = Annotated[Literal["nominatim", "yandex"], TSExport("AddressGeocoder")]
 
 csetting("identify_radius", float, default=3)
 csetting("identify_attributes", bool, default=True)

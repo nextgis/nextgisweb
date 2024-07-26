@@ -18,9 +18,9 @@ from nextgisweb.resource import (
     ConnectionScope,
     CRUTypes,
     DataScope,
-    DataStructureScope,
     Resource,
     ResourceGroup,
+    ResourceScope,
     SColumn,
     Serializer,
     SRelationship,
@@ -157,7 +157,7 @@ class Layer(Base, Resource, SpatialLayerMixin):
     identity = "tmsclient_layer"
     cls_display_name = gettext("TMS layer")
 
-    __scope__ = (DataStructureScope, DataScope)
+    __scope__ = DataScope
 
     connection_id = db.Column(db.ForeignKey(Connection.id), nullable=False)
     layer_name = db.Column(db.Unicode)
@@ -309,13 +309,13 @@ class LayerSerializer(Serializer, apitype=True):
     identity = Layer.identity
     resclass = Layer
 
-    connection = SResource(read=DataStructureScope.read, write=DataStructureScope.write)
-    layer_name = LayerNameAttr(read=DataStructureScope.read, write=DataStructureScope.write)
-    tilesize = SColumn(read=DataStructureScope.read, write=DataStructureScope.write)
-    minzoom = SColumn(read=DataStructureScope.read, write=DataStructureScope.write)
-    maxzoom = SColumn(read=DataStructureScope.read, write=DataStructureScope.write)
-    extent_left = SColumn(read=DataStructureScope.read, write=DataStructureScope.write)
-    extent_right = SColumn(read=DataStructureScope.read, write=DataStructureScope.write)
-    extent_bottom = SColumn(read=DataStructureScope.read, write=DataStructureScope.write)
-    extent_top = SColumn(read=DataStructureScope.read, write=DataStructureScope.write)
-    srs = SRelationship(read=DataStructureScope.read, write=DataStructureScope.write)
+    connection = SResource(read=ResourceScope.read, write=ResourceScope.update)
+    layer_name = LayerNameAttr(read=ResourceScope.read, write=ResourceScope.update)
+    tilesize = SColumn(read=ResourceScope.read, write=ResourceScope.update)
+    minzoom = SColumn(read=ResourceScope.read, write=ResourceScope.update)
+    maxzoom = SColumn(read=ResourceScope.read, write=ResourceScope.update)
+    extent_left = SColumn(read=ResourceScope.read, write=ResourceScope.update)
+    extent_right = SColumn(read=ResourceScope.read, write=ResourceScope.update)
+    extent_bottom = SColumn(read=ResourceScope.read, write=ResourceScope.update)
+    extent_top = SColumn(read=ResourceScope.read, write=ResourceScope.update)
+    srs = SRelationship(read=ResourceScope.read, write=ResourceScope.update)

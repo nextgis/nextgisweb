@@ -9,15 +9,16 @@ import type {
     Operation,
 } from "@nextgisweb/resource/type";
 import type { Composite } from "@nextgisweb/resource/type/Composite";
-import type {
-    CompositeRead,
-    CompositeUpdate,
-} from "@nextgisweb/resource/type/api";
+import type * as apitype from "@nextgisweb/tileset/type/api";
 
-type Value = CompositeRead["tileset"];
-type ValueUpdate = CompositeUpdate["tileset"];
-
-export class Store implements EditorStore<Value> {
+export class Store
+    implements
+        EditorStore<
+            apitype.TilesetRead,
+            apitype.TilesetCreate,
+            apitype.TilesetUpdate
+        >
+{
     identity = "tileset";
 
     source: FileMeta | null = null;
@@ -32,12 +33,12 @@ export class Store implements EditorStore<Value> {
         this.operation = operation;
     }
 
-    load(val: Value) {
+    load(val: apitype.TilesetRead) {
         console.log(val);
     }
 
     dump({ lunkwill }: DumpParams) {
-        const result: ValueUpdate = {};
+        const result: apitype.TilesetUpdate = {};
 
         if (this.source) {
             result.source = this.source;
