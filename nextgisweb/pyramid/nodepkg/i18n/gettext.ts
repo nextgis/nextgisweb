@@ -26,16 +26,17 @@ export function dpgettextf(
     domain: string,
     context: string,
     message: string,
-    param: string | number
+    ...params: MParam
 ): string {
     if (en) {
         const translation = message;
         const newTemplate = compile(translation);
         return newTemplate(translation);
     }
+
     const translation = lookup(domain, context, message);
     const newTemplate = compile(translation);
-    return newTemplate(String(param));
+    return newTemplate(...params);
 }
 
 export function dgettext(domain: string, ...[message]: MParam): string {
@@ -66,17 +67,17 @@ export function dnpgettextf(
     singular: string,
     plural: string,
     n: number,
-    param: string | number
+    ...params: MParam
 ): string {
     if (en) {
         const translation = [singular, plural][pf(n)];
         const newTemplate = compile(translation);
-        return newTemplate(n);
+        return newTemplate(...params);
     }
 
     const translation = nlookup(domain, context, singular, plural, pn)[pf(n)];
     const newTemplate = compile(translation);
-    return newTemplate(param);
+    return newTemplate(...params);
 }
 
 export function dngettext(domain: string, ...args: NParam): string {
@@ -88,30 +89,31 @@ export function dngettextf(
     singular: string,
     plural: string,
     n: number,
-    param: string | number
+    ...params: MParam
 ): string {
     const translation = dnpgettext(domain, "", singular, plural, n);
     const newTemplate = compile(translation);
-    return newTemplate(String(param));
+    return newTemplate(...params);
 }
 
 export function domain(domain: string) {
     return {
         gettext: (...args: MParam) => dgettext(domain, ...args),
         gettextf: (template: string) => {
-            return (...params: [any]) => dgettextf(domain, template, ...params);
+            return (...params: MParam) =>
+                dgettextf(domain, template, ...params);
         },
 
         pgettext: (...args: CMParam) => dpgettext(domain, ...args),
         pgettextf: (context: string, message: string) => {
-            return (param: string) =>
-                dpgettextf(domain, context, message, param);
+            return (...params: MParam) =>
+                dpgettextf(domain, context, message, ...params);
         },
 
         ngettext: (...args: NParam) => dngettext(domain, ...args),
         ngettextf: (singular: string, plural: string, n: number) => {
-            return (param: string | number) =>
-                dngettextf(domain, singular, plural, n, param);
+            return (...params: MParam) =>
+                dngettextf(domain, singular, plural, n, ...params);
         },
 
         npgettext: (...args: CNParam) => dnpgettext(domain, ...args),
@@ -121,8 +123,8 @@ export function domain(domain: string) {
             plural: string,
             n: number
         ) => {
-            return (param: string | number) =>
-                dnpgettextf(domain, context, singular, plural, n, param);
+            return (...params: MParam) =>
+                dnpgettextf(domain, context, singular, plural, n, ...params);
         },
     };
 }
