@@ -46,10 +46,11 @@ export function dgettext(domain: string, ...[message]: MParam): string {
 export function dgettextf(
     domain: string,
     template: string,
-    ...args: MParam
+    ...args: MParam | [object]
 ): string {
     const translation = dgettext(domain, template);
     const newTemplate = compile(translation);
+    console.log("oppp", args.length, ...args);
     return newTemplate(...args);
 }
 
@@ -67,7 +68,7 @@ export function dnpgettextf(
     singular: string,
     plural: string,
     n: number,
-    ...params: MParam
+    ...params: [message: string | number]
 ): string {
     if (en) {
         const translation = [singular, plural][pf(n)];
@@ -89,7 +90,7 @@ export function dngettextf(
     singular: string,
     plural: string,
     n: number,
-    ...params: MParam
+    ...params: [message: string | number]
 ): string {
     const translation = dnpgettext(domain, "", singular, plural, n);
     const newTemplate = compile(translation);
@@ -112,7 +113,7 @@ export function domain(domain: string) {
 
         ngettext: (...args: NParam) => dngettext(domain, ...args),
         ngettextf: (singular: string, plural: string, n: number) => {
-            return (...params: MParam) =>
+            return (...params: [message: string | number]) =>
                 dngettextf(domain, singular, plural, n, ...params);
         },
 
@@ -123,7 +124,7 @@ export function domain(domain: string) {
             plural: string,
             n: number
         ) => {
-            return (...params: MParam) =>
+            return (...params: [message: string | number]) =>
                 dnpgettextf(domain, context, singular, plural, n, ...params);
         },
     };
