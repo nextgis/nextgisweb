@@ -52,12 +52,12 @@ msgid "File name"
 msgstr "Имя файла"
 
 #: nodepkg/attachment-editor/AttachmentEditor.tsx:172
-#: nodepkg/attachment-table/AttachmentTable.tsx:63
+#: nodepkg/attachment-table/AttachmentTable.tsx:66
 msgid "Size"
 msgstr "Размер"
 
 #: nodepkg/attachment-editor/AttachmentEditor.tsx:178
-#: nodepkg/attachment-table/AttachmentTable.tsx:78
+#: nodepkg/attachment-table/AttachmentTable.tsx:81
 msgid "Description"
 msgstr "Описание"
 
@@ -120,7 +120,11 @@ msgstr "Экспорт"
 msgid "Import"
 msgstr "Импорт"
 
-#: nodepkg/attachment-table/AttachmentTable.tsx:72
+#: nodepkg/attachment-table/AttachmentTable.tsx:48
+msgid "Empty filename"
+msgstr "Пустое имя файла"
+
+#: nodepkg/attachment-table/AttachmentTable.tsx:75
 msgid "MIME type"
 msgstr "Тип MIME"
 
@@ -144,23 +148,23 @@ msgstr "Некорректный идентификатор объекта дл�
 msgid "Invalid keyname for file '{}'."
 msgstr "Некорректный ключ для файла '{}'."
 
-#: util.py:74
+#: util.py:75
 msgid "Invalid name for file '{}'."
 msgstr "Некорректное имя для файла '{}'."
 
-#: util.py:80
+#: util.py:82
 msgid "Invalid MIME type for file '{}'."
 msgstr "Некорректный MIME-тип для файла '{}'."
 
-#: util.py:87
+#: util.py:89
 msgid "Invalid description for file '{}'."
 msgstr "Некорректное описание для файла '{}'."
 
-#: util.py:100
+#: util.py:102
 msgid "Could not determine feature ID for file '{}'."
 msgstr "Не удалось определить идентификатор объекта для файла '{}'."
 
-#: util.py:118
+#: util.py:122
 msgid "File '{}' isn't found in the archive."
 msgstr "Файл '{}' не найден в архиве."
 
