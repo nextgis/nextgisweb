@@ -52,12 +52,12 @@ msgid "File name"
 msgstr "Имя файла"
 
 #: nodepkg/attachment-editor/AttachmentEditor.tsx:172
-#: nodepkg/attachment-table/AttachmentTable.tsx:66
+#: nodepkg/attachment-table/AttachmentTable.tsx:63
 msgid "Size"
 msgstr "Размер"
 
 #: nodepkg/attachment-editor/AttachmentEditor.tsx:178
-#: nodepkg/attachment-table/AttachmentTable.tsx:81
+#: nodepkg/attachment-table/AttachmentTable.tsx:78
 msgid "Description"
 msgstr "Описание"
 
@@ -120,11 +120,11 @@ msgstr "Экспорт"
 msgid "Import"
 msgstr "Импорт"
 
-#: nodepkg/attachment-table/AttachmentTable.tsx:48
-msgid "Empty filename"
-msgstr "Пустое имя файла"
+#: nodepkg/attachment-table/AttachmentTable.tsx:55
+msgid "Unnamed"
+msgstr "Безымянный"
 
-#: nodepkg/attachment-table/AttachmentTable.tsx:75
+#: nodepkg/attachment-table/AttachmentTable.tsx:72
 msgid "MIME type"
 msgstr "Тип MIME"
 

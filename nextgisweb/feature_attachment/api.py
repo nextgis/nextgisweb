@@ -1,7 +1,7 @@
-import mimetypes
 import re
 from io import BytesIO
 from itertools import count
+from mimetypes import guess_extension
 from tempfile import NamedTemporaryFile
 from typing import List, Optional
 from urllib.parse import quote_plus
@@ -83,7 +83,7 @@ def download(
     fobj = FileObj.filter_by(id=fileobj_id).one()
     response = UnsafeFileResponse(fobj.filename(), content_type=mime_type, request=request)
     if name is None:
-        name = ""
+        name = f"unnamed{aid}{guess_extension(mime_type) or '.bin'}"
     response.content_disposition = f"filename*=utf-8''{quote_plus(name)}"
     return response
 
@@ -191,7 +191,7 @@ def export(resource, request):
 
                 name = obj.name
                 if name is None or name.strip() == "":
-                    extension = mimetypes.guess_extension(obj.mime_type)
+                    extension = guess_extension(obj.mime_type) or ".bin"
                     name = f"{att_idx:010d}{extension}"
 
                 if name in feature_anames:
