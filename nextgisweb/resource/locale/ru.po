@@ -18,7 +18,7 @@ msgstr "Сохранить"
 #: amd/ngw-resource/CompositeWidget.js:110
 #: nodepkg/children-section/component/MenuDropdown.tsx:209
 #: nodepkg/children-section/util/createResourceTableItemOptions.ts:8
-#: nodepkg/delete-page/DeletePage.tsx:60 view.py:407
+#: nodepkg/delete-page/DeletePage.tsx:60 view.py:438
 msgid "Delete"
 msgstr "Удалить"
 
@@ -102,9 +102,9 @@ msgstr ""
 
 #: exception.py:27
 msgid ""
-"Modification of the '{attribute}' attribute requires the '{scope}: "
-"{permission}' permission."
-msgstr "Для изменения атрибута '{attribute}' необходимо право '{scope}: {permission}'."
+"Modification of the '{attribute}' attribute requires the '{permission}' "
+"permission."
+msgstr "Для изменения атрибута '{attribute}' необходимо право '{permission}'."
 
 #: exception.py:33
 msgid "The '{attribute}' attribute is read-only and cannot be updated."
@@ -197,11 +197,11 @@ msgstr "Ресурс не может быть дочерним для ресур
 
 #: model.py:514
 msgid ""
-"Unable to revoke '{s}: {p}' permission for '{u}' as the user belongs to the "
-"administrators group. Administrators must always have ability to configure "
-"permissions of resources."
+"Unable to revoke '{permission}' permission for '{user}' as the user belongs "
+"to the administrators group. Administrators must always have ability to "
+"configure permissions of resources."
 msgstr ""
-"Невозможно отозвать право '{s}: {p}' для '{u}', так как пользователь "
+"Невозможно отозвать право '{permission}' для '{user}', так как пользователь "
 "относится к группе администраторов. Администраторы всегда должны иметь "
 "возможность настраивать права для ресурсов."
 
@@ -216,13 +216,12 @@ msgid "Display name"
 msgstr "Наименование"
 
 #: nodepkg/children-section/ChildrenSection.tsx:90
-#: template/resource_section_summary.mako:5
+#: template/resource_section_main.mako:10
 msgid "Type"
 msgstr "Тип"
 
 #: nodepkg/children-section/ChildrenSection.tsx:97
-#: nodepkg/editor-widget/EditorWidget.tsx:43
-#: template/resource_section_summary.mako:20
+#: nodepkg/editor-widget/EditorWidget.tsx:43 template/resource_section_main.mako:18
 msgid "Owner"
 msgstr "Владелец"
 
@@ -350,8 +349,7 @@ msgstr "Идентификатор для API интеграции (необяз
 msgid "Parent"
 msgstr "Родитель"
 
-#: nodepkg/editor-widget/EditorWidget.tsx:55
-#: template/resource_section_summary.mako:9
+#: nodepkg/editor-widget/EditorWidget.tsx:55 template/resource_section_main.mako:12
 msgid "Keyname"
 msgstr "Ключ"
 
@@ -423,6 +421,11 @@ msgstr "Добавлено в избранное"
 msgid "Removed from favorites"
 msgstr "Удалено из избранного"
 
+#: nodepkg/main-section/CreateResourceButton.tsx:7
+#: nodepkg/main-section/CreateResourceModal.tsx:14 view.py:173 view.py:381
+msgid "Create resource"
+msgstr "Создать ресурс"
+
 #: nodepkg/permissions-widget/PermissionStoreItem.ts:13
 msgid "All fields are required"
 msgstr "Необходимо заполнить все поля"
@@ -431,7 +434,7 @@ msgstr "Необходимо заполнить все поля"
 msgid "Row conflicts with another"
 msgstr "Конфликт строк"
 
-#: nodepkg/permissions-widget/PermissionsWidget.tsx:20 view.py:352
+#: nodepkg/permissions-widget/PermissionsWidget.tsx:20 view.py:382
 msgid "Action"
 msgstr "Действие"
 
@@ -479,7 +482,7 @@ msgstr "Ресурсы не найдены"
 msgid "Search resources"
 msgstr "Поиск ресурсов"
 
-#: scope.py:14 scope.py:28 scope.py:41
+#: scope.py:14
 msgctxt "permission"
 msgid "Read"
 msgstr "Чтение"
@@ -489,7 +492,7 @@ msgctxt "permission"
 msgid "Create"
 msgstr "Создание"
 
-#: scope.py:16 scope.py:29
+#: scope.py:16
 msgctxt "permission"
 msgid "Modify"
 msgstr "Изменение"
@@ -513,28 +516,48 @@ msgstr "Настройка прав доступа"
 msgid "Data"
 msgstr "Данные"
 
-#: scope.py:39
-msgid "Connection"
-msgstr "Соединение"
-
-#: scope.py:42 scope.py:56
+#: scope.py:28
 msgctxt "permission"
-msgid "Configure"
-msgstr "Настройка"
+msgid "Read data"
+msgstr "Чтение данных"
+
+#: scope.py:29
+msgctxt "permission"
+msgid "Modify data"
+msgstr "Изменение данных"
+
+#: scope.py:39
+msgid "External connections"
+msgstr "Внешние соединения"
+
+#: scope.py:41
+msgctxt "permission"
+msgid "Read connection parameters"
+msgstr "Чтение параметров соединения"
+
+#: scope.py:42
+msgctxt "permission"
+msgid "Configure connection"
+msgstr "Настройка соединения"
 
 #: scope.py:43
 msgctxt "permission"
-msgid "Use"
-msgstr "Использование"
+msgid "Use connection"
+msgstr "Использование соединения"
 
 #: scope.py:53
-msgid "Service"
-msgstr "Сервис"
+msgid "Web GIS services"
+msgstr "Сервисы Веб ГИС"
 
 #: scope.py:55
 msgctxt "permission"
-msgid "Access"
-msgstr "Доступ"
+msgid "Access service"
+msgstr "Доступ к сервису"
+
+#: scope.py:56
+msgctxt "permission"
+msgid "Configure service"
+msgstr "Настройка сервиса"
 
 #: template/resource_section_description.mako:5
 msgid "Resource description is empty."
@@ -544,17 +567,13 @@ msgstr "У этого ресурса нет описания."
 msgid "External access"
 msgstr "Внешний доступ"
 
-#: view.py:116 view.py:416
+#: view.py:116 view.py:447
 msgid "JSON view"
 msgstr "Представление JSON"
 
-#: view.py:128 view.py:423
+#: view.py:128 view.py:454
 msgid "User permissions"
 msgstr "Права пользователя"
-
-#: view.py:173 view.py:351
-msgid "Create resource"
-msgstr "Создать ресурс"
 
 #: view.py:184
 msgid "Update resource"
@@ -564,18 +583,18 @@ msgstr "Обновить ресурс"
 msgid "Delete resource"
 msgstr "Удалить ресурс"
 
-#: view.py:253 view.py:436
+#: view.py:253 view.py:467
 msgid "Resource export"
 msgstr "Экспорт ресурсов"
 
-#: view.py:277
+#: view.py:307
 msgid "Insufficient '%s' permission in scope '%s' on resource id = %d."
 msgstr "Недостаточно разрешения '%s' в скоупе '%s' для идентификатора ресурса = %d."
 
-#: view.py:353
+#: view.py:383
 msgid "Extra"
 msgstr "Дополнительно"
 
-#: view.py:394
+#: view.py:425
 msgid "Update"
 msgstr "Изменить"

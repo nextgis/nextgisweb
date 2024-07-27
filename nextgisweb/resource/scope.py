@@ -25,8 +25,8 @@ class DataScope(Scope):
     identity = "data"
     label = gettext("Data")
 
-    read = P(pgettext("permission", "Read")).require(ResourceScope.read)
-    write = P(pgettext("permission", "Modify")).require(read)
+    read = P(pgettext("permission", "Read data")).require(ResourceScope.read)
+    write = P(pgettext("permission", "Modify data")).require(read)
 
 
 class ConnectionScope(Scope):
@@ -36,11 +36,11 @@ class ConnectionScope(Scope):
     to access remote DB for example."""
 
     identity = "connection"
-    label = gettext("Connection")
+    label = gettext("External connections")
 
-    read = P(pgettext("permission", "Read")).require(ResourceScope.read)
-    write = P(pgettext("permission", "Configure")).require(read)
-    connect = P(pgettext("permission", "Use")).require(ResourceScope.read)
+    read = P(pgettext("permission", "Read connection parameters")).require(ResourceScope.read)
+    write = P(pgettext("permission", "Configure connection")).require(read)
+    connect = P(pgettext("permission", "Use connection")).require(ResourceScope.read)
 
 
 class ServiceScope(Scope):
@@ -50,7 +50,7 @@ class ServiceScope(Scope):
     their permissions separately."""
 
     identity = "service"
-    label = gettext("Service")
+    label = gettext("Web GIS services")
 
-    connect = P(pgettext("permission", "Access")).require(ResourceScope.read)
-    configure = P(pgettext("permission", "Configure")).require(connect)
+    connect = P(pgettext("permission", "Access service")).require(ResourceScope.read)
+    configure = P(pgettext("permission", "Configure service")).require(connect)

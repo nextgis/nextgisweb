@@ -173,7 +173,7 @@ const Permission = observer(({ row }: { row: Item }) => {
 
             for (const [pid, permission] of Object.entries(scope.permissions)) {
                 const value = sid + ":" + pid;
-                const label = scope.label + ": " + permission.label;
+                const label = permission.label;
                 scopeOptions.push(
                     <Option key={value} {...{ value, label }}>
                         {permission.label}

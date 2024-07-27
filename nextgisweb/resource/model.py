@@ -512,11 +512,11 @@ class ACLAttr(SAttribute, apitype=True):
                         continue
                     raise ValidationError(
                         message=gettext(
-                            "Unable to revoke '{s}: {p}' permission for '{u}' "
-                            "as the user belongs to the administrators group. "
-                            "Administrators must always have ability to "
+                            "Unable to revoke '{permission}' permission for "
+                            "'{user}' as the user belongs to the administrators "
+                            "group. Administrators must always have ability to "
                             "configure permissions of resources."
-                        ).format(s=p.scope.label, p=p.label, u=user.display_name)
+                        ).format(permission=p.label, user=user.display_name)
                     )
                 else:
                     assert False
