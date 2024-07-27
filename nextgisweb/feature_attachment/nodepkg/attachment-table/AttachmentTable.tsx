@@ -51,8 +51,8 @@ export function AttachmentTable({
                     });
 
                     return (
-                        <a href={href} target="_blank" rel="noreferrer">
-                            {name}
+                        <a href={href} target="_blank">
+                            {name || <i>{gettext("Unnamed")}</i>}
                         </a>
                     );
                 },
@@ -120,6 +120,7 @@ export function AttachmentTable({
                     showHeader={!isSmall}
                     size="small"
                     tableLayout="auto"
+                    bordered
                 />
             )}
         </div>
