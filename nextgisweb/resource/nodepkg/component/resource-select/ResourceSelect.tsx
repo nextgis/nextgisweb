@@ -1,33 +1,26 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { Select } from "@nextgisweb/gui/antd";
+import { Select, Space } from "@nextgisweb/gui/antd";
+import { OpenInNewIcon } from "@nextgisweb/gui/icon";
 import { routeURL } from "@nextgisweb/pyramid/api";
+import { ResourceIcon } from "@nextgisweb/resource/icon";
 
-import { renderResourceCls } from "../../util/renderResourceCls";
 import { showResourcePicker } from "../resource-picker";
-import type {
-    ResourcePickerStoreOptions,
-    SelectValue,
-} from "../resource-picker/type";
+import type { ResourcePickerStoreOptions } from "../resource-picker/type";
 
 import { useResourceSelect } from "./hook/useResourceSelect";
-import type { ResourceSelectProps } from "./type";
+import type { ResourceSelectOption, ResourceSelectProps } from "./type";
 
-import "./ResourceSelect.less";
-
-interface Option {
-    label: React.ReactNode;
-    value: number;
-    cls: string;
-}
-
-export const ResourceSelect = <V extends SelectValue = SelectValue>({
+export function ResourceSelect<V extends number = number>({
     value,
     onChange,
     readOnly,
+    hideGoto,
     pickerOptions,
+    allowClear,
+    style,
     ...selectOptions
-}: ResourceSelectProps<V>) => {
+}: ResourceSelectProps<V>) {
     const pickerModal = useRef<ReturnType<typeof showResourcePicker<V>>>();
 
     const [value_, setValue_] = useState<V | undefined>(value);
@@ -39,21 +32,11 @@ export const ResourceSelect = <V extends SelectValue = SelectValue>({
         value: value_,
     });
 
-    const closePicker = () => {
-        setOpen(false);
-        if (pickerModal.current) {
-            pickerModal.current;
-        }
-    };
-
     const onPick = useCallback(
         (val: V | undefined) => {
             setValue_(val);
             setOpen(false);
-            if (onChange) {
-                onChange(val);
-            }
-            closePicker();
+            onChange?.(val);
         },
         [onChange]
     );
@@ -84,10 +67,12 @@ export const ResourceSelect = <V extends SelectValue = SelectValue>({
                 },
             });
         }
-        return closePicker;
+        // TODO: Suspcious, pickerOptions and onChange (onPick dependency) may
+        // not be memoized and picker willbe reopended eache rendering cycle.
+        return () => setOpen(false);
     }, [onPick, open, pickerOptions, value_]);
 
-    const options = useMemo<Option[]>(() => {
+    const options = useMemo<ResourceSelectOption[]>(() => {
         return resource
             ? [
                   {
@@ -99,55 +84,54 @@ export const ResourceSelect = <V extends SelectValue = SelectValue>({
             : [];
     }, [resource]);
 
-    const optionRender = ({ label, cls }: Pick<Option, "label" | "cls">) => {
-        return renderResourceCls({ name: label, cls });
-    };
+    const optionRender = useCallback(
+        ({ label, cls, value }: ResourceSelectOption) => (
+            <Space>
+                <ResourceIcon identity={cls} />
+                {label}
+                {!hideGoto && (
+                    <a
+                        href={routeURL("resource.show", value)}
+                        target="_blank"
+                        onMouseDown={(evt) => {
+                            // Prevent from opening picker
+                            evt.stopPropagation();
+                        }}
+                    >
+                        <OpenInNewIcon />
+                    </a>
+                )}
+            </Space>
+        ),
+        [hideGoto]
+    );
 
     return (
-        <>
-            {readOnly ? (
-                options.map(({ label, value, cls }) => {
-                    const Label = (
-                        <a
-                            href={routeURL("resource.show", { id: value })}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            {label}
-                        </a>
-                    );
-                    return (
-                        <div key={value}>
-                            {optionRender({ label: Label, cls })}
-                        </div>
-                    );
-                })
-            ) : (
-                <Select
-                    open={open}
-                    value={value_}
-                    loading={resourceLoading}
-                    onDropdownVisibleChange={(visible) => setOpen(visible)}
-                    popupClassName="ngw-resource-resource-select-hidden-dropdown"
-                    dropdownRender={() => <></>}
-                    onClear={() => {
-                        onPick(undefined);
-                    }}
-                    {...selectOptions}
-                >
-                    {options.map(({ label, value, cls }) => {
-                        return (
-                            <Select.Option
-                                key={value}
-                                value={value}
-                                label={label}
-                            >
-                                {optionRender({ label, cls })}
-                            </Select.Option>
-                        );
-                    })}
-                </Select>
-            )}
-        </>
+        <Select
+            open={open}
+            value={value_}
+            loading={resourceLoading}
+            onDropdownVisibleChange={(visible) => {
+                if (!visible || !readOnly) {
+                    setOpen(visible);
+                }
+            }}
+            suffixIcon={readOnly ? <></> : undefined}
+            dropdownRender={() => <></>}
+            onClear={() => {
+                onPick(undefined);
+            }}
+            allowClear={!readOnly && allowClear}
+            style={{ cursor: readOnly ? "unset" : undefined, ...(style || {}) }}
+            {...selectOptions}
+        >
+            {options.map(({ label, value, cls }) => {
+                return (
+                    <Select.Option key={value} value={value} label={label}>
+                        {optionRender({ label, cls, value })}
+                    </Select.Option>
+                );
+            })}
+        </Select>
     );
-};
+}

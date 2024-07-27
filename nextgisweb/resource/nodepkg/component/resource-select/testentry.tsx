@@ -3,12 +3,27 @@ import { ResourceSelect } from "./ResourceSelect";
 import { ResourceSelectMultiple } from "./ResourceSelectMultiple";
 
 type PropsType = Record<string, unknown>;
+
 const presets: [React.ComponentType<PropsType>, string, PropsType][] = [
-    [ResourceSelect, "Resource select", {}],
+    [
+        ResourceSelect,
+        "Resource select",
+        {
+            allowClear: true,
+            style: { width: "40rem" },
+            placeholder: "Please select",
+        },
+    ],
+    [
+        ResourceSelect,
+        "Read-only resource select",
+        { value: 0, readOnly: true, style: { width: "40rem" } },
+    ],
     [
         ResourceSelect,
         "Resource group select",
         {
+            style: { width: "40rem" },
             pickerOptions: {
                 requireClass: "resource_group",
                 hideUnavailable: true,

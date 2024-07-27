@@ -9,7 +9,6 @@ export interface ResourceSelectRefProps
     extends Omit<ResourceSelectProps<number>, "value" | "onChange"> {
     value?: ResourceRef | null;
     onChange?: (value: ResourceRef | null) => void;
-    multiple?: false;
 }
 
 export function ResourceSelectRef({

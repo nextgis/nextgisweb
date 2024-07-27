@@ -47,7 +47,7 @@ const CollectionWidget = observer<{
                 label={gettext("Resource")}
                 value={item.resourceId}
                 component={ResourceSelect}
-                props={{ readOnly: true }}
+                props={{ readOnly: true, style: { width: "100%" } }}
             />
         </Area>
     );
