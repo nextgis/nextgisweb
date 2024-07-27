@@ -1,3 +1,4 @@
+import mimetypes
 import re
 from io import BytesIO
 from itertools import count
@@ -81,6 +82,8 @@ def download(
 
     fobj = FileObj.filter_by(id=fileobj_id).one()
     response = UnsafeFileResponse(fobj.filename(), content_type=mime_type, request=request)
+    if name is None:
+        name = ""
     response.content_disposition = f"filename*=utf-8''{quote_plus(name)}"
     return response
 
@@ -188,7 +191,8 @@ def export(resource, request):
 
                 name = obj.name
                 if name is None or name.strip() == "":
-                    name = f"{att_idx:010d}"
+                    extension = mimetypes.guess_extension(obj.mime_type)
+                    name = f"{att_idx:010d}{extension}"
 
                 if name in feature_anames:
                     # Make attachment's name unique
