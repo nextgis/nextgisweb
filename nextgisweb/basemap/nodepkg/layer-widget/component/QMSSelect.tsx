@@ -3,14 +3,13 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Select, Spin } from "@nextgisweb/gui/antd";
 import type { SelectProps } from "@nextgisweb/gui/antd";
+import { OpenInNewIcon } from "@nextgisweb/gui/icon";
 import { useAbortController } from "@nextgisweb/pyramid/hook";
 import settings from "@nextgisweb/pyramid/settings!basemap";
 import { LoaderCache } from "@nextgisweb/pyramid/util/loader";
 
 import { get, search } from "../service/qms";
 import type { QMSSearch, QMSService } from "../type";
-
-import LaunchIcon from "@nextgisweb/icon/mdi/launch";
 
 const searchCache = new LoaderCache<QMSSearch[]>();
 const getCache = new LoaderCache<QMSService>();
@@ -39,7 +38,7 @@ function QMSLabel({ name, id }: { name: string; id: number }) {
                 onClick={(e) => e.stopPropagation()}
                 onMouseDown={(e) => e.stopPropagation()}
             >
-                <LaunchIcon />
+                <OpenInNewIcon />
             </a>
         </>
     );
