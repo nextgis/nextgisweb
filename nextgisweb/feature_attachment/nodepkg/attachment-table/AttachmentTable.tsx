@@ -44,6 +44,9 @@ export function AttachmentTable({
                 className: "name",
                 title: gettext("File name"),
                 render: (name: string, attachment: FeatureAttachment) => {
+                    if (!name) {
+                        name = "<" + gettext("Empty filename") + ">";
+                    }
                     const href = routeURL("feature_attachment.download", {
                         id: resourceId,
                         fid: featureId,
