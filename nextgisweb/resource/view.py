@@ -10,7 +10,7 @@ from sqlalchemy.orm import joinedload, with_polymorphic
 from sqlalchemy.orm.exc import NoResultFound
 from typing_extensions import Annotated
 
-from nextgisweb.env import DBSession, gettext
+from nextgisweb.env import DBSession, env, gettext
 from nextgisweb.lib.dynmenu import DynMenu, Label, Link
 
 from nextgisweb.auth import OnUserLogin
@@ -255,6 +255,36 @@ def resource_export(request):
     )
 
 
+def creatable_resources(parent, *, user):
+    result = []
+    options = env.resource.options
+    permissions = parent.permissions(user)
+
+    for ident, cls in Resource.registry._dict.items():
+        if ident in options["disabled_cls"] or options["disable." + ident]:
+            continue
+
+        if not cls.check_parent(parent):
+            continue
+
+        # Is current user has permission to manage resource children?
+        if ResourceScope.manage_children not in permissions:
+            continue
+
+        # Is current user has permission to create child resource?
+        child = cls(parent=parent, owner_user=user)
+        if not child.has_permission(ResourceScope.create, user):
+            continue
+
+        # Workaround SAWarning: Object of type ... not in session,
+        # add operation along 'Resource.children' will not proceed
+        child.parent = None
+
+        result.append(cls)
+
+    return result
+
+
 resource_sections = PageSections("resource_section")
 
 
@@ -325,8 +355,8 @@ def setup_pyramid(comp, config):
     # TODO: Deprecate, use resource_sections directly
     Resource.__psection__ = resource_sections
 
-    @resource_sections(priority=10)
-    def resource_section_summary(obj):
+    @resource_sections(priority=0)
+    def resource_section_main(obj):
         return True
 
     @resource_sections(priority=40)
@@ -357,36 +387,37 @@ def setup_pyramid(comp, config):
     def _resource_dynmenu(args):
         permissions = args.obj.permissions(args.request.user)
 
-        for ident, cls in Resource.registry._dict.items():
-            if ident in comp.options["disabled_cls"] or comp.options["disable." + ident]:
-                continue
+        if not comp.options["experimental.actions"]:
+            for ident, cls in Resource.registry._dict.items():
+                if ident in comp.options["disabled_cls"] or comp.options["disable." + ident]:
+                    continue
 
-            if not cls.check_parent(args.obj):
-                continue
+                if not cls.check_parent(args.obj):
+                    continue
 
-            # Is current user has permission to manage resource children?
-            if ResourceScope.manage_children not in permissions:
-                continue
+                # Is current user has permission to manage resource children?
+                if ResourceScope.manage_children not in permissions:
+                    continue
 
-            # Is current user has permission to create child resource?
-            child = cls(parent=args.obj, owner_user=args.request.user)
-            if not child.has_permission(ResourceScope.create, args.request.user):
-                continue
+                # Is current user has permission to create child resource?
+                child = cls(parent=args.obj, owner_user=args.request.user)
+                if not child.has_permission(ResourceScope.create, args.request.user):
+                    continue
 
-            # Workaround SAWarning: Object of type ... not in session,
-            # add operation along 'Resource.children' will not proceed
-            child.parent = None
+                # Workaround SAWarning: Object of type ... not in session,
+                # add operation along 'Resource.children' will not proceed
+                child.parent = None
 
-            yield Link(
-                "create/%s" % ident,
-                cls.cls_display_name,
-                lambda args, ident=ident: args.request.route_url(
-                    "resource.create",
-                    id=args.obj.id,
-                    _query=dict(cls=ident),
-                ),
-                icon=f"rescls-{cls.identity}",
-            )
+                yield Link(
+                    "create/%s" % ident,
+                    cls.cls_display_name,
+                    lambda args, ident=ident: args.request.route_url(
+                        "resource.create",
+                        id=args.obj.id,
+                        _query=dict(cls=ident),
+                    ),
+                    icon=f"rescls-{cls.identity}",
+                )
 
         if ResourceScope.update in permissions:
             yield Link(

@@ -148,5 +148,7 @@ class ResourceComponent(Component):
         Option("home.enabled", bool, default=False),
         Option("home.keyname", str, default="resource_home"),
         Option("home.groups", list, default=[]),
+
+        Option("experimental.actions", bool, default=False),
     )
     # fmt: on
