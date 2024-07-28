@@ -2,6 +2,7 @@ import re
 from functools import partial
 from itertools import chain
 from pathlib import Path
+from typing import Any, Dict, List, Literal, Union
 
 from msgspec import UNSET
 from osgeo import gdal, ogr
@@ -35,16 +36,30 @@ from nextgisweb.feature_layer.versioning import (
     OperationFieldValue,
     fversioning_guard,
 )
-from nextgisweb.file_upload import FileUpload
+from nextgisweb.file_upload import FileUpload, FileUploadRef
 from nextgisweb.layer import IBboxLayer, SpatialLayerMixin
-from nextgisweb.resource import DataScope, Resource, ResourceGroup, ResourceScope, Serializer
-from nextgisweb.resource import SerializedProperty as SP
-from nextgisweb.resource import SerializedRelationship as SR
+from nextgisweb.resource import (
+    CRUTypes,
+    DataScope,
+    Resource,
+    ResourceGroup,
+    ResourceScope,
+    SAttribute,
+    Serializer,
+    SRelationship,
+)
 from nextgisweb.spatial_ref_sys import SRS
 
 from .feature_query import FeatureQueryBase, calculate_extent
 from .kind_of_data import VectorLayerData
-from .ogrloader import FID_SOURCE, FIX_ERRORS, TOGGLE, LoaderParams, OGRLoader
+from .ogrloader import (
+    CastAutoYesNo,
+    CastGeometryType,
+    FidSource,
+    FixErrors,
+    LoaderParams,
+    OGRLoader,
+)
 from .util import DRIVERS, FIELD_TYPE_2_DB, FIELD_TYPE_SIZE, SCHEMA, read_dataset_vector, uuid_hex
 from .vlschema import VLSchema
 
@@ -682,15 +697,18 @@ def estimate_vector_layer_data(resource):
     return inspect(resource).session.scalar(query)
 
 
-class _source_attr(SP):
-    def _ogrds(self, filename, source_filename=None):
+GeometryType = Union[tuple(Literal[i] for i in GEOM_TYPE.enum)]  # type: ignore
+
+
+class SourceAttr(SAttribute, apitype=True):
+    def _ogrds(self, file_upload: FileUpload):
         ogrds = read_dataset_vector(
-            filename,
-            source_filename=source_filename,
+            str(file_upload.data_path),
+            source_filename=file_upload.name,
         )
 
         if ogrds is None:
-            ogrds = ogr.Open(filename, 0)
+            ogrds = ogr.Open(str(file_upload.data_path), 0)
             if ogrds is None:
                 raise VE(message=gettext("GDAL library failed to open file."))
             else:
@@ -731,53 +749,28 @@ class _source_attr(SP):
 
         obj.from_source(ogrlayer, **kw)
 
-    def setter(self, srlzr, value):
+    def set(self, srlzr: Serializer, value: FileUploadRef, *, create: bool):
         if srlzr.obj.id is not None:
             srlzr.obj._vlschema_wipe()
             inspect(srlzr.obj).session.flush()
 
-        fupload = FileUpload(id=value["id"])
-        ogrds = self._ogrds(str(fupload.data_path), source_filename=fupload.name)
+        ogrds = self._ogrds(value())
 
-        layer_name = srlzr.data.get("source_layer")
+        if (layer_name := srlzr.data.source_layer) is UNSET:
+            layer_name = None
         ogrlayer = self._ogrlayer(ogrds, layer_name=layer_name)
+
         kwargs = dict()
-
-        if (val := srlzr.data.get("skip_other_geometry_types", UNSET)) is not UNSET:
-            kwargs["skip_other_geometry_types"] = bool(val)
-
-        if (val := srlzr.data.get("fix_errors", UNSET)) is not UNSET:
-            if val not in FIX_ERRORS.enum:
-                raise VE(message=gettext("Unknown 'fix_errors' value."))
-            kwargs["fix_errors"] = val
-
-        if (val := srlzr.data.get("skip_errors", UNSET)) is not UNSET:
-            kwargs["skip_errors"] = bool(val)
-
-        if (val := srlzr.data.get("cast_geometry_type", UNSET)) is not UNSET:
-            if val not in (None, "POINT", "LINESTRING", "POLYGON"):
-                raise VE(message=gettext("Unknown 'cast_geometry_type' value."))
-            kwargs["cast_geometry_type"] = val
-
-        if (val := srlzr.data.get("cast_is_multi", UNSET)) is not UNSET:
-            if val not in TOGGLE.enum:
-                raise VE(message=gettext("Unknown 'cast_is_multi' value."))
-            kwargs["cast_is_multi"] = val
-
-        if (val := srlzr.data.get("cast_has_z", UNSET)) is not UNSET:
-            if val not in TOGGLE.enum:
-                raise VE(message=gettext("Unknown 'cast_has_z' value."))
-            kwargs["cast_has_z"] = val
-
-        if (val := srlzr.data.get("fid_source", UNSET)) is not UNSET:
-            if val not in FID_SOURCE.enum:
-                raise VE(message=gettext("Unknown 'fid_source' value."))
-            kwargs["fid_source"] = val
-
-        if (val := srlzr.data.get("fid_field", UNSET)) is not UNSET:
-            if isinstance(val, str):
-                val = re.split(r"\s*,\s*", val)
-            kwargs["fid_field"] = val
+        for k, a in VectorLayerSerializer.__dict__.items():
+            if (
+                not isinstance(a, LoaderAttr)
+                or k == "source_layer"
+                or (v := getattr(srlzr.data, k)) is UNSET
+            ):
+                continue
+            if k == "fid_field" and isinstance(v, str):
+                v = re.split(r"\s*,\s*", v)
+            kwargs[k] = v
 
         self._setup_layer(
             srlzr.obj,
@@ -786,16 +779,23 @@ class _source_attr(SP):
         )
 
 
-class _fields_attr(SP):
-    def setter(self, srlzr, value):
-        srlzr.obj.setup_from_fields(value)
+class LoaderAttr(SAttribute, apitype=True):
+    def __init__(self, type: Any):
+        super().__init__(write=DataScope.write)
+        self.type = type
+
+    def setup_types(self):
+        self.types = CRUTypes(self.type, None, self.type)
+
+    def set(self, srlzr: Serializer, value: Any, *, create: bool):
+        pass  # Handled by the `source` attribute
 
 
-class _geometry_type_attr(SP):
-    def setter(self, srlzr, value):
-        if value not in GEOM_TYPE.enum:
-            raise VE(message=gettext("Unsupported geometry type."))
+class GeometryTypeAttr(SAttribute, apitype=True):
+    def get(self, srlzr: Serializer) -> GeometryType:
+        return super().get(srlzr)
 
+    def set(self, srlzr: Serializer, value: GeometryType, *, create: bool):
         if srlzr.obj.id is None:
             srlzr.obj.geometry_type = value
         elif srlzr.obj.geometry_type == value:
@@ -804,38 +804,36 @@ class _geometry_type_attr(SP):
             srlzr.obj.geometry_type_change(value)
 
 
-class _delete_all_features_attr(SP):
-    def setter(self, srlzr, value):
+class FieldsAttr(SAttribute, apitype=True):
+    def set(self, srlzr: Serializer, value: List[Dict[str, Any]], *, create: bool):
+        # TODO: Improve typing, use types from feature layer APIs
+        srlzr.obj.setup_from_fields(value)
+
+
+class DeleteAllFeaturesAttr(SAttribute, apitype=True):
+    def set(self, srlzr: Serializer, value: bool, *, create: bool):
         if value:
             srlzr.obj.feature_delete_all()
 
 
-class _source_option(SP):
-    def __init__(self):
-        super().__init__(write=DataScope.write)
-
-    def setter(self, srlzr, value):
-        pass
-
-
-class VectorLayerSerializer(Serializer):
+class VectorLayerSerializer(Serializer, apitype=True):
     identity = VectorLayer.identity
     resclass = VectorLayer
 
-    srs = SR(read=ResourceScope.read, write=ResourceScope.update)
+    srs = SRelationship(read=ResourceScope.read, write=ResourceScope.update)
 
-    source = _source_attr(write=DataScope.write)
-    source_layer = _source_option()
-    fix_errors = _source_option()
-    skip_errors = _source_option()
-    cast_geometry_type = _source_option()
-    cast_is_multi = _source_option()
-    cast_has_z = _source_option()
-    fid_source = _source_option()
-    fid_field = _source_option()
-    skip_other_geometry_types = _source_option()
+    source = SourceAttr(write=DataScope.write)
+    source_layer = LoaderAttr(str)
+    fix_errors = LoaderAttr(FixErrors)
+    skip_errors = LoaderAttr(bool)
+    skip_other_geometry_types = LoaderAttr(bool)
+    cast_geometry_type = LoaderAttr(CastGeometryType)
+    cast_is_multi = LoaderAttr(CastAutoYesNo)
+    cast_has_z = LoaderAttr(CastAutoYesNo)
+    fid_source = LoaderAttr(FidSource)
+    fid_field = LoaderAttr(Union[List[str], str])
 
-    geometry_type = _geometry_type_attr(read=ResourceScope.read, write=ResourceScope.update)
-    fields = _fields_attr(write=DataScope.write)
+    geometry_type = GeometryTypeAttr(read=ResourceScope.read, write=ResourceScope.update)
+    fields = FieldsAttr(write=DataScope.write)
 
-    delete_all_features = _delete_all_features_attr(write=DataScope.write)
+    delete_all_features = DeleteAllFeaturesAttr(write=DataScope.write)

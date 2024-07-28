@@ -10,28 +10,33 @@ import type {
     EditorStoreOptions,
     Operation,
 } from "@nextgisweb/resource/type/EditorStore";
-import type {
-    CompositeRead,
-    CompositeUpdate,
-} from "@nextgisweb/resource/type/api";
-
-type Value = CompositeRead["feature_layer"];
-type ValueUpdate = CompositeUpdate["feature_layer"];
+import type * as apitype from "@nextgisweb/vector-layer/type/api";
 
 export type Mode = "empty" | "gtype" | "file" | "keep" | "delete";
+export type GeometryType = Required<apitype.VectorLayerUpdate>["geometry_type"];
 
-interface SourceOptions {
-    "fix_errors": string;
-    "skip_errors": boolean;
-    "cast_geometry_type": string;
-    "cast_is_multi": string;
-    "cast_has_z": string;
-    "fid_source": string;
-    "fid_field": string;
-    "skip_other_geometry_types": boolean;
-}
+type SourceOptions = Required<
+    Pick<
+        apitype.VectorLayerUpdate,
+        | "fix_errors"
+        | "skip_errors"
+        | "skip_other_geometry_types"
+        | "cast_geometry_type"
+        | "cast_is_multi"
+        | "cast_has_z"
+        | "fid_source"
+        | "fid_field"
+    >
+>;
 
-export class Store implements EditorStore<Value> {
+export class Store
+    implements
+        EditorStore<
+            apitype.VectorLayerRead,
+            apitype.VectorLayerUpdate,
+            apitype.VectorLayerCreate
+        >
+{
     identity = "vector_layer";
 
     mode: Mode | null = "file";
@@ -40,16 +45,17 @@ export class Store implements EditorStore<Value> {
     sourceOptions: SourceOptions = {
         "fix_errors": "LOSSY",
         "skip_errors": true,
-        "cast_geometry_type": "NONE",
-        "cast_is_multi": "NONE",
-        "cast_has_z": "NONE",
+        "cast_geometry_type": null,
+        "cast_is_multi": null,
+        "cast_has_z": null,
         "fid_source": "AUTO",
         "fid_field": "ngw_id, id",
         "skip_other_geometry_types": false,
     };
-    geometryType: string | null = null;
 
-    geometryTypeInitial: string | null = null;
+    geometryType: GeometryType | null = null;
+    geometryTypeInitial: GeometryType | null = null;
+
     confirm = false;
     uploading = false;
 
@@ -64,20 +70,20 @@ export class Store implements EditorStore<Value> {
         this.composite = composite;
     }
 
-    load(value: Value) {
+    load(value: apitype.VectorLayerRead) {
         this.geometryTypeInitial = value.geometry_type;
         this.dirty = false;
     }
 
     dump({ lunkwill }: DumpParams) {
-        if (!this.dirty) return;
+        if (!this.dirty) return undefined;
 
-        const result: ValueUpdate = {};
+        const result: apitype.VectorLayerUpdate = {};
 
         if (this.mode === "file") {
             lunkwill.suggest(true);
-            result.source = this.source;
-            result.source_layer = this.sourceLayer;
+            result.source = this.source!;
+            result.source_layer = this.sourceLayer!;
             result.srs = srsSettings.default;
 
             const so = toJS<Record<keyof SourceOptions, unknown>>(
@@ -105,11 +111,11 @@ export class Store implements EditorStore<Value> {
             Object.assign(result, so);
         } else if (this.mode === "empty") {
             result.fields = [];
-            result.geometry_type = this.geometryType;
+            result.geometry_type = this.geometryType!;
             result.srs = srsSettings.default;
         } else if (this.mode === "gtype") {
             if (this.geometryType !== this.geometryTypeInitial) {
-                result.geometry_type = this.geometryType;
+                result.geometry_type = this.geometryType!;
             }
         } else if (this.mode === "delete") {
             result.delete_all_features = true;

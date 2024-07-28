@@ -1,10 +1,10 @@
-import dataclasses as dc
 import re
 from functools import partial
 from itertools import product
-from typing import Dict, List, Optional
+from typing import Dict, List, Literal, Union
 
 import sqlalchemy as sa
+from msgspec import Struct, field
 from osgeo import ogr, osr
 
 from nextgisweb.env import gettext
@@ -29,13 +29,10 @@ MIN_INT32 = -(2**31)
 MAX_INT32 = 2**31 - 1
 ERROR_LIMIT = 10
 
-
-class FID_SOURCE:
-    AUTO = "AUTO"
-    SEQUENCE = "SEQUENCE"
-    FIELD = "FIELD"
-
-    enum = (AUTO, SEQUENCE, FIELD)
+FixErrors = Union[Literal["NONE"], Literal["SAFE"], Literal["LOSSY"]]
+FidSource = Union[Literal["AUTO"], Literal["SEQUENCE"], Literal["FIELD"]]
+CastAutoYesNo = Union[None, bool]
+CastGeometryType = Union[None, Literal["POINT"], Literal["LINESTRING"], Literal["POLYGON"]]
 
 
 class FIX_ERRORS:
@@ -46,6 +43,14 @@ class FIX_ERRORS:
     enum = (NONE, SAFE, LOSSY)
 
 
+class FID_SOURCE:
+    AUTO = "AUTO"
+    SEQUENCE = "SEQUENCE"
+    FIELD = "FIELD"
+
+    enum = (AUTO, SEQUENCE, FIELD)
+
+
 class TOGGLE:
     AUTO = None
     YES = True
@@ -54,21 +59,19 @@ class TOGGLE:
     enum = (AUTO, YES, NO)
 
 
-@dc.dataclass
-class LoaderParams:
-    skip_other_geometry_types: bool = False
-    fix_errors: str = FIX_ERRORS.NONE
+class LoaderParams(Struct, kw_only=True):
+    fix_errors: FixErrors = "NONE"
     skip_errors: bool = False
-    fid_source: str = FID_SOURCE.SEQUENCE
-    fid_field: List[str] = dc.field(default_factory=list)
-    cast_geometry_type: Optional[str] = TOGGLE.AUTO
-    cast_is_multi: Optional[str] = TOGGLE.AUTO
-    cast_has_z: Optional[str] = TOGGLE.AUTO
+    skip_other_geometry_types: bool = False
+    fid_source: FidSource = "SEQUENCE"
+    fid_field: List[str] = field(default_factory=list)
+    cast_geometry_type: CastGeometryType = None
+    cast_is_multi: CastAutoYesNo = None
+    cast_has_z: CastAutoYesNo = None
     validate: bool = True
 
 
-@dc.dataclass
-class LoaderField:
+class LoaderField(Struct, kw_only=False):
     idx: int
     name: str
     origtype: int
@@ -85,7 +88,7 @@ STRING_CAST_TYPES = (
 
 class OGRLoader:
     geometry_type: str
-    fid_field: Optional[LoaderField]
+    fid_field: Union[LoaderField, None]
     fields: Dict[int, LoaderField]
 
     def __init__(self, ogrlayer, params: LoaderParams):

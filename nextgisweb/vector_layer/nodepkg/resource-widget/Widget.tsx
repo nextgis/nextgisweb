@@ -137,6 +137,8 @@ const SourceOptions = observer(({ store }: { store: Store }) => {
     );
 });
 
+SourceOptions.displayName = "SourceOptions";
+
 export const Widget: EditorWidgetComponent<EditorWidgetProps<Store>> = observer(
     ({ store }) => {
         const [layerOpts, setLayerOpts] = useState<Option[]>();
@@ -295,6 +297,7 @@ export const Widget: EditorWidgetComponent<EditorWidgetProps<Store>> = observer(
     }
 );
 
+Widget.displayName = "Widget";
 Widget.title = gettext("Vector layer");
 Widget.activateOn = { create: true };
 Widget.order = -50;
