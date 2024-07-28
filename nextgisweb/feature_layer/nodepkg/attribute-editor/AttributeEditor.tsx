@@ -2,6 +2,7 @@ import { observer } from "mobx-react-lite";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import type { EditorWidgetProps } from "@nextgisweb/feature-layer/feature-editor/type";
+import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
 import {
     Button,
     DatePicker,
@@ -20,7 +21,7 @@ import type { FormField, SizeType } from "@nextgisweb/gui/fields-form";
 import { LookupSelect } from "@nextgisweb/lookup-table/component/lookup-select";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import type { FeatureLayerDataType, FeatureLayerField } from "../type";
+import type { FeatureLayerDataType } from "../type";
 
 import AttributeEditorStore from "./AttributeEditorStore";
 import type { NgwAttributeValue } from "./type";
@@ -34,7 +35,7 @@ const msgNoAttrs = gettext("There are no attributes in the vector layer");
 
 interface AttributeEditorStoreProps
     extends EditorWidgetProps<NgwAttributeValue | null, AttributeEditorStore> {
-    fields?: FeatureLayerField[];
+    fields?: FeatureLayerFieldRead[];
     size?: SizeType;
     onChange?: (value: NgwAttributeValue | null) => void;
 }

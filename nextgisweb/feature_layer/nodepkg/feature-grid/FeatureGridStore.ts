@@ -1,10 +1,9 @@
 import { makeAutoObservable } from "mobx";
 
+import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
 import type { ActionToolbarAction } from "@nextgisweb/gui/action-toolbar";
 import type { SizeType } from "@nextgisweb/gui/antd";
 import type { CompositeRead } from "@nextgisweb/resource/type/api";
-
-import type { FeatureLayerField } from "../type";
 
 import { KEY_FIELD_ID } from "./constant";
 import type { QueryParams } from "./hook/useFeatureTable";
@@ -24,7 +23,7 @@ export class FeatureGridStore {
     settingsOpen = false;
 
     visibleFields: number[] = [KEY_FIELD_ID];
-    fields: FeatureLayerField[] = [];
+    fields: FeatureLayerFieldRead[] = [];
 
     beforeDelete?: (featureIds: number[]) => void;
     deleteError?: (featureIds: number[]) => void;
@@ -53,7 +52,7 @@ export class FeatureGridStore {
         this.versioning = value;
     };
 
-    setFields = (fields: FeatureLayerField[]) => {
+    setFields = (fields: FeatureLayerFieldRead[]) => {
         this.fields = fields;
     };
 

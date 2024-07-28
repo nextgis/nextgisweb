@@ -4,8 +4,8 @@ import { makeAutoObservable, runInAction, toJS } from "mobx";
 import type {
     EditorStore,
     EditorStoreConstructorOptions,
-    FeatureLayerField,
 } from "@nextgisweb/feature-layer/type";
+import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
 
 import type { FeatureEditorStore } from "../feature-editor/FeatureEditorStore";
 import { formatNgwAttribute, parseNgwAttribute } from "../util/ngwAttributes";
@@ -18,7 +18,7 @@ class AttributeEditorStore implements EditorStore<NgwAttributeValue | null> {
     _initValue: NgwAttributeValue | null = null;
 
     readonly _parentStore?: FeatureEditorStore;
-    readonly _fields?: FeatureLayerField[];
+    readonly _fields?: FeatureLayerFieldRead[];
 
     constructor({ parentStore, fields }: EditorStoreConstructorOptions = {}) {
         this._parentStore = parentStore;
@@ -62,7 +62,7 @@ class AttributeEditorStore implements EditorStore<NgwAttributeValue | null> {
         return values;
     }
 
-    get fields(): FeatureLayerField[] {
+    get fields(): FeatureLayerFieldRead[] {
         if (this._parentStore) {
             return this._parentStore.fields;
         } else if (this._fields) {

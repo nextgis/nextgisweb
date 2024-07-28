@@ -1,9 +1,9 @@
+import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
 import type { ActionToolbarAction } from "@nextgisweb/gui/action-toolbar";
 import type { SizeType } from "@nextgisweb/gui/antd";
 import type { CompositeRead } from "@nextgisweb/resource/type/api";
 
 import type { NgwAttributeType } from "../type";
-import type { FeatureLayerField } from "../type/FeatureLayer";
 
 import type { $FID, $VID } from "./constant";
 import type { QueryParams } from "./hook/useFeatureTable";
@@ -21,7 +21,7 @@ export type ColOrder = "asc" | "desc" | null;
 export type OrderBy = [keynme: string, ordering: ColOrder];
 
 export interface FeatureLayerFieldCol
-    extends Omit<FeatureLayerField, "keyname"> {
+    extends Pick<FeatureLayerFieldRead, "id" | "display_name" | "datatype"> {
     keyname?: string;
     flex?: string;
 }

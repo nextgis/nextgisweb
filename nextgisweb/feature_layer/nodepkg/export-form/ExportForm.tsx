@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
 import { Checkbox, Input, Select } from "@nextgisweb/gui/antd";
 import {
     ExtentRow,
@@ -20,7 +21,6 @@ import type { SRSRead } from "@nextgisweb/spatial-ref-sys/type/api";
 
 import { useExportFeatureLayer } from "../hook/useExportFeatureLayer";
 import type { ExportFeatureLayerOptions } from "../hook/useExportFeatureLayer";
-import type { FeatureLayerField } from "../type";
 
 interface ExportFormProps {
     id: number;
@@ -60,7 +60,7 @@ const srsListToOptions = (srsList: SRSRead[]): SrsOption[] =>
         value: srs.id,
     }));
 
-const fieldListToOptions = (fieldList: FeatureLayerField[]) => {
+const fieldListToOptions = (fieldList: FeatureLayerFieldRead[]) => {
     return fieldList.map((field) => {
         return {
             label: field.display_name,

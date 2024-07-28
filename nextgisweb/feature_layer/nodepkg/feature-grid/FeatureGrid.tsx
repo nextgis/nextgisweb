@@ -7,7 +7,7 @@ import { LoadingWrapper } from "@nextgisweb/gui/component";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import type { FeatureLayer, FeatureLayerCount } from "../type/FeatureLayer";
+import type { FeatureLayerCount } from "../type/FeatureLayer";
 
 import { FeatureGridActions } from "./FeatureGridActions";
 import { FeatureGridStore } from "./FeatureGridStore";
@@ -67,7 +67,7 @@ export const FeatureGrid = observer(
 
         useEffect(() => {
             if (resourceData) {
-                const featureLayer = resourceData.feature_layer as FeatureLayer;
+                const featureLayer = resourceData.feature_layer!;
 
                 const versioning = featureLayer?.versioning?.enabled ?? false;
                 if (versioning) store.setVersioning(true);
@@ -141,3 +141,5 @@ export const FeatureGrid = observer(
         );
     }
 );
+
+FeatureGrid.displayName = "FeatureGrid";

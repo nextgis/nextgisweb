@@ -1,12 +1,12 @@
 import dayjs from "dayjs";
 
 import type {
-    FeatureLayerField,
     NgwAttributeType,
     NgwDate,
     NgwDateTime,
     NgwTime,
 } from "@nextgisweb/feature-layer/type";
+import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
@@ -22,7 +22,7 @@ export const getFieldsInfo = async (resourceId: number) => {
     const resourceInfo = await route("resource.item", resourceId).get();
     const fieldmap = new Map();
     const promises: Promise<Record<string, string>>[] = [];
-    resourceInfo.feature_layer.fields.forEach((fieldInfo: any) => {
+    resourceInfo.feature_layer!.fields.forEach((fieldInfo: any) => {
         if (!fieldInfo.grid_visibility) {
             return;
         }
@@ -49,7 +49,7 @@ export interface FieldDataItem {
 
 export const fieldValuesToDataSource = (
     fields: Record<string, NgwAttributeType>,
-    fieldsInfo: Map<string, FeatureLayerField>
+    fieldsInfo: Map<string, FeatureLayerFieldRead>
 ) => {
     let key = 0;
     const dataSource = [];

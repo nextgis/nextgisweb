@@ -1,9 +1,7 @@
 import { makeAutoObservable, runInAction, toJS } from "mobx";
 
-import type {
-    FeatureItemExtensions,
-    FeatureLayerField,
-} from "@nextgisweb/feature-layer/type";
+import type { FeatureItemExtensions } from "@nextgisweb/feature-layer/type";
+import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
 import { message } from "@nextgisweb/gui/antd";
 import { route } from "@nextgisweb/pyramid/api";
 import type { RouteBody } from "@nextgisweb/pyramid/api/type";
@@ -27,7 +25,7 @@ export class FeatureEditorStore {
     saving = false;
 
     initLoading = false;
-    fields: FeatureLayerField[] = [];
+    fields: FeatureLayerFieldRead[] = [];
 
     private _featureItem?: FeatureItem;
 

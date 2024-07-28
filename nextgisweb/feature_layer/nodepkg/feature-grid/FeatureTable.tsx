@@ -4,10 +4,9 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import Draggable from "react-draggable";
 
+import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
 import { useThemeVariables } from "@nextgisweb/gui/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-
-import type { FeatureLayerField } from "../type/FeatureLayer";
 
 import { FeatureTableRows } from "./FeatureTableRows";
 import SortIcon from "./component/SortIcon";
@@ -28,7 +27,7 @@ import "./FeatureTable.less";
 interface FeatureTableProps {
     resourceId: number;
     versioning: boolean;
-    fields: FeatureLayerField[];
+    fields: FeatureLayerFieldRead[];
     total: number;
     version?: number;
     selectedIds: number[];
@@ -365,5 +364,7 @@ const FeatureTable = observer(
         );
     }
 );
+
+FeatureTable.displayName = "FeatureTable";
 
 export default FeatureTable;

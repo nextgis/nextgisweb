@@ -1,6 +1,6 @@
 import { route } from "@nextgisweb/pyramid/api";
 
-import type { FeatureLayer, NgwAttributeType } from "../../type";
+import type { NgwAttributeType } from "../../type";
 import { getFeatureFieldValue } from "../../util/getFeatureFieldValue";
 import { $FID, $VID } from "../constant";
 
@@ -23,7 +23,7 @@ export async function updateFeaturesValue({
     const res = await route("resource.item", resourceId).get({
         cache: true,
     });
-    const featureLayer = res.feature_layer as FeatureLayer;
+    const featureLayer = res.feature_layer;
     if (!featureLayer) {
         throw new Error("");
     }
