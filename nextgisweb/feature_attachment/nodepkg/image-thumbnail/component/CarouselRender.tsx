@@ -14,7 +14,6 @@ import { getFeatureImage } from "../util/getFeatureImage";
 import { getFileImage } from "../util/getFileImage";
 
 import { LoadingOutlined } from "@ant-design/icons";
-import ArrowBack from "@nextgisweb/icon/material/arrow_back_ios_new";
 import ArrowForward from "@nextgisweb/icon/material/arrow_forward_ios";
 import PhotosphereIcon from "@nextgisweb/icon/material/panorama_photosphere";
 
@@ -24,7 +23,7 @@ const msgTogglePanorama = gettext("Toggle panorama viewer");
 
 const PhotospherePreview = lazy(() => import("./PhotospherePreview"));
 
-// based on https://github.com/akiran/react-slick/issues/1195#issuecomment-1746192879
+// Based on https://github.com/akiran/react-slick/issues/1195#issuecomment-1746192879
 const SlickButtonFix = (
     props: {
         children: JSX.Element;
@@ -37,6 +36,14 @@ const SlickButtonFix = (
     delete otherProps.slideCount;
     return <div {...otherProps}>{children}</div>;
 };
+
+// The 'arrow_back_ios' has invalid alignment (see ), the fixed version
+// ('arrow_back_ios_new') is missing in SVG icons package. See:
+// * https://github.com/google/material-design-icons/issues/1744
+// * https://github.com/marella/material-symbols/issues/40
+const ArrowBack = () => (
+    <ArrowForward style={{ transform: "rotate(180deg)" }} />
+);
 
 interface CarouselRenderProps {
     attachment: DataSource;
