@@ -1,11 +1,12 @@
 from base64 import b64decode
-from dataclasses import dataclass
+from contextlib import contextmanager
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Optional
+from typing import Union
 from warnings import warn
 
 import sqlalchemy as sa
+from msgspec import Struct, convert, to_builtins
 from pyramid.authorization import ACLHelper
 from pyramid.interfaces import ISecurityPolicy
 from pyramid.request import Request
@@ -23,6 +24,7 @@ from nextgisweb.pyramid import SessionStore, WebSession
 from .exception import (
     InvalidAuthorizationHeader,
     InvalidCredentialsException,
+    SessionAuthenticationRequired,
     UserDisabledException,
 )
 from .model import User
@@ -48,38 +50,27 @@ class AuthMedium(Enum):
     BEARER = "bearer"
 
 
-@dataclass
-class AuthState:
+class AuthState(Struct, omit_defaults=True):
     prv: AuthProvider
     uid: int
     exp: int
-    ref: Optional[int] = None
+    ref: Union[int, None] = None
 
     @classmethod
     def from_dict(cls, data):
-        return cls(
-            prv=AuthProvider(data["prv"]),
-            uid=data["uid"],
-            exp=data["exp"],
-            ref=data.get("ref"),
-        )
+        return convert(data, cls)
 
     def to_dict(self):
-        result = dict(prv=self.prv.value, uid=self.uid, exp=self.exp)
-        if self.ref is not None:
-            result["ref"] = self.ref
-        return result
+        return to_builtins(self)
 
 
-@dataclass(frozen=True)
-class AuthResult:
+class AuthResult(Struct):
     uid: int
     med: AuthMedium
     prv: AuthProvider
 
 
-@dataclass
-class OnUserLogin:
+class OnUserLogin(Struct):
     user: User
     request: Request
     next_url: str
@@ -96,6 +87,7 @@ class SecurityPolicy:
         self.options = options
         self.test_user = None
         self.acl_helper = ACLHelper()
+        self.refresh_session = False
 
     @property
     def oauth(self):
@@ -175,6 +167,15 @@ class SecurityPolicy:
             SessionStore.value.op("->>")("uid").cast(sa.Integer) == user_id,
         ).delete(synchronize_session=False)
 
+    @contextmanager
+    def refresh_session_context(self, value: bool):
+        memo = self.refresh_session
+        try:
+            self.refresh_session = value
+            yield
+        finally:
+            self.refresh_session = memo
+
     # Internals
 
     def _authenticate_request(self, request):
@@ -188,13 +189,15 @@ class SecurityPolicy:
 
     def _try_session(self, request, *, now):
         session = request.session
-        state_dict = session.get("auth.state")
-        if state_dict is None:
+        if (state_dict := session.get("auth.state")) is None:
+            if self.refresh_session:
+                raise SessionAuthenticationRequired
             return
+
         state = AuthState.from_dict(state_dict)
 
         if state.prv in (AuthProvider.OAUTH_AC, AuthProvider.OAUTH_PW):
-            if state.exp <= now:
+            if state.exp <= now or self.refresh_session:
                 try:
                     tpair = self.oauth.grant_type_refresh_token(
                         refresh_token=session["auth.refresh_token"],
@@ -215,7 +218,7 @@ class SecurityPolicy:
             if state.exp <= now:
                 return None
 
-            if state.ref <= now:
+            if state.ref <= now or self.refresh_session:
                 state.exp = now + int(self.options["local.lifetime"].total_seconds())
                 state.ref = now + int(self.options["local.refresh"].total_seconds())
                 session["auth.state"] = state.to_dict()

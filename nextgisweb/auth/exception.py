@@ -18,6 +18,11 @@ class UserDisabledException(UserException):
     http_status_code = 401
 
 
+class SessionAuthenticationRequired(UserException):
+    title = gettext("Session authentication required")
+    http_status_code = 422
+
+
 class ALinkException(UserException):
     title = gettext("Invalid authorization link")
     http_status_code = 401

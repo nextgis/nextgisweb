@@ -14,27 +14,27 @@ msgstr "Субъект с наименованием '%s' уже существ�
 msgid "Password is not set."
 msgstr "Пароль не установлен."
 
-#: api.py:586
+#: api.py:600
 msgid "User '%s' can't be a member of a group."
 msgstr "Пользователь '%s' не может быть участником группы."
 
-#: api.py:592
+#: api.py:606
 msgid "System principals can't be deleted."
 msgstr "Системные субъекты не могут быть удалены."
 
-#: api.py:607
+#: api.py:621
 msgid "User is referenced with resources"
 msgstr "Пользователь связан с ресурсами"
 
-#: api.py:609
+#: api.py:623
 msgid "Group is referenced with resources"
 msgstr "Группа связана с ресурсами"
 
-#: api.py:615
+#: api.py:629
 msgid "Administrator required"
 msgstr "Только для администраторов"
 
-#: api.py:616
+#: api.py:630
 msgid "The 'administrators' group must have at least one enabled member."
 msgstr "Группа 'administrators' должна иметь хотя бы одного включенного участника."
 
@@ -59,6 +59,10 @@ msgid "User is disabled"
 msgstr "Пользователь заблокирован"
 
 #: exception.py:22
+msgid "Session authentication required"
+msgstr "Необходима авторизация сессии"
+
+#: exception.py:27
 msgid "Invalid authorization link"
 msgstr "Некорректная ссылка для авторизации"
 

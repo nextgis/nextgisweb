@@ -440,24 +440,38 @@ class CurrentUser(Struct, kw_only=True):
     auth_provider: Optional[AuthProvider]
 
 
-def current_user(request) -> CurrentUser:
+def current_user(
+    request,
+    *,
+    require_authenticated: bool = False,
+    refresh_session: bool = False,
+) -> CurrentUser:
     """Read current user info
 
+    :param require_authenticated: Return 401 Unauthorized for unauthenticated guests
+    :param refresh_session: Refresh session authorization for testing purposes
     :returns: User info"""
-    result = CurrentUser(
-        id=request.user.id,
-        keyname=request.user.keyname,
-        display_name=request.user.display_name,
-        language=request.locale_name,
-        auth_medium=None,
-        auth_provider=None,
-    )
 
-    if aresult := request.environ.get("auth.result"):
-        if val := aresult.med:
-            result.auth_medium = val
-        if val := aresult.prv:
-            result.auth_provider = val
+    policy = request.registry.getUtility(ISecurityPolicy)
+    with policy.refresh_session_context(refresh_session):
+        user = request.user
+        if require_authenticated and user.keyname == "guest":
+            raise HTTPUnauthorized()
+
+        result = CurrentUser(
+            id=user.id,
+            keyname=user.keyname,
+            display_name=user.display_name,
+            language=request.locale_name,
+            auth_medium=None,
+            auth_provider=None,
+        )
+
+        if aresult := request.environ.get("auth.result"):
+            if val := aresult.med:
+                result.auth_medium = val
+            if val := aresult.prv:
+                result.auth_provider = val
 
     return result
 
