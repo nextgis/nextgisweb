@@ -36,6 +36,7 @@ from .permission import Permission
 from .permission import auth as permission_auth
 from .permission import manage as permission_manage
 from .policy import AuthMedium, AuthProvider
+from .util import reset_slg_cookie, sync_ulg_cookie
 
 T = TypeVar("T")
 
@@ -429,6 +430,7 @@ def profile_put(request, body: ProfileUpdate) -> EmptyObject:
         raise HTTPUnauthorized()
 
     deserialize_principal(body, request.user, create=False, request=request)
+    sync_ulg_cookie(request)
 
 
 class CurrentUser(Struct, kw_only=True):
@@ -506,6 +508,8 @@ def login(request) -> LoginResponse:
     request.response.headerlist.extend(headers)
 
     result = LoginResponse(id=user.id, keyname=user.keyname, display_name=user.display_name)
+    sync_ulg_cookie(request, user=user)
+    reset_slg_cookie(request)
 
     if event.next_url:
         result.home_url = event.next_url

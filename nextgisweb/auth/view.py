@@ -20,6 +20,7 @@ from .exception import ALinkException, InvalidCredentialsException, UserDisabled
 from .model import Group, User
 from .oauth import AuthorizationException, InvalidTokenException
 from .policy import AuthProvider, AuthState, OnUserLogin
+from .util import reset_slg_cookie, sync_ulg_cookie
 
 
 @viewargs(renderer="mako")
@@ -166,6 +167,9 @@ def oauth(request):
 
         event = OnUserLogin(user, request, data["next_url"])
         zope.event.notify(event)
+
+        sync_ulg_cookie(request, user=user)
+        reset_slg_cookie(request)
 
         response = HTTPFound(location=event.next_url, headers=headers)
         response.delete_cookie(cookie_name(state), path=oauth_path)

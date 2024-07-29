@@ -172,7 +172,14 @@ def control_panel(request, *, comp: PyramidComponent):
 
 
 def locale(request):
-    request.session["pyramid.locale"] = request.matchdict["locale"]
+    @request.add_response_callback
+    def callback(request, response):
+        response.set_cookie(
+            "ngw_slg",
+            request.matchdict["locale"],
+            **WebSession.cookie_settings(request),
+        )
+
     return HTTPFound(location=request.GET.get("next", request.application_url))
 
 
@@ -416,39 +423,26 @@ def setup_pyramid(comp, config):
     config.add_request_method(localizer, "localizer", property=True)
     config.add_request_method(translate, "translate", property=True)
 
-    locale_default = comp.env.core.locale_default
-    locale_sorted = [locale_default] + [
-        lc for lc in comp.env.core.locale_available if lc != locale_default
-    ]
+    lg_default = comp.env.core.locale_default
+    lg_ordered = sorted(
+        comp.env.core.locale_available,
+        key=lambda lg: (int(lg != lg_default), lg),
+    )
 
-    # Replace default locale negotiator with session-based one
+    @config.set_locale_negotiator
     def locale_negotiator(request):
-        environ = request.environ
+        # The previous implementation used user and session attributes, but it
+        # caused too much ploblems as the locale negotiator could be invoked
+        # from an error handler to localize an error message.
 
-        if "auth.user" in environ:
-            user_loaded = True
-        else:
-            # Force to load user's profile. But it might fail because of
-            # authentication or transaction failueres.
-            try:
-                request.user
-            except Exception:
-                user_loaded = False
-            else:
-                user_loaded = True
+        for ck in ("ngw_slg", "ngw_ulg"):
+            if (lg := request.cookies.get(ck)) in lg_ordered:
+                return lg
 
-        if user_loaded:
-            environ_language = environ["auth.user"]["language"]
-            if environ_language in locale_sorted:
-                return environ_language
-
-        session_language = request.session.get("pyramid.locale")
-        if session_language in locale_sorted:
-            return session_language
-
-        return request.accept_language.lookup(locale_sorted, default=locale_default)
-
-    config.set_locale_negotiator(locale_negotiator)
+        return request.accept_language.lookup(
+            lg_ordered,
+            default=lg_ordered[0],
+        )
 
     # Base template includes
 

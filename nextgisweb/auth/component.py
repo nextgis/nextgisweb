@@ -54,6 +54,8 @@ class AuthComponent(Component):
         ).persist()
 
     def setup_pyramid(self, config):
+        from nextgisweb.auth import sync_ulg_cookie
+
         def user(request):
             environ = request.environ
             cached = environ.get("auth.user_obj")
@@ -104,6 +106,7 @@ class AuthComponent(Component):
                     request.add_finished_callback(update_last_activity)
 
             # Store essential user details request's environ
+            environ["auth.user_obj"] = user
             environ["auth.user"] = dict(
                 id=user.id,
                 keyname=user.keyname,
@@ -113,7 +116,7 @@ class AuthComponent(Component):
                 language=user.language,
             )
 
-            environ["auth.user_obj"] = user
+            sync_ulg_cookie(request, user=user)
             return user
 
         def require_administrator(request):

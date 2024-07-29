@@ -55,3 +55,38 @@ def log_lazy_data(value):
             result[k] = v
         return json_dumps(result)
     raise NotImplementedError
+
+
+def sync_ulg_cookie_callback(request, response):
+    from nextgisweb.pyramid import WebSession
+
+    value = request.environ.pop("auth.ulg_cookie")
+    cs = WebSession.cookie_settings(request)
+    if value is None:
+        response.delete_cookie("ngw_ulg", path=cs["path"], domain=cs["domain"])
+    else:
+        response.set_cookie("ngw_ulg", value, **cs)
+
+
+def sync_ulg_cookie(request, *, user=None):
+    if user is None:
+        user = request.user
+
+    user_language = user.language
+    if request.cookies.get("ngw_ulg") == user_language:
+        return
+
+    if "auth.ulg_cookie" not in request.environ:
+        request.add_response_callback(sync_ulg_cookie_callback)
+    request.environ["auth.ulg_cookie"] = user_language
+
+
+def reset_slg_cookie_callback(request, response):
+    from nextgisweb.pyramid import WebSession
+
+    cs = WebSession.cookie_settings(request)
+    response.delete_cookie("ngw_slg", path=cs["path"], domain=cs["domain"])
+
+
+def reset_slg_cookie(request):
+    request.add_response_callback(reset_slg_cookie_callback)
