@@ -88,10 +88,10 @@ def test_redirect(ngw_env, ngw_webtest_app, ngw_auth_administrator):
             status=303,
         )
         redir_cont = resp.headers["Location"].replace("http://localhost", "")
-        assert ngw_webtest_app.cookies == {"ngw-uac": "9960451c"}
+        assert ngw_webtest_app.cookies == {"ngw_uac": "9960451c"}
         assert redir_cont == redir_next
 
-        # When ngw-uac cookie is set, the original location mustn't return 303
+        # When ngw_uac cookie is set, the original location mustn't return 303
         resp = ngw_webtest_app.get(
             redir_cont,
             headers={"User-Agent": user_agent},

@@ -105,7 +105,7 @@ def subscriber(event):
 
         if not supported:
             hash = hash_header(ua_str)
-            if request.cookies.get("ngw-uac") == hash:
+            if request.cookies.get("ngw_uac") == hash:
                 request.environ["pyramid.uacompat_bypass"] = fam_ver
                 return
 
@@ -131,7 +131,7 @@ def page(request):
 
     if arg_bypass:
         resp = Response(status=303, headerlist=[("Location", arg_next)])
-        resp.set_cookie("ngw-uac", ua_hash, max_age=86400)
+        resp.set_cookie("ngw_uac", ua_hash, max_age=86400)
         return resp
 
     fam_ver = parse_header(ua_str) if ua_str is not None else None

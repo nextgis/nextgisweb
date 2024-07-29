@@ -233,7 +233,7 @@ def test_authorization_code(server_response_mock, freezegun, ngw_webtest_app, ng
     assert redirect_qs["redirect_uri"] == "http://localhost/oauth"
     assert redirect_qs["client_id"] == CLIENT_ID
     state_key = redirect_qs["state"]
-    state = dict(parse_qsl(ngw_webtest_app.cookies[f"ngw-oastate-{state_key}"]))
+    state = dict(parse_qsl(ngw_webtest_app.cookies[f"ngw_oas_{state_key}"]))
     assert state["next_url"] == next_url
 
     ouser1 = dict(

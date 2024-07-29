@@ -124,7 +124,7 @@ def oauth(request):
     oauth_path = request.route_path("auth.oauth")
 
     def cookie_name(state):
-        return "ngw-oastate-" + state
+        return "ngw_oas_" + state
 
     if error := request.params.get("error"):
         title = None
