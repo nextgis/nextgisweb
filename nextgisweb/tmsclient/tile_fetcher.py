@@ -5,9 +5,9 @@ from queue import Empty, Queue
 from threading import Thread
 from typing import Optional, Tuple
 
-from httpx import AsyncClient, Limits, Timeout, TimeoutException
+from httpx import AsyncClient, Limits, RemoteProtocolError, Timeout, TimeoutException
 
-from nextgisweb.env import env
+from nextgisweb.env import env, gettext
 
 from nextgisweb.core.exception import ExternalServiceError
 
@@ -33,7 +33,7 @@ class FetchResult:
 
 
 class TimeoutError(ExternalServiceError):
-    title = "TMS server timeout error"
+    message = gettext("The remote server did not respond in time.")
 
 
 class TileFetcher:
@@ -78,14 +78,21 @@ class TileFetcher:
 
             try:
                 response = await client.get(url, **req_kw)
-            except TimeoutException:
-                raise TimeoutError
+            except RemoteProtocolError as exc:
+                raise ExternalServiceError(
+                    gettext("Unable to get a response from the remote server."),
+                ) from exc
+            except TimeoutException as exc:
+                raise TimeoutError from exc
             if response.status_code == 200:
                 data = response.content
             elif response.status_code in (204, 404):
                 data = None
             else:
-                raise ExternalServiceError
+                raise ExternalServiceError(
+                    gettext("An unexpected HTTP status code was received from the remote server."),
+                    data=dict(status_code=response.status_code),
+                )
 
             return position, data
 

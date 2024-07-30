@@ -110,3 +110,15 @@ msgstr "Масштаб вне диапазона"
 #: model.py:303
 msgid "Layer name required."
 msgstr "Имя слоя является обязательным."
+
+#: tile_fetcher.py:36
+msgid "The remote server did not respond in time."
+msgstr "Удаленный сервер не ответил вовремя."
+
+#: tile_fetcher.py:83
+msgid "Unable to get a response from the remote server."
+msgstr "Не удалось получить ответ от удаленного сервера."
+
+#: tile_fetcher.py:93
+msgid "An unexpected HTTP status code was received from the remote server."
+msgstr "От удаленного сервера получен неожиданный код статуса HTTP."
