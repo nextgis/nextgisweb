@@ -23,9 +23,11 @@ class BaseClass:
         self.postinit(**kwargs)
 
     def __init_subclass__(cls):
-        assert (
-            not cls.__sealed or cls.__name__ == "Base"
-        ), f"Subclassing {cls.__name__} on sealed Base"
+        # TODO: Enable eventually, bt currently it breaks jsrealm install as it
+        # requires to load all components including disabled:
+        # assert (
+        #     not cls.__sealed or cls.__name__ == "Base"
+        # ), f"Subclassing {cls.__name__} on sealed Base"
         return super().__init_subclass__()
 
     @classmethod
