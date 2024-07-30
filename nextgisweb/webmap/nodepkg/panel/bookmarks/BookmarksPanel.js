@@ -23,6 +23,7 @@ export function BookmarksPanel({ display, title, close }) {
         const query = {
             geom: "no",
             label: true,
+            extensions: [],
         };
         const features = await route(
             "feature_layer.feature.collection",
