@@ -62,6 +62,7 @@ const searchByLayers = async (criteria, limit, display, controller) => {
             limit: limit,
             geom_format: "geojson",
             label: true,
+            extensions: [],
         };
         const signal = controller.makeSignal();
         const request = route("feature_layer.feature.collection", layerId).get({
