@@ -319,10 +319,13 @@ class VLSchema(MetaData):
                 dif.append(sql_cast(bp, v.type).is_distinct_from(literal_column(v.name)))
 
         if len(values) == 0:
-            values["id"] = ct.c.fid
+            # Do nothing, need to comply UPDATE syntax
+            values["fid"] = ct.c.fid
 
         uct = update(ct).values(**values)
-        uct = uct.where(ct.c.fid == id, sql_or(*dif))
+        uct = uct.where(ct.c.fid == id)
+        if len(dif) > 0:
+            uct = uct.where(sql_or(*dif))
 
         if not self.versioning:
             return uct.returning(ct.c.fid), bmap
