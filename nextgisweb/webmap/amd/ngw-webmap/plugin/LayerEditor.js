@@ -377,10 +377,9 @@ define([
         _fetchVectorData: function (editingItem) {
             const resourceId = editingItem.id;
             xhr.get(
-                route.feature_layer.feature.collection({ id: resourceId }),
-                {
-                    handleAs: "json",
-                }
+                route.feature_layer.feature.collection({ id: resourceId }) +
+                    "?extensions=",
+                { handleAs: "json" }
             ).then(
                 lang.hitch(this, function (featuresInfo) {
                     this._handleFetchedVectorData(
@@ -550,7 +549,7 @@ define([
                 patch: this._patchFeaturesOnServer(featuresToSave.patch),
                 delete: this._deleteFeaturesOnServer(featuresToSave.delete),
             }).then(
-                lang.hitch(this, function (results) {
+                lang.hitch(this, function () {
                     this._deactivateEditingControls();
                     this._removeCurrentEditingItem();
                     this.display._layers[this.display.item.id].reload();
