@@ -6,14 +6,7 @@ from sqlalchemy.ext.mutable import MutableDict
 from nextgisweb.env import Base, gettext
 from nextgisweb.lib import db
 
-from nextgisweb.resource import (
-    DataScope,
-    Resource,
-    ResourceGroup,
-    ResourceScope,
-    SAttribute,
-    Serializer,
-)
+from nextgisweb.resource import Resource, ResourceGroup, ResourceScope, SAttribute, Serializer
 
 Base.depends_on("resource")
 
@@ -21,8 +14,6 @@ Base.depends_on("resource")
 class LookupTable(Base, Resource):
     identity = "lookup_table"
     cls_display_name = gettext("Lookup table")
-
-    __scope__ = DataScope
 
     val = db.Column(MutableDict.as_mutable(HSTORE))
 
