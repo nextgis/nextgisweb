@@ -1,7 +1,10 @@
 import re
+import os
+import subprocess
 from datetime import datetime
 from enum import Enum
 from inspect import Parameter, signature
+from shutil import copy as copy_
 from typing import TYPE_CHECKING, Any, ClassVar, Dict, List, Literal, Optional, Tuple, Type, Union
 
 from msgspec import UNSET, Meta, Struct, UnsetType, convert, defstruct, to_builtins
@@ -13,11 +16,12 @@ from nextgisweb.env import COMP_ID, Component, DBSession, env, gettext, inject
 from nextgisweb.env.package import pkginfo
 from nextgisweb.lib.apitype import AnyOf, AsJSON, EmptyObject, Gap, StatusCode, fillgap
 from nextgisweb.lib.imptool import module_from_stack
+from nextgisweb.lib.logging import logger
 
 from nextgisweb.auth import Permission
 from nextgisweb.core import CoreComponent, KindOfData
 from nextgisweb.core.exception import NotConfigured, ValidationError
-from nextgisweb.file_upload import FileUploadRef
+from nextgisweb.file_upload import FileUpload, FileUploadRef
 from nextgisweb.jsrealm import TSExport
 from nextgisweb.resource import Resource, ResourceScope
 
@@ -258,6 +262,19 @@ def storage(request, *, core: CoreComponent) -> AsJSON[Dict[str, StorageResponse
 def kind_of_data(request) -> AsJSON[Dict[str, str]]:
     request.require_administrator()
     return {k: request.translate(v.display_name) for k, v in KindOfData.registry.items()}
+
+
+def font_upload(request):
+    request.require_administrator()
+    data = request.json
+    fileupload_id = data.get("file_meta").get("id")
+    filename = data.get("file_meta").get("name")
+    fileupload = FileUpload(id=fileupload_id)
+    copy_(fileupload.data_path, os.path.join("/opt/ngw/data/app/fonts/", filename))
+    subprocess.run(["fc-cache"], capture_output=True, text=True)
+    logger.log(msg=request.json , level=1)
+    return Response("OK", status_code=200)
+
 
 
 # Component settings machinery
@@ -646,6 +663,12 @@ def setup_pyramid(comp, config):
         "/api/component/pyramid/kind_of_data",
         load_types=True,
         get=kind_of_data,
+    )
+
+    config.add_route(
+        "pyramid.fonts",
+        "/api/component/pyramid/fonts",
+        put=font_upload,
     )
 
     # Methods for customization in components
