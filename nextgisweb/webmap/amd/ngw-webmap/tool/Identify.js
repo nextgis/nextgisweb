@@ -451,7 +451,7 @@ define([
                         function (i) {
                             var item =
                                 this.display._itemConfigById[
-                                    this.display.itemStore.getValue(i, "id")
+                                this.display.itemStore.getValue(i, "id")
                                 ];
                             if (
                                 !item.identifiable ||
@@ -531,6 +531,16 @@ define([
 
             domConstruct.empty(this._popup.contentDiv);
 
+            if (webmapSettings.identify_panel) {
+                const identifyInfo = {
+                    point,
+                    response,
+                    layerLabels,
+                };
+                this.openIdentifyPanel(identifyInfo);
+                return;
+            }
+
             var widget = new Widget({
                 response: response,
                 tool: this,
@@ -555,6 +565,27 @@ define([
                 this._popup.setPosition(undefined);
                 topic.publish("feature.unhighlight");
             };
+        },
+
+        openIdentifyPanel: function (identifyInfo) {
+            const pm = this.display.panelsManager;
+            const pkey = "identify";
+            let panel = pm.getPanel(pkey);
+            if (panel) {
+                if (panel.app) {
+                    panel.app.update({ identifyInfo });
+                } else {
+                    panel.props = { identifyInfo };
+                }
+            } else {
+                throw new Error(
+                    "Identification panel should add during Display initialization"
+                );
+            }
+            const activePanel = pm.getActivePanelName();
+            if (activePanel !== pkey) {
+                pm.activatePanel(pkey);
+            }
         },
 
         identifyFeatureByAttrValue: function (

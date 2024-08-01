@@ -10,6 +10,7 @@ import {
     Select,
     Space,
     Switch,
+    Tooltip,
     Typography,
 } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -23,10 +24,21 @@ import {
 } from "./select-options";
 
 import { SaveOutlined, WarningOutlined } from "@ant-design/icons";
+import ExperimentalIcon from "@nextgisweb/icon/material/science";
 
 const { Title } = Typography;
 
 const INPUT_DEFAULT_WIDTH = { width: "100%" };
+
+const experimentalPanelMsg = gettext(
+    "Use panel instead of popup identification"
+);
+
+const experimentalPanel = (
+    <Tooltip title={experimentalPanelMsg}>
+        <ExperimentalIcon />
+    </Tooltip>
+);
 
 export const SettingsForm = ({
     onFinish,
@@ -142,6 +154,20 @@ export const SettingsForm = ({
                                 <Switch />
                             </Form.Item>
                             {gettext("Show geometry info")}
+                        </Space>
+                    </Form.Item>
+                </Col>
+                <Col span={8}>
+                    <Form.Item>
+                        <Space direction="horizontal">
+                            <Form.Item
+                                noStyle
+                                name="identify_panel"
+                                valuePropName="checked"
+                            >
+                                <Switch />
+                            </Form.Item>
+                            {experimentalPanelMsg} {experimentalPanel}
                         </Space>
                     </Form.Item>
                 </Col>

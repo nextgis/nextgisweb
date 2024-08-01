@@ -7,7 +7,7 @@ declare module "@nextgisweb/pyramid/settings!feature_layer" {
         dsco_configurable?: string | null;
     }
 
-    interface Editorwidget {
+    export interface Editorwidget {
         description: string;
         attachment: string;
     }
@@ -15,6 +15,7 @@ declare module "@nextgisweb/pyramid/settings!feature_layer" {
     interface FeatureLayerSettings {
         editor_widget: Editorwidget;
         extensions: Editorwidget;
+        extensions_comp: Editorwidget;
         export_formats: Exportformat[];
         datatypes: string[];
     }

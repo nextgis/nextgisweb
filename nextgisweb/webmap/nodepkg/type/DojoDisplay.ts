@@ -31,6 +31,10 @@ export interface FeatureHighlighter {
     highlightFeature: (data: HighlightFeatureData) => void;
     getHighlighted: () => Feature[];
     unhighlightFeature: (filter: (feature: Feature) => boolean) => void;
+    highlightFeatureById: (
+        featureId: number,
+        layerId: number
+    ) => PromiseLike<Feature>;
 }
 
 export interface WebmapItemConfig extends WebmapItem {
@@ -82,6 +86,7 @@ export interface DojoDisplay extends dijit._WidgetBase {
     featureHighlighter: FeatureHighlighter;
     getUrlParams: () => Record<string, string>;
     isTinyMode: () => boolean;
+    isTinyModePlugin: (plugin: string) => boolean;
     prepareItem: (item: WebmapItem) => WebmapItem;
     _installPlugins: (plugins: Record<string, WebmapPlugin>) => void;
     _onNewStoreItem: (item: WebmapItem | any) => void;

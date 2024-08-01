@@ -951,6 +951,19 @@ define([
                 },
             });
 
+            if (settings.identify_panel) {
+                panels.push({
+                    cls: reactPanel("@nextgisweb/webmap/panel/identification"),
+                    params: {
+                        title: gettext("Identify"),
+                        name: "identify",
+                        order: 15,
+                        menuIcon: "material-left_click",
+                        applyToTinyMap: true,
+                    },
+                });
+            }
+
             panels.push({
                 cls: reactPanel("@nextgisweb/webmap/panel/search"),
                 params: {

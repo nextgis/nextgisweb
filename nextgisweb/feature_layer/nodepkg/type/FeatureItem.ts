@@ -21,7 +21,7 @@ export type NgwAttributeType =
     | NgwTime
     | NgwDateTime;
 
-type Attrs = Record<string, NgwAttributeType>;
+export type Attrs = Record<string, NgwAttributeType>;
 
 export interface FeatureItem<F extends Attrs = Attrs> {
     id: number;

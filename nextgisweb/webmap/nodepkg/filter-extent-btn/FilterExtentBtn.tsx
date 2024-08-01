@@ -19,7 +19,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { DojoDisplay } from "../type";
 import type { MapStateControl } from "../type/MapState";
 
-import CropFreeIcon from "@nextgisweb/icon/material/crop_free/outline";
+import ExtentIcon from "@nextgisweb/icon/material/crop_free/outline";
 import DrawIcon from "@nextgisweb/icon/material/draw/outline";
 import PolyIcon from "@nextgisweb/icon/material/hexagon/outline";
 import CircleIcon from "@nextgisweb/icon/material/radio_button_unchecked/outline";
@@ -322,7 +322,7 @@ export const FilterExtentBtn = ({
         <Dropdown menu={geomTypesMenuItems}>
             <Button title={msgZoomToFiltered} size={size}>
                 <Space>
-                    <CropFreeIcon />
+                    <ExtentIcon />
                 </Space>
             </Button>
         </Dropdown>
