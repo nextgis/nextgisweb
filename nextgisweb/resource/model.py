@@ -17,6 +17,7 @@ from nextgisweb.auth import Group, OnFindReferencesData, Principal, User
 from nextgisweb.core.exception import ForbiddenError, ValidationError
 from nextgisweb.jsrealm import TSExport
 
+from . import category
 from .exception import DisplayNameNotUnique, HierarchyError
 from .interface import IResourceAdapter, interface_registry
 from .permission import RequirementList
@@ -53,6 +54,18 @@ class ResourceMeta(db.DeclarativeMeta):
         if "inherit_condition" not in margs and bres:
             margs["inherit_condition"] = id_column == bres.id
 
+        if "cls_category" not in nspc:
+            category_auto = None
+            if identity.endswith("_connection"):
+                category_auto = category.ExternalConnectionsCategory
+            elif identity.endswith("_service"):
+                category_auto = category.MapsAndServicesCategory
+            elif identity.endswith(("_layer", "_style")) or nspc.get("__scope__") == DataScope:
+                category_auto = category.LayersAndStylesCategory
+
+            if category_auto:
+                nspc["cls_category"] = category_auto
+
         return super().__new__(cls, name, bases, nspc)
 
     def __init__(cls, name, bases, nspc):
@@ -82,6 +95,8 @@ class Resource(Base, metaclass=ResourceMeta):
 
     identity: ClassVar[str] = "resource"
     cls_display_name: ClassVar[TrStr] = gettext("Resource")
+    cls_category: ClassVar[Type[category.ResourceCategory]] = category.MiscellaneousCategory
+    cls_order: ClassVar[int] = 100
 
     __scope__: ClassVar[ResourceScopeType] = (ResourceScope,)
 
@@ -612,6 +627,7 @@ def _on_find_references(event):
 class ResourceGroup(Resource):
     identity = "resource_group"
     cls_display_name = gettext("Resource group")
+    cls_order = 0
 
     @classmethod
     def check_parent(cls, parent):

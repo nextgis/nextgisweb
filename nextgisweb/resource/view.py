@@ -387,38 +387,6 @@ def setup_pyramid(comp, config):
     def _resource_dynmenu(args):
         permissions = args.obj.permissions(args.request.user)
 
-        if not comp.options["experimental.actions"]:
-            for ident, cls in Resource.registry._dict.items():
-                if ident in comp.options["disabled_cls"] or comp.options["disable." + ident]:
-                    continue
-
-                if not cls.check_parent(args.obj):
-                    continue
-
-                # Is current user has permission to manage resource children?
-                if ResourceScope.manage_children not in permissions:
-                    continue
-
-                # Is current user has permission to create child resource?
-                child = cls(parent=args.obj, owner_user=args.request.user)
-                if not child.has_permission(ResourceScope.create, args.request.user):
-                    continue
-
-                # Workaround SAWarning: Object of type ... not in session,
-                # add operation along 'Resource.children' will not proceed
-                child.parent = None
-
-                yield Link(
-                    "create/%s" % ident,
-                    cls.cls_display_name,
-                    lambda args, ident=ident: args.request.route_url(
-                        "resource.create",
-                        id=args.obj.id,
-                        _query=dict(cls=ident),
-                    ),
-                    icon=f"rescls-{cls.identity}",
-                )
-
         if ResourceScope.update in permissions:
             yield Link(
                 "operation/10-update",

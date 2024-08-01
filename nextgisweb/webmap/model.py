@@ -25,6 +25,7 @@ from nextgisweb.resource import (
     SRelationship,
     SResource,
 )
+from nextgisweb.resource.category import MapsAndServicesCategory
 from nextgisweb.spatial_ref_sys import SRS
 
 from .adapter import WebMapAdapter
@@ -55,6 +56,8 @@ class LegendSymbolsEnum(Enum):
 class WebMap(Base, Resource):
     identity = "webmap"
     cls_display_name = gettext("Web map")
+    cls_category = MapsAndServicesCategory
+    cls_order = 20
 
     __scope__ = WebMapScope
 

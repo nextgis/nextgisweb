@@ -17,6 +17,7 @@ from nextgisweb.jsrealm import TSExport
 from nextgisweb.pyramid import AsJSON, JSONType
 from nextgisweb.pyramid.api import csetting, require_storage_enabled
 
+from .category import ResourceCategory
 from .composite import CompositeSerializer
 from .events import AfterResourceCollectionPost, AfterResourcePut
 from .exception import HierarchyError, QuotaExceeded, ResourceDisabled
@@ -33,6 +34,8 @@ class BlueprintResource(Struct):
     base_classes: List[str]
     interfaces: List[str]
     scopes: List[str]
+    category: str
+    order: int
 
 
 class BlueprintPermission(Struct):
@@ -46,9 +49,16 @@ class BlueprintScope(Struct):
     permissions: Dict[str, BlueprintPermission]
 
 
+class BlueprintCategory(Struct):
+    identity: str
+    label: str
+    order: int
+
+
 class Blueprint(Struct):
     resources: Dict[str, BlueprintResource]
     scopes: Dict[str, BlueprintScope]
+    categories: Dict[str, BlueprintCategory]
 
 
 def blueprint(request) -> Blueprint:
@@ -69,6 +79,8 @@ def blueprint(request) -> Blueprint:
                 ),
                 interfaces=[i.__name__ for i in cls.implemented_interfaces()],
                 scopes=list(cls.scope.keys()),
+                category=cls.cls_category.identity,
+                order=cls.cls_order,
             )
             for identity, cls in Resource.registry.items()
         },
@@ -85,6 +97,14 @@ def blueprint(request) -> Blueprint:
                 },
             )
             for sid, scope in Scope.registry.items()
+        },
+        categories={
+            identity: BlueprintCategory(
+                identity=identity,
+                label=tr(category.label),
+                order=category.order,
+            )
+            for identity, category in ResourceCategory.registry.items()
         },
     )
 

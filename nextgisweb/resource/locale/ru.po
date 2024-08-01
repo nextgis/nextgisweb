@@ -18,7 +18,7 @@ msgstr "Сохранить"
 #: amd/ngw-resource/CompositeWidget.js:110
 #: nodepkg/children-section/component/MenuDropdown.tsx:209
 #: nodepkg/children-section/util/createResourceTableItemOptions.ts:8
-#: nodepkg/delete-page/DeletePage.tsx:60 view.py:438
+#: nodepkg/delete-page/DeletePage.tsx:60 view.py:406
 msgid "Delete"
 msgstr "Удалить"
 
@@ -54,30 +54,50 @@ msgstr "ОК"
 msgid "Cancel"
 msgstr "Отмена"
 
-#: amd/ngw-resource/form/ResourceLink.js:27 model.py:84
+#: amd/ngw-resource/form/ResourceLink.js:27 model.py:97
 #: nodepkg/editor-widget/EditorWidget.tsx:68 scope.py:12
 msgid "Resource"
 msgstr "Ресурс"
 
-#: api.py:135
+#: api.py:155
 msgid "Root resource could not be deleted."
 msgstr "Корневой ресурс удалить невозможно."
 
-#: api.py:190
+#: api.py:210
 msgid "Resource parent required."
 msgstr "Необходимо указать ресурс-родитель."
 
-#: api.py:195
+#: api.py:215
 msgid "Resource class required."
 msgstr "Необходимо указать класс ресурса."
 
-#: api.py:197
+#: api.py:217
 msgid "Unknown resource class '%s'."
 msgstr "Неизвестный класс ресурса '%s'."
 
-#: api.py:298
+#: api.py:318
 msgid "Permission not found"
 msgstr "Право доступа не найдено"
+
+#: category.py:29
+msgid "Layers and styles"
+msgstr "Слои и стили"
+
+#: category.py:34
+msgid "Maps and services"
+msgstr "Карты и сервисы"
+
+#: category.py:39
+msgid "Field data collection"
+msgstr "Сбор данных"
+
+#: category.py:44 scope.py:39
+msgid "External connections"
+msgstr "Внешние соединения"
+
+#: category.py:49
+msgid "Miscellaneous"
+msgstr "Другие ресурсы"
 
 #: component.py:94
 msgid "Main resource group"
@@ -171,31 +191,31 @@ msgstr "Избранное"
 msgid "User resources"
 msgstr "Пользовательские ресурсы"
 
-#: model.py:265
+#: model.py:280
 msgid "Resource can not be a parent himself."
 msgstr "Ресурс не может быть родителем сам себе."
 
-#: model.py:278
+#: model.py:293
 msgid "Resource keyname is not unique."
 msgstr "Ключ ресурса не уникален."
 
-#: model.py:310
+#: model.py:325
 msgid "Default style"
 msgstr "Стиль по умолчанию"
 
-#: model.py:426
+#: model.py:441
 msgid "Resource can not be without a parent."
 msgstr "Ресурс не может быть без родителя"
 
-#: model.py:433
+#: model.py:448
 msgid "You are not allowed to manage children of resource with id = %d."
 msgstr "У вас нет прав для управления дочерними ресурсами для ресурса с id = %d."
 
-#: model.py:439
+#: model.py:454
 msgid "Resource can not be a child of resource id = %d."
 msgstr "Ресурс не может быть дочерним для ресурса с id = %d."
 
-#: model.py:514
+#: model.py:529
 msgid ""
 "Unable to revoke '{permission}' permission for '{user}' as the user belongs "
 "to the administrators group. Administrators must always have ability to "
@@ -205,7 +225,7 @@ msgstr ""
 "относится к группе администраторов. Администраторы всегда должны иметь "
 "возможность настраивать права для ресурсов."
 
-#: model.py:614
+#: model.py:629
 msgid "Resource group"
 msgstr "Группа ресурсов"
 
@@ -216,12 +236,12 @@ msgid "Display name"
 msgstr "Наименование"
 
 #: nodepkg/children-section/ChildrenSection.tsx:90
-#: template/resource_section_main.mako:10
+#: template/resource_section_main.mako:11
 msgid "Type"
 msgstr "Тип"
 
 #: nodepkg/children-section/ChildrenSection.tsx:97
-#: nodepkg/editor-widget/EditorWidget.tsx:43 template/resource_section_main.mako:18
+#: nodepkg/editor-widget/EditorWidget.tsx:43 template/resource_section_main.mako:19
 msgid "Owner"
 msgstr "Владелец"
 
@@ -349,7 +369,7 @@ msgstr "Идентификатор для API интеграции (необяз
 msgid "Parent"
 msgstr "Родитель"
 
-#: nodepkg/editor-widget/EditorWidget.tsx:55 template/resource_section_main.mako:12
+#: nodepkg/editor-widget/EditorWidget.tsx:55 template/resource_section_main.mako:13
 msgid "Keyname"
 msgstr "Ключ"
 
@@ -422,9 +442,13 @@ msgid "Removed from favorites"
 msgstr "Удалено из избранного"
 
 #: nodepkg/main-section/CreateResourceButton.tsx:7
-#: nodepkg/main-section/CreateResourceModal.tsx:14 view.py:173 view.py:381
+#: nodepkg/main-section/CreateResourceModal.tsx:16 view.py:173 view.py:381
 msgid "Create resource"
 msgstr "Создать ресурс"
+
+#: nodepkg/main-section/CreateResourceModal.tsx:39
+msgid "Everything"
+msgstr "Все ресурсы"
 
 #: nodepkg/permissions-widget/PermissionStoreItem.ts:13
 msgid "All fields are required"
@@ -526,10 +550,6 @@ msgctxt "permission"
 msgid "Modify data"
 msgstr "Изменение данных"
 
-#: scope.py:39
-msgid "External connections"
-msgstr "Внешние соединения"
-
 #: scope.py:41
 msgctxt "permission"
 msgid "Read connection parameters"
@@ -567,11 +587,11 @@ msgstr "У этого ресурса нет описания."
 msgid "External access"
 msgstr "Внешний доступ"
 
-#: view.py:116 view.py:447
+#: view.py:116 view.py:415
 msgid "JSON view"
 msgstr "Представление JSON"
 
-#: view.py:128 view.py:454
+#: view.py:128 view.py:422
 msgid "User permissions"
 msgstr "Права пользователя"
 
@@ -583,7 +603,7 @@ msgstr "Обновить ресурс"
 msgid "Delete resource"
 msgstr "Удалить ресурс"
 
-#: view.py:253 view.py:467
+#: view.py:253 view.py:435
 msgid "Resource export"
 msgstr "Экспорт ресурсов"
 
@@ -595,6 +615,6 @@ msgstr "Недостаточно разрешения '%s' в скоупе '%s' 
 msgid "Extra"
 msgstr "Дополнительно"
 
-#: view.py:425
+#: view.py:393
 msgid "Update"
 msgstr "Изменить"

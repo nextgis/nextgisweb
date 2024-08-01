@@ -1,21 +1,63 @@
 .ngw-resource-create-resource-modal {
-    min-height: 280px;
-
     > div.ant-modal-body {
-        display: grid;
-        grid-template-columns: 1fr 1fr 1fr;
+        display: flex;
         gap: 1rem;
-        padding-top: 1rem;
-        font-size: 16px;
+        margin: 1rem 0;
 
-        > a.ant-btn {
-            justify-content: unset;
-            padding: 0.75rem;
-            height: unset;
+        > .categories {
+            display: flex;
+            flex: 1 1;
+            flex-direction: column;
+            gap: 0.5rem;
+            font-size: 16px;
 
-            > .ant-btn-icon > .icon {
-                width: 24px;
-                height: 24px;
+            > div {
+                cursor: pointer;
+                border-radius: var(--border-radius-lg);
+                padding: 0.5rem;
+                text-wrap: nowrap;
+
+                &.selected {
+                    background-color: var(--color-primary-bg);
+                    color: var(--color-primary);
+                }
+            }
+        }
+
+        > .resources {
+            flex: 3 3;
+            box-sizing: border-box;
+            padding-right: 1rem;
+            width: 100%;
+            height: calc(6 * (32px + 2.5rem) + 1.5rem);
+            overflow-y: auto;
+
+            > .grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr;
+                gap: 1rem;
+                width: 100%;
+                font-size: 16px;
+
+                > a.ant-btn {
+                    justify-content: unset;
+                    gap: 0.75rem;
+                    padding: 0.75rem;
+                    height: unset;
+                    line-height: 1.25;
+                    text-align: left;
+                    text-wrap: unset;
+
+                    > .ant-btn-icon > .icon {
+                        width: 32px;
+                        height: 32px;
+                    }
+
+                    > span:not(.ant-btn-icon) {
+                        margin: -0.25rem 0;
+                        margin-right: 0.5rem;
+                    }
+                }
             }
         }
     }

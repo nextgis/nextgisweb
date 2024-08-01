@@ -67,6 +67,7 @@ COLOR_INTERPRETATION = {
 class RasterLayer(Base, Resource, SpatialLayerMixin):
     identity = "raster_layer"
     cls_display_name = gettext("Raster layer")
+    cls_order = 65
 
     __scope__ = DataScope
 

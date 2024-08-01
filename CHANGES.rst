@@ -7,6 +7,8 @@ Changes
 - Fix uploading of zero-length files.
 - TUS uploader is available using CORS.
 - Data structure permission scope removed.
+- New resource creation dialog.
+
 
 4.8.0
 -----

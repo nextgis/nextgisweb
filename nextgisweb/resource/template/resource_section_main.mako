@@ -1,4 +1,5 @@
 <%! from nextgisweb.resource.view import creatable_resources %>
+<%! from nextgisweb.pyramid.api import csetting %>
 
 <%page args="section" />
 <% section.content_box = False %>
@@ -17,8 +18,7 @@
 
     summary.append((tr(_("Owner")), tr(obj.owner_user.display_name_i18n)))
 
-    if request.env.resource.options["experimental.actions"]:
-        props["creatable"] = [c.identity for c in creatable_resources(obj, user=request.user)]
+    props["creatable"] = [c.identity for c in creatable_resources(obj, user=request.user)]
 %>
 
 <div id="resourceMainSection" class="ngw-resource-section"></div>

@@ -127,6 +127,7 @@ def _vlschema_autoflush(res):
 class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin, FVersioningMixin):
     identity = "vector_layer"
     cls_display_name = gettext("Vector layer")
+    cls_order = 60
 
     __scope__ = DataScope
 
