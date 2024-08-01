@@ -3,6 +3,8 @@ import matches from "lodash-es/matches";
 type Value = NonNullable<unknown>;
 type Metadata = NonNullable<unknown>;
 
+interface NoMetadata {}
+
 type PromiseLoader<V extends Value> = () => Promise<V>;
 type ImportLoader<V extends Value> = PromiseLoader<{ default: V }>;
 
@@ -30,7 +32,9 @@ type Plugin<
     V extends Value,
     M extends Metadata,
 > = keyof M extends keyof PluginObject<Value>
-    ? never /* Key conflicts guard */
+    ? keyof M extends keyof NoMetadata
+        ? PluginObject<V>
+        : never /* Key conflicts guard */
     : PluginObject<V> & Readonly<M>;
 
 type RegisterValue<V extends Value> =
@@ -46,7 +50,7 @@ type Query<M extends Metadata> =
 
 export class PluginRegistry<
     V extends Value = Value,
-    M extends Metadata = Metadata,
+    M extends Metadata = NoMetadata,
 > {
     readonly identity: string;
     protected readonly items = new Array<Plugin<V, M>>();
@@ -115,7 +119,7 @@ export class PluginRegistry<
         else if (typeof query !== "function") query = matches(query);
 
         for (const itm of this.items) {
-            if (query(itm)) yield itm;
+            if (query(itm as Selector<M>)) yield itm;
         }
     }
 
@@ -133,7 +137,10 @@ export class PluginRegistry<
     }
 }
 
-export function pluginRegistry<V extends Value, M extends Metadata>(
+export function pluginRegistry<
+    V extends Value,
+    M extends Metadata = NoMetadata,
+>(
     identity: string
 ): Pick<PluginRegistry<V, M>, "register" | "query" | "queryAll" | "load"> {
     return new PluginRegistry<V, M>(identity);

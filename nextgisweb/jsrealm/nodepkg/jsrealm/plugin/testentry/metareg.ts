@@ -19,7 +19,7 @@ meta.queryAll().map((registry) => {
         lit("has some plugins", (r) => assert.isAtLeast(r.count, 0));
         lit("all plugins can be loaded", async (r) => {
             for (const p of r.query()) {
-                await (p as PluginRegistry).load();
+                await (p as unknown as PluginRegistry).load();
             }
         });
     });
