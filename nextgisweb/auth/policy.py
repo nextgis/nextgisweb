@@ -3,7 +3,6 @@ from contextlib import contextmanager
 from datetime import datetime, timedelta
 from enum import Enum
 from typing import Union
-from warnings import warn
 
 import sqlalchemy as sa
 from msgspec import Struct, convert, to_builtins
@@ -74,10 +73,6 @@ class OnUserLogin(Struct):
     user: User
     request: Request
     next_url: str
-
-    def set_next_url(self, url):
-        warn("Use event.next_url = ... instead of event.set_next_url()", DeprecationWarning, 2)
-        self._next_url = url
 
 
 @implementer(ISecurityPolicy)
