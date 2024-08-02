@@ -1,3 +1,4 @@
+import isEqual from "lodash-es/isEqual";
 import { action, computed, observable, runInAction, toJS } from "mobx";
 import type { InputHTMLAttributes } from "react";
 
@@ -52,9 +53,11 @@ export class MappedValue<V = any, O = any, P extends string = string> {
     private readonly owner: O;
     @observable private accessor _value: V;
     readonly prop: MappedProperty<V, O, P>;
+    private initialValue: V;
 
     constructor(value: V, owner: O, prop: MappedProperty<V, O, P>) {
         this._value = value;
+        this.initialValue = toJS(value);
         this.owner = owner;
         this.prop = prop;
     }
@@ -70,8 +73,19 @@ export class MappedValue<V = any, O = any, P extends string = string> {
         this.prop.onChange?.(this.owner);
     }
 
+    /**
+     * A regular updates method where the initial state should remain unchanged.
+     */
     @action setter = (value: V): void => {
         this.value = value;
+    };
+
+    /**
+     * Initializes the property value and sets the initial value for dirty calculation.
+     */
+    @action load = (value: V): void => {
+        this.initialValue = value;
+        this.setter(value);
     };
 
     @computed get error(): ErrorResult {
@@ -84,6 +98,10 @@ export class MappedValue<V = any, O = any, P extends string = string> {
             if (!ok) return err;
         }
         return false;
+    }
+
+    @computed get dirty(): boolean {
+        return !isEqual(toJS(this._value), this.initialValue);
     }
 
     jsonPart(): { [K in P]: V } {
@@ -181,6 +199,7 @@ export type MapperResult<O, D> = {
     $load: (target: O, source: Partial<D>) => void;
     $error: (obj: O) => ErrorResult;
     $dump: (obj: O) => Partial<D>;
+    $dirty: (obj: O) => boolean;
 };
 
 export function mapper<O, D>(
@@ -205,7 +224,7 @@ export function mapper<O, D>(
     const $load = (obj: object, source: Partial<D>) => {
         for (const [mv, pn] of iterMV(obj)) {
             if (pn in source) {
-                mv.setter(source[pn]);
+                mv.load(source[pn]);
             }
         }
     };
@@ -218,6 +237,15 @@ export function mapper<O, D>(
         return result;
     };
 
+    const $dirty = (obj: object): boolean => {
+        for (const [mv] of iterMV(obj)) {
+            if (mv.dirty) {
+                return true;
+            }
+        }
+        return false;
+    };
+
     const $error = (obj: object): ErrorResult => {
         for (const [mv] of iterMV(obj)) {
             const err = mv.error;
@@ -228,7 +256,7 @@ export function mapper<O, D>(
     };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return new Proxy({ $load, $error, $dump } as any, {
+    return new Proxy({ $load, $error, $dump, $dirty } as any, {
         get: (target, prop) => {
             if (typeof prop === "string" && !prop.startsWith("$")) {
                 props.push(prop as keyof D);
