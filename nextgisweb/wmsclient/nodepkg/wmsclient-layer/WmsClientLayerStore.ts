@@ -1,16 +1,22 @@
-import isEqual from "lodash-es/isEqual";
-import { action, computed, observable, toJS } from "mobx";
+import { action, computed, observable } from "mobx";
 
 import { mapper } from "@nextgisweb/gui/arm";
-import type { EditorStore } from "@nextgisweb/resource/type";
-import type { RelationshipRef } from "@nextgisweb/resource/type/api";
-import type { LayerCreate, LayerRead } from "@nextgisweb/wmsclient/type/api";
+import srsSettings from "@nextgisweb/pyramid/settings!spatial_ref_sys";
+import type {
+    EditorStore,
+    EditorStoreOptions,
+    Operation,
+} from "@nextgisweb/resource/type";
+import type {
+    LayerCreate,
+    LayerRead,
+    LayerUpdate,
+} from "@nextgisweb/wmsclient/type/api";
 
-type MapperLayerCreate = Omit<
+type MapperLayerCreate = NullableOmit<
     LayerCreate,
     "connection" | "imgformat" | "vendor_params"
-> &
-    Nullable<Pick<LayerCreate, "connection" | "imgformat" | "vendor_params">>;
+>;
 
 const {
     connection,
@@ -19,6 +25,8 @@ const {
     vendor_params,
     $load: mapperLoad,
     $error: mapperError,
+    $dump: mapperDump,
+    $dirty: mapperDirty,
 } = mapper<WmsClientLayerStore, MapperLayerCreate>({
     validateIf: (o) => o.validate,
     properties: {
@@ -29,47 +37,50 @@ const {
 });
 
 export class WmsClientLayerStore
-    implements EditorStore<LayerRead, LayerCreate>
+    implements EditorStore<LayerRead, LayerCreate, LayerUpdate>
 {
     readonly identity = "wmsclient_layer";
+
+    readonly operation: Operation;
 
     connection = connection.init(null, this);
     wmslayers = wmslayers.init("", this);
     imgformat = imgformat.init(null, this);
     vendor_params = vendor_params.init({}, this);
-    @observable accessor srs: RelationshipRef | undefined = { id: 3857 };
 
-    private _initValue?: LayerRead;
     @observable accessor validate = false;
+
+    constructor({ operation }: EditorStoreOptions) {
+        this.operation = operation;
+    }
 
     @action load(val: LayerRead) {
         mapperLoad(this, val);
-        this.srs = val.srs;
-        this._initValue = { ...val };
-    }
-
-    @computed get deserializeValue(): LayerCreate {
-        const result = {
-            ...this.connection.jsonPart(),
-            ...this.wmslayers.jsonPart(),
-            ...this.imgformat.jsonPart(),
-            ...this.vendor_params.jsonPart(),
-            srs: this.srs,
-        } as LayerCreate;
-
-        return toJS(result);
     }
 
     @computed get dirty(): boolean {
-        if (this.deserializeValue && this._initValue) {
-            return !isEqual(this.deserializeValue, this._initValue);
-        }
-        return true;
+        return this.operation === "create" ? true : mapperDirty(this);
     }
 
     dump() {
         if (this.dirty) {
-            return this.deserializeValue;
+            const { wmslayers, imgformat, connection, vendor_params, ...rest } =
+                mapperDump(this);
+
+            if (!connection || !imgformat || !vendor_params || !wmslayers) {
+                throw Error();
+            }
+
+            return {
+                wmslayers,
+                imgformat,
+                connection,
+                vendor_params,
+                ...rest,
+                ...(this.operation === "create"
+                    ? { srs: srsSettings.default }
+                    : {}),
+            };
         }
     }
 
