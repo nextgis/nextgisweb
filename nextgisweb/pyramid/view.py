@@ -189,14 +189,16 @@ def sysinfo(request):
     request.require_administrator()
     return dict(title=gettext("System information"), dynmenu=request.env.pyramid.control_panel)
 
+
 @viewargs(renderer="react")
-def fontsinfo(request):
+def fonts(request):
     request.require_administrator()
-    result = subprocess.run(["fc-list", ":", "family",  "fullname"], capture_output=True, text=True)
-    return dict(title=gettext("Fonts information"),
+    result = subprocess.run(["fc-list", ":", "family", "fullname"], capture_output=True, text=True)
+    return dict(
+        title=gettext("Fonts"),
         entrypoint="@nextgisweb/pyramid/fonts",
         dynmenu=request.env.pyramid.control_panel,
-        props=dict(items=result.stdout.split("\n"))
+        props=dict(items=result.stdout.split("\n")),
     )
 
 
@@ -501,11 +503,10 @@ def setup_pyramid(comp, config):
         "/control-panel/sysinfo",
     ).add_view(sysinfo)
 
-
     config.add_route(
-        "pyramid.control_panel.fontsinfo",
-        "/control-panel/fontsinfo",
-    ).add_view(fontsinfo)
+        "pyramid.control_panel.fonts",
+        "/control-panel/fonts",
+    ).add_view(fonts)
 
     if env.core.options["storage.enabled"]:
         config.add_route("pyramid.control_panel.storage", "/control-panel/storage").add_view(
@@ -600,11 +601,10 @@ def setup_pyramid(comp, config):
             lambda args: (args.request.route_url("pyramid.control_panel.sysinfo")),
         )
 
-
         yield dm.Link(
-            "info/fontsinfo",
-            gettext("Fonts information"),
-            lambda args: (args.request.route_url("pyramid.control_panel.fontsinfo")),
+            "settings/fonts",
+            gettext("Fonts"),
+            lambda args: (args.request.route_url("pyramid.control_panel.fonts")),
         )
 
         yield dm.Link(

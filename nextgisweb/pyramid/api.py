@@ -1,13 +1,10 @@
 import re
-import os
-import subprocess
 from datetime import datetime
 from enum import Enum
 from inspect import Parameter, signature
-from shutil import copy as copy_
 from typing import TYPE_CHECKING, Any, ClassVar, Dict, List, Literal, Optional, Tuple, Type, Union
 
-from msgspec import UNSET, Meta, Struct, UnsetType, convert, defstruct, to_builtins
+from msgspec import UNSET, Meta, Struct, UnsetType, convert, defstruct, field, to_builtins
 from pyramid.interfaces import IRoutesMapper
 from pyramid.response import Response
 from typing_extensions import Annotated
@@ -16,18 +13,18 @@ from nextgisweb.env import COMP_ID, Component, DBSession, env, gettext, inject
 from nextgisweb.env.package import pkginfo
 from nextgisweb.lib.apitype import AnyOf, AsJSON, EmptyObject, Gap, StatusCode, fillgap
 from nextgisweb.lib.imptool import module_from_stack
-from nextgisweb.lib.logging import logger
 
 from nextgisweb.auth import Permission
 from nextgisweb.core import CoreComponent, KindOfData
 from nextgisweb.core.exception import NotConfigured, ValidationError
-from nextgisweb.file_upload import FileUpload, FileUploadRef
+from nextgisweb.core.fontconfig import CustomFont, FontKey, SystemFont
+from nextgisweb.file_upload import FileUploadRef
 from nextgisweb.jsrealm import TSExport
 from nextgisweb.resource import Resource, ResourceScope
 
 from .permission import cors_manage, cors_view
 from .tomb.predicate import RouteMeta
-from .util import gensecret, parse_origin
+from .util import gensecret, parse_origin, restart_delayed
 
 
 def _get_cors_olist():
@@ -277,17 +274,58 @@ def kind_of_data(request) -> AsJSON[Dict[str, str]]:
     return {k: request.translate(v.display_name) for k, v in KindOfData.registry.items()}
 
 
-def font_upload(request):
+def font_сread(request) -> AsJSON[List[Union[SystemFont, CustomFont]]]:
+    """Get information about available fonts"""
     request.require_administrator()
-    data = request.json
-    fileupload_id = data.get("file_meta").get("id")
-    filename = data.get("file_meta").get("name")
-    fileupload = FileUpload(id=fileupload_id)
-    copy_(fileupload.data_path, os.path.join("/opt/ngw/data/app/fonts/", filename))
-    subprocess.run(["fc-cache"], capture_output=True, text=True)
-    logger.log(msg=request.json , level=1)
-    return Response("OK", status_code=200)
+    unordered = request.env.core.fontconfig.enumerate()
+    return sorted(unordered, key=lambda i: (not isinstance(i, CustomFont), i.label))
 
+
+class FontСUpdateBody(Struct, kw_only=True):
+    add: List[FileUploadRef] = field(default_factory=list)
+    remove: List[FontKey] = field(default_factory=list)
+
+
+class FontCUpdateResponse(Struct, kw_only=True):
+    restarted: bool
+    timestamp: float
+
+
+def font_сupdate(request, *, body: FontСUpdateBody) -> FontCUpdateResponse:
+    """Add or remove custom fonts"""
+
+    # 1. Удалить шрифты из списка body.remove из core.fontconfig.root_dir,
+    #    проверив, что они там вообще есть, a eсли нет, то ValidationError.
+
+    # 2. Поместить шрифты из body.add с заменой в core.fontconfig.root_dir,
+    #    предварительно проверив, что имена загруженных файлов удовлетворяют
+    #    условиям FontKey. Так же подумать про какой-то разумный лимит на размер
+    #    файла шрифта, будет печально если нам закинут файл на гигабайты тут.
+
+    # Поскольку операции с файловой системой происходят без транзакции, лучше
+    # вначале выполнить все проверки, а потом уже выполнять какие-то действия.
+
+    request.require_administrator()
+
+    if restarted := (len(body.add) > 0 or len(body.remove) > 0):
+        restart_delayed()
+
+    return FontCUpdateResponse(
+        restarted=restarted,
+        timestamp=datetime.utcnow().timestamp(),
+    )
+
+
+# def font_upload(request):
+#     request.require_administrator()
+#     data = request.json
+#     fileupload_id = data.get("file_meta").get("id")
+#     filename = data.get("file_meta").get("name")
+#     fileupload = FileUpload(id=fileupload_id)
+#     copy_(fileupload.data_path, os.path.join("/opt/ngw/data/app/fonts/", filename))
+#     subprocess.run(["fc-cache"], capture_output=True, text=True)
+#     logger.log(msg=request.json , level=1)
+#     return Response("OK", status_code=200)
 
 
 # Component settings machinery
@@ -685,9 +723,10 @@ def setup_pyramid(comp, config):
     )
 
     config.add_route(
-        "pyramid.fonts",
-        "/api/component/pyramid/fonts",
-        put=font_upload,
+        "pyramid.font",
+        "/api/component/pyramid/font",
+        get=font_сread,
+        put=font_сupdate,
     )
 
     # Methods for customization in components
