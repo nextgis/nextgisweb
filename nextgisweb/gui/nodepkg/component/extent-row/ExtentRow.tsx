@@ -2,6 +2,7 @@ import { observer } from "mobx-react-lite";
 import { useCallback, useState } from "react";
 
 import { Button, InputNumber, Space } from "@nextgisweb/gui/antd";
+import type { InputNumberProps } from "@nextgisweb/gui/antd";
 import { route } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -32,18 +33,52 @@ export async function getExtentFromLayer({
 
     return result;
 }
-
+/**
+ * geo - West South East North
+ * box - Left Bottom Right Top
+ */
+type LabelType = "geo" | "box";
 type ExtentKeys = "top" | "left" | "right" | "bottom";
 export type ExtentRowValue = Partial<Record<ExtentKeys, number | null>>;
 
-interface ExtentRow {
-    value: ExtentRowValue;
-    onChange: (val: ExtentRowValue) => void;
+export interface ExtentRowProps {
+    value?: ExtentRowValue;
+    onChange?: (val: ExtentRowValue) => void;
+    hideResourcePicker?: boolean;
     pickerOptions?: ResourcePickerStoreOptions;
+    labelType?: LabelType;
 }
 
+const labelAliases: Record<LabelType, Record<ExtentKeys, string>> = {
+    box: {
+        left: gettext("Left"),
+        bottom: gettext("Bottom"),
+        right: gettext("Right"),
+        top: gettext("Top"),
+    },
+    geo: {
+        left: gettext("West"),
+        bottom: gettext("South"),
+        right: gettext("East"),
+        top: gettext("North"),
+    },
+};
+
+const parts: ({ key: ExtentKeys } & InputNumberProps)[] = [
+    { key: "left", min: -180, max: 180 },
+    { key: "bottom", min: -90, max: 90 },
+    { key: "right", min: -180, max: 180 },
+    { key: "top", min: -90, max: 90 },
+];
+
 export const ExtentRow = observer(
-    ({ value, onChange, pickerOptions }: ExtentRow) => {
+    ({
+        value,
+        onChange,
+        pickerOptions,
+        hideResourcePicker,
+        labelType = "geo",
+    }: ExtentRowProps) => {
         const [loading, setIsLoading] = useState(false);
 
         const { makeSignal } = useAbortController();
@@ -61,7 +96,9 @@ export const ExtentRow = observer(
                             resourceId,
                             signal: makeSignal(),
                         });
-                        onChange(res);
+                        if (onChange) {
+                            onChange(res);
+                        }
                     } finally {
                         setIsLoading(false);
                     }
@@ -71,54 +108,32 @@ export const ExtentRow = observer(
 
         return (
             <div className="ngw-gui-extent-row">
-                <Button
-                    loading={loading}
-                    icon={<LayersIconOutlined />}
-                    onClick={onSetFromLayerClick}
-                >
-                    {gettext("From layer")}
-                </Button>
+                {!hideResourcePicker && (
+                    <Button
+                        loading={loading}
+                        icon={<LayersIconOutlined />}
+                        onClick={onSetFromLayerClick}
+                    >
+                        {gettext("From layer")}
+                    </Button>
+                )}
                 <Space.Compact style={{ display: "flex" }}>
-                    <InputNumber
-                        value={value.left}
-                        onChange={(left) => {
-                            onChange({ ...value, left });
-                        }}
-                        addonBefore={gettext("West")}
-                        precision={4}
-                        max={180}
-                        min={-180}
-                        controls={false}
-                    />
-                    <InputNumber
-                        value={value.bottom}
-                        onChange={(bottom) => {
-                            onChange({ ...value, bottom });
-                        }}
-                        addonBefore={gettext("South")}
-                        precision={4}
-                        max={90}
-                        min={-90}
-                        controls={false}
-                    />
-                    <InputNumber
-                        value={value.right}
-                        onChange={(right) => onChange({ ...value, right })}
-                        addonBefore={gettext("East")}
-                        precision={4}
-                        max={180}
-                        min={-180}
-                        controls={false}
-                    />
-                    <InputNumber
-                        value={value.top}
-                        onChange={(top) => onChange({ ...value, top })}
-                        addonBefore={gettext("North")}
-                        precision={4}
-                        max={90}
-                        min={-90}
-                        controls={false}
-                    />
+                    {parts.map(({ key, min, max }) => (
+                        <InputNumber
+                            key={key}
+                            value={value ? value[key] : undefined}
+                            onChange={(val) => {
+                                if (onChange) {
+                                    onChange({ ...value, [key]: val });
+                                }
+                            }}
+                            addonBefore={labelAliases[labelType][key]}
+                            precision={4}
+                            min={min}
+                            max={max}
+                            controls={false}
+                        />
+                    ))}
                 </Space.Compact>
             </div>
         );
