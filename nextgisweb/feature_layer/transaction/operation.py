@@ -178,8 +178,8 @@ class FeatureLayerExecutor(OperationExecutor):
             feature.id = operation.fid
 
         if isinstance(operation, (FeatureCreate, FeatureUpdate, FeatureRestore)):
-            if (geom := operation.geom) not in (None, UNSET):
-                feature.geom = Geometry.from_wkb(geom)
+            if (geom := operation.geom) is not UNSET:
+                feature.geom = Geometry.from_wkb(geom) if geom else None
 
             if (fields := operation.fields) is not UNSET:
                 if isinstance(fields, dict):

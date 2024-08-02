@@ -21,7 +21,7 @@ def mkres():
             obj.fields = [VectorLayerField(keyname="foo", datatype="STRING", display_name="foo")]
             obj.fversioning_configure(enabled=versioning)
 
-            for i in (1, 2, 3):
+            for i in (1, 2, 3, 4):
                 feat = Feature(geom=Geometry.from_wkt(f"POINT Z (0 0 {i})"))
                 feat.fields["foo"] = "Original"
                 obj.feature_create(feat)
@@ -69,7 +69,7 @@ def test_basic(versioning, fdict, mkres, ngw_webtest_app):
     assert txn_id > 0
     turl = f"{burl}/{txn_id}"
 
-    op_1 = [1, _create(geom=ptz(0, 0, 4), fields=fld("Inserted"))]
+    op_1 = [1, _create(geom=ptz(0, 0, 5), fields=fld("Inserted"))]
     resp = web.put_json(turl, [op_1])
 
     # Repeats of the same data should also report 200 OK
@@ -84,7 +84,8 @@ def test_basic(versioning, fdict, mkres, ngw_webtest_app):
     op_2 = [2, _update(fid=1, geom=ptz(1, 1, 1), fields=fld("Updated"))]
     op_3 = [3, _delete(fid=2)]
     op_4 = [4, _update(fid=3)]
-    web.put_json(turl, [op_2, op_3, op_4])
+    op_5 = [5, _update(fid=4, geom=None)]
+    web.put_json(turl, [op_2, op_3, op_4, op_5])
 
     # Results aren't available until commit happens
     web.get(turl, status=422)
@@ -97,15 +98,16 @@ def test_basic(versioning, fdict, mkres, ngw_webtest_app):
     # Fetch the results
     resp = web.get(turl, status=200).json
     assert resp == [
-        [1, _create(fid=4)],
+        [1, _create(fid=5)],
         [2, _update()],
         [3, _delete()],
         [4, _update()],
+        [5, _update()],
     ]
 
     # Validate resource features
     resp_c = web.get(f"{furl}/?extensions=", status=200).json
-    assert len(resp_c) == 3
+    assert len(resp_c) == 4
 
     resp_1 = web.get(f"{furl}/1?extensions=", status=200).json
     assert not versioning or resp_1.pop("vid")
@@ -120,7 +122,11 @@ def test_basic(versioning, fdict, mkres, ngw_webtest_app):
 
     resp_4 = web.get(f"{furl}/4?extensions=", status=200).json
     assert not versioning or resp_4.pop("vid")
-    assert resp_4 == dict(id=4, geom="POINT Z (0 0 4)", fields=dict(foo="Inserted"))
+    assert resp_4 == dict(id=4, geom=None, fields=dict(foo="Original"))
+
+    resp_5 = web.get(f"{furl}/5?extensions=", status=200).json
+    assert not versioning or resp_5.pop("vid")
+    assert resp_5 == dict(id=5, geom="POINT Z (0 0 5)", fields=dict(foo="Inserted"))
 
     # Dispose transaction
     web.delete(turl, status=200)
@@ -172,8 +178,8 @@ def test_errors(versioning, fdict, mkres, ngw_webtest_app):
     assert txn_id > 0
     turl = f"{burl}/{txn_id}"
 
-    op_1 = [1, _update(fid=5, fields=fld("Updated"))]
-    op_2 = [2, _update(fid=4, fields=fld("Omitted"))]
+    op_1 = [1, _update(fid=10, fields=fld("Updated"))]
+    op_2 = [2, _update(fid=11, fields=fld("Omitted"))]
     resp = web.put_json(turl, [op_1, op_2])
 
     # Commit should report errors
