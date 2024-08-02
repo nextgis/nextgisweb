@@ -1,5 +1,5 @@
 #: amd/ngw-feature-layer/FieldsDisplayWidget.js:35
-#: nodepkg/attribute-editor/index.ts:7 view.py:222
+#: nodepkg/attribute-editor/index.ts:7 view.py:203
 msgid "Attributes"
 msgstr "Атрибуты"
 
@@ -11,15 +11,15 @@ msgstr "Н/Д"
 msgid "Geometry"
 msgstr "Геометрия"
 
-#: api.py:93
+#: api.py:90
 msgid "Geometry is not valid."
 msgstr "Невалидная геометрия"
 
-#: api.py:335
+#: api.py:332
 msgid "Unknown spatial reference system"
 msgstr "Неизвестная система координат"
 
-#: api.py:408 api_export.py:121
+#: api.py:405 api_export.py:122
 msgid "Parameter 'intersects' geometry is not valid."
 msgstr "Параметр 'intersects' содержит невалидную геометрию."
 
@@ -31,15 +31,15 @@ msgstr "Выходной формат не указан."
 msgid "Format '%s' is not supported."
 msgstr "Формат '%s' не поддерживается."
 
-#: api_export.py:146
+#: api_export.py:148
 msgid "The export limit is set to {limit} features, but the layer contains {count}."
 msgstr "Лимит экспорта составляет {limit} объектов, однако слой содержит {count}."
 
-#: api_export.py:159
+#: api_export.py:162
 msgid "Failed to reproject 'intersects' geometry."
 msgstr "Не удалось перепроецировать геометрию 'intersects'."
 
-#: api_export.py:301
+#: api_export.py:305
 msgid "File name parameter '{}' is not valid."
 msgstr "Недопустимое имя файла '{}'."
 
@@ -63,7 +63,7 @@ msgstr "Объект не удален"
 msgid "Unable to restore the #{} feature as it is not deleted."
 msgstr "Невозможно восстановить объект #{} поскольку он не удален."
 
-#: favorite.py:5 nodepkg/fields-widget/FieldsWidget.tsx:27 view.py:56
+#: favorite.py:5 nodepkg/fields-widget/FieldsWidget.tsx:27 view.py:39
 msgid "Feature table"
 msgstr "Таблица объектов"
 
@@ -87,71 +87,51 @@ msgstr "Установить для атрибута значение NULL (Не
 msgid "There are no attributes in the vector layer"
 msgstr "В векторном слое нет атрибутов"
 
-#: nodepkg/export-form/ExportForm.tsx:177
+#: nodepkg/export-form/ExportForm.tsx:204
 msgid "Resources"
 msgstr "Ресурсы"
 
-#: nodepkg/export-form/ExportForm.tsx:199
+#: nodepkg/export-form/ExportForm.tsx:226
 msgid "Format"
 msgstr "Формат"
 
-#: nodepkg/export-form/ExportForm.tsx:212
+#: nodepkg/export-form/ExportForm.tsx:239
 msgid "SRS"
 msgstr "Система координат"
 
-#: nodepkg/export-form/ExportForm.tsx:217
+#: nodepkg/export-form/ExportForm.tsx:244
 msgid "Encoding"
 msgstr "Кодировка"
 
-#: nodepkg/export-form/ExportForm.tsx:231
+#: nodepkg/export-form/ExportForm.tsx:258
 msgid "FID field"
 msgstr "Поле FID"
 
-#: nodepkg/export-form/ExportForm.tsx:235
+#: nodepkg/export-form/ExportForm.tsx:262
 msgid "Use field display names instead of keynames"
 msgstr "Использовать наименования полей вместо ключей"
 
-#: nodepkg/export-form/ExportForm.tsx:241
+#: nodepkg/export-form/ExportForm.tsx:268
 #: nodepkg/fields-widget/FieldsWidget.tsx:167
 msgid "Fields"
 msgstr "Поля"
 
-#: nodepkg/export-form/ExportForm.tsx:247
+#: nodepkg/export-form/ExportForm.tsx:274
 msgid "Limit by extent"
 msgstr "Ограничить охватом"
 
-#: nodepkg/export-form/ExportForm.tsx:253
+#: nodepkg/export-form/ExportForm.tsx:280
 msgid "Filter text"
 msgstr "Текстовый фильтр"
 
-#: nodepkg/export-form/ExportForm.tsx:257
+#: nodepkg/export-form/ExportForm.tsx:284
 msgid "Zip archive"
 msgstr "Zip архив"
 
-#: nodepkg/export-form/ExportForm.tsx:300
+#: nodepkg/export-form/ExportForm.tsx:327
 #: nodepkg/feature-editor/FeatureEditorWidget.tsx:34
 msgid "Save"
 msgstr "Сохранить"
-
-#: nodepkg/export-form/ExtentInput.tsx:6
-msgid "deg."
-msgstr "град."
-
-#: nodepkg/export-form/ExtentInput.tsx:9
-msgid "Left"
-msgstr "Лево"
-
-#: nodepkg/export-form/ExtentInput.tsx:10
-msgid "Bottom"
-msgstr "Низ"
-
-#: nodepkg/export-form/ExtentInput.tsx:11
-msgid "Right"
-msgstr "Право"
-
-#: nodepkg/export-form/ExtentInput.tsx:12
-msgid "Top"
-msgstr "Верх"
 
 #: nodepkg/feature-editor-modal/FeatureEditorModal.tsx:18
 msgid "Cancel"
@@ -214,8 +194,8 @@ msgstr "Поиск..."
 msgid "Last changed"
 msgstr "Последнее изменение"
 
-#: nodepkg/feature-grid/component/ExportAction.tsx:30 view.py:117 view.py:128
-#: view.py:217
+#: nodepkg/feature-grid/component/ExportAction.tsx:30 view.py:99 view.py:110
+#: view.py:198
 msgid "Save as"
 msgstr "Сохранить как"
 
@@ -339,7 +319,7 @@ msgstr ""
 msgid "Settings"
 msgstr "Настройки"
 
-#: template/resource_section_fields.mako:21 view.py:206
+#: template/resource_section_fields.mako:21 view.py:187
 msgid "Table"
 msgstr "Таблица"
 
@@ -406,15 +386,15 @@ msgstr "Версия за пределами диапазона"
 msgid "Invalid range"
 msgstr "Некорректный диапазон"
 
-#: view.py:78 view.py:95
+#: view.py:60 view.py:77
 msgid "Feature #%d"
 msgstr "Объект #%d"
 
-#: view.py:136
+#: view.py:118
 msgid "MVT Vector Tiles"
 msgstr "Векторные тайлы MVT"
 
-#: view.py:137
+#: view.py:119
 msgid ""
 "The Mapbox Vector Tile is an efficient encoding for map data into vector "
 "tiles that can be rendered dynamically."
@@ -422,6 +402,6 @@ msgstr ""
 "Векторные тайлы MVT это эффективное кодирование данных карты в векторные "
 "тайлы которые могут быть динамически отрисованы."
 
-#: view.py:200
+#: view.py:182
 msgid "Features"
 msgstr "Объекты"

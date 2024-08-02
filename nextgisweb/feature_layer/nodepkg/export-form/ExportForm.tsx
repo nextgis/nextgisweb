@@ -1,7 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Checkbox, Input, Select } from "@nextgisweb/gui/antd";
-import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
+import {
+    ExtentRow,
+    LoadingWrapper,
+    SaveButton,
+} from "@nextgisweb/gui/component";
+import type { ExtentRowProps } from "@nextgisweb/gui/component/extent-row/ExtentRow";
 import { errorModal } from "@nextgisweb/gui/error";
 import type { ApiError } from "@nextgisweb/gui/error/type";
 import { FieldsForm, Form } from "@nextgisweb/gui/fields-form";
@@ -16,8 +21,6 @@ import type { SRSRead } from "@nextgisweb/spatial-ref-sys/type/api";
 import { useExportFeatureLayer } from "../hook/useExportFeatureLayer";
 import type { ExportFeatureLayerOptions } from "../hook/useExportFeatureLayer";
 import type { FeatureLayerField } from "../type";
-
-import { ExtentInput } from "./ExtentInput";
 
 interface ExportFormProps {
     id: number;
@@ -65,6 +68,30 @@ const fieldListToOptions = (fieldList: FeatureLayerField[]) => {
         };
     });
 };
+
+function ExtentInput({
+    value,
+    onChange,
+}: {
+    value?: (null | number)[];
+    onChange?: (val: (null | number)[]) => void;
+} & ExtentRowProps) {
+    const [left, bottom, right, top] = value || [];
+    return (
+        <ExtentRow
+            value={{ left, top, right, bottom }}
+            onChange={({ left, top, right, bottom }) => {
+                if (onChange) {
+                    onChange(
+                        [left, bottom, right, top].map((v) =>
+                            v !== undefined ? v : null
+                        )
+                    );
+                }
+            }}
+        />
+    );
+}
 
 export function ExportForm({ id, pick, multiple }: ExportFormProps) {
     const [staffLoading, setStaffLoading] = useState(true);
