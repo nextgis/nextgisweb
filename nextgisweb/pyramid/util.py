@@ -4,7 +4,11 @@ import string
 from calendar import timegm
 from collections import defaultdict
 from pathlib import Path
+from threading import Thread
+from time import sleep
 from typing import Any, Optional, Sequence, Tuple, Union
+
+from nextgisweb.lib.logging import logger
 
 
 def viewargs(
@@ -115,3 +119,28 @@ def set_output_buffering(request, response, value, *, strict=False):
         response.headers["X-Accel-Buffering"] = "yes" if value else "no"
     elif strict:
         raise RuntimeError("Failed to set output buffering")
+
+
+def restart_delayed(delay: int = 5):
+    try:
+        import uwsgi
+    except ImportError:
+        uwsgi = None
+
+    if uwsgi:
+        impl = uwsgi.reload
+    else:
+        import hupper
+
+        if hupper.is_active():
+            impl = hupper.get_reloader().trigger_reload
+        else:
+            raise NotImplementedError
+
+    def target():
+        logger.info("Reloading in %d seconds...", delay)
+        sleep(delay)
+        impl()
+
+    thr = Thread(target=target, daemon=False)
+    thr.start()
