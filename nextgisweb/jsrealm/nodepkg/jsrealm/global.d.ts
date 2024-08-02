@@ -14,6 +14,8 @@ declare module "@nextgisweb/jsrealm/locale-loader!" {
 
 declare type Nullable<T> = { [K in keyof T]: T[K] | null };
 
+type NullableOmit<T, K extends keyof T> = Omit<T, K> & Nullable<Pick<T, K>>;
+
 /** Current component identity like "jsrealm" or "pyramid" */
 declare const COMP_ID: string;
 
