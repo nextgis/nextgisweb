@@ -54,6 +54,10 @@ class CoreComponent(StorageComponentMixin, Component):
 
             self.locale_available.sort()
 
+        from .fontconfig import FontConfig
+
+        self.fontconfig = FontConfig(self)
+
     def initialize(self):
         super().initialize()
 
@@ -90,6 +94,8 @@ class CoreComponent(StorageComponentMixin, Component):
             gettext("NextGIS geoinformation system")
         )
         self.support_url_view = lambda request: self.options["support_url"]
+
+        self.fontconfig.initialize()
 
     def is_service_ready(self):
         while True:
