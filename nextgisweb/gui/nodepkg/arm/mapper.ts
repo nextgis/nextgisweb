@@ -1,4 +1,4 @@
-import { action, computed, observable, runInAction } from "mobx";
+import { action, computed, observable, runInAction, toJS } from "mobx";
 import type { InputHTMLAttributes } from "react";
 
 import type { ErrorResult, Validator } from "./type";
@@ -180,6 +180,7 @@ export type MapperResult<O, D> = {
 } & {
     $load: (target: O, source: Partial<D>) => void;
     $error: (obj: O) => ErrorResult;
+    $dump: (obj: O) => Partial<D>;
 };
 
 export function mapper<O, D>(
@@ -209,6 +210,14 @@ export function mapper<O, D>(
         }
     };
 
+    const $dump = (obj: object): Partial<D> => {
+        const result: Partial<D> = {};
+        for (const [mv, pn] of iterMV(obj)) {
+            result[pn] = toJS(mv.value);
+        }
+        return result;
+    };
+
     const $error = (obj: object): ErrorResult => {
         for (const [mv] of iterMV(obj)) {
             const err = mv.error;
@@ -219,7 +228,7 @@ export function mapper<O, D>(
     };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return new Proxy({ $load, $error } as any, {
+    return new Proxy({ $load, $error, $dump } as any, {
         get: (target, prop) => {
             if (typeof prop === "string" && !prop.startsWith("$")) {
                 props.push(prop as keyof D);
