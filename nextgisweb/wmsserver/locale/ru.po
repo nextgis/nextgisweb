@@ -1,28 +1,24 @@
-#: model.py:21 nodepkg/service-widget/ServiceWidget.tsx:145 view.py:16
+#: model.py:21 nodepkg/service-widget/ServiceWidget.tsx:119 view.py:16
 msgid "WMS service"
 msgstr "Сервис WMS"
 
-#: nodepkg/service-widget/ServiceWidget.tsx:24
-msgid "Not set"
-msgstr "Не установлен"
-
-#: nodepkg/service-widget/ServiceWidget.tsx:56
+#: nodepkg/service-widget/ServiceWidget.tsx:30
 msgid "Display name"
 msgstr "Наименование"
 
-#: nodepkg/service-widget/ServiceWidget.tsx:61
+#: nodepkg/service-widget/ServiceWidget.tsx:35
 msgid "Keyname"
 msgstr "Ключ"
 
-#: nodepkg/service-widget/ServiceWidget.tsx:66
+#: nodepkg/service-widget/ServiceWidget.tsx:40
 msgid "Min scale"
 msgstr "Мин. масштаб"
 
-#: nodepkg/service-widget/ServiceWidget.tsx:71
+#: nodepkg/service-widget/ServiceWidget.tsx:45
 msgid "Max scale"
 msgstr "Макс. масштаб"
 
-#: nodepkg/service-widget/ServiceWidget.tsx:76
+#: nodepkg/service-widget/ServiceWidget.tsx:50
 msgid "Resource"
 msgstr "Ресурс"
 

@@ -44,6 +44,10 @@ msgstr "Скопиривано в буфер обмена"
 msgid "Copy to clipboard"
 msgstr "Копировать в буфер обмена"
 
+#: nodepkg/component/InputScaleDenom.tsx:6
+msgid "Not set"
+msgstr "Не установлен"
+
 #: nodepkg/component/SaveButton.tsx:19 nodepkg/model-form/ModelForm.tsx:47
 msgid "Save"
 msgstr "Сохранить"
