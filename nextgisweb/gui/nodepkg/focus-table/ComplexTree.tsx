@@ -202,13 +202,13 @@ export interface ComplexTreeProps<
     store: S;
     root?: string;
     environment?: Ref<ComplexTreeEnvironment<I>> | undefined;
-    title?: (item: I) => string;
+    title?: (item: I) => Exclude<NonNullable<ReactNode>, number | boolean>;
     columns?: ComplexTreeColumn<I>[] | [(item: I) => C, ColumnMapping<I, C>];
     actions?: FocusTableActions<I, ComplexTreeEnvironment<I>, undefined>;
-    showErrors: boolean;
-    showColumns: boolean;
-    showActions: boolean;
-    onSelect: (item: I | null) => void;
+    showErrors?: boolean;
+    showColumns?: boolean;
+    showActions?: boolean;
+    onSelect?: (item: I | null) => void;
     onPrimaryAction?: (item: I) => void;
     rootClassName?: string;
 }

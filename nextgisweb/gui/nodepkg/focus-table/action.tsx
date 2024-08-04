@@ -26,6 +26,8 @@ export function deleteItem<I extends FocusTableItem>(): FocusTableAction<I> {
         key: "delete",
         title: gettext("Delete"),
         icon: <RemoveIcon />,
+        placement: "right",
+        danger: true,
         callback: (item, { selected, select, store }) => {
             const next = util.deleteItem(store, item);
             if (selected === item) select(next);

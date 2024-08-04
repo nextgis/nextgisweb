@@ -1,22 +1,26 @@
-import { Fragment, useCallback, useRef, useState } from "react";
+import { Fragment, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 
-import { ActionToolbar } from "@nextgisweb/gui/action-toolbar";
 import { mergeClasses } from "@nextgisweb/gui/util";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { ComplexTree } from "./ComplexTree";
 import type { ComplexTreeEnvironment, ComplexTreeProps } from "./ComplexTree";
 import { ROOT_ITEM } from "./DataProvider";
+import { FocusToolbar } from "./FocusToolbar";
 import { useActionsCallback } from "./hook";
 import type {
+    FocusTableAction,
     FocusTableActions,
     FocusTableItem,
     FocusTableStore,
 } from "./type";
 
-import HideDetailIcon from "@nextgisweb/icon/material/right_panel_close";
+import HideDetailsIcon from "@nextgisweb/icon/material/right_panel_close";
 
 import "./FocusTable.less";
+
+const msgHideDetails = gettext("Hide details");
 
 export interface FocusTablePropsActions<I extends FocusTableItem> {
     tableActions?: FocusTableActions<
@@ -57,12 +61,22 @@ export function FocusTable<
 }: FocusTableProps<I, C, S>) {
     const environmentRef = useRef<ComplexTreeEnvironment<I>>(null);
     const [selected, setSelected] = useState<I | null>(null);
-    const [showDetail, setShowDetail] = useState(false);
+    const [showDetails, setShowDetails] = useState(false);
 
-    const hideDetail = useCallback(() => {
-        setShowDetail(false);
-        environmentRef.current?.select(null);
-    }, [setShowDetail, environmentRef]);
+    const hideDetail = useMemo((): FocusTableAction<
+        I | null,
+        ComplexTreeEnvironment<I>
+    > => {
+        return {
+            key: "hide_details",
+            title: msgHideDetails,
+            icon: <HideDetailsIcon />,
+            callback: (ctx, env) => {
+                setShowDetails(false);
+                env.select(null);
+            },
+        };
+    }, [setShowDetails]);
 
     const getTableActions = useActionsCallback(tableActions, undefined);
     const getItemActionsDetail = useActionsCallback(itemActions, "detail");
@@ -74,18 +88,12 @@ export function FocusTable<
     return (
         <div className={mergeClasses("ngw-gui-focus-table", rootClassName)}>
             <div className="table">
-                {tableActionsArray.length > 0 && (
-                    <ActionToolbar
-                        actions={tableActionsArray.map(
-                            ({ callback, ...props }) => ({
-                                type: "text",
-                                onClick: () =>
-                                    callback(selected, environmentRef.current!),
-                                ...props,
-                            })
-                        )}
-                    />
-                )}
+                <FocusToolbar
+                    environmentRef={environmentRef}
+                    actions={tableActionsArray}
+                    selected={selected}
+                    hideEmpty
+                />
                 <div className="items">
                     <ComplexTree<I, C, S>
                         environment={environmentRef}
@@ -94,38 +102,22 @@ export function FocusTable<
                         title={title}
                         columns={columns}
                         actions={getItemActionsTree}
-                        showColumns={!showDetail}
-                        showActions={!showDetail}
+                        showColumns={!showDetails}
+                        showActions={!showDetails}
                         showErrors={true}
                         onSelect={setSelected}
-                        onPrimaryAction={() => setShowDetail(true)}
+                        onPrimaryAction={() => setShowDetails(true)}
                     />
                 </div>
             </div>
-            {showDetail && selected && environmentRef.current && (
+            {showDetails && selected && environmentRef.current && (
                 <div className="detail">
-                    {itemActionsArray.length > 0 && (
-                        <ActionToolbar
-                            actions={[
-                                {
-                                    type: "text",
-                                    icon: <HideDetailIcon />,
-                                    onClick: hideDetail,
-                                },
-                            ]}
-                            rightActions={itemActionsArray.map(
-                                ({ callback, ...props }) => ({
-                                    type: "text",
-                                    onClick: () =>
-                                        callback(
-                                            selected,
-                                            environmentRef.current!
-                                        ),
-                                    ...props,
-                                })
-                            )}
-                        />
-                    )}
+                    <FocusToolbar
+                        actions={[hideDetail, ...itemActionsArray]}
+                        environmentRef={environmentRef}
+                        selected={selected}
+                        hideEmpty
+                    />
                     <Fragment key={environmentRef.current.indexFor(selected)}>
                         {renderDetail({ item: selected })}
                     </Fragment>

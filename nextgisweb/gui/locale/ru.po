@@ -162,6 +162,10 @@ msgstr "Необходимо указать значение"
 msgid "The value entered is not valid"
 msgstr "Введенное значение некорректно"
 
+#: nodepkg/focus-table/FocusTable.tsx:23
+msgid "Hide details"
+msgstr "Скрыть детали"
+
 #: nodepkg/focus-table/action.tsx:13
 msgid "Add"
 msgstr "Добавить"

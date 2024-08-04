@@ -14,13 +14,13 @@ export interface FocusTableStore<I extends FocusTableItem> {
 
 export interface FocusTableAction<
     C,
-    E = NonNullable<C> extends FocusTableItem
-        ? ComplexTreeEnvironment<NonNullable<C>>
-        : never,
+    E = ComplexTreeEnvironment<NonNullable<C>>,
 > {
     key: string;
     title: string;
     icon?: ReactNode;
+    placement?: "left" | "right";
+    danger?: boolean;
     callback: (ctx: C, env: E) => void;
 }
 
