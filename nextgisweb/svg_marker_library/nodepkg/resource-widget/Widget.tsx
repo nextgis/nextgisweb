@@ -74,8 +74,8 @@ export const Widget: EditorWidgetComponent<EditorWidgetProps<Store>> = observer(
                         </Space>
                     </div>
                 ) : (
-                    <div>
-                        <ActionToolbar actions={actions} />
+                    <>
+                        <ActionToolbar pad borderBlockEnd actions={actions} />
                         <EdiTable
                             store={store}
                             columns={columns}
@@ -83,12 +83,13 @@ export const Widget: EditorWidgetComponent<EditorWidgetProps<Store>> = observer(
                             showHeader={false}
                             parentHeight
                         />
-                    </div>
+                    </>
                 )}
             </div>
         );
     }
 );
 
+Widget.displayName = "Widget";
 Widget.title = gettext("SVG marker library");
 Widget.activateOn = { update: true };

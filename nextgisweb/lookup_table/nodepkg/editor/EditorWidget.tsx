@@ -117,6 +117,8 @@ export const EditorWidget: EditorWidgetComponent<
         <div className="ngw-lookup-table-editor">
             {contextHolder}
             <ActionToolbar
+                pad
+                borderBlockEnd
                 actions={[
                     () => (
                         <Upload

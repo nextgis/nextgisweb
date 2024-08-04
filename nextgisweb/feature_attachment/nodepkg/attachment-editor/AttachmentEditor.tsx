@@ -107,7 +107,7 @@ const AttachmentEditor = observer(
 
         return (
             <div className="ngw-feature-attachment-editor">
-                <ActionToolbar actions={actions} actionProps={{}} />
+                <ActionToolbar pad borderBlockEnd actions={actions} />
                 <Upload {...props}>
                     <Table
                         rowKey={(record) => {
@@ -201,4 +201,5 @@ const AttachmentEditor = observer(
     }
 );
 
+AttachmentEditor.displayName = "AttachmentEditor";
 export default AttachmentEditor;

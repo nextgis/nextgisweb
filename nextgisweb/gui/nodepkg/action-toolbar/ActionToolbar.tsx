@@ -1,3 +1,4 @@
+import { theme } from "antd";
 import {
     Fragment,
     forwardRef,
@@ -9,6 +10,7 @@ import {
 import type { ForwardedRef, ReactElement, Ref } from "react";
 
 import { useFit } from "../hook/useFit";
+import { mergeClasses, mergeStyles } from "../util";
 
 import { useActionToolbar } from "./hook/useActionToolbar";
 import type {
@@ -19,12 +21,17 @@ import type {
 
 import "./ActionToolbar.less";
 
+const { useToken } = theme;
+
 function ActionToolbarInput<
     P extends Record<string, unknown> = Record<string, unknown>,
 >(
     {
         size,
         style,
+        pad = false,
+        borderBlockStart = false,
+        borderBlockEnd = false,
         actions = [],
         rightActions = [],
         actionProps,
@@ -99,6 +106,9 @@ function ActionToolbarInput<
         return [leftActionsList, rightActionsList];
     }, [actions, getAction, rightActions]);
 
+    const { token } = useToken();
+    const border = `1px solid ${token.colorSplit}`;
+
     return (
         <div
             ref={(node) => {
@@ -109,8 +119,13 @@ function ActionToolbarInput<
                     ref.current = node;
                 }
             }}
-            className="action-toolbar"
-            style={style}
+            className={mergeClasses("ngw-gui-action-toolbar", "action-toolbar")}
+            style={mergeStyles(
+                pad && { padding: token.paddingSM },
+                borderBlockStart && { borderBlockStart: border },
+                borderBlockEnd && { borderBlockEnd: border },
+                style
+            )}
         >
             {leftActions_.map((action, index) => (
                 <Fragment key={index}>{action}</Fragment>

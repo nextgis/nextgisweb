@@ -48,7 +48,7 @@ export const Widget: EditorWidgetComponent<EditorWidgetProps<Store>> = observer(
 
         return (
             <div className="ngw-raster-mosaic-resource-widget">
-                <ActionToolbar actions={actions} />
+                <ActionToolbar pad borderBlockEnd actions={actions} />
                 <EdiTable
                     columns={columns}
                     store={store}
@@ -61,5 +61,6 @@ export const Widget: EditorWidgetComponent<EditorWidgetProps<Store>> = observer(
     }
 );
 
+Widget.displayName = "Widget";
 Widget.title = gettext("Rasters");
 Widget.activateOn = { update: true };

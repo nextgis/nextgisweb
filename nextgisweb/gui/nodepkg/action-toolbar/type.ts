@@ -33,6 +33,9 @@ export interface ActionToolbarProps<
 > {
     size?: SizeType;
     style?: CSSProperties;
+    pad?: boolean;
+    borderBlockStart?: boolean;
+    borderBlockEnd?: boolean;
     actions?: ActionToolbarAction<P>[];
     rightActions?: ActionToolbarAction<P>[];
     actionProps?: P;
