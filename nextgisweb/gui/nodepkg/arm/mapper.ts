@@ -12,6 +12,7 @@ interface FieldProps {
     type?: "string" | "number";
     required?: boolean;
 }
+
 interface NumberFieldProps {
     min?: number;
     max?: number;
@@ -44,7 +45,7 @@ export type CProps<V, E = ExtraProps> = {
     onChange?: OnChange<V>;
     status?: "error";
     extraProps?: E;
-} & Omit<InputHTMLAttributes<V>, "value" | "onChange">;
+} & Pick<InputHTMLAttributes<V>, "min" | "max" | "minLength" | "maxLength">;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export class MappedValue<V = any, O = any, P extends string = string> {
@@ -117,10 +118,10 @@ export class MappedValue<V = any, O = any, P extends string = string> {
             onChange: this.setter,
             status: this.error ? "error" : undefined,
             // HTML validation props
-            max,
-            min,
-            maxLength,
-            minLength,
+            ...(min !== undefined ? { min } : {}),
+            ...(max !== undefined ? { max } : {}),
+            ...(minLength !== undefined ? { minLength } : {}),
+            ...(maxLength !== undefined ? { maxLength } : {}),
         };
         if (this.prop.extraProps) {
             cprops.extraProps = this.prop.extraProps;
