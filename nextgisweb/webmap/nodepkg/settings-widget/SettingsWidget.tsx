@@ -13,6 +13,8 @@ import type {
 import { SrsSelect } from "@nextgisweb/spatial-ref-sys/srs-select/SrsSelect";
 import type { WebMapRead } from "@nextgisweb/webmap/type/api";
 
+import { SelectLegendSymbols } from "../component";
+
 import type { SettingStore } from "./SettingStore";
 
 type AnnotationType = WebMapRead["annotation_default"];
@@ -32,12 +34,6 @@ const msgDefault = gettext("Default");
 const [msgInitExtentHelp, msgConstrExtentHelp] = [
     gettext("Web map will start at this extent"),
     gettext("Web map will not allow to move outside of this extent"),
-];
-
-const legendSymbolsOptions = [
-    { value: "expand", label: gettext("Expand") },
-    { value: "collapse", label: gettext("Collapse") },
-    { value: "disable", label: gettext("Disable") },
 ];
 
 const annotationOptions: { value: AnnotationType; label: string }[] = [
@@ -70,14 +66,12 @@ export const SettingsWidget: EditorWidgetComponent<
                 />
             </Lot>
             <Lot label={msgLegend}>
-                <Select
+                <SelectLegendSymbols
                     value={store.legendSymbols}
                     onChange={(v) => {
                         store.update({ legendSymbols: v });
                     }}
-                    placeholder={msgDefault}
                     style={{ width: "100%" }}
-                    options={legendSymbolsOptions}
                     allowClear
                 />
             </Lot>
