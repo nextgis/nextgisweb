@@ -1,5 +1,6 @@
 export { AutoCompleteHoneypot } from "./AutoCompleteHoneypot";
 export { ContentBox } from "./ContentBox";
+export { InputOpacity } from "./InputOpacity";
 export { LoadingWrapper } from "./LoadingWrapper";
 export { SaveButton } from "./SaveButton";
 export { TemplateLink } from "./TemplateLink";
