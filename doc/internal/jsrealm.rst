@@ -201,10 +201,9 @@ component packages provides the following features:
 3. Support of CSS imports like :code:`import "./resource.css"`.
 
 The ``external`` module delivers prebuilt libraries which are primarily used by
-old-style JavaScript code. Dojo  (``dojo``, ``dijit``, ``dojox``), ``dgrid``,
-``codemirror``, etc. libraries are delivered by this module. Before NextGIS Web
-was integrated with Webpack and Node, these libraries were included in NextGIS
-Web source tree.
+old-style JavaScript code. Dojo  (``dojo``, ``dijit``, ``dojox``), libraries are
+delivered by this module. Before NextGIS Web was integrated with Webpack and
+Node, these libraries were included in NextGIS Web source tree.
 
 The ``stylesheet`` module delivers compiled Less stylesheets and some fonts
 which are installed from NPM registry. Previously fonts were also included in

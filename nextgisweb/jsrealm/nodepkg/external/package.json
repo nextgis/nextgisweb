@@ -3,7 +3,6 @@
     "version": "0.0.0",
     "type": "module",
     "dependencies": {
-        "dgrid": "SitePen/dgrid#v0.3.21",
         "dijit": "1.16.x",
         "dojo": "1.16.x",
         "dojox": "1.16.x",
@@ -22,7 +21,6 @@
             "external-ol": "webpack.external-ol.cjs"
         },
         "externals": [
-            "dgrid",
             "dijit",
             "dojo",
             "dojox",

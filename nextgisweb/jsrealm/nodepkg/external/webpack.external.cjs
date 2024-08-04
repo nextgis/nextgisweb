@@ -67,12 +67,6 @@ addPackage("put-selector", {
     from: "put.js",
 });
 
-addPackage("dgrid", {
-    globOptions: {
-        ignore: ["**/test/**", "**/demos/**", "**/doc/**"],
-    },
-});
-
 addPackage("handlebars", {
     from: "dist/handlebars.min.js",
     to: "handlebars.js",
