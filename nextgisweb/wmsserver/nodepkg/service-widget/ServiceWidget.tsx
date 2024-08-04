@@ -68,6 +68,7 @@ export const ServiceWidget: EditorWidgetComponent<
             tableActions: [
                 pickToFocusTable(
                     async (res) => {
+                        const resourceId = res.resource.id;
                         if (
                             res.resource.cls.endsWith("_style") &&
                             res.resource.parent
@@ -78,7 +79,7 @@ export const ServiceWidget: EditorWidgetComponent<
                             ).get({ signal: makeSignal() });
                         }
                         return new Layer(store, {
-                            resource_id: res.resource.id,
+                            resource_id: resourceId,
                             display_name: res.resource.display_name,
                             keyname: generateResourceKeyname(res.resource),
                             min_scale_denom: null,
