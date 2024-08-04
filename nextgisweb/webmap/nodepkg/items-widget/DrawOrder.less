@@ -1,0 +1,22 @@
+.ngw-webmap-items-widget-draw-order-table {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+
+    .items {
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+    }
+}
+
+.ngw-webmap-items-widget-draw-order-position {
+    display: inline-block;
+    margin-inline-end: 1ch;
+    width: var(--position-width);
+    text-align: right;
+
+    &::after {
+        content: ".";
+    }
+}

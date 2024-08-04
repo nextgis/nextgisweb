@@ -24,7 +24,7 @@ from .util import webmap_items_to_tms_ids_list
 class ItemWidget(Widget):
     resource = WebMap
     operation = ("create", "update")
-    amdmod = "ngw-webmap/ItemWidget"
+    amdmod = "@nextgisweb/webmap/items-widget"
 
 
 class SettingsWidget(Widget):
