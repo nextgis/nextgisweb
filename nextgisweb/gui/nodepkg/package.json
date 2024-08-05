@@ -2,8 +2,12 @@
     "name": "@nextgisweb/gui",
     "version": "0.0.0",
     "type": "module",
-    "sideEffects": ["*.css", "*.less"],
+    "sideEffects": [
+        "*.css",
+        "*.less"
+    ],
     "dependencies": {
+        "@ngneat/falso": "^7.2.0",
         "@ckeditor/ckeditor5-react": "6.0.0",
         "@codemirror/commands": "^6.2.1",
         "@codemirror/lang-css": "^6.0.2",
@@ -16,18 +20,8 @@
         "@codemirror/language": "^6.6.0",
         "@codemirror/search": "^6.2.3",
         "@codemirror/view": "^6.9.0",
-        "@types/dojo": "^1.9.47",
-        "@types/react": "18.2.20",
-        "@types/react-dom": "18.2.7",
-        "@types/papaparse": "^5.3.14",
+
         "antd": "5.19.1",
-        "dayjs": "^1.11.9",
-        "mobx": "^6.10.0",
-        "mobx-react-lite": "^4.0.5",
-        "react": "18.2.0",
-        "react-dom": "18.2.0",
-        "react-wrap-balancer": "^1.1.0",
-        "papaparse": "^5.4.1",
         "react-complex-tree": "^2.3.2"
     }
 }

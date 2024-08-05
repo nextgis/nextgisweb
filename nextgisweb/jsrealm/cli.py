@@ -110,6 +110,20 @@ def install(
         comp_id: str(pkginfo.comp_path(comp_id).relative_to(cwd)) for comp_id in pkginfo.components
     }
 
+    if debug:
+        # Collect dependencies to provide auto-imports in the IDE To use package
+        # dependencies, ensure `commonDependencies: true` is included in the
+        # `nextgisweb` section of the module's package.json
+        peer_dependencies = package_json["peerDependencies"] = {}
+        for ppath in npkgs.values():
+            package_data = json.loads((ppath / "package.json").read_text())
+            if (
+                (package_nextgisweb := package_data.get("nextgisweb"))
+                and (package_dependencies := package_data.get("dependencies"))
+                and package_nextgisweb.get("commonDependencies")
+            ):
+                peer_dependencies.update({k: "*" for k in package_dependencies.keys()})
+
     def language(lang):
         nplurals, plural = PLURALS.get(lang, PLURALS.get(lang.split("-")[0]))
         return dict(code=lang, nplurals=nplurals, plural=plural)
