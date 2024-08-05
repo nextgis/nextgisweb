@@ -84,8 +84,5 @@ class LayersAttr(SAttribute, apitype=True):
         srlzr.obj.layers = [Layer(**to_builtins(obj)) for obj in value]
 
 
-class ServiceSerializer(Serializer, apitype=True):
-    identity = Service.identity
-    resclass = Service
-
+class ServiceSerializer(Serializer, resource=Service):
     layers = LayersAttr(read=ServiceScope.connect, write=ServiceScope.configure, required=True)

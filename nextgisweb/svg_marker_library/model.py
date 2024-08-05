@@ -157,10 +157,7 @@ class FilesAttr(SAttribute, apitype=True):
             srlzr.obj.files.append(svg_marker)
 
 
-class SVGMarkerLibrarySerializer(Serializer, apitype=True):
-    identity = SVGMarkerLibrary.identity
-    resclass = SVGMarkerLibrary
-
+class SVGMarkerLibrarySerializer(Serializer, resource=SVGMarkerLibrary):
     archive = ArchiveAttr(read=None, write=ResourceScope.update)
     files = FilesAttr(read=ResourceScope.read, write=ResourceScope.update)
 

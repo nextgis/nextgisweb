@@ -431,10 +431,7 @@ class RootItemAttr(SAttribute, apitype=True):
         value.to_model(srlzr.obj.root_item)
 
 
-class WebMapSerializer(Serializer, apitype=True):
-    identity = WebMap.identity
-    resclass = WebMap
-
+class WebMapSerializer(Serializer, resource=WebMap):
     extent_left = SColumn(read=ResourceScope.read, write=ResourceScope.update)
     extent_right = SColumn(read=ResourceScope.read, write=ResourceScope.update)
     extent_bottom = SColumn(read=ResourceScope.read, write=ResourceScope.update)

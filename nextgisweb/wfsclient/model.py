@@ -408,10 +408,7 @@ class VersionAttr(SColumn, apitype=True):
     ctypes = CRUTypes(VersionEnum, VersionEnum, VersionEnum)
 
 
-class WFSConnectionSerializer(Serializer, apitype=True):
-    identity = WFSConnection.identity
-    resclass = WFSConnection
-
+class WFSConnectionSerializer(Serializer, resource=WFSConnection):
     path = PathAttr(read=ConnectionScope.read, write=ConnectionScope.write)
     version = VersionAttr(read=ConnectionScope.read, write=ConnectionScope.write)
     username = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
@@ -548,10 +545,7 @@ class FieldsAttr(SAttribute, apitype=True):
                 raise ForbiddenError()
 
 
-class WFSLayerSerializer(Serializer, apitype=True):
-    identity = WFSLayer.identity
-    resclass = WFSLayer
-
+class WFSLayerSerializer(Serializer, resource=WFSLayer):
     connection = SResource(read=ResourceScope.read, write=ResourceScope.update)
     layer_name = SColumn(read=ResourceScope.read, write=ResourceScope.update)
     column_geom = SColumn(read=ResourceScope.read, write=ResourceScope.update)

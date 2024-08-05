@@ -35,10 +35,7 @@ class BasemapLayer(Base, Resource):
         return isinstance(parent, ResourceGroup)
 
 
-class BasemapLayerSerializer(Serializer, apitype=True):
-    identity = BasemapLayer.identity
-    resclass = BasemapLayer
-
+class BasemapLayerSerializer(Serializer, resource=BasemapLayer):
     url = SColumn(read=DataScope.read, write=DataScope.write)
     qms = SColumn(read=DataScope.read, write=DataScope.write)
     copyright_text = SColumn(read=DataScope.read, write=DataScope.write)

@@ -419,10 +419,7 @@ class ColorInterpretation(SAttribute, apitype=True):
         ]
 
 
-class RasterLayerSerializer(Serializer, apitype=True):
-    identity = RasterLayer.identity
-    resclass = RasterLayer
-
+class RasterLayerSerializer(Serializer, resource=RasterLayer):
     srs = SRelationship(read=ResourceScope.read, write=ResourceScope.update)
 
     xsize = SColumn(read=ResourceScope.read)

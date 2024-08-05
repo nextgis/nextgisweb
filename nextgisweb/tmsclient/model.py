@@ -115,10 +115,7 @@ class SchemeAttr(SColumn, apitype=True):
     ctypes = CRUTypes(Union[Scheme, None], Scheme, Union[Scheme, None])
 
 
-class ConnectionSerializer(Serializer, apitype=True):
-    identity = Connection.identity
-    resclass = Connection
-
+class ConnectionSerializer(Serializer, resource=Connection):
     url_template = UrlTemplateAttr(read=ConnectionScope.read, write=ConnectionScope.write)
     apikey = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
     apikey_param = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
@@ -305,10 +302,7 @@ class LayerNameAttr(SColumn, apitype=True):
         super().set(srlzr, value, create=create)
 
 
-class LayerSerializer(Serializer, apitype=True):
-    identity = Layer.identity
-    resclass = Layer
-
+class LayerSerializer(Serializer, resource=Layer):
     connection = SResource(read=ResourceScope.read, write=ResourceScope.update)
     layer_name = LayerNameAttr(read=ResourceScope.read, write=ResourceScope.update)
     tilesize = SColumn(read=ResourceScope.read, write=ResourceScope.update)

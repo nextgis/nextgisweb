@@ -30,8 +30,5 @@ class ItemsAttr(SAttribute, apitype=True):
         srlzr.obj.val = value
 
 
-class LookupTableSerializer(Serializer, apitype=True):
-    identity = LookupTable.identity
-    resclass = LookupTable
-
+class LookupTableSerializer(Serializer, resource=LookupTable):
     items = ItemsAttr(read=ResourceScope.read, write=ResourceScope.update)

@@ -559,10 +559,7 @@ class ScopesAttr(SAttribute, apitype=True):
         return list(srlzr.obj.scope.keys())
 
 
-class ResourceSerializer(Serializer, apitype=True):
-    identity = Resource.identity
-    resclass = Resource
-
+class ResourceSerializer(Serializer, resource=Resource):
     id = SColumn(read=ResourceScope.read, write=None)
     cls = ClsAttr(read=ResourceScope.read, write=None, required=False)
     creation_date = SColumn(read=ResourceScope.read, write=None)

@@ -817,10 +817,7 @@ class DeleteAllFeaturesAttr(SAttribute, apitype=True):
             srlzr.obj.feature_delete_all()
 
 
-class VectorLayerSerializer(Serializer, apitype=True):
-    identity = VectorLayer.identity
-    resclass = VectorLayer
-
+class VectorLayerSerializer(Serializer, resource=VectorLayer):
     srs = SRelationship(read=ResourceScope.read, write=ResourceScope.update)
 
     source = SourceAttr(write=DataScope.write)

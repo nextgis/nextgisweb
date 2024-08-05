@@ -27,14 +27,44 @@ class CRUTypes(Struct, frozen=True):
 class Serializer:
     registry: ClassVar[Mapping[str, Type[Serializer]]]
     identity: ClassVar[str]
-    resclass: ClassVar[model.Resource]
+    resclass: ClassVar[Type[model.Resource]]
     proptab: ClassVar[Tuple[Tuple[str, SAttribute], ...]]
     apitype: ClassVar[bool]
 
-    def __init_subclass__(cls, apitype: bool = False):
+    def __init_subclass__(
+        cls,
+        *,
+        resource: Union[Type[model.Resource], None] = None,
+        apitype: Union[bool, None] = None,
+    ):
         super().__init_subclass__()
+        if resource:
+            assert apitype is None
+            assert not hasattr(cls, "resclass")
+
+            cls.resclass = resource
+            cls.apitype = True
+
+            if not hasattr(cls, "identity"):
+                cls.identity = resource.identity
+
+        else:
+            assert hasattr(cls, "resclass")
+            cls.apitype = apitype or False
+
+            if (
+                cls.apitype
+                and issubclass(cls.resclass, model.Resource)
+                and cls.identity == cls.resclass.identity
+            ):
+                warn(
+                    f"Migrate {cls.__name__} to resource kwarg, which is "
+                    "available since nextgisweb >= 4.9.0.dev6.",
+                    DeprecationWarning,
+                    stacklevel=3,
+                )
+
         cls.check_class_name()
-        cls.apitype = apitype
 
         proptab = []
         for pn, pv in cls.__dict__.items():

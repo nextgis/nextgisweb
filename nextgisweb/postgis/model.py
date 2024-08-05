@@ -210,10 +210,7 @@ class PostgisConnection(Base, Resource):
             conn.close()
 
 
-class PostgisConnectionSerializer(Serializer, apitype=True):
-    identity = PostgisConnection.identity
-    resclass = PostgisConnection
-
+class PostgisConnectionSerializer(Serializer, resource=PostgisConnection):
     hostname = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
     port = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
     username = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
@@ -552,10 +549,7 @@ class FieldsAttr(SAttribute, apitype=True):
                 raise ForbiddenError()
 
 
-class PostgisLayerSerializer(Serializer, apitype=True):
-    identity = PostgisLayer.identity
-    resclass = PostgisLayer
-
+class PostgisLayerSerializer(Serializer, resource=PostgisLayer):
     connection = SResource(read=ResourceScope.read, write=ResourceScope.update)
     schema = SColumn(read=ResourceScope.read, write=ResourceScope.update)
     table = SColumn(read=ResourceScope.read, write=ResourceScope.update)

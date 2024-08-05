@@ -84,8 +84,5 @@ class CollectionsAttr(SAttribute, apitype=True):
                 srlzr.obj.collections.remove(co)
 
 
-class ServiceSerializer(Serializer, apitype=True):
-    identity = Service.identity
-    resclass = Service
-
+class ServiceSerializer(Serializer, resource=Service):
     collections = CollectionsAttr(read=ServiceScope.connect, write=ServiceScope.configure)

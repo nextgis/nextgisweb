@@ -193,10 +193,7 @@ class CapCacheAttr(SAttribute, apitype=True):
             srlzr.obj.capcache_clear()
 
 
-class ConnectionSerializer(Serializer, apitype=True):
-    identity = Connection.identity
-    resclass = Connection
-
+class ConnectionSerializer(Serializer, resource=Connection):
     url = UrlAttr(read=ConnectionScope.read, write=ConnectionScope.write)
     version = VersionAttr(read=ConnectionScope.read, write=ConnectionScope.write)
     username = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
@@ -309,10 +306,7 @@ class VendorParamsAttr(SColumn, apitype=True):
     ctypes = CRUTypes(Dict[str, str], Dict[str, str], Dict[str, str])
 
 
-class LayerSerializer(Serializer, apitype=True):
-    identity = Layer.identity
-    resclass = Layer
-
+class LayerSerializer(Serializer, resource=Layer):
     connection = SResource(read=ResourceScope.read, write=ResourceScope.update)
     wmslayers = SColumn(read=ResourceScope.read, write=ResourceScope.update)
     imgformat = SColumn(read=ResourceScope.read, write=ResourceScope.update)

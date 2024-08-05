@@ -402,9 +402,6 @@ class SourceAttr(SAttribute, apitype=True):
         srlzr.obj.maxy = _maxy
 
 
-class TilesetSerializer(Serializer, apitype=True):
-    identity = Tileset.identity
-    resclass = Tileset
-
+class TilesetSerializer(Serializer, resource=Tileset):
     srs = SRelationship(read=ResourceScope.read, write=ResourceScope.update)
     source = SourceAttr(write=DataScope.write)
