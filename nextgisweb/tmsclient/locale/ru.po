@@ -1,115 +1,84 @@
-#: amd/ngw-tmsclient/ConnectionWidget.js:42
-#: amd/ngw-tmsclient/template/LayerWidget.hbs:10 model.py:45
+#: model.py:45 nodepkg/tmsclient-connection/TmsClientConnectionWidget.tsx:116
+#: nodepkg/tmsclient-layer/TmsClientLayerWidget.tsx:122
 msgid "TMS connection"
 msgstr "Соединение TMS"
-
-#: amd/ngw-tmsclient/LayerWidget.js:42 model.py:158
-msgid "TMS layer"
-msgstr "Слой TMS"
-
-#: amd/ngw-tmsclient/LayersDialog.js:25
-msgid "Select layer"
-msgstr "Выбрать слой"
-
-#: amd/ngw-tmsclient/LayersDialog.js:75
-msgid "OK"
-msgstr "ОК"
-
-#: amd/ngw-tmsclient/LayersDialog.js:84
-msgid "Cancel"
-msgstr "Отмена"
-
-#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:9
-msgid "Capmode"
-msgstr "Способ"
-
-#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:11
-msgid "Custom"
-msgstr "Настраиваемый"
-
-#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:12
-msgid "NextGIS geoservices"
-msgstr "Геосервисы NextGIS"
-
-#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:20
-msgid "URL template"
-msgstr "Шаблон URL"
-
-#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:26
-msgid "API key"
-msgstr "Ключ API"
-
-#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:32
-msgid "API key param"
-msgstr "Параметр ключа API"
-
-#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:38
-msgid "Username"
-msgstr "Пользователь"
-
-#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:44
-msgid "Password"
-msgstr "Пароль"
-
-#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:49
-msgid "Scheme"
-msgstr "Схема"
-
-#: amd/ngw-tmsclient/template/ConnectionWidget.hbs:55
-msgid "Skip SSL/TLS certificate verification"
-msgstr "Не проверять сертификат SSL/TLS"
-
-#: amd/ngw-tmsclient/template/LayerWidget.hbs:15
-msgid "Choose a layer"
-msgstr "Выбрать слой"
-
-#: amd/ngw-tmsclient/template/LayerWidget.hbs:25
-msgid "Coordinate system"
-msgstr "Система координат"
-
-#: amd/ngw-tmsclient/template/LayerWidget.hbs:30
-msgid "Layer"
-msgstr "Имя слоя"
-
-#: amd/ngw-tmsclient/template/LayerWidget.hbs:39
-msgid "Min zoom level"
-msgstr "Минимальный уровень масштаба"
-
-#: amd/ngw-tmsclient/template/LayerWidget.hbs:45
-msgid "Max zoom level"
-msgstr "Максимальный уровень масштаба"
-
-#: amd/ngw-tmsclient/template/LayerWidget.hbs:51
-msgid "Left, deg."
-msgstr "Лево, град."
-
-#: amd/ngw-tmsclient/template/LayerWidget.hbs:57
-msgid "Bottom, deg."
-msgstr "Низ, град."
-
-#: amd/ngw-tmsclient/template/LayerWidget.hbs:63
-msgid "Right, deg."
-msgstr "Право, град."
-
-#: amd/ngw-tmsclient/template/LayerWidget.hbs:69
-msgid "Top, deg."
-msgstr "Верх, град."
-
-#: amd/ngw-tmsclient/template/LayerWidget.hbs:75
-msgid "Tile size, px"
-msgstr "Размер тайла, пикс."
 
 #: model.py:106
 msgid "API key required."
 msgstr "API ключ является обязательным."
 
-#: model.py:150
+#: model.py:147
 msgid "Zoom is out of range."
 msgstr "Масштаб вне диапазона"
 
-#: model.py:303
+#: model.py:155 nodepkg/tmsclient-layer/TmsClientLayerWidget.tsx:203
+msgid "TMS layer"
+msgstr "Слой TMS"
+
+#: model.py:300
 msgid "Layer name required."
 msgstr "Имя слоя является обязательным."
+
+#: nodepkg/tmsclient-connection/TmsClientConnectionWidget.tsx:32
+msgid "Type"
+msgstr "Тип"
+
+#: nodepkg/tmsclient-connection/TmsClientConnectionWidget.tsx:44
+msgid "Custom"
+msgstr "Настраиваемый"
+
+#: nodepkg/tmsclient-connection/TmsClientConnectionWidget.tsx:55
+msgid "URL template"
+msgstr "Шаблон URL"
+
+#: nodepkg/tmsclient-connection/TmsClientConnectionWidget.tsx:61
+msgid "Scheme"
+msgstr "Схема"
+
+#: nodepkg/tmsclient-connection/TmsClientConnectionWidget.tsx:72
+msgid "API key"
+msgstr "Ключ API"
+
+#: nodepkg/tmsclient-connection/TmsClientConnectionWidget.tsx:78
+msgid "API key param"
+msgstr "Параметр ключа API"
+
+#: nodepkg/tmsclient-connection/TmsClientConnectionWidget.tsx:85
+msgid "Username"
+msgstr "Пользователь"
+
+#: nodepkg/tmsclient-connection/TmsClientConnectionWidget.tsx:95
+msgid "Password"
+msgstr "Пароль"
+
+#: nodepkg/tmsclient-connection/TmsClientConnectionWidget.tsx:108
+msgid "Skip SSL/TLS certificate verification"
+msgstr "Не проверять сертификат SSL/TLS"
+
+#: nodepkg/tmsclient-layer/TmsClientLayerWidget.tsx:36
+msgid "This connection based on NextGIS Geoservices"
+msgstr "Это подключение к NextGIS Geoservices"
+
+#: nodepkg/tmsclient-layer/TmsClientLayerWidget.tsx:149
+#: nodepkg/tmsclient-layer/TmsClientLayerWidget.tsx:160
+msgid "Layer"
+msgstr "Имя слоя"
+
+#: nodepkg/tmsclient-layer/TmsClientLayerWidget.tsx:168
+msgid "Min zoom level"
+msgstr "Минимальный уровень масштаба"
+
+#: nodepkg/tmsclient-layer/TmsClientLayerWidget.tsx:176
+msgid "Max zoom level"
+msgstr "Максимальный уровень масштаба"
+
+#: nodepkg/tmsclient-layer/TmsClientLayerWidget.tsx:184
+msgid "Tile size"
+msgstr "Размер тайла"
+
+#: nodepkg/tmsclient-layer/TmsClientLayerWidget.tsx:194
+msgid "Extent"
+msgstr "Охват"
 
 #: tile_fetcher.py:36
 msgid "The remote server did not respond in time."

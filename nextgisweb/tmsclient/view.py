@@ -6,13 +6,13 @@ from .model import Connection, Layer
 class ClientWidget(Widget):
     resource = Connection
     operation = ("create", "update")
-    amdmod = "ngw-tmsclient/ConnectionWidget"
+    amdmod = "@nextgisweb/tmsclient/tmsclient-connection"
 
 
 class LayerWidget(Widget):
     resource = Layer
     operation = ("create", "update")
-    amdmod = "ngw-tmsclient/LayerWidget"
+    amdmod = "@nextgisweb/tmsclient/tmsclient-layer"
 
 
 def setup_pyramid(comp, config):
