@@ -1,5 +1,5 @@
 import isEqual from "lodash-es/isEqual";
-import { action, computed, observable, runInAction, toJS } from "mobx";
+import { action, computed, observable, runInAction } from "mobx";
 import type { InputHTMLAttributes } from "react";
 
 import type { ErrorResult, Validator } from "./type";
@@ -52,17 +52,19 @@ export class MappedValue<V = any, O = any, P extends string = string> {
     [MappedValueSymbol] = true;
 
     private readonly owner: O;
-    @observable private accessor _value: V;
     readonly prop: MappedProperty<V, O, P>;
-    private initialValue: V;
+
+    @observable.ref private accessor _value: V;
+    @observable.ref private accessor _initial: V;
 
     constructor(value: V, owner: O, prop: MappedProperty<V, O, P>) {
-        this._value = value;
-        this.initialValue = toJS(value);
         this.owner = owner;
         this.prop = prop;
+        this._value = value;
+        this._initial = value;
     }
 
+    /** Observable for current value */
     @computed get value(): V {
         return this._value;
     }
@@ -74,19 +76,20 @@ export class MappedValue<V = any, O = any, P extends string = string> {
         this.prop.onChange?.(this.owner);
     }
 
-    /**
-     * A regular updates method where the initial state should remain unchanged.
-     */
+    /** Observable for initial value */
+    @computed get initial(): V {
+        return this._initial;
+    }
+
+    /** Bound method to update value */
     @action setter = (value: V): void => {
         this.value = value;
     };
 
-    /**
-     * Initializes the property value and sets the initial value for dirty calculation.
-     */
+    /** Load new value and set this value as initial one */
     @action load = (value: V): void => {
-        this.initialValue = value;
-        this.setter(value);
+        this._value = value;
+        this._initial = value;
     };
 
     @computed get error(): ErrorResult {
@@ -101,15 +104,16 @@ export class MappedValue<V = any, O = any, P extends string = string> {
         return false;
     }
 
+    /** Value is dirty if it's different from its initial value */
     @computed get dirty(): boolean {
-        return !isEqual(toJS(this._value), this.initialValue);
+        return !isEqual(this._value, this._initial);
     }
 
     jsonPart(): { [K in P]: V } {
-        if (!this.prop.property) throw new TypeError("Property not set!");
-        return { [this.prop.property]: this._value } as { [K in P]: V };
+        return { [this.prop.name]: this._value } as { [K in P]: V };
     }
 
+    /** Generate common props for managing state of React & AntD components */
     cprops(): CProps<V> {
         const { max, maxLength, min, minLength } = this.prop
             .validationProps as StringFieldProps & NumberFieldProps;
@@ -130,15 +134,15 @@ export class MappedValue<V = any, O = any, P extends string = string> {
     }
 }
 class MappedProperty<V, O, P extends string = string> {
-    property: P;
+    readonly name: P;
+    readonly validateIf?: ValidateIf<O>;
+    readonly onChange?: OnChange<O>;
     readonly validators: Validator<V, O>[] = [];
-    validateIf?: ValidateIf<O>;
-    onChange?: OnChange<O>;
     readonly validationProps = {} as ValidationProps<V>;
     readonly extraProps?: ExtraProps;
 
-    constructor(property: P, opts: FieldOpts<V, O> & MapperOpts<O>) {
-        this.property = property;
+    constructor(name: P, opts: FieldOpts<V, O> & MapperOpts<O>) {
+        this.name = name;
         const {
             validateIf,
             onChange,
@@ -216,7 +220,7 @@ export function mapper<O, D>(
         for (const v of Object.values(obj)) {
             if (v?.[MappedValueSymbol]) {
                 const mv = v as MappedValue;
-                const pn = mv.prop.property as keyof D;
+                const pn = mv.prop.name as keyof D;
                 if (props.includes(pn)) yield [mv, pn];
             }
         }
@@ -233,7 +237,7 @@ export function mapper<O, D>(
     const $dump = (obj: object): Partial<D> => {
         const result: Partial<D> = {};
         for (const [mv, pn] of iterMV(obj)) {
-            result[pn] = toJS(mv.value);
+            result[pn] = mv.value;
         }
         return result;
     };
