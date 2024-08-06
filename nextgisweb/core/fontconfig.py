@@ -1,6 +1,7 @@
 from io import StringIO
-from os import environ, sep
+from os import environ, remove, sep
 from pathlib import Path
+from shutil import copy2
 from subprocess import check_output
 from textwrap import dedent
 from typing import List
@@ -8,6 +9,8 @@ from typing import List
 from lxml import etree
 from msgspec import Meta, Struct
 from typing_extensions import Annotated
+
+from nextgisweb.core.exception import ValidationError
 
 from .component import CoreComponent
 
@@ -21,7 +24,7 @@ class BaseFont(Struct, kw_only=True):
 
 
 class SystemFont(BaseFont, tag="system", tag_field="type"):
-    pass
+    key: str
 
 
 class CustomFont(BaseFont, tag="custom", tag_field="type"):
@@ -78,6 +81,21 @@ class FontConfig:
             if str(file).startswith(root_prefix):
                 result.append(CustomFont(key=file.name, **kwargs))
             else:
-                result.append(SystemFont(**kwargs))
+                result.append(SystemFont(key=file.name, **kwargs))
 
         return result
+
+    def add_font(self, name: str, path: Path):
+        copy2(path, self.root_path / name)
+
+
+
+    def delete_font(self, font_name: FontKey):
+        custom_fonts = filter(lambda x: isinstance(x, CustomFont), self.enumerate())
+        for font in custom_fonts:
+            if font.key == font_name:
+                font_path = self.root_path / font_name
+                remove(font_path)
+                return
+        raise ValidationError(message="Failed to find the removed font in fontconfig directory")
+

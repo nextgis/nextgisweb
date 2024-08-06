@@ -17,8 +17,8 @@ from nextgisweb.lib.imptool import module_from_stack
 from nextgisweb.auth import Permission
 from nextgisweb.core import CoreComponent, KindOfData
 from nextgisweb.core.exception import NotConfigured, ValidationError
-from nextgisweb.core.fontconfig import CustomFont, FontKey, SystemFont
-from nextgisweb.file_upload import FileUploadRef
+from nextgisweb.core.fontconfig import CustomFont, FontKey, FontPattern, SystemFont
+from nextgisweb.file_upload import FileUpload, FileUploadRef
 from nextgisweb.jsrealm import TSExport
 from nextgisweb.resource import Resource, ResourceScope
 
@@ -274,14 +274,14 @@ def kind_of_data(request) -> AsJSON[Dict[str, str]]:
     return {k: request.translate(v.display_name) for k, v in KindOfData.registry.items()}
 
 
-def font_сread(request) -> AsJSON[List[Union[SystemFont, CustomFont]]]:
+def font_cread(request) -> AsJSON[List[Union[SystemFont, CustomFont]]]:
     """Get information about available fonts"""
     request.require_administrator()
     unordered = request.env.core.fontconfig.enumerate()
     return sorted(unordered, key=lambda i: (not isinstance(i, CustomFont), i.label))
 
 
-class FontСUpdateBody(Struct, kw_only=True):
+class FontCUpdateBody(Struct, kw_only=True):
     add: List[FileUploadRef] = field(default_factory=list)
     remove: List[FontKey] = field(default_factory=list)
 
@@ -291,21 +291,23 @@ class FontCUpdateResponse(Struct, kw_only=True):
     timestamp: float
 
 
-def font_сupdate(request, *, body: FontСUpdateBody) -> FontCUpdateResponse:
+def font_cupdate(request, *, body: FontCUpdateBody) -> FontCUpdateResponse:
     """Add or remove custom fonts"""
 
-    # 1. Удалить шрифты из списка body.remove из core.fontconfig.root_dir,
-    #    проверив, что они там вообще есть, a eсли нет, то ValidationError.
-
-    # 2. Поместить шрифты из body.add с заменой в core.fontconfig.root_dir,
-    #    предварительно проверив, что имена загруженных файлов удовлетворяют
-    #    условиям FontKey. Так же подумать про какой-то разумный лимит на размер
-    #    файла шрифта, будет печально если нам закинут файл на гигабайты тут.
-
-    # Поскольку операции с файловой системой происходят без транзакции, лучше
-    # вначале выполнить все проверки, а потом уже выполнять какие-то действия.
-
     request.require_administrator()
+
+    if len(body.remove) > 0:
+        for font in body.remove:
+            request.env.core.fontconfig.delete_font(font)
+
+
+    if len(body.add) > 0:
+        for fupload_ref in body.add:
+            fupload = FileUpload(id=fupload_ref.id)
+            tested = re.search(FontPattern, fupload.name) and fupload.size <= 10485760
+            if tested:
+                request.env.core.fontconfig.add_font(fupload.name, fupload.data_path)
+
 
     if restarted := (len(body.add) > 0 or len(body.remove) > 0):
         restart_delayed()
@@ -315,17 +317,6 @@ def font_сupdate(request, *, body: FontСUpdateBody) -> FontCUpdateResponse:
         timestamp=datetime.utcnow().timestamp(),
     )
 
-
-# def font_upload(request):
-#     request.require_administrator()
-#     data = request.json
-#     fileupload_id = data.get("file_meta").get("id")
-#     filename = data.get("file_meta").get("name")
-#     fileupload = FileUpload(id=fileupload_id)
-#     copy_(fileupload.data_path, os.path.join("/opt/ngw/data/app/fonts/", filename))
-#     subprocess.run(["fc-cache"], capture_output=True, text=True)
-#     logger.log(msg=request.json , level=1)
-#     return Response("OK", status_code=200)
 
 
 # Component settings machinery
@@ -725,8 +716,8 @@ def setup_pyramid(comp, config):
     config.add_route(
         "pyramid.font",
         "/api/component/pyramid/font",
-        get=font_сread,
-        put=font_сupdate,
+        get=font_cread,
+        put=font_cupdate,
     )
 
     # Methods for customization in components

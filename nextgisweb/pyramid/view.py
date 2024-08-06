@@ -1,6 +1,5 @@
 import os
 import os.path
-import subprocess
 from base64 import b64decode
 from datetime import datetime, timedelta
 from hashlib import md5
@@ -193,12 +192,10 @@ def sysinfo(request):
 @viewargs(renderer="react")
 def fonts(request):
     request.require_administrator()
-    result = subprocess.run(["fc-list", ":", "family", "fullname"], capture_output=True, text=True)
     return dict(
         title=gettext("Fonts"),
         entrypoint="@nextgisweb/pyramid/fonts",
         dynmenu=request.env.pyramid.control_panel,
-        props=dict(items=result.stdout.split("\n")),
     )
 
 
