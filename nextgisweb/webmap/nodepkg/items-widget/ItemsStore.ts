@@ -31,8 +31,10 @@ export class ItemsStore
     @observable.ref accessor dirty = false;
     @observable.ref accessor validate = false;
 
-    readonly items = observableChildren<ItemObject>(null, "parent");
     readonly drawOrderEnabled = drawOrderEnabled.init(false, this);
+    readonly items = observableChildren<ItemObject>(null, "parent", () => {
+        this.markDirty();
+    });
 
     @action load(value: PickMy<WebMapRead>) {
         mapperLoad(this, value);

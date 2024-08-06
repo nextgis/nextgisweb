@@ -22,7 +22,7 @@ type ItemDump<T, D> = Omit<D, "item_type"> & { item_type: T };
 
 const mapperOpts = {
     validateIf: (o: BaseItem) => o.store.validate,
-    onChange: (o: BaseItem) => o.store.markDirty,
+    onChange: (o: BaseItem) => o.store.markDirty(),
 };
 
 const {
@@ -69,7 +69,9 @@ export class Group extends BaseItem<"group", WebMapItemGroupWrite> {
 
     readonly groupExpanded = groupExpanded.init(false, this);
     readonly groupExclusive = groupExclusive.init(false, this);
-    readonly children = observableChildren<ItemObject>(this, "parent");
+    readonly children = observableChildren<ItemObject>(this, "parent", () => {
+        this.store.markDirty();
+    });
 
     constructor(store: ItemsStore, data: ItemData<WebMapItemGroupWrite>) {
         super(store, data);

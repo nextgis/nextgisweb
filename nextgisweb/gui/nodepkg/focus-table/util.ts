@@ -5,7 +5,8 @@ import type { FocusTableItem, FocusTableStore } from "./type";
 
 export function observableChildren<I extends FocusTableItem>(
     parent: I | null,
-    pname: keyof I
+    pname: keyof I,
+    onChange?: () => void
 ): IObservableArray<I> {
     const result = observable.array<I>([]);
     // TODO: Is it OK not to dispose an interception?
@@ -15,6 +16,7 @@ export function observableChildren<I extends FocusTableItem>(
                 // FIXME: How can I tell TS that I[pname] accepts I | null?
                 if (item[pname] !== parent) (item[pname] as I | null) = parent;
             });
+            onChange?.();
         }
         return change;
     });

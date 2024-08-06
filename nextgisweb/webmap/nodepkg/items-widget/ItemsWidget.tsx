@@ -73,7 +73,6 @@ const adapterOptions = sortBy(
     })),
     "value"
 );
-console.log(adapterOptions);
 
 const LayerWidget = observer(({ item }: { item: Layer }) => {
     return (
