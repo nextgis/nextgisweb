@@ -12,4 +12,4 @@ class WFSConnectionWidget(Widget):
 class WFSLayerWidget(Widget):
     resource = WFSLayer
     operation = ("create", "update")
-    amdmod = "ngw-wfsclient/WFSLayerWidget"
+    amdmod = "@nextgisweb/wfsclient/wfsclient-layer"
