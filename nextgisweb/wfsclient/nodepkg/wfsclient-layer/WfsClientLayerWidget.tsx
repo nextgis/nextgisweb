@@ -51,7 +51,7 @@ async function inspectLayerFetch(
 ) {
     const data = await route("wfsclient.connection.inspect.layer", {
         id: connectionId,
-        layer: layer,
+        layer,
     }).get({ signal: options.signal });
     const result: Record<string, string> = {};
     for (const { name, type } of data.fields) {
@@ -165,7 +165,10 @@ export const WfsClientLayerWidget: EditorWidgetComponent<
                 value={store.connection}
                 component={ResourceSelectRef}
                 props={{
-                    pickerOptions: { requireClass: "wfsclient_connection" },
+                    pickerOptions: {
+                        requireClass: "wfsclient_connection",
+                        parentId: store.composite.parent,
+                    },
                     style: { width: "100%" },
                 }}
             />

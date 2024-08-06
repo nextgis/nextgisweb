@@ -34,12 +34,18 @@ export const WfsClientConnectionWidget: EditorWidgetComponent<
                 label={gettext("Username")}
                 component={InputValue}
                 value={store.username}
+                props={{
+                    autoComplete: "new-password",
+                }}
             />
 
             <LotMV
                 label={gettext("Password")}
                 component={PasswordValue}
                 value={store.password}
+                props={{
+                    autoComplete: "new-password",
+                }}
             />
 
             <LotMV

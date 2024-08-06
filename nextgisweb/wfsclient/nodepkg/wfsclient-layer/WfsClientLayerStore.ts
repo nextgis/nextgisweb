@@ -1,9 +1,9 @@
-import isEqual from "lodash-es/isEqual";
-import { action, computed, makeObservable, toJS } from "mobx";
+import { action, computed, observable } from "mobx";
 
 import { mapper, validate } from "@nextgisweb/gui/arm";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import srsSettings from "@nextgisweb/pyramid/settings!spatial_ref_sys";
+import type { Composite } from "@nextgisweb/resource/type";
 import type {
     EditorStore,
     EditorStoreOptions,
@@ -15,11 +15,10 @@ import type {
     WFSLayerUpdate,
 } from "@nextgisweb/wfsclient/type/api";
 
-type MapperConnectionCreate = Omit<
+type MapperConnectionCreate = NullableOmit<
     WFSLayerCreate,
     "connection" | "column_geom" | "layer_name"
-> &
-    Nullable<Pick<WFSLayerRead, "connection" | "column_geom" | "layer_name">>;
+>;
 
 const msgUpdate = gettext("Fields need to be updated due to autodetection");
 
@@ -32,6 +31,8 @@ const {
     fields: fields,
     $load: load,
     $error: error,
+    $dirty: dirty,
+    $dump: dump,
 } = mapper<WfsClientLayerStore, MapperConnectionCreate>({
     validateIf: (o) => o.validate,
     properties: {
@@ -54,12 +55,13 @@ fields.validate((v, s) => {
 });
 
 export class WfsClientLayerStore
-    implements EditorStore<WFSLayerRead, WFSLayerUpdate>
+    implements EditorStore<WFSLayerRead, WFSLayerCreate, WFSLayerUpdate>
 {
     readonly identity = "wfsclient_layer";
     readonly operation: Operation;
+    readonly composite: Composite;
 
-    validate = false;
+    @observable accessor validate = false;
 
     connection = connection.init(null, this);
     layerName = layerName.init("", this);
@@ -68,53 +70,44 @@ export class WfsClientLayerStore
     geometrySrid = geometrySrid.init(null, this);
     fields = fields.init("update", this);
 
-    private _initValue?: WFSLayerRead;
-
-    constructor({ operation }: EditorStoreOptions) {
+    constructor({ operation, composite }: EditorStoreOptions) {
         this.operation = operation;
-        makeObservable(this, {
-            dirty: true,
-            validate: true,
-            load: true,
-            isValid: true,
-        });
+        this.composite = composite;
     }
 
     @action load(value: WFSLayerRead) {
         load(this, value);
         this.fields.value = "keep";
-        this._initValue = { ...value };
     }
 
-    dump(): WFSLayerCreate | undefined {
-        if (this.dirty) return this.deserializeValue;
-    }
+    dump() {
+        if (this.dirty) {
+            const { connection, layer_name, column_geom, ...rest } = dump(this);
 
-    @computed get deserializeValue(): WFSLayerCreate {
-        const result = {
-            ...this.connection.jsonPart(),
-            ...this.columnGeom.jsonPart(),
-            ...this.geometryType.jsonPart(),
-            ...this.geometrySrid.jsonPart(),
-            ...this.layerName.jsonPart(),
-            ...this.fields.jsonPart(),
-            ...(this.operation === "create"
-                ? { srs: srsSettings.default }
-                : {}),
-        };
-        // @ts-expect-error ignore resourceRef with parent
-        return toJS(result);
-    }
+            if (!connection || !layer_name || !column_geom) {
+                throw new Error("Missing required parameters");
+            }
 
-    get dirty(): boolean {
-        if (this.deserializeValue && this._initValue) {
-            return !isEqual(this.deserializeValue, this._initValue);
+            const result: WFSLayerCreate | WFSLayerUpdate = {
+                connection,
+                layer_name,
+                column_geom,
+                ...(this.operation === "create"
+                    ? { srs: srsSettings.default }
+                    : {}),
+                ...rest,
+            };
+
+            return result;
         }
-        return true;
     }
 
-    get isValid(): boolean {
+    @computed get dirty(): boolean {
+        return this.operation === "create" ? true : dirty(this);
+    }
+
+    @computed get isValid(): boolean {
         this.validate = true;
-        return error(this) === false;
+        return !error(this);
     }
 }

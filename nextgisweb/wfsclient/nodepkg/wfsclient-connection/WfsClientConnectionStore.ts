@@ -1,18 +1,20 @@
-import isEqual from "lodash-es/isEqual";
-import { action, computed, observable, toJS } from "mobx";
+import { action, computed, observable } from "mobx";
 
 import { mapper } from "@nextgisweb/gui/arm";
-import type { EditorStore } from "@nextgisweb/resource/type";
+import type {
+    EditorStore,
+    EditorStoreOptions,
+    Operation,
+} from "@nextgisweb/resource/type";
 import type {
     WFSConnectionRead,
     WFSConnectionUpdate,
 } from "@nextgisweb/wfsclient/type/api";
 
-type MapperConnectionCreate = Omit<
+type MapperConnection = NullableOmit<
     WFSConnectionRead,
     "path" | "username" | "password"
-> &
-    Nullable<Pick<WFSConnectionRead, "path" | "username" | "password">>;
+>;
 
 const {
     path,
@@ -21,7 +23,9 @@ const {
     version,
     $load: mapperLoad,
     $error: mapperError,
-} = mapper<WfsClientConnectionStore, MapperConnectionCreate>({
+    $dirty: mapperDirty,
+    $dump: mapperDump,
+} = mapper<WfsClientConnectionStore, MapperConnection>({
     validateIf: (o) => o.validate,
     properties: {
         path: { required: true, url: true },
@@ -32,7 +36,8 @@ const {
 });
 
 export class WfsClientConnectionStore
-    implements EditorStore<WFSConnectionRead, WFSConnectionUpdate>
+    implements
+        EditorStore<WFSConnectionRead, WFSConnectionRead, WFSConnectionUpdate>
 {
     readonly identity = "wfsclient_connection";
 
@@ -41,35 +46,32 @@ export class WfsClientConnectionStore
     password = password.init(null, this);
     version = version.init("2.0.2", this);
 
-    private _initValue?: WFSConnectionRead;
+    readonly operation: Operation;
     @observable accessor validate = false;
+
+    constructor({ operation }: EditorStoreOptions) {
+        this.operation = operation;
+    }
 
     @action load(val: WFSConnectionRead) {
         mapperLoad(this, val);
-        this._initValue = { ...val };
-    }
-
-    @computed get deserializeValue(): WFSConnectionRead {
-        const result = {
-            ...this.path.jsonPart(),
-            ...this.username.jsonPart(),
-            ...this.password.jsonPart(),
-            ...this.version.jsonPart(),
-        } as WFSConnectionRead;
-
-        return toJS(result);
     }
 
     @computed get dirty(): boolean {
-        if (this.deserializeValue && this._initValue) {
-            return !isEqual(this.deserializeValue, this._initValue);
-        }
-        return true;
+        return this.operation === "create" ? true : mapperDirty(this);
     }
 
     dump() {
         if (this.dirty) {
-            return this.deserializeValue;
+            const { path, ...rest } = mapperDump(this);
+            if (!path) {
+                throw new Error("Missing required parameters");
+            }
+            const result: WFSConnectionRead | WFSConnectionUpdate = {
+                path,
+                ...rest,
+            };
+            return result;
         }
     }
 
