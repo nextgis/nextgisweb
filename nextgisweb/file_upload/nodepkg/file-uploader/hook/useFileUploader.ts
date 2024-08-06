@@ -150,6 +150,7 @@ export function useFileUploader<M extends boolean = false>({
         meta,
         abort,
         props,
+        fileList,
         upload,
         setMeta,
         uploading,

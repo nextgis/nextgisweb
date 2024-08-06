@@ -10,6 +10,7 @@ const msgUploadButton = gettext("Upload");
 
 export function FileUploaderButton<M extends boolean = false>({
     showProgressInDocTitle,
+    showUploadList,
     setFileMeta,
     uploadText = msgUploadButton,
     inputProps,
@@ -18,8 +19,9 @@ export function FileUploaderButton<M extends boolean = false>({
     multiple = false as M,
     accept,
 }: FileUploaderProps<M>) {
-    const { uploading, props } = useFileUploader({
+    const { uploading, props, fileList } = useFileUploader({
         showProgressInDocTitle,
+        showUploadList,
         setFileMeta,
         inputProps,
         fileMeta,
@@ -29,7 +31,7 @@ export function FileUploaderButton<M extends boolean = false>({
     });
 
     return (
-        <Upload {...props}>
+        <Upload {...props} fileList={fileList} showUploadList={true}>
             <Button icon={<InboxOutlined />} loading={uploading}>
                 {uploadText}
             </Button>
