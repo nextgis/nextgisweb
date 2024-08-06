@@ -1,26 +1,6 @@
-#: amd/ngw-wfsclient/WFSConnectionWidget.js:34 model.py:127
-msgid "WFS connection"
-msgstr "Соединение WFS"
-
-#: amd/ngw-wfsclient/WFSLayerWidget.js:46 model.py:434
+#: amd/ngw-wfsclient/WFSLayerWidget.js:46 model.py:431
 msgid "WFS layer"
 msgstr "Слой WFS"
-
-#: amd/ngw-wfsclient/template/WFSConnectionWidget.hbs:10
-msgid "WFS path"
-msgstr "Адрес WFS"
-
-#: amd/ngw-wfsclient/template/WFSConnectionWidget.hbs:16
-msgid "Username"
-msgstr "Пользователь"
-
-#: amd/ngw-wfsclient/template/WFSConnectionWidget.hbs:22
-msgid "Password"
-msgstr "Пароль"
-
-#: amd/ngw-wfsclient/template/WFSConnectionWidget.hbs:27
-msgid "Version"
-msgstr "Версия"
 
 #: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:8
 msgid "Select WFS connection"
@@ -82,3 +62,23 @@ msgstr "Оставить"
 #: amd/ngw-wfsclient/template/WFSLayerWidget.hbs:54
 msgid "Reload"
 msgstr "Загрузить"
+
+#: model.py:127 nodepkg/wfsclient-connection/WfsClientConnectionWidget.tsx:61
+msgid "WFS connection"
+msgstr "Соединение WFS"
+
+#: nodepkg/wfsclient-connection/WfsClientConnectionWidget.tsx:28
+msgid "URL"
+msgstr "URL"
+
+#: nodepkg/wfsclient-connection/WfsClientConnectionWidget.tsx:35
+msgid "Username"
+msgstr "Пользователь"
+
+#: nodepkg/wfsclient-connection/WfsClientConnectionWidget.tsx:42
+msgid "Password"
+msgstr "Пароль"
+
+#: nodepkg/wfsclient-connection/WfsClientConnectionWidget.tsx:49
+msgid "Version"
+msgstr "Версия"
