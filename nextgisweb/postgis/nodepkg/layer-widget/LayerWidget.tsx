@@ -2,15 +2,9 @@ import unique from "lodash-es/uniq";
 import { observer } from "mobx-react-lite";
 import { useCallback, useMemo, useState } from "react";
 
-import {
-    AutoComplete,
-    Input,
-    InputNumber,
-    Select,
-    Spin,
-} from "@nextgisweb/gui/antd";
-import type { AutoCompleteProps } from "@nextgisweb/gui/antd";
+import { InputNumber, Select } from "@nextgisweb/gui/antd";
 import { LotMV } from "@nextgisweb/gui/arm";
+import { AutoCompleteInput } from "@nextgisweb/gui/component";
 import { Area } from "@nextgisweb/gui/mayout";
 import { route } from "@nextgisweb/pyramid/api";
 import { useCache } from "@nextgisweb/pyramid/hook";
@@ -22,8 +16,6 @@ import type {
 } from "@nextgisweb/resource/type";
 
 import type { LayerStore } from "./LayerStore";
-
-import { LoadingOutlined } from "@ant-design/icons";
 
 const msgConnection = gettext("Connection");
 const msgSchema = gettext("Schema");
@@ -63,20 +55,6 @@ async function inspTabFetch(
         if (/^GEOMETRY\(/i.test(type)) result.geom.push(name);
     }
     return result;
-}
-
-interface AutoCompleteInputProps extends AutoCompleteProps {
-    loading?: boolean;
-}
-
-const spinner = <Spin indicator={<LoadingOutlined spin />} size="small" />;
-
-function AutoCompleteInput({ loading, ...props }: AutoCompleteInputProps) {
-    return (
-        <AutoComplete {...props}>
-            <Input suffix={loading ? spinner : <span />} />
-        </AutoComplete>
-    );
 }
 
 type FocusedField = "schema" | "table" | "columnId" | "columnGeom" | null;
