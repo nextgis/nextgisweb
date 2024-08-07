@@ -33,7 +33,7 @@ export function dpgettextf(
     if (en) {
         const translation = message;
         const newTemplate = compileREJ(translation);
-        return newTemplate(translation);
+        return newTemplate(...params);
     }
 
     const translation = lookup(domain, context, message);
