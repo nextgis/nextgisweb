@@ -12,7 +12,9 @@ const preprocessFormatNG = (input: string): string => {
     return output;
 };
 
-const processEscaped = (result: string | number | ReactNode) => {
+const processEscaped = (
+    result: string | number | ReactNode
+): string | ReactNode => {
     if (typeof result === "string" || typeof result === "number") {
         return String(result).replaceAll("{{", "{").replaceAll("}}", "}");
     } else {
@@ -20,7 +22,7 @@ const processEscaped = (result: string | number | ReactNode) => {
     }
 };
 
-export default (input: string, concatenate: boolean = true) => {
+const compile = (input: string) => {
     const string = preprocessFormatNG(input);
 
     const numMatches = string.match(numsRegexp);
@@ -54,7 +56,7 @@ export default (input: string, concatenate: boolean = true) => {
             });
 
             const escapedResult = result.map(processEscaped);
-            return concatenate ? escapedResult.join("") : escapedResult;
+            return escapedResult;
         };
     }
 
@@ -83,9 +85,22 @@ export default (input: string, concatenate: boolean = true) => {
             });
 
             const escapedResult = result.map(processEscaped);
-            return concatenate ? escapedResult.join("") : escapedResult;
+            return escapedResult;
         };
     }
 
-    return () => processEscaped(input);
+    return () => [processEscaped(input)];
 };
+
+const compileWrapper = (input: string, concatenate: boolean = true) => {
+    const output = compile(input);
+
+    // TO DO: get rid of concatenate
+    // and instead check arguments or named props object for ReactNode values
+    // and then go for react component output
+    return concatenate
+        ? (...args) => output(...args).join("")
+        : (...args) => output(...args);
+};
+
+export default compileWrapper;
