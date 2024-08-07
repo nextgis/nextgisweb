@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 const numsRegexp = /(?<!\{)\{(?!\{)\d+\}(?!\})/g;
 const numsSplitRegexp = /(\{\{[^}]+\}\}|\{[^}]+\}|[^{}]+)/g;
 
@@ -10,11 +12,15 @@ const preprocessFormatNG = (input: string): string => {
     return output;
 };
 
-const processEscaped = (result: string) => {
-    return result.replaceAll("{{", "{").replaceAll("}}", "}");
+const processEscaped = (result: string | number | ReactNode) => {
+    if (typeof result === "string" || typeof result === "number") {
+        return String(result).replaceAll("{{", "{").replaceAll("}}", "}");
+    } else {
+        return result;
+    }
 };
 
-export default (input: string) => {
+export default (input: string, concatenate: boolean = true) => {
     const string = preprocessFormatNG(input);
 
     const numMatches = string.match(numsRegexp);
@@ -27,7 +33,7 @@ export default (input: string) => {
     }
 
     if (numMatches && numMatches.length > 0) {
-        return (...args: [message: string]) => {
+        return (...args: [message: string | number | ReactNode]) => {
             if (args.length < numMatches.length) {
                 throw new Error(
                     `Expected ${numMatches.length} arguments but got ${args.length}`
@@ -46,20 +52,15 @@ export default (input: string) => {
                     return substring;
                 }
             });
-            if (string === "{{Hello}} {{3}}, {0}") {
-                console.log("splitted", splitted);
-            }
 
-            return processEscaped(result.join(""));
+            const escapedResult = result.map(processEscaped);
+            return concatenate ? escapedResult.join("") : escapedResult;
         };
     }
 
     if (stringMatches && stringMatches.length > 0) {
-        return (param: { [key: string]: string }) => {
+        return (param: { [key: string]: string | number | ReactNode }) => {
             const entries = Object.entries(param);
-            // const cleanStringMatches = stringMatches.map((match) => {
-            //     return match.slice(1, -1);
-            // });
 
             if (entries.length < stringMatches.length) {
                 throw new Error(
@@ -74,18 +75,17 @@ export default (input: string) => {
 
                 if (isParam) {
                     const argKey = substring.slice(1, -1);
+                    console.log("oppa", param[argKey]);
                     return param[argKey];
                 } else {
                     return substring;
                 }
             });
 
-            // console.log("result", result);
-
-            return processEscaped(result.join(""));
+            const escapedResult = result.map(processEscaped);
+            return concatenate ? escapedResult.join("") : escapedResult;
         };
     }
 
-    // console.log("DEFAULT USED");
     return () => processEscaped(input);
 };
