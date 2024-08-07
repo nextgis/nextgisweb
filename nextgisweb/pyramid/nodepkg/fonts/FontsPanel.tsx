@@ -1,10 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import type { CustomFont, SystemFont } from "@nextgisweb/core/type/api";
-import {
-    FileUploader,
-    FileUploaderButton,
-} from "@nextgisweb/file-upload/file-uploader";
+import { FileUploaderButton } from "@nextgisweb/file-upload/file-uploader";
 import type { FileMeta } from "@nextgisweb/file-upload/file-uploader";
 import { Button, Checkbox, Modal, Table, message } from "@nextgisweb/gui/antd";
 import type { TableColumnType } from "@nextgisweb/gui/antd";
@@ -14,10 +11,13 @@ import { route } from "../api";
 import { useRouteGet } from "../hook";
 import { gettext } from "../i18n";
 
-type FontType = CustomFont | SystemFont;
+type UploadedFont = Omit<CustomFont, "type"> & { type: "upload" };
+
+type FontType = CustomFont | SystemFont | UploadedFont;
+
 // eslint-disable-next-line
 const msgConfirm = gettext("During operation, the Web GIS will restart. All existing requests will aborted. Proceed? ")
-const msgSuccess = gettext("Successfully restarted")
+const msgSuccess = gettext("Successfully restarted");
 
 export function FontsPanel() {
     const [fileMeta, setFileMeta] = useState<FileMeta[]>([]);
@@ -28,14 +28,52 @@ export function FontsPanel() {
     const [modal, contextHolder] = Modal.useModal();
 
     const { data, isLoading } = useRouteGet("pyramid.font");
+    const [fonts, setFonts] = useState<FontType[]>([]);
+
+    useEffect(() => {
+        if (!isLoading && fonts.length <= 0) {
+            // if (!isLoading) {
+            // setFonts({key: 2});
+            setFonts(data as FontType[]);
+        }
+    }, [data, fonts, isLoading]);
+
+    useEffect(() => {
+        if (fileMeta.length > 0 && fonts.length > 0) {
+            const newItems = fileMeta.map((file) => {
+                const [name_, ext] = file.name.split(".");
+                const name = name_
+                    .replace(/-/g, " ")
+                    .replace(/([a-z])([A-Z])/g, "$1 $2");
+
+                return {
+                    label: name,
+                    type: "upload",
+                    format: ext === "ttf" ? "TrueType" : "OpenType",
+                    key: "uploaded_" + file.name,
+                };
+            }) as UploadedFont[];
+
+            setFonts([...fonts, ...newItems]);
+        }
+    }, [fileMeta]);
+
+    useEffect(() => {
+        if (deleted.length > 0 && fonts.length > 0) {
+            const fontsAfterRemoved = fonts.filter(
+                (font) => !deleted.includes(font.key)
+            );
+            setFonts(fontsAfterRemoved);
+        }
+    }, [deleted]);
+
     const filtered = showSystem
         ? { filtered: false }
         : {
-              filteredValue: ["custom"],
+              filteredValue: ["custom", "upload"],
               filtered: true,
               onFilter: (value: React.Key | boolean, record: FontType) =>
                   record.type.includes(value as string),
-              hidden: true,
           };
     const columns: TableColumnType<FontType>[] = [
         {
@@ -56,6 +94,14 @@ export function FontsPanel() {
             ...filtered,
         },
     ];
+
+    const reset = () => {
+        if (!isLoading) {
+            setFonts(data as FontType[]);
+            setSelectedRowKeys([]);
+        }
+    };
+
     const save = async () => {
         const confirmed = await modal.confirm({
             content: msgConfirm,
@@ -73,14 +119,16 @@ export function FontsPanel() {
                     const start = await route("pyramid.ping").get();
                     if (start.started > timestamp) {
                         message.success({
-                            content: msgSuccess
-                        })
+                            content: msgSuccess,
+                        });
                     }
                 }
             } catch {
                 //ignore
             } finally {
                 setFileMeta([]);
+                setDeleted([]);
+                setFonts([]);
                 window.location.reload();
             }
     };
@@ -100,29 +148,41 @@ export function FontsPanel() {
                 {showSystem}
                 {gettext("Show system fonts")}
             </Checkbox>
-            <Button danger onClick={() => setDeleted(selectedRowKeys)}>
+            <Button
+                danger
+                disabled={selectedRowKeys.length <= 0}
+                onClick={() => {
+                    setDeleted(selectedRowKeys);
+                    setSelectedRowKeys([]);
+                }}
+            >
                 {gettext("Delete")}
             </Button>
-            <Table
-                columns={columns}
-                dataSource={data}
-                rowSelection={{
-                    type: "checkbox",
-                    onChange: (keys: any) => setSelectedRowKeys(keys),
-                    getCheckboxProps: (record) => ({
-                        disabled: record.type === "system",
-                    }),
-                }}
-            />
+            <Button
+                disabled={deleted.length > 0 && fileMeta.length > 0}
+                onClick={reset}
+            >
+                {gettext("Reset")}
+            </Button>
             <FileUploaderButton
                 accept=".ttf,.otf"
                 onChange={(meta?: FileMeta[]) => {
                     if (meta) setFileMeta(meta);
                 }}
                 multiple={true}
-                showUploadList={true}
-                showProgressInDocTitle
             />
+            <Table
+                columns={columns}
+                dataSource={fonts}
+                rowSelection={{
+                    type: "checkbox",
+                    onChange: (keys: any) => setSelectedRowKeys(keys),
+                    getCheckboxProps: (record) => ({
+                        disabled: ["system", "upload"].includes(record.type),
+                    }),
+                }}
+            />
+
             <SaveButton
                 onClick={save}
                 disabled={deleted.length === 0 && fileMeta.length === 0}

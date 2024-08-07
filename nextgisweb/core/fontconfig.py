@@ -81,7 +81,7 @@ class FontConfig:
             if str(file).startswith(root_prefix):
                 result.append(CustomFont(key=file.name, **kwargs))
             else:
-                result.append(SystemFont(key=file.name, **kwargs))
+                result.append(SystemFont(key="system_" + file.name , **kwargs))
 
         return result
 
