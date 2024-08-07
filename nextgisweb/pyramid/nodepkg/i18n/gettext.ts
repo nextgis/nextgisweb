@@ -1,7 +1,8 @@
 import { lookup, nlookup } from "@nextgisweb/jsrealm/i18n/catalog";
 
-import compile from "./string-format/compile";
-import compileRE from "./string-format/complileRE";
+// import compile from "./string-format/compile";
+// import compileRE from "./string-format/complileRE";
+import compileREJ from "./string-format/complileREJ";
 
 import "@nextgisweb/jsrealm/locale-loader!";
 
@@ -31,12 +32,12 @@ export function dpgettextf(
 ): string {
     if (en) {
         const translation = message;
-        const newTemplate = compileRE(translation);
+        const newTemplate = compileREJ(translation);
         return newTemplate(translation);
     }
 
     const translation = lookup(domain, context, message);
-    const newTemplate = compileRE(translation);
+    const newTemplate = compileREJ(translation);
     return newTemplate(...params);
 }
 
@@ -50,7 +51,7 @@ export function dgettextf(
     ...args: MParam | [object]
 ): string {
     const translation = dgettext(domain, template);
-    const newTemplate = compileRE(translation);
+    const newTemplate = compileREJ(translation);
     return newTemplate(...args);
 }
 
@@ -72,12 +73,12 @@ export function dnpgettextf(
 ): string {
     if (en) {
         const translation = [singular, plural][pf(n)];
-        const newTemplate = compileRE(translation);
+        const newTemplate = compileREJ(translation);
         return newTemplate(...params);
     }
 
     const translation = nlookup(domain, context, singular, plural, pn)[pf(n)];
-    const newTemplate = compileRE(translation);
+    const newTemplate = compileREJ(translation);
     return newTemplate(...params);
 }
 
@@ -93,7 +94,7 @@ export function dngettextf(
     ...params: [message: string | number]
 ): string {
     const translation = dnpgettext(domain, "", singular, plural, n);
-    const newTemplate = compile(translation);
+    const newTemplate = compileREJ(translation);
     return newTemplate(...params);
 }
 

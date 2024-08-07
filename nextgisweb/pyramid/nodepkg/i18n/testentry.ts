@@ -44,8 +44,8 @@ const describeInterpolation = (
         });
 
         it("unescapes trivial curly braces", () => {
-            const f = sFn("{{Hello}}, {0}");
-            assert.equal(f("Arthur"), "{Hello}, Arthur");
+            const f = sFn("{{Hello}} {{3}}, {0}");
+            assert.equal(f("Arthur"), "{Hello} {3}, Arthur");
         });
 
         // it("unescapes nested curly braces", () => {
