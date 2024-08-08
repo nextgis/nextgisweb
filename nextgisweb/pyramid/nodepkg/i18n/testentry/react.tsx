@@ -4,7 +4,7 @@ import { SvgIcon } from "@nextgisweb/gui/svg-icon";
 import { gettext, gettextf } from "@nextgisweb/pyramid/i18n";
 
 const templateNamedReactNodes = gettextf(
-    "Fot this task try {icon} {serviceName}, {username}."
+    "For this task try {icon} {serviceName}, {username}."
 );
 
 const templatePositionedReactNodes = gettextf("Do you prefer {0} or {1}?");
