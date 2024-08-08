@@ -182,4 +182,6 @@ const AttributeEditor = observer(
     }
 );
 
+AttributeEditor.displayName = "AttributeEditor";
+
 export default AttributeEditor;

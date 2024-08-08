@@ -1,3 +1,4 @@
+import { useVirtualizer } from "@tanstack/react-virtual";
 import { useEffect, useMemo, useRef } from "react";
 
 import { Form } from "@nextgisweb/gui/antd";
@@ -19,6 +20,7 @@ export function FieldsForm<
 }: FieldsFormProps<P>) {
     const localForm = Form.useForm(form)[0];
     const readyRef = useRef(whenReady);
+    const parentRef = useRef(null);
 
     useEffect(() => {
         readyRef.current?.();
@@ -52,12 +54,16 @@ export function FieldsForm<
         ...(onChange && { onFieldsChange }),
     };
 
-    const formItems = useMemo(() => {
-        const includedFormItems = fields.filter((f) => f.included ?? true);
-        return includedFormItems.map((f) => {
-            return <FormItem key={f.name} {...f} />;
-        });
-    }, [fields]);
+    const includedFormItems = useMemo(
+        () => fields.filter((f) => f.included ?? true),
+        [fields]
+    );
+
+    const rowVirtualizer = useVirtualizer({
+        count: includedFormItems.length,
+        getScrollElement: () => parentRef.current,
+        estimateSize: () => 42,
+    });
 
     return (
         <Form
@@ -65,8 +71,41 @@ export function FieldsForm<
             colon={false}
             {...modifiedFormProps}
             className="fields-form"
+            style={{ width: "100%" }}
         >
-            {formItems}
+            <div
+                ref={parentRef}
+                style={{
+                    height: "400px",
+                    overflow: "auto",
+                }}
+            >
+                <div
+                    style={{
+                        height: `${rowVirtualizer.getTotalSize()}px`,
+                        width: "100%",
+                        position: "relative",
+                    }}
+                >
+                    {rowVirtualizer.getVirtualItems().map((virtualItem) => {
+                        const item = includedFormItems[virtualItem.index];
+                        return (
+                            <div
+                                key={item.name}
+                                style={{
+                                    position: "absolute",
+                                    top: 0,
+                                    left: 0,
+                                    width: "100%",
+                                    transform: `translateY(${virtualItem.start}px)`,
+                                }}
+                            >
+                                <FormItem {...item} />
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
             {children}
         </Form>
     );
