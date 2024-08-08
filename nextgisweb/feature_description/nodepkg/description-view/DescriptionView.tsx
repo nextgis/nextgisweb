@@ -22,9 +22,7 @@ const DescriptionView = ({ featureItem }: IdentifyExtensionComponentProps) => {
                 </div>
             </div>
             <div className="panel-content-container">
-                <div className="fill">
-                    <div dangerouslySetInnerHTML={{ __html: description }} />
-                </div>
+                <div dangerouslySetInnerHTML={{ __html: description }} />
             </div>
         </>
     );
