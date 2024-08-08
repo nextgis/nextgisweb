@@ -1,18 +1,17 @@
 /** @testentry react */
-import { createElement } from "react";
 
-import complileREJ from "../string-format/complileREJ";
+import { SvgIcon } from "@nextgisweb/gui/svg-icon";
+import { gettext, gettextf } from "@nextgisweb/pyramid/i18n";
 
-const testTemplate = complileREJ("Hello, {first} {last}", false);
-const compiledChildren = testTemplate({
-    first: "im string",
-    last: <span style={{ color: "tomato", fontSize: 32 }}>{"Kappa"}</span>,
+const templateReactNodes = gettextf("Fot this task try {icon} {serviceName}");
+
+const Component = templateReactNodes({
+    icon: <SvgIcon icon={"rescls-wfsserver_service"} />,
+    serviceName: <b>{gettext("WFS connection")}</b>,
 });
 
-const ReComp = createElement("fragment", {}, ...compiledChildren);
-
 function InterpolationWithReactNodeTest() {
-    return ReComp;
+    return Component;
 }
 
 export default InterpolationWithReactNodeTest;
