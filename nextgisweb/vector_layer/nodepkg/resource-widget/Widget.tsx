@@ -111,7 +111,10 @@ const SourceOptions = observer(({ store }: { store: Store }) => {
                     options={optsGType}
                     {...brg("cast_geometry_type")}
                 />
-                <Checkbox {...bcb("skip_other_geometry_types")}>
+                <Checkbox
+                    {...bcb("skip_other_geometry_types")}
+                    disabled={store.sourceOptions.cast_geometry_type === null}
+                >
                     {/* prettier-ignore */}
                     <>{gettext("Only load features of the selected geometry type")}</>
                 </Checkbox>
