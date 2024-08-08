@@ -97,10 +97,10 @@ const compile = (template: string) => {
     return () => [processEscaped(template)];
 };
 
-const compileWrapper = (template: string): string | ReactNode => {
+const compileWrapper = (template: string) => {
     const outputFn = compile(template);
 
-    return (...args: PositionedParam[] | NamedParam[]) => {
+    return (...args: PositionedParam[] | NamedParam[]): string | ReactNode => {
         const tokens = outputFn(...args);
 
         // is there better way to check if it's React Component?
