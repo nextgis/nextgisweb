@@ -1,4 +1,8 @@
+import { createElement } from "react";
 import type { ReactNode } from "react";
+
+type PositionedParam = [message: string | number | ReactNode];
+type NamedParam = { [key: string]: string | number | ReactNode };
 
 const numsRegexp = /(?<!\{)\{(?!\{)\d+\}(?!\})/g;
 const numsSplitRegexp = /(\{\{[^}]+\}\}|\{[^}]+\}|[^{}]+)/g;
@@ -22,8 +26,8 @@ const processEscaped = (
     }
 };
 
-const compile = (input: string) => {
-    const string = preprocessFormatNG(input);
+const compile = (template: string) => {
+    const string = preprocessFormatNG(template);
 
     const numMatches = string.match(numsRegexp);
     const stringMatches = string.match(stringRegexp);
@@ -35,7 +39,7 @@ const compile = (input: string) => {
     }
 
     if (numMatches && numMatches.length > 0) {
-        return (...args: [message: string | number | ReactNode]) => {
+        return (...args: PositionedParam) => {
             if (args.length < numMatches.length) {
                 throw new Error(
                     `Expected ${numMatches.length} arguments but got ${args.length}`
@@ -61,7 +65,7 @@ const compile = (input: string) => {
     }
 
     if (stringMatches && stringMatches.length > 0) {
-        return (param: { [key: string]: string | number | ReactNode }) => {
+        return (param: NamedParam) => {
             const entries = Object.entries(param);
 
             if (entries.length < stringMatches.length) {
@@ -77,7 +81,7 @@ const compile = (input: string) => {
 
                 if (isParam) {
                     const argKey = substring.slice(1, -1);
-                    console.log("oppa", param[argKey]);
+
                     return param[argKey];
                 } else {
                     return substring;
@@ -85,22 +89,28 @@ const compile = (input: string) => {
             });
 
             const escapedResult = result.map(processEscaped);
+
             return escapedResult;
         };
     }
 
-    return () => [processEscaped(input)];
+    return () => [processEscaped(template)];
 };
 
-const compileWrapper = (input: string, concatenate: boolean = true) => {
-    const output = compile(input);
+const compileWrapper = (template: string): string | ReactNode => {
+    const outputFn = compile(template);
 
-    // TO DO: get rid of concatenate
-    // and instead check arguments or named props object for ReactNode values
-    // and then go for react component output
-    return concatenate
-        ? (...args) => output(...args).join("")
-        : (...args) => output(...args);
+    return (...args: PositionedParam[] | NamedParam[]) => {
+        const tokens = outputFn(...args);
+
+        // is there better way to check if it's React Component?
+        if (tokens.some((token) => token && !!token.$$typeof)) {
+            const fragment = createElement("Fragment", {}, ...tokens);
+            return fragment;
+        } else {
+            return tokens.join("");
+        }
+    };
 };
 
 export default compileWrapper;
