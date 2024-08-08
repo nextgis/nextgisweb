@@ -76,9 +76,11 @@ const SourceOptions = observer(({ store }: { store: Store }) => {
     const brg = (key: string): RadioGroupProps => {
         const a = key as keyof typeof so;
         return {
-            value: so[a],
+            value: so[a] ?? "NONE",
             onChange: (e) => {
-                store.updateSourceOptions({ [a]: e.target.value });
+                let value = e.target.value;
+                if (value === "NONE") value = null;
+                store.updateSourceOptions({ [a]: value });
             },
         };
     };
