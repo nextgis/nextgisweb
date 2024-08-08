@@ -16,6 +16,7 @@ export function FieldsForm<
     onChange,
     whenReady,
     initialValues,
+    parentHeight = false,
     ...formProps
 }: FieldsFormProps<P>) {
     const localForm = Form.useForm(form)[0];
@@ -71,14 +72,20 @@ export function FieldsForm<
             colon={false}
             {...modifiedFormProps}
             className="fields-form"
-            style={{ width: "100%" }}
+            style={{ width: "100%", height: parentHeight ? "100%" : undefined }}
         >
             <div
                 ref={parentRef}
-                style={{
-                    height: "400px",
-                    overflow: "auto",
-                }}
+                style={
+                    parentHeight
+                        ? {
+                              height: "100%",
+                              overflowY: "auto",
+                              boxSizing: "border-box",
+                              padding: "1rem",
+                          }
+                        : undefined
+                }
             >
                 <div
                     style={{

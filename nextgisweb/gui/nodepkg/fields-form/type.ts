@@ -57,4 +57,5 @@ export interface FieldsFormProps<
     children?: ReactNode;
     fields: FormField<Extract<keyof P, string>>[];
     form?: FormInstance<P>;
+    parentHeight?: boolean;
 }
