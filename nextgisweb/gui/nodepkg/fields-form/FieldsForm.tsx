@@ -1,8 +1,8 @@
-import { useVirtualizer } from "@tanstack/react-virtual";
 import { useEffect, useMemo, useRef } from "react";
 
 import { Form } from "@nextgisweb/gui/antd";
 
+import { FieldsFormVirtualized } from "./FieldsFormVirtualized";
 import { FormItem } from "./FormItem";
 import type { FieldsFormProps, FormProps } from "./type";
 
@@ -15,13 +15,12 @@ export function FieldsForm<
     children,
     onChange,
     whenReady,
+    virtualize = false,
     initialValues,
-    parentHeight = false,
     ...formProps
 }: FieldsFormProps<P>) {
     const localForm = Form.useForm(form)[0];
     const readyRef = useRef(whenReady);
-    const parentRef = useRef(null);
 
     useEffect(() => {
         readyRef.current?.();
@@ -55,16 +54,10 @@ export function FieldsForm<
         ...(onChange && { onFieldsChange }),
     };
 
-    const includedFormItems = useMemo(
+    const includedFields = useMemo(
         () => fields.filter((f) => f.included ?? true),
         [fields]
     );
-
-    const rowVirtualizer = useVirtualizer({
-        count: includedFormItems.length,
-        getScrollElement: () => parentRef.current,
-        estimateSize: () => 42,
-    });
 
     return (
         <Form
@@ -72,47 +65,15 @@ export function FieldsForm<
             colon={false}
             {...modifiedFormProps}
             className="fields-form"
-            style={{ width: "100%", height: parentHeight ? "100%" : undefined }}
+            style={{ width: "100%", height: virtualize ? "100%" : undefined }}
         >
-            <div
-                ref={parentRef}
-                style={
-                    parentHeight
-                        ? {
-                              height: "100%",
-                              overflowY: "auto",
-                              boxSizing: "border-box",
-                              padding: "1rem",
-                          }
-                        : undefined
-                }
-            >
-                <div
-                    style={{
-                        height: `${rowVirtualizer.getTotalSize()}px`,
-                        width: "100%",
-                        position: "relative",
-                    }}
-                >
-                    {rowVirtualizer.getVirtualItems().map((virtualItem) => {
-                        const item = includedFormItems[virtualItem.index];
-                        return (
-                            <div
-                                key={item.name}
-                                style={{
-                                    position: "absolute",
-                                    top: 0,
-                                    left: 0,
-                                    width: "100%",
-                                    transform: `translateY(${virtualItem.start}px)`,
-                                }}
-                            >
-                                <FormItem {...item} />
-                            </div>
-                        );
-                    })}
-                </div>
-            </div>
+            {virtualize ? (
+                <FieldsFormVirtualized fields={includedFields}>
+                    {children}
+                </FieldsFormVirtualized>
+            ) : (
+                includedFields.map((f) => <FormItem key={f.name} {...f} />)
+            )}
             {children}
         </Form>
     );

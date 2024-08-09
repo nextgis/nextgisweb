@@ -164,7 +164,7 @@ const AttributeEditor = observer(
 
         return (
             <FieldsForm
-                parentHeight
+                virtualize
                 form={form}
                 size={size}
                 fields={formFields}
