@@ -261,13 +261,11 @@ def test_error_limit():
 
     for i in range(ERROR_LIMIT + some):
         feature = ogr.Feature(defn)
-        if i < ERROR_LIMIT:
-            feature.SetGeometry(None)
-        else:
-            feature.SetGeometry(ogr.CreateGeometryFromWkt("POINT (0 0)"))
+        wkt = "POINTM (0 0 0)" if i < ERROR_LIMIT else "POINT (0 0)"
+        feature.SetGeometry(ogr.CreateGeometryFromWkt(wkt))
         layer.CreateFeature(feature)
 
-    opts = dict(fix_errors=FIX_ERRORS.NONE, skip_other_geometry_types=False)
+    opts = dict(fix_errors=FIX_ERRORS.NONE)
     with pytest.raises(ValidationError) as excinfo:
         res.from_source(layer, **opts, skip_errors=False)
     assert excinfo.value.detail is not None

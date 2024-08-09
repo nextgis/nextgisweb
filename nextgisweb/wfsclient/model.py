@@ -85,6 +85,8 @@ url_pattern = re.compile(
     re.IGNORECASE | re.UNICODE,
 )
 
+nil_attr = r"{http://www.w3.org/2001/XMLSchema-instance}nil"
+
 
 # TODO: WFS helper module
 def find_tags(element, tag):
@@ -343,14 +345,16 @@ class WFSConnection(Base, Resource):
             fields = dict()
             geom = None
             for _property in _feature:
+                is_nil = _property.attrib.get(nil_attr, "false") == "true"
+
                 key = ns_trim(_property.tag)
                 if key == layer.column_geom:
-                    geom = geom_from_gml(_property[0])
+                    if not is_nil:
+                        geom = geom_from_gml(_property[0])
                     continue
 
                 datatype = fld_map[key]
-                nil_attr = r"{http://www.w3.org/2001/XMLSchema-instance}nil"
-                if _property.attrib.get(nil_attr, "false") == "true":
+                if is_nil:
                     value = None
                 elif datatype in (FIELD_TYPE.INTEGER, FIELD_TYPE.BIGINT):
                     value = int(_property.text)
@@ -372,10 +376,12 @@ class WFSConnection(Base, Resource):
                 fields[key] = value
 
             fid = _feature.attrib["{http://www.opengis.net/gml/3.2}id"]
-            if add_box:
+
+            if add_box and geom is not None:
                 _box = box(*geom.bounds)
             else:
                 _box = None
+
             features.append(
                 Feature(
                     layer=layer,

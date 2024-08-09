@@ -97,8 +97,13 @@ CREATE_TEST_PARAMS = (
     ),
     (
         "null-geom.geojson",
-        dict(skip_other_geometry_types=True),
-        dict(geometry_type="POINT", feature_count=1),
+        dict(cast_geometry_type="LINESTRING", skip_other_geometry_types=True),
+        dict(geometry_type="LINESTRING", feature_count=1),
+    ),
+    (
+        "null-geom.geojson",
+        dict(),
+        dict(geometry_type="POINT", feature_count=2),
     ),
     (
         # Geometries with topology errors are accepted.

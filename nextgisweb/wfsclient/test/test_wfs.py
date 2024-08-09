@@ -78,7 +78,13 @@ def layer_id(connection_id):
 def test_connection(connection_id, ngw_webtest_app):
     res = ngw_webtest_app.get("/api/resource/%d/wfsclient/inspect" % connection_id)
     layers = res.json["layers"]
-    assert layers == [dict(name="type", srid=3857, bbox=[0.0, 0.0, 131.89371, 43.11047])]
+    assert len(layers) == 1
+
+    layer = layers[0]
+    assert layer["name"] == "type"
+    assert layer["srid"] == 3857
+    for c1, c2 in zip(layer["bbox"], [0.0, 0.0, 131.89371, 43.11047]):
+        assert pytest.approx(c1) == c2
 
     ngw_webtest_app.get(
         "/api/resource/%d/wfsclient/inspect/%s" % (connection_id, "type"), status=200

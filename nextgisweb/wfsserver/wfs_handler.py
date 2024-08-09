@@ -854,6 +854,7 @@ class WFSHandler:
                     minOccurs="0",
                     name="geom",
                     type=GEOM_TYPE_TO_GML_TYPE[feature_layer.geometry_type],
+                    nillable="true",
                 ),
                 parent=__seq,
             )
@@ -1045,42 +1046,44 @@ class WFSHandler:
                 id_attr = ns_attr("gml", "id", self.p_version) if self.p_version >= v110 else "fid"
                 __feature = El(layer.keyname, {id_attr: feature_id}, parent=__member)
 
-                # TODO: Can we handle NULL geometries here?
-                if (geom := feature.geom) and geom is not None and geom is not UNSET:
-                    geom = feature.geom.ogr
-                    geom.AssignSpatialReference(osr_out)
-
-                    _minX, _maxX, _minY, _maxY = geom.GetEnvelope()
-                    minX = _minX if minX is None else min(minX, _minX)
-                    minY = _minY if minY is None else min(minY, _minY)
-                    maxX = _maxX if maxX is None else max(maxX, _maxX)
-                    maxY = _maxY if maxY is None else max(maxY, _maxY)
-
-                    geom_gml = geom.ExportToGML(
-                        [
-                            "FORMAT=%s" % self.gml_format,
-                            "NAMESPACE_DECL=YES",
-                            "SRSNAME_FORMAT=SHORT",
-                            "GMLID=geom-%s" % feature_id,
-                        ]
-                    )
-                    __gml = etree.fromstring(geom_gml, parser=gml_parser)
+                if (geom := feature.geom) is not UNSET:
                     __geom = El("geom", parent=__feature)
-                    __geom.append(__gml)
+                    if geom is not None:
+                        geom = feature.geom.ogr
+                        geom.AssignSpatialReference(osr_out)
+
+                        _minX, _maxX, _minY, _maxY = geom.GetEnvelope()
+                        minX = _minX if minX is None else min(minX, _minX)
+                        minY = _minY if minY is None else min(minY, _minY)
+                        maxX = _maxX if maxX is None else max(maxX, _maxX)
+                        maxY = _maxY if maxY is None else max(maxY, _maxY)
+
+                        geom_gml = geom.ExportToGML(
+                            [
+                                "FORMAT=%s" % self.gml_format,
+                                "NAMESPACE_DECL=YES",
+                                "SRSNAME_FORMAT=SHORT",
+                                "GMLID=geom-%s" % feature_id,
+                            ]
+                        )
+                        __gml = etree.fromstring(geom_gml, parser=gml_parser)
+                        __geom.append(__gml)
+                    else:
+                        __geom.set(ns_attr("xsi", "nil", self.p_version), "true")
 
                 for field in feature_layer.fields:
                     if field.keyname not in feature.fields:
                         continue
-                    _field = El(self._field_key_encode(field), parent=__feature)
+                    __field = El(self._field_key_encode(field), parent=__feature)
                     value = feature.fields[field.keyname]
                     if value is not None:
                         if isinstance(value, datetime):
                             value = value.isoformat()
                         elif not isinstance(value, str):
                             value = str(value)
-                        _field.text = value
+                        __field.text = value
                     else:
-                        _field.set(ns_attr("xsi", "nil", self.p_version), "true")
+                        __field.set(ns_attr("xsi", "nil", self.p_version), "true")
 
                 count += 1
 
@@ -1273,7 +1276,10 @@ class WFSHandler:
                             _value = None if len(_values) == 0 else _values[0]
 
                             if fld_keyname == geom_column:
-                                feature.geom = gml_geom_for_flayer(_value[0], feature_layer)
+                                if _value is not None:
+                                    feature.geom = gml_geom_for_flayer(_value[0], feature_layer)
+                                else:
+                                    feature.geom = None
                             else:
                                 if _value is None:
                                     value = None

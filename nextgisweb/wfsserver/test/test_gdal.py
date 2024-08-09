@@ -188,30 +188,44 @@ test_create_delete_params = []
 test_edit_params = []
 
 for version in TEST_WFS_VERSIONS:
+    xfail_gdal_create = pytest.mark.xfail(
+        version >= "2.0.0" and pkg_version.parse(GDAL_VERSION) < pkg_version.parse("3.2.1"),
+        reason="GDAL doesn't work correctly with WFS 2.x",
+    )
+
     for layer in ("type", "pointz"):
         if layer == "type":
-            test_edit_params.append(
-                pytest.param(
-                    version,
-                    layer,
-                    dict(null="not null", int=42, real=-0.0, string=None, unicode="¯\\_(ツ)_/¯"),
-                    "POINT (1 1)",
-                    id="{}-type-f1".format(version),
-                )
-            )
-            test_edit_params.append(
-                pytest.param(
-                    version,
-                    layer,
-                    dict(
-                        null=None,
-                        int=2**16,
-                        real=3.1415926535897,
-                        string="str",
-                        unicode="مرحبا بالعالم",
+            test_edit_params.extend(
+                (
+                    pytest.param(
+                        version,
+                        layer,
+                        dict(
+                            null="not null", int=42, real=-0.0, string=None, unicode="¯\\_(ツ)_/¯"
+                        ),
+                        "POINT (1 1)",
+                        id="{}-type-f1".format(version),
                     ),
-                    "POINT (0.1 -3.1)",
-                    id="{}-type-f2".format(version),
+                    pytest.param(
+                        version,
+                        layer,
+                        dict(
+                            null=None,
+                            int=2**16,
+                            real=3.1415926535897,
+                            string="str",
+                            unicode="مرحبا بالعالم",
+                        ),
+                        "POINT (0.1 -3.1)",
+                        id="{}-type-f2".format(version),
+                    ),
+                    pytest.param(
+                        version,
+                        layer,
+                        dict(),
+                        None,
+                        id="{}-type-f3".format(version),
+                    ),
                 )
             )
         elif layer == "pointz":
@@ -231,13 +245,19 @@ for version in TEST_WFS_VERSIONS:
                 layer,
                 "POINT Z (0 0 -1)" if layer == "pointz" else "POINT (0 0)",
                 id="{}-{}".format(version, layer),
-                marks=pytest.mark.xfail(
-                    version >= "2.0.0"
-                    and pkg_version.parse(GDAL_VERSION) < pkg_version.parse("3.2.1"),
-                    reason="GDAL doesn't work correctly with WFS 2.x",
-                ),
+                marks=xfail_gdal_create,
             )
         )
+        if layer == "pointz":
+            test_create_delete_params.append(
+                pytest.param(
+                    version,
+                    layer,
+                    None,
+                    id="{}-{}-null-geom".format(version, layer),
+                    marks=xfail_gdal_create,
+                )
+            )
 
 
 @pytest.mark.parametrize("version, layer, fields, wkt", test_edit_params)
@@ -255,7 +275,7 @@ def test_edit(version, layer, fields, wkt, service, ngw_httptest_app):
     assert wfs_layer is not None, gdal.GetLastErrorMsg()
 
     feature = wfs_layer.GetNextFeature()
-    geom = ogr.CreateGeometryFromWkt(wkt)
+    geom = ogr.CreateGeometryFromWkt(wkt) if wkt else None
     feature.SetGeometry(geom)
 
     for k, v in fields.items():
@@ -279,8 +299,11 @@ def test_edit(version, layer, fields, wkt, service, ngw_httptest_app):
 
     for k, v in fields.items():
         if k == "geom":
-            geom_cmp = ogr.CreateGeometryFromWkt(feature_cmp["geom"])
-            assert geom_cmp.Equals(geom)
+            if geom is not None:
+                geom_cmp = ogr.CreateGeometryFromWkt(feature_cmp["geom"])
+                assert geom_cmp.Equals(geom)
+            else:
+                assert feature_cmp["geom"] is None
         else:
             v_cmp = feature_cmp["fields"][k]
             if k == "real" and v is not None:
@@ -306,7 +329,7 @@ def test_create_delete(version, layer, wkt, service, ngw_httptest_app):
 
     feature = ogr.Feature(wfslayer_type.GetLayerDefn())
 
-    geom = ogr.CreateGeometryFromWkt(wkt)
+    geom = ogr.CreateGeometryFromWkt(wkt) if wkt else None
     feature.SetGeometry(geom)
 
     err = wfslayer_type.CreateFeature(feature)
