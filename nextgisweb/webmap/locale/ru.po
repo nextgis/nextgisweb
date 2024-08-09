@@ -542,16 +542,16 @@ msgid "Edit feature"
 msgstr "Редактировать объект"
 
 #: nodepkg/panel/identification/IdentificationPanel.tsx:38
-msgid ""
-"To identify an object, click on the map with the left mouse button. Make sure"
-" that other tools are turned off."
-msgstr ""
-"Для идентификации объекта кликните левой кнопкой мыши по карте. Убедитесь, "
-"что другие инструменты выключены."
-
-#: nodepkg/panel/identification/IdentificationPanel.tsx:41
-msgid "How it works"
+msgid "How does it work"
 msgstr "Как это работает"
+
+#: nodepkg/panel/identification/IdentificationPanel.tsx:39
+msgid ""
+"To get feature information, click on the map with the left mouse button. Make"
+" sure that other tools are turned off."
+msgstr ""
+"Чтобы получить информацию об объекте, щелкните на карте левой кнопкой мыши."
+" Убедитесь, что другие инструменты отключены."
 
 #: nodepkg/panel/identification/IdentificationPanel.tsx:42
 msgid "No objects were found at the click location."

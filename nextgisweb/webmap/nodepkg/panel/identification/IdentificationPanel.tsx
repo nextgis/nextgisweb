@@ -21,7 +21,7 @@ import type { FieldDataItem } from "./fields";
 import type {
     FeatureInfo,
     FeatureSelectorProps,
-    FeatureTabsProps,
+    FeatureTabsProps as FeatureInfoProps,
     FieldsTableProps,
     IdentificationPanelProps,
     IdentifyInfo,
@@ -35,10 +35,10 @@ import ZoomInMapIcon from "@nextgisweb/icon/material/zoom_in_map/outline";
 import "./IdentificationPanel.less";
 import "./PanelContentContainer.less";
 
+const msgTipTitle = gettext("How does it work");
 const msgTipIdent = gettext(
-    "To identify an object, click on the map with the left mouse button. Make sure that other tools are turned off."
+    "To get feature information, click on the map with the left mouse button. Make sure that other tools are turned off."
 );
-const msgTipTitle = gettext("How it works");
 const msgNotFound = gettext("No objects were found at the click location.");
 const msgLoad = gettext("Retrieving object information...");
 const msgLoading = gettext("Loading...");
@@ -159,12 +159,12 @@ const FieldsTable = ({ featureInfo, featureItem }: FieldsTableProps) => {
     return table;
 };
 
-const FeatureTabs = ({
+const FeatureInfo = ({
     display,
     featureInfo,
     featureItem,
     onUpdate,
-}: FeatureTabsProps) => {
+}: FeatureInfoProps) => {
     const [extComps, setExtComps] = useState<JSX.Element[]>([]);
     const items = [];
 
@@ -214,7 +214,7 @@ const FeatureTabs = ({
                         />
                     </div>
                 </div>
-                <div className="panel-content-container">
+                <div className="panel-content-container no-margin-x">
                     <div className="fill">
                         <FieldsTable
                             featureInfo={featureInfo}
@@ -291,7 +291,7 @@ const FeatureSelector = ({
     };
 
     return (
-        <div className="panel-content-container">
+        <div className="panel-content-container margin-all">
             <div className="fill">
                 <Select
                     onChange={onSelectChange}
@@ -369,13 +369,20 @@ const IdentifyResult = ({ identifyInfo, display }: IdentifyResultProps) => {
     }
 
     const coordinatesPanel = (
-        <CoordinatesSwitcher display={display} identifyInfo={identifyInfo} />
+        <div className="panel-content-container margin-all">
+            <div className="fill">
+                <CoordinatesSwitcher
+                    display={display}
+                    identifyInfo={identifyInfo}
+                />
+            </div>
+        </div>
     );
 
     let noFoundElement = null;
     if (isNotFound) {
         noFoundElement = (
-            <div className="no-found panel-content-container">
+            <div className="panel-content-container no-margin-x">
                 <div className="fill">
                     <Alert
                         message={msgNotFound}
@@ -404,7 +411,7 @@ const IdentifyResult = ({ identifyInfo, display }: IdentifyResultProps) => {
     let tabsElement;
     if (featureItem && featureInfo) {
         tabsElement = (
-            <FeatureTabs
+            <FeatureInfo
                 display={display}
                 featureInfo={featureInfo}
                 featureItem={featureItem}

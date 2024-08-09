@@ -1,8 +1,19 @@
+@margin-default: 8px;
+
 .panel-content-container {
     display: flex;
-    width: 100%;
-    max-width: 100%;
+    margin: 0 @margin-default;
+    width: auto;
     align-items: center;
+
+    &.margin-all {
+        margin: @margin-default;
+    }
+
+    &.no-margin-x {
+        margin-left: 0;
+        margin-right: 0;
+    }
 
     .fill {
         flex-grow: 1;
