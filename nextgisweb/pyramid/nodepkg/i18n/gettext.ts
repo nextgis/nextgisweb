@@ -1,16 +1,20 @@
+import type { ReactNode } from "react";
+
 import { lookup, nlookup } from "@nextgisweb/jsrealm/i18n/catalog";
 
-// import compile from "./string-format/compile";
-// import compileRE from "./string-format/complileRE";
-import compileREJ from "./string-format/complileREJ";
+import compile from "./string-format/complile";
 
 import "@nextgisweb/jsrealm/locale-loader!";
 
 const en = ngwConfig.locale === "en";
 const [pn, pf] = ngwConfig.plurals;
 
-type MParam = [message: string];
-type NParam = [singular: string, plural: string, n: number];
+type MParam = [message: string | ReactNode];
+type NParam = [
+    singular: string | ReactNode,
+    plural: string | ReactNode,
+    n: number | ReactNode,
+];
 
 type Context = [context: string];
 type CMParam = [...Context, ...MParam];
@@ -19,7 +23,7 @@ type CNParam = [...Context, ...NParam];
 export function dpgettext(
     domain: string,
     ...[context, message]: CMParam
-): string {
+): string | ReactNode {
     if (en) return message;
     return lookup(domain, context, message);
 }
@@ -29,19 +33,22 @@ export function dpgettextf(
     context: string,
     message: string,
     ...params: MParam
-): string {
+): string | ReactNode {
     if (en) {
         const translation = message;
-        const newTemplate = compileREJ(translation);
+        const newTemplate = compile(translation);
         return newTemplate(...params);
     }
 
     const translation = lookup(domain, context, message);
-    const newTemplate = compileREJ(translation);
+    const newTemplate = compile(translation);
     return newTemplate(...params);
 }
 
-export function dgettext(domain: string, ...[message]: MParam): string {
+export function dgettext(
+    domain: string,
+    ...[message]: MParam
+): string | ReactNode {
     return dpgettext(domain, "", message);
 }
 
@@ -49,16 +56,16 @@ export function dgettextf(
     domain: string,
     template: string,
     ...args: MParam | [object]
-): string {
+): string | ReactNode {
     const translation = dgettext(domain, template);
-    const newTemplate = compileREJ(translation);
+    const newTemplate = compile(translation);
     return newTemplate(...args);
 }
 
 export function dnpgettext(
     domain: string,
     ...[context, singular, plural, n]: CNParam
-): string {
+): string | ReactNode {
     if (en) return [singular, plural][pf(n)];
     return nlookup(domain, context, singular, plural, pn)[pf(n)];
 }
@@ -70,19 +77,19 @@ export function dnpgettextf(
     plural: string,
     n: number,
     ...params: [message: string | number]
-): string {
+): string | ReactNode {
     if (en) {
         const translation = [singular, plural][pf(n)];
-        const newTemplate = compileREJ(translation);
+        const newTemplate = compile(translation);
         return newTemplate(...params);
     }
 
     const translation = nlookup(domain, context, singular, plural, pn)[pf(n)];
-    const newTemplate = compileREJ(translation);
+    const newTemplate = compile(translation);
     return newTemplate(...params);
 }
 
-export function dngettext(domain: string, ...args: NParam): string {
+export function dngettext(domain: string, ...args: NParam): string | ReactNode {
     return dnpgettext(domain, "", ...args);
 }
 
@@ -92,9 +99,9 @@ export function dngettextf(
     plural: string,
     n: number,
     ...params: [message: string | number]
-): string {
+): string | ReactNode {
     const translation = dnpgettext(domain, "", singular, plural, n);
-    const newTemplate = compileREJ(translation);
+    const newTemplate = compile(translation);
     return newTemplate(...params);
 }
 
