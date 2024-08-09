@@ -1,4 +1,4 @@
-import { Fragment, createElement } from "react";
+import { Fragment, createElement, isValidElement } from "react";
 import type { ReactNode } from "react";
 
 type PositionedParam = [message: string | number | ReactNode];
@@ -10,7 +10,6 @@ const numsSplitRegexp = /(\{\{[^}]+\}\}|\{[^}]+\}|[^{}]+)/g;
 const stringRegexp = /(?<!\{)\{(?!\{)[a-zA-Z_][a-zA-Z0-9_]*\}(?!\})/g;
 const stringSplitRegexp = /(\{\{[^}]+\}\}|\{[^}]+\}|[^{}]+)/g;
 
-// accroding to task, to support {} as a default place for interpolation with one param
 const preprocessFormatNG = (input: string): string => {
     const output = input.includes("{}") ? input.replace("{}", "{0}") : input;
     return output;
@@ -103,8 +102,7 @@ const compileWrapper = (template: string) => {
     return (...args: PositionedParam[] | NamedParam[]): string | ReactNode => {
         const tokens = outputFn(...args);
 
-        // is there better way to check if it's React Component?
-        if (tokens.some((token) => token && !!token.$$typeof)) {
+        if (tokens.some((token) => token && isValidElement(token))) {
             const fragment = createElement(Fragment, {}, ...tokens);
             return fragment;
         } else {
