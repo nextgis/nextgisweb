@@ -8,6 +8,7 @@ Changes
 - TUS uploader is available using CORS.
 - Data structure permission scope removed.
 - New resource creation dialog.
+- Support for empty geometries when importing vector layers.
 
 
 4.8.0

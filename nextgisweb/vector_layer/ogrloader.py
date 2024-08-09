@@ -512,21 +512,24 @@ class OGRLoader:
                     row["id"] = fid_fget(feature, ogr_fid)
 
                 geom = feature.GetGeometryRef()
-                if params.validate:
-                    geom = _validate_geom(geom, wkb_type, **ctx)
+                if geom is None:
+                    row["geom"] = None
+                else:
+                    if params.validate:
+                        geom = _validate_geom(geom, wkb_type, **ctx)
 
-                if transform and geom.Transform(transform) != 0:
-                    raise FeatureError(
-                        gettext(
-                            "Feature #%d has a geometry that can't be "
-                            "reprojected to target coordinate system"
+                    if transform and geom.Transform(transform) != 0:
+                        raise FeatureError(
+                            gettext(
+                                "Feature #%d has a geometry that can't be "
+                                "reprojected to target coordinate system"
+                            )
+                            % ogr_fid
                         )
-                        % ogr_fid
-                    )
 
-                geom_bytes = bytearray(geom.ExportToWkb(ogr.wkbNDR))
-                dynamic_size += len(geom_bytes)
-                row["geom"] = geom_bytes
+                    geom_bytes = bytearray(geom.ExportToWkb(ogr.wkbNDR))
+                    dynamic_size += len(geom_bytes)
+                    row["geom"] = geom_bytes
 
                 for fidx, fname, fget, ftype in fields:
                     if not feature.IsFieldSetAndNotNull(fidx):
@@ -614,9 +617,6 @@ _wkb_supported = _wkb_points + _wkb_linestrings + _wkb_polygons
 
 
 def _validate_geom(geom, target, *, fix_errors, fid):
-    if geom is None:
-        raise FeatureGeometryTypeInvalid(gettext("Feature #%d doesn't have geometry.") % fid)
-
     if geom.IsMeasured() and fix_errors == FIX_ERRORS.LOSSY:
         geom.SetMeasured(False)
 

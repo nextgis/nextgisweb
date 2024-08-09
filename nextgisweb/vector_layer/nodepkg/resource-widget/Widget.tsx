@@ -116,7 +116,7 @@ const SourceOptions = observer(({ store }: { store: Store }) => {
                     disabled={store.sourceOptions.cast_geometry_type === null}
                 >
                     {/* prettier-ignore */}
-                    <>{gettext("Only load features of the selected geometry type")}</>
+                    <>{gettext("Skip features with other geometry types")}</>
                 </Checkbox>
             </div>
 

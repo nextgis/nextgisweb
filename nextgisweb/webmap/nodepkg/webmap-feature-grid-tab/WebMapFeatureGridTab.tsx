@@ -102,12 +102,14 @@ export function WebMapFeatureGridTab({
                                 })
                                     .get<FeatureItem>({})
                                     .then((feature) => {
-                                        const geometry = wkt.readGeometry(
-                                            feature.geom
-                                        );
-                                        display.current.map.zoomToFeature(
-                                            new Feature({ geometry })
-                                        );
+                                        if (feature.geom !== null) {
+                                            const geometry = wkt.readGeometry(
+                                                feature.geom
+                                            );
+                                            display.current.map.zoomToFeature(
+                                                new Feature({ geometry })
+                                            );
+                                        }
                                     });
                             }
                         },

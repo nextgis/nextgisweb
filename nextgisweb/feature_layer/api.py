@@ -298,7 +298,11 @@ def idelete(resource, request, fid: FeatureID) -> JSONType:
 
 def item_extent(resource, request, fid: FeatureID) -> JSONType:
     request.resource_permission(DataScope.read)
-    extent = get_extent(resource, fid, 4326)
+    if bounds := get_box_bounds(resource, fid, 4326):
+        minLon, minLat, maxLon, maxLat = bounds
+        extent = dict(minLon=minLon, minLat=minLat, maxLon=maxLon, maxLat=maxLat)
+    else:
+        extent = None
     return dict(extent=extent)
 
 
@@ -308,12 +312,7 @@ def get_box_bounds(resource, feature_id, srs_id):
     query.box()
 
     feature = query_feature_or_not_found(query, resource.id, feature_id)
-    return feature.box.bounds
-
-
-def get_extent(resource, feature_id, srs):
-    minLon, minLat, maxLon, maxLat = get_box_bounds(resource, feature_id, srs)
-    return dict(minLon=minLon, minLat=minLat, maxLon=maxLon, maxLat=maxLat)
+    return feature.box.bounds if feature.box else None
 
 
 def geometry_info(resource, request, fid: FeatureID) -> JSONType:
@@ -321,7 +320,6 @@ def geometry_info(resource, request, fid: FeatureID) -> JSONType:
 
     query = resource.feature_query()
     query.geom()
-    query.geom_format("WKT")
 
     srs_param = request.GET.get("srs")
     srs_id = int(srs_param) if srs_param is not None else 3857
@@ -336,8 +334,10 @@ def geometry_info(resource, request, fid: FeatureID) -> JSONType:
     feature = query_feature_or_not_found(query, resource.id, fid)
 
     geom = feature.geom
-    shape = geom.shape
-    geom_type = shape.geom_type
+    if geom is None:
+        return None
+
+    geom_type = geom.shape.geom_type
 
     minX, minY, maxX, maxY = get_box_bounds(resource, fid, srs_id)
     extent = dict(minX=minX, minY=minY, maxX=maxX, maxY=maxY)
