@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 
 import { lookup, nlookup } from "@nextgisweb/jsrealm/i18n/catalog";
 
-import compile from "./string-format/complile";
+import compile from "./string-format/compile";
 
 import "@nextgisweb/jsrealm/locale-loader!";
 
