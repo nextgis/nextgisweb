@@ -1,4 +1,4 @@
-import { createElement } from "react";
+import { Fragment, createElement } from "react";
 import type { ReactNode } from "react";
 
 type PositionedParam = [message: string | number | ReactNode];
@@ -105,7 +105,7 @@ const compileWrapper = (template: string) => {
 
         // is there better way to check if it's React Component?
         if (tokens.some((token) => token && !!token.$$typeof)) {
-            const fragment = createElement("Fragment", {}, ...tokens);
+            const fragment = createElement(Fragment, {}, ...tokens);
             return fragment;
         } else {
             return tokens.join("");
