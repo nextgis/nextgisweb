@@ -1,6 +1,5 @@
 /** @testentry mocha */
 import { assert } from "chai";
-// import { InfoIcon } from "package/nextgisweb/nextgisweb/gui/nodepkg/icon";
 
 import {
     gettextf,
@@ -83,11 +82,6 @@ const describeInterpolation = (
                 "Hello, Arthur Dent"
             );
         });
-
-        // it("handles TEST", () => {
-        //     const f = sFn("Hello, {0}");
-        //     assert.equal(f(InfoIcon), "Hello, Arthur");
-        // });
 
         it("unescapes trivial curly braces", () => {
             const f = sFn("{{Hello}} {{3}}, {0}");
