@@ -1,23 +1,44 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import type { CustomFont, SystemFont } from "@nextgisweb/core/type/api";
 import { FileUploaderButton } from "@nextgisweb/file-upload/file-uploader";
 import type { FileMeta } from "@nextgisweb/file-upload/file-uploader";
-import { Button, Checkbox, Modal, Table, message } from "@nextgisweb/gui/antd";
+import {
+    Button,
+    Checkbox,
+    Modal,
+    Space,
+    Spin,
+    Table,
+} from "@nextgisweb/gui/antd";
 import type { TableColumnType } from "@nextgisweb/gui/antd";
-import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
+import { LoadingWrapper } from "@nextgisweb/gui/component";
+import { Area, Lot } from "@nextgisweb/gui/mayout";
+import showModal from "@nextgisweb/gui/showModal";
 
 import { route } from "../api";
 import { useRouteGet } from "../hook";
 import { gettext } from "../i18n";
 
-type UploadedFont = Omit<CustomFont, "type"> & { type: "upload" };
-
-type FontType = CustomFont | SystemFont | UploadedFont;
+type FontType = CustomFont | SystemFont;
 
 // eslint-disable-next-line
 const msgConfirm = gettext("During operation, the Web GIS will restart. All existing requests will aborted. Proceed? ")
 const msgSuccess = gettext("Successfully restarted");
+const msgRestarting = gettext("Web GIS is restarting");
+
+const LoadingModal = (props: any) => {
+    return (
+        <Modal {...props} footer={null}>
+
+               <Space direction="horizontal">
+               {msgRestarting}
+               <Spin />
+                </Space> 
+
+        </Modal>
+    );
+};
 
 export function FontsPanel() {
     const [fileMeta, setFileMeta] = useState<FileMeta[]>([]);
@@ -28,44 +49,6 @@ export function FontsPanel() {
     const [modal, contextHolder] = Modal.useModal();
 
     const { data, isLoading } = useRouteGet("pyramid.font");
-    const [fonts, setFonts] = useState<FontType[]>([]);
-
-    useEffect(() => {
-        if (!isLoading && fonts.length <= 0) {
-            // if (!isLoading) {
-            // setFonts({key: 2});
-            setFonts(data as FontType[]);
-        }
-    }, [data, fonts, isLoading]);
-
-    useEffect(() => {
-        if (fileMeta.length > 0 && fonts.length > 0) {
-            const newItems = fileMeta.map((file) => {
-                const [name_, ext] = file.name.split(".");
-                const name = name_
-                    .replace(/-/g, " ")
-                    .replace(/([a-z])([A-Z])/g, "$1 $2");
-
-                return {
-                    label: name,
-                    type: "upload",
-                    format: ext === "ttf" ? "TrueType" : "OpenType",
-                    key: "uploaded_" + file.name,
-                };
-            }) as UploadedFont[];
-
-            setFonts([...fonts, ...newItems]);
-        }
-    }, [fileMeta]);
-
-    useEffect(() => {
-        if (deleted.length > 0 && fonts.length > 0) {
-            const fontsAfterRemoved = fonts.filter(
-                (font) => !deleted.includes(font.key)
-            );
-            setFonts(fontsAfterRemoved);
-        }
-    }, [deleted]);
 
     const filtered = showSystem
         ? { filtered: false }
@@ -94,12 +77,25 @@ export function FontsPanel() {
             ...filtered,
         },
     ];
+    const waitForRestart = async (timestamp: number) => {
+        let resp = { started: 0 };
 
-    const reset = () => {
-        if (!isLoading) {
-            setFonts(data as FontType[]);
-            setSelectedRowKeys([]);
-        }
+        const handleRestart = () => {
+            clearInterval(connectionInterval);
+            window.location.reload();
+        };
+        const connectionInterval = setInterval(async () => {
+            try {
+                resp = await route("pyramid.ping").get({ cache: false });
+            } catch {
+                //ignore
+            } finally {
+                console.log("Web GIS is not available. Retrying connection...");
+            }
+            if (resp.started > timestamp) {
+                handleRestart();
+            }
+        }, 1000);
     };
 
     const save = async () => {
@@ -114,22 +110,12 @@ export function FontsPanel() {
                         add: fileMeta,
                     },
                 });
-                const timestamp = resp.timestamp;
                 if (resp.restarted) {
-                    const start = await route("pyramid.ping").get();
-                    if (start.started > timestamp) {
-                        message.success({
-                            content: msgSuccess,
-                        });
-                    }
+                    showModal(LoadingModal, { open: true });
+                    await waitForRestart(resp.timestamp);
                 }
             } catch {
-                //ignore
-            } finally {
-                setFileMeta([]);
-                setDeleted([]);
-                setFonts([]);
-                window.location.reload();
+                console.log("err");
             }
     };
 
@@ -139,53 +125,49 @@ export function FontsPanel() {
     return (
         <div>
             {contextHolder}
-            <Checkbox
-                checked={showSystem}
-                onClick={() => {
-                    setShowSystem((showSystem) => !showSystem);
-                }}
-            >
-                {showSystem}
-                {gettext("Show system fonts")}
-            </Checkbox>
-            <Button
-                danger
-                disabled={selectedRowKeys.length <= 0}
-                onClick={() => {
-                    setDeleted(selectedRowKeys);
-                    setSelectedRowKeys([]);
-                }}
-            >
-                {gettext("Delete")}
-            </Button>
-            <Button
-                disabled={deleted.length > 0 && fileMeta.length > 0}
-                onClick={reset}
-            >
-                {gettext("Reset")}
-            </Button>
-            <FileUploaderButton
-                accept=".ttf,.otf"
-                onChange={(meta?: FileMeta[]) => {
-                    if (meta) setFileMeta(meta);
-                }}
-                multiple={true}
-            />
+
+            <Space direction="horizontal">
+                <FileUploaderButton
+                    accept=".ttf,.otf"
+                    onChange={(meta?: FileMeta[]) => {
+                        if (meta) {
+                            setFileMeta(meta);
+                            save();
+                        }
+                    }}
+                    multiple={true}
+                />
+                <Button
+                    danger
+                    disabled={selectedRowKeys.length <= 0}
+                    onClick={() => {
+                        setDeleted(selectedRowKeys);
+                        save();
+                    }}
+                >
+                    {gettext("Delete")}
+                </Button>
+                <Checkbox
+                    checked={showSystem}
+                    onClick={() => {
+                        setShowSystem((showSystem) => !showSystem);
+                    }}
+                >
+                    {showSystem}
+                    {gettext("Show system fonts")}
+                </Checkbox>
+            </Space>
+
             <Table
                 columns={columns}
-                dataSource={fonts}
+                dataSource={data}
                 rowSelection={{
                     type: "checkbox",
                     onChange: (keys: any) => setSelectedRowKeys(keys),
                     getCheckboxProps: (record) => ({
-                        disabled: ["system", "upload"].includes(record.type),
+                        disabled: ["system"].includes(record.type),
                     }),
                 }}
-            />
-
-            <SaveButton
-                onClick={save}
-                disabled={deleted.length === 0 && fileMeta.length === 0}
             />
         </div>
     );
