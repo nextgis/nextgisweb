@@ -1,4 +1,4 @@
-from nextgisweb.env import gettext
+from nextgisweb.env import gettext, gettextf
 
 from nextgisweb.core.exception import InsufficientPermissions, UserException, ValidationError
 
@@ -24,15 +24,15 @@ class AttributeUpdateForbidden(InsufficientPermissions):
         write = attr.write
         attribute = f"{attr.srlzrcls.identity}.{attr.attrname}"
         if attr.write is not None:
-            self.message = gettext(
+            self.message = gettextf(
                 "Modification of the '{attribute}' attribute requires "
                 "the '{permission}' permission."
-            ).format(attribute=attribute, permission=write.label)
+            )(attribute=attribute, permission=write.label)
             self.data.update(scope=write.scope.identity, permission=write.name)
         else:
-            self.message = gettext(
+            self.message = gettextf(
                 "The '{attribute}' attribute is read-only and cannot be updated."
-            ).format(attribute=attribute)
+            )(attribute=attribute)
             self.data.update(scope=None, permission=None)
 
 
@@ -77,11 +77,11 @@ class QuotaExceeded(UserException):
         if required < 2:
             msg = gettext("Maximum number of resources exceeded. The limit is %s.") % limit
         else:
-            msg = gettext(
-                "Not enough resource quota: {0} required, but only {1} available."
-            ).format(required, available)
+            msg = gettextf("Not enough resource quota: {0} required, but only {1} available.")(
+                required, available
+            )
         if cls is not None:
-            msg += " " + gettext("Resource type - {}.").format(cls.cls_display_name)
+            msg += " " + gettextf("Resource type - {}.")(cls.cls_display_name)
 
         super().__init__(
             message=msg,

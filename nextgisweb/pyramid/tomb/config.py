@@ -12,7 +12,7 @@ from msgspec.json import Decoder
 from pyramid.config import Configurator as PyramidConfigurator
 from typing_extensions import Annotated
 
-from nextgisweb.env import gettext
+from nextgisweb.env import gettext, gettextf
 from nextgisweb.env.package import pkginfo
 from nextgisweb.lib.apitype import ContentType, EmptyObject, JSONType, PathParam, QueryParam
 from nextgisweb.lib.apitype.query_string import QueryParamError, QueryParamRequired
@@ -93,10 +93,10 @@ def _describe_query_param_error(exc):
     data = dict(location=["query", exc.name])
     if isinstance(exc, QueryParamRequired):
         title = gettext("Parameter required")
-        message = gettext("The '{}' query parameter is required.").format(exc.name)
+        message = gettextf("The '{}' query parameter is required.")(exc.name)
     else:
         title = gettext("Invalid parameter")
-        message = gettext("The '{}' query parameter has an invalid value.").format(name)
+        message = gettextf("The '{}' query parameter has an invalid value.")(name)
     user_exception(exc, title=title, message=message, data=data, http_status_code=422)
 
 

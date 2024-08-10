@@ -7,7 +7,7 @@ from requests.exceptions import RequestException
 from sqlalchemy import sql
 from typing_extensions import Annotated, Union
 
-from nextgisweb.env import DBSession, env, gettext
+from nextgisweb.env import DBSession, env, gettext, gettextf
 from nextgisweb.lib.apitype import OP, AsJSON, Derived, EmptyObject, ReadOnly, Required, StatusCode
 from nextgisweb.lib.geometry import Geometry, Transformer, geom_area, geom_length
 
@@ -389,7 +389,7 @@ def catalog_import(request, *, body: SRSCatalogImportBody) -> SRSCatalogImportRe
 
     conflict = SRS.filter(sql.or_(*conflict_filter)).first()
     if conflict:
-        raise ValidationError(gettext("SRS #{} already exists.").format(conflict.id))
+        raise ValidationError(gettextf("SRS #{} already exists.")(conflict.id))
 
     obj.persist()
     DBSession.flush()

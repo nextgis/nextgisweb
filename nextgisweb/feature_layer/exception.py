@@ -1,4 +1,4 @@
-from nextgisweb.env import gettext
+from nextgisweb.env import gettext, gettextf
 
 from nextgisweb.core.exception import UserException
 
@@ -18,11 +18,11 @@ class FeatureNotFound(UserException):
 
 class RestoreNotDeleted(UserException):
     title = gettext("Feature not deleted")
-    message = gettext("Unable to restore the #{} feature as it is not deleted.")
+    message_tpl = gettextf("Unable to restore the #{} feature as it is not deleted.")
     http_status_code = 422
 
     def __init__(self, resource_id, feature_id):
         super().__init__(
-            message=self.message.format(feature_id),
+            message=self.message_tpl(feature_id),
             data=dict(resource_id=resource_id, feature_id=feature_id),
         )

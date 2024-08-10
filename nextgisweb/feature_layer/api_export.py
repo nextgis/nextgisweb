@@ -6,7 +6,7 @@ from osgeo import gdal
 from pyramid.response import FileResponse
 from sqlalchemy.orm.exc import NoResultFound
 
-from nextgisweb.env import env, gettext
+from nextgisweb.env import env, gettext, gettextf
 from nextgisweb.lib.geometry import Geometry, GeometryNotValid, Transformer
 
 from nextgisweb.core.exception import ValidationError
@@ -145,9 +145,9 @@ def export(resource, options, filepath):
 
         if total_count > export_limit:
             raise ValidationError(
-                message=gettext(
+                message=gettextf(
                     "The export limit is set to {limit} features, but the layer contains {count}."
-                ).format(limit=export_limit, count=total_count)
+                )(limit=export_limit, count=total_count)
             )
 
     query.geom()

@@ -16,7 +16,7 @@ from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.orm import defer, joinedload, load_only
 from sqlalchemy.orm.exc import NoResultFound
 
-from nextgisweb.env import DBSession, env, gettext
+from nextgisweb.env import DBSession, env, gettext, gettextf
 from nextgisweb.lib.config import Option, OptionAnnotations
 from nextgisweb.lib.logging import lazy_str, logger
 
@@ -320,12 +320,12 @@ class OAuthHelper:
                 if user is not None and user.id != bind_user.id:
                     dn = self.options["server.display_name"]
                     raise AuthorizationException(
-                        title=gettext("{} binding error").format(dn),
-                        message=gettext(
+                        title=gettextf("{} binding error")(dn),
+                        message=gettextf(
                             "This {dn} account ({sub}) is already bound to "
                             "the different user ({id}). Log in using this "
                             "account instead of binding it."
-                        ).format(dn=dn, sub=_atoken().sub, id=user.id),
+                        )(dn=dn, sub=_atoken().sub, id=user.id),
                     )
                 user = bind_user
 

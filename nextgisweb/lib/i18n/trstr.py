@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 from functools import partial
+from sys import _getframe
 from typing import Any, Mapping, Protocol, Sequence, Tuple, Union
+from warnings import warn_explicit
 
 from ..logging import logger
 
@@ -40,6 +42,7 @@ class TrStr(Translatable):
         number: Union[int, None] = None,
         context: Union[str, None] = None,
         domain: str,
+        stacklevel: int = 1,
     ):
         self.msg = msg
         self.plural = plural
@@ -48,10 +51,17 @@ class TrStr(Translatable):
         self.context = context
         self.domain = domain
 
+        # Remeber where it is declared for future warning
+        # TODO: Remove when warnings removed
+        frame = _getframe(stacklevel)
+        self._filename = frame.f_code.co_filename
+        self._lineno = frame.f_lineno
+
     def __str__(self) -> str:
         return self.msg
 
     def __mod__(self, arg: ModArgument):
+        # TODO: Warn and deprecated here
         return TrStrModFormat(self, arg)
 
     def __add__(self, other: TranslatableOrStr):
@@ -61,6 +71,13 @@ class TrStr(Translatable):
         return TrStrConcat(other, self)
 
     def format(self, *args, **kwargs):
+        warn_explicit(
+            "Usage of TrStr.format() has been deprecated, migrate to gettextf "
+            "functions (available since nextgisweb >= 4.9.0.dev7).",
+            DeprecationWarning,
+            filename=self._filename,
+            lineno=self._lineno,
+        )
         return TrStrFormat(self, args, kwargs)
 
     def __translate__(self, translator):
@@ -92,8 +109,43 @@ class TrStrConcat(Translatable):
         return "".join(str(i) for i in deep_translate(self.items, translator))
 
 
+class TrTpl(Translatable):
+    __slots__ = ["msg", "plural", "number", "context", "domain"]
+
+    def __init__(
+        self,
+        msg: str,
+        *,
+        plural: Union[str, None] = None,
+        number: Union[int, None] = None,
+        context: Union[str, None] = None,
+        domain: str,
+    ):
+        self.msg = msg
+        self.plural = plural
+        self.number = number
+
+        self.context = context
+        self.domain = domain
+
+    def __call__(self, *args, **kwargs):
+        return TrStrFormat(self, args, kwargs)
+
+    def format(self, *args, **kwargs):
+        return self(*args, **kwargs)
+
+    def __translate__(self, translator):
+        return translator.translate(
+            self.msg,
+            plural=self.plural,
+            number=self.number,
+            context=self.context,
+            domain=self.domain,
+        )
+
+
 class TrStrModFormat(Translatable):
-    def __init__(self, trstr: TrStr, arg: ModArgument):
+    def __init__(self, trstr: Translatable, arg: ModArgument):
         self.trstr = trstr
         self.arg = arg
 
@@ -127,7 +179,7 @@ class TrStrModFormat(Translatable):
 
 
 class TrStrFormat(Translatable):
-    def __init__(self, trstr: TrStr, args: Sequence, kwargs: Mapping):
+    def __init__(self, trstr: Translatable, args: Sequence, kwargs: Mapping):
         self.trstr = trstr
         self.args = args
         self.kwargs = kwargs
@@ -184,20 +236,45 @@ class trstr_factory:
         self.domain = domain
 
     def gettext(self, message: str) -> TrStr:
-        return TrStr(message, domain=self.domain)
+        return TrStr(message, domain=self.domain, stacklevel=2)
 
     def pgettext(self, context: str, message: str) -> TrStr:
-        return TrStr(message, context=context, domain=self.domain)
+        return TrStr(message, context=context, domain=self.domain, stacklevel=2)
 
     def ngettext(self, singular: str, plural: str, number: int) -> TrStr:
-        return TrStr(singular, plural=plural, number=number, domain=self.domain)
+        return TrStr(singular, plural=plural, number=number, domain=self.domain, stacklevel=2)
 
     def npgettext(self, context: str, singular: str, plural: str, number: int) -> TrStr:
-        return TrStr(singular, plural=plural, number=number, context=context, domain=self.domain)
+        return TrStr(
+            singular,
+            plural=plural,
+            number=number,
+            context=context,
+            domain=self.domain,
+            stacklevel=2,
+        )
+
+    def gettextf(self, message: str) -> TrTpl:
+        return TrTpl(message, domain=self.domain)
+
+    def pgettextf(self, context: str, message: str) -> TrTpl:
+        return TrTpl(message, context=context, domain=self.domain)
+
+    def ngettextf(self, singular: str, plural: str, number: int) -> TrTpl:
+        return TrTpl(singular, plural=plural, number=number, domain=self.domain)
+
+    def npgettextf(self, context: str, singular: str, plural: str, number: int) -> TrTpl:
+        return TrTpl(
+            singular,
+            plural=plural,
+            number=number,
+            context=context,
+            domain=self.domain,
+        )
 
     def __call__(self, message: str) -> TrStr:
         """Alias for gettext"""
-        return TrStr(message, domain=self.domain)
+        return TrStr(message, domain=self.domain, stacklevel=2)
 
 
 class DummyTranslator(Translator):

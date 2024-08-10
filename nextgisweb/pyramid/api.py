@@ -9,7 +9,7 @@ from pyramid.interfaces import IRoutesMapper
 from pyramid.response import Response
 from typing_extensions import Annotated
 
-from nextgisweb.env import COMP_ID, Component, DBSession, env, gettext, inject
+from nextgisweb.env import COMP_ID, Component, DBSession, env, gettext, gettextf, inject
 from nextgisweb.env.package import pkginfo
 from nextgisweb.lib.apitype import AnyOf, AsJSON, EmptyObject, Gap, StatusCode, fillgap
 from nextgisweb.lib.imptool import module_from_stack
@@ -426,10 +426,10 @@ def setup_pyramid_csettings(comp, config):
             if "all" in attrs:
                 if len(attrs) > 1:
                     raise ValidationError(
-                        message=gettext(
+                        message=gettextf(
                             "The '{}' query parameter should not contain "
                             "additional values if 'all' is specified."
-                        ).format(cid)
+                        )(cid)
                     )
                 else:
                     attrs = list(cgetters)
@@ -554,7 +554,7 @@ class header_logo(csetting):
         try:
             mime_type = LogoMimeType(fupload.mime_type)
         except ValueError:
-            msg = gettext("Got an unsupported MIME type: '{}'.").format(fupload.mime_type)
+            msg = gettextf("Got an unsupported MIME type: '{}'.")(fupload.mime_type)
             raise ValidationError(msg)
         if fupload.size > 64 * 1024:
             raise ValidationError(message=gettext("64K should be enough for a logo."))

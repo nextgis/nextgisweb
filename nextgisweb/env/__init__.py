@@ -6,7 +6,7 @@ from .environment import Env, EnvDependency, env, inject, provide, setenv
 from .model import DBSession
 
 if typing.TYPE_CHECKING:
-    from nextgisweb.lib.i18n import TrStr
+    from nextgisweb.lib.i18n import TrStr, TrTpl
 
     COMP_ID: str
 
@@ -15,6 +15,11 @@ if typing.TYPE_CHECKING:
     def pgettext(context: str, messsage: str) -> TrStr: ...
     def ngettext(singual: str, plural: str, number: int) -> TrStr: ...
     def npgettext(context: str, singual: str, plural: str, number: int) -> TrStr: ...
+
+    def gettextf(message: str) -> TrTpl: ...
+    def pgettextf(context: str, messsage: str) -> TrTpl: ...
+    def ngettextf(singual: str, plural: str, number: int) -> TrTpl: ...
+    def npgettextf(context: str, singual: str, plural: str, number: int) -> TrTpl: ...
     # fmt: on
 
     _ = gettext
@@ -26,7 +31,17 @@ def __getattr__(name):
 
         return _COMP_ID()
 
-    elif name in ("_", "gettext", "pgettext", "ngettext", "npgettext"):
+    elif name in (
+        "_",
+        "gettext",
+        "pgettext",
+        "ngettext",
+        "npgettext",
+        "gettextf",
+        "pgettextf",
+        "ngettextf",
+        "npgettextf",
+    ):
         from .component import _tr_str_factory as _factory
 
         if name == "_":

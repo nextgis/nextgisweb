@@ -2,7 +2,7 @@ from osgeo import ogr
 from sqlalchemy.ext.orderinglist import ordering_list
 from sqlalchemy.orm import declared_attr
 
-from nextgisweb.env import Base, gettext
+from nextgisweb.env import Base, gettext, gettextf
 from nextgisweb.lib import db
 from nextgisweb.lib.geometry import Transformer
 
@@ -171,9 +171,9 @@ class _fields_attr(SP):
             if "keyname" in fld:
                 if fld["keyname"] in FIELD_FORBIDDEN_NAME:
                     raise ValidationError(
-                        message=gettext(
-                            "Field name is forbidden: '{}'. Please remove or " "rename it."
-                        ).format(fld["keyname"])
+                        message=gettextf(
+                            "Field name is forbidden: '{}'. Please remove or rename it."
+                        )(fld["keyname"])
                     )
                 mfld.keyname = fld["keyname"]
             if "display_name" in fld:

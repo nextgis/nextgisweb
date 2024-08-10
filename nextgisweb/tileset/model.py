@@ -14,7 +14,7 @@ from osgeo import ogr, osr
 from PIL import Image
 from zope.interface import implementer
 
-from nextgisweb.env import COMP_ID, Base, env, gettext
+from nextgisweb.env import COMP_ID, Base, env, gettext, gettextf
 from nextgisweb.lib.osrhelper import sr_from_epsg
 from nextgisweb.lib.registry import list_registry
 
@@ -203,8 +203,9 @@ class Tileset(Base, Resource, SpatialLayerMixin):
             (gettext("Number of tiles"), sum(self.tileset_ntiles)),
             (
                 gettext("Zoom levels"),
-                gettext("From {min} to {max}").format(
-                    min=self.tileset_zmin, max=self.tileset_zmax
+                gettextf("From {min} to {max}")(
+                    min=self.tileset_zmin,
+                    max=self.tileset_zmax,
                 ),
             ),
         )
@@ -237,13 +238,13 @@ class FileFormat:
         if match := self.pattern.match(filename):
             if match["prefix"] != self.prefix:
                 raise ValidationError(
-                    message=gettext(
+                    message=gettextf(
                         "Tiles '{}' and '{}' are located in different subdirectories."
-                    ).format(self.filename, filename)
+                    )(self.filename, filename)
                 )
             if self.ext is not None and match["ext"].lower() not in self.ext:
                 raise ValidationError(
-                    message=gettext("Tiles '{}' and '{}' have different extensions.").format(
+                    message=gettextf("Tiles '{}' and '{}' have different extensions.")(
                         self.filename, filename
                     )
                 )

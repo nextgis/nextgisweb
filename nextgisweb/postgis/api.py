@@ -6,7 +6,7 @@ from sqlalchemy import inspect
 from sqlalchemy.exc import NoResultFound, NoSuchTableError, SQLAlchemyError
 from typing_extensions import Annotated
 
-from nextgisweb.env import gettext
+from nextgisweb.env import gettext, gettextf
 from nextgisweb.lib.apitype import AsJSON
 
 from nextgisweb.core.exception import ValidationError
@@ -147,7 +147,7 @@ def diagnostics(request, *, body: CheckBody) -> CheckResponse:
             try:
                 res = PostgisLayer.filter_by(id=lid).one()
             except NoResultFound:
-                raise ValidationError(message=gettext("PostGIS layer {} not found!").format(lid))
+                raise ValidationError(message=gettextf("PostGIS layer {} not found!")(lid))
 
             # Same permission as for reading layer parameters.
             request.resource_permission(ResourceScope.read, res)
@@ -171,7 +171,7 @@ def diagnostics(request, *, body: CheckBody) -> CheckResponse:
         try:
             res = PostgisConnection.filter_by(id=cid).one()
         except NoResultFound:
-            raise ValidationError(message=gettext("PostGIS connection {} not found!").format(cid))
+            raise ValidationError(message=gettextf("PostGIS connection {} not found!")(cid))
 
         request.resource_permission(ConnectionScope.connect, res)
         connection = {

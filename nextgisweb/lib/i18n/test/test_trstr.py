@@ -6,6 +6,7 @@ import pytest
 from ..trstr import Translator, trstr_factory
 
 f = trstr_factory("test")
+t = f.gettextf
 n = f.ngettext
 p = f.pgettext
 np = f.npgettext
@@ -65,10 +66,19 @@ def test_concat(uc_tr):
     assert len(value.items) == 3
 
 
-def test_format(uc_tr):
-    assert uc_tr(f("foo %s") % f("bar")) == "FOO BAR"
-    assert uc_tr(f("foo {}").format(f("bar"))) == "FOO BAR"
-    assert uc_tr(f("foo %s") % f("bar") + " " + f("foo")) == "FOO BAR FOO"
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
+@pytest.mark.parametrize(
+    "c, m",
+    [
+        pytest.param(f, True, id="legacy"),
+        pytest.param(t, False, id="template"),
+    ],
+)
+def test_format(c, m, uc_tr):
+    assert uc_tr(c("foo {}").format(f("bar"))) == "FOO BAR"
+    if m:
+        assert uc_tr(c("foo %s") % f("bar")) == "FOO BAR"
+        assert uc_tr(c("foo %s") % f("bar") + " " + f("foo")) == "FOO BAR FOO"
 
 
 class DictTranslator(Translator):
@@ -106,7 +116,7 @@ def test_guard(caplog):
             assert "Unable to format" in caplog.text
 
     dt.add("A", "B")
-    assert tr(f("A").format() + " " + f("A")) == "B B"
+    assert tr(t("A").format() + " " + f("A")) == "B B"
 
     dt.add("M%s", "T%d")
     with assert_exception():
@@ -114,18 +124,18 @@ def test_guard(caplog):
 
     dt.add("M{}", "T{}")
     dt.add("M%d", "T%d")
-    assert tr(f("M{}").format("a")) == "Ta"
-    assert tr(f("M{}").format("a") + f("M%d") % 1) == "TaT1"
+    assert tr(t("M{}").format("a")) == "Ta"
+    assert tr(t("M{}").format("a") + f("M%d") % 1) == "TaT1"
     with pytest.raises(TypeError):
-        tr(f("M{}").format("a") + f("M%d") % "a")
+        tr(t("M{}").format("a") + f("M%d") % "a")
 
     dt.add("M{}", "T{}{}")
     with assert_exception():
-        assert tr(f("M{}").format("a")) == "Ma"
+        assert tr(t("M{}").format("a")) == "Ma"
 
     dt.add("M{p}", "T{q}")
     with assert_exception():
-        assert tr(f("M{p}").format(p="a")) == "Ma"
+        assert tr(t("M{p}").format(p="a")) == "Ma"
 
     dt.add("M{q}", "T")
-    assert tr(f("M{q}").format(q="a")) == "T"
+    assert tr(t("M{q}").format(q="a")) == "T"

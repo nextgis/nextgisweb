@@ -18,7 +18,7 @@ from sqlalchemy.types import (
     Time,
 )
 
-from nextgisweb.env import gettext
+from nextgisweb.env import gettext, gettextf
 from nextgisweb.lib.logging import logger
 
 from nextgisweb.feature_layer import FIELD_TYPE
@@ -159,7 +159,7 @@ class PostgresCheck(ConnectionCheck):
         try:
             gethostbyname(self.hostname)
         except gaierror as exc:
-            self.error(gettext("Host name resolution failed: {}.").format(exc.strerror.lower()))
+            self.error(gettextf("Host name resolution failed: {}.")(exc.strerror.lower()))
             return
 
         url = EngineURL.create(
@@ -184,10 +184,10 @@ class PostgresCheck(ConnectionCheck):
         self.success(gettext("Connected to the database."))
 
         conn.execute(sql.text("SELECT 1"))
-        self.success(gettext("Executed {} query.").format("SELECT 1"))
+        self.success(gettextf("Executed {} query.")("SELECT 1"))
 
         ver = conn.execute(sql.text("SHOW server_version")).scalar().split(" ")[0]
-        self.success(gettext("PostgreSQL version {}.").format(ver))
+        self.success(gettextf("PostgreSQL version {}.")(ver))
 
     def cleanup(self):
         if conn := getattr(self, "_conn", None):
@@ -208,13 +208,13 @@ class PostgisCheck(ConnectionCheck):
         if ver is None:
             self.error(gettext("PostGIS extension not found."))
         else:
-            self.success(gettext("PostGIS extension version {}.").format(ver))
+            self.success(gettextf("PostGIS extension version {}.")(ver))
 
         gcol_count = conn.execute(sql.text("SELECT COUNT(*) FROM geometry_columns")).scalar()
-        self.say(gettext("Number of geometry columns: {}.").format(gcol_count))
+        self.say(gettextf("Number of geometry columns: {}.")(gcol_count))
 
         srs_count = conn.execute(sql.text("SELECT COUNT(*) FROM spatial_ref_sys")).scalar()
-        self.say(gettext("Number of spatial reference systems: {}.").format(srs_count))
+        self.say(gettextf("Number of spatial reference systems: {}.")(srs_count))
 
 
 class TableNotExists(Exception):
@@ -262,7 +262,7 @@ class TableCheck(LayerCheck):
         except TableNotExists:
             self.error(gettext("Table not found."))
             return
-        self.success(gettext("Table found, table type is {}.").format(tins.table_type))
+        self.success(gettextf("Table found, table type is {}.")(tins.table_type))
 
         sql_has_privilege = """
             SELECT has_table_privilege(
@@ -280,14 +280,14 @@ class TableCheck(LayerCheck):
                 dict(schema=self.schema, table=self.table, privilege=priv),
             ).scalar()
             if has_privilege:
-                self.success(gettext("{} privilege is present.").format(priv))
+                self.success(gettextf("{} privilege is present.")(priv))
             elif not req:
-                self.warning(gettext("{} privilege is absent.").format(priv))
+                self.warning(gettextf("{} privilege is absent.")(priv))
             else:
-                self.error(gettext("{} privilege is absent.").format(priv))
+                self.error(gettextf("{} privilege is absent.")(priv))
 
         count = conn.execute(select(func.count("*")).select_from(self.sa_table)).scalar()
-        self.say(gettext("Number of records: {}.").format(count))
+        self.say(gettextf("Number of records: {}.")(count))
 
         if self.column_id is None or self.column_geom is None:
             self.error(gettext("ID or geometry column isn't set."))
@@ -307,9 +307,9 @@ class IdColumnCheck(LayerCheck):
 
         ctype_repr = coltype_as_str(cinfo["type"])
         if not isinstance(cinfo["type"], Integer):
-            self.error(gettext("Column found, but has non-integer type - {}.").format(ctype_repr))
+            self.error(gettextf("Column found, but has non-integer type - {}.")(ctype_repr))
 
-        self.success(gettext("Column found, type is {}.").format(ctype_repr))
+        self.success(gettextf("Column found, type is {}.")(ctype_repr))
 
         is_table = tins.table_type == "BASE TABLE"
 
@@ -385,11 +385,9 @@ class GeomColumnCheck(LayerCheck):
             "GEOMETRY",
             self.geometry_type,
         ):
-            self.error(
-                gettext("Column found, but has an incompatible type - {}.").format(ctype_repr)
-            )
+            self.error(gettextf("Column found, but has an incompatible type - {}.")(ctype_repr))
         else:
-            self.success(gettext("Column found, type is {}.").format(ctype_repr))
+            self.success(gettextf("Column found, type is {}.")(ctype_repr))
 
         if ctype.srid != self.geometry_srid:
             self.error(gettext("Geometry SRID mismatch."))
@@ -407,11 +405,11 @@ class GeomColumnCheck(LayerCheck):
             except SQLAlchemyError:
                 if ctype.srid == srid:
                     raise
-                self.error(gettext("Failed to reproject extent to SRID {}.").format(srid))
+                self.error(gettextf("Failed to reproject extent to SRID {}.")(srid))
                 continue
 
             extent_str = ", ".join("{:.4f}".format(c) for c in extent)
-            self.say(gettext("Extent (SRID {}): {}.").format(srid, extent_str))
+            self.say(gettextf("Extent (SRID {}): {}.")(srid, extent_str))
 
 
 class ColumnsCheck(LayerCheck):
@@ -421,7 +419,7 @@ class ColumnsCheck(LayerCheck):
         for field in self.fields:
             cinfo = tins.columns.get(field.column_name)
             if cinfo is None:
-                self.error(gettext("Column of field '{}' not found.").format(field.keyname))
+                self.error(gettextf("Column of field '{}' not found.")(field.keyname))
                 return
 
             ctype = cinfo["type"]
@@ -430,15 +428,13 @@ class ColumnsCheck(LayerCheck):
             type_expected = _FIELD_TYPE_2_DB[field.datatype]
             if not isinstance(ctype, type_expected):
                 self.error(
-                    gettext(
-                        "Column of field '{}' found, but has an incompatible type - {}."
-                    ).format(field.keyname, ctype_repr)
+                    gettextf("Column of field '{}' found, but has an incompatible type - {}.")(
+                        field.keyname, ctype_repr
+                    )
                 )
             else:
                 self.success(
-                    gettext("Column of field '{}' found, type is {}.").format(
-                        field.keyname, ctype_repr
-                    )
+                    gettextf("Column of field '{}' found, type is {}.")(field.keyname, ctype_repr)
                 )
 
 

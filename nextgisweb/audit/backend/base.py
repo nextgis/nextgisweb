@@ -1,6 +1,6 @@
 from contextlib import contextmanager
 
-from nextgisweb.env import gettext, inject
+from nextgisweb.env import gettext, gettextf, inject
 from nextgisweb.lib.registry import dict_registry
 
 from nextgisweb.core.exception import NotConfigured
@@ -34,10 +34,10 @@ def is_backend_configured(identity, *, comp: AuditComponent):
 
 class AuditBackendNotConfigured(NotConfigured):
     title = gettext("Audit backend not enabled")
-    message = gettext("The '{}' audit backend is not configured on this server.")
+    message_tpl = gettextf("The '{}' audit backend is not configured on this server.")
 
     def __init__(self, identity):
-        super().__init__(message=self.message.format(identity))
+        super().__init__(message=self.message_tpl(identity))
 
 
 def require_backend(identity):
