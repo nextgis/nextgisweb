@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef } from "react";
 
 import { Form } from "@nextgisweb/gui/antd";
 
+import { FieldsFormVirtualized } from "./FieldsFormVirtualized";
 import { FormItem } from "./FormItem";
 import type { FieldsFormProps, FormProps } from "./type";
 
@@ -14,6 +15,7 @@ export function FieldsForm<
     children,
     onChange,
     whenReady,
+    virtualize = false,
     initialValues,
     ...formProps
 }: FieldsFormProps<P>) {
@@ -52,12 +54,10 @@ export function FieldsForm<
         ...(onChange && { onFieldsChange }),
     };
 
-    const formItems = useMemo(() => {
-        const includedFormItems = fields.filter((f) => f.included ?? true);
-        return includedFormItems.map((f) => {
-            return <FormItem key={f.name} {...f} />;
-        });
-    }, [fields]);
+    const includedFields = useMemo(
+        () => fields.filter((f) => f.included ?? true),
+        [fields]
+    );
 
     return (
         <Form
@@ -65,8 +65,15 @@ export function FieldsForm<
             colon={false}
             {...modifiedFormProps}
             className="fields-form"
+            style={{ width: "100%", height: virtualize ? "100%" : undefined }}
         >
-            {formItems}
+            {virtualize ? (
+                <FieldsFormVirtualized fields={includedFields}>
+                    {children}
+                </FieldsFormVirtualized>
+            ) : (
+                includedFields.map((f) => <FormItem key={f.name} {...f} />)
+            )}
             {children}
         </Form>
     );

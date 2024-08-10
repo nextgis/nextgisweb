@@ -3,8 +3,6 @@
     "version": "0.0.0",
     "type": "module",
     "dependencies": {
-        "@tanstack/react-virtual": "^3.7.0",
-        "lodash-es": "^4.17.21",
         "react-draggable": "^4.4.5"
     }
 }

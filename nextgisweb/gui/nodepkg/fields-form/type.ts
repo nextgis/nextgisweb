@@ -52,6 +52,7 @@ export interface FieldsFormProps<
     P extends Record<string, any> = Record<string, any>,
 > extends FormProps {
     initialValues?: Partial<P>;
+    virtualize?: boolean;
     whenReady?: () => void;
     onChange?: (options: FormOnChangeOptions<P>) => void;
     children?: ReactNode;

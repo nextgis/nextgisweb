@@ -163,23 +163,24 @@ const AttributeEditor = observer(
         }
 
         return (
-            <div className="ngw-gui-antd-tab-padding">
-                <FieldsForm
-                    form={form}
-                    size={size}
-                    fields={formFields}
-                    initialValues={attributes}
-                    onChange={async (v) => {
-                        if (await v.isValid()) {
-                            setValues(v.value);
-                        }
-                    }}
-                >
-                    {!formFields.length && <p>{msgNoAttrs}</p>}
-                </FieldsForm>
-            </div>
+            <FieldsForm
+                virtualize
+                form={form}
+                size={size}
+                fields={formFields}
+                initialValues={attributes}
+                onChange={async (v) => {
+                    if (await v.isValid()) {
+                        setValues(v.value);
+                    }
+                }}
+            >
+                {!formFields.length && <p>{msgNoAttrs}</p>}
+            </FieldsForm>
         );
     }
 );
+
+AttributeEditor.displayName = "AttributeEditor";
 
 export default AttributeEditor;
