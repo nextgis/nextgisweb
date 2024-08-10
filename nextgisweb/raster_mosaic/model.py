@@ -1,6 +1,8 @@
 from pathlib import Path
+from typing import List, Union
 
 import geoalchemy2 as ga
+from msgspec import UNSET, Struct, UnsetType
 from osgeo import gdal
 from sqlalchemy import func
 from sqlalchemy.ext.orderinglist import ordering_list
@@ -13,12 +15,18 @@ from nextgisweb.lib.osrhelper import sr_from_wkt
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.file_storage import FileObj
-from nextgisweb.file_upload import FileUpload
+from nextgisweb.file_upload import FileUploadRef
 from nextgisweb.layer import IBboxLayer, SpatialLayerMixin
 from nextgisweb.raster_layer.util import calc_overviews_levels
-from nextgisweb.resource import DataScope, Resource, ResourceGroup, ResourceScope, Serializer
-from nextgisweb.resource import SerializedProperty as SP
-from nextgisweb.resource import SerializedRelationship as SR
+from nextgisweb.resource import (
+    DataScope,
+    Resource,
+    ResourceGroup,
+    ResourceScope,
+    SAttribute,
+    Serializer,
+    SRelationship,
+)
 
 SUPPORTED_DRIVERS = ("GTiff",)
 
@@ -222,28 +230,42 @@ class RasterMosaicItem(Base):
         return dict(id=self.id, display_name=self.display_name)
 
 
-class _items_attr(SP):
-    def getter(self, srlzr):
-        return [itm.to_dict() for itm in srlzr.obj.items]
+class RasterMosaicItemRead(Struct, kw_only=True):
+    id: int
+    display_name: Union[str, None]
 
-    def setter(self, srlzr, value):
+
+class RasterMosaicItemWrite(Struct, kw_only=True):
+    id: Union[int, UnsetType] = UNSET
+    display_name: Union[str, None, UnsetType] = UNSET
+    file_upload: Union[FileUploadRef, UnsetType] = UNSET
+
+
+class ItemsAttr(SAttribute, apitype=True):
+    def get(self, srlzr: Serializer) -> List[RasterMosaicItemRead]:
+        return [
+            RasterMosaicItemRead(
+                id=i.id,
+                display_name=i.display_name,
+            )
+            for i in srlzr.obj.items
+        ]
+
+    def set(self, srlzr: Serializer, value: List[RasterMosaicItemWrite], *, create: bool):
         srlzr.obj.items = []
         for item in value:
-            file_upload = item.get("file_upload")
-            if file_upload is not None:
-                mitem = RasterMosaicItem(resource=srlzr.obj, display_name=item["display_name"])
-                mitem.load_file(FileUpload(id=file_upload["id"]).data_path)
+            if (file_upload := item.file_upload) is not UNSET:
+                dn = item.display_name if item.display_name is not UNSET else None
+                mitem = RasterMosaicItem(resource=srlzr.obj, display_name=dn)
+                mitem.load_file(file_upload().data_path)
             else:
-                mitem = RasterMosaicItem.filter_by(id=item["id"]).one()
+                mitem = RasterMosaicItem.filter_by(id=item.id).one()
                 if mitem.resource_id == srlzr.obj.id:
-                    mitem.display_name = item["display_name"]
+                    if (dn := item.display_name) is not UNSET:
+                        mitem.display_name = dn
             srlzr.obj.items.append(mitem)
 
 
-class RasterMosaicSerializer(Serializer):
-    identity = RasterMosaic.identity
-    resclass = RasterMosaic
-
-    srs = SR(read=ResourceScope.read, write=ResourceScope.update)
-
-    items = _items_attr(read=DataScope.read, write=DataScope.write)
+class RasterMosaicSerializer(Serializer, resource=RasterMosaic):
+    srs = SRelationship(read=ResourceScope.read, write=ResourceScope.update)
+    items = ItemsAttr(read=DataScope.read, write=DataScope.write)
