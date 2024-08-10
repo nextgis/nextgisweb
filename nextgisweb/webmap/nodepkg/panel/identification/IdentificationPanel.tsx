@@ -195,7 +195,10 @@ const FeatureInfo = ({
         makeExtensionComps();
     }, [featureItem]);
 
-    if (webmapSettings.identify_attributes) {
+    if (
+        webmapSettings.identify_attributes &&
+        Object.keys(featureItem.fields).length > 0
+    ) {
         const attrElement = (
             <div key="identify-attributes">
                 <div className="panel-content-container">
