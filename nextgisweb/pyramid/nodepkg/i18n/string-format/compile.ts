@@ -1,8 +1,8 @@
-import { Fragment, createElement, isValidElement } from "react";
-import type { ReactNode } from "react";
-
-type PositionedParam = [message: string | number | ReactNode];
-type NamedParam = { [key: string]: string | number | ReactNode };
+type Param<T = never> = string | number | T;
+export type FormatArray<T = never> = [...args: Param<T>[]];
+export type FormatObject<T = never> = Record<string, Param<T>>;
+export type FormatArgs<T = never> = FormatArray<T> | [FormatObject<T>];
+export type Compiled<A = never, R = string> = (...args: FormatArgs<A>) => R[];
 
 const numsRegexp = /(?<!\{)\{(?!\{)\d+\}(?!\})/g;
 const numsSplitRegexp = /(\{\{[^}]+\}\}|\{[^}]+\}|[^{}]+)/g;
@@ -15,9 +15,7 @@ const preprocessFormatNG = (input: string): string => {
     return output;
 };
 
-const processEscaped = (
-    result: string | number | ReactNode
-): string | ReactNode => {
+const processEscaped = (result: string | number): string => {
     if (typeof result === "string" || typeof result === "number") {
         return String(result).replaceAll("{{", "{").replaceAll("}}", "}");
     } else {
@@ -25,7 +23,7 @@ const processEscaped = (
     }
 };
 
-const compile = (template: string) => {
+export function compile(template: string): Compiled {
     const string = preprocessFormatNG(template);
 
     const numMatches = string.match(numsRegexp);
@@ -38,7 +36,7 @@ const compile = (template: string) => {
     }
 
     if (numMatches && numMatches.length > 0) {
-        return (...args: PositionedParam) => {
+        return (...args) => {
             if (args.length < numMatches.length) {
                 throw new Error(
                     `Expected ${numMatches.length} arguments but got ${args.length}`
@@ -64,7 +62,7 @@ const compile = (template: string) => {
     }
 
     if (stringMatches && stringMatches.length > 0) {
-        return (param: NamedParam) => {
+        return (param) => {
             const entries = Object.entries(param);
 
             if (entries.length < stringMatches.length) {
@@ -94,21 +92,8 @@ const compile = (template: string) => {
     }
 
     return () => [processEscaped(template)];
-};
+}
 
-const compileWrapper = (template: string) => {
-    const outputFn = compile(template);
-
-    return (...args: PositionedParam[] | NamedParam[]): string | ReactNode => {
-        const tokens = outputFn(...args);
-
-        if (tokens.some((token) => token && isValidElement(token))) {
-            const fragment = createElement(Fragment, {}, ...tokens);
-            return fragment;
-        } else {
-            return tokens.join("");
-        }
-    };
-};
-
-export default compileWrapper;
+export function castCompiled<T>(compiled: Compiled): Compiled<T, string | T> {
+    return compiled as Compiled<T, string | T>;
+}

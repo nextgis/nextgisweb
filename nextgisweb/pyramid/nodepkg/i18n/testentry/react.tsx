@@ -1,39 +1,24 @@
 /** @testentry react */
+import { ExportIcon, ImportIcon } from "@nextgisweb/gui/icon";
+import {
+    gettext as _gettext,
+    gettextf as _gettextf,
+} from "@nextgisweb/pyramid/i18n";
 
-import { SvgIcon } from "@nextgisweb/gui/svg-icon";
-import { gettext, gettextf } from "@nextgisweb/pyramid/i18n";
+import { Translated } from "../translated";
 
-const templateNamedReactNodes = gettextf(
-    "For this task try {icon} {serviceName}, {username}."
-);
-
-const templatePositionedReactNodes = gettextf("Do you prefer {0} or {1}?");
-
-const PositionedParamsComponent = templatePositionedReactNodes(
-    <>
-        <SvgIcon icon={"rescls-wfsserver_service"} />{" "}
-        <b>{gettext("WFS connection")}</b>
-    </>,
-    <>
-        <SvgIcon icon={"rescls-ogcfserver_service"} />{" "}
-        <b>{gettext("OGC API Features")}</b>
-    </>
-);
-
-const NamedParamsComponent = templateNamedReactNodes({
-    icon: <SvgIcon icon={"rescls-wfsserver_service"} />,
-    serviceName: <b>{gettext("WFS connection")}</b>,
-    username: "Ford",
-});
-
-function InterpolationWithReactNodeTest() {
+export default function TranslatedTest() {
     return (
         <>
-            {NamedParamsComponent}
+            <Translated
+                msgf={_gettextf("Hello, {first} {last}!")}
+                args={{ first: "Arthur", last: "Dent" }}
+            />
             <br />
-            {PositionedParamsComponent}
+            <Translated
+                msgf={_gettextf("Do you prefer {a} or {b}?")}
+                args={{ a: <ImportIcon />, b: <ExportIcon /> }}
+            />
         </>
     );
 }
-
-export default InterpolationWithReactNodeTest;
