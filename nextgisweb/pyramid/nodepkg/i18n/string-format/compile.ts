@@ -15,11 +15,11 @@ const preprocessFormatNG = (input: string): string => {
     return output;
 };
 
-const processEscaped = (result: string | number): string => {
+const processEscaped = <A = never>(result: Param<A>): string => {
     if (typeof result === "string" || typeof result === "number") {
         return String(result).replaceAll("{{", "{").replaceAll("}}", "}");
     } else {
-        return result;
+        return result as string;
     }
 };
 
@@ -36,7 +36,7 @@ export function compile(template: string): Compiled {
     }
 
     if (numMatches && numMatches.length > 0) {
-        return (...args) => {
+        const compileArray = <A = never>(...args: FormatArray<A>): string[] => {
             if (args.length < numMatches.length) {
                 throw new Error(
                     `Expected ${numMatches.length} arguments but got ${args.length}`
@@ -56,13 +56,14 @@ export function compile(template: string): Compiled {
                 }
             });
 
-            const escapedResult = result.map(processEscaped);
+            const escapedResult = result.map((token) => processEscaped(token));
             return escapedResult;
         };
+        return compileArray;
     }
 
     if (stringMatches && stringMatches.length > 0) {
-        return (param) => {
+        const compileObject = <A = never>(param: FormatObject<A>): string[] => {
             const entries = Object.entries(param);
 
             if (entries.length < stringMatches.length) {
@@ -72,7 +73,6 @@ export function compile(template: string): Compiled {
             }
 
             const splitted = string.match(stringSplitRegexp) || [];
-
             const result = splitted.map((substring) => {
                 const isParam = stringMatches.includes(substring);
 
@@ -89,9 +89,11 @@ export function compile(template: string): Compiled {
 
             return escapedResult;
         };
+
+        return compileObject as Compiled; // TODO find other way
     }
 
-    return () => [processEscaped(template)];
+    return (): string[] => [processEscaped(template)];
 }
 
 export function castCompiled<T>(compiled: Compiled): Compiled<T, string | T> {
