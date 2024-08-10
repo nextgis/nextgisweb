@@ -90,15 +90,22 @@ def load_extract_modules():
 
 def extract_component(comp_id):
     from babel.messages.catalog import Catalog, Message
+    from babel.messages.extract import DEFAULT_KEYWORDS
     from babel.messages.extract import extract as babel_extract
 
     load_extract_modules()
+
+    base_keywords = [f"{pre}gettext" for pre in ("", "p", "n", "np")]
+    keywords = dict(
+        **{k: v for k, v in DEFAULT_KEYWORDS.items() if (k in base_keywords or k == "_")},
+        **{f"{b}f": DEFAULT_KEYWORDS[b] for b in base_keywords},
+    )
 
     catalog_messages = dict()
     path = pkginfo.comp_path(comp_id)
     for f in extraction_root.scan(str(path), ""):
         with (path / f.path).open("rb") as fd:
-            extracted = babel_extract(extraction_methods[f.method], fd)
+            extracted = babel_extract(extraction_methods[f.method], fd, keywords=keywords)
             for ln, message, comments, context in extracted:
                 key = (message, context) if isinstance(message, str) else (message[0], context)
                 cat_msg = catalog_messages.get(key)
