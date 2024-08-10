@@ -29,6 +29,12 @@ define([
                 domStyle.set(this.domNode, "height", "100%");
             },
 
+            postCreate: function () {
+                this.inherited(arguments);
+                // Prevent useless tooltip
+                this.domNode.title = "";
+            },
+
             show: function () {
                 this._updateVisible(true);
             },
