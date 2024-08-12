@@ -1,28 +1,28 @@
-#: component.py:90
+#: component.py:94
 msgid "NextGIS geoinformation system"
 msgstr "Геоинформационная система NextGIS"
 
-#: component.py:269
+#: component.py:275
 msgid "Linux kernel"
 msgstr "Ядро Linux"
 
-#: component.py:272
+#: component.py:278
 msgid "OS distribution"
 msgstr "Дистрибутив ОС"
 
-#: component.py:284
+#: component.py:290
 msgid "CPU"
 msgstr "Процессор"
 
-#: component.py:287
+#: component.py:293
 msgid "RAM"
 msgstr "ОЗУ"
 
-#: component.py:316
+#: component.py:322
 msgid "Last backup"
 msgstr "Последняя резервная копия"
 
-#: component.py:320
+#: component.py:326
 msgid "Last maintenance"
 msgstr "Последнее обслуживание"
 
@@ -49,6 +49,10 @@ msgstr "Ошибка внешнего сервиса"
 #: exception.py:145
 msgid "Not configured"
 msgstr "Не сконфигурировано"
+
+#: fontconfig.py:101
+msgid "Font not found: {}!"
+msgstr "Шрифт не найден: {}!"
 
 #: storage.py:289
 msgid "Storage full"

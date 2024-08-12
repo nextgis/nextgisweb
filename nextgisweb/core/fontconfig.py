@@ -1,6 +1,8 @@
+import re
 from io import StringIO
 from os import environ, sep
 from pathlib import Path
+from shutil import copyfile
 from subprocess import check_output
 from textwrap import dedent
 from typing import List
@@ -9,10 +11,15 @@ from lxml import etree
 from msgspec import Meta, Struct
 from typing_extensions import Annotated
 
-from .component import CoreComponent
+from nextgisweb.env import gettextf
 
-FontPattern = r"^[A-Za-z0-9_\-]+\.(ttf|otf)$"
-FontKey = Annotated[str, Meta(pattern=FontPattern)]
+from .component import CoreComponent
+from .exception import ValidationError
+
+FONT_PATTERN = r"^[A-Za-z0-9_\-]+\.(ttf|otf)$"
+FONT_MAX_SIZE = 10485760
+
+FontKey = Annotated[str, Meta(pattern=FONT_PATTERN)]
 
 
 class BaseFont(Struct, kw_only=True):
@@ -21,7 +28,7 @@ class BaseFont(Struct, kw_only=True):
 
 
 class SystemFont(BaseFont, tag="system", tag_field="type"):
-    pass
+    pass  # System font has no key!
 
 
 class CustomFont(BaseFont, tag="custom", tag_field="type"):
@@ -81,3 +88,18 @@ class FontConfig:
                 result.append(SystemFont(**kwargs))
 
         return result
+
+    def add_font(self, key: FontKey, path: Path):
+        assert re.fullmatch(FONT_PATTERN, key)
+        target = self.root_path / key
+
+        copyfile(path, target)  # Overwrite if exists
+
+    def delete_font(self, key: FontKey):
+        assert re.fullmatch(FONT_PATTERN, key)
+        path = self.root_path / key
+
+        if not path.is_file():
+            raise ValidationError(gettextf("Font not found: {}!")(key))
+
+        path.unlink()

@@ -190,6 +190,16 @@ def sysinfo(request):
 
 
 @viewargs(renderer="react")
+def fonts(request):
+    request.require_administrator()
+    return dict(
+        title=gettext("Font management"),
+        entrypoint="@nextgisweb/pyramid/fonts",
+        dynmenu=request.env.pyramid.control_panel,
+    )
+
+
+@viewargs(renderer="react")
 def storage(request):
     request.require_administrator()
     return dict(
@@ -490,6 +500,11 @@ def setup_pyramid(comp, config):
         "/control-panel/sysinfo",
     ).add_view(sysinfo)
 
+    config.add_route(
+        "pyramid.control_panel.fonts",
+        "/control-panel/fonts",
+    ).add_view(fonts)
+
     if env.core.options["storage.enabled"]:
         config.add_route("pyramid.control_panel.storage", "/control-panel/storage").add_view(
             storage
@@ -581,6 +596,12 @@ def setup_pyramid(comp, config):
             "info/sysinfo",
             gettext("System information"),
             lambda args: (args.request.route_url("pyramid.control_panel.sysinfo")),
+        )
+
+        yield dm.Link(
+            "settings/fonts",
+            gettext("Font management"),
+            lambda args: (args.request.route_url("pyramid.control_panel.fonts")),
         )
 
         yield dm.Link(

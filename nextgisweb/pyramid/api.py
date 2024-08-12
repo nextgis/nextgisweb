@@ -4,7 +4,7 @@ from enum import Enum
 from inspect import Parameter, signature
 from typing import TYPE_CHECKING, Any, ClassVar, Dict, List, Literal, Optional, Tuple, Type, Union
 
-from msgspec import UNSET, Meta, Struct, UnsetType, convert, defstruct, to_builtins
+from msgspec import UNSET, Meta, Struct, UnsetType, convert, defstruct, field, to_builtins
 from pyramid.interfaces import IRoutesMapper
 from pyramid.response import Response
 from typing_extensions import Annotated
@@ -17,13 +17,14 @@ from nextgisweb.lib.imptool import module_from_stack
 from nextgisweb.auth import Permission
 from nextgisweb.core import CoreComponent, KindOfData
 from nextgisweb.core.exception import NotConfigured, ValidationError
-from nextgisweb.file_upload import FileUploadRef
+from nextgisweb.core.fontconfig import FONT_MAX_SIZE, FONT_PATTERN, CustomFont, FontKey, SystemFont
+from nextgisweb.file_upload import FileUpload, FileUploadRef
 from nextgisweb.jsrealm import TSExport
 from nextgisweb.resource import Resource, ResourceScope
 
 from .permission import cors_manage, cors_view
 from .tomb.predicate import RouteMeta
-from .util import gensecret, parse_origin
+from .util import gensecret, parse_origin, restart_delayed
 
 
 def _get_cors_olist():
@@ -271,6 +272,65 @@ def storage(request, *, core: CoreComponent) -> AsJSON[Dict[str, StorageResponse
 def kind_of_data(request) -> AsJSON[Dict[str, str]]:
     request.require_administrator()
     return {k: request.translate(v.display_name) for k, v in KindOfData.registry.items()}
+
+
+def font_cread(request) -> AsJSON[List[Union[SystemFont, CustomFont]]]:
+    """Get information about available fonts"""
+    request.require_administrator()
+    unordered = request.env.core.fontconfig.enumerate()
+    return sorted(unordered, key=lambda i: (not isinstance(i, CustomFont), i.label))
+
+
+class FontCUpdateBody(Struct, kw_only=True):
+    add: List[FileUploadRef] = field(default_factory=list)
+    remove: List[FontKey] = field(default_factory=list)
+
+
+class FontCUpdateResponse(Struct, kw_only=True):
+    restarted: bool
+    timestamp: float
+
+
+def font_cupdate(request, *, body: FontCUpdateBody) -> FontCUpdateResponse:
+    """Add or remove custom fonts"""
+
+    request.require_administrator()
+
+    if len(body.remove) > 0:
+        for font in body.remove:
+            request.env.core.fontconfig.delete_font(font)
+
+    if len(body.add) > 0:
+        add = []
+        for fupload_ref in body.add:
+            fupload = FileUpload(id=fupload_ref.id)
+            assert fupload.name is not None
+
+            if not re.fullmatch(FONT_PATTERN, fupload.name):
+                raise ValidationError(
+                    gettextf(
+                        "Invalid font file name: '{}'. Only latin letters, "
+                        "digits, hyphens and underscores are allowed. "
+                        "The *.ttf or *.otf extension is required."
+                    )(fupload.name)
+                )
+
+            if fupload.size > FONT_MAX_SIZE:
+                msgf = gettextf("Font '{0}' is larger than {1} bytes.")
+                raise ValidationError(msgf(fupload.name, FONT_MAX_SIZE))
+
+            add.append((fupload.name, fupload.data_path))
+
+        for name, path in add:
+            request.env.core.fontconfig.add_font(name, path)
+
+    if restarted := (len(body.add) > 0 or len(body.remove) > 0):
+        restart_delayed()
+
+    return FontCUpdateResponse(
+        restarted=restarted,
+        timestamp=datetime.utcnow().timestamp(),
+    )
 
 
 # Component settings machinery
@@ -665,6 +725,13 @@ def setup_pyramid(comp, config):
         "/api/component/pyramid/kind_of_data",
         load_types=True,
         get=kind_of_data,
+    )
+
+    config.add_route(
+        "pyramid.font",
+        "/api/component/pyramid/font",
+        get=font_cread,
+        put=font_cupdate,
     )
 
     # Methods for customization in components
