@@ -3,23 +3,29 @@ import { makeAutoObservable, toJS } from "mobx";
 import type { FileMeta } from "@nextgisweb/file-upload/file-uploader";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import srsSettings from "@nextgisweb/pyramid/settings!spatial_ref_sys";
-import type { EditorStoreOptions, Operation } from "@nextgisweb/resource/type";
-import type { CompositeRead } from "@nextgisweb/resource/type/api";
-
-type Value = CompositeRead["raster_mosaic"];
-type Data = CompositeRead["raster_mosaic"]["data"];
+import type {
+    RasterMosaicCreate,
+    RasterMosaicItemWrite,
+    RasterMosaicRead,
+    RasterMosaicUpdate,
+} from "@nextgisweb/raster-mosaic/type/api";
+import type {
+    EditorStore,
+    EditorStoreOptions,
+    Operation,
+} from "@nextgisweb/resource/type";
 
 let keySeq = 0;
 
 export class File {
     id = undefined;
-    display_name = undefined;
-    file_upload = undefined;
+    display_name?: RasterMosaicItemWrite["display_name"];
+    file_upload: RasterMosaicItemWrite["file_upload"];
 
     store: Store;
     key: number;
 
-    constructor(store: Store, data: Data) {
+    constructor(store: Store, data: RasterMosaicItemWrite) {
         makeAutoObservable(this);
         this.store = store;
         this.key = ++keySeq;
@@ -28,10 +34,13 @@ export class File {
     }
 }
 
-export class Store {
+export class Store
+    implements
+        EditorStore<RasterMosaicRead, RasterMosaicCreate, RasterMosaicUpdate>
+{
     identity = "raster_mosaic";
 
-    items: File[] = [];
+    items?: File[] = [];
     dirty = false;
 
     operation?: Operation;
@@ -42,14 +51,14 @@ export class Store {
         this.operation = operation;
     }
 
-    load(value: Value) {
-        this.items = value.items.map((data: Data) => new File(this, data));
+    load(value: RasterMosaicRead) {
+        this.items = value.items?.map((data) => new File(this, data));
         this.dirty = false;
     }
 
     dump() {
         if (!this.dirty) return undefined;
-        const result: Value = {};
+        const result: RasterMosaicUpdate | RasterMosaicCreate = {};
         if (this.operation === "create") {
             result.srs = srsSettings.default;
         }
