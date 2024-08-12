@@ -20,6 +20,7 @@ from .util import StaticMap, gensecret
 class PyramidComponent(Component):
     def make_app(self, settings={}):
         settings = dict(self._settings, **settings)
+        settings["pyramid.started"] = dt.utcnow().timestamp()
         settings["pyramid.static_map"] = StaticMap()
         config = Configurator(settings=settings)
 

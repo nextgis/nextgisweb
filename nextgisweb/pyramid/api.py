@@ -180,6 +180,19 @@ def pkg_version(request) -> AsJSON[Dict[str, str]]:
     return {pn: p.version for pn, p in request.env.packages.items()}
 
 
+class PingResponse(Struct, kw_only=True):
+    current: float
+    started: float
+
+
+def ping(request) -> PingResponse:
+    """Simple but useful request"""
+    return PingResponse(
+        current=datetime.utcnow().timestamp(),
+        started=request.registry.settings["pyramid.started"],
+    )
+
+
 class HealthcheckResponse(Struct, kw_only=True):
     success: bool
     component: Dict[str, Any]
@@ -615,6 +628,12 @@ def setup_pyramid(comp, config):
         "pyramid.healthcheck",
         "/api/component/pyramid/healthcheck",
         get=healthcheck,
+    )
+
+    config.add_route(
+        "pyramid.ping",
+        "/api/component/pyramid/ping",
+        get=ping,
     )
 
     config.add_route(
