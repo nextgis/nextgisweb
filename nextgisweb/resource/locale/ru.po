@@ -597,7 +597,7 @@ msgstr "Права пользователя"
 
 #: view.py:184
 msgid "Update resource"
-msgstr "Обновить ресурс"
+msgstr "Изменить ресурс"
 
 #: view.py:196
 msgid "Delete resource"
