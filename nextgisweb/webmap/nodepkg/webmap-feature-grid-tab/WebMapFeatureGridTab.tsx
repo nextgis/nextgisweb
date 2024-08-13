@@ -7,6 +7,7 @@ import { FeatureGridStore } from "@nextgisweb/feature-layer/feature-grid/Feature
 import type { ActionProps } from "@nextgisweb/feature-layer/feature-grid/type";
 import type { FeatureItem } from "@nextgisweb/feature-layer/type";
 import type { NgwExtent } from "@nextgisweb/feature-layer/type/FeatureExtent";
+import { message } from "@nextgisweb/gui/antd";
 import { route } from "@nextgisweb/pyramid/api/route";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import FilterExtentBtn from "@nextgisweb/webmap/filter-extent-btn";
@@ -27,6 +28,8 @@ interface WebMapFeatureGridTabProps {
     layerId: number;
     topic: DojoTopic;
 }
+
+type NoticeType = "info" | "success" | "error" | "warning" | "loading";
 
 export function WebMapFeatureGridTab({
     topic,
@@ -49,6 +52,15 @@ export function WebMapFeatureGridTab({
         const layer = display.current?.webmapStore.getLayer(layerId);
         layer?.reload();
     }, [layerId]);
+
+    const [messageApi, contextHolder] = message.useMessage();
+
+    const showMessage = (type: NoticeType, content: string) => {
+        messageApi.open({
+            type: type,
+            content: content,
+        });
+    };
 
     const [store] = useState(
         () =>
@@ -109,6 +121,13 @@ export function WebMapFeatureGridTab({
                                             display.current.map.zoomToFeature(
                                                 new Feature({ geometry })
                                             );
+                                        } else {
+                                            showMessage(
+                                                "warning",
+                                                gettext(
+                                                    "Selected feature has no geometry"
+                                                )
+                                            );
                                         }
                                     });
                             }
@@ -116,16 +135,19 @@ export function WebMapFeatureGridTab({
                     },
                     "separator",
                     (props) => (
-                        <ZoomToFilteredBtn
-                            {...props}
-                            queryParams={store.queryParams}
-                            onZoomToFiltered={(ngwExtent: NgwExtent) => {
-                                display.current.map.zoomToNgwExtent(
-                                    ngwExtent,
-                                    display.current.displayProjection
-                                );
-                            }}
-                        />
+                        <>
+                            {contextHolder}
+                            <ZoomToFilteredBtn
+                                {...props}
+                                queryParams={store.queryParams}
+                                onZoomToFiltered={(ngwExtent: NgwExtent) => {
+                                    display.current.map.zoomToNgwExtent(
+                                        ngwExtent,
+                                        display.current.displayProjection
+                                    );
+                                }}
+                            />
+                        </>
                     ),
                     (props: ActionProps) => {
                         return (

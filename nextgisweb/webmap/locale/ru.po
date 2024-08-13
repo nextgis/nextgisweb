@@ -94,12 +94,12 @@ msgid "Zoom to layer"
 msgstr "Увеличить до слоя"
 
 #: amd/ngw-webmap/tool/Identify.js:277
-#: nodepkg/panel/identification/IdentificationPanel.tsx:205
+#: nodepkg/panel/identification/IdentificationPanel.tsx:208
 msgid "Attributes"
 msgstr "Атрибуты"
 
 #: amd/ngw-webmap/tool/Identify.js:289
-#: nodepkg/panel/identification/IdentificationPanel.tsx:238
+#: nodepkg/panel/identification/IdentificationPanel.tsx:241
 msgid "Geometry"
 msgstr "Геометрия"
 
@@ -550,8 +550,8 @@ msgid ""
 "To get feature information, click on the map with the left mouse button. Make"
 " sure that other tools are turned off."
 msgstr ""
-"Чтобы получить информацию об объекте, щелкните на карте левой кнопкой мыши."
-" Убедитесь, что другие инструменты отключены."
+"Чтобы получить информацию об объекте, щелкните на карте левой кнопкой мыши. "
+"Убедитесь, что другие инструменты отключены."
 
 #: nodepkg/panel/identification/IdentificationPanel.tsx:42
 msgid "No objects were found at the click location."
@@ -573,7 +573,7 @@ msgstr "Атрибут"
 msgid "Value"
 msgstr "Значение"
 
-#: nodepkg/panel/identification/IdentificationPanel.tsx:304
+#: nodepkg/panel/identification/IdentificationPanel.tsx:307
 msgid "Zoom to feature"
 msgstr "Приблизить к объекту"
 
@@ -1028,9 +1028,13 @@ msgstr "Мультиполигон"
 msgid "GeometryCollection"
 msgstr "Коллекция геометрий"
 
-#: nodepkg/webmap-feature-grid-tab/WebMapFeatureGridTab.tsx:23
+#: nodepkg/webmap-feature-grid-tab/WebMapFeatureGridTab.tsx:24
 msgid "Go to"
 msgstr "Перейти"
+
+#: nodepkg/webmap-feature-grid-tab/WebMapFeatureGridTab.tsx:127
+msgid "Selected feature has no geometry"
+msgstr "Выбранный объект не имеет геометрии"
 
 #: nodepkg/webmap-tabs/WebMapTabs.tsx:16
 msgid "Loading"
