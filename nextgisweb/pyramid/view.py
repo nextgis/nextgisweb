@@ -7,6 +7,7 @@ from itertools import chain
 from pathlib import Path
 from time import sleep
 from typing import Optional
+from warnings import warn
 
 from markupsafe import Markup
 from psutil import Process
@@ -765,6 +766,20 @@ def json_js(value, pretty=False):
     return Markup(dumps(value, pretty=pretty))
 
 
+def _legacy_underscore(factory):
+    def wrapped(msg, _gettext=factory.gettext):
+        warn(
+            "Usage of _ in Mako templates isn't encouraged since "
+            "nextgisweb >= 4.9.0.dev8 and it will be removed in 5.0.0. "
+            "Use gettext or gettextf instead.",
+            UserWarning,  # Mako supresses DeprecationWarning
+            stacklevel=2,
+        )
+        return _gettext(msg)
+
+    return wrapped
+
+
 def _m_gettext(_template_filename):
     head = _template_filename
     comp_id = None
@@ -774,12 +789,20 @@ def _m_gettext(_template_filename):
             comp_id = head.rpartition("/")[-1]
             break
 
-    if comp_id:
-        if comp_id.startswith("nextgisweb_"):
-            comp_id = comp_id[len("nextgisweb_") :]
+    assert comp_id, "Unable to determine a component"
+    if comp_id.startswith("nextgisweb_"):
+        comp_id = comp_id[len("nextgisweb_") :]
 
-        assert comp_id in pkginfo.components, f"Component {comp_id} not found"
-        return trstr_factory(comp_id)
+    assert comp_id in pkginfo.components, f"Component {comp_id} not found"
+    factory = trstr_factory(comp_id)
+
+    return {
+        "_": _legacy_underscore(factory),
+        "gettext": factory.gettext,
+        "gettextf": factory.gettextf,
+        "ngettext": factory.ngettext,
+        "ngettextf": factory.ngettextf,
+    }
 
 
 def _setup_pyramid_mako(comp, config):
@@ -790,7 +813,18 @@ def _setup_pyramid_mako(comp, config):
         "from markupsafe import Markup",
         "from nextgisweb.pyramid.view import json_js",
         "from nextgisweb.pyramid.view import _m_gettext",
-        "_ = _m_gettext(_template_filename); del _m_gettext",
+        "_m = _m_gettext(_template_filename)",
+        *[
+            f"{k} = _m['{k}']"
+            for k in (
+                "_",
+                "gettext",
+                "gettextf",
+                "ngettext",
+                "ngettextf",
+            )
+        ],
+        "del _m, _m_gettext",
     ]
     settings["mako.default_filters"] = ["h"]
 

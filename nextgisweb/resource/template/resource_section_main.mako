@@ -8,15 +8,15 @@
     props = dict(resourceId=obj.id)
 
     summary = props["summary"] = []
-    summary.append((tr(_("Type")), f"{tr(obj.cls_display_name)} ({obj.cls})"))
+    summary.append((tr(gettext("Type")), f"{tr(obj.cls_display_name)} ({obj.cls})"))
     if keyname := obj.keyname:
-        summary.append((tr(_("Keyname")), keyname))
+        summary.append((tr(gettext("Keyname")), keyname))
 
     if get_info := getattr(obj, 'get_info', None):
         for key, value in get_info():
             summary.append((tr(key), str(tr(value))))
 
-    summary.append((tr(_("Owner")), tr(obj.owner_user.display_name_i18n)))
+    summary.append((tr(gettext("Owner")), tr(obj.owner_user.display_name_i18n)))
 
     props["creatable"] = [c.identity for c in creatable_resources(obj, user=request.user)]
 %>

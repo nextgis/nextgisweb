@@ -7,8 +7,8 @@
     <thead>
         <tr>
             <th style="width: 2em; text-align: inherit;">#</th>
-            <th style="width: 30%; text-align: inherit;">${tr(_('Layer'))}</th>
-            <th style="width: 70%; text-align: inherit;">${tr(_('Title'))}</th>
+            <th style="width: 30%; text-align: inherit;">${tr(gettext('Layer'))}</th>
+            <th style="width: 70%; text-align: inherit;">${tr(gettext('Title'))}</th>
         </tr>
     </thead>
     <tbody>

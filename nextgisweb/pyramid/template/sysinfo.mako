@@ -31,8 +31,8 @@
 <table id="package-table" class="pure-table pure-table-horizontal ngw-card" style="width: 100%">
     <thead>
         <tr> 
-            <th class="sort-default" style="width: 100%; text-align: inherit;">${tr(_('Package'))}</th>
-            <th style="width: 8em; text-align: inherit;" colspan="2" data-sort-method='dotsep'>${tr(_('Version'))}</th>
+            <th class="sort-default" style="width: 100%; text-align: inherit;">${tr(gettext('Package'))}</th>
+            <th style="width: 8em; text-align: inherit;" colspan="2" data-sort-method='dotsep'>${tr(gettext('Version'))}</th>
         </tr>
     </thead>
     <tbody>
@@ -62,7 +62,7 @@
     </tbody>
 </table>
 
-<h2>${tr(_('Platform'))}</h2>
+<h2>${tr(gettext('Platform'))}</h2>
 
 <table id="package-table" class="pure-table pure-table-horizontal ngw-card" style="width: 100%">
     <tbody>
@@ -77,7 +77,7 @@
     </tbody>
 </table>
 
-<h2>${tr(_("Browser support"))}</h2>
+<h2>${tr(gettext("Browser support"))}</h2>
 
 
 <table id="browser-table" class="pure-table pure-table-horizontal ngw-card" style="width: 100%">
@@ -88,9 +88,9 @@
             <td>
                 <% min_ver = request.env.pyramid.options[f"uacompat.{fid}"] %> 
                 %if min_ver:
-                    ${min_ver} ${tr(_("or higher"))}
+                    ${min_ver} ${tr(gettext("or higher"))}
                 %else:
-                    ${tr(_("Not supported"))}
+                    ${tr(gettext("Not supported"))}
                 %endif
             </td>
         </tr>
@@ -102,7 +102,7 @@
     %>
     %if ua_family and ua_version:
         <tr>
-            <th>${tr(_("Your browser"))}</th>
+            <th>${tr(gettext("Your browser"))}</th>
             <td>
                 ${FAMILIES[ua_family].alias}
                 ${ua_version}

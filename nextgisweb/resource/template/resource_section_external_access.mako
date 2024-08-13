@@ -1,6 +1,6 @@
 <%page args="section, links"/>
 <%
-    section.title = _("External access")
+    section.title = gettext("External access")
     section.content_box = False
 
     nextgis_docs = request.env.pyramid.options['nextgis_external_docs_links']

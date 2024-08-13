@@ -9,16 +9,16 @@
 <table class="pure-table pure-table-horizontal ngw-card" style="width: 100%">
     <thead>
         <tr>
-            <th style="width: 20%; text-align: inherit;">${tr(_("Key"))}</th>
-            <th style="width: 20%; text-align: inherit;">${tr(_("Type"))}</th>
-            <th style="width: 60%; text-align: inherit; white-space: nowrap;">${tr(_("Value"))}</th>
+            <th style="width: 20%; text-align: inherit;">${tr(gettext("Key"))}</th>
+            <th style="width: 20%; text-align: inherit;">${tr(gettext("Type"))}</th>
+            <th style="width: 60%; text-align: inherit; white-space: nowrap;">${tr(gettext("Value"))}</th>
         </tr>
     </thead>
     <%def name="value_cell_content(mi)"><%
         if mi.vtype == 'null':
             return Markup('&nbsp;')
         elif mi.vtype == 'boolean':
-            return tr(_("True")) if mi.value else tr(_("False"))
+            return tr(gettext("True")) if mi.value else tr(gettext("False"))
         else:
             return mi.value
     %></%def>

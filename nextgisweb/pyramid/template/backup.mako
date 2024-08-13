@@ -2,9 +2,9 @@
 <table id="package-table" class="pure-table pure-table-horizontal ngw-card" style="width: 100%">
     <thead>
         <tr>
-            <th>${_("Filename")}</th>
-            <th>${_("Timestamp (UTC)")}</th>
-            <th>${_("Size")}</th>
+            <th>${gettext("Filename")}</th>
+            <th>${gettext("Timestamp (UTC)")}</th>
+            <th>${gettext("Size")}</th>
         </tr>
     </thead>
     <tbody>

@@ -1,12 +1,12 @@
 <%page args="lookup_value" />
 
-<h2>${tr(_("Items"))}</h2>
+<h2>${tr(gettext("Items"))}</h2>
 
 <table class="pure-table pure-table-bordered">
     <thead>
         <tr>
-            <th>${tr(_("Key"))}</th>
-            <th>${tr(_("Value"))}</th>
+            <th>${tr(gettext("Key"))}</th>
+            <th>${tr(gettext("Value"))}</th>
         </tr>
     </thead>
     % if lookup_value is not None:

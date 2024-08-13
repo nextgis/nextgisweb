@@ -13,7 +13,7 @@
             type="submit" value="">
         <span class="dijitReset dijitInline dijitButtonNode" >
             <span>
-                ${tr(_('Sign in'))}
+                ${tr(gettext('Sign in'))}
             </span>
         </span>
     </button>

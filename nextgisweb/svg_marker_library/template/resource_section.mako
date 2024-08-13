@@ -5,7 +5,7 @@
     <thead>
         <tr>
             <th style="width: 5%">#</th>
-            <th style="width: 75%">${tr(_("Name"))}</th>
+            <th style="width: 75%">${tr(gettext("Name"))}</th>
         </tr>
     </thead>
     <tbody>
