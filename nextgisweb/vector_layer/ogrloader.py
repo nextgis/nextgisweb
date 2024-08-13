@@ -6,11 +6,11 @@ from typing import Dict, List, Literal, Union
 import sqlalchemy as sa
 from msgspec import Struct, field
 from osgeo import ogr, osr
+from zope.interface import Attribute, Interface, implementer
 
 from nextgisweb.env import gettext
 from nextgisweb.lib.json import dumps
 from nextgisweb.lib.ogrhelper import FIELD_GETTER
-from nextgisweb.lib.registry import DictRegistry
 
 from nextgisweb.core.exception import ValidationError as VE
 from nextgisweb.feature_layer import (
@@ -86,6 +86,118 @@ STRING_CAST_TYPES = (
 )
 
 
+class IExplorer(Interface):
+    identity = Attribute("Explorer identity")
+
+    def explore(self, feature):
+        """ Explore feature and returns True if done """
+
+
+@implementer(IExplorer)
+class GeomTypeExplorer:
+    identity = "geom_type"
+
+    def __init__(self, geom_filter, params):
+        self.geom_filter = geom_filter
+        self.is_multi = False
+        self.has_z = False
+        self._params = params
+
+    def explore(self, feature):
+        geom = feature.GetGeometryRef()
+        if geom is None:
+            return False
+
+        if geom.IsMeasured():
+            geom.SetMeasured(False)
+
+        gtype = geom.GetGeometryType()
+        if (
+            gtype in (ogr.wkbGeometryCollection, ogr.wkbGeometryCollection25D)
+            and geom.GetGeometryCount() == 1
+        ):
+            geom = geom.GetGeometryRef(0)
+            gtype = geom.GetGeometryType()
+
+        if gtype not in GEOM_TYPE_OGR:
+            return False
+        geometry_type = GEOM_TYPE_OGR_2_GEOM_TYPE[gtype]
+
+        if self._params.cast_geometry_type == TOGGLE.AUTO:
+            for _geom_types in (
+                GEOM_TYPE.points,
+                GEOM_TYPE.linestrings,
+                GEOM_TYPE.polygons,
+            ):
+                if geometry_type in _geom_types:
+                    self.geom_filter = self.geom_filter.intersection(set(_geom_types))
+                    break
+        elif self._params.skip_other_geometry_types and geometry_type not in self.geom_filter:
+            return False
+
+        if (
+            self._params.cast_is_multi == TOGGLE.AUTO
+            and not self.is_multi
+            and geometry_type in GEOM_TYPE.is_multi
+        ):
+            self.geom_filter = self.geom_filter.intersection(set(GEOM_TYPE.is_multi))
+            self.is_multi = True
+
+        if (
+            self._params.cast_has_z == TOGGLE.AUTO
+            and not self.has_z
+            and geometry_type in GEOM_TYPE.has_z
+        ):
+            self.geom_filter = self.geom_filter.intersection(set(GEOM_TYPE.has_z))
+            self.has_z = True
+
+        return len(self.geom_filter) <= 1
+
+
+@implementer(IExplorer)
+class Int32RangeExplorer:
+    identity = "int32_range"
+
+    def __init__(self, field_index):
+        self.result_ok = True
+        self._field_index = field_index
+
+    def explore(self, feature):
+        i = self._field_index
+        if feature.IsFieldSet(i) and not feature.IsFieldNull(i):
+            fid = feature.GetFieldAsInteger64(i)
+            if not (MIN_INT32 < fid < MAX_INT32):
+                self.result_ok = False
+                return True
+        return False
+
+
+@implementer(IExplorer)
+class UniquenessExplorer:
+    identity = "unique"
+
+    def __init__(self, field_index, field_type):
+        self.result_ok = True
+        self._field_index = field_index
+        self._field_getter = FIELD_GETTER[field_type]
+        self._values = set()
+
+    def explore(self, feature):
+        i = self._field_index
+        if not feature.IsFieldSet(i) or feature.IsFieldNull(i):
+            self.result_ok = False
+            return True
+
+        value = self._field_getter(feature, i)
+
+        if value in self._values:
+            self.result_ok = False
+            return True
+
+        self._values.add(value)
+        return False
+
+
 class OGRLoader:
     geometry_type: str
     fid_field: Union[LoaderField, None]
@@ -94,30 +206,18 @@ class OGRLoader:
     def __init__(self, ogrlayer, params: LoaderParams):
         self.ogrlayer = ogrlayer
         self.params = params
-        self.meta = None
+        self._scan()
 
-    def scan(self):
+    def _scan(self):
         ogrlayer = self.ogrlayer
         params = self.params
 
         defn = ogrlayer.GetLayerDefn()
 
-        explorer_registry = DictRegistry()
+        explorers = dict()
 
-        class Explorer:
-            identity = None
-
-            def __init__(self):
-                self.done = False
-                explorer_registry.register(self)
-
-            def _explore(self, feature):
-                pass
-
-            def work(self, feature):
-                if self.done:
-                    return
-                self.done = self._explore(feature)
+        def add_explorer(cls, *args):
+            explorers[cls.identity] = cls(*args)
 
         # Geom type
 
@@ -142,68 +242,6 @@ class OGRLoader:
 
         ltype = ogrlayer.GetGeomType()
 
-        class GeomTypeExplorer(Explorer):
-            identity = "geom_type"
-
-            def __init__(self, geom_filter):
-                super().__init__()
-                self.geom_filter = geom_filter
-                self.is_multi = False
-                self.has_z = False
-
-            def _explore(self, feature):
-                if len(self.geom_filter) <= 1:
-                    return True
-
-                geom = feature.GetGeometryRef()
-                if geom is None:
-                    return False
-
-                if geom.IsMeasured():
-                    geom.SetMeasured(False)
-
-                gtype = geom.GetGeometryType()
-                if (
-                    gtype in (ogr.wkbGeometryCollection, ogr.wkbGeometryCollection25D)
-                    and geom.GetGeometryCount() == 1
-                ):
-                    geom = geom.GetGeometryRef(0)
-                    gtype = geom.GetGeometryType()
-
-                if gtype not in GEOM_TYPE_OGR:
-                    return False
-                geometry_type = GEOM_TYPE_OGR_2_GEOM_TYPE[gtype]
-
-                if params.cast_geometry_type == TOGGLE.AUTO:
-                    for _geom_types in (
-                        GEOM_TYPE.points,
-                        GEOM_TYPE.linestrings,
-                        GEOM_TYPE.polygons,
-                    ):
-                        if geometry_type in _geom_types:
-                            self.geom_filter = self.geom_filter.intersection(set(_geom_types))
-                            break
-                elif params.skip_other_geometry_types and geometry_type not in self.geom_filter:
-                    return False
-
-                if (
-                    params.cast_is_multi == TOGGLE.AUTO
-                    and not self.is_multi
-                    and geometry_type in GEOM_TYPE.is_multi
-                ):
-                    self.geom_filter = self.geom_filter.intersection(set(GEOM_TYPE.is_multi))
-                    self.is_multi = True
-
-                if (
-                    params.cast_has_z == TOGGLE.AUTO
-                    and not self.has_z
-                    and geometry_type in GEOM_TYPE.has_z
-                ):
-                    self.geom_filter = self.geom_filter.intersection(set(GEOM_TYPE.has_z))
-                    self.has_z = True
-
-                return False
-
         geometry_type = None
         if len(geom_filter) == 1:
             geometry_type = geom_filter.pop()
@@ -211,55 +249,9 @@ class OGRLoader:
             geometry_type = GEOM_TYPE_OGR_2_GEOM_TYPE[ltype]
         elif len(geom_filter) > 1:
             # Can't determine single geometry type, need exploration
-            GeomTypeExplorer(geom_filter)
+            add_explorer(GeomTypeExplorer, geom_filter, params)
 
         # FID field
-
-        class Int32RangeExplorer(Explorer):
-            identity = "int32_range"
-
-            def __init__(self, field_index):
-                super().__init__()
-                self.result_ok = True
-                self.field_index = field_index
-
-            def _explore(self, feature):
-                i = self.field_index
-                if not feature.IsFieldSet(i) or feature.IsFieldNull(i):
-                    return False
-
-                fid = feature.GetFieldAsInteger64(i)
-                if not (MIN_INT32 < fid < MAX_INT32):
-                    self.result_ok = False
-                    return True
-
-        class UniquenessExplorer(Explorer):
-            identity = "unique"
-
-            def __init__(self, field_index, field_type):
-                super().__init__()
-                self.result_ok = True
-                self.field_index = field_index
-                self.field_type = field_type
-                self.values = set()
-
-            def _explore(self, feature):
-                i = self.field_index
-                if not feature.IsFieldSet(i) or feature.IsFieldNull(i):
-                    self.result_ok = False
-                    return True
-
-                if self.field_type == ogr.OFTInteger:
-                    value = feature.GetFieldAsInteger(i)
-                elif self.field_type == ogr.OFTInteger64:
-                    value = feature.GetFieldAsInteger64(i)
-                else:
-                    raise NotImplementedError()
-
-                if value in self.values:
-                    self.result_ok = False
-                    return True
-                self.values.add(value)
 
         fid_field_index = None
         fid_field_found = False
@@ -273,32 +265,31 @@ class OGRLoader:
                     if fld_type in (ogr.OFTInteger, ogr.OFTInteger64):
                         fid_field_index = idx
                         # Found FID field, should check for uniqueness
-                        UniquenessExplorer(fid_field_index, fld_type)
+                        add_explorer(UniquenessExplorer, fid_field_index, fld_type)
 
                         if fld_type == ogr.OFTInteger64:
                             # FID is int64, should check values for int32 range
-                            Int32RangeExplorer(fid_field_index)
+                            add_explorer(Int32RangeExplorer, fid_field_index)
                         break
 
         # Explore layer
 
-        if len(explorer_registry) > 0:
+        if len(explorers) > 0:
+            _to_explore = set(explorers.values())
             for feature in ogrlayer:
-                all_done = True
-                for explorer in explorer_registry.values():
-                    if not explorer.done:
-                        explorer.work(feature)
-                    all_done = all_done and explorer.done
-                if all_done:
+                _done_explore = set()
+                for explorer in _to_explore:
+                    if explorer.explore(feature):
+                        _done_explore.add(explorer)
+                if len(_to_explore) == len(_done_explore):
                     break
+                _to_explore -= _done_explore
 
             ogrlayer.ResetReading()
 
         # Geom type
 
-        if GeomTypeExplorer.identity in explorer_registry:
-            gt_explorer = explorer_registry[GeomTypeExplorer.identity]
-
+        if gt_explorer := explorers.get(GeomTypeExplorer.identity):
             geom_filter = gt_explorer.geom_filter
 
             if params.cast_is_multi == TOGGLE.AUTO and not gt_explorer.is_multi:
@@ -326,8 +317,7 @@ class OGRLoader:
             fid_defn = defn.GetFieldDefn(fid_field_index)
             fid_field_name = fid_defn.GetName()
 
-            if Int32RangeExplorer.identity in explorer_registry:
-                range_explorer = explorer_registry[Int32RangeExplorer.identity]
+            if range_explorer := explorers.get(Int32RangeExplorer.identity):
                 if not range_explorer.result_ok:
                     fid_field_ok = False
                     if params.fix_errors == FIX_ERRORS.NONE:
@@ -335,8 +325,7 @@ class OGRLoader:
                             message=gettext("Field '%s' is out of int32 range.") % fid_field_name
                         )
 
-            if UniquenessExplorer.identity in explorer_registry:
-                uniqueness_explorer = explorer_registry[UniquenessExplorer.identity]
+            if uniqueness_explorer := explorers.get(UniquenessExplorer.identity):
                 if not uniqueness_explorer.result_ok:
                     fid_field_ok = False
                     if params.fix_errors == FIX_ERRORS.NONE:
@@ -427,7 +416,6 @@ class OGRLoader:
         self.geometry_type = geometry_type
         self.fid_field = fid_field
         self.fields = fields
-        return self
 
     def write(
         self,

@@ -184,7 +184,7 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin, FVersioni
             dataset_ref = None
             assert layer is UNSET
 
-        loader = OGRLoader(source, params=lparams).scan()
+        loader = OGRLoader(source, params=lparams)
         self.geometry_type = loader.geometry_type
         self.fields[:] = [
             VectorLayerField(
