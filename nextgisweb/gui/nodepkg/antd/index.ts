@@ -84,5 +84,6 @@ export type { InputValueProps } from "./InputValue";
 export type { CheckboxValueProps } from "./CheckboxValue";
 
 export type { DefaultOptionType as OptionType } from "antd/es/select";
+export type { NoticeType } from "antd/es/message/interface";
 
 export type * from "antd";
