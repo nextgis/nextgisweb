@@ -1,6 +1,6 @@
 import { message } from "@nextgisweb/gui/antd";
 import { confirmDelete } from "@nextgisweb/gui/confirm";
-import { gettext, ngettext } from "@nextgisweb/pyramid/i18n";
+import { gettext, ngettextf } from "@nextgisweb/pyramid/i18n";
 
 export function confirmThenDelete(onOk: () => void) {
     confirmDelete({
@@ -13,20 +13,20 @@ export function confirmThenDelete(onOk: () => void) {
 
 export function notifySuccessfulDeletion(count: number) {
     message.success(
-        ngettext(
+        ngettextf(
             "The resource has been deleted",
             "{} resources have been deleted",
             count
-        ).replace("{}", String(count))
+        )(count)
     );
 }
 export function notifySuccessfulMove(count: number) {
     message.success(
-        ngettext(
+        ngettextf(
             "The resource has been moved",
             "{} resources have been moved",
             count
-        ).replace("{}", String(count))
+        )(count)
     );
 }
 export function notifyMoveWithError(successIds: number[], errorIds: number[]) {
@@ -39,10 +39,10 @@ export function notifyMoveWithError(successIds: number[], errorIds: number[]) {
 export function notifyMoveAbsolutError(errorIds: number[]) {
     const count = errorIds.length;
     message.error(
-        ngettext(
+        ngettextf(
             "The resource has been moved",
             "{} resources have been moved",
             count
-        ).replace("{}", String(count))
+        )(count)
     );
 }

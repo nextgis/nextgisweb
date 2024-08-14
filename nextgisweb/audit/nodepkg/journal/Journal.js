@@ -11,7 +11,7 @@ import { Button, RangePicker } from "@nextgisweb/gui/antd";
 import dayjs, { utc } from "@nextgisweb/gui/dayjs";
 import { useThemeVariables } from "@nextgisweb/gui/hook";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
-import { gettext, ngettext } from "@nextgisweb/pyramid/i18n";
+import { gettext, ngettextf } from "@nextgisweb/pyramid/i18n";
 import { PageTitle } from "@nextgisweb/pyramid/layout";
 
 import "./Journal.less";
@@ -152,13 +152,13 @@ function dayjsToApi(v) {
 function rangePresetLast(n, unit) {
     let label;
     if (unit === "minute") {
-        label = ngettext("Last {} minute", "Last {} minutes", n);
+        label = ngettextf("Last {} minute", "Last {} minutes", n);
     } else if (unit === "hour") {
-        label = ngettext("Last {} hour", "Last {} hours", n);
+        label = ngettextf("Last {} hour", "Last {} hours", n);
     } else if (unit === "day") {
-        label = ngettext("Last {} day", "Last {} days", n);
+        label = ngettextf("Last {} day", "Last {} days", n);
     }
-    label = label.replace("{}", n);
+    label = label(n);
     return {
         label: label,
         value: () => [dayjs().subtract(n, unit), null],

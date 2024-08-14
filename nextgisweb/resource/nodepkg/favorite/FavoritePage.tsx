@@ -17,7 +17,8 @@ import {
     useRoute,
     useRouteGet,
 } from "@nextgisweb/pyramid/hook";
-import { gettext } from "@nextgisweb/pyramid/i18n";
+import { gettext, gettextf } from "@nextgisweb/pyramid/i18n";
+import { Translated } from "@nextgisweb/pyramid/i18n/translated";
 import { PageTitle } from "@nextgisweb/pyramid/layout";
 import { resources } from "@nextgisweb/resource/blueprint";
 import type * as apitype from "@nextgisweb/resource/type/api";
@@ -26,7 +27,7 @@ import IconFavoriteOutline from "@nextgisweb/icon/material/star";
 
 import "./FavoritePage.less";
 
-const msgEmpty = gettext(
+const msgEmptyTextFmt = gettextf(
     "No favorite resources have been added yet. Use the star icon ({}) " +
         "in the user's context menu to add items here."
 );
@@ -118,10 +119,12 @@ export default function FavoritePage() {
                 resources.map((res) => {
                     const path: string[] = [];
 
-                    let p = res.parent ? rm.get(res.parent?.id) ?? null : null;
+                    let p = res.parent
+                        ? (rm.get(res.parent?.id) ?? null)
+                        : null;
                     while (p && p.id !== 0) {
                         path.splice(0, 0, p.display_name);
-                        p = p.parent ? rm.get(p.parent.id) ?? null : null;
+                        p = p.parent ? (rm.get(p.parent.id) ?? null) : null;
                     }
 
                     return [
@@ -318,13 +321,14 @@ export default function FavoritePage() {
     if (!data || !schema) {
         body = <LoadingWrapper />;
     } else if (data.length === 0) {
-        const [pre, post] = msgEmpty.split("{}", 2);
         body = (
             <div className="empty">
                 <Balancer>
-                    {pre}
-                    <IconFavoriteOutline />
-                    {post}
+                    <Translated
+                        msgf={msgEmptyTextFmt}
+                        // eslint-disable-next-line react/jsx-key
+                        args={[<IconFavoriteOutline />]}
+                    />
                 </Balancer>
             </div>
         );

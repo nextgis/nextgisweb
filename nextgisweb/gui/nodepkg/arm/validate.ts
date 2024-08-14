@@ -1,22 +1,22 @@
-import { gettext, ngettext } from "@nextgisweb/pyramid/i18n";
+import { gettext, gettextf, ngettextf } from "@nextgisweb/pyramid/i18n";
 
 import type { Validator } from "./type";
 
 const msgRequired = gettext("Value required");
-const msgMinLength = (value: number) =>
-    ngettext(
+const msgMinLengthFmt = (value: number) =>
+    ngettextf(
         "At least {} character required",
         "At least {} characters required",
         value
     );
-const msgMaxLength = (value: number) =>
-    ngettext(
+const msgMaxLengthFmt = (value: number) =>
+    ngettextf(
         "No more than {} character required",
         "No more than {} characters required",
         value
     );
-const msgMinValue = gettext("Value should be at least {}");
-const msgMaxValue = gettext("Value should be no more than {}");
+const msgMinValueFmt = gettextf("Value should be at least {}");
+const msgMaxValueFmt = gettextf("Value should be no more than {}");
 
 const msgPattern = gettext("Invalid value");
 const msgNotUnique = gettext("Value not unique");
@@ -55,11 +55,11 @@ export function string<V = string>({
     return (value: V) => {
         if (typeof value !== "string") return [true, undefined];
         if (typeof minLength === "number" && value.length < minLength) {
-            const m = msgMinLength(minLength).replace("{}", String(minLength));
+            const m = msgMinLengthFmt(minLength)(minLength);
             return [false, m];
         }
         if (typeof maxLength === "number" && value.length > maxLength) {
-            const m = msgMaxLength(maxLength).replace("{}", String(maxLength));
+            const m = msgMaxLengthFmt(maxLength)(maxLength);
             return [false, m];
         }
         if (pattern !== undefined && !pattern.test(value)) {
@@ -82,10 +82,10 @@ export function number<V = number>({
     return (value: V) => {
         if (typeof value !== "number") return [true, undefined];
         if (min !== undefined && value < min) {
-            return [false, msgMinValue.replace("{}", String(value))];
+            return [false, msgMinValueFmt(value)];
         }
         if (max !== undefined && value > max) {
-            return [false, msgMaxValue.replace("{}", String(value))];
+            return [false, msgMaxValueFmt(value)];
         }
         return [true, undefined];
     };

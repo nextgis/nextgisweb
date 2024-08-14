@@ -6,7 +6,7 @@ import { FieldsForm } from "@nextgisweb/gui/fields-form";
 import type { FormField } from "@nextgisweb/gui/fields-form";
 import { useKeydownListener } from "@nextgisweb/gui/hook";
 import { routeURL } from "@nextgisweb/pyramid/api";
-import { gettext } from "@nextgisweb/pyramid/i18n";
+import { gettext, gettextf } from "@nextgisweb/pyramid/i18n";
 
 import oauth from "../oauth";
 import { authStore } from "../store";
@@ -17,7 +17,7 @@ import LoginIcon from "@nextgisweb/icon/material/login";
 
 import "./LoginForm.less";
 
-const msgOauth = gettext("Sign in with {}").replace("{}", oauth.name);
+const msgOauth = gettextf("Sign in with {}")(oauth.name);
 const msgTitle = gettext("Sign in to Web GIS");
 const msgSignIn = gettext("Sign in");
 
@@ -120,3 +120,5 @@ export const LoginForm = observer((props: LoginFormProps) => {
         </div>
     );
 });
+
+LoginForm.displayName = "LoginForm";

@@ -14,7 +14,7 @@ import {
     routeURL,
 } from "@nextgisweb/pyramid/api";
 import type { RouteResp } from "@nextgisweb/pyramid/api/type";
-import { gettext } from "@nextgisweb/pyramid/i18n";
+import { gettext, gettextf } from "@nextgisweb/pyramid/i18n";
 import pyramidSettings from "@nextgisweb/pyramid/settings!pyramid";
 
 import "./AttachmentForm.less";
@@ -88,9 +88,10 @@ export function AttachmentForm({ id }: { id: number }) {
         >
             {gettext("The archive has been successfully imported.")}
             <br />
-            {gettext("Attachments imported - {i}, skipped - {s}.")
-                .replace("{i}", result.imported)
-                .replace("{s}", result.skipped)}
+            {gettextf("Attachments imported - {i}, skipped - {s}.")({
+                i: result.imported,
+                s: result.skipped,
+            })}
         </Modal>
     );
 

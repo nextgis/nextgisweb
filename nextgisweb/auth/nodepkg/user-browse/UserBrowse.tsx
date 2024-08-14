@@ -6,7 +6,7 @@ import type { TableProps } from "@nextgisweb/gui/antd";
 import { utc } from "@nextgisweb/gui/dayjs";
 import { ModelBrowse } from "@nextgisweb/gui/model-browse";
 import type { ControlProps } from "@nextgisweb/gui/model-browse/ModelBrowse";
-import { gettext } from "@nextgisweb/pyramid/i18n";
+import { gettext, gettextf } from "@nextgisweb/pyramid/i18n";
 
 import { makeTeamManageButton, default as oauth } from "../oauth";
 
@@ -119,7 +119,7 @@ export function UserBrowse({ readonly }: UserBrowseProps) {
     // prettier-ignore
     const infoNGID = useMemo(() => oauth.isNGID && <Alert
         type="info" style={{marginTop: "1ex"}}
-        message={gettext("Your team members won't be shown here until their first logon. Set \"New users\" flag for a group to automatically assign new user to this group. You may also modify permission for authenticated users to manage access for your team members.").replace("{name}", oauth.name)}
+        message={gettextf("Your team members won't be shown here until their first logon. Set \"New users\" flag for a group to automatically assign new user to this group. You may also modify permission for authenticated users to manage access for your team members.")({ name: oauth.name })}
     />, []);
 
     const tmBtn = makeTeamManageButton({ target: "_blank" });

@@ -1,7 +1,7 @@
 import { makeAutoObservable, toJS } from "mobx";
 
 import type { FileMeta } from "@nextgisweb/file-upload/file-uploader";
-import { gettext } from "@nextgisweb/pyramid/i18n";
+import { gettext, gettextf } from "@nextgisweb/pyramid/i18n";
 import type {
     CompositeRead,
     CompositeUpdate,
@@ -72,8 +72,8 @@ export class Store {
         for (const file of files) {
             let { name } = file;
             if (!name.toLowerCase().endsWith(".svg")) {
-                const msg = gettext("File '{}' has an invalid extension.");
-                return [false, msg.replace("{}", name)];
+                const msgFmt = gettextf("File '{}' has an invalid extension.");
+                return [false, msgFmt(name)];
             }
             name = name.slice(0, -".svg".length);
 

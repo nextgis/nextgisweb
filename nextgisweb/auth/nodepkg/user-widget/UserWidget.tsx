@@ -9,7 +9,7 @@ import { KeynameRule } from "@nextgisweb/gui/fields-form/rules/KeynameRule";
 import { ModelForm } from "@nextgisweb/gui/model-form";
 import type { Model } from "@nextgisweb/gui/model-form";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
-import { gettext } from "@nextgisweb/pyramid/i18n";
+import { gettext, gettextf } from "@nextgisweb/pyramid/i18n";
 import settings from "@nextgisweb/pyramid/settings!auth";
 
 import { PermissionSelect, PrincipalSelect } from "../component";
@@ -123,7 +123,7 @@ export function UserWidget({ id, readonly }: UserWidgetProps) {
                     type="info"
                     style={{ marginBottom: "1ex" }}
                     // prettier-ignore
-                    message={gettext("Consider adding {name} user to your team instead of creating a new user with a password.").replace("{name}", oauth.name)}
+                    message={gettextf("Consider adding {name} user to your team instead of creating a new user with a password.")({ name: oauth.name })}
                     action={makeTeamManageButton()}
                 />
             ),

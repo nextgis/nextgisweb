@@ -5,7 +5,7 @@ import type { FormField } from "@nextgisweb/gui/fields-form";
 import { KeynameRule } from "@nextgisweb/gui/fields-form/rules/KeynameRule";
 import { ModelForm } from "@nextgisweb/gui/model-form";
 import type { Model } from "@nextgisweb/gui/model-form";
-import { gettext } from "@nextgisweb/pyramid/i18n";
+import { gettext, gettextf } from "@nextgisweb/pyramid/i18n";
 
 import { PermissionSelect, PrincipalSelect } from "../component";
 import { default as oauth } from "../oauth";
@@ -62,7 +62,7 @@ export function GroupWidget({ id, readonly }: GroupWidgetProps) {
             },
             {
                 name: "oauth_mapping",
-                label: gettext("{dn} mapping").replace("{dn}", oauth.name),
+                label: gettextf("{dn} mapping")({ dn: oauth.name }),
                 valuePropName: "checked",
                 formItem: <Checkbox />,
                 included: oauth.group_mapping,

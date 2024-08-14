@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 
 import { Form, InputNumber, Select } from "@nextgisweb/gui/antd";
 import { route } from "@nextgisweb/pyramid/api";
-import { gettext } from "@nextgisweb/pyramid/i18n";
+import { gettext, gettextf } from "@nextgisweb/pyramid/i18n";
 import type { RasterLayerResource } from "@nextgisweb/raster-layer/type/RasterLayerResource";
 
 import type { RasterSymbolizer, Symbolizer } from "./type/Style";
@@ -10,6 +10,8 @@ import { getRasterBandRange } from "./util/getRasterBandRange";
 import { getRasterSymbolizerValues } from "./util/getRasterSymbolizerValues";
 
 import "./RasterStyleEditor.less";
+
+const msgBandFmt = gettextf("Band {}");
 
 interface RasterStyleEditorProps {
     initSymbolizer?: RasterSymbolizer;
@@ -66,9 +68,7 @@ export function RasterStyleEditor({
                     bands_.map((value, index) => ({
                         key: index,
                         value: index,
-                        label:
-                            gettext("Band {}").replace("{}", `${index + 1}`) +
-                            (value ? ` (${value})` : ""),
+                        label: msgBandFmt(index) + (value ? ` (${value})` : ""),
                     }))
                 );
                 const dtype = rasterRes.raster_layer.dtype;

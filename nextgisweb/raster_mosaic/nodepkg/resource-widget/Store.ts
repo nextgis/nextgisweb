@@ -1,7 +1,7 @@
 import { makeAutoObservable, toJS } from "mobx";
 
 import type { FileMeta } from "@nextgisweb/file-upload/file-uploader";
-import { gettext } from "@nextgisweb/pyramid/i18n";
+import { gettextf } from "@nextgisweb/pyramid/i18n";
 import srsSettings from "@nextgisweb/pyramid/settings!spatial_ref_sys";
 import type {
     RasterMosaicCreate,
@@ -79,8 +79,8 @@ export class Store
         for (const file_upload of files) {
             let { name } = file_upload;
             if (!/\.tiff?$/i.test(name)) {
-                const msg = gettext("File '{}' has an invalid extension.");
-                return [false, msg.replace("{}", name)];
+                const msgFmt = gettextf("File '{}' has an invalid extension.");
+                return [false, msgFmt(name)];
             }
             name = name.replace(/\.tiff?$/i, "");
             updated.push(new File(this, { display_name: name, file_upload }));

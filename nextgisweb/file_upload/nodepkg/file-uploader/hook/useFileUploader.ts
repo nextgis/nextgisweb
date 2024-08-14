@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { message } from "@nextgisweb/gui/antd";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
-import { gettext } from "@nextgisweb/pyramid/i18n";
+import { gettextf } from "@nextgisweb/pyramid/i18n";
 
 import type {
     FileUploaderOptions,
@@ -14,7 +14,7 @@ import type {
 } from "../type";
 import { fileUploader } from "../util/fileUploader";
 
-const msgProgress = gettext("{} uploaded...");
+const msgProgressFmt = gettextf("{} uploaded...");
 
 export function useFileUploader<M extends boolean = false>({
     accept,
@@ -48,7 +48,7 @@ export function useFileUploader<M extends boolean = false>({
     }, [meta, onChange, setInitMeta]);
 
     useEffect(() => {
-        setProgressText(progress ? msgProgress.replace("{}", progress) : null);
+        setProgressText(progress ? msgProgressFmt(progress) : null);
         if (showProgressInDocTitle && progress !== undefined) {
             document.title = progress + " | " + docTitle.current;
         } else if (document.title !== docTitle.current) {

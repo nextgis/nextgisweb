@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { Input, Select, Space } from "@nextgisweb/gui/antd";
-import { gettext } from "@nextgisweb/pyramid/i18n";
+import { gettext, gettextf } from "@nextgisweb/pyramid/i18n";
 
 import oauth from "../oauth";
 
@@ -16,7 +16,7 @@ const modes = [
     },
     {
         label: oauth.enabled
-            ? gettext("{name} only").replace("{name}", oauth.name)
+            ? gettextf("{name} only")({ name: oauth.name })
             : gettext("Turn off"),
         value: "turn_off",
     },
@@ -36,7 +36,7 @@ export const UserWidgetPassword = ({
 }: InputProps) => {
     const [mode, setMode] = useState(value === false ? "turn_off" : "keep");
     const [password, setPassword] = useState<boolean | string>(
-        mode === "assign" ? value ?? "" : ""
+        mode === "assign" ? (value ?? "") : ""
     );
 
     useEffect(() => {
