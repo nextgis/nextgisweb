@@ -43,7 +43,10 @@ export const ConnectionWidget: EditorWidgetComponent<
                 label={gettext("Password")}
                 value={store.password}
                 component={PasswordValue}
-                props={{ visibilityToggle: false }}
+                props={{
+                    visibilityToggle: false,
+                    autoComplete: "new-password",
+                }}
             />
             <LotMV
                 row
@@ -55,6 +58,7 @@ export const ConnectionWidget: EditorWidgetComponent<
     );
 });
 
+ConnectionWidget.displayName = "ConnectionWidget";
 ConnectionWidget.title = gettext("PostGIS connection");
 ConnectionWidget.activateOn = { create: true };
 ConnectionWidget.order = -50;
