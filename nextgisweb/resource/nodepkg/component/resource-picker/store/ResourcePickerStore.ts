@@ -15,6 +15,12 @@ import type { ResourceInterface } from "../../../type/Resource";
 import { loadParents } from "../../../util/loadParents";
 import type { OnNewGroupType, ResourcePickerStoreOptions } from "../type";
 
+type AbortOperation =
+    | "setResources"
+    | "setBreadcrumbItems"
+    | "createNewGroup"
+    | "getSelectedParent";
+
 const msgPickThis = gettext("Pick this group");
 const msgPickSelected = gettext("Pick selected");
 
@@ -70,10 +76,8 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
     readonly onNewGroup: OnNewGroupType | null = null;
     readonly onTraverse: ((parentId: number) => void) | null = null;
 
-    setResourcesAbortController: AbortController | null = null;
-    setBreadcrumbItemsAbortController: AbortController | null = null;
-    createNewGroupAbortController: AbortController | null = null;
-    getSelectedParentAbortController: AbortController | null = null;
+    private abortControllers: Partial<Record<AbortOperation, AbortController>> =
+        {};
 
     getThisMsg = msgPickThis;
     getSelectedMsg = msgPickSelected;
@@ -105,46 +109,24 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
         this.parentId = parentId ?? this.parentId;
         this.initialParentId = this.parentId;
 
-        if (onNewGroup) {
-            this.onNewGroup = onNewGroup;
-        }
-        if (onTraverse) {
-            this.onTraverse = onTraverse;
-        }
-        if (disableResourceIds) {
-            this.disableResourceIds = disableResourceIds;
-        }
-        if (multiple) {
-            this.multiple = multiple;
-        }
-        if (requireClass) {
-            this.requireClass = requireClass;
-        }
-        if (requireInterface) {
-            this.requireInterface = requireInterface;
-        }
-
+        this.onNewGroup = onNewGroup ?? null;
+        this.onTraverse = onTraverse ?? null;
+        this.disableResourceIds = disableResourceIds ?? [];
+        this.multiple = multiple ?? false;
+        this.requireClass = requireClass ?? null;
+        this.requireInterface = requireInterface ?? null;
         this.hideUnavailable = !!hideUnavailable;
+        this.getSelectedMsg = getSelectedMsg ?? msgPickSelected;
+        this.getThisMsg = getThisMsg ?? msgPickThis;
+        this.traverseClasses = traverseClasses ?? null;
 
-        if (getSelectedMsg) {
-            this.getSelectedMsg = getSelectedMsg;
-        }
-        if (getThisMsg) {
-            this.getThisMsg = getThisMsg;
-        }
-        if (traverseClasses) {
-            this.traverseClasses = traverseClasses;
-        }
         makeAutoObservable<
             ResourcePickerStore,
-            "_id" | "_saveLastParentIdGlobal"
+            "_id" | "_saveLastParentIdGlobal" | "abortControllers"
         >(this, {
             _id: false,
             _saveLastParentIdGlobal: false,
-            setResourcesAbortController: false,
-            getSelectedParentAbortController: false,
-            setBreadcrumbItemsAbortController: false,
-            createNewGroupAbortController: false,
+            abortControllers: false,
         });
         this._initialize({ selected, parentId });
     }
@@ -157,9 +139,7 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
             if (this._saveLastParentIdGlobal) {
                 ResourcePickerStore.GLOBAL_PARENT_ID = parent;
             }
-            if (this.onTraverse) {
-                this.onTraverse(parent);
-            }
+            this.onTraverse?.(parent);
         });
     }
 
@@ -169,9 +149,10 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
 
     getResourceClasses = (classes: ResourceCls[]): ResourceCls[] => {
         const resourceClasses: ResourceCls[] = [...classes];
-        if (this.blueprint) {
+        const blueprint = this.blueprint;
+        if (blueprint) {
             for (const cls of classes) {
-                const blueprintResourceClasses = this.blueprint.resources[cls];
+                const blueprintResourceClasses = blueprint.resources[cls];
                 if (blueprintResourceClasses) {
                     resourceClasses.push(
                         ...blueprintResourceClasses.base_classes
@@ -209,13 +190,10 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
 
     setSelected(selected: number[]): void {
         runInAction(() => {
-            const newSelected: number[] = [];
             // Imposable to remove disabled and already selected items
-            for (const disabledId of this.disableResourceIds) {
-                if (this.selected.includes(disabledId)) {
-                    newSelected.push(disabledId);
-                }
-            }
+            const newSelected = this.disableResourceIds.filter((id) =>
+                this.selected.includes(id)
+            );
             for (const s of selected) {
                 if (!newSelected.includes(s)) {
                     newSelected.push(s);
@@ -246,21 +224,32 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
     }
 
     abort(): void {
-        this._abortChildLoading();
-        this._abortBreadcrumbsLoading();
-        this._abortNewGroupCreation();
-        this._abortSelectedParentLoading();
+        Object.keys(this.abortControllers).forEach((key) => {
+            this._abortOperation(key as AbortOperation);
+        });
+    }
+
+    private _abortOperation<T extends boolean = false>(
+        operation: AbortOperation,
+        reset?: T
+    ): T extends true ? AbortController : undefined {
+        if (this.abortControllers[operation]) {
+            this.abortControllers[operation]!.abort();
+        }
+        const val = reset ? new AbortController() : undefined;
+        this.abortControllers[operation] = val;
+        return val as T extends true ? AbortController : undefined;
     }
 
     async setBreadcrumbItems(parent: number): Promise<void> {
-        this._abortBreadcrumbsLoading();
+        const abort = this._abortOperation("setBreadcrumbItems", true);
         try {
             runInAction(() => {
                 this.breadcrumbItemsLoading = true;
             });
-            this.setBreadcrumbItemsAbortController = new AbortController();
+
             const parents = await loadParents(parent, {
-                signal: this.setBreadcrumbItemsAbortController.signal,
+                signal: abort.signal,
             });
             runInAction(() => {
                 this.breadcrumbItems = parents;
@@ -279,35 +268,26 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
     }
 
     async setChildrenFor(parent: number): Promise<void> {
-        this._abortChildLoading();
-
+        const abort = this._abortOperation("setResources", true);
         try {
-            this.setResourcesAbortController = new AbortController();
             runInAction(() => {
                 this.resourcesLoading = true;
             });
-            const blueprint = await route("resource.blueprint").get({
-                signal: this.setResourcesAbortController.signal,
+            this.blueprint = await route("resource.blueprint").get({
+                signal: abort.signal,
                 cache: true,
             });
-            this.blueprint = blueprint;
-            const parentItem = await route("resource.item", parent).get({
-                signal: this.setResourcesAbortController.signal,
+            this.parentItem = await route("resource.item", parent).get({
+                signal: abort.signal,
                 cache: true,
             });
-            this.parentItem = parentItem;
             const resp = await route("resource.collection").get({
                 query: { parent: parent },
-                signal: this.setResourcesAbortController.signal,
+                signal: abort.signal,
             });
-            const resources: CompositeRead[] = [];
-            for (const x of resp) {
-                const res = x.resource;
-                const resourceVisible = this._resourceVisible(res);
-                if (resourceVisible) {
-                    resources.push(x);
-                }
-            }
+            const resources = resp.filter((x: CompositeRead) =>
+                this._resourceVisible(x.resource)
+            );
             runInAction(() => {
                 this.resources = resources;
             });
@@ -325,9 +305,8 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
     }
 
     async createNewGroup(name: string): Promise<CompositeRead | undefined> {
-        this._abortNewGroupCreation();
+        const abort = this._abortOperation("createNewGroup", true);
         try {
-            this.createNewGroupAbortController = new AbortController();
             runInAction(() => {
                 this.createNewGroupLoading = true;
             });
@@ -346,10 +325,11 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
                 id: number;
             }>({
                 json: payload,
+                signal: abort.signal,
             });
 
             await this.refresh();
-            const newItem = [...this.resources].find(
+            const newItem = this.resources.find(
                 (c) => c.resource.id === createdItem.id
             );
 
@@ -373,26 +353,23 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
     }
 
     private async _initialize({ selected }: ResourcePickerStoreOptions) {
-        if (selected && selected.length) {
+        if (selected?.length) {
             this.selected = selected;
             try {
                 runInAction(() => {
                     this.resourcesLoading = true;
                 });
-                this.getSelectedParentAbortController = new AbortController();
-                const lastSelected: number = Array.isArray(selected)
-                    ? selected[selected.length - 1]
-                    : selected;
+                const abort = this._abortOperation("getSelectedParent", true);
+                const lastSelected = selected[selected.length - 1];
                 const selectedItem = await route(
                     "resource.item",
                     lastSelected
                 ).get({
-                    signal: this.getSelectedParentAbortController.signal,
+                    signal: abort.signal,
                     cache: true,
                 });
-                if (selectedItem.resource.parent) {
-                    this.parentId = selectedItem.resource.parent.id;
-                }
+                this.parentId =
+                    selectedItem.resource.parent?.id ?? this.parentId;
             } catch {
                 // ignore
             }
@@ -401,61 +378,27 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
     }
 
     private _resourceVisible(resource: ResourceRead): boolean {
-        if (this.hideUnavailable) {
-            return this._resourceAvailable(resource);
-        }
-        return true;
+        return !this.hideUnavailable || this._resourceAvailable(resource);
     }
 
     private _resourceAvailable(resource: ResourceRead): boolean {
         const { cls, interfaces } = resource;
-        const traverseClasses = this.traverseClasses;
-        const requireClass = this.requireClass;
-        const requireInterface = this.requireInterface;
         const checks: (() => boolean)[] = [];
-        if (traverseClasses) {
+        if (this.traverseClasses) {
             checks.push(() =>
                 this.getResourceClasses([cls]).some((cls) =>
-                    traverseClasses.includes(cls)
+                    this.traverseClasses!.includes(cls)
                 )
             );
         }
-        if (requireClass) {
+        if (this.requireClass) {
             checks.push(() =>
-                this.getResourceClasses([cls]).includes(requireClass)
+                this.getResourceClasses([cls]).includes(this.requireClass!)
             );
         }
-        if (requireInterface) {
-            checks.push(() => interfaces.includes(requireInterface));
+        if (this.requireInterface) {
+            checks.push(() => interfaces.includes(this.requireInterface!));
         }
         return checks.length ? checks.some((c) => c()) : true;
-    }
-
-    private _abortChildLoading(): void {
-        if (this.setResourcesAbortController) {
-            this.setResourcesAbortController.abort();
-        }
-        this.setResourcesAbortController = null;
-    }
-
-    private _abortBreadcrumbsLoading(): void {
-        if (this.setBreadcrumbItemsAbortController) {
-            this.setBreadcrumbItemsAbortController.abort();
-        }
-        this.setBreadcrumbItemsAbortController = null;
-    }
-
-    private _abortSelectedParentLoading(): void {
-        if (this.getSelectedParentAbortController) {
-            this.getSelectedParentAbortController.abort();
-        }
-        this.getSelectedParentAbortController = null;
-    }
-
-    private _abortNewGroupCreation(): void {
-        if (this.createNewGroupAbortController) {
-            this.createNewGroupAbortController.abort();
-        }
-        this.createNewGroupAbortController = null;
     }
 }
