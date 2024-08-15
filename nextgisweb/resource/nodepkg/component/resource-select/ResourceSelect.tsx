@@ -1,40 +1,41 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Select, Space } from "@nextgisweb/gui/antd";
+import { useObjectState } from "@nextgisweb/gui/hook";
 import { OpenInNewIcon } from "@nextgisweb/gui/icon";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { ResourceIcon } from "@nextgisweb/resource/icon";
 
-import { showResourcePicker } from "../resource-picker";
 import type { ResourcePickerStoreOptions } from "../resource-picker/type";
 
+import { useResourcePicker } from "./hook/useResourcePicker";
 import { useResourceSelect } from "./hook/useResourceSelect";
 import type { ResourceSelectOption, ResourceSelectProps } from "./type";
 
 export function ResourceSelect<V extends number = number>({
-    value,
+    style,
+    value: valueProp,
     onChange,
     readOnly,
     hideGoto,
-    pickerOptions,
     allowClear,
-    style,
+    pickerOptions: pickerOptionsProp,
     ...selectOptions
 }: ResourceSelectProps<V>) {
-    const pickerModal = useRef<ReturnType<typeof showResourcePicker<V>>>();
-
-    const [value_, setValue_] = useState<V | undefined>(value);
+    const [value, setValue] = useState<V | undefined>(valueProp);
     const [open, setOpen] = useState(false);
-    const pickerParentIdMem = useRef<number | undefined>(
-        pickerOptions ? pickerOptions.parentId : undefined
-    );
+
+    const { showResourcePicker } = useResourcePicker();
+
+    const [pickerOptions] = useObjectState(pickerOptionsProp);
+
     const { resource, isLoading: resourceLoading } = useResourceSelect({
-        value: value_,
+        value: value,
     });
 
     const onPick = useCallback(
         (val: V | undefined) => {
-            setValue_(val);
+            setValue(val);
             setOpen(false);
             onChange?.(val);
         },
@@ -42,23 +43,19 @@ export function ResourceSelect<V extends number = number>({
     );
 
     useEffect(() => {
-        setValue_(value);
+        setValue(value);
     }, [value]);
 
     useEffect(() => {
         if (open) {
-            const selected: number[] = [value_]
+            const selected: number[] = [value]
                 .flat()
                 .filter((v) => typeof v === "number") as number[];
             const pickerOptions_: ResourcePickerStoreOptions = {
-                parentId: pickerParentIdMem.current,
                 ...pickerOptions,
                 selected,
-                onTraverse: (val) => {
-                    pickerParentIdMem.current = val;
-                },
             };
-            pickerModal.current = showResourcePicker({
+            showResourcePicker<V>({
                 pickerOptions: pickerOptions_,
                 onSelect: (v) => {
                     if (v !== undefined) {
@@ -67,10 +64,8 @@ export function ResourceSelect<V extends number = number>({
                 },
             });
         }
-        // TODO: Suspcious, pickerOptions and onChange (onPick dependency) may
-        // not be memoized and picker willbe reopended eache rendering cycle.
         return () => setOpen(false);
-    }, [onPick, open, pickerOptions, value_]);
+    }, [onPick, open, pickerOptions, showResourcePicker, value]);
 
     const options = useMemo<ResourceSelectOption[]>(() => {
         return resource
@@ -109,7 +104,7 @@ export function ResourceSelect<V extends number = number>({
     return (
         <Select
             open={open}
-            value={value_}
+            value={value}
             loading={resourceLoading}
             onDropdownVisibleChange={(visible) => {
                 if (!visible || !readOnly) {

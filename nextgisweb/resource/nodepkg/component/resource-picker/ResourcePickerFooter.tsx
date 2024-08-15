@@ -33,7 +33,7 @@ const msgClearSelection = gettext("Clear selection");
 
 const CreateControl = observer(
     ({ setCreateMode, resourceStore }: CreateControlProps) => {
-        const { resourcesLoading } = resourceStore;
+        const { loading } = resourceStore;
         const resourceNameInput = useRef<InputRef>(null);
 
         const [resourceName, setResourceName] = useState<string>();
@@ -82,7 +82,7 @@ const CreateControl = observer(
                 <Button
                     type="primary"
                     icon={<DoneIcon />}
-                    loading={resourcesLoading}
+                    loading={loading.setChildrenFor}
                     disabled={!resourceName}
                     onClick={onSave}
                 />
@@ -91,12 +91,15 @@ const CreateControl = observer(
     }
 );
 
-const MoveControlInner = <V extends SelectValue = SelectValue>({
+CreateControl.displayName = "CreateControl";
+
+function MoveControlInner<V extends SelectValue = SelectValue>({
     setCreateMode,
     resourceStore,
     onOk,
-}: MoveControlProps<V>) => {
+}: MoveControlProps<V>) {
     const {
+        loading,
         selected,
         parentId,
         multiple,
@@ -106,7 +109,6 @@ const MoveControlInner = <V extends SelectValue = SelectValue>({
         getResourceClasses,
         disableResourceIds,
         allowCreateResource,
-        createNewGroupLoading,
     } = resourceStore;
 
     const { getCheckboxProps } = usePickerCard({ resourceStore });
@@ -156,7 +158,7 @@ const MoveControlInner = <V extends SelectValue = SelectValue>({
             <Col>
                 {allowCreateResource &&
                     possibleToCreate &&
-                    !createNewGroupLoading && (
+                    !loading.createNewGroup && (
                         <Tooltip title={msgCreateGroup}>
                             <a
                                 style={{ fontSize: "1.5rem" }}
@@ -201,9 +203,10 @@ const MoveControlInner = <V extends SelectValue = SelectValue>({
             </Col>
         </Row>
     );
-};
+}
 
 const MoveControl = observer(MoveControlInner);
+MoveControl.displayName = "MoveControl";
 
 const ResourcePickerFooterInner = <V extends SelectValue = SelectValue>({
     resourceStore,
@@ -226,3 +229,4 @@ const ResourcePickerFooterInner = <V extends SelectValue = SelectValue>({
 };
 
 export const ResourcePickerFooter = observer(ResourcePickerFooterInner);
+ResourcePickerFooter.displayName = "ResourcePickerFooter";

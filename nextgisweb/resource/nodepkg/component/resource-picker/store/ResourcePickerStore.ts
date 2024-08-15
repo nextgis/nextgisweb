@@ -1,7 +1,5 @@
-import { action, observable, runInAction } from "mobx";
+import { action, observable } from "mobx";
 
-import { extractError } from "@nextgisweb/gui/error";
-import type { ApiError } from "@nextgisweb/gui/error/type";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type {
@@ -15,9 +13,11 @@ import type { ResourceInterface } from "../../../type/Resource";
 import { loadParents } from "../../../util/loadParents";
 import type { OnNewGroupType, ResourcePickerStoreOptions } from "../type";
 
-type AbortOperation =
-    | "setResources"
-    | "setBreadcrumbItems"
+import { actionHandler } from "./decorator/actionHandler";
+
+export type Action =
+    | "setChildrenFor"
+    | "setBreadcrumbItemsFor"
     | "createNewGroup"
     | "getSelectedParent";
 
@@ -30,48 +30,33 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
         ResourcePickerStore.GLOBAL_PARENT_ID = undefined;
     };
 
-    @observable accessor resourcesLoadError: string | boolean = false;
-    @observable accessor resourcesLoading = false;
-    @observable accessor resources: CompositeRead[] = [];
-
-    @observable accessor parentId: number = 0;
-
     @observable.ref accessor parentItem: CompositeRead | null = null;
-
     @observable.ref accessor blueprint: Blueprint | null = null;
 
-    @observable accessor setBreadcrumbItemsError: string | boolean = false;
-    @observable accessor breadcrumbItemsLoading = false;
+    @observable accessor resources: CompositeRead[] = [];
+    @observable accessor parentId: number = 0;
     @observable accessor breadcrumbItems: CompositeRead[] = [];
-
-    @observable accessor createNewGroupLoading = false;
-    @observable accessor createNewGroupError: string | boolean = false;
-
     @observable accessor hideUnavailable = false;
     @observable accessor disableResourceIds: number[] = [];
-
     @observable accessor requireClass: ResourceCls | null = null;
     @observable accessor requireInterface: ResourceInterface | null = null;
-
     @observable accessor allowSelection = true;
     @observable accessor allowMoveInside = true;
     @observable accessor traverseClasses: ResourceCls[] | null = null;
-
     @observable accessor allowCreateResource = true;
     @observable accessor selected: number[] = [];
     @observable accessor multiple = false;
-
+    @observable accessor saveLastParentIdGlobal = false;
     @observable accessor getThisMsg = msgPickThis;
     @observable accessor getSelectedMsg = msgPickSelected;
-
-    @observable accessor saveLastParentIdGlobal = false;
+    @observable accessor errors: Partial<Record<Action, string>> = {};
+    @observable accessor loading: Partial<Record<Action, boolean>> = {};
 
     readonly onNewGroup: OnNewGroupType | null = null;
     readonly onTraverse: ((parentId: number) => void) | null = null;
-    readonly initialParentId: number = 0;
+    readonly initParentId: number = 0;
 
-    private abortControllers: Partial<Record<AbortOperation, AbortController>> =
-        {};
+    private abortControllers: Partial<Record<Action, AbortController>> = {};
 
     constructor({
         multiple,
@@ -80,6 +65,7 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
         getThisMsg,
         onNewGroup,
         onTraverse,
+        initParentId,
         requireClass,
         getSelectedMsg,
         hideUnavailable,
@@ -93,8 +79,8 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
             parentId = ResourcePickerStore.GLOBAL_PARENT_ID;
         }
 
-        this.parentId = parentId ?? this.parentId;
-        this.initialParentId = this.parentId;
+        this.parentId = parentId ?? initParentId ?? this.parentId;
+        this.initParentId = initParentId ?? this.parentId;
 
         this.onNewGroup = onNewGroup ?? null;
         this.onTraverse = onTraverse ?? null;
@@ -107,13 +93,13 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
         this.getThisMsg = getThisMsg ?? msgPickThis;
         this.traverseClasses = traverseClasses ?? null;
 
-        this._initialize({ selected, parentId });
+        this.getSelectedParent({ selected, parentId });
     }
 
     @action
-    async changeParentTo(parent: number) {
+    changeParentTo(parent: number) {
         this.setChildrenFor(parent);
-        this.setBreadcrumbItems(parent);
+        this.setBreadcrumbItemsFor(parent);
 
         this.parentId = parent;
         if (this.saveLastParentIdGlobal) {
@@ -122,9 +108,9 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
         this.onTraverse?.(parent);
     }
 
-    destroy() {
+    destroy = () => {
         this.abort();
-    }
+    };
 
     getResourceClasses = (classes: ResourceCls[]): ResourceCls[] => {
         const resourceClasses: ResourceCls[] = [...classes];
@@ -164,7 +150,7 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
     }
 
     returnToInitial(): void {
-        this.changeParentTo(this.initialParentId);
+        this.changeParentTo(this.initParentId);
     }
 
     @action
@@ -201,12 +187,21 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
 
     abort(): void {
         Object.keys(this.abortControllers).forEach((key) => {
-            this._abortOperation(key as AbortOperation);
+            this._abortOperation(key as Action);
         });
     }
 
+    @action
+    _setLoading(operation: Action, status: boolean) {
+        this.loading = { ...this.loading, [operation]: status };
+    }
+    @action
+    _setError(operation: Action, msg?: string) {
+        this.errors[operation] = msg;
+    }
+
     private _abortOperation<T extends boolean = false>(
-        operation: AbortOperation,
+        operation: Action,
         reset?: T
     ): T extends true ? AbortController : undefined {
         if (this.abortControllers[operation]) {
@@ -217,121 +212,103 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
         return val as T extends true ? AbortController : undefined;
     }
 
-    @action
-    async setBreadcrumbItems(parent: number): Promise<void> {
-        const abort = this._abortOperation("setBreadcrumbItems", true);
-        try {
-            this.breadcrumbItemsLoading = true;
-            const parents = await loadParents(parent, {
-                signal: abort.signal,
-            });
+    @action setParentItem(parentItem: CompositeRead | null) {
+        this.parentItem = parentItem;
+    }
+    @action setParentId(id: number) {
+        this.parentId = id;
+    }
 
-            this.breadcrumbItems = parents;
-        } catch (er) {
-            const { title } = extractError(er as ApiError);
-            runInAction(() => {
-                this.setBreadcrumbItemsError = title;
-            });
-            throw new Error(String(er));
-        } finally {
-            this.breadcrumbItemsLoading = false;
-        }
+    @action setResources(resources: CompositeRead[]) {
+        this.resources = resources;
     }
 
     @action
+    async setBreadcrumbItems(items: CompositeRead[]): Promise<void> {
+        this.breadcrumbItems = items;
+    }
+
+    @actionHandler
+    async setBreadcrumbItemsFor(parent: number): Promise<void> {
+        const abort = this._abortOperation("setBreadcrumbItemsFor", true);
+
+        this.setBreadcrumbItems(
+            await loadParents(parent, {
+                signal: abort.signal,
+            })
+        );
+    }
+
+    @actionHandler
     async setChildrenFor(parent: number): Promise<void> {
-        const abort = this._abortOperation("setResources", true);
-        try {
-            this.resourcesLoading = true;
-            this.blueprint = await route("resource.blueprint").get({
-                signal: abort.signal,
-                cache: true,
-            });
-            this.parentItem = await route("resource.item", parent).get({
-                signal: abort.signal,
-                cache: true,
-            });
-            const resp = await route("resource.collection").get({
-                query: { parent: parent },
-                signal: abort.signal,
-            });
-            const resources = resp.filter((x: CompositeRead) =>
-                this._resourceVisible(x.resource)
-            );
+        const abort = this._abortOperation("setChildrenFor", true);
 
-            this.resources = resources;
-        } catch (er) {
-            const { title } = extractError(er as ApiError);
-            this.resourcesLoadError = title;
-            throw new Error(String(er));
-        } finally {
-            this.resourcesLoading = false;
-        }
+        this.blueprint = await route("resource.blueprint").get({
+            signal: abort.signal,
+            cache: true,
+        });
+        this.setParentItem(
+            await route("resource.item", parent).get({
+                signal: abort.signal,
+                cache: true,
+            })
+        );
+        const resp = await route("resource.collection").get({
+            query: { parent: parent },
+            signal: abort.signal,
+        });
+        this.setResources(
+            resp.filter((x: CompositeRead) => this._resourceVisible(x.resource))
+        );
     }
 
-    @action
+    @actionHandler
     async createNewGroup(name: string): Promise<CompositeRead | undefined> {
         const abort = this._abortOperation("createNewGroup", true);
-        try {
-            this.createNewGroupLoading = true;
 
-            const payload = {
-                resource: {
-                    display_name: name,
-                    keyname: null,
-                    parent: {
-                        id: this.parentId,
-                    },
-                    cls: "resource_group",
+        const payload = {
+            resource: {
+                display_name: name,
+                keyname: null,
+                parent: {
+                    id: this.parentId,
                 },
-            };
-            const createdItem = await route("resource.collection").post<{
-                id: number;
-            }>({
-                json: payload,
-                signal: abort.signal,
-            });
+                cls: "resource_group",
+            },
+        };
+        const createdItem = await route("resource.collection").post<{
+            id: number;
+        }>({
+            json: payload,
+            signal: abort.signal,
+        });
 
-            await this.refresh();
-            const newItem = this.resources.find(
-                (c) => c.resource.id === createdItem.id
-            );
+        await this.refresh();
+        const newItem = this.resources.find(
+            (c) => c.resource.id === createdItem.id
+        );
 
-            if (newItem) {
-                if (this.onNewGroup) {
-                    this.onNewGroup(newItem);
-                }
-                return newItem;
+        if (newItem) {
+            if (this.onNewGroup) {
+                this.onNewGroup(newItem);
             }
-        } catch (er) {
-            const { title } = extractError(er as ApiError);
-            this.createNewGroupError = title;
-            throw er;
-        } finally {
-            this.createNewGroupLoading = false;
+            return newItem;
         }
     }
 
-    @action
-    private async _initialize({ selected }: ResourcePickerStoreOptions) {
+    @actionHandler
+    private async getSelectedParent({ selected }: ResourcePickerStoreOptions) {
         if (selected?.length) {
-            this.selected = selected;
-            try {
-                this.resourcesLoading = true;
-                const abort = this._abortOperation("getSelectedParent", true);
-                const lastSelected = selected[selected.length - 1];
-                const selectedItem = await route(
-                    "resource.item",
-                    lastSelected
-                ).get({
+            this.setSelected(selected);
+            const abort = this._abortOperation("getSelectedParent", true);
+            const lastSelected = selected[selected.length - 1];
+            const selectedItem = await route("resource.item", lastSelected).get(
+                {
                     signal: abort.signal,
                     cache: true,
-                });
-                this.parentId =
-                    selectedItem.resource.parent?.id ?? this.parentId;
-            } catch {
-                // ignore
-            }
+                }
+            );
+            this.setParentId(selectedItem.resource.parent?.id ?? this.parentId);
         }
         this.changeParentTo(this.parentId);
     }

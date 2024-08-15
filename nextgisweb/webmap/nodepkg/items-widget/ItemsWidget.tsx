@@ -13,7 +13,7 @@ import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { adapters } from "@nextgisweb/pyramid/settings!webmap";
 import { ResourceSelect } from "@nextgisweb/resource/component";
-import { pickToFocusTable } from "@nextgisweb/resource/component/resource-picker";
+import { useFocusTablePicker } from "@nextgisweb/resource/component/resource-picker/hook/useFocusTablePicker";
 import type {
     EditorWidgetComponent,
     EditorWidgetProps,
@@ -148,6 +148,10 @@ export const ItemsWidget: EditorWidgetComponent<EditorWidgetProps<ItemsStore>> =
         const { makeSignal } = useAbortController();
         const [drawOrderEdit, setDrawOrderEdit] = useState(false);
 
+        const { pickToFocusTable } = useFocusTablePicker({
+            initParentId: store.composite.parent,
+        });
+
         const drawOrderEnabled = store.drawOrderEnabled.value;
         const { tableActions, itemActions } = useMemo(
             () => ({
@@ -206,7 +210,7 @@ export const ItemsWidget: EditorWidgetComponent<EditorWidgetProps<ItemsStore>> =
                 ],
                 itemActions: [action.deleteItem<ItemObject>()],
             }),
-            [drawOrderEnabled, makeSignal, store]
+            [drawOrderEnabled, makeSignal, pickToFocusTable, store]
         );
 
         return drawOrderEdit ? (

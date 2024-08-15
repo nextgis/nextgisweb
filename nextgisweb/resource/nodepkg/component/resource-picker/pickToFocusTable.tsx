@@ -11,14 +11,15 @@ import type { CompositeRead } from "@nextgisweb/resource/type/api";
 import { showResourcePicker } from "./showResourcePicker";
 import type { ResourcePickerStoreOptions } from "./type";
 
-interface PickToFocusTableOptions<I>
+export interface PickToFocusTableOptions<I>
     extends Partial<Omit<FocusTableAction<I>, "callback">> {
     pickerOptions?: ResourcePickerStoreOptions;
 }
 
 export function pickToFocusTable<I extends FocusTableItem>(
     factory: (resource: CompositeRead) => I | Promise<I>,
-    options?: PickToFocusTableOptions<I | null>
+    options?: PickToFocusTableOptions<I | null>,
+    showResourcePickerFunction = showResourcePicker
 ): FocusTableAction<I | null> {
     const { pickerOptions, ...restOptions } = options || {};
 
@@ -26,8 +27,8 @@ export function pickToFocusTable<I extends FocusTableItem>(
         base: I | null,
         env: { store: FocusTableStore<I>; select: (item: I) => void }
     ) => {
-        showResourcePicker({
-            pickerOptions: { saveLastParentIdGlobal: true, ...pickerOptions },
+        showResourcePickerFunction({
+            pickerOptions: { ...pickerOptions },
 
             onPick: (resources) => {
                 if (!Array.isArray(resources)) resources = [resources];

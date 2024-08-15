@@ -19,7 +19,11 @@ const msgRefresh = gettext("Refresh");
 
 export const ResourcePickerTitle = observer(
     ({ resourceStore, onClose, showClose }: ResourcePickerTitleProps) => {
-        const { initialParentId, parentId, allowMoveInside } = resourceStore;
+        const {
+            initParentId: initialParentId,
+            parentId,
+            allowMoveInside,
+        } = resourceStore;
 
         const [searchMode, setSearchMode] = useState(false);
 
@@ -100,3 +104,5 @@ export const ResourcePickerTitle = observer(
         );
     }
 );
+
+ResourcePickerTitle.displayName = "ResourcePickerTitle";

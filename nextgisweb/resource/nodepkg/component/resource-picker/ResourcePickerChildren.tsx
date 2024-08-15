@@ -30,13 +30,13 @@ function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
     onOk,
 }: ResourcePickerChildrenProps<V>) {
     const {
+        loading,
         multiple,
         selected,
         resources,
         allowSelection,
         traverseClasses,
         allowMoveInside,
-        resourcesLoading,
         getResourceClasses,
     } = resourceStore;
 
@@ -129,7 +129,7 @@ function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
             columns={columns}
             rowKey="id"
             size="middle"
-            loading={resourcesLoading}
+            loading={loading.setChildrenFor}
             rowSelection={
                 allowSelection
                     ? {

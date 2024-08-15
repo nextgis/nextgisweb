@@ -18,8 +18,7 @@ export const ResourcePickerBreadcrumb = observer(
         // TODO: make it dependent on the block length
         maxBreadcrumbItems = 2,
     }: ResourcePickerBreadcrumbProps) => {
-        const { breadcrumbItems, breadcrumbItemsLoading, allowMoveInside } =
-            resourceStore;
+        const { breadcrumbItems, loading, allowMoveInside } = resourceStore;
 
         const breadcrumbs = useMemo<BreadcrumbItems>(() => {
             const items: BreadcrumbItems = [];
@@ -114,7 +113,7 @@ export const ResourcePickerBreadcrumb = observer(
             resourceStore,
         ]);
 
-        return breadcrumbItemsLoading ? (
+        return loading.setBreadcrumbItemsFor ? (
             <Space>
                 <Skeleton.Button active size="small" shape="circle" />
                 <Skeleton.Input active size="small" />
@@ -124,3 +123,5 @@ export const ResourcePickerBreadcrumb = observer(
         );
     }
 );
+
+ResourcePickerBreadcrumb.displayName = "ResourcePickerBreadcrumb";
