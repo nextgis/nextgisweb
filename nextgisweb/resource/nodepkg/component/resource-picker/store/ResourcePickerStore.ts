@@ -24,15 +24,11 @@ type AbortOperation =
 const msgPickThis = gettext("Pick this group");
 const msgPickSelected = gettext("Pick selected");
 
-let ID = 0;
-
 export class ResourcePickerStore implements ResourcePickerStoreOptions {
     static GLOBAL_PARENT_ID?: number = undefined;
     static resetGlobalParentId = () => {
         ResourcePickerStore.GLOBAL_PARENT_ID = undefined;
     };
-
-    private readonly _id = ID++;
 
     @observable accessor resourcesLoadError: string | boolean = false;
     @observable accessor resourcesLoading = false;
@@ -92,7 +88,7 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
         disableResourceIds,
         saveLastParentIdGlobal,
     }: ResourcePickerStoreOptions) {
-        if (saveLastParentIdGlobal && ResourcePickerStore.GLOBAL_PARENT_ID) {
+        if (saveLastParentIdGlobal) {
             this.saveLastParentIdGlobal = saveLastParentIdGlobal;
             parentId = ResourcePickerStore.GLOBAL_PARENT_ID;
         }
