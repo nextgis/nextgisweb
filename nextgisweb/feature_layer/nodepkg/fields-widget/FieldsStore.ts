@@ -9,6 +9,7 @@ import type {
     EditorStoreOptions,
 } from "@nextgisweb/resource/type/EditorStore";
 import type { ResourceRef } from "@nextgisweb/resource/type/api";
+import { Composite } from "@nextgisweb/resource/type";
 
 interface FieldData {
     id: number | undefined;
@@ -106,7 +107,8 @@ export interface Value {
 
 export class FieldsStore implements EditorStore<Value>, FocusTableStore<Field> {
     readonly identity = "feature_layer";
-    readonly resourceCls: string;
+
+    readonly composite: Composite;
 
     dirty = false;
     validate = false;
@@ -115,7 +117,8 @@ export class FieldsStore implements EditorStore<Value>, FocusTableStore<Field> {
     existingFields = observable.array<Field>([]);
 
     constructor({ composite }: EditorStoreOptions) {
-        this.resourceCls = composite.cls;
+        this.composite = composite;
+
         observe(this.fields, () => this.markDirty());
         makeObservable(this, {
             dirty: true,

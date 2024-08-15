@@ -9,7 +9,7 @@ import type { FocusTablePropsActions } from "@nextgisweb/gui/focus-table";
 import { Area } from "@nextgisweb/gui/mayout";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { ResourceSelect } from "@nextgisweb/resource/component";
-import { pickToFocusTable } from "@nextgisweb/resource/component/resource-picker";
+import { useFocusTablePicker } from "@nextgisweb/resource/component/resource-picker";
 import type {
     EditorWidgetComponent,
     EditorWidgetProps,
@@ -42,7 +42,13 @@ const BasemapWidget = observer<{
                 label={gettext("Resource")}
                 value={item.resourceId}
                 component={ResourceSelect}
-                props={{ readOnly: true, style: { width: "100%" } }}
+                props={{
+                    readOnly: true,
+                    style: { width: "100%" },
+                    pickerOptions: {
+                        initParentId: item.store.composite.parent,
+                    },
+                }}
             />
         </Area>
     );
@@ -53,6 +59,10 @@ BasemapWidget.displayName = "BasemapWidget";
 export const WebMapWidget: EditorWidgetComponent<
     EditorWidgetProps<WebMapStore>
 > = observer(({ store }: EditorWidgetProps<WebMapStore>) => {
+    const { pickToFocusTable } = useFocusTablePicker({
+        initParentId: store.composite.parent,
+    });
+
     const { tableActions, itemActions } = useMemo<
         FocusTablePropsActions<Basemap>
     >(
@@ -79,7 +89,7 @@ export const WebMapWidget: EditorWidgetComponent<
             ],
             itemActions: [action.deleteItem()],
         }),
-        [store]
+        [pickToFocusTable, store]
     );
 
     return (

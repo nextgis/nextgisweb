@@ -4,9 +4,9 @@ import { Badge, Dropdown, Tooltip } from "@nextgisweb/gui/antd";
 import type { MenuProps } from "@nextgisweb/gui/antd";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import { useResourcePicker } from "@nextgisweb/resource/component/resource-select/hook/useResourcePicker";
 import type { CompositeRead } from "@nextgisweb/resource/type/api";
 
-import { showResourcePicker } from "../../component/resource-picker";
 import type { ChildrenResource } from "../type";
 import { createResourceTableItemOptions } from "../util/createResourceTableItemOptions";
 import { forEachSelected } from "../util/forEachSelected";
@@ -63,6 +63,8 @@ export function MenuDropdown({
     setSelected,
     setItems,
 }: MenuDropdownProps) {
+    const { showResourcePicker } = useResourcePicker();
+
     const selectedAllowedForFeatureExport = useMemo(() => {
         const allowedToFeatureExport = [];
 
@@ -297,6 +299,7 @@ export function MenuDropdown({
         moveSelectedTo,
         setVolumeValues,
         setVolumeVisible,
+        showResourcePicker,
         setCreationDateVisible,
     ]);
 

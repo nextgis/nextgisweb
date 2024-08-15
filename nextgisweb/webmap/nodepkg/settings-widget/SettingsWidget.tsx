@@ -97,7 +97,7 @@ export const SettingsWidget: EditorWidgetComponent<
             <Lot row label={msgBookmarks}>
                 <ResourceSelectRef
                     pickerOptions={{
-                        parentId: store.composite.parent,
+                        initParentId: store.composite.parent,
                         requireInterface: "IFeatureLayer",
                     }}
                     value={store.bookmarkResource}

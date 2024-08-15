@@ -62,7 +62,10 @@ const FieldWidget = observer<{
                 value={item.lookupTable}
                 component={ResourceSelectRef}
                 props={{
-                    pickerOptions: { requireClass: "lookup_table" },
+                    pickerOptions: {
+                        requireClass: "lookup_table",
+                        initParentId: item.store.composite.parent,
+                    },
                     placeholder: msgLookupTableNotUsed,
                     style: { width: "100%" },
                     allowClear: true,
@@ -123,7 +126,7 @@ export const FieldsWidget: EditorWidgetComponent<
     }, [store]);
 
     // TODO: Use interfaces and capabilities to get available actions
-    const isVectorLayer = store.resourceCls === "vector_layer";
+    const isVectorLayer = store.composite.cls === "vector_layer";
 
     return (
         <FocusTable<Field>
@@ -164,6 +167,7 @@ export const FieldsWidget: EditorWidgetComponent<
     );
 });
 
+FieldsWidget.displayName = "FieldsWidget";
 FieldsWidget.title = gettext("Fields");
 FieldsWidget.activateOn = { update: true };
 FieldsWidget.order = -50;

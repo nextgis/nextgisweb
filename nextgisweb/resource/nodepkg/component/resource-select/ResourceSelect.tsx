@@ -25,7 +25,10 @@ export function ResourceSelect<V extends number = number>({
     const [value, setValue] = useState<V | undefined>(valueProp);
     const [open, setOpen] = useState(false);
 
-    const { showResourcePicker } = useResourcePicker();
+    const { showResourcePicker } = useResourcePicker({
+        initParentId:
+            pickerOptionsProp?.initParentId || pickerOptionsProp?.parentId,
+    });
 
     const [pickerOptions] = useObjectState(pickerOptionsProp);
 

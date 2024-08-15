@@ -6,8 +6,8 @@ import type { InputNumberProps } from "@nextgisweb/gui/antd";
 import { route } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { showResourcePicker } from "@nextgisweb/resource/component/resource-picker";
 import type { ResourcePickerStoreOptions } from "@nextgisweb/resource/component/resource-picker/type";
+import { useResourcePicker } from "@nextgisweb/resource/component/resource-select/hook/useResourcePicker";
 
 import LayersIconOutlined from "@nextgisweb/icon/material/layers";
 
@@ -83,6 +83,8 @@ export const ExtentRow = observer(
 
         const { makeSignal } = useAbortController();
 
+        const { showResourcePicker } = useResourcePicker();
+
         const onSetFromLayerClick = useCallback(() => {
             showResourcePicker({
                 pickerOptions: {
@@ -104,7 +106,7 @@ export const ExtentRow = observer(
                     }
                 },
             });
-        }, [makeSignal, onChange, pickerOptions]);
+        }, [makeSignal, onChange, pickerOptions, showResourcePicker]);
 
         return (
             <div className="ngw-gui-extent-row">

@@ -2,7 +2,11 @@ import { action, computed, observable, observe } from "mobx";
 
 import type * as apitype from "@nextgisweb/basemap/type/api";
 import type { FocusTableStore } from "@nextgisweb/gui/focus-table";
-import type { EditorStore } from "@nextgisweb/resource/type/EditorStore";
+import type { Composite } from "@nextgisweb/resource/type";
+import type {
+    EditorStore,
+    EditorStoreOptions,
+} from "@nextgisweb/resource/type/EditorStore";
 
 import { Basemap } from "./Basemap";
 
@@ -18,7 +22,10 @@ export class WebMapStore
 
     basemaps = observable.array<Basemap>([], { deep: false });
 
-    constructor() {
+    composite: Composite;
+
+    constructor({ composite }: EditorStoreOptions) {
+        this.composite = composite;
         observe(this.basemaps, () => this.markDirty());
     }
 

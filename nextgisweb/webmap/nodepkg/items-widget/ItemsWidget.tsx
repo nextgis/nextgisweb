@@ -98,7 +98,13 @@ const LayerWidget = observer(({ item }: { item: Layer }) => {
                 label={msgResource}
                 value={item.layerStyleId}
                 component={ResourceSelect}
-                props={{ readOnly: true, style: { width: "100%" } }}
+                props={{
+                    readOnly: true,
+                    style: { width: "100%" },
+                    pickerOptions: {
+                        initParentId: item.store.composite.parent,
+                    },
+                }}
             />
             <LotMV
                 label={msgMinScaleDenom}

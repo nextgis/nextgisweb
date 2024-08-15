@@ -65,10 +65,11 @@ export function CloneWebmap({
                 pickerOptions={{
                     traverseClasses: ["resource_group"],
                     hideUnavailable: true,
+                    initParentId: data?.resource.parent?.id,
                 }}
             />
         );
-    }, []);
+    }, [data]);
 
     const fields = useMemo<FormField<keyof CloneProps>[]>(
         () => [

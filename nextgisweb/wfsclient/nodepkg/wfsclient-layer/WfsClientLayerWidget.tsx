@@ -56,7 +56,7 @@ async function inspectLayerFetch(
     const result: Record<string, string> = {};
     for (const { name, type } of data.fields) {
         if (/^gml:/i.test(type)) {
-            const typeNorm = type.replace(/(Property)?Type$/, "")
+            const typeNorm = type.replace(/(Property)?Type$/, "");
             result[name] = geometries[typeNorm];
         }
     }
@@ -167,7 +167,7 @@ export const WfsClientLayerWidget: EditorWidgetComponent<
                 props={{
                     pickerOptions: {
                         requireClass: "wfsclient_connection",
-                        parentId: store.composite.parent,
+                        initParentId: store.composite.parent,
                     },
                     style: { width: "100%" },
                 }}

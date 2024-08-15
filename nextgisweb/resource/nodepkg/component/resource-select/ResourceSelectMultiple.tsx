@@ -11,9 +11,10 @@ import type {
     ResourceRead,
 } from "@nextgisweb/resource/type/api";
 
-import { ResourcePickerStore, showResourcePicker } from "../resource-picker";
+import { ResourcePickerStore } from "../resource-picker";
 import type { SelectValue } from "../resource-picker/type";
 
+import { useResourcePicker } from "./hook/useResourcePicker";
 import type { ResourceSelectProps } from "./type";
 
 import ManageSearchIcon from "@nextgisweb/icon/material/manage_search";
@@ -32,6 +33,10 @@ const ResourceSelectMultiple = ({
     const [ids, setIds] = useState(() => uniq(initResourceIds));
     const [resources, setResources] = useState<ResourceRead[]>([]);
     const [loading, setLoading] = useState(false);
+
+    const { showResourcePicker } = useResourcePicker({
+        initParentId: pickerOptions.initParentId || pickerOptions.parentId,
+    });
 
     const [store] = useState(
         () =>

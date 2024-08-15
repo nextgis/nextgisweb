@@ -125,7 +125,7 @@ export const TmsClientLayerWidget: EditorWidgetComponent<
                 props={{
                     pickerOptions: {
                         requireClass: "tmsclient_connection",
-                        parentId: store.composite.parent,
+                        initParentId: store.composite.parent,
                     },
                     style: { width: "100%" },
                     labelRender: ({ label }) => (

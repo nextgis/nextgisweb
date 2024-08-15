@@ -3,6 +3,7 @@ import { makeObservable } from "mobx";
 import { mapper, validate } from "@nextgisweb/gui/arm";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import srsSettings from "@nextgisweb/pyramid/settings!spatial_ref_sys";
+import type { Composite } from "@nextgisweb/resource/type";
 import type {
     EditorStore,
     EditorStoreOptions,
@@ -66,8 +67,11 @@ export class LayerStore implements EditorStore<Value> {
     geometrySrid = geometrySrid.init(null, this);
     fields = fields.init("update", this);
 
-    constructor({ operation }: EditorStoreOptions) {
+    readonly composite: Composite;
+
+    constructor({ operation, composite }: EditorStoreOptions) {
         this.operation = operation;
+        this.composite = composite;
         makeObservable(this, {
             dirty: true,
             validate: true,

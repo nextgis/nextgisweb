@@ -158,7 +158,10 @@ export const LayerWidget: EditorWidgetComponent<EditorWidgetProps<LayerStore>> =
                     value={store.connection}
                     component={ResourceSelectRef}
                     props={{
-                        pickerOptions: { requireClass: "postgis_connection" },
+                        pickerOptions: {
+                            requireClass: "postgis_connection",
+                            initParentId: store.composite.parent,
+                        },
                         style: { width: "100%" },
                     }}
                 />

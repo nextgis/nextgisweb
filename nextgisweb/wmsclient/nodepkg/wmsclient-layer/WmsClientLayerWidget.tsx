@@ -88,7 +88,10 @@ export const WmsClientLayerWidget: EditorWidgetComponent<
                 value={store.connection}
                 component={ResourceSelectRef}
                 props={{
-                    pickerOptions: { requireClass: "wmsclient_connection" },
+                    pickerOptions: {
+                        requireClass: "wmsclient_connection",
+                        initParentId: store.composite.parent,
+                    },
                     style: { width: "100%" },
                 }}
             />

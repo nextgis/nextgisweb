@@ -3,6 +3,7 @@ import { action, computed, observable } from "mobx";
 import { mapper } from "@nextgisweb/gui/arm";
 import srsSettings from "@nextgisweb/pyramid/settings!spatial_ref_sys";
 import type {
+    Composite,
     EditorStore,
     EditorStoreOptions,
     Operation,
@@ -42,6 +43,7 @@ export class WmsClientLayerStore
     readonly identity = "wmsclient_layer";
 
     readonly operation: Operation;
+    readonly composite: Composite;
 
     connection = connection.init(null, this);
     wmslayers = wmslayers.init("", this);
@@ -50,8 +52,9 @@ export class WmsClientLayerStore
 
     @observable accessor validate = false;
 
-    constructor({ operation }: EditorStoreOptions) {
+    constructor({ operation, composite }: EditorStoreOptions) {
         this.operation = operation;
+        this.composite = composite;
     }
 
     @action load(val: LayerRead) {

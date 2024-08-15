@@ -1,7 +1,11 @@
 import { action, computed, observable, observe } from "mobx";
 
 import type { FocusTableStore } from "@nextgisweb/gui/focus-table";
-import type { EditorStore } from "@nextgisweb/resource/type/EditorStore";
+import type { Composite } from "@nextgisweb/resource/type";
+import type {
+    EditorStore,
+    EditorStoreOptions,
+} from "@nextgisweb/resource/type/EditorStore";
 import type * as apitype from "@nextgisweb/wmsserver/type/api";
 
 import { Layer } from "./Layer";
@@ -20,7 +24,10 @@ export class ServiceStore
 
     layers = observable.array<Layer>([], { deep: false });
 
-    constructor() {
+    composite: Composite;
+
+    constructor({ composite }: EditorStoreOptions) {
+        this.composite = composite;
         observe(this.layers, () => this.markDirty());
     }
 

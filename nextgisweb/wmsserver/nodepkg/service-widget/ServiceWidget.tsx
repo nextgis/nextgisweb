@@ -11,7 +11,7 @@ import { route } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { ResourceSelect } from "@nextgisweb/resource/component";
-import { pickToFocusTable } from "@nextgisweb/resource/component/resource-picker";
+import { useFocusTablePicker } from "@nextgisweb/resource/component/resource-picker";
 import type {
     EditorWidgetComponent,
     EditorWidgetProps,
@@ -50,7 +50,13 @@ const CollectionWidget = observer<{
                 label={gettext("Resource")}
                 value={item.resourceId}
                 component={ResourceSelect}
-                props={{ readOnly: true, style: { width: "100%" } }}
+                props={{
+                    readOnly: true,
+                    style: { width: "100%" },
+                    pickerOptions: {
+                        initParentId: item.store.composite.parent,
+                    },
+                }}
             />
         </Area>
     );
@@ -60,6 +66,10 @@ export const ServiceWidget: EditorWidgetComponent<
     EditorWidgetProps<ServiceStore>
 > = observer(({ store }: EditorWidgetProps<ServiceStore>) => {
     const { makeSignal } = useAbortController();
+
+    const { pickToFocusTable } = useFocusTablePicker({
+        initParentId: store.composite.parent,
+    });
 
     const { tableActions, itemActions } = useMemo<
         FocusTablePropsActions<Layer>
@@ -96,7 +106,7 @@ export const ServiceWidget: EditorWidgetComponent<
             ],
             itemActions: [action.deleteItem()],
         }),
-        [store, makeSignal]
+        [pickToFocusTable, store, makeSignal]
     );
 
     return (

@@ -65,5 +65,6 @@ export const EditorWidget: EditorWidgetComponent<
     );
 });
 
+EditorWidget.displayName = "EditorWidget";
 EditorWidget.title = gettext("Resource");
 EditorWidget.order = -100;
