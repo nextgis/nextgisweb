@@ -27,7 +27,8 @@ export function pickToFocusTable<I extends FocusTableItem>(
         env: { store: FocusTableStore<I>; select: (item: I) => void }
     ) => {
         showResourcePicker({
-            pickerOptions,
+            pickerOptions: { saveLastParentIdGlobal: true, ...pickerOptions },
+
             onPick: (resources) => {
                 if (!Array.isArray(resources)) resources = [resources];
                 Promise.all(resources.map((res) => factory(res))).then(
