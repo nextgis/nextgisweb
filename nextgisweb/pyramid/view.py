@@ -789,11 +789,15 @@ def _m_gettext(_template_filename):
             comp_id = head.rpartition("/")[-1]
             break
 
-    assert comp_id, "Unable to determine a component"
+    if comp_id is None:
+        return None
+
     if comp_id.startswith("nextgisweb_"):
         comp_id = comp_id[len("nextgisweb_") :]
 
-    assert comp_id in pkginfo.components, f"Component {comp_id} not found"
+    if comp_id not in pkginfo.components:
+        return None
+
     factory = trstr_factory(comp_id)
 
     return {
@@ -814,16 +818,19 @@ def _setup_pyramid_mako(comp, config):
         "from nextgisweb.pyramid.view import json_js",
         "from nextgisweb.pyramid.view import _m_gettext",
         "_m = _m_gettext(_template_filename)",
-        *[
-            f"{k} = _m['{k}']"
-            for k in (
-                "_",
-                "gettext",
-                "gettextf",
-                "ngettext",
-                "ngettextf",
-            )
-        ],
+        "if _m: "
+        + "; ".join(
+            [
+                f"{k} = _m['{k}']"
+                for k in (
+                    "_",
+                    "gettext",
+                    "gettextf",
+                    "ngettext",
+                    "ngettextf",
+                )
+            ]
+        ),
         "del _m, _m_gettext",
     ]
     settings["mako.default_filters"] = ["h"]
