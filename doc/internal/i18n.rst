@@ -29,6 +29,30 @@ utility. To update translation in ``nextgisweb_foo`` you can do the following:
   $ nano package/nextgisweb_foo/nextgisweb_foo/locale/ru.po
   $ nextgisweb-i18n --package nextgisweb_foo compile
 
+The following standard `gettext`-like functions are supported for backend and
+frontend:
+
+- ``gettext(message)``
+- ``ngettext(singular, plural, n)``
+- ``pgettext(context, message)``
+- ``npgettext(context, singular, plural, n)``
+
+In addition, each of these functions has a formatter variant with the ``f``
+suffix: ``gettextf``, ``ngettextf``, ``pgettextf`` and ``npgettextf``. They
+return callables that perform string interpolation using Python sting format
+placeholders. For example:
+
+.. code-block:: python
+
+  >>> gettextf("Hello, {}!")("Arthur")
+  Hello, Arthur!
+
+Template stings may contain one of the following:
+
+- One anonymous placeholder: ``Hello, {}!``
+- Named placeholders: ``Hello, {first} {last}!``
+- Index based placeholders: ``Hello, {0} {1}!` 
+
 Server side
 -----------
 
@@ -49,6 +73,30 @@ preferences.
   def view(request):
       tr = request.localizer.translate
       return tr(gettext("Some message for translation"))
+
+.. note::
+
+  Formatting with ``gettext("Hello, {}!").format("Arthur")`` and
+  ``gettext("Hello, %s!") % "Arthur"`` works but deprecated.
+
+.. note::
+
+  Python formatting modifiers are not supported. To format numbers, convert
+  arguments to a string first.
+
+Some formatting examples:
+
+.. code-block:: python
+
+  from nextgisweb.env import gettextf
+
+  def user_info_message(tr, user):
+      return tr(gettextf("Your login is {kn} and full name is {dn}.")(
+          kn=user.keyname, dn=user.display_name
+      ))
+
+  def percent_left_message(tr, percent):
+      return tr(gettextf("{} left.")("{:.2f}%".format(percent)))
 
 Mako
 ^^^^
@@ -86,7 +134,7 @@ are combined into one function.
 Modern JavaScript and TypeScript
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Here is the minimal example:
+Simple messages with ``gettext``:
 
 .. code-block:: javascript
 
@@ -95,6 +143,57 @@ Here is the minimal example:
   const msgTranslated = gettext("Some message for translation");
   console.log("Localized message: " + msgTranslated);
 
+Some formatting examples: 
+
+.. code-block:: javascript
+
+  import { gettextf } from "@nextgisweb/pyramid/i18n";
+
+  const msgHelloFmt = gettextf("Hello, dear {}!");
+  const msgFromToFmt = gettext("A message from {from} to {to}.")
+
+  function sayHello(name) {
+      const msgTranslated = msgHelloFmt(name);
+      console.log("Localized message: " + msgTranslated);
+  };
+
+  function noteTitle(sender, receiver) {
+      return msgFromToFmt({from: sender, to: receiver});
+  };
+
+Formatted messages with plural can be translated with ``ngettextf``:
+
+.. code-block:: javascript
+
+  import { ngettextf } from "@nextgisweb/pyramid/i18n";
+
+  function countSheepAndWolves(sheep, wolves) {
+      const msgSheep = ngettextf("{} sheep.", "{} sheep", sheep)(sheep);
+      const msgWolves = ngettextf("{} wolf", "{} wolves", wolves)(wolves);
+
+      console.log(msgSheep);
+      console.log(msgWolves);
+  }
+
+You can translate React elements with ``Translated``:
+
+.. code-block:: javascript
+
+  import { gettextf } from "@nextgisweb/pyramid/i18n";
+  import { Translated } from "@nextgisweb/pyramid/i18n/translated";
+
+  import { OpenInNewIcon } from "@nextgisweb/gui/icon";
+
+  const msgCommandTipFmt = gettextf("For {command} click {icon} icon.");
+
+  function CommandTip({ command }) {
+      return (
+          <Translated
+              msgf={msgCommandTipFmt}
+              args={{ command, icon: <OpenInNewIcon /> }}
+          />
+      );
+  }
 
 Legacy JavaScript
 ^^^^^^^^^^^^^^^^^
