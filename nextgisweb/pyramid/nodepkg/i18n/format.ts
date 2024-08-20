@@ -4,9 +4,9 @@ export type FormatObject<T = never> = Record<string, Param<T>>;
 export type FormatArgs<T = never> = FormatArray<T> | [FormatObject<T>];
 export type Compiled<A = never, R = string> = (...args: FormatArgs<A>) => R[];
 
-const numsRegexpVar = /(?:^|[^{}])(\{(?!\{)\d+\}(?!\}))/g;
+const numsRegexp = /(?:{*)(\d)(?:}*)/g;
 
-const stringRegexpVar = /(?:^|[^{}])(\{(?!\{)[a-zA-Z_][a-zA-Z0-9_]*\}(?!\}))/g;
+const stringRegexp = /(?:{*)(\{(?!\{)[a-zA-Z_][a-zA-Z0-9_]*\}(?!\}))(?:}*)/g;
 
 const tokenSplitRegexp = /(\{\{[^}]+\}\}|\{[^}]+\}|[^{}]+)/g;
 
@@ -26,30 +26,32 @@ const processEscaped = <A = never>(result: Param<A>): string => {
 export function compile(template: string): Compiled {
     const string = preprocessFormatNG(template);
 
-    const numMatchesVar = string.match(numsRegexpVar);
+    const numMatches = string
+        .match(numsRegexp)
+        ?.filter((el) => !el.includes("{{") && !el.includes("}}"));
 
-    const stringMatchesVar = string.match(stringRegexpVar);
+    const stringMatches = string
+        .match(stringRegexp)
+        ?.filter((el) => !el.includes("{{") && !el.includes("}}"));
 
-    if (!!stringMatchesVar && !!numMatchesVar) {
+    if (!!stringMatches && !!numMatches) {
         throw new Error(
             "Templates with mixed params - string keys and numbers are not supported"
         );
     }
 
-    if (numMatchesVar && numMatchesVar.length > 0) {
+    if (numMatches && numMatches.length > 0) {
         const compileArray = <A = never>(...args: FormatArray<A>): string[] => {
-            if (args.length < numMatchesVar.length) {
+            if (args.length < numMatches.length) {
                 throw new Error(
-                    `Expected ${numMatchesVar.length} arguments but got ${args.length}`
+                    `Expected ${numMatches.length} arguments but got ${args.length}`
                 );
             }
 
             const splitted = string.match(tokenSplitRegexp) || [];
 
-            const result = splitted.map((substring) => {
-                const matchesEdit = numMatchesVar.flatMap((m) => m.match(/\d/));
-
-                const isParam = matchesEdit.includes(substring.slice(1, -1));
+            const result = splitted.map((substring: string) => {
+                const isParam = numMatches.includes(substring);
 
                 if (isParam) {
                     const argIndex = parseInt(substring.slice(1, -1));
@@ -65,22 +67,19 @@ export function compile(template: string): Compiled {
         return compileArray;
     }
 
-    if (stringMatchesVar && stringMatchesVar.length > 0) {
+    if (stringMatches && stringMatches.length > 0) {
         const compileObject = <A = never>(param: FormatObject<A>): string[] => {
             const entries = Object.entries(param);
 
-            if (entries.length < stringMatchesVar.length) {
+            if (entries.length < stringMatches.length) {
                 throw new Error(
-                    `Expected ${stringMatchesVar.length} arguments but got ${entries.length}`
+                    `Expected ${stringMatches.length} arguments but got ${entries.length}`
                 );
             }
 
             const splitted = string.match(tokenSplitRegexp) || [];
-            const result = splitted.map((substring) => {
-                // bad
-                const isParam = stringMatchesVar.find(
-                    (str) => substring !== " " && str.includes(substring)
-                );
+            const result = splitted.map((substring: string) => {
+                const isParam = stringMatches.includes(substring);
 
                 if (isParam) {
                     const argKey = substring.slice(1, -1);
