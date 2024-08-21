@@ -5,6 +5,7 @@ import {
     useRef,
     useState,
 } from "react";
+import type { Key } from "react";
 
 import { PrincipalSelect } from "@nextgisweb/auth/component";
 import { Button, RangePicker } from "@nextgisweb/gui/antd";
@@ -13,8 +14,12 @@ import { useThemeVariables } from "@nextgisweb/gui/hook";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { gettext, ngettextf } from "@nextgisweb/pyramid/i18n";
 import { PageTitle } from "@nextgisweb/pyramid/layout";
+import type Routes from "@nextgisweb/pyramid/type/route";
 
 import "./Journal.less";
+
+type AuditDbaseQuery = Routes["audit.dbase"]["get"]["query"];
+type AuditDbaseQueryGetResponse = Routes["audit.dbase"]["get"]["response"];
 
 const BLOCK_SIZE = 100;
 
@@ -37,7 +42,7 @@ const FIELDS_CSV = FIELDS.concat([
 
 const FIELD_INDEX = Object.fromEntries(FIELDS.map((f, i) => [f, i]));
 
-const fld = (rec, name) => rec[FIELD_INDEX[name]];
+const fld = (rec, name: string) => rec[FIELD_INDEX[name]];
 
 const COLUMNS = [
     {
@@ -80,7 +85,7 @@ const COLUMNS = [
     },
 ];
 
-function format_tstamp(v) {
+function format_tstamp(v: string) {
     const [s, m] = v.split(".");
     return utc(s).local().format("YYYY-MM-DD HH:mm:ss") + "." + m;
 }
@@ -126,7 +131,7 @@ function Record({ tstamp, fields }) {
                 <td className="c-timestamp">{format_tstamp(tstamp)}</td>
                 {COLUMNS.map(({ className, render: Render }, idx) => (
                     <td key={idx} className={className}>
-                        <Render field={(name) => fld(fields, name)} />
+                        <Render field={(name: string) => fld(fields, name)} />
                     </td>
                 ))}
             </tr>
@@ -138,9 +143,11 @@ function Record({ tstamp, fields }) {
 function Block({ rows }) {
     return (
         <tbody>
-            {rows.map(([tstamp, ...fields], idx) => (
-                <Record key={idx} {...{ tstamp, fields }} />
-            ))}
+            {rows.map(
+                ([tstamp, ...fields]: any, idx: Key | null | undefined) => (
+                    <Record key={idx} {...{ tstamp, fields }} />
+                )
+            )}
         </tbody>
     );
 }
@@ -149,7 +156,7 @@ function dayjsToApi(v) {
     return v.local().millisecond(0).toISOString().replace(/Z$/, "");
 }
 
-function rangePresetLast(n, unit) {
+function rangePresetLast(n: number, unit: "minute" | "hour" | "day") {
     let label;
     if (unit === "minute") {
         label = ngettextf("Last {} minute", "Last {} minutes", n);
@@ -158,26 +165,40 @@ function rangePresetLast(n, unit) {
     } else if (unit === "day") {
         label = ngettextf("Last {} day", "Last {} days", n);
     }
-    label = label(n);
+
+    if (label) {
+        label = label(n);
+    }
+
     return {
         label: label,
         value: () => [dayjs().subtract(n, unit), null],
     };
 }
 
+type AuditDbaseQueryWithUser = Omit<AuditDbaseQuery, "format"> & {
+    user?: string;
+};
+
+type UrlSearchParamsArgs =
+    | string[][]
+    | Record<string, string>
+    | string
+    | URLSearchParams;
+
 export function Journal() {
-    const [params, setParams] = useState(() => ({
-        ge: null,
-        lt: null,
+    const [params, setParams] = useState<AuditDbaseQueryWithUser>(() => ({
+        ge: undefined,
+        lt: undefined,
         user: undefined,
     }));
 
-    const [blocks, setBlocks] = useState([]);
+    const [blocks, setBlocks] = useState<any[]>([]);
     const [pointer, setPointer] = useState(null);
 
-    const refLoading = useRef();
-    const refParent = useRef(null);
-    const refTable = useRef(null);
+    const refLoading = useRef<AuditDbaseQueryGetResponse>();
+    const refParent = useRef<HTMLDivElement | null>(null);
+    const refTable = useRef<HTMLTableElement | null>(null);
 
     const loadBlock = useCallback(() => {
         if (pointer === false || refLoading.current) return;
@@ -185,7 +206,11 @@ export function Journal() {
         const gt = pointer;
         const { ge, lt, user } = params;
 
-        const query = { format: "array", fields: FIELDS, limit: BLOCK_SIZE };
+        const query: AuditDbaseQuery = {
+            format: "array",
+            fields: FIELDS,
+            limit: BLOCK_SIZE,
+        };
         if (gt) query.gt = gt;
         if (ge) query.ge = ge;
         if (lt) query.lt = lt;
@@ -206,7 +231,7 @@ export function Journal() {
     }, [params, setBlocks, pointer, setPointer]);
 
     const exportCsv = () => {
-        const query = { format: "csv", fields: FIELDS_CSV };
+        const query: AuditDbaseQuery = { format: "csv", fields: FIELDS_CSV };
         const { ge, lt, user } = params;
 
         if (ge) query.ge = ge;
@@ -215,7 +240,7 @@ export function Journal() {
 
         window.open(
             `${routeURL("audit.dbase")}?${new URLSearchParams(
-                Object.entries(query)
+                Object.entries(query) as UrlSearchParamsArgs // TODO double check
             )}`
         );
     };
@@ -231,9 +256,9 @@ export function Journal() {
         const el = refParent.current;
         if (
             pointer === null ||
-            el.scrollTop + el.clientHeight > el.scrollHeight - 100
+            (el && el.scrollTop + el.clientHeight > el.scrollHeight - 100)
         ) {
-            loadBlock(pointer);
+            loadBlock();
         }
     }, [loadBlock, pointer]);
 
@@ -327,3 +352,4 @@ export function Journal() {
 }
 
 Journal.targetElementId = "main";
+Journal.displayName = "Journal";
