@@ -8,40 +8,28 @@ import {
     useRef,
     useState,
 } from "react";
-import type { Key } from "react";
 
+import type {
+    AuditArrayLogEntry,
+    AuditObject,
+} from "@nextgisweb/audit/type/api";
 import { PrincipalSelect } from "@nextgisweb/auth/component";
 import { Button, RangePicker } from "@nextgisweb/gui/antd";
 import dayjs, { utc } from "@nextgisweb/gui/dayjs";
 import { useThemeVariables } from "@nextgisweb/gui/hook";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
+import type { RouteQuery, RouteResp } from "@nextgisweb/pyramid/api/type";
 import { gettext, ngettextf } from "@nextgisweb/pyramid/i18n";
 import { PageTitle } from "@nextgisweb/pyramid/layout";
-import type Routes from "@nextgisweb/pyramid/type/route";
 
 import "./Journal.less";
 
-type AuditDbaseQuery = Routes["audit.dbase"]["get"]["query"];
-type AuditDbaseQueryGetResponse = Routes["audit.dbase"]["get"]["response"]; // any but we know it is array of primitives
+type AuditDbaseQuery = RouteQuery<"audit.dbase", "get">;
+type AuditDbaseQueryGetResponse = RouteResp<"audit.dbase", "get">;
 
-type AuditDbaseQueryGetResponseLogEntry = any[]; // change when API will be better typed
-
-type LogEntryObject = {
-    request: {
-        path: string;
-        method: string;
-        remote_addr: string;
-    };
-    response: {
-        route_name: string;
-        status_code: number;
-    };
-    user?: {
-        id: number;
-        keyname: string;
-        display_name: string;
-    };
-};
+type ExcludeFirst<T extends unknown[]> = T extends [infer _, ...infer Rest]
+    ? Rest
+    : never;
 
 type RenderArg = { field: (name: string) => string };
 
@@ -66,8 +54,19 @@ const FIELDS_CSV = FIELDS.concat([
 
 const FIELD_INDEX = Object.fromEntries(FIELDS.map((f, i) => [f, i]));
 
-const fld = (rec: AuditDbaseQueryGetResponseLogEntry, name: string): string =>
-    rec[FIELD_INDEX[name]];
+const fld = (rec: ExcludeFirst<AuditArrayLogEntry>, name: string): string => {
+    return String(rec[FIELD_INDEX[name]]);
+};
+
+export function isAuditArrayLogEntry(
+    response: AuditDbaseQueryGetResponse
+): response is AuditArrayLogEntry[] {
+    if (!Array.isArray(response)) {
+        return false;
+    }
+
+    return response.every((entry) => Array.isArray(entry));
+}
 
 const COLUMNS = [
     {
@@ -115,7 +114,7 @@ function format_tstamp(v: string) {
     return utc(s).local().format("YYYY-MM-DD HH:mm:ss") + "." + m;
 }
 
-function Detail({ data }: { data: LogEntryObject | boolean }) {
+function Detail({ data }: { data: AuditObject | boolean }) {
     const entries = Object.entries(data).filter(([k]) => k !== "@timestamp");
     return (
         <>
@@ -134,16 +133,22 @@ function Detail({ data }: { data: LogEntryObject | boolean }) {
     );
 }
 
-function Record({ tstamp, fields }: { tstamp: string; fields: typeof FIELDS }) {
+function Record({
+    tstamp,
+    fields,
+}: {
+    tstamp: string;
+    fields: ExcludeFirst<AuditArrayLogEntry>;
+}) {
     const [expanded, setExpanded] = useState(false);
-    const [detail, setDetail] = useState<LogEntryObject | boolean>(false);
+    const [detail, setDetail] = useState<AuditObject | boolean>(false);
 
     const toggle = useCallback(() => {
         setExpanded(!expanded);
         if (detail === false) {
             route("audit.dbase")
                 .get({ query: { eq: tstamp, format: "object" } })
-                .then((data) => setDetail(data[0]));
+                .then((data) => setDetail((data as AuditObject[])[0]));
         }
     }, [tstamp, expanded, setExpanded, detail, setDetail]);
 
@@ -165,12 +170,12 @@ function Record({ tstamp, fields }: { tstamp: string; fields: typeof FIELDS }) {
     );
 }
 
-function Block({ rows }: { rows: AuditDbaseQueryGetResponseLogEntry[] }) {
+function Block({ rows }: { rows: AuditArrayLogEntry[] }) {
     return (
         <tbody>
-            {rows.map(([tstamp, ...fields], idx: Key | null | undefined) => (
-                <Record key={idx} {...{ tstamp, fields }} />
-            ))}
+            {rows.map(([tstamp, ...fields], idx) => {
+                return <Record key={idx} tstamp={tstamp} fields={fields} />;
+            })}
         </tbody>
     );
 }
@@ -182,8 +187,7 @@ function dayjsToApi(v: Dayjs) {
 const rangePresetLast = (
     n: number,
     unit: "minute" | "hour" | "day"
-    // should be DateType instead of any, but it also weird in source
-): ValueDate<Exclude<RangeValueType<any>, null>> => {
+): ValueDate<NonNullable<RangeValueType<Dayjs>>> => {
     let labelf;
     if (unit === "minute") {
         labelf = ngettextf("Last {} minute", "Last {} minutes", n);
@@ -199,15 +203,25 @@ const rangePresetLast = (
     };
 };
 
+const prepareQuery = (
+    params: Partial<AuditDbaseQueryWithUser & AuditDbaseQuery> = {}
+): AuditDbaseQuery => {
+    const { ge, gt, lt, user, format, ...rest } = params;
+    const query: AuditDbaseQuery = {
+        ...rest,
+        format: format || "array",
+    };
+    if (gt) query.gt = gt;
+    if (ge) query.ge = ge;
+    if (lt) query.lt = lt;
+    if (user) query.filter = JSON.stringify({ "user.id": user });
+
+    return query;
+};
+
 type AuditDbaseQueryWithUser = Omit<AuditDbaseQuery, "format"> & {
     user?: string | number;
 };
-
-type UrlSearchParamsArgs =
-    | string[][]
-    | Record<string, string>
-    | string
-    | URLSearchParams;
 
 export function Journal() {
     const [params, setParams] = useState<AuditDbaseQueryWithUser>(() => ({
@@ -216,61 +230,64 @@ export function Journal() {
         user: undefined,
     }));
 
-    const [blocks, setBlocks] = useState<AuditDbaseQueryGetResponse>([]);
-    const [pointer, setPointer] = useState(null);
+    const [blocks, setBlocks] = useState<AuditArrayLogEntry[][]>([]);
+    const [pointer, setPointer] = useState<string | false>();
 
-    const refLoading = useRef<AuditDbaseQueryGetResponse>();
+    const refLoading = useRef<Promise<AuditDbaseQueryGetResponse>>();
     const refParent = useRef<HTMLDivElement | null>(null);
     const refTable = useRef<HTMLTableElement | null>(null);
 
     const loadBlock = useCallback(() => {
         if (pointer === false || refLoading.current) return;
 
-        const gt = pointer;
-        const { ge, lt, user } = params;
-
-        const query: AuditDbaseQuery = {
+        const query = prepareQuery({
+            ...params,
             format: "array",
             fields: FIELDS,
             limit: BLOCK_SIZE,
-        };
-        if (gt) query.gt = gt;
-        if (ge) query.ge = ge;
-        if (lt) query.lt = lt;
-        if (user) query.filter = JSON.stringify({ "user.id": user });
+            gt: pointer,
+        });
 
-        const promise = (refLoading.current = route("audit.dbase").get({
-            query: query,
-        }));
+        const promise = route("audit.dbase").get({
+            query,
+        });
+        refLoading.current = promise;
 
-        promise.then((data: AuditDbaseQueryGetResponse) => {
-            setBlocks((cur: any) => [...cur, data]);
-            if (data === null || !setPointer) return;
-            setPointer(
-                data.length === BLOCK_SIZE ? data.slice(-1)[0][0] : false
-            );
-            refLoading.current = undefined;
+        promise.then((data) => {
+            if (isAuditArrayLogEntry(data)) {
+                setBlocks((cur) => [...cur, data]);
+                // !setPointer - looks like mistake, maybe just pointer
+                if (data === null || !setPointer) return;
+
+                setPointer(
+                    data.length === BLOCK_SIZE ? data.slice(-1)[0][0] : false
+                );
+
+                refLoading.current = undefined;
+            }
         });
     }, [params, setBlocks, pointer, setPointer]);
 
     const exportCsv = () => {
-        const query: AuditDbaseQuery = { format: "csv", fields: FIELDS_CSV };
-        const { ge, lt, user } = params;
-
-        if (ge) query.ge = ge;
-        if (lt) query.lt = lt;
-        if (user) query.filter = JSON.stringify({ "user.id": user });
+        const query = prepareQuery({
+            ...params,
+            format: "csv",
+            fields: FIELDS_CSV,
+        });
 
         window.open(
             `${routeURL("audit.dbase")}?${new URLSearchParams(
-                Object.entries(query) as UrlSearchParamsArgs // TODO double check
+                Object.entries(query).map(([key, value]) => [
+                    key,
+                    Array.isArray(value) ? value.join(",") : String(value),
+                ])
             )}`
         );
     };
 
     useEffect(() => {
         setBlocks([]);
-        setPointer(null);
+        setPointer(undefined);
         refLoading.current = undefined;
     }, [params]);
 
@@ -278,7 +295,7 @@ export function Journal() {
         if (pointer === false) return;
         const el = refParent.current;
         if (
-            pointer === null ||
+            pointer === undefined ||
             (el && el.scrollTop + el.clientHeight > el.scrollHeight - 100)
         ) {
             loadBlock();
@@ -363,14 +380,9 @@ export function Journal() {
                                     ))}
                                 </tr>
                             </thead>
-                            {blocks.map(
-                                (
-                                    rows: AuditDbaseQueryGetResponseLogEntry[],
-                                    idx: number
-                                ) => (
-                                    <Block key={idx} rows={rows} />
-                                )
-                            )}
+                            {blocks.map((rows, idx: number) => (
+                                <Block key={idx} rows={rows} />
+                            ))}
                         </table>
                     </div>
                 </div>
