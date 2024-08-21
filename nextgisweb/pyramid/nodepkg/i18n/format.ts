@@ -4,11 +4,11 @@ export type FormatObject<T = never> = Record<string, Param<T>>;
 export type FormatArgs<T = never> = FormatArray<T> | [FormatObject<T>];
 export type Compiled<A = never, R = string> = (...args: FormatArgs<A>) => R[];
 
-const numsRegexp = /(?<!\{)\{(?!\{)\d+\}(?!\})/g;
-const numsSplitRegexp = /(\{\{[^}]+\}\}|\{[^}]+\}|[^{}]+)/g;
+const numsRegexp = /(?:{*)(\d)(?:}*)/g;
 
-const stringRegexp = /(?<!\{)\{(?!\{)[a-zA-Z_][a-zA-Z0-9_]*\}(?!\})/g;
-const stringSplitRegexp = /(\{\{[^}]+\}\}|\{[^}]+\}|[^{}]+)/g;
+const stringRegexp = /(?:{*)(\{(?!\{)[a-zA-Z_][a-zA-Z0-9_]*\}(?!\}))(?:}*)/g;
+
+const tokenSplitRegexp = /(\{\{[^}]+\}\}|\{[^}]+\}|[^{}]+)/g;
 
 const preprocessFormatNG = (input: string): string => {
     const output = input.includes("{}") ? input.replace("{}", "{0}") : input;
@@ -26,8 +26,13 @@ const processEscaped = <A = never>(result: Param<A>): string => {
 export function compile(template: string): Compiled {
     const string = preprocessFormatNG(template);
 
-    const numMatches = string.match(numsRegexp);
-    const stringMatches = string.match(stringRegexp);
+    const numMatches = string
+        .match(numsRegexp)
+        ?.filter((el) => !el.includes("{{") && !el.includes("}}"));
+
+    const stringMatches = string
+        .match(stringRegexp)
+        ?.filter((el) => !el.includes("{{") && !el.includes("}}"));
 
     if (!!stringMatches && !!numMatches) {
         throw new Error(
@@ -43,9 +48,9 @@ export function compile(template: string): Compiled {
                 );
             }
 
-            const splitted = string.match(numsSplitRegexp) || [];
+            const splitted = string.match(tokenSplitRegexp) || [];
 
-            const result = splitted.map((substring) => {
+            const result = splitted.map((substring: string) => {
                 const isParam = numMatches.includes(substring);
 
                 if (isParam) {
@@ -72,8 +77,8 @@ export function compile(template: string): Compiled {
                 );
             }
 
-            const splitted = string.match(stringSplitRegexp) || [];
-            const result = splitted.map((substring) => {
+            const splitted = string.match(tokenSplitRegexp) || [];
+            const result = splitted.map((substring: string) => {
                 const isParam = stringMatches.includes(substring);
 
                 if (isParam) {
