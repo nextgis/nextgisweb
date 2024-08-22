@@ -2,7 +2,7 @@ import csv
 from datetime import datetime
 from enum import Enum
 from io import StringIO
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 import sqlalchemy as sa
 import sqlalchemy.dialects.postgresql as pg
@@ -56,14 +56,7 @@ AuditObject = Annotated[AuditObject, TSExport("AuditObject")]
 AuditArrayLogEntry = Annotated[
     Tuple[
         Annotated[str, Meta(description="Timestamp")],
-        Annotated[None, Meta(description="?")],
-        Annotated[None, Meta(description="?")],
-        Annotated[str, Meta(description="HTTP method")],
-        Annotated[str, Meta(description="URL")],
-        Annotated[str, Meta(description="IP address")],
-        Annotated[str, Meta(description="Routee name")],
-        Annotated[Union[int, None], Meta(description="HTTP status code")],
-        Annotated[Union[str, None], Meta(description="User name")],
+        Annotated[List[Union[str, int, None]], Meta(description="Fields")],
     ],
     TSExport("AuditArrayLogEntry"),
 ]
@@ -136,7 +129,7 @@ def dbase(
     rows = DBSession.execute(q)
 
     if format == QueryFormat.ARRAY:
-        return [list(row) for row in rows]
+        return [(row[0], row[1:]) for row in rows]
     elif format == QueryFormat.OBJECT:
         return [data for _, data in rows]
     elif format == QueryFormat.CSV:

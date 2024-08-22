@@ -27,9 +27,7 @@ import "./Journal.less";
 type AuditDbaseQuery = RouteQuery<"audit.dbase", "get">;
 type AuditDbaseQueryGetResponse = RouteResp<"audit.dbase", "get">;
 
-type ExcludeFirst<T extends unknown[]> = T extends [infer _, ...infer Rest]
-    ? Rest
-    : never;
+type AuditFields = AuditArrayLogEntry[1];
 
 type RenderArg = { field: (name: string) => string };
 
@@ -54,7 +52,7 @@ const FIELDS_CSV = FIELDS.concat([
 
 const FIELD_INDEX = Object.fromEntries(FIELDS.map((f, i) => [f, i]));
 
-const fld = (rec: ExcludeFirst<AuditArrayLogEntry>, name: string): string => {
+const fld = (rec: AuditFields, name: string): string => {
     return String(rec[FIELD_INDEX[name]]);
 };
 
@@ -133,13 +131,7 @@ function Detail({ data }: { data: AuditObject | boolean }) {
     );
 }
 
-function Record({
-    tstamp,
-    fields,
-}: {
-    tstamp: string;
-    fields: ExcludeFirst<AuditArrayLogEntry>;
-}) {
+function Record({ tstamp, fields }: { tstamp: string; fields: AuditFields }) {
     const [expanded, setExpanded] = useState(false);
     const [detail, setDetail] = useState<AuditObject | boolean>(false);
 
@@ -173,7 +165,7 @@ function Record({
 function Block({ rows }: { rows: AuditArrayLogEntry[] }) {
     return (
         <tbody>
-            {rows.map(([tstamp, ...fields], idx) => {
+            {rows.map(([tstamp, fields], idx) => {
                 return <Record key={idx} tstamp={tstamp} fields={fields} />;
             })}
         </tbody>
@@ -256,9 +248,7 @@ export function Journal() {
         promise.then((data) => {
             if (isAuditArrayLogEntry(data)) {
                 setBlocks((cur) => [...cur, data]);
-                // !setPointer - looks like mistake, maybe just pointer
-                if (data === null || !setPointer) return;
-
+                if (data === null || !pointer) return;
                 setPointer(
                     data.length === BLOCK_SIZE ? data.slice(-1)[0][0] : false
                 );
@@ -266,7 +256,7 @@ export function Journal() {
                 refLoading.current = undefined;
             }
         });
-    }, [params, setBlocks, pointer, setPointer]);
+    }, [params, pointer]);
 
     const exportCsv = () => {
         const query = prepareQuery({
