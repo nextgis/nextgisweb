@@ -256,12 +256,13 @@ Change feature
 
 To change feature in vector layer execute following request:
 
-.. http:put:: /api/resource/(int:layer_id)/feature/(int:feature_id)
+.. http:put:: /api/resource/(int:layer_id)/feature/(int:feature_id)?srs=(int:srs)
 
    Change feature request
 
    :param layer_id: layer resource identifier
    :param feature_id: feature identifier
+   :query srs: EPSG code for input SRS (will be automatically reprojected to destination SRS)
    :reqheader Accept: must be ``*/*``
    :reqheader Authorization: optional Basic auth string to authenticate
    :<json string geom: geometry in WKT format (geometry type and spatial reference must be corespondent to layer geometry type and spatial reference)

@@ -1043,18 +1043,19 @@ Returned coordinates are in WGS84 (EPSG:4326) spatial reference.
     }
 
 Features and single feature
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 To get a single feature of vector layer execute the following request:
 
-.. http:get:: /api/resource/(int:id)/feature/(int:feature_id)
+.. http:get:: /api/resource/(int:id)/feature/(int:feature_id)/?srs=(int:srs)
 
 To get all vector layer features execute the following request:
 
-.. http:get:: /api/resource/(int:id)/feature/
+.. http:get:: /api/resource/(int:id)/feature/?srs=(int:srs)
 
    Get features
 
+   :query srs: EPSG code for input SRS (will be automatically reprojected to destination SRS)
    :reqheader Accept: must be ``*/*``
    :reqheader Authorization: optional Basic auth string to authenticate
    :>jsonarr features: features array
