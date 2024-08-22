@@ -85,20 +85,38 @@ def components_and_locales(args, work_in_progress=False):
     ext_packages = ext_meta.get("packages", [])
     ext_locales = ext_meta.get("locales", [])
 
+    filter_package = []
+    filter_comp = []
+
+    if args.package is not None and args.package != "all":
+        if args.package not in pkginfo.packages:
+            raise RuntimeError("Package %s not found." % args.package)
+        filter_package.append(args.package)
+
+    check_package = len(filter_package) == 0
+    for k in args.compackage:
+        if k in env.components:
+            filter_comp.append(k)
+        elif check_package and k in pkginfo.packages:
+            filter_package.append(k)
+        else:
+            logger.warning("Component or package [%s] not found.", k)
+
     for comp_id in env.components.keys():
-        if len(args.component) > 0 and comp_id not in args.component:
+        if len(filter_comp) > 0 and comp_id not in filter_comp:
             continue
-        if not getattr(args, "all_packages", False) and pkginfo.comp_pkg(comp_id) != args.package:
+        pname = pkginfo.comp_pkg(comp_id)
+        if len(filter_package) > 0 and pname not in filter_package:
             continue
 
         if len(getattr(args, "locale", [])) > 0:
             locales = list(args.locale)
         else:
             locales = ["ru"]
-            if pkginfo.comp_pkg(comp_id) in ext_packages:
+            if pname in ext_packages:
                 locales.extend(ext_locales)
             if work_in_progress and ext_path is not None:
-                comp_path = Path(ext_path) / pkginfo.comp_pkg(comp_id) / comp_id
+                comp_path = Path(ext_path) / pname / comp_id
                 for fn in comp_path.glob("*.po"):
                     candidate = fn.with_suffix("").name
                     if candidate not in locales:
@@ -127,8 +145,8 @@ def cmd_update(args):
         if not pot_path.is_file() or args.extract:
             cmd_extract(
                 Namespace(
-                    package=pkginfo.comp_pkg(comp_id),
-                    component=[
+                    package=None,
+                    compackage=[
                         comp_id,
                     ],
                 )
@@ -264,8 +282,8 @@ def cmd_stat(args):
         if not pot_path.is_file() or args.extract:
             cmd_extract(
                 Namespace(
-                    package=pkginfo.comp_pkg(comp_id),
-                    component=[
+                    package=None,
+                    compackage=[
                         comp_id,
                     ],
                 )
@@ -361,7 +379,7 @@ def cmd_stat(args):
             "component",
         ),
     )
-    if len(args.component) == 0:
+    if len(args.compackage) == 0:
         print_records(data, ("package",), title="PACKAGE SUMMARY")
 
 
@@ -380,24 +398,29 @@ def cmd_poeditor_sync(args):
 
     # Package versions are stored as part of the project's description in the POEditor
     description = POEditorDescription(client, poeditor_project_id)
-    local_ver = pkginfo.packages[args.package].version
-    if args.package in description.packages:
-        remote_ver = description.packages[args.package]
-
-        if pkg_version.parse(local_ver) < pkg_version.parse(remote_ver):
-            raise RuntimeError(
-                "Version of the '%s' package must be not lower than %s in order to use translations from the POEditor "
-                "(current version: %s)." % (args.package, remote_ver, local_ver)
-            )
+    pversions = dict()
 
     # Update local po-files
     poeditor_terms = {}
     reference_catalogs = {}
     for comp_id, locales in components_and_locales(args, work_in_progress=True):
+        pname = pkginfo.comp_pkg(comp_id)
+
+        if pname not in pversions:
+            local_ver = pkginfo.packages[pname].version
+            if (remote_ver := description.packages.get(pname)) and pkg_version.parse(
+                local_ver
+            ) < pkg_version.parse(remote_ver):
+                raise RuntimeError(
+                    "Version of the '%s' package must be not lower than %s in order to use translations from the POEditor "
+                    "(current version: %s)." % (pname, remote_ver, local_ver)
+                )
+            pversions[pname] = local_ver
+
         cmd_update(
             Namespace(
-                package=pkginfo.comp_pkg(comp_id),
-                component=[
+                package=None,
+                compackage=[
                     comp_id,
                 ],
                 locale=[lc for lc in locales if lc != "ru"],
@@ -545,9 +568,10 @@ def cmd_poeditor_sync(args):
                     )
 
     if len(terms_to_add) > 0 or len(terms_to_del) > 0:
+        for pname, local_ver in pversions.items():
+            logger.info("Set '%s' package version to %s in the POEditor.", pname, local_ver)
         if args.no_dry_run:
-            description.update(args.package, local_ver)
-        logger.info("Set '%s' package version to %s in the POEditor.", args.package, local_ver)
+            description.update(pversions)
 
     # TODO: Russian language as a reference
 
@@ -556,15 +580,14 @@ class POEditorDescription:
     def __init__(self, client, project_id):
         self.client = client
         self.project_id = project_id
-        self.packages = []
         self.populate()
 
     def populate(self):
         details = self.client.view_project_details(self.project_id)
         self.packages = json.loads(re.search(r"\((.+?)\)", details["description"]).group(1))
 
-    def update(self, package, version):
-        self.packages[package] = version
+    def update(self, pversions):
+        self.packages.update(pversions)
         description = "[//]: # (%s)" % (json.dumps(self.packages))
         self.client.update_project(project_id=self.project_id, description=description)
 
@@ -573,39 +596,42 @@ def main(argv=sys.argv):
     logging.basicConfig(level=logging.INFO)
 
     parser = ArgumentParser()
-    parser.add_argument("-p", "--package", default="nextgisweb")
-    parser.add_argument("--all-packages", action="store_true", default=False)
+    parser.add_argument("-p", "--package", help="Deprecated")
+    parser.add_argument("--all-packages", dest="package", action="store_const", const="all", help="Deprecated")
     parser.add_argument("--config")
 
     subparsers = parser.add_subparsers()
 
     pextract = subparsers.add_parser("extract")
-    pextract.add_argument("component", nargs="*")
+    pextract.add_argument("compackage", nargs="*")
     pextract.set_defaults(func=cmd_extract)
 
     pupdate = subparsers.add_parser("update")
-    pupdate.add_argument("component", nargs="*")
+    pupdate.add_argument("compackage", nargs="*")
     pupdate.add_argument("--locale", default=[], action="append")
     pupdate.add_argument("--force", action="store_true", default=False)
-    pupdate.add_argument("--extract", action="store_true", default=False)
+    pupdate.add_argument("--extract", action="store_true", default=True)
+    pupdate.add_argument("--no-extract", dest="extract", action="store_false")
     pupdate.add_argument("--no-obsolete", action="store_true", default=False)
     pupdate.set_defaults(func=cmd_update)
 
     pcompile = subparsers.add_parser("compile")
-    pcompile.add_argument("component", nargs="*")
+    pcompile.add_argument("compackage", nargs="*")
     pcompile.set_defaults(func=cmd_compile)
 
     pstat = subparsers.add_parser("stat")
-    pstat.add_argument("component", nargs="*")
-    pstat.add_argument("--extract", action="store_true", default=False)
+    pstat.add_argument("compackage", nargs="*")
+    pstat.add_argument("--extract", action="store_true", default=True)
+    pstat.add_argument("--no-extract", dest="extract", action="store_false")
     pstat.add_argument("--locale", default=[], action="append")
     pstat.add_argument("--work-in-progress", action="store_true", default=False)
     pstat.add_argument("--json", action="store_true", default=False)
     pstat.set_defaults(func=cmd_stat)
 
     ppoeditor_pull = subparsers.add_parser("poeditor-sync")
-    ppoeditor_pull.add_argument("component", nargs="*")
-    ppoeditor_pull.add_argument("--extract", action="store_true", default=False)
+    ppoeditor_pull.add_argument("compackage", nargs="*")
+    ppoeditor_pull.add_argument("--extract", action="store_true", default=True)
+    ppoeditor_pull.add_argument("--no-extract", dest="extract", action="store_false")
     ppoeditor_pull.add_argument("--locale", default=[], action="append")
     ppoeditor_pull.add_argument("--no-dry-run", action="store_true", default=False)
     ppoeditor_pull.set_defaults(func=cmd_poeditor_sync)
