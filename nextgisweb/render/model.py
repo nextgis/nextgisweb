@@ -481,13 +481,13 @@ class TileCacheAttr(SAttribute, apitype=True):
     def get(self, srlzr: Serializer) -> Any:
         if not env.render.tile_cache_enabled or srlzr.obj.tile_cache is None:
             return self.default
-        return getattr(srlzr.obj.tile_cache, self.attrname)
+        return getattr(srlzr.obj.tile_cache, self.model_attr)
 
     def set(self, srlzr: Serializer, value: Any, *, create: bool):
         if value != self.default or srlzr.obj.tile_cache is not None:
             if srlzr.obj.tile_cache is None:
                 srlzr.obj.tile_cache = ResourceTileCache()
-            setattr(srlzr.obj.tile_cache, self.attrname, value)
+            setattr(srlzr.obj.tile_cache, self.model_attr, value)
 
 
 class TileCacheSerializer(Serializer, apitype=True):

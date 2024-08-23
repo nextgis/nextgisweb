@@ -88,7 +88,7 @@ class SRelationship(SAttribute, apitype=True):
             obj = self.relcls.filter_by(id=value["id"]).one()
         else:
             obj = None
-        setattr(srlzr.obj, self.attrname, obj)
+        setattr(srlzr.obj, self.model_attr, obj)
 
 
 class ResourceRef(RelationshipRef, kw_only=True):

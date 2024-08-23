@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import re
-from typing import Any, ClassVar, Literal, Mapping, Tuple, Type, Union, get_type_hints
+from typing import Any, ClassVar, Literal, Mapping, Tuple, Type, Union, cast, get_type_hints
 from warnings import warn
 
 from msgspec import UNSET, Struct, UnsetType, defstruct
@@ -30,12 +30,14 @@ class Serializer:
     resclass: ClassVar[Type[model.Resource]]
     proptab: ClassVar[Tuple[Tuple[str, SAttribute], ...]]
     apitype: ClassVar[bool]
+    model_prefix: ClassVar[Union[str, None]]
 
     def __init_subclass__(
         cls,
         *,
         resource: Union[Type[model.Resource], None] = None,
         apitype: Union[bool, None] = None,
+        model_prefix: Union[str, None] = None,
     ):
         super().__init_subclass__()
         if resource:
@@ -65,6 +67,7 @@ class Serializer:
                 )
 
         cls.check_class_name()
+        cls.model_prefix = model_prefix
 
         proptab = []
         for pn, pv in cls.__dict__.items():
@@ -160,6 +163,7 @@ class SAttribute:
 
     srlzrcls: Type[Serializer]
     attrname: str
+    model_attr: str
     types: CRUTypes
 
     def __init_subclass__(cls, apitype=False) -> None:
@@ -178,10 +182,12 @@ class SAttribute:
         read: Union[Permission, None] = None,
         write: Union[Permission, None] = None,
         required: Union[bool, None] = None,
+        model_attr: Union[str, None] = None,
     ):
         self.read = read
         self.write = write
         self.required = required
+        self.model_attr = cast(str, model_attr)
         if ct := self.ctypes:
             assert read is None or ct.read is not None
             assert write is None or ct.update is not None
@@ -189,6 +195,8 @@ class SAttribute:
     def bind(self, srlzrcls: Type[Serializer], attrname: str):
         self.srlzrcls = srlzrcls
         self.attrname = attrname
+        if self.model_attr is None:
+            self.model_attr = (srlzrcls.model_prefix or "") + attrname
         self.setup_types()
 
     def setup_types(self):
@@ -222,18 +230,18 @@ class SAttribute:
     # Modern (apitype == True)
 
     def get(self, srlzr: Serializer) -> Any:
-        return getattr(srlzr.obj, self.attrname)
+        return getattr(srlzr.obj, self.model_attr)
 
     def set(self, srlzr: Serializer, value: Any, *, create: bool):
-        setattr(srlzr.obj, self.attrname, value)
+        setattr(srlzr.obj, self.model_attr, value)
 
     # Legacy (apitype == False)
 
     def getter(self, srlzr: Serializer) -> Any:
-        return getattr(srlzr.obj, self.attrname)
+        return getattr(srlzr.obj, self.model_attr)
 
     def setter(self, srlzr: Serializer, value: Any) -> None:
-        setattr(srlzr.obj, self.attrname, value)
+        setattr(srlzr.obj, self.model_attr, value)
 
 
 def _type_from_signature(fn, param: Literal["value", "return"]) -> Any:
