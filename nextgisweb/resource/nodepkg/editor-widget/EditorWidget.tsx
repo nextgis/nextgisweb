@@ -34,6 +34,7 @@ export const EditorWidget: EditorWidgetComponent<
                             parent: typeof v === "number" ? v : null,
                         })
                     }
+                    pickerOptions={{ initParentId: store.parent }}
                     allowClear={false}
                     disabled={store.operation === "create"}
                     style={{ width: "100%" }}
