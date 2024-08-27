@@ -15,7 +15,7 @@ type AutoProps = ParamsOf<typeof AutoComplete>;
 
 interface ResourcesFilterProps extends AutoProps {
     onChange?: AutoProps["onSelect"];
-    cls?: string;
+    cls?: string | string[];
 }
 
 const resourcesToOptions = (resourcesInfo: CompositeRead[]) => {
@@ -70,7 +70,8 @@ export function ResourcesFilter({
                 const query: Record<string, string> = {
                     display_name__ilike: `%${search}%`,
                 };
-                if (cls) {
+                // TODO: handle array of classes in search reqest
+                if (typeof cls === "string" && cls) {
                     query.cls = cls;
                 }
                 return query;

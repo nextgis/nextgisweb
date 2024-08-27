@@ -4,6 +4,7 @@ import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type {
     Blueprint,
+    CompositeCreate,
     CompositeRead,
     ResourceCls,
     ResourceRead,
@@ -24,7 +25,10 @@ export type Action =
 const msgPickThis = gettext("Pick this group");
 const msgPickSelected = gettext("Pick selected");
 
-export class ResourcePickerStore implements ResourcePickerStoreOptions {
+export class ResourcePickerStore
+    implements
+        Omit<ResourcePickerStoreOptions, "requireClass" | "requireInterface">
+{
     static GLOBAL_PARENT_ID?: number = undefined;
     static resetGlobalParentId = () => {
         ResourcePickerStore.GLOBAL_PARENT_ID = undefined;
@@ -38,8 +42,8 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
     @observable accessor breadcrumbItems: CompositeRead[] = [];
     @observable accessor hideUnavailable = false;
     @observable accessor disableResourceIds: number[] = [];
-    @observable accessor requireClass: ResourceCls | null = null;
-    @observable accessor requireInterface: ResourceInterface | null = null;
+    @observable accessor requireClass: ResourceCls[] = [];
+    @observable accessor requireInterface: ResourceInterface[] = [];
     @observable accessor allowSelection = true;
     @observable accessor allowMoveInside = true;
     @observable accessor traverseClasses: ResourceCls[] | null = null;
@@ -86,8 +90,16 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
         this.onTraverse = onTraverse ?? null;
         this.disableResourceIds = disableResourceIds ?? [];
         this.multiple = multiple ?? false;
-        this.requireClass = requireClass ?? null;
-        this.requireInterface = requireInterface ?? null;
+        this.requireClass = Array.isArray(requireClass)
+            ? requireClass
+            : requireClass
+              ? [requireClass]
+              : [];
+        this.requireInterface = Array.isArray(requireInterface)
+            ? requireInterface
+            : requireInterface
+              ? [requireInterface]
+              : [];
         this.hideUnavailable = !!hideUnavailable;
         this.getSelectedMsg = getSelectedMsg ?? msgPickSelected;
         this.getThisMsg = getThisMsg ?? msgPickThis;
@@ -129,20 +141,11 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
     };
 
     checkEnabled = (resource: ResourceRead): boolean => {
-        const checks: (() => boolean)[] = [];
-        const requireClass = this.requireClass;
-        const requireInterface = this.requireInterface;
-        if (requireClass) {
-            checks.push(() =>
-                this.getResourceClasses([resource.cls]).includes(requireClass)
-            );
-        }
-        if (requireInterface) {
-            checks.push(() =>
-                resource.interfaces.some((intf) => requireInterface === intf)
-            );
-        }
-        return checks.length ? checks.some((c) => c()) : true;
+        return this._checkConditions({
+            resource,
+            requireClass: this.requireClass,
+            requireInterface: this.requireInterface,
+        });
     };
 
     refresh() {
@@ -266,7 +269,7 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
     async createNewGroup(name: string): Promise<CompositeRead | undefined> {
         const abort = this._abortOperation("createNewGroup", true);
 
-        const payload = {
+        const payload: CompositeCreate = {
             resource: {
                 display_name: name,
                 keyname: null,
@@ -318,22 +321,45 @@ export class ResourcePickerStore implements ResourcePickerStoreOptions {
     }
 
     private _resourceAvailable(resource: ResourceRead): boolean {
+        return this._checkConditions({
+            resource,
+            requireClass: this.requireClass,
+            requireInterface: this.requireInterface,
+            traverseClasses: this.traverseClasses,
+        });
+    }
+
+    private _checkConditions({
+        resource,
+        requireClass = [],
+        requireInterface = [],
+        traverseClasses,
+    }: {
+        resource: ResourceRead;
+        requireClass?: ResourceCls[];
+        requireInterface?: ResourceInterface[];
+        traverseClasses?: ResourceCls[] | null;
+    }): boolean {
         const { cls, interfaces } = resource;
         const checks: (() => boolean)[] = [];
-        if (this.traverseClasses) {
+        if (traverseClasses?.length) {
             checks.push(() =>
                 this.getResourceClasses([cls]).some((cls) =>
-                    this.traverseClasses!.includes(cls)
+                    traverseClasses.includes(cls)
                 )
             );
         }
-        if (this.requireClass) {
+        if (requireClass.length) {
             checks.push(() =>
-                this.getResourceClasses([cls]).includes(this.requireClass!)
+                this.getResourceClasses([cls]).some((cls) =>
+                    requireClass.includes(cls)
+                )
             );
         }
-        if (this.requireInterface) {
-            checks.push(() => interfaces.includes(this.requireInterface!));
+        if (requireInterface.length) {
+            checks.push(() =>
+                interfaces.some((intf) => requireInterface.includes(intf))
+            );
         }
         return checks.length ? checks.some((c) => c()) : true;
     }

@@ -54,12 +54,12 @@ export interface ResourcePickerStoreOptions {
     initParentId?: number | null;
     saveLastParentIdGlobal?: boolean;
     selected?: number[];
-    requireClass?: ResourceCls | null;
+    requireClass?: ResourceCls | ResourceCls[] | null;
     getThisMsg?: string;
     onNewGroup?: null | OnNewGroupType;
     disableResourceIds?: number[];
     getSelectedMsg?: string;
-    requireInterface?: ResourceInterface | null;
+    requireInterface?: ResourceInterface | ResourceInterface[] | null;
     traverseClasses?: ResourceCls[] | null;
     hideUnavailable?: boolean;
     onTraverse?: ((parentId: number) => void) | null;
