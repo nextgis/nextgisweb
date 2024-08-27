@@ -6,8 +6,8 @@ import type { InputNumberProps } from "@nextgisweb/gui/antd";
 import { route } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import { useResourcePicker } from "@nextgisweb/resource/component/resource-picker/hook";
 import type { ResourcePickerStoreOptions } from "@nextgisweb/resource/component/resource-picker/type";
-import { useResourcePicker } from "@nextgisweb/resource/component/resource-select/hook/useResourcePicker";
 
 import LayersIconOutlined from "@nextgisweb/icon/material/layers";
 

@@ -3,10 +3,11 @@ import { useCallback } from "react";
 import type { FocusTableItem } from "@nextgisweb/gui/focus-table";
 import type { CompositeRead } from "@nextgisweb/resource/type/api";
 
-import { useResourcePicker } from "../../resource-select/hook/useResourcePicker";
-import type { ResourcePickerHookProps } from "../../resource-select/hook/useResourcePicker";
 import { pickToFocusTable as pickToFocusTableOriginal } from "../pickToFocusTable";
 import type { PickToFocusTableOptions } from "../pickToFocusTable";
+
+import { useResourcePicker } from "./useResourcePicker";
+import type { ResourcePickerHookProps } from "./useResourcePicker";
 
 export function useFocusTablePicker(props?: ResourcePickerHookProps) {
     const { showResourcePicker } = useResourcePicker(props);

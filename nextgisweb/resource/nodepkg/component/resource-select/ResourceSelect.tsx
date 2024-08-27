@@ -6,9 +6,9 @@ import { OpenInNewIcon } from "@nextgisweb/gui/icon";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { ResourceIcon } from "@nextgisweb/resource/icon";
 
+import { useResourcePicker } from "../resource-picker/hook";
 import type { ResourcePickerStoreOptions } from "../resource-picker/type";
 
-import { useResourcePicker } from "./hook/useResourcePicker";
 import { useResourceSelect } from "./hook/useResourceSelect";
 import type { ResourceSelectOption, ResourceSelectProps } from "./type";
 

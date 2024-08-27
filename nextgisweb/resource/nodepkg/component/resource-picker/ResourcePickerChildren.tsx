@@ -14,7 +14,6 @@ import usePickerCard from "./hook/usePickerCard";
 import type {
     PickerResource,
     ResourcePickerChildrenProps,
-    RowSelection,
     RowSelectionType,
     SelectValue,
 } from "./type";
@@ -54,15 +53,24 @@ function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
     }, [resources]);
 
     const rowSelection = useMemo(() => {
-        const s: RowSelection = {
-            getCheckboxProps,
-            selectedRowKeys: selected,
-            onChange: (selectedRowKeys) => {
-                resourceStore.setSelected(selectedRowKeys.map(Number));
-            },
-        };
-        return s;
-    }, [getCheckboxProps, resourceStore, selected]);
+        if (allowSelection) {
+            const rowSelection_: TableProps["rowSelection"] = {
+                type: selectionType,
+                getCheckboxProps,
+                selectedRowKeys: selected,
+                onChange: (selectedRowKeys) => {
+                    resourceStore.setSelected(selectedRowKeys.map(Number));
+                },
+            };
+            return rowSelection_;
+        }
+    }, [
+        selected,
+        selectionType,
+        resourceStore,
+        allowSelection,
+        getCheckboxProps,
+    ]);
 
     const canTraverse = useCallback(
         (record: PickerResource) => {
@@ -119,6 +127,48 @@ function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
         [renderActions]
     );
 
+    const onRow = useCallback(
+        (record: PickerResource) => {
+            const select = (pick = false) => {
+                const props = getCheckboxProps(record);
+
+                if (props.disabled) {
+                    if (pick && canTraverse(record)) {
+                        resourceStore.changeParentTo(record.id);
+                    }
+                    return;
+                }
+                if (pick && onOk) {
+                    const toPick = multiple ? [record.id] : record.id;
+                    onOk(toPick as V);
+                    return;
+                }
+                const existIndex = selected.indexOf(record.id);
+
+                let newSelected = multiple ? [...selected] : [];
+
+                // unselect on second click
+                if (existIndex !== -1) {
+                    newSelected = [...selected];
+                    newSelected.splice(existIndex, 1);
+                } else {
+                    newSelected.push(record.id);
+                }
+
+                resourceStore.setSelected(newSelected);
+            };
+            return {
+                onDoubleClick: () => {
+                    select(true);
+                },
+                onClick: debounce(() => {
+                    select();
+                }, 150),
+            };
+        },
+        [canTraverse, getCheckboxProps, multiple, onOk, resourceStore, selected]
+    );
+
     return (
         <Table
             className="ngw-resource-component-resource-picker-children"
@@ -130,54 +180,10 @@ function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
             rowKey="id"
             size="middle"
             loading={loading.setChildrenFor}
-            rowSelection={
-                allowSelection
-                    ? {
-                          type: selectionType,
-                          ...rowSelection,
-                      }
-                    : undefined
-            }
-            onRow={(record) => {
-                const select = (pick = false) => {
-                    const r = record as PickerResource;
-                    const props = getCheckboxProps(r);
-
-                    if (props.disabled) {
-                        if (pick && canTraverse(r)) {
-                            resourceStore.changeParentTo(r.id);
-                        }
-                        return;
-                    }
-                    if (pick && onOk) {
-                        const toPick = multiple ? [r.id] : r.id;
-                        onOk(toPick as V);
-                        return;
-                    }
-                    const existIndex = selected.indexOf(r.id);
-
-                    let newSelected = multiple ? [...selected] : [];
-
-                    // unselect on second click
-                    if (existIndex !== -1) {
-                        newSelected = [...selected];
-                        newSelected.splice(existIndex, 1);
-                    } else {
-                        newSelected.push(r.id);
-                    }
-
-                    resourceStore.setSelected(newSelected);
-                };
-                return {
-                    onDoubleClick: () => {
-                        select(true);
-                    },
-                    onClick: debounce(() => {
-                        select();
-                    }, 150),
-                };
-            }}
+            rowSelection={rowSelection}
+            onRow={onRow}
         />
     );
 }
 export const ResourcePickerChildren = observer(ResourcePickerChildrenInner);
+ResourcePickerChildren.displayName = "ResourcePickerChildren";

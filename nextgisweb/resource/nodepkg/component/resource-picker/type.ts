@@ -1,5 +1,6 @@
-import type { Card, Modal, Table } from "@nextgisweb/gui/antd";
-import type { ParamsOf } from "@nextgisweb/gui/type";
+import type { TableRowSelection } from "antd/es/table/interface";
+
+import type { CardProps } from "@nextgisweb/gui/antd";
 import type {
     CompositeRead,
     ResourceCls,
@@ -12,11 +13,7 @@ import type { ResourcePickerStore } from "./store/ResourcePickerStore";
 
 export type SelectValue = number | number[];
 
-export type CardProps = Parameters<typeof Card>[0];
-export type ModalProps = Parameters<typeof Modal>[0];
-
-export type TableProps = ParamsOf<typeof Table>;
-export type RowSelection = Exclude<TableProps["rowSelection"], undefined>;
+export type RowSelection = TableRowSelection<PickerResource>;
 export type RowSelectionType = RowSelection["type"];
 
 export type PickerResource = ResourceRead;

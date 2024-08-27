@@ -1,10 +1,7 @@
 import { useCallback, useEffect, useRef } from "react";
 
-import { showResourcePicker as showResourcePickerOriginal } from "../../resource-picker";
-import type {
-    ResourcePickerModalProps,
-    SelectValue,
-} from "../../resource-picker/type";
+import { showResourcePicker as showResourcePickerOriginal } from "..";
+import type { ResourcePickerModalProps, SelectValue } from "../type";
 
 export interface ResourcePickerHookProps {
     doNotSavePosition?: boolean;

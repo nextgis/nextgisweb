@@ -1,4 +1,6 @@
-import type { CardProps, ModalProps, UsePickerModalProps } from "../type";
+import type { CardProps, ModalProps } from "@nextgisweb/gui/antd";
+
+import type { UsePickerModalProps } from "../type";
 
 const usePickerModal = ({
     cardOptions = {},

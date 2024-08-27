@@ -3,14 +3,20 @@ import { useMemo } from "react";
 import type { ReactElement } from "react";
 
 import { Breadcrumb, Skeleton, Space, Tooltip } from "@nextgisweb/gui/antd";
-import type { ParamsOf } from "@nextgisweb/gui/type";
+import type {
+    BreadcrumbItemProps,
+    BreadcrumbProps,
+} from "@nextgisweb/gui/antd";
 import type { CompositeRead } from "@nextgisweb/resource/type/api";
 
 import type { ResourcePickerBreadcrumbProps } from "./type";
 
 import HomeFilledIcon from "@nextgisweb/icon/material/home";
 
-type BreadcrumbItems = NonNullable<ParamsOf<typeof Breadcrumb>["items"]>;
+type BreadcrumbItemMenuItems = NonNullable<
+    BreadcrumbItemProps["menu"]
+>["items"];
+type BreadcrumbItems = BreadcrumbProps["items"];
 
 export const ResourcePickerBreadcrumb = observer(
     ({
@@ -45,14 +51,14 @@ export const ResourcePickerBreadcrumb = observer(
                 );
             };
 
-            const menuItems = [];
+            const menuItems: BreadcrumbItemMenuItems = [];
             const packFirstItemsToMenu =
                 typeof maxBreadcrumbItems === "number" &&
                 maxBreadcrumbItems !== Infinity &&
                 breadcrumbItems.length > maxBreadcrumbItems + 1;
 
             if (packFirstItemsToMenu) {
-                // Skip the first item because it's a Home
+                // Skip the first item (Home) and pack the rest into the menu
                 const breadcrumbsForMenu = breadcrumbItems.splice(
                     1,
                     breadcrumbItems.length - 1 - maxBreadcrumbItems
@@ -75,34 +81,28 @@ export const ResourcePickerBreadcrumb = observer(
                 let name: ReactElement | string | undefined;
                 const isLink = i < breadcrumbItems.length - 1;
                 if (i === 0) {
-                    if (breadcrumbItems.length > 1) {
-                        name = (
+                    name =
+                        breadcrumbItems.length > 1 ? (
                             <Tooltip title={parent.resource.display_name}>
                                 <HomeIcon />
                             </Tooltip>
-                        );
-                    } else {
-                        name = (
+                        ) : (
                             <Space>
                                 <HomeIcon />
                                 {parent.resource.display_name}
                             </Space>
                         );
-                    }
                 }
-                const item: BreadcrumbItems[0] = {
+                items.push({
                     title: createLabel(parent, name, isLink),
                     key: parent.resource.id,
-                };
-                items.push(item);
+                });
                 if (i === 0 && packFirstItemsToMenu) {
-                    if (packFirstItemsToMenu) {
-                        items.push({
-                            title: "...",
-                            key: "-1",
-                            menu: { items: menuItems },
-                        });
-                    }
+                    items.push({
+                        title: "...",
+                        key: "-1",
+                        menu: { items: menuItems },
+                    });
                 }
             }
             return items;
