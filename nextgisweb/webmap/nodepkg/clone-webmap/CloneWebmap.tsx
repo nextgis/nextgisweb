@@ -57,26 +57,23 @@ export function CloneWebmap({
     const { makeSignal } = useAbortController();
 
     const [nameLoading, setNameLoading] = useState(false);
+    const [parentId, setParentId] = useState<number>();
     const [saving, setSaving] = useState(false);
-
-    const ResourceSelectFormItem = useMemo(() => {
-        return (
-            <ResourceSelect
-                pickerOptions={{
-                    traverseClasses: ["resource_group"],
-                    hideUnavailable: true,
-                    initParentId: data?.resource.parent?.id,
-                }}
-            />
-        );
-    }, [data]);
 
     const fields = useMemo<FormField<keyof CloneProps>[]>(
         () => [
             {
                 name: "parent",
                 label: gettext("Resource group"),
-                formItem: ResourceSelectFormItem,
+                formItem: (
+                    <ResourceSelect
+                        value={parentId}
+                        pickerOptions={{
+                            traverseClasses: ["resource_group"],
+                            hideUnavailable: true,
+                        }}
+                    />
+                ),
                 required: true,
             },
             {
@@ -87,7 +84,7 @@ export function CloneWebmap({
                 required: true,
             },
         ],
-        [nameLoading, ResourceSelectFormItem]
+        [nameLoading, parentId]
     );
 
     const setUniqName = useCallback(
@@ -115,6 +112,7 @@ export function CloneWebmap({
                     : data.resource.parent?.id;
             if (typeof parentId === "number") {
                 form.setFieldsValue({ parent: parentId });
+                setParentId(parentId);
                 setUniqName(data.resource.display_name, parentId);
             }
         }
