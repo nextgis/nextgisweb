@@ -5,9 +5,11 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { url } from "@nextgisweb/pyramid/nextgis";
 import settings from "@nextgisweb/pyramid/settings!pyramid";
 
+import type { ApiError } from "./type";
+
 const CodeLazy = lazy(() => import("./CodeLazy"));
 
-export function Body({ error }) {
+export function Body({ error }: { error: ApiError }) {
     return (
         <>
             <p>{error.message}</p>
@@ -16,7 +18,7 @@ export function Body({ error }) {
     );
 }
 
-export function TechInfo({ error }) {
+export function TechInfo({ error }: { error: ApiError }) {
     return (
         <Suspense
             fallback={
@@ -46,7 +48,15 @@ export function TechInfo({ error }) {
     );
 }
 
-export function Footer({ tinfo, setTinfo, onOk }) {
+export function Footer({
+    tinfo,
+    setTinfo,
+    onOk,
+}: {
+    tinfo: boolean;
+    setTinfo: (val: boolean) => void;
+    onOk?: () => void;
+}) {
     return (
         <div style={{ display: "flex", marginTop: "1em" }}>
             {tinfo || (
