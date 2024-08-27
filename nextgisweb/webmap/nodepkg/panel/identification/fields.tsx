@@ -23,6 +23,9 @@ export const getFieldsInfo = async (resourceId: number) => {
     const fieldmap = new Map();
     const promises: Promise<Record<string, string>>[] = [];
     resourceInfo.feature_layer.fields.forEach((fieldInfo: any) => {
+        if (!fieldInfo.grid_visibility) {
+            return;
+        }
         fieldmap.set(fieldInfo.keyname, fieldInfo);
         if (fieldInfo.lookup_table !== null) {
             promises.push(load(fieldInfo.lookup_table.id));
