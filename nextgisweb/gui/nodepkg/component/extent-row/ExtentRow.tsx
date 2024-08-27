@@ -27,8 +27,8 @@ export async function getExtentFromLayer({
     const result = {
         left: extent.minLon,
         right: extent.maxLon,
-        bottom: extent.maxLat,
-        top: extent.minLat,
+        bottom: extent.minLat,
+        top: extent.maxLat,
     } as ExtentRowValue;
 
     return result;

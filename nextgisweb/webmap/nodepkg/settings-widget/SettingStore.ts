@@ -38,7 +38,12 @@ export class SettingStore
     };
     bookmarkResource?: ResourceRef | null = null;
 
-    private _initValue: WithoutItems<apitype.WebMapRead> | null = null;
+    private _initValue: Partial<WithoutItems<apitype.WebMapRead>> = {
+        extent_bottom: -90,
+        extent_left: -180,
+        extent_right: 180,
+        extent_top: 90,
+    };
 
     constructor({ composite }: EditorStoreOptions) {
         this.composite = composite;
