@@ -1,3 +1,6 @@
+import type { Dayjs } from "dayjs";
+import type { RangeValueType } from "rc-picker/lib/PickerInput/RangePicker";
+import type { ValueDate } from "rc-picker/lib/interface";
 import {
     useCallback,
     useEffect,
@@ -5,6 +8,7 @@ import {
     useRef,
     useState,
 } from "react";
+import type { Key } from "react";
 
 import { PrincipalSelect } from "@nextgisweb/auth/component";
 import { Button, RangePicker } from "@nextgisweb/gui/antd";
@@ -13,8 +17,33 @@ import { useThemeVariables } from "@nextgisweb/gui/hook";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { gettext, ngettextf } from "@nextgisweb/pyramid/i18n";
 import { PageTitle } from "@nextgisweb/pyramid/layout";
+import type Routes from "@nextgisweb/pyramid/type/route";
 
 import "./Journal.less";
+
+type AuditDbaseQuery = Routes["audit.dbase"]["get"]["query"];
+type AuditDbaseQueryGetResponse = Routes["audit.dbase"]["get"]["response"]; // any but we know it is array of primitives
+
+type AuditDbaseQueryGetResponseLogEntry = any[]; // change when API will be better typed
+
+type LogEntryObject = {
+    request: {
+        path: string;
+        method: string;
+        remote_addr: string;
+    };
+    response: {
+        route_name: string;
+        status_code: number;
+    };
+    user?: {
+        id: number;
+        keyname: string;
+        display_name: string;
+    };
+};
+
+type RenderArg = { field: (name: string) => string };
 
 const BLOCK_SIZE = 100;
 
@@ -37,15 +66,16 @@ const FIELDS_CSV = FIELDS.concat([
 
 const FIELD_INDEX = Object.fromEntries(FIELDS.map((f, i) => [f, i]));
 
-const fld = (rec, name) => rec[FIELD_INDEX[name]];
+const fld = (rec: AuditDbaseQueryGetResponseLogEntry, name: string): string =>
+    rec[FIELD_INDEX[name]];
 
 const COLUMNS = [
     {
         title: gettext("Request"),
         className: "c-request",
-        render: ({ field }) => {
+        render: ({ field }: RenderArg) => {
             const scode = field("response.status_code");
-            const sclass = `status status-${Math.floor(scode / 100)}xx`;
+            const sclass = `status status-${Math.floor(Number(scode) / 100)}xx`;
             const method = field("request.method");
             const path = field("request.path");
             return (
@@ -59,19 +89,19 @@ const COLUMNS = [
     },
     {
         title: gettext("IP address"),
-        render: ({ field }) => <>{field("request.remote_addr")}</>,
+        render: ({ field }: RenderArg) => <>{field("request.remote_addr")}</>,
     },
     {
         title: gettext("User"),
-        render: ({ field }) => <>{field("user.display_name")}</>,
+        render: ({ field }: RenderArg) => <>{field("user.display_name")}</>,
     },
     {
         title: gettext("Route name"),
-        render: ({ field }) => <>{field("response.route_name")}</>,
+        render: ({ field }: RenderArg) => <>{field("response.route_name")}</>,
     },
     {
         title: gettext("Context"),
-        render: ({ field }) => {
+        render: ({ field }: RenderArg) => {
             const model = field("context.model");
             const id = field("context.id");
             if (!model) return <></>;
@@ -80,12 +110,12 @@ const COLUMNS = [
     },
 ];
 
-function format_tstamp(v) {
+function format_tstamp(v: string) {
     const [s, m] = v.split(".");
     return utc(s).local().format("YYYY-MM-DD HH:mm:ss") + "." + m;
 }
 
-function Detail({ data }) {
+function Detail({ data }: { data: LogEntryObject | boolean }) {
     const entries = Object.entries(data).filter(([k]) => k !== "@timestamp");
     return (
         <>
@@ -104,9 +134,9 @@ function Detail({ data }) {
     );
 }
 
-function Record({ tstamp, fields }) {
+function Record({ tstamp, fields }: { tstamp: string; fields: typeof FIELDS }) {
     const [expanded, setExpanded] = useState(false);
-    const [detail, setDetail] = useState(false);
+    const [detail, setDetail] = useState<LogEntryObject | boolean>(false);
 
     const toggle = useCallback(() => {
         setExpanded(!expanded);
@@ -126,7 +156,7 @@ function Record({ tstamp, fields }) {
                 <td className="c-timestamp">{format_tstamp(tstamp)}</td>
                 {COLUMNS.map(({ className, render: Render }, idx) => (
                     <td key={idx} className={className}>
-                        <Render field={(name) => fld(fields, name)} />
+                        <Render field={(name: string) => fld(fields, name)} />
                     </td>
                 ))}
             </tr>
@@ -135,49 +165,63 @@ function Record({ tstamp, fields }) {
     );
 }
 
-function Block({ rows }) {
+function Block({ rows }: { rows: AuditDbaseQueryGetResponseLogEntry[] }) {
     return (
         <tbody>
-            {rows.map(([tstamp, ...fields], idx) => (
+            {rows.map(([tstamp, ...fields], idx: Key | null | undefined) => (
                 <Record key={idx} {...{ tstamp, fields }} />
             ))}
         </tbody>
     );
 }
 
-function dayjsToApi(v) {
+function dayjsToApi(v: Dayjs) {
     return v.local().millisecond(0).toISOString().replace(/Z$/, "");
 }
 
-function rangePresetLast(n, unit) {
-    let label;
+const rangePresetLast = (
+    n: number,
+    unit: "minute" | "hour" | "day"
+    // should be DateType instead of any, but it also weird in source
+): ValueDate<Exclude<RangeValueType<any>, null>> => {
+    let labelf;
     if (unit === "minute") {
-        label = ngettextf("Last {} minute", "Last {} minutes", n);
+        labelf = ngettextf("Last {} minute", "Last {} minutes", n);
     } else if (unit === "hour") {
-        label = ngettextf("Last {} hour", "Last {} hours", n);
+        labelf = ngettextf("Last {} hour", "Last {} hours", n);
     } else if (unit === "day") {
-        label = ngettextf("Last {} day", "Last {} days", n);
+        labelf = ngettextf("Last {} day", "Last {} days", n);
     }
-    label = label(n);
+
     return {
-        label: label,
+        label: labelf ? labelf(n) : "",
         value: () => [dayjs().subtract(n, unit), null],
     };
-}
+};
+
+type AuditDbaseQueryWithUser = Omit<AuditDbaseQuery, "format"> & {
+    user?: string | number;
+};
+
+type UrlSearchParamsArgs =
+    | string[][]
+    | Record<string, string>
+    | string
+    | URLSearchParams;
 
 export function Journal() {
-    const [params, setParams] = useState(() => ({
-        ge: null,
-        lt: null,
+    const [params, setParams] = useState<AuditDbaseQueryWithUser>(() => ({
+        ge: undefined,
+        lt: undefined,
         user: undefined,
     }));
 
-    const [blocks, setBlocks] = useState([]);
+    const [blocks, setBlocks] = useState<AuditDbaseQueryGetResponse>([]);
     const [pointer, setPointer] = useState(null);
 
-    const refLoading = useRef();
-    const refParent = useRef(null);
-    const refTable = useRef(null);
+    const refLoading = useRef<AuditDbaseQueryGetResponse>();
+    const refParent = useRef<HTMLDivElement | null>(null);
+    const refTable = useRef<HTMLTableElement | null>(null);
 
     const loadBlock = useCallback(() => {
         if (pointer === false || refLoading.current) return;
@@ -185,7 +229,11 @@ export function Journal() {
         const gt = pointer;
         const { ge, lt, user } = params;
 
-        const query = { format: "array", fields: FIELDS, limit: BLOCK_SIZE };
+        const query: AuditDbaseQuery = {
+            format: "array",
+            fields: FIELDS,
+            limit: BLOCK_SIZE,
+        };
         if (gt) query.gt = gt;
         if (ge) query.ge = ge;
         if (lt) query.lt = lt;
@@ -195,8 +243,8 @@ export function Journal() {
             query: query,
         }));
 
-        promise.then((data) => {
-            setBlocks((cur) => [...cur, data]);
+        promise.then((data: AuditDbaseQueryGetResponse) => {
+            setBlocks((cur: any) => [...cur, data]);
             if (data === null || !setPointer) return;
             setPointer(
                 data.length === BLOCK_SIZE ? data.slice(-1)[0][0] : false
@@ -206,7 +254,7 @@ export function Journal() {
     }, [params, setBlocks, pointer, setPointer]);
 
     const exportCsv = () => {
-        const query = { format: "csv", fields: FIELDS_CSV };
+        const query: AuditDbaseQuery = { format: "csv", fields: FIELDS_CSV };
         const { ge, lt, user } = params;
 
         if (ge) query.ge = ge;
@@ -215,7 +263,7 @@ export function Journal() {
 
         window.open(
             `${routeURL("audit.dbase")}?${new URLSearchParams(
-                Object.entries(query)
+                Object.entries(query) as UrlSearchParamsArgs // TODO double check
             )}`
         );
     };
@@ -231,9 +279,9 @@ export function Journal() {
         const el = refParent.current;
         if (
             pointer === null ||
-            el.scrollTop + el.clientHeight > el.scrollHeight - 100
+            (el && el.scrollTop + el.clientHeight > el.scrollHeight - 100)
         ) {
-            loadBlock(pointer);
+            loadBlock();
         }
     }, [loadBlock, pointer]);
 
@@ -315,9 +363,14 @@ export function Journal() {
                                     ))}
                                 </tr>
                             </thead>
-                            {blocks.map((rows, idx) => (
-                                <Block key={idx} rows={rows} />
-                            ))}
+                            {blocks.map(
+                                (
+                                    rows: AuditDbaseQueryGetResponseLogEntry[],
+                                    idx: number
+                                ) => (
+                                    <Block key={idx} rows={rows} />
+                                )
+                            )}
                         </table>
                     </div>
                 </div>
@@ -327,3 +380,4 @@ export function Journal() {
 }
 
 Journal.targetElementId = "main";
+Journal.displayName = "Journal";
