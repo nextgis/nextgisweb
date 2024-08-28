@@ -126,10 +126,7 @@ function Detail({ entries }: { entries: DetailRow }) {
             {entries.map(([k, v], idx) => {
                 const last = idx === entries.length - 1;
                 return (
-                    <div
-                        key={k}
-                        className={"tr detail" + (last ? " last" : "")}
-                    >
+                    <div key={k} className={`tr detail${last ? " last" : ""}`}>
                         <div className="td c-detail-key">{k}</div>
                         <div className="td c-detail-val">
                             {JSON.stringify(v, null, " ")}
@@ -180,7 +177,10 @@ function Record({
             >
                 <div className="td c-timestamp">{format_tstamp(tstamp)}</div>
                 {COLUMNS.map(({ className, render: Render }, idx) => (
-                    <div key={idx} className={`td ${className}`}>
+                    <div
+                        key={idx}
+                        className={["td", className].filter(Boolean).join(" ")}
+                    >
                         <Render field={(name: string) => fld(fields, name)} />
                     </div>
                 ))}
@@ -426,7 +426,9 @@ export function Journal() {
                                     {COLUMNS.map((col, idx) => (
                                         <div
                                             key={idx}
-                                            className={`td ${col.className}`}
+                                            className={["td", col.className]
+                                                .filter(Boolean)
+                                                .join(" ")}
                                         >
                                             {col.title}
                                         </div>
