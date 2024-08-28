@@ -47,9 +47,16 @@ export function WebMapFeatureGridTab({
         ] as FeatureLayerWebMapPluginConfig
     );
 
-    const reloadLayer = useCallback(() => {
-        const layer = display.current?.webmapStore.getLayer(layerId);
-        layer?.reload();
+    const reloadLayer = useCallback(async () => {
+        // It is possible to have few webmap layers for one resource id
+        const layers = await display.current?.webmapStore.filterLayers({
+            query: { layerId },
+        });
+
+        layers?.forEach((item) => {
+            const layer = display.current?.webmapStore.getLayer(item.id);
+            layer?.reload();
+        });
     }, [layerId]);
 
     const [messageApi, contextHolder] = message.useMessage();

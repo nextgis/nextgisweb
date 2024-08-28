@@ -235,19 +235,24 @@ export class WebmapStore {
         return intervals;
     };
 
-    getIds = ({ query }: { query?: Record<string, unknown> } = {}) => {
+    filterLayers = ({ query }: { query?: Partial<StoreItem> } = {}) => {
         const itemStore = this._itemStore;
-        return new Promise((resolve) => {
+        return new Promise<StoreItem[]>((resolve) => {
             itemStore.fetch({
                 query,
                 queryOptions: { deep: true },
                 onComplete: function (items: StoreItem[]) {
-                    resolve(
-                        items.map((item) => itemStore.getValue(item, "id"))
-                    );
+                    resolve([...items]);
                 },
             });
         });
+    };
+
+    getIds = (options: { query?: Partial<StoreItem> } = {}) => {
+        const itemStore = this._itemStore;
+        return this.filterLayers(options).then((items) =>
+            items.map((item) => itemStore.getValue(item, "id"))
+        );
     };
 
     getLayers() {
