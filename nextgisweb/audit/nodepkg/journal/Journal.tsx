@@ -10,7 +10,13 @@ import {
     useState,
 } from "react";
 
-import type { AuditArrayLogEntry } from "@nextgisweb/audit/type/api";
+import type {
+    AuditArrayLogEntry,
+    AuditObject,
+    RequestObject,
+    ResponseObject,
+    UserObject,
+} from "@nextgisweb/audit/type/api";
 import { PrincipalSelect } from "@nextgisweb/auth/component";
 import { Button, RangePicker } from "@nextgisweb/gui/antd";
 import dayjs, { utc } from "@nextgisweb/gui/dayjs";
@@ -29,7 +35,10 @@ type AuditFields = AuditArrayLogEntry[1];
 
 type RenderArg = { field: (name: string) => string };
 
+type DetailRow = [string, RequestObject | ResponseObject | UserObject | null][];
+
 const BLOCK_SIZE = 100;
+const rowMinHeight = 28;
 
 const FIELDS = [
     "request.method",
@@ -111,52 +120,64 @@ function format_tstamp(v: string) {
     return utc(s).local().format("YYYY-MM-DD HH:mm:ss") + "." + m;
 }
 
-// function Detail({ data }: { data: AuditObject | boolean }) {
-//     const entries = Object.entries(data).filter(([k]) => k !== "@timestamp");
-//     return (
-//         <>
-//             {entries.map(([k, v], idx) => {
-//                 const last = idx === entries.length - 1;
-//                 return (
-//                     <div
-//                         key={k}
-//                         className={"tr detail" + (last ? " last" : "")}
-//                     >
-//                         <div className="td c-detail-key">{k}</div>
-//                         <div className="td c-detail-val">
-//                             {JSON.stringify(v, null, " ")}
-//                         </div>
-//                     </div>
-//                 );
-//             })}
-//         </>
-//     );
-// }
+function Detail({ entries }: { entries: DetailRow }) {
+    return (
+        <>
+            {entries.map(([k, v], idx) => {
+                const last = idx === entries.length - 1;
+                return (
+                    <div
+                        key={k}
+                        className={"tr detail" + (last ? " last" : "")}
+                    >
+                        <div className="td c-detail-key">{k}</div>
+                        <div className="td c-detail-val">
+                            {JSON.stringify(v, null, " ")}
+                        </div>
+                    </div>
+                );
+            })}
+        </>
+    );
+}
 
 function Record({
     tstamp,
     fields,
-    style,
+    expanded,
+    setRowExpansion,
 }: {
     tstamp: string;
     fields: AuditFields;
-    style: React.CSSProperties;
+    expanded?: number;
+    setRowExpansion: (height?: number) => void;
 }) {
-    // const [expanded, setExpanded] = useState(false);
-    // const [detail, setDetail] = useState<AuditObject | boolean>(false);
+    const [entries, setEntries] = useState<DetailRow | false>(false);
 
-    // const toggle = useCallback(() => {
-    //     setExpanded(!expanded);
-    //     if (detail === false) {
-    //         route("audit.dbase")
-    //             .get({ query: { eq: tstamp, format: "object" } })
-    //             .then((data) => setDetail((data as AuditObject[])[0]));
-    //     }
-    // }, [tstamp, expanded, setExpanded, detail, setDetail]);
+    const toggle = useCallback(() => {
+        if (entries === false) {
+            route("audit.dbase")
+                .get({ query: { eq: tstamp, format: "object" }, cache: true })
+                .then((data) => {
+                    const entries = Object.entries(
+                        (data as AuditObject[])[0]
+                    ).filter(([k]) => k !== "@timestamp");
+                    setEntries(entries);
+                    setRowExpansion(rowMinHeight * entries.length);
+                });
+        } else {
+            setRowExpansion(
+                expanded ? undefined : rowMinHeight * entries.length
+            );
+        }
+    }, [entries, expanded, setRowExpansion, tstamp]);
 
     return (
         <>
-            <div className="tr" style={style}>
+            <div
+                className={`tr summary${expanded ? " expanded" : ""}`}
+                onClick={toggle}
+            >
                 <div className="td c-timestamp">{format_tstamp(tstamp)}</div>
                 {COLUMNS.map(({ className, render: Render }, idx) => (
                     <div key={idx} className={`td ${className}`}>
@@ -164,7 +185,7 @@ function Record({
                     </div>
                 ))}
             </div>
-            {/* {expanded && <Detail data={detail} />} */}
+            {expanded && entries && <Detail entries={entries} />}
         </>
     );
 }
@@ -220,18 +241,46 @@ export function Journal() {
     }));
 
     const [blocks, setBlocks] = useState<AuditArrayLogEntry[][]>([]);
+
+    const [expandedRows, setExpandedRows] = useState<
+        Record<string, number | undefined>
+    >({});
+
+    const setRowExpansion = (tstamp: string, height?: number) => {
+        setExpandedRows((prev) => ({
+            ...prev,
+            [tstamp]: height,
+        }));
+    };
+
     const pointer = useRef<string | false>();
 
     const refLoading = useRef<Promise<AuditDbaseQueryGetResponse>>();
     const refParent = useRef<HTMLDivElement | null>(null);
 
-    const rowMinHeight = 27;
+    const estimateSize = useCallback(
+        (index: number) => {
+            const blockIndex = Math.floor(index / BLOCK_SIZE);
+            const rowIndex = index % BLOCK_SIZE;
+            const row = blocks[blockIndex]?.[rowIndex];
+            if (row && expandedRows[row[0]]) {
+                const [tstamp] = row;
+                const height = expandedRows[tstamp];
+                if (height) {
+                    return rowMinHeight + height;
+                }
+            }
+            return rowMinHeight;
+        },
+        [blocks, expandedRows]
+    );
 
-    const { getVirtualItems, getTotalSize } = useVirtualizer({
-        count: blocks.reduce((acc, block) => acc + block.length, 0),
-        getScrollElement: () => refParent.current,
-        estimateSize: () => rowMinHeight,
-    });
+    const { getVirtualItems, getTotalSize, measureElement, measure } =
+        useVirtualizer({
+            count: blocks.reduce((acc, block) => acc + block.length, 0),
+            getScrollElement: () => refParent.current,
+            estimateSize,
+        });
 
     const loadBlock = useCallback(() => {
         if (pointer.current === false || refLoading.current) return;
@@ -394,9 +443,11 @@ export function Journal() {
                                     const row = blocks[blockIndex]?.[rowIndex];
                                     if (!row) return null;
                                     const [tstamp, fields] = row;
+                                    const expanded = expandedRows[tstamp];
 
                                     return (
-                                        <Record
+                                        <div
+                                            key={virtualItem.key}
                                             style={{
                                                 position: "absolute",
                                                 top: 0,
@@ -405,10 +456,22 @@ export function Journal() {
                                                 height: `${virtualItem.size}px`,
                                                 transform: `translateY(${virtualItem.start}px)`,
                                             }}
-                                            key={virtualItem.key}
-                                            tstamp={tstamp}
-                                            fields={fields}
-                                        />
+                                            ref={measureElement}
+                                            data-index={virtualItem.index}
+                                        >
+                                            <Record
+                                                expanded={expanded}
+                                                setRowExpansion={(height) => {
+                                                    setRowExpansion(
+                                                        tstamp,
+                                                        height
+                                                    );
+                                                    measure();
+                                                }}
+                                                tstamp={tstamp}
+                                                fields={fields}
+                                            />
+                                        </div>
                                     );
                                 })}
                             </div>

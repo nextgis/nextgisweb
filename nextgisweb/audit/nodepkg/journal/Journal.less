@@ -46,10 +46,6 @@
                         }
                     }
 
-                    &.detail .td {
-                        line-height: 1.25;
-                    }
-
                     &:first-child {
                         margin-top: var(--header-height);
                     }
@@ -61,6 +57,8 @@
                     vertical-align: top;
                     border-left: 1px solid var(--color-border);
                     padding: 2px 8px;
+                    height: 23px;
+                    line-height: 23px;
 
                     &:first-child {
                         border-left: none;
@@ -68,11 +66,11 @@
                 }
 
                 .th {
+                    z-index: 1;
+                    background-color: var(--color-container);
                     font-weight: var(--font-weight-strong);
                     text-align: left;
                     white-space: nowrap;
-                    background-color: var(--color-container);
-                    z-index: 1;
                 }
 
                 .thead {
