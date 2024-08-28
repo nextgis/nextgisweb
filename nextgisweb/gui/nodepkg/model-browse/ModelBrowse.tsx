@@ -1,4 +1,5 @@
 import type { TableProps as AntTAbleProps } from "antd/es/table/InternalTable";
+import type { TableRowSelection } from "antd/es/table/interface";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import type { FC } from "react";
 
@@ -73,6 +74,8 @@ interface ModelBrowseProps<Data extends ModalBrowseData = ModalBrowseData>
         canDelete?: (args: { item: Data }) => boolean;
     };
     readonly?: boolean;
+    showActionColumn?: boolean;
+    customRowSelection?: TableRowSelection<Data>;
 
     createProps?: React.ButtonHTMLAttributes<HTMLButtonElement>;
     headerControls?: FC<ControlProps<Data>>[];
@@ -87,6 +90,8 @@ export function ModelBrowse<Data extends ModalBrowseData = ModalBrowseData>({
     messages,
     callbacks = {},
     itemProps = {},
+    showActionColumn = true,
+    customRowSelection,
     createProps = {},
     headerControls = [],
     selectedControls = [],
@@ -225,18 +230,12 @@ export function ModelBrowse<Data extends ModalBrowseData = ModalBrowseData>({
         return true;
     };
 
-    const rowSelection: TableProps<Data>["rowSelection"] = {
-        onChange: (selectedRowKeys) => {
-            setSelected(selectedRowKeys.map(Number));
-        },
-        getCheckboxProps: (record) => ({
-            disabled: !canDelete(record as Data),
-        }),
-    };
-
     const tableColumns: TableProps<Data>["columns"] = [
         ...(columns ? columns : []),
-        {
+    ];
+
+    if (showActionColumn) {
+        tableColumns.push({
             title: "",
             key: "action",
             width: "0px",
@@ -270,8 +269,8 @@ export function ModelBrowse<Data extends ModalBrowseData = ModalBrowseData>({
                     )}
                 </div>
             ),
-        },
-    ];
+        });
+    }
 
     const TableControl = () => (
         <Row justify="space-between">
@@ -327,30 +326,43 @@ export function ModelBrowse<Data extends ModalBrowseData = ModalBrowseData>({
         </Space>
     );
 
+    const rowSelectionDefault: TableProps<Data>["rowSelection"] = {
+        onChange: (selectedRowKeys) => {
+            setSelected(selectedRowKeys.map(Number));
+        },
+        getCheckboxProps: (record) => ({
+            disabled: !canDelete(record as Data),
+        }),
+    };
+
+    let rowSelection;
+    if (customRowSelection) {
+        rowSelection = customRowSelection;
+    } else if (!readonly) {
+        rowSelection = {
+            type: "checkbox",
+            selectedRowKeys: selected,
+            ...rowSelectionDefault,
+        } as TableRowSelection<Data>;
+    }
+
+    let headSection;
+    if (!readonly) {
+        headSection = selected.length ? SelectedControl() : TableControl();
+    }
+
     return (
         <Space
             direction="vertical"
             style={{ width: "100%" }}
             className="ngw-gui-model-browse"
         >
-            {!readonly
-                ? selected.length
-                    ? SelectedControl()
-                    : TableControl()
-                : null}
+            {headSection}
             <Table
                 className="ngw-card"
                 rowKey="id"
                 showSorterTooltip={false}
-                rowSelection={
-                    !readonly
-                        ? {
-                              type: "checkbox",
-                              selectedRowKeys: selected,
-                              ...rowSelection,
-                          }
-                        : undefined
-                }
+                rowSelection={rowSelection}
                 loading={isLoading}
                 columns={tableColumns}
                 dataSource={filteredRows}
