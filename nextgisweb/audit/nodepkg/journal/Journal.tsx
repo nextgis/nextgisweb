@@ -17,7 +17,7 @@ import { PrincipalSelect } from "@nextgisweb/auth/component";
 import { Button, RangePicker } from "@nextgisweb/gui/antd";
 import dayjs, { utc } from "@nextgisweb/gui/dayjs";
 import { useThemeVariables } from "@nextgisweb/gui/hook";
-import { route, routeURL } from "@nextgisweb/pyramid/api";
+import { encodeQueryParams, route, routeURL } from "@nextgisweb/pyramid/api";
 import type { RouteQuery, RouteResp } from "@nextgisweb/pyramid/api/type";
 import { gettext, ngettextf } from "@nextgisweb/pyramid/i18n";
 import { PageTitle } from "@nextgisweb/pyramid/layout";
@@ -266,14 +266,7 @@ export function Journal() {
             fields: FIELDS_CSV,
         });
 
-        window.open(
-            `${routeURL("audit.dbase")}?${new URLSearchParams(
-                Object.entries(query).map(([key, value]) => [
-                    key,
-                    Array.isArray(value) ? value.join(",") : String(value),
-                ])
-            )}`
-        );
+        window.open(`${routeURL("audit.dbase")}?${encodeQueryParams(query)}`);
     };
 
     useEffect(() => {

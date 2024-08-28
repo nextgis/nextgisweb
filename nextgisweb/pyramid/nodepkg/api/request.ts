@@ -108,7 +108,7 @@ type QueryScalar = string | number | boolean;
 type QueryList = QueryScalar[];
 type QueryRecord = Record<string, QueryScalar | QueryList>;
 
-function encodeQuery(
+export function encodeQueryParams(
     value: Record<string, QueryScalar | QueryList | QueryRecord>
 ): string {
     const result = [];
@@ -161,7 +161,7 @@ export async function request<
 
     let urlParams = "";
     if (opt.query !== undefined) {
-        urlParams = "?" + encodeQuery(opt.query);
+        urlParams = "?" + encodeQueryParams(opt.query);
         delete opt.query;
     }
 
