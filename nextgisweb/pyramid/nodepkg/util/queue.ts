@@ -48,6 +48,7 @@ export class RequestQueue {
     private _clearTimeout() {
         if (this.timeoutId) {
             clearTimeout(this.timeoutId);
+            this.timeoutId = undefined;
         }
     }
 

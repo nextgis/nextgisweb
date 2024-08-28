@@ -6,19 +6,29 @@ define([
     "@nextgisweb/pyramid/util",
     "ngw-webmap/ol/layer/Image",
 ], function (declare, ioQuery, Adapter, api, util, Image) {
+    const transparentImage =
+        "data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
+
     function tileLoadFunction({ src, signal }) {
         return fetch(src, {
             method: "GET",
             signal,
         })
             .then((response) => {
-                return response.arrayBuffer();
+                if (response.ok) {
+                    // return response.arrayBuffer();
+                    return Promise.reject();
+                } else {
+                    return Promise.reject();
+                }
             })
             .then((arrayBuffer) => {
-                const arrayBufferView = new Uint8Array(arrayBuffer);
-                const blob = new Blob([arrayBufferView], { type: "image/png" });
+                const blob = new Blob([arrayBuffer]);
                 const urlCreator = window.URL || window.webkitURL;
                 return urlCreator.createObjectURL(blob);
+            })
+            .catch(() => {
+                return transparentImage;
             });
     }
 
@@ -76,18 +86,21 @@ define([
                             Date.now(); // in-memory cache busting
 
                         const abortController = new AbortController();
-                        queue.add(
-                            () =>
-                                tileLoadFunction({
-                                    src: newSrc,
-                                    signal: abortController.signal,
-                                }).then((imageUrl) => {
-                                    img.src = imageUrl;
-                                }),
-                            () => {
-                                abortController.abort();
-                            }
-                        );
+                        // Use a timeout to prevent the queue from aborting right after adding, especially in cases with zoomToExtent.
+                        setTimeout(() => {
+                            queue.add(
+                                () =>
+                                    tileLoadFunction({
+                                        src: newSrc,
+                                        signal: abortController.signal,
+                                    }).then((imageUrl) => {
+                                        img.src = imageUrl;
+                                    }),
+                                () => {
+                                    abortController.abort();
+                                }
+                            );
+                        });
                     },
                 }
             );
