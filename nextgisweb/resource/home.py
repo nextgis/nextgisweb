@@ -97,4 +97,5 @@ def on_user_login(event: OnUserLogin):
     if (res := user_group(event.user, create=True)) is None:
         return
 
-    event.next_url = event.request.route_url("resource.show", id=res.id)
+    if not event.next_url:
+        event.next_url = event.request.route_url("resource.show", id=res.id)

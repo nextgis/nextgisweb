@@ -189,7 +189,11 @@ def oauth(request):
 
         # Store data in state named cookie
         response.set_cookie(
-            cookie_name(state), value=urlencode(data), path=oauth_path, max_age=600, httponly=True
+            cookie_name(state),
+            value=urlencode(data),
+            path=oauth_path,
+            max_age=600,
+            httponly=True,
         )
 
         return response

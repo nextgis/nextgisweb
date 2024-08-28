@@ -21,6 +21,8 @@ const msgOauth = gettextf("Sign in with {}")(oauth.name);
 const msgTitle = gettext("Sign in to Web GIS");
 const msgSignIn = gettext("Sign in");
 
+const isLoginLocation = location.pathname === routeURL("auth.login");
+
 export const LoginForm = observer((props: LoginFormProps) => {
     const [creds, setCreds] = useState<Credentials>({});
 
@@ -72,12 +74,16 @@ export const LoginForm = observer((props: LoginFormProps) => {
 
     useKeydownListener("enter", login);
 
+    let oauthNext;
+    if (nextQueryParam) {
+        oauthNext = nextQueryParam;
+    } else if (!isLoginLocation) {
+        oauthNext = location.href;
+    }
+
     const oauthUrl =
         routeURL("auth.oauth") +
-        "?" +
-        new URLSearchParams({
-            next: location.href,
-        });
+        (oauthNext ? "?" + new URLSearchParams({ next: oauthNext }) : "");
 
     return (
         <div className="ngw-auth-login-form">
