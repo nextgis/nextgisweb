@@ -2,18 +2,19 @@ import csv
 from datetime import datetime
 from enum import Enum
 from io import StringIO
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 import sqlalchemy as sa
 import sqlalchemy.dialects.postgresql as pg
-from msgspec import Meta
+from msgspec import Meta, Struct
 from msgspec.json import decode as msgspec_decode
 from pyramid.response import Response
 from typing_extensions import Annotated
 
 from nextgisweb.env import DBSession, inject
+from nextgisweb.lib.apitype import AsJSON
 
-from nextgisweb.pyramid import JSONType
+from nextgisweb.jsrealm import TSExport
 
 from .backend import require_backend
 from .component import AuditComponent
@@ -26,6 +27,40 @@ FIELD_PATTERN = r"^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)*$"
 Timestamp = Annotated[str, Meta(pattern=TIMESTAMP_PATTERN)]
 Field = Annotated[str, Meta(pattern=FIELD_PATTERN)]
 Filter = Dict[Field, Union[None, str, int, bool]]
+
+
+class RequestObject(Struct):
+    path: Annotated[str, Meta(description="Request path")]
+    method: Annotated[str, Meta(description="HTTP method")]
+    remote_addr: Annotated[str, Meta(description="Remote IP address")]
+
+
+class ResponseObject(Struct):
+    route_name: Annotated[str, Meta(description="Routee name")]
+    status_code: Annotated[int, Meta(description="HTTP status code")]
+
+
+class UserObject(Struct):
+    id: Annotated[int, Meta(description="User ID")]
+    keyname: Annotated[str, Meta(description="User keyname")]
+    display_name: Annotated[str, Meta(description="Display name of user")]
+
+
+class AuditObject(Struct):
+    request: RequestObject
+    response: ResponseObject
+    user: Optional[UserObject] = None
+
+
+AuditObject = Annotated[AuditObject, TSExport("AuditObject")]
+AuditArrayLogEntry = Annotated[
+    Tuple[
+        Annotated[str, Meta(description="Timestamp")],
+        Annotated[List[Union[str, int, None]], Meta(description="Fields")],
+    ],
+    TSExport("AuditArrayLogEntry"),
+]
+AuditCSV = Annotated[str, TSExport("AuditCSV")]
 
 
 class QueryFormat(Enum):
@@ -61,7 +96,7 @@ def dbase(
     filter: Optional[str] = None,
     limit: Annotated[int, Meta(gt=0, le=MAX_ROWS)] = MAX_ROWS,
     comp: AuditComponent,
-) -> JSONType:
+) -> AsJSON[Union[List[AuditArrayLogEntry], List[AuditObject], AuditCSV]]:
     request.require_administrator()
     require_backend("dbase")
 
@@ -94,7 +129,7 @@ def dbase(
     rows = DBSession.execute(q)
 
     if format == QueryFormat.ARRAY:
-        return [list(row) for row in rows]
+        return [(row[0], row[1:]) for row in rows]
     elif format == QueryFormat.OBJECT:
         return [data for _, data in rows]
     elif format == QueryFormat.CSV:
