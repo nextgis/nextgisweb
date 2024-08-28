@@ -53,7 +53,8 @@ const FIELDS_CSV = FIELDS.concat([
 const FIELD_INDEX = Object.fromEntries(FIELDS.map((f, i) => [f, i]));
 
 const fld = (rec: AuditFields, name: string): string => {
-    return String(rec[FIELD_INDEX[name]]);
+    const val = rec[FIELD_INDEX[name]];
+    return val ? String(val) : "";
 };
 
 export function isAuditArrayLogEntry(
@@ -248,7 +249,7 @@ export function Journal() {
         promise.then((data) => {
             if (isAuditArrayLogEntry(data)) {
                 setBlocks((cur) => [...cur, data]);
-                if (data === null || !pointer) return;
+                if (data === null) return;
                 setPointer(
                     data.length === BLOCK_SIZE ? data.slice(-1)[0][0] : false
                 );
