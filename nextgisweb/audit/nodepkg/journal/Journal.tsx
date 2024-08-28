@@ -1,3 +1,4 @@
+import { useVirtualizer } from "@tanstack/react-virtual";
 import type { Dayjs } from "dayjs";
 import type { RangeValueType } from "rc-picker/lib/PickerInput/RangePicker";
 import type { ValueDate } from "rc-picker/lib/interface";
@@ -9,10 +10,7 @@ import {
     useState,
 } from "react";
 
-import type {
-    AuditArrayLogEntry,
-    AuditObject,
-} from "@nextgisweb/audit/type/api";
+import type { AuditArrayLogEntry } from "@nextgisweb/audit/type/api";
 import { PrincipalSelect } from "@nextgisweb/auth/component";
 import { Button, RangePicker } from "@nextgisweb/gui/antd";
 import dayjs, { utc } from "@nextgisweb/gui/dayjs";
@@ -113,63 +111,61 @@ function format_tstamp(v: string) {
     return utc(s).local().format("YYYY-MM-DD HH:mm:ss") + "." + m;
 }
 
-function Detail({ data }: { data: AuditObject | boolean }) {
-    const entries = Object.entries(data).filter(([k]) => k !== "@timestamp");
+// function Detail({ data }: { data: AuditObject | boolean }) {
+//     const entries = Object.entries(data).filter(([k]) => k !== "@timestamp");
+//     return (
+//         <>
+//             {entries.map(([k, v], idx) => {
+//                 const last = idx === entries.length - 1;
+//                 return (
+//                     <div
+//                         key={k}
+//                         className={"tr detail" + (last ? " last" : "")}
+//                     >
+//                         <div className="td c-detail-key">{k}</div>
+//                         <div className="td c-detail-val">
+//                             {JSON.stringify(v, null, " ")}
+//                         </div>
+//                     </div>
+//                 );
+//             })}
+//         </>
+//     );
+// }
+
+function Record({
+    tstamp,
+    fields,
+    style,
+}: {
+    tstamp: string;
+    fields: AuditFields;
+    style: React.CSSProperties;
+}) {
+    // const [expanded, setExpanded] = useState(false);
+    // const [detail, setDetail] = useState<AuditObject | boolean>(false);
+
+    // const toggle = useCallback(() => {
+    //     setExpanded(!expanded);
+    //     if (detail === false) {
+    //         route("audit.dbase")
+    //             .get({ query: { eq: tstamp, format: "object" } })
+    //             .then((data) => setDetail((data as AuditObject[])[0]));
+    //     }
+    // }, [tstamp, expanded, setExpanded, detail, setDetail]);
+
     return (
         <>
-            {entries.map(([k, v], idx) => {
-                const last = idx === entries.length - 1;
-                return (
-                    <tr key={k} className={"detail" + (last ? " last" : "")}>
-                        <td className="c-detail-key">{k}</td>
-                        <td className="c-detail-val" colSpan={COLUMNS.length}>
-                            {JSON.stringify(v, null, " ")}
-                        </td>
-                    </tr>
-                );
-            })}
-        </>
-    );
-}
-
-function Record({ tstamp, fields }: { tstamp: string; fields: AuditFields }) {
-    const [expanded, setExpanded] = useState(false);
-    const [detail, setDetail] = useState<AuditObject | boolean>(false);
-
-    const toggle = useCallback(() => {
-        setExpanded(!expanded);
-        if (detail === false) {
-            route("audit.dbase")
-                .get({ query: { eq: tstamp, format: "object" } })
-                .then((data) => setDetail((data as AuditObject[])[0]));
-        }
-    }, [tstamp, expanded, setExpanded, detail, setDetail]);
-
-    return (
-        <>
-            <tr
-                className={"summary" + (expanded ? " expanded" : "")}
-                onClick={() => toggle()}
-            >
-                <td className="c-timestamp">{format_tstamp(tstamp)}</td>
+            <div className="tr" style={style}>
+                <div className="td c-timestamp">{format_tstamp(tstamp)}</div>
                 {COLUMNS.map(({ className, render: Render }, idx) => (
-                    <td key={idx} className={className}>
+                    <div key={idx} className={`td ${className}`}>
                         <Render field={(name: string) => fld(fields, name)} />
-                    </td>
+                    </div>
                 ))}
-            </tr>
-            {expanded && <Detail data={detail} />}
+            </div>
+            {/* {expanded && <Detail data={detail} />} */}
         </>
-    );
-}
-
-function Block({ rows }: { rows: AuditArrayLogEntry[] }) {
-    return (
-        <tbody>
-            {rows.map(([tstamp, fields], idx) => {
-                return <Record key={idx} tstamp={tstamp} fields={fields} />;
-            })}
-        </tbody>
     );
 }
 
@@ -224,21 +220,28 @@ export function Journal() {
     }));
 
     const [blocks, setBlocks] = useState<AuditArrayLogEntry[][]>([]);
-    const [pointer, setPointer] = useState<string | false>();
+    const pointer = useRef<string | false>();
 
     const refLoading = useRef<Promise<AuditDbaseQueryGetResponse>>();
     const refParent = useRef<HTMLDivElement | null>(null);
-    const refTable = useRef<HTMLTableElement | null>(null);
+
+    const rowMinHeight = 27;
+
+    const { getVirtualItems, getTotalSize } = useVirtualizer({
+        count: blocks.reduce((acc, block) => acc + block.length, 0),
+        getScrollElement: () => refParent.current,
+        estimateSize: () => rowMinHeight,
+    });
 
     const loadBlock = useCallback(() => {
-        if (pointer === false || refLoading.current) return;
+        if (pointer.current === false || refLoading.current) return;
 
         const query = prepareQuery({
             ...params,
             format: "array",
             fields: FIELDS,
             limit: BLOCK_SIZE,
-            gt: pointer,
+            gt: pointer.current,
         });
 
         const promise = route("audit.dbase").get({
@@ -250,14 +253,14 @@ export function Journal() {
             if (isAuditArrayLogEntry(data)) {
                 setBlocks((cur) => [...cur, data]);
                 if (data === null) return;
-                setPointer(
-                    data.length === BLOCK_SIZE ? data.slice(-1)[0][0] : false
-                );
+
+                pointer.current =
+                    data.length === BLOCK_SIZE ? data.slice(-1)[0][0] : false;
 
                 refLoading.current = undefined;
             }
         });
-    }, [params, pointer]);
+    }, [params]);
 
     const exportCsv = () => {
         const query = prepareQuery({
@@ -278,12 +281,12 @@ export function Journal() {
 
     useEffect(() => {
         setBlocks([]);
-        setPointer(undefined);
+        pointer.current = undefined;
         refLoading.current = undefined;
     }, [params]);
 
     const onScroll = useCallback(() => {
-        if (pointer === false) return;
+        if (pointer.current === false) return;
         const el = refParent.current;
         if (
             pointer === undefined ||
@@ -291,7 +294,7 @@ export function Journal() {
         ) {
             loadBlock();
         }
-    }, [loadBlock, pointer]);
+    }, [loadBlock]);
 
     useLayoutEffect(() => {
         onScroll();
@@ -358,23 +361,58 @@ export function Journal() {
             <div className="ngw-audit-journal" style={themeVariables}>
                 <div className="wrapper">
                     <div className="scroll" ref={refParent} onScroll={onScroll}>
-                        <table ref={refTable}>
-                            <thead>
-                                <tr>
-                                    <th className="c-timestamp">
+                        <div
+                            className="table"
+                            style={{
+                                height: `${getTotalSize()}px`,
+                                width: "100%",
+                                position: "relative",
+                            }}
+                        >
+                            <div className="thead">
+                                <div className="tr">
+                                    <div className="td c-timestamp">
                                         {gettext("Timestamp")}
-                                    </th>
+                                    </div>
                                     {COLUMNS.map((col, idx) => (
-                                        <th key={idx} className={col.className}>
+                                        <div
+                                            key={idx}
+                                            className={`td ${col.className}`}
+                                        >
                                             {col.title}
-                                        </th>
+                                        </div>
                                     ))}
-                                </tr>
-                            </thead>
-                            {blocks.map((rows, idx: number) => (
-                                <Block key={idx} rows={rows} />
-                            ))}
-                        </table>
+                                </div>
+                            </div>
+                            <div className="tbody">
+                                {getVirtualItems().map((virtualItem) => {
+                                    const blockIndex = Math.floor(
+                                        virtualItem.index / BLOCK_SIZE
+                                    );
+                                    const rowIndex =
+                                        virtualItem.index % BLOCK_SIZE;
+                                    const row = blocks[blockIndex]?.[rowIndex];
+                                    if (!row) return null;
+                                    const [tstamp, fields] = row;
+
+                                    return (
+                                        <Record
+                                            style={{
+                                                position: "absolute",
+                                                top: 0,
+                                                left: 0,
+                                                width: "100%",
+                                                height: `${virtualItem.size}px`,
+                                                transform: `translateY(${virtualItem.start}px)`,
+                                            }}
+                                            key={virtualItem.key}
+                                            tstamp={tstamp}
+                                            fields={fields}
+                                        />
+                                    );
+                                })}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
