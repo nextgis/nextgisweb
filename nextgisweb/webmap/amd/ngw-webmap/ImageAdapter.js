@@ -3,20 +3,28 @@ define([
     "dojo/io-query",
     "./Adapter",
     "@nextgisweb/pyramid/api",
+    "@nextgisweb/pyramid/util",
     "ngw-webmap/ol/layer/Image",
-], function (declare, ioQuery, Adapter, api, Image) {
-    const getLayerZoom = (l) => l.olLayer.getMapInternal().getView().getZoom();
+], function (declare, ioQuery, Adapter, api, util, Image) {
+    function tileLoadFunction({ src, signal }) {
+        return fetch(src, {
+            method: "GET",
+            signal,
+        })
+            .then((response) => {
+                return response.arrayBuffer();
+            })
+            .then((arrayBuffer) => {
+                const arrayBufferView = new Uint8Array(arrayBuffer);
+                const blob = new Blob([arrayBufferView], { type: "image/png" });
+                const urlCreator = window.URL || window.webkitURL;
+                return urlCreator.createObjectURL(blob);
+            });
+    }
 
     return declare(Adapter, {
         createLayer: function (item) {
-            let imagesLoading = [];
-
-            const abortLoading = function () {
-                imagesLoading.forEach((img) => {
-                    img.src = "";
-                });
-                imagesLoading = [];
-            };
+            const queue = util.imageQueue;
 
             const layer = new Image(
                 item.id,
@@ -40,7 +48,6 @@ define([
                     ratio: 1,
                     crossOrigin: "anonymous",
                     imageLoadFunction: function (image, src) {
-                        abortLoading();
                         const url = src.split("?")[0];
                         const query = src.split("?")[1];
                         const queryObject = ioQuery.queryToObject(query);
@@ -53,7 +60,7 @@ define([
 
                         const img = image.getImage();
 
-                        img.src =
+                        const newSrc =
                             url +
                             "?resource=" +
                             resource +
@@ -68,13 +75,19 @@ define([
                             "#" +
                             Date.now(); // in-memory cache busting
 
-                        imagesLoading.push(img);
-                        img._zoom = getLayerZoom(layer);
-                        img.onload = () => {
-                            imagesLoading = imagesLoading.filter(
-                                (loadedImg) => loadedImg !== img
-                            );
-                        };
+                        const abortController = new AbortController();
+                        queue.add(
+                            () =>
+                                tileLoadFunction({
+                                    src: newSrc,
+                                    signal: abortController.signal,
+                                }).then((imageUrl) => {
+                                    img.src = imageUrl;
+                                }),
+                            () => {
+                                abortController.abort();
+                            }
+                        );
                     },
                 }
             );
