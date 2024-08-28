@@ -5,6 +5,6 @@ export { tileLoadFunction } from "./tileLoadFunction";
 export * from "./loader";
 export * from "./abort";
 
-const imageQueue = new RequestQueue({ debounce: 100, limit: 4 });
+const imageQueue = new RequestQueue({ debounce: 100, limit: 6 });
 
 export { RequestQueue, imageQueue };

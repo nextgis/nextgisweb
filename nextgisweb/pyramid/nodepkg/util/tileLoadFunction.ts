@@ -1,5 +1,4 @@
-export const transparentImage =
-    "data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
+export const transparentImage = "data:image/gif;base64,R0lGODlhAQABAAAAACw=";
 
 interface TileLoadFunctionOptions extends RequestInit {
     src: string;
@@ -16,7 +15,6 @@ export function tileLoadFunction({
         .then((response) => {
             if (response.ok) {
                 return response.arrayBuffer();
-                // return Promise.reject();
             } else {
                 return Promise.reject();
             }
@@ -26,5 +24,7 @@ export function tileLoadFunction({
             const urlCreator = window.URL || window.webkitURL;
             return urlCreator.createObjectURL(blob);
         })
-        .catch(() => transparentImage);
+        .catch(() => {
+            return transparentImage;
+        });
 }

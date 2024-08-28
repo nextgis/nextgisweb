@@ -55,26 +55,19 @@ define([
                             "," +
                             queryObject["HEIGHT"] +
                             "&nd=204" +
-                            symbols +
-                            "#" +
-                            Date.now(); // in-memory cache busting
-
-                        const abortController = new AbortController();
+                            symbols;
                         // Use a timeout to prevent the queue from aborting right after adding, especially in cases with zoomToExtent.
                         setTimeout(() => {
-                            queue.add(
-                                () =>
-                                    util
-                                        .tileLoadFunction({
-                                            src: newSrc,
-                                            signal: abortController.signal,
-                                        })
-                                        .then((imageUrl) => {
-                                            img.src = imageUrl;
-                                        }),
-                                () => {
-                                    abortController.abort();
-                                }
+                            queue.add(({ signal }) =>
+                                util
+                                    .tileLoadFunction({
+                                        src: newSrc,
+                                        cache: "no-cache",
+                                        signal,
+                                    })
+                                    .then((imageUrl) => {
+                                        img.src = imageUrl;
+                                    })
                             );
                         });
                     },

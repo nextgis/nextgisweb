@@ -1,8 +1,10 @@
-type RequestFunc = () => Promise<unknown>;
+type RequestFunc = (opt: { signal: AbortSignal }) => Promise<unknown>;
 type Abort = () => void;
+
 type AbortableRequest = {
     request: RequestFunc;
     abort?: Abort;
+    abortController: AbortController;
 };
 
 interface RequestQueueOptions {
@@ -14,9 +16,8 @@ interface RequestQueueOptions {
 
 export class RequestQueue {
     private queue: AbortableRequest[] = [];
-
+    private activeRequests: AbortableRequest[] = [];
     private limit: number;
-    private activeCount: number = 0;
     private timeoutId?: ReturnType<typeof setTimeout>;
     private debounce: number;
 
@@ -25,18 +26,25 @@ export class RequestQueue {
         this.debounce = debounce;
     }
 
-    add(request: RequestFunc, abort?: () => void) {
-        this.queue.push({ request: request, abort });
+    add(request: RequestFunc, abort?: Abort) {
+        this.queue.push({
+            request,
+            abort,
+            abortController: new AbortController(),
+        });
         this.debouncedNext();
     }
 
     abort() {
-        for (const q of this.queue) {
+        for (const q of [...this.queue, ...this.activeRequests]) {
+            q.abortController.abort("The queue was cleaned");
             if (q.abort) {
                 q.abort();
             }
         }
-        this.queue = [];
+        this.queue.length = 0;
+        this.activeRequests.length = 0;
+
         this._clearTimeout();
     }
 
@@ -53,14 +61,25 @@ export class RequestQueue {
     }
 
     private _next() {
-        while (this.activeCount < this.limit && this.queue.length > 0) {
-            const { request } = this.queue.shift()!;
-            this.activeCount++;
+        while (
+            this.activeRequests.length < this.limit &&
+            this.queue.length > 0
+        ) {
+            const requestItem = this.queue.shift()!;
+            const { request, abortController } = requestItem;
 
-            request().finally(() => {
-                this.activeCount--;
+            if (!abortController.signal.aborted) {
+                this.activeRequests.push(requestItem);
+
+                request({ signal: abortController.signal }).finally(() => {
+                    this.activeRequests = this.activeRequests.filter(
+                        (req) => req !== requestItem
+                    );
+                    this.debouncedNext();
+                });
+            } else {
                 this.debouncedNext();
-            });
+            }
         }
     }
 }
