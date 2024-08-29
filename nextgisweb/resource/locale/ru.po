@@ -446,7 +446,11 @@ msgstr "Удалено из избранного"
 msgid "Create resource"
 msgstr "Создать ресурс"
 
-#: nodepkg/main-section/CreateResourceModal.tsx:39
+#: nodepkg/main-section/CreateResourceModal.tsx:17
+msgid "Search"
+msgstr "Поиск"
+
+#: nodepkg/main-section/CreateResourceModal.tsx:44
 msgid "Everything"
 msgstr "Все ресурсы"
 

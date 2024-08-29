@@ -1,8 +1,8 @@
 import sortBy from "lodash-es/sortBy";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
-import { Button, Modal } from "@nextgisweb/gui/antd";
-import type { ModalProps } from "@nextgisweb/gui/antd";
+import { Button, InputValue, Modal } from "@nextgisweb/gui/antd";
+import type { InputRef, ModalProps } from "@nextgisweb/gui/antd";
 import { useThemeVariables } from "@nextgisweb/gui/hook";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -14,6 +14,7 @@ import { ResourceIcon } from "../icon";
 import "./CreateResourceModal.less";
 
 const msgCreateResource = gettext("Create resource");
+const msgSearchPlaceholder = gettext("Search");
 
 const ALL_RESOURCES = "";
 
@@ -27,9 +28,13 @@ export default function CreateResourceModal({
     resourceId,
     creatable,
     style,
+    open,
     ...props
 }: CreateResourceModalProps) {
     const [curCatIdentity, setCurCatIdentity] = useState(ALL_RESOURCES);
+    const [search, setSearch] = useState("");
+
+    const searchRef = useRef<InputRef>(null);
 
     const [resData, catData] = useMemo(() => {
         const outCat: Record<string, BlueprintCategory> = {
@@ -64,12 +69,15 @@ export default function CreateResourceModal({
     }, [creatable, resourceId]);
 
     const resSelCat = useMemo(() => {
+        const searchLowerCase = search.toLocaleLowerCase();
         return resData.filter(
             (i) =>
-                curCatIdentity === ALL_RESOURCES ||
-                i.category === curCatIdentity
+                (curCatIdentity === ALL_RESOURCES ||
+                    i.category === curCatIdentity) &&
+                (i.key.includes(searchLowerCase) ||
+                    i.label.toLowerCase().includes(searchLowerCase))
         );
-    }, [curCatIdentity, resData]);
+    }, [curCatIdentity, resData, search]);
 
     const themeVariables = useThemeVariables({
         "border-radius-lg": "borderRadiusLG",
@@ -81,9 +89,29 @@ export default function CreateResourceModal({
         <Modal
             classNames={{ content: "ngw-resource-create-resource-modal" }}
             style={{ ...themeVariables, ...(style ? style : {}) }}
-            title={msgCreateResource}
+            title={
+                <>
+                    <div className="title">{msgCreateResource}</div>
+                    <div className="search">
+                        <InputValue
+                            ref={searchRef}
+                            value={search}
+                            onChange={setSearch}
+                            placeholder={msgSearchPlaceholder}
+                            type="search"
+                            allowClear
+                        />
+                    </div>
+                </>
+            }
+            afterOpenChange={(open) => {
+                if (open && searchRef.current) {
+                    searchRef.current.focus();
+                }
+            }}
             footer={null}
             width={960}
+            open={open}
             centered
             {...props}
         >

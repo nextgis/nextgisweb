@@ -1,8 +1,31 @@
 .ngw-resource-create-resource-modal {
+    .ant-modal-title {
+        display: flex;
+        gap: 1rem;
+        margin-inline-end: 1rem;
+
+        > .title {
+            flex: 1 1;
+        }
+
+        > .search {
+            flex: 3 3;
+
+            > span {
+                width: 50%;
+            }
+        }
+    }
+
+    > .ant-modal-close {
+        top: 20px;
+        inset-inline-end: 20px;
+    }
+
     > div.ant-modal-body {
         display: flex;
         gap: 1rem;
-        margin: 1rem 0;
+        margin: 2rem 0 1rem 0;
 
         > .categories {
             display: flex;
@@ -31,6 +54,7 @@
             width: 100%;
             height: calc(6 * (32px + 2.5rem) + 1.5rem);
             overflow-y: auto;
+            scrollbar-gutter: stable;
 
             > .grid {
                 display: grid;
