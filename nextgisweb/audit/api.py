@@ -12,7 +12,7 @@ from pyramid.response import Response
 from typing_extensions import Annotated
 
 from nextgisweb.env import DBSession, inject
-from nextgisweb.lib.apitype import AsJSON
+from nextgisweb.lib.apitype import AnyOf, AsJSON, ContentType
 
 from nextgisweb.jsrealm import TSExport
 
@@ -52,7 +52,6 @@ class AuditObject(Struct):
     user: Optional[UserObject] = None
 
 
-AuditObject = Annotated[AuditObject, TSExport("AuditObject")]
 AuditArrayLogEntry = Annotated[
     Tuple[
         Annotated[str, Meta(description="Timestamp")],
@@ -60,7 +59,6 @@ AuditArrayLogEntry = Annotated[
     ],
     TSExport("AuditArrayLogEntry"),
 ]
-AuditCSV = Annotated[str, TSExport("AuditCSV")]
 
 
 class QueryFormat(Enum):
@@ -96,7 +94,11 @@ def dbase(
     filter: Optional[str] = None,
     limit: Annotated[int, Meta(gt=0, le=MAX_ROWS)] = MAX_ROWS,
     comp: AuditComponent,
-) -> AsJSON[Union[List[AuditArrayLogEntry], List[AuditObject], AuditCSV]]:
+) -> AnyOf[
+    AsJSON[List[AuditArrayLogEntry]],
+    AsJSON[List[AuditObject]],
+    Annotated[str, ContentType("text/csv")],
+]:
     request.require_administrator()
     require_backend("dbase")
 
