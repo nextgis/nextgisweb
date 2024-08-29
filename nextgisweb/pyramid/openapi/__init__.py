@@ -5,11 +5,13 @@ from typing import Any, Dict
 from msgspec import NODEFAULT, UNSET
 from msgspec.inspect import Metadata, type_info
 from msgspec.json import schema_components
+from msgspec.msgpack import Decoder as MsgpackDecoder
 
 from nextgisweb.env import Component, inject
 from nextgisweb.lib.apitype import ContentType as CType
 from nextgisweb.lib.apitype import JSONType, annotate, iter_anyof, unannotate
 from nextgisweb.lib.apitype import StatusCode as SCode
+from nextgisweb.lib.apitype.util import decompose_union
 
 from ..component import PyramidComponent
 from ..tomb import is_json_type, iter_routes
@@ -93,9 +95,19 @@ def openapi(introspector, prefix="/api/", *, comp: PyramidComponent):
         schema_refs.append((tdef, ref))
         return ref
 
-    def schema_for_json(ct, tdef):
+    def schema_for_json(ct, tdef, *, response=False):
         result = dict()
         if ct == CType.JSON:
+            if response and len(union := decompose_union(tdef, annotated=True)) > 1:
+                # Workaround for response union types which MsgSpec unable to
+                # decode. But it doesn't need to decode them, just encode!
+                try:
+                    MsgpackDecoder(tdef)
+                except TypeError as exc:
+                    assert exc.args[0].startswith("Type unions may not contain ")
+                    result["schema"] = dict(oneOf=[schema_ref(m) for m in union])
+                    return result
+
             result["schema"] = schema_ref(tdef)
         return result
 
@@ -192,7 +204,7 @@ def openapi(introspector, prefix="/api/", *, comp: PyramidComponent):
                     response["description"] = dstr.returns
                     _del_if_none(response, "description")
                     if ct != CType.EMPTY:
-                        response["content"][str(ct)].append(schema_for_json(ct, t))
+                        response["content"][str(ct)].append(schema_for_json(ct, t, response=True))
 
     # Sort paths by path components
     doc["paths"] = dict(sorted(paths.items(), key=lambda i: i[0].split("/")))
