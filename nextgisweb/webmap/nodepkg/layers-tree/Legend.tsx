@@ -59,7 +59,7 @@ export function Legend({ nodeData, store, checkable }: LegendProps) {
                                     onClick={(evt) => evt.stopPropagation()}
                                 />
                             ) : (
-                                <div style={{ width: "16px" }} />
+                                <div style={{ flex: "0 0 16px" }} />
                             );
                     }
 
