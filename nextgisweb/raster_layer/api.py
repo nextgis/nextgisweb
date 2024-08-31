@@ -1,11 +1,15 @@
 import os
 import tempfile
 from io import DEFAULT_BUFFER_SIZE
+from typing import List, Literal, Union
 
+from msgspec import Meta, Struct
 from osgeo import gdal
 from pyramid.response import FileIter, FileResponse, Response
+from typing_extensions import Annotated
 
 from nextgisweb.env import env, gettext
+from nextgisweb.lib.apitype import AnyOf, ContentType, Query, StatusCode
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.pyramid.util import set_output_buffering
@@ -14,6 +18,30 @@ from nextgisweb.spatial_ref_sys import SRS
 
 from .gdaldriver import EXPORT_FORMAT_GDAL
 from .model import RasterLayer
+
+
+class ExportParams(Struct, kw_only=True):
+    srs: Annotated[Union[int, None], Meta(description="SRS ID")] = None
+    bands: Annotated[
+        Union[List[Annotated[int, Meta(ge=1)]], None], Meta(description="List of bands")
+    ] = None
+    format: Annotated[
+        Literal[tuple(EXPORT_FORMAT_GDAL)],
+        Meta(description="Output format"),
+    ] = "GTiff"  # type: ignore
+
+
+ExportResponse = AnyOf[
+    tuple(
+        Annotated[
+            FileResponse,
+            ContentType(driver.mime),
+        ]
+        for driver in (EXPORT_FORMAT_GDAL[format] for format in EXPORT_FORMAT_GDAL)
+        if driver.mime is not None
+    )
+    + (Annotated[Response, ContentType("application/octet-stream")],)
+]  # type: ignore
 
 
 class RangeFileWrapper(FileIter):
@@ -32,18 +60,21 @@ class RangeFileWrapper(FileIter):
         return data
 
 
-def export(resource, request):
+def export(
+    resource,
+    request,
+    *,
+    export_params: Annotated[ExportParams, Query(spread=True)],
+) -> ExportResponse:  # type: ignore
     request.resource_permission(DataScope.read)
 
-    srs = SRS.filter_by(id=int(request.GET["srs"])).one() if "srs" in request.GET else resource.srs
-    format = request.GET.get("format", "GTiff")
-    bands = request.GET["bands"].split(",") if "bands" in request.GET else None
-
-    if format is None:
-        raise ValidationError(gettext("Output format is not provided."))
-
-    if format not in EXPORT_FORMAT_GDAL:
-        raise ValidationError(gettext("Format '%s' is not supported.") % (format,))
+    srs = (
+        SRS.filter_by(id=export_params.srs).one()
+        if export_params.srs is not None
+        else resource.srs
+    )
+    bands = export_params.bands
+    format = export_params.format
 
     driver = EXPORT_FORMAT_GDAL[format]
 
@@ -82,7 +113,29 @@ def export(resource, request):
         return _warp(str(source_filename))
 
 
-def cog(resource: RasterLayer, request):
+def cog_head(
+    resource: RasterLayer, request
+) -> Annotated[Response, ContentType("image/tiff; application=geotiff; profile=cloud-optimized")]:
+    """Cloud optimized GeoTIFF endpoint"""
+    request.resource_permission(DataScope.read)
+
+    if not resource.cog:
+        raise ValidationError(gettext("Requested raster is not COG."))
+
+    return Response(
+        accept_ranges="bytes",
+        content_length=resource.fileobj.size,
+        content_type="image/tiff; application=geotiff; profile=cloud-optimized",
+    )
+
+
+def cog_get(
+    resource: RasterLayer, request
+) -> Annotated[
+    Response,
+    StatusCode(206),
+    ContentType("image/tiff; application=geotiff; profile=cloud-optimized"),
+]:
     """Cloud optimized GeoTIFF endpoint"""
 
     request.resource_permission(DataScope.read)
@@ -90,40 +143,34 @@ def cog(resource: RasterLayer, request):
     if not resource.cog:
         raise ValidationError(gettext("Requested raster is not COG."))
 
-    if request.method == "HEAD":
-        return Response(
-            accept_ranges="bytes",
-            content_length=resource.fileobj.size,
-            content_type="image/geo+tiff",
-        )
+    range = request.range
+    if range is None:
+        raise ValidationError(gettext("Range header is missed or invalid."))
 
-    if request.method == "GET":
-        range = request.range
-        if range is None:
-            raise ValidationError(gettext("Range header is missed or invalid."))
+    content_range = range.content_range(resource.fileobj.size)
+    if content_range is None:
+        raise ValidationError(gettext("Range %s can not be read." % range))
 
-        content_range = range.content_range(resource.fileobj.size)
-        if content_range is None:
-            raise ValidationError(gettext("Range %s can not be read." % range))
+    content_length = content_range.stop - content_range.start
+    response = Response(
+        status_code=206,
+        content_range=content_range,
+        content_type="image/tiff; application=geotiff; profile=cloud-optimized",
+    )
 
-        content_length = content_range.stop - content_range.start
-        response = Response(
-            status_code=206,
-            content_range=content_range,
-            content_type="image/geo+tiff",
-        )
+    response.app_iter = RangeFileWrapper(
+        open(resource.fileobj.filename(), "rb"),
+        offset=content_range.start,
+        length=content_length,
+    )
+    response.content_length = content_length
 
-        response.app_iter = RangeFileWrapper(
-            open(resource.fileobj.filename(), "rb"),
-            offset=content_range.start,
-            length=content_length,
-        )
-        response.content_length = content_length
-
-        return response
+    return response
 
 
-def download(resource: RasterLayer, request):
+def download(
+    resource: RasterLayer, request
+) -> Annotated[FileResponse, ContentType("image/tiff; application=geotiff")]:
     """Download raster in internal representation format"""
 
     request.resource_permission(DataScope.read)
@@ -152,8 +199,8 @@ def setup_pyramid(comp, config):
         "raster_layer.cog",
         "/api/resource/{id}/cog",
         factory=raster_layer_factory,
-        head=cog,
-        get=cog,
+        head=cog_head,
+        get=cog_get,
     )
 
     config.add_route(
