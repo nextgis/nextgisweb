@@ -32,7 +32,7 @@ msgstr "Разрешить тайлы для запросов изображен
 
 #: nodepkg/tile-cache-widget/TileCacheWidget.tsx:62
 msgid "Max zoom level"
-msgstr "Максимальный масштабный уровень"
+msgstr "Макс. зум"
 
 #: nodepkg/tile-cache-widget/TileCacheWidget.tsx:71
 msgid "TTL, sec."

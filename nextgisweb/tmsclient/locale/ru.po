@@ -66,11 +66,11 @@ msgstr "Имя слоя"
 
 #: nodepkg/tmsclient-layer/TmsClientLayerWidget.tsx:168
 msgid "Min zoom level"
-msgstr "Минимальный уровень масштаба"
+msgstr "Мин. зум"
 
 #: nodepkg/tmsclient-layer/TmsClientLayerWidget.tsx:176
 msgid "Max zoom level"
-msgstr "Максимальный уровень масштаба"
+msgstr "Макс. зум"
 
 #: nodepkg/tmsclient-layer/TmsClientLayerWidget.tsx:184
 msgid "Tile size"
