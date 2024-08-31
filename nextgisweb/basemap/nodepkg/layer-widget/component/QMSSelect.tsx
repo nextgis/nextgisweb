@@ -35,8 +35,6 @@ function QMSLabel({ name, id }: { name: string; id: number }) {
                 style={{ paddingLeft: "3px" }}
                 href={`${settings.qms_url}/geoservices/${id}`}
                 target="_blank"
-                onClick={(e) => e.stopPropagation()}
-                onMouseDown={(e) => e.stopPropagation()}
             >
                 <OpenInNewIcon />
             </a>
