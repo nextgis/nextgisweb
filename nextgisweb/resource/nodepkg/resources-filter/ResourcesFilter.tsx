@@ -1,4 +1,4 @@
-import debounce from "lodash-es/debounce";
+import { debounce } from "lodash-es";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { AutoComplete, Input } from "@nextgisweb/gui/antd";

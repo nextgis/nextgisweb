@@ -1,4 +1,4 @@
-import uniq from "lodash-es/uniq";
+import { uniq } from "lodash-es";
 import { useCallback, useEffect, useState } from "react";
 
 import { Button, Space, Table } from "@nextgisweb/gui/antd";

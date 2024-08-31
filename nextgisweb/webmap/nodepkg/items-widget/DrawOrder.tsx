@@ -1,4 +1,4 @@
-import sortBy from "lodash-es/sortBy";
+import { sortBy } from "lodash-es";
 import { action, computed, observable, reaction } from "mobx";
 import type { IObservableArray } from "mobx";
 import { useEffect, useMemo, useRef } from "react";

@@ -1,4 +1,4 @@
-import sortBy from "lodash-es/sortBy";
+import { sortBy } from "lodash-es";
 import { useEffect, useState } from "react";
 
 import { Spin } from "@nextgisweb/gui/antd";

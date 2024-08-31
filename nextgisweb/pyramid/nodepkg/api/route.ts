@@ -1,4 +1,4 @@
-import set from "lodash-es/set";
+import { set } from "lodash-es";
 
 import routeData from "@nextgisweb/pyramid/api/load!/api/component/pyramid/route";
 

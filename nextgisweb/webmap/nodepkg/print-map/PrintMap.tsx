@@ -1,4 +1,4 @@
-import debounce from "lodash-es/debounce";
+import { debounce } from "lodash-es";
 import { observer } from "mobx-react-lite";
 import Map from "ol/Map";
 import type OlMap from "ol/Map";

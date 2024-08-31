@@ -1,4 +1,4 @@
-import sortBy from "lodash-es/sortBy";
+import { sortBy } from "lodash-es";
 import { observer } from "mobx-react-lite";
 import { useMemo, useState } from "react";
 

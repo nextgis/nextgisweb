@@ -227,13 +227,12 @@ Writing modules
 ---------------
 
 All modules should be written as ES modules. ES versions of libraries should be
-preferred in dependencies. For example, use ``lodash-es`` instead of ``lodash``
-with granular imports:
+preferred in dependencies. For example, use ``lodash-es`` instead of ``lodash``:
 
 .. code-block:: javascript
 
   // Right way
-  import { set } from "lodash-es/set";
+  import { set } from "lodash-es";
   set(...);
 
   // Wrong way

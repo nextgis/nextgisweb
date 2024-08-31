@@ -1,4 +1,4 @@
-import isEqual from "lodash-es/isEqual";
+import { isEqual } from "lodash-es";
 import { useEffect, useRef, useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
 

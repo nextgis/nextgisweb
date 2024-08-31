@@ -1,4 +1,4 @@
-import partition from "lodash-es/partition";
+import { partition } from "lodash-es";
 import type { RefObject } from "react";
 
 import { ActionToolbar } from "../action-toolbar";

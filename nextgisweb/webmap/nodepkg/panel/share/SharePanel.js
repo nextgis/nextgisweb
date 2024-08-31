@@ -1,4 +1,4 @@
-import orderBy from "lodash-es/orderBy";
+import { orderBy } from "lodash-es";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import {

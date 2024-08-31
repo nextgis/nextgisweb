@@ -1,4 +1,4 @@
-import debounce from "lodash-es/debounce";
+import { debounce } from "lodash-es";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Select, Spin } from "@nextgisweb/gui/antd";

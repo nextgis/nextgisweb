@@ -1,15 +1,15 @@
-import difference from "lodash-es/difference";
+import { difference } from "lodash-es";
 import { makeObservable, observable, observe } from "mobx";
 
 import { mapper, validate } from "@nextgisweb/gui/arm";
 import type { ErrorResult } from "@nextgisweb/gui/arm";
 import type { FocusTableStore } from "@nextgisweb/gui/focus-table";
+import type { Composite } from "@nextgisweb/resource/type";
 import type {
     EditorStore,
     EditorStoreOptions,
 } from "@nextgisweb/resource/type/EditorStore";
 import type { ResourceRef } from "@nextgisweb/resource/type/api";
-import { Composite } from "@nextgisweb/resource/type";
 
 interface FieldData {
     id: number | undefined;

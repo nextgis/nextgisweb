@@ -1,4 +1,4 @@
-import matches from "lodash-es/matches";
+import { matches } from "lodash-es";
 
 type Value = NonNullable<unknown>;
 type Metadata = NonNullable<unknown>;

@@ -1,5 +1,4 @@
-import isObject from "lodash-es/isObject";
-import transform from "lodash-es/transform";
+import { isObject, transform } from "lodash-es";
 
 export function deepCleanUndefined<O>(value: O): O {
     if (isObject(value)) {

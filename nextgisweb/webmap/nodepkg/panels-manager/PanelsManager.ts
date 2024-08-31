@@ -1,4 +1,4 @@
-import orderBy from "lodash-es/orderBy";
+import { orderBy } from "lodash-es";
 import { reaction } from "mobx";
 
 import reactApp from "@nextgisweb/gui/react-app";

@@ -1,6 +1,6 @@
 /// <reference types="dojo/dijit" />
 
-import orderBy from "lodash-es/orderBy";
+import { orderBy } from "lodash-es";
 import Attribution from "ol/control/Attribution";
 import Rotate from "ol/control/Rotate";
 import ScaleLine from "ol/control/ScaleLine";

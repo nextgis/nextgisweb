@@ -1,4 +1,4 @@
-import isEqual from "lodash-es/isEqual";
+import { isEqual } from "lodash-es";
 import { action, computed, observable, runInAction } from "mobx";
 import type { InputHTMLAttributes } from "react";
 

@@ -1,4 +1,4 @@
-import debounce from "lodash-es/debounce";
+import { debounce } from "lodash-es";
 import GeoJSON from "ol/format/GeoJSON";
 import { useCallback, useState } from "react";
 

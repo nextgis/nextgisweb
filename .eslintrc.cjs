@@ -50,11 +50,6 @@ const config = {
                 ],
                 "patterns": [
                     {
-                        "group": ["lodash/*"],
-                        "message":
-                            "Use 'lodash-es/[util]' instead 'lodash/[util]'.",
-                    },
-                    {
                         "group": [
                             "**/nextgisweb*/*/nodepkg/*",
                             "**/nextgisweb*/nodepkg/*",

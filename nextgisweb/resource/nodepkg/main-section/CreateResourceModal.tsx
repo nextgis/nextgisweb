@@ -1,4 +1,4 @@
-import sortBy from "lodash-es/sortBy";
+import { sortBy } from "lodash-es";
 import { useMemo, useRef, useState } from "react";
 
 import { Button, InputValue, Modal } from "@nextgisweb/gui/antd";

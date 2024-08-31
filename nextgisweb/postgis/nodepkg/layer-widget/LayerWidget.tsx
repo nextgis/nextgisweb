@@ -1,4 +1,4 @@
-import unique from "lodash-es/uniq";
+import { uniq } from "lodash-es";
 import { observer } from "mobx-react-lite";
 import { useCallback, useMemo, useState } from "react";
 
@@ -113,7 +113,7 @@ export const LayerWidget: EditorWidgetComponent<EditorWidgetProps<LayerStore>> =
 
         const schemaOpts = useMemo(() => {
             if (conInfo?.status !== "ready") return undefined;
-            const schemas = unique(conInfo.data.map((i) => i.schema));
+            const schemas = uniq(conInfo.data.map((i) => i.schema));
             return schemas.map((i) => ({ label: i, value: i }));
         }, [conInfo]);
 

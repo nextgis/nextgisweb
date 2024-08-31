@@ -28,8 +28,7 @@
 
 import OlStyleParser from "geostyler-openlayers-parser";
 import type { Style, Symbolizer, SymbolizerKind } from "geostyler-style";
-import _get from "lodash-es/get";
-import _uniqueId from "lodash-es/uniqueId";
+import { get as _get, uniqueId as _uniqueId } from "lodash-es";
 import OlFeature from "ol/Feature";
 import OlMap from "ol/Map";
 import OlView from "ol/View";

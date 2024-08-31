@@ -1,5 +1,4 @@
-import difference from "lodash-es/difference";
-import pull from "lodash-es/pull";
+import { difference, pull } from "lodash-es";
 import {
     autorun,
     computed,

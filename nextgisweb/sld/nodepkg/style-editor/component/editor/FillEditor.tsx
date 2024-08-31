@@ -1,5 +1,5 @@
 import type { FillSymbolizer } from "geostyler-style";
-import _cloneDeep from "lodash-es/cloneDeep";
+import { cloneDeep as _cloneDeep } from "lodash-es";
 import { useMemo } from "react";
 
 import { InputNumber } from "@nextgisweb/gui/antd";

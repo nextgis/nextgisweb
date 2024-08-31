@@ -1,7 +1,5 @@
 /** @entrypoint */
-import groupBy from "lodash-es/groupBy";
-import partition from "lodash-es/partition";
-import sortBy from "lodash-es/sortBy";
+import { groupBy, partition, sortBy } from "lodash-es";
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { Balancer } from "react-wrap-balancer";
 

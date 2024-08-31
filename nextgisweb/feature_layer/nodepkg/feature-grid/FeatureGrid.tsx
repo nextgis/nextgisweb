@@ -1,4 +1,4 @@
-import isEqual from "lodash-es/isEqual";
+import { isEqual } from "lodash-es";
 import { observer } from "mobx-react-lite";
 import { useEffect, useRef, useState } from "react";
 

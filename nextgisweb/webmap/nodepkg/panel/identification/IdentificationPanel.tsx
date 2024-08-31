@@ -1,5 +1,5 @@
 import { publish } from "dojo/topic";
-import delay from "lodash-es/delay";
+import { delay } from "lodash-es";
 import { Suspense, lazy, useEffect, useMemo, useState } from "react";
 
 import GeometryInfo from "@nextgisweb/feature-layer/geometry-info/";
