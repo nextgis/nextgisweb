@@ -734,6 +734,13 @@ def setup_pyramid(comp, config):
         put=font_cupdate,
     )
 
+    def generate_types_view(request):
+        code = comp.codegen()
+        print(code[0])
+        return Response(body="\n".join(code[0]), content_type="text/plain")
+
+    config.add_route("generate_types", "/api/generate_types", get=generate_types_view)
+
     # Methods for customization in components
     comp.company_logo_enabled = lambda request: True
     comp.company_logo_view = None

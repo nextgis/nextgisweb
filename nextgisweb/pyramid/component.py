@@ -135,6 +135,11 @@ class PyramidComponent(Component):
 
         m.client_codegen(self)
 
+    def codegen(self):
+        from . import codegen as m
+
+        return m.codegen(self)
+
     @property
     def template_include(self):
         return ("nextgisweb:pyramid/template/update.mako",)

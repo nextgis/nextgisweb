@@ -80,8 +80,7 @@ def union(t: Sequence[Any]) -> Any:
     return t[0] if len(t) == 1 else Union[tuple(t)]  # type: ignore
 
 
-def client_codegen(self: PyramidComponent):
-    nodepkg = self.root_path / "nodepkg"
+def codegen(self: PyramidComponent):
     config = self.make_app(settings=dict())
 
     routes: Dict[str, Route] = defaultdict(Route)
@@ -129,32 +128,29 @@ def client_codegen(self: PyramidComponent):
     tsgen.add(routes_struct, export=(route_tsmodule, "Routes"))
     tsgen.add(routes_struct, export=(route_tsmodule, "default"))
 
-    no_eslint = [
-        f"/* eslint-disable {r} */"
-        for r in (
-            "prettier/prettier",
-            "import/newline-after-import",
-            "import/order",
-            "@typescript-eslint/no-explicit-any",
-        )
-    ] + [""]
+    no_eslint = "/* eslint-disable */"
 
-    code = no_eslint + [m.code for m in tsgen.compile()]
-    (nodepkg / "api/type.inc.d.ts").write_text("\n".join(code))
+    type = no_eslint + [m.code for m in tsgen.compile()]
 
-    code = no_eslint
+    load = no_eslint
     for k, v in loaders.items():
         mod = [
             f'import type route from "{route_tsmodule}";',
             f'const value: route["{v}"]["get"]["response"];',
             "export = value;",
         ]
-        code.extend(
+        load.extend(
             (
                 f'declare module "@nextgisweb/pyramid/api/load!{k}" ' + "{",
                 indented(mod),
                 "}\n",
             )
         )
+    return [type, load]
 
-    (nodepkg / "api/load.inc.d.ts").write_text("\n".join(code))
+def client_codegen(self: PyramidComponent):
+    nodepkg = self.root_path / "nodepkg"
+
+    [type, load] = codegen(self)
+    (nodepkg / "api/type.inc.d.ts").write_text("\n".join(type))
+    (nodepkg / "api/load.inc.d.ts").write_text("\n".join(load))
