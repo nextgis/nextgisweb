@@ -267,12 +267,15 @@ def creatable_resources(parent, *, user):
         if not cls.check_parent(parent):
             continue
 
-        # Is current user has permission to manage resource children?
         if ResourceScope.manage_children not in permissions:
             continue
 
-        # Is current user has permission to create child resource?
+        # Create a temporary resource to perform the remaining checks
         child = cls(parent=parent, owner_user=user)
+
+        if not parent.check_child(child):
+            continue
+
         if not child.has_permission(ResourceScope.create, user):
             continue
 

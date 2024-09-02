@@ -139,9 +139,13 @@ class Resource(Base, metaclass=ResourceMeta):
         return col
 
     @classmethod
-    def check_parent(cls, parent) -> bool:
+    def check_parent(cls, parent: "Resource") -> bool:
         """Can this resource be child for parent?"""
         return False
+
+    def check_child(self, child: "Resource") -> bool:
+        """Can this resource be parent for child?"""
+        return True
 
     @classmethod
     def implemented_interfaces(cls):
@@ -433,14 +437,15 @@ class ParentAttr(SResource, apitype=True):
     def set(self, srlzr: Serializer, value, *, create: bool):
         old_parent = srlzr.obj.parent
         super().set(srlzr, value, create=create)
+        new_parent = srlzr.obj.parent
 
-        if old_parent == srlzr.obj.parent:
+        if old_parent == new_parent:
             return
 
-        if srlzr.obj.parent is None:
+        if new_parent is None:
             raise ForbiddenError(gettext("Resource can not be without a parent."))
 
-        for parent in (old_parent, srlzr.obj.parent):
+        for parent in (old_parent, new_parent):
             if parent is not None and not parent.has_permission(
                 ResourceScope.manage_children, srlzr.user
             ):
@@ -449,7 +454,7 @@ class ParentAttr(SResource, apitype=True):
                     % parent.id
                 )
 
-        if not srlzr.obj.check_parent(srlzr.obj.parent):
+        if not srlzr.obj.check_parent(new_parent) or not new_parent.check_child(srlzr.obj):
             raise HierarchyError(
                 gettext("Resource can not be a child of resource id = %d.") % srlzr.obj.parent.id
             )
