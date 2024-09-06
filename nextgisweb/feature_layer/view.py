@@ -3,8 +3,8 @@ from pyramid.httpexceptions import HTTPNotFound
 from nextgisweb.env import gettext
 from nextgisweb.lib.dynmenu import Label, Link
 
-from nextgisweb.pyramid import JSONType, viewargs
-from nextgisweb.resource import DataScope, Resource, ResourceScope, Widget, resource_factory
+from nextgisweb.pyramid import viewargs
+from nextgisweb.resource import DataScope, Resource, Widget, resource_factory
 from nextgisweb.resource.extaccess import ExternalAccessLink
 from nextgisweb.resource.view import resource_sections
 
@@ -80,11 +80,6 @@ def feature_update(request):
     )
 
 
-def field_collection(request) -> JSONType:
-    request.resource_permission(ResourceScope.read)
-    return [f.to_dict() for f in request.context.fields]
-
-
 @viewargs(renderer="mako")
 def test_mvt(request):
     return dict()
@@ -158,12 +153,6 @@ def setup_pyramid(comp, config):
         r"/resource/{id:uint}/feature/{feature_id:int}/update",
         factory=resource_factory,
     ).add_view(feature_update, context=IFeatureLayer)
-
-    config.add_route(
-        "feature_layer.field",
-        r"/resource/{id:uint}/field/",
-        factory=resource_factory,
-    ).add_view(field_collection, context=IFeatureLayer)
 
     config.add_view(
         export,
