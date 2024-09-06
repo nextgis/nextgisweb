@@ -47,7 +47,7 @@ function VersionCell({ resourceId, versionId }: VersionProps) {
 interface RowsProps {
     resourceId: number;
     effectiveWidths: EffectiveWidths;
-    virtualItems: VirtualItem<HTMLElement>[];
+    virtualItems: VirtualItem[];
     rowMinHeight: number;
     selectedIds: number[];
     columns: FeatureLayerFieldCol[];

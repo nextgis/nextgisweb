@@ -4,7 +4,7 @@
     "type": "module",
     "private": true,
     "dependencies": {
-        "@tanstack/react-virtual": "^3.8.4",
+        "@tanstack/react-virtual": "^3.10.6",
         "@types/dojo": "^1.9.47",
         "@types/react": "18.2.20",
         "@types/react-dom": "18.2.7",
