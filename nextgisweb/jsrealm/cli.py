@@ -162,6 +162,8 @@ def install(
     scripts["build"] = "webpack --progress --config {}".format(webpack_root)
     scripts["watch"] = "webpack --progress --watch --config {}".format(webpack_root)
 
+    scripts["watch:types"] = "npx tsc --watch -p tsconfig.json"
+
     package_json["workspaces"] = [str(pp) for pp in npkgs.values()]
 
     with open("package.json", "w") as fd:
