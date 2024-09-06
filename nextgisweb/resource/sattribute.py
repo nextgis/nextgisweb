@@ -14,13 +14,11 @@ from .serialize import CRUTypes, SAttribute
 
 
 class SColumn(SAttribute, apitype=True):
-    def bind(self, srlzrcls, attrname):
-        self.column = srlzrcls.resclass.__mapper__.columns[attrname]
+    def setup_types(self):
+        self.column = self.srlzrcls.resclass.__mapper__.columns[self.model_attr]
         if self.required is None:
             self.required = not self.column.nullable and self.column.default is None
-        super().bind(srlzrcls, attrname)
 
-    def setup_types(self):
         if self.ctypes is not None:
             self.types = self.ctypes
         else:
