@@ -9,7 +9,7 @@ export type RouteParameters = {
     [K in keyof Routes]: Routes[K]["pathArr"] | [Routes[K]["pathObj"]];
 };
 
-export type RouteName = keyof RouteParameters;
+export type RouteName = keyof Routes;
 
 export type GetRouteParam<R extends RouteName> = (RouteParameters[R] &
     [object])[0];
@@ -58,7 +58,7 @@ export interface RequestOptionsJSON<
     method?: M;
 }
 
-export interface RequestOptionsBoby<
+export interface RequestOptionsBody<
     Q = any,
     RT extends ResponseType = "json",
     M extends Method = Method,
@@ -71,19 +71,19 @@ export type PutRequestOptions<
     Q = any,
     B = any,
     RT extends ResponseType = "json",
-> = RequestOptionsJSON<Q, B, RT, "PUT"> | RequestOptionsBoby<Q, RT, "PUT">;
+> = RequestOptionsJSON<Q, B, RT, "PUT"> | RequestOptionsBody<Q, RT, "PUT">;
 
 export type PostRequestOptions<
     Q = any,
     B = any,
     RT extends ResponseType = "json",
-> = RequestOptionsJSON<Q, B, RT, "PUT"> | RequestOptionsBoby<Q, RT, "PUT">;
+> = RequestOptionsJSON<Q, B, RT, "POST"> | RequestOptionsBody<Q, RT, "POST">;
 
 export type PatchRequestOptions<
     Q = any,
     B = any,
     RT extends ResponseType = "json",
-> = RequestOptionsJSON<Q, B, RT, "PATCH"> | RequestOptionsBoby<Q, RT, "PATCH">;
+> = RequestOptionsJSON<Q, B, RT, "PATCH"> | RequestOptionsBody<Q, RT, "PATCH">;
 
 export type DeleteRequestOptions<
     Q = any,
