@@ -1130,8 +1130,9 @@ class WFSHandler:
         if self.p_version == v110:
             root.set("numberOfFeatures", str(count))
         elif self.p_version >= v200:
+            # https://mapserver.org/development/rfc/ms-rfc-105.html#getfeature-operation
             root.set("numberMatched", str(count) if limit is None else "unknown")
-            root.set("numberReturned", str(count))
+            root.set("numberReturned", "0" if self.p_resulttype == "hits" else str(count))
 
         if self.p_version >= v110:
             root.set("timeStamp", datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.%f"))
