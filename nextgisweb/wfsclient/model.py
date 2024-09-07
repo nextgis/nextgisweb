@@ -13,7 +13,7 @@ from typing_extensions import Annotated
 from zope.interface import implementer
 
 from nextgisweb.env import COMP_ID, Base, env, gettext
-from nextgisweb.lib import db
+from nextgisweb.lib import db, saext
 from nextgisweb.lib.geometry import Geometry
 from nextgisweb.lib.ows import FIELD_TYPE_WFS
 
@@ -133,7 +133,7 @@ class WFSConnection(Base, Resource):
     path = db.Column(db.Unicode, nullable=False)
     username = db.Column(db.Unicode)
     password = db.Column(db.Unicode)
-    version = db.Column(db.Enum(*WFS_VERSIONS), nullable=False)
+    version = db.Column(saext.Enum(*WFS_VERSIONS), nullable=False)
 
     @classmethod
     def check_parent(cls, parent):
@@ -441,7 +441,7 @@ class WFSLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     connection_id = db.Column(db.ForeignKey(WFSConnection.id), nullable=False)
     layer_name = db.Column(db.Unicode, nullable=False)
     column_geom = db.Column(db.Unicode, nullable=False)
-    geometry_type = db.Column(db.Enum(*GEOM_TYPE.enum), nullable=False)
+    geometry_type = db.Column(saext.Enum(*GEOM_TYPE.enum), nullable=False)
     geometry_srid = db.Column(db.Integer, nullable=False)
 
     __field_class__ = WFSLayerField

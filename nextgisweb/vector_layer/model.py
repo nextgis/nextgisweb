@@ -132,7 +132,7 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin, FVersioni
     __scope__ = DataScope
 
     tbl_uuid = db.Column(db.Unicode(32), nullable=False)
-    geometry_type = db.Column(db.Enum(*GEOM_TYPE.enum), nullable=False)
+    geometry_type = db.Column(saext.Enum(*GEOM_TYPE.enum), nullable=False)
 
     __field_class__ = VectorLayerField
 

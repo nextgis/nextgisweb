@@ -6,7 +6,7 @@ from sqlalchemy.ext.orderinglist import ordering_list
 from sqlalchemy.orm import declared_attr
 
 from nextgisweb.env import Base, gettext, gettextf
-from nextgisweb.lib import db
+from nextgisweb.lib import db, saext
 from nextgisweb.lib.geometry import Transformer
 
 from nextgisweb.core.exception import ValidationError
@@ -33,7 +33,7 @@ class LayerField(Base):
 
     idx = db.Column(db.Integer, nullable=False)
     keyname = db.Column(db.Unicode, nullable=False)
-    datatype = db.Column(db.Enum(*FIELD_TYPE.enum), nullable=False)
+    datatype = db.Column(saext.Enum(*FIELD_TYPE.enum), nullable=False)
     display_name = db.Column(db.Unicode, nullable=False)
     grid_visibility = db.Column(db.Boolean, nullable=False, default=True)
     text_search = db.Column(db.Boolean, nullable=False, default=True)

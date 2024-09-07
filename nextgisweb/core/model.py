@@ -1,74 +1,77 @@
+import sqlalchemy as sa
+import sqlalchemy.dialects.postgresql as sa_postgresql
+import sqlalchemy.event as sa_event
+
 from nextgisweb.env import Base
-from nextgisweb.lib import db
 
 
 class CState(Base):
     __tablename__ = "core_cstate"
 
-    component = db.Column(db.Unicode, primary_key=True)
-    heads = db.Column(db.Unicode, nullable=False)
+    component = sa.Column(sa.Unicode, primary_key=True)
+    heads = sa.Column(sa.Unicode, nullable=False)
 
 
 class Migration(Base):
     __tablename__ = "core_migration"
 
-    component = db.Column(db.Unicode, primary_key=True)
-    revision = db.Column(db.Unicode, primary_key=True)
+    component = sa.Column(sa.Unicode, primary_key=True)
+    revision = sa.Column(sa.Unicode, primary_key=True)
 
 
 class Setting(Base):
     __tablename__ = "setting"
 
-    component = db.Column(db.Unicode, primary_key=True)
-    name = db.Column(db.Unicode, primary_key=True)
-    value = db.Column(db.JSONB, nullable=False)
+    component = sa.Column(sa.Unicode, primary_key=True)
+    name = sa.Column(sa.Unicode, primary_key=True)
+    value = sa.Column(sa_postgresql.JSONB, nullable=False)
 
 
-storage_stat_dimension = db.Table(
+storage_stat_dimension = sa.Table(
     "core_storage_stat_dimension",
     Base.metadata,
-    db.Column("tstamp", db.TIMESTAMP, nullable=False),
-    db.Column("component", db.Unicode, nullable=False),
-    db.Column("kind_of_data", db.Unicode, nullable=False),
-    db.Column("resource_id", db.Integer, index=True),
-    db.Column("value_data_volume", db.BigInteger),
+    sa.Column("tstamp", sa.TIMESTAMP, nullable=False),
+    sa.Column("component", sa.Unicode, nullable=False),
+    sa.Column("kind_of_data", sa.Unicode, nullable=False),
+    sa.Column("resource_id", sa.Integer, index=True),
+    sa.Column("value_data_volume", sa.BigInteger),
 )
 
 
-storage_stat_dimension_total = db.Table(
+storage_stat_dimension_total = sa.Table(
     "core_storage_stat_dimension_total",
     Base.metadata,
-    db.Column("tstamp", db.TIMESTAMP, nullable=False),
-    db.Column("kind_of_data", db.Unicode, primary_key=True),
-    db.Column("value_data_volume", db.BigInteger),
+    sa.Column("tstamp", sa.TIMESTAMP, nullable=False),
+    sa.Column("kind_of_data", sa.Unicode, primary_key=True),
+    sa.Column("value_data_volume", sa.BigInteger),
 )
 
 
-storage_stat_delta = db.Table(
+storage_stat_delta = sa.Table(
     "core_storage_stat_delta",
     Base.metadata,
-    db.Column("tstamp", db.TIMESTAMP, nullable=False),
-    db.Column("component", db.Unicode, nullable=False),
-    db.Column("kind_of_data", db.Unicode, nullable=False),
-    db.Column("resource_id", db.Integer, index=True),
-    db.Column("value_data_volume", db.BigInteger),
+    sa.Column("tstamp", sa.TIMESTAMP, nullable=False),
+    sa.Column("component", sa.Unicode, nullable=False),
+    sa.Column("kind_of_data", sa.Unicode, nullable=False),
+    sa.Column("resource_id", sa.Integer, index=True),
+    sa.Column("value_data_volume", sa.BigInteger),
 )
 
 
-storage_stat_delta_total = db.Table(
+storage_stat_delta_total = sa.Table(
     "core_storage_stat_delta_total",
     Base.metadata,
-    db.Column("tstamp", db.TIMESTAMP, nullable=False),
-    db.Column("kind_of_data", db.Unicode, primary_key=True),
-    db.Column("value_data_volume", db.BigInteger),
+    sa.Column("tstamp", sa.TIMESTAMP, nullable=False),
+    sa.Column("kind_of_data", sa.Unicode, primary_key=True),
+    sa.Column("value_data_volume", sa.BigInteger),
 )
 
 
-db.event.listen(
+sa_event.listen(
     storage_stat_delta,
     "after_create",
     # fmt: off
-    db.DDL("""
+    sa.DDL("""
         CREATE FUNCTION core_storage_stat_delta_after_insert() RETURNS trigger
         LANGUAGE 'plpgsql' AS $BODY$
         BEGIN
@@ -104,9 +107,9 @@ db.event.listen(
 )
 
 
-db.event.listen(
+sa_event.listen(
     storage_stat_delta,
     "after_drop",
-    db.DDL("DROP FUNCTION core_storage_stat_delta_after_insert();"),
+    sa.DDL("DROP FUNCTION core_storage_stat_delta_after_insert();"),
     propagate=True,
 )

@@ -7,13 +7,14 @@ from urllib.parse import parse_qsl, quote, urlencode, urlparse, urlunparse
 
 import PIL
 import requests
+import sqlalchemy.dialects.postgresql as sa_postgresql
 from owslib.wms import WebMapService
 from requests.exceptions import RequestException
 from typing_extensions import Annotated
 from zope.interface import implementer
 
 from nextgisweb.env import Base, env, gettext
-from nextgisweb.lib import db
+from nextgisweb.lib import db, saext
 
 from nextgisweb.core.exception import ExternalServiceError, ValidationError
 from nextgisweb.jsrealm import TSExport
@@ -50,7 +51,7 @@ class Connection(Base, Resource):
     __scope__ = ConnectionScope
 
     url = db.Column(db.Unicode, nullable=False)
-    version = db.Column(db.Enum(*WMS_VERSIONS), nullable=False)
+    version = db.Column(saext.Enum(*WMS_VERSIONS), nullable=False)
     username = db.Column(db.Unicode)
     password = db.Column(db.Unicode)
 
@@ -226,7 +227,7 @@ class Layer(Base, Resource, SpatialLayerMixin):
     connection_id = db.Column(db.ForeignKey(Resource.id), nullable=False)
     wmslayers = db.Column(db.Unicode, nullable=False)
     imgformat = db.Column(db.Unicode, nullable=False)
-    vendor_params = db.Column(db.JSONB, nullable=False, default=dict)
+    vendor_params = db.Column(sa_postgresql.JSONB, nullable=False, default=dict)
 
     connection = db.relationship(
         Resource,

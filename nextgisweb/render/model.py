@@ -17,7 +17,7 @@ from sqlalchemy import MetaData, Table
 from zope.sqlalchemy import mark_changed
 
 from nextgisweb.env import Base, DBSession, env
-from nextgisweb.lib import db
+from nextgisweb.lib import db, saext
 from nextgisweb.lib.logging import logger
 
 from nextgisweb.resource import CRUTypes, Resource, ResourceScope, SAttribute, Serializer
@@ -282,7 +282,7 @@ class ResourceTileCache(Base):
     EXPRIRES_MAX = 2147483647
 
     resource_id = db.Column(db.ForeignKey(Resource.id), primary_key=True)
-    uuid = db.Column(db.UUID, nullable=False)
+    uuid = db.Column(saext.UUID, nullable=False)
     enabled = db.Column(db.Boolean, nullable=False, default=False)
     image_compose = db.Column(db.Boolean, nullable=False, default=False)
     max_z = db.Column(db.SmallInteger)

@@ -14,7 +14,7 @@ from sqlalchemy.exc import NoSuchTableError, OperationalError, SQLAlchemyError
 from zope.interface import implementer
 
 from nextgisweb.env import Base, env, gettext
-from nextgisweb.lib import db
+from nextgisweb.lib import db, saext
 from nextgisweb.lib.geometry import Geometry
 from nextgisweb.lib.logging import logger
 
@@ -240,7 +240,7 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     table = db.Column(db.Unicode, nullable=False)
     column_id = db.Column(db.Unicode, nullable=False)
     column_geom = db.Column(db.Unicode, nullable=False)
-    geometry_type = db.Column(db.Enum(*GEOM_TYPE.enum), nullable=False)
+    geometry_type = db.Column(saext.Enum(*GEOM_TYPE.enum), nullable=False)
     geometry_srid = db.Column(db.Integer, nullable=False)
 
     __field_class__ = PostgisLayerField

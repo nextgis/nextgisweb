@@ -2,8 +2,10 @@ from sqlalchemy import exists, sql, text
 
 from nextgisweb.env import DBSession, env
 
+from .enum import Enum
 from .geometry import Geometry
 from .msgspec import Msgspec
+from .uuid import UUID
 
 
 def query_unreferenced(Model, column):

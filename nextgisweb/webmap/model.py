@@ -2,6 +2,7 @@ from enum import Enum
 from typing import List, Literal, Union
 
 import geoalchemy2 as ga
+import sqlalchemy.dialects.postgresql as sa_postgresql
 from msgspec import Struct
 from msgspec.structs import asdict as struct_asdict
 from sqlalchemy import event, text
@@ -10,7 +11,7 @@ from sqlalchemy.orm import validates
 from sqlalchemy.orm.attributes import set_committed_value
 
 from nextgisweb.env import COMP_ID, Base, DBSession, gettext, pgettext
-from nextgisweb.lib import db
+from nextgisweb.lib import db, saext
 
 from nextgisweb.auth import User
 from nextgisweb.resource import Permission as P
@@ -78,9 +79,9 @@ class WebMap(Base, Resource):
 
     annotation_enabled = db.Column(db.Boolean, nullable=False, default=False)
     annotation_default = db.Column(
-        db.Enum(*ANNOTATIONS_DEFAULT_VALUES), nullable=False, default="no"
+        saext.Enum(*ANNOTATIONS_DEFAULT_VALUES), nullable=False, default="no"
     )
-    legend_symbols = db.Column(db.Enum(LegendSymbolsEnum), nullable=True)
+    legend_symbols = db.Column(saext.Enum(LegendSymbolsEnum), nullable=True)
     measure_srs_id = db.Column(db.ForeignKey(SRS.id, ondelete="SET NULL"), nullable=True)
 
     root_item = db.relationship("WebMapItem", cascade="all")
@@ -148,7 +149,7 @@ class WebMapItem(Base):
 
     id = db.Column(db.Integer, primary_key=True)
     parent_id = db.Column(db.Integer, db.ForeignKey("webmap_item.id"))
-    item_type = db.Column(db.Enum("root", "group", "layer"), nullable=False)
+    item_type = db.Column(saext.Enum("root", "group", "layer"), nullable=False)
     position = db.Column(db.Integer, nullable=True)
     display_name = db.Column(db.Unicode, nullable=True)
     group_expanded = db.Column(db.Boolean, nullable=True, default=_item_default("group", False))
@@ -159,9 +160,9 @@ class WebMapItem(Base):
     layer_transparency = db.Column(db.Float, nullable=True)
     layer_min_scale_denom = db.Column(db.Float, nullable=True)
     layer_max_scale_denom = db.Column(db.Float, nullable=True)
-    layer_adapter = db.Column(db.Enum(*WebMapAdapter.registry.keys()), nullable=True)
+    layer_adapter = db.Column(saext.Enum(*WebMapAdapter.registry.keys()), nullable=True)
     draw_order_position = db.Column(db.Integer, nullable=True)
-    legend_symbols = db.Column(db.Enum(LegendSymbolsEnum), nullable=True)
+    legend_symbols = db.Column(saext.Enum(LegendSymbolsEnum), nullable=True)
 
     parent = db.relationship(
         "WebMapItem",
@@ -276,7 +277,7 @@ class WebMapAnnotation(Base):
     id = db.Column(db.Integer, primary_key=True)
     webmap_id = db.Column(db.ForeignKey(WebMap.id), nullable=False)
     description = db.Column(db.Unicode)
-    style = db.Column(db.JSONB)
+    style = db.Column(sa_postgresql.JSONB)
     geom = db.Column(ga.Geometry(dimension=2, srid=3857), nullable=False)
     public = db.Column(db.Boolean, nullable=False, default=True)
     user_id = db.Column(db.ForeignKey(User.id), nullable=True)
