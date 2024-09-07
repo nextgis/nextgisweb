@@ -1,5 +1,5 @@
 import sqlalchemy as sa
-import sqlalchemy.dialects.postgresql as sa_postgresql
+import sqlalchemy.dialects.postgresql as sa_pg
 import sqlalchemy.event as sa_event
 
 from nextgisweb.env import Base
@@ -24,7 +24,7 @@ class Setting(Base):
 
     component = sa.Column(sa.Unicode, primary_key=True)
     name = sa.Column(sa.Unicode, primary_key=True)
-    value = sa.Column(sa_postgresql.JSONB, nullable=False)
+    value = sa.Column(sa_pg.JSONB, nullable=False)
 
 
 storage_stat_dimension = sa.Table(

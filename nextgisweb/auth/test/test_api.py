@@ -3,11 +3,11 @@ from itertools import product
 from urllib.parse import parse_qs, urlparse
 
 import pytest
+import sqlalchemy as sa
 import transaction
 from freezegun import freeze_time
 
 from nextgisweb.env import DBSession
-from nextgisweb.lib import db
 
 from nextgisweb.auth import Group, User
 
@@ -205,10 +205,10 @@ def disable_users():
 
     with transaction.manager:
         for user in User.filter(
-            db.and_(
+            sa.and_(
                 User.keyname != "administrator",
-                db.not_(User.disabled),
-                db.not_(User.system),
+                sa.not_(User.disabled),
+                sa.not_(User.system),
             )
         ).all():
             user.disabled = True

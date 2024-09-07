@@ -1,5 +1,5 @@
 import sqlalchemy as sa
-import sqlalchemy.dialects.postgresql as sa_postgresql
+import sqlalchemy.dialects.postgresql as sa_pg
 import sqlalchemy.orm as orm
 
 from nextgisweb.env import Base
@@ -18,7 +18,7 @@ class SessionStore(Base):
 
     session_id = sa.Column(sa.ForeignKey(Session.id, ondelete="cascade"), primary_key=True)
     key = sa.Column(sa.Unicode, primary_key=True)
-    value = sa.Column(sa_postgresql.JSONB, nullable=False)
+    value = sa.Column(sa_pg.JSONB, nullable=False)
 
     session = orm.relationship(
         Session,

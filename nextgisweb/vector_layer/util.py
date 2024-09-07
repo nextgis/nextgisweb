@@ -1,7 +1,8 @@
 from uuid import uuid4
 
+import sqlalchemy as sa
+
 from nextgisweb.env import COMP_ID
-from nextgisweb.lib import db
 from nextgisweb.lib.ogrhelper import read_dataset
 
 from nextgisweb.feature_layer import FIELD_TYPE, FIELD_TYPE_OGR, GEOM_TYPE
@@ -22,7 +23,7 @@ class DRIVERS:
 
 
 FIELD_TYPE_2_ENUM = dict(zip(FIELD_TYPE_OGR, FIELD_TYPE.enum))
-FIELD_TYPE_DB = (db.Integer, db.BigInteger, db.Float, db.Unicode, db.Date, db.Time, db.DateTime)
+FIELD_TYPE_DB = (sa.Integer, sa.BigInteger, sa.Float, sa.Unicode, sa.Date, sa.Time, sa.DateTime)
 FIELD_TYPE_2_DB = dict(zip(FIELD_TYPE.enum, FIELD_TYPE_DB))
 FIELD_TYPE_SIZE = {
     FIELD_TYPE.INTEGER: 4,

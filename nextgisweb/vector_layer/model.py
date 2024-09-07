@@ -4,15 +4,17 @@ from itertools import chain
 from pathlib import Path
 from typing import Any, Dict, List, Literal, Union
 
+import sqlalchemy as sa
+import sqlalchemy.event as sa_event
+import sqlalchemy.orm as orm
 from msgspec import UNSET
 from osgeo import gdal, ogr
-from sqlalchemy import event, inspect, select, text
-from sqlalchemy.orm import validates
+from sqlalchemy import inspect, select, text
 from zope.interface import implementer
 from zope.sqlalchemy import mark_changed
 
 from nextgisweb.env import COMP_ID, Base, DBSession, env, gettext
-from nextgisweb.lib import db, saext
+from nextgisweb.lib import saext
 
 from nextgisweb.core.exception import ValidationError as VE
 from nextgisweb.feature_layer import (
@@ -87,8 +89,8 @@ class VectorLayerField(Base, LayerField):
     __tablename__ = LayerField.__tablename__ + "_" + identity
     __mapper_args__ = dict(polymorphic_identity=identity)
 
-    id = db.Column(db.ForeignKey(LayerField.id), primary_key=True)
-    fld_uuid = db.Column(db.Unicode(32), nullable=False)
+    id = sa.Column(sa.ForeignKey(LayerField.id), primary_key=True)
+    fld_uuid = sa.Column(sa.Unicode(32), nullable=False)
 
     def __init__(self, *args, **kwagrs):
         if "fld_uuid" not in kwagrs:
@@ -131,8 +133,8 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin, FVersioni
 
     __scope__ = DataScope
 
-    tbl_uuid = db.Column(db.Unicode(32), nullable=False)
-    geometry_type = db.Column(saext.Enum(*GEOM_TYPE.enum), nullable=False)
+    tbl_uuid = sa.Column(sa.Unicode(32), nullable=False)
+    geometry_type = sa.Column(saext.Enum(*GEOM_TYPE.enum), nullable=False)
 
     __field_class__ = VectorLayerField
 
@@ -542,7 +544,7 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin, FVersioni
         self.fields[:] = []
         self.tbl_uuid = uuid_hex()
 
-    @validates("tbl_uuid")
+    @orm.validates("tbl_uuid")
     def _tbl_uuid_validate(self, key, value):
         assert self.tbl_uuid is None or self.fields == []
         return value
@@ -553,18 +555,18 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin, FVersioni
 
 
 # Create vector_layer schema on table creation
-event.listen(
+sa_event.listen(
     VectorLayer.__table__,
     "after_create",
-    db.DDL(f"CREATE SCHEMA {SCHEMA}"),
+    sa.DDL(f"CREATE SCHEMA {SCHEMA}"),
     propagate=True,
 )
 
 # Drop vector_layer schema on table creation
-event.listen(
+sa_event.listen(
     VectorLayer.__table__,
     "after_drop",
-    db.DDL(f"DROP SCHEMA IF EXISTS {SCHEMA} CASCADE"),
+    sa.DDL(f"DROP SCHEMA IF EXISTS {SCHEMA} CASCADE"),
     propagate=True,
 )
 
@@ -572,7 +574,7 @@ event.listen(
 class VectorLayerSession:
     @classmethod
     def listen(cls, session):
-        event.listen(session, "before_flush", cls.before_flush)
+        sa_event.listen(session, "before_flush", cls.before_flush)
 
     @classmethod
     def before_flush(cls, session, flush_context, instances):

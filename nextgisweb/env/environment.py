@@ -7,6 +7,7 @@ from types import MappingProxyType
 from typing import Mapping
 
 import sqlalchemy as sa
+import sqlalchemy.event as sa_event
 
 from nextgisweb.lib.config import ConfigOptions, Option, OptionAnnotations, load_config
 from nextgisweb.lib.dinject import Container
@@ -171,7 +172,7 @@ class Env(Container):
                 for key, tab in comp.metadata.tables.items():
                     ctab = tab.to_metadata(metadata)
                     ctab._component_identity = comp.identity
-                    sa.event.listen(
+                    sa_event.listen(
                         ctab,
                         "after_create",
                         # After table creation write component's name

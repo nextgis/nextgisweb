@@ -3,6 +3,7 @@ from threading import Thread
 from typing import ClassVar, Mapping, Type
 
 import sqlalchemy as sa
+import sqlalchemy.event as sa_event
 import transaction
 from zope.sqlalchemy import mark_changed
 
@@ -35,8 +36,8 @@ class StorageComponentMixin:
 
         # Do flush reservations to the database as soon as possible. But
         # sometimes there's no flush event (for clean sessions).
-        sa.event.listen(DBSession, "after_flush", self._flush_reservations)
-        sa.event.listen(DBSession, "before_commit", self._flush_reservations)
+        sa_event.listen(DBSession, "after_flush", self._flush_reservations)
+        sa_event.listen(DBSession, "before_commit", self._flush_reservations)
 
     def check_storage_limit(self, requested=0):
         if (

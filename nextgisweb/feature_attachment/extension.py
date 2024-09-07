@@ -1,6 +1,6 @@
 from typing import Any
 
-from sqlalchemy.inspection import inspect
+import sqlalchemy as sa
 
 from nextgisweb.feature_layer import FeatureExtension
 
@@ -14,7 +14,7 @@ class FeatureAttachmentExtension(FeatureExtension):
     display_widget = "ngw-feature-attachment/DisplayWidget"
 
     def serialize(self, feature, *, version=None) -> Any:
-        session = inspect(self.layer).session
+        session = sa.inspect(self.layer).session
         filter_by = dict(resource_id=self.layer.id, feature_id=feature.id)
         if version is None:
             query = Attachment.filter_by(**filter_by)

@@ -2,6 +2,8 @@ from pathlib import Path
 from typing import List, Union
 
 import geoalchemy2 as ga
+import sqlalchemy as sa
+import sqlalchemy.orm as orm
 from msgspec import UNSET, Struct, UnsetType
 from osgeo import gdal
 from sqlalchemy import func
@@ -9,7 +11,6 @@ from sqlalchemy.ext.orderinglist import ordering_list
 from zope.interface import implementer
 
 from nextgisweb.env import COMP_ID, Base, DBSession, env, gettext
-from nextgisweb.lib import db
 from nextgisweb.lib.geometry import Geometry
 from nextgisweb.lib.osrhelper import sr_from_wkt
 
@@ -74,13 +75,13 @@ class RasterMosaic(Base, Resource, SpatialLayerMixin):
 
     @property
     def extent(self):
-        footprint = db.func.st_extent(RasterMosaicItem.footprint)
+        footprint = sa.func.st_extent(RasterMosaicItem.footprint)
         extent = (
             DBSession.query(
-                db.func.st_xmin(footprint).label("minLon"),
-                db.func.st_xmax(footprint).label("maxLon"),
-                db.func.st_ymin(footprint).label("minLat"),
-                db.func.st_ymax(footprint).label("maxLat"),
+                sa.func.st_xmin(footprint).label("minLon"),
+                sa.func.st_xmax(footprint).label("maxLon"),
+                sa.func.st_ymin(footprint).label("minLat"),
+                sa.func.st_ymax(footprint).label("maxLat"),
             )
             .filter(RasterMosaicItem.resource_id == self.id)
             .one()
@@ -95,17 +96,17 @@ class RasterMosaic(Base, Resource, SpatialLayerMixin):
 class RasterMosaicItem(Base):
     __tablename__ = "%s_item" % COMP_ID
 
-    id = db.Column(db.Integer, primary_key=True)
-    resource_id = db.Column(db.ForeignKey(RasterMosaic.id), nullable=False)
-    display_name = db.Column(db.Unicode, nullable=True)
-    fileobj_id = db.Column(db.ForeignKey(FileObj.id), nullable=True)
-    footprint = db.Column(ga.Geometry("POLYGON", srid=4326), nullable=True)
-    position = db.Column(db.Integer, nullable=True)
+    id = sa.Column(sa.Integer, primary_key=True)
+    resource_id = sa.Column(sa.ForeignKey(RasterMosaic.id), nullable=False)
+    display_name = sa.Column(sa.Unicode, nullable=True)
+    fileobj_id = sa.Column(sa.ForeignKey(FileObj.id), nullable=True)
+    footprint = sa.Column(ga.Geometry("POLYGON", srid=4326), nullable=True)
+    position = sa.Column(sa.Integer, nullable=True)
 
-    fileobj = db.relationship(FileObj, lazy="joined")
-    resource = db.relationship(
+    fileobj = orm.relationship(FileObj, lazy="joined")
+    resource = orm.relationship(
         RasterMosaic,
-        backref=db.backref(
+        backref=orm.backref(
             "items",
             cascade="all, delete-orphan",
             order_by=position,

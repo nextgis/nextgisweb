@@ -1,9 +1,9 @@
 import re
 
+import sqlalchemy as sa
 from sqlalchemy.orm.exc import NoResultFound
 
 from nextgisweb.env import Component, DBSession, gettext, require
-from nextgisweb.lib import db
 from nextgisweb.lib.config import Option
 from nextgisweb.lib.logging import logger
 
@@ -52,7 +52,7 @@ class ResourceComponent(Component):
 
             # Quota per resource class checking
             if cls in self.quota_resource_by_cls:
-                query = DBSession.query(db.func.count(Resource.id)).filter(Resource.cls == cls)
+                query = DBSession.query(sa.func.count(Resource.id)).filter(Resource.cls == cls)
 
                 with DBSession.no_autoflush:
                     count = query.scalar()
@@ -68,7 +68,7 @@ class ResourceComponent(Component):
 
         # Total quota checking
         if self.quota_limit is not None:
-            query = DBSession.query(db.func.count(Resource.id))
+            query = DBSession.query(sa.func.count(Resource.id))
             if self.quota_resource_cls is not None:
                 query = query.filter(Resource.cls.in_(self.quota_resource_cls))
 
@@ -125,7 +125,7 @@ class ResourceComponent(Component):
         return result
 
     def query_stat(self):
-        query = DBSession.query(Resource.cls, db.func.count(Resource.id)).group_by(Resource.cls)
+        query = DBSession.query(Resource.cls, sa.func.count(Resource.id)).group_by(Resource.cls)
 
         total = 0
         by_cls = dict()
@@ -133,7 +133,7 @@ class ResourceComponent(Component):
             by_cls[cls] = count
             total += count
 
-        query = DBSession.query(db.func.max(Resource.creation_date))
+        query = DBSession.query(sa.func.max(Resource.creation_date))
         cdate = query.scalar()
 
         return dict(resource_count=dict(total=total, cls=by_cls), last_creation_date=cdate)

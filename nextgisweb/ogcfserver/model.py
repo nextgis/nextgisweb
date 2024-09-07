@@ -1,10 +1,11 @@
 from typing import List, Union
 
+import sqlalchemy as sa
+import sqlalchemy.orm as orm
 from msgspec import Meta, Struct
 from typing_extensions import Annotated
 
 from nextgisweb.env import Base, gettext
-from nextgisweb.lib import db
 
 from nextgisweb.resource import Resource, ResourceGroup, SAttribute, Serializer, ServiceScope
 
@@ -25,24 +26,24 @@ class Service(Base, Resource):
 class Collection(Base):
     __tablename__ = "ogcfserver_collection"
 
-    service_id = db.Column(db.ForeignKey("ogcfserver_service.id"), primary_key=True)
-    resource_id = db.Column(db.ForeignKey(Resource.id), primary_key=True)
-    keyname = db.Column(db.Unicode, nullable=False)
-    display_name = db.Column(db.Unicode, nullable=False)
-    maxfeatures = db.Column(db.Integer, nullable=True)
+    service_id = sa.Column(sa.ForeignKey("ogcfserver_service.id"), primary_key=True)
+    resource_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
+    keyname = sa.Column(sa.Unicode, nullable=False)
+    display_name = sa.Column(sa.Unicode, nullable=False)
+    maxfeatures = sa.Column(sa.Integer, nullable=True)
 
-    __table_args__ = (db.UniqueConstraint(service_id, keyname),)
+    __table_args__ = (sa.UniqueConstraint(service_id, keyname),)
 
-    service = db.relationship(
+    service = orm.relationship(
         Service,
         foreign_keys=service_id,
-        backref=db.backref("collections", cascade="all, delete-orphan"),
+        backref=orm.backref("collections", cascade="all, delete-orphan"),
     )
 
-    resource = db.relationship(
+    resource = orm.relationship(
         Resource,
         foreign_keys=resource_id,
-        backref=db.backref("_ogcfserver_collections", cascade="all"),
+        backref=orm.backref("_ogcfserver_collections", cascade="all"),
     )
 
 

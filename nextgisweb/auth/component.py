@@ -1,13 +1,13 @@
 from datetime import datetime, timedelta
 from urllib.parse import urlencode, urlparse
 
+import sqlalchemy as sa
 import transaction
 from pyramid.httpexceptions import HTTPForbidden
 from sqlalchemy.orm import defer, undefer
 from sqlalchemy.orm.exc import NoResultFound
 
 from nextgisweb.env import Component, DBSession, gettext, inject
-from nextgisweb.lib import db
 from nextgisweb.lib.config import Option, OptionAnnotations
 from nextgisweb.lib.logging import logger
 
@@ -162,10 +162,10 @@ class AuthComponent(Component):
         )
 
     def query_stat(self):
-        def ucnt(*fc, agg=db.func.count):
+        def ucnt(*fc, agg=sa.func.count):
             return DBSession.query(agg(User.id)).filter(~User.system, ~User.disabled, *fc).scalar()
 
-        def ula(*fc, agg=db.func.max):
+        def ula(*fc, agg=sa.func.max):
             return DBSession.query(agg(User.last_activity)).filter(*fc).scalar()
 
         return dict(
@@ -247,8 +247,8 @@ class AuthComponent(Component):
     def check_user_limit(self, exclude_id=None):
         user_limit = self.options["user_limit"]
         if user_limit is not None:
-            query = DBSession.query(db.func.count(User.id)).filter(
-                db.and_(db.not_(User.system), db.not_(User.disabled))
+            query = DBSession.query(sa.func.count(User.id)).filter(
+                sa.and_(sa.not_(User.system), sa.not_(User.disabled))
             )
             if exclude_id is not None:
                 query = query.filter(User.id != exclude_id)

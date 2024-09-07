@@ -5,6 +5,7 @@ from datetime import datetime
 from typing import Any, List, Literal, Optional, TypeVar, Union
 
 import sqlalchemy as sa
+import sqlalchemy.event as sa_event
 import sqlalchemy.orm as orm
 from msgspec import UNSET, Meta, Struct, UnsetType
 from msgspec.inspect import StructType, type_info
@@ -132,7 +133,7 @@ class FVersioningMeta(Base):
 
 # Sequence for versioning epoch, piggyback on LayerField's table
 VERSIONING_EPOCH_SEQ = "feature_layer_vmeta_epoch_seq"
-sa.event.listen(
+sa_event.listen(
     FVersioningMeta.__table__,
     "after_create",
     sa.DDL(f"CREATE SEQUENCE {VERSIONING_EPOCH_SEQ}"),

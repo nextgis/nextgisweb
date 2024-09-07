@@ -4,9 +4,9 @@ from itertools import chain
 from typing import Callable, ClassVar, FrozenSet, Iterable, Mapping, Union, overload
 
 import sqlalchemy as sa
+import sqlalchemy.dialects.postgresql as sa_pg
 import sqlalchemy.orm as orm
 from passlib.hash import sha256_crypt
-from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 from zope.event import notify
 from zope.event.classhandler import handler
 
@@ -36,7 +36,11 @@ class Principal(Base):
     system = sa.Column(sa.Boolean, nullable=False, default=False)
     display_name = sa.Column(sa.Unicode, nullable=False)
     description = sa.Column(sa.Unicode)
-    permissions = sa.Column(ARRAY(sa.Unicode, as_tuple=True), nullable=False, default=tuple())
+    permissions = sa.Column(
+        sa_pg.ARRAY(sa.Unicode, as_tuple=True),
+        nullable=False,
+        default=tuple(),
+    )
 
     system_display_name: ClassVar[Mapping[str, TrStr]]
 
@@ -250,7 +254,7 @@ class OAuthAToken(Base):
     id = sa.Column(sa.Unicode, primary_key=True)
     exp = sa.Column(sa.BigInteger, nullable=False)
     sub = sa.Column(sa.Unicode, nullable=False)
-    data = sa.Column(JSONB, nullable=False)
+    data = sa.Column(sa_pg.JSONB, nullable=False)
 
 
 class OAuthPToken(Base):

@@ -1,5 +1,7 @@
 from typing import TYPE_CHECKING, Any, Dict, List, Literal, Mapping, Union, cast, get_args
 
+import sqlalchemy as sa
+import sqlalchemy.orm as orm
 import zope.event
 from msgspec import UNSET, Meta, Struct, UnsetType, defstruct
 from sqlalchemy.sql import exists
@@ -7,7 +9,6 @@ from sqlalchemy.sql.operators import ilike_op
 from typing_extensions import Annotated
 
 from nextgisweb.env import DBSession, gettext
-from nextgisweb.lib import db
 from nextgisweb.lib.apitype import AnyOf, EmptyObject, StatusCode, annotate
 
 from nextgisweb.auth import User
@@ -170,7 +171,7 @@ def collection_get(
         Resource.query()
         .filter_by(parent_id=parent)
         .order_by(Resource.display_name)
-        .options(db.subqueryload(Resource.acl))
+        .options(orm.subqueryload(Resource.acl))
     )
 
     serializer = CompositeSerializer(user=request.user)
@@ -426,7 +427,7 @@ def search(
         else:
             raise ValidationError("Operator '%s' is not supported" % op)
     if len(filter_) > 0:
-        query = query.filter(db.and_(*filter_))
+        query = query.filter(sa.and_(*filter_))
 
     query = query.order_by(Resource.display_name)
 

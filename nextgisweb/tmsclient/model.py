@@ -2,13 +2,15 @@ import re
 from io import BytesIO
 from typing import Literal, Union
 
+import sqlalchemy as sa
+import sqlalchemy.orm as orm
 from msgspec import UNSET
 from osgeo import ogr, osr
 from PIL import Image
 from zope.interface import implementer
 
 from nextgisweb.env import Base, env, gettext
-from nextgisweb.lib import db, saext
+from nextgisweb.lib import saext
 from nextgisweb.lib.osrhelper import sr_from_epsg
 
 from nextgisweb.core.exception import ExternalServiceError, ValidationError
@@ -46,14 +48,14 @@ class Connection(Base, Resource):
 
     __scope__ = ConnectionScope
 
-    capmode = db.Column(saext.Enum(NEXTGIS_GEOSERVICES))
-    url_template = db.Column(db.Unicode, nullable=False)
-    apikey = db.Column(db.Unicode)
-    apikey_param = db.Column(db.Unicode)
-    username = db.Column(db.Unicode)
-    password = db.Column(db.Unicode)
-    scheme = db.Column(saext.Enum(*SCHEME.enum), nullable=False, default=SCHEME.XYZ)
-    insecure = db.Column(db.Boolean, nullable=False, default=False)
+    capmode = sa.Column(saext.Enum(NEXTGIS_GEOSERVICES))
+    url_template = sa.Column(sa.Unicode, nullable=False)
+    apikey = sa.Column(sa.Unicode)
+    apikey_param = sa.Column(sa.Unicode)
+    username = sa.Column(sa.Unicode)
+    password = sa.Column(sa.Unicode)
+    scheme = sa.Column(saext.Enum(*SCHEME.enum), nullable=False, default=SCHEME.XYZ)
+    insecure = sa.Column(sa.Boolean, nullable=False, default=False)
 
     @classmethod
     def check_parent(cls, parent):
@@ -156,17 +158,17 @@ class Layer(Base, Resource, SpatialLayerMixin):
 
     __scope__ = DataScope
 
-    connection_id = db.Column(db.ForeignKey(Connection.id), nullable=False)
-    layer_name = db.Column(db.Unicode)
-    tilesize = db.Column(db.Integer, nullable=False, default=256)
-    minzoom = db.Column(db.Integer, nullable=False, default=0)
-    maxzoom = db.Column(db.Integer, nullable=False, default=14)
-    extent_left = db.Column(db.Float, default=-180.0)
-    extent_right = db.Column(db.Float, default=+180.0)
-    extent_bottom = db.Column(db.Float, default=-90.0)
-    extent_top = db.Column(db.Float, default=+90.0)
+    connection_id = sa.Column(sa.ForeignKey(Connection.id), nullable=False)
+    layer_name = sa.Column(sa.Unicode)
+    tilesize = sa.Column(sa.Integer, nullable=False, default=256)
+    minzoom = sa.Column(sa.Integer, nullable=False, default=0)
+    maxzoom = sa.Column(sa.Integer, nullable=False, default=14)
+    extent_left = sa.Column(sa.Float, default=-180.0)
+    extent_right = sa.Column(sa.Float, default=+180.0)
+    extent_bottom = sa.Column(sa.Float, default=-90.0)
+    extent_top = sa.Column(sa.Float, default=+90.0)
 
-    connection = db.relationship(
+    connection = orm.relationship(
         Connection,
         foreign_keys=connection_id,
         cascade="save-update, merge",

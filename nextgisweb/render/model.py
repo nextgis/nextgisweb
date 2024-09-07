@@ -11,13 +11,16 @@ from time import time
 from typing import Any, Union
 from uuid import uuid4
 
+import sqlalchemy as sa
+import sqlalchemy.event as sa_event
+import sqlalchemy.orm as orm
 import transaction
 from PIL import Image
 from sqlalchemy import MetaData, Table
 from zope.sqlalchemy import mark_changed
 
 from nextgisweb.env import Base, DBSession, env
-from nextgisweb.lib import db, saext
+from nextgisweb.lib import saext
 from nextgisweb.lib.logging import logger
 
 from nextgisweb.resource import CRUTypes, Resource, ResourceScope, SAttribute, Serializer
@@ -236,7 +239,7 @@ class TilestorWriter:
 
     def _write_tile_meta(self, conn, table_uuid, row):
         # fmt: off
-        conn.execute(db.sql.text("""
+        conn.execute(sa.sql.text("""
             INSERT INTO tile_cache."{0}" AS tc (z, x, y, color, tstamp)
             VALUES (:z, :x, :y, :color, :tstamp)
             ON CONFLICT (z, x, y) DO UPDATE
@@ -281,18 +284,18 @@ class ResourceTileCache(Base):
 
     EXPRIRES_MAX = 2147483647
 
-    resource_id = db.Column(db.ForeignKey(Resource.id), primary_key=True)
-    uuid = db.Column(saext.UUID, nullable=False)
-    enabled = db.Column(db.Boolean, nullable=False, default=False)
-    image_compose = db.Column(db.Boolean, nullable=False, default=False)
-    max_z = db.Column(db.SmallInteger)
-    ttl = db.Column(db.Integer)
+    resource_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
+    uuid = sa.Column(saext.UUID, nullable=False)
+    enabled = sa.Column(sa.Boolean, nullable=False, default=False)
+    image_compose = sa.Column(sa.Boolean, nullable=False, default=False)
+    max_z = sa.Column(sa.SmallInteger)
+    ttl = sa.Column(sa.Integer)
 
     async_writing = False
 
-    resource = db.relationship(
+    resource = orm.relationship(
         Resource,
-        backref=db.backref(
+        backref=orm.backref(
             "tile_cache",
             uselist=False,
             cascade="all, delete-orphan",
@@ -306,7 +309,7 @@ class ResourceTileCache(Base):
         self.reconstructor()
         super().__init__(*args, **kwagrs)
 
-    @db.reconstructor
+    @orm.reconstructor
     def reconstructor(self):
         self._sameta = None
         self._tiletab = None
@@ -317,13 +320,13 @@ class ResourceTileCache(Base):
         self._tiletab = Table(
             self.uuid.hex,
             self._sameta,
-            db.Column("z", db.SmallInteger, primary_key=True),
-            db.Column("x", db.Integer, primary_key=True),
-            db.Column("y", db.Integer, primary_key=True),
-            db.Column("color", db.Integer),
+            sa.Column("z", sa.SmallInteger, primary_key=True),
+            sa.Column("x", sa.Integer, primary_key=True),
+            sa.Column("y", sa.Integer, primary_key=True),
+            sa.Column("color", sa.Integer),
             # We don't need subsecond resolution which TIMESTAMP provides, so
             # use 4-byte INTEGER type. Say hello to 2038-year problem!
-            db.Column("tstamp", db.Integer, nullable=False),
+            sa.Column("tstamp", sa.Integer, nullable=False),
         )
 
     @property
@@ -356,7 +359,7 @@ class ResourceTileCache(Base):
 
         conn = DBSession.connection()
         trow = conn.execute(
-            db.sql.text(
+            sa.sql.text(
                 "SELECT color, tstamp "
                 'FROM tile_cache."{}" '
                 "WHERE z = :z AND x = :x AND y = :y".format(self.uuid.hex)
@@ -440,17 +443,17 @@ class ResourceTileCache(Base):
         self.initialize()
 
 
-db.event.listen(
+sa_event.listen(
     ResourceTileCache.__table__,
     "after_create",
-    db.DDL("CREATE SCHEMA IF NOT EXISTS tile_cache"),
+    sa.DDL("CREATE SCHEMA IF NOT EXISTS tile_cache"),
     propagate=True,
 )
 
-db.event.listen(
+sa_event.listen(
     ResourceTileCache.__table__,
     "after_drop",
-    db.DDL("DROP SCHEMA IF EXISTS tile_cache CASCADE"),
+    sa.DDL("DROP SCHEMA IF EXISTS tile_cache CASCADE"),
     propagate=True,
 )
 

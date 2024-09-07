@@ -1,12 +1,14 @@
 from typing import Any, List, Literal, Union
 
+import sqlalchemy as sa
+import sqlalchemy.orm as orm
 from msgspec import UNSET, Struct, UnsetType
 from osgeo import ogr
 from sqlalchemy.ext.orderinglist import ordering_list
 from sqlalchemy.orm import declared_attr
 
 from nextgisweb.env import Base, gettext, gettextf
-from nextgisweb.lib import db, saext
+from nextgisweb.lib import saext
 from nextgisweb.lib.geometry import Transformer
 
 from nextgisweb.core.exception import ValidationError
@@ -27,32 +29,32 @@ _FIELD_TYPE_2_ENUM_REVERSED = dict(zip(FIELD_TYPE.enum, FIELD_TYPE_OGR))
 class LayerField(Base):
     __tablename__ = "layer_field"
 
-    id = db.Column(db.Integer, primary_key=True)
-    layer_id = db.Column(db.ForeignKey(Resource.id), nullable=False)
-    cls = db.Column(db.Unicode, nullable=False)
+    id = sa.Column(sa.Integer, primary_key=True)
+    layer_id = sa.Column(sa.ForeignKey(Resource.id), nullable=False)
+    cls = sa.Column(sa.Unicode, nullable=False)
 
-    idx = db.Column(db.Integer, nullable=False)
-    keyname = db.Column(db.Unicode, nullable=False)
-    datatype = db.Column(saext.Enum(*FIELD_TYPE.enum), nullable=False)
-    display_name = db.Column(db.Unicode, nullable=False)
-    grid_visibility = db.Column(db.Boolean, nullable=False, default=True)
-    text_search = db.Column(db.Boolean, nullable=False, default=True)
-    lookup_table_id = db.Column(db.ForeignKey(LookupTable.id))
+    idx = sa.Column(sa.Integer, nullable=False)
+    keyname = sa.Column(sa.Unicode, nullable=False)
+    datatype = sa.Column(saext.Enum(*FIELD_TYPE.enum), nullable=False)
+    display_name = sa.Column(sa.Unicode, nullable=False)
+    grid_visibility = sa.Column(sa.Boolean, nullable=False, default=True)
+    text_search = sa.Column(sa.Boolean, nullable=False, default=True)
+    lookup_table_id = sa.Column(sa.ForeignKey(LookupTable.id))
 
     identity = __tablename__
 
     __mapper_args__ = {"polymorphic_identity": identity, "polymorphic_on": cls}
     __table_args__ = (
-        db.UniqueConstraint(layer_id, keyname, deferrable=True, initially="DEFERRED"),
-        db.UniqueConstraint(layer_id, display_name, deferrable=True, initially="DEFERRED"),
+        sa.UniqueConstraint(layer_id, keyname, deferrable=True, initially="DEFERRED"),
+        sa.UniqueConstraint(layer_id, display_name, deferrable=True, initially="DEFERRED"),
     )
 
-    layer = db.relationship(Resource, primaryjoin="Resource.id == LayerField.layer_id")
+    layer = orm.relationship(Resource, primaryjoin="Resource.id == LayerField.layer_id")
 
-    lookup_table = db.relationship(
+    lookup_table = orm.relationship(
         LookupTable,
         primaryjoin="LayerField.lookup_table_id == LookupTable.id",
-        backref=db.backref("layer_fields"),
+        backref=orm.backref("layer_fields"),
     )
 
     def __str__(self):
@@ -64,7 +66,7 @@ class LayerFieldsMixin:
 
     @declared_attr
     def fields(cls):
-        return db.relationship(
+        return orm.relationship(
             cls.__field_class__,
             foreign_keys=cls.__field_class__.layer_id,
             order_by=cls.__field_class__.idx,
@@ -76,18 +78,18 @@ class LayerFieldsMixin:
 
     @declared_attr
     def feature_label_field_id(cls):
-        return db.Column("feature_label_field_id", db.ForeignKey(cls.__field_class__.id))
+        return sa.Column("feature_label_field_id", sa.ForeignKey(cls.__field_class__.id))
 
     @declared_attr
     def feature_label_field(cls):
-        return db.relationship(
+        return orm.relationship(
             cls.__field_class__,
             uselist=False,
             primaryjoin="%s.id == %s.feature_label_field_id"
             % (cls.__field_class__.__name__, cls.__name__),
             cascade="all",
             post_update=True,
-            backref=db.backref("_feature_label_field_backref"),
+            backref=orm.backref("_feature_label_field_backref"),
         )
 
     def to_ogr(self, ogr_ds, *, name="", fields=None, use_display_name=False, fid=None):

@@ -1,7 +1,7 @@
-import sqlalchemy.dialects.postgresql as sa_postgresql
+import sqlalchemy.dialects.postgresql as sa_pg
 
 
-class UUID(sa_postgresql.UUID):
+class UUID(sa_pg.UUID):
     """SQLAclhemy-s PostgreSQL UUID wrapper with as_uuid=True by default"""
 
     def __init__(self, *args, **kwargs):

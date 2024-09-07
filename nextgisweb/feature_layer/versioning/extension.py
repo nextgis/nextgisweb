@@ -4,9 +4,9 @@ from functools import cached_property, partial
 from typing import Any, ClassVar, Dict, Literal, NamedTuple, Optional, Sequence, Tuple, Type, Union
 
 import sqlalchemy as sa
+import sqlalchemy.dialects.postgresql as sa_pg
 from msgspec import Struct
 from sqlalchemy import event, inspect
-from sqlalchemy.dialects.postgresql import ExcludeConstraint
 from sqlalchemy.sql import and_ as sql_and
 from sqlalchemy.sql import or_ as sql_or
 
@@ -444,7 +444,7 @@ class FVersioningExtensionMixin:
             *data_columns,
             cls.__version_fkey(prefix, "ht", next=True),
             *cls.fversioning_htab_args,
-            ExcludeConstraint(
+            sa_pg.ExcludeConstraint(
                 (sa.literal_column("int4range(resource_id, resource_id, '[]')"), "&&"),
                 (sa.literal_column("int4range(version_id, version_nid)"), "&&"),
                 (sa.literal_column("int4range(feature_id, feature_id, '[]')"), "&&"),

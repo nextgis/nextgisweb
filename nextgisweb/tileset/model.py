@@ -8,7 +8,7 @@ from typing import Optional
 from zipfile import ZipFile, is_zipfile
 
 import sqlalchemy as sa
-import sqlalchemy.dialects.postgresql as pg
+import sqlalchemy.dialects.postgresql as sa_pg
 import sqlalchemy.orm as orm
 from osgeo import ogr, osr
 from PIL import Image
@@ -123,7 +123,7 @@ class Tileset(Base, Resource, SpatialLayerMixin):
     tileset_zmin = sa.Column(sa.SmallInteger, nullable=False)
     tileset_zmax = sa.Column(sa.SmallInteger, nullable=False)
     tileset_ntiles = sa.Column(
-        pg.ARRAY(sa.Integer, dimensions=1, zero_indexes=True),
+        sa_pg.ARRAY(sa.Integer, dimensions=1, zero_indexes=True),
         nullable=False,
     )
     minx = sa.Column(sa.Float, nullable=False)

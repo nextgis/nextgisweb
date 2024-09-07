@@ -1,12 +1,12 @@
 from typing import Type
 
+import sqlalchemy.dialects.postgresql as sa_pg
 from msgspec import convert, to_builtins
 from sqlalchemy import TypeDecorator
-from sqlalchemy.dialects.postgresql import JSONB
 
 
 class Msgspec(TypeDecorator):
-    impl = JSONB
+    impl = sa_pg.JSONB
     cache_ok = True
 
     def __init__(self, typedef: Type):

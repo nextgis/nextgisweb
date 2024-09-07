@@ -7,14 +7,16 @@ from urllib.parse import parse_qsl, quote, urlencode, urlparse, urlunparse
 
 import PIL
 import requests
-import sqlalchemy.dialects.postgresql as sa_postgresql
+import sqlalchemy as sa
+import sqlalchemy.dialects.postgresql as sa_pg
+import sqlalchemy.orm as orm
 from owslib.wms import WebMapService
 from requests.exceptions import RequestException
 from typing_extensions import Annotated
 from zope.interface import implementer
 
 from nextgisweb.env import Base, env, gettext
-from nextgisweb.lib import db, saext
+from nextgisweb.lib import saext
 
 from nextgisweb.core.exception import ExternalServiceError, ValidationError
 from nextgisweb.jsrealm import TSExport
@@ -50,14 +52,14 @@ class Connection(Base, Resource):
 
     __scope__ = ConnectionScope
 
-    url = db.Column(db.Unicode, nullable=False)
-    version = db.Column(saext.Enum(*WMS_VERSIONS), nullable=False)
-    username = db.Column(db.Unicode)
-    password = db.Column(db.Unicode)
+    url = sa.Column(sa.Unicode, nullable=False)
+    version = sa.Column(saext.Enum(*WMS_VERSIONS), nullable=False)
+    username = sa.Column(sa.Unicode)
+    password = sa.Column(sa.Unicode)
 
-    capcache_xml = db.deferred(db.Column(db.Unicode))
-    capcache_json = db.deferred(db.Column(db.Unicode))
-    capcache_tstamp = db.Column(db.DateTime)
+    capcache_xml = orm.deferred(sa.Column(sa.Unicode))
+    capcache_json = orm.deferred(sa.Column(sa.Unicode))
+    capcache_tstamp = sa.Column(sa.DateTime)
 
     @classmethod
     def check_parent(cls, parent):
@@ -224,12 +226,12 @@ class Layer(Base, Resource, SpatialLayerMixin):
 
     __scope__ = DataScope
 
-    connection_id = db.Column(db.ForeignKey(Resource.id), nullable=False)
-    wmslayers = db.Column(db.Unicode, nullable=False)
-    imgformat = db.Column(db.Unicode, nullable=False)
-    vendor_params = db.Column(sa_postgresql.JSONB, nullable=False, default=dict)
+    connection_id = sa.Column(sa.ForeignKey(Resource.id), nullable=False)
+    wmslayers = sa.Column(sa.Unicode, nullable=False)
+    imgformat = sa.Column(sa.Unicode, nullable=False)
+    vendor_params = sa.Column(sa_pg.JSONB, nullable=False, default=dict)
 
-    connection = db.relationship(
+    connection = orm.relationship(
         Resource,
         foreign_keys=connection_id,
         cascade="save-update, merge",

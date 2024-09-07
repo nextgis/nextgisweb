@@ -1,5 +1,5 @@
 import sqlalchemy as sa
-import sqlalchemy.dialects.postgresql as pg
+import sqlalchemy.dialects.postgresql as sa_pg
 import sqlalchemy.orm as orm
 
 from nextgisweb.env import Base
@@ -19,7 +19,7 @@ class ResourceFavoriteModel(Base):
     kind = sa.Column(sa.Unicode, nullable=False)
     created = sa.Column(sa.DateTime, nullable=False)
     label = sa.Column(sa.Unicode, nullable=True)
-    data = sa.Column(pg.JSONB, nullable=False)
+    data = sa.Column(sa_pg.JSONB, nullable=False)
 
     resource = orm.relationship(Resource)
     user = orm.relationship(User)

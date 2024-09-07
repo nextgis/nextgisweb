@@ -3,12 +3,13 @@ from datetime import datetime
 from types import MappingProxyType
 from typing import ClassVar, List, Literal, Tuple, Type, Union
 
+import sqlalchemy as sa
+import sqlalchemy.orm as orm
 from msgspec import Struct
 from sqlalchemy import event, func, text
 from typing_extensions import Annotated
 
 from nextgisweb.env import Base, DBSession, env, gettext, gettextf
-from nextgisweb.lib import db
 from nextgisweb.lib.i18n import TrStr
 from nextgisweb.lib.registry import DictRegistry
 from nextgisweb.lib.safehtml import sanitize
@@ -32,7 +33,7 @@ resource_registry = DictRegistry()
 PermissionSets = namedtuple("PermissionSets", ("allow", "deny", "mask"))
 
 
-class ResourceMeta(db.DeclarativeMeta):
+class ResourceMeta(orm.DeclarativeMeta):
     def __new__(cls, name, bases, nspc):
         identity = nspc["identity"]
 
@@ -100,32 +101,32 @@ class Resource(Base, metaclass=ResourceMeta):
 
     __scope__: ClassVar[ResourceScopeType] = (ResourceScope,)
 
-    id = db.Column(db.Integer, primary_key=True)
-    cls = db.Column(db.Unicode, nullable=False)
+    id = sa.Column(sa.Integer, primary_key=True)
+    cls = sa.Column(sa.Unicode, nullable=False)
 
-    parent_id = db.Column(db.ForeignKey(id))
+    parent_id = sa.Column(sa.ForeignKey(id))
 
-    keyname = db.Column(db.Unicode, unique=True)
-    display_name = db.Column(db.Unicode, nullable=False)
-    creation_date = db.Column(db.TIMESTAMP, nullable=False, default=datetime.utcnow)
+    keyname = sa.Column(sa.Unicode, unique=True)
+    display_name = sa.Column(sa.Unicode, nullable=False)
+    creation_date = sa.Column(sa.TIMESTAMP, nullable=False, default=datetime.utcnow)
 
-    owner_user_id = db.Column(db.ForeignKey(User.id), nullable=False)
+    owner_user_id = sa.Column(sa.ForeignKey(User.id), nullable=False)
 
-    description = db.Column(db.Unicode)
+    description = sa.Column(sa.Unicode)
 
     __mapper_args__ = dict(polymorphic_on=cls)
     __table_args__ = (
-        db.CheckConstraint("parent_id IS NOT NULL OR id = 0"),
-        db.UniqueConstraint(parent_id, display_name),
+        sa.CheckConstraint("parent_id IS NOT NULL OR id = 0"),
+        sa.UniqueConstraint(parent_id, display_name),
     )
 
-    parent = db.relationship(
+    parent = orm.relationship(
         "Resource",
         remote_side=[id],
-        backref=db.backref("children", cascade=None, order_by=display_name),
+        backref=orm.backref("children", cascade=None, order_by=display_name),
     )
 
-    owner_user = db.relationship(User)
+    owner_user = orm.relationship(User)
 
     def __str__(self):
         return self.display_name
@@ -134,7 +135,7 @@ class Resource(Base, metaclass=ResourceMeta):
     def id_column(cls):
         """Constructs new 'id' column with a foreign key to cls.id"""
 
-        col = db.Column("id", db.ForeignKey(cls.id), primary_key=True)
+        col = sa.Column("id", sa.ForeignKey(cls.id), primary_key=True)
         col._creation_order = cls.id._creation_order
         return col
 
@@ -274,7 +275,7 @@ class Resource(Base, metaclass=ResourceMeta):
 
     # Data validation
 
-    @db.validates("parent")
+    @orm.validates("parent")
     def _validate_parent(self, key, value):
         """Test for closed loops in hierarchy"""
 
@@ -285,7 +286,7 @@ class Resource(Base, metaclass=ResourceMeta):
 
         return value
 
-    @db.validates("keyname")
+    @orm.validates("keyname")
     def _validate_keyname(self, key, value):
         """Test for key uniqueness"""
 
@@ -298,7 +299,7 @@ class Resource(Base, metaclass=ResourceMeta):
 
         return value
 
-    @db.validates("owner_user")
+    @orm.validates("owner_user")
     def _validate_owner_user(self, key, value):
         with DBSession.no_autoflush:
             if value.system and value.keyname != "guest":
@@ -373,19 +374,19 @@ ResourceScope.read.require(
 class ResourceACLRule(Base):
     __tablename__ = "resource_acl_rule"
 
-    resource_id = db.Column(db.ForeignKey(Resource.id), primary_key=True)
-    principal_id = db.Column(db.ForeignKey(Principal.id), primary_key=True)
+    resource_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
+    principal_id = sa.Column(sa.ForeignKey(Principal.id), primary_key=True)
 
-    identity = db.Column(db.Unicode, primary_key=True, default="")
-    scope = db.Column(db.Unicode, primary_key=True, default="")
-    permission = db.Column(db.Unicode, primary_key=True, default="")
-    propagate = db.Column(db.Boolean, primary_key=True, default=True)
-    action = db.Column(db.Unicode, nullable=False, default=True)
+    identity = sa.Column(sa.Unicode, primary_key=True, default="")
+    scope = sa.Column(sa.Unicode, primary_key=True, default="")
+    permission = sa.Column(sa.Unicode, primary_key=True, default="")
+    propagate = sa.Column(sa.Boolean, primary_key=True, default=True)
+    action = sa.Column(sa.Unicode, nullable=False, default=True)
 
-    resource = db.relationship(Resource, backref=db.backref("acl", cascade="all, delete-orphan"))
-    principal = db.relationship(
+    resource = orm.relationship(Resource, backref=orm.backref("acl", cascade="all, delete-orphan"))
+    principal = orm.relationship(
         Principal,
-        backref=db.backref(
+        backref=orm.backref(
             "__resource_acl_rule",
             cascade="all, delete-orphan",
         ),

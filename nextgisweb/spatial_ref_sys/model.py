@@ -1,9 +1,10 @@
 import sqlalchemy as sa
-from sqlalchemy.orm import declared_attr, relationship
+import sqlalchemy.event as sa_event
+import sqlalchemy.orm as orm
+from sqlalchemy.orm import declared_attr
 from zope.sqlalchemy import mark_changed
 
 from nextgisweb.env import Base, DBSession, gettext
-from nextgisweb.lib import db
 from nextgisweb.lib.osrhelper import sr_from_wkt
 
 from nextgisweb.auth import Permission
@@ -23,7 +24,7 @@ BOUNDS_EPSG_3857 = (-20037508.34, -20037508.34, 20037508.34, 20037508.34)
 class SRS(Base):
     __tablename__ = "srs"
 
-    id_seq = db.Sequence(
+    id_seq = sa.Sequence(
         "srs_id_seq",
         metadata=Base.metadata,
         start=SRID_LOCAL,
@@ -55,16 +56,16 @@ class SRS(Base):
         all = (view, manage)
 
     __table_args__ = (
-        db.CheckConstraint("id > 0 AND id <= %d" % SRID_MAX, name="srs_id_check"),
-        db.CheckConstraint(
+        sa.CheckConstraint("id > 0 AND id <= %d" % SRID_MAX, name="srs_id_check"),
+        sa.CheckConstraint(
             "(auth_name IS NULL AND auth_srid IS NULL) "
             "OR (auth_name IS NOT NULL AND auth_srid IS NOT NULL)",
             name="srs_auth_check",
         ),
-        db.UniqueConstraint("auth_name", "auth_srid", name="srs_auth_unique"),
+        sa.UniqueConstraint("auth_name", "auth_srid", name="srs_auth_unique"),
     )
 
-    @db.validates("wkt")
+    @orm.validates("wkt")
     def _validate_wkt(self, key, value):
         self.proj4 = convert_to_proj(value)
         return value
@@ -143,7 +144,7 @@ class SRS(Base):
 
 
 # fmt: off
-db.event.listen(SRS.__table__, "after_create", db.DDL("""
+sa_event.listen(SRS.__table__, "after_create", sa.DDL("""
     CREATE OR REPLACE FUNCTION srs_spatial_ref_sys_sync() RETURNS TRIGGER
     LANGUAGE 'plpgsql' AS $BODY$
     BEGIN
@@ -180,7 +181,7 @@ db.event.listen(SRS.__table__, "after_create", db.DDL("""
 """), propagate=True)
 
 
-db.event.listen(SRS.__table__, 'after_drop', db.DDL("""
+sa_event.listen(SRS.__table__, 'after_drop', sa.DDL("""
     DROP FUNCTION IF EXISTS srs_spatial_ref_sys_sync();
 """), propagate=True)
 # fmt: on
@@ -193,7 +194,7 @@ class SRSMixin:
 
     @declared_attr
     def srs(cls):
-        return relationship("SRS", lazy="joined")
+        return orm.relationship("SRS", lazy="joined")
 
 
 def synchronize_postgis_spatial_ref_sys():

@@ -5,7 +5,7 @@ from io import StringIO
 from typing import Dict, List, Optional, Tuple, Union
 
 import sqlalchemy as sa
-import sqlalchemy.dialects.postgresql as pg
+import sqlalchemy.dialects.postgresql as sa_pg
 from msgspec import Meta, Struct
 from msgspec.json import decode as msgspec_decode
 from pyramid.response import Response
@@ -126,7 +126,7 @@ def dbase(
     if filter is not None:
         filter_obj = msgspec_decode(filter, type=Filter)
         for k, v in filter_obj.items():
-            q = q.where(_field_expr(dcol, k) == sa.cast(v, pg.JSONB))
+            q = q.where(_field_expr(dcol, k) == sa.cast(v, sa_pg.JSONB))
 
     rows = DBSession.execute(q)
 

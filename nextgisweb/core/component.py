@@ -12,10 +12,11 @@ from pathlib import Path
 from subprocess import check_output
 
 import requests
-import sqlalchemy.dialects.postgresql as postgresql
+import sqlalchemy as sa
+import sqlalchemy.dialects.postgresql as sa_pg
 from msgspec import UNSET
 from requests.exceptions import JSONDecodeError, RequestException
-from sqlalchemy import create_engine, inspect, text
+from sqlalchemy import create_engine, text
 from sqlalchemy.engine.url import URL as EngineURL
 from sqlalchemy.engine.url import make_url as make_engine_url
 from sqlalchemy.exc import OperationalError
@@ -24,7 +25,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from nextgisweb.env import Component, DBSession, gettext
 from nextgisweb.env.package import enable_qualifications, pkginfo
-from nextgisweb.lib import db, json
+from nextgisweb.lib import json
 from nextgisweb.lib.config import Option, SizeInBytes
 from nextgisweb.lib.logging import logger
 
@@ -230,7 +231,7 @@ class CoreComponent(StorageComponentMixin, Component):
 
     def settings_exists(self, component, name):
         return DBSession.query(
-            db.exists().where(db.and_(Setting.component == component, Setting.name == name))
+            sa.exists().where(sa.and_(Setting.component == component, Setting.name == name))
         ).scalar()
 
     def settings_get(self, component, name, default=UNSET):
@@ -371,8 +372,8 @@ class CoreComponent(StorageComponentMixin, Component):
                 fs_size += os.stat(os.path.join(root, f), follow_symlinks=False).st_size
         result["filesystem_size"] = fs_size
         result["database_size"] = DBSession.query(
-            db.func.pg_database_size(
-                db.func.current_database(),
+            sa.func.pg_database_size(
+                sa.func.current_database(),
             )
         ).scalar()
         if self.options["storage.enabled"]:
@@ -436,9 +437,9 @@ class CoreComponent(StorageComponentMixin, Component):
     def check_integrity(self):
         metadata = self.env.metadata()
         metadata.bind = self.engine
-        inspector = inspect(self.engine)
+        inspector = sa.inspect(self.engine)
 
-        def ct_compile(coltype, _dialect=postgresql.dialect()):
+        def ct_compile(coltype, _dialect=sa_pg.dialect()):
             return coltype.compile(_dialect)
 
         for tab in metadata.tables.values():

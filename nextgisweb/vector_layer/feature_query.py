@@ -6,7 +6,6 @@ from sqlalchemy.sql import alias, literal_column, null, select
 from zope.interface import implementer
 
 from nextgisweb.env import DBSession
-from nextgisweb.lib import db
 from nextgisweb.lib.geometry import Geometry
 
 from nextgisweb.feature_layer import (
@@ -204,24 +203,24 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                         raise ValueError("Invalid value '%s' for operator '%s'." % (v, o))
                     v = null()
 
-                op = getattr(db.sql.operators, o)
+                op = getattr(sa.sql.operators, o)
                 column = idcol if k == "id" else fields[k]
                 _where_filter.append(op(column, v))
 
             if len(_where_filter) > 0:
-                where.append(db.and_(*_where_filter))
+                where.append(sa.and_(*_where_filter))
 
         if self._like or self._ilike:
             operands = []
             text_seach_fields = set(f.keyname for f in self.layer.fields if f.text_search)
             for fld_k, fld_c in fields.items():
                 if fld_k in text_seach_fields:
-                    operands.append(cast(fld_c, db.Unicode))
+                    operands.append(cast(fld_c, sa.Unicode))
             if len(operands) == 0:
                 where.append(False)
             else:
                 method, value = ("like", self._like) if self._like else ("ilike", self._ilike)
-                where.append(db.or_(*(getattr(op, method)(f"%{value}%") for op in operands)))
+                where.append(sa.or_(*(getattr(op, method)(f"%{value}%") for op in operands)))
 
         if self._intersects:
             reproject = (

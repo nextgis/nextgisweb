@@ -4,6 +4,8 @@ from io import BytesIO
 from typing import Literal, Union
 
 import requests
+import sqlalchemy as sa
+import sqlalchemy.orm as orm
 from lxml import etree
 from osgeo import ogr
 from owslib.crs import Crs
@@ -13,7 +15,7 @@ from typing_extensions import Annotated
 from zope.interface import implementer
 
 from nextgisweb.env import COMP_ID, Base, env, gettext
-from nextgisweb.lib import db, saext
+from nextgisweb.lib import saext
 from nextgisweb.lib.geometry import Geometry
 from nextgisweb.lib.ows import FIELD_TYPE_WFS
 
@@ -130,10 +132,10 @@ class WFSConnection(Base, Resource):
 
     __scope__ = ConnectionScope
 
-    path = db.Column(db.Unicode, nullable=False)
-    username = db.Column(db.Unicode)
-    password = db.Column(db.Unicode)
-    version = db.Column(saext.Enum(*WFS_VERSIONS), nullable=False)
+    path = sa.Column(sa.Unicode, nullable=False)
+    username = sa.Column(sa.Unicode)
+    password = sa.Column(sa.Unicode)
+    version = sa.Column(saext.Enum(*WFS_VERSIONS), nullable=False)
 
     @classmethod
     def check_parent(cls, parent):
@@ -427,8 +429,8 @@ class WFSLayerField(Base, LayerField):
     __tablename__ = LayerField.__tablename__ + "_" + identity
     __mapper_args__ = dict(polymorphic_identity=identity)
 
-    id = db.Column(db.ForeignKey(LayerField.id), primary_key=True)
-    column_name = db.Column(db.Unicode, nullable=False)
+    id = sa.Column(sa.ForeignKey(LayerField.id), primary_key=True)
+    column_name = sa.Column(sa.Unicode, nullable=False)
 
 
 @implementer(IFeatureLayer, IBboxLayer)
@@ -438,15 +440,15 @@ class WFSLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
     __scope__ = DataScope
 
-    connection_id = db.Column(db.ForeignKey(WFSConnection.id), nullable=False)
-    layer_name = db.Column(db.Unicode, nullable=False)
-    column_geom = db.Column(db.Unicode, nullable=False)
-    geometry_type = db.Column(saext.Enum(*GEOM_TYPE.enum), nullable=False)
-    geometry_srid = db.Column(db.Integer, nullable=False)
+    connection_id = sa.Column(sa.ForeignKey(WFSConnection.id), nullable=False)
+    layer_name = sa.Column(sa.Unicode, nullable=False)
+    column_geom = sa.Column(sa.Unicode, nullable=False)
+    geometry_type = sa.Column(saext.Enum(*GEOM_TYPE.enum), nullable=False)
+    geometry_srid = sa.Column(sa.Integer, nullable=False)
 
     __field_class__ = WFSLayerField
 
-    connection = db.relationship(
+    connection = orm.relationship(
         WFSConnection,
         foreign_keys=connection_id,
         cascade="save-update, merge",

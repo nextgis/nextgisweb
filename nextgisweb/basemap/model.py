@@ -1,11 +1,12 @@
 from typing import List, Union
 
+import sqlalchemy as sa
+import sqlalchemy.orm as orm
 from msgspec import UNSET, Meta, Struct, UnsetType, to_builtins
 from sqlalchemy.ext.orderinglist import ordering_list
 from typing_extensions import Annotated
 
 from nextgisweb.env import Base, gettext
-from nextgisweb.lib import db
 
 from nextgisweb.resource import (
     DataScope,
@@ -25,10 +26,10 @@ class BasemapLayer(Base, Resource):
 
     __scope__ = DataScope
 
-    url = db.Column(db.Unicode, nullable=False)
-    qms = db.Column(db.Unicode)
-    copyright_text = db.Column(db.Unicode)
-    copyright_url = db.Column(db.Unicode)
+    url = sa.Column(sa.Unicode, nullable=False)
+    qms = sa.Column(sa.Unicode)
+    copyright_text = sa.Column(sa.Unicode)
+    copyright_url = sa.Column(sa.Unicode)
 
     @classmethod
     def check_parent(cls, parent):
@@ -45,17 +46,17 @@ class BasemapLayerSerializer(Serializer, resource=BasemapLayer):
 class BasemapWebMap(Base):
     __tablename__ = "basemap_webmap"
 
-    webmap_id = db.Column(db.ForeignKey(WebMap.id), primary_key=True)
-    resource_id = db.Column(db.ForeignKey(Resource.id), primary_key=True)
-    position = db.Column(db.Integer)
-    display_name = db.Column(db.Unicode, nullable=False)
-    enabled = db.Column(db.Boolean)
-    opacity = db.Column(db.Float)
+    webmap_id = sa.Column(sa.ForeignKey(WebMap.id), primary_key=True)
+    resource_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
+    position = sa.Column(sa.Integer)
+    display_name = sa.Column(sa.Unicode, nullable=False)
+    enabled = sa.Column(sa.Boolean)
+    opacity = sa.Column(sa.Float)
 
-    webmap = db.relationship(
+    webmap = orm.relationship(
         WebMap,
         foreign_keys=webmap_id,
-        backref=db.backref(
+        backref=orm.backref(
             "basemaps",
             cascade="all, delete-orphan",
             order_by=position,
@@ -63,10 +64,10 @@ class BasemapWebMap(Base):
         ),
     )
 
-    resource = db.relationship(
+    resource = orm.relationship(
         Resource,
         foreign_keys=resource_id,
-        backref=db.backref(
+        backref=orm.backref(
             "_backref_basemap_webmap",
             cascade="all",
             cascade_backrefs=False,

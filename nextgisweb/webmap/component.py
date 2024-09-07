@@ -1,8 +1,9 @@
 import json
 from pathlib import Path
 
+import sqlalchemy as sa
+
 from nextgisweb.env import COMP_ID, Component, DBSession, gettext, require
-from nextgisweb.lib import db
 from nextgisweb.lib.config import Option
 from nextgisweb.lib.imptool import module_path
 
@@ -61,7 +62,7 @@ class WebMapComponent(Component):
 
     def query_stat(self):
         query_item_type = DBSession.query(
-            WebMapItem.item_type, db.func.count(WebMapItem.id)
+            WebMapItem.item_type, sa.func.count(WebMapItem.id)
         ).group_by(WebMapItem.item_type)
         return dict(item_type=dict(query_item_type.all()))
 

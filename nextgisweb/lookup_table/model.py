@@ -1,10 +1,10 @@
 from typing import Dict
 
-from sqlalchemy.dialects.postgresql import HSTORE
+import sqlalchemy as sa
+import sqlalchemy.dialects.postgresql as sa_pg
 from sqlalchemy.ext.mutable import MutableDict
 
 from nextgisweb.env import Base, gettext
-from nextgisweb.lib import db
 
 from nextgisweb.resource import Resource, ResourceGroup, ResourceScope, SAttribute, Serializer
 
@@ -15,7 +15,7 @@ class LookupTable(Base, Resource):
     identity = "lookup_table"
     cls_display_name = gettext("Lookup table")
 
-    val = db.Column(MutableDict.as_mutable(HSTORE))
+    val = sa.Column(MutableDict.as_mutable(sa_pg.HSTORE))
 
     @classmethod
     def check_parent(cls, parent):

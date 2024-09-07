@@ -1,7 +1,7 @@
 import pytest
+import sqlalchemy as sa
 
 from nextgisweb.env import DBSession
-from nextgisweb.lib import db
 from nextgisweb.lib.osrhelper import sr_from_epsg
 
 from nextgisweb.core.exception import ValidationError
@@ -25,7 +25,7 @@ def test_postgis_sync(ngw_txn):
 
     assert obj.id >= SRID_LOCAL
 
-    qpg = db.text("SELECT srtext FROM spatial_ref_sys WHERE srid = :id")
+    qpg = sa.text("SELECT srtext FROM spatial_ref_sys WHERE srid = :id")
 
     (srtext,) = DBSession.connection().execute(qpg, dict(id=obj.id)).fetchone()
     assert obj.wkt == srtext
@@ -53,7 +53,7 @@ def test_postgis_transform(ngw_txn, x, y, src, dst):
     px, py = (
         DBSession.connection()
         .execute(
-            db.text(
+            sa.text(
                 "SELECT ST_X(pt), ST_Y(pt) "
                 "FROM ST_Transform(ST_Transform("
                 "   ST_SetSRID(ST_MakePoint(:x, :y), :src) ,:dst), :src) AS pt"
