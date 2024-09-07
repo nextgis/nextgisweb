@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite";
 
-import { Checkbox, Select } from "@nextgisweb/gui/antd";
+import { Checkbox, InputValue, Select } from "@nextgisweb/gui/antd";
 import { ExtentRow } from "@nextgisweb/gui/component";
 import { Area, Lot } from "@nextgisweb/gui/mayout";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -21,6 +21,7 @@ type AnnotationType = WebMapRead["annotation_default"];
 
 const msgInitExtent = gettext("Initial extent");
 const msgConstrExtent = gettext("Constraining extent");
+const msgTitle = gettext("Title");
 const msgLegend = gettext("Legend");
 const msgAnnotations = gettext("Annotations");
 const msgAnnotationsPlaceholder = gettext("Select mode");
@@ -63,6 +64,12 @@ export const SettingsWidget: EditorWidgetComponent<
                     onChange={(value) => {
                         store.setConstrainedExtent(value);
                     }}
+                />
+            </Lot>
+            <Lot row label={msgTitle}>
+                <InputValue
+                    value={store.title || ""}
+                    onChange={(v) => store.update({ title: v })}
                 />
             </Lot>
             <Lot label={msgLegend}>

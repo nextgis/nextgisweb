@@ -36,6 +36,7 @@ export class SettingStore
         bottom: null,
         top: null,
     };
+    title: string | null = null;
     bookmarkResource?: ResourceRef | null = null;
 
     private _initValue: Partial<WithoutItems<apitype.WebMapRead>> = {
@@ -74,6 +75,7 @@ export class SettingStore
             bottom: value.extent_const_bottom,
             top: value.extent_const_top,
         };
+        this.title = value.title;
         this.bookmarkResource = value.bookmark_resource;
     }
 
@@ -91,6 +93,7 @@ export class SettingStore
             extent_const_left: this.extentConst.left,
             extent_const_right: this.extentConst.right,
             extent_const_top: this.extentConst.top,
+            title: this.title ? this.title : null,
             measure_srs: this.measureSrs ? { id: this.measureSrs } : undefined,
             bookmark_resource: this.bookmarkResource,
         });

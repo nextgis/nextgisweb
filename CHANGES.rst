@@ -10,6 +10,7 @@ Changes
 - New resource creation dialog.
 - Support for empty geometries when importing vector layers.
 - Font management in the control panel.
+- Customizable web map title.
 
 
 4.8.0

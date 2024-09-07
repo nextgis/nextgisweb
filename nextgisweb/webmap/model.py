@@ -77,6 +77,8 @@ class WebMap(Base, Resource):
     extent_const_bottom = db.Column(db.Float)
     extent_const_top = db.Column(db.Float)
 
+    title = db.Column(db.Unicode)
+
     annotation_enabled = db.Column(db.Boolean, nullable=False, default=False)
     annotation_default = db.Column(
         saext.Enum(*ANNOTATIONS_DEFAULT_VALUES), nullable=False, default="no"
@@ -442,6 +444,8 @@ class WebMapSerializer(Serializer, resource=WebMap):
     extent_const_right = SColumn(read=ResourceScope.read, write=ResourceScope.update)
     extent_const_bottom = SColumn(read=ResourceScope.read, write=ResourceScope.update)
     extent_const_top = SColumn(read=ResourceScope.read, write=ResourceScope.update)
+
+    title = SColumn(read=ResourceScope.read, write=ResourceScope.update)
 
     draw_order_enabled = SColumn(read=ResourceScope.read, write=ResourceScope.update)
     editable = SColumn(read=ResourceScope.read, write=ResourceScope.update)
