@@ -55,6 +55,14 @@ class Serializer:
             assert hasattr(cls, "resclass")
             cls.apitype = apitype or False
 
+            if not cls.apitype:
+                warn(
+                    f"{cls.__name__} uses legacy serializer API, upgrade it. "
+                    "This will become unsupported in nextgisweb 5.0.0.dev0.",
+                    DeprecationWarning,
+                    stacklevel=3,
+                )
+
             if (
                 cls.apitype
                 and issubclass(cls.resclass, model.Resource)
@@ -182,6 +190,14 @@ class SAttribute:
                 tget = _type_from_signature(mget, "return") if mget else None
                 tset = _type_from_signature(mset, "value") if mset else None
                 cls.ctypes = CRUTypes(tset, tget, tset)
+
+        if not cls.apitype:
+            warn(
+                f"{cls.__name__} uses legacy serializer API, upgrade it. "
+                "This will become unsupported in nextgisweb 5.0.0.dev0.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
 
     def __init__(
         self,
