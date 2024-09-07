@@ -133,7 +133,10 @@ class PyramidComponent(Component):
     def client_codegen(self):
         from . import codegen as m
 
-        m.client_codegen(self)
+        nodepkg = self.root_path / "nodepkg"
+        config = self.make_app(settings=dict())
+        (nodepkg / "api/type.inc.d.ts").write_text(m.api_type_module(config))
+        (nodepkg / "api/load.inc.d.ts").write_text(m.api_load_module(config))
 
     @property
     def template_include(self):

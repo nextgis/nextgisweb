@@ -1,5 +1,6 @@
 from collections import defaultdict
 from itertools import chain, count
+from textwrap import dedent
 from typing import Any, Dict, List, Literal, Sequence, Tuple, Type, Union, cast
 
 from msgspec import NODEFAULT, Struct, UnsetType, defstruct, field
@@ -7,9 +8,8 @@ from pyramid.response import Response
 
 from nextgisweb.lib.apitype import unannotate
 
-from nextgisweb.jsrealm.tsgen import TSGenerator, indented
+from nextgisweb.jsrealm.tsgen import TSGenerator
 
-from .component import PyramidComponent
 from .tomb import iter_routes
 
 counter = lambda c=count(1): next(c)
@@ -80,12 +80,24 @@ def union(t: Sequence[Any]) -> Any:
     return t[0] if len(t) == 1 else Union[tuple(t)]  # type: ignore
 
 
-def client_codegen(self: PyramidComponent):
-    nodepkg = self.root_path / "nodepkg"
-    config = self.make_app(settings=dict())
+def eslint_disable(rules: Union[Sequence[str], bool]) -> List[str]:
+    result: List[str] = []
 
+    if rules is False:
+        pass
+    elif rules is True:
+        result.append("/* eslint-disable */")
+    else:
+        result.extend(f"/* eslint-disable {r} */" for r in rules)
+
+    if len(result) > 0:
+        result.append("")
+
+    return result
+
+
+def api_type_module(config) -> str:
     routes: Dict[str, Route] = defaultdict(Route)
-    loaders: Dict[str, Any] = dict()
     for iroute in iter_routes(config.registry.introspector):
         is_api = iroute.itemplate.startswith("/api/")
         if not is_api and not iroute.client:
@@ -113,15 +125,6 @@ def client_codegen(self: PyramidComponent):
                 if (meth := getattr(route, method_attr, None)) is not None:
                     cast(List[Operation], meth).append(op)
 
-        if iroute.load_types:
-            assert (
-                len(route.path) == 0
-                and len(route_get := route.get) == 1
-                and len(route_get[0].query) == 0
-                and route_get[0].response is not UnsetType
-            ), f"Types cannot be loaded for {iroute.name}"
-            loaders[iroute.itemplate] = iroute.name
-
     routes_struct = defstruct("Routes", [v.field(k) for k, v in routes.items()])
 
     tsgen = TSGenerator()
@@ -129,32 +132,39 @@ def client_codegen(self: PyramidComponent):
     tsgen.add(routes_struct, export=(route_tsmodule, "Routes"))
     tsgen.add(routes_struct, export=(route_tsmodule, "default"))
 
-    no_eslint = [
-        f"/* eslint-disable {r} */"
-        for r in (
+    eslint = eslint_disable(
+        (
             "prettier/prettier",
             "import/newline-after-import",
             "import/order",
             "@typescript-eslint/no-explicit-any",
         )
-    ] + [""]
+    )
 
-    code = no_eslint + [m.code for m in tsgen.compile()]
-    (nodepkg / "api/type.inc.d.ts").write_text("\n".join(code))
+    return "\n".join(eslint + [m.code for m in tsgen.compile()] + [""])
 
-    code = no_eslint
-    for k, v in loaders.items():
-        mod = [
-            f'import type route from "{route_tsmodule}";',
-            f'const value: route["{v}"]["get"]["response"];',
-            "export = value;",
-        ]
-        code.extend(
-            (
-                f'declare module "@nextgisweb/pyramid/api/load!{k}" ' + "{",
-                indented(mod),
-                "}\n",
+
+def api_load_module(config) -> str:
+    code = [*eslint_disable(("import/newline-after-import",))]
+
+    template = """
+        declare module "@nextgisweb/pyramid/api/load!{path}" {{
+            import type route from "@nextgisweb/pyramid/type/route";
+            const value: route["{name}"]["get"]["response"];
+            export = value;
+        }}
+    """
+    template = dedent(template).strip("\n") + "\n"
+
+    for iroute in iter_routes(config.registry.introspector):
+        if not iroute.load_types:
+            continue
+
+        code.append(
+            template.format(
+                path=iroute.itemplate,
+                name=iroute.name,
             )
         )
 
-    (nodepkg / "api/load.inc.d.ts").write_text("\n".join(code))
+    return "\n".join(code)
