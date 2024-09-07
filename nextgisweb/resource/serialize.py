@@ -6,6 +6,7 @@ from warnings import warn
 
 from msgspec import UNSET, Struct, UnsetType, defstruct
 
+from nextgisweb.lib.apitype.util import decompose_union
 from nextgisweb.lib.registry import dict_registry
 
 from nextgisweb.auth import User
@@ -133,7 +134,12 @@ class Serializer:
                 if pv.read is ResourceScope.read:
                     # ResourceScope.read is the minimum required permission,
                     # without this permission a resource cannot be serialized.
-                    fread.append((pn, pt.read))
+                    # But it stil may contain UnsetType, then we need set UNSET
+                    # as default value.
+                    if UnsetType in decompose_union(pt.read):
+                        fread.append((pn, pt.read, UNSET))
+                    else:
+                        fread.append((pn, pt.read))
                 else:
                     fread.append((pn, Union[pt.read, UnsetType], UNSET))
             if pv.write is not None:
@@ -213,8 +219,12 @@ class SAttribute:
 
     def serialize(self, srlzr: Serializer) -> None:
         if self.readperm(srlzr):
-            apitype = srlzr.apitype and self.apitype
-            srlzr.data[self.attrname] = self.get(srlzr) if apitype else self.getter(srlzr)
+            if srlzr.apitype and self.apitype:
+                value = self.get(srlzr)
+            else:
+                value = self.getter(srlzr)
+            if value is not UNSET:
+                srlzr.data[self.attrname] = value
 
     def deserialize(self, srlzr: Serializer) -> None:
         if self.writeperm(srlzr):
