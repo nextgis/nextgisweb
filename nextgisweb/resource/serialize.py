@@ -132,10 +132,11 @@ class Serializer:
         fcreate, fread, fupdate = list(), list(), list()
         for pn, pv in cls.proptab:
             pt = pv.types
-            if pv.write is not None or (pn == "cls" and cls.identity == "resource"):
-                # FIXME: ResourceSerializer.cls create-only attribute workaround
+            if pv.write is not None:
                 if not getattr(pv, "required", False):
                     fcreate.append((pn, Union[pt.create, UnsetType], UNSET))
+                elif UnsetType in decompose_union(pt.create):
+                    fcreate.append((pn, pt.create, UNSET))
                 else:
                     fcreate.append((pn, pt.create))
             if pv.read is not None:
@@ -151,8 +152,10 @@ class Serializer:
                 else:
                     fread.append((pn, Union[pt.read, UnsetType], UNSET))
             if pv.write is not None:
-                # Any attribute can be ommited during update
-                fupdate.append((pn, Union[pt.update, UnsetType], UNSET))
+                # Any attribute can be ommited during update. Attributes of
+                # UnsetType are skipped entirely.
+                if pt.update != UnsetType:
+                    fupdate.append((pn, Union[pt.update, UnsetType], UNSET))
 
         skwa: Any = dict(kw_only=True, module=cls.__module__)
         return CRUTypes(

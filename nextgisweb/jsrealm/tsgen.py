@@ -25,8 +25,14 @@ from msgspec import UNSET, Struct, UnsetType, field
 from typing_extensions import Protocol
 
 from nextgisweb.env.package import pkginfo
-from nextgisweb.lib.apitype import disannotate
-from nextgisweb.lib.apitype.util import NoneType, get_class_annotations, is_enum, is_struct
+from nextgisweb.lib.apitype import disannotate, unannotate
+from nextgisweb.lib.apitype.util import (
+    NoneType,
+    decompose_union,
+    get_class_annotations,
+    is_enum,
+    is_struct,
+)
 from nextgisweb.lib.imptool import module_from_stack
 from nextgisweb.lib.json import dumps
 
@@ -232,7 +238,7 @@ class TSUnion(TSType, kw_only=True):
     def __tstype_init__(self):
         super().__tstype_init__()
         self.items = tuple(self.generator.add(i) for i in unique_everseen(self.args))
-        args_defined = tuple(a for a in self.args if a is not UnsetType)
+        args_defined = tuple(a for a in self.args if (unannotate(a) is not UnsetType))
         if len(self.args) != len(args_defined):
             if len(args_defined) > 1:
                 dtype = Union[args_defined]  # type: ignore
@@ -315,9 +321,13 @@ class TSStruct(TSType, kw_only=True):
         super().__tstype_init__()
         fields: List[TSStructField] = list()
         for k, v in struct_fields_encoded(self.cls):
+            if all(((unannotate(s) is UnsetType) for s in decompose_union(v))):
+                continue
+
             ts, undefined = self.generator.add(v), False
             if isinstance(ts, TSUnion) and (ts_undefined := ts.undefided_excluded) is not None:
                 ts, undefined = ts_undefined, True
+
             fields.append(TSStructField(k, ts, undefined))
         self.fields = tuple(fields)
 

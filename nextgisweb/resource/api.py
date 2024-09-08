@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Any, Dict, List, Literal, Mapping, Union, cast, get_args
+from typing import TYPE_CHECKING, Any, Dict, List, Literal, Mapping, Union, cast
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
@@ -111,12 +111,12 @@ def blueprint(request) -> Blueprint:
 
 
 if TYPE_CHECKING:
-    CompositCreate = Struct
+    CompositeCreate = Struct
     CompositeRead = Struct
     CompositeUpdate = Struct
 else:
     composite = CompositeSerializer.types()
-    CompositCreate = composite.create
+    CompositeCreate = composite.create
     CompositeRead = composite.read
     CompositeUpdate = composite.update
 
@@ -186,35 +186,14 @@ def collection_get(
 
 
 def collection_post(
-    request,
-    body: CompositCreate,
-    *,
-    cls: Union[str, UnsetType] = UNSET,
-    parent: Union[int, UnsetType] = UNSET,
+    request, body: CompositeCreate
 ) -> Annotated[ResourceRefWithParent, StatusCode(201)]:
     """Create resource"""
     request.env.core.check_storage_limit()
 
-    if body.resource is UNSET:
-        resource_type = CompositCreate.__annotations__["resource"]
-        resource_struct = get_args(resource_type)[0]
-        body.resource = resource_struct()
+    resource_cls = body.resource.cls
 
-    resource = body.resource
-
-    if cls is not UNSET:
-        resource.cls = cls
-
-    if parent is not UNSET:
-        resource.parent = dict(id=parent)
-    elif resource.parent is UNSET:
-        raise ValidationError(gettext("Resource parent required."))
-
-    resource_cls = resource.cls
-
-    if resource_cls is UNSET:
-        raise ValidationError(message=gettext("Resource class required."))
-    elif resource_cls not in Resource.registry:
+    if resource_cls not in Resource.registry:
         raise ValidationError(gettext("Unknown resource class '%s'.") % resource_cls)
     elif (
         resource_cls in request.env.resource.options["disabled_cls"]

@@ -5,7 +5,7 @@ from typing import ClassVar, List, Literal, Tuple, Type, Union
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
-from msgspec import Struct
+from msgspec import UNSET, Struct, UnsetType
 from sqlalchemy import event, func, text
 from typing_extensions import Annotated
 
@@ -416,13 +416,16 @@ ResourceCls = Annotated[str, TSExport("ResourceCls")]
 
 
 class ClsAttr(SColumn, apitype=True):
+    ctypes = CRUTypes(ResourceCls, ResourceCls, UnsetType)
+
     def writeperm(self, srlzr):
         return True
 
     def get(self, srlzr) -> ResourceCls:
         return super().get(srlzr)
 
-    def set(self, srlzr, value: ResourceCls, *, create: bool):
+    def set(self, srlzr, value: Union[ResourceCls, UnsetType], *, create: bool):
+        assert create and value is not UNSET
         assert srlzr.obj.cls == value
 
 
@@ -567,16 +570,16 @@ class ScopesAttr(SAttribute, apitype=True):
 
 class ResourceSerializer(Serializer, resource=Resource):
     id = SColumn(read=ResourceScope.read, write=None)
-    cls = ClsAttr(read=ResourceScope.read, write=None, required=False)
+    cls = ClsAttr(read=ResourceScope.read, write=ResourceScope.update, required=True)
     creation_date = SColumn(read=ResourceScope.read, write=None)
 
-    parent = ParentAttr(read=ResourceScope.read, write=ResourceScope.update)
+    parent = ParentAttr(read=ResourceScope.read, write=ResourceScope.update, required=True)
     owner_user = OwnerUserAttr(read=ResourceScope.read, write=ResourceScope.update, required=False)
 
     permissions = ACLAttr(read=ResourceScope.read, write=ResourceScope.change_permissions)
 
     keyname = SColumn(read=ResourceScope.read, write=ResourceScope.update)
-    display_name = SColumn(read=ResourceScope.read, write=ResourceScope.update)
+    display_name = SColumn(read=ResourceScope.read, write=ResourceScope.update, required=True)
 
     description = DescriptionAttr(read=ResourceScope.read, write=ResourceScope.update)
 
