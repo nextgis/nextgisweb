@@ -63,10 +63,11 @@ class CompositeSerializer:
         create, read, update = list(), list(), list()
         for k, v in Serializer.registry.items():
             t = v.types() if v.apitype else CRUTypes(Any, Any, Any)
-            create.append((k, Union[t.create, UnsetType], UNSET))
             if v.identity == "resource":
+                create.append((k, t.create))
                 read.append((k, t.read))
             else:
+                create.append((k, Union[t.create, UnsetType], UNSET))
                 read.append((k, Union[t.read, UnsetType], UNSET))
             update.append((k, Union[t.update, UnsetType], UNSET))
             assert all(not v.apitype or pv.apitype for pn, pv in v.proptab)
