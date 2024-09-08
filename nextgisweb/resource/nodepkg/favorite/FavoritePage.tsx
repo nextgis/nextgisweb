@@ -34,7 +34,7 @@ type Schema = Record<string, apitype.ResourceFavoriteSchemaItem>;
 
 type ResourceInfo = {
     id: number;
-    cls: string;
+    cls: apitype.ResourceCls;
     path: string[];
     pstr: string;
     dn: string;

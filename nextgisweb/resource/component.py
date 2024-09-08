@@ -1,22 +1,40 @@
 import re
+from typing import Literal
 
 import sqlalchemy as sa
 from sqlalchemy.orm.exc import NoResultFound
 
 from nextgisweb.env import Component, DBSession, gettext, require
+from nextgisweb.lib.apitype import fillgap
 from nextgisweb.lib.config import Option
 from nextgisweb.lib.logging import logger
 
 from nextgisweb.auth import Group, User
 
 from .exception import QuotaExceeded
-from .model import Resource, ResourceGroup
+from .interface import interface_registry
+from .model import (
+    Resource,
+    ResourceCls,
+    ResourceGroup,
+    ResourceInterfaceIdentity,
+    ResourceScope,
+    ResourceScopeIdentity,
+)
 from .model import ResourceACLRule as ACLRule
 
 
 class ResourceComponent(Component):
+    def __init__(self, env, settings):
+        super().__init__(env, settings)
+
+        fillgap(ResourceCls, Literal[tuple(Resource.registry.keys())])  # type: ignore
+        fillgap(ResourceInterfaceIdentity, Literal[tuple(i.__name__ for i in interface_registry)])  # type: ignore
+        fillgap(ResourceScopeIdentity, Literal[tuple(ResourceScope.registry.keys())])  # type: ignore
+
     def initialize(self):
         super().initialize()
+
         for item in self.options["disabled_cls"]:
             try:
                 Resource.registry[item]

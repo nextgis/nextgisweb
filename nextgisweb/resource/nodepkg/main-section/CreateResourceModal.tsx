@@ -6,7 +6,10 @@ import type { InputRef, ModalProps } from "@nextgisweb/gui/antd";
 import { useThemeVariables } from "@nextgisweb/gui/hook";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import type { BlueprintCategory } from "@nextgisweb/resource/type/api";
+import type {
+    BlueprintCategory,
+    ResourceCls,
+} from "@nextgisweb/resource/type/api";
 
 import { categories, resources } from "../blueprint";
 import { ResourceIcon } from "../icon";
@@ -45,7 +48,7 @@ export default function CreateResourceModal({
             },
         };
         const outRes = creatable.map((identity) => {
-            const resBp = resources[identity]!;
+            const resBp = resources[identity as ResourceCls]!;
             outCat[resBp.category] = categories[resBp.category];
             return {
                 key: identity,

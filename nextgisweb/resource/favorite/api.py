@@ -10,7 +10,7 @@ from nextgisweb.env import DBSession
 from nextgisweb.lib.apitype import AsJSON, EmptyObject
 
 from nextgisweb.jsrealm import TSExport
-from nextgisweb.resource.sattribute import ResourceRef
+from nextgisweb.resource import ResourceCls, ResourceRef
 
 from .base import ResourceFavorite
 from .model import ResourceFavoriteModel as Model
@@ -81,7 +81,7 @@ class ResourceFavoriteRead(Struct, kw_only=True):
 
 class ResourceFavoriteResourceInfo(Struct, kw_only=True):
     id: int
-    cls: str
+    cls: ResourceCls
     parent: Union[ResourceRef, None]
     display_name: str
 

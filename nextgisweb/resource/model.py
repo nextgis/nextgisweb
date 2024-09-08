@@ -10,6 +10,7 @@ from sqlalchemy import event, func, text
 from typing_extensions import Annotated
 
 from nextgisweb.env import Base, DBSession, env, gettext, gettextf
+from nextgisweb.lib.apitype import Gap
 from nextgisweb.lib.i18n import TrStr
 from nextgisweb.lib.registry import DictRegistry
 from nextgisweb.lib.safehtml import sanitize
@@ -412,7 +413,9 @@ class ResourceACLRule(Base):
         )
 
 
-ResourceCls = Annotated[str, TSExport("ResourceCls")]
+ResourceCls = Gap[Annotated[str, TSExport("ResourceCls")]]
+ResourceInterfaceIdentity = Gap[Annotated[str, TSExport("ResourceInterface")]]
+ResourceScopeIdentity = Gap[Annotated[str, TSExport("ResourceScope")]]
 
 
 class ClsAttr(SColumn, apitype=True):
@@ -488,7 +491,7 @@ REQUIRED_PERMISSIONS_FOR_ADMINISTATORS = [
 class ACLRule(Struct, kw_only=True):
     action: Annotated[Literal["allow", "deny"], TSExport("ACLRuleAction")]
     principal: PrincipalRef
-    identity: str
+    identity: Union[ResourceCls, Literal[""]]
     scope: str
     permission: str
     propagate: bool
@@ -559,12 +562,12 @@ class ChildrenAttr(SAttribute, apitype=True):
 
 
 class InterfacesAttr(SAttribute, apitype=True):
-    def get(self, srlzr) -> List[str]:
+    def get(self, srlzr) -> List[ResourceInterfaceIdentity]:
         return [i.getName() for i in srlzr.obj.provided_interfaces()]
 
 
 class ScopesAttr(SAttribute, apitype=True):
-    def get(self, srlzr) -> List[str]:
+    def get(self, srlzr) -> List[ResourceScopeIdentity]:
         return list(srlzr.obj.scope.keys())
 
 

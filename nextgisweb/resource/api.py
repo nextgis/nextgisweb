@@ -22,7 +22,7 @@ from .category import ResourceCategory
 from .composite import CompositeSerializer
 from .events import AfterResourceCollectionPost, AfterResourcePut
 from .exception import HierarchyError, QuotaExceeded, ResourceDisabled
-from .model import Resource
+from .model import Resource, ResourceCls, ResourceInterfaceIdentity, ResourceScopeIdentity
 from .presolver import ExplainACLRule, ExplainDefault, ExplainRequirement, PermissionResolver
 from .sattribute import ResourceRefOptional, ResourceRefWithParent
 from .scope import ResourceScope, Scope
@@ -30,11 +30,11 @@ from .view import resource_factory
 
 
 class BlueprintResource(Struct):
-    identity: str
+    identity: ResourceCls
     label: str
-    base_classes: List[str]
-    interfaces: List[str]
-    scopes: List[str]
+    base_classes: List[ResourceCls]
+    interfaces: List[ResourceInterfaceIdentity]
+    scopes: List[ResourceScopeIdentity]
     category: str
     order: int
 
@@ -45,7 +45,7 @@ class BlueprintPermission(Struct):
 
 
 class BlueprintScope(Struct):
-    identity: str
+    identity: ResourceScopeIdentity
     label: str
     permissions: Dict[str, BlueprintPermission]
 
@@ -57,8 +57,8 @@ class BlueprintCategory(Struct):
 
 
 class Blueprint(Struct):
-    resources: Dict[str, BlueprintResource]
-    scopes: Dict[str, BlueprintScope]
+    resources: Dict[ResourceCls, BlueprintResource]
+    scopes: Dict[ResourceScopeIdentity, BlueprintScope]
     categories: Dict[str, BlueprintCategory]
 
 
@@ -189,13 +189,11 @@ def collection_post(
     request, body: CompositeCreate
 ) -> Annotated[ResourceRefWithParent, StatusCode(201)]:
     """Create resource"""
-    request.env.core.check_storage_limit()
 
+    request.env.core.check_storage_limit()
     resource_cls = body.resource.cls
 
-    if resource_cls not in Resource.registry:
-        raise ValidationError(gettext("Unknown resource class '%s'.") % resource_cls)
-    elif (
+    if (
         resource_cls in request.env.resource.options["disabled_cls"]
         or request.env.resource.options["disable." + resource_cls]
     ):

@@ -8,6 +8,7 @@ import { EdiTable } from "@nextgisweb/gui/edi-table";
 import { AddIcon } from "@nextgisweb/gui/icon";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { resources, scopes } from "@nextgisweb/resource/blueprint";
+import type { ResourceCls } from "@nextgisweb/resource/type/api";
 
 import { AllowIcon, DenyIcon, ResourceIcon } from "../icon";
 import type { EditorWidgetComponent, EditorWidgetProps } from "../type";
@@ -129,7 +130,7 @@ const Apply = observer(({ row }: { row: Item }) => {
     }, []);
 
     const value = row.identity ? row.identity : row.propagate;
-    const onChange = (v: boolean | string) => {
+    const onChange = (v: ResourceCls | boolean) => {
         if (typeof v === "boolean") {
             row.update({ identity: "", propagate: v });
         } else {
@@ -138,7 +139,7 @@ const Apply = observer(({ row }: { row: Item }) => {
     };
 
     return (
-        <Select
+        <Select<ResourceCls | boolean>
             {...{ value, onChange }}
             {...selectDefaults}
             placeholder={msgColApply}

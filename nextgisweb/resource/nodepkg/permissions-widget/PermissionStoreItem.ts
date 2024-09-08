@@ -26,7 +26,7 @@ export class PermissionStoreItem {
     principal: number | null = null;
     scope: string | null = null;
     permission: string | null = null;
-    identity: string | null = null;
+    identity: ResourceCls | "" | null = null;
     propagate: boolean | null = null;
 
     readonly store: PermissionsStore;

@@ -15,7 +15,7 @@ export class PermissionsStore implements EdiTableStore<Item> {
     items: Item[] = [];
     dirty = false;
 
-    readonly resourceClass: string;
+    readonly resourceClass: ResourceCls;
 
     constructor({ composite }: { composite: Composite }) {
         makeAutoObservable(this, { identity: false });
