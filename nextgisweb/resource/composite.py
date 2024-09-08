@@ -3,9 +3,6 @@ from __future__ import annotations
 from typing import Any, Tuple, Type, Union
 
 from msgspec import UNSET, Struct, UnsetType, defstruct, to_builtins
-from typing_extensions import Annotated
-
-from nextgisweb.lib.msext import DEPRECATED
 
 from nextgisweb.auth import User
 from nextgisweb.core.exception import IUserException
@@ -66,12 +63,12 @@ class CompositeSerializer:
         create, read, update = list(), list(), list()
         for k, v in Serializer.registry.items():
             t = v.types() if v.apitype else CRUTypes(Any, Any, Any)
-            create.append((k, Union[t.create, UnsetType, Annotated[None, DEPRECATED]], UNSET))
+            create.append((k, Union[t.create, UnsetType], UNSET))
             if v.identity == "resource":
                 read.append((k, t.read))
             else:
                 read.append((k, Union[t.read, UnsetType], UNSET))
-            update.append((k, Union[t.update, UnsetType, Annotated[None, DEPRECATED]], UNSET))
+            update.append((k, Union[t.update, UnsetType], UNSET))
             assert all(not v.apitype or pv.apitype for pn, pv in v.proptab)
         return CRUTypes(
             defstruct("CompositeCreate", create),
