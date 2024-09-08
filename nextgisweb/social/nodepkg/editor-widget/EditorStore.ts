@@ -1,4 +1,4 @@
-import { makeAutoObservable, toJS } from "mobx";
+import { action, computed, observable } from "mobx";
 
 import type { UploaderMeta } from "@nextgisweb/file-upload/file-uploader";
 import { routeURL } from "@nextgisweb/pyramid/api";
@@ -6,36 +6,31 @@ import type {
     EditorStoreOptions,
     EditorStore as IEditorStore,
 } from "@nextgisweb/resource/type/EditorStore";
+import type apitype from "@nextgisweb/social/type/api";
 
-interface Value {
-    preview_image_exists?: boolean;
-    preview_description: string | null;
-    preview_file_upload?: UploaderMeta | null;
-}
-
-export class EditorStore implements IEditorStore<Value | null> {
+export class EditorStore
+    implements IEditorStore<apitype.SocialRead, apitype.SocialUpdate>
+{
     identity = "social";
+    readonly resourceId: number;
 
-    imageExisting: Blob | null = null;
-    imageUpdated?: UploaderMeta | null;
-    description: string | null = null;
+    @observable.ref accessor imageExisting: Blob | null = null;
+    @observable.ref accessor imageUpdated: UploaderMeta | null = null;
+    @observable.ref accessor description: string | null = null;
 
-    resourceId: number;
-
-    dirty = false;
+    @observable.ref accessor dirty = false;
 
     constructor({ resourceId }: EditorStoreOptions) {
         if (resourceId === undefined) {
             throw new Error("The `resourceId` is required parameter");
         }
-        makeAutoObservable(this, { identity: false });
         this.resourceId = resourceId;
     }
 
-    load(value: Value | null) {
-        this.imageUpdated = undefined;
+    load(value: apitype.SocialRead) {
+        this.imageUpdated = null;
         if (value) {
-            if (value.preview_image_exists) {
+            if (value.image_exists) {
                 this.imageExisting = null;
                 fetch(routeURL("resource.preview", this.resourceId)).then(
                     (resp) => {
@@ -46,33 +41,33 @@ export class EditorStore implements IEditorStore<Value | null> {
                 );
             }
 
-            this.description = value.preview_description;
+            this.description = value.description;
         }
         this.dirty = false;
     }
 
-    dump() {
-        if (!this.dirty) return null;
-        const result: Value = {
-            preview_description: this.description ? this.description : null,
+    dump(): apitype.SocialUpdate | undefined {
+        if (!this.dirty) return undefined;
+        const result: apitype.SocialUpdate = {
+            description: this.description ? this.description : null,
         };
 
         if (this.imageUpdated && this.imageUpdated !== null) {
-            result.preview_file_upload = this.imageUpdated;
+            result.file_upload = this.imageUpdated as UploaderMeta<false>;
         }
 
         if (this.imageExisting === null && this.imageUpdated === null) {
-            result.preview_file_upload = null;
+            result.file_upload = null;
         }
 
-        return toJS(result);
+        return result;
     }
 
-    get isValid() {
+    @computed get isValid() {
         return this.imageExisting !== undefined;
     }
 
-    update(data: Partial<EditorStore>) {
+    @action update(data: Partial<EditorStore>) {
         for (const [k, v] of Object.entries(data)) {
             if (k in this) {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
