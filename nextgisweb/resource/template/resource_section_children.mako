@@ -10,10 +10,11 @@
 <div id="childrenSection" class="ngw-resource-section ngw-card"></div>
 
 <%
+    resources = [res for res in obj.children if (ResourceScope.read in res.permissions(request.user))]
+    resources.sort(key=lambda res: (res.cls_order, res.display_name))
+
     data = list()
-    for item in obj.children:
-        if ResourceScope.read not in item.permissions(request.user):
-            continue
+    for item in resources:
         idata = dict(
             id=item.id, displayName=item.display_name, link=request.route_url('resource.show', id=item.id),
             cls=item.cls, clsDisplayName=tr(item.cls_display_name), creationDate=item.creation_date,
@@ -28,8 +29,6 @@
                     title=tr(menu_item.label), icon=menu_item.icon, key=menu_item.key))
 
         data.append(idata)
-
-    data.sort(key=lambda x: (0 if x['cls'] == 'resource_group' else (1 if x['cls'] == 'webmap' else 2), x['displayName']))
 %>
 
 <script type="text/javascript">
