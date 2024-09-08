@@ -1,4 +1,6 @@
 /** @entrypoint */
+import * as Editor from "ckeditor/bundle";
+
 import entrypoint from "@nextgisweb/jsrealm/entrypoint";
 
 export function load(path, require, ready) {
@@ -8,15 +10,20 @@ export function load(path, require, ready) {
         return;
     }
 
-    const mod = `ckeditor/translations/${lang}`;
+    if (!Editor.availableLanguages.includes(lang)) {
+        console.warn(`CKEditor: Translation '${lang}' unavailable`);
+        ready();
+        return;
+    }
 
+    const mod = `ckeditor/translations/${lang}`;
     entrypoint(mod).then(
         () => {
-            console.debug(`CKEditor ${lang} i18n: loaded from ${mod}`);
+            console.log(`CKEditor: Translation '${lang}' loaded`);
             ready();
         },
         () => {
-            console.error(`CKEditor ${lang} i18n: failed to load ${mod}`);
+            console.error(`CKEditor: Translation '${lang}' failed`);
             ready();
         }
     );

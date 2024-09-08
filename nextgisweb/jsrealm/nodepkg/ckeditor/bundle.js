@@ -114,4 +114,7 @@ Editor.defaultConfig = {
     language: "en",
 };
 
+// eslint-disable-next-line no-undef
+Editor.availableLanguages = AVAILABLE_LANGUAGES;
+
 export default Editor;
