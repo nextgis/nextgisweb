@@ -1,23 +1,25 @@
 from enum import Enum
-from typing import List, Literal, Union
+from typing import List, Literal, Type, Union
 
 import geoalchemy2 as ga
 import sqlalchemy as sa
 import sqlalchemy.dialects.postgresql as sa_pg
 import sqlalchemy.event as sa_event
 import sqlalchemy.orm as orm
-from msgspec import Struct
+from msgspec import Meta, Struct
 from msgspec.structs import asdict as struct_asdict
 from sqlalchemy import text
 from sqlalchemy.ext.orderinglist import ordering_list
 from sqlalchemy.orm.attributes import set_committed_value
+from typing_extensions import Annotated
 
 from nextgisweb.env import COMP_ID, Base, DBSession, gettext, pgettext
 from nextgisweb.lib import saext
+from nextgisweb.lib.msext import DEPRECATED
 
 from nextgisweb.auth import User
-from nextgisweb.resource import Permission as P
 from nextgisweb.resource import (
+    CRUTypes,
     Resource,
     ResourceGroup,
     ResourceScope,
@@ -28,6 +30,7 @@ from nextgisweb.resource import (
     SRelationship,
     SResource,
 )
+from nextgisweb.resource import Permission as P
 from nextgisweb.resource.category import MapsAndServicesCategory
 from nextgisweb.spatial_ref_sys import SRS
 
@@ -436,17 +439,62 @@ class RootItemAttr(SAttribute, apitype=True):
         value.to_model(srlzr.obj.root_item)
 
 
+Lon = Annotated[float, Meta(ge=-180, le=180, description="Longitude")]
+Lat = Annotated[float, Meta(ge=-90, le=90, description="Latitude")]
+
+
+class ExtentPartAttr(SColumn, apitype=True):
+    def setup_types(self):
+        if self.attrname.endswith(("_left", "_right")):
+            base = Lon
+        elif self.attrname.endswith(("_bottom", "_top")):
+            base = Lat
+        else:
+            raise NotImplementedError
+
+        self.required = False
+        self.types = CRUTypes(
+            Annotated[Union[None, base], DEPRECATED],  # type: ignore
+            Annotated[Union[None, base], DEPRECATED],  # type: ignore
+            Annotated[Union[None, base], DEPRECATED],  # type: ignore
+        )
+
+
+class ExtentWSEN(Struct, array_like=True, forbid_unknown_fields=True):
+    west: Annotated[Lon, Meta(title="West")]
+    south: Annotated[Lat, Meta(title="South")]
+    east: Annotated[Lon, Meta(title="East")]
+    north: Annotated[Lat, Meta(title="North")]
+
+
+class ExtentAttr(SAttribute, apitype=True):
+    def bind(self, srlzrcls: Type[Serializer], attrname: str):
+        super().bind(srlzrcls, attrname)
+        if attrname == "initial_extent":
+            self.attrs = tuple(f"extent_{i}" for i in ("left", "bottom", "right", "top"))
+        elif attrname == "constraining_extent":
+            self.attrs = tuple(f"extent_const_{i}" for i in ("left", "bottom", "right", "top"))
+        else:
+            raise NotImplementedError
+
+    def get(self, srlzr: Serializer) -> Union[ExtentWSEN, None]:
+        obj = srlzr.obj
+        parts = [getattr(obj, a) for a in self.attrs]
+        return ExtentWSEN(*parts) if None not in parts else None
+
+    def set(self, srlzr: Serializer, value: Union[ExtentWSEN, None], *, create: bool):
+        obj = srlzr.obj
+        if value is None:
+            for a in self.attrs:
+                setattr(obj, a, None)
+        else:
+            for a, b in zip(self.attrs, ("west", "south", "east", "north")):
+                setattr(obj, a, getattr(value, b))
+
+
 class WebMapSerializer(Serializer, resource=WebMap):
-    extent_left = SColumn(read=ResourceScope.read, write=ResourceScope.update)
-    extent_right = SColumn(read=ResourceScope.read, write=ResourceScope.update)
-    extent_bottom = SColumn(read=ResourceScope.read, write=ResourceScope.update)
-    extent_top = SColumn(read=ResourceScope.read, write=ResourceScope.update)
-
-    extent_const_left = SColumn(read=ResourceScope.read, write=ResourceScope.update)
-    extent_const_right = SColumn(read=ResourceScope.read, write=ResourceScope.update)
-    extent_const_bottom = SColumn(read=ResourceScope.read, write=ResourceScope.update)
-    extent_const_top = SColumn(read=ResourceScope.read, write=ResourceScope.update)
-
+    initial_extent = ExtentAttr(read=ResourceScope.read, write=ResourceScope.update)
+    constraining_extent = ExtentAttr(read=ResourceScope.read, write=ResourceScope.update)
     title = SColumn(read=ResourceScope.read, write=ResourceScope.update)
 
     draw_order_enabled = SColumn(read=ResourceScope.read, write=ResourceScope.update)
@@ -461,6 +509,16 @@ class WebMapSerializer(Serializer, resource=WebMap):
     bookmark_resource = SResource(read=ResourceScope.read, write=ResourceScope.update)
 
     root_item = RootItemAttr(read=ResourceScope.read, write=ResourceScope.update)
+
+    extent_left = ExtentPartAttr(read=ResourceScope.read, write=ResourceScope.update)
+    extent_right = ExtentPartAttr(read=ResourceScope.read, write=ResourceScope.update)
+    extent_bottom = ExtentPartAttr(read=ResourceScope.read, write=ResourceScope.update)
+    extent_top = ExtentPartAttr(read=ResourceScope.read, write=ResourceScope.update)
+
+    extent_const_left = ExtentPartAttr(read=ResourceScope.read, write=ResourceScope.update)
+    extent_const_right = ExtentPartAttr(read=ResourceScope.read, write=ResourceScope.update)
+    extent_const_bottom = ExtentPartAttr(read=ResourceScope.read, write=ResourceScope.update)
+    extent_const_top = ExtentPartAttr(read=ResourceScope.read, write=ResourceScope.update)
 
 
 @sa_event.listens_for(SRS, "after_delete")
