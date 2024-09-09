@@ -140,6 +140,28 @@ export function encodeQueryParams(
     return result.join("&");
 }
 
+export function generateUrl(
+    path: string,
+    query?: Record<string, QueryScalar | QueryList | QueryRecord>,
+    global?: boolean
+): string {
+    let urlParams = "";
+    if (query !== undefined) {
+        urlParams = "?" + encodeQueryParams(query);
+    }
+
+    if (global) {
+        return path + urlParams;
+    } else {
+        return (
+            ngwConfig.applicationUrl +
+            (path.startsWith("/") ? "" : "/") +
+            path +
+            urlParams
+        );
+    }
+}
+
 export async function request<
     T = unknown,
     RT extends ResponseType = "json",
@@ -156,43 +178,29 @@ export async function request<
     const {
         cache: useCache,
         responseType,
+        lunkwill,
+        query,
+        json,
         ...opt
     } = { ...defaults, ...options };
 
-    let urlParams = "";
-    if (opt.query !== undefined) {
-        urlParams = "?" + encodeQueryParams(opt.query);
-        delete opt.query;
-    }
-
     let useLunkwill = false;
-    if (opt.lunkwill !== undefined) {
-        opt.lunkwill.toHeaders(opt.headers || {});
-        delete opt.lunkwill;
+    if (lunkwill !== undefined) {
+        lunkwill.toHeaders(opt.headers || {});
         useLunkwill = true;
     }
 
     const lunkwillReturnUrl = !!opt.lunkwillReturnUrl;
     delete opt.lunkwillReturnUrl;
 
-    if (opt.json !== undefined) {
-        opt.body = JSON.stringify(opt.json);
+    if (json !== undefined) {
+        opt.body = JSON.stringify(json);
         const headers = opt.headers || {};
         headers["Content-Type"] = "application/json";
         opt.headers = headers;
-        delete opt.json;
     }
 
-    let url: string;
-    if (opt.global) {
-        url = path + urlParams;
-    } else {
-        url =
-            ngwConfig.applicationUrl +
-            (path.startsWith("/") ? "" : "/") +
-            path +
-            urlParams;
-    }
+    const url = generateUrl(path, query, opt.global);
 
     const makeRequest = async (): Promise<ToReturn<T, RT, ReturnUrl>> => {
         let response: Response;

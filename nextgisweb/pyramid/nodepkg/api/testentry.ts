@@ -25,6 +25,11 @@ export const test = async () => {
     data.key;
     data.key;
 
+    // @ts-expect-error An argument for 'options' was not provided
+    route("pyramid.settings").get();
+    // @ts-expect-error Property 'component' is missing in type
+    route("pyramid.settings").get({ query: {} });
+
     await route("pyramid.settings").get({
         // @ts-expect-error error Type '"auth1"' is not assignable to component type
         query: { component: "auth1" },
@@ -36,6 +41,8 @@ export const test = async () => {
     user.display_name;
     // @ts-expect-error Property 'display_name1' does not exist on type 'UserRead | UserReadBrief'
     user.display_name1;
+
+    route("auth.user.item", 1).url({ query: { brief: true } });
 
     const user1 = await route("auth.user.item", { id: 1 }).get<UserReadBrief>({
         query: { brief: true },

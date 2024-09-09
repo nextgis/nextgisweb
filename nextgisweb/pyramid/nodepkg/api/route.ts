@@ -2,7 +2,7 @@ import { set } from "lodash-es";
 
 import routeData from "@nextgisweb/pyramid/api/load!/api/component/pyramid/route";
 
-import { request } from "./request";
+import { generateUrl, request } from "./request";
 import type {
     RequestMethod,
     RequestOptions,
@@ -65,7 +65,16 @@ export function route<N extends RouteName>(
     ...rest: RouteParameters[N]
 ): RouteResults<N> {
     const template = routeURL(name, ...rest);
-    const result = {} as RouteResults<N>;
+    const result = {
+        url: (
+            opt?: Pick<
+                RequestOptions<ResponseType, false, RouteQuery<N, "get">>,
+                "query"
+            >
+        ) => {
+            return generateUrl(name, opt);
+        },
+    } as RouteResults<N>;
     const methods: RequestMethod[] = ["get", "post", "put", "delete", "patch"];
     for (const method of methods) {
         const methodResp = <

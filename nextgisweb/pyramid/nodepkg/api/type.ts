@@ -109,7 +109,9 @@ export type RequestOptionsByMethod<
     B = any,
     RT extends ResponseType = "json",
     ReturnUrl extends boolean = false,
-> = RouteRequestOptions<Q, B, RT, ReturnUrl>[M];
+> = M extends keyof RouteRequestOptions
+    ? RouteRequestOptions<Q, B, RT, ReturnUrl>[M]
+    : never;
 
 export type ApiRouteParams = Record<string, string>;
 
@@ -164,6 +166,19 @@ type HasRequiredKeys<T> = {
     : true;
 
 export interface RouteMethods<N extends RouteName> {
+    url: HasRequiredKeys<RouteQuery<N, "get">> extends true
+        ? (
+              options: Pick<
+                  RequestOptionsByMethod<"get", RouteQuery<N, "get">>,
+                  "query"
+              >
+          ) => string
+        : (
+              options?: Pick<
+                  RequestOptionsByMethod<"get", RouteQuery<N, "get">>,
+                  "query"
+              >
+          ) => string;
     get: HasRequiredKeys<RouteQuery<N, "get">> extends true
         ? <
               T = RouteResp<N, "get">,
@@ -229,7 +244,11 @@ export interface RouteMethods<N extends RouteName> {
 export type MethodAvailable<
     N extends RouteName,
     M extends RequestMethod,
-> = M extends keyof Routes[N] ? RouteMethods<N>[M] : never;
+> = M extends "url"
+    ? RouteMethods<N>["url"]
+    : M extends keyof Routes[N]
+      ? RouteMethods<N>[M]
+      : never;
 
 export type RouteResults<N extends RouteName> = {
     [M in keyof RouteMethods<any>]: MethodAvailable<N, M>;
