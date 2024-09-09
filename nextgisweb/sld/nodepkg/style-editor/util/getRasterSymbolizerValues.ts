@@ -1,5 +1,6 @@
+import type { RasterSymbolizer } from "@nextgisweb/sld/type/api";
+
 import type { BandRange, SymbolizerValues } from "../RasterStyleEditor";
-import type { RasterSymbolizer } from "../type/Style";
 
 export function getRasterSymbolizerValues({
     symbolizer,
@@ -23,26 +24,32 @@ export function getRasterSymbolizerValues({
     } else {
         return {
             redChannelMin:
-                symbolizer.channels.red.contrast_enhancement.normalize
+                symbolizer.channels.red?.contrast_enhancement?.normalize
                     .min_value,
             redChannelMax:
-                symbolizer.channels.red.contrast_enhancement.normalize
+                symbolizer.channels.red?.contrast_enhancement?.normalize
                     .max_value,
             greenChannelMin:
-                symbolizer.channels.green.contrast_enhancement.normalize
+                symbolizer.channels.green?.contrast_enhancement?.normalize
                     .min_value,
             greenChannelMax:
-                symbolizer.channels.green.contrast_enhancement.normalize
+                symbolizer.channels.green?.contrast_enhancement?.normalize
                     .max_value,
             blueChannelMin:
-                symbolizer.channels.blue.contrast_enhancement.normalize
+                symbolizer.channels.blue?.contrast_enhancement?.normalize
                     .min_value,
             blueChannelMax:
-                symbolizer.channels.blue.contrast_enhancement.normalize
+                symbolizer.channels.blue?.contrast_enhancement?.normalize
                     .max_value,
-            redChannel: symbolizer.channels.red.source_channel - 1,
-            greenChannel: symbolizer.channels.green.source_channel - 1,
-            blueChannel: symbolizer.channels.blue.source_channel - 1,
+            redChannel: symbolizer.channels.red
+                ? symbolizer.channels.red.source_channel - 1
+                : undefined,
+            greenChannel: symbolizer.channels.green
+                ? symbolizer.channels.green.source_channel - 1
+                : undefined,
+            blueChannel: symbolizer.channels.blue
+                ? symbolizer.channels.blue.source_channel - 1
+                : undefined,
         };
     }
 }

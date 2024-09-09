@@ -7,14 +7,14 @@ import type {
 } from "geostyler-style";
 
 import { deepCleanUndefined } from "@nextgisweb/gui/util/deepCleanUndefined";
-
 import type {
     LineSymbolizer,
     PointSymbolizer,
     PolygonSymbolizer,
-    Symbolizer,
     WellKnownName,
-} from "../type/Style";
+} from "@nextgisweb/sld/type/api";
+
+import type { Symbolizer } from "../type/Style";
 
 const setOpacity = (
     v: number | GeoStylerNumberFunction | undefined

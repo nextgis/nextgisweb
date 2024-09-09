@@ -4,8 +4,9 @@ import { Form, InputNumber, Select } from "@nextgisweb/gui/antd";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext, gettextf } from "@nextgisweb/pyramid/i18n";
 import type { RasterLayerResource } from "@nextgisweb/raster-layer/type/RasterLayerResource";
+import type { RasterSymbolizer } from "@nextgisweb/sld/type/api";
 
-import type { RasterSymbolizer, Symbolizer } from "./type/Style";
+import type { Symbolizer } from "./type/Style";
 import { getRasterBandRange } from "./util/getRasterBandRange";
 import { getRasterSymbolizerValues } from "./util/getRasterSymbolizerValues";
 
@@ -20,15 +21,15 @@ interface RasterStyleEditorProps {
 }
 
 export interface SymbolizerValues {
-    redChannelMin: number;
-    redChannelMax: number;
-    greenChannelMin: number;
-    greenChannelMax: number;
-    blueChannelMin: number;
-    blueChannelMax: number;
-    redChannel: number;
-    greenChannel: number;
-    blueChannel: number;
+    redChannelMin?: number;
+    redChannelMax?: number;
+    greenChannelMin?: number;
+    greenChannelMax?: number;
+    blueChannelMin?: number;
+    blueChannelMax?: number;
+    redChannel?: number;
+    greenChannel?: number;
+    blueChannel?: number;
 }
 
 interface BandOptions {

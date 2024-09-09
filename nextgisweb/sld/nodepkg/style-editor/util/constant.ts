@@ -1,6 +1,5 @@
 import { gettext } from "@nextgisweb/pyramid/i18n";
-
-import type { WellKnownName } from "../type/Style";
+import type { WellKnownName } from "@nextgisweb/sld/type/api";
 
 export const wellKnownNames: { value: WellKnownName; label: string }[] = [
     { value: "square", label: gettext("Square") },

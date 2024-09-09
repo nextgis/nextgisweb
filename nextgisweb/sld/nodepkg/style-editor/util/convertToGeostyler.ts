@@ -7,13 +7,13 @@ import type {
 } from "geostyler-style";
 
 import { deepCleanUndefined } from "@nextgisweb/gui/util/deepCleanUndefined";
-
 import type {
     LineSymbolizer,
     PointSymbolizer,
     PolygonSymbolizer,
-    Symbolizer,
-} from "../type/Style";
+} from "@nextgisweb/sld/type/api";
+
+import type { Symbolizer } from "../type/Style";
 
 function reverseConvertMarkSymbolizer(
     symbolizer: PointSymbolizer
