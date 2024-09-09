@@ -3,7 +3,10 @@ import { useMemo } from "react";
 
 import { List, Space } from "@nextgisweb/gui/antd";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
-import type { BlueprintResource } from "@nextgisweb/resource/type/api";
+import type {
+    BlueprintResource,
+    ResourceCls,
+} from "@nextgisweb/resource/type/api";
 
 import { SvgIcon } from "./SvgIcon";
 
@@ -11,12 +14,12 @@ const SvgIconTest = () => {
     const { data: blueprint } = useRouteGet("resource.blueprint");
 
     const allResourceClasses = useMemo<
-        (BlueprintResource & { cls: string })[]
+        (BlueprintResource & { cls: ResourceCls })[]
     >(() => {
         return blueprint
             ? Object.entries(blueprint.resources).map(([cls, res]) => ({
                   ...res,
-                  cls,
+                  cls: cls as ResourceCls,
               }))
             : [];
     }, [blueprint]);

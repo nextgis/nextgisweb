@@ -4,10 +4,9 @@ import type { CardProps } from "@nextgisweb/gui/antd";
 import type {
     CompositeRead,
     ResourceCls,
+    ResourceInterface,
     ResourceRead,
 } from "@nextgisweb/resource/type/api";
-
-import type { ResourceInterface } from "../../type/Resource";
 
 import type { ResourcePickerStore } from "./store/ResourcePickerStore";
 

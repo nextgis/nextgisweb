@@ -3,6 +3,7 @@ import { Suspense, lazy, useCallback, useState } from "react";
 import { Button } from "@nextgisweb/gui/antd";
 import { AddIcon } from "@nextgisweb/gui/icon";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import type { ResourceCls } from "@nextgisweb/resource/type/api";
 
 const msgCreateResource = gettext("Create resource");
 
@@ -10,7 +11,7 @@ const LazyModal = lazy(() => import("./CreateResourceModal"));
 
 interface CreateResourceButtonProps {
     resourceId: number;
-    creatable: string[];
+    creatable: ResourceCls[];
 }
 
 export function CreateResourceButton({

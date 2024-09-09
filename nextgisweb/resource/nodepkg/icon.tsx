@@ -1,6 +1,7 @@
 import type { SVGProps } from "react";
 
 import { SvgIcon } from "@nextgisweb/gui/svg-icon";
+import type { ResourceCls } from "@nextgisweb/resource/type/api";
 
 import MAllowIcon from "@nextgisweb/icon/material/check_circle/fill";
 import MDenyIcon from "@nextgisweb/icon/material/do_not_disturb_on/fill";
@@ -8,7 +9,7 @@ import MDenyIcon from "@nextgisweb/icon/material/do_not_disturb_on/fill";
 export function ResourceIcon({
     identity,
     ...props
-}: SVGProps<SVGSVGElement> & { identity?: string }) {
+}: SVGProps<SVGSVGElement> & { identity?: ResourceCls }) {
     return <SvgIcon icon={"rescls-" + identity} {...props} />;
 }
 

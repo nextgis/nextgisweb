@@ -24,7 +24,7 @@ const ALL_RESOURCES = "";
 interface CreateResourceModalProps
     extends Omit<ModalProps, "footer" | "classNames"> {
     resourceId: number;
-    creatable: string[];
+    creatable: ResourceCls[];
 }
 
 export default function CreateResourceModal({
@@ -48,7 +48,7 @@ export default function CreateResourceModal({
             },
         };
         const outRes = creatable.map((identity) => {
-            const resBp = resources[identity as ResourceCls]!;
+            const resBp = resources[identity]!;
             outCat[resBp.category] = categories[resBp.category];
             return {
                 key: identity,

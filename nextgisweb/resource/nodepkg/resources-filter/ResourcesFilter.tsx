@@ -7,7 +7,7 @@ import type { ParamsOf } from "@nextgisweb/gui/type";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import type { CompositeRead } from "@nextgisweb/resource/type/api";
+import type { CompositeRead, ResourceCls } from "@nextgisweb/resource/type/api";
 
 import "./ResourcesFilter.less";
 
@@ -15,7 +15,7 @@ type AutoProps = ParamsOf<typeof AutoComplete>;
 
 interface ResourcesFilterProps extends AutoProps {
     onChange?: AutoProps["onSelect"];
-    cls?: string | string[];
+    cls?: ResourceCls | ResourceCls[];
 }
 
 const resourcesToOptions = (resourcesInfo: CompositeRead[]) => {

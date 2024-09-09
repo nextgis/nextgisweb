@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
 import type { SelectProps } from "@nextgisweb/gui/antd";
+import type { ResourceCls } from "@nextgisweb/resource/type/api";
 
 import type {
     ResourcePickerStoreOptions,
@@ -10,7 +11,7 @@ import type {
 export interface ResourceSelectOption {
     label: ReactNode;
     value: number;
-    cls: string;
+    cls: ResourceCls;
 }
 
 export interface ResourceSelectProps<V extends SelectValue = SelectValue>

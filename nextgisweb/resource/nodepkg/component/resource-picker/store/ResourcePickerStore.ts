@@ -7,10 +7,10 @@ import type {
     CompositeCreate,
     CompositeRead,
     ResourceCls,
+    ResourceInterface,
     ResourceRead,
 } from "@nextgisweb/resource/type/api";
 
-import type { ResourceInterface } from "../../../type/Resource";
 import { loadParents } from "../../../util/loadParents";
 import type { OnNewGroupType, ResourcePickerStoreOptions } from "../type";
 

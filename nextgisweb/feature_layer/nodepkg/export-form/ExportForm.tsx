@@ -131,26 +131,26 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
                 signal,
             });
             setSrsOptions(srsListToOptions(srsInfo));
-            let itemInfo = null;
+
             if (id !== undefined) {
-                itemInfo = await route("resource.item", id).get({
+                const itemInfo = await route("resource.item", id).get({
                     signal,
                 });
-            }
 
-            if (itemInfo && itemInfo.feature_layer) {
-                const cls = itemInfo.resource.cls as "vector_layer";
-                const vectorLayer = itemInfo[cls];
-                if (vectorLayer) {
-                    setDefaultSrs(vectorLayer.srs.id);
-                }
-                setFieldOptions(
-                    fieldListToOptions(itemInfo.feature_layer.fields)
-                );
-            } else {
-                const defSrs = srsInfo.find((srs) => srs.id === 3857);
-                if (defSrs) {
-                    setDefaultSrs(defSrs.id);
+                if (itemInfo && itemInfo.feature_layer) {
+                    const cls = itemInfo.resource.cls as "vector_layer";
+                    const vectorLayer = itemInfo[cls];
+                    if (vectorLayer) {
+                        setDefaultSrs(vectorLayer.srs.id);
+                    }
+                    setFieldOptions(
+                        fieldListToOptions(itemInfo.feature_layer.fields)
+                    );
+                } else {
+                    const defSrs = srsInfo.find((srs) => srs.id === 3857);
+                    if (defSrs) {
+                        setDefaultSrs(defSrs.id);
+                    }
                 }
             }
         } catch (err) {

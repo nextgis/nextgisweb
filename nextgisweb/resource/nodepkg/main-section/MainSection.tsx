@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 
 import { PageTitle } from "@nextgisweb/pyramid/layout";
+import type { ResourceCls } from "@nextgisweb/resource/type/api";
 
 import { CreateResourceButton } from "./CreateResourceButton";
 
@@ -9,7 +10,7 @@ import "./MainSection.less";
 interface MainSectionProps {
     resourceId: number;
     summary: [string, string][];
-    creatable?: string[];
+    creatable?: ResourceCls[];
 }
 
 export function MainSection({
