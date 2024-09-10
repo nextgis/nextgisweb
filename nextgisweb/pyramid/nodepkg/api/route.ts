@@ -72,7 +72,7 @@ export function route<N extends RouteName>(
                 "query"
             >
         ) => {
-            return generateUrl(name, opt);
+            return generateUrl(template, opt?.query);
         },
     } as RouteResults<N>;
     const methods: RequestMethod[] = ["get", "post", "put", "delete", "patch"];
