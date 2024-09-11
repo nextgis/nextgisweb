@@ -54,7 +54,7 @@ class LayerField(Base):
     lookup_table = orm.relationship(
         LookupTable,
         primaryjoin="LayerField.lookup_table_id == LookupTable.id",
-        backref=orm.backref("layer_fields"),
+        backref=orm.backref("layer_fields", cascade_backrefs=False),
     )
 
     def __str__(self):
