@@ -19,6 +19,7 @@ from nextgisweb.pyramid import JSONType, viewargs
 from nextgisweb.pyramid.breadcrumb import Breadcrumb, breadcrumb_adapter
 from nextgisweb.pyramid.psection import PageSections
 
+from .event import OnChildClasses, OnDeletePrompt
 from .exception import ResourceNotFound
 from .extaccess import ExternalAccessLink
 from .interface import IResourceBase
@@ -257,20 +258,31 @@ def resource_export(request):
 
 def creatable_resources(parent, *, user):
     result = []
-    options = env.resource.options
+
     permissions = parent.permissions(user)
+    if ResourceScope.manage_children not in permissions:
+        return result
 
-    for ident, cls in Resource.registry._dict.items():
-        if ident in options["disabled_cls"] or options["disable." + ident]:
-            continue
+    options = env.resource.options
 
-        if not cls.check_parent(parent):
-            continue
+    classes = set(
+        cls
+        for cls in Resource.registry.values()
+        if (
+            cls.identity not in options["disabled_cls"]
+            and not options["disable." + cls.identity]
+            and cls.check_parent(parent)
+        )
+    )
 
-        if ResourceScope.manage_children not in permissions:
-            continue
+    if len(classes) == 0:
+        return result
 
+    classes = OnChildClasses.apply(parent=parent, classes=classes)
+
+    for cls in classes:
         # Create a temporary resource to perform the remaining checks
+        # TODO: It shouldn't be added to a session! Double-check it.
         child = cls(parent=parent, owner_user=user)
 
         if not parent.check_child(child):
@@ -403,6 +415,7 @@ def setup_pyramid(comp, config):
             ResourceScope.delete in permissions
             and args.obj.id != 0
             and args.obj.parent.has_permission(ResourceScope.manage_children, args.request.user)
+            and OnDeletePrompt.apply(args.obj)
         ):
             yield Link(
                 "operation/20-delete",

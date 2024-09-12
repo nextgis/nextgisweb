@@ -20,7 +20,7 @@ from nextgisweb.pyramid.api import csetting, require_storage_enabled
 
 from .category import ResourceCategory
 from .composite import CompositeSerializer
-from .events import AfterResourceCollectionPost, AfterResourcePut
+from .event import AfterResourceCollectionPost, AfterResourcePut, OnDeletePrompt
 from .exception import HierarchyError, QuotaExceeded, ResourceDisabled
 from .model import Resource, ResourceCls, ResourceInterfaceIdentity, ResourceScopeIdentity
 from .presolver import ExplainACLRule, ExplainDefault, ExplainRequirement, PermissionResolver
@@ -153,7 +153,10 @@ def item_delete(context, request) -> EmptyObject:
         DBSession.delete(obj)
 
     if context.id == 0:
-        raise HierarchyError(message=gettext("Root resource could not be deleted."))
+        raise HierarchyError(gettext("Root resource could not be deleted."))
+
+    if not OnDeletePrompt.apply(context):
+        raise HierarchyError
 
     with DBSession.no_autoflush:
         delete(context)

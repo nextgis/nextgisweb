@@ -461,7 +461,13 @@ class ParentAttr(SResource, apitype=True):
                     % parent.id
                 )
 
-        if not srlzr.obj.check_parent(new_parent) or not new_parent.check_child(srlzr.obj):
+        from .event import OnChildClasses
+
+        if not (
+            srlzr.obj.check_parent(new_parent)
+            and new_parent.check_child(srlzr.obj)
+            and (OnChildClasses.apply(parent=new_parent, classes={srlzr.obj.__class__}))
+        ):
             raise HierarchyError(
                 gettext("Resource can not be a child of resource id = %d.") % srlzr.obj.parent.id
             )
