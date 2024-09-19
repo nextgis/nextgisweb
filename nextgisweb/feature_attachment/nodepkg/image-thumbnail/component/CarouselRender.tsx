@@ -1,6 +1,15 @@
-import { Fragment, Suspense, lazy, useEffect, useState } from "react";
+import type { CarouselRef } from "antd/es/carousel";
+import {
+    Fragment,
+    useEffect,
+    useMemo,
+    useReducer,
+    useRef,
+    useState,
+} from "react";
 
-import { Button, Carousel, Image, Spin, Tooltip } from "@nextgisweb/gui/antd";
+import { Button, Carousel, Tooltip } from "@nextgisweb/gui/antd";
+import { useKeydownListener } from "@nextgisweb/gui/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { isFileImage } from "../../attachment-editor/AttachmentEditor";
@@ -13,15 +22,14 @@ import { isFeatureAttachment } from "../ImageThumbnail";
 import { getFeatureImage } from "../util/getFeatureImage";
 import { getFileImage } from "../util/getFileImage";
 
-import { LoadingOutlined } from "@ant-design/icons";
+import { CarouselSlide } from "./CarouselSlide";
+
 import ArrowForward from "@nextgisweb/icon/material/arrow_forward_ios";
 import PhotosphereIcon from "@nextgisweb/icon/material/panorama_photosphere";
 
 import "./CarouselRender.less";
 
 const msgTogglePanorama = gettext("Toggle panorama viewer");
-
-const PhotospherePreview = lazy(() => import("./PhotospherePreview"));
 
 // Based on https://github.com/akiran/react-slick/issues/1195#issuecomment-1746192879
 const SlickButtonFix = (
@@ -52,7 +60,7 @@ interface CarouselRenderProps {
     featureId: number;
 }
 
-interface urlPanorama {
+interface Attachment {
     url: string;
     isPanorama: boolean;
     fileName: string;
@@ -79,22 +87,28 @@ export function CarouselRender({
     resourceId,
     featureId,
 }: CarouselRenderProps) {
-    const [togglePanorama, setTogglePanorama] = useState(true);
-    const [fileName, setFileName] = useState<string>();
-    const [description, setDescription] = useState<string>();
-    const [imageUrlIsPanorama, setImageUrlIsPanorama] =
-        useState<urlPanorama[]>();
+    const carouselRef = useRef<CarouselRef>(null);
 
-    const imageList = data.filter((d) => {
-        if (isFeatureAttachment(d)) {
-            if ("is_image" in d) {
-                return d.is_image;
-            }
-            return false;
-        } else if ("_file" in d && d._file instanceof File) {
-            return isFileImage(d._file);
-        }
-    });
+    const [panoramaMode, togglePanoramaMode] = useReducer(
+        (state) => !state,
+        true
+    );
+    const [attachments, setAttachments] = useState<Attachment[]>([]);
+
+    const imageList = useMemo(
+        () =>
+            data.filter((d) => {
+                if (isFeatureAttachment(d)) {
+                    if ("is_image" in d) {
+                        return d.is_image;
+                    }
+                    return false;
+                } else if ("_file" in d && d._file instanceof File) {
+                    return isFileImage(d._file);
+                }
+            }),
+        [data]
+    );
     const [start] = useState(() =>
         imageList.findIndex((d) => {
             if (isFeatureAttachment(attachment)) {
@@ -106,18 +120,25 @@ export function CarouselRender({
             }
         })
     );
-    const [visibility, setVisibility] = useState<boolean>();
+    const [activeSlide, setActiveSlide] = useState(start);
+
+    const { isPanorama, description, fileName } = useMemo(() => {
+        return attachments[activeSlide] ?? {};
+    }, [attachments, activeSlide]);
+
     useEffect(() => {
         async function getUrl() {
-            const imageUrlIsPanorama_ = await Promise.all(
+            const attachments = await Promise.all(
                 imageList.map(async (d) => {
                     if (isFeatureAttachment(d)) {
                         const a = d as FeatureAttachment;
-                        return getFeatureImage({
-                            attachment: a,
-                            resourceId,
-                            featureId,
-                        });
+                        return {
+                            ...getFeatureImage({
+                                attachment: a,
+                                resourceId,
+                                featureId,
+                            }),
+                        };
                     } else {
                         const fileImage = d as FileMetaToUpload;
                         const url_ = await getFileImage(
@@ -132,16 +153,20 @@ export function CarouselRender({
                     }
                 })
             );
-            setImageUrlIsPanorama(imageUrlIsPanorama_);
-            setVisibility(imageUrlIsPanorama_[start].isPanorama);
-            setDescription(imageUrlIsPanorama_[start].description);
-            setFileName(imageUrlIsPanorama_[start].fileName);
+            setAttachments(attachments);
         }
         getUrl();
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [featureId, imageList, resourceId, start]);
+
+    useKeydownListener("ArrowLeft", () => {
+        carouselRef.current?.prev();
+    });
+    useKeydownListener("ArrowRight", () => {
+        carouselRef.current?.next();
+    });
 
     return (
-        <Fragment>
+        <>
             <div className="ngw-feature-attachment-carousel-render-toolbar">
                 {(description || fileName) && (
                     <div className="title">
@@ -150,37 +175,18 @@ export function CarouselRender({
                         )}
                     </div>
                 )}
-                {visibility && (
+                {isPanorama && (
                     <TogglePanoramaButton
-                        value={togglePanorama}
-                        onClick={() => {
-                            setTogglePanorama(!togglePanorama);
-                        }}
+                        value={panoramaMode}
+                        onClick={togglePanoramaMode}
                     />
                 )}
             </div>
-
             <Carousel
+                ref={carouselRef}
                 rootClassName="ngw-feature-attachment-carousel-render"
                 initialSlide={start}
-                beforeChange={(_, currentSlide) => {
-                    setVisibility(
-                        imageUrlIsPanorama
-                            ? imageUrlIsPanorama[currentSlide].isPanorama
-                            : false
-                    );
-                    setDescription(
-                        imageUrlIsPanorama
-                            ? imageUrlIsPanorama[currentSlide].description
-                            : ""
-                    );
-                    1;
-                    setFileName(
-                        imageUrlIsPanorama
-                            ? imageUrlIsPanorama[currentSlide].fileName
-                            : ""
-                    );
-                }}
+                beforeChange={(_, currentSlide) => setActiveSlide(currentSlide)}
                 arrows={true}
                 prevArrow={
                     <SlickButtonFix>
@@ -192,36 +198,25 @@ export function CarouselRender({
                         <ArrowForward />
                     </SlickButtonFix>
                 }
+                // Use this prop to prevent slides double render
+                // https://github.com/ant-design/ant-design/issues/25289#issuecomment-1065005918
+                infinite={false}
             >
-                {imageUrlIsPanorama
-                    ? imageUrlIsPanorama.map(({ url, isPanorama }, index) => {
-                          return togglePanorama && isPanorama ? (
-                              <Suspense
-                                  key={index}
-                                  fallback={
-                                      <Spin
-                                          indicator={
-                                              <LoadingOutlined
-                                                  style={{
-                                                      fontSize: 24,
-                                                      color: "white",
-                                                  }}
-                                                  spin={true}
-                                              />
-                                          }
-                                      />
-                                  }
-                              >
-                                  <PhotospherePreview url={url} />
-                              </Suspense>
-                          ) : (
-                              <Fragment key={index}>
-                                  <Image src={url} preview={false} />
-                              </Fragment>
-                          );
-                      })
-                    : null}
+                {attachments.map(({ url, isPanorama }, index) => {
+                    return (
+                        <Fragment key={index}>
+                            {index === activeSlide ? (
+                                <CarouselSlide
+                                    url={url}
+                                    showPanorama={isPanorama && panoramaMode}
+                                />
+                            ) : (
+                                <></>
+                            )}
+                        </Fragment>
+                    );
+                })}
             </Carousel>
-        </Fragment>
+        </>
     );
 }

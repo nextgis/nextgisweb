@@ -27,7 +27,7 @@ export default function PhotospherePreview({ url }: PhotospherePreviewProps) {
                 viewer.destroy();
             }
         };
-    }, [photosphereWrapper, url]);
+    }, [url]);
 
     return (
         <div
