@@ -839,6 +839,14 @@ def _setup_pyramid_mako(comp, config):
 
     config.include(pyramid_mako)
 
+    def mako_cache_control(event):
+        if (ri := event.get("renderer_info")) and (ri.type in (".mako", ".mak")):
+            cache_control = event["request"].response.cache_control
+            cache_control.no_store = True
+            cache_control.must_revalidate = True
+
+    config.add_subscriber(mako_cache_control, BeforeRender)
+
     # Work around the template lookup bug (test_not_found_unauthorized)
     tsp = "template/error.mako"
     base = Path(__file__).parent
