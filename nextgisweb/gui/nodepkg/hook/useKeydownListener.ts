@@ -1,13 +1,18 @@
+import { useCallback } from "react";
+
 import { useEventListener } from "./useEventListener";
 
 export function useKeydownListener(
     key: string,
-    handler: (e: KeyboardEvent) => void
+    handlerProp: (e: KeyboardEvent) => void
 ) {
-    function handler_(e: KeyboardEvent) {
-        if (e.key && e.key.toLowerCase() === key.toLowerCase()) {
-            handler(e);
-        }
-    }
+    const handler_ = useCallback(
+        (e: KeyboardEvent) => {
+            if (e.key && e.key.toLowerCase() === key.toLowerCase()) {
+                handlerProp(e);
+            }
+        },
+        [handlerProp, key]
+    );
     useEventListener("keydown", handler_);
 }
