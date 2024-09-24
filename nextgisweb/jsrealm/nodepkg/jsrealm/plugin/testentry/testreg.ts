@@ -2,22 +2,21 @@
 import { assert, expect } from "chai";
 
 import { registry } from "./registry";
+import type { Operation } from "./registry";
 
 describe("Test registry", () => {
     it("throws error on register", () => {
         expect(() => {
-            registry.register(
-                { component: COMP_ID, operation: "create" },
-                { sync: (what) => what }
-            );
+            registry.register(COMP_ID, (what) => what, {
+                operation: "create",
+            });
         }).to.throw();
     });
     ["foo:create", "bar:update", "zoo:delete"].forEach((itm) => {
-        const [id, op] = itm.split(":");
-        it(`${id} is selected for ${op}`, async () => {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const res = (await registry.load({ operation: op as any }))(op);
-            assert.strictEqual(res, itm);
+        const [id, operation] = itm.split(":") as [string, Operation];
+        it(`${id} is selected for ${operation}`, async () => {
+            const fn = await registry.load({ operation });
+            assert.strictEqual(fn(operation), itm);
         });
     });
 });

@@ -133,8 +133,9 @@ const dynamicEntries = () => {
                             if (itm.scope === metaRegistry) continue;
                             code.push(
                                 `registry.register(`,
-                                `    { component: "${itm.component}", identity: "${itm.scope}" },`,
-                                `    { import: () => entrypoint("${itm.entry}").then(({ registry }) => ({ default: registry })) }`,
+                                `    "${itm.component}",`,
+                                `    () => entrypoint("${itm.entry}").then(({ registry }) => ({ default: registry })),`,
+                                `    { identity: "${itm.scope}" },`,
                                 `);`
                             );
                         }

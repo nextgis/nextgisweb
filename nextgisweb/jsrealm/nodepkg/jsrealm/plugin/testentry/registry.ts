@@ -1,12 +1,13 @@
 /** @registry */
 import { pluginRegistry } from "../registry";
 
+export type Operation = "create" | "update" | "delete";
+
 export const registry = pluginRegistry<
     (what: string) => string,
-    { operation: "create" | "update" | "delete" }
+    { operation: Operation }
 >(MODULE_NAME);
 
-registry.register(
-    { component: COMP_ID, operation: "create" },
-    { import: () => import("./plugin/foo") }
-);
+registry.register(COMP_ID, () => import("./plugin/foo"), {
+    operation: "create",
+});

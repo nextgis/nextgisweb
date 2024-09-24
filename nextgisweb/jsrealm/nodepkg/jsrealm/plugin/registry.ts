@@ -8,16 +8,17 @@ interface NoMetadata {}
 type PromiseLoader<V extends Value> = () => Promise<V>;
 type ImportLoader<V extends Value> = PromiseLoader<{ default: V }>;
 
-class PluginObject<V extends Value> {
+class PluginObject<V extends Value, M extends Metadata> {
     readonly component: string;
     readonly #loader: PromiseLoader<V>;
 
     #promise?: Promise<V>;
     #value?: V;
 
-    constructor(component: string, loader: PromiseLoader<V>) {
+    constructor(component: string, loader: PromiseLoader<V>, meta?: M) {
         this.component = component;
         this.#loader = loader;
+        Object.assign(this, meta);
     }
 
     async load(): Promise<V> {
@@ -28,25 +29,22 @@ class PluginObject<V extends Value> {
     }
 }
 
-type Plugin<
-    V extends Value,
-    M extends Metadata,
-> = keyof M extends keyof PluginObject<Value>
-    ? keyof M extends keyof NoMetadata
-        ? PluginObject<V>
-        : never /* Key conflicts guard */
-    : PluginObject<V> & Readonly<M>;
+type Plugin<V extends Value, M extends Metadata> = PluginObject<V, M> &
+    Readonly<M>;
 
-type RegisterValue<V extends Value> =
-    | { sync: V }
-    | { promise: PromiseLoader<V> }
-    | { import: ImportLoader<V> };
+type RegisterValue<V extends Value> = V | PromiseLoader<V> | ImportLoader<V>;
 
 type Selector<M> = { component: string } & M;
 
 type Query<M extends Metadata> =
     | ((i: Selector<M>) => boolean)
     | Partial<Selector<M>>;
+
+function isAsyncLoader<V extends Value = Value>(
+    fn: unknown
+): fn is ImportLoader<V> | PromiseLoader<V> {
+    return typeof fn === "function" && fn().then instanceof Function;
+}
 
 export class PluginRegistry<
     V extends Value = Value,
@@ -61,32 +59,31 @@ export class PluginRegistry<
         this.identity = identity;
     }
 
-    register(meta: { component: string } & M, value: RegisterValue<V>) {
+    register(component: string, value: RegisterValue<V>, meta?: M): void {
         if (this._sealed)
             throw new Error(`Registry '${this.identity}' already sealed`);
 
-        const { component, ...metaRest } = meta;
         if (!ngwConfig.components.includes(component)) {
             this._skipped += 1;
             return;
         }
 
         let loader: PromiseLoader<V>;
-        if ("sync" in value) {
-            loader = () => new Promise((resolve) => resolve(value.sync));
-        } else if ("promise" in value) {
-            loader = value.promise;
-        } else if ("import" in value) {
-            loader = () =>
-                new Promise((resolve) => {
-                    value.import().then((mod) => {
-                        resolve(mod.default);
-                    });
-                });
-        } else throw TypeError("One of keys expected: sync, promise, import");
 
-        const plugin = new PluginObject<V>(component, loader);
-        Object.assign(plugin, metaRest);
+        if (isAsyncLoader(value)) {
+            loader = () =>
+                value().then((mod) => {
+                    if (mod && typeof mod === "object" && "default" in mod) {
+                        return mod.default;
+                    }
+                    return mod;
+                });
+        } else {
+            loader = () => Promise.resolve(value);
+        }
+
+        const plugin = new PluginObject<V, M>(component, loader, meta);
+
         this.items.push(plugin as Plugin<V, M>);
     }
 
@@ -127,13 +124,13 @@ export class PluginRegistry<
         return Array.from(this.query(query));
     }
 
-    async load(query?: Query<M>): Promise<V> {
+    load(query?: Query<M>): Promise<V> {
         const item = this.queryAll(query)[0];
         if (item === undefined)
             throw new Error(
                 `No plugin found for selector: ${JSON.stringify(query)}`
             );
-        return await item.load();
+        return item.load();
     }
 }
 

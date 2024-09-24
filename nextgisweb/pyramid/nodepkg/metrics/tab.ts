@@ -20,20 +20,12 @@ export const registry = pluginRegistry<
     { key: keyof Metrics; label: string }
 >(MODULE_NAME);
 
-registry.register(
-    {
-        component: COMP_ID,
-        key: "google_analytics",
-        label: gettext("Google Analytics"),
-    },
-    { import: () => import("./GoogleAnalyticsTab") }
-);
+registry.register(COMP_ID, () => import("./GoogleAnalyticsTab"), {
+    key: "google_analytics",
+    label: gettext("Google Analytics"),
+});
 
-registry.register(
-    {
-        component: COMP_ID,
-        key: "yandex_metrica",
-        label: gettext("Yandex.Metrica"),
-    },
-    { import: () => import("./YandexMetricaTab") }
-);
+registry.register(COMP_ID, () => import("./YandexMetricaTab"), {
+    key: "yandex_metrica",
+    label: gettext("Yandex.Metrica"),
+});

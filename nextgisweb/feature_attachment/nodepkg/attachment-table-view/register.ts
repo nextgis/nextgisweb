@@ -1,7 +1,4 @@
 /** @plugin */
 import { registry } from "@nextgisweb/webmap/panel/identification/registry";
 
-registry.register(
-    { component: COMP_ID },
-    { import: () => import("./AttachmentTableView") }
-);
+registry.register(COMP_ID, () => import("./AttachmentTableView"));
