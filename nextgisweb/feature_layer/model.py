@@ -201,7 +201,7 @@ class FieldsAttr(SAttribute, apitype=True):
                 # TODO: Handle errors: wrong schema, missing lookup table
                 mfld.lookup_table = LookupTable.filter_by(id=fld.lookup_table.id).one()
 
-            if fld.label_field is not UNSET:
+            if fld.label_field is True:
                 obj.feature_label_field = mfld
 
             new_fields.append(mfld)
