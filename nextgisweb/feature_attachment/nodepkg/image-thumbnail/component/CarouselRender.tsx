@@ -8,11 +8,11 @@ import {
     useState,
 } from "react";
 
+import { isFileImage } from "@nextgisweb/feature-attachment/attachment-editor/util/isFileImage";
 import { Button, Carousel, Tooltip } from "@nextgisweb/gui/antd";
 import { useKeydownListener } from "@nextgisweb/gui/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import { isFileImage } from "../../attachment-editor/AttachmentEditor";
 import type {
     DataSource,
     FileMetaToUpload,

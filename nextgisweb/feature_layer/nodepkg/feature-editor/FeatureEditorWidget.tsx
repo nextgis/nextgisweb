@@ -13,28 +13,25 @@ import type { ApiError } from "@nextgisweb/gui/error/type";
 import { useUnsavedChanges } from "@nextgisweb/gui/hook";
 import showModal from "@nextgisweb/gui/showModal";
 import type { ParamOf } from "@nextgisweb/gui/type";
-import entrypoint from "@nextgisweb/jsrealm/entrypoint";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import settings from "@nextgisweb/pyramid/settings!feature_layer";
-
-import editorWidgetRegister from "../attribute-editor";
-import type { EditorWidgetRegister } from "../type";
 
 import { FeatureEditorStore } from "./FeatureEditorStore";
 import { TabLabel } from "./component/TabLabel";
+import { ATTRIBUTES_KEY } from "./constant";
+import { registry } from "./registry";
+import type { FeatureEditorPlugin } from "./registry";
 import type { FeatureEditorWidgetProps } from "./type";
 
 import ResetIcon from "@nextgisweb/icon/material/restart_alt";
 import "./FeatureEditorWidget.less";
 
-type TabItems = NonNullable<ParamOf<typeof Tabs, "items">>;
-type TabItem = TabItems[0];
+type TabItem = NonNullable<ParamOf<typeof Tabs, "items">>[0] & {
+    order?: number;
+};
 
 const msgLoading = gettext("Loading...");
 const msgSave = gettext("Save");
 const msgReset = gettext("Reset");
-
-const ATTRIBUTES = "attributes";
 
 export const FeatureEditorWidget = observer(
     ({
@@ -44,7 +41,7 @@ export const FeatureEditorWidget = observer(
         onSave,
         store: storeProp,
     }: FeatureEditorWidgetProps) => {
-        const [activeKey, setActiveKey] = useState(ATTRIBUTES);
+        const [activeKey, setActiveKey] = useState(ATTRIBUTES_KEY);
         const store = useState<FeatureEditorStore>(() => {
             if (storeProp) return storeProp;
             if (resourceId && featureId)
@@ -54,17 +51,23 @@ export const FeatureEditorWidget = observer(
             );
         })[0];
 
-        const [items, setItems] = useState<TabItems>([]);
+        const [items, setItems] = useState<TabItem[]>([]);
 
-        const registerEditorWidget = useCallback(
-            (key: string, newEditorWidget: EditorWidgetRegister) => {
-                const widgetStore = new newEditorWidget.store({
+        const createEditorTab = useCallback(
+            async (newEditorWidget: FeatureEditorPlugin) => {
+                const key = newEditorWidget.identity;
+                const Store = await newEditorWidget.store();
+                const widgetStore = new Store.default({
                     parentStore: store,
                 });
 
-                const Widget = lazy(
-                    async () => await newEditorWidget.component()
-                );
+                if (key !== ATTRIBUTES_KEY) {
+                    store.addExtensionStore(key, widgetStore);
+                } else {
+                    store.attachAttributeStore(widgetStore);
+                }
+
+                const Widget = lazy(async () => await newEditorWidget.widget());
 
                 const ObserverTableLabel = observer(() => (
                     <TabLabel
@@ -73,9 +76,11 @@ export const FeatureEditorWidget = observer(
                         label={newEditorWidget.label}
                     />
                 ));
+                ObserverTableLabel.displayName = "ObserverTableLabel";
 
-                const newWidget: TabItem = {
+                return {
                     key,
+                    order: newEditorWidget.order,
                     label: <ObserverTableLabel />,
                     children: (
                         <Suspense fallback={msgLoading}>
@@ -83,42 +88,22 @@ export const FeatureEditorWidget = observer(
                         </Suspense>
                     ),
                 };
-                setItems((old) => [...old, newWidget]);
-                return { widgetStore };
             },
             [store]
         );
 
         useEffect(() => {
             const loadWidgets = async () => {
-                let key: keyof typeof settings.editor_widget;
-                for (key in settings.editor_widget) {
-                    const mid = settings.editor_widget[key];
-                    try {
-                        const widgetResource = (
-                            await entrypoint<{ default: EditorWidgetRegister }>(
-                                mid
-                            )
-                        ).default;
-                        const { widgetStore } = registerEditorWidget(
-                            key,
-                            widgetResource
-                        );
-                        store.addExtensionStore(key, widgetStore);
-                    } catch (er) {
-                        console.error(er);
-                    }
+                const newTabs: TabItem[] = [];
+                for (const p of registry.query()) {
+                    newTabs.push(await createEditorTab(await p.load()));
                 }
+                newTabs.sort((a, b) => (a.order ?? 100) - (b.order ?? 100));
+                setItems(newTabs);
             };
 
-            const { widgetStore } = registerEditorWidget(
-                ATTRIBUTES,
-                editorWidgetRegister as unknown as EditorWidgetRegister
-            );
-            store.attachAttributeStore(widgetStore);
-
             loadWidgets();
-        }, [store, registerEditorWidget]);
+        }, [store, createEditorTab]);
 
         useUnsavedChanges({ dirty: store.dirty });
 
@@ -177,3 +162,5 @@ export const FeatureEditorWidget = observer(
         );
     }
 );
+
+FeatureEditorWidget.displayName = "FeatureEditorWidget";

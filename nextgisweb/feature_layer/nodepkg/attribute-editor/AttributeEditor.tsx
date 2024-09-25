@@ -33,12 +33,14 @@ const style = { width: "100%" };
 const msgSetNull = gettext("Set field value to NULL (No data)");
 const msgNoAttrs = gettext("There are no attributes in the vector layer");
 
-interface AttributeEditorStoreProps
-    extends EditorWidgetProps<NgwAttributeValue | null, AttributeEditorStore> {
-    fields?: FeatureLayerFieldRead[];
-    size?: SizeType;
-    onChange?: (value: NgwAttributeValue | null) => void;
-}
+type AttributeEditorStoreProps = EditorWidgetProps<
+    AttributeEditorStore,
+    {
+        fields?: FeatureLayerFieldRead[];
+        size?: SizeType;
+        onChange?: (value: NgwAttributeValue | null) => void;
+    }
+>;
 
 const AttributeEditor = observer(
     ({

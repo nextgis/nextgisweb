@@ -17,17 +17,11 @@ import { CarouselModal } from "../image-thumbnail/component/CarouselModal";
 
 import AttachmentEditorStore from "./AttachmentEditorStore";
 import type { DataSource } from "./type";
-
+import { isFileImage } from "./util/isFileImage";
 import "./AttachmentEditor.less";
 
-export function isFileImage(file: File) {
-    return file && file["type"].split("/")[0] === "image";
-}
-
 const AttachmentEditor = observer(
-    ({
-        store,
-    }: EditorWidgetProps<DataSource[] | null, AttachmentEditorStore>) => {
+    ({ store }: EditorWidgetProps<AttachmentEditorStore>) => {
         const multiple = true;
 
         const [width] = useState(80);

@@ -5,9 +5,10 @@ import type { EditorWidgetProps } from "@nextgisweb/feature-layer/feature-editor
 import { TextEditor } from "@nextgisweb/gui/component/text-editor";
 
 import DescriptionEditorStore from "./DescriptionEditorStore";
+import type EditorStore from "./DescriptionEditorStore";
 
 const DescriptionEditor = observer(
-    ({ store }: EditorWidgetProps<string | null>) => {
+    ({ store }: EditorWidgetProps<EditorStore>) => {
         const [store_] = useState(() => store || new DescriptionEditorStore());
 
         const onChange = useCallback(

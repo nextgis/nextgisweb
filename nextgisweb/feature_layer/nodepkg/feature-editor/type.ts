@@ -22,9 +22,10 @@ export interface FeatureEditorStoreOptions {
     featureId: number;
 }
 
-export interface EditorWidgetProps<
-    V = unknown,
-    S extends EditorStore<V> = EditorStore<V>,
-> {
+export type EditorWidgetProps<
+    S extends EditorStore = EditorStore,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    M = any,
+> = {
     store?: S;
-}
+} & M;
