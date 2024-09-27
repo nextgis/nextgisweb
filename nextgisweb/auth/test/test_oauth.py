@@ -1,5 +1,5 @@
 from contextlib import contextmanager
-from datetime import datetime
+from datetime import datetime, timezone
 from secrets import token_hex, token_urlsafe
 from unittest.mock import patch
 from urllib.parse import parse_qsl, urlsplit
@@ -366,9 +366,7 @@ def test_authorization_code(server_response_mock, freezegun, ngw_webtest_app, ng
         "introspection",
         dict(token=access_token),
         introspection_response(ouser1),
-    ), patch.object(
-        ngw_env.auth.oauth, "password", new=True
-    ):
+    ), patch.object(ngw_env.auth.oauth, "password", new=True):
         ngw_webtest_app.post(
             "/api/component/auth/login",
             dict(login=ouser1["keyname"], password=ouser1["pwd"]),
@@ -399,6 +397,58 @@ def test_authorization_code(server_response_mock, freezegun, ngw_webtest_app, ng
         user2 = User.filter_by(keyname=keyname).one()
         assert user2.display_name == ouser2["family_name"] + " 2"
         assert user2.oauth_subject == ouser2["sub"]
+
+
+@pytest.fixture(scope="function")
+def local_user():
+    with transaction.manager:
+        user = User(
+            keyname="bindme",
+            display_name="Binden",
+            password="bindme",
+        ).persist()
+        DBSession.flush()
+
+    yield user.id
+
+
+def test_bind(local_user, server_response_mock, ngw_webtest_app):
+    ngw_webtest_app.post("/api/component/auth/login", dict(login="bindme", password="bindme"))
+
+    resp = ngw_webtest_app.get("/oauth", params=dict(bind="1"), status=302)
+    redirect = resp.headers["Location"]
+    redirect_qs = dict(parse_qsl(urlsplit(redirect).query))
+    state_key = redirect_qs["state"]
+
+    code = token_urlsafe(16)
+
+    def introspection_response():
+        start_tstamp = int(datetime.now(timezone.utc).timestamp())
+        return dict(exp=start_tstamp + ACCESS_TOKEN_LIFETIME, sub="wanttobind")
+
+    access_token = token_urlsafe(32)
+    refresh_token = token_urlsafe(32)
+
+    with server_response_mock(
+        "token",
+        dict(grant_type="authorization_code"),
+        response=dict(
+            access_token=access_token,
+            expires_in=ACCESS_TOKEN_LIFETIME,
+            refresh_token=refresh_token,
+            refresh_expires_in=REFRESH_TOKEN_LIFETIME,
+        ),
+    ), server_response_mock(
+        "introspection",
+        dict(token=access_token),
+        response=introspection_response(),
+    ):
+        cb_url = f"/oauth?state={state_key}&code={code}"
+        resp = ngw_webtest_app.get(cb_url, status=302)
+
+    user = User.filter_by(id=local_user).one()
+    assert user.oauth_subject == "wanttobind"
+    assert user.oauth_tstamp is not None
 
 
 @pytest.mark.parametrize(

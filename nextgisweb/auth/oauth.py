@@ -328,6 +328,7 @@ class OAuthHelper:
                         )(dn=dn, sub=_atoken().sub, id=user.id),
                     )
                 user = bind_user
+                user.oauth_subject = _atoken().sub
 
             if user is None:
                 # Register new user with default groups
