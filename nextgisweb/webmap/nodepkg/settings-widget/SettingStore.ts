@@ -22,7 +22,7 @@ function convertExtentToArray(
             (value) => value === undefined || value === null
         )
     ) {
-        return undefined;
+        return null;
     }
 
     return [left, bottom, right, top] as apitype.ExtentWSEN;
