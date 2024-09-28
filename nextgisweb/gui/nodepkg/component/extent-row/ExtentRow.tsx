@@ -9,6 +9,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { useResourcePicker } from "@nextgisweb/resource/component/resource-picker/hook";
 import type { ResourcePickerStoreOptions } from "@nextgisweb/resource/component/resource-picker/type";
 
+import ClearIcon from "@nextgisweb/icon/material/close";
 import LayersIconOutlined from "@nextgisweb/icon/material/layers";
 
 import "./ExtentRow.less";
@@ -111,13 +112,25 @@ export const ExtentRow = observer(
         return (
             <div className="ngw-gui-extent-row">
                 {!hideResourcePicker && (
-                    <Button
-                        loading={loading}
-                        icon={<LayersIconOutlined />}
-                        onClick={onSetFromLayerClick}
-                    >
-                        {gettext("From layer")}
-                    </Button>
+                    <Space.Compact style={{ display: "flex" }}>
+                        <Button
+                            loading={loading}
+                            icon={<LayersIconOutlined />}
+                            onClick={onSetFromLayerClick}
+                        >
+                            {gettext("From layer")}
+                        </Button>
+                        <Button
+                            title={gettext("Clean")}
+                            loading={loading}
+                            icon={<ClearIcon />}
+                            onClick={() => {
+                                if (onChange) {
+                                    onChange({});
+                                }
+                            }}
+                        />
+                    </Space.Compact>
                 )}
                 <Space.Compact style={{ display: "flex" }}>
                     {parts.map(({ key, min, max }) => (

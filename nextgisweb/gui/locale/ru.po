@@ -52,41 +52,45 @@ msgstr "Не установлен"
 msgid "Save"
 msgstr "Сохранить"
 
-#: nodepkg/component/extent-row/ExtentRow.tsx:54
+#: nodepkg/component/extent-row/ExtentRow.tsx:55
 msgid "Left"
 msgstr "Лево"
 
-#: nodepkg/component/extent-row/ExtentRow.tsx:55
+#: nodepkg/component/extent-row/ExtentRow.tsx:56
 msgid "Bottom"
 msgstr "Низ"
 
-#: nodepkg/component/extent-row/ExtentRow.tsx:56
+#: nodepkg/component/extent-row/ExtentRow.tsx:57
 msgid "Right"
 msgstr "Право"
 
-#: nodepkg/component/extent-row/ExtentRow.tsx:57
+#: nodepkg/component/extent-row/ExtentRow.tsx:58
 msgid "Top"
 msgstr "Верх"
 
-#: nodepkg/component/extent-row/ExtentRow.tsx:60
+#: nodepkg/component/extent-row/ExtentRow.tsx:61
 msgid "West"
 msgstr "Запад"
 
-#: nodepkg/component/extent-row/ExtentRow.tsx:61
+#: nodepkg/component/extent-row/ExtentRow.tsx:62
 msgid "South"
 msgstr "Юг"
 
-#: nodepkg/component/extent-row/ExtentRow.tsx:62
+#: nodepkg/component/extent-row/ExtentRow.tsx:63
 msgid "East"
 msgstr "Восток"
 
-#: nodepkg/component/extent-row/ExtentRow.tsx:63
+#: nodepkg/component/extent-row/ExtentRow.tsx:64
 msgid "North"
 msgstr "Север"
 
-#: nodepkg/component/extent-row/ExtentRow.tsx:117
+#: nodepkg/component/extent-row/ExtentRow.tsx:121
 msgid "From layer"
 msgstr "По слою"
+
+#: nodepkg/component/extent-row/ExtentRow.tsx:124
+msgid "Clean"
+msgstr "Очистить"
 
 #: nodepkg/component/language-select/LanguageSelect.tsx:15
 msgid "Improve or add new translation"
@@ -104,7 +108,7 @@ msgstr "Необходимо подтверждение"
 msgid "Please confirm this action."
 msgstr "Пожалуйста, подтвердите данное действие."
 
-#: nodepkg/confirm.ts:16 nodepkg/error/shared.js:69
+#: nodepkg/confirm.ts:16 nodepkg/error/shared.tsx:79
 msgid "OK"
 msgstr "OK"
 
@@ -113,8 +117,8 @@ msgid "Please confirm the deletion."
 msgstr "Пожалуйста, подтвердите удаление."
 
 #: nodepkg/confirm.ts:44 nodepkg/edi-table/RowAction.tsx:78
-#: nodepkg/focus-table/action.tsx:27 nodepkg/model-browse/ModelBrowse.tsx:257
-#: nodepkg/model-browse/ModelBrowse.tsx:324 nodepkg/model-form/ModelForm.tsx:48
+#: nodepkg/focus-table/action.tsx:27 nodepkg/model-browse/ModelBrowse.tsx:256
+#: nodepkg/model-browse/ModelBrowse.tsx:323 nodepkg/model-form/ModelForm.tsx:48
 msgid "Delete"
 msgstr "Удалить"
 
@@ -142,15 +146,15 @@ msgstr "Неожиданная ошибка"
 msgid "Something went wrong."
 msgstr "Что-то пошло не так."
 
-#: nodepkg/error/shared.js:54
+#: nodepkg/error/shared.tsx:64
 msgid "Technical information"
 msgstr "Техническая информация"
 
-#: nodepkg/error/shared.js:64
+#: nodepkg/error/shared.tsx:74
 msgid "Contact support"
 msgstr "Написать в поддержку"
 
-#: nodepkg/error/shared.js:73
+#: nodepkg/error/shared.tsx:83
 msgid "Back to home"
 msgstr "На главную"
 
@@ -170,43 +174,43 @@ msgstr "Скрыть детали"
 msgid "Add"
 msgstr "Добавить"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:109 nodepkg/model-form/ModelForm.tsx:68
+#: nodepkg/model-browse/ModelBrowse.tsx:114 nodepkg/model-form/ModelForm.tsx:68
 msgid "Confirmation"
 msgstr "Подтверждение"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:110
+#: nodepkg/model-browse/ModelBrowse.tsx:115
 msgid "Item deleted"
 msgstr "Элемент удален"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:112
+#: nodepkg/model-browse/ModelBrowse.tsx:117
 msgid "Items deleted"
 msgstr "Элементы удалены"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:180
+#: nodepkg/model-browse/ModelBrowse.tsx:185
 msgid "The errors occurred during execution"
 msgstr "Во время выполнения возникли ошибки"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:184
+#: nodepkg/model-browse/ModelBrowse.tsx:189
 msgid "Failed to delete items:"
 msgstr "Не удалось удалить элементы:"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:207
+#: nodepkg/model-browse/ModelBrowse.tsx:212
 msgid "Do you want to delete these items?"
 msgstr "Вы хотите удалить эти элементы?"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:247
+#: nodepkg/model-browse/ModelBrowse.tsx:246
 msgid "Edit"
 msgstr "Изменить"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:247
+#: nodepkg/model-browse/ModelBrowse.tsx:246
 msgid "View"
 msgstr "Просмотр"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:280
+#: nodepkg/model-browse/ModelBrowse.tsx:279
 msgid "Search"
 msgstr "Поиск"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:302 nodepkg/model-form/ModelForm.tsx:46
+#: nodepkg/model-browse/ModelBrowse.tsx:301 nodepkg/model-form/ModelForm.tsx:46
 msgid "Create"
 msgstr "Создать"
 
