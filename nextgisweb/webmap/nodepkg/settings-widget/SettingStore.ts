@@ -40,10 +40,7 @@ export class SettingStore
     bookmarkResource?: ResourceRef | null = null;
 
     private _initValue: Partial<WithoutItems<apitype.WebMapRead>> = {
-        extent_bottom: -90,
-        extent_left: -180,
-        extent_right: 180,
-        extent_top: 90,
+        initial_extent: [-90, -180, 180, 90],
     };
 
     constructor({ composite }: EditorStoreOptions) {
@@ -64,16 +61,16 @@ export class SettingStore
         this.legendSymbols = value.legend_symbols;
         this.measureSrs = value.measure_srs ? value.measure_srs.id : null;
         this.extent = {
-            left: value.extent_left,
-            right: value.extent_right,
-            bottom: value.extent_bottom,
-            top: value.extent_top,
+            left: value.initial_extent?.[0],
+            right: value.initial_extent?.[1],
+            bottom: value.initial_extent?.[2],
+            top: value.initial_extent?.[3],
         };
         this.extentConst = {
-            left: value.extent_const_left,
-            right: value.extent_const_right,
-            bottom: value.extent_const_bottom,
-            top: value.extent_const_top,
+            left: value.constraining_extent?.[0],
+            right: value.constraining_extent?.[1],
+            bottom: value.constraining_extent?.[2],
+            top: value.constraining_extent?.[3],
         };
         this.title = value.title;
         this.bookmarkResource = value.bookmark_resource;
@@ -85,14 +82,18 @@ export class SettingStore
             annotation_enabled: this.annotationEnabled,
             annotation_default: this.annotationDefault,
             legend_symbols: this.legendSymbols,
-            extent_bottom: this.extent.bottom,
-            extent_left: this.extent.left,
-            extent_right: this.extent.right,
-            extent_top: this.extent.top,
-            extent_const_bottom: this.extentConst.bottom,
-            extent_const_left: this.extentConst.left,
-            extent_const_right: this.extentConst.right,
-            extent_const_top: this.extentConst.top,
+            initial_extent: [
+                this.extent.left,
+                this.extent.bottom,
+                this.extent.right,
+                this.extent.top,
+            ],
+            constraining_extent: [
+                this.extentConst.left,
+                this.extentConst.bottom,
+                this.extentConst.right,
+                this.extentConst.top,
+            ],
             title: this.title ? this.title : null,
             measure_srs: this.measureSrs ? { id: this.measureSrs } : undefined,
             bookmark_resource: this.bookmarkResource,
