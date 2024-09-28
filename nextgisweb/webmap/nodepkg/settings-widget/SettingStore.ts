@@ -12,6 +12,33 @@ import type * as apitype from "@nextgisweb/webmap/type/api";
 
 type WithoutItems<T> = Omit<T, "root_item" | "draw_order_enabled">;
 
+function convertExtentToArray(
+    extent: ExtentRowValue
+): apitype.ExtentWSEN | null | undefined {
+    const { left, bottom, right, top } = extent;
+
+    if (
+        [left, bottom, right, top].some(
+            (value) => value === undefined || value === null
+        )
+    ) {
+        return undefined;
+    }
+
+    return [left, bottom, right, top] as apitype.ExtentWSEN;
+}
+
+function extractExtent(
+    extentArray?: (number | null | undefined)[] | null
+): ExtentRowValue {
+    return {
+        left: extentArray?.[0] ?? null,
+        bottom: extentArray?.[1] ?? null,
+        right: extentArray?.[2] ?? null,
+        top: extentArray?.[3] ?? null,
+    };
+}
+
 export class SettingStore
     implements
         EditorStore<apitype.WebMapRead, WithoutItems<apitype.WebMapUpdate>>
@@ -60,18 +87,8 @@ export class SettingStore
         this.annotationDefault = value.annotation_default;
         this.legendSymbols = value.legend_symbols;
         this.measureSrs = value.measure_srs ? value.measure_srs.id : null;
-        this.extent = {
-            left: value.initial_extent?.[0],
-            right: value.initial_extent?.[1],
-            bottom: value.initial_extent?.[2],
-            top: value.initial_extent?.[3],
-        };
-        this.extentConst = {
-            left: value.constraining_extent?.[0],
-            right: value.constraining_extent?.[1],
-            bottom: value.constraining_extent?.[2],
-            top: value.constraining_extent?.[3],
-        };
+        this.extent = extractExtent(value.initial_extent);
+        this.extentConst = extractExtent(value.constraining_extent);
         this.title = value.title;
         this.bookmarkResource = value.bookmark_resource;
     }
@@ -82,18 +99,8 @@ export class SettingStore
             annotation_enabled: this.annotationEnabled,
             annotation_default: this.annotationDefault,
             legend_symbols: this.legendSymbols,
-            initial_extent: [
-                this.extent.left,
-                this.extent.bottom,
-                this.extent.right,
-                this.extent.top,
-            ],
-            constraining_extent: [
-                this.extentConst.left,
-                this.extentConst.bottom,
-                this.extentConst.right,
-                this.extentConst.top,
-            ],
+            initial_extent: convertExtentToArray(this.extent),
+            constraining_extent: convertExtentToArray(this.extentConst),
             title: this.title ? this.title : null,
             measure_srs: this.measureSrs ? { id: this.measureSrs } : undefined,
             bookmark_resource: this.bookmarkResource,
