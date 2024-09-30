@@ -17,7 +17,7 @@ def preview_map(resource, request):
         obj=resource,
         entrypoint="@nextgisweb/layer-preview/preview-layer",
         props=dict(
-        resource_id=resource.id),
+        resourceId=resource.id),
         title=gettext("Preview"),
     )
 

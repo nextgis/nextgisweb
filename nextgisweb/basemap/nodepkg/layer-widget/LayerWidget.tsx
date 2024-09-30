@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useEffect, useMemo, useState } from "react";
 
-import { InputValue } from "@nextgisweb/gui/antd";
+import { InputValue, Slider } from "@nextgisweb/gui/antd";
 import { LotMV } from "@nextgisweb/gui/arm";
 import { Area, Lot } from "@nextgisweb/gui/mayout";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -10,7 +10,8 @@ import type {
     EditorWidgetComponent,
     EditorWidgetProps,
 } from "@nextgisweb/resource/type";
-import { Basemap, MapComponent } from "@nextgisweb/webmap/preview-map";
+import { Basemap, MapControl } from "@nextgisweb/webmap/map-component";
+import { PreviewMap } from "@nextgisweb/webmap/preview-map";
 
 import type { LayerStore } from "./LayerStore";
 import { QMSSelect } from "./component/QMSSelect";
@@ -22,13 +23,17 @@ const msgPickQmsHelpMainPart = gettext("Search for geoservices provided by ");
 const msgPickQmsHelpTodoPart = gettext("You can search by name or ID");
 
 // eslint-disable-next-line prettier/prettier
-const msgDisabled = gettext("If a service from QMS is selected, this field cannot be edited.");
+const msgDisabled = gettext(
+    "If a service from QMS is selected, this field cannot be edited."
+);
 
 export const LayerWidget: EditorWidgetComponent<EditorWidgetProps<LayerStore>> =
     observer(({ store }) => {
         const [qmsId, setQmsId] = useState<number>();
 
         const disabled = useMemo(() => qmsId !== undefined, [qmsId]);
+
+        const [opacity, setOpacity] = useState(100);
 
         useEffect(() => {
             if (store.loaded && store.qms.value) {
@@ -107,8 +112,7 @@ export const LayerWidget: EditorWidgetComponent<EditorWidgetProps<LayerStore>> =
                     />
                 </Area>
                 {store.url.value ? (
-                    <MapComponent
-                        osm
+                    <PreviewMap
                         style={{
                             margin: "1em",
                             height: "400px",
@@ -117,25 +121,31 @@ export const LayerWidget: EditorWidgetComponent<EditorWidgetProps<LayerStore>> =
                             borderStyle: "solid",
                             borderColor: "#d9d9d9",
                         }}
-                        whenCreated={(adapter) => {
-                            const observer = new ResizeObserver(() => {
-                                adapter?.map.updateSize();
-                            });
-                            observer.observe(
-                                adapter?.map.getTargetElement() as Element
-                            );
-                        }}
                     >
+                        <MapControl position="top-right">
+                            <div style={{ width: 200 }}>
+                                <Slider
+                                    min={0}
+                                    max={100}
+                                    value={opacity}
+                                    onChange={setOpacity}
+                                    tooltip={{
+                                        formatter: (value) => `${value}%`,
+                                    }}
+                                />
+                            </div>
+                        </MapControl>
                         <Basemap
                             url={store.url.value}
                             key={qmsId}
+                            opacity={opacity}
                             attributions={
                                 store.copyright_url.value
                                     ? `<a href="${store.copyright_url.value}" target="_blank">${store.copyright_text.value}</a>`
                                     : store.copyright_text.value
                             }
                         />
-                    </MapComponent>
+                    </PreviewMap>
                 ) : null}
             </>
         );

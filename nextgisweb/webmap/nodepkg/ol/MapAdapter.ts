@@ -1,12 +1,25 @@
 import OLMap from "ol/Map";
 import type { MapOptions } from "ol/PluggableMap";
-import * as Extent from "ol/extent";
+import type { FitOptions } from "ol/View";
+import type Control from "ol/control/Control";
+import { getCenter, getHeight, getWidth } from "ol/extent";
+import type { Extent } from "ol/extent";
 import type { Layer } from "ol/layer";
-import * as Proj from "ol/proj";
+import type BaseLayer from "ol/layer/Base";
+import { transform, transformExtent } from "ol/proj";
 
 import type { NgwExtent } from "@nextgisweb/feature-layer/type/api";
 
-type ExtentType = Extent.Extent;
+import type {
+    ControlPosition,
+    CreateControlOptions,
+    MapControl,
+} from "../control-container/ControlContainer";
+
+import { createControl } from "./control/createControl";
+import { PanelControl } from "./panel-control/PanelControl";
+
+type ExtentType = Extent;
 
 export class MapAdapter {
     map: OLMap;
@@ -20,8 +33,12 @@ export class MapAdapter {
 
     SMART_ZOOM = 12;
 
+    private _panelControl: PanelControl;
+
     constructor(options: MapOptions) {
-        this.map = new OLMap(options);
+        this.map = new OLMap({ controls: [], ...options });
+        this._panelControl = new PanelControl();
+        this.map.addControl(this._panelControl);
     }
 
     getScaleForResolution(res: string, mpu: number) {
@@ -37,7 +54,7 @@ export class MapAdapter {
         let center = view.getCenter();
         const mapSrsId = view.getProjection().getCode();
         if (srsId && srsId !== mapSrsId && center) {
-            center = Proj.transform(center, mapSrsId, srsId);
+            center = transform(center, mapSrsId, srsId);
         }
         return {
             zoom: view.getZoom(),
@@ -50,16 +67,16 @@ export class MapAdapter {
         let extent = view.calculateExtent();
         const mapSrsId = view.getProjection().getCode();
         if (srsId && srsId !== mapSrsId) {
-            extent = Proj.transformExtent(extent, mapSrsId, srsId);
+            extent = transformExtent(extent, mapSrsId, srsId);
         }
         return extent;
     }
 
-    zoomToExtent(extent: ExtentType) {
+    zoomToExtent(extent: ExtentType, options?: FitOptions) {
         const view = this.map.getView();
 
-        const widthExtent = Extent.getWidth(extent);
-        const heightExtent = Extent.getHeight(extent);
+        const widthExtent = getWidth(extent);
+        const heightExtent = getHeight(extent);
         let center;
 
         // If feature extent smaller than SMART_ZOOM_EXTENT then applying smart zoom to it
@@ -67,7 +84,7 @@ export class MapAdapter {
             widthExtent < this.SMART_ZOOM_EXTENT &&
             heightExtent < this.SMART_ZOOM_EXTENT
         ) {
-            center = Extent.getCenter(extent);
+            center = getCenter(extent);
             view.setCenter(center);
             const zoom = view.getZoom();
             if (zoom) {
@@ -76,18 +93,24 @@ export class MapAdapter {
                 }
             }
         } else {
-            view.fit(extent);
+            view.fit(extent, options);
         }
     }
 
-    zoomToLayer(layer: Layer) {
+    zoomToLayer(layer: Layer, options?: FitOptions) {
         const extent = layer.getExtent();
         if (extent) {
-            this.zoomToExtent(extent);
+            this.zoomToExtent(extent, options);
         }
     }
 
-    zoomToNgwExtent(ngwExtent: NgwExtent, mapProjection?: string) {
+    zoomToNgwExtent(
+        ngwExtent: NgwExtent,
+        {
+            mapProjection,
+            ...options
+        }: FitOptions & { mapProjection?: string } = {}
+    ) {
         const { minLon, minLat, maxLon, maxLat } = ngwExtent;
         if (!(minLon && minLat && maxLon && maxLat)) {
             return;
@@ -95,12 +118,12 @@ export class MapAdapter {
         if (!mapProjection) {
             mapProjection = "EPSG:3857";
         }
-        const extent = Proj.transformExtent(
+        const extent = transformExtent(
             [minLon, minLat, maxLon, maxLat],
             "EPSG:4326",
             mapProjection
         );
-        this.zoomToExtent(extent);
+        this.zoomToExtent(extent, options);
     }
 
     getMaxZIndex() {
@@ -115,5 +138,40 @@ export class MapAdapter {
         });
 
         return maxZIndex;
+    }
+
+    getControlContainer(): HTMLElement {
+        return this._panelControl.getContainer();
+    }
+
+    createControl(control: MapControl, options: CreateControlOptions): Control {
+        return createControl(control, options, this);
+    }
+
+    addLayer(layer: BaseLayer) {
+        this.map.addLayer(layer);
+    }
+    removeLayer(layer: BaseLayer) {
+        this.map.removeLayer(layer);
+    }
+
+    addControl(
+        control: Control,
+        position: ControlPosition
+    ): Control | undefined {
+        this._panelControl.addControl(control, position);
+        return control;
+    }
+
+    removeControl(control: Control): void {
+        this._panelControl.removeControl(control);
+    }
+
+    getTargetElement() {
+        return this.map.getTargetElement();
+    }
+
+    updateSize() {
+        this.map.updateSize();
     }
 }

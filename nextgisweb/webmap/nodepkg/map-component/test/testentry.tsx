@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 
-import { InputNumber, Radio, Switch } from "@nextgisweb/gui/antd";
+import { InputNumber, Switch } from "@nextgisweb/gui/antd";
 import { Area, Lot } from "@nextgisweb/gui/mayout";
 
-import { MapComponent } from "../component/MapComponent";
+import { MapComponent } from "../MapComponent";
 
 function MapComponetTest() {
     const [zoom, setZoom] = useState(0);
@@ -51,7 +51,7 @@ function MapComponetTest() {
             <MapComponent
                 zoom={zoom}
                 center={center}
-                osm={osm}
+                basemap={osm}
                 style={{ height: "50vh" }}
             ></MapComponent>
         </>

@@ -1,5 +1,5 @@
 import View from "ol/View";
-import type { ViewOptions } from "ol/View";
+import type { FitOptions, ViewOptions } from "ol/View";
 import { fromExtent } from "ol/geom/Polygon";
 import TileLayer from "ol/layer/Tile";
 import { transformExtent } from "ol/proj";
@@ -11,7 +11,7 @@ import { useObjectState } from "@nextgisweb/gui/hook";
 import type { SRSRef } from "@nextgisweb/spatial-ref-sys/type/api";
 import { MapAdapter } from "@nextgisweb/webmap/ol/MapAdapter";
 
-export interface MapExtent {
+export interface MapExtent extends FitOptions {
     extent: NgwExtent;
     srs: SRSRef;
 }
@@ -22,7 +22,7 @@ export interface MapProps extends ViewOptions {
     mapExtent?: MapExtent;
 }
 
-export function useAdapter({
+export function useMapAdapter({
     center: centerProp,
     mapSRS = { id: 3857 },
     zoom,
@@ -31,13 +31,13 @@ export function useAdapter({
     maxZoom,
     mapExtent: mapExtentProp,
 }: MapProps) {
-    const [adapter, setAdapter] = useState<MapAdapter>();
+    const [mapAdapter, setMapAdapter] = useState<MapAdapter>();
     const osmLayer = useRef<TileLayer<OSM>>();
 
     const [center] = useObjectState(centerProp);
     const [mapExtent] = useObjectState(mapExtentProp);
 
-    const createAdapter = useCallback(
+    const createMapAdapter = useCallback(
         ({ target }: { target: HTMLElement | string }) => {
             const view = new View({
                 projection: `EPSG:${mapSRS.id}`,
@@ -46,16 +46,16 @@ export function useAdapter({
                 target,
                 view,
             });
-            setAdapter(adapter);
+            setMapAdapter(adapter);
             return adapter;
         },
         [mapSRS.id]
     );
 
     const setView = useCallback((): void => {
-        if (!adapter?.map) return;
+        if (!mapAdapter?.map) return;
 
-        const curView = adapter.map.getView();
+        const curView = mapAdapter.map.getView();
 
         if (center) {
             curView.setCenter(center);
@@ -71,35 +71,33 @@ export function useAdapter({
         }
 
         if (mapExtent) {
+            const { extent, srs, ...fitOptions } = mapExtent;
             const bbox = [
-                mapExtent.extent.minLon,
-                mapExtent.extent.minLat,
-                mapExtent.extent.maxLon,
-                mapExtent.extent.maxLat,
+                extent.minLon,
+                extent.minLat,
+                extent.maxLon,
+                extent.maxLat,
             ];
             curView.fitInternal(
                 fromExtent(
-                    transformExtent(
-                        bbox,
-                        `EPSG:${mapExtent.srs.id}`,
-                        `EPSG:${mapSRS.id}`
-                    )
-                )
+                    transformExtent(bbox, `EPSG:${srs.id}`, `EPSG:${mapSRS.id}`)
+                ),
+                fitOptions
             );
         }
-    }, [adapter, center, zoom, minZoom, maxZoom, mapExtent, mapSRS.id]);
+    }, [mapAdapter, center, zoom, minZoom, maxZoom, mapExtent, mapSRS.id]);
 
     useEffect(() => {
         setView();
     }, [setView]);
 
     useEffect(() => {
-        if (adapter && osm) {
+        if (mapAdapter && osm) {
             const osmLayer_ = new TileLayer({
                 source: new OSM(),
                 zIndex: -1,
             });
-            adapter.map.addLayer(osmLayer_);
+            mapAdapter.map.addLayer(osmLayer_);
             osmLayer.current = osmLayer_;
         }
         return () => {
@@ -107,15 +105,15 @@ export function useAdapter({
                 osmLayer.current.dispose();
             }
         };
-    }, [osm, adapter]);
+    }, [osm, mapAdapter]);
 
     useEffect(() => {
         return () => {
-            if (adapter?.map) {
-                adapter.map.dispose();
+            if (mapAdapter?.map) {
+                mapAdapter.map.dispose();
             }
         };
-    }, []);
+    }, [mapAdapter]);
 
-    return { createAdapter };
+    return { createMapAdapter };
 }

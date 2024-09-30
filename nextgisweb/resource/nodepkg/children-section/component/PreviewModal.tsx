@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useReducer } from "react";
 
 import { Button, Modal } from "@nextgisweb/gui/antd";
 import type { ShowModalOptions } from "@nextgisweb/gui/showModal";
@@ -12,7 +12,7 @@ type PreviewModalProps = ShowModalOptions & {
     target?: string;
 };
 
-const NavigateButton = (href: string) => {
+const NavigateButton = ({ href }: { href: string }) => {
     return (
         <Button key={href} href={href} target="_blank">
             {gettext("Open in a new tab")}
@@ -26,15 +26,13 @@ export function PreviewModal({
     open: open_,
     ...props
 }: PreviewModalProps) {
-    const [open, setOpen] = useState(open_);
+    const [open, close] = useReducer(() => false, open_ ?? true);
     return (
         <Modal
             className="map-preview-modal"
             open={open}
             {...props}
-            onCancel={() => {
-                setOpen(false);
-            }}
+            onCancel={close}
             closeIcon={false}
             footer={null}
             width={"60vw"}
@@ -42,8 +40,15 @@ export function PreviewModal({
         >
             <PreviewLayer
                 style={{ height: "60vh", width: "60vw" }}
-                resource_id={resourceId}
-                previewControls={[NavigateButton(href)]}
+                resourceId={resourceId}
+                beforeControls={[
+                    <NavigateButton key="navigation" href={href} />,
+                ]}
+                afterControls={[
+                    <Button key="close" onClick={close}>
+                        {gettext("Close")}
+                    </Button>,
+                ]}
             />
         </Modal>
     );

@@ -1,6 +1,6 @@
-import { useContext, useEffect } from "react";
+import { useEffect } from "react";
 
-import { MapContext } from "./MapComponent";
+import { useMapContext } from "./context/useMapContext";
 import { useNGWLayer } from "./hook/useNGWLayer";
 import type { LayerType } from "./hook/useNGWLayer";
 
@@ -13,7 +13,7 @@ export function NGWLayer({
     layerType: LayerType;
     resourceId: number;
 }) {
-    const { adapter } = useContext(MapContext);
+    const { mapAdapter: adapter } = useMapContext();
 
     const layer = useNGWLayer({
         layerType: layerType,
