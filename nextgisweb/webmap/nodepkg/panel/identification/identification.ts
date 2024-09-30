@@ -40,8 +40,8 @@ export interface FeatureSelectorProps {
     onFeatureChange: (featureInfoSelected: FeatureInfo) => void;
 }
 
-export interface IdentifyExtensionComponentProps {
-    featureItem: FeatureItem;
+export interface IdentifyExtensionComponentProps<F extends Attrs = Attrs> {
+    featureItem: FeatureItem<F>;
     resourceId: number;
 }
 

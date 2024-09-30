@@ -6,4 +6,5 @@ import { pluginRegistry } from "@nextgisweb/jsrealm/plugin";
 import type { IdentifyExtensionComponentProps } from "./identification";
 
 export const registry =
-    pluginRegistry<FC<IdentifyExtensionComponentProps>>(MODULE_NAME);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    pluginRegistry<FC<IdentifyExtensionComponentProps<any>>>(MODULE_NAME);
