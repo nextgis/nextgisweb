@@ -1,41 +1,24 @@
 from nextgisweb.env import gettext
 from nextgisweb.lib.dynmenu import Link
 
+from nextgisweb.basemap.model import BasemapLayer
 from nextgisweb.feature_layer import IFeatureLayer
-from nextgisweb.layer.interface import IBboxLayer
 from nextgisweb.pyramid import viewargs
 from nextgisweb.raster_layer import RasterLayer
 from nextgisweb.render import IRenderableStyle
-from nextgisweb.resource import DataScope, Resource, ResourceScope, resource_factory
+from nextgisweb.resource import DataScope, Resource, resource_factory
 
 
-@viewargs(renderer="preview.mako")
+@viewargs(renderer="react")
 def preview_map(resource, request):
     request.resource_permission(DataScope.read)
 
-    if IFeatureLayer.providedBy(resource):
-        source_type = "geojson"
-    elif IRenderableStyle.providedBy(resource):
-        source_type = "xyz"
-    elif isinstance(resource, RasterLayer) and resource.cog:
-        source_type = "geotiff"
-
-    if IBboxLayer.providedBy(resource):
-        extent = resource.extent
-    else:
-        extent = None
-        parent = resource.parent
-        if IBboxLayer.providedBy(parent):
-            parent_permissions = parent.permissions(request.user)
-            if ResourceScope.read in parent_permissions:
-                extent = parent.extent
-
     return dict(
         obj=resource,
-        extent=extent,
-        source_type=source_type,
+        entrypoint="@nextgisweb/layer-preview/preview-layer",
+        props=dict(
+        resource_id=resource.id),
         title=gettext("Preview"),
-        maxheight=True,
     )
 
 
@@ -48,7 +31,7 @@ def setup_pyramid(comp, config):
         preview_map, context=IRenderableStyle
     ).add_view(
         preview_map, context=RasterLayer
-    )
+    ).add_view(preview_map, context=BasemapLayer)
 
     @Resource.__dynmenu__.add
     def _resource_dynmenu(args):
@@ -56,6 +39,7 @@ def setup_pyramid(comp, config):
             IFeatureLayer.providedBy(args.obj)
             or IRenderableStyle.providedBy(args.obj)
             or (isinstance(args.obj, RasterLayer) and args.obj.cog)
+            or (isinstance(args.obj, BasemapLayer))
         ) and (args.obj.has_permission(DataScope.read, args.request.user)):
             yield Link(
                 "extra/preview",

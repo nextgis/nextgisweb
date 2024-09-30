@@ -9,7 +9,7 @@ import { formatSize } from "@nextgisweb/gui/util/formatSize";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { MenuDropdown } from "./component/MenuDropdown";
-import { RenderActions } from "./component/RednerActions";
+import { RenderActions } from "./component/RenderActions";
 import type { ChildrenResource as Resource } from "./type";
 
 import "./ChildrenSection.less";

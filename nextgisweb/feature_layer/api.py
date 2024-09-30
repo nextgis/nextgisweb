@@ -530,7 +530,15 @@ def count(resource, request) -> JSONType:
     return dict(total_count=total_count)
 
 
-def feature_extent(resource, request) -> JSONType:
+class NgwExtent(Struct):
+    maxLon: int
+    minLon: int
+    maxLat: int
+    minLat: int
+
+
+
+def feature_extent(resource, request) -> NgwExtent:
     request.resource_permission(DataScope.read)
 
     query = resource.feature_query()
@@ -539,7 +547,7 @@ def feature_extent(resource, request) -> JSONType:
     apply_intersect_filter(query, request, resource)
 
     extent = query().extent
-    return dict(extent=extent)
+    return NgwExtent(**extent)
 
 
 def setup_pyramid(comp, config):

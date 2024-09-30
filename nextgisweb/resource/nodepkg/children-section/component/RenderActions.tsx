@@ -1,5 +1,6 @@
 import { Tooltip } from "@nextgisweb/gui/antd";
 import { errorModal } from "@nextgisweb/gui/error";
+import showModal from "@nextgisweb/gui/showModal";
 import { SvgIconLink } from "@nextgisweb/gui/svg-icon";
 import type { SvgIconLink as SvgIconLinkProps } from "@nextgisweb/gui/svg-icon/type";
 import { route } from "@nextgisweb/pyramid/api";
@@ -9,7 +10,10 @@ import type {
     ChildrenResource,
 } from "../type";
 import { isDeleteAction } from "../util/isDeleteAction";
+import { isPreviewAction } from "../util/isPreviewAction";
 import { confirmThenDelete, notifySuccessfulDeletion } from "../util/notify";
+
+import { PreviewModal } from "./PreviewModal";
 
 interface RenderActionsProps {
     actions: Action[];
@@ -46,11 +50,23 @@ export function RenderActions({
                 ></SvgIconLink>
             </Tooltip>
         );
-        if (isDeleteAction(action)) {
+        if (isPreviewAction(action)) {
+            return createActionBtn({
+                onClick: () => {
+                    const { destroy } = showModal(PreviewModal, {
+                        resourceId: id,
+                        href: href,
+                        open: true,
+                        onCancel: () => destroy(),
+                    });
+                },
+            });
+        } else if (isDeleteAction(action)) {
             return createActionBtn({
                 onClick: () => confirmThenDelete(deleteModelItem),
             });
+        } else {
+            return createActionBtn({ href, target });
         }
-        return createActionBtn({ href, target });
     });
 }

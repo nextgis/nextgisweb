@@ -1,12 +1,17 @@
+from msgspec import Struct
 from pyramid.httpexceptions import HTTPNotFound
 
-from nextgisweb.pyramid import JSONType
+from nextgisweb.feature_layer.api import NgwExtent
 from nextgisweb.resource import DataScope, resource_factory
 
 from .interface import IBboxLayer
 
 
-def extent(resource, request) -> JSONType:
+class Extent(Struct):
+    extent: NgwExtent
+
+
+def extent(resource, request) -> Extent:
     impl = resource.lookup_interface(IBboxLayer)
     if impl is None:
         return HTTPNotFound()

@@ -11,6 +11,8 @@ Changes
 - Support for empty geometries when importing vector layers.
 - Font management in the control panel.
 - Customizable web map title.
+- Preview layers with leaving the current page.
+- Preview of the basemap on the resource editing page.
 
 
 4.8.0
