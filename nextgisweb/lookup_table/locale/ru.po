@@ -1,6 +1,10 @@
-#: model.py:23 nodepkg/editor/EditorWidget.tsx:168 view.py:16
+#: model.py:16 nodepkg/editor/EditorWidget.tsx:170 view.py:16
 msgid "Lookup table"
 msgstr "Справочник"
+
+#: nodepkg/component/lookup-select/LookupSelect.tsx:52
+msgid "Loading..."
+msgstr "Загрузка..."
 
 #: nodepkg/editor/EditorWidget.tsx:34
 msgid "Type here to add a new item..."
