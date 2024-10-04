@@ -12,8 +12,6 @@ import type {
 import type { WfsClientConnectionStore } from "./WfsClientConnectionStore";
 
 const versionOptions = [
-    { label: "1.0.0", value: "1.0.0" },
-    { label: "1.1.0", value: "1.1.0" },
     { label: "2.0.0", value: "2.0.0" },
     { label: "2.0.2", value: "2.0.2" },
 ];

@@ -82,12 +82,26 @@ WFS_VERSIONS = (
     "2.0.2",
 )
 
+WFS_VERSIONS_SUPPORTED = (
+    "2.0.0",
+    "2.0.2",
+)
+
+
+class VersionNotSupported(Exception):
+    pass
+
+
 url_pattern = re.compile(
     r"^(https?:\/\/)([a-zа-яё0-9\-._~%]+|\[[a-zа-яё0-9\-._~%!$&\'()*+,;=:]+\])+(:[0-9]+)?(\/[a-zа-яё0-9\-._~%!$&\'()*+,;=:@]+)*\/?(\?[a-zа-яё0-9\-._~%!$&\'()*+,;=:@\/?]*)?$",
     re.IGNORECASE | re.UNICODE,
 )
 
 nil_attr = r"{http://www.w3.org/2001/XMLSchema-instance}nil"
+
+NS_WFS = "http://www.opengis.net/wfs/2.0"
+NS_FES = "http://www.opengis.net/fes/2.0"
+NS_GML = "http://www.opengis.net/gml/3.2"
 
 
 # TODO: WFS helper module
@@ -114,7 +128,10 @@ def get_srid(value):
         return None
 
 
-def fid_int(fid, layer_name):
+def fid_int(el_feature, layer_name):
+    fid = el_feature.attrib.get(f"{{{NS_GML}}}id")
+    if fid is None:
+        raise ValidationError("Feature has no ID.")
     # Check pattern 'layer_name_without_namespace.FID' and return FID
     m = re.search(r"^(.*:)?%s\.(\d+)$" % re.sub("^.*:", "", layer_name), fid)
     if m is None:
@@ -153,7 +170,7 @@ class WFSConnection(Base, Resource):
                 xml_root.attrib["service"] = "WFS"
                 kwargs["data"] = etree.tostring(xml_root)
         else:
-            raise NotImplementedError()
+            raise NotImplementedError
 
         if self.username is not None and self.username.strip() != "":
             kwargs["auth"] = requests.auth.HTTPBasicAuth(self.username, self.password)
@@ -167,15 +184,28 @@ class WFSConnection(Base, Resource):
                 **kwargs,
             )
         except RequestException:
-            raise ExternalServiceError()
+            raise ExternalServiceError
 
-        if response.status_code == 200:
-            return etree.parse(BytesIO(response.content)).getroot()
-        else:
-            raise ExternalServiceError()
+        if response.status_code < 500:
+            root = etree.parse(BytesIO(response.content)).getroot()
+            if 200 <= response.status_code < 300:
+                return root
+            if response.status_code >= 400:
+                el_exc = find_tags(root, "Exception")[0]
+                if el_exc.attrib.get("exceptionCode") == "VersionNegotiationFailed":
+                    raise VersionNotSupported
+        raise ExternalServiceError
 
     def get_capabilities(self):
-        root = self.request_wfs("GET", params=dict(REQUEST="GetCapabilities"))
+        root = self.request_wfs(
+            "GET",
+            params=dict(
+                request="GetCapabilities",
+                acceptVersions=",".join(reversed(WFS_VERSIONS_SUPPORTED)),
+            ),
+        )
+
+        version = find_tags(root, "ServiceTypeVersion")[0].text
 
         layers = []
         for el in find_tags(root, "FeatureType"):
@@ -199,7 +229,7 @@ class WFSConnection(Base, Resource):
                 )
             )
 
-        return dict(layers=layers)
+        return dict(version=version, layers=layers)
 
     def get_fields(self, layer_name):
         root = self.request_wfs(
@@ -239,9 +269,6 @@ class WFSConnection(Base, Resource):
         srs=None,
         add_box=False,
     ):
-        NS_WFS = "http://www.opengis.net/wfs/2.0"
-        NS_FES = "http://www.opengis.net/fes/2.0"
-
         req_root = etree.Element(
             etree.QName(NS_WFS, "GetFeature"), nsmap=dict(wfs=NS_WFS, fes=NS_FES)
         )
@@ -317,10 +344,15 @@ class WFSConnection(Base, Resource):
                 req_root.attrib["startIndex"] = str(offset)
 
         if get_count:
+            # Try cheap request first using resultType=hits
             req_root.attrib["resultType"] = "hits"
             root = self.request_wfs("POST", xml_root=req_root)
-            n_returned = root.attrib["numberReturned"]
-            count = None if n_returned == "unknown" else int(n_returned)
+            if (n_returned := root.attrib["numberMatched"]) != "unknown":
+                count = int(n_returned)
+            else:
+                del req_root.attrib["resultType"]
+                root = self.request_wfs("POST", xml_root=req_root)
+                count = len(find_tags(root, "member"))
             return None, count
 
         if propertyname is not None:
@@ -344,12 +376,17 @@ class WFSConnection(Base, Resource):
         for _member in _members:
             _feature = _member[0]
 
+            fid = fid_int(_feature, layer.layer_name)
             fields = dict()
             geom = None
             for _property in _feature:
+                key = ns_trim(_property.tag)
+
+                if key == "boundedBy":
+                    continue
+
                 is_nil = _property.attrib.get(nil_attr, "false") == "true"
 
-                key = ns_trim(_property.tag)
                 if key == layer.column_geom:
                     if not is_nil:
                         geom = geom_from_gml(_property[0])
@@ -377,8 +414,6 @@ class WFSConnection(Base, Resource):
                     raise ValidationError("Unknown data type: %s" % datatype)
                 fields[key] = value
 
-            fid = _feature.attrib["{http://www.opengis.net/gml/3.2}id"]
-
             if add_box and geom is not None:
                 _box = box(*geom.bounds)
             else:
@@ -387,7 +422,7 @@ class WFSConnection(Base, Resource):
             features.append(
                 Feature(
                     layer=layer,
-                    id=fid_int(fid, layer.layer_name),
+                    id=fid,
                     fields=fields,
                     geom=geom,
                     box=_box,
@@ -407,13 +442,22 @@ class PathAttr(SColumn, apitype=True):
 
 
 VersionEnum = Annotated[
-    Union[tuple(Literal[i] for i in WFS_VERSIONS)],  # type: ignore
+    Union[tuple(Literal[i] for i in WFS_VERSIONS_SUPPORTED)],  # type: ignore
     TSExport("VersionEnum"),
 ]
 
 
 class VersionAttr(SColumn, apitype=True):
     ctypes = CRUTypes(VersionEnum, VersionEnum, VersionEnum)
+
+    def set(self, srlzr: Serializer, value: str, *, create: bool):
+        result = super().set(srlzr, value, create=create)
+        connection = srlzr.obj
+        try:
+            connection.get_capabilities()
+        except VersionNotSupported:
+            raise ValidationError("Version {} not supported.".format(connection.version))
+        return result
 
 
 class WFSConnectionSerializer(Serializer, resource=WFSConnection):
@@ -550,7 +594,7 @@ class FieldsAttr(SAttribute, apitype=True):
             if srlzr.obj.connection.has_permission(ConnectionScope.connect, srlzr.user):
                 srlzr.obj.setup()
             else:
-                raise ForbiddenError()
+                raise ForbiddenError
 
 
 class WFSLayerSerializer(Serializer, resource=WFSLayer):

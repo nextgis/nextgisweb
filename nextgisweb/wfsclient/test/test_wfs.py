@@ -16,7 +16,6 @@ from ..model import WFSConnection, WFSLayer
 
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
 
-TEST_WFS_VERSIONS = ("2.0.2", "2.0.0")
 DATA = Path(vector_layer_test.__file__).parent / "data"
 
 
