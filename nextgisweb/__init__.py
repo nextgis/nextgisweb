@@ -52,12 +52,14 @@ def pkginfo():
         "basemap",
         "sld",
     )
+    optional = {"raster_mosaic"}
+    assert all((i in components) for i in optional)
 
     return dict(
         components={
             comp: dict(
                 module="nextgisweb.{}".format(comp),
-                enabled=comp not in ("wfsclient", "raster_mosaic"),
+                enabled=comp not in optional,
             )
             for comp in components
         }
