@@ -16,6 +16,8 @@ import type {
     MapControl,
 } from "../control-container/ControlContainer";
 
+import { createButtonControl } from "./control/createButtonControl";
+import type { ButtonControlOptions } from "./control/createButtonControl";
 import { createControl } from "./control/createControl";
 import { PanelControl } from "./panel-control/PanelControl";
 
@@ -146,6 +148,10 @@ export class MapAdapter {
 
     createControl(control: MapControl, options: CreateControlOptions): Control {
         return createControl(control, options, this);
+    }
+
+    createButtonControl(options: ButtonControlOptions): Control {
+        return createButtonControl(options);
     }
 
     addLayer(layer: BaseLayer) {

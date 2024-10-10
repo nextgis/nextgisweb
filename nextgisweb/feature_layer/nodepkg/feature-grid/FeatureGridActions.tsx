@@ -206,3 +206,5 @@ export const FeatureGridActions = observer(
         );
     }
 );
+
+FeatureGridActions.displayName = "FeatureGridActions";

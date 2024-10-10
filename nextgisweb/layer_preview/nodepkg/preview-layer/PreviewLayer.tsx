@@ -1,35 +1,30 @@
-import { useReducer, useState } from "react";
+import { useReducer } from "react";
 import type React from "react";
 
-import { Button, Space } from "@nextgisweb/gui/antd";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
+import { convertNgwExtentToWSEN } from "@nextgisweb/gui/util/extent";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
-import { gettext } from "@nextgisweb/pyramid/i18n";
+import { html } from "@nextgisweb/pyramid/icon";
 import {
+    AttributionControl,
     Basemap,
     MapComponent,
-    MapControl,
     NGWLayer,
+    ToggleControl,
     ZoomControl,
 } from "@nextgisweb/webmap/map-component";
 import type { LayerType } from "@nextgisweb/webmap/map-component";
-import { AttributionControl } from "@nextgisweb/webmap/map-component/control/AttributionControl";
-import type { MapAdapter } from "@nextgisweb/webmap/ol/MapAdapter";
 
 export function PreviewLayer({
-    resourceId: id,
     style,
-    beforeControls,
-    afterControls,
+    children,
+    resourceId: id,
 }: {
-    resourceId: number;
     style?: React.CSSProperties;
-    beforeControls?: React.ReactNode;
-    afterControls?: React.ReactNode;
+    children?: React.ReactNode;
+    resourceId: number;
 }) {
     const [basemap, toggleBaseMap] = useReducer((state) => !state, true);
-
-    const [mapAdapter, setMapAdapter] = useState<MapAdapter | null>(null);
 
     let layerType;
     let url;
@@ -59,9 +54,7 @@ export function PreviewLayer({
 
     const { data: extentData, isLoading: isExtentLoading } = useRouteGet(
         "layer.extent",
-        {
-            id,
-        }
+        { id }
     );
 
     const padding = [20, 20, 20, 20];
@@ -82,35 +75,24 @@ export function PreviewLayer({
                         : undefined
                 }
                 style={{ height: "75vh", ...style }}
-                whenCreated={setMapAdapter}
                 basemap={basemap}
             >
-                <ZoomControl position="top-left" />
+                <ZoomControl
+                    position="top-left"
+                    extent={
+                        extentData && convertNgwExtentToWSEN(extentData.extent)
+                    }
+                    fitOptions={{ padding }}
+                />
                 <AttributionControl position="bottom-right" />
-                <MapControl position="top-right">
-                    <Space.Compact size="small">
-                        {beforeControls}
-                        <Button
-                            type={basemap ? "primary" : "default"}
-                            onClick={toggleBaseMap}
-                        >
-                            {gettext("Toggle Basemap")}
-                        </Button>
-                        {extentData ? (
-                            <Button
-                                onClick={() => {
-                                    mapAdapter?.zoomToNgwExtent(
-                                        extentData.extent,
-                                        { padding }
-                                    );
-                                }}
-                            >
-                                {gettext("Back to layer extent")}
-                            </Button>
-                        ) : null}
-                        {afterControls}
-                    </Space.Compact>
-                </MapControl>
+                <ToggleControl
+                    position="top-left"
+                    html={html({ glyph: "map" })}
+                    styleOff={{ color: "gray" }}
+                    status={!!basemap}
+                    onClick={toggleBaseMap}
+                />
+
                 {url ? (
                     <Basemap url={url} attributions={attributions} />
                 ) : (
@@ -120,6 +102,7 @@ export function PreviewLayer({
                         zIndex={1}
                     />
                 )}
+                {children}
             </MapComponent>
         </div>
     );
