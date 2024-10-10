@@ -11,7 +11,7 @@ export function useTileLayer({
     opacity?: number;
     attributions?: string | null;
 }) {
-    const source = useRef(new Source({}));
+    const source = useRef(new Source({ wrapX: true }));
 
     useEffect(() => {
         if (attributions === null) {
