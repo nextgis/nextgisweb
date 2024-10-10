@@ -27,7 +27,10 @@ export class ZoomControl extends Zoom {
         this.fitOptions = options.fitOptions || {};
         this.extentProjection = options.extentProjection || "EPSG:4326";
         this.element.classList.remove("ol-control");
-        this.element.classList.add("mapadapter-ctrl-group");
+        this.element.classList.add(
+            "mapadapter-btn-ctrl",
+            "mapadapter-ctrl-group"
+        );
 
         this.homeButton = document.createElement("button");
         this.homeButton.innerHTML = html({ glyph: "home" });

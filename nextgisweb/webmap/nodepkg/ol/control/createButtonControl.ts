@@ -30,7 +30,7 @@ function createControlElement(options: ButtonControlOptions): HTMLElement {
     }
 
     const element = document.createElement("div");
-    element.className = `ol-unselectable mapadapter-ctrl-group${options.addClass ? ` ${options.addClass}` : ""}`;
+    element.className = `ol-unselectable mapadapter-btn-ctrl mapadapter-ctrl-group${options.addClass ? ` ${options.addClass}` : ""}`;
     element.appendChild(button);
 
     return element;

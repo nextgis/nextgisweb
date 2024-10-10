@@ -1,34 +1,36 @@
-import { StrictMode, useReducer } from "react";
+import { StrictMode, useCallback, useReducer } from "react";
 
-import { Button } from "@nextgisweb/gui/antd";
-import { gettext } from "@nextgisweb/pyramid/i18n";
-
-import { ZoomControl } from "../map-component";
+import { ToggleControl, ZoomControl } from "../map-component";
 import { MapComponent } from "../map-component/MapComponent";
 import type { MapComponentProps } from "../map-component/MapComponent";
 import { AttributionControl } from "../map-component/control/AttributionControl";
-import { MapControl } from "../map-component/control/MapControl";
+
+import MapIcon from "@nextgisweb/icon/material/map/outline";
 
 export function PreviewMap({
     children,
     basemap: osmProp = false,
     ...props
 }: MapComponentProps) {
-    const [basemap, setBasemap] = useReducer((state) => !state, osmProp);
+    const [basemap, toggleBaseMap] = useReducer((state) => !state, osmProp);
+
+    const styleToggleBtn = useCallback(
+        (status: boolean) => (status ? undefined : { color: "gray" }),
+        []
+    );
 
     return (
         <StrictMode>
             <MapComponent basemap={basemap} {...props}>
-                <MapControl position="top-right">
-                    <Button
-                        size="small"
-                        type={basemap ? "primary" : "default"}
-                        onClick={setBasemap}
-                    >
-                        {gettext("Toggle Basemap")}
-                    </Button>
-                </MapControl>
                 <ZoomControl position="top-left" />
+                <ToggleControl
+                    position="top-left"
+                    style={styleToggleBtn}
+                    status={!!basemap}
+                    onClick={toggleBaseMap}
+                >
+                    <MapIcon />
+                </ToggleControl>
                 <AttributionControl position="bottom-right" />
                 {children}
             </MapComponent>

@@ -7,8 +7,6 @@ import type {
 
 import type { MapAdapter } from "../MapAdapter";
 
-import "./createControl.css";
-
 export function createControl(
     control: MapControl,
     options: CreateControlOptions = {},
