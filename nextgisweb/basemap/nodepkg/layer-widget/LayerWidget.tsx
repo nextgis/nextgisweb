@@ -54,100 +54,115 @@ export const LayerWidget: EditorWidgetComponent<EditorWidgetProps<LayerStore>> =
         }, [qmsId, store.qms]);
 
         return (
-            <>
-                <Area pad>
-                    <Lot
-                        label={msgPickQms}
-                        help={() => (
-                            <>
-                                {msgPickQmsHelpMainPart}
-                                <a href={settings.qms_url} target="_blank">
-                                    NextGIS QMS
-                                </a>
-                                . {msgPickQmsHelpTodoPart}.
-                            </>
-                        )}
-                    >
-                        <QMSSelect
-                            value={qmsId}
-                            onChange={setQmsId}
-                            onService={(service) => {
-                                store.url.value = service.url;
-                                store.copyright_text.value =
-                                    service.copyright_text;
-                                store.copyright_url.value =
-                                    service.copyright_url;
-                                store.qms.value = JSON.stringify(service);
+            <div
+                style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    overflow: "hidden",
+                    height: "100%",
+                }}
+            >
+                <div style={{ flex: "none" }}>
+                    <Area pad style={{ height: "100%" }}>
+                        <Lot
+                            label={msgPickQms}
+                            help={() => (
+                                <>
+                                    {msgPickQmsHelpMainPart}
+                                    <a href={settings.qms_url} target="_blank">
+                                        NextGIS QMS
+                                    </a>
+                                    . {msgPickQmsHelpTodoPart}.
+                                </>
+                            )}
+                        >
+                            <QMSSelect
+                                value={qmsId}
+                                onChange={setQmsId}
+                                onService={(service) => {
+                                    store.url.value = service.url;
+                                    store.copyright_text.value =
+                                        service.copyright_text;
+                                    store.copyright_url.value =
+                                        service.copyright_url;
+                                    store.qms.value = JSON.stringify(service);
+                                }}
+                            ></QMSSelect>
+                        </Lot>
+
+                        <LotMV
+                            help={disabled ? msgDisabled : undefined}
+                            value={store.url}
+                            component={InputValue}
+                            label={gettext("URL")}
+                            props={{
+                                disabled,
                             }}
-                        ></QMSSelect>
-                    </Lot>
+                        />
 
-                    <LotMV
-                        help={disabled ? msgDisabled : undefined}
-                        value={store.url}
-                        component={InputValue}
-                        label={gettext("URL")}
-                        props={{
-                            disabled,
-                        }}
-                    />
-
-                    <LotMV
-                        help={disabled ? msgDisabled : undefined}
-                        label={gettext("Copyright text")}
-                        value={store.copyright_text}
-                        component={InputValue}
-                        props={{
-                            disabled,
-                        }}
-                    />
-                    <LotMV
-                        help={disabled ? msgDisabled : undefined}
-                        label={gettext("Copyright URL")}
-                        value={store.copyright_url}
-                        component={InputValue}
-                        props={{
-                            disabled,
-                        }}
-                    />
-                </Area>
+                        <LotMV
+                            help={disabled ? msgDisabled : undefined}
+                            label={gettext("Copyright text")}
+                            value={store.copyright_text}
+                            component={InputValue}
+                            props={{
+                                disabled,
+                            }}
+                        />
+                        <LotMV
+                            help={disabled ? msgDisabled : undefined}
+                            label={gettext("Copyright URL")}
+                            value={store.copyright_url}
+                            component={InputValue}
+                            props={{
+                                disabled,
+                            }}
+                        />
+                    </Area>
+                </div>
                 {store.url.value ? (
-                    <PreviewMap
+                    <div
                         style={{
-                            margin: "1em",
-                            height: "400px",
-                            borderRadius: "4px",
-                            borderWidth: "1px",
-                            borderStyle: "solid",
-                            borderColor: "#d9d9d9",
+                            flex: 1,
+                            padding: "2em 0px 0px",
                         }}
                     >
-                        <MapControl position="top-right">
-                            <div style={{ width: 200 }}>
-                                <Slider
-                                    min={0}
-                                    max={100}
-                                    value={opacity}
-                                    onChange={setOpacity}
-                                    tooltip={{
-                                        formatter: (value) => `${value}%`,
-                                    }}
-                                />
-                            </div>
-                        </MapControl>
-                        <Basemap
-                            url={store.url.value}
-                            key={qmsId}
-                            opacity={opacity}
-                            attributions={
-                                store.copyright_url.value
-                                    ? `<a href="${store.copyright_url.value}" target="_blank">${store.copyright_text.value}</a>`
-                                    : store.copyright_text.value
-                            }
-                        />
-                    </PreviewMap>
+                        <PreviewMap
+                            style={{
+                                height: "100%",
+                                borderRadius: "4px",
+                                borderWidth: "1px",
+                                borderStyle: "solid",
+                                borderColor: "#d9d9d9",
+                            }}
+                        >
+                            <MapControl position="top-right">
+                                <div style={{ width: 200 }}>
+                                    <Slider
+                                        min={0}
+                                        max={100}
+                                        value={opacity}
+                                        onChange={setOpacity}
+                                        tooltip={{
+                                            formatter: (value) => `${value}%`,
+                                        }}
+                                    />
+                                </div>
+                            </MapControl>
+                            <Basemap
+                                url={store.url.value}
+                                key={qmsId}
+                                opacity={opacity}
+                                attributions={
+                                    store.copyright_url.value
+                                        ? `<a href="${store.copyright_url.value}" target="_blank">${store.copyright_text.value}</a>`
+                                        : store.copyright_text.value
+                                }
+                            />
+                        </PreviewMap>
+                    </div>
                 ) : null}
-            </>
+            </div>
         );
     });
 
