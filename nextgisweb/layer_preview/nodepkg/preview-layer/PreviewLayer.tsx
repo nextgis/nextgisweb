@@ -1,10 +1,8 @@
-import { useReducer } from "react";
-import type React from "react";
+import { useCallback, useReducer } from "react";
 
 import { LoadingWrapper } from "@nextgisweb/gui/component";
 import { convertNgwExtentToWSEN } from "@nextgisweb/gui/util/extent";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
-import { html } from "@nextgisweb/pyramid/icon";
 import {
     AttributionControl,
     Basemap,
@@ -14,6 +12,8 @@ import {
     ZoomControl,
 } from "@nextgisweb/webmap/map-component";
 import type { LayerType } from "@nextgisweb/webmap/map-component";
+
+import MapIcon from "@nextgisweb/icon/material/map/outline";
 
 export function PreviewLayer({
     style,
@@ -59,6 +59,11 @@ export function PreviewLayer({
 
     const padding = [20, 20, 20, 20];
 
+    const styleToggleBtn = useCallback(
+        (status: boolean) => (status ? undefined : { color: "gray" }),
+        []
+    );
+
     if (isResLoading && isExtentLoading) {
         return <LoadingWrapper />;
     }
@@ -87,11 +92,12 @@ export function PreviewLayer({
                 <AttributionControl position="bottom-right" />
                 <ToggleControl
                     position="top-left"
-                    html={html({ glyph: "map" })}
-                    styleOff={{ color: "gray" }}
+                    style={styleToggleBtn}
                     status={!!basemap}
                     onClick={toggleBaseMap}
-                />
+                >
+                    <MapIcon />
+                </ToggleControl>
 
                 {url ? (
                     <Basemap url={url} attributions={attributions} />

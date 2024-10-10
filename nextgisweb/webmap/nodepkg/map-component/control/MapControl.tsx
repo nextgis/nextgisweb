@@ -1,6 +1,6 @@
 import type Control from "ol/control/Control";
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { MutableRefObject, ReactNode } from "react";
+import type { ReactNode } from "react";
 import { createPortal } from "react-dom";
 
 import type {
@@ -34,30 +34,27 @@ export function MapControl(props: MapControlProps) {
 
     const portal = useRef(document.createElement("div"));
 
-    const createControl = useCallback(
-        (portal: MutableRefObject<HTMLDivElement>) => {
-            return context?.mapAdapter?.createControl(
-                {
-                    onAdd() {
-                        return portal.current;
-                    },
-
-                    onRemove() {
-                        //
-                    },
+    const createControl = useCallback(() => {
+        return context?.mapAdapter?.createControl(
+            {
+                onAdd() {
+                    return portal.current;
                 },
-                { bar, margin, addClass }
-            );
-        },
-        [context?.mapAdapter, bar, margin, addClass]
-    );
+
+                onRemove() {
+                    //
+                },
+            },
+            { bar, margin, addClass }
+        );
+    }, [context?.mapAdapter, bar, margin, addClass]);
 
     const [instance, setInstance] = useState<Control>();
 
     useMapControl({ context, instance, position });
 
     useEffect(() => {
-        setInstance(createControl(portal));
+        setInstance(createControl());
     }, [createControl]);
 
     return createPortal(children, portal.current);

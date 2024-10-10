@@ -1,12 +1,12 @@
-import { useReducer } from "react";
+import { useCallback, useReducer } from "react";
 
 import { Modal } from "@nextgisweb/gui/antd";
+import { CloseIcon, OpenInNewIcon } from "@nextgisweb/gui/icon";
 import type { ShowModalOptions } from "@nextgisweb/gui/showModal";
 import PreviewLayer from "@nextgisweb/layer-preview/preview-layer";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import "./PreviewModal.less";
-import { html } from "@nextgisweb/pyramid/icon";
 import { ButtonControl } from "@nextgisweb/webmap/map-component";
+import "./PreviewModal.less";
 
 type PreviewModalProps = ShowModalOptions & {
     resourceId: number;
@@ -21,6 +21,12 @@ export function PreviewModal({
     ...props
 }: PreviewModalProps) {
     const [open, close] = useReducer(() => false, open_ ?? true);
+
+    const onOpenNewClick = useCallback(
+        () => window.open(href, "_blank"),
+        [href]
+    );
+
     return (
         <Modal
             className="map-preview-modal"
@@ -40,14 +46,17 @@ export function PreviewModal({
                     position="top-right"
                     onClick={close}
                     title={gettext("Close")}
-                    html={html({ glyph: "close" })}
-                />
+                >
+                    <CloseIcon />
+                </ButtonControl>
+
                 <ButtonControl
                     position="top-right"
-                    onClick={() => window.open(href, "_blank")}
+                    onClick={onOpenNewClick}
                     title={gettext("Open in a new tab")}
-                    html={html({ glyph: "open_in_new" })}
-                />
+                >
+                    <OpenInNewIcon />
+                </ButtonControl>
             </PreviewLayer>
         </Modal>
     );

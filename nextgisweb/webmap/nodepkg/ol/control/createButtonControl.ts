@@ -6,9 +6,6 @@ export type OnClickAsync = () => Promise<void>;
 
 export type OnClick = OnClickSync | OnClickAsync;
 
-/**
- * Options for creating a {@link WebMapControls.createButtonControl | button control}.
- */
 export interface ButtonControlOptions {
     /** Button content. */
     html?: string | HTMLElement;
@@ -23,7 +20,7 @@ export interface ButtonControlOptions {
 function createControlElement(options: ButtonControlOptions): HTMLElement {
     const button = document.createElement("button");
     button.className = "custom-button-control";
-    if (typeof options.html === "string") {
+    if (typeof options.html === "string" || typeof options.html === "number") {
         button.innerHTML = options.html;
     } else if (options.html instanceof HTMLElement) {
         button.appendChild(options.html);
@@ -43,21 +40,16 @@ export function createButtonControl(options: ButtonControlOptions): Control {
     class ButtonControl extends Control {
         constructor() {
             super({ element: createControlElement(options) });
-            const button = this.element.querySelector("button");
-            if (button && options.onClick) {
-                button.addEventListener("click", async (event) => {
-                    event.preventDefault();
-                    if (options.onClick) {
-                        try {
-                            await options.onClick();
-                        } catch (error) {
-                            console.error(
-                                "Error in button click handler:",
-                                error
-                            );
+            if (options.onClick) {
+                const button = this.element.querySelector("button");
+                if (button) {
+                    button.addEventListener("click", (event) => {
+                        event.preventDefault();
+                        if (options.onClick) {
+                            options.onClick();
                         }
-                    }
-                });
+                    });
+                }
             }
         }
     }
