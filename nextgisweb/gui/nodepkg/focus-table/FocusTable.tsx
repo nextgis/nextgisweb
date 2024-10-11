@@ -1,5 +1,4 @@
 import { Fragment, useMemo, useRef, useState } from "react";
-import type { ReactNode } from "react";
 
 import { mergeClasses } from "@nextgisweb/gui/util";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -41,7 +40,7 @@ export interface FocusTableProps<I extends FocusTableItem, C extends string, S>
             "store" | "root" | "title" | "columns"
         >,
         FocusTablePropsActions<I> {
-    renderDetail: ({ item }: { item: I }) => ReactNode;
+    renderDetail: React.ComponentType<{ item: I }>;
     rootClassName?: string;
 }
 
@@ -56,7 +55,7 @@ export function FocusTable<
     columns,
     tableActions,
     itemActions,
-    renderDetail,
+    renderDetail: Detail,
     rootClassName,
 }: FocusTableProps<I, C, S>) {
     const environmentRef = useRef<ComplexTreeEnvironment<I>>(null);
@@ -71,7 +70,7 @@ export function FocusTable<
             key: "hide_details",
             title: msgHideDetails,
             icon: <HideDetailsIcon />,
-            callback: (ctx, env) => {
+            callback: (_ctx, env) => {
                 setShowDetails(false);
                 env.select(null);
             },
@@ -119,7 +118,7 @@ export function FocusTable<
                         hideEmpty
                     />
                     <Fragment key={environmentRef.current.indexFor(selected)}>
-                        {renderDetail({ item: selected })}
+                        <Detail item={selected} />
                     </Fragment>
                 </div>
             )}
