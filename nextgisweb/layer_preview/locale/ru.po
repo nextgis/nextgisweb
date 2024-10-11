@@ -2,10 +2,6 @@
 msgid "Preview"
 msgstr "Просмотр"
 
-#: nodepkg/preview-layer/PreviewLayer.tsx:97
-msgid "Toggle OSM"
-msgstr "Переключить OSM"
-
-#: nodepkg/preview-layer/PreviewLayer.tsx:108
-msgid "Back to layer extent"
-msgstr "Вернуться к области слоя"
+#: nodepkg/preview-layer/PreviewLayer.tsx:99
+msgid "Toggle basemap"
+msgstr "Переключить подложку"

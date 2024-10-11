@@ -14,7 +14,7 @@ msgstr "Объект не найден"
 msgid "Object from URL parameters not found"
 msgstr "Объект из параметров строки запроса не найден"
 
-#: amd/ngw-webmap/Display.js:946 nodepkg/items-widget/ItemsWidget.tsx:235
+#: amd/ngw-webmap/Display.js:946 nodepkg/items-widget/ItemsWidget.tsx:245
 msgid "Layers"
 msgstr "Слои"
 
@@ -31,7 +31,7 @@ msgstr "Поиск"
 msgid "Print map"
 msgstr "Распечатать карту"
 
-#: amd/ngw-webmap/Display.js:995 nodepkg/settings-widget/SettingsWidget.tsx:27
+#: amd/ngw-webmap/Display.js:995 nodepkg/settings-widget/SettingsWidget.tsx:28
 msgid "Bookmarks"
 msgstr "Закладки"
 
@@ -43,7 +43,7 @@ msgstr "Описание"
 msgid "Share"
 msgstr "Поделиться"
 
-#: amd/ngw-webmap/Display.js:1084 nodepkg/settings-widget/SettingsWidget.tsx:25
+#: amd/ngw-webmap/Display.js:1084 nodepkg/settings-widget/SettingsWidget.tsx:26
 msgid "Annotations"
 msgstr "Аннотации"
 
@@ -94,12 +94,12 @@ msgid "Zoom to layer"
 msgstr "Увеличить до слоя"
 
 #: amd/ngw-webmap/tool/Identify.js:277
-#: nodepkg/panel/identification/IdentificationPanel.tsx:208
+#: nodepkg/panel/identification/IdentificationPanel.tsx:218
 msgid "Attributes"
 msgstr "Атрибуты"
 
 #: amd/ngw-webmap/tool/Identify.js:289
-#: nodepkg/panel/identification/IdentificationPanel.tsx:241
+#: nodepkg/panel/identification/IdentificationPanel.tsx:251
 msgid "Geometry"
 msgstr "Геометрия"
 
@@ -235,11 +235,11 @@ msgstr "Вы хотите сохранить изменения?"
 msgid "Don't save"
 msgstr "Не сохранять"
 
-#: component.py:31
+#: component.py:32
 msgid "Main web map"
 msgstr "Основная веб-карта"
 
-#: favorite.py:5 view.py:337
+#: favorite.py:5 view.py:338
 msgid "Display"
 msgstr "Открыть"
 
@@ -247,39 +247,39 @@ msgstr "Открыть"
 msgid "Fragment"
 msgstr "Фрагмент"
 
-#: model.py:40 model.py:58 view.py:332 view.py:359
+#: model.py:46 model.py:64 view.py:333 view.py:360
 msgid "Web map"
 msgstr "Веб-карта"
 
-#: model.py:42
+#: model.py:48
 msgctxt "permission"
 msgid "View annotations"
 msgstr "Просмотр аннотаций"
 
-#: model.py:43
+#: model.py:49
 msgctxt "permission"
 msgid "Draw annotations"
 msgstr "Рисование аннотаций"
 
-#: model.py:44
+#: model.py:50
 msgctxt "permission"
 msgid "Manage annotations"
 msgstr "Управление аннотациями"
 
-#: nodepkg/clone-webmap/CloneWebmap.tsx:21 view.py:347
+#: nodepkg/clone-webmap/CloneWebmap.tsx:21 view.py:348
 msgid "Clone"
 msgstr "Клонировать"
 
-#: nodepkg/clone-webmap/CloneWebmap.tsx:77
+#: nodepkg/clone-webmap/CloneWebmap.tsx:67
 msgid "Resource group"
 msgstr "Группа ресурсов"
 
-#: nodepkg/clone-webmap/CloneWebmap.tsx:84 nodepkg/items-widget/ItemsWidget.tsx:31
+#: nodepkg/clone-webmap/CloneWebmap.tsx:82 nodepkg/items-widget/ItemsWidget.tsx:31
 msgid "Display name"
 msgstr "Наименование"
 
 #: nodepkg/component/SelectLegendSymbols.tsx:5
-#: nodepkg/settings-widget/SettingsWidget.tsx:32
+#: nodepkg/settings-widget/SettingsWidget.tsx:33
 #: nodepkg/settings/select-options.js:92
 msgid "Default"
 msgstr "По умолчанию"
@@ -400,7 +400,7 @@ msgid "Max scale"
 msgstr "Макс. масштаб"
 
 #: nodepkg/items-widget/ItemsWidget.tsx:40 nodepkg/panel/print/PrintPanel.tsx:481
-#: nodepkg/settings-widget/SettingsWidget.tsx:24
+#: nodepkg/settings-widget/SettingsWidget.tsx:25
 #: nodepkg/settings/SettingsForm.js:303
 msgid "Legend"
 msgstr "Легенда"
@@ -479,6 +479,10 @@ msgstr "Показывать охват"
 #: nodepkg/map-viewer-info/MapViewerInfo.tsx:88
 msgid "Show cursor coordinates"
 msgstr "Показывать координаты курсора"
+
+#: nodepkg/ol/control/ZoomControl.ts:38
+msgid "Back to the initial extent"
+msgstr "Вернуться к начальному охвату"
 
 #: nodepkg/panel/annotations/AnnotationsPanel.js:94
 msgid "Edit annotations"
@@ -565,19 +569,19 @@ msgstr "Получение информации об объекте..."
 msgid "Loading..."
 msgstr "Загрузка..."
 
-#: nodepkg/panel/identification/IdentificationPanel.tsx:135
+#: nodepkg/panel/identification/IdentificationPanel.tsx:145
 msgid "Attribute"
 msgstr "Атрибут"
 
-#: nodepkg/panel/identification/IdentificationPanel.tsx:141
+#: nodepkg/panel/identification/IdentificationPanel.tsx:151
 msgid "Value"
 msgstr "Значение"
 
-#: nodepkg/panel/identification/IdentificationPanel.tsx:307
+#: nodepkg/panel/identification/IdentificationPanel.tsx:317
 msgid "Zoom to feature"
 msgstr "Приблизить к объекту"
 
-#: nodepkg/panel/identification/fields.tsx:107
+#: nodepkg/panel/identification/fields.tsx:110
 msgid "N/A"
 msgstr "Н/Д"
 
@@ -622,6 +626,7 @@ msgid "Number of legend columns"
 msgstr "Количество столбцов легенды"
 
 #: nodepkg/panel/print/PrintPanel.tsx:503
+#: nodepkg/settings-widget/SettingsWidget.tsx:24
 msgid "Title"
 msgstr "Заголовок"
 
@@ -787,44 +792,44 @@ msgstr "Предпросмотр"
 msgid "Constraining extent"
 msgstr "Ограничивающий охват"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:26
+#: nodepkg/settings-widget/SettingsWidget.tsx:27
 msgid "Select mode"
 msgstr "Выберите режим"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:28
+#: nodepkg/settings-widget/SettingsWidget.tsx:29
 msgid "Select resource"
 msgstr "Выберите ресурс"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:29
+#: nodepkg/settings-widget/SettingsWidget.tsx:30
 #: nodepkg/settings/SettingsForm.js:215
 msgid "Measurement SRS"
 msgstr "СК для измерений"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:30
+#: nodepkg/settings-widget/SettingsWidget.tsx:31
 msgid "Layers editing"
 msgstr "Редактирование слоев"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:35
+#: nodepkg/settings-widget/SettingsWidget.tsx:36
 msgid "Web map will start at this extent"
 msgstr "Веб-карта будет показана с этим охватом"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:36
+#: nodepkg/settings-widget/SettingsWidget.tsx:37
 msgid "Web map will not allow to move outside of this extent"
 msgstr "Веб-карта не позволит выйти за пределы этого охвата"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:40
+#: nodepkg/settings-widget/SettingsWidget.tsx:41
 msgid "Hide by default"
 msgstr "Скрыть по умолчанию"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:41
+#: nodepkg/settings-widget/SettingsWidget.tsx:42
 msgid "Show without messages"
 msgstr "Показать без сообщений"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:42
+#: nodepkg/settings-widget/SettingsWidget.tsx:43
 msgid "Show with messages"
 msgstr "Показать с сообщениями"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:136
+#: nodepkg/settings-widget/SettingsWidget.tsx:143
 msgid "Settings"
 msgstr "Настройки"
 
@@ -1028,11 +1033,11 @@ msgstr "Мультиполигон"
 msgid "GeometryCollection"
 msgstr "Коллекция геометрий"
 
-#: nodepkg/webmap-feature-grid-tab/WebMapFeatureGridTab.tsx:24
+#: nodepkg/webmap-feature-grid-tab/WebMapFeatureGridTab.tsx:25
 msgid "Go to"
 msgstr "Перейти"
 
-#: nodepkg/webmap-feature-grid-tab/WebMapFeatureGridTab.tsx:127
+#: nodepkg/webmap-feature-grid-tab/WebMapFeatureGridTab.tsx:133
 msgid "Selected feature has no geometry"
 msgstr "Выбранный объект не имеет геометрии"
 
@@ -1072,14 +1077,14 @@ msgstr ""
 "Для генерации предпросмотра вернитесь на страницу веб карты и нажмите "
 "\"Предпросмотр\"."
 
-#: view.py:252
+#: view.py:253
 msgid "Clone web map"
 msgstr "Клонировать веб-карту"
 
-#: view.py:265
+#: view.py:266
 msgid "Embedded webmap preview"
 msgstr "Просмотр встроенной веб-карты"
 
-#: view.py:275
+#: view.py:276
 msgid "Web map settings"
 msgstr "Настройки веб-карты"

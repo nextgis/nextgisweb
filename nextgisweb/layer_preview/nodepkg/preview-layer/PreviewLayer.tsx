@@ -3,6 +3,7 @@ import { useCallback, useReducer } from "react";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
 import { convertNgwExtentToWSEN } from "@nextgisweb/gui/util/extent";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 import {
     AttributionControl,
     Basemap,
@@ -95,6 +96,7 @@ export function PreviewLayer({
                     style={styleToggleBtn}
                     status={!!basemap}
                     onClick={toggleBaseMap}
+                    title={gettext("Toggle basemap")}
                 >
                     <MapIcon />
                 </ToggleControl>
