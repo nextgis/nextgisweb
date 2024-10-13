@@ -958,7 +958,7 @@ define([
                         title: gettext("Identify"),
                         name: "identify",
                         order: 15,
-                        menuIcon: "material-left_click",
+                        menuIcon: "material-arrow_selector_tool",
                         applyToTinyMap: true,
                     },
                 });
