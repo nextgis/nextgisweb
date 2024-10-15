@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
+import type React from "react";
 
 import type { CustomFont, SystemFont } from "@nextgisweb/core/type/api";
 import { FileUploaderButton } from "@nextgisweb/file-upload/file-uploader";
@@ -53,6 +54,7 @@ const LoadingModal = (props: ModalProps) => {
 export function FontsPanel() {
     const [showSystem, setShowSystem] = useState(false);
     const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
+    const fileUploaderResetter = useRef(0);
 
     const { data, isLoading } = useRouteGet("pyramid.font");
 
@@ -132,6 +134,8 @@ export function FontsPanel() {
                 }
             } catch (error) {
                 errorModal(error as ApiError);
+            } finally {
+                fileUploaderResetter.current += 1;
             }
     };
 
@@ -148,6 +152,7 @@ export function FontsPanel() {
                 style={{ marginBlockEnd: "0.5rem" }}
             >
                 <FileUploaderButton
+                    key={fileUploaderResetter.current}
                     multiple={true}
                     accept=".ttf,.otf"
                     onChange={(meta?: FileMeta[]) => {
@@ -179,7 +184,8 @@ export function FontsPanel() {
                 dataSource={dataWithKeys}
                 rowSelection={{
                     type: "checkbox",
-                    onChange: (keys: any) => setSelectedRowKeys(keys),
+                    onChange: (keys: React.Key[]) =>
+                        setSelectedRowKeys(keys as string[]),
                     getCheckboxProps: (record) => ({
                         disabled: ["system"].includes(record.type),
                     }),
