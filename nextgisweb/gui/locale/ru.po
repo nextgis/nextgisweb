@@ -108,7 +108,7 @@ msgstr "Необходимо подтверждение"
 msgid "Please confirm this action."
 msgstr "Пожалуйста, подтвердите данное действие."
 
-#: nodepkg/confirm.ts:16 nodepkg/error/shared.tsx:79
+#: nodepkg/confirm.ts:16 nodepkg/error/shared.tsx:82
 msgid "OK"
 msgstr "OK"
 
@@ -138,23 +138,31 @@ msgstr "Требуется ключ"
 msgid "Key not unique"
 msgstr "Ключ не уникален"
 
-#: nodepkg/error/index.ts:44
+#: nodepkg/error/ErrorModal.tsx:47
+msgid "Error"
+msgstr "Ошибка"
+
+#: nodepkg/error/index.ts:58
 msgid "Unexpected error"
 msgstr "Неожиданная ошибка"
 
-#: nodepkg/error/index.ts:48
+#: nodepkg/error/index.ts:62
 msgid "Something went wrong."
 msgstr "Что-то пошло не так."
 
-#: nodepkg/error/shared.tsx:64
+#: nodepkg/error/shared.tsx:21
+msgid "Unknown Error"
+msgstr "Неизвестная ошибка"
+
+#: nodepkg/error/shared.tsx:67
 msgid "Technical information"
 msgstr "Техническая информация"
 
-#: nodepkg/error/shared.tsx:74
+#: nodepkg/error/shared.tsx:77
 msgid "Contact support"
 msgstr "Написать в поддержку"
 
-#: nodepkg/error/shared.tsx:83
+#: nodepkg/error/shared.tsx:86
 msgid "Back to home"
 msgstr "На главную"
 
@@ -166,7 +174,7 @@ msgstr "Необходимо указать значение"
 msgid "The value entered is not valid"
 msgstr "Введенное значение некорректно"
 
-#: nodepkg/focus-table/FocusTable.tsx:23
+#: nodepkg/focus-table/FocusTable.tsx:22
 msgid "Hide details"
 msgstr "Скрыть детали"
 
