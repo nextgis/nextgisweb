@@ -1,6 +1,6 @@
 import { makeAutoObservable, runInAction, toJS } from "mobx";
 
-import { getChildrenDeep } from "@nextgisweb/gui/util/tree";
+import { getChildrenDeep, traverseTree } from "@nextgisweb/gui/util/tree";
 
 import { keyInMutuallyExclusiveGroupDeep } from "../layers-tree/util/treeItems";
 import type {
@@ -273,6 +273,18 @@ export class WebmapStore {
             this.setChecked([...this._checked, item.id]);
         }
         this._webmapItems = items;
+    };
+
+    removeItem = (id: number) => {
+        this.setChecked(this._checked.filter((id) => id !== id));
+        traverseTree(this._webmapItems, (item, index, arr) => {
+            if (item.id === id) {
+                arr.splice(index, 1);
+                return true;
+            }
+        });
+        this._webmapItems = [...this._webmapItems];
+        delete this._layers[id];
     };
 
     setWebmapItems = (items: StoreItem[]) => {
