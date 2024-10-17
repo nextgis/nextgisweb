@@ -14,6 +14,14 @@ export type UploaderMeta<M extends boolean = boolean> = M extends true
     ? FileMeta[]
     : FileMeta;
 
+export type AfterFileUploadOperation = {
+    message: string;
+    loader: (
+        uploadedFiles: FileMeta[],
+        options: { signal: AbortSignal }
+    ) => Promise<void>;
+};
+
 export interface UseFileUploaderProps<
     M extends boolean = boolean,
     F extends UploaderMeta<M> = UploaderMeta<M>,
@@ -28,6 +36,7 @@ export interface UseFileUploaderProps<
     showUploadList?: boolean;
     openFileDialogOnClick?: boolean;
     showProgressInDocTitle?: boolean;
+    afterUpload?: AfterFileUploadOperation[];
 }
 
 export interface FileUploaderProps<M extends boolean = boolean>

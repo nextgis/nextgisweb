@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { Balancer } from "react-wrap-balancer";
 
 import { Button, Upload } from "@nextgisweb/gui/antd";
@@ -21,6 +21,30 @@ const msgDragAndDrop = gettext("or drag and drop here");
 const msgMaxSize = formatSize(maxSize) + " " + gettext("max");
 const msgStop = gettext("Stop");
 
+function ProgressText({
+    abort,
+    progressText,
+}: {
+    abort: (reason?: string | undefined) => void;
+    progressText: string;
+}) {
+    const doAbort = useCallback(() => {
+        abort();
+    }, [abort]);
+    return (
+        <div>
+            <span>
+                <p className="ant-upload-text">{progressText}</p>
+            </span>
+            <span>
+                <Button shape="round" icon={<CancelIcon />} onClick={doAbort}>
+                    {msgStop}
+                </Button>
+            </span>
+        </div>
+    );
+}
+
 export function FileUploader<M extends boolean = false>({
     style,
     accept,
@@ -31,6 +55,7 @@ export function FileUploader<M extends boolean = false>({
     onChange,
     inputProps = {},
     uploadText = msgUpload,
+    afterUpload,
     onUploading,
     setFileMeta,
     showMaxSize = false,
@@ -40,6 +65,7 @@ export function FileUploader<M extends boolean = false>({
     const { abort, progressText, props, meta, setMeta, uploading } =
         useFileUploader<M>({
             showProgressInDocTitle,
+            afterUpload,
             setFileMeta,
             inputProps,
             fileMeta,
@@ -81,24 +107,6 @@ export function FileUploader<M extends boolean = false>({
         );
     };
 
-    const ProgressText = () => (
-        <div>
-            <span>
-                <p className="ant-upload-text">{progressText}</p>
-            </span>
-            <span>
-                <Button
-                    shape="round"
-                    icon={<CancelIcon />}
-                    onClick={() => {
-                        abort();
-                    }}
-                >
-                    {msgStop}
-                </Button>
-            </span>
-        </div>
-    );
     return (
         <Dragger
             {...props}
@@ -108,7 +116,11 @@ export function FileUploader<M extends boolean = false>({
             disabled={progressText !== null}
             accept={accept}
         >
-            {progressText !== null ? <ProgressText /> : <InputText />}
+            {progressText !== null ? (
+                <ProgressText abort={abort} progressText={progressText} />
+            ) : (
+                <InputText />
+            )}
         </Dragger>
     );
 }
