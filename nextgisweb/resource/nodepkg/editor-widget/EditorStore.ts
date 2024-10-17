@@ -57,7 +57,9 @@ export class EditorStore {
 
         this.sdnBase = composite.sdnBase;
         this.composite.watch("sdnDynamic", (attr, oldVal, newVal) => {
-            this.sdnDynamic = newVal;
+            runInAction(() => {
+                this.sdnDynamic = newVal;
+            });
         });
     }
 
