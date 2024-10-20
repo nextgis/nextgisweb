@@ -39,6 +39,11 @@ export interface RequestOptions<
     responseType?: RT;
     lunkwill?: LunkwillParam;
     lunkwillReturnUrl?: ReturnUrl;
+    /**
+     * Minimum request duration in milliseconds.
+     * @remarks Useful to prevent interface flickering for fast API requests.
+     */
+    minRequestDuration?: number;
 }
 
 export interface GetRequestOptions<

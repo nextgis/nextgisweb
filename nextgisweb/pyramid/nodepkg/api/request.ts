@@ -1,3 +1,4 @@
+import { sleep } from "@nextgisweb/gui/util";
 import { LoaderCache } from "@nextgisweb/pyramid/util/loader";
 
 import { cache } from "./cache";
@@ -181,6 +182,7 @@ export async function request<
         lunkwill,
         query,
         json,
+        minRequestDuration, // updated option name
         ...opt
     } = { ...defaults, ...options };
 
@@ -203,6 +205,8 @@ export async function request<
     const url = generateUrl(path, query, opt.global);
 
     const makeRequest = async (): Promise<ToReturn<T, RT, ReturnUrl>> => {
+        const startTime = Date.now();
+
         let response: Response;
         try {
             response = await fetch(url, opt);
@@ -255,8 +259,15 @@ export async function request<
         if (400 <= response.status && response.status <= 599) {
             throw new ServerResponseError(body as ServerResponseErrorData);
         }
+
+        const elapsedTime = Date.now() - startTime;
+        if (minRequestDuration && elapsedTime < minRequestDuration) {
+            await sleep(minRequestDuration - elapsedTime);
+        }
+
         return body as ToReturn<T, RT, ReturnUrl>;
     };
+
     if (opt.method && opt.method.toUpperCase() === "GET" && useCache) {
         const cacheToUse = useCache instanceof LoaderCache ? useCache : cache;
         return cacheToUse.promiseFor(url, makeRequest) as ToReturn<
