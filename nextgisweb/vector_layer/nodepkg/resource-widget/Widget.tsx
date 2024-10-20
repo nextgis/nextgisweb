@@ -1,17 +1,19 @@
 import { observer } from "mobx-react-lite";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import type { GeometryType } from "@nextgisweb/feature-layer/type";
 import { FileUploader } from "@nextgisweb/file-upload/file-uploader";
-import type { UploaderMeta } from "@nextgisweb/file-upload/file-uploader";
+import type {
+    FileMeta,
+    UploaderMeta,
+} from "@nextgisweb/file-upload/file-uploader";
 import { Checkbox, Collapse, Input, Radio, Select } from "@nextgisweb/gui/antd";
 import type {
     CheckboxProps,
     RadioGroupProps,
     SelectProps,
 } from "@nextgisweb/gui/antd";
-import { errorModal } from "@nextgisweb/gui/error";
-import type { ApiError } from "@nextgisweb/gui/error/type";
+import { errorModal, isAbortError } from "@nextgisweb/gui/error";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type {
@@ -33,6 +35,8 @@ const uploaderMessages = {
     uploadText: gettext("Select a dataset"),
     helpText: gettext("ESRI Shapefile (zip), GeoPackage, GeoJSON, GML, KML, CSV or XLSX formats are supported. For CSV and XLSX only points are supported, coordinates must be put in lat and lot columns."),
 }
+// prettier-ignore
+const msgInspect = gettext("Files uploaded, post-processing on the server in progress...");
 
 const RadioGroup = (props: RadioGroupProps) => (
     <Radio.Group optionType="button" buttonStyle="outline" {...props} />
@@ -149,7 +153,7 @@ export const Widget: EditorWidgetComponent<EditorWidgetProps<Store>> = observer(
         const [layerOpts, setLayerOpts] = useState<Option[]>();
         const [loading, setLoading] = useState(false);
 
-        const { operation, mode, update, source, geometryTypeInitial } = store;
+        const { operation, mode, update, geometryTypeInitial } = store;
 
         const modeOpts = useMemo(() => {
             const result: Option<Mode>[] = [];
@@ -198,15 +202,23 @@ export const Widget: EditorWidgetComponent<EditorWidgetProps<Store>> = observer(
             return result;
         }, [mode, update, geometryTypeInitial]);
 
-        useEffect(() => {
-            setLayerOpts(undefined);
-            update({ sourceLayer: null });
-            if (!source) return;
-            (async () => {
+        const inspectUpload = useCallback(
+            async (value: FileMeta[], { signal }: { signal: AbortSignal }) => {
+                const fileMeta: FileMeta | undefined = value
+                    ? Array.isArray(value)
+                        ? value[0]
+                        : value
+                    : undefined;
+
+                setLayerOpts(undefined);
+                update({ sourceLayer: null });
+                if (!fileMeta) return;
+
                 setLoading(true);
                 try {
                     const dset = await route("vector_layer.inspect").post({
-                        json: { id: source.id },
+                        json: { id: fileMeta.id },
+                        signal,
                     });
 
                     setLayerOpts(
@@ -214,13 +226,16 @@ export const Widget: EditorWidgetComponent<EditorWidgetProps<Store>> = observer(
                     );
                     update({ sourceLayer: dset.layers[0] });
                 } catch (err) {
-                    errorModal(err as ApiError);
+                    if (!isAbortError(err)) {
+                        errorModal(err);
+                    }
                     update({ source: null });
                 } finally {
                     setLoading(false);
                 }
-            })();
-        }, [store, source, update]);
+            },
+            [update]
+        );
 
         const bval = useCallback(
             (attr: keyof typeof store): SelectProps => ({
@@ -254,20 +269,24 @@ export const Widget: EditorWidgetComponent<EditorWidgetProps<Store>> = observer(
                             onUploading={(value) => {
                                 store.uploading = value;
                             }}
+                            afterUpload={[
+                                {
+                                    message: msgInspect,
+                                    loader: inspectUpload,
+                                },
+                            ]}
                             showMaxSize
                             {...uploaderMessages}
                         />
 
-                        <>
-                            <label>{gettext("Source layer")}</label>
-                            <Select
-                                loading={loading}
-                                disabled={layerOpts?.length === 1}
-                                className="row"
-                                options={layerOpts}
-                                {...bval("sourceLayer")}
-                            />
-                        </>
+                        <label>{gettext("Source layer")}</label>
+                        <Select
+                            loading={loading}
+                            disabled={layerOpts?.length === 1}
+                            className="row"
+                            options={layerOpts}
+                            {...bval("sourceLayer")}
+                        />
                     </>
                 )}
                 {["empty", "gtype"].includes(mode || "") && (
