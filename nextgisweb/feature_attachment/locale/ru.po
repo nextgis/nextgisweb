@@ -2,7 +2,8 @@
 #: nodepkg/attachment-bundle/ol-control/control.js:14
 #: nodepkg/attachment-bundle/ol-control/control.js:30
 #: nodepkg/attachment-bundle/plugin/plugin.ts:15
-#: nodepkg/attachment-editor/index.ts:8
+#: nodepkg/attachment-editor/plugin.ts:9
+#: nodepkg/attachment-table-view/AttachmentTableView.tsx:28
 msgid "Attachments"
 msgstr "Вложения"
 
@@ -46,17 +47,17 @@ msgstr "Нет вложений"
 msgid "Download all attachments"
 msgstr "Скачать все вложения"
 
-#: nodepkg/attachment-editor/AttachmentEditor.tsx:166
+#: nodepkg/attachment-editor/AttachmentEditor.tsx:160
 #: nodepkg/attachment-table/AttachmentTable.tsx:45
 msgid "File name"
 msgstr "Имя файла"
 
-#: nodepkg/attachment-editor/AttachmentEditor.tsx:172
+#: nodepkg/attachment-editor/AttachmentEditor.tsx:166
 #: nodepkg/attachment-table/AttachmentTable.tsx:63
 msgid "Size"
 msgstr "Размер"
 
-#: nodepkg/attachment-editor/AttachmentEditor.tsx:178
+#: nodepkg/attachment-editor/AttachmentEditor.tsx:172
 #: nodepkg/attachment-table/AttachmentTable.tsx:78
 msgid "Description"
 msgstr "Описание"
@@ -93,7 +94,7 @@ msgstr "Импорт архива выполнен успешно."
 msgid "Attachments imported - {i}, skipped - {s}."
 msgstr "Импортировано вложений - {i}, пропущено - {s}."
 
-#: nodepkg/attachment-form/AttachmentForm.tsx:125
+#: nodepkg/attachment-form/AttachmentForm.tsx:126
 msgid ""
 "Upload a ZIP archive to batch append attachments to existing features. An "
 "archive must contain directories named after feature IDs. Each folder can "
@@ -104,19 +105,19 @@ msgstr ""
 "объектов. Каждая директория может содержать одно или несколько вложений. "
 "Дубликаты будут пропущены."
 
-#: nodepkg/attachment-form/AttachmentForm.tsx:134
+#: nodepkg/attachment-form/AttachmentForm.tsx:135
 msgid "Delete existing attachments"
 msgstr "Удалить существующие вложения"
 
-#: nodepkg/attachment-form/AttachmentForm.tsx:159
+#: nodepkg/attachment-form/AttachmentForm.tsx:160
 msgid "Import attachments from ZIP archive"
 msgstr "Импортировать вложения из ZIP-архива."
 
-#: nodepkg/attachment-form/AttachmentForm.tsx:171
+#: nodepkg/attachment-form/AttachmentForm.tsx:172
 msgid "Export"
 msgstr "Экспорт"
 
-#: nodepkg/attachment-form/AttachmentForm.tsx:176
+#: nodepkg/attachment-form/AttachmentForm.tsx:177
 msgid "Import"
 msgstr "Импорт"
 
@@ -128,9 +129,13 @@ msgstr "Безымянный"
 msgid "MIME type"
 msgstr "Тип MIME"
 
-#: nodepkg/image-thumbnail/component/CarouselRender.tsx:23
+#: nodepkg/image-thumbnail/component/CarouselRender.tsx:32
 msgid "Toggle panorama viewer"
 msgstr "Переключить просмотр панорам"
+
+#: nodepkg/image-thumbnail/component/CarouselSlide.tsx:70
+msgid "Failed to upload image"
+msgstr "Не удалось загрузить изображение"
 
 #: util.py:26
 msgid "Invalid ZIP archive."
@@ -148,23 +153,23 @@ msgstr "Некорректный идентификатор объекта дл�
 msgid "Invalid keyname for file '{}'."
 msgstr "Некорректный ключ для файла '{}'."
 
-#: util.py:75
+#: util.py:74
 msgid "Invalid name for file '{}'."
 msgstr "Некорректное имя для файла '{}'."
 
-#: util.py:82
+#: util.py:80
 msgid "Invalid MIME type for file '{}'."
 msgstr "Некорректный MIME-тип для файла '{}'."
 
-#: util.py:89
+#: util.py:87
 msgid "Invalid description for file '{}'."
 msgstr "Некорректное описание для файла '{}'."
 
-#: util.py:102
+#: util.py:100
 msgid "Could not determine feature ID for file '{}'."
 msgstr "Не удалось определить идентификатор объекта для файла '{}'."
 
-#: util.py:122
+#: util.py:118
 msgid "File '{}' isn't found in the archive."
 msgstr "Файл '{}' не найден в архиве."
 
