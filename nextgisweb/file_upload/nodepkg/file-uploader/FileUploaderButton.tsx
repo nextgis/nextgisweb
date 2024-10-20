@@ -13,6 +13,7 @@ export function FileUploaderButton<M extends boolean = false>({
     showUploadList,
     setFileMeta,
     uploadText = msgUploadButton,
+    afterUpload,
     inputProps,
     onChange,
     fileMeta,
@@ -22,6 +23,7 @@ export function FileUploaderButton<M extends boolean = false>({
     const { uploading, props } = useFileUploader({
         showProgressInDocTitle,
         showUploadList,
+        afterUpload,
         setFileMeta,
         inputProps,
         fileMeta,

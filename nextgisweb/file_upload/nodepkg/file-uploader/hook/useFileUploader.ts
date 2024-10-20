@@ -26,6 +26,7 @@ export function useFileUploader<M extends boolean = false>({
     showUploadList = false,
     openFileDialogOnClick = true,
     showProgressInDocTitle = false,
+    afterUpload = [],
 }: UseFileUploaderProps<M>) {
     const { makeSignal, abort } = useAbortController();
 
@@ -48,9 +49,11 @@ export function useFileUploader<M extends boolean = false>({
     }, [meta, onChange, setInitMeta]);
 
     useEffect(() => {
-        setProgressText(progress ? msgProgressFmt(progress) : null);
+        setProgressText(
+            progress !== undefined ? msgProgressFmt(String(progress)) : null
+        );
         if (showProgressInDocTitle && progress !== undefined) {
-            document.title = progress + " | " + docTitle.current;
+            document.title = `${progress} | ${docTitle.current}`;
         } else if (document.title !== docTitle.current) {
             document.title = docTitle.current;
         }
@@ -67,11 +70,28 @@ export function useFileUploader<M extends boolean = false>({
     }, []);
 
     const fileUploaderWrapper = useCallback(
-        (options: FileUploaderOptions) => {
+        async (options: FileUploaderOptions) => {
             abort();
-            return fileUploader({ ...options, signal: makeSignal() });
+            const signal = makeSignal();
+            const uploadedFiles = await fileUploader({
+                ...options,
+                signal,
+            });
+
+            for (const { message, loader } of afterUpload) {
+                setProgressText(message);
+                try {
+                    await loader(uploadedFiles, { signal });
+                } catch (error) {
+                    return [];
+                }
+            }
+
+            setProgressText(null);
+
+            return signal.aborted ? [] : uploadedFiles;
         },
-        [abort, makeSignal]
+        [abort, makeSignal, afterUpload]
     );
 
     const upload = useCallback(
