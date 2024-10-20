@@ -1,4 +1,5 @@
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import { PanelContentContainer } from "@nextgisweb/webmap/panel/identification/PanelContentContainer";
 import type { IdentifyExtensionComponentProps } from "@nextgisweb/webmap/panel/identification/identification";
 
 import AttachmentTable from "../attachment-table";
@@ -22,23 +23,24 @@ export default function AttachmentTableView({
 
     return (
         <>
-            <div className="panel-content-container">
-                <div className="fill">
-                    <h3>
+            <PanelContentContainer
+                title={
+                    <>
                         <AttachFileIcon /> {gettext("Attachments")}
-                    </h3>
-                </div>
-            </div>
-            <div className="panel-content-container">
-                <div className="fill">
+                    </>
+                }
+            />
+
+            <PanelContentContainer
+                fill={
                     <AttachmentTable
                         attachments={attachments}
                         featureId={featureItem.id}
                         resourceId={resourceId}
                         isSmall
                     />
-                </div>
-            </div>
+                }
+            />
         </>
     );
 }
