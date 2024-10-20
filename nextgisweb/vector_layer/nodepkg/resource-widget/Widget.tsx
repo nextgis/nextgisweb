@@ -147,6 +147,7 @@ SourceOptions.displayName = "SourceOptions";
 export const Widget: EditorWidgetComponent<EditorWidgetProps<Store>> = observer(
     ({ store }) => {
         const [layerOpts, setLayerOpts] = useState<Option[]>();
+        const [loading, setLoading] = useState(false);
 
         const { operation, mode, update, source, geometryTypeInitial } = store;
 
@@ -202,6 +203,7 @@ export const Widget: EditorWidgetComponent<EditorWidgetProps<Store>> = observer(
             update({ sourceLayer: null });
             if (!source) return;
             (async () => {
+                setLoading(true);
                 try {
                     const dset = await route("vector_layer.inspect").post({
                         json: { id: source.id },
@@ -214,6 +216,8 @@ export const Widget: EditorWidgetComponent<EditorWidgetProps<Store>> = observer(
                 } catch (err) {
                     errorModal(err as ApiError);
                     update({ source: null });
+                } finally {
+                    setLoading(false);
                 }
             })();
         }, [store, source, update]);
@@ -253,16 +257,17 @@ export const Widget: EditorWidgetComponent<EditorWidgetProps<Store>> = observer(
                             showMaxSize
                             {...uploaderMessages}
                         />
-                        {layerOpts && layerOpts.length > 1 && (
-                            <>
-                                <label>{gettext("Source layer")}</label>
-                                <Select
-                                    className="row"
-                                    options={layerOpts}
-                                    {...bval("sourceLayer")}
-                                />
-                            </>
-                        )}
+
+                        <>
+                            <label>{gettext("Source layer")}</label>
+                            <Select
+                                loading={loading}
+                                disabled={layerOpts?.length === 1}
+                                className="row"
+                                options={layerOpts}
+                                {...bval("sourceLayer")}
+                            />
+                        </>
                     </>
                 )}
                 {["empty", "gtype"].includes(mode || "") && (
