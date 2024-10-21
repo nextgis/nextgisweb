@@ -122,7 +122,7 @@ export function IdentifyResult({ identifyInfo, display }: IdentifyResultProps) {
     const coordinatesPanel = (
         <PanelContentContainer
             marginAll
-            fill={
+            content={
                 <CoordinatesSwitcher
                     display={display}
                     identifyInfo={identifyInfo}
