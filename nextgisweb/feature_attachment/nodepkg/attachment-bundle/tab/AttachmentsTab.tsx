@@ -13,6 +13,7 @@ import {
     Tag,
     Tooltip,
 } from "@nextgisweb/gui/antd";
+import { formatSize } from "@nextgisweb/gui/util";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -20,7 +21,6 @@ import FilterExtentBtn from "@nextgisweb/webmap/filter-extent-btn";
 import type { DojoDisplay, WebmapItemConfig } from "@nextgisweb/webmap/type";
 
 import type { FeatureAttachment } from "../../type";
-import { fileSizeToString } from "../../utils";
 
 import {
     DownloadOutlined,
@@ -88,7 +88,7 @@ const attachmentsToDataList = (
     const layerId = layerItemView.layerId;
     return layerItemView.attachments.map((l: FeatureAttachmentView) => ({
         id: l.attachment.id,
-        size: fileSizeToString(l.attachment.size),
+        size: formatSize(l.attachment.size),
         name: l.attachment.name,
         description: l.attachment.description,
         featureId: l.featureId,

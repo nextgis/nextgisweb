@@ -1,10 +1,10 @@
-const UNITS_FROM_KIB = ["KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+const UNITS_FROM_KIB = ["KiB", "MiB", "GiB", "TiB", "PiB"];
 
 export function formatSize(size: number): string {
+    let i = 0;
     size /= 1024; // Convert into KB as units starts
 
-    let i = 0;
-    while (size >= 1024) {
+    while (size >= 1024 && i < UNITS_FROM_KIB.length) {
         size /= 1024;
         ++i;
     }

@@ -3,13 +3,13 @@ import { useMemo, useRef } from "react";
 import { Table } from "@nextgisweb/gui/antd";
 import type { TableProps } from "@nextgisweb/gui/antd";
 import showModal from "@nextgisweb/gui/showModal";
+import { formatSize } from "@nextgisweb/gui/util";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import ImageThumbnail from "../image-thumbnail";
 import { CarouselModal } from "../image-thumbnail/component/CarouselModal";
 import type { FeatureAttachment } from "../type";
-import { fileSizeToString } from "../utils";
 
 import "./AttachmentTable.less";
 
@@ -61,7 +61,7 @@ export function AttachmentTable({
                 dataIndex: "size",
                 className: "size",
                 title: gettext("Size"),
-                render: (size: number) => fileSizeToString(size),
+                render: (size: number) => formatSize(size),
             },
         ];
 
