@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from hashlib import md5
 from itertools import chain
 from pathlib import Path
+from secrets import token_hex
 from time import sleep
 from typing import Optional
 from warnings import warn
@@ -376,9 +377,11 @@ def setup_pyramid(comp, config):
 
     # COMMON REQUEST'S ATTRIBUTES
 
+    request_id = lambda req: token_hex(8)
     qs_parser = lambda req: QueryString(req.environ["QUERY_STRING"])
     is_api = lambda req: req.path_info.lower().startswith("/api/")
 
+    config.add_request_method(request_id, "request_id", property=True)
     config.add_request_method(qs_parser, "qs_parser", property=True)
     config.add_request_method(lambda req: env, "env", property=True)
     config.add_request_method(is_api, "is_api", property=True)

@@ -30,6 +30,7 @@ def app():
     settings["error.exc_response"] = exception.json_error_response
 
     config = Configurator(settings=settings)
+    config.add_request_method(lambda req: "deadbeef", "request_id", property=True)
     config.include(exception)
 
     def view_error(request):
@@ -68,6 +69,7 @@ def test_error(app):
         detail="Test detail",
         exception="nextgisweb.pyramid.test.test_exception.ErrorTest",
         status_code=418,
+        request_id="deadbeef",
     )
 
 
@@ -83,8 +85,9 @@ def test_exception(app):
 
     assert rjson == dict(
         title="Internal server error",
-        status_code=500,
         exception="nextgisweb.pyramid.exception.InternalServerError",
+        status_code=500,
+        request_id="deadbeef",
     )
 
 

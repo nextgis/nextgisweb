@@ -88,11 +88,17 @@ def unhandled_exception_tween_factory(handler, registry):
                 raise
 
             try:
-                logger.exception("Uncaught exception %s at %s" % (exc_name(exc), request.url))
+                logger.exception(
+                    "Exception %s while processing request %s (%s %s)",
+                    *(exc_name(exc), request.request_id, request.method, request.url),
+                )
                 iexc = InternalServerError(sys.exc_info())
                 return exc_response(request, iexc, iexc, iexc.exc_info)
             except Exception:
-                logger.exception("Exception while rendering error response at %s", request.url)
+                logger.exception(
+                    "Exception while rendering error %s (%s %s)",
+                    *(request.request_id, request.method, request.url),
+                )
                 return httpexceptions.HTTPInternalServerError()
 
     return unhandled_exception_tween
@@ -136,7 +142,7 @@ def guru_meditation(tb):
             ).encode("utf-8")
         )
 
-    return tbhash.hexdigest()
+    return tbhash.hexdigest()[:16]
 
 
 def json_error(request, err_info, exc, exc_info, debug=True):
@@ -166,6 +172,9 @@ def json_error(request, err_info, exc, exc_info, debug=True):
     data = err_info_attr(err_info, exc, "data")
     if data is not None and len(data) > 0:
         result["data"] = data
+
+    # Request ID to correlate with logs
+    result.update(request_id=request.request_id)
 
     if exc_info is not None:
         tb = traceback.extract_tb(exc_info[2])
