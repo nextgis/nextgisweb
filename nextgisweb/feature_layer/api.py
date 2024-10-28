@@ -537,7 +537,6 @@ class NgwExtent(Struct):
     minLat: int
 
 
-
 def feature_extent(resource, request) -> NgwExtent:
     request.resource_permission(DataScope.read)
 

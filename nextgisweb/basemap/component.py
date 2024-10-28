@@ -10,7 +10,6 @@ class BasemapComponent(Component):
     def setup_pyramid(self, config):
         from . import view  # noqa: F401
 
-
     def client_settings(self, request):
         return dict(
             qms_geoservices_url=self.options["qms_geoservices_url"],

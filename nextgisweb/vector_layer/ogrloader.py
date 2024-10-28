@@ -90,7 +90,7 @@ class IExplorer(Interface):
     identity = Attribute("Explorer identity")
 
     def explore(self, feature):
-        """ Explore feature and returns True if done """
+        """Explore feature and returns True if done"""
 
 
 @implementer(IExplorer)

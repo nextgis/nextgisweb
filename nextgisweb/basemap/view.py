@@ -1,4 +1,3 @@
-
 from nextgisweb.resource import Widget
 from nextgisweb.webmap import WebMap
 

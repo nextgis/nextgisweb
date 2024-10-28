@@ -366,7 +366,11 @@ def test_authorization_code(server_response_mock, freezegun, ngw_webtest_app, ng
         "introspection",
         dict(token=access_token),
         introspection_response(ouser1),
-    ), patch.object(ngw_env.auth.oauth, "password", new=True):
+    ), patch.object(
+        ngw_env.auth.oauth,
+        "password",
+        new=True,
+    ):
         ngw_webtest_app.post(
             "/api/component/auth/login",
             dict(login=ouser1["keyname"], password=ouser1["pwd"]),

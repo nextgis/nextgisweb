@@ -6,9 +6,7 @@ from sqlalchemy import func
 
 from nextgisweb.env import DBSession
 
-from nextgisweb.auth import Group, User
-
-from .. import Resource, ResourceACLRule, ResourceGroup
+from .. import Resource, ResourceGroup
 
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
 

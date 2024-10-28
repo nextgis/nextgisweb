@@ -16,8 +16,7 @@ def preview_map(resource, request):
     return dict(
         obj=resource,
         entrypoint="@nextgisweb/layer-preview/preview-layer",
-        props=dict(
-        resourceId=resource.id),
+        props=dict(resourceId=resource.id),
         title=gettext("Preview"),
     )
 
@@ -27,11 +26,19 @@ def setup_pyramid(comp, config):
         "layer_preview.map",
         r"/resource/{id:uint}/preview",
         factory=resource_factory,
-    ).add_view(preview_map, context=IFeatureLayer).add_view(
-        preview_map, context=IRenderableStyle
     ).add_view(
-        preview_map, context=RasterLayer
-    ).add_view(preview_map, context=BasemapLayer)
+        preview_map,
+        context=IFeatureLayer,
+    ).add_view(
+        preview_map,
+        context=IRenderableStyle,
+    ).add_view(
+        preview_map,
+        context=RasterLayer,
+    ).add_view(
+        preview_map,
+        context=BasemapLayer,
+    )
 
     @Resource.__dynmenu__.add
     def _resource_dynmenu(args):
