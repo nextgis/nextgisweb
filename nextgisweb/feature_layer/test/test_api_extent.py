@@ -98,13 +98,12 @@ def test_item_extent(ngw_webtest_app, vector_layer_id, extent, fid):
         pytest.param(create_postgis_layer, id="postgis_layer"),
     ),
 )
-@pytest.mark.parametrize("filter_, expected_extent", filter_extents_data)
+@pytest.mark.parametrize("filter_, expected", filter_extents_data)
 def test_filtered_extent(
     create_resource,
     filter_,
-    expected_extent,
+    expected,
     ngw_resource_group_sub,
-    ngw_httptest_app,
     ngw_webtest_app,
     ngw_data_path,
 ):
@@ -113,24 +112,17 @@ def test_filtered_extent(
     ds = ogr.Open(str(data))
     ogrlayer = ds.GetLayer(0)
 
-    with create_resource(
-        ogrlayer,
-        ngw_resource_group_sub,
-        ngw_httptest_app=ngw_httptest_app,
-    ) as layer:
+    with create_resource(ogrlayer, ngw_resource_group_sub) as layer:
         query_filter = ""
         if filter_ is not None:
             t, op, v = filter_
             like_v = v.replace("%", "")
             query_filter = f"?like={like_v}"
 
-        req_str = f"/api/resource/{layer.id}/feature_extent{query_filter}"
-
-        resp = ngw_webtest_app.get(req_str)
-        actual_extent = resp.json["extent"]
-
+        url = f"/api/resource/{layer.id}/feature_extent{query_filter}"
+        extent = ngw_webtest_app.get(url).json
         for k in ("minLat", "maxLat", "minLon", "maxLon"):
-            if expected_extent[k] is None:
-                assert actual_extent[k] is None
+            if expected[k] is None:
+                assert extent[k] is None
             else:
-                assert abs(expected_extent[k] - actual_extent[k]) < 1e-6
+                assert abs(expected[k] - extent[k]) < 1e-6
