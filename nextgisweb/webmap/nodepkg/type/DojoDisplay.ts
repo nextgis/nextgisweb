@@ -91,6 +91,7 @@ export interface DojoDisplay extends dijit._WidgetBase {
     _installPlugins: (plugins: Record<string, WebmapPlugin>) => void;
     _onNewStoreItem: (item: WebmapItem | any) => void;
     _mapAddLayer: (id: number) => void;
+    _mapDeferred: PromiseLike<void>;
 
     itemStore: CustomItemFileWriteStore;
     getItemConfig: () => ItemConfigById;

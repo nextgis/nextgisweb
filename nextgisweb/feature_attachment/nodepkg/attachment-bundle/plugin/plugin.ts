@@ -20,7 +20,6 @@ class BundleAttachmentPlugin {
     constructor(params: PluginParams) {
         this._display = params.display;
         if (settings["webmap"]["bundle"]) {
-            // @ts-expect-error ts-missing
             this._display._mapDeferred.then(() => {
                 this.buildControl();
             });
