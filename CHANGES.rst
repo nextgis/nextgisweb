@@ -4,15 +4,18 @@ Changes
 4.9.0
 -----
 
-- Fix uploading of zero-length files.
-- TUS uploader is available using CORS.
-- Data structure permission scope removed.
 - New resource creation dialog.
-- Support for empty geometries when importing vector layers.
+- Identification panel replaces popup on the webmap.
 - Font management in the control panel.
-- Customizable web map title.
 - Preview layers with leaving the current page.
 - Preview of the basemap on the resource editing page.
+- Support for empty geometries when importing vector layers.
+- Customizable web map title.
+- WFS client component turned on by default.
+- Data structure permission scope removed.
+- TUS uploader is available using CORS.
+- All of resource widgets migrated to Antd and React.
+- Fix uploading of zero-length files.
 
 
 4.8.0
