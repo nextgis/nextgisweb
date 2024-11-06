@@ -18,6 +18,7 @@ class LayerObject(Struct, kw_only=True):
 
 
 class InspectResponse(Struct, kw_only=True):
+    version: str
     layers: List[LayerObject]
 
 

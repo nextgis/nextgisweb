@@ -454,7 +454,10 @@ class VersionAttr(SColumn, apitype=True):
         result = super().set(srlzr, value, create=create)
         connection = srlzr.obj
         try:
-            connection.get_capabilities()
+            result = connection.get_capabilities()
+            # Some servers do not return version error on GetCapabilities request
+            if result["version"] != value:
+                raise VersionNotSupported
         except VersionNotSupported:
             raise ValidationError("Version {} not supported.".format(connection.version))
         return result
