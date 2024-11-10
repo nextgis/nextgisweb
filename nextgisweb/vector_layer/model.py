@@ -695,8 +695,7 @@ def estimate_vector_layer_data(resource):
         else:
             fixed += FIELD_TYPE_SIZE[f.datatype]
 
-    dynamic.insert(0, str(fixed))
-    query = select(text(" + ".join(dynamic))).select_from(ctab)
+    query = select(text("SUM(" + " + ".join([str(fixed), *dynamic]) + ")")).select_from(ctab)
     return inspect(resource).session.scalar(query)
 
 
