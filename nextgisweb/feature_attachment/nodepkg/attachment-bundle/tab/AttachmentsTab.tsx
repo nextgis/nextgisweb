@@ -30,9 +30,8 @@ import {
 
 import "./AttachmentsTab.less";
 
-const tipLabel = gettext(
-    "Draw the geometry on the map to visualize the attachments to the objects"
-);
+// prettier-ignore
+const tipLabel = gettext("Draw the geometry on the map to visualize the attachments to the objects");
 
 interface AttachmentsTabProps {
     display: DojoDisplay;
