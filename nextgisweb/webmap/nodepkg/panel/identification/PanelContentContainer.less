@@ -1,29 +1,59 @@
 @margin-default: 8px;
 
 .panel-content-container {
-    display: flex;
-    margin: 0 @margin-default;
+    display: block;
+    margin: 0;
     width: auto;
-    align-items: center;
 
-    &.margin-all {
-        margin: @margin-default;
-    }
+    .panel-title {
+        display: flex;
+        align-items: center;
+        box-sizing: border-box;
+        margin: 0;
+        padding: @margin-default;
+        width: 100%;
+        color: #076dbf;
+        text-transform: uppercase;
 
-    &.no-margin-x {
-        margin-left: 0;
-        margin-right: 0;
+        .panel-icon {
+            display: flex;
+            align-items: center;
+            padding: 0 5px 0 0;
+        }
+
+        .title-text {
+            flex-grow: 1;
+        }
+
+        .title-controls {
+            display: flex;
+            align-items: center;
+        }
+
+        .collapse-button {
+            margin-left: @margin-default;
+            color: #076dbf;
+        }
     }
 
     .fill {
         flex-grow: 1;
         overflow: hidden;
-        white-space: nowrap;
         text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
     .content {
         flex-shrink: 0;
         white-space: nowrap;
+
+        &.margin-all {
+            margin: @margin-default;
+        }
+
+        &.no-margin-x {
+            margin-right: 0;
+            margin-left: 0;
+        }
     }
 }

@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 
 import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
-import { Table } from "@nextgisweb/gui/antd";
-import { gettext } from "@nextgisweb/pyramid/i18n";
 
+import { KeyValueTable } from "../../KeyValueTable";
 import { fieldValuesToDataSource, getFieldsInfo } from "../../fields";
 import type { FieldDataItem } from "../../fields";
 import type { FieldsTableProps } from "../../identification";
@@ -40,29 +39,8 @@ export function FieldsTable({ featureInfo, featureItem }: FieldsTableProps) {
         };
     }, [featureItem, fieldsInfo]);
 
-    const columns = [
-        {
-            title: gettext("Attribute"),
-            dataIndex: "attr",
-            key: "attr",
-            className: "attr-column",
-        },
-        {
-            title: gettext("Value"),
-            dataIndex: "value",
-            key: "value",
-        },
-    ];
-
     if (dataSource) {
-        return (
-            <Table
-                className="fields-table"
-                dataSource={dataSource}
-                columns={columns}
-                showHeader={false}
-            />
-        );
+        return <KeyValueTable data={dataSource} />;
     }
 
     return null;
