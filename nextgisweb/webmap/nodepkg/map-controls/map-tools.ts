@@ -1,21 +1,16 @@
 /// <reference types="dojo/dijit" />
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore Import URL parser module
+// @ts-expect-error Import URL parser module
 import ToolMeasure from "ngw-webmap/tool/Measure";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore Import URL parser module
+// @ts-expect-error Import URL parser module
 import ToolSwipe from "ngw-webmap/tool/Swipe";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore Import URL parser module
+// @ts-expect-error Import URL parser module
 import ToolViewerInfo from "ngw-webmap/tool/ViewerInfo";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore Import URL parser module
-import ToolZoom from "ngw-webmap/tool/Zoom";
 
 import type { DojoDisplay, MapToolbar } from "../type/DojoDisplay";
 
+import ToolZoom from "./tool/Zoom";
 import type { ControlReady, ToolInfo } from "./type";
 import { getControlsInfo } from "./utils";
 
