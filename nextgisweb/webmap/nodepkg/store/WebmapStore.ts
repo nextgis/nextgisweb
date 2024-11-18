@@ -276,7 +276,7 @@ export class WebmapStore {
     };
 
     removeItem = (id: number) => {
-        this.setChecked(this._checked.filter((id) => id !== id));
+        this.setChecked(this._checked.filter((checkedId) => checkedId !== id));
         traverseTree(this._webmapItems, (item, index, arr) => {
             if (item.id === id) {
                 arr.splice(index, 1);
