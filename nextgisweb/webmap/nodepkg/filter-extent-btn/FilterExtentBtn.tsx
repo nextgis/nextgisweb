@@ -16,8 +16,8 @@ import type { MenuProps, SizeType } from "@nextgisweb/gui/antd";
 import { CloseIcon } from "@nextgisweb/gui/icon";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
+import type { StateControl } from "../map-state-observer/MapStatesObserver";
 import type { DojoDisplay } from "../type";
-import type { MapStateControl } from "../type/MapState";
 
 import ExtentIcon from "@nextgisweb/icon/material/crop_free/outline";
 import DrawIcon from "@nextgisweb/icon/material/draw/outline";
@@ -142,7 +142,7 @@ interface InteractionInfo {
     layer: OlVectorLayer<OlVectorSource>;
     source: OlVectorSource;
     mapStateKey?: string;
-    control: MapStateControl;
+    control: StateControl;
 }
 
 const buildInteraction = (
@@ -192,7 +192,7 @@ const buildInteraction = (
     });
 
     const mapStateKey = `filterExtent-${uniqueLayerId}`;
-    const control: MapStateControl = {
+    const control: StateControl = {
         activate: () => {},
         deactivate: () => {
             if (onTerminate) onTerminate();
