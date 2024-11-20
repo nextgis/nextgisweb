@@ -5,7 +5,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { html as iconHtml } from "@nextgisweb/pyramid/icon";
 import type { DojoDisplay } from "@nextgisweb/webmap/type";
 
-import { Base } from "./BaseTool";
+import { Base } from "./Base";
 import "./Zoom.css";
 
 interface ZoomOptions {
