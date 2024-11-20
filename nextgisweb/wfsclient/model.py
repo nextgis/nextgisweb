@@ -362,7 +362,7 @@ class WFSConnection(Base, Resource):
                 __query.append(__p)
 
         if srs is not None:
-            req_root.attrib["srsName"] = "EPSG:%d" % srs
+            __query.attrib["srsName"] = "EPSG:%d" % srs
 
         root = self.request_wfs("POST", xml_root=req_root)
 
@@ -657,9 +657,6 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
     def filter_by(self, **kwargs):
         self._filter_by = kwargs
-
-    def intersects(self, geom):
-        self._intersects = geom
 
     def __call__(self):
         params = dict()

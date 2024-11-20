@@ -888,9 +888,10 @@ class WFSHandler:
                 raise ValidationError("Multiple queries not supported.")
             __query = __queries[0]
             for k, v in __query.attrib.items():
-                if k.upper() in ("TYPENAME", "TYPENAMES"):
+                if self.p_typenames is None and k.upper() in ("TYPENAME", "TYPENAMES"):
                     self.p_typenames = v
-                    break
+                if self.p_srsname is None and k.upper() == "SRSNAME":
+                    self.p_srsname = v
 
         if self.p_typenames is None:
             raise ValidationError("Parameter TYPENAMES must be specified.")
