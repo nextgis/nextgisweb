@@ -13,7 +13,7 @@ interface ZoomOptions {
     out?: boolean;
 }
 
-class ZoomControl extends Base {
+export class ToolZoom extends Base {
     out: boolean;
     customIcon: string;
     private readonly interaction: DragZoom;
@@ -50,5 +50,3 @@ class ZoomControl extends Base {
         this.display.mapContainer.domNode.style.cursor = "auto";
     }
 }
-
-export default ZoomControl;

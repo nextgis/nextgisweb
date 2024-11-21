@@ -40,7 +40,9 @@
     background: #f9fafb;
 }
 
-.claro .ol-control .toggle-button.checked {
+/* Move somewhere, for the whole map */
+.claro .ol-control .toggle-button.checked,
+.claro .map-toolbar .ol-control .toggle-button.checked {
     fill: #fff;
     background: var(--primary);
     color: #fff;
