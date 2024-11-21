@@ -40,7 +40,7 @@
     background: #f9fafb;
 }
 
-.claro .map-toolbar .ol-control .toggle-button.checked {
+.claro .ol-control .toggle-button.checked {
     fill: #fff;
     background: var(--primary);
     color: #fff;
