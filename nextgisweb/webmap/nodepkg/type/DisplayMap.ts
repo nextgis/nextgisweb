@@ -28,4 +28,5 @@ export interface DisplayMap extends dojo.Stateful {
     zoomToFeature(feature: Feature): void;
     zoomToExtent(extent: number[]): void;
     zoomToNgwExtent(ngwExtent: NgwExtent, displayProjection?: string): void;
+    getMaxZIndex(): number;
 }
