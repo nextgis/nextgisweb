@@ -1,11 +1,12 @@
 import re
-from datetime import datetime
+from datetime import date, datetime, time
 from os import path
 from tempfile import NamedTemporaryFile
+from typing import Dict, Union
 
 from lxml import etree, html
 from lxml.builder import ElementMaker
-from msgspec import UNSET
+from msgspec import UNSET, UnsetType
 from osgeo import ogr
 from pyramid.request import Request
 from shapely.geometry import box
@@ -22,7 +23,13 @@ from nextgisweb.lib.ows import (
 )
 
 from nextgisweb.core.exception import ValidationError
-from nextgisweb.feature_layer import FIELD_TYPE, GEOM_TYPE, Feature, IVersionableFeatureLayer
+from nextgisweb.feature_layer import (
+    FIELD_TYPE,
+    GEOM_TYPE,
+    Feature,
+    IFeatureLayer,
+    IVersionableFeatureLayer,
+)
 from nextgisweb.layer import IBboxLayer
 from nextgisweb.resource import DataScope
 from nextgisweb.spatial_ref_sys import SRS
@@ -212,6 +219,15 @@ def geom_from_gml(el):
         if srs.is_geographic:
             return geom.flip_coordinates()
     return geom
+
+
+def transform(geom, srs_to):
+    try:
+        srs_from = SRS.filter_by(id=geom.srid).one()
+    except NoResultFound:
+        raise ValidationError("SRID (id=%d) not found." % geom.srid)
+    transformer = Transformer(srs_from.wkt, srs_to.wkt)
+    return transformer.transform(geom)
 
 
 class WFSHandler:
@@ -491,10 +507,10 @@ class WFSHandler:
 
                 if tag in ("BBOX", "Intersects"):
                     if filter_result["intersects"] is not None:
-                        raise ValidationError("%d parameter conflict." % tag)
+                        raise ValidationError("%s parameter conflict." % tag)
                     __value_reference = __el[0]
                     if ns_trim(__value_reference.tag) != "ValueReference":
-                        raise ValidationError("%d parse: ValueReference required." % tag)
+                        raise ValidationError("%s parse: ValueReference required." % tag)
                     elif __value_reference.text != get_geom_column(layer.resource):
                         raise ValidationError(
                             "Geometry column '%s' not found." % __value_reference.text
@@ -503,7 +519,7 @@ class WFSHandler:
                     try:
                         filter_result["intersects"] = geom_from_gml(__gml)
                     except GeometryNotValid:
-                        raise ValidationError("%d parse: geometry is not valid." % tag)
+                        raise ValidationError("%s parse: geometry is not valid." % tag)
                     continue
 
                 if tag in COMPARISON_OPERATORS.keys():
@@ -511,7 +527,7 @@ class WFSHandler:
 
                     __value_reference = __el[0]
                     if ns_trim(__value_reference.tag) != "ValueReference":
-                        raise ValidationError("%d parse: ValueReference required." % tag)
+                        raise ValidationError("%s parse: ValueReference required." % tag)
                     k = __value_reference.text
 
                     if tag == "PropertyIsNil":
@@ -519,7 +535,7 @@ class WFSHandler:
                     else:
                         __literal = __el[1]
                         if ns_trim(__literal.tag) != "Literal":
-                            raise ValidationError("%d parse: Literal required." % tag)
+                            raise ValidationError("%s parse: Literal required." % tag)
                         v = __literal.text
 
                     filter_result["filter"].append((k, op, v))
@@ -1173,29 +1189,6 @@ class WFSHandler:
             _summary = El("TransactionSummary", namespace=_ns_wfs, parent=_response)
             summary = dict(totalInserted=0, totalUpdated=0, totalDeleted=0)
 
-        transformer_cache = dict()
-
-        def transform(geom, srs_to):
-            if geom.srid not in transformer_cache:
-                transformer_cache[geom.srid] = dict()
-            if srs_to.id not in transformer_cache[geom.srid]:
-                try:
-                    srs_from = SRS.filter_by(id=geom.srid).one()
-                except NoResultFound:
-                    raise ValidationError("SRID (id=%d) not found." % geom.srid)
-                transformer_cache[geom.srid][srs_to.id] = Transformer(srs_from.wkt, srs_to.wkt)
-            transformer = transformer_cache[geom.srid][srs_to.id]
-            return transformer.transform(geom)
-
-        def gml_geom_for_flayer(el, flayer):
-            try:
-                geom = geom_from_gml(el)
-            except GeometryNotValid:
-                raise ValidationError("Geometry is not valid.")
-            if geom.srid is not None and geom.srid != flayer.srs_id:
-                geom = transform(geom, flayer.srs)
-            return geom
-
         fversioning_flayers = set()
 
         try:
@@ -1209,6 +1202,7 @@ class WFSHandler:
                 )
                 layer = find_layer(keyname)
                 feature_layer = layer.resource
+                geom_column = get_geom_column(feature_layer)
 
                 if (
                     IVersionableFeatureLayer.providedBy(feature_layer)
@@ -1220,15 +1214,19 @@ class WFSHandler:
 
                 if operation == "Insert":
                     feature = Feature()
-                    geom_column = get_geom_column(feature_layer)
+
+                    field_data = dict()
+                    geom_data = None
 
                     for _property in _operation[0]:
                         key = ns_trim(_property.tag)
                         fld_keyname = self._field_key_decode(key, feature_layer.fields)
                         if fld_keyname == geom_column:
-                            feature.geom = gml_geom_for_flayer(_property[0], feature_layer)
+                            geom_data = _property[0]
                         else:
-                            feature.fields[fld_keyname] = _property.text
+                            field_data[fld_keyname] = _property.text
+
+                    set_feature_data(feature, field_data, geom_data, feature_layer)
 
                     fid = feature_layer.feature_create(feature)
                     fid_str = fid_encode(fid, keyname)
@@ -1269,19 +1267,22 @@ class WFSHandler:
                         query.filter_by(id=fids[0])
 
                         feature = query().one()
-                        geom_column = get_geom_column(feature_layer)
+
+                        field_data = dict()
+                        geom_data = UNSET
 
                         for _property in find_tags(_operation, "Property"):
-                            key = find_tags(_property, "Name")[0].text
-                            fld_keyname = self._field_key_decode(key, feature_layer.fields)
+                            # NB: GDAL sends Name instead of ValueReference for 2.0 version
+                            _keys = find_tags(_property, "ValueReference")
+                            if len(_keys) == 0:
+                                _keys = find_tags(_property, "Name")
+                            _key = _keys[0]
+                            fld_keyname = self._field_key_decode(_key.text, feature_layer.fields)
                             _values = find_tags(_property, "Value")
                             _value = None if len(_values) == 0 else _values[0]
 
                             if fld_keyname == geom_column:
-                                if _value is not None:
-                                    feature.geom = gml_geom_for_flayer(_value[0], feature_layer)
-                                else:
-                                    feature.geom = None
+                                geom_data = None if _value is None else _value[0]
                             else:
                                 if _value is None:
                                     value = None
@@ -1289,7 +1290,9 @@ class WFSHandler:
                                     value = ""
                                 else:
                                     value = _value.text
-                                feature.fields[fld_keyname] = value
+                                field_data[fld_keyname] = value
+
+                        set_feature_data(feature, field_data, geom_data, feature_layer)
 
                         feature_layer.feature_put(feature)
 
@@ -1315,3 +1318,49 @@ class WFSHandler:
             El("SUCCESS", namespace=_ns_wfs, parent=_status)
 
         return _response
+
+
+# Sets feature fields from string represented values and XML element geometry
+def set_feature_data(
+    feature: Feature,
+    field_data: Dict[str, Union[str, None]],
+    geom_data: Union[etree.Element, None, UnsetType],
+    feature_layer: IFeatureLayer,
+):
+    if geom_data is UNSET:
+        pass
+    elif geom_data is None:
+        feature.geom = None
+    else:
+        try:
+            geom = geom_from_gml(geom_data)
+        except GeometryNotValid:
+            raise ValidationError("Geometry is not valid.")
+        if geom.srid is not None and geom.srid != feature_layer.srs_id:
+            geom = transform(geom, feature_layer.srs)
+        feature.geom = geom
+
+    for k, v in field_data.items():
+        try:
+            field = feature_layer.field_by_keyname(k)
+        except KeyError:
+            raise ValidationError("Unknown field '%s'." % k)
+
+        if v is None:
+            pass
+        elif field.datatype in (FIELD_TYPE.INTEGER, FIELD_TYPE.BIGINT):
+            v = int(v)
+        elif field.datatype == FIELD_TYPE.REAL:
+            v = float(v)
+        elif field.datatype == FIELD_TYPE.STRING:
+            pass
+        elif field.datatype == FIELD_TYPE.DATE:
+            v = date.fromisoformat(v)
+        elif field.datatype == FIELD_TYPE.TIME:
+            v = time.fromisoformat(v)
+        elif field.datatype == FIELD_TYPE.DATETIME:
+            v = datetime.fromisoformat(v)
+        else:
+            raise NotImplementedError
+
+        feature.fields[k] = v
