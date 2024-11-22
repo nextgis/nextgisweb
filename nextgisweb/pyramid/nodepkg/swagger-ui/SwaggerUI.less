@@ -22,20 +22,27 @@
                 min-width: unset;
                 text-shadow: unset;
             }
-            > .opblock-summary-path,
-            > .opblock-summary-path__deprecated {
-                flex-grow: 1;
-                order: 2;
-                padding: unset;
-                max-width: unset;
-                font-weight: unset;
-                font-size: 14px;
+
+            > .opblock-summary-path-description-wrapper {
+                display: contents;
+
+                > .opblock-summary-path,
+                > .opblock-summary-path__deprecated {
+                    flex-grow: 1;
+                    order: 2;
+                    padding: unset;
+                    max-width: unset;
+                    font-weight: unset;
+                    font-size: 14px;
+                }
+
+                > .opblock-summary-description {
+                    order: 4;
+                    width: 100%;
+                    font-size: 16px;
+                }
             }
-            > .opblock-summary-description {
-                order: 4;
-                width: 100%;
-                font-size: 16px;
-            }
+
             > svg.arrow {
                 order: 3;
             }
@@ -58,21 +65,25 @@
             > .opblock-summary-method {
             color: #fca130;
         }
+
         &.opblock-summary-delete
             > .opblock-summary-control
             > .opblock-summary-method {
             color: #f93e3e;
         }
+
         &.opblock-summary-head
             > .opblock-summary-control
             > .opblock-summary-method {
             color: #9012fe;
         }
+
         &.opblock-summary-options
             > .opblock-summary-control
             > .opblock-summary-method {
             color: #0d5aa7;
         }
+
         &.opblock-summary-patch
             > .opblock-summary-control
             > .opblock-summary-method {
