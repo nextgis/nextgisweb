@@ -93,6 +93,7 @@ export interface DojoDisplay extends dijit._WidgetBase {
     _zoomToInitialExtent: () => void;
     _mapExtentDeferred: PromiseLike<void>;
 
+    dumpItem: () => TreeItem;
     getVisibleItems: () => Promise<TreeItem[]>;
 
     _itemConfigById: Record<number, TreeItem>;
@@ -125,6 +126,12 @@ export interface DojoDisplay extends dijit._WidgetBase {
     _layers: Record<number, WebmapLayer>;
 
     _adapters: Record<string, WebmapAdapter>;
+}
+
+export interface PluginMenuItem {
+    icon: string;
+    title: string;
+    onClick: () => void;
 }
 
 export interface PluginParams {
