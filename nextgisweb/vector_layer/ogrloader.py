@@ -4,7 +4,8 @@ from itertools import product
 from typing import Dict, List, Literal, Union
 
 import sqlalchemy as sa
-from msgspec import Struct, field
+from msgspec import Struct
+from msgspec import field as msgspec_field
 from osgeo import ogr, osr
 from zope.interface import Attribute, Interface, implementer
 
@@ -64,7 +65,7 @@ class LoaderParams(Struct, kw_only=True):
     skip_errors: bool = False
     skip_other_geometry_types: bool = False
     fid_source: FidSource = "SEQUENCE"
-    fid_field: List[str] = field(default_factory=list)
+    fid_field: List[str] = msgspec_field(default_factory=list)
     cast_geometry_type: CastGeometryType = None
     cast_is_multi: CastAutoYesNo = None
     cast_has_z: CastAutoYesNo = None
@@ -369,7 +370,9 @@ class OGRLoader:
             if fld_name != fixed_fld_name and params.fix_errors != FIX_ERRORS.LOSSY:
                 raise VE(message=gettext("Field '%s(?)' encoding is broken.") % fixed_fld_name)
 
-            if fixed_fld_name.lower() in FIELD_FORBIDDEN_NAME:
+            if fixed_fld_name == "":
+                fixed_fld_name = "fld_1"
+            elif fixed_fld_name.lower() in FIELD_FORBIDDEN_NAME:
                 if params.fix_errors == FIX_ERRORS.NONE:
                     raise VE(
                         message=gettext(
@@ -380,25 +383,22 @@ class OGRLoader:
                 else:
                     fixed_fld_name += "_1"
 
-            if fld_name != fixed_fld_name:
-                if fixed_fld_name == "":
-                    fixed_fld_name = "fld_1"
-                while True:
-                    unique_check = True
-                    for field in fields.values():
-                        if field.name == fixed_fld_name:
-                            unique_check = False
+            while True:
+                unique_check = True
+                for field in fields.values():
+                    if field.name == fixed_fld_name:
+                        unique_check = False
 
-                            match = field_suffix_pattern.match(fixed_fld_name)
-                            if match is None:
-                                fixed_fld_name += "_1"
-                            else:
-                                n = int(match[2]) + 1
-                                fixed_fld_name = "%s_%d" % (match[1], n)
-                            break
-                    if unique_check:
+                        match = field_suffix_pattern.match(fixed_fld_name)
+                        if match is None:
+                            fixed_fld_name += "_1"
+                        else:
+                            n = int(match[2]) + 1
+                            fixed_fld_name = "%s_%d" % (match[1], n)
                         break
-                fld_name = fixed_fld_name
+                if unique_check:
+                    break
+            fld_name = fixed_fld_name
 
             fld_type_ogr = fld_defn.GetType()
             if fld_type_ogr in STRING_CAST_TYPES:
