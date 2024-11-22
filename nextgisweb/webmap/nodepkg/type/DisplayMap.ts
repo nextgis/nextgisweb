@@ -1,7 +1,7 @@
 import type Feature from "ol/Feature";
 import type Map from "ol/Map";
 
-import type { NgwExtent } from "@nextgisweb/feature-layer/type/FeatureExtent";
+import type { NgwExtent } from "@nextgisweb/feature-layer/type/api";
 
 import type { WebmapLayer } from "./WebmapLayer";
 

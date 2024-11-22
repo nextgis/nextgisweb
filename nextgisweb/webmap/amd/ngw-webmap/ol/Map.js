@@ -111,7 +111,12 @@ define([
         },
 
         zoomToNgwExtent: function (ngwExtent, displayProjection) {
-            const { minLon, minLat, maxLon, maxLat } = ngwExtent;
+            const {
+                minLon = null,
+                minLat = null,
+                maxLon = null,
+                maxLat = -null,
+            } = ngwExtent;
             if (
                 minLon === null ||
                 minLat === null ||

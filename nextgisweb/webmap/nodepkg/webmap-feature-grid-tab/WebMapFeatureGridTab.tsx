@@ -6,7 +6,7 @@ import FeatureGrid from "@nextgisweb/feature-layer/feature-grid";
 import { FeatureGridStore } from "@nextgisweb/feature-layer/feature-grid/FeatureGridStore";
 import type { ActionProps } from "@nextgisweb/feature-layer/feature-grid/type";
 import type { FeatureItem } from "@nextgisweb/feature-layer/type";
-import type { NgwExtent } from "@nextgisweb/feature-layer/type/FeatureExtent";
+import type { NgwExtent } from "@nextgisweb/feature-layer/type/api";
 import { message } from "@nextgisweb/gui/antd";
 import type { NoticeType } from "@nextgisweb/gui/antd";
 import { route } from "@nextgisweb/pyramid/api/route";

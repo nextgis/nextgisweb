@@ -531,10 +531,10 @@ def count(resource, request) -> JSONType:
 
 
 class NgwExtent(Struct):
-    maxLon: int
-    minLon: int
-    maxLat: int
-    minLat: int
+    maxLon: float
+    minLon: float
+    maxLat: float
+    minLat: float
 
 
 def feature_extent(resource, request) -> NgwExtent:
