@@ -30,7 +30,6 @@ class Serializer:
     identity: ClassVar[str]
     resclass: ClassVar[Type[model.Resource]]
     proptab: ClassVar[Tuple[Tuple[str, SAttribute], ...]]
-    apitype: ClassVar[bool]
     model_prefix: ClassVar[Union[str, None]]
 
     def __init_subclass__(
@@ -40,40 +39,15 @@ class Serializer:
         apitype: Union[bool, None] = None,
         model_prefix: Union[str, None] = None,
     ):
+        assert resource is not None
+        assert (apitype is None) or (apitype is True)
+
         super().__init_subclass__()
-        if resource:
-            assert apitype is None
-            assert not hasattr(cls, "resclass")
 
-            cls.resclass = resource
-            cls.apitype = True
+        cls.resclass = resource
 
-            if not hasattr(cls, "identity"):
-                cls.identity = resource.identity
-
-        else:
-            assert hasattr(cls, "resclass")
-            cls.apitype = apitype or False
-
-            if not cls.apitype:
-                warn(
-                    f"{cls.__name__} uses legacy serializer API, upgrade it. "
-                    "This will become unsupported in nextgisweb 5.0.0.dev0.",
-                    DeprecationWarning,
-                    stacklevel=3,
-                )
-
-            if (
-                cls.apitype
-                and issubclass(cls.resclass, model.Resource)
-                and cls.identity == cls.resclass.identity
-            ):
-                warn(
-                    f"Migrate {cls.__name__} to resource kwarg, which is "
-                    "available since nextgisweb >= 4.9.0.dev6.",
-                    DeprecationWarning,
-                    stacklevel=3,
-                )
+        if not hasattr(cls, "identity"):
+            cls.identity = resource.identity
 
         cls.check_class_name()
         cls.model_prefix = model_prefix
@@ -99,9 +73,7 @@ class Serializer:
 
     def deserialize(self) -> None:
         for pn, pv in self.proptab:
-            if self.apitype and getattr(self.data, pn, UNSET) is UNSET:
-                continue
-            elif not self.apitype and pn not in self.data:
+            if getattr(self.data, pn, UNSET) is UNSET:
                 continue
             try:
                 pv.deserialize(self)
@@ -175,7 +147,6 @@ class Serializer:
 
 
 class SAttribute:
-    apitype: ClassVar[bool] = True
     ctypes: ClassVar[Union[CRUTypes, None]] = None
 
     srlzrcls: Type[Serializer]
@@ -183,24 +154,17 @@ class SAttribute:
     model_attr: str
     types: CRUTypes
 
-    def __init_subclass__(cls, apitype=False) -> None:
+    def __init_subclass__(cls, apitype: Union[bool, None] = None) -> None:
+        assert (apitype is None) or (apitype is True)
+
         super().__init_subclass__()
-        cls.apitype = apitype
-        if apitype and cls.ctypes is None:
+        if cls.ctypes is None:
             mget, mset = [cls.__dict__.get(m) for m in ("get", "set")]
             no_setup_types = "setup_types" not in cls.__dict__
-            if apitype and no_setup_types and (mget is not None or mset is not None):
+            if no_setup_types and (mget is not None or mset is not None):
                 tget = _type_from_signature(mget, "return") if mget else None
                 tset = _type_from_signature(mset, "value") if mset else None
                 cls.ctypes = CRUTypes(tset, tget, tset)
-
-        if not cls.apitype:
-            warn(
-                f"{cls.__name__} uses legacy serializer API, upgrade it. "
-                "This will become unsupported in nextgisweb 5.0.0.dev0.",
-                DeprecationWarning,
-                stacklevel=2,
-            )
 
     def __init__(
         self,
@@ -238,38 +202,21 @@ class SAttribute:
 
     def serialize(self, srlzr: Serializer) -> None:
         if self.readperm(srlzr):
-            if srlzr.apitype and self.apitype:
-                value = self.get(srlzr)
-            else:
-                value = self.getter(srlzr)
-            if value is not UNSET:
+            if (value := self.get(srlzr)) is not UNSET:
                 srlzr.data[self.attrname] = value
 
     def deserialize(self, srlzr: Serializer) -> None:
         if self.writeperm(srlzr):
-            if srlzr.apitype and self.apitype:
-                value = getattr(srlzr.data, self.attrname)
-                assert value is not UNSET
-                self.set(srlzr, value, create=srlzr.obj.id is None)
-            else:
-                self.setter(srlzr, srlzr.data[self.attrname])
+            value = getattr(srlzr.data, self.attrname)
+            assert value is not UNSET
+            self.set(srlzr, value, create=srlzr.obj.id is None)
         else:
             raise AttributeUpdateForbidden(self)
-
-    # Modern (apitype == True)
 
     def get(self, srlzr: Serializer) -> Any:
         return getattr(srlzr.obj, self.model_attr)
 
     def set(self, srlzr: Serializer, value: Any, *, create: bool):
-        setattr(srlzr.obj, self.model_attr, value)
-
-    # Legacy (apitype == False)
-
-    def getter(self, srlzr: Serializer) -> Any:
-        return getattr(srlzr.obj, self.model_attr)
-
-    def setter(self, srlzr: Serializer, value: Any) -> None:
         setattr(srlzr.obj, self.model_attr, value)
 
 

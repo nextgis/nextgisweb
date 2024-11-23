@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from typing import Any, Tuple, Type, Union
+from typing import Tuple, Type, Union
 
-from msgspec import UNSET, Struct, UnsetType, defstruct, to_builtins
+from msgspec import UNSET, Struct, UnsetType, defstruct
 
 from nextgisweb.auth import User
 from nextgisweb.core.exception import IUserException
@@ -37,8 +37,6 @@ class CompositeSerializer:
         for identity, srlzrcls in self.members:
             sdata = getattr(value, identity)
             if sdata is not UNSET and sdata is not None:
-                if not srlzrcls.apitype:
-                    sdata = to_builtins(sdata)
                 srlzr = srlzrcls(obj, user=self.user, data=sdata)
                 if srlzr.is_applicable():
                     try:
@@ -62,7 +60,7 @@ class CompositeSerializer:
     def types(cls) -> CRUTypes:
         create, read, update = list(), list(), list()
         for k, v in Serializer.registry.items():
-            t = v.types() if v.apitype else CRUTypes(Any, Any, Any)
+            t = v.types()
             if v.identity == "resource":
                 create.append((k, t.create))
                 read.append((k, t.read))
@@ -70,7 +68,6 @@ class CompositeSerializer:
                 create.append((k, Union[t.create, UnsetType], UNSET))
                 read.append((k, Union[t.read, UnsetType], UNSET))
             update.append((k, Union[t.update, UnsetType], UNSET))
-            assert all(not v.apitype or pv.apitype for pn, pv in v.proptab)
         return CRUTypes(
             defstruct("CompositeCreate", create),
             defstruct("CompositeRead", read),

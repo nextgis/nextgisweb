@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import date, datetime
-from typing import Any, Dict, Literal, Union
+from typing import Any, Literal, Union
 
 import sqlalchemy as sa
 from msgspec import Struct
@@ -74,20 +74,6 @@ class SRelationship(SAttribute, apitype=True):
             obj = None
         super().set(srlzr, obj, create=create)
 
-    # Legacy (apitype == False)
-
-    def getter(self, srlzr) -> Union[Dict[str, int], None]:
-        if (value := super().getter(srlzr)) is None:
-            return None
-        return dict(id=value.id)
-
-    def setter(self, srlzr, value: Union[Dict[str, int], None]):
-        if value is not None:
-            obj = self.relcls.filter_by(id=value["id"]).one()
-        else:
-            obj = None
-        setattr(srlzr.obj, self.model_attr, obj)
-
 
 class ResourceRef(RelationshipRef, kw_only=True):
     id: int
@@ -109,15 +95,7 @@ class SResource(SRelationship, apitype=True):
         self.types = CRUTypes(*types)
 
     def get(self, srlzr) -> Union[ResourceRefWithParent, None]:
-        if (value := SAttribute.getter(self, srlzr)) is None:
+        if (value := SAttribute.get(self, srlzr)) is None:
             return None
         parent = ResourceRefOptional(id=value.parent_id)
         return ResourceRefWithParent(id=value.id, parent=parent)
-
-    # Legacy (apitype == False)
-
-    def getter(self, srlzr) -> Union[dict, None]:
-        if (value := SAttribute.getter(self, srlzr)) is None:
-            return None
-        parent = dict(id=value.parent_id)
-        return dict(id=value.id, parent=parent)
