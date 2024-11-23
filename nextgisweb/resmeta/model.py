@@ -98,9 +98,8 @@ class ItemsAttr(SAttribute, apitype=True):
             itm.value = val
 
 
-class ResmetaSerializer(Serializer, apitype=True):
+class ResmetaSerializer(Serializer, resource=Resource):
     identity = "resmeta"
-    resclass = Resource
 
     # TODO: It would be possible nice to implement serialization
     # without intermediate items key, but this is impossible right now

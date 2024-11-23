@@ -493,9 +493,8 @@ class TileCacheAttr(SAttribute, apitype=True):
             setattr(srlzr.obj.tile_cache, self.model_attr, value)
 
 
-class TileCacheSerializer(Serializer, apitype=True):
+class TileCacheSerializer(Serializer, resource=Resource):
     identity = "tile_cache"
-    resclass = Resource
 
     # NOTE: Flush property should be deserialized at first!
     flush = TileCacheFlushAttr(read=None, write=ResourceScope.update)

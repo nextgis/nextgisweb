@@ -117,8 +117,7 @@ class BasemapsAttr(SAttribute, apitype=True):
         srlzr.obj.basemaps = [BasemapWebMap(**to_builtins(i)) for i in value]
 
 
-class BasemapWebMapSerializer(Serializer, apitype=True):
+class BasemapWebMapSerializer(Serializer, resource=WebMap):
     identity = BasemapWebMap.__tablename__
-    resclass = WebMap
 
     basemaps = BasemapsAttr(read=ResourceScope.read, write=ResourceScope.update)
