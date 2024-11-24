@@ -243,6 +243,9 @@ def backup(env, dst):
 
 
 def restore(env, src):
+    for comp in env.chain("restore_prepare"):
+        comp.restore_prepare()
+
     metadata = env.metadata()
     with transaction.manager:
         metadata.drop_all(DBSession().connection())
@@ -267,9 +270,7 @@ def restore(env, src):
             pg_restore_list,
         ]
         + pg_copt
-        + [
-            pg_dir,
-        ],
+        + [pg_dir],
         env=dict(PGPASSWORD=pg_pass),
     )
 

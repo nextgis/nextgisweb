@@ -141,6 +141,9 @@ class Component(metaclass=ComponentMeta):
     def backup_objects(self):
         return ()
 
+    def restore_prepare(self):
+        pass
+
     def maintenance(self):
         pass
 
