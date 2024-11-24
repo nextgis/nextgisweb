@@ -1,7 +1,7 @@
 import dataclasses as dc
 import re
 from functools import cached_property, lru_cache
-from typing import Any, Iterable, Literal, Tuple, Union, cast
+from typing import Iterable, Literal, Tuple, Union
 
 from sqlalchemy.dialects.postgresql import ExcludeConstraint
 from sqlalchemy.ext.compiler import compiles
@@ -611,17 +611,25 @@ def _compile_alter_geometry_column(element, compiler, **kw):
     if nb != ob:
         raise ValueError(f"Incompatible base types: {nb} and {ob}")
 
-    expr = {
-        ("", "MULTI"): lambda e: func.ST_Multi(e),
-        ("MULTI", ""): lambda e: func.ST_GeometryN(e, _sql_one),
-        ("", ""): lambda e: e,
-    }[cast(Any, (om, nm))](_lc_geom)
+    expr = _lc_geom
 
-    expr = {
-        ("", "Z"): lambda e: func.ST_Force3D(e),
-        ("Z", ""): lambda e: func.ST_Force2D(e),
-        ("", ""): lambda e: e,
-    }[cast(Any, (oz, nz))](expr)
+    if om == nm:
+        pass
+    elif om == "MULTI":
+        expr = func.ST_GeometryN(expr, _sql_one)
+    elif nm == "MULTI":
+        expr = func.ST_Multi(expr)
+    else:
+        raise NotImplementedError
+
+    if oz == nz:
+        pass
+    elif oz == "Z":
+        expr = func.ST_Force2D(expr)
+    elif nz == "Z":
+        expr = func.ST_Force3D(expr)
+    else:
+        raise NotImplementedError
 
     return "ALTER TABLE {} ALTER COLUMN geom TYPE {} USING {}".format(
         compiler.preparer.format_table(element.table),
