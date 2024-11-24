@@ -1,26 +1,35 @@
-from nextgisweb.env import DBSession
-from nextgisweb.lib.geometry import Geometry
+from typing import List
 
+from msgspec import Struct
+
+from nextgisweb.env import DBSession, gettext
+from nextgisweb.lib.geometry import Geometry, GeometryNotValid
+
+from nextgisweb.core.exception import ValidationError
 from nextgisweb.pyramid import JSONType
 from nextgisweb.resource import DataScope, Resource, ResourceScope
 
 from .interface import IFeatureLayer
 
 
-def identify(request) -> JSONType:
-    data = request.json_body
-    srs = int(data["srs"])
-    geom = Geometry.from_wkt(data["geom"], srid=srs)
-    layers = map(int, data["layers"])
+class IdentifyBody(Struct, kw_only=True):
+    geom: str
+    srs: int
+    layers: List[int]
 
-    layer_list = DBSession.query(Resource).filter(Resource.id.in_(layers))
 
-    result = dict()
+def identify(request, *, body: IdentifyBody) -> JSONType:
+    try:
+        geom = Geometry.from_wkt(body.geom, srid=body.srs)
+    except GeometryNotValid:
+        raise ValidationError(gettext("Geometry is not valid."))
 
     # Number of features in all layers
     feature_count = 0
 
-    for layer in layer_list:
+    query = DBSession.query(Resource).filter(Resource.id.in_(body.layers))
+    result = dict()
+    for layer in query:
         layer_id_str = str(layer.id)
         if not layer.has_permission(DataScope.read, request.user):
             result[layer_id_str] = dict(error="Forbidden")
