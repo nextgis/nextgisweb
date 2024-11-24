@@ -556,10 +556,12 @@ class ACLAttr(SAttribute, apitype=True):
 
 
 class DescriptionAttr(SColumn, apitype=True):
-    def setter(self, srlzr, value):
+    ctypes = CRUTypes(Union[str, None], Union[str, None], Union[str, None])
+
+    def set(self, srlzr: Serializer, value: Union[str, None], *, create: bool):
         if value is not None:
             value = sanitize(value)
-        super().setter(srlzr, value)
+        super().set(srlzr, value, create=create)
 
 
 class ChildrenAttr(SAttribute, apitype=True):

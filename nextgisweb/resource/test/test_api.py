@@ -223,3 +223,14 @@ def test_quota(ngw_resource_group, resource_stat, override, ngw_webtest_app):
     with override(limit=rg_count + 5, resource_cls=["resource_group"]):
         check(dict(resource_group=5), 200)
         check(dict(resource_group=7), 402, dict(cls=None, required=7, available=5))
+
+
+def test_description_sanitization(ngw_resource_group, ngw_webtest_app):
+    description_unsafe = '<a href="javascript:alert(0)">Link'
+    ngw_webtest_app.put_json(
+        f"/api/resource/{ngw_resource_group}",
+        dict(resource=dict(description=description_unsafe)),
+    ).json
+
+    resp = ngw_webtest_app.get(f"/api/resource/{ngw_resource_group}").json
+    assert resp["resource"]["description"] == '<a href="">Link</a>'
