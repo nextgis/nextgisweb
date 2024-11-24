@@ -431,7 +431,7 @@ class WebMapItemRootWrite(Struct, kw_only=True):
             DBSession.delete(e)
 
 
-class RootItemAttr(SAttribute, apitype=True):
+class RootItemAttr(SAttribute):
     def get(self, srlzr: Serializer) -> WebMapItemRootRead:
         return WebMapItemRootRead.from_model(srlzr.obj.root_item)
 
@@ -443,7 +443,7 @@ Lon = Annotated[float, Meta(ge=-180, le=180, description="Longitude")]
 Lat = Annotated[float, Meta(ge=-90, le=90, description="Latitude")]
 
 
-class ExtentPartAttr(SColumn, apitype=True):
+class ExtentPartAttr(SColumn):
     def setup_types(self):
         if self.attrname.endswith(("_left", "_right")):
             base = Lon
@@ -467,7 +467,7 @@ class ExtentWSEN(Struct, array_like=True, forbid_unknown_fields=True):
     north: Annotated[Lat, Meta(title="North")]
 
 
-class ExtentAttr(SAttribute, apitype=True):
+class ExtentAttr(SAttribute):
     def bind(self, srlzrcls: Type[Serializer], attrname: str):
         super().bind(srlzrcls, attrname)
         if attrname == "initial_extent":

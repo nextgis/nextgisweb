@@ -101,7 +101,7 @@ class BasemapWebMapItemWrite(Struct, kw_only=True):
     opacity: Union[OpacityFloat, None, UnsetType] = UNSET
 
 
-class BasemapsAttr(SAttribute, apitype=True):
+class BasemapsAttr(SAttribute):
     def get(self, srlzr: Serializer) -> List[BasemapWebMapItemRead]:
         return [
             BasemapWebMapItemRead(

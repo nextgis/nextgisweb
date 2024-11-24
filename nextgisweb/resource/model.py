@@ -418,7 +418,7 @@ ResourceInterfaceIdentity = Gap[Annotated[str, TSExport("ResourceInterface")]]
 ResourceScopeIdentity = Gap[Annotated[str, TSExport("ResourceScope")]]
 
 
-class ClsAttr(SColumn, apitype=True):
+class ClsAttr(SColumn):
     ctypes = CRUTypes(ResourceCls, ResourceCls, UnsetType)
 
     def writeperm(self, srlzr):
@@ -432,7 +432,7 @@ class ClsAttr(SColumn, apitype=True):
         assert srlzr.obj.cls == value
 
 
-class ParentAttr(SResource, apitype=True):
+class ParentAttr(SResource):
     def setup_types(self):
         # Only the root has an empty parent, thus it cannot be set empty
         super().setup_types()
@@ -477,7 +477,7 @@ class PrincipalRef(Struct, kw_only=True):
     id: int
 
 
-class OwnerUserAttr(SRelationship, apitype=True):
+class OwnerUserAttr(SRelationship):
     def get(self, srlzr) -> PrincipalRef:
         return PrincipalRef(id=srlzr.obj.owner_user_id)
 
@@ -514,7 +514,7 @@ class ACLRule(Struct, kw_only=True):
         )
 
 
-class ACLAttr(SAttribute, apitype=True):
+class ACLAttr(SAttribute):
     def get(self, srlzr) -> List[ACLRule]:
         return [ACLRule.from_model(itm) for itm in srlzr.obj.acl]
 
@@ -555,7 +555,7 @@ class ACLAttr(SAttribute, apitype=True):
                     assert False
 
 
-class DescriptionAttr(SColumn, apitype=True):
+class DescriptionAttr(SColumn):
     ctypes = CRUTypes(Union[str, None], Union[str, None], Union[str, None])
 
     def set(self, srlzr: Serializer, value: Union[str, None], *, create: bool):
@@ -564,17 +564,17 @@ class DescriptionAttr(SColumn, apitype=True):
         super().set(srlzr, value, create=create)
 
 
-class ChildrenAttr(SAttribute, apitype=True):
+class ChildrenAttr(SAttribute):
     def get(self, srlzr) -> bool:
         return len(srlzr.obj.children) > 0
 
 
-class InterfacesAttr(SAttribute, apitype=True):
+class InterfacesAttr(SAttribute):
     def get(self, srlzr) -> List[ResourceInterfaceIdentity]:
         return [i.getName() for i in srlzr.obj.provided_interfaces()]
 
 
-class ScopesAttr(SAttribute, apitype=True):
+class ScopesAttr(SAttribute):
     def get(self, srlzr) -> List[ResourceScopeIdentity]:
         return list(srlzr.obj.scope.keys())
 

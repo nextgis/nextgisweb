@@ -54,7 +54,7 @@ class OGCFServerCollection(Struct, kw_only=True):
     maxfeatures: Union[Annotated[int, Meta(ge=1)], None]
 
 
-class CollectionsAttr(SAttribute, apitype=True):
+class CollectionsAttr(SAttribute):
     def get(self, srlzr) -> List[OGCFServerCollection]:
         return [
             OGCFServerCollection(

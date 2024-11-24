@@ -137,7 +137,7 @@ class FeatureLayerFieldWrite(Struct, kw_only=True):
     lookup_table: Union[ResourceRef, None, UnsetType] = UNSET
 
 
-class FieldsAttr(SAttribute, apitype=True):
+class FieldsAttr(SAttribute):
     def get(self, srlzr: Serializer) -> List[FeatureLayerFieldRead]:
         return [
             FeatureLayerFieldRead(
@@ -237,7 +237,7 @@ class FVersioningUpdate(Struct, kw_only=True):
     enabled: Union[bool, UnsetType] = UNSET
 
 
-class FVersioningAttr(SAttribute, apitype=True):
+class FVersioningAttr(SAttribute):
     def get(self, srlzr: Serializer) -> Union[FVersioningRead, None]:
         obj = srlzr.obj
         if not IVersionableFeatureLayer.providedBy(obj):

@@ -362,7 +362,7 @@ def estimate_raster_layer_data(resource):
     return fn.stat().st_size + (0 if resource.cog else fn.with_suffix(".ovr").stat().st_size)
 
 
-class SourceAttr(SAttribute, apitype=True):
+class SourceAttr(SAttribute):
     ctypes = CRUTypes(FileUploadRef, FileUploadRef, FileUploadRef)
 
     def set(self, srlzr: Serializer, value: FileUploadRef, *, create: bool):
@@ -382,7 +382,7 @@ class SourceAttr(SAttribute, apitype=True):
         )
 
 
-class CogAttr(SColumn, apitype=True):
+class CogAttr(SColumn):
     ctypes = CRUTypes(Union[bool, None], bool, Union[bool, None])
 
     def set(self, srlzr: Serializer, value: Union[bool, None], *, create: bool):
@@ -407,7 +407,7 @@ class CogAttr(SColumn, apitype=True):
         )
 
 
-class ColorInterpretation(SAttribute, apitype=True):
+class ColorInterpretation(SAttribute):
     ctypes = CRUTypes(List[str], List[str], List[str])
 
     def get(self, srlzr: Serializer) -> List[str]:

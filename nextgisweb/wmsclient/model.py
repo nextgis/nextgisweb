@@ -160,7 +160,7 @@ class Connection(Base, Resource):
         return json.loads(self.capcache_json)
 
 
-class UrlAttr(SColumn, apitype=True):
+class UrlAttr(SColumn):
     ctypes = CRUTypes(str, str, str)
 
     def set(self, srlzr: Serializer, value: str, *, create: bool):
@@ -175,7 +175,7 @@ VersionEnum = Annotated[
 ]
 
 
-class VersionAttr(SColumn, apitype=True):
+class VersionAttr(SColumn):
     ctypes = CRUTypes(VersionEnum, VersionEnum, VersionEnum)
 
 
@@ -185,7 +185,7 @@ CapCacheEnum = Annotated[
 ]
 
 
-class CapCacheAttr(SAttribute, apitype=True):
+class CapCacheAttr(SAttribute):
     def get(self, srlzr: Serializer) -> Any:
         return srlzr.obj.capcache_dict
 
@@ -305,7 +305,7 @@ class Layer(Base, Resource, SpatialLayerMixin):
 DataScope.read.require(ConnectionScope.connect, attr="connection", cls=Layer)
 
 
-class VendorParamsAttr(SColumn, apitype=True):
+class VendorParamsAttr(SColumn):
     ctypes = CRUTypes(Dict[str, str], Dict[str, str], Dict[str, str])
 
 

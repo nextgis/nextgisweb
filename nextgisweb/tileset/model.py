@@ -313,7 +313,7 @@ def read_file(fn):
     raise ValidationError(message=gettext("Unsupported data format."))
 
 
-class SourceAttr(SAttribute, apitype=True):
+class SourceAttr(SAttribute):
     def set(self, srlzr, value: FileUploadRef, *, create: bool):
         if srlzr.obj.id is not None:
             env.core.reserve_storage(

@@ -242,7 +242,7 @@ class RasterMosaicItemWrite(Struct, kw_only=True):
     file_upload: Union[FileUploadRef, UnsetType] = UNSET
 
 
-class ItemsAttr(SAttribute, apitype=True):
+class ItemsAttr(SAttribute):
     def get(self, srlzr: Serializer) -> List[RasterMosaicItemRead]:
         return [
             RasterMosaicItemRead(

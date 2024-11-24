@@ -73,7 +73,7 @@ class Connection(Base, Resource):
         return tile_fetcher.get_tiles(self, layer_name, zoom, xmin, xmax, ymin, ymax)
 
 
-class UrlTemplateAttr(SColumn, apitype=True):
+class UrlTemplateAttr(SColumn):
     ctypes = CRUTypes(Union[str, None], str, Union[str, None])
 
     def set(self, srlzr: Serializer, value: str, *, create: bool):
@@ -97,7 +97,7 @@ Capmode = Union[Literal["nextgis_geoservices"], None]
 Scheme = Union[tuple(Literal[i] for i in SCHEME.enum)]  # type: ignore
 
 
-class CapmodeAttr(SColumn, apitype=True):
+class CapmodeAttr(SColumn):
     ctypes = CRUTypes(Capmode, Capmode, Capmode)
 
     def set(self, srlzr: Serializer, value: Capmode, *, create: bool):
@@ -113,7 +113,7 @@ class CapmodeAttr(SColumn, apitype=True):
         super().set(srlzr, value, create=create)
 
 
-class SchemeAttr(SColumn, apitype=True):
+class SchemeAttr(SColumn):
     ctypes = CRUTypes(Union[Scheme, None], Scheme, Union[Scheme, None])
 
 
@@ -291,7 +291,7 @@ DataScope.read.require(
 )
 
 
-class LayerNameAttr(SColumn, apitype=True):
+class LayerNameAttr(SColumn):
     ctypes = CRUTypes(Union[str, None], Union[str, None], Union[str, None])
 
     def set(self, srlzr: Serializer, value: Union[str, None], *, create: bool):

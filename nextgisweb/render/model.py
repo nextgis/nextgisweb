@@ -458,13 +458,13 @@ sa_event.listen(
 )
 
 
-class TileCacheFlushAttr(SAttribute, apitype=True):
+class TileCacheFlushAttr(SAttribute):
     def set(self, srlzr: Serializer, value: Union[bool, None], *, create: bool):
         if value and srlzr.obj.tile_cache is not None:
             srlzr.obj.tile_cache.clear()
 
 
-class TileCacheAttr(SAttribute, apitype=True):
+class TileCacheAttr(SAttribute):
     def bind(self, srlzrcls, attrname):
         assert not self.required
         self.column = column = getattr(ResourceTileCache, attrname)

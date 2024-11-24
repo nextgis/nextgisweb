@@ -13,7 +13,7 @@ from nextgisweb.lib.msext import DEPRECATED
 from .serialize import CRUTypes, SAttribute
 
 
-class SColumn(SAttribute, apitype=True):
+class SColumn(SAttribute):
     def setup_types(self):
         self.column = self.srlzrcls.resclass.__mapper__.columns[self.model_attr]
         if self.required is None:
@@ -43,7 +43,7 @@ class RelationshipRef(Struct, kw_only=True):
     id: int
 
 
-class SRelationship(SAttribute, apitype=True):
+class SRelationship(SAttribute):
     def bind(self, srlzrcls, attrname):
         mapper = srlzrcls.resclass.__mapper__
         relationship = mapper.relationships[attrname]
@@ -87,7 +87,7 @@ class ResourceRefWithParent(ResourceRef, kw_only=True):
     parent: Annotated[ResourceRefOptional, DEPRECATED]
 
 
-class SResource(SRelationship, apitype=True):
+class SResource(SRelationship):
     def setup_types(self):
         types = (ResourceRef, ResourceRefWithParent, ResourceRef)
         if self.column.nullable:

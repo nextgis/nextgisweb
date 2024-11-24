@@ -529,15 +529,15 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 DataScope.read.require(ConnectionScope.connect, attr="connection", cls=PostgisLayer)
 
 
-class GeometryTypeAttr(SAttribute, apitype=True):
+class GeometryTypeAttr(SAttribute):
     ctypes = CRUTypes(Union[str, None], str, Union[str, None])
 
 
-class GeometrySridAttr(SAttribute, apitype=True):
+class GeometrySridAttr(SAttribute):
     ctypes = CRUTypes(Union[int, None], int, Union[int, None])
 
 
-class FieldsAttr(SAttribute, apitype=True):
+class FieldsAttr(SAttribute):
     def set(
         self,
         srlzr: Serializer,

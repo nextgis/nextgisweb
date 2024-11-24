@@ -67,7 +67,7 @@ ItemKey = Annotated[str, Meta(max_length=255)]
 ItemsType = Dict[ItemKey, Union[str, int, bool, float, None]]
 
 
-class ItemsAttr(SAttribute, apitype=True):
+class ItemsAttr(SAttribute):
     def get(self, srlzr) -> ItemsType:
         return {itm.key: itm.value for itm in srlzr.obj.resmeta}
 

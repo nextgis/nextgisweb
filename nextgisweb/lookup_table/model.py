@@ -22,7 +22,7 @@ class LookupTable(Base, Resource):
         return isinstance(parent, ResourceGroup)
 
 
-class ItemsAttr(SAttribute, apitype=True):
+class ItemsAttr(SAttribute):
     def get(self, srlzr) -> Dict[str, str]:
         return srlzr.obj.val
 

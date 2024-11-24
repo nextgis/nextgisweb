@@ -67,7 +67,7 @@ class WMSServiceLayer(Struct, kw_only=True):
     max_scale_denom: Union[float, None]
 
 
-class LayersAttr(SAttribute, apitype=True):
+class LayersAttr(SAttribute):
     def get(self, srlzr) -> List[WMSServiceLayer]:
         return [
             WMSServiceLayer(

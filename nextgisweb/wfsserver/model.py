@@ -69,7 +69,7 @@ class WFSServerLayer(Struct, kw_only=True):
     maxfeatures: Union[Annotated[int, Meta(ge=1)], None]
 
 
-class LayersAttr(SAttribute, apitype=True):
+class LayersAttr(SAttribute):
     def get(self, srlzr) -> List[WFSServerLayer]:
         return [
             WFSServerLayer(

@@ -432,7 +432,7 @@ class WFSConnection(Base, Resource):
         return features, len(features)
 
 
-class PathAttr(SColumn, apitype=True):
+class PathAttr(SColumn):
     ctypes = CRUTypes(str, str, str)
 
     def set(self, srlzr: Serializer, value: str, *, create: bool):
@@ -447,7 +447,7 @@ VersionEnum = Annotated[
 ]
 
 
-class VersionAttr(SColumn, apitype=True):
+class VersionAttr(SColumn):
     ctypes = CRUTypes(VersionEnum, VersionEnum, VersionEnum)
 
     def set(self, srlzr: Serializer, value: str, *, create: bool):
@@ -577,15 +577,15 @@ class WFSLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
         raise ValueError(f"Layer {self.layer_name} not found in Capabilities.")
 
 
-class GeometryTypeAttr(SAttribute, apitype=True):
+class GeometryTypeAttr(SAttribute):
     ctypes = CRUTypes(Union[str, None], str, Union[str, None])
 
 
-class GeometrySridAttr(SAttribute, apitype=True):
+class GeometrySridAttr(SAttribute):
     ctypes = CRUTypes(Union[int, None], int, Union[int, None])
 
 
-class FieldsAttr(SAttribute, apitype=True):
+class FieldsAttr(SAttribute):
     def set(
         self,
         srlzr: Serializer,

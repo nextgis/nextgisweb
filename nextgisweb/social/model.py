@@ -34,7 +34,7 @@ class ResourceSocial(Base):
     preview_fileobj = orm.relationship(FileObj, lazy="joined")
 
 
-class FileUploadAttr(SAttribute, apitype=True):
+class FileUploadAttr(SAttribute):
     def set(self, srlzr, value: Union[FileUploadRef, None], *, create: bool):
         if srlzr.obj.social is None:
             srlzr.obj.social = ResourceSocial()
@@ -58,13 +58,13 @@ class FileUploadAttr(SAttribute, apitype=True):
             social.preview_fileobj = None
 
 
-class ImageExistsAttr(SAttribute, apitype=True):
+class ImageExistsAttr(SAttribute):
     def get(self, srlzr) -> bool:
         social = srlzr.obj.social
         return social is not None and social.preview_fileobj_id is not None
 
 
-class DescriptionAttr(SAttribute, apitype=True):
+class DescriptionAttr(SAttribute):
     def get(self, srlzr) -> Union[str, None]:
         social = srlzr.obj.social
         return social.preview_description if social is not None else None

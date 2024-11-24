@@ -98,7 +98,7 @@ def validate_mime(fn, buf):
         raise ValidationError(gettextf("File '{}' has a format different from SVG.")(fn))
 
 
-class ArchiveAttr(SAttribute, apitype=True):
+class ArchiveAttr(SAttribute):
     def set(self, srlzr, value: FileUploadRef, *, create: bool):
         srlzr.obj.tstamp = datetime.utcnow()
 
@@ -117,7 +117,7 @@ class FilesItemUpdate(FilesItemRead, kw_only=True):
     id: Union[FileUploadID, UnsetType] = UNSET
 
 
-class FilesAttr(SAttribute, apitype=True):
+class FilesAttr(SAttribute):
     def get(self, srlzr) -> List[FilesItemRead]:
         return [FilesItemRead(name=f.name) for f in srlzr.obj.files]
 
