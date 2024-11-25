@@ -2,6 +2,7 @@ import asyncio
 import atexit
 from dataclasses import dataclass
 from queue import Empty, Queue
+from ssl import SSLCertVerificationError
 from threading import Thread
 from typing import Optional, Tuple
 
@@ -78,7 +79,7 @@ class TileFetcher:
 
             try:
                 response = await client.get(url, **req_kw)
-            except RemoteProtocolError as exc:
+            except (RemoteProtocolError, SSLCertVerificationError) as exc:
                 raise ExternalServiceError(
                     gettext("Unable to get a response from the remote server."),
                 ) from exc
