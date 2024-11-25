@@ -1,10 +1,15 @@
 import { Button, Dropdown } from "@nextgisweb/gui/antd";
+import type { MenuProps } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import MoreVertIcon from "@nextgisweb/icon/material/more_vert/outline";
 import ZoomInMapIcon from "@nextgisweb/icon/material/zoom_in_map/outline";
 
-export function LayersDropdown({ onClick }) {
+export function LayersDropdown({
+    onClick,
+}: {
+    onClick: (key: string) => void;
+}) {
     const menuItems = [
         {
             key: "zoomToAllLayers",
@@ -13,7 +18,7 @@ export function LayersDropdown({ onClick }) {
         },
     ];
 
-    const menuProps = {
+    const menuProps: MenuProps = {
         items: menuItems,
         onClick: (clickRcMenuItem) => {
             const { key } = clickRcMenuItem;
