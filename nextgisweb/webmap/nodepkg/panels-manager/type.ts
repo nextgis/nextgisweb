@@ -19,10 +19,14 @@ export interface DisplayItemConfig {
     plugin: Record<string, unknown>;
 }
 
-export interface PanelProps {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type ReactPanelComponentPropType = Record<string, any>;
+
+export interface ReactPanelComponentProps {
     display: DojoDisplay;
-    close: () => void;
     title: string;
+    close?: () => void;
+    visible?: boolean;
 }
 
 export type DojoPanel = PanelDojoItem;

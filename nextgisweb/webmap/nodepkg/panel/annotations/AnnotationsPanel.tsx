@@ -6,9 +6,9 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import AnnotationsStore from "@nextgisweb/webmap/store/annotations";
 import type { VisibleMode } from "@nextgisweb/webmap/store/annotations/AnnotationsStore";
 import type { DisplayConfig } from "@nextgisweb/webmap/type";
+import type { ReactPanel } from "@nextgisweb/webmap/ui/react-panel/ReactPanel";
 
 import { PanelHeader } from "../header";
-import type { PanelProps } from "../type";
 
 import "./AnnotationsPanel.less";
 import "../styles/panels.less";
@@ -21,7 +21,7 @@ interface AnnotationFilter {
     private: boolean;
 }
 
-interface AnnotationsPanelProps extends PanelProps {
+interface AnnotationsPanelProps extends ReactPanel {
     onTopicPublish: (val: [string, unknown?]) => void;
 }
 
