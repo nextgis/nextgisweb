@@ -21,8 +21,11 @@ interface AnnotationFilter {
     private: boolean;
 }
 
-interface AnnotationsPanelProps extends ReactPanel {
-    onTopicPublish: (val: [string, unknown?]) => void;
+interface AnnotationsPanelProps
+    extends Pick<ReactPanel, "display" | "title" | "close" | "mapStates"> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onTopicPublish: (val: [string, any?]) => void;
+    initialAnnotVisible?: VisibleMode;
 }
 
 const ADD_ANNOTATION_STATE_KEY = "addAnnotation";
