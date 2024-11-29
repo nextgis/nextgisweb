@@ -53,7 +53,8 @@ const searchByLayers = async (criteria, limit, display, controller) => {
         const id = display.itemStore.getValue(i, "id");
         const layerId = display.itemStore.getValue(i, "layerId");
         const itmConfig = display._itemConfigById[id];
-        const pluginConfig = itmConfig.plugin["ngw-webmap/plugin/FeatureLayer"];
+        const pluginConfig =
+            itmConfig.plugin["@nextgisweb/webmap/plugin/feature-layer"];
 
         if (pluginConfig === undefined || !pluginConfig.likeSearch) return;
 

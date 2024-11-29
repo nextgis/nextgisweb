@@ -952,7 +952,7 @@ define([
 
         isTinyModePlugin: function (pluginKey) {
             const disabledPlugins = [
-                "ngw-webmap/plugin/LayerEditor",
+                "@nextgisweb/webmap/plugin/layer-editor",
                 "@nextgisweb/webmap/plugin/feature-layer",
             ];
             return !disabledPlugins.includes(pluginKey);

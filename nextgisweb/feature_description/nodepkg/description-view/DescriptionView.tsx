@@ -4,8 +4,6 @@ import type { IdentifyExtensionComponentProps } from "@nextgisweb/webmap/panel/i
 
 import DescriptionIcon from "@nextgisweb/icon/material/description/outline";
 
-import "@nextgisweb/webmap/panel/identification/PanelContentContainer.less";
-
 const DescriptionView = ({ featureItem }: IdentifyExtensionComponentProps) => {
     if (!featureItem.extensions || !featureItem.extensions["description"]) {
         return null;
@@ -14,16 +12,12 @@ const DescriptionView = ({ featureItem }: IdentifyExtensionComponentProps) => {
     const description = featureItem.extensions["description"];
 
     return (
-        <>
-            <PanelContentContainer
-                icon={<DescriptionIcon />}
-                title={gettext("Description")}
-                marginAll
-                content={
-                    <div dangerouslySetInnerHTML={{ __html: description }} />
-                }
-            />
-        </>
+        <PanelContentContainer
+            icon={<DescriptionIcon />}
+            title={gettext("Description")}
+            marginAll
+            content={<div dangerouslySetInnerHTML={{ __html: description }} />}
+        />
     );
 };
 
