@@ -1,4 +1,4 @@
-import { makeAutoObservable, runInAction, toJS } from "mobx";
+import { action, computed, observable, runInAction, toJS } from "mobx";
 
 import { getChildrenDeep, traverseTree } from "@nextgisweb/gui/util/tree";
 
@@ -14,13 +14,13 @@ import type { TreeItem } from "../type/TreeItems";
 type LegendSymbols = { [layerId: number]: { [symbolIndex: number]: boolean } };
 
 export class WebmapStore {
-    _webmapItems: StoreItem[] = [];
-    _checked: number[] = [];
-    _expanded: number[] = [];
+    @observable.shallow private accessor _webmapItems: StoreItem[] = [];
+    @observable.shallow private accessor _checked: number[] = [];
+    @observable.shallow private accessor _expanded: number[] = [];
+    @observable.shallow accessor _legendSymbols: LegendSymbols = {};
 
-    _itemStore: CustomItemFileWriteStore;
-    _layers: Record<number, WebmapLayer> = {};
-    _legendSymbols: LegendSymbols = {};
+    private _itemStore: CustomItemFileWriteStore;
+    private _layers: Record<number, WebmapLayer> = {};
 
     constructor({
         itemStore,
@@ -33,7 +33,6 @@ export class WebmapStore {
         if (Array.isArray(checked)) {
             this._checked = checked;
         }
-        makeAutoObservable(this, { _itemStore: false, _layers: false });
 
         itemStore.on(
             "Set",
@@ -70,23 +69,27 @@ export class WebmapStore {
         );
     }
 
-    get webmapItems() {
+    @computed get webmapItems() {
         return [...this._webmapItems];
     }
 
-    get checked() {
+    @computed get checked() {
         return [...this._checked];
     }
 
-    get expanded() {
+    @computed get expanded() {
         return [...this._expanded];
     }
 
     getWebmapItems(): TreeItem[] {
-        return toJS(this._webmapItems as TreeItem[]);
+        return toJS(this._webmapItems);
     }
 
-    _setChecked = (id: number, newVal: boolean, oldVal?: boolean) => {
+    @action private _setChecked = (
+        id: number,
+        newVal: boolean,
+        oldVal?: boolean
+    ) => {
         const checked_ = [...this._checked];
         if (newVal) {
             if (!checked_.includes(id)) {
@@ -101,7 +104,7 @@ export class WebmapStore {
         this._checked = checked_;
     };
 
-    _itemStoreVisibility = (item: StoreItem) => {
+    private _itemStoreVisibility = (item: StoreItem) => {
         const store = this._itemStore;
 
         if (store.getValue(item, "type") === "layer") {
@@ -120,7 +123,7 @@ export class WebmapStore {
         this._updateLayersVisibility(this._checked);
     };
 
-    _prepareChecked = (checkedKeysValue: number[]) => {
+    private _prepareChecked = (checkedKeysValue: number[]) => {
         const updatedCheckedKeys = [];
         const skip: number[] = [];
 
@@ -157,7 +160,7 @@ export class WebmapStore {
         return updatedCheckedKeys;
     };
 
-    _updateLayersVisibility = (checkedKeys: number[]) => {
+    private _updateLayersVisibility = (checkedKeys: number[]) => {
         this._itemStore.fetch({
             query: { type: "layer" },
             queryOptions: { deep: true },
@@ -216,7 +219,7 @@ export class WebmapStore {
         });
     };
 
-    _consolidateIntervals = (symbols: number[]) => {
+    private _consolidateIntervals = (symbols: number[]) => {
         const sortedSymbols = symbols.slice().sort((a, b) => a - b);
         const intervals = [];
         let start = sortedSymbols[0];
@@ -263,11 +266,11 @@ export class WebmapStore {
         return this._layers[id];
     }
 
-    addLayer(id: number, layer: WebmapLayer) {
+    @action addLayer(id: number, layer: WebmapLayer) {
         this._layers[id] = layer;
     }
 
-    addItem = (item: StoreItem) => {
+    @action addItem = (item: StoreItem) => {
         const items = [item, ...this._webmapItems];
         if ("visibility" in item && item.visibility) {
             this.setChecked([...this._checked, item.id]);
@@ -275,8 +278,8 @@ export class WebmapStore {
         this._webmapItems = items;
     };
 
-    removeItem = (id: number) => {
-        this.setChecked(this._checked.filter((checkedId) => checkedId !== id));
+    @action removeItem = (id: number) => {
+        this.setChecked(this._checked.filter((cid) => cid !== id));
         traverseTree(this._webmapItems, (item, index, arr) => {
             if (item.id === id) {
                 arr.splice(index, 1);
@@ -287,12 +290,12 @@ export class WebmapStore {
         delete this._layers[id];
     };
 
-    setWebmapItems = (items: StoreItem[]) => {
+    @action setWebmapItems = (items: StoreItem[]) => {
         this._webmapItems = items;
         this.setChecked(this._checked);
     };
 
-    setChecked = (checked: number[]) => {
+    @action setChecked = (checked: number[]) => {
         const updatedCheckedKeys = this._prepareChecked(checked);
         this._checked = updatedCheckedKeys;
     };
@@ -301,7 +304,7 @@ export class WebmapStore {
         return this._checked;
     };
 
-    setExpanded = (expanded: number[]) => {
+    @action setExpanded = (expanded: number[]) => {
         this._expanded = expanded;
     };
 
@@ -314,7 +317,7 @@ export class WebmapStore {
         return layer ? layer.get("opacity") : 1;
     };
 
-    setLayerOpacity = (layerId: number, opacity: number) => {
+    @action setLayerOpacity = (layerId: number, opacity: number) => {
         const layer = this._layers[layerId];
         if (layer) {
             layer.set("opacity", opacity);

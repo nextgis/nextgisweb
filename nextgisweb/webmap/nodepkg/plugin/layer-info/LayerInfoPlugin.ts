@@ -8,7 +8,8 @@ import { PluginBase } from "../PluginBase";
 export class LayerInfoPlugin extends PluginBase {
     getPluginState(nodeData: LayerItem): PluginState {
         const state = super.getPluginState(nodeData);
-        const data = this.display.get("itemConfig").plugin[this.identity];
+        const infoConfig = this.display.get("itemConfig");
+        const data = infoConfig.plugin[this.identity];
         return {
             ...state,
             enabled: state.enabled && data.description,
@@ -17,7 +18,7 @@ export class LayerInfoPlugin extends PluginBase {
 
     async run() {
         this.openLayerInfo();
-        return;
+        return undefined;
     }
 
     getMenuItem() {

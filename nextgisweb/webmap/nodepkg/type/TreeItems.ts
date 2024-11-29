@@ -51,7 +51,7 @@ export interface LayerItem extends BaseItem {
     drawOrderPosition: number | null;
     legendInfo: LegendInfo;
     adapter: string;
-    plugin: Record<string, unknown>;
+    plugin: Record<string, any>;
     minResolution: number | null;
     maxResolution: number | null;
     editable?: boolean;
