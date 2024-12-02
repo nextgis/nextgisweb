@@ -29,7 +29,7 @@ import type { LayerItem } from "@nextgisweb/webmap/type/TreeItems";
 import { EditingToolbar } from "../../map-controls/control/editing/EditingToolbar";
 import MapStatesObserverSingleton from "../../map-state-observer";
 import type { MapStatesObserver } from "../../map-state-observer/MapStatesObserver";
-import { Vector as VectorLayer } from "../../ol/layer/Vector";
+import VectorLayer from "../../ol/layer/Vector";
 import { showFinishEditingDialog } from "../../ui/finish-editing-dialog";
 import { PluginBase } from "../PluginBase";
 

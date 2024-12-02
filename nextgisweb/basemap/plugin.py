@@ -16,6 +16,6 @@ class BasemapPlugin(WebmapPlugin):
             for bm in webmap.basemaps
         ]
         return (
-            "ngw-basemap/plugin/BaseMap",
+            "@nextgisweb/basemap/plugin/base-map",
             dict(basemaps=basemaps),
         )

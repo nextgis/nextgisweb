@@ -1,22 +1,30 @@
 import { action, observable } from "mobx";
 import type { Layer } from "ol/layer";
 import type { Source } from "ol/source";
+import type { Style } from "ol/style";
+
+import { Watchable } from "@nextgisweb/webmap/compat/Watchable";
 
 export interface LayerOptions {
     title?: string;
     visible?: boolean;
     opacity?: number;
+    maxResolution?: number;
+    minResolution?: number;
+    style?: Style;
 }
 
-export interface SourceOptions {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    [key: string]: any;
+interface LayerWatchableProps {
+    opacity: number;
+    visibility: boolean;
+    symbols: string[];
 }
 
 export abstract class BaseLayer<
     TSource extends Source = Source,
     TLayer extends Layer<TSource> = Layer<TSource>,
-> {
+    TSourceOptions = unknown,
+> extends Watchable<LayerWatchableProps> {
     name: string;
     title: string;
     isBaseLayer = false;
@@ -27,7 +35,7 @@ export abstract class BaseLayer<
     @observable accessor visibility: boolean = true;
     @observable accessor symbols: string[] = [];
 
-    protected abstract createSource(options: SourceOptions): TSource;
+    protected abstract createSource(options: TSourceOptions): TSource;
     protected abstract createLayer(
         options: LayerOptions & { source: TSource }
     ): TLayer;
@@ -35,12 +43,13 @@ export abstract class BaseLayer<
     constructor(
         name: string,
         layerOptions: LayerOptions = {},
-        sourceOptions: SourceOptions = {}
+        sourceOptions?: TSourceOptions
     ) {
+        super();
         this.name = name;
         this.title = layerOptions.title || name;
 
-        this.olSource = this.createSource(sourceOptions);
+        this.olSource = this.createSource(sourceOptions as TSourceOptions);
         this.olLayer = this.createLayer({
             ...layerOptions,
             source: this.olSource,
@@ -52,7 +61,7 @@ export abstract class BaseLayer<
                 ...layerOptions,
                 visible: this.olLayer.getVisible(),
                 opacity: this.olLayer.getOpacity(),
-                source: this.createSource(sourceOptions),
+                source: this.createSource(sourceOptions as TSourceOptions),
             };
             return this.createLayer(opts);
         };
@@ -76,26 +85,32 @@ export abstract class BaseLayer<
     @action
     setVisibility(visibility: boolean): void {
         if (this.visibility !== visibility) {
+            const oldVisibility = this.visibility;
             this.visibility = visibility;
             this.olLayer.setVisible(visibility);
+            this.notify("visibility", oldVisibility, visibility);
         }
     }
 
     @action
     setOpacity(opacity: number): void {
         if (this.opacity !== opacity) {
+            const oldOpacity = this.opacity;
             this.opacity = opacity;
             this.olLayer.setOpacity(opacity);
+            this.notify("opacity", oldOpacity, opacity);
         }
     }
 
     @action
     setSymbols(symbols: string[]): void {
+        const oldSymbold = this.symbols;
         if (symbols[0] === "-1") {
             this.olLayer.setSource(null);
         } else if (this.symbols[0] === "-1") {
             this.olLayer.setSource(this.olSource);
         }
+        this.notify("symbols", oldSymbold, symbols);
         this.symbols = symbols;
     }
 

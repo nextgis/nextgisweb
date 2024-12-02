@@ -20,7 +20,7 @@ class TileAdapter(WebMapAdapter):
     tile service, but the service itself is implemented by other component."""
 
     identity = "tile"
-    mid = "ngw-webmap/TileAdapter"
+    mid = "@nextgisweb/webmap/tile-adapter"
     display_name = gettext("Tiles")
 
 
@@ -29,5 +29,5 @@ class ImageAdapter(WebMapAdapter):
     WMS-like GetImage request, but the service itself is implemented by other component."""
 
     identity = "image"
-    mid = "ngw-webmap/ImageAdapter"
+    mid = "@nextgisweb/webmap/image-adapter"
     display_name = gettext("Image")
