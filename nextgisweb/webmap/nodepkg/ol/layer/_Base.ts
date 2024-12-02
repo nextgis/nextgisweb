@@ -125,4 +125,25 @@ export abstract class BaseLayer<
     getSource(): TSource {
         return this.olSource;
     }
+
+    /** @deprecated use {@link _Base.setVisibility} or {@link _Base.setOpacity} or {@link _Base.setSymbols} */
+    @action
+    set(
+        property: keyof LayerWatchableProps,
+        value: boolean | number | string[]
+    ): void {
+        switch (property) {
+            case "visibility":
+                this.setVisibility(value as boolean);
+                break;
+            case "opacity":
+                this.setOpacity(value as number);
+                break;
+            case "symbols":
+                this.setSymbols(value as string[]);
+                break;
+            default:
+                throw new Error(`Unknown property: ${property}`);
+        }
+    }
 }

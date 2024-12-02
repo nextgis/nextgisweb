@@ -14,6 +14,7 @@ import type { BaseLayer } from "./layer/_Base";
 
 interface MapOptions extends OlMapOptions {
     view: View;
+    logo?: boolean;
 }
 
 interface Position {
@@ -106,8 +107,15 @@ export class Map extends Watchable<MapWatchableProps> {
         return parseFloat(res.toString()) * (mpu * this.IPM * this.DPI);
     }
 
-    getResolutionForScale(scale: number, mpu: number): number {
-        return parseFloat(scale.toString()) / (mpu * this.IPM * this.DPI);
+    getResolutionForScale(
+        scale: number | string,
+        mpu: number
+    ): number | undefined {
+        if (scale === null || scale === undefined) {
+            return;
+        }
+        scale = typeof scale === "string" ? parseFloat(scale) : scale;
+        return scale / (mpu * this.IPM * this.DPI);
     }
 
     getPosition(crs?: string): Position {
