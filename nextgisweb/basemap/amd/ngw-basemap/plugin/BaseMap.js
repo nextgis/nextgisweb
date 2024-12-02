@@ -128,12 +128,7 @@ define([
                 if (copyright_text) {
                     opts.source.attributions = copyright_text;
                     if (copyright_url) {
-                        opts.source.attributions =
-                            '<a href="' +
-                            copyright_url +
-                            '">' +
-                            opts.source.attributions +
-                            "</a>";
+                        opts.source.attributions = `<a href="${copyright_url}">${opts.source.attributions}</a>`;
                     }
                 }
 

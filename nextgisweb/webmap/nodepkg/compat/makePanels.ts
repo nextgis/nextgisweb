@@ -1,5 +1,3 @@
-/** @entrypoint */
-
 import { publish } from "dojo/topic";
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
