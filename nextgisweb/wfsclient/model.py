@@ -464,10 +464,10 @@ class VersionAttr(SColumn):
 
 
 class WFSConnectionSerializer(Serializer, resource=WFSConnection):
-    path = PathAttr(read=ConnectionScope.read, write=ConnectionScope.write)
-    version = VersionAttr(read=ConnectionScope.read, write=ConnectionScope.write)
     username = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
     password = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
+    path = PathAttr(read=ConnectionScope.read, write=ConnectionScope.write)
+    version = VersionAttr(read=ConnectionScope.read, write=ConnectionScope.write)
 
 
 class WFSLayerField(Base, LayerField):
