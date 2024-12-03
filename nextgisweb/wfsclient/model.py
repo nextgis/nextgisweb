@@ -205,7 +205,7 @@ class WFSConnection(Base, Resource):
             ),
         )
 
-        version = find_tags(root, "ServiceTypeVersion")[0].text
+        version = root.attrib["version"]
 
         layers = []
         for el in find_tags(root, "FeatureType"):

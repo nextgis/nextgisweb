@@ -710,7 +710,7 @@ class WFSHandler:
         El("Title", namespace=_ns_ows, parent=__service, text=self.title)
         El("Abstract", namespace=_ns_ows, parent=__service, text=self.abstract)
         El("ServiceType", namespace=_ns_ows, parent=__service, text="WFS")
-        for version in VERSION_SUPPORTED:
+        for version in reversed(VERSION_SUPPORTED):
             El("ServiceTypeVersion", namespace=_ns_ows, parent=__service, text=version)
 
         # Operations
