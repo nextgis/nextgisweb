@@ -71,18 +71,26 @@ class FontConfig:
         root_prefix = str(self.root_path.absolute()) + sep
         for node in root.findall(".//item"):
             rec = {p: node.find(p).text for p in props}
+            file = Path(rec["file"])
 
             # Some fonts have multiple families and styles, last ones look
-            # better, so let's use only last ones.
-            family = rec["family"].split(",")[-1]
-            style = rec["style"].split(",")[-1]
+            # better, so let's use only last ones. Some fonts have variable
+            # width, and by extension, don't always have a defined style
+
+            if family := rec["family"]:
+                family = rec["family"].split(",")[-1]
+            else:
+                # Try to get the name of the font from filepath
+                family = file.with_suffix("").name
+
+            if style := rec["style"]:
+                style = style.split(",")[-1]
 
             kwargs = dict(
-                label=f"{family} {style}".strip(),
+                label=(family + (f" {style}" if style else "")).strip(),
                 format=rec["fontformat"],
             )
 
-            file = Path(rec["file"])
             if str(file).startswith(root_prefix):
                 result.append(CustomFont(key=file.name, **kwargs))
             else:
