@@ -4,9 +4,9 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Col, Row, Tree } from "@nextgisweb/gui/antd";
 import type { TreeProps } from "@nextgisweb/gui/antd";
 
+import type { PluginBase } from "../plugin/PluginBase";
 import type WebmapStore from "../store";
-import type { TreeItem } from "../type/TreeItems";
-import type { WebmapPlugin } from "../type/WebmapPlugin";
+import type { TreeItemConfig } from "../type/TreeItems";
 
 import { DropdownActions } from "./DropdownActions";
 import { Legend } from "./Legend";
@@ -27,14 +27,14 @@ export type TreeWebmapItem = TreeNodeData & {
     key: number;
     children?: TreeWebmapItem[];
     legendIcon?: React.ReactNode;
-    treeItem: TreeItem;
+    treeItem: TreeItemConfig;
 };
 
 interface LayersTreeProps {
     store: WebmapStore;
     onSelect?: (keys: number[]) => void;
     setLayerZIndex: (id: number, zIndex: number) => void;
-    getWebmapPlugins: () => Record<string, WebmapPlugin>;
+    getWebmapPlugins: () => Record<string, PluginBase>;
     onReady?: () => void;
     onFilterItems?: (
         store: WebmapStore,

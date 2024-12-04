@@ -2,25 +2,25 @@ import { action, computed, observable, runInAction, toJS } from "mobx";
 
 import { getChildrenDeep, traverseTree } from "@nextgisweb/gui/util/tree";
 
-import { keyInMutuallyExclusiveGroupDeep } from "../layers-tree/util/treeItems";
 import type {
     CustomItemFileWriteStore,
     StoreItem,
-    WebmapItem,
-    WebmapLayer,
-} from "../type";
-import type { TreeItem } from "../type/TreeItems";
+} from "../compat/CustomItemFileWriteStore";
+import type { StoreItemConfig, StoreLayerConfig } from "../compat/type";
+import { keyInMutuallyExclusiveGroupDeep } from "../layers-tree/util/treeItems";
+import type { BaseLayer } from "../ol/layer/_Base";
+import type { TreeChildrenItemConfig, TreeItemConfig } from "../type/TreeItems";
 
-type LegendSymbols = { [layerId: number]: { [symbolIndex: number]: boolean } };
+type LegendSymbols = { [layerId: string]: { [symbolIndex: number]: boolean } };
 
 export class WebmapStore {
-    @observable.shallow private accessor _webmapItems: StoreItem[] = [];
+    @observable.shallow private accessor _webmapItems: TreeItemConfig[] = [];
     @observable.shallow private accessor _checked: number[] = [];
     @observable.shallow private accessor _expanded: number[] = [];
     @observable.shallow accessor _legendSymbols: LegendSymbols = {};
 
     private _itemStore: CustomItemFileWriteStore;
-    private _layers: Record<number, WebmapLayer> = {};
+    private _layers: Record<string, BaseLayer> = {};
 
     constructor({
         itemStore,
@@ -38,8 +38,8 @@ export class WebmapStore {
             "Set",
             (
                 item: StoreItem,
-                attr: keyof WebmapItem,
-                oldVal: unknown,
+                attr: keyof StoreLayerConfig,
+                _oldVal: unknown,
                 newVal: unknown
             ) => {
                 if (
@@ -61,7 +61,7 @@ export class WebmapStore {
                     } else if (attr === "symbols") {
                         const layer = this._layers[id];
                         if (layer) {
-                            layer.set("symbols", newVal as string);
+                            layer.set("symbols", newVal as string[]);
                         }
                     }
                 }
@@ -81,7 +81,7 @@ export class WebmapStore {
         return [...this._expanded];
     }
 
-    getWebmapItems(): TreeItem[] {
+    getWebmapItems(): TreeItemConfig[] {
         return toJS(this._webmapItems);
     }
 
@@ -104,12 +104,12 @@ export class WebmapStore {
         this._checked = checked_;
     };
 
-    private _itemStoreVisibility = (item: StoreItem) => {
+    _itemStoreVisibility = (item: StoreItem) => {
         const store = this._itemStore;
 
         if (store.getValue(item, "type") === "layer") {
             const newVal = store.getValue(item, "checked");
-            if (store.getValue(item, "visibility") !== newVal) {
+            if (!!store.getValue(item, "visibility") !== newVal) {
                 const id = store.getValue(item, "id");
                 console.log(`Layer ${id} visibility has changed to ${newVal}`);
                 store.setValue(item, "visibility", newVal);
@@ -185,38 +185,41 @@ export class WebmapStore {
         runInAction(() => {
             this._legendSymbols[identity] = symbols;
         });
-
         const layer = this.getLayer(identity);
-        const layerSymbols = layer.itemConfig.legendInfo.symbols;
+        if (layer.itemConfig) {
+            const layerSymbols = layer.itemConfig.legendInfo.symbols;
 
-        const needSymbolRender = Object.entries(symbols).some(
-            ([index, renderStatus]) => {
-                const layerSymbol = layerSymbols.find(
-                    (l) => l.index === Number(index)
-                );
-                return layerSymbol && layerSymbol.render !== renderStatus;
-            }
-        );
-
-        // -1 - do not show nothing, null - use default render without symbols
-        let intervals: string[] | "-1" | null = null;
-        if (needSymbolRender) {
-            const renderIndexes: number[] = [];
-            for (const s of layerSymbols) {
-                const render = symbols[s.index] ?? s.render;
-                if (render) {
-                    renderIndexes.push(s.index);
+            const needSymbolRender = Object.entries(symbols).some(
+                ([index, renderStatus]) => {
+                    const layerSymbol = layerSymbols.find(
+                        (l) => l.index === Number(index)
+                    );
+                    return layerSymbol && layerSymbol.render !== renderStatus;
                 }
+            );
+
+            // -1 - do not show nothing, null - use default render without symbols
+            let intervals: string[] | "-1" | null = null;
+            if (needSymbolRender) {
+                const renderIndexes: number[] = [];
+                for (const s of layerSymbols) {
+                    const render = symbols[s.index] ?? s.render;
+                    if (render) {
+                        renderIndexes.push(s.index);
+                    }
+                }
+                intervals = this._consolidateIntervals(renderIndexes);
+                intervals = intervals.length ? intervals : "-1";
             }
-            intervals = this._consolidateIntervals(renderIndexes);
-            intervals = intervals.length ? intervals : "-1";
+            this._itemStore.fetchItemByIdentity({
+                identity,
+                onItem: (item) => {
+                    if (item) {
+                        this._itemStore.setValue(item, "symbols", intervals);
+                    }
+                },
+            });
         }
-        this._itemStore.fetchItemByIdentity({
-            identity,
-            onItem: (item: StoreItem) => {
-                this._itemStore.setValue(item, "symbols", intervals);
-            },
-        });
     };
 
     private _consolidateIntervals = (symbols: number[]) => {
@@ -238,23 +241,22 @@ export class WebmapStore {
         return intervals;
     };
 
-    filterLayers = ({ query }: { query?: Partial<StoreItem> } = {}) => {
+    filterLayers = ({ query }: { query?: Partial<StoreItemConfig> } = {}) => {
         const itemStore = this._itemStore;
-        return new Promise<StoreItem[]>((resolve) => {
+        return new Promise<StoreItemConfig[]>((resolve) => {
             itemStore.fetch({
                 query,
                 queryOptions: { deep: true },
-                onComplete: function (items: StoreItem[]) {
-                    resolve([...items]);
+                onComplete: (items) => {
+                    resolve(items.map((item) => itemStore.dumpItem(item)));
                 },
             });
         });
     };
 
-    getIds = (options: { query?: Partial<StoreItem> } = {}) => {
-        const itemStore = this._itemStore;
+    getIds = (options: { query?: Partial<StoreItemConfig> } = {}) => {
         return this.filterLayers(options).then((items) =>
-            items.map((item) => itemStore.getValue(item, "id"))
+            items.map((item) => item.id)
         );
     };
 
@@ -266,11 +268,12 @@ export class WebmapStore {
         return this._layers[id];
     }
 
-    @action addLayer(id: number, layer: WebmapLayer) {
+    @action addLayer(id: number, layer: BaseLayer) {
         this._layers[id] = layer;
     }
 
-    @action addItem = (item: StoreItem) => {
+    @action addItem = (item: TreeChildrenItemConfig) => {
+        console.log(item);
         const items = [item, ...this._webmapItems];
         if ("visibility" in item && item.visibility) {
             this.setChecked([...this._checked, item.id]);
@@ -290,7 +293,7 @@ export class WebmapStore {
         delete this._layers[id];
     };
 
-    @action setWebmapItems = (items: StoreItem[]) => {
+    @action setWebmapItems = (items: TreeItemConfig[]) => {
         this._webmapItems = items;
         this.setChecked(this._checked);
     };

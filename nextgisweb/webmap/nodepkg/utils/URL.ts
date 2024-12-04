@@ -19,7 +19,7 @@ function _pushState(data: PushStateData): void {
     }
 }
 
-export function getURLParams(): URLParams {
+export function getURLParams<U = URLParams>(): Record<keyof U, string> {
     const params: URLParams = {};
 
     window.location.href.replace(
@@ -38,7 +38,7 @@ export function getURLParams(): URLParams {
         }
     );
 
-    return params;
+    return params as Record<keyof U, string>;
 }
 
 export function removeURLParameter(key: string): PushStateData {

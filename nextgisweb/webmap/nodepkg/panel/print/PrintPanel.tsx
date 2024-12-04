@@ -15,9 +15,6 @@ import { CopyToClipboardButton } from "@nextgisweb/gui/buttons";
 import reactApp from "@nextgisweb/gui/react-app";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import PrintMap from "@nextgisweb/webmap/print-map";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore Import URL parser module
-import URL from "ngw-webmap/utils/URL";
 
 import type { PrintMapSettings } from "../../print-map/type";
 import type { DojoDisplay } from "../../type";
@@ -37,6 +34,7 @@ import { ShareAltOutlined } from "@ant-design/icons";
 
 import "../styles/panels.less";
 import "./PrintPanel.less";
+import { getURLParams } from "@nextgisweb/webmap/utils/URL";
 
 const { TextArea } = Input;
 
@@ -109,7 +107,7 @@ const defaultPanelMapSettings = (initTitleText: string): PrintMapSettings => {
 };
 
 const getPrintUrlSettings = (): Partial<PrintMapSettings> => {
-    const parsed = URL.getURLParams() as Record<
+    const parsed = getURLParams() as Record<
         keyof UrlPrintParams<PrintMapSettings>,
         string
     >;
@@ -138,7 +136,7 @@ const getPrintUrlSettings = (): Partial<PrintMapSettings> => {
 };
 
 const getPrintMapLink = (mapSettings: PrintMapSettings): string => {
-    const parsed = URL.getURLParams();
+    const parsed: Record<string, string> = getURLParams<PrintMapSettings>();
 
     for (const [urlParam, settingInfo] of Object.entries(urlPrintParams)) {
         const { setting } = settingInfo;
@@ -147,9 +145,11 @@ const getPrintMapLink = (mapSettings: PrintMapSettings): string => {
         }
 
         const mapSettingValue = mapSettings[setting];
-        parsed[urlParam] = settingInfo.toParam
-            ? settingInfo.toParam(mapSettingValue as never)
-            : mapSettingValue;
+        parsed[urlParam] = String(
+            settingInfo.toParam
+                ? settingInfo.toParam(mapSettingValue as never)
+                : mapSettingValue
+        );
     }
 
     const origin = window.location.origin;

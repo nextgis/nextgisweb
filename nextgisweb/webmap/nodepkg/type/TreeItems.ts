@@ -7,16 +7,16 @@ interface BaseItem {
     label: string;
     title: string;
 }
-export interface RootItem extends BaseItem {
+export interface RootItemConfig extends BaseItem {
     type: "root";
-    children: TreeItem[];
+    children: TreeChildrenItemConfig[];
 }
 
-export interface GroupItem extends BaseItem {
+export interface GroupItemConfig extends BaseItem {
     type: "group";
     expanded: boolean;
     exclusive: boolean;
-    children: TreeItem[];
+    children: TreeChildrenItemConfig[];
 }
 
 interface Icon {
@@ -26,20 +26,19 @@ interface Icon {
 export interface SymbolInfo {
     index: number;
     render: boolean;
-    display_name: string;
+    display_name: string; // possible null?
     icon: Icon;
 }
 
 interface LegendInfo {
-    visible: string;
+    visible: "collapse" | "expand";
     has_legend: boolean;
     symbols: SymbolInfo[];
     single: boolean;
-
     open?: boolean;
 }
 
-export interface LayerItem extends BaseItem {
+export interface LayerItemConfig extends BaseItem {
     type: "layer";
     layerId: number;
     styleId: number;
@@ -57,4 +56,5 @@ export interface LayerItem extends BaseItem {
     editable?: boolean;
 }
 
-export type TreeItem = GroupItem | LayerItem | RootItem;
+export type TreeItemConfig = RootItemConfig | GroupItemConfig | LayerItemConfig;
+export type TreeChildrenItemConfig = GroupItemConfig | LayerItemConfig;

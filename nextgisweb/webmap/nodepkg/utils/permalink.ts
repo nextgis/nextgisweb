@@ -1,13 +1,13 @@
 import type { Coordinate } from "ol/coordinate";
 import { toLonLat } from "ol/proj";
 
+import type { StoreItem } from "../compat/CustomItemFileWriteStore";
 import type { VisibleMode } from "../store/annotations/AnnotationsStore";
 import type { DojoDisplay } from "../type";
-import type { TreeItem } from "../type/TreeItems";
 
 export interface GetPermalinkOptions {
     display: DojoDisplay;
-    visibleItems: TreeItem[];
+    visibleItems: StoreItem[];
     visibleMode?: VisibleMode | null;
     center?: Coordinate;
     additionalParams?: Record<string, string | number | boolean | string[]>;
@@ -26,9 +26,13 @@ export const getPermalink = ({
     origin,
     pathname,
 }: GetPermalinkOptions): string => {
-    const visibleStyles = visibleItems.map(
-        (i) => display.itemStore.dumpItem(i).styleId
-    );
+    const visibleStyles: number[] = [];
+    visibleItems.forEach((i) => {
+        const item = display.itemStore.dumpItem(i);
+        if ("styleId" in item) {
+            visibleStyles.push(item.styleId);
+        }
+    });
 
     const params: Record<string, string> = {
         base: display._baseLayer.name,

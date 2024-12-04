@@ -2,24 +2,24 @@ import type { EventDataNode } from "rc-tree/lib/interface";
 
 import { getChildrenDeep, getParent } from "@nextgisweb/gui/util/tree";
 
-import type { GroupItem, TreeItem } from "../../type/TreeItems";
+import type { GroupItemConfig, TreeItemConfig } from "../../type/TreeItems";
 import type { TreeWebmapItem } from "../LayersTree";
 
 type Node = EventDataNode<TreeWebmapItem>;
 
 export function isExclusiveGroup(
-    treeItem: TreeItem
-): treeItem is GroupItem & { exclusive: true } {
+    treeItem: TreeItemConfig
+): treeItem is GroupItemConfig & { exclusive: true } {
     return treeItem.type === "group" && treeItem.exclusive;
 }
 
-export function itemIsMutalGroup(treeItem: TreeItem) {
+export function itemIsMutalGroup(treeItem: TreeItemConfig) {
     return isExclusiveGroup(treeItem) ? treeItem : false;
 }
 
 export function itemInMutuallyExclusiveGroup(
-    item: TreeItem,
-    treeItems: TreeItem[]
+    item: TreeItemConfig,
+    treeItems: TreeItemConfig[]
 ) {
     const parent = getParent(treeItems, (i) => i.key === item.key);
     if (parent) {
@@ -31,10 +31,10 @@ export function itemInMutuallyExclusiveGroup(
 
 export function keyInMutuallyExclusiveGroupDeep(
     itemKey: number,
-    treeItems: TreeItem[]
-): TreeItem[] | false {
+    treeItems: TreeItemConfig[]
+): TreeItemConfig[] | false {
     let currentNode = getParent(treeItems, (i) => i.key === itemKey);
-    const parents: TreeItem[] = [];
+    const parents: TreeItemConfig[] = [];
     let lastMutualGroupIndex: number | null = null;
 
     while (currentNode) {
@@ -55,7 +55,7 @@ export function keyInMutuallyExclusiveGroupDeep(
 
 export function determineAdditionalKeys(
     node: Node,
-    firstParent: TreeItem,
+    firstParent: TreeItemConfig,
     keys: number[]
 ) {
     const treeItem = node.treeItem;
@@ -73,7 +73,7 @@ export function determineAdditionalKeys(
 
 export function updateKeysForMutualExclusivity(
     node: Node,
-    parents: TreeItem[],
+    parents: TreeItemConfig[],
     keys: number[]
 ) {
     const mutuallyExclusive = parents[parents.length - 1];
