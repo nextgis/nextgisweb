@@ -12,7 +12,7 @@ import i18n from "@nextgisweb/pyramid/i18n";
 import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
 import type { Map } from "@nextgisweb/webmap/ol/Map";
 import type { DojoDisplay } from "@nextgisweb/webmap/type";
-import type { LayerItem } from "@nextgisweb/webmap/type/TreeItems";
+import type { LayerItemConfig } from "@nextgisweb/webmap/type/TreeItems";
 
 import { Base } from "./ToolBase";
 
@@ -158,7 +158,7 @@ export class Identify extends Base {
         items.forEach((i) => {
             const item = this.display._itemConfigById[
                 this.display.itemStore.getValue(i, "id")
-            ] as LayerItem;
+            ] as LayerItemConfig;
 
             if (
                 mapResolution === null ||
@@ -174,10 +174,11 @@ export class Identify extends Base {
             }
         });
 
-        const layerLabels: Record<string, string> = {};
+        const layerLabels: Record<number, string | null> = {};
         items.forEach((i) => {
-            layerLabels[this.display.itemStore.getValue(i, "layerId")] =
-                this.display.itemStore.getValue(i, "label");
+            const layerId = this.display.itemStore.getValue(i, "layerId");
+
+            layerLabels[layerId] = this.display.itemStore.getValue(i, "label");
         });
 
         const response = await route("feature_layer.identify").post({
@@ -216,7 +217,7 @@ export class Identify extends Base {
     private openIdentifyPanel(
         response: RouteResp<"feature_layer.identify", "post">,
         point: Coordinate,
-        layerLabels: Record<string, string>
+        layerLabels: Record<string, string | null>
     ): void {
         if (response.featureCount === 0) {
             // @ts-expect-error the event may actually be empty

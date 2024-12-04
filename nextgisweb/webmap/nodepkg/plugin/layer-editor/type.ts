@@ -2,7 +2,7 @@ import type { Collection, Feature } from "ol";
 import type { Geometry } from "ol/geom";
 import type { Interaction } from "ol/interaction";
 
-import type { LayerItem } from "@nextgisweb/webmap/type/TreeItems";
+import type { LayerItemConfig } from "@nextgisweb/webmap/type/TreeItems";
 
 export interface FeatureInfo {
     id: number;
@@ -11,7 +11,7 @@ export interface FeatureInfo {
 
 export interface EditingItem {
     id: number;
-    nodeData: LayerItem;
+    nodeData: LayerItemConfig;
     interactions: Record<string, Interaction>;
     features: Collection<Feature<Geometry>>;
     featuresDeleted: Feature<Geometry>[];
