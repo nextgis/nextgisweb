@@ -473,6 +473,12 @@ class CoreComponent(StorageComponentMixin, Component):
             if len(cols_act) > 0:
                 yield f"{tab_msg}: extra columns found ({', '.join(cols_act.keys())})."
 
+    def backup_objects(self):
+        yield from self.fontconfig.backup_objects()
+
+    def restore_prepare(self):
+        self.fontconfig.restore_prepare()
+
     # fmt: off
     option_annotations = (
         # Database options
