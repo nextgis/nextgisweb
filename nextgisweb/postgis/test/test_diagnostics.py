@@ -12,6 +12,7 @@ def con_args(ngw_env):
         database=src["database"],
         username=src["username"],
         password=src["password"],
+        sslmode=None,
     )
 
 

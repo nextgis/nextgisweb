@@ -7,6 +7,7 @@ import type { EditorStore } from "@nextgisweb/resource/type/EditorStore";
 const {
     hostname,
     port,
+    sslmode,
     username,
     password,
     database,
@@ -30,6 +31,7 @@ export class ConnectionStore implements EditorStore<PostgisConnectionRead> {
 
     hostname = hostname.init("", this);
     port = port.init(null, this);
+    sslmode = sslmode.init(null, this);
     username = username.init("", this);
     password = password.init("", this);
     database = database.init("", this);
@@ -54,6 +56,7 @@ export class ConnectionStore implements EditorStore<PostgisConnectionRead> {
         return {
             ...this.hostname.jsonPart(),
             ...this.port.jsonPart(),
+            ...this.sslmode.jsonPart(),
             ...this.username.jsonPart(),
             ...this.password.jsonPart(),
             ...this.database.jsonPart(),

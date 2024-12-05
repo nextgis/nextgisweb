@@ -110,13 +110,14 @@ class Check:
 class ConnectionCheck(Check):
     group = "connection"
 
-    def __init__(self, *, hostname, port, database, username, password):
+    def __init__(self, *, hostname, port, database, username, password, sslmode):
         super().__init__()
         self.hostname = hostname
         self.port = port
         self.database = database
         self.username = username
         self.password = password
+        self.sslmode = sslmode
 
 
 class LayerCheck(Check):
@@ -171,8 +172,11 @@ class PostgresCheck(ConnectionCheck):
             password=self.password,
         )
 
+        connect_args = dict(connect_timeout=5)
+        if self.sslmode is not None:
+            connect_args["sslmode"] = self.sslmode.value
         engine = create_engine(
-            url, client_encoding="utf-8", poolclass=NullPool, connect_args=dict(connect_timeout=5)
+            url, client_encoding="utf-8", poolclass=NullPool, connect_args=connect_args
         )
         try:
             conn = self._conn = engine.connect()
@@ -188,6 +192,11 @@ class PostgresCheck(ConnectionCheck):
 
         ver = conn.execute(sql.text("SHOW server_version")).scalar().split(" ")[0]
         self.success(gettextf("PostgreSQL version {}.")(ver))
+
+        ssl = conn.execute(
+            sql.text("SELECT ssl FROM pg_stat_ssl WHERE pid = pg_backend_pid()")
+        ).scalar()
+        self.say(gettext("SSL is used.") if ssl else gettext("SSL is not used."))
 
     def cleanup(self):
         if conn := getattr(self, "_conn", None):

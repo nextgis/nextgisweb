@@ -175,7 +175,8 @@ def diagnostics(request, *, body: CheckBody) -> CheckResponse:
 
         request.resource_permission(ConnectionScope.connect, res)
         connection = {
-            k: getattr(res, k) for k in ("hostname", "port", "database", "username", "password")
+            k: getattr(res, k)
+            for k in ("hostname", "port", "database", "username", "password", "sslmode")
         }
 
     checker = Checker(connection=connection, layer=layer)

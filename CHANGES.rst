@@ -1,6 +1,12 @@
 Changes
 =======
 
+5.0.0
+-----
+
+- Configurable SSL mode for PostGIS connections.
+
+
 4.9.0
 -----
 

@@ -1,8 +1,14 @@
 import { observer } from "mobx-react-lite";
 
-import { InputNumber, InputValue, PasswordValue } from "@nextgisweb/gui/antd";
+import {
+    InputNumber,
+    InputValue,
+    PasswordValue,
+    Select,
+} from "@nextgisweb/gui/antd";
 import { LotMV } from "@nextgisweb/gui/arm";
 import { Area } from "@nextgisweb/gui/mayout";
+import type { PostgisConnectionRead } from "@nextgisweb/postgis/type/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type {
     EditorWidgetComponent,
@@ -11,13 +17,32 @@ import type {
 
 import type { ConnectionStore } from "./ConnectionStore";
 
+const sslmodes: { value: PostgisConnectionRead["sslmode"] }[] = [
+    { value: "disable" },
+    { value: "allow" },
+    { value: "prefer" },
+    { value: "require" },
+    { value: "verify-ca" },
+    { value: "verify-full" },
+];
+
 export const ConnectionWidget: EditorWidgetComponent<
     EditorWidgetProps<ConnectionStore>
 > = observer(({ store }: EditorWidgetProps<ConnectionStore>) => {
     return (
-        <Area pad cols={["auto", "auto", "min-content"]}>
+        <Area
+            pad
+            cols={[
+                "auto",
+                "auto",
+                "auto",
+                "auto",
+                "min-content",
+                "min-content",
+            ]}
+        >
             <LotMV
-                span={2}
+                span={4}
                 label={gettext("Host")}
                 value={store.hostname}
                 component={InputValue}
@@ -34,12 +59,24 @@ export const ConnectionWidget: EditorWidgetComponent<
                 }}
             />
             <LotMV
+                label={gettext("SSL mode")}
+                value={store.sslmode}
+                component={Select}
+                props={{
+                    options: sslmodes,
+                    allowClear: true,
+                    placeholder: "prefer",
+                    popupMatchSelectWidth: false,
+                }}
+            />
+            <LotMV
+                span={3}
                 label={gettext("User")}
                 value={store.username}
                 component={InputValue}
             />
             <LotMV
-                span={2}
+                span={3}
                 label={gettext("Password")}
                 value={store.password}
                 component={PasswordValue}

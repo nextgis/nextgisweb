@@ -1,5 +1,6 @@
 import re
 from contextlib import contextmanager
+from enum import Enum
 from typing import Literal, Union
 
 import sqlalchemy as sa
@@ -120,6 +121,15 @@ def calculate_extent(layer, where=None, geomcol=None):
     return extent
 
 
+class SSLMode(Enum):
+    disable = "disable"
+    allow = "allow"
+    prefer = "prefer"
+    require = "require"
+    verify_ca = "verify-ca"
+    verify_full = "verify-full"
+
+
 class PostgisConnection(Base, Resource):
     identity = "postgis_connection"
     cls_display_name = gettext("PostGIS connection")
@@ -131,6 +141,7 @@ class PostgisConnection(Base, Resource):
     username = sa.Column(sa.Unicode, nullable=False)
     password = sa.Column(sa.Unicode, nullable=False)
     port = sa.Column(sa.Integer, nullable=True)
+    sslmode = sa.Column(saext.Enum(SSLMode), nullable=True)
 
     @classmethod
     def check_parent(cls, parent):
@@ -141,7 +152,14 @@ class PostgisConnection(Base, Resource):
 
         # Need to check connection params to see if
         # they changed for each connection request
-        credhash = (self.hostname, self.port, self.database, self.username, self.password)
+        credhash = (
+            self.hostname,
+            self.port,
+            self.sslmode,
+            self.database,
+            self.username,
+            self.password,
+        )
 
         if self.id in comp._engine:
             engine = comp._engine[self.id]
@@ -161,6 +179,9 @@ class PostgisConnection(Base, Resource):
                 options="-c statement_timeout=%d" % statement_timeout_ms,
             ),
         )
+        if self.sslmode is not None:
+            args["connect_args"]["sslmode"] = self.sslmode.value
+
         engine_url = make_engine_url(
             EngineURL.create(
                 "postgresql+psycopg2",
@@ -213,9 +234,14 @@ class PostgisConnection(Base, Resource):
             conn.close()
 
 
+class SSLModeAttr(SColumn):
+    ctypes = CRUTypes(Union[SSLMode, None], Union[SSLMode, None], Union[SSLMode, None])
+
+
 class PostgisConnectionSerializer(Serializer, resource=PostgisConnection):
     hostname = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
     port = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
+    sslmode = SSLModeAttr(read=ConnectionScope.read, write=ConnectionScope.write)
     username = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
     password = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
     database = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
