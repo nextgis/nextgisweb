@@ -32,6 +32,7 @@ import type { MapStatesObserver } from "../../map-state-observer/MapStatesObserv
 import VectorLayer from "../../ol/layer/Vector";
 import { showFinishEditingDialog } from "../../ui/finish-editing-dialog";
 import { PluginBase } from "../PluginBase";
+import type { LayerEditorWebMapPluginConfig } from "../type";
 
 import type {
     EditingItem,
@@ -94,7 +95,11 @@ export class LayerEditor extends PluginBase {
             enabled:
                 !this.disabled &&
                 nodeData.type === "layer" &&
-                nodeData.plugin[this.identity]?.writable,
+                (
+                    nodeData.plugin[
+                        this.identity
+                    ] as LayerEditorWebMapPluginConfig
+                )?.writable,
             active: nodeData.editable === true,
         };
     }
@@ -272,7 +277,8 @@ export class LayerEditor extends PluginBase {
         const isResourceSupportEditing =
             itemConfig.type === "layer" &&
             itemConfig.plugin[this.identity] &&
-            itemConfig.plugin[this.identity].writable;
+            (itemConfig.plugin[this.identity] as LayerEditorWebMapPluginConfig)
+                .writable;
 
         if (!isResourceSupportEditing) {
             this.hideEditingControls();
@@ -328,7 +334,9 @@ export class LayerEditor extends PluginBase {
 
     private buildEditingItemInteractions(editingItem: EditingItem): void {
         const itemConfig = this.display.get("itemConfig") as LayerItemConfig;
-        const pluginConfig = itemConfig.plugin[this.identity];
+        const pluginConfig = itemConfig.plugin[
+            this.identity
+        ] as LayerEditorWebMapPluginConfig;
         const pluginGeometryType = pluginConfig.geometry_type as GeometryType;
 
         const getGeometryType = () => {
