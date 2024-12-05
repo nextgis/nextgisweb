@@ -83,7 +83,7 @@ const SourceOptions = observer(({ store }: { store: Store }) => {
             value: so[a] ?? "NONE",
             onChange: (e) => {
                 let value = e.target.value;
-                if (value === "NONE") value = null;
+                if (value === "NONE" && a !== "fix_errors") value = null;
                 store.updateSourceOptions({ [a]: value });
             },
         };
