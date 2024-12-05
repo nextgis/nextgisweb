@@ -6,7 +6,7 @@ import type {
     CustomItemFileWriteStore,
     StoreItem,
 } from "../compat/CustomItemFileWriteStore";
-import type { StoreItemConfig, StoreLayerConfig } from "../compat/type";
+import type { StoreItemConfig } from "../compat/type";
 import { keyInMutuallyExclusiveGroupDeep } from "../layers-tree/util/treeItems";
 import type { BaseLayer } from "../ol/layer/_Base";
 import type { TreeChildrenItemConfig, TreeItemConfig } from "../type/TreeItems";
@@ -34,39 +34,31 @@ export class WebmapStore {
             this._checked = checked;
         }
 
-        itemStore.on(
-            "Set",
-            (
-                item: StoreItem,
-                attr: keyof StoreLayerConfig,
-                _oldVal: unknown,
-                newVal: unknown
-            ) => {
+        itemStore.on("Set", (item, attr, _oldVal, newVal) => {
+            if (
+                attr === "checked" ||
+                attr === "visibility" ||
+                attr === "symbols"
+            ) {
+                const id = itemStore.getValue(item, "id");
                 if (
-                    attr === "checked" ||
-                    attr === "visibility" ||
-                    attr === "symbols"
+                    attr === "checked" &&
+                    itemStore.getValue(item, "type") === "layer"
                 ) {
-                    const id = itemStore.getValue(item, "id");
-                    if (
-                        attr === "checked" &&
-                        itemStore.getValue(item, "type") === "layer"
-                    ) {
-                        this._itemStoreVisibility(item);
-                    } else if (attr === "visibility") {
-                        const layer = this._layers[id];
-                        if (layer) {
-                            layer.set("visibility", newVal as boolean);
-                        }
-                    } else if (attr === "symbols") {
-                        const layer = this._layers[id];
-                        if (layer) {
-                            layer.set("symbols", newVal as string[]);
-                        }
+                    this._itemStoreVisibility(item);
+                } else if (attr === "visibility") {
+                    const layer = this._layers[id];
+                    if (layer) {
+                        layer.set("visibility", newVal as boolean);
+                    }
+                } else if (attr === "symbols") {
+                    const layer = this._layers[id];
+                    if (layer) {
+                        layer.set("symbols", newVal as string[]);
                     }
                 }
             }
-        );
+        });
     }
 
     @computed get webmapItems() {
