@@ -1,6 +1,6 @@
 /** @entrypoint */
 import * as Sentry from "@sentry/browser";
-import type { Integration } from "@sentry/types";
+import type { Integration } from "@sentry/core";
 
 export function init(opts: { dsn: string; routeName: string }) {
     const integrations: Integration[] = [];

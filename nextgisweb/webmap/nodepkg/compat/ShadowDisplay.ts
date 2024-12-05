@@ -26,7 +26,7 @@ import type {
     MapURLParams,
     PanelDojoItem,
 } from "../type";
-import type { RootItemConfig, TreeItemConfig } from "../type/TreeItems";
+import type { LayerItemConfig, TreeItemConfig } from "../type/TreeItems";
 import { getURLParams, setURLParam } from "../utils/URL";
 
 import { CustomItemFileWriteStore } from "./CustomItemFileWriteStore";
@@ -168,7 +168,7 @@ export default class ShadowDisplay {
         display._postCreateDeferred.resolve(true);
     }
 
-    prepareItem(item: TreeItemConfig | RootItemConfig) {
+    prepareItem(item: TreeItemConfig) {
         const display = this.display;
         const copy = {
             id: item.id,
@@ -242,7 +242,10 @@ export default class ShadowDisplay {
         display.itemStore.fetchItemByIdentity({
             identity: itemId,
             onItem: (item) => {
-                display.set("itemConfig", display._itemConfigById[itemId]);
+                display.set(
+                    "itemConfig",
+                    display._itemConfigById[itemId] as LayerItemConfig
+                );
                 display.set("item", item);
             },
         });
@@ -512,7 +515,7 @@ export default class ShadowDisplay {
                 this._setMapExtent();
                 display._mapExtentDeferred.resolve(true);
             })
-            .then(undefined, function (err) {
+            .catch((err) => {
                 console.error(err);
             });
     }
