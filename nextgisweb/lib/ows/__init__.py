@@ -3,16 +3,20 @@ from io import BytesIO
 
 from lxml import etree
 
+_ns_xsd = "http://www.w3.org/2001/XMLSchema"
 
-class FIELD_TYPE_WFS:
-    INT = "int"
-    INTEGER = "integer"
-    LONG = "long"
-    DOUBLE = "double"
-    STRING = "string"
-    DATE = "date"
-    TIME = "time"
-    DATETIME = "dateTime"
+
+FIELD_TYPE_WFS = dict(
+    XSD_INT=(_ns_xsd, "int"),
+    XSD_INTEGER=(_ns_xsd, "integer"),
+    XSD_LONG=(_ns_xsd, "long"),
+    XSD_DOUBLE=(_ns_xsd, "double"),
+    XSD_STRING=(_ns_xsd, "string"),
+    XSD_DATE=(_ns_xsd, "date"),
+    XSD_TIME=(_ns_xsd, "time"),
+    XSD_DATETIME=(_ns_xsd, "dateTime"),
+    GML_TIME_INSTANT=("http://www.opengis.net/gml/3.2", "TimeInstantType"),
+)
 
 
 def _ns_trim(value):

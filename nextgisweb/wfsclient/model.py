@@ -52,17 +52,6 @@ from nextgisweb.resource import (
 )
 from nextgisweb.spatial_ref_sys import SRS
 
-WFS_2_FIELD_TYPE = {
-    FIELD_TYPE_WFS.INT: FIELD_TYPE.INTEGER,
-    FIELD_TYPE_WFS.INTEGER: FIELD_TYPE.INTEGER,
-    FIELD_TYPE_WFS.LONG: FIELD_TYPE.BIGINT,
-    FIELD_TYPE_WFS.DOUBLE: FIELD_TYPE.REAL,
-    FIELD_TYPE_WFS.STRING: FIELD_TYPE.STRING,
-    FIELD_TYPE_WFS.DATE: FIELD_TYPE.DATE,
-    FIELD_TYPE_WFS.TIME: FIELD_TYPE.TIME,
-    FIELD_TYPE_WFS.DATETIME: FIELD_TYPE.DATETIME,
-}
-
 COMPARISON_OPERATORS = {
     "eq": "PropertyIsEqualTo",
     "ne": "PropertyIsNotEqualTo",
@@ -244,12 +233,17 @@ class WFSConnection(Base, Resource):
             if field_type is None:
                 restriction = find_tags(cplx, "restriction")[0]
                 field_type = restriction.attrib["base"]
-            if not field_type.startswith("gml:"):
-                field_type = ns_trim(field_type)
+            pair = field_type.split(":", maxsplit=1)
+            if len(pair) == 2:
+                ns_short, wfstype = pair
+                ns = root.nsmap[ns_short]
+            else:
+                wfstype = pair[0]
+                ns = root.nsmap[None]
             fields.append(
                 dict(
                     name=el.attrib["name"],
-                    type=field_type,
+                    type=(ns, wfstype),
                 )
             )
 
@@ -368,10 +362,6 @@ class WFSConnection(Base, Resource):
 
         _members = find_tags(root, "member")
 
-        fld_map = dict()
-        for field in layer.fields:
-            fld_map[field.keyname] = field.datatype
-
         features = []
         for _member in _members:
             _feature = _member[0]
@@ -392,26 +382,33 @@ class WFSConnection(Base, Resource):
                         geom = geom_from_gml(_property[0])
                     continue
 
-                datatype = fld_map[key]
+                orig_datatype = layer.field_by_keyname(key).orig_datatype
                 if is_nil:
                     value = None
-                elif datatype in (FIELD_TYPE.INTEGER, FIELD_TYPE.BIGINT):
+                elif orig_datatype in (
+                    "XSD_INT",
+                    "XSD_INTEGER",
+                    "XSD_LONG",
+                ):
                     value = int(_property.text)
-                elif datatype == FIELD_TYPE.REAL:
+                elif orig_datatype == "XSD_DOUBLE":
                     value = float(_property.text)
-                elif datatype == FIELD_TYPE.STRING:
+                elif orig_datatype == "XSD_STRING":
                     if _property.text is None:
                         value = ""
                     else:
                         value = _property.text
-                elif datatype == FIELD_TYPE.DATE:
+                elif orig_datatype == "XSD_DATE":
                     value = date.fromisoformat(_property.text)
-                elif datatype == FIELD_TYPE.TIME:
+                elif orig_datatype == "XSD_TIME":
                     value = time.fromisoformat(_property.text)
-                elif datatype == FIELD_TYPE.DATETIME:
+                elif orig_datatype == "XSD_DATETIME":
                     value = datetime.fromisoformat(_property.text)
+                elif orig_datatype == "GML_TIME_INSTANT":
+                    _tp = find_tags(_property, "timePosition")[0]
+                    value = datetime.fromisoformat(_tp.text)
                 else:
-                    raise ValidationError("Unknown data type: %s" % datatype)
+                    raise NotImplementedError
                 fields[key] = value
 
             if add_box and geom is not None:
@@ -478,6 +475,7 @@ class WFSLayerField(Base, LayerField):
 
     id = sa.Column(sa.ForeignKey(LayerField.id), primary_key=True)
     column_name = sa.Column(sa.Unicode, nullable=False)
+    orig_datatype = sa.Column(saext.Enum(*FIELD_TYPE_WFS.keys()), nullable=False)
 
 
 @implementer(IFeatureLayer, IBboxLayer)
@@ -519,9 +517,28 @@ class WFSLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
             if field["name"] == self.column_geom:
                 continue
 
-            datatype = WFS_2_FIELD_TYPE.get(field["type"])
-            if datatype is None:
-                raise ValidationError("Unknown data type: %s" % field["type"])
+            for k, v in FIELD_TYPE_WFS.items():
+                if field["type"] == v:
+                    orig_datatype = k
+                    if k in ("XSD_INT", "XSD_INTEGER"):
+                        datatype = FIELD_TYPE.INTEGER
+                    elif k == "XSD_LONG":
+                        datatype = FIELD_TYPE.BIGINT
+                    elif k == "XSD_DOUBLE":
+                        datatype = FIELD_TYPE.REAL
+                    elif k == "XSD_STRING":
+                        datatype = FIELD_TYPE.STRING
+                    elif k == "XSD_DATE":
+                        datatype = FIELD_TYPE.DATE
+                    elif k == "XSD_TIME":
+                        datatype = FIELD_TYPE.TIME
+                    elif k in ("XSD_DATETIME", "GML_TIME_INSTANT"):
+                        datatype = FIELD_TYPE.DATETIME
+                    else:
+                        raise NotImplementedError
+                    break
+            else:
+                raise ValidationError("Unknown data type: {%s}%s" % field["type"])
 
             fopts = dict(display_name=field["name"])
             fopts.update(fdata.get(field["name"], dict()))
@@ -529,6 +546,7 @@ class WFSLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
                 WFSLayerField(
                     keyname=field["name"],
                     datatype=datatype,
+                    orig_datatype=orig_datatype,
                     column_name=field["name"],
                     **fopts,
                 )

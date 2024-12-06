@@ -40,13 +40,13 @@ from .util import validate_tag
 wfsfld_pattern = re.compile(r"^wfsfld_(\d+)$")
 
 FIELD_TYPE_2_WFS = {
-    FIELD_TYPE.INTEGER: FIELD_TYPE_WFS.INTEGER,
-    FIELD_TYPE.BIGINT: FIELD_TYPE_WFS.LONG,
-    FIELD_TYPE.REAL: FIELD_TYPE_WFS.DOUBLE,
-    FIELD_TYPE.STRING: FIELD_TYPE_WFS.STRING,
-    FIELD_TYPE.DATE: FIELD_TYPE_WFS.DATE,
-    FIELD_TYPE.TIME: FIELD_TYPE_WFS.TIME,
-    FIELD_TYPE.DATETIME: FIELD_TYPE_WFS.DATETIME,
+    FIELD_TYPE.INTEGER: FIELD_TYPE_WFS["XSD_INTEGER"],
+    FIELD_TYPE.BIGINT: FIELD_TYPE_WFS["XSD_LONG"],
+    FIELD_TYPE.REAL: FIELD_TYPE_WFS["XSD_DOUBLE"],
+    FIELD_TYPE.STRING: FIELD_TYPE_WFS["XSD_STRING"],
+    FIELD_TYPE.DATE: FIELD_TYPE_WFS["XSD_DATE"],
+    FIELD_TYPE.TIME: FIELD_TYPE_WFS["XSD_TIME"],
+    FIELD_TYPE.DATETIME: FIELD_TYPE_WFS["XSD_DATETIME"],
 }
 
 # Spec: http://docs.opengeospatial.org/is/09-025r2/09-025r2.html
@@ -876,15 +876,16 @@ class WFSHandler:
             )
 
             for field in feature_layer.fields:
-                datatype = FIELD_TYPE_2_WFS.get(field.datatype)
-                if datatype is None:
+                if field.datatype not in FIELD_TYPE_2_WFS:
                     raise ValidationError("Unknown data type: %s" % field.datatype)
+                _ns, _type = FIELD_TYPE_2_WFS[field.datatype]
+                # Ignore namespace, support XSD types only
                 El(
                     "element",
                     dict(
                         minOccurs="0",
                         name=self._field_key_encode(field),
-                        type=datatype,
+                        type=_type,
                         nillable="true",
                     ),
                     parent=__seq,
@@ -1157,6 +1158,7 @@ class WFSHandler:
         return root
 
     def _transaction(self):
+        #print(etree.tostring(self.root_body))
         _ns_wfs = nsmap("wfs", self.p_version)["ns"]
         _ns_ogc = nsmap("ogc", self.p_version)["ns"]
         if self.p_version >= v200:

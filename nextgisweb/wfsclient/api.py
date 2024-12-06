@@ -30,7 +30,7 @@ def inspect_connection(resource, request) -> InspectResponse:
 
 class FieldObject(Struct, kw_only=True):
     name: str
-    type: str
+    type: Tuple[str, str]
 
 
 class InspectLayerResponse(Struct, kw_only=True):

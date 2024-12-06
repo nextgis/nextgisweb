@@ -19,16 +19,16 @@ import type { WfsClientLayerStore } from "./WfsClientLayerStore";
 const msgAutodetect = gettext("Autodetect");
 
 const geometries: Record<string, string> = {
-    "gml:Point": "POINT",
-    "gml:LineString": "LINESTRING",
-    "gml:LinearRing": "LINESTRING",
-    "gml:Polygon": "POLYGON",
-    "gml:MultiPoint": "MULTIPOINT",
-    "gml:MultiCurve": "MULTILINESTRING",
-    "gml:MultiPolygon": "MULTIPOLYGON",
-    "gml:MultiSurface": "MULTIPOLYGON",
-    "gml:MultiSolid": "MULTIPOLYGON",
-    "gml:MultiGeometry": "GEOMETRYCOLLECTION",
+    "Point": "POINT",
+    "LineString": "LINESTRING",
+    "LinearRing": "LINESTRING",
+    "Polygon": "POLYGON",
+    "MultiPoint": "MULTIPOINT",
+    "MultiCurve": "MULTILINESTRING",
+    "MultiPolygon": "MULTIPOLYGON",
+    "MultiSurface": "MULTIPOLYGON",
+    "MultiSolid": "MULTIPOLYGON",
+    "MultiGeometry": "GEOMETRYCOLLECTION",
 };
 
 async function inspectConnectionFetch(
@@ -55,8 +55,11 @@ async function inspectLayerFetch(
     }).get({ signal: options.signal });
     const result: Record<string, string> = {};
     for (const { name, type } of data.fields) {
-        if (/^gml:/i.test(type)) {
-            const typeNorm = type.replace(/(Property)?Type$/, "");
+        if (type[0] !== "http://www.opengis.net/gml/3.2") {
+            continue;
+        }
+        const typeNorm = type[1].replace(/(Property)?Type$/, "");
+        if (typeNorm === "Geometry" || typeNorm in geometries) {
             result[name] = geometries[typeNorm];
         }
     }

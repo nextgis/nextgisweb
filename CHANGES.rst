@@ -5,7 +5,7 @@ Changes
 -----
 
 - Configurable SSL mode for PostGIS connections.
-
+- Enhanced support for date and time fields in WFS client.
 
 4.9.0
 -----
