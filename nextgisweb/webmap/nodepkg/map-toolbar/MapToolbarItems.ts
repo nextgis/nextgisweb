@@ -4,14 +4,6 @@ import type { DojoDisplay, MapTool } from "../type";
 import { ToggleControl } from "./ToggleControl";
 import { WidgetBase } from "./WidgetBase";
 
-export interface Tool extends MapTool {
-    label: string;
-    iconClass?: string;
-    customCssClass?: string;
-    customIcon?: string;
-    toolbarBtn?: ToggleControl;
-}
-
 interface ToolbarButton {
     new (options: unknown): {
         display: DojoDisplay;
@@ -30,7 +22,7 @@ export class MapToolbarItems extends WidgetBase {
     }
 
     addTool(
-        tool: Tool,
+        tool: MapTool,
         state: string,
         place?: HTMLElement | ((control: ToggleControl) => void)
     ): void {

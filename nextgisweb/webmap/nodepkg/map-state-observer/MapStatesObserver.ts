@@ -1,6 +1,6 @@
 import { makeSingleton } from "../utils/makeSingleton";
 
-interface StateControl {
+export interface StateControl {
     activate: () => void;
     deactivate: () => void;
 }
@@ -36,14 +36,16 @@ export class MapStatesObserver {
 
     addState(
         state: string,
-        control: StateControl | null,
+        control?: StateControl | null,
         activate?: boolean
     ): void {
         if (Object.prototype.hasOwnProperty.call(this._states, state)) {
             throw new Error(`State "${state}" already registered.`);
         }
 
-        this._states[state] = { control };
+        this._states[state] = {
+            control: control ?? null,
+        };
 
         if (activate) {
             this.activateState(state);
