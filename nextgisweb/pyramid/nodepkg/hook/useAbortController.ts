@@ -3,10 +3,13 @@ import { useEffect, useRef } from "react";
 import { AbortControllerHelper } from "@nextgisweb/pyramid/util/abort";
 
 export function useAbortController() {
-    const abortHelper = useRef<AbortControllerHelper>();
+    const abortHelper = useRef<AbortControllerHelper | null>(null);
 
     const makeSignal = useRef(() => {
-        return abortHelper.current!.makeSignal();
+        if (!abortHelper.current) {
+            abortHelper.current = new AbortControllerHelper();
+        }
+        return abortHelper.current.makeSignal();
     });
 
     const abort = useRef((reason?: string) => {
@@ -16,9 +19,13 @@ export function useAbortController() {
     });
 
     useEffect(() => {
-        const abortHelper_ = new AbortControllerHelper();
-        abortHelper.current = abortHelper_;
-        return () => abortHelper_.abort();
+        if (!abortHelper.current) {
+            abortHelper.current = new AbortControllerHelper();
+        }
+        const abortHelper_ = abortHelper.current;
+        return () => {
+            abortHelper_.abort();
+        };
     }, []);
 
     return { makeSignal: makeSignal.current, abort: abort.current };
