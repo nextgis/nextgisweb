@@ -1,5 +1,5 @@
 import type { Attrs, FeatureItem } from "@nextgisweb/feature-layer/type";
-import type { PanelProps } from "@nextgisweb/webmap/panels-manager/type";
+import type { ReactPanelComponentProps } from "@nextgisweb/webmap/panels-manager/type";
 
 import type { DojoDisplay } from "../../type";
 
@@ -70,6 +70,6 @@ export interface FeatureEditButtonProps {
     onUpdate: () => void;
 }
 
-export interface IdentificationPanelProps extends PanelProps {
+export interface IdentificationPanelProps extends ReactPanelComponentProps {
     identifyInfo: IdentifyInfo;
 }
