@@ -7,7 +7,7 @@ import MapViewerInfoComp from "@nextgisweb/webmap/map-viewer-info";
 import type { MapViewerInfoProps } from "@nextgisweb/webmap/map-viewer-info/MapViewerInfo";
 import type { DojoDisplay } from "@nextgisweb/webmap/type";
 
-import { Base } from "./Base";
+import { Base } from "./ToolBase";
 
 interface ViewerInfoOptions {
     display: DojoDisplay;

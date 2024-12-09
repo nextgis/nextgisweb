@@ -19,7 +19,7 @@ import type { DojoDisplay } from "@nextgisweb/webmap/type";
 import { formatMetersArea, formatMetersLength } from "@nextgisweb/webmap/utils";
 import type { DefaultConfig } from "@nextgisweb/webmap/utils/format-units";
 
-import { Base } from "./Base";
+import { Base } from "./ToolBase";
 
 import "./Measure.css";
 
