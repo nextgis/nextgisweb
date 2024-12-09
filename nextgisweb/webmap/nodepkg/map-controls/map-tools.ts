@@ -1,15 +1,14 @@
 /// <reference types="dojo/dijit" />
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
-// @ts-expect-error Import URL parser module
-import ToolMeasure from "ngw-webmap/tool/Measure";
 
 import type MapToolbar from "../map-toolbar";
 import type { DojoDisplay } from "../type/DojoDisplay";
 
+import { ToolMeasure } from "./tool/Measure";
 import { ToolSwipe } from "./tool/Swipe";
 import { ToolViewerInfo } from "./tool/ViewerInfo";
-import ToolZoom from "./tool/Zoom";
+import { ToolZoom } from "./tool/Zoom";
 import type { ControlReady, ToolInfo } from "./type";
 import { getControlsInfo } from "./utils";
 
