@@ -17,7 +17,7 @@ export class ToolViewerInfo extends Base {
     customCssClass: string = "viewer-info-tool";
     label: string;
     customIcon: string;
-    private toolbarBtn?: ToggleControl;
+    toolbarBtn?: ToggleControl;
     private mapViewerInfoCompDomNode?: HTMLElement;
     private app?: ReactAppReturn<MapViewerInfoProps>;
 
