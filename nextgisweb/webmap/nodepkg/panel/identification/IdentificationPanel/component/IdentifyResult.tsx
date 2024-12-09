@@ -5,9 +5,11 @@ import type { FeatureItem } from "@nextgisweb/feature-layer/type";
 import { Alert } from "@nextgisweb/gui/antd";
 import { errorModal } from "@nextgisweb/gui/error";
 import type { ApiError } from "@nextgisweb/gui/error/type";
+import { sleep } from "@nextgisweb/gui/util";
 import { executeWithMinDelay } from "@nextgisweb/gui/util/executeWithMinDelay";
 import { route } from "@nextgisweb/pyramid/api";
 import type { GetRequestOptions } from "@nextgisweb/pyramid/api/type";
+import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { CoordinatesSwitcher } from "../../CoordinatesSwitcher";
@@ -21,7 +23,6 @@ import { identifyInfoToFeaturesInfo } from "../util/identifyInfoToFeaturesInfo";
 
 import { FeatureInfoSection } from "./FeatureInfoSection";
 import { FeatureSelector } from "./FeatureSelector";
-import { useAbortController } from "@nextgisweb/pyramid/hook";
 
 const msgNotFound = gettext("No objects were found at the click location.");
 const msgLoad = gettext("Retrieving object information...");
@@ -43,7 +44,7 @@ const highlightFeature = (
 const loadFeatureItem = async (
     identifyInfo: IdentifyInfo,
     featureInfo: FeatureInfo,
-    options?: GetRequestOptions
+    opt?: GetRequestOptions
 ) => {
     const layerResponse = identifyInfo.response[featureInfo.layerId];
     const featureResponse = layerResponse.features[featureInfo.idx];
@@ -52,10 +53,15 @@ const loadFeatureItem = async (
         route("feature_layer.feature.item", {
             id: featureResponse.layerId,
             fid: featureResponse.id,
-        }).get(options)
+        }).get(opt),
+        {
+            onRealExecute: (res) => {
+                highlightFeature(res, featureInfo);
+            },
+            signal: opt?.signal,
+        }
     );
 
-    highlightFeature(featureItem, featureInfo);
     return featureItem;
 };
 
@@ -78,23 +84,32 @@ export function IdentifyResult({ identifyInfo, display }: IdentifyResultProps) {
     const updateFeatureItem = useCallback(
         async (featureInfo: FeatureInfo) => {
             abort();
+
+            // This is important to handle the abort error before setting the loading state.
+            await sleep(0);
+
             setFeatureItem(undefined);
+
+            const signal = makeSignal();
+
             setLoading(true);
             try {
                 const featureItemLoaded = await loadFeatureItem(
                     identifyInfo,
                     featureInfo,
-                    { signal: makeSignal() }
+                    { signal }
                 );
 
                 setFeatureItem(featureItemLoaded);
             } catch (er) {
-                errorModal(er as ApiError);
+                if ((er as Error).name !== "AbortError") {
+                    errorModal(er as ApiError);
+                }
             } finally {
                 setLoading(false);
             }
         },
-        [identifyInfo, makeSignal, abort]
+        [identifyInfo, abort, makeSignal]
     );
 
     const onFeatureChange = useCallback(
@@ -106,13 +121,14 @@ export function IdentifyResult({ identifyInfo, display }: IdentifyResultProps) {
     );
 
     const featuresInfoList = useMemo(() => {
+        abort();
         const options = identifyInfoToFeaturesInfo(identifyInfo, display);
         if (options.length) {
             const first = options[0];
             onFeatureChange(first);
         }
         return options;
-    }, [identifyInfo, display, onFeatureChange]);
+    }, [identifyInfo, display, onFeatureChange, abort]);
 
     if (!identifyInfo) {
         return null;
