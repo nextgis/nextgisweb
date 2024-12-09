@@ -8,21 +8,23 @@ import type {
 } from "@nextgisweb/feature-layer/type";
 import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
 import { route } from "@nextgisweb/pyramid/api";
+import type { GetRequestOptions } from "@nextgisweb/pyramid/api/type";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { load, lookup } from "./lookup";
 
-const fieldsCache = new Map<number, any>();
-
 export const getFieldsInfo = async (resourceId: number) => {
-    if (resourceId in fieldsCache) {
-        return fieldsCache.get(resourceId);
+    const resourceInfo = await route("resource.item", resourceId).get({
+        cache: true,
+    });
+    const fieldmap: Map<string, FeatureLayerFieldRead> = new Map();
+    const promises: Promise<Record<string, string>>[] = [];
+
+    if (!resourceInfo.feature_layer) {
+        throw new Error("Resource is not feature layer");
     }
 
-    const resourceInfo = await route("resource.item", resourceId).get();
-    const fieldmap = new Map();
-    const promises: Promise<Record<string, string>>[] = [];
-    resourceInfo.feature_layer!.fields.forEach((fieldInfo: any) => {
+    resourceInfo.feature_layer.fields.forEach((fieldInfo) => {
         if (!fieldInfo.grid_visibility) {
             return;
         }
@@ -31,10 +33,10 @@ export const getFieldsInfo = async (resourceId: number) => {
             promises.push(load(fieldInfo.lookup_table.id));
         }
     });
-    fieldsCache.set(resourceId, fieldmap);
+
     await Promise.all(promises);
 
-    return fieldsCache.get(resourceId);
+    return fieldmap;
 };
 
 const urlRegex =
@@ -47,10 +49,11 @@ export interface FieldDataItem {
     value: string | React.ReactElement;
 }
 
-export const fieldValuesToDataSource = (
+export async function fieldValuesToDataSource(
     fields: Record<string, NgwAttributeType>,
-    fieldsInfo: Map<string, FeatureLayerFieldRead>
-) => {
+    fieldsInfo: Map<string, FeatureLayerFieldRead>,
+    reuestOptions?: GetRequestOptions
+): Promise<FieldDataItem[]> {
     let key = 0;
     const dataSource = [];
 
@@ -99,7 +102,11 @@ export const fieldValuesToDataSource = (
                 dataItem.value = <a href={href}>{val as string}</a>;
             } else {
                 if (field.lookup_table) {
-                    const lval = lookup(field.lookup_table.id, val as string);
+                    const lval = await lookup(
+                        field.lookup_table.id,
+                        val as string,
+                        reuestOptions
+                    );
                     if (lval !== null) {
                         val = `[${val}] ${lval}`;
                     }
@@ -113,4 +120,4 @@ export const fieldValuesToDataSource = (
         dataSource.push(dataItem);
     }
     return dataSource;
-};
+}
