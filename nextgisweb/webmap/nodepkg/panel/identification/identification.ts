@@ -1,4 +1,5 @@
 import type { Attrs, FeatureItem } from "@nextgisweb/feature-layer/type";
+import type { PanelProps } from "@nextgisweb/webmap/panels-manager/type";
 
 import type { DojoDisplay } from "../../type";
 
@@ -69,9 +70,6 @@ export interface FeatureEditButtonProps {
     onUpdate: () => void;
 }
 
-export interface IdentificationPanelProps {
-    display: DojoDisplay;
+export interface IdentificationPanelProps extends PanelProps {
     identifyInfo: IdentifyInfo;
-    title: string;
-    close: () => void;
 }
