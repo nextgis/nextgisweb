@@ -154,7 +154,8 @@ export class Identify extends Base {
         layerLabels: Record<string, string>
     ): void {
         if (response.featureCount === 0) {
-            topic.publish("feature.unhighlight", {});
+            // @ts-expect-error the event may actually be empty
+            topic.publish("feature.unhighlight");
         }
 
         const identifyInfo = {
