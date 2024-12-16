@@ -276,7 +276,9 @@ def iput(
     with versioning(resource, request) as vobj:
         updated = loader.extensions(feature, request.json_body)
         loader(feature, request.json_body)
-        if (feature.geom or feature.fields) and IWritableFeatureLayer.providedBy(resource):
+        if (
+            feature.geom is not UNSET or len(feature.fields) > 0
+        ) and IWritableFeatureLayer.providedBy(resource):
             updated = resource.feature_put(feature) or updated
         if updated is True and vobj:
             vinfo["version"] = vobj.version_id
@@ -494,7 +496,9 @@ def cpatch(
                     vobj.mark_changed()
 
                 loader(feature, fdata)
-                if (feature.geom or feature.fields) and IWritableFeatureLayer.providedBy(resource):
+                if (
+                    feature.geom is not UNSET or len(feature.fields) > 0
+                ) and IWritableFeatureLayer.providedBy(resource):
                     resource.feature_put(feature)
 
             result.append(dict(id=feature.id, **vinfo))
