@@ -43,6 +43,24 @@ body > .webmap-wrapper {
     user-select: text;
 }
 
+.map-container {
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.map-pane {
+    position: relative;
+    flex-grow: 1;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
 /* Control panes */
 
 .control-pane {
@@ -232,6 +250,11 @@ div.dijitContentPane.leftPanelPane {
 .leftPanelPane--fullwidth {
     box-sizing: border-box;
     width: calc(100% - 50px) !important;
+}
+
+.navigation,
+.navigation-drawer {
+    width: auto;
 }
 
 .navigation,

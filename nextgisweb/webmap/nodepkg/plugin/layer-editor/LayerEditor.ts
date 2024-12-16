@@ -1,4 +1,5 @@
 import topic from "dojo/topic";
+import { reaction } from "mobx";
 import { Collection, Feature } from "ol";
 import type { CollectionEvent } from "ol/Collection";
 import type { FeatureLike } from "ol/Feature";
@@ -66,6 +67,8 @@ export class LayerEditor extends PluginBase {
     private editingItem?: EditingItem;
     private resolve?: (value: boolean | undefined) => void;
 
+    private treeItemReactionDisposer?: () => void;
+
     constructor(options: PluginParams) {
         super(options);
         const display = options.display;
@@ -114,6 +117,13 @@ export class LayerEditor extends PluginBase {
             this.setItemEditable(nodeData, true);
             this.startEditing(nodeData);
             return Promise.resolve(undefined);
+        }
+    }
+
+    destroy(): void {
+        if (this.treeItemReactionDisposer) {
+            this.treeItemReactionDisposer();
+            this.treeItemReactionDisposer = undefined;
         }
     }
 
@@ -257,13 +267,16 @@ export class LayerEditor extends PluginBase {
     }
 
     private bindTreeItem(): void {
-        this.display.watch("item", () => {
-            this.onClickTreeItem();
-        });
+        this.treeItemReactionDisposer = reaction(
+            () => this.display.item,
+            () => {
+                this.onClickTreeItem();
+            }
+        );
     }
 
     private async onClickTreeItem(): Promise<boolean> {
-        const itemConfig = this.display.get("itemConfig");
+        const itemConfig = this.display.itemConfig;
         if (!itemConfig) {
             throw new Error("There is no itemConfig in display");
         }
@@ -333,8 +346,8 @@ export class LayerEditor extends PluginBase {
     }
 
     private buildEditingItemInteractions(editingItem: EditingItem): void {
-        const itemConfig = this.display.get("itemConfig") as LayerItemConfig;
-        const pluginConfig = itemConfig.plugin[
+        const itemConfig = this.display.itemConfig;
+        const pluginConfig = itemConfig?.plugin[
             this.identity
         ] as LayerEditorWebMapPluginConfig;
         const pluginGeometryType = pluginConfig.geometry_type as GeometryType;
@@ -622,20 +635,21 @@ export class LayerEditor extends PluginBase {
             this.deactivateEditingControls();
             this.removeCurrentEditingItem();
 
-            const layer = this.display.webmapStore.getLayer(
-                this.display.itemStore.getValue(this.display.item, "id")
-            );
-
-            if (layer) {
-                layer.reload();
-            }
-            if (this.selectedResourceId !== null) {
-                topic.publish(
-                    "/webmap/feature-table/refresh",
-                    this.selectedResourceId
+            if (this.display.item) {
+                const layer = this.display.webmapStore.getLayer(
+                    this.display.itemStore.getValue(this.display.item, "id")
                 );
-            }
 
+                if (layer) {
+                    layer.reload();
+                }
+                if (this.selectedResourceId !== null) {
+                    topic.publish(
+                        "/webmap/feature-table/refresh",
+                        this.selectedResourceId
+                    );
+                }
+            }
             this.resolveRun(true);
         } catch (error) {
             console.error("Error saving changes:", error);

@@ -1,64 +1,144 @@
 /** @entrypoint */
 import topic from "dojo/topic";
+import { action, computed, observable } from "mobx";
 import { Feature } from "ol";
 import View from "ol/View";
 import type { Control } from "ol/control";
+import type { Extent } from "ol/extent";
 import type { Geometry } from "ol/geom";
 import { fromLonLat, transformExtent } from "ol/proj";
 
 import { errorModal } from "@nextgisweb/gui/error";
 import { appendTo } from "@nextgisweb/pyramid/company-logo";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import settings from "@nextgisweb/pyramid/settings!webmap";
 import { buildControls } from "@nextgisweb/webmap/map-controls";
 import MapToolbar from "@nextgisweb/webmap/map-toolbar";
 import PanelsManager from "@nextgisweb/webmap/panels-manager";
+import { WebMapTabsStore } from "@nextgisweb/webmap/webmap-tabs";
 
 import { FeatureHighlighter } from "../feature-highlighter/FeatureHighlighter";
 import { LinkToMainMap } from "../map-controls/control/LinkToMainMap";
 import MapStatesObserver from "../map-state-observer";
+import type { MapStatesObserver as IMapStatesObserver } from "../map-state-observer/MapStatesObserver";
 import { Map } from "../ol/Map";
 import type { BaseLayer } from "../ol/layer/_Base";
-import type { PanelElements } from "../panels-manager/PanelsManager";
+import type { PanelPlugin } from "../panels-manager/registry";
+import type { PluginBase } from "../plugin/PluginBase";
 import WebmapStore from "../store";
 import type {
-    DojoDisplay,
+    DisplayConfig,
     DojoDisplayIdentify,
     MapPlugin,
     MapURLParams,
-    PanelDojoItem,
+    TinyConfig,
+    WebmapAdapter,
 } from "../type";
 import type { LayerItemConfig, TreeItemConfig } from "../type/TreeItems";
+import type { WebMapSettings } from "../type/WebmapSettings";
 import { getURLParams, setURLParam } from "../utils/URL";
 
 import { CustomItemFileWriteStore } from "./CustomItemFileWriteStore";
 import type { StoreItem } from "./CustomItemFileWriteStore";
 import { LoggedDeferred } from "./LoggedDeferred";
-import { makePanels } from "./makePanels";
 import type { StoreGroupConfig, StoreItemConfig } from "./type";
 import { entrypointsLoader } from "./util/entrypointLoader";
 import { handlePostMessage } from "./util/handlePostMessage";
-
-import "./Display.css";
 
 export default class ShadowDisplay {
     private readonly modeURLParam: keyof MapURLParams = "panel";
     private readonly emptyModeURLValue = "none";
 
-    constructor(private display: DojoDisplay) {
-        display._urlParams = getURLParams<MapURLParams>();
+    mapNode!: HTMLElement;
 
-        display._itemStoreDeferred = new LoggedDeferred("_itemStoreDeferred");
-        display._mapDeferred = new LoggedDeferred("_mapDeferred");
-        display._mapExtentDeferred = new LoggedDeferred("_mapExtentDeferred");
-        display._layersDeferred = new LoggedDeferred("_layersDeferred");
-        display._postCreateDeferred = new LoggedDeferred("_postCreateDeferred");
-        display._startupDeferred = new LoggedDeferred("_startupDeferred");
+    config!: DisplayConfig;
+    tinyConfig!: TinyConfig;
+    clientSettings: WebMapSettings = settings;
+    identify!: DojoDisplayIdentify;
+    featureHighlighter!: FeatureHighlighter;
 
-        display.mapStates = MapStatesObserver.getInstance();
+    _mapDeferred!: LoggedDeferred;
+
+    _mapExtentDeferred!: LoggedDeferred;
+    _urlParams!: Record<keyof MapURLParams, string>;
+
+    _mid!: Record<string, any>;
+    _midDeferred!: Record<string, LoggedDeferred>;
+    _layersDeferred!: LoggedDeferred;
+    _postCreateDeferred!: LoggedDeferred;
+    _startupDeferred!: LoggedDeferred;
+    _itemStoreDeferred!: LoggedDeferred;
+    _extent_const!: Extent;
+    _extent!: Extent;
+    _layer_order!: number[];
+    tiny!: boolean;
+
+    _itemConfigById!: Record<string, TreeItemConfig>;
+
+    tabsManager: WebMapTabsStore;
+    panelsManager!: PanelsManager;
+
+    itemStore!: CustomItemFileWriteStore;
+    webmapStore!: WebmapStore;
+    mapStates!: IMapStatesObserver;
+
+    displayProjection!: string;
+    lonlatProjection!: string;
+
+    mapToolbar!: MapToolbar;
+    _plugins!: Record<string, PluginBase>;
+
+    leftTopControlPane!: HTMLDivElement;
+    leftBottomControlPane!: HTMLDivElement;
+    rightTopControlPane!: HTMLDivElement;
+    rightBottomControlPane!: HTMLDivElement;
+
+    /**
+     * @deprecated use webmapStore.getlayers() instead
+     */
+    _layers!: Record<number, BaseLayer>;
+
+    _adapters!: Record<string, WebmapAdapter>;
+
+    @observable.shallow accessor _baseLayer!: BaseLayer;
+    readonly map: Map;
+
+    // The Item is now editable. Or not. Who knows?
+    @observable.shallow accessor item: StoreItem | null = null;
+    @observable.shallow accessor itemConfig: LayerItemConfig | null = null;
+
+    constructor({ config }: { config: DisplayConfig }) {
+        this.config = config;
+
+        this._urlParams = getURLParams<MapURLParams>();
+
+        this._itemStoreDeferred = new LoggedDeferred("_itemStoreDeferred");
+        this._mapDeferred = new LoggedDeferred("_mapDeferred");
+        this._mapExtentDeferred = new LoggedDeferred("_mapExtentDeferred");
+        this._layersDeferred = new LoggedDeferred("_layersDeferred");
+        this._postCreateDeferred = new LoggedDeferred("_postCreateDeferred");
+        this._startupDeferred = new LoggedDeferred("_startupDeferred");
+        this.tabsManager = new WebMapTabsStore();
+        this.mapStates = MapStatesObserver.getInstance();
+
+        this.map = new Map({
+            logo: false,
+            controls: [],
+            view: new View({
+                minZoom: 3,
+                constrainResolution: true,
+                // TODO: Investigate the source of null values. Normal extent from API types without nulls.
+                extent: !(
+                    this.config.extent_const as (null | number)[]
+                ).includes(null)
+                    ? this._extent_const
+                    : undefined,
+            }),
+        });
 
         // AMD module loading
-        display._midDeferred = {};
-        display._mid = {};
+        this._midDeferred = {};
+        this._mid = {};
 
         this._buildPanelsManager();
 
@@ -66,13 +146,13 @@ export default class ShadowDisplay {
         this._initializeMids();
 
         // Map plugins
-        const wmpmids = Object.keys(display.config.webmapPlugin);
+        const wmpmids = Object.keys(this.config.webmapPlugin);
         const deferred = new LoggedDeferred("_midDeferred.webmapPlugin");
 
-        display._midDeferred.webmapPlugin = deferred;
+        this._midDeferred.webmapPlugin = deferred;
 
         entrypointsLoader(wmpmids).then((obj) => {
-            display._mid.wmplugin = obj;
+            this._mid.wmplugin = obj;
 
             deferred.resolve(obj);
         });
@@ -80,30 +160,30 @@ export default class ShadowDisplay {
         this._itemStoreSetup();
         this._webmapStoreSetup();
 
-        display._mapDeferred.then(() => {
+        this._mapDeferred.then(() => {
             this._itemStorePrepare();
         });
 
-        display.displayProjection = "EPSG:3857";
-        display.lonlatProjection = "EPSG:4326";
+        this.displayProjection = "EPSG:3857";
+        this.lonlatProjection = "EPSG:4326";
 
-        if (display.config.extent[3] > 82) {
-            display.config.extent[3] = 82;
+        if (this.config.extent[3] > 82) {
+            this.config.extent[3] = 82;
         }
-        if (display.config.extent[1] < -82) {
-            display.config.extent[1] = -82;
+        if (this.config.extent[1] < -82) {
+            this.config.extent[1] = -82;
         }
 
-        display._extent = transformExtent(
-            display.config.extent,
-            display.lonlatProjection,
-            display.displayProjection
+        this._extent = transformExtent(
+            this.config.extent,
+            this.lonlatProjection,
+            this.displayProjection
         );
 
-        display._extent_const = transformExtent(
-            display.config.extent_const,
-            display.lonlatProjection,
-            display.displayProjection
+        this._extent_const = transformExtent(
+            this.config.extent_const,
+            this.lonlatProjection,
+            this.displayProjection
         );
 
         // // Layers panel
@@ -111,9 +191,9 @@ export default class ShadowDisplay {
 
         // // Map and plugins
         Promise.all([
-            display._midDeferred.basemap,
-            display._midDeferred.webmapPlugin,
-            display._startupDeferred,
+            this._midDeferred.basemap,
+            this._midDeferred.webmapPlugin,
+            this._startupDeferred,
         ])
             .then(() => {
                 this._pluginsSetup(true);
@@ -124,7 +204,7 @@ export default class ShadowDisplay {
             });
 
         // // Setup layers
-        Promise.all([display._midDeferred.adapter, display._itemStoreDeferred])
+        Promise.all([this._midDeferred.adapter, this._itemStoreDeferred])
             .then(() => {
                 this._layersSetup();
             })
@@ -132,18 +212,17 @@ export default class ShadowDisplay {
                 console.error(err);
             });
 
-        Promise.all([display._layersDeferred, this._mapSetup])
+        Promise.all([this._layersDeferred, this._mapSetup])
             .then(() => {
                 this._mapAddLayers();
-                display.featureHighlighter =
-                    this._initializeFeatureHighlighter();
+                this.featureHighlighter = this._initializeFeatureHighlighter();
             })
             .catch((err) => {
                 console.error(err);
             });
 
         // Tools and plugins
-        Promise.all([display._midDeferred.plugin, display._layersDeferred])
+        Promise.all([this._midDeferred.plugin, this._layersDeferred])
             .then(() => {
                 this._pluginsSetup();
                 this._buildLayersTree();
@@ -154,75 +233,84 @@ export default class ShadowDisplay {
 
         // display.tools = [];
     }
-    startup() {
+    startup({
+        target,
+        leftTopControlPane,
+        leftBottomControlPane,
+        rightTopControlPane,
+        rightBottomControlPane,
+    }: {
+        target: HTMLElement;
+        leftTopControlPane: HTMLDivElement;
+        leftBottomControlPane: HTMLDivElement;
+        rightTopControlPane: HTMLDivElement;
+        rightBottomControlPane: HTMLDivElement;
+    }) {
+        this.mapNode = target;
+        this.leftTopControlPane = leftTopControlPane;
+        this.leftBottomControlPane = leftBottomControlPane;
+        this.rightTopControlPane = rightTopControlPane;
+        this.rightBottomControlPane = rightBottomControlPane;
         this._hideNavMenuForGuest();
-
-        this.display._startupDeferred.resolve(true);
+        this._startupDeferred.resolve(true);
+        this._postCreate();
     }
     _postCreate() {
-        const display = this.display;
+        // this._handleTinyDisplayMode();
 
-        const domElements: PanelElements = {
-            main: display.mainContainer,
-            leftPanel: display.leftPanelPane,
-            navigation: display.navigationMenuPane.domNode,
-        };
-        display.panelsManager.initDomElements(domElements);
-        this._handleTinyDisplayMode();
-
-        display._postCreateDeferred.resolve(true);
+        this._postCreateDeferred.resolve(true);
     }
 
     // MAP & CONTROLS
 
+    @computed
+    get activeBasemapKey(): "blank" | string {
+        if (!this._baseLayer || !this._baseLayer.name) {
+            return "blank";
+        }
+        return this._baseLayer.name;
+    }
+
+    @action
+    setBaseLayer(layer: BaseLayer) {
+        this._baseLayer = layer;
+    }
+
+    @action
     _mapSetup() {
-        this.display.mapToolbar = new MapToolbar({
-            display: this.display,
-            target: this.display.leftBottomControlPane,
+        this.mapToolbar = new MapToolbar({
+            display: this,
+            target: this.leftBottomControlPane,
         });
 
-        this.display.map = new Map({
-            target: this.display.mapNode,
-            logo: false,
-            controls: [],
-            view: new View({
-                minZoom: 3,
-                constrainResolution: true,
-                // TODO: Investigate the source of null values. Normal extent from API types without nulls.
-                extent: !(
-                    this.display.config.extent_const as (null | number)[]
-                ).includes(null)
-                    ? this.display._extent_const
-                    : undefined,
-            }),
-        });
+        this.map.startup(this.mapNode);
 
-        const controlsReady = buildControls(this.display);
+        const controlsReady = buildControls(this);
 
         if (controlsReady.has("id")) {
             const { control } = controlsReady.get("id")!;
-            this.display.identify = control as DojoDisplayIdentify;
-            this.display.mapStates.addState(
-                "identifying",
-                this.display.identify
-            );
-            this.display.mapStates.setDefaultState("identifying", true);
+            this.identify = control as DojoDisplayIdentify;
+            this.mapStates.addState("identifying", this.identify);
+            this.mapStates.setDefaultState("identifying", true);
             this._identifyFeatureByAttrValue();
         }
 
         topic.publish("/webmap/tools/initialized", true);
 
         // Resize OpenLayers Map on container resize
-        this.display.mapPane.on("resize", () => {
-            this.display.map.olMap.updateSize();
+        const resizeObserver = new ResizeObserver(() => {
+            this.map.olMap.updateSize();
         });
+        resizeObserver.observe(this.mapNode);
+
+        // resizeObserver.disconnect();
 
         // Basemaps initialization
-        const settings = this.display.clientSettings;
+        const settings = this.clientSettings;
         let idx = 0;
 
         for (const bm of settings.basemaps) {
-            const MID = this.display._mid.basemap[bm.base.mid];
+            const MID = this._mid.basemap[bm.base.mid];
 
             const baseOptions = { ...bm.base };
             const layerOptions = { ...bm.layer };
@@ -240,10 +328,10 @@ export default class ShadowDisplay {
                 );
 
                 if (layer.olLayer.getVisible()) {
-                    this.display._baseLayer = layer;
+                    this.setBaseLayer(layer);
                 }
                 layer.isBaseLayer = true;
-                this.display.map.addLayer(layer);
+                this.map.addLayer(layer);
             } catch (err) {
                 console.warn(
                     `Can't initialize layer [${baseOptions.keyname}]: ${err}`
@@ -253,20 +341,20 @@ export default class ShadowDisplay {
             idx++;
         }
 
-        appendTo(this.display.mapNode);
-        this.display._mapDeferred.resolve(true);
+        appendTo(this.mapNode);
+        this._mapDeferred.resolve(true);
     }
     _mapAddControls(controls: Control[]) {
         controls.forEach((control) => {
-            this.display.map.olMap.addControl(control);
+            this.map?.olMap.addControl(control);
         });
     }
     _mapAddLayer(id: number) {
-        const layer = this.display.webmapStore.getLayer(id);
-        this.display.map.addLayer(layer);
+        const layer = this.webmapStore.getLayer(id);
+        this.map?.addLayer(layer);
     }
     private _mapAddLayers() {
-        this.display._layer_order.forEach((id) => {
+        this._layer_order.forEach((id) => {
             this._mapAddLayer(id);
         });
     }
@@ -275,10 +363,10 @@ export default class ShadowDisplay {
         this._zoomToInitialExtent();
     }
     _zoomToInitialExtent() {
-        this.display.map.olMap.getView().fit(this.display._extent);
+        this.map.olMap.getView().fit(this._extent);
     }
     _zoomByUrlParams(): boolean {
-        const urlParams = this.display._urlParams;
+        const urlParams = this._urlParams;
 
         if (
             !("zoom" in urlParams && "lon" in urlParams && "lat" in urlParams)
@@ -286,7 +374,7 @@ export default class ShadowDisplay {
             return false;
         }
 
-        const view = this.display.map.olMap.getView();
+        const view = this.map.olMap.getView();
         if (urlParams.lon && urlParams.lat) {
             view.setCenter(
                 fromLonLat([
@@ -309,7 +397,6 @@ export default class ShadowDisplay {
     // STORE & ITEM
 
     prepareItem(item: TreeItemConfig) {
-        const display = this.display;
         const copy = {
             id: item.id,
             type: item.type,
@@ -334,20 +421,19 @@ export default class ShadowDisplay {
             });
         }
 
-        display._itemConfigById[item.id] = item;
+        this._itemConfigById[item.id] = item;
         return copy;
     }
     getItemConfig() {
-        return Object.assign({}, this.display._itemConfigById);
+        return Object.assign({}, this._itemConfigById);
     }
     dumpItem() {
-        return this.display.itemStore.dumpItem(this.display.item);
+        return this.itemStore.dumpItem(this.item);
     }
     private _itemStoreSetup() {
-        const display = this.display;
-        display._itemConfigById = {};
-        const rootItem = this.prepareItem(display.config.rootItem);
-        display.itemStore = new CustomItemFileWriteStore({
+        this._itemConfigById = {};
+        const rootItem = this.prepareItem(this.config.rootItem);
+        this.itemStore = new CustomItemFileWriteStore({
             data: {
                 identifier: "id",
                 label: "label",
@@ -356,24 +442,22 @@ export default class ShadowDisplay {
         });
     }
     private _webmapStoreSetup() {
-        this.display.webmapStore = new WebmapStore({
-            itemStore: this.display.itemStore,
+        this.webmapStore = new WebmapStore({
+            itemStore: this.itemStore,
         });
     }
     private _itemStorePrepare() {
-        const display = this.display;
-
-        display.itemStore.fetch({
+        this.itemStore.fetch({
             queryOptions: { deep: true },
             onItem: (item) => {
                 this._itemStorePrepareItem(item);
             },
             onComplete: () => {
-                display._itemStoreDeferred.resolve(true);
+                this._itemStoreDeferred.resolve(true);
             },
             onError: (error: Error) => {
                 console.error(error);
-                display._itemStoreDeferred.reject(false);
+                this._itemStoreDeferred.reject(false);
             },
         });
     }
@@ -381,16 +465,15 @@ export default class ShadowDisplay {
         this._itemStoreVisibility(item);
     }
     private _itemStoreVisibility(item: StoreItem) {
-        const webmapStore = this.display.webmapStore;
+        const webmapStore = this.webmapStore;
 
         if (webmapStore) {
             webmapStore._itemStoreVisibility(item);
         }
     }
     async getVisibleItems() {
-        return new Promise((resolve, reject) => {
-            const display = this.display;
-            const store = display.itemStore;
+        return new Promise<StoreItem[]>((resolve, reject) => {
+            const store = this.itemStore;
 
             store.fetch({
                 query: { type: "layer", visibility: true },
@@ -408,21 +491,31 @@ export default class ShadowDisplay {
 
     // LAYERS
 
-    setLayerZIndex(id: string, zIndex: number) {
-        const layer = this.display.map.layers[id];
+    switchBasemap(basemapLayerKey: string) {
+        if (!(basemapLayerKey in this.map.layers)) {
+            return false;
+        }
+
+        if (this._baseLayer && this._baseLayer.name) {
+            const { name } = this._baseLayer;
+            this.map.layers[name].olLayer.setVisible(false);
+        }
+
+        const newLayer = this.map.layers[basemapLayerKey];
+        newLayer.olLayer.setVisible(true);
+        this._baseLayer = newLayer;
+
+        return true;
+    }
+    setLayerZIndex(id: number, zIndex: number) {
+        const layer = this.map.layers[id];
         if (layer && layer.olLayer && layer.olLayer.setZIndex) {
             layer.olLayer.setZIndex(zIndex);
         }
     }
-    _getActiveBasemapKey() {
-        if (!this.display._baseLayer || !this.display._baseLayer.name) {
-            return "blank";
-        }
-        return this.display._baseLayer.name;
-    }
+
     private _layersSetup() {
-        const display = this.display;
-        const store = display.itemStore;
+        const store = this.itemStore;
         let visibleStyles: number[] | null = null;
 
         this._adaptersSetup();
@@ -436,10 +529,10 @@ export default class ShadowDisplay {
                 return this.webmapStore._layers;
             },
         });
-        display._layer_order = []; // Layers from back to front
+        this._layer_order = []; // Layers from back to front
 
-        if (typeof display._urlParams.styles === "string") {
-            visibleStyles = display._urlParams.styles
+        if (typeof this._urlParams.styles === "string") {
+            visibleStyles = this._urlParams.styles
                 .split(",")
                 .map((i) => parseInt(i, 10));
         }
@@ -448,7 +541,7 @@ export default class ShadowDisplay {
         store.fetch({
             query: { type: "layer" },
             queryOptions: { deep: true },
-            sort: display.config.drawOrderEnabled
+            sort: this.config.drawOrderEnabled
                 ? [
                       {
                           attribute: "position",
@@ -460,7 +553,7 @@ export default class ShadowDisplay {
 
                 // Turn on layers from permalink
                 let cond;
-                const layer = display.webmapStore.getLayer(
+                const layer = this.webmapStore.getLayer(
                     store.getValue(item, "id")
                 );
                 if (visibleStyles) {
@@ -475,28 +568,27 @@ export default class ShadowDisplay {
                 }
             },
             onComplete: () => {
-                display._layersDeferred.resolve(true);
+                this._layersDeferred.resolve(true);
             },
             onError: (error: Error) => {
                 console.error(error);
-                display._layersDeferred.reject(false);
+                this._layersDeferred.reject(false);
             },
         });
     }
     private _layerSetup(item: StoreItem) {
-        const display = this.display;
-        const store = display.itemStore;
+        const store = this.itemStore;
 
-        const data = display._itemConfigById[store.getValue(item, "id")];
+        const data = this._itemConfigById[store.getValue(item, "id")];
         if (data.type === "layer") {
-            const adapter = display._adapters[data.adapter];
-            const metersPerUnit = display.map.olMap
+            const adapter = this._adapters[data.adapter];
+            const metersPerUnit = this.map.olMap
                 .getView()
                 .getProjection()
                 .getMetersPerUnit();
             if (metersPerUnit !== undefined) {
                 if (data.maxScaleDenom !== null) {
-                    const minResolution = display.map.getResolutionForScale(
+                    const minResolution = this.map.getResolutionForScale(
                         data.maxScaleDenom,
                         metersPerUnit
                     );
@@ -505,7 +597,7 @@ export default class ShadowDisplay {
                     }
                 }
                 if (data.minScaleDenom !== null) {
-                    const maxResolution = display.map.getResolutionForScale(
+                    const maxResolution = this.map.getResolutionForScale(
                         data.minScaleDenom,
                         metersPerUnit
                     );
@@ -520,64 +612,61 @@ export default class ShadowDisplay {
             layer.itemId = data.id;
             layer.itemConfig = data;
 
-            display.webmapStore.addLayer(data.id, layer);
+            this.webmapStore.addLayer(data.id, layer);
         }
     }
     private _onNewStoreItem(item: StoreItem) {
-        const display = this.display;
-        const store = display.itemStore;
+        const store = this.itemStore;
         this._layerSetup(item);
-        display._layer_order.unshift(store.getValue(item, "id"));
+        this._layer_order.unshift(store.getValue(item, "id"));
     }
     private _adaptersSetup() {
-        const display = this.display;
-        display._adapters = {};
+        this._adapters = {};
 
-        Object.keys(display._mid.adapter).forEach((k) => {
-            display._adapters[k] = new display._mid.adapter[k]({
-                display,
+        Object.keys(this._mid.adapter).forEach((k) => {
+            this._adapters[k] = new this._mid.adapter[k]({
+                display: this,
             });
         });
     }
     private _buildLayersTree() {
-        const display = this.display;
-        const { expanded } = display.config.itemsStates;
-        display.webmapStore.setWebmapItems(display.config.rootItem.children);
-        display.webmapStore.setExpanded(expanded);
+        const { expanded } = this.config.itemsStates;
+        this.webmapStore.setWebmapItems(this.config.rootItem.children);
+        this.webmapStore.setExpanded(expanded);
     }
-    private _switchBasemap(basemapLayerKey: string) {
-        const display = this.display;
-
-        if (!(basemapLayerKey in display.map.layers)) {
+    @action
+    _switchBasemap(basemapLayerKey: string) {
+        if (!this.map) {
+            return;
+        }
+        if (!(basemapLayerKey in this.map.layers)) {
             return false;
         }
 
-        if (display._baseLayer && display._baseLayer.name) {
-            const { name } = display._baseLayer;
-            display.map.layers[name].olLayer.setVisible(false);
+        if (this._baseLayer && this._baseLayer.name) {
+            const { name } = this._baseLayer;
+            this.map.layers[name].olLayer.setVisible(false);
         }
 
-        const newLayer = display.map.layers[basemapLayerKey];
+        const newLayer = this.map.layers[basemapLayerKey];
         newLayer.olLayer.setVisible(true);
-        display._baseLayer = newLayer;
+        this._baseLayer = newLayer;
 
         return true;
     }
     private _layersPanelSetup() {
-        const display = this.display;
-
         Promise.all([
-            display._layersDeferred,
-            display._mapDeferred,
-            display._postCreateDeferred,
-            display.panelsManager.panelsReady.promise,
+            this._layersDeferred,
+            this._mapDeferred,
+            this._postCreateDeferred,
+            this.panelsManager.panelsReady.promise,
         ])
             .then(() => {
-                if (display._urlParams.base) {
-                    this._switchBasemap(display._urlParams.base);
+                if (this._urlParams.base) {
+                    this.switchBasemap(this._urlParams.base);
                 }
                 this._setMapExtent();
-                display._mapExtentDeferred.resolve(true);
+                this._mapExtentDeferred.resolve(true);
             })
             .catch((err) => {
                 console.error(err);
@@ -587,19 +676,16 @@ export default class ShadowDisplay {
     // PLUGINS
 
     private _pluginsSetup(wmplugin?: boolean) {
-        const display = this.display;
-
-        if (!display._plugins) {
-            display._plugins = {};
+        if (!this._plugins) {
+            this._plugins = {};
         }
 
-        const plugins = wmplugin ? display._mid.wmplugin : display._mid.plugin;
+        const plugins = wmplugin ? this._mid.wmplugin : this._mid.plugin;
         this._installPlugins(plugins);
     }
     private _installPlugins(
         plugins: Record<string, MapPlugin | { default: MapPlugin }>
     ) {
-        const display = this.display;
         Object.keys(plugins).forEach((key) => {
             console.log("Plugin [%s]::constructor...", key);
 
@@ -622,26 +708,26 @@ export default class ShadowDisplay {
 
             const plugin = new pluginInfo({
                 identity: key,
-                display,
-                itemStore: plugins ? false : display.itemStore,
+                display: this,
+                itemStore: plugins ? false : this.itemStore,
             });
 
-            display._postCreateDeferred.then(() => {
+            this._postCreateDeferred.then(() => {
                 console.log("Plugin [%s]::postCreate...", key);
                 plugin.postCreate();
 
-                display._startupDeferred.then(() => {
+                this._startupDeferred.then(() => {
                     console.log("Plugin [%s]::startup...", key);
                     plugin.startup();
 
-                    display._plugins[key] = plugin;
+                    this._plugins[key] = plugin;
                     console.info("Plugin [%s] registered", key);
                 });
             });
         });
     }
     private _initializeMids() {
-        const mids = this.display.config.mid;
+        const mids = this.config.mid;
 
         const basemapMids: [
             name: string,
@@ -668,10 +754,10 @@ export default class ShadowDisplay {
             const midarr = mids[key as keyof typeof mids];
 
             const deferred = new LoggedDeferred(`_midDeferred.${key}`);
-            this.display._midDeferred[key] = deferred;
+            this._midDeferred[key] = deferred;
 
             entrypointsLoader(midarr).then((obj) => {
-                this.display._mid[key] = obj;
+                this._mid[key] = obj;
                 deferred.resolve(obj);
             });
         }
@@ -685,37 +771,42 @@ export default class ShadowDisplay {
     }
 
     // FEATURE
+    @action
+    setItemConfig(itemConfig: LayerItemConfig) {
+        this.itemConfig = itemConfig;
+    }
+    @action
+    setItem(item: StoreItem) {
+        this.item = item;
+    }
 
     highlightGeometry(geometry: Geometry): void {
-        this.display.map.zoomToFeature(new Feature({ geometry }));
+        this.map.zoomToFeature(new Feature({ geometry }));
         topic.publish("feature.highlight", {
             olGeometry: geometry,
         });
     }
     handleSelect(selectedKeys: number[]) {
-        const display = this.display;
         if (selectedKeys.length === 0 || selectedKeys.length < 1) {
             return;
         }
         const itemId = selectedKeys[0];
-        display.itemStore.fetchItemByIdentity({
+        this.itemStore.fetchItemByIdentity({
             identity: itemId,
             onItem: (item) => {
-                display.set(
-                    "itemConfig",
-                    display._itemConfigById[itemId] as LayerItemConfig
+                this.setItemConfig(
+                    this._itemConfigById[itemId] as LayerItemConfig
                 );
-                display.set("item", item);
+
+                this.setItem(item as StoreItem);
             },
         });
     }
     _initializeFeatureHighlighter() {
-        return new FeatureHighlighter(this.display.map);
+        return new FeatureHighlighter(this.map);
     }
     private _identifyFeatureByAttrValue() {
-        const display = this.display;
-
-        const urlParams = display._urlParams;
+        const urlParams = this._urlParams;
 
         if (
             !(
@@ -727,7 +818,7 @@ export default class ShadowDisplay {
             return;
         }
 
-        display.identify
+        this.identify
             .identifyFeatureByAttrValue(
                 Number(urlParams.hl_lid),
                 urlParams.hl_attr,
@@ -748,16 +839,16 @@ export default class ShadowDisplay {
     //  UI
 
     isTinyMode() {
-        return this.display.tinyConfig !== undefined;
+        return this.tinyConfig !== undefined;
     }
 
     getUrlParams() {
-        return this.display._urlParams;
+        return this._urlParams;
     }
 
     private _buildPanelsManager() {
-        const activePanelKey = this.display._urlParams[this.modeURLParam];
-        const onChangePanel = (panel?: PanelDojoItem) => {
+        const activePanelKey = this._urlParams[this.modeURLParam];
+        const onChangePanel = (panel?: PanelPlugin) => {
             if (panel) {
                 setURLParam(this.modeURLParam, panel.name);
             } else {
@@ -767,12 +858,12 @@ export default class ShadowDisplay {
 
         let allowPanels;
         if (this.isTinyMode()) {
-            const panels = this.display._urlParams.panels;
+            const panels = this._urlParams.panels;
             allowPanels = panels ? panels.split(",") : [];
         }
 
-        this.display.panelsManager = new PanelsManager(
-            this.display,
+        this.panelsManager = new PanelsManager(
+            this,
             activePanelKey,
             allowPanels,
             onChangePanel
@@ -781,44 +872,33 @@ export default class ShadowDisplay {
         this._buildPanels();
     }
     private async _buildPanels() {
-        await Promise.all([
-            this.display._layersDeferred,
-            this.display._postCreateDeferred,
-        ]);
-        try {
-            makePanels({ display: this.display });
-        } catch (err) {
-            console.error(err);
-        }
+        await Promise.all([this._layersDeferred, this._postCreateDeferred]);
     }
     private _buildTinyPanels() {
-        const display = this.display;
-        if (!display.panelsManager.getPanelsCount()) {
+        if (!this.panelsManager.getPanelsCount()) {
             return;
         }
 
-        display.domNode.classList.add("tiny-panels");
-        const activePanel = display.panelsManager.getActivePanelName();
+        this.domNode.classList.add("tiny-panels");
+        const activePanel = this.panelsManager.getActivePanelName();
         if (!activePanel) {
             return;
         }
-        display.panelsManager.deactivatePanel();
-        display.panelsManager.activatePanel(activePanel);
+        this.panelsManager.deactivatePanel();
+        this.panelsManager.activatePanel(activePanel);
     }
     private _handleTinyDisplayMode() {
-        const display = this.display;
-
         if (!this.isTinyMode()) {
             return;
         }
 
-        display.domNode.classList.add("tiny");
+        this.domNode.classList.add("tiny");
 
         Promise.all([
-            display._layersDeferred,
-            display._mapDeferred,
-            display._postCreateDeferred,
-            display.panelsManager.panelsReady.promise,
+            this._layersDeferred,
+            this._mapDeferred,
+            this._postCreateDeferred,
+            this.panelsManager.panelsReady.promise,
         ])
             .then(() => {
                 this._buildTinyPanels();
@@ -830,7 +910,7 @@ export default class ShadowDisplay {
             });
     }
     private _hideNavMenuForGuest() {
-        if (!this.display.clientSettings.hide_nav_menu || !ngwConfig.isGuest) {
+        if (!this.clientSettings.hide_nav_menu || !ngwConfig.isGuest) {
             return;
         }
 
@@ -839,14 +919,13 @@ export default class ShadowDisplay {
         navMenu.style.display = "none";
     }
     private _addLinkToMainMap() {
-        const display = this.display;
-        if (display._urlParams.linkMainMap !== "true") {
+        if (this._urlParams.linkMainMap !== "true") {
             return;
         }
-        display.map.olMap.addControl(
+        this.map.olMap.addControl(
             new LinkToMainMap({
-                url: display.tinyConfig.mainDisplayUrl,
-                target: display.rightTopControlPane,
+                url: this.tinyConfig.mainDisplayUrl,
+                target: this.rightTopControlPane,
                 tipLabel: gettext("Open full map"),
             })
         );
@@ -867,6 +946,6 @@ export default class ShadowDisplay {
      * }, false);
      */
     _handlePostMessage() {
-        handlePostMessage(this.display);
+        handlePostMessage(this);
     }
 }

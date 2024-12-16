@@ -69,7 +69,7 @@ export function SRSWidget({ id, readonly }: { id: number; readonly: boolean }) {
             if ("message" in err) {
                 modalForm.setFields([
                     {
-                        name: "projstring",
+                        name: "projStr",
                         errors: [err.message],
                     },
                 ]);

@@ -1,1 +1,1 @@
-export { SharePanel as default } from "./SharePanel";
+export { default } from "./SharePanel";

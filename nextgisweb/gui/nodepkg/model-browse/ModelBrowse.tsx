@@ -16,6 +16,7 @@ import {
     Tooltip,
     message,
 } from "@nextgisweb/gui/antd";
+import type { ButtonProps } from "@nextgisweb/gui/antd";
 import { errorModal } from "@nextgisweb/gui/error";
 import {
     AddIcon,
@@ -77,7 +78,7 @@ interface ModelBrowseProps<Data extends ModalBrowseData = ModalBrowseData>
     showActionColumn?: boolean;
     customRowSelection?: TableRowSelection<Data>;
 
-    createProps?: React.ButtonHTMLAttributes<HTMLButtonElement>;
+    createProps?: ButtonProps;
     headerControls?: FC<ControlProps<Data>>[];
     selectedControls?: FC<ControlProps<Data>>[];
     collectionOptions?: RequestOptionsByMethod<"get">;

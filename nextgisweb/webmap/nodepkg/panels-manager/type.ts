@@ -1,4 +1,4 @@
-import type { DojoDisplay, PanelDojoItem } from "../type";
+import type ShadowDisplay from "../compat/ShadowDisplay";
 
 export interface TopicSubscription {
     remove: () => void;
@@ -17,11 +17,9 @@ export interface DisplayItemConfig {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ReactPanelComponentPropType = Record<string, any>;
 
-export interface ReactPanelComponentProps {
-    display: DojoDisplay;
+export type ReactPanelComponentProps<T = unknown> = {
+    display: ShadowDisplay;
     title: string;
     close?: () => void;
     visible?: boolean;
-}
-
-export type DojoPanel = PanelDojoItem;
+} & T;

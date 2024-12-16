@@ -6,7 +6,10 @@ import type { ComponentType, ReactNode } from "react";
 
 import type { Form } from "@nextgisweb/gui/antd";
 
-export type FormProps = Omit<Parameters<typeof Form>[0], "onChange" | "id">;
+export type FormProps = Omit<
+    Parameters<typeof Form>[0],
+    "onChange" | "id" | "form"
+> & { form?: FormInstance<any> };
 
 export type SizeType = FormProps["size"];
 

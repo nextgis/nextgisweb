@@ -1,34 +1,16 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/// <reference types="dojo/dijit" />
-
 import type Feature from "ol/Feature";
 import type OlControl from "ol/control/Control";
 import type { Options } from "ol/control/Control";
-import type { Extent } from "ol/extent";
-import type { Geometry } from "ol/geom";
 
-import type {
-    CustomItemFileWriteStore,
-    StoreItem,
-} from "../compat/CustomItemFileWriteStore";
-import type { LoggedDeferred } from "../compat/LoggedDeferred";
-import type { StoreItemConfig } from "../compat/type";
-import type { MapStatesObserver } from "../map-state-observer/MapStatesObserver";
-import type MapToolbar from "../map-toolbar";
+import type { CustomItemFileWriteStore } from "../compat/CustomItemFileWriteStore";
+import type ShadowDisplay from "../compat/ShadowDisplay";
 import type { ToggleControl } from "../map-toolbar/ToggleControl";
 import type { Map } from "../ol/Map";
-import type { BaseLayer } from "../ol/layer/_Base";
-import type PanelsManager from "../panels-manager";
 import type { PluginBase } from "../plugin/PluginBase";
-import type WebmapStore from "../store";
 import type { VisibleMode } from "../store/annotations/AnnotationsStore";
 import type { WebMapTab } from "../webmap-tabs/WebMapTabsStore";
 
-import type { DisplayConfig } from "./DisplayConfig";
-import type { LayerItemConfig, TreeItemConfig } from "./TreeItems";
-import type { WebMapSettings } from "./WebmapSettings";
-
-import type { PanelDojoItem } from ".";
+import type { LayerItemConfig } from "./TreeItems";
 
 export interface HighlightFeatureData {
     geom: string;
@@ -99,103 +81,14 @@ export interface MapURLParams {
     linkMainMap?: "true";
 }
 
-type ConfigMap = {
-    itemConfig: LayerItemConfig | null;
-    item: StoreItem | null;
-};
-
 export interface TinyConfig {
     mainDisplayUrl: string;
 }
 
 export type MapPlugin = new (val: PluginParams) => PluginBase;
 
-export interface DojoDisplay extends dijit._WidgetBase, ConfigMap {
-    leftPanelPane: PanelDojoItem;
-    navigationMenuPane: dijit.layout.ContentPane;
-    mainContainer: dijit.layout.BorderContainer;
-    mapContainer: dijit.layout.BorderContainer;
-    mapPane: dijit.layout.ContentPane;
-    mapNode: HTMLElement;
-
-    config: DisplayConfig;
-    tinyConfig: TinyConfig;
-    clientSettings: WebMapSettings;
-    identify: DojoDisplayIdentify;
-    featureHighlighter: FeatureHighlighter;
-    getUrlParams: () => Record<string, string>;
-    isTinyMode: () => boolean;
-    highlightGeometry(geometry: Geometry): void;
-    isTinyModePlugin: (plugin: string) => boolean;
-    prepareItem: (item: TreeItemConfig) => StoreItemConfig;
-    _installPlugins: (plugins: Record<string, PluginBase>) => void;
-    _onNewStoreItem: (item: StoreItem) => void;
-    _mapAddLayer: (id: number) => void;
-    _mapDeferred: LoggedDeferred;
-    _zoomToInitialExtent: () => void;
-    _mapExtentDeferred: LoggedDeferred;
-    _urlParams: Record<keyof MapURLParams, string>;
-
-    _mid: Record<string, any>;
-    _midDeferred: Record<string, LoggedDeferred>;
-    _layersDeferred: LoggedDeferred;
-    _postCreateDeferred: LoggedDeferred;
-    _startupDeferred: LoggedDeferred;
-    _itemStoreDeferred: LoggedDeferred;
-    _extent_const: Extent;
-    _extent: Extent;
-    _layer_order: number[];
-    tiny: boolean;
-    _identifyFeatureByAttrValue: () => void;
-
-    // The Item is now editable. Or not. Who knows?
-    item: StoreItem;
-
-    set<T extends keyof ConfigMap>(key: T, config: ConfigMap[T]): void;
-    get<T extends keyof ConfigMap>(name: T): ConfigMap[T];
-
-    _layersSetup: () => void;
-    handleSelect: (selectedKeys: number[]) => void;
-    setLayerZIndex: (id: number, zIndex: number) => void;
-    _switchBasemap: (basemapLayerKey: string) => void;
-    _getActiveBasemapKey: () => string;
-    dumpItem: () => TreeItemConfig;
-    getVisibleItems: () => Promise<StoreItem[]>;
-
-    tabContainer: TabContainer;
-
-    _itemConfigById: Record<string, TreeItemConfig>;
-
-    panelsManager: PanelsManager;
-
-    _baseLayer: BaseLayer;
-
-    itemStore: CustomItemFileWriteStore;
-    getItemConfig: () => Record<string, TreeItemConfig>;
-    webmapStore: WebmapStore;
-    mapStates: MapStatesObserver;
-
-    map: Map;
-
-    displayProjection: string;
-    lonlatProjection: string;
-
-    mapToolbar: MapToolbar;
-    _mapAddControls: (controls: MapControl[]) => void;
-    _plugins: Record<string, PluginBase>;
-
-    leftTopControlPane: HTMLDivElement;
-    leftBottomControlPane: HTMLDivElement;
-    rightTopControlPane: HTMLDivElement;
-    rightBottomControlPane: HTMLDivElement;
-
-    /**
-     * @deprecated use webmapStore.getlayers() instead
-     */
-    _layers: Record<number, BaseLayer>;
-
-    _adapters: Record<string, WebmapAdapter>;
-}
+/** @deprecated use {@link ShadowDisplay} instead */
+export type DojoDisplay = ShadowDisplay;
 
 export interface PluginMenuItem {
     icon: string;
@@ -205,7 +98,7 @@ export interface PluginMenuItem {
 
 export interface PluginParams {
     identity: string;
-    display: DojoDisplay;
+    display: ShadowDisplay;
     itemStore: CustomItemFileWriteStore | boolean;
 }
 
