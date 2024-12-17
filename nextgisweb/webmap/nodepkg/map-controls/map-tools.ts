@@ -1,9 +1,7 @@
-/// <reference types="dojo/dijit" />
-
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
+import type ShadowDisplay from "../compat/ShadowDisplay";
 import type MapToolbar from "../map-toolbar";
-import type { DojoDisplay } from "../type/DojoDisplay";
 
 import { ToolMeasure } from "./tool/Measure";
 import { ToolSwipe } from "./tool/Swipe";
@@ -68,12 +66,12 @@ export const ToolsInfo: ToolInfo[] = [
     },
 ];
 
-export const getToolsInfo = (display: DojoDisplay): ToolInfo[] => {
+export const getToolsInfo = (display: ShadowDisplay): ToolInfo[] => {
     return getControlsInfo<ToolInfo>(display, ToolsInfo);
 };
 
 export const buildTools = (
-    display: DojoDisplay,
+    display: ShadowDisplay,
     tools: ToolInfo[],
     controlsReady: Map<string, ControlReady>
 ): MapToolbar => {

@@ -18,7 +18,7 @@ import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import FilterExtentBtn from "@nextgisweb/webmap/filter-extent-btn";
-import type { DojoDisplay } from "@nextgisweb/webmap/type";
+import type { ShadowDisplay } from "@nextgisweb/webmap/type";
 import type { TreeItemConfig } from "@nextgisweb/webmap/type/TreeItems";
 
 import type { FeatureAttachment } from "../../type";
@@ -35,7 +35,7 @@ import "./AttachmentsTab.less";
 const tipLabel = gettext("Draw the geometry on the map to visualize the attachments to the objects");
 
 interface AttachmentsTabProps {
-    display: DojoDisplay;
+    display: ShadowDisplay;
     label: string;
 }
 
@@ -53,7 +53,7 @@ interface LayerItemView {
 
 type IdentifyFeatureFunc = (featureId: number, layerId: number) => void;
 
-const getLayersInfo = (display: DojoDisplay) => {
+const getLayersInfo = (display: ShadowDisplay) => {
     const checked = display.webmapStore.checked;
     const itemConfig = display.getItemConfig();
 
@@ -193,7 +193,7 @@ const makeAttachmentsList = (
 
 const layerItems = (
     layerAttachments: LayerItemView[] | undefined,
-    display: DojoDisplay
+    display: ShadowDisplay
 ) => {
     if (!layerAttachments) {
         return undefined;
@@ -257,7 +257,7 @@ const ButtonBulkLoad = ({ layerAttachments }: ButtonBulkLoadProps) => {
 };
 
 const fetchFeaturesAttachments = async (
-    display: DojoDisplay,
+    display: ShadowDisplay,
     signal: AbortSignal,
     geomWKT: string | undefined
 ): Promise<LayerItemView[]> => {

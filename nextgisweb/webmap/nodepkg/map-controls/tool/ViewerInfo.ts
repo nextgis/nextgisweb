@@ -5,15 +5,15 @@ import { html as iconHtml } from "@nextgisweb/pyramid/icon";
 import type { ToggleControl } from "@nextgisweb/webmap/map-toolbar/ToggleControl";
 import MapViewerInfoComp from "@nextgisweb/webmap/map-viewer-info";
 import type { MapViewerInfoProps } from "@nextgisweb/webmap/map-viewer-info/MapViewerInfo";
-import type { DojoDisplay } from "@nextgisweb/webmap/type";
+import type { ShadowDisplay } from "@nextgisweb/webmap/type";
 
-import { Base } from "./ToolBase";
+import { ToolBase } from "./ToolBase";
 
 interface ViewerInfoOptions {
-    display: DojoDisplay;
+    display: ShadowDisplay;
 }
 
-export class ToolViewerInfo extends Base {
+export class ToolViewerInfo extends ToolBase {
     customCssClass: string = "viewer-info-tool";
     label: string;
     customIcon: string;

@@ -8,7 +8,7 @@ import { WebMapTabs } from "@nextgisweb/webmap/webmap-tabs";
 import ShadowDisplay from "../compat/ShadowDisplay";
 import NavigationMenu from "../navigation-menu";
 import type { PanelPlugin } from "../panels-manager/registry";
-import type { ReactPanelComponentProps } from "../panels-manager/type";
+import type { PanelComponentProps } from "../panels-manager/type";
 import type { DisplayConfig } from "../type";
 
 import "./Display.css";
@@ -26,7 +26,7 @@ const ActiveComponent = observer(
         if (activePanel) {
             const { load, meta } = activePanel;
 
-            const Loader = lazy<ComponentType<ReactPanelComponentProps>>(() =>
+            const Loader = lazy<ComponentType<PanelComponentProps>>(() =>
                 load().then((mod) => ({
                     default: mod,
                 }))

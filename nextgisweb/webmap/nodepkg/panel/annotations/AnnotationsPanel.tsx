@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 
 import { Select, Switch } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import type { ReactPanelComponentProps } from "@nextgisweb/webmap/panels-manager/type";
+import type { PanelComponentProps } from "@nextgisweb/webmap/panels-manager/type";
 import AnnotationsStore from "@nextgisweb/webmap/store/annotations";
 import type { VisibleMode } from "@nextgisweb/webmap/store/annotations/AnnotationsStore";
 import type { DisplayConfig } from "@nextgisweb/webmap/type";
@@ -21,7 +21,7 @@ interface AnnotationFilter {
     private: boolean;
 }
 
-interface AnnotationsPanelProps extends ReactPanelComponentProps {
+interface AnnotationsPanelProps extends PanelComponentProps {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onTopicPublish: (val: [string, any?]) => void;
     initialAnnotVisible?: VisibleMode;

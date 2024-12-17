@@ -1,16 +1,16 @@
 import { Control } from "ol/control";
 
 import { html as htmlIcon } from "@nextgisweb/pyramid/icon";
-import type { DojoDisplay } from "@nextgisweb/webmap/type";
+import type { ShadowDisplay } from "@nextgisweb/webmap/type";
 
 interface HomeControlOptions {
     target?: HTMLElement;
     tipLabel?: string;
-    display: DojoDisplay;
+    display: ShadowDisplay;
 }
 
 export class InitialExtent extends Control {
-    private display: DojoDisplay;
+    private display: ShadowDisplay;
 
     constructor({ target, display, tipLabel }: HomeControlOptions) {
         const element = document.createElement("div");

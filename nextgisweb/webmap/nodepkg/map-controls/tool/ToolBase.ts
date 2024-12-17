@@ -1,16 +1,21 @@
 import type ShadowDisplay from "@nextgisweb/webmap/compat/ShadowDisplay";
+import type { ToggleControl } from "@nextgisweb/webmap/map-toolbar/ToggleControl";
 
-export abstract class Base {
+export interface ToolBaseOptions {
+    display: ShadowDisplay;
+    label?: string;
+}
+
+export abstract class ToolBase {
     display: ShadowDisplay;
     label = "Tool";
 
-    constructor({
-        display,
-        label,
-    }: {
-        display: ShadowDisplay;
-        label?: string;
-    }) {
+    iconClass?: string;
+    customCssClass?: string;
+    customIcon?: string;
+    toolbarBtn?: ToggleControl;
+
+    constructor({ display, label }: ToolBaseOptions) {
         this.display = display;
         if (label) {
             this.label = label;
@@ -20,4 +25,6 @@ export abstract class Base {
     activate() {}
 
     deactivate() {}
+
+    destroy?(): void;
 }

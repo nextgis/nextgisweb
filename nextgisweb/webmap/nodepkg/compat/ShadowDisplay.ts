@@ -1,5 +1,4 @@
 /** @entrypoint */
-import topic from "dojo/topic";
 import { action, computed, observable } from "mobx";
 import { Feature } from "ol";
 import View from "ol/View";
@@ -12,6 +11,7 @@ import { errorModal } from "@nextgisweb/gui/error";
 import { appendTo } from "@nextgisweb/pyramid/company-logo";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import settings from "@nextgisweb/pyramid/settings!webmap";
+import topic from "@nextgisweb/webmap/compat/topic";
 import { buildControls } from "@nextgisweb/webmap/map-controls";
 import MapToolbar from "@nextgisweb/webmap/map-toolbar";
 import PanelsManager from "@nextgisweb/webmap/panels-manager";
@@ -19,6 +19,7 @@ import { WebMapTabsStore } from "@nextgisweb/webmap/webmap-tabs";
 
 import { FeatureHighlighter } from "../feature-highlighter/FeatureHighlighter";
 import { LinkToMainMap } from "../map-controls/control/LinkToMainMap";
+import { Identify } from "../map-controls/tool/Identify";
 import MapStatesObserver from "../map-state-observer";
 import type { MapStatesObserver as IMapStatesObserver } from "../map-state-observer/MapStatesObserver";
 import { Map } from "../ol/Map";
@@ -28,7 +29,6 @@ import type { PluginBase } from "../plugin/PluginBase";
 import WebmapStore from "../store";
 import type {
     DisplayConfig,
-    DojoDisplayIdentify,
     MapPlugin,
     MapURLParams,
     TinyConfig,
@@ -54,7 +54,7 @@ export default class ShadowDisplay {
     config!: DisplayConfig;
     tinyConfig!: TinyConfig;
     clientSettings: WebMapSettings = settings;
-    identify!: DojoDisplayIdentify;
+    identify!: Identify;
     featureHighlighter!: FeatureHighlighter;
 
     _mapDeferred!: LoggedDeferred;
@@ -136,13 +136,12 @@ export default class ShadowDisplay {
             }),
         });
 
-        // AMD module loading
+        // Module loading
         this._midDeferred = {};
         this._mid = {};
 
         this._buildPanelsManager();
 
-        // Add basemap's AMD modules
         this._initializeMids();
 
         // Map plugins
@@ -288,11 +287,17 @@ export default class ShadowDisplay {
         const controlsReady = buildControls(this);
 
         if (controlsReady.has("id")) {
-            const { control } = controlsReady.get("id")!;
-            this.identify = control as DojoDisplayIdentify;
-            this.mapStates.addState("identifying", this.identify);
-            this.mapStates.setDefaultState("identifying", true);
-            this._identifyFeatureByAttrValue();
+            const controlObj = controlsReady.get("id");
+            if (
+                controlObj &&
+                controlObj.control &&
+                controlObj.control instanceof Identify
+            ) {
+                this.identify = controlObj.control;
+                this.mapStates.addState("identifying", this.identify);
+                this.mapStates.setDefaultState("identifying", true);
+                this._identifyFeatureByAttrValue();
+            }
         }
 
         topic.publish("/webmap/tools/initialized", true);
@@ -762,7 +767,7 @@ export default class ShadowDisplay {
             });
         }
     }
-    private isTinyModePlugin(pluginKey: string) {
+    isTinyModePlugin(pluginKey: string) {
         const disabledPlugins = [
             "@nextgisweb/webmap/plugin/layer-editor",
             "@nextgisweb/webmap/plugin/feature-layer",

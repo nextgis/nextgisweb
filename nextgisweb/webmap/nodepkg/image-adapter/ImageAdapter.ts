@@ -1,5 +1,3 @@
-import ioQuery from "dojo/io-query";
-
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { imageQueue, tileLoadFunction } from "@nextgisweb/pyramid/util";
 import Image from "@nextgisweb/webmap/ol/layer/Image";
@@ -23,6 +21,20 @@ interface QueryParams {
     HEIGHT?: string;
 }
 
+function parseQueryParams(queryString: string): QueryParams {
+    const urlParams = new URLSearchParams(queryString);
+
+    const params: QueryParams = {
+        resource: urlParams.get("resource") || "",
+        symbols: urlParams.get("symbols") || undefined,
+        BBOX: urlParams.get("BBOX") || undefined,
+        WIDTH: urlParams.get("WIDTH") || undefined,
+        HEIGHT: urlParams.get("HEIGHT") || undefined,
+    };
+
+    return params;
+}
+
 export class ImageAdapter extends Adapter {
     createLayer(item: ItemConfig) {
         const layer = new Image(
@@ -30,7 +42,6 @@ export class ImageAdapter extends Adapter {
             {
                 maxResolution: item.maxResolution,
                 minResolution: item.minResolution,
-
                 visible: item.visibility,
                 opacity: item.transparency ? 1 - item.transparency / 100 : 1.0,
             },
@@ -39,14 +50,11 @@ export class ImageAdapter extends Adapter {
                 params: {
                     resource: item.styleId,
                 },
-
                 ratio: 1,
                 crossOrigin: "anonymous",
                 imageLoadFunction: (image, src) => {
                     const [url, query] = src.split("?");
-                    const queryObject = ioQuery.queryToObject(
-                        query
-                    ) as QueryParams;
+                    const queryObject = parseQueryParams(query);
 
                     const resource = queryObject.resource;
                     const symbolsParam = queryObject.symbols;

@@ -1,8 +1,7 @@
 /** @plugin */
 
-import topic from "dojo/topic";
-
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import topic from "@nextgisweb/webmap/compat/topic";
 import { createPanelRegistry } from "@nextgisweb/webmap/panels-manager/registry";
 import AnnotationsStore from "@nextgisweb/webmap/store/annotations";
 import type { VisibleMode } from "@nextgisweb/webmap/store/annotations/AnnotationsStore";
@@ -41,7 +40,7 @@ createPanelRegistry(COMP_ID, () => import("./AnnotationsPanel"), {
             });
 
             plugin.updateMeta({
-                onTopicPublish: ([key, e]: [string, any?]) => {
+                onTopicPublish: ([key, e]) => {
                     topic.publish(key, e);
                 },
 
