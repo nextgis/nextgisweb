@@ -8,7 +8,7 @@ import Zoom from "ol/control/Zoom";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { html } from "@nextgisweb/pyramid/icon";
 
-import type ShadowDisplay from "../compat/ShadowDisplay";
+import type { Display } from "../display";
 
 import { InfoScale } from "./control/InfoScale";
 import { InitialExtent } from "./control/InitialExtent";
@@ -125,9 +125,7 @@ export const ControlsInfo: ControlInfo[] = [
     },
 ];
 
-export const buildControls = (
-    display: ShadowDisplay
-): Map<string, ControlReady> => {
+export const buildControls = (display: Display): Map<string, ControlReady> => {
     const controlsMap = new Map<string, ControlReady>();
 
     const controlsInfo = getControlsInfo<ControlInfo>(display, ControlsInfo);

@@ -1,5 +1,5 @@
 import type { Attrs, FeatureItem } from "@nextgisweb/feature-layer/type";
-import type ShadowDisplay from "@nextgisweb/webmap/compat/ShadowDisplay";
+import type { Display } from "@nextgisweb/webmap/display";
 import type { PanelComponentProps } from "@nextgisweb/webmap/panels-manager/type";
 
 export interface LayerResponse {
@@ -33,7 +33,7 @@ export interface FeatureInfo {
 }
 
 export interface FeatureSelectorProps {
-    display: ShadowDisplay;
+    display: Display;
     featureInfo?: FeatureInfo;
     featureItem?: FeatureItem;
     featuresInfoList: FeatureInfo[];
@@ -51,7 +51,7 @@ export interface FieldsTableProps {
 }
 
 export interface FeatureTabsProps {
-    display: ShadowDisplay;
+    display: Display;
     featureInfo: FeatureInfo;
     featureItem: FeatureItem;
     onUpdate: () => void;
@@ -59,11 +59,11 @@ export interface FeatureTabsProps {
 
 export interface IdentifyResultProps {
     identifyInfo: IdentifyInfo;
-    display: ShadowDisplay;
+    display: Display;
 }
 
 export interface FeatureEditButtonProps {
-    display: ShadowDisplay;
+    display: Display;
     featureId: number;
     resourceId: number;
     onUpdate: () => void;

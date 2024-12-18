@@ -1,4 +1,4 @@
-import type ShadowDisplay from "../compat/ShadowDisplay";
+import type { Display } from "../display";
 import type { ToolBase } from "../map-controls/tool/ToolBase";
 import { MapStatesObserverSingleton } from "../map-state-observer/MapStatesObserver";
 
@@ -7,16 +7,16 @@ import { WidgetBase } from "./WidgetBase";
 
 interface ToolbarButton {
     new (options: unknown): {
-        display: ShadowDisplay;
+        display: Display;
         placeAt: (node: HTMLElement) => void;
     };
 }
 
 export class MapToolbarItems extends WidgetBase {
-    private display: ShadowDisplay;
+    private display: Display;
     private mapStates = MapStatesObserverSingleton.getInstance();
 
-    constructor({ display }: { display: ShadowDisplay }) {
+    constructor({ display }: { display: Display }) {
         super();
         this.display = display;
         this.domNode.className = "map-toolbar-items";

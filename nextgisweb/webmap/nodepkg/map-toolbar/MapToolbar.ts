@@ -1,13 +1,13 @@
 import { Control as OlControl } from "ol/control";
 
-import type { ShadowDisplay } from "../type";
+import type { Display } from "../display";
 
 import { MapToolbarItems } from "./MapToolbarItems";
 
 import "./MapToolbar.css";
 
 export interface MapToolbarOptions {
-    display: ShadowDisplay;
+    display: Display;
     target?: HTMLElement;
 }
 
