@@ -1,5 +1,3 @@
-/** @entrypoint */
-
 import {
     makeRegexDecimalDegrees,
     makeRegexDegreesMinSec,

@@ -1,4 +1,3 @@
-/** @entrypoint */
 import { action, computed, observable } from "mobx";
 import { Feature } from "ol";
 import View from "ol/View";
