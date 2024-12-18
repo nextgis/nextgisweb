@@ -487,9 +487,9 @@ const webpackConfig = defaults("main", (env) => ({
     optimization: {
         runtimeChunk: { name: "chunk/runtime" },
         splitChunks: {
-            // Generate as many chunks as possible
             chunks: "all",
-            minSize: 0,
+            minSize: 30000,
+            maxSize: 250000,
         },
         minimizer: [
             {
