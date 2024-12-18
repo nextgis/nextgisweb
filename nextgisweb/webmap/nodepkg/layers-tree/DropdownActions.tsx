@@ -1,9 +1,10 @@
 import { Divider, Dropdown } from "@nextgisweb/gui/antd";
 import type { MenuProps } from "@nextgisweb/gui/antd";
 import { SvgIcon } from "@nextgisweb/gui/svg-icon";
+import type { RootItemConfig } from "@nextgisweb/webmap/type/api";
 
 import type { PluginBase } from "../plugin/PluginBase";
-import type { RootItemConfig, TreeItemConfig } from "../type/TreeItems";
+import type { TreeItemConfig } from "../type/TreeItems";
 
 import MoreVertIcon from "@nextgisweb/icon/material/more_vert/outline";
 import "./DropdownActions.less";

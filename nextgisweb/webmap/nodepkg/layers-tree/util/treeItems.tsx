@@ -1,8 +1,9 @@
 import type { EventDataNode } from "rc-tree/lib/interface";
 
 import { getChildrenDeep, getParent } from "@nextgisweb/gui/util/tree";
+import type { GroupItemConfig } from "@nextgisweb/webmap/type/api";
 
-import type { GroupItemConfig, TreeItemConfig } from "../../type/TreeItems";
+import type { TreeItemConfig } from "../../type/TreeItems";
 import type { TreeWebmapItem } from "../LayersTree";
 
 type Node = EventDataNode<TreeWebmapItem>;

@@ -1,21 +1,5 @@
 import type { BasemapLayerRead } from "@nextgisweb/basemap/type/api";
 
-import type { VisibleMode } from "../store/annotations/AnnotationsStore";
-
-import type { GroupItemConfig } from "./TreeItems";
-
-interface Scope {
-    read: boolean;
-    write: boolean;
-    manage: boolean;
-}
-
-interface Annotations {
-    enabled: boolean;
-    default: VisibleMode;
-    scope: Scope;
-}
-
 interface BasemapConfig extends BasemapLayerRead {
     keyname: string;
     display_name: string;
@@ -32,33 +16,8 @@ export interface WebmapPluginConfig {
 export type Entrypoint =
     | string
     | [midKey: string, loader: () => Promise<{ default: any }>];
-interface Mid {
+export interface Mid {
     adapter: Entrypoint[];
     basemap: Entrypoint[];
     plugin: Entrypoint[];
-}
-
-interface ItemsStates {
-    expanded: any[];
-    checked: number[];
-}
-
-export interface DisplayConfig {
-    extent: number[];
-    extent_const: number[];
-    rootItem: GroupItemConfig;
-    itemsStates: ItemsStates;
-    mid: Mid;
-    webmapPlugin: WebmapPluginConfig;
-    bookmarkLayerId?: any;
-    webmapId: number;
-    webmapDescription: string;
-    webmapTitle: string;
-    webmapEditable: boolean;
-    webmapLegendVisible: string;
-    drawOrderEnabled?: any;
-    annotations: Annotations;
-    units: string;
-    printMaxSize: number;
-    measureSrsId?: number;
 }

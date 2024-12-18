@@ -2,6 +2,8 @@ import type Feature from "ol/Feature";
 import type OlControl from "ol/control/Control";
 import type React from "react";
 
+import type { LayerItemConfig } from "@nextgisweb/webmap/type/api";
+
 import type { Adapter } from "../Adapter";
 import type { CustomItemFileWriteStore } from "../compat/CustomItemFileWriteStore";
 import type { Display } from "../display";
@@ -9,9 +11,7 @@ import type { ToolBase } from "../map-controls/tool/ToolBase";
 import type { Map } from "../ol/Map";
 import type { BaseLayer, LayerOptions } from "../ol/layer/_Base";
 import type { PluginBase } from "../plugin/PluginBase";
-import type { VisibleMode } from "../store/annotations/AnnotationsStore";
-
-import type { LayerItemConfig } from "./TreeItems";
+import type { AnnotationVisibleMode } from "../store/annotations/AnnotationsStore";
 
 export * from "./DisplayConfig";
 
@@ -65,13 +65,22 @@ export type MapControl = OlControl | ToolBase;
 
 export type WebmapAdapter = any;
 
+export interface MapRefs {
+    target: HTMLElement;
+    leftTopControlPane: HTMLElement;
+    leftBottomControlPane: HTMLElement;
+    rightTopControlPane: HTMLElement;
+    rightBottomControlPane: HTMLElement;
+}
+
+
 export interface MapURLParams {
     lon?: string;
     lat?: string;
     base?: string;
     zoom?: string;
     angle?: string;
-    annot?: VisibleMode;
+    annot?: AnnotationVisibleMode;
     events?: "true";
     panel?: string;
     panels?: string;

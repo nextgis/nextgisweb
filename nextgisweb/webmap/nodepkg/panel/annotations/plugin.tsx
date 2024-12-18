@@ -4,7 +4,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import topic from "@nextgisweb/webmap/compat/topic";
 import { createPanelRegistry } from "@nextgisweb/webmap/panels-manager/registry";
 import AnnotationsStore from "@nextgisweb/webmap/store/annotations";
-import type { VisibleMode } from "@nextgisweb/webmap/store/annotations/AnnotationsStore";
+import type { AnnotationVisibleMode } from "@nextgisweb/webmap/store/annotations/AnnotationsStore";
 
 import AnnotationIcon from "@nextgisweb/icon/material/chat";
 
@@ -21,9 +21,9 @@ createPanelRegistry(COMP_ID, () => import("./AnnotationsPanel"), {
         const display = plugin.meta?.display;
         if (display) {
             const annotUrlParam = plugin.meta?.display?._urlParams
-                .annot as VisibleMode;
-            const allowedUrlValues: VisibleMode[] = ["no", "yes", "messages"];
-            let initialAnnotVisible: VisibleMode | undefined = undefined;
+                .annot as AnnotationVisibleMode;
+            const allowedUrlValues: AnnotationVisibleMode[] = ["no", "yes", "messages"];
+            let initialAnnotVisible: AnnotationVisibleMode | undefined = undefined;
             if (annotUrlParam && allowedUrlValues.includes(annotUrlParam)) {
                 initialAnnotVisible = annotUrlParam;
             }

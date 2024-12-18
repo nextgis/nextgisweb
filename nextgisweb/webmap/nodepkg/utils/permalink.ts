@@ -3,12 +3,12 @@ import { toLonLat } from "ol/proj";
 
 import type { StoreItem } from "../compat/CustomItemFileWriteStore";
 import type { Display } from "../display";
-import type { VisibleMode } from "../store/annotations/AnnotationsStore";
+import type { AnnotationVisibleMode } from "../store/annotations/AnnotationsStore";
 
 export interface GetPermalinkOptions {
     display: Display;
     visibleItems: StoreItem[];
-    visibleMode?: VisibleMode | null;
+    visibleMode?: AnnotationVisibleMode | null;
     center?: Coordinate;
     additionalParams?: Record<string, string | number | boolean | string[]>;
     urlWithoutParams?: string;
@@ -53,7 +53,7 @@ export const getPermalink = ({
         params["lat"] = center[1].toFixed(4);
     }
 
-    let annot: VisibleMode | undefined | null = null;
+    let annot: AnnotationVisibleMode | undefined | null = null;
     const annotationPanel = display.panelsManager.getPanel("annotation");
     if (display && annotationPanel) {
         annot = visibleMode;
