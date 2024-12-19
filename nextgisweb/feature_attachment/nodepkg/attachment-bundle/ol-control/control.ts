@@ -1,12 +1,18 @@
 import { Control } from "ol/control";
+import type { Options as ControlOptions } from "ol/control/Control";
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { html } from "@nextgisweb/pyramid/icon";
+import type { Display } from "@nextgisweb/webmap/display";
+
+interface LinkToMainMapOptions extends ControlOptions {
+    display: Display;
+}
 
 export default class AttachmentBundleControl extends Control {
-    _display;
+    private _display: Display;
 
-    constructor(options) {
+    constructor(options: LinkToMainMapOptions) {
         const element = document.createElement("div");
         element.className = "ol-control ol-unselectable";
         const icon = html({ glyph: "attach_file" });
@@ -28,17 +34,11 @@ export default class AttachmentBundleControl extends Control {
 
     openTab() {
         const label = gettext("Attachments");
-        this._display.tabContainer.addTab({
+        this._display.tabsManager.addTab({
             key: "attachments",
             label,
             component: () =>
-                new Promise((resolve) => {
-                    require([
-                        "@nextgisweb/feature-attachment/attachment-bundle/tab",
-                    ], (module) => {
-                        resolve(module);
-                    });
-                }),
+                import("@nextgisweb/feature-attachment/attachment-bundle/tab"),
             props: {
                 display: this._display,
                 label,
