@@ -21,7 +21,7 @@ class BundleAttachmentPlugin {
     constructor(params: PluginParams) {
         this._display = params.display;
         if (settings["webmap"]["bundle"]) {
-            this._display._mapDeferred.then(() => {
+            this._display.mapDeferred.then(() => {
                 this.buildControl();
             });
         }

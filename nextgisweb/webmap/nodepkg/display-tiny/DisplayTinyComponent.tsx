@@ -34,7 +34,7 @@ const DisplayTinyComponent = observer(
         const addLinkToMainMap = useCallback(() => {
             if (
                 !tinyConfig ||
-                display._urlParams.linkMainMap !== "true" ||
+                display.urlParams.linkMainMap !== "true" ||
                 !mapRefs
             ) {
                 return;
@@ -47,7 +47,7 @@ const DisplayTinyComponent = observer(
                 })
             );
         }, [
-            display._urlParams.linkMainMap,
+            display.urlParams.linkMainMap,
             display.map.olMap,
             mapRefs,
             tinyConfig,

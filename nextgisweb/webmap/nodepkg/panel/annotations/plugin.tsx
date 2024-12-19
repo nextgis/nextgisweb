@@ -20,7 +20,7 @@ createPanelRegistry(COMP_ID, () => import("./AnnotationsPanel"), {
     beforeCreate: (plugin) => {
         const display = plugin.meta?.display;
         if (display) {
-            const annotUrlParam = plugin.meta?.display?._urlParams
+            const annotUrlParam = plugin.meta?.display?.urlParams
                 .annot as AnnotationVisibleMode;
             const allowedUrlValues: AnnotationVisibleMode[] = ["no", "yes", "messages"];
             let initialAnnotVisible: AnnotationVisibleMode | undefined = undefined;

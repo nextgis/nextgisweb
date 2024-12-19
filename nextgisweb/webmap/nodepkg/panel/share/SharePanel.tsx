@@ -224,7 +224,7 @@ const SharePanel = observer(
             let isMounted = true;
 
             const updateTexts = debounce(() => {
-                display._mapExtentDeferred.then(() => {
+                display.mapExtentDeferred.then(() => {
                     if (!isMounted) return;
                     updatePermalinkUrl();
                     updateEmbedCode();
@@ -244,7 +244,7 @@ const SharePanel = observer(
             };
         }, [
             visible,
-            display._mapExtentDeferred,
+            display.mapExtentDeferred,
             display.itemStore,
             display.map.olMap,
             updateEmbedCode,
@@ -252,7 +252,7 @@ const SharePanel = observer(
         ]);
 
         useEffect(() => {
-            display._mapExtentDeferred.then(() => {
+            display.mapExtentDeferred.then(() => {
                 updateEmbedCode();
             });
         }, [
@@ -263,7 +263,7 @@ const SharePanel = observer(
             controls,
             panels,
             activePanel,
-            display._mapExtentDeferred,
+            display.mapExtentDeferred,
             updateEmbedCode,
         ]);
 

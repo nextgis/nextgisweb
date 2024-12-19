@@ -17,7 +17,7 @@ export default function LayersPanel({
 }: PanelComponentProps) {
     const zoomToAllLayers = () => {
         const plugin =
-            display._plugins["@nextgisweb/webmap/plugin/zoom-to-webmap"];
+            display.plugins["@nextgisweb/webmap/plugin/zoom-to-webmap"];
         if (plugin) {
             (plugin as ZoomToWebmapPlugin).zoomToAllLayers();
         }
@@ -38,7 +38,7 @@ export default function LayersPanel({
                 store={display.webmapStore}
                 onSelect={display.handleSelect.bind(display)}
                 setLayerZIndex={display.setLayerZIndex.bind(display)}
-                getWebmapPlugins={() => ({ ...display._plugins })}
+                getWebmapPlugins={() => ({ ...display.plugins })}
                 {...props}
             />
             <div className="basemap">

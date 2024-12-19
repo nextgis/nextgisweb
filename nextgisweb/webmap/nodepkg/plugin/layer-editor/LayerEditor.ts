@@ -247,23 +247,35 @@ export class LayerEditor extends PluginBase {
     }
 
     private buildEditingControls(): void {
-        this.display.mapToolbar.items.addTool(
-            new ToolModifyFeature({ layerEditor: this, display: this.display }),
-            LayerEditor.MODIFYING_STATE_KEY,
-            this.elEditToolbar
-        );
+        const mapToolbar = this.display.mapToolbar;
+        if (mapToolbar) {
+            mapToolbar.items.addTool(
+                new ToolModifyFeature({
+                    layerEditor: this,
+                    display: this.display,
+                }),
+                LayerEditor.MODIFYING_STATE_KEY,
+                this.elEditToolbar
+            );
 
-        this.display.mapToolbar.items.addTool(
-            new ToolCreateFeature({ layerEditor: this, display: this.display }),
-            LayerEditor.CREATING_STATE_KEY,
-            this.elEditToolbar
-        );
+            mapToolbar.items.addTool(
+                new ToolCreateFeature({
+                    layerEditor: this,
+                    display: this.display,
+                }),
+                LayerEditor.CREATING_STATE_KEY,
+                this.elEditToolbar
+            );
 
-        this.display.mapToolbar.items.addTool(
-            new ToolDeleteFeature({ layerEditor: this, display: this.display }),
-            LayerEditor.DELETING_STATE_KEY,
-            this.elEditToolbar
-        );
+            mapToolbar.items.addTool(
+                new ToolDeleteFeature({
+                    layerEditor: this,
+                    display: this.display,
+                }),
+                LayerEditor.DELETING_STATE_KEY,
+                this.elEditToolbar
+            );
+        }
     }
 
     private bindTreeItem(): void {

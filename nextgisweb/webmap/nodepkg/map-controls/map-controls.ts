@@ -145,7 +145,9 @@ export const buildControls = (display: Display): Map<string, ControlReady> => {
 
     const toolsInfo = getToolsInfo(display);
     const mapToolbar = buildTools(display, toolsInfo, controlsMap);
-    display._mapAddControls([mapToolbar]);
+    if (mapToolbar) {
+        display._mapAddControls([mapToolbar]);
+    }
 
     return controlsMap;
 };
