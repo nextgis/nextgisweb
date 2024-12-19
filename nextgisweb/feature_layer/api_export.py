@@ -1,21 +1,28 @@
 import os
 import tempfile
 import zipfile
+from dataclasses import dataclass
+from dataclasses import field as dataclass_field
+from typing import Dict, List, Optional
 
+from msgspec import Struct
 from osgeo import gdal
 from pyramid.response import FileResponse
 from sqlalchemy.orm.exc import NoResultFound
+from typing_extensions import Annotated
 
 from nextgisweb.env import env, gettext, gettextf
+from nextgisweb.lib.apitype import Query
 from nextgisweb.lib.geometry import Geometry, GeometryNotValid, Transformer
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.resource import DataScope, Resource, ResourceFactory
 from nextgisweb.resource.exception import ResourceNotFound
+from nextgisweb.resource.view import ResourceID
 from nextgisweb.spatial_ref_sys import SRS
 
 from .interface import IFeatureLayer, IFeatureQueryIlike
-from .ogrdriver import EXPORT_FORMAT_OGR
+from .ogrdriver import EXPORT_FORMAT_OGR, OGRDriverT
 
 
 def _ogr_memory_ds():
@@ -57,84 +64,76 @@ def _ogr_layer_from_features(
     return ogr_layer
 
 
+@dataclass
 class ExportOptions:
-    __slots__ = (
-        "driver",
-        "dsco",
-        "lco",
-        "srs",
-        "intersects_geom",
-        "intersects_srs",
-        "fields",
-        "fid_field",
-        "use_display_name",
-        "ilike",
-    )
+    driver: OGRDriverT
+    dsco: List[str] = dataclass_field(default_factory=list)
+    lco: List[str] = dataclass_field(default_factory=list)
+    srs: Optional[SRS] = None
+    intersects_geom: Optional[Geometry] = None
+    intersects_srs: Optional[SRS] = None
+    fields: Optional[List] = None
+    fid_field: Optional[str] = None
+    use_display_name: bool = False
+    ilike: Optional[str] = None
 
-    def __init__(
-        self,
-        *,
-        format=None,
-        encoding=None,
-        srs=None,
-        intersects=None,
-        intersects_srs=None,
-        ilike=None,
-        fields=None,
-        fid="",
-        display_name="false",
-        **params,
-    ):
-        if format is None:
-            raise ValidationError(message=gettext("Output format is not provided."))
-        if format not in EXPORT_FORMAT_OGR:
-            raise ValidationError(message=gettext("Format '%s' is not supported.") % format)
-        self.driver = EXPORT_FORMAT_OGR[format]
 
-        # dataset creation options (configurable by user)
-        self.dsco = list()
-        if self.driver.dsco_configurable is not None:
-            for option in self.driver.dsco_configurable:
-                option = option.split(":")[0]
-                if option in params:
-                    self.dsco.append(f"{option}={params[option]}")
+class ExportParams(Struct, kw_only=True):
+    format: str
+    encoding: Optional[str] = None
+    srs: Optional[int] = None
+    intersects: Optional[str] = None
+    intersects_srs: Optional[int] = None
+    ilike: Optional[str] = None
+    fields: Optional[List[str]] = None
+    fid: str = ""
+    display_name: bool = False
 
-        # layer creation options
-        self.lco = []
-        if self.driver.options is not None:
-            self.lco.extend(self.driver.options)
-        if encoding is not None:
-            self.lco.append(f"ENCODING={encoding}")
+    def to_options(self) -> ExportOptions:
+        if self.format not in EXPORT_FORMAT_OGR:
+            raise ValidationError(message=gettext("Format '%s' is not supported.") % self.format)
+        driver = EXPORT_FORMAT_OGR[self.format]
+
+        opts = ExportOptions(driver=driver)
+
+        if driver.options is not None:
+            opts.lco.extend(driver.options)
+        if self.encoding is not None:
+            opts.lco.append(f"ENCODING={self.encoding}")
 
         # KML should be created as WGS84
-        if self.driver.name == "LIBKML":
-            self.srs = SRS.filter_by(id=4326).one()
-        elif srs is not None:
-            self.srs = SRS.filter_by(id=srs).one()
-        else:
-            self.srs = None
+        if driver.name == "LIBKML":
+            opts.srs = SRS.filter_by(id=4326).one()
+        elif self.srs is not None:
+            opts.srs = SRS.filter_by(id=self.srs).one()
 
-        if intersects is not None:
+        if self.intersects is not None:
             try:
-                self.intersects_geom = Geometry.from_wkt(intersects)
+                opts.intersects_geom = Geometry.from_wkt(self.intersects)
             except GeometryNotValid:
                 raise ValidationError(
                     message=gettext("Parameter 'intersects' geometry is not valid.")
                 )
 
-            if intersects_srs is not None:
-                self.intersects_srs = SRS.filter_by(id=intersects_srs).one()
-            else:
-                self.intersects_srs = None
-        else:
-            self.intersects_geom = self.intersects_srs = None
+            if self.intersects_srs is not None:
+                opts.intersects_srs = SRS.filter_by(id=self.intersects_srs).one()
 
-        self.ilike = ilike
+        self.fields = self.fields
+        if self.fid is not None and self.fid != "":
+            opts.fid_field = self.fid
+        opts.use_display_name = self.display_name
+        opts.ilike = self.ilike
 
-        self.fields = fields.split(",") if fields is not None else None
-        self.fid_field = fid if fid != "" else None
+        return opts
 
-        self.use_display_name = display_name.lower() == "true"
+
+class ResourceParam(Struct, kw_only=True):
+    id: ResourceID
+    name: Optional[str] = None
+
+
+class ExportParamsPost(ExportParams):
+    resources: List[ResourceParam]
 
 
 def export(resource, options, filepath):
@@ -217,14 +216,15 @@ def _zip_response(request, directory, filename):
         return response
 
 
-def export_single(resource, request):
+def export_single(
+    resource,
+    request,
+    *,
+    export_params: Annotated[ExportParams, Query(spread=True)],
+):
     request.resource_permission(DataScope.read)
 
-    params = dict(request.GET)
-    for p in ("srs", "intersects_srs"):
-        if p in params:
-            params[p] = int(params[p])
-    options = ExportOptions(**params)
+    options = export_params.to_options()
 
     with tempfile.TemporaryDirectory() as tmp_dir:
         filename = f"{resource.id}.{options.driver.extension}"
@@ -269,50 +269,54 @@ def view_geojson_head(resource, request):
     return view_geojson(resource, request)
 
 
-def export_multi(request):
-    if request.method == "GET":
-        params = dict(request.GET)
-        for p in ("srs", "intersects_srs"):
-            if p in params:
-                params[p] = int(params[p])
+def export_multi_get(
+    request,
+    *,
+    name: Dict[int, str],
+    resources: List[ResourceID],
+    export_params: Annotated[ExportParams, Query(spread=True)],
+):
+    params_resources = [ResourceParam(id=rid, name=name.get(rid)) for rid in resources]
+    return export_multi(request, params_resources, export_params)
 
-        params_resources = list()
-        for p in params.pop("resources").split(","):
-            splitted = p.split(":")
-            param = dict(id=int(splitted[0]))
-            for i, key in enumerate(("name",), start=1):
-                if len(splitted) <= i:
-                    break
-                param[key] = splitted[i]
-            params_resources.append(param)
-    else:
-        params = request.json_body
-        params_resources = params.pop("resources")
-    options = ExportOptions(**params)
+
+def export_multi_post(
+    request,
+    body: ExportParamsPost,
+):
+    return export_multi(request, body.resources, body)
+
+
+def export_multi(
+    request,
+    params_resources: List[ResourceParam],
+    export_params: ExportParams,
+):
+    options = export_params.to_options()
 
     with tempfile.TemporaryDirectory() as tmp_dir:
-        for param in params_resources:
+        for pr in params_resources:
             try:
-                resource = Resource.filter_by(id=param["id"]).one()
+                resource = Resource.filter_by(id=pr.id).one()
             except NoResultFound:
-                raise ResourceNotFound(param["id"])
+                raise ResourceNotFound(pr.id)
             request.resource_permission(DataScope.read, resource)
 
-            if "name" in param:
-                name = param["name"]
-                if name != os.path.basename(name):
+            if pr.name is not None:
+                if pr.name != os.path.basename(pr.name):
                     raise ValidationError(
-                        message=gettext("File name parameter '{}' is not valid.") % name
+                        message=gettext("File name parameter '{}' is not valid.") % pr.name
                     )
+                layer_name = pr.name
             else:
-                name = str(resource.id)
+                layer_name = str(resource.id)
 
             if not options.driver.single_file:
-                layer_dir = os.path.join(tmp_dir, name)
+                layer_dir = os.path.join(tmp_dir, layer_name)
                 os.mkdir(layer_dir)
             else:
                 layer_dir = tmp_dir
-            filepath = os.path.join(layer_dir, f"{name}.{options.driver.extension}")
+            filepath = os.path.join(layer_dir, f"{layer_name}.{options.driver.extension}")
 
             export(resource, options, filepath)
 
@@ -342,6 +346,6 @@ def setup_pyramid(comp, config):
     config.add_route(
         "feature_layer.export",
         "/api/component/feature_layer/export",
-        get=export_multi,
-        post=export_multi,
+        get=export_multi_get,
+        post=export_multi_post,
     )
