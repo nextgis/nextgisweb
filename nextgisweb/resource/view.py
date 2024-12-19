@@ -263,14 +263,13 @@ def creatable_resources(parent, *, user):
     if ResourceScope.manage_children not in permissions:
         return result
 
-    options = env.resource.options
+    disabled_resource_cls = env.resource.disabled_resource_cls
 
     classes = set(
         cls
         for cls in Resource.registry.values()
         if (
-            cls.identity not in options["disabled_cls"]
-            and not options["disable." + cls.identity]
+            cls.identity not in disabled_resource_cls
             and cls.check_parent(parent)
         )
     )

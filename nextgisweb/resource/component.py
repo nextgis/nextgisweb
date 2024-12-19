@@ -11,7 +11,7 @@ from nextgisweb.lib.logging import logger
 
 from nextgisweb.auth import Group, User
 
-from .exception import QuotaExceeded
+from .exception import QuotaExceeded, ResourceDisabled
 from .interface import interface_registry
 from .model import (
     Resource,
@@ -34,19 +34,29 @@ class ResourceComponent(Component):
 
     def initialize(self):
         super().initialize()
-
-        for item in self.options["disabled_cls"]:
-            try:
-                Resource.registry[item]
-            except KeyError:
-                logger.error("Resource class '%s' from disabled_cls option not found!", item)
-
+        self.disabled_resource_cls = self._parse_disabled_resource_cls()
         self.quota_limit = self.options["quota.limit"]
         self.quota_resource_cls = self.options["quota.resource_cls"]
+        self.quota_resource_by_cls = self._parse_quota_resource_by_cls()
 
-        self.quota_resource_by_cls = self.parse_quota_resource_by_cls()
+    def _parse_disabled_resource_cls(self):
+        disabled = []
+        for cls in self.options["disabled_cls"]:
+            try:
+                Resource.registry[cls]
+            except KeyError:
+                logger.error("Resource class '%s' from disabled_cls option not found!", cls)
+            else:
+                disabled.append(cls)
 
-    def parse_quota_resource_by_cls(self):
+        opts_disable = self.options.with_prefix("disable")
+        for cls in Resource.registry.keys():
+            if opts_disable[cls] and cls not in disabled:
+                disabled.append(cls)
+
+        return disabled
+
+    def _parse_quota_resource_by_cls(self):
         quota_resource_by_cls = dict()
 
         ovalue = self.options.get("quota.resource_by_cls", None)
@@ -65,6 +75,9 @@ class ResourceComponent(Component):
         required_total = 0
 
         for cls, required in data.items():
+            if cls in self.disabled_resource_cls:
+                raise ResourceDisabled(cls)
+
             if self.quota_resource_cls is None or cls in self.quota_resource_cls:
                 required_total += required
 

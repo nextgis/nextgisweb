@@ -21,7 +21,7 @@ from nextgisweb.pyramid.api import csetting, require_storage_enabled
 from .category import ResourceCategory
 from .composite import CompositeSerializer
 from .event import AfterResourceCollectionPost, AfterResourcePut, OnDeletePrompt
-from .exception import HierarchyError, QuotaExceeded, ResourceDisabled
+from .exception import HierarchyError, QuotaExceeded
 from .model import Resource, ResourceCls, ResourceInterfaceIdentity, ResourceScopeIdentity
 from .presolver import ExplainACLRule, ExplainDefault, ExplainRequirement, PermissionResolver
 from .sattribute import ResourceRefOptional, ResourceRefWithParent
@@ -196,14 +196,8 @@ def collection_post(
     """Create resource"""
 
     request.env.core.check_storage_limit()
+
     resource_cls = body.resource.cls
-
-    if (
-        resource_cls in request.env.resource.options["disabled_cls"]
-        or request.env.resource.options["disable." + resource_cls]
-    ):
-        raise ResourceDisabled(resource_cls)
-
     resource = Resource.registry[resource_cls](owner_user=request.user)
     serializer = CompositeSerializer(user=request.user)
 
@@ -457,7 +451,7 @@ def resource_volume(
 
 QuotaCheckBody = Annotated[
     Dict[
-        Annotated[str, Meta(examples=["webmap"])],
+        Annotated[ResourceCls, Meta(examples=["webmap"])],
         Annotated[int, Meta(ge=0, examples=[1])],
     ],
     TSExport("QuotaCheckBody"),
