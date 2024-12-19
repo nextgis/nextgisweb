@@ -13,6 +13,7 @@ import {
     Switch,
 } from "@nextgisweb/gui/antd";
 import { CopyToClipboardButton } from "@nextgisweb/gui/buttons";
+import { useObjectState } from "@nextgisweb/gui/hook";
 import reactApp from "@nextgisweb/gui/react-app";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { Display } from "@nextgisweb/webmap/display";
@@ -50,50 +51,83 @@ interface PrintMapCompProps {
 
 type Comp = ReturnType<typeof reactApp<PrintMapCompProps>>;
 
-interface PrintMapCompElements {
-    comp: Comp;
-    element: HTMLDivElement;
-    resizeObserver: ResizeObserver;
-}
-
-const makePrintMapComp = ({
+const usePrintMap = ({
     settings,
     display,
     initCenter,
     onScaleChange,
     onCenterChange,
-}: PrintMapCompProps): PrintMapCompElements => {
-    if (!display.mapNode) {
-        throw new Error("Display is not started yet!");
-    }
+}: PrintMapCompProps) => {
+    const resizeObserver = useRef<ResizeObserver>();
+    const printMapComp = useRef<Comp>();
+    const printMapEl = useRef<HTMLElement>();
 
-    const div = document.createElement("div");
-    div.classList.add("print-map-pane");
-    document.body.appendChild(div);
+    const destroy = useCallback(() => {
+        // Schedule cleanup to avoid synchronous unmounting
+        setTimeout(() => {
+            if (resizeObserver.current) {
+                resizeObserver.current.disconnect();
+                resizeObserver.current = undefined;
+            }
+            if (printMapComp.current) {
+                printMapComp.current.unmount();
+                printMapComp.current = undefined;
+            }
+            if (printMapEl.current) {
+                printMapEl.current.remove();
+                printMapEl.current = undefined;
+            }
+        }, 0);
+    }, []);
 
-    const resizeObserver = new ResizeObserver((entries) => {
-        const mapContainer = entries[0].target;
-        const { left, top } = mapContainer.getBoundingClientRect();
-        div.style.left = `${left}px`;
-        div.style.top = `${top}px`;
-    });
+    const createPrintMapComp = useCallback(() => {
+        if (!display.mapNode) {
+            throw new Error("Display is not started yet!");
+        }
 
-    resizeObserver.observe(display.mapNode);
+        const div = document.createElement("div");
+        div.classList.add("print-map-pane");
+        document.body.appendChild(div);
 
-    const comp: ReturnType<typeof reactApp<PrintMapCompProps>> = reactApp(
-        PrintMap,
-        { settings, display, initCenter, onScaleChange, onCenterChange },
-        div
-    );
+        const resizeObserver_ = new ResizeObserver((entries) => {
+            const mapContainer = entries[0].target;
+            const { left, top } = mapContainer.getBoundingClientRect();
+            div.style.left = `${left}px`;
+            div.style.top = `${top}px`;
+        });
 
-    return { comp, element: div, resizeObserver };
-};
+        resizeObserver_.observe(display.mapNode);
 
-const updatePrintMapComp = (comp: Comp, settings: PrintMapSettings) => {
-    if (!comp) {
-        return;
-    }
-    comp.update({ settings });
+        const comp: ReturnType<typeof reactApp<PrintMapCompProps>> = reactApp(
+            PrintMap,
+            { settings, display, initCenter, onScaleChange, onCenterChange },
+            div
+        );
+
+        resizeObserver.current = resizeObserver_;
+        printMapComp.current = comp;
+        printMapEl.current = div;
+    }, [display, initCenter, onCenterChange, onScaleChange, settings]);
+
+    useEffect(() => {
+        if (printMapComp.current) {
+            printMapComp.current.update({ settings });
+        }
+    }, [settings]);
+
+    useEffect(() => {
+        return () => {
+            destroy();
+        };
+    }, [destroy]);
+
+    return {
+        createPrintMapComp,
+        resizeObserver,
+        printMapComp,
+        printMapEl,
+        destroy,
+    };
 };
 
 const defaultPanelMapSettings = (initTitleText: string): PrintMapSettings => {
@@ -188,7 +222,7 @@ const ScalesSelect = ({
     useEffect(() => {
         if (customScale === null) return;
         onChange(customScale);
-    }, [customScale]);
+    }, [customScale, onChange]);
 
     const changeCustomScale = useCallback((value: number | null) => {
         setCustomScale(validateCustomScale(value) ? value : null);
@@ -257,113 +291,99 @@ const ScalesSelect = ({
 const PrintPanel = observer(
     ({ display, title, close }: PanelComponentProps) => {
         const [urlParsed, setUrlParsed] = useState(false);
-        const [mapInit, setMapInit] = useState(false);
+        const mapInit = useRef(false);
         const [paperFormat, setPaperFormat] = useState("210_297");
         const [disableChangeSize, setDisableChangeSize] = useState(true);
         const [scales, setScales] = useState(scalesList);
         const [center, setCenter] = useState<Coordinate>();
         const [printMapScale, setPrintMapScale] = useState<number>();
-        const printMapComp = useRef<Comp>();
-        const printMapEl = useRef<HTMLElement>();
 
         const printMaxSize = useMemo(() => {
             return display.config.printMaxSize;
         }, [display]);
 
-        const defaultSettings = useMemo(
-            () => defaultPanelMapSettings(display.config.webmapTitle),
-            [display.config.webmapTitle]
+        const [mapSettings, setMapSettings] = useObjectState<PrintMapSettings>(
+            () => defaultPanelMapSettings(display.config.webmapTitle)
         );
-        const [mapSettings, setMapSettings] =
-            useState<PrintMapSettings>(defaultSettings);
 
-        const resizeObserver = useRef<ResizeObserver>();
+        const updateMapSettings = useCallback(
+            (updateSettings: Partial<PrintMapSettings>) => {
+                setMapSettings((old) => ({ ...old, ...updateSettings }));
+            },
+            [setMapSettings]
+        );
+        const updateMapScale = useCallback(
+            (scale: PrintMapSettings["scale"]) => {
+                setMapSettings((old) => ({ ...old, scale }));
+            },
+            [setMapSettings]
+        );
 
-        const updateMapSettings = (
-            updateSettings: Partial<PrintMapSettings>
-        ) => {
-            const newMapSettings = { ...mapSettings, ...updateSettings };
-            setMapSettings(newMapSettings);
-        };
+        const changePaperFormat = useCallback(
+            (newPaperFormat: string) => {
+                setPaperFormat(newPaperFormat);
+                setDisableChangeSize(newPaperFormat !== "custom");
+                if (newPaperFormat !== "custom") {
+                    const widthHeight = newPaperFormat.split("_");
+                    const width = parseInt(widthHeight[0], 10);
+                    const height = parseInt(widthHeight[1], 10);
+                    updateMapSettings({
+                        width,
+                        height,
+                    });
+                }
+            },
+            [updateMapSettings]
+        );
 
-        const changePaperFormat = (newPaperFormat: string) => {
-            setPaperFormat(newPaperFormat);
-            setDisableChangeSize(newPaperFormat !== "custom");
-            if (newPaperFormat !== "custom") {
-                const widthHeight = newPaperFormat.split("_");
-                const width = parseInt(widthHeight[0], 10);
-                const height = parseInt(widthHeight[1], 10);
-                updateMapSettings({
-                    width,
-                    height,
-                });
-            }
-        };
-
-        if (!urlParsed) {
-            const urlSettings = getPrintUrlSettings();
-
-            const keysPaperSize: (keyof PrintMapSettings)[] = [
-                "height",
-                "width",
-            ];
-            if (keysPaperSize.every((k) => k in urlSettings)) {
-                changePaperFormat("custom");
-            } else {
-                keysPaperSize.forEach((k) => {
-                    delete urlSettings[k];
-                });
-            }
-
-            updateMapSettings(urlSettings);
-            setUrlParsed(true);
-        }
-
-        const getCenterFromUrl = (): Coordinate | null => {
-            if (mapInit) {
+        const getCenterFromUrl = useCallback((): Coordinate | null => {
+            if (mapInit.current) {
                 return null;
             }
-
             const urlSettings = getPrintUrlSettings();
             return urlSettings.center || null;
-        };
+        }, []);
 
-        const show = () => {
-            const {
-                comp,
-                element,
-                resizeObserver: resize,
-            } = makePrintMapComp({
-                settings: mapSettings,
-                display,
-                initCenter: getCenterFromUrl(),
-                onScaleChange: (scale: number) => {
-                    setPrintMapScale(scale);
-                },
-                onCenterChange: (center: Coordinate) => {
-                    setCenter(center);
-                },
-            });
-            printMapComp.current = comp;
-            printMapEl.current = element;
-            resizeObserver.current = resize;
-            setMapInit(true);
-        };
+        const { createPrintMapComp, printMapEl } = usePrintMap({
+            settings: mapSettings,
+            display,
+            initCenter: getCenterFromUrl(),
+            onScaleChange: setPrintMapScale,
+            onCenterChange: setCenter,
+        });
 
-        const hide = () => {
-            updateMapSettings({ scale: undefined });
-            if (resizeObserver.current) {
-                resizeObserver.current.disconnect();
+        useEffect(() => {
+            if (!urlParsed) {
+                const urlSettings = getPrintUrlSettings();
+
+                const keysPaperSize: (keyof PrintMapSettings)[] = [
+                    "height",
+                    "width",
+                ];
+                if (keysPaperSize.every((k) => k in urlSettings)) {
+                    changePaperFormat("custom");
+                } else {
+                    keysPaperSize.forEach((k) => {
+                        delete urlSettings[k];
+                    });
+                }
+
+                updateMapSettings(urlSettings);
+                setUrlParsed(true);
             }
-            if (printMapComp.current) {
-                printMapComp.current.unmount();
+        }, [changePaperFormat, updateMapSettings, urlParsed]);
+
+        const show = useCallback(() => {
+            if (!mapInit.current) {
+                createPrintMapComp();
+
+                mapInit.current = true;
             }
-            printMapComp.current = undefined;
-            if (printMapEl.current) {
-                printMapEl.current.remove();
-            }
-            printMapEl.current = undefined;
-        };
+        }, [createPrintMapComp]);
+
+        // const hide = useCallback(() => {
+        //     updateMapSettings({ scale: undefined });
+        // }, [updateMapSettings]);
 
         // useEffect(() => {
         //     visible ? show() : hide();
@@ -373,23 +393,14 @@ const PrintPanel = observer(
         // }, [visible]);
         useEffect(() => {
             show();
-            return () => {
-                hide();
-            };
-        }, []);
+        }, [show]);
 
         useEffect(() => {
             if (!center) {
                 return;
             }
             updateMapSettings({ center: center });
-        }, [center]);
-
-        useEffect(() => {
-            if (printMapComp.current) {
-                updatePrintMapComp(printMapComp.current, mapSettings);
-            }
-        }, [mapSettings]);
+        }, [center, updateMapSettings]);
 
         useEffect(() => {
             if (!printMapScale) {
@@ -413,7 +424,7 @@ const PrintPanel = observer(
             const newScales = [customScale, ...scalesList];
             setScales(newScales);
             updateMapSettings({ scale: printMapScale });
-        }, [printMapScale]);
+        }, [printMapScale, updateMapSettings]);
 
         const validate = (value: unknown) => {
             return typeof value === "number";
@@ -570,7 +581,7 @@ const PrintPanel = observer(
                         <ScalesSelect
                             selectedValue={mapSettings.scale}
                             scales={scales}
-                            onChange={(v) => updateMapSettings({ scale: v })}
+                            onChange={updateMapScale}
                         />
                     </div>
                 </section>
