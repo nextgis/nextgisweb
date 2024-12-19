@@ -26,6 +26,7 @@ import type {
 import { mmToPx } from "./utils";
 
 import "./PrintMap.less";
+import { AnnotationsPopup } from "../layer/annotations/AnnotationsPopup";
 
 const setMapScale = (scale: number, olMap: OlMap): void => {
     const view = olMap.getView();
@@ -97,9 +98,9 @@ const buildMap = (container: HTMLElement, display: Display): OlMap => {
         .getArray()
         .forEach((overlay) => {
             if ("annPopup" in overlay && overlay.annPopup) {
-                const annPopup = overlay.annPopup;
-                const clonedPopup = (annPopup as any).cloneOlPopup(
-                    (annPopup as any).getAnnFeature()
+                const annPopup = overlay.annPopup as AnnotationsPopup;
+                const clonedPopup = annPopup.cloneOlPopup(
+                    annPopup.getAnnFeature()
                 );
                 printMap.addOverlay(clonedPopup);
             }
