@@ -11,17 +11,44 @@ from .. import Resource, ResourceGroup
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="module")
 def disable(ngw_env):
     resource = ngw_env.resource
 
-    mem = resource.disabled_resource_cls
-    resource.disabled_resource_cls = []
-    yield
-    resource.disabled_resource_cls = mem
+    @contextmanager
+    def _disable(*resource_cls):
+        mem = resource.disabled_resource_cls
+        resource.disabled_resource_cls = list(set(mem).union(set(resource_cls)))
+        yield
+        resource.disabled_resource_cls = mem
+
+    return _disable
 
 
-def test_disable_resources(ngw_env, disable, ngw_webtest_app, ngw_resource_group):
+@pytest.fixture(scope="module")
+def quota(ngw_env):
+    comp = ngw_env.resource
+
+    @contextmanager
+    def _quota(**kw):
+        options = dict(limit=None, resource_cls=None, resource_by_cls=dict())
+        options.update(kw)
+
+        mem = dict()
+        for k, v in options.items():
+            attr = f"quota_{k}"
+            mem[attr] = getattr(comp, attr)
+            setattr(comp, attr, v)
+        try:
+            yield
+        finally:
+            for k, v in mem.items():
+                setattr(comp, k, v)
+
+    return _quota
+
+
+def test_disable_resources(disable, ngw_webtest_app, ngw_resource_group):
     def create_resource_group(display_name, expected_status):
         ngw_webtest_app.post_json(
             "/api/resource/",
@@ -35,8 +62,10 @@ def test_disable_resources(ngw_env, disable, ngw_webtest_app, ngw_resource_group
             status=expected_status,
         )
 
-    ngw_env.resource.disabled_resource_cls = ["resource_group"]
-    create_resource_group("disable.resource_group", 422)
+    create_resource_group("disable.resource_group", 201)
+
+    with disable("resource_group"):
+        create_resource_group("disable.resource_group", 422)
 
 
 @pytest.fixture(scope="module")
@@ -59,7 +88,7 @@ def test_resource_search(resource, ngw_webtest_app):
     resp = ngw_webtest_app.get(url, dict(display_name="狗子有佛性也無"), status=200)
     assert len(resp.json) == 1
 
-    resp = ngw_webtest_app.get(url, dict(display_name="狗子有佛性也無", keyname="other"), status=200)
+    resp = ngw_webtest_app.get(url, dict(display_name="狗子有佛性也無", keyname="foo"), status=200)
     assert len(resp.json) == 0
 
     resp = ngw_webtest_app.get(url, dict(display_name__ilike="%佛%"), status=200)
@@ -101,6 +130,7 @@ def resources():
             display_name="Test resource D",
             keyname="test_res_D",
         ).persist()
+
         DBSession.flush()
 
     yield
@@ -142,30 +172,7 @@ def resource_stat():
     yield total, cls_count
 
 
-@pytest.fixture
-def override(ngw_env):
-    comp = ngw_env.resource
-
-    @contextmanager
-    def wrapped(**kw):
-        options = dict(limit=None, resource_cls=None, resource_by_cls=dict())
-        options.update(kw)
-
-        mem = dict()
-        for k, v in options.items():
-            attr = f"quota_{k}"
-            mem[attr] = getattr(comp, attr)
-            setattr(comp, attr, v)
-        try:
-            yield
-        finally:
-            for k, v in mem.items():
-                setattr(comp, k, v)
-
-    return wrapped
-
-
-def test_quota(ngw_resource_group, resource_stat, override, ngw_webtest_app):
+def test_quota(quota, disable, resource_stat, ngw_resource_group, ngw_webtest_app):
     total, cls_count = resource_stat
 
     def rgrp(display_name, expected_status):
@@ -194,40 +201,44 @@ def test_quota(ngw_resource_group, resource_stat, override, ngw_webtest_app):
         if expected_result is not None:
             assert expected_result.items() <= resp.json.items()
 
-    with override():
+    with quota():
         check(dict(resource_group=999), 200)
         rgrp("No quota", 201)
 
-    with override(limit=total):
+        check(dict(non_existent=1, resource_group=1), 422)
+        with disable("resource_group"):
+            rgrp("Disabled", 422)
+
+    with quota(limit=total):
         check(dict(resource_group=0), 200)
         check(dict(resource_group=1), 402, dict(cls=None, required=1, available=0))
         rgrp("Quota exceeded", 402)
 
     rg_count = cls_count.get("resource_group", 0)
 
-    with override(limit=rg_count, resource_cls=["resource_group"]):
+    with quota(limit=rg_count, resource_cls=["resource_group"]):
         check(dict(resource_group=0), 200)
         check(dict(resource_group=1), 402, dict(cls=None, required=1, available=0))
         rgrp("Quota exceeded resource_group", 402)
 
-    with override(limit=rg_count, resource_cls=["another_resource_cls"]):
+    with quota(limit=rg_count, resource_cls=["another_resource_cls"]):
         check(dict(resource_group=999), 200)
         rgrp("Quota exceeded another cls", 201)
 
-    with override(resource_by_cls=dict(resource_group=rg_count)):
+    with quota(resource_by_cls=dict(resource_group=rg_count)):
         check(dict(resource_group=0), 200)
         check(dict(resource_group=1), 402, dict(cls="resource_group", required=1, available=0))
         rgrp("Quota by cls exceeded", 402)
 
-    with override(resource_by_cls=dict(another_resource_cls=rg_count)):
+    with quota(resource_by_cls=dict(another_resource_cls=rg_count)):
         check(dict(resource_group=999), 200)
         rgrp("Quota by cls exceeded another cls", 201)
 
-    with override(limit=total + 5):
+    with quota(limit=total + 5):
         check(dict(resource_group=5), 200)
         check(dict(resource_group=6), 402, dict(cls=None, required=6, available=5))
 
-    with override(limit=rg_count + 5, resource_cls=["resource_group"]):
+    with quota(limit=rg_count + 5, resource_cls=["resource_group"]):
         check(dict(resource_group=5), 200)
         check(dict(resource_group=7), 402, dict(cls=None, required=7, available=5))
 
