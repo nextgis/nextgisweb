@@ -7,6 +7,7 @@ import type { Display } from "@nextgisweb/webmap/display";
 
 interface LinkToMainMapOptions extends ControlOptions {
     display: Display;
+    tipLabel: string;
 }
 
 export default class AttachmentBundleControl extends Control {
