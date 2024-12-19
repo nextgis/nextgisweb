@@ -4,7 +4,13 @@ import { useCallback, useState } from "react";
 
 import { errorModal } from "@nextgisweb/gui/error";
 import type { ApiError } from "@nextgisweb/gui/error/type";
-import { LunkwillParam, request, routeURL } from "@nextgisweb/pyramid/api";
+import {
+    LunkwillParam,
+    encodeQueryParams,
+    request,
+    routeURL,
+} from "@nextgisweb/pyramid/api";
+import type { QueryParams } from "@nextgisweb/pyramid/api";
 import pyramidSettings from "@nextgisweb/pyramid/settings!pyramid";
 
 interface UseExportFeatureLayerProps {
@@ -36,41 +42,38 @@ export function useExportFeatureLayer({ id }: UseExportFeatureLayerProps) {
     const exportFeatureLayer = useCallback(
         async (values: ExportFeatureLayerOptions) => {
             const { extent, resources, ...fields } = values;
-            const json: Record<string, string> = {};
+            const params: QueryParams = {};
             if (extent && !extent.includes(null)) {
                 const wkt = new WKT().writeGeometry(
-                    fromExtent(extent as number[])
+                    fromExtent(extent as number[]),
+                    { decimals: 6 }
                 );
 
-                json.intersects = wkt;
-                json.intersects_srs = String(4326);
+                params.intersects = wkt;
+                params.intersects_srs = String(4326);
             }
             let key: keyof typeof fields;
             for (key in fields) {
                 const prop = fields[key];
                 if (prop !== undefined) {
-                    json[key] = prop;
+                    params[key] = prop;
                 }
             }
-            const params = new URLSearchParams(json);
 
             const ids = id ? String(id).split(",") : resources;
 
             let apiUrl: string | undefined = undefined;
             if (ids) {
                 if (ids.length === 1) {
-                    apiUrl =
-                        routeURL("resource.export", Number(ids[0])) +
-                        "?" +
-                        params.toString();
+                    apiUrl = routeURL("resource.export", Number(ids[0]));
+                    apiUrl += "?" + encodeQueryParams(params);
                 } else {
-                    params.append("resources", ids.join(","));
-                    apiUrl =
-                        routeURL("feature_layer.export") +
-                        "?" +
-                        params.toString();
+                    params["resources"] = ids;
+                    apiUrl = routeURL("feature_layer.export");
+                    apiUrl += "?" + encodeQueryParams(params);
                 }
             }
+
             if (apiUrl) {
                 if (pyramidSettings.lunkwill_enabled) {
                     const lunkwillParam = new LunkwillParam();
