@@ -6,7 +6,7 @@ from dataclasses import field as dataclass_field
 from enum import Enum
 from typing import Dict, List, Optional
 
-from msgspec import Struct
+from msgspec import Meta, Struct
 from osgeo import gdal
 from pyramid.response import FileResponse
 from sqlalchemy.orm.exc import NoResultFound
@@ -90,8 +90,10 @@ class ExportParams(Struct, kw_only=True):
     intersects_srs: Optional[int] = None
     ilike: Optional[str] = None
     fields: Optional[List[str]] = None
-    fid: str = ""
-    display_name: bool = False
+    fid: Annotated[str, Meta(description="Field name to store original feature ID")] = ""
+    display_name: Annotated[
+        bool, Meta(description="Use display name for fields, otherwise keyname")
+    ] = False
 
     def to_options(self) -> ExportOptions:
         driver = EXPORT_FORMAT_OGR[self.format.value]
@@ -225,6 +227,7 @@ def export_single(
     zipped: bool,
     export_params: Annotated[ExportParams, Query(spread=True)],
 ):
+    """Export feature layer"""
     request.resource_permission(DataScope.read)
 
     options = export_params.to_options()
@@ -278,6 +281,7 @@ def export_multi_get(
     resources: List[ResourceID],
     export_params: Annotated[ExportParams, Query(spread=True)],
 ):
+    """Export multiple feature layers"""
     params_resources = [ResourceParam(id=rid, name=name.get(rid)) for rid in resources]
     return export_multi(request, params_resources, export_params)
 
@@ -286,6 +290,7 @@ def export_multi_post(
     request,
     body: ExportParamsPost,
 ):
+    """Export multiple feature layers"""
     return export_multi(request, body.resources, body)
 
 
