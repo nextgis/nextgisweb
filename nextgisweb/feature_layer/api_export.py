@@ -3,6 +3,7 @@ import tempfile
 import zipfile
 from dataclasses import dataclass
 from dataclasses import field as dataclass_field
+from enum import Enum
 from typing import Dict, List, Optional
 
 from msgspec import Struct
@@ -78,8 +79,11 @@ class ExportOptions:
     ilike: Optional[str] = None
 
 
+ExportFormat = Enum("ExportFormat", {i: i for i in EXPORT_FORMAT_OGR.keys()})
+
+
 class ExportParams(Struct, kw_only=True):
-    format: str
+    format: ExportFormat
     encoding: Optional[str] = None
     srs: Optional[int] = None
     intersects: Optional[str] = None
@@ -90,9 +94,7 @@ class ExportParams(Struct, kw_only=True):
     display_name: bool = False
 
     def to_options(self) -> ExportOptions:
-        if self.format not in EXPORT_FORMAT_OGR:
-            raise ValidationError(message=gettext("Format '%s' is not supported.") % self.format)
-        driver = EXPORT_FORMAT_OGR[self.format]
+        driver = EXPORT_FORMAT_OGR[self.format.value]
 
         opts = ExportOptions(driver=driver)
 
@@ -220,6 +222,7 @@ def export_single(
     resource,
     request,
     *,
+    zipped: bool,
     export_params: Annotated[ExportParams, Query(spread=True)],
 ):
     request.resource_permission(DataScope.read)
@@ -232,7 +235,6 @@ def export_single(
 
         export(resource, options, filepath)
 
-        zipped = request.GET.get("zipped", "true").lower() == "true"
         if not options.driver.single_file or zipped:
             return _zip_response(request, tmp_dir, filename)
         else:
