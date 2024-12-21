@@ -36,7 +36,7 @@ def OGRDriver(
     display_name,
     extension,
     options=None,
-    mime=None,
+    mime="application/octet-stream",
     single_file=True,
     fid_support=False,
     lco_configurable=None,

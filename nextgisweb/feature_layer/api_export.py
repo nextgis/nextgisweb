@@ -5,12 +5,12 @@ from typing import TYPE_CHECKING, Dict, List, Literal, Union
 
 from msgspec import UNSET, Meta, Struct, UnsetType, field
 from osgeo import gdal
-from pyramid.response import FileResponse
+from pyramid.response import FileResponse, Response
 from sqlalchemy.orm.exc import NoResultFound
 from typing_extensions import Annotated
 
 from nextgisweb.env import env, gettext, gettextf
-from nextgisweb.lib.apitype import Query
+from nextgisweb.lib.apitype import ContentType, Query
 from nextgisweb.lib.geometry import Geometry, GeometryNotValid, Transformer
 
 from nextgisweb.core.exception import ValidationError
@@ -255,6 +255,9 @@ def _zip_response(request, directory, filename):
         return response
 
 
+ExportZipResponse = Annotated[Response, ContentType("application/zip")]
+
+
 def export_single(
     resource,
     request,
@@ -264,7 +267,7 @@ def export_single(
         bool,
         Meta(description="Compress exported file when using single-file formats"),
     ] = True,
-):
+) -> Response:
     """Export feature layer"""
     request.resource_permission(DataScope.read)
 
@@ -281,18 +284,21 @@ def export_single(
         else:
             response = FileResponse(
                 filepath,
-                content_type=options.driver.mime or "application/octet-stream",
+                content_type=options.driver.mime,
                 request=request,
             )
             response.content_disposition = f"attachment; filename={filename}"
             return response
 
 
-def view_geojson(resource, request):
+GEOJSON_DRIVER = EXPORT_FORMAT_OGR["GeoJSON"]
+
+
+def view_geojson(resource, request) -> Annotated[Response, ContentType(GEOJSON_DRIVER.mime)]:
     """Export feature layer in GeoJSON format"""
     request.resource_permission(DataScope.read)
 
-    options = ExportOptions(driver=EXPORT_FORMAT_OGR["GeoJSON"])
+    options = ExportOptions(driver=GEOJSON_DRIVER)
 
     with tempfile.TemporaryDirectory() as tmp_dir:
         filename = f"{resource.id}.{options.driver.extension}"
@@ -302,7 +308,7 @@ def view_geojson(resource, request):
 
         response = FileResponse(
             filepath,
-            content_type=options.driver.mime or "application/octet-stream",
+            content_type=GEOJSON_DRIVER.mime,
             request=request,
         )
         response.content_disposition = f"attachment; filename={filename}"
@@ -325,7 +331,7 @@ def export_multi_get(
         Dict[ResourceID, str],
         Meta(description="Optional names for layers, resource IDs used by default"),
     ],
-):
+) -> ExportZipResponse:
     """Export multiple feature layers"""
     params_resources = [
         ResourceParam(id=rid, name=(name.get(rid) if name is not UNSET else None))
@@ -337,7 +343,7 @@ def export_multi_get(
 def export_multi_post(
     request,
     body: ExportParamsPost,
-):
+) -> ExportZipResponse:
     """Export multiple feature layers"""
     return export_multi(request, body.resources, body)
 
