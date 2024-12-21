@@ -148,15 +148,6 @@ EXPORT_FORMAT_OGR["DXF"] = OGRDriver(
     mime="application/dxf",
 )
 
-EXPORT_FORMAT_OGR["SXF"] = OGRDriver(
-    "SXF",
-    "Storage and eXchange Format (*.sxf)",
-    "sxf",
-    single_file=False,
-    options=("SXF_NEW_BEHAVIOR=YES",),
-    dsco_configurable=("SXF_MAP_SCALE:1000000", "SXF_MAP_NAME", "SXF_SHEET_KEY"),
-)
-
 OGR_DRIVER_NAME_2_EXPORT_FORMATS = [
     {
         "name": format_id,
