@@ -1,11 +1,9 @@
 import os
 import tempfile
 import zipfile
-from dataclasses import dataclass
-from dataclasses import field as dataclass_field
-from typing import Dict, List, Optional
+from typing import TYPE_CHECKING, Dict, List, Literal, Union
 
-from msgspec import Struct
+from msgspec import UNSET, Meta, Struct, field
 from osgeo import gdal
 from pyramid.response import FileResponse
 from sqlalchemy.orm.exc import NoResultFound
@@ -20,6 +18,7 @@ from nextgisweb.resource import DataScope, Resource, ResourceFactory
 from nextgisweb.resource.exception import ResourceNotFound
 from nextgisweb.resource.view import ResourceID
 from nextgisweb.spatial_ref_sys import SRS
+from nextgisweb.spatial_ref_sys.api import SRSID
 
 from .interface import IFeatureLayer, IFeatureQueryIlike
 from .ogrdriver import EXPORT_FORMAT_OGR, OGRDriverT
@@ -64,34 +63,64 @@ def _ogr_layer_from_features(
     return ogr_layer
 
 
-@dataclass
-class ExportOptions:
+class ExportOptions(Struct):
     driver: OGRDriverT
-    dsco: List[str] = dataclass_field(default_factory=list)
-    lco: List[str] = dataclass_field(default_factory=list)
-    srs: Optional[SRS] = None
-    intersects_geom: Optional[Geometry] = None
-    intersects_srs: Optional[SRS] = None
-    fields: Optional[List] = None
-    fid_field: Optional[str] = None
+    dsco: List[str] = field(default_factory=list)
+    lco: List[str] = field(default_factory=list)
+    srs: Union[SRS, None] = None
+    intersects_geom: Union[Geometry, None] = None
+    intersects_srs: Union[SRS, None] = None
+    fields: Union[List[str], None] = None
+    fid_field: Union[str, None] = None
     use_display_name: bool = False
-    ilike: Optional[str] = None
+    ilike: Union[str, None] = None
+
+
+if TYPE_CHECKING:
+    ExportFormat = Literal["GPKG", "GeoJSON"]
+else:
+    ExportFormat = Annotated[
+        Literal[tuple(EXPORT_FORMAT_OGR.keys())],
+        Meta(description="Output format"),
+    ]
 
 
 class ExportParams(Struct, kw_only=True):
-    format: str
-    encoding: Optional[str] = None
-    srs: Optional[int] = None
-    intersects: Optional[str] = None
-    intersects_srs: Optional[int] = None
-    ilike: Optional[str] = None
-    fields: Optional[List[str]] = None
-    fid: str = ""
-    display_name: bool = False
+    format: ExportFormat
+    srs: Annotated[
+        Union[SRSID, None],
+        Meta(description="Spatial Reference System ID for output"),
+    ] = None
+    fid: Annotated[
+        str,
+        Meta(description="Field name to store original feature ID"),
+    ] = ""
+    fields: Annotated[
+        Union[List[str], None],
+        Meta(description="Field keynames to export"),
+    ] = None
+    display_name: Annotated[
+        bool,
+        Meta(description="Use display name for fields, otherwise keyname"),
+    ] = False
+    encoding: Union[str, None] = None
+
+    # Filters
+
+    intersects: Annotated[
+        Union[str, None],
+        Meta(description="Filter features using WKT geometry"),
+    ] = None
+    intersects_srs: Annotated[
+        Union[SRSID, None],
+        Meta(description="SRS ID for intersecting geometry"),
+    ] = None
+    ilike: Annotated[
+        Union[str, None],
+        Meta(description="Filter features using ILIKE condition"),
+    ] = None
 
     def to_options(self) -> ExportOptions:
-        if self.format not in EXPORT_FORMAT_OGR:
-            raise ValidationError(message=gettext("Format '%s' is not supported.") % self.format)
         driver = EXPORT_FORMAT_OGR[self.format]
 
         opts = ExportOptions(driver=driver)
@@ -129,11 +158,17 @@ class ExportParams(Struct, kw_only=True):
 
 class ResourceParam(Struct, kw_only=True):
     id: ResourceID
-    name: Optional[str] = None
+    name: Annotated[
+        Union[str, None],
+        Meta(description="Optional output layer name, resource ID used by default"),
+    ] = None
 
 
 class ExportParamsPost(ExportParams):
-    resources: List[ResourceParam]
+    resources: Annotated[
+        Annotated[List[ResourceParam], Meta(min_length=1)],
+        Meta(description="Resources to export"),
+    ]
 
 
 def export(resource, options, filepath):
@@ -221,7 +256,12 @@ def export_single(
     request,
     *,
     export_params: Annotated[ExportParams, Query(spread=True)],
+    zipped: Annotated[
+        bool,
+        Meta(description="Compress exported file when using single-file formats"),
+    ] = True,
 ):
+    """Export feature layer"""
     request.resource_permission(DataScope.read)
 
     options = export_params.to_options()
@@ -232,7 +272,6 @@ def export_single(
 
         export(resource, options, filepath)
 
-        zipped = request.GET.get("zipped", "true").lower() == "true"
         if not options.driver.single_file or zipped:
             return _zip_response(request, tmp_dir, filename)
         else:
@@ -246,9 +285,10 @@ def export_single(
 
 
 def view_geojson(resource, request):
+    """Export feature layer in GeoJSON format"""
     request.resource_permission(DataScope.read)
 
-    options = ExportOptions(format="GeoJSON")
+    options = ExportOptions(driver=EXPORT_FORMAT_OGR["GeoJSON"])
 
     with tempfile.TemporaryDirectory() as tmp_dir:
         filename = f"{resource.id}.{options.driver.extension}"
@@ -272,11 +312,21 @@ def view_geojson_head(resource, request):
 def export_multi_get(
     request,
     *,
-    name: Dict[int, str],
-    resources: List[ResourceID],
+    resources: Annotated[
+        Annotated[List[ResourceID], Meta(min_length=1)],
+        Meta(description="IDs of resources to export"),
+    ],
     export_params: Annotated[ExportParams, Query(spread=True)],
+    name: Annotated[
+        Dict[ResourceID, str],
+        Meta(description="Optional names for layers, resource IDs used by default"),
+    ],
 ):
-    params_resources = [ResourceParam(id=rid, name=name.get(rid)) for rid in resources]
+    """Export multiple feature layers"""
+    params_resources = [
+        ResourceParam(id=rid, name=(name.get(rid) if name is not UNSET else None))
+        for rid in resources
+    ]
     return export_multi(request, params_resources, export_params)
 
 
@@ -284,6 +334,7 @@ def export_multi_post(
     request,
     body: ExportParamsPost,
 ):
+    """Export multiple feature layers"""
     return export_multi(request, body.resources, body)
 
 
