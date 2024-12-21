@@ -739,19 +739,6 @@ def _validate_geom(geom, target, *, fix_errors, fid):
                     else:
                         geom = None
 
-        # NOTE: Disabled for better times.
-        # Check for topology errors and fix them as possible.
-        # invalid = True
-        # if fix_errors != ERROR_FIX.NONE:
-        #     if fix_errors == ERROR_FIX.LOSSY and not geom.IsValid():
-        #         geom = geom.MakeValid()
-        #         if geom is not None and not geom.IsValid():
-        #             geom = geom.Buffer(0)
-        #     invalid = geom is None or not geom.IsValid() or geom.GetGeometryType() != gtype
-        # if invalid:
-        #     errors.append(_("Feature #%d has invalid geometry.") % fid)
-        #     continue
-
     return geom
 
 

@@ -106,11 +106,6 @@ CREATE_TEST_PARAMS = (
         dict(fix_errors=None),
         dict(feature_count=1),
     ),
-    # (
-    #     'self-intersection.geojson',
-    #     dict(fix_errors='LOSSY'),
-    #     dict(geometry_type='POLYGON', feature_count=1),
-    # ),
     (
         "single-geom-collection.geojson",
         dict(cast_geometry_type="POINT", fix_errors="SAFE"),
