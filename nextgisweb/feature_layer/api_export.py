@@ -3,7 +3,7 @@ import tempfile
 import zipfile
 from typing import TYPE_CHECKING, Dict, List, Literal, Union
 
-from msgspec import UNSET, Meta, Struct, field
+from msgspec import UNSET, Meta, Struct, UnsetType, field
 from osgeo import gdal
 from pyramid.response import FileResponse
 from sqlalchemy.orm.exc import NoResultFound
@@ -88,37 +88,37 @@ else:
 class ExportParams(Struct, kw_only=True):
     format: ExportFormat
     srs: Annotated[
-        Union[SRSID, None],
+        Union[SRSID, UnsetType],
         Meta(description="Spatial Reference System ID for output"),
-    ] = None
+    ] = UNSET
     fid: Annotated[
-        str,
+        Union[str, UnsetType],
         Meta(description="Field name to store original feature ID"),
-    ] = ""
+    ] = UNSET
     fields: Annotated[
-        Union[List[str], None],
+        Union[List[str], UnsetType],
         Meta(description="Field keynames to export"),
-    ] = None
+    ] = UNSET
     display_name: Annotated[
-        bool,
+        Union[bool, UnsetType],
         Meta(description="Use display name for fields, otherwise keyname"),
-    ] = False
-    encoding: Union[str, None] = None
+    ] = UNSET
+    encoding: Union[str, UnsetType] = UNSET
 
     # Filters
 
     intersects: Annotated[
-        Union[str, None],
+        Union[str, UnsetType],
         Meta(description="Filter features using WKT geometry"),
-    ] = None
+    ] = UNSET
     intersects_srs: Annotated[
-        Union[SRSID, None],
+        Union[SRSID, UnsetType],
         Meta(description="SRS ID for intersecting geometry"),
-    ] = None
+    ] = UNSET
     ilike: Annotated[
-        Union[str, None],
+        Union[str, UnsetType],
         Meta(description="Filter features using ILIKE condition"),
-    ] = None
+    ] = UNSET
 
     def to_options(self) -> ExportOptions:
         driver = EXPORT_FORMAT_OGR[self.format]
@@ -127,16 +127,23 @@ class ExportParams(Struct, kw_only=True):
 
         if driver.options is not None:
             opts.lco.extend(driver.options)
-        if self.encoding is not None:
-            opts.lco.append(f"ENCODING={self.encoding}")
 
         # KML should be created as WGS84
         if driver.name == "LIBKML":
             opts.srs = SRS.filter_by(id=4326).one()
-        elif self.srs is not None:
+        elif self.srs is not UNSET:
             opts.srs = SRS.filter_by(id=self.srs).one()
 
-        if self.intersects is not None:
+        if self.fid is not UNSET and self.fid != "":
+            opts.fid_field = self.fid
+        if self.fields is not UNSET:
+            opts.fields = self.fields
+        if self.display_name is not UNSET:
+            opts.use_display_name = self.display_name
+        if self.encoding is not UNSET:
+            opts.lco.append(f"ENCODING={self.encoding}")
+
+        if self.intersects is not UNSET:
             try:
                 opts.intersects_geom = Geometry.from_wkt(self.intersects)
             except GeometryNotValid:
@@ -144,14 +151,11 @@ class ExportParams(Struct, kw_only=True):
                     message=gettext("Parameter 'intersects' geometry is not valid.")
                 )
 
-            if self.intersects_srs is not None:
+            if self.intersects_srs is not UNSET:
                 opts.intersects_srs = SRS.filter_by(id=self.intersects_srs).one()
 
-        self.fields = self.fields
-        if self.fid is not None and self.fid != "":
-            opts.fid_field = self.fid
-        opts.use_display_name = self.display_name
-        opts.ilike = self.ilike
+        if self.ilike is not UNSET:
+            opts.ilike = self.ilike
 
         return opts
 
