@@ -108,9 +108,9 @@ type QueryScalar = string | number | boolean;
 type QueryList = QueryScalar[];
 type QueryRecord = Record<string, QueryScalar | QueryList>;
 
-export function encodeQueryParams(
-    value: Record<string, QueryScalar | QueryList | QueryRecord>
-): string {
+export type QueryParams = Record<string, QueryScalar | QueryList | QueryRecord>;
+
+export function encodeQueryParams(value: QueryParams): string {
     const result = [];
     for (const [k, v] of Object.entries(value)) {
         if (
