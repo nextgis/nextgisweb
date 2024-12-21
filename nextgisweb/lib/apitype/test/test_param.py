@@ -64,7 +64,7 @@ class tc:
 
 
 tc("qux", str).ok("qux", "qu%78")
-tc("foo bar", str).ok("foo bar", "foo%20bar")
+tc("foo bar", str).ok("foo bar", "foo%20bar", "foo+bar")
 tc(42, int, float).ok("42", "042").err("foo", "4.2e1")
 tc(42, Positive[int], FortyTwo).err("-42", "0")
 tc(42, Annotated[int, Query(name="j"), Query(name="k")]).ok("k=42")

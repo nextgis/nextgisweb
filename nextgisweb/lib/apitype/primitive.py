@@ -2,7 +2,7 @@ from builtins import type as builtins_type
 from functools import partial
 from re import escape
 from typing import Any, Callable, Literal, Sequence, Tuple, get_args, get_origin
-from urllib.parse import unquote
+from urllib.parse import unquote_plus
 
 from msgspec import Meta, convert
 from typing_extensions import Annotated
@@ -18,7 +18,7 @@ StrInt = Annotated[str, Meta(pattern=r"^-?[0-9]+$")]
 StrFloat = Annotated[str, Meta(pattern=r"^-?[0-9]+(\.[0-9]+)?$")]
 StrBool = Annotated[str, Meta(pattern=r"^(false|true|no|yes)$")]
 
-unquote_strict = partial(unquote, errors="strict")
+unquote_strict = partial(unquote_plus, errors="strict")
 
 
 def string_decoder(type: Any) -> StringDecoder:
