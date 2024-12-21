@@ -1,5 +1,5 @@
 from datetime import date, datetime, time
-from typing import Dict, Optional, Union
+from typing import Dict, Union
 
 from msgspec import UNSET, UnsetType
 from osgeo import ogr
@@ -23,21 +23,21 @@ class Feature:
         return self._layer
 
     @property
-    def id(self) -> Optional[int]:
+    def id(self) -> Union[int, None]:
         return self._id
 
     @id.setter
-    def id(self, value: Optional[int]):
+    def id(self, value: Union[int, None]):
         if self._id is not None and self._id != int(value):
             raise ValueError("Existing feature ID can't be changed.")
         self._id = value
 
     @property
-    def version(self) -> Optional[int]:
+    def version(self) -> Union[int, None]:
         return self._version
 
     @property
-    def label(self) -> Optional[str]:
+    def label(self) -> Union[str, None]:
         if self._layer and self._layer.feature_label_field:
             # If object is linked to a layer and naming field is set for a layer
             # use it for naming.

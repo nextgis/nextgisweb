@@ -1,6 +1,6 @@
 from base64 import urlsafe_b64decode, urlsafe_b64encode
 from datetime import datetime
-from typing import TYPE_CHECKING, List, Literal, Optional, Union
+from typing import TYPE_CHECKING, List, Literal, Union
 
 import sqlalchemy as sa
 from msgspec import Meta, Struct
@@ -53,7 +53,7 @@ class ChangesCheckResponse(Struct, kw_only=True):
 class ChangesCursor(Struct, kw_only=True, array_like=True):
     fields: List[int]
     extensions: List[str]
-    fid_last: Optional[int] = None
+    fid_last: Union[int, None] = None
 
     def encode(self):
         mp = msgspec_encode(self)
@@ -79,8 +79,8 @@ def change_check(
     request,
     *,
     initial: int = 0,
-    target: Optional[Annotated[int, Meta(ge=1)]] = None,
-    epoch: Optional[Annotated[int, Meta(ge=1)]] = None,
+    target: Union[Annotated[int, Meta(ge=1)], None] = None,
+    epoch: Union[Annotated[int, Meta(ge=1)], None] = None,
     extensions: List[Extension] = [],
 ) -> AnyOf[ChangesCheckResponse, Annotated[None, StatusCode(204)],]:
     """Check for changes between versions

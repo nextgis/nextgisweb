@@ -1,8 +1,8 @@
 import os
-from typing import List, Optional
+from typing import List, Union
 from uuid import uuid4
 
-from msgspec import Meta
+from msgspec import UNSET, Meta, UnsetType
 from osgeo import gdal, ogr
 from pyramid.httpexceptions import HTTPNoContent, HTTPNotFound
 from pyramid.response import Response
@@ -40,16 +40,17 @@ def mvt(
     x: TileX,
     y: TileY,
     extent: int = 4096,
-    simplification: Optional[float],
+    simplification: Union[float, UnsetType] = UNSET,
     padding: Annotated[float, Meta(ge=0, le=0.5)] = 0.05,
 ) -> AnyOf[
     Annotated[None, ContentType("application/vnd.mapbox-vector-tile")],
     Annotated[None, StatusCode(204)],
 ]:
+    """Get MVT tile for one or more resources"""
     if not MVT_DRIVER_EXIST:
         return HTTPNotFound(explanation="MVT GDAL driver not found")
 
-    if simplification is None:
+    if simplification is UNSET:
         simplification = extent / 512
 
     # web mercator

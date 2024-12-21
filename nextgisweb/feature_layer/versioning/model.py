@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from contextlib import contextmanager
 from datetime import datetime
-from typing import Any, List, Literal, Optional, TypeVar, Union
+from typing import Any, List, Literal, TypeVar, Union
 
 import sqlalchemy as sa
 import sqlalchemy.event as sa_event
@@ -34,7 +34,7 @@ class FVersioningMixin:
         )
 
     @property
-    def fversioning_vobj(self) -> Optional[FVersioningObj]:
+    def fversioning_vobj(self) -> Union[FVersioningObj, None]:
         if fversioning := self.fversioning:
             return fversioning.vobj
         return None
@@ -110,7 +110,7 @@ class FVersioningMeta(Base):
         ),
     )
 
-    vobj: Optional[FVersioningObj] = None
+    vobj: Union[FVersioningObj, None] = None
 
     def next(self):
         insp = inspect(self)

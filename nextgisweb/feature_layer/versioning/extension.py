@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from functools import cached_property, partial
-from typing import Any, ClassVar, Dict, Literal, NamedTuple, Optional, Sequence, Tuple, Type, Union
+from typing import Any, ClassVar, Dict, Literal, NamedTuple, Sequence, Tuple, Type, Union
 
 import sqlalchemy as sa
 import sqlalchemy.dialects.postgresql as sa_pg
@@ -327,7 +327,7 @@ class FVersioningExtensionMixin:
     fversioning_htab_args: ClassVar[Sequence[Any]] = tuple()
 
     # Instance attributes, used internaly
-    fversioning_vobj: Optional[FVersioningObj] = None
+    fversioning_vobj: Union[FVersioningObj, None] = None
     fversioning_initializing: bool
 
     def __init_subclass__(cls) -> None:

@@ -1,7 +1,7 @@
 import abc
 import dataclasses as dc
 from functools import cached_property
-from typing import Any, ClassVar, Dict, List, Optional, Tuple, Type, TypeVar, Union
+from typing import Any, ClassVar, Dict, List, Tuple, Type, TypeVar, Union
 
 from msgspec import UNSET, Meta, Struct, UnsetType
 from msgspec.inspect import StructType, type_info
@@ -21,7 +21,7 @@ class OperationExecutor(abc.ABC):
     input_types: ClassVar[Dict[str, Type[Struct]]] = dict()
     result_types: ClassVar[Dict[str, Type[Struct]]] = dict()
 
-    def __init__(self, resource: Resource, *, vobj: Optional[FVersioningMeta]):
+    def __init__(self, resource: Resource, *, vobj: Union[FVersioningMeta, None]):
         self.resource = resource
         self.vobj = vobj
 

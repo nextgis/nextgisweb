@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Generator, List, Optional, Tuple, Union
+from typing import Any, Generator, List, Tuple, Union
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
@@ -31,7 +31,7 @@ class FeatureLayerTransaction(Base):
     def put_operation(
         self,
         seqnum: int,
-        payload: Optional[Struct],
+        payload: Union[Struct, None],
         params: Union[Struct, UnsetType],
     ):
         p_values = dict(
