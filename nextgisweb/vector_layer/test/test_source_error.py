@@ -24,38 +24,33 @@ CREATE_TEST_PARAMS = (
     ),
     (
         "incomplete-linestring.geojson",
-        dict(fix_errors="LOSSY"),
-        dict(exception=ValidationError),
-    ),
-    (
-        "incomplete-linestring.geojson",
-        dict(skip_errors=True),
-        dict(feature_count=1),
-    ),
-    (
-        "incomplete-multilinestring.geojson",
-        dict(fix_errors="SAFE"),
+        dict(),
         dict(exception=ValidationError),
     ),
     (
         "incomplete-multilinestring.geojson",
+        dict(fix_errors="SAFE", skip_errors=True),
+        dict(geometry_type="MULTILINESTRING", feature_count=0),
+    ),
+    (
+        "incomplete-multilinestring.geojson",
         dict(fix_errors="LOSSY"),
-        dict(feature_count=1),
+        dict(geometry_type="MULTILINESTRING", feature_count=1),
     ),
     (
         "incomplete-polygon.geojson",
+        dict(),
+        dict(exception=ValidationError),
+    ),
+    (
+        "incomplete-multipolygon.geojson",
+        dict(fix_errors="SAFE", skip_errors=True),
+        dict(geometry_type="MULTIPOLYGON", feature_count=0),
+    ),
+    (
+        "incomplete-multipolygon.geojson",
         dict(fix_errors="LOSSY"),
-        dict(exception=ValidationError),
-    ),
-    (
-        "incomplete-multipolygon.geojson",
-        dict(fix_errors="SAFE"),
-        dict(exception=ValidationError),
-    ),
-    (
-        "incomplete-multipolygon.geojson",
-        dict(fix_errors="LOSSY", skip_errors=True),
-        dict(feature_count=1),
+        dict(geometry_type="MULTIPOLYGON", feature_count=2),
     ),
     (
         "mixed-feature-geom.geojson",

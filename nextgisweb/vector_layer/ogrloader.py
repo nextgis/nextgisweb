@@ -500,12 +500,12 @@ class OGRLoader:
                     row["id"] = fid_fget(feature, ogr_fid)
 
                 geom = feature.GetGeometryRef()
+                if geom is not None and params.validate:
+                    geom = _validate_geom(geom, wkb_type, **ctx)
+
                 if geom is None:
                     row["geom"] = None
                 else:
-                    if params.validate:
-                        geom = _validate_geom(geom, wkb_type, **ctx)
-
                     if transform and geom.Transform(transform) != 0:
                         raise FeatureError(
                             gettext(
@@ -691,48 +691,53 @@ def _validate_geom(geom, target, *, fix_errors, fid):
                     invalid = not geom.IsValid()
 
         # Check for polygon rings with fewer than 3 points and linestrings with
-        # fewer than 2 points.
-        # Check for polygon empty rings, which are not valid for PostGIS.
+        # fewer than 2 points. Check for polygon empty rings, which are not
+        # valid for PostGIS.
         if invalid or wkb_type in _wkb_polygons:
-            parts_left = geom.GetGeometryCount() if wkb_type in _wkb_multi else None
             for part_idx, part in (
                 ((None, geom),) if (wkb_type in _wkb_single) else _iter_reversed_geom(geom)
             ):
                 if wkb_type in _wkb_polygons:
                     for ring_idx, ring in _iter_reversed_geom(part):
-                        if ring_idx > 0 and ring.IsEmpty():
-                            if fix_errors == FIX_ERRORS.NONE:
+                        if (ring_points := ring.GetPointCount()) == 0:
+                            if wkb_type is _wkb_single:
+                                pass  # POLYGON EMPTY
+                            elif fix_errors == FIX_ERRORS.NONE:
                                 raise FeatureError(gettext("Feature #%d has empty rings.") % fid)
-                            part.RemoveGeometry(ring_idx)
-                        elif invalid and ring.GetPointCount() < 4:
-                            if fix_errors == FIX_ERRORS.LOSSY and ring_idx > 0:
-                                part.RemoveGeometry(ring_idx)
-                            elif (
-                                fix_errors == FIX_ERRORS.LOSSY
-                                and wkb_type in _wkb_multi
-                                and parts_left > 1
-                            ):
+                            elif ring_idx == 0:
                                 geom.RemoveGeometry(part_idx)
-                                parts_left -= 1
                             else:
+                                part.RemoveGeometry(ring_idx)
+                        elif ring_points < 4:
+                            if fix_errors != FIX_ERRORS.LOSSY:
                                 raise FeatureError(
                                     gettext(
                                         "Feature #%d has less than 3 points in a polygon ring."
                                     )
                                     % fid
                                 )
-                elif part.GetPointCount() < 2:
-                    if (
-                        fix_errors == FIX_ERRORS.LOSSY
-                        and wkb_type in _wkb_multi
-                        and parts_left > 1
-                    ):
-                        geom.RemoveGeometry(part_idx)
-                        parts_left -= 1
+                            elif ring_idx == 0 and wkb_type in _wkb_multi:
+                                geom.RemoveGeometry(part_idx)
+                            else:
+                                part.RemoveGeometry(ring_idx)
+                elif (part_points := part.GetPointCount()) == 0:
+                    if wkb_type is _wkb_single:
+                        pass  # LINESTRING EMPTY
+                    elif fix_errors == FIX_ERRORS.NONE:
+                        raise FeatureError(
+                            gettext("Feature #%d contains an empty linestring.") % fid
+                        )
                     else:
+                        geom.RemoveGeometry(part_idx)
+                elif part_points < 2:
+                    if fix_errors != FIX_ERRORS.LOSSY:
                         raise FeatureError(
                             gettext("Feature #%d has less than 2 points in a linestring.") % fid
                         )
+                    if wkb_type is _wkb_multi:
+                        geom.RemoveGeometry(part_idx)
+                    else:
+                        geom = None
 
         # NOTE: Disabled for better times.
         # Check for topology errors and fix them as possible.
