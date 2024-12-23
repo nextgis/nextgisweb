@@ -3,7 +3,7 @@ import TileLayer from "ol/layer/Tile";
 import XYZSource from "ol/source/XYZ";
 import type { Options as XYZSourceOptions } from "ol/source/XYZ";
 
-import { BaseLayer } from "./_Base";
+import { CoreLayer } from "./_Base";
 import type { LayerOptions } from "./_Base";
 
 interface URLParams {
@@ -11,7 +11,7 @@ interface URLParams {
     resource: string;
 }
 
-export default class XYZ extends BaseLayer<
+export default class XYZ extends CoreLayer<
     XYZSource,
     TileLayer<XYZSource>,
     XYZSourceOptions

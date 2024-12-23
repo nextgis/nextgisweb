@@ -3,10 +3,10 @@ import { Image as ImageLayer } from "ol/layer";
 import { ImageWMS } from "ol/source";
 import type { Options as ImageWMSOptions } from "ol/source/ImageWMS";
 
-import { BaseLayer } from "./_Base";
+import { CoreLayer } from "./_Base";
 import type { LayerOptions } from "./_Base";
 
-export default class Image extends BaseLayer<
+export default class Image extends CoreLayer<
     ImageWMS,
     ImageLayer<ImageWMS>,
     ImageWMSOptions

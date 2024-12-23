@@ -1,4 +1,4 @@
-import { action, observable, runInAction } from "mobx";
+import { action, computed, observable, runInAction } from "mobx";
 import { Map as OlMap } from "ol";
 import type { Feature, View } from "ol";
 import type { MapOptions as OlMapOptions } from "ol/PluggableMap";
@@ -10,7 +10,7 @@ import { imageQueue } from "@nextgisweb/pyramid/util";
 
 import { Watchable } from "../compat/Watchable";
 
-import type { BaseLayer } from "./layer/_Base";
+import type { CoreLayer } from "./layer/_Base";
 
 import "ol/ol.css";
 
@@ -25,7 +25,7 @@ export interface Position {
 }
 
 interface Layers {
-    [key: string]: BaseLayer;
+    [key: string]: CoreLayer;
 }
 
 interface MapWatchableProps {
@@ -102,13 +102,23 @@ export class Map extends Watchable<MapWatchableProps> {
     }
 
     @action
-    addLayer(layer: BaseLayer): void {
+    addLayer(layer: CoreLayer): void {
         const layers = { ...this.layers, [layer.name]: layer };
         this.layers = layers;
         this.olMap.addLayer(layer.getLayer());
     }
 
-    removeLayer(layer: BaseLayer): void {
+    @computed
+    get baseLayers(): Layers {
+        const layers: Layers = {};
+        for (const [key, layer] of Object.entries(this.layers)) {
+            if (!layer.isBaseLayer) continue;
+            layers[key] = layer;
+        }
+        return layers;
+    }
+
+    removeLayer(layer: CoreLayer): void {
         this.olMap.removeLayer(layer.getLayer());
         const layers = { ...this.layers };
         delete layers[layer.name];
