@@ -16,7 +16,6 @@ export const ActiveComponent = observer(
     }) => {
         if (activePanel) {
             const { load, meta } = activePanel;
-
             const Loader = lazy<ComponentType<PanelComponentProps>>(() =>
                 load().then((mod) => ({
                     default: mod,

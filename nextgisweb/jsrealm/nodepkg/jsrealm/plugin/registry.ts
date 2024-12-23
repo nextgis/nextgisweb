@@ -103,19 +103,18 @@ export class PluginRegistry<
             return;
         }
 
-        let loader: PromiseLoader<V>;
-
-        if (isAsyncLoader(value)) {
-            loader = () =>
-                value().then((mod) => {
+        const loader: PromiseLoader<V> = () => {
+            if (isAsyncLoader(value)) {
+                return value().then((mod) => {
                     if (mod && typeof mod === "object" && "default" in mod) {
                         return mod.default;
                     }
                     return mod;
                 });
-        } else {
-            loader = () => Promise.resolve(value);
-        }
+            } else {
+                return Promise.resolve(value);
+            }
+        };
 
         const plugin = new PluginObject<V, M>(component, loader, meta);
 
