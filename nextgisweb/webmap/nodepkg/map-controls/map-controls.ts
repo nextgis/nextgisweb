@@ -1,5 +1,3 @@
-/// <reference types="dojo/dijit" />
-
 import { orderBy } from "lodash-es";
 import Attribution from "ol/control/Attribution";
 import Rotate from "ol/control/Rotate";
@@ -8,15 +6,12 @@ import Zoom from "ol/control/Zoom";
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { html } from "@nextgisweb/pyramid/icon";
-// @ts-expect-error Import URL parser module
-import InfoScale from "ngw-webmap/controls/InfoScale";
-// @ts-expect-error Import URL parser module
-import InitialExtent from "ngw-webmap/controls/InitialExtent";
-// @ts-expect-error Import URL parser module
-import MyLocation from "ngw-webmap/controls/MyLocation";
 
 import type { DojoDisplay, MapControl } from "../type";
 
+import { InfoScale } from "./control/InfoScale";
+import { InitialExtent } from "./control/InitialExtent";
+import { MyLocation } from "./control/MyLocation";
 import { ToolsInfo, buildTools, getToolsInfo } from "./map-tools";
 import { Identify } from "./tool/Identify";
 import type { ControlInfo, ControlReady } from "./type";
