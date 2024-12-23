@@ -97,9 +97,9 @@ export class PanelsManager {
         return this.active.active;
     }
 
-    closePanel(): void {
+    closePanel = (): void => {
         this.setActive(undefined, "manager");
-    }
+    };
 
     @action
     private _handleInitActive(): void {

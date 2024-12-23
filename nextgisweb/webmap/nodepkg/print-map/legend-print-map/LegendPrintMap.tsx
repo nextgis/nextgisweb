@@ -99,7 +99,7 @@ export const LegendPrintMap = ({
                                 store,
                                 layersItems
                             );
-                            printMapStore.webMapItems = filteredItems;
+                            printMapStore.setWebMapItems(filteredItems);
                             return filteredItems;
                         },
                     }}

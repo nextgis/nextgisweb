@@ -255,7 +255,7 @@ const ScalesSelect = ({
 };
 
 const PrintPanel = observer(
-    ({ display, title, close, visible }: PanelComponentProps) => {
+    ({ display, title, close }: PanelComponentProps) => {
         const [urlParsed, setUrlParsed] = useState(false);
         const [mapInit, setMapInit] = useState(false);
         const [paperFormat, setPaperFormat] = useState("210_297");
@@ -263,8 +263,8 @@ const PrintPanel = observer(
         const [scales, setScales] = useState(scalesList);
         const [center, setCenter] = useState<Coordinate>();
         const [printMapScale, setPrintMapScale] = useState<number>();
-        const [printMapComp, setPrintMapComp] = useState<Comp>();
-        const [printMapEl, setPrintMapEl] = useState<HTMLElement>();
+        const printMapComp = useRef<Comp>();
+        const printMapEl = useRef<HTMLElement>();
 
         const printMaxSize = useMemo(() => {
             return display.config.printMaxSize;
@@ -344,32 +344,39 @@ const PrintPanel = observer(
                     setCenter(center);
                 },
             });
-            setPrintMapComp(comp);
-            setPrintMapEl(element);
+            printMapComp.current = comp;
+            printMapEl.current = element;
             resizeObserver.current = resize;
             setMapInit(true);
         };
 
         const hide = () => {
-            setTimeout(() => {
-                updateMapSettings({ scale: undefined });
-                if (resizeObserver.current) {
-                    resizeObserver.current.disconnect();
-                }
-                if (printMapComp) {
-                    printMapComp.unmount();
-                }
-                setPrintMapComp(undefined);
-                setPrintMapEl(undefined);
-                if (printMapEl) {
-                    printMapEl.remove();
-                }
-            });
+            updateMapSettings({ scale: undefined });
+            if (resizeObserver.current) {
+                resizeObserver.current.disconnect();
+            }
+            if (printMapComp.current) {
+                printMapComp.current.unmount();
+            }
+            printMapComp.current = undefined;
+            if (printMapEl.current) {
+                printMapEl.current.remove();
+            }
+            printMapEl.current = undefined;
         };
 
+        // useEffect(() => {
+        //     visible ? show() : hide();
+        //     return () => {
+        //         hide();
+        //     };
+        // }, [visible]);
         useEffect(() => {
-            visible ? show() : hide();
-        }, [visible]);
+            show();
+            return () => {
+                hide();
+            };
+        }, []);
 
         useEffect(() => {
             if (!center) {
@@ -379,8 +386,8 @@ const PrintPanel = observer(
         }, [center]);
 
         useEffect(() => {
-            if (printMapComp) {
-                updatePrintMapComp(printMapComp, mapSettings);
+            if (printMapComp.current) {
+                updatePrintMapComp(printMapComp.current, mapSettings);
             }
         }, [mapSettings]);
 
@@ -573,7 +580,7 @@ const PrintPanel = observer(
                         <PrintMapExport
                             display={display}
                             mapSettings={mapSettings}
-                            printMapEl={printMapEl}
+                            printMapEl={printMapEl.current}
                         />
                         <Space.Compact>
                             <CopyToClipboardButton

@@ -100,6 +100,10 @@ export class AnnotationsPopup {
         return this;
     }
 
+    cloneOlPopup(feature: AnnotationFeature): OlPopup {
+        return this._popup.cloneOlPopup(feature);
+    }
+
     getAnnFeature(): AnnotationFeature {
         return this._annFeature;
     }
