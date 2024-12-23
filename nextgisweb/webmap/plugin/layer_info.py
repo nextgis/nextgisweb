@@ -13,4 +13,4 @@ class LayerInfoPlugin(WebmapLayerPlugin):
         else:
             payload["description"] = None
 
-        return ("ngw-webmap/plugin/LayerInfo", payload)
+        return ("@nextgisweb/webmap/plugin/layer-info", payload)
