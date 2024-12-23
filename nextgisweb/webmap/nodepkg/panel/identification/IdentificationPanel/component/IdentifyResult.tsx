@@ -5,7 +5,7 @@ import type { FeatureItem } from "@nextgisweb/feature-layer/type";
 import { Alert } from "@nextgisweb/gui/antd";
 import { errorModal } from "@nextgisweb/gui/error";
 import type { ApiError } from "@nextgisweb/gui/error/type";
-import { sleep } from "@nextgisweb/gui/util";
+import { useLoading } from "@nextgisweb/gui/hook/useLoading";
 import { executeWithMinDelay } from "@nextgisweb/gui/util/executeWithMinDelay";
 import { route } from "@nextgisweb/pyramid/api";
 import type { GetRequestOptions } from "@nextgisweb/pyramid/api/type";
@@ -58,6 +58,7 @@ const loadFeatureItem = async (
             onRealExecute: (res) => {
                 highlightFeature(res, featureInfo);
             },
+            minDelay: 700,
             signal: opt?.signal,
         }
     );
@@ -68,7 +69,8 @@ const loadFeatureItem = async (
 export function IdentifyResult({ identifyInfo, display }: IdentifyResultProps) {
     const [featureInfo, setFeatureInfo] = useState<FeatureInfo>();
     const [featureItem, setFeatureItem] = useState<FeatureItem>();
-    const [loading, setLoading] = useState(false);
+
+    const { trackPromise, isLoading } = useLoading();
 
     const { makeSignal, abort } = useAbortController();
 
@@ -85,19 +87,13 @@ export function IdentifyResult({ identifyInfo, display }: IdentifyResultProps) {
         async (featureInfo: FeatureInfo) => {
             abort();
 
-            // This is important to handle the abort error before setting the loading state.
-            await sleep(0);
-
             setFeatureItem(undefined);
 
             const signal = makeSignal();
 
-            setLoading(true);
             try {
-                const featureItemLoaded = await loadFeatureItem(
-                    identifyInfo,
-                    featureInfo,
-                    { signal }
+                const featureItemLoaded = await trackPromise(
+                    loadFeatureItem(identifyInfo, featureInfo, { signal })
                 );
 
                 setFeatureItem(featureItemLoaded);
@@ -105,11 +101,9 @@ export function IdentifyResult({ identifyInfo, display }: IdentifyResultProps) {
                 if ((er as Error).name !== "AbortError") {
                     errorModal(er as ApiError);
                 }
-            } finally {
-                setLoading(false);
             }
         },
-        [identifyInfo, abort, makeSignal]
+        [identifyInfo, abort, trackPromise, makeSignal]
     );
 
     const onFeatureChange = useCallback(
@@ -135,7 +129,7 @@ export function IdentifyResult({ identifyInfo, display }: IdentifyResultProps) {
     }
 
     let loadElement = null;
-    if (loading) {
+    if (isLoading) {
         loadElement = (
             <div className="load-row">
                 <div className="load">
