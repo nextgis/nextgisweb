@@ -16,19 +16,17 @@ define([
     "@nextgisweb/pyramid/company-logo",
     "@nextgisweb/webmap/store",
     "@nextgisweb/webmap/panels-manager",
-    "@nextgisweb/webmap/store/annotations",
     "./ol/Map",
     "@nextgisweb/webmap/map-toolbar",
     "./FeatureHighlighter",
     "@nextgisweb/webmap/map-state-observer",
-    "./ui/react-panel",
     "./ui/react-webmap-tabs",
     // tools
     "@nextgisweb/webmap/map-controls",
     // Tiny display
     "ngw-webmap/controls/LinkToMainMap",
     // panels
-    "@nextgisweb/webmap/panel/layers",
+    "@nextgisweb/webmap/compat/makePanels",
     // utils
     "./utils/URL",
     // settings
@@ -58,16 +56,14 @@ define([
     companyLogo,
     WebmapStore,
     PanelsManager,
-    AnnotationsStore,
     Map,
     MapToolbar,
     FeatureHighlighter,
     MapStatesObserver,
-    reactPanel,
     ReactWebMapTabs,
     MapControls,
     LinkToMainMap,
-    LayersPanelModule,
+    makePanels,
     URL,
     { gettext, renderTemplate },
     settings,
@@ -929,164 +925,10 @@ define([
             ]);
 
             promises
-                .then(lang.hitch(this, this._makePanels))
+                .then(() => makePanels.makePanels({ display: this }))
                 .then(undefined, (err) => {
                     console.error(err);
                 });
-        },
-
-        _makePanels: function () {
-            const panels = [];
-
-            panels.push({
-                cls: reactPanel(LayersPanelModule.default, {
-                    waitFor: [this.panelsManager.panelsReady.promise],
-                }),
-                params: {
-                    title: gettext("Layers"),
-                    name: "layers",
-                    order: 10,
-                    menuIcon: "material-layers",
-                    applyToTinyMap: true,
-                },
-            });
-
-            panels.push({
-                cls: reactPanel("@nextgisweb/webmap/panel/identification"),
-                params: {
-                    title: gettext("Identify"),
-                    name: "identify",
-                    order: 15,
-                    menuIcon: "material-arrow_selector_tool",
-                    applyToTinyMap: true,
-                },
-            });
-
-            panels.push({
-                cls: reactPanel("@nextgisweb/webmap/panel/search"),
-                params: {
-                    title: gettext("Search"),
-                    name: "search",
-                    order: 20,
-                    menuIcon: "material-search",
-                    applyToTinyMap: true,
-                },
-            });
-
-            panels.push({
-                cls: reactPanel("@nextgisweb/webmap/panel/print"),
-                params: {
-                    title: gettext("Print map"),
-                    name: "print",
-                    order: 70,
-                    menuIcon: "material-print",
-                },
-            });
-
-            const makeBookmarkPanel = new Promise((resolve) => {
-                if (!this.config.bookmarkLayerId) {
-                    resolve(undefined);
-                }
-                const panel = {
-                    cls: reactPanel("@nextgisweb/webmap/panel/bookmarks"),
-                    params: {
-                        title: gettext("Bookmarks"),
-                        name: "bookmark",
-                        order: 50,
-                        menuIcon: "material-bookmark",
-                        applyToTinyMap: true,
-                    },
-                };
-                resolve(panel);
-            });
-            panels.push(makeBookmarkPanel);
-
-            const makeInfoPanel = new Promise((resolve) => {
-                if (!this.config.webmapDescription) {
-                    resolve(undefined);
-                }
-                const panel = {
-                    cls: reactPanel("@nextgisweb/webmap/panel/description"),
-                    params: {
-                        title: gettext("Description"),
-                        name: "info",
-                        order: 40,
-                        menuIcon: "material-info",
-                        applyToTinyMap: true,
-                    },
-                };
-                resolve(panel);
-            });
-            panels.push(makeInfoPanel);
-
-            const makeAnnotationsPanel = new Promise((resolve) => {
-                this._buildAnnotationPanel(resolve);
-            });
-            panels.push(makeAnnotationsPanel);
-
-            panels.push({
-                cls: reactPanel("@nextgisweb/webmap/panel/share"),
-                params: {
-                    title: gettext("Share"),
-                    name: "share",
-                    order: 60,
-                    menuIcon: "material-share",
-                },
-            });
-
-            this.panelsManager.addPanels(panels);
-            this.panelsManager.initFinalize();
-        },
-
-        _buildAnnotationPanel: function (resolve) {
-            const shouldMakePanel =
-                this.config.annotations &&
-                this.config.annotations.enabled &&
-                this.config.annotations.scope.read;
-
-            if (!shouldMakePanel) {
-                resolve(undefined);
-                return;
-            }
-
-            const annotUrlParam = this._urlParams.annot;
-            const allowedUrlValues = ["no", "yes", "messages"];
-            let initialAnnotVisible;
-            if (annotUrlParam && allowedUrlValues.includes(annotUrlParam)) {
-                initialAnnotVisible = annotUrlParam;
-            }
-            initialAnnotVisible =
-                initialAnnotVisible || this.config.annotations.default;
-            AnnotationsStore.default.setVisibleMode(initialAnnotVisible);
-
-            require(["ngw-webmap/ui/AnnotationsManager/AnnotationsManager"], (
-                AnnotationsManager
-            ) => {
-                AnnotationsManager.getInstance({
-                    display: this,
-                    initialAnnotVisible,
-                });
-            });
-
-            const panel = {
-                cls: reactPanel("@nextgisweb/webmap/panel/annotations", {
-                    props: {
-                        onTopicPublish: (args) => {
-                            topic.publish.apply(this, args);
-                        },
-                        mapStates: MapStatesObserver.getInstance(),
-                        initialAnnotVisible,
-                    },
-                }),
-                params: {
-                    title: gettext("Annotations"),
-                    name: "annotation",
-                    order: 30,
-                    menuIcon: "material-chat",
-                    applyToTinyMap: true,
-                },
-            };
-            resolve(panel);
         },
 
         highlightGeometry: function (geometry) {
