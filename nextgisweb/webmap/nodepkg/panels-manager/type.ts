@@ -22,7 +22,7 @@ export interface DisplayItemConfig {
 export interface PanelProps {
     display: DojoDisplay;
     close: () => void;
-    title?: string;
+    title: string;
 }
 
 export type DojoPanel = PanelDojoItem;
