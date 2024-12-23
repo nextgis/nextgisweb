@@ -10,7 +10,6 @@ import {
     Select,
     Space,
     Switch,
-    Tooltip,
     Typography,
 } from "@nextgisweb/gui/antd";
 import type { OptionType } from "@nextgisweb/gui/antd";
@@ -26,20 +25,10 @@ import {
 } from "./select-options";
 
 import { SaveOutlined, WarningOutlined } from "@ant-design/icons";
-import ExperimentalIcon from "@nextgisweb/icon/material/science";
 
 const { Title } = Typography;
 
 const INPUT_DEFAULT_WIDTH = { width: "100%" };
-
-// prettier-ignore
-const experimentalPanelMsg = gettext("Use panel instead of popup identification");
-
-const experimentalPanel = (
-    <Tooltip title={experimentalPanelMsg}>
-        <ExperimentalIcon />
-    </Tooltip>
-);
 
 interface SettingsFormProps {
     onFinish: (values: WebMapCSettingsUpdate) => void;
@@ -162,20 +151,6 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({
                                 <Switch />
                             </Form.Item>
                             {gettext("Show geometry info")}
-                        </Space>
-                    </Form.Item>
-                </Col>
-                <Col span={8}>
-                    <Form.Item>
-                        <Space direction="horizontal">
-                            <Form.Item
-                                noStyle
-                                name="identify_panel"
-                                valuePropName="checked"
-                            >
-                                <Switch />
-                            </Form.Item>
-                            {experimentalPanelMsg} {experimentalPanel}
                         </Space>
                     </Form.Item>
                 </Col>
