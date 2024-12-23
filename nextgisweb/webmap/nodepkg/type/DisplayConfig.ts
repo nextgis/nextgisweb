@@ -1,3 +1,5 @@
+import type { VisibleMode } from "../store/annotations/AnnotationsStore";
+
 import type { GroupItem } from "./TreeItems";
 
 interface Scope {
@@ -8,7 +10,7 @@ interface Scope {
 
 interface Annotations {
     enabled: boolean;
-    default: string;
+    default: VisibleMode;
     scope: Scope;
 }
 
