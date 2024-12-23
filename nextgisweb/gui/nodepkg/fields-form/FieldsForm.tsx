@@ -74,7 +74,6 @@ export function FieldsForm<
             ) : (
                 includedFields.map((f) => <FormItem key={f.name} {...f} />)
             )}
-            {children}
         </Form>
     );
 }

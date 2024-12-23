@@ -57,7 +57,7 @@ interface CarouselRenderProps {
     attachment: DataSource;
     data: DataSource[];
     resourceId: number;
-    featureId: number;
+    featureId: number | null;
 }
 
 interface Attachment {
@@ -130,7 +130,10 @@ export function CarouselRender({
         async function getUrl() {
             const attachments = await Promise.all(
                 imageList.map(async (d) => {
-                    if (isFeatureAttachment(d)) {
+                    if (
+                        isFeatureAttachment(d) &&
+                        typeof featureId === "number"
+                    ) {
                         const a = d as FeatureAttachment;
                         return {
                             ...getFeatureImage({
