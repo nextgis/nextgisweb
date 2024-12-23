@@ -73,7 +73,6 @@ export interface MapRefs {
     rightBottomControlPane: HTMLElement;
 }
 
-
 export interface MapURLParams {
     lon?: string;
     lat?: string;
