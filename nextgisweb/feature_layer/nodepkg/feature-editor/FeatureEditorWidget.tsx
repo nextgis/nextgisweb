@@ -41,7 +41,7 @@ export const FeatureEditorWidget = observer(
         okBtnMsg = msgOk,
         toolbar,
         store: storeProp,
-        mode,
+        mode = "save",
         onOk,
         onSave,
     }: FeatureEditorWidgetProps) => {
