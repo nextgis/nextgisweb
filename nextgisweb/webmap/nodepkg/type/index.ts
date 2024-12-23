@@ -3,9 +3,9 @@ import type React from "react";
 import type ShadowDisplay from "../compat/ShadowDisplay";
 
 export * from "./DisplayConfig";
-export * from "./DojoDisplay";
+export * from "./ShadowDisplay";
 
-export interface BasePanelProps {
+export interface BasePanelMeta {
     display?: ShadowDisplay;
     menuIcon: React.ReactNode;
     name: string;
@@ -17,4 +17,4 @@ export interface BasePanelProps {
     key?: string;
 }
 
-export type ReactPanelProps<T = unknown> = BasePanelProps & T;
+export type PanelMeta<T = unknown> = BasePanelMeta & T;

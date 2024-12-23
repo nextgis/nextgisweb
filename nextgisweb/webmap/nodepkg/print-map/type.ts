@@ -1,6 +1,6 @@
 import type { Coordinate } from "ol/coordinate";
 
-import type { DojoDisplay } from "../type";
+import type { ShadowDisplay } from "../type";
 
 import type { printMapStore } from "./PrintMapStore";
 
@@ -17,7 +17,7 @@ export interface LegendRndCoords extends RndCoords {
 }
 
 export interface LegendPrintMapProps {
-    dojoDisplay: DojoDisplay;
+    display: ShadowDisplay;
     printMapStore: typeof printMapStore;
     legendCoords: LegendRndCoords;
     show: boolean;
@@ -54,7 +54,7 @@ export interface PrintMapSettings extends PrintMapPaper {
 export interface PrintMapProps {
     settings: PrintMapSettings;
     initCenter: Coordinate | null;
-    display: DojoDisplay;
+    display: ShadowDisplay;
     onScaleChange: (scale: number) => void;
     onCenterChange: (center: Coordinate) => void;
 }

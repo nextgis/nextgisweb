@@ -15,22 +15,22 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { html as htmlIcon } from "@nextgisweb/pyramid/icon";
 import settings from "@nextgisweb/pyramid/settings!webmap";
 import { MeasureArea, MeasureDistance } from "@nextgisweb/webmap/icon";
-import type { DojoDisplay } from "@nextgisweb/webmap/type";
+import type { ShadowDisplay } from "@nextgisweb/webmap/type";
 import { formatMetersArea, formatMetersLength } from "@nextgisweb/webmap/utils";
 import type { DefaultConfig } from "@nextgisweb/webmap/utils/format-units";
 
-import { Base } from "./ToolBase";
+import { ToolBase } from "./ToolBase";
 
 import "./Measure.css";
 
 interface MeasureOptions {
-    display: DojoDisplay;
+    display: ShadowDisplay;
     type: "LineString" | "Polygon";
 }
 
 const DELAY = 200;
 
-export class ToolMeasure extends Base {
+export class ToolMeasure extends ToolBase {
     private readonly vector: VectorLayer<VectorSource>;
     private readonly interaction: Draw;
     private active: boolean = false;

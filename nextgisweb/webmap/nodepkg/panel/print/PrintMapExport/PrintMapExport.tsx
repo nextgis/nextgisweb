@@ -10,7 +10,7 @@ import type { PrintBody, PrintFormat } from "@nextgisweb/webmap/type/api";
 
 import { printMapStore } from "../../../print-map/PrintMapStore";
 import type { PrintMapSettings } from "../../../print-map/type";
-import type { DojoDisplay } from "../../../type";
+import type { ShadowDisplay } from "../../../type";
 import { exportFormats } from "../options";
 
 import { legendItemsToModel, legendToModel } from "./legendToModel";
@@ -18,7 +18,7 @@ import { legendItemsToModel, legendToModel } from "./legendToModel";
 import { DownOutlined } from "@ant-design/icons";
 
 interface ExportProps {
-    display: DojoDisplay;
+    display: ShadowDisplay;
     format: PrintFormat;
     element: HTMLElement;
     settings: PrintMapSettings;
@@ -102,7 +102,7 @@ const runExport = ({
 interface PrintMapExportProps {
     mapSettings: PrintMapSettings;
     printMapEl?: HTMLElement;
-    display: DojoDisplay;
+    display: ShadowDisplay;
 }
 
 export const PrintMapExport = observer(

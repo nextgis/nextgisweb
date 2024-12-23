@@ -1,4 +1,3 @@
-import topic from "dojo/topic";
 import { Feature } from "ol";
 import { WKT } from "ol/format";
 import type { Geometry } from "ol/geom";
@@ -6,6 +5,7 @@ import type VectorSource from "ol/source/Vector";
 import { Circle, Stroke, Style } from "ol/style";
 
 import { route } from "@nextgisweb/pyramid/api";
+import topic from "@nextgisweb/webmap/compat/topic";
 import Vector from "@nextgisweb/webmap/ol/layer/Vector";
 
 import type { Map } from "../ol/Map";

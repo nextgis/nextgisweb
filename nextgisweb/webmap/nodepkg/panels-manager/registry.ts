@@ -9,30 +9,30 @@ import type {
     RegisterValue,
 } from "@nextgisweb/jsrealm/plugin/registry";
 
-import type { ReactPanelProps } from "../type";
+import type { PanelMeta } from "../type";
 
-import type { ReactPanelComponentProps } from "./type";
+import type { PanelComponentProps } from "./type";
 
 export type PanelWidget<T = unknown> = ComponentType<
-    ReactPanelComponentProps<T>
+    PanelComponentProps<T>
 >;
 
 export type PanelPlugin<T = unknown> = Plugin<
     PanelWidget<T>,
-    ReactPanelProps<T>
+    PanelMeta<T>
 >;
 
-export const registry = pluginRegistry<PanelWidget<any>, ReactPanelProps<any>>(
+export const registry = pluginRegistry<PanelWidget<any>, PanelMeta<any>>(
     MODULE_NAME
 );
 
 export function createPanelRegistry<T = unknown>(
     component: string,
     value: RegisterValue<PanelWidget<T>>,
-    meta?: ReactPanelProps<Partial<T>> & {
-        isEnabled?: (val: ReactPanelProps<T>) => boolean;
+    meta?: PanelMeta<Partial<T>> & {
+        isEnabled?: (val: PanelMeta<T>) => boolean;
         beforeCreate?: (
-            val: PluginObject<PanelWidget<T>, ReactPanelProps<Partial<T>>>
+            val: PluginObject<PanelWidget<T>, PanelMeta<Partial<T>>>
         ) => void;
     }
 ) {
