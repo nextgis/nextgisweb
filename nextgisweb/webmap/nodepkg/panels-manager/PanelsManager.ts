@@ -178,7 +178,9 @@ export class PanelsManager {
 
     private _activateFirstPanel(): void {
         const firstPanelKey = this._panels.keys().next().value;
-        this._activatePanel(firstPanelKey);
+        if (firstPanelKey) {
+            this._activatePanel(firstPanelKey);
+        }
     }
 
     private _makePanel(panel: AddpanelItem | PanelDojoItem): void {
@@ -197,14 +199,8 @@ export class PanelsManager {
             if (isFuncReactComponent(cls)) {
                 throw new Error("Panel React rendering is not implemented");
             } else {
-                const widget = new cls({ ...params, display: this._display });
-                if (widget.on) {
-                    widget.on("closed", (panel: PanelDojoItem) => {
-                        // can't reach this event
-                        this._closePanel(panel);
-                    });
-                }
-                newPanel = widget;
+                const widget = cls({ ...params, display: this._display });
+                newPanel = widget as unknown as PanelDojoItem;
             }
         } else if ("name" in panel) {
             name = panel.name;

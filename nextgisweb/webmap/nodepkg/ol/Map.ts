@@ -12,6 +12,8 @@ import { Watchable } from "../compat/Watchable";
 
 import type { BaseLayer } from "./layer/_Base";
 
+import "ol/ol.css";
+
 interface MapOptions extends OlMapOptions {
     view: View;
     logo?: boolean;
