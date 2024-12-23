@@ -59,4 +59,9 @@ export interface PanelDojoItem extends DojoItem {
     hide: () => void;
 
     applyToTinyMap?: boolean;
+
+    app?: {
+        update: (val: Record<string, unknown>) => void;
+    };
+    props: Record<string, unknown>
 }

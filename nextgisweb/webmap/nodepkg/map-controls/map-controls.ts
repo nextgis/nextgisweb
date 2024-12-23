@@ -7,25 +7,18 @@ import ScaleLine from "ol/control/ScaleLine";
 import Zoom from "ol/control/Zoom";
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore Import URL parser module
 import { html } from "@nextgisweb/pyramid/icon";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore Import URL parser module
+// @ts-expect-error Import URL parser module
 import InfoScale from "ngw-webmap/controls/InfoScale";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore Import URL parser module
+// @ts-expect-error Import URL parser module
 import InitialExtent from "ngw-webmap/controls/InitialExtent";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore Import URL parser module
+// @ts-expect-error Import URL parser module
 import MyLocation from "ngw-webmap/controls/MyLocation";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore Import URL parser module
-import Identify from "ngw-webmap/tool/Identify";
 
 import type { DojoDisplay, MapControl } from "../type";
 
 import { ToolsInfo, buildTools, getToolsInfo } from "./map-tools";
+import { Identify } from "./tool/Identify";
 import type { ControlInfo, ControlReady } from "./type";
 import { getControlsInfo } from "./utils";
 
@@ -126,6 +119,7 @@ export const ControlsInfo: ControlInfo[] = [
     },
     {
         label: gettext("Identification"),
+        // @ts-expect-error TODO: What is the MapControl?
         ctor: (display) => {
             return new Identify({ display });
         },
