@@ -12,7 +12,7 @@ import type WebmapStore from "../store";
 
 import type { DisplayConfig } from "./DisplayConfig";
 import type { DisplayMap } from "./DisplayMap";
-import type { TreeItem } from "./TreeItems";
+import type { LayerItem, TreeItem } from "./TreeItems";
 import type { WebmapItem } from "./WebmapItem";
 import type { WebmapLayer } from "./WebmapLayer";
 import type { WebmapPlugin } from "./WebmapPlugin";
@@ -131,6 +131,12 @@ export interface PluginParams {
     identity: string;
     display: DojoDisplay;
     itemStore: CustomItemFileWriteStore | boolean;
+}
+
+export interface PluginState {
+    enabled: boolean;
+    nodeData: LayerItem;
+    map: DisplayMap;
 }
 
 export interface Plugin {
