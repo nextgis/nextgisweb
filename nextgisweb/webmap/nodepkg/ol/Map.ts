@@ -17,7 +17,7 @@ interface MapOptions extends OlMapOptions {
     logo?: boolean;
 }
 
-interface Position {
+export interface Position {
     zoom: number;
     center: number[];
 }

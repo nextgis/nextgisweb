@@ -1,7 +1,7 @@
 import LayersTree from "../../layers-tree";
 import type { TreeWebmapItem } from "../../layers-tree/LayersTree";
 import type WebmapStore from "../../store";
-import type { LayerItem } from "../../type/TreeItems";
+import type { LayerItemConfig } from "../../type/TreeItems";
 import { printMapStore } from "../PrintMapStore";
 import RndComp from "../rnd-comp";
 import type { LegendPrintMapProps, RndCoords } from "../type";
@@ -20,7 +20,7 @@ const handleTreeItem = (
 
         const hasLegend =
             layersItem.legendIcon ||
-            (layersItem.treeItem as LayerItem).legendInfo.open;
+            (layersItem.treeItem as LayerItemConfig).legendInfo.open;
 
         if (hasLegend) {
             return layersItem;

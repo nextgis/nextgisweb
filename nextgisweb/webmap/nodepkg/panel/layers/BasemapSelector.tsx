@@ -8,8 +8,8 @@ import { UpOutlined } from "@ant-design/icons";
 
 interface BasemapSelectorProps {
     map: Map;
-    basemapDefault: number;
-    onChange: (key: number) => void;
+    basemapDefault: string;
+    onChange: (key: string) => void;
 }
 
 export function BasemapSelector({

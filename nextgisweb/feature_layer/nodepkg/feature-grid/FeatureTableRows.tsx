@@ -134,7 +134,7 @@ export function FeatureTableRows({
                 }
                 return (
                     <div
-                        key={virtualRow.key}
+                        key={virtualRow.key as React.Key}
                         className={className}
                         data-index={virtualRow.index}
                         ref={measureElement}

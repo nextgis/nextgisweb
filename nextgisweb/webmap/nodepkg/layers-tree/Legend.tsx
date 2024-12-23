@@ -3,12 +3,12 @@ import { theme } from "antd";
 import { Checkbox, ConfigProvider } from "@nextgisweb/gui/antd";
 
 import type WebmapStore from "../store";
-import type { TreeItem } from "../type/TreeItems";
+import type { TreeItemConfig } from "../type/TreeItems";
 
 import "./Legend.less";
 
 interface LegendProps {
-    nodeData: TreeItem;
+    nodeData: TreeItemConfig;
     store: WebmapStore;
     checkable: boolean;
 }
