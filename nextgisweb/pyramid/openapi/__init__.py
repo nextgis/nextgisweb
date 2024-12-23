@@ -1,4 +1,5 @@
 from collections import defaultdict
+from inspect import isclass
 from itertools import chain
 from typing import Any, Dict
 
@@ -6,6 +7,7 @@ from msgspec import NODEFAULT, UNSET
 from msgspec.inspect import Metadata, type_info
 from msgspec.json import schema_components
 from msgspec.msgpack import Decoder as MsgpackDecoder
+from pyramid.response import Response
 
 from nextgisweb.env import Component, inject
 from nextgisweb.lib.apitype import ContentType as CType
@@ -108,7 +110,10 @@ def openapi(introspector, prefix="/api/", *, comp: PyramidComponent):
                     result["schema"] = dict(oneOf=[schema_ref(m) for m in union])
                     return result
 
-            result["schema"] = schema_ref(tdef)
+            origin = unannotate(tdef)
+            if not isclass(origin) or not issubclass(origin, Response):
+                result["schema"] = schema_ref(tdef)
+
         return result
 
     # Paths
