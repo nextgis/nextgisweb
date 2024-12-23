@@ -1,1 +1,1 @@
-export { PrintPanel as default } from "./PrintPanel";
+export { default } from "./PrintPanel";

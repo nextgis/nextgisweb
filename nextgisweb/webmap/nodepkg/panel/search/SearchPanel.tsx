@@ -341,7 +341,10 @@ const search = async (
     return [searchResults, isExceeded];
 };
 
-export const SearchPanel = ({ display, close }: ReactPanelComponentProps) => {
+export default function SearchPanel({
+    display,
+    close,
+}: ReactPanelComponentProps) {
     const [loading, setLoading] = useState<boolean>(false);
     const [searchResults, setSearchResults] = useState<
         [SearchResult[], boolean] | undefined
@@ -471,4 +474,4 @@ export const SearchPanel = ({ display, close }: ReactPanelComponentProps) => {
             <div className="results">{results}</div>
         </div>
     );
-};
+}

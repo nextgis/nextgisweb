@@ -21,15 +21,11 @@ export class FeatureLayerPlugin extends PluginBase {
         if ("layerId" in item) {
             const layerId = item.layerId;
 
-            this.display.tabContainer.addTab({
+            this.display.tabsManager.addTab({
                 key: String(layerId),
                 label: item.label,
                 component: () =>
-                    import("@nextgisweb/webmap/webmap-feature-grid-tab").then(
-                        (mod) => ({
-                            default: mod.default,
-                        })
-                    ),
+                    import("@nextgisweb/webmap/webmap-feature-grid-tab"),
                 props: {
                     topic,
                     layerId: layerId,

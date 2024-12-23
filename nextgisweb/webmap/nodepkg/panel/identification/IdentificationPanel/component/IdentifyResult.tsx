@@ -84,11 +84,14 @@ export function IdentifyResult({ identifyInfo, display }: IdentifyResultProps) {
     }, [isNotFound]);
 
     const updateFeatureItem = useCallback(
-        async (featureInfo: FeatureInfo) => {
+        async (featureInfo: FeatureInfo | undefined) => {
             abort();
 
             setFeatureItem(undefined);
 
+            if (!featureInfo) {
+                return;
+            }
             const signal = makeSignal();
 
             try {
@@ -107,7 +110,7 @@ export function IdentifyResult({ identifyInfo, display }: IdentifyResultProps) {
     );
 
     const onFeatureChange = useCallback(
-        (featureInfo: FeatureInfo) => {
+        (featureInfo: FeatureInfo | undefined) => {
             setFeatureInfo(featureInfo);
             updateFeatureItem(featureInfo);
         },

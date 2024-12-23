@@ -1,3 +1,1 @@
-import { AnnotationsPanel } from "./AnnotationsPanel";
-
-export default AnnotationsPanel;
+export { default } from "./AnnotationsPanel";

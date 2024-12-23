@@ -21,7 +21,7 @@
         "@codemirror/search": "^6.2.3",
         "@codemirror/view": "^6.9.0",
 
-        "antd": "5.19.1",
+        "antd": "5.22.4",
         "react-complex-tree": "^2.3.2"
     }
 }

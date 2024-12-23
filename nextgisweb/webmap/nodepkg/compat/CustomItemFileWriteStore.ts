@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import { gettext } from "@nextgisweb/pyramid/i18n";
+
 import { EventEmitter } from "./EventEmitter";
 import type {
     StoreGroupConfig,
@@ -101,12 +103,13 @@ export class CustomItemFileWriteStore extends EventEmitter {
         }
     ): StoreItem<T> {
         const parentId = parentInfo ? parentInfo.parent.id : null;
+        const newId = this.getlastId() + 1;
         const newItemConfig = keywordArgs
             ? { ...keywordArgs, id: keywordArgs.id }
             : ({
-                  id: this.getlastId() + 1,
+                  id: newId,
                   type: "layer",
-                  label: null,
+                  label: `${gettext("New layer")}: ${newId}`,
                   position: null,
               } as T);
 

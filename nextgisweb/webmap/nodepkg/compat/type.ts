@@ -1,7 +1,7 @@
 interface BaseItem {
     id: number;
     type: string;
-    label: string | null;
+    label: string;
     position: number | null;
 }
 
