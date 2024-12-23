@@ -1,4 +1,5 @@
-import type { DojoDisplay, MapControl, MapTool } from "../type";
+import type { ToggleControl } from "../map-toolbar/ToggleControl";
+import type { DojoDisplay, MapControl } from "../type";
 
 export interface ControlBase<T> {
     ctor: (display: DojoDisplay) => T;
@@ -13,10 +14,23 @@ export interface ControlInfo extends ControlBase<MapControl> {
     postCreate?: (display: DojoDisplay, control: MapControl) => void;
 }
 
-export interface ToolInfo extends ControlBase<MapTool> {}
+export interface Tool {
+    activate: () => void;
+    deactivate: () => void;
+
+    destroy?: () => void;
+
+    label: string;
+    iconClass?: string;
+    customCssClass?: string;
+    customIcon?: string;
+    toolbarBtn?: ToggleControl;
+}
+
+export interface ToolInfo extends ControlBase<Tool> {}
 
 export type ControlsInfo = ControlInfo | ToolInfo;
-type Control = MapControl | MapTool;
+type Control = MapControl | Tool;
 
 export interface ControlReady {
     info: ControlsInfo;

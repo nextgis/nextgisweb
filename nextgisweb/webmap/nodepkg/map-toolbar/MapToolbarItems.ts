@@ -1,5 +1,6 @@
+import type { Tool } from "../map-controls/type";
 import { MapStatesObserverSingleton } from "../map-state-observer/MapStatesObserver";
-import type { DojoDisplay, MapTool } from "../type";
+import type { DojoDisplay } from "../type";
 
 import { ToggleControl } from "./ToggleControl";
 import { WidgetBase } from "./WidgetBase";
@@ -22,7 +23,7 @@ export class MapToolbarItems extends WidgetBase {
     }
 
     addTool(
-        tool: MapTool,
+        tool: Tool,
         state: string,
         place?: HTMLElement | ((control: ToggleControl) => void)
     ): void {
