@@ -34,7 +34,7 @@ function buildAnnotationPanel({ display }: { display: DojoDisplay }) {
         }
     );
     display.panelsManager.addPanels({
-        cls: reactPanel(() => import("@nextgisweb/webmap/panel/annotations/"), {
+        cls: reactPanel(() => import("@nextgisweb/webmap/panel/annotations"), {
             props: {
                 onTopicPublish: ([key, e]) => {
                     publish(key, e);

@@ -34,3 +34,4 @@ declare module "@nextgisweb/pyramid/settings!webmap" {
 
     export = value;
 }
+
