@@ -15,18 +15,16 @@ define([
     "@nextgisweb/gui/error",
     "@nextgisweb/pyramid/company-logo",
     "@nextgisweb/webmap/store",
-    "@nextgisweb/webmap/panels-manager",
     "./ol/Map",
     "@nextgisweb/webmap/map-toolbar",
-    "./FeatureHighlighter",
     "@nextgisweb/webmap/map-state-observer",
     "./ui/react-webmap-tabs",
     // tools
     "@nextgisweb/webmap/map-controls",
     // Tiny display
     "ngw-webmap/controls/LinkToMainMap",
-    // panels
-    "@nextgisweb/webmap/compat/makePanels",
+    // compat
+    "@nextgisweb/webmap/compat/ShadowDisplay",
     // utils
     "./utils/URL",
     // settings
@@ -55,15 +53,13 @@ define([
     errorModule,
     companyLogo,
     WebmapStore,
-    PanelsManager,
     Map,
     MapToolbar,
-    FeatureHighlighter,
     MapStatesObserver,
     ReactWebMapTabs,
     MapControls,
     LinkToMainMap,
-    makePanels,
+    ShadowDisplay,
     URL,
     { gettext, renderTemplate },
     settings,
@@ -159,6 +155,7 @@ define([
 
         constructor: function (options) {
             declare.safeMixin(this, options);
+            this.shadow = new ShadowDisplay.default(this);
             this._urlParams = URL.getURLParams();
 
             this._itemStoreDeferred = new LoggedDeferred("_itemStoreDeferred");
@@ -176,42 +173,16 @@ define([
             // AMD module loading
             this._midDeferred = {};
             this._mid = {};
-            var mids = this.config.mid;
+            // var mids = this.config.mid;
 
             this.clientSettings = settings;
 
-            this._buildPanelsManager();
+            this.shadow._buildPanelsManager();
 
             this.tabContainer = new ReactWebMapTabs({ display: this });
 
             // Add basemap's AMD modules
-            mids.basemap.push(
-                "ngw-webmap/ol/layer/OSM",
-                "ngw-webmap/ol/layer/XYZ",
-                "ngw-webmap/ol/layer/QuadKey"
-            );
-
-            array.forEach(
-                Object.keys(mids),
-                function (k) {
-                    var deferred = new LoggedDeferred("_midDeferred." + k);
-                    this._midDeferred[k] = deferred;
-
-                    var midarr = mids[k];
-                    require(midarr, function () {
-                        var obj = {};
-                        var i;
-                        for (i = 0; i < arguments.length; i++) {
-                            obj[midarr[i]] = arguments[i];
-                        }
-
-                        widget._mid[k] = obj;
-
-                        deferred.resolve(obj);
-                    });
-                },
-                this
-            );
+            this.shadow._initializeMids();
 
             // Map plugins
             var wmpmids = Object.keys(this.config.webmapPlugin);
@@ -288,9 +259,8 @@ define([
                 .then(
                     lang.hitch(this, function () {
                         widget._mapAddLayers();
-                        widget.featureHighlighter = new FeatureHighlighter(
-                            this.map
-                        );
+                        widget.featureHighlighter =
+                            this.shadow._initializeFeatureHighlighter();
                     })
                 )
                 .then(undefined, function (err) {
@@ -889,46 +859,6 @@ define([
             }
             this.panelsManager.deactivatePanel();
             this.panelsManager.activatePanel(activePanel);
-        },
-
-        _buildPanelsManager: function () {
-            const activePanelKey = this._urlParams[this.modeURLParam];
-            const onChangePanel = (panel) => {
-                if (panel) {
-                    URL.setURLParam(this.modeURLParam, panel.name);
-                } else {
-                    URL.setURLParam(this.modeURLParam, this.emptyModeURLValue);
-                }
-            };
-
-            let allowPanels;
-            if (this.isTinyMode()) {
-                allowPanels = this._urlParams.panels
-                    ? this._urlParams.panels.split(",")
-                    : [];
-            }
-
-            this.panelsManager = new PanelsManager.default(
-                this,
-                activePanelKey,
-                allowPanels,
-                onChangePanel
-            );
-
-            this._buildPanels();
-        },
-
-        _buildPanels: function () {
-            const promises = all([
-                this._layersDeferred,
-                this._postCreateDeferred,
-            ]);
-
-            promises
-                .then(() => makePanels.makePanels({ display: this }))
-                .then(undefined, (err) => {
-                    console.error(err);
-                });
         },
 
         highlightGeometry: function (geometry) {
