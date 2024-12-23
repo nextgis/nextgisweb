@@ -10,8 +10,8 @@ import { route } from "@nextgisweb/pyramid/api/route";
 import type { RouteQuery, RouteResp } from "@nextgisweb/pyramid/api/type";
 import i18n from "@nextgisweb/pyramid/i18n";
 import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
+import type { Map } from "@nextgisweb/webmap/ol/Map";
 import type { DojoDisplay } from "@nextgisweb/webmap/type";
-import type { DisplayMap } from "@nextgisweb/webmap/type/DisplayMap";
 import type { LayerItem } from "@nextgisweb/webmap/type/TreeItems";
 
 import { Base } from "./ToolBase";
@@ -57,7 +57,7 @@ export class Identify extends Base {
     label = i18n.gettext("Identify");
     iconClass = "iconIdentify";
     pixelRadius: number = webmapSettings.identify_radius || 10;
-    map: DisplayMap;
+    map: Map;
     control: Control;
 
     constructor(options: IdentifyOptions) {
@@ -153,22 +153,25 @@ export class Identify extends Base {
         };
 
         const items = await this.display.getVisibleItems();
-        const mapResolution = this.display.map.get("resolution");
+        const mapResolution = this.display.map.resolution;
 
         items.forEach((i) => {
             const item = this.display._itemConfigById[
                 this.display.itemStore.getValue(i, "id")
             ] as LayerItem;
+
             if (
-                !item.identifiable ||
-                (item.maxResolution !== null &&
-                    mapResolution >= item.maxResolution) ||
-                (item.minResolution !== null &&
-                    mapResolution < item.minResolution)
+                mapResolution === null ||
+                !(
+                    !item.identifiable ||
+                    (item.maxResolution !== null &&
+                        mapResolution >= item.maxResolution) ||
+                    (item.minResolution !== null &&
+                        mapResolution < item.minResolution)
+                )
             ) {
-                return;
+                request.layers.push(item.layerId);
             }
-            request.layers.push(item.layerId);
         });
 
         const layerLabels: Record<string, string> = {};
