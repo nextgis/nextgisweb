@@ -144,9 +144,9 @@ export class ReactPanel<
 
         if (this.fcomp) {
             const Component = this.fcomp;
-            const LazyWrapper = () => (
+            const LazyWrapper = (lazyProps: ReactPanelComponentProps) => (
                 <Suspense fallback={<div>...</div>}>
-                    <Component {...props} />
+                    <Component {...(lazyProps ? lazyProps : props)} />
                 </Suspense>
             );
 

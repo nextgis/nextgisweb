@@ -118,7 +118,7 @@ export class AnnotationsPopup {
         this._popup.show(coordinates, "");
 
         const { content, description } = this._createContentElements();
-        console.log(this._popup.content.outerHTML.toString());
+
         this._popup.content.appendChild(content);
 
         if (this._editable) {
