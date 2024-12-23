@@ -35,12 +35,14 @@ export const getPermalink = ({
     });
 
     const params: Record<string, string> = {
-        base: display._baseLayer.name,
         angle: String(display.map.olMap.getView().getRotation() || 0),
         zoom: String(display.map.olMap.getView().getZoom() || 0),
         styles: visibleStyles.join(","),
         ...additionalParams,
     };
+    if (display.baseLayer) {
+        params.base = display.baseLayer.name;
+    }
 
     if (center === undefined) {
         const coord = display.map.olMap.getView().getCenter();

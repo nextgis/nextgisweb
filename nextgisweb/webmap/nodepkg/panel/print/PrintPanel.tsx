@@ -63,6 +63,10 @@ const makePrintMapComp = ({
     onScaleChange,
     onCenterChange,
 }: PrintMapCompProps): PrintMapCompElements => {
+    if (!display.mapNode) {
+        throw new Error("Display is not started yet!");
+    }
+
     const div = document.createElement("div");
     div.classList.add("print-map-pane");
     document.body.appendChild(div);
