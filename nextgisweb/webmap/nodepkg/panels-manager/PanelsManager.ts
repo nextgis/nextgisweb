@@ -1,7 +1,7 @@
 import { orderBy } from "lodash-es";
 import { action, computed, observable, reaction } from "mobx";
 
-import type ShadowDisplay from "../compat/ShadowDisplay";
+import type { Display } from "../display";
 
 import { registry } from "./registry";
 import type { PanelPlugin } from "./registry";
@@ -27,7 +27,7 @@ class Deferred<T> {
 }
 
 export class PanelsManager {
-    private _display: ShadowDisplay;
+    private _display: Display;
     private _allowPanels?: string[];
 
     private _panelsReady = new Deferred<void>();
@@ -43,7 +43,7 @@ export class PanelsManager {
     };
 
     constructor(
-        display: ShadowDisplay,
+        display: Display,
         activePanelKey: string | undefined,
         allowPanels: string[] | undefined,
         onChangePanel: (panel?: PanelPlugin) => void

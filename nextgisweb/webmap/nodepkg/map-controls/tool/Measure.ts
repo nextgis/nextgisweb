@@ -14,8 +14,8 @@ import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { html as htmlIcon } from "@nextgisweb/pyramid/icon";
 import settings from "@nextgisweb/pyramid/settings!webmap";
+import type { Display } from "@nextgisweb/webmap/display";
 import { MeasureArea, MeasureDistance } from "@nextgisweb/webmap/icon";
-import type { ShadowDisplay } from "@nextgisweb/webmap/type";
 import { formatMetersArea, formatMetersLength } from "@nextgisweb/webmap/utils";
 import type { DefaultConfig } from "@nextgisweb/webmap/utils/format-units";
 
@@ -24,7 +24,7 @@ import { ToolBase } from "./ToolBase";
 import "./Measure.css";
 
 interface MeasureOptions {
-    display: ShadowDisplay;
+    display: Display;
     type: "LineString" | "Polygon";
 }
 

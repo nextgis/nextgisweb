@@ -1,5 +1,5 @@
+import type { Display } from "@nextgisweb/webmap/display";
 import type { Position } from "@nextgisweb/webmap/ol/Map";
-import type { ShadowDisplay } from "@nextgisweb/webmap/type";
 
 type TransformedPosition = {
     zoom: number;
@@ -23,7 +23,7 @@ type Detail = "position" | "zoom" | "move";
  *    }
  * }, false);
  */
-export function handlePostMessage(display: ShadowDisplay) {
+export function handlePostMessage(display: Display) {
     const parent = window.parent;
 
     if (

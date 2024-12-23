@@ -9,8 +9,8 @@ import { route } from "@nextgisweb/pyramid/api/route";
 import type { RouteQuery, RouteResp } from "@nextgisweb/pyramid/api/type";
 import i18n from "@nextgisweb/pyramid/i18n";
 import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
-import type ShadowDisplay from "@nextgisweb/webmap/compat/ShadowDisplay";
 import topic from "@nextgisweb/webmap/compat/topic";
+import type { Display } from "@nextgisweb/webmap/display";
 import type { Map } from "@nextgisweb/webmap/ol/Map";
 import type {
     IdentificationPanelProps,
@@ -49,7 +49,7 @@ class Control extends Interaction {
 }
 
 interface IdentifyOptions {
-    display: ShadowDisplay;
+    display: Display;
 }
 
 interface Request {
