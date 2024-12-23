@@ -8,7 +8,8 @@ import "./LayersPanel.less";
 
 export function LayersPanel({ title, close, display, ...props }) {
     const zoomToAllLayers = () => {
-        const plugin = display._plugins["ngw-webmap/plugin/ZoomToWebmap"];
+        const plugin =
+            display._plugins["@nextgisweb/webmap/plugin/zoom-to-webmap"];
         if (!plugin) {
             return;
         }
