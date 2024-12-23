@@ -2,7 +2,7 @@ import type { Collection, Feature } from "ol";
 import type { Geometry } from "ol/geom";
 import type { Interaction } from "ol/interaction";
 
-import type { LayerItemConfig } from "@nextgisweb/webmap/type/TreeItems";
+import type { LayerItemConfig } from "@nextgisweb/webmap/type/api";
 
 export interface FeatureInfo {
     id: number;

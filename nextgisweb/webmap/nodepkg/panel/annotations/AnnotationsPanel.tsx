@@ -5,8 +5,8 @@ import { Select, Switch } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { PanelComponentProps } from "@nextgisweb/webmap/panels-manager/type";
 import AnnotationsStore from "@nextgisweb/webmap/store/annotations";
-import type { VisibleMode } from "@nextgisweb/webmap/store/annotations/AnnotationsStore";
-import type { DisplayConfig } from "@nextgisweb/webmap/type";
+import type { AnnotationVisibleMode } from "@nextgisweb/webmap/store/annotations/AnnotationsStore";
+import type { Scope } from "@nextgisweb/webmap/type/api";
 
 import { PanelHeader } from "../header";
 
@@ -24,7 +24,7 @@ interface AnnotationFilter {
 interface AnnotationsPanelProps extends PanelComponentProps {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onTopicPublish: (val: [string, any?]) => void;
-    initialAnnotVisible?: VisibleMode;
+    initialAnnotVisible?: AnnotationVisibleMode;
 }
 
 const ADD_ANNOTATION_STATE_KEY = "addAnnotation";
@@ -34,9 +34,7 @@ const AnnotationsPanel = observer(
         const [visible, setVisible] = useState(AnnotationsStore.visibleMode);
         const [editable, setEditable] = useState(false);
         const [edit, setEdit] = useState(false);
-        const [annScope, setAnnScope] = useState<
-            DisplayConfig["annotations"]["scope"] | undefined
-        >();
+        const [annScope, setAnnScope] = useState<Scope | undefined>();
         const [geomType, setGeomType] = useState<GeometryType>("Point");
         const [annFilter, setAnnFilter] = useState<AnnotationFilter>({
             public: true,
@@ -45,7 +43,7 @@ const AnnotationsPanel = observer(
         });
 
         const changeVisible = useCallback(
-            (visibleMode: VisibleMode | null) => {
+            (visibleMode: AnnotationVisibleMode | null) => {
                 setVisible(visibleMode);
                 onTopicPublish(["/annotations/visible", visibleMode]);
 
