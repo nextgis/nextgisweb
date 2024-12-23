@@ -96,24 +96,24 @@ class PrintMapStore {
                 legendColumns,
             };
         } else if (isPortrait) {
-            const legend_height = Math.ceil(heightPx / 4) + DEFAULT_MARGIN;
+            const legendHeight = Math.ceil(heightPx / 4) + DEFAULT_MARGIN;
             this.legendCoords = {
                 x: 0,
-                y: heightPx - legend_height,
-                height: legend_height,
+                y: heightPx - legendHeight,
+                height: legendHeight,
                 width: widthPx,
                 displayed: true,
                 legendColumns,
             };
         } else {
-            const legend_width = Math.ceil(widthPx / 4) + DEFAULT_MARGIN;
+            const legendWidth = Math.ceil(widthPx / 4) + DEFAULT_MARGIN;
             this.legendCoords = {
-                x: widthPx - legend_width,
+                x: widthPx - legendWidth,
                 y: title ? this.titleCoords.height + DEFAULT_MARGIN : 0,
                 height: title
                     ? heightPx - this.titleCoords.height - DEFAULT_MARGIN
                     : heightPx,
-                width: legend_width,
+                width: legendWidth,
                 displayed: true,
                 legendColumns,
             };

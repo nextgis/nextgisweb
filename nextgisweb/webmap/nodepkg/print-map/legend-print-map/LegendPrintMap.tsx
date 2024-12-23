@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import LayersTree from "../../layers-tree";
 import type { TreeWebmapItem } from "../../layers-tree/LayersTree";
 import type WebmapStore from "../../store";
@@ -59,12 +60,17 @@ export const LegendPrintMap = ({
     display,
     show,
     legendCoords,
-    onChange: onChange,
+    onChange,
 }: LegendPrintMapProps) => {
-    if (!show) {
-        if (legendCoords.displayed) {
-            onChange({ ...legendCoords, displayed: false });
+    useEffect(() => {
+        if (!show) {
+            if (legendCoords.displayed) {
+                onChange({ ...legendCoords, displayed: false });
+            }
         }
+    });
+
+    if (!show) {
         return null;
     }
 
