@@ -63,13 +63,9 @@ export function FeatureInfoSection({
             const attrElement = (
                 <div key="identify-attributes">
                     <PanelContentContainer
-                        title={
-                            <>
-                                <ListIcon />
-                                {gettext("Attributes")}
-                            </>
-                        }
-                        content={
+                        icon={<ListIcon />}
+                        title={gettext("Attributes")}
+                        control={
                             <FeatureEditButton
                                 display={display}
                                 resourceId={featureInfo.layerId}
@@ -77,12 +73,8 @@ export function FeatureInfoSection({
                                 onUpdate={onUpdate}
                             />
                         }
-                        contentClassName="edit-wrapper"
-                    />
-
-                    <PanelContentContainer
                         noMarginX
-                        fill={
+                        content={
                             <FieldsTable
                                 featureInfo={featureInfo}
                                 featureItem={featureItem}
@@ -98,16 +90,9 @@ export function FeatureInfoSection({
             const geomElement = (
                 <div key="geometry-info">
                     <PanelContentContainer
-                        title={
-                            <>
-                                {" "}
-                                <EarthIcon />
-                                {gettext("Geometry")}
-                            </>
-                        }
-                    />
-                    <PanelContentContainer
-                        fill={
+                        icon={<EarthIcon />}
+                        title={gettext("Geometry")}
+                        content={
                             <GeometryInfo
                                 layerId={featureInfo.layerId}
                                 featureId={featureItem.id}

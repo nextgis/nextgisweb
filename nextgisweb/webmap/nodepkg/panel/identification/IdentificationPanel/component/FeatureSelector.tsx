@@ -1,4 +1,4 @@
-import { Button, Select, Tooltip } from "@nextgisweb/gui/antd";
+import { Button, Col, Row, Select, Tooltip } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { PanelContentContainer } from "../../PanelContentContainer";
@@ -39,22 +39,26 @@ export function FeatureSelector({
     return (
         <PanelContentContainer
             marginAll
-            fill={
-                <Select
-                    onChange={onSelectChange}
-                    style={{ width: "100%" }}
-                    value={featureInfo.value}
-                    options={featuresInfoList}
-                />
-            }
             content={
-                <Tooltip title={gettext("Zoom to feature")}>
-                    <Button
-                        type="link"
-                        onClick={zoomTo}
-                        icon={<ZoomInMapIcon />}
-                    />
-                </Tooltip>
+                <Row wrap={false}>
+                    <Col flex="auto">
+                        <Select
+                            onChange={onSelectChange}
+                            style={{ width: "100%" }}
+                            value={featureInfo.value}
+                            options={featuresInfoList}
+                        />
+                    </Col>
+                    <Col flex="auto">
+                        <Tooltip title={gettext("Zoom to feature")}>
+                            <Button
+                                type="link"
+                                onClick={zoomTo}
+                                icon={<ZoomInMapIcon />}
+                            />
+                        </Tooltip>
+                    </Col>
+                </Row>
             }
         />
     );
