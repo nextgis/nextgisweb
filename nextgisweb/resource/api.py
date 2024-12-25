@@ -9,7 +9,7 @@ from sqlalchemy.sql.operators import ilike_op
 from typing_extensions import Annotated
 
 from nextgisweb.env import DBSession, gettext
-from nextgisweb.lib.apitype import AnyOf, EmptyObject, StatusCode, annotate
+from nextgisweb.lib.apitype import AnyOf, EmptyObject, Query, StatusCode, annotate
 
 from nextgisweb.auth import User
 from nextgisweb.auth.api import UserID
@@ -494,6 +494,50 @@ ResourceExport = Annotated[
 csetting("resource_export", ResourceExport, default="data_read")
 
 
+# DeletedItems = Annotated[List[int], Meta(description="Items to be deleted")]
+
+
+def resource_delete(request, *, items: List[int], partial: bool):
+    pass
+
+
+class ResourceAffected(Struct):
+    count: int
+    resources: Dict[ResourceCls, int]
+
+
+class PreflightResponse(Struct, kw_only=True):
+    affected: ResourceAffected
+    unaffected: ResourceAffected
+
+
+class PreflightParams(Struct, kw_only=True):
+    items: List[int]
+
+
+def delete_preflight(request, *, params: Annotated[PreflightParams, Query(spread=True)]) -> PreflightResponse:
+    print(params.items, flush=True)
+    # return {
+    #     "affected": {
+    #         "count": 123,
+    #         "resources": {"vector_layer": 50, "qgis_vector_style": 50, "resource_group": 23},
+    #     },
+    #     "unaffected": {
+    #         "count": 3,
+    #         "resources": {"wmsclient_connection": 1, "postgis_connection": 1, "resource": 1},
+    #     },
+    # }
+    return PreflightResponse(
+        affected=ResourceAffected(
+            count=123,
+            resources={"vector_layer": 50, "qgis_vector_style": 50, "resource_group": 23},
+        ),
+        unaffected=ResourceAffected(
+            count=3, resources={"wmsclient_connection": 1, "postgis_connection": 1, "resource": 1}
+        ),
+    )
+
+
 def setup_pyramid(comp, config):
     config.add_route(
         "resource.blueprint",
@@ -510,6 +554,14 @@ def setup_pyramid(comp, config):
         put=item_put,
         delete=item_delete,
     )
+
+    config.add_route(
+        "resource.batch_delete",
+        "api/resource_delete",
+        post=resource_delete,
+    )
+
+    config.add_route("resource.preflight", "api/resource/delete_preflight", get=delete_preflight)
 
     config.add_route(
         "resource.collection",
