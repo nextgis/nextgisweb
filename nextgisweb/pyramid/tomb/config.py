@@ -3,7 +3,7 @@ from inspect import signature
 from pathlib import Path
 from sys import _getframe
 from typing import Any, Dict, Mapping, Optional, Tuple
-from warnings import warn_explicit
+from warnings import warn, warn_explicit
 
 from msgspec import NODEFAULT, Meta
 from msgspec import ValidationError as MsgSpecValidationError
@@ -206,6 +206,13 @@ class Configurator(PyramidConfigurator):
             assert client is False, "client=False is the only valid route predicate"
 
         if pattern is not None:
+            if not pattern.startswith("/"):
+                warn(
+                    f"The route pattern must begin with '/', but got '{pattern}'. This will be "
+                    "enforced and cause an error in nextgisweb >= 5.1.0.dev0.",
+                    stacklevel=stacklevel + 1,
+                )
+
             opattern = pattern
             rtypes = dict()
 
