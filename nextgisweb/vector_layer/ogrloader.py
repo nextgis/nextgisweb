@@ -685,7 +685,7 @@ def _validate_geom(geom, target, *, fix_errors, fid):
             if wkb_type in _wkb_polygons:
                 for ring_idx, ring in _iter_reversed_geom(part):
                     if (ring_points := ring.GetPointCount()) == 0:
-                        if wkb_type is _wkb_single:
+                        if wkb_type in _wkb_single:
                             pass  # POLYGON EMPTY
                         elif fix_errors == FIX_ERRORS.NONE:
                             raise FeatureError(gettext("Feature #%d has empty rings.") % fid)
@@ -718,7 +718,7 @@ def _validate_geom(geom, target, *, fix_errors, fid):
                             else:
                                 part.RemoveGeometry(ring_idx)
             elif (part_points := part.GetPointCount()) == 0:
-                if wkb_type is _wkb_single:
+                if wkb_type in _wkb_single:
                     pass  # LINESTRING EMPTY
                 elif fix_errors == FIX_ERRORS.NONE:
                     raise FeatureError(gettext("Feature #%d contains an empty linestring.") % fid)
@@ -729,7 +729,7 @@ def _validate_geom(geom, target, *, fix_errors, fid):
                     raise FeatureError(
                         gettext("Feature #%d has less than 2 points in a linestring.") % fid
                     )
-                if wkb_type is _wkb_multi:
+                if wkb_type in _wkb_multi:
                     geom.RemoveGeometry(part_idx)
                 else:
                     geom = None
