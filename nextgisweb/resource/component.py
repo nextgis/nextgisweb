@@ -75,6 +75,9 @@ class ResourceComponent(Component):
         required_total = 0
 
         for cls, required in data.items():
+            if required == 0:
+                continue
+
             if cls in self.disabled_resource_cls:
                 raise ResourceDisabled(cls)
 

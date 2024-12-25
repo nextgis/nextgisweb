@@ -205,9 +205,12 @@ def test_quota(quota, disable, resource_stat, ngw_resource_group, ngw_webtest_ap
         check(dict(resource_group=999), 200)
         rgrp("No quota", 201)
 
-        check(dict(non_existent=1, resource_group=1), 422)
+        check(dict(non_existent=1), 422)
+        check(dict(non_existent=0), 422)
+
         with disable("resource_group"):
             rgrp("Disabled", 422)
+            check(dict(resource_group=0), 200)
 
     with quota(limit=total):
         check(dict(resource_group=0), 200)
