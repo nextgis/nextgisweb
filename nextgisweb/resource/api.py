@@ -561,7 +561,7 @@ def setup_pyramid(comp, config):
         post=resource_delete,
     )
 
-    config.add_route("resource.preflight", "api/resource/delete_preflight", get=delete_preflight)
+    config.add_route("resource.preflight", "/api/resource/delete_preflight", get=delete_preflight)
 
     config.add_route(
         "resource.collection",
