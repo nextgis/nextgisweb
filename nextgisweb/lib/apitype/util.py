@@ -7,11 +7,12 @@ from typing import (
     Type,
     TypeVar,
     Union,
+    cast,
     get_args,
     get_origin,
 )
 
-from msgspec import Struct
+from msgspec import UNSET, Struct
 from msgspec import _utils as ms_utils
 from msgspec.inspect import Metadata, type_info
 from msgspec.inspect import _is_enum as is_enum  # noqa: F401
@@ -20,6 +21,7 @@ from typing_extensions import Annotated, _AnnotatedAlias
 
 get_class_annotations = ms_utils.get_class_annotations
 NoneType = type(None)
+POST_INIT = cast(Any, UNSET)
 
 T = TypeVar("T", bound=Type)
 

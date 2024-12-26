@@ -27,6 +27,7 @@ from typing_extensions import Protocol
 from nextgisweb.env.package import pkginfo
 from nextgisweb.lib.apitype import disannotate, unannotate
 from nextgisweb.lib.apitype.util import (
+    POST_INIT,
     NoneType,
     decompose_union,
     get_class_annotations,
@@ -41,7 +42,6 @@ from .util import indented
 ModuleName = str
 TypeName = str
 Export = Tuple[ModuleName, TypeName]
-POST_INIT = cast(Any, UNSET)
 
 
 class TSGenerator:

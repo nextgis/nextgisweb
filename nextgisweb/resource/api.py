@@ -4,16 +4,18 @@ import sqlalchemy as sa
 import sqlalchemy.orm as orm
 import zope.event
 from msgspec import UNSET, Meta, Struct, UnsetType, defstruct
+from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql import exists
 from sqlalchemy.sql.operators import ilike_op
 from typing_extensions import Annotated
 
 from nextgisweb.env import DBSession, gettext
 from nextgisweb.lib.apitype import AnyOf, EmptyObject, StatusCode, annotate
+from nextgisweb.lib.apitype.util import POST_INIT
 
 from nextgisweb.auth import User
 from nextgisweb.auth.api import UserID
-from nextgisweb.core.exception import InsufficientPermissions, ValidationError
+from nextgisweb.core.exception import InsufficientPermissions, UserException, ValidationError
 from nextgisweb.jsrealm import TSExport
 from nextgisweb.pyramid import AsJSON, JSONType
 from nextgisweb.pyramid.api import csetting, require_storage_enabled
@@ -21,12 +23,17 @@ from nextgisweb.pyramid.api import csetting, require_storage_enabled
 from .category import ResourceCategory
 from .composite import CompositeSerializer
 from .event import AfterResourceCollectionPost, AfterResourcePut, OnDeletePrompt
-from .exception import HierarchyError, QuotaExceeded
+from .exception import (
+    HierarchyError,
+    QuotaExceeded,
+    ResourceNotFound,
+    ResourceRootDeleteError,
+)
 from .model import Resource, ResourceCls, ResourceInterfaceIdentity, ResourceScopeIdentity
 from .presolver import ExplainACLRule, ExplainDefault, ExplainRequirement, PermissionResolver
 from .sattribute import ResourceRefOptional, ResourceRefWithParent
 from .scope import ResourceScope, Scope
-from .view import resource_factory
+from .view import ResourceID, resource_factory
 
 
 class BlueprintResource(Struct):
@@ -153,7 +160,7 @@ def item_delete(context, request) -> EmptyObject:
         DBSession.delete(obj)
 
     if context.id == 0:
-        raise HierarchyError(gettext("Root resource could not be deleted."))
+        raise ResourceRootDeleteError
 
     if not OnDeletePrompt.apply(context):
         raise HierarchyError
@@ -213,6 +220,100 @@ def collection_post(
     request.response.status_code = 201
     parent_ref = ResourceRefOptional(id=resource.parent.id)
     return ResourceRefWithParent(id=resource.id, parent=parent_ref)
+
+
+Resources = Annotated[List[ResourceID], Meta(description="Resources to delete")]
+
+
+class ResourceAffected(Struct, kw_only=True):
+    count: int = POST_INIT
+    resources: Dict[ResourceCls, int]
+
+    def __post_init__(self):
+        self.count = sum(self.resources.values())
+
+
+class ResourceDelete(Struct, kw_only=True):
+    affected: ResourceAffected
+    unaffected: ResourceAffected
+
+
+def _delete_multiple(request, resource_ids, partial, *, dry_run):
+    affected = dict()
+    unaffected = dict()
+
+    def _acc(d, cls, v=1):
+        if cls not in d:
+            d[cls] = v
+        else:
+            d[cls] += v
+
+    def delete(rid):
+        if resource.id == 0:
+            raise ResourceRootDeleteError
+
+        _affected = dict()
+
+        def _delete(resource):
+            request.resource_permission(ResourceScope.delete, resource)
+            request.resource_permission(ResourceScope.manage_children, resource)
+
+            for child in resource.children:
+                _delete(child)
+
+            if not dry_run:
+                DBSession.delete(resource)
+            _acc(_affected, resource.cls)
+
+        _delete(resource)
+        return _affected
+
+    for rid in resource_ids:
+        cls = "resource"
+
+        try:
+            resource = Resource.filter_by(id=rid).one()
+        except NoResultFound:
+            if not partial:
+                raise ResourceNotFound(rid)
+        else:
+            try:
+                resource_affected = delete(rid)
+            except UserException as exc:
+                if not partial:
+                    raise
+                if not isinstance(exc, InsufficientPermissions) and resource.has_permission(
+                    ResourceScope.read, request.user
+                ):
+                    cls = resource.cls
+            else:
+                for k, v in resource_affected.items():
+                    _acc(affected, k, v)
+                continue
+
+        _acc(unaffected, cls)
+
+    return ResourceDelete(
+        affected=ResourceAffected(resources=affected),
+        unaffected=ResourceAffected(resources=unaffected),
+    )
+
+
+def delete_get(request, *, resources: Resources) -> ResourceDelete:
+    return _delete_multiple(request, resources, True, dry_run=True)
+
+
+def delete_post(
+    request,
+    *,
+    resources: Resources,
+    partial: Annotated[
+        bool, Meta(description="Skip non-deletable resources, otherwise raising an error")
+    ] = False,
+) -> EmptyObject:
+    with DBSession.no_autoflush:
+        _delete_multiple(request, resources, partial, dry_run=False)
+    DBSession.flush()
 
 
 if TYPE_CHECKING:
@@ -516,6 +617,13 @@ def setup_pyramid(comp, config):
         "/api/resource/",
         get=collection_get,
         post=collection_post,
+    )
+
+    config.add_route(
+        "resource.items.delete",
+        "/api/resource/delete",
+        get=delete_get,
+        post=delete_post,
     )
 
     config.add_route(
