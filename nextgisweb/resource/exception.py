@@ -59,6 +59,10 @@ class HierarchyError(ValidationError):
     title = gettext("Hierarchy error")
 
 
+class ResourceRootDeleteError(HierarchyError):
+    message = gettext("Root resource could not be deleted.")
+
+
 class ResourceDisabled(ValidationError):
     message = gettext("Resource class '%s' disabled.")
 
