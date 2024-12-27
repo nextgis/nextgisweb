@@ -1,35 +1,71 @@
-import { useState } from "react";
+import classNames from "classnames";
+import { sortBy } from "lodash-es";
+import { useMemo, useState } from "react";
 
-import { Button, Checkbox, Col, Row } from "@nextgisweb/gui/antd";
+import { Button } from "@nextgisweb/gui/antd";
+import { LoadingWrapper } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
 import type { ApiError } from "@nextgisweb/gui/error/type";
 import { DeleteIcon } from "@nextgisweb/gui/icon";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
+import { useRouteGet } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import type { ResourceCls } from "@nextgisweb/resource/type/api";
 
-interface DeletePageProps {
-    id: number;
-}
+import { ResourceIcon } from "../icon";
 
-export function DeletePage({ id }: DeletePageProps) {
-    const [deleteConfirmed, setDeleteConfirmed] = useState(false);
+import type { DeletePageProps } from "./type";
+import { msgDeleteButton, msgMultiple, msgResourcesCount } from "./util";
+
+import "./DeletePage.less";
+
+
+export function DeletePage({
+    resources,
+    navigateToId,
+    isModal = false,
+    onCancel,
+    onOk,
+}: DeletePageProps) {
     const [deletingInProgress, setDeletingInProgress] = useState(false);
+
+    if (!isModal && navigateToId !== undefined) {
+        const parentResourceUrl = routeURL("resource.show", {
+            id: navigateToId,
+        });
+        onOk = () => window.open(parentResourceUrl, "_self");
+    }
+
+    const { data, isLoading } = useRouteGet({
+        name: "resource.items.delete",
+        options: { query: { resources } },
+    });
+
+    const { data: labelData, isLoading: isLabelDataLoading } =
+        useRouteGet("resource.blueprint");
+
+    const sortedData = useMemo(() => {
+        if (data && labelData)
+            return sortBy(
+                Object.entries(data.affected.resources).map(([cls, count]) => {
+                    const pb = labelData?.resources[cls as ResourceCls];
+                    return { cls, count, label: pb.label, order: pb.order };
+                }),
+                ["order", "label"]
+            );
+    }, [data, labelData]);
 
     const onDeleteClick = async () => {
         setDeletingInProgress(true);
         try {
-            const item = await route("resource.item", id).get();
-            if (!item.resource.parent) {
-                throw new Error(
-                    `Parent for resource ${item.resource.id} does not exist`
-                );
-            }
-            const parentId = item.resource.parent.id;
-            const parentResourceUrl = routeURL("resource.show", {
-                id: parentId,
+            await route("resource.items.delete").post({
+                query: {
+                    resources,
+                    partial: true,
+                },
+                body: "",
             });
-            await route("resource.item", id).delete();
-            window.open(parentResourceUrl, "_self");
+            onOk?.();
         } catch (err) {
             errorModal(err as ApiError);
         } finally {
@@ -37,30 +73,55 @@ export function DeletePage({ id }: DeletePageProps) {
         }
     };
 
+    if (!data || !labelData || isLoading || isLabelDataLoading) {
+        return <LoadingWrapper />;
+    }
+
     return (
-        <>
-            <Row style={{ marginBottom: "3rem" }}>
-                <Col>
-                    <Checkbox
-                        onChange={(e) => setDeleteConfirmed(e.target.checked)}
-                    >
-                        {gettext("Confirm deletion of the resource")}
-                    </Checkbox>
-                </Col>
-            </Row>
-            <Row>
-                <Col>
+        <div className="ngw-resource-delete-page">
+            {msgMultiple(data.affected, data.unaffected)}
+
+            <div className={classNames("table", isModal && "modal")}>
+                <div>
+                    {sortedData?.map(({ cls, count, label }) => (
+                        <div key={cls}>
+                            <ResourceIcon
+                                identity={cls as ResourceCls}
+                                style={{
+                                    width: "16px",
+                                    height: "16px",
+                                }}
+                            />
+                            <div>{label}</div>
+                            <div className="count">{count}</div>
+                            <div>{msgResourcesCount(count)}</div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            <div className="buttons">
+                <Button
+                    disabled={data.affected.count === 0}
+                    danger
+                    type="primary"
+                    icon={<DeleteIcon />}
+                    loading={deletingInProgress}
+                    onClick={onDeleteClick}
+                >
+                    {msgDeleteButton(data.affected.count)}
+                </Button>
+
+                {isModal && (
                     <Button
-                        loading={deletingInProgress}
-                        disabled={!deleteConfirmed}
-                        type="primary"
-                        icon={<DeleteIcon />}
-                        onClick={onDeleteClick}
+                        className="cancel"
+                        type="default"
+                        onClick={onCancel}
                     >
-                        {gettext("Delete")}
+                        {gettext("Cancel")}
                     </Button>
-                </Col>
-            </Row>
-        </>
+                )}
+            </div>
+        </div>
     );
 }

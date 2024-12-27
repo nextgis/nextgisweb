@@ -1,9 +1,8 @@
 import { Tooltip } from "@nextgisweb/gui/antd";
-import { errorModal } from "@nextgisweb/gui/error";
 import showModal from "@nextgisweb/gui/showModal";
 import { SvgIconLink } from "@nextgisweb/gui/svg-icon";
 import type { SvgIconLink as SvgIconLinkProps } from "@nextgisweb/gui/svg-icon/type";
-import { route } from "@nextgisweb/pyramid/api";
+import { DeleteConfirmModal } from "@nextgisweb/resource/delete-page/DeletePageModal";
 
 import type {
     ChildrenResourceAction as Action,
@@ -11,7 +10,7 @@ import type {
 } from "../type";
 import { isDeleteAction } from "../util/isDeleteAction";
 import { isPreviewAction } from "../util/isPreviewAction";
-import { confirmThenDelete, notifySuccessfulDeletion } from "../util/notify";
+import { notifySuccessfulDeletion } from "../util/notify";
 
 import { PreviewModal } from "./PreviewModal";
 
@@ -27,15 +26,21 @@ export function RenderActions({
     setTableItems,
 }: RenderActionsProps) {
     const deleteModelItem = () => {
-        return route("resource.item", id)
-            .delete()
-            .then(() => {
+        const { destroy } = showModal(DeleteConfirmModal, {
+            onCancelDelete: () => {
+                destroy();
+            },
+            onOkDelete: () => {
+                destroy();
                 setTableItems((old) => old.filter((x) => x.id !== id));
                 notifySuccessfulDeletion(1);
-            })
-            .catch((err) => {
-                errorModal(err);
-            });
+            },
+            // modal mask not clickable without onCancel
+            onCancel: () => {
+                destroy();
+            },
+            resources: [id],
+        });
     };
 
     return actions.map((action) => {
@@ -63,7 +68,7 @@ export function RenderActions({
             });
         } else if (isDeleteAction(action)) {
             return createActionBtn({
-                onClick: () => confirmThenDelete(deleteModelItem),
+                onClick: () => deleteModelItem(),
             });
         } else {
             return createActionBtn({ href, target });

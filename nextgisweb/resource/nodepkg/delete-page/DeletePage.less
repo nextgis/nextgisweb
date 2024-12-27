@@ -1,0 +1,43 @@
+.ngw-resource-delete-page {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    max-width: 40em;
+
+    > .table {
+        &.modal {
+            padding-inline-end: 16px;
+            max-height: calc(7 * 32px - 8px);
+            overflow-y: auto;
+            scrollbar-gutter: stable;
+        }
+
+        > div {
+            display: grid;
+            grid-template-columns: min-content auto min-content min-content;
+            gap: 16px 4px;
+
+            > * {
+                display: contents;
+
+                > * {
+                    line-height: 16px;
+                }
+
+                > .count {
+                    margin-inline-start: 4em;
+                    text-align: end;
+                }
+            }
+        }
+    }
+
+    > .buttons {
+        display: flex;
+        gap: 16px;
+
+        > .cancel {
+            margin-inline-start: auto;
+        }
+    }
+}

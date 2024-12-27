@@ -17,8 +17,7 @@ msgstr "Сохранить"
 
 #: amd/ngw-resource/CompositeWidget.js:110
 #: nodepkg/children-section/component/MenuDropdown.tsx:211
-#: nodepkg/children-section/util/createResourceTableItemOptions.ts:8
-#: nodepkg/delete-page/DeletePage.tsx:60 view.py:422
+#: nodepkg/children-section/util/createResourceTableItemOptions.ts:8 view.py:422
 msgid "Delete"
 msgstr "Удалить"
 
@@ -42,35 +41,31 @@ msgstr "При проверке данных обнаружена ошибка. 
 msgid "Validation failed"
 msgstr "Валидация провалилась"
 
-#: api.py:156
-msgid "Root resource could not be deleted."
-msgstr "Корневой ресурс удалить невозможно."
-
-#: api.py:301
+#: api.py:408
 msgid "Permission not found"
 msgstr "Право доступа не найдено"
 
-#: category.py:29
+#: category.py:36
 msgid "Layers and styles"
 msgstr "Слои и стили"
 
-#: category.py:34
+#: category.py:41
 msgid "Maps and services"
 msgstr "Карты и сервисы"
 
-#: category.py:39
+#: category.py:46
 msgid "Field data collection"
 msgstr "Сбор данных"
 
-#: category.py:44 scope.py:39
+#: category.py:51 scope.py:39
 msgid "External connections"
 msgstr "Внешние соединения"
 
-#: category.py:49
+#: category.py:56
 msgid "Miscellaneous"
 msgstr "Другие ресурсы"
 
-#: component.py:112
+#: component.py:130
 msgid "Main resource group"
 msgstr "Основная группа ресурсов"
 
@@ -127,22 +122,26 @@ msgid "Hierarchy error"
 msgstr "Ошибка иерархии"
 
 #: exception.py:63
+msgid "Root resource could not be deleted."
+msgstr "Корневой ресурс удалить невозможно."
+
+#: exception.py:67
 msgid "Resource class '%s' disabled."
 msgstr "Класс ресурса '%s' отключен."
 
-#: exception.py:72
+#: exception.py:76
 msgid "Quota exceeded"
 msgstr "Превышена квота"
 
-#: exception.py:78
+#: exception.py:82
 msgid "Maximum number of resources exceeded. The limit is %s."
 msgstr "Превышено допустимое число ресурсов. Лимит %s."
 
-#: exception.py:80
+#: exception.py:84
 msgid "Not enough resource quota: {0} required, but only {1} available."
 msgstr "Превышена квота на количество ресурсов: {0} запрошено, доступно {1}."
 
-#: exception.py:84
+#: exception.py:88
 msgid "Resource type - {}."
 msgstr "Тип ресурса - {}."
 
@@ -200,7 +199,7 @@ msgstr ""
 "относится к группе администраторов. Администраторы всегда должны иметь "
 "возможность настраивать права для ресурсов."
 
-#: model.py:644
+#: model.py:646
 msgid "Resource group"
 msgstr "Группа ресурсов"
 
@@ -272,13 +271,13 @@ msgstr "Переместить"
 msgid "Export vector layers"
 msgstr "Экспорт векторных слоёв"
 
-#: nodepkg/children-section/component/PreviewModal.tsx:18
-msgid "Open in a new tab"
-msgstr "Открыть в новой вкладке"
-
-#: nodepkg/children-section/component/PreviewModal.tsx:56
+#: nodepkg/children-section/component/PreviewModal.tsx:48
 msgid "Close"
 msgstr "Закрыть"
+
+#: nodepkg/children-section/component/PreviewModal.tsx:56
+msgid "Open in a new tab"
+msgstr "Открыть в новой вкладке"
 
 #: nodepkg/children-section/util/createResourceTableItemOptions.ts:7
 msgid "Change"
@@ -336,9 +335,72 @@ msgstr "Выбрать эту группу"
 msgid "Pick selected"
 msgstr "Выбрать отмеченное"
 
-#: nodepkg/delete-page/DeletePage.tsx:47
-msgid "Confirm deletion of the resource"
-msgstr "Подтвердить удаление ресурса"
+#: nodepkg/delete-page/DeletePage.tsx:121
+msgid "Cancel"
+msgstr "Отмена"
+
+#: nodepkg/delete-page/DeletePageModal.tsx:18
+msgid "Confirmation required"
+msgstr "Необходимо подтверждение"
+
+#: nodepkg/delete-page/util.ts:5
+msgid "Delete {} resource"
+msgid_plural "Delete {} resources"
+msgstr[0] "Удалить {} ресурс"
+msgstr[1] "Удалить {} ресурса"
+msgstr[2] "Удалить {} ресурсов"
+
+#: nodepkg/delete-page/util.ts:13
+msgid "resource"
+msgid_plural "resources"
+msgstr[0] "ресурс"
+msgstr[1] "ресурса"
+msgstr[2] "русурсов"
+
+#: nodepkg/delete-page/util.ts:20
+msgid ""
+"The selected resource cannot be deleted. You may not have sufficient "
+"permissions, or this resource is being referenced by other resources."
+msgstr ""
+"Выбранный ресурс невозможно удалить. Возможно, у вас недостаточноправ для "
+"удаления, или этот на этот ресурс ссылаются другие ресурсы."
+
+#: nodepkg/delete-page/util.ts:24
+msgid ""
+"Please confirm the deletion of the selected resource. This action is "
+"irreversible, and the resource will be permanently deleted."
+msgstr ""
+"Пожалуйста, подтвердите удаление выбранного ресурса. Это действие необратимо,"
+" и ресурс будет навсегда удален."
+
+#: nodepkg/delete-page/util.ts:29
+msgid ""
+"Please confirm the deletion of the selected resource and all its child "
+"resources."
+msgstr ""
+"Пожалуйста, подтвердите удаление выбранного ресурса и всех его дочерних "
+"ресурсов. "
+
+#: nodepkg/delete-page/util.ts:33
+msgid "{} resource will be permanently deleted."
+msgid_plural "{} resources will be permanently deleted."
+msgstr[0] "{} ресурс будет удален навсегда."
+msgstr[1] "{} ресурса будет удалены навсегда."
+msgstr[2] "{} ресурсов будет удалены навсегда."
+
+#: nodepkg/delete-page/util.ts:41
+msgid "{} resource cannot be deleted."
+msgid_plural "{} resources cannot be deleted."
+msgstr[0] "{} дочерний ресурс не может быть удален."
+msgstr[1] "{} дочерних ресурса не могут быть удалены."
+msgstr[2] "{} дочерних ресурсов не могут быть удалены."
+
+#: nodepkg/delete-page/util.ts:47
+msgid "Please confirm the permanent deletion of {} resource."
+msgid_plural "Please confirm the permanent deletion of {} resources."
+msgstr[0] "Пожалуйста, подтвердите необратимое удаление {} ресурса."
+msgstr[1] "Пожалуйста, подтвердите необратимое удаление {} ресурсов."
+msgstr[2] "Пожалуйста, подтвердите необратимое удаление {} ресурсов."
 
 #: nodepkg/description-editor/DescriptionEditorWidget.tsx:31
 msgid "Description"
@@ -425,15 +487,15 @@ msgid "Removed from favorites"
 msgstr "Удалено из избранного"
 
 #: nodepkg/main-section/CreateResourceButton.tsx:8
-#: nodepkg/main-section/CreateResourceModal.tsx:19 view.py:174 view.py:396
+#: nodepkg/main-section/CreateResourceModal.tsx:20 view.py:174 view.py:396
 msgid "Create resource"
 msgstr "Создать ресурс"
 
-#: nodepkg/main-section/CreateResourceModal.tsx:20
+#: nodepkg/main-section/CreateResourceModal.tsx:21
 msgid "Search"
 msgstr "Поиск"
 
-#: nodepkg/main-section/CreateResourceModal.tsx:47
+#: nodepkg/main-section/CreateResourceModal.tsx:49
 msgid "Everything"
 msgstr "Все ресурсы"
 
@@ -586,11 +648,11 @@ msgstr "Права пользователя"
 msgid "Update resource"
 msgstr "Изменить ресурс"
 
-#: view.py:197
+#: view.py:198
 msgid "Delete resource"
 msgstr "Удалить ресурс"
 
-#: view.py:254 view.py:451
+#: view.py:255 view.py:451
 msgid "Resource export"
 msgstr "Экспорт ресурсов"
 
