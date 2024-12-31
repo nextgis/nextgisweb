@@ -9,11 +9,17 @@ type PropsType = Record<string, any>;
 
 const rootsMap = new Map<HTMLElement, Root>();
 
+export interface ReactAppReturn<P extends PropsType = PropsType> {
+    ref: HTMLElement;
+    unmount: () => void;
+    update: (newProps: Partial<P>) => void;
+}
+
 export default function reactApp<P extends PropsType = PropsType>(
     Component: React.ComponentType<P>,
     props: P,
     domNode: HTMLElement
-) {
+): ReactAppReturn<P> {
     let root = rootsMap.get(domNode);
 
     if (!root) {
