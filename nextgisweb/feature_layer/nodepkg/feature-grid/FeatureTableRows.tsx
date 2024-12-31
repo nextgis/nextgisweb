@@ -1,6 +1,6 @@
 import type { VirtualItem } from "@tanstack/react-virtual";
 import { useMemo } from "react";
-import type { ReactNode } from "react";
+import type { Key, ReactNode } from "react";
 
 import { utc } from "@nextgisweb/gui/dayjs";
 import { mergeClasses } from "@nextgisweb/gui/util";
@@ -134,7 +134,7 @@ export function FeatureTableRows({
                 }
                 return (
                     <div
-                        key={virtualRow.key}
+                        key={virtualRow.key as Key}
                         className={className}
                         data-index={virtualRow.index}
                         ref={measureElement}
