@@ -12,9 +12,11 @@ export interface TextEditorProps {
     onChange?: (val: string) => void;
     parentHeight?: boolean;
     border?: boolean;
+    style?: React.CSSProperties;
 }
 
 export function TextEditor({
+    style,
     value,
     onChange: onChangeProp,
     parentHeight = true,
@@ -69,6 +71,7 @@ export function TextEditor({
                 (!border ? " borderless" : "") +
                 (parentHeight ? " parent-height" : "")
             }
+            style={style}
         >
             <CKEditor<ClassicEditor>
                 editor={Editor}
