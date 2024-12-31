@@ -1,19 +1,21 @@
 .ngw-feature-layer-feature-editor-modal.ant-modal {
+    margin: 1em;
+    padding: 0;
     width: 60%;
     min-width: 40em;
     max-width: 80em;
-
     height: 80%;
     min-height: 40em;
 
-    .ant-modal-content {
+    > div {
         height: 100%;
-        > .ant-modal-body {
-            height: 100%;
-        }
-    }
 
-    > div + div {
-        height: 100%;
+        > .ant-modal-content {
+            height: 100%;
+
+            > .ant-modal-body {
+                height: 100%;
+            }
+        }
     }
 }

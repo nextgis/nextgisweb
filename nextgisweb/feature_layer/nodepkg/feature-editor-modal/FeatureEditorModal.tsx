@@ -65,6 +65,7 @@ export function FeatureEditorModal({
             <Modal
                 className="ngw-feature-layer-feature-editor-modal"
                 width="" // Do not set the default (520px) width
+                centered={true}
                 open={open}
                 destroyOnClose
                 footer={null}
