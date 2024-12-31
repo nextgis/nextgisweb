@@ -41,7 +41,7 @@ export function LookupSelect({
     return (
         <Select
             showSearch
-            value={isLoading ? undefined : String(value)}
+            value={isLoading ? undefined : value ? String(value) : undefined}
             onChange={onChange}
             optionFilterProp="label"
             loading={isLoading}
