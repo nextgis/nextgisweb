@@ -12,6 +12,7 @@ import {
 import type { ServerResponseErrorData } from "./error";
 import type {
     LunkwillData,
+    Method,
     RequestOptions,
     ResponseType,
     ToReturn,
@@ -171,7 +172,6 @@ export async function request<
     options?: RequestOptions<RT, ReturnUrl>
 ): Promise<ToReturn<T, RT, ReturnUrl>> {
     const defaults: RequestOptions<RT, ReturnUrl> = {
-        method: "GET",
         credentials: "same-origin",
         headers: {},
     };
@@ -183,6 +183,8 @@ export async function request<
         json,
         ...opt
     } = { ...defaults, ...options };
+
+    opt.method = opt.method ? (opt.method.toUpperCase() as Method) : "GET";
 
     let useLunkwill = false;
     if (lunkwill !== undefined) {
