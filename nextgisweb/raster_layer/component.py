@@ -32,6 +32,11 @@ class RasterLayerComponent(Component, WorkdirMixin):
         self.build_missing_overviews()
         self.workdir_cleanup()
 
+    def check_integrity(self):
+        for layer in RasterLayer.query():
+            if (err := layer._check_integrity()) is not None:
+                yield f"{err} [{RasterLayer.cls_display_name} #{layer.id}]"
+
     def build_missing_overviews(self):
         logger.info("Building missing raster overviews...")
         for resource in RasterLayer.filter_by(cog=False):

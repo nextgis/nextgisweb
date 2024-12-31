@@ -356,6 +356,23 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
 
         return extent
 
+    def _check_integrity(self):
+        ds = self.gdal_dataset()
+        if ds is None:
+            return "Can't read dataset"
+        if self.xsize != ds.RasterXSize:
+            return "Size X mismatch"
+        if self.ysize != ds.RasterYSize:
+            return "Size Y mismatch"
+
+        dt = gdal.GetDataTypeByName(self.dtype)
+        for bidx in range(1, self.band_count + 1):
+            band = ds.GetRasterBand(bidx)
+            if band is None:
+                return f"Can't read band #{bidx}"
+            if band.DataType != dt:
+                return f"Band #{bidx} data type mismatch"
+
 
 def estimate_raster_layer_data(resource):
     fn = env.raster_layer.workdir_path(resource.fileobj)
@@ -411,8 +428,7 @@ class ColorInterpretation(SAttribute):
     ctypes = CRUTypes(List[str], List[str], List[str])
 
     def get(self, srlzr: Serializer) -> List[str]:
-        fdata = env.raster_layer.workdir_path(srlzr.obj.fileobj)
-        ds = gdal.OpenEx(str(fdata))
+        ds = srlzr.obj.gdal_dataset()
         return [
             COLOR_INTERPRETATION[ds.GetRasterBand(bidx).GetRasterColorInterpretation()]
             for bidx in range(1, srlzr.obj.band_count + 1)
