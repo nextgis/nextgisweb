@@ -14,6 +14,7 @@ import type { SRSRead } from "@nextgisweb/spatial-ref-sys/type/api";
 import { DDtoDM, DDtoDMS } from "./format";
 import type { IdentifyInfo, IdentifyResultProps } from "./identification";
 
+import { UpOutlined } from "@ant-design/icons";
 import PinIcon from "@nextgisweb/icon/material/pin_drop";
 
 import "./CoordinatesSwitcher.less";
@@ -182,30 +183,30 @@ export const CoordinatesSwitcher = ({
 
     return (
         <div className="coordinates-switcher">
-            <div className="fill">
-                <Select
-                    style={{ width: "100%" }}
-                    options={options}
-                    value={selectedSrsId}
-                    onChange={changeCoordinate}
+            <Tooltip title={gettext("Zoom to identification point")}>
+                <Button
+                    type="text"
+                    size="small"
+                    onClick={zoomTo}
+                    icon={<PinIcon />}
                 />
-            </div>
-            <div className="content">
-                <Tooltip title={gettext("Zoom to identification point")}>
-                    <Button type="link" onClick={zoomTo} icon={<PinIcon />} />
-                </Tooltip>
-            </div>
-            <div className="content">
-                <Tooltip
-                    title={gettext("Copy identification point coordinates")}
-                >
-                    <CopyToClipboardButton
-                        type="link"
-                        getTextToCopy={getFmtCoordinates}
-                        iconOnly
-                    />
-                </Tooltip>
-            </div>
+            </Tooltip>
+            <Select
+                variant="borderless"
+                options={options}
+                value={selectedSrsId}
+                onChange={changeCoordinate}
+                popupMatchSelectWidth={false}
+                suffixIcon={<UpOutlined style={{ pointerEvents: "none" }} />}
+            />
+            <Tooltip title={gettext("Copy identification point coordinates")}>
+                <CopyToClipboardButton
+                    type="text"
+                    size="small"
+                    getTextToCopy={getFmtCoordinates}
+                    iconOnly
+                />
+            </Tooltip>
         </div>
     );
 };

@@ -381,17 +381,6 @@ const IdentifyResult = ({ identifyInfo, display }: IdentifyResultProps) => {
         );
     }
 
-    const coordinatesPanel = (
-        <div className="panel-content-container margin-all">
-            <div className="fill">
-                <CoordinatesSwitcher
-                    display={display}
-                    identifyInfo={identifyInfo}
-                />
-            </div>
-        </div>
-    );
-
     let noFoundElement = null;
     if (isNotFound) {
         noFoundElement = (
@@ -441,7 +430,10 @@ const IdentifyResult = ({ identifyInfo, display }: IdentifyResultProps) => {
                 {tabsElement}
                 {noFoundElement}
             </div>
-            <div className="bottom">{coordinatesPanel}</div>
+            <CoordinatesSwitcher
+                display={display}
+                identifyInfo={identifyInfo}
+            />
         </>
     );
 };

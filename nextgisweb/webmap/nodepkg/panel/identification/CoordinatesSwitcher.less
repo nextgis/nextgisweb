@@ -1,26 +1,24 @@
 .coordinates-switcher {
     display: flex;
-    width: 100%;
-    max-width: 100%;
     align-items: center;
+    max-width: 100%;
 
-    .fill {
+    > .ant-select {
         flex-grow: 1;
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
+        min-width: 0;
 
+        > .ant-select-selector {
+            padding-right: 4px;
+            padding-left: 4px;
+        }
+
+        > .ant-select-arrow {
+            inset-inline-end: 4px;
+        }
     }
 
-    .content {
-        flex-shrink: 0;
-        white-space: nowrap;
-    }
-}
-
-.switch-coords {
-    .srs {
-        font-style: italic;
-        margin-left: 2px;
+    > .ant-btn {
+        flex: 0 0 auto;
+        color: var(--icon-color);
     }
 }
