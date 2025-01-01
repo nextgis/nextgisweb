@@ -22,6 +22,7 @@ import type { PanelElements } from "../panels-manager/PanelsManager";
 import WebmapStore from "../store";
 import type {
     DojoDisplay,
+    DojoDisplayIdentify,
     MapPlugin,
     MapURLParams,
     PanelDojoItem,
@@ -153,7 +154,11 @@ export default class ShadowDisplay {
 
         // display.tools = [];
     }
+    startup() {
+        this._hideNavMenuForGuest();
 
+        this.display._startupDeferred.resolve(true);
+    }
     _postCreate() {
         const display = this.display;
 
@@ -167,6 +172,141 @@ export default class ShadowDisplay {
 
         display._postCreateDeferred.resolve(true);
     }
+
+    // MAP & CONTROLS
+
+    _mapSetup() {
+        this.display.mapToolbar = new MapToolbar({
+            display: this.display,
+            target: this.display.leftBottomControlPane,
+        });
+
+        this.display.map = new Map({
+            target: this.display.mapNode,
+            logo: false,
+            controls: [],
+            view: new View({
+                minZoom: 3,
+                constrainResolution: true,
+                // TODO: Investigate the source of null values. Normal extent from API types without nulls.
+                extent: !(
+                    this.display.config.extent_const as (null | number)[]
+                ).includes(null)
+                    ? this.display._extent_const
+                    : undefined,
+            }),
+        });
+
+        const controlsReady = buildControls(this.display);
+
+        if (controlsReady.has("id")) {
+            const { control } = controlsReady.get("id")!;
+            this.display.identify = control as DojoDisplayIdentify;
+            this.display.mapStates.addState(
+                "identifying",
+                this.display.identify
+            );
+            this.display.mapStates.setDefaultState("identifying", true);
+            this._identifyFeatureByAttrValue();
+        }
+
+        topic.publish("/webmap/tools/initialized", true);
+
+        // Resize OpenLayers Map on container resize
+        this.display.mapPane.on("resize", () => {
+            this.display.map.olMap.updateSize();
+        });
+
+        // Basemaps initialization
+        const settings = this.display.clientSettings;
+        let idx = 0;
+
+        for (const bm of settings.basemaps) {
+            const MID = this.display._mid.basemap[bm.base.mid];
+
+            const baseOptions = { ...bm.base };
+            const layerOptions = { ...bm.layer };
+            const sourceOptions = { ...bm.source };
+
+            if (baseOptions.keyname === undefined) {
+                baseOptions.keyname = `basemap_${idx}`;
+            }
+
+            try {
+                const layer = new MID(
+                    baseOptions.keyname,
+                    layerOptions,
+                    sourceOptions
+                );
+
+                if (layer.olLayer.getVisible()) {
+                    this.display._baseLayer = layer;
+                }
+                layer.isBaseLayer = true;
+                this.display.map.addLayer(layer);
+            } catch (err) {
+                console.warn(
+                    `Can't initialize layer [${baseOptions.keyname}]: ${err}`
+                );
+            }
+
+            idx++;
+        }
+
+        appendTo(this.display.mapNode);
+        this.display._mapDeferred.resolve(true);
+    }
+    _mapAddControls(controls: Control[]) {
+        controls.forEach((control) => {
+            this.display.map.olMap.addControl(control);
+        });
+    }
+    _mapAddLayer(id: number) {
+        const layer = this.display.webmapStore.getLayer(id);
+        this.display.map.addLayer(layer);
+    }
+    private _mapAddLayers() {
+        this.display._layer_order.forEach((id) => {
+            this._mapAddLayer(id);
+        });
+    }
+    private _setMapExtent() {
+        if (this._zoomByUrlParams()) return;
+        this._zoomToInitialExtent();
+    }
+    _zoomToInitialExtent() {
+        this.display.map.olMap.getView().fit(this.display._extent);
+    }
+    _zoomByUrlParams(): boolean {
+        const urlParams = this.display._urlParams;
+
+        if (
+            !("zoom" in urlParams && "lon" in urlParams && "lat" in urlParams)
+        ) {
+            return false;
+        }
+
+        const view = this.display.map.olMap.getView();
+        if (urlParams.lon && urlParams.lat) {
+            view.setCenter(
+                fromLonLat([
+                    parseFloat(urlParams.lon),
+                    parseFloat(urlParams.lat),
+                ])
+            );
+        }
+        if (urlParams.zoom !== undefined) {
+            view.setZoom(parseInt(urlParams.zoom));
+        }
+
+        if ("angle" in urlParams && urlParams.angle !== undefined) {
+            view.setRotation(parseFloat(urlParams.angle));
+        }
+
+        return true;
+    }
+
+    // STORE & ITEM
 
     prepareItem(item: TreeItemConfig) {
         const display = this.display;
@@ -197,67 +337,56 @@ export default class ShadowDisplay {
         display._itemConfigById[item.id] = item;
         return copy;
     }
-
-    _mapAddControls(controls: Control[]) {
-        controls.forEach((control) => {
-            this.display.map.olMap.addControl(control);
-        });
+    getItemConfig() {
+        return Object.assign({}, this.display._itemConfigById);
     }
-
-    startup() {
-        this._hideNavMenuForGuest();
-
-        this.display._startupDeferred.resolve(true);
+    dumpItem() {
+        return this.display.itemStore.dumpItem(this.display.item);
     }
-
-    isTinyMode() {
-        return this.display.tinyConfig !== undefined;
-    }
-
-    highlightGeometry(geometry: Geometry): void {
-        this.display.map.zoomToFeature(new Feature({ geometry }));
-        topic.publish("feature.highlight", {
-            olGeometry: geometry,
-        });
-    }
-
-    _mapAddLayer(id: number) {
-        const layer = this.display.webmapStore.getLayer(id);
-        this.display.map.addLayer(layer);
-    }
-
-    _getActiveBasemapKey() {
-        if (!this.display._baseLayer || !this.display._baseLayer.name) {
-            return "blank";
-        }
-        return this.display._baseLayer.name;
-    }
-
-    handleSelect(selectedKeys: number[]) {
+    private _itemStoreSetup() {
         const display = this.display;
-        if (selectedKeys.length === 0 || selectedKeys.length < 1) {
-            return;
-        }
-        const itemId = selectedKeys[0];
-        display.itemStore.fetchItemByIdentity({
-            identity: itemId,
-            onItem: (item) => {
-                display.set(
-                    "itemConfig",
-                    display._itemConfigById[itemId] as LayerItemConfig
-                );
-                display.set("item", item);
+        display._itemConfigById = {};
+        const rootItem = this.prepareItem(display.config.rootItem);
+        display.itemStore = new CustomItemFileWriteStore({
+            data: {
+                identifier: "id",
+                label: "label",
+                items: [rootItem],
             },
         });
     }
+    private _webmapStoreSetup() {
+        this.display.webmapStore = new WebmapStore({
+            itemStore: this.display.itemStore,
+        });
+    }
+    private _itemStorePrepare() {
+        const display = this.display;
 
-    setLayerZIndex(id: string, zIndex: number) {
-        const layer = this.display.map.layers[id];
-        if (layer && layer.olLayer && layer.olLayer.setZIndex) {
-            layer.olLayer.setZIndex(zIndex);
+        display.itemStore.fetch({
+            queryOptions: { deep: true },
+            onItem: (item) => {
+                this._itemStorePrepareItem(item);
+            },
+            onComplete: () => {
+                display._itemStoreDeferred.resolve(true);
+            },
+            onError: (error: Error) => {
+                console.error(error);
+                display._itemStoreDeferred.reject(false);
+            },
+        });
+    }
+    private _itemStorePrepareItem(item: StoreItem) {
+        this._itemStoreVisibility(item);
+    }
+    private _itemStoreVisibility(item: StoreItem) {
+        const webmapStore = this.display.webmapStore;
+
+        if (webmapStore) {
+            webmapStore._itemStoreVisibility(item);
         }
     }
-
     async getVisibleItems() {
         return new Promise((resolve, reject) => {
             const display = this.display;
@@ -277,39 +406,20 @@ export default class ShadowDisplay {
         });
     }
 
-    dumpItem() {
-        return this.display.itemStore.dumpItem(this.display.item);
-    }
+    // LAYERS
 
-    getItemConfig() {
-        return Object.assign({}, this.display._itemConfigById);
-    }
-
-    getUrlParams() {
-        return this.display._urlParams;
-    }
-
-    private _hideNavMenuForGuest() {
-        if (!this.display.clientSettings.hide_nav_menu || !ngwConfig.isGuest) {
-            return;
+    setLayerZIndex(id: string, zIndex: number) {
+        const layer = this.display.map.layers[id];
+        if (layer && layer.olLayer && layer.olLayer.setZIndex) {
+            layer.olLayer.setZIndex(zIndex);
         }
-
-        const navMenu = document.querySelector("#header #menu") as HTMLElement;
-        if (!navMenu) return;
-        navMenu.style.display = "none";
     }
-
-    private _adaptersSetup() {
-        const display = this.display;
-        display._adapters = {};
-
-        Object.keys(display._mid.adapter).forEach((k) => {
-            display._adapters[k] = new display._mid.adapter[k]({
-                display,
-            });
-        });
+    _getActiveBasemapKey() {
+        if (!this.display._baseLayer || !this.display._baseLayer.name) {
+            return "blank";
+        }
+        return this.display._baseLayer.name;
     }
-
     private _layersSetup() {
         const display = this.display;
         const store = display.itemStore;
@@ -373,15 +483,119 @@ export default class ShadowDisplay {
             },
         });
     }
+    private _layerSetup(item: StoreItem) {
+        const display = this.display;
+        const store = display.itemStore;
 
-    private isTinyModePlugin(pluginKey: string) {
-        const disabledPlugins = [
-            "@nextgisweb/webmap/plugin/layer-editor",
-            "@nextgisweb/webmap/plugin/feature-layer",
-        ];
-        return !disabledPlugins.includes(pluginKey);
+        const data = display._itemConfigById[store.getValue(item, "id")];
+        if (data.type === "layer") {
+            const adapter = display._adapters[data.adapter];
+            const metersPerUnit = display.map.olMap
+                .getView()
+                .getProjection()
+                .getMetersPerUnit();
+            if (metersPerUnit !== undefined) {
+                if (data.maxScaleDenom !== null) {
+                    const minResolution = display.map.getResolutionForScale(
+                        data.maxScaleDenom,
+                        metersPerUnit
+                    );
+                    if (minResolution !== undefined) {
+                        data.minResolution = minResolution;
+                    }
+                }
+                if (data.minScaleDenom !== null) {
+                    const maxResolution = display.map.getResolutionForScale(
+                        data.minScaleDenom,
+                        metersPerUnit
+                    );
+                    if (maxResolution !== undefined) {
+                        data.maxResolution = maxResolution;
+                    }
+                }
+            }
+
+            const layer = adapter.createLayer(data);
+
+            layer.itemId = data.id;
+            layer.itemConfig = data;
+
+            display.webmapStore.addLayer(data.id, layer);
+        }
+    }
+    private _onNewStoreItem(item: StoreItem) {
+        const display = this.display;
+        const store = display.itemStore;
+        this._layerSetup(item);
+        display._layer_order.unshift(store.getValue(item, "id"));
+    }
+    private _adaptersSetup() {
+        const display = this.display;
+        display._adapters = {};
+
+        Object.keys(display._mid.adapter).forEach((k) => {
+            display._adapters[k] = new display._mid.adapter[k]({
+                display,
+            });
+        });
+    }
+    private _buildLayersTree() {
+        const display = this.display;
+        const { expanded } = display.config.itemsStates;
+        display.webmapStore.setWebmapItems(display.config.rootItem.children);
+        display.webmapStore.setExpanded(expanded);
+    }
+    private _switchBasemap(basemapLayerKey: string) {
+        const display = this.display;
+
+        if (!(basemapLayerKey in display.map.layers)) {
+            return false;
+        }
+
+        if (display._baseLayer && display._baseLayer.name) {
+            const { name } = display._baseLayer;
+            display.map.layers[name].olLayer.setVisible(false);
+        }
+
+        const newLayer = display.map.layers[basemapLayerKey];
+        newLayer.olLayer.setVisible(true);
+        display._baseLayer = newLayer;
+
+        return true;
+    }
+    private _layersPanelSetup() {
+        const display = this.display;
+
+        Promise.all([
+            display._layersDeferred,
+            display._mapDeferred,
+            display._postCreateDeferred,
+            display.panelsManager.panelsReady.promise,
+        ])
+            .then(() => {
+                if (display._urlParams.base) {
+                    this._switchBasemap(display._urlParams.base);
+                }
+                this._setMapExtent();
+                display._mapExtentDeferred.resolve(true);
+            })
+            .catch((err) => {
+                console.error(err);
+            });
     }
 
+    // PLUGINS
+
+    private _pluginsSetup(wmplugin?: boolean) {
+        const display = this.display;
+
+        if (!display._plugins) {
+            display._plugins = {};
+        }
+
+        const plugins = wmplugin ? display._mid.wmplugin : display._mid.plugin;
+        this._installPlugins(plugins);
+    }
     private _installPlugins(
         plugins: Record<string, MapPlugin | { default: MapPlugin }>
     ) {
@@ -426,291 +640,6 @@ export default class ShadowDisplay {
             });
         });
     }
-
-    private _onNewStoreItem(item: StoreItem) {
-        const display = this.display;
-        const store = display.itemStore;
-        this._layerSetup(item);
-        display._layer_order.unshift(store.getValue(item, "id"));
-    }
-
-    private _layerSetup(item: StoreItem) {
-        const display = this.display;
-        const store = display.itemStore;
-
-        const data = display._itemConfigById[store.getValue(item, "id")];
-        if (data.type === "layer") {
-            const adapter = display._adapters[data.adapter];
-            const metersPerUnit = display.map.olMap
-                .getView()
-                .getProjection()
-                .getMetersPerUnit();
-            if (metersPerUnit !== undefined) {
-                if (data.maxScaleDenom !== null) {
-                    const minResolution = display.map.getResolutionForScale(
-                        data.maxScaleDenom,
-                        metersPerUnit
-                    );
-                    if (minResolution !== undefined) {
-                        data.minResolution = minResolution;
-                    }
-                }
-                if (data.minScaleDenom !== null) {
-                    const maxResolution = display.map.getResolutionForScale(
-                        data.minScaleDenom,
-                        metersPerUnit
-                    );
-                    if (maxResolution !== undefined) {
-                        data.maxResolution = maxResolution;
-                    }
-                }
-            }
-
-            const layer = adapter.createLayer(data);
-
-            layer.itemId = data.id;
-            layer.itemConfig = data;
-
-            display.webmapStore.addLayer(data.id, layer);
-        }
-    }
-
-    private _buildLayersTree() {
-        const display = this.display;
-        const { expanded } = display.config.itemsStates;
-        display.webmapStore.setWebmapItems(display.config.rootItem.children);
-        display.webmapStore.setExpanded(expanded);
-    }
-
-    private _mapAddLayers() {
-        this.display._layer_order.forEach((id) => {
-            this._mapAddLayer(id);
-        });
-    }
-
-    private _pluginsSetup(wmplugin?: boolean) {
-        const display = this.display;
-
-        if (!display._plugins) {
-            display._plugins = {};
-        }
-
-        const plugins = wmplugin ? display._mid.wmplugin : display._mid.plugin;
-        this._installPlugins(plugins);
-    }
-
-    private _layersPanelSetup() {
-        const display = this.display;
-
-        Promise.all([
-            display._layersDeferred,
-            display._mapDeferred,
-            display._postCreateDeferred,
-            display.panelsManager.panelsReady.promise,
-        ])
-            .then(() => {
-                if (display._urlParams.base) {
-                    this._switchBasemap(display._urlParams.base);
-                }
-                this._setMapExtent();
-                display._mapExtentDeferred.resolve(true);
-            })
-            .catch((err) => {
-                console.error(err);
-            });
-    }
-
-    private _switchBasemap(basemapLayerKey: string) {
-        const display = this.display;
-
-        if (!(basemapLayerKey in display.map.layers)) {
-            return false;
-        }
-
-        if (display._baseLayer && display._baseLayer.name) {
-            const { name } = display._baseLayer;
-            display.map.layers[name].olLayer.setVisible(false);
-        }
-
-        const newLayer = display.map.layers[basemapLayerKey];
-        newLayer.olLayer.setVisible(true);
-        display._baseLayer = newLayer;
-
-        return true;
-    }
-
-    private _setMapExtent() {
-        if (this._zoomByUrlParams()) return;
-        this._zoomToInitialExtent();
-    }
-    _zoomToInitialExtent() {
-        this.display.map.olMap.getView().fit(this.display._extent);
-    }
-
-    private _webmapStoreSetup() {
-        this.display.webmapStore = new WebmapStore({
-            itemStore: this.display.itemStore,
-        });
-    }
-
-    private _itemStoreSetup() {
-        const display = this.display;
-        display._itemConfigById = {};
-        const rootItem = this.prepareItem(display.config.rootItem);
-        display.itemStore = new CustomItemFileWriteStore({
-            data: {
-                identifier: "id",
-                label: "label",
-                items: [rootItem],
-            },
-        });
-    }
-
-    private _itemStorePrepareItem(item: StoreItem) {
-        this._itemStoreVisibility(item);
-    }
-
-    private _itemStoreVisibility(item: StoreItem) {
-        const webmapStore = this.display.webmapStore;
-
-        if (webmapStore) {
-            webmapStore._itemStoreVisibility(item);
-        }
-    }
-
-    private _itemStorePrepare() {
-        const display = this.display;
-
-        display.itemStore.fetch({
-            queryOptions: { deep: true },
-            onItem: (item) => {
-                this._itemStorePrepareItem(item);
-            },
-            onComplete: () => {
-                display._itemStoreDeferred.resolve(true);
-            },
-            onError: (error: Error) => {
-                console.error(error);
-                display._itemStoreDeferred.reject(false);
-            },
-        });
-    }
-
-    _mapSetup() {
-        this.display.mapToolbar = new MapToolbar({
-            display: this.display,
-            target: this.display.leftBottomControlPane,
-        });
-
-        this.display.map = new Map({
-            target: this.display.mapNode,
-            logo: false,
-            controls: [],
-            view: new View({
-                minZoom: 3,
-                constrainResolution: true,
-                // TODO: Investigate the source of null values. Normal extent from API types without nulls.
-                extent: !(
-                    this.display.config.extent_const as (null | number)[]
-                ).includes(null)
-                    ? this.display._extent_const
-                    : undefined,
-            }),
-        });
-
-        const controlsReady = buildControls(this.display);
-
-        if (controlsReady.has("id")) {
-            const { control } = controlsReady.get("id")! as any;
-            this.display.identify = control;
-            this.display.mapStates.addState(
-                "identifying",
-                this.display.identify
-            );
-            this.display.mapStates.setDefaultState("identifying", true);
-            this._identifyFeatureByAttrValue();
-        }
-
-        topic.publish("/webmap/tools/initialized", true);
-
-        // Resize OpenLayers Map on container resize
-        this.display.mapPane.on("resize", () => {
-            this.display.map.olMap.updateSize();
-        });
-
-        // Basemaps initialization
-        const settings = this.display.clientSettings;
-        let idx = 0;
-
-        for (const bm of settings.basemaps) {
-            const MID = this.display._mid.basemap[bm.base.mid];
-
-            const baseOptions = { ...bm.base };
-            const layerOptions = { ...bm.layer };
-            const sourceOptions = { ...bm.source };
-
-            if (baseOptions.keyname === undefined) {
-                baseOptions.keyname = `basemap_${idx}`;
-            }
-
-            try {
-                const layer = new MID(
-                    baseOptions.keyname,
-                    layerOptions,
-                    sourceOptions
-                );
-
-                if (layer.olLayer.getVisible()) {
-                    this.display._baseLayer = layer;
-                }
-                layer.isBaseLayer = true;
-                this.display.map.addLayer(layer);
-            } catch (err) {
-                console.warn(
-                    `Can't initialize layer [${baseOptions.keyname}]: ${err}`
-                );
-            }
-
-            idx++;
-        }
-
-        appendTo(this.display.mapNode);
-        this.display._mapDeferred.resolve(true);
-    }
-
-    _zoomByUrlParams(): boolean {
-        const urlParams = this.display._urlParams;
-
-        if (
-            !("zoom" in urlParams && "lon" in urlParams && "lat" in urlParams)
-        ) {
-            return false;
-        }
-
-        const view = this.display.map.olMap.getView();
-        if (urlParams.lon && urlParams.lat) {
-            view.setCenter(
-                fromLonLat([
-                    parseFloat(urlParams.lon),
-                    parseFloat(urlParams.lat),
-                ])
-            );
-        }
-        if (urlParams.zoom !== undefined) {
-            view.setZoom(parseInt(urlParams.zoom));
-        }
-
-        if ("angle" in urlParams && urlParams.angle !== undefined) {
-            view.setRotation(parseFloat(urlParams.angle));
-        }
-
-        return true;
-    }
-
-    _initializeFeatureHighlighter() {
-        return new FeatureHighlighter(this.display.map);
-    }
-
     private _initializeMids() {
         const mids = this.display.config.mid;
 
@@ -747,45 +676,42 @@ export default class ShadowDisplay {
             });
         }
     }
-
-    private _buildPanelsManager() {
-        const activePanelKey = this.display._urlParams[this.modeURLParam];
-        const onChangePanel = (panel?: PanelDojoItem) => {
-            if (panel) {
-                setURLParam(this.modeURLParam, panel.name);
-            } else {
-                setURLParam(this.modeURLParam, this.emptyModeURLValue);
-            }
-        };
-
-        let allowPanels;
-        if (this.isTinyMode()) {
-            const panels = this.display._urlParams.panels;
-            allowPanels = panels ? panels.split(",") : [];
-        }
-
-        this.display.panelsManager = new PanelsManager(
-            this.display,
-            activePanelKey,
-            allowPanels,
-            onChangePanel
-        );
-
-        this._buildPanels();
+    private isTinyModePlugin(pluginKey: string) {
+        const disabledPlugins = [
+            "@nextgisweb/webmap/plugin/layer-editor",
+            "@nextgisweb/webmap/plugin/feature-layer",
+        ];
+        return !disabledPlugins.includes(pluginKey);
     }
 
-    private async _buildPanels() {
-        await Promise.all([
-            this.display._layersDeferred,
-            this.display._postCreateDeferred,
-        ]);
-        try {
-            makePanels({ display: this.display });
-        } catch (err) {
-            console.error(err);
-        }
-    }
+    // FEATURE
 
+    highlightGeometry(geometry: Geometry): void {
+        this.display.map.zoomToFeature(new Feature({ geometry }));
+        topic.publish("feature.highlight", {
+            olGeometry: geometry,
+        });
+    }
+    handleSelect(selectedKeys: number[]) {
+        const display = this.display;
+        if (selectedKeys.length === 0 || selectedKeys.length < 1) {
+            return;
+        }
+        const itemId = selectedKeys[0];
+        display.itemStore.fetchItemByIdentity({
+            identity: itemId,
+            onItem: (item) => {
+                display.set(
+                    "itemConfig",
+                    display._itemConfigById[itemId] as LayerItemConfig
+                );
+                display.set("item", item);
+            },
+        });
+    }
+    _initializeFeatureHighlighter() {
+        return new FeatureHighlighter(this.display.map);
+    }
     private _identifyFeatureByAttrValue() {
         const display = this.display;
 
@@ -819,20 +745,52 @@ export default class ShadowDisplay {
             });
     }
 
-    private _addLinkToMainMap() {
-        const display = this.display;
-        if (display._urlParams.linkMainMap !== "true") {
-            return;
-        }
-        display.map.olMap.addControl(
-            new LinkToMainMap({
-                url: display.tinyConfig.mainDisplayUrl,
-                target: display.rightTopControlPane,
-                tipLabel: gettext("Open full map"),
-            })
-        );
+    //  UI
+
+    isTinyMode() {
+        return this.display.tinyConfig !== undefined;
     }
 
+    getUrlParams() {
+        return this.display._urlParams;
+    }
+
+    private _buildPanelsManager() {
+        const activePanelKey = this.display._urlParams[this.modeURLParam];
+        const onChangePanel = (panel?: PanelDojoItem) => {
+            if (panel) {
+                setURLParam(this.modeURLParam, panel.name);
+            } else {
+                setURLParam(this.modeURLParam, this.emptyModeURLValue);
+            }
+        };
+
+        let allowPanels;
+        if (this.isTinyMode()) {
+            const panels = this.display._urlParams.panels;
+            allowPanels = panels ? panels.split(",") : [];
+        }
+
+        this.display.panelsManager = new PanelsManager(
+            this.display,
+            activePanelKey,
+            allowPanels,
+            onChangePanel
+        );
+
+        this._buildPanels();
+    }
+    private async _buildPanels() {
+        await Promise.all([
+            this.display._layersDeferred,
+            this.display._postCreateDeferred,
+        ]);
+        try {
+            makePanels({ display: this.display });
+        } catch (err) {
+            console.error(err);
+        }
+    }
     private _buildTinyPanels() {
         const display = this.display;
         if (!display.panelsManager.getPanelsCount()) {
@@ -847,7 +805,6 @@ export default class ShadowDisplay {
         display.panelsManager.deactivatePanel();
         display.panelsManager.activatePanel(activePanel);
     }
-
     private _handleTinyDisplayMode() {
         const display = this.display;
 
@@ -871,6 +828,28 @@ export default class ShadowDisplay {
             .then(undefined, function (err) {
                 console.error(err);
             });
+    }
+    private _hideNavMenuForGuest() {
+        if (!this.display.clientSettings.hide_nav_menu || !ngwConfig.isGuest) {
+            return;
+        }
+
+        const navMenu = document.querySelector("#header #menu") as HTMLElement;
+        if (!navMenu) return;
+        navMenu.style.display = "none";
+    }
+    private _addLinkToMainMap() {
+        const display = this.display;
+        if (display._urlParams.linkMainMap !== "true") {
+            return;
+        }
+        display.map.olMap.addControl(
+            new LinkToMainMap({
+                url: display.tinyConfig.mainDisplayUrl,
+                target: display.rightTopControlPane,
+                tipLabel: gettext("Open full map"),
+            })
+        );
     }
 
     /**
