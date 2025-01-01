@@ -1,44 +1,99 @@
 import { observer } from "mobx-react-lite";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { Select, Switch } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import AnnotationsStore from "@nextgisweb/webmap/store/annotations/";
+import AnnotationsStore from "@nextgisweb/webmap/store/annotations";
+import type { VisibleMode } from "@nextgisweb/webmap/store/annotations/AnnotationsStore";
+import type { DisplayConfig } from "@nextgisweb/webmap/type";
 
 import { PanelHeader } from "../header";
+import type { PanelProps } from "../type";
 
 import "./AnnotationsPanel.less";
 import "../styles/panels.less";
 
+type GeometryType = "Point" | "LineString" | "Polygon";
+
+interface AnnotationFilter {
+    public: boolean;
+    own: boolean;
+    private: boolean;
+}
+
+interface AnnotationsPanelProps extends PanelProps {
+    onTopicPublish: (val: [string, unknown?]) => void;
+}
+
 const ADD_ANNOTATION_STATE_KEY = "addAnnotation";
 
-export const AnnotationsPanel = observer(
+export const AnnotationsPanel: React.FC<AnnotationsPanelProps> = observer(
     ({ display, title, close, mapStates, onTopicPublish }) => {
-        const [visible, setVisible] = useState(undefined);
+        const [visible, setVisible] = useState(AnnotationsStore.visibleMode);
         const [editable, setEditable] = useState(false);
         const [edit, setEdit] = useState(false);
-        const [annScope, setAnnScope] = useState(undefined);
-        const [geomType, setGeomType] = useState("Point");
-        const [annFilter, setAnnFilter] = useState({
+        const [annScope, setAnnScope] = useState<
+            DisplayConfig["annotations"]["scope"] | undefined
+        >();
+        const [geomType, setGeomType] = useState<GeometryType>("Point");
+        const [annFilter, setAnnFilter] = useState<AnnotationFilter>({
             public: true,
             own: true,
             private: false,
         });
 
-        const changeVisible = (visibleMode) => {
-            setVisible(visibleMode);
-            onTopicPublish(["/annotations/visible", visibleMode]);
+        const changeVisible = useCallback(
+            (visibleMode: VisibleMode | null) => {
+                setVisible(visibleMode);
+                onTopicPublish(["/annotations/visible", visibleMode]);
 
-            if (
-                visibleMode === "no" &&
-                edit &&
-                mapStates.getActiveState() === ADD_ANNOTATION_STATE_KEY
-            ) {
-                changeEdit(false);
-            }
+                AnnotationsStore.setVisibleMode(visibleMode);
+            },
+            [onTopicPublish]
+        );
 
-            AnnotationsStore.setVisibleMode(visibleMode);
-        };
+        const changeEdit = useCallback(
+            (beginEdit: boolean) => {
+                if (beginEdit) {
+                    mapStates.activateState(ADD_ANNOTATION_STATE_KEY);
+                    changeVisible("messages");
+                    onTopicPublish([
+                        "webmap/annotations/add/activate",
+                        geomType,
+                    ]);
+                } else {
+                    mapStates.deactivateState(ADD_ANNOTATION_STATE_KEY);
+                    onTopicPublish(["webmap/annotations/add/deactivate"]);
+                }
+                setEdit(beginEdit);
+            },
+            [changeVisible, geomType, mapStates, onTopicPublish]
+        );
+
+        const changeGeomType = useCallback(
+            (type: GeometryType): void => {
+                setGeomType(type);
+                onTopicPublish([
+                    "webmap/annotations/change/geometryType",
+                    type,
+                ]);
+            },
+            [onTopicPublish]
+        );
+
+        const changeAccessTypeFilters = useCallback(
+            (value: boolean, type: keyof AnnotationFilter): void => {
+                setAnnFilter((prevFilter) => {
+                    const newFilter = { ...prevFilter, [type]: value };
+                    onTopicPublish([
+                        "webmap/annotations/filter/changed",
+                        newFilter,
+                    ]);
+                    return newFilter;
+                });
+            },
+            [onTopicPublish]
+        );
 
         useEffect(() => {
             changeVisible(AnnotationsStore.visibleMode);
@@ -49,35 +104,25 @@ export const AnnotationsPanel = observer(
             const _editable = scope.write;
             setEditable(_editable);
             if (_editable) mapStates.addState(ADD_ANNOTATION_STATE_KEY);
-        }, []);
+        }, [changeVisible, display, mapStates]);
+
+        useEffect(() => {
+            if (
+                visible === "no" &&
+                edit &&
+                mapStates.getActiveState() === ADD_ANNOTATION_STATE_KEY
+            ) {
+                changeEdit(false);
+            }
+        }, [visible, edit, mapStates, changeEdit]);
 
         if (
             visible === undefined ||
             mapStates === undefined ||
             annScope === undefined
         ) {
-            return <></>;
+            return null;
         }
-
-        const changeEdit = (beginEdit) => {
-            if (beginEdit) {
-                mapStates.activateState(ADD_ANNOTATION_STATE_KEY);
-                changeVisible("messages");
-                onTopicPublish(["webmap/annotations/add/activate", geomType]);
-            } else {
-                mapStates.deactivateState(ADD_ANNOTATION_STATE_KEY);
-                onTopicPublish(["webmap/annotations/add/deactivate"]);
-            }
-            setEdit(beginEdit);
-        };
-
-        const changeGeomType = (geomType) => {
-            setGeomType(geomType);
-            onTopicPublish([
-                "webmap/annotations/change/geometryType",
-                geomType,
-            ]);
-        };
 
         let editSection;
         if (editable) {
@@ -99,7 +144,7 @@ export const AnnotationsPanel = observer(
                         <label>{gettext("Geometry type")}</label>
                         <Select
                             style={{ width: "100%" }}
-                            onChange={(v) => changeGeomType(v)}
+                            onChange={changeGeomType}
                             disabled={!edit}
                             value={geomType}
                             options={[
@@ -119,17 +164,9 @@ export const AnnotationsPanel = observer(
             );
         }
 
-        const changeAccessTypeFilters = (value, type) => {
-            const changes = {};
-            changes[type] = value;
-            const newFilter = { ...annFilter, ...changes };
-            setAnnFilter(newFilter);
-            onTopicPublish(["webmap/annotations/filter/changed", newFilter]);
-        };
-
         return (
             <div className="ngw-panel ngw-webmap-annotations-panel">
-                <PanelHeader {...{ title, close }} />
+                <PanelHeader title={title} close={close} />
 
                 <section>
                     <h5 className="heading">{gettext("Annotations layer")}</h5>
@@ -138,7 +175,7 @@ export const AnnotationsPanel = observer(
                         <label>{gettext("Show annotations")}</label>
                         <Select
                             style={{ width: "100%" }}
-                            onChange={(value) => changeVisible(value)}
+                            onChange={changeVisible}
                             value={visible}
                             options={[
                                 { value: "no", label: gettext("No") },
@@ -148,7 +185,7 @@ export const AnnotationsPanel = observer(
                                     label: gettext("With messages"),
                                 },
                             ]}
-                        ></Select>
+                        />
                     </div>
                 </section>
 
@@ -162,7 +199,7 @@ export const AnnotationsPanel = observer(
                     <div className="input-group">
                         <Switch
                             checked={annFilter.public}
-                            onChange={(v) =>
+                            onChange={(v: boolean) =>
                                 changeAccessTypeFilters(v, "public")
                             }
                         />
@@ -174,7 +211,9 @@ export const AnnotationsPanel = observer(
                     <div className="input-group">
                         <Switch
                             checked={annFilter.own}
-                            onChange={(v) => changeAccessTypeFilters(v, "own")}
+                            onChange={(v: boolean) =>
+                                changeAccessTypeFilters(v, "own")
+                            }
                         />
                         <span className="label own">
                             {gettext("My private annotations")}
@@ -185,7 +224,7 @@ export const AnnotationsPanel = observer(
                         <div className="input-group">
                             <Switch
                                 checked={annFilter.private}
-                                onChange={(v) =>
+                                onChange={(v: boolean) =>
                                     changeAccessTypeFilters(v, "private")
                                 }
                             />
@@ -199,3 +238,5 @@ export const AnnotationsPanel = observer(
         );
     }
 );
+
+AnnotationsPanel.displayName = "AnnotationsPanel";
