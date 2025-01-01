@@ -25,9 +25,7 @@ import type { StoreItem } from "../compat/CustomItemFileWriteStore";
 import { LoggedDeferred } from "../compat/LoggedDeferred";
 import type { StoreGroupConfig, StoreItemConfig } from "../compat/type";
 import { entrypointsLoader } from "../compat/util/entrypointLoader";
-import { handlePostMessage } from "../compat/util/handlePostMessage";
 import { FeatureHighlighter } from "../feature-highlighter/FeatureHighlighter";
-import { LinkToMainMap } from "../map-controls/control/LinkToMainMap";
 import { Identify } from "../map-controls/tool/Identify";
 import MapStatesObserver from "../map-state-observer";
 import type { MapStatesObserver as IMapStatesObserver } from "../map-state-observer/MapStatesObserver";
@@ -96,12 +94,11 @@ export class Display {
     mapToolbar!: MapToolbar;
     _plugins: Record<string, PluginBase> = {};
 
-    leftTopControlPane!: HTMLElement;
-    leftBottomControlPane!: HTMLElement;
-    rightTopControlPane!: HTMLElement;
-    rightBottomControlPane!: HTMLElement;
+    leftTopControlPane?: HTMLElement;
+    leftBottomControlPane?: HTMLElement;
+    rightTopControlPane?: HTMLElement;
+    rightBottomControlPane?: HTMLElement;
 
-    _layers!: Record<number, BaseLayer>;
     _adapters!: Record<string, WebmapAdapter>;
 
     readonly map: Map;
@@ -254,8 +251,6 @@ export class Display {
         this._postCreate();
     }
     _postCreate() {
-        this._handleTinyDisplayMode();
-
         this._postCreateDeferred.resolve(true);
     }
 
@@ -881,39 +876,7 @@ export class Display {
     private async _buildPanels() {
         await Promise.all([this._layersDeferred, this._postCreateDeferred]);
     }
-    private _buildTinyPanels() {
-        if (!this.panelsManager.getPanelsCount()) {
-            return;
-        }
 
-        // this.domNode.classList.add("tiny-panels");
-        const activePanel = this.panelsManager.getActivePanelName();
-        if (!activePanel) {
-            return;
-        }
-        this.panelsManager.deactivatePanel();
-        this.panelsManager.activatePanel(activePanel);
-    }
-    private _handleTinyDisplayMode() {
-        if (!this.isTinyMode()) {
-            return;
-        }
-
-        Promise.all([
-            this._layersDeferred,
-            this._mapDeferred,
-            this._postCreateDeferred,
-            this.panelsManager.panelsReady.promise,
-        ])
-            .then(() => {
-                this._buildTinyPanels();
-                this._addLinkToMainMap();
-                this._handlePostMessage();
-            })
-            .then(undefined, function (err) {
-                console.error(err);
-            });
-    }
     private _hideNavMenuForGuest() {
         if (!this.clientSettings.hide_nav_menu || !ngwConfig.isGuest) {
             return;
@@ -922,35 +885,5 @@ export class Display {
         const navMenu = document.querySelector("#header #menu") as HTMLElement;
         if (!navMenu) return;
         navMenu.style.display = "none";
-    }
-    private _addLinkToMainMap() {
-        if (!this.tinyConfig || this._urlParams.linkMainMap !== "true") {
-            return;
-        }
-        this.map.olMap.addControl(
-            new LinkToMainMap({
-                url: this.tinyConfig.mainDisplayUrl,
-                target: this.rightTopControlPane,
-                tipLabel: gettext("Open full map"),
-            })
-        );
-    }
-
-    /**
-     * Generate window `message` events to listen from iframe
-     * @example
-     * window.addEventListener('message', function(evt) {
-     *    const data = evt.data;
-     *    if (data.event === 'ngMapExtentChanged') {
-     *        if (data.detail === 'zoom') {
-     *        } else if (data.detail === 'move') {
-     *        }
-     *        // OR
-     *        if (data.detail === 'position') {}
-     *    }
-     * }, false);
-     */
-    _handlePostMessage() {
-        handlePostMessage(this);
     }
 }

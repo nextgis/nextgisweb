@@ -17,9 +17,8 @@ export interface FeatureEditorModalProps extends ModalProps {
 
 const msgCancel = gettext("Cancel");
 const msgConfirmTitle = gettext("Are you sure?");
-const msgConfirmContent = gettext(
-    "Unsaved changes will be lost if you close the window."
-);
+// prettier-ignore
+const msgConfirmContent = gettext("Unsaved changes will be lost if you close the window.");
 
 export function FeatureEditorModal({
     open: open_,

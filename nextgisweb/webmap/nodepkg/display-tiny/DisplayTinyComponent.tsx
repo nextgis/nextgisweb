@@ -1,12 +1,15 @@
 import { observer } from "mobx-react-lite";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
-import { Layout, Spin } from "@nextgisweb/gui/antd";
+import { Spin } from "@nextgisweb/gui/antd";
 import { useRouteGet } from "@nextgisweb/pyramid/hook";
-import type { DisplayConfig } from "@nextgisweb/webmap/type/api";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
+import { handlePostMessage } from "../compat/util/handlePostMessage";
 import { Display } from "../display";
-import { MapPane } from "../display/component/MapPane";
+import { DisplayComponent } from "../display/DisplayComponent";
+import type { DisplayComponentProps } from "../display/DisplayComponent";
+import { LinkToMainMap } from "../map-controls/control/LinkToMainMap";
 import type { MapRefs, TinyConfig } from "../type";
 
 import { LoadingOutlined } from "@ant-design/icons";
@@ -14,16 +17,8 @@ import { LoadingOutlined } from "@ant-design/icons";
 import "../display/Display.css";
 import "./DisplayTiny.css";
 
-const { Content } = Layout;
-
 const DisplayTinyComponent = observer(
-    ({
-        config,
-        tinyConfig,
-    }: {
-        config: DisplayConfig;
-        tinyConfig: TinyConfig;
-    }) => {
+    ({ config, tinyConfig }: DisplayComponentProps) => {
         const [display] = useState<Display>(
             () =>
                 new Display({
@@ -32,20 +27,67 @@ const DisplayTinyComponent = observer(
                 })
         );
 
+        const { ready: panelsReady } = display.panelsManager;
+
         const [mapRefs, setMapRefs] = useState<MapRefs>();
+
+        const addLinkToMainMap = useCallback(() => {
+            if (
+                !tinyConfig ||
+                display._urlParams.linkMainMap !== "true" ||
+                !mapRefs
+            ) {
+                return;
+            }
+            display.map.olMap.addControl(
+                new LinkToMainMap({
+                    url: tinyConfig.mainDisplayUrl,
+                    target: mapRefs.rightTopControlPane,
+                    tipLabel: gettext("Open full map"),
+                })
+            );
+        }, [
+            display._urlParams.linkMainMap,
+            display.map.olMap,
+            mapRefs,
+            tinyConfig,
+        ]);
+
+        useEffect(
+            function buildTinyPanels() {
+                if (panelsReady) {
+                    return;
+                }
+
+                const activePanel = display.panelsManager.getActivePanelName();
+                if (!activePanel) {
+                    return;
+                }
+                display.panelsManager.deactivatePanel();
+                // display.panelsManager.activatePanel(activePanel);
+            },
+            [display.panelsManager, panelsReady]
+        );
+
+        const handleTinyDisplayMode = useCallback(() => {
+            addLinkToMainMap();
+            handlePostMessage(display);
+        }, [addLinkToMainMap, display]);
 
         useEffect(() => {
             if (mapRefs) {
                 display.startup(mapRefs);
+                handleTinyDisplayMode();
             }
-        }, [display, mapRefs]);
+        }, [display, handleTinyDisplayMode, mapRefs]);
 
         return (
-            <Layout style={{ width: "100%", height: "100%" }} className="tiny">
-                <Content className="map-container" style={{ paddingLeft: 0 }}>
-                    <MapPane setMapRefs={setMapRefs} />
-                </Content>
-            </Layout>
+            <DisplayComponent
+                className="tiny tiny-panels"
+                display={display}
+                config={config}
+                setMapRefs={setMapRefs}
+            />
         );
     }
 );
