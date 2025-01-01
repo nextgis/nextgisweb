@@ -106,8 +106,9 @@ class TSGenerator:
             result = TSStruct(cls=otype, **defaults)
         elif (origin := get_origin(otype)) is Union:
             result = TSUnion(args=get_args(otype), **defaults)
-        elif origin is list:
-            result = TSList(arg=get_args(otype)[0], **defaults)
+        elif origin in (list, set):
+            comment = None if origin is list else origin.__name__
+            result = TSList(arg=get_args(otype)[0], comment=comment, **defaults)
         elif origin is tuple:
             result = TSTuple(args=get_args(otype), **defaults)
         elif origin is dict:
