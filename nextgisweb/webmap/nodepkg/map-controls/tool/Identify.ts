@@ -14,7 +14,7 @@ import type { DojoDisplay } from "@nextgisweb/webmap/type";
 import type { DisplayMap } from "@nextgisweb/webmap/type/DisplayMap";
 import type { LayerItem } from "@nextgisweb/webmap/type/TreeItems";
 
-import { Base } from "./Base";
+import { Base } from "./ToolBase";
 
 import "./Identify.css";
 
