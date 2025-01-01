@@ -1,23 +1,47 @@
 .ngw-webmap-layers-tree.ant-tree {
+    &.ant-tree-show-line {
+        --ngw-webmap-layers-tree-indent: 20px;
+        --ngw-webmap-layers-tree-switcher: 24px;
+    }
+
     .ant-tree-treenode {
+        margin: 0;
         padding: 0;
+
+        > .ant-tree-indent {
+            > .ant-tree-indent-unit {
+                width: var(--ngw-webmap-layers-tree-indent);
+
+                &::before {
+                    inset-inline-end: 8px;
+                }
+            }
+        }
+
+        > .ant-tree-switcher {
+            margin-inline-end: 0;
+            width: var(--ngw-webmap-layers-tree-switcher, 6px);
+
+            > .ant-tree-switcher-leaf-line {
+                &::after {
+                    width: 6px;
+                    height: 14px;
+                }
+            }
+        }
+
+        &.ant-tree-treenode-leaf-last {
+            > .ant-tree-switcher {
+                > .ant-tree-switcher-leaf-line {
+                    &::before {
+                        height: 14px !important;
+                    }
+                }
+            }
+        }
 
         &.ant-tree-treenode-selected {
             background-color: #e6f0f8;
-        }
-    }
-
-    &:not(.ant-tree-show-line) .ant-tree-switcher-noop {
-        width: 6px;
-    }
-
-    &.ant-tree-show-line {
-        .ant-tree-indent-unit {
-            width: 18px;
-
-            &::before {
-                right: 6px;
-            }
         }
     }
 
@@ -29,7 +53,6 @@
         align-self: start;
         scale: 0.75;
         margin-top: 6px;
-        margin-right: 6px;
     }
 
     .ant-tree-node-content-wrapper {
