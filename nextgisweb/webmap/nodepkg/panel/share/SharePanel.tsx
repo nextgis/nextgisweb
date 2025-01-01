@@ -22,11 +22,11 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import settings from "@nextgisweb/pyramid/settings!webmap";
 import { useFavorites } from "@nextgisweb/resource/favorite/useFavorites";
 import { getControls } from "@nextgisweb/webmap/map-controls";
+import type { ReactPanelComponentProps } from "@nextgisweb/webmap/panels-manager/type";
 import type { PanelDojoItem } from "@nextgisweb/webmap/type";
 import { getPermalink } from "@nextgisweb/webmap/utils/permalink";
 
 import { PanelHeader } from "../header";
-import type { PanelProps } from "../type";
 
 import CloseIcon from "@nextgisweb/icon/material/close";
 import PreviewIcon from "@nextgisweb/icon/material/preview";
@@ -158,7 +158,12 @@ interface PanelOption {
     value: string;
 }
 
-export const SharePanel = ({ display, title, close, visible }: PanelProps) => {
+export const SharePanel = ({
+    display,
+    title,
+    close,
+    visible,
+}: ReactPanelComponentProps) => {
     const webmapId = display.config.webmapId;
 
     const [mapLink, setMapLink] = useState("");
@@ -324,7 +329,7 @@ export const SharePanel = ({ display, title, close, visible }: PanelProps) => {
 
     return (
         <div className="ngw-panel ngw-webmap-share-panel">
-            <PanelHeader {...{ title, close }} />
+            <PanelHeader title={title} close={close} />
             <section>
                 <h5 className="heading">{gettext("Map link")}</h5>
                 <div className="input-group">
