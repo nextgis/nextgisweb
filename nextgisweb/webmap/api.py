@@ -1,8 +1,10 @@
+from collections import namedtuple
+from inspect import signature
 from pathlib import Path
 from shutil import which
 from subprocess import check_call
 from tempfile import TemporaryDirectory
-from typing import List, Literal, Optional, Union
+from typing import Any, Dict, List, Literal, Optional, Tuple, Union
 
 from geoalchemy2.shape import to_shape
 from msgspec import UNSET, Meta, Struct, UnsetType, ValidationError
@@ -17,9 +19,15 @@ from nextgisweb.jsrealm import TSExport
 from nextgisweb.layer import IBboxLayer
 from nextgisweb.pyramid import JSONType
 from nextgisweb.pyramid.api import csetting
+from nextgisweb.render import IRenderableScaleRange
+from nextgisweb.render.api import legend_symbols_by_resource
+from nextgisweb.render.legend import ILegendSymbols
+from nextgisweb.render.util import scale_range_intersection
 from nextgisweb.resource import DataScope, ResourceFactory, ResourceScope
 
-from .model import WebMap, WebMapAnnotation, WebMapScope
+from .adapter import WebMapAdapter
+from .model import LegendSymbolsEnum, WebMap, WebMapAnnotation, WebMapScope
+from .plugin import WebmapLayerPlugin, WebmapPlugin
 
 AnnotationID = Annotated[int, Meta(ge=1, description="Annotation ID")]
 
@@ -385,6 +393,285 @@ csetting("legend_symbols", Optional[str], default=None)
 csetting("hide_nav_menu", bool, default=False)
 
 
+LayerType = Literal["layer", "group", "root"]
+AnnotationVisibleMode = Literal["no", "yes", "messages"]
+LegendVisibleMode = Literal["collapse", "expand"]
+Entrypoint = Union[str, Tuple[str, Any]]
+
+
+class Icon(Struct):
+    format: str
+    data: str
+
+
+class SymbolInfo(Struct):
+    index: int
+    render: bool
+    display_name: str
+    icon: Icon
+
+
+class LegendInfo(Struct):
+    visible: LegendVisibleMode
+    has_legend: bool
+    symbols: List[SymbolInfo]
+    single: bool
+    open: Union[bool, None] = None
+
+
+class Scope(Struct):
+    read: bool
+    write: bool
+    manage: bool
+
+
+class Annotations(Struct):
+    enabled: bool
+    default: AnnotationVisibleMode
+    scope: Scope
+
+
+class Mid(Struct):
+    adapter: List[Entrypoint]
+    basemap: List[Entrypoint]
+    plugin: List[Entrypoint]
+
+
+class ItemsStates(Struct):
+    expanded: List[Any]
+    checked: List[int]
+
+
+class BaseItem(Struct):
+    id: int
+    key: int
+    type: LayerType
+    label: str
+    title: str
+
+
+class LayerItemConfig(BaseItem):
+    type: Literal["layer"]
+    layerId: int
+    styleId: int
+    visibility: bool
+    identifiable: bool
+    transparency: Union[float, None]
+    minScaleDenom: Union[float, None]
+    maxScaleDenom: Union[float, None]
+    drawOrderPosition: Union[int, None]
+    legendInfo: LegendInfo
+    adapter: str
+    plugin: Dict[str, Any]
+    minResolution: Union[float, None] = None
+    maxResolution: Union[float, None] = None
+    editable: Union[bool, None] = None
+
+
+class GroupItemConfig(BaseItem):
+    type: Literal["group"]
+    expanded: bool
+    exclusive: bool
+    children: List[Union["GroupItemConfig", LayerItemConfig]]
+
+
+class RootItemConfig(BaseItem):
+    type: Literal["root"]
+    children: List[Union[GroupItemConfig, LayerItemConfig]]
+
+
+TreeItemConfig = Union[RootItemConfig, GroupItemConfig, LayerItemConfig]
+TreeChildrenItemConfig = Union[GroupItemConfig, LayerItemConfig]
+
+
+class DisplayConfig(Struct, kw_only=True):
+    extent: Tuple[float, float, float, float]
+    extent_const: Tuple[
+        Union[float, None], Union[float, None], Union[float, None], Union[float, None]
+    ]
+    rootItem: RootItemConfig
+    itemsStates: ItemsStates
+    mid: Mid
+    webmapPlugin: Dict[str, Any]
+    bookmarkLayerId: Union[Any, None] = None
+    webmapId: int
+    webmapDescription: str
+    webmapTitle: str
+    webmapEditable: bool
+    webmapLegendVisible: str
+    drawOrderEnabled: Union[Any, None] = None
+    annotations: Annotations
+    # units: str
+    printMaxSize: int
+    measureSrsId: Union[int, None] = None
+
+
+def display_config(obj, request) -> DisplayConfig:
+    request.resource_permission(ResourceScope.read)
+
+    MID = namedtuple("MID", ["adapter", "basemap", "plugin"])
+
+    mid = MID(
+        set(),
+        set(),
+        set(),
+    )
+
+    # Map level plugins
+    plugin = dict()
+    for pcls in WebmapPlugin.registry:
+        p_mid_data = pcls.is_supported(obj)
+        if p_mid_data:
+            plugin.update((p_mid_data,))
+
+    items_states = {
+        "expanded": [],
+        "checked": [],
+    }
+
+    ls_webmap = request.env.webmap.effective_legend_symbols() + obj.legend_symbols
+
+    def _legend(layer, style):
+        ls_layer = ls_webmap + obj.legend_symbols + layer.legend_symbols
+        result = dict(visible=ls_layer)
+        if ls_layer in (LegendSymbolsEnum.EXPAND, LegendSymbolsEnum.COLLAPSE):
+            has_legend = result["has_legend"] = ILegendSymbols.providedBy(style)
+            if has_legend:
+                legend_symbols = legend_symbols_by_resource(style, 20, request.translate)
+                result.update(symbols=legend_symbols)
+                is_single = len(legend_symbols) == 1
+                result.update(single=is_single)
+                if not is_single:
+                    result.update(open=ls_layer == LegendSymbolsEnum.EXPAND)
+
+        return result
+
+    def traverse(item):
+        data = dict(
+            id=item.id,
+            key=item.id,
+            type=item.item_type,
+            label=item.display_name,
+            title=item.display_name,
+        )
+
+        if item.item_type == "layer":
+            style = item.style
+            layer = style.parent if style.cls.endswith("_style") else style
+
+            if not style.has_permission(DataScope.read, request.user):
+                return None
+
+            # If there are no necessary permissions skip web-map element
+            # so it won't be shown in the tree
+
+            # TODO: Security
+
+            # if not layer.has_permission(
+            #     request.user,
+            #     'style-read',
+            #     'data-read',
+            # ):
+            #     return None
+
+            layer_enabled = bool(item.layer_enabled)
+            if layer_enabled:
+                items_states.get("checked").append(item.id)
+
+            scale_range = item.scale_range()
+            if IRenderableScaleRange.providedBy(style):
+                scale_range = scale_range_intersection(scale_range, style.scale_range())
+
+            # Main element parameters
+            data.update(
+                layerId=style.parent_id,
+                styleId=style.id,
+                visibility=layer_enabled,
+                identifiable=item.layer_identifiable,
+                transparency=item.layer_transparency,
+                minScaleDenom=scale_range[0],
+                maxScaleDenom=scale_range[1],
+                drawOrderPosition=item.draw_order_position,
+                legendInfo=_legend(item, style),
+            )
+
+            data["adapter"] = WebMapAdapter.registry.get(item.layer_adapter, "image").mid
+            mid.adapter.add(data["adapter"])
+
+            # Layer level plugins
+            plugin = dict()
+            plugin_base_kwargs = dict(layer=layer, webmap=obj)
+            for pcls in WebmapLayerPlugin.registry:
+                fn = pcls.is_layer_supported
+                plugin_kwargs = (
+                    dict(plugin_base_kwargs, style=style)
+                    if "style" in signature(fn).parameters
+                    else plugin_base_kwargs
+                )
+                p_mid_data = fn(**plugin_kwargs)
+                if p_mid_data:
+                    plugin.update((p_mid_data,))
+
+            data.update(plugin=plugin)
+            mid.plugin.update(plugin.keys())
+
+        elif item.item_type in ("root", "group"):
+            expanded = item.group_expanded
+            exclusive = item.group_exclusive
+            if expanded:
+                items_states.get("expanded").append(item.id)
+            # Recursively run all elements excluding those
+            # with no permissions
+            data.update(
+                expanded=expanded,
+                exclusive=exclusive,
+                children=list(filter(None, map(traverse, item.children))),
+            )
+            # Hide empty groups
+            if (item.item_type in "group") and not data["children"]:
+                return None
+
+        return data
+
+    title = obj.display_name if obj.title is None else obj.title
+
+    tmp = obj.to_dict()
+    display_config = dict(
+        extent=tmp["extent"],
+        extent_const=tmp["extent_const"],
+        rootItem=traverse(obj.root_item),
+        itemsStates=items_states,
+        mid=Mid(
+            adapter=tuple(mid.adapter),
+            basemap=tuple(mid.basemap),
+            plugin=tuple(mid.plugin),
+        ),
+        webmapPlugin=plugin,
+        bookmarkLayerId=obj.bookmark_resource_id,
+        webmapId=obj.id,
+        webmapDescription=obj.description,
+        webmapTitle=title,
+        webmapEditable=obj.editable,
+        webmapLegendVisible=obj.legend_symbols,
+        drawOrderEnabled=obj.draw_order_enabled,
+        measureSrsId=obj.measure_srs_id,
+        printMaxSize=request.env.webmap.options["print.max_size"],
+    )
+
+    if request.env.webmap.options["annotation"]:
+        display_config["annotations"] = dict(
+            enabled=obj.annotation_enabled,
+            default=obj.annotation_default,
+            scope=dict(
+                read=obj.has_permission(WebMapScope.annotation_read, request.user),
+                write=obj.has_permission(WebMapScope.annotation_write, request.user),
+                manage=obj.has_permission(WebMapScope.annotation_manage, request.user),
+            ),
+        )
+
+    return DisplayConfig(**display_config)
+
+
 def setup_pyramid(comp, config):
     webmap_factory = ResourceFactory(context=WebMap)
 
@@ -418,4 +705,11 @@ def setup_pyramid(comp, config):
         "/api/component/{id}/webmap/print",
         factory=webmap_factory,
         post=print,
+    )
+
+    config.add_route(
+        "webmap.display_config",
+        r"/api/resource/{id:uint}/webmap/display_config",
+        factory=webmap_factory,
+        get=display_config,
     )
