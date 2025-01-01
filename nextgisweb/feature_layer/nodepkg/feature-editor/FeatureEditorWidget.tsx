@@ -42,8 +42,8 @@ export const FeatureEditorWidget = observer(
         toolbar,
         store: storeProp,
         mode,
-        onSave,
         onOk,
+        onSave,
     }: FeatureEditorWidgetProps) => {
         const [activeKey, setActiveKey] = useState(ATTRIBUTES_KEY);
         const store = useState<FeatureEditorStore>(() => {

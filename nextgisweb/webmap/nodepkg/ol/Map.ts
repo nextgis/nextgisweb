@@ -77,19 +77,19 @@ export class Map extends Watchable<MapWatchableProps> {
     setResolution(resolution: number | null) {
         const oldResolution = this.resolution;
         this.resolution = resolution;
-        this.notify("resolution", oldResolution, this.resolution);
+        this.notify("resolution", oldResolution, resolution);
     }
     @action
     setPosition(position: Position | null) {
         const oldPosition = this.position;
         this.position = position;
-        this.notify("position", oldPosition, this.position);
+        this.notify("position", oldPosition, position);
     }
     @action
     setCenter(center: number[] | null) {
         const oldCenter = this.center;
         this.center = center;
-        this.notify("center", oldCenter, this.center);
+        this.notify("center", oldCenter, center);
     }
 
     addLayer(layer: BaseLayer): void {

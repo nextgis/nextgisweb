@@ -4,7 +4,7 @@ import { never } from "ol/events/condition";
 import { Draw } from "ol/interaction";
 import type { Vector as VectorSource } from "ol/source";
 
-import { Vector as VectorLayerClass } from "../../ol/layer/Vector";
+import VectorLayerClass from "../../ol/layer/Vector";
 
 import type { AnnotationsLayer } from "./AnnotationsLayer";
 
