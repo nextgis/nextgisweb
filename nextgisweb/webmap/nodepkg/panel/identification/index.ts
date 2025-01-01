@@ -1,2 +1,2 @@
 /** @entrypoint */
-export { IdentificationPanel as default } from "./IdentificationPanel";
+export { IdentificationPanel as default } from "./IdentificationPanel/IdentificationPanel";

@@ -1,34 +1,32 @@
 import { route } from "@nextgisweb/pyramid/api";
+import type { GetRequestOptions } from "@nextgisweb/pyramid/api/type";
 
-const cache = new Map<number, Record<string, string>>();
-
-export const lookup = (resourceId: number, key: string) => {
-    const data = cache.get(resourceId);
-    if (data === undefined || data === null) {
-        return null;
-    }
-    const value = data[key];
-    if (value === undefined) {
-        return null;
-    }
-    return value;
-};
-
-export const load = async (
-    resourceId: number
-): Promise<Record<string, string>> => {
-    const lookupTableItems = cache.get(resourceId);
-    if (lookupTableItems !== undefined) {
-        return lookupTableItems;
-    }
-
-    const resourceItem = await route("resource.item", resourceId).get();
+export async function load(
+    resourceId: number,
+    requestOptions?: GetRequestOptions
+): Promise<Record<string, string>> {
+    const resourceItem = await route("resource.item", resourceId).get({
+        cache: true,
+        ...requestOptions,
+    });
     if (resourceItem.lookup_table !== undefined) {
-        cache.set(resourceId, resourceItem.lookup_table.items);
         return resourceItem.lookup_table.items;
     }
 
     throw Error(
         `An error occurred while loading the lookup table with resourceId=${resourceId}`
     );
-};
+}
+
+export async function lookup(
+    resourceId: number,
+    key: string,
+    requestOptions?: GetRequestOptions
+) {
+    const data = await load(resourceId, requestOptions);
+    const value = data[key];
+    if (value === undefined) {
+        return null;
+    }
+    return value;
+}
