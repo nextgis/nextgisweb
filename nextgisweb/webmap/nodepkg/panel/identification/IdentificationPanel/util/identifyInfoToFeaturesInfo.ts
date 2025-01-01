@@ -1,10 +1,10 @@
-import type { ShadowDisplay } from "@nextgisweb/webmap/type";
+import type { Display } from "@nextgisweb/webmap/display";
 
 import type { FeatureInfo, IdentifyInfo } from "../../identification";
 
 export function identifyInfoToFeaturesInfo(
     identifyInfo: IdentifyInfo,
-    display: ShadowDisplay
+    display: Display
 ): FeatureInfo[] {
     if (!identifyInfo) {
         return [];

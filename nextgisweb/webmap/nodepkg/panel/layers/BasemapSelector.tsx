@@ -3,12 +3,12 @@ import { useMemo } from "react";
 
 import { Select } from "@nextgisweb/gui/antd";
 import type { OptionType } from "@nextgisweb/gui/antd";
-import type ShadowDisplay from "@nextgisweb/webmap/compat/ShadowDisplay";
+import type { Display } from "@nextgisweb/webmap/display";
 
 import { UpOutlined } from "@ant-design/icons";
 
 interface BasemapSelectorProps {
-    display: ShadowDisplay;
+    display: Display;
 }
 
 export const BasemapSelector = observer(({ display }: BasemapSelectorProps) => {

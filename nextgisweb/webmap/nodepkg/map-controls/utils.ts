@@ -1,9 +1,9 @@
-import type ShadowDisplay from "../compat/ShadowDisplay";
+import type { Display } from "../display";
 
 import type { ControlsInfo } from "./type";
 
 export const getControlsInfo = <T extends ControlsInfo>(
-    display: ShadowDisplay,
+    display: Display,
     controlsInfo: T[]
 ): T[] => {
     let controls;

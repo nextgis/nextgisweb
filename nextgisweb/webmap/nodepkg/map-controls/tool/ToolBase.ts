@@ -1,13 +1,13 @@
-import type ShadowDisplay from "@nextgisweb/webmap/compat/ShadowDisplay";
+import type { Display } from "@nextgisweb/webmap/display";
 import type { ToggleControl } from "@nextgisweb/webmap/map-toolbar/ToggleControl";
 
 export interface ToolBaseOptions {
-    display: ShadowDisplay;
+    display: Display;
     label?: string;
 }
 
 export abstract class ToolBase {
-    display: ShadowDisplay;
+    display: Display;
     label = "Tool";
 
     iconClass?: string;
