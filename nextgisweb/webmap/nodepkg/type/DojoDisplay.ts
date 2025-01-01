@@ -4,6 +4,7 @@ import type Feature from "ol/Feature";
 import type { Control as OlControl } from "ol/control";
 import type { Options } from "ol/control/Control";
 
+import type PanelsManager from "../panels-manager";
 import type WebmapStore from "../store";
 
 import type { DisplayConfig } from "./DisplayConfig";
@@ -92,6 +93,14 @@ export interface DojoDisplay extends dijit._WidgetBase {
     _onNewStoreItem: (item: WebmapItem | any) => void;
     _mapAddLayer: (id: number) => void;
     _mapDeferred: PromiseLike<void>;
+
+    _mapExtentDeferred: PromiseLike<void>;
+
+    getVisibleItems: () => Promise<WebmapItem[]>;
+
+    panelsManager: PanelsManager;
+
+    _baseLayer: WebmapLayer;
 
     itemStore: CustomItemFileWriteStore;
     getItemConfig: () => ItemConfigById;
