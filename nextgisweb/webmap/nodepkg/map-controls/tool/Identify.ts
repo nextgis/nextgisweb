@@ -14,7 +14,7 @@ import type { DojoDisplay } from "@nextgisweb/webmap/type";
 import type { DisplayMap } from "@nextgisweb/webmap/type/DisplayMap";
 import type { LayerItem } from "@nextgisweb/webmap/type/TreeItems";
 
-import { Base } from "./BaseTool";
+import { Base } from "./Base";
 
 import "./Identify.css";
 
@@ -72,117 +72,12 @@ export class Identify extends Base {
         this._bindEvents();
     }
 
-    private _bindEvents(): void {
-        topic.subscribe("webmap/tool/identify/on", () => {
-            this.activate();
-        });
-
-        topic.subscribe("webmap/tool/identify/off", () => {
-            this.deactivate();
-        });
-    }
-
     activate(): void {
         this.control.setActive(true);
     }
 
     deactivate(): void {
         this.control.setActive(false);
-    }
-
-    async execute(pixel: number[]): Promise<void> {
-        const olMap = this.display.map.olMap;
-        const point = olMap.getCoordinateFromPixel(pixel);
-
-        const request: Request = {
-            srs: 3857,
-            geom: this._requestGeomString(pixel),
-            layers: [],
-        };
-
-        const items = await this.display.getVisibleItems();
-        const mapResolution = this.display.map.get("resolution");
-
-        items.forEach((i) => {
-            const item = this.display._itemConfigById[
-                this.display.itemStore.getValue(i, "id")
-            ] as LayerItem;
-            if (
-                !item.identifiable ||
-                (item.maxResolution !== null &&
-                    mapResolution >= item.maxResolution) ||
-                (item.minResolution !== null &&
-                    mapResolution < item.minResolution)
-            ) {
-                return;
-            }
-            request.layers.push(item.layerId);
-        });
-
-        const layerLabels: Record<string, string> = {};
-        items.forEach((i) => {
-            layerLabels[this.display.itemStore.getValue(i, "layerId")] =
-                this.display.itemStore.getValue(i, "label");
-        });
-
-        const response = await route("feature_layer.identify").post({
-            json: request,
-        });
-
-        this.openIdentifyPanel(response, point, layerLabels);
-    }
-
-    private _requestGeomString(pixel: number[]): string {
-        const olMap = this.map.olMap;
-        const bounds = boundingExtent([
-            olMap.getCoordinateFromPixel([
-                pixel[0] - this.pixelRadius,
-                pixel[1] - this.pixelRadius,
-            ]),
-            olMap.getCoordinateFromPixel([
-                pixel[0] + this.pixelRadius,
-                pixel[1] + this.pixelRadius,
-            ]),
-        ]);
-
-        return new WKT().writeGeometry(fromExtent(bounds));
-    }
-
-    private openIdentifyPanel(
-        response: RouteResp<"feature_layer.identify", "post">,
-        point: Coordinate,
-        layerLabels: Record<string, string>
-    ): void {
-        if (response.featureCount === 0) {
-            // @ts-expect-error the event may actually be empty
-            topic.publish("feature.unhighlight");
-        }
-
-        const identifyInfo = {
-            point,
-            response,
-            layerLabels,
-        };
-
-        const pm = this.display.panelsManager;
-        const pkey = "identify";
-        const panel = pm.getPanel(pkey);
-        if (panel) {
-            if (panel.app) {
-                panel.app.update({ identifyInfo });
-            } else {
-                panel.props = { identifyInfo };
-            }
-        } else {
-            throw new Error(
-                "Identification panel should add during Display initialization"
-            );
-        }
-
-        const activePanel = pm.getActivePanelName();
-        if (activePanel !== pkey) {
-            pm.activatePanel(pkey);
-        }
     }
 
     async identifyFeatureByAttrValue(
@@ -245,5 +140,110 @@ export class Identify extends Base {
             this.map.zoomToExtent(extent);
         }
         return true;
+    }
+
+    async execute(pixel: number[]): Promise<void> {
+        const olMap = this.display.map.olMap;
+        const point = olMap.getCoordinateFromPixel(pixel);
+
+        const request: Request = {
+            srs: 3857,
+            geom: this._requestGeomString(pixel),
+            layers: [],
+        };
+
+        const items = await this.display.getVisibleItems();
+        const mapResolution = this.display.map.get("resolution");
+
+        items.forEach((i) => {
+            const item = this.display._itemConfigById[
+                this.display.itemStore.getValue(i, "id")
+            ] as LayerItem;
+            if (
+                !item.identifiable ||
+                (item.maxResolution !== null &&
+                    mapResolution >= item.maxResolution) ||
+                (item.minResolution !== null &&
+                    mapResolution < item.minResolution)
+            ) {
+                return;
+            }
+            request.layers.push(item.layerId);
+        });
+
+        const layerLabels: Record<string, string> = {};
+        items.forEach((i) => {
+            layerLabels[this.display.itemStore.getValue(i, "layerId")] =
+                this.display.itemStore.getValue(i, "label");
+        });
+
+        const response = await route("feature_layer.identify").post({
+            json: request,
+        });
+
+        this.openIdentifyPanel(response, point, layerLabels);
+    }
+
+    private _bindEvents(): void {
+        topic.subscribe("webmap/tool/identify/on", () => {
+            this.activate();
+        });
+
+        topic.subscribe("webmap/tool/identify/off", () => {
+            this.deactivate();
+        });
+    }
+
+    private _requestGeomString(pixel: number[]): string {
+        const olMap = this.map.olMap;
+        const bounds = boundingExtent([
+            olMap.getCoordinateFromPixel([
+                pixel[0] - this.pixelRadius,
+                pixel[1] - this.pixelRadius,
+            ]),
+            olMap.getCoordinateFromPixel([
+                pixel[0] + this.pixelRadius,
+                pixel[1] + this.pixelRadius,
+            ]),
+        ]);
+
+        return new WKT().writeGeometry(fromExtent(bounds));
+    }
+
+    private openIdentifyPanel(
+        response: RouteResp<"feature_layer.identify", "post">,
+        point: Coordinate,
+        layerLabels: Record<string, string>
+    ): void {
+        if (response.featureCount === 0) {
+            // @ts-expect-error the event may actually be empty
+            topic.publish("feature.unhighlight");
+        }
+
+        const identifyInfo = {
+            point,
+            response,
+            layerLabels,
+        };
+
+        const pm = this.display.panelsManager;
+        const pkey = "identify";
+        const panel = pm.getPanel(pkey);
+        if (panel) {
+            if (panel.app) {
+                panel.app.update({ identifyInfo });
+            } else {
+                panel.props = { identifyInfo };
+            }
+        } else {
+            throw new Error(
+                "Identification panel should add during Display initialization"
+            );
+        }
+
+        const activePanel = pm.getActivePanelName();
+        if (activePanel !== pkey) {
+            pm.activatePanel(pkey);
+        }
     }
 }
