@@ -6,15 +6,10 @@ import NavigationMenu from "@nextgisweb/webmap/navigation-menu";
 import { navigationMenuStore } from "@nextgisweb/webmap/navigation-menu/NavigationMenuStore";
 
 import type { NavigationPanelInfo } from "../navigation-menu/NavigationMenuStore";
-import type {
-    AddpanelItem,
-    DojoDisplay,
-    DojoItem,
-    PanelDojoItem,
-} from "../type";
+import type { AddpanelItem, DojoDisplay, PanelDojoItem } from "../type";
 
-interface PanelElements {
-    main: DojoItem;
+export interface PanelElements {
+    main: dijit.layout.BorderContainer;
     leftPanel: PanelDojoItem;
     navigation: HTMLElement;
 }
@@ -124,6 +119,7 @@ export class PanelsManager {
         }
 
         this._domElements.leftPanel.addChild(panelToActivate);
+        // @ts-expect-error Expected 2 arguments, but got 1. - maybe dojo type mistmach
         this._domElements.main.addChild(this._domElements.leftPanel);
 
         panelToActivate.show();

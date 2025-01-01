@@ -1,12 +1,12 @@
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { PluginState } from "@nextgisweb/webmap/type";
-import type { LayerItem } from "@nextgisweb/webmap/type/TreeItems";
+import type { LayerItemConfig } from "@nextgisweb/webmap/type/TreeItems";
 import reactPanel from "@nextgisweb/webmap/ui/react-panel";
 
 import { PluginBase } from "../PluginBase";
 
 export class LayerInfoPlugin extends PluginBase {
-    getPluginState(nodeData: LayerItem): PluginState {
+    getPluginState(nodeData: LayerItemConfig): PluginState {
         const state = super.getPluginState(nodeData);
         const infoConfig = this.display.get("itemConfig");
         const data = infoConfig.plugin[this.identity];

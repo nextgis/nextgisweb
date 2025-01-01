@@ -1,119 +1,30 @@
 define([
     "dojo/_base/declare",
-    "dojo/_base/lang",
-    "dojo/_base/array",
-    "dojo/Deferred",
-    "dojo/promise/all",
-    "dojo/topic",
-    "dojo/data/ItemFileWriteStore",
     "dijit/_WidgetBase",
     "dijit/_TemplatedMixin",
     "dijit/_WidgetsInTemplateMixin",
     "dijit/layout/ContentPane",
-    "openlayers/ol",
-    "@nextgisweb/gui/error",
-    "@nextgisweb/webmap/store",
-    "@nextgisweb/webmap/map-state-observer",
     "./ui/react-webmap-tabs",
-    // Tiny display
-    "ngw-webmap/controls/LinkToMainMap",
     // compat
     "@nextgisweb/webmap/compat/ShadowDisplay",
-    // utils
-    "./utils/URL",
     // settings
     "@nextgisweb/pyramid/i18n!",
     "@nextgisweb/pyramid/settings!webmap",
     "dojo/text!./template/Display.hbs",
     // template
     "dijit/layout/BorderContainer",
-    "dijit/layout/ContentPane",
-    // css
-    "xstyle/css!./template/resources/Display.css",
 ], function (
     declare,
-    lang,
-    array,
-    Deferred,
-    all,
-    topic,
-    ItemFileWriteStore,
     _WidgetBase,
     _TemplatedMixin,
     _WidgetsInTemplateMixin,
     ContentPane,
-    ol,
-    errorModule,
-    WebmapStore,
-    MapStatesObserver,
     ReactWebMapTabs,
-    LinkToMainMap,
     ShadowDisplay,
-    URL,
-    { gettext, renderTemplate },
+    { renderTemplate },
     settings,
     template
 ) {
-    var CustomItemFileWriteStore = declare([ItemFileWriteStore], {
-        dumpItem: function (item) {
-            var obj = {};
-
-            if (item) {
-                var attributes = this.getAttributes(item);
-
-                if (attributes && attributes.length > 0) {
-                    var i;
-
-                    for (i = 0; i < attributes.length; i++) {
-                        var values = this.getValues(item, attributes[i]);
-
-                        if (values) {
-                            if (values.length > 1) {
-                                var j;
-
-                                obj[attributes[i]] = [];
-                                for (j = 0; j < values.length; j++) {
-                                    var value = values[j];
-
-                                    if (this.isItem(value)) {
-                                        obj[attributes[i]].push(
-                                            this.dumpItem(value)
-                                        );
-                                    } else {
-                                        obj[attributes[i]].push(value);
-                                    }
-                                }
-                            } else {
-                                if (this.isItem(values[0])) {
-                                    obj[attributes[i]] = this.dumpItem(
-                                        values[0]
-                                    );
-                                } else {
-                                    obj[attributes[i]] = values[0];
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            return obj;
-        },
-    });
-
-    var LoggedDeferred = declare(Deferred, {
-        constructor: function (name) {
-            this.then(
-                function () {
-                    console.log("Deferred object [%s] resolved", name);
-                },
-                function () {
-                    console.error("Deferred object [%s] rejected", name);
-                }
-            );
-        },
-    });
-
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
         templateString: renderTemplate(template),
 
@@ -144,745 +55,82 @@ define([
 
         constructor: function (options) {
             declare.safeMixin(this, options);
-            this.shadow = new ShadowDisplay.default(this);
-            this._urlParams = URL.getURLParams();
-
-            this._itemStoreDeferred = new LoggedDeferred("_itemStoreDeferred");
-            this._mapDeferred = new LoggedDeferred("_mapDeferred");
-            this._mapExtentDeferred = new LoggedDeferred("_mapExtentDeferred");
-            this._layersDeferred = new LoggedDeferred("_layersDeferred");
-            this._postCreateDeferred = new LoggedDeferred(
-                "_postCreateDeferred"
-            );
-            this._startupDeferred = new LoggedDeferred("_startupDeferred");
-
-            var widget = this;
-            this.mapStates = MapStatesObserver.default.getInstance();
-
-            // AMD module loading
-            this._midDeferred = {};
-            this._mid = {};
-            // var mids = this.config.mid;
-
             this.clientSettings = settings;
-
-            this.shadow._buildPanelsManager();
-
             this.tabContainer = new ReactWebMapTabs({ display: this });
-
-            // Add basemap's AMD modules
-            this.shadow._initializeMids();
-
-            // Map plugins
-            var wmpmids = Object.keys(this.config.webmapPlugin);
-            var deferred = new LoggedDeferred("_midDeferred.webmapPlugin");
-
-            this._midDeferred.webmapPlugin = deferred;
-            require(wmpmids, function () {
-                var obj = {};
-                for (var i = 0; i < arguments.length; i++) {
-                    obj[wmpmids[i]] = arguments[i];
-                }
-
-                widget._mid.wmplugin = obj;
-
-                deferred.resolve(obj);
-            });
-
-            this._itemStoreSetup();
-            this._webmapStoreSetup();
-
-            this._mapDeferred.then(function () {
-                widget._itemStorePrepare();
-            });
-
-            this.displayProjection = "EPSG:3857";
-            this.lonlatProjection = "EPSG:4326";
-
-            if (this.config.extent[3] > 82) {
-                this.config.extent[3] = 82;
-            }
-            if (this.config.extent[1] < -82) {
-                this.config.extent[1] = -82;
-            }
-
-            this._extent = ol.proj.transformExtent(
-                this.config.extent,
-                this.lonlatProjection,
-                this.displayProjection
-            );
-
-            this._extent_const = ol.proj.transformExtent(
-                this.config.extent_const,
-                this.lonlatProjection,
-                this.displayProjection
-            );
-
-            // Layers panel
-            widget._layersPanelSetup();
-
-            // Map and plugins
-            all([
-                this._midDeferred.basemap,
-                this._midDeferred.webmapPlugin,
-                this._startupDeferred,
-            ])
-                .then(function () {
-                    widget._pluginsSetup(true);
-                    widget._mapSetup();
-                })
-                .then(undefined, function (err) {
-                    console.error(err);
-                });
-
-            // Setup layers
-            all([this._midDeferred.adapter, this._itemStoreDeferred])
-                .then(function () {
-                    widget._layersSetup();
-                })
-                .then(undefined, function (err) {
-                    console.error(err);
-                });
-
-            all([this._layersDeferred, this._mapSetup])
-                .then(
-                    lang.hitch(this, function () {
-                        widget._mapAddLayers();
-                        widget.featureHighlighter =
-                            this.shadow._initializeFeatureHighlighter();
-                    })
-                )
-                .then(undefined, function (err) {
-                    console.error(err);
-                });
-
-            // Tools and plugins
-            all([this._midDeferred.plugin, this._layersDeferred])
-                .then(function () {
-                    widget._pluginsSetup();
-                    widget._buildLayersTree();
-                })
-                .then(undefined, function (err) {
-                    console.error(err);
-                });
-
-            this.tools = [];
+            this.shadow = new ShadowDisplay.default(this);
         },
 
         postCreate: function () {
             this.inherited(arguments);
-
             this.leftPanelPane = new ContentPane({
                 class: "leftPanelPane",
                 region: "left",
                 gutters: false,
                 splitter: true,
             });
-
-            const domElements = {
-                main: this.mainContainer,
-                leftPanel: this.leftPanelPane,
-                navigation: this.navigationMenuPane.domNode,
-            };
-            this.panelsManager.initDomElements(domElements);
-            this._handleTinyDisplayMode();
-
-            this._postCreateDeferred.resolve();
+            this.shadow._postCreate();
         },
 
         startup: function () {
             this.inherited(arguments);
-
-            this._hideNavMenuForGuest();
-
-            this._startupDeferred.resolve();
-        },
-
-        _hideNavMenuForGuest: function () {
-            if (!settings.hide_nav_menu || !ngwConfig.isGuest) {
-                return;
-            }
-
-            const navMenu = document.querySelector("#header #menu");
-            if (!navMenu) return;
-            navMenu.style.display = "none";
+            this.shadow.startup();
         },
 
         prepareItem: function (item) {
-            var self = this;
-            var copy = {
-                id: item.id,
-                type: item.type,
-                label: item.label,
-            };
-
-            if (copy.type === "layer") {
-                copy.layerId = item.layerId;
-                copy.styleId = item.styleId;
-
-                copy.visibility = null;
-                copy.checked = item.visibility;
-                copy.identifiable = item.identifiable;
-                copy.position = item.drawOrderPosition;
-            } else if (copy.type === "group" || copy.type === "root") {
-                copy.children = array.map(item.children, function (c) {
-                    return self.prepareItem(c);
-                });
-            }
-            this._itemConfigById[item.id] = item;
-
-            return copy;
-        },
-
-        _webmapStoreSetup: function () {
-            this.webmapStore = new WebmapStore.default({
-                itemStore: this.itemStore,
-            });
-        },
-
-        _itemStoreSetup: function () {
-            this._itemConfigById = {};
-            var rootItem = this.prepareItem(this.config.rootItem);
-
-            this.itemStore = new CustomItemFileWriteStore({
-                data: {
-                    identifier: "id",
-                    label: "label",
-                    items: [rootItem],
-                },
-            });
-        },
-
-        _itemStorePrepare: function () {
-            var widget = this;
-
-            this.itemStore.fetch({
-                queryOptions: { deep: true },
-                onItem: function (item) {
-                    widget._itemStorePrepareItem(item);
-                },
-                onComplete: function () {
-                    widget._itemStoreDeferred.resolve();
-                },
-                onError: function () {
-                    widget._itemStoreDeferred.reject();
-                },
-            });
-        },
-
-        _itemStorePrepareItem: function (item) {
-            this._itemStoreVisibility(item);
-        },
-
-        _itemStoreVisibility: function (item) {
-            var webmapStore = this.webmapStore;
-
-            if (webmapStore) {
-                webmapStore._itemStoreVisibility(item);
-            }
-        },
-
-        _mapSetup: function () {
-            this.shadow._mapSetup();
+            this.shadow.prepareItem(item);
         },
 
         _mapAddControls: function (controls) {
-            array.forEach(
-                controls,
-                function (control) {
-                    this.map.olMap.addControl(control);
-                },
-                this
-            );
+            this.shadow._mapAddControls(controls);
         },
         _mapAddLayer: function (id) {
-            this.map.addLayer(this.webmapStore._layers[id]);
-        },
-        _mapAddLayers: function () {
-            array.forEach(
-                this._layer_order,
-                function (id) {
-                    this._mapAddLayer(id);
-                },
-                this
-            );
-        },
-
-        _adaptersSetup: function () {
-            this._adapters = {};
-            array.forEach(
-                Object.keys(this._mid.adapter),
-                function (k) {
-                    this._adapters[k] = new this._mid.adapter[k]({
-                        display: this,
-                    });
-                },
-                this
-            );
-        },
-
-        _onNewStoreItem: function (item) {
-            var widget = this,
-                store = this.itemStore;
-            widget._layerSetup(item);
-            widget._layer_order.unshift(store.getValue(item, "id"));
-        },
-
-        _layersSetup: function () {
-            var widget = this,
-                store = this.itemStore,
-                visibleStyles = null;
-
-            this._adaptersSetup();
-
-            // Layer index by id
-            /** @deprecated use this.webmapStore._layers instead. Fore backward compatibility */
-            Object.defineProperty(this, "_layers", {
-                get: function () {
-                    return this.webmapStore._layers;
-                },
-            });
-            this._layer_order = []; // Layers from back to front
-
-            if (lang.isString(widget._urlParams.styles)) {
-                visibleStyles = widget._urlParams.styles.split(",");
-                visibleStyles = array.map(visibleStyles, function (i) {
-                    return parseInt(i, 10);
-                });
-            }
-
-            // Layers initialization
-            store.fetch({
-                query: { type: "layer" },
-                queryOptions: { deep: true },
-                sort: widget.config.drawOrderEnabled
-                    ? [
-                          {
-                              attribute: "position",
-                          },
-                      ]
-                    : null,
-                onItem: function (item) {
-                    widget._onNewStoreItem(item, visibleStyles);
-
-                    // Turn on layers from permalink
-                    var cond,
-                        layer = widget.webmapStore.getLayer(
-                            store.getValue(item, "id")
-                        );
-                    if (visibleStyles) {
-                        cond =
-                            array.indexOf(
-                                visibleStyles,
-                                store.getValue(item, "styleId")
-                            ) !== -1;
-                        layer.olLayer.setVisible(cond);
-                        layer.visibility = cond;
-                        store.setValue(item, "checked", cond);
-                    }
-                },
-                onComplete: function () {
-                    widget._layersDeferred.resolve();
-                },
-                onError: function (error) {
-                    console.error(error);
-                    widget._layersDeferred.reject();
-                },
-            });
-        },
-
-        _layerSetup: function (item) {
-            var store = this.itemStore;
-
-            var data = this._itemConfigById[store.getValue(item, "id")];
-            var adapter = this._adapters[data.adapter];
-
-            data.minResolution = this.map.getResolutionForScale(
-                data.maxScaleDenom,
-                this.map.olMap.getView().getProjection().getMetersPerUnit()
-            );
-            data.maxResolution = this.map.getResolutionForScale(
-                data.minScaleDenom,
-                this.map.olMap.getView().getProjection().getMetersPerUnit()
-            );
-
-            var layer = adapter.createLayer(data);
-
-            layer.itemId = data.id;
-            layer.itemConfig = data;
-
-            this.webmapStore.addLayer(data.id, layer);
-        },
-
-        _pluginsPanels: [],
-        _pluginsSetup: function (wmplugin) {
-            if (!this._plugins) {
-                this._plugins = {};
-            }
-
-            var plugins = wmplugin ? this._mid.wmplugin : this._mid.plugin;
-            this._installPlugins(plugins);
-        },
-
-        _installPlugins: function (plugins) {
-            var widget = this;
-
-            array.forEach(
-                Object.keys(plugins),
-                function (key) {
-                    console.log("Plugin [%s]::constructor...", key);
-
-                    if (this.isTinyMode() && !this.isTinyModePlugin(key)) {
-                        return;
-                    }
-
-                    if (this.isTinyMode() && !this.isTinyModePlugin(key)) {
-                        return;
-                    }
-
-                    let pluginInfo = plugins[key];
-                    if (pluginInfo.default) {
-                        pluginInfo = pluginInfo.default;
-                    }
-
-                    var plugin = new pluginInfo({
-                        identity: key,
-                        display: this,
-                        itemStore: plugins ? false : this.itemStore,
-                    });
-
-                    widget._postCreateDeferred.then(function () {
-                        console.log("Plugin [%s]::postCreate...", key);
-                        plugin.postCreate();
-
-                        widget._startupDeferred.then(function () {
-                            console.log("Plugin [%s]::startup...", key);
-                            plugin.startup();
-
-                            widget._plugins[key] = plugin;
-                            console.info("Plugin [%s] registered", key);
-                        });
-                    });
-                },
-                this
-            );
-        },
-
-        _layersPanelSetup: function () {
-            var widget = this;
-
-            all([
-                this._layersDeferred,
-                this._mapDeferred,
-                this._postCreateDeferred,
-                this.panelsManager.panelsReady.promise,
-            ])
-                .then(function () {
-                    if (widget._urlParams.base) {
-                        widget._switchBasemap(widget._urlParams.base);
-                    }
-                    widget._setMapExtent();
-                    widget._mapExtentDeferred.resolve();
-                })
-                .then(undefined, function (err) {
-                    console.error(err);
-                });
+            this.shadow._mapAddLayer(id);
         },
 
         _switchBasemap: function (basemapLayerKey) {
-            if (!(basemapLayerKey in this.map.layers)) {
-                return false;
-            }
-
-            if (this._baseLayer && this._baseLayer.name) {
-                const { name } = this._baseLayer;
-                this.map.layers[name].olLayer.setVisible(false);
-            }
-
-            const newLayer = this.map.layers[basemapLayerKey];
-            newLayer.olLayer.setVisible(true);
-            this._baseLayer = newLayer;
-
-            return true;
+            this.shadow._switchBasemap(basemapLayerKey);
         },
+
+        _pluginsPanels: [],
 
         _getActiveBasemapKey: function () {
-            if (!this._baseLayer || !this._baseLayer.name) {
-                return "blank";
-            }
-            return this._baseLayer.name;
-        },
-
-        _buildLayersTree: function () {
-            const { expanded } = this.config.itemsStates;
-            this.webmapStore.setWebmapItems(this.config.rootItem.children);
-            this.webmapStore.setExpanded(expanded);
+            return this.shadow._getActiveBasemapKey();
         },
 
         handleSelect: function (selectedKeys) {
-            if (selectedKeys.length === 0 || selectedKeys.length < 1) {
-                return;
-            }
-            const itemId = selectedKeys[0];
-            this.itemStore.fetchItemByIdentity({
-                identity: itemId,
-                onItem: (item) => {
-                    this.set("itemConfig", this._itemConfigById[itemId]);
-                    this.set("item", item);
-                },
-            });
+            this.shadow.handleSelect(selectedKeys);
         },
 
         setLayerZIndex: function (id, zIndex) {
-            const layer = this.map.layers[id];
-            if (layer && layer.olLayer && layer.olLayer.setZIndex) {
-                layer.olLayer.setZIndex(zIndex);
-            }
+            this.shadow.setLayerZIndex(id, zIndex);
         },
 
         getVisibleItems: function () {
-            var store = this.itemStore,
-                deferred = new Deferred();
-
-            store.fetch({
-                query: { type: "layer", visibility: "true" },
-                sort: { attribute: "position" },
-                queryOptions: { deep: true },
-                onComplete: function (items) {
-                    deferred.resolve(items);
-                },
-                onError: function (error) {
-                    deferred.reject(error);
-                },
-            });
-
-            return deferred;
+            return this.shadow.getVisibleItems();
         },
 
         dumpItem: function () {
-            return this.itemStore.dumpItem(this.item);
-        },
-
-        _setMapExtent: function () {
-            if (this._zoomByUrlParams()) return;
-            this._zoomToInitialExtent();
-        },
-
-        _zoomByUrlParams: function () {
-            const urlParams = this._urlParams;
-
-            if (
-                !(
-                    "zoom" in urlParams &&
-                    "lon" in urlParams &&
-                    "lat" in urlParams
-                )
-            ) {
-                return false;
-            }
-
-            this.map.olMap
-                .getView()
-                .setCenter(
-                    ol.proj.fromLonLat([
-                        parseFloat(urlParams.lon),
-                        parseFloat(urlParams.lat),
-                    ])
-                );
-            this.map.olMap.getView().setZoom(parseInt(urlParams.zoom));
-
-            if ("angle" in urlParams) {
-                this.map.olMap
-                    .getView()
-                    .setRotation(parseFloat(urlParams.angle));
-            }
-
-            return true;
+            return this.shadow.dumpItem();
         },
 
         _zoomToInitialExtent: function () {
-            this.map.olMap.getView().fit(this._extent);
-        },
-
-        _identifyFeatureByAttrValue: function () {
-            const urlParams = this._urlParams;
-
-            if (
-                !(
-                    "hl_lid" in urlParams &&
-                    "hl_attr" in urlParams &&
-                    "hl_val" in urlParams
-                )
-            ) {
-                return;
-            }
-
-            this.identify
-                .identifyFeatureByAttrValue(
-                    urlParams.hl_lid,
-                    urlParams.hl_attr,
-                    urlParams.hl_val,
-                    urlParams.zoom
-                )
-                .then((result) => {
-                    if (result) return;
-                    errorModule.errorModal({
-                        title: gettext("Object not found"),
-                        message: gettext(
-                            "Object from URL parameters not found"
-                        ),
-                    });
-                });
-        },
-
-        _handleTinyDisplayMode: function () {
-            if (!this.isTinyMode()) {
-                return;
-            }
-
-            this.domNode.classList.add("tiny");
-
-            all([
-                this._layersDeferred,
-                this._mapDeferred,
-                this._postCreateDeferred,
-                this.panelsManager.panelsReady.promise,
-            ])
-                .then(() => {
-                    this._buildTinyPanels();
-                    this._addLinkToMainMap();
-                    this._handlePostMessage();
-                })
-                .then(undefined, function (err) {
-                    console.error(err);
-                });
-        },
-
-        _buildTinyPanels: function () {
-            if (!this.panelsManager.getPanelsCount()) {
-                return;
-            }
-
-            this.domNode.classList.add("tiny-panels");
-            const activePanel = this.panelsManager.getActivePanelName();
-            if (!activePanel) {
-                return;
-            }
-            this.panelsManager.deactivatePanel();
-            this.panelsManager.activatePanel(activePanel);
+            this.shadow._zoomToInitialExtent();
         },
 
         highlightGeometry: function (geometry) {
-            this.map.zoomToFeature(new ol.Feature({ geometry }));
-            topic.publish("feature.highlight", {
-                olGeometry: geometry,
-            });
+            this.shadow.highlightGeometry(geometry);
         },
 
         getItemConfig: function () {
-            return Object.assign({}, this._itemConfigById);
+            return this.shadow.getItemConfig();
         },
 
         getUrlParams: function () {
-            return this._urlParams;
+            return this.shadow.getUrlParams();
         },
 
         isTinyMode: function () {
-            return this.tinyConfig !== undefined;
-        },
-
-        isTinyModePlugin: function (pluginKey) {
-            const disabledPlugins = [
-                "@nextgisweb/webmap/plugin/layer-editor",
-                "@nextgisweb/webmap/plugin/feature-layer",
-            ];
-            return !disabledPlugins.includes(pluginKey);
-        },
-
-        _addLinkToMainMap: function () {
-            if (this._urlParams.linkMainMap !== "true") {
-                return;
-            }
-            this.map.olMap.addControl(
-                new LinkToMainMap({
-                    url: this.tinyConfig.mainDisplayUrl,
-                    target: this.rightTopControlPane,
-                    tipLabel: gettext("Open full map"),
-                })
-            );
-        },
-
-        /**
-         * Generate window `message` events to listen from iframe
-         * @example
-         * window.addEventListener('message', function(evt) {
-         *    var data = evt.data;
-         *    if (data.event === 'ngMapExtentChanged') {
-         *        if (data.detail === 'zoom') {
-         *        } else if (data.detail === 'move') {
-         *        }
-         *        // OR
-         *        if (data.detail === 'position') {}
-         *    }
-         * }, false);
-         */
-        _handlePostMessage: function () {
-            var widget = this;
-            var parent = window.parent;
-            if (
-                this._urlParams.events === "true" &&
-                parent &&
-                parent.postMessage
-            ) {
-                var commonOptions = {
-                    event: "ngMapExtentChanged",
-                };
-                var parsePosition = function (pos) {
-                    return {
-                        zoom: pos.zoom,
-                        lat: pos.center[1],
-                        lon: pos.center[0],
-                    };
-                };
-                widget.map.watch(
-                    "position",
-                    function (name, oldPosition, newPosition) {
-                        oldPosition = oldPosition
-                            ? parsePosition(oldPosition)
-                            : {};
-                        newPosition = parsePosition(newPosition);
-                        // set array of position part to compare between old and new state
-                        var events = [
-                            { params: ["lat", "lon"], name: "move" },
-                            { params: ["zoom"], name: "zoom" },
-                        ];
-                        var transformPosition = widget.map.getPosition(
-                            widget.lonlatProjection
-                        );
-                        // prepare to send transform position
-                        commonOptions.data = parsePosition(transformPosition);
-                        array.forEach(events, function (event) {
-                            var isChange = array.some(
-                                event.params,
-                                function (p) {
-                                    return oldPosition[p] !== newPosition[p];
-                                }
-                            );
-                            if (isChange) {
-                                commonOptions.detail = event.name;
-                                // message should be a string to work correctly with all browsers and systems
-                                parent.postMessage(
-                                    JSON.stringify(commonOptions),
-                                    "*"
-                                );
-                            }
-                        });
-                        // on any position change
-                        commonOptions.detail = name;
-                        parent.postMessage(JSON.stringify(commonOptions), "*");
-                    }
-                );
-            }
+            return this.shadow.isTinyMode();
         },
     });
 });

@@ -1,14 +1,17 @@
 import { useCallback, useMemo } from "react";
 
 import { EditIcon } from "@nextgisweb/gui/icon";
-import type { StoreItem } from "@nextgisweb/webmap/type";
 
-import type { LayerItem, TreeItem } from "../../type/TreeItems";
+import type { TreeItemConfig } from "../../type/TreeItems";
 import type { TreeWebmapItem } from "../LayersTree";
 
-export function useWebmapItems({ webMapItems }: { webMapItems: StoreItem[] }) {
+export function useWebmapItems({
+    webMapItems,
+}: {
+    webMapItems: TreeItemConfig[];
+}) {
     const handleWebMapItem = useCallback(
-        (webMapItem: TreeItem): TreeWebmapItem => {
+        (webMapItem: TreeItemConfig): TreeWebmapItem => {
             const { key, title } = webMapItem;
             const item: TreeWebmapItem = { key, title, treeItem: webMapItem };
             if (item.treeItem.type === "layer") {
@@ -32,7 +35,10 @@ export function useWebmapItems({ webMapItems }: { webMapItems: StoreItem[] }) {
 
                 item.icon = (item_) => {
                     const item = item_ as TreeWebmapItem;
-                    if ((item.treeItem as LayerItem).editable === true) {
+                    if (
+                        item.treeItem.type === "layer" &&
+                        item.treeItem.editable === true
+                    ) {
                         return <EditIcon />;
                     } else {
                         if (item.legendIcon) {
