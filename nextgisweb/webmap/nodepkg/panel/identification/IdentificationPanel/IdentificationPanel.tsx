@@ -8,9 +8,8 @@ import { IdentifyResult } from "./component/IdentifyResult";
 import "./IdentificationPanel.less";
 
 const msgTipTitle = gettext("How does it work");
-const msgTipIdent = gettext(
-    "To get feature information, click on the map with the left mouse button. Make sure that other tools are turned off."
-);
+// prettier-ignore
+const msgTipIdent = gettext("To get feature information, click on the map with the left mouse button. Make sure that other tools are turned off.");
 
 export function IdentificationPanel({
     display,
