@@ -1,11 +1,11 @@
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import settings from "@nextgisweb/pyramid/settings!feature_attachment";
-import type { DojoDisplay, PluginParams } from "@nextgisweb/webmap/type";
+import type { ShadowDisplay, PluginParams } from "@nextgisweb/webmap/type";
 
 import AttachmentBundleControl from "../ol-control";
 
 class BundleAttachmentPlugin {
-    private _display: DojoDisplay;
+    private _display: ShadowDisplay;
 
     private buildControl() {
         this._display._mapAddControls([

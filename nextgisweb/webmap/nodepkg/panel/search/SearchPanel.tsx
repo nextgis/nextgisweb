@@ -11,8 +11,8 @@ import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
 import { AbortControllerHelper } from "@nextgisweb/pyramid/util/abort";
 import { lonLatToDM } from "@nextgisweb/webmap/coordinates/formatter";
 import { parse } from "@nextgisweb/webmap/coordinates/parser";
-import type { ReactPanelComponentProps } from "@nextgisweb/webmap/panels-manager/type";
-import type { DojoDisplay } from "@nextgisweb/webmap/type";
+import type { PanelComponentProps } from "@nextgisweb/webmap/panels-manager/type";
+import type { ShadowDisplay } from "@nextgisweb/webmap/type";
 
 import { CloseButton } from "../header/CloseButton";
 
@@ -58,7 +58,7 @@ type SearchStepResult = [number, SearchResult[], boolean];
 type SearchFunction = (
     criteria: string,
     limit: number,
-    display: DojoDisplay,
+    display: ShadowDisplay,
     controller: AbortControllerHelper
 ) => Promise<SearchStepResult>;
 
@@ -312,7 +312,7 @@ const searchSteps = [
 const search = async (
     criteria: string,
     searchController: AbortControllerHelper,
-    display: DojoDisplay
+    display: ShadowDisplay
 ): Promise<[SearchResult[], boolean] | undefined> => {
     let searchResults: SearchResult[] = [],
         isExceeded = false,
@@ -344,7 +344,7 @@ const search = async (
 export default function SearchPanel({
     display,
     close,
-}: ReactPanelComponentProps) {
+}: PanelComponentProps) {
     const [loading, setLoading] = useState<boolean>(false);
     const [searchResults, setSearchResults] = useState<
         [SearchResult[], boolean] | undefined

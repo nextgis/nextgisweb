@@ -1,4 +1,5 @@
 import { orderBy } from "lodash-es";
+import { Control } from "ol/control";
 import Attribution from "ol/control/Attribution";
 import Rotate from "ol/control/Rotate";
 import ScaleLine from "ol/control/ScaleLine";
@@ -7,7 +8,7 @@ import Zoom from "ol/control/Zoom";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { html } from "@nextgisweb/pyramid/icon";
 
-import type { DojoDisplay, MapControl } from "../type";
+import type ShadowDisplay from "../compat/ShadowDisplay";
 
 import { InfoScale } from "./control/InfoScale";
 import { InitialExtent } from "./control/InitialExtent";
@@ -114,7 +115,6 @@ export const ControlsInfo: ControlInfo[] = [
     },
     {
         label: gettext("Identification"),
-        // @ts-expect-error TODO: What is the MapControl?
         ctor: (display) => {
             return new Identify({ display });
         },
@@ -126,19 +126,20 @@ export const ControlsInfo: ControlInfo[] = [
 ];
 
 export const buildControls = (
-    display: DojoDisplay
+    display: ShadowDisplay
 ): Map<string, ControlReady> => {
     const controlsMap = new Map<string, ControlReady>();
 
     const controlsInfo = getControlsInfo<ControlInfo>(display, ControlsInfo);
-    const controlsToMap: MapControl[] = [];
+    const controlsToMap: Control[] = [];
     controlsInfo.forEach((c: ControlInfo) => {
         const control = c.ctor(display);
         if (c.postCreate) {
             c.postCreate(display, control);
         }
         controlsMap.set(c.key, { info: c, control });
-        if (c.olMapControl) {
+
+        if (control instanceof Control) {
             controlsToMap.push(control);
         }
     });

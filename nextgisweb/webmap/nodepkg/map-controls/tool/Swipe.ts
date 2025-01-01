@@ -4,9 +4,9 @@ import type ShadowDisplay from "@nextgisweb/webmap/compat/ShadowDisplay";
 
 import { Swipe } from "../control/SwipeControl";
 
-import { Base } from "./ToolBase";
+import { ToolBase } from "./ToolBase";
 
-export class ToolSwipe extends Base {
+export class ToolSwipe extends ToolBase {
     orientation: "vertical" | "horizontal";
 
     customIcon?: string;

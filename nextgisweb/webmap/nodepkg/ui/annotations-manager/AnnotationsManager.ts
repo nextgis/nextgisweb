@@ -1,11 +1,11 @@
-import { subscribe } from "dojo/topic";
 import type Feature from "ol/Feature";
 import { WKT } from "ol/format";
 
 import { errorModal } from "@nextgisweb/gui/error";
 import { route } from "@nextgisweb/pyramid/api";
+import topic from "@nextgisweb/webmap/compat/topic";
 import type { VisibleMode } from "@nextgisweb/webmap/store/annotations/AnnotationsStore";
-import type { DojoDisplay } from "@nextgisweb/webmap/type";
+import type { ShadowDisplay } from "@nextgisweb/webmap/type";
 
 import { AnnotationFeature } from "../../layer/annotations/AnnotationFeature";
 import type { AnnotationInfo } from "../../layer/annotations/AnnotationFeature";
@@ -17,14 +17,14 @@ import { AnnotationsDialog } from "../annotation-dialog";
 import type { DialogResult } from "../annotation-dialog/AnnotationDialog";
 
 interface ManagerOptions {
-    display: DojoDisplay;
+    display: ShadowDisplay;
     initialAnnotVisible?: VisibleMode;
 }
 
 export class AnnotationsManager {
     private static instance: AnnotationsManager | null = null;
 
-    private _display!: DojoDisplay;
+    private _display!: ShadowDisplay;
     private _annotationsLayer!: AnnotationsLayer;
     private _editableLayer!: AnnotationsEditableLayer;
     private _annotationsDialog!: AnnotationsDialog;
@@ -120,31 +120,31 @@ export class AnnotationsManager {
     }
 
     private _bindEvents(): void {
-        subscribe(
+        topic.subscribe(
             "webmap/annotations/add/activate",
             this._onAddModeActivated.bind(this)
         );
-        subscribe(
+        topic.subscribe(
             "webmap/annotations/add/deactivate",
             this._onAddModeDeactivated.bind(this)
         );
-        subscribe(
+        topic.subscribe(
             "webmap/annotations/layer/feature/created",
             this._onCreateOlFeature.bind(this)
         );
-        subscribe(
+        topic.subscribe(
             "webmap/annotations/change/",
             this._onChangeAnnotation.bind(this)
         );
-        subscribe(
+        topic.subscribe(
             "webmap/annotations/change/geometryType",
             this._onChangeGeometryType.bind(this)
         );
-        subscribe(
+        topic.subscribe(
             "/annotations/visible",
             this._onAnnotationsVisibleChange.bind(this)
         );
-        subscribe(
+        topic.subscribe(
             "webmap/annotations/filter/changed",
             this._onFilterChanged.bind(this)
         );

@@ -1,13 +1,13 @@
 import { Control as OlControl } from "ol/control";
 
-import type { DojoDisplay } from "../type";
+import type { ShadowDisplay } from "../type";
 
 import { MapToolbarItems } from "./MapToolbarItems";
 
 import "./MapToolbar.css";
 
 export interface MapToolbarOptions {
-    display: DojoDisplay;
+    display: ShadowDisplay;
     target?: HTMLElement;
 }
 

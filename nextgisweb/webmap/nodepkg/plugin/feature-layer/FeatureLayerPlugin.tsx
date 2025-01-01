@@ -1,6 +1,5 @@
-import topic from "dojo/topic";
-
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import topic from "@nextgisweb/webmap/compat/topic";
 
 import { PluginBase } from "../PluginBase";
 

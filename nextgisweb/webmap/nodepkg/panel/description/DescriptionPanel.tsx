@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useRef } from "react";
 
 import type ShadowDisplay from "@nextgisweb/webmap/compat/ShadowDisplay";
-import type { ReactPanelComponentProps } from "@nextgisweb/webmap/panels-manager/type";
+import type { PanelComponentProps } from "@nextgisweb/webmap/panels-manager/type";
 
 import { CloseButton } from "../header/CloseButton";
 
 import "./DescriptionPanel.less";
 
-export interface DescriptionPanelProps extends ReactPanelComponentProps {
+export interface DescriptionPanelProps extends PanelComponentProps {
     content?: string | HTMLElement | null;
 }
 

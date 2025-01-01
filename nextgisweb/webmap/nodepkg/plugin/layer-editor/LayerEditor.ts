@@ -1,4 +1,3 @@
-import topic from "dojo/topic";
 import { reaction } from "mobx";
 import { Collection, Feature } from "ol";
 import type { CollectionEvent } from "ol/Collection";
@@ -17,6 +16,7 @@ import { errorModal } from "@nextgisweb/gui/error";
 import showModal from "@nextgisweb/gui/showModal";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import topic from "@nextgisweb/webmap/compat/topic";
 import { ToolCreateFeature } from "@nextgisweb/webmap/map-controls/tool/editing/CreateFeature";
 import { ToolDeleteFeature } from "@nextgisweb/webmap/map-controls/tool/editing/DeleteFeature";
 import { ToolModifyFeature } from "@nextgisweb/webmap/map-controls/tool/editing/ModifyFeature";
@@ -248,19 +248,19 @@ export class LayerEditor extends PluginBase {
 
     private buildEditingControls(): void {
         this.display.mapToolbar.items.addTool(
-            new ToolModifyFeature({ layerEditor: this }),
+            new ToolModifyFeature({ layerEditor: this, display: this.display }),
             LayerEditor.MODIFYING_STATE_KEY,
             this.elEditToolbar
         );
 
         this.display.mapToolbar.items.addTool(
-            new ToolCreateFeature({ layerEditor: this }),
+            new ToolCreateFeature({ layerEditor: this, display: this.display }),
             LayerEditor.CREATING_STATE_KEY,
             this.elEditToolbar
         );
 
         this.display.mapToolbar.items.addTool(
-            new ToolDeleteFeature({ layerEditor: this }),
+            new ToolDeleteFeature({ layerEditor: this, display: this.display }),
             LayerEditor.DELETING_STATE_KEY,
             this.elEditToolbar
         );

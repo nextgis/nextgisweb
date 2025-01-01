@@ -1,21 +1,18 @@
 import entrypoint from "@nextgisweb/jsrealm/entrypoint";
 import type { Entrypoint } from "@nextgisweb/webmap/type";
 
-export function entrypointsLoader(entrypoints: Entrypoint[]) {
-    return Promise.all(
-        entrypoints.map((m) => {
+export async function entrypointsLoader(entrypoints: Entrypoint[]) {
+    const mods = await Promise.all(
+        entrypoints.map(async (m) => {
             if (Array.isArray(m)) {
-                return m[1]().then((mod) => {
-                    return [m[0], mod.default];
-                });
+                const mod = await m[1]();
+                return [m[0], mod.default];
             } else {
-                return entrypoint<{ default: unknown }>(m).then((mod) => {
-                    return [m, mod.default];
-                });
+                const mod = await entrypoint<{ default: unknown }>(m);
+                return [m, mod.default];
             }
         })
-    ).then((mods) => {
-        const obj = Object.fromEntries(mods);
-        return obj;
-    });
+    );
+    const obj = Object.fromEntries(mods);
+    return obj;
 }

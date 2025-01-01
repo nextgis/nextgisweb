@@ -1,6 +1,6 @@
 import type { Attrs, FeatureItem } from "@nextgisweb/feature-layer/type";
 import type ShadowDisplay from "@nextgisweb/webmap/compat/ShadowDisplay";
-import type { ReactPanelComponentProps } from "@nextgisweb/webmap/panels-manager/type";
+import type { PanelComponentProps } from "@nextgisweb/webmap/panels-manager/type";
 
 export interface LayerResponse {
     features: FeatureIdentify[];
@@ -69,6 +69,6 @@ export interface FeatureEditButtonProps {
     onUpdate: () => void;
 }
 
-export interface IdentificationPanelProps extends ReactPanelComponentProps {
+export interface IdentificationPanelProps extends PanelComponentProps {
     identifyInfo: IdentifyInfo;
 }

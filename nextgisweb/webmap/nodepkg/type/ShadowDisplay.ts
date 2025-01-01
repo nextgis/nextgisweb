@@ -1,14 +1,12 @@
 import type Feature from "ol/Feature";
 import type OlControl from "ol/control/Control";
-import type { Options } from "ol/control/Control";
 
 import type { CustomItemFileWriteStore } from "../compat/CustomItemFileWriteStore";
-import type ShadowDisplay from "../compat/ShadowDisplay";
-import type { ToggleControl } from "../map-toolbar/ToggleControl";
+import type ShadowDisplayCompat from "../compat/ShadowDisplay";
+import type { ToolBase } from "../map-controls/tool/ToolBase";
 import type { Map } from "../ol/Map";
 import type { PluginBase } from "../plugin/PluginBase";
 import type { VisibleMode } from "../store/annotations/AnnotationsStore";
-import type { WebMapTab } from "../webmap-tabs/WebMapTabsStore";
 
 import type { LayerItemConfig } from "./TreeItems";
 
@@ -28,39 +26,7 @@ export interface FeatureHighlighter {
     ) => PromiseLike<Feature>;
 }
 
-export interface MapTool extends dijit._WidgetBase {
-    activate: () => void;
-    deactivate: () => void;
-
-    label: string;
-    iconClass?: string;
-    customCssClass?: string;
-    customIcon?: string;
-    toolbarBtn?: ToggleControl;
-}
-
-interface DojoDisplayIdentifyPopup {
-    widget?: DojoDisplayIdentify;
-}
-
-export interface DojoDisplayIdentify {
-    _popup: DojoDisplayIdentifyPopup;
-    identifyFeatureByAttrValue: (
-        layerId: number,
-        attribute: string,
-        value: string | number | boolean,
-        zoom?: number
-    ) => PromiseLike<boolean>;
-    reset: () => void;
-    activate: () => void;
-    deactivate: () => void;
-}
-
-export interface TabContainer {
-    addTab(tab: WebMapTab): void;
-}
-
-export type MapControl = OlControl | dijit._WidgetBase | DojoDisplayIdentify;
+export type MapControl = OlControl | ToolBase;
 
 export type WebmapAdapter = any;
 
@@ -78,6 +44,7 @@ export interface MapURLParams {
     hl_val?: string;
     hl_lid?: string;
     hl_attr?: string;
+    controls?: string;
     linkMainMap?: "true";
 }
 
@@ -87,8 +54,7 @@ export interface TinyConfig {
 
 export type MapPlugin = new (val: PluginParams) => PluginBase;
 
-/** @deprecated use {@link ShadowDisplay} instead */
-export type DojoDisplay = ShadowDisplay;
+export type ShadowDisplay = ShadowDisplayCompat;
 
 export interface PluginMenuItem {
     icon: string;
@@ -107,14 +73,4 @@ export interface PluginState {
     nodeData: LayerItemConfig;
     map: Map;
     active?: boolean;
-}
-
-export interface Plugin {
-    postCreate: () => void;
-    startup: () => void;
-}
-
-export interface ControlOption extends Options {
-    display: DojoDisplay;
-    tipLabel: string;
 }
