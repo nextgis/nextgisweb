@@ -25,7 +25,7 @@ interface WidgetOptions<
 
 export class ReactPanel<
     P extends ReactPanelComponentPropType = ReactPanelComponentPropType,
-> implements PanelDojoItem
+> implements PanelDojoItem<P>
 {
     domNode: HTMLElement;
     display!: DojoDisplay;
@@ -43,28 +43,6 @@ export class ReactPanel<
     mapStates!: MapStatesObserver;
     content!: string;
     props?: Omit<P, keyof ReactPanelComponentProps>;
-
-    set = (_key: string, _value: unknown) => {
-        console.warn(`Handle 'set' action for ${_key}`);
-    };
-
-    // @ts-expect-error --- dispose of it
-    on = (eventName: string, _callback: (panel: PanelDojoItem) => void) => {
-        console.warn(`Handle 'on' event for ${eventName}`);
-    };
-    // @ts-expect-error --- dispose of it
-    addChild = (_child: DojoItem) => {
-        console.warn(`Handle 'addChild' action`);
-    };
-    // @ts-expect-error --- dispose of it
-    get = (val: string) => {
-        console.warn(`Handle 'get' action for ${val}`);
-        return;
-    };
-    // @ts-expect-error --- dispose of it
-    removeChild = (_elem: PanelDojoItem) => {
-        console.warn("Handle `removeChild` action");
-    };
 
     app?: ReactAppReturn<P | ReactPanelComponentProps>;
     private fcomp?:
@@ -161,6 +139,32 @@ export class ReactPanel<
             );
         }
     }
+
+    /** @deprecated */
+    set = (_key: string, _value: unknown) => {
+        console.warn(`Handle 'set' action for ${_key}`);
+    };
+    /** @deprecated */
+    // @ts-expect-error no sense to repair this type
+    on = (eventName: string, _callback: (panel: PanelDojoItem) => void) => {
+        console.warn(`Handle 'on' event for ${eventName}`);
+    };
+    /** @deprecated */
+    // @ts-expect-error no sense to repair this type
+    addChild = (_child: DojoItem) => {
+        console.warn(`Handle 'addChild' action`);
+    };
+    /** @deprecated */
+    // @ts-expect-error no sense to repair this type
+    get = (val: string) => {
+        console.warn(`Handle 'get' action for ${val}`);
+        return;
+    };
+    /** @deprecated */
+    // @ts-expect-error no sense to repair this type
+    removeChild = (_elem: PanelDojoItem) => {
+        console.warn("Handle `removeChild` action");
+    };
 }
 
 export function reactPanel<
@@ -173,17 +177,7 @@ export function reactPanel<
         | React.ComponentType<P>,
     options: WidgetOptions<P> = {}
 ) {
-    return class PanelNewClass extends ReactPanel {
-        constructor(params: PanelClsParams) {
-            super(
-                fcompProp as
-                    | (() => Promise<{
-                          default: React.ComponentType<ReactPanelComponentPropType>;
-                      }>)
-                    | React.ComponentType<ReactPanelComponentPropType>,
-                options,
-                params
-            );
-        }
+    return function createPanel(params: PanelClsParams) {
+        return new ReactPanel(fcompProp, options, params);
     };
 }

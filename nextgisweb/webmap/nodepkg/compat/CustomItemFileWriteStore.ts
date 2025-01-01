@@ -22,7 +22,8 @@ interface DojoStoreItem {
 
 type GetStoreItem<T> = ArrayWrap<T> & DojoStoreItem;
 
-export type StoreItem = GetStoreItem<StoreItemConfig>;
+export type StoreItem<I extends StoreItemConfig = StoreItemConfig> =
+    GetStoreItem<I>;
 
 export interface StoreFetchOptions {
     sort?:
@@ -42,8 +43,49 @@ export interface StoreFetchItemByIdentityOptions {
 }
 
 export class CustomItemFileWriteStore extends ItemFileWriteStore {
+    constructor(options: {
+        data: {
+            identifier: keyof StoreItemConfig;
+            label: keyof StoreItemConfig;
+            items: StoreItemConfig[];
+        };
+    }) {
+        super(options);
+    }
+
+    save(item: StoreItem) {
+        return super.save(item);
+    }
+
+    // https://dojotoolkit.org/reference-guide/1.6/dojo/data/api/Write.html#newitem
+    newItem<T extends StoreItemConfig = StoreItemConfig>(
+        keywordArgs?: T,
+        parentInfo?: {
+            parent: StoreItem;
+            attribute: keyof StoreItemConfig;
+        }
+    ): StoreItem<T> {
+        return super.newItem(keywordArgs, parentInfo) as any;
+    }
+    // https://dojotoolkit.org/reference-guide/1.6/dojo/data/api/Write.html#deleteitem
+    deleteItem(item: StoreItem): boolean {
+        return super.deleteItem(item);
+    }
+
     fetch(options: StoreFetchOptions) {
         return super.fetch(options);
+    }
+
+    on<K extends keyof StoreLayerConfig>(
+        eventName: "Set",
+        callback: (
+            item: StoreItem,
+            attribute: K,
+            oldValue: StoreLayerConfig[K],
+            newValue: any
+        ) => void
+    ): { remove: () => void } {
+        return super.on(eventName, callback);
     }
 
     getValue<K extends keyof StoreLayerConfig>(
@@ -78,8 +120,23 @@ export class CustomItemFileWriteStore extends ItemFileWriteStore {
         super.setValue(item, key, value);
     }
 
+    getValues<K extends keyof StoreItem>(
+        item: StoreItem,
+        attr: K
+    ): (StoreItem[K] | StoreItem)[] {
+        return super.getValues(item, attr);
+    }
+
     fetchItemByIdentity(options: StoreFetchItemByIdentityOptions) {
         super.fetchItemByIdentity(options);
+    }
+
+    getAttributes(item: StoreItem): (keyof StoreItemConfig)[] {
+        return super.getAttributes(item);
+    }
+
+    isItem(val: unknown): val is StoreItem {
+        return super.isItem(val);
     }
 
     dumpItem(item: StoreItem | null): StoreItemConfig {
@@ -87,11 +144,10 @@ export class CustomItemFileWriteStore extends ItemFileWriteStore {
 
         if (item) {
             const attributes = this.getAttributes(item);
-
+            console.log(attributes);
             if (attributes.length > 0) {
                 for (let i = 0; i < attributes.length; i++) {
                     const values = this.getValues(item, attributes[i]);
-
                     if (values) {
                         if (values.length > 1) {
                             obj[attributes[i]] = [];

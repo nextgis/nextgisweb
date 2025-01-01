@@ -18,7 +18,8 @@ import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import FilterExtentBtn from "@nextgisweb/webmap/filter-extent-btn";
-import type { DojoDisplay, WebmapItemConfig } from "@nextgisweb/webmap/type";
+import type { DojoDisplay } from "@nextgisweb/webmap/type";
+import type { TreeItemConfig } from "@nextgisweb/webmap/type/TreeItems";
 
 import type { FeatureAttachment } from "../../type";
 
@@ -56,11 +57,12 @@ const getLayersInfo = (display: DojoDisplay) => {
     const checked = display.webmapStore.checked;
     const itemConfig = display.getItemConfig();
 
-    const layersResourceIds = new Map<number, WebmapItemConfig>();
+    const layersResourceIds = new Map<number, TreeItemConfig>();
     checked.forEach((itemId) => {
         const itemInfo = itemConfig[itemId];
         if (
             itemInfo &&
+            itemInfo.type === "layer" &&
             itemInfo.plugin &&
             "@nextgisweb/webmap/plugin/feature-layer" in itemInfo.plugin
         ) {
@@ -287,25 +289,28 @@ const fetchFeaturesAttachments = async (
 
     parts.forEach((featuresInfo: FeatureItem[], index) => {
         const layerInfo = layersInfo[index];
-        const attachments: FeatureAttachmentView[] = [];
-        featuresInfo.forEach((f: FeatureItem) => {
-            if (f.extensions && f.extensions.attachment) {
-                const attachmentsInfo = f.extensions
-                    .attachment as FeatureAttachment[];
-                const attachmentsView: FeatureAttachmentView[] =
-                    attachmentsInfo.map((a: FeatureAttachment) => ({
-                        featureId: f.id,
-                        attachment: a,
-                        label: f.label,
-                    }));
-                attachments.push(...attachmentsView);
-            }
-        });
-        result.push({
-            layerLabel: layerInfo.label,
-            layerId: layerInfo.layerId,
-            attachments,
-        });
+
+        if (layerInfo.type === "layer") {
+            const attachments: FeatureAttachmentView[] = [];
+            featuresInfo.forEach((f: FeatureItem) => {
+                if (f.extensions && f.extensions.attachment) {
+                    const attachmentsInfo = f.extensions
+                        .attachment as FeatureAttachment[];
+                    const attachmentsView: FeatureAttachmentView[] =
+                        attachmentsInfo.map((a: FeatureAttachment) => ({
+                            featureId: f.id,
+                            attachment: a,
+                            label: f.label,
+                        }));
+                    attachments.push(...attachmentsView);
+                }
+            });
+            result.push({
+                layerLabel: layerInfo.label,
+                layerId: layerInfo.layerId,
+                attachments,
+            });
+        }
     });
 
     return result;
