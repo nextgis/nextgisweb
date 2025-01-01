@@ -1,7 +1,6 @@
 import type { Attrs, FeatureItem } from "@nextgisweb/feature-layer/type";
+import type ShadowDisplay from "@nextgisweb/webmap/compat/ShadowDisplay";
 import type { ReactPanelComponentProps } from "@nextgisweb/webmap/panels-manager/type";
-
-import type { DojoDisplay } from "../../type";
 
 export interface LayerResponse {
     features: FeatureIdentify[];
@@ -13,7 +12,7 @@ export type IdentifyResponse = Record<"featureCount", number> &
 
 export interface IdentifyInfo {
     response: IdentifyResponse;
-    layerLabels: Record<string, string>;
+    layerLabels: Record<string, string | null>;
     point: number[];
 }
 
@@ -34,11 +33,11 @@ export interface FeatureInfo {
 }
 
 export interface FeatureSelectorProps {
-    display: DojoDisplay;
+    display: ShadowDisplay;
     featureInfo?: FeatureInfo;
     featureItem?: FeatureItem;
     featuresInfoList: FeatureInfo[];
-    onFeatureChange: (featureInfoSelected: FeatureInfo) => void;
+    onFeatureChange: (featureInfoSelected: FeatureInfo | undefined) => void;
 }
 
 export interface IdentifyExtensionComponentProps<F extends Attrs = Attrs> {
@@ -52,7 +51,7 @@ export interface FieldsTableProps {
 }
 
 export interface FeatureTabsProps {
-    display: DojoDisplay;
+    display: ShadowDisplay;
     featureInfo: FeatureInfo;
     featureItem: FeatureItem;
     onUpdate: () => void;
@@ -60,11 +59,11 @@ export interface FeatureTabsProps {
 
 export interface IdentifyResultProps {
     identifyInfo: IdentifyInfo;
-    display: DojoDisplay;
+    display: ShadowDisplay;
 }
 
 export interface FeatureEditButtonProps {
-    display: DojoDisplay;
+    display: ShadowDisplay;
     featureId: number;
     resourceId: number;
     onUpdate: () => void;

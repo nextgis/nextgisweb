@@ -1,15 +1,16 @@
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { PluginState } from "@nextgisweb/webmap/type";
 import type { LayerItemConfig } from "@nextgisweb/webmap/type/TreeItems";
-import reactPanel from "@nextgisweb/webmap/ui/react-panel";
 
 import { PluginBase } from "../PluginBase";
 import type { DescriptionWebMapPluginConfig } from "../type";
+import { PanelPlugin } from "@nextgisweb/webmap/panels-manager/registry";
+import { DescriptionPanelProps } from "@nextgisweb/webmap/panel/description/DescriptionPanel";
 
 export class LayerInfoPlugin extends PluginBase {
     getPluginState(nodeData: LayerItemConfig): PluginState {
         const state = super.getPluginState(nodeData);
-        const infoConfig = this.display.get("itemConfig");
+        const infoConfig = this.display.itemConfig;
         const data = infoConfig?.plugin[
             this.identity
         ] as DescriptionWebMapPluginConfig;
@@ -36,39 +37,17 @@ export class LayerInfoPlugin extends PluginBase {
 
     openLayerInfo() {
         const pm = this.display.panelsManager;
-        const pkey = "resource-description";
-        const item = this.display.dumpItem();
-        const data = this.display.get("itemConfig")?.plugin[
+        const pkey = "info";
+        const data = this.display.itemConfig?.plugin[
             this.identity
         ] as DescriptionWebMapPluginConfig;
         if (data !== undefined) {
             const content = data.description;
-            let panel = pm.getPanel(pkey);
+            const panel = pm.getPanel(
+                pkey
+            ) as PanelPlugin<DescriptionPanelProps>;
             if (panel) {
-                if (panel.app) {
-                    panel.app.update({ content });
-                } else {
-                    panel.props = { content };
-                }
-            } else {
-                const cls = reactPanel(
-                    () => import("@nextgisweb/webmap/panel/description"),
-                    {
-                        props: { content },
-                    }
-                );
-                pm.addPanels([
-                    {
-                        cls,
-                        params: {
-                            title: item.label,
-                            name: pkey,
-                            order: 100,
-                            menuIcon: "material-article",
-                        },
-                    },
-                ]);
-                panel = pm.getPanel(pkey);
+                panel.updateMeta({ content });
             }
             pm.activatePanel(pkey);
         }

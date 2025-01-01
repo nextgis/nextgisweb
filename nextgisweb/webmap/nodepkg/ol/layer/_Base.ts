@@ -4,7 +4,7 @@ import type { Source } from "ol/source";
 import type { Style } from "ol/style";
 
 import { Watchable } from "@nextgisweb/webmap/compat/Watchable";
-import { LayerItemConfig } from "@nextgisweb/webmap/type/TreeItems";
+import type { LayerItemConfig } from "@nextgisweb/webmap/type/TreeItems";
 
 export interface LayerOptions {
     title?: string;

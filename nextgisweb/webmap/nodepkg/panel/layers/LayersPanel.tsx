@@ -1,5 +1,5 @@
+import type { ReactPanelComponentProps } from "@nextgisweb/webmap/panels-manager/type";
 import type ZoomToWebmapPlugin from "@nextgisweb/webmap/plugin/zoom-to-webmap";
-import type { DojoDisplay } from "@nextgisweb/webmap/type";
 
 import { LayersTree } from "../../layers-tree/LayersTree";
 import { PanelHeader } from "../header";
@@ -9,13 +9,12 @@ import { LayersDropdown } from "./LayersDropdown";
 
 import "./LayersPanel.less";
 
-interface LayersPanel {
-    title: string;
-    close: () => void;
-    display: DojoDisplay;
-}
-
-export function LayersPanel({ title, close, display, ...props }: LayersPanel) {
+export default function LayersPanel({
+    title,
+    close,
+    display,
+    ...props
+}: ReactPanelComponentProps) {
     const zoomToAllLayers = () => {
         const plugin =
             display._plugins["@nextgisweb/webmap/plugin/zoom-to-webmap"];
@@ -43,13 +42,7 @@ export function LayersPanel({ title, close, display, ...props }: LayersPanel) {
                 {...props}
             />
             <div className="basemap">
-                <BasemapSelector
-                    map={display.map}
-                    basemapDefault={display._getActiveBasemapKey()}
-                    onChange={(key) => {
-                        display._switchBasemap(key);
-                    }}
-                />
+                <BasemapSelector display={display} />
             </div>
         </div>
     );
