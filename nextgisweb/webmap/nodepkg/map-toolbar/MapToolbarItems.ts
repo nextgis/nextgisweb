@@ -68,7 +68,7 @@ export class MapToolbarItems extends WidgetBase {
         this.mapStates.addState(state, tglButtonTool, false);
     }
 
-    addButton(Button: ToolbarButton, options: any): void {
+    addButton(Button: ToolbarButton, options: unknown): void {
         const button = new Button(options);
         button.display = this.display;
         button.placeAt(this.domNode);
