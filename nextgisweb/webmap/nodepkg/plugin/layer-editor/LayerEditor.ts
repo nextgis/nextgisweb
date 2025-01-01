@@ -10,8 +10,10 @@ import { Draw, Modify, Select, Snap } from "ol/interaction";
 import type { Interaction } from "ol/interaction";
 import { Vector as VectorSource } from "ol/source";
 
+import { FeatureEditorModal } from "@nextgisweb/feature-layer/feature-editor-modal";
 import type { GeometryType } from "@nextgisweb/feature-layer/type";
 import { errorModal } from "@nextgisweb/gui/error";
+import showModal from "@nextgisweb/gui/showModal";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { ToolCreateFeature } from "@nextgisweb/webmap/map-controls/tool/editing/CreateFeature";
@@ -366,6 +368,20 @@ export class LayerEditor extends PluginBase {
 
         draw.on("drawend", (e) => {
             e.feature.set("layer_id", this.selectedResourceId);
+            if (this.selectedResourceId) {
+                showModal(FeatureEditorModal, {
+                    editorOptions: {
+                        mode: "return",
+                        resourceId:
+                            this.selectedResourceId !== null
+                                ? this.selectedResourceId
+                                : undefined,
+                        onOk: (value) => {
+                            e.feature.set("attribution", value);
+                        },
+                    },
+                });
+            }
         });
 
         const modify = new Modify({
@@ -558,7 +574,8 @@ export class LayerEditor extends PluginBase {
             let featureToSave: Partial<FeatureToSave> | undefined = undefined;
 
             if (isNew) {
-                featureToSave = {};
+                const attribution = feature.get("attribution") || {};
+                featureToSave = { ...attribution };
             } else if (isModified || isDeleted) {
                 featureToSave = { id: feature.get("id") };
             }

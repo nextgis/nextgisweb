@@ -1,5 +1,5 @@
 import { isEqual } from "lodash-es";
-import { makeAutoObservable, runInAction, toJS } from "mobx";
+import { action, computed, observable, toJS } from "mobx";
 
 import type {
     EditorStore,
@@ -13,9 +13,9 @@ import { formatNgwAttribute, parseNgwAttribute } from "../util/ngwAttributes";
 import type { AppAttributes, NgwAttributeValue } from "./type";
 
 class AttributeEditorStore implements EditorStore<NgwAttributeValue | null> {
-    value: NgwAttributeValue | null = null;
+    @observable.shallow accessor value: NgwAttributeValue | null = null;
 
-    _initValue: NgwAttributeValue | null = null;
+    @observable.shallow accessor _initValue: NgwAttributeValue | null = null;
 
     readonly _parentStore?: FeatureEditorStore;
     readonly _fields?: FeatureLayerFieldRead[];
@@ -23,11 +23,7 @@ class AttributeEditorStore implements EditorStore<NgwAttributeValue | null> {
     constructor({ parentStore, fields }: EditorStoreConstructorOptions = {}) {
         this._parentStore = parentStore;
         this._fields = fields;
-        makeAutoObservable(this, {
-            _parentStore: false,
-            _initValue: false,
-            _fields: false,
-        });
+
         if (this.fields) {
             this.load(
                 Object.fromEntries(
@@ -37,11 +33,13 @@ class AttributeEditorStore implements EditorStore<NgwAttributeValue | null> {
         }
     }
 
+    @action
     load(value: NgwAttributeValue | null) {
         this.value = { ...value };
         this._initValue = toJS(value);
     }
 
+    @computed
     get isReady(): boolean {
         if (this._parentStore) {
             return !this._parentStore.initLoading;
@@ -50,6 +48,7 @@ class AttributeEditorStore implements EditorStore<NgwAttributeValue | null> {
     }
 
     /** Feature field values formatted for web */
+    @computed
     get attributes() {
         const values: AppAttributes = {};
         if (this.value) {
@@ -62,6 +61,7 @@ class AttributeEditorStore implements EditorStore<NgwAttributeValue | null> {
         return values;
     }
 
+    @computed
     get fields(): FeatureLayerFieldRead[] {
         if (this._parentStore) {
             return this._parentStore.fields;
@@ -71,6 +71,7 @@ class AttributeEditorStore implements EditorStore<NgwAttributeValue | null> {
         return [];
     }
 
+    @computed
     get dirty(): boolean {
         if (this.value && this._initValue) {
             return !isEqual(this.value, this._initValue);
@@ -78,6 +79,7 @@ class AttributeEditorStore implements EditorStore<NgwAttributeValue | null> {
         return false;
     }
 
+    @computed
     get saving(): boolean {
         if (this._parentStore) {
             return this._parentStore.saving;
@@ -85,16 +87,16 @@ class AttributeEditorStore implements EditorStore<NgwAttributeValue | null> {
         return false;
     }
 
+    @action
     reset = () => {
         if (this._initValue) {
             this.load(this._initValue);
         }
     };
 
+    @action
     setValues = (values: AppAttributes = {}) => {
-        runInAction(() => {
-            this.value = this._formatAttributes(values);
-        });
+        this.value = this._formatAttributes(values);
     };
 
     private _formatAttributes(values: AppAttributes) {

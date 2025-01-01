@@ -1,5 +1,5 @@
 import { isEqual } from "lodash-es";
-import { makeAutoObservable, toJS } from "mobx";
+import { action, computed, observable, toJS } from "mobx";
 
 import type {
     EditorStoreConstructorOptions,
@@ -11,12 +11,12 @@ import type { DataSource, FileMetaToUpload } from "./type";
 import { findAttachmentIndex } from "./util/findAttachmentIndex";
 
 class AttachmentEditorStore implements IEditorStore<DataSource[] | null> {
-    value: DataSource[] | null = null;
+    @observable.shallow accessor value: DataSource[] | null = null;
 
-    featureId: number;
+    featureId: number | null = null;
     resourceId: number;
 
-    _initValue: DataSource[] | null = null;
+    @observable.shallow private accessor _initValue: DataSource[] | null = null;
 
     constructor({ parentStore }: EditorStoreConstructorOptions) {
         if (!parentStore) {
@@ -27,13 +27,14 @@ class AttachmentEditorStore implements IEditorStore<DataSource[] | null> {
 
         this.featureId = parentStore.featureId;
         this.resourceId = parentStore.resourceId;
-        makeAutoObservable(this, { featureId: false, resourceId: false });
     }
 
+    @computed
     get counter() {
         return this.value && String(this.value.length);
     }
 
+    @computed
     get dirty() {
         const value = this.value;
         const _initValue = this._initValue;
@@ -52,15 +53,18 @@ class AttachmentEditorStore implements IEditorStore<DataSource[] | null> {
         return dirty;
     }
 
+    @action
     load = (value: DataSource[] | null) => {
         this.value = value;
         this._initValue = toJS(value);
     };
 
+    @action
     reset = () => {
         this.load(this._initValue);
     };
 
+    @action
     append = (value: UploaderMeta[]) => {
         const newValue = [...(this.value || [])];
 
@@ -82,6 +86,7 @@ class AttachmentEditorStore implements IEditorStore<DataSource[] | null> {
         this.value = newValue;
     };
 
+    @action
     updateItem = (item: DataSource, field: string, value: unknown) => {
         const old = this.value ? [...this.value] : [];
         const index = findAttachmentIndex(item, old);
@@ -96,6 +101,7 @@ class AttachmentEditorStore implements IEditorStore<DataSource[] | null> {
         }
     };
 
+    @action
     deleteItem = (item: DataSource) => {
         const old = this.value ? [...this.value] : [];
         const index = findAttachmentIndex(item, old);
