@@ -13,10 +13,11 @@
 }
 
 .ol-tooltip-static {
-    opacity: .9;
+    opacity: 0.9;
     border: 1px solid white;
     background-color: var(--primary);
 }
+
 .ol-tooltip-measure:before,
 .ol-tooltip-static:before {
     position: absolute;
@@ -30,4 +31,20 @@
 }
 .ol-tooltip-static:before {
     border-top-color: var(--primary);
+}
+
+.tooltip-close-button {
+    opacity: 0.7;
+    z-index: 1;
+    cursor: pointer;
+    border: none;
+    background: none;
+    padding: 2px;
+    pointer-events: auto;
+    color: white;
+    user-select: none;
+}
+
+.tooltip-close-button:hover {
+    opacity: 1;
 }

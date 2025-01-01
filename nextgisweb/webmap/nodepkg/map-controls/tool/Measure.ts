@@ -1,5 +1,4 @@
 import { debounce } from "lodash-es";
-import type { Feature } from "ol";
 import { unByKey } from "ol/Observable.js";
 import Overlay from "ol/Overlay";
 import type { EventsKey } from "ol/events";
@@ -13,6 +12,7 @@ import { Circle, Fill, Stroke, Style } from "ol/style";
 
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import { html as htmlIcon } from "@nextgisweb/pyramid/icon";
 import settings from "@nextgisweb/pyramid/settings!webmap";
 import { MeasureArea, MeasureDistance } from "@nextgisweb/webmap/icon";
 import type { DojoDisplay } from "@nextgisweb/webmap/type";
@@ -102,7 +102,7 @@ export class ToolMeasure extends Base {
             element,
             offset: [0, -15],
             positioning: "bottom-center",
-            stopEvent: false,
+            stopEvent: true,
             insertFirst: false,
         });
 
@@ -114,7 +114,33 @@ export class ToolMeasure extends Base {
                 if (!tooltip) return;
                 const measure = await this.updateMeasurement(geom);
                 if (measure) {
-                    tooltip.getElement()!.innerHTML = measure;
+                    const tooltipElement = tooltip.getElement();
+                    if (tooltipElement !== undefined) {
+                        tooltipElement.innerHTML = "";
+                        const content = document.createElement("span");
+                        content.className = "tooltip-content";
+                        tooltipElement.appendChild(content);
+                        content.innerHTML = measure;
+
+                        const closeButton = document.createElement("button");
+                        closeButton.className = "tooltip-close-button";
+                        closeButton.innerHTML = htmlIcon({ glyph: "close" });
+                        tooltipElement.appendChild(closeButton);
+
+                        closeButton.onclick = (e) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            this.closeTooltip(tooltipId);
+                            const source = this.vector.getSource();
+                            if (source) {
+                                const feature =
+                                    source.getFeatureById(tooltipId);
+                                if (feature) {
+                                    source.removeFeature(feature);
+                                }
+                            }
+                        };
+                    }
                 }
             },
             DELAY
@@ -124,6 +150,19 @@ export class ToolMeasure extends Base {
         this.display.map.olMap.addOverlay(tooltip);
 
         return tooltipId;
+    }
+
+    private closeTooltip(tooltipId: number): void {
+        const tooltip = this.measureTooltips[tooltipId];
+        if (tooltip) {
+            this.display.map.olMap.removeOverlay(tooltip);
+            delete this.measureTooltips[tooltipId];
+            const debouncedMeasure = this.debouncedMeasurements[tooltipId];
+            if (debouncedMeasure) {
+                debouncedMeasure.cancel();
+                delete this.debouncedMeasurements[tooltipId];
+            }
+        }
     }
 
     private async updateMeasurement(geom: Geometry): Promise<string> {
@@ -154,10 +193,6 @@ export class ToolMeasure extends Base {
     }
 
     private setupMeasureListeners() {
-        this.interaction.on("drawstart", () => {
-            this.createMeasureTooltip();
-        });
-
         this.interaction.on("drawend", () => {
             if (this.currentTooltipId !== null) {
                 const tooltip = this.measureTooltips[this.currentTooltipId];
@@ -174,44 +209,39 @@ export class ToolMeasure extends Base {
             this.currentTooltipId = null;
         });
 
-        this.interaction.on(
-            "drawstart",
-            (evt: { feature: Feature<Geometry> }) => {
-                this.changeListener = evt.feature
-                    .getGeometry()!
-                    .on("change", (evt) => {
-                        const geom = evt.target;
-                        let coord;
+        this.interaction.on("drawstart", (evt) => {
+            const tooltipId = this.createMeasureTooltip();
+            evt.feature.setId(tooltipId);
+            this.changeListener = evt.feature
+                .getGeometry()!
+                .on("change", (e) => {
+                    const geom = e.target;
+                    let coord;
+                    if (!this.isValid(geom)) return;
 
-                        if (!this.isValid(geom)) return;
+                    if (geom instanceof Polygon) {
+                        const ring = geom.getLinearRing(0);
+                        if (!ring || ring.getCoordinates().length <= 3) return;
+                        coord = geom.getInteriorPoint().getCoordinates();
+                    } else if (geom instanceof LineString) {
+                        const coords = geom.getCoordinates();
+                        if (coords.length <= 1) return;
+                        coord = coords[coords.length - 1];
+                    }
 
-                        if (geom instanceof Polygon) {
-                            const ring = geom.getLinearRing(0);
-                            if (!ring || ring.getCoordinates().length <= 3)
-                                return;
-                            coord = geom.getInteriorPoint().getCoordinates();
-                        } else if (geom instanceof LineString) {
-                            const coords = geom.getCoordinates();
-                            if (coords.length <= 1) return;
-                            coord = coords[coords.length - 1];
+                    if (coord && this.currentTooltipId !== null) {
+                        const tooltip =
+                            this.measureTooltips[this.currentTooltipId];
+                        const debouncedMeasure =
+                            this.debouncedMeasurements[this.currentTooltipId];
+                        if (tooltip && debouncedMeasure) {
+                            tooltip.setPosition(coord);
+                            tooltip.getElement()!.innerHTML = "...";
+                            debouncedMeasure(geom);
                         }
-
-                        if (coord && this.currentTooltipId !== null) {
-                            const tooltip =
-                                this.measureTooltips[this.currentTooltipId];
-                            const debouncedMeasure =
-                                this.debouncedMeasurements[
-                                    this.currentTooltipId
-                                ];
-                            if (tooltip && debouncedMeasure) {
-                                tooltip.setPosition(coord);
-                                tooltip.getElement()!.innerHTML = "...";
-                                debouncedMeasure(geom);
-                            }
-                        }
-                    });
-            }
-        );
+                    }
+                });
+        });
     }
 
     private isValid(geom: Geometry): boolean {
