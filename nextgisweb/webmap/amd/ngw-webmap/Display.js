@@ -18,9 +18,9 @@ define([
     "@nextgisweb/webmap/panels-manager",
     "@nextgisweb/webmap/store/annotations",
     "./ol/Map",
-    "./MapToolbar",
+    "@nextgisweb/webmap/map-toolbar",
     "./FeatureHighlighter",
-    "./MapStatesObserver",
+    "@nextgisweb/webmap/map-state-observer",
     "./ui/react-panel",
     "./ui/react-webmap-tabs",
     // tools
@@ -175,7 +175,7 @@ define([
             this._startupDeferred = new LoggedDeferred("_startupDeferred");
 
             var widget = this;
-            this.mapStates = MapStatesObserver.getInstance();
+            this.mapStates = MapStatesObserver.default.getInstance();
 
             // AMD module loading
             this._midDeferred = {};
@@ -430,7 +430,7 @@ define([
         _mapSetup: function () {
             var widget = this;
 
-            widget.mapToolbar = new MapToolbar({
+            widget.mapToolbar = new MapToolbar.default({
                 display: widget,
                 target: widget.leftBottomControlPane,
             });

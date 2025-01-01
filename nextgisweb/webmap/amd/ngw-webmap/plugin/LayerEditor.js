@@ -22,7 +22,7 @@ define([
     "ngw-webmap/tool/editing/CreateFeature",
     "ngw-webmap/tool/editing/ModifyFeature",
     "ngw-webmap/tool/editing/DeleteFeature",
-    "ngw-webmap/MapStatesObserver",
+    "@nextgisweb/webmap/map-state-observer",
     "@nextgisweb/pyramid/i18n!",
 ], function (
     declare,
@@ -76,7 +76,7 @@ define([
                 return;
             }
 
-            this.mapStates = MapStatesObserver.getInstance();
+            this.mapStates = MapStatesObserver.default.getInstance();
             this.store = new Memory();
             this.source = new ol.source.Vector();
 
