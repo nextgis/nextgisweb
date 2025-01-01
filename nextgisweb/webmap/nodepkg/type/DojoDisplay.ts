@@ -9,6 +9,7 @@ import type MapToolbar from "../map-toolbar";
 import type { ToggleControl } from "../map-toolbar/ToggleControl";
 import type PanelsManager from "../panels-manager";
 import type WebmapStore from "../store";
+import type { WebMapTab } from "../webmap-tabs/WebMapTabsStore";
 
 import type { DisplayConfig } from "./DisplayConfig";
 import type { DisplayMap } from "./DisplayMap";
@@ -74,6 +75,10 @@ export interface DojoDisplayIdentify {
     reset: () => void;
 }
 
+export interface TabContainer {
+    addTab(tab: WebMapTab): void;
+}
+
 export type MapControl = OlControl | dijit._WidgetBase | DojoDisplayIdentify;
 
 export type WebmapAdapter = any;
@@ -95,6 +100,8 @@ export interface DojoDisplay extends dijit._WidgetBase {
 
     dumpItem: () => TreeItem;
     getVisibleItems: () => Promise<TreeItem[]>;
+
+    tabContainer: TabContainer;
 
     _itemConfigById: Record<number, TreeItem>;
 

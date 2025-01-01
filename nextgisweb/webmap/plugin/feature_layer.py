@@ -12,7 +12,7 @@ class FeatureLayerPlugin(WebmapLayerPlugin):
         if IFeatureLayer.providedBy(layer):
             request = get_current_request()
             return (
-                "ngw-webmap/plugin/FeatureLayer",
+                "@nextgisweb/webmap/plugin/feature-layer",
                 dict(
                     readonly=not layer.has_permission(DataScope.write, request.user),
                     likeSearch=IFeatureQueryLike.providedBy(layer.feature_query()),

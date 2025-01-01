@@ -5,12 +5,12 @@ interface WebMapTabsStoreProps {
     onTabs?: () => void;
 }
 
-interface Tab {
+export interface WebMapTab {
     key: string;
     label: string;
     children?: ReactElement;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    component?: <T extends ComponentType<any>>() => Promise<{ default: T }>;
+    component?: () => Promise<{ default: ComponentType<any> }>;
     props?: Record<string, unknown>;
 }
 
@@ -18,7 +18,7 @@ export class WebMapTabsStore {
     activeKey?: string | null = null;
 
     _onTabs?: () => void;
-    private _tabs: Tab[] = [];
+    private _tabs: WebMapTab[] = [];
 
     constructor({ onTabs }: WebMapTabsStoreProps) {
         this._onTabs = onTabs;
@@ -40,14 +40,14 @@ export class WebMapTabsStore {
         }
     };
 
-    setTabs = (tabs: Tab[]) => {
+    setTabs = (tabs: WebMapTab[]) => {
         this._tabs = tabs;
         if (this._onTabs) {
             this._onTabs();
         }
     };
 
-    addTab = (tab: Tab): void => {
+    addTab = (tab: WebMapTab): void => {
         const key = tab.key;
         if (!key) {
             throw new Error("You can not add a tab without the key");
