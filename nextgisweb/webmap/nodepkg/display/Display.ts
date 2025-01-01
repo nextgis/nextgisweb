@@ -61,7 +61,7 @@ export class Display {
     readonly map: Map;
     mapNode?: HTMLElement;
     private _extent: Extent;
-    private _extentConst: Extent;
+    private _extentConst: Extent | null;
     private readonly _layerOrder: number[] = []; // Layers from back to front
 
     itemStore: CustomItemFileWriteStore;
@@ -124,16 +124,18 @@ export class Display {
         this.mapStates = MapStatesObserver.getInstance();
 
         this._extent = transformExtent(
-            this.config.extent,
+            this.config.initialExtent,
             this.lonlatProjection,
             this.displayProjection
         );
 
-        this._extentConst = transformExtent(
-            this.config.extent_const as number[],
-            this.lonlatProjection,
-            this.displayProjection
-        );
+        this._extentConst =
+            this.config.constrainingExtent &&
+            transformExtent(
+                this.config.constrainingExtent,
+                this.lonlatProjection,
+                this.displayProjection
+            );
 
         this.map = new Map({
             logo: false,
@@ -141,12 +143,7 @@ export class Display {
             view: new View({
                 minZoom: 3,
                 constrainResolution: true,
-                // TODO: Investigate the source of null values. Normal extent from API types without nulls.
-                extent: !(
-                    this.config.extent_const as (null | number)[]
-                ).includes(null)
-                    ? this._extentConst
-                    : undefined,
+                extent: this._extentConst || undefined,
             }),
         });
 
@@ -188,11 +185,11 @@ export class Display {
             this._itemStorePrepare();
         });
 
-        if (this.config.extent[3] > 82) {
-            this.config.extent[3] = 82;
+        if (this.config.initialExtent[3] > 82) {
+            this.config.initialExtent[3] = 82;
         }
-        if (this.config.extent[1] < -82) {
-            this.config.extent[1] = -82;
+        if (this.config.initialExtent[1] < -82) {
+            this.config.initialExtent[1] = -82;
         }
 
         // // Layers panel
@@ -609,9 +606,8 @@ export class Display {
         });
     }
     private _buildLayersTree() {
-        const { expanded } = this.config.itemsStates;
         this.webmapStore.setWebmapItems(this.config.rootItem.children);
-        this.webmapStore.setExpanded(expanded);
+        this.webmapStore.setExpanded(this.config.expandedItems);
     }
 
     private _layersPanelSetup() {
