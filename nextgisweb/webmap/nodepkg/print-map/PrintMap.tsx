@@ -10,7 +10,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { getLabel } from "../map-controls/map-controls";
-import MapScaleControl from "../ol/ol-ext/ol-mapscale";
+import MapScaleControl from "../ol-ext/ol-mapscale";
 import type { DojoDisplay } from "../type";
 
 import { printMapStore } from "./PrintMapStore";
@@ -384,3 +384,5 @@ export const PrintMap = observer(
             );
     }
 );
+
+PrintMap.displayName = "PrintMap";

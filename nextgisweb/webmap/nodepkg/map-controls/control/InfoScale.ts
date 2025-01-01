@@ -26,10 +26,12 @@ export class InfoScale extends Control {
         });
     }
 
-    private updateScale(val: number): void {
+    private updateScale(val: number | null): void {
+        if (val === null) {
+            return;
+        }
         const view = this.display.map.olMap.getView();
         const projection = view.getProjection();
-
         const scale = this.display.map.getScaleForResolution(
             val,
             projection.getMetersPerUnit() || 1
