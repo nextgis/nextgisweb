@@ -10,7 +10,7 @@ import { imageQueue } from "@nextgisweb/pyramid/util";
 
 import { Watchable } from "../compat/Watchable";
 
-import type { CoreLayer } from "./layer/_Base";
+import type { CoreLayer, ExtendedOlLayer } from "./layer/_Base";
 
 import "ol/ol.css";
 
@@ -80,6 +80,10 @@ export class Map extends Watchable<MapWatchableProps> {
                 imageQueue.abort();
             });
         });
+    }
+
+    getLayersArray() {
+        return this.olMap.getLayers().getArray() as ExtendedOlLayer[];
     }
 
     @action
