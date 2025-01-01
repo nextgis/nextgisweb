@@ -1,6 +1,5 @@
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-
 import type MapToolbar from "../map-toolbar";
 
 import { ToolMeasure } from "./tool/Measure";
@@ -75,14 +74,16 @@ export const buildTools = (
     display: Display,
     tools: ToolInfo[],
     controlsReady: Map<string, ControlReady>
-): MapToolbar => {
+): MapToolbar | undefined => {
     const mapToolbar = display.mapToolbar;
-    tools.forEach((t: ToolInfo) => {
-        const tool = t.ctor(display);
-        if (t.mapStateKey) {
-            mapToolbar.items.addTool(tool, t.mapStateKey);
-        }
-        controlsReady.set(t.key, { control: tool, info: t });
-    });
+    if (mapToolbar) {
+        tools.forEach((t: ToolInfo) => {
+            const tool = t.ctor(display);
+            if (t.mapStateKey) {
+                mapToolbar.items.addTool(tool, t.mapStateKey);
+            }
+            controlsReady.set(t.key, { control: tool, info: t });
+        });
+    }
     return mapToolbar;
 };
