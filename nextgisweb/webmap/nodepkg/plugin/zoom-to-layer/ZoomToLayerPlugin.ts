@@ -5,9 +5,9 @@ import i18n from "@nextgisweb/pyramid/i18n";
 import { PluginBase } from "../PluginBase";
 
 export class ZoomToLayerPlugin extends PluginBase {
-    run(): Promise<void> {
+    run(): Promise<undefined> {
         this.zoomToLayer();
-        return Promise.resolve();
+        return Promise.resolve(undefined);
     }
 
     getMenuItem() {

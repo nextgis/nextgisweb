@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Col, Row, Tree } from "@nextgisweb/gui/antd";
 import type { TreeProps } from "@nextgisweb/gui/antd";
@@ -12,9 +12,9 @@ import { DropdownActions } from "./DropdownActions";
 import { Legend } from "./Legend";
 import { LegendAction } from "./LegendAction";
 import { useDrag } from "./hook/useDrag";
+import { useWebmapItems } from "./hook/useWebmapItems";
 import {
     keyInMutuallyExclusiveGroupDeep,
-    prepareWebMapItems,
     updateKeysForGroup,
     updateKeysForMutualExclusivity,
 } from "./util/treeItems";
@@ -68,21 +68,22 @@ export const LayersTree = observer(
         const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
         const [moreClickId, setMoreClickId] = useState<number>();
         const [update, setUpdate] = useState(false);
-        const webmapItems = store.webmapItems;
+        const webMapItems = store.webmapItems;
 
         const { onDrop, allowDrop } = useDrag({ store, setLayerZIndex });
 
+        const { preparedWebMapItems } = useWebmapItems({ webMapItems });
+
         const treeItems = useMemo(() => {
-            let _webmapItems = prepareWebMapItems(webmapItems);
             if (onFilterItems) {
-                _webmapItems = onFilterItems(store, _webmapItems);
+                return onFilterItems(store, preparedWebMapItems);
             }
-            return _webmapItems;
-        }, [webmapItems]);
+            return preparedWebMapItems;
+        }, [onFilterItems, preparedWebMapItems, store]);
 
         const hasGroups = useMemo(
-            () => webmapItems.some((item) => item.type === "group"),
-            [webmapItems]
+            () => webMapItems.some((item) => item.type === "group"),
+            [webMapItems]
         );
 
         useEffect(() => {
@@ -137,59 +138,70 @@ export const LayersTree = observer(
             if (onSelect) onSelect(val);
         };
 
-        const titleRender = (nodeData: TreeWebmapItem) => {
-            const { title } = nodeData.treeItem;
+        const titleRender = useCallback(
+            (nodeData: TreeWebmapItem) => {
+                const { title } = nodeData.treeItem;
 
-            const shouldActions = showLegend || showDropdown;
+                const shouldActions = showLegend || showDropdown;
 
-            let actions;
-            if (shouldActions) {
-                const legendAction = showLegend && (
-                    <LegendAction
-                        nodeData={nodeData.treeItem}
-                        onClick={() => setUpdate(!update)}
-                    />
-                );
-
-                const dropdownAction = showDropdown && (
-                    <DropdownActions
-                        nodeData={nodeData.treeItem}
-                        getWebmapPlugins={getWebmapPlugins}
-                        setMoreClickId={setMoreClickId}
-                        moreClickId={moreClickId}
-                        update={update}
-                        setUpdate={setUpdate}
-                    />
-                );
-                actions = (
-                    <Col
-                        className="tree-item-action"
-                        style={{ alignItems: "center" }}
-                    >
-                        {legendAction}
-                        {dropdownAction}
-                    </Col>
-                );
-            }
-
-            return (
-                <>
-                    <Row wrap={false}>
-                        <Col flex="auto" className="tree-item-title">
-                            {title}
-                        </Col>
-                        {actions}
-                    </Row>
-                    {showLegend && (
-                        <Legend
-                            checkable={checkable}
+                let actions;
+                if (shouldActions) {
+                    const legendAction = showLegend && (
+                        <LegendAction
                             nodeData={nodeData.treeItem}
-                            store={store}
+                            onClick={() => setUpdate(!update)}
                         />
-                    )}
-                </>
-            );
-        };
+                    );
+
+                    const dropdownAction = showDropdown && (
+                        <DropdownActions
+                            nodeData={nodeData.treeItem}
+                            getWebmapPlugins={getWebmapPlugins}
+                            setMoreClickId={setMoreClickId}
+                            moreClickId={moreClickId}
+                            update={update}
+                            setUpdate={setUpdate}
+                        />
+                    );
+                    actions = (
+                        <Col
+                            className="tree-item-action"
+                            style={{ alignItems: "center" }}
+                        >
+                            {legendAction}
+                            {dropdownAction}
+                        </Col>
+                    );
+                }
+
+                return (
+                    <>
+                        <Row wrap={false}>
+                            <Col flex="auto" className="tree-item-title">
+                                {title}
+                            </Col>
+                            {actions}
+                        </Row>
+                        {showLegend && (
+                            <Legend
+                                checkable={checkable}
+                                nodeData={nodeData.treeItem}
+                                store={store}
+                            />
+                        )}
+                    </>
+                );
+            },
+            [
+                checkable,
+                getWebmapPlugins,
+                moreClickId,
+                showDropdown,
+                showLegend,
+                store,
+                update,
+            ]
+        );
 
         const shouldShowLine = showLine && hasGroups;
 
@@ -221,3 +233,5 @@ export const LayersTree = observer(
         );
     }
 );
+
+LayersTree.displayName = "LayersTree";
