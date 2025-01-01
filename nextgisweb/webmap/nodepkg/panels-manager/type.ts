@@ -10,11 +10,6 @@ export interface DojoTopic {
     ) => TopicSubscription;
 }
 
-export interface FeatureLayerWebMapPluginConfig {
-    likeSearch: boolean;
-    readonly: boolean;
-}
-
 export interface DisplayItemConfig {
     plugin: Record<string, unknown>;
 }
