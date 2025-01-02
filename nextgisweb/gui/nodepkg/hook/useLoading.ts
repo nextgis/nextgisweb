@@ -9,16 +9,16 @@ export const useLoading = () => {
 
     const trackPromise = useCallback(<T>(promise: Promise<T>): Promise<T> => {
         setPendingPromises((count) => count + 1);
-
-        promise
-            .catch(() => {
-                // Supress errors to avoid logging them in the console
-            })
-            .finally(() => {
+        return promise.then(
+            (value) => {
                 setPendingPromises((count) => count - 1);
-            });
-
-        return promise;
+                return value;
+            },
+            (reason) => {
+                setPendingPromises((count) => count - 1);
+                throw reason;
+            }
+        );
     }, []);
 
     const isLoading = pendingPromises > 0;
