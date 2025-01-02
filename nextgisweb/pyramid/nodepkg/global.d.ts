@@ -1,28 +1,27 @@
-declare const ngwConfig: {
-    components: string[];
-    instanceId: string;
-    debug: boolean;
-    applicationUrl: string;
-    staticUrl: string;
-    staticKey: string;
-    isAdministrator: boolean;
-    isGuest: boolean;
-    controlPanel: boolean;
-    userId: number;
-    userDisplayName: string;
-    invitationSession: boolean;
-    resourceHome: { id: number } | null;
-    locale: string;
-    logoutUrl: string;
-    // Defined in @nextgisweb/jsrealm/locale-loader
-    plurals: [number, { (n: number): number }];
-    // Defined by resource component
-    resourceFavorite: {
-        identity: string;
-        resource: { id: number };
-        current: number | null;
-    } | null;
-};
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
+declare const ngwConfig: import("@nextgisweb/pyramid/type/config").NgwConfig;
+
+declare module "@nextgisweb/pyramid/type/config" {
+    export interface NgwConfig {
+        components: string[];
+        instanceId: string;
+        debug: boolean;
+        applicationUrl: string;
+        staticUrl: string;
+        staticKey: string;
+        isAdministrator: boolean;
+        isGuest: boolean;
+        controlPanel: boolean;
+        userId: number;
+        userDisplayName: string;
+        invitationSession: boolean;
+        resourceHome: { id: number } | null;
+        locale: string;
+        logoutUrl: string;
+        // Defined in @nextgisweb/jsrealm/locale-loader
+        plurals: [number, { (n: number): number }];
+    }
+}
 
 declare const dojoConfig: {
     baseUrl: string;
