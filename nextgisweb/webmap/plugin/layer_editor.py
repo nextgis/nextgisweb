@@ -7,6 +7,8 @@ from .base import WebmapLayerPlugin
 
 
 class LayerEditorPlugin(WebmapLayerPlugin):
+    amd_free = True
+
     @classmethod
     def is_layer_supported(cls, layer, webmap):
         if IFeatureLayer.providedBy(layer):
