@@ -39,14 +39,16 @@ class VersionOptionType(OptionType):
         return str(value).lower()
 
 
+# fmt: off
 for f in (
-    Family("chrome", "Chrome", 102),  # Latest for Windows 7
-    Family("safari", "Safari", 15),  # Latest for macOS 10.15
-    Family("edge", "Edge", 109),  # Latest for Windows 7
-    Family("firefox", "Firefox", 102),  # ESR release
-    Family("opera", "Opera", 88),  # Based on Chrome
+    Family("chrome", "Chrome", 118),           # 2023-10
+    Family("safari", "Safari", 17),            # 2023-09
+    Family("edge", "Edge", 116),               # 2023-09
+    Family("firefox", "Firefox", 115),         # 2023-07 ESR
+    Family("opera", "Opera", 104),             # 2023-10
     Family("ie", "Internet Explorer", False),  # Not supported
 ):
+# fmt: on
     FAMILIES[f.identity] = f
     FOPTIONS.append(Option("uacompat." + f.identity, otype=VersionOptionType, default=f.required))
 
