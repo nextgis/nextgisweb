@@ -1,14 +1,11 @@
 /** @plugin */
-
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { createPanelRegistry } from "@nextgisweb/webmap/panels-manager/registry";
+import { registry } from "@nextgisweb/webmap/panels-manager/registry";
 
 import PrintIcon from "@nextgisweb/icon/material/print";
 
-const msgTitle = gettext("Print map");
-
-createPanelRegistry(COMP_ID, () => import("./PrintPanel"), {
-    title: msgTitle,
+registry.register(COMP_ID, () => import("./PrintPanel"), {
+    title: gettext("Print map"),
     name: "print",
     order: 70,
     menuIcon: <PrintIcon />,

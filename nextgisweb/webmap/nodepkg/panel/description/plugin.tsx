@@ -1,20 +1,18 @@
 /** @plugin */
-
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { createPanelRegistry } from "@nextgisweb/webmap/panels-manager/registry";
+import { registry } from "@nextgisweb/webmap/panels-manager/registry";
+import type { DisplayConfig } from "@nextgisweb/webmap/type/api";
 
 import InfoIcon from "@nextgisweb/icon/material/info";
 
-const msgTitle = gettext("Description");
-
-createPanelRegistry(COMP_ID, () => import("./DescriptionPanel"), {
-    title: msgTitle,
+registry.register(COMP_ID, () => import("./DescriptionPanel"), {
+    title: gettext("Description"),
     name: "info",
     order: 40,
     menuIcon: <InfoIcon />,
     applyToTinyMap: true,
 
-    isEnabled: (meta) => {
-        return !!(meta.content || meta.display?.config.webmapDescription);
+    isEnabled: ({ config }: { config: DisplayConfig }) => {
+        return !!config.webmapDescription;
     },
 });

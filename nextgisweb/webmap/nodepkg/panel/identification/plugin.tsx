@@ -1,17 +1,14 @@
 /** @plugin */
-
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { createPanelRegistry } from "@nextgisweb/webmap/panels-manager/registry";
+import { registry } from "@nextgisweb/webmap/panels-manager/registry";
 
 import IdentifyIcon from "@nextgisweb/icon/material/arrow_selector_tool";
 
-const msgTitle = gettext("Identify");
-
-createPanelRegistry(
+registry.register(
     COMP_ID,
     () => import("./IdentificationPanel/IdentificationPanel"),
     {
-        title: msgTitle,
+        title: gettext("Identify"),
         name: "identify",
         order: 15,
         menuIcon: <IdentifyIcon />,

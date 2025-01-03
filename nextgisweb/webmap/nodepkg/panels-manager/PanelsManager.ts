@@ -1,5 +1,5 @@
 import { orderBy } from "lodash-es";
-import { action, computed, observable, reaction } from "mobx";
+import { action, computed, observable } from "mobx";
 
 import type { Display } from "../display";
 
@@ -57,16 +57,18 @@ export class PanelsManager {
         this._allowPanels = allowPanels;
         this._onChangePanel = onChangePanel;
 
-        reaction(
-            () => registry.plugins,
-            (plugins) => {
-                for (const p of plugins) {
-                    this._makePanel(p as PanelPlugin<unknown>);
-                }
-                this._handlePanelActivation();
-            },
-            { fireImmediately: true }
-        );
+        const plugins = registry.queryAll(({ name, isEnabled }) => {
+            return (
+                (!allowPanels || allowPanels.includes(name)) &&
+                (!isEnabled || isEnabled(display))
+            );
+        });
+
+        for (const p of plugins) {
+            this._makePanel(p as PanelPlugin<unknown>);
+        }
+
+        this._handlePanelActivation();
     }
 
     /** @deprecated use observable {@link PanelsManager.ready} instead */
@@ -122,10 +124,6 @@ export class PanelsManager {
     }
 
     private _makePanel(panel: PanelPlugin<unknown>): void {
-        if (this._allowPanels && !this._allowPanels.includes(panel.name)) {
-            return;
-        }
-        panel.updateMeta({ display: this._display });
         const existingPanels = Array.from(this.panels.values());
         let newPanels = [...existingPanels, panel];
         newPanels = orderBy(newPanels, "order", "asc");
