@@ -6,6 +6,7 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 const { jsrealm } = require("../jsrealm/config.cjs");
 const defaults = require("../jsrealm/webpack/defaults.cjs");
+const fontWeightFix = require("../jsrealm/webpack/font-weight-fix.cjs");
 
 const stylesheetRoot = path.resolve(__dirname, "../../../static");
 const filename = stylesheetRoot + "/css/layout.less";
@@ -32,6 +33,7 @@ module.exports = defaults("stylesheet", {
                         options: { publicPath: "./" },
                     },
                     "css-loader",
+                    fontWeightFix,
                     {
                         loader: "less-loader",
                         options: {
@@ -49,7 +51,7 @@ module.exports = defaults("stylesheet", {
             },
             {
                 test: /\.css$/,
-                use: ["css-loader"],
+                use: ["css-loader", fontWeightFix],
             },
             {
                 test: /\.(woff2?|ttf|eot|png|gif|svg)$/,

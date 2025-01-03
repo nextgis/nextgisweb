@@ -209,7 +209,6 @@ const FeatureTable = observer(
             "color-border": "colorBorderSecondary",
             "color-active": "controlItemBgActive",
             "border-radius": "borderRadius",
-            "font-weight-strong": "fontWeightStrong",
         });
 
         let isEmpty = total === 0;

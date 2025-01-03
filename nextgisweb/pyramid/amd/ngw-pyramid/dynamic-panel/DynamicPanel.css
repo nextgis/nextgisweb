@@ -19,10 +19,9 @@
     padding: 0 16px;
     width: 100%;
     height: 40px;
-    font-weight: var(--ngw-text-font-weight);
+    font-weight: bold;
     font-size: 15px;
     line-height: 40px;
-    font-family: var(--ngw-head-font-family-list);
 }
 
 .dynamic-panel__content {

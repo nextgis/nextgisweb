@@ -295,7 +295,6 @@ export function Journal() {
         "color-alter": "colorFillAlter",
         "color-border": "colorBorderSecondary",
         "border-radius": "borderRadius",
-        "font-weight-strong": "fontWeightStrong",
     });
 
     return (

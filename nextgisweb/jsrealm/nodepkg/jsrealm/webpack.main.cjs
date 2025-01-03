@@ -13,6 +13,7 @@ const config = require("./config.cjs");
 const iconUtil = require("./icon/util.cjs");
 const tagParser = require("./tag-parser.cjs");
 const defaults = require("./webpack/defaults.cjs");
+const fontWeightFix = require("./webpack/font-weight-fix.cjs");
 const { injectCode, stripIndex, virtualImport } = require("./webpack/util.cjs");
 
 // Inject the following construction into each entrypoint module
@@ -350,11 +351,16 @@ const webpackConfig = defaults("main", (env) => ({
             },
             {
                 test: /\.css$/i,
-                use: ["style-loader", "css-loader"],
+                use: ["style-loader", "css-loader", fontWeightFix],
             },
             {
                 test: /\.less$/i,
-                use: ["style-loader", "css-loader", "less-loader"],
+                use: [
+                    "style-loader",
+                    "css-loader",
+                    fontWeightFix,
+                    "less-loader",
+                ],
             },
             {
                 test: /\.svg$/i,
