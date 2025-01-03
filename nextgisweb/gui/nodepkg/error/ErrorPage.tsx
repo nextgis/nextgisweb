@@ -8,7 +8,7 @@ export function ErrorPage({ error }: { error: ApiError }) {
 
     return (
         <div className="ngw-card" style={{ maxWidth: "40em", padding: "12px" }}>
-            <h1>{error.title}</h1>
+            <h1 style={{ margin: "0 0 12px 0" }}>{error.title}</h1>
             <Body error={error} />
             {tinfo && <TechInfo error={error} />}
             <Footer tinfo={tinfo} setTinfo={setTinfo} />
