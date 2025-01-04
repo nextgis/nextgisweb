@@ -21,16 +21,14 @@ class _AnyOfRuntime:
 class _GapRuntime:
     def __class_getitem__(cls, arg):
         _, extras = disannotate(arg)
-        if len(extras) == 0:
-            extras = (None,)
-        result = Annotated[(Any,) + extras]  # type: ignore
+        result = Annotated[(Any, _GapRuntime())]  # type: ignore
 
         # NODEFAULT will break everything if it's not filled by actual type
-        result.__dict__.update(
-            __origin__=NODEFAULT,
-            __args__=(NODEFAULT,),
-            _is_gap=True,
-        )
+        result.__dict__["__origin__"] = NODEFAULT
+        result.__dict__["__args__"] = (NODEFAULT,)
+
+        # Remember existing annotations for fillgap()
+        result.__dict__["__gap_metadata__"] = extras
 
         return result
 
@@ -44,8 +42,18 @@ else:
 
 
 def fillgap(placeholder: Any, type: Any):
-    assert placeholder._is_gap
-    placeholder.__dict__.update(__origin__=type, __args__=(type,))
+    gap_metadata = placeholder.__dict__.pop("__gap_metadata__")
+    assert isinstance(gap_metadata, tuple)
+
+    origin, extras = disannotate(type)
+    placeholder.__dict__["__origin__"] = origin
+    placeholder.__dict__["__args__"] = (origin,)
+
+    placeholder.__dict__["__metadata__"] = (
+        *placeholder.__dict__["__metadata__"],
+        *gap_metadata,
+        *extras,
+    )
 
 
 def _anyof_explode(tdef):
