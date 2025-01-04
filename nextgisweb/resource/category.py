@@ -3,9 +3,16 @@ from __future__ import annotations
 import re
 from typing import ClassVar, Mapping, Type
 
+from typing_extensions import Annotated
+
 from nextgisweb.env import gettext
+from nextgisweb.lib.apitype import Gap
 from nextgisweb.lib.i18n import TrStr
 from nextgisweb.lib.registry import dict_registry
+
+from nextgisweb.jsrealm import TSExport
+
+ResourceCategoryIdentity = Gap[Annotated[str, TSExport("ResourceCategoryIdentity")]]
 
 
 @dict_registry

@@ -8,6 +8,7 @@ import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type {
     BlueprintCategory,
+    ResourceCategoryIdentity,
     ResourceCls,
 } from "@nextgisweb/resource/type/api";
 
@@ -19,7 +20,8 @@ import "./CreateResourceModal.less";
 const msgCreateResource = gettext("Create resource");
 const msgSearchPlaceholder = gettext("Search");
 
-const ALL_RESOURCES = "";
+// FIXME: A better way exists to handle this!
+const ALL_RESOURCES = "" as ResourceCategoryIdentity;
 
 interface CreateResourceModalProps
     extends Omit<ModalProps, "footer" | "classNames"> {

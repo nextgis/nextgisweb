@@ -11,6 +11,7 @@ from nextgisweb.lib.logging import logger
 
 from nextgisweb.auth import Group, User
 
+from .category import ResourceCategory, ResourceCategoryIdentity
 from .exception import QuotaExceeded, ResourceDisabled
 from .interface import interface_registry
 from .model import (
@@ -28,9 +29,10 @@ class ResourceComponent(Component):
     def __init__(self, env, settings):
         super().__init__(env, settings)
 
-        fillgap(ResourceCls, Literal[tuple(Resource.registry.keys())])  # type: ignore
-        fillgap(ResourceInterfaceIdentity, Literal[tuple(i.__name__ for i in interface_registry)])  # type: ignore
-        fillgap(ResourceScopeIdentity, Literal[tuple(ResourceScope.registry.keys())])  # type: ignore
+        fillgap(ResourceCls, Literal[tuple(Resource.registry.keys())])
+        fillgap(ResourceInterfaceIdentity, Literal[tuple(i.__name__ for i in interface_registry)])
+        fillgap(ResourceScopeIdentity, Literal[tuple(ResourceScope.registry.keys())])
+        fillgap(ResourceCategoryIdentity, Literal[tuple(ResourceCategory.registry.keys())])
 
     def initialize(self):
         super().initialize()

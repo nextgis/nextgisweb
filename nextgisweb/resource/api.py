@@ -18,7 +18,7 @@ from nextgisweb.jsrealm import TSExport
 from nextgisweb.pyramid import AsJSON, JSONType
 from nextgisweb.pyramid.api import csetting, require_storage_enabled
 
-from .category import ResourceCategory
+from .category import ResourceCategory, ResourceCategoryIdentity
 from .composite import CompositeSerializer
 from .event import AfterResourceCollectionPost, AfterResourcePut, OnDeletePrompt
 from .exception import HierarchyError, QuotaExceeded
@@ -35,7 +35,7 @@ class BlueprintResource(Struct):
     base_classes: List[ResourceCls]
     interfaces: List[ResourceInterfaceIdentity]
     scopes: List[ResourceScopeIdentity]
-    category: str
+    category: ResourceCategoryIdentity
     order: int
 
 
@@ -51,7 +51,7 @@ class BlueprintScope(Struct):
 
 
 class BlueprintCategory(Struct):
-    identity: str
+    identity: ResourceCategoryIdentity
     label: str
     order: int
 
@@ -59,10 +59,11 @@ class BlueprintCategory(Struct):
 class Blueprint(Struct):
     resources: Dict[ResourceCls, BlueprintResource]
     scopes: Dict[ResourceScopeIdentity, BlueprintScope]
-    categories: Dict[str, BlueprintCategory]
+    categories: Dict[ResourceCategoryIdentity, BlueprintCategory]
 
 
 def blueprint(request) -> Blueprint:
+    """Read schema for resources, scopes, and categories"""
     tr = request.translate
     return Blueprint(
         resources={
@@ -272,6 +273,7 @@ def permission(
 
 
 def permission_explain(request) -> JSONType:
+    """Explain effective resource permissions"""
     request.resource_permission(ResourceScope.read)
 
     req_scope = request.params.get("scope")
@@ -369,6 +371,7 @@ def search(
     *,
     serialization: Literal["resource", "full"] = "resource",
 ) -> AsJSON[List[CompositeRead]]:
+    """Search resources"""
     principal_id = request.GET.pop("owner_user__id", None)
 
     query = DBSession.query(Resource)

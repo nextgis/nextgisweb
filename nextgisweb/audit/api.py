@@ -84,21 +84,48 @@ def _select_fields(dcol, fields):
 def dbase(
     request,
     *,
-    format: QueryFormat,
-    eq: Optional[Timestamp] = None,
-    gt: Optional[Timestamp] = None,
-    ge: Optional[Timestamp] = None,
-    lt: Optional[Timestamp] = None,
-    le: Optional[Timestamp] = None,
-    fields: List[Field] = [],
-    filter: Optional[str] = None,
-    limit: Annotated[int, Meta(gt=0, le=MAX_ROWS)] = MAX_ROWS,
+    format: Annotated[QueryFormat, Meta(description="Response format")],
+    eq: Annotated[
+        Union[Timestamp, None],
+        Meta(description="Exact timestamp filter"),
+    ] = None,
+    gt: Annotated[
+        Union[Timestamp, None],
+        Meta(description="Exclusive newer filter (greater)"),
+    ] = None,
+    ge: Annotated[
+        Union[Timestamp, None],
+        Meta(description="Inclusive newer filter (greater or qual)"),
+    ] = None,
+    lt: Annotated[
+        Union[Timestamp, None],
+        Meta(description="Exclusive older filter (less)"),
+    ] = None,
+    le: Annotated[
+        Union[Timestamp, None],
+        Meta(description="Inclusive older filter (less or equal)"),
+    ] = None,
+    fields: Annotated[
+        List[Field],
+        Meta(description="Fields to return for array and CSV format"),
+    ] = [],
+    filter: Annotated[
+        Union[str, None],
+        Meta(description="Custom filter"),
+    ] = None,
+    limit: Annotated[
+        Annotated[int, Meta(gt=0, le=MAX_ROWS)],
+        Meta(description="Maximum number of records to return"),
+    ] = MAX_ROWS,
     comp: AuditComponent,
 ) -> AnyOf[
     AsJSON[List[AuditArrayLogEntry]],
     AsJSON[List[AuditObject]],
     Annotated[str, ContentType("text/csv")],
 ]:
+    """Read audit log entries from database storage
+
+    :returns: Audit log entries from older to newer"""
     request.require_administrator()
     require_backend("dbase")
 

@@ -24,6 +24,7 @@ class ResourceFavoriteSchemaItem(Struct):
 
 
 def schema(request) -> AsJSON[Dict[str, ResourceFavoriteSchemaItem]]:
+    """Read resource favorites schema"""
     tr = request.translate
     return {
         k: ResourceFavoriteSchemaItem(
@@ -46,6 +47,7 @@ class ResourceFavoriteRef(Struct, kw_only=True):
 
 
 def cpost(request, body: ResourceFavoriteCreate) -> ResourceFavoriteRef:
+    """Create resource favorite"""
     request.require_authenticated()
 
     data = to_builtins(body)
@@ -92,6 +94,7 @@ class ResourceFavoriteCollectionGetResponse(Struct):
 
 
 def cget(request) -> ResourceFavoriteCollectionGetResponse:
+    """Read resource favorites and related resources summary"""
     request.require_authenticated()
 
     query = Model.filter_by(user_id=request.user.id)
@@ -129,6 +132,7 @@ class FeatureFavoriteItemPutBody(Struct, kw_only=True):
 
 
 def iput(request, id: int, body: FeatureFavoriteItemPutBody) -> EmptyObject:
+    """Update resource favorite"""
     request.require_authenticated()
 
     obj = Model.filter_by(id=id, user_id=request.user.id).first()
@@ -140,6 +144,7 @@ def iput(request, id: int, body: FeatureFavoriteItemPutBody) -> EmptyObject:
 
 
 def idelete(request, id: int) -> EmptyObject:
+    """Delete resource favorite"""
     request.require_authenticated()
 
     if obj := Model.filter_by(id=id, user_id=request.user.id).first():
@@ -154,7 +159,7 @@ def setup_pyramid(comp, config):
     )
 
     cpost_body = Annotated[
-        Union[tuple(v.ctype for v in ResourceFavorite.registry.values())],  # type: ignore
+        Union[tuple(v.ctype for v in ResourceFavorite.registry.values())],
         TSExport(ResourceFavoriteCreate.__name__),
     ]
 

@@ -524,6 +524,7 @@ def logout(request) -> EmptyObject:
 
 
 def permission(request) -> AsJSON[Dict[PermissionItem, str]]:
+    """Read user permission schema"""
     tr = request.translate
     return {k: tr(v.label) for k, v in Permission.registry.items()}
 
