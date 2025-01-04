@@ -1,7 +1,6 @@
 import os
 from datetime import datetime, timedelta
 from shutil import rmtree
-from warnings import warn
 
 from nextgisweb.env import Component
 from nextgisweb.lib.config import Option, SizeInBytes
@@ -41,18 +40,6 @@ class FileUploadComponent(Component):
 
         view.setup_pyramid(self, config)
         api.setup_pyramid(self, config)
-
-    def get_filename(self, fileid, makedirs=False):
-        from .model import _filenames
-
-        warn(
-            "FileUploadComponent.get_filename is deprecated since 4.7.0.dev5. "
-            "Use FileUpoad.data_path and FileUpload.meta_path instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-
-        return tuple(str(p) for p in _filenames(fileid, makedirs=makedirs))
 
     def maintenance(self):
         super().maintenance()

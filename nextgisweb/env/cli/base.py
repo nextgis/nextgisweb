@@ -1,7 +1,6 @@
 import sys
 from importlib.util import find_spec
 from typing import Optional
-from warnings import warn
 
 import transaction
 
@@ -50,16 +49,6 @@ class EnvCommand(EnvOptions):
     env: Optional[Env] = None
     env_initialize: bool = True
     use_transaction: bool = False
-
-    @classmethod
-    def customize(cls, **kwargs):
-        warn(
-            "EnvCommand.customize is deprecated since 4.7.0.dev1. Use "
-            "InTransactionCommand or UninitializedEnvCommand instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return type("CustomCommand", (cls,), kwargs)
 
     def __enter__(self):
         self.env = environment._env

@@ -1,7 +1,6 @@
 import os
 from os.path import normpath, relpath
 from pathlib import Path
-from warnings import warn
 
 from nextgisweb.env import Component, inject
 from nextgisweb.lib.logging import logger
@@ -24,15 +23,6 @@ class WorkdirMixin:
             fwork.symlink_to(relative)
 
         return fwork
-
-    def workdir_filename(self, fobj: FileObj, *, makedirs=False) -> str:
-        warn(
-            f"{self.__class__.__name__}.workdir_filename is deprecated since "
-            f"4.7.0.dev7. Use {self.__class__.__name__}.workdir_path instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return str(self.workdir_path(fobj, makedirs=makedirs))
 
     def workdir_cleanup(self):
         logger.info("Cleaning up %s working directory...", self.__class__.__name__)
