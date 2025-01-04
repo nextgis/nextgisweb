@@ -2,7 +2,18 @@ import re
 from datetime import datetime
 from enum import Enum
 from inspect import Parameter, signature
-from typing import TYPE_CHECKING, Any, ClassVar, Dict, List, Literal, Optional, Tuple, Type, Union
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    ClassVar,
+    Dict,
+    List,
+    Literal,
+    Optional,
+    Tuple,
+    Type,
+    Union,
+)
 
 from msgspec import UNSET, Meta, Struct, UnsetType, convert, defstruct, field, to_builtins
 from pyramid.interfaces import IRoutesMapper
@@ -168,15 +179,11 @@ def cors_tween_factory(handler, registry):
     return cors_tween
 
 
-SettingsComponentGap = Gap[
-    Annotated[
-        Literal["pyramid", "unknown"],
-        Meta(description="Component identity"),
-    ]
-]
+SettingsComponentGap = Gap[Annotated[str, Meta(description="Component identity")]]
 
 
 def settings(request, *, component: SettingsComponentGap) -> AsJSON[Dict[str, Any]]:
+    """Read component settings"""
     comp = request.env.components[component]
     return comp.client_settings(request)
 
@@ -230,6 +237,7 @@ def healthcheck(
 
 
 def statistics(request) -> AsJSON[Dict[str, Dict[str, Any]]]:
+    """Compute and provide per-component statistics"""
     request.require_administrator()
 
     result = dict()
@@ -237,6 +245,16 @@ def statistics(request) -> AsJSON[Dict[str, Dict[str, Any]]]:
         if hasattr(comp, "query_stat"):
             result[comp.identity] = comp.query_stat()
     return result
+
+
+KindOfDataResponse = Gap[Type[Struct]]
+
+
+def kind_of_data(request) -> KindOfDataResponse:
+    """Read available kinds of data schema"""
+
+    tr = request.translate
+    return KindOfDataResponse(**{k: tr(v.display_name) for k, v in KindOfData.registry.items()})
 
 
 class StorageNotConfigured(NotConfigured):
@@ -249,39 +267,46 @@ def require_storage_enabled(*, core: CoreComponent):
         raise StorageNotConfigured
 
 
-def storage_estimate(request) -> EmptyObject:
-    request.require_administrator()
-    require_storage_enabled()
-    request.env.core.start_estimation()
-
-
-class StorageStatusResponse(Struct, kw_only=True):
-    estimation_running: bool
+class StorageEstimateGetResponse(Struct, kw_only=True):
+    active: bool
 
 
 @inject()
-def storage_status(request, *, core: CoreComponent) -> StorageStatusResponse:
+def storage_estimate_get(request, *, core: CoreComponent) -> StorageEstimateGetResponse:
+    """Check for storage estimation status"""
     request.require_administrator()
     require_storage_enabled()
-    return StorageStatusResponse(estimation_running=core.estimation_running())
+
+    return StorageEstimateGetResponse(active=core.estimation_running())
 
 
-class StorageResponseValue(Struct, kw_only=True):
+def storage_estimate_post(request) -> EmptyObject:
+    """Start full storage estimation"""
+    request.require_administrator()
+    require_storage_enabled()
+
+    request.env.core.start_estimation()
+
+
+StorageResponse = Gap[Type[Struct]]
+
+
+class StorageValue(Struct, kw_only=True):
     estimated: Optional[Annotated[datetime, Meta(tz=False)]]
     updated: Optional[Annotated[datetime, Meta(tz=False)]]
     data_volume: Annotated[int, Meta(gt=0)]
 
 
 @inject()
-def storage(request, *, core: CoreComponent) -> AsJSON[Dict[str, StorageResponseValue]]:
+def storage(request, *, core: CoreComponent) -> StorageResponse:
+    """Read storage usage"""
     request.require_administrator()
     require_storage_enabled()
-    return {kod: StorageResponseValue(**data) for kod, data in core.query_storage().items()}
 
+    data = core.query_storage()
+    data = {"total": data.pop(""), **data}
 
-def kind_of_data(request) -> AsJSON[Dict[str, str]]:
-    request.require_administrator()
-    return {k: request.translate(v.display_name) for k, v in KindOfData.registry.items()}
+    return StorageResponse(**{k: StorageValue(**v) for k, v in data.items()})
 
 
 def font_cread(request) -> AsJSON[List[Union[SystemFont, CustomFont]]]:
@@ -685,7 +710,7 @@ def setup_pyramid(comp, config):
 
     comps = comp.env.components.values()
     comp_ids = [comp.identity for comp in comps if hasattr(comp, "client_settings")]
-    fillgap(SettingsComponentGap, Literal[tuple(comp_ids)])  # type: ignore
+    fillgap(SettingsComponentGap, Literal[tuple(comp_ids)])
 
     config.add_route(
         "pyramid.settings",
@@ -724,22 +749,13 @@ def setup_pyramid(comp, config):
         get=statistics,
     )
 
-    config.add_route(
-        "pyramid.estimate_storage",
-        "/api/component/pyramid/storage/estimate",
-        post=storage_estimate,
-    )
-
-    config.add_route(
-        "pyramid.storage_status",
-        "/api/component/pyramid/storage/status",
-        get=storage_status,
-    )
-
-    config.add_route(
-        "pyramid.storage",
-        "/api/component/pyramid/storage",
-        get=storage,
+    fillgap(
+        KindOfDataResponse,
+        defstruct(
+            "KindOfDataResponse",
+            [(i, str) for i in KindOfData.registry.keys()],
+            kw_only=True,
+        ),
     )
 
     config.add_route(
@@ -747,6 +763,30 @@ def setup_pyramid(comp, config):
         "/api/component/pyramid/kind_of_data",
         load_types=True,
         get=kind_of_data,
+    )
+
+    fillgap(
+        StorageResponse,
+        defstruct(
+            "StorageResponse",
+            [("total", Annotated[StorageValue, Meta(description="Total storage usage")])]
+            + [(i, Union[StorageValue, UnsetType], UNSET) for i in KindOfData.registry.keys()],
+            kw_only=True,
+            rename={"total": ""},
+        ),
+    )
+
+    config.add_route(
+        "pyramid.estimate_storage",
+        "/api/component/pyramid/storage/estimate",
+        get=storage_estimate_get,
+        post=storage_estimate_post,
+    )
+
+    config.add_route(
+        "pyramid.storage",
+        "/api/component/pyramid/storage",
+        get=storage,
     )
 
     config.add_route(
