@@ -1,4 +1,8 @@
+@import "./font-fix.less";
+
 .swagger-ui > div {
+    font-family: var(--ngw-text-font-family);
+
     h3.opblock-tag {
         font-size: 18px;
     }
@@ -32,7 +36,7 @@
                     order: 2;
                     padding: unset;
                     max-width: unset;
-                    font-weight: unset;
+                    font-weight: normal;
                     font-size: 14px;
                 }
 
@@ -89,5 +93,9 @@
             > .opblock-summary-method {
             color: #50e3c2;
         }
+    }
+
+    .execute-wrapper:empty {
+        display: none;
     }
 }
