@@ -1,4 +1,5 @@
-import { makeAutoObservable, runInAction, toJS } from "mobx";
+import { some } from "lodash-es";
+import { action, computed, observable, toJS } from "mobx";
 
 import type { FeatureItemExtensions } from "@nextgisweb/feature-layer/type";
 import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
@@ -7,6 +8,7 @@ import { route } from "@nextgisweb/pyramid/api";
 import type { RouteBody } from "@nextgisweb/pyramid/api/type";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { AbortControllerHelper } from "@nextgisweb/pyramid/util/abort";
+import type { CompositeRead } from "@nextgisweb/resource/type/api";
 
 import type { NgwAttributeValue } from "../attribute-editor/type";
 import type { EditorStore, FeatureItem as FeatureItem_ } from "../type";
@@ -14,24 +16,27 @@ import type { EditorStore, FeatureItem as FeatureItem_ } from "../type";
 import type { FeatureEditorStoreOptions } from "./type";
 
 type FeatureItem = FeatureItem_<NgwAttributeValue>;
+type ExtensionStores = Record<string, EditorStore>;
 
 const msgSaved = gettext("Feature saved");
 const msgNoChanges = gettext("No changes to save");
 
 export class FeatureEditorStore {
-    resourceId: number;
-    featureId: number;
+    @observable accessor resourceId: number;
+    @observable accessor featureId: number | null = null;
 
-    saving = false;
+    @observable accessor saving = false;
+    @observable accessor initLoading = false;
 
-    initLoading = false;
-    fields: FeatureLayerFieldRead[] = [];
+    @observable.shallow accessor fields: FeatureLayerFieldRead[] = [];
 
     private _featureItem?: FeatureItem;
 
-    _abortController = new AbortControllerHelper();
-    private _extensionStores: Record<string, EditorStore> = {};
-    private _attributeStore: EditorStore | null = null;
+    private _abortController = new AbortControllerHelper();
+
+    @observable.shallow private accessor _attributeStore: EditorStore | null =
+        null;
+    @observable private accessor _extensionStores: ExtensionStores = {};
 
     constructor({ resourceId, featureId }: FeatureEditorStoreOptions) {
         if (resourceId === undefined) {
@@ -43,33 +48,32 @@ export class FeatureEditorStore {
         this.resourceId = resourceId;
         this.featureId = featureId;
 
-        makeAutoObservable(this, { _abortController: false, route: false });
-
         this.initLoading = true;
         this._initialize().finally(() => {
-            runInAction(() => {
-                this.initLoading = false;
-            });
+            this.initLoading = false;
         });
     }
 
+    @computed
     get route() {
-        return route("feature_layer.feature.item", {
-            id: this.resourceId,
-            fid: this.featureId,
-        });
+        if (typeof this.featureId === "number") {
+            return route("feature_layer.feature.item", {
+                id: this.resourceId,
+                fid: this.featureId,
+            });
+        }
     }
 
+    @computed
     get dirty(): boolean {
-        const attributesDirty =
-            this._attributeStore && this._attributeStore.dirty;
-        const extensionsDirty = Object.values(this._extensionStores)
-            .filter((s) => s.dirty !== undefined)
-            .some((s) => s.dirty);
+        const stores: { dirty: boolean }[] = [];
+        if (this._attributeStore) stores.push(this._attributeStore);
+        stores.push(...Object.values(this._extensionStores));
 
-        return attributesDirty || extensionsDirty;
+        return some(stores, ({ dirty }) => dirty);
     }
 
+    @action
     private _initialize = async () => {
         this._abort();
 
@@ -78,15 +82,12 @@ export class FeatureEditorStore {
         const resp = await route("resource.item", this.resourceId).get({
             signal,
         });
-        runInAction(() => {
-            const fields =
-                resp && resp.feature_layer && resp.feature_layer.fields;
-            if (fields) {
-                this.fields = fields;
-            }
-        });
-        if (this.featureId !== undefined) {
-            const featureItem = await this.route.get<FeatureItem>({
+        const fields = resp && resp.feature_layer && resp.feature_layer.fields;
+        if (fields) {
+            this.fields = fields;
+        }
+        if (this.route) {
+            const featureItem = await this.route?.get<FeatureItem>({
                 signal,
                 query: { dt_format: "iso" },
             });
@@ -95,20 +96,12 @@ export class FeatureEditorStore {
         return resp;
     };
 
-    save = async () => {
-        if (!this.dirty) {
-            message.success(msgNoChanges);
-            return;
-        }
-
+    preparePayload = () => {
         const extensions: Record<string, unknown> = {};
         for (const key in this._extensionStores) {
             const storeExtension = this._extensionStores[key];
             extensions[key] = toJS(storeExtension.value);
         }
-        runInAction(() => {
-            this.saving = true;
-        });
 
         const json: RouteBody<"feature_layer.feature.item", "put"> = {
             extensions,
@@ -117,27 +110,41 @@ export class FeatureEditorStore {
         if (this._attributeStore && this._attributeStore.dirty) {
             json.fields = toJS(this._attributeStore.value);
         }
+        return json;
+    };
+
+    @action
+    save = async (): Promise<CompositeRead | undefined> => {
+        if (!this.dirty) {
+            message.success(msgNoChanges);
+            return;
+        }
+
+        if (!this.route) {
+            return;
+        }
 
         try {
+            this.saving = true;
             await this.route.put({
                 query: { dt_format: "iso" },
-                json,
+                json: this.preparePayload(),
             });
             // To update initial feature value
             const resp = await this._initialize();
             message.success(msgSaved);
             return resp;
         } finally {
-            runInAction(() => {
-                this.saving = false;
-            });
+            this.saving = false;
         }
     };
 
+    @action
     destroy = () => {
         this._abort();
     };
 
+    @action
     attachAttributeStore = (attributeStore: EditorStore) => {
         this._attributeStore = attributeStore;
         if (this._featureItem) {
@@ -145,6 +152,7 @@ export class FeatureEditorStore {
         }
     };
 
+    @action
     addExtensionStore = (key: string, extensionStore: EditorStore) => {
         this._extensionStores[key] = extensionStore;
         if (this._featureItem) {
@@ -154,32 +162,34 @@ export class FeatureEditorStore {
         }
     };
 
+    @action
     reset = () => {
         if (this._featureItem) {
             this._setFeatureItem(this._featureItem);
         }
     };
 
+    @action
     private _setStoreValues(featureItem: FeatureItem) {
         this._setExtensionsValue(featureItem.extensions);
         this._setAttributesValue(featureItem.fields);
     }
 
+    @action
     private _setAttributesValue(attributes: NgwAttributeValue) {
         if (this._attributeStore) {
             this._attributeStore.load(attributes);
         }
     }
 
+    @action
     private _setExtensionsValue(
         extensions: FeatureItemExtensions,
         { include }: { include?: string[] } = {}
     ) {
         for (const key in extensions) {
-            if (include) {
-                if (!include.includes(key)) {
-                    continue;
-                }
+            if (include && !include.includes(key)) {
+                continue;
             }
             const extension = extensions[key];
             const extensionStore = this._extensionStores[key];
@@ -189,10 +199,9 @@ export class FeatureEditorStore {
         }
     }
 
+    @action
     private _setFeatureItem(featureItem: FeatureItem): void {
-        runInAction(() => {
-            this._featureItem = featureItem;
-        });
+        this._featureItem = featureItem;
         this._setStoreValues(featureItem);
     }
 
