@@ -3,7 +3,7 @@ import { makeAutoObservable } from "mobx";
 import type { LoginResponse } from "@nextgisweb/auth/type/api";
 import { extractError } from "@nextgisweb/gui/error";
 import type { ApiError } from "@nextgisweb/gui/error/type";
-import entrypoint from "@nextgisweb/jsrealm/entrypoint";
+import reactApp from "@nextgisweb/gui/react-app";
 import { route } from "@nextgisweb/pyramid/api";
 
 import type { Credentials, LoginFormProps } from "../login/type";
@@ -54,12 +54,7 @@ class AuthStore {
 
     async runApp(props: LoginFormProps, el: HTMLDivElement) {
         this.showLoginModal = false; // Do not show new modal on "Sign in" click
-        const [{ default: reactApp }, { LoginBox }] = await Promise.all([
-            entrypoint<{
-                default: typeof import("@nextgisweb/gui/react-app").default;
-            }>("@nextgisweb/gui/react-app"),
-            import("../login"),
-        ]);
+        const { LoginBox } = await import("../login");
         reactApp(LoginBox, props, el);
     }
 
