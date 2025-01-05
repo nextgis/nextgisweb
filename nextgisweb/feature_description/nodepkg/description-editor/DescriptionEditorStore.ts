@@ -1,33 +1,35 @@
-import { makeAutoObservable, toJS } from "mobx";
+import { action, computed, observable } from "mobx";
 
 import type { EditorStore as IEditorStore } from "@nextgisweb/feature-layer/type";
 
-class EditorStore implements IEditorStore<string | null> {
-    _initValue: string | null = null;
+type Value = string | null;
 
-    private _value: string | null = null;
+class EditorStore implements IEditorStore<Value> {
+    @observable private accessor _value: Value = null;
+    @observable private accessor _initValue: Value = null;
 
-    constructor() {
-        makeAutoObservable(this);
-    }
-
+    @computed
     get dirty() {
         return this.value !== this._initValue;
     }
 
-    get value(): string | null {
+    @computed
+    get value(): Value {
         return this._value;
     }
 
-    set value(val: string | null) {
-        this._value = val;
+    @action
+    update(value: Value) {
+        this._value = value;
     }
 
-    load = (value: string | null) => {
-        this.value = value;
-        this._initValue = toJS(value);
+    @action
+    load = (value: Value) => {
+        this._value = value;
+        this._initValue = value;
     };
 
+    @action
     reset = () => {
         this.load(this._initValue);
     };

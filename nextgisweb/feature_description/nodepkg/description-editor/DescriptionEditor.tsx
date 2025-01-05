@@ -9,15 +9,14 @@ import type EditorStore from "./DescriptionEditorStore";
 
 const DescriptionEditor = observer(
     ({ store }: EditorWidgetProps<EditorStore>) => {
-        const [store_] = useState(() => store || new DescriptionEditorStore());
+        const [store_] = useState<DescriptionEditorStore>(() => {
+            if (store) return store;
+            return new DescriptionEditorStore();
+        });
 
         const onChange = useCallback(
             (val: string) => {
-                if (val) {
-                    store_.value = val;
-                } else {
-                    store_.value = null;
-                }
+                store_.update(val ? val : null);
             },
             [store_]
         );
