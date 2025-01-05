@@ -12,7 +12,7 @@ import "./ImageThumbnail.less";
 export type ImageThumbnailProps = {
     attachment: DataSource;
     resourceId: number;
-    featureId: number;
+    featureId: number | null;
     previewSize?: string;
     width?: number;
     height?: number;
@@ -39,7 +39,7 @@ export const ImageThumbnail = ({
                 const file_ = newAttachment._file as File;
                 const url_ = await getFileImage(file_);
                 setUrl(url_);
-            } else {
+            } else if (typeof featureId === "number") {
                 const attachment_ = attachment as FeatureAttachment;
                 const { url: url_ } = getFeatureImage({
                     featureId,
@@ -52,7 +52,7 @@ export const ImageThumbnail = ({
             }
         }
         fetchImage();
-    }, []);
+    }, [attachment, featureId, height, resourceId, width]);
 
     return (
         <div

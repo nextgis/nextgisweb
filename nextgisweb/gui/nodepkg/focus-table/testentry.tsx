@@ -9,6 +9,7 @@ import { Input, InputValue } from "@nextgisweb/gui/antd";
 import { LotMV, firstError, mapper, validate } from "@nextgisweb/gui/arm";
 import type { ErrorResult } from "@nextgisweb/gui/arm";
 import { FieldsForm, useForm } from "@nextgisweb/gui/fields-form";
+import type { FormField } from "@nextgisweb/gui/fields-form";
 import {
     FocusTable,
     action,
@@ -170,9 +171,15 @@ const GroupComponent = observer<{
     );
 });
 
+type LayerFormValues = {
+    title: string;
+    foo: string;
+    bar: string;
+};
+
 function LayerComponent({ item }: { item: Layer }) {
-    const form = useForm<Layer>()[0];
-    const fields = useMemo(
+    const form = useForm<LayerFormValues>()[0];
+    const fields = useMemo<FormField<keyof LayerFormValues>[]>(
         () => [
             { name: "title", label: "Title", formItem: <Input /> },
             { name: "foo", label: "Foo", formItem: <Input /> },

@@ -11,18 +11,18 @@ import "./CarouselModal.less";
 interface CarouselModalOptions extends ShowModalOptions {
     dataSource: DataSource[];
     attachment: DataSource;
-    featureId: number;
+    featureId: number | null;
     resourceId: number;
 }
 
-export const CarouselModal = ({
+export function CarouselModal({
     open,
     close,
     dataSource,
     attachment,
     featureId,
     resourceId,
-}: CarouselModalOptions) => {
+}: CarouselModalOptions) {
     return (
         <Modal
             rootClassName="ngw-feature-attachment-carousel-modal"
@@ -41,4 +41,4 @@ export const CarouselModal = ({
             />
         </Modal>
     );
-};
+}

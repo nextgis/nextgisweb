@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { Input, Select } from "@nextgisweb/gui/antd";
+import type { FormInstance } from "@nextgisweb/gui/antd";
 import { FieldsForm } from "@nextgisweb/gui/fields-form";
 import type { FieldsFormProps, FormField } from "@nextgisweb/gui/fields-form";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -24,10 +25,11 @@ interface SrsFormValue {
 }
 
 interface SRSImportFromProps
-    extends Omit<FieldsFormProps, "fields" | "onChange"> {
+    extends Omit<FieldsFormProps, "fields" | "onChange" | "form"> {
     format: string;
     projStr: string;
-    form: NonNullable<FieldsFormProps["form"]>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    form: FormInstance<any>;
     onChange?: (arg: (val: SrsFormValue) => SrsFormValue) => void;
 }
 

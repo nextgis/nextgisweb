@@ -72,9 +72,13 @@ export function FieldsForm<
                     {children}
                 </FieldsFormVirtualized>
             ) : (
-                includedFields.map((f) => <FormItem key={f.name} {...f} />)
+                <>
+                    {includedFields.map((f) => (
+                        <FormItem key={f.name} {...f} />
+                    ))}
+                    {children}
+                </>
             )}
-            {children}
         </Form>
     );
 }

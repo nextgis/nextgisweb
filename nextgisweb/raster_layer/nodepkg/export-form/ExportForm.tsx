@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Select } from "@nextgisweb/gui/antd";
-import type { OptionType } from "@nextgisweb/gui/antd";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
 import type { ApiError } from "@nextgisweb/gui/error/type";
@@ -15,8 +14,13 @@ import type { SRSRead } from "@nextgisweb/spatial-ref-sys/type/api";
 
 interface ExporFormValues {
     format: string;
-    srs: string;
-    bands: string[];
+    srs: number;
+    bands: number[];
+}
+
+interface OptionType {
+    label: React.ReactNode;
+    value: number;
 }
 
 const srsListToOptions = (srsList: SRSRead[]): OptionType[] => {
