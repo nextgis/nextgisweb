@@ -3,10 +3,10 @@ import { useCallback, useEffect, useState } from "react";
 
 import { Select, Switch } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import type { ReactPanelComponentProps } from "@nextgisweb/webmap/panels-manager/type";
 import AnnotationsStore from "@nextgisweb/webmap/store/annotations";
 import type { VisibleMode } from "@nextgisweb/webmap/store/annotations/AnnotationsStore";
 import type { DisplayConfig } from "@nextgisweb/webmap/type";
-import type { ReactPanel } from "@nextgisweb/webmap/ui/react-panel/ReactPanel";
 
 import { PanelHeader } from "../header";
 
@@ -21,8 +21,7 @@ interface AnnotationFilter {
     private: boolean;
 }
 
-interface AnnotationsPanelProps
-    extends Pick<ReactPanel, "display" | "title" | "close" | "mapStates"> {
+interface AnnotationsPanelProps extends ReactPanelComponentProps {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onTopicPublish: (val: [string, any?]) => void;
     initialAnnotVisible?: VisibleMode;
@@ -30,8 +29,8 @@ interface AnnotationsPanelProps
 
 const ADD_ANNOTATION_STATE_KEY = "addAnnotation";
 
-export const AnnotationsPanel: React.FC<AnnotationsPanelProps> = observer(
-    ({ display, title, close, mapStates, onTopicPublish }) => {
+const AnnotationsPanel = observer(
+    ({ display, title, close, onTopicPublish }: AnnotationsPanelProps) => {
         const [visible, setVisible] = useState(AnnotationsStore.visibleMode);
         const [editable, setEditable] = useState(false);
         const [edit, setEdit] = useState(false);
@@ -58,19 +57,19 @@ export const AnnotationsPanel: React.FC<AnnotationsPanelProps> = observer(
         const changeEdit = useCallback(
             (beginEdit: boolean) => {
                 if (beginEdit) {
-                    mapStates.activateState(ADD_ANNOTATION_STATE_KEY);
+                    display.mapStates.activateState(ADD_ANNOTATION_STATE_KEY);
                     changeVisible("messages");
                     onTopicPublish([
                         "webmap/annotations/add/activate",
                         geomType,
                     ]);
                 } else {
-                    mapStates.deactivateState(ADD_ANNOTATION_STATE_KEY);
+                    display.mapStates.deactivateState(ADD_ANNOTATION_STATE_KEY);
                     onTopicPublish(["webmap/annotations/add/deactivate"]);
                 }
                 setEdit(beginEdit);
             },
-            [changeVisible, geomType, mapStates, onTopicPublish]
+            [changeVisible, display.mapStates, geomType, onTopicPublish]
         );
 
         const changeGeomType = useCallback(
@@ -106,22 +105,22 @@ export const AnnotationsPanel: React.FC<AnnotationsPanelProps> = observer(
 
             const _editable = scope.write;
             setEditable(_editable);
-            if (_editable) mapStates.addState(ADD_ANNOTATION_STATE_KEY);
-        }, [changeVisible, display, mapStates]);
+            if (_editable) display.mapStates.addState(ADD_ANNOTATION_STATE_KEY);
+        }, [changeVisible, display]);
 
         useEffect(() => {
             if (
                 visible === "no" &&
                 edit &&
-                mapStates.getActiveState() === ADD_ANNOTATION_STATE_KEY
+                display.mapStates.getActiveState() === ADD_ANNOTATION_STATE_KEY
             ) {
                 changeEdit(false);
             }
-        }, [visible, edit, mapStates, changeEdit]);
+        }, [visible, edit, changeEdit, display.mapStates]);
 
         if (
             visible === undefined ||
-            mapStates === undefined ||
+            display.mapStates === undefined ||
             annScope === undefined
         ) {
             return null;
@@ -243,3 +242,5 @@ export const AnnotationsPanel: React.FC<AnnotationsPanelProps> = observer(
 );
 
 AnnotationsPanel.displayName = "AnnotationsPanel";
+
+export default AnnotationsPanel;

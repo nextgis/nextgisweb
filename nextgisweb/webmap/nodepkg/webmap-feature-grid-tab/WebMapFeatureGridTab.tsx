@@ -15,17 +15,18 @@ import FilterExtentBtn from "@nextgisweb/webmap/filter-extent-btn";
 import type { FeatureLayerWebMapPluginConfig } from "@nextgisweb/webmap/plugin/type";
 import ZoomToFilteredBtn from "@nextgisweb/webmap/zoom-to-filtered-btn";
 
+import type ShadowDisplay from "../compat/ShadowDisplay";
 import type {
     DisplayItemConfig,
     DojoTopic,
     TopicSubscription,
 } from "../panels-manager/type";
-import type { DojoDisplay } from "../type";
+import type { PluginBase } from "../plugin/PluginBase";
 
 const msgGoto = gettext("Go to");
 
 interface WebMapFeatureGridTabProps {
-    plugin: Record<string, unknown>;
+    plugin: PluginBase;
     layerId: number;
     topic: DojoTopic;
 }
@@ -37,12 +38,10 @@ export function WebMapFeatureGridTab({
 }: WebMapFeatureGridTabProps) {
     const topicHandlers = useRef<TopicSubscription[]>([]);
 
-    const display = useRef<DojoDisplay>(plugin.display as DojoDisplay);
-    const itemConfig = useRef<DisplayItemConfig>(
-        display.current.get("itemConfig") as DisplayItemConfig
-    );
+    const display = useRef<ShadowDisplay>(plugin.display);
+    const itemConfig = useRef<DisplayItemConfig>(display.current.itemConfig);
     const data = useRef<FeatureLayerWebMapPluginConfig>(
-        itemConfig.current.plugin[
+        itemConfig.current?.plugin[
             plugin.identity as string
         ] as FeatureLayerWebMapPluginConfig
     );

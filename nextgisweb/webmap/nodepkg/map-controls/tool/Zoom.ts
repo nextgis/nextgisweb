@@ -3,13 +3,13 @@ import { DragZoom } from "ol/interaction";
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { html as iconHtml } from "@nextgisweb/pyramid/icon";
-import type { DojoDisplay } from "@nextgisweb/webmap/type";
+import type ShadowDisplay from "@nextgisweb/webmap/compat/ShadowDisplay";
 
 import { Base } from "./ToolBase";
 import "./Zoom.css";
 
 interface ZoomOptions {
-    display: DojoDisplay;
+    display: ShadowDisplay;
     out?: boolean;
 }
 
@@ -40,13 +40,13 @@ export class ToolZoom extends Base {
 
     activate() {
         this.interaction.setActive(true);
-        this.display.mapContainer.domNode.style.cursor = this.out
+        this.display.map.olMap.getTargetElement().style.cursor = this.out
             ? "zoom-out"
             : "zoom-in";
     }
 
     deactivate() {
         this.interaction.setActive(false);
-        this.display.mapContainer.domNode.style.cursor = "auto";
+        this.display.map.olMap.getTargetElement().style.cursor = "auto";
     }
 }

@@ -12,7 +12,7 @@ const msgTipIdent = gettext(
     "To get feature information, click on the map with the left mouse button. Make sure that other tools are turned off."
 );
 
-export function IdentificationPanel({
+export default function IdentificationPanel({
     display,
     identifyInfo,
     title,

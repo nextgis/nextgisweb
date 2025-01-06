@@ -1,13 +1,9 @@
-import type {
-    DojoDisplay,
-    PluginMenuItem,
-    PluginParams,
-    PluginState,
-} from "../type";
+import type ShadowDisplay from "../compat/ShadowDisplay";
+import type { PluginMenuItem, PluginParams, PluginState } from "../type";
 import type { LayerItemConfig, LayerType } from "../type/TreeItems";
 
 export abstract class PluginBase {
-    display: DojoDisplay;
+    display: ShadowDisplay;
     identity: string;
     type: LayerType = "layer";
 

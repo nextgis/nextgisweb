@@ -1,6 +1,6 @@
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { html as htmlIcon } from "@nextgisweb/pyramid/icon";
-import type { DojoDisplay } from "@nextgisweb/webmap/type";
+import type ShadowDisplay from "@nextgisweb/webmap/compat/ShadowDisplay";
 
 import { Swipe } from "../control/SwipeControl";
 
@@ -18,7 +18,7 @@ export class ToolSwipe extends Base {
         display,
         orientation = "horizontal",
     }: {
-        display: DojoDisplay;
+        display: ShadowDisplay;
         orientation: "vertical" | "horizontal";
     }) {
         super({ display });
@@ -53,7 +53,7 @@ export class ToolSwipe extends Base {
     private updateControlLayers() {
         this.control.removeLayers(this.control.layers);
 
-        const itemConfig = this.display.get("itemConfig");
+        const itemConfig = this.display.itemConfig;
         if (itemConfig && itemConfig.type === "layer") {
             const layer = this.display.map.layers[itemConfig.id]?.olLayer;
             if (layer) {
