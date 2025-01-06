@@ -1,5 +1,5 @@
+import type { MapStatesObserver } from "../map-state-observer/MapStatesObserver";
 import type { DojoDisplay, PanelClsParams } from "../type";
-import type { MapStatesObserver } from "../type/MapState";
 
 export interface PanelProps extends PanelClsParams {
     display: DojoDisplay;
