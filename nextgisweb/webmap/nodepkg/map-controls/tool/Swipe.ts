@@ -4,7 +4,7 @@ import type { DojoDisplay } from "@nextgisweb/webmap/type";
 
 import { Swipe } from "../control/SwipeControl";
 
-import { Base } from "./Base";
+import { Base } from "./ToolBase";
 
 export class ToolSwipe extends Base {
     orientation: "vertical" | "horizontal";
