@@ -295,12 +295,12 @@ const FeatureSelector = ({
 
     const onSelectChange = (
         value: string,
-        featureInfoSelected: FeatureInfo | FeatureInfo[]
+        featureInfoSelected: FeatureInfo | FeatureInfo[] | undefined
     ) => {
         const selected = Array.isArray(featureInfoSelected)
             ? featureInfoSelected[0]
             : featureInfoSelected;
-        onFeatureChange(selected);
+        onFeatureChange(selected as FeatureInfo);
     };
 
     return (

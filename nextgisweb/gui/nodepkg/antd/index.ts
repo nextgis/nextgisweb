@@ -45,6 +45,7 @@ export {
     Slider,
     Space,
     Spin,
+    Splitter,
     Statistic,
     Steps,
     Switch,

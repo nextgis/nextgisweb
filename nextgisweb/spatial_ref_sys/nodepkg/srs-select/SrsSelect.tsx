@@ -29,7 +29,7 @@ export const SrsSelect = ({
     );
 
     const onChangeSelect = useCallback(
-        (value: number, type: OptionType | OptionType[]) => {
+        (value: number, type?: OptionType | OptionType[]) => {
             if (onChange) {
                 onChange(value, type);
             }
