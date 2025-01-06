@@ -22,12 +22,3 @@ declare const COMP_ID: string;
 /** Fully quallified module name of the current file without an extension like
  * "@nextgisweb/jsrealm/plugin/registry" */
 declare const MODULE_NAME: string;
-
-// svg.d.ts
-declare module "*.svg" {
-    export const ReactComponent: React.FunctionComponent<
-        React.SVGProps<SVGSVGElement> & { title?: string }
-    >;
-    const src: { id: string };
-    export default src;
-}
