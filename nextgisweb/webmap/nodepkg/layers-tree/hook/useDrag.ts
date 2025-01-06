@@ -2,7 +2,10 @@ import type { TreeProps } from "@nextgisweb/gui/antd";
 import { countNodes, traverseTree } from "@nextgisweb/gui/util/tree";
 
 import type WebmapStore from "../../store";
-import type { TreeItem } from "../../type/TreeItems";
+import type {
+    TreeChildrenItemConfig,
+    TreeItemConfig,
+} from "../../type/TreeItems";
 
 type TreeNodeData = NonNullable<TreeProps["treeData"]>[0];
 
@@ -23,9 +26,9 @@ export function useDrag({ store, setLayerZIndex }: UseDragProps) {
         const dropPos = info.node.pos.split("-");
         const dropPosition =
             info.dropPosition - Number(dropPos[dropPos.length - 1]);
-        const data = [...store.webmapItems] as TreeItem[];
+        const data = [...store.webmapItems] as TreeChildrenItemConfig[];
 
-        let dragObj: TreeItem | undefined;
+        let dragObj: TreeChildrenItemConfig | undefined;
 
         traverseTree(data, (item, index, arr) => {
             if (item.key === dragKey) {
@@ -36,9 +39,9 @@ export function useDrag({ store, setLayerZIndex }: UseDragProps) {
         });
 
         if (dragObj) {
-            const insertItem = (item: TreeItem) => {
-                if ("children" in item) {
-                    item.children.unshift(dragObj as TreeItem);
+            const insertItem = (item: TreeChildrenItemConfig) => {
+                if ("children" in item && dragObj) {
+                    item.children.unshift(dragObj);
                 }
             };
 
@@ -48,7 +51,7 @@ export function useDrag({ store, setLayerZIndex }: UseDragProps) {
                     (item) => item.key === dropKey && insertItem(item)
                 );
             } else {
-                let ar: TreeItem[] = [];
+                let ar: TreeItemConfig[] = [];
                 let i: number = 0;
                 traverseTree(data, (item, index, arr) => {
                     if (item.key === dropKey) {

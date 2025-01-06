@@ -41,25 +41,29 @@ export class ReactPanel<
     order = 0;
     splitter = true;
     mapStates!: MapStatesObserver;
-    content!: unknown;
+    content!: string;
     props?: Omit<P, keyof ReactPanelComponentProps>;
+
     set = (_key: string, _value: unknown) => {
-        console.log(`Handle 'set' action for ${_key}`);
+        console.warn(`Handle 'set' action for ${_key}`);
     };
 
+    // @ts-expect-error --- dispose of it
     on = (eventName: string, _callback: (panel: PanelDojoItem) => void) => {
-        console.log(`Handle 'on' event for ${eventName}`);
+        console.warn(`Handle 'on' event for ${eventName}`);
     };
+    // @ts-expect-error --- dispose of it
     addChild = (_child: DojoItem) => {
-        console.log(`Handle 'addChild' action`);
+        console.warn(`Handle 'addChild' action`);
     };
+    // @ts-expect-error --- dispose of it
     get = (val: string) => {
-        console.log(`Handle 'get' action for ${val}`);
+        console.warn(`Handle 'get' action for ${val}`);
         return;
     };
-
+    // @ts-expect-error --- dispose of it
     removeChild = (_elem: PanelDojoItem) => {
-        console.log("Handle `removeChild` action");
+        console.warn("Handle `removeChild` action");
     };
 
     app?: ReactAppReturn<P | ReactPanelComponentProps>;

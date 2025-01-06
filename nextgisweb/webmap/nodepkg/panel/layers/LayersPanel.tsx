@@ -46,7 +46,9 @@ export function LayersPanel({ title, close, display, ...props }: LayersPanel) {
                 <BasemapSelector
                     map={display.map}
                     basemapDefault={display._getActiveBasemapKey()}
-                    onChange={(key) => display._switchBasemap(key)}
+                    onChange={(key) => {
+                        display._switchBasemap(key);
+                    }}
                 />
             </div>
         </div>

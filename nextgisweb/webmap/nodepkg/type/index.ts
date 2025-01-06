@@ -6,13 +6,10 @@ import type { ReactPanelComponentPropType } from "../panels-manager/type";
 import type reactPanel from "../ui/react-panel";
 
 import type { DojoDisplay } from "./DojoDisplay";
-import type { TreeItem } from "./TreeItems";
 
 export * from "./DisplayConfig";
 export * from "./DojoDisplay";
 export * from "./WebmapItem";
-export * from "./WebmapLayer";
-export * from "./WebmapPlugin";
 
 export interface DojoItem {
     set: (key: string, value: unknown) => void;
@@ -21,25 +18,6 @@ export interface DojoItem {
     addChild: (child: DojoItem) => void;
     get: (val: string) => unknown;
     removeChild: (elem: PanelDojoItem) => void;
-}
-
-export type StoreItem = dojo.data.api.Item & TreeItem;
-
-export interface WebmapItem {
-    checked: boolean;
-    id: number;
-    identifiable: boolean;
-    label: string;
-    layerId: number;
-    position: unknown;
-    styleId: number;
-    type: string;
-    visibility: boolean;
-    symbols: string[];
-}
-
-export interface CustomItemFileWriteStore extends dojo.data.ItemFileWriteStore {
-    dumpItem: (item: StoreItem) => WebmapItem;
 }
 
 export interface PanelClsParams {
@@ -67,7 +45,7 @@ export interface AddpanelItem {
 
 export interface PanelDojoItem<
     P extends ReactPanelComponentPropType = ReactPanelComponentPropType,
-> extends DojoItem {
+> extends dijit.layout.ContentPane {
     display: DojoDisplay;
     name: string;
     menuIcon?: string;

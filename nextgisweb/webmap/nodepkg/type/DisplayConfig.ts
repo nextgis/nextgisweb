@@ -2,7 +2,7 @@ import type { BasemapLayerRead } from "@nextgisweb/basemap/type/api";
 
 import type { VisibleMode } from "../store/annotations/AnnotationsStore";
 
-import type { GroupItem } from "./TreeItems";
+import type { GroupItemConfig } from "./TreeItems";
 
 interface Scope {
     read: boolean;
@@ -45,8 +45,8 @@ interface ItemsStates {
 
 export interface DisplayConfig {
     extent: number[];
-    extent_const: null[];
-    rootItem: GroupItem;
+    extent_const: number[];
+    rootItem: GroupItemConfig;
     itemsStates: ItemsStates;
     mid: Mid;
     webmapPlugin: WebmapPluginConfig;

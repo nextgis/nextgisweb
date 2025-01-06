@@ -24,7 +24,7 @@ import type {
     PluginParams,
     PluginState,
 } from "@nextgisweb/webmap/type";
-import type { LayerItem } from "@nextgisweb/webmap/type/TreeItems";
+import type { LayerItemConfig } from "@nextgisweb/webmap/type/TreeItems";
 
 import { EditingToolbar } from "../../map-controls/control/editing/EditingToolbar";
 import MapStatesObserverSingleton from "../../map-state-observer";
@@ -87,7 +87,7 @@ export class LayerEditor extends PluginBase {
         this.initializeComponents();
     }
 
-    getPluginState(nodeData: LayerItem): PluginState {
+    getPluginState(nodeData: LayerItemConfig): PluginState {
         const state = super.getPluginState(nodeData);
         return {
             ...state,
@@ -99,7 +99,7 @@ export class LayerEditor extends PluginBase {
         };
     }
 
-    async run(nodeData: LayerItem): Promise<boolean | undefined> {
+    async run(nodeData: LayerItemConfig): Promise<boolean | undefined> {
         if (nodeData.editable) {
             return new Promise((resolve) => {
                 this.resolve = resolve;
@@ -112,7 +112,7 @@ export class LayerEditor extends PluginBase {
         }
     }
 
-    getMenuItem(nodeData: LayerItem): PluginMenuItem {
+    getMenuItem(nodeData: LayerItemConfig): PluginMenuItem {
         const active = nodeData.editable === true;
         const title = active ? gettext("Stop editing") : gettext("Edit");
 
@@ -174,7 +174,7 @@ export class LayerEditor extends PluginBase {
         this.lastEditingState = LayerEditor.CREATING_STATE_KEY;
     }
 
-    private setItemEditable(nodeData: LayerItem, status: boolean) {
+    private setItemEditable(nodeData: LayerItemConfig, status: boolean) {
         const webmapItems = [...this.display.webmapStore.webmapItems];
 
         const editableItem = webmapItems.find(
@@ -288,7 +288,7 @@ export class LayerEditor extends PluginBase {
         return true;
     }
 
-    private startEditing(nodeData: LayerItem): void {
+    private startEditing(nodeData: LayerItemConfig): void {
         this.editingItem = this.buildEditingItem(nodeData);
         this.showEditingControls();
         this.setDefaultEditMode();
@@ -305,7 +305,7 @@ export class LayerEditor extends PluginBase {
         });
     }
 
-    private buildEditingItem(nodeData: LayerItem): EditingItem {
+    private buildEditingItem(nodeData: LayerItemConfig): EditingItem {
         if (!this.selectedResourceId) throw new Error("No resource selected");
 
         const editingItem: EditingItem = {
@@ -324,7 +324,7 @@ export class LayerEditor extends PluginBase {
     }
 
     private buildEditingItemInteractions(editingItem: EditingItem): void {
-        const itemConfig = this.display.get("itemConfig") as LayerItem;
+        const itemConfig = this.display.get("itemConfig") as LayerItemConfig;
         const pluginConfig = itemConfig.plugin[this.identity];
         const pluginGeometryType = pluginConfig.geometry_type as GeometryType;
 
@@ -610,7 +610,14 @@ export class LayerEditor extends PluginBase {
 
             this.deactivateEditingControls();
             this.removeCurrentEditingItem();
-            this.display.webmapStore.getLayer(this.display.item.id).reload();
+
+            const layer = this.display.webmapStore.getLayer(
+                this.display.itemStore.getValue(this.display.item, "id")
+            );
+
+            if (layer) {
+                layer.reload();
+            }
             if (this.selectedResourceId !== null) {
                 topic.publish(
                     "/webmap/feature-table/refresh",
