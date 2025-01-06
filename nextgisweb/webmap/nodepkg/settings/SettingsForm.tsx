@@ -13,7 +13,9 @@ import {
     Tooltip,
     Typography,
 } from "@nextgisweb/gui/antd";
+import type { OptionType } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import type { WebMapCSettingsUpdate } from "@nextgisweb/webmap/type/api";
 
 import {
     AddressGeocoderOptions,
@@ -30,9 +32,8 @@ const { Title } = Typography;
 
 const INPUT_DEFAULT_WIDTH = { width: "100%" };
 
-const experimentalPanelMsg = gettext(
-    "Use panel instead of popup identification"
-);
+// prettier-ignore
+const experimentalPanelMsg = gettext("Use panel instead of popup identification");
 
 const experimentalPanel = (
     <Tooltip title={experimentalPanelMsg}>
@@ -40,17 +41,24 @@ const experimentalPanel = (
     </Tooltip>
 );
 
-export const SettingsForm = ({
+interface SettingsFormProps {
+    onFinish: (values: WebMapCSettingsUpdate) => void;
+    initialValues?: WebMapCSettingsUpdate;
+    srsOptions: OptionType[];
+    status: string;
+}
+
+export const SettingsForm: React.FC<SettingsFormProps> = ({
     onFinish,
     initialValues,
     srsOptions,
     status,
 }) => {
-    const [geocoder, setGeocoder] = useState(
-        initialValues.address_geocoder || "nominatim"
-    );
+    const [geocoder, setGeocoder] = useState<
+        WebMapCSettingsUpdate["address_geocoder"]
+    >(initialValues?.address_geocoder || "nominatim");
 
-    const onValuesChange = (changedValues, allValues) => {
+    const onValuesChange = (allValues: WebMapCSettingsUpdate) => {
         setGeocoder(allValues.address_geocoder);
     };
 
@@ -97,7 +105,7 @@ export const SettingsForm = ({
                             },
                         ]}
                     >
-                        <InputNumber min="100" style={INPUT_DEFAULT_WIDTH} />
+                        <InputNumber min={100} style={INPUT_DEFAULT_WIDTH} />
                     </Form.Item>
                 </Col>
                 <Col span={8}>
@@ -110,7 +118,7 @@ export const SettingsForm = ({
                             },
                         ]}
                     >
-                        <InputNumber min="100" style={INPUT_DEFAULT_WIDTH} />
+                        <InputNumber min={100} style={INPUT_DEFAULT_WIDTH} />
                     </Form.Item>
                 </Col>
                 <Col span={8}>
@@ -123,7 +131,7 @@ export const SettingsForm = ({
                             },
                         ]}
                     >
-                        <InputNumber min="1" style={INPUT_DEFAULT_WIDTH} />
+                        <InputNumber min={1} style={INPUT_DEFAULT_WIDTH} />
                     </Form.Item>
                 </Col>
             </Row>
@@ -279,9 +287,10 @@ export const SettingsForm = ({
                                     ),
                                     message: (
                                         <div>
-                                            {gettext(
-                                                "Invalid countries. For example ru or gb,de"
-                                            )}
+                                            {
+                                                // prettier-ignore
+                                                gettext("Invalid countries. For example ru or gb,de")
+                                            }
                                         </div>
                                     ),
                                 },
@@ -306,8 +315,10 @@ export const SettingsForm = ({
                 <Col span={8}>
                     <Form.Item
                         name="legend_symbols"
-                        normalize={(val) => (val === "default" ? null : val)}
-                        getValueProps={(val) => {
+                        normalize={(val: string) =>
+                            val === "default" ? null : val
+                        }
+                        getValueProps={(val: string) => {
                             val = !val ? "default" : val;
                             return { value: val };
                         }}
