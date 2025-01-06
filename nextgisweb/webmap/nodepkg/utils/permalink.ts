@@ -2,11 +2,11 @@ import type { Coordinate } from "ol/coordinate";
 import { toLonLat } from "ol/proj";
 
 import type { StoreItem } from "../compat/CustomItemFileWriteStore";
-import type ShadowDisplay from "../compat/ShadowDisplay";
+import type { Display } from "../display";
 import type { VisibleMode } from "../store/annotations/AnnotationsStore";
 
 export interface GetPermalinkOptions {
-    display: ShadowDisplay;
+    display: Display;
     visibleItems: StoreItem[];
     visibleMode?: VisibleMode | null;
     center?: Coordinate;

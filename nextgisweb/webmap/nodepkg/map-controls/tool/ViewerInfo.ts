@@ -2,15 +2,15 @@ import reactApp from "@nextgisweb/gui/react-app";
 import type { ReactAppReturn } from "@nextgisweb/gui/react-app";
 import i18n from "@nextgisweb/pyramid/i18n";
 import { html as iconHtml } from "@nextgisweb/pyramid/icon";
+import type { Display } from "@nextgisweb/webmap/display";
 import type { ToggleControl } from "@nextgisweb/webmap/map-toolbar/ToggleControl";
 import MapViewerInfoComp from "@nextgisweb/webmap/map-viewer-info";
 import type { MapViewerInfoProps } from "@nextgisweb/webmap/map-viewer-info/MapViewerInfo";
-import type { ShadowDisplay } from "@nextgisweb/webmap/type";
 
 import { ToolBase } from "./ToolBase";
 
 interface ViewerInfoOptions {
-    display: ShadowDisplay;
+    display: Display;
 }
 
 export class ToolViewerInfo extends ToolBase {

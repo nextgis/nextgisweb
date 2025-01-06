@@ -4,18 +4,15 @@ import { FeatureEditorModal } from "@nextgisweb/feature-layer/feature-editor-mod
 import { Button } from "@nextgisweb/gui/antd";
 import showModal from "@nextgisweb/gui/showModal";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import type ShadowDisplay from "@nextgisweb/webmap/compat/ShadowDisplay";
 import topic from "@nextgisweb/webmap/compat/topic";
+import type { Display } from "@nextgisweb/webmap/display";
 import type { TreeItemConfig } from "@nextgisweb/webmap/type/TreeItems";
 
 import type { FeatureEditButtonProps } from "./identification";
 
 import EditIcon from "@nextgisweb/icon/material/edit/fill";
 
-const isLayerReadOnly = (
-    display: ShadowDisplay,
-    config: TreeItemConfig
-): boolean => {
+const isLayerReadOnly = (display: Display, config: TreeItemConfig): boolean => {
     const pluginName = "@nextgisweb/webmap/plugin/feature-layer";
 
     if (display.isTinyMode() && !display.isTinyModePlugin(pluginName)) {
@@ -29,7 +26,7 @@ const isLayerReadOnly = (
     return false;
 };
 
-const editLayerEnabled = (display: ShadowDisplay, layerId: number): boolean => {
+const editLayerEnabled = (display: Display, layerId: number): boolean => {
     const configs = Object.values(display.getItemConfig());
     return configs.some((c) => {
         return (

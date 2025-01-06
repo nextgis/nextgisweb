@@ -1,11 +1,11 @@
 import type { Control as OlControl } from "ol/control";
 
-import type ShadowDisplay from "../compat/ShadowDisplay";
+import type { Display } from "../display";
 
 import type { ToolBase } from "./tool/ToolBase";
 
 export interface ControlBase<T> {
-    ctor: (display: ShadowDisplay) => T;
+    ctor: (display: Display) => T;
     key: string;
     label?: string;
     embeddedShowMode?: "always" | "customize";
@@ -14,7 +14,7 @@ export interface ControlBase<T> {
 
 export interface ControlInfo extends ControlBase<Control> {
     olMapControl: boolean;
-    postCreate?: (display: ShadowDisplay, control: Control) => void;
+    postCreate?: (display: Display, control: Control) => void;
 }
 
 export interface ToolInfo extends ControlBase<ToolBase> {}

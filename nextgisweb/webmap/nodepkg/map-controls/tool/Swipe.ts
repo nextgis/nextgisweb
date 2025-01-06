@@ -1,6 +1,6 @@
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { html as htmlIcon } from "@nextgisweb/pyramid/icon";
-import type ShadowDisplay from "@nextgisweb/webmap/compat/ShadowDisplay";
+import type { Display } from "@nextgisweb/webmap/display";
 
 import { Swipe } from "../control/SwipeControl";
 
@@ -18,7 +18,7 @@ export class ToolSwipe extends ToolBase {
         display,
         orientation = "horizontal",
     }: {
-        display: ShadowDisplay;
+        display: Display;
         orientation: "vertical" | "horizontal";
     }) {
         super({ display });

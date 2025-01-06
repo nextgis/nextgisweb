@@ -4,8 +4,8 @@ import { WKT } from "ol/format";
 import { errorModal } from "@nextgisweb/gui/error";
 import { route } from "@nextgisweb/pyramid/api";
 import topic from "@nextgisweb/webmap/compat/topic";
+import type { Display } from "@nextgisweb/webmap/display";
 import type { VisibleMode } from "@nextgisweb/webmap/store/annotations/AnnotationsStore";
-import type { ShadowDisplay } from "@nextgisweb/webmap/type";
 
 import { AnnotationFeature } from "../../layer/annotations/AnnotationFeature";
 import type { AnnotationInfo } from "../../layer/annotations/AnnotationFeature";
@@ -17,14 +17,14 @@ import { AnnotationsDialog } from "../annotation-dialog";
 import type { DialogResult } from "../annotation-dialog/AnnotationDialog";
 
 interface ManagerOptions {
-    display: ShadowDisplay;
+    display: Display;
     initialAnnotVisible?: VisibleMode;
 }
 
 export class AnnotationsManager {
     private static instance: AnnotationsManager | null = null;
 
-    private _display!: ShadowDisplay;
+    private _display!: Display;
     private _annotationsLayer!: AnnotationsLayer;
     private _editableLayer!: AnnotationsEditableLayer;
     private _annotationsDialog!: AnnotationsDialog;

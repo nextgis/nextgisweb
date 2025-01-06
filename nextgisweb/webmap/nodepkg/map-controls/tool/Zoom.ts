@@ -3,13 +3,13 @@ import { DragZoom } from "ol/interaction";
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { html as iconHtml } from "@nextgisweb/pyramid/icon";
-import type ShadowDisplay from "@nextgisweb/webmap/compat/ShadowDisplay";
+import type { Display } from "@nextgisweb/webmap/display";
 
 import { ToolBase } from "./ToolBase";
 import "./Zoom.css";
 
 interface ZoomOptions {
-    display: ShadowDisplay;
+    display: Display;
     out?: boolean;
 }
 

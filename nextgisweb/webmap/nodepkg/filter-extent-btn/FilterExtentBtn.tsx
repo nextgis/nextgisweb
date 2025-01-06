@@ -16,7 +16,7 @@ import type { MenuProps, SizeType } from "@nextgisweb/gui/antd";
 import { CloseIcon } from "@nextgisweb/gui/icon";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import type ShadowDisplay from "../compat/ShadowDisplay";
+import type { Display } from "../display";
 import type { StateControl } from "../map-state-observer/MapStatesObserver";
 
 import ExtentIcon from "@nextgisweb/icon/material/crop_free/outline";
@@ -31,7 +31,7 @@ import ZoomInIcon from "@nextgisweb/icon/material/zoom_in/outline";
 
 export interface FilterExtentBtnProps {
     id: number | string;
-    display: ShadowDisplay;
+    display: Display;
     size?: SizeType;
     onGeomChange?: (
         geom: Geometry | undefined,
@@ -146,7 +146,7 @@ interface InteractionInfo {
 }
 
 const buildInteraction = (
-    display: ShadowDisplay,
+    display: Display,
     uniqueLayerId: number | string,
     geomType: string,
     onDrawEnd?: (event: DrawEvent) => void,
@@ -212,7 +212,7 @@ const buildInteraction = (
 };
 
 const clearDrawInteraction = (
-    display: ShadowDisplay,
+    display: Display,
     interactionInfo: InteractionInfo
 ): InteractionInfo | undefined => {
     if (!display || !interactionInfo) return;
