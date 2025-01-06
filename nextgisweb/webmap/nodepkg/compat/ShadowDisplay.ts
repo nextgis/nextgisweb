@@ -1,8 +1,15 @@
 /** @entrypoint */
+import topic from "dojo/topic";
+import View from "ol/View";
+
 import entrypoint from "@nextgisweb/jsrealm/entrypoint";
+import { appendTo } from "@nextgisweb/pyramid/company-logo";
+import { buildControls } from "@nextgisweb/webmap/map-controls";
+import MapToolbar from "@nextgisweb/webmap/map-toolbar";
 import PanelsManager from "@nextgisweb/webmap/panels-manager";
 
 import { FeatureHighlighter } from "../feature-highlighter/FeatureHighlighter";
+import { Map } from "../ol/Map";
 import type { BaseLayer } from "../ol/layer/_Base";
 import type { DojoDisplay, PanelDojoItem } from "../type";
 import { setURLParam } from "../utils/URL";
@@ -15,6 +22,85 @@ export default class ShadowDisplay {
     private readonly emptyModeURLValue = "none";
 
     constructor(private display: DojoDisplay) {}
+
+    _mapSetup() {
+        this.display.mapToolbar = new MapToolbar({
+            display: this.display,
+            target: this.display.leftBottomControlPane,
+        });
+
+        this.display.map = new Map({
+            target: this.display.mapNode,
+            logo: false,
+            controls: [],
+            view: new View({
+                minZoom: 3,
+                constrainResolution: true,
+                extent: !this.display.config.extent_const.includes(null)
+                    ? this.display._extent_const
+                    : undefined,
+            }),
+        });
+
+        const controlsReady = buildControls(this.display);
+
+        if (controlsReady.has("id")) {
+            const { control } = controlsReady.get("id")! as any;
+            this.display.identify = control;
+            this.display.mapStates.addState(
+                "identifying",
+                this.display.identify
+            );
+            this.display.mapStates.setDefaultState("identifying", true);
+            this.display._identifyFeatureByAttrValue();
+        }
+
+        topic.publish("/webmap/tools/initialized", true);
+
+        // Resize OpenLayers Map on container resize
+        this.display.mapPane.on("resize", () => {
+            this.display.map.olMap.updateSize();
+        });
+
+        // Basemaps initialization
+        const settings = this.display.clientSettings;
+        let idx = 0;
+
+        for (const bm of settings.basemaps) {
+            const MID = this.display._mid.basemap[bm.base.mid];
+
+            const baseOptions = { ...bm.base };
+            const layerOptions = { ...bm.layer };
+            const sourceOptions = { ...bm.source };
+
+            if (baseOptions.keyname === undefined) {
+                baseOptions.keyname = `basemap_${idx}`;
+            }
+
+            try {
+                const layer = new MID(
+                    baseOptions.keyname,
+                    layerOptions,
+                    sourceOptions
+                );
+
+                if (layer.olLayer.getVisible()) {
+                    this.display._baseLayer = layer;
+                }
+                layer.isBaseLayer = true;
+                this.display.map.addLayer(layer);
+            } catch (err) {
+                console.warn(
+                    `Can't initialize layer [${baseOptions.keyname}]: ${err}`
+                );
+            }
+
+            idx++;
+        }
+
+        appendTo(this.display.mapNode);
+        this.display._mapDeferred.resolve(true);
+    }
 
     _initializeFeatureHighlighter() {
         return new FeatureHighlighter(this.display.map);

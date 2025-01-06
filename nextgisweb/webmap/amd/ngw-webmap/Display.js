@@ -4,7 +4,6 @@ define([
     "dojo/_base/array",
     "dojo/Deferred",
     "dojo/promise/all",
-    "dojo/aspect",
     "dojo/topic",
     "dojo/data/ItemFileWriteStore",
     "dijit/_WidgetBase",
@@ -13,14 +12,9 @@ define([
     "dijit/layout/ContentPane",
     "openlayers/ol",
     "@nextgisweb/gui/error",
-    "@nextgisweb/pyramid/company-logo",
     "@nextgisweb/webmap/store",
-    "./ol/Map",
-    "@nextgisweb/webmap/map-toolbar",
     "@nextgisweb/webmap/map-state-observer",
     "./ui/react-webmap-tabs",
-    // tools
-    "@nextgisweb/webmap/map-controls",
     // Tiny display
     "ngw-webmap/controls/LinkToMainMap",
     // compat
@@ -42,7 +36,6 @@ define([
     array,
     Deferred,
     all,
-    aspect,
     topic,
     ItemFileWriteStore,
     _WidgetBase,
@@ -51,13 +44,9 @@ define([
     ContentPane,
     ol,
     errorModule,
-    companyLogo,
     WebmapStore,
-    Map,
-    MapToolbar,
     MapStatesObserver,
     ReactWebMapTabs,
-    MapControls,
     LinkToMainMap,
     ShadowDisplay,
     URL,
@@ -394,85 +383,7 @@ define([
         },
 
         _mapSetup: function () {
-            var widget = this;
-
-            widget.mapToolbar = new MapToolbar.default({
-                display: widget,
-                target: widget.leftBottomControlPane,
-            });
-
-            this.map = new Map({
-                target: this.mapNode,
-                logo: false,
-                controls: [],
-                view: new ol.View({
-                    minZoom: 3,
-                    constrainResolution: true,
-                    extent: !this.config.extent_const.includes(null)
-                        ? this._extent_const
-                        : undefined,
-                }),
-            });
-
-            const controlsReady = MapControls.buildControls(this);
-
-            if (controlsReady.has("id")) {
-                const { control } = controlsReady.get("id");
-                this.identify = control;
-                this.mapStates.addState("identifying", this.identify);
-                this.mapStates.setDefaultState("identifying", true);
-                widget._identifyFeatureByAttrValue();
-            }
-
-            topic.publish("/webmap/tools/initialized");
-
-            // Resize OpenLayers Map on container resize
-            aspect.after(this.mapPane, "resize", function () {
-                widget.map.olMap.updateSize();
-            });
-
-            // Basemaps initialization
-            var idx = 0;
-            array.forEach(
-                settings.basemaps,
-                function (bm) {
-                    var MID = this._mid.basemap[bm.base.mid];
-
-                    var baseOptions = lang.clone(bm.base);
-                    var layerOptions = lang.clone(bm.layer);
-                    var sourceOptions = lang.clone(bm.source);
-
-                    if (baseOptions.keyname === undefined) {
-                        baseOptions.keyname = "basemap_" + idx;
-                    }
-
-                    try {
-                        var layer = new MID(
-                            baseOptions.keyname,
-                            layerOptions,
-                            sourceOptions
-                        );
-                        if (layer.olLayer.getVisible()) {
-                            this._baseLayer = layer;
-                        }
-                        layer.isBaseLayer = true;
-                        this.map.addLayer(layer);
-                    } catch (err) {
-                        console.warn(
-                            "Can't initialize layer [" +
-                                baseOptions.keyname +
-                                "]: " +
-                                err
-                        );
-                    }
-
-                    idx = idx + 1;
-                },
-                this
-            );
-
-            companyLogo.appendTo(this.mapNode);
-            this._mapDeferred.resolve();
+            this.shadow._mapSetup();
         },
 
         _mapAddControls: function (controls) {
