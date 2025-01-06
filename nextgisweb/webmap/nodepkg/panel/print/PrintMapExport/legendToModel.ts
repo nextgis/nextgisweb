@@ -1,13 +1,13 @@
+import type { LegendSymbol } from "@nextgisweb/render/type/api";
 import type {
     LegendElement,
     LegendTreeNode,
-    SymbolInfo,
 } from "@nextgisweb/webmap/type/api";
 
 import type { TreeWebmapItem } from "../../../layers-tree/LayersTree";
 import type { LegendRndCoords } from "../../../print-map/type";
 
-const handleLegendItems = (symbols: SymbolInfo[]): LegendTreeNode[] => {
+const handleLegendItems = (symbols: LegendSymbol[]): LegendTreeNode[] => {
     return symbols.map((symbol) => {
         return {
             title: symbol.display_name,

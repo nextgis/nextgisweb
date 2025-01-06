@@ -6,7 +6,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { PanelComponentProps } from "@nextgisweb/webmap/panels-manager/type";
 import AnnotationsStore from "@nextgisweb/webmap/store/annotations";
 import type { AnnotationVisibleMode } from "@nextgisweb/webmap/store/annotations/AnnotationsStore";
-import type { Scope } from "@nextgisweb/webmap/type/api";
+import type { AnnotationsPermissions } from "@nextgisweb/webmap/type/api";
 
 import { PanelHeader } from "../header";
 
@@ -34,7 +34,9 @@ const AnnotationsPanel = observer(
         const [visible, setVisible] = useState(AnnotationsStore.visibleMode);
         const [editable, setEditable] = useState(false);
         const [edit, setEdit] = useState(false);
-        const [annScope, setAnnScope] = useState<Scope | undefined>();
+        const [annScope, setAnnScope] = useState<
+            AnnotationsPermissions | undefined
+        >();
         const [geomType, setGeomType] = useState<GeometryType>("Point");
         const [annFilter, setAnnFilter] = useState<AnnotationFilter>({
             public: true,

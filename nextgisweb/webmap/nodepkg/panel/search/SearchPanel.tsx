@@ -181,7 +181,7 @@ const searchByNominatim: SearchFunction = async (
     };
 
     if (webmapSettings.address_search_extent) {
-        const extent = display.config.extent;
+        const extent = display.config.initialExtent;
         query.bounded = "1";
         query.viewbox = extent.join(",");
     }
@@ -248,8 +248,8 @@ const searchByYandex: SearchFunction = async (
         format: "json",
     };
 
-    if (webmapSettings.address_search_extent && display.config.extent) {
-        const extent = display.config.extent;
+    if (webmapSettings.address_search_extent && display.config.initialExtent) {
+        const extent = display.config.initialExtent;
         query.bbox = `${extent[0]},${extent[1]}~${extent[2]},${extent[3]}`;
     }
 

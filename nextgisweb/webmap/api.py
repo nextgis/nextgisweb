@@ -1,10 +1,9 @@
-from collections import namedtuple
 from inspect import signature
 from pathlib import Path
 from shutil import which
 from subprocess import check_call
 from tempfile import TemporaryDirectory
-from typing import Any, Dict, List, Literal, Optional, Tuple, Union
+from typing import Any, Dict, List, Literal, Optional, Set, Union, cast
 
 from geoalchemy2.shape import to_shape
 from msgspec import UNSET, Meta, Struct, UnsetType, ValidationError
@@ -20,13 +19,13 @@ from nextgisweb.layer import IBboxLayer
 from nextgisweb.pyramid import JSONType
 from nextgisweb.pyramid.api import csetting
 from nextgisweb.render import IRenderableScaleRange
-from nextgisweb.render.api import legend_symbols_by_resource
+from nextgisweb.render.api import LegendSymbol, legend_symbols_by_resource
 from nextgisweb.render.legend import ILegendSymbols
 from nextgisweb.render.util import scale_range_intersection
 from nextgisweb.resource import DataScope, ResourceFactory, ResourceScope
 
 from .adapter import WebMapAdapter
-from .model import LegendSymbolsEnum, WebMap, WebMapAnnotation, WebMapScope
+from .model import ExtentWSEN, LegendSymbolsEnum, WebMap, WebMapAnnotation, WebMapScope
 from .plugin import WebmapLayerPlugin, WebmapPlugin
 
 AnnotationID = Annotated[int, Meta(ge=1, description="Annotation ID")]
@@ -393,65 +392,44 @@ csetting("legend_symbols", Optional[str], default=None)
 csetting("hide_nav_menu", bool, default=False)
 
 
-LayerType = Literal["layer", "group", "root"]
 AnnotationVisibleMode = Literal["no", "yes", "messages"]
 LegendVisibleMode = Literal["collapse", "expand"]
-Entrypoint = Union[str, Tuple[str, Any]]
 
 
-class Icon(Struct):
-    format: str
-    data: str
-
-
-class SymbolInfo(Struct):
-    index: int
-    render: bool
-    display_name: str
-    icon: Icon
-
-
-class LegendInfo(Struct):
+class LegendInfo(Struct, kw_only=True):
     visible: LegendVisibleMode
     has_legend: bool
-    symbols: List[SymbolInfo]
+    symbols: List[LegendSymbol]
     single: bool
     open: Union[bool, None] = None
 
 
-class Scope(Struct):
+class AnnotationsPermissions(Struct, kw_only=True):
     read: bool
     write: bool
     manage: bool
 
 
-class Annotations(Struct):
+class AnnotationsConfig(Struct, kw_only=True):
     enabled: bool
     default: AnnotationVisibleMode
-    scope: Scope
+    scope: AnnotationsPermissions
 
 
-class Mid(Struct):
-    adapter: List[Entrypoint]
-    basemap: List[Entrypoint]
-    plugin: List[Entrypoint]
+class MidConfig(Struct, kw_only=True):
+    adapter: Set[str]
+    basemap: Set[str]
+    plugin: Set[str]
 
 
-class ItemsStates(Struct):
-    expanded: List[Any]
-    checked: List[int]
-
-
-class BaseItem(Struct):
+class BaseItem(Struct, kw_only=True):
     id: int
     key: int
-    type: LayerType
     label: str
     title: str
 
 
-class LayerItemConfig(BaseItem):
-    type: Literal["layer"]
+class LayerItemConfig(BaseItem, tag="layer", tag_field="type"):
     layerId: int
     styleId: int
     visibility: bool
@@ -468,54 +446,45 @@ class LayerItemConfig(BaseItem):
     editable: Union[bool, None] = None
 
 
-class GroupItemConfig(BaseItem):
-    type: Literal["group"]
+class GroupItemConfig(BaseItem, tag="group", tag_field="type"):
     expanded: bool
     exclusive: bool
     children: List[Union["GroupItemConfig", LayerItemConfig]]
 
 
-class RootItemConfig(BaseItem):
-    type: Literal["root"]
+class RootItemConfig(BaseItem, tag="root", tag_field="type"):
     children: List[Union[GroupItemConfig, LayerItemConfig]]
 
 
-TreeItemConfig = Union[RootItemConfig, GroupItemConfig, LayerItemConfig]
-TreeChildrenItemConfig = Union[GroupItemConfig, LayerItemConfig]
-
-
 class DisplayConfig(Struct, kw_only=True):
-    extent: Tuple[float, float, float, float]
-    extent_const: Tuple[
-        Union[float, None], Union[float, None], Union[float, None], Union[float, None]
-    ]
-    rootItem: RootItemConfig
-    itemsStates: ItemsStates
-    mid: Mid
-    webmapPlugin: Dict[str, Any]
-    bookmarkLayerId: Union[Any, None] = None
     webmapId: int
-    webmapDescription: str
     webmapTitle: str
+    webmapPlugin: Dict[str, Any]
+    initialExtent: ExtentWSEN
+    constrainingExtent: Union[ExtentWSEN, None]
+    rootItem: RootItemConfig
+    checkedItems: Set[int]
+    expandedItems: Set[int]
+    mid: MidConfig
+    annotations: AnnotationsConfig
+    webmapDescription: str
     webmapEditable: bool
     webmapLegendVisible: str
     drawOrderEnabled: Union[Any, None] = None
-    annotations: Annotations
+    measureSrsId: Union[int, None] = None
     # units: str
     printMaxSize: int
-    measureSrsId: Union[int, None] = None
+    bookmarkLayerId: Union[Any, None] = None
+
+
+def _extent_wsen_from_attrs(obj, prefix) -> Union[ExtentWSEN, None]:
+    attrs = tuple((prefix + i) for i in ("left", "bottom", "right", "top"))
+    parts = [getattr(obj, a) for a in attrs]
+    return ExtentWSEN(*parts) if None not in parts else None
 
 
 def display_config(obj, request) -> DisplayConfig:
     request.resource_permission(ResourceScope.read)
-
-    MID = namedtuple("MID", ["adapter", "basemap", "plugin"])
-
-    mid = MID(
-        set(),
-        set(),
-        set(),
-    )
 
     # Map level plugins
     plugin = dict()
@@ -523,11 +492,6 @@ def display_config(obj, request) -> DisplayConfig:
         p_mid_data = pcls.is_supported(obj)
         if p_mid_data:
             plugin.update((p_mid_data,))
-
-    items_states = {
-        "expanded": [],
-        "checked": [],
-    }
 
     ls_webmap = request.env.webmap.effective_legend_symbols() + obj.legend_symbols
 
@@ -546,6 +510,10 @@ def display_config(obj, request) -> DisplayConfig:
 
         return result
 
+    mid = MidConfig(adapter=set(), basemap=set(), plugin=set())
+    checked_items: Set[int] = set()
+    expanded_items: Set[int] = set()
+
     def traverse(item):
         data = dict(
             id=item.id,
@@ -560,23 +528,13 @@ def display_config(obj, request) -> DisplayConfig:
             layer = style.parent if style.cls.endswith("_style") else style
 
             if not style.has_permission(DataScope.read, request.user):
+                # Skip webmap item if there are no necessary permissions, so it
+                # won't be shown in the tree.
                 return None
-
-            # If there are no necessary permissions skip web-map element
-            # so it won't be shown in the tree
-
-            # TODO: Security
-
-            # if not layer.has_permission(
-            #     request.user,
-            #     'style-read',
-            #     'data-read',
-            # ):
-            #     return None
 
             layer_enabled = bool(item.layer_enabled)
             if layer_enabled:
-                items_states.get("checked").append(item.id)
+                checked_items.add(item.id)
 
             scale_range = item.scale_range()
             if IRenderableScaleRange.providedBy(style):
@@ -619,57 +577,55 @@ def display_config(obj, request) -> DisplayConfig:
             expanded = item.group_expanded
             exclusive = item.group_exclusive
             if expanded:
-                items_states.get("expanded").append(item.id)
-            # Recursively run all elements excluding those
-            # with no permissions
+                expanded_items.add(item.id)
+
+            # Recursively run all elements excluding those with no permissions
             data.update(
                 expanded=expanded,
                 exclusive=exclusive,
                 children=list(filter(None, map(traverse, item.children))),
             )
+
             # Hide empty groups
             if (item.item_type in "group") and not data["children"]:
                 return None
 
         return data
 
-    title = obj.display_name if obj.title is None else obj.title
+    initial_extent = _extent_wsen_from_attrs(obj, prefix="extent_")
+    if initial_extent is None:
+        initial_extent = ExtentWSEN(-180, -90, 180, 90)
+    constraining_extent = _extent_wsen_from_attrs(obj, prefix="extent_const_")
+    root_item = cast(RootItemConfig, traverse(obj.root_item))
+    permissions = obj.permissions(request.user)
 
-    tmp = obj.to_dict()
-    display_config = dict(
-        extent=tmp["extent"],
-        extent_const=tmp["extent_const"],
-        rootItem=traverse(obj.root_item),
-        itemsStates=items_states,
-        mid=Mid(
-            adapter=tuple(mid.adapter),
-            basemap=tuple(mid.basemap),
-            plugin=tuple(mid.plugin),
-        ),
-        webmapPlugin=plugin,
-        bookmarkLayerId=obj.bookmark_resource_id,
+    return DisplayConfig(
         webmapId=obj.id,
+        webmapTitle=obj.display_name if obj.title is None else obj.title,
+        webmapPlugin=plugin,
+        initialExtent=initial_extent,
+        constrainingExtent=constraining_extent,
+        rootItem=root_item,
+        checkedItems=checked_items,
+        expandedItems=expanded_items,
+        mid=mid,
+        annotations=AnnotationsConfig(
+            enabled=obj.annotation_enabled and request.env.webmap.options["annotation"],
+            default=obj.annotation_default,
+            scope=AnnotationsPermissions(
+                read=WebMapScope.annotation_read in permissions,
+                write=WebMapScope.annotation_write in permissions,
+                manage=WebMapScope.annotation_manage in permissions,
+            ),
+        ),
         webmapDescription=obj.description,
-        webmapTitle=title,
         webmapEditable=obj.editable,
         webmapLegendVisible=obj.legend_symbols,
         drawOrderEnabled=obj.draw_order_enabled,
         measureSrsId=obj.measure_srs_id,
+        bookmarkLayerId=obj.bookmark_resource_id,
         printMaxSize=request.env.webmap.options["print.max_size"],
     )
-
-    if request.env.webmap.options["annotation"]:
-        display_config["annotations"] = dict(
-            enabled=obj.annotation_enabled,
-            default=obj.annotation_default,
-            scope=dict(
-                read=obj.has_permission(WebMapScope.annotation_read, request.user),
-                write=obj.has_permission(WebMapScope.annotation_write, request.user),
-                manage=obj.has_permission(WebMapScope.annotation_manage, request.user),
-            ),
-        )
-
-    return DisplayConfig(**display_config)
 
 
 def setup_pyramid(comp, config):
@@ -709,7 +665,7 @@ def setup_pyramid(comp, config):
 
     config.add_route(
         "webmap.display_config",
-        r"/api/resource/{id:uint}/webmap/display_config",
+        "/api/resource/{id}/webmap/display_config",
         factory=webmap_factory,
         get=display_config,
     )
