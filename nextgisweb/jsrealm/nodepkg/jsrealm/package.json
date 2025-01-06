@@ -10,6 +10,7 @@
         "@types/react-dom": "18.2.7",
         "@types/papaparse": "^5.3.14",
         "core-js": "3",
+        "classnames": "^2.5.1",
         "lodash-es": "^4.17.21",
         "dayjs": "^1.11.9",
         "mobx": "^6.10.0",

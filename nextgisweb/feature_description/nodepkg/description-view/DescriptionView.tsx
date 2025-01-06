@@ -16,15 +16,13 @@ const DescriptionView = ({ featureItem }: IdentifyExtensionComponentProps) => {
     return (
         <>
             <PanelContentContainer
-                title={
-                    <>
-                        <DescriptionIcon /> {gettext("Description")}
-                    </>
+                icon={<DescriptionIcon />}
+                title={gettext("Description")}
+                marginAll
+                content={
+                    <div dangerouslySetInnerHTML={{ __html: description }} />
                 }
             />
-            <PanelContentContainer>
-                <div dangerouslySetInnerHTML={{ __html: description }} />
-            </PanelContentContainer>
         </>
     );
 };

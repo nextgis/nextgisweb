@@ -24,11 +24,8 @@ export default function AttachmentTableView({
     return (
         <>
             <PanelContentContainer
-                title={
-                    <>
-                        <AttachFileIcon /> {gettext("Attachments")}
-                    </>
-                }
+                icon={<AttachFileIcon />}
+                title={gettext("Attachments")}
             />
 
             <PanelContentContainer
