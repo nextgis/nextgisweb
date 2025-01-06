@@ -2,6 +2,8 @@ import { useEffect, useRef } from "react";
 
 import type { MapRefs } from "@nextgisweb/webmap/type";
 
+import "./MapPane.less";
+
 export function MapPane({
     setMapRefs,
 }: {
@@ -32,40 +34,23 @@ export function MapPane({
     }, [setMapRefs]);
 
     return (
-        <div
-            className="map-pane"
-            style={{
-                width: "100%",
-                padding: 0,
-            }}
-        >
+        <div ref={mapRef} className="ngw-webmap-display-map-pane">
             <div
-                className="map-node"
-                ref={mapRef}
-                style={{
-                    position: "absolute",
-                    width: "100%",
-                    height: "100%",
-                    padding: 0,
-                }}
-            >
-                <div
-                    ref={leftTopControlPaneRef}
-                    className="control-pane control-pane--top control-pane--left"
-                />
-                <div
-                    ref={leftBottomControlPaneRef}
-                    className="control-pane control-pane--bottom control-pane--left"
-                />
-                <div
-                    ref={rightTopControlPaneRef}
-                    className="control-pane control-pane--top control-pane--right"
-                />
-                <div
-                    ref={rightBottomControlPaneRef}
-                    className="control-pane control-pane--bottom control-pane--right"
-                />
-            </div>
+                ref={leftTopControlPaneRef}
+                className="control-pane control-pane--top control-pane--left"
+            />
+            <div
+                ref={leftBottomControlPaneRef}
+                className="control-pane control-pane--bottom control-pane--left"
+            />
+            <div
+                ref={rightTopControlPaneRef}
+                className="control-pane control-pane--top control-pane--right"
+            />
+            <div
+                ref={rightBottomControlPaneRef}
+                className="control-pane control-pane--bottom control-pane--right"
+            />
         </div>
     );
 }

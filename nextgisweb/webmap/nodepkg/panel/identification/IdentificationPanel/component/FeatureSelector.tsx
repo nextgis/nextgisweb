@@ -41,7 +41,7 @@ export function FeatureSelector({
             marginAll
             content={
                 <Row wrap={false}>
-                    <Col flex="auto">
+                    <Col flex="1 1 auto">
                         <Select
                             onChange={onSelectChange}
                             style={{ width: "100%" }}
@@ -49,7 +49,7 @@ export function FeatureSelector({
                             options={featuresInfoList}
                         />
                     </Col>
-                    <Col flex="auto">
+                    <Col flex="0 0 auto">
                         <Tooltip title={gettext("Zoom to feature")}>
                             <Button
                                 type="link"

@@ -1,7 +1,11 @@
 .ngw-webmap-panel-header {
     display: flex;
+    position: sticky;
+    top: 0;
     align-items: center;
-    border-bottom: 1px solid var(--divider-color);
+    z-index: 1;
+    border-bottom: 1px solid var(--color-border);
+    background-color: var(--color-bg-container);
     padding: 2px;
 
     > span {
