@@ -30,7 +30,7 @@ import { Identify } from "../map-controls/tool/Identify";
 import MapStatesObserver from "../map-state-observer";
 import type { MapStatesObserver as IMapStatesObserver } from "../map-state-observer/MapStatesObserver";
 import { Map } from "../ol/Map";
-import type { BaseLayer } from "../ol/layer/_Base";
+import type { CoreLayer } from "../ol/layer/_Base";
 import type { PanelPlugin } from "../panels-manager/registry";
 import type { PluginBase } from "../plugin/PluginBase";
 import WebmapStore from "../store";
@@ -99,7 +99,7 @@ export class Display {
     rightTopControlPane?: HTMLElement;
     rightBottomControlPane?: HTMLElement;
 
-    @observable.shallow accessor baseLayer: BaseLayer | null = null;
+    @observable.shallow accessor baseLayer: CoreLayer | null = null;
     @observable.shallow accessor item: StoreItem | null = null;
     @observable.shallow accessor itemConfig: LayerItemConfig | null = null;
 
@@ -258,7 +258,7 @@ export class Display {
     }
 
     @action
-    setBaseLayer(layer: BaseLayer) {
+    setBaseLayer(layer: CoreLayer) {
         this.baseLayer = layer;
     }
 
@@ -471,8 +471,8 @@ export class Display {
     }
 
     // LAYERS
-
-    switchBasemap(basemapLayerKey: string) {
+    @action
+    switchBasemap = (basemapLayerKey: string) => {
         if (!(basemapLayerKey in this.map.layers)) {
             return false;
         }
@@ -487,7 +487,8 @@ export class Display {
         this.baseLayer = newLayer;
 
         return true;
-    }
+    };
+
     setLayerZIndex(id: number, zIndex: number) {
         const layer = this.map.layers[id];
         if (layer && layer.olLayer && layer.olLayer.setZIndex) {
@@ -612,26 +613,7 @@ export class Display {
         this.webmapStore.setWebmapItems(this.config.rootItem.children);
         this.webmapStore.setExpanded(expanded);
     }
-    @action
-    _switchBasemap(basemapLayerKey: string) {
-        if (!this.map) {
-            return;
-        }
-        if (!(basemapLayerKey in this.map.layers)) {
-            return false;
-        }
 
-        if (this.baseLayer && this.baseLayer.name) {
-            const { name } = this.baseLayer;
-            this.map.layers[name].olLayer.setVisible(false);
-        }
-
-        const newLayer = this.map.layers[basemapLayerKey];
-        newLayer.olLayer.setVisible(true);
-        this.baseLayer = newLayer;
-
-        return true;
-    }
     private _layersPanelSetup() {
         Promise.all([
             this.layersDeferred,
@@ -707,7 +689,7 @@ export class Display {
         const basemapMids: [
             name: string,
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            mid: () => Promise<{ default: typeof BaseLayer<any, any, any> }>,
+            mid: () => Promise<{ default: typeof CoreLayer<any, any, any> }>,
         ][] = [
             [
                 "@nextgisweb/webmap/ol/layer/OSM",

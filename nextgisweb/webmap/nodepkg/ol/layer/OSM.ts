@@ -2,10 +2,10 @@ import { Tile as TileLayer } from "ol/layer";
 import { OSM as OSMSource } from "ol/source";
 import type { Options as OSMSourceOptions } from "ol/source/OSM";
 
-import { BaseLayer } from "./_Base";
+import { CoreLayer } from "./_Base";
 import type { LayerOptions } from "./_Base";
 
-export default class OSM extends BaseLayer<
+export default class OSM extends CoreLayer<
     OSMSource,
     TileLayer<OSMSource>,
     OSMSourceOptions

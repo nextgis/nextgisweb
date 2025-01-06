@@ -9,7 +9,7 @@ import type { CustomItemFileWriteStore } from "../compat/CustomItemFileWriteStor
 import type { Display } from "../display";
 import type { ToolBase } from "../map-controls/tool/ToolBase";
 import type { Map } from "../ol/Map";
-import type { BaseLayer, LayerOptions } from "../ol/layer/_Base";
+import type { CoreLayer, LayerOptions } from "../ol/layer/_Base";
 import type { PluginBase } from "../plugin/PluginBase";
 import type { AnnotationVisibleMode } from "../store/annotations/AnnotationsStore";
 
@@ -36,7 +36,7 @@ export type BaseLayerConstructor = new (
     name: string,
     layerOptions: LayerOptions,
     sourceOptions?: unknown
-) => BaseLayer;
+) => CoreLayer;
 
 export interface BasemapModules {
     [key: string]: BaseLayerConstructor;

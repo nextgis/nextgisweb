@@ -21,7 +21,8 @@ interface LayerWatchableProps {
     symbols: string[];
 }
 
-export abstract class BaseLayer<
+/** We are using CoreLayer instead of BaseLayer here to avoid mismatch with cartographic baselayer on the bottom of map */
+export abstract class CoreLayer<
     TSource extends Source = Source,
     TLayer extends Layer<TSource> = Layer<TSource>,
     TSourceOptions = unknown,

@@ -8,7 +8,7 @@ import type {
 } from "../compat/CustomItemFileWriteStore";
 import type { StoreItemConfig } from "../compat/type";
 import { keyInMutuallyExclusiveGroupDeep } from "../layers-tree/util/treeItems";
-import type { BaseLayer } from "../ol/layer/_Base";
+import type { CoreLayer } from "../ol/layer/_Base";
 import type { TreeChildrenItemConfig, TreeItemConfig } from "../type/TreeItems";
 
 type LegendSymbols = { [layerId: string]: { [symbolIndex: number]: boolean } };
@@ -20,7 +20,7 @@ export class WebmapStore {
     @observable.shallow accessor _legendSymbols: LegendSymbols = {};
 
     private _itemStore: CustomItemFileWriteStore;
-    private _layers: Record<string, BaseLayer> = {};
+    private _layers: Record<string, CoreLayer> = {};
 
     constructor({
         itemStore,
@@ -260,7 +260,7 @@ export class WebmapStore {
         return this._layers[id];
     }
 
-    @action addLayer(id: number, layer: BaseLayer) {
+    @action addLayer(id: number, layer: CoreLayer) {
         this._layers[id] = layer;
     }
 
