@@ -18,11 +18,11 @@ interface DropdownActionsProps {
 }
 
 export function DropdownActions({
-    nodeData,
-    getWebmapPlugins,
-    moreClickId,
-    setMoreClickId,
     update,
+    nodeData,
+    moreClickId,
+    getWebmapPlugins,
+    setMoreClickId,
     setUpdate,
 }: DropdownActionsProps) {
     const { id, type } = nodeData;

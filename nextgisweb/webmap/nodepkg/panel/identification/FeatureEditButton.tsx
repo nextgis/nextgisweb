@@ -15,7 +15,7 @@ const isLayerReadOnly = (
     display: DojoDisplay,
     config: Record<string, any>
 ): boolean => {
-    const pluginName = "ngw-webmap/plugin/FeatureLayer";
+    const pluginName = "@nextgisweb/webmap/plugin/feature-layer";
 
     if (display.isTinyMode() && !display.isTinyModePlugin(pluginName)) {
         return false;
