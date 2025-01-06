@@ -1,36 +1,26 @@
-import type { ToggleControl } from "../map-toolbar/ToggleControl";
-import type { DojoDisplay, MapControl } from "../type";
+import type { Control as OlControl } from "ol/control";
+
+import type ShadowDisplay from "../compat/ShadowDisplay";
+
+import type { ToolBase } from "./tool/ToolBase";
 
 export interface ControlBase<T> {
-    ctor: (display: DojoDisplay) => T;
+    ctor: (display: ShadowDisplay) => T;
     key: string;
     label?: string;
     embeddedShowMode?: "always" | "customize";
     mapStateKey?: string;
 }
 
-export interface ControlInfo extends ControlBase<MapControl> {
+export interface ControlInfo extends ControlBase<Control> {
     olMapControl: boolean;
-    postCreate?: (display: DojoDisplay, control: MapControl) => void;
+    postCreate?: (display: ShadowDisplay, control: Control) => void;
 }
 
-export interface Tool {
-    activate: () => void;
-    deactivate: () => void;
-
-    destroy?: () => void;
-
-    label: string;
-    iconClass?: string;
-    customCssClass?: string;
-    customIcon?: string;
-    toolbarBtn?: ToggleControl;
-}
-
-export interface ToolInfo extends ControlBase<Tool> {}
+export interface ToolInfo extends ControlBase<ToolBase> {}
 
 export type ControlsInfo = ControlInfo | ToolInfo;
-type Control = MapControl | Tool;
+type Control = OlControl | ToolBase;
 
 export interface ControlReady {
     info: ControlsInfo;

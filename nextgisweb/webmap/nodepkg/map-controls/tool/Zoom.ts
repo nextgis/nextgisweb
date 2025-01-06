@@ -5,7 +5,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { html as iconHtml } from "@nextgisweb/pyramid/icon";
 import type ShadowDisplay from "@nextgisweb/webmap/compat/ShadowDisplay";
 
-import { Base } from "./ToolBase";
+import { ToolBase } from "./ToolBase";
 import "./Zoom.css";
 
 interface ZoomOptions {
@@ -13,7 +13,7 @@ interface ZoomOptions {
     out?: boolean;
 }
 
-export class ToolZoom extends Base {
+export class ToolZoom extends ToolBase {
     out: boolean;
     customIcon: string;
     private readonly interaction: DragZoom;

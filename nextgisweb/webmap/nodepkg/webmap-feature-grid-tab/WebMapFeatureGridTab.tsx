@@ -13,14 +13,11 @@ import { route } from "@nextgisweb/pyramid/api/route";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import FilterExtentBtn from "@nextgisweb/webmap/filter-extent-btn";
 import type { FeatureLayerWebMapPluginConfig } from "@nextgisweb/webmap/plugin/type";
+import type { LayerItemConfig } from "@nextgisweb/webmap/type/TreeItems";
 import ZoomToFilteredBtn from "@nextgisweb/webmap/zoom-to-filtered-btn";
 
 import type ShadowDisplay from "../compat/ShadowDisplay";
-import type {
-    DisplayItemConfig,
-    DojoTopic,
-    TopicSubscription,
-} from "../panels-manager/type";
+import type topic from "../compat/topic";
 import type { PluginBase } from "../plugin/PluginBase";
 
 const msgGoto = gettext("Go to");
@@ -28,7 +25,7 @@ const msgGoto = gettext("Go to");
 interface WebMapFeatureGridTabProps {
     plugin: PluginBase;
     layerId: number;
-    topic: DojoTopic;
+    topic: typeof topic;
 }
 
 export function WebMapFeatureGridTab({
@@ -36,10 +33,10 @@ export function WebMapFeatureGridTab({
     plugin,
     layerId,
 }: WebMapFeatureGridTabProps) {
-    const topicHandlers = useRef<TopicSubscription[]>([]);
+    const topicHandlers = useRef<ReturnType<typeof topic.subscribe>[]>([]);
 
     const display = useRef<ShadowDisplay>(plugin.display);
-    const itemConfig = useRef<DisplayItemConfig>(display.current.itemConfig);
+    const itemConfig = useRef<LayerItemConfig>(display.current.itemConfig);
     const data = useRef<FeatureLayerWebMapPluginConfig>(
         itemConfig.current?.plugin[
             plugin.identity as string
@@ -76,7 +73,6 @@ export function WebMapFeatureGridTab({
                 cleanSelectedOnFilter: false,
                 onDelete: reloadLayer,
                 onSave: () => {
-                    display.current.identify._popup.widget?.reset();
                     reloadLayer();
                 },
 

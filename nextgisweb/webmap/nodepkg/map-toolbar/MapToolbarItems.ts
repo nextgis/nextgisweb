@@ -1,29 +1,29 @@
-import type { Tool } from "../map-controls/type";
+import type ShadowDisplay from "../compat/ShadowDisplay";
+import type { ToolBase } from "../map-controls/tool/ToolBase";
 import { MapStatesObserverSingleton } from "../map-state-observer/MapStatesObserver";
-import type { DojoDisplay } from "../type";
 
 import { ToggleControl } from "./ToggleControl";
 import { WidgetBase } from "./WidgetBase";
 
 interface ToolbarButton {
     new (options: unknown): {
-        display: DojoDisplay;
+        display: ShadowDisplay;
         placeAt: (node: HTMLElement) => void;
     };
 }
 
 export class MapToolbarItems extends WidgetBase {
-    private display: DojoDisplay;
+    private display: ShadowDisplay;
     private mapStates = MapStatesObserverSingleton.getInstance();
 
-    constructor({ display }: { display: DojoDisplay }) {
+    constructor({ display }: { display: ShadowDisplay }) {
         super();
         this.display = display;
         this.domNode.className = "map-toolbar-items";
     }
 
     addTool(
-        tool: Tool,
+        tool: ToolBase,
         state: string,
         place?: HTMLElement | ((control: ToggleControl) => void)
     ): void {

@@ -2,6 +2,8 @@ import { EventEmitter } from "./EventEmitter";
 
 type EventCallback = (...args: any[]) => void;
 
+export type SubscribeReturnType = { remove: () => void };
+
 class Topic {
     private hub: EventEmitter = new EventEmitter();
 
@@ -9,7 +11,7 @@ class Topic {
         this.hub.emit(topic, event);
     }
 
-    subscribe(topic: string, listener: EventCallback): { remove: () => void } {
+    subscribe(topic: string, listener: EventCallback): SubscribeReturnType {
         return this.hub.on(topic, listener);
     }
 }

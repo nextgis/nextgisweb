@@ -1,5 +1,5 @@
 import type { Position } from "@nextgisweb/webmap/ol/Map";
-import type { DojoDisplay } from "@nextgisweb/webmap/type";
+import type { ShadowDisplay } from "@nextgisweb/webmap/type";
 
 type TransformedPosition = {
     zoom: number;
@@ -23,7 +23,7 @@ type Detail = "position" | "zoom" | "move";
  *    }
  * }, false);
  */
-export function handlePostMessage(display: DojoDisplay) {
+export function handlePostMessage(display: ShadowDisplay) {
     const parent = window.parent;
 
     if (

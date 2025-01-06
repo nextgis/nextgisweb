@@ -1,14 +1,14 @@
 import { Control } from "ol/control";
 
-import type { DojoDisplay } from "@nextgisweb/webmap/type";
+import type { ShadowDisplay } from "@nextgisweb/webmap/type";
 
 interface ScaleControlOptions {
     target?: HTMLElement;
-    display: DojoDisplay;
+    display: ShadowDisplay;
 }
 
 export class InfoScale extends Control {
-    private display: DojoDisplay;
+    private display: ShadowDisplay;
 
     constructor({ display, target }: ScaleControlOptions) {
         const element = document.createElement("span");
