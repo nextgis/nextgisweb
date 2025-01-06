@@ -1,7 +1,9 @@
+export type LayerType = "layer" | "group" | "root";
+
 interface BaseItem {
     id: number;
     key: number;
-    type: "layer" | "group" | "root";
+    type: LayerType;
     label: string;
     title: string;
 }
