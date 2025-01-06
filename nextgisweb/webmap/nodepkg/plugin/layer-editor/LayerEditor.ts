@@ -259,6 +259,9 @@ export class LayerEditor extends PluginBase {
 
     private async onClickTreeItem(): Promise<boolean> {
         const itemConfig = this.display.get("itemConfig");
+        if (!itemConfig) {
+            throw new Error("There is no itemConfig in display");
+        }
         const isPreviousEditing = this.editingItem !== undefined;
 
         this.selectedResourceId = itemConfig.layerId;
