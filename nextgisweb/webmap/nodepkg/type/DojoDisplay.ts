@@ -90,7 +90,7 @@ export interface DojoDisplay extends dijit._WidgetBase {
     _onNewStoreItem: (item: WebmapItem | any) => void;
     _mapAddLayer: (id: number) => void;
     _mapDeferred: PromiseLike<void>;
-
+    _zoomToInitialExtent: () => void;
     _mapExtentDeferred: PromiseLike<void>;
 
     getVisibleItems: () => Promise<TreeItem[]>;
