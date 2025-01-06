@@ -15,6 +15,7 @@ import type { WebmapLayer } from "./WebmapLayer";
 import type { WebmapPlugin } from "./WebmapPlugin";
 
 import type { DojoItem } from ".";
+import { TreeItem } from "./TreeItems";
 
 export interface HighlightFeatureData {
     geom: string;
@@ -96,7 +97,9 @@ export interface DojoDisplay extends dijit._WidgetBase {
 
     _mapExtentDeferred: PromiseLike<void>;
 
-    getVisibleItems: () => Promise<WebmapItem[]>;
+    getVisibleItems: () => Promise<TreeItem[]>;
+
+    _itemConfigById: Record<number, TreeItem>;
 
     panelsManager: PanelsManager;
 

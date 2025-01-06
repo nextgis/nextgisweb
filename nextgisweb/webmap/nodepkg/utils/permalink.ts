@@ -3,11 +3,11 @@ import { toLonLat } from "ol/proj";
 
 import type { VisibleMode } from "../store/annotations/AnnotationsStore";
 import type { DojoDisplay } from "../type";
-import type { WebmapItem } from "../type/WebmapItem";
+import type { TreeItem } from "../type/TreeItems";
 
 export interface GetPermalinkOptions {
     display: DojoDisplay;
-    visibleItems: WebmapItem[];
+    visibleItems: TreeItem[];
     visibleMode?: VisibleMode | null;
     center?: Coordinate;
     additionalParams?: Record<string, string | number | boolean | string[]>;
