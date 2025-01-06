@@ -49,61 +49,57 @@ import { getURLParams, setURLParam } from "../utils/URL";
 export class Display {
     private readonly modeURLParam: keyof MapURLParams = "panel";
     private readonly emptyModeURLValue = "none";
-
-    mapNode!: HTMLElement;
+    readonly _itemConfigById: Record<string, TreeItemConfig> = {};
+    displayProjection = "EPSG:3857";
+    lonlatProjection = "EPSG:4326";
 
     config: DisplayConfig;
     tinyConfig?: TinyConfig;
     clientSettings: WebMapSettings = settings;
-    identify!: Identify;
-    featureHighlighter!: FeatureHighlighter;
+    tiny?: boolean;
 
-    _mapDeferred: LoggedDeferred;
+    readonly map: Map;
+    mapNode?: HTMLElement;
+    private _extent: Extent;
+    private _extentConst: Extent;
+    private readonly _layerOrder: number[] = []; // Layers from back to front
 
-    _mapExtentDeferred: LoggedDeferred;
-    _urlParams: Record<keyof MapURLParams, string>;
+    itemStore: CustomItemFileWriteStore;
+    webmapStore: WebmapStore;
+    tabsManager: WebMapTabsStore;
+    panelsManager: PanelsManager;
+    mapStates: IMapStatesObserver;
+    mapToolbar?: MapToolbar;
 
-    _mid: Mid = {
+    identify?: Identify;
+    featureHighlighter: FeatureHighlighter;
+    readonly plugins: Record<string, PluginBase> = {};
+    private readonly _adapters: Record<string, WebmapAdapter> = {};
+    private _mid: Mid = {
         basemap: {},
         adapter: {},
         plugin: {},
         wmplugin: {},
     };
-    _midDeferred: Record<string, LoggedDeferred>;
-    _layersDeferred: LoggedDeferred;
-    _postCreateDeferred: LoggedDeferred;
-    _startupDeferred: LoggedDeferred;
-    _itemStoreDeferred: LoggedDeferred;
-    _extent_const!: Extent;
-    _extent: Extent;
-    _layer_order!: number[];
-    tiny?: boolean;
 
-    _itemConfigById: Record<string, TreeItemConfig> = {};
+    urlParams: Record<keyof MapURLParams, string>;
 
-    tabsManager: WebMapTabsStore;
-    panelsManager!: PanelsManager;
+    // Deferred Objects
+    mapDeferred: LoggedDeferred;
+    mapExtentDeferred: LoggedDeferred;
+    layersDeferred: LoggedDeferred;
+    private _midDeferred: Record<string, LoggedDeferred>;
+    private _postCreateDeferred: LoggedDeferred;
+    private _startupDeferred: LoggedDeferred;
+    private _itemStoreDeferred: LoggedDeferred;
 
-    itemStore!: CustomItemFileWriteStore;
-    webmapStore!: WebmapStore;
-    mapStates!: IMapStatesObserver;
-
-    displayProjection = "EPSG:3857";
-    lonlatProjection = "EPSG:4326";
-
-    mapToolbar!: MapToolbar;
-    _plugins: Record<string, PluginBase> = {};
-
+    // UI Control Panes
     leftTopControlPane?: HTMLElement;
     leftBottomControlPane?: HTMLElement;
     rightTopControlPane?: HTMLElement;
     rightBottomControlPane?: HTMLElement;
 
-    _adapters!: Record<string, WebmapAdapter>;
-
-    readonly map: Map;
-
-    @observable.shallow accessor _baseLayer!: BaseLayer;
+    @observable.shallow accessor baseLayer: BaseLayer | null = null;
     @observable.shallow accessor item: StoreItem | null = null;
     @observable.shallow accessor itemConfig: LayerItemConfig | null = null;
 
@@ -116,16 +112,28 @@ export class Display {
     }) {
         this.config = config;
         this.tinyConfig = tinyConfig;
-        this._urlParams = getURLParams<MapURLParams>();
+        this.urlParams = getURLParams<MapURLParams>();
 
         this._itemStoreDeferred = new LoggedDeferred("_itemStoreDeferred");
-        this._mapDeferred = new LoggedDeferred("_mapDeferred");
-        this._mapExtentDeferred = new LoggedDeferred("_mapExtentDeferred");
-        this._layersDeferred = new LoggedDeferred("_layersDeferred");
+        this.mapDeferred = new LoggedDeferred("_mapDeferred");
+        this.mapExtentDeferred = new LoggedDeferred("_mapExtentDeferred");
+        this.layersDeferred = new LoggedDeferred("_layersDeferred");
         this._postCreateDeferred = new LoggedDeferred("_postCreateDeferred");
         this._startupDeferred = new LoggedDeferred("_startupDeferred");
         this.tabsManager = new WebMapTabsStore();
         this.mapStates = MapStatesObserver.getInstance();
+
+        this._extent = transformExtent(
+            this.config.extent,
+            this.lonlatProjection,
+            this.displayProjection
+        );
+
+        this._extentConst = transformExtent(
+            this.config.extent_const as number[],
+            this.lonlatProjection,
+            this.displayProjection
+        );
 
         this.map = new Map({
             logo: false,
@@ -137,15 +145,17 @@ export class Display {
                 extent: !(
                     this.config.extent_const as (null | number)[]
                 ).includes(null)
-                    ? this._extent_const
+                    ? this._extentConst
                     : undefined,
             }),
         });
 
+        this.featureHighlighter = new FeatureHighlighter(this.map);
+
         // Module loading
         this._midDeferred = {};
 
-        this._buildPanelsManager();
+        this.panelsManager = this._buildPanelsManager();
 
         this._initializeMids();
 
@@ -161,10 +171,20 @@ export class Display {
             deferred.resolve(obj);
         });
 
-        this._itemStoreSetup();
-        this._webmapStoreSetup();
+        const rootItem = this.prepareItem(this.config.rootItem);
+        this.itemStore = new CustomItemFileWriteStore({
+            data: {
+                identifier: "id",
+                label: "label",
+                items: [rootItem],
+            },
+        });
 
-        this._mapDeferred.then(() => {
+        this.webmapStore = new WebmapStore({
+            itemStore: this.itemStore,
+        });
+
+        this.mapDeferred.then(() => {
             this._itemStorePrepare();
         });
 
@@ -175,18 +195,6 @@ export class Display {
             this.config.extent[1] = -82;
         }
 
-        this._extent = transformExtent(
-            this.config.extent,
-            this.lonlatProjection,
-            this.displayProjection
-        );
-
-        this._extent_const = transformExtent(
-            this.config.extent_const as number[],
-            this.lonlatProjection,
-            this.displayProjection
-        );
-
         // // Layers panel
         this._layersPanelSetup();
 
@@ -195,44 +203,29 @@ export class Display {
             this._midDeferred.basemap,
             this._midDeferred.webmapPlugin,
             this._startupDeferred,
-        ])
-            .then(() => {
-                this._pluginsSetup(true);
-                this._mapSetup();
-            })
-            .catch((err) => {
-                console.error(err);
-            });
+        ]).then(() => {
+            this._pluginsSetup(true);
+            this._mapSetup();
+        });
 
         // // Setup layers
-        Promise.all([this._midDeferred.adapter, this._itemStoreDeferred])
-            .then(() => {
+        Promise.all([this._midDeferred.adapter, this._itemStoreDeferred]).then(
+            () => {
                 this._layersSetup();
-            })
-            .catch((err) => {
-                console.error(err);
-            });
+            }
+        );
 
-        Promise.all([this._layersDeferred, this._mapSetup])
-            .then(() => {
-                this._mapAddLayers();
-                this.featureHighlighter = this._initializeFeatureHighlighter();
-            })
-            .catch((err) => {
-                console.error(err);
-            });
+        Promise.all([this.layersDeferred, this._mapSetup]).then(() => {
+            this._mapAddLayers();
+        });
 
         // Tools and plugins
-        Promise.all([this._midDeferred.plugin, this._layersDeferred])
-            .then(() => {
+        Promise.all([this._midDeferred.plugin, this.layersDeferred]).then(
+            () => {
                 this._pluginsSetup();
                 this._buildLayersTree();
-            })
-            .then(undefined, function (err) {
-                console.error(err);
-            });
-
-        // display.tools = [];
+            }
+        );
     }
     startup({
         target,
@@ -258,19 +251,23 @@ export class Display {
 
     @computed
     get activeBasemapKey(): "blank" | string {
-        if (!this._baseLayer || !this._baseLayer.name) {
+        if (!this.baseLayer || !this.baseLayer.name) {
             return "blank";
         }
-        return this._baseLayer.name;
+        return this.baseLayer.name;
     }
 
     @action
     setBaseLayer(layer: BaseLayer) {
-        this._baseLayer = layer;
+        this.baseLayer = layer;
     }
 
     @action
     _mapSetup() {
+        if (!this.mapNode) {
+            throw new Error("Display is not started yet!");
+        }
+
         this.mapToolbar = new MapToolbar({
             display: this,
             target: this.leftBottomControlPane,
@@ -341,7 +338,7 @@ export class Display {
         }
 
         appendTo(this.mapNode);
-        this._mapDeferred.resolve(true);
+        this.mapDeferred.resolve(true);
     }
     _mapAddControls(controls: Control[]) {
         controls.forEach((control) => {
@@ -353,7 +350,7 @@ export class Display {
         this.map?.addLayer(layer);
     }
     private _mapAddLayers() {
-        this._layer_order.forEach((id) => {
+        this._layerOrder.forEach((id) => {
             this._mapAddLayer(id);
         });
     }
@@ -365,7 +362,7 @@ export class Display {
         this.map.olMap.getView().fit(this._extent);
     }
     _zoomByUrlParams(): boolean {
-        const urlParams = this._urlParams;
+        const urlParams = this.urlParams;
 
         if (
             !("zoom" in urlParams && "lon" in urlParams && "lat" in urlParams)
@@ -429,22 +426,7 @@ export class Display {
     dumpItem() {
         return this.itemStore.dumpItem(this.item);
     }
-    private _itemStoreSetup() {
-        this._itemConfigById = {};
-        const rootItem = this.prepareItem(this.config.rootItem);
-        this.itemStore = new CustomItemFileWriteStore({
-            data: {
-                identifier: "id",
-                label: "label",
-                items: [rootItem],
-            },
-        });
-    }
-    private _webmapStoreSetup() {
-        this.webmapStore = new WebmapStore({
-            itemStore: this.itemStore,
-        });
-    }
+
     private _itemStorePrepare() {
         this.itemStore.fetch({
             queryOptions: { deep: true },
@@ -495,14 +477,14 @@ export class Display {
             return false;
         }
 
-        if (this._baseLayer && this._baseLayer.name) {
-            const { name } = this._baseLayer;
+        if (this.baseLayer && this.baseLayer.name) {
+            const { name } = this.baseLayer;
             this.map.layers[name].olLayer.setVisible(false);
         }
 
         const newLayer = this.map.layers[basemapLayerKey];
         newLayer.olLayer.setVisible(true);
-        this._baseLayer = newLayer;
+        this.baseLayer = newLayer;
 
         return true;
     }
@@ -528,10 +510,9 @@ export class Display {
                 return this.webmapStore._layers;
             },
         });
-        this._layer_order = []; // Layers from back to front
 
-        if (typeof this._urlParams.styles === "string") {
-            visibleStyles = this._urlParams.styles
+        if (typeof this.urlParams.styles === "string") {
+            visibleStyles = this.urlParams.styles
                 .split(",")
                 .map((i) => parseInt(i, 10));
         }
@@ -567,11 +548,11 @@ export class Display {
                 }
             },
             onComplete: () => {
-                this._layersDeferred.resolve(true);
+                this.layersDeferred.resolve(true);
             },
             onError: (error: Error) => {
                 console.error(error);
-                this._layersDeferred.reject(false);
+                this.layersDeferred.reject(false);
             },
         });
     }
@@ -617,11 +598,9 @@ export class Display {
     private _onNewStoreItem(item: StoreItem) {
         const store = this.itemStore;
         this._layerSetup(item);
-        this._layer_order.unshift(store.getValue(item, "id"));
+        this._layerOrder.unshift(store.getValue(item, "id"));
     }
     private _adaptersSetup() {
-        this._adapters = {};
-
         Object.keys(this._mid.adapter).forEach((k) => {
             this._adapters[k] = new this._mid.adapter[k]({
                 display: this,
@@ -642,30 +621,30 @@ export class Display {
             return false;
         }
 
-        if (this._baseLayer && this._baseLayer.name) {
-            const { name } = this._baseLayer;
+        if (this.baseLayer && this.baseLayer.name) {
+            const { name } = this.baseLayer;
             this.map.layers[name].olLayer.setVisible(false);
         }
 
         const newLayer = this.map.layers[basemapLayerKey];
         newLayer.olLayer.setVisible(true);
-        this._baseLayer = newLayer;
+        this.baseLayer = newLayer;
 
         return true;
     }
     private _layersPanelSetup() {
         Promise.all([
-            this._layersDeferred,
-            this._mapDeferred,
+            this.layersDeferred,
+            this.mapDeferred,
             this._postCreateDeferred,
             this.panelsManager.panelsReady.promise,
         ])
             .then(() => {
-                if (this._urlParams.base) {
-                    this.switchBasemap(this._urlParams.base);
+                if (this.urlParams.base) {
+                    this.switchBasemap(this.urlParams.base);
                 }
                 this._setMapExtent();
-                this._mapExtentDeferred.resolve(true);
+                this.mapExtentDeferred.resolve(true);
             })
             .catch((err) => {
                 console.error(err);
@@ -675,10 +654,6 @@ export class Display {
     // PLUGINS
 
     private _pluginsSetup(wmplugin?: boolean) {
-        if (!this._plugins) {
-            this._plugins = {};
-        }
-
         const plugins = wmplugin ? this._mid.wmplugin : this._mid.plugin;
 
         this._installPlugins(plugins);
@@ -720,7 +695,7 @@ export class Display {
                     console.log("Plugin [%s]::startup...", key);
                     plugin.startup();
 
-                    this._plugins[key] = plugin;
+                    this.plugins[key] = plugin;
                     console.info("Plugin [%s] registered", key);
                 });
             });
@@ -804,13 +779,12 @@ export class Display {
             },
         });
     }
-    _initializeFeatureHighlighter() {
-        return new FeatureHighlighter(this.map);
-    }
+
     private _identifyFeatureByAttrValue() {
-        const urlParams = this._urlParams;
+        const urlParams = this.urlParams;
 
         if (
+            !this.identify ||
             !(
                 urlParams.hl_lid !== undefined &&
                 urlParams.hl_attr !== undefined &&
@@ -845,11 +819,11 @@ export class Display {
     }
 
     getUrlParams() {
-        return this._urlParams;
+        return this.urlParams;
     }
 
     private _buildPanelsManager() {
-        const activePanelKey = this._urlParams[this.modeURLParam];
+        const activePanelKey = this.urlParams[this.modeURLParam];
         const onChangePanel = (panel?: PanelPlugin) => {
             if (panel) {
                 setURLParam(this.modeURLParam, panel.name);
@@ -860,21 +834,18 @@ export class Display {
 
         let allowPanels;
         if (this.isTinyMode()) {
-            const panels = this._urlParams.panels;
+            const panels = this.urlParams.panels;
             allowPanels = panels ? panels.split(",") : [];
         }
 
-        this.panelsManager = new PanelsManager(
+        const panelsManager = new PanelsManager(
             this,
             activePanelKey,
             allowPanels,
             onChangePanel
         );
 
-        this._buildPanels();
-    }
-    private async _buildPanels() {
-        await Promise.all([this._layersDeferred, this._postCreateDeferred]);
+        return panelsManager;
     }
 
     private _hideNavMenuForGuest() {

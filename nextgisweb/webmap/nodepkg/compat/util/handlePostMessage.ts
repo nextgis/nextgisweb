@@ -27,7 +27,7 @@ export function handlePostMessage(display: Display) {
     const parent = window.parent;
 
     if (
-        display._urlParams.events === "true" &&
+        display.urlParams.events === "true" &&
         parent &&
         typeof parent.postMessage === "function"
     ) {
