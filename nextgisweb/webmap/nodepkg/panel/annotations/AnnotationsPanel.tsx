@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 
 import { Select, Switch } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import topic from "@nextgisweb/webmap/compat/topic";
 import type { PanelComponentProps } from "@nextgisweb/webmap/panels-manager/type";
 import AnnotationsStore from "@nextgisweb/webmap/store/annotations";
 import type { AnnotationVisibleMode } from "@nextgisweb/webmap/store/annotations/AnnotationsStore";
@@ -21,16 +22,10 @@ interface AnnotationFilter {
     private: boolean;
 }
 
-interface AnnotationsPanelProps extends PanelComponentProps {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    onTopicPublish: (val: [string, any?]) => void;
-    initialAnnotVisible?: AnnotationVisibleMode;
-}
-
 const ADD_ANNOTATION_STATE_KEY = "addAnnotation";
 
 const AnnotationsPanel = observer(
-    ({ display, title, close, onTopicPublish }: AnnotationsPanelProps) => {
+    ({ display, title, close }: PanelComponentProps) => {
         const [visible, setVisible] = useState(AnnotationsStore.visibleMode);
         const [editable, setEditable] = useState(false);
         const [edit, setEdit] = useState(false);
@@ -47,11 +42,10 @@ const AnnotationsPanel = observer(
         const changeVisible = useCallback(
             (visibleMode: AnnotationVisibleMode | null) => {
                 setVisible(visibleMode);
-                onTopicPublish(["/annotations/visible", visibleMode]);
-
+                topic.publish("/annotations/visible", visibleMode);
                 AnnotationsStore.setVisibleMode(visibleMode);
             },
-            [onTopicPublish]
+            []
         );
 
         const changeEdit = useCallback(
@@ -59,42 +53,33 @@ const AnnotationsPanel = observer(
                 if (beginEdit) {
                     display.mapStates.activateState(ADD_ANNOTATION_STATE_KEY);
                     changeVisible("messages");
-                    onTopicPublish([
-                        "webmap/annotations/add/activate",
-                        geomType,
-                    ]);
+                    topic.publish("webmap/annotations/add/activate", geomType);
                 } else {
                     display.mapStates.deactivateState(ADD_ANNOTATION_STATE_KEY);
-                    onTopicPublish(["webmap/annotations/add/deactivate"]);
+                    topic.publish("webmap/annotations/add/deactivate");
                 }
                 setEdit(beginEdit);
             },
-            [changeVisible, display.mapStates, geomType, onTopicPublish]
+            [changeVisible, display.mapStates, geomType]
         );
 
-        const changeGeomType = useCallback(
-            (type: GeometryType): void => {
-                setGeomType(type);
-                onTopicPublish([
-                    "webmap/annotations/change/geometryType",
-                    type,
-                ]);
-            },
-            [onTopicPublish]
-        );
+        const changeGeomType = useCallback((type: GeometryType): void => {
+            setGeomType(type);
+            topic.publish("webmap/annotations/change/geometryType", type);
+        }, []);
 
         const changeAccessTypeFilters = useCallback(
             (value: boolean, type: keyof AnnotationFilter): void => {
                 setAnnFilter((prevFilter) => {
                     const newFilter = { ...prevFilter, [type]: value };
-                    onTopicPublish([
+                    topic.publish(
                         "webmap/annotations/filter/changed",
-                        newFilter,
-                    ]);
+                        newFilter
+                    );
                     return newFilter;
                 });
             },
-            [onTopicPublish]
+            []
         );
 
         useEffect(() => {

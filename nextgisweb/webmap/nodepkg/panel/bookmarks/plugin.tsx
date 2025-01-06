@@ -1,20 +1,20 @@
 /** @plugin */
-
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { createPanelRegistry } from "@nextgisweb/webmap/panels-manager/registry";
+import { registry } from "@nextgisweb/webmap/panels-manager/registry";
+import type { DisplayConfig } from "@nextgisweb/webmap/type/api";
 
 import BookmarkIcon from "@nextgisweb/icon/material/bookmark";
 
 const msgTitle = gettext("Bookmarks");
 
-createPanelRegistry(COMP_ID, () => import("./BookmarksPanel"), {
+registry.register(COMP_ID, () => import("./BookmarksPanel"), {
     title: msgTitle,
     name: "bookmark",
     order: 50,
     menuIcon: <BookmarkIcon />,
     applyToTinyMap: true,
 
-    isEnabled: (meta) => {
-        return typeof meta.display?.config.bookmarkLayerId === "number";
+    isEnabled: ({ config }: { config: DisplayConfig }) => {
+        return typeof config.bookmarkLayerId === "number";
     },
 });

@@ -126,6 +126,9 @@ export interface BasePanelMeta {
     applyToTinyMap?: boolean;
     enabled?: boolean;
     key?: string;
+
+    isEnabled?: ({ config }: { config: Display["config"] }) => boolean;
+    startup?: (display: Display) => Promise<unknown>;
 }
 
 export type PanelMeta<T = unknown> = BasePanelMeta & T;
