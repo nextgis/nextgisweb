@@ -2,7 +2,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { DescriptionPanelProps } from "@nextgisweb/webmap/panel/description/DescriptionPanel";
 import type { PanelPlugin } from "@nextgisweb/webmap/panels-manager/registry";
 import type { PluginState } from "@nextgisweb/webmap/type";
-import type { LayerItemConfig } from "@nextgisweb/webmap/type/TreeItems";
+import type { LayerItemConfig } from "@nextgisweb/webmap/type/api";
 
 import { PluginBase } from "../PluginBase";
 import type { DescriptionWebMapPluginConfig } from "../type";

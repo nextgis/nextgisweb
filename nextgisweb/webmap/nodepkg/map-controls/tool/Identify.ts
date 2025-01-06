@@ -17,7 +17,7 @@ import type {
     IdentifyInfo,
 } from "@nextgisweb/webmap/panel/identification/identification";
 import type { PanelPlugin } from "@nextgisweb/webmap/panels-manager/registry";
-import type { LayerItemConfig } from "@nextgisweb/webmap/type/TreeItems";
+import type { LayerItemConfig } from "@nextgisweb/webmap/type/api";
 
 import { ToolBase } from "./ToolBase";
 

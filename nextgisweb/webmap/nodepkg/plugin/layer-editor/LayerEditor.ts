@@ -25,7 +25,7 @@ import type {
     PluginParams,
     PluginState,
 } from "@nextgisweb/webmap/type";
-import type { LayerItemConfig } from "@nextgisweb/webmap/type/TreeItems";
+import type { LayerItemConfig } from "@nextgisweb/webmap/type/api";
 
 import { EditingToolbar } from "../../map-controls/control/editing/EditingToolbar";
 import MapStatesObserverSingleton from "../../map-state-observer";

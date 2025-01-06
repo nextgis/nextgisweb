@@ -14,6 +14,10 @@ import topic from "@nextgisweb/webmap/compat/topic";
 import { buildControls } from "@nextgisweb/webmap/map-controls";
 import MapToolbar from "@nextgisweb/webmap/map-toolbar";
 import PanelsManager from "@nextgisweb/webmap/panels-manager";
+import type {
+    DisplayConfig,
+    LayerItemConfig,
+} from "@nextgisweb/webmap/type/api";
 import { WebMapTabsStore } from "@nextgisweb/webmap/webmap-tabs";
 
 import { CustomItemFileWriteStore } from "../compat/CustomItemFileWriteStore";
@@ -33,14 +37,14 @@ import type { PanelPlugin } from "../panels-manager/registry";
 import type { PluginBase } from "../plugin/PluginBase";
 import WebmapStore from "../store";
 import type {
-    DisplayConfig,
     MapPlugin,
+    MapRefs,
     MapURLParams,
     Mid,
     TinyConfig,
     WebmapAdapter,
 } from "../type";
-import type { LayerItemConfig, TreeItemConfig } from "../type/TreeItems";
+import type { TreeItemConfig } from "../type/TreeItems";
 import type { WebMapSettings } from "../type/WebmapSettings";
 import { getURLParams, setURLParam } from "../utils/URL";
 
@@ -51,7 +55,7 @@ export class Display {
     mapNode!: HTMLElement;
 
     config: DisplayConfig;
-    tinyConfig!: TinyConfig;
+    tinyConfig?: TinyConfig;
     clientSettings: WebMapSettings = settings;
     identify!: Identify;
     featureHighlighter!: FeatureHighlighter;
@@ -92,10 +96,10 @@ export class Display {
     mapToolbar!: MapToolbar;
     _plugins: Record<string, PluginBase> = {};
 
-    leftTopControlPane!: HTMLDivElement;
-    leftBottomControlPane!: HTMLDivElement;
-    rightTopControlPane!: HTMLDivElement;
-    rightBottomControlPane!: HTMLDivElement;
+    leftTopControlPane!: HTMLElement;
+    leftBottomControlPane!: HTMLElement;
+    rightTopControlPane!: HTMLElement;
+    rightBottomControlPane!: HTMLElement;
 
     _layers!: Record<number, BaseLayer>;
     _adapters!: Record<string, WebmapAdapter>;
@@ -106,9 +110,15 @@ export class Display {
     @observable.shallow accessor item: StoreItem | null = null;
     @observable.shallow accessor itemConfig: LayerItemConfig | null = null;
 
-    constructor({ config }: { config: DisplayConfig }) {
+    constructor({
+        config,
+        tinyConfig,
+    }: {
+        config: DisplayConfig;
+        tinyConfig?: TinyConfig;
+    }) {
         this.config = config;
-
+        this.tinyConfig = tinyConfig;
         this._urlParams = getURLParams<MapURLParams>();
 
         this._itemStoreDeferred = new LoggedDeferred("_itemStoreDeferred");
@@ -175,7 +185,7 @@ export class Display {
         );
 
         this._extent_const = transformExtent(
-            this.config.extent_const,
+            this.config.extent_const as number[],
             this.lonlatProjection,
             this.displayProjection
         );
@@ -233,13 +243,7 @@ export class Display {
         leftBottomControlPane,
         rightTopControlPane,
         rightBottomControlPane,
-    }: {
-        target: HTMLElement;
-        leftTopControlPane: HTMLDivElement;
-        leftBottomControlPane: HTMLDivElement;
-        rightTopControlPane: HTMLDivElement;
-        rightBottomControlPane: HTMLDivElement;
-    }) {
+    }: MapRefs) {
         this.mapNode = target;
         this.leftTopControlPane = leftTopControlPane;
         this.leftBottomControlPane = leftBottomControlPane;
@@ -250,7 +254,7 @@ export class Display {
         this._postCreate();
     }
     _postCreate() {
-        // this._handleTinyDisplayMode();
+        this._handleTinyDisplayMode();
 
         this._postCreateDeferred.resolve(true);
     }
@@ -882,7 +886,7 @@ export class Display {
             return;
         }
 
-        this.domNode.classList.add("tiny-panels");
+        // this.domNode.classList.add("tiny-panels");
         const activePanel = this.panelsManager.getActivePanelName();
         if (!activePanel) {
             return;
@@ -894,8 +898,6 @@ export class Display {
         if (!this.isTinyMode()) {
             return;
         }
-
-        this.domNode.classList.add("tiny");
 
         Promise.all([
             this._layersDeferred,
@@ -922,7 +924,7 @@ export class Display {
         navMenu.style.display = "none";
     }
     private _addLinkToMainMap() {
-        if (this._urlParams.linkMainMap !== "true") {
+        if (!this.tinyConfig || this._urlParams.linkMainMap !== "true") {
             return;
         }
         this.map.olMap.addControl(

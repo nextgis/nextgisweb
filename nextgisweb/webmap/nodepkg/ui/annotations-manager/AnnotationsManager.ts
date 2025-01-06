@@ -5,7 +5,7 @@ import { errorModal } from "@nextgisweb/gui/error";
 import { route } from "@nextgisweb/pyramid/api";
 import topic from "@nextgisweb/webmap/compat/topic";
 import type { Display } from "@nextgisweb/webmap/display";
-import type { VisibleMode } from "@nextgisweb/webmap/store/annotations/AnnotationsStore";
+import type { AnnotationVisibleMode } from "@nextgisweb/webmap/store/annotations/AnnotationsStore";
 
 import { AnnotationFeature } from "../../layer/annotations/AnnotationFeature";
 import type { AnnotationInfo } from "../../layer/annotations/AnnotationFeature";
@@ -18,7 +18,7 @@ import type { DialogResult } from "../annotation-dialog/AnnotationDialog";
 
 interface ManagerOptions {
     display: Display;
-    initialAnnotVisible?: VisibleMode;
+    initialAnnotVisible?: AnnotationVisibleMode;
 }
 
 export class AnnotationsManager {
@@ -28,7 +28,7 @@ export class AnnotationsManager {
     private _annotationsLayer!: AnnotationsLayer;
     private _editableLayer!: AnnotationsEditableLayer;
     private _annotationsDialog!: AnnotationsDialog;
-    private _annotationsVisibleState!: VisibleMode;
+    private _annotationsVisibleState!: AnnotationVisibleMode;
     private _editable!: boolean;
 
     constructor(options: ManagerOptions) {
@@ -154,7 +154,7 @@ export class AnnotationsManager {
         this._annotationsLayer.applyFilter(filter);
     }
 
-    private _onAnnotationsVisibleChange(annotVisibleState: VisibleMode): void {
+    private _onAnnotationsVisibleChange(annotVisibleState: AnnotationVisibleMode): void {
         this._annotationsVisibleState = annotVisibleState;
 
         const annotVisible =
