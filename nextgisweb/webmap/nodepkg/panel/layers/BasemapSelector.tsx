@@ -1,11 +1,23 @@
 import { useMemo } from "react";
 
 import { Select } from "@nextgisweb/gui/antd";
+import type { OptionType } from "@nextgisweb/gui/antd";
+import type { DisplayMap } from "@nextgisweb/webmap/type/DisplayMap";
 
 import { UpOutlined } from "@ant-design/icons";
 
-export function BasemapSelector({ map, basemapDefault, onChange }) {
-    const options = useMemo(() => {
+interface BasemapSelectorProps {
+    map: DisplayMap;
+    basemapDefault: number;
+    onChange: (key: number) => void;
+}
+
+export function BasemapSelector({
+    map,
+    basemapDefault,
+    onChange,
+}: BasemapSelectorProps) {
+    const options = useMemo<OptionType[]>(() => {
         const options_ = [];
         for (const [key, layer] of Object.entries(map.layers)) {
             if (!layer.isBaseLayer) continue;
