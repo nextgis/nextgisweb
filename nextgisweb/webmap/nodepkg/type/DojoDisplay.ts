@@ -7,12 +7,12 @@ import type { Options } from "ol/control/Control";
 import type { MapStatesObserver } from "../map-state-observer/MapStatesObserver";
 import type MapToolbar from "../map-toolbar";
 import type { ToggleControl } from "../map-toolbar/ToggleControl";
+import type { Map } from "../ol/Map";
 import type PanelsManager from "../panels-manager";
 import type WebmapStore from "../store";
 import type { WebMapTab } from "../webmap-tabs/WebMapTabsStore";
 
 import type { DisplayConfig } from "./DisplayConfig";
-import type { DisplayMap } from "./DisplayMap";
 import type { LayerItem, TreeItem } from "./TreeItems";
 import type { WebmapItem } from "./WebmapItem";
 import type { WebmapLayer } from "./WebmapLayer";
@@ -97,6 +97,9 @@ export interface DojoDisplay extends dijit._WidgetBase {
     _mapDeferred: PromiseLike<void>;
     _zoomToInitialExtent: () => void;
     _mapExtentDeferred: PromiseLike<void>;
+    _urlParams: Record<string, string>;
+
+    _layersDeferred: Promise<void>;
 
     handleSelect: (selectedKeys: number[]) => void;
     setLayerZIndex: (id: number, zIndex: number) => void;
@@ -118,7 +121,7 @@ export interface DojoDisplay extends dijit._WidgetBase {
     webmapStore: WebmapStore;
     mapStates: MapStatesObserver;
 
-    map: DisplayMap;
+    map: Map;
     mapContainer: dijit.layout.BorderContainer;
     displayProjection: string;
 
@@ -154,7 +157,7 @@ export interface PluginParams {
 export interface PluginState {
     enabled: boolean;
     nodeData: LayerItem;
-    map: DisplayMap;
+    map: Map;
 }
 
 export interface Plugin {
