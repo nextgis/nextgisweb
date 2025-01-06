@@ -2,7 +2,7 @@ import type { Feature } from "ol";
 import { Vector as VectorSource } from "ol/source";
 
 import type { Map } from "../../ol/Map";
-import { Vector as VectorLayerClass } from "../../ol/layer/Vector";
+import VectorLayerClass from "../../ol/layer/Vector";
 
 import { AnnotationFeature } from "./AnnotationFeature";
 import type { AnnotationInfo } from "./AnnotationFeature";
