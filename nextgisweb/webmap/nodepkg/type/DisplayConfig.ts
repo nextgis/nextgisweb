@@ -44,4 +44,5 @@ export interface DisplayConfig {
     annotations: Annotations;
     units: string;
     printMaxSize: number;
+    measureSrsId?: number;
 }
