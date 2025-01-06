@@ -14,4 +14,8 @@ export interface WebmapLayer extends dojo.Stateful {
     title: string;
     reload: () => void;
     printingCopy: () => OlLayer;
+
+    // Maybe just for MID layers?
+    name: string;
+    isBaseLayer: boolean;
 }
