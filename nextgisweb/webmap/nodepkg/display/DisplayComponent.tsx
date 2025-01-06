@@ -10,8 +10,8 @@ import NavigationMenu from "../navigation-menu";
 import type { MapRefs, TinyConfig } from "../type";
 
 import { Display } from "./Display";
-import { ActiveComponent } from "./component/ActiveComponent";
 import { MapPane } from "./component/MapPane";
+import { PanelSwitcher } from "./component/PanelSwitcher";
 
 import { LoadingOutlined } from "@ant-design/icons";
 
@@ -88,10 +88,7 @@ export const DisplayComponent = observer(
                                 size={activePanel ? horizontalPanelSize[0] : 0}
                                 resizable={!!activePanel}
                             >
-                                <ActiveComponent
-                                    display={display}
-                                    activePanel={activePanel}
-                                />
+                                <PanelSwitcher display={display} />
                             </Splitter.Panel>
                             <Splitter.Panel>
                                 <Splitter layout="vertical">
