@@ -1,7 +1,6 @@
+import classNames from "classnames";
 import { useLayoutEffect, useMemo, useRef } from "react";
 import type { ReactNode } from "react";
-
-import { mergeClasses } from "@nextgisweb/gui/util";
 
 interface PageTitleProps {
     title?: string;
@@ -25,10 +24,9 @@ export function PageTitle({ title, pullRight, children }: PageTitleProps) {
 
     return (
         <h1
-            className={mergeClasses(
-                "ngw-pyramid-layout-title",
-                pullRight && "pull-right"
-            )}
+            className={classNames("ngw-pyramid-layout-title", {
+                "pull-right": pullRight,
+            })}
         >
             {ititle}
             {children}

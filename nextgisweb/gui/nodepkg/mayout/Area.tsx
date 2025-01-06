@@ -1,7 +1,6 @@
+import classNames from "classnames";
 import { createContext } from "react";
 import type { CSSProperties, ReactNode } from "react";
-
-import { mergeClasses } from "@nextgisweb/gui/util";
 
 import "./Area.less";
 
@@ -66,10 +65,10 @@ export function Area({
     return (
         <AreaContext.Provider value={ctx}>
             <div
-                className={mergeClasses(
+                className={classNames(
                     "ngw-gui-mayout-area",
                     `label-${labelPosition}`,
-                    pad && "pad",
+                    { "pad": pad },
                     rootClassName
                 )}
                 style={{ gridTemplateColumns, ...style }}

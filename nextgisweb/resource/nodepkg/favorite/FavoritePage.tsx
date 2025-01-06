@@ -1,4 +1,5 @@
 /** @entrypoint */
+import classNames from "classnames";
 import { groupBy, partition, sortBy } from "lodash-es";
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { Balancer } from "react-wrap-balancer";
@@ -8,7 +9,6 @@ import { LoadingWrapper } from "@nextgisweb/gui/component";
 import { useThemeVariables } from "@nextgisweb/gui/hook";
 import { DeleteIcon, EditIcon, SuccessIcon } from "@nextgisweb/gui/icon";
 import { SvgIcon } from "@nextgisweb/gui/svg-icon";
-import { mergeClasses } from "@nextgisweb/gui/util";
 import { route } from "@nextgisweb/pyramid/api";
 import {
     useAbortController,
@@ -241,7 +241,7 @@ export default function FavoritePage() {
                     : undefined;
             return (
                 <tr
-                    className={mergeClasses("resource", onClick && "click")}
+                    className={classNames("resource", { "click": onClick })}
                     onClick={onClick}
                 >
                     <td className="dn">

@@ -1,10 +1,11 @@
+import classNames from "classnames";
 import type { CSSProperties } from "react";
 
+/** @deprecated Replace with classNames provided by the classnames library */
 export function mergeClasses(
     ...args: (string | false | undefined)[]
 ): string | undefined {
-    const parts = args.filter(Boolean);
-    return parts.length > 0 ? parts.join(" ") : undefined;
+    return classNames(...args);
 }
 
 export function mergeStyles(

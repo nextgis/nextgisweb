@@ -7,7 +7,6 @@
         "*.less"
     ],
     "dependencies": {
-        "@ngneat/falso": "^7.2.0",
         "@ckeditor/ckeditor5-react": "6.0.0",
         "@codemirror/commands": "^6.2.1",
         "@codemirror/lang-css": "^6.0.2",
@@ -20,8 +19,9 @@
         "@codemirror/language": "^6.6.0",
         "@codemirror/search": "^6.2.3",
         "@codemirror/view": "^6.9.0",
-
+        "@ngneat/falso": "^7.2.0",
         "antd": "5.19.1",
+        "classnames": "^2.5.1",
         "react-complex-tree": "^2.3.2"
     }
 }

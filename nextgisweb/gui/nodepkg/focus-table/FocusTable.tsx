@@ -1,6 +1,6 @@
+import classNames from "classnames";
 import { Fragment, useMemo, useRef, useState } from "react";
 
-import { mergeClasses } from "@nextgisweb/gui/util";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { ComplexTree } from "./ComplexTree";
@@ -85,7 +85,7 @@ export function FocusTable<
     const itemActionsArray = selected ? getItemActionsDetail(selected) : [];
 
     return (
-        <div className={mergeClasses("ngw-gui-focus-table", rootClassName)}>
+        <div className={classNames("ngw-gui-focus-table", rootClassName)}>
             <div className="table">
                 <FocusToolbar
                     environmentRef={environmentRef}

@@ -1,4 +1,5 @@
 import { theme } from "antd";
+import classNames from "classnames";
 import {
     Fragment,
     forwardRef,
@@ -10,7 +11,7 @@ import {
 import type { ForwardedRef, ReactElement, Ref } from "react";
 
 import { useFit } from "../hook/useFit";
-import { mergeClasses, mergeStyles } from "../util";
+import { mergeStyles } from "../util";
 
 import { useActionToolbar } from "./hook/useActionToolbar";
 import type {
@@ -119,7 +120,7 @@ function ActionToolbarInput<
                     ref.current = node;
                 }
             }}
-            className={mergeClasses("ngw-gui-action-toolbar", "action-toolbar")}
+            className={classNames("ngw-gui-action-toolbar", "action-toolbar")}
             style={mergeStyles(
                 pad && { padding: token.paddingSM },
                 borderBlockStart && { borderBlockStart: border },

@@ -1,3 +1,4 @@
+import classNames from "classnames";
 import { observer } from "mobx-react-lite";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import type { CSSProperties, MutableRefObject, ReactNode, Ref } from "react";
@@ -18,7 +19,6 @@ import { Button, Tooltip } from "@nextgisweb/gui/antd";
 import type { ButtonProps } from "@nextgisweb/gui/antd";
 import { useThemeVariables } from "@nextgisweb/gui/hook";
 import { ErrorIcon } from "@nextgisweb/gui/icon";
-import { mergeClasses } from "@nextgisweb/gui/util";
 
 import { ROOT_DATA, ROOT_ITEM, useDataProvider } from "./DataProvider";
 import type { DataProvider } from "./DataProvider";
@@ -182,7 +182,7 @@ function Container(props: {
     return (
         <div
             ref={ref}
-            className={mergeClasses(
+            className={classNames(
                 "ngw-gui-focus-table-complex-tree",
                 className
             )}

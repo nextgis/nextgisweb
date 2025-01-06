@@ -1,9 +1,9 @@
 import type { VirtualItem } from "@tanstack/react-virtual";
+import classNames from "classnames";
 import { useMemo } from "react";
 import type { Key, ReactNode } from "react";
 
 import { utc } from "@nextgisweb/gui/dayjs";
-import { mergeClasses } from "@nextgisweb/gui/util";
 import { useRouteGet } from "@nextgisweb/pyramid/hook";
 
 import { $FID, $VID, KEY_FIELD_ID, LAST_CHANGED_FIELD_ID } from "./constant";
@@ -105,7 +105,7 @@ export function FeatureTableRows({
                     return (
                         <div
                             key={f.id}
-                            className={mergeClasses("td", cellClassName)}
+                            className={classNames("td", cellClassName)}
                             style={{
                                 width: `${effectiveWidths[f.id]}px`,
                             }}
