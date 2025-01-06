@@ -38,6 +38,25 @@ interface LegendInfo {
     open?: boolean;
 }
 
+/**
+ * Сonfiguration for WebMap layer plugins.
+ * You can extend this interface by declaring additional plugin configurations in your modules.
+ *
+ * @example
+ * declare module "@nextgisweb/webmap/type/TreeItems" {
+ *     interface PluginConfig {
+ *         "@nextgisweb/webmap/plugin/feature-layer": FeatureLayerWebMapPluginConfig;
+ *     }
+ * }
+ */
+export interface PluginConfig {
+    [K: string]: any;
+}
+
+export type LayerPluginConfig = {
+    [K in keyof PluginConfig]?: PluginConfig[K] | undefined;
+};
+
 export interface LayerItemConfig extends BaseItem {
     type: "layer";
     layerId: number;
@@ -50,7 +69,7 @@ export interface LayerItemConfig extends BaseItem {
     drawOrderPosition: number | null;
     legendInfo: LegendInfo;
     adapter: string;
-    plugin: Record<string, any>;
+    plugin: LayerPluginConfig;
     minResolution: number | null;
     maxResolution: number | null;
     editable?: boolean;

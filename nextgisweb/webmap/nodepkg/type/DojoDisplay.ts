@@ -5,6 +5,7 @@ import type Feature from "ol/Feature";
 import type OlControl from "ol/control/Control";
 import type { Options } from "ol/control/Control";
 import type { Extent } from "ol/extent";
+import type { Geometry } from "ol/geom";
 
 import type {
     CustomItemFileWriteStore,
@@ -124,6 +125,7 @@ export interface DojoDisplay extends dijit._WidgetBase, ConfigMap {
     featureHighlighter: FeatureHighlighter;
     getUrlParams: () => Record<string, string>;
     isTinyMode: () => boolean;
+    highlightGeometry(geometry: Geometry): void;
     isTinyModePlugin: (plugin: string) => boolean;
     prepareItem: (item: TreeItemConfig) => StoreItemConfig;
     _installPlugins: (plugins: Record<string, PluginBase>) => void;

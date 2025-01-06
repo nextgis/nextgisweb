@@ -4,15 +4,18 @@ import type { LayerItemConfig } from "@nextgisweb/webmap/type/TreeItems";
 import reactPanel from "@nextgisweb/webmap/ui/react-panel";
 
 import { PluginBase } from "../PluginBase";
+import type { DescriptionWebMapPluginConfig } from "../type";
 
 export class LayerInfoPlugin extends PluginBase {
     getPluginState(nodeData: LayerItemConfig): PluginState {
         const state = super.getPluginState(nodeData);
         const infoConfig = this.display.get("itemConfig");
-        const data = infoConfig?.plugin[this.identity];
+        const data = infoConfig?.plugin[
+            this.identity
+        ] as DescriptionWebMapPluginConfig;
         return {
             ...state,
-            enabled: state.enabled && data.description,
+            enabled: !!(state.enabled && data.description),
         };
     }
 
@@ -35,7 +38,9 @@ export class LayerInfoPlugin extends PluginBase {
         const pm = this.display.panelsManager;
         const pkey = "resource-description";
         const item = this.display.dumpItem();
-        const data = this.display.get("itemConfig")?.plugin[this.identity];
+        const data = this.display.get("itemConfig")?.plugin[
+            this.identity
+        ] as DescriptionWebMapPluginConfig;
         if (data !== undefined) {
             const content = data.description;
             let panel = pm.getPanel(pkey);

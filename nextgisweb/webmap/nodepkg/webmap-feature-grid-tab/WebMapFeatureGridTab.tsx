@@ -12,12 +12,12 @@ import type { NoticeType } from "@nextgisweb/gui/antd";
 import { route } from "@nextgisweb/pyramid/api/route";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import FilterExtentBtn from "@nextgisweb/webmap/filter-extent-btn";
+import type { FeatureLayerWebMapPluginConfig } from "@nextgisweb/webmap/plugin/type";
 import ZoomToFilteredBtn from "@nextgisweb/webmap/zoom-to-filtered-btn";
 
 import type {
     DisplayItemConfig,
     DojoTopic,
-    FeatureLayerWebMapPluginConfig,
     TopicSubscription,
 } from "../panels-manager/type";
 import type { DojoDisplay } from "../type";
