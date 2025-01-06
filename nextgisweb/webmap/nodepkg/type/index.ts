@@ -57,6 +57,7 @@ export interface ReactPanelProps {
     order: number;
     title: string;
     splitter?: boolean;
+    applyToTinyMap?: boolean;
 }
 
 export interface AddpanelItem {
