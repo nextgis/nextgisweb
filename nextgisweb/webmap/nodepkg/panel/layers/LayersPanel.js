@@ -1,5 +1,5 @@
 import { LayersTree } from "../../layers-tree/LayersTree";
-import { PanelHeader } from "../header";
+import { PanelContainer } from "../component";
 
 import { BasemapSelector } from "./BasemapSelector";
 import { LayersDropdown } from "./LayersDropdown";
@@ -16,16 +16,33 @@ export function LayersPanel({ title, close, display, ...props }) {
     };
 
     return (
-        <div className="ngw-webmap-layers-panel">
-            <PanelHeader {...{ title, close }}>
-                <LayersDropdown
-                    onClick={(key) => {
-                        if (key === "zoomToAllLayers") {
-                            zoomToAllLayers();
-                        }
+        <PanelContainer
+            title={
+                <>
+                    {title}
+                    <LayersDropdown
+                        onClick={(key) => {
+                            if (key === "zoomToAllLayers") {
+                                zoomToAllLayers();
+                            }
+                        }}
+                    />
+                </>
+            }
+            epilog={
+                <BasemapSelector
+                    {...{
+                        map: display.map,
+                        basemapDefault: display._getActiveBasemapKey(),
+                        onChange: (key) => display._switchBasemap(key),
                     }}
                 />
-            </PanelHeader>
+            }
+            components={{
+                content: PanelContainer.Unpadded,
+                epilog: PanelContainer.Unpadded,
+            }}
+        >
             <LayersTree
                 {...{
                     store: display.webmapStore,
@@ -35,15 +52,6 @@ export function LayersPanel({ title, close, display, ...props }) {
                     ...props,
                 }}
             />
-            <div className="basemap">
-                <BasemapSelector
-                    {...{
-                        map: display.map,
-                        basemapDefault: display._getActiveBasemapKey(),
-                        onChange: (key) => display._switchBasemap(key),
-                    }}
-                />
-            </div>
-        </div>
+        </PanelContainer>
     );
 }

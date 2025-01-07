@@ -1,5 +1,7 @@
-import { Button, Dropdown } from "@nextgisweb/gui/antd";
+import { Dropdown } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+
+import { PanelTitle } from "../component";
 
 import MoreVertIcon from "@nextgisweb/icon/material/more_vert/outline";
 import ZoomInMapIcon from "@nextgisweb/icon/material/zoom_in_map/outline";
@@ -28,7 +30,10 @@ export function LayersDropdown({ onClick }) {
             destroyPopupOnHide
             placement="bottomRight"
         >
-            <Button type="text" shape="circle" icon={<MoreVertIcon />} />
+            <PanelTitle.Button
+                icon={<MoreVertIcon />}
+                style={{ marginInlineStart: "8px" }}
+            />
         </Dropdown>
     );
 }
