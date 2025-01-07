@@ -8,6 +8,7 @@ interface CloseButtonProps extends ButtonProps {
     close?: () => void;
 }
 
+/** @deprecated Use PanelTitle.ButtonClose from @nextgisweb/panel/component */
 export function CloseButton({ close, ...props }: CloseButtonProps) {
     return (
         <Button

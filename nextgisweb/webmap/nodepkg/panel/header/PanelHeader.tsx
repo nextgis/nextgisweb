@@ -9,6 +9,7 @@ interface PanelHeaderProps {
     children?: ReactNode;
 }
 
+/** @deprecated Use components from @nextgisweb/panel/component */
 export function PanelHeader({ title, close, children }: PanelHeaderProps) {
     return (
         <div className="ngw-webmap-panel-header">

@@ -1,0 +1,23 @@
+.ngw-webmap-panel-title {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    border-bottom: 1px solid var(--theme-color-border-secondary);
+    padding-inline: 8px;
+    padding-block: 4px;
+    font-size: 16px;
+    line-height: 24px;
+
+    > * {
+        flex: 0 0 auto;
+    }
+
+    > .content {
+        flex: 1 1 auto;
+        margin-left: auto;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}

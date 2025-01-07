@@ -1,0 +1,54 @@
+.ngw-webmap-panel-section {
+    > .title {
+        display: flex;
+        gap: 4px;
+        padding-inline: 8px;
+        padding-block: 4px;
+        color: var(--theme-color-text-tertiary);
+        font-size: 16px;
+        line-height: 24px;
+
+        > * {
+            flex: 0 0 auto;
+        }
+
+        > .content {
+            flex: 1 1 auto;
+            margin-inline-end: auto;
+            min-width: 0px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    }
+
+    > .content {
+        padding-block: 4px 8px;
+    }
+}
+
+.ngw-webmap-panel-padded > .ngw-webmap-panel-section {
+    margin-inline: -8px;
+
+    &:first-child {
+        margin-block-start: -8px;
+
+        & > .content:first-child {
+            margin-block-start: 4px;
+        }
+    }
+
+    &:last-child {
+        margin-block-end: -8px;
+    }
+
+    > .content {
+        margin-inline: 8px;
+    }
+}
+
+.ngw-webmap-panel-section-accent > .ngw-webmap-panel-content {
+    > .ngw-webmap-panel-section > .title {
+        color: var(--theme-color-primary);
+    }
+}

@@ -1,0 +1,38 @@
+.ngw-webmap-panel-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+
+    > .ngw-webmap-panel-header {
+        flex: 0 0 auto;
+    }
+
+    > .ngw-webmap-panel-prolog {
+        flex: 0 0 auto;
+        border-bottom: 1px solid var(--theme-color-border-secondary);
+    }
+
+    > .ngw-webmap-panel-epilog {
+        flex: 0 0 auto;
+        margin-top: auto;
+        border-top: 1px solid var(--theme-color-border-secondary);
+    }
+
+    > .ngw-webmap-panel-content {
+        display: flex;
+        flex: 1 1 auto;
+        flex-direction: column;
+        gap: 8px;
+        min-height: 0;
+        overflow-y: auto;
+
+        .ngw-webmap-panel-section + .ngw-webmap-panel-section {
+            border-top: 1px solid var(--theme-color-border-secondary);
+        }
+    }
+
+    > .ngw-webmap-panel-padded {
+        padding-inline: 8px;
+        padding-block: 8px;
+    }
+}
