@@ -21,7 +21,7 @@ import { useFavorites } from "@nextgisweb/resource/favorite/useFavorites";
 import { getControls } from "@nextgisweb/webmap/map-controls";
 import { getPermalink } from "@nextgisweb/webmap/utils/permalink";
 
-import { PanelHeader } from "../header";
+import { PanelContainer, PanelSection } from "../component";
 
 import CloseIcon from "@nextgisweb/icon/material/close";
 import PreviewIcon from "@nextgisweb/icon/material/preview";
@@ -279,10 +279,12 @@ export const SharePanel = ({ display, title, close, visible }) => {
     );
 
     return (
-        <div className="ngw-panel ngw-webmap-share-panel">
-            <PanelHeader {...{ title, close }} />
-            <section>
-                <h5 className="heading">{gettext("Map link")}</h5>
+        <PanelContainer
+            className="ngw-webmap-panel-share"
+            title={title}
+            close={close}
+        >
+            <PanelSection>
                 <div className="input-group">
                     <CodeArea value={mapLink} />
                 </div>
@@ -335,12 +337,8 @@ export const SharePanel = ({ display, title, close, visible }) => {
                         ></Input>
                     </Modal>
                 )}
-            </section>
-            <section>
-                <h5 className="heading">
-                    {gettext("Embed code for your site")}
-                </h5>
-
+            </PanelSection>
+            <PanelSection title={gettext("Embed code for your site")}>
                 <div className="input-group">
                     <span className="grow">{gettext("Map size:")}</span>
                     <InputNumber
@@ -414,7 +412,7 @@ export const SharePanel = ({ display, title, close, visible }) => {
                     </Space.Compact>
                 </form>
                 <CORSWarning />
-            </section>
-        </div>
+            </PanelSection>
+        </PanelContainer>
     );
 };

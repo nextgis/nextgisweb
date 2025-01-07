@@ -21,7 +21,7 @@ import URL from "ngw-webmap/utils/URL";
 
 import type { PrintMapSettings } from "../../print-map/type";
 import type { DojoDisplay } from "../../type";
-import { PanelHeader } from "../header";
+import { PanelContainer, PanelSection } from "../component";
 
 import PrintMapExport from "./PrintMapExport";
 import {
@@ -31,12 +31,13 @@ import {
     scalesList,
     urlPrintParams,
 } from "./options";
-import type { Scale, UrlPrintParams } from "./options";
-
-import { ShareAltOutlined } from "@ant-design/icons";
 
 import "../styles/panels.less";
 import "./PrintPanel.less";
+
+import type { Scale, UrlPrintParams } from "./options";
+
+import { ShareAltOutlined } from "@ant-design/icons";
 
 const { TextArea } = Input;
 
@@ -411,10 +412,8 @@ export const PrintPanel = ({
     };
 
     return (
-        <div className="ngw-panel print-panel">
-            <PanelHeader {...{ title, close }} />
-
-            <section>
+        <PanelContainer title={title} close={close}>
+            <PanelSection>
                 <div className="input-group column">
                     <label>{gettext("Paper format")}</label>
                     <Select
@@ -469,10 +468,8 @@ export const PrintPanel = ({
                         step={1}
                     ></InputNumber>
                 </div>
-            </section>
-
-            <section>
-                <h5 className="heading">{gettext("Elements")}</h5>
+            </PanelSection>
+            <PanelSection title={gettext("Elements")}>
                 <div className="input-group">
                     <Switch
                         checked={mapSettings.legend}
@@ -524,10 +521,8 @@ export const PrintPanel = ({
                         {gettext("North Arrow")}
                     </span>
                 </div>
-            </section>
-
-            <section>
-                <h5 className="heading">{gettext("Scale")}</h5>
+            </PanelSection>
+            <PanelSection title={gettext("Scale")}>
                 <div className="input-group">
                     <Switch
                         checked={mapSettings.scaleValue}
@@ -555,9 +550,8 @@ export const PrintPanel = ({
                         onChange={(v) => updateMapSettings({ scale: v })}
                     />
                 </div>
-            </section>
-
-            <section>
+            </PanelSection>
+            <PanelSection>
                 <div className="actions">
                     <PrintMapExport
                         display={display}
@@ -574,7 +568,7 @@ export const PrintPanel = ({
                         ></CopyToClipboardButton>
                     </Space.Compact>
                 </div>
-            </section>
-        </div>
+            </PanelSection>
+        </PanelContainer>
     );
 };

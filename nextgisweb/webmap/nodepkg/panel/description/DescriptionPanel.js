@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef } from "react";
 
-import { CloseButton } from "../header/CloseButton";
+import { PanelContainer } from "../component";
 
 import "./DescriptionPanel.less";
 
@@ -12,7 +12,7 @@ const zoomToFeature = (display, resourceId, featureId) => {
         });
 };
 
-export function DescriptionPanel({ display, close, content }) {
+export function DescriptionPanel({ display, content }) {
     const nodeRef = useRef();
 
     const contentDiv = useMemo(() => {
@@ -53,9 +53,11 @@ export function DescriptionPanel({ display, close, content }) {
     }, []);
 
     return (
-        <div className="ngw-webmap-description-panel">
-            <CloseButton {...{ close }} />
+        <PanelContainer
+            className="ngw-webmap-panel-description"
+            components={{ title: () => undefined }}
+        >
             {contentDiv}
-        </div>
+        </PanelContainer>
     );
 }

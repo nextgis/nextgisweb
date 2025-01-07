@@ -399,7 +399,7 @@ msgstr "Мин. масштаб"
 msgid "Max scale"
 msgstr "Макс. масштаб"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:40 nodepkg/panel/print/PrintPanel.tsx:481
+#: nodepkg/items-widget/ItemsWidget.tsx:40 nodepkg/panel/print/PrintPanel.tsx:478
 #: nodepkg/settings-widget/SettingsWidget.tsx:25
 #: nodepkg/settings/SettingsForm.js:303
 msgid "Legend"
@@ -533,11 +533,11 @@ msgstr "Мои приватные аннотации"
 msgid "Other private annotations"
 msgstr "Другие приватные аннотации"
 
-#: nodepkg/panel/identification/CoordinatesSwitcher.tsx:194
+#: nodepkg/panel/identification/CoordinatesSwitcher.tsx:186
 msgid "Zoom to identification point"
 msgstr "Увеличить до точки идентификации"
 
-#: nodepkg/panel/identification/CoordinatesSwitcher.tsx:200
+#: nodepkg/panel/identification/CoordinatesSwitcher.tsx:202
 msgid "Copy identification point coordinates"
 msgstr "Скопировать координаты точки идентификации"
 
@@ -597,60 +597,60 @@ msgstr "Печать"
 msgid "Save as"
 msgstr "Сохранить как"
 
-#: nodepkg/panel/print/PrintPanel.tsx:231
+#: nodepkg/panel/print/PrintPanel.tsx:232
 msgid "Custom scale"
 msgstr "Произвольный масштаб"
 
-#: nodepkg/panel/print/PrintPanel.tsx:419
+#: nodepkg/panel/print/PrintPanel.tsx:418
 msgid "Paper format"
 msgstr "Формат бумаги"
 
-#: nodepkg/panel/print/PrintPanel.tsx:429
+#: nodepkg/panel/print/PrintPanel.tsx:428
 msgid "Height, mm"
 msgstr "Высота, мм"
 
-#: nodepkg/panel/print/PrintPanel.tsx:445
+#: nodepkg/panel/print/PrintPanel.tsx:444
 msgid "Width, mm"
 msgstr "Ширина, мм"
 
-#: nodepkg/panel/print/PrintPanel.tsx:461
+#: nodepkg/panel/print/PrintPanel.tsx:460
 msgid "Margin, mm"
 msgstr "Отступ, мм"
 
-#: nodepkg/panel/print/PrintPanel.tsx:475
+#: nodepkg/panel/print/PrintPanel.tsx:472
 msgid "Elements"
 msgstr "Элементы"
 
-#: nodepkg/panel/print/PrintPanel.tsx:494
+#: nodepkg/panel/print/PrintPanel.tsx:491
 msgid "Number of legend columns"
 msgstr "Количество столбцов легенды"
 
-#: nodepkg/panel/print/PrintPanel.tsx:503
+#: nodepkg/panel/print/PrintPanel.tsx:500
 #: nodepkg/settings-widget/SettingsWidget.tsx:24
 msgid "Title"
 msgstr "Заголовок"
 
-#: nodepkg/panel/print/PrintPanel.tsx:506
+#: nodepkg/panel/print/PrintPanel.tsx:503
 msgid "Map title text"
 msgstr "Текст заголовка карты"
 
-#: nodepkg/panel/print/PrintPanel.tsx:524
+#: nodepkg/panel/print/PrintPanel.tsx:521
 msgid "North Arrow"
 msgstr "Указатель севера"
 
-#: nodepkg/panel/print/PrintPanel.tsx:530 nodepkg/panel/print/PrintPanel.tsx:551
+#: nodepkg/panel/print/PrintPanel.tsx:525 nodepkg/panel/print/PrintPanel.tsx:546
 msgid "Scale"
 msgstr "Масштаб"
 
-#: nodepkg/panel/print/PrintPanel.tsx:537
+#: nodepkg/panel/print/PrintPanel.tsx:532
 msgid "Scale value"
 msgstr "Значение масштаба"
 
-#: nodepkg/panel/print/PrintPanel.tsx:546
+#: nodepkg/panel/print/PrintPanel.tsx:541
 msgid "Scale bar"
 msgstr "Масштабная линейка"
 
-#: nodepkg/panel/print/PrintPanel.tsx:572
+#: nodepkg/panel/print/PrintPanel.tsx:566
 msgid "Copy link to the print map"
 msgstr "Скопировать ссылку на карту для печати"
 
@@ -682,17 +682,17 @@ msgstr "TIFF"
 msgid "PDF"
 msgstr "PDF"
 
-#: nodepkg/panel/search/SearchPanel.js:324
+#: nodepkg/panel/search/SearchPanel.js:268
+msgid "Enter at least 2 characters"
+msgstr "Введите минимум 2 символа"
+
+#: nodepkg/panel/search/SearchPanel.js:351
 msgid "Not found"
 msgstr "Не найдено"
 
-#: nodepkg/panel/search/SearchPanel.js:329
+#: nodepkg/panel/search/SearchPanel.js:356
 msgid "Refine search criterion. Displayed first 100 search results."
 msgstr "Уточните критерий поиска. Отображены первые 100 результатов поиска."
-
-#: nodepkg/panel/search/SearchPanel.js:362
-msgid "Enter at least 2 characters"
-msgstr "Введите минимум 2 символа"
 
 #: nodepkg/panel/share/SharePanel.js:34
 msgid ""
@@ -720,19 +720,15 @@ msgstr "Нет"
 msgid "Active panel"
 msgstr "Активная панель"
 
-#: nodepkg/panel/share/SharePanel.js:285
-msgid "Map link"
-msgstr "Ссылка на карту"
-
-#: nodepkg/panel/share/SharePanel.js:293
+#: nodepkg/panel/share/SharePanel.js:295
 msgid "The map link copied to clipboard."
 msgstr "Ссылка на карту скопирована в буфер обмена."
 
-#: nodepkg/panel/share/SharePanel.js:297
+#: nodepkg/panel/share/SharePanel.js:299
 msgid "Copy link"
 msgstr "Копировать ссылку"
 
-#: nodepkg/panel/share/SharePanel.js:331
+#: nodepkg/panel/share/SharePanel.js:333
 msgid "Optional fragment label"
 msgstr "Необязательное название фрагмента"
 
@@ -740,51 +736,51 @@ msgstr "Необязательное название фрагмента"
 msgid "Embed code for your site"
 msgstr "Вставить карту на сайт"
 
-#: nodepkg/panel/share/SharePanel.js:345
+#: nodepkg/panel/share/SharePanel.js:343
 msgid "Map size:"
 msgstr "Размер карты:"
 
-#: nodepkg/panel/share/SharePanel.js:347 nodepkg/settings/SettingsForm.js:93
+#: nodepkg/panel/share/SharePanel.js:345 nodepkg/settings/SettingsForm.js:93
 msgid "Width, px"
 msgstr "Ширина, пикс."
 
-#: nodepkg/panel/share/SharePanel.js:353 nodepkg/settings/SettingsForm.js:106
+#: nodepkg/panel/share/SharePanel.js:351 nodepkg/settings/SettingsForm.js:106
 msgid "Height, px"
 msgstr "Высота, пикс."
 
-#: nodepkg/panel/share/SharePanel.js:357
+#: nodepkg/panel/share/SharePanel.js:355
 msgid "px"
 msgstr "px"
 
-#: nodepkg/panel/share/SharePanel.js:360
+#: nodepkg/panel/share/SharePanel.js:358
 msgid "Map tools"
 msgstr "Инструменты карты"
 
-#: nodepkg/panel/share/SharePanel.js:364
+#: nodepkg/panel/share/SharePanel.js:362
 msgid "Panels"
 msgstr "Панели"
 
-#: nodepkg/panel/share/SharePanel.js:379
+#: nodepkg/panel/share/SharePanel.js:377
 msgid "Link to main map"
 msgstr "Ссылка на основную карту"
 
-#: nodepkg/panel/share/SharePanel.js:388
+#: nodepkg/panel/share/SharePanel.js:386
 msgid "Generate events"
 msgstr "Генерация событий"
 
-#: nodepkg/panel/share/SharePanel.js:392
+#: nodepkg/panel/share/SharePanel.js:390
 msgid "Embed code"
 msgstr "Код для встраивания"
 
-#: nodepkg/panel/share/SharePanel.js:405
+#: nodepkg/panel/share/SharePanel.js:403
 msgid "The embed code copied to clipboard."
 msgstr "Код для встраивания скопирован в буфер обмена."
 
-#: nodepkg/panel/share/SharePanel.js:409
+#: nodepkg/panel/share/SharePanel.js:407
 msgid "Copy code"
 msgstr "Копировать код"
 
-#: nodepkg/panel/share/SharePanel.js:412
+#: nodepkg/panel/share/SharePanel.js:410
 msgid "Preview"
 msgstr "Предпросмотр"
 
@@ -1045,7 +1041,7 @@ msgstr "Выбранный объект не имеет геометрии"
 msgid "Loading"
 msgstr "Загрузка"
 
-#: nodepkg/zoom-to-filtered-btn/ZoomToFilteredBtn.tsx:20
+#: nodepkg/zoom-to-filtered-btn/ZoomToFilteredBtn.tsx:17
 msgid "Zoom to filtered features"
 msgstr "Приблизить к найденным объектам"
 

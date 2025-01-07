@@ -1,8 +1,8 @@
 import { debounce } from "lodash-es";
 import GeoJSON from "ol/format/GeoJSON";
-import { useCallback, useState } from "react";
+import { createContext, useCallback, useContext, useState } from "react";
 
-import { Alert, Button, Input, Spin } from "@nextgisweb/gui/antd";
+import { Alert, Input, Spin } from "@nextgisweb/gui/antd";
 import { request, route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
@@ -10,7 +10,7 @@ import { AbortControllerHelper } from "@nextgisweb/pyramid/util/abort";
 import { lonLatToDM } from "@nextgisweb/webmap/coordinates/formatter";
 import { parse } from "@nextgisweb/webmap/coordinates/parser";
 
-import { CloseButton } from "../header/CloseButton";
+import { PanelContainer, PanelTitle } from "../component";
 
 import { LoadingOutlined } from "@ant-design/icons";
 import BackspaceIcon from "@nextgisweb/icon/material/backspace";
@@ -252,6 +252,33 @@ const search = async (criteria, searchController, display) => {
     return [searchResults, isExceeded];
 };
 
+const SearchPanelContext = createContext(null);
+SearchPanelContext.displayName = "SearchPanelContext";
+
+function SearchPanelTitle({ className, close }) {
+    const { searchText, searchChange, clearSearchText } =
+        useContext(SearchPanelContext);
+    return (
+        <div className={className}>
+            <Input
+                className="content"
+                variant="borderless"
+                value={searchText}
+                onChange={searchChange}
+                placeholder={gettext("Enter at least 2 characters")}
+            />
+
+            {searchText && searchText.trim() && (
+                <PanelTitle.Button
+                    icon={<BackspaceIcon />}
+                    onClick={() => clearSearchText()}
+                />
+            )}
+            <PanelTitle.ButtonClose close={close} />
+        </div>
+    );
+}
+
 export const SearchPanel = ({ display, close }) => {
     const [loading, setLoading] = useState(false);
     const [searchResults, setSearchResults] = useState(undefined);
@@ -339,11 +366,6 @@ export const SearchPanel = ({ display, close }) => {
         results = <Spin className="loading" indicator={indicator} />;
     }
 
-    const clearSearchText = () => {
-        setSearchText(undefined);
-        clearResults();
-    };
-
     const clearResults = () => {
         if (searchController) {
             searchController.abort();
@@ -353,27 +375,31 @@ export const SearchPanel = ({ display, close }) => {
         setLoading(false);
     };
 
+    const clearSearchText = () => {
+        setSearchText(undefined);
+        clearResults();
+    };
+
     return (
-        <div className="ngw-webmap-search-panel">
-            <div className="control">
-                <Input
-                    onChange={searchChange}
-                    variant="borderless"
-                    placeholder={gettext("Enter at least 2 characters")}
-                    value={searchText}
-                />
-                {searchText && searchText.trim() && (
-                    <Button
-                        onClick={() => clearSearchText()}
-                        type="text"
-                        shape="circle"
-                        icon={<BackspaceIcon />}
-                    />
-                )}
-                <CloseButton {...{ close }} />
-            </div>
-            {info}
-            <div className="results">{results}</div>
-        </div>
+        <SearchPanelContext.Provider
+            value={{
+                searchText,
+                searchChange,
+                clearSearchText,
+            }}
+        >
+            <PanelContainer
+                className="ngw-webmap-panel-search"
+                close={close}
+                prolog={info}
+                components={{
+                    title: SearchPanelTitle,
+                    prolog: PanelContainer.Unpadded,
+                    content: PanelContainer.Unpadded,
+                }}
+            >
+                <div className="results">{results}</div>
+            </PanelContainer>
+        </SearchPanelContext.Provider>
     );
 };

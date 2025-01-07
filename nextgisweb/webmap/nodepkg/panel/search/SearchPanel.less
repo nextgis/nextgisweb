@@ -1,25 +1,19 @@
-.ngw-webmap-search-panel {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-
-    > .control {
-        display: flex;
-        border-bottom: 1px solid var(--divider-color);
-        padding: 2px;
-
-        button {
-            color: var(--icon-color);
-        }
+.ngw-webmap-panel-search {
+    > .ngw-webmap-panel-title {
+        padding-inline-start: 0;
+        padding-block: 1px;
     }
 
-    > .results {
-        flex: auto;
-        overflow-y: auto;
+    > .ngw-webmap-panel-prolog > .ant-alert {
+        border: none;
+        border-radius: none;
+    }
 
+    > .ngw-webmap-panel-content {
         .result {
             cursor: pointer;
-            padding: 6px 10px 6px 10px;
+            padding-inline: 10px;
+            padding-block: 6px;
 
             svg {
                 padding-left: 2px;
