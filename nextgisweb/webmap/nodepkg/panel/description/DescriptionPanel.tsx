@@ -1,10 +1,21 @@
 import { useEffect, useMemo, useRef } from "react";
 
+import type { ReactPanelComponentProps } from "@nextgisweb/webmap/panels-manager/type";
+import type { DojoDisplay } from "@nextgisweb/webmap/type";
+
 import { PanelContainer } from "../component";
 
 import "./DescriptionPanel.less";
 
-const zoomToFeature = (display, resourceId, featureId) => {
+export interface DescriptionPanelProps extends ReactPanelComponentProps {
+    content?: string | HTMLElement;
+}
+
+const zoomToFeature = (
+    display: DojoDisplay,
+    resourceId: number,
+    featureId: number
+) => {
     display.featureHighlighter
         .highlightFeatureById(featureId, resourceId)
         .then((feature) => {
@@ -12,8 +23,8 @@ const zoomToFeature = (display, resourceId, featureId) => {
         });
 };
 
-export function DescriptionPanel({ display, content }) {
-    const nodeRef = useRef();
+export function DescriptionPanel({ display, content }: DescriptionPanelProps) {
+    const nodeRef = useRef<HTMLDivElement>(null);
 
     const contentDiv = useMemo(() => {
         return (
@@ -22,13 +33,14 @@ export function DescriptionPanel({ display, content }) {
                 ref={nodeRef}
                 dangerouslySetInnerHTML={{
                     __html:
-                        content === undefined
-                            ? display.config.webmapDescription
-                            : content,
+                        content instanceof HTMLElement ||
+                        typeof content === "string"
+                            ? content
+                            : display.config.webmapDescription,
                 }}
             />
         );
-    }, [content]);
+    }, [content, display.config.webmapDescription]);
 
     useEffect(() => {
         if (!nodeRef || !nodeRef.current) {
@@ -41,16 +53,20 @@ export function DescriptionPanel({ display, content }) {
             const linkText = el.getAttribute(
                 tagName === "a" ? "href" : "data-target"
             );
-            if (/^\d+:\d+$/.test(linkText)) {
+            if (linkText && /^\d+:\d+$/.test(linkText)) {
                 el.addEventListener("click", (e) => {
                     e.preventDefault();
                     e.stopPropagation();
                     const [resourceId, featureId] = linkText.split(":");
-                    zoomToFeature(display, resourceId, featureId);
+                    zoomToFeature(
+                        display,
+                        Number(resourceId),
+                        Number(featureId)
+                    );
                 });
             }
         });
-    }, []);
+    }, [display]);
 
     return (
         <PanelContainer
