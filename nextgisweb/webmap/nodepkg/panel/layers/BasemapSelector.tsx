@@ -12,27 +12,25 @@ interface BasemapSelectorProps {
 }
 
 export const BasemapSelector = observer(({ display }: BasemapSelectorProps) => {
-    const { map, activeBasemapKey } = display;
+    const { map, activeBasemapKey, switchBasemap } = display;
+    const { baseLayers } = map;
 
     const options = useMemo<OptionType[]>(() => {
         const options_ = [];
-        for (const [key, layer] of Object.entries(map.layers)) {
-            if (!layer.isBaseLayer) continue;
+        for (const [key, layer] of Object.entries(baseLayers)) {
             options_.push({
                 label: layer.title,
                 value: key,
             });
         }
         return options_;
-    }, [map.layers]);
+    }, [baseLayers]);
 
     return (
         <Select
-            defaultValue={activeBasemapKey}
+            value={activeBasemapKey}
             options={options}
-            onChange={(key) => {
-                display._switchBasemap(key);
-            }}
+            onChange={switchBasemap}
             style={{ width: "100%" }}
             variant="borderless"
             suffixIcon={<UpOutlined style={{ pointerEvents: "none" }} />}
