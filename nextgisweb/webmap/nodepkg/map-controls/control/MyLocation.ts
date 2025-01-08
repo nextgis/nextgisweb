@@ -8,12 +8,12 @@ import { Circle as CircleStyle, Fill, Stroke, Style } from "ol/style";
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { html as htmlIcon } from "@nextgisweb/pyramid/icon";
-import type { ShadowDisplay } from "@nextgisweb/webmap/type";
+import type { Display } from "@nextgisweb/webmap/display";
 
 interface GeolocationControlOptions {
     target?: HTMLElement;
     tipLabel?: string;
-    display: ShadowDisplay;
+    display: Display;
 }
 
 const zIndexLocationLayer = 6000;

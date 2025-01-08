@@ -1,9 +1,9 @@
-import type ShadowDisplay from "../compat/ShadowDisplay";
+import type { Display } from "../display";
 import type { PluginMenuItem, PluginParams, PluginState } from "../type";
 import type { LayerItemConfig, LayerType } from "../type/TreeItems";
 
 export abstract class PluginBase {
-    display: ShadowDisplay;
+    display: Display;
     identity: string;
     type: LayerType = "layer";
 

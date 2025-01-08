@@ -1,18 +1,18 @@
 import { Control } from "ol/control";
 import type { Options } from "ol/control/Control";
 
+import type { Display } from "@nextgisweb/webmap/display";
 import "./EditingToolbar.css";
-import type { ShadowDisplay } from "@nextgisweb/webmap/type";
 
 interface EditingToolbarOptions extends Options {
     tipLabel?: string;
-    display: ShadowDisplay;
+    display: Display;
 }
 
 export class EditingToolbar extends Control {
     tipLabel?: string;
     element: HTMLElement;
-    display: ShadowDisplay;
+    display: Display;
 
     constructor({ target, display, tipLabel }: EditingToolbarOptions) {
         const element = document.createElement("div");

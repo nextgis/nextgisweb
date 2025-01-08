@@ -11,8 +11,8 @@ import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
 import { AbortControllerHelper } from "@nextgisweb/pyramid/util/abort";
 import { lonLatToDM } from "@nextgisweb/webmap/coordinates/formatter";
 import { parse } from "@nextgisweb/webmap/coordinates/parser";
+import type { Display } from "@nextgisweb/webmap/display";
 import type { PanelComponentProps } from "@nextgisweb/webmap/panels-manager/type";
-import type { ShadowDisplay } from "@nextgisweb/webmap/type";
 
 import { PanelContainer, PanelTitle } from "../component";
 
@@ -58,7 +58,7 @@ type SearchStepResult = [number, SearchResult[], boolean];
 type SearchFunction = (
     criteria: string,
     limit: number,
-    display: ShadowDisplay,
+    display: Display,
     controller: AbortControllerHelper
 ) => Promise<SearchStepResult>;
 
@@ -312,7 +312,7 @@ const searchSteps = [
 const search = async (
     criteria: string,
     searchController: AbortControllerHelper,
-    display: ShadowDisplay
+    display: Display
 ): Promise<[SearchResult[], boolean] | undefined> => {
     let searchResults: SearchResult[] = [],
         isExceeded = false,

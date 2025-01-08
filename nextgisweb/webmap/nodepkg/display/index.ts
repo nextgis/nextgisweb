@@ -1,4 +1,6 @@
 /** @entrypoint */
-import { Display } from "./Display";
+import { DisplayComponent } from "./DisplayComponent";
 
-export default Display;
+export { Display } from "./Display";
+
+export default DisplayComponent;

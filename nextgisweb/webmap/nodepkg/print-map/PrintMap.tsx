@@ -9,9 +9,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
+import type { Display } from "../display";
 import { getLabel } from "../map-controls/map-controls";
 import MapScaleControl from "../ol-ext/ol-mapscale";
-import type { ShadowDisplay } from "../type";
 
 import { printMapStore } from "./PrintMapStore";
 import { buildPrintStyle } from "./PrintMapStyle";
@@ -61,7 +61,7 @@ const switchRotateControl = (olMap: OlMap, show: boolean): void => {
     }
 };
 
-const buildMap = (container: HTMLElement, display: ShadowDisplay): OlMap => {
+const buildMap = (container: HTMLElement, display: Display): OlMap => {
     const interactions = defaultInteractions({
         doubleClickZoom: true,
         keyboard: true,

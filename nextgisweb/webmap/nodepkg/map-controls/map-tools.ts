@@ -1,6 +1,6 @@
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import type ShadowDisplay from "../compat/ShadowDisplay";
+
 import type MapToolbar from "../map-toolbar";
 
 import { ToolMeasure } from "./tool/Measure";
@@ -9,6 +9,7 @@ import { ToolViewerInfo } from "./tool/ViewerInfo";
 import { ToolZoom } from "./tool/Zoom";
 import type { ControlReady, ToolInfo } from "./type";
 import { getControlsInfo } from "./utils";
+import { Display } from "../display";
 
 export const ToolsInfo: ToolInfo[] = [
     {
@@ -66,12 +67,12 @@ export const ToolsInfo: ToolInfo[] = [
     },
 ];
 
-export const getToolsInfo = (display: ShadowDisplay): ToolInfo[] => {
+export const getToolsInfo = (display: Display): ToolInfo[] => {
     return getControlsInfo<ToolInfo>(display, ToolsInfo);
 };
 
 export const buildTools = (
-    display: ShadowDisplay,
+    display: Display,
     tools: ToolInfo[],
     controlsReady: Map<string, ControlReady>
 ): MapToolbar => {

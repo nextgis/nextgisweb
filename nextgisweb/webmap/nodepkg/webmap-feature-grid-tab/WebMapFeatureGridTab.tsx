@@ -16,8 +16,8 @@ import type { FeatureLayerWebMapPluginConfig } from "@nextgisweb/webmap/plugin/t
 import type { LayerItemConfig } from "@nextgisweb/webmap/type/TreeItems";
 import ZoomToFilteredBtn from "@nextgisweb/webmap/zoom-to-filtered-btn";
 
-import type ShadowDisplay from "../compat/ShadowDisplay";
 import type topic from "../compat/topic";
+import type { Display } from "../display";
 import type { PluginBase } from "../plugin/PluginBase";
 
 const msgGoto = gettext("Go to");
@@ -35,7 +35,7 @@ export function WebMapFeatureGridTab({
 }: WebMapFeatureGridTabProps) {
     const topicHandlers = useRef<ReturnType<typeof topic.subscribe>[]>([]);
 
-    const display = useRef<ShadowDisplay>(plugin.display);
+    const display = useRef<Display>(plugin.display);
     const itemConfig = useRef<LayerItemConfig>(display.current.itemConfig);
     const data = useRef<FeatureLayerWebMapPluginConfig>(
         itemConfig.current?.plugin[

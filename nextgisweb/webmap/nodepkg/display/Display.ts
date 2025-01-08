@@ -17,6 +17,12 @@ import MapToolbar from "@nextgisweb/webmap/map-toolbar";
 import PanelsManager from "@nextgisweb/webmap/panels-manager";
 import { WebMapTabsStore } from "@nextgisweb/webmap/webmap-tabs";
 
+import { CustomItemFileWriteStore } from "../compat/CustomItemFileWriteStore";
+import type { StoreItem } from "../compat/CustomItemFileWriteStore";
+import { LoggedDeferred } from "../compat/LoggedDeferred";
+import type { StoreGroupConfig, StoreItemConfig } from "../compat/type";
+import { entrypointsLoader } from "../compat/util/entrypointLoader";
+import { handlePostMessage } from "../compat/util/handlePostMessage";
 import { FeatureHighlighter } from "../feature-highlighter/FeatureHighlighter";
 import { LinkToMainMap } from "../map-controls/control/LinkToMainMap";
 import { Identify } from "../map-controls/tool/Identify";
@@ -31,6 +37,7 @@ import type {
     DisplayConfig,
     MapPlugin,
     MapURLParams,
+    Mid,
     TinyConfig,
     WebmapAdapter,
 } from "../type";
@@ -38,42 +45,40 @@ import type { LayerItemConfig, TreeItemConfig } from "../type/TreeItems";
 import type { WebMapSettings } from "../type/WebmapSettings";
 import { getURLParams, setURLParam } from "../utils/URL";
 
-import { CustomItemFileWriteStore } from "./CustomItemFileWriteStore";
-import type { StoreItem } from "./CustomItemFileWriteStore";
-import { LoggedDeferred } from "./LoggedDeferred";
-import type { StoreGroupConfig, StoreItemConfig } from "./type";
-import { entrypointsLoader } from "./util/entrypointLoader";
-import { handlePostMessage } from "./util/handlePostMessage";
-
-export default class ShadowDisplay {
+export class Display {
     private readonly modeURLParam: keyof MapURLParams = "panel";
     private readonly emptyModeURLValue = "none";
 
     mapNode!: HTMLElement;
 
-    config!: DisplayConfig;
+    config: DisplayConfig;
     tinyConfig!: TinyConfig;
     clientSettings: WebMapSettings = settings;
     identify!: Identify;
     featureHighlighter!: FeatureHighlighter;
 
-    _mapDeferred!: LoggedDeferred;
+    _mapDeferred: LoggedDeferred;
 
-    _mapExtentDeferred!: LoggedDeferred;
-    _urlParams!: Record<keyof MapURLParams, string>;
+    _mapExtentDeferred: LoggedDeferred;
+    _urlParams: Record<keyof MapURLParams, string>;
 
-    _mid!: Record<string, any>;
-    _midDeferred!: Record<string, LoggedDeferred>;
-    _layersDeferred!: LoggedDeferred;
-    _postCreateDeferred!: LoggedDeferred;
-    _startupDeferred!: LoggedDeferred;
-    _itemStoreDeferred!: LoggedDeferred;
+    _mid: Mid = {
+        basemap: {},
+        adapter: {},
+        plugin: {},
+        wmplugin: {},
+    };
+    _midDeferred: Record<string, LoggedDeferred>;
+    _layersDeferred: LoggedDeferred;
+    _postCreateDeferred: LoggedDeferred;
+    _startupDeferred: LoggedDeferred;
+    _itemStoreDeferred: LoggedDeferred;
     _extent_const!: Extent;
-    _extent!: Extent;
+    _extent: Extent;
     _layer_order!: number[];
-    tiny!: boolean;
+    tiny?: boolean;
 
-    _itemConfigById!: Record<string, TreeItemConfig>;
+    _itemConfigById: Record<string, TreeItemConfig> = {};
 
     tabsManager: WebMapTabsStore;
     panelsManager!: PanelsManager;
@@ -82,28 +87,23 @@ export default class ShadowDisplay {
     webmapStore!: WebmapStore;
     mapStates!: IMapStatesObserver;
 
-    displayProjection!: string;
-    lonlatProjection!: string;
+    displayProjection = "EPSG:3857";
+    lonlatProjection = "EPSG:4326";
 
     mapToolbar!: MapToolbar;
-    _plugins!: Record<string, PluginBase>;
+    _plugins: Record<string, PluginBase> = {};
 
     leftTopControlPane!: HTMLDivElement;
     leftBottomControlPane!: HTMLDivElement;
     rightTopControlPane!: HTMLDivElement;
     rightBottomControlPane!: HTMLDivElement;
 
-    /**
-     * @deprecated use webmapStore.getlayers() instead
-     */
     _layers!: Record<number, BaseLayer>;
-
     _adapters!: Record<string, WebmapAdapter>;
 
-    @observable.shallow accessor _baseLayer!: BaseLayer;
     readonly map: Map;
 
-    // The Item is now editable. Or not. Who knows?
+    @observable.shallow accessor _baseLayer!: BaseLayer;
     @observable.shallow accessor item: StoreItem | null = null;
     @observable.shallow accessor itemConfig: LayerItemConfig | null = null;
 
@@ -138,7 +138,6 @@ export default class ShadowDisplay {
 
         // Module loading
         this._midDeferred = {};
-        this._mid = {};
 
         this._buildPanelsManager();
 
@@ -162,9 +161,6 @@ export default class ShadowDisplay {
         this._mapDeferred.then(() => {
             this._itemStorePrepare();
         });
-
-        this.displayProjection = "EPSG:3857";
-        this.lonlatProjection = "EPSG:4326";
 
         if (this.config.extent[3] > 82) {
             this.config.extent[3] = 82;
@@ -686,6 +682,7 @@ export default class ShadowDisplay {
         }
 
         const plugins = wmplugin ? this._mid.wmplugin : this._mid.plugin;
+
         this._installPlugins(plugins);
     }
     private _installPlugins(
@@ -756,13 +753,15 @@ export default class ShadowDisplay {
         mids.basemap.push(...basemapMids);
 
         for (const key in mids) {
-            const midarr = mids[key as keyof typeof mids];
+            const k = key as keyof typeof mids;
+            const midarr = mids[k];
 
-            const deferred = new LoggedDeferred(`_midDeferred.${key}`);
-            this._midDeferred[key] = deferred;
+            const deferred = new LoggedDeferred(`_midDeferred.${k}`);
+            this._midDeferred[k] = deferred;
 
             entrypointsLoader(midarr).then((obj) => {
-                this._mid[key] = obj;
+                this._mid[k] = obj;
+
                 deferred.resolve(obj);
             });
         }

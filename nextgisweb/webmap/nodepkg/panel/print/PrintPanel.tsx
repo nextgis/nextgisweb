@@ -15,7 +15,7 @@ import {
 import { CopyToClipboardButton } from "@nextgisweb/gui/buttons";
 import reactApp from "@nextgisweb/gui/react-app";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import type ShadowDisplay from "@nextgisweb/webmap/compat/ShadowDisplay";
+import type { Display } from "@nextgisweb/webmap/display";
 import type { PanelComponentProps } from "@nextgisweb/webmap/panels-manager/type";
 import PrintMap from "@nextgisweb/webmap/print-map";
 import { getURLParams } from "@nextgisweb/webmap/utils/URL";
@@ -45,7 +45,7 @@ const { TextArea } = Input;
 
 interface PrintMapCompProps {
     settings: PrintMapSettings;
-    display: ShadowDisplay;
+    display: Display;
     initCenter: Coordinate | null;
     onScaleChange: (scale: number) => void;
     onCenterChange: (center: Coordinate) => void;
