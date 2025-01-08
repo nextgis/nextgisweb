@@ -46,7 +46,7 @@ export class AnnotationsManager {
         this._annotationsDialog = new AnnotationsDialog();
         this._editable = this._display.config.annotations.scope.write;
 
-        this._display._layersDeferred.then(() => this._init());
+        this._display.layersDeferred.then(() => this._init());
         AnnotationsManager.instance = this;
     }
 
