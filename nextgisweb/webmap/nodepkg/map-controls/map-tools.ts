@@ -5,11 +5,10 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import ToolMeasure from "ngw-webmap/tool/Measure";
 // @ts-expect-error Import URL parser module
 import ToolSwipe from "ngw-webmap/tool/Swipe";
-// @ts-expect-error Import URL parser module
-import ToolViewerInfo from "ngw-webmap/tool/ViewerInfo";
 
 import type { DojoDisplay, MapToolbar } from "../type/DojoDisplay";
 
+import { ViewerInfoTool as ToolViewerInfo } from "./tool/ViewerInfo";
 import ToolZoom from "./tool/Zoom";
 import type { ControlReady, ToolInfo } from "./type";
 import { getControlsInfo } from "./utils";
