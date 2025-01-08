@@ -2,12 +2,12 @@ import { useMemo } from "react";
 
 import { Select } from "@nextgisweb/gui/antd";
 import type { OptionType } from "@nextgisweb/gui/antd";
-import type { DisplayMap } from "@nextgisweb/webmap/type/DisplayMap";
+import type { Map } from "@nextgisweb/webmap/ol/Map";
 
 import { UpOutlined } from "@ant-design/icons";
 
 interface BasemapSelectorProps {
-    map: DisplayMap;
+    map: Map;
     basemapDefault: number;
     onChange: (key: number) => void;
 }
