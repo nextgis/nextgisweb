@@ -98,6 +98,10 @@ export interface DojoDisplay extends dijit._WidgetBase {
     _zoomToInitialExtent: () => void;
     _mapExtentDeferred: PromiseLike<void>;
 
+    handleSelect: (selectedKeys: number[]) => void;
+    setLayerZIndex: (id: number, zIndex: number) => void;
+    _switchBasemap: (basemapLayerKey: number) => void;
+    _getActiveBasemapKey: () => number;
     dumpItem: () => TreeItem;
     getVisibleItems: () => Promise<TreeItem[]>;
 

@@ -1,3 +1,6 @@
+import type ZoomToWebmapPlugin from "@nextgisweb/webmap/plugin/zoom-to-webmap";
+import type { DojoDisplay } from "@nextgisweb/webmap/type";
+
 import { LayersTree } from "../../layers-tree/LayersTree";
 import { PanelContainer } from "../component";
 
@@ -6,14 +9,19 @@ import { LayersDropdown } from "./LayersDropdown";
 
 import "./LayersPanel.less";
 
-export function LayersPanel({ title, close, display, ...props }) {
+interface LayersPanel {
+    title: string;
+    close: () => void;
+    display: DojoDisplay;
+}
+
+export function LayersPanel({ title, close, display, ...props }: LayersPanel) {
     const zoomToAllLayers = () => {
         const plugin =
             display._plugins["@nextgisweb/webmap/plugin/zoom-to-webmap"];
-        if (!plugin) {
-            return;
+        if (plugin) {
+            (plugin as ZoomToWebmapPlugin).zoomToAllLayers();
         }
-        plugin.zoomToAllLayers();
     };
 
     return (
