@@ -1,14 +1,11 @@
 /** @plugin */
-
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { createPanelRegistry } from "@nextgisweb/webmap/panels-manager/registry";
+import { registry } from "@nextgisweb/webmap/panels-manager/registry";
 
 import LayersIcon from "@nextgisweb/icon/material/layers";
 
-const msgTitle = gettext("Layers");
-
-createPanelRegistry(COMP_ID, () => import("./LayersPanel"), {
-    title: msgTitle,
+registry.register(COMP_ID, () => import("./LayersPanel"), {
+    title: gettext("Layers"),
     name: "layers",
     order: 10,
     menuIcon: <LayersIcon />,

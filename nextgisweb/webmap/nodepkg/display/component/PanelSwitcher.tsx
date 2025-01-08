@@ -14,11 +14,20 @@ import "./PanelSwitcher.css";
 const PanelRender = observer(
     ({ panel, display }: { panel: PanelPlugin; display: Display }) => {
         const { load, meta } = panel;
-        const Loader = lazy<ComponentType<PanelComponentProps>>(() =>
-            load().then((mod) => ({
-                default: mod,
-            }))
-        );
+        const Loader = useMemo(() => {
+            return lazy<ComponentType<PanelComponentProps>>(async () => {
+                let Component = await load();
+                if (meta.startup) {
+                    const propsStartup = (await meta.startup(display)) ?? {};
+                    const Base = Component;
+                    // eslint-disable-next-line react/display-name
+                    Component = (props) => (
+                        <Base {...propsStartup} {...props} />
+                    );
+                }
+                return { default: Component };
+            });
+        }, [load, display, meta]);
 
         const { closePanel } = display.panelsManager;
 
