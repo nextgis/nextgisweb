@@ -21,10 +21,15 @@ interface LayerWatchableProps {
     symbols: string[];
 }
 
+export type ExtendedOlLayer<
+    TSource extends Source = Source,
+    TLayer extends Layer<TSource> = Layer<TSource>,
+> = TLayer & { printingCopy?: () => TLayer };
+
 /** We are using CoreLayer instead of BaseLayer here to avoid mismatch with cartographic baselayer on the bottom of map */
 export abstract class CoreLayer<
     TSource extends Source = Source,
-    TLayer extends Layer<TSource> = Layer<TSource>,
+    TLayer extends ExtendedOlLayer<TSource> = ExtendedOlLayer<TSource>,
     TSourceOptions = unknown,
 > extends Watchable<LayerWatchableProps> {
     name: string;
@@ -58,8 +63,7 @@ export abstract class CoreLayer<
             source: this.olSource,
         });
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (this.olLayer as any).printingCopy = () => {
+        this.olLayer.printingCopy = () => {
             const opts = {
                 ...layerOptions,
                 visible: this.olLayer.getVisible(),
