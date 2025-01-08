@@ -8,14 +8,16 @@ interface NoMetadata {}
 type PromiseLoader<V extends Value> = () => Promise<V>;
 type ImportLoader<V extends Value> = PromiseLoader<{ default: V }>;
 
+type Loader<V extends Value> = V | PromiseLoader<V> | ImportLoader<V>;
+
 class PluginObject<V extends Value, M extends Metadata> {
     readonly component: string;
-    readonly #loader: PromiseLoader<V>;
+    readonly #loader: Loader<V>;
 
     #promise?: Promise<V>;
     #value?: V;
 
-    constructor(component: string, loader: PromiseLoader<V>, meta?: M) {
+    constructor(component: string, loader: Loader<V>, meta?: M) {
         this.component = component;
         this.#loader = loader;
         Object.assign(this, meta);
@@ -23,7 +25,32 @@ class PluginObject<V extends Value, M extends Metadata> {
 
     async load(): Promise<V> {
         if (this.#value !== undefined) return this.#value;
-        if (this.#promise === undefined) this.#promise = this.#loader();
+        if (this.#promise === undefined) {
+            if (typeof this.#loader === "function") {
+                type FnLoader = ImportLoader<V> | PromiseLoader<V>;
+                const fnResult = (this.#loader as FnLoader)();
+                if (fnResult.then instanceof Function) {
+                    this.#promise = fnResult.then((mod) => {
+                        if (
+                            mod &&
+                            typeof mod === "object" &&
+                            "default" in mod
+                        ) {
+                            return mod.default;
+                        }
+                        return mod;
+                    });
+                } else {
+                    // FIXME: This needs refactoring because if V is a function,
+                    // there's no way to distinguish V from () => Promise<V> at
+                    // runtime without invoking it, which may lead to errors.
+                    this.#value = this.#loader as V;
+                    return this.#value;
+                }
+            } else {
+                this.#promise = (async () => this.#loader as V)();
+            }
+        }
         this.#value = await this.#promise;
         return this.#value;
     }
@@ -32,19 +59,11 @@ class PluginObject<V extends Value, M extends Metadata> {
 type Plugin<V extends Value, M extends Metadata> = PluginObject<V, M> &
     Readonly<M>;
 
-type RegisterValue<V extends Value> = V | PromiseLoader<V> | ImportLoader<V>;
-
 type Selector<M> = { component: string } & M;
 
 type Query<M extends Metadata> =
     | ((i: Selector<M>) => boolean)
     | Partial<Selector<M>>;
-
-function isAsyncLoader<V extends Value = Value>(
-    fn: unknown
-): fn is ImportLoader<V> | PromiseLoader<V> {
-    return typeof fn === "function" && fn().then instanceof Function;
-}
 
 export class PluginRegistry<
     V extends Value = Value,
@@ -59,7 +78,7 @@ export class PluginRegistry<
         this.identity = identity;
     }
 
-    register(component: string, value: RegisterValue<V>, meta?: M): void {
+    register(component: string, value: Loader<V>, meta?: M): void {
         if (this._sealed)
             throw new Error(`Registry '${this.identity}' already sealed`);
 
@@ -68,22 +87,7 @@ export class PluginRegistry<
             return;
         }
 
-        let loader: PromiseLoader<V>;
-
-        if (isAsyncLoader(value)) {
-            loader = () =>
-                value().then((mod) => {
-                    if (mod && typeof mod === "object" && "default" in mod) {
-                        return mod.default;
-                    }
-                    return mod;
-                });
-        } else {
-            loader = () => Promise.resolve(value);
-        }
-
-        const plugin = new PluginObject<V, M>(component, loader, meta);
-
+        const plugin = new PluginObject<V, M>(component, value, meta);
         this.items.push(plugin as Plugin<V, M>);
     }
 
