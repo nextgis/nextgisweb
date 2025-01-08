@@ -116,7 +116,10 @@ export function ExportForm({ id }: { id: number }) {
     if (status === "loading") {
         return <LoadingWrapper />;
     }
-
+    console.log(
+        defaultSrs,
+        bandOptions.map((band) => band.value)
+    );
     return (
         <FieldsForm
             fields={fields}

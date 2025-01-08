@@ -1,8 +1,9 @@
-import { publish } from "dojo/topic";
 import type { Feature, Map } from "ol";
 import { never } from "ol/events/condition";
 import { Draw } from "ol/interaction";
 import type { Vector as VectorSource } from "ol/source";
+
+import topic from "@nextgisweb/webmap/compat/topic";
 
 import VectorLayerClass from "../../ol/layer/Vector";
 
@@ -72,7 +73,10 @@ export class AnnotationsEditableLayer {
         });
 
         this._draw.on("drawend", (e: { feature: Feature }) => {
-            publish("webmap/annotations/layer/feature/created", e.feature);
+            topic.publish(
+                "webmap/annotations/layer/feature/created",
+                e.feature
+            );
         });
 
         this._map.olMap.addInteraction(this._draw);

@@ -1,4 +1,3 @@
-import topic from "dojo/topic";
 import type { MapBrowserEvent } from "ol";
 import type { Coordinate } from "ol/coordinate";
 import { boundingExtent, getCenter } from "ol/extent";
@@ -11,6 +10,7 @@ import type { RouteQuery, RouteResp } from "@nextgisweb/pyramid/api/type";
 import i18n from "@nextgisweb/pyramid/i18n";
 import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
 import type ShadowDisplay from "@nextgisweb/webmap/compat/ShadowDisplay";
+import topic from "@nextgisweb/webmap/compat/topic";
 import type { Map } from "@nextgisweb/webmap/ol/Map";
 import type {
     IdentificationPanelProps,
@@ -19,7 +19,7 @@ import type {
 import type { PanelPlugin } from "@nextgisweb/webmap/panels-manager/registry";
 import type { LayerItemConfig } from "@nextgisweb/webmap/type/TreeItems";
 
-import { Base } from "./ToolBase";
+import { ToolBase } from "./ToolBase";
 
 import "./Identify.css";
 
@@ -58,7 +58,7 @@ interface Request {
     layers: number[];
 }
 
-export class Identify extends Base {
+export class Identify extends ToolBase {
     label = i18n.gettext("Identify");
     iconClass = "iconIdentify";
     pixelRadius: number = webmapSettings.identify_radius || 10;
@@ -225,7 +225,6 @@ export class Identify extends Base {
         layerLabels: Record<string, string | null>
     ): void {
         if (response.featureCount === 0) {
-            // @ts-expect-error the event may actually be empty
             topic.publish("feature.unhighlight");
         }
 

@@ -16,7 +16,7 @@ import { CopyToClipboardButton } from "@nextgisweb/gui/buttons";
 import reactApp from "@nextgisweb/gui/react-app";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type ShadowDisplay from "@nextgisweb/webmap/compat/ShadowDisplay";
-import type { ReactPanelComponentProps } from "@nextgisweb/webmap/panels-manager/type";
+import type { PanelComponentProps } from "@nextgisweb/webmap/panels-manager/type";
 import PrintMap from "@nextgisweb/webmap/print-map";
 import { getURLParams } from "@nextgisweb/webmap/utils/URL";
 
@@ -254,7 +254,7 @@ const ScalesSelect = ({
 };
 
 const PrintPanel = observer(
-    ({ display, title, close, visible }: ReactPanelComponentProps) => {
+    ({ display, title, close, visible }: PanelComponentProps) => {
         const [urlParsed, setUrlParsed] = useState(false);
         const [mapInit, setMapInit] = useState(false);
         const [paperFormat, setPaperFormat] = useState("210_297");

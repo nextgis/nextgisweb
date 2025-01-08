@@ -1,4 +1,4 @@
-import type { ReactPanelComponentProps } from "@nextgisweb/webmap/panels-manager/type";
+import type { PanelComponentProps } from "@nextgisweb/webmap/panels-manager/type";
 import type ZoomToWebmapPlugin from "@nextgisweb/webmap/plugin/zoom-to-webmap";
 
 import { LayersTree } from "../../layers-tree/LayersTree";
@@ -14,7 +14,7 @@ export default function LayersPanel({
     close,
     display,
     ...props
-}: ReactPanelComponentProps) {
+}: PanelComponentProps) {
     const zoomToAllLayers = () => {
         const plugin =
             display._plugins["@nextgisweb/webmap/plugin/zoom-to-webmap"];

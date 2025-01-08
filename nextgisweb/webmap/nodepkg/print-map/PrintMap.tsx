@@ -11,7 +11,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { getLabel } from "../map-controls/map-controls";
 import MapScaleControl from "../ol-ext/ol-mapscale";
-import type { DojoDisplay } from "../type";
+import type { ShadowDisplay } from "../type";
 
 import { printMapStore } from "./PrintMapStore";
 import { buildPrintStyle } from "./PrintMapStyle";
@@ -61,7 +61,7 @@ const switchRotateControl = (olMap: OlMap, show: boolean): void => {
     }
 };
 
-const buildMap = (container: HTMLElement, display: DojoDisplay): OlMap => {
+const buildMap = (container: HTMLElement, display: ShadowDisplay): OlMap => {
     const interactions = defaultInteractions({
         doubleClickZoom: true,
         keyboard: true,
@@ -284,7 +284,7 @@ export const PrintMap = observer(
 
             return (
                 <LegendPrintMap
-                    dojoDisplay={display}
+                    display={display}
                     printMapStore={printMapStore}
                     legendCoords={legendCoords}
                     show={legend}

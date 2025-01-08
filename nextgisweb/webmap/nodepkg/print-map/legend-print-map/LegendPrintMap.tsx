@@ -56,7 +56,7 @@ const filterTreeItems = (store: WebmapStore, layersItems: TreeWebmapItem[]) => {
 };
 
 export const LegendPrintMap = ({
-    dojoDisplay: display,
+    display,
     show,
     legendCoords,
     onChange: onChange,

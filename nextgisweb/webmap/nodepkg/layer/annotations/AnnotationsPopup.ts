@@ -1,4 +1,4 @@
-import { publish } from "dojo/topic";
+import topic from "@nextgisweb/webmap/compat/topic";
 
 import type { Map } from "../../ol/Map";
 import { OlPopup } from "../../ol-ext/ol-popup";
@@ -177,6 +177,6 @@ export class AnnotationsPopup {
     }
 
     private _onEditAnnotation(): void {
-        publish("webmap/annotations/change/", this._annFeature);
+        topic.publish("webmap/annotations/change/", this._annFeature);
     }
 }
