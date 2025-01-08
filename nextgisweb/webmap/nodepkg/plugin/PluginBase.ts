@@ -11,8 +11,8 @@ export abstract class PluginBase {
     identity: string;
     type: LayerType = "layer";
 
-    run?(): void;
-    getMenuItem?(): PluginMenuItem;
+    run?(nodeData: LayerItem): Promise<boolean | undefined>;
+    getMenuItem?(nodeData: LayerItem): PluginMenuItem;
 
     constructor({ display, identity }: PluginParams) {
         this.display = display;
@@ -27,9 +27,6 @@ export abstract class PluginBase {
             map: this.display.map,
         };
     }
-
-
-
 
     postCreate() {}
 

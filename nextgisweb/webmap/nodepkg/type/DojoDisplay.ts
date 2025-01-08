@@ -83,6 +83,10 @@ export type MapControl = OlControl | dijit._WidgetBase | DojoDisplayIdentify;
 
 export type WebmapAdapter = any;
 
+type ConfigMap = {
+    itemConfig: LayerItem;
+};
+
 export interface DojoDisplay extends dijit._WidgetBase {
     config: DisplayConfig;
     identify: DojoDisplayIdentify;
@@ -92,6 +96,7 @@ export interface DojoDisplay extends dijit._WidgetBase {
     isTinyModePlugin: (plugin: string) => boolean;
     prepareItem: (item: WebmapItem) => WebmapItem;
     _installPlugins: (plugins: Record<string, WebmapPlugin>) => void;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     _onNewStoreItem: (item: WebmapItem | any) => void;
     _mapAddLayer: (id: number) => void;
     _mapDeferred: PromiseLike<void>;
@@ -100,6 +105,15 @@ export interface DojoDisplay extends dijit._WidgetBase {
     _urlParams: Record<string, string>;
 
     _layersDeferred: Promise<void>;
+
+    tiny: boolean;
+
+    item: { id: number };
+
+    get<T extends keyof ConfigMap | string>(
+        name: T
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ): T extends keyof ConfigMap ? ConfigMap[T] : any;
 
     handleSelect: (selectedKeys: number[]) => void;
     setLayerZIndex: (id: number, zIndex: number) => void;
@@ -158,6 +172,7 @@ export interface PluginState {
     enabled: boolean;
     nodeData: LayerItem;
     map: Map;
+    active?: boolean;
 }
 
 export interface Plugin {

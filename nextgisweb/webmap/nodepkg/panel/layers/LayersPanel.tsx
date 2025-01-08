@@ -53,13 +53,11 @@ export function LayersPanel({ title, close, display, ...props }: LayersPanel) {
             }}
         >
             <LayersTree
-                {...{
-                    store: display.webmapStore,
-                    onSelect: display.handleSelect.bind(display),
-                    setLayerZIndex: display.setLayerZIndex.bind(display),
-                    getWebmapPlugins: () => ({ ...display._plugins }),
-                    ...props,
-                }}
+                store={display.webmapStore}
+                onSelect={display.handleSelect.bind(display)}
+                setLayerZIndex={display.setLayerZIndex.bind(display)}
+                getWebmapPlugins={() => ({ ...display._plugins })}
+                {...props}
             />
         </PanelContainer>
     );

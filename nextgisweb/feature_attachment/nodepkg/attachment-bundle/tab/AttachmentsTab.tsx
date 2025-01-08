@@ -63,7 +63,7 @@ const getLayersInfo = (display: DojoDisplay) => {
         if (
             itemInfo &&
             itemInfo.plugin &&
-            "ngw-webmap/plugin/FeatureLayer" in itemInfo.plugin
+            "@nextgisweb/webmap/plugin/feature-layer" in itemInfo.plugin
         ) {
             layersResourceIds.set(itemInfo.layerId, itemInfo);
         }

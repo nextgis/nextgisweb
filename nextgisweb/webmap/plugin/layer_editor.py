@@ -15,7 +15,7 @@ class LayerEditorPlugin(WebmapLayerPlugin):
             if not write_permission:
                 return False
             return (
-                "ngw-webmap/plugin/LayerEditor",
+                "@nextgisweb/webmap/plugin/layer-editor",
                 dict(
                     writable=IWritableFeatureLayer.providedBy(layer),
                     geometry_type=layer.geometry_type,
