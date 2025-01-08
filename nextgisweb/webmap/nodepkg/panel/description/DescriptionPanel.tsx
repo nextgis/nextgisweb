@@ -8,7 +8,7 @@ import { PanelContainer } from "../component";
 import "./DescriptionPanel.less";
 
 export interface DescriptionPanelProps extends ReactPanelComponentProps {
-    content?: string | HTMLElement;
+    content?: string | HTMLElement | null;
 }
 
 const zoomToFeature = (

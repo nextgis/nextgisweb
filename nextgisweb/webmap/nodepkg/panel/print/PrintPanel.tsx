@@ -14,7 +14,9 @@ import {
 import { CopyToClipboardButton } from "@nextgisweb/gui/buttons";
 import reactApp from "@nextgisweb/gui/react-app";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import type { ReactPanelComponentProps } from "@nextgisweb/webmap/panels-manager/type";
 import PrintMap from "@nextgisweb/webmap/print-map";
+import { getURLParams } from "@nextgisweb/webmap/utils/URL";
 
 import type { PrintMapSettings } from "../../print-map/type";
 import type { DojoDisplay } from "../../type";
@@ -31,7 +33,6 @@ import {
 
 import "../styles/panels.less";
 import "./PrintPanel.less";
-import { getURLParams } from "@nextgisweb/webmap/utils/URL";
 
 import type { Scale, UrlPrintParams } from "./options";
 
@@ -161,13 +162,6 @@ const getPrintMapLink = (mapSettings: PrintMapSettings): string => {
     return `${urlWithoutParams}?${queryString}`;
 };
 
-interface PrintPanelProps {
-    display: DojoDisplay;
-    title: string;
-    close: () => void;
-    visible: boolean;
-}
-
 interface ScalesSelectProps {
     selectedValue: number | undefined;
     scales: Scale[];
@@ -261,7 +255,7 @@ export const PrintPanel = ({
     title,
     close,
     visible,
-}: PrintPanelProps) => {
+}: ReactPanelComponentProps) => {
     const [urlParsed, setUrlParsed] = useState(false);
     const [mapInit, setMapInit] = useState(false);
     const [paperFormat, setPaperFormat] = useState("210_297");
