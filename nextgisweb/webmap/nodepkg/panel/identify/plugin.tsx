@@ -7,7 +7,7 @@ import { IdentifyStore } from "./IdentifyStore";
 
 import IdentifyIcon from "@nextgisweb/icon/material/arrow_selector_tool";
 
-registry.register(COMP_ID, () => import("./IdentificationPanel"), {
+registry.register(COMP_ID, () => import("./IdentifyPanel"), {
     name: "identify",
     title: gettext("Identify"),
     icon: <IdentifyIcon />,

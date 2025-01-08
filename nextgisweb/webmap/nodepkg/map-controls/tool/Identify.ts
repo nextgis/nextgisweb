@@ -12,8 +12,8 @@ import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
 import topic from "@nextgisweb/webmap/compat/topic";
 import type { Display } from "@nextgisweb/webmap/display";
 import type { Map } from "@nextgisweb/webmap/ol/Map";
-import type { IdentifyStore } from "@nextgisweb/webmap/panel/identification";
-import type { IdentifyInfo } from "@nextgisweb/webmap/panel/identification/identification";
+import type { IdentifyStore } from "@nextgisweb/webmap/panel/identify";
+import type { IdentifyInfo } from "@nextgisweb/webmap/panel/identify/identification";
 import type { LayerItemConfig } from "@nextgisweb/webmap/type/api";
 
 import { ToolBase } from "./ToolBase";

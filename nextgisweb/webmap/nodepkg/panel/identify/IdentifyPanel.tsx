@@ -23,7 +23,7 @@ import { FeatureSelector } from "./component/FeatureSelector";
 import type { FeatureInfo, IdentifyInfo } from "./identification";
 import { identifyInfoToFeaturesInfo } from "./util/identifyInfoToFeaturesInfo";
 
-import "./IdentificationPanel.less";
+import "./IdentifyPanel.less";
 
 // prettier-ignore
 const msgTipIdent = gettext("To get feature information, click on the map with the left mouse button. Make sure that other tools are turned off.");
@@ -69,7 +69,7 @@ const loadFeatureItem = async (
     return featureItem;
 };
 
-const IdentificationPanel: PanelWidget<IdentifyStore> = observer(
+const IdentifyPanel: PanelWidget<IdentifyStore> = observer(
     ({ display, store }) => {
         const [featureInfo, setFeatureInfo] = useState<FeatureInfo>();
         const [featureItem, setFeatureItem] = useState<FeatureItem>();
@@ -204,5 +204,5 @@ const IdentificationPanel: PanelWidget<IdentifyStore> = observer(
     }
 );
 
-IdentificationPanel.displayName = "IdentificationPanel";
-export default IdentificationPanel as PanelWidget;
+IdentifyPanel.displayName = "IdentifyPanel";
+export default IdentifyPanel as PanelWidget;

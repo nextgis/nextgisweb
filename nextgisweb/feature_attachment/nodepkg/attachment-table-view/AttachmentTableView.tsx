@@ -1,6 +1,6 @@
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { PanelSection } from "@nextgisweb/webmap/panel/component";
-import type { IdentifyExtensionComponentProps } from "@nextgisweb/webmap/panel/identification/identification";
+import type { IdentifyExtensionComponentProps } from "@nextgisweb/webmap/panel/identify/identification";
 
 import AttachmentTable from "../attachment-table";
 import type { FeatureAttachment } from "../type";

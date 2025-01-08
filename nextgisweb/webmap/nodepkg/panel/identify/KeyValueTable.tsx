@@ -24,7 +24,7 @@ export function KeyValueTable({ data }: { data: FieldDataItem[] }) {
 
     return (
         <Table
-            className="ngw-webmap-panel-identification-kv-table"
+            className="ngw-webmap-panel-identify-kv-table"
             dataSource={data.map(({ key, value, attr }) => ({
                 key,
                 value,
