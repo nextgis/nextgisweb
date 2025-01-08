@@ -69,12 +69,6 @@ type Query<M extends Metadata> =
     | ((i: Selector<M>) => boolean)
     | Partial<Selector<M>>;
 
-function isAsyncLoader<V extends Value = Value>(
-    fn: unknown
-): fn is ImportLoader<V> | PromiseLoader<V> {
-    return typeof fn === "function" && fn().then instanceof Function;
-}
-
 export class PluginRegistry<
     V extends Value = Value,
     M extends Metadata = NoMetadata,
@@ -104,16 +98,22 @@ export class PluginRegistry<
         }
 
         const loader: PromiseLoader<V> = () => {
-            if (isAsyncLoader(value)) {
-                return value().then((mod) => {
-                    if (mod && typeof mod === "object" && "default" in mod) {
-                        return mod.default;
-                    }
-                    return mod;
-                });
-            } else {
-                return Promise.resolve(value);
+            if (typeof value === "function") {
+                const valFunc = (value as ImportLoader<V> | PromiseLoader<V>)();
+                if ("then" in valFunc) {
+                    return valFunc.then((mod) => {
+                        if (
+                            mod &&
+                            typeof mod === "object" &&
+                            "default" in mod
+                        ) {
+                            return mod.default;
+                        }
+                        return mod;
+                    }) as Promise<V>;
+                }
             }
+            return Promise.resolve(value) as Promise<V>;
         };
 
         const plugin = new PluginObject<V, M>(component, loader, meta);

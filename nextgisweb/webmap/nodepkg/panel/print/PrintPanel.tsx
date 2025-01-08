@@ -47,7 +47,7 @@ const { TextArea } = Input;
 interface PrintMapCompProps {
     settings: PrintMapSettings;
     display: Display;
-    initCenter: Coordinate | null;
+    getCenterFromUrl: () => Coordinate | null;
     onScaleChange: (scale: number) => void;
     onCenterChange: (center: Coordinate) => void;
 }
@@ -57,7 +57,7 @@ type Comp = ReturnType<typeof reactApp<PrintMapCompProps>>;
 const usePrintMap = ({
     settings,
     display,
-    initCenter,
+    getCenterFromUrl,
     onScaleChange,
     onCenterChange,
 }: PrintMapCompProps) => {
@@ -103,14 +103,20 @@ const usePrintMap = ({
 
         const comp: ReturnType<typeof reactApp<PrintMapCompProps>> = reactApp(
             PrintMap,
-            { settings, display, initCenter, onScaleChange, onCenterChange },
+            {
+                settings,
+                display,
+                initCenter: getCenterFromUrl(),
+                onScaleChange,
+                onCenterChange,
+            },
             div
         );
 
         resizeObserver.current = resizeObserver_;
         printMapComp.current = comp;
         printMapEl.current = div;
-    }, [display, initCenter, onCenterChange, onScaleChange, settings]);
+    }, [display, getCenterFromUrl, onCenterChange, onScaleChange, settings]);
 
     useEffect(() => {
         if (printMapComp.current) {
@@ -292,7 +298,7 @@ const ScalesSelect = ({
 };
 
 const PrintPanel = observer(
-    ({ display, title, close }: PanelComponentProps) => {
+    ({ display, title, close, name }: PanelComponentProps) => {
         const [urlParsed, setUrlParsed] = useState(false);
         const mapInit = useRef(false);
         const [paperFormat, setPaperFormat] = useState("210_297");
@@ -304,6 +310,10 @@ const PrintPanel = observer(
         const printMaxSize = useMemo(() => {
             return display.config.printMaxSize;
         }, [display]);
+
+        const visible = useMemo(() => {
+            return display.panelsManager.activePanelName === name;
+        }, [display.panelsManager.activePanelName, name]);
 
         const [mapSettings, setMapSettings] = useObjectState<PrintMapSettings>(
             () => defaultPanelMapSettings(display.config.webmapTitle)
@@ -347,10 +357,10 @@ const PrintPanel = observer(
             return urlSettings.center || null;
         }, []);
 
-        const { createPrintMapComp, printMapEl } = usePrintMap({
+        const { createPrintMapComp, printMapEl, destroy } = usePrintMap({
             settings: mapSettings,
             display,
-            initCenter: getCenterFromUrl(),
+            getCenterFromUrl,
             onScaleChange: setPrintMapScale,
             onCenterChange: setCenter,
         });
@@ -387,16 +397,16 @@ const PrintPanel = observer(
         // const hide = useCallback(() => {
         //     updateMapSettings({ scale: undefined });
         // }, [updateMapSettings]);
+        const hide = useCallback(() => {
+            if (mapInit.current) {
+                destroy();
+                mapInit.current = false;
+            }
+        }, [destroy]);
 
-        // useEffect(() => {
-        //     visible ? show() : hide();
-        //     return () => {
-        //         hide();
-        //     };
-        // }, [visible]);
         useEffect(() => {
-            show();
-        }, [show]);
+            visible ? show() : hide();
+        }, [hide, show, visible]);
 
         useEffect(() => {
             if (!center) {
@@ -442,7 +452,7 @@ const PrintPanel = observer(
                         <label>{gettext("Paper format")}</label>
                         <Select
                             style={{ width: "100%" }}
-                            onChange={(v) => changePaperFormat(v)}
+                            onChange={changePaperFormat}
                             value={paperFormat}
                             options={pageFormats}
                         ></Select>
