@@ -13,7 +13,7 @@ import settings from "@nextgisweb/pyramid/settings!webmap";
 import topic from "@nextgisweb/webmap/compat/topic";
 import { buildControls } from "@nextgisweb/webmap/map-controls";
 import MapToolbar from "@nextgisweb/webmap/map-toolbar";
-import PanelsManager from "@nextgisweb/webmap/panels-manager";
+import { PanelsManager } from "@nextgisweb/webmap/panels-manager";
 import type {
     DisplayConfig,
     LayerItemConfig,
@@ -31,7 +31,7 @@ import MapStatesObserver from "../map-state-observer";
 import type { MapStatesObserver as IMapStatesObserver } from "../map-state-observer/MapStatesObserver";
 import { Map } from "../ol/Map";
 import type { CoreLayer } from "../ol/layer/_Base";
-import type { PanelPlugin } from "../panels-manager/registry";
+import type { PanelStore } from "../panels-manager";
 import type { PluginBase } from "../plugin/PluginBase";
 import WebmapStore from "../store";
 import type {
@@ -802,7 +802,7 @@ export class Display {
 
     private _buildPanelsManager() {
         const activePanelKey = this.urlParams[this.modeURLParam];
-        const onChangePanel = (panel?: PanelPlugin) => {
+        const onChangePanel = (panel?: PanelStore) => {
             if (panel) {
                 setURLParam(this.modeURLParam, panel.name);
             } else {

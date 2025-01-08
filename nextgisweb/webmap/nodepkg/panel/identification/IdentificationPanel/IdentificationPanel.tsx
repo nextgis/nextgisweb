@@ -1,3 +1,4 @@
+import { observer } from "mobx-react-lite";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import type { FeatureItem } from "@nextgisweb/feature-layer/type";
@@ -70,135 +71,141 @@ const loadFeatureItem = async (
     return featureItem;
 };
 
-export default function IdentificationPanel({
-    display,
-    identifyInfo,
-    title,
-    close,
-}: IdentificationPanelProps) {
-    const [featureInfo, setFeatureInfo] = useState<FeatureInfo>();
-    const [featureItem, setFeatureItem] = useState<FeatureItem>();
+const IdentificationPanel = observer(
+    ({ display, store }: IdentificationPanelProps) => {
+        const [featureInfo, setFeatureInfo] = useState<FeatureInfo>();
+        const [featureItem, setFeatureItem] = useState<FeatureItem>();
 
-    const { trackPromise, isLoading } = useLoading();
+        const { trackPromise, isLoading } = useLoading();
+        const { makeSignal, abort } = useAbortController();
 
-    const { makeSignal, abort } = useAbortController();
+        const identifyInfo = store.identifyInfo;
 
-    const isNotFound = identifyInfo && identifyInfo.response.featureCount === 0;
+        const isNotFound =
+            identifyInfo && identifyInfo.response.featureCount === 0;
 
-    useEffect(() => {
-        if (isNotFound) {
-            setFeatureInfo(undefined);
-            setFeatureItem(undefined);
-        }
-    }, [isNotFound]);
-
-    const updateFeatureItem = useCallback(
-        async (featureInfo: FeatureInfo | undefined) => {
-            abort();
-
-            setFeatureItem(undefined);
-
-            if (!featureInfo) {
-                return;
+        useEffect(() => {
+            if (isNotFound) {
+                setFeatureInfo(undefined);
+                setFeatureItem(undefined);
             }
-            const signal = makeSignal();
+        }, [isNotFound]);
 
-            try {
-                const featureItemLoaded = await trackPromise(
-                    loadFeatureItem(identifyInfo, featureInfo, { signal })
-                );
+        const updateFeatureItem = useCallback(
+            async (featureInfo: FeatureInfo | undefined) => {
+                abort();
 
-                setFeatureItem(featureItemLoaded);
-            } catch (er) {
-                if ((er as Error).name !== "AbortError") {
-                    errorModal(er as ApiError);
+                setFeatureItem(undefined);
+
+                if (!featureInfo) {
+                    return;
                 }
-            }
-        },
-        [identifyInfo, abort, trackPromise, makeSignal]
-    );
+                const signal = makeSignal();
 
-    const onFeatureChange = useCallback(
-        (featureInfo: FeatureInfo | undefined) => {
-            setFeatureInfo(featureInfo);
-            updateFeatureItem(featureInfo);
-        },
-        [updateFeatureItem]
-    );
+                try {
+                    const featureItemLoaded = await trackPromise(
+                        loadFeatureItem(identifyInfo!, featureInfo, { signal })
+                    );
 
-    const featuresInfoList = useMemo(() => {
-        abort();
-        const options = identifyInfoToFeaturesInfo(identifyInfo, display);
-        if (options.length) {
-            const first = options[0];
-            onFeatureChange(first);
-        }
-        return options;
-    }, [identifyInfo, display, onFeatureChange, abort]);
-
-    let loadElement = null;
-    if (isLoading) {
-        loadElement = (
-            <div className="load-row">
-                <div className="load">
-                    <div>{msgLoad}</div>
-                </div>
-            </div>
+                    setFeatureItem(featureItemLoaded);
+                } catch (er) {
+                    if ((er as Error).name !== "AbortError") {
+                        errorModal(er as ApiError);
+                    }
+                }
+            },
+            [identifyInfo, abort, trackPromise, makeSignal]
         );
-    }
 
-    return (
-        <PanelContainer
-            className="ngw-webmap-panel-identify"
-            title={title}
-            close={close}
-            prolog={
-                !identifyInfo ? (
-                    <Alert
-                        className="alert"
-                        message={msgTipIdent}
-                        showIcon={false}
-                        type="info"
-                        banner
-                    />
-                ) : isNotFound ? (
-                    <Alert
-                        message={msgNotFound}
-                        type="warning"
-                        showIcon
-                        banner
-                    />
-                ) : (
-                    <FeatureSelector
+        const onFeatureChange = useCallback(
+            (featureInfo: FeatureInfo | undefined) => {
+                setFeatureInfo(featureInfo);
+                updateFeatureItem(featureInfo);
+            },
+            [updateFeatureItem]
+        );
+
+        const featuresInfoList = useMemo(() => {
+            abort();
+            if (!identifyInfo) return [];
+            const options = identifyInfoToFeaturesInfo(identifyInfo, display);
+            if (options.length) {
+                const first = options[0];
+                onFeatureChange(first);
+            }
+            return options;
+        }, [identifyInfo, display, onFeatureChange, abort]);
+
+        let loadElement = null;
+        if (isLoading) {
+            loadElement = (
+                <div className="load-row">
+                    <div className="load">
+                        <div>{msgLoad}</div>
+                    </div>
+                </div>
+            );
+        }
+
+        return (
+            <PanelContainer
+                className="ngw-webmap-panel-identify"
+                title={store.title}
+                close={store.close}
+                prolog={
+                    !identifyInfo ? (
+                        <Alert
+                            className="alert"
+                            message={msgTipIdent}
+                            showIcon={false}
+                            type="info"
+                            banner
+                        />
+                    ) : isNotFound ? (
+                        <Alert
+                            message={msgNotFound}
+                            type="warning"
+                            showIcon
+                            banner
+                        />
+                    ) : (
+                        <FeatureSelector
+                            display={display}
+                            featureInfo={featureInfo}
+                            featureItem={featureItem}
+                            featuresInfoList={featuresInfoList}
+                            onFeatureChange={onFeatureChange}
+                        />
+                    )
+                }
+                epilog={
+                    identifyInfo && (
+                        <CoordinatesSwitcher
+                            display={display}
+                            identifyInfo={identifyInfo}
+                        />
+                    )
+                }
+                sectionAccent={true}
+                components={{
+                    prolog: PanelContainer.Unpadded,
+                    epilog: PanelContainer.Unpadded,
+                }}
+            >
+                {loadElement}
+                {featureItem && featureInfo && (
+                    <FeatureInfoSection
                         display={display}
                         featureInfo={featureInfo}
                         featureItem={featureItem}
-                        featuresInfoList={featuresInfoList}
-                        onFeatureChange={onFeatureChange}
+                        onUpdate={() => updateFeatureItem(featureInfo)}
                     />
-                )
-            }
-            epilog={
-                <CoordinatesSwitcher
-                    display={display}
-                    identifyInfo={identifyInfo}
-                />
-            }
-            sectionAccent={true}
-            components={{
-                prolog: PanelContainer.Unpadded,
-                epilog: PanelContainer.Unpadded,
-            }}
-        >
-            {loadElement}
-            {featureItem && featureInfo && (
-                <FeatureInfoSection
-                    display={display}
-                    featureInfo={featureInfo}
-                    featureItem={featureItem}
-                    onUpdate={() => updateFeatureItem(featureInfo)}
-                />
-            )}
-        </PanelContainer>
-    );
-}
+                )}
+            </PanelContainer>
+        );
+    }
+);
+
+IdentificationPanel.displayName = "IdentificationPanel";
+
+export default IdentificationPanel;

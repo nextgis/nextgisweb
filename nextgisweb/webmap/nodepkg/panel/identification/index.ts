@@ -1,1 +1,1 @@
-export { default } from "./IdentificationPanel/IdentificationPanel";
+export { IdentifyStore } from "./IdentifyStore";

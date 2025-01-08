@@ -1,6 +1,5 @@
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import type { DescriptionPanelProps } from "@nextgisweb/webmap/panel/description/DescriptionPanel";
-import type { PanelPlugin } from "@nextgisweb/webmap/panels-manager/registry";
+import type { DescriptionStore } from "@nextgisweb/webmap/panel/description/DescriptionStore";
 import type { PluginState } from "@nextgisweb/webmap/type";
 import type { LayerItemConfig } from "@nextgisweb/webmap/type/api";
 
@@ -42,12 +41,9 @@ export class LayerInfoPlugin extends PluginBase {
             this.identity
         ] as DescriptionWebMapPluginConfig;
         if (data !== undefined) {
-            const content = data.description;
-            const panel = pm.getPanel(
-                pkey
-            ) as PanelPlugin<DescriptionPanelProps>;
+            const panel = pm.getPanel<DescriptionStore>(pkey);
             if (panel) {
-                panel.updateMeta({ content });
+                panel.setContent(data.description);
             }
             pm.activatePanel(pkey);
         }

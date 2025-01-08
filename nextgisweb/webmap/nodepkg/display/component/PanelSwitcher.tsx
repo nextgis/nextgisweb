@@ -4,40 +4,26 @@ import type { ComponentType } from "react";
 
 import { Tabs } from "@nextgisweb/gui/antd";
 import type { TabsProps } from "@nextgisweb/gui/antd";
+import type { PanelStore } from "@nextgisweb/webmap/panels-manager";
 
-import type { PanelPlugin } from "../../panels-manager/registry";
 import type { PanelComponentProps } from "../../panels-manager/type";
 import type { Display } from "../Display";
 
 import "./PanelSwitcher.css";
 
-const PanelRender = observer(
-    ({ panel, display }: { panel: PanelPlugin; display: Display }) => {
-        const { load, meta } = panel;
-        const Loader = useMemo(() => {
-            return lazy<ComponentType<PanelComponentProps>>(async () => {
-                let Component = await load();
-                if (meta.startup) {
-                    const propsStartup = (await meta.startup(display)) ?? {};
-                    const Base = Component;
-                    // eslint-disable-next-line react/display-name
-                    Component = (props) => (
-                        <Base {...propsStartup} {...props} />
-                    );
-                }
-                return { default: Component };
-            });
-        }, [load, display, meta]);
+const PanelRender = observer(({ panel }: { panel: PanelStore }) => {
+    const Loader = useMemo(() => {
+        return lazy<ComponentType<PanelComponentProps>>(async () => {
+            return { default: await panel.load() };
+        });
+    }, [panel]);
 
-        const { closePanel } = display.panelsManager;
-
-        return (
-            <Suspense fallback={null}>
-                <Loader display={display} close={closePanel} {...meta} />
-            </Suspense>
-        );
-    }
-);
+    return (
+        <Suspense fallback={null}>
+            <Loader store={panel} display={panel.display} />
+        </Suspense>
+    );
+});
 
 PanelRender.displayName = "PanelRender";
 
@@ -45,7 +31,7 @@ export const PanelSwitcher = observer(({ display }: { display: Display }) => {
     const { panels, activePanel } = display.panelsManager;
 
     const activeKey = useMemo(
-        () => (activePanel ? activePanel.meta.name : undefined),
+        () => (activePanel ? activePanel.name : undefined),
         [activePanel]
     );
 
@@ -54,11 +40,11 @@ export const PanelSwitcher = observer(({ display }: { display: Display }) => {
             const item: NonNullable<TabsProps["items"]>[0] = {
                 key: panel.name,
                 label: panel.title,
-                children: <PanelRender panel={panel} display={display} />,
+                children: <PanelRender panel={panel} />,
             };
             return item;
         });
-    }, [display, panels]);
+    }, [panels]);
 
     return (
         <Tabs
@@ -70,4 +56,5 @@ export const PanelSwitcher = observer(({ display }: { display: Display }) => {
         />
     );
 });
+
 PanelSwitcher.displayName = "PanelSwitcher";

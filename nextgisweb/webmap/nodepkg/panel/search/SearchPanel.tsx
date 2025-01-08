@@ -1,5 +1,6 @@
 import type { FeatureCollection } from "geojson";
 import { debounce } from "lodash-es";
+import { observer } from "mobx-react-lite";
 import GeoJSON from "ol/format/GeoJSON";
 import type { Geometry } from "ol/geom";
 import { createContext, useCallback, useContext, useState } from "react";
@@ -369,7 +370,7 @@ function SearchPanelTitle({ className, close }: PanelTitleProps) {
     );
 }
 
-export default function SearchPanel({ display, close }: PanelComponentProps) {
+const SearchPanel = observer(({ store, display }: PanelComponentProps) => {
     const [loading, setLoading] = useState<boolean>(false);
     const [searchResults, setSearchResults] = useState<
         [SearchResult[], boolean] | undefined
@@ -486,7 +487,7 @@ export default function SearchPanel({ display, close }: PanelComponentProps) {
         >
             <PanelContainer
                 className="ngw-webmap-panel-search"
-                close={close}
+                close={store.close}
                 prolog={info}
                 components={{
                     title: SearchPanelTitle,
@@ -498,4 +499,8 @@ export default function SearchPanel({ display, close }: PanelComponentProps) {
             </PanelContainer>
         </SearchPanelContext.Provider>
     );
-}
+});
+
+SearchPanel.displayName = "SearchPanel";
+
+export default SearchPanel;

@@ -5,8 +5,9 @@ import type { PluginMenuItem, PluginParams, PluginState } from "../type";
 import type { TreeItemType } from "../type/TreeItems";
 
 export abstract class PluginBase {
-    display: Display;
-    identity: string;
+    readonly identity: string;
+    readonly display: Display;
+
     type: TreeItemType = "layer";
 
     run?(nodeData: LayerItemConfig): Promise<boolean | undefined>;

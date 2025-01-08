@@ -1,9 +1,10 @@
+import classNames from "classnames";
 import { observer } from "mobx-react-lite";
-import { useCallback, useMemo } from "react";
-import type { ReactElement } from "react";
+import { useCallback } from "react";
 
-import type PanelsManager from "../panels-manager";
+import type { PanelsManager } from "../panels-manager";
 import type { PanelPlugin } from "../panels-manager/registry";
+
 import "./NavigationMenu.less";
 
 export interface NavigationMenuProps {
@@ -23,41 +24,23 @@ export const NavigationMenu = observer(
             [store]
         );
 
-        const menuItems = useMemo(() => {
-            const menu: ReactElement[] = [];
-            if (store.panels) {
-                const activePanel = store.activePanel;
-                store.panels.forEach(({ meta }) => {
-                    const enabled = meta.enabled ?? true;
-
-                    if (enabled) {
-                        const activeClass =
-                            meta.name === activePanel?.name ? "active" : "";
-                        menu.push(
-                            <div
-                                key={meta.name}
-                                className={`navigation-menu__item ${activeClass}`}
-                                title={meta.title}
-                                onClick={() => onClickItem(meta.name)}
-                            >
-                                {typeof meta.menuIcon === "string" ? (
-                                    <svg className="icon" fill="currentColor">
-                                        <use
-                                            xlinkHref={`#icon-${meta.menuIcon}`}
-                                        />
-                                    </svg>
-                                ) : (
-                                    meta.menuIcon
-                                )}
-                            </div>
-                        );
-                    }
-                });
-            }
-            return menu;
-        }, [onClickItem, store.activePanel, store.panels]);
-
-        return <div className="navigation-menu">{menuItems}</div>;
+        const active = store.activePanel;
+        return (
+            <div className="navigation-menu">
+                {store.sorted().map(({ name, title, plugin }) => (
+                    <div
+                        key={name}
+                        title={title}
+                        onClick={() => onClickItem(name)}
+                        className={classNames("navigation-menu__item", {
+                            "active": name === active?.name,
+                        })}
+                    >
+                        {plugin.menuIcon}
+                    </div>
+                ))}
+            </div>
+        );
     }
 );
 

@@ -1,3 +1,2 @@
-import { PanelsManager } from "./PanelsManager";
-
-export default PanelsManager;
+export { PanelsManager } from "./PanelsManager";
+export { PanelStore } from "./PanelStore";

@@ -12,11 +12,8 @@ import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
 import topic from "@nextgisweb/webmap/compat/topic";
 import type { Display } from "@nextgisweb/webmap/display";
 import type { Map } from "@nextgisweb/webmap/ol/Map";
-import type {
-    IdentificationPanelProps,
-    IdentifyInfo,
-} from "@nextgisweb/webmap/panel/identification/identification";
-import type { PanelPlugin } from "@nextgisweb/webmap/panels-manager/registry";
+import type { IdentifyStore } from "@nextgisweb/webmap/panel/identification";
+import type { IdentifyInfo } from "@nextgisweb/webmap/panel/identification/identification";
 import type { LayerItemConfig } from "@nextgisweb/webmap/type/api";
 
 import { ToolBase } from "./ToolBase";
@@ -236,11 +233,9 @@ export class Identify extends ToolBase {
 
         const pm = this.display.panelsManager;
         const pkey = "identify";
-        const panel = pm.getPanel(pkey) as PanelPlugin<
-            Partial<IdentificationPanelProps>
-        >;
+        const panel = pm.getPanel<IdentifyStore>(pkey);
         if (panel) {
-            panel.updateMeta({ identifyInfo, key: point.toString() });
+            panel.setIdentifyInfo(identifyInfo);
         } else {
             throw new Error(
                 "Identification panel should add during Display initialization"

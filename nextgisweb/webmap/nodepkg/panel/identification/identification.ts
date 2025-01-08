@@ -2,6 +2,8 @@ import type { Attrs, FeatureItem } from "@nextgisweb/feature-layer/type";
 import type { Display } from "@nextgisweb/webmap/display";
 import type { PanelComponentProps } from "@nextgisweb/webmap/panels-manager/type";
 
+import type { IdentifyStore } from "./IdentifyStore";
+
 export interface LayerResponse {
     features: FeatureIdentify[];
     featureCount: number;
@@ -70,5 +72,6 @@ export interface FeatureEditButtonProps {
 }
 
 export interface IdentificationPanelProps extends PanelComponentProps {
+    store: IdentifyStore;
     identifyInfo: IdentifyInfo;
 }

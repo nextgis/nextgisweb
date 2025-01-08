@@ -71,12 +71,10 @@ export class LayerEditor extends PluginBase {
 
     constructor(options: PluginParams) {
         super(options);
-        const display = options.display;
-        this.display = display;
 
-        if (display.tiny) return;
+        if (this.display.tiny) return;
 
-        if (!display.config.webmapEditable) {
+        if (!this.display.config.webmapEditable) {
             this.disabled = true;
             return;
         }

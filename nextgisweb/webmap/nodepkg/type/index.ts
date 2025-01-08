@@ -10,6 +10,7 @@ import type { Display } from "../display";
 import type { ToolBase } from "../map-controls/tool/ToolBase";
 import type { Map } from "../ol/Map";
 import type { CoreLayer, LayerOptions } from "../ol/layer/_Base";
+import type { PanelStore } from "../panels-manager";
 import type { PluginBase } from "../plugin/PluginBase";
 import type { AnnotationVisibleMode } from "../store/annotations/AnnotationsStore";
 
@@ -117,16 +118,13 @@ export interface PluginState {
 }
 
 export interface BasePanelMeta {
-    display?: Display;
-    menuIcon: React.ReactNode;
     name: string;
-    order: number;
     title: string;
-    splitter?: boolean;
+    menuIcon: React.ReactNode;
+    order: number;
     applyToTinyMap?: boolean;
-    enabled?: boolean;
-    key?: string;
 
+    storeClass?: typeof PanelStore;
     isEnabled?: ({ config }: { config: Display["config"] }) => boolean;
     startup?: (display: Display) => Promise<unknown>;
 }

@@ -1,14 +1,14 @@
-import { orderBy } from "lodash-es";
 import { action, computed, observable } from "mobx";
 
 import type { Display } from "../display";
 
+import { PanelStore } from "./PanelStore";
+import type { PanelStore as Panel } from "./PanelStore";
 import { registry } from "./registry";
-import type { PanelPlugin } from "./registry";
 
 type Source = "init" | "menu" | "manager";
 
-export interface NavigationPanelInfo {
+interface NavigationPanelInfo {
     active?: string;
     source: Source;
 }
@@ -32,13 +32,10 @@ export class PanelsManager {
 
     /** @deprecated use observable {@link PanelsManager.ready} instead */
     private _panelsReady = new Deferred<void>();
-    private _onChangePanel: (panel?: PanelPlugin) => void;
+    private _onChangePanel: (panel?: Panel) => void;
 
-    @observable accessor ready = false;
-    @observable.shallow accessor panels = new Map<
-        string,
-        PanelPlugin<unknown>
-    >();
+    @observable.ref accessor ready = false;
+    @observable.shallow accessor panels = new Map<string, Panel>();
     @observable.shallow accessor active: NavigationPanelInfo = {
         active: undefined,
         source: "init",
@@ -48,7 +45,7 @@ export class PanelsManager {
         display: Display,
         activePanelKey: string | undefined,
         allowPanels: string[] | undefined,
-        onChangePanel: (panel?: PanelPlugin) => void
+        onChangePanel: (panel?: Panel) => void
     ) {
         this._display = display;
         if (activePanelKey) {
@@ -64,8 +61,11 @@ export class PanelsManager {
             );
         });
 
-        for (const p of plugins) {
-            this._makePanel(p as PanelPlugin<unknown>);
+        for (const plugin of plugins) {
+            const cls = plugin.storeClass ?? PanelStore;
+            const panel = new cls(plugin, this._display);
+            this.panels.set(plugin.name, panel);
+            this._handleInitActive();
         }
 
         this._handlePanelActivation();
@@ -88,7 +88,7 @@ export class PanelsManager {
     }
 
     @computed
-    get activePanel(): PanelPlugin | undefined {
+    get activePanel(): Panel | undefined {
         if (this.activePanelName) {
             return this.panels.get(this.activePanelName);
         }
@@ -123,33 +123,12 @@ export class PanelsManager {
         }
     }
 
-    private _makePanel(panel: PanelPlugin<unknown>): void {
-        const existingPanels = Array.from(this.panels.values());
-        let newPanels = [...existingPanels, panel];
-        newPanels = orderBy(newPanels, "order", "asc");
-        this.panels = new Map(newPanels.map((p) => [p.name, p]));
-
-        this._handleInitActive();
-    }
-
     getActivePanelName(): string | undefined {
         return this.activePanelName;
     }
 
-    getPanel(name: string): PanelPlugin | undefined {
-        return this.panels.get(name);
-    }
-
-    getPanelsNames(): string[] {
-        return [...this.panels.keys()];
-    }
-
-    getPanels(): PanelPlugin[] {
-        return [...this.panels.values()];
-    }
-
-    getPanelsCount(): number {
-        return this.panels.size;
+    getPanel<T extends Panel = Panel>(name: string): T | undefined {
+        return this.panels.get(name) as T;
     }
 
     activatePanel(name: string): void {
@@ -158,5 +137,16 @@ export class PanelsManager {
 
     deactivatePanel(): void {
         this.closePanel();
+    }
+
+    sorted(): Panel[] {
+        const sorted: Panel[] = [];
+        for (const panel of this.panels.values()) {
+            if (panel.enabled === false) continue;
+            sorted.push(panel);
+        }
+
+        sorted.sort((a, b) => a.order - b.order);
+        return sorted;
     }
 }

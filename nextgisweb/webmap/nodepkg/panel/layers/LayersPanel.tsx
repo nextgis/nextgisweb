@@ -1,3 +1,5 @@
+import { observer } from "mobx-react-lite";
+
 import type { PanelComponentProps } from "@nextgisweb/webmap/panels-manager/type";
 import type ZoomToWebmapPlugin from "@nextgisweb/webmap/plugin/zoom-to-webmap";
 
@@ -9,47 +11,49 @@ import { LayersDropdown } from "./LayersDropdown";
 
 import "./LayersPanel.less";
 
-export default function LayersPanel({
-    title,
-    close,
-    display,
-    ...props
-}: PanelComponentProps) {
-    const zoomToAllLayers = () => {
-        const plugin =
-            display.plugins["@nextgisweb/webmap/plugin/zoom-to-webmap"];
-        if (plugin) {
-            (plugin as ZoomToWebmapPlugin).zoomToAllLayers();
-        }
-    };
-
-    return (
-        <PanelContainer
-            title={
-                <>
-                    {title}
-                    <LayersDropdown
-                        onClick={(key) => {
-                            if (key === "zoomToAllLayers") {
-                                zoomToAllLayers();
-                            }
-                        }}
-                    />
-                </>
+const LayersPanel = observer(
+    ({ store, display, ...props }: PanelComponentProps) => {
+        const zoomToAllLayers = () => {
+            const plugin =
+                display.plugins["@nextgisweb/webmap/plugin/zoom-to-webmap"];
+            if (plugin) {
+                (plugin as ZoomToWebmapPlugin).zoomToAllLayers();
             }
-            epilog={<BasemapSelector display={display} />}
-            components={{
-                content: PanelContainer.Unpadded,
-                epilog: PanelContainer.Unpadded,
-            }}
-        >
-            <LayersTree
-                store={display.webmapStore}
-                onSelect={display.handleSelect.bind(display)}
-                setLayerZIndex={display.setLayerZIndex.bind(display)}
-                getWebmapPlugins={() => ({ ...display.plugins })}
-                {...props}
-            />
-        </PanelContainer>
-    );
-}
+        };
+
+        return (
+            <PanelContainer
+                title={
+                    <>
+                        {store.title}
+                        <LayersDropdown
+                            onClick={(key) => {
+                                if (key === "zoomToAllLayers") {
+                                    zoomToAllLayers();
+                                }
+                            }}
+                        />
+                    </>
+                }
+                close={store.close}
+                epilog={<BasemapSelector display={display} />}
+                components={{
+                    content: PanelContainer.Unpadded,
+                    epilog: PanelContainer.Unpadded,
+                }}
+            >
+                <LayersTree
+                    store={display.webmapStore}
+                    onSelect={display.handleSelect.bind(display)}
+                    setLayerZIndex={display.setLayerZIndex.bind(display)}
+                    getWebmapPlugins={() => ({ ...display.plugins })}
+                    {...props}
+                />
+            </PanelContainer>
+        );
+    }
+);
+
+LayersPanel.displayName = "LayersPanel";
+
+export default LayersPanel;

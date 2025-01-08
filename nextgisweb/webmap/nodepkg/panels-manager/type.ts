@@ -1,9 +1,8 @@
 import type { Display } from "../display";
 
+import type { PanelStore } from "./PanelStore";
+
 export type PanelComponentProps<T = unknown> = {
+    store: PanelStore;
     display: Display;
-    name: string;
-    title: string;
-    close?: () => void;
-    visible?: boolean;
 } & T;
