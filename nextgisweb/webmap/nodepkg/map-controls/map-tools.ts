@@ -6,7 +6,8 @@ import ToolMeasure from "ngw-webmap/tool/Measure";
 // @ts-expect-error Import URL parser module
 import ToolSwipe from "ngw-webmap/tool/Swipe";
 
-import type { DojoDisplay, MapToolbar } from "../type/DojoDisplay";
+import type MapToolbar from "../map-toolbar";
+import type { DojoDisplay } from "../type/DojoDisplay";
 
 import { ViewerInfoTool as ToolViewerInfo } from "./tool/ViewerInfo";
 import ToolZoom from "./tool/Zoom";

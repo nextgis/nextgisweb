@@ -1,9 +1,10 @@
-import type { Tool } from "./MapToolbarItems";
+import type { MapTool } from "../type";
+
 import { WidgetBase } from "./WidgetBase";
 
 export interface ToggleButtonOptions {
     label?: string;
-    tool?: Tool;
+    tool?: MapTool;
     class?: string;
     state?: string;
     showLabel?: boolean;
@@ -15,7 +16,7 @@ export interface ToggleButtonOptions {
 
 export class ToggleControl extends WidgetBase {
     content: string;
-    tool?: Tool;
+    tool?: MapTool;
     state: string;
     buttonNode: HTMLButtonElement;
     iconNode: HTMLElement | null;

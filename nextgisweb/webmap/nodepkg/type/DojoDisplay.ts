@@ -4,18 +4,18 @@ import type Feature from "ol/Feature";
 import type { Control as OlControl } from "ol/control";
 import type { Options } from "ol/control/Control";
 
+import type { MapStatesObserver } from "../map-state-observer/MapStatesObserver";
+import type MapToolbar from "../map-toolbar";
+import type { ToggleControl } from "../map-toolbar/ToggleControl";
 import type PanelsManager from "../panels-manager";
 import type WebmapStore from "../store";
 
 import type { DisplayConfig } from "./DisplayConfig";
 import type { DisplayMap } from "./DisplayMap";
-import type { MapStatesObserver } from "./MapState";
+import type { TreeItem } from "./TreeItems";
 import type { WebmapItem } from "./WebmapItem";
 import type { WebmapLayer } from "./WebmapLayer";
 import type { WebmapPlugin } from "./WebmapPlugin";
-
-import type { DojoItem } from ".";
-import { TreeItem } from "./TreeItems";
 
 export interface HighlightFeatureData {
     geom: string;
@@ -51,16 +51,12 @@ export interface ItemConfigById {
 export interface MapTool extends dijit._WidgetBase {
     activate: () => void;
     deactivate: () => void;
-}
 
-export interface MapToolbarItems {
-    addTool: (tool: MapTool, state: string, place?: HTMLElement) => void;
-    addSeparator: () => void;
-    addButton: (button: DojoItem, options: any) => void;
-}
-
-export interface MapToolbar extends OlControl {
-    items: MapToolbarItems;
+    label: string;
+    iconClass?: string;
+    customCssClass?: string;
+    customIcon?: string;
+    toolbarBtn?: ToggleControl;
 }
 
 interface DojoDisplayIdentifyPopup {
