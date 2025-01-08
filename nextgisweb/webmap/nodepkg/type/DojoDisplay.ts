@@ -4,6 +4,7 @@ import type Feature from "ol/Feature";
 import type { Control as OlControl } from "ol/control";
 import type { Options } from "ol/control/Control";
 
+import type { LoggedDeferred } from "../compat/LoggedDeferred";
 import type { MapStatesObserver } from "../map-state-observer/MapStatesObserver";
 import type MapToolbar from "../map-toolbar";
 import type { ToggleControl } from "../map-toolbar/ToggleControl";
@@ -17,6 +18,7 @@ import type { LayerItem, TreeItem } from "./TreeItems";
 import type { WebmapItem } from "./WebmapItem";
 import type { WebmapLayer } from "./WebmapLayer";
 import type { WebmapPlugin } from "./WebmapPlugin";
+import type { WebMapSettings } from "./WebmapSettings";
 
 export interface HighlightFeatureData {
     geom: string;
@@ -89,6 +91,7 @@ type ConfigMap = {
 
 export interface DojoDisplay extends dijit._WidgetBase {
     config: DisplayConfig;
+    clientSettings: WebMapSettings;
     identify: DojoDisplayIdentify;
     featureHighlighter: FeatureHighlighter;
     getUrlParams: () => Record<string, string>;
@@ -104,7 +107,10 @@ export interface DojoDisplay extends dijit._WidgetBase {
     _mapExtentDeferred: PromiseLike<void>;
     _urlParams: Record<string, string>;
 
+    _mid: Record<string, any>;
+    _midDeferred: Record<string, LoggedDeferred>;
     _layersDeferred: Promise<void>;
+    _postCreateDeferred: Promise<void>;
 
     tiny: boolean;
 

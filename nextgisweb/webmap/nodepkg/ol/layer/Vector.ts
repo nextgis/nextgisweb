@@ -1,11 +1,16 @@
 import { Vector as VectorLayer } from "ol/layer";
 import { Vector as VectorSource } from "ol/source";
+import type { Options as VectorSourceOptions } from "ol/source/Vector";
 
 import { BaseLayer } from "./_Base";
-import type { LayerOptions, SourceOptions } from "./_Base";
+import type { LayerOptions } from "./_Base";
 
-export class Vector extends BaseLayer {
-    protected createSource(options: SourceOptions): VectorSource {
+export default class Vector extends BaseLayer<
+    VectorSource,
+    VectorLayer<VectorSource>,
+    VectorSourceOptions
+> {
+    protected createSource(options: VectorSourceOptions): VectorSource {
         return new VectorSource(options);
     }
 
