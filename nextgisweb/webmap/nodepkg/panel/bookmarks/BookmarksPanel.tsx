@@ -6,8 +6,8 @@ import { Spin } from "@nextgisweb/gui/antd";
 import { route } from "@nextgisweb/pyramid/api";
 import { useRouteGet } from "@nextgisweb/pyramid/hook";
 
-import { PanelContainer } from "../component";
 import type { PanelWidget } from "..";
+import { PanelContainer } from "../component";
 
 import { LoadingOutlined } from "@ant-design/icons";
 

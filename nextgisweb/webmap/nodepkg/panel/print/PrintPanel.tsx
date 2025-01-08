@@ -20,9 +20,9 @@ import type { Display } from "@nextgisweb/webmap/display";
 import PrintMap from "@nextgisweb/webmap/print-map";
 import { getURLParams } from "@nextgisweb/webmap/utils/URL";
 
+import type { PanelWidget } from "..";
 import type { PrintMapSettings } from "../../print-map/type";
 import { PanelContainer, PanelSection } from "../component";
-import type { PanelWidget } from "..";
 
 import PrintMapExport from "./PrintMapExport";
 import {

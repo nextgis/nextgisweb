@@ -3,8 +3,8 @@ import { useEffect, useMemo, useRef } from "react";
 
 import type { Display } from "@nextgisweb/webmap/display";
 
-import { PanelContainer } from "../component";
 import type { PanelWidget } from "..";
+import { PanelContainer } from "../component";
 
 import type { DescriptionStore } from "./DescriptionStore";
 

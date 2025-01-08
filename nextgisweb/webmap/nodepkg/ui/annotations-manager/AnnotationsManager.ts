@@ -154,7 +154,9 @@ export class AnnotationsManager {
         this._annotationsLayer.applyFilter(filter);
     }
 
-    private _onAnnotationsVisibleChange(annotVisibleState: AnnotationVisibleMode): void {
+    private _onAnnotationsVisibleChange(
+        annotVisibleState: AnnotationVisibleMode
+    ): void {
         this._annotationsVisibleState = annotVisibleState;
 
         const annotVisible =

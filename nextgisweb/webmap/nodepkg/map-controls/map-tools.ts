@@ -1,5 +1,6 @@
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
+import type { Display } from "../display";
 import type MapToolbar from "../map-toolbar";
 
 import { ToolMeasure } from "./tool/Measure";
@@ -8,7 +9,6 @@ import { ToolViewerInfo } from "./tool/ViewerInfo";
 import { ToolZoom } from "./tool/Zoom";
 import type { ControlReady, ToolInfo } from "./type";
 import { getControlsInfo } from "./utils";
-import { Display } from "../display";
 
 export const ToolsInfo: ToolInfo[] = [
     {
