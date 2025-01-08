@@ -44,8 +44,8 @@ const urlRegex =
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export interface FieldDataItem {
-    key: number;
-    attr: string;
+    key: number | string;
+    attr?: string;
     value: string | React.ReactElement;
 }
 
