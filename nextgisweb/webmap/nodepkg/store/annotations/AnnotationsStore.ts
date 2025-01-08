@@ -1,13 +1,12 @@
-import { makeAutoObservable } from "mobx";
+import { action, observable } from "mobx";
+
+export type VisibleMode = "no" | "yes" | "messages";
 
 class AnnotationsStore {
-    visibleMode?: string = undefined;
+    @observable accessor visibleMode: VisibleMode | null = null;
 
-    constructor() {
-        makeAutoObservable(this);
-    }
-
-    setVisibleMode(visibleMode?: string): void {
+    @action
+    setVisibleMode(visibleMode: VisibleMode | null): void {
         this.visibleMode = visibleMode;
     }
 }
