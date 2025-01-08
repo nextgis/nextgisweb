@@ -22,6 +22,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import settings from "@nextgisweb/pyramid/settings!webmap";
 import { useFavorites } from "@nextgisweb/resource/favorite/useFavorites";
 import { getControls } from "@nextgisweb/webmap/map-controls";
+import type { ReactPanelComponentProps } from "@nextgisweb/webmap/panels-manager/type";
 import type { PanelDojoItem } from "@nextgisweb/webmap/type";
 import { getPermalink } from "@nextgisweb/webmap/utils/permalink";
 
@@ -157,7 +158,12 @@ interface PanelOption {
     value: string;
 }
 
-export const SharePanel = ({ display, title, close, visible }: PanelProps) => {
+export const SharePanel = ({
+    display,
+    title,
+    close,
+    visible,
+}: ReactPanelComponentProps) => {
     const webmapId = display.config.webmapId;
 
     const [mapLink, setMapLink] = useState("");

@@ -6,7 +6,12 @@ import NavigationMenu from "@nextgisweb/webmap/navigation-menu";
 import { navigationMenuStore } from "@nextgisweb/webmap/navigation-menu/NavigationMenuStore";
 
 import type { NavigationPanelInfo } from "../navigation-menu/NavigationMenuStore";
-import type { DojoDisplay, DojoItem, PanelDojoItem } from "../type";
+import type {
+    AddpanelItem,
+    DojoDisplay,
+    DojoItem,
+    PanelDojoItem,
+} from "../type";
 
 interface PanelElements {
     main: DojoItem;
@@ -27,7 +32,7 @@ class Deferred<T> {
     }
 }
 
-function isFuncReactComponent(cls: any): cls is React.FC {
+function isFuncReactComponent(cls: unknown): cls is React.FC {
     return (
         typeof cls === "function" &&
         String(cls).includes("return React.createElement")
@@ -37,11 +42,11 @@ function isFuncReactComponent(cls: any): cls is React.FC {
 export class PanelsManager {
     private _display: DojoDisplay;
     private _domElements!: PanelElements;
-    private _activePanelKey?: string;
+    _activePanelKey?: string;
     private _allowPanels?: string[];
     private _panels = new Map<string, PanelDojoItem>();
     private _initialized = false;
-    private _initPromises: Promise<PanelDojoItem>[] = [];
+    private _initPromises: Promise<PanelDojoItem | AddpanelItem>[] = [];
 
     private _onChangePanel: (panel?: PanelDojoItem) => void;
     private _panelsReady = new Deferred<void>();
@@ -153,7 +158,7 @@ export class PanelsManager {
         navigationMenuStore.setActive(this._activePanelKey, "manager");
     }
 
-    private _closePanel(panel: PanelDojoItem): void {
+    _closePanel(panel: PanelDojoItem): void {
         this._deactivatePanel(panel);
     }
 
@@ -180,12 +185,12 @@ export class PanelsManager {
         this._activatePanel(firstPanelKey);
     }
 
-    private _makePanel(panel: PanelDojoItem): void {
+    private _makePanel(panel: AddpanelItem | PanelDojoItem): void {
         if (!panel) {
             return;
         }
-        let newPanel: PanelDojoItem;
-        let name: string;
+        let newPanel: PanelDojoItem | undefined = undefined;
+        let name: string | undefined = undefined;
         if (panel.cls) {
             const { cls, params } = panel;
             name = params.name;
@@ -205,7 +210,7 @@ export class PanelsManager {
                 }
                 newPanel = widget;
             }
-        } else {
+        } else if ("name" in panel) {
             name = panel.name;
             if (this._allowPanels && !this._allowPanels.includes(name)) {
                 return;
@@ -218,6 +223,10 @@ export class PanelsManager {
                 });
             }
             newPanel = panel;
+        }
+        if (name === undefined || newPanel === undefined) {
+            console.error(`Unable to create new panel`);
+            return;
         }
 
         if (this._panels.has(name)) {
@@ -251,13 +260,14 @@ export class PanelsManager {
         });
     }
 
-    async addPanels(
-        panelsInfo: PanelDojoItem[] | PanelDojoItem | Promise<PanelDojoItem>[]
-    ): Promise<void> {
-        const panels: (PanelDojoItem | Promise<PanelDojoItem>)[] =
-            Array.isArray(panelsInfo) ? panelsInfo : [panelsInfo];
+    async addPanels(panelsInfo: AddpanelItem[] | AddpanelItem): Promise<void> {
+        const panels: (AddpanelItem | Promise<AddpanelItem>)[] = Array.isArray(
+            panelsInfo
+        )
+            ? panelsInfo
+            : [panelsInfo];
         const promises = panels.filter(
-            (p): p is Promise<PanelDojoItem> => p instanceof Promise
+            (p): p is Promise<AddpanelItem> => p instanceof Promise
         );
 
         promises.forEach((p) =>
@@ -271,7 +281,7 @@ export class PanelsManager {
         }
 
         const readyPanels = panels.filter(
-            (p): p is PanelDojoItem => !(p instanceof Promise)
+            (p): p is AddpanelItem => !(p instanceof Promise)
         );
         readyPanels.forEach((panelInfo) => {
             this._makePanel(panelInfo);
