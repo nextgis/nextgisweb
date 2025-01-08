@@ -70,11 +70,11 @@ export const FeatureEditButton = ({
 
     return (
         <Button
-            style={{ color: "#fd7676" }}
+            type="text"
+            size="small"
+            icon={<EditIcon />}
             title={gettext("Edit feature")}
             onClick={edit}
-            type="text"
-            icon={<EditIcon />}
         />
     );
 };
