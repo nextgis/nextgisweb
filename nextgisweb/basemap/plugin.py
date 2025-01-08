@@ -2,6 +2,8 @@ from nextgisweb.webmap.plugin import WebmapPlugin
 
 
 class BasemapPlugin(WebmapPlugin):
+    amd_free = True
+
     @classmethod
     def is_supported(cls, webmap):
         # TODO: Security

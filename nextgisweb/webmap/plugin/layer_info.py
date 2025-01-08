@@ -2,6 +2,8 @@ from .base import WebmapLayerPlugin
 
 
 class LayerInfoPlugin(WebmapLayerPlugin):
+    amd_free = True
+
     @classmethod
     def is_layer_supported(cls, *, style, layer, webmap):
         payload = dict()
