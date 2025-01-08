@@ -1,8 +1,8 @@
+import classNames from "classnames";
 import { observer } from "mobx-react-lite";
 import { useCallback, useEffect, useState } from "react";
 
 import { Spin, Splitter } from "@nextgisweb/gui/antd";
-import { mergeClasses } from "@nextgisweb/gui/util";
 import { useRouteGet } from "@nextgisweb/pyramid/hook";
 import type { DisplayConfig } from "@nextgisweb/webmap/type/api";
 import { WebMapTabs } from "@nextgisweb/webmap/webmap-tabs";
@@ -70,7 +70,7 @@ export const DisplayComponent = observer(
 
         return (
             <Splitter
-                className={mergeClasses("ngw-webmap-display", className)}
+                className={classNames("ngw-webmap-display", className)}
                 onResize={setHorizontalPanelSize}
             >
                 {display.panelsManager.panels.size > 0 && (
