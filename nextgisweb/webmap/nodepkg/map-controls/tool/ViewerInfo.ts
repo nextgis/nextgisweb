@@ -13,7 +13,7 @@ interface ViewerInfoOptions {
     display: DojoDisplay;
 }
 
-export class ViewerInfoTool extends Base {
+export class ToolViewerInfo extends Base {
     customCssClass: string = "viewer-info-tool";
     label: string;
     customIcon: string;
