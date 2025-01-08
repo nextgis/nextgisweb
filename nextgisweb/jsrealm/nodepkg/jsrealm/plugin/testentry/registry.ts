@@ -8,6 +8,6 @@ export const registry = pluginRegistry<
     { operation: Operation }
 >(MODULE_NAME);
 
-registry.register(COMP_ID, () => import("./plugin/foo"), {
+registry.registerLoader(COMP_ID, () => import("./plugin/foo"), {
     operation: "create",
 });

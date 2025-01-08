@@ -3,7 +3,7 @@ import reactApp from "@nextgisweb/gui/react-app";
 import entrypoint from "@nextgisweb/jsrealm/entrypoint";
 import { registry } from "@nextgisweb/jsrealm/testentry/driver";
 
-registry.register(
+registry.registerLoader(
     COMP_ID,
     async () => {
         return (name: string, el: HTMLElement) => {

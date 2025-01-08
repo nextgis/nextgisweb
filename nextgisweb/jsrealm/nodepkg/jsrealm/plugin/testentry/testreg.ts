@@ -7,7 +7,7 @@ import type { Operation } from "./registry";
 describe("Test registry", () => {
     it("throws error on register", () => {
         expect(() => {
-            registry.register(COMP_ID, (what) => what, {
+            registry.registerValue(COMP_ID, (what) => what, {
                 operation: "create",
             });
         }).to.throw();

@@ -6,6 +6,6 @@ export const registry = pluginRegistry<
     { identity: string }
 >(MODULE_NAME);
 
-registry.register(COMP_ID, () => import("./mocha"), {
+registry.registerLoader(COMP_ID, () => import("./mocha"), {
     identity: "mocha",
 });

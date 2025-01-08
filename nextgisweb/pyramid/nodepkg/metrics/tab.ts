@@ -20,12 +20,12 @@ export const registry = pluginRegistry<
     { key: keyof Metrics; label: string }
 >(MODULE_NAME);
 
-registry.register(COMP_ID, () => import("./GoogleAnalyticsTab"), {
+registry.registerLoader(COMP_ID, () => import("./GoogleAnalyticsTab"), {
     key: "google_analytics",
     label: gettext("Google Analytics"),
 });
 
-registry.register(COMP_ID, () => import("./YandexMetricaTab"), {
+registry.registerLoader(COMP_ID, () => import("./YandexMetricaTab"), {
     key: "yandex_metrica",
     label: gettext("Yandex.Metrica"),
 });

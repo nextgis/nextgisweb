@@ -1,7 +1,7 @@
 /** @plugin */
 import { registry } from "@nextgisweb/jsrealm/plugin/testentry/registry";
 
-registry.register(
+registry.registerLoader(
     COMP_ID,
     () =>
         new Promise<(what: string) => string>((resolve) =>

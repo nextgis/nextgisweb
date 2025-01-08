@@ -5,10 +5,10 @@ type Metadata = NonNullable<unknown>;
 
 interface NoMetadata {}
 
-type PromiseLoader<V extends Value> = () => Promise<V>;
+type PromiseLoader<V extends Value> = (...args: []) => Promise<V>;
 type ImportLoader<V extends Value> = PromiseLoader<{ default: V }>;
 
-type Loader<V extends Value> = V | PromiseLoader<V> | ImportLoader<V>;
+type Loader<V extends Value> = PromiseLoader<V> | ImportLoader<V>;
 
 class PluginObject<V extends Value, M extends Metadata> {
     readonly component: string;
@@ -25,32 +25,11 @@ class PluginObject<V extends Value, M extends Metadata> {
 
     async load(): Promise<V> {
         if (this.#value !== undefined) return this.#value;
-        if (this.#promise === undefined) {
-            if (typeof this.#loader === "function") {
-                type FnLoader = ImportLoader<V> | PromiseLoader<V>;
-                const fnResult = (this.#loader as FnLoader)();
-                if (fnResult.then instanceof Function) {
-                    this.#promise = fnResult.then((mod) => {
-                        if (
-                            mod &&
-                            typeof mod === "object" &&
-                            "default" in mod
-                        ) {
-                            return mod.default;
-                        }
-                        return mod;
-                    });
-                } else {
-                    // FIXME: This needs refactoring because if V is a function,
-                    // there's no way to distinguish V from () => Promise<V> at
-                    // runtime without invoking it, which may lead to errors.
-                    this.#value = this.#loader as V;
-                    return this.#value;
-                }
-            } else {
-                this.#promise = (async () => this.#loader as V)();
-            }
-        }
+        this.#promise ??= this.#loader().then((data) =>
+            data && typeof data === "object" && "default" in data
+                ? data.default
+                : data
+        );
         this.#value = await this.#promise;
         return this.#value;
     }
@@ -78,38 +57,78 @@ export class PluginRegistry<
         this.identity = identity;
     }
 
-    register(component: string, value: Loader<V>, meta?: M): void {
-        if (this._sealed)
+    protected _register(component: string, fn: () => Plugin<V, M>): void {
+        if (this._sealed) {
             throw new Error(`Registry '${this.identity}' already sealed`);
+        }
 
         if (!ngwConfig.components.includes(component)) {
             this._skipped += 1;
             return;
         }
 
-        const plugin = new PluginObject<V, M>(component, value, meta);
-        this.items.push(plugin as Plugin<V, M>);
+        this.items.push(fn());
     }
 
+    /**
+     * Register plugin using loader function
+     *
+     * @param component Use {@link COMP_ID} global
+     * @param loader Zero-argument function returning plugin value
+     * @param meta Plugin metadata
+     *
+     * @example
+     * registry.register(COMP_ID, () => import("./module"), {foo: "bar"})
+     */
+    registerLoader(component: string, loader: Loader<V>, meta?: M): void {
+        this._register(component, () => {
+            const plugin = new PluginObject<V, M>(component, loader, meta);
+            return plugin as Plugin<V, M>;
+        });
+    }
+
+    /**
+     * Register plugin value directly
+     *
+     * Useful for registries without plugin metadata, which manage asynchronous
+     * loading themselves.
+     *
+     * @param component Use {@link COMP_ID} global
+     * @param value Plugin value
+     * @param meta Plugin metadata
+     *
+     * @example
+     * registry.register(COMP_ID, {
+     *     store: () => import("./Store"),
+     *     widget: () => import("./Widget"),
+     * })
+     */
+    registerValue(component: string, value: V, meta?: M): void {
+        this.registerLoader(component, async () => value, meta);
+    }
+
+    /** @deprecated Use {@link registerLoader} or {@link registerValue} */
+    register(component: string, loader: Loader<V>, meta?: M): void {
+        this.registerLoader(component, loader, meta);
+    }
+
+    /** Seal registry to prevent future plugin registrations */
     seal() {
         this._sealed = true;
         console.debug(
             `Registry '${this.identity}': ` +
-                `${this.items.length} plugins registered, ` +
+                `${this.items.length} registered, ` +
                 `${this._skipped} skipped`
         );
     }
 
-    get sealed() {
-        return this._sealed;
-    }
-
-    get count() {
-        return this.items.length;
-    }
-
-    get skipped() {
-        return this._skipped;
+    /** Get registry status for testing purposes */
+    status() {
+        return {
+            sealed: this._sealed,
+            count: this.items.length,
+            skipped: this._skipped,
+        };
     }
 
     *query(query?: Query<M>) {
@@ -143,6 +162,14 @@ export function pluginRegistry<
     M extends Metadata = NoMetadata,
 >(
     identity: string
-): Pick<PluginRegistry<V, M>, "register" | "query" | "queryAll" | "load"> {
+): Pick<
+    PluginRegistry<V, M>,
+    | "register"
+    | "registerLoader"
+    | "registerValue"
+    | "query"
+    | "queryAll"
+    | "load"
+> {
     return new PluginRegistry<V, M>(identity);
 }
