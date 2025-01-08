@@ -7,8 +7,8 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { handlePostMessage } from "../compat/util/handlePostMessage";
 import { Display } from "../display";
-import { DisplayComponent } from "../display/DisplayComponent";
-import type { DisplayComponentProps } from "../display/DisplayComponent";
+import { DisplayWidget } from "../display/DisplayWidget";
+import type { DisplayComponentProps } from "../display/DisplayWidget";
 import { LinkToMainMap } from "../map-controls/control/LinkToMainMap";
 import type { MapRefs, TinyConfig } from "../type";
 
@@ -81,7 +81,7 @@ const DisplayTinyComponent = observer(
         }, [display, handleTinyDisplayMode, mapRefs]);
 
         return (
-            <DisplayComponent
+            <DisplayWidget
                 className="tiny tiny-panels"
                 display={display}
                 config={config}

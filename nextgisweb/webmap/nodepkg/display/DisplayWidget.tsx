@@ -7,17 +7,17 @@ import { useRouteGet } from "@nextgisweb/pyramid/hook";
 import type { DisplayConfig } from "@nextgisweb/webmap/type/api";
 import { WebMapTabs } from "@nextgisweb/webmap/webmap-tabs";
 
-import NavigationMenu from "../navigation-menu";
 import type { MapRefs, TinyConfig } from "../type";
 
 import { Display } from "./Display";
 import { MapPane } from "./component/MapPane";
+import { NavigationMenu } from "./component/NavigationMenu";
 import { PanelSwitcher } from "./component/PanelSwitcher";
 
 import { LoadingOutlined } from "@ant-design/icons";
 
-import "./DisplayComponent.css";
-import "./DisplayComponent.less";
+import "./DisplayWidget.css";
+import "./DisplayWidget.less";
 
 const { Panel } = Splitter;
 
@@ -29,7 +29,7 @@ export interface DisplayComponentProps {
     setMapRefs?: (val: MapRefs) => void;
 }
 
-export const DisplayComponent = observer(
+export const DisplayWidget = observer(
     ({
         config,
         className,
@@ -106,7 +106,7 @@ export const DisplayComponent = observer(
         );
     }
 );
-DisplayComponent.displayName = "Display";
+DisplayWidget.displayName = "Display";
 
 export function DisplayLoader({ id }: { id: number }) {
     const { data: config, isLoading } = useRouteGet("webmap.display_config", {
@@ -122,5 +122,5 @@ export function DisplayLoader({ id }: { id: number }) {
             />
         );
     }
-    return <DisplayComponent config={config} />;
+    return <DisplayWidget config={config} />;
 }

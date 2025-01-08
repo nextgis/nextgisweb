@@ -1,6 +1,3 @@
 /** @entrypoint */
-import { DisplayLoader } from "./DisplayComponent";
-
+export { DisplayLoader as default } from "./DisplayWidget";
 export { Display } from "./Display";
-
-export default DisplayLoader;
