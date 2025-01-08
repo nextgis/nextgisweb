@@ -1,6 +1,6 @@
 import type { Display } from "@nextgisweb/webmap/display";
 
-import type { FeatureInfo, IdentifyInfo } from "../../identification";
+import type { FeatureInfo, IdentifyInfo } from "../identification";
 
 export function identifyInfoToFeaturesInfo(
     identifyInfo: IdentifyInfo,

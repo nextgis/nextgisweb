@@ -1,7 +1,8 @@
 import type { FC } from "react";
 
+import { registry } from "@nextgisweb/webmap/identification/registry";
+
 import type { IdentifyExtensionComponentProps } from "./identification";
-import { registry } from "./registry";
 
 const extWidgetClasses = new Map<
     string,

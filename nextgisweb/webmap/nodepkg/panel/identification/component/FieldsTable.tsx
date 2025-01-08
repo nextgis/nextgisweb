@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 
 import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
 
-import { KeyValueTable } from "../../KeyValueTable";
-import { fieldValuesToDataSource, getFieldsInfo } from "../../fields";
-import type { FieldDataItem } from "../../fields";
-import type { FieldsTableProps } from "../../identification";
+import { KeyValueTable } from "../KeyValueTable";
+import { fieldValuesToDataSource, getFieldsInfo } from "../fields";
+import type { FieldDataItem } from "../fields";
+import type { FieldsTableProps } from "../identification";
 
 export function FieldsTable({ featureInfo, featureItem }: FieldsTableProps) {
     const [fieldsInfo, setFieldsInfo] =

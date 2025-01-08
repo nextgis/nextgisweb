@@ -3,7 +3,7 @@ import type { FC } from "react";
 
 import { pluginRegistry } from "@nextgisweb/jsrealm/plugin";
 
-import type { IdentifyExtensionComponentProps } from "./identification";
+import type { IdentifyExtensionComponentProps } from "../panel/identification/identification";
 
 export const registry =
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

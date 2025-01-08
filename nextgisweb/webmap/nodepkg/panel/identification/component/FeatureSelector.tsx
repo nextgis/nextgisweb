@@ -1,7 +1,7 @@
 import { Button, Select, Tooltip } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import type { FeatureInfo, FeatureSelectorProps } from "../../identification";
+import type { FeatureInfo, FeatureSelectorProps } from "../identification";
 
 import ZoomInMapIcon from "@nextgisweb/icon/material/zoom_in_map/outline";
 

@@ -5,10 +5,11 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
 import { PanelSection } from "@nextgisweb/webmap/panel/component";
 
-import { FeatureEditButton } from "../../FeatureEditButton";
-import { getExtensionsComps } from "../../extensions";
-import type { FeatureTabsProps as FeatureInfoProps } from "../../identification";
-import { FieldsTable } from "../component/FieldsTable";
+import { FeatureEditButton } from "../FeatureEditButton";
+import { getExtensionsComps } from "../extensions";
+import type { FeatureTabsProps as FeatureInfoProps } from "../identification";
+
+import { FieldsTable } from "./FieldsTable";
 
 import ListIcon from "@nextgisweb/icon/material/list/outline";
 import EarthIcon from "@nextgisweb/icon/material/public/outline";

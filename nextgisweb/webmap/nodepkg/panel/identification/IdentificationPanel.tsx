@@ -13,14 +13,14 @@ import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import topic from "@nextgisweb/webmap/compat/topic";
 
-import { PanelContainer } from "../../component";
-import type { PanelWidget } from "../../type";
-import { CoordinatesSwitcher } from "../CoordinatesSwitcher";
-import type { IdentifyStore } from "../IdentifyStore";
-import type { FeatureInfo, IdentifyInfo } from "../identification";
+import type { PanelWidget } from "..";
+import { PanelContainer } from "../component";
 
+import { CoordinatesSwitcher } from "./CoordinatesSwitcher";
+import type { IdentifyStore } from "./IdentifyStore";
 import { FeatureInfoSection } from "./component/FeatureInfoSection";
 import { FeatureSelector } from "./component/FeatureSelector";
+import type { FeatureInfo, IdentifyInfo } from "./identification";
 import { identifyInfoToFeaturesInfo } from "./util/identifyInfoToFeaturesInfo";
 
 import "./IdentificationPanel.less";
