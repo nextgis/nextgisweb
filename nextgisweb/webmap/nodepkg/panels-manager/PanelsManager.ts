@@ -30,9 +30,11 @@ export class PanelsManager {
     private _display: Display;
     private _allowPanels?: string[];
 
+    /** @deprecated use observable {@link PanelsManager.ready} instead */
     private _panelsReady = new Deferred<void>();
     private _onChangePanel: (panel?: PanelPlugin) => void;
 
+    @observable accessor ready = false;
     @observable.shallow accessor panels = new Map<
         string,
         PanelPlugin<unknown>
@@ -67,13 +69,20 @@ export class PanelsManager {
         );
     }
 
+    /** @deprecated use observable {@link PanelsManager.ready} instead */
     get panelsReady(): Deferred<void> {
         return this._panelsReady;
     }
 
     @action
     setActive(active: string | undefined, source: Source): void {
+        const currentActive = this.active.active;
         this.active = { active, source };
+        if (currentActive !== active) {
+            if (this._onChangePanel) {
+                this._onChangePanel(this.activePanel);
+            }
+        }
     }
 
     @computed
@@ -92,7 +101,9 @@ export class PanelsManager {
         this.setActive(undefined, "manager");
     }
 
+    @action
     private _handleInitActive(): void {
+        this.ready = true;
         this._panelsReady.resolve();
     }
 
