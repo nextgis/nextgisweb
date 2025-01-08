@@ -1,40 +1,64 @@
 import { observer } from "mobx-react-lite";
+import { useCallback, useMemo } from "react";
 import type { ReactElement } from "react";
 
-import type { PanelDojoItem } from "../type";
-
-import { navigationMenuStore } from "./NavigationMenuStore";
-
+import type PanelsManager from "../panels-manager";
+import type { PanelPlugin } from "../panels-manager/registry";
 import "./NavigationMenu.less";
 
 export interface NavigationMenuProps {
-    panels: Map<string, PanelDojoItem>;
+    panels: Map<string, PanelPlugin>;
 }
 
-export const NavigationMenu = observer(({ panels }: NavigationMenuProps) => {
-    const onClickItem = (item: PanelDojoItem) => {
-        navigationMenuStore.setActive(item.name, "menu");
-    };
+export const NavigationMenu = observer(
+    ({ store }: { store: PanelsManager }) => {
+        const onClickItem = useCallback(
+            (name: string) => {
+                if (store.activePanelName === name) {
+                    store.closePanel();
+                } else {
+                    store.setActive(name, "menu");
+                }
+            },
+            [store]
+        );
 
-    const menuItems: ReactElement[] = [];
-    if (panels) {
-        const activePanel = navigationMenuStore.activePanel;
-        panels.forEach((p) => {
-            const activeClass = p.name === activePanel ? "active" : "";
-            menuItems.push(
-                <div
-                    key={p.name}
-                    className={`navigation-menu__item ${activeClass}`}
-                    title={p.title}
-                    onClick={() => onClickItem(p)}
-                >
-                    <svg className="icon" fill="currentColor">
-                        <use xlinkHref={`#icon-${p.menuIcon}`} />
-                    </svg>
-                </div>
-            );
-        });
+        const menuItems = useMemo(() => {
+            const menu: ReactElement[] = [];
+            if (store.panels) {
+                const activePanel = store.activePanel;
+                store.panels.forEach(({ meta }) => {
+                    const enabled = meta.enabled ?? true;
+
+                    if (enabled) {
+                        const activeClass =
+                            meta.name === activePanel?.name ? "active" : "";
+                        menu.push(
+                            <div
+                                key={meta.name}
+                                className={`navigation-menu__item ${activeClass}`}
+                                title={meta.title}
+                                onClick={() => onClickItem(meta.name)}
+                            >
+                                {typeof meta.menuIcon === "string" ? (
+                                    <svg className="icon" fill="currentColor">
+                                        <use
+                                            xlinkHref={`#icon-${meta.menuIcon}`}
+                                        />
+                                    </svg>
+                                ) : (
+                                    meta.menuIcon
+                                )}
+                            </div>
+                        );
+                    }
+                });
+            }
+            return menu;
+        }, [onClickItem, store.activePanel, store.panels]);
+
+        return <div className="navigation-menu">{menuItems}</div>;
     }
+);
 
-    return <div className="navigation-menu">{menuItems}</div>;
-});
+NavigationMenu.displayName = "NavigationMenu";

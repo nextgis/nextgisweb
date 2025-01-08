@@ -1,4 +1,5 @@
 import { debounce } from "lodash-es";
+import { observer } from "mobx-react-lite";
 import type { Coordinate } from "ol/coordinate";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
@@ -14,6 +15,7 @@ import {
 import { CopyToClipboardButton } from "@nextgisweb/gui/buttons";
 import reactApp from "@nextgisweb/gui/react-app";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import type ShadowDisplay from "@nextgisweb/webmap/compat/ShadowDisplay";
 import type { ReactPanelComponentProps } from "@nextgisweb/webmap/panels-manager/type";
 import PrintMap from "@nextgisweb/webmap/print-map";
 import { getURLParams } from "@nextgisweb/webmap/utils/URL";
@@ -21,6 +23,7 @@ import { getURLParams } from "@nextgisweb/webmap/utils/URL";
 import type { PrintMapSettings } from "../../print-map/type";
 import type { DojoDisplay } from "../../type";
 import { PanelContainer, PanelSection } from "../component";
+import { PanelHeader } from "../header";
 
 import PrintMapExport from "./PrintMapExport";
 import {
@@ -42,7 +45,7 @@ const { TextArea } = Input;
 
 interface PrintMapCompProps {
     settings: PrintMapSettings;
-    display: DojoDisplay;
+    display: ShadowDisplay;
     initCenter: Coordinate | null;
     onScaleChange: (scale: number) => void;
     onCenterChange: (center: Coordinate) => void;
@@ -74,7 +77,7 @@ const makePrintMapComp = ({
         div.style.top = `${top}px`;
     });
 
-    resizeObserver.observe(display.mapContainer.domNode);
+    resizeObserver.observe(display.mapNode);
 
     const comp: ReturnType<typeof reactApp<PrintMapCompProps>> = reactApp(
         PrintMap,
@@ -250,319 +253,345 @@ const ScalesSelect = ({
     );
 };
 
-export const PrintPanel = ({
-    display,
-    title,
-    close,
-    visible,
-}: ReactPanelComponentProps) => {
-    const [urlParsed, setUrlParsed] = useState(false);
-    const [mapInit, setMapInit] = useState(false);
-    const [paperFormat, setPaperFormat] = useState("210_297");
-    const [disableChangeSize, setDisableChangeSize] = useState(true);
-    const [scales, setScales] = useState(scalesList);
-    const [center, setCenter] = useState<Coordinate>();
-    const [printMapScale, setPrintMapScale] = useState<number>();
-    const [printMapComp, setPrintMapComp] = useState<Comp>();
-    const [printMapEl, setPrintMapEl] = useState<HTMLElement>();
+const PrintPanel = observer(
+    ({ display, title, close, visible }: ReactPanelComponentProps) => {
+        const [urlParsed, setUrlParsed] = useState(false);
+        const [mapInit, setMapInit] = useState(false);
+        const [paperFormat, setPaperFormat] = useState("210_297");
+        const [disableChangeSize, setDisableChangeSize] = useState(true);
+        const [scales, setScales] = useState(scalesList);
+        const [center, setCenter] = useState<Coordinate>();
+        const [printMapScale, setPrintMapScale] = useState<number>();
+        const [printMapComp, setPrintMapComp] = useState<Comp>();
+        const [printMapEl, setPrintMapEl] = useState<HTMLElement>();
 
-    const printMaxSize = useMemo(() => {
-        return display.config.printMaxSize;
-    }, [display]);
+        const printMaxSize = useMemo(() => {
+            return display.config.printMaxSize;
+        }, [display]);
 
-    const defaultSettings = useMemo(
-        () => defaultPanelMapSettings(display.config.webmapTitle),
-        [display.config.webmapTitle]
-    );
-    const [mapSettings, setMapSettings] =
-        useState<PrintMapSettings>(defaultSettings);
+        const defaultSettings = useMemo(
+            () => defaultPanelMapSettings(display.config.webmapTitle),
+            [display.config.webmapTitle]
+        );
+        const [mapSettings, setMapSettings] =
+            useState<PrintMapSettings>(defaultSettings);
 
-    const resizeObserver = useRef<ResizeObserver>();
+        const resizeObserver = useRef<ResizeObserver>();
 
-    const updateMapSettings = (updateSettings: Partial<PrintMapSettings>) => {
-        const newMapSettings = { ...mapSettings, ...updateSettings };
-        setMapSettings(newMapSettings);
-    };
-
-    const changePaperFormat = (newPaperFormat: string) => {
-        setPaperFormat(newPaperFormat);
-        setDisableChangeSize(newPaperFormat !== "custom");
-        if (newPaperFormat !== "custom") {
-            const widthHeight = newPaperFormat.split("_");
-            const width = parseInt(widthHeight[0], 10);
-            const height = parseInt(widthHeight[1], 10);
-            updateMapSettings({
-                width,
-                height,
-            });
-        }
-    };
-
-    if (!urlParsed) {
-        const urlSettings = getPrintUrlSettings();
-
-        const keysPaperSize: (keyof PrintMapSettings)[] = ["height", "width"];
-        if (keysPaperSize.every((k) => k in urlSettings)) {
-            changePaperFormat("custom");
-        } else {
-            keysPaperSize.forEach((k) => {
-                delete urlSettings[k];
-            });
-        }
-
-        updateMapSettings(urlSettings);
-        setUrlParsed(true);
-    }
-
-    const getCenterFromUrl = (): Coordinate | null => {
-        if (mapInit) {
-            return null;
-        }
-
-        const urlSettings = getPrintUrlSettings();
-        return urlSettings.center || null;
-    };
-
-    const show = () => {
-        const {
-            comp,
-            element,
-            resizeObserver: resize,
-        } = makePrintMapComp({
-            settings: mapSettings,
-            display,
-            initCenter: getCenterFromUrl(),
-            onScaleChange: (scale: number) => {
-                setPrintMapScale(scale);
-            },
-            onCenterChange: (center: Coordinate) => {
-                setCenter(center);
-            },
-        });
-        setPrintMapComp(comp);
-        setPrintMapEl(element);
-        resizeObserver.current = resize;
-        setMapInit(true);
-    };
-
-    const hide = () => {
-        setTimeout(() => {
-            updateMapSettings({ scale: undefined });
-            if (resizeObserver.current) {
-                resizeObserver.current.disconnect();
-            }
-            if (printMapComp) {
-                printMapComp.unmount();
-            }
-            setPrintMapComp(undefined);
-            setPrintMapEl(undefined);
-            if (printMapEl) {
-                printMapEl.remove();
-            }
-        });
-    };
-
-    useEffect(() => {
-        visible ? show() : hide();
-    }, [visible]);
-
-    useEffect(() => {
-        if (!center) {
-            return;
-        }
-        updateMapSettings({ center: center });
-    }, [center]);
-
-    useEffect(() => {
-        if (printMapComp) {
-            updatePrintMapComp(printMapComp, mapSettings);
-        }
-    }, [mapSettings]);
-
-    useEffect(() => {
-        if (!printMapScale) {
-            return;
-        }
-
-        const scaleInList = scalesList.some((s) => s.value === printMapScale);
-        if (scaleInList) {
-            setScales(scalesList);
-            return;
-        }
-
-        const customScale = {
-            value: printMapScale,
-            label: scaleToLabel(printMapScale),
-            disabled: true,
+        const updateMapSettings = (
+            updateSettings: Partial<PrintMapSettings>
+        ) => {
+            const newMapSettings = { ...mapSettings, ...updateSettings };
+            setMapSettings(newMapSettings);
         };
 
-        const newScales = [customScale, ...scalesList];
-        setScales(newScales);
-        updateMapSettings({ scale: printMapScale });
-    }, [printMapScale]);
+        const changePaperFormat = (newPaperFormat: string) => {
+            setPaperFormat(newPaperFormat);
+            setDisableChangeSize(newPaperFormat !== "custom");
+            if (newPaperFormat !== "custom") {
+                const widthHeight = newPaperFormat.split("_");
+                const width = parseInt(widthHeight[0], 10);
+                const height = parseInt(widthHeight[1], 10);
+                updateMapSettings({
+                    width,
+                    height,
+                });
+            }
+        };
 
-    const validate = (value: unknown) => {
-        return typeof value === "number";
-    };
+        if (!urlParsed) {
+            const urlSettings = getPrintUrlSettings();
 
-    return (
-        <PanelContainer title={title} close={close}>
-            <PanelSection>
-                <div className="input-group column">
-                    <label>{gettext("Paper format")}</label>
-                    <Select
-                        style={{ width: "100%" }}
-                        onChange={(v) => changePaperFormat(v)}
-                        value={paperFormat}
-                        options={pageFormats}
-                    ></Select>
-                </div>
+            const keysPaperSize: (keyof PrintMapSettings)[] = [
+                "height",
+                "width",
+            ];
+            if (keysPaperSize.every((k) => k in urlSettings)) {
+                changePaperFormat("custom");
+            } else {
+                keysPaperSize.forEach((k) => {
+                    delete urlSettings[k];
+                });
+            }
 
-                <div className="input-group column">
-                    <label>{gettext("Height, mm")}</label>
-                    <InputNumber
-                        style={{ width: "100%" }}
-                        onChange={(v) =>
-                            validate(v) &&
-                            updateMapSettings({ height: v || undefined })
-                        }
-                        value={mapSettings.height}
-                        min={5}
-                        max={printMaxSize}
-                        step={1}
-                        disabled={disableChangeSize}
-                    ></InputNumber>
-                </div>
+            updateMapSettings(urlSettings);
+            setUrlParsed(true);
+        }
 
-                <div className="input-group column">
-                    <label>{gettext("Width, mm")}</label>
-                    <InputNumber
-                        style={{ width: "100%" }}
-                        onChange={(v) =>
-                            validate(v) &&
-                            updateMapSettings({ width: v || undefined })
-                        }
-                        value={mapSettings.width}
-                        min={5}
-                        max={printMaxSize}
-                        step={1}
-                        disabled={disableChangeSize}
-                    ></InputNumber>
-                </div>
+        const getCenterFromUrl = (): Coordinate | null => {
+            if (mapInit) {
+                return null;
+            }
 
-                <div className="input-group column">
-                    <label>{gettext("Margin, mm")}</label>
-                    <InputNumber
-                        style={{ width: "100%" }}
-                        onChange={(v) =>
-                            validate(v) && updateMapSettings({ margin: v || 0 })
-                        }
-                        value={mapSettings.margin}
-                        min={0}
-                        step={1}
-                    ></InputNumber>
-                </div>
-            </PanelSection>
-            <PanelSection title={gettext("Elements")}>
-                <div className="input-group">
-                    <Switch
-                        checked={mapSettings.legend}
-                        onChange={(v) => updateMapSettings({ legend: v })}
-                    />
-                    <span className="checkbox__label">{gettext("Legend")}</span>
-                </div>
-                <div className="input-group">
-                    <Select
-                        onChange={(v) =>
-                            updateMapSettings({ legendColumns: v })
-                        }
-                        value={mapSettings.legendColumns}
-                        options={legendColumns}
-                        size="small"
-                        disabled={!mapSettings.legend}
-                    ></Select>
-                    <span className="checkbox__label">
-                        {gettext("Number of legend columns")}
-                    </span>
-                </div>
+            const urlSettings = getPrintUrlSettings();
+            return urlSettings.center || null;
+        };
 
-                <div className="input-group">
-                    <Switch
-                        checked={mapSettings.title}
-                        onChange={(v) => updateMapSettings({ title: v })}
-                    />
-                    <span className="checkbox__label">{gettext("Title")}</span>
-                </div>
-                <div className="input-group column">
-                    <label>{gettext("Map title text")}</label>
-                    <TextArea
-                        onChange={(e) =>
-                            updateMapSettings({ titleText: e.target.value })
-                        }
-                        rows={2}
-                        value={mapSettings.titleText}
-                        size="small"
-                        disabled={!mapSettings.title}
-                    ></TextArea>
-                </div>
+        const show = () => {
+            const {
+                comp,
+                element,
+                resizeObserver: resize,
+            } = makePrintMapComp({
+                settings: mapSettings,
+                display,
+                initCenter: getCenterFromUrl(),
+                onScaleChange: (scale: number) => {
+                    setPrintMapScale(scale);
+                },
+                onCenterChange: (center: Coordinate) => {
+                    setCenter(center);
+                },
+            });
+            setPrintMapComp(comp);
+            setPrintMapEl(element);
+            resizeObserver.current = resize;
+            setMapInit(true);
+        };
 
-                <div className="input-group">
-                    <Switch
-                        checked={mapSettings.arrow}
-                        onChange={(v) => updateMapSettings({ arrow: v })}
-                    />
-                    <span className="checkbox__label">
-                        {gettext("North Arrow")}
-                    </span>
-                </div>
-            </PanelSection>
-            <PanelSection title={gettext("Scale")}>
-                <div className="input-group">
-                    <Switch
-                        checked={mapSettings.scaleValue}
-                        onChange={(v) => updateMapSettings({ scaleValue: v })}
-                    />
-                    <span className="checkbox__label">
-                        {gettext("Scale value")}
-                    </span>
-                </div>
-                <div className="input-group">
-                    <Switch
-                        checked={mapSettings.scaleLine}
-                        onChange={(v) => updateMapSettings({ scaleLine: v })}
-                    />
-                    <span className="checkbox__label">
-                        {gettext("Scale bar")}
-                    </span>
-                </div>
+        const hide = () => {
+            setTimeout(() => {
+                updateMapSettings({ scale: undefined });
+                if (resizeObserver.current) {
+                    resizeObserver.current.disconnect();
+                }
+                if (printMapComp) {
+                    printMapComp.unmount();
+                }
+                setPrintMapComp(undefined);
+                setPrintMapEl(undefined);
+                if (printMapEl) {
+                    printMapEl.remove();
+                }
+            });
+        };
 
-                <div className="input-group column">
-                    <label>{gettext("Scale")}</label>
-                    <ScalesSelect
-                        selectedValue={mapSettings.scale}
-                        scales={scales}
-                        onChange={(v) => updateMapSettings({ scale: v })}
-                    />
-                </div>
-            </PanelSection>
-            <PanelSection>
-                <div className="actions">
-                    <PrintMapExport
-                        display={display}
-                        mapSettings={mapSettings}
-                        printMapEl={printMapEl}
-                    />
-                    <Space.Compact>
-                        <CopyToClipboardButton
-                            type="link"
-                            getTextToCopy={() => getPrintMapLink(mapSettings)}
-                            icon={<ShareAltOutlined />}
-                            title={gettext("Copy link to the print map")}
-                            iconOnly
-                        ></CopyToClipboardButton>
-                    </Space.Compact>
-                </div>
-            </PanelSection>
-        </PanelContainer>
-    );
-};
+        useEffect(() => {
+            visible ? show() : hide();
+        }, [visible]);
+
+        useEffect(() => {
+            if (!center) {
+                return;
+            }
+            updateMapSettings({ center: center });
+        }, [center]);
+
+        useEffect(() => {
+            if (printMapComp) {
+                updatePrintMapComp(printMapComp, mapSettings);
+            }
+        }, [mapSettings]);
+
+        useEffect(() => {
+            if (!printMapScale) {
+                return;
+            }
+
+            const scaleInList = scalesList.some(
+                (s) => s.value === printMapScale
+            );
+            if (scaleInList) {
+                setScales(scalesList);
+                return;
+            }
+
+            const customScale = {
+                value: printMapScale,
+                label: scaleToLabel(printMapScale),
+                disabled: true,
+            };
+
+            const newScales = [customScale, ...scalesList];
+            setScales(newScales);
+            updateMapSettings({ scale: printMapScale });
+        }, [printMapScale]);
+
+        const validate = (value: unknown) => {
+            return typeof value === "number";
+        };
+
+        return (
+            <div className="ngw-panel print-panel">
+                <PanelHeader {...{ title, close }} />
+
+                <section>
+                    <div className="input-group column">
+                        <label>{gettext("Paper format")}</label>
+                        <Select
+                            style={{ width: "100%" }}
+                            onChange={(v) => changePaperFormat(v)}
+                            value={paperFormat}
+                            options={pageFormats}
+                        ></Select>
+                    </div>
+
+                    <div className="input-group column">
+                        <label>{gettext("Height, mm")}</label>
+                        <InputNumber
+                            style={{ width: "100%" }}
+                            onChange={(v) =>
+                                validate(v) &&
+                                updateMapSettings({ height: v || undefined })
+                            }
+                            value={mapSettings.height}
+                            min={5}
+                            max={printMaxSize}
+                            step={1}
+                            disabled={disableChangeSize}
+                        ></InputNumber>
+                    </div>
+
+                    <div className="input-group column">
+                        <label>{gettext("Width, mm")}</label>
+                        <InputNumber
+                            style={{ width: "100%" }}
+                            onChange={(v) =>
+                                validate(v) &&
+                                updateMapSettings({ width: v || undefined })
+                            }
+                            value={mapSettings.width}
+                            min={5}
+                            max={printMaxSize}
+                            step={1}
+                            disabled={disableChangeSize}
+                        ></InputNumber>
+                    </div>
+
+                    <div className="input-group column">
+                        <label>{gettext("Margin, mm")}</label>
+                        <InputNumber
+                            style={{ width: "100%" }}
+                            onChange={(v) =>
+                                validate(v) &&
+                                updateMapSettings({ margin: v || 0 })
+                            }
+                            value={mapSettings.margin}
+                            min={0}
+                            step={1}
+                        ></InputNumber>
+                    </div>
+                </section>
+
+                <section>
+                    <h5 className="heading">{gettext("Elements")}</h5>
+                    <div className="input-group">
+                        <Switch
+                            checked={mapSettings.legend}
+                            onChange={(v) => updateMapSettings({ legend: v })}
+                        />
+                        <span className="checkbox__label">
+                            {gettext("Legend")}
+                        </span>
+                    </div>
+                    <div className="input-group">
+                        <Select
+                            onChange={(v) =>
+                                updateMapSettings({ legendColumns: v })
+                            }
+                            value={mapSettings.legendColumns}
+                            options={legendColumns}
+                            size="small"
+                            disabled={!mapSettings.legend}
+                        ></Select>
+                        <span className="checkbox__label">
+                            {gettext("Number of legend columns")}
+                        </span>
+                    </div>
+
+                    <div className="input-group">
+                        <Switch
+                            checked={mapSettings.title}
+                            onChange={(v) => updateMapSettings({ title: v })}
+                        />
+                        <span className="checkbox__label">
+                            {gettext("Title")}
+                        </span>
+                    </div>
+                    <div className="input-group column">
+                        <label>{gettext("Map title text")}</label>
+                        <TextArea
+                            onChange={(e) =>
+                                updateMapSettings({ titleText: e.target.value })
+                            }
+                            rows={2}
+                            value={mapSettings.titleText}
+                            size="small"
+                            disabled={!mapSettings.title}
+                        ></TextArea>
+                    </div>
+
+                    <div className="input-group">
+                        <Switch
+                            checked={mapSettings.arrow}
+                            onChange={(v) => updateMapSettings({ arrow: v })}
+                        />
+                        <span className="checkbox__label">
+                            {gettext("North Arrow")}
+                        </span>
+                    </div>
+                </section>
+
+                <section>
+                    <h5 className="heading">{gettext("Scale")}</h5>
+                    <div className="input-group">
+                        <Switch
+                            checked={mapSettings.scaleValue}
+                            onChange={(v) =>
+                                updateMapSettings({ scaleValue: v })
+                            }
+                        />
+                        <span className="checkbox__label">
+                            {gettext("Scale value")}
+                        </span>
+                    </div>
+                    <div className="input-group">
+                        <Switch
+                            checked={mapSettings.scaleLine}
+                            onChange={(v) =>
+                                updateMapSettings({ scaleLine: v })
+                            }
+                        />
+                        <span className="checkbox__label">
+                            {gettext("Scale bar")}
+                        </span>
+                    </div>
+
+                    <div className="input-group column">
+                        <label>{gettext("Scale")}</label>
+                        <ScalesSelect
+                            selectedValue={mapSettings.scale}
+                            scales={scales}
+                            onChange={(v) => updateMapSettings({ scale: v })}
+                        />
+                    </div>
+                </section>
+
+                <section>
+                    <div className="actions">
+                        <PrintMapExport
+                            display={display}
+                            mapSettings={mapSettings}
+                            printMapEl={printMapEl}
+                        />
+                        <Space.Compact>
+                            <CopyToClipboardButton
+                                type="link"
+                                getTextToCopy={() =>
+                                    getPrintMapLink(mapSettings)
+                                }
+                                icon={<ShareAltOutlined />}
+                                title={gettext("Copy link to the print map")}
+                                iconOnly
+                            ></CopyToClipboardButton>
+                        </Space.Compact>
+                    </div>
+                </section>
+            </div>
+        );
+    }
+);
+
+PrintPanel.displayName = "PrintPanel";
+
+export default PrintPanel;

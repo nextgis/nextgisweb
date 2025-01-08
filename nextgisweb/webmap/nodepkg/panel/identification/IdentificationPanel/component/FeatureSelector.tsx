@@ -28,7 +28,7 @@ export function FeatureSelector({
 
     const onSelectChange = (
         _value: string,
-        featureInfoSelected: FeatureInfo | FeatureInfo[]
+        featureInfoSelected: FeatureInfo | FeatureInfo[] | undefined
     ) => {
         const selected = Array.isArray(featureInfoSelected)
             ? featureInfoSelected[0]

@@ -497,4 +497,4 @@ export const SearchPanel = ({ display, close }: ReactPanelComponentProps) => {
             </PanelContainer>
         </SearchPanelContext.Provider>
     );
-};
+}

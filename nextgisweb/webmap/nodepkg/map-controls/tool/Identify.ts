@@ -10,8 +10,13 @@ import { route } from "@nextgisweb/pyramid/api/route";
 import type { RouteQuery, RouteResp } from "@nextgisweb/pyramid/api/type";
 import i18n from "@nextgisweb/pyramid/i18n";
 import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
+import type ShadowDisplay from "@nextgisweb/webmap/compat/ShadowDisplay";
 import type { Map } from "@nextgisweb/webmap/ol/Map";
-import type { DojoDisplay } from "@nextgisweb/webmap/type";
+import type {
+    IdentificationPanelProps,
+    IdentifyInfo,
+} from "@nextgisweb/webmap/panel/identification/identification";
+import type { PanelPlugin } from "@nextgisweb/webmap/panels-manager/registry";
 import type { LayerItemConfig } from "@nextgisweb/webmap/type/TreeItems";
 
 import { Base } from "./ToolBase";
@@ -44,7 +49,7 @@ class Control extends Interaction {
 }
 
 interface IdentifyOptions {
-    display: DojoDisplay;
+    display: ShadowDisplay;
 }
 
 interface Request {
@@ -224,7 +229,7 @@ export class Identify extends Base {
             topic.publish("feature.unhighlight");
         }
 
-        const identifyInfo = {
+        const identifyInfo: IdentifyInfo = {
             point,
             response,
             layerLabels,
@@ -232,13 +237,11 @@ export class Identify extends Base {
 
         const pm = this.display.panelsManager;
         const pkey = "identify";
-        const panel = pm.getPanel(pkey);
+        const panel = pm.getPanel(pkey) as PanelPlugin<
+            Partial<IdentificationPanelProps>
+        >;
         if (panel) {
-            if (panel.app) {
-                panel.app.update({ identifyInfo });
-            } else {
-                panel.props = { identifyInfo };
-            }
+            panel.updateMeta({ identifyInfo, key: point.toString() });
         } else {
             throw new Error(
                 "Identification panel should add during Display initialization"

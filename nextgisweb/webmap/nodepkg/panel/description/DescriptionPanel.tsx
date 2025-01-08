@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef } from "react";
 
+import type ShadowDisplay from "@nextgisweb/webmap/compat/ShadowDisplay";
 import type { ReactPanelComponentProps } from "@nextgisweb/webmap/panels-manager/type";
-import type { DojoDisplay } from "@nextgisweb/webmap/type";
 
 import { PanelContainer } from "../component";
 
@@ -12,7 +12,7 @@ export interface DescriptionPanelProps extends ReactPanelComponentProps {
 }
 
 const zoomToFeature = (
-    display: DojoDisplay,
+    display: ShadowDisplay,
     resourceId: number,
     featureId: number
 ) => {

@@ -40,18 +40,24 @@ export class Map extends Watchable<MapWatchableProps> {
     private readonly SMART_ZOOM_EXTENT = 100;
     private readonly SMART_ZOOM = 12;
 
-    olMap: OlMap;
-    layers: Layers = {};
+    readonly olMap: OlMap;
+    @observable.shallow accessor layers: Layers = {};
 
     @observable accessor resolution: number | null = null;
     @observable accessor center: number[] | null = null;
     @observable.shallow accessor position: Position | null = null;
 
-    constructor(options: MapOptions) {
+    constructor(private options: MapOptions) {
         super();
-        this.olMap = new OlMap(options);
+        const { target, ...rest } = this.options;
+        this.olMap = new OlMap(rest);
+    }
 
-        const olView = this.olMap.getView();
+    startup(target: HTMLElement) {
+        const olMap = this.olMap;
+
+        olMap.setTarget(target);
+        const olView = olMap.getView();
 
         olView.on("change:resolution", () => {
             runInAction(() => {
@@ -65,12 +71,12 @@ export class Map extends Watchable<MapWatchableProps> {
             });
         });
 
-        this.olMap.on("moveend", () => {
+        olMap.on("moveend", () => {
             this.setPosition(this.getPosition());
         });
         // Workaround to scip first map move event on start
-        this.olMap.once("movestart", () => {
-            this.olMap.on("movestart", () => {
+        olMap.once("movestart", () => {
+            olMap.on("movestart", () => {
                 imageQueue.abort();
             });
         });
@@ -95,14 +101,18 @@ export class Map extends Watchable<MapWatchableProps> {
         this.notify("center", oldCenter, center);
     }
 
+    @action
     addLayer(layer: BaseLayer): void {
-        this.layers[layer.name] = layer;
+        const layers = { ...this.layers, [layer.name]: layer };
+        this.layers = layers;
         this.olMap.addLayer(layer.getLayer());
     }
 
     removeLayer(layer: BaseLayer): void {
         this.olMap.removeLayer(layer.getLayer());
-        delete this.layers[layer.name];
+        const layers = { ...this.layers };
+        delete layers[layer.name];
+        this.layers === layers;
     }
 
     getScaleForResolution(res: number, mpu: number): number {
