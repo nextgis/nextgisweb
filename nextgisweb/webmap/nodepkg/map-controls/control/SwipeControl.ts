@@ -2,20 +2,27 @@ import type { Map as OlMap } from "ol";
 import { Control } from "ol/control";
 import type { Layer } from "ol/layer";
 import type RenderEvent from "ol/render/Event";
+
+import { gettext } from "@nextgisweb/pyramid/i18n";
+import { html as htmlIcon } from "@nextgisweb/pyramid/icon";
 import "./Swipe.css";
+
+type Orientation = "vertical" | "horizontal";
 
 interface SwipeOptions {
     className?: string;
     layers?: Layer[];
     position?: number;
-    orientation?: "vertical" | "horizontal";
+    orientation?: Orientation;
 }
 
 export class Swipe extends Control {
     layers: Layer[] = [];
     private position: number;
-    private orientation: "vertical" | "horizontal";
+    private orientation: Orientation;
+    private isReversed: boolean = false;
     private isDragging = false;
+    private toggleButton: HTMLDivElement;
 
     constructor(options: SwipeOptions = {}) {
         const element = document.createElement("div");
@@ -24,31 +31,41 @@ export class Swipe extends Control {
         const button = document.createElement("button");
         element.appendChild(button);
 
+        const toggleButton = document.createElement("div");
+        toggleButton.className = "ol-swipe-toggle";
+        toggleButton.innerHTML = htmlIcon({ glyph: "sync" });
+        toggleButton.title = gettext("Rotate swipe");
+        element.appendChild(toggleButton);
+
         super({ element });
 
+        this.toggleButton = toggleButton;
         this.layers = options.layers || [];
         this.position = options.position || 0.5;
         this.orientation = options.orientation || "vertical";
 
         this.setupDragHandlers();
+        this.setupToggleHandler();
         this.updateControlStyle();
     }
 
     setMap(map: OlMap | null): void {
-        if (this.getMap()) {
+        const oldMap = this.getMap();
+        if (oldMap) {
             this.layers.forEach((layer) => {
                 layer.un("prerender", this.precompose);
                 layer.un("postrender", this.postcompose);
             });
-            this.getMap()?.render();
+
+            oldMap.render();
         }
 
         super.setMap(map);
 
         if (map) {
             this.layers.forEach((layer) => {
-                layer.on("prerender", this.precompose.bind(this));
-                layer.on("postrender", this.postcompose.bind(this));
+                layer.on("prerender", this.precompose);
+                layer.on("postrender", this.postcompose);
             });
             map.render();
         }
@@ -59,8 +76,8 @@ export class Swipe extends Control {
             if (!this.layers.includes(layer)) {
                 this.layers.push(layer);
                 if (this.getMap()) {
-                    layer.on("prerender", this.precompose.bind(this));
-                    layer.on("postrender", this.postcompose.bind(this));
+                    layer.on("prerender", this.precompose);
+                    layer.on("postrender", this.postcompose);
                     this.getMap()?.render();
                 }
             }
@@ -84,6 +101,36 @@ export class Swipe extends Control {
         this.position = position;
         this.updateControlStyle();
         this.getMap()?.render();
+    }
+
+    private getNextState() {
+        const states: {
+            orientation: Orientation;
+            isReversed: boolean;
+        }[] = [
+            { orientation: "vertical", isReversed: false },
+            { orientation: "horizontal", isReversed: false },
+            { orientation: "vertical", isReversed: true },
+            { orientation: "horizontal", isReversed: true },
+        ];
+
+        const currentIndex = states.findIndex(
+            (state) =>
+                state.orientation === this.orientation &&
+                state.isReversed === this.isReversed
+        );
+        return states[(currentIndex + 1) % states.length];
+    }
+
+    private setupToggleHandler(): void {
+        this.toggleButton.addEventListener("click", (e: MouseEvent) => {
+            e.stopPropagation();
+            const nextState = this.getNextState();
+            this.orientation = nextState.orientation;
+            this.isReversed = nextState.isReversed;
+            this.updateControlStyle();
+            this.getMap()?.render();
+        });
     }
 
     private setupDragHandlers(): void {
@@ -119,38 +166,55 @@ export class Swipe extends Control {
 
     private updateControlStyle(): void {
         const element = this.element;
+        const position = this.position;
+
         if (this.orientation === "vertical") {
-            element.style.left = `${this.position * 100}%`;
+            element.style.left = `${position * 100}%`;
             element.style.top = "";
         } else {
-            element.style.top = `${this.position * 100}%`;
+            element.style.top = `${position * 100}%`;
             element.style.left = "";
         }
 
-        element.classList.remove("vertical", "horizontal");
+        element.classList.remove("vertical", "horizontal", "reversed");
         element.classList.add(this.orientation);
-    }
-
-    private precompose(event: RenderEvent): void {
-        const ctx = event.context;
-        if (ctx && "beginPath" in ctx) {
-            const canvas = ctx.canvas;
-            const position = this.position;
-            const isVertical = this.orientation === "vertical";
-
-            const width = isVertical ? canvas.width * position : canvas.width;
-            const height = isVertical
-                ? canvas.height
-                : canvas.height * position;
-
-            ctx.save();
-            ctx.beginPath();
-            ctx.rect(0, 0, width, height);
-            ctx.clip();
+        if (this.isReversed) {
+            element.classList.add("reversed");
         }
     }
 
-    private postcompose(e: RenderEvent): void {
+    private precompose = (e: RenderEvent): void => {
+        const ctx = e.context;
+        if (ctx && "beginPath" in ctx) {
+            const { width, height } = ctx.canvas;
+            const { orientation, position } = this;
+            const isVertical = orientation === "vertical";
+
+            const maskPosition = this.isReversed ? 1 - position : position;
+
+            const [x, y, w, h] = [
+                isVertical
+                    ? this.isReversed
+                        ? width - width * maskPosition
+                        : 0
+                    : 0,
+                isVertical
+                    ? 0
+                    : this.isReversed
+                      ? height - height * maskPosition
+                      : 0,
+                isVertical ? width * maskPosition : width,
+                isVertical ? height : height * maskPosition,
+            ];
+
+            ctx.save();
+            ctx.beginPath();
+            ctx.rect(x, y, w, h);
+            ctx.clip();
+        }
+    };
+
+    private postcompose = (e: RenderEvent): void => {
         const restore = () => {
             if (e.context && "restore" in e.context) e.context.restore();
         };
@@ -164,5 +228,5 @@ export class Swipe extends Control {
         } else {
             restore();
         }
-    }
+    };
 }
