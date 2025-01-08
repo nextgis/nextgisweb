@@ -19,6 +19,7 @@ import type { WebmapItem } from "./WebmapItem";
 import type { WebmapLayer } from "./WebmapLayer";
 import type { WebmapPlugin } from "./WebmapPlugin";
 import type { WebMapSettings } from "./WebmapSettings";
+import { Extent } from "ol/extent";
 
 export interface HighlightFeatureData {
     geom: string;
@@ -102,18 +103,19 @@ export interface DojoDisplay extends dijit._WidgetBase {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     _onNewStoreItem: (item: WebmapItem | any) => void;
     _mapAddLayer: (id: number) => void;
-    _mapDeferred: PromiseLike<void>;
+    _mapDeferred: LoggedDeferred;
     _zoomToInitialExtent: () => void;
     _mapExtentDeferred: PromiseLike<void>;
     _urlParams: Record<string, string>;
-
+    mapNode: HTMLElement;
+    mapPane: dijit.layout.ContentPane;
     _mid: Record<string, any>;
     _midDeferred: Record<string, LoggedDeferred>;
     _layersDeferred: Promise<void>;
     _postCreateDeferred: Promise<void>;
-
+    _extent_const: Extent;
     tiny: boolean;
-
+    _identifyFeatureByAttrValue: () => void;
     item: { id: number };
 
     get<T extends keyof ConfigMap | string>(
