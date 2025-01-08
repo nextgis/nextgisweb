@@ -1,26 +1,3 @@
-body,
-html {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-}
-
-body {
-    display: flex;
-    flex-direction: column;
-}
-
-body > .webmap-wrapper {
-    flex-grow: 1;
-    min-width: 0;
-}
-
-.webmap-display > div > .dijitTabContainer > .dijitTabPaneWrapper {
-    border: 0;
-}
-
 .nextgis .ol-rotate {
     top: 4.643em;
     right: auto;
@@ -41,24 +18,6 @@ body > .webmap-wrapper {
     -moz-user-select: text;
     -webkit-user-select: text;
     user-select: text;
-}
-
-.map-container {
-    display: flex;
-    position: relative;
-    flex-direction: column;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-}
-
-.map-pane {
-    position: relative;
-    flex-grow: 1;
-    padding: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
 }
 
 /* Control panes */
@@ -237,27 +196,4 @@ body > .webmap-wrapper {
     margin-top: -3px;
     margin-bottom: -1px;
     height: 14px;
-}
-
-/* leftPanelPane */
-
-div.dijitContentPane.leftPanelPane {
-    border-right: 1px solid rgba(0, 0, 0, 0.12);
-    padding: 0;
-    width: 350px;
-}
-
-.leftPanelPane--fullwidth {
-    box-sizing: border-box;
-    width: calc(100% - 50px) !important;
-}
-
-.navigation,
-.navigation-drawer {
-    width: auto;
-}
-
-.navigation,
-.navigation-menu-pane {
-    width: 50px;
 }

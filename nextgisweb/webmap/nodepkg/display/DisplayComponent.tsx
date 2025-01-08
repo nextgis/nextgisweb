@@ -1,7 +1,8 @@
 import { observer } from "mobx-react-lite";
 import { useCallback, useEffect, useState } from "react";
 
-import { Layout, Spin, Splitter } from "@nextgisweb/gui/antd";
+import { Spin, Splitter } from "@nextgisweb/gui/antd";
+import { mergeClasses } from "@nextgisweb/gui/util";
 import { useRouteGet } from "@nextgisweb/pyramid/hook";
 import type { DisplayConfig } from "@nextgisweb/webmap/type/api";
 import { WebMapTabs } from "@nextgisweb/webmap/webmap-tabs";
@@ -15,9 +16,10 @@ import { PanelSwitcher } from "./component/PanelSwitcher";
 
 import { LoadingOutlined } from "@ant-design/icons";
 
-import "./Display.css";
+import "./DisplayComponent.css";
+import "./DisplayComponent.less";
 
-const { Content, Sider } = Layout;
+const { Panel } = Splitter;
 
 export interface DisplayComponentProps {
     config: DisplayConfig;
@@ -30,7 +32,7 @@ export interface DisplayComponentProps {
 export const DisplayComponent = observer(
     ({
         config,
-        className = "",
+        className,
         display: displayProp,
         setMapRefs: setMapRefsProp,
     }: DisplayComponentProps) => {
@@ -67,47 +69,40 @@ export const DisplayComponent = observer(
         }, [display, mapRefs]);
 
         return (
-            <Layout
-                style={{ width: "100%", height: "100%" }}
-                className={className}
+            <Splitter
+                className={mergeClasses("ngw-webmap-display", className)}
+                onResize={setHorizontalPanelSize}
             >
-                <Layout>
-                    {display.panelsManager.panels.size > 0 && (
-                        <Sider width={50}>
-                            <NavigationMenu store={display.panelsManager} />
-                        </Sider>
-                    )}
-
-                    <Content
-                        className="map-container"
-                        style={{ paddingLeft: 0 }}
+                {display.panelsManager.panels.size > 0 && (
+                    <Panel
+                        key="menu"
+                        resizable={false}
+                        size="50px"
+                        style={{ flexGrow: 0, flexShrink: 0 }}
                     >
-                        <Splitter onResize={setHorizontalPanelSize}>
-                            <Splitter.Panel
-                                key="nav-panel"
-                                size={activePanel ? horizontalPanelSize[0] : 0}
-                                resizable={!!activePanel}
-                            >
-                                <PanelSwitcher display={display} />
-                            </Splitter.Panel>
-                            <Splitter.Panel>
-                                <Splitter layout="vertical">
-                                    <Splitter.Panel key="map">
-                                        <MapPane setMapRefs={setMapRefs} />
-                                    </Splitter.Panel>
-                                    {display.tabsManager.tabs.length && (
-                                        <Splitter.Panel key="map-bottom">
-                                            <WebMapTabs
-                                                store={display.tabsManager}
-                                            />
-                                        </Splitter.Panel>
-                                    )}
-                                </Splitter>
-                            </Splitter.Panel>
-                        </Splitter>
-                    </Content>
-                </Layout>
-            </Layout>
+                        <NavigationMenu store={display.panelsManager} />
+                    </Panel>
+                )}
+                <Panel
+                    key="panels"
+                    size={activePanel ? horizontalPanelSize[0] : 0}
+                    resizable={!!activePanel}
+                >
+                    <PanelSwitcher display={display} />
+                </Panel>
+                <Panel key="main">
+                    <Splitter layout="vertical">
+                        <Panel key="map">
+                            <MapPane setMapRefs={setMapRefs} />
+                        </Panel>
+                        {display.tabsManager.tabs.length && (
+                            <Panel key="tabs">
+                                <WebMapTabs store={display.tabsManager} />
+                            </Panel>
+                        )}
+                    </Splitter>
+                </Panel>
+            </Splitter>
         );
     }
 );

@@ -14,7 +14,6 @@ import type { MapRefs, TinyConfig } from "../type";
 
 import { LoadingOutlined } from "@ant-design/icons";
 
-import "../display/Display.css";
 import "./DisplayTiny.css";
 
 const DisplayTinyComponent = observer(
