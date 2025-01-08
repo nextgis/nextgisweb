@@ -20,22 +20,10 @@ const formatConfig: DefaultConfig = {
     locale,
 };
 
-const formatLength = (length: number) => {
-    if (webmapSettings.units_length === undefined) {
-        throw new Error("The webmap setting units_length is not provided");
-    }
-    return formatMetersLength(
-        length,
-        webmapSettings.units_length,
-        formatConfig
-    );
-};
-const formatArea = (area: number) => {
-    if (webmapSettings.units_area === undefined) {
-        throw new Error("The webmap setting units_area is not provided");
-    }
-    return formatMetersArea(area, webmapSettings.units_area, formatConfig);
-};
+const formatLength = (length: number) =>
+    formatMetersLength(length, webmapSettings.units_length, formatConfig);
+const formatArea = (area: number) =>
+    formatMetersArea(area, webmapSettings.units_area, formatConfig);
 
 export function GeometryInfo({
     layerId,
