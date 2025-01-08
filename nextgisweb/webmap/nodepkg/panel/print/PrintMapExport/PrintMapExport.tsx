@@ -158,3 +158,5 @@ export const PrintMapExport = observer(
         );
     }
 );
+
+PrintMapExport.displayName = "PrintMapExport";
