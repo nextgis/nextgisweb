@@ -1,5 +1,7 @@
-import { orderBy } from "lodash-es";
+import type { TextAreaProps } from "antd/es/input";
+import { debounce } from "lodash-es";
 import { useCallback, useEffect, useRef, useState } from "react";
+import type React from "react";
 
 import {
     Alert,
@@ -12,13 +14,15 @@ import {
     Switch,
     Tooltip,
 } from "@nextgisweb/gui/antd";
+import type { InputRef, OptionType, SelectProps } from "@nextgisweb/gui/antd";
 import { CopyToClipboardButton } from "@nextgisweb/gui/buttons";
 import { TemplateLink } from "@nextgisweb/gui/component";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import settings from "@nextgisweb/pyramid/settings!";
+import settings from "@nextgisweb/pyramid/settings!webmap";
 import { useFavorites } from "@nextgisweb/resource/favorite/useFavorites";
 import { getControls } from "@nextgisweb/webmap/map-controls";
+import type { PanelDojoItem } from "@nextgisweb/webmap/type";
 import { getPermalink } from "@nextgisweb/webmap/utils/permalink";
 
 import { PanelContainer, PanelSection } from "../component";
@@ -34,7 +38,7 @@ import "./SharePanel.less";
 const msgCORS = gettext("<a>CORS</a> must be enabled for the target origin when embedding a web map on a different domain.");
 const msgAddFragmentToFavorites = gettext("Add web map fragment to favorites");
 
-const makeIframeTag = (iframeSrc, height, width) => {
+const makeIframeTag = (iframeSrc: string, height: number, width: number) => {
     return (
         `<iframe src="${iframeSrc}" ` +
         `style="overflow:hidden;height:${height}px;width:${width}px" ` +
@@ -58,7 +62,7 @@ const CORSWarning = () => {
     );
 };
 
-const CodeArea = (props) => {
+const CodeArea = (props: TextAreaProps) => {
     return (
         <Input.TextArea
             style={{ wordBreak: "break-all", overflow: "hidden" }}
@@ -77,7 +81,7 @@ const toolsOptions = getControls()
         };
     });
 
-const ToolsSelect = (props) => {
+const ToolsSelect = (props: SelectProps) => {
     return (
         <Select
             mode="multiple"
@@ -92,7 +96,7 @@ const ToolsSelect = (props) => {
     );
 };
 
-const PanelsSelect = (props) => {
+const PanelsSelect = (props: SelectProps) => {
     return (
         <Select
             mode="multiple"
@@ -107,15 +111,23 @@ const PanelsSelect = (props) => {
 };
 
 const DEFAULT_ACTIVE_PANEL = "none";
-const ActivePanelSelect = ({ panelsOptions, onChange, activePanel }) => {
+const ActivePanelSelect = ({
+    panelsOptions,
+    onChange,
+    activePanel,
+}: {
+    panelsOptions: OptionType[];
+    onChange: (val: string) => void;
+    activePanel: string;
+}) => {
     const NoneOption = {
         label: gettext("None"),
         value: "none",
     };
-    const options = [NoneOption, ...panelsOptions];
+    const options: OptionType[] = [NoneOption, ...panelsOptions];
 
     return (
-        <Select
+        <Select<string>
             style={{
                 width: "100%",
             }}
@@ -126,7 +138,7 @@ const ActivePanelSelect = ({ panelsOptions, onChange, activePanel }) => {
     );
 };
 
-const PanelTitle = ({ panelInfo }) => {
+const PanelTitle = ({ panelInfo }: { panelInfo: PanelDojoItem }) => {
     return (
         <div className="panel-title">
             <div>
@@ -139,7 +151,13 @@ const PanelTitle = ({ panelInfo }) => {
     );
 };
 
-export const SharePanel = ({ display, title, close, visible }) => {
+interface PanelOption {
+    label: React.ReactNode;
+    title: string;
+    value: string;
+}
+
+export const SharePanel = ({ display, title, close, visible }: PanelProps) => {
     const webmapId = display.config.webmapId;
 
     const [mapLink, setMapLink] = useState("");
@@ -148,25 +166,27 @@ export const SharePanel = ({ display, title, close, visible }) => {
     const [addLinkToMap, setAddLinkToMap] = useState(true);
     const [generateEvents, setGenerateEvents] = useState(false);
     const [embedCode, setEmbedCode] = useState("");
-    const [controls, setControls] = useState([]);
-    const [panelsOptions, setPanelsOptions] = useState([]);
-    const [panels, setPanels] = useState([]);
+    const [controls, setControls] = useState<string[]>([]);
+    const [panelsOptions, setPanelsOptions] = useState<PanelOption[]>([]);
+    const [panels, setPanels] = useState<string[]>([]);
     const [activePanel, setActivePanel] = useState(DEFAULT_ACTIVE_PANEL);
 
     const [favLabelModalOpen, setFavLabelModalOpen] = useState(false);
-    const favLabelRef = useRef();
+    const favLabelRef = useRef<InputRef>(null);
     const [favLabelValue, setFavlabelValue] = useState("");
 
-    const updatePermalinkUrl = () => {
+    const updatePermalinkUrl = useCallback(() => {
         display.getVisibleItems().then((visibleItems) => {
-            const permalink = getPermalink(display, visibleItems);
+            const permalink = getPermalink({ display, visibleItems });
             setMapLink(decodeURIComponent(permalink));
         });
-    };
+    }, [display]);
 
-    const updateEmbedCode = () => {
+    const updateEmbedCode = useCallback(() => {
         display.getVisibleItems().then((visibleItems) => {
-            const permalinkOptions = {
+            const iframeSrc = getPermalink({
+                display,
+                visibleItems,
                 urlWithoutParams:
                     ngwConfig.applicationUrl +
                     routeURL("webmap.display.tiny", webmapId),
@@ -177,33 +197,52 @@ export const SharePanel = ({ display, title, close, visible }) => {
                     controls,
                     panels,
                 },
-            };
-            const iframeSrc = getPermalink(
-                display,
-                visibleItems,
-                permalinkOptions
-            );
+            });
             const embedCode = makeIframeTag(iframeSrc, heightMap, widthMap);
             setEmbedCode(embedCode);
         });
-    };
-
-    const updateTexts = useCallback(() => {
-        display._mapExtentDeferred.then(() => {
-            updatePermalinkUrl();
-            updateEmbedCode();
-        });
-    }, [visible]);
+    }, [
+        activePanel,
+        addLinkToMap,
+        controls,
+        display,
+        generateEvents,
+        heightMap,
+        panels,
+        webmapId,
+        widthMap,
+    ]);
 
     useEffect(() => {
-        display.map.olMap.getView().on("change", updateTexts);
+        let isMounted = true;
+
+        const updateTexts = debounce(() => {
+            display._mapExtentDeferred.then(() => {
+                if (!isMounted) return;
+                updatePermalinkUrl();
+                updateEmbedCode();
+            });
+        });
+
+        const mapView = display.map.olMap.getView();
+        mapView.on("change", updateTexts);
         const listener = display.itemStore.on("Set", updateTexts);
+
         updateTexts();
+
         return () => {
-            display.map.olMap.getView().un("change", updateTexts);
+            isMounted = false;
+            mapView.un("change", updateTexts);
             listener.remove();
         };
-    }, [updateTexts]);
+    }, [
+        visible,
+        display._mapExtentDeferred,
+        display.itemStore,
+        display.map.olMap,
+        updateEmbedCode,
+        updatePermalinkUrl,
+    ]);
 
     useEffect(() => {
         display._mapExtentDeferred.then(() => {
@@ -217,6 +256,8 @@ export const SharePanel = ({ display, title, close, visible }) => {
         controls,
         panels,
         activePanel,
+        display._mapExtentDeferred,
+        updateEmbedCode,
     ]);
 
     useEffect(() => {
@@ -239,15 +280,17 @@ export const SharePanel = ({ display, title, close, visible }) => {
                 .filter((p) => p.applyToTinyMap === true)
                 .map((p) => {
                     return {
+                        title: p.title,
                         label: <PanelTitle panelInfo={p} />,
                         value: p.name,
                     };
-                });
-            setPanelsOptions(orderBy(panelsForTinyMap, "label", "asc"));
+                })
+                .sort((a, b) => a.title.localeCompare(b.title));
+            setPanelsOptions(panelsForTinyMap);
         });
     }, [display]);
 
-    const previewUrl = routeURL("webmap.preview_embedded", webmapId);
+    const previewUrl = routeURL("webmap.preview_embedded");
 
     let activePanelSelect;
     if (panels.length) {
@@ -268,11 +311,11 @@ export const SharePanel = ({ display, title, close, visible }) => {
 
     const favorites = useFavorites({ resource: { id: webmapId } });
     const addToFavorites = useCallback(
-        (link, name) => {
+        (link: string, name: string | null) => {
             favorites.add({
                 identity: "webmap.fragment",
                 query_string: link.slice(link.indexOf("?") + 1),
-                label: name || undefined,
+                label: name || null,
             });
         },
         [favorites]
@@ -344,13 +387,17 @@ export const SharePanel = ({ display, title, close, visible }) => {
                     <InputNumber
                         title={gettext("Width, px")}
                         value={widthMap}
-                        onChange={(v) => setWidthMap(v)}
+                        onChange={(v) => {
+                            if (v !== null) setWidthMap(v);
+                        }}
                     />
                     <CloseIcon />
                     <InputNumber
                         title={gettext("Height, px")}
                         value={heightMap}
-                        onChange={(v) => setHeightMap(v)}
+                        onChange={(v) => {
+                            if (v !== null) setHeightMap(v);
+                        }}
                     />
                     <span>{gettext("px")}</span>
                 </div>
