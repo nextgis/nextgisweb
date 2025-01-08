@@ -22,9 +22,7 @@ import PrintMap from "@nextgisweb/webmap/print-map";
 import { getURLParams } from "@nextgisweb/webmap/utils/URL";
 
 import type { PrintMapSettings } from "../../print-map/type";
-import type { DojoDisplay } from "../../type";
 import { PanelContainer, PanelSection } from "../component";
-import { PanelHeader } from "../header";
 
 import PrintMapExport from "./PrintMapExport";
 import {
@@ -444,10 +442,8 @@ const PrintPanel = observer(
         };
 
         return (
-            <div className="ngw-panel print-panel">
-                <PanelHeader {...{ title, close }} />
-
-                <section>
+            <PanelContainer title={title} close={close}>
+                <PanelSection>
                     <div className="input-group column">
                         <label>{gettext("Paper format")}</label>
                         <Select
@@ -503,10 +499,9 @@ const PrintPanel = observer(
                             step={1}
                         ></InputNumber>
                     </div>
-                </section>
+                </PanelSection>
 
-                <section>
-                    <h5 className="heading">{gettext("Elements")}</h5>
+                <PanelSection title={gettext("Elements")}>
                     <div className="input-group">
                         <Switch
                             checked={mapSettings.legend}
@@ -562,10 +557,9 @@ const PrintPanel = observer(
                             {gettext("North Arrow")}
                         </span>
                     </div>
-                </section>
+                </PanelSection>
 
-                <section>
-                    <h5 className="heading">{gettext("Scale")}</h5>
+                <PanelSection title={gettext("Scale")}>
                     <div className="input-group">
                         <Switch
                             checked={mapSettings.scaleValue}
@@ -597,9 +591,9 @@ const PrintPanel = observer(
                             onChange={updateMapScale}
                         />
                     </div>
-                </section>
+                </PanelSection>
 
-                <section>
+                <PanelSection>
                     <div className="actions">
                         <PrintMapExport
                             display={display}
@@ -618,8 +612,8 @@ const PrintPanel = observer(
                             ></CopyToClipboardButton>
                         </Space.Compact>
                     </div>
-                </section>
-            </div>
+                </PanelSection>
+            </PanelContainer>
         );
     }
 );

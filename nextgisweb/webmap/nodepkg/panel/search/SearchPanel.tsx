@@ -15,6 +15,7 @@ import type { Display } from "@nextgisweb/webmap/display";
 import type { PanelComponentProps } from "@nextgisweb/webmap/panels-manager/type";
 
 import { PanelContainer, PanelTitle } from "../component";
+import type { PanelTitleProps } from "../component";
 
 import { LoadingOutlined } from "@ant-design/icons";
 import BackspaceIcon from "@nextgisweb/icon/material/backspace";
@@ -341,10 +342,10 @@ const search = async (
     return [searchResults, isExceeded];
 };
 
-const SearchPanelContext = createContext(null);
+const SearchPanelContext = createContext<any>(null);
 SearchPanelContext.displayName = "SearchPanelContext";
 
-function SearchPanelTitle({ className, close }) {
+function SearchPanelTitle({ className, close }: PanelTitleProps) {
     const { searchText, searchChange, clearSearchText } =
         useContext(SearchPanelContext);
     return (
@@ -368,7 +369,7 @@ function SearchPanelTitle({ className, close }) {
     );
 }
 
-export const SearchPanel = ({ display, close }: ReactPanelComponentProps) => {
+export default function SearchPanel({ display, close }: PanelComponentProps) {
     const [loading, setLoading] = useState<boolean>(false);
     const [searchResults, setSearchResults] = useState<
         [SearchResult[], boolean] | undefined

@@ -23,7 +23,10 @@ const zoomToFeature = (
         });
 };
 
-export function DescriptionPanel({ display, content }: DescriptionPanelProps) {
+export default function DescriptionPanel({
+    display,
+    content,
+}: DescriptionPanelProps) {
     const nodeRef = useRef<HTMLDivElement>(null);
 
     const contentDiv = useMemo(() => {

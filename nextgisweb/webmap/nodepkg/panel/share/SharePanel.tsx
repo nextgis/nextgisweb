@@ -329,10 +329,8 @@ const SharePanel = observer(
         );
 
         return (
-            <div className="ngw-panel ngw-webmap-share-panel">
-                <PanelHeader title={title} close={close} />
-                <section>
-                    <h5 className="heading">{gettext("Map link")}</h5>
+            <PanelContainer title={title} close={close}>
+                <PanelSection>
                     <div className="input-group">
                         <CodeArea value={mapLink} />
                     </div>
@@ -385,12 +383,8 @@ const SharePanel = observer(
                             ></Input>
                         </Modal>
                     )}
-                </section>
-                <section>
-                    <h5 className="heading">
-                        {gettext("Embed code for your site")}
-                    </h5>
-
+                </PanelSection>
+                <PanelSection title={gettext("Embed code for your site")}>
                     <div className="input-group">
                         <span className="grow">{gettext("Map size:")}</span>
                         <InputNumber
@@ -468,8 +462,8 @@ const SharePanel = observer(
                         </Space.Compact>
                     </form>
                     <CORSWarning />
-                </section>
-            </div>
+                </PanelSection>
+            </PanelContainer>
         );
     }
 );
