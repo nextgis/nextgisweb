@@ -151,7 +151,7 @@ const dynamicEntries = () => {
                     return [
                         entry,
                         {
-                            import: virtualImport(wrapper, code.join("\n")),
+                            import: virtualImport(wrapper, code, entry),
                             library: { type: "amd", name: entry },
                         },
                     ];
@@ -243,12 +243,11 @@ for (const { code: lang, nplurals, plural } of config.i18n.languages) {
         `import dayjs from "@nextgisweb/gui/dayjs";`,
         `import "${dayjs.filename}";`,
         `dayjs.locale('${dayjs.original}');`,
-    ]
-        .concat(pofiles.map((fn) => `import "${path.resolve(fn)}";`))
-        .join("\n");
+    ].concat(pofiles.map((fn) => `import "${path.resolve(fn)}";`));
 
+    const fn = path.join(localeOutDir, lang + ".js");
     staticEntries[entry] = {
-        import: virtualImport(path.join(localeOutDir, lang + ".js"), code),
+        import: virtualImport(fn, code, entry),
         library: { type: "amd", name: entry },
     };
 }
