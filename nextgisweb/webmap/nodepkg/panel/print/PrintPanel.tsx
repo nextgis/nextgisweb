@@ -17,12 +17,12 @@ import { useObjectState } from "@nextgisweb/gui/hook";
 import reactApp from "@nextgisweb/gui/react-app";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { Display } from "@nextgisweb/webmap/display";
-import type { PanelWidget } from "@nextgisweb/webmap/panels-manager/registry";
 import PrintMap from "@nextgisweb/webmap/print-map";
 import { getURLParams } from "@nextgisweb/webmap/utils/URL";
 
 import type { PrintMapSettings } from "../../print-map/type";
 import { PanelContainer, PanelSection } from "../component";
+import type { PanelWidget } from "..";
 
 import PrintMapExport from "./PrintMapExport";
 import {
@@ -307,8 +307,8 @@ const PrintPanel: PanelWidget = observer(({ store, display }) => {
     }, [display]);
 
     const visible = useMemo(() => {
-        return display.panelsManager.activePanelName === store.name;
-    }, [display.panelsManager.activePanelName, store.name]);
+        return display.panelManager.activePanelName === store.name;
+    }, [display.panelManager.activePanelName, store.name]);
 
     const [mapSettings, setMapSettings] = useObjectState<PrintMapSettings>(() =>
         defaultPanelMapSettings(display.config.webmapTitle)

@@ -12,9 +12,9 @@ import type { GetRequestOptions } from "@nextgisweb/pyramid/api/type";
 import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import topic from "@nextgisweb/webmap/compat/topic";
-import type { PanelWidget } from "@nextgisweb/webmap/panels-manager/registry";
 
 import { PanelContainer } from "../../component";
+import type { PanelWidget } from "../../type";
 import { CoordinatesSwitcher } from "../CoordinatesSwitcher";
 import type { IdentifyStore } from "../IdentifyStore";
 import type { FeatureInfo, IdentifyInfo } from "../identification";

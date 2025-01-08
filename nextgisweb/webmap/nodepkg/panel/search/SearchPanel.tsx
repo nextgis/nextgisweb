@@ -13,10 +13,10 @@ import { AbortControllerHelper } from "@nextgisweb/pyramid/util/abort";
 import { lonLatToDM } from "@nextgisweb/webmap/coordinates/formatter";
 import { parse } from "@nextgisweb/webmap/coordinates/parser";
 import type { Display } from "@nextgisweb/webmap/display";
-import type { PanelWidget } from "@nextgisweb/webmap/panels-manager/registry";
 
 import { PanelContainer, PanelTitle } from "../component";
 import type { PanelTitleProps } from "../component";
+import type { PanelWidget } from "..";
 
 import { LoadingOutlined } from "@ant-design/icons";
 import BackspaceIcon from "@nextgisweb/icon/material/backspace";

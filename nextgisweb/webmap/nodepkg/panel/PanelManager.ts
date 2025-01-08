@@ -1,9 +1,8 @@
 import { action, computed, observable } from "mobx";
 
 import type { Display } from "../display";
+import { PanelStore } from "../panel/PanelStore";
 
-import { PanelStore } from "./PanelStore";
-import type { PanelStore as Panel } from "./PanelStore";
 import { registry } from "./registry";
 
 type Source = "init" | "menu" | "manager";
@@ -26,16 +25,16 @@ class Deferred<T> {
     }
 }
 
-export class PanelsManager {
+export class PanelManager {
     private _display: Display;
     private _allowPanels?: string[];
 
-    /** @deprecated use observable {@link PanelsManager.ready} instead */
+    /** @deprecated use observable {@link PanelManager.ready} instead */
     private _panelsReady = new Deferred<void>();
-    private _onChangePanel: (panel?: Panel) => void;
+    private _onChangePanel: (panel?: PanelStore) => void;
 
     @observable.ref accessor ready = false;
-    @observable.shallow accessor panels = new Map<string, Panel>();
+    @observable.shallow accessor panels = new Map<string, PanelStore>();
     @observable.shallow accessor active: NavigationPanelInfo = {
         active: undefined,
         source: "init",
@@ -45,7 +44,7 @@ export class PanelsManager {
         display: Display,
         activePanelKey: string | undefined,
         allowPanels: string[] | undefined,
-        onChangePanel: (panel?: Panel) => void
+        onChangePanel: (panel?: PanelStore) => void
     ) {
         this._display = display;
         if (activePanelKey) {
@@ -71,7 +70,7 @@ export class PanelsManager {
         this._handlePanelActivation();
     }
 
-    /** @deprecated use observable {@link PanelsManager.ready} instead */
+    /** @deprecated use observable {@link PanelManager.ready} instead */
     get panelsReady(): Deferred<void> {
         return this._panelsReady;
     }
@@ -88,7 +87,7 @@ export class PanelsManager {
     }
 
     @computed
-    get activePanel(): Panel | undefined {
+    get activePanel(): PanelStore | undefined {
         if (this.activePanelName) {
             return this.panels.get(this.activePanelName);
         }
@@ -127,7 +126,7 @@ export class PanelsManager {
         return this.activePanelName;
     }
 
-    getPanel<T extends Panel = Panel>(name: string): T | undefined {
+    getPanel<T extends PanelStore = PanelStore>(name: string): T | undefined {
         return this.panels.get(name) as T;
     }
 
@@ -139,8 +138,8 @@ export class PanelsManager {
         this.closePanel();
     }
 
-    sorted(): Panel[] {
-        const sorted: Panel[] = [];
+    sorted(): PanelStore[] {
+        const sorted: PanelStore[] = [];
         for (const panel of this.panels.values()) {
             sorted.push(panel);
         }

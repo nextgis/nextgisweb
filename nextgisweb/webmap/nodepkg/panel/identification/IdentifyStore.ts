@@ -1,6 +1,6 @@
 import { action, observable } from "mobx";
 
-import { PanelStore } from "@nextgisweb/webmap/panels-manager";
+import { PanelStore } from "@nextgisweb/webmap/panel";
 
 import type { IdentifyInfo } from "./identification";
 

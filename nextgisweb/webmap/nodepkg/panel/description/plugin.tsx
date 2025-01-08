@@ -1,6 +1,6 @@
 /** @plugin */
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { registry } from "@nextgisweb/webmap/panels-manager/registry";
+import { registry } from "@nextgisweb/webmap/panel/registry";
 import type { DisplayConfig } from "@nextgisweb/webmap/type/api";
 
 import { DescriptionStore } from "./DescriptionStore";

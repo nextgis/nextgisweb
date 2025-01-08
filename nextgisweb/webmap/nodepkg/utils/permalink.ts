@@ -56,7 +56,7 @@ export const getPermalink = ({
     }
 
     let annot: AnnotationVisibleMode | undefined | null = null;
-    const annotationPanel = display.panelsManager.getPanel("annotation");
+    const annotationPanel = display.panelManager.getPanel("annotation");
     if (display && annotationPanel) {
         annot = visibleMode;
     }

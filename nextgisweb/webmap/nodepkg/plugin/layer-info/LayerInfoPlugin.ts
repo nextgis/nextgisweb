@@ -35,7 +35,7 @@ export class LayerInfoPlugin extends PluginBase {
     }
 
     openLayerInfo() {
-        const pm = this.display.panelsManager;
+        const pm = this.display.panelManager;
         const pkey = "info";
         const data = this.display.itemConfig?.plugin[
             this.identity

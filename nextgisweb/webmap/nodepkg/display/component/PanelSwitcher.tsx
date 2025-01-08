@@ -3,7 +3,7 @@ import { Suspense, lazy, useMemo } from "react";
 
 import { Tabs } from "@nextgisweb/gui/antd";
 import type { TabsProps } from "@nextgisweb/gui/antd";
-import type { PanelStore } from "@nextgisweb/webmap/panels-manager";
+import type { PanelStore } from "@nextgisweb/webmap/panel";
 
 import type { Display } from "../Display";
 
@@ -26,7 +26,7 @@ const PanelRender = observer(({ panel }: { panel: PanelStore }) => {
 PanelRender.displayName = "PanelRender";
 
 export const PanelSwitcher = observer(({ display }: { display: Display }) => {
-    const { panels, activePanel } = display.panelsManager;
+    const { panels, activePanel } = display.panelManager;
 
     const activeKey = useMemo(
         () => (activePanel ? activePanel.name : undefined),

@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 
 import type { Display } from "../display";
 
-import type { PanelPlugin, PanelWidget } from "./registry";
+import type { PanelPlugin, PanelWidget } from ".";
 
 export class PanelStore {
     readonly name: string;
@@ -44,6 +44,6 @@ export class PanelStore {
     }
 
     close = () => {
-        this.display.panelsManager.closePanel();
+        this.display.panelManager.closePanel();
     };
 }

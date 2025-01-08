@@ -231,7 +231,7 @@ export class Identify extends ToolBase {
             layerLabels,
         };
 
-        const pm = this.display.panelsManager;
+        const pm = this.display.panelManager;
         const pkey = "identify";
         const panel = pm.getPanel<IdentifyStore>(pkey);
         if (panel) {

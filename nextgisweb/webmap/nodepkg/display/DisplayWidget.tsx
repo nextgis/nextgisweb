@@ -56,7 +56,7 @@ export const DisplayWidget = observer(
             [setMapRefsProp]
         );
 
-        const { activePanel } = display.panelsManager;
+        const { activePanel } = display.panelManager;
 
         const [horizontalPanelSize, setHorizontalPanelSize] = useState<
             (number | undefined)[]
@@ -73,14 +73,14 @@ export const DisplayWidget = observer(
                 className={classNames("ngw-webmap-display", className)}
                 onResize={setHorizontalPanelSize}
             >
-                {display.panelsManager.panels.size > 0 && (
+                {display.panelManager.panels.size > 0 && (
                     <Panel
                         key="menu"
                         resizable={false}
                         size="50px"
                         style={{ flexGrow: 0, flexShrink: 0 }}
                     >
-                        <NavigationMenu store={display.panelsManager} />
+                        <NavigationMenu store={display.panelManager} />
                     </Panel>
                 )}
                 <Panel

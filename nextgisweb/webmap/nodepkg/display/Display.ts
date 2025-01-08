@@ -13,7 +13,6 @@ import settings from "@nextgisweb/pyramid/settings!webmap";
 import topic from "@nextgisweb/webmap/compat/topic";
 import { buildControls } from "@nextgisweb/webmap/map-controls";
 import MapToolbar from "@nextgisweb/webmap/map-toolbar";
-import { PanelsManager } from "@nextgisweb/webmap/panels-manager/PanelsManager";
 import type {
     DisplayConfig,
     LayerItemConfig,
@@ -31,7 +30,8 @@ import MapStatesObserver from "../map-state-observer";
 import type { MapStatesObserver as IMapStatesObserver } from "../map-state-observer/MapStatesObserver";
 import { Map } from "../ol/Map";
 import type { CoreLayer } from "../ol/layer/_Base";
-import type { PanelStore } from "../panels-manager";
+import type { PanelStore } from "../panel";
+import { PanelManager } from "../panel/PanelManager";
 import type { PluginBase } from "../plugin/PluginBase";
 import WebmapStore from "../store";
 import type {
@@ -67,7 +67,7 @@ export class Display {
     itemStore: CustomItemFileWriteStore;
     webmapStore: WebmapStore;
     tabsManager: WebMapTabsStore;
-    panelsManager: PanelsManager;
+    panelManager: PanelManager;
     mapStates: IMapStatesObserver;
     mapToolbar?: MapToolbar;
 
@@ -152,7 +152,7 @@ export class Display {
         // Module loading
         this._midDeferred = {};
 
-        this.panelsManager = this._buildPanelsManager();
+        this.panelManager = this._buildPanelManager();
 
         this._initializeMids();
 
@@ -615,7 +615,7 @@ export class Display {
             this.layersDeferred,
             this.mapDeferred,
             this._postCreateDeferred,
-            this.panelsManager.panelsReady.promise,
+            this.panelManager.panelsReady.promise,
         ])
             .then(() => {
                 if (this.urlParams.base) {
@@ -800,7 +800,7 @@ export class Display {
         return this.urlParams;
     }
 
-    private _buildPanelsManager() {
+    private _buildPanelManager() {
         const activePanelKey = this.urlParams[this.modeURLParam];
         const onChangePanel = (panel?: PanelStore) => {
             if (panel) {
@@ -816,14 +816,14 @@ export class Display {
             allowPanels = panels ? panels.split(",") : [];
         }
 
-        const panelsManager = new PanelsManager(
+        const panelManager = new PanelManager(
             this,
             activePanelKey,
             allowPanels,
             onChangePanel
         );
 
-        return panelsManager;
+        return panelManager;
     }
 
     private _hideNavMenuForGuest() {

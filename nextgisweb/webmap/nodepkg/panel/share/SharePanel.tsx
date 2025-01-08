@@ -23,10 +23,10 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import settings from "@nextgisweb/pyramid/settings!webmap";
 import { useFavorites } from "@nextgisweb/resource/favorite/useFavorites";
 import { getControls } from "@nextgisweb/webmap/map-controls";
-import type { PanelStore } from "@nextgisweb/webmap/panels-manager";
-import type { PanelWidget } from "@nextgisweb/webmap/panels-manager/registry";
+import type { PanelStore } from "@nextgisweb/webmap/panel";
 import { getPermalink } from "@nextgisweb/webmap/utils/permalink";
 
+import type { PanelWidget } from "..";
 import { PanelContainer, PanelSection } from "../component";
 
 import CloseIcon from "@nextgisweb/icon/material/close";
@@ -271,8 +271,8 @@ const SharePanel: PanelWidget = observer(({ store, display }) => {
     }, [panels, activePanel]);
 
     useEffect(() => {
-        display.panelsManager.panelsReady.promise.then(() => {
-            const panelsForTinyMap = display.panelsManager
+        display.panelManager.panelsReady.promise.then(() => {
+            const panelsForTinyMap = display.panelManager
                 .sorted()
                 .filter((p) => p.applyToTinyMap === true)
                 .map((p) => {

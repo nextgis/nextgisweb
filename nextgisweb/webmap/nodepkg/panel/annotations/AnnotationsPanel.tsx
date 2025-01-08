@@ -4,11 +4,11 @@ import { useCallback, useEffect, useState } from "react";
 import { Select, Switch } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import topic from "@nextgisweb/webmap/compat/topic";
-import type { PanelWidget } from "@nextgisweb/webmap/panels-manager/registry";
 import AnnotationsStore from "@nextgisweb/webmap/store/annotations";
 import type { AnnotationVisibleMode } from "@nextgisweb/webmap/store/annotations/AnnotationsStore";
 import type { AnnotationsPermissions } from "@nextgisweb/webmap/type/api";
 
+import type { PanelWidget } from "..";
 import { PanelContainer, PanelSection } from "../component";
 
 import "./AnnotationsPanel.less";

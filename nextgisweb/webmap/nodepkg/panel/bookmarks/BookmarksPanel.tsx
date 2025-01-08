@@ -5,9 +5,9 @@ import { useMemo, useState } from "react";
 import { Spin } from "@nextgisweb/gui/antd";
 import { route } from "@nextgisweb/pyramid/api";
 import { useRouteGet } from "@nextgisweb/pyramid/hook";
-import type { PanelWidget } from "@nextgisweb/webmap/panels-manager/registry";
 
 import { PanelContainer } from "../component";
+import type { PanelWidget } from "..";
 
 import { LoadingOutlined } from "@ant-design/icons";
 

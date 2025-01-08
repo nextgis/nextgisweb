@@ -1,8 +1,9 @@
 import { action, observable } from "mobx";
 
 import type { Display } from "@nextgisweb/webmap/display";
-import { PanelStore } from "@nextgisweb/webmap/panels-manager";
-import type { PanelPlugin } from "@nextgisweb/webmap/panels-manager/registry";
+
+import { PanelStore } from "..";
+import type { PanelPlugin } from "..";
 
 export class DescriptionStore extends PanelStore {
     @observable.ref accessor content: string | null = null;

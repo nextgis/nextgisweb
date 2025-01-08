@@ -2,9 +2,9 @@ import { observer } from "mobx-react-lite";
 import { useEffect, useMemo, useRef } from "react";
 
 import type { Display } from "@nextgisweb/webmap/display";
-import type { PanelWidget } from "@nextgisweb/webmap/panels-manager/registry";
 
 import { PanelContainer } from "../component";
+import type { PanelWidget } from "..";
 
 import type { DescriptionStore } from "./DescriptionStore";
 

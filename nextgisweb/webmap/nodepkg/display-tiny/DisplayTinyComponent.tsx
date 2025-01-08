@@ -26,7 +26,7 @@ const DisplayTinyComponent = observer(
                 })
         );
 
-        const { ready: panelsReady } = display.panelsManager;
+        const { ready: panelsReady } = display.panelManager;
 
         const [mapRefs, setMapRefs] = useState<MapRefs>();
 
@@ -58,14 +58,14 @@ const DisplayTinyComponent = observer(
                     return;
                 }
 
-                const activePanel = display.panelsManager.getActivePanelName();
+                const activePanel = display.panelManager.getActivePanelName();
                 if (!activePanel) {
                     return;
                 }
-                display.panelsManager.deactivatePanel();
-                // display.panelsManager.activatePanel(activePanel);
+                display.panelManager.deactivatePanel();
+                // display.panelManager.activatePanel(activePanel);
             },
-            [display.panelsManager, panelsReady]
+            [display.panelManager, panelsReady]
         );
 
         const handleTinyDisplayMode = useCallback(() => {

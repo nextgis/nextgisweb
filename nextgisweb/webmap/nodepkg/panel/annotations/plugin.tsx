@@ -1,7 +1,7 @@
 /** @plugin */
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { Display } from "@nextgisweb/webmap/display";
-import { registry } from "@nextgisweb/webmap/panels-manager/registry";
+import { registry } from "@nextgisweb/webmap/panel/registry";
 import type { AnnotationVisibleMode } from "@nextgisweb/webmap/store/annotations/AnnotationsStore";
 import type { DisplayConfig } from "@nextgisweb/webmap/type/api";
 

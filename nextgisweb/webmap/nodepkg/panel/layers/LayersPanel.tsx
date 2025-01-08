@@ -1,8 +1,8 @@
 import { observer } from "mobx-react-lite";
 
-import type { PanelWidget } from "@nextgisweb/webmap/panels-manager/registry";
 import type ZoomToWebmapPlugin from "@nextgisweb/webmap/plugin/zoom-to-webmap";
 
+import type { PanelWidget } from "..";
 import { LayersTree } from "../../layers-tree/LayersTree";
 import { PanelContainer } from "../component";
 
