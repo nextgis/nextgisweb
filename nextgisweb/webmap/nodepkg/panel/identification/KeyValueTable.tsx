@@ -5,13 +5,15 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import type { FieldDataItem } from "./fields";
 
+import "./KeyValueTable.less";
+
 export function KeyValueTable({ data }: { data: FieldDataItem[] }) {
     const columns: ColumnsType<FieldDataItem> = [
         {
+            className: "attr-column",
             title: gettext("Attribute"),
             dataIndex: "attr",
             key: "attr",
-            className: "attr-column",
         },
         {
             title: gettext("Value"),
@@ -22,14 +24,15 @@ export function KeyValueTable({ data }: { data: FieldDataItem[] }) {
 
     return (
         <Table
-            size="small"
-            className="key-value-table"
+            className="ngw-webmap-panel-identification-kv-table"
             dataSource={data.map(({ key, value, attr }) => ({
                 key,
                 value,
                 attr: attr ?? (key ? String(key) : undefined),
             }))}
             columns={columns}
+            bordered={true}
+            size="small"
             showHeader={false}
         />
     );
