@@ -4,6 +4,7 @@ import type { Source } from "ol/source";
 import type { Style } from "ol/style";
 
 import { Watchable } from "@nextgisweb/webmap/compat/Watchable";
+import { LayerItemConfig } from "@nextgisweb/webmap/type/TreeItems";
 
 export interface LayerOptions {
     title?: string;
@@ -33,7 +34,8 @@ export abstract class BaseLayer<
 
     @observable accessor opacity: number = 1;
     @observable accessor visibility: boolean = true;
-    @observable accessor symbols: string[] = [];
+    @observable.shallow accessor symbols: string[] = [];
+    @observable.shallow accessor itemConfig: LayerItemConfig | null = null;
 
     protected abstract createSource(options: TSourceOptions): TSource;
     protected abstract createLayer(
@@ -114,6 +116,11 @@ export abstract class BaseLayer<
         this.symbols = symbols;
     }
 
+    @action
+    setItemConfig(itemConfig: LayerItemConfig) {
+        this.itemConfig = itemConfig;
+    }
+
     reload(): void {
         this.olSource.changed();
     }
@@ -142,6 +149,21 @@ export abstract class BaseLayer<
             case "symbols":
                 this.setSymbols(value as string[]);
                 break;
+            default:
+                throw new Error(`Unknown property: ${property}`);
+        }
+    }
+
+    /** @deprecated use {@link _Base.visibility}, {@link _Base.opacity}, or {@link _Base.symbols} */
+    @action
+    get(property: keyof LayerWatchableProps): boolean | number | string[] {
+        switch (property) {
+            case "visibility":
+                return this.visibility;
+            case "opacity":
+                return this.opacity;
+            case "symbols":
+                return this.symbols;
             default:
                 throw new Error(`Unknown property: ${property}`);
         }

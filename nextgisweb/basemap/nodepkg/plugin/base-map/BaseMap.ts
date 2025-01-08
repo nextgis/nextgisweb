@@ -103,7 +103,11 @@ export class BaseMap extends PluginBase {
         addCoordinateTransforms(
             "EPSG:3857",
             "EPSG:3395",
-            toEPSG3395fromEPSG3857
+            toEPSG3395fromEPSG3857,
+            (input: number[]) => {
+                console.warn("Handle the inverse transform!");
+                return input;
+            }
         );
 
         if (wmplugin.basemaps.length) {

@@ -1,11 +1,88 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import ItemFileWriteStore from "dojo/data/ItemFileWriteStore";
 
-interface Item {
-    [key: string]: any;
+import type {
+    StoreGroupConfig,
+    StoreItemConfig,
+    StoreLayerConfig,
+} from "./type";
+
+export interface StoreFetchQuery {
+    deep: true;
+}
+type ArrayWrap<T> = {
+    [P in keyof T]: T[P][];
+};
+
+interface DojoStoreItem {
+    id?: number[];
+    _S?: any[];
+    _R?: any[];
+}
+
+type GetStoreItem<T> = ArrayWrap<T> & DojoStoreItem;
+
+export type StoreItem = GetStoreItem<StoreItemConfig>;
+
+export interface StoreFetchOptions {
+    sort?:
+        | { attribute: keyof StoreItemConfig }
+        | Array<{ attribute: keyof StoreItemConfig }>
+        | null;
+    query?: Partial<StoreItemConfig>;
+    queryOptions?: StoreFetchQuery;
+    onItem?: (item: StoreItem) => void;
+    onComplete?: (items: StoreItem[]) => void;
+    onError?: (error: Error) => void;
+}
+
+export interface StoreFetchItemByIdentityOptions {
+    identity: number;
+    onItem: (item: StoreItem | null) => void;
 }
 
 export class CustomItemFileWriteStore extends ItemFileWriteStore {
-    dumpItem(item: Item | null): Record<string, any> {
+    fetch(options: StoreFetchOptions) {
+        return super.fetch(options);
+    }
+
+    getValue<K extends keyof StoreLayerConfig>(
+        item: StoreItem,
+        key: K
+    ): StoreLayerConfig[K];
+    getValue<K extends keyof StoreGroupConfig>(
+        item: StoreItem,
+        key: K
+    ): StoreGroupConfig[K];
+    getValue<K extends keyof StoreItemConfig>(
+        item: StoreItem,
+        key: K
+    ): StoreItemConfig[K] {
+        return super.getValue(item, key);
+    }
+    setValue<K extends keyof StoreGroupConfig>(
+        item: StoreItem,
+        key: K,
+        value: StoreGroupConfig[K]
+    ): void;
+    setValue<K extends keyof StoreLayerConfig>(
+        item: StoreItem,
+        key: K,
+        value: StoreLayerConfig[K]
+    ): void;
+    setValue<K extends keyof StoreItemConfig>(
+        item: StoreItem,
+        key: K,
+        value: StoreItemConfig[K]
+    ): void {
+        super.setValue(item, key, value);
+    }
+
+    fetchItemByIdentity(options: StoreFetchItemByIdentityOptions) {
+        super.fetchItemByIdentity(options);
+    }
+
+    dumpItem(item: StoreItem | null): StoreItemConfig {
         const obj: Record<string, any> = {};
 
         if (item) {
@@ -41,6 +118,6 @@ export class CustomItemFileWriteStore extends ItemFileWriteStore {
             }
         }
 
-        return obj;
+        return obj as StoreItemConfig;
     }
 }
