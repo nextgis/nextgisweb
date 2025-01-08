@@ -10,8 +10,8 @@ import InfoIcon from "@nextgisweb/icon/material/info";
 registry.register(COMP_ID, () => import("./DescriptionPanel"), {
     name: "info",
     title: gettext("Description"),
+    icon: <InfoIcon />,
     order: 40,
-    menuIcon: <InfoIcon />,
     applyToTinyMap: true,
 
     storeClass: DescriptionStore,

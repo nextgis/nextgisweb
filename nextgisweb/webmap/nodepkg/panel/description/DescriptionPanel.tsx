@@ -2,17 +2,13 @@ import { observer } from "mobx-react-lite";
 import { useEffect, useMemo, useRef } from "react";
 
 import type { Display } from "@nextgisweb/webmap/display";
-import type { PanelComponentProps } from "@nextgisweb/webmap/panels-manager/type";
+import type { PanelWidget } from "@nextgisweb/webmap/panels-manager/registry";
 
 import { PanelContainer } from "../component";
 
 import type { DescriptionStore } from "./DescriptionStore";
 
 import "./DescriptionPanel.less";
-
-export interface DescriptionPanelProps extends PanelComponentProps {
-    store: DescriptionStore;
-}
 
 const zoomToFeature = (
     display: Display,
@@ -26,8 +22,8 @@ const zoomToFeature = (
         });
 };
 
-const DescriptionPanel = observer(
-    ({ store, display }: DescriptionPanelProps) => {
+const DescriptionPanel: PanelWidget<DescriptionStore> = observer(
+    ({ store, display }) => {
         const nodeRef = useRef<HTMLDivElement>(null);
 
         const content = store.content;
@@ -83,5 +79,4 @@ const DescriptionPanel = observer(
 );
 
 DescriptionPanel.displayName = "DescriptionPanel";
-
-export default DescriptionPanel;
+export default DescriptionPanel as PanelWidget;

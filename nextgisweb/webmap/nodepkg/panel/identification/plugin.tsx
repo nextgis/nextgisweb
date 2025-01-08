@@ -11,11 +11,12 @@ registry.register(
     COMP_ID,
     () => import("./IdentificationPanel/IdentificationPanel"),
     {
-        title: gettext("Identify"),
         name: "identify",
+        title: gettext("Identify"),
+        icon: <IdentifyIcon />,
         order: 15,
-        menuIcon: <IdentifyIcon />,
         applyToTinyMap: true,
+
         storeClass: IdentifyStore,
     }
 );

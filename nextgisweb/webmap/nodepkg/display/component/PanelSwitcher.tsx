@@ -1,19 +1,17 @@
 import { observer } from "mobx-react-lite";
 import { Suspense, lazy, useMemo } from "react";
-import type { ComponentType } from "react";
 
 import { Tabs } from "@nextgisweb/gui/antd";
 import type { TabsProps } from "@nextgisweb/gui/antd";
 import type { PanelStore } from "@nextgisweb/webmap/panels-manager";
 
-import type { PanelComponentProps } from "../../panels-manager/type";
 import type { Display } from "../Display";
 
 import "./PanelSwitcher.css";
 
 const PanelRender = observer(({ panel }: { panel: PanelStore }) => {
     const Loader = useMemo(() => {
-        return lazy<ComponentType<PanelComponentProps>>(async () => {
+        return lazy(async () => {
             return { default: await panel.load() };
         });
     }, [panel]);

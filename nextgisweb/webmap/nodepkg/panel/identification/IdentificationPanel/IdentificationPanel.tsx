@@ -12,14 +12,12 @@ import type { GetRequestOptions } from "@nextgisweb/pyramid/api/type";
 import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import topic from "@nextgisweb/webmap/compat/topic";
+import type { PanelWidget } from "@nextgisweb/webmap/panels-manager/registry";
 
 import { PanelContainer } from "../../component";
 import { CoordinatesSwitcher } from "../CoordinatesSwitcher";
-import type {
-    FeatureInfo,
-    IdentificationPanelProps,
-    IdentifyInfo,
-} from "../identification";
+import type { IdentifyStore } from "../IdentifyStore";
+import type { FeatureInfo, IdentifyInfo } from "../identification";
 
 import { FeatureInfoSection } from "./component/FeatureInfoSection";
 import { FeatureSelector } from "./component/FeatureSelector";
@@ -71,8 +69,8 @@ const loadFeatureItem = async (
     return featureItem;
 };
 
-const IdentificationPanel = observer(
-    ({ display, store }: IdentificationPanelProps) => {
+const IdentificationPanel: PanelWidget<IdentifyStore> = observer(
+    ({ display, store }) => {
         const [featureInfo, setFeatureInfo] = useState<FeatureInfo>();
         const [featureItem, setFeatureItem] = useState<FeatureItem>();
 
@@ -207,5 +205,4 @@ const IdentificationPanel = observer(
 );
 
 IdentificationPanel.displayName = "IdentificationPanel";
-
-export default IdentificationPanel;
+export default IdentificationPanel as PanelWidget;

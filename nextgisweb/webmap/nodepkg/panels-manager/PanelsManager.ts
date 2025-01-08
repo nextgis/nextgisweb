@@ -142,7 +142,6 @@ export class PanelsManager {
     sorted(): Panel[] {
         const sorted: Panel[] = [];
         for (const panel of this.panels.values()) {
-            if (panel.enabled === false) continue;
             sorted.push(panel);
         }
 

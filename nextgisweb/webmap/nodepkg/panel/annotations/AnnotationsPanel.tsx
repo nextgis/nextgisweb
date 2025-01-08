@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Select, Switch } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import topic from "@nextgisweb/webmap/compat/topic";
-import type { PanelComponentProps } from "@nextgisweb/webmap/panels-manager/type";
+import type { PanelWidget } from "@nextgisweb/webmap/panels-manager/registry";
 import AnnotationsStore from "@nextgisweb/webmap/store/annotations";
 import type { AnnotationVisibleMode } from "@nextgisweb/webmap/store/annotations/AnnotationsStore";
 import type { AnnotationsPermissions } from "@nextgisweb/webmap/type/api";
@@ -23,7 +23,7 @@ interface AnnotationFilter {
 
 const ADD_ANNOTATION_STATE_KEY = "addAnnotation";
 
-const AnnotationsPanel = observer(({ store, display }: PanelComponentProps) => {
+const AnnotationsPanel: PanelWidget = observer(({ store, display }) => {
     const [visible, setVisible] = useState(AnnotationsStore.visibleMode);
     const [editable, setEditable] = useState(false);
     const [edit, setEdit] = useState(false);
@@ -112,7 +112,7 @@ const AnnotationsPanel = observer(({ store, display }: PanelComponentProps) => {
             title={store.title}
             close={store.close}
         >
-            <PanelSection title={gettext("Annotations layer")}>
+            <PanelSection>
                 <div className="input-group column">
                     <label>{gettext("Show annotations")}</label>
                     <Select
@@ -212,5 +212,4 @@ const AnnotationsPanel = observer(({ store, display }: PanelComponentProps) => {
 });
 
 AnnotationsPanel.displayName = "AnnotationsPanel";
-
 export default AnnotationsPanel;

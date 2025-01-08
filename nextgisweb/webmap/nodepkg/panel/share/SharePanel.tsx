@@ -24,7 +24,7 @@ import settings from "@nextgisweb/pyramid/settings!webmap";
 import { useFavorites } from "@nextgisweb/resource/favorite/useFavorites";
 import { getControls } from "@nextgisweb/webmap/map-controls";
 import type { PanelStore } from "@nextgisweb/webmap/panels-manager";
-import type { PanelComponentProps } from "@nextgisweb/webmap/panels-manager/type";
+import type { PanelWidget } from "@nextgisweb/webmap/panels-manager/registry";
 import { getPermalink } from "@nextgisweb/webmap/utils/permalink";
 
 import { PanelContainer, PanelSection } from "../component";
@@ -143,7 +143,7 @@ const ActivePanelSelect = ({
 const PanelTitle = ({ panel }: { panel: PanelStore }) => {
     return (
         <div className="panel-title">
-            <div>{panel.menuIcon}</div>
+            <div>{panel.icon}</div>
             <div className="title">{panel.title}</div>
         </div>
     );
@@ -155,7 +155,7 @@ interface PanelOption {
     value: string;
 }
 
-const SharePanel = observer(({ store, display }: PanelComponentProps) => {
+const SharePanel: PanelWidget = observer(({ store, display }) => {
     const webmapId = display.config.webmapId;
 
     const [mapLink, setMapLink] = useState("");
@@ -458,5 +458,4 @@ const SharePanel = observer(({ store, display }: PanelComponentProps) => {
 });
 
 SharePanel.displayName = "SharePanel";
-
 export default SharePanel;

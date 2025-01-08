@@ -2,7 +2,7 @@ import classNames from "classnames";
 import { observer } from "mobx-react-lite";
 import { useCallback } from "react";
 
-import type { PanelsManager } from "../panels-manager";
+import type { PanelsManager } from "../panels-manager/PanelsManager";
 import type { PanelPlugin } from "../panels-manager/registry";
 
 import "./NavigationMenu.less";
@@ -36,7 +36,7 @@ export const NavigationMenu = observer(
                             "active": name === active?.name,
                         })}
                     >
-                        {plugin.menuIcon}
+                        {plugin.icon}
                     </div>
                 ))}
             </div>

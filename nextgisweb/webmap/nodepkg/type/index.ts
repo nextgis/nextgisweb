@@ -1,6 +1,5 @@
 import type Feature from "ol/Feature";
 import type OlControl from "ol/control/Control";
-import type React from "react";
 
 import type { LayerItemConfig } from "@nextgisweb/webmap/type/api";
 
@@ -10,7 +9,6 @@ import type { Display } from "../display";
 import type { ToolBase } from "../map-controls/tool/ToolBase";
 import type { Map } from "../ol/Map";
 import type { CoreLayer, LayerOptions } from "../ol/layer/_Base";
-import type { PanelStore } from "../panels-manager";
 import type { PluginBase } from "../plugin/PluginBase";
 import type { AnnotationVisibleMode } from "../store/annotations/AnnotationsStore";
 
@@ -116,17 +114,3 @@ export interface PluginState {
     map: Map;
     active?: boolean;
 }
-
-export interface BasePanelMeta {
-    name: string;
-    title: string;
-    menuIcon: React.ReactNode;
-    order: number;
-    applyToTinyMap?: boolean;
-
-    storeClass?: typeof PanelStore;
-    isEnabled?: ({ config }: { config: Display["config"] }) => boolean;
-    startup?: (display: Display) => Promise<unknown>;
-}
-
-export type PanelMeta<T = unknown> = BasePanelMeta & T;

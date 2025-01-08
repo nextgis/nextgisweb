@@ -8,10 +8,10 @@ import type { DisplayConfig } from "@nextgisweb/webmap/type/api";
 import AnnotationIcon from "@nextgisweb/icon/material/chat";
 
 registry.register(COMP_ID, () => import("./AnnotationsPanel"), {
-    title: gettext("Annotations"),
     name: "annotation",
+    title: gettext("Annotations"),
+    icon: <AnnotationIcon />,
     order: 30,
-    menuIcon: <AnnotationIcon />,
     applyToTinyMap: true,
 
     isEnabled: ({ config }: { config: DisplayConfig }) => {
@@ -48,6 +48,5 @@ registry.register(COMP_ID, () => import("./AnnotationsPanel"), {
 
         console.log(initialAnnotVisible);
         new AnnotationsManager({ display, initialAnnotVisible });
-        return {};
     },
 });

@@ -13,7 +13,7 @@ import settings from "@nextgisweb/pyramid/settings!webmap";
 import topic from "@nextgisweb/webmap/compat/topic";
 import { buildControls } from "@nextgisweb/webmap/map-controls";
 import MapToolbar from "@nextgisweb/webmap/map-toolbar";
-import { PanelsManager } from "@nextgisweb/webmap/panels-manager";
+import { PanelsManager } from "@nextgisweb/webmap/panels-manager/PanelsManager";
 import type {
     DisplayConfig,
     LayerItemConfig,

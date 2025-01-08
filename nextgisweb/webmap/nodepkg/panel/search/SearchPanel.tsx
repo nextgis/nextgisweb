@@ -13,7 +13,7 @@ import { AbortControllerHelper } from "@nextgisweb/pyramid/util/abort";
 import { lonLatToDM } from "@nextgisweb/webmap/coordinates/formatter";
 import { parse } from "@nextgisweb/webmap/coordinates/parser";
 import type { Display } from "@nextgisweb/webmap/display";
-import type { PanelComponentProps } from "@nextgisweb/webmap/panels-manager/type";
+import type { PanelWidget } from "@nextgisweb/webmap/panels-manager/registry";
 
 import { PanelContainer, PanelTitle } from "../component";
 import type { PanelTitleProps } from "../component";
@@ -370,7 +370,7 @@ function SearchPanelTitle({ className, close }: PanelTitleProps) {
     );
 }
 
-const SearchPanel = observer(({ store, display }: PanelComponentProps) => {
+const SearchPanel: PanelWidget = observer(({ store, display }) => {
     const [loading, setLoading] = useState<boolean>(false);
     const [searchResults, setSearchResults] = useState<
         [SearchResult[], boolean] | undefined
@@ -502,5 +502,4 @@ const SearchPanel = observer(({ store, display }: PanelComponentProps) => {
 });
 
 SearchPanel.displayName = "SearchPanel";
-
 export default SearchPanel;

@@ -1,10 +1,9 @@
 import { observable } from "mobx";
-import type { ComponentType, ReactNode } from "react";
+import type { ReactNode } from "react";
 
 import type { Display } from "../display";
 
-import type { PanelPlugin } from "./registry";
-import type { PanelComponentProps } from "./type";
+import type { PanelPlugin, PanelWidget } from "./registry";
 
 export class PanelStore {
     readonly name: string;
@@ -13,10 +12,8 @@ export class PanelStore {
 
     @observable.ref accessor title: string;
     @observable.ref accessor order: number;
-    @observable.ref accessor enabled: boolean = true;
 
-    private loadPromise?: Promise<ComponentType<PanelComponentProps>> =
-        undefined;
+    private loadPromise?: Promise<PanelWidget<PanelStore>> = undefined;
 
     constructor(plugin: PanelPlugin, display: Display) {
         this.plugin = plugin;
@@ -27,25 +24,19 @@ export class PanelStore {
         this.order = plugin.order ?? Number.MAX_SAFE_INTEGER;
     }
 
-    get menuIcon(): ReactNode {
-        return this.plugin.menuIcon;
+    get icon(): ReactNode {
+        return this.plugin.icon;
     }
 
     get applyToTinyMap(): boolean {
         return this.applyToTinyMap;
     }
 
-    async load(): Promise<ComponentType<PanelComponentProps>> {
+    async load(): Promise<PanelWidget<PanelStore>> {
         if (!this.loadPromise) {
             this.loadPromise = (async () => {
-                let component = await this.plugin.load();
-                const startup = this.plugin.startup;
-                if (startup) {
-                    const propsStartup = (await startup(this.display)) ?? {};
-                    const base = component;
-                    // @ts-expect-error Non-functional component?
-                    component = (props) => base({ ...propsStartup, ...props });
-                }
+                const component = await this.plugin.load();
+                await this.plugin.startup?.(this.display);
                 return component;
             })();
         }

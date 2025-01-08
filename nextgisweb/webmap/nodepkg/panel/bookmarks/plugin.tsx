@@ -5,13 +5,11 @@ import type { DisplayConfig } from "@nextgisweb/webmap/type/api";
 
 import BookmarkIcon from "@nextgisweb/icon/material/bookmark";
 
-const msgTitle = gettext("Bookmarks");
-
 registry.register(COMP_ID, () => import("./BookmarksPanel"), {
-    title: msgTitle,
     name: "bookmark",
+    title: gettext("Bookmarks"),
+    icon: <BookmarkIcon />,
     order: 50,
-    menuIcon: <BookmarkIcon />,
     applyToTinyMap: true,
 
     isEnabled: ({ config }: { config: DisplayConfig }) => {

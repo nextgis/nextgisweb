@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 import { Spin } from "@nextgisweb/gui/antd";
 import { route } from "@nextgisweb/pyramid/api";
 import { useRouteGet } from "@nextgisweb/pyramid/hook";
-import type { PanelComponentProps } from "@nextgisweb/webmap/panels-manager/type";
+import type { PanelWidget } from "@nextgisweb/webmap/panels-manager/registry";
 
 import { PanelContainer } from "../component";
 
@@ -18,7 +18,7 @@ interface Bookmark {
     label: string;
 }
 
-const BookmarksPanel = observer(({ store, display }: PanelComponentProps) => {
+const BookmarksPanel: PanelWidget = observer(({ store, display }) => {
     const bookmarkLayerId = display.config.bookmarkLayerId;
 
     const [bookmarkSelected, setBookmarkSelected] = useState<Bookmark>();
@@ -88,5 +88,4 @@ const BookmarksPanel = observer(({ store, display }: PanelComponentProps) => {
 });
 
 BookmarksPanel.displayName = "BookmarksPanel";
-
 export default BookmarksPanel;

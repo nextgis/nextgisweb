@@ -17,7 +17,7 @@ import { useObjectState } from "@nextgisweb/gui/hook";
 import reactApp from "@nextgisweb/gui/react-app";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { Display } from "@nextgisweb/webmap/display";
-import type { PanelComponentProps } from "@nextgisweb/webmap/panels-manager/type";
+import type { PanelWidget } from "@nextgisweb/webmap/panels-manager/registry";
 import PrintMap from "@nextgisweb/webmap/print-map";
 import { getURLParams } from "@nextgisweb/webmap/utils/URL";
 
@@ -293,7 +293,7 @@ const ScalesSelect = ({
     );
 };
 
-const PrintPanel = observer(({ store, display }: PanelComponentProps) => {
+const PrintPanel: PanelWidget = observer(({ store, display }) => {
     const [urlParsed, setUrlParsed] = useState(false);
     const mapInit = useRef(false);
     const [paperFormat, setPaperFormat] = useState("210_297");
@@ -602,5 +602,4 @@ const PrintPanel = observer(({ store, display }: PanelComponentProps) => {
 });
 
 PrintPanel.displayName = "PrintPanel";
-
 export default PrintPanel;
