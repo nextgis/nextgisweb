@@ -1,12 +1,12 @@
 import { action, observable } from "mobx";
 
-export type VisibleMode = "no" | "yes" | "messages";
+export type AnnotationVisibleMode = "no" | "yes" | "messages";
 
 class AnnotationsStore {
-    @observable accessor visibleMode: VisibleMode | null = null;
+    @observable accessor visibleMode: AnnotationVisibleMode | null = null;
 
     @action
-    setVisibleMode(visibleMode: VisibleMode | null): void {
+    setVisibleMode(visibleMode: AnnotationVisibleMode | null): void {
         this.visibleMode = visibleMode;
     }
 }

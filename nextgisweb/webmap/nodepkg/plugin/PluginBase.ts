@@ -1,11 +1,13 @@
+import type { LayerItemConfig } from "@nextgisweb/webmap/type/api";
+
 import type { Display } from "../display";
 import type { PluginMenuItem, PluginParams, PluginState } from "../type";
-import type { LayerItemConfig, LayerType } from "../type/TreeItems";
+import type { TreeItemType } from "../type/TreeItems";
 
 export abstract class PluginBase {
     display: Display;
     identity: string;
-    type: LayerType = "layer";
+    type: TreeItemType = "layer";
 
     run?(nodeData: LayerItemConfig): Promise<boolean | undefined>;
     getMenuItem?(nodeData: LayerItemConfig): PluginMenuItem;

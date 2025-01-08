@@ -13,7 +13,7 @@ import { route } from "@nextgisweb/pyramid/api/route";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import FilterExtentBtn from "@nextgisweb/webmap/filter-extent-btn";
 import type { FeatureLayerWebMapPluginConfig } from "@nextgisweb/webmap/plugin/type";
-import type { LayerItemConfig } from "@nextgisweb/webmap/type/TreeItems";
+import type { LayerItemConfig } from "@nextgisweb/webmap/type/api";
 import ZoomToFilteredBtn from "@nextgisweb/webmap/zoom-to-filtered-btn";
 
 import type topic from "../compat/topic";
