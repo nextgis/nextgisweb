@@ -11,6 +11,7 @@ import type {
     StoreItem,
 } from "../compat/CustomItemFileWriteStore";
 import type { LoggedDeferred } from "../compat/LoggedDeferred";
+import type { StoreItemConfig } from "../compat/type";
 import type { MapStatesObserver } from "../map-state-observer/MapStatesObserver";
 import type MapToolbar from "../map-toolbar";
 import type { ToggleControl } from "../map-toolbar/ToggleControl";
@@ -24,7 +25,6 @@ import type { WebMapTab } from "../webmap-tabs/WebMapTabsStore";
 
 import type { DisplayConfig } from "./DisplayConfig";
 import type { LayerItemConfig, TreeItemConfig } from "./TreeItems";
-import type { WebmapItem } from "./WebmapItem";
 import type { WebMapSettings } from "./WebmapSettings";
 
 import type { PanelDojoItem } from ".";
@@ -43,15 +43,6 @@ export interface FeatureHighlighter {
         featureId: number,
         layerId: number
     ) => PromiseLike<Feature>;
-}
-
-export interface WebmapItemConfig extends WebmapItem {
-    plugin?: Record<string, unknown>;
-    label: string;
-}
-
-export interface ItemConfigById {
-    [key: number]: WebmapItemConfig;
 }
 
 export interface MapTool extends dijit._WidgetBase {
@@ -108,7 +99,8 @@ export interface MapURLParams {
 }
 
 type ConfigMap = {
-    itemConfig: LayerItemConfig;
+    itemConfig: LayerItemConfig | null;
+    item: StoreItem | null;
 };
 
 export interface TinyConfig {
@@ -117,7 +109,7 @@ export interface TinyConfig {
 
 export type MapPlugin = new (val: PluginParams) => PluginBase;
 
-export interface DojoDisplay extends dijit._WidgetBase {
+export interface DojoDisplay extends dijit._WidgetBase, ConfigMap {
     leftPanelPane: PanelDojoItem;
     navigationMenuPane: dijit.layout.ContentPane;
     mainContainer: dijit.layout.BorderContainer;
@@ -133,10 +125,9 @@ export interface DojoDisplay extends dijit._WidgetBase {
     getUrlParams: () => Record<string, string>;
     isTinyMode: () => boolean;
     isTinyModePlugin: (plugin: string) => boolean;
-    prepareItem: (item: WebmapItem) => WebmapItem;
+    prepareItem: (item: TreeItemConfig) => StoreItemConfig;
     _installPlugins: (plugins: Record<string, PluginBase>) => void;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    _onNewStoreItem: (item: WebmapItem | any) => void;
+    _onNewStoreItem: (item: StoreItem) => void;
     _mapAddLayer: (id: number) => void;
     _mapDeferred: LoggedDeferred;
     _zoomToInitialExtent: () => void;
@@ -158,10 +149,8 @@ export interface DojoDisplay extends dijit._WidgetBase {
     // The Item is now editable. Or not. Who knows?
     item: StoreItem;
 
-    get<T extends keyof ConfigMap | string>(
-        name: T
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ): T extends keyof ConfigMap ? ConfigMap[T] : any;
+    set<T extends keyof ConfigMap>(key: T, config: ConfigMap[T]): void;
+    get<T extends keyof ConfigMap>(name: T): ConfigMap[T];
 
     _layersSetup: () => void;
     handleSelect: (selectedKeys: number[]) => void;
@@ -180,7 +169,7 @@ export interface DojoDisplay extends dijit._WidgetBase {
     _baseLayer: BaseLayer;
 
     itemStore: CustomItemFileWriteStore;
-    getItemConfig: () => ItemConfigById;
+    getItemConfig: () => Record<string, TreeItemConfig>;
     webmapStore: WebmapStore;
     mapStates: MapStatesObserver;
 

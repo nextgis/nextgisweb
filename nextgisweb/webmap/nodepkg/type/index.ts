@@ -3,13 +3,12 @@
 import type { ReactAppReturn } from "@nextgisweb/gui/react-app";
 
 import type { ReactPanelComponentPropType } from "../panels-manager/type";
-import type reactPanel from "../ui/react-panel";
+import type { ReactPanel } from "../ui/react-panel/ReactPanel";
 
 import type { DojoDisplay } from "./DojoDisplay";
 
 export * from "./DisplayConfig";
 export * from "./DojoDisplay";
-export * from "./WebmapItem";
 
 export interface DojoItem {
     set: (key: string, value: unknown) => void;
@@ -39,7 +38,7 @@ export interface ReactPanelProps {
 }
 
 export interface AddpanelItem {
-    cls: ReturnType<typeof reactPanel>;
+    cls: (params: PanelClsParams) => ReactPanel<any>;
     params: ReactPanelProps;
 }
 
@@ -52,7 +51,7 @@ export interface PanelDojoItem<
     title: string;
 
     order?: number;
-    cls?: ReturnType<typeof reactPanel>;
+    cls?: (params: PanelClsParams) => ReactPanel<P>;
     params: PanelClsParams;
 
     isFullWidth?: boolean;
