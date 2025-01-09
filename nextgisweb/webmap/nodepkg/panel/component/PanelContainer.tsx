@@ -26,7 +26,7 @@ export interface PanelContainerProps extends PropsWithChildren {
     className?: string;
     title?: ReactNode;
     suffix?: ReactNode;
-    close?: () => void;
+    close: () => void;
     prolog?: ReactNode;
     epilog?: ReactNode;
     sectionAccent?: boolean;

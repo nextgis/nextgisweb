@@ -17,8 +17,9 @@ import { formatSize } from "@nextgisweb/gui/util";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import type { Display } from "@nextgisweb/webmap/display";
 import FilterExtentBtn from "@nextgisweb/webmap/filter-extent-btn";
-import type { DojoDisplay, WebmapItemConfig } from "@nextgisweb/webmap/type";
+import type { TreeItemConfig } from "@nextgisweb/webmap/type/TreeItems";
 
 import type { FeatureAttachment } from "../../type";
 
@@ -35,7 +36,7 @@ const tipLabel = gettext(
 );
 
 interface AttachmentsTabProps {
-    display: DojoDisplay;
+    display: Display;
     label: string;
 }
 
@@ -53,17 +54,18 @@ interface LayerItemView {
 
 type IdentifyFeatureFunc = (featureId: number, layerId: number) => void;
 
-const getLayersInfo = (display: DojoDisplay) => {
+const getLayersInfo = (display: Display) => {
     const checked = display.webmapStore.checked;
     const itemConfig = display.getItemConfig();
 
-    const layersResourceIds = new Map<number, WebmapItemConfig>();
+    const layersResourceIds = new Map<number, TreeItemConfig>();
     checked.forEach((itemId) => {
         const itemInfo = itemConfig[itemId];
         if (
             itemInfo &&
+            itemInfo.type === "layer" &&
             itemInfo.plugin &&
-            "ngw-webmap/plugin/FeatureLayer" in itemInfo.plugin
+            "@nextgisweb/webmap/plugin/feature-layer" in itemInfo.plugin
         ) {
             layersResourceIds.set(itemInfo.layerId, itemInfo);
         }
@@ -192,14 +194,14 @@ const makeAttachmentsList = (
 
 const layerItems = (
     layerAttachments: LayerItemView[] | undefined,
-    display: DojoDisplay
+    display: Display
 ) => {
     if (!layerAttachments) {
         return undefined;
     }
 
     const identifyFeature = (featureId: number, layerId: number) => {
-        display.identify.identifyFeatureByAttrValue(layerId, "id", featureId);
+        display.identify?.identifyFeatureByAttrValue(layerId, "id", featureId);
     };
 
     return layerAttachments?.map((l) => {
@@ -256,7 +258,7 @@ const ButtonBulkLoad = ({ layerAttachments }: ButtonBulkLoadProps) => {
 };
 
 const fetchFeaturesAttachments = async (
-    display: DojoDisplay,
+    display: Display,
     signal: AbortSignal,
     geomWKT: string | undefined
 ): Promise<LayerItemView[]> => {
@@ -288,25 +290,28 @@ const fetchFeaturesAttachments = async (
 
     parts.forEach((featuresInfo: FeatureItem[], index) => {
         const layerInfo = layersInfo[index];
-        const attachments: FeatureAttachmentView[] = [];
-        featuresInfo.forEach((f: FeatureItem) => {
-            if (f.extensions && f.extensions.attachment) {
-                const attachmentsInfo = f.extensions
-                    .attachment as FeatureAttachment[];
-                const attachmentsView: FeatureAttachmentView[] =
-                    attachmentsInfo.map((a: FeatureAttachment) => ({
-                        featureId: f.id,
-                        attachment: a,
-                        label: f.label,
-                    }));
-                attachments.push(...attachmentsView);
-            }
-        });
-        result.push({
-            layerLabel: layerInfo.label,
-            layerId: layerInfo.layerId,
-            attachments,
-        });
+
+        if (layerInfo.type === "layer") {
+            const attachments: FeatureAttachmentView[] = [];
+            featuresInfo.forEach((f: FeatureItem) => {
+                if (f.extensions && f.extensions.attachment) {
+                    const attachmentsInfo = f.extensions
+                        .attachment as FeatureAttachment[];
+                    const attachmentsView: FeatureAttachmentView[] =
+                        attachmentsInfo.map((a: FeatureAttachment) => ({
+                            featureId: f.id,
+                            attachment: a,
+                            label: f.label,
+                        }));
+                    attachments.push(...attachmentsView);
+                }
+            });
+            result.push({
+                layerLabel: layerInfo.label,
+                layerId: layerInfo.layerId,
+                attachments,
+            });
+        }
     });
 
     return result;

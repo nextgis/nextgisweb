@@ -35,7 +35,7 @@ class PluginObject<V extends Value, M extends Metadata> {
     }
 }
 
-type Plugin<V extends Value, M extends Metadata> = PluginObject<V, M> &
+export type Plugin<V extends Value, M extends Metadata> = PluginObject<V, M> &
     Readonly<M>;
 
 type Selector<M> = { component: string } & M;

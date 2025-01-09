@@ -1,12 +1,11 @@
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import type { IdentifyExtensionComponentProps } from "@nextgisweb/webmap/panel/identification/identification";
+import { PanelSection } from "@nextgisweb/webmap/panel/component";
+import type { IdentifyExtensionComponentProps } from "@nextgisweb/webmap/panel/identify/identification";
 
 import AttachmentTable from "../attachment-table";
 import type { FeatureAttachment } from "../type";
 
 import AttachFileIcon from "@nextgisweb/icon/material/attach_file/fill";
-
-import "@nextgisweb/webmap/panel/identification/PanelContentContainer.less";
 
 export default function AttachmentTableView({
     featureItem,
@@ -21,24 +20,13 @@ export default function AttachmentTableView({
     ] as FeatureAttachment[];
 
     return (
-        <>
-            <div className="panel-content-container">
-                <div className="fill">
-                    <h3>
-                        <AttachFileIcon /> {gettext("Attachments")}
-                    </h3>
-                </div>
-            </div>
-            <div className="panel-content-container">
-                <div className="fill">
-                    <AttachmentTable
-                        attachments={attachments}
-                        featureId={featureItem.id}
-                        resourceId={resourceId}
-                        isSmall
-                    />
-                </div>
-            </div>
-        </>
+        <PanelSection icon={<AttachFileIcon />} title={gettext("Attachments")}>
+            <AttachmentTable
+                attachments={attachments}
+                featureId={featureItem.id}
+                resourceId={resourceId}
+                isSmall
+            />
+        </PanelSection>
     );
 }

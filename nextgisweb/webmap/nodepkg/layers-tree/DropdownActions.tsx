@@ -1,16 +1,17 @@
 import { Divider, Dropdown } from "@nextgisweb/gui/antd";
 import type { MenuProps } from "@nextgisweb/gui/antd";
 import { SvgIcon } from "@nextgisweb/gui/svg-icon";
+import type { RootItemConfig } from "@nextgisweb/webmap/type/api";
 
-import type { WebmapPlugin } from "../type";
-import type { TreeItem } from "../type/TreeItems";
+import type { PluginBase } from "../plugin/PluginBase";
+import type { TreeItemConfig } from "../type/TreeItems";
 
 import MoreVertIcon from "@nextgisweb/icon/material/more_vert/outline";
 import "./DropdownActions.less";
 
 interface DropdownActionsProps {
-    nodeData: TreeItem;
-    getWebmapPlugins: () => Record<string, WebmapPlugin>;
+    nodeData: TreeItemConfig | RootItemConfig;
+    getWebmapPlugins: () => Record<string, PluginBase>;
     moreClickId?: number;
     setMoreClickId: (id: number | undefined) => void;
     update: boolean;
@@ -18,11 +19,11 @@ interface DropdownActionsProps {
 }
 
 export function DropdownActions({
-    nodeData,
-    getWebmapPlugins,
-    moreClickId,
-    setMoreClickId,
     update,
+    nodeData,
+    moreClickId,
+    getWebmapPlugins,
+    setMoreClickId,
     setUpdate,
 }: DropdownActionsProps) {
     const { id, type } = nodeData;
@@ -56,11 +57,14 @@ export function DropdownActions({
             if (plugin.getMenuItem) {
                 const { icon, title, onClick } = plugin.getMenuItem(nodeData);
                 const onClick_ = async () => {
-                    const run = onClick || plugin.run;
-                    if (plugin && run) {
-                        const result = await run(nodeData);
-                        if (result !== undefined) {
-                            setUpdate(!update);
+                    if (plugin) {
+                        if (onClick) {
+                            onClick();
+                        } else if (plugin.run) {
+                            const result = await plugin.run(nodeData);
+                            if (result !== undefined) {
+                                setUpdate(!update);
+                            }
                         }
                     }
                     setMoreClickId(undefined);

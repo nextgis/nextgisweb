@@ -2,6 +2,8 @@ from .base import WebmapLayerPlugin
 
 
 class LayerInfoPlugin(WebmapLayerPlugin):
+    amd_free = True
+
     @classmethod
     def is_layer_supported(cls, *, style, layer, webmap):
         payload = dict()
@@ -13,4 +15,4 @@ class LayerInfoPlugin(WebmapLayerPlugin):
         else:
             payload["description"] = None
 
-        return ("ngw-webmap/plugin/LayerInfo", payload)
+        return ("@nextgisweb/webmap/plugin/layer-info", payload)

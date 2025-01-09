@@ -1,0 +1,26 @@
+.ngw-webmap-display-navigation-menu {
+    box-sizing: border-box;
+    background-color: var(--primary);
+    padding: 8px 0 !important;
+    width: 50px;
+    height: 100%;
+    overflow: auto;
+    color: var(--on-primary-text);
+
+    .ngw-webmap-display-navigation-menu-item {
+        cursor: pointer;
+        height: 40px;
+        user-select: none;
+        text-align: center;
+
+        & > svg.icon {
+            opacity: 0.5;
+            font-size: 24px;
+        }
+
+        &.active > svg.icon,
+        &:hover > svg.icon {
+            opacity: 1;
+        }
+    }
+}
