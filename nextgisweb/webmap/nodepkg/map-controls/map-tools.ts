@@ -1,21 +1,12 @@
-/// <reference types="dojo/dijit" />
-
 import { gettext } from "@nextgisweb/pyramid/i18n";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore Import URL parser module
-import ToolMeasure from "ngw-webmap/tool/Measure";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore Import URL parser module
-import ToolSwipe from "ngw-webmap/tool/Swipe";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore Import URL parser module
-import ToolViewerInfo from "ngw-webmap/tool/ViewerInfo";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore Import URL parser module
-import ToolZoom from "ngw-webmap/tool/Zoom";
 
-import type { DojoDisplay, MapToolbar } from "../type/DojoDisplay";
+import type { Display } from "../display";
+import type MapToolbar from "../map-toolbar";
 
+import { ToolMeasure } from "./tool/Measure";
+import { ToolSwipe } from "./tool/Swipe";
+import { ToolViewerInfo } from "./tool/ViewerInfo";
+import { ToolZoom } from "./tool/Zoom";
 import type { ControlReady, ToolInfo } from "./type";
 import { getControlsInfo } from "./utils";
 
@@ -75,22 +66,24 @@ export const ToolsInfo: ToolInfo[] = [
     },
 ];
 
-export const getToolsInfo = (display: DojoDisplay): ToolInfo[] => {
+export const getToolsInfo = (display: Display): ToolInfo[] => {
     return getControlsInfo<ToolInfo>(display, ToolsInfo);
 };
 
 export const buildTools = (
-    display: DojoDisplay,
+    display: Display,
     tools: ToolInfo[],
     controlsReady: Map<string, ControlReady>
-): MapToolbar => {
+): MapToolbar | undefined => {
     const mapToolbar = display.mapToolbar;
-    tools.forEach((t: ToolInfo) => {
-        const tool = t.ctor(display);
-        if (t.mapStateKey) {
-            mapToolbar.items.addTool(tool, t.mapStateKey);
-        }
-        controlsReady.set(t.key, { control: tool, info: t });
-    });
+    if (mapToolbar) {
+        tools.forEach((t: ToolInfo) => {
+            const tool = t.ctor(display);
+            if (t.mapStateKey) {
+                mapToolbar.items.addTool(tool, t.mapStateKey);
+            }
+            controlsReady.set(t.key, { control: tool, info: t });
+        });
+    }
     return mapToolbar;
 };

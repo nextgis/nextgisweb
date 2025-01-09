@@ -26,7 +26,7 @@ const CoordsDisplay = ({ coord, round = 0 }: CoordPairProps) => {
     return <span>{coord.map((c) => roundValue(c, round)).join(" ")}</span>;
 };
 
-interface MapViewerInfoProps {
+export interface MapViewerInfoProps {
     map: Map;
     show: boolean;
 }

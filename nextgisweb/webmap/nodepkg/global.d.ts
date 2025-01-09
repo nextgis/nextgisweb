@@ -36,8 +36,6 @@ declare module "@nextgisweb/pyramid/settings!webmap" {
         identify_radius: number;
         identify_attributes: boolean;
         show_geometry_info: boolean;
-        popup_width: number;
-        popup_height: number;
         address_search_enabled: boolean;
         address_search_extent: boolean;
         address_geocoder: AddressGeocoder;

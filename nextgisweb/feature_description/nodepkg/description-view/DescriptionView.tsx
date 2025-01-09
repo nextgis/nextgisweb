@@ -1,9 +1,8 @@
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import type { IdentifyExtensionComponentProps } from "@nextgisweb/webmap/panel/identification/identification";
+import { PanelSection } from "@nextgisweb/webmap/panel/component";
+import type { IdentifyExtensionComponentProps } from "@nextgisweb/webmap/panel/identify/identification";
 
 import DescriptionIcon from "@nextgisweb/icon/material/description/outline";
-
-import "@nextgisweb/webmap/panel/identification/PanelContentContainer.less";
 
 const DescriptionView = ({ featureItem }: IdentifyExtensionComponentProps) => {
     if (!featureItem.extensions || !featureItem.extensions["description"]) {
@@ -13,18 +12,9 @@ const DescriptionView = ({ featureItem }: IdentifyExtensionComponentProps) => {
     const description = featureItem.extensions["description"];
 
     return (
-        <>
-            <div className="panel-content-container">
-                <div className="fill">
-                    <h3>
-                        <DescriptionIcon /> {gettext("Description")}
-                    </h3>
-                </div>
-            </div>
-            <div className="panel-content-container">
-                <div dangerouslySetInnerHTML={{ __html: description }} />
-            </div>
-        </>
+        <PanelSection icon={<DescriptionIcon />} title={gettext("Description")}>
+            <div dangerouslySetInnerHTML={{ __html: description }} />
+        </PanelSection>
     );
 };
 
