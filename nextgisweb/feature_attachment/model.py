@@ -8,6 +8,7 @@ import sqlalchemy as sa
 import sqlalchemy.orm as orm
 from msgspec import UNSET, Struct, UnsetType
 from PIL import Image, UnidentifiedImageError
+from PIL.Image import DecompressionBombError
 from sqlalchemy.dialects import postgresql as pg
 
 from nextgisweb.env import Base
@@ -82,7 +83,7 @@ class FeatureAttachment(Base, FVersioningExtensionMixin):
         if self.is_image:
             try:
                 image = Image.open(self.fileobj.filename())
-            except UnidentifiedImageError:
+            except (UnidentifiedImageError, DecompressionBombError):
                 pass
             else:
                 if exif := image.getexif():
