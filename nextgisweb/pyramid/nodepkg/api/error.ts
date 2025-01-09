@@ -13,7 +13,7 @@ export class BaseAPIError extends BaseError {
     }
 }
 
-export class NetworksResponseError extends BaseAPIError {
+export class NetworkResponseError extends BaseAPIError {
     readonly detail: string;
 
     // prettier-ignore

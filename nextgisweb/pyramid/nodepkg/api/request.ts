@@ -6,7 +6,7 @@ import {
     LunkwillError,
     LunkwillRequestCancelled,
     LunkwillRequestFailed,
-    NetworksResponseError,
+    NetworkResponseError,
     ServerResponseError,
 } from "./error";
 import type { ServerResponseErrorData } from "./error";
@@ -88,7 +88,7 @@ async function lunkwillFetch(lwRespUrl: string) {
     try {
         return await window.fetch(lwRespUrl, { credentials: "same-origin" });
     } catch (e) {
-        throw new NetworksResponseError();
+        throw new NetworkResponseError();
     }
 }
 
@@ -212,7 +212,7 @@ export async function request<
             if ((e as Error).name === "AbortError") {
                 throw e;
             }
-            throw new NetworksResponseError();
+            throw new NetworkResponseError();
         }
 
         if (useLunkwill && lunkwillCheckResponse(response)) {

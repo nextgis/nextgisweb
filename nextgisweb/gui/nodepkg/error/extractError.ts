@@ -1,4 +1,4 @@
-import { NetworksResponseError } from "@nextgisweb/pyramid/api";
+import { NetworkResponseError } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { isApiError } from "./util";
@@ -24,7 +24,7 @@ export function extractError(error: unknown) {
                 response.status === 0 ||
                 response.data === undefined
             ) {
-                const fallback = new NetworksResponseError();
+                const fallback = new NetworkResponseError();
                 return {
                     title: fallback.title,
                     message: fallback.message,
