@@ -22,6 +22,14 @@ export default function Testentry() {
             >
                 CustomException
             </Button>
+            <Button
+                onClick={() => {
+                    // @ts-expect-error If forbids the second argument somehow
+                    window.require(["missing"], function () {});
+                }}
+            >
+                DojoLoaderError
+            </Button>
         </Space.Compact>
     );
 }
