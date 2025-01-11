@@ -1,7 +1,7 @@
 from binascii import crc32
 from dataclasses import dataclass
 from functools import lru_cache
-from typing import Optional, Union
+from typing import Union
 
 from pyramid.events import NewRequest
 from pyramid.httpexceptions import HTTPSeeOther
@@ -12,14 +12,13 @@ from nextgisweb.lib.config import Option, OptionAnnotations, OptionType
 from .util import viewargs
 
 FAMILIES = dict()
-FOPTIONS = []
 
 
 @dataclass(frozen=True)
 class Family:
     identity: str
     alias: str
-    required: Optional[Union[int, bool]]
+    required: Union[int, bool]
 
 
 class VersionOptionType(OptionType):
@@ -40,24 +39,32 @@ class VersionOptionType(OptionType):
 
 
 # fmt: off
-for f in (
+BROWSER_FAMILIES = (
     Family("chrome", "Chrome", 118),           # 2023-10
     Family("safari", "Safari", 17),            # 2023-09
     Family("edge", "Edge", 116),               # 2023-09
     Family("firefox", "Firefox", 115),         # 2023-07 ESR
     Family("opera", "Opera", 104),             # 2023-10
     Family("ie", "Internet Explorer", False),  # Not supported
-):
-# fmt: on
-    FAMILIES[f.identity] = f
-    FOPTIONS.append(Option("uacompat." + f.identity, otype=VersionOptionType, default=f.required))
-
-option_annotations = OptionAnnotations(
-    [
-        Option("uacompat.enabled", bool, default=True),
-    ]
-    + FOPTIONS
 )
+# fmt: on
+
+opt_ann_list = [Option("uacompat.enabled", bool, default=True)]
+for f in BROWSER_FAMILIES:
+    FAMILIES[f.identity] = f
+    opt_ann_list.append(
+        Option(
+            "uacompat." + f.identity,
+            otype=VersionOptionType,
+            default=f.required,
+        )
+    )
+
+option_annotations = OptionAnnotations(opt_ann_list)
+
+
+def get_header(request):
+    return request.user_agent
 
 
 @lru_cache(maxsize=64)
@@ -97,8 +104,7 @@ def subscriber(event):
     if not options["enabled"]:
         return
 
-    ua_str = request.user_agent
-
+    ua_str = get_header(request)
     if fam_ver := parse_header(ua_str):
         fam_id, cur = fam_ver
         req = options[fam_id]
@@ -113,7 +119,13 @@ def subscriber(event):
 
             raise HTTPSeeOther(
                 location=request.route_path(
-                    "pyramid.uacompat", _query=dict(next=request.path_qs, hash=hash)
+                    "pyramid.uacompat",
+                    _query=dict(
+                        fam=fam_id,
+                        ver=cur,
+                        next=request.path_qs,
+                        hash=hash,
+                    ),
                 )
             )
 
@@ -124,7 +136,7 @@ def page(request):
     arg_hash = request.GET.get("hash", None)
     arg_bypass = request.GET.get("bypass", "0").lower() == "1"
 
-    ua_str = request.GET.get("ua", request.user_agent)
+    ua_str = get_header(request)
     ua_hash = hash_header(ua_str) if ua_str is not None else None
 
     if arg_hash != ua_hash and arg_hash is not None:
