@@ -29,6 +29,7 @@ export function LayersPanel({ title, close, display, ...props }) {
                     />
                 </>
             }
+            close={close}
             epilog={
                 <BasemapSelector
                     {...{
