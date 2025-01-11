@@ -92,12 +92,8 @@ def handler(obj, request):
         raise HTTPBadRequest(explanation="Invalid REQUEST parameter value.")
 
 
-def _maker():
-    return ElementMaker()
-
-
 def _get_capabilities(obj, params, request):
-    E = _maker()
+    E = ElementMaker()
 
     OnlineResource = lambda url: E.OnlineResource(
         {"{%s}type" % NS_XLINK: "simple", "{%s}href" % NS_XLINK: url}
@@ -122,7 +118,7 @@ def _get_capabilities(obj, params, request):
         E.Request(
             E.GetCapabilities(E.Format("application/vnd.ogc.wms_xml"), DCPType()),
             E.GetMap(E.Format(IMAGE_FORMAT.PNG), E.Format(IMAGE_FORMAT.JPEG), DCPType()),
-            E.GetFeatureInfo(E.Format("text/html"), DCPType()),
+            E.GetFeatureInfo(E.Format("text/html"), E.Format("application/json"), DCPType()),
             E.GetLegendGraphic(E.Format(IMAGE_FORMAT.PNG), DCPType()),
         ),
         E.Exception(
@@ -401,6 +397,7 @@ def _get_feature_info(obj, params, request):
         request.resource_permission(DataScope.read, flayer)
 
         query = flayer.feature_query()
+        query.geom()
         query.intersects(qgeom)
 
         # Limit number of layer features so that we
@@ -424,21 +421,23 @@ def _get_feature_info(obj, params, request):
             break
 
     if p_info_format == "application/json":
-        result = [
-            dict(
-                keyname=result["keyname"],
-                display_name=result["display_name"],
-                features=[
-                    {
-                        fld.display_name: feature.fields[fld.keyname]
-                        for fld in result["feature_layer"].fields
-                    }
-                    for feature in result["features"]
-                ],
-            )
-            for result in results
-        ]
-        return Response(dumps(result), content_type="application/json", charset="utf-8")
+        data = dict(
+            type="FeatureCollection",
+            totalFeatures="unknown",
+            features=[],
+            crs=dict(type="name", properties=dict(name=f"urn:ogc:def:crs:EPSG::{epsg}")),
+        )
+        for result in results:
+            for f in result["features"]:
+                data["features"].append(
+                    dict(
+                        type="Feature",
+                        id=result["keyname"] + "." + str(f.id),
+                        properties=f.fields,
+                        geometry=f.geom.to_geojson(),
+                    )
+                )
+        return Response(dumps(data), content_type="application/json", charset="utf-8")
 
     return Response(
         render_template(

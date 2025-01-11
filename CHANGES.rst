@@ -7,6 +7,7 @@ Changes
 - Configurable SSL mode for PostGIS connections.
 - Enhanced support for date and time fields in WFS client.
 - Chrome 118+, Safari 17+, Edge 116+ or Firefox 115+ is required.
+- Enhanced support for JSON output format in the WMS services.
 
 4.9.0
 -----
