@@ -41,6 +41,11 @@ from .util import indented
 ModuleName = str
 TypeName = str
 Export = Tuple[ModuleName, TypeName]
+
+# FIXME: Placeholder to indicate a field is defined in __post_init__. However,
+# this approach is problematic and likely requires refactoring, as MsgSpec
+# 0.19.0 introduced a change where __post_init__ is now called not only during
+# construction but also during conversion (deserialization).
 POST_INIT = cast(Any, UNSET)
 
 
