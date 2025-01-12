@@ -9,7 +9,7 @@ export default () => {
     meta.queryAll().map((registry) => {
         const lit = (
             assertion: string,
-            callback: (val: BaseRegistry<unknown, NonNullable<unknown>>) => void
+            callback: (val: BaseRegistry) => void
         ) => {
             it(assertion, async () => {
                 await callback(await registry.load());

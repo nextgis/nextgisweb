@@ -2,7 +2,10 @@ import { matches } from "lodash-es";
 
 type Query<M extends NonNullable<unknown>> = ((i: M) => boolean) | Partial<M>;
 
-export class BaseRegistry<P, M extends NonNullable<unknown>> {
+export class BaseRegistry<
+    P extends NonNullable<unknown> = NonNullable<unknown>,
+    M extends NonNullable<unknown> = NonNullable<unknown>,
+> {
     readonly identity: string;
     protected readonly items = new Array<P>();
     protected _sealed = false;
