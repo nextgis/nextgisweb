@@ -147,13 +147,21 @@ export class PluginRegistry<
         return Array.from(this.query(query));
     }
 
-    load(query?: Query<M>): Promise<V> {
-        const item = this.queryAll(query)[0];
-        if (item === undefined)
-            throw new Error(
-                `No plugin found for selector: ${JSON.stringify(query)}`
-            );
-        return item.load();
+    queryOne(query?: Query<M>) {
+        let found = undefined;
+        for (const plugin of this.query(query)) {
+            if (found === undefined) {
+                found = plugin;
+            } else {
+                throw new Error("Multiple plugins found!");
+            }
+        }
+
+        if (found === undefined) {
+            throw new Error("No plugin found!");
+        }
+
+        return found;
     }
 }
 
@@ -169,7 +177,7 @@ export function pluginRegistry<
     | "registerValue"
     | "query"
     | "queryAll"
-    | "load"
+    | "queryOne"
 > {
     return new PluginRegistry<V, M>(identity);
 }

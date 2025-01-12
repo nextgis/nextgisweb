@@ -36,7 +36,7 @@
 
             require(["@nextgisweb/jsrealm/testentry/driver"], ({ registry }) => {
                 const teType = ${testentries[selected]['type'] | json_js};
-                registry.load({identity: teType}).then((runner) => {
+                registry.queryOne({identity: teType}).load().then((runner) => {
                     runner(${json_js(selected)}, element);
                 });
             })
