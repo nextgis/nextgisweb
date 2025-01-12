@@ -1,32 +1,17 @@
 from pathlib import Path
 
-from pyramid.httpexceptions import HTTPNotFound
-
-from nextgisweb.env import inject
-from nextgisweb.lib.json import loadb
-
 from nextgisweb.pyramid import viewargs
-
-from .component import JSRealmComponent
-
-
-@inject()
-def read_testentries(*, comp: JSRealmComponent):
-    return loadb((Path(comp.options["dist_path"]) / "main/testentry.json").read_bytes())
 
 
 @viewargs(renderer="mako")
 def testentry(request):
-    testentries = read_testentries()
-
     selected = "/".join(request.matchdict["subpath"])
     if selected == "":
         selected = None
-    elif selected not in testentries:
-        raise HTTPNotFound()
 
     return dict(
-        testentries=read_testentries(), selected=selected, title=selected if selected else ""
+        selected=selected,
+        title=selected or "Test entries",
     )
 
 

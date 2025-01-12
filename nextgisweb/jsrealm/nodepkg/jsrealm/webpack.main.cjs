@@ -5,6 +5,7 @@ const path = require("path");
 const CopyPlugin = require("copy-webpack-plugin");
 const ESLintPlugin = require("eslint-webpack-plugin");
 const ForkTsCheckerPlugin = require("fork-ts-checker-webpack-plugin");
+const { sortBy } = require("lodash");
 const { DefinePlugin } = require("webpack");
 const WebpackAssetsManifest = require("webpack-assets-manifest");
 
@@ -56,119 +57,159 @@ function scanForEntries() {
     return result;
 }
 
-let isDynamicEntry;
-let testentries, plRegistries, plFileScope;
+let isDynamicEntry, plRegistries, plFileToRegistry;
 
 const dynamicEntries = () => {
     const entrypoints = scanForEntries();
 
-    testentries = Object.fromEntries(
-        entrypoints
-            .filter(({ type }) => type === "testentry")
-            .map(({ entry, testentry: type }) => [entry, { type }])
-    );
-
-    plRegistries = [];
-    plFileScope = {};
-
-    const plScopeFiles = {};
+    plRegistries = {};
+    plFileToRegistry = {};
 
     entrypoints
         .filter(({ type }) => type === "registry")
-        .forEach(({ entry, fullname, registry }) => {
-            if (!registry) registry = config.pathToModule(fullname, true);
-            plRegistries.push({
-                scope: registry,
-                fullname,
-                entry,
+        .forEach(({ entry, fullname }) => {
+            const loaderFile = fullname.replace(/\.[tj]?sx?$/, ".inc.ts");
+            const loaderModule = fullname.replace(/(\.[tj]?sx?)?$/, ".inc");
+            plFileToRegistry[fullname] = plRegistries[entry] = {
                 component: config.pathToComponent(fullname),
-            });
+                fullname,
+                loaderFile,
+                loaderModule,
+                pluginFiles: [],
+                pluginModules: [],
+            };
         });
 
-    const plScopes = plRegistries.map((i) => i.scope);
     const plRegExp = /\s+from\s+["](@nextgisweb\/[^"]*)["];/g;
     entrypoints
         .filter(({ type }) => type === "plugin")
-        .forEach(({ plugin, fullname }) => {
-            if (!plugin) {
+        .forEach(({ entry, plugin: registry, fullname }) => {
+            if (!registry) {
                 const body = fs.readFileSync(fullname, { encoding: "utf-8" });
                 for (const [_, n] of body.matchAll(plRegExp)) {
-                    if (plScopes.includes(n)) {
-                        plugin = n;
+                    if (plRegistries[n] !== undefined) {
+                        registry = n;
                         break;
                     }
                 }
             }
-            if (plScopeFiles[plugin] === undefined) plScopeFiles[plugin] = [];
-            plFileScope[fullname] = plugin;
-            plScopeFiles[plugin].push(fullname);
+
+            const registryObject = plRegistries[registry];
+            registryObject.pluginFiles.push(fullname);
+            registryObject.pluginModules.push(entry);
+        });
+
+    entrypoints
+        .filter(({ type }) => type === "registry")
+        .forEach(({ entry, fullname, registry }) => {
+            registry = registry || config.pathToModule(fullname, true);
+
+            const registryObject = plRegistries[registry];
+            const plugins = registryObject.pluginModules;
+
+            const code = [
+                `/* eslint-disable @typescript-eslint/no-explicit-any */`,
+                `/* eslint-disable prettier/prettier */`,
+                `/* eslint-disable import/order */`,
+                ``,
+                `import { registry } from "${entry}";`,
+                ...plugins.map((f, i) => `import * as p${i + 1} from "${f}";`),
+                ``,
+                `export * from "${entry}";`,
+            ];
+
+            if (registry === "@nextgisweb/jsrealm/plugin/meta") {
+                for (const [entry, itm] of Object.entries(plRegistries)) {
+                    // Do not include meta registry itself
+                    if (entry === registry) continue;
+                    code.push(
+                        ``,
+                        `registry.registerLoader(`,
+                        `    "${itm.component}",`,
+                        `    () => import("${entry}").then(({ registry }) => registry as any),`,
+                        `    { identity: "${entry}" }`,
+                        `);`
+                    );
+                }
+            } else if (registry === "@nextgisweb/jsrealm/testentry/registry") {
+                const testentries = sortBy(
+                    entrypoints
+                        .filter(({ type }) => type === "testentry")
+                        .map(({ entry, testentry, fullname }) => ({
+                            component: config.pathToComponent(fullname),
+                            driver: testentry,
+                            entry: entry,
+                        })),
+                    ["entry"]
+                );
+
+                for (const { component, driver, entry } of testentries) {
+                    code.push(
+                        ``,
+                        `registry.register("${component}", {`,
+                        `    identity: "${entry}",`,
+                        `    driver: "${driver}",`,
+                        `    value: () => import("${entry}")`,
+                        `});`
+                    );
+                }
+            }
+
+            code.push("", "registry.seal();");
+
+            if (plugins.length > 0) {
+                // Side-effect to prevent tree shaking
+                const px = plugins.map((_, i) => `p${i + 1}`);
+                code.push("", `[${px.join(", ")}];`);
+            }
+
+            const codeString = code.join("\n") + "\n";
+            if (
+                !fs.existsSync(registryObject.loaderFile) ||
+                fs.readFileSync(registryObject.loaderFile, {
+                    encoding: "utf-8",
+                }) !== codeString
+            ) {
+                fs.writeFileSync(registryObject.loaderFile, codeString);
+            }
         });
 
     const webpackEntries = Object.fromEntries(
         entrypoints
-            .filter(({ type }) => type !== "plugin")
-            .map(({ type, entry, fullname, registry }) => {
-                if (type === "registry") {
-                    if (!registry)
-                        registry = config.pathToModule(fullname, true);
-
-                    const wrapper = fullname.replace(
-                        /\.[tj]?sx?$/,
-                        "-wrapper.js"
-                    );
-
-                    const code = [
-                        withChunks(entry),
-                        `import entrypoint from "@nextgisweb/jsrealm/entrypoint";`,
-                        `import { registry } from "${fullname}";`,
-                        ...(plScopeFiles[registry] || []).map(
-                            // Import + side-effect to avoid shaking out
-                            (fn, i) => `import * as m${i} from "${fn}"; m${i};`
-                        ),
-                    ];
-
-                    const metaRegistry = "@nextgisweb/jsrealm/plugin/meta";
-                    if (registry === metaRegistry) {
-                        for (const itm of plRegistries) {
-                            // Do not include meta registry itself
-                            if (itm.scope === metaRegistry) continue;
-                            code.push(
-                                `registry.register(`,
-                                `    "${itm.component}",`,
-                                `    () => entrypoint("${itm.entry}").then(({ registry }) => ({ default: registry })),`,
-                                `    { identity: "${itm.scope}" },`,
-                                `);`
-                            );
-                        }
-                    }
-
-                    code.push(
-                        `export * from "${fullname}";`,
-                        `if (!registry) throw new Error("Registry '${registry}' is not defined");`,
-                        "registry.seal();"
-                    );
-
-                    return [
-                        entry,
-                        {
-                            import: virtualImport(wrapper, code, entry),
-                            library: { type: "amd", name: entry },
-                        },
-                    ];
-                } else {
-                    return [
-                        entry,
-                        {
-                            import: injectCode(fullname, withChunks(entry)),
-                            library: { type: "amd", name: entry },
-                        },
-                    ];
-                }
+            .filter(({ type }) => type === "entrypoint")
+            .map(({ entry, fullname }) => {
+                return [
+                    entry,
+                    {
+                        import: injectCode(fullname, withChunks(entry)),
+                        library: { type: "amd", name: entry },
+                    },
+                ];
             })
     );
 
     isDynamicEntry = (m) => webpackEntries[m] !== undefined;
     return webpackEntries;
+};
+
+const registryResolver = {
+    apply(resolver) {
+        resolver.hooks.result.tap("registryResolver", (result) => {
+            const registryObject = plFileToRegistry[result.path];
+            if (registryObject) {
+                const issuer = result.context.issuer;
+                if (
+                    issuer === registryObject.loaderFile ||
+                    registryObject.pluginFiles.includes(issuer)
+                ) {
+                    return result;
+                } else {
+                    result.path = registryObject.loaderFile;
+                    return result;
+                }
+            }
+        });
+    },
 };
 
 const staticEntries = {};
@@ -304,12 +345,6 @@ const webpackAssetsManifestPlugin = new WebpackAssetsManifest({
 
         return result;
     },
-
-    done(manifest) {
-        // Piggyback on the assets manifest hook to write testentry.json
-        const fn = manifest.compiler.outputPath + "/testentry.json";
-        fs.writeFileSync(fn, JSON.stringify(testentries));
-    },
 });
 
 /* Does the path belongs to NGW component with JS package? */ /* prettier-ignore */
@@ -389,7 +424,7 @@ const webpackConfig = defaults("main", (env) => ({
     },
     resolve: {
         extensions: [".tsx", ".ts", "..."],
-        plugins: [new iconUtil.IconResolverPlugin()],
+        plugins: [registryResolver, new iconUtil.IconResolverPlugin()],
     },
     plugins: [
         new CopyPlugin({
@@ -432,7 +467,7 @@ const webpackConfig = defaults("main", (env) => ({
         chunkFilename: "chunk/[id].js",
     },
     externals: [
-        function ({ context, request, contextInfo }, callback) {
+        function ({ context, request }, callback) {
             // Use AMD loader for with-chunks!some-entrypoint-name imports.
             if (request.startsWith("@nextgisweb/jsrealm/with-chunks!")) {
                 return callback(null, `amd ${request}`);
@@ -467,18 +502,6 @@ const webpackConfig = defaults("main", (env) => ({
                 if (isDynamicEntry(rmod)) {
                     if (rmod === "@nextgisweb/pyramid/i18n" && !rarg) {
                         rarg = config.pathToComponent(context);
-                    }
-
-                    // If it's a plugin for some registry, we must import an
-                    // unwrapped registry module. Plugins must import registries
-                    // from modules with @registry.
-                    const iscope = plFileScope[contextInfo.issuer];
-                    if (iscope) {
-                        for (const { scope, entry } of plRegistries) {
-                            if (iscope === scope && rmod === entry) {
-                                return callback();
-                            }
-                        }
                     }
 
                     const mod = rmod + (rarg !== undefined ? "!" + rarg : "");
