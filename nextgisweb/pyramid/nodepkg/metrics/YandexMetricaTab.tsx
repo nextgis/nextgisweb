@@ -1,21 +1,19 @@
 import { useState } from "react";
+import type { FC } from "react";
 
 import { CheckboxValue, InputValue } from "@nextgisweb/gui/antd";
 import { Area, Lot } from "@nextgisweb/gui/mayout";
-import type { Metrics } from "@nextgisweb/pyramid/type/api";
 
 import { gettext } from "../i18n";
 
 import type { TabProps } from "./tab";
 
-type TabValue = NonNullable<Metrics["yandex_metrica"]>;
-
-export default function YandexMetricaTab({
+const YandexMetricaTab: FC<TabProps<"yandex_metrica">> = ({
     value,
     onChange,
     readonly,
-}: TabProps<TabValue>) {
-    const [ivalue, setIvalue] = useState<TabValue>(() => ({
+}) => {
+    const [ivalue, setIvalue] = useState<NonNullable<typeof value>>(() => ({
         id: value?.id || "",
         webvisor: value?.webvisor || false,
     }));
@@ -39,7 +37,6 @@ export default function YandexMetricaTab({
                     allowClear
                 />
             </Lot>
-
             <Lot>
                 <CheckboxValue
                     value={ivalue.webvisor}
@@ -53,4 +50,8 @@ export default function YandexMetricaTab({
             </Lot>
         </Area>
     );
-}
+};
+
+YandexMetricaTab.displayName = "YandexMetricaTab";
+
+export default YandexMetricaTab;

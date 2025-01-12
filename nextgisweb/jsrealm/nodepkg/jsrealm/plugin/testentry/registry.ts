@@ -1,9 +1,9 @@
 /** @registry */
-import { pluginRegistry } from "../registry";
+import { loaderRegistry } from "../loader";
 
 export type Operation = "create" | "update" | "delete";
 
-export const registry = pluginRegistry<
+export const registry = loaderRegistry<
     (what: string) => string,
     { operation: Operation }
 >(MODULE_NAME);

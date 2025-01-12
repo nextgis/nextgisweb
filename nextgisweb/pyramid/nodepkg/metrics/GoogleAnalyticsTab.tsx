@@ -1,21 +1,19 @@
 import { useState } from "react";
+import type { FC } from "react";
 
 import { InputValue } from "@nextgisweb/gui/antd";
 import { Area, Lot } from "@nextgisweb/gui/mayout";
-import type { Metrics } from "@nextgisweb/pyramid/type/api";
 
 import { gettext } from "../i18n";
 
 import type { TabProps } from "./tab";
 
-type TabValue = NonNullable<Metrics["google_analytics"]>;
-
-export default function GoogleAnalyticsTab({
+const GoogleAnalyticsTab: FC<TabProps<"google_analytics">> = ({
     value,
     onChange,
     readonly,
-}: TabProps<TabValue>) {
-    const [ivalue, setIvalue] = useState<TabValue>(() => ({
+}) => {
+    const [ivalue, setIvalue] = useState<NonNullable<typeof value>>(() => ({
         id: value?.id || "",
     }));
 
@@ -40,4 +38,8 @@ export default function GoogleAnalyticsTab({
             </Lot>
         </Area>
     );
-}
+};
+
+GoogleAnalyticsTab.displayName = "GoogleAnalyticsTab";
+
+export default GoogleAnalyticsTab;

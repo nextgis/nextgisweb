@@ -2,12 +2,13 @@
 import { assert } from "chai";
 
 import { meta } from "..";
-import type { PluginRegistry } from "..";
+import { LoaderObject } from "../loader";
+import type { BaseRegistry } from "../registry";
 
 meta.queryAll().map((registry) => {
     const lit = (
         assertion: string,
-        callback: (val: PluginRegistry) => void
+        callback: (val: BaseRegistry<unknown, NonNullable<unknown>>) => void
     ) => {
         it(assertion, async () => {
             await callback(await registry.load());
@@ -17,9 +18,11 @@ meta.queryAll().map((registry) => {
     describe(registry.identity, () => {
         lit("has been sealed", (r) => assert.isTrue(r.status().sealed));
         lit("has some plugins", (r) => assert.isAtLeast(r.status().count, 0));
-        lit("all plugins can be loaded", async (r) => {
+        lit("plugins can be loaded", async (r) => {
             for (const p of r.query()) {
-                await p.load();
+                if (p instanceof LoaderObject) {
+                    await p.load();
+                }
             }
         });
     });

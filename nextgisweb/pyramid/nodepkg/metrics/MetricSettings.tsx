@@ -1,10 +1,13 @@
-import { useEffect, useMemo, useState } from "react";
+import { isEqual } from "lodash-es";
+import { Suspense, lazy, useEffect, useMemo, useState } from "react";
+import type { FC } from "react";
 import { Balancer } from "react-wrap-balancer";
 
 import { Button, Card, Dropdown, Tabs, message } from "@nextgisweb/gui/antd";
 import { SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
 import type { ApiError } from "@nextgisweb/gui/error/type";
+import { useUnsavedChanges } from "@nextgisweb/gui/hook";
 import type { Metrics } from "@nextgisweb/pyramid/type/api";
 
 import { route } from "../api";
@@ -12,7 +15,7 @@ import { gettext } from "../i18n";
 import { PageTitle } from "../layout";
 
 import { registry } from "./tab";
-import type { MetricSettingsTab, PyramidMetricsComponent } from "./type";
+import type { TabProps, TabValue } from "./tab";
 
 import "./MetricSettings.less";
 
@@ -32,30 +35,37 @@ const PlaceholderCard = () => (
     </Card>
 );
 
-function useTabComponents() {
-    const [value, setValue] = useState<MetricSettingsTab[]>();
-    useEffect(() => {
-        const promises: Promise<MetricSettingsTab>[] = [];
-        for (const tab of registry.query()) {
-            promises.push(
-                tab.load().then((component) => ({
-                    key: tab.key as keyof Metrics,
-                    label: tab.label,
-                    component: component as PyramidMetricsComponent,
-                }))
-            );
-        }
-        Promise.all(promises).then(setValue);
-    }, []);
-    return value;
-}
+type WidgetComponent = {
+    [K in keyof Metrics]-?: FC<TabProps<K>>;
+}[keyof Metrics];
 
 export function MetricsSettings() {
-    const tabComponents = useTabComponents();
-
+    const [initial, setInitial] = useState<Metrics>();
     const [value, setValue] = useState<Metrics>();
     const [status, setStatus] = useState<string | null>("loading");
     const [activeTab, setActiveTab] = useState<string>();
+
+    const tabs = useMemo(() => {
+        return registry.queryAll().map(({ key, label, widget }) => {
+            const Widget = lazy<WidgetComponent>(widget);
+            const onChange = (value: TabValue | null) => {
+                setValue((stateValue) => ({
+                    ...stateValue,
+                    ...{ [key]: value },
+                }));
+            };
+
+            return {
+                key,
+                label,
+                component: (props: Omit<TabProps, "onChange">) => (
+                    <Suspense>
+                        <Widget onChange={onChange} {...props} />
+                    </Suspense>
+                ),
+            };
+        });
+    }, []);
 
     useEffect(() => {
         route("pyramid.csettings")
@@ -64,41 +74,37 @@ export function MetricsSettings() {
             })
             .then((data) => {
                 if (data.pyramid) {
+                    setInitial(data.pyramid.metrics);
                     setValue(data.pyramid.metrics);
                     setStatus(null);
                 }
             });
     }, []);
 
+    const dirty = !isEqual(initial, value);
+    useUnsavedChanges({ dirty });
+
     const [titems, aitems] = useMemo(() => {
-        if (value === undefined || tabComponents === undefined) return [];
+        if (value === undefined) return [];
 
         const titems = [];
         const aitems = [];
         const readonly = status !== null;
 
-        for (const { key, label, component: Component } of tabComponents) {
+        for (const { key, label, component: Component } of tabs) {
             const val = value[key];
             if (val !== undefined) {
                 titems.push({
                     key: key,
                     label: label,
-                    children: (
-                        <Component
-                            value={val}
-                            onChange={(val) => {
-                                setValue({ ...value, ...{ [key]: val } });
-                            }}
-                            {...{ readonly }}
-                        />
-                    ),
+                    children: <Component value={val} readonly={readonly} />,
                 });
             } else {
                 aitems.push({ key, label });
             }
         }
         return [titems, aitems];
-    }, [value, tabComponents, status]);
+    }, [value, status, tabs]);
 
     const [messageApi, contextHolder] = message.useMessage();
 
@@ -126,6 +132,8 @@ export function MetricsSettings() {
             await route("pyramid.csettings").put({
                 json: { pyramid: { metrics: payload } },
             });
+
+            setInitial(value);
 
             messageApi.open({
                 type: "success",
@@ -175,6 +183,7 @@ export function MetricsSettings() {
                     )}
                     <div>
                         <SaveButton
+                            disabled={!dirty}
                             loading={status === "saving"}
                             onClick={save}
                         />

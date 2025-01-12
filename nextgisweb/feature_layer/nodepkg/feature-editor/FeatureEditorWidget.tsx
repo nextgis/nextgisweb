@@ -98,10 +98,9 @@ export const FeatureEditorWidget = observer(
 
         useEffect(() => {
             const loadWidgets = async () => {
-                const newTabs: TabItem[] = [];
-                for (const p of registry.query()) {
-                    newTabs.push(await createEditorTab(await p.load()));
-                }
+                const newTabs = await Promise.all(
+                    registry.queryAll().map(createEditorTab)
+                );
                 newTabs.sort((a, b) => (a.order ?? 100) - (b.order ?? 100));
                 setItems(newTabs);
             };

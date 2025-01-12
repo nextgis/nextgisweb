@@ -1,7 +1,7 @@
 /** @registry */
-import { pluginRegistry } from "../../plugin";
+import { loaderRegistry } from "../../plugin";
 
-export const registry = pluginRegistry<
+export const registry = loaderRegistry<
     (module: string, el: HTMLElement) => void,
     { identity: string }
 >(MODULE_NAME);

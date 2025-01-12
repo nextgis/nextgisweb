@@ -1,7 +1,9 @@
 /** @registry */
-import { pluginRegistry } from "./registry";
-import type { PluginRegistry } from "./registry";
+import { loaderRegistry } from "./loader";
+import type { BaseRegistry } from "./registry";
 
-export const registry = pluginRegistry<PluginRegistry, { identity: string }>(
-    MODULE_NAME
-);
+/** Registry of all registries for testing purposes */
+export const registry = loaderRegistry<
+    BaseRegistry<unknown, NonNullable<unknown>>,
+    { identity: string }
+>(MODULE_NAME);
