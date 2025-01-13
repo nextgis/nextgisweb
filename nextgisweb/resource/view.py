@@ -193,7 +193,8 @@ def delete(request):
     request.resource_permission(ResourceScope.read)
     return dict(
         entrypoint="@nextgisweb/resource/delete-page",
-        props=dict(id=request.context.id),
+        # Delete page is universal for multiple resources deletion which is why resources is an array
+        props=dict(resources=[request.context.id], navigateToId=request.context.parent.id),
         title=gettext("Delete resource"),
         obj=request.context,
         maxheight=True,

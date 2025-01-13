@@ -18,13 +18,23 @@ import { ExclamationCircleFilled } from "@ant-design/icons";
 
 const { Text, Paragraph, Title } = Typography;
 
-interface DeletePageProps {
-    resources: number[];
-    navigateToId: number;
-    isModal: boolean;
-    onCancel?: () => void;
-    onOk?: () => void;
+interface IsModal {
+    navigateToId?: never;
+    isModal: true;
+    onCancel: () => void;
+    onOk: () => void;
 }
+
+interface NotModal {
+    navigateToId: number;
+    isModal: false;
+    onCancel?: never;
+    onOk?: never;
+}
+
+type DeletePageProps = {
+    resources: number[];
+} & (IsModal | NotModal);
 
 const msgMultiple = (
     affected: ResourceAffected,
@@ -52,19 +62,18 @@ const msgMultiple = (
 export function DeletePage({
     resources,
     navigateToId,
-    onCancel = undefined,
-    onOk = undefined,
+    isModal = false,
+    onCancel,
+    onOk,
 }: DeletePageProps) {
     const [deletingInProgress, setDeletingInProgress] = useState(false);
 
-    if (!onCancel && resources.length === 1) {
+    if (!isModal && navigateToId !== undefined) {
         const resUrl = routeURL("resource.show", {
             id: resources[0],
         });
         onCancel = () => window.open(resUrl, "_self");
-    }
 
-    if (!onOk) {
         const parentResourceUrl = routeURL("resource.show", {
             id: navigateToId,
         });
@@ -101,6 +110,7 @@ export function DeletePage({
                 },
                 body: "",
             });
+            // @ts-expect-error onOk should always defined
             onOk();
         } catch (err) {
             errorModal(err as ApiError);
@@ -118,11 +128,11 @@ export function DeletePage({
                         style={{
                             fontSize: 22,
                             color: "#faad14",
-                            marginTop: "27px",
+                            marginTop: "0.75px",
                         }}
                     />
                     <Paragraph>
-                        <Title level={5}>
+                        <Title level={5} style={{ marginTop: 0 }}>
                             {gettext("Confirmation required")}
                         </Title>
                         <Text>
