@@ -1,30 +1,3 @@
-import type { WebMapCSettingsRead } from "@nextgisweb/webmap/type/api";
+import type settings from "@nextgisweb/pyramid/settings!webmap";
 
-interface BaseMap {
-    base: {
-        keyname: string;
-        mid: string;
-    };
-    layer: {
-        title: string;
-        visible?: boolean;
-    };
-    source: Record<string, unknown>;
-}
-
-interface Adapters {
-    tile: {
-        display_name: string;
-    };
-    image: {
-        display_name: string;
-    };
-}
-
-export interface WebMapSettings extends WebMapCSettingsRead {
-    basemaps: BaseMap[];
-    editing: boolean;
-    annotation: boolean;
-    adapters: Adapters;
-    check_origin: boolean;
-}
+export type WebMapSettings = typeof settings;
