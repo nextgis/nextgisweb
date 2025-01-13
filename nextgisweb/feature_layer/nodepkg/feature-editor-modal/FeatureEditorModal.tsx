@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { Button, Modal } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -22,16 +22,17 @@ const [msgConfirmTitle, msgConfirmContent] = [
 ];
 
 export function FeatureEditorModal({
-    open: open_,
+    open: openProp,
     editorOptions,
+    onCancel,
     ...modalProps
 }: FeatureEditorModalProps) {
-    const [open, setOpen] = useState(open_);
+    const [open, setOpen] = useState(openProp);
     const { resourceId, featureId, onSave, mode, onOk } = editorOptions || {};
     const [modal, contextHolder] = Modal.useModal();
 
     if (typeof resourceId !== "number") {
-        throw new Error("The `editorOptions.resourceId` are reuqired");
+        throw new Error("The `editorOptions.resourceId` is reuqired");
     }
     const [store] = useState(
         () =>
@@ -45,22 +46,29 @@ export function FeatureEditorModal({
         setOpen(false);
     };
 
-    const handleClose = () => {
-        if (store.dirty) {
-            modal.confirm({
-                title: msgConfirmTitle,
-                content: msgConfirmContent,
-                onOk: close,
-                onCancel: () => {},
-            });
-        } else {
-            close();
-        }
-    };
+    const handleClose = useCallback(
+        (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+            const close_ = () => {
+                onCancel?.(e);
+                close();
+            };
+
+            if (store.dirty) {
+                modal.confirm({
+                    title: msgConfirmTitle,
+                    content: msgConfirmContent,
+                    onOk: close_,
+                });
+            } else {
+                close_();
+            }
+        },
+        [modal, onCancel, store.dirty]
+    );
 
     useEffect(() => {
-        setOpen(open_);
-    }, [open_]);
+        setOpen(openProp);
+    }, [openProp]);
 
     return (
         <>

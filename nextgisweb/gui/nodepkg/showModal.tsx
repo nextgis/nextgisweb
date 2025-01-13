@@ -43,6 +43,7 @@ export default function showModal<
     } = config;
 
     const destroy = () => {
+        // To avoid attempt to synchronously unmount a root while React was already rendering.
         Promise.resolve().then(() => {
             root.unmount();
         });
