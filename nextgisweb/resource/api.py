@@ -283,12 +283,10 @@ def _delete_multiple(request, resource_ids, partial, *, dry_run):
         else:
             try:
                 resource_affected = delete(resource)
-            except UserException as exc:
+            except UserException:
                 if not partial:
                     raise
-                if not isinstance(exc, InsufficientPermissions) and resource.has_permission(
-                    ResourceScope.read, request.user
-                ):
+                if resource.has_permission(ResourceScope.read, request.user):
                     cls = resource.cls
             else:
                 for k, v in resource_affected.items():
