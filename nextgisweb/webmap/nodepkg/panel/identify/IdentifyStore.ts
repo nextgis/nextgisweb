@@ -4,7 +4,7 @@ import { PanelStore } from "@nextgisweb/webmap/panel";
 
 import type { IdentifyInfo } from "./identification";
 
-export class IdentifyStore extends PanelStore {
+class IdentifyStore extends PanelStore {
     @observable accessor identifyInfo: IdentifyInfo | undefined = undefined;
 
     @action
@@ -12,3 +12,5 @@ export class IdentifyStore extends PanelStore {
         this.identifyInfo = value;
     }
 }
+
+export default IdentifyStore;

@@ -3,19 +3,25 @@ import type { ReactNode } from "react";
 
 import type { Display } from "../display";
 
-import type { PanelPlugin, PanelWidget } from ".";
+import type { PanelPlugin, PanelWidgetProps } from ".";
+
+export interface PanelStoreConstructorOptions {
+    plugin: PanelPlugin;
+    display: Display;
+}
 
 export class PanelStore {
     readonly name: string;
-    readonly plugin: PanelPlugin;
-    readonly display: Display;
+
+    public readonly plugin: PanelPlugin;
+    public readonly display: Display;
 
     @observable.ref accessor title: string;
     @observable.ref accessor order: number;
 
-    private loadPromise?: Promise<PanelWidget<PanelStore>> = undefined;
+    private loadPromise?: Promise<React.FC<PanelWidgetProps<PanelStore>>>;
 
-    constructor(plugin: PanelPlugin, display: Display) {
+    constructor({ plugin, display }: PanelStoreConstructorOptions) {
         this.plugin = plugin;
         this.display = display;
 
@@ -29,13 +35,13 @@ export class PanelStore {
     }
 
     get applyToTinyMap(): boolean {
-        return this.applyToTinyMap;
+        return this.plugin.applyToTinyMap ?? false;
     }
 
-    async load(): Promise<PanelWidget<PanelStore>> {
+    async load(): Promise<React.FC<PanelWidgetProps<PanelStore>>> {
         if (!this.loadPromise) {
             this.loadPromise = (async () => {
-                const component = await this.plugin.load();
+                const component = (await this.plugin.widget()).default;
                 await this.plugin.startup?.(this.display);
                 return component;
             })();

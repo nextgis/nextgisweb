@@ -5,7 +5,8 @@ import { registry } from "@nextgisweb/webmap/panel/registry";
 
 import SearchIcon from "@nextgisweb/icon/material/search";
 
-registry.register(COMP_ID, () => import("./SearchPanel"), {
+registry.register(COMP_ID, {
+    widget: () => import("./SearchPanel"),
     name: "search",
     title: gettext("Search"),
     icon: <SearchIcon />,
