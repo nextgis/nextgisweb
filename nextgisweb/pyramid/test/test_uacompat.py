@@ -1,3 +1,5 @@
+from urllib.parse import parse_qs, urlparse
+
 import pytest
 
 from ..uacompat import parse_header
@@ -63,7 +65,11 @@ def test_redirect(ngw_env, ngw_webtest_app, ngw_auth_administrator):
             status=303,
         )
         redir = resp.headers["Location"].replace("http://localhost", "")
-        assert redir == "/uacompat?next=%2Fresource%2F0&hash=9960451c"
+        up = urlparse(redir)
+        assert up.path == "/uacompat"
+        query = parse_qs(up.query)
+        assert query["next"][0] == "/resource/0"
+        assert query["hash"][0] == "9960451c"
 
         # Without the same User-Agent it must redirect to the original location
         resp = ngw_webtest_app.get(redir, status=303)
