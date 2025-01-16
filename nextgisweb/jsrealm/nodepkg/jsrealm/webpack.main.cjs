@@ -95,8 +95,12 @@ const dynamicEntries = () => {
             }
 
             const registryObject = plRegistries[registry];
-            registryObject.pluginFiles.push(fullname);
-            registryObject.pluginModules.push(entry);
+            if (registryObject) {
+                registryObject.pluginFiles.push(fullname);
+                registryObject.pluginModules.push(entry);
+            } else {
+                console.log(`Registry missing for ${entry}`);
+            }
         });
 
     entrypoints
