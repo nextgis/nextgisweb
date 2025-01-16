@@ -685,9 +685,9 @@ def _validate_geom(geom, target, *, fix_errors, fid):
             if wkb_type in _wkb_polygons:
                 for ring_idx, ring in _iter_reversed_geom(part):
                     if (ring_points := ring.GetPointCount()) == 0:
-                        if wkb_type in _wkb_single:
-                            pass  # POLYGON EMPTY
-                        elif fix_errors == FIX_ERRORS.NONE:
+                        if fix_errors == FIX_ERRORS.NONE or (
+                            ring_idx == 0 and wkb_type in _wkb_single
+                        ):
                             raise FeatureError(gettext("Feature #%d has empty rings.") % fid)
                         elif ring_idx == 0:
                             geom.RemoveGeometry(part_idx)
