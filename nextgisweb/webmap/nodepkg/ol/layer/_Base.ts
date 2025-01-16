@@ -18,7 +18,7 @@ export interface LayerOptions {
 interface LayerWatchableProps {
     opacity: number;
     visibility: boolean;
-    symbols: string[];
+    symbols: string[] | "-1";
 }
 
 export type ExtendedOlLayer<
@@ -40,7 +40,7 @@ export abstract class CoreLayer<
 
     @observable accessor opacity: number = 1;
     @observable accessor visibility: boolean = true;
-    @observable.shallow accessor symbols: string[] = [];
+    @observable accessor symbols: "-1" | string[] = [];
     @observable.shallow accessor itemConfig: LayerItemConfig | null = null;
 
     protected abstract createSource(options: TSourceOptions): TSource;
@@ -110,11 +110,11 @@ export abstract class CoreLayer<
     }
 
     @action
-    setSymbols(symbols: string[]): void {
+    setSymbols(symbols: string[] | "-1"): void {
         const oldSymbold = this.symbols;
-        if (symbols[0] === "-1") {
+        if (symbols === "-1") {
             this.olLayer.setSource(null);
-        } else if (this.symbols[0] === "-1") {
+        } else if (this.symbols === "-1") {
             this.olLayer.setSource(this.olSource);
         }
         this.notify("symbols", oldSymbold, symbols);
@@ -161,7 +161,9 @@ export abstract class CoreLayer<
 
     /** @deprecated use {@link _Base.visibility}, {@link _Base.opacity}, or {@link _Base.symbols} */
     @action
-    get(property: keyof LayerWatchableProps): boolean | number | string[] {
+    get(
+        property: keyof LayerWatchableProps
+    ): boolean | number | string[] | "-1" {
         switch (property) {
             case "visibility":
                 return this.visibility;
