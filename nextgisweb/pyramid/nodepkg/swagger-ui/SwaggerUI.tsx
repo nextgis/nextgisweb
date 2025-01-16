@@ -1,3 +1,4 @@
+// @ts-expect-error - @types/swagger-ui-react has nested dependencies for latest @types/react
 import SwaggerUIReact from "swagger-ui-react";
 
 import { routeURL } from "@nextgisweb/pyramid/api";
