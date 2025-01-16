@@ -354,29 +354,25 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
                 tab_geom_type = row["type"]
 
-                if tab_geom_type == "GEOMETRY" and self.geometry_type is None:
-                    raise ValidationError(
-                        gettext(
-                            "Geometry type missing in geometry_columns table! You should specify it manually."
+                if tab_geom_type == "GEOMETRY":
+                    if self.geometry_type is None:
+                        raise ValidationError(
+                            gettext(
+                                "Geometry type missing in geometry_columns table! You should specify it manually."
+                            )
                         )
-                    )
+                else:
+                    if row["coord_dimension"] == 3:
+                        tab_geom_type += "Z"
 
-                if row["coord_dimension"] == 3:
-                    tab_geom_type += "Z"
-
-                if (
-                    self.geometry_type is not None
-                    and tab_geom_type != "GEOMETRY"
-                    and self.geometry_type != tab_geom_type
-                ):
-                    raise ValidationError(
-                        gettext(
-                            "Geometry type in geometry_columns table does not match specified!"
+                    if self.geometry_type is None:
+                        self.geometry_type = tab_geom_type
+                    elif tab_geom_type != self.geometry_type:
+                        raise ValidationError(
+                            gettext(
+                                "Geometry type in geometry_columns table does not match specified!"
+                            )
                         )
-                    )
-
-                if self.geometry_type is None:
-                    self.geometry_type = tab_geom_type
 
             colfound_id = False
             colfound_geom = False
