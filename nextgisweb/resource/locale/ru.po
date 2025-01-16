@@ -385,15 +385,15 @@ msgstr ""
 msgid "{} resource will be permanently deleted."
 msgid_plural "{} resources will be permanently deleted."
 msgstr[0] "{} ресурс будет удален навсегда."
-msgstr[1] "{} ресурса будет удалены навсегда."
-msgstr[2] "{} ресурсов будет удалены навсегда."
+msgstr[1] "{} ресурса будут удалены навсегда."
+msgstr[2] "{} ресурсов будут удалены навсегда."
 
 #: nodepkg/delete-page/util.ts:41
 msgid "{} resource cannot be deleted."
 msgid_plural "{} resources cannot be deleted."
-msgstr[0] "{} дочерний ресурс не может быть удален."
-msgstr[1] "{} дочерних ресурса не могут быть удалены."
-msgstr[2] "{} дочерних ресурсов не могут быть удалены."
+msgstr[0] "{} ресурс не может быть удален."
+msgstr[1] "{} ресурса не могут быть удалены."
+msgstr[2] "{} ресурсов не могут быть удалены."
 
 #: nodepkg/delete-page/util.ts:47
 msgid "Please confirm the permanent deletion of {} resource."
