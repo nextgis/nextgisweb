@@ -100,7 +100,7 @@ def components_and_locales(args, work_in_progress=False):
         elif check_package and k in pkginfo.packages:
             filter_package.append(k)
         else:
-            logger.warning("Component or package [%s] not found.", k)
+            raise RuntimeError("Component or package [%s] not found.", k)
 
     for comp_id in env.components.keys():
         if len(filter_comp) > 0 and comp_id not in filter_comp:
