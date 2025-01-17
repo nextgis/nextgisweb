@@ -29,17 +29,25 @@ function handleVisibleDeprecation<T extends ShowModalOptions>(config: T): T {
     return restConfig as T;
 }
 
-// Based on https://github.com/ant-design/ant-design/blob/master/components/modal/confirm.tsx
 export default function showModal<
     T extends ShowModalOptions = ShowModalOptions,
 >(ModalComponent: (props: T) => ReactElement, config: T) {
     const container = document.createDocumentFragment();
+    const root = createRoot(container);
 
     config = handleVisibleDeprecation(config);
+    const {
+        onCancel: originalOnCancel,
+        afterClose: originalAfterClose,
+        ...restConfig
+    } = config;
 
-    let currentConfig: T = { ...config, open: config.open ?? true };
-
-    const root = createRoot(container);
+    const destroy = () => {
+        // To avoid attempt to synchronously unmount a root while React was already rendering.
+        Promise.resolve().then(() => {
+            root.unmount();
+        });
+    };
 
     const render = (props: T) => {
         root.render(
@@ -49,16 +57,12 @@ export default function showModal<
         );
     };
 
+    let currentConfig: T;
+
     const close = () => {
         currentConfig = {
             ...currentConfig,
             open: false,
-            afterClose: () => {
-                if (typeof config.afterClose === "function") {
-                    config.afterClose();
-                }
-                root.unmount();
-            },
         };
         render(currentConfig);
     };
@@ -76,12 +80,24 @@ export default function showModal<
         render(currentConfig);
     }
 
-    currentConfig.close = close;
+    currentConfig = {
+        ...restConfig,
+        open: config.open ?? true,
+        afterClose: () => {
+            originalAfterClose?.();
+            destroy();
+        },
+        onCancel: (e) => {
+            originalOnCancel?.(e);
+            close();
+        },
+        close,
+    } as T;
 
     render(currentConfig);
 
     return {
-        destroy: close,
+        destroy,
         close,
         update,
     };
