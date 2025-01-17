@@ -19,7 +19,6 @@ import { msgDeleteButton, msgMultiple, msgResourcesCount } from "./util";
 
 import "./DeletePage.less";
 
-
 export function DeletePage({
     resources,
     navigateToId,
@@ -81,24 +80,26 @@ export function DeletePage({
         <div className="ngw-resource-delete-page">
             {msgMultiple(data.affected, data.unaffected)}
 
-            <div className={classNames("table", isModal && "modal")}>
-                <div>
-                    {sortedData?.map(({ cls, count, label }) => (
-                        <div key={cls}>
-                            <ResourceIcon
-                                identity={cls as ResourceCls}
-                                style={{
-                                    width: "16px",
-                                    height: "16px",
-                                }}
-                            />
-                            <div>{label}</div>
-                            <div className="count">{count}</div>
-                            <div>{msgResourcesCount(count)}</div>
-                        </div>
-                    ))}
+            {sortedData && sortedData.length > 0 && (
+                <div className={classNames("table", isModal && "modal")}>
+                    <div>
+                        {sortedData.map(({ cls, count, label }) => (
+                            <div key={cls}>
+                                <ResourceIcon
+                                    identity={cls as ResourceCls}
+                                    style={{
+                                        width: "16px",
+                                        height: "16px",
+                                    }}
+                                />
+                                <div>{label}</div>
+                                <div className="count">{count}</div>
+                                <div>{msgResourcesCount(count)}</div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
-            </div>
+            )}
 
             <div className="buttons">
                 <Button
