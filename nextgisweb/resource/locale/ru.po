@@ -355,7 +355,7 @@ msgid "resource"
 msgid_plural "resources"
 msgstr[0] "ресурс"
 msgstr[1] "ресурса"
-msgstr[2] "русурсов"
+msgstr[2] "ресурсов"
 
 #: nodepkg/delete-page/util.ts:20
 msgid ""
