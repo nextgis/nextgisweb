@@ -2,8 +2,18 @@
 declare const ngwConfig: import("@nextgisweb/pyramid/type/config").NgwConfig;
 
 declare module "@nextgisweb/pyramid/type/config" {
+    interface Distribution {
+        name: string;
+        description: string | null;
+        version: string | null;
+        date: string | null;
+    }
+
     export interface NgwConfig {
+        packages: Record<string, string>;
         components: string[];
+        distribution: Distribution | null;
+        ngupdateUrl: string | null;
         instanceId: string;
         debug: boolean;
         applicationUrl: string;

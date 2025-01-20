@@ -14,13 +14,11 @@
         <div id="updateSysInfo"></div>
         <script type="text/javascript">
             require([
-                "@nextgisweb/pyramid/update/sysinfo",
+                "@nextgisweb/pyramid/update",
                 "@nextgisweb/gui/react-app"
-            ], function (
-                updateSysInfo, reactApp
-            ) {
+            ], function (update, reactApp) {
                 reactApp.default(
-                    updateSysInfo.default, {},
+                    update.UpdateSysInfo, {},
                     document.getElementById("updateSysInfo"),
                 );
             });

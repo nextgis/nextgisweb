@@ -11,11 +11,11 @@ msgstr "Скопировано"
 msgid "Unable to copy"
 msgstr "Не удалось скопировать"
 
-#: api.py:259
+#: api.py:261
 msgid "Storage management is not enabled on this server."
 msgstr "Управление хранилищем не включено на этом сервере."
 
-#: api.py:344
+#: api.py:346
 msgid ""
 "Invalid font file name: '{}'. Only latin letters, digits, hyphens and "
 "underscores are allowed. The *.ttf or *.otf extension is required."
@@ -23,11 +23,11 @@ msgstr ""
 "Недопустимое имя файла шрифта: '{}'. Разрешены только латинские буквы, цифры,"
 " дефисы и подчеркивания. Требуется расширение *.ttf или *.otf."
 
-#: api.py:352
+#: api.py:354
 msgid "Font '{0}' is larger than {1} bytes."
 msgstr "Шрифт '{0}' больше {1} байт."
 
-#: api.py:547
+#: api.py:549
 msgid ""
 "The '{}' query parameter should not contain additional values if 'all' is "
 "specified."
@@ -35,15 +35,15 @@ msgstr ""
 "Параметр запроса '{}' не должен содержать дополнительных значений, если "
 "указано 'all'."
 
-#: api.py:675
+#: api.py:677
 msgid "Got an unsupported MIME type: '{}'."
 msgstr "Получен неподдерживаемый тип MIME: '{}'."
 
-#: api.py:678
+#: api.py:680
 msgid "64K should be enough for a logo."
 msgstr "64K должно быть достаточно для логотипа."
 
-#: api.py:844
+#: api.py:846
 msgid "Your Web GIS at nextgis.com"
 msgstr "Ваши карты онлайн на nextgis.com"
 
@@ -269,7 +269,7 @@ msgstr "Показать системные шрифты"
 msgid "The home path setting is saved."
 msgstr "Настройка стартовой страницы сохранена."
 
-#: nodepkg/i18n/testentry.ts:8 nodepkg/i18n/testentry.ts:12 test/test_i18n.py:15
+#: nodepkg/i18n/testentry.ts:9 nodepkg/i18n/testentry.ts:13 test/test_i18n.py:15
 msgctxt "test"
 msgid "unit"
 msgid_plural "units"
@@ -293,15 +293,15 @@ msgstr "Настройки пользователя"
 msgid "Sign out"
 msgstr "Выйти"
 
-#: nodepkg/layout/store.ts:48
+#: nodepkg/layout/store.ts:52
 msgid "Resources"
 msgstr "Ресурсы"
 
-#: nodepkg/layout/store.ts:54 view.py:171
+#: nodepkg/layout/store.ts:58 view.py:171
 msgid "Control panel"
 msgstr "Панель управления"
 
-#: nodepkg/layout/store.ts:61
+#: nodepkg/layout/store.ts:65
 msgid "Help"
 msgstr "Справка"
 
@@ -313,27 +313,27 @@ msgstr "Рекомендуемая высота 45 px и ширина до 200 p
 msgid "Only PNG and SVG images are supported."
 msgstr "Поддерживаются только изображения PNG и SVG."
 
-#: nodepkg/metrics/GoogleAnalyticsTab.tsx:30
+#: nodepkg/metrics/GoogleAnalyticsTab.tsx:28
 msgid "Measurement ID"
 msgstr "Идентификатор потока данных"
 
-#: nodepkg/metrics/MetricSettings.tsx:19
+#: nodepkg/metrics/MetricSettings.tsx:22
 msgid "Add"
 msgstr "Добавить"
 
-#: nodepkg/metrics/MetricSettings.tsx:20
+#: nodepkg/metrics/MetricSettings.tsx:23
 msgid "The setting is saved."
 msgstr "Настройка сохранена."
 
-#: nodepkg/metrics/MetricSettings.tsx:21
+#: nodepkg/metrics/MetricSettings.tsx:24
 msgid "Reload the page to get them applied."
 msgstr "Обновите страницу, чтобы настройки вступили в силу."
 
-#: nodepkg/metrics/MetricSettings.tsx:25
+#: nodepkg/metrics/MetricSettings.tsx:28
 msgid "Add one or more counters to your Web GIS."
 msgstr "Добавьте один или несколько счетчиков в вашу Веб ГИС."
 
-#: nodepkg/metrics/MetricSettings.tsx:26
+#: nodepkg/metrics/MetricSettings.tsx:29
 msgid ""
 "HTML code of these counters will be embeded into each page and will allow you"
 " to track user activity."
@@ -341,19 +341,19 @@ msgstr ""
 "HTML-код этих счетчиков будет встроен в каждую страницу и позволит "
 "отслеживать активность пользователей."
 
-#: nodepkg/metrics/YandexMetricaTab.tsx:31
+#: nodepkg/metrics/YandexMetricaTab.tsx:29
 msgid "Tag number"
 msgstr "Номер счетчика"
 
-#: nodepkg/metrics/YandexMetricaTab.tsx:51
+#: nodepkg/metrics/YandexMetricaTab.tsx:48
 msgid "Webvisor"
 msgstr "Вебвизор"
 
-#: nodepkg/metrics/tab.ts:25
+#: nodepkg/metrics/tab.ts:32
 msgid "Google Analytics"
 msgstr "Google Аналитика"
 
-#: nodepkg/metrics/tab.ts:30
+#: nodepkg/metrics/tab.ts:38
 msgid "Yandex.Metrica"
 msgstr "Яндекс.Метрика"
 
@@ -405,31 +405,19 @@ msgstr "Оценка хранилища"
 msgid "The system name setting is saved."
 msgstr "Настройка названия Веб ГИС сохранена."
 
-#: nodepkg/update/index.js:56
-msgid "Critical updates are available"
-msgstr "Доступны критические обновления"
-
-#: nodepkg/update/index.js:57
-msgid "Updates are available"
-msgstr "Доступны обновления"
-
-#: nodepkg/update/index.js:59
-msgid "Click to see what's new"
-msgstr "Нажмите и узнайте, что нового"
-
-#: nodepkg/update/sysinfo.js:14
+#: nodepkg/update/UpdateSysInfo.tsx:15
 msgid "Checking for updates..."
 msgstr "Проверяем наличие обновлений..."
 
-#: nodepkg/update/sysinfo.js:15
+#: nodepkg/update/UpdateSysInfo.tsx:16
 msgid "<a>Contact support</a> for update."
 msgstr "<a>Обратитесь в поддержку</a> для установки обновлений."
 
-#: nodepkg/update/sysinfo.js:16
+#: nodepkg/update/UpdateSysInfo.tsx:17
 msgid "Show details"
 msgstr "Подробнее"
 
-#: nodepkg/update/sysinfo.js:20
+#: nodepkg/update/UpdateSysInfo.tsx:21
 msgid ""
 "Critical updates are available: {version}. Please consider updating an soon "
 "as possible."
@@ -437,13 +425,25 @@ msgstr ""
 "Доступны критические обновления: {version}. Рекомендуем установить их как "
 "можно быстрее."
 
-#: nodepkg/update/sysinfo.js:21
+#: nodepkg/update/UpdateSysInfo.tsx:22
 msgid "New version of {distribution} is available: {version}."
 msgstr "Доступна новая версия {distribution}: {version}."
 
-#: nodepkg/update/sysinfo.js:22
+#: nodepkg/update/UpdateSysInfo.tsx:23
 msgid "Your {distribution} is up-to-date."
 msgstr "У вас последняя версия {distribution}."
+
+#: nodepkg/update/index.tsx:27
+msgid "Critical updates are available"
+msgstr "Доступны критические обновления"
+
+#: nodepkg/update/index.tsx:28
+msgid "Updates are available"
+msgstr "Доступны обновления"
+
+#: nodepkg/update/index.tsx:30
+msgid "Click to see what's new"
+msgstr "Нажмите и узнайте, что нового"
 
 #: permission.py:5 view.py:235 view.py:592
 msgid "Cross-origin resource sharing (CORS)"
@@ -461,31 +461,31 @@ msgstr "Время (UTC)"
 msgid "Size"
 msgstr "Размер"
 
-#: template/sysinfo.mako:34
+#: template/sysinfo.mako:32
 msgid "Package"
 msgstr "Пакет"
 
-#: template/sysinfo.mako:35
+#: template/sysinfo.mako:33
 msgid "Version"
 msgstr "Версия"
 
-#: template/sysinfo.mako:65
+#: template/sysinfo.mako:63
 msgid "Platform"
 msgstr "Платформа"
 
-#: template/sysinfo.mako:80
+#: template/sysinfo.mako:78
 msgid "Browser support"
 msgstr "Поддержка браузеров"
 
-#: template/sysinfo.mako:91
+#: template/sysinfo.mako:89
 msgid "or higher"
 msgstr "или выше"
 
-#: template/sysinfo.mako:93
+#: template/sysinfo.mako:91
 msgid "Not supported"
 msgstr "Не поддерживается"
 
-#: template/sysinfo.mako:105
+#: template/sysinfo.mako:103
 msgid "Your browser"
 msgstr "Ваш браузер"
 

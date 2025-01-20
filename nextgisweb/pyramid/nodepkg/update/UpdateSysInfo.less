@@ -1,32 +1,33 @@
 .ngw-pyramid-update-sysinfo {
     display: flex;
     align-items: center;
-    margin-bottom: 1em;
+    gap: 1em;
+    margin-block-end: 1em;
     border-radius: var(--border-radius-root);
     background-color: rgba(128, 138, 147, 0.25);
-    padding: 12px;
+    padding: 1em;
 
-    &.critical {
-        background-color: var(--surface-bg-danger);
-    }
-
-    &.non-critical {
+    &.update {
         background-color: var(--surface-bg-success);
+
+        &.critical {
+            background-color: var(--surface-bg-danger);
+        }
     }
 
-    > .btn {
-        margin-left: auto;
+    > .ant-btn {
+        margin-inline-start: auto;
     }
 }
 
 .ngw-pyramid-update-sysinfo-modal {
     .ant-modal-body {
-        padding: 8px;
+        margin: 0 -1em -1em -1em;
     }
 
     iframe {
         border: none;
         width: 100%;
-        height: 75vh;
+        height: 66vh;
     }
 }
