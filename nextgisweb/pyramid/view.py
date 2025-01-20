@@ -211,13 +211,20 @@ def storage(request):
     )
 
 
-@viewargs(renderer="backup.mako")
+@viewargs(renderer="react")
 def backup_browse(request):
     if not request.env.pyramid.options["backup.download"]:
         raise HTTPNotFound()
+
     request.require_administrator()
     items = request.env.core.get_backups()
-    return dict(title=gettext("Backups"), items=items, dynmenu=request.env.pyramid.control_panel)
+
+    return dict(
+        title=gettext("Backups"),
+        dynmenu=request.env.pyramid.control_panel,
+        entrypoint="@nextgisweb/pyramid/backup-browse",
+        props=dict(items=items),
+    )
 
 
 def backup_download(request):

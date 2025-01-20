@@ -4,12 +4,14 @@ import os
 import re
 from collections import namedtuple
 from contextlib import contextmanager
+from datetime import datetime
 from functools import lru_cache
 from packaging.version import Version
 from subprocess import check_call, check_output
 
 import sqlalchemy as sa
 import transaction
+from msgspec import Struct
 from zope.sqlalchemy import mark_changed
 
 from nextgisweb.env import DBSession
@@ -85,7 +87,10 @@ class BackupConfiguration:
         self._exclude_table_data.append("{}.{}".format(schema, table))
 
 
-BackupMetadata = namedtuple("BackupMetadata", ["filename", "timestamp", "size"])
+class BackupMetadata(Struct):
+    filename: str
+    timestamp: datetime
+    size: int
 
 
 def parse_pg_dump_version(output):
@@ -116,7 +121,7 @@ def backup(env, dst):
     # TRANSACTION AND CONNECTION
 
     con = DBSession.connection()
-    con.execute(sa.text("SET TRANSACTION ISOLATION LEVEL SERIALIZABLE " "   READ ONLY DEFERRABLE"))
+    con.execute(sa.text("SET TRANSACTION ISOLATION LEVEL SERIALIZABLE    READ ONLY DEFERRABLE"))
 
     (snapshot,) = con.execute(sa.text("SELECT pg_export_snapshot()")).fetchone()
     logger.debug("Using postgres snapshot: %s", snapshot)

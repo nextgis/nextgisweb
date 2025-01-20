@@ -425,7 +425,9 @@ class CoreComponent(StorageComponentMixin, Component):
             relfn = fn.relative_to(backup_path)
             result.append(
                 BackupMetadata(
-                    relfn, datetime.strptime(str(relfn), backup_filename), fn.stat().st_size
+                    str(relfn),
+                    datetime.strptime(str(relfn), backup_filename),
+                    fn.stat().st_size,
                 )
             )
         result = sorted(result, key=lambda x: x.timestamp, reverse=True)
