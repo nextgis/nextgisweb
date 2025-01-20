@@ -1,4 +1,5 @@
-import { makeAutoObservable } from "mobx";
+import { action, computed, observable } from "mobx";
+import type { ReactNode } from "react";
 
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -12,32 +13,34 @@ export interface MenuItem {
     key?: number;
     className?: string;
     href?: string;
-    title?: string;
+    title?: ReactNode;
     notification?: string;
 }
 
 class LayoutStore {
-    menuNotification: string | null = null;
-    menuItems: MenuItem[] = [];
-    _counter: number;
+    @observable.shallow accessor menuItems: MenuItem[] = [];
 
-    constructor() {
-        makeAutoObservable(this);
-        this._counter = 0;
+    private counter: number = 0;
+
+    @action
+    addMenuItem(item: MenuItem) {
+        this.menuItems.push({ key: ++this.counter, ...item });
     }
 
-    addMenuItem(item: MenuItem) {
-        const { notification, ...rest } = item;
-        if (notification && this.menuNotification) {
-            rest.className = rest.className || `notification-${notification}`;
+    @computed
+    get notification() {
+        let current: string | null = null;
+        this.menuItems.forEach(({ notification }) => {
+            if (!notification) return;
             if (
+                !current ||
                 NOTIFICATION_ORDER.indexOf(notification) >
-                NOTIFICATION_ORDER.indexOf(this.menuNotification)
+                    NOTIFICATION_ORDER.indexOf(current)
             ) {
-                this.menuNotification = notification;
+                current = notification;
             }
-        }
-        this.menuItems.push({ key: ++this._counter, ...rest });
+        });
+        return current;
     }
 }
 
