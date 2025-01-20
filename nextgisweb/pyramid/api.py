@@ -304,7 +304,8 @@ def storage(request, *, core: CoreComponent) -> StorageResponse:
     require_storage_enabled()
 
     data = core.query_storage()
-    data = {"total": data.pop(""), **data}
+    if "" in data:
+        data = {"total": data.pop(""), **data}
 
     return StorageResponse(**{k: StorageValue(**v) for k, v in data.items()})
 
@@ -769,7 +770,15 @@ def setup_pyramid(comp, config):
         StorageResponse,
         defstruct(
             "StorageResponse",
-            [("total", Annotated[StorageValue, Meta(description="Total storage usage")])]
+            [
+                (
+                    "total",
+                    Annotated[
+                        Union[StorageValue, UnsetType], Meta(description="Total storage usage")
+                    ],
+                    UNSET,
+                )
+            ]
             + [(i, Union[StorageValue, UnsetType], UNSET) for i in KindOfData.registry.keys()],
             kw_only=True,
             rename={"total": ""},
