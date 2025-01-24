@@ -140,8 +140,10 @@ class ExportParams(Struct, kw_only=True):
             opts.fields = self.fields
         if self.display_name is not UNSET:
             opts.use_display_name = self.display_name
-        if self.encoding is not UNSET:
-            opts.lco.append(f"ENCODING={self.encoding}")
+
+        if (encoding := self.encoding) is UNSET:
+            encoding = "UTF-8"
+        opts.lco.append(f"ENCODING={encoding}")
 
         if self.intersects is not UNSET:
             try:
