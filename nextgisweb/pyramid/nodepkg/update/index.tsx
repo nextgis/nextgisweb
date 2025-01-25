@@ -7,7 +7,7 @@ import { layoutStore } from "@nextgisweb/pyramid/layout";
 
 import { updateStore } from "./UpdateStore";
 
-export { UpdateSysInfo } from "./UpdateSysInfo";
+export { updateStore };
 
 export function init() {
     const sysInfoURL = routeURL("pyramid.control_panel.sysinfo");

@@ -35,6 +35,8 @@ from .openapi import openapi
 from .session import WebSession
 from .tomb.predicate import ErrorRendererPredicate
 from .tomb.response import StaticFileResponse
+from .uacompat import FAMILIES
+from .uacompat import parse_header as ua_parse_header
 from .util import StaticMap, StaticSourcePredicate, set_output_buffering, viewargs
 
 
@@ -185,10 +187,48 @@ def locale(request):
     return HTTPFound(location=request.GET.get("next", request.application_url))
 
 
-@viewargs(renderer="mako")
+@viewargs(renderer="react")
 def sysinfo(request):
     request.require_administrator()
-    return dict(title=gettext("System information"), dynmenu=request.env.pyramid.control_panel)
+    tr = request.translate
+
+    def _package(pobj):
+        pdescription = pobj.metadata["Summary"]
+        if not pdescription or pdescription == "UNKNOWN":
+            pdescription = pobj.name
+        pcommit = pobj.commit
+        if pcommit and pobj.dirty:
+            pcommit += "+"
+        return dict(
+            name=pobj.name,
+            description=pdescription,
+            version=pobj.version,
+            commit=pcommit,
+        )
+
+    packages = [_package(pobj) for pobj in request.env.packages.values()]
+    packages.sort(key=lambda o: "" if o["name"] == "nextgisweb" else o["name"])
+
+    platform = []
+    for comp in request.env.chain("sys_info"):
+        platform.extend((tr(k), tr(v)) for k, v in comp.sys_info())
+
+    def _browser_suppopr(fid, fam):
+        min_ver = request.env.pyramid.options[f"uacompat.{fid}"]
+        return (fam.alias, min_ver)
+
+    ua_parsed = ua_parse_header(ua_header) if (ua_header := request.user_agent) else None
+    browser = dict(
+        support=[_browser_suppopr(fid, fam) for fid, fam in FAMILIES.items()],
+        current=(FAMILIES[ua_parsed[0]].alias, ua_parsed[1]) if ua_parsed else None,
+    )
+
+    return dict(
+        title=gettext("System information"),
+        entrypoint="@nextgisweb/pyramid/system-info",
+        props=dict(packages=packages, platform=platform, browser=browser),
+        dynmenu=request.env.pyramid.control_panel,
+    )
 
 
 @viewargs(renderer="react")

@@ -7,10 +7,9 @@ import { TemplateLink } from "@nextgisweb/gui/component";
 import { gettext, gettextf } from "@nextgisweb/pyramid/i18n";
 import { url } from "@nextgisweb/pyramid/nextgis";
 import settings from "@nextgisweb/pyramid/settings!pyramid";
+import { updateStore } from "@nextgisweb/pyramid/update";
 
-import { updateStore } from "./UpdateStore";
-
-import "./UpdateSysInfo.less";
+import "./SystemInfoUpdate.less";
 
 const msgChecking = gettext("Checking for updates...");
 const msgContactSupport = gettext("<a>Contact support</a> for update.");
@@ -25,7 +24,7 @@ const [msgCritical, msgHasUpdate, msgUpToDate] = [
 
 const { distribution } = ngwConfig;
 
-export const UpdateSysInfo = observer(() => {
+export const SystemInfoUpdate = observer(() => {
     const [detailsVisible, setDetailsVisible] = useState(false);
     const [showDetails, hideDetails] = useMemo(() => {
         return [() => setDetailsVisible(true), () => setDetailsVisible(false)];
@@ -83,7 +82,7 @@ export const UpdateSysInfo = observer(() => {
     }
 
     return (
-        <div className={classNames("ngw-pyramid-update-sysinfo", cn)}>
+        <div className={classNames("ngw-pyramid-system-info-update", cn)}>
             <div className="msg">
                 {msg}
                 {extra && <div>{extra}</div>}
@@ -93,4 +92,4 @@ export const UpdateSysInfo = observer(() => {
     );
 });
 
-UpdateSysInfo.displayName = "UpdateSysInfo";
+SystemInfoUpdate.displayName = "SystemInfoUpdate";

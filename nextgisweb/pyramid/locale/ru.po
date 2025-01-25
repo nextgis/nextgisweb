@@ -15,7 +15,7 @@ msgstr "Не удалось скопировать"
 msgid "Storage management is not enabled on this server."
 msgstr "Управление хранилищем не включено на этом сервере."
 
-#: api.py:346
+#: api.py:347
 msgid ""
 "Invalid font file name: '{}'. Only latin letters, digits, hyphens and "
 "underscores are allowed. The *.ttf or *.otf extension is required."
@@ -23,11 +23,11 @@ msgstr ""
 "Недопустимое имя файла шрифта: '{}'. Разрешены только латинские буквы, цифры,"
 " дефисы и подчеркивания. Требуется расширение *.ttf или *.otf."
 
-#: api.py:354
+#: api.py:355
 msgid "Font '{0}' is larger than {1} bytes."
 msgstr "Шрифт '{0}' больше {1} байт."
 
-#: api.py:549
+#: api.py:550
 msgid ""
 "The '{}' query parameter should not contain additional values if 'all' is "
 "specified."
@@ -35,15 +35,15 @@ msgstr ""
 "Параметр запроса '{}' не должен содержать дополнительных значений, если "
 "указано 'all'."
 
-#: api.py:677
+#: api.py:678
 msgid "Got an unsupported MIME type: '{}'."
 msgstr "Получен неподдерживаемый тип MIME: '{}'."
 
-#: api.py:680
+#: api.py:681
 msgid "64K should be enough for a logo."
 msgstr "64K должно быть достаточно для логотипа."
 
-#: api.py:846
+#: api.py:855
 msgid "Your Web GIS at nextgis.com"
 msgstr "Ваши карты онлайн на nextgis.com"
 
@@ -178,6 +178,18 @@ msgstr "Ошибка длительного запроса"
 msgid "Long-running request was cancelled."
 msgstr "Длительный запрос был отменен."
 
+#: nodepkg/backup-browse/BackupBrowse.tsx:24
+msgid "Filename"
+msgstr "Имя файла"
+
+#: nodepkg/backup-browse/BackupBrowse.tsx:39
+msgid "Timestamp (UTC)"
+msgstr "Время (UTC)"
+
+#: nodepkg/backup-browse/BackupBrowse.tsx:45
+msgid "Size"
+msgstr "Размер"
+
 #: nodepkg/company-logo.ts:32
 msgid "Get your own Web GIS at nextgis.com"
 msgstr "Создайте свою Веб ГИС на nextgis.com"
@@ -293,15 +305,15 @@ msgstr "Настройки пользователя"
 msgid "Sign out"
 msgstr "Выйти"
 
-#: nodepkg/layout/store.ts:52
+#: nodepkg/layout/store.ts:51
 msgid "Resources"
 msgstr "Ресурсы"
 
-#: nodepkg/layout/store.ts:58 view.py:171
+#: nodepkg/layout/store.ts:57 view.py:173
 msgid "Control panel"
 msgstr "Панель управления"
 
-#: nodepkg/layout/store.ts:65
+#: nodepkg/layout/store.ts:64
 msgid "Help"
 msgstr "Справка"
 
@@ -401,23 +413,47 @@ msgstr "из"
 msgid "Estimate storage"
 msgstr "Оценка хранилища"
 
-#: nodepkg/system-name-form/SystemNameForm.tsx:4
-msgid "The system name setting is saved."
-msgstr "Настройка названия Веб ГИС сохранена."
+#: nodepkg/system-info/SystemInfo.tsx:58
+msgid "Package"
+msgstr "Пакет"
 
-#: nodepkg/update/UpdateSysInfo.tsx:15
+#: nodepkg/system-info/SystemInfo.tsx:59
+msgid "Version"
+msgstr "Версия"
+
+#: nodepkg/system-info/SystemInfo.tsx:76
+msgid "Platform"
+msgstr "Платформа"
+
+#: nodepkg/system-info/SystemInfo.tsx:88
+msgid "Browser support"
+msgstr "Поддержка браузеров"
+
+#: nodepkg/system-info/SystemInfo.tsx:96
+msgid "or higher"
+msgstr "или выше"
+
+#: nodepkg/system-info/SystemInfo.tsx:97
+msgid "Not supported"
+msgstr "Не поддерживается"
+
+#: nodepkg/system-info/SystemInfo.tsx:103
+msgid "Your browser"
+msgstr "Ваш браузер"
+
+#: nodepkg/system-info/SystemInfoUpdate.tsx:14
 msgid "Checking for updates..."
 msgstr "Проверяем наличие обновлений..."
 
-#: nodepkg/update/UpdateSysInfo.tsx:16
+#: nodepkg/system-info/SystemInfoUpdate.tsx:15
 msgid "<a>Contact support</a> for update."
 msgstr "<a>Обратитесь в поддержку</a> для установки обновлений."
 
-#: nodepkg/update/UpdateSysInfo.tsx:17
+#: nodepkg/system-info/SystemInfoUpdate.tsx:16
 msgid "Show details"
 msgstr "Подробнее"
 
-#: nodepkg/update/UpdateSysInfo.tsx:21
+#: nodepkg/system-info/SystemInfoUpdate.tsx:20
 msgid ""
 "Critical updates are available: {version}. Please consider updating an soon "
 "as possible."
@@ -425,13 +461,17 @@ msgstr ""
 "Доступны критические обновления: {version}. Рекомендуем установить их как "
 "можно быстрее."
 
-#: nodepkg/update/UpdateSysInfo.tsx:22
+#: nodepkg/system-info/SystemInfoUpdate.tsx:21
 msgid "New version of {distribution} is available: {version}."
 msgstr "Доступна новая версия {distribution}: {version}."
 
-#: nodepkg/update/UpdateSysInfo.tsx:23
+#: nodepkg/system-info/SystemInfoUpdate.tsx:22
 msgid "Your {distribution} is up-to-date."
 msgstr "У вас последняя версия {distribution}."
+
+#: nodepkg/system-name-form/SystemNameForm.tsx:4
+msgid "The system name setting is saved."
+msgstr "Настройка названия Веб ГИС сохранена."
 
 #: nodepkg/update/index.tsx:27
 msgid "Critical updates are available"
@@ -445,49 +485,9 @@ msgstr "Доступны обновления"
 msgid "Click to see what's new"
 msgstr "Нажмите и узнайте, что нового"
 
-#: permission.py:5 view.py:235 view.py:592
+#: permission.py:5 view.py:282 view.py:639
 msgid "Cross-origin resource sharing (CORS)"
 msgstr "Cross-origin resource sharing (CORS)"
-
-#: template/backup.mako:5
-msgid "Filename"
-msgstr "Имя файла"
-
-#: template/backup.mako:6
-msgid "Timestamp (UTC)"
-msgstr "Время (UTC)"
-
-#: template/backup.mako:7
-msgid "Size"
-msgstr "Размер"
-
-#: template/sysinfo.mako:32
-msgid "Package"
-msgstr "Пакет"
-
-#: template/sysinfo.mako:33
-msgid "Version"
-msgstr "Версия"
-
-#: template/sysinfo.mako:63
-msgid "Platform"
-msgstr "Платформа"
-
-#: template/sysinfo.mako:78
-msgid "Browser support"
-msgstr "Поддержка браузеров"
-
-#: template/sysinfo.mako:89
-msgid "or higher"
-msgstr "или выше"
-
-#: template/sysinfo.mako:91
-msgid "Not supported"
-msgstr "Не поддерживается"
-
-#: template/sysinfo.mako:103
-msgid "Your browser"
-msgstr "Ваш браузер"
 
 #: template/uacompat.mako:3
 msgid "Browser compatibility test"
@@ -574,50 +574,50 @@ msgstr "Некорректный параметр"
 msgid "The '{}' query parameter has an invalid value."
 msgstr "Параметр запроса '{}' имеет недопустимое значение."
 
-#: view.py:159
+#: view.py:161
 msgid "HTTP API documentation"
 msgstr "Документация HTTP API"
 
-#: view.py:191 view.py:601
+#: view.py:227 view.py:648
 msgid "System information"
 msgstr "Информация о системе"
 
-#: view.py:198 view.py:607
+#: view.py:238 view.py:654
 msgid "Font management"
 msgstr "Управление шрифтами"
 
-#: view.py:209 view.py:644
+#: view.py:249 view.py:691
 msgid "Storage"
 msgstr "Хранилище"
 
-#: view.py:220 view.py:651
+#: view.py:263 view.py:698
 msgid "Backups"
 msgstr "Резервные копии"
 
-#: view.py:247 view.py:619
+#: view.py:294 view.py:666
 msgid "Custom CSS"
 msgstr "Пользовательские стили CSS"
 
-#: view.py:257 view.py:625
+#: view.py:304 view.py:672
 msgid "Custom logo"
 msgstr "Логотип"
 
-#: view.py:267 view.py:613
+#: view.py:314 view.py:660
 msgid "Web GIS name"
 msgstr "Название Веб ГИС"
 
-#: view.py:277 view.py:631
+#: view.py:324 view.py:678
 msgid "Home path"
 msgstr "Стартовая страница"
 
-#: view.py:287 view.py:637
+#: view.py:334 view.py:684
 msgid "Metrics and analytics"
 msgstr "Метрики и аналитика"
 
-#: view.py:581
+#: view.py:628
 msgid "Info"
 msgstr "Информация"
 
-#: view.py:582
+#: view.py:629
 msgid "Settings"
 msgstr "Настройки"

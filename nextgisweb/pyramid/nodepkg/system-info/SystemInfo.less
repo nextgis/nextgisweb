@@ -1,0 +1,40 @@
+.ngw-pyramid-system-info {
+    > h2:not(:first-child) {
+        margin-block: 2em 1em;
+    }
+
+    > table {
+        width: 100%;
+
+        th,
+        td {
+            padding: 8px;
+            text-align: start;
+        }
+
+        tbody td {
+            width: 0;
+            white-space: nowrap;
+
+            &:first-child {
+                width: 75%;
+                white-space: normal;
+            }
+        }
+
+        tbody th:first-child {
+            min-width: 15em;
+            white-space: nowrap;
+
+            & + td {
+                width: 100%;
+            }
+        }
+
+        thead > tr > th,
+        tbody > tr:not(*:last-child) > th,
+        tbody > tr:not(*:last-child) > td {
+            border-bottom: 1px solid #f0f0f0;
+        }
+    }
+}
