@@ -1,6 +1,5 @@
 import { action, computed, observable } from "mobx";
 import { Feature } from "ol";
-import View from "ol/View";
 import type { Control } from "ol/control";
 import type { Extent } from "ol/extent";
 import type { Geometry } from "ol/geom";
@@ -87,7 +86,11 @@ export class Display {
     urlParams: Record<keyof MapURLParams, string>;
 
     // Deferred Objects
+
+    @observable.ref accessor mapReady = false;
+    // @deprecated use observable mapReady instead
     mapDeferred: LoggedDeferred;
+
     mapExtentDeferred: LoggedDeferred;
     layersDeferred: LoggedDeferred;
     private _midDeferred: Record<string, LoggedDeferred>;
@@ -142,11 +145,7 @@ export class Display {
         this.map = new Map({
             logo: false,
             controls: [],
-            view: new View({
-                minZoom: 3,
-                constrainResolution: true,
-                extent: this._extentConst || undefined,
-            }),
+            extent: this._extentConst || undefined,
         });
 
         this.featureHighlighter = new FeatureHighlighter(this.map);
@@ -272,7 +271,9 @@ export class Display {
             target: this.leftBottomControlPane,
         });
 
-        this.map.startup(this.mapNode);
+        this.map.startup(this.mapNode).then(() => {
+            this.setMapReady(true);
+        });
 
         const controlsReady = buildControls(this);
 
@@ -339,6 +340,12 @@ export class Display {
         appendTo(this.mapNode);
         this.mapDeferred.resolve(true);
     }
+
+    @action
+    private setMapReady(status: boolean) {
+        this.mapReady = status;
+    }
+
     _mapAddControls(controls: Control[]) {
         controls.forEach((control) => {
             this.map?.olMap.addControl(control);

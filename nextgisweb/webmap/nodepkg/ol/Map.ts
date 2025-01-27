@@ -1,8 +1,10 @@
 import { action, computed, observable, runInAction } from "mobx";
 import { Map as OlMap } from "ol";
-import type { Feature, View } from "ol";
+import type { Feature } from "ol";
 import type { MapOptions as OlMapOptions } from "ol/PluggableMap";
+import View from "ol/View";
 import * as olExtent from "ol/extent";
+import type { Extent } from "ol/extent";
 import * as olProj from "ol/proj";
 
 import type { NgwExtent } from "@nextgisweb/feature-layer/type/api";
@@ -15,8 +17,8 @@ import type { CoreLayer, ExtendedOlLayer } from "./layer/_Base";
 import "ol/ol.css";
 
 interface MapOptions extends OlMapOptions {
-    view: View;
     logo?: boolean;
+    extent?: Extent;
 }
 
 export interface Position {
@@ -32,6 +34,7 @@ interface MapWatchableProps {
     resolution: number | null;
     center: number[] | null;
     position: Position | null;
+    zoom: number | null;
 }
 
 export class Map extends Watchable<MapWatchableProps> {
@@ -44,40 +47,49 @@ export class Map extends Watchable<MapWatchableProps> {
     @observable.shallow accessor layers: Layers = {};
 
     @observable accessor resolution: number | null = null;
-    @observable accessor center: number[] | null = null;
-    @observable.shallow accessor position: Position | null = null;
+    @observable.struct accessor center: number[] | null = null;
+    @observable accessor zoom: number | null = null;
+    @observable.struct accessor position: Position | null = null;
 
     constructor(private options: MapOptions) {
         super();
-        const { target, ...rest } = this.options;
-        this.olMap = new OlMap(rest);
+        const { target, extent, ...rest } = this.options;
+        const view = new View({
+            minZoom: 3,
+            constrainResolution: true,
+            extent,
+        });
+        this.olMap = new OlMap({ ...rest, view });
     }
 
-    startup(target: HTMLElement) {
-        const olMap = this.olMap;
+    async startup(target: HTMLElement): Promise<void> {
+        return new Promise((resolve) => {
+            const olMap = this.olMap;
+            olMap.setTarget(target);
+            const olView = olMap.getView();
 
-        olMap.setTarget(target);
-        const olView = olMap.getView();
-
-        olView.on("change:resolution", () => {
-            runInAction(() => {
-                this.setResolution(olView.getResolution() ?? null);
+            olView.on("change:resolution", () => {
+                runInAction(() => {
+                    this.setResolution(olView.getResolution() ?? null);
+                });
             });
-        });
 
-        olView.on("change:center", () => {
-            runInAction(() => {
-                this.setCenter(olView.getCenter() ?? null);
+            olView.on("change:center", () => {
+                runInAction(() => {
+                    this.setCenter(olView.getCenter() ?? null);
+                });
             });
-        });
 
-        olMap.on("moveend", () => {
-            this.setPosition(this.getPosition());
-        });
-        // Workaround to scip first map move event on start
-        olMap.once("movestart", () => {
-            olMap.on("movestart", () => {
-                imageQueue.abort();
+            olMap.on("moveend", () => {
+                this.setPosition(this.getPosition());
+            });
+            // Workaround to scip first map move event on start
+            olMap.once("movestart", () => {
+                // Map ready only then first move happend
+                resolve();
+                olMap.on("movestart", () => {
+                    imageQueue.abort();
+                });
             });
         });
     }
@@ -96,6 +108,11 @@ export class Map extends Watchable<MapWatchableProps> {
     setPosition(position: Position | null) {
         const oldPosition = this.position;
         this.position = position;
+        if (position) {
+            const { zoom, center } = position;
+            this.setZoom(zoom);
+            this.setCenter(center);
+        }
         this.notify("position", oldPosition, position);
     }
     @action
@@ -103,6 +120,12 @@ export class Map extends Watchable<MapWatchableProps> {
         const oldCenter = this.center;
         this.center = center;
         this.notify("center", oldCenter, center);
+    }
+    @action
+    setZoom(zoom: number) {
+        const oldZoom = this.zoom;
+        this.zoom = zoom;
+        this.notify("zoom", oldZoom, zoom);
     }
 
     @action

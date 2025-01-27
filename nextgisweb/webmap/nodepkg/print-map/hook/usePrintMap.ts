@@ -50,9 +50,12 @@ export function usePrintMap({ display }: { display: Display }) {
                 shiftDragZoom: false,
             });
 
+            const mapView = display.map.olMap.getView();
+            const center = mapView.getCenter();
+            const zoom = mapView.getZoom();
             const view = new View({
-                center: display.map.olMap.getView().getCenter(),
-                zoom: display.map.olMap.getView().getZoom(),
+                center,
+                zoom,
             });
 
             const map: OlMap = new Map({

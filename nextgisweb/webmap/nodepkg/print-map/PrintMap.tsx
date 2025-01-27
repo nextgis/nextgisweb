@@ -69,8 +69,8 @@ export const PrintMap = observer<PrintMapProps>(
             titleText,
             arrow,
         } = settings;
-
-        const { buildPrintMap: buildMap } = usePrintMap({ display });
+        const { mapReady } = display;
+        const { buildPrintMap } = usePrintMap({ display });
 
         const { legendCoords, titleCoords, mapCoords } = printMapStore;
 
@@ -95,13 +95,15 @@ export const PrintMap = observer<PrintMapProps>(
         }, [width, height, margin, settings]);
 
         useEffect(() => {
+            if (!mapReady) return;
+
             if (printMap.current || !printMapRef.current) return;
 
             const { height, width } = mapCoords;
             const isContainerReady = height && width;
             if (!isContainerReady) return;
 
-            const map = buildMap(printMapRef.current);
+            const map = buildPrintMap(printMapRef.current);
 
             if (initCenter) {
                 const view = map.getView();
@@ -138,12 +140,12 @@ export const PrintMap = observer<PrintMapProps>(
             printMap.current = map;
             setMapScaleControl(mapScale);
         }, [
-            buildMap,
-            display,
-            initCenter,
+            mapReady,
             mapCoords,
-            onCenterChange,
+            initCenter,
+            buildPrintMap,
             onScaleChange,
+            onCenterChange,
         ]);
 
         useEffect(() => {
