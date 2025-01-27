@@ -36,7 +36,14 @@ export function FeatureSelector({
     };
 
     return (
-        <div style={{ display: "flex", padding: "8px" }}>
+        <div
+            style={{
+                display: "flex",
+                alignItems: "center",
+                padding: "8px",
+                gap: "4px",
+            }}
+        >
             <Select
                 onChange={onSelectChange}
                 style={{ flex: "1 1 auto", minWidth: 0 }}
