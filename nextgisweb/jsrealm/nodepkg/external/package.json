@@ -6,7 +6,6 @@
         "dijit": "1.16.x",
         "dojo": "1.16.x",
         "dojox": "1.16.x",
-        "handlebars": "^3.0.3",
         "put-selector": "^0.3.6",
         "string-replace-loader": "^3.0.1",
         "uglify-js": "~3.17.4",
@@ -22,7 +21,6 @@
             "dijit",
             "dojo",
             "dojox",
-            "handlebars",
             "mocha",
             "put-selector",
             "xstyle"

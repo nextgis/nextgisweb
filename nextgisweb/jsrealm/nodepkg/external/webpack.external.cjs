@@ -67,11 +67,6 @@ addPackage("put-selector", {
     from: "put.js",
 });
 
-addPackage("handlebars", {
-    from: "dist/handlebars.min.js",
-    to: "handlebars.js",
-});
-
 addPackage("mocha", {
     from: "mocha.*",
 });

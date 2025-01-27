@@ -83,9 +83,6 @@ extras_require = dict(
 
 entry_points = {
     "paste.app_factory": ["main = nextgisweb:main"],
-    "babel.extractors": [
-        "hbs = nextgisweb.i18n.hbs:extract",
-    ],
     "pytest11": [
         "nextgisweb.env = nextgisweb.env.test",
         "nextgisweb.auth = nextgisweb.auth.test",

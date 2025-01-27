@@ -14,7 +14,7 @@ module.exports = ({ once, clean, compress, bundleAnalyzer } = {}) => {
     clean !== false && add(new CleanWebpackPlugin());
 
     if (compress || (!debug && compress !== false)) {
-        const compressRegExp = /\.(js|css|html|hbs|json|svg)$/i;
+        const compressRegExp = /\.(js|css|html|json|svg)$/i;
 
         pyramid.compression.gzip &&
             add(

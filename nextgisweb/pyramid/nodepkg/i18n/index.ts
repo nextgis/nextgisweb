@@ -2,7 +2,6 @@
 import { callingComponent } from "../util/loader";
 
 import { domain } from "./gettext";
-import { factory } from "./handlebars";
 
 export const normalize = callingComponent;
 export function load(
@@ -11,7 +10,7 @@ export function load(
     load: { (module: unknown): unknown }
 ) {
     const gettext = domain(component);
-    const module = { renderTemplate: factory(gettext), ...gettext };
+    const module = { ...gettext };
     load({ _esModule: true, default: module, ...module });
 }
 

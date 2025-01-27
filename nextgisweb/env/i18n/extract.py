@@ -148,7 +148,6 @@ extraction_root.file(r"\.py$", "python", {"server"})
 
 extraction_methods = dict(
     javascript="babel.messages.extract:extract_javascript",
-    handlebars="nextgisweb.env.i18n.handlebars:extract",
     mako="mako.ext.babelplugin:extract",
     python="babel.messages.extract:extract_python",
 )
