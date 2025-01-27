@@ -80,7 +80,7 @@ export class PanelManager {
                 (!isEnabled || isEnabled(this._display))
             );
         });
-
+        plugins.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
         for (const plugin of plugins) {
             const Cls = plugin.store
                 ? (await plugin.store()).default
