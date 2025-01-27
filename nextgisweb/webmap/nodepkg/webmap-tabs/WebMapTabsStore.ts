@@ -1,66 +1,61 @@
-import { makeAutoObservable, runInAction } from "mobx";
+import { action, observable } from "mobx";
+import type React from "react";
 import type { ComponentType, ReactElement } from "react";
 
 interface WebMapTabsStoreProps {
     onTabs?: () => void;
 }
 
-interface Tab {
+export interface WebMapTab<P = any> {
     key: string;
-    label: string;
+    label: React.ReactNode;
     children?: ReactElement;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    component?: <T extends ComponentType<any>>() => Promise<{ default: T }>;
-    props?: Record<string, unknown>;
+    component?: () => Promise<{ default: ComponentType<P> }>;
+    props?: P;
 }
 
 export class WebMapTabsStore {
-    activeKey?: string | null = null;
-
     _onTabs?: () => void;
-    private _tabs: Tab[] = [];
 
-    constructor({ onTabs }: WebMapTabsStoreProps) {
+    @observable.shallow accessor tabs: WebMapTab[] = [];
+    @observable accessor activeKey: string | null = null;
+
+    constructor({ onTabs }: WebMapTabsStoreProps = {}) {
         this._onTabs = onTabs;
-        makeAutoObservable(this, { _onTabs: false });
     }
 
-    get tabs() {
-        return this._tabs;
-    }
-
+    @action
     setActiveKey = (activeKey?: string) => {
         if (activeKey) {
-            const exist = this._tabs.find((t) => t.key === activeKey);
+            const exist = this.tabs.find((t) => t.key === activeKey);
             if (exist) {
-                runInAction(() => {
-                    this.activeKey = activeKey;
-                });
+                this.activeKey = activeKey;
             }
         }
     };
 
-    setTabs = (tabs: Tab[]) => {
-        this._tabs = tabs;
+    @action
+    setTabs = (tabs: WebMapTab[]) => {
+        this.tabs = tabs;
         if (this._onTabs) {
             this._onTabs();
         }
     };
 
-    addTab = (tab: Tab): void => {
+    addTab = <P = any>(tab: WebMapTab<P>): void => {
         const key = tab.key;
         if (!key) {
             throw new Error("You can not add a tab without the key");
         }
-        const exist = this._tabs.find((t) => t.key === key);
+        const exist = this.tabs.find((t) => t.key === key);
         if (!exist) {
-            this.setTabs([...this._tabs, tab]);
+            this.setTabs([...this.tabs, tab]);
         }
         this.setActiveKey(key);
     };
 
     removeTab = (key: string): void => {
-        const existIndex = this._tabs.findIndex((t) => t.key === key);
+        const existIndex = this.tabs.findIndex((t) => t.key === key);
         if (existIndex !== -1) {
             const newTabs = [...this.tabs];
             newTabs.splice(existIndex, 1);

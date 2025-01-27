@@ -9,9 +9,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
+import type { Display } from "../display";
+import type { AnnotationsPopup } from "../layer/annotations/AnnotationsPopup";
 import { getLabel } from "../map-controls/map-controls";
-import MapScaleControl from "../ol/ol-ext/ol-mapscale";
-import type { DojoDisplay } from "../type";
+import MapScaleControl from "../ol-ext/ol-mapscale";
 
 import { printMapStore } from "./PrintMapStore";
 import { buildPrintStyle } from "./PrintMapStyle";
@@ -61,7 +62,7 @@ const switchRotateControl = (olMap: OlMap, show: boolean): void => {
     }
 };
 
-const buildMap = (container: HTMLElement, display: DojoDisplay): OlMap => {
+const buildMap = (container: HTMLElement, display: Display): OlMap => {
     const interactions = defaultInteractions({
         doubleClickZoom: true,
         keyboard: true,
@@ -81,25 +82,22 @@ const buildMap = (container: HTMLElement, display: DojoDisplay): OlMap => {
         view,
     });
 
-    display.map.olMap
-        .getLayers()
-        .getArray()
-        .forEach((layer) => {
-            if (layer.getVisible() && (layer as any).printingCopy) {
-                // Adding the same layer to different maps causes
-                // infinite loading, thus we need a copy.
-                printMap.addLayer((layer as any).printingCopy());
-            }
-        });
+    display.map.getLayersArray().forEach((layer) => {
+        if (layer.getVisible() && layer.printingCopy) {
+            // Adding the same layer to different maps causes
+            // infinite loading, thus we need a copy.
+            printMap.addLayer(layer.printingCopy());
+        }
+    });
 
     display.map.olMap
         .getOverlays()
         .getArray()
         .forEach((overlay) => {
             if ("annPopup" in overlay && overlay.annPopup) {
-                const annPopup = overlay.annPopup;
-                const clonedPopup = (annPopup as any).cloneOlPopup(
-                    (annPopup as any).getAnnFeature()
+                const annPopup = overlay.annPopup as AnnotationsPopup;
+                const clonedPopup = annPopup.cloneOlPopup(
+                    annPopup.getAnnFeature()
                 );
                 printMap.addOverlay(clonedPopup);
             }
@@ -191,7 +189,7 @@ export const PrintMap = observer(
             return () => {
                 printMapStyle.clear();
             };
-        }, [width, height, margin]);
+        }, [width, height, margin, settings]);
 
         useEffect(() => {
             if (printMap.current || !printMapRef.current) return;
@@ -236,7 +234,7 @@ export const PrintMap = observer(
             map.addControl(mapScale);
             printMap.current = map;
             setMapScaleControl(mapScale);
-        }, [display, mapCoords]);
+        }, [display, initCenter, mapCoords, onCenterChange, onScaleChange]);
 
         useEffect(() => {
             if (printMap.current && style) {
@@ -262,7 +260,7 @@ export const PrintMap = observer(
             }
         }, [scaleLine, scaleValue, mapScaleControl]);
 
-        const legendComp = useMemo(() => {
+        useEffect(() => {
             if (!legend) {
                 if (legendCoords.displayed) {
                     printMapStore.updateCoordinates(
@@ -274,17 +272,23 @@ export const PrintMap = observer(
                         settings
                     );
                 }
-                return null;
             }
+        }, [legend, legendCoords, legendCoords.displayed, settings]);
+        useEffect(() => {
+            const shouldReset =
+                (title && !printMapStore.titleCoords.displayed) ||
+                (!title && printMapStore.titleCoords.displayed) ||
+                !legendCoords.displayed;
 
-            if (!legendCoords.displayed) {
+            if (shouldReset) {
                 printMapStore.makeLayout(settings);
-                return null;
             }
+        }, [legendCoords.displayed, settings, title]);
 
+        const legendComp = useMemo(() => {
             return (
                 <LegendPrintMap
-                    dojoDisplay={display}
+                    display={display}
                     printMapStore={printMapStore}
                     legendCoords={legendCoords}
                     show={legend}
@@ -297,22 +301,13 @@ export const PrintMap = observer(
                     }}
                 />
             );
-        }, [legend, legendCoords, legendColumns]);
+        }, [legend, legendCoords, display, settings]);
 
         useEffect(() => {
             printMapStore.updateColumnsCount(legendColumns);
         }, [legendColumns]);
 
         const titleComp = useMemo(() => {
-            const shouldReset =
-                (title && !printMapStore.titleCoords.displayed) ||
-                (!title && printMapStore.titleCoords.displayed);
-
-            if (shouldReset) {
-                printMapStore.makeLayout(settings);
-                return null;
-            }
-
             if (!title) return null;
 
             return (
@@ -334,7 +329,7 @@ export const PrintMap = observer(
                     <div className="print-title">{titleText}</div>
                 </RndComp>
             );
-        }, [title, titleCoords, titleText]);
+        }, [settings, title, titleCoords, titleText]);
 
         const mapComp = useMemo(() => {
             setTimeout(() => {
@@ -366,9 +361,9 @@ export const PrintMap = observer(
                     <div className="print-olmap" ref={printMapRef}></div>
                 </RndComp>
             );
-        }, [mapCoords]);
+        }, [mapCoords, settings, style]);
 
-        if (printMap)
+        if (printMap) {
             return (
                 <div className="print-map-page-wrapper">
                     <div className="print-map-export-wrapper">
@@ -382,5 +377,9 @@ export const PrintMap = observer(
                     </div>
                 </div>
             );
+        }
+        return null;
     }
 );
+
+PrintMap.displayName = "PrintMap";

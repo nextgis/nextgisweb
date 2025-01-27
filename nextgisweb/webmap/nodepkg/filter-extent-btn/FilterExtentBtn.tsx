@@ -16,8 +16,8 @@ import type { MenuProps, SizeType } from "@nextgisweb/gui/antd";
 import { CloseIcon } from "@nextgisweb/gui/icon";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import type { DojoDisplay } from "../type";
-import type { MapStateControl } from "../type/MapState";
+import type { Display } from "../display";
+import type { StateControl } from "../map-state-observer/MapStatesObserver";
 
 import ExtentIcon from "@nextgisweb/icon/material/crop_free/outline";
 import DrawIcon from "@nextgisweb/icon/material/draw/outline";
@@ -31,7 +31,7 @@ import ZoomInIcon from "@nextgisweb/icon/material/zoom_in/outline";
 
 export interface FilterExtentBtnProps {
     id: number | string;
-    display: DojoDisplay;
+    display: Display;
     size?: SizeType;
     onGeomChange?: (
         geom: Geometry | undefined,
@@ -142,11 +142,11 @@ interface InteractionInfo {
     layer: OlVectorLayer<OlVectorSource>;
     source: OlVectorSource;
     mapStateKey?: string;
-    control: MapStateControl;
+    control: StateControl;
 }
 
 const buildInteraction = (
-    display: DojoDisplay,
+    display: Display,
     uniqueLayerId: number | string,
     geomType: string,
     onDrawEnd?: (event: DrawEvent) => void,
@@ -192,7 +192,7 @@ const buildInteraction = (
     });
 
     const mapStateKey = `filterExtent-${uniqueLayerId}`;
-    const control: MapStateControl = {
+    const control: StateControl = {
         activate: () => {},
         deactivate: () => {
             if (onTerminate) onTerminate();
@@ -212,7 +212,7 @@ const buildInteraction = (
 };
 
 const clearDrawInteraction = (
-    display: DojoDisplay,
+    display: Display,
     interactionInfo: InteractionInfo
 ): InteractionInfo | undefined => {
     if (!display || !interactionInfo) return;
