@@ -3,12 +3,12 @@ import type OlControl from "ol/control/Control";
 
 import type { LayerItemConfig } from "@nextgisweb/webmap/type/api";
 
-import type { AdapterLayer } from "../AdapterLayer";
+import type { LayerDisplayAdapterCtor } from "../DisplayLayerAdapter";
 import type { CustomItemFileWriteStore } from "../compat/CustomItemFileWriteStore";
 import type { Display } from "../display";
 import type { ToolBase } from "../map-controls/tool/ToolBase";
-import type { Map } from "../ol/Map";
-import type { CoreLayer, LayerOptions } from "../ol/layer/_Base";
+import type { MapStore } from "../ol/MapStore";
+import type { CoreLayer, LayerOptions } from "../ol/layer/CoreLayer";
 import type { PluginBase } from "../plugin/PluginBase";
 import type { AnnotationVisibleMode } from "../store/annotations/AnnotationsStore";
 
@@ -42,7 +42,7 @@ export interface BasemapModules {
 }
 
 export interface AdapterModules {
-    [key: string]: typeof AdapterLayer;
+    [key: string]: LayerDisplayAdapterCtor;
 }
 
 export interface PluginModules {
@@ -61,8 +61,6 @@ export interface Mid {
 }
 
 export type MapControl = OlControl | ToolBase;
-
-export type WebmapAdapter = AdapterLayer;
 
 export interface MapRefs {
     target: HTMLElement;
@@ -111,6 +109,6 @@ export interface PluginParams {
 export interface PluginState {
     enabled: boolean;
     nodeData: LayerItemConfig;
-    map: Map;
+    map: MapStore;
     active?: boolean;
 }

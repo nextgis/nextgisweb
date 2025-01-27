@@ -7,7 +7,7 @@ import type { Options as StyleOptions } from "ol/style/Style";
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import type { Map } from "../../ol/Map";
+import type { MapStore } from "../../ol/MapStore";
 
 import { AnnotationsPopup } from "./AnnotationsPopup";
 
@@ -284,7 +284,7 @@ export class AnnotationFeature {
         return true;
     }
 
-    togglePopup(visible: boolean, map?: Map): boolean {
+    togglePopup(visible: boolean, map?: MapStore): boolean {
         if (
             (visible && this._popupVisible) ||
             (!visible && !this._popupVisible)

@@ -3,8 +3,8 @@ import TileLayer from "ol/layer/Tile";
 import XYZSource from "ol/source/XYZ";
 import type { Options as XYZSourceOptions } from "ol/source/XYZ";
 
-import { CoreLayer } from "./_Base";
-import type { LayerOptions } from "./_Base";
+import { CoreLayer } from "./CoreLayer";
+import type { LayerOptions } from "./CoreLayer";
 
 interface URLParams {
     [key: string]: string;

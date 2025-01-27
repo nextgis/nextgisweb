@@ -8,7 +8,7 @@ import type {
 } from "../compat/CustomItemFileWriteStore";
 import type { StoreItemConfig } from "../compat/type";
 import { keyInMutuallyExclusiveGroupDeep } from "../layers-tree/util/treeItems";
-import type { CoreLayer } from "../ol/layer/_Base";
+import type { CoreLayer } from "../ol/layer/CoreLayer";
 import type { TreeChildrenItemConfig, TreeItemConfig } from "../type/TreeItems";
 
 type LegendSymbols = { [layerId: string]: { [symbolIndex: number]: boolean } };

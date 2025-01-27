@@ -1,6 +1,6 @@
 import topic from "@nextgisweb/webmap/compat/topic";
 
-import type { Map } from "../../ol/Map";
+import type { MapStore } from "../../ol/MapStore";
 import { OlPopup } from "../../ol-ext/ol-popup";
 import type { PopupOptions } from "../../ol-ext/ol-popup";
 
@@ -51,7 +51,7 @@ export class AnnotationsPopup {
     private _annFeature: AnnotationFeature;
     private _contentElements: PopupTemplateElements | null = null;
     private _editable: boolean;
-    private _map: Map | null = null;
+    private _map: MapStore | null = null;
 
     constructor(
         annotationFeature: AnnotationFeature,
@@ -91,7 +91,7 @@ export class AnnotationsPopup {
             this._annFeature.getDescriptionAsHtml();
     }
 
-    addToMap(map: Map): this {
+    addToMap(map: MapStore): this {
         if (this._map) return this;
 
         this._map = map;

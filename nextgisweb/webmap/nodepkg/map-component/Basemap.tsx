@@ -15,10 +15,10 @@ export function Basemap({
     const { mapAdapter } = useMapContext();
     const basemap = useTileLayer({ url, attributions, opacity });
     useEffect(() => {
-        mapAdapter?.addLayer(basemap);
+        mapAdapter?.olMap.addLayer(basemap);
 
         return () => {
-            mapAdapter?.removeLayer(basemap);
+            mapAdapter?.olMap.removeLayer(basemap);
         };
     }, [mapAdapter, url, basemap]);
     return null;

@@ -1,9 +1,9 @@
 import { createContext, useContext } from "react";
 
-import type { MapAdapter } from "@nextgisweb/webmap/ol/MapAdapter";
+import type { MapStore } from "@nextgisweb/webmap/ol/MapStore";
 
 export interface MapAdapterRef {
-    mapAdapter?: MapAdapter;
+    mapAdapter?: MapStore;
 }
 
 export const MapContext = createContext<MapAdapterRef | null>(null);

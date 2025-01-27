@@ -144,7 +144,11 @@ export function WebMapFeatureGridTab({
                                 onZoomToFiltered={(ngwExtent: NgwExtent) => {
                                     display.current.map.zoomToNgwExtent(
                                         ngwExtent,
-                                        display.current.displayProjection
+                                        {
+                                            displayProjection:
+                                                display.current
+                                                    .displayProjection,
+                                        }
                                     );
                                 }}
                             />

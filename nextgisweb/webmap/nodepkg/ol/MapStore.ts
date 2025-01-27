@@ -1,8 +1,10 @@
 import { action, computed, observable, runInAction } from "mobx";
-import { Map as OlMap } from "ol";
 import type { Feature } from "ol";
+import OlMap from "ol/Map";
 import type { MapOptions as OlMapOptions } from "ol/PluggableMap";
 import View from "ol/View";
+import type { FitOptions } from "ol/View";
+import type Control from "ol/control/Control";
 import * as olExtent from "ol/extent";
 import type { Extent } from "ol/extent";
 import * as olProj from "ol/proj";
@@ -11,9 +13,17 @@ import type { NgwExtent } from "@nextgisweb/feature-layer/type/api";
 import { imageQueue } from "@nextgisweb/pyramid/util";
 
 import { Watchable } from "../compat/Watchable";
+import type {
+    ControlPosition,
+    CreateControlOptions,
+    MapControl,
+} from "../control-container/ControlContainer";
 
-import type { CoreLayer, ExtendedOlLayer } from "./layer/_Base";
-
+import { createButtonControl } from "./control/createButtonControl";
+import type { ButtonControlOptions } from "./control/createButtonControl";
+import { createControl } from "./control/createControl";
+import type { CoreLayer, ExtendedOlLayer } from "./layer/CoreLayer";
+import { PanelControl } from "./panel-control/PanelControl";
 import "ol/ol.css";
 
 interface MapOptions extends OlMapOptions {
@@ -37,11 +47,13 @@ interface MapWatchableProps {
     zoom: number | null;
 }
 
-export class Map extends Watchable<MapWatchableProps> {
+export class MapStore extends Watchable<MapWatchableProps> {
     private readonly DPI = 1000 / 39.37 / 0.28;
     private readonly IPM = 39.37;
     private readonly SMART_ZOOM_EXTENT = 100;
     private readonly SMART_ZOOM = 12;
+
+    private readonly _panelControl: PanelControl;
 
     readonly olMap: OlMap;
     @observable.shallow accessor layers: Layers = {};
@@ -60,9 +72,14 @@ export class Map extends Watchable<MapWatchableProps> {
             extent,
         });
         this.olMap = new OlMap({ ...rest, view });
+        this._panelControl = new PanelControl();
+        this.olMap.addControl(this._panelControl);
+        if (target) {
+            this.startup(target);
+        }
     }
 
-    async startup(target: HTMLElement): Promise<void> {
+    async startup(target: string | HTMLElement): Promise<void> {
         return new Promise((resolve) => {
             const olMap = this.olMap;
             olMap.setTarget(target);
@@ -202,17 +219,17 @@ export class Map extends Watchable<MapWatchableProps> {
         return extent;
     }
 
-    zoomToFeature(feature: Feature): void {
+    zoomToFeature(feature: Feature, options?: FitOptions): void {
         const geometry = feature.getGeometry();
         if (!geometry) {
             throw new Error("Feature has no geometry");
         }
 
         const extent = geometry.getExtent();
-        this.zoomToExtent(extent);
+        this.zoomToExtent(extent, options);
     }
 
-    zoomToExtent(extent: number[]): void {
+    zoomToExtent(extent: number[], options?: FitOptions): void {
         const view = this.olMap.getView();
         const widthExtent = olExtent.getWidth(extent);
         const heightExtent = olExtent.getHeight(extent);
@@ -229,13 +246,16 @@ export class Map extends Watchable<MapWatchableProps> {
                 view.setZoom(this.SMART_ZOOM);
             }
         } else {
-            view.fit(extent);
+            view.fit(extent, options);
         }
     }
 
     zoomToNgwExtent(
         ngwExtent: NgwExtent,
-        displayProjection: string = "EPSG:3857"
+        {
+            displayProjection,
+            ...options
+        }: FitOptions & { displayProjection?: string } = {}
     ): void {
         const { minLon, minLat, maxLon, maxLat } = ngwExtent;
         if (
@@ -253,7 +273,7 @@ export class Map extends Watchable<MapWatchableProps> {
             displayProjection
         );
 
-        this.zoomToExtent(extent);
+        this.zoomToExtent(extent, options);
     }
 
     getMaxZIndex(): number {
@@ -268,5 +288,37 @@ export class Map extends Watchable<MapWatchableProps> {
         });
 
         return maxZIndex;
+    }
+
+    getControlContainer(): HTMLElement {
+        return this._panelControl.getContainer();
+    }
+
+    createControl(control: MapControl, options: CreateControlOptions): Control {
+        return createControl(control, options, this);
+    }
+
+    createButtonControl(options: ButtonControlOptions): Control {
+        return createButtonControl(options);
+    }
+
+    addControl(
+        control: Control,
+        position: ControlPosition
+    ): Control | undefined {
+        this._panelControl.addControl(control, position);
+        return control;
+    }
+
+    removeControl(control: Control): void {
+        this._panelControl.removeControl(control);
+    }
+
+    getTargetElement() {
+        return this.olMap.getTargetElement();
+    }
+
+    updateSize() {
+        this.olMap.updateSize();
     }
 }

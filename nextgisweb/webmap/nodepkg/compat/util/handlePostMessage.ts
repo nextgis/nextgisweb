@@ -1,5 +1,5 @@
 import type { Display } from "@nextgisweb/webmap/display";
-import type { Position } from "@nextgisweb/webmap/ol/Map";
+import type { Position } from "@nextgisweb/webmap/ol/MapStore";
 
 type TransformedPosition = {
     zoom: number;

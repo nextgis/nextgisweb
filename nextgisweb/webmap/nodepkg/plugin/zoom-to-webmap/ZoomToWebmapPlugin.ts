@@ -9,10 +9,9 @@ export class ZoomToWebmapPlugin extends PluginBase {
             .get()
             .then((extent) => {
                 if (!extent) return;
-                this.display.map.zoomToNgwExtent(
-                    extent,
-                    this.display.displayProjection
-                );
+                this.display.map.zoomToNgwExtent(extent, {
+                    displayProjection: this.display.displayProjection,
+                });
             });
     }
 }

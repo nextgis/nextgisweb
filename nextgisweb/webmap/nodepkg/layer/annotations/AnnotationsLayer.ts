@@ -1,7 +1,7 @@
 import type { Feature } from "ol";
 import { Vector as VectorSource } from "ol/source";
 
-import type { Map } from "../../ol/Map";
+import type { MapStore } from "../../ol/MapStore";
 import VectorLayerClass from "../../ol/layer/Vector";
 
 import { AnnotationFeature } from "./AnnotationFeature";
@@ -17,7 +17,7 @@ export interface AccessFilter {
 export class AnnotationsLayer {
     private _layer: VectorLayerClass;
     private _source: VectorSource;
-    private _map: Map | null = null;
+    private _map: MapStore | null = null;
     private _popupsVisible: boolean | null = null;
     private _editable = false;
     private _filter: AccessFilter = {
@@ -36,7 +36,7 @@ export class AnnotationsLayer {
         this._layer.getLayer().setSource(this._source);
     }
 
-    addToMap(map: Map): void {
+    addToMap(map: MapStore): void {
         this._map = map;
         map.addLayer(this._layer);
     }

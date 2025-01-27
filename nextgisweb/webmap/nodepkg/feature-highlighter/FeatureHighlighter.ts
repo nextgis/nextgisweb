@@ -8,7 +8,7 @@ import { route } from "@nextgisweb/pyramid/api";
 import topic from "@nextgisweb/webmap/compat/topic";
 import Vector from "@nextgisweb/webmap/ol/layer/Vector";
 
-import type { Map } from "../ol/Map";
+import type { MapStore } from "../ol/MapStore";
 
 interface HighlightEvent {
     geom?: string;
@@ -22,13 +22,13 @@ interface FeatureFilterFn {
 }
 
 export class FeatureHighlighter {
-    private _map: Map;
+    private _map: MapStore;
     private _source: VectorSource;
     private _overlay: Vector;
     private _wkt: WKT;
     private _zIndex = 1000;
 
-    constructor(map: Map, highlightStyle?: Style) {
+    constructor(map: MapStore, highlightStyle?: Style) {
         this._map = map;
         this._zIndex = this._zIndex + Object.keys(map.layers).length;
         this._wkt = new WKT();

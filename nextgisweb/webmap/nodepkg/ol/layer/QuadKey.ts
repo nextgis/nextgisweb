@@ -3,8 +3,8 @@ import { XYZ as XYZSource } from "ol/source";
 import type { Options as XYZSourceOptions } from "ol/source/XYZ";
 import type { TileCoord } from "ol/tilecoord";
 
-import { CoreLayer } from "./_Base";
-import type { LayerOptions } from "./_Base";
+import { CoreLayer } from "./CoreLayer";
+import type { LayerOptions } from "./CoreLayer";
 
 function quadKey(tileCoord: TileCoord): string {
     const z = tileCoord[0];

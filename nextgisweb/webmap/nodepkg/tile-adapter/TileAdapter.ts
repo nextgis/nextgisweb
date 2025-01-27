@@ -3,9 +3,9 @@ import { tileLoadFunction } from "@nextgisweb/pyramid/util";
 import XYZ from "@nextgisweb/webmap/ol/layer/XYZ";
 import type { LayerItemConfig } from "@nextgisweb/webmap/type/api";
 
-import { AdapterLayer } from "../AdapterLayer";
+import { LayerDisplayAdapter } from "../DisplayLayerAdapter";
 
-export default class TileAdapter extends AdapterLayer {
+export default class TileAdapter extends LayerDisplayAdapter {
     createLayer(item: LayerItemConfig) {
         const layer = new XYZ(
             String(item.id),

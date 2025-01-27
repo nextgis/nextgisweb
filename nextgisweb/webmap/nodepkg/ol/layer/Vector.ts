@@ -2,8 +2,8 @@ import { Vector as VectorLayer } from "ol/layer";
 import { Vector as VectorSource } from "ol/source";
 import type { Options as VectorSourceOptions } from "ol/source/Vector";
 
-import { CoreLayer } from "./_Base";
-import type { LayerOptions } from "./_Base";
+import { CoreLayer } from "./CoreLayer";
+import type { LayerOptions } from "./CoreLayer";
 
 export default class Vector extends CoreLayer<
     VectorSource,

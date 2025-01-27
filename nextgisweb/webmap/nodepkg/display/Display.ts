@@ -19,7 +19,10 @@ import type {
 } from "@nextgisweb/webmap/type/api";
 import { WebMapTabsStore } from "@nextgisweb/webmap/webmap-tabs";
 
-import type { AdapterLayer } from "../AdapterLayer";
+import type {
+    LayerDisplayAdapter,
+    LayerDisplayAdapterCtor,
+} from "../DisplayLayerAdapter";
 import { CustomItemFileWriteStore } from "../compat/CustomItemFileWriteStore";
 import type { StoreItem } from "../compat/CustomItemFileWriteStore";
 import { LoggedDeferred } from "../compat/LoggedDeferred";
@@ -29,8 +32,8 @@ import { FeatureHighlighter } from "../feature-highlighter/FeatureHighlighter";
 import { Identify } from "../map-controls/tool/Identify";
 import MapStatesObserver from "../map-state-observer";
 import type { MapStatesObserver as IMapStatesObserver } from "../map-state-observer/MapStatesObserver";
-import { Map } from "../ol/Map";
-import type { CoreLayer } from "../ol/layer/_Base";
+import { MapStore } from "../ol/MapStore";
+import type { CoreLayer } from "../ol/layer/CoreLayer";
 import type { PanelStore } from "../panel";
 import { PanelManager } from "../panel/PanelManager";
 import type { PluginBase } from "../plugin/PluginBase";
@@ -42,7 +45,6 @@ import type {
     MapURLParams,
     Mid,
     TinyConfig,
-    WebmapAdapter,
 } from "../type";
 import type { TreeItemConfig } from "../type/TreeItems";
 import type { WebMapSettings } from "../type/WebmapSettings";
@@ -60,7 +62,7 @@ export class Display {
     clientSettings: WebMapSettings = settings;
     tiny?: boolean;
 
-    readonly map: Map;
+    readonly map: MapStore;
     mapNode?: HTMLElement;
     private _extent: Extent;
     private _extentConst: Extent | null;
@@ -76,7 +78,7 @@ export class Display {
     identify?: Identify;
     featureHighlighter: FeatureHighlighter;
     readonly plugins: Record<string, PluginBase> = {};
-    readonly _adapters: Record<string, WebmapAdapter> = {};
+    readonly _adapters: Record<string, LayerDisplayAdapter> = {};
     private _mid: Mid = {
         basemap: {},
         adapter: {},
@@ -143,7 +145,7 @@ export class Display {
                 this.displayProjection
             );
 
-        this.map = new Map({
+        this.map = new MapStore({
             logo: false,
             controls: [],
             extent: this._extentConst || undefined,
@@ -503,7 +505,7 @@ export class Display {
         }
     }
 
-    setupAdapter(key: string, Module: typeof AdapterLayer) {
+    setupAdapter(key: string, Module: LayerDisplayAdapterCtor) {
         if (!this._adapters[key]) {
             this._adapters[key] = new Module({
                 display: this,

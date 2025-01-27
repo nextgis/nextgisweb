@@ -11,7 +11,7 @@ import i18n from "@nextgisweb/pyramid/i18n";
 import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
 import topic from "@nextgisweb/webmap/compat/topic";
 import type { Display } from "@nextgisweb/webmap/display";
-import type { Map } from "@nextgisweb/webmap/ol/Map";
+import type { MapStore } from "@nextgisweb/webmap/ol/MapStore";
 import type IdentifyStore from "@nextgisweb/webmap/panel/identify/IdentifyStore";
 import type { IdentifyInfo } from "@nextgisweb/webmap/panel/identify/identification";
 import type { LayerItemConfig } from "@nextgisweb/webmap/type/api";
@@ -59,7 +59,7 @@ export class Identify extends ToolBase {
     label = i18n.gettext("Identify");
     iconClass = "iconIdentify";
     pixelRadius: number = webmapSettings.identify_radius || 10;
-    map: Map;
+    map: MapStore;
     control: Control;
 
     constructor(options: IdentifyOptions) {

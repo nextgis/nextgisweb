@@ -28,10 +28,9 @@ export class ZoomToLayerPlugin extends PluginBase {
                     id: item.styleId,
                 }).get({ cache: true });
 
-                this.display.map.zoomToNgwExtent(
-                    extent,
-                    this.display.displayProjection
-                );
+                this.display.map.zoomToNgwExtent(extent, {
+                    displayProjection: this.display.displayProjection,
+                });
             } catch (error) {
                 errorModal(error);
             }
