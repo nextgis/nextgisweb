@@ -1,3 +1,4 @@
+import { action, observable } from "mobx";
 import type { MapBrowserEvent } from "ol";
 import type { Coordinate } from "ol/coordinate";
 import { boundingExtent, getCenter } from "ol/extent";
@@ -6,19 +7,25 @@ import { fromExtent } from "ol/geom/Polygon";
 import Interaction from "ol/interaction/Interaction";
 
 import { route } from "@nextgisweb/pyramid/api/route";
-import type { RouteQuery, RouteResp } from "@nextgisweb/pyramid/api/type";
+import type {
+    GetRequestOptions,
+    RouteQuery,
+    RouteResp,
+} from "@nextgisweb/pyramid/api/type";
 import i18n from "@nextgisweb/pyramid/i18n";
 import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
 import topic from "@nextgisweb/webmap/compat/topic";
 import type { Display } from "@nextgisweb/webmap/display";
 import type { MapStore } from "@nextgisweb/webmap/ol/MapStore";
 import type IdentifyStore from "@nextgisweb/webmap/panel/identify/IdentifyStore";
-import type { IdentifyInfo } from "@nextgisweb/webmap/panel/identify/identification";
+import type {
+    FeatureHighlightEvent,
+    FeatureInfo,
+    IdentifyInfo,
+} from "@nextgisweb/webmap/panel/identify/identification";
 import type { LayerItemConfig } from "@nextgisweb/webmap/type/api";
 
 import { ToolBase } from "./ToolBase";
-
-import "./Identify.css";
 
 const wkt = new WKT();
 
@@ -62,6 +69,10 @@ export class Identify extends ToolBase {
     map: MapStore;
     control: Control;
 
+    @observable.shallow accessor identifyInfo: IdentifyInfo | null = null;
+    @observable.shallow
+    accessor highlightedFeature: FeatureHighlightEvent | null = null;
+
     constructor(options: IdentifyOptions) {
         super(options);
 
@@ -80,6 +91,42 @@ export class Identify extends ToolBase {
 
     deactivate(): void {
         this.control.setActive(false);
+    }
+
+    @action
+    setHighlightedFeature(highlightedFeature: FeatureHighlightEvent | null) {
+        this.highlightedFeature = highlightedFeature;
+    }
+
+    async highlightFeature(
+        identifyInfo: IdentifyInfo,
+        featureInfo: FeatureInfo,
+        opt?: GetRequestOptions
+    ) {
+        const layerResponse = identifyInfo.response[featureInfo.layerId];
+        const featureResponse = layerResponse.features[featureInfo.idx];
+        this.setHighlightedFeature(null);
+        const featureItem = await route("feature_layer.feature.item", {
+            id: featureResponse.layerId,
+            fid: featureResponse.id,
+        }).get(opt);
+
+        const { label } = featureInfo;
+
+        const featureHightlight: FeatureHighlightEvent = {
+            geom: featureItem.geom,
+            featureId: featureItem.id,
+            layerId: featureInfo.layerId,
+            featureInfo: { ...featureItem, labelWithLayer: label },
+        };
+        this.setHighlightedFeature(featureHightlight);
+
+        topic.publish<FeatureHighlightEvent>(
+            "feature.highlight",
+            featureHightlight
+        );
+
+        return featureItem;
     }
 
     async identifyFeatureByAttrValue(
@@ -216,12 +263,15 @@ export class Identify extends ToolBase {
         return new WKT().writeGeometry(fromExtent(bounds));
     }
 
+    @action
     private openIdentifyPanel(
         response: RouteResp<"feature_layer.identify", "post">,
         point: Coordinate,
         layerLabels: Record<string, string | null>
     ): void {
+        this.highlightedFeature = null;
         if (response.featureCount === 0) {
+            this.identifyInfo = null;
             topic.publish("feature.unhighlight");
         }
 
@@ -230,6 +280,8 @@ export class Identify extends ToolBase {
             response,
             layerLabels,
         };
+
+        this.identifyInfo = identifyInfo;
 
         const pm = this.display.panelManager;
         const pkey = "identify";

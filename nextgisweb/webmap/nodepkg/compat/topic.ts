@@ -7,7 +7,7 @@ export type SubscribeReturnType = { remove: () => void };
 class Topic {
     private hub: EventEmitter = new EventEmitter();
 
-    publish(topic: string, event?: any): void {
+    publish<T>(topic: string, event?: T): void {
         this.hub.emit(topic, event);
     }
 

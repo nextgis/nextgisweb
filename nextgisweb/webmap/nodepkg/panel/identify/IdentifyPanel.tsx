@@ -7,11 +7,10 @@ import { errorModal } from "@nextgisweb/gui/error";
 import type { ApiError } from "@nextgisweb/gui/error/type";
 import { useLoading } from "@nextgisweb/gui/hook/useLoading";
 import { executeWithMinDelay } from "@nextgisweb/gui/util/executeWithMinDelay";
-import { route } from "@nextgisweb/pyramid/api";
 import type { GetRequestOptions } from "@nextgisweb/pyramid/api/type";
 import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import topic from "@nextgisweb/webmap/compat/topic";
+import type { Display } from "@nextgisweb/webmap/display";
 
 import { PanelContainer } from "../component";
 import type { PanelPluginWidgetProps } from "../registry";
@@ -30,43 +29,22 @@ const msgTipIdent = gettext("To get feature information, click on the map with t
 const msgLoad = gettext("Retrieving object information...");
 const msgNotFound = gettext("No objects were found at the click location.");
 
-const highlightFeature = (
-    featureItem: FeatureItem,
-    featureInfo: FeatureInfo
-) => {
-    const { label } = featureInfo;
-
-    topic.publish("feature.highlight", {
-        geom: featureItem.geom,
-        featureId: featureItem.id,
-        layerId: featureInfo.layerId,
-        featureInfo: { ...featureItem, labelWithLayer: label },
-    });
-};
-
 const loadFeatureItem = async (
+    display: Display,
     identifyInfo: IdentifyInfo,
     featureInfo: FeatureInfo,
     opt?: GetRequestOptions
 ) => {
-    const layerResponse = identifyInfo.response[featureInfo.layerId];
-    const featureResponse = layerResponse.features[featureInfo.idx];
-
-    const featureItem = await executeWithMinDelay(
-        route("feature_layer.feature.item", {
-            id: featureResponse.layerId,
-            fid: featureResponse.id,
-        }).get(opt),
-        {
-            onRealExecute: (res) => {
-                highlightFeature(res, featureInfo);
-            },
-            minDelay: 700,
-            signal: opt?.signal,
-        }
-    );
-
-    return featureItem;
+    if (display.identify) {
+        const featureItem = await executeWithMinDelay(
+            display.identify?.highlightFeature(identifyInfo, featureInfo, opt),
+            {
+                minDelay: 700,
+                signal: opt?.signal,
+            }
+        );
+        return featureItem;
+    }
 };
 
 const IdentifyPanel = observer<PanelPluginWidgetProps<IdentifyStore>>(
@@ -102,7 +80,9 @@ const IdentifyPanel = observer<PanelPluginWidgetProps<IdentifyStore>>(
 
                 try {
                     const featureItemLoaded = await trackPromise(
-                        loadFeatureItem(identifyInfo!, featureInfo, { signal })
+                        loadFeatureItem(display, identifyInfo!, featureInfo, {
+                            signal,
+                        })
                     );
 
                     setFeatureItem(featureItemLoaded);
@@ -112,7 +92,7 @@ const IdentifyPanel = observer<PanelPluginWidgetProps<IdentifyStore>>(
                     }
                 }
             },
-            [identifyInfo, abort, trackPromise, makeSignal]
+            [abort, makeSignal, trackPromise, display, identifyInfo]
         );
 
         const onFeatureChange = useCallback(

@@ -1,4 +1,4 @@
-import { observable } from "mobx";
+import { computed, observable } from "mobx";
 import type { ReactNode } from "react";
 
 import type { Display } from "../display";
@@ -36,6 +36,11 @@ export class PanelStore {
 
     get applyToTinyMap(): boolean {
         return this.plugin.applyToTinyMap ?? false;
+    }
+
+    @computed
+    get visible() {
+        return this.display.panelManager.activePanelName === this.name;
     }
 
     async load(): Promise<React.FC<PanelWidgetProps<PanelStore>>> {

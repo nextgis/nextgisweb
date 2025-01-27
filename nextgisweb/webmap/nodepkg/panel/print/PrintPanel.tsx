@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite";
 import type { Coordinate } from "ol/coordinate";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { Space } from "@nextgisweb/gui/antd";
 import { CopyToClipboardButton } from "@nextgisweb/gui/buttons";
@@ -29,12 +29,10 @@ import "./PrintPanel.less";
 const PrintPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
     const mapInit = useRef(false);
 
+    const { close, title, visible } = store;
+
     const [center, setCenter] = useState<Coordinate>();
     const [printMapScale, setPrintMapScale] = useState<number>();
-
-    const visible = useMemo(() => {
-        return display.panelManager.activePanelName === store.name;
-    }, [display.panelManager.activePanelName, store.name]);
 
     const [mapSettings, setMapSettings] = useObjectState<PrintMapSettings>(() =>
         defaultPanelMapSettings(display.config.webmapTitle)
@@ -97,7 +95,7 @@ const PrintPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
     }, [center, updateMapSettings]);
 
     return (
-        <PanelContainer title={store.title} close={store.close}>
+        <PanelContainer title={title} close={close}>
             <PanelSection>
                 <PrintPaperSettings
                     display={display}

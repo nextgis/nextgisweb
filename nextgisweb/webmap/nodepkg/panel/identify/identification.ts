@@ -1,6 +1,13 @@
 import type { Attrs, FeatureItem } from "@nextgisweb/feature-layer/type";
 import type { Display } from "@nextgisweb/webmap/display";
 
+export interface FeatureHighlightEvent<F extends Attrs = Attrs> {
+    geom: string;
+    featureId: number;
+    layerId: number;
+    featureInfo: FeatureItem<F> & { labelWithLayer: string };
+}
+
 export interface LayerResponse {
     features: FeatureIdentify[];
     featureCount: number;
