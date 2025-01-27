@@ -15,6 +15,7 @@ interface HighlightEvent {
     olGeometry?: Geometry;
     layerId?: number;
     featureId?: number;
+    feature?: Feature;
 }
 
 interface FeatureFilterFn {
@@ -77,19 +78,25 @@ export class FeatureHighlighter {
         let geometry: Geometry;
         this._source.clear();
 
-        if (e.geom) {
-            geometry = this._wkt.readGeometry(e.geom);
-        } else if (e.olGeometry) {
-            geometry = e.olGeometry;
+        let feature: Feature;
+        if (e.feature) {
+            feature = e.feature;
         } else {
-            throw new Error("No geometry provided");
+            if (e.geom) {
+                geometry = this._wkt.readGeometry(e.geom);
+            } else if (e.olGeometry) {
+                geometry = e.olGeometry;
+            } else {
+                throw new Error("No geometry provided");
+            }
+
+            feature = new Feature({
+                geometry,
+                layerId: e.layerId,
+                featureId: e.featureId,
+            });
         }
 
-        const feature = new Feature({
-            geometry,
-            layerId: e.layerId,
-            featureId: e.featureId,
-        });
         this._source.addFeature(feature);
 
         return feature;
