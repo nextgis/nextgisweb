@@ -102,7 +102,6 @@
 .nextgis .ol-control__btn,
 .nextgis .ol-control__btn:active,
 .nextgis .ol-control__btn:focus {
-    display: block;
     margin: 1px 0 0;
     box-shadow: 0 3px 7px rgba(2, 34, 60, 0.16);
     border-radius: 2px;
