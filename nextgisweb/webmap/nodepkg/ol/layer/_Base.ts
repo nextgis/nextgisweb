@@ -159,18 +159,18 @@ export abstract class CoreLayer<
         }
     }
 
-    /** @deprecated use {@link _Base.visibility}, {@link _Base.opacity}, or {@link _Base.symbols} */
+    /** @deprecated use {@link CoreLayer.visibility}, {@link CoreLayer.opacity}, or {@link CoreLayer.symbols} */
     @action
-    get(
-        property: keyof LayerWatchableProps
-    ): boolean | number | string[] | "-1" {
+    get<K extends keyof LayerWatchableProps>(
+        property: K
+    ): LayerWatchableProps[K] {
         switch (property) {
             case "visibility":
-                return this.visibility;
+                return this.visibility as LayerWatchableProps[K];
             case "opacity":
-                return this.opacity;
+                return this.opacity as LayerWatchableProps[K];
             case "symbols":
-                return this.symbols;
+                return this.symbols as LayerWatchableProps[K];
             default:
                 throw new Error(`Unknown property: ${property}`);
         }

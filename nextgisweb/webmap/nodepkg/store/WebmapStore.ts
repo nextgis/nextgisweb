@@ -309,13 +309,13 @@ export class WebmapStore {
 
     getLayerOpacity = (layerId: number) => {
         const layer = this._layers[layerId];
-        return layer ? layer.get("opacity") : 1;
+        return layer ? layer.opacity : 1;
     };
 
     @action setLayerOpacity = (layerId: number, opacity: number) => {
         const layer = this._layers[layerId];
         if (layer) {
-            layer.set("opacity", opacity);
+            layer.setOpacity(opacity);
         }
     };
 }
