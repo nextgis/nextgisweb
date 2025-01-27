@@ -85,8 +85,9 @@ const BookmarksPanel = observer<PanelPluginWidgetProps>(
                 className="ngw-webmap-panel-bookmarks"
                 title={store.title}
                 close={store.close}
+                components={{ content: PanelContainer.Unpadded }}
             >
-                {bookmarksJsx}
+                <div>{bookmarksJsx}</div>
             </PanelContainer>
         );
     }
