@@ -1,7 +1,7 @@
 import type { Projection } from "ol/proj";
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { AreaUnits, LengthUnits } from "@nextgisweb/webmap/type/api";
+import type { AreaUnits, LengthUnits } from "@nextgisweb/webmap/type/api";
 
 const m_to_km = 1e-3;
 const m_to_ft = 1 / 0.3048;

@@ -1,11 +1,12 @@
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import settings from "@nextgisweb/pyramid/settings!feature_attachment";
-import type { DojoDisplay, PluginParams } from "@nextgisweb/webmap/type";
+import type { Display } from "@nextgisweb/webmap/display";
+import type { PluginParams } from "@nextgisweb/webmap/type";
 
 import AttachmentBundleControl from "../ol-control";
 
 class BundleAttachmentPlugin {
-    private _display: DojoDisplay;
+    private _display: Display;
 
     private buildControl() {
         this._display._mapAddControls([
@@ -20,7 +21,7 @@ class BundleAttachmentPlugin {
     constructor(params: PluginParams) {
         this._display = params.display;
         if (settings["webmap"]["bundle"]) {
-            this._display._mapDeferred.then(() => {
+            this._display.mapDeferred.then(() => {
                 this.buildControl();
             });
         }

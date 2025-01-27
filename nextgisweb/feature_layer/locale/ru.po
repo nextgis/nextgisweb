@@ -1,5 +1,5 @@
 #: amd/ngw-feature-layer/FieldsDisplayWidget.js:35
-#: nodepkg/attribute-editor/plugin.ts:11 view.py:192
+#: nodepkg/attribute-editor/plugin.ts:10 view.py:192
 msgid "Attributes"
 msgstr "Атрибуты"
 
@@ -19,19 +19,19 @@ msgstr "Невалидная геометрия"
 msgid "Unknown spatial reference system"
 msgstr "Неизвестная система координат"
 
-#: api.py:422 api_export.py:151
+#: api.py:422 api_export.py:153
 msgid "Parameter 'intersects' geometry is not valid."
 msgstr "Параметр 'intersects' содержит невалидную геометрию."
 
-#: api_export.py:186
+#: api_export.py:188
 msgid "The export limit is set to {limit} features, but the layer contains {count}."
 msgstr "Лимит экспорта составляет {limit} объектов, однако слой содержит {count}."
 
-#: api_export.py:200
+#: api_export.py:202
 msgid "Failed to reproject 'intersects' geometry."
 msgstr "Не удалось перепроецировать геометрию 'intersects'."
 
-#: api_export.py:369
+#: api_export.py:371
 msgid "File name parameter '{}' is not valid."
 msgstr "Недопустимое имя файла '{}'."
 

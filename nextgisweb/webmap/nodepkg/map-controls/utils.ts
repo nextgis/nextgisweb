@@ -1,9 +1,9 @@
-import type { DojoDisplay } from "../type";
+import type { Display } from "../display";
 
 import type { ControlsInfo } from "./type";
 
 export const getControlsInfo = <T extends ControlsInfo>(
-    display: DojoDisplay,
+    display: Display,
     controlsInfo: T[]
 ): T[] => {
     let controls;

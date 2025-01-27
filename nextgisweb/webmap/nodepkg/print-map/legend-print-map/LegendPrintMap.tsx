@@ -1,7 +1,8 @@
+import { useEffect } from "react";
+
 import LayersTree from "../../layers-tree";
 import type { TreeWebmapItem } from "../../layers-tree/LayersTree";
 import type WebmapStore from "../../store";
-import type { LayerItem } from "../../type/TreeItems";
 import { printMapStore } from "../PrintMapStore";
 import RndComp from "../rnd-comp";
 import type { LegendPrintMapProps, RndCoords } from "../type";
@@ -20,7 +21,8 @@ const handleTreeItem = (
 
         const hasLegend =
             layersItem.legendIcon ||
-            (layersItem.treeItem as LayerItem).legendInfo.open;
+            (layersItem.treeItem.type === "layer" &&
+                layersItem.treeItem.legendInfo.open);
 
         if (hasLegend) {
             return layersItem;
@@ -56,15 +58,20 @@ const filterTreeItems = (store: WebmapStore, layersItems: TreeWebmapItem[]) => {
 };
 
 export const LegendPrintMap = ({
-    dojoDisplay: display,
+    display,
     show,
     legendCoords,
-    onChange: onChange,
+    onChange,
 }: LegendPrintMapProps) => {
-    if (!show) {
-        if (legendCoords.displayed) {
-            onChange({ ...legendCoords, displayed: false });
+    useEffect(() => {
+        if (!show) {
+            if (legendCoords.displayed) {
+                onChange({ ...legendCoords, displayed: false });
+            }
         }
+    });
+
+    if (!show) {
         return null;
     }
 
@@ -99,7 +106,7 @@ export const LegendPrintMap = ({
                                 store,
                                 layersItems
                             );
-                            printMapStore.webMapItems = filteredItems;
+                            printMapStore.setWebMapItems(filteredItems);
                             return filteredItems;
                         },
                     }}

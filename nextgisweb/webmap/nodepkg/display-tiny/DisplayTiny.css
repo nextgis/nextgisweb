@@ -1,0 +1,18 @@
+.tiny .navigation-menu-pane {
+    width: 0;
+}
+
+.tiny.tiny-panels .navigation-menu-pane {
+    width: 50px;
+}
+
+/* .tiny .company-logo {
+    top: 16px;
+    right: 16px;
+    bottom: auto;
+}
+
+.tiny .company-logo img {
+    width: 91px;
+    height: auto;
+} */

@@ -2,7 +2,7 @@ import type { ViewOptions } from "ol/View";
 import { useEffect, useRef } from "react";
 import type React from "react";
 
-import type { MapAdapter } from "@nextgisweb/webmap/ol/MapAdapter";
+import type { MapStore } from "@nextgisweb/webmap/ol/MapStore";
 import "ol/ol.css";
 import "./MapComponent.less";
 
@@ -15,7 +15,7 @@ export interface MapComponentProps extends ViewOptions {
     target?: string;
     style?: React.CSSProperties;
     basemap?: boolean;
-    whenCreated?: (mapAdapter: MapAdapter | null) => void;
+    whenCreated?: (mapAdapter: MapStore | null) => void;
     mapExtent?: MapExtent;
     resetView?: boolean;
 }
@@ -30,7 +30,7 @@ export function MapComponent({
     whenCreated,
     ...props
 }: MapComponentProps) {
-    const mapRef = useRef<MapAdapter>();
+    const mapRef = useRef<MapStore>();
     const { createMapAdapter } = useMapAdapter({
         center,
         zoom,

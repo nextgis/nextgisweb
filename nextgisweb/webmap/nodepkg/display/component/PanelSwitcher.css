@@ -1,0 +1,5 @@
+.panel-switcher .ant-tabs-content,
+.panel-switcher .ant-tabs-tabpane {
+    width: 100%;
+    height: 100%;
+}

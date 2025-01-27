@@ -1,5 +1,6 @@
 #: amd/ngw-feature-description/DisplayWidget.js:7
-#: nodepkg/description-editor/index.ts:7
+#: nodepkg/description-editor/plugin.ts:8
+#: nodepkg/description-view/DescriptionView.tsx:15
 msgid "Description"
 msgstr "Описание"
 

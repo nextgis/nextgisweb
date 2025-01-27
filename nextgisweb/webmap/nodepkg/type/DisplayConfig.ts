@@ -1,47 +1,23 @@
-import type { GroupItem } from "./TreeItems";
+import type { BasemapLayerRead } from "@nextgisweb/basemap/type/api";
 
-interface Scope {
-    read: boolean;
-    write: boolean;
-    manage: boolean;
+interface BasemapConfig extends BasemapLayerRead {
+    keyname: string;
+    display_name: string;
+
+    opacity?: number;
+    enabled?: boolean;
 }
 
-interface Annotations {
-    enabled: boolean;
-    default: string;
-    scope: Scope;
+export interface WebmapPluginConfig {
+    [name: string]: Record<string, any>;
+    basemaps: BasemapConfig[];
 }
 
-interface WebmapPlugin {
-    [name: string]: Record<string, unknown>;
-}
-
-interface Mid {
-    adapter: string[];
-    basemap: string[];
-    plugin: string[];
-}
-
-interface ItemsStates {
-    expanded: any[];
-    checked: number[];
-}
-
-export interface DisplayConfig {
-    extent: number[];
-    extent_const: null[];
-    rootItem: GroupItem;
-    itemsStates: ItemsStates;
-    mid: Mid;
-    webmapPlugin: WebmapPlugin;
-    bookmarkLayerId?: any;
-    webmapId: number;
-    webmapDescription: string;
-    webmapTitle: string;
-    webmapEditable: boolean;
-    webmapLegendVisible: string;
-    drawOrderEnabled?: any;
-    annotations: Annotations;
-    units: string;
-    printMaxSize: number;
+export type Entrypoint =
+    | string
+    | [midKey: string, loader: () => Promise<{ default: any }>];
+export interface Mid {
+    adapter: Entrypoint[];
+    basemap: Entrypoint[];
+    plugin: Entrypoint[];
 }

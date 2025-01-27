@@ -9,7 +9,7 @@ Changes
 - Chrome 118+, Safari 17+, Edge 116+ or Firefox 115+ is required.
 - Enhanced support for JSON output format in the WMS services.
 - Enhanced resource deletion confirmation with details of resources to delete.
-
+- Identification panel is enabled by default.
 
 4.9.0
 -----

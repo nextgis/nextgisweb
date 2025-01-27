@@ -1,6 +1,6 @@
 <%inherit file='nextgisweb:pyramid/template/base.mako' />
 
-<%include file="nextgisweb:pyramid/template/header.mako" args="title=display_config['webmapTitle'],
+<%include file="nextgisweb:pyramid/template/header.mako" args="title=title,
     hide_resource_filter=True"/>
 
 <div id="webmap-wrapper" class="webmap-wrapper">
@@ -9,11 +9,13 @@
 </div>
 
 <script type="text/javascript">
-    require(["ngw-webmap/Display"], function (Display) {
-        const displayConfig = ${json_js(display_config)};
-        new Display({ config: displayConfig })
-            .placeAt(document.getElementById("display"))
-            .startup();
+    require([
+        "@nextgisweb/webmap/display",
+        "@nextgisweb/gui/react-app",
+    ], function ({ default: comp }, { default: reactApp }) {
+        const props = { id: ${json_js(id)} };
+        const el = document.getElementById("display")
+        reactApp(comp, props, el);
     });
 </script>
 

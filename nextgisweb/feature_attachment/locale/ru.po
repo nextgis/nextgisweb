@@ -1,9 +1,9 @@
 #: amd/ngw-feature-attachment/DisplayWidget.js:9
-#: nodepkg/attachment-bundle/ol-control/control.js:14
-#: nodepkg/attachment-bundle/ol-control/control.js:30
-#: nodepkg/attachment-bundle/plugin/plugin.ts:15
-#: nodepkg/attachment-editor/plugin.ts:9
-#: nodepkg/attachment-table-view/AttachmentTableView.tsx:28
+#: nodepkg/attachment-bundle/ol-control/control.ts:21
+#: nodepkg/attachment-bundle/ol-control/control.ts:37
+#: nodepkg/attachment-bundle/plugin/plugin.ts:16
+#: nodepkg/attachment-editor/plugin.ts:8
+#: nodepkg/attachment-table-view/AttachmentTableView.tsx:23
 msgid "Attachments"
 msgstr "Вложения"
 
@@ -23,27 +23,27 @@ msgstr "Вложение с id = %d не найдено в объекте с id 
 msgid "The attachment may have been deleted or an error in the address."
 msgstr "Вложение могло быть удалено, либо допущена ошибка в адресе."
 
-#: nodepkg/attachment-bundle/tab/AttachmentsTab.tsx:33
+#: nodepkg/attachment-bundle/tab/AttachmentsTab.tsx:34
 msgid "Draw the geometry on the map to visualize the attachments to the objects"
 msgstr "Нарисуйте геометрию на карте, чтобы отобразить вложения к объектам."
 
-#: nodepkg/attachment-bundle/tab/AttachmentsTab.tsx:130
+#: nodepkg/attachment-bundle/tab/AttachmentsTab.tsx:132
 msgid "Object: "
 msgstr "Объект: "
 
-#: nodepkg/attachment-bundle/tab/AttachmentsTab.tsx:139
+#: nodepkg/attachment-bundle/tab/AttachmentsTab.tsx:141
 msgid "Identify object"
 msgstr "Идентифицировать объект"
 
-#: nodepkg/attachment-bundle/tab/AttachmentsTab.tsx:160
+#: nodepkg/attachment-bundle/tab/AttachmentsTab.tsx:162
 msgid "Attachments: "
 msgstr "Вложений: "
 
-#: nodepkg/attachment-bundle/tab/AttachmentsTab.tsx:187
+#: nodepkg/attachment-bundle/tab/AttachmentsTab.tsx:189
 msgid "No attachments"
 msgstr "Нет вложений"
 
-#: nodepkg/attachment-bundle/tab/AttachmentsTab.tsx:253
+#: nodepkg/attachment-bundle/tab/AttachmentsTab.tsx:255
 msgid "Download all attachments"
 msgstr "Скачать все вложения"
 

@@ -1,0 +1,73 @@
+:root {
+    --annotation-public: #97e07e;
+    --annotation-own: #e8b3f8;
+    --annotation-private: #f88f8f;
+}
+
+body .ol-popup.annotation .annotation-edit-controls {
+    display: none;
+}
+
+body.annotations-edit .ol-popup.annotation.no-edit .annotation-edit-controls {
+    display: none;
+}
+
+body.annotations-edit .ol-popup.annotation:hover .annotation-edit-controls {
+    display: block;
+}
+
+.ol-popup.annotation {
+    box-shadow: 0 3px 7px rgba(2, 34, 60, 0.16);
+    border: none;
+    border-radius: 2px;
+    padding: 6px 8px 8px;
+    min-height: 30px;
+}
+
+.ol-popup.annotation.public {
+    left: -55px;
+    border-left: var(--annotation-public) 5px solid;
+}
+
+.ol-popup.annotation.own {
+    left: -55px;
+    border-left: var(--annotation-own) 5px solid;
+}
+
+.ol-popup.annotation.private {
+    left: -55px;
+    border-left: var(--annotation-private) 5px solid;
+}
+
+.ol-popup.annotation:before {
+    border: none;
+}
+
+.ol-popup.annotation .ol-popup-closer {
+    display: none;
+}
+
+.ol-popup.annotation .annotation-edit-controls {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    box-shadow: 0 2px 3px rgba(2, 34, 60, 0.24);
+    border-radius: 2px;
+    background-color: #f1f1f1;
+    padding: 3px;
+}
+
+.ol-popup.annotation .annotation-edit-controls .annotation-edit {
+    display: block;
+    cursor: pointer;
+    color: var(--icon-color);
+    font-size: 16px;
+}
+
+.ol-popup.annotation .annotation-edit-controls .annotation-edit:hover {
+    color: var(--primary);
+}
+
+.annotation-layer {
+    z-index: -1;
+}

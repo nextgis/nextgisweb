@@ -1,0 +1,25 @@
+.annotation-access-type {
+    margin: 0 0 9px 0;
+    border: 1px solid transparent;
+    border-left-width: 8px;
+    padding: 1px 2px 1px 5px;
+    color: #818181;
+    font-size: 12px;
+    text-align: left;
+}
+
+.annotation-access-type .empty {
+    display: none;
+}
+
+.annotation-access-type .public {
+    border-color: var(--annotation-public);
+}
+
+.annotation-access-type own {
+    border-color: var(--annotation-own);
+}
+
+.annotation-access-type .private {
+    border-color: var(--annotation-private);
+}

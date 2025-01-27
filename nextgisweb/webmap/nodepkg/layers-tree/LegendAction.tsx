@@ -2,7 +2,7 @@ import type { MouseEvent } from "react";
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import type { TreeItem } from "../type/TreeItems";
+import type { TreeItemConfig } from "../type/TreeItems";
 
 import CollapseIcon from "@nextgisweb/icon/material/keyboard_arrow_up/outline";
 import ExpandIcon from "@nextgisweb/icon/material/view_list/outline";
@@ -14,7 +14,7 @@ export function LegendAction({
     nodeData,
     onClick,
 }: {
-    nodeData: TreeItem;
+    nodeData: TreeItemConfig;
     onClick: (id: number) => void;
 }) {
     const legendInfo = "legendInfo" in nodeData && nodeData.legendInfo;

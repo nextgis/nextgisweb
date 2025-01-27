@@ -14,13 +14,13 @@
 <div id="display" style="width: 100%; height: 100%"></div>
 
 <script type="text/javascript">
-    require(["ngw-webmap/Display"], function (Display) {
-        const displayConfig = ${json_js(display_config)};
+    require([
+        "@nextgisweb/webmap/display-tiny",
+        "@nextgisweb/gui/react-app",
+    ], function ({ default: comp }, { default: reactApp }) {
         const mainDisplayUrl = ${json_js(request.route_url('webmap.display', id=obj.id) + "?" + request.query_string)};
-        const tinyConfig = {mainDisplayUrl};
-
-        new Display({ config: displayConfig, tinyConfig })
-            .placeAt(document.getElementById("display"))
-            .startup();
+        const props = { id: ${json_js(id)}, tinyConfig: { mainDisplayUrl: mainDisplayUrl }};
+        const el = document.getElementById("display")
+        reactApp(comp, props, el);
     });
 </script>

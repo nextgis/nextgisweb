@@ -1,62 +1,114 @@
-/// <reference types="dojo/dijit" />
+import type Feature from "ol/Feature";
+import type OlControl from "ol/control/Control";
 
-import type { DojoDisplay } from "./DojoDisplay";
-import type { TreeItem } from "./TreeItems";
+import type { LayerItemConfig } from "@nextgisweb/webmap/type/api";
+
+import type { LayerDisplayAdapterCtor } from "../DisplayLayerAdapter";
+import type { CustomItemFileWriteStore } from "../compat/CustomItemFileWriteStore";
+import type { Display } from "../display";
+import type { ToolBase } from "../map-controls/tool/ToolBase";
+import type { MapStore } from "../ol/MapStore";
+import type { CoreLayer, LayerOptions } from "../ol/layer/CoreLayer";
+import type { PluginBase } from "../plugin/PluginBase";
+import type { AnnotationVisibleMode } from "../store/annotations/AnnotationsStore";
 
 export * from "./DisplayConfig";
-export * from "./DojoDisplay";
-export * from "./WebmapItem";
-export * from "./WebmapLayer";
-export * from "./WebmapPlugin";
 
-export interface DojoItem extends HTMLElement {
-    set: (key: string, value: unknown) => void;
-    domNode: HTMLElement;
-    on?: (eventName: string, callback: (panel: PanelDojoItem) => void) => void;
-    addChild: (child: DojoItem) => void;
-    get: (val: string) => unknown;
-}
-
-export type StoreItem = dojo.data.api.Item & TreeItem;
-
-export interface WebmapItem {
-    checked: boolean;
-    id: number;
-    identifiable: boolean;
-    label: string;
+export interface HighlightFeatureData {
+    geom: string;
+    featureId: number;
     layerId: number;
-    position: unknown;
-    styleId: number;
-    type: string;
-    visibility: boolean;
-    symbols: string[];
 }
 
-export interface CustomItemFileWriteStore extends dojo.data.ItemFileWriteStore {
-    dumpItem: (item: StoreItem) => WebmapItem;
+export interface FeatureHighlighter {
+    highlightFeature: (data: HighlightFeatureData) => void;
+    getHighlighted: () => Feature[];
+    unhighlightFeature: (filter: (feature: Feature) => boolean) => void;
+    highlightFeatureById: (
+        featureId: number,
+        layerId: number
+    ) => PromiseLike<Feature>;
 }
 
-export interface PanelClsParams {
-    display: DojoDisplay;
-    menuIcon: string;
-    name: string;
-    order: number;
+// use this wrapper because BaseLayer is abstract class
+export type BaseLayerConstructor = new (
+    name: string,
+    layerOptions: LayerOptions,
+    sourceOptions?: unknown
+) => CoreLayer;
+
+export interface BasemapModules {
+    [key: string]: BaseLayerConstructor;
+}
+
+export interface AdapterModules {
+    [key: string]: LayerDisplayAdapterCtor;
+}
+
+export interface PluginModules {
+    [key: string]: MapPlugin;
+}
+
+export interface WMPluginModules {
+    [key: string]: MapPlugin;
+}
+
+export interface Mid {
+    basemap: BasemapModules;
+    adapter: AdapterModules;
+    plugin: PluginModules;
+    wmplugin: WMPluginModules;
+}
+
+export type MapControl = OlControl | ToolBase;
+
+export interface MapRefs {
+    target: HTMLElement;
+    leftTopControlPane: HTMLElement;
+    leftBottomControlPane: HTMLElement;
+    rightTopControlPane: HTMLElement;
+    rightBottomControlPane: HTMLElement;
+}
+
+export interface MapURLParams {
+    lon?: string;
+    lat?: string;
+    base?: string;
+    zoom?: string;
+    angle?: string;
+    annot?: AnnotationVisibleMode;
+    events?: "true";
+    panel?: string;
+    panels?: string;
+    styles?: string;
+    hl_val?: string;
+    hl_lid?: string;
+    hl_attr?: string;
+    controls?: string;
+    linkMainMap?: "true";
+}
+
+export interface TinyConfig {
+    mainDisplayUrl: string;
+}
+
+export type MapPlugin = new (val: PluginParams) => PluginBase;
+
+export interface PluginMenuItem {
+    icon: string;
     title: string;
-    splitter: boolean;
+    onClick: () => void;
 }
 
-export interface PanelDojoItem extends DojoItem {
-    name: string;
-    menuIcon?: string;
-    title: string;
+export interface PluginParams {
+    identity: string;
+    display: Display;
+    itemStore: CustomItemFileWriteStore | boolean;
+}
 
-    order?: number;
-    cls?: new (params: PanelClsParams) => PanelDojoItem;
-    params: PanelClsParams;
-
-    isFullWidth?: boolean;
-    show: () => void;
-    hide: () => void;
-
-    applyToTinyMap?: boolean;
+export interface PluginState {
+    enabled: boolean;
+    nodeData: LayerItemConfig;
+    map: MapStore;
+    active?: boolean;
 }

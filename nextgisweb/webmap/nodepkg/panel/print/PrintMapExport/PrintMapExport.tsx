@@ -6,11 +6,11 @@ import { Button, Dropdown, Space } from "@nextgisweb/gui/antd";
 import type { MenuProps } from "@nextgisweb/gui/antd";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import type { Display } from "@nextgisweb/webmap/display";
 import type { PrintBody, PrintFormat } from "@nextgisweb/webmap/type/api";
 
 import { printMapStore } from "../../../print-map/PrintMapStore";
 import type { PrintMapSettings } from "../../../print-map/type";
-import type { DojoDisplay } from "../../../type";
 import { exportFormats } from "../options";
 
 import { legendItemsToModel, legendToModel } from "./legendToModel";
@@ -18,7 +18,7 @@ import { legendItemsToModel, legendToModel } from "./legendToModel";
 import { DownOutlined } from "@ant-design/icons";
 
 interface ExportProps {
-    display: DojoDisplay;
+    display: Display;
     format: PrintFormat;
     element: HTMLElement;
     settings: PrintMapSettings;
@@ -102,7 +102,7 @@ const runExport = ({
 interface PrintMapExportProps {
     mapSettings: PrintMapSettings;
     printMapEl?: HTMLElement;
-    display: DojoDisplay;
+    display: Display;
 }
 
 export const PrintMapExport = observer(
@@ -158,3 +158,5 @@ export const PrintMapExport = observer(
         );
     }
 );
+
+PrintMapExport.displayName = "PrintMapExport";

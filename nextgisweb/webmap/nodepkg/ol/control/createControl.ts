@@ -5,12 +5,12 @@ import type {
     MapControl,
 } from "@nextgisweb/webmap/control-container/ControlContainer";
 
-import type { MapAdapter } from "../MapAdapter";
+import type { MapStore } from "../MapStore";
 
 export function createControl(
     control: MapControl,
     options: CreateControlOptions = {},
-    map: MapAdapter
+    map: MapStore
 ): Control {
     class NewControl extends Control {
         constructor() {

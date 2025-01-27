@@ -1,9 +1,9 @@
-import type { MapAdapter } from "../ol/MapAdapter";
+import type { MapStore } from "../ol/MapStore";
 import "./ControlContainer.css";
 
 export interface MapControl {
-    onAdd(map?: MapAdapter): HTMLElement | undefined;
-    onRemove(map?: MapAdapter): unknown;
+    onAdd(map?: MapStore): HTMLElement | undefined;
+    onRemove(map?: MapStore): unknown;
     getContainer?(): HTMLElement;
     remove?(): void;
 }
@@ -24,13 +24,13 @@ export interface ControlContainerOptions {
     target?: string;
     classPrefix?: string;
     addClass?: string;
-    mapAdapter?: MapAdapter;
+    mapAdapter?: MapStore;
 }
 
 export class ControlContainer {
     private readonly classPrefix: string = "mapadapter";
     private readonly addClass?: string;
-    private readonly mapAdapter?: MapAdapter;
+    private readonly mapAdapter?: MapStore;
     private _container: HTMLElement;
     private _positionsContainers: {
         [key in ControlPosition]: HTMLElement | null;

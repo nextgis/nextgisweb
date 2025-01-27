@@ -7,6 +7,8 @@ from .base import WebmapLayerPlugin
 
 
 class LayerEditorPlugin(WebmapLayerPlugin):
+    amd_free = True
+
     @classmethod
     def is_layer_supported(cls, layer, webmap):
         if IFeatureLayer.providedBy(layer):
@@ -15,7 +17,7 @@ class LayerEditorPlugin(WebmapLayerPlugin):
             if not write_permission:
                 return False
             return (
-                "ngw-webmap/plugin/LayerEditor",
+                "@nextgisweb/webmap/plugin/layer-editor",
                 dict(
                     writable=IWritableFeatureLayer.providedBy(layer),
                     geometry_type=layer.geometry_type,

@@ -1,4 +1,3 @@
-/** @entrypoint */
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import pyramidSettings from "@nextgisweb/pyramid/settings!pyramid";
 

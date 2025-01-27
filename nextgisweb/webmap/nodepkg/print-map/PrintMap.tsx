@@ -1,20 +1,13 @@
 import { debounce } from "lodash-es";
 import { observer } from "mobx-react-lite";
-import Map from "ol/Map";
 import type OlMap from "ol/Map";
-import View from "ol/View";
-import { Rotate } from "ol/control";
-import { defaults as defaultInteractions } from "ol/interaction";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { gettext } from "@nextgisweb/pyramid/i18n";
-
-import { getLabel } from "../map-controls/map-controls";
-import MapScaleControl from "../ol/ol-ext/ol-mapscale";
-import type { DojoDisplay } from "../type";
+import MapScaleControl from "../ol-ext/ol-mapscale";
 
 import { printMapStore } from "./PrintMapStore";
 import { buildPrintStyle } from "./PrintMapStyle";
+import { usePrintMap } from "./hook/usePrintMap";
 import LegendPrintMap from "./legend-print-map";
 import RndComp from "./rnd-comp";
 import type {
@@ -23,97 +16,9 @@ import type {
     PrintMapProps,
     PrintMapSettings,
 } from "./type";
-import { mmToPx } from "./utils";
+import { mmToPx, setMapScale, switchRotateControl } from "./utils";
 
 import "./PrintMap.less";
-
-const setMapScale = (scale: number, olMap: OlMap): void => {
-    const view = olMap.getView();
-    const center = view.getCenter();
-    if (!center) {
-        return;
-    }
-    const cosh = (value: number) => {
-        return (Math.exp(value) + Math.exp(-value)) / 2;
-    };
-    const pointResolution3857 = cosh(center[1] / 6378137);
-    const resolution = pointResolution3857 * (scale / (96 * 39.3701));
-    olMap.getView().setResolution(resolution);
-};
-
-const switchRotateControl = (olMap: OlMap, show: boolean): void => {
-    const controls = olMap.getControls();
-    const rotateControl = controls
-        .getArray()
-        .find((control) => control instanceof Rotate);
-
-    if (!rotateControl && show) {
-        const rotateControl = new Rotate({
-            tipLabel: gettext("Reset rotation"),
-            label: getLabel("arrow_upward"),
-            autoHide: false,
-        });
-        olMap.addControl(rotateControl);
-    }
-
-    if (rotateControl && !show) {
-        olMap.removeControl(rotateControl);
-    }
-};
-
-const buildMap = (container: HTMLElement, display: DojoDisplay): OlMap => {
-    const interactions = defaultInteractions({
-        doubleClickZoom: true,
-        keyboard: true,
-        mouseWheelZoom: true,
-        shiftDragZoom: false,
-    });
-
-    const view = new View({
-        center: display.map.olMap.getView().getCenter(),
-        zoom: display.map.olMap.getView().getZoom(),
-    });
-
-    const printMap: OlMap = new Map({
-        target: container,
-        controls: [],
-        interactions,
-        view,
-    });
-
-    display.map.olMap
-        .getLayers()
-        .getArray()
-        .forEach((layer) => {
-            if (layer.getVisible() && (layer as any).printingCopy) {
-                // Adding the same layer to different maps causes
-                // infinite loading, thus we need a copy.
-                printMap.addLayer((layer as any).printingCopy());
-            }
-        });
-
-    display.map.olMap
-        .getOverlays()
-        .getArray()
-        .forEach((overlay) => {
-            if ("annPopup" in overlay && overlay.annPopup) {
-                const annPopup = overlay.annPopup;
-                const clonedPopup = (annPopup as any).cloneOlPopup(
-                    (annPopup as any).getAnnFeature()
-                );
-                printMap.addOverlay(clonedPopup);
-            }
-        });
-
-    const mapLogoEl = document.getElementsByClassName("map-logo");
-    if (mapLogoEl.length > 0) {
-        const olViewportEl = container.getElementsByClassName("ol-viewport")[0];
-        const newLogoEl = mapLogoEl[0].cloneNode(true);
-        olViewportEl.appendChild(newLogoEl);
-    }
-
-    return printMap;
-};
 
 class PrintMapStyle {
     style: HTMLStyleElement;
@@ -149,14 +54,8 @@ class PrintMapStyle {
     }
 }
 
-export const PrintMap = observer(
-    ({
-        settings,
-        display,
-        initCenter,
-        onScaleChange,
-        onCenterChange,
-    }: PrintMapProps) => {
+export const PrintMap = observer<PrintMapProps>(
+    ({ settings, display, initCenter, onScaleChange, onCenterChange }) => {
         const {
             width,
             height,
@@ -170,6 +69,8 @@ export const PrintMap = observer(
             titleText,
             arrow,
         } = settings;
+        const { mapReady } = display;
+        const { buildPrintMap } = usePrintMap({ display });
 
         const { legendCoords, titleCoords, mapCoords } = printMapStore;
 
@@ -191,16 +92,18 @@ export const PrintMap = observer(
             return () => {
                 printMapStyle.clear();
             };
-        }, [width, height, margin]);
+        }, [width, height, margin, settings]);
 
         useEffect(() => {
+            if (!mapReady) return;
+
             if (printMap.current || !printMapRef.current) return;
 
             const { height, width } = mapCoords;
             const isContainerReady = height && width;
             if (!isContainerReady) return;
 
-            const map = buildMap(printMapRef.current, display);
+            const map = buildPrintMap(printMapRef.current);
 
             if (initCenter) {
                 const view = map.getView();
@@ -236,7 +139,14 @@ export const PrintMap = observer(
             map.addControl(mapScale);
             printMap.current = map;
             setMapScaleControl(mapScale);
-        }, [display, mapCoords]);
+        }, [
+            mapReady,
+            mapCoords,
+            initCenter,
+            buildPrintMap,
+            onScaleChange,
+            onCenterChange,
+        ]);
 
         useEffect(() => {
             if (printMap.current && style) {
@@ -262,7 +172,7 @@ export const PrintMap = observer(
             }
         }, [scaleLine, scaleValue, mapScaleControl]);
 
-        const legendComp = useMemo(() => {
+        useEffect(() => {
             if (!legend) {
                 if (legendCoords.displayed) {
                     printMapStore.updateCoordinates(
@@ -274,17 +184,23 @@ export const PrintMap = observer(
                         settings
                     );
                 }
-                return null;
             }
+        }, [legend, legendCoords, legendCoords.displayed, settings]);
+        useEffect(() => {
+            const shouldReset =
+                (title && !printMapStore.titleCoords.displayed) ||
+                (!title && printMapStore.titleCoords.displayed) ||
+                !legendCoords.displayed;
 
-            if (!legendCoords.displayed) {
+            if (shouldReset) {
                 printMapStore.makeLayout(settings);
-                return null;
             }
+        }, [legendCoords.displayed, settings, title]);
 
+        const legendComp = useMemo(() => {
             return (
                 <LegendPrintMap
-                    dojoDisplay={display}
+                    display={display}
                     printMapStore={printMapStore}
                     legendCoords={legendCoords}
                     show={legend}
@@ -297,22 +213,13 @@ export const PrintMap = observer(
                     }}
                 />
             );
-        }, [legend, legendCoords, legendColumns]);
+        }, [legend, legendCoords, display, settings]);
 
         useEffect(() => {
             printMapStore.updateColumnsCount(legendColumns);
         }, [legendColumns]);
 
         const titleComp = useMemo(() => {
-            const shouldReset =
-                (title && !printMapStore.titleCoords.displayed) ||
-                (!title && printMapStore.titleCoords.displayed);
-
-            if (shouldReset) {
-                printMapStore.makeLayout(settings);
-                return null;
-            }
-
             if (!title) return null;
 
             return (
@@ -334,7 +241,7 @@ export const PrintMap = observer(
                     <div className="print-title">{titleText}</div>
                 </RndComp>
             );
-        }, [title, titleCoords, titleText]);
+        }, [settings, title, titleCoords, titleText]);
 
         const mapComp = useMemo(() => {
             setTimeout(() => {
@@ -366,9 +273,9 @@ export const PrintMap = observer(
                     <div className="print-olmap" ref={printMapRef}></div>
                 </RndComp>
             );
-        }, [mapCoords]);
+        }, [mapCoords, settings, style]);
 
-        if (printMap)
+        if (printMap) {
             return (
                 <div className="print-map-page-wrapper">
                     <div className="print-map-export-wrapper">
@@ -382,5 +289,9 @@ export const PrintMap = observer(
                     </div>
                 </div>
             );
+        }
+        return null;
     }
 );
+
+PrintMap.displayName = "PrintMap";

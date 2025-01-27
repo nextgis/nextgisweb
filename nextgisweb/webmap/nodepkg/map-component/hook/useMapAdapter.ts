@@ -9,7 +9,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { NgwExtent } from "@nextgisweb/feature-layer/type/api";
 import { useObjectState } from "@nextgisweb/gui/hook";
 import type { SRSRef } from "@nextgisweb/spatial-ref-sys/type/api";
-import { MapAdapter } from "@nextgisweb/webmap/ol/MapAdapter";
+import { MapStore } from "@nextgisweb/webmap/ol/MapStore";
 
 export interface MapExtent extends FitOptions {
     extent: NgwExtent;
@@ -31,7 +31,7 @@ export function useMapAdapter({
     maxZoom,
     mapExtent: mapExtentProp,
 }: MapProps) {
-    const [mapAdapter, setMapAdapter] = useState<MapAdapter>();
+    const [mapAdapter, setMapAdapter] = useState<MapStore>();
     const osmLayer = useRef<TileLayer<OSM>>();
 
     const [center] = useObjectState(centerProp);
@@ -42,7 +42,7 @@ export function useMapAdapter({
             const view = new View({
                 projection: `EPSG:${mapSRS.id}`,
             });
-            const adapter = new MapAdapter({
+            const adapter = new MapStore({
                 target,
                 view,
             });
@@ -53,9 +53,9 @@ export function useMapAdapter({
     );
 
     const setView = useCallback((): void => {
-        if (!mapAdapter?.map) return;
+        if (!mapAdapter?.olMap) return;
 
-        const curView = mapAdapter.map.getView();
+        const curView = mapAdapter.olMap.getView();
 
         if (center) {
             curView.setCenter(center);
@@ -97,7 +97,7 @@ export function useMapAdapter({
                 source: new OSM(),
                 zIndex: -1,
             });
-            mapAdapter.map.addLayer(osmLayer_);
+            mapAdapter.olMap.addLayer(osmLayer_);
             osmLayer.current = osmLayer_;
         }
         return () => {
@@ -109,8 +109,8 @@ export function useMapAdapter({
 
     useEffect(() => {
         return () => {
-            if (mapAdapter?.map) {
-                mapAdapter.map.dispose();
+            if (mapAdapter?.olMap) {
+                mapAdapter.olMap.dispose();
             }
         };
     }, [mapAdapter]);

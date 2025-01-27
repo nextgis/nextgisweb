@@ -21,12 +21,12 @@ export function NGWLayer({
     });
 
     useEffect(() => {
-        if (!adapter?.map) return;
+        if (!adapter?.olMap) return;
 
-        adapter.map.addLayer(layer);
+        adapter.olMap.addLayer(layer);
 
         return () => {
-            adapter.map.removeLayer(layer);
+            adapter.olMap.removeLayer(layer);
         };
     }, [layerType, resourceId, adapter, zIndex, layer]);
 

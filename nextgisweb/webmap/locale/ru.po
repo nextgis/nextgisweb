@@ -6,240 +6,11 @@ msgstr "Тайлы"
 msgid "Image"
 msgstr "Изображение"
 
-#: amd/ngw-webmap/Display.js:853
-msgid "Object not found"
-msgstr "Объект не найден"
-
-#: amd/ngw-webmap/Display.js:854
-msgid "Object from URL parameters not found"
-msgstr "Объект из параметров строки запроса не найден"
-
-#: amd/ngw-webmap/Display.js:946 nodepkg/items-widget/ItemsWidget.tsx:245
-msgid "Layers"
-msgstr "Слои"
-
-#: amd/ngw-webmap/Display.js:958 amd/ngw-webmap/tool/Identify.js:388
-#: amd/ngw-webmap/tool/Identify.js:404
-msgid "Identify"
-msgstr "Идентификация"
-
-#: amd/ngw-webmap/Display.js:970
-msgid "Search"
-msgstr "Поиск"
-
-#: amd/ngw-webmap/Display.js:981
-msgid "Print map"
-msgstr "Распечатать карту"
-
-#: amd/ngw-webmap/Display.js:995 nodepkg/settings-widget/SettingsWidget.tsx:28
-msgid "Bookmarks"
-msgstr "Закладки"
-
-#: amd/ngw-webmap/Display.js:1013 amd/ngw-webmap/plugin/LayerInfo.js:28
-msgid "Description"
-msgstr "Описание"
-
-#: amd/ngw-webmap/Display.js:1032
-msgid "Share"
-msgstr "Поделиться"
-
-#: amd/ngw-webmap/Display.js:1084 nodepkg/settings-widget/SettingsWidget.tsx:26
-msgid "Annotations"
-msgstr "Аннотации"
-
-#: amd/ngw-webmap/Display.js:1129
-msgid "Open full map"
-msgstr "Открыть карту целиком"
-
-#: amd/ngw-webmap/controls/MyLocation.js:128
-msgid "Your location could not be determined"
-msgstr "Определить местоположение не удалось"
-
-#: amd/ngw-webmap/layers/annotations/AnnotationFeature.js:10
-msgid "Your annotation text"
-msgstr "Ваш текст аннотации"
-
-#: amd/ngw-webmap/layers/annotations/AnnotationFeature.js:127
-msgid "Public annotation"
-msgstr "Публичная аннотация"
-
-#: amd/ngw-webmap/layers/annotations/AnnotationFeature.js:129
-msgid "My private annotation"
-msgstr "Моя приватная аннотация"
-
-#: amd/ngw-webmap/layers/annotations/AnnotationFeature.js:132
-msgid "Private annotation"
-msgstr "Приватная аннотация"
-
-#: amd/ngw-webmap/layers/annotations/AnnotationsPopup.hbs:7
-#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:250
-msgid "Edit annotation"
-msgstr "Редактировать аннотацию"
-
-#: amd/ngw-webmap/plugin/FeatureLayer.js:18
-msgid "Feature table"
-msgstr "Таблица объектов"
-
-#: amd/ngw-webmap/plugin/LayerEditor.js:142
-msgid "Stop editing"
-msgstr "Завершить редактирование"
-
-#: amd/ngw-webmap/plugin/LayerEditor.js:143
-#: nodepkg/panel/annotations/AnnotationsPanel.js:86
-msgid "Edit"
-msgstr "Редактировать"
-
-#: amd/ngw-webmap/plugin/ZoomToLayer.js:25
-msgid "Zoom to layer"
-msgstr "Увеличить до слоя"
-
-#: amd/ngw-webmap/tool/Identify.js:277
-#: nodepkg/panel/identification/IdentificationPanel.tsx:218
-msgid "Attributes"
-msgstr "Атрибуты"
-
-#: amd/ngw-webmap/tool/Identify.js:289
-#: nodepkg/panel/identification/IdentificationPanel.tsx:251
-msgid "Geometry"
-msgstr "Геометрия"
-
-#: amd/ngw-webmap/tool/Identify.js:558
-msgid "Features"
-msgstr "Объектов"
-
-#: amd/ngw-webmap/tool/Measure.js:36 nodepkg/map-controls/map-tools.ts:42
-msgid "Measure distance"
-msgstr "Измерение расстояния"
-
-#: amd/ngw-webmap/tool/Measure.js:42 nodepkg/map-controls/map-tools.ts:51
-msgid "Measure area"
-msgstr "Измерение площади"
-
-#: amd/ngw-webmap/tool/Measure.js:235
-msgid "Double click to finish."
-msgstr "Щёлкните дважды, чтобы завершить."
-
-#: amd/ngw-webmap/tool/Rotate.js:9
-msgid "Rotate"
-msgstr "Поворот"
-
-#: amd/ngw-webmap/tool/Swipe.js:13 nodepkg/map-controls/map-tools.ts:60
-msgid "Vertical swipe"
-msgstr "Вертикальная шторка"
-
-#: amd/ngw-webmap/tool/Swipe.js:20
-msgid "Horizontal swipe"
-msgstr "Горизонтальная шторка"
-
-#: amd/ngw-webmap/tool/ViewerInfo.js:16
-msgid "Show cursor coordinates / extent"
-msgstr "Показать координаты курсора / охват"
-
-#: amd/ngw-webmap/tool/Zoom.js:14 nodepkg/map-controls/map-controls.ts:46
-#: nodepkg/map-controls/map-tools.ts:24
-msgid "Zoom in"
-msgstr "Приблизить"
-
-#: amd/ngw-webmap/tool/Zoom.js:20 nodepkg/map-controls/map-controls.ts:47
-#: nodepkg/map-controls/map-tools.ts:33
-msgid "Zoom out"
-msgstr "Отодвинуть"
-
-#: amd/ngw-webmap/tool/editing/CreateFeature.js:13
-msgid "Create features"
-msgstr "Создать объекты"
-
-#: amd/ngw-webmap/tool/editing/DeleteFeature.js:13
-msgid "Delete features"
-msgstr "Удалить объекты"
-
-#: amd/ngw-webmap/tool/editing/ModifyFeature.js:13
-msgid "Modify features"
-msgstr "Изменить объекты"
-
-#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:109
-#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:47
-#: nodepkg/settings/SettingsForm.js:339
-msgid "Save"
-msgstr "Сохранить"
-
-#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:114
-#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:57
-msgid "Cancel"
-msgstr "Отменить"
-
-#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:119
-msgid "Delete"
-msgstr "Удалить"
-
-#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:131
-msgid "Create as public"
-msgstr "Создать как публичную"
-
-#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:140
-msgid "Create as private"
-msgstr "Создать как приватную"
-
-#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:149
-msgid "Create"
-msgstr "Создать"
-
-#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsDialog.js:255
-msgid "Create annotation"
-msgstr "Создать аннотацию"
-
-#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsSettings.hbs:5
-msgid "Stroke: width / color"
-msgstr "Обводка: ширина / цвет"
-
-#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsSettings.hbs:10
-#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsSettings.hbs:46
-msgid "Please enter a numeric value"
-msgstr "Введите числовое значение"
-
-#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsSettings.hbs:11
-msgid "Invalid width: should be from 0 to 20 px"
-msgstr "Значение должно быть от 0 до 20 пикс."
-
-#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsSettings.hbs:13
-msgid "Stroke width, px"
-msgstr "Ширина обводки, пикс."
-
-#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsSettings.hbs:18
-msgid "Stroke color"
-msgstr "Цвет обводки"
-
-#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsSettings.hbs:25
-#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsSettings.hbs:31
-msgid "Fill color"
-msgstr "Цвет заливки"
-
-#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsSettings.hbs:38
-#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsSettings.hbs:43
-msgid "Circle size, px"
-msgstr "Размер пунсона, пикс"
-
-#: amd/ngw-webmap/ui/AnnotationsDialog/AnnotationsSettings.hbs:47
-msgid "Invalid width: should be from 1 to 100 px"
-msgstr "Значение должно быть от 1 до 100 пикс."
-
-#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:24
-msgid "Stopping editing"
-msgstr "Завершить редактирование?"
-
-#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:34
-msgid "Do you want to save changes?"
-msgstr "Вы хотите сохранить изменения?"
-
-#: amd/ngw-webmap/ui/FinishEditingDialog/FinishEditingDialog.js:52
-msgid "Don't save"
-msgstr "Не сохранять"
-
 #: component.py:32
 msgid "Main web map"
 msgstr "Основная веб-карта"
 
-#: favorite.py:5 view.py:338
+#: favorite.py:5 view.py:171
 msgid "Display"
 msgstr "Открыть"
 
@@ -247,7 +18,7 @@ msgstr "Открыть"
 msgid "Fragment"
 msgstr "Фрагмент"
 
-#: model.py:46 model.py:64 view.py:333 view.py:360
+#: model.py:46 model.py:64 view.py:166 view.py:193
 msgid "Web map"
 msgstr "Веб-карта"
 
@@ -266,7 +37,7 @@ msgctxt "permission"
 msgid "Manage annotations"
 msgstr "Управление аннотациями"
 
-#: nodepkg/clone-webmap/CloneWebmap.tsx:21 view.py:348
+#: nodepkg/clone-webmap/CloneWebmap.tsx:21 view.py:181
 msgid "Clone"
 msgstr "Клонировать"
 
@@ -280,24 +51,36 @@ msgstr "Наименование"
 
 #: nodepkg/component/SelectLegendSymbols.tsx:5
 #: nodepkg/settings-widget/SettingsWidget.tsx:33
-#: nodepkg/settings/select-options.js:92
+#: nodepkg/settings/select-options.ts:92
 msgid "Default"
 msgstr "По умолчанию"
 
 #: nodepkg/component/SelectLegendSymbols.tsx:8
-#: nodepkg/settings/select-options.js:93
+#: nodepkg/settings/select-options.ts:93
 msgid "Expand"
 msgstr "Развернуть"
 
 #: nodepkg/component/SelectLegendSymbols.tsx:9
-#: nodepkg/settings/select-options.js:94
+#: nodepkg/settings/select-options.ts:94
 msgid "Collapse"
 msgstr "Свернуть"
 
 #: nodepkg/component/SelectLegendSymbols.tsx:10
-#: nodepkg/settings/select-options.js:95
+#: nodepkg/settings/select-options.ts:95
 msgid "Disable"
 msgstr "Отключить"
+
+#: nodepkg/display-tiny/DisplayTinyComponent.tsx:45
+msgid "Open full map"
+msgstr "Открыть карту целиком"
+
+#: nodepkg/display/Display.ts:805
+msgid "Object not found"
+msgstr "Объект не найден"
+
+#: nodepkg/display/Display.ts:806
+msgid "Object from URL parameters not found"
+msgstr "Объект из параметров строки запроса не найден"
 
 #: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:61
 msgid "Radius:"
@@ -313,7 +96,7 @@ msgid "Circle"
 msgstr "Окружность"
 
 #: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:89
-#: nodepkg/panel/annotations/AnnotationsPanel.js:109
+#: nodepkg/panel/annotations/AnnotationsPanel.tsx:161
 msgid "Line"
 msgstr "Линия"
 
@@ -322,7 +105,7 @@ msgid "Rectangle"
 msgstr "Прямоугольник"
 
 #: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:102
-#: nodepkg/panel/annotations/AnnotationsPanel.js:113
+#: nodepkg/panel/annotations/AnnotationsPanel.tsx:165
 #: nodepkg/utils/geometry-types.ts:15
 msgid "Polygon"
 msgstr "Полигон"
@@ -399,9 +182,10 @@ msgstr "Мин. масштаб"
 msgid "Max scale"
 msgstr "Макс. масштаб"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:40 nodepkg/panel/print/PrintPanel.tsx:478
+#: nodepkg/items-widget/ItemsWidget.tsx:40
+#: nodepkg/panel/print/component/PrintElementsSettings.tsx:27
 #: nodepkg/settings-widget/SettingsWidget.tsx:25
-#: nodepkg/settings/SettingsForm.js:303
+#: nodepkg/settings/SettingsForm.tsx:287
 msgid "Legend"
 msgstr "Легенда"
 
@@ -425,9 +209,25 @@ msgstr "Изменить порядок рисования"
 msgid "Customize draw order"
 msgstr "Настроить порядок рисования"
 
+#: nodepkg/items-widget/ItemsWidget.tsx:245 nodepkg/panel/layers/plugin.tsx:10
+msgid "Layers"
+msgstr "Слои"
+
 #: nodepkg/layer-opacity-slider/LayerOpacitySlider.tsx:8
 msgid "Opacity"
 msgstr "Непрозрачность"
+
+#: nodepkg/layer/annotations/AnnotationFeature.ts:53
+msgid "Your annotation text"
+msgstr "Ваш текст аннотации"
+
+#: nodepkg/layer/annotations/AnnotationFeature.ts:187
+msgid "Public annotation"
+msgstr "Публичная аннотация"
+
+#: nodepkg/layer/annotations/AnnotationFeature.ts:189
+msgid "My private annotation"
+msgstr "Моя приватная аннотация"
 
 #: nodepkg/layers-tree/LegendAction.tsx:10
 msgid "Show legend"
@@ -437,40 +237,93 @@ msgstr "Показывать легенду"
 msgid "Hide legend"
 msgstr "Скрывать легенду"
 
-#: nodepkg/map-controls/map-controls.ts:58
+#: nodepkg/map-controls/control/MyLocation.ts:167
+msgid "Your location could not be determined"
+msgstr "Определить местоположение не удалось"
+
+#: nodepkg/map-controls/control/SwipeControl.ts:37
+msgid "Rotate swipe"
+msgstr ""
+
+#: nodepkg/map-controls/map-controls.ts:35 nodepkg/map-controls/map-tools.ts:15
+#: nodepkg/map-controls/tool/Zoom.ts:25
+msgid "Zoom in"
+msgstr "Приблизить"
+
+#: nodepkg/map-controls/map-controls.ts:36 nodepkg/map-controls/map-tools.ts:24
+#: nodepkg/map-controls/tool/Zoom.ts:25
+msgid "Zoom out"
+msgstr "Отодвинуть"
+
+#: nodepkg/map-controls/map-controls.ts:47
 msgid "Attributions"
 msgstr "Информация о правообладателях"
 
-#: nodepkg/map-controls/map-controls.ts:70 nodepkg/print-map/PrintMap.tsx:52
+#: nodepkg/map-controls/map-controls.ts:59 nodepkg/print-map/utils.ts:34
 msgid "Reset rotation"
 msgstr "Отменить поворот"
 
-#: nodepkg/map-controls/map-controls.ts:85
+#: nodepkg/map-controls/map-controls.ts:74
 msgid "Scale line"
 msgstr "Линейка масштаба"
 
-#: nodepkg/map-controls/map-controls.ts:97
+#: nodepkg/map-controls/map-controls.ts:86
 msgid "Info scale"
 msgstr "Числовой масштаб"
 
-#: nodepkg/map-controls/map-controls.ts:107
-#: nodepkg/map-controls/map-controls.ts:110
+#: nodepkg/map-controls/map-controls.ts:96 nodepkg/map-controls/map-controls.ts:99
 #: nodepkg/settings-widget/SettingsWidget.tsx:22
 msgid "Initial extent"
 msgstr "Начальный охват"
 
-#: nodepkg/map-controls/map-controls.ts:120
-#: nodepkg/map-controls/map-controls.ts:123
+#: nodepkg/map-controls/map-controls.ts:109
+#: nodepkg/map-controls/map-controls.ts:112
 msgid "Locate me"
 msgstr "Определить мое местоположение"
 
-#: nodepkg/map-controls/map-controls.ts:128
+#: nodepkg/map-controls/map-controls.ts:117
 msgid "Identification"
 msgstr "Идентификация"
 
-#: nodepkg/map-controls/map-tools.ts:68
+#: nodepkg/map-controls/map-tools.ts:33 nodepkg/map-controls/tool/Measure.ts:51
+msgid "Measure distance"
+msgstr "Измерение расстояния"
+
+#: nodepkg/map-controls/map-tools.ts:42 nodepkg/map-controls/tool/Measure.ts:52
+msgid "Measure area"
+msgstr "Измерение площади"
+
+#: nodepkg/map-controls/map-tools.ts:51 nodepkg/map-controls/tool/Swipe.ts:28
+msgid "Vertical swipe"
+msgstr "Вертикальная шторка"
+
+#: nodepkg/map-controls/map-tools.ts:59
 msgid "Cursor coordinates / extent"
 msgstr "Координаты курсора / охвата"
+
+#: nodepkg/map-controls/tool/Identify.ts:66 nodepkg/panel/identify/plugin.tsx:12
+msgid "Identify"
+msgstr "Идентификация"
+
+#: nodepkg/map-controls/tool/Swipe.ts:35
+msgid "Horizontal swipe"
+msgstr "Горизонтальная шторка"
+
+#: nodepkg/map-controls/tool/ViewerInfo.ts:26
+msgid "Show cursor coordinates / extent"
+msgstr "Показать координаты курсора / охват"
+
+#: nodepkg/map-controls/tool/editing/CreateFeature.ts:14
+msgid "Create features"
+msgstr "Создать объекты"
+
+#: nodepkg/map-controls/tool/editing/DeleteFeature.ts:14
+msgid "Delete features"
+msgstr "Удалить объекты"
+
+#: nodepkg/map-controls/tool/editing/ModifyFeature.ts:14
+msgid "Modify features"
+msgstr "Изменить объекты"
 
 #: nodepkg/map-viewer-info/MapViewerInfo.tsx:87
 msgid "Show extent"
@@ -484,72 +337,84 @@ msgstr "Показывать координаты курсора"
 msgid "Back to the initial extent"
 msgstr "Вернуться к начальному охвату"
 
-#: nodepkg/panel/annotations/AnnotationsPanel.js:94
+#: nodepkg/panel/annotations/AnnotationsPanel.tsx:121
+msgid "Show annotations"
+msgstr "Показывать аннотации"
+
+#: nodepkg/panel/annotations/AnnotationsPanel.tsx:127
+msgid "No"
+msgstr "Нет"
+
+#: nodepkg/panel/annotations/AnnotationsPanel.tsx:128
+msgid "Yes"
+msgstr "Да"
+
+#: nodepkg/panel/annotations/AnnotationsPanel.tsx:131
+msgid "With messages"
+msgstr "С сообщениями"
+
+#: nodepkg/panel/annotations/AnnotationsPanel.tsx:139
+#: nodepkg/plugin/layer-editor/LayerEditor.ts:130
+msgid "Edit"
+msgstr "Редактировать"
+
+#: nodepkg/panel/annotations/AnnotationsPanel.tsx:146
 msgid "Edit annotations"
 msgstr "Редактировать аннотации"
 
-#: nodepkg/panel/annotations/AnnotationsPanel.js:99
+#: nodepkg/panel/annotations/AnnotationsPanel.tsx:151
 msgid "Geometry type"
 msgstr "Тип геометрии"
 
-#: nodepkg/panel/annotations/AnnotationsPanel.js:106
+#: nodepkg/panel/annotations/AnnotationsPanel.tsx:158
 #: nodepkg/utils/geometry-types.ts:6
 msgid "Point"
 msgstr "Точка"
 
-#: nodepkg/panel/annotations/AnnotationsPanel.js:135
-msgid "Annotations layer"
-msgstr "Слой аннотаций"
-
-#: nodepkg/panel/annotations/AnnotationsPanel.js:138
-msgid "Show annotations"
-msgstr "Показывать аннотации"
-
-#: nodepkg/panel/annotations/AnnotationsPanel.js:144
-msgid "No"
-msgstr "Нет"
-
-#: nodepkg/panel/annotations/AnnotationsPanel.js:145
-msgid "Yes"
-msgstr "Да"
-
-#: nodepkg/panel/annotations/AnnotationsPanel.js:148
-msgid "With messages"
-msgstr "С сообщениями"
-
-#: nodepkg/panel/annotations/AnnotationsPanel.js:159
+#: nodepkg/panel/annotations/AnnotationsPanel.tsx:173
 msgid "Private annotations"
 msgstr "Приватные аннотации"
 
-#: nodepkg/panel/annotations/AnnotationsPanel.js:170
+#: nodepkg/panel/annotations/AnnotationsPanel.tsx:184
 msgid "Public annotations"
 msgstr "Публичные аннотации"
 
-#: nodepkg/panel/annotations/AnnotationsPanel.js:180
+#: nodepkg/panel/annotations/AnnotationsPanel.tsx:196
 msgid "My private annotations"
 msgstr "Мои приватные аннотации"
 
-#: nodepkg/panel/annotations/AnnotationsPanel.js:193
+#: nodepkg/panel/annotations/AnnotationsPanel.tsx:209
 msgid "Other private annotations"
 msgstr "Другие приватные аннотации"
 
-#: nodepkg/panel/identification/CoordinatesSwitcher.tsx:186
+#: nodepkg/panel/annotations/plugin.tsx:13
+#: nodepkg/settings-widget/SettingsWidget.tsx:26
+msgid "Annotations"
+msgstr "Аннотации"
+
+#: nodepkg/panel/bookmarks/plugin.tsx:11
+#: nodepkg/settings-widget/SettingsWidget.tsx:28
+msgid "Bookmarks"
+msgstr "Закладки"
+
+#: nodepkg/panel/description/plugin.tsx:11
+#: nodepkg/plugin/layer-info/LayerInfoPlugin.ts:30
+msgid "Description"
+msgstr "Описание"
+
+#: nodepkg/panel/identify/CoordinatesSwitcher.tsx:186
 msgid "Zoom to identification point"
 msgstr "Увеличить до точки идентификации"
 
-#: nodepkg/panel/identification/CoordinatesSwitcher.tsx:202
+#: nodepkg/panel/identify/CoordinatesSwitcher.tsx:202
 msgid "Copy identification point coordinates"
 msgstr "Скопировать координаты точки идентификации"
 
-#: nodepkg/panel/identification/FeatureEditButton.tsx:69
+#: nodepkg/panel/identify/FeatureEditButton.tsx:76
 msgid "Edit feature"
 msgstr "Редактировать объект"
 
-#: nodepkg/panel/identification/IdentificationPanel.tsx:38
-msgid "How does it work"
-msgstr "Как это работает"
-
-#: nodepkg/panel/identification/IdentificationPanel.tsx:39
+#: nodepkg/panel/identify/IdentifyPanel.tsx:28
 msgid ""
 "To get feature information, click on the map with the left mouse button. Make"
 " sure that other tools are turned off."
@@ -557,35 +422,43 @@ msgstr ""
 "Чтобы получить информацию об объекте, щелкните на карте левой кнопкой мыши. "
 "Убедитесь, что другие инструменты отключены."
 
-#: nodepkg/panel/identification/IdentificationPanel.tsx:42
-msgid "No objects were found at the click location."
-msgstr "Объекты в месте клика не найдены."
-
-#: nodepkg/panel/identification/IdentificationPanel.tsx:43
+#: nodepkg/panel/identify/IdentifyPanel.tsx:29
 msgid "Retrieving object information..."
 msgstr "Получение информации об объекте..."
 
-#: nodepkg/panel/identification/IdentificationPanel.tsx:44
-msgid "Loading..."
-msgstr "Загрузка..."
+#: nodepkg/panel/identify/IdentifyPanel.tsx:30
+msgid "No objects were found at the click location."
+msgstr "Объекты в месте клика не найдены."
 
-#: nodepkg/panel/identification/IdentificationPanel.tsx:145
+#: nodepkg/panel/identify/KeyValueTable.tsx:14
 msgid "Attribute"
 msgstr "Атрибут"
 
-#: nodepkg/panel/identification/IdentificationPanel.tsx:151
+#: nodepkg/panel/identify/KeyValueTable.tsx:19
 msgid "Value"
 msgstr "Значение"
 
-#: nodepkg/panel/identification/IdentificationPanel.tsx:317
+#: nodepkg/panel/identify/component/FeatureInfoSection.tsx:17
+msgid "Loading..."
+msgstr "Загрузка..."
+
+#: nodepkg/panel/identify/component/FeatureInfoSection.tsx:66
+msgid "Attributes"
+msgstr "Атрибуты"
+
+#: nodepkg/panel/identify/component/FeatureInfoSection.tsx:90
+msgid "Geometry"
+msgstr "Геометрия"
+
+#: nodepkg/panel/identify/component/FeatureSelector.tsx:53
 msgid "Zoom to feature"
 msgstr "Приблизить к объекту"
 
-#: nodepkg/panel/identification/fields.tsx:110
+#: nodepkg/panel/identify/fields.tsx:117
 msgid "N/A"
 msgstr "Н/Д"
 
-#: nodepkg/panel/layers/LayersDropdown.js:12
+#: nodepkg/panel/layers/LayersDropdown.tsx:19
 msgid "Zoom to all layers"
 msgstr "Увеличить до всех слоев"
 
@@ -597,62 +470,63 @@ msgstr "Печать"
 msgid "Save as"
 msgstr "Сохранить как"
 
-#: nodepkg/panel/print/PrintPanel.tsx:232
-msgid "Custom scale"
-msgstr "Произвольный масштаб"
-
-#: nodepkg/panel/print/PrintPanel.tsx:418
-msgid "Paper format"
-msgstr "Формат бумаги"
-
-#: nodepkg/panel/print/PrintPanel.tsx:428
-msgid "Height, mm"
-msgstr "Высота, мм"
-
-#: nodepkg/panel/print/PrintPanel.tsx:444
-msgid "Width, mm"
-msgstr "Ширина, мм"
-
-#: nodepkg/panel/print/PrintPanel.tsx:460
-msgid "Margin, mm"
-msgstr "Отступ, мм"
-
-#: nodepkg/panel/print/PrintPanel.tsx:472
+#: nodepkg/panel/print/PrintPanel.tsx:107
 msgid "Elements"
 msgstr "Элементы"
 
-#: nodepkg/panel/print/PrintPanel.tsx:491
+#: nodepkg/panel/print/PrintPanel.tsx:114
+#: nodepkg/panel/print/component/PrintScaleSettings.tsx:73
+msgid "Scale"
+msgstr "Масштаб"
+
+#: nodepkg/panel/print/PrintPanel.tsx:134
+msgid "Copy link to the print map"
+msgstr "Скопировать ссылку на карту для печати"
+
+#: nodepkg/panel/print/component/PrintElementsSettings.tsx:38
 msgid "Number of legend columns"
 msgstr "Количество столбцов легенды"
 
-#: nodepkg/panel/print/PrintPanel.tsx:500
+#: nodepkg/panel/print/component/PrintElementsSettings.tsx:47
 #: nodepkg/settings-widget/SettingsWidget.tsx:24
 msgid "Title"
 msgstr "Заголовок"
 
-#: nodepkg/panel/print/PrintPanel.tsx:503
+#: nodepkg/panel/print/component/PrintElementsSettings.tsx:50
 msgid "Map title text"
 msgstr "Текст заголовка карты"
 
-#: nodepkg/panel/print/PrintPanel.tsx:521
+#: nodepkg/panel/print/component/PrintElementsSettings.tsx:68
 msgid "North Arrow"
 msgstr "Указатель севера"
 
-#: nodepkg/panel/print/PrintPanel.tsx:525 nodepkg/panel/print/PrintPanel.tsx:546
-msgid "Scale"
-msgstr "Масштаб"
+#: nodepkg/panel/print/component/PrintPaperSettings.tsx:77
+msgid "Paper format"
+msgstr "Формат бумаги"
 
-#: nodepkg/panel/print/PrintPanel.tsx:532
+#: nodepkg/panel/print/component/PrintPaperSettings.tsx:87
+msgid "Height, mm"
+msgstr "Высота, мм"
+
+#: nodepkg/panel/print/component/PrintPaperSettings.tsx:103
+msgid "Width, mm"
+msgstr "Ширина, мм"
+
+#: nodepkg/panel/print/component/PrintPaperSettings.tsx:119
+msgid "Margin, mm"
+msgstr "Отступ, мм"
+
+#: nodepkg/panel/print/component/PrintScaleSettings.tsx:61
 msgid "Scale value"
 msgstr "Значение масштаба"
 
-#: nodepkg/panel/print/PrintPanel.tsx:541
+#: nodepkg/panel/print/component/PrintScaleSettings.tsx:69
 msgid "Scale bar"
 msgstr "Масштабная линейка"
 
-#: nodepkg/panel/print/PrintPanel.tsx:566
-msgid "Copy link to the print map"
-msgstr "Скопировать ссылку на карту для печати"
+#: nodepkg/panel/print/component/ScalesSelect.tsx:73
+msgid "Custom scale"
+msgstr "Произвольный масштаб"
 
 #: nodepkg/panel/print/options.tsx:11
 msgid "Portrait"
@@ -682,107 +556,131 @@ msgstr "TIFF"
 msgid "PDF"
 msgstr "PDF"
 
-#: nodepkg/panel/search/SearchPanel.js:268
+#: nodepkg/panel/print/plugin.tsx:10
+msgid "Print map"
+msgstr "Распечатать карту"
+
+#: nodepkg/panel/search/SearchPanel.tsx:359
 msgid "Enter at least 2 characters"
 msgstr "Введите минимум 2 символа"
 
-#: nodepkg/panel/search/SearchPanel.js:351
+#: nodepkg/panel/search/SearchPanel.tsx:448
 msgid "Not found"
 msgstr "Не найдено"
 
-#: nodepkg/panel/search/SearchPanel.js:356
+#: nodepkg/panel/search/SearchPanel.tsx:453
 msgid "Refine search criterion. Displayed first 100 search results."
 msgstr "Уточните критерий поиска. Отображены первые 100 результатов поиска."
 
-#: nodepkg/panel/share/SharePanel.js:34
+#: nodepkg/panel/search/plugin.tsx:11
+msgid "Search"
+msgstr "Поиск"
+
+#: nodepkg/panel/share/SharePanel.tsx:40
 msgid ""
 "<a>CORS</a> must be enabled for the target origin when embedding a web map on"
 " a different domain."
 msgstr "<a>CORS</a> должен быть включен при встраивании веб-карты на домене."
 
-#: nodepkg/panel/share/SharePanel.js:35
+#: nodepkg/panel/share/SharePanel.tsx:41
 msgid "Add web map fragment to favorites"
 msgstr "Добавить фрагмент веб-карты в избранное"
 
-#: nodepkg/panel/share/SharePanel.js:88
+#: nodepkg/panel/share/SharePanel.tsx:94
 msgid "Select tools"
 msgstr "Выберите инструменты"
 
-#: nodepkg/panel/share/SharePanel.js:104
+#: nodepkg/panel/share/SharePanel.tsx:110
 msgid "Select panels"
 msgstr "Выберите панели"
 
-#: nodepkg/panel/share/SharePanel.js:112
+#: nodepkg/panel/share/SharePanel.tsx:126
 msgid "None"
 msgstr "Нет"
 
-#: nodepkg/panel/share/SharePanel.js:259
+#: nodepkg/panel/share/SharePanel.tsx:299
 msgid "Active panel"
 msgstr "Активная панель"
 
-#: nodepkg/panel/share/SharePanel.js:295
+#: nodepkg/panel/share/SharePanel.tsx:331
 msgid "The map link copied to clipboard."
 msgstr "Ссылка на карту скопирована в буфер обмена."
 
-#: nodepkg/panel/share/SharePanel.js:299
+#: nodepkg/panel/share/SharePanel.tsx:335
 msgid "Copy link"
 msgstr "Копировать ссылку"
 
-#: nodepkg/panel/share/SharePanel.js:333
+#: nodepkg/panel/share/SharePanel.tsx:369
 msgid "Optional fragment label"
 msgstr "Необязательное название фрагмента"
 
-#: nodepkg/panel/share/SharePanel.js:341
+#: nodepkg/panel/share/SharePanel.tsx:377
 msgid "Embed code for your site"
 msgstr "Вставить карту на сайт"
 
-#: nodepkg/panel/share/SharePanel.js:343
+#: nodepkg/panel/share/SharePanel.tsx:379
 msgid "Map size:"
 msgstr "Размер карты:"
 
-#: nodepkg/panel/share/SharePanel.js:345 nodepkg/settings/SettingsForm.js:93
+#: nodepkg/panel/share/SharePanel.tsx:381 nodepkg/settings/SettingsForm.tsx:90
 msgid "Width, px"
 msgstr "Ширина, пикс."
 
-#: nodepkg/panel/share/SharePanel.js:351 nodepkg/settings/SettingsForm.js:106
+#: nodepkg/panel/share/SharePanel.tsx:389 nodepkg/settings/SettingsForm.tsx:103
 msgid "Height, px"
 msgstr "Высота, пикс."
 
-#: nodepkg/panel/share/SharePanel.js:355
+#: nodepkg/panel/share/SharePanel.tsx:395
 msgid "px"
 msgstr "px"
 
-#: nodepkg/panel/share/SharePanel.js:358
+#: nodepkg/panel/share/SharePanel.tsx:398
 msgid "Map tools"
 msgstr "Инструменты карты"
 
-#: nodepkg/panel/share/SharePanel.js:362
+#: nodepkg/panel/share/SharePanel.tsx:402
 msgid "Panels"
 msgstr "Панели"
 
-#: nodepkg/panel/share/SharePanel.js:377
+#: nodepkg/panel/share/SharePanel.tsx:417
 msgid "Link to main map"
 msgstr "Ссылка на основную карту"
 
-#: nodepkg/panel/share/SharePanel.js:386
+#: nodepkg/panel/share/SharePanel.tsx:426
 msgid "Generate events"
 msgstr "Генерация событий"
 
-#: nodepkg/panel/share/SharePanel.js:390
+#: nodepkg/panel/share/SharePanel.tsx:430
 msgid "Embed code"
 msgstr "Код для встраивания"
 
-#: nodepkg/panel/share/SharePanel.js:403
+#: nodepkg/panel/share/SharePanel.tsx:443
 msgid "The embed code copied to clipboard."
 msgstr "Код для встраивания скопирован в буфер обмена."
 
-#: nodepkg/panel/share/SharePanel.js:407
+#: nodepkg/panel/share/SharePanel.tsx:447
 msgid "Copy code"
 msgstr "Копировать код"
 
-#: nodepkg/panel/share/SharePanel.js:410
+#: nodepkg/panel/share/SharePanel.tsx:450
 msgid "Preview"
 msgstr "Предпросмотр"
+
+#: nodepkg/panel/share/plugin.tsx:11
+msgid "Share"
+msgstr "Поделиться"
+
+#: nodepkg/plugin/feature-layer/FeatureLayerPlugin.tsx:10
+msgid "Feature table"
+msgstr "Таблица объектов"
+
+#: nodepkg/plugin/layer-editor/LayerEditor.ts:130
+msgid "Stop editing"
+msgstr "Завершить редактирование"
+
+#: nodepkg/plugin/zoom-to-layer/ZoomToLayerPlugin.ts:16
+msgid "Zoom to layer"
+msgstr "Увеличить до слоя"
 
 #: nodepkg/settings-widget/SettingsWidget.tsx:23
 msgid "Constraining extent"
@@ -797,7 +695,7 @@ msgid "Select resource"
 msgstr "Выберите ресурс"
 
 #: nodepkg/settings-widget/SettingsWidget.tsx:30
-#: nodepkg/settings/SettingsForm.js:215
+#: nodepkg/settings/SettingsForm.tsx:198
 msgid "Measurement SRS"
 msgstr "СК для измерений"
 
@@ -829,161 +727,217 @@ msgstr "Показать с сообщениями"
 msgid "Settings"
 msgstr "Настройки"
 
-#: nodepkg/settings/Settings.js:48
+#: nodepkg/settings/Settings.tsx:63
 msgid "Settings saved"
 msgstr "Настройки сохранены"
 
-#: nodepkg/settings/SettingsForm.js:33
-msgid "Use panel instead of popup identification"
-msgstr "Использовать панель вместо всплывающего окна для идентификации"
-
-#: nodepkg/settings/SettingsForm.js:66
+#: nodepkg/settings/SettingsForm.tsx:63
 msgid "General"
 msgstr "Общие"
 
-#: nodepkg/settings/SettingsForm.js:79
+#: nodepkg/settings/SettingsForm.tsx:76
 msgid "Hide navigation menu for guest"
 msgstr "Скрывать меню навигации для гостя"
 
-#: nodepkg/settings/SettingsForm.js:87
+#: nodepkg/settings/SettingsForm.tsx:84
 msgid "Identify popup"
 msgstr "Окно идентификации"
 
-#: nodepkg/settings/SettingsForm.js:119
+#: nodepkg/settings/SettingsForm.tsx:116
 msgid "Radius, px"
 msgstr "Радиус, пикс."
 
-#: nodepkg/settings/SettingsForm.js:142
+#: nodepkg/settings/SettingsForm.tsx:139
 msgid "Show feature attributes"
 msgstr "Показывать атрибуты объектов"
 
-#: nodepkg/settings/SettingsForm.js:156
+#: nodepkg/settings/SettingsForm.tsx:153
 msgid "Show geometry info"
 msgstr "Показывать информацию о геометрии"
 
-#: nodepkg/settings/SettingsForm.js:176
+#: nodepkg/settings/SettingsForm.tsx:159
 msgid "Measurement"
 msgstr "Измерения"
 
-#: nodepkg/settings/SettingsForm.js:182
+#: nodepkg/settings/SettingsForm.tsx:165
 msgid "Length units"
 msgstr "Единицы длины"
 
-#: nodepkg/settings/SettingsForm.js:191
+#: nodepkg/settings/SettingsForm.tsx:174
 msgid "Area units"
 msgstr "Единицы площади"
 
-#: nodepkg/settings/SettingsForm.js:201
+#: nodepkg/settings/SettingsForm.tsx:184
 msgid "Degree format"
 msgstr "Формат градусов"
 
-#: nodepkg/settings/SettingsForm.js:225
+#: nodepkg/settings/SettingsForm.tsx:208
 msgid "Address search"
 msgstr "Адресный поиск"
 
-#: nodepkg/settings/SettingsForm.js:238
+#: nodepkg/settings/SettingsForm.tsx:221
 msgid "Enable"
 msgstr "Включить"
 
-#: nodepkg/settings/SettingsForm.js:252
+#: nodepkg/settings/SettingsForm.tsx:235
 msgid "Limit by web map initial extent"
 msgstr "Ограничить начальным охватом карты"
 
-#: nodepkg/settings/SettingsForm.js:262
+#: nodepkg/settings/SettingsForm.tsx:245
 msgid "Provider"
 msgstr "Провайдер"
 
-#: nodepkg/settings/SettingsForm.js:274
+#: nodepkg/settings/SettingsForm.tsx:257
 msgid "Limit search results to countries"
 msgstr "Ограничить поиск странами"
 
-#: nodepkg/settings/SettingsForm.js:282
+#: nodepkg/settings/SettingsForm.tsx:267
 msgid "Invalid countries. For example ru or gb,de"
 msgstr "Неверные значения. Например, ru или gb,de"
 
-#: nodepkg/settings/SettingsForm.js:295
+#: nodepkg/settings/SettingsForm.tsx:279
 msgid "Yandex.Maps API Geocoder Key"
 msgstr "Ключ геокодера API Яндекс.Карт"
 
-#: nodepkg/settings/SettingsForm.js:314
+#: nodepkg/settings/SettingsForm.tsx:300
 msgid "Visibility"
 msgstr "Видимость"
 
-#: nodepkg/settings/select-options.js:5
+#: nodepkg/settings/SettingsForm.tsx:325
+#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:159
+#: nodepkg/ui/finish-editing-dialog/FinishEditingDialog.tsx:57
+msgid "Save"
+msgstr "Сохранить"
+
+#: nodepkg/settings/select-options.ts:5
 msgid "Meters"
 msgstr "Метры"
 
-#: nodepkg/settings/select-options.js:9
+#: nodepkg/settings/select-options.ts:9
 msgid "Kilometers"
 msgstr "Километры"
 
-#: nodepkg/settings/select-options.js:13
+#: nodepkg/settings/select-options.ts:13
 msgid "Meters/kilometers (auto)"
 msgstr "Метры/километры (авто)"
 
-#: nodepkg/settings/select-options.js:17
+#: nodepkg/settings/select-options.ts:17
 msgid "Feet"
 msgstr "Футы"
 
-#: nodepkg/settings/select-options.js:21
+#: nodepkg/settings/select-options.ts:21
 msgid "Miles"
 msgstr "Мили"
 
-#: nodepkg/settings/select-options.js:25
+#: nodepkg/settings/select-options.ts:25
 msgid "Feet/miles (auto)"
 msgstr "Футы/мили (авто)"
 
-#: nodepkg/settings/select-options.js:32
+#: nodepkg/settings/select-options.ts:32
 msgid "Sq. meters"
 msgstr "Кв. метры"
 
-#: nodepkg/settings/select-options.js:36
+#: nodepkg/settings/select-options.ts:36
 msgid "Sq. kilometers"
 msgstr "Кв. километры"
 
-#: nodepkg/settings/select-options.js:40
+#: nodepkg/settings/select-options.ts:40
 msgid "Sq. meters/kilometers (auto)"
 msgstr "Кв. метры/километры (авто)"
 
-#: nodepkg/settings/select-options.js:44
+#: nodepkg/settings/select-options.ts:44
 msgid "Hectares"
 msgstr "Гектары"
 
-#: nodepkg/settings/select-options.js:48
+#: nodepkg/settings/select-options.ts:48
 msgid "Acres"
 msgstr "Акры"
 
-#: nodepkg/settings/select-options.js:52
+#: nodepkg/settings/select-options.ts:52
 msgid "Sq. miles"
 msgstr "Кв. мили"
 
-#: nodepkg/settings/select-options.js:56
+#: nodepkg/settings/select-options.ts:56
 msgid "Acres/sq. miles (auto)"
 msgstr "Акры/кв. мили (авто)"
 
-#: nodepkg/settings/select-options.js:60
+#: nodepkg/settings/select-options.ts:60
 msgid "Sq. feet"
 msgstr "Кв. футы"
 
-#: nodepkg/settings/select-options.js:67
+#: nodepkg/settings/select-options.ts:67
 msgid "Decimal degrees"
 msgstr "Десятичные градусы"
 
-#: nodepkg/settings/select-options.js:71
+#: nodepkg/settings/select-options.ts:71
 msgid "Degrees, decimal minutes"
 msgstr "Градусы и десятичные минуты"
 
-#: nodepkg/settings/select-options.js:75
+#: nodepkg/settings/select-options.ts:75
 msgid "Degrees, minutes, seconds"
 msgstr "Градусы, минуты, секунды"
 
-#: nodepkg/settings/select-options.js:82
+#: nodepkg/settings/select-options.ts:82
 msgid "Nominatim (OSM)"
 msgstr "Nominatim (OSM)"
 
-#: nodepkg/settings/select-options.js:86
+#: nodepkg/settings/select-options.ts:86
 msgid "Yandex.Maps API Geocoder"
 msgstr "Геокодер API Яндекс.Карт"
+
+#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:116
+msgid "Create as public"
+msgstr "Создать как публичную"
+
+#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:123
+msgid "Create as private"
+msgstr "Создать как приватную"
+
+#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:131
+msgid "Edit annotation"
+msgstr "Редактировать аннотацию"
+
+#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:132
+msgid "Create annotation"
+msgstr "Создать аннотацию"
+
+#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:153
+msgid "Delete"
+msgstr "Удалить"
+
+#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:156
+#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:165
+#: nodepkg/ui/finish-editing-dialog/FinishEditingDialog.tsx:48
+msgid "Cancel"
+msgstr "Отменить"
+
+#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:169
+msgid "Create"
+msgstr "Создать"
+
+#: nodepkg/ui/annotation-dialog/AnnotationsSettings.tsx:39
+msgid "Stroke: width / color"
+msgstr "Обводка: ширина / цвет"
+
+#: nodepkg/ui/annotation-dialog/AnnotationsSettings.tsx:66
+msgid "Fill color"
+msgstr "Цвет заливки"
+
+#: nodepkg/ui/annotation-dialog/AnnotationsSettings.tsx:75
+msgid "Circle size, px"
+msgstr "Размер пунсона, пикс"
+
+#: nodepkg/ui/finish-editing-dialog/FinishEditingDialog.tsx:21
+msgid "Stopping editing"
+msgstr "Завершить редактирование?"
+
+#: nodepkg/ui/finish-editing-dialog/FinishEditingDialog.tsx:30
+msgid "Do you want to save changes?"
+msgstr "Вы хотите сохранить изменения?"
+
+#: nodepkg/ui/finish-editing-dialog/FinishEditingDialog.tsx:40
+msgid "Don't save"
+msgstr "Не сохранять"
 
 #: nodepkg/utils/format-units.tsx:14
 msgid "km"
@@ -1029,11 +983,11 @@ msgstr "Мультиполигон"
 msgid "GeometryCollection"
 msgstr "Коллекция геометрий"
 
-#: nodepkg/webmap-feature-grid-tab/WebMapFeatureGridTab.tsx:25
+#: nodepkg/webmap-feature-grid-tab/WebMapFeatureGridTab.tsx:23
 msgid "Go to"
 msgstr "Перейти"
 
-#: nodepkg/webmap-feature-grid-tab/WebMapFeatureGridTab.tsx:133
+#: nodepkg/webmap-feature-grid-tab/WebMapFeatureGridTab.tsx:128
 msgid "Selected feature has no geometry"
 msgstr "Выбранный объект не имеет геометрии"
 
@@ -1073,14 +1027,14 @@ msgstr ""
 "Для генерации предпросмотра вернитесь на страницу веб карты и нажмите "
 "\"Предпросмотр\"."
 
-#: view.py:253
+#: view.py:86
 msgid "Clone web map"
 msgstr "Клонировать веб-карту"
 
-#: view.py:266
+#: view.py:99
 msgid "Embedded webmap preview"
 msgstr "Просмотр встроенной веб-карты"
 
-#: view.py:276
+#: view.py:109
 msgid "Web map settings"
 msgstr "Настройки веб-карты"
