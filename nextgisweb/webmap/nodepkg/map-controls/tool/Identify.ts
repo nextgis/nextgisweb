@@ -12,7 +12,7 @@ import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
 import topic from "@nextgisweb/webmap/compat/topic";
 import type { Display } from "@nextgisweb/webmap/display";
 import type { Map } from "@nextgisweb/webmap/ol/Map";
-import type { IdentifyStore } from "@nextgisweb/webmap/panel/identify";
+import type IdentifyStore from "@nextgisweb/webmap/panel/identify/IdentifyStore";
 import type { IdentifyInfo } from "@nextgisweb/webmap/panel/identify/identification";
 import type { LayerItemConfig } from "@nextgisweb/webmap/type/api";
 

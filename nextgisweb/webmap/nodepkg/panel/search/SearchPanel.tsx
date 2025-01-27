@@ -14,9 +14,9 @@ import { lonLatToDM } from "@nextgisweb/webmap/coordinates/formatter";
 import { parse } from "@nextgisweb/webmap/coordinates/parser";
 import type { Display } from "@nextgisweb/webmap/display";
 
-import type { PanelWidget } from "..";
 import { PanelContainer, PanelTitle } from "../component";
 import type { PanelTitleProps } from "../component";
+import type { PanelPluginWidgetProps } from "../registry";
 
 import { LoadingOutlined } from "@ant-design/icons";
 import BackspaceIcon from "@nextgisweb/icon/material/backspace";
@@ -370,7 +370,7 @@ function SearchPanelTitle({ className, close }: PanelTitleProps) {
     );
 }
 
-const SearchPanel: PanelWidget = observer(({ store, display }) => {
+const SearchPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
     const [loading, setLoading] = useState<boolean>(false);
     const [searchResults, setSearchResults] = useState<
         [SearchResult[], boolean] | undefined

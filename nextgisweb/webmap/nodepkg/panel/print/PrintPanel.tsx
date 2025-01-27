@@ -20,9 +20,9 @@ import type { Display } from "@nextgisweb/webmap/display";
 import PrintMap from "@nextgisweb/webmap/print-map";
 import { getURLParams } from "@nextgisweb/webmap/utils/URL";
 
-import type { PanelWidget } from "..";
 import type { PrintMapSettings } from "../../print-map/type";
 import { PanelContainer, PanelSection } from "../component";
+import type { PanelPluginWidgetProps } from "../registry";
 
 import PrintMapExport from "./PrintMapExport";
 import {
@@ -293,7 +293,7 @@ const ScalesSelect = ({
     );
 };
 
-const PrintPanel: PanelWidget = observer(({ store, display }) => {
+const PrintPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
     const [urlParsed, setUrlParsed] = useState(false);
     const mapInit = useRef(false);
     const [paperFormat, setPaperFormat] = useState("210_297");

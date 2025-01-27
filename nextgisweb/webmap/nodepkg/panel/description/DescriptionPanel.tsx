@@ -3,10 +3,10 @@ import { useEffect, useMemo, useRef } from "react";
 
 import type { Display } from "@nextgisweb/webmap/display";
 
-import type { PanelWidget } from "..";
 import { PanelContainer } from "../component";
+import type { PanelPluginWidgetProps } from "../registry";
 
-import type { DescriptionStore } from "./DescriptionStore";
+import type DescriptionStore from "./DescriptionStore";
 
 import "./DescriptionPanel.less";
 
@@ -22,7 +22,7 @@ const zoomToFeature = (
         });
 };
 
-const DescriptionPanel: PanelWidget<DescriptionStore> = observer(
+const DescriptionPanel = observer<PanelPluginWidgetProps<DescriptionStore>>(
     ({ store, display }) => {
         const nodeRef = useRef<HTMLDivElement>(null);
 
@@ -79,4 +79,4 @@ const DescriptionPanel: PanelWidget<DescriptionStore> = observer(
 );
 
 DescriptionPanel.displayName = "DescriptionPanel";
-export default DescriptionPanel as PanelWidget;
+export default DescriptionPanel;

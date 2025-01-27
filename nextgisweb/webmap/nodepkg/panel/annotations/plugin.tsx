@@ -7,7 +7,8 @@ import type { DisplayConfig } from "@nextgisweb/webmap/type/api";
 
 import AnnotationIcon from "@nextgisweb/icon/material/chat";
 
-registry.register(COMP_ID, () => import("./AnnotationsPanel"), {
+registry.register(COMP_ID, {
+    widget: () => import("./AnnotationsPanel"),
     name: "annotation",
     title: gettext("Annotations"),
     icon: <AnnotationIcon />,
@@ -46,7 +47,6 @@ registry.register(COMP_ID, () => import("./AnnotationsPanel"), {
             "@nextgisweb/webmap/ui/annotations-manager/AnnotationsManager"
         );
 
-        console.log(initialAnnotVisible);
         new AnnotationsManager({ display, initialAnnotVisible });
     },
 });

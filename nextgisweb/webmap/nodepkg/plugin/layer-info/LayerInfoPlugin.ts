@@ -1,5 +1,5 @@
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import type { DescriptionStore } from "@nextgisweb/webmap/panel/description/DescriptionStore";
+import type DescriptionStore from "@nextgisweb/webmap/panel/description/DescriptionStore";
 import type { PluginState } from "@nextgisweb/webmap/type";
 import type { LayerItemConfig } from "@nextgisweb/webmap/type/api";
 

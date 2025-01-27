@@ -1,4 +1,4 @@
-import { action, computed, observable } from "mobx";
+import { action, computed, observable, runInAction } from "mobx";
 
 import type { Display } from "../display";
 import { PanelStore } from "../panel/PanelStore";
@@ -52,38 +52,12 @@ export class PanelManager {
         }
         this._allowPanels = allowPanels;
         this._onChangePanel = onChangePanel;
-
-        const plugins = registry.queryAll(({ name, isEnabled }) => {
-            return (
-                (!allowPanels || allowPanels.includes(name)) &&
-                (!isEnabled || isEnabled(display))
-            );
-        });
-
-        for (const plugin of plugins) {
-            const cls = plugin.storeClass ?? PanelStore;
-            const panel = new cls(plugin, this._display);
-            this.panels.set(plugin.name, panel);
-            this._handleInitActive();
-        }
-
-        this._handlePanelActivation();
+        this.buildPlugins();
     }
 
     /** @deprecated use observable {@link PanelManager.ready} instead */
     get panelsReady(): Deferred<void> {
         return this._panelsReady;
-    }
-
-    @action
-    setActive(active: string | undefined, source: Source): void {
-        const currentActive = this.active.active;
-        this.active = { active, source };
-        if (currentActive !== active) {
-            if (this._onChangePanel) {
-                this._onChangePanel(this.activePanel);
-            }
-        }
     }
 
     @computed
@@ -98,9 +72,67 @@ export class PanelManager {
         return this.active.active;
     }
 
+    private async buildPlugins() {
+        const allowPanels = this._allowPanels;
+        const plugins = registry.queryAll(({ name, isEnabled }) => {
+            return (
+                (!allowPanels || allowPanels.includes(name)) &&
+                (!isEnabled || isEnabled(this._display))
+            );
+        });
+
+        for (const plugin of plugins) {
+            const Cls = plugin.store
+                ? (await plugin.store()).default
+                : PanelStore;
+            const panel = new Cls({ plugin, display: this._display });
+            runInAction(() => {
+                const panels = new Map(this.panels);
+                panels.set(plugin.name, panel);
+                this.panels = panels;
+            });
+            this._handleInitActive();
+        }
+
+        this._handlePanelActivation();
+    }
+
+    @action
+    setActive(active: string | undefined, source: Source): void {
+        const currentActive = this.active.active;
+        this.active = { active, source };
+        if (currentActive !== active) {
+            if (this._onChangePanel) {
+                this._onChangePanel(this.activePanel);
+            }
+        }
+    }
+
     closePanel = (): void => {
         this.setActive(undefined, "manager");
     };
+
+    getActivePanelName(): string | undefined {
+        return this.activePanelName;
+    }
+
+    getPanel<T extends PanelStore = PanelStore>(name: string): T | undefined {
+        return this.panels.get(name) as T;
+    }
+
+    activatePanel(name: string): void {
+        this.setActive(name, "manager");
+    }
+
+    deactivatePanel(): void {
+        this.closePanel();
+    }
+
+    sorted(): PanelStore[] {
+        return Array.from(this.panels.values()).sort(
+            (a, b) => a.order - b.order
+        );
+    }
 
     @action
     private _handleInitActive(): void {
@@ -120,31 +152,5 @@ export class PanelManager {
         if (firstPanelKey) {
             this.setActive(firstPanelKey, "init");
         }
-    }
-
-    getActivePanelName(): string | undefined {
-        return this.activePanelName;
-    }
-
-    getPanel<T extends PanelStore = PanelStore>(name: string): T | undefined {
-        return this.panels.get(name) as T;
-    }
-
-    activatePanel(name: string): void {
-        this.setActive(name, "manager");
-    }
-
-    deactivatePanel(): void {
-        this.closePanel();
-    }
-
-    sorted(): PanelStore[] {
-        const sorted: PanelStore[] = [];
-        for (const panel of this.panels.values()) {
-            sorted.push(panel);
-        }
-
-        sorted.sort((a, b) => a.order - b.order);
-        return sorted;
     }
 }

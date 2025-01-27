@@ -5,7 +5,8 @@ import type { DisplayConfig } from "@nextgisweb/webmap/type/api";
 
 import BookmarkIcon from "@nextgisweb/icon/material/bookmark";
 
-registry.register(COMP_ID, () => import("./BookmarksPanel"), {
+registry.register(COMP_ID, {
+    widget: () => import("./BookmarksPanel"),
     name: "bookmark",
     title: gettext("Bookmarks"),
     icon: <BookmarkIcon />,

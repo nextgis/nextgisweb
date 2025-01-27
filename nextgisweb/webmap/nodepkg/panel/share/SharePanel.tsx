@@ -26,8 +26,8 @@ import { getControls } from "@nextgisweb/webmap/map-controls";
 import type { PanelStore } from "@nextgisweb/webmap/panel";
 import { getPermalink } from "@nextgisweb/webmap/utils/permalink";
 
-import type { PanelWidget } from "..";
 import { PanelContainer, PanelSection } from "../component";
+import type { PanelPluginWidgetProps } from "../registry";
 
 import CloseIcon from "@nextgisweb/icon/material/close";
 import PreviewIcon from "@nextgisweb/icon/material/preview";
@@ -155,9 +155,9 @@ interface PanelOption {
     value: string;
 }
 
-const SharePanel: PanelWidget = observer(({ store, display }) => {
+const SharePanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
     const webmapId = display.config.webmapId;
-
+    const { panelManager } = display;
     const [mapLink, setMapLink] = useState("");
     const [widthMap, setWidthMap] = useState(800);
     const [heightMap, setHeightMap] = useState(600);
@@ -271,8 +271,8 @@ const SharePanel: PanelWidget = observer(({ store, display }) => {
     }, [panels, activePanel]);
 
     useEffect(() => {
-        display.panelManager.panelsReady.promise.then(() => {
-            const panelsForTinyMap = display.panelManager
+        if (panelManager.ready) {
+            const panelsForTinyMap = panelManager
                 .sorted()
                 .filter((p) => p.applyToTinyMap === true)
                 .map((p) => {
@@ -284,8 +284,8 @@ const SharePanel: PanelWidget = observer(({ store, display }) => {
                 })
                 .sort((a, b) => a.title.localeCompare(b.title));
             setPanelsOptions(panelsForTinyMap);
-        });
-    }, [display]);
+        }
+    }, [panelManager, panelManager.ready]);
 
     const previewUrl = routeURL("webmap.preview_embedded");
 

@@ -1,2 +1,7 @@
 export { PanelStore } from "./PanelStore";
-export type { PanelPlugin, PanelWidget, PanelMeta } from "./type";
+export type {
+    PanelPlugin,
+    PanelPluginWidgetProps as PanelWidgetProps,
+    PanelPluginWidget,
+    PanelPluginStore,
+} from "./registry";

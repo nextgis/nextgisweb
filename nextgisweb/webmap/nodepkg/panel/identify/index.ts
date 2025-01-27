@@ -1,1 +1,1 @@
-export { IdentifyStore } from "./IdentifyStore";
+export * as default from "./IdentifyStore";
