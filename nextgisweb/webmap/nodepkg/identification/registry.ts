@@ -1,10 +1,13 @@
 /** @registry */
 import type { FC } from "react";
 
-import { loaderRegistry } from "@nextgisweb/jsrealm/plugin";
+import { pluginRegistry } from "@nextgisweb/jsrealm/plugin";
+import type { ImportCallback } from "@nextgisweb/jsrealm/plugin";
 
 import type { IdentifyExtensionComponentProps } from "../panel/identify/identification";
 
 export const registry =
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    loaderRegistry<FC<IdentifyExtensionComponentProps<any>>>(MODULE_NAME);
+    pluginRegistry<ImportCallback<FC<IdentifyExtensionComponentProps<any>>>>(
+        MODULE_NAME
+    );

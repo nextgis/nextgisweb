@@ -33,9 +33,7 @@ export function FeatureInfoSection({
             const newExtComps: JSX.Element[] = [];
             const extensionsComp = await getExtensionsComps();
             extensionsComp.forEach((comp, key) => {
-                const ExtensionComponent = lazy(async () => ({
-                    default: await comp,
-                }));
+                const ExtensionComponent = lazy(comp);
                 newExtComps.push(
                     <Suspense
                         key={key}
