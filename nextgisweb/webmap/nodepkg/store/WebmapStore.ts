@@ -265,7 +265,6 @@ export class WebmapStore {
     }
 
     @action addItem = (item: TreeChildrenItemConfig) => {
-        console.log(item);
         const items = [item, ...this._webmapItems];
         if ("visibility" in item && item.visibility) {
             this.setChecked([...this._checked, item.id]);

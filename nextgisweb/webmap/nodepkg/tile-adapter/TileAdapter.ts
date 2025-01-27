@@ -1,26 +1,18 @@
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { tileLoadFunction } from "@nextgisweb/pyramid/util";
 import XYZ from "@nextgisweb/webmap/ol/layer/XYZ";
+import type { LayerItemConfig } from "@nextgisweb/webmap/type/api";
 
-import { Adapter } from "../Adapter";
+import { AdapterLayer } from "../AdapterLayer";
 
-interface ItemConfig {
-    id: string;
-    styleId: string;
-    maxResolution?: number;
-    minResolution?: number;
-    visibility: boolean;
-    transparency?: number;
-}
-
-export default class TileAdapter extends Adapter {
-    createLayer(item: ItemConfig) {
+export default class TileAdapter extends AdapterLayer {
+    createLayer(item: LayerItemConfig) {
         const layer = new XYZ(
-            item.id,
+            String(item.id),
             {
                 visible: item.visibility,
-                maxResolution: item.maxResolution,
-                minResolution: item.minResolution,
+                maxResolution: item.maxResolution ?? undefined,
+                minResolution: item.minResolution ?? undefined,
                 opacity: item.transparency ? 1 - item.transparency / 100 : 1.0,
             },
             {

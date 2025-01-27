@@ -87,14 +87,6 @@ export class CustomItemFileWriteStore extends EventEmitter {
         return item.type === "group" || item.type === "root";
     }
 
-    save(item: StoreItem) {
-        if (!this.isItem(item)) {
-            throw new Error("Invalid item");
-        }
-        this.items.set(item.id, item);
-        this.emit("Set", item, "save", null, item);
-    }
-
     newItem<T extends StoreItemConfig = StoreItemConfig>(
         keywordArgs?: T,
         parentInfo?: {

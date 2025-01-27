@@ -3,7 +3,7 @@ import type OlControl from "ol/control/Control";
 
 import type { LayerItemConfig } from "@nextgisweb/webmap/type/api";
 
-import type { Adapter } from "../Adapter";
+import type { AdapterLayer } from "../AdapterLayer";
 import type { CustomItemFileWriteStore } from "../compat/CustomItemFileWriteStore";
 import type { Display } from "../display";
 import type { ToolBase } from "../map-controls/tool/ToolBase";
@@ -42,7 +42,7 @@ export interface BasemapModules {
 }
 
 export interface AdapterModules {
-    [key: string]: typeof Adapter;
+    [key: string]: typeof AdapterLayer;
 }
 
 export interface PluginModules {
@@ -62,7 +62,7 @@ export interface Mid {
 
 export type MapControl = OlControl | ToolBase;
 
-export type WebmapAdapter = any;
+export type WebmapAdapter = AdapterLayer;
 
 export interface MapRefs {
     target: HTMLElement;

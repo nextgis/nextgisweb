@@ -1,17 +1,9 @@
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { imageQueue, tileLoadFunction } from "@nextgisweb/pyramid/util";
 import Image from "@nextgisweb/webmap/ol/layer/Image";
+import type { LayerItemConfig } from "@nextgisweb/webmap/type/api";
 
-import { Adapter } from "../Adapter";
-
-interface ItemConfig {
-    id: string;
-    styleId: string;
-    maxResolution?: number;
-    minResolution?: number;
-    visibility: boolean;
-    transparency?: number;
-}
+import { AdapterLayer } from "../AdapterLayer";
 
 interface QueryParams {
     resource: string;
@@ -35,13 +27,13 @@ function parseQueryParams(queryString: string): QueryParams {
     return params;
 }
 
-export class ImageAdapter extends Adapter {
-    createLayer(item: ItemConfig) {
+export class ImageAdapter extends AdapterLayer {
+    createLayer(item: LayerItemConfig) {
         const layer = new Image(
-            item.id,
+            String(item.id),
             {
-                maxResolution: item.maxResolution,
-                minResolution: item.minResolution,
+                maxResolution: item.maxResolution ?? undefined,
+                minResolution: item.minResolution ?? undefined,
                 visible: item.visibility,
                 opacity: item.transparency ? 1 - item.transparency / 100 : 1.0,
             },

@@ -19,6 +19,7 @@ import type {
 } from "@nextgisweb/webmap/type/api";
 import { WebMapTabsStore } from "@nextgisweb/webmap/webmap-tabs";
 
+import type { AdapterLayer } from "../AdapterLayer";
 import { CustomItemFileWriteStore } from "../compat/CustomItemFileWriteStore";
 import type { StoreItem } from "../compat/CustomItemFileWriteStore";
 import { LoggedDeferred } from "../compat/LoggedDeferred";
@@ -75,7 +76,7 @@ export class Display {
     identify?: Identify;
     featureHighlighter: FeatureHighlighter;
     readonly plugins: Record<string, PluginBase> = {};
-    private readonly _adapters: Record<string, WebmapAdapter> = {};
+    readonly _adapters: Record<string, WebmapAdapter> = {};
     private _mid: Mid = {
         basemap: {},
         adapter: {},
@@ -398,7 +399,7 @@ export class Display {
 
     // STORE & ITEM
 
-    prepareItem(item: TreeItemConfig) {
+    prepareItem<T extends TreeItemConfig>(item: T): StoreItemConfig {
         const copy = {
             id: item.id,
             type: item.type,
@@ -502,6 +503,14 @@ export class Display {
         }
     }
 
+    setupAdapter(key: string, Module: typeof AdapterLayer) {
+        if (!this._adapters[key]) {
+            this._adapters[key] = new Module({
+                display: this,
+            });
+        }
+    }
+
     private _layersSetup() {
         const store = this.itemStore;
         let visibleStyles: number[] | null = null;
@@ -596,22 +605,21 @@ export class Display {
 
             const layer = adapter.createLayer(data);
 
-            layer.itemId = data.id;
-            layer.itemConfig = data;
+            // layer.itemId = data.id;
+            layer.setItemConfig(data);
 
             this.webmapStore.addLayer(data.id, layer);
         }
     }
-    private _onNewStoreItem(item: StoreItem) {
+
+    _onNewStoreItem(item: StoreItem) {
         const store = this.itemStore;
         this._layerSetup(item);
         this._layerOrder.unshift(store.getValue(item, "id"));
     }
     private _adaptersSetup() {
         Object.keys(this._mid.adapter).forEach((k) => {
-            this._adapters[k] = new this._mid.adapter[k]({
-                display: this,
-            });
+            this.setupAdapter(k, this._mid.adapter[k]);
         });
     }
     private _buildLayersTree() {
@@ -645,7 +653,7 @@ export class Display {
 
         this._installPlugins(plugins);
     }
-    private _installPlugins(
+    _installPlugins(
         plugins: Record<string, MapPlugin | { default: MapPlugin }>
     ) {
         Object.keys(plugins).forEach((key) => {
