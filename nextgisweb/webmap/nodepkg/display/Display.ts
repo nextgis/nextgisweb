@@ -16,6 +16,7 @@ import MapToolbar from "@nextgisweb/webmap/map-toolbar";
 import type {
     DisplayConfig,
     LayerItemConfig,
+    MidConfig,
 } from "@nextgisweb/webmap/type/api";
 import { WebMapTabsStore } from "@nextgisweb/webmap/webmap-tabs";
 
@@ -35,6 +36,7 @@ import { PanelManager } from "../panel/PanelManager";
 import type { PluginBase } from "../plugin/PluginBase";
 import WebmapStore from "../store";
 import type {
+    Entrypoint,
     MapPlugin,
     MapRefs,
     MapURLParams,
@@ -680,13 +682,12 @@ export class Display {
         });
     }
     private _initializeMids() {
-        const mids = this.config.mid;
+        const mids = { ...this.config.mid } as Record<
+            keyof MidConfig,
+            (string | Entrypoint)[]
+        >;
 
-        const basemapMids: [
-            name: string,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            mid: () => Promise<{ default: typeof CoreLayer<any, any, any> }>,
-        ][] = [
+        const basemapMids: Entrypoint[] = [
             [
                 "@nextgisweb/webmap/ol/layer/OSM",
                 () => import("@nextgisweb/webmap/ol/layer/OSM"),
