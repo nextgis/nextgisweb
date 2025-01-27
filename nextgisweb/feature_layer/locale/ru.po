@@ -7,10 +7,6 @@ msgstr "Атрибуты"
 msgid "N/A"
 msgstr "Н/Д"
 
-#: amd/ngw-feature-layer/GeometryInfoWidget.js:9
-msgid "Geometry"
-msgstr "Геометрия"
-
 #: api.py:99 api_identify.py:27
 msgid "Geometry is not valid."
 msgstr "Невалидная геометрия"

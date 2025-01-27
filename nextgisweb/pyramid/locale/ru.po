@@ -1,16 +1,3 @@
-#: amd/ngw-pyramid/CopyButton/CopyButton.js:28
-#: amd/ngw-pyramid/CopyButton/CopyButton.js:30
-msgid "Copy to clipboard"
-msgstr "Копировать"
-
-#: amd/ngw-pyramid/CopyButton/CopyButton.js:31
-msgid "Copied"
-msgstr "Скопировано"
-
-#: amd/ngw-pyramid/CopyButton/CopyButton.js:32
-msgid "Unable to copy"
-msgstr "Не удалось скопировать"
-
 #: api.py:261
 msgid "Storage management is not enabled on this server."
 msgstr "Управление хранилищем не включено на этом сервере."
@@ -190,7 +177,7 @@ msgstr "Время (UTC)"
 msgid "Size"
 msgstr "Размер"
 
-#: nodepkg/company-logo.ts:32
+#: nodepkg/company-logo.ts:31
 msgid "Get your own Web GIS at nextgis.com"
 msgstr "Создайте свою Веб ГИС на nextgis.com"
 
