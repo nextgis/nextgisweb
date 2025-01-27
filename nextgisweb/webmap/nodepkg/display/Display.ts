@@ -89,7 +89,7 @@ export class Display {
     // Deferred Objects
 
     @observable.ref accessor mapReady = false;
-    // @deprecated use observable mapReady instead
+    /** @deprecated use observable {@link mapReady instead} */
     mapDeferred: LoggedDeferred;
 
     mapExtentDeferred: LoggedDeferred;
