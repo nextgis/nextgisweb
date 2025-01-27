@@ -50,10 +50,13 @@ const BookmarksPanel = observer<PanelPluginWidgetProps>(
                 bookmarkLayerId,
                 bookmark.key
             ).get();
+
             display.map.zoomToNgwExtent(
                 // @ts-expect-error Extent may be null for features without geometries
                 result.extent,
-                display.displayProjection
+                {
+                    displayProjection: display.displayProjection,
+                }
             );
             setBookmarkSelected(bookmark);
         };
