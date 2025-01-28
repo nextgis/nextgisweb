@@ -4,7 +4,7 @@ from math import ceil, floor, log
 from pathlib import Path
 from typing import Dict, List, Literal, Union
 
-from msgspec import Meta, Struct
+from msgspec import UNSET, Meta, Struct, UnsetType
 from PIL import Image, ImageDraw, ImageFont
 from pyramid.httpexceptions import HTTPBadRequest
 from pyramid.response import Response
@@ -14,7 +14,8 @@ from nextgisweb.env import gettext
 from nextgisweb.lib.apitype import AnyOf, AsJSON, ContentType, StatusCode
 
 from nextgisweb.core.exception import UserException, ValidationError
-from nextgisweb.resource import DataScope, Resource, ResourceFactory, ResourceNotFound
+from nextgisweb.resource import DataScope, Resource, ResourceFactory, ResourceNotFound, ResourceRef
+from nextgisweb.resource.api import ResourceID
 
 from .imgcodec import COMPRESSION_FAST, FORMAT_PNG, image_encoder_factory
 from .interface import ILegendableStyle, IRenderableStyle
@@ -64,18 +65,6 @@ RenderResponse = AnyOf[
     Annotated[Response, StatusCode(204)],
     Annotated[Response, StatusCode(404), ContentType("application/octet-stream")],
 ]
-
-
-class LegendIcon(Struct, kw_only=True):
-    format: Literal["png"]
-    data: bytes
-
-
-class LegendSymbol(Struct, kw_only=True):
-    index: int
-    render: Union[bool, None]
-    display_name: str
-    icon: LegendIcon
 
 
 class InvalidOriginError(UserException):
@@ -433,32 +422,112 @@ def legend(request) -> Annotated[Response, ContentType("image/png")]:
     return Response(body_file=result, content_type="image/png")
 
 
-def legend_symbols_by_resource(resource, icon_size: int, tr):
-    result = list()
+ResourceLegendSymbolsResources = Annotated[
+    List[ResourceID],
+    Meta(
+        min_length=1,
+        description="Resource IDs for getting legend symbols",
+    ),
+]
 
-    for s in resource.legend_symbols(icon_size):
+ResourceLegendSymbolsIconSize = Annotated[
+    int,
+    Meta(ge=8, le=64),
+    Meta(description="Legend symbol size in pixels"),
+]
+
+
+class LegendIcon(Struct, kw_only=True):
+    format: Literal["png"]
+    data: bytes
+
+    @classmethod
+    def from_image(cls, image):
         buf = BytesIO()
-        s.icon.save(buf, "png", compress_level=3)
+        image.save(buf, "png", compress_level=3)
+        return cls(format="png", data=buf.getvalue())
 
-        result.append(
-            LegendSymbol(
-                index=s.index,
-                render=s.render,
-                display_name=tr(s.display_name),
-                icon=LegendIcon(
-                    format="png",
-                    data=buf.getvalue(),
-                ),
+
+class LegendSymbol(Struct, kw_only=True):
+    index: int
+    render: Union[bool, None]
+    display_name: str
+    icon: LegendIcon
+
+    @classmethod
+    def from_resource(cls, resource, *, icon_size, translate):
+        return [
+            cls(
+                index=item.index,
+                render=item.render,
+                display_name=translate(item.display_name),
+                icon=LegendIcon.from_image(item.icon),
+            )
+            for item in resource.legend_symbols(icon_size)
+        ]
+
+
+class ResourceLegendSymbolsItem(Struct, kw_only=True):
+    resource: ResourceRef
+    legend_symbols: Annotated[
+        Union[List[LegendSymbol], UnsetType],
+        Meta(description="Resource legend symbols if available"),
+    ] = UNSET
+
+
+class ResourceLegendSymbolsResponse(Struct, kw_only=True):
+    items: List[ResourceLegendSymbolsItem]
+
+
+def legend_symbols(
+    request, *, icon_size: ResourceLegendSymbolsIconSize = 24
+) -> AsJSON[List[LegendSymbol]]:
+    """Get resource legend symbols"""
+    request.resource_permission(DataScope.read)
+
+    return LegendSymbol.from_resource(
+        request.context,
+        icon_size=icon_size,
+        translate=request.translate,
+    )
+
+
+def resource_legend_symbols(
+    request,
+    *,
+    resources: ResourceLegendSymbolsResources,
+    icon_size: ResourceLegendSymbolsIconSize = 24,
+) -> ResourceLegendSymbolsResponse:
+    """Get legend symbols of multiple resources"""
+
+    resources = list(set(resources))
+    query = Resource.filter(Resource.id.in_(resources)).all()
+    if len(query) != len(resources):
+        missing_ids = set(resources) - set(obj.id for obj in query)
+        missing = ", ".join(str(i) for i in missing_ids)
+        raise ValidationError("Resources not found: {}!".format(missing))
+
+    items: List[ResourceLegendSymbolsItem] = []
+    for res in query:
+        request.resource_permission(DataScope.read, res)
+
+        if not ILegendSymbols.providedBy(res):
+            legend_symbols = UNSET
+        else:
+            legend_symbols = LegendSymbol.from_resource(
+                res,
+                icon_size=icon_size,
+                translate=request.translate,
+            )
+
+        items.append(
+            ResourceLegendSymbolsItem(
+                resource=ResourceRef(id=res.id),
+                legend_symbols=legend_symbols,
             )
         )
 
-    return result
-
-
-def legend_symbols(request, *, icon_size: int = 24) -> AsJSON[List[LegendSymbol]]:
-    """Get resource legend symbols"""
-    request.resource_permission(DataScope.read)
-    return legend_symbols_by_resource(request.context, icon_size, request.translate)
+    return ResourceLegendSymbolsResponse(items=items)
 
 
 def setup_pyramid(comp, config):
@@ -481,8 +550,15 @@ def setup_pyramid(comp, config):
     )
 
     config.add_route(
+        "render.resource_legend_symbols",
+        "/api/component/render/legend_symbols",
+        get=resource_legend_symbols,
+    )
+
+    config.add_route(
         "render.legend_symbols",
         "/api/resource/{id}/legend_symbols",
         factory=ResourceFactory(context=ILegendSymbols),
         get=legend_symbols,
+        deprecated=True,
     )

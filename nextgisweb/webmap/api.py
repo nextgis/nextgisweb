@@ -20,7 +20,7 @@ from nextgisweb.layer import IBboxLayer
 from nextgisweb.pyramid import JSONType
 from nextgisweb.pyramid.api import csetting
 from nextgisweb.render import IRenderableScaleRange
-from nextgisweb.render.api import LegendSymbol, legend_symbols_by_resource
+from nextgisweb.render.api import LegendSymbol
 from nextgisweb.render.legend import ILegendSymbols
 from nextgisweb.render.util import scale_range_intersection
 from nextgisweb.resource import DataScope, ResourceFactory, ResourceScope
@@ -516,7 +516,11 @@ def display_config(obj, request) -> DisplayConfig:
         if ls_layer in (LegendSymbolsEnum.EXPAND, LegendSymbolsEnum.COLLAPSE):
             has_legend = result["has_legend"] = ILegendSymbols.providedBy(style)
             if has_legend:
-                legend_symbols = legend_symbols_by_resource(style, 20, request.translate)
+                legend_symbols = LegendSymbol.from_resource(
+                    style,
+                    icon_size=20,
+                    translate=request.translate,
+                )
                 result.update(symbols=legend_symbols)
                 is_single = len(legend_symbols) == 1
                 result.update(single=is_single)
