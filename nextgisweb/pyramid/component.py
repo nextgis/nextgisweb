@@ -164,7 +164,7 @@ class PyramidComponent(Component):
             pass
 
         if t := self.options["request_timeout"]:
-            yield (gettext("Request timeout"), t)
+            yield (gettext("Request timeout"), str(t))
 
         lunkwill = self.options["lunkwill.enabled"]
         yield ("Lunkwill", gettext("Enabled") if lunkwill else gettext("Disabled"))
