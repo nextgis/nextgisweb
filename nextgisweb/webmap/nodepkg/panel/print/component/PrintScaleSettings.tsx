@@ -54,6 +54,7 @@ export const PrintScaleSettings: FC<PrintScaleSettings> = ({
         <>
             <div className="input-group">
                 <Switch
+                    size="small"
                     checked={mapSettings.scaleValue}
                     onChange={(v) => updateMapSettings({ scaleValue: v })}
                 />
@@ -63,6 +64,7 @@ export const PrintScaleSettings: FC<PrintScaleSettings> = ({
             </div>
             <div className="input-group">
                 <Switch
+                    size="small"
                     checked={mapSettings.scaleLine}
                     onChange={(v) => updateMapSettings({ scaleLine: v })}
                 />

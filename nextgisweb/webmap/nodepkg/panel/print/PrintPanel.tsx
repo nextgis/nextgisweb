@@ -69,9 +69,6 @@ const PrintPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
         }
     }, [createPrintMapComp]);
 
-    // const hide = useCallback(() => {
-    //     updateMapSettings({ scale: undefined });
-    // }, [updateMapSettings]);
     const hide = useCallback(() => {
         if (mapInit.current) {
             destroy();
@@ -96,7 +93,7 @@ const PrintPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
 
     return (
         <PanelContainer title={title} close={close}>
-            <PanelSection>
+            <PanelSection flex>
                 <PrintPaperSettings
                     display={display}
                     mapSettings={mapSettings}
@@ -104,38 +101,33 @@ const PrintPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
                 />
             </PanelSection>
 
-            <PanelSection title={gettext("Elements")}>
+            <PanelSection title={gettext("Elements")} flex>
                 <PrintElementsSettings
                     mapSettings={mapSettings}
                     updateMapSettings={updateMapSettings}
                 />
             </PanelSection>
 
-            <PanelSection title={gettext("Scale")}>
+            <PanelSection title={gettext("Scale")} flex>
                 <PrintScaleSettings
                     printMapScale={printMapScale}
                     mapSettings={mapSettings}
                     updateMapSettings={updateMapSettings}
                 />
-            </PanelSection>
-
-            <PanelSection>
-                <div className="actions">
+                <Space.Compact>
                     <PrintMapExport
                         display={display}
                         mapSettings={mapSettings}
                         printMapEl={printMapEl.current}
                     />
-                    <Space.Compact>
-                        <CopyToClipboardButton
-                            type="link"
-                            getTextToCopy={getTextToCopy}
-                            icon={<ShareAltOutlined />}
-                            title={gettext("Copy link to the print map")}
-                            iconOnly
-                        ></CopyToClipboardButton>
-                    </Space.Compact>
-                </div>
+                    <CopyToClipboardButton
+                        type="default"
+                        getTextToCopy={getTextToCopy}
+                        icon={<ShareAltOutlined />}
+                        title={gettext("Copy link to the print map")}
+                        iconOnly
+                    />
+                </Space.Compact>
             </PanelSection>
         </PanelContainer>
     );

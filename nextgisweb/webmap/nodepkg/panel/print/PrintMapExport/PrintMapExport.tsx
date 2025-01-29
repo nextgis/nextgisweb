@@ -138,7 +138,7 @@ export const PrintMapExport = observer(
         };
 
         return (
-            <Space.Compact>
+            <>
                 <Button
                     loading={loadingPrint}
                     type="primary"
@@ -154,7 +154,7 @@ export const PrintMapExport = observer(
                         </Space>
                     </Button>
                 </Dropdown>
-            </Space.Compact>
+            </>
         );
     }
 );

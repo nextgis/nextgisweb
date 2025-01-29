@@ -8,12 +8,14 @@ export interface PanelSectionProps extends PropsWithChildren {
     icon?: ReactNode;
     title?: ReactNode;
     suffix?: ReactNode;
+    flex?: boolean;
 }
 
 export function PanelSection({
     icon,
     title,
     suffix,
+    flex,
     children,
 }: PanelSectionProps) {
     const themeVariables = useThemeVariables({
@@ -30,7 +32,7 @@ export function PanelSection({
                     <div className="suffix">{suffix}</div>
                 </div>
             )}
-            <div className="content">{children}</div>
+            <div className={classNames("content", { flex })}>{children}</div>
         </section>
     );
 }

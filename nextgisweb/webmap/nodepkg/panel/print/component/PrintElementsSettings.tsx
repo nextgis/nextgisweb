@@ -21,6 +21,7 @@ export const PrintElementsSettings: FC<PrintElementsSettingsProps> = ({
         <>
             <div className="input-group">
                 <Switch
+                    size="small"
                     checked={mapSettings.legend}
                     onChange={(v) => updateMapSettings({ legend: v })}
                 />
@@ -41,6 +42,7 @@ export const PrintElementsSettings: FC<PrintElementsSettingsProps> = ({
 
             <div className="input-group">
                 <Switch
+                    size="small"
                     checked={mapSettings.title}
                     onChange={(v) => updateMapSettings({ title: v })}
                 />
@@ -61,6 +63,7 @@ export const PrintElementsSettings: FC<PrintElementsSettingsProps> = ({
 
             <div className="input-group">
                 <Switch
+                    size="small"
                     checked={mapSettings.arrow}
                     onChange={(v) => updateMapSettings({ arrow: v })}
                 />

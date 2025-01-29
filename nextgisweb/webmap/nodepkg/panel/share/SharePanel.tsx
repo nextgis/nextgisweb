@@ -320,10 +320,8 @@ const SharePanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
 
     return (
         <PanelContainer title={store.title} close={store.close}>
-            <PanelSection>
-                <div className="input-group">
-                    <CodeArea value={mapLink} />
-                </div>
+            <PanelSection flex>
+                <CodeArea value={mapLink} />
                 {favorites.contextHolder}
                 <Space.Compact>
                     <CopyToClipboardButton
@@ -370,11 +368,11 @@ const SharePanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
                             onChange={(e) => {
                                 setFavlabelValue(e.target.value);
                             }}
-                        ></Input>
+                        />
                     </Modal>
                 )}
             </PanelSection>
-            <PanelSection title={gettext("Embed code for your site")}>
+            <PanelSection title={gettext("Embed code for your site")} flex>
                 <div className="input-group">
                     <span className="grow">{gettext("Map size:")}</span>
                     <InputNumber
@@ -410,6 +408,7 @@ const SharePanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
                 {activePanelSelect}
                 <div className="input-group">
                     <Switch
+                        size="small"
                         checked={addLinkToMap}
                         onChange={(v) => setAddLinkToMap(v)}
                     />
@@ -419,6 +418,7 @@ const SharePanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
                 </div>
                 <div className="input-group">
                     <Switch
+                        size="small"
                         checked={generateEvents}
                         onChange={(v) => setGenerateEvents(v)}
                     />
@@ -430,7 +430,6 @@ const SharePanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
                     <label>{gettext("Embed code")}</label>
                     <CodeArea value={embedCode} rows={4} />
                 </div>
-
                 <form action={previewUrl} method="POST" target="_blank">
                     <input
                         type="hidden"
