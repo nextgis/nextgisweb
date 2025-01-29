@@ -6,10 +6,18 @@ import { routeURL } from "@nextgisweb/pyramid/api";
 import "swagger-ui-react/swagger-ui.css";
 import "./SwaggerUI.less";
 
+const allowTryItOutFor = () => (_: unknown, path: string) =>
+    !path.match(/\?context=\w+$/i);
+
 const Plugin = () => {
     return {
         components: {
             InfoContainer: () => <></>,
+        },
+        statePlugins: {
+            // NOTE: Hide the "Try it out" button for overloaded paths
+            // containing "?context=...", see NGW-1359 for details.
+            spec: { wrapSelectors: { allowTryItOutFor } },
         },
     };
 };
