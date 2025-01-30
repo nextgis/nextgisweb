@@ -41,6 +41,7 @@ import type {
     FeatureToSave,
     FeaturesToSave,
 } from "./type";
+import { findNode } from "@nextgisweb/gui/util/tree";
 
 export class LayerEditor extends PluginBase {
     private static readonly CREATING_STATE_KEY = "creatingFeatures";
@@ -190,7 +191,8 @@ export class LayerEditor extends PluginBase {
     private setItemEditable(nodeData: LayerItemConfig, status: boolean) {
         const webmapItems = [...this.display.webmapStore.webmapItems];
 
-        const editableItem = webmapItems.find(
+        const editableItem = findNode(
+            webmapItems,
             (item) => item.id === nodeData.id
         );
         if (editableItem && editableItem.type === "layer") {
