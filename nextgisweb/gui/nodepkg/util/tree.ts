@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type DefaultTreeItem = Record<any, any>;
 
 type D = DefaultTreeItem;
@@ -94,4 +95,24 @@ export function countNodes<F extends D = D>(
         relation
     );
     return count;
+}
+
+export function findNode<F extends D = D>(
+    items: F[],
+    compare: CompareFunction<F>,
+    relation: TreeRelation<F> = "children"
+): F | undefined {
+    for (const item of items) {
+        if (compare(item)) {
+            return item;
+        }
+        const children = getChildren(item, relation);
+        if (children) {
+            const found = findNode(children, compare, relation);
+            if (found) {
+                return found;
+            }
+        }
+    }
+    return undefined;
 }
