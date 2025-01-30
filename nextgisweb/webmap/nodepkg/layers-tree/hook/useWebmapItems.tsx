@@ -6,9 +6,9 @@ import type { TreeItemConfig } from "../../type/TreeItems";
 import type { TreeWebmapItem } from "../LayersTree";
 
 export function useWebmapItems({
-    webMapItems,
+    webmapItems,
 }: {
-    webMapItems: TreeItemConfig[];
+    webmapItems: TreeItemConfig[];
 }) {
     const handleWebMapItem = useCallback(
         (webMapItem: TreeItemConfig): TreeWebmapItem => {
@@ -19,7 +19,12 @@ export function useWebmapItems({
 
                 if ("legendInfo" in item.treeItem) {
                     const { legendInfo } = item.treeItem;
-                    if (legendInfo && legendInfo.visible && legendInfo.single) {
+                    if (
+                        legendInfo &&
+                        legendInfo.visible &&
+                        legendInfo.single &&
+                        legendInfo.symbols
+                    ) {
                         item.legendIcon = (
                             <img
                                 width={20}
@@ -57,8 +62,8 @@ export function useWebmapItems({
     );
 
     const preparedWebMapItems = useMemo(() => {
-        return webMapItems.map(handleWebMapItem);
-    }, [handleWebMapItem, webMapItems]);
+        return webmapItems.map(handleWebMapItem);
+    }, [handleWebMapItem, webmapItems]);
 
     return { preparedWebMapItems };
 }

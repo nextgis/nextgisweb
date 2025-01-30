@@ -37,7 +37,7 @@ export function Legend({ nodeData, store, checkable }: LegendProps) {
                     },
                 }}
             >
-                {legendInfo.symbols.map((s, idx) => {
+                {legendInfo.symbols?.map((s, idx) => {
                     const id = nodeData.id;
                     const symbols = store._legendSymbols[id];
                     const render = (symbols && symbols[s.index]) ?? s.render;

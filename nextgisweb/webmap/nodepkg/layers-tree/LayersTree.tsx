@@ -68,11 +68,11 @@ export const LayersTree = observer(
         const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
         const [moreClickId, setMoreClickId] = useState<number>();
         const [update, setUpdate] = useState(false);
-        const webMapItems = store.webmapItems;
+        const { webmapItems, layersWithoutLegendInfo } = store;
 
         const { onDrop, allowDrop } = useDrag({ store, setLayerZIndex });
 
-        const { preparedWebMapItems } = useWebmapItems({ webMapItems });
+        const { preparedWebMapItems } = useWebmapItems({ webmapItems });
 
         const treeItems = useMemo(() => {
             if (onFilterItems) {
@@ -82,8 +82,8 @@ export const LayersTree = observer(
         }, [onFilterItems, preparedWebMapItems, store]);
 
         const hasGroups = useMemo(
-            () => webMapItems.some((item) => item.type === "group"),
-            [webMapItems]
+            () => webmapItems.some((item) => item.type === "group"),
+            [webmapItems]
         );
 
         useEffect(() => {
@@ -91,6 +91,12 @@ export const LayersTree = observer(
                 onReady();
             }
         }, [onReady]);
+
+        useEffect(() => {
+            store.updateResourceLegendSymbols(
+                layersWithoutLegendInfo.map((layer) => layer.styleId)
+            );
+        }, [store, layersWithoutLegendInfo]);
 
         const onExpand = (expandedKeysValue: React.Key[]) => {
             if (!expandable) return;

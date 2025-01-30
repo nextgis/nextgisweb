@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 
 import LayersTree from "../../layers-tree";
 import type { TreeWebmapItem } from "../../layers-tree/LayersTree";
@@ -63,13 +63,40 @@ export const LegendPrintMap = ({
     legendCoords,
     onChange,
 }: LegendPrintMapProps) => {
+    const { webmapStore } = display;
+    const { visibleLayers } = webmapStore;
+
     useEffect(() => {
         if (!show) {
             if (legendCoords.displayed) {
                 onChange({ ...legendCoords, displayed: false });
             }
         }
-    });
+    }, [legendCoords, onChange, show]);
+
+    useEffect(() => {
+        if (show) {
+            const visibleLayersWithoutSymbols = visibleLayers.filter(
+                webmapStore.shouldHaveLegendInfo
+            );
+            if (visibleLayersWithoutSymbols.length) {
+                webmapStore.updateResourceLegendSymbols(
+                    visibleLayersWithoutSymbols.map((layer) => layer.styleId)
+                );
+            }
+        }
+    }, [show, webmapStore, visibleLayers]);
+
+    const fakeCb = useCallback(() => {}, []);
+    const fakeCbObj = useCallback(() => ({}), []);
+    const onFilterItems = useCallback(
+        (store: WebmapStore, layersItems: TreeWebmapItem[]) => {
+            const filteredItems = filterTreeItems(store, layersItems);
+            printMapStore.setWebMapItems(filteredItems);
+            return filteredItems;
+        },
+        []
+    );
 
     if (!show) {
         return null;
@@ -89,27 +116,17 @@ export const LegendPrintMap = ({
         >
             <div className="legend" style={style}>
                 <LayersTree
-                    {...{
-                        store: display.webmapStore,
-                        onSelect: () => {},
-                        setLayerZIndex: () => {},
-                        getWebmapPlugins: () => ({}),
-                        onReady: () => {},
-                        showDropdown: false,
-                        draggable: false,
-                        checkable: false,
-                        selectable: false,
-                        showLine: false,
-                        expandable: false,
-                        onFilterItems: (store, layersItems) => {
-                            const filteredItems = filterTreeItems(
-                                store,
-                                layersItems
-                            );
-                            printMapStore.setWebMapItems(filteredItems);
-                            return filteredItems;
-                        },
-                    }}
+                    store={webmapStore}
+                    setLayerZIndex={fakeCb}
+                    getWebmapPlugins={fakeCbObj}
+                    onReady={fakeCb}
+                    showDropdown={false}
+                    draggable={false}
+                    checkable={false}
+                    selectable={false}
+                    showLine={false}
+                    expandable={false}
+                    onFilterItems={onFilterItems}
                 />
             </div>
         </RndComp>

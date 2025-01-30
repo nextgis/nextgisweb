@@ -39,11 +39,13 @@ const handleWebmapItem = (treeWebmapItem: TreeWebmapItem): LegendTreeNode => {
         treeNode.children = treeNodes;
     } else if (treeWebmapItem.treeItem.type === "layer") {
         const legendInfo = treeWebmapItem.treeItem.legendInfo;
-        if (legendInfo.single) {
-            treeNode.icon = legendInfo.symbols[0].icon.data;
-        } else {
-            const legendItems = handleLegendItems(legendInfo.symbols);
-            treeNode.children = legendItems;
+        if (legendInfo.symbols) {
+            if (legendInfo.single) {
+                treeNode.icon = legendInfo.symbols[0].icon.data;
+            } else {
+                const legendItems = handleLegendItems(legendInfo.symbols);
+                treeNode.children = legendItems;
+            }
         }
     }
 

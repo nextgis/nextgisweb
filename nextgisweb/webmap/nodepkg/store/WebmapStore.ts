@@ -1,6 +1,9 @@
 import { action, computed, observable, runInAction, toJS } from "mobx";
 
 import { getChildrenDeep, traverseTree } from "@nextgisweb/gui/util/tree";
+import { route } from "@nextgisweb/pyramid/api";
+import type { LegendSymbol } from "@nextgisweb/render/type/api";
+import type { LayerItemConfig, LegendInfo } from "@nextgisweb/webmap/type/api";
 
 import type {
     CustomItemFileWriteStore,
@@ -21,6 +24,8 @@ export class WebmapStore {
 
     private _itemStore: CustomItemFileWriteStore;
     private _layers: Record<string, CoreLayer> = {};
+
+    private readonly _loadedResourceSymbols = new Set<number>();
 
     constructor({
         itemStore,
@@ -179,38 +184,45 @@ export class WebmapStore {
         });
         const layer = this.getLayer(identity);
         if (layer.itemConfig) {
-            const layerSymbols = layer.itemConfig.legendInfo.symbols;
-
-            const needSymbolRender = Object.entries(symbols).some(
-                ([index, renderStatus]) => {
-                    const layerSymbol = layerSymbols.find(
-                        (l) => l.index === Number(index)
-                    );
-                    return layerSymbol && layerSymbol.render !== renderStatus;
-                }
-            );
-
-            // -1 - do not show nothing, null - use default render without symbols
-            let intervals: string[] | "-1" | null = null;
-            if (needSymbolRender) {
-                const renderIndexes: number[] = [];
-                for (const s of layerSymbols) {
-                    const render = symbols[s.index] ?? s.render;
-                    if (render) {
-                        renderIndexes.push(s.index);
+            const layerSymbols = layer.itemConfig.legendInfo?.symbols;
+            if (layerSymbols) {
+                const needSymbolRender = Object.entries(symbols).some(
+                    ([index, renderStatus]) => {
+                        const layerSymbol = layerSymbols.find(
+                            (l) => l.index === Number(index)
+                        );
+                        return (
+                            layerSymbol && layerSymbol.render !== renderStatus
+                        );
                     }
+                );
+
+                // -1 - do not show nothing, null - use default render without symbols
+                let intervals: string[] | "-1" | null = null;
+                if (needSymbolRender) {
+                    const renderIndexes: number[] = [];
+                    for (const s of layerSymbols) {
+                        const render = symbols[s.index] ?? s.render;
+                        if (render) {
+                            renderIndexes.push(s.index);
+                        }
+                    }
+                    intervals = this._consolidateIntervals(renderIndexes);
+                    intervals = intervals.length ? intervals : "-1";
                 }
-                intervals = this._consolidateIntervals(renderIndexes);
-                intervals = intervals.length ? intervals : "-1";
+                this._itemStore.fetchItemByIdentity({
+                    identity,
+                    onItem: (item) => {
+                        if (item) {
+                            this._itemStore.setValue(
+                                item,
+                                "symbols",
+                                intervals
+                            );
+                        }
+                    },
+                });
             }
-            this._itemStore.fetchItemByIdentity({
-                identity,
-                onItem: (item) => {
-                    if (item) {
-                        this._itemStore.setValue(item, "symbols", intervals);
-                    }
-                },
-            });
         }
     };
 
@@ -301,6 +313,107 @@ export class WebmapStore {
     @action setExpanded = (expanded: number[]) => {
         this._expanded = expanded;
     };
+
+    @computed get visibleLayers(): LayerItemConfig[] {
+        const visibleLayers: LayerItemConfig[] = [];
+
+        traverseTree(this._webmapItems, (item) => {
+            if (item.type === "layer" && this.getLayerVisibility(item.id)) {
+                visibleLayers.push(item);
+            }
+        });
+
+        return visibleLayers;
+    }
+
+    @computed get layersInExpandedGroups(): LayerItemConfig[] {
+        const layers: LayerItemConfig[] = [];
+
+        const traverse = (items: TreeItemConfig[], parentExpanded: boolean) => {
+            for (const item of items) {
+                if (item.type === "group") {
+                    const isExpanded = this._expanded.includes(item.id);
+                    if (isExpanded && parentExpanded) {
+                        traverse(item.children || [], true);
+                    } else {
+                        traverse(item.children || [], false);
+                    }
+                } else if (item.type === "layer") {
+                    if (parentExpanded) {
+                        layers.push(item);
+                    }
+                }
+            }
+        };
+
+        traverse(this._webmapItems, true);
+        return layers;
+    }
+
+    shouldHaveLegendInfo = (layer: LayerItemConfig) => {
+        return (
+            !this._loadedResourceSymbols.has(layer.styleId) &&
+            layer.legendInfo.has_legend &&
+            (layer.legendInfo.symbols === null ||
+                layer.legendInfo.symbols === undefined)
+        );
+    };
+
+    @computed get layersWithoutLegendInfo(): LayerItemConfig[] {
+        return this.layersInExpandedGroups.filter(this.shouldHaveLegendInfo);
+    }
+
+    @action.bound
+    async updateResourceLegendSymbols(resources: number[]) {
+        if (resources.length) {
+            try {
+                resources.forEach((id) => this._loadedResourceSymbols.add(id));
+                const legends = await route(
+                    "render.resource_legend_symbols"
+                ).get({
+                    query: { resources, icon_size: 20 },
+                });
+
+                runInAction(() => {
+                    legends.items.forEach(({ resource, legend_symbols }) => {
+                        this.updateLayerLegendInfo(resource.id, legend_symbols);
+                    });
+                });
+            } catch (error) {
+                console.error(
+                    "Error fetching render.resource_legend_symbols:",
+                    error
+                );
+            } finally {
+                resources.forEach((id) =>
+                    this._loadedResourceSymbols.delete(id)
+                );
+            }
+        }
+    }
+
+    @action
+    private updateLayerLegendInfo(styleId: number, symbols?: LegendSymbol[]) {
+        const webmapItems = [...this._webmapItems];
+        traverseTree(webmapItems, (item) => {
+            if (item.type === "layer" && item.styleId === styleId) {
+                const single = !!symbols && symbols.length === 1;
+                const legendInfo: LegendInfo = {
+                    ...item.legendInfo,
+                    symbols: symbols ?? [],
+                    single,
+                };
+                if (!single) {
+                    legendInfo.open = legendInfo.visible === "expand";
+                }
+                item.legendInfo = legendInfo;
+                return true;
+            }
+            return false;
+        });
+
+        this._webmapItems = webmapItems;
+    }
 
     getLayerVisibility = (layerId: number) => {
         return this._checked.includes(layerId);
