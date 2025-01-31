@@ -115,14 +115,14 @@ export function AnnotationsModal({
             key: "public",
             label: gettext("Create as public"),
             onClick: () => {
-                handleCreate(false);
+                handleCreate(true);
             },
         },
         {
             key: "private",
             label: gettext("Create as private"),
             onClick: () => {
-                handleCreate(true);
+                handleCreate(false);
             },
         },
     ];
