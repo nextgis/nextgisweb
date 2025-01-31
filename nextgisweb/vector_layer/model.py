@@ -50,7 +50,6 @@ from nextgisweb.resource import (
     Serializer,
     SRelationship,
 )
-from nextgisweb.spatial_ref_sys import SRS
 
 from .feature_query import FeatureQueryBase, calculate_extent
 from .kind_of_data import VectorLayerData
@@ -292,11 +291,8 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin, FVersioni
     @property
     @vlschema_autoflush
     def feature_query(self):
-        srs_supported_ = [row[0] for row in DBSession.query(SRS.id).all()]
-
         class BoundFeatureQuery(FeatureQueryBase):
             layer = self
-            srs_supported = srs_supported_
 
         return BoundFeatureQuery
 

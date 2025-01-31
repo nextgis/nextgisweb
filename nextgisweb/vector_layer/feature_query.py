@@ -60,6 +60,12 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
         self._order_by = None
 
+    @property
+    def srs_supported(self):
+        # TODO: The srs_supported attribute needs refactoring. This workaround
+        # prevents querying all SRSs during BoundFeatureQuery creation.
+        return tuple(row[0] for row in DBSession.query(SRS.id).all())
+
     def pit(self, version):
         self._pit_version = version
 
