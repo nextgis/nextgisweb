@@ -66,11 +66,14 @@ export class FeatureEditorStore {
 
     @computed
     get dirty(): boolean {
-        const stores: { dirty: boolean }[] = [];
-        if (this._attributeStore) stores.push(this._attributeStore);
-        stores.push(...Object.values(this._extensionStores));
+        if (this.featureId !== null) {
+            const stores: { dirty: boolean }[] = [];
+            if (this._attributeStore) stores.push(this._attributeStore);
+            stores.push(...Object.values(this._extensionStores));
 
-        return some(stores, ({ dirty }) => dirty);
+            return some(stores, ({ dirty }) => dirty);
+        }
+        return true;
     }
 
     @action
