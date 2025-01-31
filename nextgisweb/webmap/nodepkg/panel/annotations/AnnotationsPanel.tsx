@@ -116,7 +116,7 @@ const AnnotationsPanel = observer<PanelPluginWidgetProps>(
                 title={store.title}
                 close={store.close}
             >
-                <PanelSection>
+                <PanelSection flex>
                     <div className="input-group column">
                         <label>{gettext("Show annotations")}</label>
                         <Select
@@ -136,9 +136,10 @@ const AnnotationsPanel = observer<PanelPluginWidgetProps>(
                 </PanelSection>
 
                 {editable && (
-                    <PanelSection title={gettext("Edit")}>
+                    <PanelSection title={gettext("Edit")} flex>
                         <div className="input-group">
                             <Switch
+                                size="small"
                                 checked={edit}
                                 onChange={(v) => changeEdit(v)}
                             />
@@ -170,11 +171,10 @@ const AnnotationsPanel = observer<PanelPluginWidgetProps>(
                     </PanelSection>
                 )}
 
-                <PanelSection title={gettext("Private annotations")}>
-                    <h5 className="heading"></h5>
-
+                <PanelSection title={gettext("Private annotations")} flex>
                     <div className="input-group">
                         <Switch
+                            size="small"
                             checked={annFilter.public}
                             onChange={(v: boolean) =>
                                 changeAccessTypeFilters(v, "public")
@@ -187,6 +187,7 @@ const AnnotationsPanel = observer<PanelPluginWidgetProps>(
 
                     <div className="input-group">
                         <Switch
+                            size="small"
                             checked={annFilter.own}
                             onChange={(v: boolean) =>
                                 changeAccessTypeFilters(v, "own")
@@ -200,6 +201,7 @@ const AnnotationsPanel = observer<PanelPluginWidgetProps>(
                     {annScope.manage && (
                         <div className="input-group">
                             <Switch
+                                size="small"
                                 checked={annFilter.private}
                                 onChange={(v: boolean) =>
                                     changeAccessTypeFilters(v, "private")
