@@ -156,7 +156,8 @@ export const LayersTree = observer(
                     if (nodeData.treeItem.type === "layer") {
                         const treeLayer = nodeData.treeItem;
 
-                        legendAction = !!treeLayer.legendInfo.symbols?.length &&
+                        legendAction = treeLayer.legendInfo.symbols &&
+                            treeLayer.legendInfo.symbols.length > 1 &&
                             showLegend && (
                                 <LegendAction
                                     nodeData={treeLayer}
