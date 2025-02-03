@@ -40,7 +40,7 @@ export class MapStatesObserver {
         activate?: boolean
     ): void {
         if (Object.prototype.hasOwnProperty.call(this._states, state)) {
-            throw new Error(`State "${state}" already registered.`);
+            return;
         }
 
         this._states[state] = {
