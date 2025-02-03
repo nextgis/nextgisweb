@@ -147,17 +147,23 @@ export const LayersTree = observer(
         const titleRender = useCallback(
             (nodeData: TreeWebmapItem) => {
                 const { title } = nodeData.treeItem;
-
                 const shouldActions = showLegend || showDropdown;
 
                 let actions;
+
                 if (shouldActions) {
-                    const legendAction = showLegend && (
-                        <LegendAction
-                            nodeData={nodeData.treeItem}
-                            onClick={() => setUpdate(!update)}
-                        />
-                    );
+                    let legendAction;
+                    if (nodeData.treeItem.type === "layer") {
+                        const treeLayer = nodeData.treeItem;
+
+                        legendAction = !!treeLayer.legendInfo.symbols?.length &&
+                            showLegend && (
+                                <LegendAction
+                                    nodeData={treeLayer}
+                                    onClick={() => setUpdate(!update)}
+                                />
+                            );
+                    }
 
                     const dropdownAction = showDropdown && (
                         <DropdownActions
