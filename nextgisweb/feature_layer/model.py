@@ -21,7 +21,7 @@ from .interface import FIELD_TYPE, FIELD_TYPE_OGR, IVersionableFeatureLayer
 
 Base.depends_on("resource", "lookup_table")
 
-FIELD_FORBIDDEN_NAME = ("fid", "geom")
+FIELD_FORBIDDEN_NAME = ("geom",)
 
 _FIELD_TYPE_2_ENUM_REVERSED = dict(zip(FIELD_TYPE.enum, FIELD_TYPE_OGR))
 
@@ -92,7 +92,7 @@ class LayerFieldsMixin:
             backref=orm.backref("_feature_label_field_backref"),
         )
 
-    def to_ogr(self, ogr_ds, *, name="", fields=None, use_display_name=False, fid=None):
+    def to_ogr(self, ogr_ds, *, name="", fields=None, aliases=None, fid=None):
         if fields is None:
             fields = self.fields
         sr = self.srs.to_osr()
@@ -100,7 +100,7 @@ class LayerFieldsMixin:
         for field in fields:
             ogr_layer.CreateField(
                 ogr.FieldDefn(
-                    field.keyname if not use_display_name else field.display_name,
+                    aliases[field.keyname] if aliases is not None else field.keyname,
                     _FIELD_TYPE_2_ENUM_REVERSED[field.datatype],
                 )
             )

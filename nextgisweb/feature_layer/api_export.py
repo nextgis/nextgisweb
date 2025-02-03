@@ -1,10 +1,10 @@
 import os
 import tempfile
 import zipfile
-from typing import TYPE_CHECKING, Dict, List, Literal, Union
+from typing import TYPE_CHECKING, Dict, Iterable, List, Literal, Tuple, Union
 
 from msgspec import UNSET, Meta, Struct, UnsetType, field
-from osgeo import gdal
+from osgeo import gdal, ogr
 from pyramid.response import FileResponse, Response
 from sqlalchemy.orm.exc import NoResultFound
 from typing_extensions import Annotated
@@ -20,42 +20,55 @@ from nextgisweb.resource.view import ResourceID
 from nextgisweb.spatial_ref_sys import SRS
 from nextgisweb.spatial_ref_sys.api import SRSID
 
+from .feature import Feature
 from .interface import IFeatureLayer, IFeatureQueryIlike
+from .model import LayerField
 from .ogrdriver import EXPORT_FORMAT_OGR, OGRDriverT
+from .util import unique_name
 
 
 def _ogr_memory_ds():
     return gdal.GetDriverByName("Memory").Create("", 0, 0, 0, gdal.GDT_Unknown)
 
 
-def _ogr_layer_from_features(
-    layer,
-    features,
-    *,
-    ds,
-    name="",
-    fields=None,
-    use_display_name=False,
-    fid=None,
-):
-    layer_fields = (
-        layer.fields
-        if fields is None
-        else sorted(
-            (field for field in layer.fields if field.keyname in fields),
-            key=lambda field: fields.index(field.keyname),
+FieldMap = List[Tuple[str, LayerField]]
+
+
+# Returns an ordered list with OGR field name and LayerField pair
+def get_field_map(
+    fields: Union[List[str], None], layer_fields: List[LayerField], use_display_name: bool
+) -> FieldMap:
+    if fields is not None:
+        layer_fields = sorted(
+            (f for f in layer_fields if f.keyname in fields), key=lambda f: fields.index(f.keyname)
         )
-    )
-    ogr_layer = layer.to_ogr(
-        ds, name=name, fields=layer_fields, use_display_name=use_display_name, fid=fid
-    )
+    return [(f.display_name if use_display_name else f.keyname, f) for f in layer_fields]
+
+
+def _ogr_layer_from_features(
+    layer: IFeatureLayer,
+    features: Iterable[Feature],
+    *,
+    ds: gdal.Dataset,
+    name: str = "",
+    field_map: Union[FieldMap, None] = None,
+    fid: Union[str, None] = None,
+) -> ogr.Layer:
+    if field_map is not None:
+        layer_fields = [field for _, field in field_map]
+        aliases = {field.keyname: alias for alias, field in field_map}
+    else:
+        layer_fields = layer.fields
+        aliases = None
+
+    ogr_layer = layer.to_ogr(ds, name=name, fields=layer_fields, aliases=aliases, fid=fid)
     layer_defn = ogr_layer.GetLayerDefn()
 
     f_kw = dict()
     if fid is not None:
         f_kw["fid"] = fid
-    if use_display_name:
-        f_kw["aliases"] = {field.keyname: field.display_name for field in layer_fields}
+    if aliases is not None:
+        f_kw["aliases"] = aliases
 
     for f in features:
         ogr_layer.CreateFeature(f.to_ogr(layer_defn, **f_kw))
@@ -74,6 +87,42 @@ class ExportOptions(Struct):
     fid_field: Union[str, None] = None
     use_display_name: bool = False
     ilike: Union[str, None] = None
+
+    def for_fields(self, ogr_fields: List[str]) -> "ExportOptions":
+        opts = ExportOptions(
+            driver=self.driver,
+            dsco=self.dsco.copy(),
+            lco=self.lco.copy(),
+            srs=self.srs,
+            intersects_geom=self.intersects_geom,
+            intersects_srs=self.intersects_srs,
+            fields=self.fields,
+            fid_field=self.fid_field,
+            use_display_name=self.use_display_name,
+            ilike=self.ilike,
+        )
+
+        if opts.fid_field is not None:
+            if opts.fid_field in ogr_fields:
+                raise ValidationError(
+                    gettextf("Couldn't add FID field '{}'. Such field already exists.")(
+                        opts.fid_field
+                    )
+                )
+            ogr_fields.append(opts.fid_field)
+
+        # Set GPKG FID field
+        if opts.driver.name == "GPKG":
+            gpkg_fid = unique_name("fid", ogr_fields)
+            opts.lco.append(f"FID={gpkg_fid}")
+
+        # Set GeoJSON feature ID via additional field
+        elif opts.driver.name == "GeoJSON":
+            if opts.fid_field is None:
+                opts.fid_field = unique_name("gj_fid", ogr_fields)
+                opts.lco.append(f"ID_FIELD={opts.fid_field}")
+
+        return opts
 
 
 if TYPE_CHECKING:
@@ -177,7 +226,11 @@ class ExportParamsPost(ExportParams):
     ]
 
 
-def export(resource, options, filepath):
+def export(resource: IFeatureLayer, options: ExportOptions, filepath: str):
+    field_map = get_field_map(options.fields, resource.fields, options.use_display_name)
+
+    options = options.for_fields([alias for alias, _ in field_map])
+
     query = resource.feature_query()
 
     if (export_limit := env.feature_layer.export_limit) is not None:
@@ -216,8 +269,7 @@ def export(resource, options, filepath):
         resource,
         query(),
         ds=ogr_ds,
-        fields=options.fields,
-        use_display_name=options.use_display_name,
+        field_map=field_map,
         fid=options.fid_field,
     )
 

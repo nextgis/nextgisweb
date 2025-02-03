@@ -9,6 +9,7 @@ from osgeo import gdal
 from nextgisweb.env import DBSession
 from nextgisweb.lib.geometry import Geometry
 
+from nextgisweb.feature_layer import FIELD_TYPE
 from nextgisweb.vector_layer import VectorLayer
 
 from .. import Feature
@@ -133,12 +134,16 @@ def resources():
     with transaction.manager:
         for i in range(some):
             layer = VectorLayer(geometry_type="POINT").persist()
+            layer.setup_from_fields([dict(keyname="fid", datatype=FIELD_TYPE.STRING)])
+
+            layer_name = f"layer_{i}"
 
             f = Feature()
             f.geom = Geometry.from_wkt(f"POINT ({i} {i})")
+            f.fields["fid"] = layer_name
             layer.feature_create(f)
 
-            params.append(dict(id=layer.id, name=f"layer_{i}"))
+            params.append(dict(id=layer.id, name=layer_name))
 
     yield params
 
@@ -182,3 +187,7 @@ def test_export_multi(driver_label, resources, ngw_webtest_app):
             layer = ds.GetLayer(0)
             assert layer is not None
             assert layer.GetFeatureCount() == 1
+
+            if driver_label != "DXF":
+                f = layer.GetNextFeature()
+                assert f["fid"] == name

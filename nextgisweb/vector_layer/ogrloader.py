@@ -1,4 +1,3 @@
-import re
 from functools import partial
 from itertools import product
 from typing import Dict, List, Literal, Union
@@ -22,6 +21,7 @@ from nextgisweb.feature_layer import (
     GEOM_TYPE_OGR,
     GEOM_TYPE_OGR_2_GEOM_TYPE,
 )
+from nextgisweb.feature_layer.util import unique_name
 from nextgisweb.spatial_ref_sys import SRS
 
 from .util import FIELD_TYPE_2_ENUM, FIELD_TYPE_SIZE, fix_encoding, utf8len
@@ -357,7 +357,6 @@ class OGRLoader:
 
         # Fields
 
-        field_suffix_pattern = re.compile(r"(.*)_(\d+)")
         fields: Dict[int, LoaderField] = dict()
         for i in range(defn.GetFieldCount()):
             if i == fid_field_index:
@@ -383,22 +382,7 @@ class OGRLoader:
                 else:
                     fixed_fld_name += "_1"
 
-            while True:
-                unique_check = True
-                for field in fields.values():
-                    if field.name == fixed_fld_name:
-                        unique_check = False
-
-                        match = field_suffix_pattern.match(fixed_fld_name)
-                        if match is None:
-                            fixed_fld_name += "_1"
-                        else:
-                            n = int(match[2]) + 1
-                            fixed_fld_name = "%s_%d" % (match[1], n)
-                        break
-                if unique_check:
-                    break
-            fld_name = fixed_fld_name
+            fld_name = unique_name(fixed_fld_name, tuple(f.name for f in fields.values()))
 
             fld_type_ogr = fld_defn.GetType()
             if fld_type_ogr in STRING_CAST_TYPES:
