@@ -4,7 +4,7 @@ import pyramidSettings from "@nextgisweb/pyramid/settings!pyramid";
 import { routeURL } from "./api";
 
 const css = [
-    ".map-logo { display: block; position: absolute; right: 10px; bottom: 28px; text-decoration: none; line-height: 1; z-index: 1000;  }",
+    ".map-logo { display: block; position: absolute; right: 10px; bottom: 28px; text-decoration: none; line-height: 1; z-index: 10;  }",
     ".map-logo img { width: 94px; }",
 ].join("\n");
 
