@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Col, Row, Tree } from "@nextgisweb/gui/antd";
 import type { TreeProps } from "@nextgisweb/gui/antd";
+import { findNode } from "@nextgisweb/gui/util/tree";
 
 import type { PluginBase } from "../plugin/PluginBase";
 import type WebmapStore from "../store";
@@ -68,7 +69,7 @@ export const LayersTree = observer(
         const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
         const [moreClickId, setMoreClickId] = useState<number>();
         const [update, setUpdate] = useState(false);
-        const { webmapItems, layersWithoutLegendInfo } = store;
+        const { webmapItems, checked, layersWithoutLegendInfo } = store;
 
         const { onDrop, allowDrop } = useDrag({ store, setLayerZIndex });
 
@@ -216,6 +217,13 @@ export const LayersTree = observer(
             ]
         );
 
+        const checkedKeys = useMemo(() => {
+            const ch = checked.filter((id) =>
+                findNode(treeItems, (node) => node.key === id)
+            );
+            return ch;
+        }, [checked, treeItems]);
+
         const shouldShowLine = showLine && hasGroups;
 
         return (
@@ -233,7 +241,7 @@ export const LayersTree = observer(
                 expandedKeys={store.expanded}
                 autoExpandParent={false}
                 onCheck={onCheck}
-                checkedKeys={store.checked}
+                checkedKeys={checkedKeys}
                 onSelect={_onSelect}
                 selectedKeys={selectedKeys}
                 treeData={treeItems}
