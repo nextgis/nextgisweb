@@ -79,6 +79,10 @@ export class AnnotationsLayer {
         }
     }
 
+    setZIndex(zIndex: number) {
+        this._layer.getLayer().setZIndex(zIndex);
+    }
+
     hidePopups(): void {
         const features = this._source.getFeatures();
         features.forEach((feature) => {

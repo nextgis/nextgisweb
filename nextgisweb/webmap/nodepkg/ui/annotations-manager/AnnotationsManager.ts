@@ -15,6 +15,7 @@ import { AnnotationsLayer } from "../../layer/annotations/AnnotationsLayer";
 import type { AccessFilter } from "../../layer/annotations/AnnotationsLayer";
 import { AnnotationsDialog } from "../annotation-dialog";
 import type { DialogResult } from "../annotation-dialog/AnnotationDialog";
+import { reaction } from "mobx";
 
 interface ManagerOptions {
     display: Display;
@@ -31,22 +32,34 @@ export class AnnotationsManager {
     private _annotationsVisibleState!: AnnotationVisibleMode;
     private _editable!: boolean;
 
-    constructor(options: ManagerOptions) {
+    constructor({ display, initialAnnotVisible }: ManagerOptions) {
         if (AnnotationsManager.instance) {
             return AnnotationsManager.instance;
         }
-        if (!options.display) {
+        if (!display) {
             throw new Error(
                 'AnnotationsManager: "display" required parameter for first call!'
             );
         }
 
-        this._display = options.display;
-        this._annotationsVisibleState = options.initialAnnotVisible ?? "no";
+        this._display = display;
+        this._annotationsVisibleState = initialAnnotVisible ?? "no";
         this._annotationsDialog = new AnnotationsDialog();
         this._editable = this._display.config.annotations.scope.write;
 
         this._display.layersDeferred.then(() => this._init());
+
+        reaction(
+            () => display.webmapStore.layers,
+            () => {
+                if (this._annotationsLayer) {
+                    this._annotationsLayer.setZIndex(
+                        Object.keys(display.webmapStore.layers).length * 2 // Multiply by two for insurance
+                    );
+                }
+            }
+        );
+
         AnnotationsManager.instance = this;
     }
 
