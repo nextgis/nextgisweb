@@ -23,7 +23,8 @@ export class WebmapStore {
     @observable.shallow accessor _legendSymbols: LegendSymbols = {};
 
     private _itemStore: CustomItemFileWriteStore;
-    private _layers: Record<string, CoreLayer> = {};
+    @observable.shallow private accessor _layers: Record<string, CoreLayer> =
+        {};
 
     private readonly _loadedResourceSymbols = new Set<number>();
 
@@ -264,6 +265,10 @@ export class WebmapStore {
         );
     };
 
+    @computed get layers() {
+        return this._layers;
+    }
+
     getLayers() {
         return this._layers;
     }
@@ -273,7 +278,7 @@ export class WebmapStore {
     }
 
     @action addLayer(id: number, layer: CoreLayer) {
-        this._layers[id] = layer;
+        this._layers = { ...this._layers, [id]: layer };
     }
 
     @action addItem = (item: TreeChildrenItemConfig) => {
@@ -408,12 +413,16 @@ export class WebmapStore {
                 }
                 item.legendInfo = legendInfo;
 
-                for (const layer of Object.values(this._layers)) {
+                const layers = { ...this._layers };
+                for (const layer of Object.values(layers)) {
                     if (
                         layer.itemConfig &&
                         layer.itemConfig.styleId === styleId
                     ) {
                         layer.itemConfig.legendInfo = legendInfo;
+                        runInAction(() => {
+                            this._layers = layers;
+                        });
                         break;
                     }
                 }
