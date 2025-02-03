@@ -407,6 +407,17 @@ export class WebmapStore {
                     legendInfo.open = legendInfo.visible === "expand";
                 }
                 item.legendInfo = legendInfo;
+
+                for (const layer of Object.values(this._layers)) {
+                    if (
+                        layer.itemConfig &&
+                        layer.itemConfig.styleId === styleId
+                    ) {
+                        layer.itemConfig.legendInfo = legendInfo;
+                        break;
+                    }
+                }
+
                 return true;
             }
             return false;
