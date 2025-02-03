@@ -39,6 +39,7 @@ export const PanelSwitcher = observer(({ display }: { display: Display }) => {
                 key: panel.name,
                 label: panel.title,
                 children: <PanelRender panel={panel} />,
+                ...panel.plugin.tab,
             };
             return item;
         });

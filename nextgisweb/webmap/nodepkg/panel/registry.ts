@@ -1,4 +1,5 @@
 /** @registry */
+import type { TabsProps } from "rc-tabs";
 import type { FC, ReactNode } from "react";
 
 import { pluginRegistry } from "@nextgisweb/jsrealm/plugin";
@@ -9,6 +10,8 @@ import type {
     PanelStore,
     PanelStoreConstructorOptions,
 } from "../panel/PanelStore";
+
+type Tab = NonNullable<TabsProps["items"]>[number];
 
 export interface PanelPluginWidgetProps<S extends PanelStore = PanelStore> {
     store: S;
@@ -30,6 +33,8 @@ export interface PanelPlugin<S extends PanelStore = PanelStore> {
     icon: ReactNode;
     order?: number;
     applyToTinyMap?: boolean;
+
+    tab?: Omit<Tab, "key" | "label">;
 
     isEnabled?: ({ config }: { config: Display["config"] }) => boolean;
     startup?: (display: Display) => Promise<void>;

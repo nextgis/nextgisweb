@@ -15,6 +15,8 @@ registry.register(COMP_ID, {
     order: 30,
     applyToTinyMap: true,
 
+    tab: { forceRender: true },
+
     isEnabled: ({ config }: { config: DisplayConfig }) => {
         return (
             config.annotations &&
