@@ -17,7 +17,18 @@ class FieldDefn(Struct, kw_only=True):
     text_search: Union[bool, UnsetType] = UNSET
 
 
-def setup_fields(res: VectorLayer, fields: Sequence[FieldDefn], *, destructive: bool = False):
+class SetupFieldsResult(Struct, kw_only=True):
+    present: Sequence[VectorLayerField]
+    absent: Sequence[VectorLayerField]
+    added: Sequence[VectorLayerField]
+
+
+def setup_fields(
+    res: VectorLayer,
+    fields: Sequence[FieldDefn],
+    *,
+    destructive: bool = False,
+) -> SetupFieldsResult:
     """Synchronize the fields of a VectorLayer with the provided definitions
 
     Add or update fields in the VectorLayer based on the given sequence of FieldDefn objects. If
@@ -30,14 +41,20 @@ def setup_fields(res: VectorLayer, fields: Sequence[FieldDefn], *, destructive: 
     :param destructive: Remove or not fields not present in `fields` (default is False)
     """
 
-    existing = {f.keyname: f for f in res.fields}
+    rest = {f.keyname: f for f in res.fields}
     attrs = ("display_name", "grid_visibility", "text_search", "lookup_table")
+
+    present = list()
+    added = list()
 
     ordered = []
     for fd in fields:
-        if (fld := existing.pop(fd.keyname, None)) is None:
+        if fld := rest.pop(fd.keyname, None):
+            present.append(fld)
+        else:
             fld = VectorLayerField(keyname=fd.keyname, datatype=fd.datatype)
             res.fields.append(fld)
+            added.append(fld)
 
         ordered.append(fld)
         for a in attrs:
@@ -48,10 +65,18 @@ def setup_fields(res: VectorLayer, fields: Sequence[FieldDefn], *, destructive: 
         if fd.label_field is True:
             res.feature_label_field = fld
 
+    absent = list(rest.values())
     if destructive:
-        for fld in existing.values():
+        for fld in absent:
             res.fields.remove(fld)
     else:
-        ordered.extend(existing.values())
+        # Place absent fields in the end
+        ordered.extend(absent)
 
     res.fields.sort(key=lambda fld: ordered.index(fld))
+
+    return SetupFieldsResult(
+        present=present,
+        absent=absent,
+        added=added,
+    )
