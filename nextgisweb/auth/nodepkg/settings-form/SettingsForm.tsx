@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 
-import { Button, message } from "@nextgisweb/gui/antd";
+import { Button, Input, message } from "@nextgisweb/gui/antd";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
 import { LanguageSelect } from "@nextgisweb/gui/component/language-select";
 import { errorModal } from "@nextgisweb/gui/error";
@@ -49,6 +49,12 @@ export function SettingsForm() {
         const result = [];
 
         result.push({
+            name: "keyname",
+            label: gettext("Login"),
+            formItem: <Input readOnly={true} />,
+        });
+
+        result.push({
             name: "language",
             formItem: <LanguageSelect />,
             loading: isSaving,
@@ -76,6 +82,7 @@ export function SettingsForm() {
         }
     };
     const initialValues = {
+        keyname: profile ? profile.keyname : null,
         language: profile ? profile.language : null,
     };
     return (

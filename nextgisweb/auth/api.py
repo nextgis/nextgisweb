@@ -407,6 +407,7 @@ def group_idelete(request, id: GroupID) -> EmptyObject:
 
 
 class Profile(Struct, kw_only=True):
+    keyname: ReadOnly[str]
     oauth_subject: ReadOnly[Optional[str]]
     language: Default[Optional[Language]]
 
