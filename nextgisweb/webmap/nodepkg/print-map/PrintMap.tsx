@@ -72,6 +72,12 @@ export const PrintMap = observer<PrintMapProps>(
         const { mapReady } = display;
         const { buildPrintMap } = usePrintMap({ display });
 
+        const settingsRef = useRef({ ...settings });
+
+        useEffect(() => {
+            settingsRef.current = { ...settings };
+        }, [settings]);
+
         const { legendCoords, titleCoords, mapCoords } = printMapStore;
 
         const printMapRef = useRef<HTMLDivElement>(null);
@@ -87,12 +93,12 @@ export const PrintMap = observer<PrintMapProps>(
             printMapStyle.update(printPaper);
             setStyle(printMapStyle);
             const shouldReset = printMapStore.updatePrintMapPaper(printPaper);
-            if (shouldReset) printMapStore.makeLayout(settings);
+            if (shouldReset) printMapStore.makeLayout(settingsRef.current);
 
             return () => {
                 printMapStyle.clear();
             };
-        }, [width, height, margin, settings]);
+        }, [width, height, margin]);
 
         useEffect(() => {
             if (!mapReady) return;
@@ -193,9 +199,9 @@ export const PrintMap = observer<PrintMapProps>(
                 !legendCoords.displayed;
 
             if (shouldReset) {
-                printMapStore.makeLayout(settings);
+                printMapStore.makeLayout(settingsRef.current);
             }
-        }, [legendCoords.displayed, settings, title]);
+        }, [legendCoords.displayed, title]);
 
         const legendComp = useMemo(() => {
             return (

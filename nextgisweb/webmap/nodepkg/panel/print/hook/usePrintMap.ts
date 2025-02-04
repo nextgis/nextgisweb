@@ -96,7 +96,6 @@ export function usePrintMap({
     return {
         createPrintMapComp,
         resizeObserver,
-        printMapComp,
         printMapEl,
         destroy,
     };
