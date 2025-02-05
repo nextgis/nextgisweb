@@ -61,7 +61,6 @@ export function RenderActions({
                     const { destroy } = showModal(PreviewModal, {
                         resourceId: id,
                         href: href,
-                        open: true,
                         onCancel: () => destroy(),
                     });
                 },
