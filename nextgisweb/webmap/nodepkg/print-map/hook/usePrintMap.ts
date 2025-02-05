@@ -4,6 +4,8 @@ import View from "ol/View";
 import { defaults as defaultInteractions } from "ol/interaction";
 import { useCallback, useEffect, useState } from "react";
 
+import { imageQueue } from "@nextgisweb/pyramid/util";
+
 import type { Display } from "../../display";
 import type { AnnotationsPopup } from "../../layer/annotations/AnnotationsPopup";
 
@@ -63,6 +65,15 @@ export function usePrintMap({ display }: { display: Display }) {
                 controls: [],
                 interactions,
                 view,
+            });
+
+            // This is an important aspect not just for optimization
+            // but also for handling the print map logic,
+            // where after each position change, the map scale is rounded and the map view is redrawn.
+            map.once("movestart", () => {
+                map.on("movestart", () => {
+                    imageQueue.abort();
+                });
             });
 
             const mapLogoEl = document.getElementsByClassName("map-logo");
