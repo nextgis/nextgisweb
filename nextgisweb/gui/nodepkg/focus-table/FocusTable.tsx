@@ -1,6 +1,7 @@
 import classNames from "classnames";
 import { Fragment, useMemo, useRef, useState } from "react";
 
+import { Splitter } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { ComplexTree } from "./ComplexTree";
@@ -86,42 +87,51 @@ export function FocusTable<
 
     return (
         <div className={classNames("ngw-gui-focus-table", rootClassName)}>
-            <div className="table">
-                <FocusToolbar
-                    environmentRef={environmentRef}
-                    actions={tableActionsArray}
-                    selected={selected}
-                    hideEmpty
-                />
-                <div className="items">
-                    <ComplexTree<I, C, S>
-                        environment={environmentRef}
-                        store={store}
-                        root={root}
-                        title={title}
-                        columns={columns}
-                        actions={getItemActionsTree}
-                        showColumns={!showDetails}
-                        showActions={!showDetails}
-                        showErrors={true}
-                        onSelect={setSelected}
-                        onPrimaryAction={() => setShowDetails(true)}
-                    />
-                </div>
-            </div>
-            {showDetails && selected && environmentRef.current && (
-                <div className="detail">
-                    <FocusToolbar
-                        actions={[hideDetail, ...itemActionsArray]}
-                        environmentRef={environmentRef}
-                        selected={selected}
-                        hideEmpty
-                    />
-                    <Fragment key={environmentRef.current.indexFor(selected)}>
-                        <Detail item={selected} />
-                    </Fragment>
-                </div>
-            )}
+            <Splitter>
+                <Splitter.Panel min="20%" defaultSize="35%">
+                    <div className="table">
+                        <FocusToolbar
+                            environmentRef={environmentRef}
+                            actions={tableActionsArray}
+                            selected={selected}
+                            hideEmpty
+                        />
+                        <div className="items">
+                            <ComplexTree<I, C, S>
+                                environment={environmentRef}
+                                store={store}
+                                root={root}
+                                title={title}
+                                columns={columns}
+                                actions={getItemActionsTree}
+                                showColumns={!showDetails}
+                                showActions={!showDetails}
+                                showErrors={true}
+                                onSelect={setSelected}
+                                onPrimaryAction={() => setShowDetails(true)}
+                            />
+                        </div>
+                    </div>
+                </Splitter.Panel>
+
+                {showDetails && selected && environmentRef.current && (
+                    <Splitter.Panel min="20%" defaultSize="65%">
+                        <div className="detail">
+                            <FocusToolbar
+                                actions={[hideDetail, ...itemActionsArray]}
+                                environmentRef={environmentRef}
+                                selected={selected}
+                                hideEmpty
+                            />
+                            <Fragment
+                                key={environmentRef.current.indexFor(selected)}
+                            >
+                                <Detail item={selected} />
+                            </Fragment>
+                        </div>
+                    </Splitter.Panel>
+                )}
+            </Splitter>
         </div>
     );
 }
