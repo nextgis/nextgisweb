@@ -1,7 +1,6 @@
 import { Spin } from "@nextgisweb/gui/antd";
 import { useRouteGet } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
 
 import type { GeometryInfo } from "../type/GeometryInfo";
 
@@ -14,12 +13,14 @@ interface GeometryInfoProps {
     resourceId: number;
     featureId: number;
     showPreview?: boolean;
+    srid?: number;
 }
 
 export function GeometryInfo({
+    showPreview,
     resourceId,
     featureId,
-    showPreview,
+    srid = 4326,
 }: GeometryInfoProps) {
     const {
         data: geometryInfo,
@@ -33,7 +34,7 @@ export function GeometryInfo({
         },
         options: {
             query: {
-                srs: webmapSettings.measurement_srid,
+                srs: srid,
             },
         },
     });
@@ -64,6 +65,7 @@ export function GeometryInfo({
                     geometryInfo={geometryInfo}
                     resourceId={resourceId}
                     featureId={featureId}
+                    srid={srid}
                 />
             )}
             <GeometryInfoTable geometryInfo={geometryInfo} />

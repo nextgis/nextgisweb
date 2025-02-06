@@ -14,6 +14,7 @@ import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { useResource } from "@nextgisweb/resource/hook/useResource";
 
+import { FeatureDisplayModal } from "../feature-display-modal";
 import { FeatureEditorModal } from "../feature-editor-modal";
 
 import type { FeatureGridStore } from "./FeatureGridStore";
@@ -22,6 +23,7 @@ import { ExportAction } from "./component/ExportAction";
 import type { ActionProps } from "./type";
 
 const msgOpenTitle = gettext("Open");
+const msgOpenOnNewPage = gettext("Open on a new page");
 const msgDeleteTitle = gettext("Delete");
 const msgEditTitle = gettext("Edit");
 const msgEditOnNewPage = gettext("Edit on a new page");
@@ -90,15 +92,41 @@ export const FeatureGridActions = observer(
         }, [selectedIds, beforeDelete, store, id, onDelete, deleteError]);
 
         const defActions: ActionToolbarAction<ActionProps>[] = [
-            {
-                onClick: () => {
-                    goTo("feature_layer.feature.show");
-                },
-                icon: <OpenInNewIcon />,
-                title: msgOpenTitle,
-                disabled: !selectedIds.length,
-                size,
-            },
+            (props: CreateButtonActionProps) => (
+                <Space.Compact key="feature-item-open">
+                    <Tooltip title={!props.isFit && msgOpenTitle}>
+                        <Button
+                            disabled={!selectedIds.length}
+                            size={size}
+                            onClick={() => {
+                                if (selectedIds.length) {
+                                    const featureId = selectedIds[0];
+                                    showModal(FeatureDisplayModal, {
+                                        featureId,
+                                        resourceId: id,
+                                    });
+                                }
+                            }}
+                        >
+                            {props.isFit && msgOpenTitle}
+                        </Button>
+                    </Tooltip>
+                    {editOnNewPage && (
+                        <Tooltip title={msgOpenOnNewPage} key="open-new-page">
+                            <Button
+                                disabled={!selectedIds.length}
+                                size={size}
+                                onClick={() => {
+                                    if (selectedIds.length) {
+                                        goTo("feature_layer.feature.show");
+                                    }
+                                }}
+                                icon={<OpenInNewIcon />}
+                            />
+                        </Tooltip>
+                    )}
+                </Space.Compact>
+            ),
         ];
 
         if (!readonly) {
@@ -146,7 +174,7 @@ export const FeatureGridActions = observer(
                                             );
                                         }}
                                         icon={<OpenInNewIcon />}
-                                    ></Button>
+                                    />
                                 </Tooltip>
                             )}
                         </Space.Compact>

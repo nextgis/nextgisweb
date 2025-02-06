@@ -160,23 +160,27 @@ msgstr "Открыть настройки таблицы"
 msgid "Refresh table"
 msgstr "Обновить таблицу"
 
-#: nodepkg/feature-grid/FeatureGridActions.tsx:24
+#: nodepkg/feature-grid/FeatureGridActions.tsx:25
 msgid "Open"
 msgstr "Открыть"
 
-#: nodepkg/feature-grid/FeatureGridActions.tsx:25
+#: nodepkg/feature-grid/FeatureGridActions.tsx:26
+msgid "Open on a new page"
+msgstr "Открывать на новой странице"
+
+#: nodepkg/feature-grid/FeatureGridActions.tsx:27
 msgid "Delete"
 msgstr "Удалить"
 
-#: nodepkg/feature-grid/FeatureGridActions.tsx:26
+#: nodepkg/feature-grid/FeatureGridActions.tsx:28
 msgid "Edit"
 msgstr "Редактировать"
 
-#: nodepkg/feature-grid/FeatureGridActions.tsx:27
+#: nodepkg/feature-grid/FeatureGridActions.tsx:29
 msgid "Edit on a new page"
 msgstr "Редактировать на новой странице"
 
-#: nodepkg/feature-grid/FeatureGridActions.tsx:29
+#: nodepkg/feature-grid/FeatureGridActions.tsx:31
 msgid "Search..."
 msgstr "Поиск..."
 
@@ -242,11 +246,11 @@ msgstr "Не используется"
 msgid "Field"
 msgstr "Поле"
 
-#: nodepkg/geometry-info/GeometryInfo.tsx:45
+#: nodepkg/geometry-info/GeometryInfo.tsx:46
 msgid "Load geometry info..."
 msgstr "Загрузка информации..."
 
-#: nodepkg/geometry-info/GeometryInfo.tsx:54
+#: nodepkg/geometry-info/GeometryInfo.tsx:55
 msgid "Failed to get information about the geometry"
 msgstr "Не удалось получить информацию о геометрии"
 
