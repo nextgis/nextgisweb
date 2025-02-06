@@ -1,0 +1,28 @@
+.ngw-feature-layer-feature-display-modal.ant-modal {
+    margin: 1em;
+    padding: 0;
+    width: 60%;
+    min-width: 40em;
+    max-width: 80em;
+    height: 80%;
+    min-height: 40em;
+
+    > div {
+        height: 100%;
+
+        > .ant-modal-content {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+
+            > .ant-modal-body {
+                flex: 1 1 auto;
+                margin-inline-end: -8px;
+                padding-inline-end: 8px;
+                overflow-y: auto;
+                scrollbar-gutter: stable;
+                scrollbar-width: thin;
+            }
+        }
+    }
+}

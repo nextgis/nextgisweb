@@ -176,6 +176,7 @@ const IdentifyPanel = observer<PanelPluginWidgetProps<IdentifyStore>>(
                 {featureItem && featureInfo && (
                     <FeatureInfoSection
                         showGeometryInfo={webmapSettings.show_geometry_info}
+                        measurementSrid={webmapSettings.measurement_srid}
                         showAttributes={webmapSettings.identify_attributes}
                         resourceId={featureInfo.layerId}
                         featureItem={featureItem}

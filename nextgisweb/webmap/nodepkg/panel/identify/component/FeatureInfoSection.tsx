@@ -19,6 +19,7 @@ export interface FeatureInfoSectionProps {
     resourceId: number;
     featureItem: FeatureItem;
     showAttributes?: boolean;
+    measurementSrid?: number;
     showGeometryInfo?: boolean;
     attributePanelAction?: ReactElement;
 }
@@ -27,6 +28,7 @@ export function FeatureInfoSection({
     resourceId,
     featureItem,
     showAttributes = true,
+    measurementSrid,
     showGeometryInfo = false,
     attributePanelAction,
 }: FeatureInfoSectionProps) {
@@ -88,6 +90,7 @@ export function FeatureInfoSection({
                     title={gettext("Geometry")}
                 >
                     <GeometryInfo
+                        srid={measurementSrid}
                         showPreview
                         resourceId={resourceId}
                         featureId={featureItem.id}
@@ -100,6 +103,7 @@ export function FeatureInfoSection({
     }, [
         attributePanelAction,
         showGeometryInfo,
+        measurementSrid,
         showAttributes,
         featureItem,
         resourceId,

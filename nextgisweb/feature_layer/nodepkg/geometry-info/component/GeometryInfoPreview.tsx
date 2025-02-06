@@ -3,6 +3,7 @@ import { Circle } from "ol/style";
 import Fill from "ol/style/Fill";
 import Stroke from "ol/style/Stroke";
 import Style from "ol/style/Style";
+import type { Options as StyleOptions } from "ol/style/Style";
 import { useMemo } from "react";
 
 import type { NgwExtent } from "@nextgisweb/feature-layer/type/api";
@@ -16,34 +17,36 @@ function getFeatureStyle(
     feature: FeatureLike,
     isHighlighted: boolean
 ): Style | void {
-    const strokeAlpha = isHighlighted ? 1 : 0.3;
-    const fillAlpha = isHighlighted ? 0.5 : 0.1;
+    const strokeAlpha = isHighlighted ? 1 : 0.1;
+    const fillAlpha = isHighlighted ? 0.25 : 0.05;
+
+    const colorRGB = isHighlighted ? "255,0,255" : "0,0,255";
 
     const stroke = new Stroke({
-        color: `rgba(0, 0, 255, ${strokeAlpha})`,
+        color: `rgba(${colorRGB}, ${strokeAlpha})`,
         width: 2,
     });
     const fill = new Fill({
-        color: `rgba(0, 0, 255, ${fillAlpha})`,
+        color: `rgba(${colorRGB}, ${fillAlpha})`,
     });
+
+    const styleOptions: StyleOptions = {
+        stroke,
+        fill,
+        zIndex: isHighlighted ? 1000 : 0,
+    };
 
     const geometry = feature.getGeometry();
     if (geometry) {
         const geomType = geometry.getType();
         if (geomType === "Point" || geomType === "MultiPoint") {
-            return new Style({
-                image: new Circle({
-                    radius: 5,
-                    fill,
-                    stroke,
-                }),
+            styleOptions.image = new Circle({
+                radius: 5,
+                fill,
+                stroke,
             });
         }
-
-        return new Style({
-            stroke,
-            fill,
-        });
+        return new Style(styleOptions);
     }
 }
 
@@ -61,11 +64,13 @@ export function GeometryInfoPreview({
     resourceId,
     featureId,
     height = 300,
+    srid = 4326,
 }: {
-    geometryInfo: GeometryInfo;
+    srid?: number;
     height?: number;
     resourceId: number;
     featureId: number;
+    geometryInfo: GeometryInfo;
 }) {
     const layerOptions = useMemo<LayerOptions>(() => {
         return {
@@ -83,7 +88,7 @@ export function GeometryInfoPreview({
             style={{ width: "100%", height: `${height}px` }}
             mapExtent={{
                 extent: convertExtentToNgwExtent(geometryInfo.extent),
-                srs: { id: 4326 },
+                srs: { id: srid },
                 maxZoom: 18,
             }}
         >
