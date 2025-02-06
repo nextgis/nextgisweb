@@ -1,20 +1,32 @@
+import { MVT } from "ol/format";
 import GeoJSON from "ol/format/GeoJSON";
 import Tile from "ol/layer/Tile";
 import VectorLayer from "ol/layer/Vector";
+import VectorTileLayer from "ol/layer/VectorTile";
 import WebGLTileLayer from "ol/layer/WebGLTile";
 import GeoTIFF from "ol/source/GeoTIFF";
 import VectorSource from "ol/source/Vector";
+import VectorTileSource from "ol/source/VectorTile";
 import XYZ from "ol/source/XYZ";
+import type { StyleLike } from "ol/style/Style";
 import { useMemo } from "react";
 
 import { routeURL } from "@nextgisweb/pyramid/api";
 
-export type LayerType = "geojson" | "geotiff" | "XYZ";
+export type LayerType = "geojson" | "geotiff" | "XYZ" | "MVT";
 
-const createGeoJsonLayer = (resourceId: number) => {
+export interface LayerOptions {
+    style?: StyleLike;
+}
+
+const createGeoJsonLayer = (
+    resourceId: number,
+    layerOptions?: LayerOptions
+) => {
     const url = routeURL("feature_layer.geojson", resourceId);
     const layer = new VectorLayer({
         source: new VectorSource({ url: url, format: new GeoJSON() }),
+        ...layerOptions,
     });
     return layer;
 };
@@ -37,21 +49,41 @@ const createXYZLayer = (resourceId: number) => {
     return layer;
 };
 
+const createMVTLayer = (resourceId: number, layerOptions?: LayerOptions) => {
+    const url =
+        routeURL("feature_layer.mvt") +
+        `?resource=${resourceId}&x={x}&y={y}&z={z}&nd=204`;
+    const source = new VectorTileSource({
+        format: new MVT(),
+        url,
+    });
+    return new VectorTileLayer({
+        source,
+        ...layerOptions,
+    });
+};
+
 export function useNGWLayer({
     layerType,
     resourceId,
+    layerOptions,
 }: {
     layerType: LayerType;
     resourceId: number;
+    layerOptions?: LayerOptions;
 }) {
     const layer = useMemo(() => {
         if (layerType === "geojson") {
-            return createGeoJsonLayer(resourceId);
+            return createGeoJsonLayer(resourceId, layerOptions);
         } else if (layerType === "geotiff") {
             return createGeoTIFFLayer(resourceId);
-        } else {
+        } else if (layerType === "MVT") {
+            return createMVTLayer(resourceId, layerOptions);
+        } else if (layerType === "XYZ") {
             return createXYZLayer(resourceId);
+        } else {
+            throw new Error(`Not supported layer type: ${layerType}`);
         }
-    }, [layerType, resourceId]);
+    }, [layerOptions, layerType, resourceId]);
     return layer;
 }

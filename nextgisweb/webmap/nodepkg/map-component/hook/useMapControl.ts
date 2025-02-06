@@ -16,13 +16,13 @@ export function useMapControl({
 }) {
     // const [container, setContainer] = useState<HTMLElement>();
     const added = useRef<Control>();
-    const mapAdapter = useMemo(() => {
-        return context?.mapAdapter;
-    }, [context?.mapAdapter]);
+    const mapStore = useMemo(() => {
+        return context?.mapStore;
+    }, [context?.mapStore]);
     useEffect(
         function addControl() {
-            if (instance && mapAdapter) {
-                const control = mapAdapter.addControl(instance, position);
+            if (instance && mapStore) {
+                const control = mapStore.addControl(instance, position);
                 if (control) {
                     added.current = control;
                     // if (control.getContainer)
@@ -31,12 +31,12 @@ export function useMapControl({
             }
 
             return function removeControl() {
-                if (mapAdapter && added.current) {
-                    mapAdapter.removeControl(added.current);
+                if (mapStore && added.current) {
+                    mapStore.removeControl(added.current);
                 }
             };
         },
-        [context, mapAdapter, instance, position]
+        [context, mapStore, instance, position]
     );
 
     // return {

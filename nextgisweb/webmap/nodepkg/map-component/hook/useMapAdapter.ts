@@ -31,7 +31,7 @@ export function useMapAdapter({
     maxZoom,
     mapExtent: mapExtentProp,
 }: MapProps) {
-    const [mapAdapter, setMapAdapter] = useState<MapStore>();
+    const [mapStore, setMapStore] = useState<MapStore>();
     const osmLayer = useRef<TileLayer<OSM>>();
 
     const [center] = useObjectState(centerProp);
@@ -45,17 +45,18 @@ export function useMapAdapter({
             const adapter = new MapStore({
                 target,
                 view,
+                controls: [],
             });
-            setMapAdapter(adapter);
+            setMapStore(adapter);
             return adapter;
         },
         [mapSRS.id]
     );
 
     const setView = useCallback((): void => {
-        if (!mapAdapter?.olMap) return;
+        if (!mapStore?.olMap) return;
 
-        const curView = mapAdapter.olMap.getView();
+        const curView = mapStore.olMap.getView();
 
         if (center) {
             curView.setCenter(center);
@@ -85,19 +86,19 @@ export function useMapAdapter({
                 fitOptions
             );
         }
-    }, [mapAdapter, center, zoom, minZoom, maxZoom, mapExtent, mapSRS.id]);
+    }, [mapStore, center, zoom, minZoom, maxZoom, mapExtent, mapSRS.id]);
 
     useEffect(() => {
         setView();
     }, [setView]);
 
     useEffect(() => {
-        if (mapAdapter && osm) {
+        if (mapStore && osm) {
             const osmLayer_ = new TileLayer({
                 source: new OSM(),
                 zIndex: -1,
             });
-            mapAdapter.olMap.addLayer(osmLayer_);
+            mapStore.olMap.addLayer(osmLayer_);
             osmLayer.current = osmLayer_;
         }
         return () => {
@@ -105,15 +106,15 @@ export function useMapAdapter({
                 osmLayer.current.dispose();
             }
         };
-    }, [osm, mapAdapter]);
+    }, [osm, mapStore]);
 
     useEffect(() => {
         return () => {
-            if (mapAdapter?.olMap) {
-                mapAdapter.olMap.dispose();
+            if (mapStore?.olMap) {
+                mapStore.olMap.dispose();
             }
         };
-    }, [mapAdapter]);
+    }, [mapStore]);
 
     return { createMapAdapter };
 }

@@ -26,11 +26,11 @@ export function ButtonControl({ children, ...props }: MapControlProps) {
     const portal = useRef(document.createElement("div"));
 
     const createControl = useCallback(() => {
-        return context.mapAdapter?.createButtonControl({
+        return context.mapStore?.createButtonControl({
             html: portal.current,
             ...propState,
         });
-    }, [context.mapAdapter, propState]);
+    }, [context.mapStore, propState]);
 
     const [instance, setInstance] = useState<Control | undefined>();
 

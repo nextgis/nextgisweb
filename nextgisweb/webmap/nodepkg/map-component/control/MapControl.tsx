@@ -35,7 +35,7 @@ export function MapControl(props: MapControlProps) {
     const portal = useRef(document.createElement("div"));
 
     const createControl = useCallback(() => {
-        return context?.mapAdapter?.createControl(
+        return context?.mapStore?.createControl(
             {
                 onAdd() {
                     return portal.current;
@@ -47,7 +47,7 @@ export function MapControl(props: MapControlProps) {
             },
             { bar, margin, addClass }
         );
-    }, [context?.mapAdapter, bar, margin, addClass]);
+    }, [context?.mapStore, bar, margin, addClass]);
 
     const [instance, setInstance] = useState<Control>();
 

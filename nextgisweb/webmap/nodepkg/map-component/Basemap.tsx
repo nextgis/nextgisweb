@@ -12,14 +12,14 @@ export function Basemap({
     opacity?: number;
     attributions?: string | null;
 }) {
-    const { mapAdapter } = useMapContext();
+    const { mapStore } = useMapContext();
     const basemap = useTileLayer({ url, attributions, opacity });
     useEffect(() => {
-        mapAdapter?.olMap.addLayer(basemap);
+        mapStore?.olMap.addLayer(basemap);
 
         return () => {
-            mapAdapter?.olMap.removeLayer(basemap);
+            mapStore?.olMap.removeLayer(basemap);
         };
-    }, [mapAdapter, url, basemap]);
+    }, [mapStore, url, basemap]);
     return null;
 }

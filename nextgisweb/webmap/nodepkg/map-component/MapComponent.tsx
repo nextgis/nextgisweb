@@ -15,7 +15,7 @@ export interface MapComponentProps extends ViewOptions {
     target?: string;
     style?: React.CSSProperties;
     basemap?: boolean;
-    whenCreated?: (mapAdapter: MapStore | null) => void;
+    whenCreated?: (mapStore: MapStore | null) => void;
     mapExtent?: MapExtent;
     resetView?: boolean;
 }
@@ -69,7 +69,7 @@ export function MapComponent({
     }, [createMapAdapter, whenCreated]);
 
     return (
-        <MapProvider value={{ mapAdapter: mapRef.current }}>
+        <MapProvider value={{ mapStore: mapRef.current }}>
             <div ref={mapContainerRef} style={style} className="map" {...props}>
                 {children}
             </div>
