@@ -5,8 +5,6 @@
     "dependencies": {
         "dijit": "1.16.x",
         "dojo": "1.16.x",
-        "dojox": "1.16.x",
-        "put-selector": "^0.3.6",
         "string-replace-loader": "^3.0.1",
         "uglify-js": "~3.17.4",
         "uglifycss": "^0.0.29",
@@ -20,9 +18,7 @@
         "externals": [
             "dijit",
             "dojo",
-            "dojox",
             "mocha",
-            "put-selector",
             "xstyle"
         ]
     }

@@ -43,14 +43,13 @@ function addPackage(name, options) {
     copyPatterns.push(options);
 }
 
-for (const pkg of ["dojo", "dijit", "dojox"]) {
+for (const pkg of ["dojo", "dijit"]) {
     addPackage(pkg, {
         globOptions: {
             ignore: [
                 "**/tests/**",
                 "**/testsDOH/**",
                 "**/demos/**",
-                "**/dojox/mobile/**",
                 "**/themes/(nihilo|soria|tundra|iphone)/**",
             ],
         },
@@ -61,10 +60,6 @@ addPackage("xstyle", {
     globOptions: {
         ignore: ["**/test/**"],
     },
-});
-
-addPackage("put-selector", {
-    from: "put.js",
 });
 
 addPackage("mocha", {
