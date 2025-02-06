@@ -10,12 +10,14 @@ import { executeWithMinDelay } from "@nextgisweb/gui/util/executeWithMinDelay";
 import type { GetRequestOptions } from "@nextgisweb/pyramid/api/type";
 import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
 import type { Display } from "@nextgisweb/webmap/display";
 
 import { PanelContainer } from "../component";
 import type { PanelPluginWidgetProps } from "../registry";
 
 import { CoordinatesSwitcher } from "./CoordinatesSwitcher";
+import { FeatureEditButton } from "./FeatureEditButton";
 import type IdentifyStore from "./IdentifyStore";
 import { FeatureInfoSection } from "./component/FeatureInfoSection";
 import { FeatureSelector } from "./component/FeatureSelector";
@@ -173,10 +175,18 @@ const IdentifyPanel = observer<PanelPluginWidgetProps<IdentifyStore>>(
                 {loadElement}
                 {featureItem && featureInfo && (
                     <FeatureInfoSection
-                        display={display}
-                        featureInfo={featureInfo}
+                        showGeometryInfo={webmapSettings.show_geometry_info}
+                        showAttributes={webmapSettings.identify_attributes}
+                        resourceId={featureInfo.layerId}
                         featureItem={featureItem}
-                        onUpdate={() => updateFeatureItem(featureInfo)}
+                        attributePanelAction={
+                            <FeatureEditButton
+                                display={display}
+                                resourceId={featureInfo.layerId}
+                                featureId={featureItem.id}
+                                onUpdate={() => updateFeatureItem(featureInfo)}
+                            />
+                        }
                     />
                 )}
             </PanelContainer>

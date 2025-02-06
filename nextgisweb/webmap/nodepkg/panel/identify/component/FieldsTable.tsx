@@ -1,25 +1,30 @@
 import { useEffect, useState } from "react";
 
+import type { FeatureItem } from "@nextgisweb/feature-layer/type";
 import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
 
 import { KeyValueTable } from "../KeyValueTable";
 import { fieldValuesToDataSource, getFieldsInfo } from "../fields";
 import type { FieldDataItem } from "../fields";
-import type { FieldsTableProps } from "../identification";
 
-export function FieldsTable({ featureInfo, featureItem }: FieldsTableProps) {
+export interface FieldsTableProps {
+    resourceId: number;
+    featureItem: FeatureItem;
+}
+
+export function FieldsTable({ featureItem, resourceId }: FieldsTableProps) {
     const [fieldsInfo, setFieldsInfo] =
         useState<Map<string, FeatureLayerFieldRead>>();
     const [dataSource, setDataSource] = useState<FieldDataItem[]>();
 
     useEffect(() => {
         async function load() {
-            const fields = await getFieldsInfo(featureInfo.layerId);
+            const fields = await getFieldsInfo(resourceId);
             setFieldsInfo(fields);
         }
         setDataSource(undefined);
         load();
-    }, [featureInfo.layerId, featureItem]);
+    }, [resourceId, featureItem]);
 
     useEffect(() => {
         if (!fieldsInfo) {

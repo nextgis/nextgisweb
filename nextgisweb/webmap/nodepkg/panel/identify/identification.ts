@@ -51,18 +51,6 @@ export interface IdentifyExtensionComponentProps<F extends Attrs = Attrs> {
     resourceId: number;
 }
 
-export interface FieldsTableProps {
-    featureInfo: FeatureInfo;
-    featureItem: FeatureItem;
-}
-
-export interface FeatureTabsProps {
-    display: Display;
-    featureInfo: FeatureInfo;
-    featureItem: FeatureItem;
-    onUpdate: () => void;
-}
-
 export interface IdentifyResultProps {
     identifyInfo: IdentifyInfo;
     display: Display;

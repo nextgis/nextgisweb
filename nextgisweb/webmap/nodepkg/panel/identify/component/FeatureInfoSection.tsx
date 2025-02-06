@@ -1,13 +1,12 @@
 import { Suspense, lazy, useEffect, useMemo, useState } from "react";
+import type { ReactElement } from "react";
 
 import GeometryInfo from "@nextgisweb/feature-layer/geometry-info/";
+import type { FeatureItem } from "@nextgisweb/feature-layer/type";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
 import { PanelSection } from "@nextgisweb/webmap/panel/component";
 
-import { FeatureEditButton } from "../FeatureEditButton";
 import { getExtensionsComps } from "../extensions";
-import type { FeatureTabsProps as FeatureInfoProps } from "../identification";
 
 import { FieldsTable } from "./FieldsTable";
 
@@ -16,12 +15,21 @@ import EarthIcon from "@nextgisweb/icon/material/public/outline";
 
 const msgLoading = gettext("Loading...");
 
+export interface FeatureInfoSectionProps {
+    resourceId: number;
+    featureItem: FeatureItem;
+    showAttributes?: boolean;
+    showGeometryInfo?: boolean;
+    attributePanelAction?: ReactElement;
+}
+
 export function FeatureInfoSection({
-    display,
-    featureInfo,
+    resourceId,
     featureItem,
-    onUpdate,
-}: FeatureInfoProps) {
+    showAttributes = true,
+    showGeometryInfo = false,
+    attributePanelAction,
+}: FeatureInfoSectionProps) {
     const [extComps, setExtComps] = useState<JSX.Element[]>([]);
 
     useEffect(() => {
@@ -42,7 +50,7 @@ export function FeatureInfoSection({
                     >
                         <ExtensionComponent
                             featureItem={featureItem}
-                            resourceId={featureInfo.layerId}
+                            resourceId={resourceId}
                         ></ExtensionComponent>
                     </Suspense>
                 );
@@ -51,30 +59,20 @@ export function FeatureInfoSection({
         };
 
         makeExtensionComps();
-    }, [featureInfo.layerId, featureItem]);
+    }, [resourceId, featureItem]);
 
     const items = useMemo(() => {
         const items_ = [];
-        if (
-            webmapSettings.identify_attributes &&
-            Object.keys(featureItem.fields).length > 0
-        ) {
+        if (showAttributes && Object.keys(featureItem.fields).length > 0) {
             const attrElement = (
                 <PanelSection
                     key="attributes"
                     icon={<ListIcon />}
                     title={gettext("Attributes")}
-                    suffix={
-                        <FeatureEditButton
-                            display={display}
-                            resourceId={featureInfo.layerId}
-                            featureId={featureItem.id}
-                            onUpdate={onUpdate}
-                        />
-                    }
+                    suffix={attributePanelAction}
                 >
                     <FieldsTable
-                        featureInfo={featureInfo}
+                        resourceId={resourceId}
                         featureItem={featureItem}
                     />
                 </PanelSection>
@@ -82,7 +80,7 @@ export function FeatureInfoSection({
             items_.push(attrElement);
         }
 
-        if (webmapSettings.show_geometry_info) {
+        if (showGeometryInfo) {
             const geomElement = (
                 <PanelSection
                     key="geometry"
@@ -90,7 +88,8 @@ export function FeatureInfoSection({
                     title={gettext("Geometry")}
                 >
                     <GeometryInfo
-                        layerId={featureInfo.layerId}
+                        showPreview
+                        resourceId={resourceId}
                         featureId={featureItem.id}
                     />
                 </PanelSection>
@@ -98,7 +97,13 @@ export function FeatureInfoSection({
             items_.push(geomElement);
         }
         return items_;
-    }, [display, featureInfo, featureItem, onUpdate]);
+    }, [
+        attributePanelAction,
+        showGeometryInfo,
+        showAttributes,
+        featureItem,
+        resourceId,
+    ]);
 
     return <>{[...items, ...extComps]}</>;
 }

@@ -24,13 +24,13 @@ export interface ControlContainerOptions {
     target?: string;
     classPrefix?: string;
     addClass?: string;
-    mapAdapter?: MapStore;
+    mapStore?: MapStore;
 }
 
 export class ControlContainer {
     private readonly classPrefix: string = "mapadapter";
     private readonly addClass?: string;
-    private readonly mapAdapter?: MapStore;
+    private readonly mapStore?: MapStore;
     private _container: HTMLElement;
     private _positionsContainers: {
         [key in ControlPosition]: HTMLElement | null;
@@ -44,7 +44,7 @@ export class ControlContainer {
     constructor(opt: ControlContainerOptions = {}) {
         this.classPrefix = opt.classPrefix || this.classPrefix;
         this.addClass = opt.addClass;
-        this.mapAdapter = opt.mapAdapter;
+        this.mapStore = opt.mapStore;
         this._container = this.createContainerElement();
     }
 
@@ -96,7 +96,7 @@ export class ControlContainer {
     }
 
     addControl(control: MapControl, position: ControlPosition): void {
-        const controlContainer = control.onAdd(this.mapAdapter);
+        const controlContainer = control.onAdd(this.mapStore);
         if (controlContainer instanceof HTMLElement) {
             this.append(controlContainer, position);
         }
