@@ -1,12 +1,3 @@
-#: amd/ngw-feature-layer/FieldsDisplayWidget.js:35
-#: nodepkg/attribute-editor/plugin.ts:10 view.py:192
-msgid "Attributes"
-msgstr "Атрибуты"
-
-#: amd/ngw-feature-layer/FieldsDisplayWidget.js:178
-msgid "N/A"
-msgstr "Н/Д"
-
 #: api.py:99 api_identify.py:27
 msgid "Geometry is not valid."
 msgstr "Невалидная геометрия"
@@ -15,19 +6,23 @@ msgstr "Невалидная геометрия"
 msgid "Unknown spatial reference system"
 msgstr "Неизвестная система координат"
 
-#: api.py:422 api_export.py:153
+#: api.py:422 api_export.py:202
 msgid "Parameter 'intersects' geometry is not valid."
 msgstr "Параметр 'intersects' содержит невалидную геометрию."
 
-#: api_export.py:188
+#: api_export.py:108
+msgid "Couldn't add FID field '{}'. Such field already exists."
+msgstr ""
+
+#: api_export.py:241
 msgid "The export limit is set to {limit} features, but the layer contains {count}."
 msgstr "Лимит экспорта составляет {limit} объектов, однако слой содержит {count}."
 
-#: api_export.py:202
+#: api_export.py:255
 msgid "Failed to reproject 'intersects' geometry."
 msgstr "Не удалось перепроецировать геометрию 'intersects'."
 
-#: api_export.py:371
+#: api_export.py:423
 msgid "File name parameter '{}' is not valid."
 msgstr "Недопустимое имя файла '{}'."
 
@@ -74,6 +69,10 @@ msgstr "Установить для атрибута значение NULL (Не
 #: nodepkg/attribute-editor/AttributeEditor.tsx:34
 msgid "There are no attributes in the vector layer"
 msgstr "В векторном слое нет атрибутов"
+
+#: nodepkg/attribute-editor/plugin.ts:10 view.py:188
+msgid "Attributes"
+msgstr "Атрибуты"
 
 #: nodepkg/export-form/ExportForm.tsx:204
 msgid "Resources"
@@ -186,8 +185,8 @@ msgstr "Поиск..."
 msgid "Last changed"
 msgstr "Последнее изменение"
 
-#: nodepkg/feature-grid/component/ExportAction.tsx:30 view.py:94 view.py:105
-#: view.py:187
+#: nodepkg/feature-grid/component/ExportAction.tsx:30 view.py:90 view.py:101
+#: view.py:183
 msgid "Save as"
 msgstr "Сохранить как"
 
@@ -243,43 +242,43 @@ msgstr "Не используется"
 msgid "Field"
 msgstr "Поле"
 
-#: nodepkg/geometry-info/GeometryInfo.tsx:56
+#: nodepkg/geometry-info/GeometryInfo.tsx:45
 msgid "Load geometry info..."
 msgstr "Загрузка информации..."
 
-#: nodepkg/geometry-info/GeometryInfo.tsx:65
+#: nodepkg/geometry-info/GeometryInfo.tsx:54
 msgid "Failed to get information about the geometry"
 msgstr "Не удалось получить информацию о геометрии"
 
-#: nodepkg/geometry-info/GeometryInfo.tsx:75
+#: nodepkg/geometry-info/component/GeometryInfoTable.tsx:34
 msgid "Perimeter"
 msgstr "Периметр"
 
-#: nodepkg/geometry-info/GeometryInfo.tsx:76
+#: nodepkg/geometry-info/component/GeometryInfoTable.tsx:35
 msgid "Length"
 msgstr "Длина"
 
-#: nodepkg/geometry-info/GeometryInfo.tsx:84
+#: nodepkg/geometry-info/component/GeometryInfoTable.tsx:43
 msgid "Area"
 msgstr "Площадь"
 
-#: nodepkg/geometry-info/GeometryInfo.tsx:92
+#: nodepkg/geometry-info/component/GeometryInfoTable.tsx:52
 msgid "Geometry type"
 msgstr "Тип геометрии"
 
-#: nodepkg/geometry-info/GeometryInfo.tsx:100
+#: nodepkg/geometry-info/component/GeometryInfoTable.tsx:60
 msgid "Extent (xMin)"
 msgstr "Охват (xMin)"
 
-#: nodepkg/geometry-info/GeometryInfo.tsx:104
+#: nodepkg/geometry-info/component/GeometryInfoTable.tsx:64
 msgid "Extent (yMin)"
 msgstr "Охват (yMin)"
 
-#: nodepkg/geometry-info/GeometryInfo.tsx:108
+#: nodepkg/geometry-info/component/GeometryInfoTable.tsx:68
 msgid "Extent (xMax)"
 msgstr "Охват (xMax)"
 
-#: nodepkg/geometry-info/GeometryInfo.tsx:112
+#: nodepkg/geometry-info/component/GeometryInfoTable.tsx:72
 msgid "Extent (yMax)"
 msgstr "Охват (yMax)"
 
@@ -311,7 +310,7 @@ msgstr ""
 msgid "Settings"
 msgstr "Настройки"
 
-#: template/resource_section_fields.mako:21 view.py:176
+#: template/resource_section_fields.mako:21 view.py:172
 msgid "Table"
 msgstr "Таблица"
 
@@ -378,15 +377,15 @@ msgstr "Версия за пределами диапазона"
 msgid "Invalid range"
 msgstr "Некорректный диапазон"
 
-#: view.py:60 view.py:77
+#: view.py:57 view.py:73
 msgid "Feature #%d"
 msgstr "Объект #%d"
 
-#: view.py:113
+#: view.py:109
 msgid "MVT Vector Tiles"
 msgstr "Векторные тайлы MVT"
 
-#: view.py:114
+#: view.py:110
 msgid ""
 "The Mapbox Vector Tile is an efficient encoding for map data into vector "
 "tiles that can be rendered dynamically."
@@ -394,6 +393,9 @@ msgstr ""
 "Векторные тайлы MVT это эффективное кодирование данных карты в векторные "
 "тайлы которые могут быть динамически отрисованы."
 
-#: view.py:171
+#: view.py:167
 msgid "Features"
 msgstr "Объекты"
+
+#~ msgid "N/A"
+#~ msgstr "Н/Д"

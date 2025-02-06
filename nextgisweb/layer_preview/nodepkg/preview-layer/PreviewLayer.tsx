@@ -1,4 +1,4 @@
-import { useCallback, useReducer } from "react";
+import { useCallback, useMemo, useReducer } from "react";
 
 import { LoadingWrapper } from "@nextgisweb/gui/component";
 import { convertNgwExtentToWSEN } from "@nextgisweb/gui/util/extent";
@@ -12,7 +12,6 @@ import {
     ToggleControl,
     ZoomControl,
 } from "@nextgisweb/webmap/map-component";
-import type { LayerType } from "@nextgisweb/webmap/map-component";
 
 import MapIcon from "@nextgisweb/icon/material/map/outline";
 
@@ -27,31 +26,38 @@ export function PreviewLayer({
 }) {
     const [basemap, toggleBaseMap] = useReducer((state) => !state, true);
 
-    let layerType;
-    let url;
-    let attributions;
     const { data: resData, isLoading: isResLoading } = useRouteGet(
         "resource.item",
         { id }
     );
-    if (resData) {
-        if (resData.basemap_layer) {
-            const base = resData.basemap_layer;
-            url = base.url;
-            attributions = base.copyright_url
-                ? `<a href="${base.copyright_url}" target="_blank">${base.copyright_text}</a>`
-                : base.copyright_text;
-        } else {
+
+    const layerType = useMemo(() => {
+        if (resData) {
             const interfaces = resData?.resource.interfaces;
             if (interfaces.includes("IFeatureLayer")) {
-                layerType = "geojson";
+                return "MVT";
             } else if (resData.raster_layer) {
-                layerType = "geotiff";
-            } else {
-                layerType = "xyz";
+                return "geotiff";
             }
         }
-    }
+        return "XYZ";
+    }, [resData]);
+
+    const url = useMemo(() => {
+        if (resData?.basemap_layer) {
+            const base = resData.basemap_layer;
+            return base.url;
+        }
+    }, [resData]);
+
+    const attributions = useMemo(() => {
+        if (resData?.basemap_layer) {
+            const base = resData.basemap_layer;
+            return base.copyright_url
+                ? `<a href="${base.copyright_url}" target="_blank">${base.copyright_text}</a>`
+                : base.copyright_text;
+        }
+    }, [resData]);
 
     const { data: extentData, isLoading: isExtentLoading } = useRouteGet(
         "layer.extent",
@@ -106,7 +112,7 @@ export function PreviewLayer({
                 ) : (
                     <NGWLayer
                         resourceId={id}
-                        layerType={layerType as LayerType}
+                        layerType={layerType}
                         zIndex={1}
                     />
                 )}

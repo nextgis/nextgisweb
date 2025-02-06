@@ -44,22 +44,18 @@ def feature_browse(request):
     )
 
 
-@viewargs(renderer="mako")
+@viewargs(renderer="react")
 def feature_show(request):
     request.resource_permission(DataScope.read)
 
     feature_id = int(request.matchdict["feature_id"])
 
-    ext_mid = dict()
-    for k, ecls in FeatureExtension.registry._dict.items():
-        if hasattr(ecls, "display_widget"):
-            ext_mid[k] = ecls.display_widget
-
     return dict(
         obj=request.context,
+        entrypoint="@nextgisweb/feature-layer/feature-display",
+        props=dict(resourceId=request.context.id, featureId=feature_id),
         title=gettext("Feature #%d") % feature_id,
-        feature_id=feature_id,
-        ext_mid=ext_mid,
+        maxheight=True,
         dynmenu=False,
     )
 
