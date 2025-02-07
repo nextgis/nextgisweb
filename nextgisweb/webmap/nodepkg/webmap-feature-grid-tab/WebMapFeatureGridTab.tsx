@@ -75,6 +75,13 @@ export function WebMapFeatureGridTab({
                 onSave: () => {
                     reloadLayer();
                 },
+                onOpen: ({ featureId, resourceId }) => {
+                    display.current.identify?.identifyFeatureByAttrValue(
+                        resourceId,
+                        "id",
+                        featureId
+                    );
+                },
 
                 onSelect: (newVal) => {
                     store.setSelectedIds(newVal);

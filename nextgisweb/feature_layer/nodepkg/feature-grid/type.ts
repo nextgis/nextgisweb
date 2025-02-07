@@ -49,4 +49,5 @@ export interface FeatureGridProps {
     onSelect?: (selected: number[]) => void;
     onDelete?: (featureIds: number[]) => void;
     onSave?: (value: CompositeRead | undefined) => void;
+    onOpen?: (opt: { featureId: number; resourceId: number }) => void;
 }

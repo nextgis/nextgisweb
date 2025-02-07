@@ -12,6 +12,7 @@ import { DeleteIcon, EditIcon, OpenInNewIcon } from "@nextgisweb/gui/icon";
 import showModal from "@nextgisweb/gui/showModal";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import type Routes from "@nextgisweb/pyramid/type/route";
 import { useResource } from "@nextgisweb/resource/hook/useResource";
 
 import { FeatureDisplayModal } from "../feature-display-modal";
@@ -42,23 +43,26 @@ export const FeatureGridActions = observer(
             id,
             size,
             actions: propActions,
-            selectedIds,
             readonly,
             queryParams,
+            selectedIds,
             editOnNewPage,
             beforeDelete,
             deleteError,
             onDelete,
             onSave,
+            onOpen,
         } = store;
 
         const { isExportAllowed } = useResource({ id });
 
         const goTo = useCallback(
             (
-                path:
+                path: keyof Pick<
+                    Routes,
                     | "feature_layer.feature.update"
                     | "feature_layer.feature.show"
+                >
             ) => {
                 if (selectedIds.length) {
                     window.open(
@@ -91,6 +95,20 @@ export const FeatureGridActions = observer(
             store.bumpVersion();
         }, [selectedIds, beforeDelete, store, id, onDelete, deleteError]);
 
+        const onOpenClick = useCallback(() => {
+            if (selectedIds.length) {
+                const featureId = selectedIds[0];
+                if (onOpen) {
+                    onOpen({ featureId, resourceId: id });
+                } else {
+                    showModal(FeatureDisplayModal, {
+                        featureId,
+                        resourceId: id,
+                    });
+                }
+            }
+        }, [selectedIds, onOpen, id]);
+
         const defActions: ActionToolbarAction<ActionProps>[] = [
             (props: CreateButtonActionProps) => (
                 <Space.Compact key="feature-item-open">
@@ -98,33 +116,24 @@ export const FeatureGridActions = observer(
                         <Button
                             disabled={!selectedIds.length}
                             size={size}
-                            onClick={() => {
-                                if (selectedIds.length) {
-                                    const featureId = selectedIds[0];
-                                    showModal(FeatureDisplayModal, {
-                                        featureId,
-                                        resourceId: id,
-                                    });
-                                }
-                            }}
+                            onClick={onOpenClick}
                         >
                             {props.isFit && msgOpenTitle}
                         </Button>
                     </Tooltip>
-                    {editOnNewPage && (
-                        <Tooltip title={msgOpenOnNewPage} key="open-new-page">
-                            <Button
-                                disabled={!selectedIds.length}
-                                size={size}
-                                onClick={() => {
-                                    if (selectedIds.length) {
-                                        goTo("feature_layer.feature.show");
-                                    }
-                                }}
-                                icon={<OpenInNewIcon />}
-                            />
-                        </Tooltip>
-                    )}
+
+                    <Tooltip title={msgOpenOnNewPage} key="open-new-page">
+                        <Button
+                            disabled={!selectedIds.length}
+                            size={size}
+                            onClick={() => {
+                                if (selectedIds.length) {
+                                    goTo("feature_layer.feature.show");
+                                }
+                            }}
+                            icon={<OpenInNewIcon />}
+                        />
+                    </Tooltip>
                 </Space.Compact>
             ),
         ];
