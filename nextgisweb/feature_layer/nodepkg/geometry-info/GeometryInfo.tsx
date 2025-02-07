@@ -10,9 +10,10 @@ import { GeometryInfoTable } from "./component/GeometryInfoTable";
 import "./GeometryInfo.less";
 
 interface GeometryInfoProps {
+    showPreview?: boolean;
     resourceId: number;
     featureId: number;
-    showPreview?: boolean;
+    showInfo?: boolean;
     srid?: number;
 }
 
@@ -20,6 +21,7 @@ export function GeometryInfo({
     showPreview,
     resourceId,
     featureId,
+    showInfo,
     srid = 4326,
 }: GeometryInfoProps) {
     const {
@@ -68,7 +70,7 @@ export function GeometryInfo({
                     srid={srid}
                 />
             )}
-            <GeometryInfoTable geometryInfo={geometryInfo} />
+            {showInfo && <GeometryInfoTable geometryInfo={geometryInfo} />}
         </>
     );
 }

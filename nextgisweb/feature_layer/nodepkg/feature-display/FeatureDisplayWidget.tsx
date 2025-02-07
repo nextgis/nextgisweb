@@ -4,6 +4,8 @@ import { LoadingWrapper } from "@nextgisweb/gui/component";
 import { useRouteGet } from "@nextgisweb/pyramid/hook";
 import { FeatureInfoSection } from "@nextgisweb/webmap/panel/identify/component/FeatureInfoSection";
 
+import "./FeatureDisplayWidget.less";
+
 export interface FeatureDisplayWidget {
     resourceId: number;
     featureId: number;
@@ -24,9 +26,10 @@ export const FeatureDisplayWidget = observer<FeatureDisplayWidget>(
         }
 
         return (
-            <div className="ngw-feature-layer-editor">
+            <div className="ngw-feature-layer-display ">
                 <FeatureInfoSection
                     showGeometryInfo
+                    showGeometryPreview
                     resourceId={resourceId}
                     featureItem={featureItem}
                 />

@@ -47,6 +47,7 @@ export function FeatureDisplayModal({
                 ) : (
                     <FeatureInfoSection
                         showGeometryInfo
+                        showGeometryPreview
                         resourceId={resourceId}
                         featureItem={featureItem}
                     />

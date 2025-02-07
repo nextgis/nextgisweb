@@ -21,6 +21,7 @@ export interface FeatureInfoSectionProps {
     showAttributes?: boolean;
     measurementSrid?: number;
     showGeometryInfo?: boolean;
+    showGeometryPreview?: boolean;
     attributePanelAction?: ReactElement;
 }
 
@@ -30,6 +31,7 @@ export function FeatureInfoSection({
     showAttributes = true,
     measurementSrid,
     showGeometryInfo = false,
+    showGeometryPreview,
     attributePanelAction,
 }: FeatureInfoSectionProps) {
     const [extComps, setExtComps] = useState<JSX.Element[]>([]);
@@ -82,7 +84,7 @@ export function FeatureInfoSection({
             items_.push(attrElement);
         }
 
-        if (showGeometryInfo) {
+        if (showGeometryInfo || showGeometryPreview) {
             const geomElement = (
                 <PanelSection
                     key="geometry"
@@ -91,7 +93,8 @@ export function FeatureInfoSection({
                 >
                     <GeometryInfo
                         srid={measurementSrid}
-                        showPreview
+                        showInfo={showGeometryInfo}
+                        showPreview={showGeometryPreview}
                         resourceId={resourceId}
                         featureId={featureItem.id}
                     />
@@ -102,6 +105,7 @@ export function FeatureInfoSection({
         return items_;
     }, [
         attributePanelAction,
+        showGeometryPreview,
         showGeometryInfo,
         measurementSrid,
         showAttributes,
