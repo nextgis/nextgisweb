@@ -179,7 +179,10 @@ def cors_tween_factory(handler, registry):
     return cors_tween
 
 
-SettingsComponentGap = Gap[Annotated[str, Meta(description="Component identity")]]
+SettingsComponentGap = Annotated[
+    Gap("SettingsComponentGap", str),
+    Meta(description="Component identity"),
+]
 
 
 def settings(request, *, component: SettingsComponentGap) -> AsJSON[Dict[str, Any]]:
@@ -247,7 +250,7 @@ def statistics(request) -> AsJSON[Dict[str, Dict[str, Any]]]:
     return result
 
 
-KindOfDataResponse = Gap[Type[Struct]]
+KindOfDataResponse = Gap("KindOfDataResponse", Type[Struct])
 
 
 def kind_of_data(request) -> KindOfDataResponse:
@@ -288,7 +291,7 @@ def storage_estimate_post(request) -> EmptyObject:
     request.env.core.start_estimation()
 
 
-StorageResponse = Gap[Type[Struct]]
+StorageResponse = Gap("StorageResponse", Type[Struct])
 
 
 class StorageValue(Struct, kw_only=True):

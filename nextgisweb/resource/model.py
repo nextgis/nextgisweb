@@ -413,9 +413,20 @@ class ResourceACLRule(Base):
         )
 
 
-ResourceCls = Gap[Annotated[str, TSExport("ResourceCls")]]
-ResourceInterfaceIdentity = Gap[Annotated[str, TSExport("ResourceInterface")]]
-ResourceScopeIdentity = Gap[Annotated[str, TSExport("ResourceScope")]]
+ResourceCls = Annotated[
+    Gap("ResourceCls", str),
+    TSExport("ResourceCls"),
+]
+
+ResourceInterfaceIdentity = Annotated[
+    Gap("ResourceInterfaceIdentity", str),
+    TSExport("ResourceInterface"),
+]
+
+ResourceScopeIdentity = Annotated[
+    Gap("ResourceScopeIdentity", str),
+    TSExport("ResourceScope"),
+]
 
 
 class ClsAttr(SColumn):

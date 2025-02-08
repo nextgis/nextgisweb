@@ -12,7 +12,10 @@ from nextgisweb.lib.registry import dict_registry
 
 from nextgisweb.jsrealm import TSExport
 
-ResourceCategoryIdentity = Gap[Annotated[str, TSExport("ResourceCategoryIdentity")]]
+ResourceCategoryIdentity = Annotated[
+    Gap("ResourceCategoryIdentity", str),
+    TSExport("ResourceCategoryIdentity"),
+]
 
 
 @dict_registry

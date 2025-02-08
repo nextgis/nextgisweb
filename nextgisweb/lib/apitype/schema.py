@@ -1,10 +1,11 @@
-from typing import TYPE_CHECKING, Any, TypeVar, Union, get_args
+from typing import TYPE_CHECKING, Any, NewType, TypeVar, Union, get_args
+from warnings import warn
 
 from msgspec import NODEFAULT
 from typing_extensions import Annotated, _AnnotatedAlias
 
 from .http import ContentType
-from .util import disannotate
+from .util import annotate, disannotate, unannotate
 
 T = TypeVar("T")
 
@@ -18,42 +19,64 @@ class _AnyOfRuntime:
         return result
 
 
-class _GapRuntime:
-    def __class_getitem__(cls, arg):
-        _, extras = disannotate(arg)
-        result = Annotated[(Any, _GapRuntime())]  # type: ignore
-
-        # NODEFAULT will break everything if it's not filled by actual type
-        result.__dict__["__origin__"] = NODEFAULT
-        result.__dict__["__args__"] = (NODEFAULT,)
-
-        # Remember existing annotations for fillgap()
-        result.__dict__["__gap_metadata__"] = extras
-
-        return result
+if TYPE_CHECKING:
+    AnyOf = Union
+else:
+    AnyOf = _AnyOfRuntime
 
 
 if TYPE_CHECKING:
-    AnyOf = Union
-    Gap = Annotated[T, None]
+    Gap = NewType
+
+elif type(NewType) is type:
+
+    class Gap(NewType):
+        def __init__(self, name: str, type: Any) -> None:
+            self._fallback, self._extras = disannotate(type)
+            super().__init__(name, NODEFAULT)
+
+        def __fillgap__(self, type: Any):
+            # TODO: Check for the current value
+            self.__supertype__ = annotate(type, self._extras)
+
+        def __call__(self, *args, **kwargs):
+            return self.__supertype__(*args, **kwargs)
+
+        def __getattribute__(self, name: str) -> Any:
+            if name == "__supertype__":
+                if (value := self.__dict__["__supertype__"]) is NODEFAULT:
+                    warn(
+                        f"Accessing {self.name} while it hasn't been populated "
+                        "with an actual type. Returning '{self._fallback}'.",
+                        RuntimeWarning,
+                    )
+                    return self._fallback
+                return value
+            else:
+                return super().__getattribute__(name)
+
 else:
-    AnyOf = _AnyOfRuntime
-    Gap = _GapRuntime
+
+    def Gap(name: str, type: Any):
+        def new_type(*args, **kwargs):
+            return new_type.__supertype__(*args, **kwargs)
+
+        def __fillgap__(type: Any):
+            new_type.__supertype__ = annotate(type, new_type._extras)
+
+        new_type.__name__ = name
+        new_type.__supertype__ = NODEFAULT
+
+        new_type.__fillgap__ = __fillgap__
+        new_type._falback, new_type._extras = disannotate(type)
+
+        return new_type
 
 
 def fillgap(placeholder: Any, type: Any):
-    gap_metadata = placeholder.__dict__.pop("__gap_metadata__")
-    assert isinstance(gap_metadata, tuple)
-
-    origin, extras = disannotate(type)
-    placeholder.__dict__["__origin__"] = origin
-    placeholder.__dict__["__args__"] = (origin,)
-
-    placeholder.__dict__["__metadata__"] = (
-        *placeholder.__dict__["__metadata__"],
-        *gap_metadata,
-        *extras,
-    )
+    placeholder = unannotate(placeholder)
+    assert hasattr(placeholder, "__fillgap__")
+    placeholder.__fillgap__(type)
 
 
 def _anyof_explode(tdef):
