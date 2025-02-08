@@ -193,7 +193,7 @@ def sysinfo(request):
     tr = request.translate
 
     def _package(pobj):
-        pdescription = pobj.metadata["Summary"]
+        pdescription = pobj.metadata.get("Summary")
         if not pdescription or pdescription == "UNKNOWN":
             pdescription = pobj.name
         pcommit = pobj.commit
