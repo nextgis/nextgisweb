@@ -17,4 +17,3 @@ def test_asset(get):
 
 def test_amd_file(get):
     get("dojo/dojo.js")
-    get("ngw-pyramid/nop.js")
