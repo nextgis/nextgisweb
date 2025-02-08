@@ -65,8 +65,7 @@ class TSGenerator:
         return module
 
     def add(self, tdef: Any, *, export: Union[Export, None] = None) -> TSType:
-        otype, annotations = disannotate(tdef)
-
+        otype, annotations = disannotate(tdef, supertype=True)
         if (result := self.types.get(otype)) is None:
             result = self.translate(otype)
             if (
@@ -90,6 +89,8 @@ class TSGenerator:
 
     def translate(self, otype: Any) -> TSType:
         defaults: Any = dict(generator=self, type=otype)
+        if supertype := getattr(otype, "__supertype__", None):
+            otype = supertype
 
         if otype is UnsetType:
             result = TSPrimitive(keyword="never", **defaults)

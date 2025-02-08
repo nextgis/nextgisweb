@@ -33,19 +33,28 @@ def annotate(tdef: T, annotations: Iterable[Any]) -> T:
     return Annotated[(tdef,) + annotations]  # type: ignore
 
 
-def unannotate(tdef: T) -> T:
+def unannotate(tdef: T, *, supertype: bool = False) -> T:
     """Extract original type from annotated"""
 
-    if type(tdef) is _AnnotatedAlias and get_origin(tdef) is not None:
-        return get_args(tdef)[0]
-    return tdef
+    return disannotate(tdef, supertype=supertype)[0]
 
 
-def disannotate(tdef: T) -> Tuple[T, Tuple[Any, ...]]:
+def disannotate(tdef: T, *, supertype: bool = False) -> Tuple[T, Tuple[Any, ...]]:
     """Disassamble annotated type to original type and annotations"""
 
+    if supertype and (sdef := getattr(tdef, "__supertype__", None)):
+        tdef = sdef
+
     if type(tdef) is _AnnotatedAlias:
-        return get_args(tdef)[0], getattr(tdef, "__metadata__")
+        result_type = get_args(tdef)[0]
+        result_extras = getattr(tdef, "__metadata__")
+
+        if supertype:
+            result_type, supertype_extras = disannotate(result_type, supertype=True)
+            result_extras = supertype_extras + result_extras
+
+        return result_type, result_extras
+
     return tdef, ()
 
 

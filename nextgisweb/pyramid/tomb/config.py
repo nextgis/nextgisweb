@@ -345,7 +345,7 @@ class Configurator(PyramidConfigurator):
             elif return_type is JSONType:
                 return_renderer = "json"
             else:
-                return_concrete, return_extras = disannotate(return_type)
+                return_concrete, return_extras = disannotate(return_type, supertype=True)
                 if (
                     return_concrete is EmptyObject
                     or is_struct(return_concrete)

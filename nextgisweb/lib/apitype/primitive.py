@@ -22,7 +22,7 @@ unquote_strict = partial(unquote_plus, errors="strict")
 
 
 def string_decoder(type: Any) -> StringDecoder:
-    otype = unannotate(type)
+    otype = unannotate(type, supertype=True)
 
     if otype == str:
         return _urlsafe(lambda val, type=type: convert(val, type), False)
