@@ -52,7 +52,7 @@ module.exports = (name, config, options) => {
         }
 
         if (config.name === undefined) config.name = name;
-        if (config.bail === undefined) config.bail = !env.WEBPACK_WATCH;
+        if (config.bail === undefined) config.bail = !debug;
 
         if (config.output === undefined) config.output = {};
         if (config.output.path === undefined) {
