@@ -73,7 +73,7 @@ def deep_dict(qs: QueryString, *, name: str, loadk: StringDecoder, loadv: String
         return {
             loadk(unquote_strict(pn[name_len + 1 : -1])): loadv(unquote_strict(pvs[-1]))
             for pn, pvs in qs.grouped.items()
-            if len(pn) > name_len and pn[name_len] == "[" and pn[-1] == "]"
+            if pn.startswith(name) and len(pn) > name_len and pn[name_len] == "[" and pn[-1] == "]"
         }
     except ValidationError as exc:
         raise QueryParamInvalidValue(name) from exc
