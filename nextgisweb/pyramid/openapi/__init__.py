@@ -48,6 +48,7 @@ def _pfact(pin, **defaults):
         obj.update(defaults)
         obj.update(kwargs)
         _del_if_none(obj, "description")
+        _del_if_false(obj, "deprecated")
         res.append(obj)
 
     return res, _append
@@ -175,10 +176,12 @@ def openapi(introspector, prefix="/api/", *, comp: PyramidComponent):
 
             # Operation parameters
             for param in chain(*(p.spreaded for p in view.query_params.values())):
+                ti = type_info(param.type)
+                ejs = ti.extra_json_schema if isinstance(ti, Metadata) else dict()
+                assert isinstance(ejs, dict)
+
                 if (pdesc := dstr.params.get(param.name)) is None:
-                    ti = type_info(param.type)
-                    if isinstance(ti, Metadata) and (ejs := ti.extra_json_schema):
-                        pdesc = ejs.get("description")
+                    pdesc = ejs.get("description")
 
                 o_param(
                     param.name,
@@ -186,6 +189,7 @@ def openapi(introspector, prefix="/api/", *, comp: PyramidComponent):
                     required=param.default is NODEFAULT,
                     schema=schema_ref(param.type, param.default),
                     description=pdesc,
+                    deprecated=ejs.get("deprecated", False),
                 )
 
             # Merge path and operation parameters
