@@ -4,6 +4,7 @@ import type { Display } from "../display";
 import { PanelStore } from "../panel/PanelStore";
 
 import { registry } from "./registry";
+import type { PanelPlugin } from "./registry";
 
 type Source = "init" | "menu" | "manager";
 
@@ -82,19 +83,33 @@ export class PanelManager {
         });
         plugins.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
         for (const plugin of plugins) {
+            await this.registerPlugin(plugin);
+        }
+        this._handlePanelActivation();
+    }
+
+    async registerPlugin(
+        pluginDef: PanelPlugin<PanelStore> | string
+    ): Promise<PanelStore | undefined> {
+        let plugin: PanelPlugin<PanelStore> | undefined = undefined;
+        if (typeof pluginDef === "string") {
+            plugin = registry.queryOne(({ name }) => name === pluginDef);
+        } else {
+            plugin = pluginDef;
+        }
+        if (plugin) {
             const Cls = plugin.store
                 ? (await plugin.store()).default
                 : PanelStore;
             const panel = new Cls({ plugin, display: this._display });
+            const panels = new Map(this.panels);
+            panels.set(plugin.name, panel);
             runInAction(() => {
-                const panels = new Map(this.panels);
-                panels.set(plugin.name, panel);
                 this.panels = panels;
             });
             this._handleInitActive();
+            return panel;
         }
-
-        this._handlePanelActivation();
     }
 
     @action
