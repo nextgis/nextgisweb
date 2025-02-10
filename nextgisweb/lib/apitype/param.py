@@ -95,6 +95,7 @@ class QueryParam:
     name: str
     type: Any
     default: Any
+    required: bool
 
     otype: Any
     extras: Tuple[Any, ...]
@@ -146,6 +147,7 @@ class QueryParam:
         self.otype = otype
         self.extras = extras + oextras
         self.default = default
+        self.required = default is NODEFAULT
 
         origin = get_origin(otype)
         args = get_args(otype)
@@ -171,6 +173,7 @@ class QueryParam:
             # TODO: Support for lists
             self.style = Style.DEEP_OBJECT
             self.shape = Shape.OBJECT
+            self.required = False
             typek, typev = args
             loadk = string_decoder(typek)
             seq = get_origin(unannotate(typev)) in (list, tuple)

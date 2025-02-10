@@ -186,7 +186,7 @@ def openapi(introspector, prefix="/api/", *, comp: PyramidComponent):
                 o_param(
                     param.name,
                     style=param.style.value,
-                    required=param.default is NODEFAULT,
+                    required=param.required,
                     schema=schema_ref(param.type, param.default),
                     description=pdesc,
                     deprecated=ejs.get("deprecated", False),
