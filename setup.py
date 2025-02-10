@@ -31,7 +31,7 @@ requires = [
     'importlib-metadata==4.6; python_version<"3.10"',
     "lxml==4.9.3",
     "msgspec==0.17.0",
-    "numpy",
+    "numpy<2",
     "networkx",
     "orjson==3.9.9",
     "OWSLib==0.29.2",
