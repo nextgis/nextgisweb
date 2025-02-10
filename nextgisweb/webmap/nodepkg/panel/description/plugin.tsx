@@ -1,7 +1,6 @@
 /** @plugin */
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { panelRegistry } from "@nextgisweb/webmap/panel/registry";
-import type { DisplayConfig } from "@nextgisweb/webmap/type/api";
 
 import InfoIcon from "@nextgisweb/icon/material/info";
 
@@ -14,7 +13,7 @@ panelRegistry(COMP_ID, {
     applyToTinyMap: true,
 
     store: () => import("./DescriptionStore"),
-    isEnabled: ({ config }: { config: DisplayConfig }) => {
+    isEnabled: ({ config }) => {
         return !!config.webmapDescription;
     },
 });

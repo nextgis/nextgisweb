@@ -95,7 +95,7 @@ export interface TinyConfig {
 export type MapPlugin = new (val: PluginParams) => PluginBase;
 
 export interface PluginMenuItem {
-    icon: string;
+    icon: React.ReactNode;
     title: string;
     onClick: () => void;
 }

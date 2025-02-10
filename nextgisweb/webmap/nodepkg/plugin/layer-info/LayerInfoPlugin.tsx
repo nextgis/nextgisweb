@@ -6,6 +6,8 @@ import type { LayerItemConfig } from "@nextgisweb/webmap/type/api";
 import { PluginBase } from "../PluginBase";
 import type { DescriptionWebMapPluginConfig } from "../type";
 
+import DescriptioIcon from "@nextgisweb/icon/material/article";
+
 export class LayerInfoPlugin extends PluginBase {
     getPluginState(nodeData: LayerItemConfig): PluginState {
         const state = super.getPluginState(nodeData);
@@ -26,7 +28,7 @@ export class LayerInfoPlugin extends PluginBase {
 
     getMenuItem() {
         return {
-            icon: "material-article",
+            icon: <DescriptioIcon />,
             title: gettext("Description"),
             onClick: () => {
                 return this.run();
@@ -34,14 +36,17 @@ export class LayerInfoPlugin extends PluginBase {
         };
     }
 
-    openLayerInfo() {
+    private async openLayerInfo() {
         const pm = this.display.panelManager;
         const pkey = "info";
         const data = this.display.itemConfig?.plugin[
             this.identity
         ] as DescriptionWebMapPluginConfig;
         if (data !== undefined) {
-            const panel = pm.getPanel<DescriptionStore>(pkey);
+            let panel = pm.getPanel<DescriptionStore>(pkey);
+            if (!panel) {
+                panel = (await pm.registerPlugin(pkey)) as DescriptionStore;
+            }
             if (panel) {
                 panel.setContent(data.description);
             }
