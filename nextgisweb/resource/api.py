@@ -1,16 +1,21 @@
-from typing import TYPE_CHECKING, Any, Dict, List, Literal, Mapping, Union, cast
+from typing import TYPE_CHECKING, Any, ClassVar, Dict, List, Literal, Mapping, Union, cast
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
 import zope.event
-from msgspec import UNSET, Meta, Struct, UnsetType, defstruct
+from msgspec import UNSET, DecodeError, Meta, Struct, UnsetType, defstruct, field, to_builtins
+from msgspec import ValidationError as MsgspecValidationError
+from msgspec.json import Decoder
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql import exists
-from sqlalchemy.sql.operators import ilike_op
+from sqlalchemy.sql import or_ as sa_or
+from sqlalchemy.sql.operators import eq as eq_op
+from sqlalchemy.sql.operators import ilike_op, in_op, like_op
 from typing_extensions import Annotated
 
 from nextgisweb.env import DBSession, gettext
-from nextgisweb.lib.apitype import AnyOf, EmptyObject, StatusCode, annotate
+from nextgisweb.lib.apitype import AnyOf, EmptyObject, Query, StatusCode, annotate
+from nextgisweb.lib.msext import DEPRECATED
 
 from nextgisweb.auth import User
 from nextgisweb.auth.api import UserID
@@ -477,58 +482,317 @@ def permission_explain(request) -> JSONType:
     return _explain_jsonify(resolver)
 
 
+class SearchRootParams(Struct, kw_only=True):
+    root: Annotated[
+        Union[ResourceID, UnsetType],
+        Meta(description="Starting resource ID for recursive search"),
+    ] = UNSET
+
+    parent_id__recursive: Annotated[
+        Union[ResourceID, UnsetType],
+        Meta(description="Use `root` instead"),
+        DEPRECATED,
+    ] = UNSET
+
+    def query(self):
+        if (root := self.root) is UNSET:
+            root = self.parent_id__recursive
+
+        result = sa.select(Resource)
+        if root is not UNSET:
+            child = (
+                sa.select(Resource.id, sa.literal_column("0").label("depth"))
+                .where(Resource.id == root)
+                .cte("child", recursive=True)
+            )
+
+            child = child.union_all(
+                sa.select(Resource.id, sa.literal_column("depth + 1")).where(
+                    Resource.parent_id == child.c.id
+                )
+            )
+
+            result = result.join(child, Resource.id == child.c.id)
+
+        return result
+
+
+class SearchAttrParams(Struct, kw_only=True):
+    id: Annotated[
+        Union[ResourceID, UnsetType],
+        Meta(description="Filter by exact ID"),
+    ] = UNSET
+
+    id__eq: Annotated[
+        Union[ResourceID, UnsetType],
+        Meta(description="Use `id` instead"),
+        DEPRECATED,
+    ] = UNSET
+
+    id__in: Annotated[
+        Union[List[ResourceID], UnsetType],
+        Meta(description="Filter by list of IDs"),
+    ] = UNSET
+
+    cls: Annotated[
+        Union[str, UnsetType],
+        Meta(description="Filter by exact type"),
+    ] = UNSET
+
+    cls__eq: Annotated[
+        Union[str, UnsetType],
+        Meta(description="Use `cls` instead"),
+        DEPRECATED,
+    ] = UNSET
+
+    cls__like: Annotated[
+        Union[str, UnsetType],
+        Meta(description="Filter by type pattern with case sensitivity"),
+        DEPRECATED,
+    ] = UNSET
+
+    cls__ilike: Annotated[
+        Union[str, UnsetType],
+        Meta(description="Filter by type pattern without case sensitivity"),
+        DEPRECATED,
+    ] = UNSET
+
+    cls__in: Annotated[
+        Union[List[str], UnsetType],
+        Meta(description="Filter by list of types"),
+    ] = UNSET
+
+    parent: Annotated[
+        Union["ResourceID", UnsetType],
+        Meta(description="Filter by exact parent ID"),
+    ] = UNSET
+
+    parent__in: Annotated[
+        Union[List["ResourceID"], UnsetType],
+        Meta(description="Filter by list of parent IDs"),
+    ] = UNSET
+
+    parent_id: Annotated[
+        Union["ResourceID", UnsetType],
+        Meta(description="Use `parent` instead"),
+        DEPRECATED,
+    ] = UNSET
+
+    parent_id__eq: Annotated[
+        Union["ResourceID", UnsetType],
+        Meta(description="Use `parent` instead"),
+        DEPRECATED,
+    ] = UNSET
+
+    parent_id__in: Annotated[
+        Union[List["ResourceID"], UnsetType],
+        Meta(description="Use `parent__in` instead"),
+        DEPRECATED,
+    ] = UNSET
+
+    keyname: Annotated[
+        Union[str, UnsetType],
+        Meta(description="Filter by exact keyname"),
+    ] = UNSET
+
+    keyname__eq: Annotated[
+        Union[str, UnsetType],
+        Meta(description="Use `keyname` instead"),
+        DEPRECATED,
+    ] = UNSET
+
+    keyname__in: Annotated[
+        Union[List[str], UnsetType],
+        Meta(description="Filter by list of keynames"),
+    ] = UNSET
+
+    display_name: Annotated[
+        Union[str, UnsetType],
+        Meta(description="Filter by exact display name"),
+    ] = UNSET
+
+    display_name__eq: Annotated[
+        Union[str, UnsetType],
+        Meta(description="Use `display_name` instead"),
+        DEPRECATED,
+    ] = UNSET
+
+    display_name__like: Annotated[
+        Union[str, UnsetType],
+        Meta(description="Filter by display name pattern with case sensitivity"),
+    ] = UNSET
+
+    display_name__ilike: Annotated[
+        Union[str, UnsetType],
+        Meta(description="Filter by display name pattern without case sensitivity"),
+    ] = UNSET
+
+    display_name__in: Annotated[
+        Union[List[str], UnsetType],
+        Meta(description="Filter by list of display names"),
+    ] = UNSET
+
+    owner_user: Annotated[
+        Union[UserID, UnsetType],
+        Meta(description="Filter by owner user ID"),
+    ] = UNSET
+
+    owner_user__in: Annotated[
+        Union[List[UserID], UnsetType],
+        Meta(description="Filter by list of owner user IDs"),
+    ] = UNSET
+
+    owner_user_id: Annotated[
+        Union[UserID, UnsetType],
+        Meta(description="Use `owner_user` instead"),
+        DEPRECATED,
+    ] = UNSET
+
+    owner_user_id__eq: Annotated[
+        Union[UserID, UnsetType],
+        Meta(description="Use `owner_user` instead"),
+        DEPRECATED,
+    ] = UNSET
+
+    owner_user_id__in: Annotated[
+        Union[List[UserID], UnsetType],
+        Meta(description="Use `owner_user__in` instead"),
+        DEPRECATED,
+    ] = UNSET
+
+    ats: ClassVar[Dict[str, Any]] = {
+        "id": Resource.id,
+        "cls": Resource.cls,
+        "parent": Resource.parent_id,
+        "keyname": Resource.keyname,
+        "display_name": Resource.display_name,
+        "owner_user": Resource.owner_user_id,
+        # DEPRECATED
+        "parent_id": Resource.parent_id,
+        "owner_user_id": Resource.owner_user_id,
+    }
+
+    ops: ClassVar[Dict[str, Any]] = {
+        "": eq_op,
+        "eq": eq_op,
+        "like": like_op,
+        "ilike": ilike_op,
+        "in": lambda a, b: in_op(a, tuple(b)),
+    }
+
+    def filters(self):
+        ats = self.ats
+        ops = self.ops
+        for k, v in to_builtins(self).items():
+            s = k.split("__", maxsplit=1)
+            if len(s) == 1:
+                s = (*s, "")
+            yield ops[s[1]](ats[s[0]], v)
+
+
+class SearchResmetaParams(Struct, kw_only=True):
+    has: Annotated[
+        Dict[str, bool],
+        Meta(
+            description="Filter by the presence of metadata keys\n\n"
+            "If `true`, only resources that include the specified metadata key "
+            "will be returned. If `false`, only resources that do not contain "
+            "the key will be returned.",
+            examples=[dict()],  # Just to stop Swagger UI make crazy defaults
+        ),
+    ] = field(name="resmeta__has")
+
+    json: Annotated[
+        Dict[str, str],
+        Meta(
+            description="Filter by metadata values\n\n"
+            'Values should be JSON-encoded, e.g., `"foo"` for a string '
+            "match, `42` for a number match, and `true` for a boolean match.",
+            examples=[dict()],  # Just to stop Swagger UI make crazy defaults
+        ),
+    ] = field(name="resmeta__json")
+
+    like: Annotated[
+        Dict[str, str],
+        Meta(
+            description="Filter by metadata value pattern with case sensitivity",
+            examples=[dict()],  # Just to stop Swagger UI make crazy defaults
+        ),
+    ] = field(name="resmeta__like")
+
+    ilike: Annotated[
+        Dict[str, str],
+        Meta(
+            description="Filter by metadata value pattern without case sensitivity",
+            examples=[dict()],  # Just to stop Swagger UI make crazy defaults
+        ),
+    ] = field(name="resmeta__ilike")
+
+    vdecoder: ClassVar = Decoder(Union[str, int, float, bool])
+
+    def filters(self, id):
+        from nextgisweb.resmeta.model import ResourceMetadataItem as RMI
+
+        def _cond(k, *where):
+            return exists().where(id == RMI.resource_id, RMI.key == k, *where)
+
+        for k, v in self.has.items():
+            cond = _cond(k)
+            yield cond if v else ~cond
+
+        for k, v in self.json.items():
+            try:
+                d = self.vdecoder.decode(v)
+            except (DecodeError, MsgspecValidationError) as exc:
+                raise ValidationError(message=exc.args[0])
+            if isinstance(d, (int, float)):
+                vfilter = sa_or(RMI.vinteger == d, RMI.vfloat == d)
+            elif isinstance(d, bool):
+                vfilter = RMI.vboolean == d
+            elif isinstance(d, str):
+                vfilter = RMI.vtext == d
+            else:
+                raise NotImplementedError
+            yield _cond(k, vfilter)
+
+        for o, c in (
+            ("like", like_op),
+            ("ilike", ilike_op),
+        ):
+            d = getattr(self, o)
+            for k, v in d.items():
+                yield _cond(k, c(RMI.vtext, v))
+
+
 def search(
     request,
     *,
-    serialization: Literal["resource", "full"] = "resource",
+    serialization: Annotated[
+        Literal["resource", "full"],
+        Meta(
+            description="Resource serialization mode\n\n"
+            "If set to `full`, all resource keys are returned, but this is "
+            "significantly slower. Otherwise, only the `resource` key is serialized."
+        ),
+    ] = "resource",
+    root: Annotated[SearchRootParams, Query(spread=True)],
+    attrs: Annotated[SearchAttrParams, Query(spread=True)],
+    resmeta: Annotated[SearchResmetaParams, Query(spread=True)],
 ) -> AsJSON[List[CompositeRead]]:
     """Search resources"""
-    principal_id = request.GET.pop("owner_user__id", None)
 
-    query = DBSession.query(Resource)
-    if "parent_id__recursive" in request.GET:
-        parent_id_recursive = int(request.GET.pop("parent_id__recursive"))
-        if parent_id_recursive != 0:
-            rquery = (
-                DBSession.query(Resource.id)
-                .filter(Resource.id == int(parent_id_recursive))
-                .cte(recursive=True)
-            )
-            rquery = rquery.union_all(
-                DBSession.query(Resource.id).filter(Resource.parent_id == rquery.c.id)
-            )
-            query = query.filter(exists().where(Resource.id == rquery.c.id))
-
-    filter_ = []
-    for k, v in request.GET.items():
-        split = k.rsplit("__", 1)
-        if len(split) == 2:
-            k, op = split
-        else:
-            op = "eq"
-
-        if not hasattr(Resource, k):
-            continue
-        attr = getattr(Resource, k)
-        if op == "eq":
-            filter_.append(attr == v)
-        elif op == "ilike":
-            filter_.append(ilike_op(attr, v))
-        else:
-            raise ValidationError("Operator '%s' is not supported" % op)
-    if len(filter_) > 0:
-        query = query.filter(sa.and_(*filter_))
-
+    query = root.query()
+    query = query.where(*attrs.filters(), *resmeta.filters(Resource.id))
     query = query.order_by(Resource.display_name)
-
-    if principal_id is not None:
-        owner = User.filter_by(principal_id=int(principal_id)).one()
-        query = query.filter_by(owner_user=owner)
 
     cs_keys = None if serialization == "full" else ("resource",)
     serializer = CompositeSerializer(keys=cs_keys, user=request.user)
     check_perm = lambda res, u=request.user: res.has_permission(ResourceScope.read, u)
-    return [serializer.serialize(res, CompositeRead) for res in query if check_perm(res)]
+    return [
+        serializer.serialize(res, CompositeRead)
+        for (res,) in DBSession.execute(query)
+        if check_perm(res)
+    ]
 
 
 class ResourceVolume(Struct, kw_only=True):
