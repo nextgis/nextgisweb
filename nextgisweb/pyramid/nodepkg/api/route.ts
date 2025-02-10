@@ -1,5 +1,3 @@
-import { set } from "lodash-es";
-
 import routeData from "@nextgisweb/pyramid/api/load!/api/component/pyramid/route";
 
 import { generateUrl, request } from "./request";
@@ -96,24 +94,4 @@ export function route<N extends RouteName>(
         (result[method] as unknown) = methodResp;
     }
     return result;
-}
-
-export const compatRoute = {};
-
-// Because both keys "feature_layer.store"
-// exist functions should be created in alphabetical order.
-for (const key of Object.keys(routeData).sort()) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const fn = (...args: any[]) => {
-        if (ngwConfig.debug) {
-            const msg =
-                `Module "ngw-pyramid/route" has been deprecated! Use ` +
-                `routeURL() or route() from "@nextgisweb/pyramid/api" instead.`;
-            console.warn(new Error(msg));
-        }
-        // We don't care about types in legacy code
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return routeURL(key as any, ...args);
-    };
-    set(compatRoute, key, fn);
 }

@@ -11,7 +11,7 @@ define([
     "dijit/layout/BorderContainer",
     "dijit/layout/ContentPane",
     "dijit/layout/TabContainer",
-    "ngw-pyramid/ErrorDialog",
+    "@nextgisweb/gui/error",
     "@nextgisweb/pyramid/api",
     "@nextgisweb/pyramid/i18n!",
     "xstyle/css!./resource/CompositeWidget.css",
@@ -28,7 +28,7 @@ define([
     BorderContainer,
     ContentPane,
     TabContainer,
-    ErrorDialog,
+    { errorModal },
     api,
     i18n
 ) {
@@ -322,7 +322,7 @@ define([
                 this.tabContainer.resize();
 
                 if (err !== undefined) {
-                    new ErrorDialog(err).show();
+                    errorModal(err);
                 }
             },
 
