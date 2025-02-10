@@ -1,3 +1,4 @@
+import { reaction } from "mobx";
 import type Feature from "ol/Feature";
 import { WKT } from "ol/format";
 
@@ -15,11 +16,14 @@ import { AnnotationsLayer } from "../../layer/annotations/AnnotationsLayer";
 import type { AccessFilter } from "../../layer/annotations/AnnotationsLayer";
 import { AnnotationsDialog } from "../annotation-dialog";
 import type { DialogResult } from "../annotation-dialog/AnnotationDialog";
-import { reaction } from "mobx";
 
 interface ManagerOptions {
     display: Display;
     initialAnnotVisible?: AnnotationVisibleMode;
+}
+
+function annotationVisible(annot: AnnotationVisibleMode) {
+    return annot === "yes" || annot === "messages";
 }
 
 export class AnnotationsManager {
@@ -117,7 +121,9 @@ export class AnnotationsManager {
     }
 
     private _buildAnnotationsLayers(): void {
-        this._annotationsLayer = new AnnotationsLayer();
+        this._annotationsLayer = new AnnotationsLayer({
+            visible: annotationVisible(this._annotationsVisibleState),
+        });
         this._annotationsLayer.addToMap(this._display.map);
         this._editableLayer = new AnnotationsEditableLayer(this._display.map);
     }
@@ -172,8 +178,7 @@ export class AnnotationsManager {
     ): void {
         this._annotationsVisibleState = annotVisibleState;
 
-        const annotVisible =
-            annotVisibleState === "yes" || annotVisibleState === "messages";
+        const annotVisible = annotationVisible(annotVisibleState);
         this._annotationsLayer.getLayer().setVisibility(annotVisible);
 
         if (this._isMessagesVisible()) {

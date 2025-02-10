@@ -26,13 +26,19 @@ export class AnnotationsLayer {
         private: false,
     };
 
-    constructor(editable?: boolean) {
+    constructor({
+        editable,
+        visible,
+    }: {
+        editable?: boolean;
+        visible?: boolean;
+    } = {}) {
         this._editable = editable ?? false;
         this._source = new VectorSource();
         this._layer = new VectorLayerClass("", {
             title: "annotations",
+            visible,
         });
-        this._layer.visibility = false;
         this._layer.getLayer().setSource(this._source);
     }
 
