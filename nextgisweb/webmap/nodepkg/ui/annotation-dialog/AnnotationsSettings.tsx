@@ -1,4 +1,5 @@
 import { Col, ColorPicker, Form, InputNumber, Row } from "@nextgisweb/gui/antd";
+import { presetColors } from "@nextgisweb/gui/util/constant/presetColors";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 export interface AnnotationSettings {
@@ -51,6 +52,12 @@ export function AnnotationsSettings({
                     </Col>
                     <Col>
                         <ColorPicker
+                            presets={[
+                                {
+                                    label: gettext("Colors"),
+                                    colors: presetColors,
+                                },
+                            ]}
                             value={value.colorStroke}
                             onChange={(e) => {
                                 handleColorChange(
@@ -65,6 +72,12 @@ export function AnnotationsSettings({
 
             <Form.Item label={gettext("Fill color")}>
                 <ColorPicker
+                    presets={[
+                        {
+                            label: gettext("Colors"),
+                            colors: presetColors,
+                        },
+                    ]}
                     value={value.fillStroke}
                     onChange={(e) => {
                         handleColorChange(e.toHexString(), "fillStroke");
