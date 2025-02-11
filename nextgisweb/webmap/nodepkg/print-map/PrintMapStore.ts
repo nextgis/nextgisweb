@@ -48,41 +48,26 @@ class PrintMapStore {
     }
 
     @action
-    updatePrintMapPaper(paper: PrintMapPaper): boolean {
-        if (!this.printMapPaper) {
-            this.printMapPaper = paper;
-            return true;
-        }
-
-        const shouldUpdate =
-            paper.height !== this.printMapPaper.height ||
-            paper.width !== this.printMapPaper.width ||
-            paper.margin !== this.printMapPaper.margin;
-
-        if (shouldUpdate) {
-            this.printMapPaper = paper;
-        }
-
-        return shouldUpdate;
-    }
-
-    @action
     makeLayout(settings: PrintMapSettings) {
-        const { width, height, margin, legend, legendColumns, title } =
-            settings;
+        const {
+            width,
+            height,
+            margin = 0,
+            legend,
+            legendColumns,
+            title,
+        } = settings;
 
-        const marginVerified = margin ?? 0;
-
-        const widthPx = Math.round(mmToPx(width - marginVerified * 2));
-        const heightPx = Math.round(mmToPx(height - marginVerified * 2));
-
+        const widthPx = Math.round(mmToPx(width - margin * 2));
+        const heightPx = Math.round(mmToPx(height - margin * 2));
         const isPortrait = widthPx < heightPx;
 
+        const titleHeight = title ? 42 : 0;
         this.titleCoords = {
             x: 0,
             y: 0,
             width: title ? widthPx : 0,
-            height: title ? 42 : 0,
+            height: titleHeight,
             displayed: !!title,
         };
 
@@ -109,9 +94,9 @@ class PrintMapStore {
             const legendWidth = Math.ceil(widthPx / 4) + DEFAULT_MARGIN;
             this.legendCoords = {
                 x: widthPx - legendWidth,
-                y: title ? this.titleCoords.height + DEFAULT_MARGIN : 0,
+                y: title ? titleHeight + DEFAULT_MARGIN : 0,
                 height: title
-                    ? heightPx - this.titleCoords.height - DEFAULT_MARGIN
+                    ? heightPx - titleHeight - DEFAULT_MARGIN
                     : heightPx,
                 width: legendWidth,
                 displayed: true,
@@ -134,29 +119,21 @@ class PrintMapStore {
 
         this.mapCoords = {
             x: 0,
-            y: title ? this.titleCoords.height + DEFAULT_MARGIN : 0,
+            y: title ? titleHeight + DEFAULT_MARGIN : 0,
             width: widthMap,
             height: heightMap,
             displayed: true,
         };
     }
-
     @action
     updateCoordinates(
         type: "legendCoords" | "titleCoords" | "mapCoords",
-        coords: RndCoords | LegendRndCoords,
-        settings: PrintMapSettings
+        coords: RndCoords | LegendRndCoords
     ) {
-        const shouldResetDefault = coords.displayed !== this[type].displayed;
-
         if (type === "legendCoords") {
             this.legendCoords = coords as LegendRndCoords;
         } else {
             this[type] = coords;
-        }
-
-        if (shouldResetDefault) {
-            this.makeLayout(settings);
         }
     }
 

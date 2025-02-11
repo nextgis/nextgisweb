@@ -92,13 +92,12 @@ export const PrintMap = observer<PrintMapProps>(
             const printMapStyle = new PrintMapStyle();
             printMapStyle.update(printPaper);
             setStyle(printMapStyle);
-            const shouldReset = printMapStore.updatePrintMapPaper(printPaper);
-            if (shouldReset) printMapStore.makeLayout(settingsRef.current);
+            printMapStore.makeLayout(settingsRef.current);
 
             return () => {
                 printMapStyle.clear();
             };
-        }, [width, height, margin]);
+        }, [width, height, margin, legend, title, legendColumns]);
 
         useEffect(() => {
             if (!mapReady) return;
@@ -178,31 +177,6 @@ export const PrintMap = observer<PrintMapProps>(
             }
         }, [scaleLine, scaleValue, mapScaleControl]);
 
-        useEffect(() => {
-            if (!legend) {
-                if (legendCoords.displayed) {
-                    printMapStore.updateCoordinates(
-                        "legendCoords",
-                        {
-                            ...legendCoords,
-                            displayed: false,
-                        },
-                        settings
-                    );
-                }
-            }
-        }, [legend, legendCoords, legendCoords.displayed, settings]);
-        useEffect(() => {
-            const shouldReset =
-                (title && !printMapStore.titleCoords.displayed) ||
-                (!title && printMapStore.titleCoords.displayed) ||
-                !legendCoords.displayed;
-
-            if (shouldReset) {
-                printMapStore.makeLayout(settingsRef.current);
-            }
-        }, [legendCoords.displayed, title]);
-
         const legendComp = useMemo(() => {
             return (
                 <LegendPrintMap
@@ -213,13 +187,12 @@ export const PrintMap = observer<PrintMapProps>(
                     onChange={(rndCoords: LegendRndCoords) => {
                         printMapStore.updateCoordinates(
                             "legendCoords",
-                            rndCoords,
-                            settings
+                            rndCoords
                         );
                     }}
                 />
             );
-        }, [legend, legendCoords, display, settings]);
+        }, [legend, legendCoords, display]);
 
         useEffect(() => {
             printMapStore.updateColumnsCount(legendColumns);
@@ -227,19 +200,14 @@ export const PrintMap = observer<PrintMapProps>(
 
         const titleComp = useMemo(() => {
             if (!title) return null;
-
             return (
                 <RndComp
                     coords={titleCoords}
                     onChange={(rndCoords) => {
-                        printMapStore.updateCoordinates(
-                            "titleCoords",
-                            {
-                                ...rndCoords,
-                                displayed: true,
-                            },
-                            settings
-                        );
+                        printMapStore.updateCoordinates("titleCoords", {
+                            ...rndCoords,
+                            displayed: true,
+                        });
                     }}
                     className="title-rnd"
                     displayed
@@ -247,7 +215,7 @@ export const PrintMap = observer<PrintMapProps>(
                     <div className="print-title">{titleText}</div>
                 </RndComp>
             );
-        }, [settings, title, titleCoords, titleText]);
+        }, [title, titleCoords, titleText]);
 
         const mapComp = useMemo(() => {
             setTimeout(() => {
@@ -255,19 +223,14 @@ export const PrintMap = observer<PrintMapProps>(
                     printMap.current.updateSize();
                 }
             });
-
             return (
                 <RndComp
                     coords={mapCoords}
                     onChange={(rndCoords) => {
-                        printMapStore.updateCoordinates(
-                            "mapCoords",
-                            {
-                                ...rndCoords,
-                                displayed: true,
-                            },
-                            settings
-                        );
+                        printMapStore.updateCoordinates("mapCoords", {
+                            ...rndCoords,
+                            displayed: true,
+                        });
                         if (printMap.current && style) {
                             printMap.current.updateSize();
                         }
@@ -279,24 +242,21 @@ export const PrintMap = observer<PrintMapProps>(
                     <div className="print-olmap" ref={printMapRef}></div>
                 </RndComp>
             );
-        }, [mapCoords, settings, style]);
+        }, [mapCoords, style]);
 
-        if (printMap) {
-            return (
-                <div className="print-map-page-wrapper">
-                    <div className="print-map-export-wrapper">
-                        <div className="print-map-page">
-                            <div id="printMap" className="print-map">
-                                {legendComp}
-                                {titleComp}
-                                {mapComp}
-                            </div>
+        return (
+            <div className="print-map-page-wrapper">
+                <div className="print-map-export-wrapper">
+                    <div className="print-map-page">
+                        <div id="printMap" className="print-map">
+                            {legendComp}
+                            {titleComp}
+                            {mapComp}
                         </div>
                     </div>
                 </div>
-            );
-        }
-        return null;
+            </div>
+        );
     }
 );
 
