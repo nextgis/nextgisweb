@@ -1,24 +1,21 @@
 .ngw-gui-focus-table {
-    display: flex;
-    flex-direction: row;
     height: 100%;
 
     > .table {
         display: flex;
-        flex: 1;
         flex-direction: column;
+        height: 100%;
 
         > .items {
             flex: 1;
             min-height: 0;
             overflow-y: auto;
+            scrollbar-gutter: stable;
+            scrollbar-width: thin;
         }
     }
 
     > .detail {
-        flex: 2;
-        border-left: 1px solid rgba(0, 0, 0, 0.06);
-
         > .action-toolbar {
             flex: 1;
             min-width: 0;
