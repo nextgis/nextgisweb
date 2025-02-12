@@ -43,7 +43,7 @@ export function GeometryInfo({
 
     if (isLoading) {
         return (
-            <div className="loading">
+            <div className="ngw-feature-layer-geometry-info-loading">
                 <Spin />
                 <div>{gettext("Load geometry info...")}</div>
             </div>
@@ -52,7 +52,7 @@ export function GeometryInfo({
 
     if (error || !geometryInfo) {
         return (
-            <div className="error">
+            <div className="ngw-feature-layer-geometry-info-error">
                 <div>
                     {gettext("Failed to get information about the geometry")}
                 </div>
