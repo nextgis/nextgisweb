@@ -8,6 +8,8 @@ from .interface import (
     GEOM_TYPE_2_WKB_TYPE,
     GEOM_TYPE_OGR,
     GEOM_TYPE_OGR_2_GEOM_TYPE,
+    FeatureLayerFieldDatatype,
+    FeaureLayerGeometryType,
     IFeatureLayer,
     IFeatureQuery,
     IFeatureQueryClipByBox,

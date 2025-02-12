@@ -2,8 +2,6 @@ import { Spin } from "@nextgisweb/gui/antd";
 import { useRouteGet } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import type { GeometryInfo } from "../type/GeometryInfo";
-
 import { GeometryInfoPreview } from "./component/GeometryInfoPreview";
 import { GeometryInfoTable } from "./component/GeometryInfoTable";
 
@@ -28,7 +26,7 @@ export function GeometryInfo({
         data: geometryInfo,
         isLoading,
         error,
-    } = useRouteGet<GeometryInfo>({
+    } = useRouteGet({
         name: "feature_layer.feature.geometry_info",
         params: {
             id: resourceId,

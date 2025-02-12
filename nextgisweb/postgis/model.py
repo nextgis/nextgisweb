@@ -30,6 +30,7 @@ from nextgisweb.feature_layer import (
     Feature,
     FeatureQueryIntersectsMixin,
     FeatureSet,
+    FeaureLayerGeometryType,
     IFeatureLayer,
     IFeatureQuery,
     IFeatureQueryFilter,
@@ -552,7 +553,11 @@ DataScope.read.require(ConnectionScope.connect, attr="connection", cls=PostgisLa
 
 
 class GeometryTypeAttr(SAttribute):
-    ctypes = CRUTypes(Union[str, None], str, Union[str, None])
+    ctypes = CRUTypes(
+        Union[FeaureLayerGeometryType, None],
+        FeaureLayerGeometryType,
+        Union[FeaureLayerGeometryType, None],
+    )
 
 
 class GeometrySridAttr(SAttribute):

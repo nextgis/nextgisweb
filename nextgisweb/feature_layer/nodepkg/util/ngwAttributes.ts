@@ -1,19 +1,20 @@
 import dayjs from "dayjs";
 
+import type { FeatureLayerFieldDatatype } from "@nextgisweb/feature-layer/type/api";
+
 import type {
     NgwAttributeType,
     NgwDate,
     NgwDateTime,
     NgwTime,
 } from "../type/FeatureItem";
-import type { FeatureLayerDataType } from "../type/FeatureLayer";
 
-export function isDateType(datatype: FeatureLayerDataType) {
+export function isDateType(datatype: FeatureLayerFieldDatatype) {
     return ["DATE", "TIME", "DATETIME"].includes(datatype);
 }
 
 export function parseNgwAttribute(
-    datatype: FeatureLayerDataType,
+    datatype: FeatureLayerFieldDatatype,
     value: NgwAttributeType
 ) {
     if (value !== null && isDateType(datatype)) {
@@ -43,7 +44,7 @@ export function parseNgwAttribute(
 }
 
 export function formatNgwAttribute(
-    datatype: FeatureLayerDataType,
+    datatype: FeatureLayerFieldDatatype,
     value: unknown,
     opt: { isoDate?: boolean } = {}
 ): NgwAttributeType {

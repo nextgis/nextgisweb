@@ -7,8 +7,6 @@ import { LoadingWrapper } from "@nextgisweb/gui/component";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import type { FeatureLayerCount } from "../type/FeatureLayer";
-
 import { FeatureGridActions } from "./FeatureGridActions";
 import { FeatureGridStore } from "./FeatureGridStore";
 import FeatureTable from "./FeatureTable";
@@ -50,10 +48,10 @@ export const FeatureGrid = observer(
             onSelect,
         } = store;
 
-        const { data: totalData, refresh: refreshTotal } =
-            useRouteGet<FeatureLayerCount>("feature_layer.feature.count", {
-                id,
-            });
+        const { data: totalData, refresh: refreshTotal } = useRouteGet(
+            "feature_layer.feature.count",
+            { id }
+        );
         const { data: resourceData, isLoading } = useRouteGet("resource.item", {
             id,
         });

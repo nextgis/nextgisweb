@@ -15,7 +15,11 @@ from nextgisweb.lib.apitype import AnyOf, AsJSON, StatusCode
 from nextgisweb.auth.api import UserReadBrief, serialize_principal
 from nextgisweb.resource import DataScope, resource_factory
 
-from ..interface import IVersionableFeatureLayer
+from ..interface import (
+    FeatureLayerFieldDatatype,
+    FeaureLayerGeometryType,
+    IVersionableFeatureLayer,
+)
 from ..versioning import FVersioningExtensionMixin
 from .exception import (
     FVersioningEpochMismatch,
@@ -32,7 +36,7 @@ VersionID = Annotated[int, Meta(ge=0, description="Version ID")]
 class FieldSummary(Struct, kw_only=True):
     id: int
     keyname: str
-    datatype: str
+    datatype: FeatureLayerFieldDatatype
 
 
 class SRSReference(Struct, kw_only=True):
@@ -44,7 +48,7 @@ class ChangesCheckResponse(Struct, kw_only=True):
     initial: Annotated[int, Meta(ge=0)]
     target: Annotated[int, Meta(gt=0)]
     tstamp: datetime
-    geometry_type: str
+    geometry_type: FeaureLayerGeometryType
     srs: SRSReference
     fields: List[FieldSummary]
     fetch: Annotated[str, Meta(description="URL to start fetching changes")]

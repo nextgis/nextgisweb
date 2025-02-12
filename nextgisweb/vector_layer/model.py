@@ -2,7 +2,7 @@ import re
 from functools import partial
 from itertools import chain
 from pathlib import Path
-from typing import Any, Dict, List, Literal, Union
+from typing import Any, Dict, List, Union
 
 import sqlalchemy as sa
 import sqlalchemy.event as sa_event
@@ -20,6 +20,7 @@ from nextgisweb.core.exception import ValidationError as VE
 from nextgisweb.feature_layer import (
     FIELD_TYPE,
     GEOM_TYPE,
+    FeaureLayerGeometryType,
     IFeatureLayer,
     IFieldEditableFeatureLayer,
     IGeometryEditableFeatureLayer,
@@ -695,9 +696,6 @@ def estimate_vector_layer_data(resource):
     return inspect(resource).session.scalar(query)
 
 
-GeometryType = Union[tuple(Literal[i] for i in GEOM_TYPE.enum)]  # type: ignore
-
-
 class SourceAttr(SAttribute):
     def _ogrds(self, file_upload: FileUpload):
         ogrds = read_dataset_vector(
@@ -790,10 +788,10 @@ class LoaderAttr(SAttribute):
 
 
 class GeometryTypeAttr(SAttribute):
-    def get(self, srlzr: Serializer) -> GeometryType:
+    def get(self, srlzr: Serializer) -> FeaureLayerGeometryType:
         return super().get(srlzr)
 
-    def set(self, srlzr: Serializer, value: GeometryType, *, create: bool):
+    def set(self, srlzr: Serializer, value: FeaureLayerGeometryType, *, create: bool):
         if srlzr.obj.id is None:
             srlzr.obj.geometry_type = value
         elif srlzr.obj.geometry_type == value:

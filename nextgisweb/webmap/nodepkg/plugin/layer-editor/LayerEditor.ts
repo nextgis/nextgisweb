@@ -11,9 +11,10 @@ import type { Interaction } from "ol/interaction";
 import { Vector as VectorSource } from "ol/source";
 
 import { FeatureEditorModal } from "@nextgisweb/feature-layer/feature-editor-modal";
-import type { GeometryType } from "@nextgisweb/feature-layer/type";
+import type { FeaureLayerGeometryType } from "@nextgisweb/feature-layer/type/api";
 import { errorModal } from "@nextgisweb/gui/error";
 import showModal from "@nextgisweb/gui/showModal";
+import { findNode } from "@nextgisweb/gui/util/tree";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import topic from "@nextgisweb/webmap/compat/topic";
@@ -41,7 +42,6 @@ import type {
     FeatureToSave,
     FeaturesToSave,
 } from "./type";
-import { findNode } from "@nextgisweb/gui/util/tree";
 
 export class LayerEditor extends PluginBase {
     private static readonly CREATING_STATE_KEY = "creatingFeatures";
@@ -362,10 +362,11 @@ export class LayerEditor extends PluginBase {
         const pluginConfig = itemConfig?.plugin[
             this.identity
         ] as LayerEditorWebMapPluginConfig;
-        const pluginGeometryType = pluginConfig.geometry_type as GeometryType;
+        const pluginGeometryType =
+            pluginConfig.geometry_type as FeaureLayerGeometryType;
 
         const getGeometryType = () => {
-            const mapping: Record<GeometryType, OlGeometryType> = {
+            const mapping: Record<FeaureLayerGeometryType, OlGeometryType> = {
                 POINT: "Point",
                 LINESTRING: "LineString",
                 POLYGON: "Polygon",
@@ -383,7 +384,7 @@ export class LayerEditor extends PluginBase {
         };
 
         const getLayout = (): Draw["geometryLayout_"] => {
-            const zTypes: GeometryType[] = [
+            const zTypes: FeaureLayerGeometryType[] = [
                 "POINTZ",
                 "LINESTRINGZ",
                 "POLYGONZ",

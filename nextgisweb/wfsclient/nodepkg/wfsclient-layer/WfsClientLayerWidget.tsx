@@ -1,6 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useCallback, useMemo, useState } from "react";
 
+import type { FeaureLayerGeometryType } from "@nextgisweb/feature-layer/type/api";
 import { InputNumber, Select } from "@nextgisweb/gui/antd";
 import { LotMV } from "@nextgisweb/gui/arm";
 import { AutoCompleteInput } from "@nextgisweb/gui/component";
@@ -18,7 +19,7 @@ import type { WfsClientLayerStore } from "./WfsClientLayerStore";
 
 const msgAutodetect = gettext("Autodetect");
 
-const geometries: Record<string, string> = {
+const geometries: Record<string, FeaureLayerGeometryType> = {
     "Point": "POINT",
     "LineString": "LINESTRING",
     "LinearRing": "LINESTRING",
@@ -28,7 +29,6 @@ const geometries: Record<string, string> = {
     "MultiPolygon": "MULTIPOLYGON",
     "MultiSurface": "MULTIPOLYGON",
     "MultiSolid": "MULTIPOLYGON",
-    "MultiGeometry": "GEOMETRYCOLLECTION",
 };
 
 async function inspectConnectionFetch(
@@ -53,7 +53,8 @@ async function inspectLayerFetch(
         id: connectionId,
         layer,
     }).get({ signal: options.signal });
-    const result: Record<string, string> = {};
+
+    const result: Record<string, FeaureLayerGeometryType> = {};
     for (const { name, type } of data.fields) {
         if (type[0] !== "http://www.opengis.net/gml/3.2") {
             continue;
@@ -146,7 +147,7 @@ export const WfsClientLayerWidget: EditorWidgetComponent<
         [focusedField]
     );
 
-    const updateGeometryType = (value: string) => {
+    const updateGeometryType = (value: FeaureLayerGeometryType) => {
         if (layerInfo.status === "ready") {
             store.columnGeom.value = value;
             store.geometryType.value = layerInfo.data[value] ?? null;

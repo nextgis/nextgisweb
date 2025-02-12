@@ -1,4 +1,4 @@
-from typing import Any, List, Literal, Union
+from typing import Any, List, Union
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
@@ -17,7 +17,12 @@ from nextgisweb.resource import Resource, ResourceScope, SAttribute, Serializer
 from nextgisweb.resource.model import ResourceRef
 from nextgisweb.spatial_ref_sys import SRS
 
-from .interface import FIELD_TYPE, FIELD_TYPE_OGR, IVersionableFeatureLayer
+from .interface import (
+    FIELD_TYPE,
+    FIELD_TYPE_OGR,
+    FeatureLayerFieldDatatype,
+    IVersionableFeatureLayer,
+)
 
 Base.depends_on("resource", "lookup_table")
 
@@ -109,14 +114,11 @@ class LayerFieldsMixin:
         return ogr_layer
 
 
-DataType = Union[tuple(Literal[i] for i in FIELD_TYPE.enum)]  # type: ignore
-
-
 class FeatureLayerFieldRead(Struct, kw_only=True):
     id: int
     keyname: str
     display_name: str
-    datatype: DataType
+    datatype: FeatureLayerFieldDatatype
     typemod: Any
     label_field: bool
     grid_visibility: bool
@@ -129,7 +131,7 @@ class FeatureLayerFieldWrite(Struct, kw_only=True):
     delete: Union[bool, UnsetType] = UNSET
     keyname: Union[str, UnsetType] = UNSET
     display_name: Union[str, UnsetType] = UNSET
-    datatype: Union[DataType, UnsetType] = UNSET
+    datatype: Union[FeatureLayerFieldDatatype, UnsetType] = UNSET
     typemod: Union[Any, UnsetType] = UNSET
     label_field: Union[bool, UnsetType] = UNSET
     grid_visibility: Union[bool, UnsetType] = UNSET

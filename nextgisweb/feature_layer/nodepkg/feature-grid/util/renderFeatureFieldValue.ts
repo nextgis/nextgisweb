@@ -1,10 +1,10 @@
+import type { FeatureLayerFieldDatatype } from "@nextgisweb/feature-layer/type/api";
 import { utc } from "@nextgisweb/gui/dayjs";
 
 import type { NgwAttributeType } from "../../type";
-import type { FeatureLayerDataType } from "../../type/FeatureLayer";
 
 export function renderFeatureFieldValue(
-    { datatype }: { datatype: FeatureLayerDataType },
+    { datatype }: { datatype: FeatureLayerFieldDatatype },
     val: NgwAttributeType
 ): string | number | null {
     if (val) {

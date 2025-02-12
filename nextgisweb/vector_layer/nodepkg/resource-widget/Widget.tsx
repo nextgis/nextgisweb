@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useCallback, useMemo, useState } from "react";
 
-import type { GeometryType } from "@nextgisweb/feature-layer/type";
+import type { FeaureLayerGeometryType } from "@nextgisweb/feature-layer/type/api";
 import { FileUploader } from "@nextgisweb/file-upload/file-uploader";
 import type {
     FileMeta,
@@ -172,13 +172,13 @@ export const Widget: EditorWidgetComponent<EditorWidgetProps<Store>> = observer(
         }, [operation, update]);
 
         const gtypeOpts = useMemo(() => {
-            const result: Option<GeometryType>[] = [];
+            const result: Option<FeaureLayerGeometryType>[] = [];
             const gti = geometryTypeInitial;
             const btype =
                 mode === "gtype"
                     ? gti && gti.replace(/^(?:MULTI)?(.*?)Z?$/, "$1")
                     : undefined;
-            const add = (value: GeometryType, label: string) => {
+            const add = (value: FeaureLayerGeometryType, label: string) => {
                 if (btype) {
                     if (!value.includes(btype)) return;
                     if (value === gti) label += " (" + gettext("current") + ")";

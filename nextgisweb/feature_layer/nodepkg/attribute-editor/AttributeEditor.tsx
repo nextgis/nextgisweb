@@ -2,7 +2,10 @@ import { observer } from "mobx-react-lite";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import type { EditorWidgetProps } from "@nextgisweb/feature-layer/feature-editor/type";
-import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
+import type {
+    FeatureLayerFieldDatatype,
+    FeatureLayerFieldRead,
+} from "@nextgisweb/feature-layer/type/api";
 import {
     Button,
     DatePicker,
@@ -20,8 +23,6 @@ import { FieldsForm, Form } from "@nextgisweb/gui/fields-form";
 import type { FormField, SizeType } from "@nextgisweb/gui/fields-form";
 import { LookupSelect } from "@nextgisweb/lookup-table/component/lookup-select";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-
-import type { FeatureLayerDataType } from "../type";
 
 import AttributeEditorStore from "./AttributeEditorStore";
 import type { NgwAttributeValue } from "./type";
@@ -85,7 +86,7 @@ const AttributeEditor = observer(
                 placeholder,
             }: {
                 placeholder?: string;
-            }): Record<FeatureLayerDataType, React.ReactElement> => {
+            }): Record<FeatureLayerFieldDatatype, React.ReactElement> => {
                 const dpProps: DatePickerProps = {
                     style,
                     placeholder,

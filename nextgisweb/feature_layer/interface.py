@@ -1,6 +1,10 @@
+from typing import TYPE_CHECKING, Literal
+
 from osgeo import ogr
+from typing_extensions import Annotated
 from zope.interface import Attribute, Interface
 
+from nextgisweb.jsrealm import TSExport
 from nextgisweb.resource import IResourceBase
 
 GEOM_TYPE_OGR = (
@@ -97,6 +101,21 @@ class FIELD_TYPE:
     DATETIME = "DATETIME"
 
     enum = (INTEGER, BIGINT, REAL, STRING, DATE, TIME, DATETIME)
+
+
+if TYPE_CHECKING:
+    FeaureLayerGeometryType = str
+    FeatureLayerFieldDatatype = str
+else:
+    FeaureLayerGeometryType = Annotated[
+        Literal[GEOM_TYPE.enum],
+        TSExport("FeaureLayerGeometryType"),
+    ]
+
+    FeatureLayerFieldDatatype = Annotated[
+        Literal[FIELD_TYPE.enum],
+        TSExport("FeatureLayerFieldDatatype"),
+    ]
 
 
 class IFeatureLayer(IResourceBase):
