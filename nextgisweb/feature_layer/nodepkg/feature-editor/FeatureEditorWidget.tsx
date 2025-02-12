@@ -1,5 +1,12 @@
 import { observer } from "mobx-react-lite";
-import { Suspense, lazy, useCallback, useEffect, useState } from "react";
+import {
+    Suspense,
+    lazy,
+    useCallback,
+    useEffect,
+    useMemo,
+    useState,
+} from "react";
 
 import { ActionToolbar } from "@nextgisweb/gui/action-toolbar";
 import type {
@@ -55,6 +62,8 @@ export const FeatureEditorWidget = observer(
             );
         })[0];
 
+        const { dirty } = store;
+
         const [items, setItems] = useState<TabItem[]>([]);
 
         const createEditorTab = useCallback(
@@ -108,52 +117,58 @@ export const FeatureEditorWidget = observer(
             loadWidgets();
         }, [store, createEditorTab]);
 
-        useUnsavedChanges({ dirty: store.dirty });
+        useUnsavedChanges({ dirty });
 
-        const actions: ActionToolbarAction[] = [
-            <SaveButton
-                disabled={!store.dirty}
-                key="save"
-                loading={store.saving}
-                onClick={async () => {
-                    if (mode === "save") {
-                        try {
-                            const res = await store.save();
-                            if (onSave) {
-                                onSave(res);
+        const toolbarProps: Partial<ActionToolbarProps> = useMemo(() => {
+            const actions: ActionToolbarAction[] = [
+                <SaveButton
+                    disabled={!dirty}
+                    key="save"
+                    loading={store.saving}
+                    onClick={async () => {
+                        if (mode === "save") {
+                            try {
+                                const res = await store.save();
+                                if (onSave) {
+                                    onSave(res);
+                                }
+                            } catch (error) {
+                                showModal(ErrorModal, {
+                                    error: error as ApiError,
+                                });
                             }
-                        } catch (error) {
-                            showModal(ErrorModal, { error: error as ApiError });
+                        } else if (onOk) {
+                            onOk(store.preparePayload());
                         }
-                    } else if (onOk) {
-                        onOk(store.preparePayload());
-                    }
-                }}
-            >
-                {mode === "save" ? msgSave : okBtnMsg}
-            </SaveButton>,
-        ];
-        const rightActions: ActionToolbarAction[] = [];
-        if (store.dirty) {
-            rightActions.push(
-                <Button
-                    key="reset"
-                    onClick={() => {
-                        store.reset();
                     }}
-                    icon={<ResetIcon />}
                 >
-                    {msgReset}
-                </Button>
-            );
-        }
+                    {mode === "save" ? msgSave : okBtnMsg}
+                </SaveButton>,
+            ];
+            const rightActions: ActionToolbarAction[] = [];
+            if (dirty) {
+                rightActions.push(
+                    <Button
+                        key="reset"
+                        onClick={() => {
+                            store.reset();
+                        }}
+                        icon={<ResetIcon />}
+                    >
+                        {msgReset}
+                    </Button>
+                );
+            }
 
-        const toolbarProps: Partial<ActionToolbarProps> = { ...toolbar };
-        toolbarProps.actions = [...actions, ...(toolbarProps.actions || [])];
-        toolbarProps.rightActions = [
-            ...rightActions,
-            ...(toolbarProps.rightActions || []),
-        ];
+            return {
+                ...toolbar,
+                actions: [...actions, ...(toolbar?.actions || [])],
+                rightActions: [
+                    ...rightActions,
+                    ...(toolbar?.rightActions || []),
+                ],
+            };
+        }, [mode, okBtnMsg, onOk, onSave, store, dirty, toolbar]);
 
         return (
             <div className="ngw-feature-layer-editor">

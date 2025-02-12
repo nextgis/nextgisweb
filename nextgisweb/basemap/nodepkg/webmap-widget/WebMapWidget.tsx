@@ -60,7 +60,7 @@ export const WebMapWidget: EditorWidgetComponent<
     EditorWidgetProps<WebMapStore>
 > = observer(({ store }: EditorWidgetProps<WebMapStore>) => {
     const { pickToFocusTable } = useFocusTablePicker({
-        initParentId: store.composite.parent,
+        initParentId: store.composite.parent || undefined,
     });
 
     const { tableActions, itemActions } = useMemo<
