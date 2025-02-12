@@ -1,9 +1,9 @@
-import { makeAutoObservable, runInAction, toJS } from "mobx";
+import { action, computed, observable, toJS } from "mobx";
 
 import type { ResourceCls, ResourceRead } from "@nextgisweb/resource/type/api";
 
+import type { CompositeStore } from "../composite/CompositeStore";
 import type { EditorStoreOptions, Operation } from "../type";
-import type { Composite } from "../type/Composite";
 
 type NullableProperties<T> = {
     [P in keyof T]?: T[P] | null;
@@ -24,22 +24,20 @@ interface Loaded {
 export class EditorStore {
     identity = "resource";
 
-    cls: ResourceCls | null = null;
-    displayName: string | null = null;
-    keyname: string | null = null;
-    parent: number | null = null;
-    ownerUser: number | null = null;
+    @observable accessor cls: ResourceCls | null = null;
+    @observable accessor displayName: string | null = null;
+    @observable accessor keyname: string | null = null;
+    @observable accessor parent: number | null = null;
+    @observable accessor ownerUser: number | null = null;
 
-    sdnBase = null;
-    sdnDynamic = null;
+    @observable accessor sdnBase: string | null = null;
 
-    operation?: Operation;
-    composite?: Composite;
+    @observable accessor operation: Operation;
+    @observable.shallow accessor composite: CompositeStore;
 
-    _loaded: Loaded;
+    @observable.shallow accessor _loaded: Loaded;
 
     constructor({ composite, operation }: EditorStoreOptions) {
-        makeAutoObservable(this, { identity: false });
         this.composite = composite;
         this.operation = operation;
 
@@ -56,13 +54,14 @@ export class EditorStore {
         this.parent = this.composite.parent;
 
         this.sdnBase = composite.sdnBase;
-        this.composite.watch("sdnDynamic", (attr, oldVal, newVal) => {
-            runInAction(() => {
-                this.sdnDynamic = newVal;
-            });
-        });
     }
 
+    @computed
+    get sdnDynamic() {
+        return this.composite.sdnDynamic;
+    }
+
+    @action
     load(value: Value) {
         const loaded: Loaded = {
             displayName: value.display_name || null,
@@ -109,12 +108,12 @@ export class EditorStore {
         return toJS(result);
     }
 
-    update = (props: Partial<this>) => {
-        runInAction(() => {
-            Object.assign(this, props);
-        });
-    };
+    @action
+    update(props: Partial<this>) {
+        Object.assign(this, props);
+    }
 
+    @computed
     get isValid() {
         const c = this._loaded;
         return (
@@ -123,6 +122,7 @@ export class EditorStore {
         );
     }
 
+    @computed
     get displayNameIsValid() {
         return !!(
             this.displayName ||
@@ -130,6 +130,7 @@ export class EditorStore {
         );
     }
 
+    @computed
     get keynameIsValid() {
         return !this.keyname || /^[a-z][a-z0-9_-]*$/i.test(this.keyname);
     }
