@@ -867,7 +867,7 @@ def quota_check(
     return QuotaCheckSuccess(success=True)
 
 
-WidgetOperation = Annotated[Literal["create", "update", "delete"], Meta(description="")]
+WidgetOperation = Annotated[Literal["create", "update", "delete", "read"], Meta(description="")]
 
 
 class ResourceWidget(Struct, kw_only=True):

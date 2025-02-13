@@ -122,7 +122,7 @@ export function encodeQueryParams(value: QueryParams): string {
             result.push(`${k}=${encodeURIComponent(v)}`);
         } else if (Array.isArray(v)) {
             result.push(`${k}=${v.map(encodeURIComponent).join(",")}`);
-        } else {
+        } else if (v !== undefined) {
             for (const [sk, sv] of Object.entries(v)) {
                 const ske = `${k}[${encodeURIComponent(sk)}]`;
                 if (

@@ -177,14 +177,15 @@ def create(request):
     )
 
 
-@viewargs(renderer="composite_widget.mako")
+@viewargs(renderer="react")
 def update(request):
     request.resource_permission(ResourceScope.update)
     return dict(
         obj=request.context,
+        entrypoint="@nextgisweb/resource/composite",
         title=gettext("Update resource"),
         maxheight=True,
-        query=dict(operation="update", id=request.context.id),
+        props=dict(operation="update", id=request.context.id),
     )
 
 

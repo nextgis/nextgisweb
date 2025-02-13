@@ -1,6 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useEffect, useMemo, useState } from "react";
 
+import { TabLabel } from "@nextgisweb/feature-layer/feature-editor/component/TabLabel";
 import { ActionToolbar } from "@nextgisweb/gui/action-toolbar";
 import type {
     ActionToolbarAction,
@@ -8,42 +9,26 @@ import type {
 } from "@nextgisweb/gui/action-toolbar";
 import { Tabs } from "@nextgisweb/gui/antd";
 import { SaveButton } from "@nextgisweb/gui/component";
+import { errorModal } from "@nextgisweb/gui/error";
 import type { ParamOf } from "@nextgisweb/gui/type";
-import entrypoint from "@nextgisweb/jsrealm/entrypoint";
-import { useRouteGet } from "@nextgisweb/pyramid/hook";
+import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import type {
-    EditorStore,
-    EditorStoreOptions,
-} from "@nextgisweb/resource/type/EditorStore";
 import type {
     ResourceCls,
     ResourceWidget,
 } from "@nextgisweb/resource/type/api";
 
-import type {
-    EditorWidgetComponent,
-    EditorWidgetProps,
-    Operation,
-} from "../type";
+import type { ActiveOnOptions, Operation } from "../type";
 
 import { CompositeStore } from "./CompositeStore";
 
 import "./CompositeWidget.less";
 
-interface CompositeWidgetProps {
-    cls: ResourceCls;
+export interface CompositeWidgetProps {
+    cls?: ResourceCls;
     operation: Operation;
-    parent: number;
-}
-
-interface WidgetEntrypoint<S extends EditorStore = EditorStore> {
-    store: new (args: EditorStoreOptions) => S;
-    widget: EditorWidgetComponent<EditorWidgetProps<S>>;
-}
-interface WidgetMember<S extends EditorStore = EditorStore> {
-    store: S;
-    widget: EditorWidgetComponent<EditorWidgetProps<S>>;
+    parent?: number;
+    id?: number;
 }
 
 type TabItem = NonNullable<ParamOf<typeof Tabs, "items">>[0] & {
@@ -54,64 +39,105 @@ const operationMsg: Record<ResourceWidget["operation"], string> = {
     create: gettext("Create"),
     update: gettext("Save"),
     delete: gettext("Delete"),
+    read: gettext("Read"),
 };
 
+function goToResource(id: number, edit = false) {
+    if (edit) {
+        window.location.href = route("resource.update", {
+            id,
+        }).url();
+    } else {
+        window.location.href = route("resource.show", {
+            id,
+        }).url();
+    }
+}
+
 const CompositeWidget = observer(
-    ({ cls, operation, parent }: CompositeWidgetProps) => {
+    ({ cls, operation, parent, id }: CompositeWidgetProps) => {
         const [activeKey, setActiveKey] = useState<string>();
-        const [composite, setComposite] = useState<CompositeStore>();
-        const [members, setMembers] = useState<WidgetMember[]>();
-        const { data } = useRouteGet({
-            name: "resource.widget",
-            options: {
-                query: { cls, operation, parent },
-            },
-        });
+        const [composite] = useState(
+            () => new CompositeStore({ cls, operation, parent, id })
+        );
+        const { isValid, members } = composite;
 
         const items = useMemo<TabItem[]>(() => {
             if (members) {
                 return members
                     .map(({ store, widget: Widget }) => {
-                        return {
-                            key: Widget.title || "Widget",
+                        const ObserverTableLabel = observer(() => (
+                            <TabLabel
+                                isValid={store.isValid}
+                                label={Widget.title}
+                            />
+                        ));
+                        ObserverTableLabel.displayName = `ObserverTableLabel-${store.identity}`;
+
+                        const tab: TabItem = {
+                            key: store.identity,
                             order: Widget.order,
-                            label: Widget.title,
+                            label: <ObserverTableLabel />,
                             children: <Widget store={store}></Widget>,
                         };
+                        return tab;
                     })
                     .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
             }
             return [];
         }, [members]);
 
-        // const toolbarProps: Partial<ActionToolbarProps> = useMemo(() => {
-        //     const props: ActionToolbarProps = {
-        //         actions: [{}],
-        //     };
+        useEffect(() => {
+            const selected = members?.find((member) => {
+                const activateOn: ActiveOnOptions =
+                    member.widget.activateOn || {};
+                if (activateOn[operation]) {
+                    return true;
+                }
+            });
+            if (selected) {
+                setActiveKey(selected.store.identity);
+            }
+        }, [members, operation]);
 
-        //     return props;
-        // }, []);
+        useEffect(() => {
+            composite.init();
+        }, [composite]);
 
         const toolbarProps: Partial<ActionToolbarProps> = useMemo(() => {
             const actions: ActionToolbarAction[] = [
                 <SaveButton
-                    // disabled={!dirty}
+                    disabled={!isValid}
                     key="save"
-                    // loading={store.saving}
+                    loading={composite.saving}
                     onClick={async () => {
                         if (operation === "create") {
-                            // try {
-                            //     const res = await composite.save();
-                            //     if (onSave) {
-                            //         onSave(res);
-                            //     }
-                            // } catch (error) {
-                            //     errorModal(error);
-                            // }
+                            try {
+                                const res = await composite.create();
+                                if (res) {
+                                    goToResource(res.id);
+                                }
+                            } catch (error) {
+                                errorModal(error);
+                            }
                         } else if (operation === "update") {
-                            //
+                            try {
+                                await composite.update();
+                                if (composite.id !== null) {
+                                    goToResource(composite.id);
+                                }
+                            } catch (error) {
+                                errorModal(error);
+                            }
                         } else if (operation === "delete") {
-                            //
+                            try {
+                                await composite.delete();
+                                if (composite.parent !== null) {
+                                    goToResource(composite.parent);
+                                }
+                            } catch (error) {
+                                errorModal(error);
+                            }
                         }
                     }}
                 >
@@ -124,33 +150,7 @@ const CompositeWidget = observer(
                 actions,
                 rightActions,
             };
-        }, [operation]);
-
-        useEffect(() => {
-            if (data) {
-                const composite = new CompositeStore(data);
-                setComposite(composite);
-                const loadWidgets = async () => {
-                    const modules: WidgetMember[] = [];
-
-                    for (const [moduleName, params] of Object.entries(
-                        data.config
-                    )) {
-                        const module =
-                            await entrypoint<WidgetEntrypoint>(moduleName);
-                        const widgetStore = new module.store({
-                            composite,
-                            operation,
-                            ...params,
-                        });
-                        modules.push({ ...module, store: widgetStore });
-                    }
-                    setMembers(modules);
-                };
-
-                loadWidgets();
-            }
-        }, [data, operation]);
+        }, [composite, isValid, operation]);
 
         return (
             <div className="ngw-resource-composite">
