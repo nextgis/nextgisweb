@@ -13,7 +13,7 @@ export interface Composite extends dijit.layout.BorderContainer {
     buttons: any[];
     operation: string;
     id: string;
-    parent: number;
+    parent?: number;
     cls: ResourceCls;
 
     // from console

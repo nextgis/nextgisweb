@@ -1,6 +1,6 @@
 import type { LunkwillParam } from "@nextgisweb/pyramid/api";
 
-import type { Composite } from "./Composite";
+import type { CompositeStore } from "../composite/CompositeStore";
 
 export type Operation = "create" | "update" | "delete";
 
@@ -9,7 +9,7 @@ export interface DumpParams {
 }
 
 export interface EditorStoreOptions {
-    composite: Composite;
+    composite: CompositeStore;
     operation: Operation;
     resourceId?: number;
 }
