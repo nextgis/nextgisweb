@@ -1,8 +1,9 @@
 import type { LunkwillParam } from "@nextgisweb/pyramid/api";
+import type { ResourceWidget } from "@nextgisweb/resource/type/api";
 
 import type { CompositeStore } from "../composite/CompositeStore";
 
-export type Operation = "create" | "update" | "delete";
+export type Operation = ResourceWidget["operation"];
 
 export interface DumpParams {
     lunkwill: LunkwillParam;
