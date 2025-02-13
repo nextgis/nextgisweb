@@ -385,6 +385,18 @@ class WebMapItemGroupRead(Struct, kw_only=True, tag="group", tag_field="item_typ
         )
 
 
+def enable_exclusive(group, _found=False):
+    for child in group.children:
+        if child.item_type == "group":
+            _found = enable_exclusive(child, _found)
+        elif child.item_type == "layer" and child.layer_enabled:
+            if not _found:
+                _found = True
+            else:
+                child.layer_enabled = False
+    return _found
+
+
 class WebMapItemGroupWrite(Struct, kw_only=True, tag="group", tag_field="item_type"):
     display_name: str
     group_expanded: bool = False
@@ -394,16 +406,9 @@ class WebMapItemGroupWrite(Struct, kw_only=True, tag="group", tag_field="item_ty
     def to_model(self):
         asdict = struct_asdict(self)
         children = [i.to_model() for i in asdict.pop("children")]
-        result = WebMapItem(item_type="group", **asdict)
+        result = WebMapItem(item_type="group", children=children, **asdict)
         if result.group_exclusive:
-            enabled_child_found = False
-            for child in reversed(children):
-                if child.item_type == "layer" and child.layer_enabled:
-                    if not enabled_child_found:
-                        enabled_child_found = True
-                    else:
-                        child.layer_enabled = False
-        result.children = children
+            enable_exclusive(result)
         return result
 
 
