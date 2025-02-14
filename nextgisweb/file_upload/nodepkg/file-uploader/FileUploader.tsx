@@ -7,7 +7,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { maxSize } from "@nextgisweb/pyramid/settings!file_upload";
 
 import { useFileUploader } from "./hook/useFileUploader";
-import type { FileMeta, FileUploaderProps } from "./type";
+import type { FileMeta, FileUploaderProps, UploaderMeta } from "./type";
 
 import BackspaceIcon from "@nextgisweb/icon/material/backspace";
 import CancelIcon from "@nextgisweb/icon/material/cancel";
@@ -45,22 +45,58 @@ function ProgressText({
     );
 }
 
+function InputText<M extends boolean = false>({
+    meta,
+    setMeta,
+    helpText,
+    uploadText = msgUpload,
+    showMaxSize = false,
+    dragAndDropText = msgDragAndDrop,
+}: FileUploaderProps & {
+    meta?: UploaderMeta<M>;
+    setMeta: React.Dispatch<React.SetStateAction<UploaderMeta<M> | undefined>>;
+}) {
+    const firstMeta = (Array.isArray(meta) ? meta[0] : meta) as FileMeta;
+    return firstMeta ? (
+        <p className="ant-upload-text">
+            {firstMeta.name}{" "}
+            <span className="size">{formatSize(firstMeta.size)}</span>
+            <Button
+                onClick={(e) => {
+                    e.stopPropagation();
+                    setMeta(undefined);
+                }}
+                type="link"
+                icon={<BackspaceIcon />}
+            />
+        </p>
+    ) : (
+        // This component cause the console error on tab switch: Uncaught ResizeObserver loop completed with undelivered notifications.
+        // https://github.com/shuding/react-wrap-balancer/issues/82
+        <Balancer ratio={0.62}>
+            <p className="ant-upload-text">
+                <span className="clickable">{uploadText}</span>{" "}
+                {dragAndDropText}
+            </p>
+            {helpText ? <p className="ant-upload-hint">{helpText}</p> : ""}
+            {showMaxSize && <p className="ant-upload-hint">{msgMaxSize}</p>}
+        </Balancer>
+    );
+}
+
 export function FileUploader<M extends boolean = false>({
     style,
     accept,
     height = 220,
     fileMeta,
-    helpText,
     multiple,
     onChange,
     inputProps = {},
-    uploadText = msgUpload,
     afterUpload,
     onUploading,
     setFileMeta,
-    showMaxSize = false,
-    dragAndDropText = msgDragAndDrop,
     showProgressInDocTitle = true,
+    ...rest
 }: FileUploaderProps<M>) {
     const { abort, progressText, props, meta, setMeta, uploading } =
         useFileUploader<M>({
@@ -78,35 +114,6 @@ export function FileUploader<M extends boolean = false>({
         onUploading && onUploading(uploading);
     }, [uploading, onUploading]);
 
-    const InputText = () => {
-        const firstMeta = (Array.isArray(meta) ? meta[0] : meta) as FileMeta;
-        return firstMeta ? (
-            <>
-                <p className="ant-upload-text">
-                    {firstMeta.name}{" "}
-                    <span className="size">{formatSize(firstMeta.size)}</span>
-                    <Button
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            setMeta(undefined);
-                        }}
-                        type="link"
-                        icon={<BackspaceIcon />}
-                    />
-                </p>
-            </>
-        ) : (
-            <Balancer ratio={0.62}>
-                <p className="ant-upload-text">
-                    <span className="clickable">{uploadText}</span>{" "}
-                    {dragAndDropText}
-                </p>
-                {helpText ? <p className="ant-upload-hint">{helpText}</p> : ""}
-                {showMaxSize && <p className="ant-upload-hint">{msgMaxSize}</p>}
-            </Balancer>
-        );
-    };
-
     return (
         <Dragger
             {...props}
@@ -119,7 +126,7 @@ export function FileUploader<M extends boolean = false>({
             {progressText !== null ? (
                 <ProgressText abort={abort} progressText={progressText} />
             ) : (
-                <InputText />
+                <InputText {...rest} meta={meta} setMeta={setMeta} />
             )}
         </Dragger>
     );
