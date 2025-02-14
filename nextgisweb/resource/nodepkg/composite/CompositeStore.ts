@@ -203,15 +203,6 @@ export class CompositeStore {
             this.load(item);
         }
     }
-    // @action
-    // suggestDN(value: string | null) {
-    //     this.sdnDynamic = value;
-    //     return () => {
-    //         if (this.sdnDynamic === value) {
-    //             this.sdnDynamic = null;
-    //         }
-    //     };
-    // }
 
     private async loadMembers(config: ResourceWidget["config"]) {
         const members = await Promise.all(
@@ -247,16 +238,28 @@ export class CompositeStore {
         }
 
         this.setSaving(true);
-        console.debug("Validation completed with success");
-        const lunkwill = new LunkwillParam();
         try {
-            const data = await this.dump(lunkwill);
-            console.debug("Serialization completed");
+            console.debug("Validation completed with success");
+            const lunkwill = new LunkwillParam();
+
+            let data: CompositeCreate | CompositeUpdate;
+            try {
+                data = await this.dump(lunkwill);
+                console.debug("Serialization completed");
+            } catch (er) {
+                console.error("Serialization failed", er);
+                throw {
+                    title: gettext("Unexpected error"),
+                    message: gettext("Serialization failed"),
+                    detail: er,
+                };
+            }
+
             try {
                 const response = (await request(url, {
-                    method: method,
+                    method,
                     json: data,
-                    lunkwill: lunkwill,
+                    lunkwill,
                 })) as ResourceRefWithParent;
                 console.debug("REST API request completed");
                 return response;
@@ -264,13 +267,6 @@ export class CompositeStore {
                 console.error("REST API request failed");
                 throw er;
             }
-        } catch (er) {
-            console.error("Serialization failed");
-            throw {
-                title: gettext("Unexpected error"),
-                message: gettext("Serialization failed"),
-                detail: er,
-            };
         } finally {
             this.setSaving(false);
         }

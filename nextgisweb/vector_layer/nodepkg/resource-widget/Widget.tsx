@@ -167,9 +167,9 @@ export const Widget: EditorWidgetComponent<EditorWidgetProps<Store>> = observer(
                 add("file", gettext("Replace layer features from file"));
                 add("delete", gettext("Delete all features from layer"));
             }
-            update({ mode: result[0].value });
+
             return result;
-        }, [operation, update]);
+        }, [operation]);
 
         const gtypeOpts = useMemo(() => {
             const result: Option<FeaureLayerGeometryType>[] = [];

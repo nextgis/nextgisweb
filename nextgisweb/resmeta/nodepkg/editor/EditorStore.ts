@@ -1,3 +1,5 @@
+import { action } from "mobx";
+
 import { EditorStore as KeyValueEditorStore } from "@nextgisweb/gui/edi-table/store/EditorStore";
 import { RecordItem } from "@nextgisweb/gui/edi-table/store/RecordItem";
 import type { RecordOption } from "@nextgisweb/gui/edi-table/store/RecordItem";
@@ -7,6 +9,7 @@ export class EditorStore extends KeyValueEditorStore<{
 }> {
     identity = "resmeta";
 
+    @action
     load(value: { items: RecordOption[] }) {
         if (value) {
             this.items = Object.entries(value.items).map(

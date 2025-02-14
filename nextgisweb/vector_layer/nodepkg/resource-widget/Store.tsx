@@ -1,4 +1,4 @@
-import { makeAutoObservable, runInAction, toJS } from "mobx";
+import { action, computed, observable, toJS } from "mobx";
 
 import type { FileMeta } from "@nextgisweb/file-upload/file-uploader";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -39,37 +39,39 @@ export class Store
 {
     identity = "vector_layer";
 
-    mode: Mode | null = "file";
-    source: FileMeta | null = null;
-    sourceLayer: string | null = null;
-    sourceOptions: SourceOptions = {
-        "fix_errors": "LOSSY",
-        "skip_errors": true,
-        "cast_geometry_type": null,
-        "cast_is_multi": null,
-        "cast_has_z": null,
-        "fid_source": "AUTO",
-        "fid_field": "ngw_id, id",
-        "skip_other_geometry_types": false,
+    @observable accessor mode: Mode | null = "file";
+    @observable.shallow accessor source: FileMeta | null = null;
+    @observable accessor sourceLayer: string | null = null;
+    @observable.shallow accessor sourceOptions: SourceOptions = {
+        fix_errors: "LOSSY",
+        skip_errors: true,
+        cast_geometry_type: null,
+        cast_is_multi: null,
+        cast_has_z: null,
+        fid_source: "AUTO",
+        fid_field: "ngw_id, id",
+        skip_other_geometry_types: false,
     };
 
-    geometryType: GeometryType | null = null;
-    geometryTypeInitial: GeometryType | null = null;
+    @observable accessor geometryType: GeometryType | null = null;
+    @observable accessor geometryTypeInitial: GeometryType | null = null;
 
-    confirm = false;
-    uploading = false;
+    @observable accessor confirm = false;
+    @observable accessor uploading = false;
 
-    dirty = false;
+    @observable accessor dirty = false;
 
-    operation?: Operation;
-    composite: Composite;
+    @observable accessor operation: Operation;
+    @observable.shallow accessor composite: Composite;
 
     constructor({ composite, operation }: EditorStoreOptions) {
-        makeAutoObservable(this, { identity: false });
         this.operation = operation;
         this.composite = composite;
+
+        this.mode = operation === "create" ? "file" : "keep";
     }
 
+    @action
     load(value: apitype.VectorLayerRead) {
         this.geometryTypeInitial = value.geometry_type;
         this.dirty = false;
@@ -96,9 +98,9 @@ export class Store
             };
             const ayn = (k: keyof SourceOptions) => {
                 const vmap: Record<string, unknown> = {
-                    "NONE": null,
-                    "YES": true,
-                    "NO": false,
+                    NONE: null,
+                    YES: true,
+                    NO: false,
                 };
                 const val = so[k] as string;
                 if (val in vmap) {
@@ -124,29 +126,27 @@ export class Store
         return toJS(result);
     }
 
-    updateSourceOptions = (sourceOptions: Partial<SourceOptions>) => {
-        runInAction(() => {
-            const so = { ...this.sourceOptions };
-            Object.entries(sourceOptions).forEach(([key, value]) => {
-                (so as Record<string, unknown>)[key] = value;
-            });
-
-            this.sourceOptions = so;
+    @action.bound
+    updateSourceOptions(sourceOptions: Partial<SourceOptions>) {
+        const so = { ...this.sourceOptions };
+        Object.entries(sourceOptions).forEach(([key, value]) => {
+            (so as Record<string, unknown>)[key] = value;
         });
-    };
+        this.sourceOptions = so;
+    }
 
-    update = (props: Partial<this>) => {
-        runInAction(() => {
-            Object.assign(this, props);
+    @action.bound
+    update(props: Partial<this>) {
+        Object.assign(this, props);
 
-            if (!("confirm" in props)) {
-                this.confirm = false;
-            }
+        if (!("confirm" in props)) {
+            this.confirm = false;
+        }
 
-            this.dirty = true;
-        });
-    };
+        this.dirty = true;
+    }
 
+    @computed
     get isValid() {
         if (this.confirmMsg && !this.confirm) return false;
         if (this.mode === "file") {
@@ -157,12 +157,14 @@ export class Store
         return true;
     }
 
+    @computed
     get suggestedDisplayName() {
         if (this.sourceLayer) return this.sourceLayer;
         const base = this.source?.name;
         return base ? base.replace(/\.[a-z0-9]+$/i, "") : undefined;
     }
 
+    @computed
     get confirmMsg() {
         if (this.operation === "create") return undefined;
         const mode = this.mode;

@@ -1,3 +1,5 @@
+import { action } from "mobx";
+
 import { EditorStore as KeyValueEditorStore } from "@nextgisweb/gui/edi-table/store/EditorStore";
 import { RecordItem } from "@nextgisweb/gui/edi-table/store/RecordItem";
 
@@ -10,6 +12,7 @@ export class VendorParamsStore extends KeyValueEditorStore<StoreValue> {
         this.load(value);
     }
 
+    @action
     load(val?: StoreValue) {
         if (val) {
             this.items = Object.entries(val).map(
