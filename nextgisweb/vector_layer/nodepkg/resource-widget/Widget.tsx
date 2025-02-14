@@ -264,7 +264,7 @@ export const Widget: EditorWidgetComponent<EditorWidgetProps<Store>> = observer(
                         <FileUploader
                             onChange={onFileChange}
                             onUploading={(value) => {
-                                store.uploading = value;
+                                store.update({ uploading: value });
                             }}
                             afterUpload={[
                                 {

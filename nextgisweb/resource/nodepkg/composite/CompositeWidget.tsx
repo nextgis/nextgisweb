@@ -24,12 +24,18 @@ import { CompositeStore } from "./CompositeStore";
 
 import "./CompositeWidget.less";
 
-export interface CompositeWidgetProps {
-    cls?: ResourceCls;
+export interface CompositeWidgetCreateProps {
     operation: Operation;
+    cls?: ResourceCls;
     parent?: number;
+}
+export interface CompositeWidgetUpdateProps {
+    operation: Operation;
     id?: number;
 }
+
+export type CompositeWidgetProps = CompositeWidgetCreateProps &
+    CompositeWidgetUpdateProps;
 
 type TabItem = NonNullable<ParamOf<typeof Tabs, "items">>[0] & {
     order?: number;
@@ -65,17 +71,17 @@ const CompositeWidget = observer(
         const items = useMemo<TabItem[]>(() => {
             if (members) {
                 return members
-                    .map(({ store, widget: Widget }) => {
+                    .map(({ store, key, widget: Widget }) => {
                         const ObserverTableLabel = observer(() => (
                             <TabLabel
                                 isValid={store.isValid}
                                 label={Widget.title}
                             />
                         ));
-                        ObserverTableLabel.displayName = `ObserverTableLabel-${store.identity}`;
+                        ObserverTableLabel.displayName = `ObserverTableLabel-${key}`;
 
                         const tab: TabItem = {
-                            key: store.identity,
+                            key,
                             order: Widget.order,
                             label: <ObserverTableLabel />,
                             children: <Widget store={store}></Widget>,
@@ -96,7 +102,7 @@ const CompositeWidget = observer(
                 }
             });
             if (selected) {
-                setActiveKey(selected.store.identity);
+                setActiveKey(selected.key);
             }
         }, [members, operation]);
 

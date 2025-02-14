@@ -34,6 +34,7 @@ interface WidgetEntrypoint<S extends EditorStore = EditorStore> {
 }
 
 export interface WidgetMember<S extends EditorStore = EditorStore> {
+    key: string;
     store: S;
     widget: EditorWidgetComponent<EditorWidgetProps<S>>;
 }
@@ -45,12 +46,12 @@ export class CompositeStore {
 
     @observable accessor id: number | null = null;
     @observable accessor owner_user: number | null = null;
+    /** Suggested resource display name from cls options */
     @observable accessor sdnBase: string | null = null;
-    @observable accessor membersLoading = false;
-    @observable accessor sdnDynamic: string | null = null;
 
     @observable.shallow accessor config: Record<string, unknown> | null = null;
 
+    @observable accessor membersLoading = false;
     @observable accessor members: WidgetMember[] | null = null;
     @observable accessor saving = false;
 
@@ -103,12 +104,23 @@ export class CompositeStore {
     @action
     setConfig(config: ResourceWidget["config"]) {
         this.config = config;
-        this.loadWidgets(config);
+        this.loadMembers(config);
     }
 
     @action
     setSaving(status: boolean) {
         this.saving = status;
+    }
+
+    /** Suggested resource display name from file name or other aspects */
+    @computed get sdnDynamic(): string | undefined {
+        const firstMemberWithSdn = this.members?.find(
+            (member) => member.store.suggestedDisplayName
+        );
+        if (firstMemberWithSdn) {
+            return firstMemberWithSdn.store.suggestedDisplayName;
+        }
+        return undefined;
     }
 
     @computed
@@ -154,7 +166,7 @@ export class CompositeStore {
     load(data: CompositeRead): void {
         if (this.members) {
             for (const member of this.members) {
-                const identity = member.store.identity as keyof CompositeCreate;
+                const identity = member.store.identity;
                 member.store.load(getValueByPath(data, identity));
             }
         }
@@ -191,17 +203,17 @@ export class CompositeStore {
             this.load(item);
         }
     }
-    @action
-    suggestDN(value: string | null) {
-        this.sdnDynamic = value;
-        return () => {
-            if (this.sdnDynamic === value) {
-                this.sdnDynamic = null;
-            }
-        };
-    }
+    // @action
+    // suggestDN(value: string | null) {
+    //     this.sdnDynamic = value;
+    //     return () => {
+    //         if (this.sdnDynamic === value) {
+    //             this.sdnDynamic = null;
+    //         }
+    //     };
+    // }
 
-    private async loadWidgets(config: ResourceWidget["config"]) {
+    private async loadMembers(config: ResourceWidget["config"]) {
         const members = await Promise.all(
             Object.entries(config).map(async ([moduleName, params]) => {
                 const member = await entrypoint<WidgetEntrypoint>(moduleName);
@@ -212,7 +224,7 @@ export class CompositeStore {
                     ...params,
                 });
 
-                return { ...member, store: widgetStore };
+                return { ...member, key: moduleName, store: widgetStore };
             })
         );
 
