@@ -66,7 +66,7 @@ const CompositeWidget = observer(
         const [composite] = useState(
             () => new CompositeStore({ cls, operation, parent, id })
         );
-        const { isValid, members } = composite;
+        const { validate, members } = composite;
 
         const items = useMemo<TabItem[]>(() => {
             if (members) {
@@ -74,7 +74,7 @@ const CompositeWidget = observer(
                     .map(({ store, key, widget: Widget }) => {
                         const ObserverTableLabel = observer(() => (
                             <TabLabel
-                                isValid={store.isValid}
+                                isValid={validate ? store.isValid : true}
                                 label={Widget.title}
                             />
                         ));
@@ -91,7 +91,7 @@ const CompositeWidget = observer(
                     .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
             }
             return [];
-        }, [members]);
+        }, [members, validate]);
 
         useEffect(() => {
             const selected = members?.find((member) => {
@@ -113,7 +113,6 @@ const CompositeWidget = observer(
         const toolbarProps: Partial<ActionToolbarProps> = useMemo(() => {
             const actions: ActionToolbarAction[] = [
                 <SaveButton
-                    disabled={!isValid}
                     key="save"
                     loading={composite.saving}
                     onClick={async () => {
@@ -135,15 +134,6 @@ const CompositeWidget = observer(
                             } catch (error) {
                                 errorModal(error);
                             }
-                        } else if (operation === "delete") {
-                            try {
-                                await composite.delete();
-                                if (composite.parent !== null) {
-                                    goToResource(composite.parent);
-                                }
-                            } catch (error) {
-                                errorModal(error);
-                            }
                         }
                     }}
                 >
@@ -156,7 +146,7 @@ const CompositeWidget = observer(
                 actions,
                 rightActions,
             };
-        }, [composite, isValid, operation]);
+        }, [composite, operation]);
 
         return (
             <div className="ngw-resource-composite">

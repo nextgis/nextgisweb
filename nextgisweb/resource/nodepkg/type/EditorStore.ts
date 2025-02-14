@@ -27,5 +27,7 @@ export interface EditorStore<READ = any, CREATE = READ, UPDATE = CREATE> {
 
     isValid?: boolean;
 
+    validate?: boolean;
+
     suggestedDisplayName?: string;
 }

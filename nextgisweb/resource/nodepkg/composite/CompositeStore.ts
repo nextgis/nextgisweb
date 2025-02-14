@@ -51,6 +51,8 @@ export class CompositeStore {
 
     @observable.shallow accessor config: Record<string, unknown> | null = null;
 
+    @observable accessor validate = false;
+
     @observable accessor membersLoading = false;
     @observable accessor members: WidgetMember[] | null = null;
     @observable accessor saving = false;
@@ -101,6 +103,7 @@ export class CompositeStore {
     setMembers(members: WidgetMember[]) {
         this.members = members;
     }
+
     @action
     setConfig(config: ResourceWidget["config"]) {
         this.config = config;
@@ -123,14 +126,15 @@ export class CompositeStore {
         return undefined;
     }
 
+    @action
+    setValidate(status: boolean) {
+        this.validate = status;
+    }
+
     @computed
     get isValid(): boolean {
-        if (this.members) {
-            return this.members.every((m) => {
-                return m.store.isValid;
-            });
-        }
-        return false;
+        if (!this.validate) return true;
+        return this.members?.every((member) => member.store.isValid) ?? true;
     }
 
     async dump(
@@ -187,15 +191,8 @@ export class CompositeStore {
             });
         }
     }
-    async delete(): Promise<void> {
-        if (this.id !== null) {
-            this.storeRequest({
-                url: routeURL("resource.item", { id: this.id }),
-                method: "DELETE",
-            });
-        }
-    }
-    async refresh(): Promise<void> {
+
+    private async refresh(): Promise<void> {
         if (this.id !== null) {
             const item = await route("resource.item", {
                 id: this.id,
@@ -228,6 +225,7 @@ export class CompositeStore {
     }: { url: string } & RequestOptions): Promise<
         ResourceRefWithParent | undefined
     > {
+        this.setValidate(true);
         if (!this.isValid) {
             console.debug("Validation completed without success");
             throw {
