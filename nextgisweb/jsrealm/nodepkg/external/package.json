@@ -3,23 +3,17 @@
     "version": "0.0.0",
     "type": "module",
     "dependencies": {
-        "dijit": "1.16.x",
         "dojo": "1.16.x",
         "string-replace-loader": "^3.0.1",
         "uglify-js": "~3.17.4",
-        "uglifycss": "^0.0.29",
-        "xstyle": "^0.3.2"
+        "uglifycss": "^0.0.29"
     },
     "nextgisweb": {
         "webpackConfigs": {
-            "amd": "webpack.amd.cjs",
             "external": "webpack.external.cjs"
         },
         "externals": [
-            "dijit",
-            "dojo",
-            "mocha",
-            "xstyle"
+            "mocha"
         ]
     }
 }
