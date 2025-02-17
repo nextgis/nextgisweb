@@ -6,5 +6,10 @@
 
     > .ant-tabs {
         flex-grow: 1;
+
+        // It's not clear why, but it fixes tab scrolling
+        > .ant-tabs-nav > .ant-tabs-nav-wrap {
+            width: 0;
+        }
     }
 }
