@@ -1,4 +1,4 @@
-#: api.py:23 model.py:715
+#: api.py:23 model.py:709
 msgid "GDAL library failed to open file."
 msgstr "Библиотеке GDAL не удалось открыть файл."
 
@@ -70,23 +70,23 @@ msgstr "Тип геометрии"
 msgid "Feature count"
 msgstr "Количество объектов"
 
-#: model.py:718
+#: model.py:712
 msgid "Unsupport OGR driver: %s."
 msgstr "Драйвер OGR '%s' не поддерживается."
 
-#: model.py:727
+#: model.py:721
 msgid "Dataset doesn't contain layers."
 msgstr "Набор данных не содержит ни одного слоя."
 
-#: model.py:730
+#: model.py:724
 msgid "Dataset contains more than one layer."
 msgstr "Набор данных содержит более одного слоя."
 
-#: model.py:735
+#: model.py:729
 msgid "Unable to open layer."
 msgstr "Не удалось открыть слой."
 
-#: model.py:748
+#: model.py:742
 msgid "Layer doesn't contain coordinate system information."
 msgstr "Слой не содержит информации о системе координат."
 
@@ -237,19 +237,27 @@ msgstr "Поле %s не найдено"
 msgid "None of fields %s are integer."
 msgstr "Ни одно из полей %d не является целочисленным."
 
-#: ogrloader.py:371
+#: ogrloader.py:370
 msgid "Field '%s(?)' encoding is broken."
 msgstr "Кодировка поля '%s(?)' повреждена."
 
-#: ogrloader.py:378
+#: ogrloader.py:377
 msgid "Field name is forbidden: '%s'. Please remove or rename it."
 msgstr "Недопустимое имя поля: '%s'. Удалите или переименуйте его."
 
-#: ogrloader.py:411
+#: ogrloader.py:395
 msgid "Unsupported field type: %r."
 msgstr "Тип поля %r не поддерживается."
 
-#: ogrloader.py:511
+#: ogrloader.py:420
+msgid ""
+"The source layer has a local coordinate system and can't be reprojected to "
+"the target coordinate system."
+msgstr ""
+"Исходный слой имеет локальную систему координат и не может быть "
+"перепроецирован в целевую."
+
+#: ogrloader.py:503
 msgid ""
 "Feature #%d has a geometry that can't be reprojected to target coordinate "
 "system"
@@ -257,50 +265,50 @@ msgstr ""
 "Геометрия объект #%d не может быть перепроецирована в целевую систему "
 "координат."
 
-#: ogrloader.py:557
+#: ogrloader.py:549
 msgid "Vector layer cannot be written due to errors."
 msgstr "Векторный слой не может быть записан из-за ошибок."
 
-#: ogrloader.py:583
+#: ogrloader.py:575
 msgid "Feature (seq. #%d) doesn't have a FID field '%s'."
 msgstr "Объект (ном. #%d) не содержит поле FID '%s'."
 
-#: ogrloader.py:587
+#: ogrloader.py:579
 msgid "Feature (seq. #%d) FID field '%s' is null."
 msgstr "Объект (ном. #%d) содержит пустое поле FID '%s'."
 
-#: ogrloader.py:634 ogrloader.py:673
+#: ogrloader.py:626 ogrloader.py:665
 msgid "Feature #%d has multiple geometries satisfying the conditions."
 msgstr "Объект #%d содержит несколько геометрий, удовлетворяющих условиям."
 
-#: ogrloader.py:644
+#: ogrloader.py:636
 msgid "Feature #%d has unknown geometry type: %d (%s)."
 msgstr "Объект #%d содержит неизвестный тип геометрии: %d (%s)."
 
-#: ogrloader.py:653
+#: ogrloader.py:645
 msgid "Feature #%d has unsuitable geometry type: %d (%s)."
 msgstr "Объект #%d содержит неподходящий тип геометрии: %d (%s)."
 
-#: ogrloader.py:688
-msgid "Feature #%d has unclosed rings."
-msgstr "Объект #%d содержит незамкнутые кольца."
-
-#: ogrloader.py:706
+#: ogrloader.py:683
 msgid "Feature #%d has empty rings."
 msgstr "Объект #%d содержит пустые кольца."
 
-#: ogrloader.py:714
+#: ogrloader.py:694
+msgid "Feature #%d has unclosed rings."
+msgstr "Объект #%d содержит незамкнутые кольца."
+
+#: ogrloader.py:703
 msgid "Feature #%d has less than 3 points in a polygon ring."
 msgstr "Объект #%d содержит меньше 3-х точек в кольце полигона."
 
-#: ogrloader.py:728
+#: ogrloader.py:716
 msgid "Feature #%d contains an empty linestring."
 msgstr "Объект #%d содержит пустую линию."
 
-#: ogrloader.py:735
+#: ogrloader.py:722
 msgid "Feature #%d has less than 2 points in a linestring."
 msgstr "Объект #%d содержит меньше 2-х точек в линии."
 
-#: ogrloader.py:765
+#: ogrloader.py:739
 msgid "Feature #%d contains a broken encoding of field '%s'."
 msgstr "Объект #%d содержит поврежденную кодировку поля '%s'."

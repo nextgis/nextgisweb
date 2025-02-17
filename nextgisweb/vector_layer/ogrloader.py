@@ -415,6 +415,14 @@ class OGRLoader:
         params = self.params
 
         source_osr = ogrlayer.GetSpatialRef()
+        if source_osr.IsLocal():
+            raise VE(
+                gettext(
+                    "The source layer has a local coordinate system and can't be "
+                    "reprojected to the target coordinate system."
+                )
+            )
+
         target_osr = srs.to_osr()
         transform = (
             osr.CoordinateTransformation(source_osr, target_osr)
