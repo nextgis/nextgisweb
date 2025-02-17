@@ -66,7 +66,7 @@ const CompositeWidget = observer(
         const [composite] = useState(
             () => new CompositeStore({ cls, operation, parent, id })
         );
-        const { validate, members } = composite;
+        const { validate, members, saving } = composite;
 
         const items = useMemo<TabItem[]>(() => {
             if (members) {
@@ -114,7 +114,7 @@ const CompositeWidget = observer(
             const actions: ActionToolbarAction[] = [
                 <SaveButton
                     key="save"
-                    loading={composite.saving}
+                    loading={saving}
                     onClick={async () => {
                         if (operation === "create") {
                             try {
@@ -146,7 +146,7 @@ const CompositeWidget = observer(
                 actions,
                 rightActions,
             };
-        }, [composite, operation]);
+        }, [saving, composite, operation]);
 
         return (
             <div className="ngw-resource-composite">
