@@ -174,6 +174,7 @@ export const FeatureEditorWidget = observer(
             <div className="ngw-feature-layer-editor">
                 <Tabs
                     type="card"
+                    size="large"
                     activeKey={activeKey}
                     onChange={setActiveKey}
                     items={items}

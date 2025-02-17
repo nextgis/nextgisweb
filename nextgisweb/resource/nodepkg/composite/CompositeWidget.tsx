@@ -200,6 +200,7 @@ const CompositeWidget = observer(
                 </div>
                 <Tabs
                     style={{ display: saving ? "none" : undefined }}
+                    size="large"
                     type="card"
                     activeKey={activeKey}
                     onChange={setActiveKey}
