@@ -118,3 +118,140 @@ def test_order_tms_ids_should_consider_the_draw_order_enabled(webmap_with_items)
         webmap = WebMap.filter_by(id=webmap.id).one()
         webmap.draw_order_enabled = False
         DBSession.flush()
+
+
+def _fill_fake_attrs(items, title=None):
+    if title is None:
+        title = []
+    for i, item in enumerate(items, start=1):
+        subtitle = title + [str(i)]
+        t = item["item_type"]
+        item["display_name"] = f"{t}|{'-'.join(subtitle)}"
+        if t == "layer":
+            item["layer_style_id"] = 0
+            item["layer_adapter"] = "image"
+        if "children" in item:
+            _fill_fake_attrs(item["children"], subtitle)
+
+
+def _check_expected_enabled(item, expected, path=None):
+    if path is None:
+        path = []
+
+    for i, child in enumerate(item.children, start=1):
+        subpath = path + [i]
+        if child.item_type == "layer" and child.layer_enabled:
+            assert subpath in expected, f"Layer item '{child.display_name}' shouldn't be enabled"
+            expected.remove(subpath)
+        elif child.item_type == "group":
+            _check_expected_enabled(child, expected, subpath)
+
+
+@pytest.mark.parametrize(
+    "items, expected",
+    (
+        (
+            [
+                dict(
+                    item_type="group",
+                    group_exclusive=True,
+                    children=[
+                        dict(item_type="layer", layer_enabled=False),
+                        dict(item_type="layer", layer_enabled=True),
+                        dict(item_type="layer", layer_enabled=True),
+                    ],
+                )
+            ],
+            [[1, 2]],
+        ),
+        (
+            [
+                dict(
+                    item_type="group",
+                    group_exclusive=False,
+                    children=[
+                        dict(item_type="layer", layer_enabled=True),
+                        dict(item_type="layer", layer_enabled=False),
+                        dict(item_type="layer", layer_enabled=True),
+                    ],
+                )
+            ],
+            [[1, 1], [1, 3]],
+        ),
+        (
+            [
+                dict(item_type="layer", layer_enabled=False),
+                dict(
+                    item_type="group",
+                    group_exclusive=True,
+                    children=[
+                        dict(item_type="layer", layer_enabled=False),
+                        dict(
+                            item_type="group",
+                            children=[
+                                dict(item_type="layer", layer_enabled=True),
+                                dict(
+                                    item_type="group",
+                                    children=[
+                                        dict(item_type="layer", layer_enabled=True),
+                                    ],
+                                ),
+                            ],
+                        ),
+                        dict(item_type="layer", layer_enabled=True),
+                    ],
+                ),
+                dict(item_type="layer", layer_enabled=True),
+            ],
+            [[2, 2, 1], [2, 2, 2, 1], [3]],
+        ),
+        (
+            [
+                dict(
+                    item_type="group",
+                    group_exclusive=True,
+                    children=[
+                        dict(
+                            item_type="group",
+                            children=[
+                                dict(item_type="layer", layer_enabled=True),
+                                dict(item_type="layer", layer_enabled=True),
+                            ],
+                        ),
+                        dict(item_type="layer", layer_enabled=True),
+                    ],
+                ),
+            ],
+            [[1, 1, 1], [1, 1, 2]],
+        ),
+        (
+            [
+                dict(
+                    item_type="group",
+                    group_exclusive=True,
+                    children=[
+                        dict(item_type="layer", layer_enabled=True),
+                        dict(item_type="group", children=[]),
+                        dict(
+                            item_type="group",
+                            children=[
+                                dict(item_type="layer", layer_enabled=True),
+                                dict(item_type="layer", layer_enabled=True),
+                            ],
+                        ),
+                    ],
+                ),
+            ],
+            [[1, 1]],
+        ),
+    ),
+)
+def test_exclusive(items, expected):
+    _fill_fake_attrs(items)
+
+    root = WebMap().root_item
+    root_struct = convert(dict(item_type="root", children=items), WebMapItemRootWrite)
+    root_struct.to_model(root)
+
+    _check_expected_enabled(root, expected)
+    assert len(expected) == 0, "Not all enabled layer items found"
