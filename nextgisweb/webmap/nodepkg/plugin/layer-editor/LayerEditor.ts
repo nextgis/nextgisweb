@@ -684,6 +684,9 @@ export class LayerEditor extends PluginBase {
         }).patch({
             // @ts-expect-error TODO: define patch payload for feature_layer.feature.collection
             json: features,
+            query: {
+                dt_format: "iso",
+            },
         });
     }
 

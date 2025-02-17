@@ -17,7 +17,7 @@ export function parseNgwAttribute(
     datatype: FeatureLayerFieldDatatype,
     value: NgwAttributeType
 ) {
-    if (value !== null && isDateType(datatype)) {
+    if (value !== undefined && value !== null && isDateType(datatype)) {
         let dt;
         if (typeof value === "object") {
             if (datatype === "DATE") {
