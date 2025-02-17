@@ -82,6 +82,7 @@ const CompositeWidget = observer(
 
                         const tab: TabItem = {
                             key,
+                            disabled: saving,
                             order: Widget.order,
                             label: <ObserverTableLabel />,
                             children: <Widget store={store}></Widget>,
@@ -91,7 +92,7 @@ const CompositeWidget = observer(
                     .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
             }
             return [];
-        }, [members, validate]);
+        }, [members, saving, validate]);
 
         useEffect(() => {
             const selected = members?.find((member) => {
