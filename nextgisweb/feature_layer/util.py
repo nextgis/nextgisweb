@@ -10,10 +10,10 @@ def unique_name(name: str, collection: Sequence[str]):
         return name
 
     if m := _suffix_pattern.match(name):
-        n = int(m[2]) + 1
+        n, base = int(m[2]) + 1, m[1]
     else:
-        n = 1
+        n, base = 1, name
     for i in range(n, n + len(collection) + 1):
-        candidate = "%s_%d" % (name, i)
+        candidate = "%s_%d" % (base, i)
         if candidate not in collection:
             return candidate
