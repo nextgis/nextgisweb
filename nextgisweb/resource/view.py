@@ -173,7 +173,6 @@ def create(request):
         entrypoint="@nextgisweb/resource/composite",
         title=gettext("Create resource"),
         maxheight=True,
-        maxwidth=True,
         props=dict(operation="create", cls=cls, parent=request.context.id),
     )
 
@@ -186,7 +185,6 @@ def update(request):
         entrypoint="@nextgisweb/resource/composite",
         title=gettext("Update resource"),
         maxheight=True,
-        maxwidth=True,
         props=dict(operation="update", id=request.context.id),
     )
 

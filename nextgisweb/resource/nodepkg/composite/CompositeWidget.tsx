@@ -7,7 +7,7 @@ import type {
     ActionToolbarAction,
     ActionToolbarProps,
 } from "@nextgisweb/gui/action-toolbar";
-import { Tabs } from "@nextgisweb/gui/antd";
+import { Button, Spin, Tabs } from "@nextgisweb/gui/antd";
 import { SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
 import type { ParamOf } from "@nextgisweb/gui/type";
@@ -21,6 +21,8 @@ import type {
 import type { ActiveOnOptions, Operation } from "../type";
 
 import { CompositeStore } from "./CompositeStore";
+
+import { LoadingOutlined } from "@ant-design/icons";
 
 import "./CompositeWidget.less";
 
@@ -59,6 +61,9 @@ function goToResource(id: number, edit = false) {
         }).url();
     }
 }
+
+// prettier-ignore
+const msgSaving = gettext("Please wait. Processing request...")
 
 const CompositeWidget = observer(
     ({ cls, operation, parent, id }: CompositeWidgetProps) => {
@@ -141,6 +146,30 @@ const CompositeWidget = observer(
                     {operationMsg[operation]}
                 </SaveButton>,
             ];
+
+            if (operation === "create") {
+                const saveAndEdit: ActionToolbarAction = (
+                    <Button
+                        type="primary"
+                        key="save"
+                        loading={saving}
+                        onClick={async () => {
+                            try {
+                                const res = await composite.create();
+                                if (res) {
+                                    goToResource(res.id, true);
+                                }
+                            } catch (error) {
+                                errorModal(error);
+                            }
+                        }}
+                    >
+                        {gettext("Create and edit")}
+                    </Button>
+                );
+                actions.push(saveAndEdit);
+            }
+
             const rightActions: ActionToolbarAction[] = [];
 
             return {
@@ -151,13 +180,40 @@ const CompositeWidget = observer(
 
         return (
             <div className="ngw-resource-composite">
-                <Tabs
-                    type="card"
-                    activeKey={activeKey}
-                    onChange={setActiveKey}
-                    items={items}
-                    parentHeight
-                />
+                {saving ? (
+                    <div
+                        style={{
+                            display: "flex",
+                            height: "100%",
+                            alignItems: "center",
+                            justifyContent: "center",
+                        }}
+                    >
+                        <Spin
+                            indicator={<LoadingOutlined spin />}
+                            tip={
+                                <div
+                                    style={{
+                                        width: "100%",
+                                        textAlign: "center",
+                                    }}
+                                >
+                                    {msgSaving}
+                                </div>
+                            }
+                        >
+                            <div style={{ width: "500px" }} />
+                        </Spin>
+                    </div>
+                ) : (
+                    <Tabs
+                        type="card"
+                        activeKey={activeKey}
+                        onChange={setActiveKey}
+                        items={items}
+                        parentHeight
+                    />
+                )}
                 <ActionToolbar {...toolbarProps} />
             </div>
         );
