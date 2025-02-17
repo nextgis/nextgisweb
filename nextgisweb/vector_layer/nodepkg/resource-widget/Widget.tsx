@@ -152,7 +152,14 @@ export const Widget: EditorWidgetComponent<EditorWidgetProps<Store>> = observer(
     ({ store }) => {
         const [layerOpts, setLayerOpts] = useState<Option[]>();
 
-        const { operation, mode, update, geometryTypeInitial } = store;
+        const {
+            operation,
+            mode,
+            update,
+            geometryTypeInitial,
+            confirmMsg,
+            confirm,
+        } = store;
 
         const modeOpts = useMemo(() => {
             const result: Option<Mode>[] = [];
@@ -256,6 +263,13 @@ export const Widget: EditorWidgetComponent<EditorWidgetProps<Store>> = observer(
             [update]
         );
 
+        const onUploading = useCallback(
+            (value: boolean) => {
+                store.update({ uploading: value });
+            },
+            [store]
+        );
+
         return (
             <div className="ngw-vector-layer-resource-widget">
                 <Select className="mode" options={modeOpts} {...bval("mode")} />
@@ -263,9 +277,7 @@ export const Widget: EditorWidgetComponent<EditorWidgetProps<Store>> = observer(
                     <>
                         <FileUploader
                             onChange={onFileChange}
-                            onUploading={(value) => {
-                                store.update({ uploading: value });
-                            }}
+                            onUploading={onUploading}
                             afterUpload={[
                                 {
                                     message: msgInspect,
@@ -299,14 +311,14 @@ export const Widget: EditorWidgetComponent<EditorWidgetProps<Store>> = observer(
                         />
                     </>
                 )}
-                {store.confirmMsg && (
+                {confirmMsg && (
                     <Checkbox
-                        checked={store.confirm}
+                        checked={confirm}
                         onChange={({ target: { checked } }) => {
                             update({ confirm: checked });
                         }}
                     >
-                        {store.confirmMsg}
+                        {confirmMsg}
                     </Checkbox>
                 )}
                 {mode === "file" && (
