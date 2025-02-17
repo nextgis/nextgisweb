@@ -1,0 +1,28 @@
+.ngw-resource-composite {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    height: 100%;
+
+    > .spin {
+        display: flex;
+        flex-grow: 1;
+        justify-content: center;
+        align-items: center;
+        border: 1px solid var(--color-border-secondary);
+        border-radius: var(--border-radius);
+
+        > .ant-spin-nested-loading {
+            width: 100%;
+        }
+    }
+
+    > .ant-tabs {
+        flex-grow: 1;
+
+        // It's not clear why, but it fixes tab scrolling
+        > .ant-tabs-nav > .ant-tabs-nav-wrap {
+            width: 0;
+        }
+    }
+}

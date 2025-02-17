@@ -1,4 +1,4 @@
-import { makeObservable, observable, observe } from "mobx";
+import { makeObservable, observable, observe, runInAction } from "mobx";
 
 import type { FocusTableStore } from "@nextgisweb/gui/focus-table";
 import type { Composite } from "@nextgisweb/resource/type";
@@ -53,7 +53,9 @@ export class ServiceStore
     }
 
     get isValid(): boolean {
-        this.validate = true;
+        runInAction(() => {
+            this.validate = true;
+        });
         return this.layers.every((i) => i.error === false);
     }
 

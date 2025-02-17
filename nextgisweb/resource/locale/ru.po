@@ -1,67 +1,24 @@
-#: amd/ngw-resource/CompositeWidget.js:52
-msgid "Please wait. Processing request..."
-msgstr "Подождите, пожалуйста, идет обработка запроса..."
-
-#: amd/ngw-resource/CompositeWidget.js:85
-msgid "Create"
-msgstr "Создать"
-
-#: amd/ngw-resource/CompositeWidget.js:94
-msgid "Create and edit"
-msgstr "Создать и изменить"
-
-#: amd/ngw-resource/CompositeWidget.js:103
-#: nodepkg/export-settings/ExportSettings.tsx:80
-msgid "Save"
-msgstr "Сохранить"
-
-#: amd/ngw-resource/CompositeWidget.js:110
-#: nodepkg/children-section/component/MenuDropdown.tsx:211
-#: nodepkg/children-section/util/createResourceTableItemOptions.ts:8 view.py:422
-msgid "Delete"
-msgstr "Удалить"
-
-#: amd/ngw-resource/CompositeWidget.js:273 amd/ngw-resource/CompositeWidget.js:295
-msgid "Unexpected error"
-msgstr "Внезапная ошибка"
-
-#: amd/ngw-resource/CompositeWidget.js:274
-msgid "Serialization failed"
-msgstr "Сериализация не удалась"
-
-#: amd/ngw-resource/CompositeWidget.js:285
-msgid "Validation error"
-msgstr "Ошибка валидации"
-
-#: amd/ngw-resource/CompositeWidget.js:286
-msgid "Errors found during data validation. Tabs with errors marked in red."
-msgstr "При проверке данных обнаружена ошибка. Вкладки с ошибками отмечены красным."
-
-#: amd/ngw-resource/CompositeWidget.js:296
-msgid "Validation failed"
-msgstr "Валидация провалилась"
-
-#: api.py:408
+#: api.py:417
 msgid "Permission not found"
 msgstr "Право доступа не найдено"
 
-#: category.py:36
+#: category.py:39
 msgid "Layers and styles"
 msgstr "Слои и стили"
 
-#: category.py:41
+#: category.py:44
 msgid "Maps and services"
 msgstr "Карты и сервисы"
 
-#: category.py:46
+#: category.py:49
 msgid "Field data collection"
 msgstr "Сбор данных"
 
-#: category.py:51 scope.py:39
+#: category.py:54 scope.py:39
 msgid "External connections"
 msgstr "Внешние соединения"
 
-#: category.py:56
+#: category.py:59
 msgid "Miscellaneous"
 msgstr "Другие ресурсы"
 
@@ -177,19 +134,19 @@ msgstr "Ключ ресурса не уникален."
 msgid "Default style"
 msgstr "Стиль по умолчанию"
 
-#: model.py:453
+#: model.py:464
 msgid "Resource can not be without a parent."
 msgstr "Ресурс не может быть без родителя"
 
-#: model.py:460
+#: model.py:471
 msgid "You are not allowed to manage children of resource with id = %d."
 msgstr "У вас нет прав для управления дочерними ресурсами для ресурса с id = %d."
 
-#: model.py:472
+#: model.py:483
 msgid "Resource can not be a child of resource id = %d."
 msgstr "Ресурс не может быть дочерним для ресурса с id = %d."
 
-#: model.py:547
+#: model.py:558
 msgid ""
 "Unable to revoke '{permission}' permission for '{user}' as the user belongs "
 "to the administrators group. Administrators must always have ability to "
@@ -199,7 +156,7 @@ msgstr ""
 "относится к группе администраторов. Администраторы всегда должны иметь "
 "возможность настраивать права для ресурсов."
 
-#: model.py:646
+#: model.py:657
 msgid "Resource group"
 msgstr "Группа ресурсов"
 
@@ -258,6 +215,12 @@ msgstr "Скрыть дату создания ресурса"
 #: nodepkg/children-section/component/MenuDropdown.tsx:197
 msgid "Show resource creation date"
 msgstr "Показать дату создания ресурса"
+
+#: nodepkg/children-section/component/MenuDropdown.tsx:211
+#: nodepkg/children-section/util/createResourceTableItemOptions.ts:8
+#: nodepkg/composite/CompositeWidget.tsx:50 view.py:373
+msgid "Delete"
+msgstr "Удалить"
 
 #: nodepkg/children-section/component/MenuDropdown.tsx:220
 msgid "Not all of the selected can be deleted."
@@ -335,7 +298,44 @@ msgstr "Выбрать эту группу"
 msgid "Pick selected"
 msgstr "Выбрать отмеченное"
 
-#: nodepkg/delete-page/DeletePage.tsx:121
+#: nodepkg/composite/CompositeStore.ts:232
+msgid "Validation error"
+msgstr "Ошибка валидации"
+
+#: nodepkg/composite/CompositeStore.ts:234
+msgid "Errors found during data validation. Tabs with errors marked in red."
+msgstr "При проверке данных обнаружена ошибка. Вкладки с ошибками отмечены красным."
+
+#: nodepkg/composite/CompositeStore.ts:250
+msgid "Unexpected error"
+msgstr "Внезапная ошибка"
+
+#: nodepkg/composite/CompositeStore.ts:251
+msgid "Serialization failed"
+msgstr "Сериализация не удалась"
+
+#: nodepkg/composite/CompositeWidget.tsx:48
+msgid "Create"
+msgstr "Создать"
+
+#: nodepkg/composite/CompositeWidget.tsx:49
+#: nodepkg/export-settings/ExportSettings.tsx:80
+msgid "Save"
+msgstr "Сохранить"
+
+#: nodepkg/composite/CompositeWidget.tsx:51
+msgid "Read"
+msgstr "Прочитать"
+
+#: nodepkg/composite/CompositeWidget.tsx:67
+msgid "Please wait. Processing request..."
+msgstr "Подождите, пожалуйста, идет обработка запроса..."
+
+#: nodepkg/composite/CompositeWidget.tsx:168
+msgid "Create and edit"
+msgstr "Создать и изменить"
+
+#: nodepkg/delete-page/DeletePage.tsx:122
 msgid "Cancel"
 msgstr "Отмена"
 
@@ -487,7 +487,7 @@ msgid "Removed from favorites"
 msgstr "Удалено из избранного"
 
 #: nodepkg/main-section/CreateResourceButton.tsx:8
-#: nodepkg/main-section/CreateResourceModal.tsx:20 view.py:174 view.py:396
+#: nodepkg/main-section/CreateResourceModal.tsx:20 view.py:174 view.py:347
 msgid "Create resource"
 msgstr "Создать ресурс"
 
@@ -507,7 +507,7 @@ msgstr "Необходимо заполнить все поля"
 msgid "Row conflicts with another"
 msgstr "Конфликт строк"
 
-#: nodepkg/permissions-widget/PermissionsWidget.tsx:21 view.py:397
+#: nodepkg/permissions-widget/PermissionsWidget.tsx:21 view.py:348
 msgid "Action"
 msgstr "Действие"
 
@@ -636,34 +636,34 @@ msgstr "У этого ресурса нет описания."
 msgid "External access"
 msgstr "Внешний доступ"
 
-#: view.py:117 view.py:431
+#: view.py:116 view.py:382
 msgid "JSON view"
 msgstr "Представление JSON"
 
-#: view.py:129 view.py:438
+#: view.py:128 view.py:389
 msgid "User permissions"
 msgstr "Права пользователя"
 
-#: view.py:185
+#: view.py:186
 msgid "Update resource"
 msgstr "Изменить ресурс"
 
-#: view.py:198
+#: view.py:199
 msgid "Delete resource"
 msgstr "Удалить ресурс"
 
-#: view.py:255 view.py:451
+#: view.py:210 view.py:402
 msgid "Resource export"
 msgstr "Экспорт ресурсов"
 
-#: view.py:322
+#: view.py:274
 msgid "Insufficient '%s' permission in scope '%s' on resource id = %d."
 msgstr "Недостаточно разрешения '%s' в скоупе '%s' для идентификатора ресурса = %d."
 
-#: view.py:398
+#: view.py:349
 msgid "Extra"
 msgstr "Дополнительно"
 
-#: view.py:408
+#: view.py:359
 msgid "Update"
 msgstr "Изменить"

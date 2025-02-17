@@ -3,9 +3,12 @@ from typing import TYPE_CHECKING, Any, ClassVar, Dict, List, Literal, Mapping, U
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
 import zope.event
+import zope.event.classhandler
 from msgspec import UNSET, DecodeError, Meta, Struct, UnsetType, defstruct, field, to_builtins
 from msgspec import ValidationError as MsgspecValidationError
 from msgspec.json import Decoder
+from pyramid.httpexceptions import HTTPBadRequest
+from sqlalchemy.orm import with_polymorphic
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql import exists
 from sqlalchemy.sql import or_ as sa_or
@@ -38,6 +41,7 @@ from .presolver import ExplainACLRule, ExplainDefault, ExplainRequirement, Permi
 from .sattribute import ResourceRefOptional, ResourceRefWithParent
 from .scope import ResourceScope, Scope
 from .view import ResourceID, resource_factory
+from .widget import CompositeWidget
 
 
 class BlueprintResource(Struct):
@@ -863,6 +867,71 @@ def quota_check(
     return QuotaCheckSuccess(success=True)
 
 
+WidgetOperation = Annotated[Literal["create", "update", "delete", "read"], Meta(description="")]
+
+
+class ResourceWidget(Struct, kw_only=True):
+    operation: Annotated[WidgetOperation, Meta(description="Operation type")]
+    config: Annotated[Dict[str, dict], Meta(description="Widget configuration")]
+    id: Annotated[Union[int, None], Meta(description="Resource ID")]
+    cls: Annotated[ResourceCls, Meta(description="Resource class identifier")]
+    parent: Annotated[Union[int, None], Meta(description="Parent resource ID")]
+    owner_user: Annotated[int, Meta(description="Owner user ID")]
+    suggested_display_name: Annotated[Union[str, None], Meta(description="Suggested display name")]
+
+
+def widget(
+    request,
+    *,
+    operation: Union[WidgetOperation, None] = None,
+    id: Annotated[Union[int, None], Meta(description="Resource ID")] = None,
+    cls: Annotated[Union[ResourceCls, None], Meta(description="Resource class")] = None,
+    parent: Annotated[Union[int, None], Meta(description="Parent resource ID")] = None,
+) -> ResourceWidget:
+    resid = id
+    clsid = cls
+    parent_id = parent
+    suggested_display_name = None
+
+    if operation == "create":
+        if resid is not None or clsid is None or parent_id is None:
+            raise HTTPBadRequest()
+
+        if clsid not in Resource.registry._dict:
+            raise HTTPBadRequest()
+
+        parent = with_polymorphic(Resource, "*").filter_by(id=parent_id).one()
+        owner_user = request.user
+
+        tr = request.localizer.translate
+        obj = Resource.registry[clsid](parent=parent, owner_user=request.user)
+        suggested_display_name = obj.suggest_display_name(tr)
+
+    elif operation in ("update", "delete"):
+        if resid is None or clsid is not None or parent_id is not None:
+            raise HTTPBadRequest()
+
+        obj = with_polymorphic(Resource, "*").filter_by(id=resid).one()
+
+        clsid = obj.cls
+        parent = obj.parent
+        owner_user = obj.owner_user
+
+    else:
+        raise HTTPBadRequest()
+
+    widget = CompositeWidget(operation=operation, obj=obj, request=request)
+    return ResourceWidget(
+        operation=operation,
+        config=widget.config(),
+        id=resid,
+        cls=clsid,
+        parent=parent.id if parent else None,
+        owner_user=owner_user.id,
+        suggested_display_name=suggested_display_name,
+    )
+
+
 # Component settings
 
 ResourceExport = Annotated[
@@ -955,3 +1024,5 @@ def setup_pyramid(comp, config):
         factory=resource_factory,
         overloaded=True,
     )
+
+    config.add_route("resource.widget", "/api/resource/widget", get=widget)

@@ -4,7 +4,7 @@ from dataclasses import dataclass
 import zope.event
 import zope.event.classhandler
 from msgspec import Meta
-from pyramid.httpexceptions import HTTPBadRequest, HTTPFound
+from pyramid.httpexceptions import HTTPFound
 from pyramid.threadlocal import get_current_request
 from sqlalchemy.orm import joinedload, with_polymorphic
 from sqlalchemy.orm.exc import NoResultFound
@@ -26,7 +26,6 @@ from .interface import IResourceBase
 from .model import Resource
 from .permission import Permission, Scope
 from .scope import ResourceScope
-from .widget import CompositeWidget
 
 ResourceID = Annotated[int, Meta(ge=0, description="Resource ID")]
 
@@ -164,27 +163,29 @@ class OnResourceCreateView:
     parent: Resource
 
 
-@viewargs(renderer="composite_widget.mako")
+@viewargs(renderer="react")
 def create(request):
     request.resource_permission(ResourceScope.manage_children)
     cls = request.GET.get("cls")
     zope.event.notify(OnResourceCreateView(cls=cls, parent=request.context))
     return dict(
         obj=request.context,
+        entrypoint="@nextgisweb/resource/composite",
         title=gettext("Create resource"),
         maxheight=True,
-        query=dict(operation="create", cls=cls, parent=request.context.id),
+        props=dict(operation="create", cls=cls, parent=request.context.id),
     )
 
 
-@viewargs(renderer="composite_widget.mako")
+@viewargs(renderer="react")
 def update(request):
     request.resource_permission(ResourceScope.update)
     return dict(
         obj=request.context,
+        entrypoint="@nextgisweb/resource/composite",
         title=gettext("Update resource"),
         maxheight=True,
-        query=dict(operation="update", id=request.context.id),
+        props=dict(operation="update", id=request.context.id),
     )
 
 
@@ -198,52 +199,6 @@ def delete(request):
         title=gettext("Delete resource"),
         obj=request.context,
         maxheight=True,
-    )
-
-
-def widget(request) -> JSONType:
-    operation = request.GET.get("operation", None)
-    resid = request.GET.get("id", None)
-    clsid = request.GET.get("cls", None)
-    parent_id = request.GET.get("parent", None)
-    suggested_display_name = None
-
-    if operation == "create":
-        if resid is not None or clsid is None or parent_id is None:
-            raise HTTPBadRequest()
-
-        if clsid not in Resource.registry._dict:
-            raise HTTPBadRequest()
-
-        parent = with_polymorphic(Resource, "*").filter_by(id=parent_id).one()
-        owner_user = request.user
-
-        tr = request.localizer.translate
-        obj = Resource.registry[clsid](parent=parent, owner_user=request.user)
-        suggested_display_name = obj.suggest_display_name(tr)
-
-    elif operation in ("update", "delete"):
-        if resid is None or clsid is not None or parent_id is not None:
-            raise HTTPBadRequest()
-
-        obj = with_polymorphic(Resource, "*").filter_by(id=resid).one()
-
-        clsid = obj.cls
-        parent = obj.parent
-        owner_user = obj.owner_user
-
-    else:
-        raise HTTPBadRequest()
-
-    widget = CompositeWidget(operation=operation, obj=obj, request=request)
-    return dict(
-        operation=operation,
-        config=widget.config(),
-        id=resid,
-        cls=clsid,
-        parent=parent.id if parent else None,
-        owner_user=owner_user.id,
-        suggested_display_name=suggested_display_name,
     )
 
 
@@ -269,10 +224,7 @@ def creatable_resources(parent, *, user):
     classes = set(
         cls
         for cls in Resource.registry.values()
-        if (
-            cls.identity not in disabled_resource_cls
-            and cls.check_parent(parent)
-        )
+        if (cls.identity not in disabled_resource_cls and cls.check_parent(parent))
     )
 
     if len(classes) == 0:
@@ -347,7 +299,6 @@ def setup_pyramid(comp, config):
 
     _route("schema", "schema", get=schema)
     _route("root", "", get=root)
-    _route("widget", "widget", get=widget)
 
     _resource_route("show", r"{id:uint}", get=show)
     _resource_route("json", r"{id:uint}/json", get=json_view)

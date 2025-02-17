@@ -1,4 +1,4 @@
-import { makeAutoObservable } from "mobx";
+import { makeAutoObservable, runInAction } from "mobx";
 
 import type { EdiTableStore } from "@nextgisweb/gui/edi-table";
 import type { ACLRule, ResourceCls } from "@nextgisweb/resource/type/api";
@@ -40,7 +40,9 @@ export class PermissionsStore implements EdiTableStore<Item> {
 
     get isValid() {
         if (!this.dirty) return true;
-        this.validate = true;
+        runInAction(() => {
+            this.validate = true;
+        });
         return this.items.every((item) => item.error === null);
     }
 

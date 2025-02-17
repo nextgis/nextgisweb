@@ -37,32 +37,29 @@ export function useRouteGet<
     options?: RequestOptions<N, RT>,
     loadOnInit = true
 ) {
-    let endpointName_: N;
-    let params_: GetRouteParam<N> = {
-        ...params,
-    } as GetRouteParam<N>;
-    let options_: RequestOptions<N, RT> = {
-        ...options,
-    };
-    let loadOnInit_: boolean = loadOnInit;
+    let endpointName: N;
+    let mergedParams: GetRouteParam<N>;
+    let mergedOptions: RequestOptions<N, RT>;
+    let shouldLoadOnInit: boolean;
+
     if (typeof nameOrProps === "string") {
-        endpointName_ = nameOrProps;
+        endpointName = nameOrProps;
+        mergedParams = params || ({} as GetRouteParam<N>);
+        mergedOptions = options || ({} as RequestOptions<N, RT>);
+        shouldLoadOnInit = loadOnInit;
     } else {
-        endpointName_ = nameOrProps.name as N;
-        params_ = {
-            ...nameOrProps.params,
-            ...params,
-        } as GetRouteParam<N>;
-        options_ = { ...nameOrProps.options, ...options };
-        loadOnInit_ = nameOrProps.loadOnInit ?? loadOnInit;
+        endpointName = nameOrProps.name as N;
+        mergedParams = { ...nameOrProps.params, ...params } as GetRouteParam<N>;
+        mergedOptions = { ...nameOrProps.options, ...options };
+        shouldLoadOnInit = nameOrProps.loadOnInit ?? loadOnInit;
     }
 
-    const { route, abort } = useRoute<N>(endpointName_, params_);
-    const [isLoading, setIsLoading] = useState(!!loadOnInit_);
+    const { route, abort } = useRoute<N>(endpointName, mergedParams);
+    const [isLoading, setIsLoading] = useState(shouldLoadOnInit);
     const [data, setData] = useState<ResolvedRouteResponse<D, N, RT>>();
     const [error, setError] = useState<ApiError | null>(null);
 
-    const [routerOptions] = useObjectState(options_);
+    const [routerOptions] = useObjectState(mergedOptions);
 
     const refresh = useCallback(async () => {
         abort();

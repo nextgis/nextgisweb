@@ -1,4 +1,4 @@
-import { action, computed, observable } from "mobx";
+import { action, computed, observable, runInAction } from "mobx";
 
 import { mapper } from "@nextgisweb/gui/arm";
 import type {
@@ -32,8 +32,7 @@ const {
 });
 
 export class TmsClientConnectionStore
-    implements
-        EditorStore<ConnectionCreate, ConnectionCreate, ConnectionUpdate>
+    implements EditorStore<ConnectionCreate, ConnectionCreate, ConnectionUpdate>
 {
     readonly identity = "tmsclient_connection";
     readonly operation: Operation;
@@ -74,7 +73,9 @@ export class TmsClientConnectionStore
     }
 
     @computed get isValid(): boolean {
-        this.validate = true;
+        runInAction(() => {
+            this.validate = true;
+        });
         return !this.error;
     }
 }

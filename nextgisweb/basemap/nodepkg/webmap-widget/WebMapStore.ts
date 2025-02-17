@@ -1,8 +1,8 @@
-import { action, computed, observable, observe } from "mobx";
+import { action, computed, observable, observe, runInAction } from "mobx";
 
 import type * as apitype from "@nextgisweb/basemap/type/api";
 import type { FocusTableStore } from "@nextgisweb/gui/focus-table";
-import type { Composite } from "@nextgisweb/resource/type";
+import type { CompositeStore } from "@nextgisweb/resource/composite/CompositeStore";
 import type {
     EditorStore,
     EditorStoreOptions,
@@ -22,7 +22,7 @@ export class WebMapStore
 
     basemaps = observable.array<Basemap>([], { deep: false });
 
-    composite: Composite;
+    composite: CompositeStore;
 
     constructor({ composite }: EditorStoreOptions) {
         this.composite = composite;
@@ -44,7 +44,9 @@ export class WebMapStore
     }
 
     @computed get isValid(): boolean {
-        this.validate = true;
+        runInAction(() => {
+            this.validate = true;
+        });
         return this.basemaps.every((i) => i.error === false);
     }
 

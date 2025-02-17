@@ -152,7 +152,14 @@ export const Widget: EditorWidgetComponent<EditorWidgetProps<Store>> = observer(
     ({ store }) => {
         const [layerOpts, setLayerOpts] = useState<Option[]>();
 
-        const { operation, mode, update, geometryTypeInitial } = store;
+        const {
+            operation,
+            mode,
+            update,
+            geometryTypeInitial,
+            confirmMsg,
+            confirm,
+        } = store;
 
         const modeOpts = useMemo(() => {
             const result: Option<Mode>[] = [];
@@ -167,9 +174,9 @@ export const Widget: EditorWidgetComponent<EditorWidgetProps<Store>> = observer(
                 add("file", gettext("Replace layer features from file"));
                 add("delete", gettext("Delete all features from layer"));
             }
-            update({ mode: result[0].value });
+
             return result;
-        }, [operation, update]);
+        }, [operation]);
 
         const gtypeOpts = useMemo(() => {
             const result: Option<FeaureLayerGeometryType>[] = [];
@@ -256,16 +263,22 @@ export const Widget: EditorWidgetComponent<EditorWidgetProps<Store>> = observer(
             [update]
         );
 
+        const onUploading = useCallback(
+            (value: boolean) => {
+                store.update({ uploading: value });
+            },
+            [store]
+        );
+
         return (
             <div className="ngw-vector-layer-resource-widget">
                 <Select className="mode" options={modeOpts} {...bval("mode")} />
                 {mode === "file" && (
                     <>
                         <FileUploader
+                            fileMeta={store.source ?? undefined}
                             onChange={onFileChange}
-                            onUploading={(value) => {
-                                store.uploading = value;
-                            }}
+                            onUploading={onUploading}
                             afterUpload={[
                                 {
                                     message: msgInspect,
@@ -299,14 +312,14 @@ export const Widget: EditorWidgetComponent<EditorWidgetProps<Store>> = observer(
                         />
                     </>
                 )}
-                {store.confirmMsg && (
+                {confirmMsg && (
                     <Checkbox
-                        checked={store.confirm}
+                        checked={confirm}
                         onChange={({ target: { checked } }) => {
                             update({ confirm: checked });
                         }}
                     >
-                        {store.confirmMsg}
+                        {confirmMsg}
                     </Checkbox>
                 )}
                 {mode === "file" && (
@@ -316,7 +329,7 @@ export const Widget: EditorWidgetComponent<EditorWidgetProps<Store>> = observer(
                             {
                                 key: "default",
                                 label: gettext("Advanced options"),
-                                children: <SourceOptions {...{ store }} />,
+                                children: <SourceOptions store={store} />,
                             },
                         ]}
                     />

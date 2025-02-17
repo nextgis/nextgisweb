@@ -1,5 +1,5 @@
 import { isEqual } from "lodash-es";
-import { action, computed, observable } from "mobx";
+import { action, computed, observable, runInAction } from "mobx";
 
 import { mapper } from "@nextgisweb/gui/arm";
 import type { EditorStore } from "@nextgisweb/resource/type";
@@ -74,7 +74,9 @@ export class WmsClientConnectionStore
     }
 
     @computed get isValid() {
-        this.validate = true;
+        runInAction(() => {
+            this.validate = true;
+        });
         return !this.error;
     }
 }

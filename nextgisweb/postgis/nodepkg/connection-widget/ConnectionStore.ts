@@ -1,4 +1,4 @@
-import { makeObservable } from "mobx";
+import { makeObservable, runInAction } from "mobx";
 
 import { mapper, validate } from "@nextgisweb/gui/arm";
 import type { PostgisConnectionRead } from "@nextgisweb/postgis/type/api";
@@ -68,7 +68,9 @@ export class ConnectionStore implements EditorStore<PostgisConnectionRead> {
     }
 
     get isValid(): boolean {
-        this.validate = true;
+        runInAction(() => {
+            this.validate = true;
+        });
         return error(this) === false;
     }
 }

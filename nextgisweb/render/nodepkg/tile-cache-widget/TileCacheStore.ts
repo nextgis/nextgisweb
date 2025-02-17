@@ -1,4 +1,4 @@
-import { action, computed, observable } from "mobx";
+import { action, computed, observable, runInAction } from "mobx";
 
 import { mapper } from "@nextgisweb/gui/arm";
 import type * as apitype from "@nextgisweb/render/type/api";
@@ -52,7 +52,9 @@ export class TileCacheStore implements EditorStore<Value> {
     }
 
     @computed get isValid() {
-        this.validate = true;
+        runInAction(() => {
+            this.validate = true;
+        });
         return mapperError(this) === false;
     }
 }

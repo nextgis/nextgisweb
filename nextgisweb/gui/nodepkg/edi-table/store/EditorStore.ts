@@ -1,4 +1,4 @@
-import { action, computed, makeObservable, observable } from "mobx";
+import { action, computed, observable, runInAction } from "mobx";
 
 import type { EdiTableStore } from "@nextgisweb/gui/edi-table";
 
@@ -9,67 +9,64 @@ export class EditorStore<V = unknown, D = V>
 {
     identity = "";
 
-    items: RecordItem[] = [];
-    dirty = false;
+    @observable.shallow accessor items: RecordItem[] = [];
+    @observable accessor dirty = false;
 
     constructor() {
-        // Used makeObservable instead makeAutoObservable to be able to extend EditorStore class
-        makeObservable(this, {
-            items: observable,
-            dirty: observable,
-            validate: observable,
-            placeholder: observable,
-            isValid: computed,
-            rows: computed,
-            load: action,
-            dump: action,
-            rotatePlaceholder: action,
-            deleteRow: action,
-            cloneRow: action,
-        });
-
-        this.items = [];
-
         this.rotatePlaceholder();
     }
 
+    @action
     load(value: V) {
         console.log(value);
     }
 
+    @action
     dump(): D | undefined {
         return this.items as D;
     }
 
+    @computed
     get isValid() {
-        this.validate = true;
+        runInAction(() => {
+                    runInAction(() => {
+            this.validate = true;
+        });
+        });
         return this.items.every((r) => r.error === false);
     }
 
     // EdiTable
 
-    validate = false;
-    placeholder: RecordItem | null = null;
+    @observable accessor validate = false;
+    @observable.shallow accessor placeholder: RecordItem | null = null;
 
+    @computed
     get rows() {
         return this.items;
     }
 
+    @action
     setDirty(val: boolean) {
         this.dirty = val;
     }
 
+    @action
     rotatePlaceholder() {
         if (this.placeholder && !this.placeholder.key) return;
-        this.placeholder && this.items.push(this.placeholder);
+        if (this.placeholder) {
+            this.items.push(this.placeholder);
+        }
         this.placeholder = new RecordItem(this, { key: "", value: undefined });
     }
 
+    @action
     deleteRow(row: RecordItem) {
         this.rows.splice(this.rows.indexOf(row), 1);
         this.dirty = true;
     }
 
+    @action
     cloneRow(row: RecordItem) {
         const idx = this.items.indexOf(row);
         const data = { key: row.key, value: row.value };

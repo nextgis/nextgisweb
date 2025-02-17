@@ -1,5 +1,5 @@
 import { isEqual } from "lodash-es";
-import { action, computed, observable } from "mobx";
+import { action, computed, observable, runInAction } from "mobx";
 
 import type {
     BasemapLayerCreate,
@@ -66,7 +66,9 @@ export class LayerStore
     }
 
     @computed get isValid() {
-        this.validate = true;
+        runInAction(() => {
+            this.validate = true;
+        });
         return !mapperError(this);
     }
 }

@@ -1,4 +1,4 @@
-import { action, computed, observable, observe } from "mobx";
+import { action, computed, observable, observe, runInAction } from "mobx";
 
 import type { FocusTableStore } from "@nextgisweb/gui/focus-table";
 import type * as apitype from "@nextgisweb/ogcfserver/type/api";
@@ -48,7 +48,9 @@ export class ServiceStore
     }
 
     @computed get isValid(): boolean {
-        this.validate = true;
+        runInAction(() => {
+            this.validate = true;
+        });
         return this.collections.every((i) => i.error === false);
     }
 

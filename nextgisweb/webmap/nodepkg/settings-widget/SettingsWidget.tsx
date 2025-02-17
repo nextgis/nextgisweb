@@ -50,7 +50,9 @@ export const SettingsWidget: EditorWidgetComponent<
         <Area pad cols={["1fr", "1fr"]}>
             <Lot row label={msgInitExtent} help={msgInitExtentHelp}>
                 <ExtentRow
-                    pickerOptions={{ parentId: store.composite.parent }}
+                    pickerOptions={{
+                        parentId: store.composite.parent || undefined,
+                    }}
                     value={store.extent}
                     onChange={(value) => {
                         store.setExtent(value);
@@ -59,7 +61,9 @@ export const SettingsWidget: EditorWidgetComponent<
             </Lot>
             <Lot row label={msgConstrExtent} help={msgConstrExtentHelp}>
                 <ExtentRow
-                    pickerOptions={{ parentId: store.composite.parent }}
+                    pickerOptions={{
+                        parentId: store.composite.parent ?? undefined,
+                    }}
                     value={store.extentConst}
                     onChange={(value) => {
                         store.setConstrainedExtent(value);

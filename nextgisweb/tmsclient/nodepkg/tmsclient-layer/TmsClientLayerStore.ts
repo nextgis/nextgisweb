@@ -1,4 +1,4 @@
-import { action, computed, observable } from "mobx";
+import { action, computed, observable, runInAction } from "mobx";
 
 import { mapper } from "@nextgisweb/gui/arm";
 import srsSettings from "@nextgisweb/pyramid/settings!spatial_ref_sys";
@@ -119,7 +119,9 @@ export class TmsClientLayerStore
     }
 
     @computed get isValid(): boolean {
-        this.validate = true;
+        runInAction(() => {
+            this.validate = true;
+        });
         return !this.error;
     }
 }

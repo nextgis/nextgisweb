@@ -1,5 +1,5 @@
 import { difference } from "lodash-es";
-import { makeObservable, observable, observe } from "mobx";
+import { makeObservable, observable, observe, runInAction } from "mobx";
 
 import { mapper, validate } from "@nextgisweb/gui/arm";
 import type { ErrorResult } from "@nextgisweb/gui/arm";
@@ -130,7 +130,9 @@ export class FieldsStore implements EditorStore<Value>, FocusTableStore<Field> {
     }
 
     get isValid(): boolean {
-        this.validate = true;
+        runInAction(() => {
+            this.validate = true;
+        });
         return this.fields.every((i) => i.error === false);
     }
 

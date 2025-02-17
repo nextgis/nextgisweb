@@ -68,7 +68,7 @@ export const ServiceWidget: EditorWidgetComponent<
     const { makeSignal } = useAbortController();
 
     const { pickToFocusTable } = useFocusTablePicker({
-        initParentId: store.composite.parent,
+        initParentId: store.composite.parent ?? undefined,
     });
 
     const { tableActions, itemActions } = useMemo<

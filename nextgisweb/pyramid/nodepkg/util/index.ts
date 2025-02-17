@@ -1,4 +1,3 @@
-/** @entrypoint */
 import { RequestQueue } from "./queue";
 
 export { tileLoadFunction } from "./tileLoadFunction";

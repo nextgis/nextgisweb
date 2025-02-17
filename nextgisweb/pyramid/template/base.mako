@@ -131,7 +131,7 @@
                         </h1>
 
                         %if hasattr(next, 'body'):
-                            <div id="content" class="content">
+                            <div id="content" class="content" style="width: 100%">
                                 ${next.body()}
                             </div>
                         %endif

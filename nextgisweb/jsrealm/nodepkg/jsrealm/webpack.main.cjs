@@ -355,7 +355,7 @@ const webpackAssetsManifestPlugin = new WebpackAssetsManifest({
 const ngwCompRegExp = new RegExp("/(?:nextgisweb(?:_\\w+)?/)(\\w+)/nodepkg(?:$|/)");
 
 /* Does the module name belongs to an external or legacy AMD? */ /* prettier-ignore */
-const extOrLegacyRegExp = new RegExp(`^(((${config.externals.join("|")})(/|$))|ngw-)`);
+const extOrLegacyRegExp = new RegExp(`^(((${config.externals.join("|")})(/|$)))`);
 
 /** @type {import("webpack").Configuration} */
 const webpackConfig = defaults("main", (env) => ({

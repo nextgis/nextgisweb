@@ -25,7 +25,7 @@ export const Widget: EditorWidgetComponent<EditorWidgetProps<Store>> = observer(
                         store.update({ source: value });
                     }}
                     onUploading={(value) => {
-                        store.uploading = value;
+                        store.update({ uploading: value });
                     }}
                     showMaxSize
                     {...uploaderMessages}
@@ -35,5 +35,6 @@ export const Widget: EditorWidgetComponent<EditorWidgetProps<Store>> = observer(
     }
 );
 
+Widget.displayName = "Widget";
 Widget.title = gettext("Tileset");
 Widget.activateOn = { create: true };

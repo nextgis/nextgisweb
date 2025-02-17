@@ -1,4 +1,4 @@
-import { action, computed, observable } from "mobx";
+import { action, computed, observable, runInAction } from "mobx";
 
 import { mapper, validate } from "@nextgisweb/gui/arm";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -107,7 +107,9 @@ export class WfsClientLayerStore
     }
 
     @computed get isValid(): boolean {
-        this.validate = true;
+        runInAction(() => {
+            this.validate = true;
+        });
         return !error(this);
     }
 }

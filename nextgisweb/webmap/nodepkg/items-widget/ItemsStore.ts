@@ -1,4 +1,4 @@
-import { action, computed, observable } from "mobx";
+import { action, computed, observable, runInAction } from "mobx";
 import type { IObservableArray } from "mobx";
 
 import { mapper } from "@nextgisweb/gui/arm";
@@ -73,7 +73,9 @@ export class ItemsStore
     }
 
     @computed get isValid(): boolean {
-        this.validate = true;
+        runInAction(() => {
+            this.validate = true;
+        });
         return this.items.every((i) => {
             return i.error === false;
         });

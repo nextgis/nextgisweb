@@ -63,7 +63,7 @@ export const ServiceWidget: EditorWidgetComponent<
     EditorWidgetProps<ServiceStore>
 > = observer(({ store }: EditorWidgetProps<ServiceStore>) => {
     const { pickToFocusTable } = useFocusTablePicker({
-        initParentId: store.composite.parent,
+        initParentId: store.composite.parent || undefined,
     });
 
     const { tableActions, itemActions } = useMemo<

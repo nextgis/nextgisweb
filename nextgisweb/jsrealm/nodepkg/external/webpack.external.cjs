@@ -43,23 +43,9 @@ function addPackage(name, options) {
     copyPatterns.push(options);
 }
 
-for (const pkg of ["dojo", "dijit"]) {
-    addPackage(pkg, {
-        globOptions: {
-            ignore: [
-                "**/tests/**",
-                "**/testsDOH/**",
-                "**/demos/**",
-                "**/themes/(nihilo|soria|tundra|iphone)/**",
-            ],
-        },
-    });
-}
-
-addPackage("xstyle", {
-    globOptions: {
-        ignore: ["**/test/**"],
-    },
+// We still use Dojo's AMD loader
+addPackage("dojo", {
+    from: "dojo.js",
 });
 
 addPackage("mocha", {

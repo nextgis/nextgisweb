@@ -1,4 +1,4 @@
-import { makeObservable } from "mobx";
+import { action, computed, observable, runInAction } from "mobx";
 
 import { mapper, validate } from "@nextgisweb/gui/arm";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -55,8 +55,8 @@ export class LayerStore implements EditorStore<Value> {
     readonly identity = "postgis_layer";
     readonly operation: Operation;
 
-    dirty = false;
-    validate = false;
+    @observable accessor dirty = false;
+    @observable accessor validate = false;
 
     connection = connection.init(null, this);
     schema = schema.init("", this);
@@ -72,15 +72,9 @@ export class LayerStore implements EditorStore<Value> {
     constructor({ operation, composite }: EditorStoreOptions) {
         this.operation = operation;
         this.composite = composite;
-        makeObservable(this, {
-            dirty: true,
-            validate: true,
-            load: true,
-            markDirty: true,
-            isValid: true,
-        });
     }
 
+    @action
     load(value: Value) {
         load(this, value);
         this.fields.value = "keep";
@@ -104,12 +98,18 @@ export class LayerStore implements EditorStore<Value> {
         };
     }
 
+    @action
     markDirty() {
         this.dirty = true;
     }
 
+    @computed
     get isValid(): boolean {
-        this.validate = true;
+        runInAction(() => {
+            runInAction(() => {
+                this.validate = true;
+            });
+        });
         return error(this) === false;
     }
 }

@@ -155,7 +155,7 @@ export const ItemsWidget: EditorWidgetComponent<EditorWidgetProps<ItemsStore>> =
         const [drawOrderEdit, setDrawOrderEdit] = useState(false);
 
         const { pickToFocusTable } = useFocusTablePicker({
-            initParentId: store.composite.parent,
+            initParentId: store.composite.parent || undefined,
         });
 
         const drawOrderEnabled = store.drawOrderEnabled.value;
