@@ -140,8 +140,8 @@ export class CompositeStore {
     async dump(
         lunkwill: LunkwillParam
     ): Promise<CompositeCreate | CompositeUpdate> {
-        if (!this.members || this.parent === null) {
-            throw new Error("");
+        if (!this.members) {
+            throw new Error("The Store is not loaded yet");
         }
 
         const data: CompositeCreate | CompositeUpdate = { resource: {} };
@@ -150,7 +150,10 @@ export class CompositeStore {
             if (this.cls) {
                 (data as CompositeCreate).resource.cls = this.cls;
             }
-            (data as CompositeCreate).resource.parent = { id: this.parent };
+
+            if (this.parent !== null) {
+                (data as CompositeCreate).resource.parent = { id: this.parent };
+            }
         }
 
         for (const member of this.members) {
