@@ -1,3 +1,4 @@
+import { get, set } from "lodash-es";
 import { action, computed, observable, reaction, runInAction } from "mobx";
 
 import entrypoint from "@nextgisweb/jsrealm/entrypoint";
@@ -26,7 +27,6 @@ import type {
 } from "../type";
 
 import type { CompositeWidgetProps } from "./CompositeWidget";
-import { getValueByPath, setValueByPath } from "./util/objUtil";
 
 interface WidgetEntrypoint<S extends EditorStore = EditorStore> {
     store: new (args: EditorStoreOptions) => S;
@@ -54,7 +54,7 @@ export class CompositeStore {
     @observable accessor validate = false;
 
     @observable accessor membersLoading = false;
-    @observable accessor members: WidgetMember[] | null = null;
+    @observable.shallow accessor members: WidgetMember[] | null = null;
     @observable accessor saving = false;
 
     constructor({ id, cls, operation, parent }: CompositeWidgetProps) {
@@ -158,9 +158,9 @@ export class CompositeStore {
             if (identity) {
                 const result = await member.store.dump({ lunkwill });
                 if (result !== undefined) {
-                    const current = getValueByPath(data, identity);
+                    const current = get(data, identity);
                     if (current !== undefined) Object.assign(result, current);
-                    setValueByPath(data, identity, result);
+                    set(data, identity, result);
                 }
             }
         }
@@ -171,7 +171,7 @@ export class CompositeStore {
         if (this.members) {
             for (const member of this.members) {
                 const identity = member.store.identity;
-                member.store.load(getValueByPath(data, identity));
+                member.store.load(get(data, identity));
             }
         }
     }
