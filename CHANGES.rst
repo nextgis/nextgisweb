@@ -10,6 +10,15 @@ Changes
 - Enhanced support for JSON output format in the WMS services.
 - Enhanced resource deletion confirmation with details of resources to delete.
 - Identification panel is enabled by default.
+- Webmap migrated to React with many new features.
+- On-demand webmap legend symbol loading, optimizing opening time.
+- Experimental support for Python 3.10.
+- Improved handling of `fid` fields in feature layers.
+- Extended resource search HTTP API.
+- New feature display page and modal dialog displaying geometries.
+- Resource editing interface finally migrated to React.
+- All legacy AMD modules migrated to TypeScript and Dojo dependency removed.
+
 
 4.9.0
 -----
