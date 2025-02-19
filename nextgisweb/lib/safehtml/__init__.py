@@ -1,28 +1,27 @@
-from lxml.etree import tounicode
-from lxml.html import document_fromstring
-from lxml.html.clean import Cleaner
+from copy import deepcopy
 
-_cleaner = Cleaner(style=True)
+import nh3
+from lxml.html import document_fromstring
+
+url_schemes = nh3.ALLOWED_URL_SCHEMES | {"data"}
+attributes = deepcopy(nh3.ALLOWED_ATTRIBUTES)
+attributes["*"] = {"class"}
 
 
 def sanitize(text, *, validate=False):
     if text is None:
         return None
 
-    # LXML should handle anything without exceptions
-    doc = document_fromstring("<html><body>" + text + "</body></html>")
-    cleaned = _cleaner.clean_html(doc)
+    cleaned = nh3.clean(text, link_rel=None, attributes=attributes, url_schemes=url_schemes)
 
     if validate:
-        if not compare(doc.body, cleaned.body):
+        # LXML should handle anything without exceptions
+        doc = document_fromstring("<html><body>" + text + "</body></html>")
+        doc_cleaned = document_fromstring("<html><body>" + cleaned + "</body></html>")
+        if not compare(doc.body, doc_cleaned.body):
             raise ValueError
 
-    outbody = cleaned.body
-    return (
-        (outbody.text if outbody.text is not None else "")
-        + "".join(tounicode(el, method="html") for el in outbody)
-        + (outbody.tail if outbody.tail is not None else "")
-    )
+    return cleaned
 
 
 def compare(a, b):
