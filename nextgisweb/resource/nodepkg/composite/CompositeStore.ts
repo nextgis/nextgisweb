@@ -1,5 +1,12 @@
 import { get, set } from "lodash-es";
-import { action, computed, observable, reaction, runInAction } from "mobx";
+import {
+    action,
+    computed,
+    isObservableProp,
+    observable,
+    reaction,
+    runInAction,
+} from "mobx";
 
 import entrypoint from "@nextgisweb/jsrealm/entrypoint";
 import {
@@ -132,6 +139,17 @@ export class CompositeStore {
     }
 
     @computed
+    get dirty(): boolean {
+        if (!this.members) {
+            return false;
+        } else {
+            return this.members.some(({ store }) =>
+                store.dirty !== undefined ? store.dirty : false
+            );
+        }
+    }
+
+    @computed
     get isValid(): boolean {
         if (!this.validate) return true;
         return this.members?.every((member) => member.store.isValid) ?? true;
@@ -214,6 +232,12 @@ export class CompositeStore {
                     operation: this.operation,
                     ...params,
                 });
+
+                if (!isObservableProp(widgetStore, "dirty")) {
+                    console.warn(
+                        `Missing 'dirty' observable in '${moduleName}' store!`
+                    );
+                }
 
                 return { ...member, key: moduleName, store: widgetStore };
             })

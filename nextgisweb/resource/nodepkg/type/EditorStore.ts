@@ -25,6 +25,8 @@ export interface EditorStore<READ = any, CREATE = READ, UPDATE = CREATE> {
 
     dump: (val: DumpParams) => CREATE | UPDATE | undefined;
 
+    dirty?: boolean;
+
     isValid?: boolean;
 
     validate?: boolean;

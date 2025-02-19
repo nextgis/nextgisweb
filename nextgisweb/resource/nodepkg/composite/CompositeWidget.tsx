@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { TabLabel } from "@nextgisweb/feature-layer/feature-editor/component/TabLabel";
 import { ActionToolbar } from "@nextgisweb/gui/action-toolbar";
@@ -10,7 +10,7 @@ import type {
 import { Button, Spin, Tabs } from "@nextgisweb/gui/antd";
 import { SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
-import { useThemeVariables } from "@nextgisweb/gui/hook";
+import { useThemeVariables, useUnsavedChanges } from "@nextgisweb/gui/hook";
 import type { ParamOf } from "@nextgisweb/gui/type";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -51,18 +51,6 @@ const operationMsg: Record<ResourceWidget["operation"], string> = {
     read: gettext("Read"),
 };
 
-function goToResource(id: number, edit = false) {
-    if (edit) {
-        window.location.href = route("resource.update", {
-            id,
-        }).url();
-    } else {
-        window.location.href = route("resource.show", {
-            id,
-        }).url();
-    }
-}
-
 // prettier-ignore
 const msgSaving = gettext("Please wait. Processing request...")
 
@@ -72,7 +60,9 @@ const CompositeWidget = observer(
         const [composite] = useState(
             () => new CompositeStore({ cls, operation, parent, id })
         );
-        const { validate, members, saving } = composite;
+
+        const { validate, members, dirty, saving } = composite;
+        const { disable: disableUnsavedChanges } = useUnsavedChanges({ dirty });
 
         const items = useMemo<TabItem[]>(() => {
             if (members) {
@@ -81,6 +71,12 @@ const CompositeWidget = observer(
                         const ObserverTableLabel = observer(() => (
                             <TabLabel
                                 isValid={validate ? store.isValid : true}
+                                // Do not show dirty mark until every widget store isDirty work correctly
+                                // dirty={
+                                //     operation === "update"
+                                //         ? (store.dirty ?? undefined)
+                                //         : undefined
+                                // }
                                 label={Widget.title}
                             />
                         ));
@@ -116,6 +112,22 @@ const CompositeWidget = observer(
         useEffect(() => {
             composite.init();
         }, [composite]);
+
+        const goToResource = useCallback(
+            (id: number, edit = false) => {
+                disableUnsavedChanges();
+                if (edit) {
+                    window.location.href = route("resource.update", {
+                        id,
+                    }).url();
+                } else {
+                    window.location.href = route("resource.show", {
+                        id,
+                    }).url();
+                }
+            },
+            [disableUnsavedChanges]
+        );
 
         const toolbarProps: Partial<ActionToolbarProps> = useMemo(() => {
             const actions: ActionToolbarAction[] = [
@@ -177,7 +189,7 @@ const CompositeWidget = observer(
                 actions,
                 rightActions,
             };
-        }, [saving, composite, operation]);
+        }, [saving, operation, composite, goToResource]);
 
         const themeVariables = useThemeVariables({
             "color-border-secondary": "colorBorderSecondary",

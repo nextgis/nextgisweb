@@ -1,22 +1,46 @@
-import { useEffect } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface UseUnsavedChangesProps {
     dirty: boolean;
+    initiallyEnabled?: boolean;
 }
 
-export function useUnsavedChanges({ dirty }: UseUnsavedChangesProps) {
+export function useUnsavedChanges({
+    dirty,
+    initiallyEnabled = true,
+}: UseUnsavedChangesProps) {
+    const [enabled, setEnabled] = useState(initiallyEnabled);
+    const stateRef = useRef({ dirty, enabled });
+
     useEffect(() => {
-        const alertUnsaved = (event: BeforeUnloadEvent) => {
-            if (dirty) {
-                event.preventDefault();
-                event.returnValue = "";
-            }
-        };
+        stateRef.current = { dirty, enabled };
+    }, [dirty, enabled]);
 
+    const alertUnsaved = useCallback((event: BeforeUnloadEvent) => {
+        if (stateRef.current.dirty && stateRef.current.enabled) {
+            event.preventDefault();
+            event.returnValue = "";
+        }
+    }, []);
+
+    useEffect(() => {
         window.addEventListener("beforeunload", alertUnsaved);
-
         return () => {
             window.removeEventListener("beforeunload", alertUnsaved);
         };
-    }, [dirty]);
+    }, [alertUnsaved]);
+
+    const enable = useCallback(() => {
+        if (!stateRef.current.enabled) {
+            window.addEventListener("beforeunload", alertUnsaved);
+        }
+        setEnabled(true);
+    }, [alertUnsaved]);
+
+    const disable = useCallback(() => {
+        setEnabled(false);
+        window.removeEventListener("beforeunload", alertUnsaved);
+    }, [alertUnsaved]);
+
+    return { enable, disable };
 }

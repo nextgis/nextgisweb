@@ -1,4 +1,3 @@
-import { some } from "lodash-es";
 import { action, computed, observable, toJS } from "mobx";
 
 import type { FeatureItemExtensions } from "@nextgisweb/feature-layer/type";
@@ -71,7 +70,7 @@ export class FeatureEditorStore {
             if (this._attributeStore) stores.push(this._attributeStore);
             stores.push(...Object.values(this._extensionStores));
 
-            return some(stores, ({ dirty }) => dirty);
+            return stores.some(({ dirty }) => dirty);
         }
         return true;
     }

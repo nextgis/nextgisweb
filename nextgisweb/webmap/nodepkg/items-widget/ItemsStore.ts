@@ -42,6 +42,8 @@ export class ItemsStore
 
     composite: Composite;
 
+    private _loaded = false;
+
     constructor({ composite }: EditorStoreOptions) {
         this.composite = composite;
     }
@@ -55,6 +57,7 @@ export class ItemsStore
                     : new Layer(this, item)
             )
         );
+        this._loaded = true;
     }
 
     dump(): PickMy<WebMapUpdate> | undefined {
@@ -69,7 +72,9 @@ export class ItemsStore
     }
 
     @action markDirty() {
-        this.dirty = true;
+        if (this._loaded) {
+            this.dirty = true;
+        }
     }
 
     @computed get isValid(): boolean {

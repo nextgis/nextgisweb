@@ -1,5 +1,5 @@
 import { isEqual } from "lodash-es";
-import { makeAutoObservable, toJS } from "mobx";
+import { action, computed, observable, toJS } from "mobx";
 
 import type { ExtentRowValue } from "@nextgisweb/gui/component";
 import type {
@@ -8,13 +8,18 @@ import type {
 } from "@nextgisweb/resource/type";
 import type { Composite } from "@nextgisweb/resource/type/Composite";
 import type { ResourceRef } from "@nextgisweb/resource/type/api";
-import type * as apitype from "@nextgisweb/webmap/type/api";
+import type {
+    ExtentWSEN,
+    WebMapRead,
+    WebMapUpdate,
+} from "@nextgisweb/webmap/type/api";
 
 type WithoutItems<T> = Omit<T, "root_item" | "draw_order_enabled">;
+type AnnotationDefault = WebMapRead["annotation_default"];
 
 function convertExtentToArray(
     extent: ExtentRowValue
-): apitype.ExtentWSEN | null | undefined {
+): ExtentWSEN | null | undefined {
     const { left, bottom, right, top } = extent;
 
     if (
@@ -25,7 +30,7 @@ function convertExtentToArray(
         return null;
     }
 
-    return [left, bottom, right, top] as apitype.ExtentWSEN;
+    return [left, bottom, right, top] as ExtentWSEN;
 }
 
 function extractExtent(
@@ -40,46 +45,41 @@ function extractExtent(
 }
 
 export class SettingStore
-    implements
-        EditorStore<apitype.WebMapRead, WithoutItems<apitype.WebMapUpdate>>
+    implements EditorStore<WebMapRead, WithoutItems<WebMapUpdate>>
 {
     readonly identity = "webmap";
     readonly composite: Composite;
 
-    editable = false;
-    annotationEnabled = false;
-    annotationDefault: apitype.WebMapRead["annotation_default"] = "no";
-    legendSymbols: apitype.WebMapRead["legend_symbols"] = null;
-    measureSrs: null | number = null;
-    extent: ExtentRowValue = {
+    @observable accessor editable = false;
+    @observable accessor annotationEnabled = false;
+    @observable accessor annotationDefault: AnnotationDefault = "no";
+    @observable accessor legendSymbols: WebMapRead["legend_symbols"] = null;
+    @observable accessor measureSrs: null | number = null;
+    @observable.shallow accessor extent: ExtentRowValue = {
         left: -180,
         right: 180,
         bottom: -90,
         top: 90,
     };
-    extentConst: ExtentRowValue = {
+    @observable.shallow accessor extentConst: ExtentRowValue = {
         left: null,
         right: null,
         bottom: null,
         top: null,
     };
-    title: string | null = null;
-    bookmarkResource?: ResourceRef | null = null;
+    @observable accessor title: string | null = null;
+    @observable accessor bookmarkResource: ResourceRef | null = null;
 
-    private _initValue: Partial<WithoutItems<apitype.WebMapRead>> = {
+    private _initValue: Partial<WithoutItems<WebMapRead>> = {
         initial_extent: [-90, -180, 180, 90],
     };
 
     constructor({ composite }: EditorStoreOptions) {
         this.composite = composite;
-
-        makeAutoObservable<SettingStore, "_initValue">(this, {
-            identity: false,
-            _initValue: false,
-        });
     }
 
-    load(val: apitype.WebMapRead) {
+    @action
+    load(val: WebMapRead) {
         const { root_item, draw_order_enabled, ...value } = val;
         this._initValue = value;
         this.editable = value.editable;
@@ -93,7 +93,8 @@ export class SettingStore
         this.bookmarkResource = value.bookmark_resource;
     }
 
-    get deserializeValue(): WithoutItems<apitype.WebMapUpdate> {
+    @computed
+    get deserializeValue(): WithoutItems<WebMapUpdate> {
         return toJS({
             editable: this.editable,
             annotation_enabled: this.annotationEnabled,
@@ -111,38 +112,57 @@ export class SettingStore
         return this.dirty ? this.deserializeValue : undefined;
     }
 
+    @computed
     get isValid() {
         return true;
     }
 
+    @computed
     get dirty(): boolean {
         if (this.deserializeValue && this._initValue) {
-            const { measure_srs, ...value } = this.deserializeValue;
-            const { measure_srs: measure_srs_init, ...initValue } =
-                this._initValue;
-            if (value && initValue) {
-                const isValuesEqual = !isEqual(
-                    { measureSrsId: measure_srs_init?.id, ...value },
-                    { measureSrsId: measure_srs?.id, ...initValue }
-                );
-                return isValuesEqual;
-            }
+            const deserialized = this.deserializeValue;
+            const initValueFiltered = Object.keys(deserialized).reduce(
+                (acc, key) => {
+                    if (key in this._initValue) {
+                        const value =
+                            this._initValue[
+                                key as keyof WithoutItems<WebMapRead>
+                            ];
+                        (acc as Record<string, unknown>)[key] = value;
+                    }
+                    return acc;
+                },
+                {} as Partial<WithoutItems<WebMapRead>>
+            );
+
+            const isValuesEqual = !isEqual(
+                {
+                    ...deserialized,
+                    measure_srs: deserialized.measure_srs?.id,
+                },
+                {
+                    ...initValueFiltered,
+                    measure_srs: initValueFiltered.measure_srs?.id,
+                }
+            );
+
+            return isValuesEqual;
         }
         return false;
     }
 
+    @action
     setExtent(value: ExtentRowValue) {
         this.extent = value;
     }
 
+    @action
     setConstrainedExtent(value: ExtentRowValue) {
         this.extentConst = value;
     }
 
+    @action
     update(source: Partial<this>) {
-        Object.entries(source).forEach(
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            ([key, value]) => ((this as any)[key] = value)
-        );
+        Object.assign(this, source);
     }
 }
