@@ -357,8 +357,8 @@ def _get_feature_info(obj, params, request):
         raise ValidationError(message="CRS/SRS parameter required.")
     p_info_format = params.get("INFO_FORMAT", "text/html")
 
-    p_x = float(params.get("X"))
-    p_y = float(params.get("Y"))
+    p_x = float(params.get("X", params.get("I")))
+    p_y = float(params.get("Y", params.get("J")))
     p_query_layers = params.get("QUERY_LAYERS").split(",")
     p_feature_count = int(params.get("FEATURE_COUNT", GFI_FEATURE_COUNT))
 
