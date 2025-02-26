@@ -48,7 +48,9 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({
     >(initialValues?.address_geocoder || "nominatim");
 
     const onValuesChange = (allValues: WebMapCSettingsUpdate) => {
-        setGeocoder(allValues.address_geocoder);
+        if ("address_geocoder" in allValues) {
+            setGeocoder(allValues.address_geocoder);
+        }
     };
 
     return (

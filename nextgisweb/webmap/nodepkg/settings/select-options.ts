@@ -1,6 +1,8 @@
+import type { SelectProps } from "antd";
+
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-export const UnitsLengthOptions = [
+export const UnitsLengthOptions: SelectProps["options"] = [
     {
         label: gettext("Meters"),
         value: "m",
@@ -27,7 +29,7 @@ export const UnitsLengthOptions = [
     },
 ];
 
-export const UnitsAreaOptions = [
+export const UnitsAreaOptions: SelectProps["options"] = [
     {
         label: gettext("Sq. meters"),
         value: "sq_m",
@@ -62,7 +64,7 @@ export const UnitsAreaOptions = [
     },
 ];
 
-export const DegreeFormatOptions = [
+export const DegreeFormatOptions: SelectProps["options"] = [
     {
         label: gettext("Decimal degrees"),
         value: "dd",
@@ -77,7 +79,7 @@ export const DegreeFormatOptions = [
     },
 ];
 
-export const AddressGeocoderOptions = [
+export const AddressGeocoderOptions: SelectProps["options"] = [
     {
         label: gettext("Nominatim (OSM)"),
         value: "nominatim",
@@ -88,7 +90,7 @@ export const AddressGeocoderOptions = [
     },
 ];
 
-export const LegendEnabledOptions = [
+export const LegendEnabledOptions: SelectProps["options"] = [
     { value: "default", label: gettext("Default") },
     { value: "expand", label: gettext("Expand") },
     { value: "collapse", label: gettext("Collapse") },
