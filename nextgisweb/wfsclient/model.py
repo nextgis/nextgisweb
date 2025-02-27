@@ -202,10 +202,12 @@ class WFSConnection(Base, Resource):
             if find_tags(el, "NoCRS"):
                 continue
 
-            srid = get_srid(find_tags(el, "DefaultCRS")[0].text)
+            _default = find_tags(el, "DefaultCRS")
+            if len(_default) < 1:
+                continue
 
-            is_supported = isinstance(srid, int)
-            if not is_supported:
+            srid = get_srid(_default[0].text)
+            if not isinstance(srid, int):
                 continue
 
             el_bbox = find_tags(el, "WGS84BoundingBox")[0]
