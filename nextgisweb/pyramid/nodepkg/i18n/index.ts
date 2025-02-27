@@ -1,18 +1,4 @@
-/** @entrypoint */
-import { callingComponent } from "../util/loader";
-
 import { domain } from "./gettext";
-
-export const normalize = callingComponent;
-export function load(
-    component: string,
-    require: unknown,
-    load: { (module: unknown): unknown }
-) {
-    const gettext = domain(component);
-    const module = { ...gettext };
-    load({ _esModule: true, default: module, ...module });
-}
 
 // Only for types, replaced by loader at runtime
 const fake = domain("");

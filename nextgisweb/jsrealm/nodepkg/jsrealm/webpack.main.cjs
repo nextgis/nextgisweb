@@ -14,7 +14,7 @@ const iconUtil = require("./icon/util.cjs");
 const tagParser = require("./tag-parser.cjs");
 const defaults = require("./webpack/defaults.cjs");
 const fontWeightFix = require("./webpack/font-weight-fix.cjs");
-const { injectCode, stripIndex, virtualImport } = require("./webpack/util.cjs");
+const { injectCode, stripIndex } = require("./webpack/util.cjs");
 
 // Inject the following construction into each entrypoint module
 // at compilation time:
@@ -216,6 +216,29 @@ const registryResolver = {
                 }
             }
         });
+
+        // Redirect @nexgisweb/pyramid/i18n with component specific
+        // @nextgisweb/jsrealm/i18n/comp/* implementations.
+        resolver.getHook("beforeResolve").tap("PyramidI18nHook", (obj) => {
+            if (!obj.context.issuer) return;
+
+            let match = false;
+            if (obj.request === "@nextgisweb/pyramid/i18n") {
+                match = true;
+            } else if (
+                obj.request.startsWith(".") &&
+                obj.request.endsWith("/i18n")
+            ) {
+                const joined = path.join(obj.path, obj.request);
+                match = joined.endsWith("/nextgisweb/pyramid/nodepkg/i18n");
+            }
+            if (match) {
+                const comp = config.pathToComponent(obj.path);
+                if (comp) {
+                    obj.request = `@nextgisweb/jsrealm/i18n/comp/${comp}.inc`;
+                }
+            }
+        });
     },
 };
 
@@ -267,13 +290,31 @@ function lookupLocale(key, map) {
 const antdLocales = scanLocales("antd", "es");
 const dayjsLocales = scanLocales("dayjs");
 
-const localeOutDir = path.resolve(
-    require.resolve("@nextgisweb/jsrealm/locale-loader"),
-    "../locale"
-);
+const jsrealmPackageJson = require.resolve("@nextgisweb/jsrealm/package.json");
+const i18nCompDir = path.resolve(jsrealmPackageJson, "../i18n/comp");
+const i18nLangDir = path.resolve(jsrealmPackageJson, "../i18n/lang");
+
+const gettextReexport = [];
+for (const p of ["", "n", "p", "np"]) {
+    for (const s of ["", "f"]) {
+        gettextReexport.push(`${p}gettext${s}`);
+    }
+}
+
+for (const comp of Object.keys(config.env.components)) {
+    const code = [
+        'import { domain as domainFactory } from "@nextgisweb/pyramid/i18n/gettext";\n',
+        `const domain = domainFactory("${comp}");\n`,
+        "export const {",
+        ...gettextReexport.map((i) => `    ${i},`),
+        "} = domain;\n",
+        "export default domain;",
+    ];
+    const fn = path.join(i18nCompDir, `${comp}.inc.ts`);
+    fs.writeFileSync(fn, code.join("\n") + "\n");
+}
 
 for (const { code: lang, nplurals, plural } of config.i18n.languages) {
-    const entry = `@nextgisweb/jsrealm/locale/${lang}`;
     const antd = lookupLocale(lang, antdLocales);
     const dayjs = lookupLocale(lang, dayjsLocales);
 
@@ -286,19 +327,20 @@ for (const { code: lang, nplurals, plural } of config.i18n.languages) {
         pofiles.push(...glob.sync(config.i18n.external + `/*/*/${lang}.po`));
 
     const code = [
-        withChunks(entry),
-        `ngwConfig.plurals = [${nplurals}, n => Number(${plural})];`,
-        `export { default as antd } from "${antd.filename}";`,
+        "/* eslint-disable eqeqeq */",
+        "/* eslint-disable @typescript-eslint/no-unused-vars */",
+        "/* eslint-disable prettier/prettier */",
+        `import { default as antd } from "${antd.filename}";`,
         `import dayjs from "@nextgisweb/gui/dayjs";`,
-        `import "${dayjs.filename}";`,
-        `dayjs.locale('${dayjs.original}');`,
-    ].concat(pofiles.map((fn) => `import "${path.resolve(fn)}";`));
-
-    const fn = path.join(localeOutDir, lang + ".js");
-    staticEntries[entry] = {
-        import: virtualImport(fn, code, entry),
-        library: { type: "amd", name: entry },
-    };
+        `import "${dayjs.filename}";\n`,
+        ...pofiles.map((fn) => `import "${path.resolve(fn)}";`),
+        "",
+        `dayjs.locale("${dayjs.original}");`,
+        `ngwConfig.plurals = [${nplurals}, (n) => Number(${plural})];`,
+        "export { antd }",
+    ];
+    const fn = path.join(i18nLangDir, `${lang}.inc.ts`);
+    fs.writeFileSync(fn, code.join("\n") + "\n");
 }
 
 const sharedIconIds = {};
@@ -496,10 +538,6 @@ const webpackConfig = defaults("main", (env) => ({
             if (rpkg) {
                 let [rmod, rarg] = rpkg.split("!", 2);
                 if (isDynamicEntry(rmod)) {
-                    if (rmod === "@nextgisweb/pyramid/i18n" && !rarg) {
-                        rarg = config.pathToComponent(context);
-                    }
-
                     const mod = rmod + (rarg !== undefined ? "!" + rarg : "");
                     return callback(null, `amd ${mod}`);
                 }

@@ -28,7 +28,7 @@ declare module "@nextgisweb/pyramid/type/config" {
         resourceHome: { id: number } | null;
         locale: string;
         logoutUrl: string;
-        // Defined in @nextgisweb/jsrealm/locale-loader
+        // Defined by @nextgisweb/jsrealm/i18n/lang
         plurals: [number, { (n: number): number }];
     }
 }

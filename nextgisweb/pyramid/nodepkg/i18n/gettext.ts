@@ -3,7 +3,7 @@ import { lookup, nlookup } from "@nextgisweb/jsrealm/i18n/catalog";
 import { compile } from "./format";
 import type { Compiled, FormatArgs } from "./format";
 
-import "@nextgisweb/jsrealm/locale-loader!";
+await import("@nextgisweb/jsrealm/i18n/lang");
 
 const en = ngwConfig.locale === "en";
 const [pn, pf] = ngwConfig.plurals;

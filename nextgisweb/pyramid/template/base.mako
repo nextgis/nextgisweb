@@ -64,7 +64,6 @@
     %endfor
 
     <script type="text/javascript">
-        ngwEntry("@nextgisweb/jsrealm/locale-loader!");
         ngwEntry("@nextgisweb/pyramid/icon/entrypoint");
     </script>
 

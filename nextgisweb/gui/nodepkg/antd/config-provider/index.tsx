@@ -1,6 +1,6 @@
 import Base from "antd/es/config-provider";
 
-import { antd } from "@nextgisweb/jsrealm/locale-loader!";
+import { antd } from "@nextgisweb/jsrealm/i18n/lang";
 
 import type { ParamsOf } from "../../type";
 

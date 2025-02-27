@@ -1,10 +1,3 @@
-declare module "@nextgisweb/jsrealm/locale-loader!" {
-    const value: {
-        antd: any;
-    };
-    export = value;
-}
-
 /** @deprecated It's a confusing global */
 declare type Nullable<T> = { [K in keyof T]: T[K] | null };
 
