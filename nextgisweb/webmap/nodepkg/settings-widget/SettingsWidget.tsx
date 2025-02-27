@@ -4,18 +4,20 @@ import { Checkbox, InputValue, Select } from "@nextgisweb/gui/antd";
 import { ExtentRow } from "@nextgisweb/gui/component";
 import { Area, Lot } from "@nextgisweb/gui/mayout";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { annotation, editing } from "@nextgisweb/pyramid/settings!webmap";
 import { ResourceSelectRef } from "@nextgisweb/resource/component";
 import type {
     EditorWidgetComponent,
     EditorWidgetProps,
 } from "@nextgisweb/resource/type";
 import { SrsSelect } from "@nextgisweb/spatial-ref-sys/srs-select/SrsSelect";
+import settings from "@nextgisweb/webmap/client-settings";
 import type { WebMapRead } from "@nextgisweb/webmap/type/api";
 
 import { SelectLegendSymbols } from "../component";
 
 import type { SettingStore } from "./SettingStore";
+
+const { annotation, editing } = settings;
 
 type AnnotationType = WebMapRead["annotation_default"];
 

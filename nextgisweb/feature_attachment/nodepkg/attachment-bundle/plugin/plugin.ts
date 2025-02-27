@@ -1,5 +1,5 @@
+import settings from "@nextgisweb/feature-attachment/client-settings";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import settings from "@nextgisweb/pyramid/settings!feature_attachment";
 import type { Display } from "@nextgisweb/webmap/display";
 import type { PluginParams } from "@nextgisweb/webmap/type";
 

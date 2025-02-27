@@ -1,4 +1,4 @@
-import settings from "@nextgisweb/pyramid/settings!basemap";
+import settings from "@nextgisweb/basemap/client-settings";
 
 import type { QMSSearch, QMSService } from "../type";
 

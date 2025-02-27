@@ -1,6 +1,6 @@
 import { Button, Select, Space } from "@nextgisweb/gui/antd";
+import settings from "@nextgisweb/pyramid/client-settings";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import settings from "@nextgisweb/pyramid/settings!pyramid";
 
 type InputProps = Parameters<typeof Select>[0];
 

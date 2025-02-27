@@ -1,11 +1,11 @@
 import { debounce } from "lodash-es";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import settings from "@nextgisweb/basemap/client-settings";
 import { Select, Spin } from "@nextgisweb/gui/antd";
 import type { SelectProps } from "@nextgisweb/gui/antd";
 import { OpenInNewIcon } from "@nextgisweb/gui/icon";
 import { useAbortController } from "@nextgisweb/pyramid/hook";
-import settings from "@nextgisweb/pyramid/settings!basemap";
 import { LoaderCache } from "@nextgisweb/pyramid/util/loader";
 
 import { get, search } from "../service/qms";

@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 
+import settings from "@nextgisweb/auth/client-settings";
 import type { GroupRead } from "@nextgisweb/auth/type/api";
 import { Alert, Checkbox, Input } from "@nextgisweb/gui/antd";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
@@ -10,7 +11,6 @@ import { ModelForm } from "@nextgisweb/gui/model-form";
 import type { Model } from "@nextgisweb/gui/model-form";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext, gettextf } from "@nextgisweb/pyramid/i18n";
-import settings from "@nextgisweb/pyramid/settings!auth";
 
 import { PermissionSelect, PrincipalSelect } from "../component";
 import { makeTeamManageButton, default as oauth } from "../oauth";

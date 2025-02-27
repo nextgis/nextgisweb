@@ -2,7 +2,7 @@ import type { Map } from "ol";
 import { get as getProjection, transform, transformExtent } from "ol/proj";
 import { useCallback, useEffect, useState } from "react";
 
-import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
+import webmapSettings from "@nextgisweb/webmap/client-settings";
 import { getDecPlacesRoundCoordByProj } from "@nextgisweb/webmap/utils/format-units";
 
 export const useProjections = (map: Map) => {

@@ -2,7 +2,6 @@ import { action, computed, observable, toJS } from "mobx";
 
 import type { FileMeta } from "@nextgisweb/file-upload/file-uploader";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import srsSettings from "@nextgisweb/pyramid/settings!spatial_ref_sys";
 import type { Composite } from "@nextgisweb/resource/type/Composite";
 import type {
     DumpParams,
@@ -10,6 +9,7 @@ import type {
     EditorStoreOptions,
     Operation,
 } from "@nextgisweb/resource/type/EditorStore";
+import srsSettings from "@nextgisweb/spatial-ref-sys/client-settings";
 import type * as apitype from "@nextgisweb/vector-layer/type/api";
 
 export type Mode = "empty" | "gtype" | "file" | "keep" | "delete";

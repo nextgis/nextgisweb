@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
-import settings from "@nextgisweb/pyramid/settings!resource";
+import settings from "@nextgisweb/resource/client-settings";
 import type { DataScopePermissions } from "@nextgisweb/resource/type/api";
 
 const resourceExportSetting = settings.resource_export;

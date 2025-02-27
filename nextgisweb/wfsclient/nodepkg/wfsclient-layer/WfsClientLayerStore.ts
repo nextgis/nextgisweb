@@ -2,13 +2,13 @@ import { action, computed, observable, runInAction } from "mobx";
 
 import { mapper, validate } from "@nextgisweb/gui/arm";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import srsSettings from "@nextgisweb/pyramid/settings!spatial_ref_sys";
 import type { Composite } from "@nextgisweb/resource/type";
 import type {
     EditorStore,
     EditorStoreOptions,
     Operation,
 } from "@nextgisweb/resource/type/EditorStore";
+import srsSettings from "@nextgisweb/spatial-ref-sys/client-settings";
 import type {
     WFSLayerCreate,
     WFSLayerRead,

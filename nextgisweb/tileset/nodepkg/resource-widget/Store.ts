@@ -1,7 +1,6 @@
 import { makeAutoObservable, runInAction, toJS } from "mobx";
 
 import type { FileMeta } from "@nextgisweb/file-upload/file-uploader";
-import srsSettings from "@nextgisweb/pyramid/settings!spatial_ref_sys";
 import type {
     DumpParams,
     EditorStore,
@@ -9,6 +8,7 @@ import type {
     Operation,
 } from "@nextgisweb/resource/type";
 import type { Composite } from "@nextgisweb/resource/type/Composite";
+import srsSettings from "@nextgisweb/spatial-ref-sys/client-settings";
 import type * as apitype from "@nextgisweb/tileset/type/api";
 
 export class Store

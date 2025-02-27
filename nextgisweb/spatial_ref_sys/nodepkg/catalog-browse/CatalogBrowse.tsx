@@ -15,7 +15,7 @@ import { OpenInNewIcon, SearchIcon } from "@nextgisweb/gui/icon";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import settings from "@nextgisweb/pyramid/settings!spatial_ref_sys";
+import settings from "@nextgisweb/spatial-ref-sys/client-settings";
 import type { SRSRead } from "@nextgisweb/spatial-ref-sys/type/api";
 
 import InputOutlineIcon from "@nextgisweb/icon/material/input";

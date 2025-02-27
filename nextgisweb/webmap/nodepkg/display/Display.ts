@@ -8,7 +8,6 @@ import { fromLonLat, transformExtent } from "ol/proj";
 import { errorModal } from "@nextgisweb/gui/error";
 import { appendTo } from "@nextgisweb/pyramid/company-logo";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import settings from "@nextgisweb/pyramid/settings!webmap";
 import topic from "@nextgisweb/webmap/compat/topic";
 import { buildControls } from "@nextgisweb/webmap/map-controls";
 import MapToolbar from "@nextgisweb/webmap/map-toolbar";
@@ -23,6 +22,7 @@ import type {
     LayerDisplayAdapter,
     LayerDisplayAdapterCtor,
 } from "../DisplayLayerAdapter";
+import settings from "../client-settings";
 import { CustomItemFileWriteStore } from "../compat/CustomItemFileWriteStore";
 import type { StoreItem } from "../compat/CustomItemFileWriteStore";
 import { LoggedDeferred } from "../compat/LoggedDeferred";
@@ -47,7 +47,6 @@ import type {
     TinyConfig,
 } from "../type";
 import type { TreeItemConfig } from "../type/TreeItems";
-import type { WebMapSettings } from "../type/WebmapSettings";
 import { getURLParams, setURLParam } from "../utils/URL";
 
 export class Display {
@@ -59,7 +58,7 @@ export class Display {
 
     config: DisplayConfig;
     tinyConfig?: TinyConfig;
-    clientSettings: WebMapSettings = settings;
+    clientSettings = settings;
     tiny?: boolean;
 
     readonly map: MapStore;

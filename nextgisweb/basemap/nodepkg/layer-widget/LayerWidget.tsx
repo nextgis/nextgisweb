@@ -1,11 +1,11 @@
 import { observer } from "mobx-react-lite";
 import { useEffect, useMemo, useState } from "react";
 
+import settings from "@nextgisweb/basemap/client-settings";
 import { InputValue, Slider } from "@nextgisweb/gui/antd";
 import { LotMV } from "@nextgisweb/gui/arm";
 import { Area, Lot } from "@nextgisweb/gui/mayout";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import settings from "@nextgisweb/pyramid/settings!basemap";
 import type {
     EditorWidgetComponent,
     EditorWidgetProps,

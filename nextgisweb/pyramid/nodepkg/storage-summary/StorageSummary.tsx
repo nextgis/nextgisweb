@@ -5,9 +5,9 @@ import { Button, Skeleton, Table } from "@nextgisweb/gui/antd";
 import { utc } from "@nextgisweb/gui/dayjs";
 import { sleep, sorterFactory } from "@nextgisweb/gui/util";
 import { route } from "@nextgisweb/pyramid/api";
+import settings from "@nextgisweb/pyramid/client-settings";
 import { gettext, gettextf } from "@nextgisweb/pyramid/i18n";
 import { Translated } from "@nextgisweb/pyramid/i18n/translated";
-import settings from "@nextgisweb/pyramid/settings!pyramid";
 import type {
     KindOfDataResponse,
     StorageValue,

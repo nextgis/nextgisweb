@@ -1,10 +1,10 @@
 import { useCallback, useEffect } from "react";
 import { Balancer } from "react-wrap-balancer";
 
+import settings from "@nextgisweb/file-upload/client-settings";
 import { Button, Upload } from "@nextgisweb/gui/antd";
 import { formatSize } from "@nextgisweb/gui/util/formatSize";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { maxSize } from "@nextgisweb/pyramid/settings!file_upload";
 
 import { useFileUploader } from "./hook/useFileUploader";
 import type { FileMeta, FileUploaderProps, UploaderMeta } from "./type";
@@ -18,7 +18,7 @@ const { Dragger } = Upload;
 
 const msgUpload = gettext("Select a file");
 const msgDragAndDrop = gettext("or drag and drop here");
-const msgMaxSize = formatSize(maxSize) + " " + gettext("max");
+const msgMaxSize = formatSize(settings.maxSize) + " " + gettext("max");
 const msgStop = gettext("Stop");
 
 function ProgressText({

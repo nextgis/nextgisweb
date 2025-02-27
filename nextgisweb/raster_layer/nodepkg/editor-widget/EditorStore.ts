@@ -1,8 +1,7 @@
 import { action, computed, observable } from "mobx";
 
 import type { FileUploadObject } from "@nextgisweb/file-upload/type/api";
-import settings from "@nextgisweb/pyramid/settings!raster_layer";
-import srsSettings from "@nextgisweb/pyramid/settings!spatial_ref_sys";
+import settings from "@nextgisweb/raster-layer/client-settings";
 import type * as apitype from "@nextgisweb/raster-layer/type/api";
 import type { Composite } from "@nextgisweb/resource/type/Composite";
 import type {
@@ -11,6 +10,7 @@ import type {
     EditorStore as IEditorStore,
     Operation,
 } from "@nextgisweb/resource/type/EditorStore";
+import srsSettings from "@nextgisweb/spatial-ref-sys/client-settings";
 
 export class EditorStore
     implements IEditorStore<apitype.RasterLayerRead, apitype.RasterLayerUpdate>

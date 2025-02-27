@@ -10,7 +10,7 @@ import { executeWithMinDelay } from "@nextgisweb/gui/util/executeWithMinDelay";
 import type { GetRequestOptions } from "@nextgisweb/pyramid/api/type";
 import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
+import webmapSettings from "@nextgisweb/webmap/client-settings";
 import type { Display } from "@nextgisweb/webmap/display";
 
 import { PanelContainer } from "../component";

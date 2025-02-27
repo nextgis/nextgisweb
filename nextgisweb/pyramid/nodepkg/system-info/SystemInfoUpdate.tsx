@@ -4,9 +4,9 @@ import { useEffect, useMemo, useState } from "react";
 
 import { Button, Modal } from "@nextgisweb/gui/antd";
 import { TemplateLink } from "@nextgisweb/gui/component";
+import settings from "@nextgisweb/pyramid/client-settings";
 import { gettext, gettextf } from "@nextgisweb/pyramid/i18n";
 import { url } from "@nextgisweb/pyramid/nextgis";
-import settings from "@nextgisweb/pyramid/settings!pyramid";
 import { updateStore } from "@nextgisweb/pyramid/update";
 
 import "./SystemInfoUpdate.less";

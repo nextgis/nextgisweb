@@ -2,7 +2,6 @@ import { action, computed, observable, runInAction } from "mobx";
 
 import { mapper, validate } from "@nextgisweb/gui/arm";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import srsSettings from "@nextgisweb/pyramid/settings!spatial_ref_sys";
 import type { Composite } from "@nextgisweb/resource/type";
 import type {
     EditorStore,
@@ -10,6 +9,7 @@ import type {
     Operation,
 } from "@nextgisweb/resource/type/EditorStore";
 import type { ResourceRef } from "@nextgisweb/resource/type/api";
+import srsSettings from "@nextgisweb/spatial-ref-sys/client-settings";
 
 const msgUpdate = gettext("Fields need to be updated due to autodetection");
 

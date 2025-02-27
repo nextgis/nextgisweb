@@ -1,13 +1,13 @@
 import { action, computed, observable, runInAction } from "mobx";
 
 import { mapper } from "@nextgisweb/gui/arm";
-import srsSettings from "@nextgisweb/pyramid/settings!spatial_ref_sys";
 import type {
     Composite,
     EditorStore,
     EditorStoreOptions,
     Operation,
 } from "@nextgisweb/resource/type";
+import srsSettings from "@nextgisweb/spatial-ref-sys/client-settings";
 import type {
     LayerCreate,
     LayerRead,

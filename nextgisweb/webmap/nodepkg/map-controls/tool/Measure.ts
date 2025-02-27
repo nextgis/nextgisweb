@@ -13,7 +13,7 @@ import { Circle, Fill, Stroke, Style } from "ol/style";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { html as htmlIcon } from "@nextgisweb/pyramid/icon";
-import settings from "@nextgisweb/pyramid/settings!webmap";
+import settings from "@nextgisweb/webmap/client-settings";
 import type { Display } from "@nextgisweb/webmap/display";
 import { MeasureArea, MeasureDistance } from "@nextgisweb/webmap/icon";
 import { formatMetersArea, formatMetersLength } from "@nextgisweb/webmap/utils";

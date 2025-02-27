@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import settings from "@nextgisweb/feature-layer/client-settings";
 import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
 import { Checkbox, Input, Select } from "@nextgisweb/gui/antd";
 import {
@@ -15,7 +16,6 @@ import type { FormField } from "@nextgisweb/gui/fields-form";
 import { route } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import settings from "@nextgisweb/pyramid/settings!feature_layer";
 import { ResourceSelectMultiple } from "@nextgisweb/resource/component";
 import type { SRSRead } from "@nextgisweb/spatial-ref-sys/type/api";
 

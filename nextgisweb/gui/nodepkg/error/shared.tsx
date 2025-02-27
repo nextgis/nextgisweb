@@ -1,9 +1,9 @@
 import { Suspense, lazy } from "react";
 
 import { Button, Space, Spin } from "@nextgisweb/gui/antd";
+import settings from "@nextgisweb/pyramid/client-settings";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { url } from "@nextgisweb/pyramid/nextgis";
-import settings from "@nextgisweb/pyramid/settings!pyramid";
 
 import { isApiError, isError } from "./util";
 

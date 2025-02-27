@@ -2,7 +2,6 @@ import { makeAutoObservable, toJS } from "mobx";
 
 import type { FileMeta } from "@nextgisweb/file-upload/file-uploader";
 import { gettextf } from "@nextgisweb/pyramid/i18n";
-import srsSettings from "@nextgisweb/pyramid/settings!spatial_ref_sys";
 import type {
     RasterMosaicCreate,
     RasterMosaicItemWrite,
@@ -14,6 +13,7 @@ import type {
     EditorStoreOptions,
     Operation,
 } from "@nextgisweb/resource/type";
+import srsSettings from "@nextgisweb/spatial-ref-sys/client-settings";
 
 let keySeq = 0;
 

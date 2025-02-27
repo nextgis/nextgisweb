@@ -1,7 +1,7 @@
 import { Upload, isSupported } from "tus-js-client";
 
+import settings from "@nextgisweb/file-upload/client-settings";
 import { routeURL } from "@nextgisweb/pyramid/api";
-import { chunkSize } from "@nextgisweb/pyramid/settings!file_upload";
 
 import type { FileMeta, FileUploaderOptions } from "../type";
 
@@ -61,7 +61,7 @@ async function tusUpload({
             const uploader = new Upload(file, {
                 endpoint: routeURL("file_upload.collection"),
                 storeFingerprintForResuming: false,
-                chunkSize: chunkSize,
+                chunkSize: settings.chunkSize,
                 metadata: { name: file.name },
                 onProgress: (bytesUploaded) => {
                     if (onProgress) {

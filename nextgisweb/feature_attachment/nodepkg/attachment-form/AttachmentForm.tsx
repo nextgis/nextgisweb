@@ -14,8 +14,8 @@ import {
     routeURL,
 } from "@nextgisweb/pyramid/api";
 import type { RouteResp } from "@nextgisweb/pyramid/api/type";
+import pyramidSettings from "@nextgisweb/pyramid/client-settings";
 import { gettext, gettextf } from "@nextgisweb/pyramid/i18n";
-import pyramidSettings from "@nextgisweb/pyramid/settings!pyramid";
 
 import "./AttachmentForm.less";
 

@@ -2,8 +2,8 @@ import { action, computed, observable } from "mobx";
 import type { ReactNode } from "react";
 
 import { routeURL } from "@nextgisweb/pyramid/api";
+import settings from "@nextgisweb/pyramid/client-settings";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import settings from "@nextgisweb/pyramid/settings!pyramid";
 
 import { url } from "../nextgis";
 

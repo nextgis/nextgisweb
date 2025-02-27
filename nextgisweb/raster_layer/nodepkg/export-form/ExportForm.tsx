@@ -9,7 +9,7 @@ import type { FormField } from "@nextgisweb/gui/fields-form";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import settings from "@nextgisweb/pyramid/settings!raster_layer";
+import settings from "@nextgisweb/raster-layer/client-settings";
 import type { SRSRead } from "@nextgisweb/spatial-ref-sys/type/api";
 
 interface ExporFormValues {

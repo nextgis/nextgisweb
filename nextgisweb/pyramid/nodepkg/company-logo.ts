@@ -1,5 +1,5 @@
+import pyramidSettings from "@nextgisweb/pyramid/client-settings";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import pyramidSettings from "@nextgisweb/pyramid/settings!pyramid";
 
 import { routeURL } from "./api";
 

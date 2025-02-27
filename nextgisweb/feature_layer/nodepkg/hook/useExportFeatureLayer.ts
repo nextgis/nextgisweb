@@ -11,7 +11,7 @@ import {
     routeURL,
 } from "@nextgisweb/pyramid/api";
 import type { QueryParams } from "@nextgisweb/pyramid/api";
-import pyramidSettings from "@nextgisweb/pyramid/settings!pyramid";
+import pyramidSettings from "@nextgisweb/pyramid/client-settings";
 
 interface UseExportFeatureLayerProps {
     id: number;

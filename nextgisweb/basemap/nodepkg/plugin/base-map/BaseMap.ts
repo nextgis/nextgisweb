@@ -1,9 +1,9 @@
 import { addCoordinateTransforms, addProjection, getTransform } from "ol/proj";
 import * as olProj from "ol/proj";
 
+import type { WebmapSettings } from "@nextgisweb/webmap/client-settings";
 import { PluginBase } from "@nextgisweb/webmap/plugin/PluginBase";
 import type { PluginParams, WebmapPluginConfig } from "@nextgisweb/webmap/type";
-import type { WebMapSettings } from "@nextgisweb/webmap/type/WebmapSettings";
 
 const a = 6378137;
 const b = 6356752.3142;
@@ -116,7 +116,7 @@ export class BaseMap extends PluginBase {
     }
 
     private _setBasemapsFromPlugin(
-        settings: WebMapSettings,
+        settings: WebmapSettings,
         wmplugin: WebmapPluginConfig
     ): void {
         settings.basemaps = [];

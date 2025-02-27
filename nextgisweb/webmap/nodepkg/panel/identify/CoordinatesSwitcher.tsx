@@ -8,8 +8,8 @@ import type { OptionType } from "@nextgisweb/gui/antd";
 import { CopyToClipboardButton } from "@nextgisweb/gui/buttons";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
 import type { SRSRead } from "@nextgisweb/spatial-ref-sys/type/api";
+import webmapSettings from "@nextgisweb/webmap/client-settings";
 import type { Display } from "@nextgisweb/webmap/display";
 
 import { DDtoDM, DDtoDMS } from "./format";

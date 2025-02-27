@@ -11,13 +11,13 @@ import { Area, Lot } from "@nextgisweb/gui/mayout";
 import { route } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { adapters } from "@nextgisweb/pyramid/settings!webmap";
 import { ResourceSelect } from "@nextgisweb/resource/component";
 import { useFocusTablePicker } from "@nextgisweb/resource/component/resource-picker/hook/useFocusTablePicker";
 import type {
     EditorWidgetComponent,
     EditorWidgetProps,
 } from "@nextgisweb/resource/type";
+import settings from "@nextgisweb/webmap/client-settings";
 
 import { SelectLegendSymbols } from "../component";
 
@@ -27,6 +27,8 @@ import type { ItemObject } from "./Item";
 import type { ItemsStore } from "./ItemsStore";
 
 import ReorderIcon from "@nextgisweb/icon/material/reorder";
+
+const { adapters } = settings;
 
 const msgDisplayName = gettext("Display name");
 const msgExpanded = gettext("Expanded");
