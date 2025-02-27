@@ -47,6 +47,9 @@
 
     <script src="${request.static_url('dojo/dojo.js')}"></script>
     <script src="${request.static_url('main/runtime.js')}"></script>
+    
+    <link rel="preload" href="${request.static_url('main/manifest.json')}" as="fetch" crossorigin />
+    <link rel="preload" href="${request.route_url('pyramid.route')}" as="fetch" crossorigin />
 
     %if hasattr(self, 'assets'):
         ${self.assets()}
