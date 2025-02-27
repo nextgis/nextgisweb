@@ -34,7 +34,7 @@ def login(request):
     )
 
 
-@viewargs(renderer="mako")
+@viewargs(renderer="react")
 def session_invite(request):
     next_url = request.params.get("next", request.application_url)
 
@@ -43,7 +43,13 @@ def session_invite(request):
             raise HTTPNotFound()
 
         return dict(
-            session_id=request.GET["sid"], expires=request.GET["expires"], next_url=next_url
+            title=gettext("Invitation session"),
+            entrypoint="@nextgisweb/auth/session-invite",
+            props=dict(
+                sid=request.GET["sid"],
+                expires=request.GET["expires"],
+                next=next_url,
+            ),
         )
 
     elif request.method == "POST":
@@ -60,8 +66,7 @@ def session_invite(request):
         exp = datetime.fromtimestamp(state.exp)
         if expires != exp or state.ref != 0:
             raise InvalidCredentialsException(message=gettext("Invalid 'expires' parameter."))
-        now = datetime.utcnow()
-        if exp <= now:
+        if exp <= datetime.utcnow():
             raise InvalidCredentialsException(message=gettext("Session expired."))
 
         cookie_settings = WebSession.cookie_settings(request)

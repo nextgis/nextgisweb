@@ -1,40 +1,40 @@
-#: api.py:81
+#: api.py:82
 msgid "The '%s' attribute of the system principal can't be changed."
 msgstr "Атрибут '%s' системного субъекта не может быть изменен."
 
-#: api.py:88
+#: api.py:89
 msgid "Principal '%s' already exists."
 msgstr "Субъект '%s' уже существует."
 
-#: api.py:90
+#: api.py:91
 msgid "Principal with full name '%s' already exists."
 msgstr "Субъект с наименованием '%s' уже существует."
 
-#: api.py:160
+#: api.py:161
 msgid "Password is not set."
 msgstr "Пароль не установлен."
 
-#: api.py:600
+#: api.py:606
 msgid "User '%s' can't be a member of a group."
 msgstr "Пользователь '%s' не может быть участником группы."
 
-#: api.py:606
+#: api.py:612
 msgid "System principals can't be deleted."
 msgstr "Системные субъекты не могут быть удалены."
 
-#: api.py:621
+#: api.py:627
 msgid "User is referenced with resources"
 msgstr "Пользователь связан с ресурсами"
 
-#: api.py:623
+#: api.py:629
 msgid "Group is referenced with resources"
 msgstr "Группа связана с ресурсами"
 
-#: api.py:629
+#: api.py:635
 msgid "Administrator required"
 msgstr "Только для администраторов"
 
-#: api.py:630
+#: api.py:636
 msgid "The 'administrators' group must have at least one enabled member."
 msgstr "Группа 'administrators' должна иметь хотя бы одного включенного участника."
 
@@ -42,7 +42,7 @@ msgstr "Группа 'administrators' должна иметь хотя бы од
 msgid "Administrator"
 msgstr "Администратор"
 
-#: component.py:258
+#: component.py:261
 msgid "Maximum number of users is reached. Your current plan user number limit is %d."
 msgstr "Превышено максимальное количество пользователей. Лимит текущего плана - %d."
 
@@ -66,23 +66,23 @@ msgstr "Необходима авторизация сессии"
 msgid "Invalid authorization link"
 msgstr "Некорректная ссылка для авторизации"
 
-#: model.py:92
+#: model.py:96
 msgid "Guest"
 msgstr "Гость"
 
-#: model.py:93
+#: model.py:97
 msgid "Everyone"
 msgstr "Любой пользователь"
 
-#: model.py:94
+#: model.py:98
 msgid "Authenticated"
 msgstr "Прошедший проверку"
 
-#: model.py:95
+#: model.py:99
 msgid "Owner"
 msgstr "Владелец"
 
-#: model.py:202
+#: model.py:206
 msgid "Administrators"
 msgstr "Администраторы"
 
@@ -117,7 +117,7 @@ msgstr "Да"
 msgid "No"
 msgstr "Нет"
 
-#: nodepkg/group-widget/GroupWidget.tsx:41 view.py:285 view.py:378
+#: nodepkg/group-widget/GroupWidget.tsx:41 view.py:298 view.py:391
 msgid "Users"
 msgstr "Пользователи"
 
@@ -137,25 +137,25 @@ msgstr "Описание"
 msgid "Sign in with {}"
 msgstr "Войти через {}"
 
-#: nodepkg/login/LoginForm.tsx:21 view.py:32
+#: nodepkg/login/LoginForm.tsx:21 view.py:33
 msgid "Sign in to Web GIS"
 msgstr "Войти в Веб ГИС"
 
-#: nodepkg/login/LoginForm.tsx:22 template/session_invite.mako:16
+#: nodepkg/login/LoginForm.tsx:22 nodepkg/session-invite/SessionInvite.tsx:18
 msgid "Sign in"
 msgstr "Войти"
 
-#: nodepkg/login/LoginForm.tsx:35 nodepkg/user-browse/UserBrowse.tsx:25
-#: nodepkg/user-widget/UserWidget.tsx:48
+#: nodepkg/login/LoginForm.tsx:37 nodepkg/settings-form/SettingsForm.tsx:53
+#: nodepkg/user-browse/UserBrowse.tsx:25 nodepkg/user-widget/UserWidget.tsx:48
 msgid "Login"
 msgstr "Логин"
 
-#: nodepkg/login/LoginForm.tsx:40 nodepkg/user-browse/UserBrowse.tsx:26
+#: nodepkg/login/LoginForm.tsx:42 nodepkg/user-browse/UserBrowse.tsx:26
 #: nodepkg/user-widget/UserWidget.tsx:55
 msgid "Password"
 msgstr "Пароль"
 
-#: nodepkg/login/LoginForm.tsx:94
+#: nodepkg/login/LoginForm.tsx:100
 msgid "or using login and password"
 msgstr "или используя логин и пароль"
 
@@ -175,11 +175,11 @@ msgstr "Привязать аккаунт"
 msgid "Account not bound"
 msgstr "Аккаунт не привязан"
 
-#: nodepkg/settings-form/SettingsForm.tsx:55 nodepkg/user-widget/UserWidget.tsx:106
+#: nodepkg/settings-form/SettingsForm.tsx:61 nodepkg/user-widget/UserWidget.tsx:106
 msgid "Language"
 msgstr "Язык"
 
-#: nodepkg/settings-form/SettingsForm.tsx:71
+#: nodepkg/settings-form/SettingsForm.tsx:77
 msgid "Saved"
 msgstr "Сохранено"
 
@@ -244,7 +244,7 @@ msgstr "Для изменения пароля заполните это пол�
 msgid "Authorization link"
 msgstr "Авторизация по ссылке"
 
-#: nodepkg/user-widget/UserWidget.tsx:89 view.py:319 view.py:384
+#: nodepkg/user-widget/UserWidget.tsx:89 view.py:332 view.py:397
 msgid "Groups"
 msgstr "Группы"
 
@@ -291,27 +291,27 @@ msgstr ""
 "Этот аккаунт {dn} ({sub}) уже привязан к другому пользователю ({id}). Войдите"
 " с использованием этого аккаунта вместо привязки."
 
-#: oauth.py:638
+#: oauth.py:639
 msgid "OAuth authorization error"
 msgstr "Ошибка авторизации OAuth"
 
-#: oauth.py:643
+#: oauth.py:644
 msgid "Invalid OAuth token"
 msgstr "Некорректный токен OAuth"
 
-#: oauth.py:648
+#: oauth.py:649
 msgid "Invalid OAuth scope"
 msgstr "Некорректный скоуп OAuth"
 
-#: oauth.py:653
+#: oauth.py:654
 msgid "OAuth password grant type failed"
 msgstr "Не удалось получить доступ по паролю OAuth"
 
-#: oauth.py:658
+#: oauth.py:659
 msgid "OAuth token refresh failed"
 msgstr "Не удалось выполнить обновление токена OAuth"
 
-#: oauth.py:663
+#: oauth.py:664
 msgid "OAuth access token is expired"
 msgstr "Срок действия токена OAuth истек"
 
@@ -323,23 +323,27 @@ msgstr "Просмотр"
 msgid "Manage"
 msgstr "Управление"
 
-#: permission.py:39 view.py:374
+#: permission.py:39 view.py:387
 msgid "Groups and users"
 msgstr "Группы и пользователи"
 
-#: view.py:57
+#: view.py:46
+msgid "Invitation session"
+msgstr "Сессия по приглашению"
+
+#: view.py:64
 msgid "Session not found."
 msgstr "Сессия не найдена."
 
-#: view.py:61
+#: view.py:68
 msgid "Invalid 'expires' parameter."
 msgstr "Некорректный параметр 'expires'."
 
-#: view.py:64
+#: view.py:70
 msgid "Session expired."
 msgstr "Сессия устарела."
 
-#: view.py:83
+#: view.py:89
 msgid ""
 "Failed to authenticate using the given authorization link. Please check the "
 "link and contact the administrator."
@@ -347,15 +351,15 @@ msgstr ""
 "Не удалось выполнить авторизацию с использованием указанной авторизационной "
 "ссылки. Пожалуйста, проверьте ссылку и свяжитесь с администратором."
 
-#: view.py:94
+#: view.py:100
 msgid "Usage of authorization link is forbidden for administrators."
 msgstr "Использование авторизационных ссылок запрещено для администраторов."
 
-#: view.py:133
+#: view.py:139
 msgid "Team membership required"
 msgstr "Необходимо участие в команде"
 
-#: view.py:134
+#: view.py:140
 msgid ""
 "You are not a member of this Web GIS team. Contact Web GIS administrator and "
 "ask to be added to the team."
@@ -363,14 +367,14 @@ msgstr ""
 "Вы не являетесь участником команды этой Веб ГИС. Свяжитесь с администратором "
 "Веб ГИС для добавления в команду."
 
-#: view.py:278
+#: view.py:291
 msgid "User settings"
 msgstr "Настройки пользователя"
 
-#: view.py:301
+#: view.py:314
 msgid "Create new user"
 msgstr "Создать нового пользователя"
 
-#: view.py:335
+#: view.py:348
 msgid "Create new group"
 msgstr "Создать новую группу"

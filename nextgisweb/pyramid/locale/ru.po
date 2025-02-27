@@ -282,7 +282,7 @@ msgstr "Войти"
 
 #: nodepkg/layout/Avatar.tsx:20
 msgid "Invitation session"
-msgstr "Пригласительная сессия"
+msgstr "Сессия по приглашению"
 
 #: nodepkg/layout/Avatar.tsx:23
 msgid "User settings"
