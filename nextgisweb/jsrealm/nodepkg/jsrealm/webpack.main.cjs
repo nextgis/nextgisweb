@@ -2,7 +2,6 @@ const fs = require("fs");
 const glob = require("glob");
 const path = require("path");
 
-const CopyPlugin = require("copy-webpack-plugin");
 const ESLintPlugin = require("eslint-webpack-plugin");
 const ForkTsCheckerPlugin = require("fork-ts-checker-webpack-plugin");
 const { sortBy } = require("lodash");
@@ -24,7 +23,8 @@ const { injectCode, stripIndex, virtualImport } = require("./webpack/util.cjs");
 //
 // This import is handled by AMD loader and loads all chunks
 // required by the entrypoint.
-const withChunks = (ep) => `import "@nextgisweb/jsrealm/with-chunks!${ep}"`;
+const WITH_CHUNKS = "@nextgisweb/jsrealm/with-chunks";
+const withChunks = (ep) => `import "${WITH_CHUNKS}!${ep}"`;
 
 const presetEnvOptIndex = babelOptions.presets.findIndex(
     (item) => typeof item[0] === "string" && item[0] === "@babel/preset-env"
@@ -182,10 +182,13 @@ const dynamicEntries = () => {
         entrypoints
             .filter(({ type }) => type === "entrypoint")
             .map(({ entry, fullname }) => {
+                if (entry !== WITH_CHUNKS) {
+                    fullname = injectCode(fullname, withChunks(entry));
+                }
                 return [
                     entry,
                     {
-                        import: injectCode(fullname, withChunks(entry)),
+                        import: fullname,
                         library: { type: "amd", name: entry },
                     },
                 ];
@@ -337,7 +340,7 @@ const webpackAssetsManifestPlugin = new WebpackAssetsManifest({
         const processEntry = ([entry, data]) => [
             entry,
             (data.assets?.js || [])
-                .filter((c) => c !== "chunk/runtime.js" && c !== `${entry}.js`)
+                .filter((c) => c !== "runtime.js" && c !== `${entry}.js`)
                 .map((c) => c.replace(/\.js$/, "")),
         ];
 
@@ -431,17 +434,6 @@ const webpackConfig = defaults("main", (env) => ({
         plugins: [registryResolver, new iconUtil.IconResolverPlugin()],
     },
     plugins: [
-        new CopyPlugin({
-            // Copy @nextgisweb/jsrealm/with-chunks!entry-name loader directly
-            // to the dist directly. It is written in ES5-compatible way as AMD
-            // module and mustn't be processed by webpack runtime loader.
-            patterns: [
-                {
-                    from: require.resolve("./with-chunks.js"),
-                    to: "@nextgisweb/jsrealm/",
-                },
-            ],
-        }),
         new DefinePlugin({
             COMP_ID: DefinePlugin.runtimeValue(({ module }) => {
                 return JSON.stringify(config.pathToComponent(module.context));
@@ -466,9 +458,8 @@ const webpackConfig = defaults("main", (env) => ({
     ],
     output: {
         enabledLibraryTypes: ["amd"],
-        filename: (pathData) =>
-            pathData.chunk.name !== undefined ? "[name].js" : "chunk/[name].js",
-        chunkFilename: "chunk/[id].js",
+        filename: () => "[name].js",
+        chunkFilename: "[id].js",
     },
     externals: [
         function ({ context, request }, callback) {
@@ -517,7 +508,7 @@ const webpackConfig = defaults("main", (env) => ({
         },
     ],
     optimization: {
-        runtimeChunk: { name: "chunk/runtime" },
+        runtimeChunk: { name: "runtime" },
         splitChunks: {
             // Generate as many chunks as possible
             chunks: "all",
