@@ -2,7 +2,6 @@ from collections import defaultdict
 from itertools import chain, count
 from json import dumps as json_dumps
 from textwrap import dedent
-from json import dumps as json_dumps
 from typing import Any, Dict, List, Literal, Sequence, Tuple, Type, Union, cast
 
 from msgspec import NODEFAULT, Struct, UnsetType, defstruct, field
@@ -180,5 +179,33 @@ def route(comp) -> str:
         "const data: Record<string, string[]> = {};".format(data),
         "export default data;\n",
     ]
+
+    return "\n".join(code)
+
+
+def react_renderer(config) -> str:
+    code = [
+        "/** @plugin */",
+        'import { registry } from "@nextgisweb/jsrealm/entrypoint/registry";\n',
+    ]
+
+    template = """
+        registry.register("{comp}", {{
+            identity: "{module}",
+            value: () => import("{module}"),
+        }});
+    """
+
+    template = dedent(template).strip("\n") + "\n"
+
+    modules = set()
+    for iroute in iter_routes(config.registry.introspector):
+        for iview in iroute.views:
+            if react_renderer := iview.react_renderer:
+                modules.add(react_renderer)
+
+    for module in sorted(modules):
+        comp = module.split("/")[1].replace("-", "_")
+        code.append(template.format(comp=comp, module=module))
 
     return "\n".join(code)
