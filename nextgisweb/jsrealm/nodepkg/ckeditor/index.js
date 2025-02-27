@@ -1,6 +1,18 @@
-import * as module from "ckeditor/bundle";
-import "@nextgisweb/ckeditor/i18n-loader!";
-
 import "./index.less";
 
-export const Editor = module.default;
+async function loader() {
+    const Editor = await ngwEntry("ckeditor/bundle");
+
+    const lang = window.ngwConfig.locale;
+    if (lang === "en") {
+        // noop
+    } else if (!Editor.availableLanguages.includes(lang)) {
+        console.warn(`CKEditor: Translation '${lang}' unavailable`);
+    } else {
+        await ngwEntry(`ckeditor/translations/${lang}`);
+        console.log(`CKEditor: Translation '${lang}' loaded`);
+    }
+    return Editor;
+}
+
+export const Editor = await loader();
