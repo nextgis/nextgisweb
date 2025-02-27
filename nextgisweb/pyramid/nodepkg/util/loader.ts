@@ -49,29 +49,3 @@ export class LoaderCache<T = unknown> {
         }
     }
 }
-
-export function callingComponent(
-    arg: string,
-    toAbsMid: (val: string) => string
-) {
-    const abs = toAbsMid(".");
-    const parts = abs.split("/");
-    const component = (
-        parts[0] === "@nextgisweb" ? parts[1] : parts[0].replace(/^ngw-/, "")
-    )
-        .replace(/-/g, "_")
-        .replace(".", "");
-
-    // if (component == req) {
-    //     console.debug(
-    //         `Consider to replace "@nextgisweb/pyramid/i18n!${req}" ` +
-    //         `with "@nextgisweb/pyramid/i18n" in "${abs}".`
-    //     );
-    // }
-
-    if (arg === "") {
-        return component;
-    } else {
-        return arg;
-    }
-}

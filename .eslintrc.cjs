@@ -165,7 +165,7 @@ const config = {
     settings: {
         "react": { version: "18" },
         "componentWrapperFunctions": ["observer"],
-        "import/internal-regex": "^(@nextgisweb/|ngw-)",
+        "import/internal-regex": "^@nextgisweb/",
     },
 };
 
