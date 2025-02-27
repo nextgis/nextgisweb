@@ -10,9 +10,6 @@ from .model import FeatureDescription as Description
 class FeatureDescriptionExtension(FeatureExtension):
     identity = "description"
 
-    editor_widget = "@nextgisweb/feature-description/description-editor"
-    display_widget = "ngw-feature-description/DisplayWidget"
-
     def serialize(self, feature, *, version=None):
         filter_by = dict(resource_id=self.layer.id, feature_id=feature.id)
         if version is None:

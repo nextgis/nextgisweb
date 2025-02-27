@@ -10,9 +10,6 @@ from .model import FeatureAttachment as Attachment
 class FeatureAttachmentExtension(FeatureExtension):
     identity = "attachment"
 
-    editor_widget = "@nextgisweb/feature-attachment/attachment-editor"
-    display_widget = "ngw-feature-attachment/DisplayWidget"
-
     def serialize(self, feature, *, version=None) -> Any:
         session = sa.inspect(self.layer).session
         filter_by = dict(resource_id=self.layer.id, feature_id=feature.id)
