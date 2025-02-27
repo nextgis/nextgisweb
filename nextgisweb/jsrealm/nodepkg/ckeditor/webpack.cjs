@@ -41,10 +41,11 @@ module.exports = defaults(
             entry: path.resolve(__dirname, "bundle.js"),
 
             output: {
-                library: "CKEditor",
-                filename: "bundle.js",
-                libraryTarget: "umd",
+                library: "ckeditor",
+                filename: "index.js",
+                libraryTarget: "amd",
                 libraryExport: "default",
+                amdContainer: "ngwExternal",
             },
 
             optimization: {
@@ -104,6 +105,7 @@ module.exports = defaults(
                 new ckeTranslations.CKEditorTranslationsPlugin({
                     language: "en",
                     additionalLanguages: languages.found,
+                    outputDirectory: ".",
                 }),
                 new DefinePlugin({
                     AVAILABLE_LANGUAGES: JSON.stringify(languages.found),

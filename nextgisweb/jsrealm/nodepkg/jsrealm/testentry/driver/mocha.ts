@@ -5,8 +5,7 @@ export default (value: (...args: []) => void, el: HTMLElement) => {
     root.id = "mocha";
     el.append(root);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ngwEntry<never>("mocha/mocha").then(() => {
+    ngwExternal("mocha/mocha").then(() => {
         mocha.setup("bdd");
         value();
         mocha.run();

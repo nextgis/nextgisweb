@@ -43,11 +43,6 @@ function addPackage(name, options) {
     copyPatterns.push(options);
 }
 
-// We still use Dojo's AMD loader
-addPackage("dojo", {
-    from: "dojo.js",
-});
-
 addPackage("mocha", {
     from: "mocha.*",
 });

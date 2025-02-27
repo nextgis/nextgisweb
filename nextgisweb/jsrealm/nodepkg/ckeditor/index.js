@@ -1,18 +1,12 @@
 import "./index.less";
 
-async function loader() {
-    const Editor = await ngwEntry("ckeditor/bundle");
+export const Editor = await ngwExternal("ckeditor");
 
-    const lang = window.ngwConfig.locale;
-    if (lang === "en") {
-        // noop
-    } else if (!Editor.availableLanguages.includes(lang)) {
-        console.warn(`CKEditor: Translation '${lang}' unavailable`);
-    } else {
-        await ngwEntry(`ckeditor/translations/${lang}`);
-        console.log(`CKEditor: Translation '${lang}' loaded`);
-    }
-    return Editor;
+const lang = window.ngwConfig.locale;
+if (lang === "en") {
+    // noop
+} else if (!Editor.availableLanguages.includes(lang)) {
+    console.log(`CKEditor: Translation uavailable for '${lang}'`);
+} else {
+    await ngwExternal(`ckeditor/${lang}`);
 }
-
-export const Editor = await loader();

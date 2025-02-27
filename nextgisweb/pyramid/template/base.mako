@@ -44,8 +44,6 @@
     <link href="${custom_css_url}" rel="stylesheet" type="text/css"/>
 
     <%include file="nextgisweb:pyramid/template/client_config.mako" />
-
-    <script src="${request.static_url('dojo/dojo.js')}"></script>
     <script src="${request.static_url('main/ngwEntry.js')}"></script>
     
     %if hasattr(self, 'assets'):

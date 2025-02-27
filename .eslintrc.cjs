@@ -20,6 +20,7 @@ const config = {
     globals: {
         ngwConfig: "readonly",
         ngwEntry: "readonly",
+        ngwExternal: "readonly",
     },
     rules: {
         "eqeqeq": "error",

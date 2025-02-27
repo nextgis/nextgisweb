@@ -24,11 +24,10 @@ export default function Testentry() {
             </Button>
             <Button
                 onClick={() => {
-                    // @ts-expect-error If forbids the second argument somehow
-                    window.require(["missing"], function () {});
+                    ngwEntry("missing");
                 }}
             >
-                DojoLoaderError
+                EntrypointError
             </Button>
         </Space.Compact>
     );

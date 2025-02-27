@@ -3,7 +3,6 @@
     "version": "0.0.0",
     "type": "module",
     "dependencies": {
-        "dojo": "1.16.x",
         "string-replace-loader": "^3.0.1",
         "uglify-js": "~3.17.4",
         "uglifycss": "^0.0.29"

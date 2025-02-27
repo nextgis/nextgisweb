@@ -13,7 +13,3 @@ def get(ngw_env, ngw_webtest_app):
 
 def test_asset(get):
     get("asset/pyramid/nextgis.png")
-
-
-def test_amd_file(get):
-    get("dojo/dojo.js")
