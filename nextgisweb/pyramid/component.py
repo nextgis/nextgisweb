@@ -136,6 +136,7 @@ class PyramidComponent(Component):
         nodepkg = self.root_path / "nodepkg"
         config = self.make_app(settings=dict())
         (nodepkg / "api/type.inc.d.ts").write_text(m.api_type_module(config))
+        (nodepkg / "api/route.inc.ts").write_text(m.route(self))
 
     @property
     def template_include(self):

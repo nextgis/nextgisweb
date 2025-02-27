@@ -1,6 +1,5 @@
-import routeData from "@nextgisweb/pyramid/api/load!/api/component/pyramid/route";
-
 import { generateUrl, request } from "./request";
+import routeData from "./route.inc";
 import type {
     RequestMethod,
     RequestOptions,

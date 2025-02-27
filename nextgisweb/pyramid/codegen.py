@@ -1,5 +1,6 @@
 from collections import defaultdict
 from itertools import chain, count
+from json import dumps as json_dumps
 from textwrap import dedent
 from json import dumps as json_dumps
 from typing import Any, Dict, List, Literal, Sequence, Tuple, Type, Union, cast
@@ -167,5 +168,17 @@ def api_load_module(config) -> str:
                 name=iroute.name,
             )
         )
+
+    return "\n".join(code)
+
+
+def route(comp) -> str:
+    data = json_dumps(comp.route_meta, ensure_ascii=False, indent=4)
+
+    code = [
+        *eslint_disable(("prettier/prettier",)),
+        "const data: Record<string, string[]> = {};".format(data),
+        "export default data;\n",
+    ]
 
     return "\n".join(code)
