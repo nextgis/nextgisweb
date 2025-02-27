@@ -1,4 +1,3 @@
-/** @entrypoint */
 import classNames from "classnames";
 import { groupBy, partition, sortBy } from "lodash-es";
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
