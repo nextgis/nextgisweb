@@ -45,15 +45,15 @@
 
 <script type="text/javascript">
     Promise.all([
-        ngwEntry("@nextgisweb/gui/react-app").then((m) => m.default),
-        ngwEntry("@nextgisweb/pyramid/layout"),
-    ]).then(([reactApp, {Avatar, Menu}]) => {
-        reactApp(Avatar, {}, document.getElementById("avatar"));
-        reactApp(Menu, {}, document.getElementById("menu"));
+        ngwEntry("@nextgisweb/gui/react-boot").then((m) => m.default),
+        ngwEntry("@nextgisweb/pyramid/layout/entrypoint"),
+    ]).then(([reactBoot, {Avatar, Menu}]) => {
+        reactBoot(Avatar, {}, document.getElementById("avatar"));
+        reactBoot(Menu, {}, document.getElementById("menu"));
         
         %if not hide_resource_filter:
             ngwEntry("@nextgisweb/resource/resources-filter").then(
-                ({default: ResourcesFilter}) => reactApp(
+                ({default: ResourcesFilter}) => reactBoot(
                     ResourcesFilter,
                     { onChange(v, opt) { window.location.href = opt.url } },
                     document.getElementById("resourcesFilter"),

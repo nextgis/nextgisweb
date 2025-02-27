@@ -2,7 +2,7 @@ import Feature from "ol/Feature";
 import WKT from "ol/format/WKT";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import FeatureGrid from "@nextgisweb/feature-layer/feature-grid";
+import { FeatureGrid } from "@nextgisweb/feature-layer/feature-grid/FeatureGrid";
 import { FeatureGridStore } from "@nextgisweb/feature-layer/feature-grid/FeatureGridStore";
 import type { ActionProps } from "@nextgisweb/feature-layer/feature-grid/type";
 import type { FeatureItem } from "@nextgisweb/feature-layer/type";

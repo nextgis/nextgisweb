@@ -1,7 +1,7 @@
 import { Suspense, lazy, useEffect, useMemo, useState } from "react";
 import type { ReactElement } from "react";
 
-import GeometryInfo from "@nextgisweb/feature-layer/geometry-info/";
+import GeometryInfo from "@nextgisweb/feature-layer/geometry-info";
 import type { FeatureItem } from "@nextgisweb/feature-layer/type";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { PanelSection } from "@nextgisweb/webmap/panel/component";

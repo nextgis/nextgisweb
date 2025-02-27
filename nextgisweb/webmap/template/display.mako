@@ -9,13 +9,12 @@
 </div>
 
 <script type="text/javascript">
-    Promise.all([
-        ngwEntry("@nextgisweb/gui/react-app").then((m) => m.default),
-        ngwEntry("@nextgisweb/webmap/display").then((m) => m.default),
-    ]).then(([reactApp, comp]) => {
-        const props = { id: ${json_js(id)} };
-        const el = document.getElementById("display")
-        reactApp(comp, props, el);
+    ngwEntry("@nextgisweb/gui/react-boot").then(({ default: reactBoot}) => {
+        reactBoot(
+            "@nextgisweb/webmap/display/entrypoint",
+            { id: ${json_js(id)} },
+            "display"
+        );
     });
 </script>
 

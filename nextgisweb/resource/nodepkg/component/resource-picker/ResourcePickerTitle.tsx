@@ -5,7 +5,7 @@ import { Button, Col, Row, Space, Tooltip } from "@nextgisweb/gui/antd";
 import { CloseIcon, SearchIcon } from "@nextgisweb/gui/icon";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import ResourcesFilter from "../../resources-filter";
+import { ResourcesFilter } from "../../resources-filter/ResourcesFilter";
 
 import { ResourcePickerBreadcrumb } from "./ResourcePickerBreadcrumb";
 import type { ResourcePickerTitleProps } from "./type";

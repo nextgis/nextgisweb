@@ -3,7 +3,7 @@ import { useCallback, useReducer } from "react";
 import { Modal } from "@nextgisweb/gui/antd";
 import { CloseIcon, OpenInNewIcon } from "@nextgisweb/gui/icon";
 import type { ShowModalOptions } from "@nextgisweb/gui/showModal";
-import PreviewLayer from "@nextgisweb/layer-preview/preview-layer";
+import { PreviewLayer } from "@nextgisweb/layer-preview/preview-layer/PreviewLayer";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { ButtonControl } from "@nextgisweb/webmap/map-component";
 import "./PreviewModal.less";

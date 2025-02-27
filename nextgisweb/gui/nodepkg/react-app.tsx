@@ -1,4 +1,3 @@
-/** @entrypoint */
 import { createRoot } from "react-dom/client";
 import type { Root } from "react-dom/client";
 import { Provider as BalancedProvider } from "react-wrap-balancer";

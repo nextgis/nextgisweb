@@ -24,14 +24,11 @@
 <div id="resourceMainSection" class="ngw-resource-section"></div>
 
 <script type="text/javascript">
-    Promise.all([
-        ngwEntry("@nextgisweb/gui/react-app").then((m) => m.default),
-        ngwEntry("@nextgisweb/resource/main-section").then((m) => m.default),
-    ]).then(([reactApp, comp]) => {
-        reactApp(
-            comp,
+    ngwEntry("@nextgisweb/gui/react-boot").then(({ default: reactBoot}) => {
+        reactBoot(
+            "@nextgisweb/resource/main-section",
             ${json_js(props)},
-            document.getElementById('resourceMainSection')
+            "resourceMainSection"
         );
     });
 </script>

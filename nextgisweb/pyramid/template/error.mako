@@ -15,11 +15,12 @@
 </div>
 
 <script type="text/javascript">
-    Promise.all([
-        ngwEntry("@nextgisweb/gui/react-app").then((m) => m.default),
-        ngwEntry("@nextgisweb/gui/error"),
-    ]).then(([reactApp, { ErrorPage }]) => {
-        const props = ${json_js(dict(error=error_json))};
-        reactApp(ErrorPage, props, document.getElementById('content'));
+    ngwEntry("@nextgisweb/gui/react-boot").then(({ default: reactBoot}) => {
+        reactBoot(
+            "@nextgisweb/gui/error/entrypoint",
+            ${json_js(dict(error=error_json))},
+            "content",
+            { name: "ErrorPage" }
+        );
     });
 </script>

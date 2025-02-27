@@ -32,16 +32,15 @@
 %>
 
 <script type="text/javascript">
-    Promise.all([
-        ngwEntry("@nextgisweb/gui/react-app").then((m) => m.default),
-        ngwEntry("@nextgisweb/resource/children-section").then((m) => m.default),
-    ]).then(([reactApp, comp]) => {
-        reactApp(
-            comp, {
+    ngwEntry("@nextgisweb/gui/react-boot").then(({ default: reactBoot}) => {
+        reactBoot(
+            "@nextgisweb/resource/children-section",
+            {
                 storageEnabled: ${json_js(request.env.core.options['storage.enabled'])},
                 data: ${json_js(data)},
                 resourceId: ${obj.id},
-            }, document.getElementById('childrenSection')
+            },
+            "childrenSection"
         );
     });
 </script>

@@ -11,13 +11,12 @@
 <div id="display" style="width: 100%; height: 100%"></div>
 
 <script type="text/javascript">
-    Promise.all([
-        ngwEntry("@nextgisweb/gui/react-app").then((m) => m.default),
-        ngwEntry("@nextgisweb/webmap/display-tiny").then((m) => m.default),
-    ]).then(([reactApp, comp]) => {
+    ngwEntry("@nextgisweb/gui/react-boot").then(({ default: reactBoot}) => {
         const mainDisplayUrl = ${json_js(request.route_url('webmap.display', id=obj.id) + "?" + request.query_string)};
-        const props = { id: ${json_js(id)}, tinyConfig: { mainDisplayUrl: mainDisplayUrl }};
-        const el = document.getElementById("display")
-        reactApp(comp, props, el);
+        reactBoot(
+            "@nextgisweb/webmap/display-tiny",
+            { id: ${json_js(id)}, tinyConfig: { mainDisplayUrl: mainDisplayUrl }},
+            "display"
+        );
     });
 </script>

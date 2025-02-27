@@ -65,7 +65,7 @@
 
     <script type="text/javascript">
         ngwEntry("@nextgisweb/jsrealm/locale-loader!");
-        ngwEntry("@nextgisweb/pyramid/icon");
+        ngwEntry("@nextgisweb/pyramid/icon/entrypoint");
     </script>
 
     <%include file="nextgisweb:pyramid/template/metrics.mako"/>

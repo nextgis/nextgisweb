@@ -1,4 +1,3 @@
-/** @entrypoint */
 import "@nextgisweb/jsrealm/shared-icon";
 
 export function html({
