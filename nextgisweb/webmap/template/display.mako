@@ -9,10 +9,10 @@
 </div>
 
 <script type="text/javascript">
-    require([
-        "@nextgisweb/webmap/display",
-        "@nextgisweb/gui/react-app",
-    ], function ({ default: comp }, { default: reactApp }) {
+    Promise.all([
+        ngwEntry("@nextgisweb/gui/react-app").then((m) => m.default),
+        ngwEntry("@nextgisweb/webmap/display").then((m) => m.default),
+    ]).then(([reactApp, comp]) => {
         const props = { id: ${json_js(id)} };
         const el = document.getElementById("display")
         reactApp(comp, props, el);

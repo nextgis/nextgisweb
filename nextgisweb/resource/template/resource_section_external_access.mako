@@ -16,12 +16,12 @@
 <div id="externalAccessSection"></div>
 
 <script type="text/javascript">
-    require([
-        "@nextgisweb/resource/external-access",
-        "@nextgisweb/gui/react-app",
-    ], function (comp, reactApp) {
-        reactApp.default(
-            comp.default, 
+    Promise.all([
+        ngwEntry("@nextgisweb/gui/react-app").then((m) => m.default),
+        ngwEntry("@nextgisweb/resource/external-access").then((m) => m.default),
+    ]).then(([reactApp, comp]) => {
+        reactApp(
+            comp, 
             {links: ${json_js(links)}},
             document.getElementById('externalAccessSection')
         );

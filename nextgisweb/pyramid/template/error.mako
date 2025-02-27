@@ -15,14 +15,11 @@
 </div>
 
 <script type="text/javascript">
-    require([
-        '@nextgisweb/gui/error',
-        "@nextgisweb/gui/react-app",
-    ], function (errorModule, reactApp) {
-        var props = ${json_js(dict(error=error_json))};
-        reactApp.default(
-            errorModule.ErrorPage, props,
-            document.getElementById('content')
-        );
+    Promise.all([
+        ngwEntry("@nextgisweb/gui/react-app").then((m) => m.default),
+        ngwEntry("@nextgisweb/gui/error"),
+    ]).then(([reactApp, { ErrorPage }]) => {
+        const props = ${json_js(dict(error=error_json))};
+        reactApp(ErrorPage, props, document.getElementById('content'));
     });
 </script>

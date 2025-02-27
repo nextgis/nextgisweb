@@ -1,4 +1,3 @@
-import entrypoint from "@nextgisweb/jsrealm/entrypoint";
 import type { Entrypoint } from "@nextgisweb/webmap/type";
 
 export async function entrypointsLoader(entrypoints: Entrypoint[]) {
@@ -8,7 +7,7 @@ export async function entrypointsLoader(entrypoints: Entrypoint[]) {
                 const mod = await m[1]();
                 return [m[0], mod.default];
             } else {
-                const mod = await entrypoint<{ default: unknown }>(m);
+                const mod = await ngwEntry<{ default: unknown }>(m);
                 return [m, mod.default];
             }
         })

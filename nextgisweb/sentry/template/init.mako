@@ -11,7 +11,7 @@
         )
     %>
     <script type="text/javascript">
-        require(["@nextgisweb/sentry/init"], function ({ init }) {
+        ngwEntry("@nextgisweb/sentry/init").then(({ init }) => {
             init(${json_js(init_opts)});
         });
     </script>

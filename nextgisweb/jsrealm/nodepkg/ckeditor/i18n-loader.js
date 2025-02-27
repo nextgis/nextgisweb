@@ -1,8 +1,6 @@
 /** @entrypoint */
 import * as Editor from "ckeditor/bundle";
 
-import entrypoint from "@nextgisweb/jsrealm/entrypoint";
-
 export function load(path, require, ready) {
     const lang = window.ngwConfig.locale;
     if (lang === "en") {
@@ -17,7 +15,7 @@ export function load(path, require, ready) {
     }
 
     const mod = `ckeditor/translations/${lang}`;
-    entrypoint(mod).then(
+    window.ngwEntry(mod).then(
         () => {
             console.log(`CKEditor: Translation '${lang}' loaded`);
             ready();

@@ -11,10 +11,10 @@
 <div id="display" style="width: 100%; height: 100%"></div>
 
 <script type="text/javascript">
-    require([
-        "@nextgisweb/webmap/display-tiny",
-        "@nextgisweb/gui/react-app",
-    ], function ({ default: comp }, { default: reactApp }) {
+    Promise.all([
+        ngwEntry("@nextgisweb/gui/react-app").then((m) => m.default),
+        ngwEntry("@nextgisweb/webmap/display-tiny").then((m) => m.default),
+    ]).then(([reactApp, comp]) => {
         const mainDisplayUrl = ${json_js(request.route_url('webmap.display', id=obj.id) + "?" + request.query_string)};
         const props = { id: ${json_js(id)}, tinyConfig: { mainDisplayUrl: mainDisplayUrl }};
         const el = document.getElementById("display")

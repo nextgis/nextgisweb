@@ -43,21 +43,22 @@
     </div>
 </div>
 
-<script>
-    require([
-        "@nextgisweb/gui/react-app",
-        "@nextgisweb/pyramid/layout",
-        "@nextgisweb/resource/resources-filter",
-    ], function (reactApp, layout, resourcesFilter) {
-        reactApp.default(layout.Avatar, {}, document.getElementById("avatar"));
-        reactApp.default(layout.Menu, {}, document.getElementById("menu"));
-
+<script type="text/javascript">
+    Promise.all([
+        ngwEntry("@nextgisweb/gui/react-app").then((m) => m.default),
+        ngwEntry("@nextgisweb/pyramid/layout"),
+    ]).then(([reactApp, {Avatar, Menu}]) => {
+        reactApp(Avatar, {}, document.getElementById("avatar"));
+        reactApp(Menu, {}, document.getElementById("menu"));
+        
         %if not hide_resource_filter:
-        reactApp.default(resourcesFilter.default, {
-            onChange: function(v, opt) {
-                window.location.href = opt.url
-            }
-        }, document.getElementById("resourcesFilter"));
+            ngwEntry("@nextgisweb/resource/resources-filter").then(
+                ({default: ResourcesFilter}) => reactApp(
+                    ResourcesFilter,
+                    { onChange(v, opt) { window.location.href = opt.url } },
+                    document.getElementById("resourcesFilter"),
+                )
+            );
         %endif
     });
 </script>

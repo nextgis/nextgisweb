@@ -1,5 +1,3 @@
-import entrypoint from "@nextgisweb/jsrealm/entrypoint";
-
 import "./mocha.less";
 
 export default (value: (...args: []) => void, el: HTMLElement) => {
@@ -7,7 +5,8 @@ export default (value: (...args: []) => void, el: HTMLElement) => {
     root.id = "mocha";
     el.append(root);
 
-    entrypoint("mocha/mocha").then(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ngwEntry<never>("mocha/mocha").then(() => {
         mocha.setup("bdd");
         value();
         mocha.run();

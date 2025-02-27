@@ -47,6 +47,7 @@
 
     <script src="${request.static_url('dojo/dojo.js')}"></script>
     <script src="${request.static_url('main/runtime.js')}"></script>
+    <script src="${request.static_url('main/@nextgisweb/jsrealm/ngwEntry.js')}"></script>
     
     <link rel="preload" href="${request.static_url('main/manifest.json')}" as="fetch" crossorigin />
     <link rel="preload" href="${request.route_url('pyramid.route')}" as="fetch" crossorigin />
@@ -64,10 +65,8 @@
     %endfor
 
     <script type="text/javascript">
-        require([
-            "@nextgisweb/jsrealm/locale-loader!",
-            "@nextgisweb/pyramid/icon",
-        ]);
+        ngwEntry("@nextgisweb/jsrealm/locale-loader!");
+        ngwEntry("@nextgisweb/pyramid/icon");
     </script>
 
     <%include file="nextgisweb:pyramid/template/metrics.mako"/>

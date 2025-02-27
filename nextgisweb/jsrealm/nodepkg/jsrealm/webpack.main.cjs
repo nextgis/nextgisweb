@@ -219,7 +219,8 @@ const registryResolver = {
     },
 };
 
-const staticEntries = {};
+const NGW_ENTRY = "@nextgisweb/jsrealm/ngwEntry";
+const staticEntries = { [NGW_ENTRY]: require.resolve(`${NGW_ENTRY}.js`) };
 
 function scanLocales(pkg, subpath = "") {
     const root = require.resolve(pkg + "/package.json");

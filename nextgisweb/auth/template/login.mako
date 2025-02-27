@@ -15,10 +15,10 @@
 </div>
 
 <script type="text/javascript">
-    require(["@nextgisweb/auth/store"], function ({ authStore }) {
+    ngwEntry("@nextgisweb/auth/store").then(({authStore}) => {
         authStore.runApp(
             ${json_js(props)},
             document.getElementById('content')
         );
-    });
+    })
 </script>

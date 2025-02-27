@@ -8,7 +8,6 @@ import {
     runInAction,
 } from "mobx";
 
-import entrypoint from "@nextgisweb/jsrealm/entrypoint";
 import {
     LunkwillParam,
     request,
@@ -225,7 +224,7 @@ export class CompositeStore {
     private async loadMembers(config: ResourceWidget["config"]) {
         const members = await Promise.all(
             Object.entries(config).map(async ([moduleName, params]) => {
-                const member = await entrypoint<WidgetEntrypoint>(moduleName);
+                const member = await ngwEntry<WidgetEntrypoint>(moduleName);
 
                 const widgetStore = new member.store({
                     composite: this,

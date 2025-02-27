@@ -1,12 +1,12 @@
 <div id="legendSymbols"></div>
 
 <script type="text/javascript">
-    require([
-        "@nextgisweb/render/legend-symbols-widget",
-        "@nextgisweb/gui/react-app",
-    ], function (comp, reactApp) {
-        reactApp.default(
-            comp.default, {
+    Promise.all([
+        ngwEntry("@nextgisweb/gui/react-app").then((m) => m.default),
+        ngwEntry("@nextgisweb/render/legend-symbols-widget").then((m) => m.default),
+    ]).then(([reactApp, comp]) => {
+        reactApp(
+            comp, {
                 resourceId: ${obj.id},
             }, document.getElementById('legendSymbols')
         );
