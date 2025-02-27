@@ -11,9 +11,6 @@
     "nextgisweb": {
         "webpackConfigs": {
             "external": "webpack.external.cjs"
-        },
-        "externals": [
-            "mocha"
-        ]
+        }
     }
 }

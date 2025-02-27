@@ -46,11 +46,8 @@
     <%include file="nextgisweb:pyramid/template/client_config.mako" />
 
     <script src="${request.static_url('dojo/dojo.js')}"></script>
-    <script src="${request.static_url('main/runtime.js')}"></script>
-    <script src="${request.static_url('main/@nextgisweb/jsrealm/ngwEntry.js')}"></script>
+    <script src="${request.static_url('main/ngwEntry.js')}"></script>
     
-    <link rel="preload" href="${request.static_url('main/manifest.json')}" as="fetch" crossorigin />
-
     %if hasattr(self, 'assets'):
         ${self.assets()}
     %endif

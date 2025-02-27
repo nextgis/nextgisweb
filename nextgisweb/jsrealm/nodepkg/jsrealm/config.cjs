@@ -6,7 +6,6 @@ const section = packageJson.nextgisweb;
 
 const components = [];
 const packages = [];
-const externals = [];
 
 for (const [cId, cPath] of Object.entries(section.env.components)) {
     components.push({ name: cId, path: path.resolve(cPath) });
@@ -20,7 +19,6 @@ for (const wsPath of packageJson.workspaces) {
         path: path.resolve(wsPath),
         json: packageJson,
     });
-    externals.push(...(packageJson?.nextgisweb?.externals || []));
 }
 
 const debug = section.core.debug;
@@ -50,7 +48,6 @@ module.exports = {
     debug,
     distPath,
     packages,
-    externals,
     pathToComponent,
     pathToModule,
     ...section,
