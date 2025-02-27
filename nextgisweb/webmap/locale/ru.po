@@ -51,22 +51,22 @@ msgstr "Наименование"
 
 #: nodepkg/component/SelectLegendSymbols.tsx:5
 #: nodepkg/settings-widget/SettingsWidget.tsx:33
-#: nodepkg/settings/select-options.ts:92
+#: nodepkg/settings/select-options.ts:94
 msgid "Default"
 msgstr "По умолчанию"
 
 #: nodepkg/component/SelectLegendSymbols.tsx:8
-#: nodepkg/settings/select-options.ts:93
+#: nodepkg/settings/select-options.ts:95
 msgid "Expand"
 msgstr "Развернуть"
 
 #: nodepkg/component/SelectLegendSymbols.tsx:9
-#: nodepkg/settings/select-options.ts:94
+#: nodepkg/settings/select-options.ts:96
 msgid "Collapse"
 msgstr "Свернуть"
 
 #: nodepkg/component/SelectLegendSymbols.tsx:10
-#: nodepkg/settings/select-options.ts:95
+#: nodepkg/settings/select-options.ts:97
 msgid "Disable"
 msgstr "Отключить"
 
@@ -185,7 +185,7 @@ msgstr "Макс. масштаб"
 #: nodepkg/items-widget/ItemsWidget.tsx:40
 #: nodepkg/panel/print/component/PrintElementsSettings.tsx:28
 #: nodepkg/settings-widget/SettingsWidget.tsx:25
-#: nodepkg/settings/SettingsForm.tsx:287
+#: nodepkg/settings/SettingsForm.tsx:261
 msgid "Legend"
 msgstr "Легенда"
 
@@ -281,7 +281,7 @@ msgstr "Начальный охват"
 msgid "Locate me"
 msgstr "Определить мое местоположение"
 
-#: nodepkg/map-controls/map-controls.ts:117
+#: nodepkg/map-controls/map-controls.ts:117 nodepkg/settings/SettingsForm.tsx:84
 msgid "Identification"
 msgstr "Идентификация"
 
@@ -397,16 +397,16 @@ msgstr "Аннотации"
 msgid "Bookmarks"
 msgstr "Закладки"
 
-#: nodepkg/panel/description/plugin.tsx:11
-#: nodepkg/plugin/layer-info/LayerInfoPlugin.ts:30
+#: nodepkg/panel/description/plugin.tsx:10
+#: nodepkg/plugin/layer-info/LayerInfoPlugin.tsx:32
 msgid "Description"
 msgstr "Описание"
 
-#: nodepkg/panel/identify/CoordinatesSwitcher.tsx:186
+#: nodepkg/panel/identify/CoordinatesSwitcher.tsx:178
 msgid "Zoom to identification point"
 msgstr "Увеличить до точки идентификации"
 
-#: nodepkg/panel/identify/CoordinatesSwitcher.tsx:202
+#: nodepkg/panel/identify/CoordinatesSwitcher.tsx:194
 msgid "Copy identification point coordinates"
 msgstr "Скопировать координаты точки идентификации"
 
@@ -622,11 +622,11 @@ msgstr "Вставить карту на сайт"
 msgid "Map size:"
 msgstr "Размер карты:"
 
-#: nodepkg/panel/share/SharePanel.tsx:379 nodepkg/settings/SettingsForm.tsx:90
+#: nodepkg/panel/share/SharePanel.tsx:379
 msgid "Width, px"
 msgstr "Ширина, пикс."
 
-#: nodepkg/panel/share/SharePanel.tsx:387 nodepkg/settings/SettingsForm.tsx:103
+#: nodepkg/panel/share/SharePanel.tsx:387
 msgid "Height, px"
 msgstr "Высота, пикс."
 
@@ -695,7 +695,7 @@ msgid "Select resource"
 msgstr "Выберите ресурс"
 
 #: nodepkg/settings-widget/SettingsWidget.tsx:30
-#: nodepkg/settings/SettingsForm.tsx:198
+#: nodepkg/settings/SettingsForm.tsx:172
 msgid "Measurement SRS"
 msgstr "СК для измерений"
 
@@ -723,7 +723,7 @@ msgstr "Показать без сообщений"
 msgid "Show with messages"
 msgstr "Показать с сообщениями"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:143
+#: nodepkg/settings-widget/SettingsWidget.tsx:147
 msgid "Settings"
 msgstr "Настройки"
 
@@ -731,157 +731,153 @@ msgstr "Настройки"
 msgid "Settings saved"
 msgstr "Настройки сохранены"
 
-#: nodepkg/settings/SettingsForm.tsx:63
+#: nodepkg/settings/SettingsForm.tsx:65
 msgid "General"
 msgstr "Общие"
 
-#: nodepkg/settings/SettingsForm.tsx:76
+#: nodepkg/settings/SettingsForm.tsx:78
 msgid "Hide navigation menu for guest"
 msgstr "Скрывать меню навигации для гостя"
 
-#: nodepkg/settings/SettingsForm.tsx:84
-msgid "Identify popup"
-msgstr "Окно идентификации"
-
-#: nodepkg/settings/SettingsForm.tsx:116
-msgid "Radius, px"
-msgstr "Радиус, пикс."
-
-#: nodepkg/settings/SettingsForm.tsx:139
+#: nodepkg/settings/SettingsForm.tsx:97
 msgid "Show feature attributes"
 msgstr "Показывать атрибуты объектов"
 
-#: nodepkg/settings/SettingsForm.tsx:153
+#: nodepkg/settings/SettingsForm.tsx:111
 msgid "Show geometry info"
 msgstr "Показывать информацию о геометрии"
 
-#: nodepkg/settings/SettingsForm.tsx:159
+#: nodepkg/settings/SettingsForm.tsx:121
+msgid "Radius, px"
+msgstr "Радиус, пикс."
+
+#: nodepkg/settings/SettingsForm.tsx:133
 msgid "Measurement"
 msgstr "Измерения"
 
-#: nodepkg/settings/SettingsForm.tsx:165
+#: nodepkg/settings/SettingsForm.tsx:139
 msgid "Length units"
 msgstr "Единицы длины"
 
-#: nodepkg/settings/SettingsForm.tsx:174
+#: nodepkg/settings/SettingsForm.tsx:148
 msgid "Area units"
 msgstr "Единицы площади"
 
-#: nodepkg/settings/SettingsForm.tsx:184
+#: nodepkg/settings/SettingsForm.tsx:158
 msgid "Degree format"
 msgstr "Формат градусов"
 
-#: nodepkg/settings/SettingsForm.tsx:208
+#: nodepkg/settings/SettingsForm.tsx:182
 msgid "Address search"
 msgstr "Адресный поиск"
 
-#: nodepkg/settings/SettingsForm.tsx:221
+#: nodepkg/settings/SettingsForm.tsx:195
 msgid "Enable"
 msgstr "Включить"
 
-#: nodepkg/settings/SettingsForm.tsx:235
+#: nodepkg/settings/SettingsForm.tsx:209
 msgid "Limit by web map initial extent"
 msgstr "Ограничить начальным охватом карты"
 
-#: nodepkg/settings/SettingsForm.tsx:245
+#: nodepkg/settings/SettingsForm.tsx:219
 msgid "Provider"
 msgstr "Провайдер"
 
-#: nodepkg/settings/SettingsForm.tsx:257
+#: nodepkg/settings/SettingsForm.tsx:231
 msgid "Limit search results to countries"
 msgstr "Ограничить поиск странами"
 
-#: nodepkg/settings/SettingsForm.tsx:267
+#: nodepkg/settings/SettingsForm.tsx:241
 msgid "Invalid countries. For example ru or gb,de"
 msgstr "Неверные значения. Например, ru или gb,de"
 
-#: nodepkg/settings/SettingsForm.tsx:279
+#: nodepkg/settings/SettingsForm.tsx:253
 msgid "Yandex.Maps API Geocoder Key"
 msgstr "Ключ геокодера API Яндекс.Карт"
 
-#: nodepkg/settings/SettingsForm.tsx:300
+#: nodepkg/settings/SettingsForm.tsx:274
 msgid "Visibility"
 msgstr "Видимость"
 
-#: nodepkg/settings/SettingsForm.tsx:325
+#: nodepkg/settings/SettingsForm.tsx:299
 #: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:159
 #: nodepkg/ui/finish-editing-dialog/FinishEditingDialog.tsx:57
 msgid "Save"
 msgstr "Сохранить"
 
-#: nodepkg/settings/select-options.ts:5
+#: nodepkg/settings/select-options.ts:7
 msgid "Meters"
 msgstr "Метры"
 
-#: nodepkg/settings/select-options.ts:9
+#: nodepkg/settings/select-options.ts:11
 msgid "Kilometers"
 msgstr "Километры"
 
-#: nodepkg/settings/select-options.ts:13
+#: nodepkg/settings/select-options.ts:15
 msgid "Meters/kilometers (auto)"
 msgstr "Метры/километры (авто)"
 
-#: nodepkg/settings/select-options.ts:17
+#: nodepkg/settings/select-options.ts:19
 msgid "Feet"
 msgstr "Футы"
 
-#: nodepkg/settings/select-options.ts:21
+#: nodepkg/settings/select-options.ts:23
 msgid "Miles"
 msgstr "Мили"
 
-#: nodepkg/settings/select-options.ts:25
+#: nodepkg/settings/select-options.ts:27
 msgid "Feet/miles (auto)"
 msgstr "Футы/мили (авто)"
 
-#: nodepkg/settings/select-options.ts:32
+#: nodepkg/settings/select-options.ts:34
 msgid "Sq. meters"
 msgstr "Кв. метры"
 
-#: nodepkg/settings/select-options.ts:36
+#: nodepkg/settings/select-options.ts:38
 msgid "Sq. kilometers"
 msgstr "Кв. километры"
 
-#: nodepkg/settings/select-options.ts:40
+#: nodepkg/settings/select-options.ts:42
 msgid "Sq. meters/kilometers (auto)"
 msgstr "Кв. метры/километры (авто)"
 
-#: nodepkg/settings/select-options.ts:44
+#: nodepkg/settings/select-options.ts:46
 msgid "Hectares"
 msgstr "Гектары"
 
-#: nodepkg/settings/select-options.ts:48
+#: nodepkg/settings/select-options.ts:50
 msgid "Acres"
 msgstr "Акры"
 
-#: nodepkg/settings/select-options.ts:52
+#: nodepkg/settings/select-options.ts:54
 msgid "Sq. miles"
 msgstr "Кв. мили"
 
-#: nodepkg/settings/select-options.ts:56
+#: nodepkg/settings/select-options.ts:58
 msgid "Acres/sq. miles (auto)"
 msgstr "Акры/кв. мили (авто)"
 
-#: nodepkg/settings/select-options.ts:60
+#: nodepkg/settings/select-options.ts:62
 msgid "Sq. feet"
 msgstr "Кв. футы"
 
-#: nodepkg/settings/select-options.ts:67
+#: nodepkg/settings/select-options.ts:69
 msgid "Decimal degrees"
 msgstr "Десятичные градусы"
 
-#: nodepkg/settings/select-options.ts:71
+#: nodepkg/settings/select-options.ts:73
 msgid "Degrees, decimal minutes"
 msgstr "Градусы и десятичные минуты"
 
-#: nodepkg/settings/select-options.ts:75
+#: nodepkg/settings/select-options.ts:77
 msgid "Degrees, minutes, seconds"
 msgstr "Градусы, минуты, секунды"
 
-#: nodepkg/settings/select-options.ts:82
+#: nodepkg/settings/select-options.ts:84
 msgid "Nominatim (OSM)"
 msgstr "Nominatim (OSM)"
 
-#: nodepkg/settings/select-options.ts:86
+#: nodepkg/settings/select-options.ts:88
 msgid "Yandex.Maps API Geocoder"
 msgstr "Геокодер API Яндекс.Карт"
 

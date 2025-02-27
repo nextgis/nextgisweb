@@ -79,53 +79,9 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({
                         </Space>
                     </Form.Item>
                 </Col>
-                <Col span={8}></Col>
-                <Col span={8}></Col>
             </Row>
 
-            <Title level={4}>{gettext("Identify popup")}</Title>
-
-            <Row gutter={[16, 16]}>
-                <Col span={8}>
-                    <Form.Item
-                        name="popup_width"
-                        label={gettext("Width, px")}
-                        rules={[
-                            {
-                                required: true,
-                            },
-                        ]}
-                    >
-                        <InputNumber min={100} style={INPUT_DEFAULT_WIDTH} />
-                    </Form.Item>
-                </Col>
-                <Col span={8}>
-                    <Form.Item
-                        name="popup_height"
-                        label={gettext("Height, px")}
-                        rules={[
-                            {
-                                required: true,
-                            },
-                        ]}
-                    >
-                        <InputNumber min={100} style={INPUT_DEFAULT_WIDTH} />
-                    </Form.Item>
-                </Col>
-                <Col span={8}>
-                    <Form.Item
-                        name="identify_radius"
-                        label={gettext("Radius, px")}
-                        rules={[
-                            {
-                                required: true,
-                            },
-                        ]}
-                    >
-                        <InputNumber min={1} style={INPUT_DEFAULT_WIDTH} />
-                    </Form.Item>
-                </Col>
-            </Row>
+            <Title level={4}>{gettext("Identification")}</Title>
 
             <Row gutter={[16, 16]}>
                 <Col span={8}>
@@ -154,6 +110,22 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({
                             </Form.Item>
                             {gettext("Show geometry info")}
                         </Space>
+                    </Form.Item>
+                </Col>
+            </Row>
+
+            <Row gutter={[16, 16]}>
+                <Col span={8}>
+                    <Form.Item
+                        name="identify_radius"
+                        label={gettext("Radius, px")}
+                        rules={[
+                            {
+                                required: true,
+                            },
+                        ]}
+                    >
+                        <InputNumber min={1} style={INPUT_DEFAULT_WIDTH} />
                     </Form.Item>
                 </Col>
             </Row>
