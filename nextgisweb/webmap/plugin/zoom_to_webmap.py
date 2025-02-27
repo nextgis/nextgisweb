@@ -1,4 +1,8 @@
+from nextgisweb.jsrealm import jsentry
+
 from .base import WebmapLayerPlugin
+
+ENTRY = jsentry("@nextgisweb/webmap/plugin/zoom-to-webmap")
 
 
 class ZoomToWebmapPlugin(WebmapLayerPlugin):
@@ -6,4 +10,4 @@ class ZoomToWebmapPlugin(WebmapLayerPlugin):
 
     @classmethod
     def is_layer_supported(cls, layer, webmap):
-        return ("@nextgisweb/webmap/plugin/zoom-to-webmap", dict())
+        return (ENTRY, dict())

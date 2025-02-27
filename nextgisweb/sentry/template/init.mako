@@ -1,3 +1,5 @@
+<%! from nextgisweb.sentry.view import INIT_JSENTRY %>
+
 %if bypass := request.environ.get("pyramid.uacompat_bypass"):
     <!-- Sentry disabled due to user agent incompatibility: ${bypass} -->
 %else:
@@ -11,7 +13,7 @@
         )
     %>
     <script type="text/javascript">
-        ngwEntry("@nextgisweb/sentry/init").then(({ init }) => {
+        ngwEntry(${json_js(INIT_JSENTRY)}).then(({ init }) => {
             init(${json_js(init_opts)});
         });
     </script>

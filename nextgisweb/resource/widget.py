@@ -1,3 +1,5 @@
+from nextgisweb.jsrealm import jsentry
+
 from .model import Resource
 
 _registry = []
@@ -54,16 +56,16 @@ class CompositeWidget(WidgetBase):
 class ResourceWidget(Widget):
     resource = Resource
     operation = ("create", "update")
-    amdmod = "@nextgisweb/resource/editor-widget"
+    amdmod = jsentry("@nextgisweb/resource/editor-widget")
 
 
 class ResourcePermissionWidget(Widget):
     resource = Resource
     operation = ("update",)
-    amdmod = "@nextgisweb/resource/permissions-widget"
+    amdmod = jsentry("@nextgisweb/resource/permissions-widget")
 
 
 class ResourceDescriptionWiget(Widget):
     resource = Resource
     operation = ("create", "update")
-    amdmod = "@nextgisweb/resource/description-editor"
+    amdmod = jsentry("@nextgisweb/resource/description-editor")

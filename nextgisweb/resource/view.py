@@ -16,6 +16,7 @@ from nextgisweb.lib.dynmenu import DynMenu, Label, Link
 from nextgisweb.auth import OnUserLogin
 from nextgisweb.core.exception import InsufficientPermissions
 from nextgisweb.gui import react_renderer
+from nextgisweb.jsrealm import jsentry
 from nextgisweb.pyramid import JSONType, viewargs
 from nextgisweb.pyramid.breadcrumb import Breadcrumb, breadcrumb_adapter
 from nextgisweb.pyramid.psection import PageSections
@@ -27,6 +28,11 @@ from .interface import IResourceBase
 from .model import Resource
 from .permission import Permission, Scope
 from .scope import ResourceScope
+
+MAIN_SECTION_JSENTRY = jsentry("@nextgisweb/resource/main-section")
+CHILDREN_SECTION_JSENTRY = jsentry("@nextgisweb/resource/children-section")
+EXTERNAL_ACCESS_JSENTRY = jsentry("@nextgisweb/resource/external-access")
+RESOURCE_ENTRY_JSENTRY = jsentry("@nextgisweb/resource/resources-filter")
 
 ResourceID = Annotated[int, Meta(ge=0, description="Resource ID")]
 

@@ -1,6 +1,8 @@
 <%!
     from pathlib import Path
     import nextgisweb.pyramid as m
+    from nextgisweb.gui.view import REACT_BOOT_JSENTRY
+    from nextgisweb.pyramid.view import LAYOUT_JSENTRY
     svglogo = None
 %>
 
@@ -45,8 +47,8 @@
 
 <script type="text/javascript">
     Promise.all([
-        ngwEntry("@nextgisweb/gui/react-boot").then((m) => m.default),
-        ngwEntry("@nextgisweb/pyramid/layout/entrypoint"),
+        ngwEntry(${json_js(REACT_BOOT_JSENTRY)}).then((m) => m.default),
+        ngwEntry(${json_js(LAYOUT_JSENTRY)}),
     ]).then(([reactBoot, {Avatar, Menu}]) => {
         reactBoot(Avatar, {}, document.getElementById("avatar"));
         reactBoot(Menu, {}, document.getElementById("menu"));

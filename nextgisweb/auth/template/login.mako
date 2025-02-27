@@ -15,7 +15,7 @@
 </div>
 
 <script type="text/javascript">
-    ngwEntry("@nextgisweb/auth/store/entrypoint").then(({authStore}) => {
+    ngwEntry(${json_js(entrypoint)}).then(({authStore}) => {
         authStore.runApp(
             ${json_js(props)},
             document.getElementById('content')

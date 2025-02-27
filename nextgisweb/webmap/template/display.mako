@@ -1,3 +1,5 @@
+<%! from nextgisweb.gui.view import REACT_BOOT_JSENTRY %>
+
 <%inherit file='nextgisweb:pyramid/template/base.mako' />
 
 <%include file="nextgisweb:pyramid/template/header.mako" args="title=title,
@@ -9,11 +11,12 @@
 </div>
 
 <script type="text/javascript">
-    ngwEntry("@nextgisweb/gui/react-boot").then(({ default: reactBoot}) => {
+    ngwEntry(${json_js(REACT_BOOT_JSENTRY)}).then(({ default: reactBoot}) => {
         reactBoot(
-            "@nextgisweb/webmap/display/entrypoint",
+            ${json_js(entrypoint)},
             { id: ${json_js(id)} },
-            "display"
+            "display",
+            { name: "DisplayLoader" }
         );
     });
 </script>

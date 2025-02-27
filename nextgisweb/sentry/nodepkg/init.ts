@@ -1,4 +1,3 @@
-/** @entrypoint */
 import * as Sentry from "@sentry/browser";
 import type { Integration } from "@sentry/core";
 

@@ -2,6 +2,7 @@ from nextgisweb.env import gettext
 from nextgisweb.lib.dynmenu import Link
 
 from nextgisweb.gui import react_renderer
+from nextgisweb.jsrealm import jsentry
 from nextgisweb.resource import ConnectionScope, DataScope, Resource, Widget, resource_factory
 
 from .model import PostgisConnection, PostgisLayer
@@ -10,13 +11,13 @@ from .model import PostgisConnection, PostgisLayer
 class PostgisConnectionWidget(Widget):
     resource = PostgisConnection
     operation = ("create", "update")
-    amdmod = "@nextgisweb/postgis/connection-widget"
+    amdmod = jsentry("@nextgisweb/postgis/connection-widget")
 
 
 class PostgisLayerWidget(Widget):
     resource = PostgisLayer
     operation = ("create", "update")
-    amdmod = "@nextgisweb/postgis/layer-widget"
+    amdmod = jsentry("@nextgisweb/postgis/layer-widget")
 
 
 def setup_pyramid(comp, config):

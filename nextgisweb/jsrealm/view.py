@@ -1,6 +1,9 @@
 from pathlib import Path
 
+from nextgisweb.jsrealm import jsentry
 from nextgisweb.pyramid import viewargs
+
+JSENTRY = jsentry("@nextgisweb/jsrealm/testentry/runner")
 
 
 @viewargs(renderer="mako")
@@ -10,6 +13,7 @@ def testentry(request):
         selected = None
 
     return dict(
+        entrypoint=JSENTRY,
         selected=selected,
         title=selected or "Test entries",
     )

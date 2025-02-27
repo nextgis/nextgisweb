@@ -1,4 +1,3 @@
-/** @entrypoint */
 import { registry as drivers } from "./driver";
 import { registry as testentries } from "./registry";
 

@@ -9,7 +9,7 @@
             const element = document.createElement("div");
             const current = document.currentScript;
             current.parentNode.insertBefore(element, current.nextSibling);
-            ngwEntry("@nextgisweb/jsrealm/testentry/runner").then(({ menu }) => {
+            ngwEntry(${json_js(entrypoint)}).then(({ menu }) => {
                 menu(${selected | json_js}, element);
             });
         })();
@@ -25,7 +25,7 @@
             const current = document.currentScript;
             current.parentNode.insertBefore(element, current.nextSibling);
 
-            ngwEntry("@nextgisweb/jsrealm/testentry/runner").then(({ default: runner }) => {
+            ngwEntry(${json_js(entrypoint)}).then(({ default: runner }) => {
                 runner(${(selected or "") | json_js}, element);
             });
         })();

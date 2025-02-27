@@ -19,7 +19,7 @@ class FeatureAttachmentComponent(Component):
         from . import extension, plugin  # noqa: F401
 
     def setup_pyramid(self, config):
-        from . import api, view
+        from . import api, plugin, view  # noqa: F401
 
         api.setup_pyramid(self, config)
         view.setup_pyramid(self, config)

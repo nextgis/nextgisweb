@@ -1,5 +1,6 @@
 from nextgisweb.env import env, gettext
 
+from nextgisweb.jsrealm import jsentry
 from nextgisweb.resource import Resource, Widget
 from nextgisweb.resource.extaccess import ExternalAccessLink
 from nextgisweb.resource.view import resource_sections
@@ -7,11 +8,13 @@ from nextgisweb.resource.view import resource_sections
 from .interface import IRenderableNonCached, IRenderableStyle
 from .legend import ILegendSymbols
 
+LEGEND_SYMBOLS_WIDGET_JSENTRY = jsentry("@nextgisweb/render/legend-symbols-widget")
+
 
 class TileCacheWidget(Widget):
     interface = IRenderableStyle
     operation = ("create", "update")
-    amdmod = "@nextgisweb/render/tile-cache-widget"
+    amdmod = jsentry("@nextgisweb/render/tile-cache-widget")
 
     def is_applicable(self):
         return (

@@ -1,5 +1,8 @@
-<%! from nextgisweb.resource.view import creatable_resources %>
-<%! from nextgisweb.pyramid.api import csetting %>
+<%!
+    from nextgisweb.pyramid.api import csetting
+    from nextgisweb.gui.view import REACT_BOOT_JSENTRY
+    from nextgisweb.resource.view import creatable_resources, MAIN_SECTION_JSENTRY
+%>
 
 <%page args="section" />
 <% section.content_box = False %>
@@ -24,9 +27,9 @@
 <div id="resourceMainSection" class="ngw-resource-section"></div>
 
 <script type="text/javascript">
-    ngwEntry("@nextgisweb/gui/react-boot").then(({ default: reactBoot}) => {
+    ngwEntry(${json_js(REACT_BOOT_JSENTRY)}).then(({ default: reactBoot}) => {
         reactBoot(
-            "@nextgisweb/resource/main-section",
+            ${json_js(MAIN_SECTION_JSENTRY)},
             ${json_js(props)},
             "resourceMainSection"
         );

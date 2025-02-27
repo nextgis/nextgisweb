@@ -4,6 +4,7 @@ from nextgisweb.env import gettext
 from nextgisweb.lib import dynmenu as dm
 
 from nextgisweb.gui import react_renderer
+from nextgisweb.jsrealm import jsentry
 from nextgisweb.resource import Resource, Widget
 from nextgisweb.resource.extaccess import ExternalAccessLink
 
@@ -13,7 +14,7 @@ from .model import RasterLayer
 class RasterLayerWidget(Widget):
     resource = RasterLayer
     operation = ("create", "update")
-    amdmod = "@nextgisweb/raster-layer/editor-widget"
+    amdmod = jsentry("@nextgisweb/raster-layer/editor-widget")
 
 
 @react_renderer("@nextgisweb/raster-layer/export-form")

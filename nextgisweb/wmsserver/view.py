@@ -1,5 +1,6 @@
 from nextgisweb.env import gettext
 
+from nextgisweb.jsrealm import jsentry
 from nextgisweb.resource import Widget
 from nextgisweb.resource.extaccess import ExternalAccessLink
 
@@ -9,7 +10,7 @@ from .model import Service
 class ServiceWidget(Widget):
     resource = Service
     operation = ("create", "update")
-    amdmod = "@nextgisweb/wmsserver/service-widget"
+    amdmod = jsentry("@nextgisweb/wmsserver/service-widget")
 
 
 class WMSLink(ExternalAccessLink):

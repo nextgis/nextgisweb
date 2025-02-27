@@ -1,4 +1,3 @@
-/** @entrypoint */
 import { DescriptionEditorStore } from "./DescriptionEditorStore";
 import { DescriptionEditorWidget } from "./DescriptionEditorWidget";
 

@@ -90,6 +90,9 @@ class SentryComponent(Component):
         with sentry_sdk.configure_scope() as scope:
             scope.add_event_processor(add_instance_id)
 
+    def setup_pyramid(self, config):
+        from . import view  # noqa: F401
+
     @property
     def template_include(self):
         return ("nextgisweb:sentry/template/init.mako",) if self.dsn_js else ()

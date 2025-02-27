@@ -12,6 +12,7 @@ from nextgisweb.env.package import pkginfo
 from nextgisweb.lib.logging import logger
 
 from nextgisweb.core import CoreComponent
+from nextgisweb.jsrealm import JSEntry
 from nextgisweb.pyramid import PyramidComponent
 from nextgisweb.pyramid.uacompat import FAMILIES
 
@@ -80,6 +81,11 @@ def install(
     if watch and build:
         raise RuntimeError("Flags --watch and --build are mutually exclusive.")
 
+    # NOTE: It loads modules using Component.setup_pyramid, which may register
+    # entrypoints using jsentry.
+    for comp in env.chain("client_codegen"):
+        comp.client_codegen()
+
     debug = core.options["debug"]
     cwd = Path().resolve()
 
@@ -144,6 +150,17 @@ def install(
     s_jsrealm["tscheck"] = jsrealm.options.get("tscheck", debug)
     s_jsrealm["eslint"] = jsrealm.options.get("eslint", debug)
 
+    s_jsrealm["entries"] = [
+        (i.component, i.module)
+        for i in sorted(
+            JSEntry.registry,
+            key=lambda entry: (
+                entry.component,
+                entry.module,
+            ),
+        )
+    ]
+
     stylesheets = s_jsrealm["stylesheets"] = list()
     for comp in env.chain("stylesheets"):
         stylesheets.extend(str(s) for s in comp.stylesheets())
@@ -170,9 +187,6 @@ def install(
         fd.write(json.dumps(package_json, indent=4))
 
     create_tsconfig(npkgs, debug=debug)
-
-    for comp in env.chain("client_codegen"):
-        comp.client_codegen()
 
     ngw_root = pkginfo.packages["nextgisweb"]._path.parent
     pkg_root = ngw_root.parent

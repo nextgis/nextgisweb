@@ -1,3 +1,5 @@
+<%! from nextgisweb.gui.view import REACT_BOOT_JSENTRY %>
+
 <%inherit file='nextgisweb:pyramid/template/base.mako' />
 
 <% system_name = request.env.core.system_full_name() %>
@@ -15,9 +17,9 @@
 </div>
 
 <script type="text/javascript">
-    ngwEntry("@nextgisweb/gui/react-boot").then(({ default: reactBoot}) => {
+    ngwEntry(${json_js(REACT_BOOT_JSENTRY)}).then(({ default: reactBoot}) => {
         reactBoot(
-            "@nextgisweb/gui/error/entrypoint",
+            ${json_js(entrypoint)},
             ${json_js(dict(error=error_json))},
             "content",
             { name: "ErrorPage" }

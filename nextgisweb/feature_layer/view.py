@@ -4,6 +4,7 @@ from nextgisweb.env import gettext
 from nextgisweb.lib.dynmenu import Label, Link
 
 from nextgisweb.gui import react_renderer
+from nextgisweb.jsrealm import jsentry
 from nextgisweb.resource import DataScope, Resource, Widget, resource_factory
 from nextgisweb.resource.extaccess import ExternalAccessLink
 from nextgisweb.resource.view import resource_sections
@@ -15,13 +16,13 @@ from .ogrdriver import MVT_DRIVER_EXIST
 class FeatureLayerFieldsWidget(Widget):
     interface = IFeatureLayer
     operation = ("update",)
-    amdmod = "@nextgisweb/feature-layer/fields-widget"
+    amdmod = jsentry("@nextgisweb/feature-layer/fields-widget")
 
 
 class SettingsWidget(Widget):
     interface = IFeatureLayer
     operation = ("create", "update")
-    amdmod = "@nextgisweb/feature-layer/settings-widget"
+    amdmod = jsentry("@nextgisweb/feature-layer/settings-widget")
 
     def is_applicable(self) -> bool:
         return IVersionableFeatureLayer.providedBy(self.obj) and super().is_applicable()

@@ -1,4 +1,8 @@
+from nextgisweb.jsrealm import jsentry
+
 from .base import WebmapLayerPlugin
+
+ENTRY = jsentry("@nextgisweb/webmap/plugin/layer-info")
 
 
 class LayerInfoPlugin(WebmapLayerPlugin):
@@ -15,4 +19,4 @@ class LayerInfoPlugin(WebmapLayerPlugin):
         else:
             payload["description"] = None
 
-        return ("@nextgisweb/webmap/plugin/layer-info", payload)
+        return (ENTRY, payload)

@@ -1,6 +1,10 @@
 from pyramid.renderers import render_to_response
 
+from nextgisweb.jsrealm import jsentry
+
 from .util import REACT_RENDERER
+
+REACT_BOOT_JSENTRY = jsentry("@nextgisweb/gui/react-boot")
 
 
 def react_renderer_factory(info):

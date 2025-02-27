@@ -181,31 +181,3 @@ def route(comp) -> str:
     ]
 
     return "\n".join(code)
-
-
-def react_renderer(config) -> str:
-    code = [
-        "/** @plugin */",
-        'import { registry } from "@nextgisweb/jsrealm/entrypoint/registry";\n',
-    ]
-
-    template = """
-        registry.register("{comp}", {{
-            identity: "{module}",
-            value: () => import("{module}"),
-        }});
-    """
-
-    template = dedent(template).strip("\n") + "\n"
-
-    modules = set()
-    for iroute in iter_routes(config.registry.introspector):
-        for iview in iroute.views:
-            if react_renderer := iview.react_renderer:
-                modules.add(react_renderer)
-
-    for module in sorted(modules):
-        comp = module.split("/")[1].replace("-", "_")
-        code.append(template.format(comp=comp, module=module))
-
-    return "\n".join(code)

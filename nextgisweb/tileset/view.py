@@ -1,3 +1,4 @@
+from nextgisweb.jsrealm import jsentry
 from nextgisweb.resource import Widget
 
 from .model import Tileset
@@ -6,7 +7,7 @@ from .model import Tileset
 class TilesetWidget(Widget):
     resource = Tileset
     operation = ("create", "update")
-    amdmod = "@nextgisweb/tileset/resource-widget"
+    amdmod = jsentry("@nextgisweb/tileset/resource-widget")
 
 
 def setup_pyramid(comp, config):

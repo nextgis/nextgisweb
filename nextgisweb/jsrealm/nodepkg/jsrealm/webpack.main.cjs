@@ -108,9 +108,22 @@ entrypoints
         ];
 
         if (registry === "@nextgisweb/jsrealm/entrypoint/registry") {
+            code.push(``, `// JSRealm entries`);
+            config.jsrealm.entries.forEach(([component, module]) => {
+                code.push(
+                    ``,
+                    `registry.register("${component}", {`,
+                    `    identity: "${module}",`,
+                    `    value: () => import("${module}"),`,
+                    `});`
+                );
+            });
+
             // Register entrypoint marked with "@entrypoint" in the entrypoint
             // registry. Eventually, we'll eliminate "@entrypoint" marker at
             // all, and this block will be deleted.
+
+            code.push(``, `// Legacy @entrypoints`);
             entrypoints
                 .filter(({ type }) => type === "entrypoint")
                 .forEach(({ entry, fullname }) => {
@@ -123,6 +136,8 @@ entrypoints
                         `});`
                     );
                 });
+
+            code.push(``, `// Other`, ``);
         } else if (registry === "@nextgisweb/jsrealm/plugin/meta") {
             for (const [entry, itm] of Object.entries(plRegistries)) {
                 // Do not include meta registry itself

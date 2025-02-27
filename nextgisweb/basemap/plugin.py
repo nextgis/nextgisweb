@@ -1,4 +1,7 @@
+from nextgisweb.jsrealm import jsentry
 from nextgisweb.webmap.plugin import WebmapPlugin
+
+ENTRY = jsentry("@nextgisweb/basemap/plugin/base-map")
 
 
 class BasemapPlugin(WebmapPlugin):
@@ -13,11 +16,8 @@ class BasemapPlugin(WebmapPlugin):
                 qms=bm.resource.qms,
                 copyright_text=bm.resource.copyright_text,
                 copyright_url=bm.resource.copyright_url,
-                **bm.to_dict()
+                **bm.to_dict(),
             )
             for bm in webmap.basemaps
         ]
-        return (
-            "@nextgisweb/basemap/plugin/base-map",
-            dict(basemaps=basemaps),
-        )
+        return (ENTRY, dict(basemaps=basemaps))

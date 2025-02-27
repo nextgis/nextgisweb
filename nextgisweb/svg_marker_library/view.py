@@ -1,6 +1,7 @@
 from nextgisweb.env import COMP_ID, gettext
 from nextgisweb.lib.dynmenu import Label, Link
 
+from nextgisweb.jsrealm import jsentry
 from nextgisweb.resource import Resource, Widget
 from nextgisweb.resource.view import resource_sections
 
@@ -10,7 +11,7 @@ from .model import SVGMarkerLibrary
 class Widget(Widget):
     resource = SVGMarkerLibrary
     operation = ("create", "update")
-    amdmod = "@nextgisweb/svg-marker-library/resource-widget"
+    amdmod = jsentry("@nextgisweb/svg-marker-library/resource-widget")
 
 
 def setup_pyramid(comp, config):

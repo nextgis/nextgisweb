@@ -1,6 +1,8 @@
 from nextgisweb.env import gettext
 from nextgisweb.lib.registry import dict_registry
 
+from nextgisweb.jsrealm import jsentry
+
 
 @dict_registry
 class WebMapAdapter:
@@ -20,7 +22,7 @@ class TileAdapter(WebMapAdapter):
     tile service, but the service itself is implemented by other component."""
 
     identity = "tile"
-    mid = "@nextgisweb/webmap/tile-adapter"
+    mid = jsentry("@nextgisweb/webmap/tile-adapter")
     display_name = gettext("Tiles")
 
 
@@ -29,5 +31,5 @@ class ImageAdapter(WebMapAdapter):
     WMS-like GetImage request, but the service itself is implemented by other component."""
 
     identity = "image"
-    mid = "@nextgisweb/webmap/image-adapter"
+    mid = jsentry("@nextgisweb/webmap/image-adapter")
     display_name = gettext("Image")

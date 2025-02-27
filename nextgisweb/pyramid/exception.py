@@ -16,6 +16,9 @@ from nextgisweb.lib import json
 from nextgisweb.lib.logging import logger
 
 from nextgisweb.core.exception import IUserException, user_exception
+from nextgisweb.jsrealm import jsentry
+
+JSENTRY = jsentry("@nextgisweb/gui/error")
 
 
 def includeme(config):
@@ -197,6 +200,7 @@ def html_error_response(request, err_info, exc, exc_info, debug=True):
     response = render_to_response(
         "nextgisweb:pyramid/template/error.mako",
         dict(
+            entrypoint=JSENTRY,
             error_json=json_error(request, err_info, exc, exc_info, debug=debug),
             title=err_info_attr(err_info, exc, "title"),
             custom_layout=True,

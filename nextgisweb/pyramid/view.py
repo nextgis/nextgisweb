@@ -29,6 +29,7 @@ from nextgisweb.lib.logging import logger
 from nextgisweb.core import CoreComponent
 from nextgisweb.core.exception import ForbiddenError, UserException
 from nextgisweb.gui import react_renderer
+from nextgisweb.jsrealm import jsentry
 
 from . import exception, permission, renderer
 from .component import PyramidComponent
@@ -39,6 +40,10 @@ from .tomb.response import StaticFileResponse
 from .uacompat import FAMILIES
 from .uacompat import parse_header as ua_parse_header
 from .util import StaticMap, StaticSourcePredicate, set_output_buffering, viewargs
+
+ICON_JSENTRY = jsentry("@nextgisweb/pyramid/icon")
+UPDATE_JSENTRY = jsentry("@nextgisweb/pyramid/update")
+LAYOUT_JSENTRY = jsentry("@nextgisweb/pyramid/layout")
 
 
 def asset(request):

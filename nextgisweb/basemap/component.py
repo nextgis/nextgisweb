@@ -8,7 +8,7 @@ class BasemapComponent(Component):
 
     @require("resource", "webmap")
     def setup_pyramid(self, config):
-        from . import view  # noqa: F401
+        from . import plugin, view  # noqa: F401
 
     def client_settings(self, request):
         return dict(

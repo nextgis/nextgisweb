@@ -1,4 +1,8 @@
+from nextgisweb.jsrealm import jsentry
+
 from .base import WebmapLayerPlugin
+
+ENTRY = jsentry("@nextgisweb/webmap/plugin/layer-opacity")
 
 
 class LayerOpacityPlugin(WebmapLayerPlugin):
@@ -6,4 +10,4 @@ class LayerOpacityPlugin(WebmapLayerPlugin):
 
     @classmethod
     def is_layer_supported(cls, layer, webmap):
-        return ("@nextgisweb/webmap/plugin/layer-opacity", dict())
+        return (ENTRY, dict())

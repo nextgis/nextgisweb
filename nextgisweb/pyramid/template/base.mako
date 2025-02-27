@@ -4,6 +4,7 @@
     from types import SimpleNamespace
     from msgspec import NODEFAULT
     from nextgisweb.pyramid.breadcrumb import breadcrumb_path
+    from nextgisweb.pyramid.view import ICON_JSENTRY
 %>
 
 <%namespace file="nextgisweb:pyramid/template/util.mako" import="icon_svg"/>
@@ -59,7 +60,7 @@
     %endfor
 
     <script type="text/javascript">
-        ngwEntry("@nextgisweb/pyramid/icon/entrypoint");
+        ngwEntry(${json_js(ICON_JSENTRY)});
     </script>
 
     <%include file="nextgisweb:pyramid/template/metrics.mako"/>
