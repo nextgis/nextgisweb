@@ -5,7 +5,7 @@ import type RenderEvent from "ol/render/Event";
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { html as htmlIcon } from "@nextgisweb/pyramid/icon";
-import "./Swipe.css";
+import "./SwipeControl.css";
 
 type Orientation = "vertical" | "horizontal";
 

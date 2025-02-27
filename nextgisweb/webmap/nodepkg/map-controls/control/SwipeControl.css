@@ -1,4 +1,4 @@
-.nextgis .ol-swipe {
+.ol-swipe {
     -webkit-transform: translate(-50%, -50%);
     position: absolute;
     top: 50%;
@@ -6,7 +6,7 @@
     transform: translate(-50%, -50%);
 }
 
-.nextgis .ol-swipe:before {
+.ol-swipe:before {
     -webkit-transform: translate(-2px, 0);
     position: absolute;
     top: -5000px;
@@ -18,7 +18,7 @@
     width: 4px;
     content: "";
 }
-.nextgis .ol-swipe.horizontal:before {
+.ol-swipe.horizontal:before {
     top: 50%;
     right: -5000px;
     bottom: auto;
@@ -27,26 +27,26 @@
     height: 4px;
 }
 
-.nextgis .ol-swipe,
-.nextgis .ol-swipe button {
+.ol-swipe,
+.ol-swipe button {
     cursor: ew-resize;
 }
 
-.nextgis .ol-swipe button,
-.nextgis .ol-swipe button:hover,
-.nextgis .ol-swipe button:focus,
-.nextgis .ol-swipe button:active {
+.ol-swipe button,
+.ol-swipe button:hover,
+.ol-swipe button:focus,
+.ol-swipe button:active {
     background-color: var(--accent);
 }
 
-.nextgis .ol-swipe.horizontal,
-.nextgis .ol-swipe.horizontal button {
+.ol-swipe.horizontal,
+.ol-swipe.horizontal button {
     cursor: ns-resize;
 }
 
-.nextgis .ol-swipe:after,
-.nextgis .ol-swipe button:before,
-.nextgis .ol-swipe button:after {
+.ol-swipe:after,
+.ol-swipe button:before,
+.ol-swipe button:after {
     position: absolute;
     top: 25%;
     bottom: 25%;
@@ -55,21 +55,21 @@
     width: 2px;
     content: "";
 }
-.nextgis .ol-swipe:after {
+.ol-swipe:after {
     /* Set the sandwich midle stick in correct position */
     transform: translate(-1px, 0);
 }
-.nextgis .ol-swipe button:before {
+.ol-swipe button:before {
     transform: translateX(-7px);
 }
 
-.nextgis .ol-swipe button:after {
+.ol-swipe button:after {
     transform: translateX(5px);
 }
 
-.nextgis .ol-swipe.horizontal:after,
-.nextgis .ol-swipe.horizontal button:before,
-.nextgis .ol-swipe.horizontal button:after {
+.ol-swipe.horizontal:after,
+.ol-swipe.horizontal button:before,
+.ol-swipe.horizontal button:after {
     top: 50%;
     right: 25%;
     bottom: auto;
@@ -78,19 +78,19 @@
     height: 2px;
 }
 
-.nextgis .ol-swipe.horizontal:after {
+.ol-swipe.horizontal:after {
     transform: translate(0, -1px);
 }
 
-.nextgis .ol-swipe.horizontal button:before {
+.ol-swipe.horizontal button:before {
     transform: translateY(-7px);
 }
 
-.nextgis .ol-swipe.horizontal button:after {
+.ol-swipe.horizontal button:after {
     transform: translateY(5px);
 }
 
-.nextgis .ol-swipe .ol-swipe-toggle {
+.ol-swipe .ol-swipe-toggle {
     display: flex;
     position: absolute;
     top: -40px;
@@ -108,29 +108,29 @@
     height: 16px;
 }
 
-.nextgis .ol-swipe .ol-swipe-toggle:hover {
+.ol-swipe .ol-swipe-toggle:hover {
     background-color: var(--accent);
 }
 
-.nextgis .ol-swipe .ol-swipe-toggle:hover svg {
+.ol-swipe .ol-swipe-toggle:hover svg {
     stroke: white;
 }
 
-.nextgis .ol-swipe .ol-swipe-toggle svg {
+.ol-swipe .ol-swipe-toggle svg {
     stroke: var(--accent);
     transition: transform 0s ease;
 }
 
-.nextgis .ol-swipe.horizontal .ol-swipe-toggle {
+.ol-swipe.horizontal .ol-swipe-toggle {
     top: 50%;
     left: -40px;
     transform: translateY(-50%);
 }
 
-.nextgis .ol-swipe.horizontal .ol-swipe-toggle svg {
+.ol-swipe.horizontal .ol-swipe-toggle svg {
     transform: rotate(90deg);
 }
 
-.nextgis .ol-swipe .ol-swipe-toggle:focus {
+.ol-swipe .ol-swipe-toggle:focus {
     outline: none;
 }

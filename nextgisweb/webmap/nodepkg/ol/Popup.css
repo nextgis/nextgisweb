@@ -7,9 +7,6 @@
     padding: 2px 4px 0;
 }
 
-.ngwPopup .dijitTooltipContainer {
-    overflow: hidden;
-}
 .ngwPopup .tooltip__container {
     overflow: hidden;
 }

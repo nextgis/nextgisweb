@@ -9,12 +9,7 @@
         <input name="next" type="hidden" value="${next_url}">
     %endif
 
-    <button class="dijit dijitReset dijitInline dijitButton--primary dijitButton"
-            type="submit" value="">
-        <span class="dijitReset dijitInline dijitButtonNode" >
-            <span>
-                ${tr(gettext('Sign in'))}
-            </span>
-        </span>
+    <button type="submit" value="">
+        ${tr(gettext('Sign in'))}
     </button>
 </form>

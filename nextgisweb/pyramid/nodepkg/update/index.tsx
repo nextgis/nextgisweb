@@ -26,7 +26,12 @@ export function init() {
                         {critical
                             ? gettext("Critical updates are available")
                             : gettext("Updates are available")}
-                        <div className="text-muted small-text">
+                        <div
+                            style={{
+                                fontSize: "14px",
+                                color: "var(--text-secondary)",
+                            }}
+                        >
                             {gettext("Click to see what's new")}
                         </div>
                     </>

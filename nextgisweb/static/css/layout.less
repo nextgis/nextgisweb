@@ -13,12 +13,6 @@
 @import "blocks/_tables.less";
 @import "blocks/_typography.less";
 
-// Antd 5 doesn't set box-sizing: border-box as Antd 4, but we rely on it.
-div.dijitTabPane,
-table.dijitSelect {
-    box-sizing: border-box;
-}
-
 /* -- BASE STYLES -- */
 
 body,
@@ -326,10 +320,6 @@ a[class*=" icon-"]:hover:before {
             }
         }
     }
-}
-
-.padding-block {
-    padding: 8px;
 }
 
 .overlay {

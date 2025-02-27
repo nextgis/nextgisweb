@@ -15,10 +15,10 @@ export class Popup extends Overlay {
 
     constructor({ size, title, ...options }: PopupOptions) {
         const container = document.createElement("div");
-        container.className = "ngwPopup"; // Before dijitTooltipBelow
+        container.className = "ngwPopup";
 
         const subcontainer = document.createElement("div");
-        subcontainer.className = "tooltip__container"; // Before dijitTooltipContainer
+        subcontainer.className = "tooltip__container";
         container.appendChild(subcontainer);
 
         const contentDiv = document.createElement("div");
@@ -37,13 +37,13 @@ export class Popup extends Overlay {
 
         // Close button in the header
         const closeButton = document.createElement("span");
-        closeButton.className = "popup__close"; // Before dijitDialogCloseIcon
+        closeButton.className = "popup__close";
         closeButton.addEventListener("click", () => this.setMap(null));
         titleBar.appendChild(closeButton);
 
         // Connector arrow
         const connector = document.createElement("div");
-        connector.className = "popup__connector"; // Before dijitTooltipConnector
+        connector.className = "popup__connector";
         container.appendChild(connector);
 
         super({

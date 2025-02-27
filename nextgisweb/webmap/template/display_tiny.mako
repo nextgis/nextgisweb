@@ -5,9 +5,6 @@
         body, html {
             min-width: 0 !important; width: 100%; height: 100%; margin:0; padding: 0; overflow: hidden;
         }
-        div.dijitTabPaneWrapper.dijitTabContainerTop-container.dijitAlignCenter {
-            border: none;
-        }
     </style>
 </%def>
 

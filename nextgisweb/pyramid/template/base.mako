@@ -80,7 +80,7 @@
     ${include_head | n}
 </head>
 
-<body class="claro nextgis <%block name='body_class'/>">
+<body class="<%block name='body_class'/>">
     %if not custom_layout:
         <%
             lclasses = ["ngw-pyramid-layout"]
