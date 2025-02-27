@@ -10,6 +10,7 @@ import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import webmapSettings from "@nextgisweb/pyramid/settings!webmap";
 import type { SRSRead } from "@nextgisweb/spatial-ref-sys/type/api";
+import type { Display } from "@nextgisweb/webmap/display";
 
 import { DDtoDM, DDtoDMS } from "./format";
 import type { IdentifyInfo, IdentifyResultProps } from "./identification";
@@ -19,9 +20,8 @@ import PinIcon from "@nextgisweb/icon/material/pin_drop";
 
 import "./CoordinatesSwitcher.less";
 
-const localStorageKey = "ng.coordinates.srs";
-const defaultSrs = 4326;
 const degreeFormatSetting = webmapSettings.degree_format;
+const measurementSridSetting = webmapSettings.measurement_srid;
 const wkt = new WKT();
 
 const formatGeographicCoords = (coordinates: Coordinate) => {
@@ -86,22 +86,14 @@ const transformCoordinates = async (
     return transfCoords;
 };
 
-const getDefaultSrs = (transfCoords: TransfCoords): number => {
-    let defaultSrsId: number | undefined = undefined;
-    const storageSrsId = localStorage.getItem(localStorageKey);
-    if (storageSrsId) {
-        const num = parseInt(storageSrsId, 10);
-        const isNumber = !isNaN(num) && num.toString() === storageSrsId;
-        if (isNumber && transfCoords.has(num)) {
-            defaultSrsId = num;
-        }
-    }
-    if (!defaultSrsId) {
-        localStorage.setItem(localStorageKey, defaultSrs.toString());
-        defaultSrsId = defaultSrs;
+let localMeasureSrsId: number | undefined = undefined;
+const getDefaultMeasureSrsId = (display: Display) => {
+    if (localMeasureSrsId !== undefined) {
+        return localMeasureSrsId;
     }
 
-    return defaultSrsId;
+    localMeasureSrsId = display.config.measureSrsId || measurementSridSetting;
+    return localMeasureSrsId;
 };
 
 export const CoordinatesSwitcher = ({
@@ -164,11 +156,11 @@ export const CoordinatesSwitcher = ({
         });
 
         setOptions(newOptions);
-        setSelectedSrsId(getDefaultSrs(transfCoords));
+        setSelectedSrsId(getDefaultMeasureSrsId(display));
     }, [transfCoords]);
 
     const changeCoordinate = (value: number) => {
-        localStorage.setItem(localStorageKey, value.toString());
+        localMeasureSrsId = value;
         setSelectedSrsId(value);
     };
 
