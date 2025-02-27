@@ -2,7 +2,7 @@
 import { useState } from "react";
 
 import { Checkbox, Space } from "@nextgisweb/gui/antd";
-import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
+import * as blueprint from "@nextgisweb/resource/blueprint";
 
 import { FieldsForm } from "../../fields-form";
 import type { FormField } from "../../fields-form";
@@ -11,7 +11,6 @@ import { Code } from "./Code";
 import type { CodeProps } from "./Code";
 
 function CodeTest() {
-    const { data: blueprint } = useRouteGet("resource.blueprint");
     const [props, setProps] = useState<CodeProps>({
         lang: "json",
         readOnly: true,
@@ -36,10 +35,6 @@ function CodeTest() {
             formItem: <Checkbox />,
         },
     ];
-
-    if (!blueprint) {
-        return <>Loading...</>;
-    }
 
     return (
         <Space direction="vertical">

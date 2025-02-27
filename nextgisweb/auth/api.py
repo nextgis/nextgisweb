@@ -591,7 +591,6 @@ def setup_pyramid(comp, config):
     config.add_route(
         "auth.permission",
         "/api/component/auth/permission",
-        load_types=True,
         get=permission,
     )
 

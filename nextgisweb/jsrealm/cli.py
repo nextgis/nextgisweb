@@ -23,7 +23,7 @@ def create_tsconfig(npkgs: Dict[str, Path], *, debug):
     paths = {"react": ["./node_modules/@types/react"]}
 
     compiler_options = dict(
-        target="es2015",
+        target="es2017",
         lib=["dom", "dom.iterable", "esnext"],
         allowJs=True,
         skipLibCheck=True,

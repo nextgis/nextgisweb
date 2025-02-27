@@ -16,7 +16,9 @@ export function useLoadData({
     resourceId,
     userId,
 }: UseLoadDataProps): [PermissionData[] | null, boolean] {
-    const { data: schema } = useRouteGet("resource.blueprint");
+    const { data: schema } = useRouteGet("resource.blueprint", undefined, {
+        cache: true,
+    });
 
     const { data: effective } = useRouteGet({
         name: "resource.permission",

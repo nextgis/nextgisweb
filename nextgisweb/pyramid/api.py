@@ -765,7 +765,6 @@ def setup_pyramid(comp, config):
     config.add_route(
         "pyramid.kind_of_data",
         "/api/component/pyramid/kind_of_data",
-        load_types=True,
         get=kind_of_data,
     )
 

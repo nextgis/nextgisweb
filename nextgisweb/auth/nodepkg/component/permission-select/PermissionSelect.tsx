@@ -3,7 +3,9 @@ import { useMemo } from "react";
 import type { Permission } from "@nextgisweb/auth/type/api";
 import { Select } from "@nextgisweb/gui/antd";
 import type { SelectProps } from "@nextgisweb/gui/antd";
-import permission from "@nextgisweb/pyramid/api/load!/api/component/auth/permission";
+import { route } from "@nextgisweb/pyramid/api";
+
+const permission = await route("auth.permission").get({ cache: true });
 
 interface PermissionSelectProps extends SelectProps<Permission> {
     multiple?: boolean;

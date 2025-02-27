@@ -5,7 +5,6 @@ import { Button, Skeleton, Table } from "@nextgisweb/gui/antd";
 import { utc } from "@nextgisweb/gui/dayjs";
 import { sleep, sorterFactory } from "@nextgisweb/gui/util";
 import { route } from "@nextgisweb/pyramid/api";
-import kindOfData from "@nextgisweb/pyramid/api/load!/api/component/pyramid/kind_of_data";
 import { gettext, gettextf } from "@nextgisweb/pyramid/i18n";
 import { Translated } from "@nextgisweb/pyramid/i18n/translated";
 import settings from "@nextgisweb/pyramid/settings!pyramid";
@@ -17,6 +16,8 @@ import type {
 import CachedIcon from "@nextgisweb/icon/material/cached";
 
 import "./StorageSummary.less";
+
+const kindOfData = await route("pyramid.kind_of_data").get({ cache: true });
 
 const [msgDelayed, msgEstF, msgEstFU, msgEstU, msgEstN] = [
     gettext("Some changes may be reflected only after full estimation."),

@@ -40,8 +40,11 @@ export function DeletePage({
         options: { query: { resources } },
     });
 
-    const { data: labelData, isLoading: isLabelDataLoading } =
-        useRouteGet("resource.blueprint");
+    const { data: labelData, isLoading: isLabelDataLoading } = useRouteGet(
+        "resource.blueprint",
+        undefined,
+        { cache: true }
+    );
 
     const sortedData = useMemo(() => {
         if (data && labelData)

@@ -2,7 +2,7 @@
 import { useMemo } from "react";
 
 import { List, Space } from "@nextgisweb/gui/antd";
-import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
+import * as blueprint from "@nextgisweb/resource/blueprint";
 import type {
     BlueprintResource,
     ResourceCls,
@@ -11,8 +11,6 @@ import type {
 import { SvgIcon } from "./SvgIcon";
 
 const SvgIconTest = () => {
-    const { data: blueprint } = useRouteGet("resource.blueprint");
-
     const allResourceClasses = useMemo<
         (BlueprintResource & { cls: ResourceCls })[]
     >(() => {
@@ -22,7 +20,7 @@ const SvgIconTest = () => {
                   cls: cls as ResourceCls,
               }))
             : [];
-    }, [blueprint]);
+    }, []);
 
     return (
         <Space direction="vertical">

@@ -1,3 +1,5 @@
-import blueprint from "@nextgisweb/pyramid/api/load!/api/component/resource/blueprint";
+import { route } from "@nextgisweb/pyramid/api";
 
-export const { resources, scopes, categories } = blueprint;
+const data = await route("resource.blueprint").get({ cache: true });
+
+export const { resources, scopes, categories } = data;

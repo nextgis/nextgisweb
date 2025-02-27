@@ -1,6 +1,7 @@
 from collections import defaultdict
 from itertools import chain, count
 from textwrap import dedent
+from json import dumps as json_dumps
 from typing import Any, Dict, List, Literal, Sequence, Tuple, Type, Union, cast
 
 from msgspec import NODEFAULT, Struct, UnsetType, defstruct, field
