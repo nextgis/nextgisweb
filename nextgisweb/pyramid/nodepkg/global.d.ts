@@ -33,12 +33,6 @@ declare module "@nextgisweb/pyramid/type/config" {
     }
 }
 
-declare const dojoConfig: {
-    baseUrl: string;
-    isDebug: boolean;
-    locale: string;
-};
-
 declare module "@nextgisweb/pyramid/settings!pyramid" {
     interface Language {
         display_name: string;

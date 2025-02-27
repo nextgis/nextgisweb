@@ -7,8 +7,7 @@ export default (value: (...args: []) => void, el: HTMLElement) => {
     root.id = "mocha";
     el.append(root);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    entrypoint("mocha").then((mocha: any) => {
+    entrypoint("mocha/mocha").then(() => {
         mocha.setup("bdd");
         value();
         mocha.run();

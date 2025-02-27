@@ -11,7 +11,7 @@ import { getGeometryTypeTitle } from "@nextgisweb/webmap/utils/geometry-types";
 import type { GeometryInfo } from "../../type/GeometryInfo";
 import "./GeometryInfoTable.less";
 
-const locale = dojoConfig.locale;
+const locale = ngwConfig.locale;
 const formatConfig: DefaultConfig = {
     format: "jsx",
     locale,

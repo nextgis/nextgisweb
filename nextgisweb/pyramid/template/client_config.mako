@@ -69,16 +69,10 @@
 
     dojoConfig = {
         "async": True,
-        "isDebug": True,
         "packages": [
             {"name": "@nextgisweb", "location": request.static_url('main/@nextgisweb')}
         ],
         "baseUrl": request.static_url('dojo'),
-        "locale": request.locale_name,
-        "aliases": [
-            ['mocha', 'mocha/mocha'],
-            ['openlayers/ol', 'external-ol/ol'],
-        ],
     }
 %>
 

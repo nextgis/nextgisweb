@@ -18,7 +18,6 @@ const config = {
         "plugin:prettier/recommended",
     ],
     globals: {
-        dojoConfig: "readonly",
         ngwConfig: "readonly",
     },
     rules: {
@@ -158,16 +157,6 @@ const config = {
                 sourceType: "module",
                 jsx: true,
                 babelOptions: { configFile: babelConfigPath },
-            },
-        },
-        {
-            files: expcomp("amd/**/*.js"),
-            plugins: ["requirejs"],
-            extends: ["eslint:recommended", "plugin:requirejs/recommended"],
-            env: { browser: true, amd: true, es2015: true },
-            rules: {
-                "eqeqeq": "warn",
-                "no-useless-escape": "warn",
             },
         },
     ],
