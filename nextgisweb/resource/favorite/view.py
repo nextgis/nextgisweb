@@ -2,19 +2,16 @@ import sqlalchemy as sa
 
 from nextgisweb.env import DBSession, gettext
 
-from nextgisweb.pyramid import viewargs
+from nextgisweb.gui import react_renderer
 
 from ..model import Resource
 from .base import ResourceFavorite
 from .model import ResourceFavoriteModel
 
 
-@viewargs(renderer="react")
+@react_renderer("@nextgisweb/resource/favorite/FavoritePage")
 def page(request):
-    return dict(
-        title=gettext("Favorites"),
-        entrypoint="@nextgisweb/resource/favorite/FavoritePage",
-    )
+    return dict(title=gettext("Favorites"))
 
 
 def config_value(request):

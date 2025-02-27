@@ -1,7 +1,7 @@
 from nextgisweb.env import gettext
 from nextgisweb.lib.dynmenu import Link
 
-from nextgisweb.pyramid import viewargs
+from nextgisweb.gui import react_renderer
 from nextgisweb.resource import ConnectionScope, DataScope, Resource, Widget, resource_factory
 
 from .model import PostgisConnection, PostgisLayer
@@ -42,8 +42,10 @@ def setup_pyramid(comp, config):
             )
 
 
-@viewargs(renderer="react")
-def diagnostics_page(context, request):
+@react_renderer("@nextgisweb/postgis/diagnostics-widget")
+def diagnostics_page(request):
+    context = request.context
+
     if isinstance(context, PostgisConnection):
         request.resource_permission(ConnectionScope.connect)
         data = dict(connection=dict(id=context.id))
@@ -54,7 +56,6 @@ def diagnostics_page(context, request):
         raise ValueError
 
     return dict(
-        entrypoint="@nextgisweb/postgis/diagnostics-widget",
         props=dict(data=data),
         title=gettext("PostGIS diagnostics"),
         obj=request.context,

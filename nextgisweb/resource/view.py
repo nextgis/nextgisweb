@@ -15,6 +15,7 @@ from nextgisweb.lib.dynmenu import DynMenu, Label, Link
 
 from nextgisweb.auth import OnUserLogin
 from nextgisweb.core.exception import InsufficientPermissions
+from nextgisweb.gui import react_renderer
 from nextgisweb.pyramid import JSONType, viewargs
 from nextgisweb.pyramid.breadcrumb import Breadcrumb, breadcrumb_adapter
 from nextgisweb.pyramid.psection import PageSections
@@ -107,11 +108,10 @@ def root(request):
     return HTTPFound(request.route_url("resource.show", id=0))
 
 
-@viewargs(renderer="react")
+@react_renderer("@nextgisweb/resource/json-view")
 def json_view(request):
     request.resource_permission(ResourceScope.read)
     return dict(
-        entrypoint="@nextgisweb/resource/json-view",
         props=dict(id=request.context.id),
         title=gettext("JSON view"),
         obj=request.context,
@@ -119,11 +119,10 @@ def json_view(request):
     )
 
 
-@viewargs(renderer="react")
+@react_renderer("@nextgisweb/resource/effective-permissions")
 def effective_permisssions(request):
     request.resource_permission(ResourceScope.read)
     return dict(
-        entrypoint="@nextgisweb/resource/effective-permissions",
         props=dict(resourceId=request.context.id),
         title=gettext("User permissions"),
         obj=request.context,
@@ -163,37 +162,34 @@ class OnResourceCreateView:
     parent: Resource
 
 
-@viewargs(renderer="react")
+@react_renderer("@nextgisweb/resource/composite")
 def create(request):
     request.resource_permission(ResourceScope.manage_children)
     cls = request.GET.get("cls")
     zope.event.notify(OnResourceCreateView(cls=cls, parent=request.context))
     return dict(
         obj=request.context,
-        entrypoint="@nextgisweb/resource/composite",
         title=gettext("Create resource"),
         maxheight=True,
         props=dict(operation="create", cls=cls, parent=request.context.id),
     )
 
 
-@viewargs(renderer="react")
+@react_renderer("@nextgisweb/resource/composite")
 def update(request):
     request.resource_permission(ResourceScope.update)
     return dict(
         obj=request.context,
-        entrypoint="@nextgisweb/resource/composite",
         title=gettext("Update resource"),
         maxheight=True,
         props=dict(operation="update", id=request.context.id),
     )
 
 
-@viewargs(renderer="react")
+@react_renderer("@nextgisweb/resource/delete-page")
 def delete(request):
     request.resource_permission(ResourceScope.read)
     return dict(
-        entrypoint="@nextgisweb/resource/delete-page",
         # Delete page is universal for multiple resources deletion which is why resources is an array
         props=dict(resources=[request.context.id], navigateToId=request.context.parent.id),
         title=gettext("Delete resource"),
@@ -202,11 +198,10 @@ def delete(request):
     )
 
 
-@viewargs(renderer="react")
+@react_renderer("@nextgisweb/resource/export-settings")
 def resource_export(request):
     request.require_administrator()
     return dict(
-        entrypoint="@nextgisweb/resource/export-settings",
         title=gettext("Resource export"),
         dynmenu=request.env.pyramid.control_panel,
     )

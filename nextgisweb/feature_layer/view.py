@@ -3,7 +3,7 @@ from pyramid.httpexceptions import HTTPNotFound
 from nextgisweb.env import gettext
 from nextgisweb.lib.dynmenu import Label, Link
 
-from nextgisweb.pyramid import viewargs
+from nextgisweb.gui import react_renderer
 from nextgisweb.resource import DataScope, Resource, Widget, resource_factory
 from nextgisweb.resource.extaccess import ExternalAccessLink
 from nextgisweb.resource.view import resource_sections
@@ -27,7 +27,7 @@ class SettingsWidget(Widget):
         return IVersionableFeatureLayer.providedBy(self.obj) and super().is_applicable()
 
 
-@viewargs(renderer="react")
+@react_renderer("@nextgisweb/feature-layer/feature-grid")
 def feature_browse(request):
     request.resource_permission(DataScope.read)
 
@@ -36,14 +36,13 @@ def feature_browse(request):
     return dict(
         obj=request.context,
         title=gettext("Feature table"),
-        entrypoint="@nextgisweb/feature-layer/feature-grid",
         props=dict(id=request.context.id, readonly=readonly, editOnNewPage=True),
         maxwidth=True,
         maxheight=True,
     )
 
 
-@viewargs(renderer="react")
+@react_renderer("@nextgisweb/feature-layer/feature-display")
 def feature_show(request):
     request.resource_permission(DataScope.read)
 
@@ -51,7 +50,6 @@ def feature_show(request):
 
     return dict(
         obj=request.context,
-        entrypoint="@nextgisweb/feature-layer/feature-display",
         props=dict(resourceId=request.context.id, featureId=feature_id),
         title=gettext("Feature #%d") % feature_id,
         maxheight=True,
@@ -59,7 +57,7 @@ def feature_show(request):
     )
 
 
-@viewargs(renderer="react")
+@react_renderer("@nextgisweb/feature-layer/feature-editor")
 def feature_update(request):
     request.resource_permission(DataScope.write)
 
@@ -67,7 +65,6 @@ def feature_update(request):
 
     return dict(
         obj=request.context,
-        entrypoint="@nextgisweb/feature-layer/feature-editor",
         props=dict(resourceId=request.context.id, featureId=feature_id),
         title=gettext("Feature #%d") % feature_id,
         maxheight=True,
@@ -75,7 +72,7 @@ def feature_update(request):
     )
 
 
-@viewargs(renderer="react")
+@react_renderer("@nextgisweb/feature-layer/export-form")
 def export(request):
     if not request.context.has_export_permission(request.user):
         raise HTTPNotFound()
@@ -83,18 +80,16 @@ def export(request):
         obj=request.context,
         title=gettext("Save as"),
         props=dict(id=request.context.id),
-        entrypoint="@nextgisweb/feature-layer/export-form",
         maxheight=True,
     )
 
 
-@viewargs(renderer="react")
+@react_renderer("@nextgisweb/feature-layer/export-form")
 def export_multiple(request):
     return dict(
         obj=request.context,
         title=gettext("Save as"),
         props=dict(multiple=True, pick=True),
-        entrypoint="@nextgisweb/feature-layer/export-form",
         maxheight=True,
     )
 

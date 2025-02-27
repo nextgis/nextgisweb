@@ -3,7 +3,7 @@ from pyramid.httpexceptions import HTTPNotFound
 from nextgisweb.env import gettext
 from nextgisweb.lib import dynmenu as dm
 
-from nextgisweb.pyramid import viewargs
+from nextgisweb.gui import react_renderer
 from nextgisweb.resource import Resource, Widget
 from nextgisweb.resource.extaccess import ExternalAccessLink
 
@@ -16,7 +16,7 @@ class RasterLayerWidget(Widget):
     amdmod = "@nextgisweb/raster-layer/editor-widget"
 
 
-@viewargs(renderer="react")
+@react_renderer("@nextgisweb/raster-layer/export-form")
 def export(request):
     if not request.context.has_export_permission(request.user):
         raise HTTPNotFound()
@@ -24,7 +24,6 @@ def export(request):
         obj=request.context,
         title=gettext("Save as"),
         props=dict(id=request.context.id),
-        entrypoint="@nextgisweb/raster-layer/export-form",
         maxheight=True,
     )
 

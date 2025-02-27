@@ -4,30 +4,26 @@ from sqlalchemy.orm.exc import NoResultFound
 from nextgisweb.env import gettext
 from nextgisweb.lib import dynmenu as dm
 
-from nextgisweb.pyramid import viewargs
+from nextgisweb.gui import react_renderer
 
 from .model import SRS
 from .pyramid import require_catalog_configured
 
 
-@viewargs(renderer="react")
+@react_renderer("@nextgisweb/spatial-ref-sys/srs-browse")
 def srs_browse(request):
     request.user.require_permission(any, *SRS.permissions.all)
 
     return dict(
         title=gettext("Spatial reference systems"),
-        entrypoint="@nextgisweb/spatial-ref-sys/srs-browse",
         props=dict(readonly=not request.user.has_permission(SRS.permissions.manage)),
         dynmenu=request.env.pyramid.control_panel,
     )
 
 
-@viewargs(renderer="react")
+@react_renderer("@nextgisweb/spatial-ref-sys/srs-widget")
 def srs_create_or_edit(request):
-    result = dict(
-        entrypoint="@nextgisweb/spatial-ref-sys/srs-widget",
-        dynmenu=request.env.pyramid.control_panel,
-    )
+    result = dict(dynmenu=request.env.pyramid.control_panel)
 
     if "id" not in request.matchdict:
         request.user.require_permission(SRS.permissions.manage)
@@ -45,19 +41,18 @@ def srs_create_or_edit(request):
     return result
 
 
-@viewargs(renderer="react")
+@react_renderer("@nextgisweb/spatial-ref-sys/catalog-browse")
 def catalog_browse(request):
     request.user.require_permission(SRS.permissions.manage)
     require_catalog_configured()
 
     return dict(
         title=gettext("Spatial reference system catalog"),
-        entrypoint="@nextgisweb/spatial-ref-sys/catalog-browse",
         dynmenu=request.env.pyramid.control_panel,
     )
 
 
-@viewargs(renderer="react")
+@react_renderer("@nextgisweb/spatial-ref-sys/catalog-import")
 def catalog_import(request):
     request.user.require_permission(SRS.permissions.manage)
     require_catalog_configured()
@@ -67,7 +62,6 @@ def catalog_import(request):
     item_url = catalog_url + "/srs/" + str(catalog_id)
     return dict(
         title=gettext("Spatial reference system") + " #%d" % catalog_id,
-        entrypoint="@nextgisweb/spatial-ref-sys/catalog-import",
         props=dict(url=item_url, id=catalog_id),
         dynmenu=request.env.pyramid.control_panel,
     )

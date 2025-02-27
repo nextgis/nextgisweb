@@ -5,6 +5,7 @@ from pyramid.renderers import render_to_response
 from nextgisweb.env import gettext
 from nextgisweb.lib.dynmenu import Label, Link
 
+from nextgisweb.gui import react_renderer
 from nextgisweb.pyramid import viewargs
 from nextgisweb.render.view import TMSLink
 from nextgisweb.resource import Resource, ResourceFactory, ResourceScope, Widget
@@ -76,11 +77,10 @@ def display_tiny(obj, request):
     return display(obj, request)
 
 
-@viewargs(renderer="react")
+@react_renderer("@nextgisweb/webmap/clone-webmap")
 def clone(request):
     request.resource_permission(ResourceScope.read)
     return dict(
-        entrypoint="@nextgisweb/webmap/clone-webmap",
         props=dict(id=request.context.id),
         obj=request.context,
         title=gettext("Clone web map"),
@@ -101,11 +101,10 @@ def preview_embedded(request):
     )
 
 
-@viewargs(renderer="react")
+@react_renderer("@nextgisweb/webmap/settings")
 def settings(request):
     request.require_administrator()
     return dict(
-        entrypoint="@nextgisweb/webmap/settings",
         title=gettext("Web map settings"),
         dynmenu=request.env.pyramid.control_panel,
     )

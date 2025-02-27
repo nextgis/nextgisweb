@@ -4,11 +4,11 @@ from nextgisweb.env import gettext
 from nextgisweb.lib import dynmenu as dm
 
 from nextgisweb.feature_layer import IFeatureLayer
-from nextgisweb.pyramid import viewargs
+from nextgisweb.gui import react_renderer
 from nextgisweb.resource import DataScope, Resource, resource_factory
 
 
-@viewargs(renderer="react")
+@react_renderer("@nextgisweb/feature-attachment/attachment-form")
 def attachment(request):
     request.resource_permission(DataScope.read)
 
@@ -19,7 +19,6 @@ def attachment(request):
         obj=request.context,
         title=gettext("Manage attachments"),
         props=dict(id=request.context.id),
-        entrypoint="@nextgisweb/feature-attachment/attachment-form",
         maxheight=True,
     )
 

@@ -1,19 +1,18 @@
 from nextgisweb.env import gettext
 from nextgisweb.lib.dynmenu import Link
 
-from nextgisweb.pyramid import viewargs
+from nextgisweb.gui import react_renderer
 
 from .backend import is_backend_configured, require_backend
 
 
-@viewargs(renderer="react")
+@react_renderer("@nextgisweb/audit/journal")
 def journal(request):
     request.require_administrator()
     require_backend("dbase")
 
     return dict(
         title=gettext("Journal"),
-        entrypoint="@nextgisweb/audit/journal",
         dynmenu=request.env.pyramid.control_panel,
         maxwidth=True,
         maxheight=True,

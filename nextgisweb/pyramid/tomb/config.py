@@ -286,7 +286,7 @@ class Configurator(PyramidConfigurator):
 
         if view is not None:
             # Extract attrs missing in kwargs from view.__pyramid_{attr}__
-            attrs = {"renderer", "query_params"}.difference(set(kwargs.keys()))
+            attrs = {"renderer", "query_params", "react_renderer"}.difference(set(kwargs.keys()))
 
             fn = view
             while fn and len(attrs) > 0:
@@ -383,6 +383,7 @@ class Configurator(PyramidConfigurator):
                 component=component,
                 body_type=body_type,
                 return_type=return_type,
+                react_renderer=kwargs.pop("react_renderer", None),
             )
 
         if renderer := kwargs.get("renderer"):

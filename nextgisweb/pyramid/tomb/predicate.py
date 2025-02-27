@@ -43,6 +43,7 @@ class ViewMeta(MetaPredicateBase):
     query_params: Mapping[str, QueryParam]
     body_type: Optional[type]
     return_type: Optional[type]
+    react_renderer: Optional[str]
 
 
 @dataclass

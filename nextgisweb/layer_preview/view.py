@@ -3,19 +3,19 @@ from nextgisweb.lib.dynmenu import Link
 
 from nextgisweb.basemap.model import BasemapLayer
 from nextgisweb.feature_layer import IFeatureLayer
-from nextgisweb.pyramid import viewargs
+from nextgisweb.gui import react_renderer
 from nextgisweb.raster_layer import RasterLayer
 from nextgisweb.render import IRenderableStyle
 from nextgisweb.resource import DataScope, Resource, resource_factory
 
 
-@viewargs(renderer="react")
-def preview_map(resource, request):
+@react_renderer("@nextgisweb/layer-preview/preview-layer")
+def preview_map(request):
     request.resource_permission(DataScope.read)
+    resource = request.context
 
     return dict(
         obj=resource,
-        entrypoint="@nextgisweb/layer-preview/preview-layer",
         props=dict(resourceId=resource.id),
         title=gettext("Preview"),
     )
