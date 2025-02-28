@@ -25,7 +25,7 @@ function isUpToDate(name) {
     const fn = path.resolve(distPath, name, "webpack-stats.json");
     if (!fs.existsSync(fn)) return false;
 
-    const sdata = JSON.parse(fs.readFileSync(fn));
+    const sdata = JSON.parse(fs.readFileSync(fn, "utf8"));
     if (sdata.errorsCount !== 0) return false;
 
     const lckct = fs.statSync(path.resolve("yarn.lock")).ctimeMs;

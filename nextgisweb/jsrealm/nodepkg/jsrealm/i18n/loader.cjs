@@ -20,7 +20,7 @@ function potFlagged(comp) {
     const fn = path.resolve(env.components[comp], "locale/.pot");
     if (!fs.existsSync(fn)) return;
 
-    const tr = po.parse(fs.readFileSync(fn)).translations;
+    const tr = po.parse(fs.readFileSync(fn, "utf8")).translations;
     const dindex = {};
     for (const [context, messages] of Object.entries(tr)) {
         const cindex = (dindex[context] = []);

@@ -5,7 +5,7 @@ const doctrine = require("doctrine");
 const extractRegexp = /\/\*\*.*(?:\*\/$|$(?:\s*\*\s?.*$)*\s*\*\/)/m;
 
 module.exports = function tagParser(fn) {
-    const body = fs.readFileSync(fn, { encoding: "utf-8" });
+    const body = fs.readFileSync(fn, "utf8");
     const match = extractRegexp.exec(body);
     if (match) {
         const jsdoc = match[0];

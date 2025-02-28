@@ -1,7 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 
-const packageJson = JSON.parse(fs.readFileSync(`package.json`));
+const packageJson = JSON.parse(fs.readFileSync(`package.json`), "utf8");
 const section = packageJson.nextgisweb;
 
 const components = [];
@@ -12,7 +12,9 @@ for (const [cId, cPath] of Object.entries(section.env.components)) {
 }
 
 for (const wsPath of packageJson.workspaces) {
-    const packageJson = JSON.parse(fs.readFileSync(`${wsPath}/package.json`));
+    const packageJson = JSON.parse(
+        fs.readFileSync(`${wsPath}/package.json`, "utf8")
+    );
     const packageName = packageJson.name;
     packages.push({
         name: packageName,

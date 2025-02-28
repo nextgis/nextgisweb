@@ -70,7 +70,7 @@ entrypoints
     .filter(({ type }) => type === "plugin")
     .forEach(({ entry, plugin: registry, fullname }) => {
         if (!registry) {
-            const body = fs.readFileSync(fullname, { encoding: "utf-8" });
+            const body = fs.readFileSync(fullname, "utf8");
             for (const [_, n] of body.matchAll(plRegExp)) {
                 if (plRegistries[n] !== undefined) {
                     registry = n;
@@ -186,9 +186,7 @@ entrypoints
         const codeString = code.join("\n") + "\n";
         if (
             !fs.existsSync(registryObject.loaderFile) ||
-            fs.readFileSync(registryObject.loaderFile, {
-                encoding: "utf-8",
-            }) !== codeString
+            fs.readFileSync(registryObject.loaderFile, "utf8") !== codeString
         ) {
             fs.writeFileSync(registryObject.loaderFile, codeString);
         }
@@ -354,7 +352,7 @@ for (const [comp, compDir] of Object.entries(config.env.components)) {
     for (const collection of Object.keys(iconUtil.COLLECTIONS)) {
         const fn = path.resolve(dir, `${collection}.json`);
         if (!fs.existsSync(fn)) continue;
-        for (const ref of JSON.parse(fs.readFileSync(fn))) {
+        for (const ref of JSON.parse(fs.readFileSync(fn, "utf8"))) {
             iconsFromJson.push(`@nextgisweb/icon/${collection}/${ref}`);
         }
     }
