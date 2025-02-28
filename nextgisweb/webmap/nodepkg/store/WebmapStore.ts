@@ -109,7 +109,6 @@ export class WebmapStore {
             const newVal = store.getValue(item, "checked");
             if (!!store.getValue(item, "visibility") !== newVal) {
                 const id = store.getValue(item, "id");
-                console.log(`Layer ${id} visibility has changed to ${newVal}`);
                 store.setValue(item, "visibility", newVal);
                 this._setChecked(id, newVal);
             }

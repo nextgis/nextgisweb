@@ -8,15 +8,6 @@ export class LoggedDeferred<T = boolean> {
             this.resolvePromise = resolve;
             this.rejectPromise = reject;
         });
-
-        this.promise.then(
-            () => {
-                console.log("Deferred object [%s] resolved", this.name);
-            },
-            () => {
-                console.error("Deferred object [%s] rejected", this.name);
-            }
-        );
     }
 
     resolve(value: T): void {

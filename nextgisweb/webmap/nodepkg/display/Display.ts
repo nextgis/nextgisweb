@@ -658,8 +658,6 @@ export class Display {
         plugins: Record<string, MapPlugin | { default: MapPlugin }>
     ) {
         Object.keys(plugins).forEach((key) => {
-            console.log("Plugin [%s]::constructor...", key);
-
             if (this.isTinyMode() && !this.isTinyModePlugin(key)) {
                 return;
             }
@@ -684,15 +682,11 @@ export class Display {
             });
 
             this._postCreateDeferred.then(() => {
-                console.log("Plugin [%s]::postCreate...", key);
                 plugin.postCreate();
 
                 this._startupDeferred.then(() => {
-                    console.log("Plugin [%s]::startup...", key);
                     plugin.startup();
-
                     this.plugins[key] = plugin;
-                    console.info("Plugin [%s] registered", key);
                 });
             });
         });
