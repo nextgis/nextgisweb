@@ -6,12 +6,13 @@ PRESERVE = {
     "none": None,
     "empty": "",
     "plain": "Text",
+    "unicode": "無无",
     "paragraph": "<p>Text</p>",
     "two-paragraphs": "<p>T</p><p>Text</p>",
     "data-url-img": '<img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=">',
-    "unknown-link": '<a href="e1c://server">Text</a>',
-    "figure-table": '<figure class="table"><table></table></figure>',
-    "unicode": "無无",
+    "1c-link": '<a href="e1c://server">Text</a>',
+    "data-colon": '<a href="https://domain.org/path/data:colon"></a>',
+    "feature-link": '<a href="123:456">Feature #456 of resource #123</a>',
 }
 
 
@@ -30,8 +31,9 @@ CLEAN = {
     "unballanced": ("<b><i>T</b></i>", "<b><i>T</i></b>"),
     "mixed-brs": ("1<br>2<br/>3", "1<br>2<br>3"),
     "js-tag": ("<p></p><script>alert()</script>", "<p></p>"),
-    "js-href": ('<a href="javascript:alert()"></a>', '<a href=""></a>'),
+    "js-href": ('<a href="javascript:alert()"></a>', "<a></a>"),
     "js-onclick": ('<div onclick="alert()"></div>', "<div></div>"),
+    "data-unknown": ('<img src="data:unknown">', "<img>"),
     "style-tag": ("Some <style>a { color: red; }</style> text", "Some  text"),
     "style-breaking": ('<div style="position: fixed; inset: 0"/>', "<div></div>"),
     "style-font-weight": ('<span style="font-weight: bold"/>', "<span></span>"),
