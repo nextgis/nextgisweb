@@ -1,8 +1,6 @@
 import pytest
 import transaction
 
-from nextgisweb.env import DBSession
-
 from .. import WebMap, WebMapItem
 
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
@@ -25,22 +23,27 @@ def enable_annotation(ngw_env):
 @pytest.fixture(scope="module")
 def webmap(ngw_env):
     with transaction.manager:
-        obj = WebMap(root_item=WebMapItem(item_type="root")).persist()
-        DBSession.flush()
-        DBSession.expunge(obj)
+        obj = WebMap(
+            root_item=WebMapItem(item_type="root"),
+        ).persist()
 
-    yield obj
+    yield obj.id
 
 
 def test_annotation_post_get(webmap, ngw_webtest_app):
-    result = ngw_webtest_app.post_json(
-        "/api/resource/%d/annotation/" % webmap.id, ANNOTATION_SAMPLE
-    )
+    aid = ngw_webtest_app.post_json(
+        f"/api/resource/{webmap}/annotation/",
+        ANNOTATION_SAMPLE,
+    ).json["id"]
 
-    aid = result.json["id"]
-    assert aid > 0
-
-    adata = ngw_webtest_app.get("/api/resource/%d/annotation/%d" % (webmap.id, aid)).json
+    aurl = f"/api/resource/{webmap}/annotation/{aid}"
+    adata = ngw_webtest_app.get(aurl).json
     del adata["id"]
-
     assert adata == ANNOTATION_SAMPLE
+
+    danger_html = '<a href="javascript:alert()">XSS</a><b>Foo'
+    safe_html = "<a>XSS</a><b>Foo</b>"
+    ngw_webtest_app.put_json(aurl, dict(description=danger_html))
+
+    adata = ngw_webtest_app.get(aurl).json
+    assert adata["description"] == safe_html

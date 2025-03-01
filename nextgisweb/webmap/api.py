@@ -14,6 +14,7 @@ from pyramid.response import Response
 from typing_extensions import Annotated
 
 from nextgisweb.env import DBSession
+from nextgisweb.lib.safehtml import sanitize
 
 from nextgisweb.jsrealm import TSExport
 from nextgisweb.layer import IBboxLayer
@@ -60,7 +61,9 @@ def annotation_from_dict(obj, data):
     for k in ("description", "style", "geom", "public"):
         if k in data:
             v = data[k]
-            if k == "geom":
+            if k == "description":
+                v = sanitize(v)
+            elif k == "geom":
                 v = "SRID=3857;" + v
             setattr(obj, k, v)
 
