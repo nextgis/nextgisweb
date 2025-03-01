@@ -76,7 +76,7 @@ extras_require = dict(
         "pytest-flake8",
         "pytest-watch",
         "pytest==7.3.*",
-        "ruff",
+        "ruff>=0.9.0",
         "sqlglot",
         "webtest",
     ]

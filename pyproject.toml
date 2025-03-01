@@ -3,17 +3,20 @@ line-length = 99
 
 [tool.ruff]
 line-length = 99
-select = ["E", "F", "W", "I", "TID251"]
-ignore = ["E501", "E731"]
 exclude = [
     "docker.py",
     "nextgisweb/raster_layer/test/validate_cloud_optimized_geotiff.py",
 ]
 
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "TID251"]
+ignore = ["E501", "E731"]
+
+
+[tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401"]
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 variables = ["_"]
 # Absolute imports are more readable, relative ones are circuitous. So, let's
 # combine them with the following rules:
@@ -41,11 +44,11 @@ section-order = [
     "local-folder",
 ]
 
-[tool.ruff.isort.sections]
+[tool.ruff.lint.isort.sections]
 "nextgisweb_env_lib" = ["nextgisweb.env", "nextgisweb.lib"]
 "nextgisweb_comp" = ["nextgisweb"]
 
-[tool.ruff.flake8-tidy-imports]
+[tool.ruff.lint.flake8-tidy-imports]
 
-[tool.ruff.flake8-tidy-imports.banned-api]
+[tool.ruff.lint.flake8-tidy-imports.banned-api]
 pkg_resources.msg = "Consider importlib.metadata or nextgisweb.imptool.module_path"
