@@ -106,11 +106,11 @@ msgstr "Тип ресурса - {}."
 msgid "Go to"
 msgstr "Перейти"
 
-#: favorite/__init__.py:7 nodepkg/favorite/FavoritePage.tsx:381
+#: favorite/__init__.py:7 nodepkg/favorite/FavoritePage.tsx:380
 msgid "Edit"
 msgstr "Изменить"
 
-#: favorite/view.py:15 nodepkg/favorite/Avatar.tsx:54
+#: favorite/view.py:14 nodepkg/favorite/Avatar.tsx:54
 msgid "Favorites"
 msgstr "Избранное"
 
@@ -138,15 +138,19 @@ msgstr "Стиль по умолчанию"
 msgid "Resource can not be without a parent."
 msgstr "Ресурс не может быть без родителя"
 
-#: model.py:471
+#: model.py:467
+msgid "You are not allowed to create or move a resource of type '{}' here."
+msgstr "Вам не разрешено создавать или перемещать ресурс типа '{}' сюда."
+
+#: model.py:475
 msgid "You are not allowed to manage children of resource with id = %d."
 msgstr "У вас нет прав для управления дочерними ресурсами для ресурса с id = %d."
 
-#: model.py:483
+#: model.py:487
 msgid "Resource can not be a child of resource id = %d."
 msgstr "Ресурс не может быть дочерним для ресурса с id = %d."
 
-#: model.py:558
+#: model.py:562
 msgid ""
 "Unable to revoke '{permission}' permission for '{user}' as the user belongs "
 "to the administrators group. Administrators must always have ability to "
@@ -156,7 +160,7 @@ msgstr ""
 "относится к группе администраторов. Администраторы всегда должны иметь "
 "возможность настраивать права для ресурсов."
 
-#: model.py:657
+#: model.py:661
 msgid "Resource group"
 msgstr "Группа ресурсов"
 
@@ -167,12 +171,12 @@ msgid "Display name"
 msgstr "Наименование"
 
 #: nodepkg/children-section/ChildrenSection.tsx:90
-#: template/resource_section_main.mako:11
+#: template/resource_section_main.mako:14
 msgid "Type"
 msgstr "Тип"
 
 #: nodepkg/children-section/ChildrenSection.tsx:97
-#: nodepkg/editor-widget/EditorWidget.tsx:44 template/resource_section_main.mako:19
+#: nodepkg/editor-widget/EditorWidget.tsx:44 template/resource_section_main.mako:22
 msgid "Owner"
 msgstr "Владелец"
 
@@ -218,7 +222,7 @@ msgstr "Показать дату создания ресурса"
 
 #: nodepkg/children-section/component/MenuDropdown.tsx:211
 #: nodepkg/children-section/util/createResourceTableItemOptions.ts:8
-#: nodepkg/composite/CompositeWidget.tsx:50 view.py:373
+#: nodepkg/composite/CompositeWidget.tsx:50 view.py:374
 msgid "Delete"
 msgstr "Удалить"
 
@@ -298,19 +302,19 @@ msgstr "Выбрать эту группу"
 msgid "Pick selected"
 msgstr "Выбрать отмеченное"
 
-#: nodepkg/composite/CompositeStore.ts:232
+#: nodepkg/composite/CompositeStore.ts:258
 msgid "Validation error"
 msgstr "Ошибка валидации"
 
-#: nodepkg/composite/CompositeStore.ts:234
+#: nodepkg/composite/CompositeStore.ts:260
 msgid "Errors found during data validation. Tabs with errors marked in red."
 msgstr "При проверке данных обнаружена ошибка. Вкладки с ошибками отмечены красным."
 
-#: nodepkg/composite/CompositeStore.ts:250
+#: nodepkg/composite/CompositeStore.ts:276
 msgid "Unexpected error"
 msgstr "Внезапная ошибка"
 
-#: nodepkg/composite/CompositeStore.ts:251
+#: nodepkg/composite/CompositeStore.ts:277
 msgid "Serialization failed"
 msgstr "Сериализация не удалась"
 
@@ -327,15 +331,15 @@ msgstr "Сохранить"
 msgid "Read"
 msgstr "Прочитать"
 
-#: nodepkg/composite/CompositeWidget.tsx:67
+#: nodepkg/composite/CompositeWidget.tsx:55
 msgid "Please wait. Processing request..."
 msgstr "Подождите, пожалуйста, идет обработка запроса..."
 
-#: nodepkg/composite/CompositeWidget.tsx:168
+#: nodepkg/composite/CompositeWidget.tsx:180
 msgid "Create and edit"
 msgstr "Создать и изменить"
 
-#: nodepkg/delete-page/DeletePage.tsx:122
+#: nodepkg/delete-page/DeletePage.tsx:125
 msgid "Cancel"
 msgstr "Отмена"
 
@@ -414,7 +418,7 @@ msgstr "Идентификатор для API интеграции (необяз
 msgid "Parent"
 msgstr "Родитель"
 
-#: nodepkg/editor-widget/EditorWidget.tsx:56 template/resource_section_main.mako:13
+#: nodepkg/editor-widget/EditorWidget.tsx:56 template/resource_section_main.mako:16
 msgid "Keyname"
 msgstr "Ключ"
 
@@ -466,7 +470,7 @@ msgstr "Используйте эти ссылки для подключения
 msgid "Read more"
 msgstr "Подробнее"
 
-#: nodepkg/favorite/FavoritePage.tsx:28
+#: nodepkg/favorite/FavoritePage.tsx:27
 msgid ""
 "No favorite resources have been added yet. Use the star icon ({}) in the "
 "user's context menu to add items here."
@@ -474,7 +478,7 @@ msgstr ""
 "Избранные ресурсы пока не были добавлены. Используйте значок звездочки ({}) в"
 " контекстном меню пользователя, чтобы добавить сюда элементы."
 
-#: nodepkg/favorite/FavoritePage.tsx:381
+#: nodepkg/favorite/FavoritePage.tsx:380
 msgid "Done"
 msgstr "Готово"
 
@@ -487,7 +491,7 @@ msgid "Removed from favorites"
 msgstr "Удалено из избранного"
 
 #: nodepkg/main-section/CreateResourceButton.tsx:8
-#: nodepkg/main-section/CreateResourceModal.tsx:20 view.py:174 view.py:347
+#: nodepkg/main-section/CreateResourceModal.tsx:20 view.py:178 view.py:348
 msgid "Create resource"
 msgstr "Создать ресурс"
 
@@ -507,7 +511,7 @@ msgstr "Необходимо заполнить все поля"
 msgid "Row conflicts with another"
 msgstr "Конфликт строк"
 
-#: nodepkg/permissions-widget/PermissionsWidget.tsx:21 view.py:348
+#: nodepkg/permissions-widget/PermissionsWidget.tsx:21 view.py:349
 msgid "Action"
 msgstr "Действие"
 
@@ -632,38 +636,38 @@ msgstr "Настройка сервиса"
 msgid "Resource description is empty."
 msgstr "У этого ресурса нет описания."
 
-#: template/resource_section_external_access.mako:3
+#: template/resource_section_external_access.mako:8
 msgid "External access"
 msgstr "Внешний доступ"
 
-#: view.py:116 view.py:382
+#: view.py:122 view.py:383
 msgid "JSON view"
 msgstr "Представление JSON"
 
-#: view.py:128 view.py:389
+#: view.py:133 view.py:390
 msgid "User permissions"
 msgstr "Права пользователя"
 
-#: view.py:186
+#: view.py:189
 msgid "Update resource"
 msgstr "Изменить ресурс"
 
-#: view.py:199
+#: view.py:201
 msgid "Delete resource"
 msgstr "Удалить ресурс"
 
-#: view.py:210 view.py:402
+#: view.py:211 view.py:403
 msgid "Resource export"
 msgstr "Экспорт ресурсов"
 
-#: view.py:274
+#: view.py:275
 msgid "Insufficient '%s' permission in scope '%s' on resource id = %d."
 msgstr "Недостаточно разрешения '%s' в скоупе '%s' для идентификатора ресурса = %d."
 
-#: view.py:349
+#: view.py:350
 msgid "Extra"
 msgstr "Дополнительно"
 
-#: view.py:359
+#: view.py:360
 msgid "Update"
 msgstr "Изменить"

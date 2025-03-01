@@ -463,6 +463,10 @@ class ParentAttr(SResource):
         if new_parent is None:
             raise ForbiddenError(gettext("Resource can not be without a parent."))
 
+        if not srlzr.obj.has_permission(ResourceScope.create, srlzr.user):
+            m = gettextf("You are not allowed to create or move a resource of type '{}' here.")
+            raise ForbiddenError(m(srlzr.obj.cls))
+
         for parent in (old_parent, new_parent):
             if parent is not None and not parent.has_permission(
                 ResourceScope.manage_children, srlzr.user

@@ -1,3 +1,5 @@
+from secrets import token_urlsafe
+
 import pytest
 import sqlalchemy.sql as sql
 import transaction
@@ -31,8 +33,8 @@ def user_id(ngw_resource_group):
         DBSession.delete(User.filter_by(id=user.id).one())
 
 
-def test_change_owner(ngw_resource_group, user_id, ngw_webtest_app):
-    url = "/api/resource/%d" % ngw_resource_group
+def test_change_owner(ngw_resource_group_sub, user_id, ngw_webtest_app):
+    url = "/api/resource/%d" % ngw_resource_group_sub
 
     def owner_data(owner_id):
         return dict(resource=dict(owner_user=dict(id=owner_id)))
@@ -43,7 +45,7 @@ def test_change_owner(ngw_resource_group, user_id, ngw_webtest_app):
 
     with transaction.manager:
         ResourceACLRule(
-            resource_id=ngw_resource_group,
+            resource_id=ngw_resource_group_sub,
             principal=admin,
             identity=ResourceGroup.identity,
             scope=ResourceScope.identity,
@@ -178,3 +180,51 @@ def test_admin_permissions(admin, ngw_webtest_app, ngw_resource_group):
     check(dict(scope="resource", permission="read"), 422)
     check(dict(scope="resource", permission="update"), 422)
     check(dict(scope="resource", permission="change_permissions"), 422)
+
+
+@pytest.mark.parametrize("permission", ["create", "manage_children"])
+def test_create(permission, ngw_resource_group_sub, ngw_resource_group, ngw_webtest_app):
+    pid, sid = ngw_resource_group, ngw_resource_group_sub
+    uid = ngw_webtest_app.get("/api/component/auth/current_user").json["id"]
+
+    ngw_webtest_app.put_json(
+        f"/api/resource/{sid}",
+        dict(
+            resource=dict(
+                permissions=[
+                    dict(
+                        action="deny",
+                        identity="resource_group",
+                        scope="resource",
+                        permission=permission,
+                        propagate=True,
+                        principal=dict(id=uid),
+                    ),
+                ],
+            ),
+        ),
+    )
+
+    # Create new resource
+
+    dn = token_urlsafe(8)
+    ngw_webtest_app.post_json(
+        "/api/resource/",
+        dict(resource=dict(cls="resource_group", parent=dict(id=sid), display_name=dn)),
+        status=403,
+    )
+
+    # Move existing resource
+
+    dn = token_urlsafe(8)
+    cid = ngw_webtest_app.post_json(
+        "/api/resource/",
+        dict(resource=dict(cls="resource_group", parent=dict(id=pid), display_name=dn)),
+        status=201,
+    ).json["id"]
+
+    ngw_webtest_app.put_json(
+        f"/api/resource/{cid}",
+        dict(resource=dict(parent=dict(id=sid))),
+        status=403,
+    )
