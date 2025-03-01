@@ -254,4 +254,4 @@ def test_description_sanitization(ngw_resource_group, ngw_webtest_app):
     ).json
 
     resp = ngw_webtest_app.get(f"/api/resource/{ngw_resource_group}").json
-    assert resp["resource"]["description"] == '<a href="">Link</a>'
+    assert resp["resource"]["description"] == "<a>Link</a>"
