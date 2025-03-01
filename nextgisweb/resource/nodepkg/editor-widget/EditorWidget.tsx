@@ -26,20 +26,23 @@ export const EditorWidget: EditorWidgetComponent<
                 />
             </Lot>
 
-            <Lot label={gettext("Parent")}>
-                <ResourceSelect
-                    value={store.parent !== null ? store.parent : undefined}
-                    onChange={(v) =>
-                        store.update({
-                            parent: typeof v === "number" ? v : null,
-                        })
-                    }
-                    pickerOptions={{ initParentId: store.parent }}
-                    allowClear={false}
-                    disabled={store.operation === "create"}
-                    style={{ width: "100%" }}
-                />
-            </Lot>
+            {/* Hide unchangeable parent for the main resource group */}
+            {store.composite.id !== 0 && (
+                <Lot label={gettext("Parent")}>
+                    <ResourceSelect
+                        value={store.parent !== null ? store.parent : undefined}
+                        onChange={(v) =>
+                            store.update({
+                                parent: typeof v === "number" ? v : null,
+                            })
+                        }
+                        pickerOptions={{ initParentId: store.parent }}
+                        allowClear={false}
+                        disabled={store.operation === "create"}
+                        style={{ width: "100%" }}
+                    />
+                </Lot>
+            )}
 
             <Lot label={gettext("Owner")}>
                 <PrincipalSelect
