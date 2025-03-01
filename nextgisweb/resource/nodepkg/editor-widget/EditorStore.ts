@@ -1,4 +1,4 @@
-import { action, computed, observable, toJS } from "mobx";
+import { action, computed, observable } from "mobx";
 
 import type { ResourceCls, ResourceRead } from "@nextgisweb/resource/type/api";
 
@@ -24,6 +24,9 @@ interface Loaded {
 export class EditorStore {
     identity = "resource";
 
+    readonly operation: Operation;
+    readonly composite: CompositeStore;
+
     @observable accessor cls: ResourceCls | null = null;
     @observable accessor displayName: string | null = null;
     @observable accessor keyname: string | null = null;
@@ -32,10 +35,8 @@ export class EditorStore {
 
     @observable accessor sdnBase: string | null = null;
 
-    @observable accessor operation: Operation;
-    @observable.shallow accessor composite: CompositeStore;
-
     @observable.shallow accessor _loaded: Loaded;
+    @observable.ref accessor dirty: boolean = false;
 
     constructor({ composite, operation }: EditorStoreOptions) {
         this.composite = composite;
@@ -75,8 +76,8 @@ export class EditorStore {
         this.parent = loaded.parent;
         this.ownerUser = loaded.ownerUser;
 
-        // Update the _loaded property
         this._loaded = loaded;
+        this.dirty = false;
     }
 
     dump() {
@@ -105,12 +106,13 @@ export class EditorStore {
             result.owner_user = { id: this.ownerUser };
         }
 
-        return toJS(result);
+        return result;
     }
 
     @action
     update(props: Partial<this>) {
         Object.assign(this, props);
+        this.dirty = true;
     }
 
     @computed
