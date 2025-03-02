@@ -1,10 +1,9 @@
-from inspect import findsource, getfile, signature
+from inspect import signature
 from pathlib import Path
 from shutil import which
 from subprocess import check_call
 from tempfile import TemporaryDirectory
 from typing import Any, Dict, List, Literal, Optional, Set, Union, cast
-from warnings import warn_explicit
 
 from geoalchemy2.shape import to_shape
 from msgspec import UNSET, Meta, Struct, UnsetType, ValidationError
@@ -487,26 +486,12 @@ def _extent_wsen_from_attrs(obj, prefix) -> Union[ExtentWSEN, None]:
     return ExtentWSEN(*parts) if None not in parts else None
 
 
-def _amd_free(iterable):
-    for item in iterable:
-        if getattr(item, "amd_free", False):
-            yield item
-        else:
-            warn_explicit(
-                f"Unsupported plugin {item.__name__} ignored!",
-                category=DeprecationWarning,
-                filename=getfile(item),
-                lineno=findsource(item)[1] + 1,
-                module=item.__module__,
-            )
-
-
 def display_config(obj, request) -> DisplayConfig:
     request.resource_permission(ResourceScope.read)
 
     # Map level plugins
     plugin = dict()
-    for p_cls in _amd_free(WebmapPlugin.registry):
+    for p_cls in WebmapPlugin.registry:
         if p_mid_data := p_cls.is_supported(obj):
             p_mid, p_payload = p_mid_data
             plugin[p_mid] = p_payload
@@ -572,7 +557,7 @@ def display_config(obj, request) -> DisplayConfig:
             # Layer level plugins
             plugin = dict()
             plugin_base_kwargs = dict(layer=layer, webmap=obj)
-            for pcls in _amd_free(WebmapLayerPlugin.registry):
+            for pcls in WebmapLayerPlugin.registry:
                 fn = pcls.is_layer_supported
                 plugin_kwargs = (
                     dict(plugin_base_kwargs, style=style)

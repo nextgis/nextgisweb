@@ -6,11 +6,9 @@ from nextgisweb.resource import DataScope
 
 from .base import WebmapLayerPlugin
 
-ENTRY = jsentry("@nextgisweb/webmap/plugin/layer-editor")
-
 
 class LayerEditorPlugin(WebmapLayerPlugin):
-    amd_free = True
+    entry = jsentry("@nextgisweb/webmap/plugin/layer-editor")
 
     @classmethod
     def is_layer_supported(cls, layer, webmap):
@@ -20,7 +18,7 @@ class LayerEditorPlugin(WebmapLayerPlugin):
             if not write_permission:
                 return False
             return (
-                ENTRY,
+                cls.entry,
                 dict(
                     writable=IWritableFeatureLayer.providedBy(layer),
                     geometry_type=layer.geometry_type,
