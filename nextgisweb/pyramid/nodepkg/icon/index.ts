@@ -1,18 +1,7 @@
-import "@nextgisweb/jsrealm/shared-icon";
+import type { FC } from "react";
 
-export function html({
-    collection,
-    glyph,
-    variant,
-    fill = "currentColor",
-}: {
-    collection?: string;
-    glyph: string;
-    variant?: "baseline" | string;
-    fill?: "currentColor" | string;
-}) {
-    const id =
-        `icon-${collection || "material"}-${glyph}` +
-        (variant && variant !== "baseline" ? `-${variant}` : "");
-    return `<svg class="icon" fill="${fill}"><use xlink:href="#${id}"/></svg>`;
+import "@nextgisweb/jsrealm/icon.inc";
+
+export function iconHtml(icon: FC & { id: string }) {
+    return `<svg class="icon" fill="currentColor"><use xlink:href="#${icon.id}"/></svg>`;
 }

@@ -6,7 +6,7 @@ from nextgisweb.env import gettext
 from nextgisweb.lib.dynmenu import Label, Link
 
 from nextgisweb.gui import react_renderer
-from nextgisweb.jsrealm import jsentry
+from nextgisweb.jsrealm import icon, jsentry
 from nextgisweb.pyramid import viewargs
 from nextgisweb.render.view import TMSLink
 from nextgisweb.resource import Resource, ResourceFactory, ResourceScope, Widget
@@ -178,6 +178,9 @@ def setup_pyramid(comp, config):
         get=settings,
     )
 
+    icon_display = icon("display")
+    icon_clone = icon("material/content_copy")
+
     @Resource.__dynmenu__.add
     def _resource_dynmenu(args):
         if not isinstance(args.obj, WebMap):
@@ -192,7 +195,7 @@ def setup_pyramid(comp, config):
                 lambda args: args.request.route_url("webmap.display", id=args.obj.id),
                 important=True,
                 target="_blank",
-                icon="webmap-display",
+                icon=icon_display,
             )
 
         if args.obj.has_permission(ResourceScope.read, args.request.user):
@@ -202,7 +205,7 @@ def setup_pyramid(comp, config):
                 lambda args: args.request.route_url("webmap.clone", id=args.obj.id),
                 important=False,
                 target="_self",
-                icon="material-content_copy",
+                icon=icon_clone,
             )
 
     @comp.env.pyramid.control_panel.add

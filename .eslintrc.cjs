@@ -80,6 +80,7 @@ const config = {
                 "pathGroups": [
                     { pattern: "glob", group: "builtin" },
                     { pattern: "@nextgisweb/icon/**", group: "index" },
+                    { pattern: "@nextgisweb/*/icon/**", group: "index" },
                     { pattern: "@ant-design/icons", group: "index" },
                 ],
                 "alphabetize": { order: "asc", orderImportKind: "desc" },

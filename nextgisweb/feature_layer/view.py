@@ -4,7 +4,7 @@ from nextgisweb.env import gettext
 from nextgisweb.lib.dynmenu import Label, Link
 
 from nextgisweb.gui import react_renderer
-from nextgisweb.jsrealm import jsentry
+from nextgisweb.jsrealm import icon, jsentry
 from nextgisweb.resource import DataScope, Resource, Widget, resource_factory
 from nextgisweb.resource.extaccess import ExternalAccessLink
 from nextgisweb.resource.view import resource_sections
@@ -146,6 +146,9 @@ def setup_pyramid(comp, config):
         context=IFeatureLayer,
     )
 
+    icon_feature_browse = icon("material/table")
+    icon_export = icon("material/download")
+
     # Layer menu extension
     @Resource.__dynmenu__.add
     def _resource_dynmenu(args):
@@ -162,7 +165,7 @@ def setup_pyramid(comp, config):
                     "feature_layer.feature.browse", id=args.obj.id
                 ),
                 important=True,
-                icon="material-table",
+                icon=icon_feature_browse,
             )
 
         if args.obj.has_export_permission(args.request.user):
@@ -170,7 +173,7 @@ def setup_pyramid(comp, config):
                 "feature_layer/export",
                 gettext("Save as"),
                 lambda args: args.request.route_url("resource.export.page", id=args.obj.id),
-                icon="material-download",
+                icon=icon_export,
             )
 
     @resource_sections(title=gettext("Attributes"))

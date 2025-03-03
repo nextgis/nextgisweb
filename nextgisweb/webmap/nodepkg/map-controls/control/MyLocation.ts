@@ -7,8 +7,10 @@ import VectorSource from "ol/source/Vector";
 import { Circle as CircleStyle, Fill, Stroke, Style } from "ol/style";
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { html as htmlIcon } from "@nextgisweb/pyramid/icon";
+import { iconHtml } from "@nextgisweb/pyramid/icon";
 import type { Display } from "@nextgisweb/webmap/display";
+
+import Icon from "@nextgisweb/icon/material/my_location";
 
 interface GeolocationControlOptions {
     target?: HTMLElement;
@@ -49,7 +51,7 @@ export class MyLocation extends Control {
         const iconSpan = document.createElement("span");
         iconSpan.className = "ol-control__icon";
 
-        iconSpan.innerHTML = htmlIcon({ glyph: "my_location" });
+        iconSpan.innerHTML = iconHtml(Icon);
 
         button.appendChild(iconSpan);
         element.appendChild(button);

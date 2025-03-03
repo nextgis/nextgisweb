@@ -4,7 +4,10 @@ import type { Layer } from "ol/layer";
 import type RenderEvent from "ol/render/Event";
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { html as htmlIcon } from "@nextgisweb/pyramid/icon";
+import { iconHtml } from "@nextgisweb/pyramid/icon";
+
+import Icon from "@nextgisweb/icon/material/sync";
+
 import "./SwipeControl.css";
 
 type Orientation = "vertical" | "horizontal";
@@ -33,7 +36,7 @@ export class Swipe extends Control {
 
         const toggleButton = document.createElement("div");
         toggleButton.className = "ol-swipe-toggle";
-        toggleButton.innerHTML = htmlIcon({ glyph: "sync" });
+        toggleButton.innerHTML = iconHtml(Icon);
         toggleButton.title = gettext("Rotate swipe");
         element.appendChild(toggleButton);
 

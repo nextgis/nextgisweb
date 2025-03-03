@@ -5,6 +5,8 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { getLabel } from "../map-controls/map-controls";
 
+import NorthIcon from "@nextgisweb/icon/material/arrow_upward";
+
 export const mmToPx = (mm: number): number => {
     return (mm / 10) * (96 / 2.54);
 };
@@ -32,7 +34,7 @@ export function switchRotateControl(olMap: OlMap, show: boolean): void {
     if (!rotateControl && show) {
         const rotateControl = new Rotate({
             tipLabel: gettext("Reset rotation"),
-            label: getLabel("arrow_upward"),
+            label: getLabel(NorthIcon),
             autoHide: false,
         });
         olMap.addControl(rotateControl);

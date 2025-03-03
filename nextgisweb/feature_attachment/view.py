@@ -5,6 +5,7 @@ from nextgisweb.lib import dynmenu as dm
 
 from nextgisweb.feature_layer import IFeatureLayer
 from nextgisweb.gui import react_renderer
+from nextgisweb.jsrealm import icon
 from nextgisweb.resource import DataScope, Resource, resource_factory
 
 
@@ -30,6 +31,8 @@ def setup_pyramid(comp, config):
         factory=resource_factory,
     ).add_view(attachment, context=IFeatureLayer)
 
+    icon_manage_attachments = icon("material/attach_file")
+
     # Layer menu extension
     @Resource.__dynmenu__.add
     def _resource_dynmenu(args):
@@ -41,5 +44,5 @@ def setup_pyramid(comp, config):
                 "feature_layer/feature_attachment",
                 gettext("Manage attachments"),
                 lambda args: args.request.route_url("feature_attachment.page", id=args.obj.id),
-                icon="material-attach_file",
+                icon=icon_manage_attachments,
             )

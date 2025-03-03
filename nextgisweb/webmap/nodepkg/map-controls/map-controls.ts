@@ -4,9 +4,10 @@ import Attribution from "ol/control/Attribution";
 import Rotate from "ol/control/Rotate";
 import ScaleLine from "ol/control/ScaleLine";
 import Zoom from "ol/control/Zoom";
+import type { FC } from "react";
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { html } from "@nextgisweb/pyramid/icon";
+import { iconHtml } from "@nextgisweb/pyramid/icon";
 
 import type { Display } from "../display";
 
@@ -18,9 +19,13 @@ import { Identify } from "./tool/Identify";
 import type { ControlInfo, ControlReady } from "./type";
 import { getControlsInfo } from "./utils";
 
-export const getLabel = (glyph: string): HTMLElement => {
+import ZoomInIcon from "@nextgisweb/icon/material/add";
+import NorthIcon from "@nextgisweb/icon/material/arrow_upward";
+import ZoomOutIcon from "@nextgisweb/icon/material/remove";
+
+export const getLabel = (Icon: FC & { id: string }): HTMLElement => {
     const labelEl = document.createElement("span");
-    labelEl.innerHTML = html({ glyph });
+    labelEl.innerHTML = iconHtml(Icon);
     labelEl.classList.add("ol-control__icon");
     return labelEl;
 };
@@ -30,8 +35,8 @@ export const ControlsInfo: ControlInfo[] = [
         key: "z",
         ctor: (display) => {
             return new Zoom({
-                zoomInLabel: getLabel("add"),
-                zoomOutLabel: getLabel("remove"),
+                zoomInLabel: getLabel(ZoomInIcon),
+                zoomOutLabel: getLabel(ZoomOutIcon),
                 zoomInTipLabel: gettext("Zoom in"),
                 zoomOutTipLabel: gettext("Zoom out"),
                 target: display.leftTopControlPane,
@@ -58,7 +63,7 @@ export const ControlsInfo: ControlInfo[] = [
             return new Rotate({
                 tipLabel: gettext("Reset rotation"),
                 target: display.leftTopControlPane,
-                label: getLabel("arrow_upward"),
+                label: getLabel(NorthIcon),
             });
         },
         olMapControl: true,

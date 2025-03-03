@@ -3,10 +3,12 @@ import topic from "@nextgisweb/webmap/compat/topic";
 
 import { PluginBase } from "../PluginBase";
 
+import TableIcon from "@nextgisweb/icon/material/table";
+
 export class FeatureLayerPlugin extends PluginBase {
     getMenuItem() {
         return {
-            icon: "material-table",
+            icon: <TableIcon />,
             title: gettext("Feature table"),
             onClick: () => {
                 this.openFeatureGrid();

@@ -1,15 +1,14 @@
+import { EditIcon } from "@nextgisweb/gui/icon";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import { iconHtml } from "@nextgisweb/pyramid/icon";
 
 const template = `
 <div>
     <div class="annotation-description">
     </div>
     <div class="annotation-edit-controls">
-        <span class="annotation-edit"
-              title="${gettext("Edit annotation")}">
-            <svg class="icon" fill="currentColor">
-                <use xlink:href="#icon-material-edit"/>
-            </svg>
+        <span class="annotation-edit" title="${gettext("Edit annotation")}">
+            ${iconHtml(EditIcon)}
         </span>
     </div>
 </div>`;

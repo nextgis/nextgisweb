@@ -1,6 +1,6 @@
 declare module "@nextgisweb/icon/*" {
-    import type { FC, SVGProps } from "react";
+    import type { IconComponent } from "@nextgisweb/icon";
 
-    const value: FC<SVGProps<SVGSVGElement>>;
+    const value: IconComponent;
     export = value;
 }

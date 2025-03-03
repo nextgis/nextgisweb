@@ -1,7 +1,9 @@
 import { Control } from "ol/control";
 
-import { html as htmlIcon } from "@nextgisweb/pyramid/icon";
+import { iconHtml } from "@nextgisweb/pyramid/icon";
 import type { Display } from "@nextgisweb/webmap/display";
+
+import Icon from "@nextgisweb/icon/material/home";
 
 interface HomeControlOptions {
     target?: HTMLElement;
@@ -20,7 +22,7 @@ export class InitialExtent extends Control {
         const iconSpan = document.createElement("span");
         iconSpan.className = "ol-control__icon";
 
-        iconSpan.innerHTML = htmlIcon({ glyph: "home" });
+        iconSpan.innerHTML = iconHtml(Icon);
 
         button.appendChild(iconSpan);
         element.appendChild(button);

@@ -2,7 +2,7 @@ from nextgisweb.env import gettext
 from nextgisweb.lib.dynmenu import Link
 
 from nextgisweb.gui import react_renderer
-from nextgisweb.jsrealm import jsentry
+from nextgisweb.jsrealm import icon, jsentry
 from nextgisweb.resource import ConnectionScope, DataScope, Resource, Widget, resource_factory
 
 from .model import PostgisConnection, PostgisLayer
@@ -29,6 +29,8 @@ def setup_pyramid(comp, config):
         diagnostics_page, context=PostgisLayer
     )
 
+    icon_diagnostics = icon("material/flaky")
+
     @Resource.__dynmenu__.add
     def _resource_dynmenu(args):
         if (
@@ -39,7 +41,7 @@ def setup_pyramid(comp, config):
                 "extra/postgis-diagnostics",
                 gettext("Diagnostics"),
                 lambda args: args.request.route_url("postgis.diagnostics_page", id=args.obj.id),
-                icon="material-flaky",
+                icon=icon_diagnostics,
             )
 
 

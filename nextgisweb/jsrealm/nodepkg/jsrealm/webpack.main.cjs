@@ -334,29 +334,65 @@ for (const { code: lang, nplurals, plural } of config.i18n.languages) {
 }
 
 const sharedIconIds = {};
-const iconsFromJson = [];
+const iconsCollection = [];
+const iconTypeDefs = [];
 
 for (const [comp, compDir] of Object.entries(config.env.components)) {
-    const dir = path.resolve(compDir, "icon");
-    if (!fs.existsSync(dir)) continue;
+    const iconDir = path.resolve(compDir, "icon");
+    if (!fs.existsSync(iconDir)) continue;
 
-    for (let fn of glob.sync(`${dir}/**/*.svg`)) {
-        const relSvgPath = path.relative(dir, fn).replace(/\.svg$/, "");
-        const id = (`icon-${comp}-` + relSvgPath).replace(
-            /\w+-resource\/(\w+)/,
-            (m, p) => `rescls-${p}`
-        );
-        sharedIconIds[fn] = id;
-    }
-
-    for (const collection of Object.keys(iconUtil.COLLECTIONS)) {
-        const fn = path.resolve(dir, `${collection}.json`);
-        if (!fs.existsSync(fn)) continue;
-        for (const ref of JSON.parse(fs.readFileSync(fn, "utf8"))) {
-            iconsFromJson.push(`@nextgisweb/icon/${collection}/${ref}`);
+    const mod = ["@nextgisweb", comp.replace("_", "-"), "icon", "*"].join("/");
+    const resourceDir = path.join(iconDir, "resource");
+    for (const fn of glob.sync(`**/*.svg`, {
+        cwd: iconDir,
+        absolute: true,
+    })) {
+        if (fn.startsWith(resourceDir)) {
+            const id = fn.replace(
+                /.*\/(\w+)\.svg$/,
+                (m, n) => `icon-rescls-${n}`
+            );
+            sharedIconIds[fn] = id;
+        } else if (!iconTypeDefs.includes(mod)) {
+            iconTypeDefs.push(mod);
         }
     }
 }
+
+for (const [collection, ...rest] of config.jsrealm.icons) {
+    const suf = rest.filter((i) => !!i);
+    if (collection in iconUtil.COLLECTIONS) {
+        iconsCollection.push(`@nextgisweb/icon/${collection}/${suf}`);
+    } else {
+        const compDir = path.resolve(config.env.components[collection]);
+        const fn = path.join(compDir, "icon", ...suf) + ".svg";
+        const id = `icon-${collection}-${suf.join("-")}`;
+        sharedIconIds[fn] = id;
+    }
+}
+
+fs.writeFileSync(
+    path.join(__dirname, "icon.inc.ts"),
+    Object.keys(sharedIconIds)
+        .concat(iconsCollection)
+        .map((i) => `import "${i}";`)
+        .join("\n") + "\n"
+);
+
+fs.writeFileSync(
+    path.join(__dirname, "../icon/comp.inc.d.ts"),
+    iconTypeDefs
+        .map((m) => {
+            return [
+                `declare module "${m}" {`,
+                `    import type { IconComponent } from "@nextgisweb/icon";\n`,
+                `    const value: IconComponent;`,
+                `    export = value;`,
+                `}\n`,
+            ].join("\n");
+        })
+        .join("\n")
+);
 
 const babelLoader = {
     loader: "babel-loader",
@@ -368,20 +404,6 @@ const webpackConfig = defaults("main", (env) => ({
     entry: { "ngwEntry": require.resolve("@nextgisweb/jsrealm/ngwEntry.js") },
     module: {
         rules: [
-            {
-                test: require.resolve("@nextgisweb/jsrealm/shared-icon"),
-                use: [
-                    babelLoader,
-                    {
-                        loader: "imports-loader",
-                        options: {
-                            imports: Object.keys(sharedIconIds)
-                                .concat(iconsFromJson)
-                                .map((fn) => `side-effects ${fn}`),
-                        },
-                    },
-                ],
-            },
             {
                 test: /\.(m?js|tsx?)$/,
                 // In development mode exclude everything in node_modules for

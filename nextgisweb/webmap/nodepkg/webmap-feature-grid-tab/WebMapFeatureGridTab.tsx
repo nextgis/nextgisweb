@@ -20,6 +20,8 @@ import type topic from "../compat/topic";
 import type { Display } from "../display";
 import type { PluginBase } from "../plugin/PluginBase";
 
+import GoToIcon from "@nextgisweb/icon/material/center_focus_weak";
+
 const msgGoto = gettext("Go to");
 
 interface WebMapFeatureGridTabProps {
@@ -110,7 +112,7 @@ export function WebMapFeatureGridTab({
                 actions: [
                     {
                         title: msgGoto,
-                        icon: "material-center_focus_weak",
+                        icon: <GoToIcon />,
                         disabled: (params) => !params?.selectedIds?.length,
                         action: () => {
                             const wkt = new WKT();

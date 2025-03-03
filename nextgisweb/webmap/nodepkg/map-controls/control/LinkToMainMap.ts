@@ -1,7 +1,9 @@
 import { Control } from "ol/control";
 import type { Options as ControlOptions } from "ol/control/Control";
 
-import { html as htmlIcon } from "@nextgisweb/pyramid/icon";
+import { iconHtml } from "@nextgisweb/pyramid/icon";
+
+import Icon from "@nextgisweb/icon/material/open_in_new";
 
 interface LinkToMainMapOptions extends ControlOptions {
     tipLabel?: string;
@@ -17,7 +19,7 @@ export class LinkToMainMap extends Control {
         element.innerHTML = `
             <button>
                 <span class="ol-control__icon">
-                    ${htmlIcon({ glyph: "open_in_new" })}
+                    ${iconHtml(Icon)}
                 </span>
             </button>
         `;

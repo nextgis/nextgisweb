@@ -12,7 +12,7 @@ from nextgisweb.env.package import pkginfo
 from nextgisweb.lib.logging import logger
 
 from nextgisweb.core import CoreComponent
-from nextgisweb.jsrealm import JSEntry
+from nextgisweb.jsrealm import Icon, JSEntry
 from nextgisweb.pyramid import PyramidComponent
 from nextgisweb.pyramid.uacompat import FAMILIES
 
@@ -157,6 +157,18 @@ def install(
             key=lambda entry: (
                 entry.component,
                 entry.module,
+            ),
+        )
+    ]
+
+    s_jsrealm["icons"] = [
+        (i.collection, i.glyph, i.variant)
+        for i in sorted(
+            Icon.registry,
+            key=lambda icon: (
+                icon.collection,
+                icon.glyph,
+                icon.variant,
             ),
         )
     ]

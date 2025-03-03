@@ -2,8 +2,10 @@ import { Control } from "ol/control";
 import type { Options as ControlOptions } from "ol/control/Control";
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { html } from "@nextgisweb/pyramid/icon";
+import { iconHtml } from "@nextgisweb/pyramid/icon";
 import type { Display } from "@nextgisweb/webmap/display";
+
+import Icon from "@nextgisweb/icon/material/attach_file";
 
 interface LinkToMainMapOptions extends ControlOptions {
     display: Display;
@@ -16,8 +18,7 @@ export default class AttachmentBundleControl extends Control {
     constructor(options: LinkToMainMapOptions) {
         const element = document.createElement("div");
         element.className = "ol-control ol-unselectable";
-        const icon = html({ glyph: "attach_file" });
-        element.innerHTML = `<button><span class="ol-control__icon">${icon}</span></button>`;
+        element.innerHTML = `<button><span class="ol-control__icon">${iconHtml(Icon)}</span></button>`;
         element.title = gettext("Attachments");
 
         element.addEventListener("click", () => {

@@ -10,9 +10,10 @@ import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
 import { Circle, Fill, Stroke, Style } from "ol/style";
 
+import { CloseIcon } from "@nextgisweb/gui/icon";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { html as htmlIcon } from "@nextgisweb/pyramid/icon";
+import { iconHtml } from "@nextgisweb/pyramid/icon";
 import settings from "@nextgisweb/webmap/client-settings";
 import type { Display } from "@nextgisweb/webmap/display";
 import { MeasureArea, MeasureDistance } from "@nextgisweb/webmap/icon";
@@ -124,7 +125,7 @@ export class ToolMeasure extends ToolBase {
 
                         const closeButton = document.createElement("button");
                         closeButton.className = "tooltip-close-button";
-                        closeButton.innerHTML = htmlIcon({ glyph: "close" });
+                        closeButton.innerHTML = iconHtml(CloseIcon);
                         tooltipElement.appendChild(closeButton);
 
                         closeButton.onclick = (e) => {

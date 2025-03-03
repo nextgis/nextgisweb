@@ -16,7 +16,7 @@ from nextgisweb.lib.dynmenu import DynMenu, Label, Link
 from nextgisweb.auth import OnUserLogin
 from nextgisweb.core.exception import InsufficientPermissions
 from nextgisweb.gui import react_renderer
-from nextgisweb.jsrealm import jsentry
+from nextgisweb.jsrealm import icon, jsentry
 from nextgisweb.pyramid import JSONType, viewargs
 from nextgisweb.pyramid.breadcrumb import Breadcrumb, breadcrumb_adapter
 from nextgisweb.pyramid.psection import PageSections
@@ -350,6 +350,11 @@ def setup_pyramid(comp, config):
         Label("extra", gettext("Extra")),
     )
 
+    icon_edit = icon("material/edit")
+    icon_delete = icon("material/delete")
+    icon_json = icon("material/data_object")
+    icon_effective_permissions = icon("material/key")
+
     @Resource.__dynmenu__.add
     def _resource_dynmenu(args):
         permissions = args.obj.permissions(args.request.user)
@@ -360,7 +365,7 @@ def setup_pyramid(comp, config):
                 gettext("Update"),
                 lambda args: args.request.route_url("resource.update", id=args.obj.id),
                 important=True,
-                icon="material-edit",
+                icon=icon_edit,
             )
 
         if (
@@ -374,7 +379,7 @@ def setup_pyramid(comp, config):
                 gettext("Delete"),
                 lambda args: args.request.route_url("resource.delete", id=args.obj.id),
                 important=True,
-                icon="material-delete",
+                icon=icon_delete,
             )
 
         if ResourceScope.read in permissions:
@@ -382,7 +387,7 @@ def setup_pyramid(comp, config):
                 "extra/json",
                 gettext("JSON view"),
                 lambda args: args.request.route_url("resource.json", id=args.obj.id),
-                icon="material-data_object",
+                icon=icon_json,
             )
 
             yield Link(
@@ -392,7 +397,7 @@ def setup_pyramid(comp, config):
                     "resource.effective_permissions",
                     id=args.obj.id,
                 ),
-                icon="material-key",
+                icon=icon_effective_permissions,
             )
 
     @comp.env.pyramid.control_panel.add

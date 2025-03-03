@@ -1,10 +1,12 @@
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { html as htmlIcon } from "@nextgisweb/pyramid/icon";
+import { iconHtml } from "@nextgisweb/pyramid/icon";
 import type { Display } from "@nextgisweb/webmap/display";
 
 import { Swipe } from "../control/SwipeControl";
 
 import { ToolBase } from "./ToolBase";
+
+import Icon from "@nextgisweb/icon/material/compare";
 
 export class ToolSwipe extends ToolBase {
     orientation: "vertical" | "horizontal";
@@ -26,10 +28,7 @@ export class ToolSwipe extends ToolBase {
         this.orientation = orientation;
         if (this.orientation === "vertical") {
             this.label = gettext("Vertical swipe");
-            this.customIcon =
-                '<span class="ol-control__icon">' +
-                htmlIcon({ glyph: "compare" }) +
-                "</span>";
+            this.customIcon = `<span class="ol-control__icon">${iconHtml(Icon)}</span>`;
         } else {
             this.orientation = "horizontal";
             this.label = gettext("Horizontal swipe");

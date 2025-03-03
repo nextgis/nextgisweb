@@ -4,6 +4,8 @@ import i18n from "@nextgisweb/pyramid/i18n";
 
 import { PluginBase } from "../PluginBase";
 
+import Icon from "@nextgisweb/icon/material/zoom_in_map";
+
 export class ZoomToLayerPlugin extends PluginBase {
     run(): Promise<undefined> {
         this.zoomToLayer();
@@ -12,7 +14,7 @@ export class ZoomToLayerPlugin extends PluginBase {
 
     getMenuItem() {
         return {
-            icon: "material-zoom_in_map",
+            icon: <Icon />,
             title: i18n.gettext("Zoom to layer"),
             onClick: () => {
                 this.run();

@@ -1,14 +1,15 @@
 from nextgisweb.env import gettext
 
+from nextgisweb.jsrealm import icon
 from nextgisweb.resource.favorite import Field, ResourceFavorite, from_route
 
-from_route("webmap.display", gettext("Display"), icon="webmap-display")
+from_route("webmap.display", gettext("Display"), icon=icon("display"))
 
 
 class WebMapFragmentFavorite(ResourceFavorite):
     kind = "fragment"
     label = gettext("Fragment")
-    icon = "material-crop_free"
+    icon = icon("material/crop_free")
 
     query_string: Field[str]
 

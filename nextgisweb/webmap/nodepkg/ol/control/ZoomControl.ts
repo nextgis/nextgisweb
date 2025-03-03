@@ -6,7 +6,9 @@ import { transformExtent } from "ol/proj";
 import type { ProjectionLike } from "ol/proj";
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { html } from "@nextgisweb/pyramid/icon";
+import { iconHtml } from "@nextgisweb/pyramid/icon";
+
+import InitialExtentIcon from "@nextgisweb/icon/material/home";
 
 export interface ZoomControlOptions extends Options {
     extent?: Extent;
@@ -33,7 +35,7 @@ export class ZoomControl extends Zoom {
         );
 
         this.homeButton = document.createElement("button");
-        this.homeButton.innerHTML = html({ glyph: "home" });
+        this.homeButton.innerHTML = iconHtml(InitialExtentIcon);
         this.homeButton.className = "home-button";
         this.homeButton.title = gettext("Back to the initial extent");
         this.homeButton.addEventListener(

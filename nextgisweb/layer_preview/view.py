@@ -4,6 +4,7 @@ from nextgisweb.lib.dynmenu import Link
 from nextgisweb.basemap.model import BasemapLayer
 from nextgisweb.feature_layer import IFeatureLayer
 from nextgisweb.gui import react_renderer
+from nextgisweb.jsrealm import icon
 from nextgisweb.raster_layer import RasterLayer
 from nextgisweb.render import IRenderableStyle
 from nextgisweb.resource import DataScope, Resource, resource_factory
@@ -40,6 +41,8 @@ def setup_pyramid(comp, config):
         context=BasemapLayer,
     )
 
+    icon_preview = icon("material/preview")
+
     @Resource.__dynmenu__.add
     def _resource_dynmenu(args):
         if (
@@ -53,5 +56,5 @@ def setup_pyramid(comp, config):
                 gettext("Preview"),
                 lambda args: args.request.route_url("layer_preview.map", id=args.obj.id),
                 important=True,
-                icon="material-preview",
+                icon=icon_preview,
             )

@@ -1,13 +1,15 @@
 import reactApp from "@nextgisweb/gui/react-app";
 import type { ReactAppReturn } from "@nextgisweb/gui/react-app";
 import i18n from "@nextgisweb/pyramid/i18n";
-import { html as iconHtml } from "@nextgisweb/pyramid/icon";
+import { iconHtml } from "@nextgisweb/pyramid/icon";
 import type { Display } from "@nextgisweb/webmap/display";
 import type { ToggleControl } from "@nextgisweb/webmap/map-toolbar/ToggleControl";
 import MapViewerInfoComp from "@nextgisweb/webmap/map-viewer-info";
 import type { MapViewerInfoProps } from "@nextgisweb/webmap/map-viewer-info/MapViewerInfo";
 
 import { ToolBase } from "./ToolBase";
+
+import Icon from "@nextgisweb/icon/material/location_searching";
 
 interface ViewerInfoOptions {
     display: Display;
@@ -26,7 +28,7 @@ export class ToolViewerInfo extends ToolBase {
         this.label = i18n.gettext("Show cursor coordinates / extent");
         this.customIcon = `
             <span class="ol-control__icon">
-                ${iconHtml({ glyph: "location_searching" })}
+                ${iconHtml(Icon)}
             </span>
         `;
     }

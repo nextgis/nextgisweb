@@ -2,10 +2,14 @@ import { always } from "ol/events/condition";
 import { DragZoom } from "ol/interaction";
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { html as iconHtml } from "@nextgisweb/pyramid/icon";
+import { iconHtml } from "@nextgisweb/pyramid/icon";
 import type { Display } from "@nextgisweb/webmap/display";
 
 import { ToolBase } from "./ToolBase";
+
+import ZoomInIcon from "@nextgisweb/icon/material/zoom_in";
+import ZoomOutIcon from "@nextgisweb/icon/material/zoom_out";
+
 import "./Zoom.css";
 
 interface ZoomOptions {
@@ -25,7 +29,7 @@ export class ToolZoom extends ToolBase {
         this.label = this.out ? gettext("Zoom out") : gettext("Zoom in");
         this.customIcon = `
             <span class="ol-control__icon">
-                ${iconHtml({ glyph: this.out ? "zoom_out" : "zoom_in" })}
+                ${iconHtml(this.out ? ZoomOutIcon : ZoomInIcon)}
             </span>
         `;
 

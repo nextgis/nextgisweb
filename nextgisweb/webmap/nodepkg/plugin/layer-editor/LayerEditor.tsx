@@ -13,6 +13,7 @@ import { Vector as VectorSource } from "ol/source";
 import { FeatureEditorModal } from "@nextgisweb/feature-layer/feature-editor-modal";
 import type { FeaureLayerGeometryType } from "@nextgisweb/feature-layer/type/api";
 import { errorModal } from "@nextgisweb/gui/error";
+import { EditIcon } from "@nextgisweb/gui/icon";
 import showModal from "@nextgisweb/gui/showModal";
 import { findNode } from "@nextgisweb/gui/util/tree";
 import { route } from "@nextgisweb/pyramid/api";
@@ -131,7 +132,7 @@ export class LayerEditor extends PluginBase {
         const title = active ? gettext("Stop editing") : gettext("Edit");
 
         return {
-            icon: "material-edit",
+            icon: <EditIcon />,
             title,
             onClick: async () => {
                 await this.run(nodeData);
