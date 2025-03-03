@@ -9,12 +9,13 @@ const msgDashed = gettext("Dashed");
 const msgDashDotted = gettext("Dash - dotted");
 const msgDash = gettext("Dash");
 const msgGap = gettext("Gap");
+const msgLine = gettext("Line");
 
 const { Option } = Select;
 
 interface DashPatternInputProps {
     value?: number[];
-    onChange?: (value: number[]) => void;
+    onChange?: (value: number[] | undefined) => void;
     lineWidth?: number; // Line width used for calculating preset values
 }
 
@@ -24,7 +25,9 @@ export const DashPatternInput: React.FC<DashPatternInputProps> = ({
     lineWidth = 1,
 }) => {
     const [dashPattern, setDashPattern] = useState<number[]>(value);
-    const [preset, setPreset] = useState<string>("");
+    const [preset, setPreset] = useState<string>(
+        Array.isArray(value) && value.length === 0 ? "line" : ""
+    );
 
     const handleInputChange = (index: number, newValue: number | null) => {
         if (newValue === null || isNaN(newValue)) return; // Ignore invalid inputs
@@ -33,20 +36,25 @@ export const DashPatternInput: React.FC<DashPatternInputProps> = ({
         newDashPattern[index] = newValue;
         setDashPattern(newDashPattern);
         if (onChange) {
-            onChange(newDashPattern);
+            const resultNewDashPattern =
+                newDashPattern.length === 0 ? undefined : newDashPattern;
+            onChange(resultNewDashPattern);
         }
     };
 
     const handlePresetChange = (presetName: string) => {
         let newDashPattern: number[] = [];
         switch (presetName) {
-            case "Dotted":
+            case "line":
+                newDashPattern = [];
+                break;
+            case "dotted":
                 newDashPattern = [lineWidth, lineWidth];
                 break;
-            case "Dashed":
+            case "dashed":
                 newDashPattern = [lineWidth * 3, lineWidth];
                 break;
-            case "Dash-Dotted":
+            case "dash-dotted":
                 newDashPattern = [
                     lineWidth * 3,
                     lineWidth,
@@ -61,7 +69,9 @@ export const DashPatternInput: React.FC<DashPatternInputProps> = ({
         setDashPattern(newDashPattern);
         setPreset(presetName);
         if (onChange) {
-            onChange(newDashPattern);
+            const resultNewDashPattern =
+                newDashPattern.length === 0 ? undefined : newDashPattern;
+            onChange(resultNewDashPattern);
         }
     };
 
@@ -70,7 +80,9 @@ export const DashPatternInput: React.FC<DashPatternInputProps> = ({
         newDashPattern.splice(index, 2);
         setDashPattern(newDashPattern);
         if (onChange) {
-            onChange(newDashPattern);
+            const resultNewDashPattern =
+                newDashPattern.length === 0 ? undefined : newDashPattern;
+            onChange(resultNewDashPattern);
         }
     };
 
@@ -88,15 +100,23 @@ export const DashPatternInput: React.FC<DashPatternInputProps> = ({
                 >
                     <InputNumber
                         value={dashPattern[i]}
-                        onChange={(value) => handleInputChange(i, value)}
+                        onChange={(value) => {
+                            setPreset("");
+                            handleInputChange(i, value);
+                        }}
                         placeholder={msgDash}
+                        defaultValue={i === dashPattern.length ? undefined : 0}
                         min={0}
                         style={{ width: "90px", marginRight: "12px" }}
                     />
                     <InputNumber
                         value={dashPattern[i + 1]}
-                        onChange={(value) => handleInputChange(i + 1, value)}
+                        onChange={(value) => {
+                            setPreset("");
+                            handleInputChange(i + 1, value);
+                        }}
                         placeholder={msgGap}
+                        defaultValue={i === dashPattern.length ? undefined : 0}
                         min={0}
                         style={{
                             width: "90px",
@@ -122,10 +142,12 @@ export const DashPatternInput: React.FC<DashPatternInputProps> = ({
                 onChange={handlePresetChange}
                 placeholder="Select a preset"
                 style={{ width: "100%", marginBottom: 16 }}
+                defaultValue="line"
             >
-                <Option value="Dotted">{msgDotted}</Option>
-                <Option value="Dashed">{msgDashed}</Option>
-                <Option value="Dash-Dotted">{msgDashDotted}</Option>
+                <Option value="line">{msgLine}</Option>
+                <Option value="dotted">{msgDotted}</Option>
+                <Option value="dashed">{msgDashed}</Option>
+                <Option value="dash-dotted">{msgDashDotted}</Option>
             </Select>
 
             {renderInputFields()}
