@@ -8,12 +8,14 @@ import type { FormField } from "@nextgisweb/gui/fields-form";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { ColorInput } from "../../field/ColorInput";
+import { DashPatternInput } from "../../field/DashInput";
 import type { EditorProps } from "../../type";
 import { extractColorAndOpacity } from "../../util/extractColorAndOpacity";
 import { hexWithOpacity } from "../../util/hexWithOpacity";
 
 const msgFillColor = gettext("Fill color");
 const msgWidth = gettext("Width");
+const msgDash = gettext("Dash");
 
 export function LineEditor({ value, onChange }: EditorProps<LineSymbolizer>) {
     const onSymbolizer = (v: LineSymbolizer) => {
@@ -28,6 +30,8 @@ export function LineEditor({ value, onChange }: EditorProps<LineSymbolizer>) {
                 symbolizerClone.color = color;
                 symbolizerClone.opacity = opacity;
             }
+
+            console.log("symbolizerClones", symbolizerClone);
 
             onChange(symbolizerClone);
         }
@@ -44,6 +48,11 @@ export function LineEditor({ value, onChange }: EditorProps<LineSymbolizer>) {
                 label: msgWidth,
                 name: "width",
                 formItem: <InputNumber min={0} />,
+            },
+            {
+                label: msgDash,
+                name: "dasharray",
+                formItem: <DashPatternInput />,
             },
         ],
         []
