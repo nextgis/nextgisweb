@@ -1,11 +1,10 @@
 import { EditIcon } from "@nextgisweb/gui/icon";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { iconHtml } from "@nextgisweb/pyramid/icon";
+import type { LayerEditor } from "@nextgisweb/webmap/plugin/layer-editor/LayerEditor";
 
 import { ToolBase } from "../ToolBase";
 import type { ToolBaseOptions } from "../ToolBase";
-
-import type { LayerEditor } from "./../../../plugin/layer-editor/LayerEditor";
 
 interface ModifyFeatureOptions extends ToolBaseOptions {
     layerEditor: LayerEditor;

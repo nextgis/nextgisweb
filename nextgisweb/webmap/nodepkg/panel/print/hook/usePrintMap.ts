@@ -4,8 +4,7 @@ import { useCallback, useEffect, useRef } from "react";
 import reactApp from "@nextgisweb/gui/react-app";
 import type { Display } from "@nextgisweb/webmap/display";
 import PrintMap from "@nextgisweb/webmap/print-map";
-
-import type { PrintMapSettings } from "../../../print-map/type";
+import type { PrintMapSettings } from "@nextgisweb/webmap/print-map/type";
 
 interface PrintMapCompProps {
     settings: PrintMapSettings;

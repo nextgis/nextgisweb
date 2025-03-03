@@ -3,8 +3,8 @@ import type { FC } from "react";
 
 import { Switch } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import type { PrintMapSettings } from "@nextgisweb/webmap/print-map/type";
 
-import type { PrintMapSettings } from "../../../print-map/type";
 import { ScalesSelect } from "../component/ScalesSelect";
 import { scaleToLabel, scalesList } from "../options";
 

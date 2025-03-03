@@ -10,8 +10,8 @@ import type {
     ResourceInterface,
     ResourceRead,
 } from "@nextgisweb/resource/type/api";
+import { loadParents } from "@nextgisweb/resource/util/loadParents";
 
-import { loadParents } from "../../../util/loadParents";
 import type { OnNewGroupType, ResourcePickerStoreOptions } from "../type";
 
 import { actionHandler } from "./decorator/actionHandler";

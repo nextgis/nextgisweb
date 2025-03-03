@@ -7,10 +7,10 @@ import type { MenuProps } from "@nextgisweb/gui/antd";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { Display } from "@nextgisweb/webmap/display";
+import { printMapStore } from "@nextgisweb/webmap/print-map/PrintMapStore";
+import type { PrintMapSettings } from "@nextgisweb/webmap/print-map/type";
 import type { PrintBody, PrintFormat } from "@nextgisweb/webmap/type/api";
 
-import { printMapStore } from "../../../print-map/PrintMapStore";
-import type { PrintMapSettings } from "../../../print-map/type";
 import { exportFormats } from "../options";
 
 import { legendItemsToModel, legendToModel } from "./legendToModel";

@@ -57,6 +57,14 @@ const config = {
                         ],
                         "message": "Use '@nextgisweb/*' namespace instead.",
                     },
+                    {
+                        "group": ["./../*"],
+                        "message": "Remove useless './' prefix.",
+                    },
+                    {
+                        "group": ["../../../*"],
+                        "message": "Too many levels up, use absolute name.",
+                    },
                 ],
             },
         ],
