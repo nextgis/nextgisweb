@@ -15,7 +15,7 @@ import { hexWithOpacity } from "../../util/hexWithOpacity";
 
 const msgFillColor = gettext("Fill color");
 const msgWidth = gettext("Width");
-const msgDash = gettext("Dash");
+const msgLine = gettext("Line");
 
 export function LineEditor({ value, onChange }: EditorProps<LineSymbolizer>) {
     const onSymbolizer = (v: LineSymbolizer) => {
@@ -48,7 +48,7 @@ export function LineEditor({ value, onChange }: EditorProps<LineSymbolizer>) {
                 formItem: <InputNumber min={0} />,
             },
             {
-                label: msgDash,
+                label: msgLine,
                 name: "dasharray",
                 formItem: <DashPatternInput />,
             },
