@@ -12,10 +12,9 @@ const msgGap = gettext("Gap");
 
 const { Option } = Select;
 
-// Define types for the component props
 interface DashPatternInputProps {
-    value?: number[]; // Array of numbers representing the dash pattern (e.g., [5, 3])
-    onChange?: (value: number[]) => void; // Callback function triggered when the dash pattern changes
+    value?: number[];
+    onChange?: (value: number[]) => void;
     lineWidth?: number; // Line width used for calculating preset values
 }
 
@@ -24,7 +23,6 @@ export const DashPatternInput: React.FC<DashPatternInputProps> = ({
     onChange,
     lineWidth = 1,
 }) => {
-    // State for the dash pattern and selected preset
     const [dashPattern, setDashPattern] = useState<number[]>(value);
     const [preset, setPreset] = useState<string>("");
 
@@ -35,11 +33,11 @@ export const DashPatternInput: React.FC<DashPatternInputProps> = ({
         newDashPattern[index] = newValue;
         setDashPattern(newDashPattern);
         if (onChange) {
+            console.log("handleInputChange newDashPattern", newDashPattern);
             onChange(newDashPattern);
         }
     };
 
-    // Handle changes to the preset dropdown
     const handlePresetChange = (presetName: string) => {
         let newDashPattern: number[] = [];
         switch (presetName) {
@@ -64,21 +62,21 @@ export const DashPatternInput: React.FC<DashPatternInputProps> = ({
         setDashPattern(newDashPattern);
         setPreset(presetName);
         if (onChange) {
+            console.log("handlePresetChange newDashPattern", newDashPattern);
             onChange(newDashPattern);
         }
     };
 
-    // Handle deleting a dash-gap row
     const handleDeleteRow = (index: number) => {
         const newDashPattern = [...dashPattern];
         newDashPattern.splice(index, 2);
         setDashPattern(newDashPattern);
         if (onChange) {
+            console.log("handleDeleteRow newDashPattern", newDashPattern);
             onChange(newDashPattern);
         }
     };
 
-    // Render the dynamic input fields with delete buttons
     const renderInputFields = () => {
         const fields: JSX.Element[] = [];
         for (let i = 0; i < dashPattern.length + 2; i += 2) {

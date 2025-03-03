@@ -8,6 +8,7 @@ import type { FormField } from "@nextgisweb/gui/fields-form";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { ColorInput } from "../../field/ColorInput";
+import { DashPatternInput } from "../../field/DashInput";
 import type { EditorProps } from "../../type";
 import { extractColorAndOpacity } from "../../util/extractColorAndOpacity";
 import { hexWithOpacity } from "../../util/hexWithOpacity";
@@ -15,6 +16,7 @@ import { hexWithOpacity } from "../../util/hexWithOpacity";
 const msgFillColor = gettext("Fill color");
 const msgOutlineColor = gettext("Stroke color");
 const msgOutlineWidth = gettext("Stroke width");
+const msgDash = gettext("Dash");
 
 export function FillEditor({ value, onChange }: EditorProps<FillSymbolizer>) {
     const onSymbolizer = (v: FillSymbolizer) => {
@@ -58,6 +60,11 @@ export function FillEditor({ value, onChange }: EditorProps<FillSymbolizer>) {
                 label: msgOutlineWidth,
                 name: "outlineWidth",
                 formItem: <InputNumber min={0} />,
+            },
+            {
+                label: msgDash,
+                name: "outlineDasharray",
+                formItem: <DashPatternInput />,
             },
         ],
         []
