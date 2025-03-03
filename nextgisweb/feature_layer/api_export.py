@@ -53,6 +53,7 @@ def _ogr_layer_from_features(
     name: str = "",
     field_map: Union[FieldMap, None] = None,
     fid: Union[str, None] = None,
+    make_valid: bool = False,
 ) -> ogr.Layer:
     if field_map is not None:
         layer_fields = [field for _, field in field_map]
@@ -71,6 +72,8 @@ def _ogr_layer_from_features(
         f_kw["aliases"] = aliases
 
     for f in features:
+        if make_valid:
+            f.geom = Geometry(ogr=f.geom.ogr.MakeValid())
         ogr_layer.CreateFeature(f.to_ogr(layer_defn, **f_kw))
 
     return ogr_layer

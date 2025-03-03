@@ -1,4 +1,5 @@
 import os
+from packaging import version
 from typing import List, Union
 from uuid import uuid4
 
@@ -100,7 +101,11 @@ def mvt(
             tolerance = ((obj.srs.maxx - obj.srs.minx) / (1 << z)) / extent
             query.simplify(tolerance * simplification)
 
-        _ogr_layer_from_features(obj, query(), name="ngw:%d" % obj.id, ds=ds)
+        # https://github.com/OSGeo/gdal/commit/f286e04ef98bba45666ba2c2dae26ad8bad4729b
+        make_valid = version.parse(gdal.__version__.split("-")[0]) < version.parse("3.5.0")
+        _ogr_layer_from_features(
+            obj, query(), name="ngw:%d" % obj.id, ds=ds, make_valid=make_valid
+        )
 
     # flush changes
     ds = None
