@@ -26,7 +26,7 @@ export class WebmapStore {
     @observable.shallow private accessor _layers: Record<string, CoreLayer> =
         {};
 
-    private readonly _loadedResourceSymbols = new Set<number>();
+    private readonly _loadingResourceSymbols = new Set<number>();
 
     constructor({
         itemStore,
@@ -356,7 +356,7 @@ export class WebmapStore {
 
     shouldHaveLegendInfo = (layer: LayerItemConfig) => {
         return (
-            !this._loadedResourceSymbols.has(layer.styleId) &&
+            !this._loadingResourceSymbols.has(layer.styleId) &&
             layer.legendInfo.has_legend &&
             (layer.legendInfo.symbols === null ||
                 layer.legendInfo.symbols === undefined)
@@ -370,18 +370,23 @@ export class WebmapStore {
     @action.bound
     async updateResourceLegendSymbols(resources: number[]) {
         if (resources.length) {
+            const newResources = resources.filter(
+                (id) => !this._loadingResourceSymbols.has(id)
+            );
+            if (!newResources.length) return;
+
             try {
-                resources.forEach((id) => this._loadedResourceSymbols.add(id));
+                newResources.forEach((id) =>
+                    this._loadingResourceSymbols.add(id)
+                );
                 const legends = await route(
                     "render.resource_legend_symbols"
                 ).get({
-                    query: { resources, icon_size: 20 },
+                    query: { resources: newResources, icon_size: 20 },
+                    cache: true,
                 });
-
-                runInAction(() => {
-                    legends.items.forEach(({ resource, legend_symbols }) => {
-                        this.updateLayerLegendInfo(resource.id, legend_symbols);
-                    });
+                legends.items.forEach(({ resource, legend_symbols }) => {
+                    this.updateLayerLegendInfo(resource.id, legend_symbols);
                 });
             } catch (error) {
                 console.error(
@@ -389,8 +394,8 @@ export class WebmapStore {
                     error
                 );
             } finally {
-                resources.forEach((id) =>
-                    this._loadedResourceSymbols.delete(id)
+                newResources.forEach((id) =>
+                    this._loadingResourceSymbols.delete(id)
                 );
             }
         }
@@ -399,8 +404,16 @@ export class WebmapStore {
     @action
     private updateLayerLegendInfo(styleId: number, symbols?: LegendSymbol[]) {
         const webmapItems = [...this._webmapItems];
+        const layers = { ...this._layers };
+        let updated = false;
         traverseTree(webmapItems, (item) => {
-            if (item.type === "layer" && item.styleId === styleId) {
+            if (
+                item.type === "layer" &&
+                item.styleId === styleId &&
+                item.legendInfo.has_legend &&
+                !item.legendInfo.symbols
+            ) {
+                updated = true;
                 const single = !!symbols && symbols.length === 1;
                 const legendInfo: LegendInfo = {
                     ...item.legendInfo,
@@ -412,17 +425,13 @@ export class WebmapStore {
                 }
                 item.legendInfo = legendInfo;
 
-                const layers = { ...this._layers };
                 for (const layer of Object.values(layers)) {
                     if (
                         layer.itemConfig &&
-                        layer.itemConfig.styleId === styleId
+                        layer.itemConfig.styleId === styleId &&
+                        !layer.itemConfig.legendInfo
                     ) {
                         layer.itemConfig.legendInfo = legendInfo;
-                        runInAction(() => {
-                            this._layers = layers;
-                        });
-                        break;
                     }
                 }
 
@@ -430,8 +439,10 @@ export class WebmapStore {
             }
             return false;
         });
-
-        this._webmapItems = webmapItems;
+        if (updated) {
+            this._layers = layers;
+            this._webmapItems = webmapItems;
+        }
     }
 
     getLayerVisibility = (layerId: number) => {
