@@ -64,6 +64,8 @@ export const RowActions = observer(
     }
 );
 
+RowActions.displayName = "RowActions";
+
 export const WELLKNOWN_ROW_ACTIONS: Record<
     string,
     RowActionConfig<FunctionKeys<EdiTableStore>>

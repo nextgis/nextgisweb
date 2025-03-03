@@ -3,7 +3,7 @@ import { useCallback } from "react";
 import type { ResourcePickerStore } from "../store/ResourcePickerStore";
 import type { PickerResource, RowSelection } from "../type";
 
-type CheckboxProps = ReturnType<NonNullable<RowSelection["getCheckboxProps"]>>
+type CheckboxProps = ReturnType<NonNullable<RowSelection["getCheckboxProps"]>>;
 
 interface UsePickerCardProps {
     resourceStore: ResourcePickerStore;

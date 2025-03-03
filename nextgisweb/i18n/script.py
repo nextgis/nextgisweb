@@ -596,9 +596,11 @@ def main(argv=sys.argv):
     logging.basicConfig(level=logging.INFO)
 
     parser = ArgumentParser()
-    parser.add_argument("-p", "--package", help="Deprecated")
-    parser.add_argument("--all-packages", dest="package", action="store_const", const="all", help="Deprecated")
     parser.add_argument("--config")
+
+    # TODO: Remove these two arguments
+    parser.add_argument("-p", "--package")
+    parser.add_argument("--all-packages", dest="package", action="store_const", const="all")
 
     subparsers = parser.add_subparsers()
 

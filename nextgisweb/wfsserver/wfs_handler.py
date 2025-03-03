@@ -1158,7 +1158,6 @@ class WFSHandler:
         return root
 
     def _transaction(self):
-        #print(etree.tostring(self.root_body))
         _ns_wfs = nsmap("wfs", self.p_version)["ns"]
         _ns_ogc = nsmap("ogc", self.p_version)["ns"]
         if self.p_version >= v200:

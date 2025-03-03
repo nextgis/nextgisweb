@@ -3,7 +3,7 @@ import { imageQueue, tileLoadFunction } from "@nextgisweb/pyramid/util";
 import Image from "@nextgisweb/webmap/ol/layer/Image";
 import type { LayerItemConfig } from "@nextgisweb/webmap/type/api";
 
-import { LayerDisplayAdapter  } from "../DisplayLayerAdapter";
+import { LayerDisplayAdapter } from "../DisplayLayerAdapter";
 
 interface QueryParams {
     resource: string;
@@ -27,7 +27,7 @@ function parseQueryParams(queryString: string): QueryParams {
     return params;
 }
 
-export class ImageAdapter extends LayerDisplayAdapter  {
+export class ImageAdapter extends LayerDisplayAdapter {
     createLayer(item: LayerItemConfig) {
         const layer = new Image(
             String(item.id),

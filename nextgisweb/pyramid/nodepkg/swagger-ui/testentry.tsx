@@ -68,7 +68,7 @@ export default function SwaggerTestEntry() {
         const print = (arr: string[], label: string) => {
             arr.sort();
             console.log(`${label} = ${arr.join(", ")}`);
-        }
+        };
 
         print(familyDefault, "FAMILY DEFAULT");
         print(familyMonospace, "FAMILY MONOSPACE");

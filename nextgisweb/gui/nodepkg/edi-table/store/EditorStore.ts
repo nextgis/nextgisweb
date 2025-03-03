@@ -29,9 +29,9 @@ export class EditorStore<V = unknown, D = V>
     @computed
     get isValid() {
         runInAction(() => {
-                    runInAction(() => {
-            this.validate = true;
-        });
+            runInAction(() => {
+                this.validate = true;
+            });
         });
         return this.items.every((r) => r.error === false);
     }

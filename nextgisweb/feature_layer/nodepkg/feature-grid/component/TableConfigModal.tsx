@@ -7,7 +7,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { FeatureGridStore } from "../FeatureGridStore";
 import { LAST_CHANGED_FIELD_ID } from "../constant";
 
-export default observer(({ store }: { store: FeatureGridStore }) => {
+const TableConfigModal = observer(({ store }: { store: FeatureGridStore }) => {
     const { settingsOpen, visibleFields, fields } = store;
 
     const close = () => {
@@ -58,3 +58,6 @@ export default observer(({ store }: { store: FeatureGridStore }) => {
         </Modal>
     );
 });
+
+TableConfigModal.displayName = "TableConfigModal";
+export default TableConfigModal;
