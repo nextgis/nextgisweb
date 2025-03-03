@@ -4,25 +4,24 @@ import { Button, InputNumber, Select } from "@nextgisweb/gui/antd";
 import { CloseIcon } from "@nextgisweb/gui/icon";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-const msgDotted = gettext("Dotted");
-const msgDashed = gettext("Dashed");
-const msgDashDotted = gettext("Dash - dotted");
+import { LinePatternPresetView } from "../component/LinePatternPresetView";
+import { linePatternPresets } from "../util/linePatternPresets";
+
 const msgDash = gettext("Dash");
 const msgGap = gettext("Gap");
-const msgLine = gettext("Line");
 
 const { Option } = Select;
 
 interface DashPatternInputProps {
     value?: number[];
     onChange?: (value: number[] | undefined) => void;
-    lineWidth?: number; // Line width used for calculating preset values
+    // lineWidth?: number; // Line width used for calculating preset values
 }
 
 export const DashPatternInput: React.FC<DashPatternInputProps> = ({
     value = [],
     onChange,
-    lineWidth = 1,
+    // lineWidth = 3,
 }) => {
     const [dashPattern, setDashPattern] = useState<number[]>(value);
     const [preset, setPreset] = useState<string>(
@@ -43,35 +42,21 @@ export const DashPatternInput: React.FC<DashPatternInputProps> = ({
     };
 
     const handlePresetChange = (presetName: string) => {
-        let newDashPattern: number[] = [];
-        switch (presetName) {
-            case "line":
-                newDashPattern = [];
-                break;
-            case "dotted":
-                newDashPattern = [lineWidth, lineWidth];
-                break;
-            case "dashed":
-                newDashPattern = [lineWidth * 3, lineWidth];
-                break;
-            case "dash-dotted":
-                newDashPattern = [
-                    lineWidth * 3,
-                    lineWidth,
-                    lineWidth,
-                    lineWidth,
-                ];
-                break;
-            default:
-                newDashPattern = [];
-                break;
-        }
-        setDashPattern(newDashPattern);
-        setPreset(presetName);
-        if (onChange) {
-            const resultNewDashPattern =
-                newDashPattern.length === 0 ? undefined : newDashPattern;
-            onChange(resultNewDashPattern);
+        const newDashPatternPreset = linePatternPresets.find(
+            (preset) => preset.keyname === presetName
+        );
+
+        if (!newDashPatternPreset) {
+            return;
+        } else {
+            const newDashPattern = newDashPatternPreset.value.dasharray || [];
+            setDashPattern(newDashPattern);
+            setPreset(presetName);
+            if (onChange) {
+                const resultNewDashPattern =
+                    newDashPattern.length === 0 ? undefined : newDashPattern;
+                onChange(resultNewDashPattern);
+            }
         }
     };
 
@@ -144,10 +129,11 @@ export const DashPatternInput: React.FC<DashPatternInputProps> = ({
                 style={{ width: "100%", marginBottom: 16 }}
                 defaultValue="line"
             >
-                <Option value="line">{msgLine}</Option>
-                <Option value="dotted">{msgDotted}</Option>
-                <Option value="dashed">{msgDashed}</Option>
-                <Option value="dash-dotted">{msgDashDotted}</Option>
+                {linePatternPresets.map((preset) => (
+                    <Option key={preset.keyname} value={preset.keyname}>
+                        <LinePatternPresetView presetData={preset} />
+                    </Option>
+                ))}
             </Select>
 
             {renderInputFields()}
