@@ -89,14 +89,14 @@ export const DashPatternInput: React.FC<DashPatternInputProps> = ({
                     <InputNumber
                         value={dashPattern[i]}
                         onChange={(value) => handleInputChange(i, value)}
-                        placeholder={msgGap}
+                        placeholder={msgDash}
                         min={0}
                         style={{ width: "90px", marginRight: "12px" }}
                     />
                     <InputNumber
                         value={dashPattern[i + 1]}
                         onChange={(value) => handleInputChange(i + 1, value)}
-                        placeholder={msgDash}
+                        placeholder={msgGap}
                         min={0}
                         style={{
                             width: "90px",
