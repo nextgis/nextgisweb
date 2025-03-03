@@ -31,8 +31,6 @@ export function LineEditor({ value, onChange }: EditorProps<LineSymbolizer>) {
                 symbolizerClone.opacity = opacity;
             }
 
-            console.log("symbolizerClones", symbolizerClone);
-
             onChange(symbolizerClone);
         }
     };

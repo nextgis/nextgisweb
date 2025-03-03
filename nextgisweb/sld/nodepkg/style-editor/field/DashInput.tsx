@@ -33,7 +33,6 @@ export const DashPatternInput: React.FC<DashPatternInputProps> = ({
         newDashPattern[index] = newValue;
         setDashPattern(newDashPattern);
         if (onChange) {
-            console.log("handleInputChange newDashPattern", newDashPattern);
             onChange(newDashPattern);
         }
     };
@@ -62,7 +61,6 @@ export const DashPatternInput: React.FC<DashPatternInputProps> = ({
         setDashPattern(newDashPattern);
         setPreset(presetName);
         if (onChange) {
-            console.log("handlePresetChange newDashPattern", newDashPattern);
             onChange(newDashPattern);
         }
     };
@@ -72,7 +70,6 @@ export const DashPatternInput: React.FC<DashPatternInputProps> = ({
         newDashPattern.splice(index, 2);
         setDashPattern(newDashPattern);
         if (onChange) {
-            console.log("handleDeleteRow newDashPattern", newDashPattern);
             onChange(newDashPattern);
         }
     };

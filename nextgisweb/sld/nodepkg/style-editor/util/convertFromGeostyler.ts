@@ -55,6 +55,7 @@ function convertLineSymbolizer(gsLine: GSLineSymbolizer): LineSymbolizer {
             color: gsLine.color as string,
             width: gsLine.width as number,
             opacity: setOpacity(gsLine.opacity),
+            dash_pattern: gsLine?.dasharray as number[],
         },
     };
 }
@@ -74,6 +75,7 @@ function convertFillSymbolizer(gsFill: GSFillSymbolizer): PolygonSymbolizer {
                   color: gsFill.outlineColor as string,
                   width: gsFill.outlineWidth as number,
                   opacity: setOpacity(gsFill.outlineOpacity),
+                  dash_pattern: gsFill.outlineDasharray as number[],
               }
             : undefined,
     };
