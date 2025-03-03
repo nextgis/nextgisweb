@@ -1,4 +1,3 @@
-import os
 from packaging import version
 from typing import List, Union
 from uuid import uuid4
@@ -31,6 +30,11 @@ def _ogr_ds(driver, options):
         "/vsimem/%s" % uuid4(),
         options=options,
     )
+
+
+# Prior to GDAL 3.5.0 we need to manually make geometries valid. See
+# https://github.com/OSGeo/gdal/commit/f286e04ef98bba45666ba2c2dae26ad8bad4729b
+MAKE_VALID = version.parse(gdal.__version__.split("-")[0]) < version.parse("3.5.0")
 
 
 def mvt(
@@ -101,20 +105,13 @@ def mvt(
             tolerance = ((obj.srs.maxx - obj.srs.minx) / (1 << z)) / extent
             query.simplify(tolerance * simplification)
 
-        # https://github.com/OSGeo/gdal/commit/f286e04ef98bba45666ba2c2dae26ad8bad4729b
-        make_valid = version.parse(gdal.__version__.split("-")[0]) < version.parse("3.5.0")
-        _ogr_layer_from_features(
-            obj, query(), name="ngw:%d" % obj.id, ds=ds, make_valid=make_valid
-        )
+        _ogr_layer_from_features(obj, query(), name=f"ngw:{obj.id}", ds=ds, make_valid=MAKE_VALID)
 
-    # flush changes
+    # Flush changes
     ds = None
 
-    filepath = os.path.join("%s" % vsibuf, "%d" % z, "%d" % x, "%d.pbf" % y)
-
     try:
-        f = gdal.VSIFOpenL(filepath, "rb")
-
+        f = gdal.VSIFOpenL(f"{vsibuf}/{z}/{x}/{y}.pbf", "rb")
         if f is not None:
             # SEEK_END = 2
             gdal.VSIFSeekL(f, 0, 2)
