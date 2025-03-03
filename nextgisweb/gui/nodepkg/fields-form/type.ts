@@ -19,7 +19,6 @@ export interface FormFieldChoice {
 }
 
 export interface FormOnChangeOptions<
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     P extends Record<string, any> = Record<string, unknown>,
 > {
     isValid: () => Promise<boolean>;
@@ -51,7 +50,6 @@ export interface FormField<N extends string = string> extends FormItemProps<N> {
 }
 
 export interface FieldsFormProps<
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     P extends Record<string, any> = Record<string, any>,
 > extends FormProps {
     initialValues?: Partial<P>;

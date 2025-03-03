@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { EventEmitter } from "./EventEmitter";

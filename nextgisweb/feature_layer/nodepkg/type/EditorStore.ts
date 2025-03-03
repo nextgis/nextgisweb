@@ -7,7 +7,6 @@ export interface EditorStoreConstructorOptions {
     fields?: FeatureLayerFieldRead[];
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface EditorStore<V = any> {
     value: V;
 

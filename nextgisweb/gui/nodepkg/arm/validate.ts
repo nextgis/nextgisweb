@@ -22,7 +22,6 @@ const msgPattern = gettext("Invalid value");
 const msgNotUnique = gettext("Value not unique");
 const msgInvalidURL = gettext("Invalid URL");
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function required<V = any>(): Validator<V> {
     return (value: V) => {
         if (value === undefined || value === null || value === "") {

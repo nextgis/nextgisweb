@@ -4,7 +4,6 @@ import type { CSSProperties, ReactNode } from "react";
 
 export type ButtonProps = Parameters<typeof Button>[0];
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type CreateButtonActionProps = Record<string, any>;
 export interface UseActionToolbarProps {
     size?: SizeType;

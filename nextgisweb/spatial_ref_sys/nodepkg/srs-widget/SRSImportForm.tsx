@@ -28,7 +28,6 @@ interface SRSImportFromProps
     extends Omit<FieldsFormProps, "fields" | "onChange" | "form"> {
     format: string;
     projStr: string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     form: FormInstance<any>;
     onChange?: (arg: (val: SrsFormValue) => SrsFormValue) => void;
 }

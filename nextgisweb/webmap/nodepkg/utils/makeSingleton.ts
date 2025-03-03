@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 export function makeSingleton<T extends new (...args: any[]) => any>(ctor: T) {
     let instance: InstanceType<T> | null = null;
 

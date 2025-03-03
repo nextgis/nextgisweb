@@ -153,7 +153,6 @@ export const OlRenderer: React.FC<OlRendererProps> = ({
         };
         // parser style to OL style
         const { output: olStyles, errors = [] } = await styleParser.writeStyle(
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             style as any
         );
         if (errors.length > 0) {

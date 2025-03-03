@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { Routes } from "@nextgisweb/pyramid/type/route";
 
 import type { LoaderCache } from "../util/loader";

@@ -143,7 +143,6 @@ function ActionToolbarInput<
     );
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ActionToolbarType = <P extends Record<string, any> = Record<string, any>>(
     props: ActionToolbarProps<P> & { ref?: Ref<HTMLDivElement> }
 ) => ReactElement;

@@ -24,7 +24,6 @@ interface StringFieldProps {
     url?: boolean;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ExtraProps = Record<string, any>;
 type ValidationProps<V> = FieldProps &
     (V extends number
@@ -47,7 +46,6 @@ export type CProps<V, E = ExtraProps> = {
     extraProps?: E;
 } & Pick<InputHTMLAttributes<V>, "min" | "max" | "minLength" | "maxLength">;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export class MappedValue<V = any, O = any, P extends string = string> {
     [MappedValueSymbol] = true;
 
@@ -260,7 +258,6 @@ export function mapper<O, D>(
         return false;
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return new Proxy({ $load, $error, $dump, $dirty } as any, {
         get: (target, prop) => {
             if (typeof prop === "string" && !prop.startsWith("$")) {

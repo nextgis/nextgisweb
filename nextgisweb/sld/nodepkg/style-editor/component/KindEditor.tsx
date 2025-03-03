@@ -14,11 +14,7 @@ interface SymbolizerKindProps {
 }
 
 const componentMap: Partial<
-    Record<
-        SymbolizerKind,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        React.FC<EditorProps<any>>
-    >
+    Record<SymbolizerKind, React.FC<EditorProps<any>>>
 > = {
     "Mark": MarkEditor,
     "Line": LineEditor,

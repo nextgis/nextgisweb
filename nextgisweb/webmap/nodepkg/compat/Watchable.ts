@@ -1,4 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export abstract class Watchable<WatchableProps extends Record<string, any>> {
     private watchHandlers: {
         [K in keyof WatchableProps]?: Array<

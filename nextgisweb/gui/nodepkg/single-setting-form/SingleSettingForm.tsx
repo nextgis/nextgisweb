@@ -36,7 +36,6 @@ export function SingleSettingForm({
     const [status, setStatus] = useState<"loading" | "saving" | null>(
         "loading"
     );
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [value, setValue] = useState<any>();
 
     const { data } = useRouteGet<Record<string, Record<string, unknown>>>({

@@ -97,7 +97,6 @@ entrypoints
         const plugins = registryObject.pluginModules;
 
         const code = [
-            `/* eslint-disable @typescript-eslint/no-explicit-any */`,
             `/* eslint-disable prettier/prettier */`,
             `/* eslint-disable import/order */`,
             ``,

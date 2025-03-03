@@ -150,7 +150,7 @@ const config = {
                 "react/prop-types": "off", // Use TypeScript instead
                 "react/jsx-no-target-blank": "off", // Unsupported browsers
                 "react/display-name": "warn",
-                "@typescript-eslint/no-explicit-any": "warn",
+                "@typescript-eslint/no-explicit-any": "off",
                 "@typescript-eslint/no-use-before-define": "warn",
                 "@typescript-eslint/no-unused-vars": [
                     "error",

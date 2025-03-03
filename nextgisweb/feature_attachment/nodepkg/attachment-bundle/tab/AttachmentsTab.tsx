@@ -266,7 +266,6 @@ const fetchFeaturesAttachments = async (
         return [];
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const promises: Promise<any[]>[] = [];
     const layersInfoById = getLayersInfo(display);
 

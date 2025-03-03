@@ -62,7 +62,6 @@ export function useRoute<N extends RouteName>(
         Object.keys(apiResults).forEach((m) => {
             const method = m as keyof RouteResults<N>;
 
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const originalMethod: (...args: any[]) => unknown =
                 apiResults[method];
             const overloadedMethod = async (

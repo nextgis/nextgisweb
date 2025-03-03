@@ -32,10 +32,6 @@ export interface FeatureEditorStoreOptions {
     mode?: FeatureEditorMode;
 }
 
-export type EditorWidgetProps<
-    S extends EditorStore = EditorStore,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    M = any,
-> = {
+export type EditorWidgetProps<S extends EditorStore = EditorStore, M = any> = {
     store?: S;
 } & M;

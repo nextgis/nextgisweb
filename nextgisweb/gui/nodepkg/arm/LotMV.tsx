@@ -7,7 +7,6 @@ import type { LotProps } from "@nextgisweb/gui/mayout";
 
 import type { MappedValue } from "./mapper";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface LotMVProps<V, C extends (props: any) => ReactNode>
     extends Omit<LotProps, "children"> {
     value: MappedValue<V>;
@@ -18,7 +17,6 @@ export interface LotMVProps<V, C extends (props: any) => ReactNode>
     >;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function LotMVBase<V, C extends (props: any) => ReactNode>({
     value,
     component,

@@ -4,7 +4,6 @@ import type { TableProps as AntTAbleProps } from "antd/es/table/InternalTable";
 
 import "./index.less";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface TableProps<D = any> extends AntTAbleProps<D> {
     parentHeight?: boolean;
 }

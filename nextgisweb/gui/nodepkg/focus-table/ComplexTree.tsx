@@ -151,7 +151,6 @@ function Container(props: {
     className?: string;
     style?: CSSProperties;
     children: ReactNode;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     containerProps: any;
 }) {
     const { className, containerProps, children } = props;

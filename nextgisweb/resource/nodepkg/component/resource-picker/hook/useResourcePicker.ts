@@ -14,7 +14,6 @@ export function useResourcePicker({
 }: ResourcePickerHookProps = {}) {
     const pickerParentIdRef = useRef<number>();
     const pickerModal =
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         useRef<ReturnType<typeof showResourcePickerOriginal<any>>>();
 
     const updatePickerOptions = useCallback(

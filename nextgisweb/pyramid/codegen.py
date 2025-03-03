@@ -138,7 +138,6 @@ def api_type_module(config) -> str:
             "prettier/prettier",
             "import/newline-after-import",
             "import/order",
-            "@typescript-eslint/no-explicit-any",
         )
     )
 

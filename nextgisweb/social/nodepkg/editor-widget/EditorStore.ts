@@ -70,7 +70,6 @@ export class EditorStore
     @action update(data: Partial<EditorStore>) {
         for (const [k, v] of Object.entries(data)) {
             if (k in this) {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 (this as any)[k] = v;
             }
         }
