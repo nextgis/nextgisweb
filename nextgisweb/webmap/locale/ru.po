@@ -243,7 +243,7 @@ msgstr "Определить местоположение не удалось"
 
 #: nodepkg/map-controls/control/SwipeControl.ts:37
 msgid "Rotate swipe"
-msgstr ""
+msgstr "Повернуть шторку"
 
 #: nodepkg/map-controls/map-controls.ts:35 nodepkg/map-controls/map-tools.ts:15
 #: nodepkg/map-controls/tool/Zoom.ts:25

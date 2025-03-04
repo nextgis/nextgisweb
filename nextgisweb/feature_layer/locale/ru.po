@@ -12,7 +12,7 @@ msgstr "Параметр 'intersects' содержит невалидную ге
 
 #: api_export.py:108
 msgid "Couldn't add FID field '{}'. Such field already exists."
-msgstr ""
+msgstr "Не удалось добавить поле FID '{}'. Такое поле уже существует."
 
 #: api_export.py:241
 msgid "The export limit is set to {limit} features, but the layer contains {count}."

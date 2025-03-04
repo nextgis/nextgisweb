@@ -116,9 +116,9 @@ msgstr "OK"
 msgid "Please confirm the deletion."
 msgstr "Пожалуйста, подтвердите удаление."
 
-#: nodepkg/confirm.ts:44 nodepkg/edi-table/RowAction.tsx:78
-#: nodepkg/focus-table/action.tsx:27 nodepkg/model-browse/ModelBrowse.tsx:256
-#: nodepkg/model-browse/ModelBrowse.tsx:323 nodepkg/model-form/ModelForm.tsx:48
+#: nodepkg/confirm.ts:44 nodepkg/edi-table/RowAction.tsx:80
+#: nodepkg/focus-table/action.tsx:27 nodepkg/model-browse/ModelBrowse.tsx:257
+#: nodepkg/model-browse/ModelBrowse.tsx:324 nodepkg/model-form/ModelForm.tsx:48
 msgid "Delete"
 msgstr "Удалить"
 
@@ -126,7 +126,7 @@ msgstr "Удалить"
 msgid "Failed to delete."
 msgstr "Ошибка удаления."
 
-#: nodepkg/edi-table/RowAction.tsx:73
+#: nodepkg/edi-table/RowAction.tsx:75
 msgid "Clone"
 msgstr "Клонировать"
 
@@ -138,17 +138,21 @@ msgstr "Требуется ключ"
 msgid "Key not unique"
 msgstr "Ключ не уникален"
 
-#: nodepkg/error/ErrorModal.tsx:47
+#: nodepkg/error/ErrorModal.tsx:46 nodepkg/error/extractError.ts:49
 msgid "Error"
 msgstr "Ошибка"
 
-#: nodepkg/error/index.ts:58
+#: nodepkg/error/extractError.ts:40
 msgid "Unexpected error"
 msgstr "Неожиданная ошибка"
 
-#: nodepkg/error/index.ts:62
+#: nodepkg/error/extractError.ts:44 nodepkg/error/extractError.ts:50
 msgid "Something went wrong."
 msgstr "Что-то пошло не так."
+
+#: nodepkg/error/extractError.ts:54
+msgid "An unknown error occurred."
+msgstr "Возникла неизвестная ошибка."
 
 #: nodepkg/error/shared.tsx:21
 msgid "Unknown Error"
@@ -174,7 +178,7 @@ msgstr "Необходимо указать значение"
 msgid "The value entered is not valid"
 msgstr "Введенное значение некорректно"
 
-#: nodepkg/focus-table/FocusTable.tsx:22
+#: nodepkg/focus-table/FocusTable.tsx:23
 msgid "Hide details"
 msgstr "Скрыть детали"
 
@@ -182,43 +186,43 @@ msgstr "Скрыть детали"
 msgid "Add"
 msgstr "Добавить"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:114 nodepkg/model-form/ModelForm.tsx:68
+#: nodepkg/model-browse/ModelBrowse.tsx:115 nodepkg/model-form/ModelForm.tsx:68
 msgid "Confirmation"
 msgstr "Подтверждение"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:115
+#: nodepkg/model-browse/ModelBrowse.tsx:116
 msgid "Item deleted"
 msgstr "Элемент удален"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:117
+#: nodepkg/model-browse/ModelBrowse.tsx:118
 msgid "Items deleted"
 msgstr "Элементы удалены"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:185
+#: nodepkg/model-browse/ModelBrowse.tsx:186
 msgid "The errors occurred during execution"
 msgstr "Во время выполнения возникли ошибки"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:189
+#: nodepkg/model-browse/ModelBrowse.tsx:190
 msgid "Failed to delete items:"
 msgstr "Не удалось удалить элементы:"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:212
+#: nodepkg/model-browse/ModelBrowse.tsx:213
 msgid "Do you want to delete these items?"
 msgstr "Вы хотите удалить эти элементы?"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:246
+#: nodepkg/model-browse/ModelBrowse.tsx:247
 msgid "Edit"
 msgstr "Изменить"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:246
+#: nodepkg/model-browse/ModelBrowse.tsx:247
 msgid "View"
 msgstr "Просмотр"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:279
+#: nodepkg/model-browse/ModelBrowse.tsx:280
 msgid "Search"
 msgstr "Поиск"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:301 nodepkg/model-form/ModelForm.tsx:46
+#: nodepkg/model-browse/ModelBrowse.tsx:302 nodepkg/model-form/ModelForm.tsx:46
 msgid "Create"
 msgstr "Создать"
 
