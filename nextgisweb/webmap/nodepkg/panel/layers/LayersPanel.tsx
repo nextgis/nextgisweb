@@ -36,7 +36,7 @@ const LayersPanel = observer<PanelPluginWidgetProps>(
                     </>
                 }
                 close={store.close}
-                epilog={<BasemapSelector display={display} />}
+                epilog={<BasemapSelector map={display.map} />}
                 components={{
                     content: PanelContainer.Unpadded,
                     epilog: PanelContainer.Unpadded,
@@ -45,7 +45,7 @@ const LayersPanel = observer<PanelPluginWidgetProps>(
                 <LayersTree
                     store={display.webmapStore}
                     onSelect={display.handleSelect.bind(display)}
-                    setLayerZIndex={display.setLayerZIndex.bind(display)}
+                    setLayerZIndex={display.map.setLayerZIndex.bind(display)}
                     getWebmapPlugins={() => ({ ...display.plugins })}
                     {...props}
                 />

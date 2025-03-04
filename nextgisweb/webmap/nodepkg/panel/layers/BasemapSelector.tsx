@@ -3,17 +3,16 @@ import { useMemo } from "react";
 
 import { Select } from "@nextgisweb/gui/antd";
 import type { OptionType } from "@nextgisweb/gui/antd";
-import type { Display } from "@nextgisweb/webmap/display";
+import type { MapStore } from "@nextgisweb/webmap/ol/MapStore";
 
 import { UpOutlined } from "@ant-design/icons";
 
 interface BasemapSelectorProps {
-    display: Display;
+    map: MapStore;
 }
 
-export const BasemapSelector = observer(({ display }: BasemapSelectorProps) => {
-    const { map, activeBasemapKey, switchBasemap } = display;
-    const { baseLayers } = map;
+export const BasemapSelector = observer(({ map }: BasemapSelectorProps) => {
+    const { baseLayers, activeBasemapKey, switchBasemap } = map;
 
     const options = useMemo<OptionType[]>(() => {
         const options_ = [];

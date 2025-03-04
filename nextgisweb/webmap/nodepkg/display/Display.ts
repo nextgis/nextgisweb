@@ -1,4 +1,4 @@
-import { action, computed, observable } from "mobx";
+import { action, observable } from "mobx";
 import { Feature } from "ol";
 import type { Control } from "ol/control";
 import type { Extent } from "ol/extent";
@@ -33,7 +33,6 @@ import { Identify } from "../map-controls/tool/Identify";
 import MapStatesObserver from "../map-state-observer";
 import type { MapStatesObserver as IMapStatesObserver } from "../map-state-observer/MapStatesObserver";
 import { MapStore } from "../ol/MapStore";
-import type { CoreLayer } from "../ol/layer/CoreLayer";
 import type { PanelStore } from "../panel";
 import { PanelManager } from "../panel/PanelManager";
 import type { PluginBase } from "../plugin/PluginBase";
@@ -79,7 +78,6 @@ export class Display {
     readonly plugins: Record<string, PluginBase> = {};
     readonly _adapters: Record<string, LayerDisplayAdapter> = {};
     private _mid: Mid = {
-        basemap: {},
         adapter: {},
         plugin: {},
         wmplugin: {},
@@ -106,7 +104,6 @@ export class Display {
     rightTopControlPane?: HTMLElement;
     rightBottomControlPane?: HTMLElement;
 
-    @observable.shallow accessor baseLayer: CoreLayer | null = null;
     @observable.shallow accessor item: StoreItem | null = null;
     @observable.shallow accessor itemConfig: LayerItemConfig | null = null;
 
@@ -200,7 +197,6 @@ export class Display {
 
         // // Map and plugins
         Promise.all([
-            this._midDeferred.basemap,
             this._midDeferred.webmapPlugin,
             this._startupDeferred,
         ]).then(() => {
@@ -249,19 +245,6 @@ export class Display {
 
     // MAP & CONTROLS
 
-    @computed
-    get activeBasemapKey(): "blank" | string {
-        if (!this.baseLayer || !this.baseLayer.name) {
-            return "blank";
-        }
-        return this.baseLayer.name;
-    }
-
-    @action
-    setBaseLayer(layer: CoreLayer) {
-        this.baseLayer = layer;
-    }
-
     @action
     _mapSetup() {
         if (!this.mapNode) {
@@ -302,42 +285,6 @@ export class Display {
         resizeObserver.observe(this.mapNode);
 
         // resizeObserver.disconnect();
-
-        // Basemaps initialization
-        const settings = this.clientSettings;
-        let idx = 0;
-
-        for (const bm of settings.basemaps) {
-            const MID = this._mid.basemap[bm.base.mid];
-
-            const baseOptions = { ...bm.base };
-            const layerOptions = { ...bm.layer };
-            const sourceOptions = { ...bm.source };
-
-            if (baseOptions.keyname === undefined) {
-                baseOptions.keyname = `basemap_${idx}`;
-            }
-
-            try {
-                const layer = new MID(
-                    baseOptions.keyname,
-                    layerOptions,
-                    sourceOptions
-                );
-
-                if (layer.olLayer.getVisible()) {
-                    this.setBaseLayer(layer);
-                }
-                layer.isBaseLayer = true;
-                this.map.addLayer(layer);
-            } catch (err) {
-                console.warn(
-                    `Can't initialize layer [${baseOptions.keyname}]: ${err}`
-                );
-            }
-
-            idx++;
-        }
 
         appendTo(this.mapNode);
         this.mapDeferred.resolve(true);
@@ -479,30 +426,6 @@ export class Display {
     }
 
     // LAYERS
-    @action
-    switchBasemap = (basemapLayerKey: string) => {
-        if (!(basemapLayerKey in this.map.layers)) {
-            return false;
-        }
-
-        if (this.baseLayer && this.baseLayer.name) {
-            const { name } = this.baseLayer;
-            this.map.layers[name].olLayer.setVisible(false);
-        }
-
-        const newLayer = this.map.layers[basemapLayerKey];
-        newLayer.olLayer.setVisible(true);
-        this.baseLayer = newLayer;
-
-        return true;
-    };
-
-    setLayerZIndex(id: number, zIndex: number) {
-        const layer = this.map.layers[id];
-        if (layer && layer.olLayer && layer.olLayer.setZIndex) {
-            layer.olLayer.setZIndex(zIndex);
-        }
-    }
 
     setupAdapter(key: string, Module: LayerDisplayAdapterCtor) {
         if (!this._adapters[key]) {
@@ -637,7 +560,7 @@ export class Display {
         ])
             .then(() => {
                 if (this.urlParams.base) {
-                    this.switchBasemap(this.urlParams.base);
+                    this.map.switchBasemap(this.urlParams.base);
                 }
                 this._setMapExtent();
                 this.mapExtentDeferred.resolve(true);
@@ -696,23 +619,6 @@ export class Display {
             keyof MidConfig,
             (string | Entrypoint)[]
         >;
-
-        const basemapMids: Entrypoint[] = [
-            [
-                "@nextgisweb/webmap/ol/layer/OSM",
-                () => import("@nextgisweb/webmap/ol/layer/OSM"),
-            ],
-            [
-                "@nextgisweb/webmap/ol/layer/XYZ",
-                () => import("@nextgisweb/webmap/ol/layer/XYZ"),
-            ],
-            [
-                "@nextgisweb/webmap/ol/layer/QuadKey",
-                () => import("@nextgisweb/webmap/ol/layer/QuadKey"),
-            ],
-        ];
-
-        mids.basemap.push(...basemapMids);
 
         for (const key in mids) {
             const k = key as keyof typeof mids;

@@ -6,19 +6,12 @@ import type {
     LengthUnits,
 } from "@nextgisweb/webmap/type/api";
 
-interface BaseMap {
-    base: { keyname: string; mid: string };
-    layer: { title: string; visible?: boolean };
-    source: Record<string, unknown>;
-}
-
 interface Adapters {
     tile: { display_name: string };
     image: { display_name: string };
 }
 
 export interface WebmapSettings {
-    basemaps: BaseMap[];
     editing: boolean;
     annotation: boolean;
     adapters: Adapters;

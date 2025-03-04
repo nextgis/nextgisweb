@@ -1,0 +1,10 @@
+[
+    {
+        "keyname": "osm-mapnik",
+        "display_name": "OpenStreetMap",
+        "url": "https://{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        "copyright_text": "© OpenStreetMap contributors",
+        "copyright_url": "https://www.openstreetmap.org/copyright",
+        "enabled": true
+    }
+]

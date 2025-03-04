@@ -138,6 +138,11 @@ export abstract class CoreLayer<
         return this.olSource;
     }
 
+    dispose() {
+        this.olLayer.dispose();
+        this.olSource.dispose();
+    }
+
     /** @deprecated use {@link _Base.setVisibility} or {@link _Base.setOpacity} or {@link _Base.setSymbols} */
     @action
     set(

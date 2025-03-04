@@ -1,15 +1,20 @@
 import View from "ol/View";
 import type { FitOptions, ViewOptions } from "ol/View";
 import { fromExtent } from "ol/geom/Polygon";
-import TileLayer from "ol/layer/Tile";
 import { transformExtent } from "ol/proj";
-import OSM from "ol/source/OSM";
+import type XYZ from "ol/source/XYZ";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import settings from "@nextgisweb/basemap/client-settings";
+import {
+    addBaselayer,
+    prepareBaselayerConfig,
+} from "@nextgisweb/basemap/util/baselayer";
 import type { NgwExtent } from "@nextgisweb/feature-layer/type/api";
 import { useObjectState } from "@nextgisweb/gui/hook";
 import type { SRSRef } from "@nextgisweb/spatial-ref-sys/type/api";
 import { MapStore } from "@nextgisweb/webmap/ol/MapStore";
+import type QuadKey from "@nextgisweb/webmap/ol/layer/QuadKey";
 
 export interface MapExtent extends FitOptions {
     extent: NgwExtent;
@@ -18,7 +23,7 @@ export interface MapExtent extends FitOptions {
 
 export interface MapProps extends ViewOptions {
     mapSRS?: SRSRef;
-    osm?: boolean;
+    basemap?: boolean;
     mapExtent?: MapExtent;
 }
 
@@ -26,13 +31,13 @@ export function useMapAdapter({
     center: centerProp,
     mapSRS = { id: 3857 },
     zoom,
-    osm = true,
+    basemap = true,
     minZoom,
     maxZoom,
     mapExtent: mapExtentProp,
 }: MapProps) {
     const [mapStore, setMapStore] = useState<MapStore>();
-    const osmLayer = useRef<TileLayer<OSM>>();
+    const baseRef = useRef<QuadKey | XYZ | undefined>(undefined);
 
     const [center] = useObjectState(centerProp);
     const [mapExtent] = useObjectState(mapExtentProp);
@@ -93,20 +98,29 @@ export function useMapAdapter({
     }, [setView]);
 
     useEffect(() => {
-        if (mapStore && osm) {
-            const osmLayer_ = new TileLayer({
-                source: new OSM(),
-                zIndex: -1,
-            });
-            mapStore.olMap.addLayer(osmLayer_);
-            osmLayer.current = osmLayer_;
+        if (mapStore && basemap) {
+            const baselayers = settings.basemaps.filter(
+                (l) => l.enabled !== false
+            );
+            if (baselayers.length) {
+                const baselayer = baselayers[0];
+                const opts = prepareBaselayerConfig(baselayer);
+                addBaselayer({ ...opts, map: mapStore }).then((layer) => {
+                    if (!basemap) {
+                        layer?.dispose();
+                    } else {
+                        baseRef.current = layer;
+                    }
+                });
+            }
         }
         return () => {
-            if (osmLayer.current) {
-                osmLayer.current.dispose();
+            if (baseRef.current) {
+                baseRef.current.dispose();
+                baseRef.current = undefined;
             }
         };
-    }, [osm, mapStore]);
+    }, [basemap, mapStore]);
 
     useEffect(() => {
         return () => {

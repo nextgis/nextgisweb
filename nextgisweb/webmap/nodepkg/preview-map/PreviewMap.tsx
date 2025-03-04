@@ -11,10 +11,10 @@ import MapIcon from "@nextgisweb/icon/material/map/outline";
 
 export function PreviewMap({
     children,
-    basemap: osmProp = false,
+    basemap: basemapProp = false,
     ...props
 }: MapComponentProps) {
-    const [basemap, toggleBaseMap] = useReducer((state) => !state, osmProp);
+    const [basemap, toggleBaseMap] = useReducer((state) => !state, basemapProp);
 
     const styleToggleBtn = useCallback(
         (status: boolean) => (status ? undefined : { color: "gray" }),
