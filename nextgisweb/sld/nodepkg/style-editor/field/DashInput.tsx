@@ -29,10 +29,18 @@ export const DashPatternInput: React.FC<DashPatternInputProps> = ({
     );
 
     const handleInputChange = (index: number, newValue: number | null) => {
-        if (newValue === null || isNaN(newValue)) return; // Ignore invalid inputs
-
+        if (newValue === null || isNaN(newValue)) return;
         const newDashPattern = [...dashPattern];
+
         newDashPattern[index] = newValue;
+
+        const isDashField = index % 2 === 0;
+        const pairedIndex = isDashField ? index + 1 : index - 1;
+
+        if (newValue !== 0 && newDashPattern[pairedIndex] === undefined) {
+            newDashPattern[pairedIndex] = 0;
+        }
+
         setDashPattern(newDashPattern);
         if (onChange) {
             const resultNewDashPattern =
@@ -74,6 +82,8 @@ export const DashPatternInput: React.FC<DashPatternInputProps> = ({
     const renderInputFields = () => {
         const fields: JSX.Element[] = [];
         for (let i = 0; i < dashPattern.length + 2; i += 2) {
+            const isLastRow = i >= dashPattern.length;
+
             fields.push(
                 <div
                     key={i}
@@ -84,28 +94,24 @@ export const DashPatternInput: React.FC<DashPatternInputProps> = ({
                     }}
                 >
                     <InputNumber
-                        value={dashPattern[i]}
+                        value={isLastRow ? undefined : dashPattern[i]}
                         onChange={(value) => {
                             setPreset("");
                             handleInputChange(i, value);
                         }}
                         placeholder={msgDash}
-                        defaultValue={i === dashPattern.length ? undefined : 0}
                         min={0}
                         style={{ width: "90px", marginRight: "12px" }}
                     />
                     <InputNumber
-                        value={dashPattern[i + 1]}
+                        value={isLastRow ? undefined : dashPattern[i + 1]}
                         onChange={(value) => {
                             setPreset("");
                             handleInputChange(i + 1, value);
                         }}
                         placeholder={msgGap}
-                        defaultValue={i === dashPattern.length ? undefined : 0}
                         min={0}
-                        style={{
-                            width: "90px",
-                        }}
+                        style={{ width: "90px" }}
                     />
                     <Button
                         type="text"
