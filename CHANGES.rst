@@ -4,20 +4,21 @@ Changes
 5.0.0
 -----
 
-- Configurable SSL mode for PostGIS connections.
-- Enhanced support for date and time fields in WFS client.
-- Chrome 118+, Safari 17+, Edge 116+ or Firefox 115+ is required.
-- Enhanced support for JSON output format in the WMS services.
-- Enhanced resource deletion confirmation with details of resources to delete.
-- Identification panel is enabled by default.
 - Webmap migrated to React with many new features.
+- The identification panel enabled by default, replacing webmap popups.
+- Resource editing interface fully migrated to React.
+- New feature display page and modal dialog with vector tile geometries.
+- Enhanced resource deletion confirmation with details of resources to delete.
 - On-demand webmap legend symbol loading, optimizing opening time.
-- Experimental support for Python 3.10.
+- Configurable SSL mode for PostGIS connections.
+- Handling of invalid geometries for MVT vector tiles.
+- Better support for date and time fields in WFS clients.
+- Expanded JSON output format capabilities in WMS services.
 - Improved handling of `fid` fields in feature layers.
 - Extended resource search HTTP API.
-- New feature display page and modal dialog displaying geometries.
-- Resource editing interface finally migrated to React.
-- All legacy AMD modules migrated to TypeScript and Dojo dependency removed.
+- Chrome 118+, Safari 17+, Edge 116+, or Firefox 115+ is required.
+- All legacy AMD modules migrated to TypeScript, and Dojo dependency removed.
+- Experimental support for Python 3.10.
 
 
 4.9.0
