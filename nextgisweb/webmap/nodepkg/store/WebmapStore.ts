@@ -428,8 +428,7 @@ export class WebmapStore {
                 for (const layer of Object.values(layers)) {
                     if (
                         layer.itemConfig &&
-                        layer.itemConfig.styleId === styleId &&
-                        !layer.itemConfig.legendInfo
+                        layer.itemConfig.styleId === styleId
                     ) {
                         layer.itemConfig.legendInfo = legendInfo;
                     }
