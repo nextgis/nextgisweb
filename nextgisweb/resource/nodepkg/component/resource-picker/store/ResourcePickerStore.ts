@@ -16,11 +16,13 @@ import type { OnNewGroupType, ResourcePickerStoreOptions } from "../type";
 
 import { actionHandler } from "./decorator/actionHandler";
 
-export type Action =
+type Action = keyof Pick<
+    ResourcePickerStore,
     | "setChildrenFor"
     | "setBreadcrumbItemsFor"
     | "createNewGroup"
-    | "getSelectedParent";
+    | "getSelectedParent"
+>;
 
 const msgPickThis = gettext("Pick this group");
 const msgPickSelected = gettext("Pick selected");
@@ -37,24 +39,24 @@ export class ResourcePickerStore
     @observable.ref accessor parentItem: CompositeRead | null = null;
     @observable.ref accessor blueprint: Blueprint | null = null;
 
-    @observable accessor resources: CompositeRead[] = [];
+    @observable.shallow accessor resources: CompositeRead[] | null = null;
     @observable accessor parentId: number = 0;
-    @observable accessor breadcrumbItems: CompositeRead[] = [];
+    @observable.shallow accessor breadcrumbItems: CompositeRead[] = [];
     @observable accessor hideUnavailable = false;
-    @observable accessor disableResourceIds: number[] = [];
-    @observable accessor requireClass: ResourceCls[] = [];
-    @observable accessor requireInterface: ResourceInterface[] = [];
+    @observable.shallow accessor disableResourceIds: number[] = [];
+    @observable.shallow accessor requireClass: ResourceCls[] = [];
+    @observable.shallow accessor requireInterface: ResourceInterface[] = [];
     @observable accessor allowSelection = true;
     @observable accessor allowMoveInside = true;
-    @observable accessor traverseClasses: ResourceCls[] | null = null;
+    @observable.shallow accessor traverseClasses: ResourceCls[] | null = null;
     @observable accessor allowCreateResource = true;
-    @observable accessor selected: number[] = [];
+    @observable.shallow accessor selected: number[] = [];
     @observable accessor multiple = false;
     @observable accessor saveLastParentIdGlobal = false;
     @observable accessor getThisMsg = msgPickThis;
     @observable accessor getSelectedMsg = msgPickSelected;
-    @observable accessor errors: Partial<Record<Action, string>> = {};
-    @observable accessor loading: Partial<Record<Action, boolean>> = {};
+    @observable.shallow accessor errors: Partial<Record<Action, string>> = {};
+    @observable.shallow accessor loading: Partial<Record<Action, boolean>> = {};
 
     readonly onNewGroup: OnNewGroupType | null = null;
     readonly onTraverse: ((parentId: number) => void) | null = null;
@@ -73,8 +75,8 @@ export class ResourcePickerStore
         requireClass,
         getSelectedMsg,
         hideUnavailable,
-        requireInterface,
         traverseClasses,
+        requireInterface,
         disableResourceIds,
         saveLastParentIdGlobal,
     }: ResourcePickerStoreOptions) {
@@ -110,14 +112,19 @@ export class ResourcePickerStore
 
     @action
     changeParentTo(parent: number) {
-        this.setChildrenFor(parent);
-        this.setBreadcrumbItemsFor(parent);
-
-        this.parentId = parent;
-        if (this.saveLastParentIdGlobal) {
-            ResourcePickerStore.GLOBAL_PARENT_ID = parent;
+        if (this.resources && !this.multiple) {
+            this.setSelected([]);
         }
-        this.onTraverse?.(parent);
+
+        if (!this.resources || this.parentId !== parent) {
+            this.setChildrenFor(parent);
+            this.setBreadcrumbItemsFor(parent);
+            this.parentId = parent;
+            if (this.saveLastParentIdGlobal) {
+                ResourcePickerStore.GLOBAL_PARENT_ID = parent;
+            }
+            this.onTraverse?.(parent);
+        }
     }
 
     destroy = () => {
@@ -195,11 +202,11 @@ export class ResourcePickerStore
     }
 
     @action
-    _setLoading(operation: Action, status: boolean) {
+    setLoading(operation: Action, status: boolean) {
         this.loading = { ...this.loading, [operation]: status };
     }
     @action
-    _setError(operation: Action, msg?: string) {
+    setError(operation: Action, msg?: string) {
         this.errors[operation] = msg;
     }
 
@@ -287,7 +294,7 @@ export class ResourcePickerStore
         });
 
         await this.refresh();
-        const newItem = this.resources.find(
+        const newItem = this.resources?.find(
             (c) => c.resource.id === createdItem.id
         );
 
@@ -300,7 +307,7 @@ export class ResourcePickerStore
     }
 
     @actionHandler
-    private async getSelectedParent({ selected }: ResourcePickerStoreOptions) {
+    async getSelectedParent({ selected }: ResourcePickerStoreOptions) {
         if (selected?.length) {
             this.setSelected(selected);
             const abort = this._abortOperation("getSelectedParent", true);

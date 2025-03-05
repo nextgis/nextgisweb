@@ -13,7 +13,7 @@ import "./ResourcePickerModal.less";
 export function ResourcePickerModal<V extends SelectValue = SelectValue>({
     open: open_,
     visible: visible_,
-    store,
+    store: storeProp,
     onSelect,
     onPick: onPickProp,
     closeOnSelect = true,
@@ -24,8 +24,8 @@ export function ResourcePickerModal<V extends SelectValue = SelectValue>({
 }: ResourcePickerModalProps<V>) {
     const [open, setOpen] = useState(open_ ?? visible_ ?? true);
 
-    const [resourceStore] = useState(
-        () => store || new ResourcePickerStore(pickerOptions)
+    const [store] = useState(
+        () => storeProp || new ResourcePickerStore(pickerOptions)
     );
 
     const { modalProps, cardProps } = usePickerModal({
@@ -34,7 +34,7 @@ export function ResourcePickerModal<V extends SelectValue = SelectValue>({
         ...rest,
     });
 
-    const close = () => setOpen(false);
+    const close = useCallback(() => setOpen(false), []);
 
     const onPick = useCallback(
         (resourceId: V) => {
@@ -42,23 +42,25 @@ export function ResourcePickerModal<V extends SelectValue = SelectValue>({
                 onSelect(resourceId);
             }
             if (onPickProp) {
-                if (Array.isArray(resourceId)) {
-                    const resourceItems: CompositeRead[] = [];
-                    for (const id of resourceId) {
-                        const item = resourceStore.resources.find(
-                            (r) => r.resource.id === id
+                if (store.resources) {
+                    if (Array.isArray(resourceId)) {
+                        const resourceItems: CompositeRead[] = [];
+                        for (const id of resourceId) {
+                            const item = store.resources.find(
+                                (r) => r.resource.id === id
+                            );
+                            if (item) {
+                                resourceItems.push(item);
+                            }
+                        }
+                        onPickProp(resourceItems);
+                    } else {
+                        const item = store.resources.find(
+                            (r) => r.resource.id === resourceId
                         );
                         if (item) {
-                            resourceItems.push(item);
+                            onPickProp(item);
                         }
-                    }
-                    onPickProp(resourceItems);
-                } else {
-                    const item = resourceStore.resources.find(
-                        (r) => r.resource.id === resourceId
-                    );
-                    if (item) {
-                        onPickProp(item);
                     }
                 }
             }
@@ -66,7 +68,7 @@ export function ResourcePickerModal<V extends SelectValue = SelectValue>({
                 close();
             }
         },
-        [closeOnSelect, onPickProp, onSelect, resourceStore.resources]
+        [close, closeOnSelect, onPickProp, onSelect, store.resources]
     );
 
     useEffect(() => {
@@ -84,7 +86,7 @@ export function ResourcePickerModal<V extends SelectValue = SelectValue>({
             {...modalProps}
         >
             <ResourcePickerCard
-                store={resourceStore}
+                store={store}
                 pickerOptions={pickerOptions}
                 cardOptions={cardProps}
                 onSelect={onPick}

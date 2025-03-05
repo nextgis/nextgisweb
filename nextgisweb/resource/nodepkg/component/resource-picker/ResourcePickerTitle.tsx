@@ -8,6 +8,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { ResourcesFilter } from "../../resources-filter/ResourcesFilter";
 
 import { ResourcePickerBreadcrumb } from "./ResourcePickerBreadcrumb";
+import type { ResourcePickerStore } from "./store/ResourcePickerStore";
 import type { ResourcePickerTitleProps } from "./type";
 
 import ArrowBack from "@nextgisweb/icon/material/arrow_back";
@@ -17,81 +18,102 @@ import SyncIcon from "@nextgisweb/icon/material/sync";
 const msgGotoInitialGroup = gettext("Go to initial group");
 const msgRefresh = gettext("Refresh");
 
-export const ResourcePickerTitle = observer(
-    ({ resourceStore, onClose, showClose }: ResourcePickerTitleProps) => {
+interface SearchPanelProps {
+    store: ResourcePickerStore;
+    onCancelSearch: () => void;
+}
+
+const SearchPanel = observer(({ store, onCancelSearch }: SearchPanelProps) => {
+    return (
+        <Space.Compact>
+            <Button icon={<ArrowBack />} onClick={onCancelSearch} />
+            <ResourcesFilter
+                cls={store.requireClass || undefined}
+                onChange={(v, opt) => {
+                    store.changeParentTo(Number(opt.key));
+                    onCancelSearch();
+                }}
+            />
+        </Space.Compact>
+    );
+});
+
+SearchPanel.displayName = "SearchPanel";
+
+interface PathPanelProps {
+    store: ResourcePickerStore;
+    onEnterSearchMode: () => void;
+}
+
+export const PathPanel = observer(
+    ({ store, onEnterSearchMode }: PathPanelProps) => {
         const {
             initParentId: initialParentId,
             parentId,
             allowMoveInside,
-        } = resourceStore;
-
-        const [searchMode, setSearchMode] = useState(false);
-
-        useEffect(() => {
-            resourceStore.setAllowCreateResource(!searchMode);
-        }, [searchMode, resourceStore]);
-
-        function SearchPanel() {
-            return (
-                <Space.Compact>
-                    <Button
-                        icon={<ArrowBack />}
-                        onClick={() => setSearchMode(false)}
-                    />
-                    <ResourcesFilter
-                        cls={resourceStore.requireClass || undefined}
-                        onChange={(v, opt) => {
-                            resourceStore.changeParentTo(Number(opt.key));
-                            setSearchMode(false);
-                        }}
-                    />
-                </Space.Compact>
-            );
-        }
-
-        function PathPanel() {
-            return (
-                <Row>
+        } = store;
+        return (
+            <Row>
+                <Col style={{ width: "30px" }}>
+                    <a onClick={onEnterSearchMode}>
+                        <SearchIcon />
+                    </a>
+                </Col>
+                <Col flex="auto" className="resource-breadcrumb">
+                    <ResourcePickerBreadcrumb store={store} />
+                </Col>
+                {parentId !== initialParentId && allowMoveInside && (
                     <Col style={{ width: "30px" }}>
-                        <a onClick={() => setSearchMode(true)}>
-                            <SearchIcon />
-                        </a>
-                    </Col>
-                    <Col flex="auto" className="resource-breadcrumb">
-                        <ResourcePickerBreadcrumb
-                            resourceStore={resourceStore}
-                        />
-                    </Col>
-
-                    {parentId !== initialParentId && allowMoveInside && (
-                        <Col style={{ width: "30px" }}>
-                            <Tooltip title={msgGotoInitialGroup}>
-                                <a
-                                    onClick={() =>
-                                        resourceStore.returnToInitial()
-                                    }
-                                >
-                                    <StartIcon />
-                                </a>
-                            </Tooltip>
-                        </Col>
-                    )}
-
-                    <Col style={{ width: "30px" }}>
-                        <Tooltip title={msgRefresh}>
-                            <a onClick={() => resourceStore.refresh()}>
-                                <SyncIcon />
+                        <Tooltip title={msgGotoInitialGroup}>
+                            <a onClick={() => store.returnToInitial()}>
+                                <StartIcon />
                             </a>
                         </Tooltip>
                     </Col>
-                </Row>
-            );
-        }
+                )}
+                <Col style={{ width: "30px" }}>
+                    <Tooltip title={msgRefresh}>
+                        <a onClick={() => store.refresh()}>
+                            <SyncIcon />
+                        </a>
+                    </Tooltip>
+                </Col>
+            </Row>
+        );
+    }
+);
+
+PathPanel.displayName = "PathPanel";
+
+export const ResourcePickerTitle = observer(
+    ({ store, onClose, showClose }: ResourcePickerTitleProps) => {
+        const [searchMode, setSearchMode] = useState(false);
+
+        const stopSearch = () => {
+            setSearchMode(false);
+        };
+        const startSearch = () => {
+            setSearchMode(true);
+        };
+
+        useEffect(() => {
+            store.setAllowCreateResource(!searchMode);
+        }, [searchMode, store]);
 
         return (
             <Row justify="space-between">
                 <Col flex="auto">
-                    {searchMode ? <SearchPanel /> : <PathPanel />}
+                    {searchMode ? (
+                        <SearchPanel
+                            store={store}
+                            onCancelSearch={stopSearch}
+                        />
+                    ) : (
+                        <PathPanel
+                            store={store}
+                            onEnterSearchMode={startSearch}
+                        />
+                    )}
                 </Col>
                 {showClose && (
                     <Col>

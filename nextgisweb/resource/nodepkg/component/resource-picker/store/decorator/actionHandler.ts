@@ -12,17 +12,17 @@ export function actionHandler(
         ...args: any[]
     ): Promise<any> {
         const operationName = originalMethod.name || "operation";
-        this._setLoading(operationName, true);
+        this.setLoading(operationName, true);
 
         try {
             const result = await originalMethod.apply(this, args);
             return result;
         } catch (er) {
             const { title } = extractError(er as ApiError);
-            this._setError(operationName, title);
+            this.setError(operationName, title);
             throw er;
         } finally {
-            this._setLoading(operationName, false);
+            this.setLoading(operationName, false);
         }
     };
 }
