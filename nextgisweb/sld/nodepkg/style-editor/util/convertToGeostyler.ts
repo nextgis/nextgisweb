@@ -52,7 +52,7 @@ function reverseConvertLineSymbolizer(
         width: stroke.width,
         opacity: stroke.opacity,
         dasharray: stroke?.dash_pattern,
-        cap: "butt",
+        cap: stroke.cap,
     };
 }
 
@@ -69,7 +69,7 @@ function reverseConvertFillSymbolizer(
         outlineOpacity: stroke?.opacity,
         outlineWidth: stroke?.width,
         outlineDasharray: stroke?.dash_pattern,
-        outlineCap: "butt",
+        outlineCap: stroke?.outlineCap,
     };
 }
 

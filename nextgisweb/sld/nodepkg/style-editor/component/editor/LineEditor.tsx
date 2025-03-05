@@ -1,6 +1,6 @@
 import type { LineSymbolizer } from "geostyler-style";
 import { cloneDeep as _cloneDeep } from "lodash-es";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 import { InputNumber } from "@nextgisweb/gui/antd";
 import { FieldsForm } from "@nextgisweb/gui/fields-form";
@@ -18,11 +18,16 @@ const msgWidth = gettext("Width");
 const msgLine = gettext("Line");
 
 export function LineEditor({ value, onChange }: EditorProps<LineSymbolizer>) {
+    const [width, setWidth] = useState<number | undefined>(value.width);
+
+    console.log("LineS", value);
+
     const onSymbolizer = (v: LineSymbolizer) => {
         if (onChange) {
             const symbolizerClone: LineSymbolizer = _cloneDeep({
                 ...value,
                 ...v,
+                cap: "butt",
             });
 
             if (typeof v.color === "string") {
@@ -50,10 +55,10 @@ export function LineEditor({ value, onChange }: EditorProps<LineSymbolizer>) {
             {
                 label: msgLine,
                 name: "dasharray",
-                formItem: <DashPatternInput />,
+                formItem: <DashPatternInput lineWidth={width as number} />,
             },
         ],
-        []
+        [width]
     );
 
     const { color, opacity } = value;
@@ -68,6 +73,7 @@ export function LineEditor({ value, onChange }: EditorProps<LineSymbolizer>) {
             initialValues={initialValue}
             onChange={({ value: v }) => {
                 onSymbolizer(v as LineSymbolizer);
+                setWidth(v.width as number);
             }}
         />
     );

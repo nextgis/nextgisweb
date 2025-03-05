@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Button, InputNumber, Select } from "@nextgisweb/gui/antd";
 import { CloseIcon } from "@nextgisweb/gui/icon";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { LinePatternPresetView } from "../component/LinePatternPresetView";
-import { linePatternPresets } from "../util/linePatternPresets";
+import { getLinePatternPresets } from "../util/linePatternPresets";
 
 const msgDash = gettext("Dash");
 const msgGap = gettext("Gap");
@@ -15,18 +15,30 @@ const { Option } = Select;
 interface DashPatternInputProps {
     value?: number[];
     onChange?: (value: number[] | undefined) => void;
-    // lineWidth?: number; // Line width used for calculating preset values
+    lineWidth?: number; // Line width used for calculating preset values
 }
 
 export const DashPatternInput: React.FC<DashPatternInputProps> = ({
     value = [],
     onChange,
-    // lineWidth = 3,
+    lineWidth = 3,
 }) => {
+    console.log(">>", lineWidth);
+
     const [dashPattern, setDashPattern] = useState<number[]>(value);
     const [preset, setPreset] = useState<string>(
         Array.isArray(value) && value.length === 0 ? "line" : ""
     );
+
+    useEffect(() => {
+        if (preset) {
+            setDashPattern(
+                getLinePatternPresets(lineWidth).find(
+                    (pr) => pr.keyname === preset
+                )?.value.dasharray || []
+            );
+        }
+    }, [lineWidth, preset]);
 
     const handleInputChange = (index: number, newValue: number | null) => {
         if (newValue === null || isNaN(newValue)) return;
@@ -50,7 +62,7 @@ export const DashPatternInput: React.FC<DashPatternInputProps> = ({
     };
 
     const handlePresetChange = (presetName: string) => {
-        const newDashPatternPreset = linePatternPresets.find(
+        const newDashPatternPreset = getLinePatternPresets(lineWidth).find(
             (preset) => preset.keyname === presetName
         );
 
@@ -135,9 +147,12 @@ export const DashPatternInput: React.FC<DashPatternInputProps> = ({
                 style={{ width: "100%", marginBottom: 16 }}
                 defaultValue="line"
             >
-                {linePatternPresets.map((preset) => (
+                {getLinePatternPresets(lineWidth).map((preset) => (
                     <Option key={preset.keyname} value={preset.keyname}>
-                        <LinePatternPresetView presetData={preset} />
+                        <LinePatternPresetView
+                            presetData={preset}
+                            width={lineWidth}
+                        />
                     </Option>
                 ))}
             </Select>

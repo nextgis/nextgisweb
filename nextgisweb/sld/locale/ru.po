@@ -39,6 +39,7 @@ msgid "Fill"
 msgstr "Заливка"
 
 #: nodepkg/style-editor/component/TypeSelect/TypeField.tsx:17
+#: nodepkg/style-editor/component/editor/LineEditor.tsx:18
 msgid "Line"
 msgstr "Линия"
 
@@ -63,7 +64,6 @@ msgid "Stroke width"
 msgstr "Ширина контура"
 
 #: nodepkg/style-editor/component/editor/FillEditor.tsx:19
-#: nodepkg/style-editor/component/editor/LineEditor.tsx:18
 #: nodepkg/style-editor/field/DashInput.tsx:10
 msgid "Dash"
 msgstr "Штрих"
@@ -88,18 +88,6 @@ msgstr "Нет"
 msgid "Transparent"
 msgstr "Прозрачный"
 
-#: nodepkg/style-editor/field/DashInput.tsx:7
-msgid "Dotted"
-msgstr "Точечный пунктир"
-
-#: nodepkg/style-editor/field/DashInput.tsx:8
-msgid "Dashed"
-msgstr "Пунктир"
-
-#: nodepkg/style-editor/field/DashInput.tsx:9
-msgid "Dash - dotted"
-msgstr "Переменный пунктир"
-
 #: nodepkg/style-editor/field/DashInput.tsx:11
 msgid "Gap"
 msgstr "Пропуск"
@@ -123,3 +111,19 @@ msgstr "Звезда"
 #: nodepkg/style-editor/util/constant.ts:9
 msgid "Cross"
 msgstr "Крест"
+
+#: nodepkg/style-editor/util/linePatternPresets.ts:3
+msgid "Solid"
+msgstr "Сплошная линия"
+
+#: nodepkg/style-editor/util/linePatternPresets.ts:4
+msgid "Dotted"
+msgstr "Точечный пунктир"
+
+#: nodepkg/style-editor/util/linePatternPresets.ts:5
+msgid "Dashed"
+msgstr "Пунктир"
+
+#: nodepkg/style-editor/util/linePatternPresets.ts:6
+msgid "Dash - dotted"
+msgstr "Переменный пунктир"

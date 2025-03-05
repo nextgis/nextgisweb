@@ -24,6 +24,7 @@ export function FillEditor({ value, onChange }: EditorProps<FillSymbolizer>) {
             const symbolizerClone: FillSymbolizer = _cloneDeep({
                 ...value,
                 ...v,
+                outlineCap: "butt",
             });
 
             if (typeof v.color === "string") {
