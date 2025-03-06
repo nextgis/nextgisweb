@@ -1,6 +1,6 @@
 import type { FillSymbolizer } from "geostyler-style";
 import { cloneDeep as _cloneDeep } from "lodash-es";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 import { InputNumber } from "@nextgisweb/gui/antd";
 import { FieldsForm } from "@nextgisweb/gui/fields-form";
@@ -19,6 +19,10 @@ const msgOutlineWidth = gettext("Stroke width");
 const msgDash = gettext("Dash");
 
 export function FillEditor({ value, onChange }: EditorProps<FillSymbolizer>) {
+    const [outlineWidth, setOutlineWidth] = useState<number | undefined>(
+        value.outlineWidth as number
+    );
+
     const onSymbolizer = (v: FillSymbolizer) => {
         if (onChange) {
             const symbolizerClone: FillSymbolizer = _cloneDeep({
@@ -64,10 +68,12 @@ export function FillEditor({ value, onChange }: EditorProps<FillSymbolizer>) {
             {
                 label: msgDash,
                 name: "outlineDasharray",
-                formItem: <DashPatternInput />,
+                formItem: (
+                    <DashPatternInput lineWidth={outlineWidth as number} />
+                ),
             },
         ],
-        []
+        [outlineWidth]
     );
 
     const { color, opacity, fillOpacity, outlineColor, outlineOpacity } = value;
@@ -84,6 +90,7 @@ export function FillEditor({ value, onChange }: EditorProps<FillSymbolizer>) {
             initialValues={initialValue}
             onChange={({ value: v }) => {
                 onSymbolizer(v as FillSymbolizer);
+                setOutlineWidth(v.outlineWidth as number);
             }}
         />
     );
