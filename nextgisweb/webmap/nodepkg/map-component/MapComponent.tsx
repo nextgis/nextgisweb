@@ -23,19 +23,19 @@ export interface MapComponentProps extends ViewOptions {
 export function MapComponent({
     children,
     style,
-    basemap: osm,
+    basemap,
     zoom = 0,
     center = [0, 0],
     mapExtent,
     whenCreated,
     ...props
 }: MapComponentProps) {
-    const mapRef = useRef<MapStore>();
+    const mapRef = useRef<MapStore | null>(null);
     const { createMapAdapter } = useMapAdapter({
         center,
         zoom,
         mapExtent,
-        osm,
+        basemap,
     });
 
     const mapContainerRef = useRef<HTMLDivElement>(null);

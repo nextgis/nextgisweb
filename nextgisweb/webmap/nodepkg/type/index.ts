@@ -8,7 +8,6 @@ import type { CustomItemFileWriteStore } from "../compat/CustomItemFileWriteStor
 import type { Display } from "../display";
 import type { ToolBase } from "../map-controls/tool/ToolBase";
 import type { MapStore } from "../ol/MapStore";
-import type { CoreLayer, LayerOptions } from "../ol/layer/CoreLayer";
 import type { PluginBase } from "../plugin/PluginBase";
 import type { AnnotationVisibleMode } from "../store/annotations/AnnotationsStore";
 
@@ -30,17 +29,6 @@ export interface FeatureHighlighter {
     ) => PromiseLike<Feature>;
 }
 
-// use this wrapper because BaseLayer is abstract class
-export type BaseLayerConstructor = new (
-    name: string,
-    layerOptions: LayerOptions,
-    sourceOptions?: unknown
-) => CoreLayer;
-
-export interface BasemapModules {
-    [key: string]: BaseLayerConstructor;
-}
-
 export interface AdapterModules {
     [key: string]: LayerDisplayAdapterCtor;
 }
@@ -54,7 +42,6 @@ export interface WMPluginModules {
 }
 
 export interface Mid {
-    basemap: BasemapModules;
     adapter: AdapterModules;
     plugin: PluginModules;
     wmplugin: WMPluginModules;

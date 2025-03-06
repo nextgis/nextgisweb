@@ -421,7 +421,6 @@ class AnnotationsConfig(Struct, kw_only=True):
 
 class MidConfig(Struct, kw_only=True):
     adapter: Set[str]
-    basemap: Set[str]
     plugin: Set[str]
 
 
@@ -506,7 +505,7 @@ def display_config(obj, request) -> DisplayConfig:
 
         return result
 
-    mid = MidConfig(adapter=set(), basemap=set(), plugin=set())
+    mid = MidConfig(adapter=set(), plugin=set())
     checked_items: Set[int] = set()
     expanded_items: Set[int] = set()
 

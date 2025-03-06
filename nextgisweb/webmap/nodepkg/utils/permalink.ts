@@ -40,8 +40,8 @@ export const getPermalink = ({
         styles: visibleStyles.join(","),
         ...additionalParams,
     };
-    if (display.baseLayer) {
-        params.base = display.baseLayer.name;
+    if (display.map.baseLayer) {
+        params.base = display.map.baseLayer.name;
     }
 
     if (center === undefined) {

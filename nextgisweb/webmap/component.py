@@ -1,11 +1,7 @@
-import json
-from pathlib import Path
-
 import sqlalchemy as sa
 
 from nextgisweb.env import COMP_ID, Component, DBSession, gettext, require
 from nextgisweb.lib.config import Option
-from nextgisweb.lib.imptool import module_path
 
 from nextgisweb.auth import User
 
@@ -21,8 +17,6 @@ class WebMapComponent(Component):
 
     def initialize(self):
         super().initialize()
-        basemaps_path = Path(self.options["basemaps"])
-        self.basemaps = json.loads(basemaps_path.read_text())
 
     @require("resource", "auth")
     def initialize_db(self):
@@ -48,7 +42,6 @@ class WebMapComponent(Component):
 
         result = dict(
             {k: v.getter() for k, v in csetting.registry[COMP_ID].items()},
-            basemaps=self.basemaps,
             editing=self.options["editing"],
             annotation=self.options["annotation"],
             adapters=dict(
@@ -75,7 +68,6 @@ class WebMapComponent(Component):
 
     # fmt: off
     option_annotations = (
-        Option("basemaps", default=module_path("nextgisweb.webmap") / "basemaps.json", doc="Basemaps description file."),
         Option("annotation", bool, default=True, doc="Turn on / off annotations."),
         Option("editing", bool, default=True),
         Option("check_origin", bool, default=False, doc="Check iframe Referer header."),

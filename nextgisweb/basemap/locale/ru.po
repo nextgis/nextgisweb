@@ -1,52 +1,56 @@
-#: model.py:24
+#: model.py:25
 msgid "Basemap"
 msgstr "Подложка веб-карты"
 
-#: nodepkg/layer-widget/LayerWidget.tsx:18
+#: nodepkg/layer-widget/LayerWidget.tsx:20
 msgid "Pick from QMS"
 msgstr "Выбрать из QMS"
 
-#: nodepkg/layer-widget/LayerWidget.tsx:20
+#: nodepkg/layer-widget/LayerWidget.tsx:22
 msgid "Search for geoservices provided by "
 msgstr "Искать геосервисы, предоставленные "
 
-#: nodepkg/layer-widget/LayerWidget.tsx:21
+#: nodepkg/layer-widget/LayerWidget.tsx:23
 msgid "You can search by name or ID"
 msgstr "Можно искать по имени или по ID"
 
-#: nodepkg/layer-widget/LayerWidget.tsx:24
+#: nodepkg/layer-widget/LayerWidget.tsx:26
 msgid "If a service from QMS is selected, this field cannot be edited."
 msgstr "Пока выбран сервис из QMS, редактирование этих полей отключено."
 
-#: nodepkg/layer-widget/LayerWidget.tsx:80
+#: nodepkg/layer-widget/LayerWidget.tsx:95
 msgid "URL"
 msgstr "URL"
 
-#: nodepkg/layer-widget/LayerWidget.tsx:88
+#: nodepkg/layer-widget/LayerWidget.tsx:103
 msgid "Copyright text"
 msgstr "Текст для копирайта"
 
-#: nodepkg/layer-widget/LayerWidget.tsx:97
+#: nodepkg/layer-widget/LayerWidget.tsx:112
 msgid "Copyright URL"
 msgstr "Ссылка на копирайт"
 
-#: nodepkg/layer-widget/LayerWidget.tsx:109
-#: nodepkg/webmap-widget/WebMapWidget.tsx:125
+#: nodepkg/layer-widget/LayerWidget.tsx:168
+#: nodepkg/webmap-widget/WebMapWidget.tsx:108
 msgid "Basemaps"
 msgstr "Подложки"
 
-#: nodepkg/webmap-widget/WebMapWidget.tsx:54
+#: nodepkg/plugin/base-map/BaseMap.ts:56
+msgid "No basemap"
+msgstr "Без подложки"
+
+#: nodepkg/webmap-widget/WebMapWidget.tsx:27
 msgid "Display name"
 msgstr "Наименование"
 
-#: nodepkg/webmap-widget/WebMapWidget.tsx:61
+#: nodepkg/webmap-widget/WebMapWidget.tsx:34
 msgid "Default basemap"
 msgstr "Подложка по умолчанию"
 
-#: nodepkg/webmap-widget/WebMapWidget.tsx:64
+#: nodepkg/webmap-widget/WebMapWidget.tsx:37
 msgid "Opacity"
 msgstr "Непрозрачность"
 
-#: nodepkg/webmap-widget/WebMapWidget.tsx:69
+#: nodepkg/webmap-widget/WebMapWidget.tsx:42
 msgid "Resource"
 msgstr "Ресурс"

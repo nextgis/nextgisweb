@@ -23,9 +23,7 @@ const msgPickQmsHelpMainPart = gettext("Search for geoservices provided by ");
 const msgPickQmsHelpTodoPart = gettext("You can search by name or ID");
 
 // eslint-disable-next-line prettier/prettier
-const msgDisabled = gettext(
-    "If a service from QMS is selected, this field cannot be edited."
-);
+const msgDisabled = gettext("If a service from QMS is selected, this field cannot be edited.");
 
 export const LayerWidget: EditorWidgetComponent<EditorWidgetProps<LayerStore>> =
     observer(({ store }) => {

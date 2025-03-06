@@ -64,7 +64,18 @@ export function PreviewLayer({
         { id }
     );
 
-    const padding = [20, 20, 20, 20];
+    const padding = useMemo(() => [20, 20, 20, 20], []);
+    const mapExtent = useMemo(
+        () =>
+            extentData
+                ? {
+                      extent: extentData.extent,
+                      srs: { id: 4326 },
+                      padding,
+                  }
+                : undefined,
+        [extentData, padding]
+    );
 
     const styleToggleBtn = useCallback(
         (status: boolean) => (status ? undefined : { color: "gray" }),
@@ -77,15 +88,7 @@ export function PreviewLayer({
     return (
         <div style={{ position: "relative" }}>
             <MapComponent
-                mapExtent={
-                    extentData
-                        ? {
-                              extent: extentData.extent,
-                              srs: { id: 4326 },
-                              padding,
-                          }
-                        : undefined
-                }
+                mapExtent={mapExtent}
                 style={{ height: "75vh", ...style }}
                 basemap={basemap}
             >

@@ -58,6 +58,7 @@ export class MapStore extends Watchable<MapWatchableProps> {
     readonly olMap: OlMap;
     @observable.shallow accessor layers: Layers = {};
 
+    @observable.shallow accessor baseLayer: CoreLayer | null = null;
     @observable accessor resolution: number | null = null;
     @observable.struct accessor center: number[] | null = null;
     @observable accessor zoom: number | null = null;
@@ -78,6 +79,37 @@ export class MapStore extends Watchable<MapWatchableProps> {
             this.startup(target);
         }
     }
+
+    @computed
+    get activeBasemapKey(): "blank" | string {
+        if (!this.baseLayer || !this.baseLayer.name) {
+            return "blank";
+        }
+        return this.baseLayer.name;
+    }
+
+    @action
+    setBaseLayer(layer: CoreLayer) {
+        this.baseLayer = layer;
+    }
+
+    @action
+    switchBasemap = (basemapLayerKey: string) => {
+        if (!(basemapLayerKey in this.layers)) {
+            return false;
+        }
+
+        if (this.baseLayer && this.baseLayer.name) {
+            const { name } = this.baseLayer;
+            this.layers[name].olLayer.setVisible(false);
+        }
+
+        const newLayer = this.layers[basemapLayerKey];
+        newLayer.olLayer.setVisible(true);
+        this.baseLayer = newLayer;
+
+        return true;
+    };
 
     async startup(target: string | HTMLElement): Promise<void> {
         return new Promise((resolve) => {
@@ -149,7 +181,19 @@ export class MapStore extends Watchable<MapWatchableProps> {
     addLayer(layer: CoreLayer): void {
         const layers = { ...this.layers, [layer.name]: layer };
         this.layers = layers;
-        this.olMap.addLayer(layer.getLayer());
+        const olLayer = layer.getLayer();
+        if (layer.isBaseLayer) {
+            olLayer.setZIndex(-1);
+        }
+        this.olMap.addLayer(olLayer);
+    }
+
+    setLayerZIndex(layerDef: CoreLayer | number, zIndex: number) {
+        const layer =
+            typeof layerDef === "number" ? this.layers[layerDef] : layerDef;
+        if (layer && layer.olLayer && layer.olLayer.setZIndex) {
+            layer.olLayer.setZIndex(zIndex);
+        }
     }
 
     @computed
