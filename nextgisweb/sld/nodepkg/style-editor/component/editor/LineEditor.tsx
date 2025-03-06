@@ -18,16 +18,15 @@ const msgWidth = gettext("Width");
 const msgLine = gettext("Line");
 
 export function LineEditor({ value, onChange }: EditorProps<LineSymbolizer>) {
-    const [width, setWidth] = useState<number | undefined>(value.width);
-
-    console.log("LineS", value);
+    const [width, setWidth] = useState<number | undefined>(
+        value.width as number
+    );
 
     const onSymbolizer = (v: LineSymbolizer) => {
         if (onChange) {
             const symbolizerClone: LineSymbolizer = _cloneDeep({
                 ...value,
                 ...v,
-                cap: "butt",
             });
 
             if (typeof v.color === "string") {

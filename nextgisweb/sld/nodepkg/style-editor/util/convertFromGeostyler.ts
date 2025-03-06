@@ -56,7 +56,7 @@ function convertLineSymbolizer(gsLine: GSLineSymbolizer): LineSymbolizer {
             width: gsLine.width as number,
             opacity: setOpacity(gsLine.opacity),
             dash_pattern: gsLine?.dasharray as number[],
-            cap: gsLine.cap,
+            cap: gsLine.cap || "butt",
         },
     };
 }
@@ -79,7 +79,7 @@ function convertFillSymbolizer(gsFill: GSFillSymbolizer): PolygonSymbolizer {
                   width: gsFill.outlineWidth as number,
                   opacity: setOpacity(gsFill.outlineOpacity),
                   dash_pattern: gsFill.outlineDasharray as number[],
-                  outlineCap: gsFill?.outlineCap,
+                  outlineCap: gsFill?.outlineCap || "butt",
               }
             : undefined,
     };
