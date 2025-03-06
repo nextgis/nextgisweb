@@ -23,7 +23,7 @@ export const DashPatternInput: React.FC<DashPatternInputProps> = ({
     onChange,
     lineWidth = 3,
 }) => {
-    console.log(">>", lineWidth);
+    console.log("lineWidth", lineWidth);
 
     const [dashPattern, setDashPattern] = useState<number[]>(value);
     const [preset, setPreset] = useState<string>(
@@ -32,11 +32,12 @@ export const DashPatternInput: React.FC<DashPatternInputProps> = ({
 
     useEffect(() => {
         if (preset) {
-            setDashPattern(
+            const newPattern =
                 getLinePatternPresets(lineWidth).find(
                     (pr) => pr.keyname === preset
-                )?.value.dasharray || []
-            );
+                )?.value.dasharray || [];
+
+            setDashPattern(newPattern);
         }
     }, [lineWidth, preset]);
 
