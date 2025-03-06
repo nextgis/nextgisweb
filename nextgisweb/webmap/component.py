@@ -15,7 +15,10 @@ from .model import LegendSymbolsEnum, WebMap, WebMapItem
 
 class WebMapComponent(Component):
     def __init__(self, env, settings):
-        from . import favorite  # noqa: F401
+        from . import (
+            favorite,  # noqa: F401
+            wm_option,  # noqa: F401
+        )
 
         super().__init__(env, settings)
 
