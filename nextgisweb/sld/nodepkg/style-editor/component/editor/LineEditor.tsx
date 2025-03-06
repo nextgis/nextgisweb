@@ -1,6 +1,6 @@
 import type { LineSymbolizer } from "geostyler-style";
 import { cloneDeep as _cloneDeep } from "lodash-es";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import { InputNumber } from "@nextgisweb/gui/antd";
 import { FieldsForm } from "@nextgisweb/gui/fields-form";
@@ -22,22 +22,25 @@ export function LineEditor({ value, onChange }: EditorProps<LineSymbolizer>) {
         value.width as number
     );
 
-    const onSymbolizer = (v: LineSymbolizer) => {
-        if (onChange) {
-            const symbolizerClone: LineSymbolizer = _cloneDeep({
-                ...value,
-                ...v,
-            });
+    const onSymbolizer = useCallback(
+        (v: LineSymbolizer) => {
+            if (onChange) {
+                const symbolizerClone: LineSymbolizer = _cloneDeep({
+                    ...value,
+                    ...v,
+                });
 
-            if (typeof v.color === "string") {
-                const [color, opacity] = extractColorAndOpacity(v.color);
-                symbolizerClone.color = color;
-                symbolizerClone.opacity = opacity;
+                if (typeof v.color === "string") {
+                    const [color, opacity] = extractColorAndOpacity(v.color);
+                    symbolizerClone.color = color;
+                    symbolizerClone.opacity = opacity;
+                }
+
+                onChange(symbolizerClone);
             }
-
-            onChange(symbolizerClone);
-        }
-    };
+        },
+        [onChange, value]
+    );
 
     const fields = useMemo<FormField<keyof LineSymbolizer>[]>(
         () => [
@@ -66,14 +69,21 @@ export function LineEditor({ value, onChange }: EditorProps<LineSymbolizer>) {
         color: hexWithOpacity(color, opacity),
     };
 
+    const onChangeCallback = useCallback(
+        ({ value: v }) => {
+            onSymbolizer(v as LineSymbolizer);
+            if (v.width !== undefined) {
+                setWidth(v.width as number);
+            }
+        },
+        [onSymbolizer]
+    );
+
     return (
         <FieldsForm
             fields={fields}
             initialValues={initialValue}
-            onChange={({ value: v }) => {
-                onSymbolizer(v as LineSymbolizer);
-                setWidth(v.width as number);
-            }}
+            onChange={onChangeCallback}
         />
     );
 }

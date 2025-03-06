@@ -110,6 +110,8 @@ export const OlRenderer: React.FC<OlRendererProps> = ({
     }, [getSampleGeomFromSymbolizer]);
 
     useEffect(() => {
+        // cons;
+
         layer.current = new OlLayerVector({
             source: new OlSourceVector(),
         });
