@@ -1,6 +1,12 @@
 Changes
 =======
 
+5.1.0
+-----
+
+- Configurable default basemaps for on-premises installations.
+
+
 5.0.0
 -----
 

@@ -1,17 +1,12 @@
-import json
-from pathlib import Path
-
 from nextgisweb.env import Component, require
 from nextgisweb.lib.config import Option
-from nextgisweb.lib.imptool import module_path
 
 
 class BasemapComponent(Component):
     def initialize(self):
         from . import plugin  # noqa: F401
 
-        basemaps_path = Path(self.options["basemaps"])
-        self.basemaps = json.loads(basemaps_path.read_text())
+        self.basemaps = self._basemaps()
 
     @require("resource", "webmap")
     def setup_pyramid(self, config):
@@ -25,9 +20,65 @@ class BasemapComponent(Component):
             qms_url=self.options["qms_url"],
         )
 
+    def _basemaps(self):
+        if self.options["no_preset"]:
+            return []
+
+        keys = set()
+        for s in self.options._options:
+            p = s.split(".")
+            if p[0] == "preset" and len(p) == 3:
+                keys.add(p[1])
+
+        if len(keys) == 0:
+            return [
+                dict(
+                    keyname="osm-mapnik",
+                    display_name="OpenStreetMap",
+                    url="https://{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                    copyright_text="© OpenStreetMap contributors",
+                    copyright_url="https://www.openstreetmap.org/copyright",
+                    enabled=True,
+                )
+            ]
+
+        result = list()
+        has_enabled = False
+        prefixed = self.options.with_prefix("preset")
+        for idx, k in enumerate(sorted(keys), start=1):
+            enabled = prefixed.get(f"{k}.enabled")
+            if enabled is None:
+                enabled = idx == 1
+            if enabled:
+                if has_enabled:
+                    enabled = False
+                else:
+                    has_enabled = True
+
+            result.append(
+                dict(
+                    keyname=prefixed.get(f"{k}.keyname"),
+                    display_name=prefixed.get(f"{k}.display_name"),
+                    url=prefixed.get(f"{k}.url"),
+                    epsg=prefixed.get(f"{k}.epsg"),
+                    copyright_text=prefixed.get(f"{k}.copyright_text"),
+                    copyright_url=prefixed.get(f"{k}.copyright_url"),
+                    enabled=enabled,
+                )
+            )
+
+        return result
+
     # fmt: off
     option_annotations = (
-        Option("basemaps", default=module_path("nextgisweb.basemap") / "basemaps.json", doc="Basemaps description file."),
+        Option("no_preset", bool, default=False, doc="Disable preset basemaps"),
+        Option("preset.*.keyname", str, doc="Preset basemap keyname"),
+        Option("preset.*.display_name", str, doc="Preset basemap display name"),
+        Option("preset.*.url", str, doc="Preset basemap URL template"),
+        Option("preset.*.epsg", int, default=None, doc="Preset basemap EPSG code"),
+        Option("preset.*.copyright_text", str, default=None, doc="Preset basemap copyright text"),
+        Option("preset.*.copyright_url", str, default=None, doc="Preset basemap copyright URL"),
+        Option("preset.*.enabled", bool, default=None, doc="Preset basemap default flag"),
         Option("qms_url", default="https://qms.nextgis.com"),
         Option("qms_geoservices_url", default="https://qms.nextgis.com/api/v1/geoservices/"),
         Option("qms_icons_url", default="https://qms.nextgis.com/api/v1/icons/"),
