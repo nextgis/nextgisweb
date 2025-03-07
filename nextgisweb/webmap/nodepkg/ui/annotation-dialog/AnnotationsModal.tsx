@@ -133,6 +133,7 @@ export function AnnotationsModal({
 
     const accessType = annFeature?.getAccessType();
     const accessTitle = annFeature?.getAccessTypeTitle();
+    const geometryType = annFeature?.getGeometryType();
 
     return (
         <Modal
@@ -198,6 +199,7 @@ export function AnnotationsModal({
                 <div>
                     <AnnotationsSettings
                         value={settings}
+                        geometryType={geometryType}
                         onChange={setSettings}
                     />
                 </div>

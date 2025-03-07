@@ -2,6 +2,7 @@ import { Feature } from "ol";
 import { asArray, asString } from "ol/color";
 import { WKT } from "ol/format";
 import type { Geometry } from "ol/geom";
+import type { Type as GeometryType } from "ol/geom/Geometry";
 import { Circle as CircleStyle, Fill, Stroke, Style } from "ol/style";
 import type { Options as StyleOptions } from "ol/style/Style";
 
@@ -169,6 +170,10 @@ export class AnnotationFeature {
 
     getFeature(): Feature | undefined {
         return this._feature;
+    }
+
+    getGeometryType(): GeometryType | undefined {
+        return this.getFeature()?.getGeometry()?.getType();
     }
 
     getAccessType(): AccessType {
