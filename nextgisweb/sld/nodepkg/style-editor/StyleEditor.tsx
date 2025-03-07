@@ -1,7 +1,5 @@
 import type { Symbolizer as GSSymbolizer } from "geostyler-style";
-import { useCallback, useEffect } from "react";
-
-import { useObjectState } from "@nextgisweb/gui/hook";
+import { useEffect, useState } from "react";
 
 import { KindEditor } from "./component/KindEditor";
 import type { Symbolizer, SymbolizerType } from "./type/Style";
@@ -20,16 +18,9 @@ export function StyleEditor({
     onChange: onSymbolizerChange,
     initType = "point",
 }: StyleEditorProps) {
-    const getSymbolizer = useCallback(
+    const [symbolizer, setSymbolizer] = useState<GSSymbolizer>(
         () =>
-            (value && convertToGeostyler(value)) ||
-            generateSymbolizer(initType),
-        [value, initType]
-    );
-
-    const [symbolizer, setSymbolizer] = useObjectState<GSSymbolizer>(
-        getSymbolizer,
-        { ignoreUndefined: true }
+            (value && convertToGeostyler(value)) || generateSymbolizer(initType)
     );
 
     useEffect(() => {

@@ -13,6 +13,7 @@ from nextgisweb.lib.saext import Msgspec
 Color = Union[Annotated[str, Meta(pattern=r"#[0-9A-F]{6}")], UnsetType]
 Opacity = Union[Annotated[float, Meta(ge=0, le=1)], UnsetType]
 Size = Union[Annotated[float, Meta(ge=0)], UnsetType]
+DashPattern = Union[Annotated[List[Annotated[float, Meta(ge=0)]], Meta(min_length=2)], UnsetType]
 
 NS_SLD = "http://www.opengis.net/sld"
 
@@ -32,6 +33,7 @@ class Stroke(Struct):
     opacity: Opacity = UNSET
     color: Color = UNSET
     width: Size = UNSET
+    dash_pattern: DashPattern = UNSET
 
     def xml(self):
         _stroke = E.Stroke()
@@ -41,6 +43,10 @@ class Stroke(Struct):
             _stroke.append(E.SvgParameter(dict(name="stroke-opacity"), str(self.opacity)))
         if self.width is not UNSET:
             _stroke.append(E.SvgParameter(dict(name="stroke-width"), str(self.width)))
+        if self.dash_pattern is not UNSET:
+            dp = " ".join(map(str, self.dash_pattern))
+            _stroke.append(E.SvgParameter(dict(name="stroke-dasharray"), dp))
+            _stroke.append(E.SvgParameter(dict(name="stroke-linecap"), "butt"))
         return _stroke
 
 
