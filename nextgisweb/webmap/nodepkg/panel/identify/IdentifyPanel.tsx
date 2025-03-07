@@ -31,6 +31,8 @@ const msgTipIdent = gettext("To get feature information, click on the map with t
 const msgLoad = gettext("Retrieving object information...");
 const msgNotFound = gettext("No objects were found at the click location.");
 
+const measurementSridSetting = webmapSettings.measurement_srid;
+
 const loadFeatureItem = async (
     display: Display,
     identifyInfo: IdentifyInfo,
@@ -127,6 +129,30 @@ const IdentifyPanel = observer<PanelPluginWidgetProps<IdentifyStore>>(
             );
         }
 
+        let featureInfoSection;
+        if (featureItem && featureInfo) {
+            const measurementSrid =
+                display.config.measureSrsId || measurementSridSetting;
+
+            featureInfoSection = (
+                <FeatureInfoSection
+                    showGeometryInfo={webmapSettings.show_geometry_info}
+                    measurementSrid={measurementSrid}
+                    showAttributes={webmapSettings.identify_attributes}
+                    resourceId={featureInfo.layerId}
+                    featureItem={featureItem}
+                    attributePanelAction={
+                        <FeatureEditButton
+                            display={display}
+                            resourceId={featureInfo.layerId}
+                            featureId={featureItem.id}
+                            onUpdate={() => updateFeatureItem(featureInfo)}
+                        />
+                    }
+                />
+            );
+        }
+
         return (
             <PanelContainer
                 className="ngw-webmap-panel-identify"
@@ -173,23 +199,7 @@ const IdentifyPanel = observer<PanelPluginWidgetProps<IdentifyStore>>(
                 }}
             >
                 {loadElement}
-                {featureItem && featureInfo && (
-                    <FeatureInfoSection
-                        showGeometryInfo={webmapSettings.show_geometry_info}
-                        measurementSrid={webmapSettings.measurement_srid}
-                        showAttributes={webmapSettings.identify_attributes}
-                        resourceId={featureInfo.layerId}
-                        featureItem={featureItem}
-                        attributePanelAction={
-                            <FeatureEditButton
-                                display={display}
-                                resourceId={featureInfo.layerId}
-                                featureId={featureItem.id}
-                                onUpdate={() => updateFeatureItem(featureInfo)}
-                            />
-                        }
-                    />
-                )}
+                {featureInfoSection}
             </PanelContainer>
         );
     }
