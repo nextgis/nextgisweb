@@ -1,8 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Button, InputNumber, Select } from "@nextgisweb/gui/antd";
-import { useObjectState } from "@nextgisweb/gui/hook";
-import { useEffectDebugger } from "@nextgisweb/gui/hook/useEffectDebugger";
 import { CloseIcon } from "@nextgisweb/gui/icon";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
@@ -25,14 +23,12 @@ export const DashPatternInput: React.FC<DashPatternInputProps> = ({
     onChange,
     lineWidth = 3,
 }) => {
-    console.log("lineWidth", lineWidth);
-
-    const [dashPattern, setDashPattern] = useObjectState<number[]>(value);
-    const [preset, setPreset] = useState<string>(
+    const [dashPattern, setDashPattern] = useState<number[]>(value);
+    const [preset, setPreset] = useState<string>(() =>
         Array.isArray(value) && value.length === 0 ? "line" : ""
     );
 
-    useEffectDebugger(() => {
+    useEffect(() => {
         if (preset) {
             const newPattern =
                 getLinePatternPresets(lineWidth).find(
@@ -50,9 +46,10 @@ export const DashPatternInput: React.FC<DashPatternInputProps> = ({
                 }
             });
         }
-    }, [lineWidth, onChange, preset, setDashPattern]);
+    }, [lineWidth, onChange, preset]);
 
     const handleInputChange = (index: number, newValue: number | null) => {
+        setPreset("");
         if (newValue === null || isNaN(newValue)) return;
         const newDashPattern = [...dashPattern];
 
