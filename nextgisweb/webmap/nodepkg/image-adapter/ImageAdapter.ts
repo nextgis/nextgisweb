@@ -54,8 +54,6 @@ export class ImageAdapter extends LayerDisplayAdapter {
                         ? `&symbols[${resource}]=${symbolsParam === "-1" ? "" : symbolsParam}`
                         : "";
 
-                    const img = image.getImage();
-
                     const newSrc =
                         `${url}?resource=${resource}` +
                         `&extent=${queryObject.BBOX}` +
@@ -72,7 +70,13 @@ export class ImageAdapter extends LayerDisplayAdapter {
                                 cache: "no-cache",
                                 signal,
                             }).then((imageUrl) => {
-                                (img as HTMLImageElement).src = imageUrl;
+                                const img =
+                                    image.getImage() as HTMLImageElement;
+                                if (img.dispatchEvent) {
+                                    const event = new Event("load");
+                                    img.dispatchEvent(event);
+                                }
+                                img.src = imageUrl;
                             })
                         );
                     });

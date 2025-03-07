@@ -5,6 +5,7 @@ Changes
 -----
 
 - Configurable default basemaps for on-premises installations.
+- OpenLayers library upgraded to 10.4.
 
 
 5.0.0

@@ -552,7 +552,9 @@ export class LayerEditor extends PluginBase {
         return layerId === this.selectedResourceId;
     }
 
-    private deleteSelectedFeatures(event: CollectionEvent): void {
+    private deleteSelectedFeatures(
+        event: CollectionEvent<Feature<Geometry>>
+    ): void {
         const feature = event.target.item(0);
         feature.setProperties({ deleted: true });
         this.source.removeFeature(feature);
