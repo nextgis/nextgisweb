@@ -46,6 +46,7 @@ class Stroke(Struct):
         if self.dash_pattern is not UNSET:
             dp = " ".join(map(str, self.dash_pattern))
             _stroke.append(E.SvgParameter(dict(name="stroke-dasharray"), dp))
+            _stroke.append(E.SvgParameter(dict(name="stroke-linecap"), "butt"))
         return _stroke
 
 
