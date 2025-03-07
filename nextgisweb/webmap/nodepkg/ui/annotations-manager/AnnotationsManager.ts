@@ -192,6 +192,7 @@ export class AnnotationsManager {
         if (this._editable) {
             document.body.classList.add("annotations-edit");
         }
+        import("@nextgisweb/gui/component/text-editor");
         this._editableLayer.activate(this._annotationsLayer, geometryType);
     }
 

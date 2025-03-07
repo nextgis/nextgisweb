@@ -1,7 +1,6 @@
-import { useEffect, useState } from "react";
+import { Suspense, lazy, useEffect, useState } from "react";
 
-import { Button, Dropdown, Modal, Space } from "@nextgisweb/gui/antd";
-import { TextEditor } from "@nextgisweb/gui/component/text-editor";
+import { Button, Dropdown, Modal, Skeleton, Space } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type {
     AnnotationFeature,
@@ -18,6 +17,12 @@ const DEFAULTS = {
     transitionName: "",
     maskTransitionName: "",
 };
+
+const TextEditor = lazy(() =>
+    import("@nextgisweb/gui/component/text-editor").then((module) => ({
+        default: module.TextEditor,
+    }))
+);
 
 export interface AnnotationsModalProps {
     open?: boolean;
@@ -189,11 +194,15 @@ export function AnnotationsModal({
                 )}
 
                 <div style={{ marginBottom: "16px", height: "200px" }}>
-                    <TextEditor
-                        value={editorValue}
-                        onChange={setEditorValue}
-                        parentHeight
-                    />
+                    <Suspense
+                        fallback={<Skeleton active paragraph={{ rows: 4 }} />}
+                    >
+                        <TextEditor
+                            value={editorValue}
+                            onChange={setEditorValue}
+                            parentHeight
+                        />
+                    </Suspense>
                 </div>
 
                 <div>
