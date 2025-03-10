@@ -14,9 +14,9 @@ import { extractColorAndOpacity } from "../../util/extractColorAndOpacity";
 import { hexWithOpacity } from "../../util/hexWithOpacity";
 
 const msgFillColor = gettext("Fill color");
-const msgOutlineColor = gettext("Stroke color");
-const msgOutlineWidth = gettext("Stroke width");
-const msgDash = gettext("Dash");
+const msgStrokeColor = gettext("Stroke color");
+const msgStrokeWidth = gettext("Stroke width");
+const msgStrokeStyle = gettext("Stroke style");
 
 export function FillEditor({ value, onChange }: EditorProps<FillSymbolizer>) {
     const [outlineWidth, setOutlineWidth] = useState<number | undefined>(
@@ -56,17 +56,17 @@ export function FillEditor({ value, onChange }: EditorProps<FillSymbolizer>) {
                 formItem: <ColorInput />,
             },
             {
-                label: msgOutlineColor,
+                label: msgStrokeColor,
                 name: "outlineColor",
                 formItem: <ColorInput />,
             },
             {
-                label: msgOutlineWidth,
+                label: msgStrokeWidth,
                 name: "outlineWidth",
                 formItem: <InputNumber min={0} />,
             },
             {
-                label: msgDash,
+                label: msgStrokeStyle,
                 name: "outlineDasharray",
                 formItem: (
                     <DashPatternInput lineWidth={outlineWidth as number} />

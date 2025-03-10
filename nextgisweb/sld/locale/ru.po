@@ -39,7 +39,6 @@ msgid "Fill"
 msgstr "Заливка"
 
 #: nodepkg/style-editor/component/TypeSelect/TypeField.tsx:17
-#: nodepkg/style-editor/component/editor/LineEditor.tsx:18
 msgid "Line"
 msgstr "Линия"
 
@@ -64,13 +63,16 @@ msgid "Stroke width"
 msgstr "Ширина контура"
 
 #: nodepkg/style-editor/component/editor/FillEditor.tsx:19
-#: nodepkg/style-editor/field/DashInput.tsx:10
-msgid "Dash"
-msgstr "Штрих"
+msgid "Stroke style"
+msgstr "Стиль контура"
 
 #: nodepkg/style-editor/component/editor/LineEditor.tsx:17
 msgid "Width"
 msgstr "Ширина"
+
+#: nodepkg/style-editor/component/editor/LineEditor.tsx:18
+msgid "Style"
+msgstr "Стиль"
 
 #: nodepkg/style-editor/component/editor/MarkEditor.tsx:18
 msgid "Shape"
@@ -87,6 +89,10 @@ msgstr "Нет"
 #: nodepkg/style-editor/field/ColorInput.tsx:19
 msgid "Transparent"
 msgstr "Прозрачный"
+
+#: nodepkg/style-editor/field/DashInput.tsx:10
+msgid "Dash"
+msgstr "Штрих"
 
 #: nodepkg/style-editor/field/DashInput.tsx:11
 msgid "Gap"
