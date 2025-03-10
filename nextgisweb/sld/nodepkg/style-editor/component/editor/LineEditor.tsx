@@ -19,11 +19,15 @@ const msgStyle = gettext("Style");
 
 export function LineEditor({ value, onChange }: EditorProps<LineSymbolizer>) {
     const [width, setWidth] = useState<number | undefined>(
-        value.width as number
+        typeof value.width === "number" ? value.width : undefined
     );
 
     const onSymbolizer = useCallback(
-        (v: LineSymbolizer) => {
+        ({ value: v }: { value: LineSymbolizer }) => {
+            if (typeof v.width === "number") {
+                setWidth(v.width);
+            }
+
             if (onChange) {
                 const symbolizerClone: LineSymbolizer = _cloneDeep({
                     ...value,
@@ -35,7 +39,6 @@ export function LineEditor({ value, onChange }: EditorProps<LineSymbolizer>) {
                     symbolizerClone.color = color;
                     symbolizerClone.opacity = opacity;
                 }
-
                 onChange(symbolizerClone);
             }
         },
@@ -57,7 +60,7 @@ export function LineEditor({ value, onChange }: EditorProps<LineSymbolizer>) {
             {
                 label: msgStyle,
                 name: "dasharray",
-                formItem: <DashPatternInput lineWidth={width as number} />,
+                formItem: <DashPatternInput lineWidth={width} />,
             },
         ],
         [width]
@@ -69,21 +72,11 @@ export function LineEditor({ value, onChange }: EditorProps<LineSymbolizer>) {
         color: hexWithOpacity(color, opacity),
     };
 
-    const onChangeCallback = useCallback(
-        ({ value: v }) => {
-            onSymbolizer(v as LineSymbolizer);
-            if (v.width !== undefined) {
-                setWidth(v.width as number);
-            }
-        },
-        [onSymbolizer]
-    );
-
     return (
         <FieldsForm
             fields={fields}
             initialValues={initialValue}
-            onChange={onChangeCallback}
+            onChange={onSymbolizer}
         />
     );
 }
