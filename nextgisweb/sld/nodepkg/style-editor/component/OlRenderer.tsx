@@ -110,6 +110,8 @@ export const OlRenderer: React.FC<OlRendererProps> = ({
     }, [getSampleGeomFromSymbolizer]);
 
     useEffect(() => {
+        // cons;
+
         layer.current = new OlLayerVector({
             source: new OlSourceVector(),
         });
@@ -159,6 +161,12 @@ export const OlRenderer: React.FC<OlRendererProps> = ({
             return undefined;
         } else if (layer.current) {
             // apply new OL style to vector layer
+
+            // CRUTCH BECAUSE styleParser IGNORES CAP!!!
+            olStyles.stroke_.lineCap_ =
+                newSymbolizers[0]?.cap ||
+                newSymbolizers[0]?.outlineCap ||
+                undefined;
             layer.current.setStyle(olStyles);
             return olStyles;
         }

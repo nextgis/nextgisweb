@@ -55,12 +55,16 @@ function convertLineSymbolizer(gsLine: GSLineSymbolizer): LineSymbolizer {
             color: gsLine.color as string,
             width: gsLine.width as number,
             opacity: setOpacity(gsLine.opacity),
+            dash_pattern: gsLine?.dasharray as number[],
+            cap: gsLine.cap || "butt",
         },
     };
 }
 
 function convertFillSymbolizer(gsFill: GSFillSymbolizer): PolygonSymbolizer {
     const fillOpacity = setOpacity(gsFill.fillOpacity || gsFill.opacity);
+
+    console.log("gsFill", gsFill);
     return {
         type: "polygon",
         fill: gsFill.color
@@ -74,6 +78,8 @@ function convertFillSymbolizer(gsFill: GSFillSymbolizer): PolygonSymbolizer {
                   color: gsFill.outlineColor as string,
                   width: gsFill.outlineWidth as number,
                   opacity: setOpacity(gsFill.outlineOpacity),
+                  dash_pattern: gsFill.outlineDasharray as number[],
+                  outlineCap: gsFill?.outlineCap || "butt",
               }
             : undefined,
     };

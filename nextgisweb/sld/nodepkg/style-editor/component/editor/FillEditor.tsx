@@ -1,6 +1,6 @@
 import type { FillSymbolizer } from "geostyler-style";
 import { cloneDeep as _cloneDeep } from "lodash-es";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 import { InputNumber } from "@nextgisweb/gui/antd";
 import { FieldsForm } from "@nextgisweb/gui/fields-form";
@@ -8,6 +8,7 @@ import type { FormField } from "@nextgisweb/gui/fields-form";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { ColorInput } from "../../field/ColorInput";
+import { DashPatternInput } from "../../field/DashInput";
 import type { EditorProps } from "../../type";
 import { extractColorAndOpacity } from "../../util/extractColorAndOpacity";
 import { hexWithOpacity } from "../../util/hexWithOpacity";
@@ -15,8 +16,13 @@ import { hexWithOpacity } from "../../util/hexWithOpacity";
 const msgFillColor = gettext("Fill color");
 const msgOutlineColor = gettext("Stroke color");
 const msgOutlineWidth = gettext("Stroke width");
+const msgDash = gettext("Dash");
 
 export function FillEditor({ value, onChange }: EditorProps<FillSymbolizer>) {
+    const [outlineWidth, setOutlineWidth] = useState<number | undefined>(
+        value.outlineWidth as number
+    );
+
     const onSymbolizer = (v: FillSymbolizer) => {
         if (onChange) {
             const symbolizerClone: FillSymbolizer = _cloneDeep({
@@ -59,8 +65,15 @@ export function FillEditor({ value, onChange }: EditorProps<FillSymbolizer>) {
                 name: "outlineWidth",
                 formItem: <InputNumber min={0} />,
             },
+            {
+                label: msgDash,
+                name: "outlineDasharray",
+                formItem: (
+                    <DashPatternInput lineWidth={outlineWidth as number} />
+                ),
+            },
         ],
-        []
+        [outlineWidth]
     );
 
     const { color, opacity, fillOpacity, outlineColor, outlineOpacity } = value;
@@ -77,6 +90,7 @@ export function FillEditor({ value, onChange }: EditorProps<FillSymbolizer>) {
             initialValues={initialValue}
             onChange={({ value: v }) => {
                 onSymbolizer(v as FillSymbolizer);
+                setOutlineWidth(v.outlineWidth as number);
             }}
         />
     );
