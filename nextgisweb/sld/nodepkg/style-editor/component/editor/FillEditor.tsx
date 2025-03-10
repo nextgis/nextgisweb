@@ -1,6 +1,6 @@
 import type { FillSymbolizer } from "geostyler-style";
 import { cloneDeep as _cloneDeep } from "lodash-es";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import { InputNumber } from "@nextgisweb/gui/antd";
 import { FieldsForm } from "@nextgisweb/gui/fields-form";
@@ -23,30 +23,37 @@ export function FillEditor({ value, onChange }: EditorProps<FillSymbolizer>) {
         value.outlineWidth as number
     );
 
-    const onSymbolizer = (v: FillSymbolizer) => {
-        if (onChange) {
-            const symbolizerClone: FillSymbolizer = _cloneDeep({
-                ...value,
-                ...v,
-            });
-
-            if (typeof v.color === "string") {
-                const [color, opacity] = extractColorAndOpacity(v.color);
-                symbolizerClone.color = color;
-                symbolizerClone.opacity = opacity;
-                symbolizerClone.fillOpacity = opacity;
-            }
-            if (typeof v.outlineColor === "string") {
-                const [strokeColor, strokeOpacity] = extractColorAndOpacity(
-                    v.outlineColor
-                );
-                symbolizerClone.outlineColor = strokeColor;
-                symbolizerClone.outlineOpacity = strokeOpacity;
+    const onSymbolizer = useCallback(
+        ({ value: v }: { value: FillSymbolizer }) => {
+            if (typeof v.outlineWidth === "number") {
+                setOutlineWidth(v.outlineWidth);
             }
 
-            onChange(symbolizerClone);
-        }
-    };
+            if (onChange) {
+                const symbolizerClone: FillSymbolizer = _cloneDeep({
+                    ...value,
+                    ...v,
+                });
+
+                if (typeof v.color === "string") {
+                    const [color, opacity] = extractColorAndOpacity(v.color);
+                    symbolizerClone.color = color;
+                    symbolizerClone.opacity = opacity;
+                    symbolizerClone.fillOpacity = opacity;
+                }
+                if (typeof v.outlineColor === "string") {
+                    const [strokeColor, strokeOpacity] = extractColorAndOpacity(
+                        v.outlineColor
+                    );
+                    symbolizerClone.outlineColor = strokeColor;
+                    symbolizerClone.outlineOpacity = strokeOpacity;
+                }
+
+                onChange(symbolizerClone);
+            }
+        },
+        [onChange, value]
+    );
 
     const fields = useMemo<FormField<keyof FillSymbolizer>[]>(
         () => [
@@ -88,10 +95,7 @@ export function FillEditor({ value, onChange }: EditorProps<FillSymbolizer>) {
         <FieldsForm
             fields={fields}
             initialValues={initialValue}
-            onChange={({ value: v }) => {
-                onSymbolizer(v as FillSymbolizer);
-                setOutlineWidth(v.outlineWidth as number);
-            }}
+            onChange={onSymbolizer}
         />
     );
 }
