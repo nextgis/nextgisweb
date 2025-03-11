@@ -37,6 +37,7 @@ import OlGeomPoint from "ol/geom/Point";
 import OlGeomPolygon from "ol/geom/Polygon";
 import OlLayerVector from "ol/layer/Vector";
 import OlSourceVector from "ol/source/Vector";
+import type OlStyle from "ol/style/Style";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type React from "react";
 
@@ -154,19 +155,23 @@ export const OlRenderer: React.FC<OlRendererProps> = ({
             ],
         };
         // parser style to OL style
-        const { output: olStyles, errors = [] } = await styleParser.writeStyle(
+        const { output, errors = [] } = await styleParser.writeStyle(
             style as any
         );
+        const olStyles = output as OlStyle;
         if (errors.length > 0) {
             return undefined;
-        } else if (layer.current) {
+        } else if (layer.current && olStyles) {
             // apply new OL style to vector layer
 
             // CRUTCH BECAUSE styleParser IGNORES CAP!!!
-            olStyles.stroke_.lineCap_ =
-                newSymbolizers[0]?.cap ||
-                newSymbolizers[0]?.outlineCap ||
-                undefined;
+            if (newSymbolizers[0]?.kind === "Fill") {
+                const stroke = olStyles.getStroke();
+                const outlineCap = newSymbolizers[0]?.outlineCap;
+                if (typeof outlineCap === "string" && stroke) {
+                    stroke.setLineCap(outlineCap);
+                }
+            }
             layer.current.setStyle(olStyles);
             return olStyles;
         }
