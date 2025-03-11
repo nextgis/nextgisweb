@@ -28,7 +28,7 @@ function potFlagged(comp) {
             const fstr = (comments || {}).flag;
             const flags = !fstr ? [] : fstr.split(/\s*,\s*/);
             const has = (flag) => flags.includes(flag);
-            if (has("server") && !has("amd") && !has("jsrealm")) continue;
+            if (has("server") && !has("jsrealm")) continue;
             cindex.push(msgid);
         }
     }
