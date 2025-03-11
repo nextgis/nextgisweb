@@ -5,6 +5,7 @@ Changes
 -----
 
 - Configurable default basemaps for on-premises installations.
+- Support for dash patterns in user-defined styles.
 
 
 5.0.0

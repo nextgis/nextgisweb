@@ -1,0 +1,11 @@
+.dash-sample-wrapper > .gs-symbolizer-olrenderer {
+    border: none;
+    width: 60px;
+    height: 20px;
+}
+
+.line-preset-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}

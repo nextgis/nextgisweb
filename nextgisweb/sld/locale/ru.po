@@ -1,32 +1,32 @@
-#: nodepkg/style-editor/RasterStyleEditor.tsx:70
+#: nodepkg/style-editor/RasterStyleEditor.tsx:15
 msgid "Band {}"
 msgstr "Канал {}"
 
-#: nodepkg/style-editor/RasterStyleEditor.tsx:148
+#: nodepkg/style-editor/RasterStyleEditor.tsx:149
 msgid "Red channel"
 msgstr "Красный канал"
 
-#: nodepkg/style-editor/RasterStyleEditor.tsx:152
-#: nodepkg/style-editor/RasterStyleEditor.tsx:165
-#: nodepkg/style-editor/RasterStyleEditor.tsx:178
+#: nodepkg/style-editor/RasterStyleEditor.tsx:153
+#: nodepkg/style-editor/RasterStyleEditor.tsx:166
+#: nodepkg/style-editor/RasterStyleEditor.tsx:179
 msgid "Min"
 msgstr "Минимум"
 
-#: nodepkg/style-editor/RasterStyleEditor.tsx:156
-#: nodepkg/style-editor/RasterStyleEditor.tsx:169
-#: nodepkg/style-editor/RasterStyleEditor.tsx:182
+#: nodepkg/style-editor/RasterStyleEditor.tsx:157
+#: nodepkg/style-editor/RasterStyleEditor.tsx:170
+#: nodepkg/style-editor/RasterStyleEditor.tsx:183
 msgid "Max"
 msgstr "Максимум"
 
-#: nodepkg/style-editor/RasterStyleEditor.tsx:161
+#: nodepkg/style-editor/RasterStyleEditor.tsx:162
 msgid "Green channel"
 msgstr "Зеленый канал"
 
-#: nodepkg/style-editor/RasterStyleEditor.tsx:174
+#: nodepkg/style-editor/RasterStyleEditor.tsx:175
 msgid "Blue channel"
 msgstr "Синий канал"
 
-#: nodepkg/style-editor/component/KindEditor.tsx:28
+#: nodepkg/style-editor/component/KindEditor.tsx:24
 msgid "Symbolizer unknown!"
 msgstr "Неизвестный тип символики"
 
@@ -46,25 +46,33 @@ msgstr "Линия"
 msgid "Type"
 msgstr "Тип"
 
-#: nodepkg/style-editor/component/editor/FillEditor.tsx:15
-#: nodepkg/style-editor/component/editor/LineEditor.tsx:15
+#: nodepkg/style-editor/component/editor/FillEditor.tsx:16
+#: nodepkg/style-editor/component/editor/LineEditor.tsx:16
 #: nodepkg/style-editor/component/editor/MarkEditor.tsx:20
 msgid "Fill color"
 msgstr "Цвет заливки"
 
-#: nodepkg/style-editor/component/editor/FillEditor.tsx:16
+#: nodepkg/style-editor/component/editor/FillEditor.tsx:17
 #: nodepkg/style-editor/component/editor/MarkEditor.tsx:21
 msgid "Stroke color"
 msgstr "Цвет контура"
 
-#: nodepkg/style-editor/component/editor/FillEditor.tsx:17
+#: nodepkg/style-editor/component/editor/FillEditor.tsx:18
 #: nodepkg/style-editor/component/editor/MarkEditor.tsx:22
 msgid "Stroke width"
 msgstr "Ширина контура"
 
-#: nodepkg/style-editor/component/editor/LineEditor.tsx:16
+#: nodepkg/style-editor/component/editor/FillEditor.tsx:19
+msgid "Stroke style"
+msgstr "Стиль контура"
+
+#: nodepkg/style-editor/component/editor/LineEditor.tsx:17
 msgid "Width"
 msgstr "Ширина"
+
+#: nodepkg/style-editor/component/editor/LineEditor.tsx:18
+msgid "Style"
+msgstr "Стиль"
 
 #: nodepkg/style-editor/component/editor/MarkEditor.tsx:18
 msgid "Shape"
@@ -82,22 +90,46 @@ msgstr "Нет"
 msgid "Transparent"
 msgstr "Прозрачный"
 
-#: nodepkg/style-editor/util/constant.ts:6
+#: nodepkg/style-editor/field/DashInput.tsx:10
+msgid "Dash"
+msgstr "Штрих"
+
+#: nodepkg/style-editor/field/DashInput.tsx:11
+msgid "Gap"
+msgstr "Пропуск"
+
+#: nodepkg/style-editor/util/constant.ts:5
 msgid "Square"
 msgstr "Квадрат"
 
-#: nodepkg/style-editor/util/constant.ts:7
+#: nodepkg/style-editor/util/constant.ts:6
 msgid "Circle"
 msgstr "Круг"
 
-#: nodepkg/style-editor/util/constant.ts:8
+#: nodepkg/style-editor/util/constant.ts:7
 msgid "Triangle"
 msgstr "Треугольник"
 
-#: nodepkg/style-editor/util/constant.ts:9
+#: nodepkg/style-editor/util/constant.ts:8
 msgid "Star"
 msgstr "Звезда"
 
-#: nodepkg/style-editor/util/constant.ts:10
+#: nodepkg/style-editor/util/constant.ts:9
 msgid "Cross"
 msgstr "Крест"
+
+#: nodepkg/style-editor/util/linePatternPresets.ts:3
+msgid "Solid"
+msgstr "Сплошная линия"
+
+#: nodepkg/style-editor/util/linePatternPresets.ts:4
+msgid "Dotted"
+msgstr "Точечный пунктир"
+
+#: nodepkg/style-editor/util/linePatternPresets.ts:5
+msgid "Dashed"
+msgstr "Пунктир"
+
+#: nodepkg/style-editor/util/linePatternPresets.ts:6
+msgid "Dash - dotted"
+msgstr "Переменный пунктир"
