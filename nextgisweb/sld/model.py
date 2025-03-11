@@ -106,28 +106,35 @@ class Graphic(Struct):
 class PointSymbolizer(Struct, tag="point"):
     graphic: Graphic
 
-    def xml(self):
-        return E.PointSymbolizer(self.graphic.xml())
+    def xml_items(self):
+        return [E.PointSymbolizer(self.graphic.xml())]
 
 
 class LineSymbolizer(Struct, tag="line"):
     stroke: Stroke
 
-    def xml(self):
-        return E.LineSymbolizer(self.stroke.xml())
+    def xml_items(self):
+        return [E.LineSymbolizer(self.stroke.xml())]
 
 
 class PolygonSymbolizer(Struct, tag="polygon"):
     stroke: Union[Stroke, UnsetType] = UNSET
     fill: Union[Fill, UnsetType] = UNSET
 
-    def xml(self):
+    def xml_items(self):
+        result = []
         _polygon_symbolizer = E.PolygonSymbolizer()
+        result.append(_polygon_symbolizer)
         if self.stroke is not UNSET:
-            _polygon_symbolizer.append(self.stroke.xml())
+            # https://api.qgis.org/api/3.40/qgssymbollayerutils_8cpp_source.html#l02501
+            if self.stroke.dash_pattern is not UNSET:
+                line_symbolizer = LineSymbolizer(stroke=self.stroke)
+                result.extend(line_symbolizer.xml_items())
+            else:
+                _polygon_symbolizer.append(self.stroke.xml())
         if self.fill is not UNSET:
             _polygon_symbolizer.append(self.fill.xml())
-        return _polygon_symbolizer
+        return result
 
 
 class Algorithm(Enum):
@@ -184,12 +191,12 @@ class RasterSymbolizer(Struct, tag="raster"):
     channels: Channels
     opacity: Opacity = UNSET
 
-    def xml(self):
+    def xml_items(self):
         _raster_symbolizer = E.RasterSymbolizer()
         if self.opacity is not UNSET:
             _raster_symbolizer.append(E.Opacity(str(self.opacity)))
         _raster_symbolizer.append(self.channels.xml())
-        return _raster_symbolizer
+        return [_raster_symbolizer]
 
 
 Symbolizer = Union[PointSymbolizer, LineSymbolizer, PolygonSymbolizer, RasterSymbolizer]
@@ -201,7 +208,7 @@ class Rule(Struct):
     def xml(self):
         _rule = E.Rule()
         for symbolizer in self.symbolizers:
-            _rule.append(symbolizer.xml())
+            _rule.extend(symbolizer.xml_items())
         return _rule
 
 
