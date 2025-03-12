@@ -2,6 +2,8 @@ import { observer } from "mobx-react-lite";
 import { useMemo } from "react";
 import type { ReactElement } from "react";
 
+import cn from "classnames";
+
 import { Breadcrumb, Skeleton, Space, Tooltip } from "@nextgisweb/gui/antd";
 import type {
     BreadcrumbItemProps,
@@ -20,28 +22,31 @@ type BreadcrumbItems = BreadcrumbProps["items"];
 
 export const ResourcePickerBreadcrumb = observer(
     ({
-        resourceStore,
+        store,
         // TODO: make it dependent on the block length
         maxBreadcrumbItems = 2,
     }: ResourcePickerBreadcrumbProps) => {
-        const { breadcrumbItems, loading, allowMoveInside } = resourceStore;
+        const { breadcrumbItems, loading, allowMoveInside } = store;
 
         const breadcrumbs = useMemo<BreadcrumbItems>(() => {
             const items: BreadcrumbItems = [];
             const onClick = (newLastResourceId: number) => {
-                resourceStore.changeParentTo(newLastResourceId);
+                store.changeParentTo(newLastResourceId);
             };
 
             const createLabel = (
                 resItem: CompositeRead,
                 name?: string | ReactElement,
-                link = true
+                isActive = false
             ) => {
                 const displayName = name || resItem.resource.display_name;
                 return (
                     <span className="resource-breadcrumb-item">
-                        {allowMoveInside && link ? (
-                            <a onClick={() => onClick(resItem.resource.id)}>
+                        {allowMoveInside ? (
+                            <a
+                                onClick={() => onClick(resItem.resource.id)}
+                                className={cn({ "active": isActive })}
+                            >
                                 {displayName}
                             </a>
                         ) : (
@@ -79,7 +84,7 @@ export const ResourcePickerBreadcrumb = observer(
             for (let i = 0; i < breadcrumbItems.length; i++) {
                 const parent = breadcrumbItems[i];
                 let name: ReactElement | string | undefined;
-                const isLink = i < breadcrumbItems.length - 1;
+                const isActive = i >= breadcrumbItems.length - 1;
                 if (i === 0) {
                     name =
                         breadcrumbItems.length > 1 ? (
@@ -94,7 +99,7 @@ export const ResourcePickerBreadcrumb = observer(
                         );
                 }
                 items.push({
-                    title: createLabel(parent, name, isLink),
+                    title: createLabel(parent, name, isActive),
                     key: parent.resource.id,
                 });
                 if (i === 0 && packFirstItemsToMenu) {
@@ -106,12 +111,7 @@ export const ResourcePickerBreadcrumb = observer(
                 }
             }
             return items;
-        }, [
-            maxBreadcrumbItems,
-            breadcrumbItems,
-            allowMoveInside,
-            resourceStore,
-        ]);
+        }, [maxBreadcrumbItems, breadcrumbItems, allowMoveInside, store]);
 
         return loading.setBreadcrumbItemsFor ? (
             <Space>

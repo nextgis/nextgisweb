@@ -25,7 +25,7 @@ import "./ResourcePickerChildren.less";
 const msgDislpayName = gettext("Display name");
 
 function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
-    resourceStore,
+    store,
     onOk,
 }: ResourcePickerChildrenProps<V>) {
     const {
@@ -37,19 +37,21 @@ function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
         traverseClasses,
         allowMoveInside,
         getResourceClasses,
-    } = resourceStore;
+    } = store;
 
     const [selectionType] = useState<RowSelectionType>(() =>
         multiple ? "checkbox" : "radio"
     );
-    const { getCheckboxProps } = usePickerCard({ resourceStore });
+    const { getCheckboxProps } = usePickerCard({ store });
 
     const dataSource = useMemo(() => {
-        const children_: PickerResource[] = [];
-        for (const x of resources) {
-            children_.push(x.resource);
+        const children: PickerResource[] = [];
+        if (resources) {
+            for (const x of resources) {
+                children.push(x.resource);
+            }
         }
-        return children_;
+        return children;
     }, [resources]);
 
     const rowSelection = useMemo(() => {
@@ -59,18 +61,12 @@ function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
                 getCheckboxProps,
                 selectedRowKeys: selected,
                 onChange: (selectedRowKeys) => {
-                    resourceStore.setSelected(selectedRowKeys.map(Number));
+                    store.setSelected(selectedRowKeys.map(Number));
                 },
             };
             return rowSelection_;
         }
-    }, [
-        selected,
-        selectionType,
-        resourceStore,
-        allowSelection,
-        getCheckboxProps,
-    ]);
+    }, [selected, selectionType, store, allowSelection, getCheckboxProps]);
 
     const canTraverse = useCallback(
         (record: PickerResource) => {
@@ -100,12 +96,12 @@ function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
                     onClick={(e) => {
                         e.stopPropagation();
                         e.preventDefault();
-                        resourceStore.changeParentTo(record.id);
+                        store.changeParentTo(record.id);
                     }}
                 />
             );
         },
-        [canTraverse, resourceStore]
+        [canTraverse, store]
     );
 
     const columns = useMemo<TableProps["columns"]>(
@@ -134,7 +130,7 @@ function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
 
                 if (props.disabled) {
                     if (pick && canTraverse(record)) {
-                        resourceStore.changeParentTo(record.id);
+                        store.changeParentTo(record.id);
                     }
                     return;
                 }
@@ -155,7 +151,7 @@ function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
                     newSelected.push(record.id);
                 }
 
-                resourceStore.setSelected(newSelected);
+                store.setSelected(newSelected);
             };
             return {
                 onDoubleClick: () => {
@@ -166,7 +162,7 @@ function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
                 }, 150),
             };
         },
-        [canTraverse, getCheckboxProps, multiple, onOk, resourceStore, selected]
+        [canTraverse, getCheckboxProps, multiple, onOk, store, selected]
     );
 
     return (

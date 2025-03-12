@@ -18,28 +18,28 @@ export type RowSelectionType = RowSelection["type"];
 export type PickerResource = ResourceRead;
 
 export interface ResourcePickerBreadcrumbProps {
-    resourceStore: ResourcePickerStore;
+    store: ResourcePickerStore;
     maxBreadcrumbItems?: number;
 }
 
 export interface ResourcePickerChildrenProps<
     V extends SelectValue = SelectValue,
 > {
-    resourceStore: ResourcePickerStore;
+    store: ResourcePickerStore;
     onOk?: (val: V) => void;
 }
 
 export interface ResourcePickerFooterProps<
     V extends SelectValue = SelectValue,
 > {
-    resourceStore: ResourcePickerStore;
+    store: ResourcePickerStore;
     onOk?: (val: V) => void;
 }
 
 export type OnNewGroupType = (resource: CompositeRead) => void;
 
 export interface ResourcePickerTitleProps {
-    resourceStore: ResourcePickerStore;
+    store: ResourcePickerStore;
     onClose?: () => void;
     showClose?: boolean;
 }

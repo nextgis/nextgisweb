@@ -18,12 +18,12 @@ import DoneIcon from "@nextgisweb/icon/material/check";
 import CreateNewFolder from "@nextgisweb/icon/material/create_new_folder";
 
 interface CreateControlProps {
-    resourceStore: ResourcePickerStore;
+    store: ResourcePickerStore;
     setCreateMode?: (val: boolean) => void;
 }
 
 interface MoveControlProps<V extends SelectValue = SelectValue> {
-    resourceStore: ResourcePickerStore;
+    store: ResourcePickerStore;
     setCreateMode?: (val: boolean) => void;
     onOk?: (val: V) => void;
 }
@@ -32,8 +32,8 @@ const msgCreateGroup = gettext("Create group");
 const msgClearSelection = gettext("Clear selection");
 
 const CreateControl = observer(
-    ({ setCreateMode, resourceStore }: CreateControlProps) => {
-        const { loading } = resourceStore;
+    ({ setCreateMode, store }: CreateControlProps) => {
+        const { loading } = store;
         const resourceNameInput = useRef<InputRef>(null);
 
         const [resourceName, setResourceName] = useState<string>();
@@ -41,7 +41,7 @@ const CreateControl = observer(
         const onSave = async () => {
             try {
                 if (resourceName) {
-                    await resourceStore.createNewGroup(resourceName);
+                    await store.createNewGroup(resourceName);
                     if (setCreateMode) {
                         setCreateMode(false);
                     }
@@ -95,7 +95,7 @@ CreateControl.displayName = "CreateControl";
 
 function MoveControlInner<V extends SelectValue = SelectValue>({
     setCreateMode,
-    resourceStore,
+    store,
     onOk,
 }: MoveControlProps<V>) {
     const {
@@ -109,9 +109,9 @@ function MoveControlInner<V extends SelectValue = SelectValue>({
         getResourceClasses,
         disableResourceIds,
         allowCreateResource,
-    } = resourceStore;
+    } = store;
 
-    const { getCheckboxProps } = usePickerCard({ resourceStore });
+    const { getCheckboxProps } = usePickerCard({ store });
 
     const pickThisGroupAllowed = useMemo(() => {
         if (parentItem) {
@@ -131,7 +131,7 @@ function MoveControlInner<V extends SelectValue = SelectValue>({
     }, [getResourceClasses, parentItem]);
 
     const onCreateClick = () => {
-        resourceStore.clearSelection();
+        store.clearSelection();
         if (setCreateMode) {
             setCreateMode(true);
         }
@@ -176,7 +176,7 @@ function MoveControlInner<V extends SelectValue = SelectValue>({
                             <Button
                                 icon={<HighlightOff />}
                                 onClick={() => {
-                                    resourceStore.clearSelection();
+                                    store.clearSelection();
                                 }}
                             ></Button>
                         </Tooltip>
@@ -209,7 +209,7 @@ const MoveControl = observer(MoveControlInner);
 MoveControl.displayName = "MoveControl";
 
 const ResourcePickerFooterInner = <V extends SelectValue = SelectValue>({
-    resourceStore,
+    store,
     onOk,
     ...props
 }: ResourcePickerFooterProps<V>) => {
@@ -218,10 +218,13 @@ const ResourcePickerFooterInner = <V extends SelectValue = SelectValue>({
     return (
         <>
             {createMode ? (
-                <CreateControl {...{ resourceStore, setCreateMode }} />
+                <CreateControl store={store} setCreateMode={setCreateMode} />
             ) : (
                 <MoveControl
-                    {...{ resourceStore, setCreateMode, onOk, ...props }}
+                    store={store}
+                    setCreateMode={setCreateMode}
+                    onOk={onOk}
+                    {...props}
                 />
             )}
         </>

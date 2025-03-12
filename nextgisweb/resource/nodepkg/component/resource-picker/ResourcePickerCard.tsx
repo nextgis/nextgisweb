@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { Card } from "@nextgisweb/gui/antd";
 
@@ -25,25 +25,28 @@ export function ResourcePickerCard<V extends SelectValue = SelectValue>({
     showClose,
     onSelect,
     onClose,
-    store,
+    store: storeProp,
 }: ResourcePickerCardProps<V>) {
     const style = cardOptions.style || defaultStyle;
     const bodyStyle = cardOptions.styles?.body || defaultBodyStyle;
 
-    const [resourceStore] = useState(
-        () => store || new ResourcePickerStore(pickerOptions)
+    const [store] = useState(
+        () => storeProp || new ResourcePickerStore(pickerOptions)
     );
 
-    const onOk_ = (resource: V) => {
-        if (onSelect) {
-            onSelect(resource);
-        }
-    };
+    const onOk_ = useCallback(
+        (resource: V) => {
+            if (onSelect) {
+                onSelect(resource);
+            }
+        },
+        [onSelect]
+    );
 
     useEffect(() => {
-        const destroy = resourceStore.destroy;
+        const destroy = store.destroy;
         return destroy;
-    }, [resourceStore]);
+    }, [store]);
 
     return (
         <Card
@@ -55,21 +58,18 @@ export function ResourcePickerCard<V extends SelectValue = SelectValue>({
                 <ResourcePickerTitle
                     showClose={showClose}
                     onClose={onClose}
-                    resourceStore={resourceStore}
+                    store={store}
                 />
             }
             actions={[
                 <ResourcePickerFooter
                     key="footer"
-                    resourceStore={resourceStore}
+                    store={store}
                     onOk={onOk_}
                 />,
             ]}
         >
-            <ResourcePickerChildren
-                resourceStore={resourceStore}
-                onOk={onOk_}
-            />
+            <ResourcePickerChildren store={store} onOk={onOk_} />
         </Card>
     );
 }
