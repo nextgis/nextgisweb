@@ -559,9 +559,6 @@ export class Display {
             this.panelManager.panelsReady.promise,
         ])
             .then(() => {
-                if (this.urlParams.base) {
-                    this.map.switchBasemap(this.urlParams.base);
-                }
                 this._setMapExtent();
                 this.mapExtentDeferred.resolve(true);
             })

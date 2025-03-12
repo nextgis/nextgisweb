@@ -18,7 +18,7 @@ export class BaseMap extends PluginBase {
         this.initialize();
     }
 
-    private initialize(): void {
+    private async initialize(): Promise<void> {
         const wmplugin = this.display.config.webmapPlugin[
             this.identity
         ] as WebmapPluginConfig;
@@ -27,12 +27,15 @@ export class BaseMap extends PluginBase {
             ? wmplugin.basemaps
             : settings.basemaps;
 
-        this.setBasemapsFromPlugin(basemaps);
+        await this.setBasemapsFromPlugin(basemaps);
+        if (this.display.urlParams.base) {
+            this.display.map.switchBasemap(this.display.urlParams.base);
+        }
     }
 
-    private setBasemapsFromPlugin(
+    private async setBasemapsFromPlugin(
         basemaps: WebmapPluginBaselayer[] | BasemapConfig[]
-    ): void {
+    ): Promise<void> {
         let isDefaultExisted = false;
         const map = this.display.map;
         for (const { ...bm } of basemaps) {
@@ -44,13 +47,13 @@ export class BaseMap extends PluginBase {
                 }
 
                 const opts = prepareBaselayerConfig(bm);
-                addBaselayer({ ...opts, map });
+                await addBaselayer({ ...opts, map });
             } catch (er) {
                 //
             }
         }
 
-        addBaselayer({
+        await addBaselayer({
             map,
             layer: {
                 title: gettext("No basemap"),
