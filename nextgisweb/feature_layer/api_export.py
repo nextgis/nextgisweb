@@ -278,12 +278,13 @@ def export(resource: IFeatureLayer, options: ExportOptions, filepath: str):
 
     driver = options.driver
     srs = options.srs if options.srs is not None else resource.srs
+    layer_name = driver.get_layer_name(resource.display_name)
 
     vtopts = dict(
         options=[],
         format=driver.name,
         dstSRS=srs.wkt,
-        layerName=resource.display_name,
+        layerName=layer_name,
         geometryType=resource.geometry_type,
     )
     if driver.fid_support and options.fid_field is None:
