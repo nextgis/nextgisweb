@@ -12,7 +12,7 @@ import { Vector as VectorSource } from "ol/source";
 
 import { FeatureEditorModal } from "@nextgisweb/feature-layer/feature-editor-modal";
 import type { FeaureLayerGeometryType } from "@nextgisweb/feature-layer/type/api";
-import { errorModal } from "@nextgisweb/gui/error";
+import { errorModal, isApiError } from "@nextgisweb/gui/error";
 import { EditIcon } from "@nextgisweb/gui/icon";
 import showModal from "@nextgisweb/gui/showModal";
 import { findNode } from "@nextgisweb/gui/util/tree";
@@ -463,20 +463,24 @@ export class LayerEditor extends PluginBase {
 
     private async fetchVectorData(editingItem: EditingItem): Promise<void> {
         const resourceId = editingItem.id;
-        let featuresInfo: FeatureInfo[] | undefined = undefined;
         try {
-            featuresInfo = await route("feature_layer.feature.collection", {
-                id: resourceId,
-            }).get({
+            const featuresInfo = await route(
+                "feature_layer.feature.collection",
+                {
+                    id: resourceId,
+                }
+            ).get({
                 query: {
                     extensions: [],
+                    fields: [],
                 },
             });
-        } catch (error) {
-            errorModal(error);
-        }
-        if (featuresInfo) {
             this.handleFetchedVectorData(resourceId, featuresInfo, editingItem);
+        } catch (error) {
+            if (isApiError(error)) {
+                errorModal(error);
+            }
+            console.error(error);
         }
     }
 
