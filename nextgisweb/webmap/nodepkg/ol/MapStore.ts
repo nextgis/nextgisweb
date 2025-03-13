@@ -188,6 +188,7 @@ export class MapStore extends Watchable<MapWatchableProps> {
         this.olMap.addLayer(olLayer);
     }
 
+    @action.bound
     setLayerZIndex(layerDef: CoreLayer | number, zIndex: number) {
         const layer =
             typeof layerDef === "number" ? this.layers[layerDef] : layerDef;
