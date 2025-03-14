@@ -2,12 +2,12 @@ import { action, computed, observable, runInAction } from "mobx";
 
 import { mapper, validate } from "@nextgisweb/gui/arm";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import type { Composite } from "@nextgisweb/resource/type";
+import type { CompositeStore } from "@nextgisweb/resource/composite";
 import type {
     EditorStore,
     EditorStoreOptions,
     Operation,
-} from "@nextgisweb/resource/type/EditorStore";
+} from "@nextgisweb/resource/type";
 import type { ResourceRef } from "@nextgisweb/resource/type/api";
 import srsSettings from "@nextgisweb/spatial-ref-sys/client-settings";
 
@@ -67,7 +67,7 @@ export class LayerStore implements EditorStore<Value> {
     geometrySrid = geometrySrid.init(null, this);
     fields = fields.init("update", this);
 
-    readonly composite: Composite;
+    readonly composite: CompositeStore;
 
     constructor({ operation, composite }: EditorStoreOptions) {
         this.operation = operation;

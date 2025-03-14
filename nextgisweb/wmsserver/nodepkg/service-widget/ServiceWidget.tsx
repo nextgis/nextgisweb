@@ -12,10 +12,7 @@ import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { ResourceSelect } from "@nextgisweb/resource/component";
 import { useFocusTablePicker } from "@nextgisweb/resource/component/resource-picker";
-import type {
-    EditorWidgetComponent,
-    EditorWidgetProps,
-} from "@nextgisweb/resource/type";
+import type { EditorWidget } from "@nextgisweb/resource/type";
 import { generateResourceKeyname } from "@nextgisweb/resource/util/generateResourceKeyname";
 
 import { Layer } from "./Layer";
@@ -62,69 +59,69 @@ const CollectionWidget = observer<{
     );
 });
 
-export const ServiceWidget: EditorWidgetComponent<
-    EditorWidgetProps<ServiceStore>
-> = observer(({ store }: EditorWidgetProps<ServiceStore>) => {
-    const { makeSignal } = useAbortController();
+export const ServiceWidget: EditorWidget<ServiceStore> = observer(
+    ({ store }) => {
+        const { makeSignal } = useAbortController();
 
-    const { pickToFocusTable } = useFocusTablePicker({
-        initParentId: store.composite.parent ?? undefined,
-    });
+        const { pickToFocusTable } = useFocusTablePicker({
+            initParentId: store.composite.parent ?? undefined,
+        });
 
-    const { tableActions, itemActions } = useMemo<
-        FocusTablePropsActions<Layer>
-    >(
-        () => ({
-            tableActions: [
-                pickToFocusTable(
-                    async (res) => {
-                        const resourceId = res.resource.id;
-                        if (
-                            res.resource.cls.endsWith("_style") &&
-                            res.resource.parent
-                        ) {
-                            res = await route(
-                                "resource.item",
-                                res.resource.parent?.id
-                            ).get({ signal: makeSignal() });
-                        }
-                        return new Layer(store, {
-                            resource_id: resourceId,
-                            display_name: res.resource.display_name,
-                            keyname: generateResourceKeyname(res.resource),
-                            min_scale_denom: null,
-                            max_scale_denom: null,
-                        });
-                    },
-                    {
-                        pickerOptions: {
-                            requireInterface: "IRenderableStyle",
-                            multiple: true,
+        const { tableActions, itemActions } = useMemo<
+            FocusTablePropsActions<Layer>
+        >(
+            () => ({
+                tableActions: [
+                    pickToFocusTable(
+                        async (res) => {
+                            const resourceId = res.resource.id;
+                            if (
+                                res.resource.cls.endsWith("_style") &&
+                                res.resource.parent
+                            ) {
+                                res = await route(
+                                    "resource.item",
+                                    res.resource.parent?.id
+                                ).get({ signal: makeSignal() });
+                            }
+                            return new Layer(store, {
+                                resource_id: resourceId,
+                                display_name: res.resource.display_name,
+                                keyname: generateResourceKeyname(res.resource),
+                                min_scale_denom: null,
+                                max_scale_denom: null,
+                            });
                         },
-                    }
-                ),
-            ],
-            itemActions: [action.deleteItem()],
-        }),
-        [pickToFocusTable, store, makeSignal]
-    );
+                        {
+                            pickerOptions: {
+                                requireInterface: "IRenderableStyle",
+                                multiple: true,
+                            },
+                        }
+                    ),
+                ],
+                itemActions: [action.deleteItem()],
+            }),
+            [pickToFocusTable, store, makeSignal]
+        );
 
-    return (
-        <FocusTable<Layer>
-            store={store}
-            title={(item) => item.displayName.value}
-            columns={[
-                {
-                    render: (l: Layer) => l.keyname.value,
-                    width: ["25%", "50%"],
-                },
-            ]}
-            tableActions={tableActions}
-            itemActions={itemActions}
-            renderDetail={({ item }) => <CollectionWidget item={item} />}
-        />
-    );
-});
+        return (
+            <FocusTable<Layer>
+                store={store}
+                title={(item) => item.displayName.value}
+                columns={[
+                    {
+                        render: (l: Layer) => l.keyname.value,
+                        width: ["25%", "50%"],
+                    },
+                ]}
+                tableActions={tableActions}
+                itemActions={itemActions}
+                renderDetail={({ item }) => <CollectionWidget item={item} />}
+            />
+        );
+    }
+);
 
 ServiceWidget.displayName = "ServiceWidget";
 ServiceWidget.title = gettext("WMS service");

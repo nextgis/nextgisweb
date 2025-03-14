@@ -2,11 +2,11 @@ import { action, computed, observable, observe, runInAction } from "mobx";
 
 import type { FocusTableStore } from "@nextgisweb/gui/focus-table";
 import type * as apitype from "@nextgisweb/ogcfserver/type/api";
-import type { Composite } from "@nextgisweb/resource/type";
+import type { CompositeStore } from "@nextgisweb/resource/composite";
 import type {
     EditorStore,
     EditorStoreOptions,
-} from "@nextgisweb/resource/type/EditorStore";
+} from "@nextgisweb/resource/type";
 
 import { Collection } from "./Collection";
 
@@ -24,7 +24,7 @@ export class ServiceStore
 
     collections = observable.array<Collection>([]);
 
-    composite: Composite;
+    composite: CompositeStore;
 
     constructor({ composite }: EditorStoreOptions) {
         this.composite = composite;

@@ -2,13 +2,13 @@ import { action, computed, observable, toJS } from "mobx";
 
 import type { FileMeta } from "@nextgisweb/file-upload/file-uploader";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import type { Composite } from "@nextgisweb/resource/type/Composite";
+import type { CompositeStore } from "@nextgisweb/resource/composite";
 import type {
     DumpParams,
     EditorStore,
     EditorStoreOptions,
     Operation,
-} from "@nextgisweb/resource/type/EditorStore";
+} from "@nextgisweb/resource/type";
 import srsSettings from "@nextgisweb/spatial-ref-sys/client-settings";
 import type * as apitype from "@nextgisweb/vector-layer/type/api";
 
@@ -62,7 +62,7 @@ export class Store
     @observable accessor dirty = false;
 
     @observable accessor operation: Operation;
-    @observable.shallow accessor composite: Composite;
+    @observable.shallow accessor composite: CompositeStore;
 
     constructor({ composite, operation }: EditorStoreOptions) {
         this.operation = operation;

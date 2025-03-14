@@ -3,13 +3,13 @@ import { action, computed, observable } from "mobx";
 import type { FileUploadObject } from "@nextgisweb/file-upload/type/api";
 import settings from "@nextgisweb/raster-layer/client-settings";
 import type * as apitype from "@nextgisweb/raster-layer/type/api";
-import type { Composite } from "@nextgisweb/resource/type/Composite";
+import type { CompositeStore } from "@nextgisweb/resource/composite";
 import type {
     DumpParams,
     EditorStoreOptions,
     EditorStore as IEditorStore,
     Operation,
-} from "@nextgisweb/resource/type/EditorStore";
+} from "@nextgisweb/resource/type";
 import srsSettings from "@nextgisweb/spatial-ref-sys/client-settings";
 
 export class EditorStore
@@ -17,7 +17,7 @@ export class EditorStore
 {
     readonly identity = "raster_layer";
     readonly operation: Operation;
-    readonly composite: Composite;
+    readonly composite: CompositeStore;
 
     @observable.ref accessor source: FileUploadObject | undefined = undefined;
     @observable.ref accessor uploading = false;

@@ -1,11 +1,11 @@
 import { makeObservable, observable, observe, runInAction } from "mobx";
 
 import type { FocusTableStore } from "@nextgisweb/gui/focus-table";
-import type { Composite } from "@nextgisweb/resource/type";
+import type { CompositeStore } from "@nextgisweb/resource/composite";
 import type {
     EditorStore,
     EditorStoreOptions,
-} from "@nextgisweb/resource/type/EditorStore";
+} from "@nextgisweb/resource/type";
 import type { WFSServerLayer } from "@nextgisweb/wfsserver/type/api";
 
 import { Layer } from "./Layer";
@@ -24,7 +24,7 @@ export class ServiceStore
 
     layers = observable.array<Layer>([]);
 
-    composite: Composite;
+    composite: CompositeStore;
 
     constructor({ composite }: EditorStoreOptions) {
         this.composite = composite;

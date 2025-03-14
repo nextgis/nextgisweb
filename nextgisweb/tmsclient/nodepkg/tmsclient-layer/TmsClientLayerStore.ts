@@ -1,8 +1,9 @@
 import { action, computed, observable, runInAction } from "mobx";
 
 import { mapper } from "@nextgisweb/gui/arm";
+import type { NullableProps } from "@nextgisweb/gui/type";
+import type { CompositeStore } from "@nextgisweb/resource/composite";
 import type {
-    Composite,
     EditorStore,
     EditorStoreOptions,
     Operation,
@@ -14,7 +15,7 @@ import type {
     LayerUpdate,
 } from "@nextgisweb/tmsclient/type/api";
 
-type MapperLayerCreate = NullableOmit<
+type MapperLayerCreate = NullableProps<
     LayerCreate,
     "connection" | "minzoom" | "maxzoom"
 > & {
@@ -54,7 +55,7 @@ export class TmsClientLayerStore
 {
     readonly identity = "tmsclient_layer";
     readonly operation: Operation;
-    readonly composite: Composite;
+    readonly composite: CompositeStore;
 
     readonly connection = connection.init(null, this);
     readonly layer_name = layer_name.init("", this);

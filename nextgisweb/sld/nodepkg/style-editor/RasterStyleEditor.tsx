@@ -3,7 +3,6 @@ import { useCallback, useEffect, useState } from "react";
 import { Form, InputNumber, Select } from "@nextgisweb/gui/antd";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext, gettextf } from "@nextgisweb/pyramid/i18n";
-import type { RasterLayerResource } from "@nextgisweb/raster-layer/type/RasterLayerResource";
 import type { RasterSymbolizer } from "@nextgisweb/sld/type/api";
 
 import type { Symbolizer } from "./type/Style";
@@ -63,8 +62,7 @@ export function RasterStyleEditor({
                 cache: true,
             });
             if (rasterRes.raster_layer) {
-                const bands_ = (rasterRes.raster_layer as RasterLayerResource)
-                    .color_interpretation;
+                const bands_ = rasterRes.raster_layer.color_interpretation;
                 setBands(
                     bands_.map((value, index) => ({
                         key: index,

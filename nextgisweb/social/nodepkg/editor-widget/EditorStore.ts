@@ -5,7 +5,7 @@ import { routeURL } from "@nextgisweb/pyramid/api";
 import type {
     EditorStoreOptions,
     EditorStore as IEditorStore,
-} from "@nextgisweb/resource/type/EditorStore";
+} from "@nextgisweb/resource/type";
 import type apitype from "@nextgisweb/social/type/api";
 
 export class EditorStore

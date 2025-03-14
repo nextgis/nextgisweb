@@ -16,10 +16,7 @@ import type {
 import { errorModal, isAbortError } from "@nextgisweb/gui/error";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import type {
-    EditorWidgetComponent,
-    EditorWidgetProps,
-} from "@nextgisweb/resource/type";
+import type { EditorWidget } from "@nextgisweb/resource/type";
 
 import type { Mode, Store } from "./Store";
 
@@ -148,196 +145,192 @@ const SourceOptions = observer(({ store }: { store: Store }) => {
 
 SourceOptions.displayName = "SourceOptions";
 
-export const Widget: EditorWidgetComponent<EditorWidgetProps<Store>> = observer(
-    ({ store }) => {
-        const [layerOpts, setLayerOpts] = useState<Option[]>();
+export const Widget: EditorWidget<Store> = observer(({ store }) => {
+    const [layerOpts, setLayerOpts] = useState<Option[]>();
 
-        const {
-            operation,
-            mode,
-            update,
-            geometryTypeInitial,
-            confirmMsg,
-            confirm,
-        } = store;
+    const {
+        operation,
+        mode,
+        update,
+        geometryTypeInitial,
+        confirmMsg,
+        confirm,
+    } = store;
 
-        const modeOpts = useMemo(() => {
-            const result: Option<Mode>[] = [];
-            const add = (value: Mode, label: string) =>
-                result.push({ label, value });
-            if (operation === "create") {
-                add("file", gettext("Load features from file"));
-                add("empty", gettext("Create empty layer"));
-            } else {
-                add("keep", gettext("Keep existing layer features"));
-                add("gtype", gettext("Change geometry type"));
-                add("file", gettext("Replace layer features from file"));
-                add("delete", gettext("Delete all features from layer"));
+    const modeOpts = useMemo(() => {
+        const result: Option<Mode>[] = [];
+        const add = (value: Mode, label: string) =>
+            result.push({ label, value });
+        if (operation === "create") {
+            add("file", gettext("Load features from file"));
+            add("empty", gettext("Create empty layer"));
+        } else {
+            add("keep", gettext("Keep existing layer features"));
+            add("gtype", gettext("Change geometry type"));
+            add("file", gettext("Replace layer features from file"));
+            add("delete", gettext("Delete all features from layer"));
+        }
+
+        return result;
+    }, [operation]);
+
+    const gtypeOpts = useMemo(() => {
+        const result: Option<FeaureLayerGeometryType>[] = [];
+        const gti = geometryTypeInitial;
+        const btype =
+            mode === "gtype"
+                ? gti && gti.replace(/^(?:MULTI)?(.*?)Z?$/, "$1")
+                : undefined;
+        const add = (value: FeaureLayerGeometryType, label: string) => {
+            if (btype) {
+                if (!value.includes(btype)) return;
+                if (value === gti) label += " (" + gettext("current") + ")";
             }
+            result.push({ label, value });
+        };
+        add("POINT", gettext("Point"));
+        add("LINESTRING", gettext("Line"));
+        add("POLYGON", gettext("Polygon"));
+        add("MULTIPOINT", gettext("Multipoint"));
+        add("MULTILINESTRING", gettext("Multiline"));
+        add("MULTIPOLYGON", gettext("Multipolygon"));
+        add("POINTZ", gettext("Point Z"));
+        add("LINESTRINGZ", gettext("Line Z"));
+        add("POLYGONZ", gettext("Polygon Z"));
+        add("MULTIPOINTZ", gettext("Multipoint Z"));
+        add("MULTILINESTRINGZ", gettext("Multiline Z"));
+        add("MULTIPOLYGONZ", gettext("Multipolygon Z"));
+        update({ geometryType: gti ? gti : result[0].value });
+        return result;
+    }, [mode, update, geometryTypeInitial]);
 
-            return result;
-        }, [operation]);
+    const inspectUpload = useCallback(
+        async (value: FileMeta[], { signal }: { signal: AbortSignal }) => {
+            const fileMeta: FileMeta | undefined = value
+                ? Array.isArray(value)
+                    ? value[0]
+                    : value
+                : undefined;
 
-        const gtypeOpts = useMemo(() => {
-            const result: Option<FeaureLayerGeometryType>[] = [];
-            const gti = geometryTypeInitial;
-            const btype =
-                mode === "gtype"
-                    ? gti && gti.replace(/^(?:MULTI)?(.*?)Z?$/, "$1")
-                    : undefined;
-            const add = (value: FeaureLayerGeometryType, label: string) => {
-                if (btype) {
-                    if (!value.includes(btype)) return;
-                    if (value === gti) label += " (" + gettext("current") + ")";
+            setLayerOpts(undefined);
+            update({ sourceLayer: null });
+            if (!fileMeta) return;
+
+            try {
+                const dset = await route("vector_layer.inspect").post({
+                    json: { id: fileMeta.id },
+                    signal,
+                });
+
+                setLayerOpts(dset.layers.map((i) => ({ value: i, label: i })));
+                update({ sourceLayer: dset.layers[0] });
+            } catch (err) {
+                if (!isAbortError(err)) {
+                    errorModal(err);
                 }
-                result.push({ label, value });
-            };
-            add("POINT", gettext("Point"));
-            add("LINESTRING", gettext("Line"));
-            add("POLYGON", gettext("Polygon"));
-            add("MULTIPOINT", gettext("Multipoint"));
-            add("MULTILINESTRING", gettext("Multiline"));
-            add("MULTIPOLYGON", gettext("Multipolygon"));
-            add("POINTZ", gettext("Point Z"));
-            add("LINESTRINGZ", gettext("Line Z"));
-            add("POLYGONZ", gettext("Polygon Z"));
-            add("MULTIPOINTZ", gettext("Multipoint Z"));
-            add("MULTILINESTRINGZ", gettext("Multiline Z"));
-            add("MULTIPOLYGONZ", gettext("Multipolygon Z"));
-            update({ geometryType: gti ? gti : result[0].value });
-            return result;
-        }, [mode, update, geometryTypeInitial]);
+                update({ source: null });
+                throw err;
+            }
+        },
+        [update]
+    );
 
-        const inspectUpload = useCallback(
-            async (value: FileMeta[], { signal }: { signal: AbortSignal }) => {
-                const fileMeta: FileMeta | undefined = value
+    const bval = useCallback(
+        (attr: keyof typeof store): SelectProps => ({
+            value: store[attr],
+            onChange: (v) => {
+                update({ [attr]: v });
+            },
+        }),
+        [store, update]
+    );
+
+    const onFileChange = useCallback(
+        (value?: UploaderMeta) =>
+            update({
+                source: value
                     ? Array.isArray(value)
                         ? value[0]
                         : value
-                    : undefined;
-
-                setLayerOpts(undefined);
-                update({ sourceLayer: null });
-                if (!fileMeta) return;
-
-                try {
-                    const dset = await route("vector_layer.inspect").post({
-                        json: { id: fileMeta.id },
-                        signal,
-                    });
-
-                    setLayerOpts(
-                        dset.layers.map((i) => ({ value: i, label: i }))
-                    );
-                    update({ sourceLayer: dset.layers[0] });
-                } catch (err) {
-                    if (!isAbortError(err)) {
-                        errorModal(err);
-                    }
-                    update({ source: null });
-                    throw err;
-                }
-            },
-            [update]
-        );
-
-        const bval = useCallback(
-            (attr: keyof typeof store): SelectProps => ({
-                value: store[attr],
-                onChange: (v) => {
-                    update({ [attr]: v });
-                },
+                    : null,
             }),
-            [store, update]
-        );
+        [update]
+    );
 
-        const onFileChange = useCallback(
-            (value?: UploaderMeta) =>
-                update({
-                    source: value
-                        ? Array.isArray(value)
-                            ? value[0]
-                            : value
-                        : null,
-                }),
-            [update]
-        );
+    const onUploading = useCallback(
+        (value: boolean) => {
+            store.update({ uploading: value });
+        },
+        [store]
+    );
 
-        const onUploading = useCallback(
-            (value: boolean) => {
-                store.update({ uploading: value });
-            },
-            [store]
-        );
-
-        return (
-            <div className="ngw-vector-layer-resource-widget">
-                <Select className="mode" options={modeOpts} {...bval("mode")} />
-                {mode === "file" && (
-                    <>
-                        <FileUploader
-                            fileMeta={store.source ?? undefined}
-                            onChange={onFileChange}
-                            onUploading={onUploading}
-                            afterUpload={[
-                                {
-                                    message: msgInspect,
-                                    loader: inspectUpload,
-                                },
-                            ]}
-                            showMaxSize
-                            {...uploaderMessages}
-                        />
-
-                        {layerOpts && layerOpts.length > 1 && (
-                            <>
-                                <label>{gettext("Source layer")}</label>
-                                <Select
-                                    disabled={layerOpts?.length === 1}
-                                    className="row"
-                                    options={layerOpts}
-                                    {...bval("sourceLayer")}
-                                />
-                            </>
-                        )}
-                    </>
-                )}
-                {["empty", "gtype"].includes(mode || "") && (
-                    <>
-                        <label>{gettext("Geometry type")}</label>
-                        <Select
-                            className="row"
-                            options={gtypeOpts}
-                            {...bval("geometryType")}
-                        />
-                    </>
-                )}
-                {confirmMsg && (
-                    <Checkbox
-                        checked={confirm}
-                        onChange={({ target: { checked } }) => {
-                            update({ confirm: checked });
-                        }}
-                    >
-                        {confirmMsg}
-                    </Checkbox>
-                )}
-                {mode === "file" && (
-                    <Collapse
-                        size="small"
-                        items={[
+    return (
+        <div className="ngw-vector-layer-resource-widget">
+            <Select className="mode" options={modeOpts} {...bval("mode")} />
+            {mode === "file" && (
+                <>
+                    <FileUploader
+                        fileMeta={store.source ?? undefined}
+                        onChange={onFileChange}
+                        onUploading={onUploading}
+                        afterUpload={[
                             {
-                                key: "default",
-                                label: gettext("Advanced options"),
-                                children: <SourceOptions store={store} />,
+                                message: msgInspect,
+                                loader: inspectUpload,
                             },
                         ]}
+                        showMaxSize
+                        {...uploaderMessages}
                     />
-                )}
-            </div>
-        );
-    }
-);
+
+                    {layerOpts && layerOpts.length > 1 && (
+                        <>
+                            <label>{gettext("Source layer")}</label>
+                            <Select
+                                disabled={layerOpts?.length === 1}
+                                className="row"
+                                options={layerOpts}
+                                {...bval("sourceLayer")}
+                            />
+                        </>
+                    )}
+                </>
+            )}
+            {["empty", "gtype"].includes(mode || "") && (
+                <>
+                    <label>{gettext("Geometry type")}</label>
+                    <Select
+                        className="row"
+                        options={gtypeOpts}
+                        {...bval("geometryType")}
+                    />
+                </>
+            )}
+            {confirmMsg && (
+                <Checkbox
+                    checked={confirm}
+                    onChange={({ target: { checked } }) => {
+                        update({ confirm: checked });
+                    }}
+                >
+                    {confirmMsg}
+                </Checkbox>
+            )}
+            {mode === "file" && (
+                <Collapse
+                    size="small"
+                    items={[
+                        {
+                            key: "default",
+                            label: gettext("Advanced options"),
+                            children: <SourceOptions store={store} />,
+                        },
+                    ]}
+                />
+            )}
+        </div>
+    );
+});
 
 Widget.displayName = "Widget";
 Widget.title = gettext("Vector layer");

@@ -1,5 +1,6 @@
 import { makeAutoObservable, toJS } from "mobx";
 
+import type { NullableProps } from "@nextgisweb/gui/type";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { resources, scopes } from "@nextgisweb/resource/blueprint";
 import type {
@@ -32,7 +33,7 @@ export class PermissionStoreItem {
     readonly store: PermissionsStore;
     readonly key: number;
 
-    constructor(store: PermissionsStore, data?: Nullable<ACLRule>) {
+    constructor(store: PermissionsStore, data?: NullableProps<ACLRule>) {
         makeAutoObservable(this, {});
         this.store = store;
         this.key = ++keySeq;

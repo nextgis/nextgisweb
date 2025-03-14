@@ -6,7 +6,7 @@ import type { CompositeStore } from "@nextgisweb/resource/composite/CompositeSto
 import type {
     EditorStore,
     EditorStoreOptions,
-} from "@nextgisweb/resource/type/EditorStore";
+} from "@nextgisweb/resource/type";
 
 import { Basemap } from "./Basemap";
 

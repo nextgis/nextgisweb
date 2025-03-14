@@ -11,7 +11,7 @@ import { resources, scopes } from "@nextgisweb/resource/blueprint";
 import type { ResourceCls } from "@nextgisweb/resource/type/api";
 
 import { AllowIcon, DenyIcon, ResourceIcon } from "../icon";
-import type { EditorWidgetComponent, EditorWidgetProps } from "../type";
+import type { EditorWidget } from "../type";
 
 import type { PermissionStoreItem as Item } from "./PermissionStoreItem";
 import type { PermissionsStore } from "./PermissionsStore";
@@ -220,11 +220,11 @@ const columns = [
     { key: "permission", title: msgColPermission, width: "50%", component: Permission },
 ];
 
-export const PermissionsWidget: EditorWidgetComponent<
-    EditorWidgetProps<PermissionsStore>
-> = observer(({ store }) => {
-    return <EdiTable store={store} columns={columns} parentHeight />;
-});
+export const PermissionsWidget: EditorWidget<PermissionsStore> = observer(
+    ({ store }) => {
+        return <EdiTable store={store} columns={columns} parentHeight />;
+    }
+);
 
 PermissionsWidget.displayName = "PermissionsWidget";
 PermissionsWidget.title = gettext("Permissions");

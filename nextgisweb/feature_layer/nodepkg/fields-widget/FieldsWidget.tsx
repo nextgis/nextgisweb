@@ -7,10 +7,7 @@ import { FocusTable, Toggle, action } from "@nextgisweb/gui/focus-table";
 import { Area } from "@nextgisweb/gui/mayout";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { ResourceSelectRef } from "@nextgisweb/resource/component";
-import type {
-    EditorWidgetComponent,
-    EditorWidgetProps,
-} from "@nextgisweb/resource/type";
+import type { EditorWidget } from "@nextgisweb/resource/type";
 
 import { DatatypeSelect } from "./DatatypeSelect";
 import { Field } from "./FieldsStore";
@@ -93,9 +90,7 @@ const FieldWidget = observer<{
     );
 });
 
-export const FieldsWidget: EditorWidgetComponent<
-    EditorWidgetProps<FieldsStore>
-> = observer(({ store }: EditorWidgetProps<FieldsStore>) => {
+export const FieldsWidget: EditorWidget<FieldsStore> = observer(({ store }) => {
     const createField = useCallback(() => {
         let seqnum = 0;
         let suffix = "";

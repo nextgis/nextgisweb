@@ -2,6 +2,7 @@ import { isEqual } from "lodash-es";
 import { action, computed, observable, runInAction } from "mobx";
 
 import { mapper } from "@nextgisweb/gui/arm";
+import type { NullableProps } from "@nextgisweb/gui/type";
 import type { EditorStore } from "@nextgisweb/resource/type";
 import type { ConnectionCreate } from "@nextgisweb/wmsclient/type/api";
 
@@ -9,7 +10,7 @@ type MapperConnectionCreate = Omit<
     ConnectionCreate,
     "url" | "username" | "password"
 > &
-    Nullable<Pick<ConnectionCreate, "url" | "username" | "password">>;
+    NullableProps<Pick<ConnectionCreate, "url" | "username" | "password">>;
 
 const {
     url,

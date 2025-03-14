@@ -2,14 +2,13 @@ import { action } from "mobx";
 
 import { EditorStore as KeyValueEditorStore } from "@nextgisweb/gui/edi-table/store/EditorStore";
 import { RecordItem } from "@nextgisweb/gui/edi-table/store/RecordItem";
+import type { LookupTableRead } from "@nextgisweb/lookup-table/type/api";
 
-import type { LookupTableResource } from "../type/LookupTableResource";
-
-export class EditorStore extends KeyValueEditorStore<LookupTableResource> {
+export class EditorStore extends KeyValueEditorStore<LookupTableRead> {
     identity = "lookup_table";
 
     @action
-    load(value: LookupTableResource) {
+    load(value: LookupTableRead) {
         if (value) {
             this.items = Object.entries(value.items).map(
                 ([key, value]) => new RecordItem(this, { key, value })
@@ -23,7 +22,7 @@ export class EditorStore extends KeyValueEditorStore<LookupTableResource> {
         this.items = [];
     };
 
-    dump(): LookupTableResource | undefined {
+    dump(): LookupTableRead | undefined {
         if (!this.dirty) return undefined;
 
         const items = Object.fromEntries(

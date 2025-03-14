@@ -4,11 +4,11 @@ import { makeObservable, observable, observe, runInAction } from "mobx";
 import { mapper, validate } from "@nextgisweb/gui/arm";
 import type { ErrorResult } from "@nextgisweb/gui/arm";
 import type { FocusTableStore } from "@nextgisweb/gui/focus-table";
-import type { Composite } from "@nextgisweb/resource/type";
+import type { CompositeStore } from "@nextgisweb/resource/composite";
 import type {
     EditorStore,
     EditorStoreOptions,
-} from "@nextgisweb/resource/type/EditorStore";
+} from "@nextgisweb/resource/type";
 import type { ResourceRef } from "@nextgisweb/resource/type/api";
 
 interface FieldData {
@@ -108,7 +108,7 @@ export interface Value {
 export class FieldsStore implements EditorStore<Value>, FocusTableStore<Field> {
     readonly identity = "feature_layer";
 
-    readonly composite: Composite;
+    readonly composite: CompositeStore;
 
     dirty = false;
     validate = false;

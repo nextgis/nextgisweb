@@ -10,10 +10,7 @@ import { route } from "@nextgisweb/pyramid/api";
 import { useCache } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { ResourceSelectRef } from "@nextgisweb/resource/component";
-import type {
-    EditorWidgetComponent,
-    EditorWidgetProps,
-} from "@nextgisweb/resource/type";
+import type { EditorWidget } from "@nextgisweb/resource/type";
 
 import type { LayerStore } from "./LayerStore";
 
@@ -86,143 +83,142 @@ const fieldsOptions = [
     { value: "update", label: gettext("Update definitions from the database") },
 ];
 
-export const LayerWidget: EditorWidgetComponent<EditorWidgetProps<LayerStore>> =
-    observer(({ store }: EditorWidgetProps<LayerStore>) => {
-        const [focusedField, setFocusedField] = useState<FocusedField>(null);
+export const LayerWidget: EditorWidget<LayerStore> = observer(({ store }) => {
+    const [focusedField, setFocusedField] = useState<FocusedField>(null);
 
-        const inspCon = useCache(inspConFetch);
-        const inspTab = useCache(inspTabFetch);
+    const inspCon = useCache(inspConFetch);
+    const inspTab = useCache(inspTabFetch);
 
-        const conId = store.connection.value?.id;
-        const schema = store.schema.value;
-        const table = store.table.value;
+    const conId = store.connection.value?.id;
+    const schema = store.schema.value;
+    const table = store.table.value;
 
-        let conInfo: OrSkipped<typeof inspCon> = SKIPPED;
-        if (conId) {
-            // Do not inspect connection util schema or table focused
-            const cachedOnly = !conFields.includes(focusedField!);
-            conInfo = inspCon([conId], { cachedOnly });
-        }
+    let conInfo: OrSkipped<typeof inspCon> = SKIPPED;
+    if (conId) {
+        // Do not inspect connection util schema or table focused
+        const cachedOnly = !conFields.includes(focusedField!);
+        conInfo = inspCon([conId], { cachedOnly });
+    }
 
-        let tabInfo: OrSkipped<typeof inspTab> = SKIPPED;
-        if (conId && schema && table) {
-            // Do not inspect table util id or geom column focused
-            const cachedOnly = !tabFields.includes(focusedField!);
-            tabInfo = inspTab([conId, schema, table], { cachedOnly });
-        }
+    let tabInfo: OrSkipped<typeof inspTab> = SKIPPED;
+    if (conId && schema && table) {
+        // Do not inspect table util id or geom column focused
+        const cachedOnly = !tabFields.includes(focusedField!);
+        tabInfo = inspTab([conId, schema, table], { cachedOnly });
+    }
 
-        const schemaOpts = useMemo(() => {
-            if (conInfo?.status !== "ready") return undefined;
-            const schemas = uniq(conInfo.data.map((i) => i.schema));
-            return schemas.map((i) => ({ label: i, value: i }));
-        }, [conInfo]);
+    const schemaOpts = useMemo(() => {
+        if (conInfo?.status !== "ready") return undefined;
+        const schemas = uniq(conInfo.data.map((i) => i.schema));
+        return schemas.map((i) => ({ label: i, value: i }));
+    }, [conInfo]);
 
-        const tableOpts = useMemo(() => {
-            if (conInfo?.status !== "ready") return undefined;
-            const tables = conInfo.data
-                .filter((i) => i.schema === schema)
-                .map((i) => i.table);
-            return tables.map((i) => ({ label: i, value: i }));
-        }, [schema, conInfo]);
+    const tableOpts = useMemo(() => {
+        if (conInfo?.status !== "ready") return undefined;
+        const tables = conInfo.data
+            .filter((i) => i.schema === schema)
+            .map((i) => i.table);
+        return tables.map((i) => ({ label: i, value: i }));
+    }, [schema, conInfo]);
 
-        const columnIdOpts = useMemo(() => {
-            if (tabInfo?.status !== "ready") return undefined;
-            return tabInfo.data.id.map((n) => ({ value: n, label: n }));
-        }, [tabInfo]);
+    const columnIdOpts = useMemo(() => {
+        if (tabInfo?.status !== "ready") return undefined;
+        return tabInfo.data.id.map((n) => ({ value: n, label: n }));
+    }, [tabInfo]);
 
-        const columnGeomOpts = useMemo(() => {
-            if (tabInfo?.status !== "ready") return undefined;
-            return tabInfo.data.geom.map((n) => ({ value: n, label: n }));
-        }, [tabInfo]);
+    const columnGeomOpts = useMemo(() => {
+        if (tabInfo?.status !== "ready") return undefined;
+        return tabInfo.data.geom.map((n) => ({ value: n, label: n }));
+    }, [tabInfo]);
 
-        const acProps = useCallback(
-            (
-                field: NonNullable<FocusedField>,
-                { status }: { status: unknown | "skipped" },
-                options: { label: string; value: string }[] | undefined
-            ) => ({
-                onFocus: () => setFocusedField(field),
-                onBlur: () => setFocusedField(null),
-                loading: status === "loading" && focusedField === field,
-                style: { width: "100%" },
-                options,
-            }),
-            [focusedField]
-        );
+    const acProps = useCallback(
+        (
+            field: NonNullable<FocusedField>,
+            { status }: { status: unknown | "skipped" },
+            options: { label: string; value: string }[] | undefined
+        ) => ({
+            onFocus: () => setFocusedField(field),
+            onBlur: () => setFocusedField(null),
+            loading: status === "loading" && focusedField === field,
+            style: { width: "100%" },
+            options,
+        }),
+        [focusedField]
+    );
 
-        return (
-            <Area pad cols={["1fr", "1fr"]}>
-                <LotMV
-                    row
-                    label={msgConnection}
-                    value={store.connection}
-                    component={ResourceSelectRef}
-                    props={{
-                        pickerOptions: {
-                            requireClass: "postgis_connection",
-                            initParentId: store.composite.parent,
-                        },
-                        style: { width: "100%" },
-                    }}
-                />
-                <LotMV
-                    label={msgSchema}
-                    value={store.schema}
-                    component={AutoCompleteInput}
-                    props={acProps("schema", conInfo, schemaOpts)}
-                />
-                <LotMV
-                    label={msgTable}
-                    value={store.table}
-                    component={AutoCompleteInput}
-                    props={acProps("table", conInfo, tableOpts)}
-                />
-                <LotMV
-                    label={msgColumnId}
-                    value={store.columnId}
-                    component={AutoCompleteInput}
-                    props={acProps("columnId", tabInfo, columnIdOpts)}
-                />
-                <LotMV
-                    label={msgColumnGeom}
-                    value={store.columnGeom}
-                    component={AutoCompleteInput}
-                    props={acProps("columnGeom", tabInfo, columnGeomOpts)}
-                />
-                <LotMV
-                    label={msgGeometryType}
-                    value={store.geometryType}
-                    component={Select}
-                    props={{
-                        options: geometryTypeOptions,
-                        allowClear: true,
-                        placeholder: msgAutodetect,
-                        style: { width: "100%" },
-                    }}
-                />
-                <LotMV
-                    label={msgSrid}
-                    value={store.geometrySrid}
-                    component={InputNumber}
-                    props={{
-                        ...{ min: 1, max: 998999, controls: false },
-                        placeholder: msgAutodetect,
-                        style: { width: "100%" },
-                    }}
-                />
-                <LotMV
-                    row
-                    label={msgFields}
-                    value={store.fields}
-                    component={Select}
-                    props={{
-                        options: fieldsOptions,
-                        style: { width: "100%" },
-                    }}
-                />
-            </Area>
-        );
-    });
+    return (
+        <Area pad cols={["1fr", "1fr"]}>
+            <LotMV
+                row
+                label={msgConnection}
+                value={store.connection}
+                component={ResourceSelectRef}
+                props={{
+                    pickerOptions: {
+                        requireClass: "postgis_connection",
+                        initParentId: store.composite.parent,
+                    },
+                    style: { width: "100%" },
+                }}
+            />
+            <LotMV
+                label={msgSchema}
+                value={store.schema}
+                component={AutoCompleteInput}
+                props={acProps("schema", conInfo, schemaOpts)}
+            />
+            <LotMV
+                label={msgTable}
+                value={store.table}
+                component={AutoCompleteInput}
+                props={acProps("table", conInfo, tableOpts)}
+            />
+            <LotMV
+                label={msgColumnId}
+                value={store.columnId}
+                component={AutoCompleteInput}
+                props={acProps("columnId", tabInfo, columnIdOpts)}
+            />
+            <LotMV
+                label={msgColumnGeom}
+                value={store.columnGeom}
+                component={AutoCompleteInput}
+                props={acProps("columnGeom", tabInfo, columnGeomOpts)}
+            />
+            <LotMV
+                label={msgGeometryType}
+                value={store.geometryType}
+                component={Select}
+                props={{
+                    options: geometryTypeOptions,
+                    allowClear: true,
+                    placeholder: msgAutodetect,
+                    style: { width: "100%" },
+                }}
+            />
+            <LotMV
+                label={msgSrid}
+                value={store.geometrySrid}
+                component={InputNumber}
+                props={{
+                    ...{ min: 1, max: 998999, controls: false },
+                    placeholder: msgAutodetect,
+                    style: { width: "100%" },
+                }}
+            />
+            <LotMV
+                row
+                label={msgFields}
+                value={store.fields}
+                component={Select}
+                props={{
+                    options: fieldsOptions,
+                    style: { width: "100%" },
+                }}
+            />
+        </Area>
+    );
+});
 
 LayerWidget.displayName = "LayerWidget";
 LayerWidget.title = gettext("PostGIS layer");

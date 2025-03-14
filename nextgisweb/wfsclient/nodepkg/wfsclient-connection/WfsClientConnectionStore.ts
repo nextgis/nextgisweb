@@ -1,6 +1,7 @@
 import { action, computed, observable, runInAction } from "mobx";
 
 import { mapper } from "@nextgisweb/gui/arm";
+import type { NullableProps } from "@nextgisweb/gui/type";
 import type {
     EditorStore,
     EditorStoreOptions,
@@ -11,7 +12,7 @@ import type {
     WFSConnectionUpdate,
 } from "@nextgisweb/wfsclient/type/api";
 
-type MapperConnection = NullableOmit<
+type MapperConnection = NullableProps<
     WFSConnectionRead,
     "path" | "username" | "password"
 >;

@@ -25,24 +25,19 @@ import type {
     ResourceWidget,
 } from "@nextgisweb/resource/type/api";
 
-import type {
-    EditorStore,
-    EditorStoreOptions,
-    EditorWidgetComponent,
-    EditorWidgetProps,
-} from "../type";
+import type { EditorStore, EditorStoreOptions, EditorWidget } from "../type";
 
 import type { CompositeWidgetProps } from "./CompositeWidget";
 
 interface WidgetEntrypoint<S extends EditorStore = EditorStore> {
     store: new (args: EditorStoreOptions) => S;
-    widget: EditorWidgetComponent<EditorWidgetProps<S>>;
+    widget: EditorWidget<S>;
 }
 
 export interface WidgetMember<S extends EditorStore = EditorStore> {
     key: string;
     store: S;
-    widget: EditorWidgetComponent<EditorWidgetProps<S>>;
+    widget: EditorWidget<S>;
 }
 
 export class CompositeStore {

@@ -10,10 +10,7 @@ import { Area } from "@nextgisweb/gui/mayout";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { ResourceSelect } from "@nextgisweb/resource/component";
 import { useFocusTablePicker } from "@nextgisweb/resource/component/resource-picker";
-import type {
-    EditorWidgetComponent,
-    EditorWidgetProps,
-} from "@nextgisweb/resource/type";
+import type { EditorWidget } from "@nextgisweb/resource/type";
 
 import { Basemap } from "./Basemap";
 import type { WebMapStore } from "./WebMapStore";
@@ -56,9 +53,7 @@ const BasemapWidget = observer<{
 
 BasemapWidget.displayName = "BasemapWidget";
 
-export const WebMapWidget: EditorWidgetComponent<
-    EditorWidgetProps<WebMapStore>
-> = observer(({ store }: EditorWidgetProps<WebMapStore>) => {
+export const WebMapWidget: EditorWidget<WebMapStore> = observer(({ store }) => {
     const { pickToFocusTable } = useFocusTablePicker({
         initParentId: store.composite.parent || undefined,
     });

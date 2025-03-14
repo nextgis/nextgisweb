@@ -6,7 +6,7 @@ import type {
     EditorStore,
     EditorStoreOptions,
 } from "@nextgisweb/resource/type";
-import type { Composite } from "@nextgisweb/resource/type/Composite";
+import type { CompositeStore } from "@nextgisweb/resource/composite";
 import type { ResourceRef } from "@nextgisweb/resource/type/api";
 import type {
     ExtentWSEN,
@@ -48,7 +48,7 @@ export class SettingStore
     implements EditorStore<WebMapRead, WithoutItems<WebMapUpdate>>
 {
     readonly identity = "webmap";
-    readonly composite: Composite;
+    readonly composite: CompositeStore;
 
     @observable accessor editable = false;
     @observable accessor annotationEnabled = false;

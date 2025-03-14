@@ -9,10 +9,7 @@ import { Area } from "@nextgisweb/gui/mayout";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { ResourceSelect } from "@nextgisweb/resource/component";
 import { useFocusTablePicker } from "@nextgisweb/resource/component/resource-picker";
-import type {
-    EditorWidgetComponent,
-    EditorWidgetProps,
-} from "@nextgisweb/resource/type";
+import type { EditorWidget } from "@nextgisweb/resource/type";
 import { generateResourceKeyname } from "@nextgisweb/resource/util/generateResourceKeyname";
 
 import { Layer } from "./Layer";
@@ -59,55 +56,55 @@ const LayerWidget = observer<{
     );
 });
 
-export const ServiceWidget: EditorWidgetComponent<
-    EditorWidgetProps<ServiceStore>
-> = observer(({ store }: EditorWidgetProps<ServiceStore>) => {
-    const { pickToFocusTable } = useFocusTablePicker({
-        initParentId: store.composite.parent || undefined,
-    });
+export const ServiceWidget: EditorWidget<ServiceStore> = observer(
+    ({ store }) => {
+        const { pickToFocusTable } = useFocusTablePicker({
+            initParentId: store.composite.parent || undefined,
+        });
 
-    const { tableActions, itemActions } = useMemo<
-        FocusTablePropsActions<Layer>
-    >(
-        () => ({
-            tableActions: [
-                pickToFocusTable(
-                    (res) =>
-                        new Layer(store, {
-                            resource_id: res.resource.id,
-                            display_name: res.resource.display_name,
-                            keyname: generateResourceKeyname(res.resource),
-                            maxfeatures: 1000,
-                        }),
+        const { tableActions, itemActions } = useMemo<
+            FocusTablePropsActions<Layer>
+        >(
+            () => ({
+                tableActions: [
+                    pickToFocusTable(
+                        (res) =>
+                            new Layer(store, {
+                                resource_id: res.resource.id,
+                                display_name: res.resource.display_name,
+                                keyname: generateResourceKeyname(res.resource),
+                                maxfeatures: 1000,
+                            }),
+                        {
+                            pickerOptions: {
+                                requireInterface: "IFeatureLayer",
+                                multiple: true,
+                            },
+                        }
+                    ),
+                ],
+                itemActions: [action.deleteItem()],
+            }),
+            [pickToFocusTable, store]
+        );
+
+        return (
+            <FocusTable<Layer>
+                store={store}
+                title={(item) => item.displayName.value}
+                columns={[
                     {
-                        pickerOptions: {
-                            requireInterface: "IFeatureLayer",
-                            multiple: true,
-                        },
-                    }
-                ),
-            ],
-            itemActions: [action.deleteItem()],
-        }),
-        [pickToFocusTable, store]
-    );
-
-    return (
-        <FocusTable<Layer>
-            store={store}
-            title={(item) => item.displayName.value}
-            columns={[
-                {
-                    render: (l: Layer) => l.keyname.value,
-                    width: ["25%", "50%"],
-                },
-            ]}
-            tableActions={tableActions}
-            itemActions={itemActions}
-            renderDetail={({ item }) => <LayerWidget item={item} />}
-        />
-    );
-});
+                        render: (l: Layer) => l.keyname.value,
+                        width: ["25%", "50%"],
+                    },
+                ]}
+                tableActions={tableActions}
+                itemActions={itemActions}
+                renderDetail={({ item }) => <LayerWidget item={item} />}
+            />
+        );
+    }
+);
 
 ServiceWidget.displayName = "ServiceWidget";
 ServiceWidget.title = gettext("WFS service");

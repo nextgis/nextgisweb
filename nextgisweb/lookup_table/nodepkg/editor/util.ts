@@ -2,8 +2,7 @@ import Papa from "papaparse";
 
 import type { RecordOption } from "@nextgisweb/gui/edi-table/store/RecordItem";
 import { downloadCsv } from "@nextgisweb/gui/util";
-
-import type { LookupTableResource } from "../type/LookupTableResource";
+import type { LookupTableRead } from "@nextgisweb/lookup-table/type/api";
 
 export function exportToCsv(items: RecordOption[]) {
     const serializedItems = items.map((item) => {
@@ -41,8 +40,8 @@ export function dataToRecords(data: string[][]): RecordOption[] {
 
 export function recordsToLookup(
     items: RecordOption[]
-): LookupTableResource["items"] {
-    const result: LookupTableResource["items"] = {};
+): LookupTableRead["items"] {
+    const result: LookupTableRead["items"] = {};
     items.forEach(({ key, value }) => {
         if (key) {
             result[key] = String(value);

@@ -2,7 +2,7 @@ import { action, computed, observable, runInAction } from "mobx";
 
 import { mapper } from "@nextgisweb/gui/arm";
 import type * as apitype from "@nextgisweb/render/type/api";
-import type { EditorStore } from "@nextgisweb/resource/type/EditorStore";
+import type { EditorStore } from "@nextgisweb/resource/type";
 
 type Value = apitype.TileCacheUpdate;
 

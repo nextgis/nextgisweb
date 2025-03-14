@@ -4,10 +4,7 @@ import { useCallback } from "react";
 import { CheckboxValue, Modal, Tooltip } from "@nextgisweb/gui/antd";
 import { Area, Lot } from "@nextgisweb/gui/mayout";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import type {
-    EditorWidgetComponent,
-    EditorWidgetProps,
-} from "@nextgisweb/resource/type";
+import type { EditorWidget } from "@nextgisweb/resource/type";
 
 import type { SettingStore } from "./SettingStore";
 
@@ -25,41 +22,41 @@ const versioningExperimental = (
     </Tooltip>
 );
 
-export const SettingsWidget: EditorWidgetComponent<
-    EditorWidgetProps<SettingStore>
-> = observer(({ store }: { store: SettingStore }) => {
-    const [modal, modalContextHolder] = Modal.useModal();
+export const SettingsWidget: EditorWidget<SettingStore> = observer(
+    ({ store }) => {
+        const [modal, modalContextHolder] = Modal.useModal();
 
-    const versioningEnabledOnChange = useCallback(
-        (v: boolean) => {
-            const onOk = () => store.update({ versioningEnabled: v });
-            if (v || !store.versioningExisting) return onOk();
+        const versioningEnabledOnChange = useCallback(
+            (v: boolean) => {
+                const onOk = () => store.update({ versioningEnabled: v });
+                if (v || !store.versioningExisting) return onOk();
 
-            // prettier-ignore
-            const [title, content] = [
+                // prettier-ignore
+                const [title, content] = [
                 gettext("Disable feature versioning?"),
                 gettext("Turning off feature versioning will truncate the history and keep only the latest state.")
             ]
 
-            modal.confirm({ title, content, onOk });
-        },
-        [modal, store]
-    );
+                modal.confirm({ title, content, onOk });
+            },
+            [modal, store]
+        );
 
-    return (
-        <Area pad>
-            {modalContextHolder}
-            <Lot label={false}>
-                <CheckboxValue
-                    value={store.versioningEnabled}
-                    onChange={versioningEnabledOnChange}
-                >
-                    {msgVersioningEnabled} {versioningExperimental}
-                </CheckboxValue>
-            </Lot>
-        </Area>
-    );
-});
+        return (
+            <Area pad>
+                {modalContextHolder}
+                <Lot label={false}>
+                    <CheckboxValue
+                        value={store.versioningEnabled}
+                        onChange={versioningEnabledOnChange}
+                    >
+                        {msgVersioningEnabled} {versioningExperimental}
+                    </CheckboxValue>
+                </Lot>
+            </Area>
+        );
+    }
+);
 
 SettingsWidget.displayName = "SettingsWidget";
 SettingsWidget.title = gettext("Settings");

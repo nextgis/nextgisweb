@@ -19,7 +19,7 @@ interface EditorWidgetOptions {
     order?: number;
 }
 
-export type EditorWidgetComponent<P = unknown> = (
+export type EditorWidget<S extends EditorStore, P = EditorWidgetProps<S>> = (
     | FunctionComponent<P>
     | ForwardRefRenderFunction<unknown, P>
 ) &

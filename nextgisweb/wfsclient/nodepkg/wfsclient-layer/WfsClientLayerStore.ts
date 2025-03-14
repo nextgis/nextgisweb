@@ -1,13 +1,14 @@
 import { action, computed, observable, runInAction } from "mobx";
 
 import { mapper, validate } from "@nextgisweb/gui/arm";
+import type { NullableProps } from "@nextgisweb/gui/type";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import type { Composite } from "@nextgisweb/resource/type";
+import type { CompositeStore } from "@nextgisweb/resource/composite";
 import type {
     EditorStore,
     EditorStoreOptions,
     Operation,
-} from "@nextgisweb/resource/type/EditorStore";
+} from "@nextgisweb/resource/type";
 import srsSettings from "@nextgisweb/spatial-ref-sys/client-settings";
 import type {
     WFSLayerCreate,
@@ -15,7 +16,7 @@ import type {
     WFSLayerUpdate,
 } from "@nextgisweb/wfsclient/type/api";
 
-type MapperConnectionCreate = NullableOmit<
+type MapperConnectionCreate = NullableProps<
     WFSLayerCreate,
     "connection" | "column_geom" | "layer_name"
 >;
@@ -59,7 +60,7 @@ export class WfsClientLayerStore
 {
     readonly identity = "wfsclient_layer";
     readonly operation: Operation;
-    readonly composite: Composite;
+    readonly composite: CompositeStore;
 
     @observable accessor validate = false;
 

@@ -5,8 +5,8 @@ import { mapper } from "@nextgisweb/gui/arm";
 import type { ErrorResult } from "@nextgisweb/gui/arm";
 import { observableChildren } from "@nextgisweb/gui/focus-table";
 import type { FocusTableStore } from "@nextgisweb/gui/focus-table";
+import type { CompositeStore } from "@nextgisweb/resource/composite";
 import type {
-    Composite,
     EditorStore,
     EditorStoreOptions,
 } from "@nextgisweb/resource/type";
@@ -40,7 +40,7 @@ export class ItemsStore
         this.markDirty();
     });
 
-    composite: Composite;
+    composite: CompositeStore;
 
     private _loaded = false;
 

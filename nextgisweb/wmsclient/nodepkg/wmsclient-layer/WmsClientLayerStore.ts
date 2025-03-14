@@ -1,8 +1,9 @@
 import { action, computed, observable, runInAction } from "mobx";
 
 import { mapper } from "@nextgisweb/gui/arm";
+import type { NullableProps } from "@nextgisweb/gui/type";
+import type { CompositeStore } from "@nextgisweb/resource/composite";
 import type {
-    Composite,
     EditorStore,
     EditorStoreOptions,
     Operation,
@@ -14,7 +15,7 @@ import type {
     LayerUpdate,
 } from "@nextgisweb/wmsclient/type/api";
 
-type MapperLayerCreate = NullableOmit<
+type MapperLayerCreate = NullableProps<
     LayerCreate,
     "connection" | "imgformat" | "vendor_params"
 >;
@@ -43,7 +44,7 @@ export class WmsClientLayerStore
     readonly identity = "wmsclient_layer";
 
     readonly operation: Operation;
-    readonly composite: Composite;
+    readonly composite: CompositeStore;
 
     connection = connection.init(null, this);
     wmslayers = wmslayers.init("", this);

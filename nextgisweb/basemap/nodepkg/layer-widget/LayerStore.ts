@@ -7,7 +7,7 @@ import type {
     BasemapLayerUpdate,
 } from "@nextgisweb/basemap/type/api";
 import { mapper } from "@nextgisweb/gui/arm";
-import type { EditorStore } from "@nextgisweb/resource/type/EditorStore";
+import type { EditorStore } from "@nextgisweb/resource/type";
 
 const {
     copyright_text,

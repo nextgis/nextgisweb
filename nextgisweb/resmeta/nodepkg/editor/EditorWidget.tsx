@@ -12,10 +12,7 @@ import type {
     EdiTableColumn,
 } from "@nextgisweb/gui/edi-table/type";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import type {
-    EditorWidgetComponent,
-    EditorWidgetProps,
-} from "@nextgisweb/resource/type";
+import type { EditorWidget as IEditorWidget } from "@nextgisweb/resource/type";
 
 import type { EditorStore } from "./EditorStore";
 
@@ -130,13 +127,18 @@ const columns: EdiTableColumn<RecordItem>[] = [
     },
 ];
 
-export const EditorWidget: EditorWidgetComponent<
-    EditorWidgetProps<EditorStore>
-> = observer(({ store }) => {
-    return (
-        <EdiTable store={store} columns={columns} rowKey="id" parentHeight />
-    );
-});
+export const EditorWidget: IEditorWidget<EditorStore> = observer(
+    ({ store }) => {
+        return (
+            <EdiTable
+                store={store}
+                columns={columns}
+                rowKey="id"
+                parentHeight
+            />
+        );
+    }
+);
 
 EditorWidget.displayName = "EditorWidget";
 EditorWidget.title = gettext("Metadata");

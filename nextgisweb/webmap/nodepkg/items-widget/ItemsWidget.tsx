@@ -13,10 +13,7 @@ import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { ResourceSelect } from "@nextgisweb/resource/component";
 import { useFocusTablePicker } from "@nextgisweb/resource/component/resource-picker/hook/useFocusTablePicker";
-import type {
-    EditorWidgetComponent,
-    EditorWidgetProps,
-} from "@nextgisweb/resource/type";
+import type { EditorWidget } from "@nextgisweb/resource/type";
 import settings from "@nextgisweb/webmap/client-settings";
 
 import { SelectLegendSymbols } from "../component";
@@ -151,97 +148,93 @@ const LayerWidget = observer(({ item }: { item: Layer }) => {
 GroupWidget.displayName = "GroupWidget";
 LayerWidget.displayName = "LayerWidget";
 
-export const ItemsWidget: EditorWidgetComponent<EditorWidgetProps<ItemsStore>> =
-    observer(({ store }: EditorWidgetProps<ItemsStore>) => {
-        const { makeSignal } = useAbortController();
-        const [drawOrderEdit, setDrawOrderEdit] = useState(false);
+export const ItemsWidget: EditorWidget<ItemsStore> = observer(({ store }) => {
+    const { makeSignal } = useAbortController();
+    const [drawOrderEdit, setDrawOrderEdit] = useState(false);
 
-        const { pickToFocusTable } = useFocusTablePicker({
-            initParentId: store.composite.parent || undefined,
-        });
-
-        const drawOrderEnabled = store.drawOrderEnabled.value;
-        const { tableActions, itemActions } = useMemo(
-            () => ({
-                tableActions: [
-                    pickToFocusTable<ItemObject>(
-                        async (res) => {
-                            const resourceId = res.resource.id;
-                            if (
-                                res.resource.cls.endsWith("_style") &&
-                                res.resource.parent
-                            ) {
-                                res = await route(
-                                    "resource.item",
-                                    res.resource.parent?.id
-                                ).get({ signal: makeSignal() });
-                            }
-                            return new Layer(store, {
-                                display_name: res.resource.display_name,
-                                layer_style_id: resourceId,
-                            });
-                        },
-                        {
-                            title: msgLayer,
-                            pickerOptions: {
-                                requireInterface: "IRenderableStyle",
-                                multiple: true,
-                            },
-                        }
-                    ),
-                    action.addItem<ItemObject, Group>(
-                        () =>
-                            new Group(store, {
-                                display_name: gettext(msgGroup),
-                            }),
-                        {
-                            key: "add_group",
-                            title: msgGroup,
-                        }
-                    ),
-                    (
-                        context: ItemObject | null
-                    ): FocusTableAction<ItemObject | null>[] => {
-                        if (context) return [];
-                        return [
-                            {
-                                key: "draw_order",
-                                title: drawOrderEnabled
-                                    ? msgDrawOrderEdit
-                                    : msgDrawOrderCustomize,
-                                icon: <ReorderIcon />,
-                                placement: "left",
-                                callback: () => setDrawOrderEdit(true),
-                            },
-                        ];
-                    },
-                ],
-                itemActions: [action.deleteItem<ItemObject>()],
-            }),
-            [drawOrderEnabled, makeSignal, pickToFocusTable, store]
-        );
-
-        return drawOrderEdit ? (
-            <DrawOrderTable
-                store={store}
-                close={() => setDrawOrderEdit(false)}
-            />
-        ) : (
-            <FocusTable<ItemObject>
-                store={store}
-                title={(item) => item.displayName.value}
-                tableActions={tableActions}
-                itemActions={itemActions}
-                renderDetail={({ item }) =>
-                    item instanceof Group ? (
-                        <GroupWidget item={item} />
-                    ) : (
-                        <LayerWidget item={item} />
-                    )
-                }
-            />
-        );
+    const { pickToFocusTable } = useFocusTablePicker({
+        initParentId: store.composite.parent || undefined,
     });
+
+    const drawOrderEnabled = store.drawOrderEnabled.value;
+    const { tableActions, itemActions } = useMemo(
+        () => ({
+            tableActions: [
+                pickToFocusTable<ItemObject>(
+                    async (res) => {
+                        const resourceId = res.resource.id;
+                        if (
+                            res.resource.cls.endsWith("_style") &&
+                            res.resource.parent
+                        ) {
+                            res = await route(
+                                "resource.item",
+                                res.resource.parent?.id
+                            ).get({ signal: makeSignal() });
+                        }
+                        return new Layer(store, {
+                            display_name: res.resource.display_name,
+                            layer_style_id: resourceId,
+                        });
+                    },
+                    {
+                        title: msgLayer,
+                        pickerOptions: {
+                            requireInterface: "IRenderableStyle",
+                            multiple: true,
+                        },
+                    }
+                ),
+                action.addItem<ItemObject, Group>(
+                    () =>
+                        new Group(store, {
+                            display_name: gettext(msgGroup),
+                        }),
+                    {
+                        key: "add_group",
+                        title: msgGroup,
+                    }
+                ),
+                (
+                    context: ItemObject | null
+                ): FocusTableAction<ItemObject | null>[] => {
+                    if (context) return [];
+                    return [
+                        {
+                            key: "draw_order",
+                            title: drawOrderEnabled
+                                ? msgDrawOrderEdit
+                                : msgDrawOrderCustomize,
+                            icon: <ReorderIcon />,
+                            placement: "left",
+                            callback: () => setDrawOrderEdit(true),
+                        },
+                    ];
+                },
+            ],
+            itemActions: [action.deleteItem<ItemObject>()],
+        }),
+        [drawOrderEnabled, makeSignal, pickToFocusTable, store]
+    );
+
+    return drawOrderEdit ? (
+        <DrawOrderTable store={store} close={() => setDrawOrderEdit(false)} />
+    ) : (
+        <FocusTable<ItemObject>
+            store={store}
+            title={(item) => item.displayName.value}
+            tableActions={tableActions}
+            itemActions={itemActions}
+            renderDetail={({ item }) =>
+                item instanceof Group ? (
+                    <GroupWidget item={item} />
+                ) : (
+                    <LayerWidget item={item} />
+                )
+            }
+        />
+    );
+});
 
 ItemsWidget.displayName = "ItemsWidget";
 ItemsWidget.title = gettext("Layers");

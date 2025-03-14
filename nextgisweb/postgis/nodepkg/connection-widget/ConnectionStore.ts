@@ -2,7 +2,7 @@ import { makeObservable, runInAction } from "mobx";
 
 import { mapper, validate } from "@nextgisweb/gui/arm";
 import type { PostgisConnectionRead } from "@nextgisweb/postgis/type/api";
-import type { EditorStore } from "@nextgisweb/resource/type/EditorStore";
+import type { EditorStore } from "@nextgisweb/resource/type";
 
 const {
     hostname,

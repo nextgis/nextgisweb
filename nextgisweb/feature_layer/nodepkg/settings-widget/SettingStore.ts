@@ -1,6 +1,6 @@
 import { action, computed, makeObservable, observable } from "mobx";
 
-import type { EditorStore } from "@nextgisweb/resource/type/EditorStore";
+import type { EditorStore } from "@nextgisweb/resource/type";
 
 interface Value {
     versioning?: { enabled?: boolean };

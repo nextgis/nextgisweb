@@ -16,10 +16,7 @@ import type {
 import { ClearIcon, ExportIcon, ImportIcon } from "@nextgisweb/gui/icon";
 import { parseCsv } from "@nextgisweb/gui/util/parseCsv";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import type {
-    EditorWidgetComponent,
-    EditorWidgetProps,
-} from "@nextgisweb/resource/type";
+import type { EditorWidget as IEditorWidget } from "@nextgisweb/resource/type";
 
 import type { EditorStore } from "./EditorStore";
 import {
@@ -95,77 +92,82 @@ const columns: EdiTableColumn<RecordItem>[] = [
     },
 ];
 
-export const EditorWidget: EditorWidgetComponent<
-    EditorWidgetProps<EditorStore>
-> = observer(({ store }) => {
-    const exportLookup = useCallback(() => {
-        exportToCsv([{ key: "Key", value: "Value" }, ...store.items]);
-    }, [store.items]);
+export const EditorWidget: IEditorWidget<EditorStore> = observer(
+    ({ store }) => {
+        const exportLookup = useCallback(() => {
+            exportToCsv([{ key: "Key", value: "Value" }, ...store.items]);
+        }, [store.items]);
 
-    const [modal, contextHolder] = Modal.useModal();
+        const [modal, contextHolder] = Modal.useModal();
 
-    const handleFileChange = async (file: File) => {
-        if (file) {
-            const json = await parseCsv<[key: string, value: string]>(file);
-            const items = updateItems(store.items, dataToRecords(json.data));
-            store.load({ items: recordsToLookup(items) });
-            store.setDirty(true);
-        }
-    };
+        const handleFileChange = async (file: File) => {
+            if (file) {
+                const json = await parseCsv<[key: string, value: string]>(file);
+                const items = updateItems(
+                    store.items,
+                    dataToRecords(json.data)
+                );
+                store.load({ items: recordsToLookup(items) });
+                store.setDirty(true);
+            }
+        };
 
-    return (
-        <div className="ngw-lookup-table-editor">
-            {contextHolder}
-            <ActionToolbar
-                pad
-                borderBlockEnd
-                actions={[
-                    () => (
-                        <Upload
-                            beforeUpload={async (e) => {
-                                let confirmed = true;
-                                if (store.items.length) {
-                                    confirmed = await modal.confirm({
-                                        content: msgConfirm,
-                                    });
-                                }
-                                if (confirmed) {
-                                    store.clear();
-                                    handleFileChange(e);
-                                }
-                                // Prevent antd uploader request
-                                return false;
-                            }}
-                            showUploadList={false}
-                        >
-                            <Button icon={<ImportIcon />}>{msgImport}</Button>
-                        </Upload>
-                    ),
-                    {
-                        icon: <ExportIcon />,
-                        title: msgExport,
-                        onClick: exportLookup,
-                    },
-                ]}
-                rightActions={[
-                    {
-                        title: msgClear,
-                        icon: <ClearIcon />,
-                        danger: true,
-                        disabled: !store.items.length,
-                        onClick: store.clear,
-                    },
-                ]}
-            />
-            <EdiTable
-                store={store}
-                columns={columns}
-                rowKey="id"
-                parentHeight
-            />
-        </div>
-    );
-});
+        return (
+            <div className="ngw-lookup-table-editor">
+                {contextHolder}
+                <ActionToolbar
+                    pad
+                    borderBlockEnd
+                    actions={[
+                        () => (
+                            <Upload
+                                beforeUpload={async (e) => {
+                                    let confirmed = true;
+                                    if (store.items.length) {
+                                        confirmed = await modal.confirm({
+                                            content: msgConfirm,
+                                        });
+                                    }
+                                    if (confirmed) {
+                                        store.clear();
+                                        handleFileChange(e);
+                                    }
+                                    // Prevent antd uploader request
+                                    return false;
+                                }}
+                                showUploadList={false}
+                            >
+                                <Button icon={<ImportIcon />}>
+                                    {msgImport}
+                                </Button>
+                            </Upload>
+                        ),
+                        {
+                            icon: <ExportIcon />,
+                            title: msgExport,
+                            onClick: exportLookup,
+                        },
+                    ]}
+                    rightActions={[
+                        {
+                            title: msgClear,
+                            icon: <ClearIcon />,
+                            danger: true,
+                            disabled: !store.items.length,
+                            onClick: store.clear,
+                        },
+                    ]}
+                />
+                <EdiTable
+                    store={store}
+                    columns={columns}
+                    rowKey="id"
+                    parentHeight
+                />
+            </div>
+        );
+    }
+);
 
 EditorWidget.title = gettext("Lookup table");
 EditorWidget.order = 100;
