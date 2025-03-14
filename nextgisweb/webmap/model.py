@@ -326,8 +326,8 @@ class WebMapItemLayerRead(Struct, kw_only=True, tag="layer", tag_field="item_typ
     layer_transparency: Union[float, None]
     layer_style_id: int
     style_parent_id: Union[int, None]
-    layer_min_scale_denom: Union[int, None]
-    layer_max_scale_denom: Union[int, None]
+    layer_min_scale_denom: Union[float, None]
+    layer_max_scale_denom: Union[float, None]
     layer_adapter: str
     draw_order_position: Union[int, None]
     legend_symbols: Union[LegendSymbolsEnum, None]
@@ -359,8 +359,8 @@ class WebMapItemLayerWrite(Struct, kw_only=True, tag="layer", tag_field="item_ty
     layer_identifiable: bool = True
     layer_transparency: Union[float, None] = None
     layer_style_id: int
-    layer_min_scale_denom: Union[int, None] = None
-    layer_max_scale_denom: Union[int, None] = None
+    layer_min_scale_denom: Union[float, None] = None
+    layer_max_scale_denom: Union[float, None] = None
     layer_adapter: str
     draw_order_position: Union[int, None] = None
     legend_symbols: Union[LegendSymbolsEnum, None] = None
