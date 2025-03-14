@@ -10,7 +10,7 @@ import type {
     EditorWidgetComponent,
     EditorWidgetProps,
 } from "@nextgisweb/resource/type";
-import { Basemap, MapControl } from "@nextgisweb/webmap/map-component";
+import { MapControl, UrlLayer } from "@nextgisweb/webmap/map-component";
 import { PreviewMap } from "@nextgisweb/webmap/preview-map";
 
 import type { LayerStore } from "./LayerStore";
@@ -18,11 +18,11 @@ import { QMSSelect } from "./component/QMSSelect";
 import type { QMSService } from "./type";
 
 const msgPickQms = gettext("Pick from QMS");
-// eslint-disable-next-line prettier/prettier
+
 const msgPickQmsHelpMainPart = gettext("Search for geoservices provided by ");
 const msgPickQmsHelpTodoPart = gettext("You can search by name or ID");
 
-// eslint-disable-next-line prettier/prettier
+// prettier-ignore
 const msgDisabled = gettext("If a service from QMS is selected, this field cannot be edited.");
 
 export const LayerWidget: EditorWidgetComponent<EditorWidgetProps<LayerStore>> =
@@ -147,7 +147,7 @@ export const LayerWidget: EditorWidgetComponent<EditorWidgetProps<LayerStore>> =
                                     />
                                 </div>
                             </MapControl>
-                            <Basemap
+                            <UrlLayer
                                 url={store.url.value}
                                 key={qmsId}
                                 opacity={opacity}

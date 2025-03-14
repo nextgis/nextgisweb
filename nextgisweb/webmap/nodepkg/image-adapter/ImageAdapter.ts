@@ -44,7 +44,7 @@ export class ImageAdapter extends LayerDisplayAdapter {
                 },
                 ratio: 1,
                 crossOrigin: "anonymous",
-                imageLoadFunction: (image, src) => {
+                imageLoadFunction: (imageTile, src) => {
                     const [url, query] = src.split("?");
                     const queryObject = parseQueryParams(query);
 
@@ -53,8 +53,6 @@ export class ImageAdapter extends LayerDisplayAdapter {
                     const symbols = symbolsParam
                         ? `&symbols[${resource}]=${symbolsParam === "-1" ? "" : symbolsParam}`
                         : "";
-
-                    const img = image.getImage();
 
                     const newSrc =
                         `${url}?resource=${resource}` +
@@ -72,7 +70,9 @@ export class ImageAdapter extends LayerDisplayAdapter {
                                 cache: "no-cache",
                                 signal,
                             }).then((imageUrl) => {
-                                (img as HTMLImageElement).src = imageUrl;
+                                const img =
+                                    imageTile.getImage() as HTMLImageElement;
+                                img.src = imageUrl;
                             })
                         );
                     });

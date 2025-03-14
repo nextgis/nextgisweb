@@ -6,6 +6,7 @@ Changes
 
 - Configurable default basemaps for on-premises installations.
 - Support for dash patterns in user-defined styles.
+- OpenLayers library upgraded to 10.4.
 
 
 5.0.0

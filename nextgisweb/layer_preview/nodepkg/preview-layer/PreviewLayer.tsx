@@ -6,7 +6,7 @@ import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import {
     AttributionControl,
-    Basemap,
+    UrlLayer,
     MapComponent,
     NGWLayer,
     ToggleControl,
@@ -111,7 +111,7 @@ export function PreviewLayer({
                 </ToggleControl>
 
                 {url ? (
-                    <Basemap url={url} attributions={attributions} />
+                    <UrlLayer url={url} attributions={attributions} />
                 ) : (
                     <NGWLayer
                         resourceId={id}

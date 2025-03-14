@@ -1,4 +1,3 @@
-import type XYZ from "ol/source/XYZ";
 import type { Options as XYZSourceOptions } from "ol/source/XYZ";
 
 import type {
@@ -10,6 +9,7 @@ import { registerEPSG3395Projection } from "@nextgisweb/basemap/util/epsg3395";
 import type { MapStore } from "@nextgisweb/webmap/ol/MapStore";
 import type { LayerOptions } from "@nextgisweb/webmap/ol/layer/CoreLayer";
 import type QuadKey from "@nextgisweb/webmap/ol/layer/QuadKey";
+import type XYZ from "@nextgisweb/webmap/ol/layer/XYZ";
 
 let idx = 0;
 
@@ -86,16 +86,14 @@ export function prepareBaselayerConfig(
     return { source, layer, keyname };
 }
 
-export async function addBaselayer({
+export async function createTileLayer({
     source,
     layer: layerOptions,
     keyname,
-    map,
 }: {
     source: XYZSourceOptions;
-    layer: LayerOptions;
+    layer?: LayerOptions;
     keyname?: string;
-    map: MapStore;
 }): Promise<QuadKey | XYZ | undefined> {
     if (!keyname) {
         keyname = `basemap_${idx++}`;
@@ -108,14 +106,29 @@ export async function addBaselayer({
 
         const layer = new MID(keyname, layerOptions, source);
 
+        return layer as QuadKey | XYZ;
+    } catch (err) {
+        console.warn(`Can't initialize layer [${keyname}]: ${err}`);
+    }
+}
+
+export async function addBaselayer({
+    map,
+    ...layerOptions
+}: {
+    source: XYZSourceOptions;
+    layer?: LayerOptions;
+    keyname?: string;
+    map: MapStore;
+}): Promise<QuadKey | XYZ | undefined> {
+    const layer = await createTileLayer(layerOptions);
+    if (layer) {
         if (layer.olLayer.getVisible()) {
             map.setBaseLayer(layer);
         }
         layer.isBaseLayer = true;
         map.addLayer(layer);
         return layer as QuadKey | XYZ;
-    } catch (err) {
-        console.warn(`Can't initialize layer [${keyname}]: ${err}`);
     }
 }
 

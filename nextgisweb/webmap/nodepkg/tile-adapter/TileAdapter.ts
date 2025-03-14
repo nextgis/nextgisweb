@@ -21,11 +21,9 @@ export default class TileAdapter extends LayerDisplayAdapter {
                 tileLoadFunction: (image, src) => {
                     // @ts-expect-error Property 'getImage' does not exist on type 'Tile'.
                     const img = image.getImage() as HTMLImageElement;
-                    const abortController = new AbortController();
 
                     tileLoadFunction({
                         src,
-                        signal: abortController.signal,
                         cache: "force-cache",
                     }).then((imageUrl) => {
                         img.src = imageUrl;

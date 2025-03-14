@@ -86,7 +86,7 @@ export class AnnotationsLayer {
     }
 
     setZIndex(zIndex: number) {
-        this._layer.getLayer().setZIndex(zIndex);
+        this._layer.setZIndex(zIndex);
     }
 
     hidePopups(): void {

@@ -2,7 +2,6 @@ import View from "ol/View";
 import type { FitOptions, ViewOptions } from "ol/View";
 import { fromExtent } from "ol/geom/Polygon";
 import { transformExtent } from "ol/proj";
-import type XYZ from "ol/source/XYZ";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import settings from "@nextgisweb/basemap/client-settings";
@@ -15,6 +14,7 @@ import { useObjectState } from "@nextgisweb/gui/hook";
 import type { SRSRef } from "@nextgisweb/spatial-ref-sys/type/api";
 import { MapStore } from "@nextgisweb/webmap/ol/MapStore";
 import type QuadKey from "@nextgisweb/webmap/ol/layer/QuadKey";
+import type XYZ from "@nextgisweb/webmap/ol/layer/XYZ";
 
 export interface MapExtent extends FitOptions {
     extent: NgwExtent;

@@ -126,6 +126,10 @@ export abstract class CoreLayer<
         this.itemConfig = itemConfig;
     }
 
+    setZIndex(zIndex: number) {
+        this.getLayer()?.setZIndex(zIndex);
+    }
+
     reload(): void {
         this.olSource.changed();
     }

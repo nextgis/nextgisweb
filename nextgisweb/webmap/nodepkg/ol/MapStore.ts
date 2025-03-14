@@ -1,7 +1,7 @@
 import { action, computed, observable, runInAction } from "mobx";
 import type { Feature } from "ol";
 import OlMap from "ol/Map";
-import type { MapOptions as OlMapOptions } from "ol/PluggableMap";
+import type { MapOptions as OlMapOptions } from "ol/Map";
 import View from "ol/View";
 import type { FitOptions } from "ol/View";
 import type Control from "ol/control/Control";

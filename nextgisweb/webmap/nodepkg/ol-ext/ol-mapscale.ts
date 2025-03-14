@@ -1,7 +1,6 @@
 import type Map from "ol/Map";
 import { Control, ScaleLine } from "ol/control";
 import { getPointResolution } from "ol/proj";
-import Units from "ol/proj/Units";
 
 type FormatNumberFunction = (
     num: number,
@@ -137,7 +136,7 @@ class MapScaleControl extends Control {
                 projection,
                 resolution,
                 center,
-                Units.METERS
+                "m"
             );
             const scale = Math.round(
                 pointResolution * INCHES_PER_METER * DOTS_PER_INCH

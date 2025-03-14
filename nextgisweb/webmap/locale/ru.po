@@ -1,24 +1,24 @@
-#: adapter.py:24
+#: adapter.py:26
 msgid "Tiles"
 msgstr "Тайлы"
 
-#: adapter.py:33
+#: adapter.py:35
 msgid "Image"
 msgstr "Изображение"
 
-#: component.py:32
+#: component.py:26
 msgid "Main web map"
 msgstr "Основная веб-карта"
 
-#: favorite.py:5 view.py:171
+#: favorite.py:6 view.py:194
 msgid "Display"
 msgstr "Открыть"
 
-#: favorite.py:10
+#: favorite.py:11
 msgid "Fragment"
 msgstr "Фрагмент"
 
-#: model.py:46 model.py:64 view.py:166 view.py:193
+#: model.py:46 model.py:64 view.py:189 view.py:216
 msgid "Web map"
 msgstr "Веб-карта"
 
@@ -37,7 +37,7 @@ msgctxt "permission"
 msgid "Manage annotations"
 msgstr "Управление аннотациями"
 
-#: nodepkg/clone-webmap/CloneWebmap.tsx:21 view.py:181
+#: nodepkg/clone-webmap/CloneWebmap.tsx:21 view.py:204
 msgid "Clone"
 msgstr "Клонировать"
 
@@ -45,12 +45,12 @@ msgstr "Клонировать"
 msgid "Resource group"
 msgstr "Группа ресурсов"
 
-#: nodepkg/clone-webmap/CloneWebmap.tsx:82 nodepkg/items-widget/ItemsWidget.tsx:31
+#: nodepkg/clone-webmap/CloneWebmap.tsx:82 nodepkg/items-widget/ItemsWidget.tsx:33
 msgid "Display name"
 msgstr "Наименование"
 
 #: nodepkg/component/SelectLegendSymbols.tsx:5
-#: nodepkg/settings-widget/SettingsWidget.tsx:33
+#: nodepkg/settings-widget/SettingsWidget.tsx:35
 #: nodepkg/settings/select-options.ts:94
 msgid "Default"
 msgstr "По умолчанию"
@@ -74,11 +74,11 @@ msgstr "Отключить"
 msgid "Open full map"
 msgstr "Открыть карту целиком"
 
-#: nodepkg/display/Display.ts:805
+#: nodepkg/display/Display.ts:704
 msgid "Object not found"
 msgstr "Объект не найден"
 
-#: nodepkg/display/Display.ts:806
+#: nodepkg/display/Display.ts:705
 msgid "Object from URL parameters not found"
 msgstr "Объект из параметров строки запроса не найден"
 
@@ -150,66 +150,66 @@ msgstr "Порядок рисования по умолчанию"
 msgid "Group members have errors"
 msgstr "Ошибка в участниках группы"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:32
+#: nodepkg/items-widget/ItemsWidget.tsx:34
 msgid "Expanded"
 msgstr "Развернута"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:33
+#: nodepkg/items-widget/ItemsWidget.tsx:35
 msgid "Exclusive"
 msgstr "Взаимоисключающая"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:34
+#: nodepkg/items-widget/ItemsWidget.tsx:36
 msgid "Enabled"
 msgstr "Включен"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:35
+#: nodepkg/items-widget/ItemsWidget.tsx:37
 msgid "Identifiable"
 msgstr "Идентифицируемый"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:36
+#: nodepkg/items-widget/ItemsWidget.tsx:38
 msgid "Resource"
 msgstr "Ресурс"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:37
+#: nodepkg/items-widget/ItemsWidget.tsx:39
 msgid "Transparency"
 msgstr "Прозрачность"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:38
+#: nodepkg/items-widget/ItemsWidget.tsx:40
 msgid "Min scale"
 msgstr "Мин. масштаб"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:39
+#: nodepkg/items-widget/ItemsWidget.tsx:41
 msgid "Max scale"
 msgstr "Макс. масштаб"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:40
+#: nodepkg/items-widget/ItemsWidget.tsx:42
 #: nodepkg/panel/print/component/PrintElementsSettings.tsx:28
-#: nodepkg/settings-widget/SettingsWidget.tsx:25
+#: nodepkg/settings-widget/SettingsWidget.tsx:27
 #: nodepkg/settings/SettingsForm.tsx:261
 msgid "Legend"
 msgstr "Легенда"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:41
+#: nodepkg/items-widget/ItemsWidget.tsx:43
 msgid "Adapter"
 msgstr "Адаптер"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:42
+#: nodepkg/items-widget/ItemsWidget.tsx:44
 msgid "Layer"
 msgstr "Слой"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:43
+#: nodepkg/items-widget/ItemsWidget.tsx:45
 msgid "Group"
 msgstr "Группа"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:44
+#: nodepkg/items-widget/ItemsWidget.tsx:46
 msgid "Edit draw order"
 msgstr "Изменить порядок рисования"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:45
+#: nodepkg/items-widget/ItemsWidget.tsx:47
 msgid "Customize draw order"
 msgstr "Настроить порядок рисования"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:245 nodepkg/panel/layers/plugin.tsx:10
+#: nodepkg/items-widget/ItemsWidget.tsx:247 nodepkg/panel/layers/plugin.tsx:10
 msgid "Layers"
 msgstr "Слои"
 
@@ -217,15 +217,15 @@ msgstr "Слои"
 msgid "Opacity"
 msgstr "Непрозрачность"
 
-#: nodepkg/layer/annotations/AnnotationFeature.ts:53
+#: nodepkg/layer/annotations/AnnotationFeature.ts:54
 msgid "Your annotation text"
 msgstr "Ваш текст аннотации"
 
-#: nodepkg/layer/annotations/AnnotationFeature.ts:187
+#: nodepkg/layer/annotations/AnnotationFeature.ts:192
 msgid "Public annotation"
 msgstr "Публичная аннотация"
 
-#: nodepkg/layer/annotations/AnnotationFeature.ts:189
+#: nodepkg/layer/annotations/AnnotationFeature.ts:194
 msgid "My private annotation"
 msgstr "Моя приватная аннотация"
 
@@ -237,63 +237,68 @@ msgstr "Показывать легенду"
 msgid "Hide legend"
 msgstr "Скрывать легенду"
 
-#: nodepkg/map-controls/control/MyLocation.ts:167
+#: nodepkg/map-component/UrlLayer.tsx:11
+msgid "Unable to load tile"
+msgstr "Ошибка загрузки тайла"
+
+#: nodepkg/map-controls/control/MyLocation.ts:169
 msgid "Your location could not be determined"
 msgstr "Определить местоположение не удалось"
 
-#: nodepkg/map-controls/control/SwipeControl.ts:37
+#: nodepkg/map-controls/control/SwipeControl.ts:40
 msgid "Rotate swipe"
 msgstr "Повернуть шторку"
 
-#: nodepkg/map-controls/map-controls.ts:35 nodepkg/map-controls/map-tools.ts:15
-#: nodepkg/map-controls/tool/Zoom.ts:25
+#: nodepkg/map-controls/map-controls.ts:40 nodepkg/map-controls/map-tools.ts:15
+#: nodepkg/map-controls/tool/Zoom.ts:29
 msgid "Zoom in"
 msgstr "Приблизить"
 
-#: nodepkg/map-controls/map-controls.ts:36 nodepkg/map-controls/map-tools.ts:24
-#: nodepkg/map-controls/tool/Zoom.ts:25
+#: nodepkg/map-controls/map-controls.ts:41 nodepkg/map-controls/map-tools.ts:24
+#: nodepkg/map-controls/tool/Zoom.ts:29
 msgid "Zoom out"
 msgstr "Отодвинуть"
 
-#: nodepkg/map-controls/map-controls.ts:47
+#: nodepkg/map-controls/map-controls.ts:52
 msgid "Attributions"
 msgstr "Информация о правообладателях"
 
-#: nodepkg/map-controls/map-controls.ts:59 nodepkg/print-map/utils.ts:34
+#: nodepkg/map-controls/map-controls.ts:64 nodepkg/print-map/utils.ts:36
 msgid "Reset rotation"
 msgstr "Отменить поворот"
 
-#: nodepkg/map-controls/map-controls.ts:74
+#: nodepkg/map-controls/map-controls.ts:79
 msgid "Scale line"
 msgstr "Линейка масштаба"
 
-#: nodepkg/map-controls/map-controls.ts:86
+#: nodepkg/map-controls/map-controls.ts:91
 msgid "Info scale"
 msgstr "Числовой масштаб"
 
-#: nodepkg/map-controls/map-controls.ts:96 nodepkg/map-controls/map-controls.ts:99
-#: nodepkg/settings-widget/SettingsWidget.tsx:22
+#: nodepkg/map-controls/map-controls.ts:101
+#: nodepkg/map-controls/map-controls.ts:104
+#: nodepkg/settings-widget/SettingsWidget.tsx:24
 msgid "Initial extent"
 msgstr "Начальный охват"
 
-#: nodepkg/map-controls/map-controls.ts:109
-#: nodepkg/map-controls/map-controls.ts:112
+#: nodepkg/map-controls/map-controls.ts:114
+#: nodepkg/map-controls/map-controls.ts:117
 msgid "Locate me"
 msgstr "Определить мое местоположение"
 
-#: nodepkg/map-controls/map-controls.ts:117 nodepkg/settings/SettingsForm.tsx:84
+#: nodepkg/map-controls/map-controls.ts:122 nodepkg/settings/SettingsForm.tsx:84
 msgid "Identification"
 msgstr "Идентификация"
 
-#: nodepkg/map-controls/map-tools.ts:33 nodepkg/map-controls/tool/Measure.ts:51
+#: nodepkg/map-controls/map-tools.ts:33 nodepkg/map-controls/tool/Measure.ts:52
 msgid "Measure distance"
 msgstr "Измерение расстояния"
 
-#: nodepkg/map-controls/map-tools.ts:42 nodepkg/map-controls/tool/Measure.ts:52
+#: nodepkg/map-controls/map-tools.ts:42 nodepkg/map-controls/tool/Measure.ts:53
 msgid "Measure area"
 msgstr "Измерение площади"
 
-#: nodepkg/map-controls/map-tools.ts:51 nodepkg/map-controls/tool/Swipe.ts:28
+#: nodepkg/map-controls/map-tools.ts:51 nodepkg/map-controls/tool/Swipe.ts:30
 msgid "Vertical swipe"
 msgstr "Вертикальная шторка"
 
@@ -305,15 +310,15 @@ msgstr "Координаты курсора / охвата"
 msgid "Identify"
 msgstr "Идентификация"
 
-#: nodepkg/map-controls/tool/Swipe.ts:35
+#: nodepkg/map-controls/tool/Swipe.ts:34
 msgid "Horizontal swipe"
 msgstr "Горизонтальная шторка"
 
-#: nodepkg/map-controls/tool/ViewerInfo.ts:26
+#: nodepkg/map-controls/tool/ViewerInfo.ts:28
 msgid "Show cursor coordinates / extent"
 msgstr "Показать координаты курсора / охват"
 
-#: nodepkg/map-controls/tool/editing/CreateFeature.ts:14
+#: nodepkg/map-controls/tool/editing/CreateFeature.ts:15
 msgid "Create features"
 msgstr "Создать объекты"
 
@@ -333,7 +338,7 @@ msgstr "Показывать охват"
 msgid "Show cursor coordinates"
 msgstr "Показывать координаты курсора"
 
-#: nodepkg/ol/control/ZoomControl.ts:38
+#: nodepkg/ol/control/ZoomControl.ts:40
 msgid "Back to the initial extent"
 msgstr "Вернуться к начальному охвату"
 
@@ -354,7 +359,7 @@ msgid "With messages"
 msgstr "С сообщениями"
 
 #: nodepkg/panel/annotations/AnnotationsPanel.tsx:139
-#: nodepkg/plugin/layer-editor/LayerEditor.ts:131
+#: nodepkg/plugin/layer-editor/LayerEditor.tsx:132
 msgid "Edit"
 msgstr "Редактировать"
 
@@ -388,12 +393,12 @@ msgid "Other private annotations"
 msgstr "Другие приватные аннотации"
 
 #: nodepkg/panel/annotations/plugin.tsx:13
-#: nodepkg/settings-widget/SettingsWidget.tsx:26
+#: nodepkg/settings-widget/SettingsWidget.tsx:28
 msgid "Annotations"
 msgstr "Аннотации"
 
 #: nodepkg/panel/bookmarks/plugin.tsx:11
-#: nodepkg/settings-widget/SettingsWidget.tsx:28
+#: nodepkg/settings-widget/SettingsWidget.tsx:30
 msgid "Bookmarks"
 msgstr "Закладки"
 
@@ -488,7 +493,7 @@ msgid "Number of legend columns"
 msgstr "Количество столбцов легенды"
 
 #: nodepkg/panel/print/component/PrintElementsSettings.tsx:49
-#: nodepkg/settings-widget/SettingsWidget.tsx:24
+#: nodepkg/settings-widget/SettingsWidget.tsx:26
 msgid "Title"
 msgstr "Заголовок"
 
@@ -670,60 +675,60 @@ msgstr "Предпросмотр"
 msgid "Share"
 msgstr "Поделиться"
 
-#: nodepkg/plugin/feature-layer/FeatureLayerPlugin.tsx:10
+#: nodepkg/plugin/feature-layer/FeatureLayerPlugin.tsx:12
 msgid "Feature table"
 msgstr "Таблица объектов"
 
-#: nodepkg/plugin/layer-editor/LayerEditor.ts:131
+#: nodepkg/plugin/layer-editor/LayerEditor.tsx:132
 msgid "Stop editing"
 msgstr "Завершить редактирование"
 
-#: nodepkg/plugin/zoom-to-layer/ZoomToLayerPlugin.ts:16
+#: nodepkg/plugin/zoom-to-layer/ZoomToLayerPlugin.tsx:18
 msgid "Zoom to layer"
 msgstr "Увеличить до слоя"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:23
+#: nodepkg/settings-widget/SettingsWidget.tsx:25
 msgid "Constraining extent"
 msgstr "Ограничивающий охват"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:27
+#: nodepkg/settings-widget/SettingsWidget.tsx:29
 msgid "Select mode"
 msgstr "Выберите режим"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:29
+#: nodepkg/settings-widget/SettingsWidget.tsx:31
 msgid "Select resource"
 msgstr "Выберите ресурс"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:30
+#: nodepkg/settings-widget/SettingsWidget.tsx:32
 #: nodepkg/settings/SettingsForm.tsx:172
 msgid "Measurement SRS"
 msgstr "СК для измерений"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:31
+#: nodepkg/settings-widget/SettingsWidget.tsx:33
 msgid "Layers editing"
 msgstr "Редактирование слоев"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:36
+#: nodepkg/settings-widget/SettingsWidget.tsx:38
 msgid "Web map will start at this extent"
 msgstr "Веб-карта будет показана с этим охватом"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:37
+#: nodepkg/settings-widget/SettingsWidget.tsx:39
 msgid "Web map will not allow to move outside of this extent"
 msgstr "Веб-карта не позволит выйти за пределы этого охвата"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:41
+#: nodepkg/settings-widget/SettingsWidget.tsx:43
 msgid "Hide by default"
 msgstr "Скрыть по умолчанию"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:42
+#: nodepkg/settings-widget/SettingsWidget.tsx:44
 msgid "Show without messages"
 msgstr "Показать без сообщений"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:43
+#: nodepkg/settings-widget/SettingsWidget.tsx:45
 msgid "Show with messages"
 msgstr "Показать с сообщениями"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:147
+#: nodepkg/settings-widget/SettingsWidget.tsx:149
 msgid "Settings"
 msgstr "Настройки"
 
@@ -800,7 +805,7 @@ msgid "Visibility"
 msgstr "Видимость"
 
 #: nodepkg/settings/SettingsForm.tsx:299
-#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:159
+#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:165
 #: nodepkg/ui/finish-editing-dialog/FinishEditingDialog.tsx:57
 msgid "Save"
 msgstr "Сохранить"
@@ -881,50 +886,50 @@ msgstr "Nominatim (OSM)"
 msgid "Yandex.Maps API Geocoder"
 msgstr "Геокодер API Яндекс.Карт"
 
-#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:116
+#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:121
 msgid "Create as public"
 msgstr "Создать как публичную"
 
-#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:123
+#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:128
 msgid "Create as private"
 msgstr "Создать как приватную"
 
-#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:131
+#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:136
 msgid "Edit annotation"
 msgstr "Редактировать аннотацию"
 
-#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:132
+#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:137
 msgid "Create annotation"
 msgstr "Создать аннотацию"
 
-#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:153
+#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:159
 msgid "Delete"
 msgstr "Удалить"
 
-#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:156
-#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:165
+#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:162
+#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:171
 #: nodepkg/ui/finish-editing-dialog/FinishEditingDialog.tsx:48
 msgid "Cancel"
 msgstr "Отменить"
 
-#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:169
+#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:175
 msgid "Create"
 msgstr "Создать"
 
-#: nodepkg/ui/annotation-dialog/AnnotationsSettings.tsx:40
+#: nodepkg/ui/annotation-dialog/AnnotationsSettings.tsx:59
 msgid "Stroke: width / color"
 msgstr "Обводка: ширина / цвет"
 
-#: nodepkg/ui/annotation-dialog/AnnotationsSettings.tsx:57
 #: nodepkg/ui/annotation-dialog/AnnotationsSettings.tsx:77
+#: nodepkg/ui/annotation-dialog/AnnotationsSettings.tsx:102
 msgid "Colors"
 msgstr "Цвета"
 
-#: nodepkg/ui/annotation-dialog/AnnotationsSettings.tsx:73
+#: nodepkg/ui/annotation-dialog/AnnotationsSettings.tsx:97
 msgid "Fill color"
 msgstr "Цвет заливки"
 
-#: nodepkg/ui/annotation-dialog/AnnotationsSettings.tsx:88
+#: nodepkg/ui/annotation-dialog/AnnotationsSettings.tsx:117
 msgid "Circle size, px"
 msgstr "Размер пунсона, пикс"
 
@@ -984,11 +989,11 @@ msgstr "Мультиполигон"
 msgid "GeometryCollection"
 msgstr "Коллекция геометрий"
 
-#: nodepkg/webmap-feature-grid-tab/WebMapFeatureGridTab.tsx:23
+#: nodepkg/webmap-feature-grid-tab/WebMapFeatureGridTab.tsx:25
 msgid "Go to"
 msgstr "Перейти"
 
-#: nodepkg/webmap-feature-grid-tab/WebMapFeatureGridTab.tsx:135
+#: nodepkg/webmap-feature-grid-tab/WebMapFeatureGridTab.tsx:137
 msgid "Selected feature has no geometry"
 msgstr "Выбранный объект не имеет геометрии"
 
@@ -1028,14 +1033,14 @@ msgstr ""
 "Для генерации предпросмотра вернитесь на страницу веб карты и нажмите "
 "\"Предпросмотр\"."
 
-#: view.py:86
+#: view.py:107
 msgid "Clone web map"
 msgstr "Клонировать веб-карту"
 
-#: view.py:99
+#: view.py:120
 msgid "Embedded webmap preview"
 msgstr "Просмотр встроенной веб-карты"
 
-#: view.py:109
+#: view.py:129
 msgid "Web map settings"
 msgstr "Настройки веб-карты"

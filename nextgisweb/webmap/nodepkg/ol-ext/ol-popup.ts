@@ -15,9 +15,8 @@ export class OlPopup extends Overlay {
 
     constructor(options: PopupOptions = {}) {
         const defaultOptions: PopupOptions = {
-            autoPan: true,
-            autoPanAnimation: {
-                duration: 250,
+            autoPan: {
+                animation: { duration: 250 },
             },
         };
 
