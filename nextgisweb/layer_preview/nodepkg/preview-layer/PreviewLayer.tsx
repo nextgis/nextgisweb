@@ -6,10 +6,10 @@ import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import {
     AttributionControl,
-    UrlLayer,
     MapComponent,
     NGWLayer,
     ToggleControl,
+    UrlLayer,
     ZoomControl,
 } from "@nextgisweb/webmap/map-component";
 

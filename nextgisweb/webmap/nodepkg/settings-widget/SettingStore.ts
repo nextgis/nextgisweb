@@ -2,11 +2,11 @@ import { isEqual } from "lodash-es";
 import { action, computed, observable, toJS } from "mobx";
 
 import type { ExtentRowValue } from "@nextgisweb/gui/component";
+import type { CompositeStore } from "@nextgisweb/resource/composite";
 import type {
     EditorStore,
     EditorStoreOptions,
 } from "@nextgisweb/resource/type";
-import type { CompositeStore } from "@nextgisweb/resource/composite";
 import type { ResourceRef } from "@nextgisweb/resource/type/api";
 import type {
     ExtentWSEN,

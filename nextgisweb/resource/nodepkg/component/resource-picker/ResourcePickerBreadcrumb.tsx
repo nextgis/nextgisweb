@@ -1,8 +1,7 @@
+import classNames from "classnames";
 import { observer } from "mobx-react-lite";
 import { useMemo } from "react";
 import type { ReactElement } from "react";
-
-import cn from "classnames";
 
 import { Breadcrumb, Skeleton, Space, Tooltip } from "@nextgisweb/gui/antd";
 import type {
@@ -45,7 +44,7 @@ export const ResourcePickerBreadcrumb = observer(
                         {allowMoveInside ? (
                             <a
                                 onClick={() => onClick(resItem.resource.id)}
-                                className={cn({ "active": isActive })}
+                                className={classNames({ "active": isActive })}
                             >
                                 {displayName}
                             </a>

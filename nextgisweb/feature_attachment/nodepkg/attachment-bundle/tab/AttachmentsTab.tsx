@@ -322,29 +322,27 @@ function AttachmentsTab({ display }: AttachmentsTabProps) {
     const [geomWKT, setGeomWKT] = useState<string>();
     const [layerAttachments, setLayerAttachments] = useState<LayerItemView[]>();
 
-    const loadFeatures = async () => {
-        setLayerAttachments(undefined);
-        setLoading(true);
-        const signal = makeSignal();
-
-        const layersAttachments = await fetchFeaturesAttachments(
-            display,
-            signal,
-            geomWKT
-        );
-
-        setLayerAttachments(layersAttachments);
-        setLoading(false);
-    };
-
     useEffect(() => {
         abort();
         if (geomWKT) {
-            loadFeatures();
+            (async () => {
+                setLayerAttachments(undefined);
+                setLoading(true);
+                const signal = makeSignal();
+
+                const layersAttachments = await fetchFeaturesAttachments(
+                    display,
+                    signal,
+                    geomWKT
+                );
+
+                setLayerAttachments(layersAttachments);
+                setLoading(false);
+            })();
         } else {
             setLayerAttachments(undefined);
         }
-    }, [geomWKT]);
+    }, [abort, display, geomWKT, makeSignal]);
 
     const listAttachments = useMemo(
         () => layerItems(layerAttachments, display),
