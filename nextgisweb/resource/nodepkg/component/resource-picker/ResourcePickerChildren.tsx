@@ -3,7 +3,7 @@ import { debounce } from "lodash-es";
 import { observer } from "mobx-react-lite";
 import { useCallback, useMemo, useState } from "react";
 
-import { Button, Space, Table, Tooltip } from "@nextgisweb/gui/antd";
+import { Badge, Button, Space, Table, Tooltip } from "@nextgisweb/gui/antd";
 import type { TableProps } from "@nextgisweb/gui/antd";
 import showModal from "@nextgisweb/gui/showModal";
 import { sorterFactory } from "@nextgisweb/gui/util";
@@ -22,6 +22,7 @@ import type {
 } from "./type";
 
 import FolderOpenIcon from "@nextgisweb/icon/material/arrow_forward";
+import SelectAllIcon from "@nextgisweb/icon/material/select_all";
 import PreviewIcon from "@nextgisweb/icon/material/visibility";
 
 import "./ResourcePickerChildren.less";
@@ -40,6 +41,8 @@ function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
         allowSelection,
         traverseClasses,
         allowMoveInside,
+        loadingParentsChildren,
+        selectedParentsRegistry,
         getResourceClasses,
     } = store;
 
@@ -48,29 +51,48 @@ function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
     );
     const { getCheckboxProps } = usePickerCard({ store });
 
-    const dataSource = useMemo(() => {
-        const children: PickerResource[] = [];
-        if (resources) {
-            for (const x of resources) {
-                children.push(x.resource);
-            }
-        }
-        return children;
-    }, [resources]);
+    const dataSource = useMemo(
+        () => (resources ? resources.map((x) => x.resource) : []),
+        [resources]
+    );
 
     const rowSelection = useMemo(() => {
-        if (allowSelection) {
-            const rowSelection_: TableProps["rowSelection"] = {
-                type: selectionType,
-                getCheckboxProps,
-                selectedRowKeys: selected,
-                onChange: (selectedRowKeys) => {
-                    store.setSelected(selectedRowKeys.map(Number));
-                },
-            };
-            return rowSelection_;
-        }
-    }, [selected, selectionType, store, allowSelection, getCheckboxProps]);
+        if (!allowSelection) return;
+        return {
+            type: selectionType,
+            getCheckboxProps,
+            selectedRowKeys: selected,
+            onChange: (selectedRowKeys: (string | number)[]) => {
+                const newKeys = selectedRowKeys.map(Number);
+
+                const dataSourceIds = dataSource.map((item) => item.id);
+                let newSelected: number[];
+
+                if (newKeys.length === 0) {
+                    newSelected = selected.filter(
+                        (id) => !dataSourceIds.includes(id)
+                    );
+                } else {
+                    const preserved = selected.filter(
+                        (id) => !dataSourceIds.includes(id)
+                    );
+
+                    const updatedCurrent = dataSourceIds.filter((id) =>
+                        newKeys.includes(id)
+                    );
+                    newSelected = [...preserved, ...updatedCurrent];
+                }
+                store.setSelected(newSelected);
+            },
+        } as TableProps["rowSelection"];
+    }, [
+        getCheckboxProps,
+        allowSelection,
+        selectionType,
+        dataSource,
+        selected,
+        store,
+    ]);
 
     const canTraverse = useCallback(
         (record: PickerResource) => {
@@ -96,8 +118,72 @@ function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
             const canPreview = record.interfaces.some((resourceInterface) =>
                 renderableInterfaces.includes(resourceInterface)
             );
+
+            let openBtn: React.ReactNode = undefined;
+            let selectAllBtn: React.ReactNode = undefined;
+            if (canTraverse(record)) {
+                const selectedParent = store.multiple
+                    ? selectedParentsRegistry.get(record.id)
+                    : 0;
+                const childrenCount = selectedParent
+                    ? selectedParent.children.length
+                    : 0;
+                openBtn = (
+                    <Tooltip title={gettext("Open")}>
+                        <Button
+                            type="text"
+                            shape="circle"
+                            icon={
+                                <Badge
+                                    color={"var(--primary)"}
+                                    count={childrenCount}
+                                    size="small"
+                                    offset={[5, 0]}
+                                >
+                                    <FolderOpenIcon />
+                                </Badge>
+                            }
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                e.preventDefault();
+                                store.changeParentTo(record.id);
+                            }}
+                        />
+                    </Tooltip>
+                );
+
+                const withRendarableChildrenInterfaces: ResourceInterface[] = [
+                    "IFeatureLayer",
+                ];
+                const canSelectAllChildren = record.interfaces.some(
+                    (resourceInterface) =>
+                        withRendarableChildrenInterfaces.includes(
+                            resourceInterface
+                        )
+                );
+
+                if (canSelectAllChildren && multiple) {
+                    selectAllBtn = (
+                        <Tooltip title={gettext("Select all")}>
+                            <Button
+                                type="text"
+                                shape="circle"
+                                loading={loadingParentsChildren.has(record.id)}
+                                icon={<SelectAllIcon />}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    e.preventDefault();
+                                    store.selectAllChildren(record.id);
+                                }}
+                            />
+                        </Tooltip>
+                    );
+                }
+            }
+
             return (
                 <Space>
+                    {selectAllBtn}
                     {canPreview && (
                         <Tooltip title={gettext("Preview")}>
                             <Button
@@ -114,24 +200,17 @@ function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
                             />
                         </Tooltip>
                     )}
-                    {canTraverse(record) && (
-                        <Tooltip title={gettext("Open")}>
-                            <Button
-                                type="text"
-                                shape="circle"
-                                icon={<FolderOpenIcon />}
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    e.preventDefault();
-                                    store.changeParentTo(record.id);
-                                }}
-                            />
-                        </Tooltip>
-                    )}
+                    {openBtn}
                 </Space>
             );
         },
-        [canTraverse, store]
+        [
+            canTraverse,
+            loadingParentsChildren,
+            multiple,
+            selectedParentsRegistry,
+            store,
+        ]
     );
 
     const columns = useMemo<TableProps["columns"]>(
@@ -147,6 +226,7 @@ function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
             {
                 className: "actions",
                 dataIndex: "actions",
+                align: "right",
                 render: renderActions,
             },
         ],
@@ -164,23 +244,19 @@ function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
                     }
                     return;
                 }
-                if (pick && onOk) {
+                if (pick && onOk && !multiple) {
                     const toPick = multiple ? [record.id] : record.id;
                     onOk(toPick as V);
                     return;
                 }
                 const existIndex = selected.indexOf(record.id);
-
-                let newSelected = multiple ? [...selected] : [];
-
+                const newSelected = multiple ? [...selected] : [];
                 // unselect on second click
                 if (existIndex !== -1) {
-                    newSelected = [...selected];
                     newSelected.splice(existIndex, 1);
                 } else {
                     newSelected.push(record.id);
                 }
-
                 store.setSelected(newSelected);
             };
             return {
@@ -211,5 +287,6 @@ function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
         />
     );
 }
+
 export const ResourcePickerChildren = observer(ResourcePickerChildrenInner);
 ResourcePickerChildren.displayName = "ResourcePickerChildren";

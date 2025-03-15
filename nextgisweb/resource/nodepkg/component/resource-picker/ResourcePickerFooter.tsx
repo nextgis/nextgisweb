@@ -149,6 +149,9 @@ function MoveControlInner<V extends SelectValue = SelectValue>({
                 }}
             >
                 {getSelectedMsg}
+                {multiple && selected.length
+                    ? ` (${selected.length})`
+                    : undefined}
             </Button>
         );
     };
