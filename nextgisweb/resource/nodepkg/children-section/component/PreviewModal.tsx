@@ -10,7 +10,7 @@ import "./PreviewModal.less";
 
 type PreviewModalProps = ShowModalOptions & {
     resourceId: number;
-    href: string;
+    href?: string;
     target?: string;
 };
 

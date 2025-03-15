@@ -3,10 +3,13 @@ import { debounce } from "lodash-es";
 import { observer } from "mobx-react-lite";
 import { useCallback, useMemo, useState } from "react";
 
-import { Button, Table } from "@nextgisweb/gui/antd";
+import { Button, Space, Table, Tooltip } from "@nextgisweb/gui/antd";
 import type { TableProps } from "@nextgisweb/gui/antd";
+import showModal from "@nextgisweb/gui/showModal";
 import { sorterFactory } from "@nextgisweb/gui/util";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import { PreviewModal } from "@nextgisweb/resource/children-section/component/PreviewModal";
+import type { ResourceInterface } from "@nextgisweb/resource/type/api";
 
 import { renderResourceCls } from "../../util/renderResourceCls";
 
@@ -19,6 +22,7 @@ import type {
 } from "./type";
 
 import FolderOpenIcon from "@nextgisweb/icon/material/arrow_forward";
+import PreviewIcon from "@nextgisweb/icon/material/visibility";
 
 import "./ResourcePickerChildren.less";
 
@@ -85,20 +89,46 @@ function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
         NonNullable<ColumnProps<PickerResource>["render"]>
     >(
         (_, record) => {
-            if (!canTraverse(record)) {
-                return <></>;
-            }
+            const renderableInterfaces: ResourceInterface[] = [
+                "IFeatureLayer",
+                "IRenderableStyle",
+            ];
+            const canPreview = record.interfaces.some((resourceInterface) =>
+                renderableInterfaces.includes(resourceInterface)
+            );
             return (
-                <Button
-                    type="text"
-                    shape="circle"
-                    icon={<FolderOpenIcon />}
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        e.preventDefault();
-                        store.changeParentTo(record.id);
-                    }}
-                />
+                <Space>
+                    {canPreview && (
+                        <Tooltip title={gettext("Preview")}>
+                            <Button
+                                type="text"
+                                shape="circle"
+                                icon={<PreviewIcon />}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    e.preventDefault();
+                                    showModal(PreviewModal, {
+                                        resourceId: record.id,
+                                    });
+                                }}
+                            />
+                        </Tooltip>
+                    )}
+                    {canTraverse(record) && (
+                        <Tooltip title={gettext("Open")}>
+                            <Button
+                                type="text"
+                                shape="circle"
+                                icon={<FolderOpenIcon />}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    e.preventDefault();
+                                    store.changeParentTo(record.id);
+                                }}
+                            />
+                        </Tooltip>
+                    )}
+                </Space>
             );
         },
         [canTraverse, store]
