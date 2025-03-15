@@ -27,6 +27,7 @@ from nextgisweb.resource import DataScope, ResourceFactory, ResourceScope
 
 from .adapter import WebMapAdapter
 from .model import ExtentWSEN, LegendSymbolsEnum, WebMap, WebMapAnnotation, WebMapScope
+from .option import WebMapOption
 from .plugin import WebmapLayerPlugin, WebmapPlugin
 
 AnnotationID = Annotated[int, Meta(ge=1, description="Annotation ID")]
@@ -477,6 +478,7 @@ class DisplayConfig(Struct, kw_only=True):
     # units: str
     printMaxSize: int
     bookmarkLayerId: Union[Any, None] = None
+    options: Dict[str, bool]
 
 
 def _extent_wsen_from_attrs(obj, prefix) -> Union[ExtentWSEN, None]:
@@ -597,6 +599,13 @@ def display_config(obj, request) -> DisplayConfig:
     root_item = cast(RootItemConfig, traverse(obj.root_item))
     permissions = obj.permissions(request.user)
 
+    options = dict()
+    for k, v in WebMapOption.registry.items():
+        if obj.options is not None and k in obj.options:
+            options[k] = obj.options[k]
+        else:
+            options[k] = v.default()
+
     return DisplayConfig(
         webmapId=obj.id,
         webmapTitle=obj.display_name if obj.title is None else obj.title,
@@ -623,6 +632,7 @@ def display_config(obj, request) -> DisplayConfig:
         measureSrsId=obj.measure_srs_id,
         bookmarkLayerId=obj.bookmark_resource_id,
         printMaxSize=request.env.webmap.options["print.max_size"],
+        options=options,
     )
 
 
@@ -667,3 +677,7 @@ def setup_pyramid(comp, config):
         factory=webmap_factory,
         get=display_config,
     )
+
+    from .option import api as option_api
+
+    option_api.setup_pyramid(comp, config)

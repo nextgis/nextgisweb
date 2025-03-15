@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import List, Literal, Type, Union
+from typing import Dict, List, Literal, Type, Union
 
 import geoalchemy2 as ga
 import sqlalchemy as sa
@@ -18,6 +18,7 @@ from nextgisweb.lib import saext
 from nextgisweb.lib.msext import DEPRECATED
 
 from nextgisweb.auth import User
+from nextgisweb.core.exception import ValidationError
 from nextgisweb.resource import (
     CRUTypes,
     Resource,
@@ -35,6 +36,7 @@ from nextgisweb.resource.category import MapsAndServicesCategory
 from nextgisweb.spatial_ref_sys import SRS
 
 from .adapter import WebMapAdapter
+from .option import WebMapOption
 
 Base.depends_on("resource")
 
@@ -90,6 +92,7 @@ class WebMap(Base, Resource):
     )
     legend_symbols = sa.Column(saext.Enum(LegendSymbolsEnum), nullable=True)
     measure_srs_id = sa.Column(sa.ForeignKey(SRS.id, ondelete="SET NULL"), nullable=True)
+    options = sa.Column(saext.Msgspec(Dict[str, bool]), nullable=False, default=dict)
 
     root_item = orm.relationship("WebMapItem", cascade="all")
 
@@ -498,6 +501,17 @@ class ExtentAttr(SAttribute):
                 setattr(obj, a, getattr(value, b))
 
 
+class OptionsAttr(SAttribute):
+    def get(self, srlzr: Serializer) -> Dict[str, bool]:
+        return srlzr.obj.options
+
+    def set(self, srlzr: Serializer, value: Dict[str, bool], *, create: bool):
+        for k in value.keys():
+            if k not in WebMapOption.registry:
+                raise ValidationError("Unknown web map option '{}'.".format(k))
+        super().set(srlzr, value, create=create)
+
+
 class WebMapSerializer(Serializer, resource=WebMap):
     initial_extent = ExtentAttr(read=ResourceScope.read, write=ResourceScope.update)
     constraining_extent = ExtentAttr(read=ResourceScope.read, write=ResourceScope.update)
@@ -525,6 +539,8 @@ class WebMapSerializer(Serializer, resource=WebMap):
     extent_const_right = ExtentPartAttr(read=ResourceScope.read, write=ResourceScope.update)
     extent_const_bottom = ExtentPartAttr(read=ResourceScope.read, write=ResourceScope.update)
     extent_const_top = ExtentPartAttr(read=ResourceScope.read, write=ResourceScope.update)
+
+    options = OptionsAttr(read=ResourceScope.read, write=ResourceScope.update)
 
 
 @sa_event.listens_for(SRS, "after_delete")

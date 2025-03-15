@@ -47,3 +47,24 @@ def test_annotation_post_get(webmap, ngw_webtest_app):
 
     adata = ngw_webtest_app.get(aurl).json
     assert adata["description"] == safe_html
+
+
+@pytest.mark.parametrize(
+    "options, ok",
+    (
+        pytest.param(None, False, id="null"),
+        pytest.param(dict(), True, id="empty"),
+        pytest.param({"unknown": True}, False, id="unknown-key"),
+        pytest.param({"webmap.identification_geometry": "wrong-type"}, False, id="wrong-type"),
+        pytest.param({"webmap.identification_geometry": True}, True, id="known"),
+    ),
+)
+def test_options(options, ok, webmap, ngw_webtest_app):
+    url = f"/api/resource/{webmap}"
+
+    ngw_webtest_app.put_json(url, dict(webmap=dict(options=options)), status=200 if ok else 422)
+    if not ok:
+        return
+
+    data = ngw_webtest_app.get(url, status=200).json
+    assert data["webmap"]["options"] == options
