@@ -22,7 +22,7 @@ import type {
 } from "./type";
 
 import FolderOpenIcon from "@nextgisweb/icon/material/arrow_forward";
-import SelectAllIcon from "@nextgisweb/icon/material/select_all";
+import SelectFirstIcon from "@nextgisweb/icon/material/editor_choice";
 import PreviewIcon from "@nextgisweb/icon/material/visibility";
 
 import "./ResourcePickerChildren.less";
@@ -120,14 +120,14 @@ function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
             );
 
             let openBtn: React.ReactNode = undefined;
-            let selectAllBtn: React.ReactNode = undefined;
+            let selectFirstBtn: React.ReactNode = undefined;
             if (canTraverse(record)) {
                 const selectedParent = store.multiple
                     ? selectedParentsRegistry.get(record.id)
-                    : 0;
+                    : undefined;
                 const childrenCount = selectedParent
                     ? selectedParent.children.length
-                    : 0;
+                    : undefined;
                 openBtn = (
                     <Tooltip title={gettext("Open")}>
                         <Button
@@ -155,25 +155,25 @@ function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
                 const withRendarableChildrenInterfaces: ResourceInterface[] = [
                     "IFeatureLayer",
                 ];
-                const canSelectAllChildren = record.interfaces.some(
+                const canSelectFirstChildren = record.interfaces.some(
                     (resourceInterface) =>
                         withRendarableChildrenInterfaces.includes(
                             resourceInterface
                         )
                 );
 
-                if (canSelectAllChildren && multiple) {
-                    selectAllBtn = (
-                        <Tooltip title={gettext("Select all")}>
+                if (!selectedParent && canSelectFirstChildren && multiple) {
+                    selectFirstBtn = (
+                        <Tooltip title={gettext("Select first")}>
                             <Button
                                 type="text"
                                 shape="circle"
                                 loading={loadingParentsChildren.has(record.id)}
-                                icon={<SelectAllIcon />}
+                                icon={<SelectFirstIcon />}
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     e.preventDefault();
-                                    store.selectAllChildren(record.id);
+                                    store.selectFirstChildren(record.id);
                                 }}
                             />
                         </Tooltip>
@@ -183,7 +183,7 @@ function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
 
             return (
                 <Space>
-                    {selectAllBtn}
+                    {selectFirstBtn}
                     {canPreview && (
                         <Tooltip title={gettext("Preview")}>
                             <Button

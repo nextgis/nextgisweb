@@ -19,7 +19,7 @@ import { actionHandler } from "./decorator/actionHandler";
 
 type Action = keyof Pick<
     ResourcePickerStore,
-    | "selectAllChildren"
+    | "selectChildren"
     | "setChildrenFor"
     | "setBreadcrumbItemsFor"
     | "createNewGroup"
@@ -66,7 +66,7 @@ export class ResourcePickerStore
 
     @observable.shallow accessor selectedParentsRegistry: Map<
         number,
-        { parent: number; children: number[]; loading?: boolean }
+        { children: number[]; loading?: boolean }
     > = new Map();
     @observable.shallow accessor loadingParentsChildren: Set<number> =
         new Set();
@@ -199,29 +199,51 @@ export class ResourcePickerStore
     }
 
     @actionHandler
+    async selectFirstChildren(parentId: number) {
+        this.selectChildren(parentId, (resources) =>
+            resources.length ? [resources[0].resource.id] : []
+        );
+    }
+
     async selectAllChildren(parentId: number) {
+        this.selectChildren(parentId, (resources) =>
+            resources.map((item) => item.resource.id)
+        );
+    }
+
+    @actionHandler
+    async selectChildren(
+        parentId: number,
+        getNewSelectedIds: (resource: CompositeRead[]) => number[]
+    ) {
         if (this.multiple && !this.loadingParentsChildren.has(parentId)) {
             try {
                 const registry = new Set(this.loadingParentsChildren);
                 registry.add(parentId);
                 this.setLoadingParentsChildren(registry);
 
-                const abort = this._abortOperation("selectAllChildren", true);
-                const childrenResources = await this.fetchChildrenResources(
-                    parentId,
-                    { signal: abort.signal }
+                const abort = this._abortOperation("selectChildren", true);
+
+                const response = await this.fetchChildrenResources(parentId, {
+                    signal: abort.signal,
+                });
+                const childrenResources = response.filter(
+                    (child) =>
+                        this.checkEnabled(child.resource) &&
+                        !this.disableResourceIds.includes(child.resource.id)
                 );
 
                 if (!this.resources || this.resources.length === 0) {
                     return;
                 }
+                if (childrenResources.length) {
+                    const newSelected = new Set<number>([
+                        ...this.selected,
+                        ...getNewSelectedIds(childrenResources),
+                    ]);
 
-                const newSelected = new Set<number>([
-                    ...this.selected,
-                    ...childrenResources.map((item) => item.resource.id),
-                ]);
-
-                this.setSelected(Array.from(newSelected));
+                    this.setSelected(Array.from(newSelected));
+                }
             } finally {
                 const registry = new Set(this.loadingParentsChildren);
                 registry.delete(parentId);
@@ -383,10 +405,7 @@ export class ResourcePickerStore
     }
 
     private async updateSelectedParentsRegistry(): Promise<void> {
-        const registry = new Map<
-            number,
-            { parent: number; children: number[] }
-        >();
+        const registry = new Map<number, { children: number[] }>();
 
         for (const selectedId of this.selected) {
             try {
@@ -396,16 +415,17 @@ export class ResourcePickerStore
                 );
                 for (const parentItem of parentsChain) {
                     const parentId = parentItem.resource.id;
-                    if (!registry.has(parentId)) {
-                        registry.set(parentId, {
-                            parent: parentId,
-                            children: [],
-                        });
-                    }
-                    const entry = registry.get(parentId)!;
+                    if (parentId !== selectedId) {
+                        if (!registry.has(parentId)) {
+                            registry.set(parentId, {
+                                children: [],
+                            });
+                        }
+                        const entry = registry.get(parentId)!;
 
-                    if (!entry.children.some((id) => id === selectedId)) {
-                        entry.children.push(selectedId);
+                        if (!entry.children.some((id) => id === selectedId)) {
+                            entry.children.push(selectedId);
+                        }
                     }
                 }
             } catch (error) {
