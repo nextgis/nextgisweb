@@ -1,4 +1,4 @@
-import type { DatePickerProps } from "antd/lib/date-picker";
+import type { DatePickerProps } from "antd/es/date-picker";
 import type { PickerRef } from "rc-picker";
 import { forwardRef } from "react";
 

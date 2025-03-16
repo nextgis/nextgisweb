@@ -1,10 +1,10 @@
-import type {
-    FormItemProps as AntdFormItemProps,
-    FormInstance,
-} from "antd/lib/form";
 import type { ComponentType, ReactNode } from "react";
 
-import type { Form } from "@nextgisweb/gui/antd";
+import type {
+    FormItemProps as AntdFormItemProps,
+    Form,
+    FormInstance,
+} from "@nextgisweb/gui/antd";
 
 export type FormProps = Omit<
     Parameters<typeof Form>[0],

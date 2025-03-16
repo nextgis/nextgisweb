@@ -1,4 +1,3 @@
-import type { TextAreaProps } from "antd/es/input";
 import { debounce } from "lodash-es";
 import { observer } from "mobx-react-lite";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -15,7 +14,12 @@ import {
     Switch,
     Tooltip,
 } from "@nextgisweb/gui/antd";
-import type { InputRef, OptionType, SelectProps } from "@nextgisweb/gui/antd";
+import type {
+    InputRef,
+    OptionType,
+    SelectProps,
+    TextAreaProps,
+} from "@nextgisweb/gui/antd";
 import { CopyToClipboardButton } from "@nextgisweb/gui/buttons";
 import { TemplateLink } from "@nextgisweb/gui/component";
 import { routeURL } from "@nextgisweb/pyramid/api";

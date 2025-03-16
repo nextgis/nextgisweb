@@ -1,8 +1,8 @@
-import type { FormInstance } from "antd/lib/form";
 import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 
 import { Button, Form, Popconfirm, Space, message } from "@nextgisweb/gui/antd";
+import type { FormInstance } from "@nextgisweb/gui/antd";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
 import { FieldsForm } from "@nextgisweb/gui/fields-form";

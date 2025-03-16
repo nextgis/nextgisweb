@@ -1,4 +1,3 @@
-import type { CarouselRef } from "antd/es/carousel";
 import {
     Fragment,
     useEffect,
@@ -10,6 +9,7 @@ import {
 
 import { isFileImage } from "@nextgisweb/feature-attachment/attachment-editor/util/isFileImage";
 import { Button, Carousel, Tooltip } from "@nextgisweb/gui/antd";
+import type { CarouselRef } from "@nextgisweb/gui/antd";
 import { useKeydownListener } from "@nextgisweb/gui/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 

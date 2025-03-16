@@ -1,4 +1,3 @@
-import type { TooltipPropsWithTitle } from "antd/es/tooltip";
 import { useContext } from "react";
 import type { CSSProperties, ReactNode } from "react";
 
@@ -12,10 +11,10 @@ export interface LotProps {
     label?: string | false;
 
     /** Show help icon and help message in tooltip */
-    help?: TooltipPropsWithTitle["title"];
+    help?: ReactNode | (() => ReactNode);
 
     /** Show help icon and error message in tooltip */
-    error?: TooltipPropsWithTitle["title"] | boolean;
+    error?: ReactNode | boolean;
 
     /** Starting column in grid layout
      *

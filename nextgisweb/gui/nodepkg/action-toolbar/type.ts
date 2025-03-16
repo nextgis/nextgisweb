@@ -1,6 +1,6 @@
-import type { Button } from "antd";
-import type { SizeType } from "antd/lib/config-provider/SizeContext";
 import type { CSSProperties, ReactNode } from "react";
+
+import type { Button, SizeType } from "../antd";
 
 export type ButtonProps = Parameters<typeof Button>[0];
 

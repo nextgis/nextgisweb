@@ -1,10 +1,9 @@
-import type { ColumnProps } from "antd/lib/table/Column";
 import { debounce } from "lodash-es";
 import { observer } from "mobx-react-lite";
 import { useCallback, useMemo, useState } from "react";
 
 import { Button, Table } from "@nextgisweb/gui/antd";
-import type { TableProps } from "@nextgisweb/gui/antd";
+import type { TableColumnProps, TableProps } from "@nextgisweb/gui/antd";
 import { sorterFactory } from "@nextgisweb/gui/util";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
@@ -82,7 +81,7 @@ function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
     );
 
     const renderActions = useCallback<
-        NonNullable<ColumnProps<PickerResource>["render"]>
+        NonNullable<TableColumnProps<PickerResource>["render"]>
     >(
         (_, record) => {
             if (!canTraverse(record)) {

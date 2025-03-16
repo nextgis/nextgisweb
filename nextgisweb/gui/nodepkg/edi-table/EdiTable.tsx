@@ -1,14 +1,13 @@
-import type { AnyObject } from "antd/es/_util/type";
 import { observer } from "mobx-react-lite";
 import { createElement, useCallback, useMemo } from "react";
 
 import { Table } from "../antd";
-import type { TableProps } from "../antd";
+import type { TableColumnType, TableProps } from "../antd";
 
 import type { EdiTableStore } from "./EdiTableStore";
 import { RowActions, WELLKNOWN_ROW_ACTIONS } from "./RowAction";
 import type { RowAction, RowActionConfig } from "./RowAction";
-import type { AntTableCollumn, EdiTableColumn, FunctionKeys } from "./type";
+import type { AnyObject, EdiTableColumn, FunctionKeys } from "./type";
 
 import "./EdiTable.less";
 
@@ -87,7 +86,7 @@ function EdiTableComponent<R extends AnyObject = AnyObject>({
 
         return columns
             .map(({ key, component, shrink, ...columnProps }, idx) => {
-                const result: AntTableCollumn = {
+                const result: TableColumnType = {
                     key,
                     dataIndex: String(key),
                     ...columnProps,

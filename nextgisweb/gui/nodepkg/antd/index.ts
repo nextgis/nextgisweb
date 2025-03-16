@@ -61,6 +61,8 @@ export {
     notification,
 } from "antd";
 
+export * from "./theme";
+
 export { default as InputInteger } from "./input-integer";
 export { default as Calendar } from "./calendar";
 export { default as ConfigProvider } from "./config-provider";
@@ -72,7 +74,11 @@ export { default as Table } from "./table";
 export { default as Tabs } from "./tabs";
 export { default as InputBigInteger } from "./input-big-integer";
 
-export type { SizeType } from "antd/lib/config-provider/SizeContext";
+export type { CarouselRef } from "antd/es/carousel";
+export type { SizeType } from "antd/es/config-provider/SizeContext";
+export type { TextAreaProps } from "antd/es/input";
+export type { TableRowSelection } from "antd/es/table/interface";
+
 export type { TableProps } from "./table";
 export type { TabsProps } from "./tabs";
 export type { InputIntegerProps } from "./input-integer";

@@ -65,6 +65,10 @@ const config = {
                         "group": ["../../../*"],
                         "message": "Too many levels up, use absolute name.",
                     },
+                    {
+                        "group": ["ant/lib", "antd/lib/*"],
+                        "message": "Use `@nextgisweb/gui/antd' or 'antd/es'.",
+                    },
                 ],
             },
         ],

@@ -1,6 +1,4 @@
-import { theme } from "antd";
-
-import { Checkbox, ConfigProvider } from "@nextgisweb/gui/antd";
+import { Checkbox, ConfigProvider, useToken } from "@nextgisweb/gui/antd";
 
 import type WebmapStore from "../store";
 import type { TreeItemConfig } from "../type/TreeItems";
@@ -12,8 +10,6 @@ interface LegendProps {
     store: WebmapStore;
     checkable: boolean;
 }
-
-const { useToken } = theme;
 
 export function Legend({ nodeData, store, checkable }: LegendProps) {
     const { token } = useToken();

@@ -1,6 +1,5 @@
-import type { ColumnsType } from "antd/es/table";
-
 import { Table } from "@nextgisweb/gui/antd";
+import type { TableColumnsType } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import type { FieldDataItem } from "./fields";
@@ -8,7 +7,7 @@ import type { FieldDataItem } from "./fields";
 import "./KeyValueTable.less";
 
 export function KeyValueTable({ data }: { data: FieldDataItem[] }) {
-    const columns: ColumnsType<FieldDataItem> = [
+    const columns: TableColumnsType<FieldDataItem> = [
         {
             className: "attr-column",
             title: gettext("Attribute"),

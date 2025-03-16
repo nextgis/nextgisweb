@@ -1,8 +1,7 @@
-import { theme } from "antd";
-import type { AliasToken } from "antd/es/theme/interface";
 import type { CSSProperties } from "react";
 
-const { useToken } = theme;
+import { useToken } from "../antd";
+import type { AliasToken } from "../antd";
 
 export function useThemeVariables(
     mapping: Record<string, keyof AliasToken>

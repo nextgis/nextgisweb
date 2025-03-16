@@ -1,5 +1,6 @@
 import type { AnyObject } from "antd/es/_util/type";
-import type { ColumnType } from "antd/lib/table";
+
+import type { TableColumnType } from "../antd";
 
 export type FunctionKeys<
     T,
@@ -9,8 +10,6 @@ export type FunctionKeys<
     [K in keyof RT]: RT[K] extends (row: R) => void ? K : never;
 }[keyof RT];
 
-export type AntTableCollumn = ColumnType<AnyObject>;
-
 export interface ComponentProps<R extends AnyObject = AnyObject> {
     value: unknown;
     row: R;
@@ -18,7 +17,9 @@ export interface ComponentProps<R extends AnyObject = AnyObject> {
 }
 
 export interface EdiTableColumn<R extends AnyObject = AnyObject>
-    extends AntTableCollumn {
+    extends TableColumnType {
     shrink?: boolean | string;
     component?: React.ComponentType<ComponentProps<R>>;
 }
+
+export type { AnyObject };

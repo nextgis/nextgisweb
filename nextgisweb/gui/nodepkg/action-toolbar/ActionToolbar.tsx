@@ -1,4 +1,3 @@
-import { theme } from "antd";
 import classNames from "classnames";
 import {
     Fragment,
@@ -10,6 +9,7 @@ import {
 } from "react";
 import type { ForwardedRef, ReactElement, Ref } from "react";
 
+import { useToken } from "../antd";
 import { useFit } from "../hook/useFit";
 import { mergeStyles } from "../util";
 
@@ -21,8 +21,6 @@ import type {
 } from "./type";
 
 import "./ActionToolbar.less";
-
-const { useToken } = theme;
 
 function ActionToolbarInput<
     P extends Record<string, unknown> = Record<string, unknown>,

@@ -1,7 +1,7 @@
-import type { UploadFile } from "antd/lib/upload/interface";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { message } from "@nextgisweb/gui/antd";
+import type { UploadFile } from "@nextgisweb/gui/antd";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 import { gettextf } from "@nextgisweb/pyramid/i18n";
 

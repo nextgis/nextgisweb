@@ -1,4 +1,3 @@
-import type { RcFile } from "antd/es/upload/interface";
 import { useState } from "react";
 
 import { fileUploader } from "@nextgisweb/file-upload";
@@ -95,7 +94,7 @@ export function AttachmentForm({ id }: { id: number }) {
         </Modal>
     );
 
-    const doImport = async (fileObj: RcFile) => {
+    const doImport = async (fileObj: File) => {
         try {
             setLoading("import");
             const uploadedFiles = await fileUploader({ files: [fileObj] });

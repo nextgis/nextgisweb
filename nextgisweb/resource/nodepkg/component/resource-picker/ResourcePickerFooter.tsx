@@ -1,8 +1,8 @@
-import type { InputRef } from "antd/lib/input/Input";
 import { observer } from "mobx-react-lite";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { Button, Col, Input, Row, Space, Tooltip } from "@nextgisweb/gui/antd";
+import type { InputRef } from "@nextgisweb/gui/antd";
 import { errorModal } from "@nextgisweb/gui/error";
 import type { ApiError } from "@nextgisweb/gui/error/type";
 import { useKeydownListener } from "@nextgisweb/gui/hook";

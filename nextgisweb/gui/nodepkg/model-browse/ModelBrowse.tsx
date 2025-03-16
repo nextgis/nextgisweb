@@ -1,5 +1,3 @@
-import type { TableProps as AntTAbleProps } from "antd/es/table/InternalTable";
-import type { TableRowSelection } from "antd/es/table/interface";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import type { FC } from "react";
 
@@ -16,7 +14,11 @@ import {
     Tooltip,
     message,
 } from "@nextgisweb/gui/antd";
-import type { ButtonProps } from "@nextgisweb/gui/antd";
+import type {
+    ButtonProps,
+    TableProps,
+    TableRowSelection,
+} from "@nextgisweb/gui/antd";
 import { errorModal } from "@nextgisweb/gui/error";
 import {
     AddIcon,
@@ -37,8 +39,6 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { ApiError } from "../error/type";
 
 import VisibilityIcon from "@nextgisweb/icon/material/visibility";
-
-type TableProps<D> = AntTAbleProps<D>;
 
 export interface ModalBrowseData {
     id: number;

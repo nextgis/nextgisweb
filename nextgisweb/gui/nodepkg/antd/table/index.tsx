@@ -1,10 +1,10 @@
 import { Table as TableBase } from "antd";
 import type { AnyObject } from "antd/es/_util/type";
-import type { TableProps as AntTAbleProps } from "antd/es/table/InternalTable";
+import type { TableProps as AntTableProps } from "antd/es/table";
 
 import "./index.less";
 
-export interface TableProps<D = any> extends AntTAbleProps<D> {
+export interface TableProps<D = any> extends AntTableProps<D> {
     parentHeight?: boolean;
 }
 
@@ -20,7 +20,7 @@ export default function Table<D extends AnyObject = AnyObject>({
             .join(" ");
     }
 
-    const tableProps: AntTAbleProps<D> = { ...props, pagination, className };
+    const tableProps: AntTableProps<D> = { ...props, pagination, className };
 
     return <TableBase {...tableProps} />;
 }
@@ -34,3 +34,5 @@ Table.SELECTION_NONE = TableBase.SELECTION_NONE;
 Table.Column = TableBase.Column;
 Table.ColumnGroup = TableBase.ColumnGroup;
 Table.Summary = TableBase.Summary;
+
+export type { ColumnProps } from "antd/es/table";

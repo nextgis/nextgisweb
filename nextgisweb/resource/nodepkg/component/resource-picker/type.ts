@@ -1,6 +1,4 @@
-import type { TableRowSelection } from "antd/es/table/interface";
-
-import type { CardProps } from "@nextgisweb/gui/antd";
+import type { CardProps, TableRowSelection } from "@nextgisweb/gui/antd";
 import type {
     CompositeRead,
     ResourceCls,

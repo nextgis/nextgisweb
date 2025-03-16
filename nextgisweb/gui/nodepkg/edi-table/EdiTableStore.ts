@@ -1,4 +1,4 @@
-import type { AnyObject } from "antd/es/_util/type";
+import type { AnyObject } from "./type";
 
 export interface EdiTableStore<Row extends AnyObject = AnyObject> {
     rows: Row[];

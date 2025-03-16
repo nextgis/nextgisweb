@@ -1,4 +1,3 @@
-import type { AnyObject } from "antd/lib/_util/type";
 import { observer } from "mobx-react-lite";
 
 import { CloneIcon, ErrorIcon, RemoveIcon } from "@nextgisweb/gui/icon";
@@ -8,7 +7,7 @@ import { Button, Tooltip } from "../antd";
 import type { ButtonProps } from "../antd";
 
 import type { EdiTableStore } from "./EdiTableStore";
-import type { FunctionKeys } from "./type";
+import type { AnyObject, FunctionKeys } from "./type";
 
 export interface RowActionConfig<T> {
     callback: T;
