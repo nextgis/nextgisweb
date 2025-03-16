@@ -31,7 +31,7 @@ class AttachmentEditorStore implements IEditorStore<DataSource[] | null> {
 
     @computed
     get counter() {
-        return this.value && String(this.value.length);
+        return this.value ? this.value.length : null;
     }
 
     @computed

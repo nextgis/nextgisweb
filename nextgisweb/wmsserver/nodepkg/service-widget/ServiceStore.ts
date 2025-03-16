@@ -31,7 +31,8 @@ export class ServiceStore
         observe(this.layers, () => this.markDirty());
     }
 
-    @action load({ layers }: Value) {
+    @action
+    load({ layers }: Value) {
         this.layers.replace(layers.map((v) => new Layer(this, v)));
         this.dirty = false;
     }
@@ -41,15 +42,22 @@ export class ServiceStore
         return { layers: this.layers.map((i) => i.json()) };
     }
 
-    @action markDirty() {
+    @action
+    markDirty() {
         this.dirty = true;
     }
 
-    @computed get isValid(): boolean {
+    @computed
+    get isValid(): boolean {
         runInAction(() => {
             this.validate = true;
         });
         return this.layers.every((i) => i.error === false);
+    }
+
+    @computed
+    get counter() {
+        return this.layers.length;
     }
 
     // FocusTableStore

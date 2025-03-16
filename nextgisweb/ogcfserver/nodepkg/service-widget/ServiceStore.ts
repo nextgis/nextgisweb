@@ -31,7 +31,8 @@ export class ServiceStore
         observe(this.collections, () => this.markDirty());
     }
 
-    @action load({ collections }: Value) {
+    @action
+    load({ collections }: Value) {
         this.collections.replace(
             collections.map((v) => new Collection(this, v))
         );
@@ -43,7 +44,8 @@ export class ServiceStore
         return { collections: this.collections.map((i) => i.json()) };
     }
 
-    @action markDirty() {
+    @action
+    markDirty() {
         this.dirty = true;
     }
 
@@ -52,6 +54,11 @@ export class ServiceStore
             this.validate = true;
         });
         return this.collections.every((i) => i.error === false);
+    }
+
+    @computed
+    get counter() {
+        return this.collections.length;
     }
 
     // FocusTableStore

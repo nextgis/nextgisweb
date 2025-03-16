@@ -26,6 +26,8 @@ export interface EditorStore<READ = any, CREATE = READ, UPDATE = CREATE> {
 
     dirty?: boolean;
 
+    counter?: number;
+
     isValid?: boolean;
 
     validate?: boolean;

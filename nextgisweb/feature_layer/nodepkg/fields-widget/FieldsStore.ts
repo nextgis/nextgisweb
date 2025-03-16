@@ -125,6 +125,7 @@ export class FieldsStore implements EditorStore<Value>, FocusTableStore<Field> {
             validate: true,
             load: true,
             markDirty: true,
+            counter: true,
             isValid: true,
         });
     }
@@ -160,6 +161,10 @@ export class FieldsStore implements EditorStore<Value>, FocusTableStore<Field> {
 
     markDirty() {
         this.dirty = true;
+    }
+
+    get counter() {
+        return this.fields.length;
     }
 
     // FocusTableStore

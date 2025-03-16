@@ -35,6 +35,7 @@ export class ServiceStore
             load: true,
             markDirty: true,
             isValid: true,
+            counter: true,
         });
     }
 
@@ -57,6 +58,10 @@ export class ServiceStore
             this.validate = true;
         });
         return this.layers.every((i) => i.error === false);
+    }
+
+    get counter() {
+        return this.layers.length;
     }
 
     // FocusTableStore

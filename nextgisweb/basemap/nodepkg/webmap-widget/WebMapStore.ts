@@ -29,7 +29,8 @@ export class WebMapStore
         observe(this.basemaps, () => this.markDirty());
     }
 
-    @action load({ basemaps }: Value) {
+    @action
+    load({ basemaps }: Value) {
         this.basemaps.replace(basemaps.map((v) => new Basemap(this, v)));
         this.dirty = false;
     }
@@ -39,15 +40,22 @@ export class WebMapStore
         return { basemaps: this.basemaps.map((i) => i.json()) };
     }
 
-    @action markDirty() {
+    @action
+    markDirty() {
         this.dirty = true;
     }
 
-    @computed get isValid(): boolean {
+    @computed
+    get isValid(): boolean {
         runInAction(() => {
             this.validate = true;
         });
         return this.basemaps.every((i) => i.error === false);
+    }
+
+    @computed
+    get counter() {
+        return this.basemaps.length;
     }
 
     // FocusTableStore

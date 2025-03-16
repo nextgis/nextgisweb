@@ -1,17 +1,16 @@
 import { observer } from "mobx-react-lite";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { TabLabel } from "@nextgisweb/feature-layer/feature-editor/component/TabLabel";
 import { ActionToolbar } from "@nextgisweb/gui/action-toolbar";
 import type {
     ActionToolbarAction,
     ActionToolbarProps,
 } from "@nextgisweb/gui/action-toolbar";
 import { Button, Spin, Tabs } from "@nextgisweb/gui/antd";
-import { SaveButton } from "@nextgisweb/gui/component";
+import type { TabsProps } from "@nextgisweb/gui/antd";
+import { SaveButton, TabsLabelBadge } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
 import { useThemeVariables, useUnsavedChanges } from "@nextgisweb/gui/hook";
-import type { ParamOf } from "@nextgisweb/gui/type";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type {
@@ -40,7 +39,7 @@ export interface CompositeWidgetUpdateProps {
 export type CompositeWidgetProps = CompositeWidgetCreateProps &
     CompositeWidgetUpdateProps;
 
-type TabItem = NonNullable<ParamOf<typeof Tabs, "items">>[0] & {
+type TabItem = NonNullable<TabsProps["items"]>[number] & {
     order?: number;
 };
 
@@ -68,25 +67,24 @@ const CompositeWidget = observer(
             if (members) {
                 return members
                     .map(({ store, key, widget: Widget }) => {
-                        const ObserverTableLabel = observer(() => (
-                            <TabLabel
-                                isValid={validate ? store.isValid : true}
-                                // Do not show dirty mark until every widget store isDirty work correctly
-                                // dirty={
-                                //     operation === "update"
-                                //         ? (store.dirty ?? undefined)
-                                //         : undefined
-                                // }
-                                label={Widget.title}
-                            />
+                        // TODO: Do we need a local observer here?
+                        const TabsLabelObserver = observer(() => (
+                            <TabsLabelBadge
+                                error={validate && !store.isValid}
+                                dirty={store.dirty}
+                                counter={store.counter}
+                            >
+                                {Widget.title}
+                            </TabsLabelBadge>
                         ));
-                        ObserverTableLabel.displayName = `ObserverTableLabel-${key}`;
+
+                        TabsLabelObserver.displayName = `TabsLabelObserver-${key}`;
 
                         const tab: TabItem = {
                             key,
                             disabled: saving,
                             order: Widget.order,
-                            label: <ObserverTableLabel />,
+                            label: <TabsLabelObserver />,
                             children: <Widget store={store}></Widget>,
                         };
                         return tab;

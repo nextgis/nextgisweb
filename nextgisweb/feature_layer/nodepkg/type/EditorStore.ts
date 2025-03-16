@@ -23,7 +23,7 @@ export interface EditorStore<V = any> {
     /**
      * A quick report the number of records in storage value to extract for external component such as a tab
      */
-    counter?: number | string | null;
+    counter?: number | null;
 
     load: (value: V) => void;
 

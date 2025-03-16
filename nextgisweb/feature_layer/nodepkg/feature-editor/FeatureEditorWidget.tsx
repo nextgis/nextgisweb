@@ -14,25 +14,26 @@ import type {
     ActionToolbarProps,
 } from "@nextgisweb/gui/action-toolbar";
 import { Button, Tabs } from "@nextgisweb/gui/antd";
+import type { TabsProps } from "@nextgisweb/gui/antd";
+import { TabsLabelBadge } from "@nextgisweb/gui/component";
 import { SaveButton } from "@nextgisweb/gui/component/SaveButton";
 import { ErrorModal } from "@nextgisweb/gui/error/ErrorModal";
 import type { ApiError } from "@nextgisweb/gui/error/type";
 import { useUnsavedChanges } from "@nextgisweb/gui/hook";
 import showModal from "@nextgisweb/gui/showModal";
-import type { ParamOf } from "@nextgisweb/gui/type";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { FeatureEditorStore } from "./FeatureEditorStore";
-import { TabLabel } from "./component/TabLabel";
 import { ATTRIBUTES_KEY } from "./constant";
 import { registry } from "./registry";
 import type { FeatureEditorPlugin } from "./registry";
 import type { FeatureEditorWidgetProps } from "./type";
 
 import ResetIcon from "@nextgisweb/icon/material/restart_alt";
+
 import "./FeatureEditorWidget.less";
 
-type TabItem = NonNullable<ParamOf<typeof Tabs, "items">>[0] & {
+type TabItem = NonNullable<TabsProps["items"]>[number] & {
     order?: number;
 };
 
@@ -82,19 +83,21 @@ export const FeatureEditorWidget = observer(
 
                 const Widget = lazy(async () => await newEditorWidget.widget());
 
-                const ObserverTableLabel = observer(() => (
-                    <TabLabel
-                        counter={widgetStore.counter}
+                const TabsLabelObserver = observer(() => (
+                    <TabsLabelBadge
+                        counter={widgetStore.counter ?? undefined}
                         dirty={widgetStore.dirty}
-                        label={newEditorWidget.label}
-                    />
+                    >
+                        {newEditorWidget.label}
+                    </TabsLabelBadge>
                 ));
-                ObserverTableLabel.displayName = "ObserverTableLabel";
+
+                TabsLabelObserver.displayName = "TabsLabelObserver";
 
                 return {
                     key,
                     order: newEditorWidget.order,
-                    label: <ObserverTableLabel />,
+                    label: <TabsLabelObserver />,
                     children: (
                         <Suspense fallback={msgLoading}>
                             <Widget store={widgetStore}></Widget>

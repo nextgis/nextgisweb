@@ -1,0 +1,43 @@
+.ngw-gui-tabs-label-badge {
+    > span.badge {
+        display: inline-block;
+        margin-inline-start: 8px;
+        color: var(--theme-color-text);
+
+        &.error {
+            color: var(--theme-color-error);
+        }
+
+        &.countable {
+            vertical-align: 2px;
+            border-radius: 7px;
+            min-width: 10px;
+            font-size: 10px;
+            line-height: 14px;
+            text-align: center;
+
+            &:not(.long) {
+                padding-inline: 2px;
+            }
+
+            &.long {
+                padding-inline: 6px;
+            }
+        }
+
+        &.uncountable {
+            vertical-align: 2px;
+            border-radius: 3px;
+            width: 6px;
+            height: 6px;
+        }
+
+        &.dirty {
+            background-color: var(--theme-color-dirty);
+        }
+
+        &.clean {
+            background-color: var(--theme-color-clean);
+        }
+    }
+}

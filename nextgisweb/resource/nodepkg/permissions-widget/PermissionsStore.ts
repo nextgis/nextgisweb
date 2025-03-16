@@ -46,6 +46,10 @@ export class PermissionsStore implements EdiTableStore<Item> {
         return this.items.every((item) => item.error === null);
     }
 
+    get counter() {
+        return this.items.length;
+    }
+
     // EdiTable
 
     validate = false;

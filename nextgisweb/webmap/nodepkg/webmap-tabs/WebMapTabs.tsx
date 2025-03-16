@@ -2,12 +2,12 @@ import { observer } from "mobx-react-lite";
 import { Suspense, lazy, useMemo } from "react";
 
 import { Tabs } from "@nextgisweb/gui/antd";
-import type { ParamOf } from "@nextgisweb/gui/type";
+import type { TabsProps } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import type { WebMapTabsStore } from "./WebMapTabsStore";
 
-type TabItems = NonNullable<ParamOf<typeof Tabs, "items">>;
+type TabItems = NonNullable<TabsProps["items"]>;
 
 interface WebMapTabsProps {
     store: WebMapTabsStore;
