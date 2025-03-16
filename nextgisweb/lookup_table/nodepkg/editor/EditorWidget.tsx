@@ -169,6 +169,7 @@ export const EditorWidget: IEditorWidget<EditorStore> = observer(
     }
 );
 
+EditorWidget.displayName = "EditorWidget";
 EditorWidget.title = gettext("Lookup table");
-EditorWidget.order = 100;
-EditorWidget.displayName = "LookupTableEditorWidget";
+EditorWidget.activateOn = { update: true };
+EditorWidget.order = -50;
