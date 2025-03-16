@@ -1,4 +1,4 @@
-import { action, computed, makeObservable, observable } from "mobx";
+import { action, computed, observable } from "mobx";
 
 import type { EditorStore } from "@nextgisweb/resource/type";
 
@@ -14,11 +14,8 @@ export class SettingStore implements EditorStore<Value> {
     @observable accessor versioningEnabled = false;
     @observable accessor versioningExisting = false;
 
-    constructor() {
-        makeObservable(this);
-    }
-
-    @action load(value: Value) {
+    @action
+    load(value: Value) {
         this.versioningEnabled = !!value?.versioning?.enabled;
         this.versioningExisting = this.versioningEnabled;
         this.dirty = false;
@@ -30,11 +27,13 @@ export class SettingStore implements EditorStore<Value> {
         return result;
     }
 
-    @computed get isValid() {
+    @computed
+    get isValid() {
         return true;
     }
 
-    @action update(source: Pick<this, "versioningEnabled">) {
+    @action
+    update(source: Pick<this, "versioningEnabled">) {
         Object.assign(this, source);
         this.dirty = true;
     }

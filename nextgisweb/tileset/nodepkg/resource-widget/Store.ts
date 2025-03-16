@@ -1,4 +1,4 @@
-import { makeAutoObservable, runInAction, toJS } from "mobx";
+import { action, computed, observable } from "mobx";
 
 import type { FileMeta } from "@nextgisweb/file-upload/file-uploader";
 import type { CompositeStore } from "@nextgisweb/resource/composite";
@@ -19,22 +19,22 @@ export class Store
             apitype.TilesetUpdate
         >
 {
-    identity = "tileset";
+    readonly identity = "tileset";
 
-    source: FileMeta | null = null;
-    uploading = false;
+    @observable.shallow accessor source: FileMeta | null = null;
+    @observable.ref accessor uploading = false;
 
-    operation?: Operation;
-    composite: CompositeStore;
+    readonly operation: Operation;
+    readonly composite: CompositeStore;
 
     constructor({ composite, operation }: EditorStoreOptions) {
-        makeAutoObservable(this, { identity: false });
         this.composite = composite;
         this.operation = operation;
     }
 
-    load(val: apitype.TilesetRead) {
-        console.log(val);
+    @action
+    load() {
+        // NOOP
     }
 
     dump({ lunkwill }: DumpParams) {
@@ -47,21 +47,22 @@ export class Store
 
         lunkwill.suggest(!!this.source);
 
-        return toJS(result);
+        return result;
     }
 
-    update = (props: Partial<this>) => {
-        runInAction(() => {
-            Object.assign(this, props);
-        });
-    };
+    @action.bound
+    update(props: Partial<this>) {
+        Object.assign(this, props);
+    }
 
+    @computed
     get isValid() {
         return (
             !this.uploading && (this.operation === "update" || !!this.source)
         );
     }
 
+    @computed
     get suggestedDisplayName() {
         const base = this.source?.name;
         return base ? base.replace(/\.\w*$/, "") : undefined;

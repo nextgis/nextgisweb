@@ -1,4 +1,4 @@
-import { makeAutoObservable, toJS } from "mobx";
+import { action, computed, observable } from "mobx";
 
 import type { FileMeta } from "@nextgisweb/file-upload/file-uploader";
 import { gettext, gettextf } from "@nextgisweb/pyramid/i18n";
@@ -13,17 +13,16 @@ type Value = NonNullable<CompositeRead["svg_marker_library"]>;
 type ValueUpdate = NonNullable<CompositeUpdate["svg_marker_library"]>;
 
 export class File {
-    name: string = "";
-    file: FileMeta | null = null;
-    id: number;
+    @observable.ref accessor name: string = "";
+    @observable.ref accessor file: FileMeta | null = null;
 
-    store: Store;
+    readonly store: Store;
+    readonly id: number;
 
     constructor(
         store: Store,
         { name, file }: { name: string; file?: FileMeta | null }
     ) {
-        makeAutoObservable(this);
         this.store = store;
         this.id = ++idSeq;
         this.name = name;
@@ -32,17 +31,13 @@ export class File {
 }
 
 export class Store {
-    identity = "svg_marker_library";
+    readonly identity = "svg_marker_library";
 
-    files: File[] = [];
-    archive: FileMeta | null = null;
-    dirty = false;
+    @observable.shallow accessor files: File[] = [];
+    @observable.ref accessor archive: FileMeta | null = null;
+    @observable.ref accessor dirty = false;
 
-    constructor() {
-        makeAutoObservable(this, { identity: false });
-        this.files = [];
-    }
-
+    @action
     load(value: Value) {
         this.files = value.files.map(({ name }) => new File(this, { name }));
         this.archive = null;
@@ -60,13 +55,15 @@ export class Store {
                 ...(file ? { id: file.id } : {}),
             }));
         }
-        return toJS(result);
+        return result;
     }
 
+    @computed
     get isValid() {
         return true;
     }
 
+    @action
     appendFiles(files: FileMeta[]): [boolean, string | null] {
         const updated = [...this.files];
         for (const file of files) {
@@ -86,6 +83,7 @@ export class Store {
         return [true, null];
     }
 
+    @action
     fromArchive(archive: FileMeta | null): [boolean, string | null] {
         const { name } = archive || {};
         if (name && !name.toLowerCase().endsWith(".zip")) {
@@ -99,12 +97,14 @@ export class Store {
 
     // EdiTable
 
-    validate = false;
+    @observable.ref accessor validate = false;
 
+    @computed
     get rows() {
         return this.files;
     }
 
+    @action
     deleteRow(row: File) {
         this.rows.splice(this.rows.indexOf(row), 1);
         this.dirty = true;

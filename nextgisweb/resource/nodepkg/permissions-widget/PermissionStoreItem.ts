@@ -1,4 +1,4 @@
-import { makeAutoObservable, toJS } from "mobx";
+import { action, computed, observable } from "mobx";
 
 import type { NullableProps } from "@nextgisweb/gui/type";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -23,18 +23,17 @@ const isSameOrSubclass = (child: ResourceCls, parent: ResourceCls) =>
 let keySeq = 0;
 
 export class PermissionStoreItem {
-    action: ACLRuleAction | null = null;
-    principal: number | null = null;
-    scope: string | null = null;
-    permission: string | null = null;
-    identity: ResourceCls | "" | null = null;
-    propagate: boolean | null = null;
+    @observable.ref accessor action: ACLRuleAction | null = null;
+    @observable.ref accessor principal: number | null = null;
+    @observable.ref accessor scope: string | null = null;
+    @observable.ref accessor permission: string | null = null;
+    @observable.ref accessor identity: ResourceCls | "" | null = null;
+    @observable.ref accessor propagate: boolean | null = null;
 
     readonly store: PermissionsStore;
     readonly key: number;
 
     constructor(store: PermissionsStore, data?: NullableProps<ACLRule>) {
-        makeAutoObservable(this, {});
         this.store = store;
         this.key = ++keySeq;
 
@@ -61,16 +60,17 @@ export class PermissionStoreItem {
     }
 
     dump(): ACLRule {
-        return toJS({
+        return {
             action: this.action,
             principal: { id: this.principal },
             scope: this.scope,
             permission: this.permission,
             identity: this.identity,
             propagate: this.propagate,
-        }) as ACLRule;
+        } as ACLRule;
     }
 
+    @computed
     get scopes() {
         if (this.identity) {
             return resourceScopes(this.identity);
@@ -82,6 +82,7 @@ export class PermissionStoreItem {
         return resourceScopes("resource");
     }
 
+    @computed
     get error() {
         if (
             this.action === null ||
@@ -114,6 +115,7 @@ export class PermissionStoreItem {
         return null;
     }
 
+    @action
     update(data: Partial<ACLRule>) {
         for (const [k, v] of Object.entries(data)) {
             Object.assign(this, { [k]: v });

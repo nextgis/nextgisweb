@@ -1,6 +1,5 @@
-import { makeAutoObservable } from "mobx";
+import { observable } from "mobx";
 
-import type { LoginResponse } from "@nextgisweb/auth/type/api";
 import { extractError } from "@nextgisweb/gui/error";
 import type { ApiError } from "@nextgisweb/gui/error/type";
 import reactApp from "@nextgisweb/gui/react-app";
@@ -9,24 +8,20 @@ import { route } from "@nextgisweb/pyramid/api";
 import type { Credentials, LoginFormProps } from "../login/type";
 
 class AuthStore {
-    loginError = "";
-    isLogining = false;
-    authenticated = !ngwConfig.isGuest;
-    invitationSession = ngwConfig.invitationSession;
-    userDisplayName = ngwConfig.userDisplayName;
-    isAdministrator = ngwConfig.isAdministrator;
-    showLoginModal = true;
-
-    constructor() {
-        makeAutoObservable(this);
-    }
+    @observable.ref accessor loginError = "";
+    @observable.ref accessor isLogining = false;
+    @observable.ref accessor authenticated = !ngwConfig.isGuest;
+    @observable.ref accessor invitationSession = ngwConfig.invitationSession;
+    @observable.ref accessor userDisplayName = ngwConfig.userDisplayName;
+    @observable.ref accessor isAdministrator = ngwConfig.isAdministrator;
+    @observable.ref accessor showLoginModal = true;
 
     async login(creds: Credentials) {
         this._logout();
         this._cleanErrors();
         try {
             this.isLogining = true;
-            const resp = await route("auth.login_cookies").post<LoginResponse>({
+            const resp = await route("auth.login_cookies").post({
                 json: creds,
             });
             this.authenticated = true;

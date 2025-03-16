@@ -1,4 +1,4 @@
-import { makeAutoObservable, runInAction } from "mobx";
+import { action, computed, observable, runInAction } from "mobx";
 
 import type { EdiTableStore } from "@nextgisweb/gui/edi-table";
 import type { ACLRule, ResourceCls } from "@nextgisweb/resource/type/api";
@@ -10,21 +10,21 @@ interface Composite {
 }
 
 export class PermissionsStore implements EdiTableStore<Item> {
-    identity = "resource.permissions";
+    readonly identity = "resource.permissions";
 
-    items: Item[] = [];
-    dirty = false;
+    @observable.shallow accessor items: Item[] = [];
+    @observable.ref accessor dirty = false;
 
     readonly resourceClass: ResourceCls;
 
     constructor({ composite }: { composite: Composite }) {
-        makeAutoObservable(this, { identity: false });
         this.resourceClass = composite.cls;
         this.items = [];
 
         this.rotatePlaceholder();
     }
 
+    @action
     load(value: ACLRule[]) {
         // Existing data transformation
         const isUseful = (item: Item) => item.propagate || item.identity === "";
@@ -38,6 +38,7 @@ export class PermissionsStore implements EdiTableStore<Item> {
         return this.items.map((item) => item.dump());
     }
 
+    @computed
     get isValid() {
         if (!this.dirty) return true;
         runInAction(() => {
@@ -46,30 +47,35 @@ export class PermissionsStore implements EdiTableStore<Item> {
         return this.items.every((item) => item.error === null);
     }
 
+    @computed
     get counter() {
         return this.items.length;
     }
 
     // EdiTable
 
-    validate = false;
-    placeholder: Item | null = null;
+    @observable.ref accessor validate = false;
+    @observable.ref accessor placeholder: Item | null = null;
 
+    @computed
     get rows() {
         return this.items;
     }
 
+    @action
     rotatePlaceholder() {
         if (this.placeholder && this.placeholder.action === null) return;
         this.placeholder && this.items.push(this.placeholder);
         this.placeholder = new Item(this);
     }
 
+    @action
     deleteRow(row: Item) {
         this.items.splice(this.items.indexOf(row), 1);
         this.dirty = true;
     }
 
+    @action
     cloneRow(row: Item) {
         const idx = this.items.indexOf(row);
         this.items.splice(idx + 1, 0, new Item(this, row.dump()));

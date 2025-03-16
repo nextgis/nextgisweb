@@ -1,4 +1,4 @@
-import { makeAutoObservable } from "mobx";
+import { action, computed, observable } from "mobx";
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
@@ -13,24 +13,25 @@ export interface RecordOption {
 }
 
 export class RecordItem implements RecordOption {
-    key: string | undefined = undefined;
-    value: unknown = undefined;
+    @observable.ref accessor key: string | undefined = undefined;
+    @observable.ref accessor value: unknown = undefined;
 
-    id: number;
-    store: EditorStore;
+    readonly id: number;
+    readonly store: EditorStore;
 
     constructor(store: EditorStore, { key, value }: RecordOption) {
-        makeAutoObservable(this);
         this.store = store;
         this.id = ++idSeq;
         this.key = key;
         this.value = value;
     }
 
+    @computed
     get type() {
         return this.value === null ? "null" : typeof this.value;
     }
 
+    @computed
     get error() {
         if (this.key === "") return gettext("Key required");
 
@@ -43,6 +44,7 @@ export class RecordItem implements RecordOption {
         return false;
     }
 
+    @action
     update({ key, value, type }: Partial<RecordOption>) {
         if (key !== undefined) {
             this.key = key;
