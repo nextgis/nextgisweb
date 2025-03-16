@@ -1,0 +1,23 @@
+.ngw-webmap-settings-widget-options-widget {
+    display: grid;
+    grid-template-columns: auto 6em;
+    align-items: center;
+    grid-gap: 0.5rem;
+
+    > .category {
+        grid-column: 1 / span 2;
+        font-size: 16px;
+
+        &:not(:first-child) {
+            margin-block-start: 1rem;
+        }
+    }
+
+    > label {
+        padding-inline-start: 1rem;
+    }
+
+    > .ant-select {
+        width: 100%;
+    }
+}

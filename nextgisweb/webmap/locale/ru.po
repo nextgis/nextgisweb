@@ -50,7 +50,7 @@ msgid "Display name"
 msgstr "Наименование"
 
 #: nodepkg/component/SelectLegendSymbols.tsx:5
-#: nodepkg/settings-widget/SettingsWidget.tsx:32
+#: nodepkg/settings-widget/SettingsWidget.tsx:36
 #: nodepkg/settings/select-options.ts:94
 msgid "Default"
 msgstr "По умолчанию"
@@ -66,6 +66,7 @@ msgid "Collapse"
 msgstr "Свернуть"
 
 #: nodepkg/component/SelectLegendSymbols.tsx:10
+#: nodepkg/settings-widget/SettingsWidget.tsx:50
 #: nodepkg/settings/select-options.ts:97
 msgid "Disable"
 msgstr "Отключить"
@@ -184,7 +185,7 @@ msgstr "Макс. масштаб"
 
 #: nodepkg/items-widget/ItemsWidget.tsx:39
 #: nodepkg/panel/print/component/PrintElementsSettings.tsx:28
-#: nodepkg/settings-widget/SettingsWidget.tsx:24
+#: nodepkg/settings-widget/SettingsWidget.tsx:26
 #: nodepkg/settings/SettingsForm.tsx:261
 msgid "Legend"
 msgstr "Легенда"
@@ -277,7 +278,7 @@ msgstr "Числовой масштаб"
 
 #: nodepkg/map-controls/map-controls.ts:101
 #: nodepkg/map-controls/map-controls.ts:104
-#: nodepkg/settings-widget/SettingsWidget.tsx:21
+#: nodepkg/settings-widget/SettingsWidget.tsx:23
 msgid "Initial extent"
 msgstr "Начальный охват"
 
@@ -348,10 +349,12 @@ msgid "Show annotations"
 msgstr "Показывать аннотации"
 
 #: nodepkg/panel/annotations/AnnotationsPanel.tsx:127
+#: nodepkg/settings-widget/OptionsWidget.tsx:37
 msgid "No"
 msgstr "Нет"
 
 #: nodepkg/panel/annotations/AnnotationsPanel.tsx:128
+#: nodepkg/settings-widget/OptionsWidget.tsx:36
 msgid "Yes"
 msgstr "Да"
 
@@ -394,12 +397,12 @@ msgid "Other private annotations"
 msgstr "Другие приватные аннотации"
 
 #: nodepkg/panel/annotations/plugin.tsx:13
-#: nodepkg/settings-widget/SettingsWidget.tsx:25
+#: nodepkg/settings-widget/SettingsWidget.tsx:27
 msgid "Annotations"
 msgstr "Аннотации"
 
 #: nodepkg/panel/bookmarks/plugin.tsx:11
-#: nodepkg/settings-widget/SettingsWidget.tsx:27
+#: nodepkg/settings-widget/SettingsWidget.tsx:29
 msgid "Bookmarks"
 msgstr "Закладки"
 
@@ -494,7 +497,7 @@ msgid "Number of legend columns"
 msgstr "Количество столбцов легенды"
 
 #: nodepkg/panel/print/component/PrintElementsSettings.tsx:49
-#: nodepkg/settings-widget/SettingsWidget.tsx:23
+#: nodepkg/settings-widget/SettingsWidget.tsx:25
 msgid "Title"
 msgstr "Заголовок"
 
@@ -688,48 +691,65 @@ msgstr "Завершить редактирование"
 msgid "Zoom to layer"
 msgstr "Увеличить до слоя"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:22
+#: nodepkg/settings-widget/OptionsWidget.tsx:13
+msgid "Auto"
+msgstr "Авто"
+
+#: nodepkg/settings-widget/SettingsWidget.tsx:24
 msgid "Constraining extent"
 msgstr "Ограничивающий охват"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:26
+#: nodepkg/settings-widget/SettingsWidget.tsx:28
 msgid "Select mode"
 msgstr "Выберите режим"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:28
+#: nodepkg/settings-widget/SettingsWidget.tsx:30
 msgid "Select resource"
 msgstr "Выберите ресурс"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:29
+#: nodepkg/settings-widget/SettingsWidget.tsx:31
 #: nodepkg/settings/SettingsForm.tsx:172
 msgid "Measurement SRS"
 msgstr "СК для измерений"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:30
+#: nodepkg/settings-widget/SettingsWidget.tsx:32
 msgid "Layers editing"
 msgstr "Редактирование слоев"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:35
+#: nodepkg/settings-widget/SettingsWidget.tsx:33
+msgid "Additional options"
+msgstr "Дополнительные опции"
+
+#: nodepkg/settings-widget/SettingsWidget.tsx:34
+msgid "Configure"
+msgstr "Настроить"
+
+#: nodepkg/settings-widget/SettingsWidget.tsx:39
 msgid "Web map will start at this extent"
 msgstr "Веб-карта будет показана с этим охватом"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:36
+#: nodepkg/settings-widget/SettingsWidget.tsx:40
 msgid "Web map will not allow to move outside of this extent"
 msgstr "Веб-карта не позволит выйти за пределы этого охвата"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:40
+#: nodepkg/settings-widget/SettingsWidget.tsx:44
 msgid "Hide by default"
 msgstr "Скрыть по умолчанию"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:41
+#: nodepkg/settings-widget/SettingsWidget.tsx:45
 msgid "Show without messages"
 msgstr "Показать без сообщений"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:42
+#: nodepkg/settings-widget/SettingsWidget.tsx:46
 msgid "Show with messages"
 msgstr "Показать с сообщениями"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:151
+#: nodepkg/settings-widget/SettingsWidget.tsx:51
+#: nodepkg/settings/SettingsForm.tsx:195
+msgid "Enable"
+msgstr "Включить"
+
+#: nodepkg/settings-widget/SettingsWidget.tsx:185
 msgid "Settings"
 msgstr "Настройки"
 
@@ -776,10 +796,6 @@ msgstr "Формат градусов"
 #: nodepkg/settings/SettingsForm.tsx:182
 msgid "Address search"
 msgstr "Адресный поиск"
-
-#: nodepkg/settings/SettingsForm.tsx:195
-msgid "Enable"
-msgstr "Включить"
 
 #: nodepkg/settings/SettingsForm.tsx:209
 msgid "Limit by web map initial extent"

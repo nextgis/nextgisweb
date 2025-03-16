@@ -50,11 +50,11 @@ export class SettingStore
     readonly identity = "webmap";
     readonly composite: CompositeStore;
 
-    @observable accessor editable = false;
-    @observable accessor annotationEnabled = false;
-    @observable accessor annotationDefault: AnnotationDefault = "no";
-    @observable accessor legendSymbols: WebMapRead["legend_symbols"] = null;
-    @observable accessor measureSrs: null | number = null;
+    @observable.ref accessor editable = false;
+    @observable.ref accessor annotationEnabled = false;
+    @observable.ref accessor annotationDefault: AnnotationDefault = "no";
+    @observable.ref accessor legendSymbols: WebMapRead["legend_symbols"] = null;
+    @observable.ref accessor measureSrs: null | number = null;
     @observable.shallow accessor extent: ExtentRowValue = {
         left: -180,
         right: 180,
@@ -67,8 +67,9 @@ export class SettingStore
         bottom: null,
         top: null,
     };
-    @observable accessor title: string | null = null;
-    @observable accessor bookmarkResource: ResourceRef | null = null;
+    @observable.ref accessor title: string | null = null;
+    @observable.ref accessor bookmarkResource: ResourceRef | null = null;
+    @observable.shallow accessor options: WebMapRead["options"] = {};
 
     private _initValue: Partial<WithoutItems<WebMapRead>> = {
         initial_extent: [-90, -180, 180, 90],
@@ -91,6 +92,7 @@ export class SettingStore
         this.extentConst = extractExtent(value.constraining_extent);
         this.title = value.title;
         this.bookmarkResource = value.bookmark_resource;
+        this.options = value.options;
     }
 
     @computed
@@ -105,6 +107,7 @@ export class SettingStore
             title: this.title ? this.title : null,
             measure_srs: this.measureSrs ? { id: this.measureSrs } : undefined,
             bookmark_resource: this.bookmarkResource,
+            options: this.options,
         });
     }
 
@@ -159,6 +162,15 @@ export class SettingStore
     @action
     setConstrainedExtent(value: ExtentRowValue) {
         this.extentConst = value;
+    }
+
+    @action
+    setOption(identity: string, value: boolean | undefined) {
+        if (value === undefined) {
+            delete this.options[identity];
+        } else {
+            this.options[identity] = value;
+        }
     }
 
     @action

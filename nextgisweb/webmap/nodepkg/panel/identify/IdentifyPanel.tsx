@@ -134,13 +134,14 @@ const IdentifyPanel = observer<PanelPluginWidgetProps<IdentifyStore>>(
             const measurementSrid =
                 display.config.measureSrsId || measurementSridSetting;
 
+            const opts = display.config.options;
             featureInfoSection = (
                 <FeatureInfoSection
-                    showGeometryInfo={webmapSettings.show_geometry_info}
-                    measurementSrid={measurementSrid}
-                    showAttributes={webmapSettings.identify_attributes}
                     resourceId={featureInfo.layerId}
                     featureItem={featureItem}
+                    measurementSrid={measurementSrid}
+                    showGeometryInfo={opts["webmap.identification_geometry"]}
+                    showAttributes={opts["webmap.identification_attributes"]}
                     attributePanelAction={
                         <FeatureEditButton
                             display={display}
