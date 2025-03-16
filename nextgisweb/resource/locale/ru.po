@@ -102,11 +102,11 @@ msgstr "Превышена квота на количество ресурсов
 msgid "Resource type - {}."
 msgstr "Тип ресурса - {}."
 
-#: favorite/__init__.py:6
+#: favorite/__init__.py:8
 msgid "Go to"
 msgstr "Перейти"
 
-#: favorite/__init__.py:7 nodepkg/favorite/FavoritePage.tsx:380
+#: favorite/__init__.py:9 nodepkg/favorite/FavoritePage.tsx:380
 msgid "Edit"
 msgstr "Изменить"
 
@@ -118,7 +118,7 @@ msgstr "Избранное"
 msgid "User resources"
 msgstr "Пользовательские ресурсы"
 
-#: model.py:99 nodepkg/editor-widget/EditorWidget.tsx:70 scope.py:12
+#: model.py:99 nodepkg/editor-widget/EditorWidget.tsx:79 scope.py:12
 msgid "Resource"
 msgstr "Ресурс"
 
@@ -165,8 +165,8 @@ msgid "Resource group"
 msgstr "Группа ресурсов"
 
 #: nodepkg/children-section/ChildrenSection.tsx:76
-#: nodepkg/component/resource-picker/ResourcePickerChildren.tsx:25
-#: nodepkg/editor-widget/EditorWidget.tsx:20
+#: nodepkg/component/resource-picker/ResourcePickerChildren.tsx:27
+#: nodepkg/editor-widget/EditorWidget.tsx:19
 msgid "Display name"
 msgstr "Наименование"
 
@@ -176,7 +176,7 @@ msgid "Type"
 msgstr "Тип"
 
 #: nodepkg/children-section/ChildrenSection.tsx:97
-#: nodepkg/editor-widget/EditorWidget.tsx:44 template/resource_section_main.mako:22
+#: nodepkg/editor-widget/EditorWidget.tsx:50 template/resource_section_main.mako:22
 msgid "Owner"
 msgstr "Владелец"
 
@@ -222,7 +222,7 @@ msgstr "Показать дату создания ресурса"
 
 #: nodepkg/children-section/component/MenuDropdown.tsx:211
 #: nodepkg/children-section/util/createResourceTableItemOptions.ts:8
-#: nodepkg/composite/CompositeWidget.tsx:50 view.py:374
+#: nodepkg/composite/CompositeWidget.tsx:49 view.py:379
 msgid "Delete"
 msgstr "Удалить"
 
@@ -273,6 +273,10 @@ msgstr[0] "Ресурс перемещен"
 msgstr[1] "Перемещено {} ресурса"
 msgstr[2] "Перемещено {} ресурсов"
 
+#: nodepkg/component/resource-picker/ResourcePickerChildren.tsx:29
+msgid "Select first eligible child resource"
+msgstr "Выбрать первый подходящий дочерний ресурс"
+
 #: nodepkg/component/resource-picker/ResourcePickerFooter.tsx:31
 msgid "Create group"
 msgstr "Создать группу"
@@ -281,11 +285,11 @@ msgstr "Создать группу"
 msgid "Clear selection"
 msgstr "Очистить выделение"
 
-#: nodepkg/component/resource-picker/ResourcePickerTitle.tsx:17
+#: nodepkg/component/resource-picker/ResourcePickerTitle.tsx:18
 msgid "Go to initial group"
 msgstr "Вернуться в исходную группу"
 
-#: nodepkg/component/resource-picker/ResourcePickerTitle.tsx:18
+#: nodepkg/component/resource-picker/ResourcePickerTitle.tsx:19
 msgid "Refresh"
 msgstr "Обновить"
 
@@ -294,48 +298,48 @@ msgstr "Обновить"
 msgid "Add"
 msgstr "Добавить"
 
-#: nodepkg/component/resource-picker/store/ResourcePickerStore.ts:25
+#: nodepkg/component/resource-picker/store/ResourcePickerStore.ts:29
 msgid "Pick this group"
 msgstr "Выбрать эту группу"
 
-#: nodepkg/component/resource-picker/store/ResourcePickerStore.ts:26
+#: nodepkg/component/resource-picker/store/ResourcePickerStore.ts:30
 msgid "Pick selected"
 msgstr "Выбрать отмеченное"
 
-#: nodepkg/composite/CompositeStore.ts:258
+#: nodepkg/composite/CompositeStore.ts:253
 msgid "Validation error"
 msgstr "Ошибка валидации"
 
-#: nodepkg/composite/CompositeStore.ts:260
+#: nodepkg/composite/CompositeStore.ts:255
 msgid "Errors found during data validation. Tabs with errors marked in red."
 msgstr "При проверке данных обнаружена ошибка. Вкладки с ошибками отмечены красным."
 
-#: nodepkg/composite/CompositeStore.ts:276
+#: nodepkg/composite/CompositeStore.ts:271
 msgid "Unexpected error"
 msgstr "Внезапная ошибка"
 
-#: nodepkg/composite/CompositeStore.ts:277
+#: nodepkg/composite/CompositeStore.ts:272
 msgid "Serialization failed"
 msgstr "Сериализация не удалась"
 
-#: nodepkg/composite/CompositeWidget.tsx:48
+#: nodepkg/composite/CompositeWidget.tsx:47
 msgid "Create"
 msgstr "Создать"
 
-#: nodepkg/composite/CompositeWidget.tsx:49
+#: nodepkg/composite/CompositeWidget.tsx:48
 #: nodepkg/export-settings/ExportSettings.tsx:80
 msgid "Save"
 msgstr "Сохранить"
 
-#: nodepkg/composite/CompositeWidget.tsx:51
+#: nodepkg/composite/CompositeWidget.tsx:50
 msgid "Read"
 msgstr "Прочитать"
 
-#: nodepkg/composite/CompositeWidget.tsx:55
+#: nodepkg/composite/CompositeWidget.tsx:54
 msgid "Please wait. Processing request..."
 msgstr "Подождите, пожалуйста, идет обработка запроса..."
 
-#: nodepkg/composite/CompositeWidget.tsx:180
+#: nodepkg/composite/CompositeWidget.tsx:178
 msgid "Create and edit"
 msgstr "Создать и изменить"
 
@@ -406,7 +410,7 @@ msgstr[0] "Пожалуйста, подтвердите необратимое �
 msgstr[1] "Пожалуйста, подтвердите необратимое удаление {} ресурсов."
 msgstr[2] "Пожалуйста, подтвердите необратимое удаление {} ресурсов."
 
-#: nodepkg/description-editor/DescriptionEditorWidget.tsx:31
+#: nodepkg/description-editor/DescriptionEditorWidget.tsx:30
 msgid "Description"
 msgstr "Описание"
 
@@ -414,11 +418,11 @@ msgstr "Описание"
 msgid "Identifier for API integration (optional)"
 msgstr "Идентификатор для API интеграции (необязательно)"
 
-#: nodepkg/editor-widget/EditorWidget.tsx:29
+#: nodepkg/editor-widget/EditorWidget.tsx:32
 msgid "Parent"
 msgstr "Родитель"
 
-#: nodepkg/editor-widget/EditorWidget.tsx:56 template/resource_section_main.mako:16
+#: nodepkg/editor-widget/EditorWidget.tsx:64 template/resource_section_main.mako:16
 msgid "Keyname"
 msgstr "Ключ"
 
@@ -503,11 +507,11 @@ msgstr "Поиск"
 msgid "Everything"
 msgstr "Все ресурсы"
 
-#: nodepkg/permissions-widget/PermissionStoreItem.ts:13
+#: nodepkg/permissions-widget/PermissionStoreItem.ts:14
 msgid "All fields are required"
 msgstr "Необходимо заполнить все поля"
 
-#: nodepkg/permissions-widget/PermissionStoreItem.ts:14
+#: nodepkg/permissions-widget/PermissionStoreItem.ts:15
 msgid "Row conflicts with another"
 msgstr "Конфликт строк"
 
@@ -640,11 +644,11 @@ msgstr "У этого ресурса нет описания."
 msgid "External access"
 msgstr "Внешний доступ"
 
-#: view.py:122 view.py:383
+#: view.py:122 view.py:388
 msgid "JSON view"
 msgstr "Представление JSON"
 
-#: view.py:133 view.py:390
+#: view.py:133 view.py:395
 msgid "User permissions"
 msgstr "Права пользователя"
 
@@ -656,7 +660,7 @@ msgstr "Изменить ресурс"
 msgid "Delete resource"
 msgstr "Удалить ресурс"
 
-#: view.py:211 view.py:403
+#: view.py:211 view.py:408
 msgid "Resource export"
 msgstr "Экспорт ресурсов"
 
@@ -668,6 +672,6 @@ msgstr "Недостаточно разрешения '%s' в скоупе '%s' 
 msgid "Extra"
 msgstr "Дополнительно"
 
-#: view.py:360
+#: view.py:365
 msgid "Update"
 msgstr "Изменить"

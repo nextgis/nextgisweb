@@ -8,6 +8,7 @@ Changes
 - Support for dash patterns in user-defined styles.
 - OpenLayers library upgraded to 10.4.
 - Ability to configure webmap panels.
+- Refined resource picker behaviour for single and multi-selection.
 
 
 5.0.0

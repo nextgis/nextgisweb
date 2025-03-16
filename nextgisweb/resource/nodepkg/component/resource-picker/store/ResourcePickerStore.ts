@@ -1,6 +1,7 @@
-import { action, observable } from "mobx";
+import { action, observable, runInAction } from "mobx";
 
 import { route } from "@nextgisweb/pyramid/api";
+import type { RequestOptions } from "@nextgisweb/pyramid/api/type";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type {
     Blueprint,
@@ -18,6 +19,7 @@ import { actionHandler } from "./decorator/actionHandler";
 
 type Action = keyof Pick<
     ResourcePickerStore,
+    | "selectChildren"
     | "setChildrenFor"
     | "setBreadcrumbItemsFor"
     | "createNewGroup"
@@ -40,6 +42,10 @@ export class ResourcePickerStore
     @observable.ref accessor blueprint: Blueprint | null = null;
 
     @observable.shallow accessor resources: CompositeRead[] | null = null;
+    @observable.shallow accessor allLoadedResources: Map<
+        number,
+        CompositeRead
+    > = new Map();
     @observable accessor parentId: number = 0;
     @observable.shallow accessor breadcrumbItems: CompositeRead[] = [];
     @observable accessor hideUnavailable = false;
@@ -57,6 +63,13 @@ export class ResourcePickerStore
     @observable accessor getSelectedMsg = msgPickSelected;
     @observable.shallow accessor errors: Partial<Record<Action, string>> = {};
     @observable.shallow accessor loading: Partial<Record<Action, boolean>> = {};
+
+    @observable.shallow accessor selectedParentsRegistry: Map<
+        number,
+        { children: number[]; loading?: boolean }
+    > = new Map();
+    @observable.shallow accessor loadingParentsChildren: Set<number> =
+        new Set();
 
     readonly onNewGroup: OnNewGroupType | null = null;
     readonly onTraverse: ((parentId: number) => void) | null = null;
@@ -165,8 +178,8 @@ export class ResourcePickerStore
 
     @action
     setSelected(selected: number[]): void {
-        const newSelected = this.disableResourceIds.filter((id) =>
-            this.selected.includes(id)
+        const newSelected = this.selected.filter((id) =>
+            this.disableResourceIds.includes(id)
         );
         for (const s of selected) {
             if (!newSelected.includes(s)) {
@@ -174,6 +187,69 @@ export class ResourcePickerStore
             }
         }
         this.selected = newSelected;
+
+        if (this.multiple) {
+            this.updateSelectedParentsRegistry();
+        }
+    }
+
+    @action
+    setLoadingParentsChildren(registry: Set<number>) {
+        this.loadingParentsChildren = registry;
+    }
+
+    @actionHandler
+    async selectFirstChildren(parentId: number) {
+        this.selectChildren(parentId, (resources) =>
+            resources.length ? [resources[0].resource.id] : []
+        );
+    }
+
+    async selectAllChildren(parentId: number) {
+        this.selectChildren(parentId, (resources) =>
+            resources.map((item) => item.resource.id)
+        );
+    }
+
+    @actionHandler
+    async selectChildren(
+        parentId: number,
+        getNewSelectedIds: (resource: CompositeRead[]) => number[]
+    ) {
+        if (this.multiple && !this.loadingParentsChildren.has(parentId)) {
+            try {
+                const registry = new Set(this.loadingParentsChildren);
+                registry.add(parentId);
+                this.setLoadingParentsChildren(registry);
+
+                const abort = this._abortOperation("selectChildren", true);
+
+                const response = await this.fetchChildrenResources(parentId, {
+                    signal: abort.signal,
+                });
+                const childrenResources = response.filter(
+                    (child) =>
+                        this.checkEnabled(child.resource) &&
+                        !this.disableResourceIds.includes(child.resource.id)
+                );
+
+                if (!this.resources || this.resources.length === 0) {
+                    return;
+                }
+                if (childrenResources.length) {
+                    const newSelected = new Set<number>([
+                        ...this.selected,
+                        ...getNewSelectedIds(childrenResources),
+                    ]);
+
+                    this.setSelected(Array.from(newSelected));
+                }
+            } finally {
+                const registry = new Set(this.loadingParentsChildren);
+                registry.delete(parentId);
+                this.setLoadingParentsChildren(registry);
+            }
+        }
     }
 
     clearSelection = (): void => {
@@ -231,6 +307,16 @@ export class ResourcePickerStore
 
     @action setResources(resources: CompositeRead[]) {
         this.resources = resources;
+
+        this.updateLoadedResources(resources);
+    }
+
+    @action updateLoadedResources(resources: CompositeRead[]) {
+        const allResources = new Map(this.allLoadedResources);
+        resources.forEach((resource) => {
+            allResources.set(resource.resource.id, resource);
+        });
+        this.allLoadedResources = allResources;
     }
 
     @action
@@ -245,6 +331,7 @@ export class ResourcePickerStore
         this.setBreadcrumbItems(
             await loadParents(parent, {
                 signal: abort.signal,
+                cache: true,
             })
         );
     }
@@ -263,12 +350,23 @@ export class ResourcePickerStore
                 cache: true,
             })
         );
-        const resp = await route("resource.collection").get({
-            query: { parent: parent },
+        const childrenResources = await this.fetchChildrenResources(parent, {
             signal: abort.signal,
         });
-        this.setResources(
-            resp.filter((x: CompositeRead) => this._resourceVisible(x.resource))
+        this.setResources(childrenResources);
+    }
+
+    private async fetchChildrenResources(
+        parent: number,
+        { signal }: RequestOptions = {}
+    ) {
+        const resp = await route("resource.collection").get({
+            query: { parent: parent },
+            signal,
+        });
+        this.updateLoadedResources(resp);
+        return resp.filter((x: CompositeRead) =>
+            this._resourceVisible(x.resource)
         );
     }
 
@@ -304,6 +402,39 @@ export class ResourcePickerStore
             }
             return newItem;
         }
+    }
+
+    private async updateSelectedParentsRegistry(): Promise<void> {
+        const registry = new Map<number, { children: number[] }>();
+
+        for (const selectedId of this.selected) {
+            try {
+                const parentsChain: CompositeRead[] = await loadParents(
+                    selectedId,
+                    { cache: true }
+                );
+                for (const parentItem of parentsChain) {
+                    const parentId = parentItem.resource.id;
+                    if (parentId !== selectedId) {
+                        if (!registry.has(parentId)) {
+                            registry.set(parentId, {
+                                children: [],
+                            });
+                        }
+                        const entry = registry.get(parentId)!;
+
+                        if (!entry.children.some((id) => id === selectedId)) {
+                            entry.children.push(selectedId);
+                        }
+                    }
+                }
+            } catch (error) {
+                //
+            }
+        }
+        runInAction(() => {
+            this.selectedParentsRegistry = registry;
+        });
     }
 
     @actionHandler

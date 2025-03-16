@@ -42,22 +42,18 @@ export function ResourcePickerModal<V extends SelectValue = SelectValue>({
                 onSelect(resourceId);
             }
             if (onPickProp) {
-                if (store.resources) {
+                if (store.allLoadedResources) {
                     if (Array.isArray(resourceId)) {
                         const resourceItems: CompositeRead[] = [];
                         for (const id of resourceId) {
-                            const item = store.resources.find(
-                                (r) => r.resource.id === id
-                            );
+                            const item = store.allLoadedResources.get(id);
                             if (item) {
                                 resourceItems.push(item);
                             }
                         }
                         onPickProp(resourceItems);
                     } else {
-                        const item = store.resources.find(
-                            (r) => r.resource.id === resourceId
-                        );
+                        const item = store.allLoadedResources.get(resourceId);
                         if (item) {
                             onPickProp(item);
                         }
@@ -68,7 +64,7 @@ export function ResourcePickerModal<V extends SelectValue = SelectValue>({
                 close();
             }
         },
-        [close, closeOnSelect, onPickProp, onSelect, store.resources]
+        [close, closeOnSelect, onPickProp, onSelect, store.allLoadedResources]
     );
 
     useEffect(() => {

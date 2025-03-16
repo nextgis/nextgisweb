@@ -1,11 +1,13 @@
+import { theme } from "antd";
 import { debounce } from "lodash-es";
 import { observer } from "mobx-react-lite";
 import { useCallback, useMemo, useState } from "react";
 
-import { Button, Table } from "@nextgisweb/gui/antd";
+import { Badge, Button, Table } from "@nextgisweb/gui/antd";
 import type { TableColumnProps, TableProps } from "@nextgisweb/gui/antd";
 import { sorterFactory } from "@nextgisweb/gui/util";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import type { ResourceInterface } from "@nextgisweb/resource/type/api";
 
 import { renderResourceCls } from "../../util/renderResourceCls";
 
@@ -18,10 +20,12 @@ import type {
 } from "./type";
 
 import FolderOpenIcon from "@nextgisweb/icon/material/arrow_forward";
+import SelectFirstIcon from "@nextgisweb/icon/material/editor_choice";
 
 import "./ResourcePickerChildren.less";
 
 const msgDislpayName = gettext("Display name");
+const msgSelectFirst = gettext("Select first eligible child resource");
 
 function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
     store,
@@ -35,6 +39,8 @@ function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
         allowSelection,
         traverseClasses,
         allowMoveInside,
+        loadingParentsChildren,
+        selectedParentsRegistry,
         getResourceClasses,
     } = store;
 
@@ -43,29 +49,48 @@ function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
     );
     const { getCheckboxProps } = usePickerCard({ store });
 
-    const dataSource = useMemo(() => {
-        const children: PickerResource[] = [];
-        if (resources) {
-            for (const x of resources) {
-                children.push(x.resource);
-            }
-        }
-        return children;
-    }, [resources]);
+    const dataSource = useMemo(
+        () => (resources ? resources.map((x) => x.resource) : []),
+        [resources]
+    );
 
     const rowSelection = useMemo(() => {
-        if (allowSelection) {
-            const rowSelection_: TableProps["rowSelection"] = {
-                type: selectionType,
-                getCheckboxProps,
-                selectedRowKeys: selected,
-                onChange: (selectedRowKeys) => {
-                    store.setSelected(selectedRowKeys.map(Number));
-                },
-            };
-            return rowSelection_;
-        }
-    }, [selected, selectionType, store, allowSelection, getCheckboxProps]);
+        if (!allowSelection) return;
+        return {
+            type: selectionType,
+            getCheckboxProps,
+            selectedRowKeys: selected,
+            onChange: (selectedRowKeys: (string | number)[]) => {
+                const newKeys = selectedRowKeys.map(Number);
+
+                const dataSourceIds = dataSource.map((item) => item.id);
+                let newSelected: number[];
+
+                if (newKeys.length === 0) {
+                    newSelected = selected.filter(
+                        (id) => !dataSourceIds.includes(id)
+                    );
+                } else {
+                    const preserved = selected.filter(
+                        (id) => !dataSourceIds.includes(id)
+                    );
+
+                    const updatedCurrent = dataSourceIds.filter((id) =>
+                        newKeys.includes(id)
+                    );
+                    newSelected = [...preserved, ...updatedCurrent];
+                }
+                store.setSelected(newSelected);
+            },
+        } as TableProps["rowSelection"];
+    }, [
+        getCheckboxProps,
+        allowSelection,
+        selectionType,
+        dataSource,
+        selected,
+        store,
+    ]);
 
     const canTraverse = useCallback(
         (record: PickerResource) => {
@@ -80,27 +105,85 @@ function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
         [allowMoveInside, getResourceClasses, traverseClasses]
     );
 
+    const { token } = theme.useToken();
+    const colorPrimary = token.colorPrimary;
+
     const renderActions = useCallback<
         NonNullable<TableColumnProps<PickerResource>["render"]>
     >(
         (_, record) => {
-            if (!canTraverse(record)) {
-                return <></>;
+            let openBtn: React.ReactNode = undefined;
+            let selectFirstBtn: React.ReactNode = undefined;
+            if (canTraverse(record)) {
+                const selectedParent = store.multiple
+                    ? selectedParentsRegistry.get(record.id)
+                    : undefined;
+                const childrenCount = selectedParent
+                    ? selectedParent.children.length
+                    : undefined;
+                openBtn = (
+                    <Badge
+                        dot={!!childrenCount}
+                        count={childrenCount}
+                        offset={[-4, 4]}
+                        color={colorPrimary}
+                    >
+                        <Button
+                            type="text"
+                            shape="circle"
+                            icon={<FolderOpenIcon />}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                e.preventDefault();
+                                store.changeParentTo(record.id);
+                            }}
+                        />
+                    </Badge>
+                );
+
+                const withRendarableChildrenInterfaces: ResourceInterface[] = [
+                    "IFeatureLayer",
+                ];
+                const canSelectFirstChildren = record.interfaces.some(
+                    (resourceInterface) =>
+                        withRendarableChildrenInterfaces.includes(
+                            resourceInterface
+                        )
+                );
+
+                if (!selectedParent && canSelectFirstChildren && multiple) {
+                    selectFirstBtn = (
+                        <Button
+                            type="text"
+                            shape="circle"
+                            loading={loadingParentsChildren.has(record.id)}
+                            icon={<SelectFirstIcon />}
+                            title={msgSelectFirst}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                e.preventDefault();
+                                store.selectFirstChildren(record.id);
+                            }}
+                        />
+                    );
+                }
             }
+
             return (
-                <Button
-                    type="text"
-                    shape="circle"
-                    icon={<FolderOpenIcon />}
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        e.preventDefault();
-                        store.changeParentTo(record.id);
-                    }}
-                />
+                <>
+                    {selectFirstBtn}
+                    {openBtn}
+                </>
             );
         },
-        [canTraverse, store]
+        [
+            canTraverse,
+            colorPrimary,
+            loadingParentsChildren,
+            multiple,
+            selectedParentsRegistry,
+            store,
+        ]
     );
 
     const columns = useMemo<TableProps["columns"]>(
@@ -116,6 +199,7 @@ function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
             {
                 className: "actions",
                 dataIndex: "actions",
+                align: "right",
                 render: renderActions,
             },
         ],
@@ -133,23 +217,19 @@ function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
                     }
                     return;
                 }
-                if (pick && onOk) {
+                if (pick && onOk && !multiple) {
                     const toPick = multiple ? [record.id] : record.id;
                     onOk(toPick as V);
                     return;
                 }
                 const existIndex = selected.indexOf(record.id);
-
-                let newSelected = multiple ? [...selected] : [];
-
+                const newSelected = multiple ? [...selected] : [];
                 // unselect on second click
                 if (existIndex !== -1) {
-                    newSelected = [...selected];
                     newSelected.splice(existIndex, 1);
                 } else {
                     newSelected.push(record.id);
                 }
-
                 store.setSelected(newSelected);
             };
             return {
@@ -180,5 +260,6 @@ function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
         />
     );
 }
+
 export const ResourcePickerChildren = observer(ResourcePickerChildrenInner);
 ResourcePickerChildren.displayName = "ResourcePickerChildren";
