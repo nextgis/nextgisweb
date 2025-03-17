@@ -17,6 +17,7 @@ from zope.interface import implementer
 from nextgisweb.env import COMP_ID, Base, env, gettext
 from nextgisweb.lib import saext
 from nextgisweb.lib.geometry import Geometry
+from nextgisweb.lib.logging import logger
 from nextgisweb.lib.ows import FIELD_TYPE_WFS
 
 from nextgisweb.core.exception import ExternalServiceError, ForbiddenError, ValidationError
@@ -385,7 +386,12 @@ class WFSConnection(Base, Resource):
                         geom = geom_from_gml(_property[0])
                     continue
 
-                orig_datatype = layer.field_by_keyname(key).orig_datatype
+                try:
+                    layer_field = layer.field_by_keyname(key)
+                except KeyError:
+                    continue
+
+                orig_datatype = layer_field.orig_datatype
                 if is_nil:
                     value = None
                 elif orig_datatype in (
@@ -396,7 +402,7 @@ class WFSConnection(Base, Resource):
                     value = int(_property.text)
                 elif orig_datatype == "XSD_DOUBLE":
                     value = float(_property.text)
-                elif orig_datatype == "XSD_STRING":
+                elif orig_datatype in ("XSD_STRING", "XSD_DECIMAL"):
                     if _property.text is None:
                         value = ""
                     else:
@@ -529,7 +535,7 @@ class WFSLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
                         datatype = FIELD_TYPE.BIGINT
                     elif k == "XSD_DOUBLE":
                         datatype = FIELD_TYPE.REAL
-                    elif k == "XSD_STRING":
+                    elif k in ("XSD_STRING", "XSD_DECIMAL"):
                         datatype = FIELD_TYPE.STRING
                     elif k == "XSD_DATE":
                         datatype = FIELD_TYPE.DATE
@@ -541,7 +547,8 @@ class WFSLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
                         raise NotImplementedError
                     break
             else:
-                raise ValidationError("Unknown data type: {%s}%s" % field["type"])
+                logger.warning("Unknown data type: {%s}%s" % field["type"])
+                continue
 
             fopts = dict(display_name=field["name"])
             fopts.update(fdata.get(field["name"], dict()))
