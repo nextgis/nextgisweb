@@ -1,4 +1,4 @@
-import { observable } from "mobx";
+import { action, observable } from "mobx";
 
 import { extractError } from "@nextgisweb/gui/error";
 import type { ApiError } from "@nextgisweb/gui/error/type";
@@ -16,6 +16,7 @@ class AuthStore {
     @observable.ref accessor isAdministrator = ngwConfig.isAdministrator;
     @observable.ref accessor showLoginModal = true;
 
+    @action
     async login(creds: Credentials) {
         this._logout();
         this._cleanErrors();
@@ -37,6 +38,7 @@ class AuthStore {
         }
     }
 
+    @action
     logout() {
         this._logout();
         window.open(ngwConfig.logoutUrl, "_self");
@@ -47,17 +49,20 @@ class AuthStore {
         loginModal();
     }
 
+    @action
     async runApp(props: LoginFormProps, el: HTMLDivElement) {
         this.showLoginModal = false; // Do not show new modal on "Sign in" click
         const { LoginBox } = await import("../login");
         reactApp(LoginBox, props, el);
     }
 
+    @action
     _logout() {
         this.authenticated = false;
         this.userDisplayName = "";
     }
 
+    @action
     _cleanErrors() {
         this.loginError = "";
     }
