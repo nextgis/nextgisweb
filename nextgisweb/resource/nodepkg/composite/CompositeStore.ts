@@ -174,8 +174,13 @@ export class CompositeStore {
                 const result = await member.store.dump({ lunkwill });
                 if (result !== undefined) {
                     const current = get(data, identity);
-                    if (current !== undefined) Object.assign(current, result);
-                    set(data, identity, result);
+                    set(
+                        data,
+                        identity,
+                        current !== undefined
+                            ? Object.assign(current, result)
+                            : result
+                    );
                 }
             }
         }
