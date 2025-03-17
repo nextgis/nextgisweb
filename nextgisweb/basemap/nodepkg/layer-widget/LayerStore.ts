@@ -37,15 +37,15 @@ export class LayerStore
 
     private _initValue?: BasemapLayerRead | undefined;
 
-    @action load(value: BasemapLayerRead) {
+    @action
+    load(value: BasemapLayerRead) {
         layerLoad(this, value);
         this._initValue = { ...value };
         this.loaded = true;
     }
 
-    @computed get deserializeValue(): Partial<
-        BasemapLayerCreate | BasemapLayerUpdate
-    > {
+    @computed
+    get deserializeValue(): Partial<BasemapLayerCreate | BasemapLayerUpdate> {
         return {
             ...this.copyright_text.jsonPart(),
             ...this.copyright_url.jsonPart(),
@@ -58,14 +58,16 @@ export class LayerStore
         return this.dirty ? this.deserializeValue : undefined;
     }
 
-    @computed get dirty(): boolean {
+    @computed
+    get dirty(): boolean {
         if (this.deserializeValue && this._initValue) {
             return !isEqual(this.deserializeValue, this._initValue);
         }
         return true;
     }
 
-    @computed get isValid() {
+    @computed
+    get isValid() {
         runInAction(() => {
             this.validate = true;
         });

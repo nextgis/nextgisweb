@@ -298,20 +298,24 @@ export class ResourcePickerStore
         return val as T extends true ? AbortController : undefined;
     }
 
-    @action setParentItem(parentItem: CompositeRead | null) {
+    @action
+    setParentItem(parentItem: CompositeRead | null) {
         this.parentItem = parentItem;
     }
-    @action setParentId(id: number) {
+    @action
+    setParentId(id: number) {
         this.parentId = id;
     }
 
-    @action setResources(resources: CompositeRead[]) {
+    @action
+    setResources(resources: CompositeRead[]) {
         this.resources = resources;
 
         this.updateLoadedResources(resources);
     }
 
-    @action updateLoadedResources(resources: CompositeRead[]) {
+    @action
+    updateLoadedResources(resources: CompositeRead[]) {
         const allResources = new Map(this.allLoadedResources);
         resources.forEach((resource) => {
             allResources.set(resource.resource.id, resource);

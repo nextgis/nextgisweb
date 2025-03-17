@@ -52,7 +52,8 @@ export class TmsClientConnectionStore
         this.operation = operation;
     }
 
-    @action load(val: ConnectionCreate) {
+    @action
+    load(val: ConnectionCreate) {
         mapperLoad(this, val);
     }
 
@@ -64,15 +65,18 @@ export class TmsClientConnectionStore
         }
     }
 
-    @computed get dirty(): boolean {
+    @computed
+    get dirty(): boolean {
         return this.operation === "create" ? true : mapperDirty(this);
     }
 
-    @computed get error() {
+    @computed
+    get error() {
         return mapperError(this);
     }
 
-    @computed get isValid(): boolean {
+    @computed
+    get isValid(): boolean {
         runInAction(() => {
             this.validate = true;
         });

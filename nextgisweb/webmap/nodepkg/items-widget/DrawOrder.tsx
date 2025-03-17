@@ -34,11 +34,13 @@ class DrawOrderLayer {
         this.collection = collection;
     }
 
-    @computed get position(): number {
+    @computed
+    get position(): number {
         return this.collection.indexOf(this) + 1;
     }
 
-    @computed get title(): string {
+    @computed
+    get title(): string {
         let parent: ItemObject | null = this.layer;
         const path: string[] = [];
         while (parent) {
@@ -73,7 +75,8 @@ class DrawOrderStore implements FocusTableStore<DrawOrderLayer> {
         );
     }
 
-    @action sync() {
+    @action
+    sync() {
         this.items.forEach(({ layer, position }) => {
             if (layer.layerDrawOrderPosition.value !== position) {
                 layer.layerDrawOrderPosition.value = position;

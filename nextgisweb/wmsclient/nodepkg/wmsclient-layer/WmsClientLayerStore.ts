@@ -58,11 +58,13 @@ export class WmsClientLayerStore
         this.composite = composite;
     }
 
-    @action load(val: LayerRead) {
+    @action
+    load(val: LayerRead) {
         mapperLoad(this, val);
     }
 
-    @computed get dirty(): boolean {
+    @computed
+    get dirty(): boolean {
         return this.operation === "create" ? true : mapperDirty(this);
     }
 
@@ -88,11 +90,13 @@ export class WmsClientLayerStore
         }
     }
 
-    @computed get error() {
+    @computed
+    get error() {
         return mapperError(this);
     }
 
-    @computed get isValid() {
+    @computed
+    get isValid() {
         runInAction(() => {
             this.validate = true;
         });

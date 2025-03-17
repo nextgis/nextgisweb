@@ -49,7 +49,8 @@ export class ServiceStore
         this.dirty = true;
     }
 
-    @computed get isValid(): boolean {
+    @computed
+    get isValid(): boolean {
         runInAction(() => {
             this.validate = true;
         });

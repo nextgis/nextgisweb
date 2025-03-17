@@ -54,11 +54,13 @@ export class WfsClientConnectionStore
         this.operation = operation;
     }
 
-    @action load(val: WFSConnectionRead) {
+    @action
+    load(val: WFSConnectionRead) {
         mapperLoad(this, val);
     }
 
-    @computed get dirty(): boolean {
+    @computed
+    get dirty(): boolean {
         return this.operation === "create" ? true : mapperDirty(this);
     }
 
@@ -76,11 +78,13 @@ export class WfsClientConnectionStore
         }
     }
 
-    @computed get error() {
+    @computed
+    get error() {
         return mapperError(this);
     }
 
-    @computed get isValid() {
+    @computed
+    get isValid() {
         runInAction(() => {
             this.validate = true;
         });

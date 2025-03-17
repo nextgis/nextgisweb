@@ -76,7 +76,8 @@ export class WfsClientLayerStore
         this.composite = composite;
     }
 
-    @action load(value: WFSLayerRead) {
+    @action
+    load(value: WFSLayerRead) {
         load(this, value);
         this.fields.value = "keep";
     }
@@ -103,11 +104,13 @@ export class WfsClientLayerStore
         }
     }
 
-    @computed get dirty(): boolean {
+    @computed
+    get dirty(): boolean {
         return this.operation === "create" ? true : dirty(this);
     }
 
-    @computed get isValid(): boolean {
+    @computed
+    get isValid(): boolean {
         runInAction(() => {
             this.validate = true;
         });

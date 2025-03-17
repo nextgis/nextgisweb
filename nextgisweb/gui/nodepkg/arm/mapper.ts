@@ -63,7 +63,8 @@ export class MappedValue<V = any, O = any, P extends string = string> {
     }
 
     /** Observable for current value */
-    @computed get value(): V {
+    @computed
+    get value(): V {
         return this._value;
     }
 
@@ -75,22 +76,26 @@ export class MappedValue<V = any, O = any, P extends string = string> {
     }
 
     /** Observable for initial value */
-    @computed get initial(): V {
+    @computed
+    get initial(): V {
         return this._initial;
     }
 
     /** Bound method to update value */
-    @action setter = (value: V): void => {
+    @action
+    setter = (value: V): void => {
         this.value = value;
     };
 
     /** Load new value and set this value as initial one */
-    @action load = (value: V): void => {
+    @action
+    load = (value: V): void => {
         this._value = value;
         this._initial = value;
     };
 
-    @computed get error(): ErrorResult {
+    @computed
+    get error(): ErrorResult {
         if (this.prop.validateIf?.(this.owner) === false) {
             return undefined;
         }
@@ -103,7 +108,8 @@ export class MappedValue<V = any, O = any, P extends string = string> {
     }
 
     /** Value is dirty if it's different from its initial value */
-    @computed get dirty(): boolean {
+    @computed
+    get dirty(): boolean {
         return !isEqual(this._value, this._initial);
     }
 

@@ -48,7 +48,8 @@ export class ItemsStore
         this.composite = composite;
     }
 
-    @action load(value: PickMy<WebMapRead>) {
+    @action
+    load(value: PickMy<WebMapRead>) {
         mapperLoad(this, value);
         this.items.replace(
             value.root_item.children.map((item) =>
@@ -71,13 +72,15 @@ export class ItemsStore
         };
     }
 
-    @action markDirty() {
+    @action
+    markDirty() {
         if (this._loaded) {
             this.dirty = true;
         }
     }
 
-    @computed get isValid(): boolean {
+    @computed
+    get isValid(): boolean {
         runInAction(() => {
             this.validate = true;
         });

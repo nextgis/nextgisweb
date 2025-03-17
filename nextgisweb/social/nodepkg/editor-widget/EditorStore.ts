@@ -63,11 +63,13 @@ export class EditorStore
         return result;
     }
 
-    @computed get isValid() {
+    @computed
+    get isValid() {
         return this.imageExisting !== undefined;
     }
 
-    @action update(data: Partial<EditorStore>) {
+    @action
+    update(data: Partial<EditorStore>) {
         for (const [k, v] of Object.entries(data)) {
             if (k in this) {
                 (this as any)[k] = v;

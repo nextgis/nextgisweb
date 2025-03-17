@@ -31,12 +31,14 @@ export class TileCacheStore implements EditorStore<Value> {
     @observable accessor dirty = false;
     @observable accessor validate = false;
 
-    @action load(value: Value) {
+    @action
+    load(value: Value) {
         mapperLoad(this, value);
         this.dirty = false;
     }
 
-    @action markDirty() {
+    @action
+    markDirty() {
         this.dirty = true;
     }
 
@@ -51,7 +53,8 @@ export class TileCacheStore implements EditorStore<Value> {
         };
     }
 
-    @computed get isValid() {
+    @computed
+    get isValid() {
         runInAction(() => {
             this.validate = true;
         });

@@ -72,7 +72,8 @@ export class TmsClientLayerStore
         this.composite = composite;
     }
 
-    @action load(val: LayerRead) {
+    @action
+    load(val: LayerRead) {
         const value: MapperLayerCreate = {
             ...val,
             extent: {
@@ -85,7 +86,8 @@ export class TmsClientLayerStore
         mapperLoad(this, value);
     }
 
-    @computed get dirty(): boolean {
+    @computed
+    get dirty(): boolean {
         return this.operation === "create" ? true : mapperDirty(this);
     }
 
@@ -115,11 +117,13 @@ export class TmsClientLayerStore
         }
     }
 
-    @computed get error() {
+    @computed
+    get error() {
         return mapperError(this);
     }
 
-    @computed get isValid(): boolean {
+    @computed
+    get isValid(): boolean {
         runInAction(() => {
             this.validate = true;
         });

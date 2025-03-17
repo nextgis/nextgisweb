@@ -7,12 +7,14 @@ export class DescriptionEditorStore {
     @observable.ref accessor loaded: string | null = null;
     @observable.ref accessor dirty: boolean = false;
 
-    @action setValue(value: string | null) {
+    @action
+    setValue(value: string | null) {
         this.value = value;
         this.dirty = this.value !== this.loaded;
     }
 
-    @action load(value: string) {
+    @action
+    load(value: string) {
         this.value = this.loaded = value;
         this.dirty = false;
     }

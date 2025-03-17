@@ -31,7 +31,8 @@ export class EditorStore
         this.composite = composite;
     }
 
-    @action load(value: apitype.RasterLayerRead) {
+    @action
+    load(value: apitype.RasterLayerRead) {
         this.cog = this.cogInitial = !!value.cog;
         this.dirty = false;
     }
@@ -55,20 +56,23 @@ export class EditorStore
         };
     }
 
-    @action update(props: Partial<this>) {
+    @action
+    update(props: Partial<this>) {
         Object.assign(this, props);
         if (props.source !== undefined || props.cog !== undefined) {
             this.dirty = true;
         }
     }
 
-    @computed get isValid() {
+    @computed
+    get isValid() {
         return (
             !this.uploading && (this.operation === "update" || !!this.source)
         );
     }
 
-    @computed get suggestedDisplayName() {
+    @computed
+    get suggestedDisplayName() {
         const base = this.source?.name;
         return base ? base.replace(/\.tiff?$/i, "") : undefined;
     }

@@ -117,7 +117,8 @@ export class CompositeStore {
     }
 
     /** Suggested resource display name from file name or other aspects */
-    @computed get sdnDynamic(): string | undefined {
+    @computed
+    get sdnDynamic(): string | undefined {
         const firstMemberWithSdn = this.members?.find(
             (member) => member.store.suggestedDisplayName
         );

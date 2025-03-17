@@ -95,7 +95,8 @@ export class Group extends BaseItem<"group", WebMapItemGroupWrite> {
         };
     }
 
-    @computed get error(): ErrorResult {
+    @computed
+    get error(): ErrorResult {
         return firstError(
             () => baseError(this),
             () => groupError(this),
@@ -158,7 +159,8 @@ export class Layer extends BaseItem<"layer", WebMapItemLayerWrite> {
         };
     }
 
-    @computed get error(): ErrorResult {
+    @computed
+    get error(): ErrorResult {
         return firstError(
             () => baseError(this),
             () => layerError(this)

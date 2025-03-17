@@ -67,15 +67,18 @@ export class WebmapStore {
         });
     }
 
-    @computed get webmapItems() {
+    @computed
+    get webmapItems() {
         return [...this._webmapItems];
     }
 
-    @computed get checked() {
+    @computed
+    get checked() {
         return [...this._checked];
     }
 
-    @computed get expanded() {
+    @computed
+    get expanded() {
         return [...this._expanded];
     }
 
@@ -83,11 +86,8 @@ export class WebmapStore {
         return toJS(this._webmapItems);
     }
 
-    @action private _setChecked = (
-        id: number,
-        newVal: boolean,
-        oldVal?: boolean
-    ) => {
+    @action
+    private _setChecked = (id: number, newVal: boolean, oldVal?: boolean) => {
         const checked_ = [...this._checked];
         if (newVal) {
             if (!checked_.includes(id)) {
@@ -264,7 +264,8 @@ export class WebmapStore {
         );
     };
 
-    @computed get layers() {
+    @computed
+    get layers() {
         return this._layers;
     }
 
@@ -276,11 +277,13 @@ export class WebmapStore {
         return this._layers[id];
     }
 
-    @action addLayer(id: number, layer: CoreLayer) {
+    @action
+    addLayer(id: number, layer: CoreLayer) {
         this._layers = { ...this._layers, [id]: layer };
     }
 
-    @action addItem = (item: TreeChildrenItemConfig) => {
+    @action
+    addItem = (item: TreeChildrenItemConfig) => {
         const items = [item, ...this._webmapItems];
         if ("visibility" in item && item.visibility) {
             this.setChecked([...this._checked, item.id]);
@@ -288,7 +291,8 @@ export class WebmapStore {
         this._webmapItems = items;
     };
 
-    @action removeItem = (id: number) => {
+    @action
+    removeItem = (id: number) => {
         this.setChecked(this._checked.filter((cid) => cid !== id));
         traverseTree(this._webmapItems, (item, index, arr) => {
             if (item.id === id) {
@@ -300,12 +304,14 @@ export class WebmapStore {
         delete this._layers[id];
     };
 
-    @action setWebmapItems = (items: TreeItemConfig[]) => {
+    @action
+    setWebmapItems = (items: TreeItemConfig[]) => {
         this._webmapItems = items;
         this.setChecked(this._checked);
     };
 
-    @action setChecked = (checked: number[]) => {
+    @action
+    setChecked = (checked: number[]) => {
         const updatedCheckedKeys = this._prepareChecked(checked);
         this._checked = updatedCheckedKeys;
     };
@@ -314,11 +320,13 @@ export class WebmapStore {
         return this._checked;
     };
 
-    @action setExpanded = (expanded: number[]) => {
+    @action
+    setExpanded = (expanded: number[]) => {
         this._expanded = expanded;
     };
 
-    @computed get visibleLayers(): LayerItemConfig[] {
+    @computed
+    get visibleLayers(): LayerItemConfig[] {
         const visibleLayers: LayerItemConfig[] = [];
 
         traverseTree(this._webmapItems, (item) => {
@@ -330,7 +338,8 @@ export class WebmapStore {
         return visibleLayers;
     }
 
-    @computed get layersInExpandedGroups(): LayerItemConfig[] {
+    @computed
+    get layersInExpandedGroups(): LayerItemConfig[] {
         const layers: LayerItemConfig[] = [];
 
         const traverse = (items: TreeItemConfig[], parentExpanded: boolean) => {
@@ -363,7 +372,8 @@ export class WebmapStore {
         );
     };
 
-    @computed get layersWithoutLegendInfo(): LayerItemConfig[] {
+    @computed
+    get layersWithoutLegendInfo(): LayerItemConfig[] {
         return this.layersInExpandedGroups.filter(this.shouldHaveLegendInfo);
     }
 
@@ -453,7 +463,8 @@ export class WebmapStore {
         return layer ? layer.opacity : 1;
     };
 
-    @action setLayerOpacity = (layerId: number, opacity: number) => {
+    @action
+    setLayerOpacity = (layerId: number, opacity: number) => {
         const layer = this._layers[layerId];
         if (layer) {
             layer.setOpacity(opacity);

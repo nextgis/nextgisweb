@@ -41,13 +41,15 @@ export class WmsClientConnectionStore
     private _initValue?: ConnectionCreate;
     @observable accessor validate = false;
 
-    @action load(val: ConnectionCreate) {
+    @action
+    load(val: ConnectionCreate) {
         const { capcache, ...value_ } = val;
         mapperLoad(this, value_);
         this._initValue = { ...value_ };
     }
 
-    @computed get deserializeValue() {
+    @computed
+    get deserializeValue() {
         return {
             ...this.url.jsonPart(),
             ...this.username.jsonPart(),
@@ -57,7 +59,8 @@ export class WmsClientConnectionStore
         } as ConnectionCreate;
     }
 
-    @computed get dirty(): boolean {
+    @computed
+    get dirty(): boolean {
         if (this.deserializeValue && this._initValue) {
             return !isEqual(this.deserializeValue, this._initValue);
         }
@@ -70,11 +73,13 @@ export class WmsClientConnectionStore
         }
     }
 
-    @computed get error() {
+    @computed
+    get error() {
         return mapperError(this);
     }
 
-    @computed get isValid() {
+    @computed
+    get isValid() {
         runInAction(() => {
             this.validate = true;
         });
