@@ -12,7 +12,7 @@ import { Vector as VectorSource } from "ol/source";
 
 import { FeatureEditorModal } from "@nextgisweb/feature-layer/feature-editor-modal";
 import type { FeaureLayerGeometryType } from "@nextgisweb/feature-layer/type/api";
-import { errorModal } from "@nextgisweb/gui/error";
+import { errorModal, isApiError } from "@nextgisweb/gui/error";
 import { EditIcon } from "@nextgisweb/gui/icon";
 import showModal from "@nextgisweb/gui/showModal";
 import { findNode } from "@nextgisweb/gui/util/tree";
@@ -352,6 +352,7 @@ export class LayerEditor extends PluginBase {
         };
 
         this.fetchVectorData(editingItem);
+
         this.buildEditingItemInteractions(editingItem);
         this.store.set(editingItem.id, editingItem);
 
@@ -461,18 +462,25 @@ export class LayerEditor extends PluginBase {
     }
 
     private async fetchVectorData(editingItem: EditingItem): Promise<void> {
+        const resourceId = editingItem.id;
         try {
-            const resourceId = editingItem.id;
             const featuresInfo = await route(
                 "feature_layer.feature.collection",
                 {
                     id: resourceId,
                 }
-            ).get({ query: { extensions: [] } });
-
+            ).get({
+                query: {
+                    extensions: [],
+                    fields: [],
+                },
+            });
             this.handleFetchedVectorData(resourceId, featuresInfo, editingItem);
         } catch (error) {
-            errorModal(error);
+            if (isApiError(error)) {
+                errorModal(error);
+            }
+            console.error(error);
         }
     }
 
@@ -481,14 +489,18 @@ export class LayerEditor extends PluginBase {
         featuresInfo: FeatureInfo[],
         editingItem: EditingItem
     ): void {
-        const olFeatures = featuresInfo.map(
-            (featureInfo) =>
-                new Feature({
-                    id: featureInfo.id,
-                    layer_id: layerId,
-                    geometry: this.wkt.readGeometry(featureInfo.geom),
-                })
-        );
+        const olFeatures: Feature<Geometry>[] = [];
+        featuresInfo.forEach((featureInfo) => {
+            if (featureInfo.geom) {
+                olFeatures.push(
+                    new Feature({
+                        id: featureInfo.id,
+                        layer_id: layerId,
+                        geometry: this.wkt.readGeometry(featureInfo.geom),
+                    })
+                );
+            }
+        });
 
         editingItem.features.extend(olFeatures);
         this.source.addFeatures(olFeatures);
