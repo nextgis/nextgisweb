@@ -1,5 +1,6 @@
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { imageQueue, tileLoadFunction } from "@nextgisweb/pyramid/util";
+import { QUEUE_ABORT_REASON } from "@nextgisweb/pyramid/util/queue";
 import Image from "@nextgisweb/webmap/ol/layer/Image";
 import type { LayerItemConfig } from "@nextgisweb/webmap/type/api";
 
@@ -69,11 +70,17 @@ export class ImageAdapter extends LayerDisplayAdapter {
                                 src: newSrc,
                                 cache: "no-cache",
                                 signal,
-                            }).then((imageUrl) => {
-                                const img =
-                                    imageTile.getImage() as HTMLImageElement;
-                                img.src = imageUrl;
                             })
+                                .then((imageUrl) => {
+                                    const img =
+                                        imageTile.getImage() as HTMLImageElement;
+                                    img.src = imageUrl;
+                                })
+                                .catch((error) => {
+                                    if (error !== QUEUE_ABORT_REASON) {
+                                        console.error(error);
+                                    }
+                                })
                         );
                     });
                 },

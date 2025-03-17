@@ -14,6 +14,8 @@ interface RequestQueueOptions {
     debounce?: number;
 }
 
+export const QUEUE_ABORT_REASON = "The queue was cleaned";
+
 export class RequestQueue {
     private queue: AbortableRequest[] = [];
     private activeRequests: AbortableRequest[] = [];
@@ -37,7 +39,7 @@ export class RequestQueue {
 
     abort() {
         for (const q of [...this.queue, ...this.activeRequests]) {
-            q.abortController.abort("The queue was cleaned");
+            q.abortController.abort(QUEUE_ABORT_REASON);
             if (q.abort) {
                 q.abort();
             }
