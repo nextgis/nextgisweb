@@ -20,11 +20,24 @@ export function usePrintMap({ display }: { display: Display }) {
     const redrawLayers = useCallback(() => {
         if (printMap) {
             clearOlMap(printMap);
+            // Use getLayersArray() from the OL map directly because some layers may have been added directly to the OL map rather than to display.map
             display.map.getLayersArray().forEach((layer) => {
                 if (layer.getVisible() && layer.printingCopy) {
                     // Adding the same layer to different maps causes
                     // infinite loading, thus we need a copy.
-                    printMap.addLayer(layer.printingCopy());
+                    const copyLayer = layer.printingCopy();
+
+                    const matchedLayerEntry = Object.values(
+                        display.map.layers
+                    ).find(
+                        (entry) => entry.getLayer && entry.getLayer() === layer
+                    );
+
+                    if (matchedLayerEntry?.isBaseLayer) {
+                        copyLayer.setZIndex(-1);
+                    }
+
+                    printMap.addLayer(copyLayer);
                 }
             });
 
