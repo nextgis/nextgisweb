@@ -1,4 +1,4 @@
-import { makeObservable, observable, observe, runInAction } from "mobx";
+import { action, computed, observable, observe, runInAction } from "mobx";
 
 import type { FocusTableStore } from "@nextgisweb/gui/focus-table";
 import type { CompositeStore } from "@nextgisweb/resource/composite";
@@ -18,27 +18,19 @@ export class ServiceStore
     implements EditorStore<Value>, FocusTableStore<Layer>
 {
     readonly identity = "wfsserver_service";
-
-    dirty = false;
-    validate = false;
+    readonly composite: CompositeStore;
 
     layers = observable.array<Layer>([]);
 
-    composite: CompositeStore;
+    @observable.ref accessor dirty = false;
+    @observable.ref accessor validate = false;
 
     constructor({ composite }: EditorStoreOptions) {
         this.composite = composite;
         observe(this.layers, () => this.markDirty());
-        makeObservable(this, {
-            dirty: true,
-            validate: true,
-            load: true,
-            markDirty: true,
-            isValid: true,
-            counter: true,
-        });
     }
 
+    @action
     load({ layers }: Value) {
         this.layers.replace(layers.map((v) => new Layer(this, v)));
         this.dirty = false;
@@ -49,10 +41,12 @@ export class ServiceStore
         return { layers: this.layers.map((i) => i.json()) };
     }
 
+    @action
     markDirty() {
         this.dirty = true;
     }
 
+    @computed
     get isValid(): boolean {
         runInAction(() => {
             this.validate = true;
@@ -60,6 +54,7 @@ export class ServiceStore
         return this.layers.every((i) => i.error === false);
     }
 
+    @computed
     get counter() {
         return this.layers.length;
     }

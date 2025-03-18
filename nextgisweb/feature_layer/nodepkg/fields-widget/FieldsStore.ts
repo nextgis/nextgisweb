@@ -1,5 +1,5 @@
 import { difference } from "lodash-es";
-import { makeObservable, observable, observe, runInAction } from "mobx";
+import { action, computed, observable, observe, runInAction } from "mobx";
 
 import { mapper, validate } from "@nextgisweb/gui/arm";
 import type { ErrorResult } from "@nextgisweb/gui/arm";
@@ -65,7 +65,6 @@ export class Field {
     constructor(store: FieldsStore, data: FieldData) {
         this.store = store;
         fieldLoad(this, data);
-        makeObservable(this, { error: true });
         observe(this.labelField, "value", () => {
             if (this.labelField.value) {
                 this.store.fields.forEach((i) => {
@@ -91,6 +90,7 @@ export class Field {
         };
     }
 
+    @computed
     get error(): ErrorResult {
         return fieldError(this);
     }
@@ -107,29 +107,20 @@ export interface Value {
 
 export class FieldsStore implements EditorStore<Value>, FocusTableStore<Field> {
     readonly identity = "feature_layer";
-
     readonly composite: CompositeStore;
-
-    dirty = false;
-    validate = false;
 
     fields = observable.array<Field>([]);
     existingFields = observable.array<Field>([]);
 
+    @observable.ref accessor dirty = false;
+    @observable.ref accessor validate = false;
+
     constructor({ composite }: EditorStoreOptions) {
         this.composite = composite;
-
         observe(this.fields, () => this.markDirty());
-        makeObservable(this, {
-            dirty: true,
-            validate: true,
-            load: true,
-            markDirty: true,
-            counter: true,
-            isValid: true,
-        });
     }
 
+    @computed
     get isValid(): boolean {
         runInAction(() => {
             this.validate = true;
@@ -137,6 +128,7 @@ export class FieldsStore implements EditorStore<Value>, FocusTableStore<Field> {
         return this.fields.every((i) => i.error === false);
     }
 
+    @action
     load({ fields }: Value) {
         this.fields.replace(fields.map((v) => new Field(this, v)));
         this.existingFields.replace(this.fields);
@@ -159,10 +151,12 @@ export class FieldsStore implements EditorStore<Value>, FocusTableStore<Field> {
         return { fields };
     }
 
+    @action
     markDirty() {
         this.dirty = true;
     }
 
+    @computed
     get counter() {
         return this.fields.length;
     }

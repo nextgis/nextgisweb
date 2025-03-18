@@ -1,4 +1,4 @@
-import { makeObservable, runInAction } from "mobx";
+import { action, computed, observable, runInAction } from "mobx";
 
 import { mapper, validate } from "@nextgisweb/gui/arm";
 import type { PostgisConnectionRead } from "@nextgisweb/postgis/type/api";
@@ -26,9 +26,6 @@ database.validate(validate.string({ minLength: 1 }));
 export class ConnectionStore implements EditorStore<PostgisConnectionRead> {
     readonly identity = "postgis_connection";
 
-    dirty = false;
-    validate = false;
-
     hostname = hostname.init("", this);
     port = port.init(null, this);
     sslmode = sslmode.init(null, this);
@@ -36,16 +33,10 @@ export class ConnectionStore implements EditorStore<PostgisConnectionRead> {
     password = password.init("", this);
     database = database.init("", this);
 
-    constructor() {
-        makeObservable(this, {
-            dirty: true,
-            validate: true,
-            load: true,
-            markDirty: true,
-            isValid: true,
-        });
-    }
+    @observable.ref accessor dirty = false;
+    @observable.ref accessor validate = false;
 
+    @action
     load(value: PostgisConnectionRead) {
         load(this, value);
         this.dirty = false;
@@ -63,10 +54,12 @@ export class ConnectionStore implements EditorStore<PostgisConnectionRead> {
         };
     }
 
+    @action
     markDirty() {
         this.dirty = true;
     }
 
+    @computed
     get isValid(): boolean {
         runInAction(() => {
             this.validate = true;

@@ -1,6 +1,6 @@
 /** @testentry react */
 import * as falso from "@ngneat/falso";
-import { makeObservable, override } from "mobx";
+import { action, computed, observable } from "mobx";
 import type { IObservableArray } from "mobx";
 import { observer } from "mobx-react-lite";
 import { useMemo } from "react";
@@ -12,8 +12,8 @@ import { FieldsForm, useForm } from "@nextgisweb/gui/fields-form";
 import type { FormField } from "@nextgisweb/gui/fields-form";
 import {
     FocusTable,
-    action,
     columnsForType,
+    action as focusTableAction,
     observableChildren,
 } from "@nextgisweb/gui/focus-table";
 import type {
@@ -55,16 +55,16 @@ class Base<T extends TypeValue = TypeValue, D extends Common<T> = Common<T>> {
     readonly store: Store;
     readonly type: T;
 
-    parent: Group | null = null;
+    @observable.ref accessor parent: Group | null = null;
     title = baseTitle.init("", this);
 
     constructor(store: Store, { type, ...data }: D) {
         this.store = store;
         this.type = type;
         baseLoad(this, data);
-        makeObservable(this, { parent: true, error: true });
     }
 
+    @computed
     get error(): ErrorResult {
         return baseError(this);
     }
@@ -78,7 +78,6 @@ class Group extends Base<"group", Omit<GroupPayload, "children">> {
         { children, ...data }: Omit<GroupPayload, "type">
     ) {
         super(store, { type: "group", ...data });
-        makeObservable(this, { error: override });
         this.children.replace(
             children.map((item) =>
                 item.type === "group"
@@ -89,7 +88,8 @@ class Group extends Base<"group", Omit<GroupPayload, "children">> {
         );
     }
 
-    get error(): ErrorResult {
+    // NOTE: Not sure about overridden computables, but it seems to work
+    get error() {
         return firstError(
             () => super.error,
             () => {
@@ -117,16 +117,17 @@ class Layer extends Base<"layer", LayerPayload> {
     constructor(store: Store, { ...data }: Omit<LayerPayload, "type">) {
         super(store, { type: "layer", ...data });
         layerLoad(this, data);
-        makeObservable(this, { error: override, update: true });
     }
 
-    get error(): ErrorResult {
+    // NOTE: Not sure about overridden computables, but it seems to work
+    get error() {
         return firstError(
             () => super.error,
             () => layerError(this)
         );
     }
 
+    @action
     update(value: Partial<Omit<LayerPayload, "type" | "children">>) {
         Object.entries(value).forEach(([k, v]) =>
             this[k as keyof typeof value].setter(v)
@@ -209,7 +210,7 @@ export default function ComplexTreeTest() {
     const { tableActions, itemActions } = useMemo<FocusTablePropsActions<Item>>(
         () => ({
             tableActions: [
-                action.addItem(
+                focusTableAction.addItem(
                     () =>
                         new Group(store, {
                             title: falso.randCompanyName(),
@@ -217,7 +218,7 @@ export default function ComplexTreeTest() {
                         }),
                     { key: "add_group", title: "Add group" }
                 ),
-                action.addItem(
+                focusTableAction.addItem(
                     () =>
                         new Layer(store, {
                             title: falso.randBrand(),
@@ -227,7 +228,7 @@ export default function ComplexTreeTest() {
                     { key: "add_layer", title: "Add layer" }
                 ),
             ],
-            itemActions: [action.deleteItem()],
+            itemActions: [focusTableAction.deleteItem()],
         }),
         [store]
     );

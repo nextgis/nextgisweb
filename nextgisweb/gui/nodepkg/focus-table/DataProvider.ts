@@ -1,12 +1,5 @@
 import { difference, pull } from "lodash-es";
-import {
-    autorun,
-    computed,
-    makeObservable,
-    observable,
-    observe,
-    runInAction,
-} from "mobx";
+import { autorun, computed, observable, observe, runInAction } from "mobx";
 import { useEffect, useMemo } from "react";
 import type {
     TreeDataProvider,
@@ -88,7 +81,6 @@ export class DataProvider<I extends FocusTableItem>
     constructor(props: DataProviderOpts<I>) {
         this.store = props.store;
         this.rootItem = props.rootItem;
-        makeObservable(this, { isFlat: computed });
     }
 
     startup() {
@@ -189,6 +181,7 @@ export class DataProvider<I extends FocusTableItem>
         this.cleanupItem.set(id, itemCleanup);
     }
 
+    @computed
     get isFlat(): boolean {
         const rootItem = this.treeItems.get(this.rootItem);
         if (rootItem === undefined) return false;
