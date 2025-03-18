@@ -48,6 +48,11 @@ const config = {
                         "name": "prop-types",
                         "message": "Use TypeScript for typing",
                     },
+                    {
+                        "name": "mobx",
+                        "importNames": ["makeAutoObservable", "makeObservable"],
+                        "message": "Use decorators instead",
+                    },
                 ],
                 "patterns": [
                     {
