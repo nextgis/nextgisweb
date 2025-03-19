@@ -10,7 +10,7 @@ import type { ResourcePickerModalProps, SelectValue } from "./type";
 
 import "./ResourcePickerModal.less";
 
-export function ResourcePickerModal<V extends SelectValue = SelectValue>({
+function ResourcePickerModal<V extends SelectValue = SelectValue>({
     open: open_,
     visible: visible_,
     store: storeProp,
@@ -92,3 +92,5 @@ export function ResourcePickerModal<V extends SelectValue = SelectValue>({
         </Modal>
     );
 }
+
+export default ResourcePickerModal;

@@ -14,7 +14,7 @@ type PreviewModalProps = ShowModalOptions & {
     target?: string;
 };
 
-export function PreviewModal({
+function PreviewModal({
     resourceId,
     href,
     open: open_,
@@ -61,3 +61,5 @@ export function PreviewModal({
         </Modal>
     );
 }
+
+export default PreviewModal;
