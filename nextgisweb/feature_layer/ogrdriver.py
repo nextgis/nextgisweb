@@ -27,6 +27,7 @@ OGRDriverT = namedtuple(
         "fid_support",
         "lco_configurable",
         "dsco_configurable",
+        "get_layer_name",
     ],
 )
 
@@ -41,6 +42,7 @@ def OGRDriver(
     fid_support=False,
     lco_configurable=None,
     dsco_configurable=None,
+    get_layer_name=lambda x: x,
 ):
     return OGRDriverT(
         name,
@@ -52,7 +54,14 @@ def OGRDriver(
         fid_support,
         lco_configurable,
         dsco_configurable,
+        get_layer_name,
     )
+
+
+def layer_name_gpkg(name):
+    if name[0] in r"`~!@#$%^&*()+-={}|[]\\:\";'<>?,./" or name[:4] == "gpkg":
+        return f"_{name}"
+    return name
 
 
 EXPORT_FORMAT_OGR["GPKG"] = OGRDriver(
@@ -62,6 +71,7 @@ EXPORT_FORMAT_OGR["GPKG"] = OGRDriver(
     single_file=True,
     fid_support=True,
     mime="application/geopackage+vnd.sqlite3",
+    get_layer_name=layer_name_gpkg,
 )
 
 EXPORT_FORMAT_OGR["GeoJSON"] = OGRDriver(
