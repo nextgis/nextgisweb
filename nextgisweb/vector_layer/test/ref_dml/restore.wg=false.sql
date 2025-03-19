@@ -11,9 +11,9 @@ WITH qet AS (
         ht.nid AS nid,
         ht.nop AS nop,
         ht.geom AS geom,
-        :fld_1 AS fld_i,
-        :fld_2 AS fld_t,
-        :fld_3 AS fld_d
+        CAST(:fld_1 AS INT) AS fld_i,
+        CAST(:fld_2 AS TEXT) AS fld_t,
+        CAST(:fld_3 AS DATE) AS fld_d
     FROM ht, qet
     WHERE
         ht.fid = qet.fid

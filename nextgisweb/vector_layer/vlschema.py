@@ -390,9 +390,10 @@ class VLSchema(MetaData):
         for idx, (k, v) in enumerate(ct.fields.items(), start=1):
             if fields is None or k in fields:
                 bmap[k] = bpn = f"fld_{idx}"
-                cht.append(bindparam(bpn).label(v.name))
+                bp = bindparam(bpn).label(v.name)
             else:
-                cht.append(literal_column(v.name))
+                bp = literal_column(v.name)
+            cht.append(sql_cast(bp, v.type))
 
         sht = select(ht.c.fid, ht.c.nid, ht.c.nop, *cht)
         hir = func.int4range(ht.c.vid, ht.c.nid)
