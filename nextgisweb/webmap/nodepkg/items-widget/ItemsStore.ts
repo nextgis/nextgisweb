@@ -9,6 +9,7 @@ import type { CompositeStore } from "@nextgisweb/resource/composite";
 import type {
     EditorStore,
     EditorStoreOptions,
+    Operation,
 } from "@nextgisweb/resource/type";
 import type { WebMapRead, WebMapUpdate } from "@nextgisweb/webmap/type/api";
 
@@ -40,12 +41,13 @@ export class ItemsStore
         this.markDirty();
     });
 
-    composite: CompositeStore;
-
+    readonly composite: CompositeStore;
+    readonly operation: Operation;
     private _loaded = false;
 
-    constructor({ composite }: EditorStoreOptions) {
+    constructor({ composite, operation }: EditorStoreOptions) {
         this.composite = composite;
+        this.operation = operation;
     }
 
     @action
@@ -74,9 +76,14 @@ export class ItemsStore
 
     @action
     markDirty() {
-        if (this._loaded) {
-            this.dirty = true;
+        /**
+         * Calling mapperLoad(this, value) in {@link load} action triggers the mapper’s onChange callback, which calls this {@link markDirty}.
+         * So this condition prevents the dirty flag from being set during data initialization in update mode.
+         */
+        if (!this._loaded && this.operation === "update") {
+            return;
         }
+        this.dirty = true;
     }
 
     @computed
