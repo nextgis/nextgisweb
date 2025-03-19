@@ -9,24 +9,10 @@ type ModalParams = ParamsOf<typeof Modal>;
 
 export interface ShowModalOptions extends ModalParams {
     open?: boolean;
-    /** @deprecated use {@link ShowModalOptions.open} instead */
-    visible?: boolean;
+
     close?: () => void;
 }
 
-function handleVisibleDeprecation<T extends ShowModalOptions>(config: T): T {
-    if (config.visible !== undefined) {
-        console.warn(
-            "The 'visible' prop is deprecated. Please use 'open' instead."
-        );
-        if (config.open === undefined) {
-            config.open = config.visible;
-        }
-    }
-    // Remove the 'visible' prop from the config
-    const { visible, ...restConfig } = config;
-    return restConfig as T;
-}
 export function showModalBase<T extends ShowModalOptions>(
     renderContent: (props: T) => ReactElement,
     config: T
@@ -34,7 +20,6 @@ export function showModalBase<T extends ShowModalOptions>(
     const container = document.createDocumentFragment();
     const root = createRoot(container);
 
-    config = handleVisibleDeprecation(config);
     const {
         onCancel: originalOnCancel,
         afterClose: originalAfterClose,
@@ -66,7 +51,6 @@ export function showModalBase<T extends ShowModalOptions>(
         if (typeof configUpdate === "function") {
             currentConfig = configUpdate(currentConfig);
         } else {
-            configUpdate = handleVisibleDeprecation(configUpdate);
             currentConfig = {
                 ...currentConfig,
                 ...configUpdate,
