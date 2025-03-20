@@ -47,6 +47,7 @@ import type {
 } from "../type";
 import type { TreeItemConfig } from "../type/TreeItems";
 import { getURLParams, setURLParam } from "../utils/URL";
+import { normalizeExtent } from "../utils/normalizeExtent";
 
 export class Display {
     private readonly modeURLParam: keyof MapURLParams = "panel";
@@ -127,19 +128,24 @@ export class Display {
         this.tabsManager = new WebMapTabsStore();
         this.mapStates = MapStatesObserver.getInstance();
 
+        this.config.initialExtent = normalizeExtent(this.config.initialExtent);
         this._extent = transformExtent(
             this.config.initialExtent,
             this.lonlatProjection,
             this.displayProjection
         );
 
-        this._extentConst =
-            this.config.constrainingExtent &&
-            transformExtent(
+        this._extentConst = null;
+        if (this.config.constrainingExtent) {
+            this.config.constrainingExtent = normalizeExtent(
+                this.config.constrainingExtent
+            );
+            this._extentConst = transformExtent(
                 this.config.constrainingExtent,
                 this.lonlatProjection,
                 this.displayProjection
             );
+        }
 
         this.map = new MapStore({
             logo: false,
