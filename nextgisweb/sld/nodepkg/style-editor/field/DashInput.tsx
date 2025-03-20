@@ -34,7 +34,6 @@ export const DashPatternInput: React.FC<DashPatternInputProps> = ({
                 getLinePatternPresets(lineWidth).find(
                     (pr) => pr.keyname === preset
                 )?.value.dasharray || [];
-            console.log;
             setDashPattern((old) => {
                 if (JSON.stringify(old) !== JSON.stringify(newPattern)) {
                     if (onChange) {
