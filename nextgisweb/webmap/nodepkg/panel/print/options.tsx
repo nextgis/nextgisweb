@@ -119,7 +119,11 @@ export const urlPrintParams: UrlPrintParams<PrintMapSettings> = {
     },
     print_arrow: { fromParam: (v) => v === "true", setting: "arrow" },
     print_title: { fromParam: (v) => v === "true", setting: "title" },
-    print_titleText: { setting: undefined },
+    print_titleText: {
+        fromParam: (v) => (v ? decodeURIComponent(v) : ""),
+        toParam: (v) => (v ? encodeURIComponent(v) : ""),
+        setting: "titleText",
+    },
     print_legend: { fromParam: (v) => v === "true", setting: "legend" },
     print_legendColumns: { fromParam: parseNumber, setting: "legendColumns" },
 };
