@@ -191,17 +191,10 @@ export class Display {
             this._itemStorePrepare();
         });
 
-        if (this.config.initialExtent[3] > 82) {
-            this.config.initialExtent[3] = 82;
-        }
-        if (this.config.initialExtent[1] < -82) {
-            this.config.initialExtent[1] = -82;
-        }
-
-        // // Layers panel
+        // Layers panel
         this._layersPanelSetup();
 
-        // // Map and plugins
+        // Map and plugins
         Promise.all([
             this._midDeferred.webmapPlugin,
             this._startupDeferred,
@@ -210,7 +203,7 @@ export class Display {
             this._mapSetup();
         });
 
-        // // Setup layers
+        // Setup layers
         Promise.all([this._midDeferred.adapter, this._itemStoreDeferred]).then(
             () => {
                 this._layersSetup();
