@@ -15,6 +15,10 @@ interface PrintPaperSettingsProps {
     updateMapSettings: (updateSettings: Partial<PrintMapSettings>) => void;
 }
 
+const calculateFormat = (urlSettings: Partial<PrintMapSettings>) => {
+    return `${urlSettings.width}_${urlSettings.height}`;
+};
+
 export const PrintPaperSettings: FC<PrintPaperSettingsProps> = ({
     display,
     mapSettings,
@@ -55,7 +59,9 @@ export const PrintPaperSettings: FC<PrintPaperSettingsProps> = ({
                 "width",
             ];
             if (keysPaperSize.every((k) => k in urlSettings)) {
-                changePaperFormat("custom");
+                const format = calculateFormat(urlSettings);
+                const pageFormat = pageFormats.find((f) => f.value === format);
+                changePaperFormat(pageFormat?.value || "custom");
             } else {
                 keysPaperSize.forEach((k) => {
                     delete urlSettings[k];
