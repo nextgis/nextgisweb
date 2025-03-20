@@ -156,7 +156,10 @@ export class PanelManager {
     }
 
     private _handlePanelActivation(): void {
-        if (!this.active.active || !this.panels.has(this.active.active)) {
+        if (
+            (!this.active.active || !this.panels.has(this.active.active)) &&
+            this.active.active !== "none"
+        ) {
             this._activateFirstPanel();
         }
         this._handleInitActive();
