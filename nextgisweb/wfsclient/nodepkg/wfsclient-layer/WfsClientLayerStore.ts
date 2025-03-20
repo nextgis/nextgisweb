@@ -78,8 +78,7 @@ export class WfsClientLayerStore
 
     @action
     load(value: WFSLayerRead) {
-        load(this, value);
-        this.fields.value = "keep";
+        load(this, { ...value, fields: "keep" });
     }
 
     dump() {
