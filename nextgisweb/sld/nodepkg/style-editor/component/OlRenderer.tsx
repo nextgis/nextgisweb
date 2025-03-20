@@ -102,11 +102,13 @@ export const OlRenderer: React.FC<OlRendererProps> = ({
                 Name: "Sample Feature",
             });
             source.addFeature(sampleFeature);
-            // zoom to feature extent
+
+            // Zoom to feature extent with padding
             const extent = source.getExtent();
             if (map.current) {
                 map.current.getView().fit(extent, {
                     maxZoom: 20,
+                    padding: Array(4).fill(10),
                 });
             }
         }
