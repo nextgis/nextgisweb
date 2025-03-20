@@ -34,6 +34,10 @@ export const EditorWidget: IEditorWidget<EditorStore> = observer(
                 <ImageUploader
                     image={image}
                     onChange={(value) => {
+                        if (!store.dirty && value === undefined) {
+                            return;
+                        }
+
                         store.update({
                             imageUpdated: value === undefined ? null : value,
                         });
