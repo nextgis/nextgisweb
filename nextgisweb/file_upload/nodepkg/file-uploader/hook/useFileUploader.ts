@@ -2,8 +2,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { message } from "@nextgisweb/gui/antd";
 import type { UploadFile } from "@nextgisweb/gui/antd";
+import { errorModal } from "@nextgisweb/gui/error";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
-import { gettextf } from "@nextgisweb/pyramid/i18n";
+import { gettext, gettextf } from "@nextgisweb/pyramid/i18n";
 
 import type {
     FileUploaderOptions,
@@ -15,6 +16,9 @@ import type {
 import { fileUploader } from "../util/fileUploader";
 
 const msgProgressFmt = gettextf("{} uploaded...");
+
+const msgUploadError = gettext("Upload is not completed");
+const msgFileTooBigFallback = gettext("Uploaded file too large");
 
 export function useFileUploader<M extends boolean = false>({
     accept,
@@ -115,6 +119,17 @@ export function useFileUploader<M extends boolean = false>({
                 }
             } catch (er) {
                 console.log(er);
+                if ((er as { status_code: number }).status_code === 413) {
+                    const errorTitle =
+                        (er as { title: string }).title ||
+                        msgFileTooBigFallback;
+
+                    errorModal({
+                        title: msgUploadError,
+                        message: errorTitle,
+                        detail: er,
+                    });
+                }
             } finally {
                 setProgress(undefined);
                 setUploading(false);
