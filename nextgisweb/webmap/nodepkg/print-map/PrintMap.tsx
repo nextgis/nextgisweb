@@ -117,11 +117,14 @@ export const PrintMap = observer<PrintMapProps>(
 
             if (initCenter) {
                 viewPrintMap.setCenter(initCenter);
+                if (scale) {
+                    setMapScale(scale, map);
+                    onScaleChange(scale);
+                }
             } else {
                 const mainMapView = display.map.olMap.getView();
                 viewPrintMap.setCenter(mainMapView.getCenter());
                 viewPrintMap.setZoom(mainMapView.getZoom() as number);
-
                 const currentScale = getMapScale(display.map.olMap);
                 if (currentScale) {
                     onScaleChange(currentScale);
@@ -161,8 +164,10 @@ export const PrintMap = observer<PrintMapProps>(
             });
             map.addControl(mapScale);
 
-            printMap.current = map;
             setMapScaleControl(mapScale);
+            switchRotateControl(map, arrow);
+
+            printMap.current = map;
         }, [
             mapReady,
             mapCoords,
@@ -171,6 +176,8 @@ export const PrintMap = observer<PrintMapProps>(
             onScaleChange,
             onCenterChange,
             display,
+            arrow,
+            scale,
         ]);
 
         useEffect(() => {
