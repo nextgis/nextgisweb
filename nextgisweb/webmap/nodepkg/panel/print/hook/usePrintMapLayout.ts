@@ -11,6 +11,7 @@ interface PrintMapCompProps {
     display: Display;
     getCenterFromUrl: () => Coordinate | null;
     onScaleChange: (scale: number) => void;
+    onZoomChange: (zoom: number) => void;
     onCenterChange: (center: Coordinate) => void;
 }
 
@@ -21,6 +22,7 @@ export function usePrintMapLayout({
     display,
     getCenterFromUrl,
     onScaleChange,
+    onZoomChange,
     onCenterChange,
 }: PrintMapCompProps) {
     const resizeObserver = useRef<ResizeObserver>();
@@ -71,6 +73,7 @@ export function usePrintMapLayout({
                 initCenter: getCenterFromUrl(),
                 onScaleChange,
                 onCenterChange,
+                onZoomChange,
             },
             div
         );
@@ -78,7 +81,14 @@ export function usePrintMapLayout({
         resizeObserver.current = resizeObserver_;
         printMapComp.current = comp;
         printMapEl.current = div;
-    }, [display, getCenterFromUrl, onCenterChange, onScaleChange, settings]);
+    }, [
+        display,
+        settings,
+        getCenterFromUrl,
+        onCenterChange,
+        onScaleChange,
+        onZoomChange,
+    ]);
 
     useEffect(() => {
         if (printMapComp.current) {
