@@ -41,8 +41,15 @@ const PrintPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
 
     const { close, title, visible } = store;
 
+    const [zoom, setZoom] = useState<number>();
     const [center, setCenter] = useState<Coordinate>();
     const [printMapScale, setPrintMapScale] = useState<number>();
+
+    const mapPositionRef = useRef({ center, zoom });
+
+    useEffect(() => {
+        mapPositionRef.current = { center, zoom };
+    }, [center, zoom]);
 
     const [mapSettings, setMapSettings] = useObjectState<PrintMapSettings>(() =>
         defaultPanelMapSettings(display.config.webmapTitle)
@@ -65,9 +72,10 @@ const PrintPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
     const { createPrintMapComp, printMapEl, destroy } = usePrintMapLayout({
         settings: mapSettings,
         display,
-        getCenterFromUrl,
+        onZoomChange: setZoom,
         onScaleChange: setPrintMapScale,
         onCenterChange: setCenter,
+        getCenterFromUrl,
     });
 
     const show = useCallback(() => {
@@ -81,9 +89,17 @@ const PrintPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
     const hide = useCallback(() => {
         if (mapInit.current) {
             destroy();
+
+            // Sync the main map's view with last print preview position before closing
+            const mainMapView = display.map.olMap.getView();
+            mainMapView.setCenter(mapPositionRef.current.center);
+            if (mapPositionRef.current.zoom) {
+                mainMapView.setZoom(mapPositionRef.current.zoom);
+            }
+
             mapInit.current = false;
         }
-    }, [destroy]);
+    }, [destroy, display]);
 
     const getTextToCopy = useCallback(() => {
         return getPrintMapLink(mapSettings);

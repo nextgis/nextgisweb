@@ -59,7 +59,14 @@ const scaleFormatter = (scale: number): string => {
 };
 
 export const PrintMap = observer<PrintMapProps>(
-    ({ settings, display, initCenter, onScaleChange, onCenterChange }) => {
+    ({
+        display,
+        settings,
+        initCenter,
+        onCenterChange,
+        onScaleChange,
+        onZoomChange,
+    }) => {
         const {
             width,
             height,
@@ -138,9 +145,6 @@ export const PrintMap = observer<PrintMapProps>(
                 const centerPrintMap = map.getView().getCenter();
                 if (centerPrintMap) {
                     onCenterChange(centerPrintMap);
-
-                    const mainMapView = display.map.olMap.getView();
-                    mainMapView.setCenter(centerPrintMap);
                 }
             };
 
@@ -154,8 +158,10 @@ export const PrintMap = observer<PrintMapProps>(
             const onChangeScale = debounce((scale: string) => {
                 onScaleChange(parseInt(scale, 10));
 
-                const mainMapView = display.map.olMap.getView();
-                mainMapView.setZoom(viewPrintMap.getZoom() as number);
+                const zoom = viewPrintMap.getZoom();
+                if (zoom !== undefined) {
+                    onZoomChange(zoom);
+                }
             }, 100);
 
             const mapScale = new MapScaleControl({
@@ -169,15 +175,16 @@ export const PrintMap = observer<PrintMapProps>(
 
             printMap.current = map;
         }, [
+            scale,
+            arrow,
+            display,
             mapReady,
             mapCoords,
             initCenter,
+            onCenterChange,
             buildPrintMap,
             onScaleChange,
-            onCenterChange,
-            display,
-            arrow,
-            scale,
+            onZoomChange,
         ]);
 
         useEffect(() => {

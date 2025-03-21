@@ -56,5 +56,6 @@ export interface PrintMapProps {
     initCenter: Coordinate | null;
     display: Display;
     onScaleChange: (scale: number) => void;
+    onZoomChange: (zoom: number) => void;
     onCenterChange: (center: Coordinate) => void;
 }
