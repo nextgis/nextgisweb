@@ -15,7 +15,7 @@ import PrintMapExport from "./PrintMapExport";
 import { PrintElementsSettings } from "./component/PrintElementsSettings";
 import { PrintPaperSettings } from "./component/PrintPaperSettings";
 import { PrintScaleSettings } from "./component/PrintScaleSettings";
-import { usePrintMap } from "./hook/usePrintMap";
+import { usePrintMapLayout } from "./hook/usePrintMapLayout";
 import {
     defaultPanelMapSettings,
     getPrintMapLink,
@@ -25,6 +25,16 @@ import {
 import { ShareAltOutlined } from "@ant-design/icons";
 
 import "./PrintPanel.less";
+
+let isCenterFromUrlRead = false;
+const getCenterUrlSettings = (): Coordinate | null => {
+    if (isCenterFromUrlRead) return null;
+
+    const urlSettings = getPrintUrlSettings();
+    isCenterFromUrlRead = true;
+
+    return urlSettings.center || null;
+};
 
 const PrintPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
     const mapInit = useRef(false);
@@ -49,11 +59,10 @@ const PrintPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
         if (mapInit.current) {
             return null;
         }
-        const urlSettings = getPrintUrlSettings();
-        return urlSettings.center || null;
+        return getCenterUrlSettings();
     }, []);
 
-    const { createPrintMapComp, printMapEl, destroy } = usePrintMap({
+    const { createPrintMapComp, printMapEl, destroy } = usePrintMapLayout({
         settings: mapSettings,
         display,
         getCenterFromUrl,

@@ -25,6 +25,24 @@ export function setMapScale(scale: number, olMap: OlMap): void {
     olMap.getView().setResolution(resolution);
 }
 
+export function getMapScale(olMap: OlMap): number | undefined {
+    const view = olMap.getView();
+    const center = view.getCenter();
+    const resolution = view.getResolution();
+
+    if (!center || !resolution) {
+        return;
+    }
+
+    const cosh = (value: number) => {
+        return (Math.exp(value) + Math.exp(-value)) / 2;
+    };
+
+    const pointResolution3857 = cosh(center[1] / 6378137);
+    const scale = (resolution * (96 * 39.3701)) / pointResolution3857;
+    return scale;
+}
+
 export function switchRotateControl(olMap: OlMap, show: boolean): void {
     const controls = olMap.getControls();
     const rotateControl = controls

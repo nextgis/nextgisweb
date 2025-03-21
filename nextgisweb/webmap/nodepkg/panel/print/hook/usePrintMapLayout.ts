@@ -16,7 +16,7 @@ interface PrintMapCompProps {
 
 type Comp = ReturnType<typeof reactApp<PrintMapCompProps>>;
 
-export function usePrintMap({
+export function usePrintMapLayout({
     settings,
     display,
     getCenterFromUrl,
