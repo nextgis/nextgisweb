@@ -50,13 +50,13 @@ def cmp_fields(gj_fields, fields):
             assert gjv is None
         elif t in (str, int):
             assert gjv == v
-        elif t == float:
+        elif t is float:
             assert pytest.approx(gjv) == v
-        elif t == date:
+        elif t is date:
             assert date.fromisoformat(gjv) == v
-        elif t == time:
+        elif t is time:
             assert time.fromisoformat(gjv) == v
-        elif t == datetime:
+        elif t is datetime:
             assert datetime.fromisoformat(gjv) == v
         else:
             raise NotImplementedError("Can't compare {} type.".format(t))
@@ -227,15 +227,28 @@ def test_geometry(
         for i, f in enumerate(result):
             cmp_geom(gj_fs[i]["geometry"], f.geom, layer.srs)
 
-        # - srs
-        srs = SRS.filter_by(id=4326).one()
+        # # - srs
+        srs4326 = SRS.filter_by(id=4326).one()
         query = layer.feature_query()
         query.geom()
-        query.srs(srs)
+        query.srs(srs4326)
         result = query()
         assert result.total_count == len(gj_fs)
         for i, f in enumerate(result):
-            cmp_geom(gj_fs[i]["geometry"], f.geom, srs)
+            cmp_geom(gj_fs[i]["geometry"], f.geom, srs4326)
+
+        # - box
+        query = layer.feature_query()
+        query.box()
+        query.srs(srs4326)
+        result = query()
+        assert result.total_count == len(gj_fs)
+        for i, f in enumerate(result):
+            gj_geom = gj_fs[i]["geometry"]
+            b1 = Geometry.from_geojson(gj_geom).bounds
+            b2 = f.box.bounds
+            for c1, c2 in zip(b1, b2):
+                assert pytest.approx(c1) == c2
 
 
 filter_extents_data = generate_filter_extents()

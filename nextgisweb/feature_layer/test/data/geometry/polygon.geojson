@@ -5,7 +5,7 @@
     "features": [
         {
             "type": "Feature",
-            "properties": {},
+            "properties": { "iam": "polygon" },
             "geometry": {
                 "type": "Polygon",
                 "coordinates": [

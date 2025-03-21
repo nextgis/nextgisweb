@@ -17,9 +17,6 @@ from .. import WFSConnection, WFSLayer
 
 @contextmanager
 def create_feature_layer(ogrlayer, parent_id, ngw_httptest_app):
-    if not env.options.get("component.wfsclient"):
-        pytest.skip("wfsclient disabled")
-
     with create_vector_layer(ogrlayer, parent_id) as vlayer:
         with transaction.manager:
             res_common = dict(parent_id=parent_id, owner_user=User.by_keyname("administrator"))

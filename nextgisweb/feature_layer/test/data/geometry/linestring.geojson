@@ -5,7 +5,7 @@
     "features": [
         {
             "type": "Feature",
-            "properties": {},
+            "properties": { "sometimes": "fields matter" },
             "geometry": {
                 "type": "LineString",
                 "coordinates": [

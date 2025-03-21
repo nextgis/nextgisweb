@@ -354,6 +354,8 @@ class WFSConnection(Base, Resource):
             return None, count
 
         if propertyname is not None:
+            if add_box and layer.column_geom not in propertyname:
+                propertyname.append(layer.column_geom)
             for p in propertyname:
                 __p = etree.Element(etree.QName(NS_WFS, "PropertyName"))
                 __p.text = p
