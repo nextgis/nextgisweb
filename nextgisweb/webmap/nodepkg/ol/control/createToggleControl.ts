@@ -82,8 +82,8 @@ export function createToggleControl(
             try {
                 await options.onClick(status);
                 updateControl();
-            } catch (error) {
-                console.error("Error in toggle click handler:", error);
+            } catch (err) {
+                console.error("Error in toggle click handler:", err);
                 status = !status; // Revert status on error
             }
         } else {

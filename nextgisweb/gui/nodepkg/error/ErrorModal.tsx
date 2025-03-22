@@ -3,15 +3,17 @@ import { useEffect, useState } from "react";
 import { Modal } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
+import showModal from "../showModal";
 import type { ParamsOf } from "../type";
 
+import { extractError } from "./extractError";
+import type { ErrorInfo } from "./extractError";
 import { Body, Footer, TechInfo } from "./shared";
-import { isApiError } from "./util";
 
 type ModalProps = ParamsOf<typeof Modal>;
 
 export interface ErrorModalProps extends ModalProps {
-    error: unknown;
+    error: ErrorInfo;
 }
 
 const DEFAULTS = {
@@ -39,11 +41,16 @@ export function ErrorModal({
         }
     }, [visible, open_]);
 
+    const title =
+        "title" in error && typeof error.title === "string"
+            ? error.title
+            : gettext("Error");
+
     return (
         <Modal
             {...DEFAULTS}
             {...props}
-            title={isApiError(error) ? error.title : gettext("Error")}
+            title={title}
             open={open}
             destroyOnClose
             onCancel={() => setOpen(false)}
@@ -53,4 +60,8 @@ export function ErrorModal({
             {tinfo && <TechInfo error={error} />}
         </Modal>
     );
+}
+
+export function errorModal(error: unknown, props?: Partial<ErrorModalProps>) {
+    return showModal(ErrorModal, { error: extractError(error), ...props });
 }

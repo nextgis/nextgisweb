@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
 
-import type { ApiError } from "@nextgisweb/gui/error/type";
 import { useObjectState } from "@nextgisweb/gui/hook/useObjectState";
 
 import type {
@@ -57,7 +56,7 @@ export function useRouteGet<
     const { route, abort } = useRoute<N>(endpointName, mergedParams);
     const [isLoading, setIsLoading] = useState(shouldLoadOnInit);
     const [data, setData] = useState<ResolvedRouteResponse<D, N, RT>>();
-    const [error, setError] = useState<ApiError | null>(null);
+    const [error, setError] = useState<NonNullable<unknown> | null>(null);
 
     const [routerOptions] = useObjectState(mergedOptions);
 
@@ -84,8 +83,8 @@ export function useRouteGet<
                 routerOptions
             );
             setData(data);
-        } catch (er) {
-            setError(er as ApiError);
+        } catch (err) {
+            setError(err!);
         } finally {
             setIsLoading(false);
         }

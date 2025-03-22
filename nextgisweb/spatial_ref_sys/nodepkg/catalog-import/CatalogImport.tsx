@@ -3,7 +3,6 @@ import { useMemo, useState } from "react";
 import { Button, Form, Input } from "@nextgisweb/gui/antd";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
-import type { ApiError } from "@nextgisweb/gui/error/type";
 import { FieldsForm } from "@nextgisweb/gui/fields-form";
 import type { FormField } from "@nextgisweb/gui/fields-form";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
@@ -61,7 +60,7 @@ export function CatalogImport({ url, id }: CatalogImportProps) {
             });
             window.open(routeURL("srs.edit", resp.id), "_self");
         } catch (err) {
-            errorModal(err as ApiError);
+            errorModal(err);
         } finally {
             setStatus(null);
         }

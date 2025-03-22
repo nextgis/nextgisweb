@@ -10,7 +10,6 @@ import {
 } from "@nextgisweb/gui/antd";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
-import type { ApiError } from "@nextgisweb/gui/error/type";
 import { route } from "@nextgisweb/pyramid/api";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -57,7 +56,7 @@ export function CORSSettings(props: { readonly: boolean }) {
                 });
                 message.success(gettext("CORS settings updated"));
             } catch (err) {
-                errorModal(err as ApiError);
+                errorModal(err);
             }
         } catch {
             message.error(gettext("Fix the form errors first"));

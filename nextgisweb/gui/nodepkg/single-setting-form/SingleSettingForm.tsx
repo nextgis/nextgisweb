@@ -8,7 +8,6 @@ import type { KeysWithMethods } from "@nextgisweb/pyramid/api/type";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import type { ApiError } from "../error/type";
 import type { ParamsOf } from "../type";
 
 type InputParams = ParamsOf<typeof Input>;
@@ -74,7 +73,7 @@ export function SingleSettingForm({
                 );
             }
         } catch (err) {
-            errorModal(err as ApiError);
+            errorModal(err);
         } finally {
             setStatus(null);
         }

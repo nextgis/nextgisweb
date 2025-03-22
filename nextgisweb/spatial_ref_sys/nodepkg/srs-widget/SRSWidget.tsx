@@ -1,10 +1,9 @@
 import { useMemo, useState } from "react";
 
 import { Button, Form, Input, Modal } from "@nextgisweb/gui/antd";
-import type { ApiError } from "@nextgisweb/gui/error/type";
 import type { FormField } from "@nextgisweb/gui/fields-form";
 import { ModelForm } from "@nextgisweb/gui/model-form";
-import { route } from "@nextgisweb/pyramid/api";
+import { BaseAPIError, route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type {
     ConvertBody,
@@ -64,15 +63,16 @@ export function SRSWidget({ id, readonly }: { id: number; readonly: boolean }) {
             const fields = form.getFieldsValue();
             form.setFieldsValue({ ...fields, wkt: resp.wkt });
             setIsModalVisible(false);
-        } catch (error) {
-            const err = error as ApiError;
-            if ("message" in err) {
+        } catch (err) {
+            if (err instanceof BaseAPIError) {
                 modalForm.setFields([
                     {
                         name: "projStr",
                         errors: [err.message],
                     },
                 ]);
+            } else {
+                throw err;
             }
         }
     };

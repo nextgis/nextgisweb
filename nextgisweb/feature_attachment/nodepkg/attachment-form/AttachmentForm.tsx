@@ -4,7 +4,6 @@ import { fileUploader } from "@nextgisweb/file-upload";
 import { Button, Checkbox, Modal, Tabs, Upload } from "@nextgisweb/gui/antd";
 import type { ModalProps } from "@nextgisweb/gui/antd";
 import { errorModal } from "@nextgisweb/gui/error";
-import type { ApiError } from "@nextgisweb/gui/error/type";
 import showModal from "@nextgisweb/gui/showModal";
 import {
     LunkwillParam,
@@ -39,7 +38,7 @@ export function AttachmentForm({ id }: { id: number }) {
                 });
                 window.open(respUrl);
             } catch (err) {
-                errorModal(err as ApiError);
+                errorModal(err);
                 return;
             } finally {
                 setLoading(undefined);
@@ -112,7 +111,7 @@ export function AttachmentForm({ id }: { id: number }) {
                 onCancel: () => destroy(),
             });
         } catch (err) {
-            errorModal(err as ApiError);
+            errorModal(err);
             return;
         } finally {
             setLoading(undefined);

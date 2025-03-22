@@ -93,7 +93,7 @@ export function ResourcesFilter({
                 const options = resourcesToOptions(resources);
                 setOptions(options);
                 setAcSatus("");
-            } catch (er) {
+            } catch (err) {
                 setAcSatus("error");
             } finally {
                 setLoading(false);

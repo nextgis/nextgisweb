@@ -1,5 +1,4 @@
 import { extractError } from "@nextgisweb/gui/error";
-import type { ApiError } from "@nextgisweb/gui/error/type";
 
 import type { ResourcePickerStore } from "../ResourcePickerStore";
 
@@ -17,10 +16,10 @@ export function actionHandler(
         try {
             const result = await originalMethod.apply(this, args);
             return result;
-        } catch (er) {
-            const { title } = extractError(er as ApiError);
+        } catch (err) {
+            const { title } = extractError(err);
             this.setError(operationName, title);
-            throw er;
+            throw err;
         } finally {
             this.setLoading(operationName, false);
         }

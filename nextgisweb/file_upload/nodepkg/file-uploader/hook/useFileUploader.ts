@@ -82,7 +82,7 @@ export function useFileUploader<M extends boolean = false>({
                 setProgressText(message);
                 try {
                     await loader(uploadedFiles, { signal });
-                } catch (error) {
+                } catch {
                     return [];
                 }
             }

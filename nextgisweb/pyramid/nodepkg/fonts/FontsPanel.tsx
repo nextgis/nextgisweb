@@ -15,7 +15,6 @@ import {
 import type { ModalProps, TableColumnType } from "@nextgisweb/gui/antd";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
-import type { ApiError } from "@nextgisweb/gui/error/type";
 import showModal from "@nextgisweb/gui/showModal";
 import type { FontCUpdateBody } from "@nextgisweb/pyramid/type/api";
 
@@ -132,8 +131,8 @@ export function FontsPanel() {
                         showModal(LoadingModal, { open: true });
                         await waitForRestart(resp.timestamp);
                     }
-                } catch (error) {
-                    errorModal(error as ApiError);
+                } catch (err) {
+                    errorModal(err);
                 }
         },
         [modal]

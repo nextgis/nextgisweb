@@ -139,8 +139,8 @@ const CompositeWidget = observer(
                                 if (res) {
                                     goToResource(res.id);
                                 }
-                            } catch (error) {
-                                errorModal(error);
+                            } catch (err) {
+                                errorModal(err);
                             }
                         } else if (operation === "update") {
                             try {
@@ -148,8 +148,8 @@ const CompositeWidget = observer(
                                 if (composite.id !== null) {
                                     goToResource(composite.id);
                                 }
-                            } catch (error) {
-                                errorModal(error);
+                            } catch (err) {
+                                errorModal(err);
                             }
                         }
                     }}
@@ -170,8 +170,8 @@ const CompositeWidget = observer(
                                 if (res) {
                                     goToResource(res.id, true);
                                 }
-                            } catch (error) {
-                                errorModal(error);
+                            } catch (err) {
+                                errorModal(err);
                             }
                         }}
                     >

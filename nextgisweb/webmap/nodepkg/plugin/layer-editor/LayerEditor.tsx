@@ -12,7 +12,7 @@ import { Vector as VectorSource } from "ol/source";
 
 import { FeatureEditorModal } from "@nextgisweb/feature-layer/feature-editor-modal";
 import type { FeaureLayerGeometryType } from "@nextgisweb/feature-layer/type/api";
-import { errorModal, isApiError } from "@nextgisweb/gui/error";
+import { errorModal, isAbortError } from "@nextgisweb/gui/error";
 import { EditIcon } from "@nextgisweb/gui/icon";
 import showModal from "@nextgisweb/gui/showModal";
 import { findNode } from "@nextgisweb/gui/util/tree";
@@ -476,11 +476,10 @@ export class LayerEditor extends PluginBase {
                 },
             });
             this.handleFetchedVectorData(resourceId, featuresInfo, editingItem);
-        } catch (error) {
-            if (isApiError(error)) {
-                errorModal(error);
+        } catch (err) {
+            if (!isAbortError(err)) {
+                errorModal(err);
             }
-            console.error(error);
         }
     }
 
@@ -679,8 +678,8 @@ export class LayerEditor extends PluginBase {
                 }
             }
             this.resolveRun(true);
-        } catch (error) {
-            console.error("Error saving changes:", error);
+        } catch (err) {
+            console.error("Error saving changes:", err);
         }
     }
 

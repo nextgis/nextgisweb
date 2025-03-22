@@ -2,10 +2,11 @@ import { observer } from "mobx-react-lite";
 import { useEffect, useMemo, useState } from "react";
 
 import { Alert, Button, Form, Input } from "@nextgisweb/gui/antd";
+import { errorModal } from "@nextgisweb/gui/error";
 import { FieldsForm } from "@nextgisweb/gui/fields-form";
 import type { FormField } from "@nextgisweb/gui/fields-form";
 import { useKeydownListener } from "@nextgisweb/gui/hook";
-import { routeURL } from "@nextgisweb/pyramid/api";
+import { BaseAPIError, routeURL } from "@nextgisweb/pyramid/api";
 import { gettext, gettextf } from "@nextgisweb/pyramid/i18n";
 
 import oauth from "../oauth";
@@ -67,8 +68,11 @@ export const LoginForm = observer((props: LoginFormProps) => {
                 const next = nextQueryParam || resp.home_url || location.origin;
                 window.open(next, "_self");
             }
-        } catch {
-            // ignore
+        } catch (err) {
+            // authStore handles BaseAPIError
+            if (!(err instanceof BaseAPIError)) {
+                errorModal(err);
+            }
         }
     };
 

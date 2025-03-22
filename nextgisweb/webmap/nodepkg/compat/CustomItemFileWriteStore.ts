@@ -187,9 +187,9 @@ export class CustomItemFileWriteStore extends EventEmitter {
             if (options.onComplete) {
                 options.onComplete(results);
             }
-        } catch (error) {
+        } catch (err) {
             if (options.onError) {
-                options.onError(error as Error);
+                options.onError(err as Error);
             }
         }
     }

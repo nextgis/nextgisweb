@@ -1,3 +1,4 @@
+import { isAbortError } from "@nextgisweb/gui/error";
 import { LoaderCache } from "@nextgisweb/pyramid/util/loader";
 
 import { cache } from "./cache";
@@ -30,7 +31,7 @@ function lunkwillCheckResponse(lwResp: Response) {
 async function responseJson(response: Response) {
     try {
         return response.json();
-    } catch (e) {
+    } catch (err) {
         throw new InvalidResponseError();
     }
 }
@@ -56,7 +57,7 @@ async function lunkwillResponseUrl(lwResp: Response) {
         try {
             lwResp = await fetch(sum, { credentials: "same-origin" });
             lwData = await lwResp.json();
-        } catch (e) {
+        } catch (err) {
             failed = true;
             continue;
         }
@@ -68,9 +69,9 @@ async function lunkwillResponseUrl(lwResp: Response) {
                 ready = true;
                 break;
             case "cancelled":
-                throw new LunkwillRequestCancelled(lwData);
+                throw new LunkwillRequestCancelled(undefined, lwData);
             case "failed":
-                throw new LunkwillRequestFailed(lwData);
+                throw new LunkwillRequestFailed(undefined, lwData);
             case "spooled":
             case "processing":
             case "buffering":
@@ -87,7 +88,7 @@ async function lunkwillResponseUrl(lwResp: Response) {
 async function lunkwillFetch(lwRespUrl: string) {
     try {
         return await window.fetch(lwRespUrl, { credentials: "same-origin" });
-    } catch (e) {
+    } catch (err) {
         throw new NetworkResponseError();
     }
 }
@@ -211,9 +212,9 @@ export async function request<
         let response: Response;
         try {
             response = await fetch(url, opt);
-        } catch (e) {
-            if ((e as Error).name === "AbortError") {
-                throw e;
+        } catch (err) {
+            if (isAbortError(err)) {
+                throw err;
             }
             throw new NetworkResponseError();
         }
@@ -246,12 +247,9 @@ export async function request<
             } else {
                 throw new InvalidResponseError();
             }
-        } catch (e) {
-            if (
-                (e as Error).name === "AbortError" ||
-                e instanceof InvalidResponseError
-            ) {
-                throw e;
+        } catch (err) {
+            if (isAbortError(err) || err instanceof InvalidResponseError) {
+                throw err;
             }
 
             throw new InvalidResponseError();

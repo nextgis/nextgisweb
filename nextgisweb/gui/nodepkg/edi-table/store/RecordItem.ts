@@ -70,7 +70,7 @@ export class RecordItem implements RecordOption {
                 } else {
                     try {
                         this.value = JSON.parse(this.value as string);
-                    } catch (e) {
+                    } catch (err) {
                         // Do nothing
                     }
                 }

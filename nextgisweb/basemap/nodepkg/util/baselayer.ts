@@ -48,8 +48,8 @@ export function prepareBaselayerConfig(
                     projection: `EPSG:${qms.epsg}`,
                 };
             }
-        } catch (er) {
-            console.log(er);
+        } catch (err) {
+            console.log(err);
         }
     } else if (config.url) {
         source.url = config.url;
@@ -151,7 +151,7 @@ export async function addBasemaps(
             if (layer) {
                 layers.push(layer);
             }
-        } catch (er) {
+        } catch (err) {
             //
         }
     }

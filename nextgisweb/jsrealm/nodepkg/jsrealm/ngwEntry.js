@@ -74,7 +74,7 @@ window.ngwExternal.define = (name, dependencies, factory) => {
 
     try {
         resolve(factory());
-    } catch (e) {
-        reject(e);
+    } catch (err) {
+        reject(err);
     }
 };

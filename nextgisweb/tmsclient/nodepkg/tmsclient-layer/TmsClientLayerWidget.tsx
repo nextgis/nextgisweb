@@ -10,8 +10,7 @@ import {
 } from "@nextgisweb/gui/antd";
 import { LotMV } from "@nextgisweb/gui/arm";
 import { ExtentRow } from "@nextgisweb/gui/component";
-import { errorModal } from "@nextgisweb/gui/error";
-import type { ApiError } from "@nextgisweb/gui/error/type";
+import { errorModal, isAbortError } from "@nextgisweb/gui/error";
 import { Area } from "@nextgisweb/gui/mayout";
 import { route } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook";
@@ -89,11 +88,10 @@ export const TmsClientLayerWidget: EditorWidget<TmsClientLayerStore> = observer(
                             }
                         }
                     }
-                } catch (er) {
-                    if (er instanceof Error && er.name === "AbortError") {
-                        // ignore
+                } catch (err) {
+                    if (!isAbortError(err)) {
+                        errorModal(err);
                     }
-                    errorModal(er as ApiError);
                 }
             }
             if (store.connection.value) {

@@ -99,7 +99,7 @@ export class OlPopup extends Overlay {
         try {
             document.createEvent("TouchEvent");
             return true;
-        } catch (e) {
+        } catch {
             return false;
         }
     }

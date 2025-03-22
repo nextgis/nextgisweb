@@ -2,6 +2,8 @@ import { Modal, message } from "@nextgisweb/gui/antd";
 import type { ModalFuncProps } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
+import { isAbortError } from "./error";
+
 interface ConfirmOptions extends ModalFuncProps {
     errorMessage?: string;
 }
@@ -20,13 +22,11 @@ export function confirm({
             if (onOk) {
                 try {
                     await onOk();
-                } catch (er) {
-                    const isUserAbort =
-                        er && (er as Error).name === "AbortError";
-                    if (errorMessage && !isUserAbort) {
+                } catch (err) {
+                    if (errorMessage && !isAbortError(err)) {
                         message.error(errorMessage);
                     }
-                    throw er;
+                    throw err;
                 }
             }
         },

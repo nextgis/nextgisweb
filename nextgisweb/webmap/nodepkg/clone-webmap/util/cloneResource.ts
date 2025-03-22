@@ -1,5 +1,4 @@
 import { errorModal } from "@nextgisweb/gui/error";
-import type { ApiError } from "@nextgisweb/gui/error/type";
 import { route } from "@nextgisweb/pyramid/api";
 import type { CompositeCreate } from "@nextgisweb/resource/type/api";
 
@@ -47,6 +46,6 @@ export async function cloneResource({
         });
         return cloneItem;
     } catch (err) {
-        errorModal(err as ApiError);
+        errorModal(err);
     }
 }

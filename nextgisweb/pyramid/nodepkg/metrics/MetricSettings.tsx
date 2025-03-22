@@ -6,7 +6,6 @@ import { Balancer } from "react-wrap-balancer";
 import { Button, Card, Dropdown, Tabs, message } from "@nextgisweb/gui/antd";
 import { SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
-import type { ApiError } from "@nextgisweb/gui/error/type";
 import { useUnsavedChanges } from "@nextgisweb/gui/hook";
 import type { Metrics } from "@nextgisweb/pyramid/type/api";
 
@@ -140,7 +139,7 @@ export function MetricsSettings() {
                 content: msgSuccess + " " + msgSuccessReload,
             });
         } catch (err) {
-            errorModal(err as ApiError);
+            errorModal(err);
         } finally {
             setStatus(null);
         }

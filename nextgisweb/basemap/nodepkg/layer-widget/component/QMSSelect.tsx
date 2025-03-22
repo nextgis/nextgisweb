@@ -125,7 +125,7 @@ export function QMSSelect({
                 onService(data);
             }
             onChange(data.id);
-        } catch (error) {
+        } catch (err) {
             // TODO: handle error
         }
     };

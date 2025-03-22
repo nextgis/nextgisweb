@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useReducer } from "react";
 
+import { isAbortError } from "@nextgisweb/gui/error";
 import { arraySequenceIndexer } from "@nextgisweb/gui/util";
 
 export type CacheObject<V> =
@@ -81,7 +82,7 @@ export function useCache<
                 rerender();
             });
             promise.catch((error) => {
-                if (error && error.name === "AbortError") {
+                if (isAbortError(error)) {
                     delete cache[id];
                 } else {
                     record[0] = { status: "error" as const, error };

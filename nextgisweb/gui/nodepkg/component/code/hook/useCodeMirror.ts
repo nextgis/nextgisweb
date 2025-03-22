@@ -40,7 +40,7 @@ const getLang = async (lang: Lang): Promise<() => LanguageSupport> => {
     try {
         const module = await importers[fullLang]();
         return module;
-    } catch (er) {
+    } catch (err) {
         throw new Error(
             `CodeMirror language for '${fullLang}' is not installed`
         );

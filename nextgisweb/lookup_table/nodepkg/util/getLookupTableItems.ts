@@ -17,9 +17,9 @@ export async function getLookupTableItems(
                 throw new Error(`Resource ${lookupId} is not lookup table`);
             }
             return resourceItem.lookup_table.items;
-        } catch (er) {
+        } catch (err) {
             EXCLUDED_IDS.push(lookupId);
-            throw er;
+            throw err;
         }
     }
     throw new Error(`Lookupp table ${lookupId} not founded`);

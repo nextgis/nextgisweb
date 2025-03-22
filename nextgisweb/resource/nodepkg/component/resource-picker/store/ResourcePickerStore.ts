@@ -432,7 +432,7 @@ export class ResourcePickerStore
                         }
                     }
                 }
-            } catch (error) {
+            } catch (err) {
                 //
             }
         }

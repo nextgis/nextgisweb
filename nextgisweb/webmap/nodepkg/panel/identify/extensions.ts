@@ -17,8 +17,8 @@ export const loadFeatureLayerExtensions = async (): Promise<void> => {
         for (const p of registry.query()) {
             extWidgetClasses.set(`plugin${idx++}`, p);
         }
-    } catch (error) {
-        console.error("Error loading extensions:", error);
+    } catch (err) {
+        console.error("Error loading extensions:", err);
     }
 
     loaded = true;

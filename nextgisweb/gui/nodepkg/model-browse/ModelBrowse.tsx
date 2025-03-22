@@ -36,8 +36,6 @@ import type {
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import type { ApiError } from "../error/type";
-
 import VisibilityIcon from "@nextgisweb/icon/material/visibility";
 
 export interface ModalBrowseData {
@@ -163,7 +161,7 @@ export function ModelBrowse<Data extends ModalBrowseData = ModalBrowseData>({
                 callbacks.deleteModelItem();
             }
         } catch (err) {
-            errorModal(err as ApiError);
+            errorModal(err);
         }
     };
 
@@ -202,7 +200,7 @@ export function ModelBrowse<Data extends ModalBrowseData = ModalBrowseData>({
                 callbacks.deleteSelected();
             }
         } catch (err) {
-            errorModal(err as ApiError);
+            errorModal(err);
         } finally {
             setIsDeleting(false);
         }

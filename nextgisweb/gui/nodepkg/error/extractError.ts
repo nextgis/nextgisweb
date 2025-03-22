@@ -1,56 +1,44 @@
-import { NetworkResponseError } from "@nextgisweb/pyramid/api";
+import { BaseAPIError } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import { isApiError } from "./util";
+const msgDefaultMessage = gettext("Something went wrong.");
+const msgDefaultTitle = gettext("Error");
 
-export function extractError(error: unknown) {
-    if (isApiError(error)) {
-        if (error.name && error.message && error.title) {
-            return {
-                title: error.title,
-                message: error.message,
-                detail: error.detail || null,
-                data:
-                    error.data &&
-                    typeof error.data === "object" &&
-                    error.data.data
-                        ? error.data.data
-                        : null,
-            };
-        } else if (error.response) {
-            const response = error.response;
-            if (
-                response.status === undefined ||
-                response.status === 0 ||
-                response.data === undefined
-            ) {
-                const fallback = new NetworkResponseError();
-                return {
-                    title: fallback.title,
-                    message: fallback.message,
-                    detail: fallback.detail,
-                };
-            }
-        }
+export interface ErrorInfo {
+    message: string;
+    title: string;
+    detail?: string;
+    data?: unknown;
+}
 
+export function extractError(error: unknown): ErrorInfo {
+    if (error instanceof BaseAPIError) {
         return {
-            title:
-                typeof error.title === "string"
-                    ? error.title
-                    : gettext("Unexpected error"),
+            message: error.message,
+            title: error.title,
+            detail: error.detail,
+            data: error.data,
+        };
+    } else if (error instanceof Error) {
+        return {
+            message: error.message,
+            title: error.name,
+        };
+    } else if (error && typeof error === "object") {
+        return {
             message:
-                typeof error.message === "string"
+                "message" in error && typeof error.message === "string"
                     ? error.message
-                    : gettext("Something went wrong."),
+                    : msgDefaultMessage,
+            title:
+                "title" in error && typeof error.title === "string"
+                    ? error.title
+                    : msgDefaultTitle,
         };
     }
 
     return {
-        title: gettext("Error"),
-        message: gettext("Something went wrong."),
-        stack_trace:
-            typeof error === "object" && error !== null
-                ? JSON.stringify(error)
-                : gettext("An unknown error occurred."),
+        message: msgDefaultMessage,
+        title: msgDefaultTitle,
     };
 }

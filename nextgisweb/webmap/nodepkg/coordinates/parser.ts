@@ -212,7 +212,7 @@ const parseDms = (input: string): Coordinate[] => {
                 Pick<CoordinatesObject, "a" | "b" | "isLonLatA" | "isLonLatB">
             >
         );
-    } catch (error) {
+    } catch {
         return [];
     }
 };
@@ -237,7 +237,7 @@ const parseDecimalDegrees = (input: string): Coordinate[] => {
                 Pick<CoordinatesObject, "a" | "b" | "isLonLatA" | "isLonLatB">
             >
         );
-    } catch (error) {
+    } catch {
         return [];
     }
 };

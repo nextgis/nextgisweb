@@ -250,7 +250,7 @@ msgstr "Открыть в новой вкладке"
 msgid "Change"
 msgstr "Изменить"
 
-#: nodepkg/children-section/util/forEachSelected.ts:8
+#: nodepkg/children-section/util/forEachSelected.ts:7
 msgid "Operation in progress"
 msgstr "Выполняется операция"
 
@@ -273,15 +273,15 @@ msgstr[0] "Ресурс перемещен"
 msgstr[1] "Перемещено {} ресурса"
 msgstr[2] "Перемещено {} ресурсов"
 
-#: nodepkg/component/resource-picker/ResourcePickerChildren.tsx:29
+#: nodepkg/component/resource-picker/ResourcePickerChildren.tsx:28
 msgid "Select first eligible child resource"
 msgstr "Выбрать первый подходящий дочерний ресурс"
 
-#: nodepkg/component/resource-picker/ResourcePickerFooter.tsx:31
+#: nodepkg/component/resource-picker/ResourcePickerFooter.tsx:30
 msgid "Create group"
 msgstr "Создать группу"
 
-#: nodepkg/component/resource-picker/ResourcePickerFooter.tsx:32
+#: nodepkg/component/resource-picker/ResourcePickerFooter.tsx:31
 msgid "Clear selection"
 msgstr "Очистить выделение"
 
@@ -306,28 +306,20 @@ msgstr "Выбрать эту группу"
 msgid "Pick selected"
 msgstr "Выбрать отмеченное"
 
-#: nodepkg/composite/CompositeStore.ts:253
-msgid "Validation error"
-msgstr "Ошибка валидации"
-
-#: nodepkg/composite/CompositeStore.ts:255
+#: nodepkg/composite/CompositeStore.ts:261
 msgid "Errors found during data validation. Tabs with errors marked in red."
 msgstr "При проверке данных обнаружена ошибка. Вкладки с ошибками отмечены красным."
 
-#: nodepkg/composite/CompositeStore.ts:271
-msgid "Unexpected error"
-msgstr "Внезапная ошибка"
-
-#: nodepkg/composite/CompositeStore.ts:272
-msgid "Serialization failed"
-msgstr "Сериализация не удалась"
+#: nodepkg/composite/CompositeStore.ts:262
+msgid "Validation error"
+msgstr "Ошибка валидации"
 
 #: nodepkg/composite/CompositeWidget.tsx:47
 msgid "Create"
 msgstr "Создать"
 
 #: nodepkg/composite/CompositeWidget.tsx:48
-#: nodepkg/export-settings/ExportSettings.tsx:80
+#: nodepkg/export-settings/ExportSettings.tsx:79
 msgid "Save"
 msgstr "Сохранить"
 
@@ -343,7 +335,7 @@ msgstr "Подождите, пожалуйста, идет обработка з
 msgid "Create and edit"
 msgstr "Создать и изменить"
 
-#: nodepkg/delete-page/DeletePage.tsx:125
+#: nodepkg/delete-page/DeletePage.tsx:124
 msgid "Cancel"
 msgstr "Отмена"
 
@@ -434,11 +426,11 @@ msgstr "Нет"
 msgid "Yes"
 msgstr "Да"
 
-#: nodepkg/export-settings/ExportSettings.tsx:36
+#: nodepkg/export-settings/ExportSettings.tsx:35
 msgid "The setting is saved."
 msgstr "Настройка сохранена."
 
-#: nodepkg/export-settings/ExportSettings.tsx:57
+#: nodepkg/export-settings/ExportSettings.tsx:56
 msgid ""
 "Select the category of users who can use the \"Save as\" link to download "
 "resource data."
@@ -446,19 +438,19 @@ msgstr ""
 "Выберите категорию пользователей, которые могут видеть ссылку \"Сохранить "
 "как\" для скачивания данных ресурса."
 
-#: nodepkg/export-settings/ExportSettings.tsx:67
+#: nodepkg/export-settings/ExportSettings.tsx:66
 msgid "Users with \"Data: Read\" permission"
 msgstr "Пользователи с правом доступа \"Данные: Чтение\""
 
-#: nodepkg/export-settings/ExportSettings.tsx:70
+#: nodepkg/export-settings/ExportSettings.tsx:69
 msgid "Users with \"Data: Modify\" permission"
 msgstr "Пользователи с правом доступа \"Данные: Изменение\""
 
-#: nodepkg/export-settings/ExportSettings.tsx:73
+#: nodepkg/export-settings/ExportSettings.tsx:72
 msgid "Administrators"
 msgstr "Администраторы"
 
-#: nodepkg/export-settings/ExportSettings.tsx:88
+#: nodepkg/export-settings/ExportSettings.tsx:87
 msgid ""
 "* This will not affect REST API use which will continue to be governed by "
 "permissions."

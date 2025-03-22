@@ -3,7 +3,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Select } from "@nextgisweb/gui/antd";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
-import type { ApiError } from "@nextgisweb/gui/error/type";
 import { FieldsForm, Form } from "@nextgisweb/gui/fields-form";
 import type { FormField } from "@nextgisweb/gui/fields-form";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
@@ -66,7 +65,7 @@ export function ExportForm({ id }: { id: number }) {
             );
             setDefaultSrs(srs.id);
         } catch (err) {
-            errorModal(err as ApiError);
+            errorModal(err);
         } finally {
             setStatus("loaded");
         }

@@ -3,7 +3,6 @@ import { fromExtent } from "ol/geom/Polygon";
 import { useCallback, useState } from "react";
 
 import { errorModal } from "@nextgisweb/gui/error";
-import type { ApiError } from "@nextgisweb/gui/error/type";
 import {
     LunkwillParam,
     encodeQueryParams,
@@ -86,7 +85,7 @@ export function useExportFeatureLayer({ id }: UseExportFeatureLayerProps) {
                         });
                         window.open(respUrl);
                     } catch (err) {
-                        errorModal(err as ApiError);
+                        errorModal(err);
                         return;
                     } finally {
                         setExportLoading(false);

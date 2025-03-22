@@ -1,9 +1,7 @@
 import { action, observable } from "mobx";
 
-import { extractError } from "@nextgisweb/gui/error";
-import type { ApiError } from "@nextgisweb/gui/error/type";
 import reactApp from "@nextgisweb/gui/react-app";
-import { route } from "@nextgisweb/pyramid/api";
+import { BaseAPIError, route } from "@nextgisweb/pyramid/api";
 
 import type { Credentials, LoginFormProps } from "../login/type";
 
@@ -28,11 +26,11 @@ class AuthStore {
             this.authenticated = true;
             this.userDisplayName = resp.display_name;
             return resp;
-        } catch (er) {
-            const er_ = er as ApiError;
-            const { title } = extractError(er_);
-            this.loginError = title;
-            throw new Error(er_.title);
+        } catch (err) {
+            if (err instanceof BaseAPIError) {
+                this.loginError = err.title;
+            }
+            throw err;
         } finally {
             this.isLogining = false;
         }

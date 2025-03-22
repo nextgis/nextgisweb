@@ -4,73 +4,81 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import type { LunkwillData } from "./type";
 
-export class BaseAPIError extends BaseError {
-    title: string;
+interface BaseAPIErrorOpts<D> {
+    title?: string;
+    detail?: string;
+    data?: D;
+}
 
-    constructor(message: string) {
-        super(message || gettext("Something went wrong."));
-        this.title = gettext("Unknown API error");
+export class BaseAPIError<D = unknown> extends BaseError {
+    readonly message: string;
+    readonly title: string;
+    readonly detail?: string;
+    readonly data?: D;
+
+    protected defaultMessage = gettext("Something went wrong.");
+    protected defaultTitle = gettext("Unknown API error");
+    protected defaultDetail: string | undefined = undefined;
+
+    constructor(message?: string, opts: BaseAPIErrorOpts<D> = {}) {
+        // With the first agrument undefined BaseError won't initialize the
+        // message property.
+        super("");
+
+        this.message = message ?? this.defaultMessage;
+        this.title = opts.title ?? this.defaultTitle;
+        this.detail = opts.detail ?? this.defaultDetail;
+        this.data = opts.data;
     }
 }
 
-export class NetworkResponseError extends BaseAPIError {
-    readonly detail: string;
-
-    // prettier-ignore
-    constructor(message?: string) {
-        super(message || gettext("There is no response from the server or problem connecting to server."));
-        this.title = gettext("Network error");
-        this.detail = gettext("Check network connectivity and try again later.");
-    }
+// prettier-ignore
+export class NetworkResponseError extends BaseAPIError<undefined> {
+    protected defaultMessage = gettext("There is no response from the server or problem connecting to server.");
+    protected defaultTitle = gettext("Network error");
+    protected defaultDetail = gettext("Check network connectivity and try again later.");
 }
 
-export class InvalidResponseError extends BaseAPIError {
-    constructor(message?: string) {
-        super(message || gettext("Something went wrong."));
-        this.title = gettext("Unexpected server response");
-    }
+export class InvalidResponseError extends BaseAPIError<undefined> {
+    protected defaultMessage = gettext("Something went wrong.");
+    protected defaultTitle = gettext("Unexpected server response");
 }
 
 export interface ServerResponseErrorData {
-    message: string;
+    message?: string;
     title?: string;
     detail?: string;
     exception?: string;
-    status_code?: number;
+    status_code: number;
 }
 
-export class ServerResponseError extends BaseAPIError {
-    readonly detail: string | null;
-    readonly data: ServerResponseErrorData;
+export class ServerResponseError extends BaseAPIError<ServerResponseErrorData> {
+    readonly exception?: string;
+    readonly status_code: number;
 
     constructor(data: ServerResponseErrorData) {
-        super(data.message);
-        this.title = data.title || this.title;
-        this.detail = data.detail || null;
-        this.data = data;
+        super(data.message, {
+            title: data.title,
+            detail: data.detail,
+            data: data,
+        });
+        this.exception = data.exception;
+        this.status_code = data.status_code;
     }
 }
 
-export class LunkwillError extends BaseError {
-    readonly title: string;
-    readonly data: LunkwillData;
+// prettier-ignore
+export class LunkwillError extends BaseAPIError<LunkwillData> {
+    protected defaultMessage = gettext("Unexpected error while processing long-running request.");
+    protected defaultTitle = gettext("Long-running request error");
 
-    // prettier-ignore
     constructor(message?: string, data: LunkwillData = {}) {
-        super(message || gettext("Unexpected error while processing long-running request."));
-        this.title = gettext("Long-running request error");
-        this.data = data;
+        super(message, { data });
     }
 }
 
 export class LunkwillRequestCancelled extends LunkwillError {
-    constructor(data: LunkwillData) {
-        super(gettext("Long-running request was cancelled."), data);
-    }
+    protected defaultMessage = gettext("Long-running request was cancelled.");
 }
 
-export class LunkwillRequestFailed extends LunkwillError {
-    constructor(data: LunkwillData) {
-        super(undefined, data);
-    }
-}
+export class LunkwillRequestFailed extends LunkwillError {}

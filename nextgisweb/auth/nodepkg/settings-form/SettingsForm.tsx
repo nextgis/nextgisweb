@@ -4,7 +4,6 @@ import { Button, Input, message } from "@nextgisweb/gui/antd";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
 import { LanguageSelect } from "@nextgisweb/gui/component/language-select";
 import { errorModal } from "@nextgisweb/gui/error";
-import type { ApiError } from "@nextgisweb/gui/error/type";
 import { FieldsForm } from "@nextgisweb/gui/fields-form";
 import type {
     FormField,
@@ -76,7 +75,7 @@ export function SettingsForm() {
             await route("auth.profile").put({ json });
             message.success(gettext("Saved"));
         } catch (err) {
-            errorModal(err as ApiError);
+            errorModal(err);
         } finally {
             setSaving(false);
         }

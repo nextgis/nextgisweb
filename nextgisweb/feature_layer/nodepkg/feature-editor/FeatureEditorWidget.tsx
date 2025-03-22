@@ -135,8 +135,8 @@ export const FeatureEditorWidget = observer(
                             onSave(res);
                         }
                     }
-                } catch (error) {
-                    errorModal(error);
+                } catch (err) {
+                    errorModal(err);
                 }
             } else if (onOk) {
                 onOk(store.preparePayload());

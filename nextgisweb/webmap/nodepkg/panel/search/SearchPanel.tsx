@@ -332,8 +332,8 @@ const search = async (
                 searchController
             );
             searchResults = searchResults.concat(results);
-        } catch (e) {
-            console.error(e);
+        } catch (err) {
+            console.error(err);
         }
         if (searchController.empty) {
             return undefined;

@@ -4,7 +4,6 @@ import { message } from "@nextgisweb/gui/antd";
 import type { OptionType } from "@nextgisweb/gui/antd";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
-import type { ApiError } from "@nextgisweb/gui/error/type";
 import { route } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -43,7 +42,7 @@ export function Settings() {
                 setSettings(csettings.webmap);
                 setSrsOptions(srsListToOptions(srsInfo));
             } catch (err) {
-                errorModal(err as ApiError);
+                errorModal(err);
             } finally {
                 setStatus("loaded");
             }
@@ -62,7 +61,7 @@ export function Settings() {
 
                 messageApi.success(gettext("Settings saved"));
             } catch (err) {
-                errorModal(err as ApiError);
+                errorModal(err);
             } finally {
                 setStatus("loaded");
             }

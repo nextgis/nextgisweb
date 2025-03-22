@@ -48,7 +48,7 @@ msgstr "Копировать в буфер обмена"
 msgid "Not set"
 msgstr "Не установлен"
 
-#: nodepkg/component/SaveButton.tsx:19 nodepkg/model-form/ModelForm.tsx:47
+#: nodepkg/component/SaveButton.tsx:19 nodepkg/model-form/ModelForm.tsx:46
 msgid "Save"
 msgstr "Сохранить"
 
@@ -100,73 +100,61 @@ msgstr "Уточнить перевод или добавить новый"
 msgid "Browser default"
 msgstr "По умолчанию в браузере"
 
-#: nodepkg/confirm.ts:13
+#: nodepkg/confirm.ts:12
 msgid "Confirmation required"
 msgstr "Необходимо подтверждение"
 
-#: nodepkg/confirm.ts:14
+#: nodepkg/confirm.ts:13
 msgid "Please confirm this action."
 msgstr "Пожалуйста, подтвердите данное действие."
 
-#: nodepkg/confirm.ts:16 nodepkg/error/shared.tsx:82
+#: nodepkg/confirm.ts:15 nodepkg/error/shared.tsx:81
 msgid "OK"
 msgstr "OK"
 
-#: nodepkg/confirm.ts:43
+#: nodepkg/confirm.ts:42
 msgid "Please confirm the deletion."
 msgstr "Пожалуйста, подтвердите удаление."
 
-#: nodepkg/confirm.ts:44 nodepkg/edi-table/RowAction.tsx:80
-#: nodepkg/focus-table/action.tsx:27 nodepkg/model-browse/ModelBrowse.tsx:257
-#: nodepkg/model-browse/ModelBrowse.tsx:324 nodepkg/model-form/ModelForm.tsx:48
+#: nodepkg/confirm.ts:43 nodepkg/edi-table/RowAction.tsx:79
+#: nodepkg/focus-table/action.tsx:27 nodepkg/model-browse/ModelBrowse.tsx:255
+#: nodepkg/model-browse/ModelBrowse.tsx:322 nodepkg/model-form/ModelForm.tsx:47
 msgid "Delete"
 msgstr "Удалить"
 
-#: nodepkg/confirm.ts:45
+#: nodepkg/confirm.ts:44
 msgid "Failed to delete."
 msgstr "Ошибка удаления."
 
-#: nodepkg/edi-table/RowAction.tsx:75
+#: nodepkg/edi-table/RowAction.tsx:74
 msgid "Clone"
 msgstr "Клонировать"
 
-#: nodepkg/edi-table/store/RecordItem.ts:35
+#: nodepkg/edi-table/store/RecordItem.ts:36
 msgid "Key required"
 msgstr "Требуется ключ"
 
-#: nodepkg/edi-table/store/RecordItem.ts:41
+#: nodepkg/edi-table/store/RecordItem.ts:42
 msgid "Key not unique"
 msgstr "Ключ не уникален"
 
-#: nodepkg/error/ErrorModal.tsx:46 nodepkg/error/extractError.ts:49
+#: nodepkg/error/ErrorModal.tsx:47 nodepkg/error/extractError.ts:5
 msgid "Error"
 msgstr "Ошибка"
 
-#: nodepkg/error/extractError.ts:40
-msgid "Unexpected error"
-msgstr "Неожиданная ошибка"
-
-#: nodepkg/error/extractError.ts:44 nodepkg/error/extractError.ts:50
+#: nodepkg/error/extractError.ts:4
 msgid "Something went wrong."
 msgstr "Что-то пошло не так."
 
-#: nodepkg/error/extractError.ts:54
-msgid "An unknown error occurred."
-msgstr "Возникла неизвестная ошибка."
-
-#: nodepkg/error/shared.tsx:21
-msgid "Unknown Error"
-msgstr "Неизвестная ошибка"
-
-#: nodepkg/error/shared.tsx:67
+#: nodepkg/error/shared.tsx:66
 msgid "Technical information"
 msgstr "Техническая информация"
 
-#: nodepkg/error/shared.tsx:77
+#: nodepkg/error/shared.tsx:76
 msgid "Contact support"
 msgstr "Написать в поддержку"
 
-#: nodepkg/error/shared.tsx:86
+#: nodepkg/error/shared.tsx:85
 msgid "Back to home"
 msgstr "На главную"
 
@@ -186,51 +174,51 @@ msgstr "Скрыть детали"
 msgid "Add"
 msgstr "Добавить"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:115 nodepkg/model-form/ModelForm.tsx:68
+#: nodepkg/model-browse/ModelBrowse.tsx:113 nodepkg/model-form/ModelForm.tsx:67
 msgid "Confirmation"
 msgstr "Подтверждение"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:116
+#: nodepkg/model-browse/ModelBrowse.tsx:114
 msgid "Item deleted"
 msgstr "Элемент удален"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:118
+#: nodepkg/model-browse/ModelBrowse.tsx:116
 msgid "Items deleted"
 msgstr "Элементы удалены"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:186
+#: nodepkg/model-browse/ModelBrowse.tsx:184
 msgid "The errors occurred during execution"
 msgstr "Во время выполнения возникли ошибки"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:190
+#: nodepkg/model-browse/ModelBrowse.tsx:188
 msgid "Failed to delete items:"
 msgstr "Не удалось удалить элементы:"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:213
+#: nodepkg/model-browse/ModelBrowse.tsx:211
 msgid "Do you want to delete these items?"
 msgstr "Вы хотите удалить эти элементы?"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:247
+#: nodepkg/model-browse/ModelBrowse.tsx:245
 msgid "Edit"
 msgstr "Изменить"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:247
+#: nodepkg/model-browse/ModelBrowse.tsx:245
 msgid "View"
 msgstr "Просмотр"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:280
+#: nodepkg/model-browse/ModelBrowse.tsx:278
 msgid "Search"
 msgstr "Поиск"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:302 nodepkg/model-form/ModelForm.tsx:46
+#: nodepkg/model-browse/ModelBrowse.tsx:300 nodepkg/model-form/ModelForm.tsx:45
 msgid "Create"
 msgstr "Создать"
 
-#: nodepkg/model-form/ModelForm.tsx:105
+#: nodepkg/model-form/ModelForm.tsx:104
 msgid "Fix the form errors first"
 msgstr "Необходимо исправить ошибки в форме"
 
-#: nodepkg/model-logo-form/ModelLogoForm.tsx:29
+#: nodepkg/model-logo-form/ModelLogoForm.tsx:27
 msgid "Logo saved. Reload the page to get them applied."
 msgstr "Логотип сохранен. Для просмотра изменений обновите страницу."
 
@@ -242,10 +230,10 @@ msgstr "Выполняется операция"
 msgid "Cancel"
 msgstr "Отмена"
 
-#: nodepkg/single-setting-form/SingleSettingForm.tsx:25
+#: nodepkg/single-setting-form/SingleSettingForm.tsx:24
 msgid "The setting is saved."
 msgstr "Настройка сохранена."
 
-#: nodepkg/single-setting-form/SingleSettingForm.tsx:26
+#: nodepkg/single-setting-form/SingleSettingForm.tsx:25
 msgid "Reload the page to get them applied."
 msgstr "Обновите страницу, чтобы настройки вступили в силу."

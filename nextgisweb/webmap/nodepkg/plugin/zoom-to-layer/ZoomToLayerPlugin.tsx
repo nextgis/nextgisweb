@@ -33,8 +33,8 @@ export class ZoomToLayerPlugin extends PluginBase {
                 this.display.map.zoomToNgwExtent(extent, {
                     displayProjection: this.display.displayProjection,
                 });
-            } catch (error) {
-                errorModal(error);
+            } catch (err) {
+                errorModal(err);
             }
         }
     }

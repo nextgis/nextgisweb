@@ -9,6 +9,7 @@ import {
 } from "mobx";
 
 import {
+    BaseAPIError,
     LunkwillParam,
     request,
     route,
@@ -254,44 +255,26 @@ export class CompositeStore {
     > {
         this.setValidate(true);
         if (!this.isValid) {
-            console.debug("Validation completed without success");
-            throw {
-                title: gettext("Validation error"),
+            // TODO: Refactor user errors
+            throw new BaseAPIError(
                 // prettier-ignore
-                message: gettext("Errors found during data validation. Tabs with errors marked in red."),
-            };
+                gettext("Errors found during data validation. Tabs with errors marked in red."),
+                { title: gettext("Validation error") }
+            );
         }
 
         this.setSaving(true);
         try {
-            console.debug("Validation completed with success");
             const lunkwill = new LunkwillParam();
+            const data = await this.dump(lunkwill);
 
-            let data: CompositeCreate | CompositeUpdate;
-            try {
-                data = await this.dump(lunkwill);
-                console.debug("Serialization completed");
-            } catch (er) {
-                console.error("Serialization failed", er);
-                throw {
-                    title: gettext("Unexpected error"),
-                    message: gettext("Serialization failed"),
-                    detail: er,
-                };
-            }
+            const response = (await request(url, {
+                method,
+                json: data,
+                lunkwill,
+            })) as ResourceRefWithParent;
 
-            try {
-                const response = (await request(url, {
-                    method,
-                    json: data,
-                    lunkwill,
-                })) as ResourceRefWithParent;
-                console.debug("REST API request completed");
-                return response;
-            } catch (er) {
-                console.error("REST API request failed");
-                throw er;
-            }
+            return response;
         } finally {
             this.setSaving(false);
         }

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 
-import type { ApiError } from "@nextgisweb/gui/error/type";
 import { route } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 import type { CompositeRead } from "@nextgisweb/resource/type/api";
@@ -15,7 +14,7 @@ export function useResourceSelect<V extends SelectValue = SelectValue>({
 
     const [resource, setResource] = useState<CompositeRead | null>(null);
     const [isLoading, setIsLoading] = useState(typeof value === "number");
-    const [error, setError] = useState<ApiError>();
+    const [error, setError] = useState<NonNullable<unknown> | null>(null);
 
     useEffect(() => {
         const loadResource = async () => {
@@ -28,8 +27,8 @@ export function useResourceSelect<V extends SelectValue = SelectValue>({
                         signal: makeSignal(),
                     });
                     setResource(res);
-                } catch (er) {
-                    setError(er as ApiError);
+                } catch (err) {
+                    setError(err!);
                 } finally {
                     setIsLoading(false);
                 }

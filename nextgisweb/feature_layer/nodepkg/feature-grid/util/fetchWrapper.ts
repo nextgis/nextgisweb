@@ -1,3 +1,4 @@
+import { isAbortError } from "@nextgisweb/gui/error";
 import type { LoaderCache } from "@nextgisweb/pyramid/util/loader";
 
 import { fetchFeatures } from "../api/fetchFeatures";
@@ -50,11 +51,9 @@ export function fetchWrapper({
                 signal,
             });
         })
-        .catch((er) => {
-            if (er && er.name === "AbortError") {
-                // ignore abort error
-            } else {
-                throw er;
+        .catch((err) => {
+            if (!isAbortError(err)) {
+                throw err;
             }
         });
 }

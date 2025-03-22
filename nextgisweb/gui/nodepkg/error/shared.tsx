@@ -5,20 +5,19 @@ import settings from "@nextgisweb/pyramid/client-settings";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { url } from "@nextgisweb/pyramid/nextgis";
 
-import { isApiError, isError } from "./util";
+import type { ErrorInfo } from "./extractError";
 
 const CodeLazy = lazy(() => import("./CodeLazy"));
 
-export function Body({ error }: { error: unknown }) {
-    if (isApiError(error) || isError(error)) {
-        return (
-            <>
-                <p>{error.message}</p>
-                {"detail" in error && <p>{error.detail}</p>}
-            </>
-        );
-    }
-    return <>{typeof error === "string" ? error : gettext("Unknown Error")}</>;
+export function Body({ error }: { error: ErrorInfo }) {
+    return (
+        <>
+            <p>{error.message}</p>
+            {"detail" in error && typeof error.detail === "string" && (
+                <p>{error.detail}</p>
+            )}
+        </>
+    );
 }
 
 export function TechInfo({ error }: { error: unknown }) {

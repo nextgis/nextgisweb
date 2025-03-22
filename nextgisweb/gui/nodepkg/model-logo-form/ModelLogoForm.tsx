@@ -10,8 +10,6 @@ import { route } from "@nextgisweb/pyramid/api";
 import type { KeysWithMethods } from "@nextgisweb/pyramid/api/type";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import type { ApiError } from "../error/type";
-
 interface ModelLogoFormProps extends ImageUploaderProps {
     component: string;
     model: KeysWithMethods<["get", "put"]>;
@@ -80,7 +78,7 @@ export function ModelLogoForm({
             });
             message.success(msg.saveSuccess);
         } catch (err) {
-            errorModal(err as ApiError);
+            errorModal(err);
         } finally {
             setStatus(null);
         }

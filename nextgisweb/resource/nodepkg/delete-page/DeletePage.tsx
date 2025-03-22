@@ -5,7 +5,6 @@ import { useMemo, useState } from "react";
 import { Button } from "@nextgisweb/gui/antd";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
-import type { ApiError } from "@nextgisweb/gui/error/type";
 import { DeleteIcon } from "@nextgisweb/gui/icon";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { useRouteGet } from "@nextgisweb/pyramid/hook";
@@ -69,7 +68,7 @@ export function DeletePage({
             });
             onOk?.();
         } catch (err) {
-            errorModal(err as ApiError);
+            errorModal(err);
         } finally {
             setDeletingInProgress(false);
         }

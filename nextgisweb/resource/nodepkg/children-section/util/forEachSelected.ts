@@ -1,5 +1,4 @@
 import { errorModal } from "@nextgisweb/gui/error";
-import type { ApiError } from "@nextgisweb/gui/error/type";
 import { showProgressModal } from "@nextgisweb/gui/progress-modal";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
@@ -53,10 +52,10 @@ export async function forEachSelected({
                 setItems((old: ChildrenResource[]) => {
                     return old.filter((row) => !sucessIds.includes(row.id));
                 });
-            } catch (er) {
+            } catch (err) {
                 errorIds.push(selectedId);
                 await new Promise((resolve) => {
-                    errorModal(er as ApiError, {
+                    errorModal(err, {
                         afterClose: () => resolve(undefined),
                     });
                 });
@@ -70,7 +69,7 @@ export async function forEachSelected({
         progressModal.close();
         onComplate(sucessIds, errorIds);
     } catch (err) {
-        errorModal(err as ApiError);
+        errorModal(err);
     } finally {
         if (setInProgress) {
             setInProgress(false);

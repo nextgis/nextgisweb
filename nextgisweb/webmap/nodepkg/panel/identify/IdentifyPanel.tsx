@@ -3,8 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import type { FeatureItem } from "@nextgisweb/feature-layer/type";
 import { Alert } from "@nextgisweb/gui/antd";
-import { errorModal } from "@nextgisweb/gui/error";
-import type { ApiError } from "@nextgisweb/gui/error/type";
+import { errorModal, isAbortError } from "@nextgisweb/gui/error";
 import { useLoading } from "@nextgisweb/gui/hook/useLoading";
 import { executeWithMinDelay } from "@nextgisweb/gui/util/executeWithMinDelay";
 import type { GetRequestOptions } from "@nextgisweb/pyramid/api/type";
@@ -90,9 +89,9 @@ const IdentifyPanel = observer<PanelPluginWidgetProps<IdentifyStore>>(
                     );
 
                     setFeatureItem(featureItemLoaded);
-                } catch (er) {
-                    if ((er as Error).name !== "AbortError") {
-                        errorModal(er as ApiError);
+                } catch (err) {
+                    if (!isAbortError(err)) {
+                        errorModal(err);
                     }
                 }
             },

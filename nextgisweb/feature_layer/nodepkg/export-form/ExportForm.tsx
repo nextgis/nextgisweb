@@ -10,7 +10,6 @@ import {
 } from "@nextgisweb/gui/component";
 import type { ExtentRowProps } from "@nextgisweb/gui/component/extent-row/ExtentRow";
 import { errorModal } from "@nextgisweb/gui/error";
-import type { ApiError } from "@nextgisweb/gui/error/type";
 import { FieldsForm, Form } from "@nextgisweb/gui/fields-form";
 import type { FormField } from "@nextgisweb/gui/fields-form";
 import { route } from "@nextgisweb/pyramid/api";
@@ -154,7 +153,7 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
                 }
             }
         } catch (err) {
-            errorModal(err as ApiError);
+            errorModal(err);
         } finally {
             setStaffLoading(false);
         }

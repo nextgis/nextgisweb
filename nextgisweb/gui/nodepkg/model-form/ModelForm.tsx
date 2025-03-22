@@ -15,7 +15,6 @@ import type {
 import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import type { ApiError } from "../error/type";
 import { useKeydownListener } from "../hook/useKeydownListener";
 
 interface Messages {
@@ -99,7 +98,7 @@ export function ModelForm(props: ModelFormProps) {
                 const url = routeURL(model.browse);
                 window.open(url, "_self");
             } catch (err) {
-                errorModal(err as ApiError);
+                errorModal(err);
             }
         } catch (err) {
             message.error(gettext("Fix the form errors first"));
@@ -116,7 +115,7 @@ export function ModelForm(props: ModelFormProps) {
             const url = routeURL(model.browse);
             window.open(url, "_self");
         } catch (err) {
-            errorModal(err as ApiError);
+            errorModal(err);
         } finally {
             setStatus(null);
         }
@@ -134,7 +133,7 @@ export function ModelForm(props: ModelFormProps) {
                 if (formProps.onChange) {
                     formProps.onChange({ value: initialValues });
                 }
-            } catch (er) {
+            } catch {
                 // model item is not exist handler
             }
         }

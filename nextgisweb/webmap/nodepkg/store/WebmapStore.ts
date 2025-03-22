@@ -398,10 +398,10 @@ export class WebmapStore {
                 legends.items.forEach(({ resource, legend_symbols }) => {
                     this.updateLayerLegendInfo(resource.id, legend_symbols);
                 });
-            } catch (error) {
+            } catch (err) {
                 console.error(
                     "Error fetching render.resource_legend_symbols:",
-                    error
+                    err
                 );
             } finally {
                 newResources.forEach((id) =>

@@ -1,9 +1,9 @@
 import { useState } from "react";
 
+import type { ErrorInfo } from "./extractError";
 import { Body, Footer, TechInfo } from "./shared";
-import type { ApiError } from "./type";
 
-export function ErrorPage({ error }: { error: ApiError }) {
+export function ErrorPage({ error }: { error: ErrorInfo }) {
     const [tinfo, setTinfo] = useState(false);
 
     return (

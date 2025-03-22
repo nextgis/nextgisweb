@@ -27,7 +27,7 @@ export function getFeatureImage({
     if ("file_meta" in attachment) {
         try {
             projection = attachment.file_meta.panorama.ProjectionType;
-        } catch (error) {
+        } catch (err) {
             // pass
         }
     }

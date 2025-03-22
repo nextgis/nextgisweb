@@ -4,7 +4,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Badge, Button, Col, Input, Row, Space } from "@nextgisweb/gui/antd";
 import type { InputRef } from "@nextgisweb/gui/antd";
 import { errorModal } from "@nextgisweb/gui/error";
-import type { ApiError } from "@nextgisweb/gui/error/type";
 import { useKeydownListener } from "@nextgisweb/gui/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
@@ -46,8 +45,8 @@ const CreateControl = observer(
                         setCreateMode(false);
                     }
                 }
-            } catch (er) {
-                errorModal(er as ApiError);
+            } catch (err) {
+                errorModal(err);
             }
         };
 
