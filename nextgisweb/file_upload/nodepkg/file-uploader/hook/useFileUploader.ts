@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { message } from "@nextgisweb/gui/antd";
 import type { UploadFile } from "@nextgisweb/gui/antd";
+import { errorModal } from "@nextgisweb/gui/error";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 import { gettextf } from "@nextgisweb/pyramid/i18n";
 
@@ -113,8 +114,8 @@ export function useFileUploader<M extends boolean = false>({
                         setMeta(uploadedFile as UploaderMeta<M>);
                     }
                 }
-            } catch (er) {
-                console.log(er);
+            } catch (err) {
+                errorModal(err);
             } finally {
                 setProgress(undefined);
                 setUploading(false);
