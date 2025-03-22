@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import type { FeaureLayerGeometryType } from "@nextgisweb/feature-layer/type/api";
 import { FileUploader } from "@nextgisweb/file-upload/file-uploader";
@@ -200,9 +200,14 @@ export const Widget: EditorWidget<Store> = observer(({ store }) => {
         add("MULTIPOINTZ", gettext("Multipoint Z"));
         add("MULTILINESTRINGZ", gettext("Multiline Z"));
         add("MULTIPOLYGONZ", gettext("Multipolygon Z"));
-        update({ geometryType: gti ? gti : result[0].value });
         return result;
-    }, [mode, update, geometryTypeInitial]);
+    }, [geometryTypeInitial, mode]);
+
+    useEffect(() => {
+        update({
+            geometryType: mode === "gtype" ? geometryTypeInitial : "POINT",
+        });
+    }, [geometryTypeInitial, mode, update]);
 
     const inspectUpload = useCallback(
         async (value: FileMeta[], { signal }: { signal: AbortSignal }) => {
