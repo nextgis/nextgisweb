@@ -9,10 +9,10 @@ interface Value {
 export class SettingStore implements EditorStore<Value> {
     readonly identity = "feature_layer";
 
-    @observable accessor dirty = false;
+    @observable.ref accessor dirty = false;
 
-    @observable accessor versioningEnabled = false;
-    @observable accessor versioningExisting = false;
+    @observable.ref accessor versioningEnabled = false;
+    @observable.ref accessor versioningExisting = false;
 
     @action
     load(value: Value) {
@@ -23,8 +23,7 @@ export class SettingStore implements EditorStore<Value> {
 
     dump(): Value | undefined {
         if (!this.dirty) return undefined;
-        const result = { versioning: { enabled: this.versioningEnabled } };
-        return result;
+        return { versioning: { enabled: this.versioningEnabled } };
     }
 
     @computed

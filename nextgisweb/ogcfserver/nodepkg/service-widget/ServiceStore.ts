@@ -1,4 +1,4 @@
-import { action, computed, observable, observe, runInAction } from "mobx";
+import { action, computed, observable, observe } from "mobx";
 
 import type { FocusTableStore } from "@nextgisweb/gui/focus-table";
 import type * as apitype from "@nextgisweb/ogcfserver/type/api";
@@ -18,13 +18,12 @@ export class ServiceStore
     implements EditorStore<Value>, FocusTableStore<Collection>
 {
     readonly identity = "ogcfserver_service";
+    readonly composite: CompositeStore;
 
-    @observable accessor dirty = false;
-    @observable accessor validate = false;
+    readonly collections = observable.array<Collection>([]);
 
-    collections = observable.array<Collection>([]);
-
-    composite: CompositeStore;
+    @observable.ref accessor dirty = false;
+    @observable.ref accessor validate = false;
 
     constructor({ composite }: EditorStoreOptions) {
         this.composite = composite;
@@ -51,9 +50,6 @@ export class ServiceStore
 
     @computed
     get isValid(): boolean {
-        runInAction(() => {
-            this.validate = true;
-        });
         return this.collections.every((i) => i.error === false);
     }
 

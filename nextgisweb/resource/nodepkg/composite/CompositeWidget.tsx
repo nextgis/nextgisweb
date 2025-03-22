@@ -6,223 +6,196 @@ import type {
     ActionToolbarAction,
     ActionToolbarProps,
 } from "@nextgisweb/gui/action-toolbar";
-import { Button, Spin, Tabs } from "@nextgisweb/gui/antd";
+import { Dropdown, Spin, Tabs } from "@nextgisweb/gui/antd";
 import type { TabsProps } from "@nextgisweb/gui/antd";
 import { SaveButton, TabsLabelBadge } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
 import { useThemeVariables, useUnsavedChanges } from "@nextgisweb/gui/hook";
+import { EditIcon } from "@nextgisweb/gui/icon";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import type {
-    ResourceCls,
-    ResourceWidget,
-} from "@nextgisweb/resource/type/api";
 
-import type { ActiveOnOptions, Operation } from "../type";
+import type { ActiveOnOptions, EditorStore } from "../type";
 
 import { CompositeStore } from "./CompositeStore";
+import type { CompositeSetup } from "./CompositeStore";
 
 import { LoadingOutlined } from "@ant-design/icons";
 
 import "./CompositeWidget.less";
 
-export interface CompositeWidgetCreateProps {
-    operation: Operation;
-    cls?: ResourceCls;
-    parent?: number;
-}
-export interface CompositeWidgetUpdateProps {
-    operation: Operation;
-    id?: number;
-}
-
-export type CompositeWidgetProps = CompositeWidgetCreateProps &
-    CompositeWidgetUpdateProps;
+const msgCreate = gettext("Create");
+const msgCreateEdit = gettext("Create and edit");
+const msgSave = gettext("Save");
+const msgSaving = gettext("Please wait. Processing request...");
 
 type TabItem = NonNullable<TabsProps["items"]>[number] & {
     order?: number;
 };
 
-const operationMsg: Record<ResourceWidget["operation"], string> = {
-    create: gettext("Create"),
-    update: gettext("Save"),
-    delete: gettext("Delete"),
-    read: gettext("Read"),
-};
+interface TabsLabelProps {
+    composite: CompositeStore;
+    member: EditorStore;
+    title: string;
+}
 
-// prettier-ignore
-const msgSaving = gettext("Please wait. Processing request...")
+const TabsLabel = observer<TabsLabelProps>(({ composite, member, title }) => {
+    return (
+        <TabsLabelBadge
+            error={composite.validate && !member.isValid}
+            dirty={member.dirty}
+            counter={member.counter}
+        >
+            {title}
+        </TabsLabelBadge>
+    );
+});
 
-const CompositeWidget = observer(
-    ({ cls, operation, parent, id }: CompositeWidgetProps) => {
-        const [activeKey, setActiveKey] = useState<string>();
-        const [composite] = useState(
-            () => new CompositeStore({ cls, operation, parent, id })
-        );
+TabsLabel.displayName = "TabsLabel";
 
-        const { validate, members, dirty, saving } = composite;
-        const { disable: disableUnsavedChanges } = useUnsavedChanges({ dirty });
+export interface CompositeWidgetProps {
+    setup: CompositeSetup;
+}
 
-        const items = useMemo<TabItem[]>(() => {
-            if (members) {
-                return members
-                    .map(({ store, key, widget: Widget }) => {
-                        // TODO: Do we need a local observer here?
-                        const TabsLabelObserver = observer(() => (
-                            <TabsLabelBadge
-                                error={validate && !store.isValid}
-                                dirty={store.dirty}
-                                counter={store.counter}
-                            >
-                                {Widget.title}
-                            </TabsLabelBadge>
-                        ));
+const CompositeWidget = observer(({ setup }: CompositeWidgetProps) => {
+    const [activeKey, setActiveKey] = useState<string>();
+    const [composite] = useState(() => new CompositeStore({ setup }));
+    const [redirecting, setRedirecting] = useState(false);
 
-                        TabsLabelObserver.displayName = `TabsLabelObserver-${key}`;
+    const { operation } = setup;
+    const { members, dirty } = composite;
+    const { disable: disableUnsavedChanges } = useUnsavedChanges({ dirty });
 
-                        const tab: TabItem = {
-                            key,
-                            disabled: saving,
-                            order: Widget.order,
-                            label: <TabsLabelObserver />,
-                            children: <Widget store={store}></Widget>,
-                        };
-                        return tab;
-                    })
-                    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    const items = useMemo<TabItem[]>(() => {
+        if (!members) return [];
+        return members
+            .map(({ store, key, widget: Widget }) => {
+                const tab: TabItem = {
+                    key,
+                    order: Widget.order,
+                    label: (
+                        <TabsLabel
+                            composite={composite}
+                            member={store}
+                            title={Widget.title!}
+                        />
+                    ),
+                    children: <Widget store={store} />,
+                };
+                return tab;
+            })
+            .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    }, [composite, members]);
+
+    useEffect(() => {
+        const selected = members?.find((member) => {
+            const activateOn: ActiveOnOptions = member.widget.activateOn || {};
+            if (activateOn[operation]) {
+                return true;
             }
-            return [];
-        }, [members, saving, validate]);
+        });
+        if (selected) {
+            setActiveKey(selected.key);
+        }
+    }, [members, operation]);
 
-        useEffect(() => {
-            const selected = members?.find((member) => {
-                const activateOn: ActiveOnOptions =
-                    member.widget.activateOn || {};
-                if (activateOn[operation]) {
-                    return true;
-                }
-            });
-            if (selected) {
-                setActiveKey(selected.key);
+    useEffect(() => {
+        composite.init();
+    }, [composite]);
+
+    const submit = useCallback(
+        async (edit: boolean = false) => {
+            setRedirecting(true);
+
+            let id;
+            try {
+                ({ id } = await composite.submit());
+            } catch (err) {
+                setRedirecting(false);
+                errorModal(err);
+                return;
             }
-        }, [members, operation]);
 
-        useEffect(() => {
-            composite.init();
-        }, [composite]);
+            disableUnsavedChanges();
+            const routeName = edit ? "resource.update" : "resource.show";
+            window.location.href = route(routeName, { id }).url();
+        },
+        [composite, disableUnsavedChanges]
+    );
 
-        const goToResource = useCallback(
-            (id: number, edit = false) => {
-                disableUnsavedChanges();
-                if (edit) {
-                    window.location.href = route("resource.update", {
-                        id,
-                    }).url();
-                } else {
-                    window.location.href = route("resource.show", {
-                        id,
-                    }).url();
-                }
-            },
-            [disableUnsavedChanges]
-        );
+    const inProgress = composite.loading || composite.saving || redirecting;
 
-        const toolbarProps: Partial<ActionToolbarProps> = useMemo(() => {
-            const actions: ActionToolbarAction[] = [
+    const toolbarProps: Partial<ActionToolbarProps> = useMemo(() => {
+        const actions: ActionToolbarAction[] = [];
+
+        if (operation === "create") {
+            actions.push(
+                <Dropdown.Button
+                    key="create"
+                    type="primary"
+                    menu={{
+                        items: [
+                            {
+                                key: "create_edit",
+                                label: msgCreateEdit,
+                                icon: <EditIcon />,
+                                onClick: () => submit(true),
+                            },
+                        ],
+                    }}
+                    disabled={inProgress}
+                    onClick={() => submit(false)}
+                >
+                    {msgCreate}
+                </Dropdown.Button>
+            );
+        } else if (operation === "update") {
+            actions.push(
                 <SaveButton
                     key="save"
-                    disabled={saving}
-                    onClick={async () => {
-                        if (operation === "create") {
-                            try {
-                                const res = await composite.create();
-                                if (res) {
-                                    goToResource(res.id);
-                                }
-                            } catch (err) {
-                                errorModal(err);
-                            }
-                        } else if (operation === "update") {
-                            try {
-                                await composite.update();
-                                if (composite.id !== null) {
-                                    goToResource(composite.id);
-                                }
-                            } catch (err) {
-                                errorModal(err);
-                            }
-                        }
-                    }}
+                    disabled={inProgress}
+                    onClick={() => submit(false)}
                 >
-                    {operationMsg[operation]}
-                </SaveButton>,
-            ];
+                    {msgSave}
+                </SaveButton>
+            );
+        }
+        return { actions };
+    }, [inProgress, operation, submit]);
 
-            if (operation === "create") {
-                const saveAndEdit: ActionToolbarAction = (
-                    <Button
-                        type="primary"
-                        key="save"
-                        disabled={saving}
-                        onClick={async () => {
-                            try {
-                                const res = await composite.create();
-                                if (res) {
-                                    goToResource(res.id, true);
-                                }
-                            } catch (err) {
-                                errorModal(err);
-                            }
-                        }}
-                    >
-                        {gettext("Create and edit")}
-                    </Button>
-                );
-                actions.push(saveAndEdit);
-            }
+    const themeVariables = useThemeVariables({
+        "color-border-secondary": "colorBorderSecondary",
+        "border-radius": "borderRadius",
+    });
 
-            const rightActions: ActionToolbarAction[] = [];
-
-            return {
-                actions,
-                rightActions,
-            };
-        }, [saving, operation, composite, goToResource]);
-
-        const themeVariables = useThemeVariables({
-            "color-border-secondary": "colorBorderSecondary",
-            "border-radius": "borderRadius",
-        });
-
-        return (
-            <div className="ngw-resource-composite" style={themeVariables}>
-                <div
-                    style={{ display: saving ? undefined : "none" }}
-                    className="spin"
-                >
-                    <Spin
-                        size="large"
-                        indicator={<LoadingOutlined spin />}
-                        tip={msgSaving}
-                    >
-                        <div />
-                    </Spin>
-                </div>
-                <Tabs
-                    style={{ display: saving ? "none" : undefined }}
+    return (
+        <div className="ngw-resource-composite" style={themeVariables}>
+            <div
+                style={{ display: inProgress ? undefined : "none" }}
+                className="spin"
+            >
+                <Spin
                     size="large"
-                    type="card"
-                    activeKey={activeKey}
-                    onChange={setActiveKey}
-                    items={items}
-                    parentHeight
-                />
-
-                <ActionToolbar {...toolbarProps} />
+                    indicator={<LoadingOutlined spin />}
+                    tip={composite.saving || redirecting ? msgSaving : ""}
+                >
+                    <div />
+                </Spin>
             </div>
-        );
-    }
-);
+            <Tabs
+                style={{ display: inProgress ? "none" : undefined }}
+                size="large"
+                type="card"
+                activeKey={activeKey}
+                onChange={setActiveKey}
+                items={items}
+                parentHeight
+            />
+
+            <ActionToolbar {...toolbarProps} />
+        </div>
+    );
+});
 
 CompositeWidget.displayName = "CompositeWidget";
 

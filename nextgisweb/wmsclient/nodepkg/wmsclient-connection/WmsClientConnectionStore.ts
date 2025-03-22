@@ -1,5 +1,5 @@
 import { isEqual } from "lodash-es";
-import { action, computed, observable, runInAction } from "mobx";
+import { action, computed, observable } from "mobx";
 
 import { mapper } from "@nextgisweb/gui/arm";
 import type { NullableProps } from "@nextgisweb/gui/type";
@@ -32,14 +32,14 @@ export class WmsClientConnectionStore
 {
     readonly identity = "wmsclient_connection";
 
-    url = url.init(null, this);
-    username = username.init(null, this);
-    password = password.init(null, this);
-    version = version.init("1.1.1", this);
-    capcache = capcache.init("query", this);
+    readonly url = url.init(null, this);
+    readonly username = username.init(null, this);
+    readonly password = password.init(null, this);
+    readonly version = version.init("1.1.1", this);
+    readonly capcache = capcache.init("query", this);
 
     private _initValue?: ConnectionCreate;
-    @observable accessor validate = false;
+    @observable.ref accessor validate = false;
 
     @action
     load(val: ConnectionCreate) {
@@ -80,9 +80,6 @@ export class WmsClientConnectionStore
 
     @computed
     get isValid() {
-        runInAction(() => {
-            this.validate = true;
-        });
         return !this.error;
     }
 }

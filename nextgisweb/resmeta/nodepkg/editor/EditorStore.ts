@@ -7,7 +7,7 @@ import type { RecordOption } from "@nextgisweb/gui/edi-table/store/RecordItem";
 export class EditorStore extends KeyValueEditorStore<{
     items: RecordOption[];
 }> {
-    identity = "resmeta";
+    readonly identity = "resmeta";
 
     @action
     load(value: { items: RecordOption[] }) {

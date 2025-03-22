@@ -867,69 +867,77 @@ def quota_check(
     return QuotaCheckSuccess(success=True)
 
 
-WidgetOperation = Annotated[Literal["create", "update", "delete", "read"], Meta(description="")]
+CompositeWidgetOperation = Annotated[
+    Literal["create", "update"],
+    TSExport("CompositeWidgetOperation"),
+]
+
+CompositeMembersConfig = Annotated[
+    Dict[str, Any],
+    TSExport("CompositeMembersConfig"),
+]
 
 
-class ResourceWidget(Struct, kw_only=True):
-    operation: Annotated[WidgetOperation, Meta(description="Operation type")]
-    config: Annotated[Dict[str, dict], Meta(description="Widget configuration")]
-    id: Annotated[Union[int, None], Meta(description="Resource ID")]
-    cls: Annotated[ResourceCls, Meta(description="Resource class identifier")]
-    parent: Annotated[Union[int, None], Meta(description="Parent resource ID")]
-    owner_user: Annotated[int, Meta(description="Owner user ID")]
+class CompositeOperationCreate(Struct, kw_only=True, tag="create", tag_field="operation"):
+    cls: ResourceCls
+    parent: ResourceID
+    owner_user: UserID
+    members: CompositeMembersConfig
     suggested_display_name: Annotated[Union[str, None], Meta(description="Suggested display name")]
+
+
+class CompositeOperationUpdate(Struct, kw_only=True, tag="update", tag_field="operation"):
+    id: ResourceID
+    cls: ResourceCls
+    parent: Union[ResourceID, None]
+    owner_user: UserID
+    members: CompositeMembersConfig
 
 
 def widget(
     request,
     *,
-    operation: Union[WidgetOperation, None] = None,
-    id: Annotated[Union[int, None], Meta(description="Resource ID")] = None,
-    cls: Annotated[Union[ResourceCls, None], Meta(description="Resource class")] = None,
-    parent: Annotated[Union[int, None], Meta(description="Parent resource ID")] = None,
-) -> ResourceWidget:
-    resid = id
-    clsid = cls
-    parent_id = parent
-    suggested_display_name = None
-
+    operation: CompositeWidgetOperation,
+    id: Union[ResourceID, None] = None,
+    cls: Union[ResourceCls, None] = None,
+    parent: Union[ResourceID, None] = None,
+) -> AsJSON[Union[CompositeOperationCreate, CompositeOperationUpdate]]:
     if operation == "create":
-        if resid is not None or clsid is None or parent_id is None:
+        if id is not None or cls is None or parent is None:
             raise HTTPBadRequest()
 
-        if clsid not in Resource.registry._dict:
+        if cls not in Resource.registry._dict:
             raise HTTPBadRequest()
 
-        parent = with_polymorphic(Resource, "*").filter_by(id=parent_id).one()
-        owner_user = request.user
+        parent_obj = with_polymorphic(Resource, "*").filter_by(id=parent).one()
 
         tr = request.localizer.translate
-        obj = Resource.registry[clsid](parent=parent, owner_user=request.user)
-        suggested_display_name = obj.suggest_display_name(tr)
+        obj = Resource.registry[cls](parent=parent_obj, owner_user=request.user)
+        composite = CompositeWidget(operation=operation, obj=obj, request=request)
+        suggested_dn = obj.suggest_display_name(tr)
+        return CompositeOperationCreate(
+            cls=cls,
+            parent=parent_obj.id,
+            owner_user=request.user.id,
+            members=composite.config(),
+            suggested_display_name=suggested_dn,
+        )
 
-    elif operation in ("update", "delete"):
-        if resid is None or clsid is not None or parent_id is not None:
+    elif operation == "update":
+        if id is None or cls is not None or parent is not None:
             raise HTTPBadRequest()
 
-        obj = with_polymorphic(Resource, "*").filter_by(id=resid).one()
-
-        clsid = obj.cls
-        parent = obj.parent
-        owner_user = obj.owner_user
-
+        obj = with_polymorphic(Resource, "*").filter_by(id=id).one()
+        composite = CompositeWidget(operation=operation, obj=obj, request=request)
+        return CompositeOperationUpdate(
+            id=obj.id,
+            cls=obj.cls,
+            parent=obj.parent_id,
+            owner_user=request.user.id,
+            members=composite.config(),
+        )
     else:
-        raise HTTPBadRequest()
-
-    widget = CompositeWidget(operation=operation, obj=obj, request=request)
-    return ResourceWidget(
-        operation=operation,
-        config=widget.config(),
-        id=resid,
-        cls=clsid,
-        parent=parent.id if parent else None,
-        owner_user=owner_user.id,
-        suggested_display_name=suggested_display_name,
-    )
+        raise NotImplementedError
 
 
 # Component settings

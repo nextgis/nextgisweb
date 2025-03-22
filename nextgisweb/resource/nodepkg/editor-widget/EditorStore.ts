@@ -1,9 +1,10 @@
+import { isEmpty } from "lodash-es";
 import { action, computed, observable } from "mobx";
 
-import type { ResourceCls, ResourceRead } from "@nextgisweb/resource/type/api";
+import type { ResourceRead } from "@nextgisweb/resource/type/api";
 
 import type { CompositeStore } from "../composite/CompositeStore";
-import type { EditorStoreOptions, Operation } from "../type";
+import type { EditorStoreOptions } from "../type";
 
 type NullableProperties<T> = {
     [P in keyof T]?: T[P] | null;
@@ -22,27 +23,23 @@ interface Loaded {
 }
 
 export class EditorStore {
-    identity = "resource";
-
-    readonly operation: Operation;
+    readonly identity = "resource";
     readonly composite: CompositeStore;
 
-    @observable accessor cls: ResourceCls | null = null;
-    @observable accessor displayName: string | null = null;
-    @observable accessor keyname: string | null = null;
-    @observable accessor parent: number | null = null;
-    @observable accessor ownerUser: number | null = null;
+    @observable.ref accessor displayName: string | null = null;
+    @observable.ref accessor keyname: string | null = null;
+    @observable.ref accessor parent: number | null = null;
+    @observable.ref accessor ownerUser: number | null = null;
 
-    @observable accessor sdnBase: string | null = null;
+    @observable.ref accessor sdnBase: string | null = null;
 
     @observable.shallow accessor _loaded: Loaded;
     @observable.ref accessor dirty: boolean = false;
 
-    constructor({ composite, operation }: EditorStoreOptions) {
+    constructor({ composite }: EditorStoreOptions) {
         this.composite = composite;
-        this.operation = operation;
 
-        const ownerUser = this.composite.owner_user;
+        const ownerUser = this.composite.ownerUser;
         this._loaded = {
             ownerUser,
             displayName: null,
@@ -51,7 +48,6 @@ export class EditorStore {
         };
         this.ownerUser = ownerUser;
 
-        this.cls = this.composite.cls;
         this.parent = this.composite.parent;
 
         this.sdnBase = composite.sdnBase;
@@ -84,11 +80,18 @@ export class EditorStore {
         const result: Value = {};
         const c = this._loaded;
 
-        if (this.operation === "create") {
-            result.cls = this.cls;
+        if (this.composite.operation === "create") {
+            result.cls = this.composite.cls;
         }
 
-        if (this.operation === "create" || this.displayName !== c.displayName) {
+        if (this.parent !== c.parent || this.composite.operation === "create") {
+            result.parent = { id: this.parent };
+        }
+
+        if (
+            this.composite.operation === "create" ||
+            this.displayName !== c.displayName
+        ) {
             result.display_name = this.displayName
                 ? this.displayName
                 : this.sdnDynamic || this.sdnBase;
@@ -98,15 +101,11 @@ export class EditorStore {
             result.keyname = this.keyname ? this.keyname : null;
         }
 
-        if (this.parent !== c.parent) {
-            result.parent = { id: this.parent };
-        }
-
         if (this.ownerUser !== c.ownerUser) {
             result.owner_user = { id: this.ownerUser };
         }
 
-        return result;
+        return !isEmpty(result) ? result : undefined;
     }
 
     @action
@@ -128,7 +127,8 @@ export class EditorStore {
     get displayNameIsValid() {
         return !!(
             this.displayName ||
-            (this.operation === "create" && (this.sdnDynamic || this.sdnBase))
+            (this.composite.operation === "create" &&
+                (this.sdnDynamic || this.sdnBase))
         );
     }
 

@@ -1,9 +1,10 @@
 import type { LunkwillParam } from "@nextgisweb/pyramid/api";
-import type { ResourceWidget } from "@nextgisweb/resource/type/api";
+import type { CompositeWidgetOperation } from "@nextgisweb/resource/type/api";
 
-import type { CompositeStore } from "../composite/CompositeStore";
+import type { CompositeStore } from "../composite";
 
-export type Operation = ResourceWidget["operation"];
+/** @deprecated Use {@link CompositeWidgetOperation} instead */
+export type Operation = CompositeWidgetOperation;
 
 export interface DumpParams {
     lunkwill: LunkwillParam;
@@ -11,26 +12,22 @@ export interface DumpParams {
 
 export interface EditorStoreOptions {
     composite: CompositeStore;
-    operation: Operation;
-    resourceId?: number;
 }
 
 export interface EditorStore<READ = any, CREATE = READ, UPDATE = CREATE> {
-    identity: string;
-
-    uploading?: boolean;
+    readonly identity: string;
 
     load: (value: READ) => unknown;
 
     dump: (val: DumpParams) => CREATE | UPDATE | undefined;
 
-    dirty?: boolean;
+    dirty: boolean;
 
     counter?: number;
 
-    isValid?: boolean;
-
     validate?: boolean;
+
+    isValid: boolean;
 
     suggestedDisplayName?: string;
 }

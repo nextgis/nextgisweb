@@ -1,5 +1,5 @@
 import { difference } from "lodash-es";
-import { action, computed, observable, observe, runInAction } from "mobx";
+import { action, computed, observable, observe } from "mobx";
 
 import { mapper, validate } from "@nextgisweb/gui/arm";
 import type { ErrorResult } from "@nextgisweb/gui/arm";
@@ -53,14 +53,14 @@ fieldDatatype.validate(validate.required());
 export class Field {
     readonly store: FieldsStore;
 
-    id = fieldId.init(undefined, this);
-    displayName = fieldDisplayName.init("", this);
-    keyname = fieldKeyname.init("", this);
-    datatype = fieldDatatype.init("", this);
-    lookupTable = fieldLookupTable.init(null, this);
-    labelField = fieldLabelField.init(false, this);
-    gridVisibility = fieldGridVisibility.init(true, this);
-    textSearch = fieldTextSearch.init(true, this);
+    readonly id = fieldId.init(undefined, this);
+    readonly displayName = fieldDisplayName.init("", this);
+    readonly keyname = fieldKeyname.init("", this);
+    readonly datatype = fieldDatatype.init("", this);
+    readonly lookupTable = fieldLookupTable.init(null, this);
+    readonly labelField = fieldLabelField.init(false, this);
+    readonly gridVisibility = fieldGridVisibility.init(true, this);
+    readonly textSearch = fieldTextSearch.init(true, this);
 
     constructor(store: FieldsStore, data: FieldData) {
         this.store = store;
@@ -109,8 +109,8 @@ export class FieldsStore implements EditorStore<Value>, FocusTableStore<Field> {
     readonly identity = "feature_layer";
     readonly composite: CompositeStore;
 
-    fields = observable.array<Field>([]);
-    existingFields = observable.array<Field>([]);
+    readonly fields = observable.array<Field>([]);
+    readonly existingFields = observable.array<Field>([]);
 
     @observable.ref accessor dirty = false;
     @observable.ref accessor validate = false;
@@ -122,9 +122,6 @@ export class FieldsStore implements EditorStore<Value>, FocusTableStore<Field> {
 
     @computed
     get isValid(): boolean {
-        runInAction(() => {
-            this.validate = true;
-        });
         return this.fields.every((i) => i.error === false);
     }
 

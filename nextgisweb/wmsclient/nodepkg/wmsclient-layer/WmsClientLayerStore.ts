@@ -1,4 +1,4 @@
-import { action, computed, observable, runInAction } from "mobx";
+import { action, computed, observable } from "mobx";
 
 import { mapper } from "@nextgisweb/gui/arm";
 import type { NullableProps } from "@nextgisweb/gui/type";
@@ -6,7 +6,6 @@ import type { CompositeStore } from "@nextgisweb/resource/composite";
 import type {
     EditorStore,
     EditorStoreOptions,
-    Operation,
 } from "@nextgisweb/resource/type";
 import srsSettings from "@nextgisweb/spatial-ref-sys/client-settings";
 import type {
@@ -42,19 +41,16 @@ export class WmsClientLayerStore
     implements EditorStore<LayerRead, LayerCreate, LayerUpdate>
 {
     readonly identity = "wmsclient_layer";
-
-    readonly operation: Operation;
     readonly composite: CompositeStore;
 
-    connection = connection.init(null, this);
-    wmslayers = wmslayers.init("", this);
-    imgformat = imgformat.init(null, this);
-    vendor_params = vendor_params.init({}, this);
+    readonly connection = connection.init(null, this);
+    readonly wmslayers = wmslayers.init("", this);
+    readonly imgformat = imgformat.init(null, this);
+    readonly vendor_params = vendor_params.init({}, this);
 
-    @observable accessor validate = false;
+    @observable.ref accessor validate = false;
 
-    constructor({ operation, composite }: EditorStoreOptions) {
-        this.operation = operation;
+    constructor({ composite }: EditorStoreOptions) {
         this.composite = composite;
     }
 
@@ -65,7 +61,7 @@ export class WmsClientLayerStore
 
     @computed
     get dirty(): boolean {
-        return this.operation === "create" ? true : mapperDirty(this);
+        return this.composite.operation === "create" ? true : mapperDirty(this);
     }
 
     dump() {
@@ -83,7 +79,7 @@ export class WmsClientLayerStore
                 connection,
                 vendor_params,
                 ...rest,
-                ...(this.operation === "create"
+                ...(this.composite.operation === "create"
                     ? { srs: srsSettings.default }
                     : {}),
             };
@@ -97,9 +93,6 @@ export class WmsClientLayerStore
 
     @computed
     get isValid() {
-        runInAction(() => {
-            this.validate = true;
-        });
         return !this.error;
     }
 }

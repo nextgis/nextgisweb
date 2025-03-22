@@ -1,3 +1,4 @@
+import { isEmpty } from "lodash-es";
 import { action, computed, observable, toJS } from "mobx";
 
 import type { FileMeta } from "@nextgisweb/file-upload/file-uploader";
@@ -7,7 +8,6 @@ import type {
     DumpParams,
     EditorStore,
     EditorStoreOptions,
-    Operation,
 } from "@nextgisweb/resource/type";
 import srsSettings from "@nextgisweb/spatial-ref-sys/client-settings";
 import type * as apitype from "@nextgisweb/vector-layer/type/api";
@@ -37,7 +37,8 @@ export class Store
             apitype.VectorLayerCreate
         >
 {
-    identity = "vector_layer";
+    readonly identity = "vector_layer";
+    readonly composite: CompositeStore;
 
     @observable accessor mode: Mode | null = "file";
     @observable.shallow accessor source: FileMeta | null = null;
@@ -59,16 +60,11 @@ export class Store
     @observable accessor confirm = false;
     @observable accessor uploading = false;
 
-    @observable accessor dirty = false;
+    @observable.ref accessor dirty = false;
 
-    @observable accessor operation: Operation;
-    @observable.shallow accessor composite: CompositeStore;
-
-    constructor({ composite, operation }: EditorStoreOptions) {
-        this.operation = operation;
+    constructor({ composite }: EditorStoreOptions) {
         this.composite = composite;
-
-        this.mode = operation === "create" ? "file" : "keep";
+        this.mode = this.composite.operation === "create" ? "file" : "keep";
     }
 
     @action
@@ -135,17 +131,6 @@ export class Store
         this.sourceOptions = so;
     }
 
-    @action.bound
-    update(props: Partial<this>) {
-        Object.assign(this, props);
-
-        if (!("confirm" in props)) {
-            this.confirm = false;
-        }
-
-        this.dirty = true;
-    }
-
     @computed
     get isValid() {
         if (this.confirmMsg && !this.confirm) return false;
@@ -164,9 +149,40 @@ export class Store
         return base ? base.replace(/\.[a-z0-9]+$/i, "") : undefined;
     }
 
+    @action.bound
+    update(values: Partial<Omit<this, "source" | "uploading">>) {
+        for (const [k, v] of Object.entries(values)) {
+            if (this[k as keyof typeof values] === v) {
+                delete values[k as keyof typeof values];
+            }
+        }
+
+        if (isEmpty(values)) return;
+        Object.assign(this, values);
+
+        if (!("confirm" in values)) {
+            this.confirm = false;
+        }
+
+        this.dirty = true;
+    }
+
+    @action.bound
+    setSource(value: this["source"] | undefined) {
+        value = value ?? null;
+        if (this.source === value) return;
+        this.source = value;
+        this.dirty = true;
+    }
+
+    @action.bound
+    setUploading(value: this["uploading"]) {
+        this.uploading = value;
+    }
+
     @computed
     get confirmMsg() {
-        if (this.operation === "create") return undefined;
+        if (this.composite.operation === "create") return undefined;
         const mode = this.mode;
 
         if (

@@ -1,4 +1,4 @@
-import { action, computed, observable, runInAction } from "mobx";
+import { action, computed, observable } from "mobx";
 
 import type { EdiTableStore } from "@nextgisweb/gui/edi-table";
 
@@ -10,7 +10,7 @@ export class EditorStore<V = unknown, D = V>
     identity = "";
 
     @observable.shallow accessor items: RecordItem[] = [];
-    @observable accessor dirty = false;
+    @observable.ref accessor dirty = false;
 
     constructor() {
         this.rotatePlaceholder();
@@ -28,9 +28,6 @@ export class EditorStore<V = unknown, D = V>
 
     @computed
     get isValid() {
-        runInAction(() => {
-            this.validate = true;
-        });
         return this.items.every((r) => r.error === false);
     }
 
@@ -41,7 +38,7 @@ export class EditorStore<V = unknown, D = V>
 
     // EdiTable
 
-    @observable accessor validate = false;
+    @observable.ref accessor validate = false;
     @observable.shallow accessor placeholder: RecordItem | null = null;
 
     @computed

@@ -75,9 +75,9 @@ export const LayerWidget: EditorWidget<LayerStore> = observer(({ store }) => {
                             onChange={setQmsId}
                             onService={(service) => {
                                 store.url.value = service.url;
-                                store.copyright_text.value =
+                                store.copyrightText.value =
                                     service.copyright_text;
-                                store.copyright_url.value =
+                                store.copyrightUrl.value =
                                     service.copyright_url;
                                 store.qms.value = JSON.stringify(service);
                             }}
@@ -89,28 +89,22 @@ export const LayerWidget: EditorWidget<LayerStore> = observer(({ store }) => {
                         value={store.url}
                         component={InputValue}
                         label={gettext("URL")}
-                        props={{
-                            disabled,
-                        }}
+                        props={{ disabled }}
                     />
 
                     <LotMV
                         help={disabled ? msgDisabled : undefined}
                         label={gettext("Copyright text")}
-                        value={store.copyright_text}
+                        value={store.copyrightText}
                         component={InputValue}
-                        props={{
-                            disabled,
-                        }}
+                        props={{ disabled }}
                     />
                     <LotMV
                         help={disabled ? msgDisabled : undefined}
                         label={gettext("Copyright URL")}
-                        value={store.copyright_url}
+                        value={store.copyrightUrl}
                         component={InputValue}
-                        props={{
-                            disabled,
-                        }}
+                        props={{ disabled }}
                     />
                 </Area>
             </div>
@@ -148,9 +142,9 @@ export const LayerWidget: EditorWidget<LayerStore> = observer(({ store }) => {
                             key={qmsId}
                             opacity={opacity}
                             attributions={
-                                store.copyright_url.value
-                                    ? `<a href="${store.copyright_url.value}" target="_blank">${store.copyright_text.value}</a>`
-                                    : store.copyright_text.value
+                                store.copyrightUrl.value
+                                    ? `<a href="${store.copyrightUrl.value}" target="_blank">${store.copyrightText.value}</a>`
+                                    : store.copyrightText.value
                             }
                         />
                     </PreviewMap>
@@ -161,4 +155,5 @@ export const LayerWidget: EditorWidget<LayerStore> = observer(({ store }) => {
 });
 
 LayerWidget.displayName = "LayerWidget";
-LayerWidget.title = gettext("Basemaps");
+LayerWidget.title = gettext("Basemap");
+LayerWidget.activateOn = { create: true };

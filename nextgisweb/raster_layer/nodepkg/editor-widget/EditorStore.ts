@@ -8,7 +8,6 @@ import type {
     DumpParams,
     EditorStoreOptions,
     EditorStore as IEditorStore,
-    Operation,
 } from "@nextgisweb/resource/type";
 import srsSettings from "@nextgisweb/spatial-ref-sys/client-settings";
 
@@ -16,7 +15,6 @@ export class EditorStore
     implements IEditorStore<apitype.RasterLayerRead, apitype.RasterLayerUpdate>
 {
     readonly identity = "raster_layer";
-    readonly operation: Operation;
     readonly composite: CompositeStore;
 
     @observable.ref accessor source: FileUploadObject | undefined = undefined;
@@ -26,8 +24,7 @@ export class EditorStore
 
     @observable.ref accessor dirty = false;
 
-    constructor({ composite, operation }: EditorStoreOptions) {
-        this.operation = operation;
+    constructor({ composite }: EditorStoreOptions) {
         this.composite = composite;
     }
 
@@ -41,7 +38,7 @@ export class EditorStore
         if (!this.dirty) return;
 
         lunkwill.suggest(
-            this.operation === "create" ||
+            this.composite.operation === "create" ||
                 !!this.source ||
                 this.cog !== this.cogInitial
         );
@@ -67,7 +64,8 @@ export class EditorStore
     @computed
     get isValid() {
         return (
-            !this.uploading && (this.operation === "update" || !!this.source)
+            !this.uploading &&
+            (this.composite.operation === "update" || !!this.source)
         );
     }
 

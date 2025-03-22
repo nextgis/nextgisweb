@@ -221,8 +221,7 @@ msgid "Show resource creation date"
 msgstr "Показать дату создания ресурса"
 
 #: nodepkg/children-section/component/MenuDropdown.tsx:211
-#: nodepkg/children-section/util/createResourceTableItemOptions.ts:8
-#: nodepkg/composite/CompositeWidget.tsx:49 view.py:379
+#: nodepkg/children-section/util/createResourceTableItemOptions.ts:8 view.py:381
 msgid "Delete"
 msgstr "Удалить"
 
@@ -306,32 +305,28 @@ msgstr "Выбрать эту группу"
 msgid "Pick selected"
 msgstr "Выбрать отмеченное"
 
-#: nodepkg/composite/CompositeStore.ts:261
+#: nodepkg/composite/CompositeStore.ts:241
 msgid "Errors found during data validation. Tabs with errors marked in red."
 msgstr "При проверке данных обнаружена ошибка. Вкладки с ошибками отмечены красным."
 
-#: nodepkg/composite/CompositeStore.ts:262
+#: nodepkg/composite/CompositeStore.ts:242
 msgid "Validation error"
 msgstr "Ошибка валидации"
 
-#: nodepkg/composite/CompositeWidget.tsx:47
+#: nodepkg/composite/CompositeWidget.tsx:27
+msgid "Please wait. Processing request..."
+msgstr "Подождите, пожалуйста, идет обработка запроса..."
+
+#: nodepkg/composite/CompositeWidget.tsx:34
 msgid "Create"
 msgstr "Создать"
 
-#: nodepkg/composite/CompositeWidget.tsx:48
+#: nodepkg/composite/CompositeWidget.tsx:35
 #: nodepkg/export-settings/ExportSettings.tsx:79
 msgid "Save"
 msgstr "Сохранить"
 
-#: nodepkg/composite/CompositeWidget.tsx:50
-msgid "Read"
-msgstr "Прочитать"
-
-#: nodepkg/composite/CompositeWidget.tsx:54
-msgid "Please wait. Processing request..."
-msgstr "Подождите, пожалуйста, идет обработка запроса..."
-
-#: nodepkg/composite/CompositeWidget.tsx:178
+#: nodepkg/composite/CompositeWidget.tsx:175
 msgid "Create and edit"
 msgstr "Создать и изменить"
 
@@ -487,7 +482,7 @@ msgid "Removed from favorites"
 msgstr "Удалено из избранного"
 
 #: nodepkg/main-section/CreateResourceButton.tsx:8
-#: nodepkg/main-section/CreateResourceModal.tsx:20 view.py:178 view.py:348
+#: nodepkg/main-section/CreateResourceModal.tsx:20 view.py:180 view.py:350
 msgid "Create resource"
 msgstr "Создать ресурс"
 
@@ -507,7 +502,7 @@ msgstr "Необходимо заполнить все поля"
 msgid "Row conflicts with another"
 msgstr "Конфликт строк"
 
-#: nodepkg/permissions-widget/PermissionsWidget.tsx:21 view.py:349
+#: nodepkg/permissions-widget/PermissionsWidget.tsx:21 view.py:351
 msgid "Action"
 msgstr "Действие"
 
@@ -636,34 +631,34 @@ msgstr "У этого ресурса нет описания."
 msgid "External access"
 msgstr "Внешний доступ"
 
-#: view.py:122 view.py:388
+#: view.py:122 view.py:390
 msgid "JSON view"
 msgstr "Представление JSON"
 
-#: view.py:133 view.py:395
+#: view.py:133 view.py:397
 msgid "User permissions"
 msgstr "Права пользователя"
 
-#: view.py:189
+#: view.py:192
 msgid "Update resource"
 msgstr "Изменить ресурс"
 
-#: view.py:201
+#: view.py:203
 msgid "Delete resource"
 msgstr "Удалить ресурс"
 
-#: view.py:211 view.py:408
+#: view.py:213 view.py:410
 msgid "Resource export"
 msgstr "Экспорт ресурсов"
 
-#: view.py:275
+#: view.py:277
 msgid "Insufficient '%s' permission in scope '%s' on resource id = %d."
 msgstr "Недостаточно разрешения '%s' в скоупе '%s' для идентификатора ресурса = %d."
 
-#: view.py:350
+#: view.py:352
 msgid "Extra"
 msgstr "Дополнительно"
 
-#: view.py:365
+#: view.py:367
 msgid "Update"
 msgstr "Изменить"

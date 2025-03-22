@@ -1,4 +1,4 @@
-import { action, computed, observable, observe, runInAction } from "mobx";
+import { action, computed, observable, observe } from "mobx";
 
 import type { FocusTableStore } from "@nextgisweb/gui/focus-table";
 import type { CompositeStore } from "@nextgisweb/resource/composite";
@@ -18,13 +18,12 @@ export class ServiceStore
     implements EditorStore<Value>, FocusTableStore<Layer>
 {
     readonly identity = "wmsserver_service";
+    readonly composite: CompositeStore;
 
-    @observable accessor dirty = false;
-    @observable accessor validate = false;
+    readonly layers = observable.array<Layer>([], { deep: false });
 
-    layers = observable.array<Layer>([], { deep: false });
-
-    composite: CompositeStore;
+    @observable.ref accessor dirty = false;
+    @observable.ref accessor validate = false;
 
     constructor({ composite }: EditorStoreOptions) {
         this.composite = composite;
@@ -49,9 +48,6 @@ export class ServiceStore
 
     @computed
     get isValid(): boolean {
-        runInAction(() => {
-            this.validate = true;
-        });
         return this.layers.every((i) => i.error === false);
     }
 

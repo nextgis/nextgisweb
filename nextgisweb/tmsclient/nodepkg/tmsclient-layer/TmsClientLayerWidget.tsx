@@ -101,7 +101,7 @@ export const TmsClientLayerWidget: EditorWidget<TmsClientLayerStore> = observer(
         }, [abort, makeSignal, store.connection.value]);
 
         useEffect(() => {
-            if (layers && store.operation === "create") {
+            if (layers && store.composite.operation === "create") {
                 const layer = layers.find(
                     (l) => l.layer === store.layer_name.value
                 );

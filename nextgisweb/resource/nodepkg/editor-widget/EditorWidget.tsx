@@ -28,7 +28,7 @@ export const EditorWidget: IEditorWidget<EditorStore> = observer(
                 </Lot>
 
                 {/* Hide unchangeable parent for the main resource group */}
-                {store.composite.id !== 0 && (
+                {store.composite.resourceId !== 0 && (
                     <Lot label={gettext("Parent")}>
                         <ResourceSelect
                             value={
@@ -41,7 +41,7 @@ export const EditorWidget: IEditorWidget<EditorStore> = observer(
                             }
                             pickerOptions={{ initParentId: store.parent }}
                             allowClear={false}
-                            disabled={store.operation === "create"}
+                            disabled={store.composite.operation === "create"}
                             style={{ width: "100%" }}
                         />
                     </Lot>

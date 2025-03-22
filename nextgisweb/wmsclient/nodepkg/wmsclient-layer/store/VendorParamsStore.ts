@@ -23,11 +23,9 @@ export class VendorParamsStore extends KeyValueEditorStore<StoreValue> {
     }
 
     dump(): StoreValue | undefined {
-        if (this.dirty) {
-            const items = Object.fromEntries(
-                this.items.map((i) => [i.key, String(i.value)])
-            );
-            return items;
-        }
+        if (!this.dirty) return undefined;
+        return Object.fromEntries(
+            this.items.map((i) => [i.key, String(i.value)])
+        );
     }
 }

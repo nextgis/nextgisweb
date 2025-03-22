@@ -8,10 +8,10 @@ import type {
     RasterMosaicRead,
     RasterMosaicUpdate,
 } from "@nextgisweb/raster-mosaic/type/api";
+import type { CompositeStore } from "@nextgisweb/resource/composite";
 import type {
     EditorStore,
     EditorStoreOptions,
-    Operation,
 } from "@nextgisweb/resource/type";
 import srsSettings from "@nextgisweb/spatial-ref-sys/client-settings";
 
@@ -37,15 +37,14 @@ export class Store
         EditorStore<RasterMosaicRead, RasterMosaicCreate, RasterMosaicUpdate>
 {
     readonly identity = "raster_mosaic";
+    readonly composite: CompositeStore;
 
     @observable.shallow accessor items: File[] = [];
     @observable.ref accessor dirty = false;
 
-    readonly operation: Operation;
-
-    constructor({ operation }: EditorStoreOptions) {
+    constructor({ composite }: EditorStoreOptions) {
+        this.composite = composite;
         this.items = [];
-        this.operation = operation;
     }
 
     @action
@@ -57,7 +56,7 @@ export class Store
     dump() {
         if (!this.dirty) return undefined;
         const result: RasterMosaicUpdate | RasterMosaicCreate = {};
-        if (this.operation === "create") {
+        if (this.composite.operation === "create") {
             result.srs = srsSettings.default;
         }
 

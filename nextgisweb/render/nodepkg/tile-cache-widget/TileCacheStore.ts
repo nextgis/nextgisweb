@@ -1,4 +1,4 @@
-import { action, computed, observable, runInAction } from "mobx";
+import { action, computed, observable } from "mobx";
 
 import { mapper } from "@nextgisweb/gui/arm";
 import type * as apitype from "@nextgisweb/render/type/api";
@@ -22,14 +22,14 @@ const {
 export class TileCacheStore implements EditorStore<Value> {
     readonly identity = "tile_cache";
 
-    enabled = enabled.init(false, this);
-    imageCompose = imageCompose.init(false, this);
-    maxZ = maxZ.init(null, this);
-    ttl = ttl.init(null, this);
-    flush = flush.init(false, this);
+    readonly enabled = enabled.init(false, this);
+    readonly imageCompose = imageCompose.init(false, this);
+    readonly maxZ = maxZ.init(null, this);
+    readonly ttl = ttl.init(null, this);
+    readonly flush = flush.init(false, this);
 
-    @observable accessor dirty = false;
-    @observable accessor validate = false;
+    @observable.ref accessor dirty = false;
+    @observable.ref accessor validate = false;
 
     @action
     load(value: Value) {
@@ -55,9 +55,6 @@ export class TileCacheStore implements EditorStore<Value> {
 
     @computed
     get isValid() {
-        runInAction(() => {
-            this.validate = true;
-        });
         return mapperError(this) === false;
     }
 }

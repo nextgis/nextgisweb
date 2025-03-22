@@ -1,4 +1,4 @@
-import { action, computed, observable, runInAction } from "mobx";
+import { action, computed, observable } from "mobx";
 import type { IObservableArray } from "mobx";
 
 import { mapper } from "@nextgisweb/gui/arm";
@@ -9,7 +9,6 @@ import type { CompositeStore } from "@nextgisweb/resource/composite";
 import type {
     EditorStore,
     EditorStoreOptions,
-    Operation,
 } from "@nextgisweb/resource/type";
 import type { WebMapRead, WebMapUpdate } from "@nextgisweb/webmap/type/api";
 
@@ -33,21 +32,20 @@ export class ItemsStore
         FocusTableStore<ItemObject>
 {
     readonly identity = "webmap";
-    @observable.ref accessor dirty = false;
-    @observable.ref accessor validate = false;
+    readonly composite: CompositeStore;
 
     readonly drawOrderEnabled = drawOrderEnabled.init(false, this);
     readonly items = observableChildren<ItemObject>(null, "parent", () => {
         this.markDirty();
     });
 
-    readonly composite: CompositeStore;
-    readonly operation: Operation;
+    @observable.ref accessor dirty = false;
+    @observable.ref accessor validate = false;
+
     private _loaded = false;
 
-    constructor({ composite, operation }: EditorStoreOptions) {
+    constructor({ composite }: EditorStoreOptions) {
         this.composite = composite;
-        this.operation = operation;
     }
 
     @action
@@ -64,7 +62,7 @@ export class ItemsStore
     }
 
     dump(): PickMy<WebMapUpdate> | undefined {
-        if (!this.dirty) return;
+        if (!this.dirty) return undefined;
         return {
             ...this.drawOrderEnabled.jsonPart(),
             root_item: {
@@ -80,7 +78,7 @@ export class ItemsStore
          * Calling mapperLoad(this, value) in {@link load} action triggers the mapper’s onChange callback, which calls this {@link markDirty}.
          * So this condition prevents the dirty flag from being set during data initialization in update mode.
          */
-        if (!this._loaded && this.operation === "update") {
+        if (!this._loaded && this.composite.operation === "update") {
             return;
         }
         this.dirty = true;
@@ -88,9 +86,6 @@ export class ItemsStore
 
     @computed
     get isValid(): boolean {
-        runInAction(() => {
-            this.validate = true;
-        });
         return this.items.every((i) => {
             return i.error === false;
         });

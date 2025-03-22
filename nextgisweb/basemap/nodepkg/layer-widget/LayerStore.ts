@@ -1,5 +1,4 @@
-import { isEqual } from "lodash-es";
-import { action, computed, observable, runInAction } from "mobx";
+import { action, computed, observable } from "mobx";
 
 import type {
     BasemapLayerCreate,
@@ -10,11 +9,13 @@ import { mapper } from "@nextgisweb/gui/arm";
 import type { EditorStore } from "@nextgisweb/resource/type";
 
 const {
-    copyright_text,
-    copyright_url,
     qms,
     url,
-    $load: layerLoad,
+    copyright_text: copyrightText,
+    copyright_url: copyrightUrl,
+    $load: mapperLoad,
+    $dump: mapperDump,
+    $dirty: mapperDirty,
     $error: mapperError,
 } = mapper<LayerStore, BasemapLayerRead>({
     validateIf: (o) => o.validate,
@@ -27,50 +28,31 @@ export class LayerStore
 {
     readonly identity = "basemap_layer";
 
-    readonly copyright_text = copyright_text.init("", this);
-    readonly copyright_url = copyright_url.init(null, this);
-    readonly qms = qms.init(null, this);
     readonly url = url.init("", this);
+    readonly qms = qms.init(null, this);
+    readonly copyrightText = copyrightText.init("", this);
+    readonly copyrightUrl = copyrightUrl.init(null, this);
 
-    @observable accessor loaded = false;
-    @observable accessor validate = false;
-
-    private _initValue?: BasemapLayerRead | undefined;
+    @observable.ref accessor loaded = false;
+    @observable.ref accessor validate = false;
 
     @action
     load(value: BasemapLayerRead) {
-        layerLoad(this, value);
-        this._initValue = { ...value };
+        mapperLoad(this, value);
         this.loaded = true;
     }
 
-    @computed
-    get deserializeValue(): Partial<BasemapLayerCreate | BasemapLayerUpdate> {
-        return {
-            ...this.copyright_text.jsonPart(),
-            ...this.copyright_url.jsonPart(),
-            ...this.url.jsonPart(),
-            ...this.qms.jsonPart(),
-        };
-    }
-
     dump(): BasemapLayerCreate | BasemapLayerUpdate | undefined {
-        return this.dirty ? this.deserializeValue : undefined;
+        return this.dirty ? mapperDump(this) : undefined;
     }
 
     @computed
-    get dirty(): boolean {
-        if (this.deserializeValue && this._initValue) {
-            return !isEqual(this.deserializeValue, this._initValue);
-        }
-        return true;
+    get dirty() {
+        return mapperDirty(this);
     }
 
     @computed
     get isValid() {
-        runInAction(() => {
-            this.validate = true;
-        });
         return !mapperError(this);
     }
 }

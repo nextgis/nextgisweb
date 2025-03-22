@@ -173,22 +173,24 @@ def create(request):
     request.resource_permission(ResourceScope.manage_children)
     cls = request.GET.get("cls")
     zope.event.notify(OnResourceCreateView(cls=cls, parent=request.context))
+    setup = dict(operation="create", cls=cls, parent=request.context.id)
     return dict(
+        props=dict(setup=setup),
         obj=request.context,
         title=gettext("Create resource"),
         maxheight=True,
-        props=dict(operation="create", cls=cls, parent=request.context.id),
     )
 
 
 @react_renderer("@nextgisweb/resource/composite")
 def update(request):
     request.resource_permission(ResourceScope.update)
+    setup = dict(operation="update", id=request.context.id)
     return dict(
+        props=dict(setup=setup),
         obj=request.context,
         title=gettext("Update resource"),
         maxheight=True,
-        props=dict(operation="update", id=request.context.id),
     )
 
 

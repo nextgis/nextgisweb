@@ -1,34 +1,25 @@
 import { get, set } from "lodash-es";
-import {
-    action,
-    computed,
-    isObservableProp,
-    observable,
-    reaction,
-    runInAction,
-} from "mobx";
+import { BaseError } from "make-error";
+import { action, computed, observable, runInAction } from "mobx";
 
-import {
-    BaseAPIError,
-    LunkwillParam,
-    request,
-    route,
-    routeURL,
-} from "@nextgisweb/pyramid/api";
-import type { RequestOptions } from "@nextgisweb/pyramid/api/type";
+import { BaseAPIError, LunkwillParam, route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type {
     CompositeCreate,
-    CompositeRead,
+    CompositeMembersConfig,
     CompositeUpdate,
+    CompositeWidgetOperation,
     ResourceCls,
-    ResourceRefWithParent,
-    ResourceWidget,
+    ResourceRef,
 } from "@nextgisweb/resource/type/api";
 
 import type { EditorStore, EditorStoreOptions, EditorWidget } from "../type";
 
-import type { CompositeWidgetProps } from "./CompositeWidget";
+export type CompositeSetup =
+    | { operation: "create"; cls: ResourceCls; parent: number }
+    | { operation: "update"; id: number };
+
+class CompositeUninitialized extends BaseError {}
 
 interface WidgetEntrypoint<S extends EditorStore = EditorStore> {
     store: new (args: EditorStoreOptions) => S;
@@ -41,80 +32,71 @@ export interface WidgetMember<S extends EditorStore = EditorStore> {
     widget: EditorWidget<S>;
 }
 
+export interface CompositeStoreOptions {
+    setup: CompositeSetup;
+}
+
 export class CompositeStore {
-    @observable accessor operation: ResourceWidget["operation"];
-    @observable accessor cls: ResourceCls | null = null;
-    @observable accessor parent: number | null = null;
+    readonly setup: CompositeSetup;
+    readonly operation: CompositeWidgetOperation;
+    readonly resourceId: number | null;
 
-    @observable accessor id: number | null = null;
-    @observable accessor owner_user: number | null = null;
-    /** Suggested resource display name from cls options */
-    @observable accessor sdnBase: string | null = null;
+    // The following private properties are set in CompositeStore.init and
+    // accessed via corresponding getters with initialization guards.
+    #cls: ResourceCls | undefined = undefined;
+    #parent: number | null | undefined = undefined;
+    #ownerUser: number | undefined = undefined;
+    #sdnBase: string | null | undefined = undefined;
 
-    @observable.shallow accessor config: Record<string, unknown> | null = null;
+    @observable.ref accessor validate = false;
+    @observable.ref accessor members: WidgetMember[] | undefined = undefined;
+    @observable.ref accessor loading = true;
+    @observable.ref accessor saving = false;
 
-    @observable accessor validate = false;
-
-    @observable accessor membersLoading = false;
-    @observable.shallow accessor members: WidgetMember[] | null = null;
-    @observable accessor saving = false;
-
-    constructor({ id, cls, operation, parent }: CompositeWidgetProps) {
-        this.operation = operation;
-        if (parent !== undefined) {
-            this.parent = parent;
-        }
-        if (cls) {
-            this.cls = cls;
-        }
-        if (id !== undefined) {
-            this.id = id;
-        }
+    constructor({ setup: request }: CompositeStoreOptions) {
+        this.setup = request;
+        this.operation = request.operation;
+        this.resourceId = request.operation === "update" ? request.id : null;
     }
 
     async init() {
-        const { config, cls, id, parent, owner_user, suggested_display_name } =
-            await route("resource.widget").get({
-                query: {
-                    id: this.id ?? undefined,
-                    cls: this.cls ?? undefined,
-                    operation: this.operation,
-                    parent: this.parent ?? undefined,
-                },
-            });
-        this.setConfig(config);
+        const data = await route("resource.widget").get({ query: this.setup });
         runInAction(() => {
-            this.cls = cls;
-            this.id = id;
-            this.parent = parent;
-            this.owner_user = owner_user;
-            this.sdnBase = suggested_display_name;
+            this.#cls = data.cls;
+            this.#parent = data.parent;
+            this.#ownerUser = data.owner_user;
+            this.#sdnBase =
+                data.operation === "create"
+                    ? data.suggested_display_name
+                    : null;
         });
+        this.loadMembers(data.members);
+    }
 
-        reaction(
-            () => this.members,
-            () => {
-                if (this.operation === "read" || this.operation === "update") {
-                    this.refresh();
-                }
-            }
-        );
+    private initializationGuard<T>(value: T) {
+        if (value === undefined) throw new CompositeUninitialized();
+        return value;
+    }
+
+    get cls() {
+        return this.initializationGuard(this.#cls);
+    }
+
+    get parent() {
+        return this.initializationGuard(this.#parent);
+    }
+
+    get ownerUser() {
+        return this.initializationGuard(this.#ownerUser);
+    }
+
+    get sdnBase() {
+        return this.initializationGuard(this.#sdnBase);
     }
 
     @action
-    setMembers(members: WidgetMember[]) {
-        this.members = members;
-    }
-
-    @action
-    setConfig(config: ResourceWidget["config"]) {
-        this.config = config;
-        this.loadMembers(config);
-    }
-
-    @action
-    setSaving(status: boolean) {
-        this.saving = status;
+    setSaving(value: boolean) {
+        this.saving = value;
     }
 
     /** Suggested resource display name from file name or other aspects */
@@ -130,8 +112,13 @@ export class CompositeStore {
     }
 
     @action
-    setValidate(status: boolean) {
-        this.validate = status;
+    setValidate(value: boolean) {
+        this.validate = value;
+        this.initializationGuard(this.members).forEach(({ store }) => {
+            if (store.validate !== undefined) {
+                store.validate = value;
+            }
+        });
     }
 
     @computed
@@ -154,23 +141,8 @@ export class CompositeStore {
     async dump(
         lunkwill: LunkwillParam
     ): Promise<CompositeCreate | CompositeUpdate> {
-        if (!this.members) {
-            throw new Error("The Store is not loaded yet");
-        }
-
-        const data: CompositeCreate | CompositeUpdate = { resource: {} };
-
-        if (this.operation === "create") {
-            if (this.cls) {
-                (data as CompositeCreate).resource.cls = this.cls;
-            }
-
-            if (this.parent !== null) {
-                (data as CompositeCreate).resource.parent = { id: this.parent };
-            }
-        }
-
-        for (const member of this.members) {
+        const data: CompositeCreate | CompositeUpdate = {};
+        for (const member of this.initializationGuard(this.members)) {
             const identity = member.store.identity;
             if (identity) {
                 const result = await member.store.dump({ lunkwill });
@@ -189,43 +161,22 @@ export class CompositeStore {
         return data;
     }
 
-    load(data: CompositeRead): void {
-        if (this.members) {
-            for (const member of this.members) {
-                const identity = member.store.identity;
-                member.store.load(get(data, identity));
-            }
-        }
-    }
-
-    async create(): Promise<ResourceRefWithParent | undefined> {
-        return this.storeRequest({
-            url: routeURL("resource.collection"),
-            method: "POST",
-        });
-    }
-
-    async update(): Promise<ResourceRefWithParent | undefined> {
-        if (this.id !== null) {
-            return this.storeRequest({
-                url: routeURL("resource.item", { id: this.id }),
-                method: "PUT",
-            });
-        }
-    }
-
     private async refresh(): Promise<void> {
-        if (this.id !== null) {
-            const item = await route("resource.item", {
-                id: this.id,
-            }).get();
-            this.load(item);
+        if (this.resourceId === null) throw new Error();
+
+        const item = await route("resource.item", {
+            id: this.resourceId,
+        }).get();
+
+        for (const member of this.initializationGuard(this.members)) {
+            const identity = member.store.identity;
+            member.store.load(get(item, identity));
         }
     }
 
-    private async loadMembers(config: ResourceWidget["config"]) {
+    private async loadMembers(value: CompositeMembersConfig) {
         const members = await Promise.all(
-            Object.entries(config).map(async ([moduleName, params]) => {
+            Object.entries(value).map(async ([moduleName, params]) => {
                 const member = await ngwEntry<WidgetEntrypoint>(moduleName);
 
                 const widgetStore = new member.store({
@@ -234,25 +185,24 @@ export class CompositeStore {
                     ...params,
                 });
 
-                if (!isObservableProp(widgetStore, "dirty")) {
-                    console.warn(
-                        `Missing 'dirty' observable in '${moduleName}' store!`
-                    );
-                }
-
                 return { ...member, key: moduleName, store: widgetStore };
             })
         );
 
-        this.setMembers(members);
+        runInAction(() => {
+            this.members = members;
+        });
+
+        if (this.operation === "update") {
+            await this.refresh();
+        }
+
+        runInAction(() => {
+            this.loading = false;
+        });
     }
 
-    private async storeRequest({
-        url,
-        method,
-    }: { url: string } & RequestOptions): Promise<
-        ResourceRefWithParent | undefined
-    > {
+    async submit(): Promise<ResourceRef> {
         this.setValidate(true);
         if (!this.isValid) {
             // TODO: Refactor user errors
@@ -267,14 +217,18 @@ export class CompositeStore {
         try {
             const lunkwill = new LunkwillParam();
             const data = await this.dump(lunkwill);
-
-            const response = (await request(url, {
-                method,
-                json: data,
-                lunkwill,
-            })) as ResourceRefWithParent;
-
-            return response;
+            if (this.operation === "create") {
+                return (await route("resource.collection").post({
+                    json: data as Extract<typeof data, CompositeCreate>,
+                    lunkwill,
+                })) as ResourceRef;
+            } else if (this.operation === "update") {
+                await route("resource.item", { id: this.resourceId! }).put({
+                    json: data as Extract<typeof data, CompositeUpdate>,
+                    lunkwill,
+                });
+                return { id: this.resourceId! };
+            } else throw new Error("Unreachable");
         } finally {
             this.setSaving(false);
         }

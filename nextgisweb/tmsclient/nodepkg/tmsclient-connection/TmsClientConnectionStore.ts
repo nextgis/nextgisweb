@@ -1,10 +1,10 @@
-import { action, computed, observable, runInAction } from "mobx";
+import { action, computed, observable } from "mobx";
 
 import { mapper } from "@nextgisweb/gui/arm";
+import type { CompositeStore } from "@nextgisweb/resource/composite";
 import type {
     EditorStore,
     EditorStoreOptions,
-    Operation,
 } from "@nextgisweb/resource/type";
 import type {
     ConnectionCreate,
@@ -35,7 +35,7 @@ export class TmsClientConnectionStore
     implements EditorStore<ConnectionCreate, ConnectionCreate, ConnectionUpdate>
 {
     readonly identity = "tmsclient_connection";
-    readonly operation: Operation;
+    readonly composite: CompositeStore;
 
     readonly apikeyParam = apikey_param.init(null, this);
     readonly urlTemplate = url_template.init(null, this);
@@ -46,10 +46,10 @@ export class TmsClientConnectionStore
     readonly scheme = scheme.init("xyz", this);
     readonly apikey = apikey.init(null, this);
 
-    @observable accessor validate = false;
+    @observable.ref accessor validate = false;
 
-    constructor({ operation }: EditorStoreOptions) {
-        this.operation = operation;
+    constructor({ composite }: EditorStoreOptions) {
+        this.composite = composite;
     }
 
     @action
@@ -67,7 +67,7 @@ export class TmsClientConnectionStore
 
     @computed
     get dirty(): boolean {
-        return this.operation === "create" ? true : mapperDirty(this);
+        return this.composite.operation === "create" ? true : mapperDirty(this);
     }
 
     @computed
@@ -77,9 +77,6 @@ export class TmsClientConnectionStore
 
     @computed
     get isValid(): boolean {
-        runInAction(() => {
-            this.validate = true;
-        });
         return !this.error;
     }
 }

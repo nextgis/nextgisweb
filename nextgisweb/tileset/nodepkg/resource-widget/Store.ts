@@ -6,7 +6,6 @@ import type {
     DumpParams,
     EditorStore,
     EditorStoreOptions,
-    Operation,
 } from "@nextgisweb/resource/type";
 import srsSettings from "@nextgisweb/spatial-ref-sys/client-settings";
 import type * as apitype from "@nextgisweb/tileset/type/api";
@@ -20,16 +19,14 @@ export class Store
         >
 {
     readonly identity = "tileset";
-
-    @observable.shallow accessor source: FileMeta | null = null;
-    @observable.ref accessor uploading = false;
-
-    readonly operation: Operation;
     readonly composite: CompositeStore;
 
-    constructor({ composite, operation }: EditorStoreOptions) {
+    @observable.ref accessor source: FileMeta | null = null;
+
+    @observable.ref accessor uploading = false;
+
+    constructor({ composite }: EditorStoreOptions) {
         this.composite = composite;
-        this.operation = operation;
     }
 
     @action
@@ -50,15 +47,16 @@ export class Store
         return result;
     }
 
-    @action.bound
-    update(props: Partial<this>) {
-        Object.assign(this, props);
+    @computed
+    get dirty() {
+        return !!this.source;
     }
 
     @computed
     get isValid() {
         return (
-            !this.uploading && (this.operation === "update" || !!this.source)
+            !this.uploading &&
+            (this.composite.operation === "update" || !!this.source)
         );
     }
 
@@ -66,5 +64,10 @@ export class Store
     get suggestedDisplayName() {
         const base = this.source?.name;
         return base ? base.replace(/\.\w*$/, "") : undefined;
+    }
+
+    @action.bound
+    update(props: Partial<this>) {
+        Object.assign(this, props);
     }
 }

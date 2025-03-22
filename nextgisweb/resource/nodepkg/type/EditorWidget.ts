@@ -1,6 +1,6 @@
 import type { ForwardRefRenderFunction, FunctionComponent } from "react";
 
-import type { ResourceWidget } from "@nextgisweb/resource/type/api";
+import type { CompositeWidgetOperation } from "@nextgisweb/resource/type/api";
 
 import type { EditorStore } from "./EditorStore";
 
@@ -8,9 +8,8 @@ export interface EditorWidgetProps<S extends EditorStore = EditorStore> {
     store: S;
 }
 
-type Operation = ResourceWidget["operation"];
 export type ActiveOnOptions = {
-    [key in Operation]?: boolean;
+    [key in CompositeWidgetOperation]?: boolean;
 };
 
 interface EditorWidgetOptions {

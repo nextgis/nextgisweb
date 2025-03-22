@@ -1,4 +1,4 @@
-import { action, computed, observable, observe, runInAction } from "mobx";
+import { action, computed, observable, observe } from "mobx";
 
 import type * as apitype from "@nextgisweb/basemap/type/api";
 import type { FocusTableStore } from "@nextgisweb/gui/focus-table";
@@ -16,13 +16,12 @@ export class WebMapStore
     implements EditorStore<Value>, FocusTableStore<Basemap>
 {
     readonly identity = "basemap_webmap";
+    readonly composite: CompositeStore;
 
-    @observable accessor dirty = false;
-    @observable accessor validate = false;
+    @observable.ref accessor dirty = false;
+    @observable.ref accessor validate = false;
 
-    basemaps = observable.array<Basemap>([], { deep: false });
-
-    composite: CompositeStore;
+    readonly basemaps = observable.array<Basemap>([], { deep: false });
 
     constructor({ composite }: EditorStoreOptions) {
         this.composite = composite;
@@ -47,9 +46,6 @@ export class WebMapStore
 
     @computed
     get isValid(): boolean {
-        runInAction(() => {
-            this.validate = true;
-        });
         return this.basemaps.every((i) => i.error === false);
     }
 

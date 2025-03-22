@@ -1,4 +1,4 @@
-import { action, computed, observable, runInAction } from "mobx";
+import { action, computed, observable } from "mobx";
 
 import { mapper, validate } from "@nextgisweb/gui/arm";
 import type { NullableProps } from "@nextgisweb/gui/type";
@@ -7,7 +7,6 @@ import type { CompositeStore } from "@nextgisweb/resource/composite";
 import type {
     EditorStore,
     EditorStoreOptions,
-    Operation,
 } from "@nextgisweb/resource/type";
 import srsSettings from "@nextgisweb/spatial-ref-sys/client-settings";
 import type {
@@ -59,20 +58,18 @@ export class WfsClientLayerStore
     implements EditorStore<WFSLayerRead, WFSLayerCreate, WFSLayerUpdate>
 {
     readonly identity = "wfsclient_layer";
-    readonly operation: Operation;
     readonly composite: CompositeStore;
 
-    @observable accessor validate = false;
+    readonly connection = connection.init(null, this);
+    readonly layerName = layerName.init("", this);
+    readonly columnGeom = columnGeom.init("", this);
+    readonly geometryType = geometryType.init(null, this);
+    readonly geometrySrid = geometrySrid.init(null, this);
+    readonly fields = fields.init("update", this);
 
-    connection = connection.init(null, this);
-    layerName = layerName.init("", this);
-    columnGeom = columnGeom.init("", this);
-    geometryType = geometryType.init(null, this);
-    geometrySrid = geometrySrid.init(null, this);
-    fields = fields.init("update", this);
+    @observable.ref accessor validate = false;
 
-    constructor({ operation, composite }: EditorStoreOptions) {
-        this.operation = operation;
+    constructor({ composite }: EditorStoreOptions) {
         this.composite = composite;
     }
 
@@ -93,7 +90,7 @@ export class WfsClientLayerStore
                 connection,
                 layer_name,
                 column_geom,
-                ...(this.operation === "create"
+                ...(this.composite.operation === "create"
                     ? { srs: srsSettings.default }
                     : {}),
                 ...rest,
@@ -105,14 +102,11 @@ export class WfsClientLayerStore
 
     @computed
     get dirty(): boolean {
-        return this.operation === "create" ? true : dirty(this);
+        return this.composite.operation === "create" ? true : dirty(this);
     }
 
     @computed
     get isValid(): boolean {
-        runInAction(() => {
-            this.validate = true;
-        });
         return !error(this);
     }
 }
