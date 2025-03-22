@@ -1,5 +1,5 @@
 import { isEqual } from "lodash-es";
-import { action, computed, observable, toJS } from "mobx";
+import { action, computed, observable } from "mobx";
 
 import type { ExtentRowValue } from "@nextgisweb/gui/component";
 import type { CompositeStore } from "@nextgisweb/resource/composite";
@@ -55,13 +55,13 @@ export class SettingStore
     @observable.ref accessor annotationDefault: AnnotationDefault = "no";
     @observable.ref accessor legendSymbols: WebMapRead["legend_symbols"] = null;
     @observable.ref accessor measureSrs: null | number = null;
-    @observable.shallow accessor extent: ExtentRowValue = {
+    @observable.ref accessor initialExtent: ExtentRowValue = {
         left: -180,
         right: 180,
         bottom: -90,
         top: 90,
     };
-    @observable.shallow accessor extentConst: ExtentRowValue = {
+    @observable.ref accessor constrainingExtent: ExtentRowValue = {
         left: null,
         right: null,
         bottom: null,
@@ -71,48 +71,63 @@ export class SettingStore
     @observable.ref accessor bookmarkResource: ResourceRef | null = null;
     @observable.shallow accessor options: WebMapRead["options"] = {};
 
-    private _initValue: Partial<WithoutItems<WebMapRead>> = {
-        initial_extent: [-90, -180, 180, 90],
-    };
+    private initialValue: WithoutItems<WebMapUpdate>;
 
     constructor({ composite }: EditorStoreOptions) {
         this.composite = composite;
+        this.initialValue = this.deserializedValue;
     }
 
     @action
     load(val: WebMapRead) {
-        const { root_item, draw_order_enabled, ...value } = val;
-        this._initValue = value;
+        const {
+            // Managed by ItemsStore
+            root_item,
+            draw_order_enabled,
+            // Deprecated extent_*
+            extent_left,
+            extent_right,
+            extent_bottom,
+            extent_top,
+            extent_const_left,
+            extent_const_right,
+            extent_const_bottom,
+            extent_const_top,
+            // Our precious
+            ...value
+        } = val;
+
+        this.initialValue = value;
         this.editable = value.editable;
         this.annotationEnabled = value.annotation_enabled;
         this.annotationDefault = value.annotation_default;
         this.legendSymbols = value.legend_symbols;
         this.measureSrs = value.measure_srs ? value.measure_srs.id : null;
-        this.extent = extractExtent(value.initial_extent);
-        this.extentConst = extractExtent(value.constraining_extent);
+        this.initialExtent = extractExtent(value.initial_extent);
+        this.constrainingExtent = extractExtent(value.constraining_extent);
         this.title = value.title;
         this.bookmarkResource = value.bookmark_resource;
         this.options = value.options;
     }
 
     @computed
-    get deserializeValue(): WithoutItems<WebMapUpdate> {
-        return toJS({
+    get deserializedValue(): WithoutItems<WebMapUpdate> {
+        return {
             editable: this.editable,
             annotation_enabled: this.annotationEnabled,
             annotation_default: this.annotationDefault,
             legend_symbols: this.legendSymbols,
-            initial_extent: convertExtentToArray(this.extent),
-            constraining_extent: convertExtentToArray(this.extentConst),
+            initial_extent: convertExtentToArray(this.initialExtent),
+            constraining_extent: convertExtentToArray(this.constrainingExtent),
             title: this.title ? this.title : null,
-            measure_srs: this.measureSrs ? { id: this.measureSrs } : undefined,
+            measure_srs: this.measureSrs ? { id: this.measureSrs } : null,
             bookmark_resource: this.bookmarkResource,
-            options: this.options,
-        });
+            options: { ...this.options },
+        };
     }
 
     dump() {
-        return this.dirty ? this.deserializeValue : undefined;
+        return this.dirty ? this.deserializedValue : undefined;
     }
 
     @computed
@@ -122,46 +137,17 @@ export class SettingStore
 
     @computed
     get dirty(): boolean {
-        if (this.deserializeValue && this._initValue) {
-            const deserialized = this.deserializeValue;
-            const initValueFiltered = Object.keys(deserialized).reduce(
-                (acc, key) => {
-                    if (key in this._initValue) {
-                        const value =
-                            this._initValue[
-                                key as keyof WithoutItems<WebMapRead>
-                            ];
-                        (acc as Record<string, unknown>)[key] = value;
-                    }
-                    return acc;
-                },
-                {} as Partial<WithoutItems<WebMapRead>>
-            );
-
-            const isValuesEqual = !isEqual(
-                {
-                    ...deserialized,
-                    measure_srs: deserialized.measure_srs?.id,
-                },
-                {
-                    ...initValueFiltered,
-                    measure_srs: initValueFiltered.measure_srs?.id,
-                }
-            );
-
-            return isValuesEqual;
-        }
-        return false;
+        return !isEqual(this.deserializedValue, this.initialValue);
     }
 
     @action
     setExtent(value: ExtentRowValue) {
-        this.extent = value;
+        this.initialExtent = value;
     }
 
     @action
     setConstrainedExtent(value: ExtentRowValue) {
-        this.extentConst = value;
+        this.constrainingExtent = value;
     }
 
     @action

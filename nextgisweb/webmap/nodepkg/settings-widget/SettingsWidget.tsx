@@ -62,7 +62,7 @@ export const SettingsWidget: EditorWidget<SettingStore> = observer(
                             pickerOptions={{
                                 parentId: store.composite.parent || undefined,
                             }}
-                            value={store.extent}
+                            value={store.initialExtent}
                             onChange={(value) => {
                                 store.setExtent(value);
                             }}
@@ -73,7 +73,7 @@ export const SettingsWidget: EditorWidget<SettingStore> = observer(
                             pickerOptions={{
                                 parentId: store.composite.parent ?? undefined,
                             }}
-                            value={store.extentConst}
+                            value={store.constrainingExtent}
                             onChange={(value) => {
                                 store.setConstrainedExtent(value);
                             }}
