@@ -395,6 +395,7 @@ class GeomColumnCheck(LayerCheck):
             self.geometry_type,
         ):
             self.error(gettextf("Column found, but has an incompatible type - {}.")(ctype_repr))
+            return
         else:
             self.success(gettextf("Column found, type is {}.")(ctype_repr))
 
@@ -417,7 +418,10 @@ class GeomColumnCheck(LayerCheck):
                 self.error(gettextf("Failed to reproject extent to SRID {}.")(srid))
                 continue
 
-            extent_str = ", ".join("{:.4f}".format(c) for c in extent)
+            if extent[0] is None:
+                extent_str = "NULL"
+            else:
+                extent_str = ", ".join("{:.4f}".format(c) for c in extent)
             self.say(gettextf("Extent (SRID {}): {}.")(srid, extent_str))
 
 
