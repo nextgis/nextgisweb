@@ -46,21 +46,21 @@ export class ResourcePickerStore
         number,
         CompositeRead
     > = new Map();
-    @observable accessor parentId: number = 0;
+    @observable.ref accessor parentId: number = 0;
     @observable.shallow accessor breadcrumbItems: CompositeRead[] = [];
-    @observable accessor hideUnavailable = false;
+    @observable.ref accessor hideUnavailable = false;
     @observable.shallow accessor disableResourceIds: number[] = [];
     @observable.shallow accessor requireClass: ResourceCls[] = [];
     @observable.shallow accessor requireInterface: ResourceInterface[] = [];
-    @observable accessor allowSelection = true;
-    @observable accessor allowMoveInside = true;
+    @observable.ref accessor allowSelection = true;
+    @observable.ref accessor allowMoveInside = true;
     @observable.shallow accessor traverseClasses: ResourceCls[] | null = null;
-    @observable accessor allowCreateResource = true;
+    @observable.ref accessor allowCreateResource = true;
     @observable.shallow accessor selected: number[] = [];
-    @observable accessor multiple = false;
-    @observable accessor saveLastParentIdGlobal = false;
-    @observable accessor getThisMsg = msgPickThis;
-    @observable accessor getSelectedMsg = msgPickSelected;
+    @observable.ref accessor multiple = false;
+    @observable.ref accessor saveLastParentIdGlobal = false;
+    @observable.ref accessor getThisMsg = msgPickThis;
+    @observable.ref accessor getSelectedMsg = msgPickSelected;
     @observable.shallow accessor errors: Partial<Record<Action, string>> = {};
     @observable.shallow accessor loading: Partial<Record<Action, boolean>> = {};
 

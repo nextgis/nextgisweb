@@ -10,32 +10,35 @@ import type { QueryParams } from "./hook/useFeatureTable";
 import type { ActionProps, FeatureGridProps, SetValue } from "./type";
 
 export class FeatureGridStore {
-    @observable accessor id: number;
-    @observable accessor versioning: boolean = false;
-    @observable accessor size: SizeType = "middle";
-    @observable accessor actions: ActionToolbarAction<ActionProps>[] = [];
-    @observable accessor version: number = 0;
-    @observable accessor readonly: boolean = true;
-    @observable accessor editOnNewPage: boolean = false;
-    @observable accessor cleanSelectedOnFilter: boolean = true;
-    @observable accessor settingsOpen: boolean = false;
+    @observable.ref accessor id: number;
+    @observable.ref accessor versioning: boolean = false;
+    @observable.ref accessor size: SizeType = "middle";
+    @observable.ref accessor actions: ActionToolbarAction<ActionProps>[] = [];
+    @observable.ref accessor version: number = 0;
+    @observable.ref accessor readonly: boolean = true;
+    @observable.ref accessor editOnNewPage: boolean = false;
+    @observable.ref accessor cleanSelectedOnFilter: boolean = true;
+    @observable.ref accessor settingsOpen: boolean = false;
 
     @observable.shallow accessor selectedIds: number[] = [];
     @observable.shallow accessor queryParams: QueryParams | null = null;
     @observable.shallow accessor visibleFields: number[] = [KEY_FIELD_ID];
     @observable.shallow accessor fields: FeatureLayerFieldRead[] = [];
 
-    @observable accessor beforeDelete: ((featureIds: number[]) => void) | null =
+    @observable.ref accessor beforeDelete:
+        | ((featureIds: number[]) => void)
+        | null = null;
+    @observable.ref accessor deleteError:
+        | ((featureIds: number[]) => void)
+        | null = null;
+    @observable.ref accessor onSelect: ((selected: number[]) => void) | null =
         null;
-    @observable accessor deleteError: ((featureIds: number[]) => void) | null =
+    @observable.ref accessor onDelete: ((featureIds: number[]) => void) | null =
         null;
-    @observable accessor onSelect: ((selected: number[]) => void) | null = null;
-    @observable accessor onDelete: ((featureIds: number[]) => void) | null =
-        null;
-    @observable accessor onOpen:
+    @observable.ref accessor onOpen:
         | ((opt: { featureId: number; resourceId: number }) => void)
         | null = null;
-    @observable accessor onSave:
+    @observable.ref accessor onSave:
         | ((value: CompositeRead | undefined) => void)
         | null = null;
 
@@ -51,106 +54,102 @@ export class FeatureGridStore {
         }
     }
 
-    @action
-    setId = (id: number) => {
+    @action.bound
+    setId(id: number) {
         this.id = id;
-    };
+    }
 
-    @action
-    setVersioning = (value: boolean) => {
+    @action.bound
+    setVersioning(value: boolean) {
         this.versioning = value;
-    };
+    }
 
-    @action
-    setFields = (fields: FeatureLayerFieldRead[]) => {
+    @action.bound
+    setFields(fields: FeatureLayerFieldRead[]) {
         this.fields = fields;
-    };
+    }
 
-    @action
-    setVisibleFields = (visibleFields: number[]) => {
+    @action.bound
+    setVisibleFields(visibleFields: number[]) {
         this.visibleFields = visibleFields;
-    };
+    }
 
-    @action
-    setSize = (size: SizeType | undefined) => {
+    @action.bound
+    setSize(size: SizeType | undefined) {
         this.size = size;
-    };
+    }
 
-    @action
-    setActions = (actions: ActionToolbarAction<ActionProps>[]) => {
+    @action.bound
+    setActions(actions: ActionToolbarAction<ActionProps>[]) {
         this.actions = actions;
-    };
+    }
 
-    @action
-    setVersion = (version: number) => {
+    @action.bound
+    setVersion(version: number) {
         this.version = version;
-    };
+    }
 
-    @action
-    setSettingsOpen = (settingsOpen: boolean) => {
+    @action.bound
+    setSettingsOpen(settingsOpen: boolean) {
         this.settingsOpen = settingsOpen;
-    };
+    }
 
-    @action
-    bumpVersion = () => {
+    @action.bound
+    bumpVersion() {
         this.version = this.version + 1;
-    };
+    }
 
-    @action
-    setReadonly = (readonly: boolean) => {
+    @action.bound
+    setReadonly(readonly: boolean) {
         this.readonly = readonly;
-    };
+    }
 
-    @action
-    setQueryParams = (queryParams: SetValue<QueryParams | null>) => {
+    @action.bound
+    setQueryParams(queryParams: SetValue<QueryParams | null>) {
         this.setValue("queryParams", queryParams);
-    };
+    }
 
-    @action
-    setSelectedIds = (selectedIds: SetValue<number[]>) => {
+    @action.bound
+    setSelectedIds(selectedIds: SetValue<number[]>) {
         this.setValue("selectedIds", selectedIds);
-    };
+    }
 
-    @action
-    setEditOnNewPage = (editOnNewPage: boolean) => {
+    @action.bound
+    setEditOnNewPage(editOnNewPage: boolean) {
         this.editOnNewPage = editOnNewPage;
-    };
+    }
 
-    @action
-    setCleanSelectedOnFilter = (cleanSelectedOnFilter: boolean) => {
+    @action.bound
+    setCleanSelectedOnFilter(cleanSelectedOnFilter: boolean) {
         this.cleanSelectedOnFilter = cleanSelectedOnFilter;
-    };
+    }
 
-    @action
-    setBeforeDelete = (
-        beforeDelete: ((featureIds: number[]) => void) | null
-    ) => {
+    @action.bound
+    setBeforeDelete(beforeDelete: ((featureIds: number[]) => void) | null) {
         this.beforeDelete = beforeDelete;
-    };
+    }
 
-    @action
+    @action.bound
     setDeleteError = (deleteError: ((featureIds: number[]) => void) | null) => {
         this.deleteError = deleteError;
     };
 
-    @action
-    setOnSelect = (onSelect: ((selected: number[]) => void) | null) => {
+    @action.bound
+    setOnSelect(onSelect: ((selected: number[]) => void) | null) {
         this.onSelect = onSelect;
-    };
+    }
 
-    @action
-    setOnDelete = (onDelete: ((featureIds: number[]) => void) | null) => {
+    @action.bound
+    setOnDelete(onDelete: ((featureIds: number[]) => void) | null) {
         this.onDelete = onDelete;
-    };
+    }
 
-    @action
-    setOnSave = (
-        onSave: ((value: CompositeRead | undefined) => void) | null
-    ) => {
+    @action.bound
+    setOnSave(onSave: ((value: CompositeRead | undefined) => void) | null) {
         this.onSave = onSave;
-    };
+    }
 
-    @action
+    @action.bound
     private setValue<T>(property: keyof this, valueOrUpdater: SetValue<T>) {
         const isUpdaterFunction = (
             input: unknown

@@ -59,9 +59,9 @@ export class MapStore extends Watchable<MapWatchableProps> {
     @observable.shallow accessor layers: Layers = {};
 
     @observable.shallow accessor baseLayer: CoreLayer | null = null;
-    @observable accessor resolution: number | null = null;
+    @observable.ref accessor resolution: number | null = null;
     @observable.struct accessor center: number[] | null = null;
-    @observable accessor zoom: number | null = null;
+    @observable.ref accessor zoom: number | null = null;
     @observable.struct accessor position: Position | null = null;
 
     constructor(private options: MapOptions) {

@@ -38,8 +38,8 @@ export abstract class CoreLayer<
     olLayer: TLayer;
     olSource: TSource;
 
-    @observable accessor opacity: number = 1;
-    @observable accessor visibility: boolean = true;
+    @observable.ref accessor opacity: number = 1;
+    @observable.ref accessor visibility: boolean = true;
     @observable accessor symbols: "-1" | string[] = [];
     @observable.shallow accessor itemConfig: LayerItemConfig | null = null;
 

@@ -30,7 +30,7 @@ export class FeatureEditorStore {
 
     @observable.shallow private accessor _attributeStore: EditorStore | null =
         null;
-    @observable private accessor _extensionStores: ExtensionStores = {};
+    @observable.shallow private accessor _extensionStores: ExtensionStores = {};
 
     constructor({ resourceId, featureId }: FeatureEditorStoreOptions) {
         this.resourceId = resourceId;

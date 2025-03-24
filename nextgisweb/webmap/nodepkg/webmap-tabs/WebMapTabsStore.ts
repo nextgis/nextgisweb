@@ -18,7 +18,7 @@ export class WebMapTabsStore {
     _onTabs?: () => void;
 
     @observable.shallow accessor tabs: WebMapTab[] = [];
-    @observable accessor activeKey: string | null = null;
+    @observable.ref accessor activeKey: string | null = null;
 
     constructor({ onTabs }: WebMapTabsStoreProps = {}) {
         this._onTabs = onTabs;
