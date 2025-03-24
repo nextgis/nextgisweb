@@ -30,5 +30,5 @@ export function init(opts: { dsn: string; routeName: string }) {
         },
     });
 
-    (window as any).ngwSentry = Sentry;
+    window.ngwSentry = Sentry.getClient();
 }

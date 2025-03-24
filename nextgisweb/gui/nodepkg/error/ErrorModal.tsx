@@ -63,8 +63,8 @@ export function ErrorModal({
 }
 
 export function errorModal(error: unknown, props?: Partial<ErrorModalProps>) {
-    if (ngwSentry && error instanceof Error) {
-        ngwSentry.captureException(error);
+    if (window.ngwSentry && error instanceof Error) {
+        window.ngwSentry.captureException(error);
     }
     return showModal(ErrorModal, { error: extractError(error), ...props });
 }
