@@ -10,8 +10,8 @@ export function isExtentValid([minX, minY, maxX, maxY]: number[]): boolean {
         minY <= 90 &&
         maxY >= -90 &&
         maxY <= 90 &&
-        minX <= maxX &&
-        minY <= maxY
+        minX < maxX &&
+        minY < maxY
     );
 }
 
@@ -29,13 +29,10 @@ export function normalizeExtent(
     const normalized: ExtentWSEN = [minLon, minLat, maxLon, maxLat];
 
     if (isExtentValid(normalized)) {
-        console.error(
-            `Input extent [${extent}] is invalid. Using normalized extent [${normalized}].`
-        );
+        console.warn(`Extent ${extent} normalized to ${normalized}`);
         return normalized;
     }
-    console.error(
-        `Input extent [${extent}] remains invalid even after attempted normalization ([${normalized}]). Using fallback extent [${fallback}].`
-    );
+
+    console.warn(`Failed to normalize extent ${extent}, using ${fallback}`);
     return fallback;
 }
