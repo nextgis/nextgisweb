@@ -546,7 +546,8 @@ def _lc_changes_fields(count):
 def _lc_changes_bits(count):
     cols = ["dif_geom", *(f"dif_{i}" for i in range(1, count + 1))]
     cols = [f"CASE WHEN {c} THEN '1' ELSE '0' END" for c in cols]
-    return literal_column(f"CONCAT({', '.join(cols)})").label("bits")
+    # NOTE: CONCAT fails here if len(cols) > 100
+    return literal_column(" || ".join(cols)).label("bits")
 
 
 @lru_cache

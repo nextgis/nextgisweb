@@ -11,12 +11,7 @@ SELECT
         WHEN NOT pi AND pt AND di
         THEN 'R'
     END AS op,
-    CONCAT(
-        CASE WHEN dif_geom THEN '1' ELSE '0' END,
-        CASE WHEN dif_1 THEN '1' ELSE '0' END,
-        CASE WHEN dif_2 THEN '1' ELSE '0' END,
-        CASE WHEN dif_3 THEN '1' ELSE '0' END
-    ) AS bits,
+    CASE WHEN dif_geom THEN '1' ELSE '0' END || CASE WHEN dif_1 THEN '1' ELSE '0' END || CASE WHEN dif_2 THEN '1' ELSE '0' END || CASE WHEN dif_3 THEN '1' ELSE '0' END AS bits,
     CASE WHEN dif_geom THEN ST_AsBinary(qt.geom, 'NDR') END AS geom,
     CASE WHEN dif_1 THEN qt.fld_1 END AS fld_1,
     CASE WHEN dif_2 THEN qt.fld_2 END AS fld_2,
