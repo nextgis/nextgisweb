@@ -665,20 +665,20 @@ def _validate_geom(geom, target, *, fix_errors, fid):
                 gettext("Feature #%d has multiple geometries satisfying the conditions.") % fid
             )
 
-    if wkb_type in _wkb_points:
+    if target in _wkb_points:
         pass  # Points are always valid.
     else:
         # Check for polygon rings with fewer than 3 points and linestrings with
         # fewer than 2 points. Check for polygon empty rings, which are not
         # valid for PostGIS.
         for part_idx, part in (
-            ((None, geom),) if (wkb_type in _wkb_single) else _iter_reversed_geom(geom)
+            ((None, geom),) if (target in _wkb_single) else _iter_reversed_geom(geom)
         ):
-            if wkb_type in _wkb_polygons:
+            if target in _wkb_polygons:
                 for ring_idx, ring in _iter_reversed_geom(part):
                     if (ring_points := ring.GetPointCount()) == 0:
                         if fix_errors == FIX_ERRORS.NONE or (
-                            ring_idx == 0 and wkb_type in _wkb_single
+                            ring_idx == 0 and target in _wkb_single
                         ):
                             raise FeatureError(gettext("Feature #%d has empty rings.") % fid)
                         elif ring_idx == 0:
@@ -705,12 +705,12 @@ def _validate_geom(geom, target, *, fix_errors, fid):
                                     )
                                     % fid
                                 )
-                            elif ring_idx == 0 and wkb_type in _wkb_multi:
+                            elif ring_idx == 0 and target in _wkb_multi:
                                 geom.RemoveGeometry(part_idx)
                             else:
                                 part.RemoveGeometry(ring_idx)
             elif (part_points := part.GetPointCount()) == 0:
-                if wkb_type in _wkb_single:
+                if target in _wkb_single:
                     pass  # LINESTRING EMPTY
                 elif fix_errors == FIX_ERRORS.NONE:
                     raise FeatureError(gettext("Feature #%d contains an empty linestring.") % fid)
@@ -721,7 +721,7 @@ def _validate_geom(geom, target, *, fix_errors, fid):
                     raise FeatureError(
                         gettext("Feature #%d has less than 2 points in a linestring.") % fid
                     )
-                if wkb_type in _wkb_multi:
+                if target in _wkb_multi:
                     geom.RemoveGeometry(part_idx)
                 else:
                     geom = None
