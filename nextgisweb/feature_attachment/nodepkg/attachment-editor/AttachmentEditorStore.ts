@@ -1,5 +1,5 @@
 import { isEqual } from "lodash-es";
-import { action, computed, observable, toJS } from "mobx";
+import { action, computed, observable } from "mobx";
 
 import type {
     EditorStoreConstructorOptions,
@@ -10,13 +10,12 @@ import type { UploaderMeta } from "@nextgisweb/file-upload/file-uploader/type";
 import type { DataSource, FileMetaToUpload } from "./type";
 import { findAttachmentIndex } from "./util/findAttachmentIndex";
 
-class AttachmentEditorStore implements IEditorStore<DataSource[] | null> {
-    @observable.shallow accessor value: DataSource[] | null = null;
+class AttachmentEditorStore implements IEditorStore<DataSource[]> {
+    readonly featureId: number | null = null;
+    readonly resourceId: number;
 
-    featureId: number | null = null;
-    resourceId: number;
-
-    @observable.shallow private accessor _initValue: DataSource[] | null = null;
+    @observable.shallow accessor value: DataSource[] = [];
+    @observable.shallow private accessor _initValue: DataSource[] = [];
 
     constructor({ parentStore }: EditorStoreConstructorOptions) {
         if (!parentStore) {
@@ -31,7 +30,7 @@ class AttachmentEditorStore implements IEditorStore<DataSource[] | null> {
 
     @computed
     get counter() {
-        return this.value ? this.value.length : null;
+        return this.value.length;
     }
 
     @computed
@@ -53,19 +52,20 @@ class AttachmentEditorStore implements IEditorStore<DataSource[] | null> {
         return dirty;
     }
 
-    @action
-    load = (value: DataSource[] | null) => {
+    @action.bound
+    load(value: DataSource[] | null) {
+        value ??= [];
         this.value = value;
-        this._initValue = toJS(value);
-    };
+        this._initValue = value;
+    }
 
-    @action
-    reset = () => {
-        this.load(this._initValue);
-    };
+    @action.bound
+    reset() {
+        this.value = this._initValue;
+    }
 
-    @action
-    append = (value: UploaderMeta[]) => {
+    @action.bound
+    append(value: UploaderMeta[]) {
         const newValue = [...(this.value || [])];
 
         for (const meta of value) {
@@ -84,10 +84,10 @@ class AttachmentEditorStore implements IEditorStore<DataSource[] | null> {
         }
 
         this.value = newValue;
-    };
+    }
 
-    @action
-    updateItem = (item: DataSource, field: string, value: unknown) => {
+    @action.bound
+    updateItem(item: DataSource, field: string, value: unknown) {
         const old = this.value ? [...this.value] : [];
         const index = findAttachmentIndex(item, old);
         if (index !== -1) {
@@ -99,18 +99,18 @@ class AttachmentEditorStore implements IEditorStore<DataSource[] | null> {
             });
             this.value = updatedAttachments;
         }
-    };
+    }
 
-    @action
-    deleteItem = (item: DataSource) => {
+    @action.bound
+    deleteItem(item: DataSource) {
         const old = this.value ? [...this.value] : [];
         const index = findAttachmentIndex(item, old);
         if (index !== -1) {
             const newAttachments = old;
             newAttachments.splice(index, 1);
-            this.value = newAttachments.length ? newAttachments : null;
+            this.value = newAttachments.length ? newAttachments : [];
         }
-    };
+    }
 }
 
 export default AttachmentEditorStore;

@@ -5,8 +5,8 @@ import type { EditorStore as IEditorStore } from "@nextgisweb/feature-layer/type
 type Value = string | null;
 
 class EditorStore implements IEditorStore<Value> {
-    @observable private accessor _value: Value = null;
-    @observable private accessor _initValue: Value = null;
+    @observable.ref private accessor _value: Value = null;
+    @observable.ref private accessor _initValue: Value = null;
 
     @computed
     get dirty() {
@@ -23,16 +23,16 @@ class EditorStore implements IEditorStore<Value> {
         this._value = value;
     }
 
-    @action
-    load = (value: Value) => {
+    @action.bound
+    load(value: Value) {
         this._value = value;
         this._initValue = value;
-    };
+    }
 
-    @action
-    reset = () => {
+    @action.bound
+    reset() {
         this.load(this._initValue);
-    };
+    }
 }
 
 export default EditorStore;

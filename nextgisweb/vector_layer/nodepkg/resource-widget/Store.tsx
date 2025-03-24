@@ -1,5 +1,5 @@
 import { isEmpty } from "lodash-es";
-import { action, computed, observable, toJS } from "mobx";
+import { action, computed, observable } from "mobx";
 
 import type { FileMeta } from "@nextgisweb/file-upload/file-uploader";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -40,9 +40,9 @@ export class Store
     readonly identity = "vector_layer";
     readonly composite: CompositeStore;
 
-    @observable accessor mode: Mode | null = "file";
+    @observable.ref accessor mode: Mode | null = "file";
     @observable.shallow accessor source: FileMeta | null = null;
-    @observable accessor sourceLayer: string | null = null;
+    @observable.ref accessor sourceLayer: string | null = null;
     @observable.shallow accessor sourceOptions: SourceOptions = {
         fix_errors: "LOSSY",
         skip_errors: true,
@@ -54,11 +54,11 @@ export class Store
         skip_other_geometry_types: false,
     };
 
-    @observable accessor geometryType: GeometryType | null = null;
-    @observable accessor geometryTypeInitial: GeometryType | null = null;
+    @observable.ref accessor geometryType: GeometryType | null = null;
+    @observable.ref accessor geometryTypeInitial: GeometryType | null = null;
 
-    @observable accessor confirm = false;
-    @observable accessor uploading = false;
+    @observable.ref accessor confirm = false;
+    @observable.ref accessor uploading = false;
 
     @observable.ref accessor dirty = false;
 
@@ -84,9 +84,11 @@ export class Store
             result.source_layer = this.sourceLayer!;
             result.srs = srsSettings.default;
 
-            const so = toJS<Record<keyof SourceOptions, unknown>>(
-                this.sourceOptions
-            );
+            const so = { ...this.sourceOptions } as Record<
+                keyof SourceOptions,
+                unknown
+            >;
+
             const onull = (k: keyof SourceOptions) => {
                 if (so[k] === "NONE") {
                     so[k] = null;
@@ -119,7 +121,7 @@ export class Store
             result.delete_all_features = true;
         }
 
-        return toJS(result);
+        return result;
     }
 
     @action.bound

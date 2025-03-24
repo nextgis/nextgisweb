@@ -50,8 +50,12 @@ const config = {
                     },
                     {
                         "name": "mobx",
-                        "importNames": ["makeAutoObservable", "makeObservable"],
-                        "message": "Use decorators instead",
+                        "importNames": [
+                            "makeAutoObservable",
+                            "makeObservable",
+                            "toJS",
+                        ],
+                        "message": "Don't use this API and use decorators",
                     },
                 ],
                 "patterns": [

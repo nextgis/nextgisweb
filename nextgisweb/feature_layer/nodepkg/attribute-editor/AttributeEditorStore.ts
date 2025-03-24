@@ -1,5 +1,5 @@
 import { isEqual } from "lodash-es";
-import { action, computed, observable, toJS } from "mobx";
+import { action, computed, observable } from "mobx";
 
 import type {
     EditorStore,
@@ -12,31 +12,27 @@ import { formatNgwAttribute, parseNgwAttribute } from "../util/ngwAttributes";
 
 import type { AppAttributes, NgwAttributeValue } from "./type";
 
-class AttributeEditorStore implements EditorStore<NgwAttributeValue | null> {
-    @observable.shallow accessor value: NgwAttributeValue | null = null;
-
-    @observable.shallow accessor _initValue: NgwAttributeValue | null = null;
-
+class AttributeEditorStore implements EditorStore<NgwAttributeValue> {
     readonly _parentStore?: FeatureEditorStore;
     readonly _fields?: FeatureLayerFieldRead[];
+
+    @observable.shallow accessor value: NgwAttributeValue = {};
+    @observable.shallow private accessor _initValue: NgwAttributeValue = {};
 
     constructor({ parentStore, fields }: EditorStoreConstructorOptions = {}) {
         this._parentStore = parentStore;
         this._fields = fields;
-
-        if (this.fields) {
-            this.load(
-                Object.fromEntries(
-                    this.fields.map(({ keyname }) => [keyname, null])
-                )
-            );
-        }
+        this.load(null);
     }
 
     @action
     load(value: NgwAttributeValue | null) {
-        this.value = { ...value };
-        this._initValue = toJS(value);
+        value ??= Object.fromEntries(
+            this.fields.map(({ keyname }) => [keyname, null])
+        );
+
+        this.value = value;
+        this._initValue = value;
     }
 
     @computed

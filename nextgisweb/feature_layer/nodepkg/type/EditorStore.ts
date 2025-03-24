@@ -25,7 +25,12 @@ export interface EditorStore<V = any> {
      */
     counter?: number | null;
 
-    load: (value: V) => void;
+    /**
+     * Load value into store
+     *
+     * @param value Loaded value, null indicates no data
+     */
+    load: (value: V | null) => void;
 
     isValid?: boolean;
 }

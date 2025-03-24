@@ -1,4 +1,4 @@
-import { action, computed, observable, toJS } from "mobx";
+import { action, computed, observable } from "mobx";
 
 import type { FeatureItemExtensions } from "@nextgisweb/feature-layer/type";
 import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
@@ -16,11 +16,11 @@ type FeatureItem = FeatureItem_<NgwAttributeValue>;
 type ExtensionStores = Record<string, EditorStore>;
 
 export class FeatureEditorStore {
-    @observable accessor resourceId: number;
-    @observable accessor featureId: number | null = null;
+    readonly resourceId: number;
+    readonly featureId: number | null = null;
 
-    @observable accessor saving = false;
-    @observable accessor initLoading = false;
+    @observable.ref accessor saving = false;
+    @observable.ref accessor initLoading = false;
 
     @observable.shallow accessor fields: FeatureLayerFieldRead[] = [];
 
@@ -33,12 +33,6 @@ export class FeatureEditorStore {
     @observable private accessor _extensionStores: ExtensionStores = {};
 
     constructor({ resourceId, featureId }: FeatureEditorStoreOptions) {
-        if (resourceId === undefined) {
-            throw new Error(
-                "`resourceId` is required attribute for FeatureEditorStore"
-            );
-        }
-
         this.resourceId = resourceId;
         this.featureId = featureId;
 
@@ -109,7 +103,7 @@ export class FeatureEditorStore {
         const extensions: Record<string, unknown> = {};
         for (const key in this._extensionStores) {
             const storeExtension = this._extensionStores[key];
-            extensions[key] = toJS(storeExtension.value);
+            extensions[key] = storeExtension.value;
         }
 
         const json: RouteBody<"feature_layer.feature.item", "put"> = {
@@ -117,7 +111,7 @@ export class FeatureEditorStore {
         };
 
         if (this._attributeStore && this._attributeStore.dirty) {
-            json.fields = toJS(this._attributeStore.value);
+            json.fields = this._attributeStore.value;
         }
         return json;
     };
