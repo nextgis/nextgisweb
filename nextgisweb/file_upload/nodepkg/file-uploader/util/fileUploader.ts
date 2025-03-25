@@ -1,6 +1,7 @@
 import { Upload, isSupported } from "tus-js-client";
 
 import settings from "@nextgisweb/file-upload/client-settings";
+import { makeAbortError } from "@nextgisweb/gui/error/util";
 import { routeURL } from "@nextgisweb/pyramid/api";
 
 import type { FileMeta, FileUploaderOptions } from "../type";
@@ -37,7 +38,7 @@ async function upload({
         if (signal) {
             signal.addEventListener("abort", () => {
                 xhr.abort();
-                reject(new DOMException("Aborted", "AbortError"));
+                reject(makeAbortError());
             });
         }
         xhr.send(data);
@@ -102,7 +103,7 @@ async function tusUpload({
             if (signal) {
                 signal.addEventListener("abort", () => {
                     uploader.abort();
-                    reject(new DOMException("Aborted", "AbortError"));
+                    reject(makeAbortError());
                 });
             }
             uploader.start();

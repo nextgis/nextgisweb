@@ -1,3 +1,5 @@
+import { makeAbortError } from "../error/util";
+
 import { sleep } from "./sleep";
 
 interface ExecuteWithMinDelayOptions<T> {
@@ -28,11 +30,11 @@ export async function executeWithMinDelay<T>(
     requestPromise: Promise<T>,
     { minDelay = 1000, onRealExecute, signal }: ExecuteWithMinDelayOptions<T>
 ): Promise<T> {
-    if (signal?.aborted) throw new DOMException("Aborted", "AbortError");
+    if (signal?.aborted) throw makeAbortError();
 
     const abortPromise = new Promise<never>((_, reject) =>
         signal?.addEventListener("abort", () => {
-            reject(new DOMException("Aborted", "AbortError"));
+            reject(makeAbortError());
         })
     );
 

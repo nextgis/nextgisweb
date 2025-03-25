@@ -6,3 +6,7 @@ export function isAbortError(error: unknown): error is DOMException {
             error.name === "AbortError"
     );
 }
+
+export function makeAbortError(message?: string) {
+    return new DOMException(message, "AbortError");
+}
