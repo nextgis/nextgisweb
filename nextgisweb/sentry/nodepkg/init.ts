@@ -22,7 +22,17 @@ export function init(opts: { dsn: string; routeName: string }) {
 
         beforeSend(event, hint) {
             const error = hint.originalException;
+
+            // The server has its own logic for reporting API errors, so skip
+            // client-side reporting.
             if (error instanceof BaseAPIError) {
+                return null;
+            }
+
+            // Webpack's ChunkLoadError is considered fatal. This can also happen
+            // in legacy browsers due to unsupported JavaScript syntax (e.g., ??=).
+            if (error instanceof Error && error.name === "ChunkLoadError") {
+                Sentry.getClient()?.close();
                 return null;
             }
 
