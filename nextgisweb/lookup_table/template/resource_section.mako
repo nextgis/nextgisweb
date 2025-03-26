@@ -9,12 +9,10 @@
             <th>${tr(gettext("Value"))}</th>
         </tr>
     </thead>
-    % if lookup_value is not None:
-        % for key, value in lookup_value.items():
-            <tr>
-                <td>${key}</td>
-                <td>${value}</td>
-            </tr>
-        % endfor
-    % endif
+    % for key, value in lookup_value:
+        <tr>
+            <td>${key}</td>
+            <td>${value}</td>
+        </tr>
+    % endfor
 </table>

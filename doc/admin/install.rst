@@ -26,7 +26,7 @@ System requirements
 - Node.js 20.x or higher and Yarn 1.x package manager. We recommend using
   NodeSource and Yarn package repositories.
 
-- PostgreSQL database with PostGIS and hstore extensions enabled:
+- PostgreSQL database with PostGIS extension enabled:
 
   - The minimum required versions are PostgreSQL 10 and PostGIS 2.5.
 
@@ -54,7 +54,6 @@ System requirements
       nextgisweb=# ALTER TABLE spatial_ref_sys OWNER TO nextgisweb;
       nextgisweb=# ALTER TABLE geography_columns OWNER TO nextgisweb;
       nextgisweb=# ALTER TABLE geometry_columns OWNER TO nextgisweb;
-      nextgisweb=# CREATE EXTENSION hstore;
       nextgisweb=# \quit
 
     Now you can connect ``nextgisweb`` database on ``localhost`` with
