@@ -198,6 +198,21 @@ def cmd_update(args):
                 write_po(po_path, po)
 
 
+def update_catalog_using_ai_catalog(
+    catalog: Catalog,
+    ai_catalog: Catalog,
+):
+    for ai_msg in ai_catalog:
+        if ai_msg.id == "":
+            continue
+        if ai_msg.id not in catalog._messages:
+            catalog[ai_msg.id] = ai_msg
+        else:
+            if catalog[ai_msg.id].string == "":
+                del catalog[ai_msg.id]
+                catalog[ai_msg.id] = ai_msg
+
+
 def cmd_compile(args):
     for comp_id, locales in components_and_locales(args, work_in_progress=False):
         for locale in locales:
@@ -207,11 +222,20 @@ def cmd_compile(args):
                 mo_path = catfn(ext="mo", internal=True)
                 if mo_path.exists():
                     mo_path.unlink()
-
                 continue
 
             with po_path.open("r") as po:
                 catalog = read_po(po, locale=to_gettext_locale(locale), domain=comp_id)
+
+            catalog_ai = None
+            cat_ai_fn = partial(catalog_filename, comp_id, locale, "ai.po")
+            ai_po_path = cat_ai_fn()
+            if ai_po_path.exists():
+                with ai_po_path.open("r") as ai_po:
+                    catalog_ai = read_po(ai_po, locale=to_gettext_locale(locale), domain=comp_id)
+
+            if catalog_ai:
+                update_catalog_using_ai_catalog(catalog, catalog_ai)
 
             logger.info(
                 "Compiling component [%s] locale [%s] (%d messages)...",
