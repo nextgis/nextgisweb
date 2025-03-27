@@ -40,15 +40,39 @@ module.exports = function (source) {
     const flagged = potFlagged(comp);
     flagged || console.warn(`POT-file for '${comp}' component not found`);
 
+    // Parse main translations
     const translations = po.parse(source).translations;
+
+    // Parse AI translations if they exist
+    const aiPath = this.resourcePath.replace(/\.po$/, ".ai.po");
+    let aiTranslations = {};
+    if (fs.existsSync(aiPath)) {
+        const aiContent = fs.readFileSync(aiPath, "utf8");
+        aiTranslations = po.parse(aiContent).translations;
+    }
+
     const domainIndex = {};
     for (const [context, messages] of Object.entries(translations)) {
         const contextIndex = (domainIndex[context ? context : ""] = {});
         const cflagged = flagged && flagged[context];
+
+        // Process main translations
         for (const { msgid, msgstr } of Object.values(messages)) {
             if (msgstr.includes("")) continue;
             if (cflagged && !cflagged.includes(msgid)) continue;
             contextIndex[msgid] = msgstr;
+        }
+
+        // Add AI translations if they exist and main translation is empty
+        const aiMessages = aiTranslations[context] || {};
+        for (const { msgid, msgstr } of Object.values(aiMessages)) {
+            if (
+                !contextIndex[msgid] &&
+                msgstr &&
+                (!cflagged || cflagged.includes(msgid))
+            ) {
+                contextIndex[msgid] = msgstr;
+            }
         }
     }
 
