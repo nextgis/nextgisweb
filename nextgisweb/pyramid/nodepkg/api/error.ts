@@ -1,5 +1,4 @@
-import { BaseError } from "make-error";
-
+import { BaseError } from "@nextgisweb/jsrealm/error";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import type { LunkwillData } from "./type";
@@ -20,15 +19,12 @@ export class BaseAPIError<D = unknown> extends BaseError {
     protected defaultTitle = gettext("Unknown API error");
     protected defaultDetail: string | undefined = undefined;
 
-    constructor(message?: string, opts: BaseAPIErrorOpts<D> = {}) {
-        // With the first agrument undefined BaseError won't initialize the
-        // message property.
-        super("");
-
+    constructor(message?: string, options: BaseAPIErrorOpts<D> = {}) {
+        super(message);
         this.message = message ?? this.defaultMessage;
-        this.title = opts.title ?? this.defaultTitle;
-        this.detail = opts.detail ?? this.defaultDetail;
-        this.data = opts.data;
+        this.title = options.title ?? this.defaultTitle;
+        this.detail = options.detail ?? this.defaultDetail;
+        this.data = options.data;
     }
 }
 

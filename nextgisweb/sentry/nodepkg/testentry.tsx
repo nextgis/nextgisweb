@@ -1,7 +1,6 @@
 /** @testentry react */
-import { BaseError } from "make-error";
-
 import { Button, Space } from "@nextgisweb/gui/antd";
+import { BaseError } from "@nextgisweb/jsrealm/error";
 
 class CustomError extends BaseError {}
 

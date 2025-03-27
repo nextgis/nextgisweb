@@ -1,7 +1,7 @@
 import { get, set } from "lodash-es";
-import { BaseError } from "make-error";
 import { action, computed, observable, runInAction } from "mobx";
 
+import { BaseError } from "@nextgisweb/jsrealm/error";
 import { BaseAPIError, LunkwillParam, route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type {

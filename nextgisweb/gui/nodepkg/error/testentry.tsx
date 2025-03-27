@@ -1,8 +1,8 @@
 /** @testentry react */
-import { Button, Space } from "antd";
-import { BaseError } from "make-error";
-
+import { BaseError } from "@nextgisweb/jsrealm/error";
 import { ServerResponseError } from "@nextgisweb/pyramid/api";
+
+import { Button, Space } from "../antd";
 
 import { errorModal } from ".";
 
