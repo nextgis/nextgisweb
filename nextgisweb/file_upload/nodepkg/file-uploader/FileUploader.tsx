@@ -47,14 +47,14 @@ function ProgressText({
 
 function InputText<M extends boolean = false>({
     meta,
-    setMeta,
     helpText,
+    clearMeta,
     uploadText = msgUpload,
     showMaxSize = false,
     dragAndDropText = msgDragAndDrop,
 }: FileUploaderProps & {
     meta?: UploaderMeta<M>;
-    setMeta: React.Dispatch<React.SetStateAction<UploaderMeta<M> | undefined>>;
+    clearMeta?: () => void;
 }) {
     const firstMeta = (Array.isArray(meta) ? meta[0] : meta) as FileMeta;
     return firstMeta ? (
@@ -64,7 +64,7 @@ function InputText<M extends boolean = false>({
             <Button
                 onClick={(e) => {
                     e.stopPropagation();
-                    setMeta(undefined);
+                    clearMeta?.();
                 }}
                 type="link"
                 icon={<BackspaceIcon />}
@@ -98,7 +98,7 @@ export function FileUploader<M extends boolean = false>({
     showProgressInDocTitle = true,
     ...rest
 }: FileUploaderProps<M>) {
-    const { abort, progressText, props, meta, setMeta, uploading } =
+    const { abort, progressText, props, meta, uploading, clearMeta } =
         useFileUploader<M>({
             showProgressInDocTitle,
             afterUpload,
@@ -126,7 +126,7 @@ export function FileUploader<M extends boolean = false>({
             {progressText !== null ? (
                 <ProgressText abort={abort} progressText={progressText} />
             ) : (
-                <InputText {...rest} meta={meta} setMeta={setMeta} />
+                <InputText {...rest} meta={meta} clearMeta={clearMeta} />
             )}
         </Dragger>
     );
