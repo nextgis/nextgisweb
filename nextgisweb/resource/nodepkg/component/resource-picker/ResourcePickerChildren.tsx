@@ -7,7 +7,10 @@ import { Badge, Button, Table } from "@nextgisweb/gui/antd";
 import type { TableColumnProps, TableProps } from "@nextgisweb/gui/antd";
 import { sorterFactory } from "@nextgisweb/gui/util";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import type { ResourceInterface } from "@nextgisweb/resource/type/api";
+import type {
+    ResourceCls,
+    ResourceInterface,
+} from "@nextgisweb/resource/type/api";
 
 import { renderResourceCls } from "../../util/renderResourceCls";
 
@@ -141,15 +144,15 @@ function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
                     </Badge>
                 );
 
-                const withRendarableChildrenInterfaces: ResourceInterface[] = [
+                const findFirstInterfaces: ResourceInterface[] = [
                     "IFeatureLayer",
                 ];
-                const canSelectFirstChildren = record.interfaces.some(
-                    (resourceInterface) =>
-                        withRendarableChildrenInterfaces.includes(
-                            resourceInterface
-                        )
-                );
+                const findFirstClasses: ResourceCls[] = ["raster_layer"];
+
+                const canSelectFirstChildren =
+                    record.interfaces.some((resInterface) =>
+                        findFirstInterfaces.includes(resInterface)
+                    ) || findFirstClasses.includes(record.cls);
 
                 if (!selectedParent && canSelectFirstChildren && multiple) {
                     selectFirstBtn = (
