@@ -709,6 +709,8 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
             params["offset"] = self._offset
         if self._srs is not None:
             params["srs"] = self._srs.id
+        else:
+            params["srs"] = self.layer.srs_id
         if self._box:
             params["add_box"] = True
         if self._intersects:
