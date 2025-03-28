@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { Button, Modal } from "@nextgisweb/gui/antd";
 import { TemplateLink } from "@nextgisweb/gui/component";
+import { assert } from "@nextgisweb/jsrealm/error";
 import settings from "@nextgisweb/pyramid/client-settings";
 import { gettext, gettextf } from "@nextgisweb/pyramid/i18n";
 import { url } from "@nextgisweb/pyramid/nextgis";
@@ -37,7 +38,7 @@ export const SystemInfoUpdate = observer(() => {
     const [status, data] = updateStore.state;
     if (status === "disabled") return <></>;
 
-    if (!distribution) throw new Error("Undefined distribution");
+    assert(distribution);
 
     let cn, msg, extra, btn;
     if (status === "loading") {

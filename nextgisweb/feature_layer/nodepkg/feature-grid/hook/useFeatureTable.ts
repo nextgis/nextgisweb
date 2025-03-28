@@ -3,6 +3,7 @@ import { debounce } from "lodash-es";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { RefObject } from "react";
 
+import { assert } from "@nextgisweb/jsrealm/error";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 import { LoaderCache } from "@nextgisweb/pyramid/util/loader";
 
@@ -148,10 +149,7 @@ export function useFeatureTable({
         abort();
         if (pages.length) {
             const cache = loaderCache.current;
-
-            if (!cache) {
-                throw new Error("unreachable");
-            }
+            assert(cache);
 
             const cacheKeys = pages.map((page) => ({
                 page,

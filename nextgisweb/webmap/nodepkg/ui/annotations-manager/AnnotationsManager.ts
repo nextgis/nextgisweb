@@ -3,6 +3,7 @@ import type Feature from "ol/Feature";
 import { WKT } from "ol/format";
 
 import { errorModal } from "@nextgisweb/gui/error";
+import { assert } from "@nextgisweb/jsrealm/error";
 import { route } from "@nextgisweb/pyramid/api";
 import topic from "@nextgisweb/webmap/compat/topic";
 import type { Display } from "@nextgisweb/webmap/display";
@@ -40,11 +41,8 @@ export class AnnotationsManager {
         if (AnnotationsManager.instance) {
             return AnnotationsManager.instance;
         }
-        if (!display) {
-            throw new Error(
-                'AnnotationsManager: "display" required parameter for first call!'
-            );
-        }
+
+        assert(display);
 
         this._display = display;
         this._annotationsVisibleState = initialAnnotVisible ?? "no";
@@ -305,9 +303,8 @@ export class AnnotationsManager {
         newAnnotationInfo: AnnotationInfo
     ): Promise<AnnotationInfo> {
         const annotationId = annFeature.getId();
-        if (annotationId === undefined) {
-            throw new Error("The annotation feature has no ID");
-        }
+        assert(annotationId);
+
         const updateInfo = await route("webmap.annotation.item", {
             id: this._display.config.webmapId,
             annotation_id: Number(annotationId),

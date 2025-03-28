@@ -2,6 +2,7 @@ import type { Coordinate } from "ol/coordinate";
 import { useCallback, useEffect, useRef } from "react";
 
 import reactApp from "@nextgisweb/gui/react-app";
+import { assert } from "@nextgisweb/jsrealm/error";
 import type { Display } from "@nextgisweb/webmap/display";
 import PrintMap from "@nextgisweb/webmap/print-map";
 import type { PrintMapSettings } from "@nextgisweb/webmap/print-map/type";
@@ -48,9 +49,7 @@ export function usePrintMapLayout({
     }, []);
 
     const createPrintMapComp = useCallback(() => {
-        if (!display.mapNode) {
-            throw new Error("Display is not started yet!");
-        }
+        assert(display.mapNode);
 
         const div = document.createElement("div");
         div.classList.add("print-map-pane");

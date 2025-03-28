@@ -2,6 +2,7 @@ import { action, computed, observable } from "mobx";
 
 import { mapper } from "@nextgisweb/gui/arm";
 import type { NullableProps } from "@nextgisweb/gui/type";
+import { assert } from "@nextgisweb/jsrealm/error";
 import type { CompositeStore } from "@nextgisweb/resource/composite";
 import type {
     EditorStore,
@@ -92,8 +93,7 @@ export class TmsClientLayerStore
         if (this.dirty) {
             const { extent, tilesize, minzoom, maxzoom, connection, ...rest } =
                 mapperDump(this);
-
-            if (!connection) throw new Error("Connection is required");
+            assert(connection);
 
             const result: LayerCreate | LayerUpdate = {
                 connection,

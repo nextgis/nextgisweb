@@ -2,13 +2,15 @@ import type { ViewOptions } from "ol/View";
 import { useEffect, useRef } from "react";
 import type React from "react";
 
+import { assert } from "@nextgisweb/jsrealm/error";
 import type { MapStore } from "@nextgisweb/webmap/ol/MapStore";
-import "ol/ol.css";
-import "./MapComponent.less";
 
 import { MapProvider } from "./context/useMapContext";
 import { useMapAdapter } from "./hook/useMapAdapter";
 import type { MapExtent } from "./hook/useMapAdapter";
+
+import "ol/ol.css";
+import "./MapComponent.less";
 
 export interface MapComponentProps extends ViewOptions {
     children?: React.ReactNode;
@@ -42,25 +44,20 @@ export function MapComponent({
 
     useEffect(() => {
         let observer: ResizeObserver | undefined = undefined;
-        if (mapContainerRef.current) {
-            if (!mapRef.current) {
-                const adapter = createMapAdapter({
-                    target: mapContainerRef.current,
-                });
-                mapRef.current = adapter;
-                if (whenCreated) {
-                    whenCreated(adapter);
-                }
-            }
-        } else {
-            throw new Error("Unreachable");
-        }
-        if (mapRef.current) {
-            observer = new ResizeObserver(() => {
-                mapRef.current?.updateSize();
+        assert(mapContainerRef.current);
+        if (!mapRef.current) {
+            const adapter = createMapAdapter({
+                target: mapContainerRef.current,
             });
-            observer.observe(mapRef.current.getTargetElement());
+            mapRef.current = adapter;
+            if (whenCreated) {
+                whenCreated(adapter);
+            }
         }
+        observer = new ResizeObserver(() => {
+            mapRef.current?.updateSize();
+        });
+        observer.observe(mapRef.current.getTargetElement());
         return () => {
             if (observer) {
                 observer.disconnect();

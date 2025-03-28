@@ -2,6 +2,7 @@ import { action, computed, observable } from "mobx";
 
 import { mapper } from "@nextgisweb/gui/arm";
 import type { NullableProps } from "@nextgisweb/gui/type";
+import { assert } from "@nextgisweb/jsrealm/error";
 import type { CompositeStore } from "@nextgisweb/resource/composite";
 import type {
     EditorStore,
@@ -67,9 +68,8 @@ export class WfsClientConnectionStore
     dump() {
         if (this.dirty) {
             const { path, ...rest } = mapperDump(this);
-            if (!path) {
-                throw new Error("Missing required parameters");
-            }
+            assert(path);
+
             const result: WFSConnectionRead | WFSConnectionUpdate = {
                 path,
                 ...rest,

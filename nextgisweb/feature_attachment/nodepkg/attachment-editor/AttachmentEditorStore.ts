@@ -6,6 +6,7 @@ import type {
     EditorStore as IEditorStore,
 } from "@nextgisweb/feature-layer/type";
 import type { UploaderMeta } from "@nextgisweb/file-upload/file-uploader/type";
+import { assert } from "@nextgisweb/jsrealm/error";
 
 import type { DataSource, FileMetaToUpload } from "./type";
 import { findAttachmentIndex } from "./util/findAttachmentIndex";
@@ -18,12 +19,7 @@ class AttachmentEditorStore implements IEditorStore<DataSource[]> {
     @observable.shallow private accessor _initValue: DataSource[] = [];
 
     constructor({ parentStore }: EditorStoreConstructorOptions) {
-        if (!parentStore) {
-            throw new Error(
-                "The `parentStore` is required for AttachmentEditorStore"
-            );
-        }
-
+        assert(parentStore);
         this.featureId = parentStore.featureId;
         this.resourceId = parentStore.resourceId;
     }

@@ -1,5 +1,7 @@
 import { matches } from "lodash-es";
 
+import { assert } from "../error";
+
 type Query<M extends NonNullable<unknown>> = ((i: M) => boolean) | Partial<M>;
 
 export class BaseRegistry<
@@ -16,9 +18,7 @@ export class BaseRegistry<
     }
 
     protected _register(component: string, fn: () => P): void {
-        if (this._sealed) {
-            throw new Error(`Registry '${this.identity}' already sealed`);
-        }
+        assert(!this._sealed, `Registry '${this.identity}' has been sealed`);
 
         if (!ngwConfig.components.includes(component)) {
             this._skipped += 1;
@@ -30,6 +30,7 @@ export class BaseRegistry<
 
     /** Seal registry to prevent future plugin registrations */
     seal() {
+        assert(!this._sealed, `Registry '${this.identity}' has been sealed`);
         this._sealed = true;
         console.debug(
             `Registry '${this.identity}': ` +
@@ -48,8 +49,7 @@ export class BaseRegistry<
     }
 
     *query(query?: Query<M>) {
-        if (!this._sealed)
-            throw new Error(`Registry '${this.identity}' hasn't been sealed`);
+        assert(this._sealed, `Registry '${this.identity}' hasn't been sealed`);
 
         if (query === undefined) query = () => true;
         else if (typeof query !== "function") query = matches(query);

@@ -16,6 +16,7 @@ import { errorModal, isAbortError } from "@nextgisweb/gui/error";
 import { EditIcon } from "@nextgisweb/gui/icon";
 import showModal from "@nextgisweb/gui/showModal";
 import { findNode } from "@nextgisweb/gui/util/tree";
+import { assert } from "@nextgisweb/jsrealm/error";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import topic from "@nextgisweb/webmap/compat/topic";
@@ -290,9 +291,7 @@ export class LayerEditor extends PluginBase {
 
     private async onClickTreeItem(): Promise<boolean> {
         const itemConfig = this.display.itemConfig;
-        if (!itemConfig) {
-            throw new Error("There is no itemConfig in display");
-        }
+        assert(itemConfig);
         const isPreviousEditing = this.editingItem !== undefined;
 
         this.selectedResourceId = itemConfig.layerId;
@@ -341,8 +340,7 @@ export class LayerEditor extends PluginBase {
     }
 
     private buildEditingItem(nodeData: LayerItemConfig): EditingItem {
-        if (!this.selectedResourceId) throw new Error("No resource selected");
-
+        assert(this.selectedResourceId);
         const editingItem: EditingItem = {
             id: this.selectedResourceId,
             nodeData,

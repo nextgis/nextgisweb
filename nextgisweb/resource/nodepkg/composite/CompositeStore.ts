@@ -1,7 +1,7 @@
 import { get, set } from "lodash-es";
 import { action, computed, observable, runInAction } from "mobx";
 
-import { BaseError } from "@nextgisweb/jsrealm/error";
+import { BaseError, assert } from "@nextgisweb/jsrealm/error";
 import { BaseAPIError, LunkwillParam, route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type {
@@ -228,7 +228,7 @@ export class CompositeStore {
                     lunkwill,
                 });
                 return { id: this.resourceId! };
-            } else throw new Error("Unreachable");
+            } else assert(false);
         } finally {
             this.setSaving(false);
         }

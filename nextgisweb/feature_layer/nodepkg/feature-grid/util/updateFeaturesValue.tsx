@@ -1,3 +1,4 @@
+import { assert } from "@nextgisweb/jsrealm/error";
 import { route } from "@nextgisweb/pyramid/api";
 
 import type { NgwAttributeType } from "../../type";
@@ -23,10 +24,10 @@ export async function updateFeaturesValue({
     const res = await route("resource.item", resourceId).get({
         cache: true,
     });
+
     const featureLayer = res.feature_layer;
-    if (!featureLayer) {
-        throw new Error("");
-    }
+    assert(featureLayer);
+
     const newData: Item[] = [];
     for (const item of data) {
         const newItem: Item = { [$FID]: item[$FID] };

@@ -3,6 +3,7 @@ import { never } from "ol/events/condition";
 import { Draw } from "ol/interaction";
 import type { Vector as VectorSource } from "ol/source";
 
+import { assert } from "@nextgisweb/jsrealm/error";
 import topic from "@nextgisweb/webmap/compat/topic";
 
 import VectorLayerClass from "../../ol/layer/Vector";
@@ -62,10 +63,7 @@ export class AnnotationsEditableLayer {
     }
 
     private _setInteractions(geometryType: AnnotationGeometryType): void {
-        if (!this._source) {
-            throw new Error("Source not initialized");
-        }
-
+        assert(this._source);
         this._draw = new Draw({
             source: this._source,
             type: geometryType,

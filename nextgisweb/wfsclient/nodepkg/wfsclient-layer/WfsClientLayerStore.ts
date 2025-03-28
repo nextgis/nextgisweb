@@ -2,6 +2,7 @@ import { action, computed, observable } from "mobx";
 
 import { mapper, validate } from "@nextgisweb/gui/arm";
 import type { NullableProps } from "@nextgisweb/gui/type";
+import { assert } from "@nextgisweb/jsrealm/error";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { CompositeStore } from "@nextgisweb/resource/composite";
 import type {
@@ -81,10 +82,7 @@ export class WfsClientLayerStore
     dump() {
         if (this.dirty) {
             const { connection, layer_name, column_geom, ...rest } = dump(this);
-
-            if (!connection || !layer_name || !column_geom) {
-                throw new Error("Missing required parameters");
-            }
+            assert(connection && layer_name && column_geom);
 
             const result: WFSLayerCreate | WFSLayerUpdate = {
                 connection,

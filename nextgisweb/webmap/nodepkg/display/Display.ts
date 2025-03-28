@@ -6,6 +6,7 @@ import type { Geometry } from "ol/geom";
 import { fromLonLat, transformExtent } from "ol/proj";
 
 import { errorModal } from "@nextgisweb/gui/error";
+import { assert } from "@nextgisweb/jsrealm/error";
 import { appendTo } from "@nextgisweb/pyramid/company-logo";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import topic from "@nextgisweb/webmap/compat/topic";
@@ -246,9 +247,7 @@ export class Display {
 
     @action
     _mapSetup() {
-        if (!this.mapNode) {
-            throw new Error("Display is not started yet!");
-        }
+        assert(this.mapNode);
 
         this.mapToolbar = new MapToolbar({
             display: this,

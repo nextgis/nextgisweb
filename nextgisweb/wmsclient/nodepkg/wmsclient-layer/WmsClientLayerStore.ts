@@ -2,6 +2,7 @@ import { action, computed, observable } from "mobx";
 
 import { mapper } from "@nextgisweb/gui/arm";
 import type { NullableProps } from "@nextgisweb/gui/type";
+import { assert } from "@nextgisweb/jsrealm/error";
 import type { CompositeStore } from "@nextgisweb/resource/composite";
 import type {
     EditorStore,
@@ -69,9 +70,7 @@ export class WmsClientLayerStore
             const { wmslayers, imgformat, connection, vendor_params, ...rest } =
                 mapperDump(this);
 
-            if (!connection || !imgformat || !vendor_params || !wmslayers) {
-                throw Error();
-            }
+            assert(connection && imgformat && vendor_params && wmslayers);
 
             return {
                 wmslayers,

@@ -12,3 +12,30 @@ export class BaseError<O extends ErrorOptions = ErrorOptions> extends Error {
         this.name = this.constructor.name;
     }
 }
+
+export class AssertionError extends BaseError {}
+
+/**
+ * Throw {@link AssertionError} if {@link condition} is falsy
+ *
+ * Acts as a TypeScript assertion function (`asserts condition`) to narrow types
+ * after checks.
+ *
+ * @param condition Condition to check
+ * @param message Optional error message
+ * @throws {AssertionError} If condition is falsy
+ *
+ * @example
+ * const value: string | undefined = foo();
+ * assert(value, "Value required");
+ * // Input is now typed as string
+ * console.log(value.toUpperCase());
+ */
+export function assert(
+    condition: unknown,
+    message: string = "Assertion failed"
+): asserts condition {
+    if (!condition) {
+        throw new AssertionError(message);
+    }
+}

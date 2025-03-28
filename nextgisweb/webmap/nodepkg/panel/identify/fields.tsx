@@ -7,6 +7,7 @@ import type {
     NgwTime,
 } from "@nextgisweb/feature-layer/type";
 import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
+import { assert } from "@nextgisweb/jsrealm/error";
 import { route } from "@nextgisweb/pyramid/api";
 import type { GetRequestOptions } from "@nextgisweb/pyramid/api/type";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -20,10 +21,7 @@ export const getFieldsInfo = async (resourceId: number) => {
     const fieldmap: Map<string, FeatureLayerFieldRead> = new Map();
     const promises: Promise<Record<string, string>>[] = [];
 
-    if (!resourceInfo.feature_layer) {
-        throw new Error("Resource is not feature layer");
-    }
-
+    assert(resourceInfo.feature_layer);
     resourceInfo.feature_layer.fields.forEach((fieldInfo) => {
         if (!fieldInfo.grid_visibility) {
             return;

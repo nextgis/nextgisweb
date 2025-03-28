@@ -6,6 +6,7 @@ import Draggable from "react-draggable";
 
 import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
 import { useThemeVariables } from "@nextgisweb/gui/hook";
+import { assert } from "@nextgisweb/jsrealm/error";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { FeatureTableRows } from "./FeatureTableRows";
@@ -179,9 +180,7 @@ const FeatureTable = observer(
 
         useLayoutEffect(() => {
             const tbodyRefElement = tbodyRef.current;
-            if (!tbodyRefElement) {
-                throw "unreachable";
-            }
+            assert(tbodyRefElement);
             const updateTableWidth = () => {
                 setTableWidth(tbodyRefElement.offsetWidth);
             };

@@ -10,6 +10,7 @@ import {
     useState,
 } from "react";
 
+import { assert } from "@nextgisweb/jsrealm/error";
 // import { useAbortController } from "@nextgisweb/pyramid/hook";
 
 import { Button, CheckboxValue } from "../antd";
@@ -125,9 +126,7 @@ function eventsReducer(
         return state;
     } else if (action === "log") {
         return [...state, rest as Event];
-    } else {
-        throw Error();
-    }
+    } else assert(false);
 }
 
 export default function LifecycleTestentry() {

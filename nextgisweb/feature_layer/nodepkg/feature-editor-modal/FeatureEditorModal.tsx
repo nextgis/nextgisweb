@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { Button, Modal } from "@nextgisweb/gui/antd";
+import { assert } from "@nextgisweb/jsrealm/error";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { FeatureEditorStore } from "../feature-editor/FeatureEditorStore";
@@ -31,9 +32,7 @@ export function FeatureEditorModal({
     const { resourceId, featureId, onSave, mode, onOk } = editorOptions || {};
     const [modal, contextHolder] = Modal.useModal();
 
-    if (typeof resourceId !== "number") {
-        throw new Error("The `editorOptions.resourceId` is reuqired");
-    }
+    assert(typeof resourceId === "number");
     const [store] = useState(
         () =>
             new FeatureEditorStore({

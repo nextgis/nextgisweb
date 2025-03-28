@@ -19,6 +19,7 @@ import { TabsLabelBadge } from "@nextgisweb/gui/component";
 import { SaveButton } from "@nextgisweb/gui/component/SaveButton";
 import { errorModal } from "@nextgisweb/gui/error";
 import { useUnsavedChanges } from "@nextgisweb/gui/hook";
+import { assert } from "@nextgisweb/jsrealm/error";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { FeatureEditorStore } from "./FeatureEditorStore";
@@ -57,11 +58,8 @@ export const FeatureEditorWidget = observer(
         const [activeKey, setActiveKey] = useState(ATTRIBUTES_KEY);
         const store = useState<FeatureEditorStore>(() => {
             if (storeProp) return storeProp;
-            if (resourceId && featureId)
-                return new FeatureEditorStore({ resourceId, featureId });
-            throw new Error(
-                "Either 'store' should be provided or both 'resourceId' and 'featureId'"
-            );
+            assert(resourceId && featureId);
+            return new FeatureEditorStore({ resourceId, featureId });
         })[0];
 
         const { dirty, saving } = store;
