@@ -358,14 +358,14 @@ export function ModelBrowse<Data extends ModalBrowseData = ModalBrowseData>({
         >
             {headSection}
             <Table
-                className="ngw-card"
-                rowKey="id"
+                size="middle"
+                card={true}
                 showSorterTooltip={false}
                 rowSelection={rowSelection}
                 loading={isLoading}
                 columns={tableColumns}
                 dataSource={filteredRows}
-                size="middle"
+                rowKey="id"
                 {...tableProps}
             />
         </Space>

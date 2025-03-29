@@ -1,26 +1,38 @@
 import { Table as TableBase } from "antd";
 import type { AnyObject } from "antd/es/_util/type";
 import type { TableProps as AntTableProps } from "antd/es/table";
+import classNames from "classnames";
 
 import "./index.less";
 
 export interface TableProps<D = any> extends AntTableProps<D> {
+    card?: boolean;
     parentHeight?: boolean;
 }
 
 export default function Table<D extends AnyObject = AnyObject>({
     className,
-    parentHeight = false,
+    style,
+    card,
+    parentHeight,
+    bordered,
     pagination = false,
     ...props
 }: TableProps<D>) {
-    if (parentHeight) {
-        className = (className ? className.split(" ") : [])
-            .concat("ant-table-parent-height")
-            .join(" ");
-    }
+    className = classNames(className, {
+        "ant-table-card": card,
+        "ant-table-parent-height": parentHeight,
+    });
 
-    const tableProps: AntTableProps<D> = { ...props, pagination, className };
+    if (card) bordered = true;
+
+    const tableProps: AntTableProps<D> = {
+        className,
+        style,
+        bordered,
+        pagination,
+        ...props,
+    };
 
     return <TableBase {...tableProps} />;
 }

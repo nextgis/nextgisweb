@@ -32,3 +32,15 @@
         }
     }
 }
+
+.ant-table-card {
+    .ant-table.ant-table-bordered > .ant-table-container > .ant-table-content {
+        table > tbody > tr,
+        table > thead > tr {
+            td:not(:last-child),
+            th:not(:last-child) {
+                border-inline-end: none;
+            }
+        }
+    }
+}

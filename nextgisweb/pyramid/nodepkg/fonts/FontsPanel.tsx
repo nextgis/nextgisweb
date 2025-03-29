@@ -182,7 +182,8 @@ export function FontsPanel() {
                 </CheckboxValue>
             </Flex>
             <Table
-                className="ngw-card"
+                size="middle"
+                card={true}
                 columns={columns}
                 dataSource={dataWithKeys}
                 rowSelection={{

@@ -1,4 +1,3 @@
-import classNames from "classnames";
 import { utc } from "dayjs";
 import { useMemo } from "react";
 
@@ -53,13 +52,13 @@ export function BackupBrowse({ items }: BackupBrowseProps) {
 
     return (
         <Table
-            className={classNames("ngw-pyramid-backup-page", "ngw-card")}
+            className={"ngw-pyramid-backup-page"}
+            size="middle"
+            card={true}
             style={{ width: "100%" }}
             dataSource={items}
             columns={columns}
             rowKey="filename"
-            bordered={true}
-            size="middle"
         />
     );
 }
