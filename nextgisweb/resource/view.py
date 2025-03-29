@@ -32,7 +32,7 @@ from .scope import ResourceScope
 MAIN_SECTION_JSENTRY = jsentry("@nextgisweb/resource/main-section")
 CHILDREN_SECTION_JSENTRY = jsentry("@nextgisweb/resource/children-section")
 EXTERNAL_ACCESS_JSENTRY = jsentry("@nextgisweb/resource/external-access")
-RESOURCE_ENTRY_JSENTRY = jsentry("@nextgisweb/resource/resources-filter")
+RESOURCE_FILTER_JSENTRY = jsentry("@nextgisweb/resource/resources-filter")
 
 ResourceID = Annotated[int, Meta(ge=0, description="Resource ID")]
 

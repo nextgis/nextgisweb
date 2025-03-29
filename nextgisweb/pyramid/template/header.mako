@@ -3,6 +3,7 @@
     import nextgisweb.pyramid as m
     from nextgisweb.gui.view import REACT_BOOT_JSENTRY
     from nextgisweb.pyramid.view import LAYOUT_JSENTRY
+    from nextgisweb.resource.view import RESOURCE_FILTER_JSENTRY
     svglogo = None
 %>
 
@@ -54,7 +55,7 @@
         reactBoot(Menu, {}, document.getElementById("menu"));
         
         %if not hide_resource_filter:
-            ngwEntry("@nextgisweb/resource/resources-filter").then(
+            ngwEntry(${json_js(RESOURCE_FILTER_JSENTRY)}).then(
                 ({default: ResourcesFilter}) => reactBoot(
                     ResourcesFilter,
                     { onChange(v, opt) { window.location.href = opt.url } },
