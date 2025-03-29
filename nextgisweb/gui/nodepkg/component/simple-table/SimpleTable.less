@@ -1,0 +1,66 @@
+.ngw-gui-simple-table {
+    border: 1px solid var(--theme-color-border-secondary);
+    border-radius: var(--theme-border-radius);
+    border-spacing: 0;
+
+    thead {
+        background: none;
+    }
+
+    th {
+        color: var(--text-base);
+    }
+
+    td,
+    th {
+        vertical-align: middle;
+        border-bottom: 1px solid var(--theme-color-border-secondary);
+        border-left: 0;
+        padding: 0.8em 1em;
+        text-align: left;
+
+        &.fit-content {
+            width: 1%;
+            white-space: nowrap;
+        }
+    }
+
+    tbody {
+        th {
+            color: var(--text-base);
+            font-weight: bold;
+            text-align: left;
+            text-transform: none;
+        }
+
+        tr {
+            &:hover td,
+            &:hover th {
+                background-color: #fbfbfb;
+            }
+        }
+
+        & + thead {
+            tr {
+                th,
+                td {
+                    padding-top: 20px;
+                }
+            }
+        }
+    }
+
+    > tbody > tr:last-child > td,
+    > tbody > tr:last-child > th {
+        border-bottom-width: 1px;
+    }
+
+    > tbody:last-child > tr:last-child > td,
+    > tbody:last-child > tr:last-child > th {
+        border-bottom: 0;
+    }
+
+    & + & {
+        margin-top: 20px;
+    }
+}

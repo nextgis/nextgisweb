@@ -1,7 +1,7 @@
 import { Fragment, useState } from "react";
 
 import { PrincipalSelect } from "@nextgisweb/auth/component";
-import { LoadingWrapper } from "@nextgisweb/gui/component";
+import { LoadingWrapper, SimpleTable } from "@nextgisweb/gui/component";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { useLoadData } from "./hook/useLoadData";
@@ -33,7 +33,7 @@ export function EffectivePermissions({
                 disabled={!seeOthers}
                 allowClear={false}
             />
-            <table className="pure-table pure-table-horizontal ngw-card">
+            <SimpleTable>
                 <tbody>
                     {data.map(({ key, label, items }) => (
                         <Fragment key={key}>
@@ -51,7 +51,7 @@ export function EffectivePermissions({
                         </Fragment>
                     ))}
                 </tbody>
-            </table>
+            </SimpleTable>
         </div>
     );
 }

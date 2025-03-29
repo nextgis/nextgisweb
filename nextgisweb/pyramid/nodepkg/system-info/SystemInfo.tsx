@@ -1,6 +1,7 @@
 import { useMemo, useRef } from "react";
 
 import { CopyToClipboardButton } from "@nextgisweb/gui/buttons";
+import { SimpleTable } from "@nextgisweb/gui/component";
 
 import { gettext } from "../i18n";
 import { PageTitle } from "../layout";
@@ -52,7 +53,7 @@ export function SystemInfo({ packages, platform, browser }: SystemInfoProps) {
                     </h2>
                 )}
                 <SystemInfoUpdate />
-                <table className="ngw-card">
+                <SimpleTable>
                     <thead>
                         <tr>
                             <th>{gettext("Package")}</th>
@@ -71,10 +72,10 @@ export function SystemInfo({ packages, platform, browser }: SystemInfoProps) {
                             )
                         )}
                     </tbody>
-                </table>
+                </SimpleTable>
 
                 <h2>{gettext("Platform")}</h2>
-                <table className="ngw-card">
+                <SimpleTable>
                     <tbody>
                         {platform.map(([k, v], idx) => (
                             <tr key={idx}>
@@ -83,10 +84,10 @@ export function SystemInfo({ packages, platform, browser }: SystemInfoProps) {
                             </tr>
                         ))}
                     </tbody>
-                </table>
+                </SimpleTable>
 
                 <h2>{gettext("Browser support")}</h2>
-                <table className="ngw-card">
+                <SimpleTable>
                     <tbody>
                         {browser.support.map(([family, version], idx) => (
                             <tr key={idx}>
@@ -105,7 +106,7 @@ export function SystemInfo({ packages, platform, browser }: SystemInfoProps) {
                             </tr>
                         )}
                     </tbody>
-                </table>
+                </SimpleTable>
             </div>
         </>
     );
