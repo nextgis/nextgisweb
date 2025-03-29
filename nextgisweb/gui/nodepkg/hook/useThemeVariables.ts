@@ -27,7 +27,8 @@ export function useThemeVariables(
                     `--${vname}`,
                     `${token[tkey]}${
                         tkey.startsWith("borderRadius") ||
-                        tkey.startsWith("fontSize")
+                        tkey.startsWith("fontSize") ||
+                        tkey.startsWith("padding")
                             ? "px"
                             : ""
                     }`,

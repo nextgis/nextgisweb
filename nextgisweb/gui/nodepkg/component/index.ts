@@ -7,5 +7,6 @@ export { LoadingWrapper } from "./LoadingWrapper";
 export { SaveButton } from "./SaveButton";
 export { TemplateLink } from "./TemplateLink";
 
+export * from "./content-card";
 export * from "./tabs-label-badge";
 export * from "./extent-row";
