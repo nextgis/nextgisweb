@@ -3,6 +3,6 @@
     "version": "0.0.0",
     "type": "module",
     "dependencies": {
-        "@sentry/browser": "~8.47.0"
+        "@sentry/browser": "~9.10.1"
     }
 }

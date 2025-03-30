@@ -1,6 +1,7 @@
 import * as Sentry from "@sentry/browser";
 import type { Integration } from "@sentry/core";
 
+import { isAbortError } from "@nextgisweb/gui/error";
 import { BaseAPIError } from "@nextgisweb/pyramid/api";
 
 export function init(opts: { dsn: string; routeName: string }) {
@@ -22,6 +23,11 @@ export function init(opts: { dsn: string; routeName: string }) {
 
         beforeSend(event, hint) {
             const error = hint.originalException;
+
+            // Too many abort errors captured, ignore them
+            if (isAbortError(error)) {
+                return null;
+            }
 
             // The server has its own logic for reporting API errors, so skip
             // client-side reporting.

@@ -1,5 +1,6 @@
 /** @testentry react */
 import { Button, Space } from "@nextgisweb/gui/antd";
+import { makeAbortError } from "@nextgisweb/gui/error/util";
 import { BaseError } from "@nextgisweb/jsrealm/error";
 
 class CustomError extends BaseError {}
@@ -27,6 +28,13 @@ export default function Testentry() {
                 }}
             >
                 EntrypointError
+            </Button>
+            <Button
+                onClick={() => {
+                    throw makeAbortError("Test abort error");
+                }}
+            >
+                AbortError
             </Button>
         </Space.Compact>
     );
