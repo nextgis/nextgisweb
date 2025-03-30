@@ -8,10 +8,15 @@ from nextgisweb.resource.view import resource_sections
 from .model import SVGMarkerLibrary
 
 
-class Widget(Widget):
+class SVGMarkerLibraryWidget(Widget):
     resource = SVGMarkerLibrary
     operation = ("create", "update")
     amdmod = jsentry("@nextgisweb/svg-marker-library/resource-widget")
+
+
+@resource_sections("@nextgisweb/svg-marker-library/resource-section")
+def _resource_section(obj, **kwargs):
+    return isinstance(obj, SVGMarkerLibrary)
 
 
 def setup_pyramid(comp, config):
@@ -27,7 +32,3 @@ def setup_pyramid(comp, config):
             gettext("Export"),
             lambda args: args.request.route_url("resource.export", id=args.obj.id),
         )
-
-    @resource_sections(title=gettext("SVG marker library"), priority=20)
-    def resource_section(obj):
-        return isinstance(obj, SVGMarkerLibrary)

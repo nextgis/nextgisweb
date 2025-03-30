@@ -8,8 +8,6 @@ from nextgisweb.resource.view import resource_sections
 from .interface import IRenderableNonCached, IRenderableStyle
 from .legend import ILegendSymbols
 
-LEGEND_SYMBOLS_WIDGET_JSENTRY = jsentry("@nextgisweb/render/legend-symbols-widget")
-
 
 class TileCacheWidget(Widget):
     interface = IRenderableStyle
@@ -41,7 +39,11 @@ class TMSLink(ExternalAccessLink):
         )
 
 
+@resource_sections("@nextgisweb/render/resource-section/legend-symbols")
+def resource_section_legend_symbols(obj, **kwargs):
+    enabled = env.render.options["legend_symbols_section"]
+    return enabled and ILegendSymbols.providedBy(obj)
+
+
 def setup_pyramid(comp, config):
-    @resource_sections(title=gettext("Legend symbols"))
-    def resource_section_legend_symbols(obj):
-        return env.render.options["legend_symbols_section"] and ILegendSymbols.providedBy(obj)
+    pass

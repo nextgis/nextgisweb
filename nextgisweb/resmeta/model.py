@@ -5,7 +5,7 @@ import sqlalchemy.orm as orm
 from msgspec import Meta
 from typing_extensions import Annotated
 
-from nextgisweb.env import Base, gettext
+from nextgisweb.env import Base
 
 from nextgisweb.resource import Resource, ResourceScope, SAttribute, Serializer
 
@@ -55,13 +55,6 @@ class ResourceMetadataItem(Base):
         self.vtext = value if isinstance(value, str) else None
         self.vboolean = value if isinstance(value, bool) else None
 
-
-VTYPE_DISPLAY_NAME = {
-    "string": gettext("String"),
-    "number": gettext("Number"),
-    "boolean": gettext("Boolean"),
-    "null": gettext("Empty"),
-}
 
 ItemKey = Annotated[str, Meta(max_length=255)]
 ItemsType = Dict[ItemKey, Union[str, int, bool, float, None]]

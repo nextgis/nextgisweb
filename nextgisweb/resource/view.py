@@ -1,25 +1,25 @@
 import warnings
 from dataclasses import dataclass
+from types import SimpleNamespace
 
 import zope.event
 import zope.event.classhandler
 from msgspec import Meta
 from pyramid.httpexceptions import HTTPFound
-from pyramid.threadlocal import get_current_request
 from sqlalchemy.orm import joinedload, with_polymorphic
 from sqlalchemy.orm.exc import NoResultFound
 from typing_extensions import Annotated
 
 from nextgisweb.env import DBSession, env, gettext
+from nextgisweb.lib import dynmenu as dm
 from nextgisweb.lib.dynmenu import DynMenu, Label, Link
 
 from nextgisweb.auth import OnUserLogin
 from nextgisweb.core.exception import InsufficientPermissions
 from nextgisweb.gui import react_renderer
 from nextgisweb.jsrealm import icon, jsentry
-from nextgisweb.pyramid import JSONType, viewargs
+from nextgisweb.pyramid import JSONType
 from nextgisweb.pyramid.breadcrumb import Breadcrumb, breadcrumb_adapter
-from nextgisweb.pyramid.psection import PageSections
 
 from .event import OnChildClasses, OnDeletePrompt
 from .exception import ResourceNotFound
@@ -27,11 +27,9 @@ from .extaccess import ExternalAccessLink
 from .interface import IResourceBase
 from .model import Resource
 from .permission import Permission, Scope
+from .psection import PageSections
 from .scope import ResourceScope
 
-MAIN_SECTION_JSENTRY = jsentry("@nextgisweb/resource/main-section")
-CHILDREN_SECTION_JSENTRY = jsentry("@nextgisweb/resource/children-section")
-EXTERNAL_ACCESS_JSENTRY = jsentry("@nextgisweb/resource/external-access")
 RESOURCE_FILTER_JSENTRY = jsentry("@nextgisweb/resource/resources-filter")
 
 ResourceID = Annotated[int, Meta(ge=0, description="Resource ID")]
@@ -104,10 +102,24 @@ def resource_breadcrumb(obj, request):
         )
 
 
-@viewargs(renderer="nextgisweb:pyramid/template/psection.mako")
+@react_renderer("@nextgisweb/resource/page/show")
 def show(request):
     request.resource_permission(ResourceScope.read)
-    return dict(obj=request.context, sections=request.context.__psection__)
+    obj = request.context
+
+    sections = list()
+    for section in resource_sections:
+        if not (ctx := section.callback(obj, request=request)):
+            continue
+        if not isinstance(ctx, dict):
+            ctx = dict()
+        sections.append({"module": section.jsentry, "props": ctx})
+
+    props = {"resourceId": obj.id, "sectionsConfig": sections}
+    return dict(
+        props=props,
+        obj=request.context,
+    )
 
 
 def root(request):
@@ -255,7 +267,104 @@ def creatable_resources(parent, *, user):
     return result
 
 
+# Sections
+
 resource_sections = PageSections("resource_section")
+
+
+@resource_sections("@nextgisweb/resource/resource-section/main", order=-100)
+def resource_section_main(obj, *, request, **kwargs):
+    tr = request.localizer.translate
+
+    result = {"resourceId": obj.id}
+
+    summary = result["summary"] = []
+    summary.append((tr(gettext("Type")), f"{tr(obj.cls_display_name)} ({obj.cls})"))
+    if keyname := obj.keyname:
+        summary.append((tr(gettext("Keyname")), keyname))
+
+    if get_info := getattr(obj, "get_info", None):
+        for key, value in get_info():
+            summary.append((tr(key), str(tr(value))))
+
+    summary.append((tr(gettext("Owner")), tr(obj.owner_user.display_name_i18n)))
+
+    result["creatable"] = [c.identity for c in creatable_resources(obj, user=request.user)]
+
+    return result
+
+
+@resource_sections("@nextgisweb/resource/resource-section/children", order=-50)
+def resource_section_children(obj, *, request, **kwargs):
+    if len(obj.children) == 0:
+        return
+
+    tr = request.localizer.translate
+
+    resources = [
+        resource
+        for resource in obj.children
+        if (ResourceScope.read in resource.permissions(request.user))
+    ]
+
+    resources.sort(key=lambda res: (res.cls_order, res.display_name))
+
+    payload = list()
+    for item in resources:
+        idata = dict(
+            id=item.id,
+            displayName=item.display_name,
+            cls=item.cls,
+            clsDisplayName=tr(item.cls_display_name),
+            creationDate=item.creation_date,
+            ownerUserDisplayName=tr(item.owner_user.display_name_i18n),
+        )
+
+        iacts = idata["actions"] = list()
+        args = SimpleNamespace(obj=item, request=request)
+        for menu_item in item.__dynmenu__.build(args):
+            if (
+                isinstance(menu_item, dm.Link)
+                and menu_item.important
+                and menu_item.icon is not None
+            ):
+                iacts.append(
+                    dict(
+                        href=menu_item.url(args),
+                        target=menu_item.target,
+                        title=tr(menu_item.label),
+                        icon=menu_item.icon,
+                        key=menu_item.key,
+                    )
+                )
+
+        payload.append(idata)
+
+    return {"resourceChildren": payload}
+
+
+@resource_sections("@nextgisweb/resource/resource-section/description", order=-60)
+def resource_section_description(obj, **kwargs):
+    return obj.description is not None
+
+
+@resource_sections("@nextgisweb/resource/resource-section/external-access")
+def resource_section_external_access(obj, *, request, **kwargs):
+    tr = request.localizer.translate
+
+    external_docs_links = request.env.pyramid.options["nextgis_external_docs_links"]
+    links = list()
+    for link in ExternalAccessLink.registry:
+        if itm := link.factory(obj, request):
+            links.append(
+                dict(
+                    title=tr(itm.title),
+                    help=tr(itm.help) if itm.help else None,
+                    docsUrl=itm.docs_url if external_docs_links else None,
+                    url=itm.url,
+                )
+            )
+    return {"links": links} if len(links) > 0 else None
 
 
 def setup_pyramid(comp, config):
@@ -315,37 +424,13 @@ def setup_pyramid(comp, config):
     )
 
     # CRUD
+
     _resource_route("create", r"{id:uint}/create", get=create)
     _resource_route("update", r"{id:uint}/update", get=update)
     _resource_route("delete", r"{id:uint}/delete", get=delete)
 
-    # Sections
-
-    # TODO: Deprecate, use resource_sections directly
-    Resource.__psection__ = resource_sections
-
-    @resource_sections(priority=0)
-    def resource_section_main(obj):
-        return True
-
-    @resource_sections(priority=40)
-    def resource_section_children(obj):
-        return len(obj.children) > 0
-
-    @resource_sections(priority=20)
-    def resource_section_description(obj):
-        return obj.description is not None
-
-    @resource_sections()
-    def resource_section_external_access(obj):
-        items = list()
-        request = get_current_request()
-        for link in ExternalAccessLink.registry:
-            if itm := link.factory(obj, request):
-                items.append(itm)
-        return dict(links=items) if len(items) > 0 else None
-
     # Actions
+
     Resource.__dynmenu__ = DynMenu(
         Label("create", gettext("Create resource")),
         Label("operation", gettext("Action")),

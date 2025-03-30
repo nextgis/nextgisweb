@@ -1,17 +1,18 @@
-from nextgisweb.env import gettext
-
 from nextgisweb.jsrealm import jsentry
 from nextgisweb.resource import Resource, Widget
 from nextgisweb.resource.view import resource_sections
 
 
-class Widget(Widget):
+class ResMetaWidget(Widget):
     resource = Resource
     operation = ("create", "update")
     amdmod = jsentry("@nextgisweb/resmeta/editor")
 
 
+@resource_sections("@nextgisweb/resmeta/resource-section", order=80)
+def resource_section(obj, **kwargs):
+    return len(obj.resmeta) > 0
+
+
 def setup_pyramid(comp, config):
-    @resource_sections(title=gettext("Metadata"), priority=40)
-    def resource_section(obj):
-        return len(obj.resmeta) > 0
+    pass
