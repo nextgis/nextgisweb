@@ -26,120 +26,123 @@ const DEFAULT_ROW_ACTIONS = Object.keys(
     WELLKNOWN_ROW_ACTIONS
 ) as FunctionKeys<EdiTableStore>[];
 
-function EdiTableComponent<R extends AnyObject = AnyObject>({
-    store,
-    columns,
-    rowActions = DEFAULT_ROW_ACTIONS,
-    className,
-    size = "small",
-    rowKey,
-    ...tableProps
-}: EdiTableProps<EdiTableStore<R>, R>) {
-    const renderActs = useCallback(
-        (row: R) => {
-            const actions: RowAction[] = [];
-            for (const actOrKey of rowActions) {
-                const actConfig =
-                    typeof actOrKey === "string"
-                        ? {
-                              key: actOrKey,
-                              ...WELLKNOWN_ROW_ACTIONS[actOrKey],
-                          }
-                        : (actOrKey as RowAction);
+export const EdiTable = observer(
+    <R extends AnyObject = AnyObject>({
+        store,
+        columns,
+        rowActions = DEFAULT_ROW_ACTIONS,
+        className,
+        size = "small",
+        rowKey,
+        ...tableProps
+    }: EdiTableProps<EdiTableStore<R>, R>) => {
+        const renderActs = useCallback(
+            (row: R) => {
+                const actions: RowAction[] = [];
+                for (const actOrKey of rowActions) {
+                    const actConfig =
+                        typeof actOrKey === "string"
+                            ? {
+                                  key: actOrKey,
+                                  ...WELLKNOWN_ROW_ACTIONS[actOrKey],
+                              }
+                            : (actOrKey as RowAction);
 
-                let act: RowAction;
+                    let act: RowAction;
 
-                if (typeof actConfig.callback === "string") {
-                    const storeCbKey = actConfig.callback;
-                    const catCallback = store[storeCbKey];
+                    if (typeof actConfig.callback === "string") {
+                        const storeCbKey = actConfig.callback;
+                        const catCallback = store[storeCbKey];
 
-                    if (typeof catCallback !== "function") continue;
-                    act = { ...actConfig, callback: catCallback };
-                    act.callback = act.callback.bind(store);
-                } else {
-                    act = actConfig;
-                }
-
-                actions.push(act);
-            }
-            return <RowActions {...{ row, actions, store }} />;
-        },
-        [store, rowActions]
-    );
-
-    const tableDataSource = [...store.rows];
-
-    // There is no way to append a placeholder row by overriding components
-    // property. It works in general, but looses focus on inputs. So we add
-    // placeholders to rows and customize rendering via hooks.
-    store.placeholder && tableDataSource.push(store.placeholder);
-
-    const tableColumns = useMemo(() => {
-        const isPlaceholder = (row: unknown) => row === store.placeholder;
-        const actsCell = { className: "row-actions" };
-        const hideCell = { colSpan: 0 };
-        const placeholderCell = {
-            colSpan: columns.length + 1,
-            className: "placeholder",
-        };
-
-        return columns
-            .map(({ key, component, shrink, ...columnProps }, idx) => {
-                const result: TableColumnType = {
-                    key,
-                    dataIndex: String(key),
-                    ...columnProps,
-                };
-
-                const className = classNames(
-                    columnProps.className || String(key),
-                    { "shrink": shrink }
-                );
-
-                const style: React.CSSProperties = {};
-                if (shrink && shrink !== true) {
-                    style.minWidth = shrink;
-                }
-
-                result.onHeaderCell = () => ({ className, ...{ style } });
-                result.onCell = (row) => {
-                    if (isPlaceholder(row)) {
-                        return idx === 0 ? placeholderCell : hideCell;
+                        if (typeof catCallback !== "function") continue;
+                        act = { ...actConfig, callback: catCallback };
+                        act.callback = act.callback.bind(store);
+                    } else {
+                        act = actConfig;
                     }
-                    return { className, ...{ style } };
-                };
 
-                if (component) {
-                    result.render = (value, row) =>
-                        createElement(component, {
-                            ...{ value, row },
-                            placeholder: idx === 0 && isPlaceholder(row),
-                        });
+                    actions.push(act);
                 }
+                return <RowActions {...{ row, actions, store }} />;
+            },
+            [store, rowActions]
+        );
 
-                return result;
-            })
-            .concat([
-                {
-                    key: "rowActions",
-                    fixed: "right",
-                    onHeaderCell: () => actsCell,
-                    onCell: (row) => (isPlaceholder(row) ? hideCell : actsCell),
-                    render: (_, row) => renderActs(row),
-                },
-            ]);
-    }, [store, columns, renderActs]);
+        const tableDataSource = [...store.rows];
 
-    return (
-        <Table
-            className={classNames("ngw-gui-edi-table", className)}
-            dataSource={tableDataSource}
-            columns={tableColumns}
-            size={size}
-            rowKey={rowKey}
-            {...tableProps}
-        />
-    );
-}
+        // There is no way to append a placeholder row by overriding components
+        // property. It works in general, but looses focus on inputs. So we add
+        // placeholders to rows and customize rendering via hooks.
+        store.placeholder && tableDataSource.push(store.placeholder);
 
-export const EdiTable = observer(EdiTableComponent);
+        const tableColumns = useMemo(() => {
+            const isPlaceholder = (row: unknown) => row === store.placeholder;
+            const actsCell = { className: "row-actions" };
+            const hideCell = { colSpan: 0 };
+            const placeholderCell = {
+                colSpan: columns.length + 1,
+                className: "placeholder",
+            };
+
+            return columns
+                .map(({ key, component, shrink, ...columnProps }, idx) => {
+                    const result: TableColumnType = {
+                        key,
+                        dataIndex: String(key),
+                        ...columnProps,
+                    };
+
+                    const className = classNames(
+                        columnProps.className || String(key),
+                        { "shrink": shrink }
+                    );
+
+                    const style: React.CSSProperties = {};
+                    if (shrink && shrink !== true) {
+                        style.minWidth = shrink;
+                    }
+
+                    result.onHeaderCell = () => ({ className, ...{ style } });
+                    result.onCell = (row) => {
+                        if (isPlaceholder(row)) {
+                            return idx === 0 ? placeholderCell : hideCell;
+                        }
+                        return { className, ...{ style } };
+                    };
+
+                    if (component) {
+                        result.render = (value, row) =>
+                            createElement(component, {
+                                ...{ value, row },
+                                placeholder: idx === 0 && isPlaceholder(row),
+                            });
+                    }
+
+                    return result;
+                })
+                .concat([
+                    {
+                        key: "rowActions",
+                        fixed: "right",
+                        onHeaderCell: () => actsCell,
+                        onCell: (row) =>
+                            isPlaceholder(row) ? hideCell : actsCell,
+                        render: (_, row) => renderActs(row),
+                    },
+                ]);
+        }, [store, columns, renderActs]);
+
+        return (
+            <Table
+                className={classNames("ngw-gui-edi-table", className)}
+                dataSource={tableDataSource}
+                columns={tableColumns}
+                size={size}
+                rowKey={rowKey}
+                {...tableProps}
+            />
+        );
+    }
+);
+
+EdiTable.displayName = "EdiTable";
