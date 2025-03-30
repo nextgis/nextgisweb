@@ -55,7 +55,7 @@ const FIELD_INDEX = Object.fromEntries(FIELDS.map((f, i) => [f, i]));
 
 const fld = (rec: AuditFields, name: string): string => {
     const val = rec[FIELD_INDEX[name]];
-    return val ? String(val) : "";
+    return val !== undefined && val !== null ? String(val) : "";
 };
 
 export function isAuditArrayLogEntry(
