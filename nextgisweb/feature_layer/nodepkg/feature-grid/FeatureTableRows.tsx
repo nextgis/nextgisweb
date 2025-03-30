@@ -122,20 +122,15 @@ export function FeatureTableRows({
         <>
             {virtualItems.map((virtualRow) => {
                 let selectedKey: number | undefined = undefined;
-                let className = "tr";
-
                 const row = data.find((d) => d.__rowIndex === virtualRow.index);
                 if (row) {
                     selectedKey = selectedIds.find((s) => s === row[$FID]);
                 }
 
-                if (selectedKey) {
-                    className += " selected";
-                }
                 return (
                     <div
                         key={virtualRow.key as Key}
-                        className={className}
+                        className={classNames("tr", selectedKey && "selected")}
                         data-index={virtualRow.index}
                         ref={measureElement}
                         style={{

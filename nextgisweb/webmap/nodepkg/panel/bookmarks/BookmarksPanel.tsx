@@ -1,3 +1,4 @@
+import classNames from "classnames";
 import { sortBy } from "lodash-es";
 import { observer } from "mobx-react-lite";
 import { useMemo, useState } from "react";
@@ -66,8 +67,8 @@ const BookmarksPanel = observer<PanelPluginWidgetProps>(
                 bookmarkSelected && bookmark.key === bookmarkSelected.key;
             return (
                 <div
-                    className={`bookmark ${isSelected ? "selected" : ""}`}
                     key={bookmark.key}
+                    className={classNames("bookmark", isSelected && "selected")}
                     onClick={() => selectBookmark(bookmark)}
                 >
                     <span>{bookmark.label}</span>

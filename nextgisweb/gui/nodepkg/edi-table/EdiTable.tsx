@@ -1,3 +1,4 @@
+import classNames from "classnames";
 import { observer } from "mobx-react-lite";
 import { createElement, useCallback, useMemo } from "react";
 
@@ -34,8 +35,6 @@ function EdiTableComponent<R extends AnyObject = AnyObject>({
     rowKey,
     ...tableProps
 }: EdiTableProps<EdiTableStore<R>, R>) {
-    className = (className ? className + " " : "") + "ngw-gui-edi-table";
-
     const renderActs = useCallback(
         (row: R) => {
             const actions: RowAction[] = [];
@@ -92,11 +91,14 @@ function EdiTableComponent<R extends AnyObject = AnyObject>({
                     ...columnProps,
                 };
 
-                let className = columnProps.className || String(key);
+                const className = classNames(
+                    columnProps.className || String(key),
+                    { "shrink": shrink }
+                );
+
                 const style: React.CSSProperties = {};
-                if (shrink) {
-                    className += " shrink";
-                    if (shrink !== true) style.minWidth = shrink;
+                if (shrink && shrink !== true) {
+                    style.minWidth = shrink;
                 }
 
                 result.onHeaderCell = () => ({ className, ...{ style } });
@@ -130,9 +132,9 @@ function EdiTableComponent<R extends AnyObject = AnyObject>({
 
     return (
         <Table
+            className={classNames("ngw-gui-edi-table", className)}
             dataSource={tableDataSource}
             columns={tableColumns}
-            className={className}
             size={size}
             rowKey={rowKey}
             {...tableProps}

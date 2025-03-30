@@ -1,3 +1,5 @@
+import classNames from "classnames";
+
 import { registry as drivers } from "./driver";
 import { registry as testentries } from "./registry";
 
@@ -30,7 +32,7 @@ export const menu = (selected: string, element: HTMLElement) => {
         }
 
         const l = document.createElement("li");
-        l.className = "item" + (selected === p.identity ? " selected" : "");
+        l.className = classNames("item", selected === p.identity && "selected");
         root.appendChild(l);
 
         const a = document.createElement("a");

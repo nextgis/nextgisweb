@@ -1,6 +1,7 @@
 import type { ClassicEditor } from "@ckeditor/ckeditor5-editor-classic";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import type { SourceEditing } from "@ckeditor/ckeditor5-source-editing";
+import classNames from "classnames";
 import { useCallback, useEffect, useState } from "react";
 
 import { Editor } from "@nextgisweb/ckeditor";
@@ -66,11 +67,10 @@ export function TextEditor({
 
     return (
         <div
-            className={
-                "ngw-gui-component-text-editor" +
-                (!border ? " borderless" : "") +
-                (parentHeight ? " parent-height" : "")
-            }
+            className={classNames("ngw-gui-component-text-editor", {
+                "borderless": !border,
+                "parent-height": parentHeight,
+            })}
             style={style}
         >
             <CKEditor<ClassicEditor>

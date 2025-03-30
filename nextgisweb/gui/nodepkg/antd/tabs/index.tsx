@@ -1,4 +1,5 @@
 import { Tabs as TabsBase } from "antd";
+import classNames from "classnames";
 
 import "./index.less";
 
@@ -13,11 +14,9 @@ export default function Tabs({
     parentHeight = false,
     ...props
 }: TabsProps) {
-    if (parentHeight) {
-        className = (className ? className.split(" ") : [])
-            .concat("ant-tabs-parent-height")
-            .join(" ");
-    }
+    className = classNames(className, {
+        "ant-tabs-parent-height": parentHeight,
+    });
 
-    return <TabsBase {...{ ...props, className }} />;
+    return <TabsBase className={className} {...props} />;
 }
