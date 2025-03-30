@@ -9,6 +9,7 @@ import type { ParamsOf } from "../type";
 import { extractError } from "./extractError";
 import type { ErrorInfo } from "./extractError";
 import { Body, Footer, TechInfo } from "./shared";
+import { isAbortError } from "./util";
 
 type ModalProps = ParamsOf<typeof Modal>;
 
@@ -62,9 +63,25 @@ export function ErrorModal({
     );
 }
 
-export function errorModal(error: unknown, props?: Partial<ErrorModalProps>) {
+interface ErrorModalOpts extends Partial<ErrorModalProps> {
+    ignoreAbort?: boolean;
+}
+
+export function errorModal(error: unknown, opts?: ErrorModalOpts): boolean {
+    const { ignoreAbort, ...props } = opts ?? {};
+    if (ignoreAbort && isAbortError(error)) return false;
+
     if (window.ngwSentry && error instanceof Error) {
         window.ngwSentry.captureException(error);
     }
-    return showModal(ErrorModal, { error: extractError(error), ...props });
+
+    showModal(ErrorModal, { error: extractError(error), ...props });
+    return true;
+}
+
+export function errorModalUnlessAbort(
+    error: unknown,
+    opts?: Omit<ErrorModalOpts, "ignoreAbortError">
+): boolean {
+    return errorModal(error, { ignoreAbort: true, ...opts });
 }
