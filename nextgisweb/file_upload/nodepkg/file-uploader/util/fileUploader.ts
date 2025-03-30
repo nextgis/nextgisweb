@@ -102,7 +102,7 @@ async function tusUpload({
             });
             if (signal) {
                 signal.addEventListener("abort", () => {
-                    uploader.abort();
+                    uploader.abort(true);
                     reject(makeAbortError());
                 });
             }
