@@ -11,13 +11,12 @@ from packaging import version as pkg_version
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 from time import sleep
-from typing import List
+from typing import List, Union
 
-from attr import asdict, attrib, attrs
 from babel.messages.catalog import Catalog
 from babel.messages.mofile import write_mo
 from babel.messages.pofile import read_po
-from msgspec import Struct
+from msgspec import Struct, to_builtins
 from poeditor import POEditorAPI
 
 from nextgisweb.env import Env, env
@@ -259,17 +258,16 @@ def cmd_compile(args):
                 write_mo(mo, catalog)
 
 
-@attrs
-class StatRecord:
-    package = attrib(default=None)
-    component = attrib(default=None)
-    locale = attrib(default=None)
+class StatRecord(Struct, kw_only=True):
+    package: Union[str, None] = None
+    component: Union[str, None] = None
+    locale: Union[str, None] = None
 
-    count = attrib(default=0)
-    translated = attrib(default=0)
-    not_found = attrib(default=0)
-    not_translated = attrib(default=0)
-    obsolete = attrib(default=0)
+    count: int = 0
+    translated: int = 0
+    not_found: int = 0
+    not_translated: int = 0
+    obsolete: int = 0
 
     @property
     def completeness(self):
@@ -347,7 +345,7 @@ def cmd_stat(args):
             )
 
     if args.json:
-        print(json.dumps([asdict(i) for i in data], indent=2))
+        print(json.dumps([to_builtins(i) for i in data], indent=2))
         return
 
     locales = sorted(list(all_locales))
