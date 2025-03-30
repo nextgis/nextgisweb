@@ -11,11 +11,13 @@ from packaging import version as pkg_version
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 from time import sleep
+from typing import List
 
 from attr import asdict, attrib, attrs
 from babel.messages.catalog import Catalog
 from babel.messages.mofile import write_mo
 from babel.messages.pofile import read_po
+from msgspec import Struct
 from poeditor import POEditorAPI
 
 from nextgisweb.env import Env, env
@@ -77,11 +79,19 @@ def catalog_filename(component, locale, ext="po", internal=False, mkdir=False):
     return base / "{}.{}".format(locale, ext)
 
 
+class ComponentMeta(Struct, kw_only=True):
+    comp: str
+    pkg: str
+    locales: List[str]
+    external: bool
+
+
 def components_and_locales(args, work_in_progress=False):
-    ext_path = env.core.options["locale.external_path"]
-    ext_meta = (
-        json.loads((Path(ext_path) / "metadata.json").read_text()) if ext_path is not None else {}
-    )
+    ext_meta = dict()
+    if ext_path := env.core.options["locale.external_path"]:
+        ext_meta_path = Path(ext_path) / "metadata.json"
+        ext_meta = json.loads(ext_meta_path.read_text())
+
     ext_packages = ext_meta.get("packages", [])
     ext_locales = ext_meta.get("locales", [])
 
@@ -105,55 +115,56 @@ def components_and_locales(args, work_in_progress=False):
     for comp_id in env.components.keys():
         if len(filter_comp) > 0 and comp_id not in filter_comp:
             continue
-        pname = pkginfo.comp_pkg(comp_id)
-        if len(filter_package) > 0 and pname not in filter_package:
+
+        pkg = pkginfo.comp_pkg(comp_id)
+        if len(filter_package) > 0 and pkg not in filter_package:
             continue
+
+        external = pkg in ext_packages
 
         if len(getattr(args, "locale", [])) > 0:
             locales = list(args.locale)
         else:
-            locales = ["ru"]
-            if pname in ext_packages:
-                locales.extend(ext_locales)
-            if work_in_progress and ext_path is not None:
-                comp_path = Path(ext_path) / pname / comp_id
+            locales = ["ru", *(ext_locales if external else [])]
+            if work_in_progress and external:
+                comp_path = Path(ext_path) / pkg / comp_id
                 for fn in comp_path.glob("*.po"):
                     candidate = fn.with_suffix("").name
-                    if candidate not in locales:
-                        locales.append(candidate)
+                    if re.fullmatch(r"\w{2,3}(-\w{2,3})?", candidate):
+                        if candidate not in locales:
+                            locales.append(candidate)
 
         locales.sort()
         logger.debug("Locale list for [%s] = %s", comp_id, " ".join(locales))
-        yield comp_id, locales
+
+        yield ComponentMeta(
+            comp=comp_id,
+            pkg=pkg,
+            locales=locales,
+            external=external,
+        )
 
 
 def cmd_extract(args):
-    for cident, _ in components_and_locales(args):
-        catalog = extract_component(cident)
-        logger.info("%d messages extracted from component [%s]", len(catalog), cident)
+    for meta in components_and_locales(args):
+        catalog = extract_component(meta.comp)
+        logger.info("%d messages extracted from component [%s]", len(catalog), meta.comp)
 
-        outfn = catalog_filename(cident, None, ext="pot", mkdir=True)
+        outfn = catalog_filename(meta.comp, None, ext="pot", mkdir=True)
         logger.debug("Writing POT-file to %s", outfn)
 
         write_po(outfn, catalog, ignore_obsolete=True)
 
 
 def cmd_update(args):
-    for comp_id, locales in components_and_locales(args, work_in_progress=True):
-        pot_path = catalog_filename(comp_id, "", ext="pot", mkdir=True)
+    for meta in components_and_locales(args, work_in_progress=True):
+        pot_path = catalog_filename(meta.comp, "", ext="pot", mkdir=True)
 
         if not pot_path.is_file() or args.extract:
-            cmd_extract(
-                Namespace(
-                    package=None,
-                    compackage=[
-                        comp_id,
-                    ],
-                )
-            )
+            cmd_extract(Namespace(package=None, compackage=[meta.comp]))
 
-        for locale in locales:
-            po_path = catalog_filename(comp_id, locale, mkdir=True)
+        for locale in meta.locales:
+            po_path = catalog_filename(meta.comp, locale, mkdir=True)
 
             with io.open(pot_path, "r") as pot_fd:
                 pot = read_po(pot_fd, locale=to_gettext_locale(locale))
@@ -163,13 +174,13 @@ def cmd_update(args):
                 if pot_is_empty:
                     continue
 
-                logger.info("Creating component [%s] locale [%s]...", comp_id, locale)
+                logger.info("Creating component [%s] locale [%s]...", meta.comp, locale)
                 write_po(po_path, pot)
 
                 continue
 
             if pot_is_empty:
-                logger.info("Deleting component [%s] locale [%s]...", comp_id, locale)
+                logger.info("Deleting component [%s] locale [%s]...", meta.comp, locale)
                 po_path.unlink()
                 continue
 
@@ -179,7 +190,7 @@ def cmd_update(args):
             not_found, _, obsolete = compare_catalogs(pot, po)
 
             if not_found or obsolete or args.force:
-                logger.info("Updating component [%s] locale [%s]...", comp_id, locale)
+                logger.info("Updating component [%s] locale [%s]...", meta.comp, locale)
 
                 po.update(pot, True)
 
@@ -214,9 +225,9 @@ def update_catalog_using_ai_catalog(
 
 
 def cmd_compile(args):
-    for comp_id, locales in components_and_locales(args, work_in_progress=False):
-        for locale in locales:
-            catfn = partial(catalog_filename, comp_id, locale)
+    for meta in components_and_locales(args, work_in_progress=False):
+        for locale in meta.locales:
+            catfn = partial(catalog_filename, meta.comp, locale)
             po_path = catfn()
             if not po_path.exists():
                 mo_path = catfn(ext="mo", internal=True)
@@ -225,21 +236,21 @@ def cmd_compile(args):
                 continue
 
             with po_path.open("r") as po:
-                catalog = read_po(po, locale=to_gettext_locale(locale), domain=comp_id)
+                catalog = read_po(po, locale=to_gettext_locale(locale), domain=meta.comp)
 
             catalog_ai = None
-            cat_ai_fn = partial(catalog_filename, comp_id, locale, "ai.po")
+            cat_ai_fn = partial(catalog_filename, meta.comp, locale, "ai.po")
             ai_po_path = cat_ai_fn()
             if ai_po_path.exists():
                 with ai_po_path.open("r") as ai_po:
-                    catalog_ai = read_po(ai_po, locale=to_gettext_locale(locale), domain=comp_id)
+                    catalog_ai = read_po(ai_po, locale=to_gettext_locale(locale), domain=meta.comp)
 
             if catalog_ai:
                 update_catalog_using_ai_catalog(catalog, catalog_ai)
 
             logger.info(
                 "Compiling component [%s] locale [%s] (%d messages)...",
-                comp_id,
+                meta.comp,
                 locale,
                 len(catalog),
             )
@@ -298,20 +309,13 @@ def cmd_stat(args):
     all_components = set()
     all_locales = set()
 
-    for comp_id, locales in components_and_locales(args, work_in_progress=args.work_in_progress):
-        all_packages.add(pkginfo.comp_pkg(comp_id))
-        all_components.add(comp_id)
+    for meta in components_and_locales(args, work_in_progress=args.work_in_progress):
+        all_packages.add(meta.pkg)
+        all_components.add(meta.comp)
 
-        pot_path = catalog_filename(comp_id, None, ext="pot", mkdir=False)
+        pot_path = catalog_filename(meta.comp, None, ext="pot", mkdir=False)
         if not pot_path.is_file() or args.extract:
-            cmd_extract(
-                Namespace(
-                    package=None,
-                    compackage=[
-                        comp_id,
-                    ],
-                )
-            )
+            cmd_extract(Namespace(package=None, compackage=[meta.comp]))
 
         if pot_path.exists():
             with pot_path.open("r") as fd:
@@ -319,9 +323,9 @@ def cmd_stat(args):
         else:
             pot = Catalog()
 
-        for locale in locales:
+        for locale in meta.locales:
             all_locales.add(locale)
-            po_path = catalog_filename(comp_id, locale, ext="po", mkdir=False)
+            po_path = catalog_filename(meta.comp, locale, ext="po", mkdir=False)
             if po_path.exists():
                 with po_path.open("r") as po_fd:
                     po = read_po(po_fd, locale=to_gettext_locale(locale))
@@ -331,8 +335,8 @@ def cmd_stat(args):
             not_found, not_translated, obsolete = compare_catalogs(pot, po)
             data.append(
                 StatRecord(
-                    package=pkginfo.comp_pkg(comp_id),
-                    component=comp_id,
+                    package=meta.pkg,
+                    component=meta.comp,
                     locale=locale,
                     count=len(pot),
                     translated=len(pot) - len(not_found) - len(not_translated),
@@ -427,36 +431,36 @@ def cmd_poeditor_sync(args):
     # Update local po-files
     poeditor_terms = {}
     reference_catalogs = {}
-    for comp_id, locales in components_and_locales(args, work_in_progress=True):
-        pname = pkginfo.comp_pkg(comp_id)
+    for meta in components_and_locales(args, work_in_progress=True):
+        if not meta.external:
+            continue
 
-        if pname not in pversions:
-            local_ver = pkginfo.packages[pname].version
-            if (remote_ver := description.packages.get(pname)) and pkg_version.parse(
+        if meta.pkg not in pversions:
+            local_ver = pkginfo.packages[meta.pkg].version
+            if (remote_ver := description.packages.get(meta.pkg)) and pkg_version.parse(
                 local_ver
             ) < pkg_version.parse(remote_ver):
                 raise RuntimeError(
-                    "Version of the '%s' package must be not lower than %s in order to use translations from the POEditor "
-                    "(current version: %s)." % (pname, remote_ver, local_ver)
+                    "Version of the '%s' package must be not lower "
+                    "than %s in order to use translations from the POEditor "
+                    "(current version: %s)." % (meta.pkg, remote_ver, local_ver)
                 )
-            pversions[pname] = local_ver
+            pversions[meta.pkg] = local_ver
 
         cmd_update(
             Namespace(
                 package=None,
-                compackage=[
-                    comp_id,
-                ],
-                locale=[lc for lc in locales if lc != "ru"],
+                compackage=[meta.comp],
+                locale=[lc for lc in meta.locales if lc != "ru"],
                 extract=args.extract,
                 no_obsolete=True,
                 force=False,
             )
         )
 
-        for locale in locales:
-            if locale == "ru" and locales != ["ru"]:
-                po_path = catalog_filename(comp_id, locale)
+        for locale in meta.locales:
+            if locale == "ru" and meta.locales != ["ru"]:
+                po_path = catalog_filename(meta.comp, locale)
                 if po_path.exists():
                     ref_catalog = reference_catalogs.get(locale)
                     if ref_catalog is None:
@@ -464,7 +468,7 @@ def cmd_poeditor_sync(args):
                         reference_catalogs[locale] = ref_catalog
                     with po_path.open("r") as po_fd:
                         for m in read_po(po_fd, locale=to_gettext_locale(locale)):
-                            m.context = comp_id
+                            m.context = meta.comp
                             ref_catalog[m.id] = m
                 continue
 
@@ -477,9 +481,9 @@ def cmd_poeditor_sync(args):
                 poeditor_terms[locale] = terms
 
             # Filter terms by context
-            terms = [term for term in terms if comp_id == term["context"]]
+            terms = [term for term in terms if meta.comp == term["context"]]
 
-            po_path = catalog_filename(comp_id, locale)
+            po_path = catalog_filename(meta.comp, locale)
 
             if not po_path.exists():
                 continue
@@ -507,7 +511,7 @@ def cmd_poeditor_sync(args):
                 logger.info(
                     "%d messages translated for component [%s] locale [%s]",
                     updated,
-                    comp_id,
+                    meta.comp,
                     locale,
                 )
 
@@ -519,15 +523,18 @@ def cmd_poeditor_sync(args):
         remote_terms[item["term"]].add(item["context"])
 
     comps = []
-    for comp_id, _ in components_and_locales(args, work_in_progress=True):
-        pot_path = catalog_filename(comp_id, "", ext="pot")
+    for meta in components_and_locales(args, work_in_progress=True):
+        if not meta.external:
+            continue
+
+        pot_path = catalog_filename(meta.comp, "", ext="pot")
         with pot_path.open("r") as fd:
             pot = read_po(fd)
         for msg in pot:
             if msg.id == "":
                 continue
-            target_state[msg.id][comp_id] = True
-        comps.append(comp_id)
+            target_state[msg.id][meta.comp] = True
+        comps.append(meta.comp)
 
     for comp_id in comps:
         for msg_id in target_state:
