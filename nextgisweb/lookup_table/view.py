@@ -13,7 +13,7 @@ class LookupTableWidget(Widget):
 
 @resource_sections("@nextgisweb/lookup-table/resource-section")
 def resource_section(obj, **kwargs):
-    return isinstance(obj, LookupTable) and len(obj.val) > 0
+    return isinstance(obj, LookupTable) and len(obj.value) > 0
 
 
 def setup_pyramid(comp, config):
