@@ -47,14 +47,19 @@ export function useFileUploader<M extends boolean = false>({
     }, [meta, setInitMeta]);
 
     useEffect(() => {
+        const originalDocTitle = docTitle.current;
         setProgressText(
             progress !== undefined ? msgProgressFmt(String(progress)) : null
         );
         if (showProgressInDocTitle && progress !== undefined) {
-            document.title = `${progress} | ${docTitle.current}`;
-        } else if (document.title !== docTitle.current) {
-            document.title = docTitle.current;
+            document.title = `${progress} | ${originalDocTitle}`;
+        } else if (document.title !== originalDocTitle) {
+            document.title = originalDocTitle;
         }
+
+        return () => {
+            document.title = originalDocTitle;
+        };
     }, [progress, showProgressInDocTitle]);
 
     useEffect(() => {
@@ -85,7 +90,8 @@ export function useFileUploader<M extends boolean = false>({
                 setProgressText(message);
                 try {
                     await loader(uploadedFiles, { signal });
-                } catch {
+                } catch (er) {
+                    console.log(er);
                     return [];
                 }
             }
