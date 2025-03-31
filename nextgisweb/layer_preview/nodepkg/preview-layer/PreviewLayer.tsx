@@ -82,7 +82,7 @@ export function PreviewLayer({
         []
     );
 
-    if (isResLoading && isExtentLoading) {
+    if (isResLoading || isExtentLoading) {
         return <LoadingWrapper />;
     }
     return (

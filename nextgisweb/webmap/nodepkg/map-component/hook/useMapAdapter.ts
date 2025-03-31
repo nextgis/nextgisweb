@@ -63,12 +63,6 @@ export function useMapAdapter({
 
         const curView = mapStore.olMap.getView();
 
-        if (center) {
-            curView.setCenter(center);
-        }
-        if (zoom !== undefined) {
-            curView.setZoom(zoom);
-        }
         if (minZoom !== undefined) {
             curView.setMinZoom(minZoom);
         }
@@ -90,6 +84,13 @@ export function useMapAdapter({
                 ),
                 fitOptions
             );
+        } else {
+            if (center) {
+                curView.setCenter(center);
+            }
+            if (zoom !== undefined) {
+                curView.setZoom(zoom);
+            }
         }
     }, [mapStore, center, zoom, minZoom, maxZoom, mapExtent, mapSRS.id]);
 
