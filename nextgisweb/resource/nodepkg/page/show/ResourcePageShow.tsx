@@ -1,12 +1,15 @@
 import { zip } from "lodash-es";
 import { useEffect, useMemo, useState } from "react";
 
+import { Flex, Spin } from "@nextgisweb/gui/antd";
 import { assert } from "@nextgisweb/jsrealm/error";
 import { useRouteGet } from "@nextgisweb/pyramid/hook";
 import type {
     ResourceSection,
     ResourceSectionProps,
 } from "@nextgisweb/resource/resource-section";
+
+import { LoadingOutlined } from "@ant-design/icons";
 
 type SectionConfig = { module: string; props: NonNullable<unknown> };
 
@@ -78,7 +81,13 @@ export function ResourcePageShow({
     }, [components, resourceData, resourceId, sectionsConfig]);
 
     if (resourceError) throw resourceError;
-    if (!sections) return <></>;
+    if (!sections) {
+        return (
+            <Flex style={{ padding: "4em 8em" }} vertical>
+                <Spin size="large" indicator={<LoadingOutlined spin />} />
+            </Flex>
+        );
+    }
 
     return (
         <>
