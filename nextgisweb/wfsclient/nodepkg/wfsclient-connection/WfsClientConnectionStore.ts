@@ -47,7 +47,7 @@ export class WfsClientConnectionStore
     readonly path = path.init(null, this);
     readonly username = username.init(null, this);
     readonly password = password.init(null, this);
-    readonly version = version.init("2.0.2", this);
+    readonly version = version.init("2.0.0", this);
 
     @observable.ref accessor validate = false;
 
