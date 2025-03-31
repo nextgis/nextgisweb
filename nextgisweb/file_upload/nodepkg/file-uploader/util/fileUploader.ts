@@ -2,7 +2,7 @@ import { Upload, isSupported } from "tus-js-client";
 
 import settings from "@nextgisweb/file-upload/client-settings";
 import { makeAbortError } from "@nextgisweb/gui/error/util";
-import { routeURL } from "@nextgisweb/pyramid/api";
+import { BaseAPIError, routeURL } from "@nextgisweb/pyramid/api";
 
 import type { FileMeta, FileUploaderOptions } from "../type";
 
@@ -79,7 +79,7 @@ async function tusUpload({
                     }
                 },
                 onError: (error) => {
-                    if ("originalResponse" in error) {
+                    if ("originalResponse" in error && error.originalResponse) {
                         const response = error.originalResponse;
                         const respHeader = response.getHeader("Content-Type");
                         if (respHeader === "application/json") {
@@ -87,6 +87,7 @@ async function tusUpload({
                         }
                         reject(error);
                     }
+                    reject(new BaseAPIError());
                 },
                 onSuccess: () => {
                     alreadyUploadedSize += progressFileSize;
