@@ -1,6 +1,12 @@
 .ngw-gui-edi-table {
-    .ant-table {
+    .ant-table .ant-table-container {
         .ant-table-cell {
+            &.row-handle {
+                padding-inline-end: 0;
+                width: 0;
+                white-space: nowrap;
+            }
+
             &.row-actions {
                 text-align: right;
             }

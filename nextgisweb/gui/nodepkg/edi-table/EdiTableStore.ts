@@ -7,4 +7,5 @@ export interface EdiTableStore<Row extends AnyObject = AnyObject> {
 
     cloneRow?: (row: Row) => void;
     deleteRow: (row: Row) => void;
+    moveRow?: (row: Row, index: number) => void;
 }

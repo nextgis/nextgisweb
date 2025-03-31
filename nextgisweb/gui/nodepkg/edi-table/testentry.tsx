@@ -1,6 +1,6 @@
 /** @testentry react */
 import * as falso from "@ngneat/falso";
-import { range } from "lodash-es";
+import { clamp, range, remove } from "lodash-es";
 import { action, observable } from "mobx";
 import { observer } from "mobx-react-lite";
 import { useEffect, useMemo, useState } from "react";
@@ -49,6 +49,16 @@ class Store implements EdiTableStore<Row> {
     @action.bound
     deleteRow(row: Row) {
         this.rows.remove(row);
+    }
+
+    @action.bound
+    moveRow(row: Row, index: number) {
+        index = clamp(index, 0, this.rows.length - 1);
+
+        const newRows = [...this.rows];
+        remove(newRows, (i) => i === row);
+        newRows.splice(index, 0, row);
+        this.rows.replace(newRows);
     }
 }
 
