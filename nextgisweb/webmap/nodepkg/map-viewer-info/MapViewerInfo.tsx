@@ -1,4 +1,4 @@
-import type { Map, MapBrowserEvent } from "ol";
+import type { Map } from "ol";
 import { unByKey } from "ol/Observable";
 import type { EventsKey } from "ol/events";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -63,9 +63,8 @@ export function MapViewerInfo({ map, show }: MapViewerInfoProps) {
 
         const bindEvents = () => {
             if (type === "mouse") {
-                callbackKey = map.on(
-                    "pointermove",
-                    (evt: MapBrowserEvent<UIEvent>) => setCoord(evt.coordinate)
+                callbackKey = map.on("pointermove", (evt) =>
+                    setCoord(evt.coordinate)
                 );
             } else {
                 updateExtent();

@@ -43,7 +43,7 @@ class Control extends Interaction {
         this.tool = options.tool;
     }
 
-    handleClickEvent(evt: MapBrowserEvent<UIEvent>): boolean {
+    handleClickEvent(evt: MapBrowserEvent): boolean {
         if (evt.type === "singleclick") {
             this.tool.execute(evt.pixel);
             evt.preventDefault();
