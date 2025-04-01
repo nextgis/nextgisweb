@@ -9,7 +9,7 @@ import type {
 import { Dropdown, Spin, Tabs } from "@nextgisweb/gui/antd";
 import type { TabsProps } from "@nextgisweb/gui/antd";
 import { SaveButton, TabsLabelBadge } from "@nextgisweb/gui/component";
-import { errorModal } from "@nextgisweb/gui/error";
+import { ErrorModal, errorModal } from "@nextgisweb/gui/error";
 import { useThemeVariables, useUnsavedChanges } from "@nextgisweb/gui/hook";
 import { EditIcon } from "@nextgisweb/gui/icon";
 import { route } from "@nextgisweb/pyramid/api";
@@ -100,7 +100,7 @@ const CompositeWidget = observer(({ setup }: CompositeWidgetProps) => {
     }, [members, operation]);
 
     useEffect(() => {
-        composite.init();
+        composite.init().catch();
     }, [composite]);
 
     const submit = useCallback(
@@ -167,6 +167,10 @@ const CompositeWidget = observer(({ setup }: CompositeWidgetProps) => {
         "color-border-secondary": "colorBorderSecondary",
         "border-radius": "borderRadius",
     });
+
+    if (composite.error) {
+        return <ErrorModal error={composite.error}></ErrorModal>;
+    }
 
     return (
         <div className="ngw-resource-composite" style={themeVariables}>

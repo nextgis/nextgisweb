@@ -1,6 +1,8 @@
 import { get, set } from "lodash-es";
 import { action, computed, observable, runInAction } from "mobx";
 
+import { extractError } from "@nextgisweb/gui/error";
+import type { ErrorInfo } from "@nextgisweb/gui/error/extractError";
 import { BaseError, assert } from "@nextgisweb/jsrealm/error";
 import { BaseAPIError, LunkwillParam, route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -52,6 +54,7 @@ export class CompositeStore {
     @observable.ref accessor members: WidgetMember[] | undefined = undefined;
     @observable.ref accessor loading = true;
     @observable.ref accessor saving = false;
+    @observable.shallow accessor error: ErrorInfo | null = null;
 
     constructor({ setup: request }: CompositeStoreOptions) {
         this.setup = request;
@@ -60,17 +63,26 @@ export class CompositeStore {
     }
 
     async init() {
-        const data = await route("resource.widget").get({ query: this.setup });
-        runInAction(() => {
-            this.#cls = data.cls;
-            this.#parent = data.parent;
-            this.#ownerUser = data.owner_user;
-            this.#sdnBase =
-                data.operation === "create"
-                    ? data.suggested_display_name
-                    : null;
-        });
-        this.loadMembers(data.members);
+        try {
+            const data = await route("resource.widget").get({
+                query: this.setup,
+            });
+            runInAction(() => {
+                this.#cls = data.cls;
+                this.#parent = data.parent;
+                this.#ownerUser = data.owner_user;
+                this.#sdnBase =
+                    data.operation === "create"
+                        ? data.suggested_display_name
+                        : null;
+            });
+            this.loadMembers(data.members);
+        } catch (er) {
+            runInAction(() => {
+                this.loading = false;
+                this.error = extractError(er);
+            });
+        }
     }
 
     private initializationGuard<T>(value: T) {
