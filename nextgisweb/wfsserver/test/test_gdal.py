@@ -1,3 +1,5 @@
+import re
+from datetime import date, datetime
 from itertools import product
 from packaging import version as pkg_version
 from pathlib import Path
@@ -11,13 +13,14 @@ from nextgisweb.env import DBSession
 from nextgisweb.vector_layer import VectorLayer
 from nextgisweb.vector_layer import test as vector_layer_test
 
+from .. import wfs_handler
 from ..model import Layer as WFSLayer
 from ..model import Service as WFSService
 
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
 
 TEST_WFS_VERSIONS = ("2.0.2", "2.0.0", "1.1.0", "1.0.0")
-GDAL_VERSION = gdal.__version__.split("-")[0]
+GDAL_VERSION = pkg_version.parse(gdal.__version__.split("-")[0])
 DATA = Path(vector_layer_test.__file__).parent / "data"
 
 
@@ -31,6 +34,27 @@ def read_dataset(filename):
 def force_schema_validation(ngw_env):
     with ngw_env.wfsserver.force_schema_validation():
         yield
+
+
+@pytest.fixture(scope="module", autouse=True)
+def patch_gdal_dates():
+    # https://github.com/OSGeo/gdal/issues/2403
+    if pkg_version.parse("3.4.1") <= GDAL_VERSION:
+
+        def date_from_iso(value):
+            m = re.match(r"^(\d{4})\/(\d{2})\/(\d{2})$", value)
+            y, mon, d = map(int, m.groups())
+            return date(y, mon, d)
+
+        def datetime_from_iso(value):
+            m = re.match(r"^(\d{4})\/(\d{2})\/(\d{2}) (\d{2}):(\d{2}):(\d{2})$", value)
+            y, mon, d, h, min, s = map(int, m.groups())
+            return datetime(y, mon, d, h, min, s)
+
+        mem = wfs_handler.date_from_iso, wfs_handler.datetime_from_iso
+        wfs_handler.date_from_iso, wfs_handler.datetime_from_iso = date_from_iso, datetime_from_iso
+        yield
+        wfs_handler.date_from_iso, wfs_handler.datetime_from_iso = mem
 
 
 @pytest.fixture(scope="module")
@@ -189,7 +213,7 @@ test_edit_params = []
 
 for version in TEST_WFS_VERSIONS:
     xfail_gdal_create = pytest.mark.xfail(
-        version >= "2.0.0" and pkg_version.parse(GDAL_VERSION) < pkg_version.parse("3.2.1"),
+        version >= "2.0.0" and GDAL_VERSION < pkg_version.parse("3.2.1"),
         reason="GDAL doesn't work correctly with WFS 2.x",
     )
 

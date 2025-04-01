@@ -1321,6 +1321,14 @@ class WFSHandler:
         return _response
 
 
+def date_from_iso(value):
+    return date.fromisoformat(value)
+
+
+def datetime_from_iso(value):
+    return datetime.fromisoformat(value)
+
+
 # Sets feature fields from string represented values and XML element geometry
 def set_feature_data(
     feature: Feature,
@@ -1356,11 +1364,11 @@ def set_feature_data(
         elif field.datatype == FIELD_TYPE.STRING:
             pass
         elif field.datatype == FIELD_TYPE.DATE:
-            v = date.fromisoformat(v)
+            v = date_from_iso(v)
         elif field.datatype == FIELD_TYPE.TIME:
             v = time.fromisoformat(v)
         elif field.datatype == FIELD_TYPE.DATETIME:
-            v = datetime.fromisoformat(v)
+            v = datetime_from_iso(v)
         else:
             raise NotImplementedError
 
