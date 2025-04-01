@@ -1,4 +1,4 @@
-import { extractError } from "@nextgisweb/gui/error";
+import { extractError, isAbortError } from "@nextgisweb/gui/error";
 
 import type { ResourcePickerStore } from "../ResourcePickerStore";
 
@@ -17,9 +17,10 @@ export function actionHandler(
             const result = await originalMethod.apply(this, args);
             return result;
         } catch (err) {
-            const { title } = extractError(err);
-            this.setError(operationName, title);
-            throw err;
+            if (!isAbortError(err)) {
+                const errorInfo = extractError(err);
+                this.setError(operationName, errorInfo);
+            }
         } finally {
             this.setLoading(operationName, false);
         }

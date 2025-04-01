@@ -1,5 +1,6 @@
 import { action, observable, runInAction } from "mobx";
 
+import type { ErrorInfo } from "@nextgisweb/gui/error/extractError";
 import { route } from "@nextgisweb/pyramid/api";
 import type { RequestOptions } from "@nextgisweb/pyramid/api/type";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -61,7 +62,8 @@ export class ResourcePickerStore
     @observable.ref accessor saveLastParentIdGlobal = false;
     @observable.ref accessor getThisMsg = msgPickThis;
     @observable.ref accessor getSelectedMsg = msgPickSelected;
-    @observable.shallow accessor errors: Partial<Record<Action, string>> = {};
+    @observable.shallow accessor errors: Partial<Record<Action, ErrorInfo>> =
+        {};
     @observable.shallow accessor loading: Partial<Record<Action, boolean>> = {};
 
     @observable.shallow accessor selectedParentsRegistry: Map<
@@ -176,8 +178,8 @@ export class ResourcePickerStore
         this.changeParentTo(this.initParentId);
     }
 
-    @action
-    setSelected(selected: number[]): void {
+    @actionHandler
+    async setSelected(selected: number[]): Promise<void> {
         const newSelected = this.selected.filter((id) =>
             this.disableResourceIds.includes(id)
         );
@@ -186,7 +188,9 @@ export class ResourcePickerStore
                 newSelected.push(s);
             }
         }
-        this.selected = newSelected;
+        runInAction(() => {
+            this.selected = newSelected;
+        });
 
         if (this.multiple) {
             this.updateSelectedParentsRegistry();
@@ -282,7 +286,7 @@ export class ResourcePickerStore
         this.loading = { ...this.loading, [operation]: status };
     }
     @action
-    setError(operation: Action, msg?: string) {
+    setError(operation: Action, msg?: ErrorInfo) {
         this.errors[operation] = msg;
     }
 
@@ -291,7 +295,7 @@ export class ResourcePickerStore
         reset?: T
     ): T extends true ? AbortController : undefined {
         if (this.abortControllers[operation]) {
-            this.abortControllers[operation]!.abort();
+            this.abortControllers[operation]?.abort();
         }
         const val = reset ? new AbortController() : undefined;
         this.abortControllers[operation] = val;
@@ -412,28 +416,24 @@ export class ResourcePickerStore
         const registry = new Map<number, { children: number[] }>();
 
         for (const selectedId of this.selected) {
-            try {
-                const parentsChain: CompositeRead[] = await loadParents(
-                    selectedId,
-                    { cache: true }
-                );
-                for (const parentItem of parentsChain) {
-                    const parentId = parentItem.resource.id;
-                    if (parentId !== selectedId) {
-                        if (!registry.has(parentId)) {
-                            registry.set(parentId, {
-                                children: [],
-                            });
-                        }
-                        const entry = registry.get(parentId)!;
+            const parentsChain: CompositeRead[] = await loadParents(
+                selectedId,
+                { cache: true }
+            );
+            for (const parentItem of parentsChain) {
+                const parentId = parentItem.resource.id;
+                if (parentId !== selectedId) {
+                    if (!registry.has(parentId)) {
+                        registry.set(parentId, {
+                            children: [],
+                        });
+                    }
+                    const entry = registry.get(parentId)!;
 
-                        if (!entry.children.some((id) => id === selectedId)) {
-                            entry.children.push(selectedId);
-                        }
+                    if (!entry.children.some((id) => id === selectedId)) {
+                        entry.children.push(selectedId);
                     }
                 }
-            } catch (err) {
-                //
             }
         }
         runInAction(() => {
