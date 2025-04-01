@@ -107,7 +107,11 @@ export const EditorWidget: IEditorWidget<EditorStore> = observer(
                     store.items,
                     dataToRecords(json.data)
                 );
-                store.load({ items: recordsToLookup(items) });
+                store.load({
+                    items: recordsToLookup(items),
+                    order: [],
+                    sort: "CUSTOM",
+                });
                 store.setDirty(true);
             }
         };

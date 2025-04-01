@@ -2,9 +2,20 @@ import { action } from "mobx";
 
 import { EditorStore as KeyValueEditorStore } from "@nextgisweb/gui/edi-table";
 import { RecordItem } from "@nextgisweb/gui/edi-table/store/RecordItem";
-import type { LookupTableRead } from "@nextgisweb/lookup-table/type/api";
+import type {
+    LookupTableCreate,
+    LookupTableRead,
+    LookupTableUpdate,
+} from "@nextgisweb/lookup-table/type/api";
+import type { EditorStore as IEditorStore } from "@nextgisweb/resource/type";
 
-export class EditorStore extends KeyValueEditorStore<LookupTableRead> {
+export class EditorStore
+    extends KeyValueEditorStore<
+        LookupTableRead | LookupTableCreate | LookupTableUpdate
+    >
+    implements
+        IEditorStore<LookupTableRead, LookupTableCreate, LookupTableUpdate>
+{
     identity = "lookup_table";
 
     @action
@@ -22,7 +33,7 @@ export class EditorStore extends KeyValueEditorStore<LookupTableRead> {
         this.items = [];
     };
 
-    dump(): LookupTableRead | undefined {
+    dump(): LookupTableCreate | LookupTableUpdate | undefined {
         if (!this.dirty) return undefined;
 
         const items = Object.fromEntries(
