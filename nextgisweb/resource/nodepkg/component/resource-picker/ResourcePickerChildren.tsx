@@ -24,6 +24,7 @@ import type {
 
 import FolderOpenIcon from "@nextgisweb/icon/material/arrow_forward";
 import SelectFirstIcon from "@nextgisweb/icon/material/editor_choice";
+import { LoadingOutlined } from "@ant-design/icons";
 
 import "./ResourcePickerChildren.less";
 
@@ -257,7 +258,9 @@ function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
             columns={columns}
             rowKey="id"
             size="middle"
-            loading={loading.setChildrenFor}
+            loading={
+                loading.setChildrenFor && { indicator: <LoadingOutlined /> }
+            }
             rowSelection={rowSelection}
             onRow={onRow}
         />
