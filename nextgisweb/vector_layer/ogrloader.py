@@ -14,7 +14,6 @@ from nextgisweb.lib.ogrhelper import FIELD_GETTER
 
 from nextgisweb.core.exception import ValidationError as VE
 from nextgisweb.feature_layer import (
-    FIELD_FORBIDDEN_NAME,
     FIELD_TYPE,
     GEOM_TYPE,
     GEOM_TYPE_2_WKB_TYPE,
@@ -371,16 +370,6 @@ class OGRLoader:
 
             if fixed_fld_name == "":
                 fixed_fld_name = "fld_1"
-            elif fixed_fld_name.lower() in FIELD_FORBIDDEN_NAME:
-                if params.fix_errors == FIX_ERRORS.NONE:
-                    raise VE(
-                        message=gettext(
-                            "Field name is forbidden: '%s'. Please remove or rename it."
-                        )
-                        % fld_name
-                    )
-                else:
-                    fixed_fld_name += "_1"
 
             fld_name = unique_name(fixed_fld_name, tuple(f.name for f in fields.values()))
 

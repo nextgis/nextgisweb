@@ -278,16 +278,12 @@ def test_error_limit():
 def test_geom_field(ngw_data_path):
     res = VectorLayer().persist()
     src = ngw_data_path / "geom-fld.geojson"
-
-    with pytest.raises(ValidationError):
-        res.from_source(src)
-
-    res.from_source(src, fix_errors=FIX_ERRORS.SAFE)
+    res.from_source(src)
 
     query = res.feature_query()
     feature = query().one()
     assert feature.id == 1
-    assert list(feature.fields.keys()) == ["geom_1"]
+    assert list(feature.fields.keys()) == ["geom"]
 
 
 @pytest.mark.parametrize(

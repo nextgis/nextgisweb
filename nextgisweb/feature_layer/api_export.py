@@ -118,6 +118,8 @@ class ExportOptions(Struct):
         if opts.driver.name == "GPKG":
             gpkg_fid = unique_name("fid", ogr_fields)
             opts.lco.append(f"FID={gpkg_fid}")
+            gpkg_geom = unique_name("geom", ogr_fields)
+            opts.lco.append(f"GEOMETRY_NAME={gpkg_geom}")
 
         # Set GeoJSON feature ID via additional field
         elif opts.driver.name == "GeoJSON":

@@ -24,7 +24,6 @@ from nextgisweb.lib.logging import logger
 
 from nextgisweb.core.exception import ForbiddenError, ValidationError
 from nextgisweb.feature_layer import (
-    FIELD_FORBIDDEN_NAME,
     FIELD_TYPE,
     GEOM_TYPE,
     Feature,
@@ -388,10 +387,6 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
                 elif column["name"] == self.column_geom:
                     colfound_geom = True
-
-                elif column["name"] in FIELD_FORBIDDEN_NAME:
-                    # TODO: Currently id and geom fields break vector layer. We should fix it!
-                    pass
 
                 else:
                     if isinstance(column["type"], sa.BigInteger):

@@ -134,13 +134,19 @@ def resources():
     with transaction.manager:
         for i in range(some):
             layer = VectorLayer(geometry_type="POINT").persist()
-            layer.setup_from_fields([dict(keyname="fid", datatype=FIELD_TYPE.STRING)])
+            layer.setup_from_fields(
+                [
+                    dict(keyname="fid", datatype=FIELD_TYPE.STRING),
+                    dict(keyname="geom", datatype=FIELD_TYPE.INTEGER),
+                ]
+            )
 
             layer_name = f"layer_{i}"
 
             f = Feature()
             f.geom = Geometry.from_wkt(f"POINT ({i} {i})")
             f.fields["fid"] = layer_name
+            f.fields["geom"] = i
             layer.feature_create(f)
 
             params.append(dict(id=layer.id, name=layer_name))

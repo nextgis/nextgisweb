@@ -7,7 +7,7 @@ from osgeo import ogr
 from sqlalchemy.ext.orderinglist import ordering_list
 from sqlalchemy.orm import declared_attr
 
-from nextgisweb.env import Base, gettext, gettextf
+from nextgisweb.env import Base, gettext
 from nextgisweb.lib import saext
 from nextgisweb.lib.geometry import Transformer
 
@@ -25,8 +25,6 @@ from .interface import (
 )
 
 Base.depends_on("resource", "lookup_table")
-
-FIELD_FORBIDDEN_NAME = ("geom",)
 
 _FIELD_TYPE_2_ENUM_REVERSED = dict(zip(FIELD_TYPE.enum, FIELD_TYPE_OGR))
 
@@ -180,12 +178,6 @@ class FieldsAttr(SAttribute):
                 mfld = obj.field_create(fld.datatype)
 
             if fld.keyname is not UNSET:
-                if fld.keyname in FIELD_FORBIDDEN_NAME:
-                    raise ValidationError(
-                        message=gettextf(
-                            "Field name is forbidden: '{}'. Please remove or rename it."
-                        )(fld.keyname)
-                    )
                 mfld.keyname = fld.keyname
 
             if fld.display_name is not UNSET:
