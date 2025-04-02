@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
+import { errorModal, isAbortError } from "@nextgisweb/gui/error";
 import { useObjectState } from "@nextgisweb/gui/hook/useObjectState";
 
 import type {
@@ -41,6 +42,9 @@ export function useRouteGet<
     let mergedOptions: RequestOptions<N, RT>;
     let shouldLoadOnInit: boolean;
 
+    const onError = useRef<((err: unknown) => void) | undefined>();
+    const showErrorModal = useRef(false);
+
     if (typeof nameOrProps === "string") {
         endpointName = nameOrProps;
         mergedParams = params || ({} as GetRouteParam<N>);
@@ -51,6 +55,8 @@ export function useRouteGet<
         mergedParams = { ...nameOrProps.params, ...params } as GetRouteParam<N>;
         mergedOptions = { ...nameOrProps.options, ...options };
         shouldLoadOnInit = nameOrProps.loadOnInit ?? loadOnInit;
+        onError.current = nameOrProps.onError;
+        showErrorModal.current = !!nameOrProps.showErrorModal;
     }
 
     const { route, abort } = useRoute<N>(endpointName, mergedParams);
@@ -84,11 +90,17 @@ export function useRouteGet<
             );
             setData(data);
         } catch (err) {
-            setError(err!);
+            if (!isAbortError) {
+                setError(err!);
+                if (showErrorModal.current) {
+                    errorModal(err);
+                }
+                onError.current?.(err);
+            }
         } finally {
             setIsLoading(false);
         }
-    }, [abort, route, routerOptions]);
+    }, [abort, onError, route, routerOptions, showErrorModal]);
 
     useEffect(() => {
         refresh();

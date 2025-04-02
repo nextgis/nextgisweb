@@ -16,4 +16,6 @@ export interface UseRouteGetParams<
     params?: GetRouteParam<N>;
     options?: RequestOptionsByMethod<"get", RouteQuery<N, "get">, never, RT>;
     loadOnInit?: boolean;
+    onError?: (err: unknown) => void;
+    showErrorModal?: boolean;
 }
