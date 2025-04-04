@@ -70,3 +70,30 @@ export function updateItems(
 
     return updatedItems;
 }
+
+export function sortLookupItems(data: [string, string][], sortOrder: string) {
+    const sortedData = [...data];
+
+    switch (sortOrder) {
+        case "KEY_ASC":
+            sortedData.sort((a, b) => a[0].localeCompare(b[0]));
+            break;
+        case "KEY_DESC":
+            sortedData.sort((a, b) => b[0].localeCompare(a[0]));
+            break;
+        case "VALUE_ASC":
+            sortedData.sort((a, b) =>
+                a[1].toString().localeCompare(b[1].toString())
+            );
+            break;
+        case "VALUE_DESC":
+            sortedData.sort((a, b) =>
+                b[1].toString().localeCompare(a[1].toString())
+            );
+            break;
+        default:
+            return data;
+    }
+
+    return sortedData;
+}
