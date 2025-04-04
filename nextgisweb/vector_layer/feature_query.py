@@ -133,7 +133,11 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                 func.st_makeenvelope(*self._clip_by_box.bounds),
                 self._clip_by_box.srid,
             )
-            geomexpr = func.st_clipbybox2d(geomexpr, clip)
+
+            # Wrap geomexpr in ST_Force2D to avoid invalid coordinates for
+            # geometries with Z. The issue is fixed in modern GEOS and should
+            # work out of the box without discarding the Z coordinate.
+            geomexpr = func.st_clipbybox2d(func.st_force2d(geomexpr), clip)
 
         if self._simplify is not None:
             geomexpr = func.st_simplifypreservetopology(geomexpr, self._simplify)
