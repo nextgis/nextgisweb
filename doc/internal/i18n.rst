@@ -20,14 +20,15 @@ To be able to extract messages for translation, they must be marked up
 appropriately. Below is described how to do this, as well as how to ensure the
 display of already translated messages.
 
-All on messages are performed using ``nextgisweb-i18n`` command line
-utility. To update translation in ``nextgisweb_foo`` you can do the following:
+All operations on messages are performed using the ``nextgisweb-i18n`` command
+line utility. To update translation in ``nextgisweb_foo`` you can do the
+following:
 
 .. code-block:: bash
 
-  $ nextgisweb-i18n --package nextgisweb_foo update --extract --locale ru
+  $ nextgisweb-i18n update --locale ru nextgisweb_foo
   $ nano package/nextgisweb_foo/nextgisweb_foo/locale/ru.po
-  $ nextgisweb-i18n --package nextgisweb_foo compile
+  $ nextgisweb-i18n compile nextgisweb_foo
 
 The following standard `gettext`-like functions are supported for backend and
 frontend:
@@ -39,7 +40,7 @@ frontend:
 
 In addition, each of these functions has a formatter variant with the ``f``
 suffix: ``gettextf``, ``ngettextf``, ``pgettextf`` and ``npgettextf``. They
-return callables that perform string interpolation using Python sting format
+return callables that perform string interpolation using Python string format
 placeholders. For example:
 
 .. code-block:: python
@@ -47,11 +48,12 @@ placeholders. For example:
   >>> gettextf("Hello, {}!")("Arthur")
   Hello, Arthur!
 
-Template stings may contain one of the following:
+Template strings may contain one of the following:
 
 - One anonymous placeholder: ``Hello, {}!``
 - Named placeholders: ``Hello, {first} {last}!``
-- Index based placeholders: ``Hello, {0} {1}!` 
+- Index-based placeholders: ``Hello, {0} {1}!``
+
 
 Server side
 -----------
@@ -59,7 +61,7 @@ Server side
 Python
 ^^^^^^
 
-Since python code is executed on a server, the same application instance must be
+Since Python code is executed on a server, the same application instance must be
 able to serve users with different locales, it is necessary to use a two-step
 work with messages: first, a message is marked as requiring translation, then
 before displaying it to the user, it's translated according to the user's
@@ -131,8 +133,8 @@ When executing client-side code, user preferences are already known and there is
 no need for two-step processing. Translation and marking strings for translation
 are combined into one function.
 
-Modern JavaScript and TypeScript
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+JavaScript and TypeScript
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Simple messages with ``gettext``:
 
@@ -194,16 +196,3 @@ You can translate React elements with ``Translated``:
           />
       );
   }
-
-Legacy JavaScript
-^^^^^^^^^^^^^^^^^
-
-.. code-block:: javascript
-
-  define(["@nextgisweb/pyramid/i18n!"], function ({ gettext }) {
-      const msgTranslated = gettext("Some message for translation");
-      console.log("Localized message: " + msgTranslated);
-  });
-
-As a result of loading this module, a message will be displayed, translated in
-exactly the same way as on the server.
