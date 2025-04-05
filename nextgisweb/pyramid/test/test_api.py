@@ -31,6 +31,26 @@ def test_healthcheck(webtest):
     webtest.get("/api/component/pyramid/healthcheck")
 
 
+def test_malformed_json(webtest):
+    # Login uses request.json_body
+    resp = webtest.post(
+        "/api/component/auth/login",
+        params="{ /* INVALID JSON */ }",
+        content_type="application/json",
+        status=400,
+    )
+    assert resp.json["exception"].endswith(".MalformedJSONBody")
+
+    # Resource APIs use Msgspec
+    resp = webtest.put(
+        "/api/resource/0",
+        params="{ /* INVALID JSON */ }",
+        content_type="application/json",
+        status=400,
+    )
+    assert resp.json["exception"].endswith(".MalformedJSONBody")
+
+
 def test_settings(component, webtest):
     if hasattr(Component.registry[component], "client_settings"):
         webtest.get("/api/component/pyramid/settings?component={}".format(component))

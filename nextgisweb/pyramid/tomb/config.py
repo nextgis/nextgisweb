@@ -6,6 +6,7 @@ from typing import Any, Dict, Mapping, Optional, Tuple
 from warnings import warn, warn_explicit
 
 from msgspec import NODEFAULT, Meta
+from msgspec import DecodeError as MsgspecDecodeError
 from msgspec import ValidationError as MsgSpecValidationError
 from msgspec.inspect import IntType, Metadata, type_info
 from msgspec.json import Decoder
@@ -23,6 +24,7 @@ from nextgisweb.lib.logging import logger
 
 from nextgisweb.core.exception import ValidationError, user_exception
 
+from .exception import MalformedJSONBody
 from .helper import RouteHelper
 from .inspect import iter_routes
 from .predicate import ErrorRendererPredicate, RequestMethodPredicate, RouteMeta, ViewMeta
@@ -37,6 +39,8 @@ def _json_msgspec_factory(typedef):
             return decoder.decode(request.body)
         except MsgSpecValidationError as exc:
             raise ValidationError(message=exc.args[0]) from exc
+        except MsgspecDecodeError as exc:
+            raise MalformedJSONBody from exc
 
     return _json_msgspec
 

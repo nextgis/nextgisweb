@@ -18,6 +18,8 @@ from nextgisweb.lib.logging import logger
 from nextgisweb.core.exception import IUserException, user_exception
 from nextgisweb.jsrealm import jsentry
 
+from .tomb.exception import MalformedJSONBody
+
 JSENTRY = jsentry("@nextgisweb/gui/error")
 
 
@@ -37,8 +39,7 @@ def includeme(config):
         try:
             return json.loadb(req.body)
         except ValueError as exc:
-            user_exception(exc, title="JSON parse error", http_status_code=400)
-            raise
+            raise MalformedJSONBody from exc
 
     config.add_request_method(json_body, "json_body", property=True)
     config.add_request_method(json_body, "json", property=True)
