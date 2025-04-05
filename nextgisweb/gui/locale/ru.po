@@ -38,7 +38,7 @@ msgstr "Некорректный URL"
 
 #: nodepkg/buttons/CopyToClipboardButton.tsx:23
 msgid "Copied to clipboard"
-msgstr "Скопиривано в буфер обмена"
+msgstr "Скопировано в буфер обмена"
 
 #: nodepkg/buttons/CopyToClipboardButton.tsx:28
 msgid "Copy to clipboard"
