@@ -330,6 +330,13 @@ def cmd_stat(args):
             else:
                 po = Catalog(locale=to_gettext_locale(locale))
 
+            if args.ai:
+                ai_po_path = catalog_filename(meta.comp, locale, ext="ai.po", mkdir=False)
+                if ai_po_path.exists():
+                    with ai_po_path.open("r") as ai_po_fd:
+                        ai_po = read_po(ai_po_fd, locale=to_gettext_locale(locale))
+                        update_catalog_using_ai_catalog(po, ai_po)
+
             not_found, not_translated, obsolete = compare_catalogs(pot, po)
             data.append(
                 StatRecord(
@@ -657,6 +664,7 @@ def main(argv=sys.argv):
     pstat.add_argument("--locale", default=[], action="append")
     pstat.add_argument("--work-in-progress", action="store_true", default=False)
     pstat.add_argument("--json", action="store_true", default=False)
+    pstat.add_argument("--ai", action="store_true", default=False, help="Include AI translations in statistics")
     pstat.set_defaults(func=cmd_stat)
 
     ppoeditor_pull = subparsers.add_parser("poeditor-sync")
