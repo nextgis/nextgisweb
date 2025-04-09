@@ -73,14 +73,25 @@ export class EditorStore
     @action
     load(value: LookupTableRead) {
         if (value) {
-            this.items = Object.entries(value.items).map(
-                ([key, value]) => new RecordItem(this, { key, value })
-            );
-
             if (value.sort) this.sort = value.sort;
 
-            // need to handle order
-            if (value.order) this.order = value.order;
+            if (value.order) {
+                this.order = value.order;
+
+                const orderedEntries = value.order.map((key: string) => [
+                    key,
+                    value.items[key],
+                ]);
+
+                this.items = orderedEntries.map(
+                    ([key, value]) => new RecordItem(this, { key, value })
+                );
+            } else {
+                // Remove is value order is always present
+                this.items = Object.entries(value.items).map(
+                    ([key, value]) => new RecordItem(this, { key, value })
+                );
+            }
 
             this.dirty = false;
         }
