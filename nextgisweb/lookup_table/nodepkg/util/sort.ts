@@ -59,3 +59,13 @@ export function lookupTableIsSorted<R extends Row>(
     }
     return true;
 }
+
+export function lookupTableLoadItems(value: LookupTableRead): Row[] {
+    return lookupTableSort(
+        Object.entries(value.items).map(([key, value]) => {
+            return { key, value };
+        }),
+        "CUSTOM",
+        value.order
+    );
+}
