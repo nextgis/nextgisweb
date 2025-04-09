@@ -97,3 +97,55 @@ export function sortLookupItems(data: [string, string][], sortOrder: string) {
 
     return sortedData;
 }
+
+export function isSortedCorrectly(
+    data: [string, string][],
+    sortOrder: string
+): boolean {
+    if (data.length <= 1) return true; // Empty or single-item arrays are always sorted
+
+    switch (sortOrder) {
+        case "KEY_ASC":
+            for (let i = 1; i < data.length; i++) {
+                if (data[i - 1][0].localeCompare(data[i][0]) > 0) {
+                    return false;
+                }
+            }
+            return true;
+
+        case "KEY_DESC":
+            for (let i = 1; i < data.length; i++) {
+                if (data[i - 1][0].localeCompare(data[i][0]) < 0) {
+                    return false;
+                }
+            }
+            return true;
+
+        case "VALUE_ASC":
+            for (let i = 1; i < data.length; i++) {
+                if (
+                    data[i - 1][1]
+                        .toString()
+                        .localeCompare(data[i][1].toString()) > 0
+                ) {
+                    return false;
+                }
+            }
+            return true;
+
+        case "VALUE_DESC":
+            for (let i = 1; i < data.length; i++) {
+                if (
+                    data[i - 1][1]
+                        .toString()
+                        .localeCompare(data[i][1].toString()) < 0
+                ) {
+                    return false;
+                }
+            }
+            return true;
+
+        default:
+            return true; // For unknown sort orders, consider it sorted
+    }
+}

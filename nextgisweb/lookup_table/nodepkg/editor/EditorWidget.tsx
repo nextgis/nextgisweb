@@ -63,13 +63,24 @@ InputKey.displayName = "InputKey";
 const InputValue = observer(({ row }: ComponentProps<RecordItem>) => {
     if (row.type === "string") {
         return (
-            <Input
-                value={row.value as InputProps["value"]}
-                onChange={(e) => {
-                    row.update({ value: e.target.value });
-                }}
-                variant="borderless"
-            />
+            <div style={{ display: "flex" }}>
+                <Input
+                    value={row.value as InputProps["value"]}
+                    onChange={(e) => {
+                        row.update({ value: e.target.value });
+                    }}
+                    variant="borderless"
+                />
+                {row.isSortError && (
+                    <span
+                        onClick={() => {
+                            row.store.sortItems();
+                        }}
+                    >
+                        bad
+                    </span>
+                )}
+            </div>
         );
     }
 

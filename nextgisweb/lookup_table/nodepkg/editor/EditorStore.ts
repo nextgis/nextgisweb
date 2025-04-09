@@ -4,6 +4,7 @@ import type { IObservableArray } from "mobx";
 
 import { EditorStore as KeyValueEditorStore } from "@nextgisweb/gui/edi-table";
 import { RecordItem } from "@nextgisweb/gui/edi-table/store/RecordItem";
+import type { RecordOption } from "@nextgisweb/gui/edi-table/store/RecordItem";
 import type {
     LookupTableCreate,
     LookupTableRead,
@@ -11,7 +12,7 @@ import type {
 } from "@nextgisweb/lookup-table/type/api";
 import type { EditorStore as IEditorStore } from "@nextgisweb/resource/type";
 
-import { recordsToLookup, sortLookupItems } from "./util";
+import { isSortedCorrectly, recordsToLookup, sortLookupItems } from "./util";
 
 export class EditorStore
     extends KeyValueEditorStore<
@@ -26,6 +27,8 @@ export class EditorStore
 
     @observable.ref accessor order: string[] | undefined = undefined;
 
+    @observable.ref accessor isSorted: boolean = true;
+
     @action
     setSort(val: LookupTableRead["sort"]) {
         if (val) this.sort = val;
@@ -37,6 +40,14 @@ export class EditorStore
         this.sortItems();
     }
 
+    checkIfSorted(items: RecordItem[] | RecordOption[], sort: string) {
+        const normalizedItems = recordsToLookup(items);
+
+        const isOk = isSortedCorrectly(Object.entries(normalizedItems), sort);
+        // this.isSorted = isOk;
+        return isOk;
+    }
+
     @action
     sortItems() {
         const items = recordsToLookup(this.items);
@@ -46,7 +57,13 @@ export class EditorStore
             // handled by moveRow
         } else {
             this.items = sorted.map(
-                ([key, value]) => new RecordItem(this, { key, value })
+                ([key, value]) =>
+                    new RecordItem(this, {
+                        key,
+                        value,
+                        onUpdate: () =>
+                            this.checkIfSorted(this.items, this.sort),
+                    })
             );
         }
     }
@@ -84,12 +101,24 @@ export class EditorStore
                 ]);
 
                 this.items = orderedEntries.map(
-                    ([key, value]) => new RecordItem(this, { key, value })
+                    ([key, value]) =>
+                        new RecordItem(this, {
+                            key,
+                            value,
+                            onUpdate: () =>
+                                this.checkIfSorted(this.items, this.sort),
+                        })
                 );
             } else {
                 // Remove is value order is always present
                 this.items = Object.entries(value.items).map(
-                    ([key, value]) => new RecordItem(this, { key, value })
+                    ([key, value]) =>
+                        new RecordItem(this, {
+                            key,
+                            value,
+                            onUpdate: () =>
+                                this.checkIfSorted(this.items, this.sort),
+                        })
                 );
             }
 
