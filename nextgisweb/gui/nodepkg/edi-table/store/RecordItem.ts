@@ -10,24 +10,30 @@ export interface RecordOption {
     key: string | undefined;
     value: unknown;
     type?: string;
-    onUpdate?: () => boolean;
+    onUpdate?: () => boolean | string;
+    lookupSortCallback?: () => void;
 }
 
 export class RecordItem implements RecordOption {
     @observable.ref accessor key: string | undefined = undefined;
     @observable.ref accessor value: unknown = undefined;
-    @observable.ref accessor isSortError: boolean = false;
+    @observable.ref accessor isSortError: boolean | "key" | "value" = false;
 
     readonly id: number;
     readonly store: EditorStore;
-    onUpdate: (() => boolean) | undefined;
+    onUpdate: (() => boolean | string) | undefined;
+    lookupSortCallback: (() => void) | undefined;
 
-    constructor(store: EditorStore, { key, value, onUpdate }: RecordOption) {
+    constructor(
+        store: EditorStore,
+        { key, value, onUpdate, lookupSortCallback }: RecordOption
+    ) {
         this.store = store;
         this.id = ++idSeq;
         this.key = key;
         this.value = value;
         this.onUpdate = onUpdate;
+        this.lookupSortCallback = lookupSortCallback;
     }
 
     @computed
@@ -89,8 +95,8 @@ export class RecordItem implements RecordOption {
         }
 
         if (this.onUpdate) {
-            const isRowOk = this.onUpdate();
-            this.isSortError = !isRowOk;
+            const isRowNotOk = this.onUpdate();
+            this.isSortError = isRowNotOk as boolean | "key" | "value";
         }
 
         this.store.dirty = true;

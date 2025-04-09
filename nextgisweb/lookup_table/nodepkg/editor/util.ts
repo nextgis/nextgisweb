@@ -98,28 +98,28 @@ export function sortLookupItems(data: [string, string][], sortOrder: string) {
     return sortedData;
 }
 
-export function isSortedCorrectly(
+export function isSortedWrong(
     data: [string, string][],
     sortOrder: string
-): boolean {
-    if (data.length <= 1) return true; // Empty or single-item arrays are always sorted
+): boolean | string {
+    if (data.length <= 1) return false;
 
     switch (sortOrder) {
         case "KEY_ASC":
             for (let i = 1; i < data.length; i++) {
                 if (data[i - 1][0].localeCompare(data[i][0]) > 0) {
-                    return false;
+                    return "key";
                 }
             }
-            return true;
+            return false;
 
         case "KEY_DESC":
             for (let i = 1; i < data.length; i++) {
                 if (data[i - 1][0].localeCompare(data[i][0]) < 0) {
-                    return false;
+                    return "key";
                 }
             }
-            return true;
+            return false;
 
         case "VALUE_ASC":
             for (let i = 1; i < data.length; i++) {
@@ -128,10 +128,10 @@ export function isSortedCorrectly(
                         .toString()
                         .localeCompare(data[i][1].toString()) > 0
                 ) {
-                    return false;
+                    return "value";
                 }
             }
-            return true;
+            return false;
 
         case "VALUE_DESC":
             for (let i = 1; i < data.length; i++) {
@@ -140,12 +140,12 @@ export function isSortedCorrectly(
                         .toString()
                         .localeCompare(data[i][1].toString()) < 0
                 ) {
-                    return false;
+                    return "value";
                 }
             }
-            return true;
+            return false;
 
         default:
-            return true; // For unknown sort orders, consider it sorted
+            return false; // For unknown sort orders, consider it sorted
     }
 }

@@ -40,20 +40,34 @@ const msgConfirm = gettext("All existing records will be deleted after import. A
 const InputKey = observer(
     ({ row, placeholder }: ComponentProps<RecordItem>) => {
         return (
-            <Input
-                value={row.key}
-                onChange={(e) => {
-                    const props: Partial<RecordOption> = {
-                        key: e.target.value,
-                    };
-                    if (row.value === undefined) {
-                        props.value = "";
-                    }
-                    row.update(props);
-                }}
-                variant="borderless"
-                placeholder={placeholder ? msgTypeToAdd : undefined}
-            />
+            <div style={{ display: "flex" }}>
+                <Input
+                    value={row.key}
+                    onChange={(e) => {
+                        const props: Partial<RecordOption> = {
+                            key: e.target.value,
+                        };
+                        if (row.value === undefined) {
+                            props.value = "";
+                        }
+                        row.update(props);
+                    }}
+                    variant="borderless"
+                    placeholder={placeholder ? msgTypeToAdd : undefined}
+                />
+                {row.isSortError === "key" && (
+                    <Button
+                        danger
+                        size="small"
+                        onClick={() => {
+                            if (row.lookupSortCallback)
+                                row.lookupSortCallback();
+                        }}
+                    >
+                        {gettext("Sort")}
+                    </Button>
+                )}
+            </div>
         );
     }
 );
@@ -71,14 +85,17 @@ const InputValue = observer(({ row }: ComponentProps<RecordItem>) => {
                     }}
                     variant="borderless"
                 />
-                {row.isSortError && (
-                    <span
+                {row.isSortError === "value" && (
+                    <Button
+                        danger
+                        size="small"
                         onClick={() => {
-                            row.store.sortItems();
+                            if (row.lookupSortCallback)
+                                row.lookupSortCallback();
                         }}
                     >
-                        bad
-                    </span>
+                        {gettext("Sort")}
+                    </Button>
                 )}
             </div>
         );

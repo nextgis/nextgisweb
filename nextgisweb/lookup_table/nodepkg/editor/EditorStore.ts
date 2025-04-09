@@ -12,7 +12,7 @@ import type {
 } from "@nextgisweb/lookup-table/type/api";
 import type { EditorStore as IEditorStore } from "@nextgisweb/resource/type";
 
-import { isSortedCorrectly, recordsToLookup, sortLookupItems } from "./util";
+import { isSortedWrong, recordsToLookup, sortLookupItems } from "./util";
 
 export class EditorStore
     extends KeyValueEditorStore<
@@ -43,9 +43,7 @@ export class EditorStore
     checkIfSorted(items: RecordItem[] | RecordOption[], sort: string) {
         const normalizedItems = recordsToLookup(items);
 
-        const isOk = isSortedCorrectly(Object.entries(normalizedItems), sort);
-        // this.isSorted = isOk;
-        return isOk;
+        return isSortedWrong(Object.entries(normalizedItems), sort);
     }
 
     @action
@@ -63,6 +61,7 @@ export class EditorStore
                         value,
                         onUpdate: () =>
                             this.checkIfSorted(this.items, this.sort),
+                        lookupSortCallback: () => this.sortItems(),
                     })
             );
         }
@@ -107,6 +106,7 @@ export class EditorStore
                             value,
                             onUpdate: () =>
                                 this.checkIfSorted(this.items, this.sort),
+                            lookupSortCallback: () => this.sortItems(),
                         })
                 );
             } else {
@@ -118,6 +118,7 @@ export class EditorStore
                             value,
                             onUpdate: () =>
                                 this.checkIfSorted(this.items, this.sort),
+                            lookupSortCallback: () => this.sortItems(),
                         })
                 );
             }
