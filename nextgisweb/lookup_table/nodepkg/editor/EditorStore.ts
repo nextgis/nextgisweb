@@ -1,5 +1,6 @@
 import { clamp, remove } from "lodash-es";
-import { action, computed, IObservableArray, observable } from "mobx";
+import { action, computed, observable } from "mobx";
+import type { IObservableArray } from "mobx";
 
 import { EditorStore as KeyValueEditorStore } from "@nextgisweb/gui/edi-table";
 import { RecordItem } from "@nextgisweb/gui/edi-table/store/RecordItem";
@@ -32,6 +33,8 @@ export class EditorStore
         if (this.sort !== "CUSTOM") {
             this.order = undefined;
         }
+
+        this.sortItems();
     }
 
     @action
@@ -73,6 +76,11 @@ export class EditorStore
             this.items = Object.entries(value.items).map(
                 ([key, value]) => new RecordItem(this, { key, value })
             );
+
+            if (value.sort) this.sort = value.sort;
+
+            // need to handle order
+            if (value.order) this.order = value.order;
 
             this.dirty = false;
         }
