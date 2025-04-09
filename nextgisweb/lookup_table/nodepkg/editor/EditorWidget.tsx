@@ -2,7 +2,14 @@ import { observer } from "mobx-react-lite";
 import { useCallback } from "react";
 
 import { ActionToolbar } from "@nextgisweb/gui/action-toolbar";
-import { Button, Input, Modal, Select, Upload } from "@nextgisweb/gui/antd";
+import {
+    Button,
+    Input,
+    Modal,
+    Select,
+    Space,
+    Upload,
+} from "@nextgisweb/gui/antd";
 import type { InputProps } from "@nextgisweb/gui/antd";
 import { EdiTable } from "@nextgisweb/gui/edi-table";
 import type {
@@ -28,12 +35,15 @@ import {
 } from "./util";
 
 import SortIcon from "@nextgisweb/icon/material/swap_vert";
+import ReorderIcon from "@nextgisweb/icon/material/sync";
 
 import "./EditorWidget.less";
 
 const msgTypeToAdd = gettext("Type here to add a new item...");
 const msgExport = gettext("Export");
 const msgImport = gettext("Import");
+const msgSort = gettext("Sort order");
+const msgResort = gettext("Resort rows");
 const msgClear = gettext("Clear");
 
 // prettier-ignore
@@ -42,34 +52,20 @@ const msgConfirm = gettext("All existing records will be deleted after import. A
 const InputKey = observer(
     ({ row, placeholder }: ComponentProps<RecordItem>) => {
         return (
-            <div style={{ display: "flex" }}>
-                <Input
-                    value={row.key}
-                    onChange={(e) => {
-                        const props: Partial<RecordOption> = {
-                            key: e.target.value,
-                        };
-                        if (row.value === undefined) {
-                            props.value = "";
-                        }
-                        row.update(props);
-                    }}
-                    variant="borderless"
-                    placeholder={placeholder ? msgTypeToAdd : undefined}
-                />
-                {row.isSortError === "key" && (
-                    <Button
-                        danger
-                        size="small"
-                        onClick={() => {
-                            if (row.lookupSortCallback)
-                                row.lookupSortCallback();
-                        }}
-                    >
-                        {gettext("Sort")}
-                    </Button>
-                )}
-            </div>
+            <Input
+                value={row.key}
+                onChange={(e) => {
+                    const props: Partial<RecordOption> = {
+                        key: e.target.value,
+                    };
+                    if (row.value === undefined) {
+                        props.value = "";
+                    }
+                    row.update(props);
+                }}
+                variant="borderless"
+                placeholder={placeholder ? msgTypeToAdd : undefined}
+            />
         );
     }
 );
@@ -79,27 +75,13 @@ InputKey.displayName = "InputKey";
 const InputValue = observer(({ row }: ComponentProps<RecordItem>) => {
     if (row.type === "string") {
         return (
-            <div style={{ display: "flex" }}>
-                <Input
-                    value={row.value as InputProps["value"]}
-                    onChange={(e) => {
-                        row.update({ value: e.target.value });
-                    }}
-                    variant="borderless"
-                />
-                {row.isSortError === "value" && (
-                    <Button
-                        danger
-                        size="small"
-                        onClick={() => {
-                            if (row.lookupSortCallback)
-                                row.lookupSortCallback();
-                        }}
-                    >
-                        {gettext("Sort")}
-                    </Button>
-                )}
-            </div>
+            <Input
+                value={row.value as InputProps["value"]}
+                onChange={(e) => {
+                    row.update({ value: e.target.value });
+                }}
+                variant="borderless"
+            />
         );
     }
 
@@ -121,6 +103,17 @@ const columns: EdiTableColumn<RecordItem>[] = [
         width: "75%",
         component: InputValue,
     },
+];
+
+const sortSelectOptions: {
+    value: LookupTableRead["sort"];
+    label: string;
+}[] = [
+    { value: "KEY_ASC", label: gettext("Key, ascending") },
+    { value: "KEY_DESC", label: gettext("Key, descending") },
+    { value: "VALUE_ASC", label: gettext("Value, ascending") },
+    { value: "VALUE_DESC", label: gettext("Value, descending") },
+    { value: "CUSTOM", label: gettext("Custom") },
 ];
 
 export const EditorWidget: IEditorWidget<EditorStore> = observer(
@@ -147,20 +140,7 @@ export const EditorWidget: IEditorWidget<EditorStore> = observer(
             }
         };
 
-        const sortSelectOptions: {
-            value: LookupTableRead["sort"];
-            label: string;
-        }[] = [
-            { value: "KEY_ASC", label: gettext("Key, ascending") },
-            { value: "KEY_DESC", label: gettext("Key, descending") },
-            { value: "VALUE_ASC", label: gettext("Value, ascending") },
-            { value: "VALUE_DESC", label: gettext("Value, descending") },
-            { value: "CUSTOM", label: gettext("Custom") },
-        ];
-
-        const handleSortChange = (val: LookupTableRead["sort"]) => {
-            store.setSort(val);
-        };
+        const { sort, setSort, isSorted } = store;
 
         return (
             <div className="ngw-lookup-table-editor">
@@ -197,18 +177,27 @@ export const EditorWidget: IEditorWidget<EditorStore> = observer(
                             title: msgExport,
                             onClick: exportLookup,
                         },
+                        () => (
+                            <Space.Compact>
+                                <Select
+                                    prefix={<SortIcon />}
+                                    title={msgSort}
+                                    options={sortSelectOptions}
+                                    popupMatchSelectWidth={false}
+                                    value={sort}
+                                    onChange={setSort}
+                                />
+                                {!isSorted && (
+                                    <Button
+                                        icon={<ReorderIcon />}
+                                        title={msgResort}
+                                        onClick={() => setSort()}
+                                    />
+                                )}
+                            </Space.Compact>
+                        ),
                     ]}
                     rightActions={[
-                        () => (
-                            <Select
-                                prefix={<SortIcon />}
-                                title={gettext("Sort order")}
-                                options={sortSelectOptions}
-                                popupMatchSelectWidth={false}
-                                defaultValue={store.sort}
-                                onChange={(val) => handleSortChange(val)}
-                            />
-                        ),
                         {
                             title: msgClear,
                             icon: <ClearIcon />,

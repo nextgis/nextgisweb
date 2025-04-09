@@ -1,10 +1,9 @@
 import { clamp, remove } from "lodash-es";
-import { action, computed, observable } from "mobx";
+import { action, computed, observable, runInAction } from "mobx";
 import type { IObservableArray } from "mobx";
 
 import { EditorStore as KeyValueEditorStore } from "@nextgisweb/gui/edi-table";
 import { RecordItem } from "@nextgisweb/gui/edi-table/store/RecordItem";
-import type { RecordOption } from "@nextgisweb/gui/edi-table/store/RecordItem";
 import type {
     LookupTableCreate,
     LookupTableRead,
@@ -12,7 +11,7 @@ import type {
 } from "@nextgisweb/lookup-table/type/api";
 import type { EditorStore as IEditorStore } from "@nextgisweb/resource/type";
 
-import { isSortedWrong, recordsToLookup, sortLookupItems } from "./util";
+import { lookupTableIsSorted, lookupTableSort } from "../util/sort";
 
 export class EditorStore
     extends KeyValueEditorStore<
@@ -21,65 +20,41 @@ export class EditorStore
     implements
         IEditorStore<LookupTableRead, LookupTableCreate, LookupTableUpdate>
 {
-    identity = "lookup_table";
+    readonly identity = "lookup_table";
 
     @observable.ref accessor sort: LookupTableRead["sort"] = "KEY_ASC";
 
-    @observable.ref accessor order: string[] | undefined = undefined;
-
-    @observable.ref accessor isSorted: boolean = true;
-
-    @action
-    setSort(val: LookupTableRead["sort"]) {
-        if (val) this.sort = val;
+    @action.bound
+    setSort(value?: LookupTableRead["sort"]) {
+        if (value) this.sort = value;
         this.dirty = true;
-        if (this.sort !== "CUSTOM") {
-            this.order = undefined;
-        }
 
-        this.sortItems();
+        if (this.sort === "CUSTOM") return;
+        this.items = lookupTableSort(this.items, this.sort);
     }
 
-    checkIfSorted(items: RecordItem[] | RecordOption[], sort: string) {
-        const normalizedItems = recordsToLookup(items);
-
-        return isSortedWrong(Object.entries(normalizedItems), sort);
-    }
-
-    @action
-    sortItems() {
-        const items = recordsToLookup(this.items);
-        const sorted = sortLookupItems(Object.entries(items), this.sort);
-
-        if (this.sort === "CUSTOM") {
-            // handled by moveRow
-        } else {
-            this.items = sorted.map(
-                ([key, value]) =>
-                    new RecordItem(this, {
-                        key,
-                        value,
-                        onUpdate: () =>
-                            this.checkIfSorted(this.items, this.sort),
-                        lookupSortCallback: () => this.sortItems(),
-                    })
-            );
-        }
+    @computed
+    get isSorted() {
+        if (this.sort === "CUSTOM") return true;
+        return lookupTableIsSorted(this.items, this.sort);
     }
 
     @computed
     get moveRow() {
         if (this.sort === "CUSTOM") {
             return (row: any, index: number) => {
-                index = clamp(index, 0, this.rows.length - 1);
-                const newRows = [...this.rows];
-                remove(newRows, (i) => i === row);
-                newRows.splice(index, 0, row);
+                runInAction(() => {
+                    index = clamp(index, 0, this.rows.length - 1);
+                    const newRows = [...this.rows];
+                    remove(newRows, (i) => i === row);
+                    newRows.splice(index, 0, row);
 
-                // type weirdness
-                (this.rows as IObservableArray<RecordItem>).replace(newRows);
-
-                this.order = newRows.map((row) => row.key as string);
+                    // type weirdness
+                    (this.rows as IObservableArray<RecordItem>).replace(
+                        newRows
+                    );
+                    this.dirty = true;
+                });
             };
         } else {
             return undefined;
@@ -88,43 +63,15 @@ export class EditorStore
 
     @action
     load(value: LookupTableRead) {
-        if (value) {
-            if (value.sort) this.sort = value.sort;
-
-            if (value.order) {
-                this.order = value.order;
-
-                const orderedEntries = value.order.map((key: string) => [
-                    key,
-                    value.items[key],
-                ]);
-
-                this.items = orderedEntries.map(
-                    ([key, value]) =>
-                        new RecordItem(this, {
-                            key,
-                            value,
-                            onUpdate: () =>
-                                this.checkIfSorted(this.items, this.sort),
-                            lookupSortCallback: () => this.sortItems(),
-                        })
-                );
-            } else {
-                // Remove is value order is always present
-                this.items = Object.entries(value.items).map(
-                    ([key, value]) =>
-                        new RecordItem(this, {
-                            key,
-                            value,
-                            onUpdate: () =>
-                                this.checkIfSorted(this.items, this.sort),
-                            lookupSortCallback: () => this.sortItems(),
-                        })
-                );
-            }
-
-            this.dirty = false;
-        }
+        this.items = lookupTableSort(
+            Object.entries(value.items).map(
+                ([key, value]) => new RecordItem(this, { key, value })
+            ),
+            value.sort,
+            value.order
+        );
+        this.sort = value.sort;
+        this.dirty = false;
     }
 
     @action.bound
@@ -138,6 +85,6 @@ export class EditorStore
         const items = Object.fromEntries(
             this.items.map((i) => [i.key, String(i.value)])
         );
-        return { items, sort: this.sort, order: this.order };
+        return { items, sort: this.sort, order: this.items.map((i) => i.key!) };
     }
 }
