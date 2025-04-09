@@ -128,6 +128,10 @@ export const EditorWidget: IEditorWidget<EditorStore> = observer(
             { value: "CUSTOM", label: gettext("CUSTOM") },
         ];
 
+        const handleSortChange = (val: LookupTableRead["sort"]) => {
+            store.setSort(val);
+        };
+
         return (
             <div className="ngw-lookup-table-editor">
                 {contextHolder}
@@ -170,7 +174,7 @@ export const EditorWidget: IEditorWidget<EditorStore> = observer(
                                 className="lookup-table-editor--sort-select"
                                 options={sortSelectOptions}
                                 defaultValue={store.sort}
-                                onChange={(val) => store.setSort(val)}
+                                onChange={(val) => handleSortChange(val)}
                             ></Select>
                         ),
                         {
