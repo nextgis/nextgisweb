@@ -25,15 +25,19 @@ export function LookupSelect({
 
     const options = useMemo(() => {
         const items = data?.lookup_table?.items;
+        const order = data?.lookup_table?.order;
         if (items) {
-            return Object.entries(items)
-                .map(([value, label]) => {
-                    return {
-                        value,
-                        label,
-                    };
-                })
-                .sort((a, b) => a.label.localeCompare(b.label));
+            const orderedItemsEntries = order?.map((key: string) => [
+                key,
+                items[key],
+            ]);
+
+            return orderedItemsEntries?.map(([value, label]) => {
+                return {
+                    value,
+                    label,
+                };
+            });
         }
         return [];
     }, [data]);
