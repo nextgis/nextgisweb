@@ -2,7 +2,7 @@ import { observer } from "mobx-react-lite";
 import { useCallback } from "react";
 
 import { ActionToolbar } from "@nextgisweb/gui/action-toolbar";
-import { Button, Input, Modal, Upload } from "@nextgisweb/gui/antd";
+import { Button, Input, Modal, Select, Upload } from "@nextgisweb/gui/antd";
 import type { InputProps } from "@nextgisweb/gui/antd";
 import { EdiTable } from "@nextgisweb/gui/edi-table";
 import type {
@@ -15,6 +15,7 @@ import type {
 } from "@nextgisweb/gui/edi-table/type";
 import { ClearIcon, ExportIcon, ImportIcon } from "@nextgisweb/gui/icon";
 import { parseCsv } from "@nextgisweb/gui/util/parseCsv";
+import type { LookupTableRead } from "@nextgisweb/lookup-table/type/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { EditorWidget as IEditorWidget } from "@nextgisweb/resource/type";
 
@@ -116,6 +117,17 @@ export const EditorWidget: IEditorWidget<EditorStore> = observer(
             }
         };
 
+        const sortSelectOptions: {
+            value: LookupTableRead["sort"];
+            label: string;
+        }[] = [
+            { value: "KEY_ASC", label: gettext("KEY_ASC") },
+            { value: "KEY_DESC", label: gettext("KEY_DESC") },
+            { value: "VALUE_ASC", label: gettext("VALUE_ASC") },
+            { value: "VALUE_DESC", label: gettext("VALUE_DESC") },
+            { value: "CUSTOM", label: gettext("CUSTOM") },
+        ];
+
         return (
             <div className="ngw-lookup-table-editor">
                 {contextHolder}
@@ -153,6 +165,14 @@ export const EditorWidget: IEditorWidget<EditorStore> = observer(
                         },
                     ]}
                     rightActions={[
+                        () => (
+                            <Select
+                                className="lookup-table-editor--sort-select"
+                                options={sortSelectOptions}
+                                defaultValue={store.sort}
+                                onChange={(val) => store.setSort(val)}
+                            ></Select>
+                        ),
                         {
                             title: msgClear,
                             icon: <ClearIcon />,
