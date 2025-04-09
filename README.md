@@ -18,7 +18,7 @@ Important links:
 -   Homepage: https://nextgis.com/nextgis-web/
 -   Get your own cloud Web GIS: https://nextgis.com/pricing-base/
 -   Sign up for on premise plan: https://nextgis.com/pricing/
--   User manual: https://docs.nextgis.com/docs_ngweb/source/toc.html
+-   User manual: https://docs.nextgis.com/docs_ngweb/source/index.html
 -   Developer manual: https://docs.nextgis.com/docs_ngweb_dev/doc/toc.html
 
 ## License
