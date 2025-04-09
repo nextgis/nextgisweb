@@ -27,6 +27,8 @@ import {
     updateItems,
 } from "./util";
 
+import SortIcon from "@nextgisweb/icon/material/swap_vert";
+
 import "./EditorWidget.less";
 
 const msgTypeToAdd = gettext("Type here to add a new item...");
@@ -110,13 +112,13 @@ const columns: EdiTableColumn<RecordItem>[] = [
     {
         key: "key",
         title: gettext("Key"),
-        width: "50%",
+        width: "25%",
         component: InputKey,
     },
     {
         key: "value",
         title: gettext("Value"),
-        width: "50%",
+        width: "75%",
         component: InputValue,
     },
 ];
@@ -149,11 +151,11 @@ export const EditorWidget: IEditorWidget<EditorStore> = observer(
             value: LookupTableRead["sort"];
             label: string;
         }[] = [
-            { value: "KEY_ASC", label: gettext("KEY_ASC") },
-            { value: "KEY_DESC", label: gettext("KEY_DESC") },
-            { value: "VALUE_ASC", label: gettext("VALUE_ASC") },
-            { value: "VALUE_DESC", label: gettext("VALUE_DESC") },
-            { value: "CUSTOM", label: gettext("CUSTOM") },
+            { value: "KEY_ASC", label: gettext("Key, ascending") },
+            { value: "KEY_DESC", label: gettext("Key, descending") },
+            { value: "VALUE_ASC", label: gettext("Value, ascending") },
+            { value: "VALUE_DESC", label: gettext("Value, descending") },
+            { value: "CUSTOM", label: gettext("Custom") },
         ];
 
         const handleSortChange = (val: LookupTableRead["sort"]) => {
@@ -199,11 +201,13 @@ export const EditorWidget: IEditorWidget<EditorStore> = observer(
                     rightActions={[
                         () => (
                             <Select
-                                className="lookup-table-editor--sort-select"
+                                prefix={<SortIcon />}
+                                title={gettext("Sort order")}
                                 options={sortSelectOptions}
+                                popupMatchSelectWidth={false}
                                 defaultValue={store.sort}
                                 onChange={(val) => handleSortChange(val)}
-                            ></Select>
+                            />
                         ),
                         {
                             title: msgClear,
