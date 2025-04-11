@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { useCallback } from "react";
+import { forwardRef, useCallback } from "react";
 
 import { ActionToolbar } from "@nextgisweb/gui/action-toolbar";
 import {
@@ -10,7 +10,7 @@ import {
     Space,
     Upload,
 } from "@nextgisweb/gui/antd";
-import type { InputProps } from "@nextgisweb/gui/antd";
+import type { InputProps, InputRef } from "@nextgisweb/gui/antd";
 import { EdiTable } from "@nextgisweb/gui/edi-table";
 import type {
     RecordItem,
@@ -50,9 +50,13 @@ const msgClear = gettext("Clear");
 const msgConfirm = gettext("All existing records will be deleted after import. Are you sure you want to proceed?");
 
 const InputKey = observer(
-    ({ row, placeholder }: ComponentProps<RecordItem>) => {
+    forwardRef<
+        InputRef,
+        ComponentProps<RecordItem> & { placeholder?: boolean }
+    >(({ row, placeholder }, ref) => {
         return (
             <Input
+                ref={ref}
                 value={row.key}
                 onChange={(e) => {
                     const props: Partial<RecordOption> = {
@@ -67,7 +71,7 @@ const InputKey = observer(
                 placeholder={placeholder ? msgTypeToAdd : undefined}
             />
         );
-    }
+    })
 );
 
 InputKey.displayName = "InputKey";

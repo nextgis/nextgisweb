@@ -15,12 +15,14 @@ import {
     createElement,
     useCallback,
     useContext,
+    useEffect,
     useMemo,
+    useRef,
 } from "react";
 import type { CSSProperties, FC, HTMLAttributes } from "react";
 
 import { Button, Table } from "../antd";
-import type { TableColumnType, TableProps } from "../antd";
+import type { InputRef, TableColumnType, TableProps } from "../antd";
 
 import type { EdiTableStore } from "./EdiTableStore";
 import { RowActions, WELLKNOWN_ROW_ACTIONS } from "./RowAction";
@@ -140,6 +142,21 @@ export const EdiTable = observer(
             [store, rowActions]
         );
 
+        const placeholderRef = useRef<InputRef | null>(null);
+
+        const handleKeyDown = useCallback((e: KeyboardEvent) => {
+            if (e.key === "Enter" && placeholderRef.current) {
+                placeholderRef.current.focus?.();
+            }
+        }, []);
+
+        useEffect(() => {
+            document.addEventListener("keydown", handleKeyDown);
+            return () => {
+                document.removeEventListener("keydown", handleKeyDown);
+            };
+        }, [handleKeyDown]);
+
         const tableDataSource = [...store.rows];
 
         // There is no way to append a placeholder row by overriding components
@@ -212,9 +229,15 @@ export const EdiTable = observer(
                         if (component) {
                             result.render = (value, row) =>
                                 createElement(component, {
-                                    ...{ value, row },
+                                    value,
+                                    row,
                                     placeholder:
                                         idx === 0 && isPlaceholder(row),
+                                    ...(idx === 0 &&
+                                    isPlaceholder(row) &&
+                                    placeholderRef
+                                        ? { ref: placeholderRef }
+                                        : {}),
                                 });
                         }
 

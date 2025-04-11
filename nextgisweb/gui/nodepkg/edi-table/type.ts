@@ -16,10 +16,10 @@ export interface ComponentProps<R extends AnyObject = AnyObject> {
     placeholder?: boolean | string;
 }
 
-export interface EdiTableColumn<R extends AnyObject = AnyObject>
+export interface EdiTableColumn<R extends AnyObject = AnyObject, P = any>
     extends TableColumnType {
     shrink?: boolean | string;
-    component?: React.ComponentType<ComponentProps<R>>;
+    component?: React.ComponentType<ComponentProps<R> & P>;
 }
 
 export type { AnyObject };
