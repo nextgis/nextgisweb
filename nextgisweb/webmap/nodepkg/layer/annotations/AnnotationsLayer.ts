@@ -1,7 +1,9 @@
 import type { Feature } from "ol";
+import { Vector as VectorLayer } from "ol/layer";
 import { Vector as VectorSource } from "ol/source";
 
 import type { MapStore } from "../../ol/MapStore";
+import type { ExtendedOlLayer } from "../../ol/layer/CoreLayer";
 import VectorLayerClass from "../../ol/layer/Vector";
 
 import { AnnotationFeature } from "./AnnotationFeature";
@@ -40,6 +42,35 @@ export class AnnotationsLayer {
             visible,
         });
         this._layer.getLayer().setSource(this._source);
+
+        const olLayer = this._layer.getLayer() as ExtendedOlLayer;
+        olLayer.printingCopy = () => {
+            const newSource = new VectorSource({
+                features: this._source.getFeatures().map((feature) => {
+                    const clonedFeature = feature.clone();
+                    const annFeature = feature.get("annFeature");
+                    if (annFeature) {
+                        clonedFeature.set("annFeature", annFeature);
+                    }
+
+                    const popup = feature.get("popup");
+                    if (popup) {
+                        clonedFeature.set("popup", popup);
+                    }
+                    clonedFeature.setStyle(feature.getStyle());
+                    return clonedFeature;
+                }),
+            });
+
+            const newLayer = new VectorLayer({
+                source: newSource,
+                visible: this._layer.getLayer().getVisible(),
+                opacity: this._layer.getLayer().getOpacity(),
+                zIndex: this._layer.getLayer().getZIndex(),
+            });
+
+            return newLayer;
+        };
     }
 
     addToMap(map: MapStore): void {

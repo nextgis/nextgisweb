@@ -16,7 +16,7 @@ interface PopupTemplateElements {
 
 type AccessType = "public" | "own" | "private" | null;
 
-class OlPopupExtendsd extends OlPopup {
+class OlPopupExtended extends OlPopup {
     constructor(
         public annFeature: AnnotationFeature,
         public annPopup: AnnotationsPopup,
@@ -47,7 +47,7 @@ class OlPopupExtendsd extends OlPopup {
 }
 
 export class AnnotationsPopup {
-    private _popup: OlPopupExtendsd;
+    private _popup: OlPopupExtended;
     private _annFeature: AnnotationFeature;
     private _contentElements: PopupTemplateElements | null = null;
     private _editable: boolean;
@@ -65,7 +65,7 @@ export class AnnotationsPopup {
             ? `annotation ${this._getAccessCssClass(annotationFeature)}`
             : "annotation";
 
-        this._popup = new OlPopupExtendsd(annotationFeature, this, {
+        this._popup = new OlPopupExtended(annotationFeature, this, {
             insertFirst: false,
             autoPan: false,
             customCssClass,
