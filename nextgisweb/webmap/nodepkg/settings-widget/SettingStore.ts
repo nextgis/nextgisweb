@@ -8,41 +8,12 @@ import type {
     EditorStoreOptions,
 } from "@nextgisweb/resource/type";
 import type { ResourceRef } from "@nextgisweb/resource/type/api";
-import type {
-    ExtentWSEN,
-    WebMapRead,
-    WebMapUpdate,
-} from "@nextgisweb/webmap/type/api";
+import type { WebMapRead, WebMapUpdate } from "@nextgisweb/webmap/type/api";
+
+import { convertExtentToArray, extractExtentFromArray } from "../utils/extent";
 
 type WithoutItems<T> = Omit<T, "root_item" | "draw_order_enabled">;
 type AnnotationDefault = WebMapRead["annotation_default"];
-
-function convertExtentToArray(
-    extent: ExtentRowValue
-): ExtentWSEN | null | undefined {
-    const { left, bottom, right, top } = extent;
-
-    if (
-        [left, bottom, right, top].some(
-            (value) => value === undefined || value === null
-        )
-    ) {
-        return null;
-    }
-
-    return [left, bottom, right, top] as ExtentWSEN;
-}
-
-function extractExtent(
-    extentArray?: (number | null | undefined)[] | null
-): ExtentRowValue {
-    return {
-        left: extentArray?.[0] ?? null,
-        bottom: extentArray?.[1] ?? null,
-        right: extentArray?.[2] ?? null,
-        top: extentArray?.[3] ?? null,
-    };
-}
 
 export class SettingStore
     implements EditorStore<WebMapRead, WithoutItems<WebMapUpdate>>
@@ -103,8 +74,10 @@ export class SettingStore
         this.annotationDefault = value.annotation_default;
         this.legendSymbols = value.legend_symbols;
         this.measureSrs = value.measure_srs ? value.measure_srs.id : null;
-        this.initialExtent = extractExtent(value.initial_extent);
-        this.constrainingExtent = extractExtent(value.constraining_extent);
+        this.initialExtent = extractExtentFromArray(value.initial_extent);
+        this.constrainingExtent = extractExtentFromArray(
+            value.constraining_extent
+        );
         this.title = value.title;
         this.bookmarkResource = value.bookmark_resource;
         this.options = value.options;
