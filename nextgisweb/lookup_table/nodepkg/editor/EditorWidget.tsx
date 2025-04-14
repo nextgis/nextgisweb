@@ -49,10 +49,11 @@ const msgClear = gettext("Clear");
 // prettier-ignore
 const msgConfirm = gettext("All existing records will be deleted after import. Are you sure you want to proceed?");
 
-const InputKey = observer(
-    ({ row, placeholder }: ComponentProps<RecordItem>) => {
+const InputKey = observer<ComponentProps<RecordItem>>(
+    ({ row, placeholder, placeholderRef }) => {
         return (
             <Input
+                ref={placeholderRef}
                 value={row.key}
                 onChange={(e) => {
                     const props: Partial<RecordOption> = {
@@ -72,7 +73,7 @@ const InputKey = observer(
 
 InputKey.displayName = "InputKey";
 
-const InputValue = observer(({ row }: ComponentProps<RecordItem>) => {
+const InputValue = observer<ComponentProps<RecordItem>>(({ row }) => {
     if (row.type === "string") {
         return (
             <Input
@@ -90,7 +91,7 @@ const InputValue = observer(({ row }: ComponentProps<RecordItem>) => {
 
 InputValue.displayName = "InputValue";
 
-const columns: EdiTableColumn<RecordItem>[] = [
+const columns: EdiTableColumn<ComponentProps<RecordItem>>[] = [
     {
         key: "key",
         title: gettext("Key"),
