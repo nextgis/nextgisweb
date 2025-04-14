@@ -1,7 +1,6 @@
-from time import sleep
-
 import pytest
 import transaction
+from freezegun import freeze_time
 from PIL import Image, ImageDraw
 
 from nextgisweb.env import DBSession
@@ -108,11 +107,15 @@ def test_get_missing(frtc):
 
 def test_ttl(frtc, img_cross_red):
     tile = (0, 0, 0)
-    frtc.ttl = 1
-    frtc.put_tile(tile, img_cross_red)
-    sleep(1)
-    exists, cimg = frtc.get_tile(tile)
-    assert not exists
+    frtc.ttl = 10
+    with freeze_time() as dt:
+        frtc.put_tile(tile, img_cross_red)
+        dt.tick(5)
+        exists, cimg = frtc.get_tile(tile)
+        assert exists
+        dt.tick(6)
+        exists, cimg = frtc.get_tile(tile)
+        assert not exists
 
 
 def test_clear(frtc, img_cross_red):
