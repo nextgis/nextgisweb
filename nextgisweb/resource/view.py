@@ -345,7 +345,7 @@ def resource_section_children(obj, *, request, **kwargs):
 
 @resource_sections("@nextgisweb/resource/resource-section/description", order=-60)
 def resource_section_description(obj, **kwargs):
-    return obj.description is not None
+    return bool(obj.description)
 
 
 @resource_sections("@nextgisweb/resource/resource-section/external-access")
