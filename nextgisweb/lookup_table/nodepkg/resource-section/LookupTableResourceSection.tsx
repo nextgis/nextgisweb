@@ -6,11 +6,13 @@ import { assert } from "@nextgisweb/jsrealm/error";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { ResourceSection } from "@nextgisweb/resource/resource-section";
 
+import { lookupTableLoadItems } from "../util/sort";
+
 export const LookupTableResourceSection: ResourceSection = ({
     resourceData,
 }) => {
-    const items = resourceData.lookup_table?.items;
-    assert(items);
+    const lookupTable = resourceData.lookup_table;
+    assert(lookupTable);
 
     type Record = { key: string; value: string };
 
@@ -33,12 +35,8 @@ export const LookupTableResourceSection: ResourceSection = ({
     }, []);
 
     const dataSource = useMemo<Record[]>(
-        () =>
-            Object.entries(items).map(([key, value]) => ({
-                key,
-                value,
-            })),
-        [items]
+        () => lookupTableLoadItems(lookupTable),
+        [lookupTable]
     );
 
     return (

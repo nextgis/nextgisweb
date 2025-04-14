@@ -2,6 +2,7 @@ import { useMemo } from "react";
 
 import { Select } from "@nextgisweb/gui/antd";
 import type { SelectProps } from "@nextgisweb/gui/antd";
+import { lookupTableLoadItems } from "@nextgisweb/lookup-table/util/sort";
 import { useRouteGet } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
@@ -24,16 +25,11 @@ export function LookupSelect({
     });
 
     const options = useMemo(() => {
-        const items = data?.lookup_table?.items;
-        if (items) {
-            return Object.entries(items)
-                .map(([value, label]) => {
-                    return {
-                        value,
-                        label,
-                    };
-                })
-                .sort((a, b) => a.label.localeCompare(b.label));
+        const lookupTable = data?.lookup_table;
+        if (lookupTable) {
+            return lookupTableLoadItems(lookupTable).map(({ key, value }) => {
+                return { value: key, label: value };
+            });
         }
         return [];
     }, [data]);

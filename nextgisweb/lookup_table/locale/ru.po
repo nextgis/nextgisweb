@@ -1,28 +1,36 @@
-#: model.py:16 nodepkg/editor/EditorWidget.tsx:170 view.py:16
+#: model.py:34 nodepkg/editor/EditorWidget.tsx:226
 msgid "Lookup table"
 msgstr "Справочник"
 
-#: nodepkg/component/lookup-select/LookupSelect.tsx:52
+#: nodepkg/component/lookup-select/LookupSelect.tsx:48
 msgid "Loading..."
 msgstr "Загрузка..."
 
-#: nodepkg/editor/EditorWidget.tsx:34
+#: nodepkg/editor/EditorWidget.tsx:42
 msgid "Type here to add a new item..."
 msgstr "Введите новый ключ здесь..."
 
-#: nodepkg/editor/EditorWidget.tsx:35
+#: nodepkg/editor/EditorWidget.tsx:43
 msgid "Export"
 msgstr "Экспорт"
 
-#: nodepkg/editor/EditorWidget.tsx:36
+#: nodepkg/editor/EditorWidget.tsx:44
 msgid "Import"
 msgstr "Импорт"
 
-#: nodepkg/editor/EditorWidget.tsx:37
+#: nodepkg/editor/EditorWidget.tsx:45
+msgid "Sort order"
+msgstr "Порядок сортировки"
+
+#: nodepkg/editor/EditorWidget.tsx:46
+msgid "Resort rows"
+msgstr "Пересортировать строки"
+
+#: nodepkg/editor/EditorWidget.tsx:47
 msgid "Clear"
 msgstr "Очистить"
 
-#: nodepkg/editor/EditorWidget.tsx:40
+#: nodepkg/editor/EditorWidget.tsx:50
 msgid ""
 "All existing records will be deleted after import. Are you sure you want to "
 "proceed?"
@@ -30,14 +38,36 @@ msgstr ""
 "Все существующие записи будут удалены после импорта. Вы уверены, что хотите "
 "продолжить?"
 
-#: nodepkg/editor/EditorWidget.tsx:86 template/resource_section.mako:8
+#: nodepkg/editor/EditorWidget.tsx:100
+#: nodepkg/resource-section/LookupTableResourceSection.tsx:23
 msgid "Key"
 msgstr "Ключ"
 
-#: nodepkg/editor/EditorWidget.tsx:92 template/resource_section.mako:9
+#: nodepkg/editor/EditorWidget.tsx:106
+#: nodepkg/resource-section/LookupTableResourceSection.tsx:30
 msgid "Value"
 msgstr "Значение"
 
-#: template/resource_section.mako:3
+#: nodepkg/editor/EditorWidget.tsx:116
+msgid "Key, ascending"
+msgstr "Ключ, возр."
+
+#: nodepkg/editor/EditorWidget.tsx:117
+msgid "Key, descending"
+msgstr "Ключ, убыв."
+
+#: nodepkg/editor/EditorWidget.tsx:118
+msgid "Value, ascending"
+msgstr "Значение, возр."
+
+#: nodepkg/editor/EditorWidget.tsx:119
+msgid "Value, descending"
+msgstr "Значение, убыв."
+
+#: nodepkg/editor/EditorWidget.tsx:120
+msgid "Custom"
+msgstr "Настраиваемый"
+
+#: nodepkg/resource-section/LookupTableResourceSection.tsx:55
 msgid "Items"
 msgstr "Элементы справочника"

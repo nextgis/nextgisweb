@@ -161,6 +161,8 @@ export const EdiTable = observer(
             }
         };
 
+        const { moveRow } = store;
+
         const tableColumns: TableColumnType<R>[] = useMemo(() => {
             const isPlaceholder = (row: R) => row === store.placeholder;
             const actsCell = { className: "row-actions" };
@@ -242,7 +244,7 @@ export const EdiTable = observer(
             }
 
             return resultColumns;
-        }, [store, columns, renderActs]);
+        }, [store, columns, renderActs, moveRow]);
 
         return (
             <DndContext
