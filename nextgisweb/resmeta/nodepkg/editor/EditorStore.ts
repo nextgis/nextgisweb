@@ -4,9 +4,7 @@ import { EditorStore as KeyValueEditorStore } from "@nextgisweb/gui/edi-table";
 import { RecordItem } from "@nextgisweb/gui/edi-table/store/RecordItem";
 import type { RecordOption } from "@nextgisweb/gui/edi-table/store/RecordItem";
 
-export class EditorStore extends KeyValueEditorStore<{
-    items: RecordOption[];
-}> {
+export class EditorStore extends KeyValueEditorStore {
     readonly identity = "resmeta";
 
     @action

@@ -6,20 +6,20 @@ import type { EditorStore } from "./EditorStore";
 
 let idSeq = 0;
 
-export interface RecordOption {
-    key: string | undefined;
-    value: unknown;
+export interface RecordOption<V = any> {
+    key: string;
+    value: V;
     type?: string;
 }
 
-export class RecordItem implements RecordOption {
-    @observable.ref accessor key: string | undefined = undefined;
-    @observable.ref accessor value: unknown = undefined;
+export class RecordItem<V = any> implements RecordOption<V> {
+    @observable.ref accessor key: string = "";
+    @observable.ref accessor value: V = undefined as V;
 
     readonly id: number;
     readonly store: EditorStore;
 
-    constructor(store: EditorStore, { key, value }: RecordOption) {
+    constructor(store: EditorStore, { key, value }: RecordOption<V>) {
         this.store = store;
         this.id = ++idSeq;
         this.key = key;
@@ -45,44 +45,49 @@ export class RecordItem implements RecordOption {
     }
 
     @action
-    update({ key, value, type }: Partial<RecordOption>) {
+    update({ key, value, type }: Partial<RecordOption<V>>) {
         if (key !== undefined) {
             this.key = key;
         }
 
+        let val = this.value as unknown;
+        // If the new value is `null` and the current type is "number" convert it to 0
+        // to prevents assigning `null` to a number field
         if (value !== undefined) {
-            this.value = this.type === "number" && value === null ? 0 : value;
+            val = this.type === "number" && value === null ? 0 : value;
         }
 
         if (type !== undefined) {
             if (type === "string") {
-                if (this.value === undefined || this.value === null) {
-                    this.value = "";
+                if (val === undefined || val === null) {
+                    val = "";
                 } else {
-                    this.value = this.value.toString();
+                    val = val.toString();
                 }
                 if (typeof this.value !== "string") {
-                    this.value = "";
+                    val = "";
                 }
             } else if (type === "number") {
-                if (typeof this.value === "boolean") {
-                    this.value = this.value ? 1 : 0;
+                if (typeof val === "boolean") {
+                    val = val ? 1 : 0;
                 } else {
                     try {
-                        this.value = JSON.parse(this.value as string);
+                        val = JSON.parse(val as string);
                     } catch (err) {
                         // Do nothing
                     }
                 }
-                if (typeof this.value !== "number") {
-                    this.value = 0;
+                if (typeof val !== "number") {
+                    val = 0;
                 }
             } else if (type === "boolean") {
-                this.value = !!this.value;
+                val = !!val;
             } else if (type === "null") {
-                this.value = null;
+                val = null;
             }
         }
+
+        this.value = val as V;
 
         this.store.dirty = true;
 

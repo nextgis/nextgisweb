@@ -4,9 +4,7 @@ import type { EdiTableStore } from "@nextgisweb/gui/edi-table";
 
 import { RecordItem } from "./RecordItem";
 
-export class EditorStore<V = unknown, D = V>
-    implements EdiTableStore<RecordItem>
-{
+export class EditorStore implements EdiTableStore<RecordItem> {
     identity = "";
 
     @observable.shallow accessor items: RecordItem[] = [];
@@ -14,16 +12,6 @@ export class EditorStore<V = unknown, D = V>
 
     constructor() {
         this.rotatePlaceholder();
-    }
-
-    @action
-    load(value: V) {
-        console.log(value);
-    }
-
-    @action
-    dump(): D | undefined {
-        return this.items as D;
     }
 
     @computed
@@ -57,7 +45,10 @@ export class EditorStore<V = unknown, D = V>
         if (this.placeholder) {
             this.items.push(this.placeholder);
         }
-        this.placeholder = new RecordItem(this, { key: "", value: undefined });
+        this.placeholder = new RecordItem(this, {
+            key: "",
+            value: undefined,
+        });
     }
 
     @action

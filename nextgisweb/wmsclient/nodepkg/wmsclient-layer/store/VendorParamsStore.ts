@@ -4,7 +4,7 @@ import { EditorStore as KeyValueEditorStore } from "@nextgisweb/gui/edi-table";
 import { RecordItem } from "@nextgisweb/gui/edi-table/store/RecordItem";
 
 type StoreValue = Record<string, string>;
-export class VendorParamsStore extends KeyValueEditorStore<StoreValue> {
+export class VendorParamsStore extends KeyValueEditorStore {
     identity = "";
 
     constructor(value?: StoreValue) {

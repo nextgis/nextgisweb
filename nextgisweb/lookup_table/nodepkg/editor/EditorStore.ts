@@ -14,9 +14,7 @@ import type { EditorStore as IEditorStore } from "@nextgisweb/resource/type";
 import { lookupTableIsSorted, lookupTableSort } from "../util/sort";
 
 export class EditorStore
-    extends KeyValueEditorStore<
-        LookupTableRead | LookupTableCreate | LookupTableUpdate
-    >
+    extends KeyValueEditorStore
     implements
         IEditorStore<LookupTableRead, LookupTableCreate, LookupTableUpdate>
 {
@@ -30,7 +28,8 @@ export class EditorStore
         this.dirty = true;
 
         if (this.sort === "CUSTOM") return;
-        this.items = lookupTableSort(this.items, this.sort);
+        const items = lookupTableSort(this.items, this.sort);
+        this.items = items;
     }
 
     @computed
@@ -63,13 +62,10 @@ export class EditorStore
 
     @action
     load(value: LookupTableRead) {
-        this.items = lookupTableSort(
-            Object.entries(value.items).map(
-                ([key, value]) => new RecordItem(this, { key, value })
-            ),
-            value.sort,
-            value.order
+        const items = Object.entries(value.items).map(
+            ([key, value]) => new RecordItem(this, { key, value })
         );
+        this.items = lookupTableSort(items, value.sort, value.order);
         this.sort = value.sort;
         this.dirty = false;
     }
