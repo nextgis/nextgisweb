@@ -14,7 +14,7 @@ export function init(opts: { dsn: string; routeName: string }) {
         es2020 = eval(
             "((undefined?.() ?? Number.MAX_SAFE_INTEGER) === 9007199254740991) " +
                 "&& !!Promise.allSettled && !!String.prototype.matchAll " +
-                "&& ((...rest) => rest[0])(true)"
+                "&& ((...rest) => rest[0])(true) && ((v = true) => v)()"
         );
     } catch {
         // Assume ES2020 is unsupported
