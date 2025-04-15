@@ -1,6 +1,6 @@
 from io import BytesIO
 from itertools import product
-from math import ceil, floor, log
+from math import ceil, floor
 from pathlib import Path
 from typing import Dict, List, Literal, Union
 
@@ -16,11 +16,13 @@ from nextgisweb.lib.apitype import AnyOf, AsJSON, ContentType, StatusCode
 from nextgisweb.core.exception import UserException, ValidationError
 from nextgisweb.resource import DataScope, Resource, ResourceFactory, ResourceNotFound, ResourceRef
 from nextgisweb.resource.api import ResourceID
+from nextgisweb.spatial_ref_sys import SRS
+from nextgisweb.spatial_ref_sys.api import SRSID
 
 from .imgcodec import COMPRESSION_FAST, FORMAT_PNG, image_encoder_factory
 from .interface import ILegendableStyle, IRenderableStyle
 from .legend import ILegendSymbols
-from .util import af_transform
+from .util import TILE_SIZE, af_transform, image_zoom
 
 RenderResource = Annotated[
     List[int],
@@ -81,7 +83,7 @@ with open(Path(__file__).parent / "empty_256x256.png", "rb") as f:
 
 
 def rtoint(arg):
-    return tuple(map(lambda c: int(round(c)), arg))
+    return tuple(round(c) for c in arg)
 
 
 def tile_debug_info(img, offset=(0, 0), color="black", zxy=None, extent=None, msg=None):
@@ -110,7 +112,7 @@ def image_response(img, empty_code, size):
             return Response(None, status=204, content_type=None)
         elif empty_code == 404:
             return Response(b"", status=404, content_type="application/octet-stream")
-        elif size == (256, 256):
+        elif size == (TILE_SIZE, TILE_SIZE):
             return Response(EMPTY_TILE_256x256, content_type="image/png")
         else:
             img = Image.new("RGBA", size)
@@ -164,6 +166,7 @@ def tile(
 
     p_symbols = process_symbols(symbols) if symbols else dict()
     p_cache = cache and request.env.render.tile_cache_enabled
+    srs_obj = SRS.filter_by(id=3857).one()
 
     aimg = None
     for resid in resource:
@@ -199,8 +202,8 @@ def tile(
             cond = dict()
             if rsymbols is not None:
                 cond["symbols"] = rsymbols
-            req = obj.render_request(obj.srs, cond=cond)
-            rimg = req.render_tile((z, x, y), 256)
+            req = obj.render_request(srs_obj, cond=cond)
+            rimg = req.render_tile((z, x, y), TILE_SIZE)
 
             if cache_enabled:
                 tcache.put_tile((z, x, y), rimg)
@@ -219,13 +222,14 @@ def tile(
                     % (obj.id, aimg.mode, rimg.mode)
                 )
 
-    return image_response(aimg, nd, (256, 256))
+    return image_response(aimg, nd, (TILE_SIZE, TILE_SIZE))
 
 
 def image(
     request,
     *,
     resource: RenderResource,
+    srs: SRSID = 3857,
     extent: RenderExtent,
     size: ImageSize,
     symbols: Symbols,
@@ -238,59 +242,14 @@ def image(
 
     p_symbols = process_symbols(symbols) if symbols else dict()
     p_cache = cache and request.env.render.tile_cache_enabled
-
-    resolution = (
-        (extent[2] - extent[0]) / size[0],
-        (extent[3] - extent[1]) / size[1],
-    )
-
-    aimg = None
-    zexact = None
-    for resid in resource:
-        obj = Resource.filter_by(id=resid).one_or_none()
-
-        if obj is None:
-            raise ResourceNotFound(resid)
-
-        if not IRenderableStyle.providedBy(obj):
-            raise ValidationError("Resource (ID=%d) cannot be rendered." % (resid,))
-
-        request.resource_permission(DataScope.read, obj)
-
-        rimg = None
-
-        if p_cache and zexact is None:
-            if abs(resolution[0] - resolution[1]) < 1e-9:
-                ztile = log((obj.srs.maxx - obj.srs.minx) / (256 * resolution[0]), 2)
-                zexact = abs(round(ztile) - ztile) < 1e-9
-                if zexact:
-                    ztile = int(round(ztile))
-            else:
-                zexact = False
-
-        rsymbols = p_symbols.get(resid)
-        tcache = obj.tile_cache
-
-        # Is requested image may be cached via tiles?
-        cache_enabled = (
-            p_cache
-            and rsymbols is None
-            and zexact
-            and tcache is not None
-            and tcache.enabled
-            and tcache.image_compose
-            and (tcache.max_z is None or ztile <= tcache.max_z)
-        )
-
-        ext_extent = extent
-        ext_size = size
-        ext_offset = (0, 0)
-
-        if cache_enabled:
+    srs_obj = SRS.filter_by(id=srs).one()
+    if p_cache:
+        cache_zoom = image_zoom(extent, size, srs_obj)
+        if cache_zoom is not None:
             # Affine transform from layer to tile
             at_l2t = af_transform(
-                (obj.srs.minx, obj.srs.miny, obj.srs.maxx, obj.srs.maxy),
-                (0, 0, 2**ztile, 2**ztile),
+                (srs_obj.minx, srs_obj.miny, srs_obj.maxx, srs_obj.maxy),
+                (0, 0, 2**cache_zoom, 2**cache_zoom),
             )
             at_t2l = ~at_l2t
 
@@ -305,22 +264,53 @@ def image(
             t_rt = tuple(at_l2t * extent[2:4])
 
             tb = (
-                int(floor(t_lb[0]) if t_lb[0] == min(t_lb[0], t_rt[0]) else ceil(t_lb[0])),
-                int(floor(t_lb[1]) if t_lb[1] == min(t_lb[1], t_rt[1]) else ceil(t_lb[1])),
-                int(floor(t_rt[0]) if t_rt[0] == min(t_lb[0], t_rt[0]) else ceil(t_rt[0])),
-                int(floor(t_rt[1]) if t_rt[1] == min(t_lb[1], t_rt[1]) else ceil(t_rt[1])),
+                floor(t_lb[0]) if t_lb[0] == min(t_lb[0], t_rt[0]) else ceil(t_lb[0]),
+                floor(t_lb[1]) if t_lb[1] == min(t_lb[1], t_rt[1]) else ceil(t_lb[1]),
+                floor(t_rt[0]) if t_rt[0] == min(t_lb[0], t_rt[0]) else ceil(t_rt[0]),
+                floor(t_rt[1]) if t_rt[1] == min(t_lb[1], t_rt[1]) else ceil(t_rt[1]),
             )
 
-            ext_extent = at_t2l * tb[0:2] + at_t2l * tb[2:4]
+            cache_ext_extent = at_t2l * tb[0:2] + at_t2l * tb[2:4]
             ext_im = rtoint(at_t2i * tb[0:2] + at_t2i * tb[2:4])
-            ext_size = (ext_im[2] - ext_im[0], ext_im[1] - ext_im[3])
-            ext_offset = (-ext_im[0], -ext_im[3])
+            cache_ext_size = (ext_im[2] - ext_im[0], ext_im[1] - ext_im[3])
+            cache_ext_offset = (-ext_im[0], -ext_im[3])
 
             tx_range = tuple(range(min(tb[0], tb[2]), max(tb[0], tb[2])))
             ty_range = tuple(range(min(tb[1], tb[3]), max(tb[1], tb[3])))
 
+    aimg = None
+    for resid in resource:
+        obj = Resource.filter_by(id=resid).one_or_none()
+
+        if obj is None:
+            raise ResourceNotFound(resid)
+
+        if not IRenderableStyle.providedBy(obj):
+            raise ValidationError("Resource (ID=%d) cannot be rendered." % (resid,))
+
+        request.resource_permission(DataScope.read, obj)
+
+        rimg = None
+
+        rsymbols = p_symbols.get(resid)
+        tcache = obj.tile_cache
+
+        # Is requested image may be cached via tiles?
+        cache_enabled = (
+            p_cache
+            and cache_zoom is not None
+            and rsymbols is None
+            and tcache is not None
+            and tcache.enabled
+            and tcache.image_compose
+            and (tcache.max_z is None or cache_zoom <= tcache.max_z)
+        )
+
+        if cache_enabled:
             for tx, ty in product(tx_range, ty_range):
-                cache_exists, timg = tcache.get_tile((ztile, tx, ty))
+                zxy = (cache_zoom, tx, ty)
+
+                cache_exists, timg = tcache.get_tile(zxy)
                 if not cache_exists:
                     rimg = None
                     break
@@ -336,7 +326,7 @@ def image(
                         timg = tile_debug_info(
                             timg.convert("RGBA"),
                             color="blue",
-                            zxy=(ztile, tx, ty),
+                            zxy=zxy,
                             extent=at_t2l * (tx, ty) + at_t2l * (tx + 1, ty + 1),
                             msg=msg,
                         )
@@ -351,7 +341,17 @@ def image(
             cond = dict()
             if rsymbols is not None:
                 cond["symbols"] = rsymbols
-            req = obj.render_request(obj.srs, cond=cond)
+            req = obj.render_request(srs_obj, cond=cond)
+
+            if cache_enabled:
+                ext_extent = cache_ext_extent
+                ext_size = cache_ext_size
+                ext_offset = cache_ext_offset
+            else:
+                ext_extent = extent
+                ext_size = size
+                ext_offset = (0, 0)
+
             rimg = req.render_extent(ext_extent, ext_size)
 
             empty_image = rimg is None
@@ -359,15 +359,19 @@ def image(
             if cache_enabled:
                 tile_cache_failed = False
                 for tx, ty in product(tx_range, ty_range):
+                    zxy = (cache_zoom, tx, ty)
+
                     t_offset = at_t2i * (tx, ty)
                     t_offset = rtoint((t_offset[0] + ext_offset[0], t_offset[1] + ext_offset[1]))
                     if empty_image:
                         timg = None
                     else:
-                        timg = rimg.crop(t_offset + (t_offset[0] + 256, t_offset[1] + 256))
+                        timg = rimg.crop(
+                            t_offset + (t_offset[0] + TILE_SIZE, t_offset[1] + TILE_SIZE)
+                        )
 
                     tile_cache_failed = tile_cache_failed or (
-                        not obj.tile_cache.put_tile((ztile, tx, ty), timg)
+                        not obj.tile_cache.put_tile(zxy, timg)
                     )
 
                     if tdi:
@@ -380,7 +384,7 @@ def image(
                             rimg,
                             offset=t_offset,
                             color="red",
-                            zxy=(ztile, tx, ty),
+                            zxy=zxy,
                             extent=at_t2l * (tx, ty) + at_t2l * (tx + 1, ty + 1),
                             msg=msg,
                         )

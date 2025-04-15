@@ -1,7 +1,10 @@
 import struct
+from math import log2
 
 import PIL.ImageStat
 from affine import Affine
+
+TILE_SIZE = 256
 
 
 def imgcolor(img):
@@ -79,3 +82,22 @@ def scale_range_intersection(a, b):
         max_i = max(max_a, max_b)
 
     return (min_i, max_i)
+
+
+def image_zoom(extent, size, srs):
+    if srs.id != 3857:
+        return None
+
+    epsilon = 1e-9
+
+    res_x = (extent[2] - extent[0]) / size[0]
+    res_y = (extent[3] - extent[1]) / size[1]
+    if abs(res_x - res_y) > epsilon:
+        return None
+
+    z = log2((srs.maxx - srs.minx) / (TILE_SIZE * res_x))
+    rz = round(z)
+    if abs(rz - z) > epsilon:
+        return None
+
+    return rz

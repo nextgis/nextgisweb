@@ -26,7 +26,7 @@ from nextgisweb.lib.logging import logger
 from nextgisweb.resource import CRUTypes, Resource, ResourceScope, SAttribute, Serializer
 
 from .interface import IRenderableNonCached, IRenderableStyle
-from .util import imgcolor, pack_color, unpack_color
+from .util import TILE_SIZE, imgcolor, pack_color, unpack_color
 
 Base.depends_on("resource")
 
@@ -381,7 +381,7 @@ class ResourceTileCache(Base):
             colors = unpack_color(color)
             if colors[3] == 0:
                 return True, None
-            return True, Image.new("RGBA", (256, 256), colors)
+            return True, Image.new("RGBA", (TILE_SIZE, TILE_SIZE), colors)
 
         else:
             tilestor, lock = self.get_tilestor()
