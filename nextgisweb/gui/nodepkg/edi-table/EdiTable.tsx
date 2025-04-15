@@ -35,7 +35,7 @@ import "./EdiTable.less";
 
 export interface EdiTableProps<
     S extends EdiTableStore,
-    R extends AnyObject = AnyObject,
+    R extends AnyObject,
     T = FunctionKeys<S>,
 > extends Omit<TableProps, "columns"> {
     rowActions?: T[] | RowActionConfig<T>[] | RowAction<R>[];
@@ -222,18 +222,18 @@ export const EdiTable = observer(
                         };
 
                         if (component) {
-                            result.render = (value, row) =>
-                                createElement(component, {
+                            result.render = (value, row) => {
+                                const placeholder =
+                                    idx === 0 && isPlaceholder(row);
+                                return createElement(component, {
                                     value,
                                     row,
-                                    placeholder:
-                                        idx === 0 && isPlaceholder(row),
-                                    ...(idx === 0 &&
-                                    isPlaceholder(row) &&
-                                    placeholderRef
-                                        ? { placeholderRef }
-                                        : {}),
+                                    placeholder,
+                                    placeholderRef: placeholder
+                                        ? placeholderRef
+                                        : undefined,
                                 });
+                            };
                         }
 
                         return result;

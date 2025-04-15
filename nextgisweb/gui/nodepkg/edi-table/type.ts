@@ -11,11 +11,16 @@ export type FunctionKeys<
     [K in keyof RT]: RT[K] extends (row: R) => void ? K : never;
 }[keyof RT];
 
-export interface EdiTableColumnComponentProps<R extends AnyObject = AnyObject> {
+export interface EdiTableColumnComponentProps<R extends AnyObject> {
     /**
      * Current row
      */
     row: R;
+
+    /**
+     * Current cell's value
+     */
+    value: unknown;
 
     /**
      * Indicates if current row is placeholder row
@@ -31,10 +36,9 @@ export interface EdiTableColumnComponentProps<R extends AnyObject = AnyObject> {
     placeholderRef?: Ref<InputRef>;
 }
 
-export interface EdiTableColumn<R extends AnyObject = AnyObject, P = any>
-    extends TableColumnType {
+export interface EdiTableColumn<R extends AnyObject> extends TableColumnType {
     shrink?: boolean | string;
-    component?: ComponentType<EdiTableColumnComponentProps<R> & P>;
+    component?: ComponentType<EdiTableColumnComponentProps<R>>;
 }
 
 export type { AnyObject };

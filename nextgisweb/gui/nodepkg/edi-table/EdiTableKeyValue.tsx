@@ -178,7 +178,7 @@ export class EdiTableKeyValueStore<V>
 }
 
 export const EdiTableKeyInput = observer<
-    EdiTableColumnComponentProps<EdiTableKeyValueRow<unknown>>
+    EdiTableColumnComponentProps<EdiTableKeyValueRow<any>>
 >(({ row, placeholder, placeholderRef }) => {
     return (
         <InputValue

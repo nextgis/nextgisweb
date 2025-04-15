@@ -8,10 +8,7 @@ import {
     EdiTableKeyInput,
     EdiTableValueInput,
 } from "@nextgisweb/gui/edi-table";
-import type {
-    EdiTableColumn,
-    EdiTableColumnComponentProps,
-} from "@nextgisweb/gui/edi-table";
+import type { EdiTableColumn } from "@nextgisweb/gui/edi-table";
 import { ClearIcon, ExportIcon, ImportIcon } from "@nextgisweb/gui/icon";
 import { parseCsv } from "@nextgisweb/gui/util/parseCsv";
 import type { LookupTableRead } from "@nextgisweb/lookup-table/type/api";
@@ -42,7 +39,7 @@ const msgConfirm = gettext("All existing records will be deleted after import. A
 
 type RowType = EditorStore["items"][number];
 
-const columns: EdiTableColumn<EdiTableColumnComponentProps<RowType>>[] = [
+const columns: EdiTableColumn<RowType>[] = [
     {
         key: "key",
         title: gettext("Key"),
