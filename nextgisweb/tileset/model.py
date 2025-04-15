@@ -395,8 +395,13 @@ class SourceAttr(SAttribute):
         )
 
         xtile_min, xtile_max, ytile_min, ytile_max, _ntiles = stat[zmax]
-        _minx, _miny, _nvm1, _nvm2 = srlzr.obj.srs.tile_extent((zmax, xtile_min, ytile_min))
-        _nvm1, _nvm2, _maxx, _maxy = srlzr.obj.srs.tile_extent((zmax, xtile_max, ytile_max))
+        assert xtile_min <= xtile_max and ytile_min <= ytile_max
+
+        # NOTE: Y-axis is top to bottom here!
+        _minx, _miny = srlzr.obj.srs.tile_extent((zmax, xtile_min, ytile_max))[0:2]
+        _maxx, _maxy = srlzr.obj.srs.tile_extent((zmax, xtile_max, ytile_min))[2:4]
+        assert _minx <= _maxx and _miny <= _maxy, (_minx, _maxx, _miny, _maxy)
+
         srlzr.obj.minx = _minx
         srlzr.obj.maxx = _maxx
         srlzr.obj.miny = _miny
