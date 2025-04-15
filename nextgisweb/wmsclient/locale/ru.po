@@ -60,7 +60,7 @@ msgid "WMS layers"
 msgstr "Слои WMS"
 
 #: nodepkg/wmsclient-layer/WmsClientLayerWidget.tsx:116
-#: nodepkg/wmsclient-layer/component/VendorParamsModal.tsx:110
+#: nodepkg/wmsclient-layer/component/VendorParamsModal.tsx:65
 msgid "Vendor parameters"
 msgstr "Вендор параметры"
 
@@ -72,14 +72,10 @@ msgstr "Изменить вендор параметры"
 msgid "WMS Layer"
 msgstr "Слой WMS"
 
-#: nodepkg/wmsclient-layer/component/VendorParamsModal.tsx:20
-msgid "Type to add a new vendor parameter"
-msgstr "Введите новый ключ здесь"
-
-#: nodepkg/wmsclient-layer/component/VendorParamsModal.tsx:66
+#: nodepkg/wmsclient-layer/component/VendorParamsModal.tsx:21
 msgid "Key"
 msgstr "Ключ"
 
-#: nodepkg/wmsclient-layer/component/VendorParamsModal.tsx:72
+#: nodepkg/wmsclient-layer/component/VendorParamsModal.tsx:27
 msgid "Value"
 msgstr "Значение"

@@ -1,10 +1,14 @@
 import Papa from "papaparse";
 
-import type { RecordOption } from "@nextgisweb/gui/edi-table/store/RecordItem";
 import { downloadCsv } from "@nextgisweb/gui/util";
 import type { LookupTableRead } from "@nextgisweb/lookup-table/type/api";
 
-export function exportToCsv(items: RecordOption[]) {
+export interface RowData {
+    key: string;
+    value: string;
+}
+
+export function exportToCsv(items: RowData[]) {
     const serializedItems = items.map((item) => {
         return [item.key as string, item.value as string];
     });
@@ -14,11 +18,11 @@ export function exportToCsv(items: RecordOption[]) {
     downloadCsv(csvContent, "lookup_table.csv");
 }
 
-export function dataToRecords(data: string[][]): RecordOption[] {
+export function dataToRecords(data: string[][]): RowData[] {
     const headers = data[0].map((header) => header.toLowerCase());
     const keyIndex = headers.indexOf("key");
     const valueIndex = headers.indexOf("value");
-    const items: RecordOption[] = [];
+    const items: RowData[] = [];
 
     data.forEach((columns, index) => {
         let key, value;
@@ -38,9 +42,7 @@ export function dataToRecords(data: string[][]): RecordOption[] {
     return items;
 }
 
-export function recordsToLookup(
-    items: RecordOption[]
-): LookupTableRead["items"] {
+export function recordsToLookup(items: RowData[]): LookupTableRead["items"] {
     const result: LookupTableRead["items"] = {};
     items.forEach(({ key, value }) => {
         if (key) {
@@ -51,9 +53,9 @@ export function recordsToLookup(
 }
 
 export function updateItems(
-    oldItems: RecordOption[],
-    newItems: RecordOption[]
-): RecordOption[] {
+    oldItems: RowData[],
+    newItems: RowData[]
+): RowData[] {
     const updatedItems = [...oldItems];
 
     newItems.forEach((newItem) => {

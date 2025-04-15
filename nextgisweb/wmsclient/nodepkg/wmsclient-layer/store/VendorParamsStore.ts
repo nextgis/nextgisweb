@@ -1,14 +1,17 @@
 import { action } from "mobx";
 
-import { EditorStore as KeyValueEditorStore } from "@nextgisweb/gui/edi-table";
-import { RecordItem } from "@nextgisweb/gui/edi-table/store/RecordItem";
+import {
+    EdiTableKeyValueRow,
+    EdiTableKeyValueStore,
+} from "@nextgisweb/gui/edi-table";
 
 type StoreValue = Record<string, string>;
-export class VendorParamsStore extends KeyValueEditorStore {
+
+export class VendorParamsStore extends EdiTableKeyValueStore<string> {
     identity = "";
 
     constructor(value?: StoreValue) {
-        super();
+        super({ defaultValue: "" });
         this.load(value);
     }
 
@@ -16,7 +19,8 @@ export class VendorParamsStore extends KeyValueEditorStore {
     load(val?: StoreValue) {
         if (val) {
             this.items = Object.entries(val).map(
-                ([key, value]) => new RecordItem(this, { key, value })
+                ([key, value]) =>
+                    new EdiTableKeyValueRow<string>(this, { key, value })
             );
             this.dirty = false;
         }
@@ -24,8 +28,6 @@ export class VendorParamsStore extends KeyValueEditorStore {
 
     dump(): StoreValue | undefined {
         if (!this.dirty) return undefined;
-        return Object.fromEntries(
-            this.items.map((i) => [i.key, String(i.value)])
-        );
+        return Object.fromEntries(this.items.map((i) => [i.key, i.value]));
     }
 }

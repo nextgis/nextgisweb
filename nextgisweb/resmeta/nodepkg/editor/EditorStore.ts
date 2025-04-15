@@ -1,28 +1,44 @@
 import { action } from "mobx";
 
-import { EditorStore as KeyValueEditorStore } from "@nextgisweb/gui/edi-table";
-import { RecordItem } from "@nextgisweb/gui/edi-table/store/RecordItem";
-import type { RecordOption } from "@nextgisweb/gui/edi-table/store/RecordItem";
+import {
+    EdiTableKeyValueRow,
+    EdiTableKeyValueStore,
+} from "@nextgisweb/gui/edi-table";
+import type {
+    ResmetaCreate,
+    ResmetaRead,
+    ResmetaUpdate,
+} from "@nextgisweb/resmeta/type/api";
+import type { EditorStore as IEditorStore } from "@nextgisweb/resource/type";
 
-export class EditorStore extends KeyValueEditorStore {
+export type ValueType = ResmetaRead["items"][string];
+
+export class EditorStore
+    extends EdiTableKeyValueStore<ValueType>
+    implements IEditorStore<ResmetaRead, ResmetaCreate, ResmetaUpdate>
+{
     readonly identity = "resmeta";
 
+    constructor() {
+        super({ defaultValue: "" });
+    }
+
     @action
-    load(value: { items: RecordOption[] }) {
+    load(value: ResmetaRead) {
         if (value) {
             this.items = Object.entries(value.items).map(
-                ([key, value]) => new RecordItem(this, { key, value })
+                ([key, value]) =>
+                    new EdiTableKeyValueRow<ValueType>(this, { key, value })
             );
             this.dirty = false;
         }
     }
 
-    dump(): { items: RecordOption[] } | undefined {
+    dump() {
         if (!this.dirty) return undefined;
         const items = Object.fromEntries(
             this.items.map((i) => [i.key, i.value])
         );
-        // FIXME: Type of items should be Record<string, string | number | boolean | null>
-        return { items: items as unknown as RecordOption[] };
+        return { items };
     }
 }

@@ -100,15 +100,15 @@ msgstr "Уточнить перевод или добавить новый"
 msgid "Browser default"
 msgstr "По умолчанию в браузере"
 
-#: nodepkg/confirm.ts:12
+#: nodepkg/confirm.ts:14
 msgid "Confirmation required"
 msgstr "Необходимо подтверждение"
 
-#: nodepkg/confirm.ts:13
+#: nodepkg/confirm.ts:15
 msgid "Please confirm this action."
 msgstr "Пожалуйста, подтвердите данное действие."
 
-#: nodepkg/confirm.ts:15 nodepkg/error/shared.tsx:81
+#: nodepkg/confirm.ts:17 nodepkg/error/shared.tsx:81
 msgid "OK"
 msgstr "OK"
 
@@ -126,19 +126,23 @@ msgstr "Удалить"
 msgid "Failed to delete."
 msgstr "Ошибка удаления."
 
+#: nodepkg/edi-table/EdiTableKeyValue.tsx:11
+msgid "Type here to add a new item..."
+msgstr "Введите новый ключ здесь..."
+
+#: nodepkg/edi-table/EdiTableKeyValue.tsx:42
+msgid "Key required"
+msgstr "Требуется ключ"
+
+#: nodepkg/edi-table/EdiTableKeyValue.tsx:48
+msgid "Key not unique"
+msgstr "Ключ не уникален"
+
 #: nodepkg/edi-table/RowAction.tsx:74
 msgid "Clone"
 msgstr "Клонировать"
 
-#: nodepkg/edi-table/store/RecordItem.ts:36
-msgid "Key required"
-msgstr "Требуется ключ"
-
-#: nodepkg/edi-table/store/RecordItem.ts:42
-msgid "Key not unique"
-msgstr "Ключ не уникален"
-
-#: nodepkg/error/ErrorModal.tsx:47 nodepkg/error/extractError.ts:5
+#: nodepkg/error/ErrorModal.tsx:48 nodepkg/error/extractError.ts:5
 msgid "Error"
 msgstr "Ошибка"
 

@@ -1,117 +1,87 @@
 import { observer } from "mobx-react-lite";
 
-import { Input, InputNumber, Select } from "@nextgisweb/gui/antd";
-import type { InputNumberProps, InputProps } from "@nextgisweb/gui/antd";
-import { EdiTable } from "@nextgisweb/gui/edi-table";
+import { InputNumber, InputValue, Select } from "@nextgisweb/gui/antd";
+import { EdiTable, EdiTableKeyInput } from "@nextgisweb/gui/edi-table";
 import type {
-    RecordItem,
-    RecordOption,
-} from "@nextgisweb/gui/edi-table/store/RecordItem";
-import type {
-    ComponentProps,
     EdiTableColumn,
-} from "@nextgisweb/gui/edi-table/type";
+    EdiTableColumnComponentProps,
+} from "@nextgisweb/gui/edi-table";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { EditorWidget as IEditorWidget } from "@nextgisweb/resource/type";
 
 import type { EditorStore } from "./EditorStore";
 
-const msgTypeToAdd = gettext("Type here to add a new key...");
-
 const { Option } = Select;
 
-const InputKey = observer(
-    ({ row, placeholder }: ComponentProps<RecordItem>) => {
+type RowType = EditorStore["items"][number];
+
+const ValueInput = observer<EdiTableColumnComponentProps<RowType>>(
+    ({ row }) => {
+        if (row.type === "string") {
+            return (
+                <InputValue
+                    variant="borderless"
+                    value={row.value as string}
+                    onChange={row.setValue}
+                />
+            );
+        } else if (row.type === "number") {
+            return (
+                <InputNumber
+                    variant="borderless"
+                    controls={false}
+                    value={row.value as number}
+                    onChange={row.setValue}
+                />
+            );
+        } else if (row.type === "boolean") {
+            return (
+                <Select
+                    variant="borderless"
+                    popupMatchSelectWidth={false}
+                    value={row.value as boolean}
+                    onChange={row.setValue}
+                >
+                    <Option value={false}>{gettext("False")}</Option>
+                    <Option value={true}>{gettext("True")}</Option>
+                </Select>
+            );
+        }
+
+        return <></>;
+    }
+);
+
+ValueInput.displayName = "ValueInput";
+
+const SelectType = observer<EdiTableColumnComponentProps<RowType>>(
+    ({ row }) => {
         return (
-            <Input
-                value={row.key}
-                onChange={(e) => {
-                    const props: Partial<RecordOption> = {
-                        key: e.target.value,
-                    };
-                    if (row.value === undefined) {
-                        props.value = "";
-                    }
-                    row.update(props);
-                }}
+            <Select
                 variant="borderless"
-                placeholder={placeholder ? msgTypeToAdd : undefined}
-            />
+                popupMatchSelectWidth={false}
+                value={row.type}
+                onChange={(value) => {
+                    row.update({ type: value });
+                }}
+            >
+                <Option value="string">{gettext("String")}</Option>
+                <Option value="number">{gettext("Number")}</Option>
+                <Option value="boolean">{gettext("Boolean")}</Option>
+                <Option value="null">{gettext("Empty")}</Option>
+            </Select>
         );
     }
 );
 
-InputKey.displayName = "InputKey";
-
-const InputValue = observer(({ row }: ComponentProps<RecordItem>) => {
-    if (row.type === "string") {
-        return (
-            <Input
-                value={row.value as InputProps["value"]}
-                onChange={(e) => {
-                    row.update({ value: e.target.value });
-                }}
-                variant="borderless"
-            />
-        );
-    } else if (row.type === "number") {
-        return (
-            <InputNumber
-                value={row.value as InputNumberProps["value"]}
-                controls={false}
-                onChange={(newValue) => {
-                    row.update({ value: newValue });
-                }}
-                variant="borderless"
-            />
-        );
-    } else if (row.type === "boolean") {
-        return (
-            <Select
-                value={row.value}
-                onChange={(value) => {
-                    row.update({ value: value });
-                }}
-                variant="borderless"
-                popupMatchSelectWidth={false}
-            >
-                <Option value={false}>{gettext("False")}</Option>
-                <Option value={true}>{gettext("True")}</Option>
-            </Select>
-        );
-    }
-
-    return <></>;
-});
-
-InputValue.displayName = "InputValue";
-
-const SelectType = observer(({ row }: ComponentProps<RecordItem>) => {
-    return (
-        <Select
-            value={row.type}
-            onChange={(value) => {
-                row.update({ type: value });
-            }}
-            variant="borderless"
-            popupMatchSelectWidth={false}
-        >
-            <Option value="string">{gettext("String")}</Option>
-            <Option value="number">{gettext("Number")}</Option>
-            <Option value="boolean">{gettext("Boolean")}</Option>
-            <Option value="null">{gettext("Empty")}</Option>
-        </Select>
-    );
-});
-
 SelectType.displayName = "SelectType";
 
-const columns: EdiTableColumn<RecordItem>[] = [
+const columns: EdiTableColumn<RowType>[] = [
     {
         key: "key",
         title: gettext("Key"),
         width: "50%",
-        component: InputKey,
+        component: EdiTableKeyInput,
     },
     {
         key: "type",
@@ -123,7 +93,7 @@ const columns: EdiTableColumn<RecordItem>[] = [
         key: "value",
         title: gettext("Value"),
         width: "50%",
-        component: InputValue,
+        component: ValueInput,
     },
 ];
 

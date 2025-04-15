@@ -1,77 +1,32 @@
-import { observer } from "mobx-react-lite";
 import { useEffect, useState } from "react";
 
-import { Input, Modal } from "@nextgisweb/gui/antd";
-import type { InputProps } from "@nextgisweb/gui/antd";
-import { EdiTable } from "@nextgisweb/gui/edi-table";
+import { Modal } from "@nextgisweb/gui/antd";
+import {
+    EdiTable,
+    EdiTableKeyInput,
+    EdiTableValueInput,
+} from "@nextgisweb/gui/edi-table";
 import type {
-    RecordItem,
-    RecordOption,
-} from "@nextgisweb/gui/edi-table/store/RecordItem";
-import type {
-    ComponentProps,
     EdiTableColumn,
-} from "@nextgisweb/gui/edi-table/type";
+    EdiTableKeyValueRow,
+} from "@nextgisweb/gui/edi-table";
 import type { ShowModalOptions } from "@nextgisweb/gui/showModal";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { VendorParamsStore } from "../store/VendorParamsStore";
 
-const msgTypeToAdd = gettext("Type to add a new vendor parameter");
-
-const InputKey = observer(
-    ({ row, placeholder }: ComponentProps<RecordItem>) => {
-        return (
-            <Input
-                value={row.key}
-                onChange={(e) => {
-                    const props: Partial<RecordOption> = {
-                        key: e.target.value,
-                    };
-                    if (row.value === undefined) {
-                        props.value = "";
-                    }
-                    row.update(props);
-                }}
-                variant="borderless"
-                placeholder={placeholder ? msgTypeToAdd : undefined}
-            />
-        );
-    }
-);
-
-InputKey.displayName = "InputKey";
-
-const InputValue = observer(({ row }: ComponentProps<RecordItem>) => {
-    if (row.type === "string") {
-        return (
-            <Input
-                value={row.value as InputProps["value"]}
-                onChange={(e) => {
-                    row.update({ value: e.target.value });
-                }}
-                variant="borderless"
-            />
-        );
-    }
-
-    return <></>;
-});
-
-InputValue.displayName = "InputValue";
-
-const columns: EdiTableColumn<RecordItem>[] = [
+const columns: EdiTableColumn<EdiTableKeyValueRow<string>>[] = [
     {
         key: "key",
         title: gettext("Key"),
         width: "50%",
-        component: InputKey,
+        component: EdiTableKeyInput,
     },
     {
         key: "value",
         title: gettext("Value"),
         width: "50%",
-        component: InputValue,
+        component: EdiTableValueInput,
     },
 ];
 

@@ -2,24 +2,16 @@ import { observer } from "mobx-react-lite";
 import { useCallback } from "react";
 
 import { ActionToolbar } from "@nextgisweb/gui/action-toolbar";
+import { Button, Modal, Select, Space, Upload } from "@nextgisweb/gui/antd";
 import {
-    Button,
-    Input,
-    Modal,
-    Select,
-    Space,
-    Upload,
-} from "@nextgisweb/gui/antd";
-import type { InputProps } from "@nextgisweb/gui/antd";
-import { EdiTable } from "@nextgisweb/gui/edi-table";
+    EdiTable,
+    EdiTableKeyInput,
+    EdiTableValueInput,
+} from "@nextgisweb/gui/edi-table";
 import type {
-    RecordItem,
-    RecordOption,
-} from "@nextgisweb/gui/edi-table/store/RecordItem";
-import type {
-    ComponentProps,
     EdiTableColumn,
-} from "@nextgisweb/gui/edi-table/type";
+    EdiTableColumnComponentProps,
+} from "@nextgisweb/gui/edi-table";
 import { ClearIcon, ExportIcon, ImportIcon } from "@nextgisweb/gui/icon";
 import { parseCsv } from "@nextgisweb/gui/util/parseCsv";
 import type { LookupTableRead } from "@nextgisweb/lookup-table/type/api";
@@ -39,7 +31,6 @@ import ReorderIcon from "@nextgisweb/icon/material/sync";
 
 import "./EditorWidget.less";
 
-const msgTypeToAdd = gettext("Type here to add a new item...");
 const msgExport = gettext("Export");
 const msgImport = gettext("Import");
 const msgSort = gettext("Sort order");
@@ -49,60 +40,20 @@ const msgClear = gettext("Clear");
 // prettier-ignore
 const msgConfirm = gettext("All existing records will be deleted after import. Are you sure you want to proceed?");
 
-const InputKey = observer<ComponentProps<RecordItem>>(
-    ({ row, placeholder, placeholderRef }) => {
-        return (
-            <Input
-                ref={placeholderRef}
-                value={row.key}
-                onChange={(e) => {
-                    const props: Partial<RecordOption> = {
-                        key: e.target.value,
-                    };
-                    if (row.value === undefined) {
-                        props.value = "";
-                    }
-                    row.update(props);
-                }}
-                variant="borderless"
-                placeholder={placeholder ? msgTypeToAdd : undefined}
-            />
-        );
-    }
-);
+type RowType = EditorStore["items"][number];
 
-InputKey.displayName = "InputKey";
-
-const InputValue = observer<ComponentProps<RecordItem>>(({ row }) => {
-    if (row.type === "string") {
-        return (
-            <Input
-                value={row.value as InputProps["value"]}
-                onChange={(e) => {
-                    row.update({ value: e.target.value });
-                }}
-                variant="borderless"
-            />
-        );
-    }
-
-    return <></>;
-});
-
-InputValue.displayName = "InputValue";
-
-const columns: EdiTableColumn<ComponentProps<RecordItem>>[] = [
+const columns: EdiTableColumn<EdiTableColumnComponentProps<RowType>>[] = [
     {
         key: "key",
         title: gettext("Key"),
         width: "25%",
-        component: InputKey,
+        component: EdiTableKeyInput,
     },
     {
         key: "value",
         title: gettext("Value"),
         width: "75%",
-        component: InputValue,
+        component: EdiTableValueInput,
     },
 ];
 

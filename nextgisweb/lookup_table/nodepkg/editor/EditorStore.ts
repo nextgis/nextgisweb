@@ -1,9 +1,10 @@
 import { clamp, remove } from "lodash-es";
 import { action, computed, observable, runInAction } from "mobx";
-import type { IObservableArray } from "mobx";
 
-import { EditorStore as KeyValueEditorStore } from "@nextgisweb/gui/edi-table";
-import { RecordItem } from "@nextgisweb/gui/edi-table/store/RecordItem";
+import {
+    EdiTableKeyValueRow,
+    EdiTableKeyValueStore,
+} from "@nextgisweb/gui/edi-table";
 import type {
     LookupTableCreate,
     LookupTableRead,
@@ -14,13 +15,17 @@ import type { EditorStore as IEditorStore } from "@nextgisweb/resource/type";
 import { lookupTableIsSorted, lookupTableSort } from "../util/sort";
 
 export class EditorStore
-    extends KeyValueEditorStore
+    extends EdiTableKeyValueStore<string>
     implements
         IEditorStore<LookupTableRead, LookupTableCreate, LookupTableUpdate>
 {
     readonly identity = "lookup_table";
 
     @observable.ref accessor sort: LookupTableRead["sort"] = "KEY_ASC";
+
+    constructor() {
+        super({ defaultValue: "" });
+    }
 
     @action.bound
     setSort(value?: LookupTableRead["sort"]) {
@@ -47,11 +52,7 @@ export class EditorStore
                     const newRows = [...this.rows];
                     remove(newRows, (i) => i === row);
                     newRows.splice(index, 0, row);
-
-                    // type weirdness
-                    (this.rows as IObservableArray<RecordItem>).replace(
-                        newRows
-                    );
+                    this.rows.splice(0, this.rows.length, ...newRows);
                     this.dirty = true;
                 });
             };
@@ -63,7 +64,7 @@ export class EditorStore
     @action
     load(value: LookupTableRead) {
         const items = Object.entries(value.items).map(
-            ([key, value]) => new RecordItem(this, { key, value })
+            ([key, value]) => new EdiTableKeyValueRow(this, { key, value })
         );
         this.items = lookupTableSort(items, value.sort, value.order);
         this.sort = value.sort;
