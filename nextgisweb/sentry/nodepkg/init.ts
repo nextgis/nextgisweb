@@ -12,9 +12,11 @@ export function init(opts: { dsn: string; routeName: string }) {
     let es2020 = false;
     try {
         es2020 = eval(
-            "((undefined?.() ?? Number.MAX_SAFE_INTEGER) === 9007199254740991) " +
+            "class C { static #f = true; t() { return C.#f } }; " +
+                "((undefined?.() ?? Number.MAX_SAFE_INTEGER) === 9007199254740991) " +
                 "&& !!Promise.allSettled && !!String.prototype.matchAll " +
-                "&& ((...rest) => rest[0])(true) && ((v = true) => v)()"
+                "&& ((...rest) => rest[0])(true) && ((v = true) => v)() " +
+                "&& (new C()).t()"
         );
     } catch {
         // Assume ES2020 is unsupported
