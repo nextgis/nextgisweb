@@ -90,7 +90,7 @@ export function useRouteGet<
             );
             setData(data);
         } catch (err) {
-            if (!isAbortError) {
+            if (isAbortError(err)) {
                 setError(err!);
                 if (showErrorModal.current) {
                     errorModal(err);
@@ -100,7 +100,7 @@ export function useRouteGet<
         } finally {
             setIsLoading(false);
         }
-    }, [abort, onError, route, routerOptions, showErrorModal]);
+    }, [abort, route, routerOptions]);
 
     useEffect(() => {
         refresh();
