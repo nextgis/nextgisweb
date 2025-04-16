@@ -1,9 +1,12 @@
-import { useCallback, useMemo, useReducer } from "react";
+import { useCallback, useEffect, useMemo, useReducer, useState } from "react";
 
 import { LoadingWrapper } from "@nextgisweb/gui/component";
 import { convertNgwExtentToWSEN } from "@nextgisweb/gui/util/extent";
+import type { Extent } from "@nextgisweb/layer/type/api";
+import { useRoute } from "@nextgisweb/pyramid/hook";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import type { ResourceInterface } from "@nextgisweb/resource/type/api";
 import {
     AttributionControl,
     MapComponent,
@@ -14,6 +17,9 @@ import {
 } from "@nextgisweb/webmap/map-component";
 
 import MapIcon from "@nextgisweb/icon/material/map/outline";
+
+const extentInterfaces: ResourceInterface[] = ["IBboxLayer"];
+const mvtInterfaces: ResourceInterface[] = ["IFeatureLayer"];
 
 export function PreviewLayer({
     style,
@@ -34,7 +40,7 @@ export function PreviewLayer({
     const layerType = useMemo(() => {
         if (resData) {
             const interfaces = resData?.resource.interfaces;
-            if (interfaces.includes("IFeatureLayer")) {
+            if (interfaces.some((iface) => mvtInterfaces.includes(iface))) {
                 return "MVT";
             } else if (resData.raster_layer) {
                 return "geotiff";
@@ -59,10 +65,29 @@ export function PreviewLayer({
         }
     }, [resData]);
 
-    const { data: extentData, isLoading: isExtentLoading } = useRouteGet(
-        "layer.extent",
-        { id }
-    );
+    const { route: extentRoute } = useRoute("layer.extent", { id });
+    const [extentData, setExtentData] = useState<Extent>();
+    const [isExtentLoading, setIsExtentLoading] = useState(true);
+
+    useEffect(() => {
+        const loadExtent = async () => {
+            if (
+                resData &&
+                resData.resource.interfaces.some((iface) =>
+                    extentInterfaces.includes(iface)
+                )
+            ) {
+                await extentRoute.get().then(setExtentData);
+            }
+        };
+        loadExtent()
+            .catch(() => {
+                // ignore
+            })
+            .finally(() => {
+                setIsExtentLoading(false);
+            });
+    }, [extentRoute, resData]);
 
     const padding = useMemo(() => [20, 20, 20, 20], []);
     const mapExtent = useMemo(
