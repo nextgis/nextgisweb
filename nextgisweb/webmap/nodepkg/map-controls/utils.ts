@@ -10,8 +10,8 @@ export const getControlsInfo = <T extends ControlsInfo>(
 
     if (display.isTinyMode()) {
         const urlParams = display.getUrlParams();
-        if ("controls" in urlParams && urlParams.controls) {
-            const urlKeys = urlParams.controls.split(",");
+        const urlKeys = urlParams.controls;
+        if (urlKeys) {
             controls = controlsInfo.filter((c: ControlsInfo) => {
                 const matchToUrlKey = c.key ? urlKeys.includes(c.key) : false;
                 const alwaysEmbeddedShow = c.embeddedShowMode === "always";

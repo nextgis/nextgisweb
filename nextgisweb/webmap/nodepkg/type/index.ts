@@ -10,6 +10,7 @@ import type { ToolBase } from "../map-controls/tool/ToolBase";
 import type { MapStore } from "../ol/MapStore";
 import type { PluginBase } from "../plugin/PluginBase";
 import type { AnnotationVisibleMode } from "../store/annotations/AnnotationsStore";
+import { UrlParams } from "../utils/UrlParams";
 
 export * from "./DisplayConfig";
 
@@ -57,23 +58,41 @@ export interface MapRefs {
     rightBottomControlPane: HTMLElement;
 }
 
-export interface MapURLParams {
-    lon?: string;
-    lat?: string;
+export interface DisplayURLParams {
+    lon?: number;
+    lat?: number;
     base?: string;
-    zoom?: string;
-    angle?: string;
+    zoom?: number;
+    angle?: number;
     annot?: AnnotationVisibleMode;
     events?: "true";
     panel?: string;
-    panels?: string;
-    styles?: string;
+    panels?: string[];
+    styles?: number[];
     hl_val?: string;
-    hl_lid?: string;
+    hl_lid?: number;
     hl_attr?: string;
-    controls?: string;
+    controls?: string[];
     linkMainMap?: "true";
 }
+
+export const displayURLParams = new UrlParams<DisplayURLParams>({
+    lon: { parse: parseFloat },
+    lat: { parse: parseFloat },
+    base: {},
+    zoom: { parse: parseInt },
+    angle: { parse: parseInt },
+    annot: {},
+    events: {},
+    panel: {},
+    panels: { parse: (val) => val.split(",") },
+    styles: { parse: (val) => val.split(",").map((i) => parseInt(i, 10)) },
+    hl_val: {},
+    hl_lid: {},
+    hl_attr: {},
+    controls: { parse: (val) => val.split(",") },
+    linkMainMap: {},
+});
 
 export interface TinyConfig {
     mainDisplayUrl: string;
