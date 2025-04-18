@@ -59,7 +59,7 @@ class TOGGLE:
     enum = (AUTO, YES, NO)
 
 
-class LoaderParams(Struct, kw_only=True):
+class LoaderParams(Struct, kw_only=True, frozen=True):
     fix_errors: FixErrors = "NONE"
     skip_errors: bool = False
     skip_other_geometry_types: bool = False
@@ -69,6 +69,12 @@ class LoaderParams(Struct, kw_only=True):
     cast_is_multi: CastAutoYesNo = None
     cast_has_z: CastAutoYesNo = None
     validate: bool = True
+
+    def __post_init__(self):
+        if self.skip_other_geometry_types and self.cast_geometry_type is None:
+            raise VE(
+                "Parameter 'cast_geometry_type' is required with 'skip_other_geometry_types=true'."
+            )
 
 
 class LoaderField(Struct, kw_only=False):

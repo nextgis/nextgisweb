@@ -54,6 +54,11 @@ CREATE_TEST_PARAMS = (
     ),
     (
         "mixed-feature-geom.geojson",
+        dict(skip_other_geometry_types=True),
+        dict(exception=ValidationError),
+    ),
+    (
+        "mixed-feature-geom.geojson",
         dict(cast_geometry_type="POINT", skip_other_geometry_types=True),
         dict(geometry_type="MULTIPOINT", feature_count=2),
     ),

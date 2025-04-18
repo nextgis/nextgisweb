@@ -161,10 +161,11 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin, FVersioni
         return "layer_%s" % self.tbl_uuid
 
     def from_source(self, source, *, layer=UNSET, **kw):
-        lparams = LoaderParams()
+        lp_kw = dict()
         for k in list(kw.keys()):
-            if hasattr(lparams, k):
-                setattr(lparams, k, kw.pop(k))
+            if k in LoaderParams.__annotations__:
+                lp_kw[k] = kw.pop(k)
+        lparams = LoaderParams(**lp_kw)
 
         if isinstance(source, Path):
             source = str(source)
