@@ -130,6 +130,11 @@ export class Store
         Object.entries(sourceOptions).forEach(([key, value]) => {
             (so as Record<string, unknown>)[key] = value;
         });
+
+        if (sourceOptions.cast_geometry_type === null) {
+            so.skip_other_geometry_types = false;
+        }
+
         this.sourceOptions = so;
     }
 
@@ -160,7 +165,8 @@ export class Store
         }
 
         if (isEmpty(values)) return;
-        Object.assign(this, values);
+
+        if (values.geometryType) Object.assign(this, values);
 
         if (!("confirm" in values)) {
             this.confirm = false;
