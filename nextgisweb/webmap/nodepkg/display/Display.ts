@@ -38,7 +38,6 @@ import type { PanelStore } from "../panel";
 import { PanelManager } from "../panel/PanelManager";
 import type { PluginBase } from "../plugin/PluginBase";
 import WebmapStore from "../store";
-import { displayURLParams } from "../type";
 import type {
     DisplayURLParams,
     Entrypoint,
@@ -50,6 +49,8 @@ import type {
 import type { TreeItemConfig } from "../type/TreeItems";
 import { setURLParam } from "../utils/URL";
 import { normalizeExtent } from "../utils/normalizeExtent";
+
+import { displayURLParams } from "./displayURLParams";
 
 export class Display {
     private readonly emptyModeURLValue = "none";
@@ -430,7 +431,6 @@ export class Display {
 
     private _layersSetup() {
         const store = this.itemStore;
-        let visibleStyles: number[] | null = null;
 
         this._adaptersSetup();
 
@@ -443,10 +443,6 @@ export class Display {
                 return this.webmapStore._layers;
             },
         });
-
-        if (this.urlParams.styles?.length) {
-            visibleStyles = this.urlParams.styles;
-        }
 
         // Layers initialization
         store.fetch({
@@ -464,15 +460,20 @@ export class Display {
 
                 // Turn on layers from permalink
                 let cond;
-                const layer = this.webmapStore.getLayer(
-                    store.getValue(item, "id")
-                );
-                if (visibleStyles) {
-                    cond =
-                        visibleStyles.indexOf(
-                            store.getValue(item, "styleId")
-                        ) !== -1;
-
+                const layerId = store.getValue(item, "id");
+                const layer = this.webmapStore.getLayer(layerId);
+                if (this.urlParams.styles) {
+                    const styleId = store.getValue(item, "styleId");
+                    cond = styleId in this.urlParams.styles;
+                    if (cond) {
+                        const symbols = this.urlParams.styles[styleId];
+                        if (symbols) {
+                            this.webmapStore.setItemSymbols(
+                                layerId,
+                                symbols === "-1" ? [] : symbols
+                            );
+                        }
+                    }
                     layer.olLayer.setVisible(cond);
                     layer.setVisibility(cond);
                     store.setValue(item, "checked", cond);

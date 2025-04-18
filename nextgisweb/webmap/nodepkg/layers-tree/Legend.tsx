@@ -1,8 +1,10 @@
+import { useMemo } from "react";
+
 import { Checkbox, ConfigProvider, useToken } from "@nextgisweb/gui/antd";
 
 import type WebmapStore from "../store";
 import type { TreeItemConfig } from "../type/TreeItems";
-
+import { restoreSymbols } from "../utils/symbolsIntervals";
 import "./Legend.less";
 
 interface LegendProps {
@@ -15,6 +17,20 @@ export function Legend({ nodeData, store, checkable }: LegendProps) {
     const { token } = useToken();
 
     const legendInfo = "legendInfo" in nodeData && nodeData.legendInfo;
+
+    const intervals = useMemo<
+        Record<number, boolean> | "-1" | undefined
+    >(() => {
+        const storeItem = store.getStoreItem(nodeData.id);
+        if (storeItem && storeItem.type === "layer") {
+            if (Array.isArray(storeItem.symbols)) {
+                return restoreSymbols(storeItem.symbols);
+            } else if (storeItem.symbols === "-1") {
+                return "-1";
+            }
+        }
+    }, [nodeData.id, store]);
+
     if (!nodeData || !legendInfo || !legendInfo.open) {
         return <></>;
     }
@@ -35,13 +51,18 @@ export function Legend({ nodeData, store, checkable }: LegendProps) {
             >
                 {legendInfo.symbols?.map((s, idx) => {
                     const id = nodeData.id;
-                    const symbols = store._legendSymbols[id];
-                    const render = (symbols && symbols[s.index]) ?? s.render;
+
+                    const render =
+                        intervals === "-1"
+                            ? false
+                            : intervals
+                              ? !!intervals[s.index]
+                              : s.render;
 
                     let checkbox;
                     if (checkable) {
                         checkbox =
-                            s.render !== null ? (
+                            render !== null ? (
                                 <Checkbox
                                     style={{ width: "16px" }}
                                     defaultChecked={render}

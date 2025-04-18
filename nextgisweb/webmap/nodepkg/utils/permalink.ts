@@ -27,11 +27,16 @@ export const getPermalink = ({
     origin,
     pathname,
 }: GetPermalinkOptions): string => {
-    const visibleStyles: number[] = [];
+    // { 1: ['0-5', '8-12'], 2: [], 3: '-1' } >>> 1[0-5|8-12],2,3[-1]
+    const visibleStyles: string[] = [];
     visibleItems.forEach((i) => {
         const item = display.itemStore.dumpItem(i);
         if ("styleId" in item) {
-            visibleStyles.push(item.styleId);
+            let styleStr = String(item.styleId);
+            if (item.symbols && item.symbols.length) {
+                styleStr += `[${Array.isArray(item.symbols) ? item.symbols.join("|") : item.symbols}]`;
+            }
+            visibleStyles.push(styleStr);
         }
     });
 

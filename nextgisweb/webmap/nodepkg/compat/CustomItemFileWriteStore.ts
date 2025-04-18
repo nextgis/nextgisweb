@@ -38,7 +38,7 @@ export type StoreItem<I extends StoreItemConfig = StoreItemConfig> = I &
     CustomStoreItem;
 
 export class CustomItemFileWriteStore extends EventEmitter {
-    private items: Map<number, CustomStoreItem> = new Map();
+    items: Map<number, CustomStoreItem> = new Map();
 
     constructor(options: {
         data: {

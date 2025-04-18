@@ -5,6 +5,9 @@ interface BaseItem {
     position: number | null;
 }
 
+// `-1` - hide layer at all, `null` - use default render without symbols
+export type LayerSymbols = string[] | "-1" | null;
+
 export interface StoreLayerConfig extends BaseItem {
     type: "layer";
     layerId: number;
@@ -12,7 +15,7 @@ export interface StoreLayerConfig extends BaseItem {
     checked: boolean;
     visibility: boolean | null;
     identifiable: boolean;
-    symbols: string[] | "-1" | null;
+    symbols: LayerSymbols;
 }
 
 export interface StoreGroupConfig extends BaseItem {

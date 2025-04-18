@@ -1,4 +1,4 @@
-import { action, computed, observable, runInAction } from "mobx";
+import { action, computed, observable } from "mobx";
 
 import { getChildrenDeep, traverseTree } from "@nextgisweb/gui/util/tree";
 import { route } from "@nextgisweb/pyramid/api";
@@ -9,18 +9,16 @@ import type {
     CustomItemFileWriteStore,
     StoreItem,
 } from "../compat/CustomItemFileWriteStore";
-import type { StoreItemConfig } from "../compat/type";
+import type { LayerSymbols, StoreItemConfig } from "../compat/type";
 import { keyInMutuallyExclusiveGroupDeep } from "../layers-tree/util/treeItems";
 import type { CoreLayer } from "../ol/layer/CoreLayer";
 import type { TreeChildrenItemConfig, TreeItemConfig } from "../type/TreeItems";
-
-type LegendSymbols = { [layerId: string]: { [symbolIndex: number]: boolean } };
+import { restoreSymbols } from "../utils/symbolsIntervals";
 
 export class WebmapStore {
     @observable.shallow private accessor _webmapItems: TreeItemConfig[] = [];
     @observable.shallow private accessor _checked: number[] = [];
     @observable.shallow private accessor _expanded: number[] = [];
-    @observable.shallow accessor _legendSymbols: LegendSymbols = {};
 
     private _itemStore: CustomItemFileWriteStore;
     @observable.shallow private accessor _layers: Record<string, CoreLayer> =
@@ -173,61 +171,66 @@ export class WebmapStore {
         });
     };
 
+    getStoreItem(identity: number) {
+        return this._itemStore.items.get(identity);
+    }
+
     setLayerLegendSymbol = (
         identity: number,
         symbolIndex: number,
         status: boolean
     ) => {
-        const symbols = { ...(this._legendSymbols[identity] || {}) };
-        symbols[symbolIndex] = status;
-        runInAction(() => {
-            this._legendSymbols[identity] = symbols;
-        });
         const layer = this.getLayer(identity);
         if (layer.itemConfig) {
             const layerSymbols = layer.itemConfig.legendInfo?.symbols;
             if (layerSymbols) {
-                const needSymbolRender = Object.entries(symbols).some(
-                    ([index, renderStatus]) => {
-                        const layerSymbol = layerSymbols.find(
-                            (l) => l.index === Number(index)
-                        );
-                        return (
-                            layerSymbol && layerSymbol.render !== renderStatus
-                        );
-                    }
-                );
-
-                // -1 - do not show nothing, null - use default render without symbols
-                let intervals: string[] | "-1" | null = null;
-                if (needSymbolRender) {
-                    const renderIndexes: number[] = [];
-                    for (const s of layerSymbols) {
-                        const render = symbols[s.index] ?? s.render;
-                        if (render) {
-                            renderIndexes.push(s.index);
+                const symbols: { [symbolIndex: number]: boolean } = {};
+                const storeItem = this.getStoreItem(identity);
+                if (storeItem && storeItem.type === "layer") {
+                    const itemIntervals = storeItem.symbols;
+                    if (Array.isArray(itemIntervals)) {
+                        const restoredSymbols = restoreSymbols(itemIntervals);
+                        for (const layerSymbol of layerSymbols) {
+                            symbols[layerSymbol.index] =
+                                restoredSymbols[layerSymbol.index] ?? false;
+                        }
+                    } else if (itemIntervals === "-1") {
+                        for (const layerSymbol of layerSymbols) {
+                            symbols[layerSymbol.index] = false;
                         }
                     }
-                    intervals = this._consolidateIntervals(renderIndexes);
-                    intervals = intervals.length ? intervals : "-1";
                 }
-                this._itemStore.fetchItemByIdentity({
-                    identity,
-                    onItem: (item) => {
-                        if (item) {
-                            this._itemStore.setValue(
-                                item,
-                                "symbols",
-                                intervals
-                            );
-                        }
-                    },
-                });
+                symbols[symbolIndex] = status;
+
+                const renderIndexes: number[] = [];
+                for (const s of layerSymbols) {
+                    const render = symbols[s.index] ?? s.render;
+                    if (render) {
+                        renderIndexes.push(s.index);
+                    }
+                }
+                // `-1` - hide layer at all, `null` - use default render without symbols
+                const intervals: LayerSymbols =
+                    this._consolidateIntervals(renderIndexes);
+
+                this.setItemSymbols(identity, intervals);
             }
         }
     };
 
-    private _consolidateIntervals = (symbols: number[]) => {
+    setItemSymbols(identity: number, intervals: string[]) {
+        const symbols = intervals.length ? intervals : "-1";
+        this._itemStore.fetchItemByIdentity({
+            identity,
+            onItem: (item) => {
+                if (item) {
+                    this._itemStore.setValue(item, "symbols", symbols);
+                }
+            },
+        });
+    }
+
+    private _consolidateIntervals = (symbols: number[]): string[] => {
         const sortedSymbols = symbols.slice().sort((a, b) => a - b);
         const intervals = [];
         let start = sortedSymbols[0];
