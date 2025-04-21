@@ -54,7 +54,7 @@ async function tusUpload({
 
     let totalFilesSize = 0;
     let alreadyUploadedSize = 0;
-
+    let uploaded = false;
     for (const file of files) {
         totalFilesSize += file.size;
         let progressFileSize = 0;
@@ -92,6 +92,7 @@ async function tusUpload({
                 onSuccess: () => {
                     alreadyUploadedSize += progressFileSize;
                     const url_ = uploader.url;
+                    uploaded = true;
                     if (url_) {
                         fetch(url_, { signal })
                             .then((resp) => resp.json().then(resolve))
@@ -103,8 +104,10 @@ async function tusUpload({
             });
             if (signal) {
                 signal.addEventListener("abort", () => {
-                    uploader.abort(true);
-                    reject(makeAbortError());
+                    if (!uploaded) {
+                        uploader.abort(true);
+                        reject(makeAbortError());
+                    }
                 });
             }
             uploader.start();
