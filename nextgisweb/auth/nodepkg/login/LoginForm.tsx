@@ -60,6 +60,11 @@ export const LoginForm = observer((props: LoginFormProps) => {
     const login = async () => {
         try {
             await form.validateFields();
+        } catch {
+            return;
+        }
+
+        try {
             const resp = await authStore.login(creds);
             if (props.reloadAfterLogin) {
                 location.reload();
