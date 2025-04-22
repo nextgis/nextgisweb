@@ -31,7 +31,7 @@ function createEmptyTile(
     return canvas.toDataURL("image/png");
 }
 
-const exptyTile = createEmptyTile();
+const emptyTile = createEmptyTile();
 
 export function UrlLayer({
     url,
@@ -71,7 +71,7 @@ export function UrlLayer({
                                 img.src = imageUrl;
                             })
                             .catch(() => {
-                                img.src = exptyTile;
+                                img.src = emptyTile;
                             });
                     },
                 },

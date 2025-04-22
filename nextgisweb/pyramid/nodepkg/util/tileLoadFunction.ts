@@ -1,4 +1,4 @@
-const transparentImage =
+export const transparentImage =
     "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEAAAAALAAAAAABAAEAAAIBAAA=";
 
 interface TileLoadFunctionOptions extends RequestInit {

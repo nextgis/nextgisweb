@@ -1,5 +1,9 @@
 import { routeURL } from "@nextgisweb/pyramid/api";
-import { imageQueue, tileLoadFunction } from "@nextgisweb/pyramid/util";
+import {
+    imageQueue,
+    tileLoadFunction,
+    transparentImage,
+} from "@nextgisweb/pyramid/util";
 import { QUEUE_ABORT_REASON } from "@nextgisweb/pyramid/util/queue";
 import Image from "@nextgisweb/webmap/ol/layer/Image";
 import type { LayerItemConfig } from "@nextgisweb/webmap/type/api";
@@ -62,6 +66,7 @@ export class ImageAdapter extends LayerDisplayAdapter {
                         "&nd=204" +
                         symbols;
 
+                    const img = imageTile.getImage() as HTMLImageElement;
                     // Use a timeout to prevent the queue from aborting right after adding,
                     // especially in cases with zoomToExtent.
                     setTimeout(() => {
@@ -72,14 +77,13 @@ export class ImageAdapter extends LayerDisplayAdapter {
                                 signal,
                             })
                                 .then((imageUrl) => {
-                                    const img =
-                                        imageTile.getImage() as HTMLImageElement;
                                     img.src = imageUrl;
                                 })
                                 .catch((error) => {
                                     if (error !== QUEUE_ABORT_REASON) {
                                         console.error(error);
                                     }
+                                    img.src = transparentImage;
                                 })
                         );
                     });

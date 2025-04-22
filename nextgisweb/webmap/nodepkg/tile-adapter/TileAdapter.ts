@@ -1,5 +1,5 @@
 import { routeURL } from "@nextgisweb/pyramid/api";
-import { tileLoadFunction } from "@nextgisweb/pyramid/util";
+import { tileLoadFunction, transparentImage } from "@nextgisweb/pyramid/util";
 import XYZ from "@nextgisweb/webmap/ol/layer/XYZ";
 import type { LayerItemConfig } from "@nextgisweb/webmap/type/api";
 
@@ -25,9 +25,13 @@ export default class TileAdapter extends LayerDisplayAdapter {
                     tileLoadFunction({
                         src,
                         cache: "force-cache",
-                    }).then((imageUrl) => {
-                        img.src = imageUrl;
-                    });
+                    })
+                        .then((imageUrl) => {
+                            img.src = imageUrl;
+                        })
+                        .catch(() => {
+                            img.src = transparentImage;
+                        });
                 },
             }
         );

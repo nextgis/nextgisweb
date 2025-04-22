@@ -1,6 +1,6 @@
 import { RequestQueue } from "./queue";
 
-export { tileLoadFunction } from "./tileLoadFunction";
+export { tileLoadFunction, transparentImage } from "./tileLoadFunction";
 export * from "./loader";
 export * from "./abort";
 
