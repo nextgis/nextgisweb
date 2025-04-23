@@ -64,6 +64,12 @@ class Env(Container):
                 if cv is not None:
                     cfg_components[ci] = cv
 
+        if cfgenv.get("enable_optional_components", False):
+            for cid in pkginfo.components:
+                if cid not in cfg_components and not pkginfo.comp_enabled(cid):
+                    logger.debug("Optional component '%s' enabled", cid)
+                    cfg_components[cid] = True
+
         loaded_packages, loaded_components = load_all(
             packages=cfg_packages, components=cfg_components, enable_disabled=enable_disabled
         )
@@ -237,6 +243,8 @@ class Env(Container):
 
     # fmt: off
     option_annotations = OptionAnnotations((
+        Option("enable_optional_components", bool, None, doc=(
+            "Enable all optional components except those explicitly disabled.")),
         Option("package.*", bool, None, doc=(
             "Disable installed package by setting false.")),
         Option("component.*", bool, None, doc=(
