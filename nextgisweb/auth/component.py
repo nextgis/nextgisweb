@@ -7,7 +7,7 @@ from pyramid.httpexceptions import HTTPForbidden
 from sqlalchemy.orm import defer, undefer
 from sqlalchemy.orm.exc import NoResultFound
 
-from nextgisweb.env import Component, DBSession, gettext, inject
+from nextgisweb.env import Component, DBSession, gettext, gettextf, inject
 from nextgisweb.lib.config import Option, OptionAnnotations
 from nextgisweb.lib.logging import logger
 
@@ -142,6 +142,10 @@ class AuthComponent(Component):
         enabled = (self.oauth is not None) and self.oauth.authorization_code
         return dict(
             alink=self.options["alink"],
+            user_limit=dict(
+                total=self.options["user_limit"],
+                local=self.options["user_limit_local"],
+            ),
             oauth=dict(
                 enabled=enabled,
                 default=self.oauth.options["default"] if enabled else None,
@@ -162,19 +166,13 @@ class AuthComponent(Component):
         )
 
     def query_stat(self):
-        def ucnt(*fc, agg=sa.func.count):
-            return DBSession.query(agg(User.id)).filter(~User.system, ~User.disabled, *fc).scalar()
-
-        def ula(*fc, agg=sa.func.max):
-            return DBSession.query(agg(User.last_activity)).filter(*fc).scalar()
-
         return dict(
-            user_count=ucnt(),
-            oauth_count=ucnt(User.oauth_subject.is_not(None)),
+            user_count=_ucnt(),
+            oauth_count=_ucnt(User.oauth_subject.is_not(None)),
             last_activity=dict(
-                everyone=ula(),
-                authenticated=ula(User.keyname != "guest"),
-                administrator=ula(User.member_of.any(keyname="administrators")),
+                everyone=_ula(),
+                authenticated=_ula(User.keyname != "guest"),
+                administrator=_ula(User.member_of.any(keyname="administrators")),
             ),
         )
 
@@ -245,23 +243,32 @@ class AuthComponent(Component):
         return url
 
     def check_user_limit(self, exclude_id=None):
-        user_limit = self.options["user_limit"]
-        if user_limit is not None:
-            query = DBSession.query(sa.func.count(User.id)).filter(
-                sa.and_(sa.not_(User.system), sa.not_(User.disabled))
-            )
+        if (limit := self.options["user_limit"]) is not None:
+            fc = []
             if exclude_id is not None:
-                query = query.filter(User.id != exclude_id)
+                fc.append(User.id != exclude_id)
+            uc = _ucnt(*fc)
 
-            with DBSession.no_autoflush:
-                active_user_count = query.scalar()
-
-            if active_user_count >= user_limit:
+            if uc >= limit:
                 raise ValidationError(
                     message=gettext(
                         "Maximum number of users is reached. Your current plan user number limit is %d."
                     )
-                    % user_limit
+                    % limit
+                )
+
+    def check_user_limit_local(self, exclude_id=None):
+        if (limit := self.options["user_limit_local"]) is not None:
+            fc = [User.password_hash.is_not(None)]
+            if exclude_id is not None:
+                fc.append(User.id != exclude_id)
+            uc_local = _ucnt(*fc)
+
+            if uc_local >= limit:
+                raise ValidationError(
+                    message=gettextf(
+                        "Maximum number of local users is reached. Your current plan local user number limit is {}."
+                    ).format(limit)
                 )
 
     def maintenance(self):
@@ -291,7 +298,8 @@ class AuthComponent(Component):
 
         Option("activity_delta", timedelta, default=timedelta(minutes=10), doc="User last activity update time delta."),
 
-        Option("user_limit", int, default=None, doc="Limit of enabled users"),
+        Option("user_limit", int, default=None, doc="Limit of enabled users."),
+        Option("user_limit_local", int, default=None, doc="Limit of enabled local users."),
 
         Option("provision.administrator.password", str, default="admin"),
         Option("provision.administrator.oauth_subject", str, default=None),
@@ -300,3 +308,10 @@ class AuthComponent(Component):
 
     option_annotations += OAuthHelper.option_annotations.with_prefix("oauth")
     option_annotations += SecurityPolicy.option_annotations.with_prefix("policy")
+
+
+def _ucnt(*fc, agg=sa.func.count):
+    return DBSession.query(agg(User.id)).filter(~User.system, ~User.disabled, *fc).scalar()
+
+def _ula(*fc, agg=sa.func.max):
+    return DBSession.query(agg(User.last_activity)).filter(*fc).scalar()

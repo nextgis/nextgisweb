@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from itertools import product
 from urllib.parse import parse_qs, urlparse
+from uuid import uuid4
 
 import pytest
 import sqlalchemy as sa
@@ -13,11 +14,15 @@ from nextgisweb.auth import Group, User
 
 
 @pytest.fixture(scope="module", autouse=True)
-def disable_oauth(ngw_env):
+def _set_options(ngw_env):
     auth = ngw_env.auth
 
     prev_helper = auth.oauth
-    with auth.options.override({"oauth.enabled": False}):
+    with auth.options.override({
+        "oauth.enabled": False,
+        "user_limit": None,
+        "user_limit_local": None,
+    }):
         auth.oauth = None
         yield
     auth.oauth = prev_helper
@@ -222,27 +227,22 @@ def disable_users():
         DBSession.flush()
 
 
-def test_user_limit(ngw_env, ngw_webtest_app, ngw_auth_administrator, disable_users):
-    admins = Group.filter_by(keyname="administrators").one()
-
-    vasya = dict(
-        keyname="test-vasya",
-        display_name="Test Vasya",
-        password="12345",
+def _user_obj(keyname: str):
+    return dict(
+        keyname=keyname,
+        display_name=" ".join(s.capitalize() for s in keyname.split("-")),
+        password=uuid4().hex,
         disabled=False,
-        member_of=[admins.id],
     )
 
+
+def test_user_limit(ngw_env, ngw_webtest_app, ngw_auth_administrator, disable_users):
     with ngw_env.auth.options.override(dict(user_limit=2)):
+        vasya = _user_obj("test-vasya")
         res = ngw_webtest_app.post_json(user_url(), vasya, status=201)
         vasya_id = res.json["id"]
 
-        petya = dict(
-            keyname="test-petya",
-            display_name="Test Petya",
-            password="67890",
-            disabled=False,
-        )
+        petya = _user_obj("test-petya")
         ngw_webtest_app.post_json(user_url(), petya, status=422)
 
         vasya["disabled"] = True
@@ -251,12 +251,7 @@ def test_user_limit(ngw_env, ngw_webtest_app, ngw_auth_administrator, disable_us
         res = ngw_webtest_app.post_json(user_url(), petya, status=201)
         petya_id = res.json["id"]
 
-        masha = dict(
-            keyname="test-masha",
-            display_name="Test Masha",
-            password="password",
-            disabled=False,
-        )
+        masha = _user_obj("test-masha")
         ngw_webtest_app.post_json(user_url(), masha, status=422)
 
         ngw_webtest_app.delete(user_url(vasya_id), status=200)
@@ -264,10 +259,10 @@ def test_user_limit(ngw_env, ngw_webtest_app, ngw_auth_administrator, disable_us
 
 
 def test_user_over_limit(ngw_env, ngw_webtest_app, ngw_auth_administrator, disable_users):
-    user1 = dict(keyname="test-user1", display_name="Test user1", password="12345", disabled=False)
+    user1 = _user_obj("test-user1")
     res = ngw_webtest_app.post_json(user_url(), user1)
     user1_id = res.json["id"]
-    user2 = dict(keyname="test-user2", display_name="Test user2", password="12345", disabled=False)
+    user2 = _user_obj("test-user2")
     res = ngw_webtest_app.post_json(user_url(), user2)
     user2_id = res.json["id"]
 
@@ -299,6 +294,36 @@ def test_user_over_limit(ngw_env, ngw_webtest_app, ngw_auth_administrator, disab
 
     ngw_webtest_app.delete(user_url(user1_id), status=200)
     ngw_webtest_app.delete(user_url(user2_id), status=200)
+
+
+def test_user_limit_local(ngw_env, ngw_webtest_app, ngw_auth_administrator, disable_users):
+    with ngw_env.auth.options.override(dict(user_limit_local=2)):
+        vasya = _user_obj("test-vasya")
+        res = ngw_webtest_app.post_json(user_url(), vasya, status=201)
+        vasya_id = res.json["id"]
+
+        petya = _user_obj("test-petya")
+        ngw_webtest_app.post_json(user_url(), petya, status=422)
+
+        vasya["disabled"] = True
+        ngw_webtest_app.put_json(user_url(vasya_id), vasya, status=200)
+
+        res = ngw_webtest_app.post_json(user_url(), petya, status=201)
+        petya_id = res.json["id"]
+
+        masha = _user_obj("test-masha")
+        ngw_webtest_app.post_json(user_url(), masha, status=422)
+
+        masha["password"] = False
+        res = ngw_webtest_app.post_json(user_url(), masha, status=201)
+        masha_id = res.json["id"]
+
+        vasya["disabled"] = False
+        ngw_webtest_app.put_json(user_url(vasya_id), vasya, status=422)
+
+        ngw_webtest_app.delete(user_url(vasya_id), status=200)
+        ngw_webtest_app.delete(user_url(petya_id), status=200)
+        ngw_webtest_app.delete(user_url(masha_id), status=200)
 
 
 def test_unique(ngw_webtest_app, ngw_auth_administrator):
