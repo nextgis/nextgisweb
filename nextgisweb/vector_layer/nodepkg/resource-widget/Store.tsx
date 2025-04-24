@@ -165,8 +165,7 @@ export class Store
         }
 
         if (isEmpty(values)) return;
-
-        if (values.geometryType) Object.assign(this, values);
+        Object.assign(this, values);
 
         if (!("confirm" in values)) {
             this.confirm = false;
