@@ -1,11 +1,5 @@
 import io
-import os
-import os.path
-import sys
 from setuptools import find_packages, setup
-from setuptools.command.develop import develop
-from setuptools.command.install import install
-from stat import S_IXGRP, S_IXOTH, S_IXUSR
 from subprocess import CalledProcessError, check_output
 
 with io.open("VERSION", "r") as fd:
@@ -94,35 +88,12 @@ entry_points = {
     "nextgisweb.packages": [
         "nextgisweb = nextgisweb:pkginfo",
     ],
+    "console_scripts": [
+        "nextgisweb = nextgisweb.script:main",
+        "nextgisweb-config = nextgisweb.script:config",
+        "nextgisweb-i18n = nextgisweb.i18n.script:main",
+    ],
 }
-
-
-class DevelopCommand(develop):
-    def run(self):
-        develop.run(self)
-
-        # Builtin console_scripts entrypoint scripts are very slow because of
-        # checking package requirement. So we use generated wrapper scripts.
-
-        bin_dir, _ = os.path.split(sys.executable)
-        for name, module, func in (
-            ("nextgisweb", "nextgisweb.script", "main"),
-            ("nextgisweb-config", "nextgisweb.script", "config"),
-            ("nextgisweb-i18n", "nextgisweb.i18n.script", "main"),
-        ):
-            sf = os.path.join(bin_dir, name)
-            with open(sf, "w") as fd:
-                fd.write("#!{}\n".format(sys.executable))
-                fd.write("from {} import {} as main\n".format(module, func))
-                fd.write("if __name__ == '__main__': main()\n")
-
-            st = os.stat(sf)
-            os.chmod(sf, st.st_mode | S_IXUSR | S_IXGRP | S_IXOTH)
-
-
-class InstallCommand(install):
-    def run(self):
-        raise RuntimeError("Only development mode installation (pip install -e ...) is supported!")
 
 
 setup(
@@ -139,8 +110,4 @@ setup(
     install_requires=requires,
     extras_require=extras_require,
     entry_points=entry_points,
-    cmdclass=dict(
-        develop=DevelopCommand,
-        install=InstallCommand,
-    ),
 )
