@@ -9,26 +9,26 @@ install.
 System requirements
 -------------------
 
-- Modern Linux distribution like Ubuntu Linux 20.04:
+- Modern Linux distribution like Ubuntu Linux 22.04:
 
   - We expect that NextGIS Web can be installed on most modern Linux
     distributions. But we run it under LTS-version Ubuntu Linux, and this
-    instruction was tested on Ubuntu Linux 20.04.
+    instruction was tested on Ubuntu Linux 22.04.
   
   - We don't provide community support for running NextGIS Web on other
     distributions. So if you any installation-related issue, please try to
-    reproduce a problem on Ubuntu Linux 20.04 before you report them.
+    reproduce a problem on Ubuntu Linux 22.04 before you report them.
 
-- Python >= 3.8.
+- Python >= 3.10.
 
-- GDAL >= 3.
+- GDAL >= 3.4.
 
 - Node.js 20.x or higher and Yarn 1.x package manager. We recommend using
   NodeSource and Yarn package repositories.
 
 - PostgreSQL database with PostGIS extension enabled:
 
-  - The minimum required versions are PostgreSQL 10 and PostGIS 2.5.
+  - The minimum required versions are PostgreSQL 12 and PostGIS 3.0.
 
   - PostgreSQL user must be owner of database and PostGIS system tables
     ``spatial_ref_sys``, ``geography_columns``, ``geometry_columns``,
