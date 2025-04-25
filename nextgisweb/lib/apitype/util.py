@@ -9,7 +9,6 @@ from typing import (
     Type,
     TypeVar,
     Union,
-    _AnnotatedAlias,
     cast,
     get_args,
     get_origin,
@@ -48,10 +47,9 @@ def disannotate(tdef: T, *, supertype: bool = False) -> Tuple[T, Tuple[Any, ...]
     if supertype and (sdef := getattr(tdef, "__supertype__", None)):
         tdef = sdef
 
-    if type(tdef) is _AnnotatedAlias:
-        result_type = get_args(tdef)[0]
-        result_extras = getattr(tdef, "__metadata__")
-
+    if get_origin(tdef) is Annotated:
+        result_type, *result_extras = get_args(tdef)
+        result_extras = tuple(result_extras)
         if supertype:
             result_type, supertype_extras = disannotate(result_type, supertype=True)
             result_extras = supertype_extras + result_extras

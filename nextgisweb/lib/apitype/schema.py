@@ -5,8 +5,8 @@ from typing import (
     NewType,
     TypeVar,
     Union,
-    _AnnotatedAlias,
     get_args,
+    get_origin,
 )
 from warnings import warn
 
@@ -88,7 +88,7 @@ def fillgap(placeholder: Any, type: Any):
 
 
 def _anyof_explode(tdef):
-    if type(tdef) is _AnnotatedAlias:
+    if get_origin(tdef) is Annotated:
         if getattr(tdef, "__metadata__") == (_AnyOfRuntime,):
             return list(get_args(get_args(tdef)[0])), True
     return [tdef], False
