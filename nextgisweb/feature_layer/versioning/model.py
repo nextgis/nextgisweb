@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from contextlib import contextmanager
 from datetime import datetime
-from typing import Any, List, Literal, TypeVar, Union
+from typing import Annotated, Any, List, Literal, TypeVar, Union
 
 import sqlalchemy as sa
 import sqlalchemy.event as sa_event
@@ -10,7 +10,6 @@ import sqlalchemy.orm as orm
 from msgspec import UNSET, Meta, Struct, UnsetType
 from msgspec.inspect import StructType, type_info
 from sqlalchemy import inspect
-from typing_extensions import Annotated
 from zope.interface import classImplements
 
 from nextgisweb.env import Base

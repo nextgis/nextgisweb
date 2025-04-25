@@ -1,6 +1,7 @@
 import warnings
 from dataclasses import dataclass
 from types import SimpleNamespace
+from typing import Annotated
 
 import zope.event
 import zope.event.classhandler
@@ -8,7 +9,6 @@ from msgspec import Meta
 from pyramid.httpexceptions import HTTPFound
 from sqlalchemy.orm import joinedload, with_polymorphic
 from sqlalchemy.orm.exc import NoResultFound
-from typing_extensions import Annotated
 
 from nextgisweb.env import DBSession, env, gettext
 from nextgisweb.lib import dynmenu as dm

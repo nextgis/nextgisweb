@@ -1,11 +1,10 @@
 import json
-from typing import Any, Dict, List, Literal
+from typing import Annotated, Any, Dict, List, Literal, Union
 
 import requests
 from msgspec import UNSET, Meta, Struct, UnsetType
 from requests.exceptions import RequestException
 from sqlalchemy import sql
-from typing_extensions import Annotated, Union
 
 from nextgisweb.env import DBSession, env, gettext, gettextf
 from nextgisweb.lib.apitype import OP, AsJSON, Derived, EmptyObject, ReadOnly, Required, StatusCode

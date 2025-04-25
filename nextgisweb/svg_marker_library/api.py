@@ -1,8 +1,9 @@
+from typing import Annotated
+
 import zipstream
 from msgspec import Meta
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.response import FileResponse, Response
-from typing_extensions import Annotated
 
 from nextgisweb.lib.apitype import ContentType
 

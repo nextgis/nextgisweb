@@ -1,9 +1,8 @@
-from typing import Dict, Union
+from typing import Annotated, Dict, Union
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
 from msgspec import Meta
-from typing_extensions import Annotated
 
 from nextgisweb.env import Base
 

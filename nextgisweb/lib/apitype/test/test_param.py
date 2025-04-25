@@ -1,10 +1,9 @@
 from enum import Enum
 from itertools import chain, product
-from typing import Dict, List, Literal, Optional, Tuple, TypeVar, Union
+from typing import Annotated, Dict, List, Literal, Optional, Tuple, TypeVar, Union
 
 import pytest
 from msgspec import UNSET, Meta, Struct, UnsetType, field
-from typing_extensions import Annotated
 
 from ..param import DefaultsNotSupported, Query, QueryParam, Shape
 from ..query_string import QueryString

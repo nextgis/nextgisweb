@@ -2,11 +2,10 @@ import re
 from contextlib import contextmanager
 from dataclasses import dataclass
 from functools import cached_property, partial
-from typing import Any, List, Literal, Union
+from typing import Annotated, Any, List, Literal, Union
 
 from msgspec import UNSET, Meta, Struct, UnsetType
 from sqlalchemy.orm.exc import NoResultFound
-from typing_extensions import Annotated
 
 from nextgisweb.env import gettext
 from nextgisweb.lib.apitype import AsJSON, Query

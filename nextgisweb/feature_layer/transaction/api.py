@@ -1,8 +1,7 @@
 from datetime import datetime
-from typing import TYPE_CHECKING, Any, Dict, List, Tuple, Type, Union
+from typing import TYPE_CHECKING, Annotated, Any, Dict, List, Tuple, Type, Union
 
 from msgspec import UNSET, Meta, Struct, UnsetType, convert
-from typing_extensions import Annotated
 
 from nextgisweb.env import DBSession
 from nextgisweb.lib.apitype import AsJSON

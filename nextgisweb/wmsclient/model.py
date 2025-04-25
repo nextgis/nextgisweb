@@ -2,7 +2,7 @@ import json
 import re
 from datetime import datetime
 from io import BytesIO
-from typing import Any, Dict, Literal, Union
+from typing import Annotated, Any, Dict, Literal, Union
 from urllib.parse import parse_qsl, quote, urlencode, urlparse, urlunparse
 
 import PIL
@@ -12,7 +12,6 @@ import sqlalchemy.dialects.postgresql as sa_pg
 import sqlalchemy.orm as orm
 from owslib.wms import WebMapService
 from requests.exceptions import RequestException
-from typing_extensions import Annotated
 from zope.interface import implementer
 
 from nextgisweb.env import Base, env, gettext

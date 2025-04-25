@@ -2,13 +2,12 @@ from io import BytesIO
 from itertools import product
 from math import ceil, floor
 from pathlib import Path
-from typing import Dict, List, Literal, Union
+from typing import Annotated, Dict, List, Literal, Union
 
 from msgspec import UNSET, Meta, Struct, UnsetType
 from PIL import Image, ImageDraw, ImageFont
 from pyramid.httpexceptions import HTTPBadRequest
 from pyramid.response import Response
-from typing_extensions import Annotated
 
 from nextgisweb.env import gettext
 from nextgisweb.lib.apitype import AnyOf, AsJSON, ContentType, StatusCode

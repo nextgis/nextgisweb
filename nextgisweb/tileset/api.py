@@ -1,5 +1,6 @@
+from typing import Annotated
+
 from pyramid.response import FileResponse, Response
-from typing_extensions import Annotated
 
 from nextgisweb.lib.apitype import ContentType
 

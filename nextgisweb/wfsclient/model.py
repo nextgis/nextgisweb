@@ -1,7 +1,7 @@
 import re
 from datetime import date, datetime, time
 from io import BytesIO
-from typing import Literal, Union
+from typing import Annotated, Literal, Union
 
 import requests
 import sqlalchemy as sa
@@ -11,7 +11,6 @@ from osgeo import ogr
 from owslib.crs import Crs
 from requests.exceptions import RequestException
 from shapely.geometry import box
-from typing_extensions import Annotated
 from zope.interface import implementer
 
 from nextgisweb.env import COMP_ID, Base, env, gettext

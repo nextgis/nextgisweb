@@ -1,10 +1,9 @@
 import re
-from typing import List, Union
+from typing import Annotated, List, Union
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
 from msgspec import Meta, Struct
-from typing_extensions import Annotated
 
 from nextgisweb.env import Base, gettext
 

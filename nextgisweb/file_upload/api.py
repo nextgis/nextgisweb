@@ -1,13 +1,12 @@
 import re
 from base64 import b64decode
 from shutil import copyfileobj
-from typing import List, Union
+from typing import Annotated, List, Union
 
 import magic
 import pyramid.httpexceptions as exc
 from msgspec import UNSET, Meta, Struct, UnsetType
 from pyramid.response import Response
-from typing_extensions import Annotated
 
 from nextgisweb.env import gettext, inject
 from nextgisweb.lib.apitype import AnyOf, AsJSON, StatusCode

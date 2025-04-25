@@ -1,8 +1,7 @@
 from enum import Enum
-from typing import Dict, List, Union
+from typing import Annotated, Dict, List, Union
 
 from msgspec import Meta
-from typing_extensions import Annotated
 
 from nextgisweb.lib.apitype import AnyOf, AsJSON, ContentType, JSONType, Query, StatusCode
 from nextgisweb.lib.apitype.test.test_param import EnumA, LiteralA, StructA

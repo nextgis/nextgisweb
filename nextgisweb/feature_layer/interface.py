@@ -1,7 +1,6 @@
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Annotated, Literal
 
 from osgeo import ogr
-from typing_extensions import Annotated
 from zope.interface import Attribute, Interface
 
 from nextgisweb.jsrealm import TSExport

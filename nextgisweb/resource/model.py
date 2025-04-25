@@ -1,13 +1,12 @@
 from collections import namedtuple
 from datetime import datetime
 from types import MappingProxyType
-from typing import ClassVar, List, Literal, Tuple, Type, Union
+from typing import Annotated, ClassVar, List, Literal, Tuple, Type, Union
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
 from msgspec import UNSET, Struct, UnsetType
 from sqlalchemy import event, func, text
-from typing_extensions import Annotated
 
 from nextgisweb.env import Base, DBSession, env, gettext, gettextf
 from nextgisweb.lib.apitype import Gap

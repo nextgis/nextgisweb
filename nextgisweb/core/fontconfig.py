@@ -5,11 +5,10 @@ from pathlib import Path
 from shutil import copyfile, copyfileobj
 from subprocess import check_output
 from textwrap import dedent
-from typing import List
+from typing import Annotated, List
 
 from lxml import etree
 from msgspec import Meta, Struct
-from typing_extensions import Annotated
 
 from nextgisweb.env import gettextf
 

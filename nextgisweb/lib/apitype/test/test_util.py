@@ -1,7 +1,6 @@
-from typing import Optional, Union
+from typing import Annotated, Optional, Union
 
 import pytest
-from typing_extensions import Annotated
 
 from ..util import annotate, disannotate, is_optional, unannotate
 

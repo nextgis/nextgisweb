@@ -1,7 +1,6 @@
-from typing import List, Tuple
+from typing import Annotated, List, Tuple
 
 from msgspec import Meta, Struct
-from typing_extensions import Annotated
 
 from nextgisweb.resource import ConnectionScope, ResourceFactory
 

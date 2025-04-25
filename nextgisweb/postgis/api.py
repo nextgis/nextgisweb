@@ -1,10 +1,9 @@
-from typing import List, Union
+from typing import Annotated, List, Union
 
 from msgspec import UNSET, Meta, Struct, UnsetType
 from msgspec.structs import asdict
 from sqlalchemy import inspect
 from sqlalchemy.exc import NoResultFound, NoSuchTableError, SQLAlchemyError
-from typing_extensions import Annotated
 
 from nextgisweb.env import gettext, gettextf
 from nextgisweb.lib.apitype import AsJSON

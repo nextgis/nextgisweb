@@ -1,13 +1,12 @@
 from base64 import urlsafe_b64decode, urlsafe_b64encode
 from datetime import datetime
-from typing import TYPE_CHECKING, List, Literal, Union
+from typing import TYPE_CHECKING, Annotated, List, Literal, Union
 
 import sqlalchemy as sa
 from msgspec import Meta, Struct
 from msgspec.msgpack import decode as msgspec_decode
 from msgspec.msgpack import encode as msgspec_encode
 from pyramid.response import Response
-from typing_extensions import Annotated
 
 from nextgisweb.env import DBSession
 from nextgisweb.lib.apitype import AnyOf, AsJSON, StatusCode

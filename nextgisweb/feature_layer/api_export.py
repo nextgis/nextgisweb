@@ -1,13 +1,12 @@
 import os
 import tempfile
 import zipfile
-from typing import TYPE_CHECKING, Dict, Iterable, List, Literal, Tuple, Union
+from typing import TYPE_CHECKING, Annotated, Dict, Iterable, List, Literal, Tuple, Union
 
 from msgspec import UNSET, Meta, Struct, UnsetType, field
 from osgeo import gdal, ogr
 from pyramid.response import FileResponse, Response
 from sqlalchemy.orm.exc import NoResultFound
-from typing_extensions import Annotated
 
 from nextgisweb.env import env, gettext, gettextf
 from nextgisweb.lib.apitype import ContentType, Query

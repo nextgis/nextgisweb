@@ -1,9 +1,8 @@
 import re
-from typing import ClassVar, Mapping, Type, TypeVar, Union
+from typing import Annotated, ClassVar, Mapping, Type, TypeVar, Union
 
 from msgspec import Struct, defstruct
 from msgspec import _utils as ms_utils
-from typing_extensions import Annotated
 
 from nextgisweb.env.package import pkginfo
 from nextgisweb.lib.apitype import disannotate

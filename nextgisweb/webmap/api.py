@@ -3,14 +3,13 @@ from pathlib import Path
 from shutil import which
 from subprocess import check_call
 from tempfile import TemporaryDirectory
-from typing import Any, Dict, List, Literal, Optional, Set, Union, cast
+from typing import Annotated, Any, Dict, List, Literal, Optional, Set, Union, cast
 
 from geoalchemy2.shape import to_shape
 from msgspec import UNSET, Meta, Struct, UnsetType, ValidationError
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.renderers import render
 from pyramid.response import Response
-from typing_extensions import Annotated
 
 from nextgisweb.env import DBSession
 from nextgisweb.lib.safehtml import sanitize

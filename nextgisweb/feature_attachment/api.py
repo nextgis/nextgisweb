@@ -3,7 +3,7 @@ from io import BytesIO
 from itertools import count
 from mimetypes import guess_extension
 from tempfile import NamedTemporaryFile
-from typing import List, Optional
+from typing import Annotated, List, Optional
 from urllib.parse import quote_plus
 from zipfile import ZIP_DEFLATED, ZipFile
 
@@ -11,7 +11,6 @@ from msgspec import Meta, Struct
 from PIL import Image
 from pyramid.response import FileResponse, Response
 from sqlalchemy.sql import select
-from typing_extensions import Annotated
 
 from nextgisweb.env import DBSession
 from nextgisweb.lib.apitype import ContentType

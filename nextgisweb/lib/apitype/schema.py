@@ -1,8 +1,16 @@
-from typing import TYPE_CHECKING, Any, NewType, TypeVar, Union, get_args
+from typing import (
+    TYPE_CHECKING,
+    Annotated,
+    Any,
+    NewType,
+    TypeVar,
+    Union,
+    _AnnotatedAlias,
+    get_args,
+)
 from warnings import warn
 
 from msgspec import NODEFAULT
-from typing_extensions import Annotated, _AnnotatedAlias
 
 from .http import ContentType
 from .util import annotate, disannotate, unannotate

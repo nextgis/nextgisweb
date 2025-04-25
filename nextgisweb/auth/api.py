@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import TYPE_CHECKING, Dict, List, Literal, Optional, TypeVar, Union
+from typing import TYPE_CHECKING, Annotated, Dict, List, Literal, Optional, TypeVar, Union
 
 import sqlalchemy as sa
 from msgspec import UNSET, Meta, Struct, UnsetType
@@ -8,7 +8,6 @@ from pyramid.interfaces import ISecurityPolicy
 from pyramid.request import Request
 from pyramid.security import forget
 from sqlalchemy.orm import aliased, undefer
-from typing_extensions import Annotated
 
 from nextgisweb.env import DBSession, gettext, inject
 from nextgisweb.lib.apitype import (

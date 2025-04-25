@@ -2,14 +2,13 @@ import csv
 from datetime import datetime
 from enum import Enum
 from io import StringIO
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Annotated, Dict, List, Optional, Tuple, Union
 
 import sqlalchemy as sa
 import sqlalchemy.dialects.postgresql as sa_pg
 from msgspec import Meta, Struct
 from msgspec.json import decode as msgspec_decode
 from pyramid.response import Response
-from typing_extensions import Annotated
 
 from nextgisweb.env import DBSession, inject
 from nextgisweb.lib.apitype import AnyOf, AsJSON, ContentType

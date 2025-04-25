@@ -1,11 +1,10 @@
 from enum import Enum
-from typing import List, Union
+from typing import Annotated, List, Union
 
 import sqlalchemy as sa
 from lxml.builder import ElementMaker
 from lxml.etree import QName, tostring
 from msgspec import UNSET, Meta, Struct, UnsetType, convert, to_builtins
-from typing_extensions import Annotated
 
 from nextgisweb.env import Base
 from nextgisweb.lib.saext import Msgspec

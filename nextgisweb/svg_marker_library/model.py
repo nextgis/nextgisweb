@@ -1,13 +1,12 @@
 import os.path
 import zipfile
 from datetime import datetime
-from typing import Dict, List, Union
+from typing import Annotated, Dict, List, Union
 
 import magic
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
 from msgspec import UNSET, Meta, Struct, UnsetType
-from typing_extensions import Annotated
 
 from nextgisweb.env import Base, gettext, gettextf
 

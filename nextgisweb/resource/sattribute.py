@@ -1,11 +1,10 @@
 from __future__ import annotations
 
 from datetime import date, datetime
-from typing import Any, Literal, Union
+from typing import Annotated, Any, Literal, Union
 
 import sqlalchemy as sa
 from msgspec import Struct
-from typing_extensions import Annotated
 
 from nextgisweb.lib.apitype.util import is_enum
 from nextgisweb.lib.msext import DEPRECATED

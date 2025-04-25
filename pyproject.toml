@@ -51,4 +51,5 @@ section-order = [
 [tool.ruff.lint.flake8-tidy-imports]
 
 [tool.ruff.lint.flake8-tidy-imports.banned-api]
-pkg_resources.msg = "Consider importlib.metadata or nextgisweb.imptool.module_path"
+"pkg_resources".msg = "Consider importlib.metadata or nextgisweb.imptool.module_path"
+"typing_extensions.Annotated".msg = "Import Annotated from typing directly"

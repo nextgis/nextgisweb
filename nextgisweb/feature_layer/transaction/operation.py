@@ -1,11 +1,10 @@
 import abc
 import dataclasses as dc
 from functools import cached_property
-from typing import Any, ClassVar, Dict, List, Tuple, Type, TypeVar, Union
+from typing import Annotated, Any, ClassVar, Dict, List, Tuple, Type, TypeVar, Union
 
 from msgspec import UNSET, Meta, Struct, UnsetType
 from msgspec.inspect import StructType, type_info
-from typing_extensions import Annotated
 
 from nextgisweb.lib.geometry import Geometry
 

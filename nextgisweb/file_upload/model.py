@@ -1,9 +1,8 @@
 import pickle
 from pathlib import Path
-from typing import Optional, Tuple, Union, overload
+from typing import Annotated, Optional, Tuple, Union, overload
 
 from msgspec import UNSET, Meta, Struct, UnsetType
-from typing_extensions import Annotated
 from ulid import ULID
 
 from nextgisweb.env import env, gettext

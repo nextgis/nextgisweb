@@ -1,11 +1,10 @@
 from builtins import type as builtins_type
 from functools import partial
 from re import escape
-from typing import Any, Callable, Literal, Sequence, Tuple, get_args, get_origin
+from typing import Annotated, Any, Callable, Literal, Sequence, Tuple, get_args, get_origin
 from urllib.parse import unquote_plus
 
 from msgspec import Meta, convert
-from typing_extensions import Annotated
 
 from .util import is_enum, unannotate
 

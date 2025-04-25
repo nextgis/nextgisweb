@@ -2,7 +2,7 @@ import re
 from inspect import signature
 from pathlib import Path
 from sys import _getframe
-from typing import Any, Dict, Mapping, Optional, Tuple
+from typing import Annotated, Any, Dict, Mapping, Optional, Tuple
 from warnings import warn, warn_explicit
 
 from msgspec import NODEFAULT, Meta
@@ -11,7 +11,6 @@ from msgspec import ValidationError as MsgSpecValidationError
 from msgspec.inspect import IntType, Metadata, type_info
 from msgspec.json import Decoder
 from pyramid.config import Configurator as PyramidConfigurator
-from typing_extensions import Annotated
 
 from nextgisweb.env import gettext, gettextf
 from nextgisweb.env.package import pkginfo

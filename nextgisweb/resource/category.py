@@ -1,9 +1,7 @@
 from __future__ import annotations
 
 import re
-from typing import ClassVar, Mapping, Type
-
-from typing_extensions import Annotated
+from typing import Annotated, ClassVar, Mapping, Type
 
 from nextgisweb.env import gettext
 from nextgisweb.lib.apitype import Gap

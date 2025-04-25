@@ -1,5 +1,5 @@
 from packaging import version
-from typing import List, Union
+from typing import Annotated, List, Union
 from uuid import uuid4
 
 from msgspec import UNSET, Meta, UnsetType
@@ -8,7 +8,6 @@ from pyramid.httpexceptions import HTTPNoContent, HTTPNotFound
 from pyramid.response import Response
 from shapely.geometry import box
 from sqlalchemy.orm.exc import NoResultFound
-from typing_extensions import Annotated
 
 from nextgisweb.lib.apitype import AnyOf, ContentType, StatusCode
 from nextgisweb.lib.geometry import Geometry

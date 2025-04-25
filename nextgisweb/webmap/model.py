@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Dict, List, Literal, Type, Union
+from typing import Annotated, Dict, List, Literal, Type, Union
 
 import geoalchemy2 as ga
 import sqlalchemy as sa
@@ -11,7 +11,6 @@ from msgspec.structs import asdict as struct_asdict
 from sqlalchemy import text
 from sqlalchemy.ext.orderinglist import ordering_list
 from sqlalchemy.orm.attributes import set_committed_value
-from typing_extensions import Annotated
 
 from nextgisweb.env import COMP_ID, Base, DBSession, gettext, pgettext
 from nextgisweb.lib import saext

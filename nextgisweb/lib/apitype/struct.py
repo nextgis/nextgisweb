@@ -1,12 +1,11 @@
 from enum import Enum
 from itertools import groupby
 from types import MappingProxyType
-from typing import TYPE_CHECKING, Any, List, Tuple, TypeVar, Union
+from typing import TYPE_CHECKING, Annotated, Any, List, Tuple, TypeVar, Union
 
 from msgspec import UNSET, UnsetType, defstruct
 from msgspec.inspect import type_info
 from msgspec.structs import asdict
-from typing_extensions import Annotated
 
 from .util import annotate, disannotate
 

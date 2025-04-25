@@ -4,6 +4,7 @@ from enum import Enum
 from inspect import Parameter, signature
 from typing import (
     TYPE_CHECKING,
+    Annotated,
     Any,
     ClassVar,
     Dict,
@@ -18,7 +19,6 @@ from typing import (
 from msgspec import UNSET, Meta, Struct, UnsetType, convert, defstruct, field, to_builtins
 from pyramid.interfaces import IRoutesMapper
 from pyramid.response import Response
-from typing_extensions import Annotated
 
 from nextgisweb.env import COMP_ID, Component, DBSession, env, gettext, gettextf, inject
 from nextgisweb.env.package import pkginfo

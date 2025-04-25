@@ -1,7 +1,8 @@
+from typing import Annotated
+
 import pytest
 from msgspec import Meta, Struct, ValidationError
 from msgspec.json import decode, encode
-from typing_extensions import Annotated
 
 from ..struct import OP, Default, Derived, ReadOnly, flag, omit
 

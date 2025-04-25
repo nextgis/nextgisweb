@@ -1,10 +1,9 @@
 from datetime import datetime
 from inspect import Parameter, signature
-from typing import Dict, List, Union
+from typing import Annotated, Dict, List, Union
 
 from msgspec import UNSET, Struct, UnsetType, to_builtins
 from pyramid.httpexceptions import HTTPNotFound
-from typing_extensions import Annotated
 
 from nextgisweb.env import DBSession
 from nextgisweb.lib.apitype import AsJSON, EmptyObject

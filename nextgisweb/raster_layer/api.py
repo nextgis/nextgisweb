@@ -1,12 +1,11 @@
 import os
 import tempfile
 from io import DEFAULT_BUFFER_SIZE
-from typing import List, Literal, Union
+from typing import Annotated, List, Literal, Union
 
 from msgspec import Meta, Struct
 from osgeo import gdal
 from pyramid.response import FileIter, FileResponse, Response
-from typing_extensions import Annotated
 
 from nextgisweb.env import env, gettext
 from nextgisweb.lib.apitype import AnyOf, ContentType, Query, StatusCode
