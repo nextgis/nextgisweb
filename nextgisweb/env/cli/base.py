@@ -1,6 +1,5 @@
 import sys
 from importlib.util import find_spec
-from typing import Optional
 
 import transaction
 
@@ -13,7 +12,7 @@ from ..environment import Env, env, inject
 
 
 class EnvOptions:
-    config: Optional[str] = opt(metavar="path", doc="Configuration file path")
+    config: str | None = opt(metavar="path", doc="Configuration file path")
 
 
 class DryRunOptions:
@@ -46,7 +45,7 @@ class bootstrap(EnvOptions):
 
 
 class EnvCommand(EnvOptions):
-    env: Optional[Env] = None
+    env: Env | None = None
     env_initialize: bool = True
     use_transaction: bool = False
 

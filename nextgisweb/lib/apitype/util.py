@@ -1,3 +1,4 @@
+from types import UnionType
 from typing import (
     TYPE_CHECKING,
     Annotated,
@@ -9,6 +10,7 @@ from typing import (
     TypeVar,
     Union,
     _AnnotatedAlias,
+    cast,
     get_args,
     get_origin,
 )
@@ -63,7 +65,7 @@ def decompose_union(tdef: Type, *, annotated: bool = True) -> Tuple[Type, ...]:
     if annotated:
         tdef = unannotate(tdef)
 
-    if get_origin(tdef) == Union:
+    if get_origin(tdef) in (UnionType, Union):
         return get_args(tdef)
     else:
         return (tdef,)
@@ -73,7 +75,7 @@ def is_optional(tdef: Type) -> Tuple[bool, Type]:
     """Determine if type definition is an optional type"""
 
     tdef = unannotate(tdef)
-    if get_origin(tdef) == Union:
+    if get_origin(tdef) in (UnionType, Union):
         result = (False,)
         args = []
         for a in get_args(tdef):
@@ -84,7 +86,7 @@ def is_optional(tdef: Type) -> Tuple[bool, Type]:
                 args.append(a)
         if result:
             ndef = args[0] if len(args) == 1 else Union[tuple(args)]  # type: ignore
-            return True, ndef
+            return True, cast(Type, ndef)
     return False, tdef
 
 

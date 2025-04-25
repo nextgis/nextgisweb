@@ -1,5 +1,3 @@
-from typing import Optional
-
 from nextgisweb.env.cli import UninitializedEnvCommand, cli, opt
 from nextgisweb.lib.logging import logger
 
@@ -13,7 +11,7 @@ def server(
     self: UninitializedEnvCommand,
     host: str = opt("0.0.0.0"),
     port: int = opt(8080),
-    reload: Optional[bool] = opt(flag=True),
+    reload: bool | None = opt(flag=True),
     *,
     core: CoreComponent,
     pyramid: PyramidComponent,

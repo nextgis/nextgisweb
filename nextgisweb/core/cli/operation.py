@@ -2,7 +2,6 @@ import os
 import shutil
 from datetime import datetime, timedelta
 from time import sleep
-from typing import List
 
 import transaction
 
@@ -75,7 +74,7 @@ def wait_for_service(self: EnvCommand, timeout: int = opt(120, short="t", metava
 @cli.command()
 def psql(
     self: UninitializedEnvCommand,
-    arg: List[str] = arg(nargs="..."),
+    arg: list[str] = arg(nargs="..."),
 ):
     """Launch psql connected to database
 

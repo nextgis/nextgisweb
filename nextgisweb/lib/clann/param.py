@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from enum import Enum
 from functools import partial
-from typing import Any, List, Optional, Tuple, Union, get_args, get_origin
+from types import NoneType, UnionType
+from typing import Any, Optional, Tuple, Union, get_args, get_origin
 
 from msgspec import UNSET
 from typing_extensions import Protocol
@@ -63,16 +64,16 @@ class Param:
         iarg = self.ptype == ARGUMENT
 
         is_optional = False
-        if get_origin(annnotation) == Union:
+        if get_origin(annnotation) in (Union, UnionType):
             a = get_args(annnotation)
-            if len(a) == 2 and a[1] == type(None):
-                annnotation = a[0]
+            if len(a) == 2 and NoneType in a:
+                annnotation = a[0 if a[1] is NoneType else 1]
                 is_optional = True
             else:
                 raise NotImplementedError
 
         is_list = False
-        if get_origin(annnotation) == list:
+        if get_origin(annnotation) is list:
             annnotation = get_args(annnotation)[0]
             is_list = True
 
@@ -89,12 +90,12 @@ class Param:
         elif default is None and not is_optional:
             raise ValueError("Default is None for non optional type")
 
-        if self.flag and (annnotation != bool or not iopt or is_list):
+        if self.flag and (annnotation is not bool or not iopt or is_list):
             raise ValueError("Flag is only allowed for booleans")
 
         args = self._option_strings() if iopt else [self.name]
 
-        if iopt and annnotation == bool and not is_list:
+        if iopt and annnotation is bool and not is_list:
             if self.flag:
                 kwargs["action"] = "flag"
                 annnotation = None
@@ -130,7 +131,7 @@ class Param:
         kwargs.update(self.extra)
         return args, kwargs
 
-    def _option_strings(self) -> List[str]:
+    def _option_strings(self) -> list[str]:
         assert self.name is not None
         return (["-" + self.short] if self.short else []) + ["--" + self.name.replace("_", "-")]
 

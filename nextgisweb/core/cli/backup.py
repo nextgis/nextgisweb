@@ -7,7 +7,6 @@ from os.path import join as path_join
 from os.path import split as path_split
 from shutil import rmtree
 from tempfile import TemporaryDirectory, mkdtemp, mkstemp
-from typing import Optional
 from zipfile import ZipFile, is_zipfile
 
 import transaction
@@ -24,7 +23,7 @@ def backup(
     self: EnvCommand,
     no_zip: bool = opt(False),
     one_shot: bool = opt(False),
-    target: Optional[str] = arg(metavar="path"),
+    target: str | None = arg(metavar="path"),
     *,
     core: CoreComponent,
 ):

@@ -4,6 +4,7 @@ import re
 from datetime import datetime, time
 from itertools import count
 from textwrap import indent
+from types import UnionType
 from typing import (
     Any,
     Dict,
@@ -110,7 +111,7 @@ class TSGenerator:
             result = TSEnum(args=[m.value for m in otype], **defaults)
         elif is_struct(otype):
             result = TSStruct(cls=otype, **defaults)
-        elif (origin := get_origin(otype)) is Union:
+        elif (origin := get_origin(otype)) in (UnionType, Union):
             result = TSUnion(args=get_args(otype), **defaults)
         elif origin in (list, set):
             comment = None if origin is list else origin.__name__

@@ -1,4 +1,4 @@
-from typing import Annotated, Optional, Union
+from typing import Annotated, Union
 
 import pytest
 
@@ -24,8 +24,9 @@ def test_annotated(origin, tdef, annotations):
     "tdef, expected",
     [
         [str, False],
-        [Optional[str], True],
-        [Annotated[Optional[str], 1, 2], True],
+        [str | None, True],
+        [Union[str, None], True],
+        [Annotated[str | None, 1, 2], True],
         [Union[str, Union[int, None]], True],
         [Union[str, Annotated[None, 1, 2]], True],
     ],

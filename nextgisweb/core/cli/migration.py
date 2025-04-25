@@ -1,6 +1,5 @@
 from datetime import datetime
 from pathlib import Path
-from typing import List, Optional
 
 import transaction
 from zope.sqlalchemy import mark_changed
@@ -148,7 +147,7 @@ class MigrationApplyCommand(
 
 
 class ComponentMigrationCommand(MigrationApplyCommand):
-    component: List[str] = arg(doc="Component identity")
+    component: list[str] = arg(doc="Component identity")
 
 
 class RevisionMigrationCommand(MigrationApplyCommand):
@@ -183,15 +182,20 @@ class create(RegistryMixin, UninitializedEnvCommand):
     """Create a new migration boilerplate"""
 
     format: str = opt(
-        "sql", choices=("sql", "python"), doc=("SQL (default) or Python migration format")
+        "sql",
+        choices=("sql", "python"),
+        doc=("SQL (default) or Python migration format"),
     )
-    parent: Optional[str] = opt(
-        metavar="REV", doc=("Start from a given revision (excludes --merge)")
+    parent: str | None = opt(
+        metavar="REV",
+        doc=("Start from a given revision (excludes --merge)"),
     )
-    merge: Optional[List[str]] = opt(
-        nargs=2, metavar="REV", doc=("Merge two given revisions (excludes --parent)")
+    merge: list[str] | None = opt(
+        nargs=2,
+        metavar="REV",
+        doc=("Merge two given revisions (excludes --parent)"),
     )
-    date: Optional[str] = opt(doc="Override migration date")
+    date: str | None = opt(doc="Override migration date")
 
     component: str = arg(doc="Component identity")
     message: str = arg(doc="Migration message")

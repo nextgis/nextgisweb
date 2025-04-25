@@ -1,6 +1,6 @@
 from enum import Enum
 from itertools import chain, product
-from typing import Annotated, Dict, List, Literal, Optional, Tuple, TypeVar, Union
+from typing import Annotated, Literal, TypeVar, Union
 
 import pytest
 from msgspec import UNSET, Meta, Struct, UnsetType, field
@@ -12,9 +12,9 @@ T = TypeVar("T")
 
 FortyTwo = Annotated[int, Meta(ge=42, le=42)]
 Positive = Annotated[T, Meta(gt=0)]
-EmptyList = Annotated[List[T], Meta(max_length=0)]
-ExactlyTwo = Annotated[List[T], Meta(min_length=2, max_length=2)]
-TwoOrThree = Annotated[List[T], Meta(min_length=2, max_length=3)]
+EmptyList = Annotated[list[T], Meta(max_length=0)]
+ExactlyTwo = Annotated[list[T], Meta(min_length=2, max_length=2)]
+TwoOrThree = Annotated[list[T], Meta(min_length=2, max_length=3)]
 
 LiteralA = Literal["foo", "bar", "qux"]
 
@@ -28,13 +28,13 @@ class EnumA(Enum):
 class StructA(Struct, kw_only=True):
     i: int
     b: bool = False
-    s: Optional[str] = None
-    t: Tuple[float, float]
+    s: Union[str, None] = None
+    t: tuple[float, float]
 
 
 class StructB(Struct, kw_only=True):
     i: int = field(name="j")
-    t: Tuple[float, float] = (0, 0)
+    t: tuple[float, float] = (0, 0)
 
 
 class tc:
@@ -73,23 +73,23 @@ tc(3.14, float, Positive[float]).ok("3.14", "03.14").err("1e10")
 tc(EnumA.FOO, EnumA).ok("foo").err("zoo")
 tc("qux", LiteralA).ok("qux", "qu%78").err("zoo")
 
-tc([1, 2], List[int], ExactlyTwo[int], TwoOrThree[int]).ok("1,2", "1%2C2")
-tc((1, 2), Tuple[int, ...], Tuple[int, float]).ok("1,2", "1%2C2")
-tc((1, True), Tuple[Positive[int], bool]).ok("1,true").err("-1,true")
+tc([1, 2], list[int], ExactlyTwo[int], TwoOrThree[int]).ok("1,2", "1%2C2")
+tc((1, 2), tuple[int, ...], tuple[int, float]).ok("1,2", "1%2C2")
+tc((1, True), tuple[Positive[int], bool]).ok("1,true").err("-1,true")
 tc([1, 2], ExactlyTwo[int], TwoOrThree[int]).ok("1,2").err("", "1,2,3,4")
-tc(["foo,bar", "qux"], List[str]).ok("foo%2Cbar,qux")
-tc([], List[int], EmptyList[int]).ok("").err("foo")
+tc(["foo,bar", "qux"], list[str]).ok("foo%2Cbar,qux")
+tc([], list[int], EmptyList[int]).ok("").err("foo")
 
 tc(StructA(i=1, b=True, s="foo", t=(0, 3.14)), StructA).ok("i=1&b=true&s=foo&t=0,3.14")
 tc(StructA(i=1, b=False, s="foo", t=(0, 0)), StructA).ok("i=1&s=foo&t=0,0")
 tc(StructA(i=1, b=False, s=None, t=(0, 0)), StructA).ok("i=1&t=0,0")
 tc(StructB(i=42), StructB).ok("j=42")
 tc(StructB(i=0, t=(1, 2)), StructB).ok("j=0&t=1,2")
-tc(dict(a=42), Dict[str, int], Dict[str, FortyTwo]).ok("par[a]=42", "par%5Ba%5D=42")
-tc({42: "qux"}, Dict[int, str], Dict[FortyTwo, str]).ok("par[42]=qux", "par[4%32]=qu%78")
+tc(dict(a=42), dict[str, int], dict[str, FortyTwo]).ok("par[a]=42", "par%5Ba%5D=42")
+tc({42: "qux"}, dict[int, str], dict[FortyTwo, str]).ok("par[42]=qux", "par[4%32]=qu%78")
 
-tc({0: [1]}, Dict[int, List[int]]).ok("par[0]=1").err("par[0]=foo")
-tc({0: (1, 2)}, Dict[int, Tuple[int, int]]).ok("par[0]=1,2")
+tc({0: [1]}, dict[int, list[int]]).ok("par[0]=1").err("par[0]=foo")
+tc({0: (1, 2)}, dict[int, tuple[int, int]]).ok("par[0]=1,2")
 
 
 @pytest.mark.parametrize("tdef,raw,expected", chain(*(c.vproduct() for c in tc.registry)))
@@ -108,7 +108,7 @@ def test_valid(tdef, raw, expected):
             qp.decoder(qs_empty)
 
         dec_default = QueryParam("par", tdef, expected).decoder
-        dec_none = QueryParam("par", Optional[tdef], None).decoder
+        dec_none = QueryParam("par", Union[tdef, None], None).decoder
         dec_unset = QueryParam("par", Union[tdef, UnsetType], UNSET).decoder
 
         assert dec_none(qs) == expected

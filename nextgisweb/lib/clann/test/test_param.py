@@ -1,5 +1,5 @@
 from functools import partial
-from typing import List, Optional
+from typing import List, Union
 
 import pytest
 
@@ -19,23 +19,32 @@ a = partial(t, arg, "arg")
 
 def test_generic():
     assert o(str) == dict(type=str, required=True)
-    assert o(Optional[str], None) == dict(type=str, default=None)
+    assert o(str | None, None) == o(Union[str, None], None) == dict(type=str, default=None)
 
     assert a(str) == dict(type=str)
-    assert a(Optional[str]) == dict(type=str, default=None, nargs="?")
+    assert a(str | None) == a(Union[str, None]) == dict(type=str, default=None, nargs="?")
 
 
 def test_bool():
     assert o(bool) == dict(type=bool, required=True)
-    assert o(Optional[bool]) == dict(type=bool, default=None)
-    assert o(bool, False) == dict(action="store_true", default=False)
-    assert o(Optional[bool], flag=True) == dict(default=None, action="flag")
+    assert o(bool | None) == o(Union[bool, None]) == dict(type=bool, default=None)
+    assert o(bool, default=False) == dict(action="store_true", default=False)
+    assert (
+        o(bool | None, flag=True)
+        == o(None | bool, flag=True)
+        == o(Union[bool, None], flag=True)
+        == dict(default=None, action="flag")
+    )
 
 
 def test_list():
-    assert o(List[str]) == dict(type=str, default=[], action="append")
-    assert o(Optional[List[str]]) == dict(type=str, default=None, action="append")
+    assert o(list[str]) == o(List[str]) == dict(type=str, default=[], action="append")
+    assert (
+        o(list[str] | None)
+        == o(Union[list[str], None])
+        == dict(type=str, default=None, action="append")
+    )
 
-    assert a(List[str]) == dict(type=str, default=[], nargs="+")
+    assert a(list[str]) == dict(type=str, default=[], nargs="+")
     with pytest.raises(NotImplementedError):
-        a(Optional[List[str]])
+        a(list[str] | None)
