@@ -61,8 +61,11 @@ export class Store
         }
 
         result.items = (this.items || []).map(
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            ({ store, key, ...rest }) => rest
+            ({ id, display_name, file_upload }) => ({
+                id,
+                display_name,
+                file_upload,
+            })
         );
         return result;
     }
