@@ -4,5 +4,27 @@ import { testContent } from "./testContent";
 import { DescriptionComponent } from "./index";
 
 export default function DescriptionComponentTestEntry() {
-    return <DescriptionComponent content={testContent} />;
+    return (
+        <>
+            <div
+                style={{
+                    width: "400px",
+                    border: "2px solid black",
+                }}
+            >
+                <DescriptionComponent content={testContent} />
+            </div>
+
+            <br />
+
+            <div
+                style={{
+                    height: "200px",
+                    border: "2px solid black",
+                }}
+            >
+                <DescriptionComponent content={testContent} />
+            </div>
+        </>
+    );
 }
