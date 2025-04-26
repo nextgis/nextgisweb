@@ -47,7 +47,7 @@ requires = [
     "SQLAlchemy==1.4.49",
     "transaction==3.1.0",
     "typing-extensions",
-    "ua-parser==0.18.0",
+    "ua-parser[re2]==1.0.*",
     "urllib3<2",
     "waitress==2.1.2",
     "zipstream-new==1.1.8",

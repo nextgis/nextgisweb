@@ -49,6 +49,13 @@ BROWSER_FAMILIES = (
 )
 # fmt: on
 
+MOBILE_FAMILIES = {
+    "chrome mobile": "chrome",
+    "mobile safari": "safari",
+    "edge mobile": "edge",
+    "firefox mobile": "firefox",
+}
+
 opt_ann_list = [Option("uacompat.enabled", bool, default=True)]
 for f in BROWSER_FAMILIES:
     FAMILIES[f.identity] = f
@@ -69,18 +76,28 @@ def get_header(request):
 
 @lru_cache(maxsize=64)
 def parse_header(value):
-    from ua_parser import user_agent_parser  # Slow import!
+    from ua_parser import parse  # Slow import!
 
     if value is None:
         return None
 
-    parsed = user_agent_parser.ParseUserAgent(value)
-    fid = parsed["family"].lower()
-    if fid not in FAMILIES:
-        return None
-    if parsed.get("major", None) is None:
-        return None
-    return fid, int(parsed["major"])
+    parsed = parse(value)
+    if os := parsed.os:
+        if os.family.lower() == "ios":
+            if os_major := os.major:
+                os_major = int(os_major)
+                if os_major >= 12:
+                    return ("safari", os_major)
+
+    if ua := parsed.user_agent:
+        if ua_family := ua.family:
+            ua_family = ua_family.lower()
+            ua_family = MOBILE_FAMILIES.get(ua_family, ua_family)
+            if ua_family in FAMILIES:
+                if ua_major := ua.major:
+                    return (ua_family, int(ua_major))
+
+    return None
 
 
 def hash_header(value):
