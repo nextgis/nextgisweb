@@ -1,22 +1,17 @@
 import { route } from "@nextgisweb/pyramid/api";
+import type Routes from "@nextgisweb/pyramid/type/route";
 
 import type { FeatureItem } from "../../type";
 import { $FID, $VID } from "../constant";
 import type { OrderBy } from "../type";
 
-interface FeatureLayerQuery {
-    offset?: number;
-    limit?: number;
-    geom?: boolean;
-    extensions?: string[];
-    dt_format?: "iso";
-    fields?: string[];
-    order_by?: string;
-    like?: string;
-    ilike?: string;
-    intersects?: string;
-    label?: boolean;
-}
+type FeatureLayerQuery =
+    Routes["feature_layer.feature.collection"]["get"]["query"] & {
+        // TODO: Remove these mebers when API types are added
+        like?: string;
+        ilike?: string;
+        intersects?: string;
+    };
 
 export interface FetchFeaturesOptions {
     resourceId: number;

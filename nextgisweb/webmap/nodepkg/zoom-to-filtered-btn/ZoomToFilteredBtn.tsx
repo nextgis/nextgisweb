@@ -30,7 +30,7 @@ export const ZoomToFilteredBtn = ({
         if (!onZoomToFiltered) {
             return;
         }
-        const resp = await route.get<NgwExtent>({
+        const resp = await route.get({
             query: queryParams || undefined,
             cache: true,
         });

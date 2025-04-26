@@ -30,8 +30,10 @@ const BookmarksPanel = observer<PanelPluginWidgetProps>(
             params: { id: bookmarkLayerId },
             options: {
                 query: {
-                    geom: true,
+                    geom: false,
                     label: true,
+                    dt_format: "iso",
+                    fields: [],
                     extensions: [],
                 },
             },

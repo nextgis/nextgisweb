@@ -6,7 +6,6 @@ import { Alert } from "@nextgisweb/gui/antd";
 import { errorModal, isAbortError } from "@nextgisweb/gui/error";
 import { useLoading } from "@nextgisweb/gui/hook/useLoading";
 import { executeWithMinDelay } from "@nextgisweb/gui/util/executeWithMinDelay";
-import type { GetRequestOptions } from "@nextgisweb/pyramid/api/type";
 import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import webmapSettings from "@nextgisweb/webmap/client-settings";
@@ -36,7 +35,7 @@ const loadFeatureItem = async (
     display: Display,
     identifyInfo: IdentifyInfo,
     featureInfo: FeatureInfo,
-    opt?: GetRequestOptions
+    opt: { signal: AbortSignal }
 ) => {
     if (display.identify) {
         const featureItem = await executeWithMinDelay(

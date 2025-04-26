@@ -3,8 +3,8 @@ import type { Dayjs } from "dayjs";
 import type { NgwAttributeType } from "@nextgisweb/feature-layer/type";
 import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
 import {
-    isDateType,
-    parseNgwAttribute,
+    isDateTimeFieldType,
+    unmarshalFieldValue,
 } from "@nextgisweb/feature-layer/util/ngwAttributes";
 import { assert } from "@nextgisweb/jsrealm/error";
 import { route } from "@nextgisweb/pyramid/api";
@@ -57,8 +57,8 @@ export async function fieldValuesToDataSource(
     for (const k in fields) {
         const field = fieldsInfo.get(k);
         if (!field) continue;
-        let val = parseNgwAttribute(field.datatype, fields[k]);
-        if (val !== null && isDateType(field.datatype)) {
+        let val = unmarshalFieldValue(field.datatype, fields[k]);
+        if (val !== null && isDateTimeFieldType(field.datatype)) {
             val = val as Dayjs;
             switch (field.datatype) {
                 case "DATE":

@@ -464,13 +464,12 @@ export class LayerEditor extends PluginBase {
         try {
             const featuresInfo = await route(
                 "feature_layer.feature.collection",
-                {
-                    id: resourceId,
-                }
+                { id: resourceId }
             ).get({
                 query: {
-                    extensions: [],
+                    dt_format: "iso",
                     fields: [],
+                    extensions: [],
                 },
             });
             this.handleFetchedVectorData(resourceId, featuresInfo, editingItem);
@@ -696,9 +695,7 @@ export class LayerEditor extends PluginBase {
         }).patch({
             // @ts-expect-error TODO: define patch payload for feature_layer.feature.collection
             json: features,
-            query: {
-                dt_format: "iso",
-            },
+            query: { dt_format: "iso" },
         });
     }
 

@@ -93,7 +93,13 @@ export function WebMapFeatureGridTab({
                             id: layerId,
                             fid,
                         })
-                            .get<FeatureItem>({})
+                            .get<FeatureItem>({
+                                query: {
+                                    dt_format: "iso",
+                                    fields: [],
+                                    extensions: [],
+                                },
+                            })
                             .then((feature) => {
                                 display.current.featureHighlighter.highlightFeature(
                                     {
@@ -122,7 +128,13 @@ export function WebMapFeatureGridTab({
                                     id: layerId,
                                     fid,
                                 })
-                                    .get<FeatureItem>({})
+                                    .get<FeatureItem>({
+                                        query: {
+                                            dt_format: "iso",
+                                            fields: [],
+                                            extensions: [],
+                                        },
+                                    })
                                     .then((feature) => {
                                         if (feature.geom !== null) {
                                             const geometry = wkt.readGeometry(

@@ -90,7 +90,7 @@ export class FeatureEditorStore {
             this.setFields(fields);
         }
         if (this.route) {
-            const featureItem = await this.route?.get<FeatureItem>({
+            const featureItem = await this.route.get<FeatureItem>({
                 signal,
                 query: { dt_format: "iso" },
             });

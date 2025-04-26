@@ -7,11 +7,7 @@ import { fromExtent } from "ol/geom/Polygon";
 import Interaction from "ol/interaction/Interaction";
 
 import { route } from "@nextgisweb/pyramid/api/route";
-import type {
-    GetRequestOptions,
-    RouteQuery,
-    RouteResp,
-} from "@nextgisweb/pyramid/api/type";
+import type { RouteQuery, RouteResp } from "@nextgisweb/pyramid/api/type";
 import i18n from "@nextgisweb/pyramid/i18n";
 import webmapSettings from "@nextgisweb/webmap/client-settings";
 import topic from "@nextgisweb/webmap/compat/topic";
@@ -101,7 +97,7 @@ export class Identify extends ToolBase {
     async highlightFeature(
         identifyInfo: IdentifyInfo,
         featureInfo: FeatureInfo,
-        opt?: GetRequestOptions
+        opt: { signal: AbortSignal }
     ) {
         const layerResponse = identifyInfo.response[featureInfo.layerId];
         const featureResponse = layerResponse.features[featureInfo.idx];
@@ -109,7 +105,7 @@ export class Identify extends ToolBase {
         const featureItem = await route("feature_layer.feature.item", {
             id: featureResponse.layerId,
             fid: featureResponse.id,
-        }).get(opt);
+        }).get({ query: { dt_format: "iso" }, ...opt });
 
         const { label } = featureInfo;
 
@@ -143,6 +139,7 @@ export class Identify extends ToolBase {
             [key: `fld_${string}`]: string | number;
         } = {
             limit: 1,
+            dt_format: "iso",
         };
         query[`fld_${attrName}__eq`] = attrValue;
 

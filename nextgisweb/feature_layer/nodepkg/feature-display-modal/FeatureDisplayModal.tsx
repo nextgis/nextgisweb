@@ -25,7 +25,7 @@ export function FeatureDisplayModal({
             id: resourceId,
             fid: featureId,
         },
-        { query: { label: true } }
+        { query: { label: true, dt_format: "iso" } }
     );
 
     return (

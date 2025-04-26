@@ -18,7 +18,8 @@ export const FeatureDisplayWidget = observer<FeatureDisplayWidget>(
             {
                 id: resourceId,
                 fid: featureId,
-            }
+            },
+            { query: { dt_format: "iso" } }
         );
 
         if (isLoading) {

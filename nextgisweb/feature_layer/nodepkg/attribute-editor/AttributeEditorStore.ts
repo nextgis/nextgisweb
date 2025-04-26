@@ -8,7 +8,7 @@ import type {
 import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
 
 import type { FeatureEditorStore } from "../feature-editor/FeatureEditorStore";
-import { formatNgwAttribute, parseNgwAttribute } from "../util/ngwAttributes";
+import { marshalFieldValue, unmarshalFieldValue } from "../util/ngwAttributes";
 
 import type { AppAttributes, NgwAttributeValue } from "./type";
 
@@ -51,7 +51,10 @@ class AttributeEditorStore implements EditorStore<NgwAttributeValue> {
             for (const field of this.fields) {
                 const { keyname, datatype } = field;
                 const val = this.value[keyname];
-                values[keyname] = parseNgwAttribute(datatype, val);
+                values[keyname] =
+                    val !== undefined
+                        ? unmarshalFieldValue(datatype, val)
+                        : undefined;
             }
         }
         return values;
@@ -101,7 +104,7 @@ class AttributeEditorStore implements EditorStore<NgwAttributeValue> {
             const val = values[key];
             const field = this.fields.find((f) => f.keyname === key);
             if (field) {
-                attributes[key] = formatNgwAttribute(field.datatype, val);
+                attributes[key] = marshalFieldValue(field.datatype, val);
             }
         }
         return attributes;

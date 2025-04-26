@@ -1,90 +1,52 @@
 import dayjs from "dayjs";
+import type { Dayjs } from "dayjs";
 
 import type { FeatureLayerFieldDatatype } from "@nextgisweb/feature-layer/type/api";
+import { assert } from "@nextgisweb/jsrealm/error";
 
-import type {
-    NgwAttributeType,
-    NgwDate,
-    NgwDateTime,
-    NgwTime,
-} from "../type/FeatureItem";
+import type { NgwAttributeType } from "../type/FeatureItem";
 
-export function isDateType(datatype: FeatureLayerFieldDatatype) {
-    return ["DATE", "TIME", "DATETIME"].includes(datatype);
+const DATETIME_TYPES: readonly FeatureLayerFieldDatatype[] = [
+    "DATE",
+    "TIME",
+    "DATETIME",
+];
+
+export function isDateTimeFieldType(datatype: FeatureLayerFieldDatatype) {
+    return DATETIME_TYPES.includes(datatype);
 }
 
-export function parseNgwAttribute(
+export function unmarshalFieldValue(
     datatype: FeatureLayerFieldDatatype,
     value: NgwAttributeType
-) {
-    if (value !== undefined && value !== null && isDateType(datatype)) {
-        let dt;
-        if (typeof value === "object") {
-            if (datatype === "DATE") {
-                const { year, month, day } = value as NgwDate;
-                dt = new Date(year, month - 1, day);
-            } else if (datatype === "TIME") {
-                const { hour, minute, second } = value as NgwTime;
-                dt = new Date(0, 0, 0, hour, minute, second);
-            } else if (datatype === "DATETIME") {
-                const { year, month, day, hour, minute, second } =
-                    value as NgwDateTime;
-                dt = new Date(year, month - 1, day, hour, minute, second);
-            }
-        } else if (typeof value === "string") {
-            if (datatype !== "TIME") {
-                dt = value;
-            } else {
-                dt = `1970-00-00T${value}`;
-            }
+): null | number | string | Dayjs {
+    if (value === null) {
+        return value;
+    } else if (isDateTimeFieldType(datatype)) {
+        assert(typeof value === "string");
+        if (datatype !== "TIME") {
+            return dayjs(value);
+        } else {
+            return dayjs(`1970-00-00T${value}`);
         }
-        return dayjs(dt);
     }
     return value;
 }
 
-export function formatNgwAttribute(
+export function marshalFieldValue(
     datatype: FeatureLayerFieldDatatype,
-    value: unknown,
-    opt: { isoDate?: boolean } = {}
+    value: unknown
 ): NgwAttributeType {
     if (value === null) {
         return null;
-    }
-    if (isDateType(datatype)) {
+    } else if (isDateTimeFieldType(datatype)) {
         const v = dayjs(value as string);
-        const isoDate = opt.isoDate ?? true;
-        if (isoDate) {
-            if (datatype === "DATE") {
-                return dayjs(v).format("YYYY-MM-DD");
-            } else if (datatype === "TIME") {
-                return dayjs(v).format("HH:mm:ss");
-            } else if (datatype === "DATETIME") {
-                return dayjs(v).format("YYYY-MM-DDTHH:mm:ss");
-            }
-        } else {
-            if (datatype === "DATE") {
-                return {
-                    year: v.get("year"),
-                    month: v.get("month") + 1,
-                    day: v.get("day"),
-                };
-            } else if (datatype === "TIME") {
-                return {
-                    hour: v.get("hour"),
-                    minute: v.get("minute"),
-                    second: v.get("second"),
-                };
-            } else if (datatype === "DATETIME") {
-                return {
-                    year: v.get("year"),
-                    month: v.get("month") + 1,
-                    day: v.get("day"),
-                    hour: v.get("hour"),
-                    minute: v.get("minute"),
-                    second: v.get("second"),
-                };
-            }
+        if (datatype === "DATE") {
+            return dayjs(v).format("YYYY-MM-DD");
+        } else if (datatype === "TIME") {
+            return dayjs(v).format("HH:mm:ss");
+        } else if (datatype === "DATETIME") {
+            return dayjs(v).format("YYYY-MM-DDTHH:mm:ss");
         }
     }
     return value as NgwAttributeType;

@@ -120,6 +120,8 @@ const searchByLayers: SearchFunction = async (
                 limit: limit,
                 geom_format: "geojson",
                 label: true,
+                dt_format: "iso",
+                fields: [],
                 extensions: [],
                 // @ts-expect-error not in tsgen api yet
                 ilike: criteria,

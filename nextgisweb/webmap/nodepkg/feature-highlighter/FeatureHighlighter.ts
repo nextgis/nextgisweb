@@ -152,7 +152,7 @@ export class FeatureHighlighter {
         const feature = await route("feature_layer.feature.item", {
             id: layerId,
             fid: featureId,
-        }).get();
+        }).get({ query: { dt_format: "iso", fields: [], extensions: [] } });
 
         return this._highlightFeature({
             geom: feature.geom,
