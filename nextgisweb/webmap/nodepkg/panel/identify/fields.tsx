@@ -1,12 +1,11 @@
-import dayjs from "dayjs";
+import type { Dayjs } from "dayjs";
 
-import type {
-    NgwAttributeType,
-    NgwDate,
-    NgwDateTime,
-    NgwTime,
-} from "@nextgisweb/feature-layer/type";
+import type { NgwAttributeType } from "@nextgisweb/feature-layer/type";
 import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
+import {
+    isDateType,
+    parseNgwAttribute,
+} from "@nextgisweb/feature-layer/util/ngwAttributes";
 import { assert } from "@nextgisweb/jsrealm/error";
 import { route } from "@nextgisweb/pyramid/api";
 import type { GetRequestOptions } from "@nextgisweb/pyramid/api/type";
@@ -56,23 +55,24 @@ export async function fieldValuesToDataSource(
     const dataSource = [];
 
     for (const k in fields) {
-        let val = fields[k];
         const field = fieldsInfo.get(k);
         if (!field) continue;
-
-        if (val && field.datatype === "DATE") {
-            const { year, month, day } = val as NgwDate;
-            const dt = new Date(year, month - 1, day);
-            val = dayjs(dt).format("YYYY-MM-DD");
-        } else if (val && field.datatype === "TIME") {
-            const { hour, minute, second } = val as NgwTime;
-            const dt = new Date(0, 0, 0, hour, minute, second);
-            val = dayjs(dt).format("HH:mm:ss");
-        } else if (val && field.datatype === "DATETIME") {
-            const { year, month, day, hour, minute, second } =
-                val as NgwDateTime;
-            const dt = new Date(year, month - 1, day, hour, minute, second);
-            val = dayjs(dt).format("YYYY-MM-DD HH:mm:ss");
+        let val = parseNgwAttribute(field.datatype, fields[k]);
+        if (val !== null && isDateType(field.datatype)) {
+            val = val as Dayjs;
+            switch (field.datatype) {
+                case "DATE":
+                    val = val.format("L");
+                    break;
+                case "TIME":
+                    val = val.format("LTS");
+                    break;
+                case "DATETIME":
+                    val = val.format("L LTS");
+                    break;
+                default:
+                    assert(false, `Unexpected datatype: ${field.datatype}`);
+            }
         }
 
         const dataItem: FieldDataItem = {
