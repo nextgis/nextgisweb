@@ -8,7 +8,7 @@ export default function DescriptionComponentTestEntry() {
         <>
             <div
                 style={{
-                    width: "400px",
+                    height: "200px",
                     border: "2px solid black",
                 }}
             >
@@ -19,7 +19,7 @@ export default function DescriptionComponentTestEntry() {
 
             <div
                 style={{
-                    height: "200px",
+                    width: "400px",
                     border: "2px solid black",
                 }}
             >
