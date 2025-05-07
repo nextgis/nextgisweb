@@ -240,6 +240,7 @@ const SharePanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
     }, [
         display.mapExtentDeferred,
         display.itemStore,
+        display.map.baseLayer,
         display.map.olMap,
         updateEmbedCode,
         updatePermalinkUrl,
@@ -257,6 +258,7 @@ const SharePanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
         controls,
         panels,
         activePanel,
+        display.map.baseLayer,
         display.mapExtentDeferred,
         updateEmbedCode,
     ]);
