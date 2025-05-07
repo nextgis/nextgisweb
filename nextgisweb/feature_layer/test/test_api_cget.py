@@ -27,6 +27,7 @@ def vector_layer_id():
     with transaction.manager:
         geojson = {"type": "FeatureCollection", "features": get_features_for_orderby_test()}
         obj = VectorLayer().persist().from_ogr(json.dumps(geojson))
+        obj.feature_label_field = obj.field_by_keyname("string")
         DBSession.flush()
 
     yield obj.id
@@ -54,7 +55,6 @@ def get_features_for_orderby_test():
             "type": "Feature",
             "geometry": {"type": "Point", "coordinates": [0.0, 0.0]},
             "properties": {"int": num, "string": text},
-            "label": "label",
         }
         features.append(feature)
 
@@ -80,4 +80,14 @@ def test_there_is_no_label_by_default(ngw_webtest_app, vector_layer_id):
 
 def test_return_label_by_parameter(ngw_webtest_app, vector_layer_id):
     resp = ngw_webtest_app.get(f"/api/resource/{vector_layer_id}/feature/?label=true")
-    assert "label" in resp.json[0]
+    fdata = resp.json[3]
+    assert "label" in fdata
+    assert fdata["label"] == "bar"
+
+
+def test_label_without_fields(ngw_webtest_app, vector_layer_id):
+    resp = ngw_webtest_app.get(f"/api/resource/{vector_layer_id}/feature/?label=true&fields=")
+    fdata = resp.json[3]
+    assert len(fdata["fields"]) == 0
+    assert "label" in fdata
+    assert fdata["label"] == "bar"

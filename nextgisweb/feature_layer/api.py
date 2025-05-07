@@ -191,7 +191,14 @@ class Dumper:
     def feature_query(self):
         query = self.resource.feature_query()
         feature_query_pit(self.resource, query, self.params.version, self.params.epoch)
-        query.fields(*(self.field_dumpers.keys() if self.field_dumpers is not None else ()))
+
+        fields = list()
+        if self.field_dumpers is not None:
+            fields.extend(self.field_dumpers.keys())
+        if self.params.label and (lf := self.resource.feature_label_field) is not None:
+            if lf.keyname not in fields:
+                fields.append(lf.keyname)
+        query.fields(*fields)
 
         if self.params.geom:
             query.geom()
