@@ -84,8 +84,13 @@ export function usePrintMap({ display }: { display: Display }) {
             // but also for handling the print map logic,
             // where after each position change, the map scale is rounded and the map view is redrawn.
             map.once("movestart", () => {
-                map.on("movestart", () => {
-                    imageQueue.abort();
+                // If the display page opens in the print panel, the main map starts loading invisibly underneath.
+                // Aborting the shared image queue too early prevents the main map from loading its layers.
+                // So we have to wait until it's fully loaded before using the queue for the print map.
+                imageQueue.waitAll().then(() => {
+                    map.on("movestart", () => {
+                        imageQueue.abort();
+                    });
                 });
             });
 

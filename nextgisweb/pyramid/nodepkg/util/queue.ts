@@ -23,6 +23,8 @@ export class RequestQueue {
     private timeoutId?: ReturnType<typeof setTimeout>;
     private debounce: number;
 
+    private idleResolvers: Array<() => void> = [];
+
     constructor({ limit = 1, debounce = 0 }: RequestQueueOptions = {}) {
         this.limit = limit;
         this.debounce = debounce;
@@ -46,8 +48,19 @@ export class RequestQueue {
         }
         this.queue.length = 0;
         this.activeRequests.length = 0;
-
         this._clearTimeout();
+
+        this.checkIdle();
+    }
+
+    waitAll(): Promise<void> {
+        return new Promise<void>((resolve) => {
+            if (this.isIdle()) {
+                resolve();
+            } else {
+                this.idleResolvers.push(resolve);
+            }
+        });
     }
 
     private debouncedNext() {
@@ -77,11 +90,23 @@ export class RequestQueue {
                     this.activeRequests = this.activeRequests.filter(
                         (req) => req !== requestItem
                     );
+                    this.checkIdle();
                     this.debouncedNext();
                 });
             } else {
                 this.debouncedNext();
             }
+        }
+    }
+
+    private isIdle(): boolean {
+        return this.queue.length === 0 && this.activeRequests.length === 0;
+    }
+
+    private checkIdle() {
+        if (this.isIdle()) {
+            this.idleResolvers.forEach((resolve) => resolve());
+            this.idleResolvers = [];
         }
     }
 }
