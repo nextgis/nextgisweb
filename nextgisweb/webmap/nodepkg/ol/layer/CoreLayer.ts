@@ -4,6 +4,7 @@ import type { Source } from "ol/source";
 import type { Style } from "ol/style";
 
 import { Watchable } from "@nextgisweb/webmap/compat/Watchable";
+import type { LayerSymbols } from "@nextgisweb/webmap/compat/type";
 import type { LayerItemConfig } from "@nextgisweb/webmap/type/api";
 
 export interface LayerOptions {
@@ -18,7 +19,7 @@ export interface LayerOptions {
 interface LayerWatchableProps {
     opacity: number;
     visibility: boolean;
-    symbols: string[] | "-1";
+    symbols: LayerSymbols;
 }
 
 export type ExtendedOlLayer<
@@ -40,7 +41,7 @@ export abstract class CoreLayer<
 
     @observable.ref accessor opacity: number = 1;
     @observable.ref accessor visibility: boolean = true;
-    @observable accessor symbols: "-1" | string[] = [];
+    @observable accessor symbols: LayerSymbols = [];
     @observable.shallow accessor itemConfig: LayerItemConfig | null = null;
 
     protected abstract createSource(options: TSourceOptions): TSource;
@@ -64,13 +65,18 @@ export abstract class CoreLayer<
         });
 
         this.olLayer.printingCopy = () => {
+            const printSource = this.createSource(
+                sourceOptions as TSourceOptions
+            );
             const opts = {
                 ...layerOptions,
                 visible: this.olLayer.getVisible(),
                 opacity: this.olLayer.getOpacity(),
-                source: this.createSource(sourceOptions as TSourceOptions),
+                source: printSource,
             };
-            return this.createLayer(opts);
+            const printLayer = this.createLayer(opts);
+            this.toggleSourceBySymbols(this.symbols, printLayer, printSource);
+            return printLayer;
         };
 
         this.setOpacity(this.olLayer.getOpacity() ?? 1);
@@ -110,13 +116,9 @@ export abstract class CoreLayer<
     }
 
     @action
-    setSymbols(symbols: string[] | "-1"): void {
+    setSymbols(symbols: LayerSymbols): void {
         const oldSymbold = this.symbols;
-        if (symbols === "-1") {
-            this.olLayer.setSource(null);
-        } else if (this.symbols === "-1") {
-            this.olLayer.setSource(this.olSource);
-        }
+        this.toggleSourceBySymbols(symbols, this.olLayer, this.olSource);
         this.notify("symbols", oldSymbold, symbols);
         this.symbols = symbols;
     }
@@ -151,7 +153,7 @@ export abstract class CoreLayer<
     @action
     set(
         property: keyof LayerWatchableProps,
-        value: boolean | number | string[]
+        value: boolean | number | LayerSymbols
     ): void {
         switch (property) {
             case "visibility":
@@ -161,7 +163,7 @@ export abstract class CoreLayer<
                 this.setOpacity(value as number);
                 break;
             case "symbols":
-                this.setSymbols(value as string[]);
+                this.setSymbols(value as LayerSymbols);
                 break;
             default:
                 throw new Error(`Unknown property: ${property}`);
@@ -182,6 +184,18 @@ export abstract class CoreLayer<
                 return this.symbols as LayerWatchableProps[K];
             default:
                 throw new Error(`Unknown property: ${property}`);
+        }
+    }
+
+    private toggleSourceBySymbols(
+        symbols: LayerSymbols,
+        layer: TLayer,
+        source: TSource
+    ) {
+        if (symbols === "-1") {
+            layer.setSource(null);
+        } else if (this.symbols === "-1") {
+            layer.setSource(source);
         }
     }
 }

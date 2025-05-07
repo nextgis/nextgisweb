@@ -12,7 +12,13 @@ export default class Image extends CoreLayer<
     ImageWMSOptions
 > {
     protected createSource(options: ImageWMSOptions): ImageWMS {
-        return new ImageWMS(options);
+        const source = new ImageWMS(options);
+        if (Array.isArray(this.symbols) && this.symbols.length) {
+            source.updateParams({
+                symbols: this.symbols,
+            });
+        }
+        return source;
     }
 
     protected createLayer(
