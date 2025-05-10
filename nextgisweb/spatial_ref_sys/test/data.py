@@ -48,3 +48,18 @@ srs_def = [
         "wkt": 'PROJCS["WGS 84 / UTM zone 31N", GEOGCS["WGS 84", DATUM["WGS_1984", SPHEROID["WGS 84",6378137,298.257223563, AUTHORITY["EPSG","7030"]], AUTHORITY["EPSG","6326"]], PRIMEM["Greenwich",0, AUTHORITY["EPSG","8901"]], UNIT["degree",0.0174532925199433, AUTHORITY["EPSG","9122"]], AUTHORITY["EPSG","4326"]], PROJECTION["Transverse_Mercator"], PARAMETER["latitude_of_origin",0], PARAMETER["central_meridian",3], PARAMETER["scale_factor",0.9996], PARAMETER["false_easting",500000], PARAMETER["false_northing",0], UNIT["metre",1, AUTHORITY["EPSG","9001"]], AXIS["Easting",EAST], AXIS["Northing",NORTH], AUTHORITY["EPSG","32631"]]',
     },
 ]
+
+wrong_srs_def = [
+    {
+        "display_name": "INVALID_SRS_1",
+        "wkt": 'PROJCS["Invalid TM with lat_0>90",GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563]],PRIMEM["Greenwich",0],UNIT["degree",0.0174532925199433]],PROJECTION["tmerc"],PARAMETER["lat_0",95],PARAMETER["lon_0",0],PARAMETER["k",1],PARAMETER["x_0",0],PARAMETER["y_0",0],UNIT["metre",1]]',
+    },
+    {
+        "display_name": "INVALID_SRS_2",
+        "wkt": 'PROJCS["Invalid Mercator with lat_ts>90",GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563]],PRIMEM["Greenwich",0],UNIT["degree",0.0174532925199433]],PROJECTION["merc"],PARAMETER["lon_0",0],PARAMETER["lat_ts",95],PARAMETER["x_0",0],PARAMETER["y_0",0],UNIT["metre",1]]',
+    },
+    {
+        "display_name": "INVALID_SRS_3",
+        "wkt": 'PROJCS["Invalid Oblique Mercator",GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563]],PRIMEM["Greenwich",0],UNIT["degree",0.0174532925199433]],PROJECTION["omerc"],PARAMETER["lat_0",95],PARAMETER["lonc",0],PARAMETER["alpha",0],PARAMETER["gamma",0],PARAMETER["k",1],PARAMETER["x_0",0],PARAMETER["y_0",0],UNIT["metre",1]]',
+    },
+]

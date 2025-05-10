@@ -79,6 +79,7 @@ const transformCoordinates = async (
     });
     const transfCoords: TransfCoords = new Map<number, Coordinate>();
     transformed.forEach((t) => {
+        if (t.geom === null) return;
         const wktPoint: OlGeomPoint = wkt.readGeometry(t.geom) as OlGeomPoint;
         const coordinates = wktPoint.getCoordinates();
         transfCoords.set(parseInt(t.srs_id, 10), coordinates);

@@ -190,7 +190,7 @@ class GeomTransformBatchBody(Struct, kw_only=True):
 
 class GeomTransformBatchResponse(Struct, kw_only=True):
     srs_id: SRSWKT
-    geom: GeomWKT
+    geom: Annotated[Union[GeomWKT, None], Meta(description="Transformed geometry")]
 
 
 def geom_transform_batch(
@@ -204,10 +204,13 @@ def geom_transform_batch(
 
     result = []
     for srs in srs_to:
-        transformer = Transformer(srs_from.wkt, srs.wkt)
-        geom = Geometry.from_wkt(body.geom)
-        geom_srs_to = transformer.transform(geom)
-        result.append(GeomTransformBatchResponse(srs_id=srs.id, geom=geom_srs_to.wkt))
+        try:
+            transformer = Transformer(srs_from.wkt, srs.wkt)
+            geom = Geometry.from_wkt(body.geom)
+            geom_srs_to = transformer.transform(geom)
+            result.append(GeomTransformBatchResponse(srs_id=srs.id, geom=geom_srs_to.wkt))
+        except ValueError:
+            result.append(GeomTransformBatchResponse(srs_id=srs.id, geom=None))
 
     return result
 

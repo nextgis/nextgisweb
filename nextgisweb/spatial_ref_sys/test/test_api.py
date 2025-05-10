@@ -10,6 +10,7 @@ from .data import (
     transform_batch_expected,
     transform_batch_input,
     transform_batch_input_wrong_srs_to,
+    wrong_srs_def,
 )
 
 MOSCOW_VLADIVOSTOK = "LINESTRING(37.62 55.75,131.9 43.12)"
@@ -35,6 +36,24 @@ def srs_ids():
 
     with transaction.manager:
         for srs_id in srs_add.values():
+            DBSession.delete(SRS.filter_by(id=srs_id).one())
+
+
+@pytest.fixture(scope="module")
+def wrong_srs_ids():
+    srs_wrong = dict()
+    with transaction.manager:
+        for srs_info in wrong_srs_def:
+            display_name = srs_info["display_name"]
+            obj = SRS(display_name=display_name, wkt=srs_info["wkt"]).persist()
+            DBSession.flush()
+            DBSession.expunge(obj)
+            srs_wrong[display_name] = obj.id
+
+    yield srs_wrong
+
+    with transaction.manager:
+        for srs_id in srs_wrong.values():
             DBSession.delete(SRS.filter_by(id=srs_id).one())
 
 
@@ -77,6 +96,80 @@ def test_geom_transform_batch_return_empty_if_srs_to_wrong(srs_ids, ngw_webtest_
     ).json
 
     assert len(result) == 0
+
+
+def test_return_none_if_calculation_failed(wrong_srs_ids, ngw_webtest_app):
+    result = ngw_webtest_app.post_json(
+        "/api/component/spatial_ref_sys/geom_transform",
+        {
+            "geom": "POINT(30 60)",
+            "srs_from": 4326,
+            "srs_to": [wrong_srs_ids["INVALID_SRS_1"]],
+        },
+    ).json
+
+    assert len(result) == 1
+    assert result[0]["srs_id"] == wrong_srs_ids["INVALID_SRS_1"]
+    assert result[0]["geom"] is None
+
+
+def test_return_none_for_multiple_invalid_srs(wrong_srs_ids, ngw_webtest_app):
+    result = ngw_webtest_app.post_json(
+        "/api/component/spatial_ref_sys/geom_transform",
+        {
+            "geom": "POINT(30 60)",
+            "srs_from": 4326,
+            "srs_to": [
+                wrong_srs_ids["INVALID_SRS_1"],
+                wrong_srs_ids["INVALID_SRS_2"],
+            ],
+        },
+    ).json
+
+    assert len(result) == 2
+    for item in result:
+        assert item["srs_id"] in [wrong_srs_ids["INVALID_SRS_1"], wrong_srs_ids["INVALID_SRS_2"]]
+        assert item["geom"] is None
+
+
+def test_mixed_valid_invalid_srs(srs_ids, wrong_srs_ids, ngw_webtest_app):
+    result = ngw_webtest_app.post_json(
+        "/api/component/spatial_ref_sys/geom_transform",
+        {
+            "geom": "POINT(30 60)",
+            "srs_from": 4326,
+            "srs_to": [
+                srs_ids["EPSG:3857"],
+                wrong_srs_ids["INVALID_SRS_1"],
+            ],
+        },
+    ).json
+
+    assert len(result) == 2
+    assert result[0]["srs_id"] == srs_ids["EPSG:3857"]
+    assert result[0]["geom"] is not None
+    assert result[1]["srs_id"] == wrong_srs_ids["INVALID_SRS_1"]
+    assert result[1]["geom"] is None
+
+
+def test_multiple_different_invalid_srs(wrong_srs_ids, ngw_webtest_app):
+    result = ngw_webtest_app.post_json(
+        "/api/component/spatial_ref_sys/geom_transform",
+        {
+            "geom": "POINT(30 60)",
+            "srs_from": 4326,
+            "srs_to": [
+                wrong_srs_ids["INVALID_SRS_1"],
+                wrong_srs_ids["INVALID_SRS_2"],
+                wrong_srs_ids["INVALID_SRS_3"],
+            ],
+        },
+    ).json
+
+    assert len(result) == 3
+    for item in result:
+        assert item["geom"] is None
+        assert item["srs_id"] in wrong_srs_ids.values()
 
 
 def test_geom_length(ngw_webtest_app):
