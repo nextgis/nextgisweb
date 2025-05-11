@@ -35,23 +35,28 @@ class AuthComponent(Component):
     def initialize_db(self, *, core: CoreComponent):
         tr = core.localizer().translate
         for keyname, display_name in User.system_display_name.items():
-            self.initialize_user(keyname, tr(display_name), system=True).persist()
+            self.initialize_user(keyname, tr(display_name), system=True)
 
         adm_opts = self.options.with_prefix("provision.administrator")
+        adm_kw = dict(
+            system=False,
+            password=adm_opts["password"],
+            oauth_subject=adm_opts["oauth_subject"],
+        )
+        if adm_kw["password"] is None and adm_kw["oauth_subject"] is None:
+            adm_kw["password"] = "admin"
+        admin = self.initialize_user(
+            "administrator",
+            tr(gettext("Administrator")),
+            **adm_kw,
+        )
+
         self.initialize_group(
             "administrators",
             tr(Group.system_display_name["administrators"]),
             system=True,
-            members=[
-                self.initialize_user(
-                    "administrator",
-                    tr(gettext("Administrator")),
-                    system=False,
-                    password=adm_opts["password"],
-                    oauth_subject=adm_opts["oauth_subject"],
-                ),
-            ],
-        ).persist()
+            members=[admin],
+        )
 
     def setup_pyramid(self, config):
         from nextgisweb.auth import sync_ulg_cookie
@@ -301,7 +306,7 @@ class AuthComponent(Component):
         Option("user_limit", int, default=None, doc="Limit of enabled users."),
         Option("user_limit_local", int, default=None, doc="Limit of enabled local users."),
 
-        Option("provision.administrator.password", str, default="admin"),
+        Option("provision.administrator.password", str, default=None),
         Option("provision.administrator.oauth_subject", str, default=None),
     ))
     # fmt: on
