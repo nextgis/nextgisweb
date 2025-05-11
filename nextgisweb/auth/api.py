@@ -201,8 +201,13 @@ def deserialize_principal(
         obj.persist()
         DBSession.flush()
 
-    if is_user and not obj.disabled and (create or "disabled" in updated):
-        auth.check_user_limit(obj.id)
+    if is_user and not obj.disabled:
+        if create or "disabled" in updated:
+            auth.check_user_limit(obj.id)
+        if obj.password_hash is not None and (
+            create or "password" in updated or "disabled" in updated
+        ):
+            auth.check_user_limit_local(obj.id)
 
     return updated
 
