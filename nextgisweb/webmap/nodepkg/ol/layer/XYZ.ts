@@ -17,7 +17,13 @@ export default class XYZ extends CoreLayer<
     XYZSourceOptions
 > {
     protected createSource(options: XYZSourceOptions): XYZSource {
-        return new XYZSource(options);
+        const source = new XYZSource(options);
+
+        if (Array.isArray(this.symbols) && this.symbols.length) {
+            this.updateSymbols(this.symbols);
+        }
+
+        return source;
     }
 
     protected createLayer(
@@ -29,7 +35,10 @@ export default class XYZ extends CoreLayer<
     @action
     override setSymbols(symbols: string[]): void {
         super.setSymbols(symbols);
+        this.updateSymbols(symbols);
+    }
 
+    private updateSymbols(symbols: string[]) {
         const urls = this.olSource.getUrls();
         if (urls && urls.length > 0) {
             const updatedUrls = urls.map((url) =>
