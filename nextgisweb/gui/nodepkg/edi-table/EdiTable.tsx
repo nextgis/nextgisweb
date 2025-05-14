@@ -41,6 +41,7 @@ export interface EdiTableProps<
     rowActions?: T[] | RowActionConfig<T>[] | RowAction<R>[];
     store: S;
     columns: EdiTableColumn<R>[];
+    rowSelection?: TableProps<TableColumnType<R>>["rowSelection"];
 }
 
 const DEFAULT_ROW_ACTIONS = Object.keys(
@@ -108,6 +109,7 @@ export const EdiTable = observer(
         className,
         size = "small",
         rowKey = "key",
+        rowSelection,
         ...tableProps
     }: EdiTableProps<EdiTableStore<R>, R>) => {
         const { moveRow, placeholder } = store;
@@ -274,6 +276,7 @@ export const EdiTable = observer(
                     strategy={verticalListSortingStrategy}
                 >
                     <Table
+                        rowSelection={rowSelection}
                         className={classNames("ngw-gui-edi-table", className)}
                         dataSource={tableDataSource}
                         columns={tableColumns}
