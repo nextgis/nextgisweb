@@ -7,8 +7,9 @@ import { fromExtent } from "ol/geom/Polygon";
 import Interaction from "ol/interaction/Interaction";
 
 import { route } from "@nextgisweb/pyramid/api/route";
-import type { RouteQuery, RouteResp } from "@nextgisweb/pyramid/api/type";
+import type { RouteQuery } from "@nextgisweb/pyramid/api/type";
 import i18n from "@nextgisweb/pyramid/i18n";
+import type { RasterLayerIdentifyResponse } from "@nextgisweb/raster-layer/type/api";
 import webmapSettings from "@nextgisweb/webmap/client-settings";
 import topic from "@nextgisweb/webmap/compat/topic";
 import type { Display } from "@nextgisweb/webmap/display";
@@ -17,7 +18,9 @@ import type IdentifyStore from "@nextgisweb/webmap/panel/identify/IdentifyStore"
 import type {
     FeatureHighlightEvent,
     FeatureInfo,
+    FeatureResponse,
     IdentifyInfo,
+    IdentifyResponse,
 } from "@nextgisweb/webmap/panel/identify/identification";
 import type { LayerItemConfig } from "@nextgisweb/webmap/type/api";
 
@@ -100,29 +103,32 @@ export class Identify extends ToolBase {
         opt: { signal: AbortSignal }
     ) {
         const layerResponse = identifyInfo.response[featureInfo.layerId];
-        const featureResponse = layerResponse.features[featureInfo.idx];
-        this.setHighlightedFeature(null);
-        const featureItem = await route("feature_layer.feature.item", {
-            id: featureResponse.layerId,
-            fid: featureResponse.id,
-        }).get({ query: { dt_format: "iso" }, ...opt });
 
-        const { label } = featureInfo;
+        if ("features" in layerResponse) {
+            const featureResponse = layerResponse.features[featureInfo.idx];
+            this.setHighlightedFeature(null);
+            const featureItem = await route("feature_layer.feature.item", {
+                id: featureResponse.layerId,
+                fid: featureResponse.id,
+            }).get({ query: { dt_format: "iso" }, ...opt });
 
-        const featureHightlight: FeatureHighlightEvent = {
-            geom: featureItem.geom,
-            featureId: featureItem.id,
-            layerId: featureInfo.layerId,
-            featureInfo: { ...featureItem, labelWithLayer: label },
-        };
-        this.setHighlightedFeature(featureHightlight);
+            const { label } = featureInfo;
 
-        topic.publish<FeatureHighlightEvent>(
-            "feature.highlight",
-            featureHightlight
-        );
+            const featureHightlight: FeatureHighlightEvent = {
+                geom: featureItem.geom,
+                featureId: featureItem.id,
+                layerId: featureInfo.layerId,
+                featureInfo: { ...featureItem, labelWithLayer: label },
+            };
+            this.setHighlightedFeature(featureHightlight);
 
-        return featureItem;
+            topic.publish<FeatureHighlightEvent>(
+                "feature.highlight",
+                featureHightlight
+            );
+
+            return featureItem;
+        }
     }
 
     async identifyFeatureByAttrValue(
@@ -154,7 +160,7 @@ export class Identify extends ToolBase {
         const foundFeature = features[0];
         const responseLayerId = layerInfo.resource.id;
 
-        const identifyResponse = {
+        const identifyResponse: FeatureResponse = {
             featureCount: 1,
             [responseLayerId]: {
                 featureCount: 1,
@@ -173,10 +179,14 @@ export class Identify extends ToolBase {
         const extent = geometry.getExtent();
         const center = getCenter(extent);
 
-        const layerLabel: Record<number, string> = {};
-        layerLabel[responseLayerId] = layerInfo.resource.display_name;
+        const layerLabels: Record<number, string> = {};
+        layerLabels[responseLayerId] = layerInfo.resource.display_name;
 
-        this.openIdentifyPanel(identifyResponse, center, layerLabel);
+        this.openIdentifyPanel({
+            features: identifyResponse,
+            point: center,
+            layerLabels,
+        });
 
         if (zoom) {
             const view = this.map.olMap.getView();
@@ -201,6 +211,8 @@ export class Identify extends ToolBase {
         const items = await this.display.getVisibleItems();
         const mapResolution = this.display.map.resolution;
 
+        const rasterLayers: number[] = [];
+
         items.forEach((i) => {
             const item = this.display._itemConfigById[
                 this.display.itemStore.getValue(i, "id")
@@ -216,7 +228,13 @@ export class Identify extends ToolBase {
                         mapResolution < item.minResolution)
                 )
             ) {
-                request.layers.push(item.layerId);
+                if (item.identification) {
+                    if (item.identification.mode === "feature_layer") {
+                        request.layers.push(item.identification.resource.id);
+                    } else if (item.identification.mode === "raster_layer") {
+                        rasterLayers.push(item.identification.resource.id);
+                    }
+                }
             }
         });
 
@@ -227,11 +245,21 @@ export class Identify extends ToolBase {
             layerLabels[layerId] = this.display.itemStore.getValue(i, "label");
         });
 
-        const response = await route("feature_layer.identify").post({
-            json: request,
-        });
+        let features;
+        if (request.layers.length) {
+            features = await route("feature_layer.identify").post({
+                json: request,
+            });
+        }
+        let raster: RasterLayerIdentifyResponse | undefined;
+        if (rasterLayers.length) {
+            const [x, y] = olMap.getCoordinateFromPixel([pixel[0], pixel[1]]);
+            raster = await route("raster_layer.identify").get({
+                query: { resources: rasterLayers, x, y },
+            });
+        }
 
-        this.openIdentifyPanel(response, point, layerLabels);
+        this.openIdentifyPanel({ features, point, layerLabels, raster });
     }
 
     private _bindEvents(): void {
@@ -261,15 +289,32 @@ export class Identify extends ToolBase {
     }
 
     @action
-    private openIdentifyPanel(
-        response: RouteResp<"feature_layer.identify", "post">,
-        point: Coordinate,
-        layerLabels: Record<string, string | null>
-    ): void {
+    private openIdentifyPanel({
+        features,
+        point,
+        layerLabels,
+        raster,
+    }: {
+        features?: FeatureResponse;
+
+        point: Coordinate;
+        layerLabels: Record<string, string | null>;
+        raster?: RasterLayerIdentifyResponse;
+    }): void {
         this.highlightedFeature = null;
+
+        const response: IdentifyResponse = features || { featureCount: 0 };
+
         if (response.featureCount === 0) {
             this.identifyInfo = null;
             topic.publish("feature.unhighlight");
+        }
+
+        if (raster) {
+            for (const item of raster.items) {
+                response[item.resource.id] = item;
+                response.featureCount += 1;
+            }
         }
 
         const identifyInfo: IdentifyInfo = {

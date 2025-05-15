@@ -1,7 +1,7 @@
 import { Button, Select, Tooltip } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import type { FeatureInfo, FeatureSelectorProps } from "../identification";
+import type { FeatureSelectorProps, IdentifyInfoItem } from "../identification";
 
 import ZoomInMapIcon from "@nextgisweb/icon/material/zoom_in_map/outline";
 
@@ -27,7 +27,7 @@ export function FeatureSelector({
 
     const onSelectChange = (
         _value: string,
-        featureInfoSelected: FeatureInfo | FeatureInfo[] | undefined
+        featureInfoSelected: IdentifyInfoItem | IdentifyInfoItem[] | undefined
     ) => {
         const selected = Array.isArray(featureInfoSelected)
             ? featureInfoSelected[0]
@@ -50,15 +50,17 @@ export function FeatureSelector({
                 value={featureInfo.value}
                 options={featuresInfoList}
             />
-            <Tooltip title={gettext("Zoom to feature")}>
-                <Button
-                    type="link"
-                    size="small"
-                    onClick={zoomTo}
-                    icon={<ZoomInMapIcon />}
-                    style={{ flex: "0 0 auto" }}
-                />
-            </Tooltip>
+            {featureInfo.type === "feature_layer" && (
+                <Tooltip title={gettext("Zoom to feature")}>
+                    <Button
+                        type="link"
+                        size="small"
+                        onClick={zoomTo}
+                        icon={<ZoomInMapIcon />}
+                        style={{ flex: "0 0 auto" }}
+                    />
+                </Tooltip>
+            )}
         </div>
     );
 }

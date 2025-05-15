@@ -14,6 +14,7 @@ from pyramid.response import Response
 from nextgisweb.env import DBSession
 from nextgisweb.lib.safehtml import sanitize
 
+from nextgisweb.feature_layer import IFeatureLayer
 from nextgisweb.jsrealm import TSExport
 from nextgisweb.layer import IBboxLayer
 from nextgisweb.pyramid import JSONType
@@ -22,7 +23,7 @@ from nextgisweb.render import IRenderableScaleRange
 from nextgisweb.render.api import LegendSymbol
 from nextgisweb.render.legend import ILegendSymbols
 from nextgisweb.render.util import scale_range_intersection
-from nextgisweb.resource import DataScope, ResourceFactory, ResourceScope
+from nextgisweb.resource import DataScope, ResourceFactory, ResourceRef, ResourceScope
 
 from .adapter import WebMapAdapter
 from .model import ExtentWSEN, LegendSymbolsEnum, WebMap, WebMapAnnotation, WebMapScope
@@ -431,6 +432,11 @@ class BaseItem(Struct, kw_only=True):
     title: str
 
 
+class LayerIdentification(Struct, kw_only=True):
+    mode: Literal["feature_layer", "raster_layer"]
+    resource: ResourceRef
+
+
 class LayerItemConfig(BaseItem, tag="layer", tag_field="type"):
     layerId: int
     styleId: int
@@ -446,6 +452,7 @@ class LayerItemConfig(BaseItem, tag="layer", tag_field="type"):
     minResolution: Union[float, None] = None
     maxResolution: Union[float, None] = None
     editable: Union[bool, None] = None
+    identification: Union[LayerIdentification, None] = None
 
 
 class GroupItemConfig(BaseItem, tag="group", tag_field="type"):
@@ -549,6 +556,23 @@ def display_config(obj, request) -> DisplayConfig:
                 maxScaleDenom=scale_range[1],
                 drawOrderPosition=item.draw_order_position,
                 legendInfo=legend_info,
+            )
+
+            identification_mode = None
+            if not item.layer_identifiable:
+                pass
+            elif IFeatureLayer.providedBy(layer):
+                identification_mode = "feature_layer"
+            elif layer.cls == "raster_layer":
+                identification_mode = "raster_layer"
+
+            data.update(
+                identification=dict(
+                    mode=identification_mode,
+                    resource=ResourceRef(id=layer.id),
+                )
+                if identification_mode is not None
+                else None
             )
 
             data["adapter"] = WebMapAdapter.registry.get(item.layer_adapter, "image").mid

@@ -1,8 +1,9 @@
 import { Feature } from "ol";
 import { WKT } from "ol/format";
 import type { Geometry } from "ol/geom";
+import Point from "ol/geom/Point";
 import type VectorSource from "ol/source/Vector";
-import { Circle, Stroke, Style } from "ol/style";
+import { Circle, RegularShape, Stroke, Style } from "ol/style";
 
 import { route } from "@nextgisweb/pyramid/api";
 import topic from "@nextgisweb/webmap/compat/topic";
@@ -10,12 +11,13 @@ import Vector from "@nextgisweb/webmap/ol/layer/Vector";
 
 import type { MapStore } from "../ol/MapStore";
 
-interface HighlightEvent {
+export interface HighlightEvent {
     geom?: string;
     olGeometry?: Geometry;
     layerId?: number;
     featureId?: number;
     feature?: Feature;
+    coordinates?: [number, number];
 }
 
 interface FeatureFilterFn {
@@ -28,16 +30,20 @@ export class FeatureHighlighter {
     private _overlay: Vector;
     private _wkt: WKT;
     private _zIndex = 1000;
+    private _strokeColor = "rgba(255,255,0,1)";
+
+    private _highlightStyle?: Style;
 
     constructor(map: MapStore, highlightStyle?: Style) {
         this._map = map;
         this._zIndex = this._zIndex + Object.keys(map.layers).length;
         this._wkt = new WKT();
 
+        this._highlightStyle = highlightStyle;
         this._overlay = new Vector("highlight", {
             title: "Highlight Overlay",
-            style: highlightStyle ?? this._getDefaultStyle(),
         });
+
         this._overlay.olLayer.setZIndex(this._zIndex);
         const source = this._overlay.olLayer.getSource();
         if (!source) {
@@ -53,7 +59,7 @@ export class FeatureHighlighter {
     private _getDefaultStyle(): Style {
         const strokeStyle = new Stroke({
             width: 3,
-            color: "rgba(255,255,0,1)",
+            color: this._strokeColor,
         });
 
         return new Style({
@@ -61,6 +67,24 @@ export class FeatureHighlighter {
             image: new Circle({
                 stroke: strokeStyle,
                 radius: 5,
+            }),
+        });
+    }
+
+    private _getCrossStyle(): Style {
+        const stroke =
+            this._highlightStyle?.getStroke() ||
+            new Stroke({
+                color: this._strokeColor,
+                width: 2,
+            });
+
+        return new Style({
+            image: new RegularShape({
+                points: 4,
+                radius: 10,
+                angle: Math.PI / 4,
+                stroke,
             }),
         });
     }
@@ -79,22 +103,33 @@ export class FeatureHighlighter {
         this._source.clear();
 
         let feature: Feature;
-        if (e.feature) {
-            feature = e.feature;
-        } else {
-            if (e.geom) {
-                geometry = this._wkt.readGeometry(e.geom);
-            } else if (e.olGeometry) {
-                geometry = e.olGeometry;
-            } else {
-                throw new Error("No geometry provided");
-            }
-
+        if (e.coordinates) {
+            const geometry = new Point(e.coordinates);
             feature = new Feature({
                 geometry,
                 layerId: e.layerId,
                 featureId: e.featureId,
             });
+            feature.setStyle(this._getCrossStyle());
+        } else {
+            if (e.feature) {
+                feature = e.feature;
+            } else {
+                if (e.geom) {
+                    geometry = this._wkt.readGeometry(e.geom);
+                } else if (e.olGeometry) {
+                    geometry = e.olGeometry;
+                } else {
+                    throw new Error("No geometry provided");
+                }
+
+                feature = new Feature({
+                    geometry,
+                    layerId: e.layerId,
+                    featureId: e.featureId,
+                });
+            }
+            feature.setStyle(this._highlightStyle ?? this._getDefaultStyle());
         }
 
         this._source.addFeature(feature);
