@@ -57,6 +57,11 @@ def wrong_srs_ids():
             DBSession.delete(SRS.filter_by(id=srs_id).one())
 
 
+def test_protected(ngw_webtest_app, ngw_auth_administrator):
+    data = dict(wkt=srs_def[0]["wkt"])
+    ngw_webtest_app.put_json("/api/component/spatial_ref_sys/3857", data, status=422)
+
+
 def test_geom_transform(ngw_webtest_app):
     result = ngw_webtest_app.post_json(
         "/api/component/spatial_ref_sys/%d/geom_transform" % 3857,

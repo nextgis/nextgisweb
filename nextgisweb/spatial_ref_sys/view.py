@@ -1,13 +1,10 @@
-from pyramid.httpexceptions import HTTPNotFound
-from sqlalchemy.orm.exc import NoResultFound
-
 from nextgisweb.env import gettext
 from nextgisweb.lib import dynmenu as dm
 
 from nextgisweb.gui import react_renderer
 
 from .model import SRS
-from .pyramid import require_catalog_configured
+from .pyramid import require_catalog_configured, srs_factory
 
 
 @react_renderer("@nextgisweb/spatial-ref-sys/srs-browse")
@@ -22,23 +19,26 @@ def srs_browse(request):
 
 
 @react_renderer("@nextgisweb/spatial-ref-sys/srs-widget")
-def srs_create_or_edit(request):
-    result = dict(dynmenu=request.env.pyramid.control_panel)
+def srs_create(request):
+    request.user.require_permission(SRS.permissions.manage)
 
-    if "id" not in request.matchdict:
-        request.user.require_permission(SRS.permissions.manage)
-        result["title"] = gettext("Create new Spatial reference system")
-    else:
-        request.user.require_permission(any, *SRS.permissions.all)
-        try:
-            obj = SRS.filter_by(**request.matchdict).one()
-        except NoResultFound:
-            raise HTTPNotFound()
-        readonly = not request.user.has_permission(SRS.permissions.manage)
-        result["props"] = dict(id=obj.id, readonly=readonly)
-        result["title"] = obj.display_name
+    return dict(
+        title=gettext("Create new Spatial reference system"),
+        dynmenu=request.env.pyramid.control_panel,
+    )
 
-    return result
+
+@react_renderer("@nextgisweb/spatial-ref-sys/srs-widget")
+def srs_edit(request):
+    request.user.require_permission(any, *SRS.permissions.all)
+
+    srs = request.context
+    readonly = not request.user.has_permission(SRS.permissions.manage)
+    return dict(
+        props=dict(id=srs.id, readonly=readonly),
+        title=srs.display_name,
+        dynmenu=request.env.pyramid.control_panel,
+    )
 
 
 @react_renderer("@nextgisweb/spatial-ref-sys/catalog-browse")
@@ -69,8 +69,8 @@ def catalog_import(request):
 
 def setup_pyramid(comp, config):
     config.add_route("srs.browse", "/srs/", get=srs_browse)
-    config.add_route("srs.create", "/srs/create", get=srs_create_or_edit)
-    config.add_route("srs.edit", "/srs/{id:pint}", get=srs_create_or_edit)
+    config.add_route("srs.create", "/srs/create", get=srs_create)
+    config.add_route("srs.edit", "/srs/{id}", factory=srs_factory, get=srs_edit)
 
     config.add_route("srs.catalog", "/srs/catalog", get=catalog_browse)
     config.add_route("srs.catalog.import", "/srs/catalog/{id:pint}", get=catalog_import)

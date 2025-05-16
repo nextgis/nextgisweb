@@ -13,15 +13,9 @@ from nextgisweb.lib.geometry import Geometry, Transformer, geom_area, geom_lengt
 from nextgisweb.core.exception import ExternalServiceError, ValidationError
 from nextgisweb.jsrealm import TSExport
 
-from .model import SRID_MAX, SRS, WKT_EPSG_4326
-from .pyramid import require_catalog_configured
+from .model import SRS, WKT_EPSG_4326
+from .pyramid import SRSID, require_catalog_configured, srs_factory
 from .util import SRSFormat, convert_to_wkt
-
-SRSID = Annotated[
-    int,
-    Meta(ge=1, le=SRID_MAX, description="Spatial reference system ID"),
-    Meta(examples=[4326]),
-]
 
 DisplayName = Annotated[str, Meta(min_length=1, description="Display name", examples=["WGS 84"])]
 SRSWKT = Annotated[str, Meta(description="OGC WKT definition", examples=[WKT_EPSG_4326])]
@@ -93,8 +87,8 @@ def deserialize(obj, data: SRSCreate, *, create: bool):
                 raise ValidationError(("SRS display name is not unique."))
         obj.display_name = display_name
 
-    if (wkt := data.wkt) is not UNSET:
-        if not create and obj.protected and wkt != data.wkt:
+    if (wkt := data.wkt) is not UNSET and wkt != obj.wkt:
+        if not create and obj.protected:
             raise ValidationError(("OGC WKT definition cannot be changed for this SRS."))
         obj.wkt = wkt
 
@@ -116,30 +110,27 @@ def cpost(request, *, body: SRSCreate) -> Annotated[SRSRef, StatusCode(201)]:
     return SRSRef(id=obj.id)
 
 
-def iget(request, id: SRSID) -> SRSRead:
+def iget(srs, request) -> SRSRead:
     """Read spatial reference system"""
-    obj = SRS.filter_by(id=id).one()
-    return serialize(obj)
+    return serialize(srs)
 
 
-def iput(request, id: SRSID, *, body: SRSUpdate) -> SRSRef:
+def iput(srs, request, *, body: SRSUpdate) -> SRSRef:
     """Update spatial reference system"""
     request.user.require_permission(SRS.permissions.manage)
 
-    obj = SRS.filter_by(id=id).one()
-    deserialize(obj, body, create=False)
-    return SRSRef(id=obj.id)
+    deserialize(srs, body, create=False)
+    return SRSRef(id=srs.id)
 
 
-def idelete(request, id: SRSID) -> EmptyObject:
+def idelete(srs, request) -> EmptyObject:
     """Delete spatial reference system"""
     request.user.require_permission(SRS.permissions.manage)
 
-    obj = SRS.filter_by(id=id).one()
-    if obj.system:
+    if srs.system:
         raise ValidationError(gettext("System SRS cannot be deleted."))
 
-    DBSession.delete(obj)
+    DBSession.delete(srs)
     return None
 
 
@@ -170,10 +161,9 @@ class GeomTransformResponse(Struct, kw_only=True):
     geom: SRSWKT
 
 
-def geom_transform(request, id: SRSID, *, body: GeomTransformBody) -> GeomTransformResponse:
+def geom_transform(srs_to, request, *, body: GeomTransformBody) -> GeomTransformResponse:
     """Transform geometry from one SRS to another"""
     srs_from = SRS.filter_by(id=body.srs).one()
-    srs_to = SRS.filter_by(id=id).one()
     geom = Geometry.from_wkt(body.geom)
 
     transformer = Transformer(srs_from.wkt, srs_to.wkt)
@@ -232,8 +222,7 @@ class GeometryPropertyBody(Struct, kw_only=True):
     geom: Union[GeomWKT, GeomGeoJSON]
 
 
-def geom_calc(id: SRSID, data: GeometryPropertyBody, measure_fun):
-    srs_to = SRS.filter_by(id=id).one()
+def geom_calc(srs_to: SRS, data: GeometryPropertyBody, measure_fun):
     if (srs_from_id := data.srs) is UNSET:
         srs_from_id = srs_to.id
 
@@ -256,23 +245,23 @@ SRSIDCalculation = Annotated[SRSID, Meta(description="ID of SRS to make calculat
 
 
 def geom_length_post(
+    srs,
     request,
-    id: SRSIDCalculation,
     *,
     body: GeometryPropertyBody,
 ) -> GeometryPropertyResponse:
     """Calculate geometry length on SRS"""
-    return geom_calc(id, body, geom_length)
+    return geom_calc(srs, body, geom_length)
 
 
 def geom_area_post(
+    srs,
     request,
-    id: SRSIDCalculation,
     *,
     body: GeometryPropertyBody,
 ) -> GeometryPropertyResponse:
     """Calculate geometry area on SRS"""
-    return geom_calc(id, body, geom_area)
+    return geom_calc(srs, body, geom_area)
 
 
 class SRSCatalogRecord(Struct, kw_only=True):
@@ -435,28 +424,28 @@ def setup_pyramid(comp, config):
     config.add_route(
         "spatial_ref_sys.geom_transform",
         "/api/component/spatial_ref_sys/{id}/geom_transform",
-        types=dict(id=int),
+        factory=srs_factory,
         post=geom_transform,
     )
 
     config.add_route(
         "spatial_ref_sys.geom_length",
         "/api/component/spatial_ref_sys/{id}/geom_length",
-        types=dict(id=int),
+        factory=srs_factory,
         post=geom_length_post,
     )
 
     config.add_route(
         "spatial_ref_sys.geom_area",
         "/api/component/spatial_ref_sys/{id}/geom_area",
-        types=dict(id=int),
+        factory=srs_factory,
         post=geom_area_post,
     )
 
     config.add_route(
         "spatial_ref_sys.item",
         "/api/component/spatial_ref_sys/{id}",
-        types=dict(id=int),
+        factory=srs_factory,
         get=iget,
         put=iput,
         delete=idelete,
