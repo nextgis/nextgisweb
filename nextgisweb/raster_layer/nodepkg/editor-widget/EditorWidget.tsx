@@ -11,7 +11,7 @@ import type { EditorStore } from "./EditorStore";
 // prettier-ignore
 const uploaderMessages = {
     uploadText: gettext("Select a dataset"),
-    helpText: gettext("Dataset should be in GeoTIFF format."),
+    helpText: gettext("Dataset should be in GeoTIFF or ZIP format."),
 }
 
 export const EditorWidget: IEditorWidget<EditorStore> = observer(

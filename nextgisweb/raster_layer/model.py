@@ -5,6 +5,7 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import List, Union
 from warnings import warn
+from zipfile import is_zipfile
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
@@ -12,7 +13,7 @@ from msgspec import UNSET
 from osgeo import gdal, gdalconst, ogr, osr
 from zope.interface import implementer
 
-from nextgisweb.env import COMP_ID, Base, env, gettext
+from nextgisweb.env import COMP_ID, Base, env, gettext, gettextf
 from nextgisweb.lib.logging import logger
 from nextgisweb.lib.osrhelper import SpatialReferenceError, sr_from_epsg, sr_from_wkt
 
@@ -89,6 +90,32 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         if isinstance(filename, Path):
             filename = str(filename)
 
+        if is_zipfile(filename):
+            zip_filename = "/vsizip/{%s}" % filename
+            supported_extensions = set(
+                ext
+                for driver_name in SUPPORTED_DRIVERS
+                for ext in gdal.GetDriverByName(driver_name)
+                .GetMetadata()
+                .get("DMD_EXTENSIONS", "")
+                .split()
+            )
+            # Assuming extensions are present and correctly indicate file types
+            supported_zip_items = []
+            for zip_item in gdal.ReadDir(zip_filename):
+                zip_item_ext = Path(zip_item).suffix.removeprefix(".")
+                if zip_item_ext.lower() in supported_extensions:
+                    supported_zip_items.append(zip_item)
+            if not supported_zip_items:
+                raise ValidationError(gettext("No supported files found in the archive."))
+            if len(supported_zip_items) > 1:
+                raise ValidationError(
+                    gettextf(
+                        "The archive contains multiple supported files: {supported_zip_items}."
+                    )(supported_zip_items=", ".join(supported_zip_items))
+                )
+            filename = f"{zip_filename}/{supported_zip_items[0]}"
+
         if env_arg is not None:
             warn(
                 "RasterLayer.load_file's env_arg is deprecated since 4.7.0.dev7.",
@@ -97,21 +124,12 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
             )
         comp = env.raster_layer
 
-        ds = gdal.Open(filename, gdalconst.GA_ReadOnly)
+        ds = gdal.OpenEx(filename, gdalconst.GA_ReadOnly, allowed_drivers=SUPPORTED_DRIVERS)
         if not ds:
             raise ValidationError(gettext("GDAL library was unable to open the file."))
 
-        dsdriver = ds.GetDriver()
         dsproj = ds.GetProjection()
         dsgtran = ds.GetGeoTransform()
-
-        if dsdriver.ShortName not in SUPPORTED_DRIVERS:
-            raise ValidationError(
-                gettext(
-                    "Raster has format '%(format)s', however only following formats are supported: %(all_formats)s."
-                )
-                % dict(format=dsdriver.ShortName, all_formats=", ".join(SUPPORTED_DRIVERS))
-            )
 
         if not dsproj or not dsgtran:
             raise ValidationError(
@@ -207,17 +225,17 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         size_limit = comp.options["size_limit"]
         if size_limit is not None and size_expected > size_limit:
             raise ValidationError(
-                message=gettext(
-                    "The uncompressed raster size (%(size)s) exceeds the limit "
-                    "(%(limit)s) by %(delta)s. Reduce raster size to fit the limit."
-                )
-                % dict(
+                message=gettextf(
+                    "The uncompressed raster size ({size}) exceeds the limit "
+                    "({limit}) by {delta}. Reduce raster size to fit the limit."
+                )(
                     size=format_size(size_expected),
                     limit=format_size(size_limit),
                     delta=format_size(size_expected - size_limit),
                 )
             )
 
+        cmd.extend(("--config", "GDAL_PAM_ENABLED", "NO"))
         cmd.extend(("-co", "COMPRESS=DEFLATE", "-co", "TILED=YES", "-co", "BIGTIFF=YES", filename))
 
         fobj = FileObj(component="raster_layer")
