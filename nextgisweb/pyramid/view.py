@@ -48,17 +48,15 @@ LAYOUT_JSENTRY = jsentry("@nextgisweb/pyramid/layout")
 
 
 class ModelFactory:
-    def __init__(self, context, *, key="id", tdef=int, idcol_name="id"):
+    def __init__(self, context, *, key="id", tdef=int):
         self.key = key
         self.tdef = tdef
         self.context = context
-        self.idcol_name = idcol_name
 
     def __call__(self, request):
         model_id = request.path_param[self.key]
-        idcol = getattr(self.context, self.idcol_name)
         try:
-            obj = self.context.filter(idcol == model_id).one()
+            obj = self.context.filter(self.context.id == model_id).one()
         except NoResultFound:
             raise HTTPNotFound
         return obj

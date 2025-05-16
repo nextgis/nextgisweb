@@ -36,6 +36,7 @@ from .permission import auth as permission_auth
 from .permission import manage as permission_manage
 from .policy import AuthMedium, AuthProvider
 from .util import reset_slg_cookie, sync_ulg_cookie
+from .view import GroupID, UserID, group_factory, user_factory
 
 T = TypeVar("T")
 
@@ -43,8 +44,6 @@ BRIEF = flag("Brief")
 DefaultNonBrief = Default[Annotated[T, omit(BRIEF)]]
 ReadOnlyNonBrief = ReadOnly[Annotated[T, omit(BRIEF)]]
 
-UserID = Annotated[int, Meta(ge=1, description="User ID", examples=[4])]
-GroupID = Annotated[int, Meta(ge=1, description="Group ID", examples=[5])]
 Keyname = Annotated[str, Meta(pattern=r"^[A-Za-z][A-Za-z0-9_\-]*$")]
 DisplayName = Annotated[str, Meta(min_length=1)]
 Description = Annotated[str, Meta(examples=[None])]
@@ -280,24 +279,22 @@ def user_cpost(request, *, body: UserCreate) -> Annotated[UserRef, StatusCode(20
     return UserRef(id=obj.id)
 
 
-def user_iget(request, id: UserID, *, brief: Brief = False) -> UserIGetResponse:
+def user_iget(obj, request, *, brief: Brief = False) -> UserIGetResponse:
     """Read user
 
     :returns: User object"""
     brief_or_permission(request, brief)
 
-    q = User.filter_by(id=id).options(undefer(User.is_administrator))
     cls = UserReadBrief if brief else UserRead
-    return serialize_principal(q.one(), cls, tr=request.translate)
+    return serialize_principal(obj, cls, tr=request.translate)
 
 
-def user_iput(request, id: UserID, *, body: UserUpdate) -> UserRef:
+def user_iput(obj, request, *, body: UserUpdate) -> UserRef:
     """Update user
 
     :returns: User reference"""
     request.user.require_permission(permission_manage)
 
-    obj = User.filter_by(id=id).one()
     updated = deserialize_principal(body, obj, create=False, request=request)
 
     if obj.id != request.authenticated_userid and ({"keyname", "password", "alink"} & updated):
@@ -310,9 +307,8 @@ def user_iput(request, id: UserID, *, body: UserUpdate) -> UserRef:
     return UserRef(id=obj.id)
 
 
-def user_idelete(request, id: UserID) -> EmptyObject:
+def user_idelete(obj, request) -> EmptyObject:
     """Delete user"""
-    obj = User.filter_by(id=id).one()
     if obj.is_administrator:
         request.require_administrator()
     else:
@@ -377,35 +373,32 @@ def group_cpost(request, *, body: GroupCreate) -> Annotated[GroupRef, StatusCode
     return GroupRef(id=obj.id)
 
 
-def group_iget(request, id: GroupID, *, brief: Brief = False) -> GroupIGetResponse:
+def group_iget(obj, request, *, brief: Brief = False) -> GroupIGetResponse:
     """Read group
 
     :returns: Group object"""
     brief_or_permission(request, brief)
 
-    obj = Group.filter_by(id=id).one()
     cls = GroupReadBrief if brief else GroupRead
     return serialize_principal(obj, cls, tr=request.translate)
 
 
-def group_iput(request, id: GroupID, *, body: GroupUpdate) -> GroupRef:
+def group_iput(obj, request, *, body: GroupUpdate) -> GroupRef:
     """Update group
 
     :returns: Group reference"""
     request.user.require_permission(permission_manage)
 
-    obj = Group.filter_by(id=id).one()
     updated = deserialize_principal(body, obj, create=False, request=request)
     if {"members"} & updated:
         check_last_administrator()
     return GroupRef(id=obj.id)
 
 
-def group_idelete(request, id: GroupID) -> EmptyObject:
+def group_idelete(obj, request) -> EmptyObject:
     """Delete group"""
     request.user.require_permission(permission_manage)
 
-    obj = Group.filter_by(id=id).one()
     check_principal_delete(obj)
     DBSession.delete(obj)
 
@@ -545,7 +538,7 @@ def setup_pyramid(comp, config):
     config.add_route(
         "auth.user.item",
         "/api/component/auth/user/{id}",
-        types=dict(id=int),
+        factory=user_factory,
         get=user_iget,
         put=user_iput,
         delete=user_idelete,
@@ -568,7 +561,7 @@ def setup_pyramid(comp, config):
     config.add_route(
         "auth.group.item",
         "/api/component/auth/group/{id}",
-        types=dict(id=int),
+        factory=group_factory,
         get=group_iget,
         put=group_iput,
         delete=group_idelete,

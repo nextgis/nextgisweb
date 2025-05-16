@@ -1,13 +1,16 @@
 import secrets
 import string
 from datetime import datetime
+from typing import Annotated
 from urllib.parse import parse_qsl, urlencode
 
 import zope.event
+from msgspec import Meta
 from pyramid.events import BeforeRender
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound, HTTPUnauthorized
 from pyramid.renderers import render_to_response
 from pyramid.security import forget, remember
+from sqlalchemy.orm import undefer
 from sqlalchemy.orm.exc import NoResultFound
 
 from nextgisweb.env import DBSession, gettext
@@ -16,6 +19,7 @@ from nextgisweb.lib import dynmenu as dm
 from nextgisweb.gui import react_renderer
 from nextgisweb.jsrealm import jsentry
 from nextgisweb.pyramid import SessionStore, WebSession, viewargs
+from nextgisweb.pyramid.view import ModelFactory
 
 from . import permission
 from .exception import ALinkException, InvalidCredentialsException, UserDisabledException
@@ -25,6 +29,26 @@ from .policy import AuthProvider, AuthState, OnUserLogin
 from .util import reset_slg_cookie, sync_ulg_cookie
 
 STORE_JSENTRY = jsentry("@nextgisweb/auth/store")
+
+UserID = Annotated[int, Meta(ge=1, description="User ID", examples=[4])]
+GroupID = Annotated[int, Meta(ge=1, description="Group ID", examples=[5])]
+
+
+class UserFactory(ModelFactory):
+    def __call__(self, request):
+        if request.matched_route.name == "auth.user.item" and request.method == "GET":
+            model_id = request.path_param[self.key]
+            try:
+                obj = User.filter_by(id=model_id).options(undefer(User.is_administrator)).one()
+            except NoResultFound:
+                raise HTTPNotFound
+            return obj
+
+        return super().__call__(request)
+
+
+user_factory = UserFactory(User, tdef=UserID)
+group_factory = ModelFactory(Group, tdef=GroupID)
 
 
 @viewargs(renderer="mako")
@@ -299,6 +323,7 @@ def settings(request):
 @react_renderer("@nextgisweb/auth/user-browse")
 def user_browse(request):
     request.user.require_permission(any, *permission.auth)
+
     return dict(
         title=gettext("Users"),
         props=dict(readonly=not request.user.has_permission(permission.manage)),
@@ -307,28 +332,29 @@ def user_browse(request):
 
 
 @react_renderer("@nextgisweb/auth/user-widget")
-def user_create_or_edit(request):
-    result = dict(dynmenu=request.env.pyramid.control_panel)
+def user_create(request):
+    request.user.require_permission(permission.manage)
 
-    if "id" not in request.matchdict:
-        request.user.require_permission(permission.manage)
-        result["title"] = gettext("Create new user")
-    else:
-        request.user.require_permission(any, *permission.auth)
-        try:
-            obj = User.filter_by(**request.matchdict).one()
-        except NoResultFound:
-            raise HTTPNotFound()
-        readonly = not request.user.has_permission(permission.manage)
-        result["props"] = dict(id=obj.id, readonly=readonly)
-        result["title"] = obj.display_name
+    return dict(title=gettext("Create new user"), dynmenu=request.env.pyramid.control_panel)
 
-    return result
+
+@react_renderer("@nextgisweb/auth/user-widget")
+def user_edit(request):
+    request.user.require_permission(any, *permission.auth)
+
+    obj = request.context
+    readonly = not request.user.has_permission(permission.manage)
+    return dict(
+        props=dict(id=obj.id, readonly=readonly),
+        title=obj.display_name,
+        dynmenu=request.env.pyramid.control_panel,
+    )
 
 
 @react_renderer("@nextgisweb/auth/group-browse")
 def group_browse(request):
     request.user.require_permission(any, *permission.auth)
+
     return dict(
         title=gettext("Groups"),
         props=dict(readonly=not request.user.has_permission(permission.manage)),
@@ -337,23 +363,26 @@ def group_browse(request):
 
 
 @react_renderer("@nextgisweb/auth/group-widget")
-def group_create_or_edit(request):
-    result = dict(dynmenu=request.env.pyramid.control_panel)
+def group_create(request):
+    request.user.require_permission(permission.manage)
 
-    if "id" not in request.matchdict:
-        request.user.require_permission(permission.manage)
-        result["title"] = gettext("Create new group")
-    else:
-        request.user.require_permission(any, *permission.auth)
-        try:
-            obj = Group.filter_by(**request.matchdict).one()
-        except NoResultFound:
-            raise HTTPNotFound()
-        readonly = not request.user.has_permission(permission.manage)
-        result["props"] = dict(id=obj.id, readonly=readonly)
-        result["title"] = obj.display_name
+    return dict(
+        title=gettext("Create new group"),
+        dynmenu=request.env.pyramid.control_panel,
+    )
 
-    return result
+
+@react_renderer("@nextgisweb/auth/group-widget")
+def group_edit(request):
+    request.user.require_permission(any, *permission.auth)
+
+    obj = request.context
+    readonly = not request.user.has_permission(permission.manage)
+    return dict(
+        props=dict(id=obj.id, readonly=readonly),
+        title=obj.display_name,
+        dynmenu=request.env.pyramid.control_panel,
+    )
 
 
 def setup_pyramid(comp, config):
@@ -370,12 +399,12 @@ def setup_pyramid(comp, config):
     config.add_request_method(_login_url, name="login_url")
 
     config.add_route("auth.user.browse", "/auth/user/").add_view(user_browse)
-    config.add_route("auth.user.create", "/auth/user/create").add_view(user_create_or_edit)
-    config.add_route("auth.user.edit", "/auth/user/{id:uint}").add_view(user_create_or_edit)
+    config.add_route("auth.user.create", "/auth/user/create", get=user_create)
+    config.add_route("auth.user.edit", "/auth/user/{id}", factory=user_factory, get=user_edit)
 
     config.add_route("auth.group.browse", "/auth/group/").add_view(group_browse)
-    config.add_route("auth.group.create", "/auth/group/create").add_view(group_create_or_edit)
-    config.add_route("auth.group.edit", "/auth/group/{id:uint}").add_view(group_create_or_edit)
+    config.add_route("auth.group.create", "/auth/group/create", get=group_create)
+    config.add_route("auth.group.edit", "/auth/group/{id}", factory=group_factory, get=group_edit)
 
     @comp.env.pyramid.control_panel.add
     def _control_panel(args):
