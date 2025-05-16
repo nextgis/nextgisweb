@@ -11,6 +11,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import webmapSettings from "@nextgisweb/webmap/client-settings";
 import topic from "@nextgisweb/webmap/compat/topic";
 import type { Display } from "@nextgisweb/webmap/display";
+import type { HighlightEvent } from "@nextgisweb/webmap/feature-highlighter/FeatureHighlighter";
 
 import { PanelContainer } from "../component";
 import type { PanelPluginWidgetProps } from "../registry";
@@ -29,7 +30,6 @@ import type {
 import { identifyInfoToFeaturesInfo } from "./util/identifyInfoToFeaturesInfo";
 
 import "./IdentifyPanel.less";
-import { HighlightEvent } from "@nextgisweb/webmap/feature-highlighter/FeatureHighlighter";
 
 // prettier-ignore
 const msgTipIdent = gettext("To get feature information, click on the map with the left mouse button. Make sure that other tools are turned off.");

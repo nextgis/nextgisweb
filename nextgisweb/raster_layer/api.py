@@ -209,7 +209,6 @@ def setup_pyramid(comp, config):
         get=download,
     )
 
-
     from . import api_identify
 
     api_identify.setup_pyramid(comp, config)

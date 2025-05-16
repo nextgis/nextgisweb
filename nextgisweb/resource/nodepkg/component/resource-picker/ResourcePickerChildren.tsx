@@ -22,9 +22,9 @@ import type {
     SelectValue,
 } from "./type";
 
+import { LoadingOutlined } from "@ant-design/icons";
 import FolderOpenIcon from "@nextgisweb/icon/material/arrow_forward";
 import SelectFirstIcon from "@nextgisweb/icon/material/editor_choice";
-import { LoadingOutlined } from "@ant-design/icons";
 
 import "./ResourcePickerChildren.less";
 

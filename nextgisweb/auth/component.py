@@ -318,5 +318,6 @@ class AuthComponent(Component):
 def _ucnt(*fc, agg=sa.func.count):
     return DBSession.query(agg(User.id)).filter(~User.system, ~User.disabled, *fc).scalar()
 
+
 def _ula(*fc, agg=sa.func.max):
     return DBSession.query(agg(User.last_activity)).filter(*fc).scalar()

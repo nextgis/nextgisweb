@@ -664,7 +664,9 @@ def main(argv=sys.argv):
     pstat.add_argument("--locale", default=[], action="append")
     pstat.add_argument("--work-in-progress", action="store_true", default=False)
     pstat.add_argument("--json", action="store_true", default=False)
-    pstat.add_argument("--ai", action="store_true", default=False, help="Include AI translations in statistics")
+    pstat.add_argument(
+        "--ai", action="store_true", default=False, help="Include AI translations in statistics"
+    )
     pstat.set_defaults(func=cmd_stat)
 
     ppoeditor_pull = subparsers.add_parser("poeditor-sync")

@@ -18,11 +18,13 @@ def _set_options(ngw_env):
     auth = ngw_env.auth
 
     prev_helper = auth.oauth
-    with auth.options.override({
-        "oauth.enabled": False,
-        "user_limit": None,
-        "user_limit_local": None,
-    }):
+    with auth.options.override(
+        {
+            "oauth.enabled": False,
+            "user_limit": None,
+            "user_limit_local": None,
+        }
+    ):
         auth.oauth = None
         yield
     auth.oauth = prev_helper
