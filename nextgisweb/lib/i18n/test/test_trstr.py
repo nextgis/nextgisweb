@@ -5,11 +5,12 @@ import pytest
 
 from ..trstr import Translator, trstr_factory
 
-f = trstr_factory("test")
-t = f.gettextf
-n = f.ngettext
-p = f.pgettext
-np = f.npgettext
+factory = trstr_factory("test")
+_gettext = factory.gettext
+_gettextf = factory.gettextf
+_ngettext = factory.ngettext
+_pgettext = factory.pgettext
+_npgettext = factory.npgettext
 
 
 class UpperCaseTranslator(Translator):
@@ -45,23 +46,23 @@ def uc_tr():
 
 
 def test_context(uc_tr):
-    assert uc_tr(f("foo")) == "FOO"
-    assert uc_tr(p("ctx", "bar")) == "BAR@CTX"
+    assert uc_tr(_gettext("foo")) == "FOO"
+    assert uc_tr(_pgettext("ctx", "bar")) == "BAR@CTX"
 
 
 def test_plural(uc_tr):
-    assert uc_tr(n("one", "many", 1)) == "ONE"
-    assert uc_tr(n("one", "many", 2)) == "MANY"
-    assert uc_tr(np("ctx", "one", "many", 1)) == "ONE@CTX"
-    assert uc_tr(np("ctx", "one", "many", 2)) == "MANY@CTX"
+    assert uc_tr(_ngettext("one", "many", 1)) == "ONE"
+    assert uc_tr(_ngettext("one", "many", 2)) == "MANY"
+    assert uc_tr(_npgettext("ctx", "one", "many", 1)) == "ONE@CTX"
+    assert uc_tr(_npgettext("ctx", "one", "many", 2)) == "MANY@CTX"
 
 
 def test_concat(uc_tr):
-    assert uc_tr(f("foo") + " " + f("bar")) == "FOO BAR"
-    assert uc_tr(f("foo") + (" " + f("bar"))) == "FOO BAR"
+    assert uc_tr(_gettext("foo") + " " + _gettext("bar")) == "FOO BAR"
+    assert uc_tr(_gettext("foo") + (" " + _gettext("bar"))) == "FOO BAR"
 
-    value = f("foo")
-    value += " " + f("bar")
+    value = _gettext("foo")
+    value += " " + _gettext("bar")
     assert uc_tr(value) == "FOO BAR"
     assert len(value.items) == 3
 
@@ -70,15 +71,15 @@ def test_concat(uc_tr):
 @pytest.mark.parametrize(
     "c, m",
     [
-        pytest.param(f, True, id="legacy"),
-        pytest.param(t, False, id="template"),
+        pytest.param(_gettext, True, id="legacy"),
+        pytest.param(_gettextf, False, id="template"),
     ],
 )
 def test_format(c, m, uc_tr):
-    assert uc_tr(c("foo {}").format(f("bar"))) == "FOO BAR"
+    assert uc_tr(c("foo {}").format(_gettext("bar"))) == "FOO BAR"
     if m:
-        assert uc_tr(c("foo %s") % f("bar")) == "FOO BAR"
-        assert uc_tr(c("foo %s") % f("bar") + " " + f("foo")) == "FOO BAR FOO"
+        assert uc_tr(c("foo %s") % _gettext("bar")) == "FOO BAR"
+        assert uc_tr(c("foo %s") % _gettext("bar") + " " + _gettext("foo")) == "FOO BAR FOO"
 
 
 class DictTranslator(Translator):
@@ -116,26 +117,26 @@ def test_guard(caplog):
             assert "Unable to format" in caplog.text
 
     dt.add("A", "B")
-    assert tr(t("A").format() + " " + f("A")) == "B B"
+    assert tr(_gettextf("A").format() + " " + _gettext("A")) == "B B"
 
     dt.add("M%s", "T%d")
     with assert_exception():
-        assert tr(f("M%s") % "a") == "Ma"
+        assert tr(_gettext("M%s") % "a") == "Ma"
 
     dt.add("M{}", "T{}")
     dt.add("M%d", "T%d")
-    assert tr(t("M{}").format("a")) == "Ta"
-    assert tr(t("M{}").format("a") + f("M%d") % 1) == "TaT1"
+    assert tr(_gettextf("M{}").format("a")) == "Ta"
+    assert tr(_gettextf("M{}").format("a") + _gettext("M%d") % 1) == "TaT1"
     with pytest.raises(TypeError):
-        tr(t("M{}").format("a") + f("M%d") % "a")
+        tr(_gettextf("M{}").format("a") + _gettext("M%d") % "a")
 
     dt.add("M{}", "T{}{}")
     with assert_exception():
-        assert tr(t("M{}").format("a")) == "Ma"
+        assert tr(_gettextf("M{}").format("a")) == "Ma"
 
     dt.add("M{p}", "T{q}")
     with assert_exception():
-        assert tr(t("M{p}").format(p="a")) == "Ma"
+        assert tr(_gettextf("M{p}").format(p="a")) == "Ma"
 
     dt.add("M{q}", "T")
-    assert tr(t("M{q}").format(q="a")) == "T"
+    assert tr(_gettextf("M{q}").format(q="a")) == "T"
