@@ -1,7 +1,8 @@
 from datetime import timedelta
+from functools import cache
 
 import sqlalchemy as sa
-from sqlalchemy.exc import DatabaseError
+from sqlalchemy.exc import SQLAlchemyError
 
 from nextgisweb.env import Component, DBSession, env
 from nextgisweb.lib.config import Option
@@ -59,41 +60,32 @@ class SentryComponent(Component):
                         i["value"] = str(i_value)
             return event
 
-        event_user = None
+        @cache
+        def get_instance_id():
+            try:
+                try:
+                    instance_id = DBSession.scalar(qs)
+                except SQLAlchemyError:
+                    # Transaction may be aborted, so can try a new connection.
+                    # Rollback doesn't fit here as it changes the transaction
+                    # state.
+                    with env.core.engine.connect() as con:
+                        instance_id = con.scalar(qs)
+            except SQLAlchemyError:
+                logger.warning("Unable to fetch instance ID")
+            except Exception:
+                logger.error("Error retrieving instance ID")
+                return None
+            else:
+                if instance_id is not None:
+                    return dict(id=instance_id)
+                else:
+                    logger.warning("Unable to fetch instance ID")
+                    return None
 
         def add_instance_id(event, hint):
-            nonlocal event_user
-
-            if event_user is None:
-                try:
-                    try:
-                        instance_id = DBSession.scalar(qs)
-                    except DatabaseError:
-                        # Transaction may be aborted, so can try a new
-                        # connection. Rollback doesn't fit here as it changes
-                        # the transaction state.
-                        with env.core.engine.connect() as con:
-                            instance_id = con.scalar(qs)
-                except DatabaseError:
-                    logger.warning(
-                        "Failed to get instance ID, the database may not have "
-                        "been initialized yet"
-                    )
-                except Exception:
-                    logger.error("Got an exception while getting instance ID")
-                else:
-                    if instance_id is not None:
-                        # That's OK to cache, instance ID can't change
-                        event_user = dict(id=instance_id)
-                    else:
-                        logger.warning(
-                            "Instance ID is not set, the database may not have "
-                            "been initialized yet"
-                        )
-
-            if event_user is not None:
+            if event_user := get_instance_id():
                 event["user"] = event_user
-
             return event
 
         with sentry_sdk.configure_scope() as scope:
