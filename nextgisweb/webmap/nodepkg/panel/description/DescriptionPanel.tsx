@@ -34,7 +34,7 @@ const DescriptionPanel = observer<PanelPluginWidgetProps<DescriptionStore>>(
                 <DescriptionComponent
                     className="content"
                     content={content ?? ""}
-                    ref={nodeRef}
+                    elementRef={nodeRef}
                 />
             );
         }, [content]);
