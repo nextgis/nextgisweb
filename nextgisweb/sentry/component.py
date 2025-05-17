@@ -50,6 +50,15 @@ class SentryComponent(Component):
             sc.name == "instance_id",
         )
 
+        # Workaround for NextGIS Web exception: nextgisweb.i18n.Translatable may
+        # be passed as exception arguments, and Sentry won't stringify them.
+        def stringify_i18n(event, hint):
+            if (e := event.get("exception")) and (e_values := e.get("values")):
+                for i in e_values:
+                    if (i_value := i.get("value")) and not isinstance(i_value, str):
+                        i["value"] = str(i_value)
+            return event
+
         event_user = None
 
         def add_instance_id(event, hint):
@@ -88,6 +97,7 @@ class SentryComponent(Component):
             return event
 
         with sentry_sdk.configure_scope() as scope:
+            scope.add_event_processor(stringify_i18n)
             scope.add_event_processor(add_instance_id)
 
     def setup_pyramid(self, config):

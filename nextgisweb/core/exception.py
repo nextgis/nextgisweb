@@ -108,9 +108,6 @@ class UserException(Exception):
 
         assert numkw == len(kwargs)
 
-    def __str__(self):
-        return "{}: {}".format(self.__class__.__name__, self.message)
-
 
 class ValidationError(UserException):
     title = gettext("Validation error")
