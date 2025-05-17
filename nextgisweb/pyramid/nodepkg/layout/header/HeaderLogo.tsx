@@ -1,4 +1,4 @@
-import { routeURL } from "../api";
+import { routeURL } from "../../api";
 
 const config = ngwConfig.headerLogo;
 

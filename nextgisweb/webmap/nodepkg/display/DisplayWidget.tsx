@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 
 import { Spin, Splitter } from "@nextgisweb/gui/antd";
 import { useRouteGet } from "@nextgisweb/pyramid/hook";
-import { Header } from "@nextgisweb/pyramid/layout/Header";
+import { Header } from "@nextgisweb/pyramid/layout/header/Header";
 import type { DisplayConfig } from "@nextgisweb/webmap/type/api";
 import { WebMapTabs } from "@nextgisweb/webmap/webmap-tabs";
 
