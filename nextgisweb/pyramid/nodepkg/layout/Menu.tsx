@@ -28,7 +28,7 @@ const MenuItem = observer(
 
 MenuItem.displayName = "MenuItem";
 
-export const Menu = observer(() => {
+const Menu = observer(() => {
     const [visible, setVisible] = useState(false);
 
     return (
@@ -59,3 +59,4 @@ export const Menu = observer(() => {
 });
 
 Menu.displayName = "Menu";
+export default Menu;

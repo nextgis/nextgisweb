@@ -29,6 +29,7 @@
     </a>
     <div class="text">${title}</div>
     <div class="container">
+        <div id="header-components"></div>
         %if not hide_resource_filter:
             <div class="header-resources-filter" id="resourcesFilter"></div>
         %endif
@@ -50,7 +51,8 @@
     Promise.all([
         ngwEntry(${json_js(REACT_BOOT_JSENTRY)}).then((m) => m.default),
         ngwEntry(${json_js(LAYOUT_JSENTRY)}),
-    ]).then(([reactBoot, {Avatar, Menu}]) => {
+    ]).then(([reactBoot, {Avatar, Menu, HeaderComponents}]) => {
+        reactBoot(HeaderComponents, {}, document.getElementById("header-components"));
         reactBoot(Avatar, {}, document.getElementById("avatar"));
         reactBoot(Menu, {}, document.getElementById("menu"));
         
