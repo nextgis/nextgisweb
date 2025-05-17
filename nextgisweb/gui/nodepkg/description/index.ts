@@ -1,0 +1,1 @@
+export { DescriptionComponent } from "./DescriptionComponent";
