@@ -1,6 +1,9 @@
 <%!
+    from pathlib import Path
     from nextgisweb.auth.policy import AuthProvider
     from nextgisweb.resource.home import user_group
+
+    svglogo_content = None
 %>
 
 <%
@@ -66,6 +69,26 @@
 
     if request.env.ngupdate_url:
         ngwConfig['ngupdateUrl'] = request.env.ngupdate_url
+
+    try:
+        if request.env.core.settings_exists('pyramid', 'logo'):
+            ngwConfig["headerLogo"] = {
+                "type": "custom",
+                "ckey": request.env.core.settings_get('pyramid', 'logo.ckey'),
+            }
+    except Exception:
+        pass
+
+    if "headerLogo" not in ngwConfig:
+        global svglogo_content
+        if svglogo_content is None:
+            logo_path = Path(request.env.pyramid.options["logo"])
+            svglogo_content = logo_path.read_text()
+
+        ngwConfig["headerLogo"] = {
+            "type": "builtin",
+            "content": svglogo_content, 
+        }
 %>
 
 <script type="text/javascript">
