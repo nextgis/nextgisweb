@@ -12,12 +12,13 @@ from pyramid.renderers import render
 from pyramid.response import Response
 
 from nextgisweb.env import DBSession
+from nextgisweb.lib.apitype.util import EmptyObject
 from nextgisweb.lib.safehtml import sanitize
 
 from nextgisweb.feature_layer import IFeatureLayer
 from nextgisweb.jsrealm import TSExport
 from nextgisweb.layer import IBboxLayer
-from nextgisweb.pyramid import JSONType
+from nextgisweb.pyramid import AsJSON, JSONType
 from nextgisweb.pyramid.api import csetting
 from nextgisweb.render import IRenderableScaleRange
 from nextgisweb.render.api import LegendSymbol
@@ -33,100 +34,122 @@ from .plugin import WebmapLayerPlugin, WebmapPlugin
 AnnotationID = Annotated[int, Meta(ge=1, description="Annotation ID")]
 
 
-def annotation_to_dict(obj, request, with_user_info=False):
-    result = dict()
+class AnnotationRead(Struct, kw_only=True):
+    id: AnnotationID
+    geom: str
+    public: bool
+    own: bool
+    description: Optional[str]
+    style: Optional[Dict[str, Any]]
+    user_id: Union[int, UnsetType] = UNSET
+    user: Union[str, UnsetType] = UNSET
 
-    keys = ("id", "description", "style", "geom", "public")
-    if with_user_info and (obj.public is False):
-        keys = keys + (
-            "user_id",
-            "user",
-        )
 
+class AnnotationCreate(Struct, kw_only=True):
+    geom: str
+    public: bool
+    description: Union[str, UnsetType] = UNSET
+    style: Union[Dict[str, Any], UnsetType] = UNSET
+
+
+class AnnotationUpdate(Struct, kw_only=True):
+    description: Union[str, UnsetType] = UNSET
+    style: Union[Dict[str, Any], UnsetType] = UNSET
+    geom: Union[str, UnsetType] = UNSET
+
+
+class AnnotationCreateResponse(Struct, kw_only=True):
+    id: AnnotationID
+
+
+def to_annot_read(obj: WebMapAnnotation, request, with_user_info=False) -> AnnotationRead:
     user_id = request.user.id
-    result["own"] = user_id == obj.user_id
 
-    for k in keys:
-        v = getattr(obj, k)
-        if k == "geom":
-            v = to_shape(v).wkt
-        if k == "user" and (v is not None):
-            v = v.display_name
-        if v is not None:
-            result[k] = v
-    return result
+    annotation_read = AnnotationRead(
+        id=obj.id,
+        description=obj.description,
+        style=obj.style,
+        geom=to_shape(obj.geom).wkt,
+        public=obj.public,
+        own=user_id == obj.user_id,
+    )
 
+    if with_user_info and (obj.public is False):
+        annotation_read.user_id = obj.user_id
+        annotation_read.user = obj.user.display_name if obj.user else UNSET
 
-def annotation_from_dict(obj, data):
-    for k in ("description", "style", "geom", "public"):
-        if k in data:
-            v = data[k]
-            if k == "description":
-                v = sanitize(v)
-            elif k == "geom":
-                v = "SRID=3857;" + v
-            setattr(obj, k, v)
+    return annotation_read
 
 
-def check_annotation_enabled(request):
+def prepare_annotation(
+    obj: WebMapAnnotation, data: Union[AnnotationCreate, AnnotationUpdate]
+) -> None:
+    if isinstance(data, AnnotationCreate):
+        obj.public = data.public
+
+    if data.geom is not UNSET and data.geom:
+        obj.geom = f"SRID=3857;{data.geom}"
+
+    obj.style = data.style if data.style is not UNSET else None
+    obj.description = sanitize(data.description) if data.description is not UNSET else None
+
+
+def check_annotation_enabled(request) -> None:
     if not request.env.webmap.options["annotation"]:
         raise HTTPNotFound()
 
 
-def annotation_cget(resource, request) -> JSONType:
+def annotation_cget(resource, request) -> AsJSON[List[AnnotationRead]]:
     check_annotation_enabled(request)
     request.resource_permission(WebMapScope.annotation_read)
 
     if resource.has_permission(WebMapScope.annotation_manage, request.user):
-        return [annotation_to_dict(a, request, with_user_info=True) for a in resource.annotations]
+        return [to_annot_read(a, request, with_user_info=True) for a in resource.annotations]
 
     return [
-        annotation_to_dict(a, request)
+        to_annot_read(a, request)
         for a in resource.annotations
         if a.public or (not a.public and a.user_id == request.user.id)
     ]
 
 
-def annotation_cpost(resource, request) -> JSONType:
-    check_annotation_enabled(request)
-    request.resource_permission(WebMapScope.annotation_write)
-    obj = WebMapAnnotation()
-    annotation_from_dict(obj, request.json_body)
-    if not obj.public:
-        obj.user_id = request.user.id
-    resource.annotations.append(obj)
-    DBSession.flush()
-    return dict(id=obj.id)
-
-
-def annotation_iget(resource, request) -> JSONType:
+def annotation_iget(resource, request) -> AsJSON[AnnotationRead]:
     check_annotation_enabled(request)
     request.resource_permission(WebMapScope.annotation_read)
     obj = WebMapAnnotation.filter_by(
         webmap_id=resource.id, id=int(request.matchdict["annotation_id"])
     ).one()
     with_user_info = resource.has_permission(WebMapScope.annotation_manage, request.user)
-    return annotation_to_dict(obj, request, with_user_info)
+    return to_annot_read(obj, request, with_user_info)
 
 
-def annotation_iput(resource, request) -> JSONType:
+def annotation_cpost(resource, request, *, body: AnnotationCreate) -> AnnotationCreateResponse:
+    check_annotation_enabled(request)
+    request.resource_permission(WebMapScope.annotation_write)
+    obj = WebMapAnnotation()
+    prepare_annotation(obj, body)
+    if not obj.public:
+        obj.user_id = request.user.id
+    resource.annotations.append(obj)
+    DBSession.flush()
+    return AnnotationCreateResponse(id=obj.id)
+
+
+def annotation_iput(resource, request, *, body: AnnotationUpdate) -> AnnotationCreateResponse:
     check_annotation_enabled(request)
     request.resource_permission(WebMapScope.annotation_write)
     obj = WebMapAnnotation.filter_by(
         webmap_id=resource.id, id=int(request.matchdict["annotation_id"])
     ).one()
-    annotation_from_dict(obj, request.json_body)
-    return dict(id=obj.id)
+    prepare_annotation(obj, body)
+    return AnnotationCreateResponse(id=obj.id)
 
 
-def annotation_idelete(resource, request) -> JSONType:
+def annotation_idelete(resource, request, annotation_id: int) -> EmptyObject:
     check_annotation_enabled(request)
     request.resource_permission(WebMapScope.annotation_write)
-    obj = WebMapAnnotation.filter_by(
-        webmap_id=resource.id, id=int(request.matchdict["annotation_id"])
-    ).one()
+    obj = WebMapAnnotation.filter_by(webmap_id=resource.id, id=annotation_id).one()
     DBSession.delete(obj)
-    return None
 
 
 def add_extent(e1, e2):

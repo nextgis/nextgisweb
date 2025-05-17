@@ -8,6 +8,7 @@ import { route } from "@nextgisweb/pyramid/api";
 import topic from "@nextgisweb/webmap/compat/topic";
 import type { Display } from "@nextgisweb/webmap/display";
 import type { AnnotationVisibleMode } from "@nextgisweb/webmap/store/annotations/AnnotationsStore";
+import type { AnnotationCreate } from "@nextgisweb/webmap/type/api";
 
 import { AnnotationFeature } from "../../layer/annotations/AnnotationFeature";
 import type { AnnotationInfo } from "../../layer/annotations/AnnotationFeature";
@@ -261,7 +262,7 @@ export class AnnotationsManager {
         const createInfo = await route("webmap.annotation.collection", {
             id: this._display.config.webmapId,
         }).post({
-            json: newAnnotationInfo,
+            json: newAnnotationInfo as AnnotationCreate,
         });
 
         return this._getAnnotation(
