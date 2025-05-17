@@ -140,3 +140,22 @@ def test_guard(caplog):
 
     dt.add("M{q}", "T")
     assert tr(_gettextf("M{q}").format(q="a")) == "T"
+
+
+@pytest.mark.parametrize(
+    "value, expected",
+    [
+        pytest.param(_gettext("foo"), "foo", id="gettext"),
+        pytest.param(_gettextf("foo {}"), "foo {}", id="gettextf"),
+        pytest.param(_ngettext("foo", "bar", 1), "foo", id="ngettext-singular"),
+        pytest.param(_ngettext("foo", "bar", 2), "bar", id="ngettext-plural"),
+        pytest.param(_pgettext("qux", "foo"), "foo", id="npgettext"),
+        pytest.param(_npgettext("qux", "foo", "bar", 1), "foo", id="pgettext-singular"),
+        pytest.param(_npgettext("qux", "foo", "bar", 2), "bar", id="pgettext-plural"),
+        # Formatting
+        pytest.param(_gettextf("foo {}").format("bar"), "foo bar", id="gettextf-format"),
+        pytest.param(_gettextf("foo {}").format("bar"), "foo bar", id="gettextf-format"),
+    ],
+)
+def test_str(value, expected):
+    assert str(value) == expected

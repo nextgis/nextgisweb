@@ -58,7 +58,11 @@ class TrStr(Translatable):
         self._lineno = frame.f_lineno
 
     def __str__(self) -> str:
-        return self.msg
+        if self.number is None or self.number == 1:
+            return self.msg
+
+        assert self.plural is not None
+        return self.plural
 
     def __mod__(self, arg: ModArgument):
         # TODO: Warn and deprecated here
@@ -127,6 +131,9 @@ class TrTpl(Translatable):
 
         self.context = context
         self.domain = domain
+
+    def __str__(self) -> str:
+        return self.msg
 
     def __call__(self, *args, **kwargs):
         return TrStrFormat(self, args, kwargs)
