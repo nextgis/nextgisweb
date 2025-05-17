@@ -6,6 +6,8 @@ import { HeaderComponents } from "./HeaderComponents";
 import HeaderLogo from "./HeaderLogo";
 import { layoutStore } from "./store";
 
+import "./Header.less";
+
 interface HeaderProps {
     title?: string;
     hideResourceFilter?: boolean;
