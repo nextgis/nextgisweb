@@ -45,7 +45,7 @@ placeholders. For example:
 
 .. code-block:: python
 
-  >>> gettextf("Hello, {}!")("Arthur")
+  >>> print(gettextf("Hello, {}!")("Arthur"))
   Hello, Arthur!
 
 Template strings may contain one of the following:
