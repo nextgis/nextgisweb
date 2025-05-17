@@ -6,6 +6,11 @@
 }
 
 .description-html > * img {
-    max-width: 100%;
-    height: auto;
+    max-width: 100% !important;
+    height: auto !important;
+}
+
+.description-html > * .ant-image {
+    max-width: 100% !important;
+    height: auto !important;
 }

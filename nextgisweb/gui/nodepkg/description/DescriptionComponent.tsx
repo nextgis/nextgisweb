@@ -1,5 +1,7 @@
 import type { Ref } from "react";
+
 import "./description.css";
+import { processHtmlWithImage } from "./processHTML";
 
 type DescriptionComponent = {
     content: string;
@@ -12,14 +14,12 @@ const DescriptionComponent = ({
     ref = null,
     className = "",
 }: DescriptionComponent) => {
+    const processedContent = processHtmlWithImage({ htmlString: content });
+
     return (
-        <div
-            ref={ref}
-            className={`description-html ${className}`}
-            dangerouslySetInnerHTML={{
-                __html: content ?? "",
-            }}
-        />
+        <div ref={ref} className={`description-html ${className}`}>
+            {processedContent}
+        </div>
     );
 };
 
