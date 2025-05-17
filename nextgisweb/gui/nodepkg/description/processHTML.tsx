@@ -1,15 +1,13 @@
 import { Image } from "antd";
 import parse, { domToReact } from "html-react-parser";
 import type { DOMNode, HTMLReactParserOptions } from "html-react-parser";
+import type { ReactNode } from "react";
 import type React from "react";
 
-interface HtmlToReactWithImagesProps {
-    htmlString: string;
-}
-
-const processHtmlWithImage: React.FC<HtmlToReactWithImagesProps> = ({
-    htmlString,
-}) => {
+const processHtml: React.FC<string> = (
+    htmlString: string,
+    onLinkClick?: (() => void) | null
+): ReactNode => {
     const options: HTMLReactParserOptions = {
         replace: (node: DOMNode) => {
             if (node.type === "tag") {
@@ -20,12 +18,32 @@ const processHtmlWithImage: React.FC<HtmlToReactWithImagesProps> = ({
                     return <Image src={src} alt={alt} />;
                 }
 
-                // there are warning about divs inside p, while
+                // there are warning about divs inside p, maybe should be handled in different way
                 if (el.name === "p") {
                     return (
                         <div>
                             {domToReact(el.children as DOMNode[], options)}
                         </div>
+                    );
+                }
+
+                if (el.name === "a" && el.attribs?.href) {
+                    const href = el.attribs.href;
+                    const target = el.attribs.target;
+
+                    return (
+                        <a
+                            href={href}
+                            target={target}
+                            onClick={(e) => {
+                                if (onLinkClick) {
+                                    e.preventDefault();
+                                    onLinkClick();
+                                }
+                            }}
+                        >
+                            {domToReact(el.children as DOMNode[], options)}
+                        </a>
                     );
                 }
             }
@@ -36,4 +54,4 @@ const processHtmlWithImage: React.FC<HtmlToReactWithImagesProps> = ({
     return <>{parse(htmlString, options)}</>;
 };
 
-export { processHtmlWithImage };
+export { processHtml };
