@@ -1,5 +1,6 @@
 import os
 import os.path
+import re
 from datetime import datetime as dt
 from datetime import timedelta
 from operator import itemgetter
@@ -7,6 +8,7 @@ from shutil import copyfileobj
 
 import sqlalchemy as sa
 import transaction
+from anyio import Path
 
 from nextgisweb.env import Component, DBSession
 from nextgisweb.lib.config import Option
@@ -125,12 +127,18 @@ class FileStorageComponent(Component):
 
         delta = self.options["cleanup_keep_interval"]
 
+        filename_re = re.compile(r"[0-9a-f]{32}")
         for dirpath, dirnames, filenames in os.walk(self.path, topdown=False):
             relist = False
 
             for fn in filenames:
-                obj = FileObj.filter_by(uuid=fn).first()
                 fullfn = os.path.join(dirpath, fn)
+                if not filename_re.fullmatch(fn):
+                    relfn = Path(fullfn).relative_to(self.path)
+                    logger.error("Unexpected file in storage: %s", str(relfn))
+                    continue
+
+                obj = FileObj.filter_by(uuid=fn).first()
                 stat = os.stat(fullfn)
 
                 if obj is None and (dt.utcnow() - dt.utcfromtimestamp(stat.st_ctime) > delta):
