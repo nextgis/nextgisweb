@@ -82,7 +82,8 @@ def to_annot_read(obj: WebMapAnnotation, request, with_user_info=False) -> Annot
 
 
 def prepare_annotation(
-    obj: WebMapAnnotation, data: Union[AnnotationCreate, AnnotationUpdate]
+    obj: WebMapAnnotation,
+    data: Union[AnnotationCreate, AnnotationUpdate],
 ) -> None:
     if isinstance(data, AnnotationCreate):
         obj.public = data.public
@@ -100,6 +101,7 @@ def check_annotation_enabled(request) -> None:
 
 
 def annotation_cget(resource, request) -> AsJSON[List[AnnotationRead]]:
+    """Read annotations"""
     check_annotation_enabled(request)
     request.resource_permission(WebMapScope.annotation_read)
 
@@ -113,19 +115,16 @@ def annotation_cget(resource, request) -> AsJSON[List[AnnotationRead]]:
     ]
 
 
-def annotation_iget(resource, request) -> AsJSON[AnnotationRead]:
-    check_annotation_enabled(request)
-    request.resource_permission(WebMapScope.annotation_read)
-    obj = WebMapAnnotation.filter_by(
-        webmap_id=resource.id, id=int(request.matchdict["annotation_id"])
-    ).one()
-    with_user_info = resource.has_permission(WebMapScope.annotation_manage, request.user)
-    return to_annot_read(obj, request, with_user_info)
-
-
-def annotation_cpost(resource, request, *, body: AnnotationCreate) -> AnnotationCreateResponse:
+def annotation_cpost(
+    resource,
+    request,
+    *,
+    body: AnnotationCreate,
+) -> AnnotationCreateResponse:
+    """Create annotation"""
     check_annotation_enabled(request)
     request.resource_permission(WebMapScope.annotation_write)
+
     obj = WebMapAnnotation()
     prepare_annotation(obj, body)
     if not obj.public:
@@ -135,19 +134,45 @@ def annotation_cpost(resource, request, *, body: AnnotationCreate) -> Annotation
     return AnnotationCreateResponse(id=obj.id)
 
 
-def annotation_iput(resource, request, *, body: AnnotationUpdate) -> AnnotationCreateResponse:
+def annotation_iget(
+    resource,
+    request,
+    annotation_id: int,
+) -> AsJSON[AnnotationRead]:
+    """Read annotation"""
+    check_annotation_enabled(request)
+    request.resource_permission(WebMapScope.annotation_read)
+
+    obj = WebMapAnnotation.filter_by(webmap_id=resource.id, id=annotation_id).one()
+    with_user_info = resource.has_permission(WebMapScope.annotation_manage, request.user)
+    return to_annot_read(obj, request, with_user_info)
+
+
+def annotation_iput(
+    resource,
+    request,
+    annotation_id: int,
+    *,
+    body: AnnotationUpdate,
+) -> AnnotationCreateResponse:
+    """Update annotation"""
     check_annotation_enabled(request)
     request.resource_permission(WebMapScope.annotation_write)
-    obj = WebMapAnnotation.filter_by(
-        webmap_id=resource.id, id=int(request.matchdict["annotation_id"])
-    ).one()
+
+    obj = WebMapAnnotation.filter_by(webmap_id=resource.id, id=annotation_id).one()
     prepare_annotation(obj, body)
     return AnnotationCreateResponse(id=obj.id)
 
 
-def annotation_idelete(resource, request, annotation_id: int) -> EmptyObject:
+def annotation_idelete(
+    resource,
+    request,
+    annotation_id: int,
+) -> EmptyObject:
+    """Delete annotation"""
     check_annotation_enabled(request)
     request.resource_permission(WebMapScope.annotation_write)
+
     obj = WebMapAnnotation.filter_by(webmap_id=resource.id, id=annotation_id).one()
     DBSession.delete(obj)
 
@@ -175,6 +200,7 @@ def add_extent(e1, e2):
 
 
 def get_webmap_extent(resource, request) -> JSONType:
+    """Calculate webmap layers' extent"""
     request.resource_permission(ResourceScope.read)
 
     def traverse(item, extent):
@@ -283,6 +309,7 @@ def check_page_max_size(request, body: PrintBody):
 
 
 def print(request, *, body: PrintBody) -> Response:
+    """Generate printable webmap document"""
     check_page_max_size(request, body)
     with TemporaryDirectory() as temp_name:
         temp_dir = Path(temp_name)
@@ -517,6 +544,7 @@ def _extent_wsen_from_attrs(obj, prefix) -> Union[ExtentWSEN, None]:
 
 
 def display_config(obj, request) -> DisplayConfig:
+    """Generate webmap display widget configuration"""
     request.resource_permission(ResourceScope.read)
 
     # Map level plugins
