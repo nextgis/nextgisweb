@@ -4,11 +4,11 @@ import re
 from datetime import datetime as dt
 from datetime import timedelta
 from operator import itemgetter
+from pathlib import Path
 from shutil import copyfileobj
 
 import sqlalchemy as sa
 import transaction
-from anyio import Path
 
 from nextgisweb.env import Component, DBSession
 from nextgisweb.lib.config import Option
