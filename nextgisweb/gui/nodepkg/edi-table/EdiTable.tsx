@@ -230,6 +230,8 @@ export const EdiTable = observer(
                                 return createElement(component, {
                                     value,
                                     row,
+                                    // HERE WE CAN ADD SOME PROPS TO COMPONENT VIA ADDING TO COLUMNS
+                                    // and with that we can set selected row
                                     placeholder,
                                     placeholderRef: placeholder
                                         ? placeholderRef
