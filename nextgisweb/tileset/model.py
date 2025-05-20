@@ -4,14 +4,13 @@ from contextlib import closing
 from functools import lru_cache
 from io import BytesIO
 from tempfile import NamedTemporaryFile
-from typing import Optional
 from zipfile import ZipFile, is_zipfile
 
 import sqlalchemy as sa
 import sqlalchemy.dialects.postgresql as sa_pg
 import sqlalchemy.orm as orm
 from osgeo import ogr, osr
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 from zope.interface import implementer
 
 from nextgisweb.env import COMP_ID, Base, env, gettext, gettextf
@@ -86,6 +85,15 @@ Base.depends_on("resource")
 class TilesetData(KindOfData):
     identity = "tileset"
     display_name = gettext("Tilesets")
+
+
+class TileValidationError(ValidationError):
+    tile_message = gettext("Tile {} unsupported.")
+
+    def __init__(self, tile, message):
+        tile_message = self.__class__.tile_message.format("z=%d x=%d y=%d" % tile)
+        message = tile_message + " " + message
+        super().__init__(message)
 
 
 @implementer(IExtentRenderRequest, ITileRenderRequest)
@@ -214,7 +222,7 @@ class Tileset(Base, Resource, SpatialLayerMixin):
 @list_registry
 class FileFormat:
     pattern: re.Pattern
-    offset_z: Optional[int] = 0
+    offset_z: int = 0
 
     def __init_subclass__(cls):
         cls.pattern = re.compile(cls.pattern)
@@ -285,24 +293,19 @@ def read_file(fn):
                     yield z, x, y, data
         return
 
-    with sqlite3.connect(f"file:{fn}?mode=ro", uri=True) as connection, closing(
-        connection.cursor()
-    ) as cursor:  # NOQA waiting for python 3.10
+    with (
+        sqlite3.connect(f"file:{fn}?mode=ro", uri=True) as connection,
+        closing(connection.cursor()) as cursor,
+    ):
         sql_tiles = """
             SELECT zoom_level, tile_column, tile_row, tile_data FROM tiles
             ORDER BY zoom_level, tile_column, tile_row
         """
         try:
-            row = cursor.execute(sql_tiles + " LIMIT 1").fetchone()
+            cursor.execute(sql_tiles + " LIMIT 1").fetchone()
         except sqlite3.DatabaseError:
             pass  # Not MBTiles
         else:
-            if row is not None:
-                try:
-                    Image.open(BytesIO(row[3]))
-                except IOError:
-                    raise ValidationError(message=gettext("Unsupported data format."))
-
             try:
                 for z, x, y, data in cursor.execute(sql_tiles):
                     yield z, x, toggle_tms_xyz_y(z, y), data
@@ -341,10 +344,17 @@ class SourceAttr(SAttribute):
                 # fmt: on
 
                 for z, x, y, img_data in read_file(value().data_path):
-                    img = Image.open(BytesIO(img_data))
+                    try:
+                        img = Image.open(BytesIO(img_data))
+                    except UnidentifiedImageError:
+                        raise TileValidationError(
+                            (z, x, y),
+                            gettext("Unsupported data format."),
+                        )
                     if img.size != (256, 256):
-                        raise ValidationError(
-                            message=gettext("Only 256x256 px tiles are supported.")
+                        raise TileValidationError(
+                            (z, x, y),
+                            gettext("Only 256x256 px tiles are supported."),
                         )
                     color = imgcolor(img)
                     data = img_data if color is None else COLOR_MAGIC + bytes(color)
