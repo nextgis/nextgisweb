@@ -9,6 +9,7 @@ from zipfile import is_zipfile
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
+from affine import Affine
 from msgspec import UNSET
 from osgeo import gdal, gdalconst, ogr, osr
 from zope.interface import implementer
@@ -196,9 +197,10 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         dst_osr = self.srs.to_osr()
 
         reproject = not src_osr.IsSame(dst_osr)
+        rectilinear = Affine.from_gdal(*dsgtran).is_rectilinear
         add_alpha = reproject and not has_nodata and alpha_band is None
 
-        if reproject:
+        if reproject or not rectilinear:
             cmd = ["gdalwarp", "-of", "GTiff", "-t_srs", "EPSG:%d" % self.srs.id]
             if add_alpha:
                 cmd.append("-dstalpha")
