@@ -194,17 +194,60 @@ class SecurityPolicy:
 
         if state.prv in (AuthProvider.OAUTH_AC, AuthProvider.OAUTH_PW):
             if state.exp <= now or self.refresh_session:
-                try:
-                    tpair = self.oauth.grant_type_refresh_token(
-                        refresh_token=session["auth.refresh_token"],
-                        access_token=session["auth.access_token"],
+                # To avoid issues with concurrent token refreshes, particularly
+                # with NextGIS ID On-Premise, we implement a lock and adjust the
+                # session keys.
+
+                session_id = request.session.id
+                with request.env.core.engine.connect() as con, con.begin():
+                    con.execute(
+                        sa.text("SELECT pg_advisory_xact_lock(hashtext((:sid)::text))"),
+                        dict(sid=f"auth_oauth_{session_id}"),
                     )
 
-                    state.exp = tpair.access_exp
-                    session["auth.state"] = state.to_dict()
-                    session["auth.access_token"] = tpair.access_token
-                    session["auth.refresh_token"] = tpair.refresh_token
-                except OAuthATokenRefreshException:
+                    # Another worker may have already refreshed it, so a
+                    # double-check is necessary.
+                    access_token_double_check = con.execute(
+                        sa.select(SessionStore.value).filter_by(
+                            session_id=session_id,
+                            key="auth.access_token",
+                        )
+                    ).scalar()
+
+                    if session["auth.access_token"] != access_token_double_check:
+                        refresh_success = True
+                    else:
+                        try:
+                            tpair = self.oauth.grant_type_refresh_token(
+                                refresh_token=session["auth.refresh_token"],
+                                access_token=session["auth.access_token"],
+                            )
+
+                            state.exp = tpair.access_exp
+                            con.execute(
+                                sa.update(SessionStore)
+                                .values(value=sa.bindparam("v"))
+                                .filter_by(session_id=session_id, key=sa.bindparam("k")),
+                                [
+                                    dict(k="auth.state", v=state.to_dict()),
+                                    dict(k="auth.access_token", v=tpair.access_token),
+                                    dict(k="auth.refresh_token", v=tpair.refresh_token),
+                                ],
+                            )
+                        except OAuthATokenRefreshException:
+                            refresh_success = False
+                        else:
+                            refresh_success = True
+
+                # FIXME: Prevent overwriting new session keys by ensuring they
+                # are not replaced in the session.
+                for k in ("auth.state", "auth.access_token", "auth.refresh_token"):
+                    try:
+                        session._updated.remove(k)
+                    except ValueError:
+                        pass
+
+                if not refresh_success:
                     self.forget(request)
                     return None
 
