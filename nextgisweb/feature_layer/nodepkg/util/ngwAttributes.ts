@@ -16,6 +16,29 @@ export function isDateTimeFieldType(datatype: FeatureLayerFieldDatatype) {
     return DATETIME_TYPES.includes(datatype);
 }
 
+const parseDate = (value: string | number) => {
+    let dayjsValue = dayjs(value);
+
+    if (typeof value !== "string") {
+        return dayjsValue;
+    }
+
+    // This is a common way to start a date string (e.g., "YYYY-MM-DD").
+    const regex = /^(\d{4})-/;
+    const match = value.match(regex);
+    if (match) {
+        const year = parseInt(match[1], 10);
+        if (year < 100) {
+            // To prevent misinterpretation and ensure the year is set EXACTLY as provided
+            // (e.g., year 50 should be the year 50 AD, not 1950 or 2050),
+            // we explicitly set the year component of the dayjs object.
+            dayjsValue = dayjsValue.year(year);
+        }
+    }
+
+    return dayjsValue;
+};
+
 export function unmarshalFieldValue(
     datatype: FeatureLayerFieldDatatype,
     value: NgwAttributeType
@@ -25,7 +48,7 @@ export function unmarshalFieldValue(
     } else if (isDateTimeFieldType(datatype)) {
         assert(typeof value === "string");
         if (datatype !== "TIME") {
-            return dayjs(value);
+            return parseDate(value);
         } else {
             return dayjs(`1970-00-00T${value}`);
         }
@@ -40,13 +63,15 @@ export function marshalFieldValue(
     if (value === null) {
         return null;
     } else if (isDateTimeFieldType(datatype)) {
-        const v = dayjs(value as string);
+        const dayjsValue = dayjs.isDayjs(value)
+            ? value
+            : parseDate(value as string);
         if (datatype === "DATE") {
-            return dayjs(v).format("YYYY-MM-DD");
+            return dayjsValue.format("YYYY-MM-DD");
         } else if (datatype === "TIME") {
-            return dayjs(v).format("HH:mm:ss");
+            return dayjsValue.format("HH:mm:ss");
         } else if (datatype === "DATETIME") {
-            return dayjs(v).format("YYYY-MM-DDTHH:mm:ss");
+            return dayjsValue.format("YYYY-MM-DDTHH:mm:ss");
         }
     }
     return value as NgwAttributeType;
