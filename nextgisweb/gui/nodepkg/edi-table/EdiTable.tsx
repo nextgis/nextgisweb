@@ -149,7 +149,19 @@ export const EdiTable = observer(
         const placeholderRef = useRef<InputRef | null>(null);
 
         const handleKeyDown = useCallback(() => {
-            if (placeholderRef.current) {
+            const inputEl = placeholderRef.current?.input;
+            const activeEl = document.activeElement;
+
+            if (!inputEl) return;
+
+            const container = inputEl.closest(".ant-table-container");
+
+            if (
+                placeholderRef.current &&
+                container &&
+                activeEl &&
+                container.contains(activeEl)
+            ) {
                 placeholderRef.current.focus?.();
             }
         }, []);
