@@ -9,6 +9,7 @@ from sqlalchemy import sql
 from nextgisweb.env import DBSession, env, gettext, gettextf
 from nextgisweb.lib.apitype import OP, AsJSON, Derived, EmptyObject, ReadOnly, Required, StatusCode
 from nextgisweb.lib.geometry import Geometry, Transformer, geom_area, geom_length
+from nextgisweb.lib.osrhelper import sr_from_wkt
 
 from nextgisweb.core.exception import ExternalServiceError, ValidationError
 from nextgisweb.jsrealm import TSExport
@@ -88,9 +89,15 @@ def deserialize(obj, data: SRSCreate, *, create: bool):
         obj.display_name = display_name
 
     if (wkt := data.wkt) is not UNSET and wkt != obj.wkt:
-        if not create and obj.protected:
-            raise ValidationError(("OGC WKT definition cannot be changed for this SRS."))
-        obj.wkt = wkt
+        wkt_short = sr_from_wkt(wkt).ExportToWkt()
+        if wkt_short != obj.wkt:
+            if not create and obj.protected:
+                raise ValidationError(("OGC WKT definition cannot be changed for this SRS."))
+            if len(wkt_short) > (wkt_maxlen := 2048):
+                raise ValidationError(
+                    f"OGC WKT definition cannot be longer than {wkt_maxlen} characters"
+                )
+            obj.wkt = wkt_short
 
 
 def cget(request) -> AsJSON[List[SRSRead]]:
