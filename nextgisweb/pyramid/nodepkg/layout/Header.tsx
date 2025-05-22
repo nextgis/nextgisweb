@@ -1,16 +1,15 @@
 import { observer } from "mobx-react-lite";
-import { Suspense, lazy, useEffect, useRef, useState } from "react";
+import { Suspense, lazy, useEffect, useRef } from "react";
 
 import { Avatar } from "./Avatar";
 import { HeaderComponents } from "./HeaderComponents";
+import HeaderLogo from "./HeaderLogo";
 import { layoutStore } from "./store";
 
 interface HeaderProps {
     title?: string;
     hideResourceFilter?: boolean;
     hideMenu?: boolean;
-    returnUrl?: string;
-    applicationUrl?: string;
 }
 
 const ResourcesFilter = lazy(
@@ -19,45 +18,16 @@ const ResourcesFilter = lazy(
 const Menu = lazy(() => import("./Menu"));
 
 export const Header = observer<HeaderProps>(
-    ({
-        title,
-        hideResourceFilter = false,
-        hideMenu = false,
-        returnUrl,
-        applicationUrl = ngwConfig.applicationUrl,
-    }: HeaderProps) => {
+    ({ title, hideResourceFilter = false, hideMenu = false }: HeaderProps) => {
         const hideMenuRef = useRef(hideMenu);
-        const [logoElement] = useState<React.ReactNode>();
-        // const { route } = useRoute("pyramid.csettings");
 
         useEffect(() => {
             layoutStore.setHideMenu(hideMenuRef.current);
-            const getLogoElement = async () => {
-                // const company_logo = pyramidSettings.company_logo;
-                // const hlogo = `${routeURL("pyramid.asset.hlogo")}?ckey=${company_logo.ckey}`;
-                // // console.log(hlogo);
-                // // if (enabled) {
-                // //     // const logo = await route("pyramid.static", {
-                // //     // skey: ckey,
-                // //     // }).get();
-                // //     // console.log(logo);
-                // // } else {
-                // //     //
-                // // }
-                // setLogoElement(<img src={hlogo} />);
-                // const logo = await route.get({
-                //     query: {
-                //         pyramid: ["header_logo"],
-                //     },
-                // });
-                // console.log(company_logo, logo);
-            };
-            getLogoElement();
         }, []);
 
         return (
             <div className="ngw-pyramid-layout-header">
-                <a href={returnUrl || applicationUrl}>{logoElement}</a>
+                <HeaderLogo />
                 <div className="text">{title}</div>
                 <div className="container">
                     <div id="header-components">
