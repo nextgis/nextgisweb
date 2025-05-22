@@ -165,57 +165,6 @@ a[class*=" icon-"]:hover:before {
     }
 }
 
-/* -- Header --*/
-
-.ngw-pyramid-layout-header {
-    display: flex;
-    position: relative;
-    align-items: center;
-    gap: 10px;
-    box-sizing: border-box;
-    border-bottom: 1px solid var(--divider-color);
-    padding: 5px 5px;
-    min-width: 0;
-    min-height: 50px;
-
-    &::before {
-        position: absolute;
-        opacity: 0.1;
-        z-index: -1;
-        inset: 0;
-        background-color: var(--primary);
-        content: "";
-    }
-
-    > a {
-        display: flex;
-        flex-shrink: 1;
-        justify-content: center;
-        box-sizing: content-box;
-        min-width: 40px;
-
-        > img {
-            display: block;
-        }
-    }
-
-    > div.text {
-        flex-grow: 1;
-        color: var(--primary);
-        font-weight: var(--ngw-head-font-weight);
-        font-size: 16px;
-        font-family: var(--ngw-head-font-family);
-    }
-
-    > div.container {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        min-width: 0;
-        min-height: 32px;
-    }
-}
-
 /* Sidebar */
 
 .ngw-pyramid-layout-sidebar {

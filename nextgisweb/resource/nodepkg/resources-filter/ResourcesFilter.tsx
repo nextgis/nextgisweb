@@ -13,8 +13,10 @@ import "./ResourcesFilter.less";
 
 type AutoProps = ParamsOf<typeof AutoComplete>;
 
+export type ResourcesFilterPropsOnChange = AutoProps["onSelect"];
+
 interface ResourcesFilterProps extends Omit<AutoProps, "onChange"> {
-    onChange?: AutoProps["onSelect"];
+    onChange?: ResourcesFilterPropsOnChange;
     cls?: ResourceCls | ResourceCls[];
 }
 

@@ -10,7 +10,6 @@ import { url } from "../nextgis";
 const NOTIFICATION_ORDER = ["success", "danger"];
 
 export interface MenuItem {
-    key?: number;
     className?: string;
     href?: string;
     title?: ReactNode;
@@ -19,12 +18,16 @@ export interface MenuItem {
 
 class LayoutStore {
     @observable.shallow accessor menuItems: MenuItem[] = [];
+    @observable.ref accessor hideMenu = false;
 
-    private counter: number = 0;
-
-    @action
+    @action.bound
     addMenuItem(item: MenuItem) {
-        this.menuItems.push({ key: ++this.counter, ...item });
+        this.menuItems.push(item);
+    }
+
+    @action.bound
+    setHideMenu(val: boolean) {
+        this.hideMenu = val;
     }
 
     @computed

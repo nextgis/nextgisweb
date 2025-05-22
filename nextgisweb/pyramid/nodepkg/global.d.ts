@@ -28,6 +28,11 @@ declare module "@nextgisweb/pyramid/type/config" {
         resourceHome: { id: number } | null;
         locale: string;
         logoutUrl: string;
+
+        headerLogo:
+            | { type: "builtin"; content: str }
+            | { type: "custom"; ckey: str };
+
         // Defined by @nextgisweb/jsrealm/i18n/lang
         plurals: [number, { (n: number): number }];
     }

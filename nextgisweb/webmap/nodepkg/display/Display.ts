@@ -9,6 +9,7 @@ import { errorModal } from "@nextgisweb/gui/error";
 import { assert } from "@nextgisweb/jsrealm/error";
 import { appendTo } from "@nextgisweb/pyramid/company-logo";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import { layoutStore } from "@nextgisweb/pyramid/layout";
 import topic from "@nextgisweb/webmap/compat/topic";
 import { buildControls } from "@nextgisweb/webmap/map-controls";
 import MapToolbar from "@nextgisweb/webmap/map-toolbar";
@@ -732,12 +733,8 @@ export class Display {
     }
 
     private _hideNavMenuForGuest() {
-        if (!this.clientSettings.hide_nav_menu || !ngwConfig.isGuest) {
-            return;
-        }
-
-        const navMenu = document.querySelector("#header #menu") as HTMLElement;
-        if (!navMenu) return;
-        navMenu.style.display = "none";
+        const shouldHideMenu =
+            this.clientSettings.hide_nav_menu && ngwConfig.isGuest;
+        layoutStore.setHideMenu(shouldHideMenu);
     }
 }

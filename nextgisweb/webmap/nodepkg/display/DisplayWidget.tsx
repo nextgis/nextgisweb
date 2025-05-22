@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 
 import { Spin, Splitter } from "@nextgisweb/gui/antd";
 import { useRouteGet } from "@nextgisweb/pyramid/hook";
+import { Header } from "@nextgisweb/pyramid/layout/header/Header";
 import type { DisplayConfig } from "@nextgisweb/webmap/type/api";
 import { WebMapTabs } from "@nextgisweb/webmap/webmap-tabs";
 
@@ -108,19 +109,23 @@ export const DisplayWidget = observer(
 );
 DisplayWidget.displayName = "Display";
 
-export function DisplayLoader({ id }: { id: number }) {
+export function DisplayLoader({ id, title }: { id: number; title: string }) {
     const { data: config, isLoading } = useRouteGet("webmap.display_config", {
         id,
     });
 
-    if (isLoading || !config) {
-        return (
-            <Spin
-                indicator={<LoadingOutlined spin />}
-                size="large"
-                fullscreen
-            />
-        );
-    }
-    return <DisplayWidget config={config} />;
+    return (
+        <div className="ngw-webmap-display-loader">
+            <Header title={title} hideResourceFilter={true} hideMenu={true} />
+            {isLoading || !config ? (
+                <Spin
+                    size="large"
+                    fullscreen
+                    indicator={<LoadingOutlined spin />}
+                />
+            ) : (
+                <DisplayWidget config={config} />
+            )}
+        </div>
+    );
 }
