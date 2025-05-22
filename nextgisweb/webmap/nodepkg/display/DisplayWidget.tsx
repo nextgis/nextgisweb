@@ -115,17 +115,17 @@ export function DisplayLoader({ id, title }: { id: number; title: string }) {
     });
 
     return (
-        <>
-            <Header hideResourceFilter title={title} hideMenu={true} />
+        <div className="ngw-webmap-display-loader">
+            <Header title={title} hideResourceFilter={true} hideMenu={true} />
             {isLoading || !config ? (
                 <Spin
-                    indicator={<LoadingOutlined spin />}
                     size="large"
                     fullscreen
+                    indicator={<LoadingOutlined spin />}
                 />
             ) : (
                 <DisplayWidget config={config} />
             )}
-        </>
+        </div>
     );
 }
