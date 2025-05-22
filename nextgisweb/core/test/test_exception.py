@@ -65,7 +65,7 @@ def test_user_exception():
             http_status_code=418,
         )
     except UserException as exc:
-        assert str(exc) == "UserException: Message"
+        assert str(exc) == "Message"
         assert exc.title == "Title"
         assert exc.message == "Message"
         assert exc.detail == "Detail"
@@ -74,7 +74,7 @@ def test_user_exception():
 
 def test_localizer():
     exc = UserException(gettext("The answer is %d") % 42)
-    assert str(exc) == "UserException: The answer is 42"
+    assert str(exc) == "The answer is 42"
 
 
 def test_positional_message():
