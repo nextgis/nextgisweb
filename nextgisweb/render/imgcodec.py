@@ -1,4 +1,6 @@
 from enum import Enum
+from importlib import import_module
+from importlib.util import find_spec
 
 
 class CompressionEnum(Enum):
@@ -62,13 +64,12 @@ def image_encoder_factory(
     return _encode
 
 
-def _has_fpng():
-    try:
-        import pillow_fpng  # noqa: F401
-    except ModuleNotFoundError:
-        return False
-    else:
+def _try_fpng():
+    mod = "pillow_fpng"
+    if find_spec(mod):
+        import_module(mod)
         return True
+    return False
 
 
-has_fpng = _has_fpng()
+has_fpng = _try_fpng()
