@@ -22,8 +22,9 @@ class LayoutStore {
 
     @action.bound
     addMenuItem(item: MenuItem) {
-        this.menuItems = [...this.menuItems, item];
+        this.menuItems.push(item);
     }
+
     @action.bound
     setHideMenu(val: boolean) {
         this.hideMenu = val;

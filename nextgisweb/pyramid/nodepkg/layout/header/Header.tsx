@@ -43,4 +43,5 @@ export const Header = observer<HeaderProps>((props: HeaderProps) => {
         </div>
     );
 });
+
 Header.displayName = "Header";

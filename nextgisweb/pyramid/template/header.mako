@@ -5,8 +5,7 @@
 
 <%page args="title"/>
 
-<div id="header" >
-</div>
+<div id="header"></div>
 
 <script type="text/javascript">
     Promise.all([

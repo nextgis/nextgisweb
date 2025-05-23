@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 import { Drawer } from "@nextgisweb/gui/antd";
 
@@ -31,10 +31,6 @@ const Menu = observer<HeaderProps>((props) => {
 
     const { menuItems: storeMenuItems } = layoutStore;
 
-    const menuItems = useMemo(() => {
-        return [...storeMenuItems, ...pluginMenuItems];
-    }, [pluginMenuItems, storeMenuItems]);
-
     return (
         <>
             <div
@@ -54,7 +50,7 @@ const Menu = observer<HeaderProps>((props) => {
                 onClose={() => setVisible(false)}
                 className="ngw-pyramid-menu-drawer"
             >
-                {menuItems.map((item, i) => {
+                {[...storeMenuItems, ...pluginMenuItems].map((item, i) => {
                     return <MenuItem key={i} item={item} />;
                 })}
             </Drawer>
