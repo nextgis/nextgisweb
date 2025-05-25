@@ -62,4 +62,12 @@ wrong_srs_def = [
         "display_name": "INVALID_SRS_3",
         "wkt": 'PROJCS["Invalid Oblique Mercator",GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563]],PRIMEM["Greenwich",0],UNIT["degree",0.0174532925199433]],PROJECTION["omerc"],PARAMETER["lat_0",95],PARAMETER["lonc",0],PARAMETER["alpha",0],PARAMETER["gamma",0],PARAMETER["k",1],PARAMETER["x_0",0],PARAMETER["y_0",0],UNIT["metre",1]]',
     },
+    {
+        "display_name": "INVALID_SRS_4",
+        "wkt": """LOCAL_CS["Nonearth", UNIT["Meter",1]]""",
+    },
+    {
+        "display_name": "INVALID_SRS_5",
+        "wkt": """ENGCRS["Nonearth",EDATUM[""],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["Meter",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["Meter",1]]]""",
+    },
 ]

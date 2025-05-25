@@ -172,7 +172,11 @@ class Transformer:
         # NB: geom.srid is not considered
         ogr_geom = geom.ogr.Clone()
         if self._transformation is not None:
-            if ogr_geom.Transform(self._transformation) != 0:
+            try:
+                result = ogr_geom.Transform(self._transformation)
+                if result != 0:
+                    raise ValueError(gdal.GetLastErrorMsg())
+            except TypeError:
                 raise ValueError(gdal.GetLastErrorMsg())
         return Geometry.from_ogr(ogr_geom)
 
