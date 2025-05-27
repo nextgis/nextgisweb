@@ -1,7 +1,8 @@
-import pathlib
 import zipfile
 from contextlib import contextmanager
 from datetime import date, datetime, time
+from pathlib import Path
+from tempfile import TemporaryDirectory
 
 from osgeo import gdal, ogr
 
@@ -14,6 +15,11 @@ OGR_VRT_LAYER = """
     <GeometryField encoding="PointFromColumns" x="lon" y="lat" reportSrcColumn="false"/>
 </OGRVRTLayer>
 """
+
+
+class AutoCleaningTemporaryDirectory(TemporaryDirectory):
+    def __del__(self):
+        self.cleanup()
 
 
 @contextmanager
@@ -33,13 +39,23 @@ def read_dataset(filename, **kw):
     vrt_layers = None
     source_filename = kw.pop("source_filename", None)
     allowed_drivers = kw.pop("allowed_drivers", ())
+    tempdir = None
     if source_filename is not None:
-        suffix = pathlib.Path(source_filename).suffix.lower()
+        suffix = Path(source_filename).suffix.lower()
         if suffix in (".csv", ".xlsx"):
             allowed_drivers += ("OGR_VRT",)
-            dst_path = pathlib.Path(filename).with_suffix(suffix)
-            if not (dst_path.is_symlink() or dst_path.is_file()):
-                dst_path.symlink_to(filename)
+
+            # GDAL < 3.8 doesn't support reading XLSX files without the *.xlsx
+            # extension. To handle this, symlinks are created. Since
+            # read_dataset is not a context manager (as it ideally should be),
+            # we use the AutoCleaningTemporaryDirectory subclass, which ensures
+            # cleanup in its destructor. TemporaryDirectory behaves similarly
+            # but issues a warning, so we rely on our cleanup being executed
+            # first.
+            tempdir = AutoCleaningTemporaryDirectory()
+
+            dst_path = Path(tempdir.name) / Path(filename).with_suffix(suffix).name
+            dst_path.symlink_to(filename)
 
             vrt_layers = ""
             ogrds = gdal.OpenEx(str(dst_path), 0)
@@ -55,7 +71,10 @@ def read_dataset(filename, **kw):
         ogrfn = "/vsizip/{%s}" % str(filename)
     else:
         ogrfn = str(filename)
-    return gdal.OpenEx(ogrfn, 0, **kw)
+
+    result = gdal.OpenEx(ogrfn, 0, **kw)
+    result._piggyback_ref = tempdir
+    return result
 
 
 def read_layer_features(layer, geometry_format=None):
