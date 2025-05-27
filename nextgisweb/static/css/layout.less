@@ -255,3 +255,7 @@ a[class*=" icon-"]:hover:before {
 @import "override-antd.less";
 
 @import "include.less";
+
+// To prevent FOUC, import it as soon as possible. When the SPA or global
+// spinner is done, switch to a normal import from Header.tsx.
+@import "../../pyramid/nodepkg/layout/header/Header.less";

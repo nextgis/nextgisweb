@@ -7,7 +7,8 @@ import { layoutStore } from "../store";
 import { HeaderComponents } from "./HeaderComponents";
 import HeaderLogo from "./HeaderLogo";
 
-import "./Header.less";
+// NOTE: Header.less is imported in layout.less as it's used during bootstrapping
+// import "./Header.less";
 
 export interface HeaderProps {
     title?: string;

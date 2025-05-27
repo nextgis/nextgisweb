@@ -5,7 +5,7 @@
 
 <%page args="title"/>
 
-<div id="header"></div>
+<div id="header" class="ngw-pyramid-layout-header-stub"></div>
 
 <script type="text/javascript">
     Promise.all([
