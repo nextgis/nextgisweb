@@ -3,7 +3,6 @@ from typing import Literal
 from osgeo import osr
 
 from nextgisweb.env import gettext
-from nextgisweb.lib.osrhelper import SpatialReferenceError, sr_from_wkt
 
 from nextgisweb.core.exception import ValidationError
 
@@ -62,11 +61,3 @@ def convert_to_wkt(source: str, format: SRSFormat, pretty=False) -> str:
 
     wkt = sr.ExportToPrettyWkt() if pretty else sr.ExportToWkt()
     return wkt
-
-
-def convert_to_proj(source):
-    try:
-        sr = sr_from_wkt(source)
-    except SpatialReferenceError:
-        raise ValidationError(message=gettext("Invalid OGC WKT definition!"))
-    return sr.ExportToProj4()
