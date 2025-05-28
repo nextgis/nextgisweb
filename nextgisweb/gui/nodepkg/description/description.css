@@ -18,7 +18,6 @@
 
 .description-html > * table {
     display: block;
-    background-color: steelblue;
     width: 100%;
     overflow-x: auto;
     white-space: nowrap;
