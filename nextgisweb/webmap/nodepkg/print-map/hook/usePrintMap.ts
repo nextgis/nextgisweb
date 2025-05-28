@@ -8,6 +8,7 @@ import { imageQueue } from "@nextgisweb/pyramid/util";
 
 import type { Display } from "../../display";
 import type { AnnotationsPopup } from "../../layer/annotations/AnnotationsPopup";
+import { mapStartup } from "@nextgisweb/webmap/ol/util/mapStartup";
 
 function clearOlMap(map: OlMap) {
     map.getLayers().clear();
@@ -88,9 +89,7 @@ export function usePrintMap({ display }: { display: Display }) {
                 // Aborting the shared image queue too early prevents the main map from loading its layers.
                 // So we have to wait until it's fully loaded before using the queue for the print map.
                 imageQueue.waitAll().then(() => {
-                    map.on("movestart", () => {
-                        imageQueue.abort();
-                    });
+                    mapStartup({ olMap: map, queue: imageQueue });
                 });
             });
 
