@@ -29,23 +29,25 @@ export const LayerWidget: EditorWidget<LayerStore> = observer(({ store }) => {
 
     const [opacity, setOpacity] = useState(100);
 
+    const [initialized, setInitialized] = useState(false);
+
     useEffect(() => {
         if (store.loaded && store.qms.value) {
             try {
                 const qmsId = JSON.parse(store.qms.value) as QMSService;
                 setQmsId(qmsId.id);
-            } catch {
-                //
+            } finally {
+                setInitialized(true);
             }
         }
     }, [store.loaded, store.qms.value]);
 
     // Clean store qms but do not touch copyright_text and copyright_url
     useEffect(() => {
-        if (!qmsId) {
+        if (initialized && !qmsId) {
             store.qms.value = null;
         }
-    }, [qmsId, store.qms]);
+    }, [initialized, qmsId, store.qms]);
 
     return (
         <div
