@@ -23,7 +23,7 @@ export default function DescriptionComponentTestEntry() {
                     border: "2px solid black",
                 }}
             >
-                <DescriptionComponent content={testContent} />
+                <DescriptionComponent mode="compact" content={testContent} />
             </div>
         </>
     );

@@ -8,6 +8,7 @@ type DescriptionComponent = {
     onLinkClick?: (() => void) | null;
     elementRef?: Ref<HTMLDivElement> | null;
     className?: string;
+    mode?: "compact" | "default";
 };
 
 const DescriptionComponent = ({
@@ -15,11 +16,15 @@ const DescriptionComponent = ({
     onLinkClick = null,
     elementRef = null,
     className = "",
+    mode = "default",
 }: DescriptionComponent) => {
     const processedContent = processHtml(content, onLinkClick);
 
     return (
-        <div ref={elementRef} className={`description-html ${className}`}>
+        <div
+            ref={elementRef}
+            className={`description-html description-mode--${mode} ${className}`}
+        >
             {processedContent}
         </div>
     );
