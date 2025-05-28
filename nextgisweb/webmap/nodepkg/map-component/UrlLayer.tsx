@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
 import { createTileLayer } from "@nextgisweb/basemap/util/baselayer";
+import { isValidURL } from "@nextgisweb/gui/arm/validate";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { tileLoadFunction } from "@nextgisweb/pyramid/util";
 import type QuadKey from "@nextgisweb/webmap/ol/layer/QuadKey";
@@ -49,7 +50,7 @@ export function UrlLayer({
 
     useEffect(() => {
         const abortController = new AbortController();
-        if (mapStore && url) {
+        if (mapStore && url && isValidURL(url)) {
             createTileLayer({
                 source: {
                     attributions: attributions ?? undefined,
