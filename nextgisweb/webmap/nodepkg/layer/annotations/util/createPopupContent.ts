@@ -13,6 +13,7 @@ const template = `
     </div>
 </div>`;
 
+// Here  annotation popup is created
 export function createPopupContent() {
     const tempContainer = document.createElement("div");
     tempContainer.innerHTML = template;

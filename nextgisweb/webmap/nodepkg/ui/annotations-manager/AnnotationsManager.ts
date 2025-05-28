@@ -245,6 +245,7 @@ export class AnnotationsManager {
         }
     }
 
+    // annotations created
     private async _createAnnotation(
         annFeature: AnnotationFeature,
         newAnnotationInfo: AnnotationInfo
