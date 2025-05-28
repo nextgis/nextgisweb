@@ -2,6 +2,7 @@ type RequestFunc = (opt: { signal: AbortSignal }) => Promise<unknown>;
 type Abort = () => void;
 
 type AbortableRequest = {
+    id?: string | number;
     request: RequestFunc;
     abort?: Abort;
     abortController: AbortController;
@@ -20,9 +21,12 @@ export class RequestQueue {
     private queue: AbortableRequest[] = [];
     private activeRequests: AbortableRequest[] = [];
     private limit: number;
-    private timeoutId?: ReturnType<typeof setTimeout>;
-    private debounce: number;
+    readonly debounce: number;
 
+    private timeoutId?: ReturnType<typeof setTimeout>;
+    private resumeTimer?: ReturnType<typeof setTimeout>;
+
+    private paused = false;
     private idleResolvers: Array<() => void> = [];
 
     constructor({ limit = 1, debounce = 0 }: RequestQueueOptions = {}) {
@@ -30,8 +34,17 @@ export class RequestQueue {
         this.debounce = debounce;
     }
 
-    add(request: RequestFunc, abort?: Abort) {
+    add(
+        request: RequestFunc,
+        options?: { abort?: Abort; id?: string | number }
+    ) {
+        const { abort, id } = options || {};
+        if (id !== undefined && id !== null) {
+            this.removeById(id);
+        }
+
         this.queue.push({
+            id,
             request,
             abort,
             abortController: new AbortController(),
@@ -49,7 +62,7 @@ export class RequestQueue {
         this.queue.length = 0;
         this.activeRequests.length = 0;
         this._clearTimeout();
-
+        this._clearResumeTimer();
         this.checkIdle();
     }
 
@@ -63,7 +76,24 @@ export class RequestQueue {
         });
     }
 
+    pause(pauseDuration?: number) {
+        this.paused = true;
+        this._clearTimeout();
+        this._clearResumeTimer();
+        if (pauseDuration) {
+            this.resumeTimer = setTimeout(() => this.resume(), pauseDuration);
+        }
+    }
+
+    resume() {
+        if (!this.paused) return;
+        this.paused = false;
+        this._clearResumeTimer();
+        this._next();
+    }
+
     private debouncedNext() {
+        if (this.paused) return;
         this._clearTimeout();
         this.timeoutId = setTimeout(() => this._next(), this.debounce);
     }
@@ -75,7 +105,16 @@ export class RequestQueue {
         }
     }
 
+    private _clearResumeTimer() {
+        if (this.resumeTimer) {
+            clearTimeout(this.resumeTimer);
+            this.resumeTimer = undefined;
+        }
+    }
+
     private _next() {
+        if (this.paused) return;
+
         while (
             this.activeRequests.length < this.limit &&
             this.queue.length > 0
@@ -96,6 +135,17 @@ export class RequestQueue {
             } else {
                 this.debouncedNext();
             }
+        }
+    }
+
+    private removeById(id: number | string) {
+        this.queue = this.queue.filter((item) => item.id !== id);
+        const idx = this.activeRequests.findIndex((it) => it.id === id);
+        if (idx >= 0) {
+            const running = this.activeRequests[idx];
+            running.abortController.abort(QUEUE_ABORT_REASON);
+            running.abort?.();
+            this.activeRequests.splice(idx, 1);
         }
     }
 

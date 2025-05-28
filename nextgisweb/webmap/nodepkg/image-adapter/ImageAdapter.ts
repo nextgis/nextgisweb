@@ -70,21 +70,23 @@ export class ImageAdapter extends LayerDisplayAdapter {
                     // Use a timeout to prevent the queue from aborting right after adding,
                     // especially in cases with zoomToExtent.
                     setTimeout(() => {
-                        imageQueue.add(({ signal }) =>
-                            tileLoadFunction({
-                                src: newSrc,
-                                cache: "no-cache",
-                                signal,
-                            })
-                                .then((imageUrl) => {
-                                    img.src = imageUrl;
+                        imageQueue.add(
+                            ({ signal }) =>
+                                tileLoadFunction({
+                                    src: newSrc,
+                                    cache: "no-cache",
+                                    signal,
                                 })
-                                .catch((error) => {
-                                    if (error !== QUEUE_ABORT_REASON) {
-                                        console.error(error);
-                                    }
-                                    img.src = transparentImage;
-                                })
+                                    .then((imageUrl) => {
+                                        img.src = imageUrl;
+                                    })
+                                    .catch((error) => {
+                                        if (error !== QUEUE_ABORT_REASON) {
+                                            console.error(error);
+                                        }
+                                        img.src = transparentImage;
+                                    }),
+                            { id: item.id }
                         );
                     });
                 },

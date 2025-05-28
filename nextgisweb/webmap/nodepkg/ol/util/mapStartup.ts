@@ -22,6 +22,8 @@ export function mapStartup({
 
         if (isSameSize) {
             queue.abort();
+        } else {
+            queue.pause(queue.debounce);
         }
         lastSize = newSize;
     };
