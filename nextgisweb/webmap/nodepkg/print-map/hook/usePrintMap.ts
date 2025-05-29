@@ -5,6 +5,7 @@ import { defaults as defaultInteractions } from "ol/interaction";
 import { useCallback, useEffect, useState } from "react";
 
 import { imageQueue } from "@nextgisweb/pyramid/util";
+import { mapStartup } from "@nextgisweb/webmap/ol/util/mapStartup";
 
 import type { Display } from "../../display";
 import type { AnnotationsPopup } from "../../layer/annotations/AnnotationsPopup";
@@ -88,9 +89,7 @@ export function usePrintMap({ display }: { display: Display }) {
                 // Aborting the shared image queue too early prevents the main map from loading its layers.
                 // So we have to wait until it's fully loaded before using the queue for the print map.
                 imageQueue.waitAll().then(() => {
-                    map.on("movestart", () => {
-                        imageQueue.abort();
-                    });
+                    mapStartup({ olMap: map, queue: imageQueue });
                 });
             });
 

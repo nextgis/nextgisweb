@@ -24,6 +24,8 @@ import type { ButtonControlOptions } from "./control/createButtonControl";
 import { createControl } from "./control/createControl";
 import type { CoreLayer, ExtendedOlLayer } from "./layer/CoreLayer";
 import { PanelControl } from "./panel-control/PanelControl";
+import { mapStartup } from "./util/mapStartup";
+
 import "ol/ol.css";
 
 interface MapOptions extends OlMapOptions {
@@ -133,13 +135,11 @@ export class MapStore extends Watchable<MapWatchableProps> {
             olMap.on("moveend", () => {
                 this.setPosition(this.getPosition());
             });
-            // Workaround to scip first map move event on start
+            // Workaround to skip first map move event on start
             olMap.once("movestart", () => {
                 // Map ready only then first move happend
                 resolve();
-                olMap.on("movestart", () => {
-                    imageQueue.abort();
-                });
+                mapStartup({ olMap, queue: imageQueue });
             });
         });
     }
