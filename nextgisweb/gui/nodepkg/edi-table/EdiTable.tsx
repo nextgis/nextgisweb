@@ -21,7 +21,7 @@ import {
 import type { CSSProperties, FC, HTMLAttributes } from "react";
 
 import { Button, Table } from "../antd";
-import type { InputRef, TableColumnType, TableProps } from "../antd";
+import type { InputRef, TableColumnType, TableProps, TableRef } from "../antd";
 import { useKeydownListener } from "../hook";
 
 import type { EdiTableStore } from "./EdiTableStore";
@@ -30,7 +30,6 @@ import type { RowAction, RowActionConfig } from "./RowAction";
 import type { AnyObject, EdiTableColumn, FunctionKeys } from "./type";
 
 import { HolderOutlined } from "@ant-design/icons";
-
 import "./EdiTable.less";
 
 export interface EdiTableProps<
@@ -112,6 +111,8 @@ export const EdiTable = observer(
     }: EdiTableProps<EdiTableStore<R>, R>) => {
         const { moveRow, placeholder } = store;
 
+        const tableRef = useRef<TableRef | null>(null);
+
         const renderActs = useCallback(
             (row: R) => {
                 const actions: RowAction[] = [];
@@ -147,12 +148,19 @@ export const EdiTable = observer(
         const placeholderRef = useRef<InputRef | null>(null);
 
         const handleKeyDown = useCallback(() => {
+            const inputEl = placeholderRef.current?.input;
+            if (!inputEl) return;
+
             if (placeholderRef.current) {
                 placeholderRef.current.focus?.();
             }
         }, []);
-
-        useKeydownListener("Enter", handleKeyDown);
+        const nativeEl = tableRef.current?.nativeElement;
+        useKeydownListener(
+            "Enter",
+            handleKeyDown,
+            nativeEl ? { current: nativeEl } : undefined
+        );
 
         const tableDataSource = [...store.rows];
 
@@ -274,6 +282,7 @@ export const EdiTable = observer(
                     strategy={verticalListSortingStrategy}
                 >
                     <Table
+                        ref={tableRef}
                         className={classNames("ngw-gui-edi-table", className)}
                         dataSource={tableDataSource}
                         columns={tableColumns}

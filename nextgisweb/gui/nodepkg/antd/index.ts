@@ -79,7 +79,7 @@ export type { SizeType } from "antd/es/config-provider/SizeContext";
 export type { TextAreaProps } from "antd/es/input";
 export type { TableRowSelection } from "antd/es/table/interface";
 
-export type { TableProps } from "./table";
+export type { TableProps, TableRef } from "./table";
 export type { TabsProps } from "./tabs";
 export type { InputIntegerProps } from "./input-integer";
 export type { InputBigIntegerProps } from "./input-big-integer";

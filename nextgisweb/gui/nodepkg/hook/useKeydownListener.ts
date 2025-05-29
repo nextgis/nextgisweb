@@ -2,9 +2,11 @@ import { useCallback } from "react";
 
 import { useEventListener } from "./useEventListener";
 
-export function useKeydownListener(
+export function useKeydownListener<T extends HTMLElement = HTMLDivElement>(
     key: string,
-    handlerProp: (e: KeyboardEvent) => void
+    handlerProp: (e: KeyboardEvent) => void,
+    element?: React.RefObject<T>,
+    options?: boolean | AddEventListenerOptions
 ) {
     const handler_ = useCallback(
         (e: KeyboardEvent) => {
@@ -14,5 +16,11 @@ export function useKeydownListener(
         },
         [handlerProp, key]
     );
-    useEventListener("keydown", handler_);
+
+    useEventListener(
+        "keydown",
+        handler_,
+        element as React.RefObject<T>,
+        options
+    );
 }
