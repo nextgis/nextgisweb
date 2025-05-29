@@ -13,8 +13,14 @@ const template = `
     </div>
 </div>`;
 
+type createPopupContentProps = {
+    mode?: "compact" | "default";
+};
+
 // Here  annotation popup is created
-export function createPopupContent() {
+export function createPopupContent({
+    mode = "default",
+}: createPopupContentProps = {}) {
     const tempContainer = document.createElement("div");
     tempContainer.innerHTML = template;
     const content = tempContainer.firstElementChild as HTMLElement;
@@ -22,6 +28,9 @@ export function createPopupContent() {
     const description = content.querySelector(
         ".annotation-description"
     ) as HTMLElement;
+
+    description.classList.add(`annotation-description-mode--${mode}`);
+
     const icon = content.querySelector(".icon") as HTMLElement;
     const edit = content.querySelector(".annotation-edit") as HTMLElement;
     const editControls = content.querySelector(

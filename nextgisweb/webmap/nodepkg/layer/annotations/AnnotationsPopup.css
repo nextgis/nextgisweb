@@ -2,6 +2,7 @@
     --annotation-public: #97e07e;
     --annotation-own: #e8b3f8;
     --annotation-private: #f88f8f;
+    --annotation-description-max-width: 360px;
 }
 
 body .ol-popup.annotation .annotation-edit-controls {
@@ -70,4 +71,45 @@ body.annotations-edit .ol-popup.annotation:hover .annotation-edit-controls {
 
 .annotation-layer {
     z-index: -1;
+}
+
+.annotation-description {
+    display: block;
+    width: 100%;
+    max-width: var(--annotation-description-max-width);
+    max-height: 300px;
+    overflow: hidden;
+    overflow-y: auto;
+    overflow-wrap: anywhere;
+}
+
+.annotation-description > * img {
+    display: block;
+    box-sizing: border-box;
+    max-width: var(--annotation-description-max-width);
+    height: auto;
+}
+
+.annotation-description > * table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.annotation-description-mode--compact ul,
+.annotation-description-mode--compact ol {
+    margin-left: 0.5rem;
+    padding-left: 1rem;
+}
+
+.annotation-description-mode--compact ul ul,
+.annotation-description-mode--compact ol ol,
+.annotation-description-mode--compact ul ol,
+.annotation-description-mode--compact ol ul {
+    margin-left: 0.25rem;
+}
+
+.annotation-description-mode--default {
+    margin: auto;
 }
