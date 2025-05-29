@@ -1,6 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useEffect, useMemo, useRef } from "react";
 
+import { DescriptionComponent } from "@nextgisweb/gui/description";
 import type { Display } from "@nextgisweb/webmap/display";
 
 import { PanelContainer } from "../component";
@@ -30,12 +31,10 @@ const DescriptionPanel = observer<PanelPluginWidgetProps<DescriptionStore>>(
 
         const contentDiv = useMemo(() => {
             return (
-                <div
+                <DescriptionComponent
                     className="content"
+                    content={content ?? ""}
                     ref={nodeRef}
-                    dangerouslySetInnerHTML={{
-                        __html: content ?? "",
-                    }}
                 />
             );
         }, [content]);
