@@ -5,10 +5,10 @@ import { defaults as defaultInteractions } from "ol/interaction";
 import { useCallback, useEffect, useState } from "react";
 
 import { imageQueue } from "@nextgisweb/pyramid/util";
+import { mapStartup } from "@nextgisweb/webmap/ol/util/mapStartup";
 
 import type { Display } from "../../display";
 import type { AnnotationsPopup } from "../../layer/annotations/AnnotationsPopup";
-import { mapStartup } from "@nextgisweb/webmap/ol/util/mapStartup";
 
 function clearOlMap(map: OlMap) {
     map.getLayers().clear();

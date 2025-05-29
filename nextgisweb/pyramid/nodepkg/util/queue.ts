@@ -2,7 +2,7 @@ type RequestFunc = (opt: { signal: AbortSignal }) => Promise<unknown>;
 type Abort = () => void;
 
 type AbortableRequest = {
-    id?: string | number;
+    id: string | number;
     request: RequestFunc;
     abort?: Abort;
     abortController: AbortController;
@@ -42,14 +42,15 @@ export class RequestQueue {
         if (id !== undefined && id !== null) {
             this.removeById(id);
         }
-
-        this.queue.push({
-            id,
+        const queueItem: AbortableRequest = {
+            id: id ?? Math.random().toString(36).slice(2),
             request,
             abort,
             abortController: new AbortController(),
-        });
+        };
+        this.queue.push(queueItem);
         this.debouncedNext();
+        return queueItem;
     }
 
     abort() {

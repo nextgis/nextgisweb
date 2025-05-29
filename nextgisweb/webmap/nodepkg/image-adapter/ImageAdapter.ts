@@ -1,3 +1,5 @@
+import { getUid } from "ol/util";
+
 import { routeURL } from "@nextgisweb/pyramid/api";
 import {
     imageQueue,
@@ -49,7 +51,7 @@ export class ImageAdapter extends LayerDisplayAdapter {
                 },
                 ratio: 1,
                 crossOrigin: "anonymous",
-                imageLoadFunction: (imageTile, src) => {
+                imageLoadFunction: function (imageTile, src) {
                     const [url, query] = src.split("?");
                     const queryObject = parseQueryParams(query);
 
@@ -67,6 +69,8 @@ export class ImageAdapter extends LayerDisplayAdapter {
                         symbols;
 
                     const img = imageTile.getImage() as HTMLImageElement;
+                    const id = getUid(this);
+
                     // Use a timeout to prevent the queue from aborting right after adding,
                     // especially in cases with zoomToExtent.
                     setTimeout(() => {
@@ -86,7 +90,7 @@ export class ImageAdapter extends LayerDisplayAdapter {
                                         }
                                         img.src = transparentImage;
                                     }),
-                            { id: item.id }
+                            { id }
                         );
                     });
                 },
