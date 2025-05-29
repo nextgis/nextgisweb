@@ -6,6 +6,7 @@ import { observer } from "mobx-react-lite";
 import { useEffect, useMemo, useState } from "react";
 
 import { InputValue } from "../antd";
+import type { TableColumnType, TableProps } from "../antd";
 
 import { EdiTable } from "./EdiTable";
 import type { EdiTableStore } from "./EdiTableStore";
@@ -100,12 +101,27 @@ export default function EdiTableTestEntry() {
         });
     }, [store]);
 
+    const rowSelection: TableProps<Row>["rowSelection"] = {
+        type: "radio",
+        onChange: (
+            selectedRowKeys: React.Key[],
+            selectedRows: TableColumnType<any>[]
+        ) => {
+            console.log(
+                `selectedRowKeys: ${selectedRowKeys}`,
+                "selectedRows: ",
+                selectedRows
+            );
+        },
+    };
+
     return (
         <EdiTable<Row>
             card={true}
             columns={columns}
             store={store}
             rowKey="key"
+            rowSelection={rowSelection}
         />
     );
 }

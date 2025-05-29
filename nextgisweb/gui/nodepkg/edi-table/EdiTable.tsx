@@ -37,7 +37,7 @@ export interface EdiTableProps<
     S extends EdiTableStore,
     R extends AnyObject,
     T = FunctionKeys<S>,
-> extends Omit<TableProps, "columns"> {
+> extends Omit<TableProps<R>, "columns"> {
     rowActions?: T[] | RowActionConfig<T>[] | RowAction<R>[];
     store: S;
     columns: EdiTableColumn<R>[];
