@@ -1,7 +1,8 @@
 import type { Ref } from "react";
 
-import "./description.css";
 import { processHtml } from "./processHTML";
+
+import "./DescriptionComponent.less";
 
 type DescriptionComponent = {
     content: string;
@@ -23,7 +24,7 @@ const DescriptionComponent = ({
     return (
         <div
             ref={elementRef}
-            className={`description-html description-mode--${mode} ${className}`}
+            className={`ngw-gui-component-description-html ngw-gui-component-description-html-${mode} ${className}`}
         >
             {processedContent}
         </div>

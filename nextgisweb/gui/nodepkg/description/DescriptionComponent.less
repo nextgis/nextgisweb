@@ -1,0 +1,43 @@
+.ngw-gui-component-description-html {
+    max-width: 100%;
+    max-height: 100%;
+    overflow: hidden;
+    overflow-y: auto;
+    overflow-wrap: anywhere;
+
+    img {
+        max-width: 100% !important;
+        height: auto !important;
+    }
+
+    .ant-image {
+        max-width: 100% !important;
+        height: auto !important;
+    }
+
+    table {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    &-compact {
+        ul,
+        ol {
+            margin-left: 0.5rem;
+            padding-left: 1rem;
+        }
+
+        ul ul,
+        ol ol,
+        ul ol,
+        ol ul {
+            margin-left: 0.25rem;
+        }
+    }
+
+    &-default {
+        margin: auto;
+    }
+}
