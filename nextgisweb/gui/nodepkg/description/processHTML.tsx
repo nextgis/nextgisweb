@@ -6,7 +6,7 @@ import type React from "react";
 
 const processHtml: React.FC<string> = (
     htmlString: string,
-    onLinkClick?: (() => void) | null
+    onLinkClick?: (() => boolean) | null
 ): ReactNode => {
     const options: HTMLReactParserOptions = {
         replace: (node: DOMNode) => {
@@ -37,8 +37,9 @@ const processHtml: React.FC<string> = (
                             target={target}
                             onClick={(e) => {
                                 if (onLinkClick) {
-                                    e.preventDefault();
-                                    onLinkClick();
+                                    if (onLinkClick()) {
+                                        e.preventDefault();
+                                    }
                                 }
                             }}
                         >

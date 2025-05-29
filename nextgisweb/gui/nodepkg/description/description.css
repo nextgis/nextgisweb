@@ -3,6 +3,7 @@
     max-height: 100%;
     overflow: hidden;
     overflow-y: auto;
+    overflow-wrap: anywhere;
 }
 
 .description-html > * img {
@@ -13,4 +14,12 @@
 .description-html > * .ant-image {
     max-width: 100% !important;
     height: auto !important;
+}
+
+.description-html > * table {
+    display: block;
+    background-color: steelblue;
+    width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;
 }
