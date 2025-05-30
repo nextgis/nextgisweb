@@ -222,7 +222,6 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
             1 if add_alpha else 0,
             data_type=data_type if gdal.VersionInfo() < "3030300" else None,
         )  # https://github.com/OSGeo/gdal/issues/4469
-        ds_measure = None
 
         size_limit = comp.options["size_limit"]
         if size_limit is not None and size_expected > size_limit:
@@ -275,7 +274,23 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
 
         ds = gdal.Open(dst_file, gdalconst.GA_ReadOnly)
 
-        assert raster_size(ds) == size_expected, "Expected size mismatch"
+        try:
+            assert raster_size(ds) == size_expected, "Expected size mismatch"
+        except AssertionError:
+            # https://github.com/OSGeo/gdal/commit/6b5f015195ccf683b6ca5ab6a8425921516225c1
+            band = ds.GetRasterBand(1)
+            band_measure = ds_measure.GetRasterBand(1)
+            if band.DataType != band_measure.DataType:
+                logger.error(
+                    "Data type changed during warp from '%s' to '%s' (nodata: '%s')",
+                    gdal.GetDataTypeName(band.DataType),
+                    gdal.GetDataTypeName(band_measure.DataType),
+                    band.GetNoDataValue(),
+                )
+            else:
+                raise
+        finally:
+            ds_measure = None
 
         self.dtype = gdal.GetDataTypeName(data_type)
         self.xsize = ds.RasterXSize
