@@ -13,9 +13,18 @@ const processHtml: React.FC<string> = (
             if (node.type === "tag") {
                 const el = node;
 
+                const isInTextImage =
+                    el.name === "img" &&
+                    (el.nextSibling?.type === "text" ||
+                        el.previousSibling?.type === "text");
+
                 if (el.name === "img") {
                     const { src, alt } = el.attribs;
-                    return <Image src={src} alt={alt} />;
+                    if (isInTextImage) {
+                        return <img src={src} alt={alt} />;
+                    } else {
+                        return <Image src={src} alt={alt} />;
+                    }
                 }
 
                 if (el.name === "a" && el.attribs?.href) {
