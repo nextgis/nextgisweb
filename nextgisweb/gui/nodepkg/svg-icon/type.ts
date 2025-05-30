@@ -2,6 +2,7 @@ import type { ReactNode, SVGProps } from "react";
 
 export interface SvgIconProps extends SVGProps<SVGSVGElement> {
     icon?: string;
+    addClass?: string;
 }
 
 export interface SvgIconLink

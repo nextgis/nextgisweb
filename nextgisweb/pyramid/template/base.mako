@@ -83,7 +83,7 @@
         <div class="${' '.join(lclasses)}">
             <%include
                 file="nextgisweb:pyramid/template/header.mako"
-                args="title=system_name, hide_resource_filter=hasattr(self, 'hide_resource_filter')"
+                args="title=system_name"
             />
 
             <%

@@ -1,0 +1,62 @@
+.ngw-pyramid-dynmenu {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+
+    > li.label {
+        margin: 24px 0 6px 0;
+        border-bottom: 1px solid var(--divider-color);
+        color: var(--text-secondary);
+        text-transform: uppercase;
+
+        &:first-child {
+            margin-top: 0;
+        }
+    }
+
+    > li.item {
+        position: relative;
+        padding-top: 3px;
+        padding-bottom: 3px;
+
+        &:after {
+            position: absolute;
+            top: 0;
+            top: 0;
+            bottom: 0;
+            left: -24px;
+            opacity: 0;
+            background-color: var(--primary);
+            width: 3px;
+            content: "";
+        }
+
+        &:hover {
+            &:after {
+                opacity: 1;
+            }
+        }
+
+        &.selected {
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        > a {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--on-sidebar-text);
+            text-decoration: none;
+
+            &:hover {
+                color: var(--primary);
+            }
+
+            > svg.icon {
+                width: 16px;
+                height: 16px;
+            }
+        }
+    }
+}
