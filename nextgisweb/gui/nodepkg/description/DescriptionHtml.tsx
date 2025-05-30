@@ -2,9 +2,9 @@ import type { Ref } from "react";
 
 import { processHtml } from "./processHTML";
 
-import "./DescriptionComponent.less";
+import "./DescriptionHtml.less";
 
-type DescriptionComponent = {
+type DescriptionHtml = {
     content: string;
     onLinkClick?: (() => void) | null;
     elementRef?: Ref<HTMLDivElement> | null;
@@ -12,13 +12,13 @@ type DescriptionComponent = {
     mode?: "compact" | "default";
 };
 
-const DescriptionComponent = ({
+const DescriptionHtml = ({
     content,
     onLinkClick = null,
     elementRef = null,
     className = "",
     mode = "default",
-}: DescriptionComponent) => {
+}: DescriptionHtml) => {
     const processedContent = processHtml(content, onLinkClick);
 
     return (
@@ -31,6 +31,6 @@ const DescriptionComponent = ({
     );
 };
 
-DescriptionComponent.displayName = "Description";
+DescriptionHtml.displayName = "Description";
 
-export { DescriptionComponent };
+export { DescriptionHtml };

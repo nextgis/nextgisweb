@@ -1,5 +1,5 @@
 // import { ContentCard } from "@nextgisweb/gui/component";
-import { DescriptionComponent } from "@nextgisweb/gui/description";
+import { DescriptionHtml } from "@nextgisweb/gui/description";
 import { assert } from "@nextgisweb/jsrealm/error";
 
 import type { ResourceSection } from "../type";
@@ -10,7 +10,7 @@ export const ResourceSectionDescription: ResourceSection = ({
     const description = resourceData.resource.description;
     assert(description);
 
-    return <DescriptionComponent content={description} />;
+    return <DescriptionHtml content={description} />;
 };
 
 ResourceSectionDescription.displayName = "ResourceSectionDescription";

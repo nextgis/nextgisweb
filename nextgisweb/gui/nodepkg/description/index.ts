@@ -1,1 +1,1 @@
-export { DescriptionComponent } from "./DescriptionComponent";
+export { DescriptionHtml } from "./DescriptionHtml";

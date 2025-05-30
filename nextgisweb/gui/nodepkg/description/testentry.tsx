@@ -1,7 +1,7 @@
 /** @testentry react */
 import { testContent } from "./testContent";
 
-import { DescriptionComponent } from "./index";
+import { DescriptionHtml } from "./index";
 
 export default function DescriptionComponentTestEntry() {
     return (
@@ -12,7 +12,7 @@ export default function DescriptionComponentTestEntry() {
                     border: "2px solid black",
                 }}
             >
-                <DescriptionComponent content={testContent} />
+                <DescriptionHtml content={testContent} />
             </div>
 
             <br />
@@ -23,7 +23,7 @@ export default function DescriptionComponentTestEntry() {
                     border: "2px solid black",
                 }}
             >
-                <DescriptionComponent mode="compact" content={testContent} />
+                <DescriptionHtml mode="compact" content={testContent} />
             </div>
         </>
     );
