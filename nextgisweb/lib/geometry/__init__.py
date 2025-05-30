@@ -176,7 +176,7 @@ class Transformer:
                 result = ogr_geom.Transform(self._transformation)
                 if result != 0:
                     raise ValueError(gdal.GetLastErrorMsg())
-            except TypeError:
+            except (NotImplementedError, TypeError):
                 raise ValueError(gdal.GetLastErrorMsg())
         return Geometry.from_ogr(ogr_geom)
 
