@@ -18,15 +18,6 @@ const processHtml: React.FC<string> = (
                     return <Image src={src} alt={alt} />;
                 }
 
-                // there are warning about divs inside p, maybe should be handled in different way
-                if (el.name === "p") {
-                    return (
-                        <div>
-                            {domToReact(el.children as DOMNode[], options)}
-                        </div>
-                    );
-                }
-
                 if (el.name === "a" && el.attribs?.href) {
                     const href = el.attribs.href;
                     const target = el.attribs.target;
