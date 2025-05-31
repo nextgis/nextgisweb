@@ -16,7 +16,7 @@ from nextgisweb.pyramid import JSONType
 from nextgisweb.resource import DataScope, Resource, ResourceFactory
 from nextgisweb.spatial_ref_sys import SRS
 
-from .dtutil import DT_DATATYPES, DT_DUMPERS, DT_LOADERS
+from .dtutil import DT_DATATYPES, DT_DUMPERS, DT_LOADERS, DtFormat
 from .exception import FeatureNotFound
 from .extension import FeatureExtension
 from .feature import Feature
@@ -32,14 +32,15 @@ from .versioning import FVersioningNotEnabled, FVersioningOutOfRange
 FeatureID = Annotated[int, Meta(description="Feature ID")]
 
 ParamGeomNull = Annotated[
-    bool, Meta(description="Write NULL geometries if true, and skip them otherwise")
+    bool,
+    Meta(description="Write NULL geometries if true, and skip them otherwise"),
 ]
 ParamGeomFormat = Annotated[
     Literal["wkt", "geojson"],
     Meta(description="Geometry serialization format"),
 ]
 ParamDtFormat = Annotated[
-    Literal["iso", "obj"],
+    DtFormat,
     Meta(description="Date and time serialization format"),
 ]
 ParamSrs = Union[Annotated[int, Meta(gt=0)], None]

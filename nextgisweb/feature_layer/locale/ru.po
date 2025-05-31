@@ -1,12 +1,12 @@
-#: api.py:98 api_identify.py:27
+#: api.py:99 api_identify.py:27
 msgid "Geometry is not valid."
 msgstr "Невалидная геометрия"
 
-#: api.py:353
+#: api.py:354
 msgid "Unknown spatial reference system"
 msgstr "Неизвестная система координат"
 
-#: api.py:428 api_export.py:206
+#: api.py:429 api_export.py:206
 msgid "Parameter 'intersects' geometry is not valid."
 msgstr "Параметр 'intersects' содержит невалидную геометрию."
 
@@ -25,6 +25,24 @@ msgstr "Не удалось перепроецировать геометрию 
 #: api_export.py:428
 msgid "File name parameter '{}' is not valid."
 msgstr "Недопустимое имя файла '{}'."
+
+#: dtutil.py:28
+msgid "Got an invalid date-time value in the legacy format: {}."
+msgstr "Получено некорректное значение даты-времени в устаревшем формате: {}."
+
+#: dtutil.py:29
+msgid "Please use dt_format=iso and ISO-8601 based format."
+msgstr "Пожалуйста, используйте dt_format=iso и формат, основанный на ISO-8601."
+
+#: dtutil.py:37
+msgid "Got an invalid date-time value in ISO-8601 format: {}."
+msgstr "Получено некорректное значение даты-времени в формате ISO-8601: {}."
+
+#: dtutil.py:38
+msgid "Value should be in RFC 3339 {} format without timezone and leap seconds."
+msgstr ""
+"Значение должно быть в формате RFC 3339 {} без часового пояса и секунд "
+"координации."
 
 #: exception.py:7
 msgid "Feature not found"
