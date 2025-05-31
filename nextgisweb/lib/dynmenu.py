@@ -1,7 +1,22 @@
+from typing import Any, Callable, Iterable, cast, overload
+
+from nextgisweb.lib.i18n import TranslatableOrStr
+
+DynMenuFactory = Callable[[Any], Iterable["Item"]]
+
+
 class DynMenu:
-    def __init__(self, *args):
+    def __init__(self, *args: "Item" | DynMenuFactory):
         self._items = list(args)
         self._filters = list()
+
+    @overload
+    def add(self, *items: "Item"):
+        ...
+
+    @overload
+    def add(self, item: DynMenuFactory, /):
+        ...
 
     def add(self, *items):
         self._items.extend(items)
@@ -10,12 +25,9 @@ class DynMenu:
         self._filters.append(func)
 
     def build(self, args):
-        result = list()
-
+        result: list[Item] = list()
         for item in self._items:
-            if isinstance(item, DynItem):
-                result.extend(item.build(args))
-            elif callable(item):
+            if callable(item):
                 result.extend(item(args))
             else:
                 result.append(item.copy())
@@ -30,96 +42,59 @@ class DynMenu:
 
 
 class Item:
-    def __init__(self, key):
-        self._key = tuple(key.split("/")) if isinstance(key, str) else (() if key is None else key)
+    def __init__(self, key: str | tuple[str, ...]):
+        if isinstance(key, str):
+            _key = tuple(key.split("/"))
+        elif key is None:
+            _key = cast(tuple[str, ...], ())
+        else:
+            _key = key
+        self.key = _key
 
     def copy(self):
         return Item(self.key)
 
     @property
-    def key(self):
-        return self._key
-
-    @property
     def level(self):
-        return len(self._key) - 1
-
-
-class DynItem(Item):
-    def __init__(self, key=None):
-        super().__init__(key)
-
-    def copy(self):
-        raise NotImplementedError()
-
-    def sub(self, value):
-        if not self.key:
-            return value
-        else:
-            if isinstance(value, str):
-                value = tuple(value.split("/"))
-            return self.key + value
-
-    def build(self, args):
-        pass
+        return len(self.key) - 1
 
 
 class Label(Item):
-    def __init__(self, key, label):
+    def __init__(self, key: str | tuple[str, ...], label: TranslatableOrStr):
         super().__init__(key)
-        self._label = label
+        self.label = label
 
     def copy(self):
-        return Label(self.key, self.label)
-
-    @property
-    def label(self):
-        return self._label
+        return Label(self.key, label=self.label)
 
 
 class Link(Item):
     def __init__(
-        self, key, label, url, *, important=False, target="_self", icon=None, icon_suffix=None
+        self,
+        key: str | tuple[str, ...],
+        label: TranslatableOrStr,
+        url: Callable[[Any], str],
+        *,
+        important: bool = False,
+        target: str = "_self",
+        icon: str | None = None,
+        icon_suffix: str | None = None,
     ):
         super().__init__(key)
-        self._label = label
-        self._url = url
-        self._important = important
-        self._target = target
-        self._icon = icon
-        self._icon_suffix = icon_suffix
+        self.label = label
+        self.url = url
+        self.important = important
+        self.target = target
+        self.icon = icon
+        self.icon_suffix = icon_suffix
 
     def copy(self):
         return Link(
             self.key,
-            self.label,
-            self.url,
+            label=self.label,
+            url=self.url,
             important=self.important,
             target=self.target,
             icon=self.icon,
             icon_suffix=self.icon_suffix,
         )
-
-    @property
-    def label(self):
-        return self._label
-
-    @property
-    def url(self):
-        return self._url
-
-    @property
-    def icon(self):
-        return self._icon
-
-    @property
-    def important(self):
-        return self._important
-
-    @property
-    def target(self):
-        return self._target
-
-    @property
-    def icon_suffix(self):
-        return self._icon_suffix
