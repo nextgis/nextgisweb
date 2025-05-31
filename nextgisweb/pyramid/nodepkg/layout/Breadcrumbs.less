@@ -1,0 +1,38 @@
+.ngw-pyramid-layout-breadcrumbs,
+.ngw-pyramid-layout-breadcrumbs-stub:empty {
+    min-height: 22px;
+    color: var(--theme-color-text-tertiary);
+
+    > span {
+        &::before {
+            vertical-align: 30%;
+            opacity: 0.5;
+            margin-inline: 8px 4px;
+            margin-block: 4px;
+            content: "●";
+            font-size: 6px;
+        }
+
+        &:first-child::before {
+            display: none;
+        }
+
+        > a {
+            color: inherit;
+            text-decoration: none;
+
+            > svg.icon {
+                opacity: 0.75;
+                margin-inline-end: 4px;
+            }
+
+            &:hover {
+                color: var(--theme-color-link-active);
+
+                > svg.icon {
+                    opacity: revert;
+                }
+            }
+        }
+    }
+}

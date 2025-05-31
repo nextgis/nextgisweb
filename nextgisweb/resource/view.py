@@ -19,7 +19,7 @@ from nextgisweb.core.exception import InsufficientPermissions
 from nextgisweb.gui import react_renderer
 from nextgisweb.jsrealm import icon, jsentry
 from nextgisweb.pyramid import JSONType
-from nextgisweb.pyramid.breadcrumb import Breadcrumb, breadcrumb_adapter
+from nextgisweb.pyramid.breadcrumb import Breadcrumb
 
 from .event import OnChildClasses, OnDeletePrompt
 from .exception import ResourceNotFound
@@ -91,14 +91,16 @@ class ResourceFactory:
 resource_factory = ResourceFactory()
 
 
-@breadcrumb_adapter
+@Breadcrumb.register
 def resource_breadcrumb(obj, request):
     if isinstance(obj, Resource):
-        return Breadcrumb(
-            label=obj.display_name,
-            link=request.route_url("resource.show", id=obj.id),
-            icon=f"rescls-{obj.cls}",
-            parent=obj.parent,
+        return (
+            Breadcrumb(
+                label=obj.display_name,
+                link=request.route_url("resource.show", id=obj.id),
+                icon=f"rescls-{obj.cls}",
+            ),
+            obj.parent,
         )
 
 

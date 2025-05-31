@@ -3,11 +3,10 @@
 <%!
     from types import SimpleNamespace
     from msgspec import NODEFAULT
+    from nextgisweb.gui.view import REACT_BOOT_JSENTRY
     from nextgisweb.pyramid.breadcrumb import breadcrumb_path
-    from nextgisweb.pyramid.view import ICON_JSENTRY
+    from nextgisweb.pyramid.view import ICON_JSENTRY, LAYOUT_JSENTRY
 %>
-
-<%namespace file="nextgisweb:pyramid/template/util.mako" import="icon_svg"/>
 
 <%
     effective_title = None if title is UNDEFINED else title
@@ -21,6 +20,7 @@
     system_name = request.env.core.system_full_name()
     head_title = (tr(effective_title) + " | " + system_name) if (effective_title is not None) else (system_name)
 %>
+
 <html>
 <head>
     <title>${head_title}</title>
@@ -95,20 +95,16 @@
                 <div class="ngw-pyramid-layout-mwrapper">
                     <div id="main" class="ngw-pyramid-layout-main">
                         %if len(bcpath) > 0:
-                            <div class="ngw-pyramid-layout-bcrumb">
-                                %for idx, bc in enumerate(bcpath):
-                                    <span>
-                                        <a href="${bc.link}">
-                                            %if bc.icon:
-                                                ${icon_svg(bc.icon)}
-                                            %endif
-                                            %if bc.label:
-                                                ${tr(bc.label)}
-                                            %endif
-                                        </a>
-                                    </span>
-                                %endfor
-                            </div>
+                            <div id="breadcrumbs" class="ngw-pyramid-layout-breadcrumbs-stub"></div>
+                            <script type="text/javascript">
+                                Promise.all([
+                                    ngwEntry(${json_js(REACT_BOOT_JSENTRY)}).then((m) => m.default),
+                                    ngwEntry(${json_js(LAYOUT_JSENTRY)}),
+                                ]).then(([reactBoot, {Breadcrumbs}]) => {
+                                    const props = ${json_js({"items": bcpath})};
+                                    reactBoot(Breadcrumbs,  props, document.getElementById("breadcrumbs"));
+                                });
+                            </script>
                         %endif
 
                         <h1 id="title" class="ngw-pyramid-layout-title">
