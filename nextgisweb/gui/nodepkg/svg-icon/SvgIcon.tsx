@@ -1,8 +1,10 @@
+import classNames from "classnames";
+
 import type { SvgIconProps } from "./type";
 
-export function SvgIcon({ icon, ...rest }: SvgIconProps) {
+export function SvgIcon({ icon, className, ...rest }: SvgIconProps) {
     return (
-        <svg className="icon" {...rest}>
+        <svg className={classNames("icon", className)} {...rest}>
             <use xlinkHref={`#icon-${icon}`} />
         </svg>
     );

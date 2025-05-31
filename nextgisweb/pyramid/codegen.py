@@ -7,6 +7,7 @@ from typing import Any, Dict, List, Literal, Sequence, Tuple, Type, Union, cast
 from msgspec import NODEFAULT, Struct, UnsetType, defstruct, field
 from pyramid.response import Response
 
+import nextgisweb.lib.dynmenu as dm
 from nextgisweb.lib.apitype import unannotate
 
 from nextgisweb.jsrealm.tsgen import TSGenerator
@@ -168,6 +169,20 @@ def api_load_module(config) -> str:
         )
 
     return "\n".join(code)
+
+
+def dynmenu(config) -> str:
+    tsgen = TSGenerator()
+    route_tsmodule = "@nextgisweb/pyramid/layout/dynmenu/type"
+    tsgen.add(dm.Label.JSON, export=(route_tsmodule, "DynMenuLabel"))
+    tsgen.add(dm.Link.JSON, export=(route_tsmodule, "DynMenuLink"))
+    tsgen.add(
+        Union[dm.Label.JSON, dm.Link.JSON],
+        export=(route_tsmodule, "DynMenuItem"),
+    )
+
+    eslint = eslint_disable(("prettier/prettier",))
+    return "\n".join(eslint + [m.code for m in tsgen.compile()] + [""])
 
 
 def route(comp) -> str:

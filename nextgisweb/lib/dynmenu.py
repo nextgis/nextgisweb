@@ -1,5 +1,7 @@
 from typing import Any, Callable, Iterable, cast, overload
 
+from msgspec import Struct
+
 from nextgisweb.lib.i18n import TranslatableOrStr
 
 DynMenuFactory = Callable[[Any], Iterable["Item"]]
@@ -40,6 +42,19 @@ class DynMenu:
 
         return result
 
+    def json(self, args):
+        result: list[Item.JSON] = []
+        label = None
+        for item in self.build(args):
+            if isinstance(item, Label):
+                label = item
+            else:
+                if label is not None:
+                    result.append(label.json(args))
+                    label = None
+                result.append(item.json(args))
+        return result
+
 
 class Item:
     def __init__(self, key: str | tuple[str, ...]):
@@ -58,6 +73,12 @@ class Item:
     def level(self):
         return len(self.key) - 1
 
+    class JSON(Struct, kw_only=True):
+        key: list[str]
+
+    def json(self, args) -> JSON:
+        raise NotImplementedError
+
 
 class Label(Item):
     def __init__(self, key: str | tuple[str, ...], label: TranslatableOrStr):
@@ -66,6 +87,16 @@ class Label(Item):
 
     def copy(self):
         return Label(self.key, label=self.label)
+
+    class JSON(Item.JSON, tag="label", kw_only=True):
+        label: str
+
+    def json(self, args) -> JSON:
+        translate = args.request.translate
+        return Label.JSON(
+            key=list(self.key),
+            label=translate(self.label),
+        )
 
 
 class Link(Item):
@@ -97,4 +128,25 @@ class Link(Item):
             target=self.target,
             icon=self.icon,
             icon_suffix=self.icon_suffix,
+        )
+
+    class JSON(Item.JSON, tag="link", kw_only=True):
+        label: str
+        url: str
+        target: str
+        icon: str | None
+        icon_suffix: str | None
+        selected: bool
+
+    def json(self, args) -> JSON:
+        translate = args.request.translate
+        url = self.url(args)
+        return Link.JSON(
+            key=list(self.key),
+            label=translate(self.label),
+            url=url,
+            target=self.target,
+            icon=self.icon,
+            icon_suffix=self.icon_suffix,
+            selected=url == args.request.url,
         )
