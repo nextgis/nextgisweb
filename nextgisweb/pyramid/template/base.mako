@@ -65,6 +65,23 @@
     ${include_head | n}
 </head>
 
+<%def name="render_dynmenu()">
+    <%
+        dynmenu_kwargs = SimpleNamespace(request=request)
+        if (dynmenu := context.get("dynmenu", NODEFAULT)) is NODEFAULT:
+            if obj and (dynmenu := getattr(obj, "__dynmenu__", NODEFAULT)) is not NODEFAULT:
+                dynmenu_kwargs.obj = obj
+    %>
+    %if (dynmenu is not NODEFAULT) and dynmenu:
+        <div class="ngw-pyramid-layout-sidebar">
+            <%include
+                file="nextgisweb:pyramid/template/dynmenu.mako"
+                args="dynmenu=dynmenu, args=dynmenu_kwargs"
+            />
+        </div>
+    %endif
+</%def>
+
 <body>
     %if not custom_layout:
         <%
@@ -74,19 +91,6 @@
         %>
         <div class="${' '.join(lclasses)}">
             <%include file="nextgisweb:pyramid/template/header.mako" args="header=system_name"/>
-            <%
-                if (dynmenu := context.get("dynmenu", NODEFAULT)) is not NODEFAULT:
-                    if dynmenu:
-                        dynmenu_kwargs = context.get('dynmenu_kwargs', SimpleNamespace(request=request))
-                    else:
-                        dynmenu_kwargs = None
-                elif obj and (dynmenu := getattr(obj,'__dynmenu__', None)):
-                    dynmenu_kwargs = SimpleNamespace(obj=obj, request=request)
-                else:
-                    dynmenu_kwargs = None
-                has_dynmenu = dynmenu_kwargs is not None
-            %>
-
             <div class="ngw-pyramid-layout-crow">
                 <div class="ngw-pyramid-layout-mwrapper">
                     <div id="main" class="ngw-pyramid-layout-main">
@@ -118,14 +122,7 @@
                         %endif
                     </div>
                 </div>
-                %if has_dynmenu:
-                    <div class="ngw-pyramid-layout-sidebar">
-                        <%include
-                            file="nextgisweb:pyramid/template/dynmenu.mako"
-                            args="dynmenu=dynmenu, args=dynmenu_kwargs"
-                        />
-                    </div>
-                %endif
+                ${render_dynmenu()}
             </div>
         </div>
     %else:
