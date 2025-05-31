@@ -73,7 +73,8 @@ def read_dataset(filename, **kw):
         ogrfn = str(filename)
 
     result = gdal.OpenEx(ogrfn, 0, **kw)
-    result._piggyback_ref = tempdir
+    if (result is not None) and (tempdir is not None):
+        result._piggyback_ref = tempdir
     return result
 
 
