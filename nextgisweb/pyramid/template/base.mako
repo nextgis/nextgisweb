@@ -11,10 +11,6 @@
 
 <%
     effective_title = None if title is UNDEFINED else title
-    if hasattr(next, 'title'):
-        new_title = next.title()
-        effective_title = new_title if (new_title is not None) else effective_title
-
     bcpath = list()
     if obj is not UNDEFINED:
         bcpath = breadcrumb_path(obj, request)
@@ -47,10 +43,6 @@
     <%include file="nextgisweb:pyramid/template/client_config.mako" />
     <script src="${request.static_url('main/ngwEntry.js')}"></script>
     
-    %if hasattr(self, 'assets'):
-        ${self.assets()}
-    %endif
-
     %if hasattr(self, 'head'):
         ${self.head()}
     %endif
@@ -73,7 +65,7 @@
     ${include_head | n}
 </head>
 
-<body class="<%block name='body_class'/>">
+<body>
     %if not custom_layout:
         <%
             lclasses = ["ngw-pyramid-layout"]
@@ -81,11 +73,7 @@
             if maxheight: lclasses += ["ngw-pyramid-layout-vstretch"]
         %>
         <div class="${' '.join(lclasses)}">
-            <%include
-                file="nextgisweb:pyramid/template/header.mako"
-                args="title=system_name, hide_resource_filter=hasattr(self, 'hide_resource_filter')"
-            />
-
+            <%include file="nextgisweb:pyramid/template/header.mako" args="header=system_name"/>
             <%
                 if (dynmenu := context.get("dynmenu", NODEFAULT)) is not NODEFAULT:
                     if dynmenu:
@@ -121,9 +109,6 @@
 
                         <h1 id="title" class="ngw-pyramid-layout-title">
                             ${tr(effective_title)}
-                            %if hasattr(next, 'title_ext'):
-                                <div class="ext">${next.title_ext()}</div>
-                            %endif
                         </h1>
 
                         %if hasattr(next, 'body'):
@@ -133,15 +118,7 @@
                         %endif
                     </div>
                 </div>
-                <% 
-                    sidebar = getattr(next, 'sidebar', None)
-                    has_sidebar = getattr(next, 'has_sidebar', lambda: True)()
-                %>
-                %if not has_sidebar:
-                    <% pass %>
-                %elif sidebar := getattr(next, 'sidebar', None):
-                    <div class="ngw-pyramid-layout-sidebar">${sidebar()}</div>
-                %elif has_dynmenu:
+                %if has_dynmenu:
                     <div class="ngw-pyramid-layout-sidebar">
                         <%include
                             file="nextgisweb:pyramid/template/dynmenu.mako"

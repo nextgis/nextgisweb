@@ -2,13 +2,8 @@
 
 <%inherit file='nextgisweb:pyramid/template/base.mako' />
 
-<% system_name = request.env.core.system_full_name() %>
-
 <div class="ngw-pyramid-layout">
-    <%include
-        file="nextgisweb:pyramid/template/header.mako"
-        args="title=system_name, hide_resource_filter=True"
-    />
+    <%include file="nextgisweb:pyramid/template/header.mako"/>
     <div
         id="content"
         class="ngw-pyramid-layout-crow"

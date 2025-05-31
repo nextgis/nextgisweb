@@ -1,8 +1,5 @@
 <%inherit file='nextgisweb:pyramid/template/base.mako' />
 
-<%def name="has_sidebar()"><% return selected is not None %></%def>
-<%def name="sidebar()">${dynmenu()}</%def>
-
 <%def name="dynmenu()">
     <script type="text/javascript">
         (function () {
