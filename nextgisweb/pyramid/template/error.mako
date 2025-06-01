@@ -11,13 +11,9 @@
     ></div>
 </div>
 
-<script type="text/javascript">
-    ngwEntry(${json_js(REACT_BOOT_JSENTRY)}).then(({ default: reactBoot}) => {
-        reactBoot(
-            ${json_js(entrypoint)},
-            ${json_js(dict(error=error_json))},
-            "content",
-            { name: "ErrorPage" }
-        );
-    });
-</script>
+<%include file="nextgisweb:gui/template/react_boot.mako" args="
+    jsentry=entrypoint,
+    name='ErrorPage',
+    props={'error': error_json},
+    element='content',
+"/>

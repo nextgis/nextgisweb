@@ -72,7 +72,6 @@ def display_view(obj, request, *, entrypoint):
     return dict(
         entrypoint=entrypoint,
         obj=obj,
-        id=obj.id,
         title=title,
         custom_layout=True,
     )

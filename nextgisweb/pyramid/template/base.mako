@@ -3,7 +3,6 @@
 <%!
     from types import SimpleNamespace
     from msgspec import NODEFAULT
-    from nextgisweb.gui.view import REACT_BOOT_JSENTRY
     from nextgisweb.pyramid.breadcrumb import breadcrumb_path
     from nextgisweb.pyramid.view import ICON_JSENTRY, LAYOUT_JSENTRY
 %>
@@ -96,15 +95,12 @@
                     <div id="main" class="ngw-pyramid-layout-main">
                         %if len(bcpath) > 0:
                             <div id="breadcrumbs" class="ngw-pyramid-layout-breadcrumbs-stub"></div>
-                            <script type="text/javascript">
-                                Promise.all([
-                                    ngwEntry(${json_js(REACT_BOOT_JSENTRY)}).then((m) => m.default),
-                                    ngwEntry(${json_js(LAYOUT_JSENTRY)}),
-                                ]).then(([reactBoot, {Breadcrumbs}]) => {
-                                    const props = ${json_js({"items": bcpath})};
-                                    reactBoot(Breadcrumbs,  props, document.getElementById("breadcrumbs"));
-                                });
-                            </script>
+                            <%include file="nextgisweb:gui/template/react_boot.mako" args="
+                                jsentry=LAYOUT_JSENTRY,
+                                name='Breadcrumbs',
+                                props={'items': bcpath},
+                                element='breadcrumbs',
+                            "/>
                         %endif
 
                         <h1 id="title" class="ngw-pyramid-layout-title">
