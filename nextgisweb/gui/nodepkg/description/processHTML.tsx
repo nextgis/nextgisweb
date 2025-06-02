@@ -6,7 +6,7 @@ import type React from "react";
 
 const processHtml: React.FC<string> = (
     htmlString: string,
-    onLinkClick?: (() => boolean) | null
+    onLinkClick?: ((e: React.MouseEvent<HTMLAnchorElement>) => boolean) | null
 ): ReactNode => {
     const options: HTMLReactParserOptions = {
         replace: (node: DOMNode) => {
@@ -30,14 +30,13 @@ const processHtml: React.FC<string> = (
                 if (el.name === "a" && el.attribs?.href) {
                     const href = el.attribs.href;
                     const target = el.attribs.target;
-
                     return (
                         <a
                             href={href}
                             target={target}
                             onClick={(e) => {
                                 if (onLinkClick) {
-                                    if (onLinkClick()) {
+                                    if (onLinkClick(e)) {
                                         e.preventDefault();
                                     }
                                 }

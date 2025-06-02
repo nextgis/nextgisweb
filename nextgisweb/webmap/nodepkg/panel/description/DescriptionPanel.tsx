@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { useEffect, useMemo, useRef } from "react";
+import { useMemo, useRef } from "react";
 
 import { DescriptionHtml } from "@nextgisweb/gui/description";
 import type { Display } from "@nextgisweb/webmap/display";
@@ -35,35 +35,26 @@ const DescriptionPanel = observer<PanelPluginWidgetProps<DescriptionStore>>(
                     className="content"
                     content={content ?? ""}
                     elementRef={nodeRef}
+                    onLinkClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
+                        const href = e?.currentTarget.getAttribute("href");
+                        e?.currentTarget.setAttribute("target", "_blank");
+
+                        if (href && /^\d+:\d+$/.test(href)) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            const [resourceId, featureId] = href.split(":");
+                            zoomToFeature(
+                                display,
+                                Number(resourceId),
+                                Number(featureId)
+                            );
+                            return true;
+                        }
+                        return false;
+                    }}
                 />
             );
-        }, [content]);
-
-        useEffect(() => {
-            if (!nodeRef || !nodeRef.current) {
-                console.warn("InfoPanel: nodeRef | nodeRef.current are empty");
-                return;
-            }
-
-            nodeRef.current.querySelectorAll("a, span").forEach((el) => {
-                const tagName = el.tagName.toLowerCase();
-                const linkText = el.getAttribute(
-                    tagName === "a" ? "href" : "data-target"
-                );
-                if (linkText && /^\d+:\d+$/.test(linkText)) {
-                    el.addEventListener("click", (e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        const [resourceId, featureId] = linkText.split(":");
-                        zoomToFeature(
-                            display,
-                            Number(resourceId),
-                            Number(featureId)
-                        );
-                    });
-                }
-            });
-        }, [display]);
+        }, [content, display]);
 
         return (
             <PanelContainer

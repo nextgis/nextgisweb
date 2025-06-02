@@ -6,7 +6,7 @@ import "./DescriptionHtml.less";
 
 type DescriptionHtml = {
     content: string;
-    onLinkClick?: (() => void) | null;
+    onLinkClick?: ((e: React.MouseEvent<HTMLAnchorElement>) => void) | null;
     elementRef?: Ref<HTMLDivElement> | null;
     className?: string;
     mode?: "compact" | "default";
