@@ -2,7 +2,7 @@ import pytest
 import sqlalchemy as sa
 
 from nextgisweb.env import DBSession
-from nextgisweb.lib.osrhelper import sr_from_epsg
+from nextgisweb.lib.osrhelper import sr_from_epsg, sr_from_wkt
 
 from nextgisweb.core.exception import ValidationError
 
@@ -18,6 +18,11 @@ from ..model import (
 WKT_EPSG_3395 = 'PROJCS["WGS 84 / World Mercator",GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]],PROJECTION["Mercator_1SP"],PARAMETER["central_meridian",0],PARAMETER["scale_factor",1],PARAMETER["false_easting",0],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["Easting",EAST],AXIS["Northing",NORTH],AUTHORITY["EPSG","3395"]]'
 
 
+def get_postgis_wkt(srid):
+    qpg = sa.text("SELECT srtext FROM spatial_ref_sys WHERE srid = :id")
+    return DBSession.connection().execute(qpg, dict(id=srid)).scalar()
+
+
 def test_postgis_sync(ngw_txn):
     obj = SRS(wkt=WKT_EPSG_4326, display_name="")
     obj.persist()
@@ -25,21 +30,38 @@ def test_postgis_sync(ngw_txn):
 
     assert obj.id >= SRID_LOCAL
 
-    qpg = sa.text("SELECT srtext FROM spatial_ref_sys WHERE srid = :id")
-
-    (srtext,) = DBSession.connection().execute(qpg, dict(id=obj.id)).fetchone()
+    srtext = get_postgis_wkt(obj.id)
     assert obj.wkt == srtext
 
     obj.wkt = WKT_EPSG_3857
     DBSession.flush()
 
-    (srtext,) = DBSession.connection().execute(qpg, dict(id=obj.id)).fetchone()
+    srtext = get_postgis_wkt(obj.id)
     assert obj.wkt == srtext
 
     DBSession.delete(obj)
     DBSession.flush()
 
-    assert DBSession.connection().execute(qpg, dict(id=obj.id)).fetchone() is None
+    assert get_postgis_wkt(obj.id) is None
+
+
+def test_wkt_long(ngw_txn):
+    wkt_long = (" " * 2048) + WKT_EPSG_3857
+    sr = sr_from_wkt(wkt_long)
+
+    srs = SRS(wkt=wkt_long, display_name="Test long WKT")
+    srs.persist()
+    DBSession.flush()
+
+    sr_long = sr_from_wkt(srs.wkt)
+    assert sr.IsSame(sr_long)
+
+    sr_short = sr_from_wkt(srs.wkt_short)
+    assert sr.IsSame(sr_short)
+
+    wkt_postgis = get_postgis_wkt(srs.id)
+    sr_postgis = sr_from_wkt(wkt_postgis)
+    assert sr.IsSame(sr_postgis)
 
 
 @pytest.mark.parametrize(

@@ -5,11 +5,10 @@ from sqlalchemy.orm import declared_attr
 from zope.sqlalchemy import mark_changed
 
 from nextgisweb.env import Base, DBSession, gettext
-from nextgisweb.lib.osrhelper import sr_from_wkt
+from nextgisweb.lib.osrhelper import SpatialReferenceError, sr_from_wkt
 
 from nextgisweb.auth import Permission
-
-from .util import convert_to_proj
+from nextgisweb.core.exception import ValidationError
 
 SRID_MAX = 998999  # PostGIS maximum srid (srs.id)
 SRID_LOCAL = 990001  # First local srid (srs.id)
@@ -43,6 +42,9 @@ class SRS(Base):
     auth_name = sa.Column(sa.Unicode)  # NULL auth_* used for
     auth_srid = sa.Column(sa.Integer)  # custom local projection
     wkt = sa.Column(sa.Unicode, nullable=False)
+    wkt_short = sa.Column(
+        sa.Unicode, nullable=False
+    )  # https://lists.osgeo.org/pipermail/postgis-users/2025-May/046787.html
     proj4 = sa.Column(sa.Unicode, nullable=False)
     minx = sa.Column(sa.Float)
     miny = sa.Column(sa.Float)
@@ -67,7 +69,23 @@ class SRS(Base):
 
     @orm.validates("wkt")
     def _validate_wkt(self, key, value):
-        self.proj4 = convert_to_proj(value)
+        try:
+            sr = sr_from_wkt(value)
+        except SpatialReferenceError:
+            raise ValidationError(message=gettext("Invalid OGC WKT definition!"))
+
+        self.proj4 = sr.ExportToProj4()
+
+        if len(value) <= (wkt_maxlen := 2048):
+            wkt_short = value
+        else:
+            wkt_short = sr.ExportToWkt()
+            if len(wkt_short) > wkt_maxlen:
+                raise ValidationError(
+                    f"OGC WKT definition cannot be longer than {wkt_maxlen} characters."
+                )
+        self.wkt_short = wkt_short
+
         return value
 
     @property
@@ -152,12 +170,12 @@ sa_event.listen(SRS.__table__, "after_create", sa.DDL("""
             -- Update existing spatial_ref_sys row
             UPDATE spatial_ref_sys SET
             auth_name = NEW.auth_name, auth_srid = NEW.auth_srid,
-            srtext = NEW.wkt, proj4text = NEW.proj4
+            srtext = NEW.wkt_short, proj4text = NEW.proj4
             WHERE srid = NEW.id;
 
             -- Insert if missing
             INSERT INTO spatial_ref_sys (srid, auth_name, auth_srid, srtext, proj4text)
-            SELECT NEW.id, NEW.auth_name, NEW.auth_srid, NEW.wkt, NEW.proj4
+            SELECT NEW.id, NEW.auth_name, NEW.auth_srid, NEW.wkt_short, NEW.proj4
             WHERE NOT EXISTS(SELECT * FROM spatial_ref_sys WHERE srid = NEW.id);
 
             RETURN NEW;
