@@ -55,7 +55,48 @@ class PrintMapStyle {
 }
 
 const scaleFormatter = (scale: number): string => {
-    return String(Math.round(scale / 1000) * 1000);
+    if (scale <= 0) {
+        throw new Error("The scale must be a positive number");
+    }
+
+    let precisionToUse: number | null = null;
+
+    if (scale > 0 && scale < 350) {
+        precisionToUse = 10;
+    } else if (scale > 350 && scale < 700) {
+        precisionToUse = 25;
+    } else if (scale > 700 && scale < 1250) {
+        precisionToUse = 50;
+    } else if (scale > 1250 && scale < 3000) {
+        precisionToUse = 125;
+    } else if (scale > 3000 && scale < 7000) {
+        precisionToUse = 250;
+    } else if (scale > 7000 && scale < 15000) {
+        precisionToUse = 500;
+    } else if (scale > 15000 && scale < 35000) {
+        precisionToUse = 1250;
+    } else if (scale > 35000 && scale < 70000) {
+        precisionToUse = 2500;
+    } else if (scale > 70000 && scale < 120000) {
+        precisionToUse = 5000;
+    } else if (scale > 120000 && scale < 300000) {
+        precisionToUse = 10000;
+    } else if (scale > 300000 && scale < 600000) {
+        precisionToUse = 25000;
+    } else if (scale > 600000 && scale < 2000000) {
+        precisionToUse = 50000;
+    } else if (scale > 2000000 && scale < 8000000) {
+        precisionToUse = 200000;
+    } else if (scale > 8000000) {
+        precisionToUse = 500000;
+    }
+
+    if (precisionToUse !== null) {
+        const rounded = Math.round(scale / precisionToUse) * precisionToUse;
+        return String(rounded);
+    } else {
+        return String(scale);
+    }
 };
 
 export const PrintMap = observer<PrintMapProps>(
