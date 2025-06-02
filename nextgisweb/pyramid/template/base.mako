@@ -73,10 +73,11 @@
     %>
     %if (dynmenu is not NODEFAULT) and dynmenu:
         <div class="ngw-pyramid-layout-sidebar">
-            <%include
-                file="nextgisweb:pyramid/template/dynmenu.mako"
-                args="dynmenu=dynmenu, args=dynmenu_kwargs"
-            />
+            <%include file="nextgisweb:gui/template/react_boot.mako" args="
+                jsentry=LAYOUT_JSENTRY,
+                name='Dynmenu',
+                props={'items': dynmenu.json(dynmenu_kwargs)},
+            "/>
         </div>
     %endif
 </%def>
