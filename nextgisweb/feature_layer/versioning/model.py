@@ -14,7 +14,7 @@ from zope.interface import classImplements
 
 from nextgisweb.env import Base
 
-from nextgisweb.auth import User
+from nextgisweb.auth import OnFindReferencesData, Principal, User
 from nextgisweb.resource import Resource
 
 from ..interface import IVersionableFeatureLayer
@@ -334,3 +334,19 @@ class FeatureRestore(Struct, kw_only=True, tag="feature.restore", tag_field="act
     vid: VersionID
     geom: Union[Geom, UnsetType] = UNSET
     fields: Union[Fields, UnsetType] = UNSET
+
+
+@Principal.on_find_references.handler
+def _on_find_references(event):
+    principal = event.principal
+    data = event.data
+
+    if isinstance(principal, User):
+        for vobj in FVersioningObj.filter_by(user_id=principal.id):
+            data.append(
+                OnFindReferencesData(
+                    cls=vobj.resource.cls,
+                    id=vobj.resource_id,
+                    autoremove=False,
+                )
+            )
