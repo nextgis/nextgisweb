@@ -57,6 +57,10 @@ class Layer(Base):
     def scale_range(self):
         return (self.min_scale_denom, self.max_scale_denom)
 
+    @property
+    def is_queryable(self):
+        return hasattr(self.resource, "feature_layer")
+
 
 class WMSServiceLayer(Struct, kw_only=True):
     resource_id: int

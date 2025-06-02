@@ -138,7 +138,7 @@ def _get_capabilities(obj, params, request):
     )
 
     for lyr in obj.layers:
-        queryable = "1" if hasattr(lyr.resource, "feature_layer") else "0"
+        queryable = "1" if lyr.is_queryable else "0"
 
         lnode = E.Layer(
             dict(queryable=queryable),
@@ -391,6 +391,11 @@ def _get_feature_info(obj, params, request):
 
     for lname in p_query_layers:
         layer = layer_by_keyname(obj, lname)
+        if not layer.is_queryable:
+            raise ValidationError(
+                f"Layer '{layer.keyname}' not queryable.",
+                data=dict(code="LayerNotQueryable"),
+            )
         flayer = layer.resource.feature_layer
 
         request.resource_permission(DataScope.read, layer.resource)
