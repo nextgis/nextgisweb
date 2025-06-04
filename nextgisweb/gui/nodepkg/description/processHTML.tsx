@@ -12,6 +12,11 @@ type ProcessedHtmlProps = {
     onLinkClick?: ((e: React.MouseEvent<HTMLAnchorElement>) => boolean) | null;
 };
 
+type ElementWorkaround = Element & {
+    data: string;
+    type: string;
+};
+
 const ProcessedHtml: React.FC<ProcessedHtmlProps> = ({
     htmlString,
     onLinkClick,
@@ -19,11 +24,10 @@ const ProcessedHtml: React.FC<ProcessedHtmlProps> = ({
     const options: HTMLReactParserOptions = {
         replace: (node: DOMNode) => {
             if (node.type === "tag") {
-                const el = node;
-                // console.log("test", node instanceof Element);
+                const el = node as ElementWorkaround;
 
-                const isHollowText = (element: Element): boolean => {
-                    if (element?.type !== "text") return false;
+                const isHollowText = (element: ElementWorkaround): boolean => {
+                    if ((element as DOMNode)?.type !== "text") return false;
                     return element.data.replace(/\n/g, "").trim() === "";
                 };
 
@@ -33,9 +37,13 @@ const ProcessedHtml: React.FC<ProcessedHtmlProps> = ({
                     const { nextSibling, previousSibling } = el;
                     return (
                         (nextSibling?.type === "text" &&
-                            !isHollowText(nextSibling)) ||
+                            !isHollowText(
+                                nextSibling as unknown as ElementWorkaround
+                            )) ||
                         (previousSibling?.type === "text" &&
-                            !isHollowText(previousSibling))
+                            !isHollowText(
+                                previousSibling as unknown as ElementWorkaround
+                            ))
                     );
                 };
 
@@ -46,6 +54,18 @@ const ProcessedHtml: React.FC<ProcessedHtmlProps> = ({
                     } else {
                         return <Image src={src} alt={alt} />;
                     }
+                }
+
+                const isImageWrapperParagraph = (el: Element) =>
+                    el.name === "p" &&
+                    (el?.firstChild as Element)?.name === "img";
+
+                if (isImageWrapperParagraph(el)) {
+                    return (
+                        <div>
+                            {domToReact(el.children as DOMNode[], options)}
+                        </div>
+                    );
                 }
 
                 if (el.name === "a" && el.attribs?.href) {
