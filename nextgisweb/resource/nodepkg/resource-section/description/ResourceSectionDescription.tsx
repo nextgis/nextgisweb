@@ -10,7 +10,24 @@ export const ResourceSectionDescription: ResourceSection = ({
     const description = resourceData.resource.description;
     assert(description);
 
-    return <DescriptionHtml content={description} />;
+    const handleOnLinkClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+        const href = e?.currentTarget.getAttribute("href");
+        e?.currentTarget.setAttribute("target", "_blank");
+
+        if (href && /^\d+:\d+$/.test(href)) {
+            e.preventDefault();
+            e.stopPropagation();
+            return true;
+        }
+        return false;
+    };
+
+    return (
+        <DescriptionHtml
+            content={description}
+            onLinkClick={handleOnLinkClick}
+        />
+    );
 };
 
 ResourceSectionDescription.displayName = "ResourceSectionDescription";
