@@ -1,26 +1,47 @@
 import { Image } from "antd";
 import parse, { domToReact } from "html-react-parser";
-import type { DOMNode, HTMLReactParserOptions } from "html-react-parser";
-import type { ReactNode } from "react";
+import type {
+    DOMNode,
+    Element,
+    HTMLReactParserOptions,
+} from "html-react-parser";
 import type React from "react";
 
-const processHtml: React.FC<string> = (
-    htmlString: string,
-    onLinkClick?: ((e: React.MouseEvent<HTMLAnchorElement>) => boolean) | null
-): ReactNode => {
+type ProcessedHtmlProps = {
+    htmlString: string;
+    onLinkClick?: ((e: React.MouseEvent<HTMLAnchorElement>) => boolean) | null;
+};
+
+const ProcessedHtml: React.FC<ProcessedHtmlProps> = ({
+    htmlString,
+    onLinkClick,
+}) => {
     const options: HTMLReactParserOptions = {
         replace: (node: DOMNode) => {
             if (node.type === "tag") {
                 const el = node;
+                // console.log("test", node instanceof Element);
 
-                const isInTextImage =
-                    el.name === "img" &&
-                    (el.nextSibling?.type === "text" ||
-                        el.previousSibling?.type === "text");
+                const isHollowText = (element: Element): boolean => {
+                    if (element?.type !== "text") return false;
+                    return element.data.replace(/\n/g, "").trim() === "";
+                };
+
+                const isAdjacentToNonHollowText = (el: Element): boolean => {
+                    if (el.name !== "img") return false;
+
+                    const { nextSibling, previousSibling } = el;
+                    return (
+                        (nextSibling?.type === "text" &&
+                            !isHollowText(nextSibling)) ||
+                        (previousSibling?.type === "text" &&
+                            !isHollowText(previousSibling))
+                    );
+                };
 
                 if (el.name === "img") {
                     const { src, alt } = el.attribs;
-                    if (isInTextImage) {
+                    if (isAdjacentToNonHollowText(el)) {
                         return <img src={src} alt={alt} />;
                     } else {
                         return <Image src={src} alt={alt} />;
@@ -54,4 +75,4 @@ const processHtml: React.FC<string> = (
     return <>{parse(htmlString, options)}</>;
 };
 
-export { processHtml };
+export { ProcessedHtml };
