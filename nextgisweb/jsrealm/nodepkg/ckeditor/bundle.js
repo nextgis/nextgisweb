@@ -13,6 +13,7 @@ import BlockQuote from "@ckeditor/ckeditor5-block-quote/src/blockquote.js";
 import ClassicEditor from "@ckeditor/ckeditor5-editor-classic/src/classiceditor.js";
 import Essentials from "@ckeditor/ckeditor5-essentials/src/essentials.js";
 import Heading from "@ckeditor/ckeditor5-heading/src/heading.js";
+import GeneralHtmlSupport from "@ckeditor/ckeditor5-html-support/src/generalhtmlsupport.js";
 import Image from "@ckeditor/ckeditor5-image/src/image.js";
 import ImageCaption from "@ckeditor/ckeditor5-image/src/imagecaption.js";
 import ImageInsert from "@ckeditor/ckeditor5-image/src/imageinsert.js";
@@ -66,6 +67,7 @@ Editor.builtinPlugins = [
     TableToolbar,
     TextTransformation,
     Base64UploadAdapter,
+    GeneralHtmlSupport,
 ];
 
 // Editor configuration.
@@ -107,6 +109,16 @@ Editor.defaultConfig = {
     },
     table: {
         contentToolbar: ["tableColumn", "tableRow", "mergeTableCells"],
+    },
+    htmlSupport: {
+        allow: [
+            {
+                name: "figure",
+                attributes: true,
+                classes: true,
+                styles: true,
+            },
+        ],
     },
     // This value must be kept in sync with the language defined in webpack.config.js.
     language: "en",

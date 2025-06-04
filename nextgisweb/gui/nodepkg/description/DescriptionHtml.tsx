@@ -1,6 +1,6 @@
 import type { Ref } from "react";
 
-import { ProcessedHtml } from "./processHTML";
+import { ProcessedHtml } from "./ProcessHTML";
 
 import "./DescriptionHtml.less";
 

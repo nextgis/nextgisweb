@@ -12,40 +12,31 @@ type ProcessedHtmlProps = {
     onLinkClick?: ((e: React.MouseEvent<HTMLAnchorElement>) => boolean) | null;
 };
 
-type ElementWorkaround = Element & {
-    data: string;
-    type: string;
+type ChildNode = DOMNode["nextSibling"] & DOMNode["previousSibling"];
+
+const isHollowText = (el: ChildNode): boolean => {
+    if (el?.type !== "text") return false;
+    return el.data.replace(/\n/g, "").trim() === "";
 };
 
-const ProcessedHtml: React.FC<ProcessedHtmlProps> = ({
+const isAdjacentToNonHollowText = (el: Element): boolean => {
+    if (el.name !== "img") return false;
+
+    const { nextSibling, previousSibling } = el;
+    return (
+        (nextSibling?.type === "text" && !isHollowText(nextSibling)) ||
+        (previousSibling?.type === "text" && !isHollowText(previousSibling))
+    );
+};
+
+export const ProcessedHtml: React.FC<ProcessedHtmlProps> = ({
     htmlString,
     onLinkClick,
 }) => {
     const options: HTMLReactParserOptions = {
         replace: (node: DOMNode) => {
             if (node.type === "tag") {
-                const el = node as ElementWorkaround;
-
-                const isHollowText = (element: ElementWorkaround): boolean => {
-                    if ((element as DOMNode)?.type !== "text") return false;
-                    return element.data.replace(/\n/g, "").trim() === "";
-                };
-
-                const isAdjacentToNonHollowText = (el: Element): boolean => {
-                    if (el.name !== "img") return false;
-
-                    const { nextSibling, previousSibling } = el;
-                    return (
-                        (nextSibling?.type === "text" &&
-                            !isHollowText(
-                                nextSibling as unknown as ElementWorkaround
-                            )) ||
-                        (previousSibling?.type === "text" &&
-                            !isHollowText(
-                                previousSibling as unknown as ElementWorkaround
-                            ))
-                    );
-                };
+                const el = node;
 
                 if (el.name === "img") {
                     const { src, alt } = el.attribs;
@@ -56,15 +47,23 @@ const ProcessedHtml: React.FC<ProcessedHtmlProps> = ({
                     }
                 }
 
-                const isImageWrapperParagraph = (el: Element) =>
-                    el.name === "p" &&
-                    (el?.firstChild as Element)?.name === "img";
+                // Ckeditor 5 automatically changes the html structure in Source editing mode. Automatically add the p tag surrounding the child tags.
+                // So we have to normalize the HTML structure to work with Antd Image component.
+                // Otherwise CKEditor changes will cause errors in console.
+                const isParagraphInFigure =
+                    el.name === "figure" &&
+                    el.firstChild &&
+                    el.firstChild.type === "tag" &&
+                    el.firstChild.name === "p";
 
-                if (isImageWrapperParagraph(el)) {
+                if (isParagraphInFigure) {
                     return (
-                        <div>
-                            {domToReact(el.children as DOMNode[], options)}
-                        </div>
+                        <figure>
+                            {domToReact(
+                                el.firstChild.children as DOMNode[],
+                                options
+                            )}
+                        </figure>
                     );
                 }
 
@@ -83,6 +82,7 @@ const ProcessedHtml: React.FC<ProcessedHtmlProps> = ({
                                 }
                             }}
                         >
+                            {/* Why ws should use `as` here – https://github.com/remarkablemark/html-react-parser/issues/1126#issuecomment-1784188447 */}
                             {domToReact(el.children as DOMNode[], options)}
                         </a>
                     );
@@ -94,5 +94,3 @@ const ProcessedHtml: React.FC<ProcessedHtmlProps> = ({
     };
     return <>{parse(htmlString, options)}</>;
 };
-
-export { ProcessedHtml };
