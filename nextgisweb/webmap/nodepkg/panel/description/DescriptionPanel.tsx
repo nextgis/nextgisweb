@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { useMemo, useRef } from "react";
+import { useRef } from "react";
 
 import { DescriptionHtml } from "@nextgisweb/gui/description";
 import type { Display } from "@nextgisweb/webmap/display";
@@ -29,32 +29,19 @@ const DescriptionPanel = observer<PanelPluginWidgetProps<DescriptionStore>>(
 
         const content = store.content;
 
-        const contentDiv = useMemo(() => {
-            return (
-                <DescriptionHtml
-                    className="content"
-                    content={content ?? ""}
-                    elementRef={nodeRef}
-                    onLinkClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
-                        const href = e?.currentTarget.getAttribute("href");
-                        e?.currentTarget.setAttribute("target", "_blank");
+        const handleOnLinkClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+            const href = e?.currentTarget.getAttribute("href");
+            e?.currentTarget.setAttribute("target", "_blank");
 
-                        if (href && /^\d+:\d+$/.test(href)) {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            const [resourceId, featureId] = href.split(":");
-                            zoomToFeature(
-                                display,
-                                Number(resourceId),
-                                Number(featureId)
-                            );
-                            return true;
-                        }
-                        return false;
-                    }}
-                />
-            );
-        }, [content, display]);
+            if (href && /^\d+:\d+$/.test(href)) {
+                e.preventDefault();
+                e.stopPropagation();
+                const [resourceId, featureId] = href.split(":");
+                zoomToFeature(display, Number(resourceId), Number(featureId));
+                return true;
+            }
+            return false;
+        };
 
         return (
             <PanelContainer
@@ -62,7 +49,12 @@ const DescriptionPanel = observer<PanelPluginWidgetProps<DescriptionStore>>(
                 close={() => {}}
                 components={{ title: () => undefined }}
             >
-                {contentDiv}
+                <DescriptionHtml
+                    className="content"
+                    content={content ?? ""}
+                    elementRef={nodeRef}
+                    onLinkClick={handleOnLinkClick}
+                />
             </PanelContainer>
         );
     }
