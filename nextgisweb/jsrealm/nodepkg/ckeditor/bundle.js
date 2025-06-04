@@ -10,6 +10,7 @@ import Italic from "@ckeditor/ckeditor5-basic-styles/src/italic.js";
 import Strikethrough from "@ckeditor/ckeditor5-basic-styles/src/strikethrough.js";
 import Underline from "@ckeditor/ckeditor5-basic-styles/src/underline.js";
 import BlockQuote from "@ckeditor/ckeditor5-block-quote/src/blockquote.js";
+import Plugin from "@ckeditor/ckeditor5-core/src/plugin.js";
 import ClassicEditor from "@ckeditor/ckeditor5-editor-classic/src/classiceditor.js";
 import Essentials from "@ckeditor/ckeditor5-essentials/src/essentials.js";
 import Heading from "@ckeditor/ckeditor5-heading/src/heading.js";
@@ -30,7 +31,35 @@ import SourceEditing from "@ckeditor/ckeditor5-source-editing/src/sourceediting.
 import Table from "@ckeditor/ckeditor5-table/src/table.js";
 import TableToolbar from "@ckeditor/ckeditor5-table/src/tabletoolbar.js";
 import TextTransformation from "@ckeditor/ckeditor5-typing/src/texttransformation.js";
+import ButtonView from "@ckeditor/ckeditor5-ui/src/button/buttonview.js";
 import Base64UploadAdapter from "@ckeditor/ckeditor5-upload/src/adapters/base64uploadadapter.js";
+
+class NgwLinkButton extends Plugin {
+    init() {
+        const editor = this.editor;
+
+        editor.ui.componentFactory.add("ngwLinkButton", (locale) => {
+            const view = new ButtonView(locale);
+
+            view.set({
+                label: "Feature Link",
+                withText: true,
+                tooltip: true,
+            });
+
+            view.on("execute", () => {
+                const callback = editor.config.get("ngwLinkButton.openDialog");
+                if (typeof callback === "function") {
+                    callback(editor);
+                } else {
+                    //
+                }
+            });
+
+            return view;
+        });
+    }
+}
 
 class Editor extends ClassicEditor {
     constructor(element, config) {
@@ -68,6 +97,7 @@ Editor.builtinPlugins = [
     TextTransformation,
     Base64UploadAdapter,
     GeneralHtmlSupport,
+    NgwLinkButton,
 ];
 
 // Editor configuration.
@@ -95,6 +125,8 @@ Editor.defaultConfig = {
             "indent",
             "|",
             "sourceEditing",
+            "|",
+            "ngwLinkButton",
         ],
     },
     image: {

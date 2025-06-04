@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { ActionToolbar } from "@nextgisweb/gui/action-toolbar";
 import type {
@@ -47,6 +47,7 @@ export const FeatureGridActions = observer(
             queryParams,
             selectedIds,
             editOnNewPage,
+            isExportAllowed: propIsExportAllowed,
             beforeDelete,
             deleteError,
             onDelete,
@@ -55,6 +56,18 @@ export const FeatureGridActions = observer(
         } = store;
 
         const { isExportAllowed } = useResource({ id });
+
+        const [exportAllowed, setExportAllowed] = useState(false);
+
+        useEffect(() => {
+            const run = async () => {
+                if (propIsExportAllowed) {
+                    const allowed = await isExportAllowed();
+                    setExportAllowed(allowed);
+                }
+            };
+            run();
+        }, [propIsExportAllowed, isExportAllowed]);
 
         const goTo = useCallback(
             (
@@ -203,7 +216,7 @@ export const FeatureGridActions = observer(
         }
 
         const rightActions: ActionToolbarAction<ActionProps>[] = [];
-        if (isExportAllowed) {
+        if (exportAllowed) {
             rightActions.push((props) => (
                 <ExportAction queryParams={queryParams} {...props} />
             ));

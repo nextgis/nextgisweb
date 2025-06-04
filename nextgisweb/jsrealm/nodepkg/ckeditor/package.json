@@ -26,6 +26,7 @@
         "@ckeditor/ckeditor5-theme-lark": "42.0.0",
         "@ckeditor/ckeditor5-typing": "42.0.0",
         "@ckeditor/ckeditor5-upload": "42.0.0",
+        "@ckeditor/ckeditor5-core": "42.0.0",
         "postcss-loader": "^4.3.0",
         "raw-loader": "^4.0.2",
         "terser-webpack-plugin": "^4.2.3"

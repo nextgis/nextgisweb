@@ -1,10 +1,15 @@
+import type { EditorConfig } from "@ckeditor/ckeditor5-core/src/editor/editorconfig";
 import type { ClassicEditor } from "@ckeditor/ckeditor5-editor-classic";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import type { SourceEditing } from "@ckeditor/ckeditor5-source-editing";
 import classNames from "classnames";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Editor } from "@nextgisweb/ckeditor";
+import showModal from "@nextgisweb/gui/showModal";
+import { useResourcePicker } from "@nextgisweb/resource/component/resource-picker";
+
+import { FeatureSelectModal } from "./FeatureSelectModal";
 
 import "./TextEditor.less";
 
@@ -24,6 +29,7 @@ export function TextEditor({
     border = true,
 }: TextEditorProps) {
     const [editor, setEditor] = useState<ClassicEditor>();
+    const { showResourcePicker } = useResourcePicker();
 
     const onChange = useCallback(() => {
         if (editor && onChangeProp) {
@@ -65,6 +71,53 @@ export function TextEditor({
         }
     }, [onChange, editor]);
 
+    const config = useMemo(() => {
+        const customConfig = {
+            ngwLinkButton: {
+                openDialog: (editor: ClassicEditor) => {
+                    const resourceSelect = showResourcePicker({
+                        pickerOptions: {
+                            requireInterface: "IFeatureLayer",
+                        },
+                        onSelect: (resourceId: number) => {
+                            resourceSelect.destroy();
+
+                            const featureSelectModal = showModal(
+                                FeatureSelectModal,
+                                {
+                                    resourceId,
+                                    onPick: (val: number) => {
+                                        editor.model.change((writer) => {
+                                            const linkText = `Feature#${val}`;
+
+                                            const hrefValue = `${resourceId}:${val}`;
+
+                                            const selection =
+                                                editor.model.document.selection;
+                                            const insertPosition =
+                                                selection.getFirstPosition();
+                                            if (insertPosition) {
+                                                writer.insertText(
+                                                    linkText,
+                                                    { linkHref: hrefValue },
+                                                    insertPosition
+                                                );
+                                            }
+                                        });
+
+                                        editor.editing.view.focus();
+                                        featureSelectModal.destroy();
+                                    },
+                                }
+                            );
+                        },
+                    });
+                },
+            },
+        } as EditorConfig;
+        return customConfig;
+    }, [showResourcePicker]);
+
     return (
         <div
             className={classNames("ngw-gui-component-text-editor", {
@@ -78,6 +131,7 @@ export function TextEditor({
                 data={value}
                 onReady={setEditor}
                 onChange={onChange}
+                config={config}
             />
         </div>
     );

@@ -43,6 +43,7 @@ export interface FeatureGridProps {
     queryParams?: QueryParams;
     selectedIds?: number[];
     editOnNewPage?: boolean;
+    isExportAllowed?: boolean;
     cleanSelectedOnFilter?: boolean;
     beforeDelete?: (featureIds: number[]) => void;
     deleteError?: (featureIds: number[]) => void;
