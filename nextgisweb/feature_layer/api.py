@@ -16,11 +16,13 @@ from nextgisweb.pyramid import JSONType
 from nextgisweb.resource import DataScope, Resource, ResourceFactory
 from nextgisweb.spatial_ref_sys import SRS
 
+from .biutil import BIGINT_DUMPERS, BigIntFormat, bigint_loader
 from .dtutil import DT_DATATYPES, DT_DUMPERS, DT_LOADERS, DtFormat
 from .exception import FeatureNotFound
 from .extension import FeatureExtension
 from .feature import Feature
 from .interface import (
+    FIELD_TYPE,
     IFeatureLayer,
     IFeatureQueryIlike,
     IFeatureQueryLike,
@@ -42,6 +44,10 @@ ParamGeomFormat = Annotated[
 ParamDtFormat = Annotated[
     DtFormat,
     Meta(description="Date and time serialization format"),
+]
+ParamBigIntFormat = Annotated[
+    BigIntFormat,
+    Meta(description="Big integer serialization format"),
 ]
 ParamSrs = Union[Annotated[int, Meta(gt=0)], None]
 
@@ -75,6 +81,8 @@ class Loader:
             fld_datatype = fld.datatype
             if fld_datatype in DT_DATATYPES:
                 fld_load = DT_LOADERS[self.params.dt_format][fld_datatype]
+            elif fld_datatype == FIELD_TYPE.BIGINT:
+                fld_load = bigint_loader
             else:
                 fld_load = lambda val: val
             result[fld.keyname] = fld_load
@@ -127,6 +135,7 @@ class DumperParams(Struct, kw_only=True):
     geom: Annotated[bool, Meta(description="Return feature geometry")] = True
     geom_format: ParamGeomFormat = "wkt"
     dt_format: ParamDtFormat = "obj"
+    bigint_format: ParamBigIntFormat = "compat"
     fields: Annotated[
         Union[List[str], None],
         Meta(description="Field keynames to return, all fields returned by default"),
@@ -167,6 +176,8 @@ class Dumper:
             fld_datatype = fld.datatype
             if fld_datatype in DT_DATATYPES:
                 fld_dump = DT_DUMPERS[self.params.dt_format][fld_datatype]
+            elif fld_datatype == FIELD_TYPE.BIGINT:
+                fld_dump = BIGINT_DUMPERS[self.params.bigint_format]
             else:
                 fld_dump = lambda val: val
             result[fld_keyname] = fld_dump

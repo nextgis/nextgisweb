@@ -8,6 +8,8 @@ from nextgisweb.env import DBSession
 from nextgisweb.vector_layer import VectorLayer
 from nextgisweb.vector_layer import test as vector_layer_test
 
+from ..biutil import MAX_INT64, MAX_SAFE_INTEGER, MIN_INT64, MIN_SAFE_INTEGER
+
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
 
 DATA = Path(vector_layer_test.__file__).parent / "data"
@@ -61,3 +63,97 @@ def test_datetime_valid(type, format, value, type_layer, ngw_webtest_app):
     ngw_webtest_app.put_json(api_url, {"fields": {type: value}}, status=200)
     resp = ngw_webtest_app.get(api_url, status=200)
     assert resp.json["fields"][type] == value
+
+
+@pytest.fixture
+def bigint_layer():
+    with transaction.manager:
+        layer = VectorLayer(geometry_type="POINT").persist()
+        layer.setup_from_fields([dict(keyname="f", datatype="BIGINT")])
+        DBSession.flush()
+        DBSession.expunge(layer)
+    yield layer.id
+
+
+@pytest.mark.parametrize(
+    "value,cases",
+    (
+        pytest.param(-1.5, {None: -2}, id="float-round-up"),
+        pytest.param(-1.4, {None: -1}, id="float-round-down"),
+        pytest.param(
+            MAX_INT64,
+            {"compat": str(MAX_INT64), "string": str(MAX_INT64), "number": MAX_INT64},
+            id="int64-max",
+        ),
+        pytest.param(
+            MIN_INT64,
+            {"compat": str(MIN_INT64), "string": str(MIN_INT64), "number": MIN_INT64},
+            id="int64-min",
+        ),
+        # Send as string cause of orjson behaviour
+        pytest.param(
+            MAX_SAFE_INTEGER,
+            {
+                None: MAX_SAFE_INTEGER,
+                "string": str(MAX_SAFE_INTEGER),
+                "number": MAX_SAFE_INTEGER,
+            },
+            id="compat-max-safe",
+        ),
+        pytest.param(
+            MIN_SAFE_INTEGER,
+            {
+                None: MIN_SAFE_INTEGER,
+                "string": str(MIN_SAFE_INTEGER),
+                "number": MIN_SAFE_INTEGER,
+            },
+            id="compat-min-safe",
+        ),
+        pytest.param(
+            MAX_SAFE_INTEGER + 1,
+            {
+                None: str(MAX_SAFE_INTEGER + 1),
+                "string": str(MAX_SAFE_INTEGER + 1),
+                "number": MAX_SAFE_INTEGER + 1,
+            },
+            id="compat-max-unsafe",
+        ),
+        pytest.param(
+            MIN_SAFE_INTEGER - 1,
+            {
+                None: str(MIN_SAFE_INTEGER - 1),
+                "string": str(MIN_SAFE_INTEGER - 1),
+                "number": MIN_SAFE_INTEGER - 1,
+            },
+            id="compat-min-unsafe",
+        ),
+    ),
+)
+def test_bigint_valid(value, cases, bigint_layer, ngw_webtest_app):
+    url = f"/api/resource/{bigint_layer}/feature/"
+    feature = dict(geom="POINT (0 0)", fields=dict(f=value))
+    resp = ngw_webtest_app.post_json(url, feature, status=200)
+    fid = resp.json["id"]
+
+    for bi_fmt, expected in cases.items():
+        q = dict()
+        if bi_fmt is not None:
+            q["bigint_format"] = bi_fmt
+        resp = ngw_webtest_app.get(url + str(fid), q, status=200)
+        v = resp.json["fields"]["f"]
+        assert type(v) is type(expected)
+        assert v == expected
+
+
+@pytest.mark.parametrize(
+    "value",
+    (
+        pytest.param("qwerty", id="invalid"),
+        pytest.param(MAX_INT64 + 1, id="int64-max-overflow"),
+        pytest.param(str(MIN_INT64 - 1), id="int64-min-overflow"),
+    ),
+)
+def test_bigint(value, bigint_layer, ngw_webtest_app):
+    url = f"/api/resource/{bigint_layer}/feature/"
+    feature = dict(geom="POINT (0 0)", fields=dict(f=value))
+    ngw_webtest_app.post_json(url, feature, status=422)
