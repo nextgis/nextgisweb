@@ -107,7 +107,7 @@ def clone(request):
     )
 
 
-@viewargs(renderer="mako")
+@react_renderer("@nextgisweb/webmap/preview-embedded")
 def preview_embedded(request):
     iframe = None
     if "iframe" in request.POST:
@@ -115,8 +115,8 @@ def preview_embedded(request):
         request.response.headerlist.append(("X-XSS-Protection", "0"))
 
     return dict(
-        iframe=iframe,
         title=gettext("Embedded webmap preview"),
+        props=dict(iframe=iframe),
         limit_width=False,
     )
 
