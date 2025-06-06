@@ -1,21 +1,37 @@
-from typing import Literal
+from json import dumps as json_dumps
+from typing import Any, Callable, Literal
+
+from nextgisweb.env import gettextf
 
 from nextgisweb.core.exception import ValidationError
 
-BigintFormat = Literal["compat", "string", "number"]
+BigIntFormat = Literal["compat", "string", "number"]
+
+MAX_SAFE_INTEGER = (1 << 53) - 1
+MIN_SAFE_INTEGER = -MAX_SAFE_INTEGER
+
+MAX_INT64 = (1 << 63) - 1
+MIN_INT64 = -(1 << 63)
 
 
-# JavaScript can't take numbers over 53 bits without approximateness
-def bigint_compat(val):
-    if -(n := 2**53) <= val <= n:
-        return val
-    return str(val)
+BIGINT_DUMPERS: dict[BigIntFormat, Callable] = {
+    "compat": lambda val: val if (MIN_SAFE_INTEGER <= val <= MAX_SAFE_INTEGER) else str(val),
+    "string": lambda val: str(val),
+    "number": lambda val: val,
+}
 
 
-BIGINT_DUMPERS = dict()
-BIGINT_DUMPERS["compat"] = bigint_compat
-BIGINT_DUMPERS["string"] = lambda val: str(val)
-BIGINT_DUMPERS["number"] = lambda val: val
+class BigIntValidationError(ValidationError):
+    message_ = gettextf("Got an invalid BIGINT value: {}.")
+    detail_ = gettextf("The value must be within the inclusive range of {min} to {max}.")
+
+    def __init__(self, value: Any):
+        # Using the built-in json module as orjson only supports 64-bit integers
+        value_json = json_dumps(value, ensure_ascii=False)
+        super().__init__(
+            message=self.message_.format(value_json),
+            detail=self.detail_.format(min=MIN_INT64, max=MAX_INT64),
+        )
 
 
 def bigint_loader(val):
@@ -25,14 +41,14 @@ def bigint_loader(val):
         case str():
             try:
                 val = int(val)
-            except ValueError:
-                raise ValidationError("Can't convert string value '%s' to big integer." % val)
+            except ValueError as exc:
+                raise BigIntValidationError(val) from exc
         case float():
             val = round(val)
         case _:
-            raise ValidationError("Invalid big integer value.")
+            raise BigIntValidationError(val)
 
-    if -(n := 2**63) <= val < n:
+    if MIN_INT64 <= val <= MAX_INT64:
         return val
 
-    raise ValidationError("Big integer value %d is out of int64 range." % val)
+    raise BigIntValidationError(val)
