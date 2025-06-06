@@ -1,3 +1,4 @@
+import { DescriptionHtml } from "@nextgisweb/gui/description";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { PanelSection } from "@nextgisweb/webmap/panel/component";
 import type { IdentifyExtensionComponentProps } from "@nextgisweb/webmap/panel/identify/identification";
@@ -13,7 +14,10 @@ const DescriptionView = ({ featureItem }: IdentifyExtensionComponentProps) => {
 
     return (
         <PanelSection icon={<DescriptionIcon />} title={gettext("Description")}>
-            <div dangerouslySetInnerHTML={{ __html: description }} />
+            <DescriptionHtml
+                variant="compact"
+                content={description as string}
+            />
         </PanelSection>
     );
 };

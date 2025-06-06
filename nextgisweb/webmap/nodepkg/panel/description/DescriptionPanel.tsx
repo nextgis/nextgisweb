@@ -1,6 +1,7 @@
 import { observer } from "mobx-react-lite";
-import { useEffect, useMemo, useRef } from "react";
+import { useRef } from "react";
 
+import { DescriptionHtml } from "@nextgisweb/gui/description";
 import type { Display } from "@nextgisweb/webmap/display";
 
 import { PanelContainer } from "../component";
@@ -28,43 +29,19 @@ const DescriptionPanel = observer<PanelPluginWidgetProps<DescriptionStore>>(
 
         const content = store.content;
 
-        const contentDiv = useMemo(() => {
-            return (
-                <div
-                    className="content"
-                    ref={nodeRef}
-                    dangerouslySetInnerHTML={{
-                        __html: content ?? "",
-                    }}
-                />
-            );
-        }, [content]);
+        const handleOnLinkClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+            const href = e?.currentTarget.getAttribute("href");
+            e?.currentTarget.setAttribute("target", "_blank");
 
-        useEffect(() => {
-            if (!nodeRef || !nodeRef.current) {
-                console.warn("InfoPanel: nodeRef | nodeRef.current are empty");
-                return;
+            if (href && /^\d+:\d+$/.test(href)) {
+                e.preventDefault();
+                e.stopPropagation();
+                const [resourceId, featureId] = href.split(":");
+                zoomToFeature(display, Number(resourceId), Number(featureId));
+                return true;
             }
-
-            nodeRef.current.querySelectorAll("a, span").forEach((el) => {
-                const tagName = el.tagName.toLowerCase();
-                const linkText = el.getAttribute(
-                    tagName === "a" ? "href" : "data-target"
-                );
-                if (linkText && /^\d+:\d+$/.test(linkText)) {
-                    el.addEventListener("click", (e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        const [resourceId, featureId] = linkText.split(":");
-                        zoomToFeature(
-                            display,
-                            Number(resourceId),
-                            Number(featureId)
-                        );
-                    });
-                }
-            });
-        }, [display]);
+            return false;
+        };
 
         return (
             <PanelContainer
@@ -72,7 +49,13 @@ const DescriptionPanel = observer<PanelPluginWidgetProps<DescriptionStore>>(
                 close={() => {}}
                 components={{ title: () => undefined }}
             >
-                {contentDiv}
+                <DescriptionHtml
+                    className="content"
+                    variant="compact"
+                    content={content ?? ""}
+                    elementRef={nodeRef}
+                    onLinkClick={handleOnLinkClick}
+                />
             </PanelContainer>
         );
     }

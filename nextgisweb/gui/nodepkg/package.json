@@ -26,6 +26,7 @@
         "@ngneat/falso": "^7.2.0",
         "antd": "5.22.7",
         "classnames": "^2.5.1",
+        "html-react-parser": "5.2.5",
         "react-complex-tree": "^2.3.2"
     }
 }
