@@ -17,6 +17,7 @@ from nextgisweb.env import DBSession, gettext
 from nextgisweb.lib import dynmenu as dm
 
 from nextgisweb.gui import REACT_RENDERER, react_renderer
+from nextgisweb.jsrealm import jsentry
 from nextgisweb.pyramid import SessionStore, WebSession
 from nextgisweb.pyramid.view import ModelFactory
 
@@ -29,6 +30,8 @@ from .util import reset_slg_cookie, sync_ulg_cookie
 
 UserID = Annotated[int, Meta(ge=1, description="User ID", examples=[4])]
 GroupID = Annotated[int, Meta(ge=1, description="Group ID", examples=[5])]
+
+LOGIN_JSENTRY = jsentry("@nextgisweb/auth/login-page")
 
 
 class UserFactory(ModelFactory):
@@ -50,11 +53,10 @@ group_factory = ModelFactory(Group, tdef=GroupID)
 
 @react_renderer("@nextgisweb/auth/login-page")
 def login(request):
-    next_url = request.params.get("next", request.application_url)
     return dict(
         props=dict(reloadAfterLogin=False),
+        layout_mode="headerOnly",
         title=gettext("Sign in to Web GIS"),
-        next_url=next_url,
     )
 
 
@@ -297,8 +299,11 @@ def forbidden_error_handler(request, err_info, exc, exc_info, **kwargs):
             response = render_to_response(
                 REACT_RENDERER,
                 dict(
-                    entrypoint="@nextgisweb/auth/login-page",
-                    reloadAfterLogin=True,
+                    entrypoint=LOGIN_JSENTRY,
+                    layout_mode="headerOnly",
+                    props=dict(
+                        reloadAfterLogin=True,
+                    ),
                 ),
                 request=request,
             )

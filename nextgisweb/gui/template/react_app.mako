@@ -8,6 +8,7 @@
 <%
     base_props = dict(
         entrypoint = entrypoint,
+        layoutMode = layout_mode if layout_mode is not UNDEFINED else None,
         entrypointProps = props if props is not UNDEFINED else {},
         title=tr(effective_title),
         maxwidth=None if maxwidth is UNDEFINED else maxwidth,

@@ -1,3 +1,4 @@
+import classNames from "classnames";
 import { Suspense, lazy, useMemo } from "react";
 
 import { Flex, Spin } from "@nextgisweb/gui/antd";
@@ -15,6 +16,7 @@ interface BaseProps {
     hideMenu?: boolean;
     maxwidth?: boolean;
     maxheight?: boolean;
+    layoutMode?: "headerOnly" | "main" | "content";
     entrypoint: string;
     breadcrumbs: BreadcrumbItem[];
     dynMenuItems: DynMenuItem[];
@@ -36,59 +38,75 @@ export function Base({
     dynMenuItems,
     breadcrumbs,
     entrypoint,
+    layoutMode = "content",
     maxheight,
     hideMenu,
     maxwidth,
     title,
 }: BaseProps) {
-    const layoutClasses = [
-        "ngw-pyramid-layout",
-        maxwidth && "ngw-pyramid-layout-hstretch",
-        maxheight && "ngw-pyramid-layout-vstretch",
-    ]
-        .filter(Boolean)
-        .join(" ");
-
     const LazyBody = useMemo(() => {
         return lazy(() => window.ngwEntry(entrypoint));
     }, [entrypoint]);
 
+    const renderBody = (
+        <Suspense fallback={<EntrypointFallback />}>
+            <LazyBody {...entrypointProps} />
+        </Suspense>
+    );
+
     return (
-        <div className={layoutClasses}>
+        <div
+            className={classNames("ngw-pyramid-layout", {
+                "ngw-pyramid-layout-hstretch": maxwidth,
+                "ngw-pyramid-layout-vstretch": maxheight,
+            })}
+        >
             <Header
                 title={title}
                 hideResourceFilter={hideResourceFilter}
                 hideMenu={hideMenu}
             />
-            <div className="ngw-pyramid-layout-crow">
-                <div className="ngw-pyramid-layout-mwrapper">
-                    <div id="main" className="ngw-pyramid-layout-main">
-                        {breadcrumbs.length > 0 && (
-                            <Breadcrumbs items={breadcrumbs} />
-                        )}
 
-                        <h1 id="title" className="ngw-pyramid-layout-title">
-                            {title}
-                        </h1>
+            {layoutMode === "headerOnly" ? (
+                renderBody
+            ) : (
+                <div className="ngw-pyramid-layout-crow">
+                    <div className="ngw-pyramid-layout-mwrapper">
+                        <div id="main" className="ngw-pyramid-layout-main">
+                            {layoutMode === "main" ? (
+                                renderBody
+                            ) : (
+                                <>
+                                    {breadcrumbs.length > 0 && (
+                                        <Breadcrumbs items={breadcrumbs} />
+                                    )}
 
-                        <div
-                            id="content"
-                            className="content"
-                            style={{ width: "100%" }}
-                        >
-                            <Suspense fallback={<EntrypointFallback />}>
-                                <LazyBody {...entrypointProps} />
-                            </Suspense>
+                                    <h1
+                                        id="title"
+                                        className="ngw-pyramid-layout-title"
+                                    >
+                                        {title}
+                                    </h1>
+
+                                    <div
+                                        id="content"
+                                        className="content"
+                                        style={{ width: "100%" }}
+                                    >
+                                        {renderBody}
+                                    </div>
+                                </>
+                            )}
                         </div>
                     </div>
-                </div>
 
-                {dynMenuItems && dynMenuItems.length > 0 && (
-                    <div className="ngw-pyramid-layout-sidebar">
-                        <Dynmenu items={dynMenuItems} />
-                    </div>
-                )}
-            </div>
+                    {dynMenuItems && dynMenuItems.length > 0 && (
+                        <div className="ngw-pyramid-layout-sidebar">
+                            <Dynmenu items={dynMenuItems} />
+                        </div>
+                    )}
+                </div>
+            )}
         </div>
     );
 }

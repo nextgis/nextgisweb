@@ -18,6 +18,7 @@ export const LoginPage = observer((props: LoginFormProps) => {
                     justifyContent: "center",
                     alignItems: "center",
                     padding: "24px",
+                    backgroundColor: "#fafafa",
                 }}
             >
                 <LoginBox {...props} />
