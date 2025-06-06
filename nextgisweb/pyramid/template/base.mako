@@ -8,6 +8,11 @@
 %>
 
 <%
+    if is_custom_layout is UNDEFINED and (c := getattr(next, "is_custom_layout", None)):
+        x_custom_layout = c()
+    else:
+        x_custom_layout = custom_layout
+
     effective_title = None if title is UNDEFINED else title
     bcpath = list()
     if obj is not UNDEFINED:
@@ -18,7 +23,16 @@
 
     system_name = request.env.core.system_full_name()
     head_title = (tr(effective_title) + " | " + system_name) if (effective_title is not None) else (system_name)
+
+    dynmenu_kwargs = SimpleNamespace(request=request)
+    if (dynmenu := context.get("dynmenu", UNDEFINED)) is UNDEFINED:
+        if obj and (dynmenu := getattr(obj, "__dynmenu__", UNDEFINED)) is not UNDEFINED:
+            dynmenu_kwargs.obj = obj
 %>
+
+<%def name="get_effective_title()"><% return effective_title %></%def>
+<%def name="get_dynmenu()"><% return dynmenu %></%def>
+<%def name="get_dynmenu_kwargs()"><% return dynmenu_kwargs %></%def>
 
 <html>
 <head>
@@ -65,12 +79,6 @@
 </head>
 
 <%def name="render_dynmenu()">
-    <%
-        dynmenu_kwargs = SimpleNamespace(request=request)
-        if (dynmenu := context.get("dynmenu", NODEFAULT)) is NODEFAULT:
-            if obj and (dynmenu := getattr(obj, "__dynmenu__", NODEFAULT)) is not NODEFAULT:
-                dynmenu_kwargs.obj = obj
-    %>
     %if (dynmenu is not NODEFAULT) and dynmenu:
         <div class="ngw-pyramid-layout-sidebar">
             <%include file="nextgisweb:gui/template/react_boot.mako" args="
@@ -83,7 +91,7 @@
 </%def>
 
 <body>
-    %if not custom_layout:
+    %if not x_custom_layout:
         <%
             lclasses = ["ngw-pyramid-layout"]
             if maxwidth: lclasses += ["ngw-pyramid-layout-hstretch"]
