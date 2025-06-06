@@ -14,7 +14,10 @@ const DescriptionView = ({ featureItem }: IdentifyExtensionComponentProps) => {
 
     return (
         <PanelSection icon={<DescriptionIcon />} title={gettext("Description")}>
-            <DescriptionHtml content={description as string} />
+            <DescriptionHtml
+                variant="compact"
+                content={description as string}
+            />
         </PanelSection>
     );
 };

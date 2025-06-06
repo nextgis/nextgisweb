@@ -1,34 +1,34 @@
-import type { Ref } from "react";
+import type { FC, Ref } from "react";
 
-import { ProcessedHtml } from "./ProcessHTML";
+import { ProcessedHtml } from "./ProcessedHtml";
 
 import "./DescriptionHtml.less";
 
-type DescriptionHtml = {
+interface DescriptionHtmlProps {
     content: string;
     onLinkClick?: ((e: React.MouseEvent<HTMLAnchorElement>) => boolean) | null;
     elementRef?: Ref<HTMLDivElement> | null;
     className?: string;
-    mode?: "compact" | "default";
-};
+    variant?: "compact" | "default";
+}
 
-const DescriptionHtml = ({
+const DescriptionHtml: FC<DescriptionHtmlProps> = ({
     content,
     onLinkClick = null,
     elementRef = null,
     className = "",
-    mode = "default",
-}: DescriptionHtml) => {
+    variant: variant = "default",
+}) => {
     return (
         <div
             ref={elementRef}
-            className={`ngw-gui-component-description-html ngw-gui-component-description-html-${mode} ${className}`}
+            className={`ngw-gui-component-description-html ngw-gui-component-description-html-${variant} ${className}`}
         >
             <ProcessedHtml htmlString={content} onLinkClick={onLinkClick} />
         </div>
     );
 };
 
-DescriptionHtml.displayName = "Description";
+DescriptionHtml.displayName = "DescriptionHtml";
 
 export { DescriptionHtml };

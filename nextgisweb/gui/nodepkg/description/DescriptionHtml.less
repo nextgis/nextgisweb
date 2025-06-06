@@ -5,6 +5,10 @@
     overflow-y: auto;
     overflow-wrap: anywhere;
 
+    figure {
+        margin-inline: 0;
+    }
+
     img {
         max-width: 100% !important;
         height: auto !important;
@@ -25,19 +29,15 @@
     &-compact {
         ul,
         ol {
-            margin-left: 0.5rem;
-            padding-left: 1rem;
+            margin-inline-start: 0.5rem;
+            padding-inline-start: 1rem;
         }
 
         ul ul,
         ol ol,
         ul ol,
         ol ul {
-            margin-left: 0.25rem;
+            margin-inline-start: 0.25rem;
         }
-    }
-
-    &-default {
-        // margin: auto; // was causing vertical centering
     }
 }

@@ -5,12 +5,8 @@ import type {
     Element,
     HTMLReactParserOptions,
 } from "html-react-parser";
+import type { FC } from "react";
 import type React from "react";
-
-type ProcessedHtmlProps = {
-    htmlString: string;
-    onLinkClick?: ((e: React.MouseEvent<HTMLAnchorElement>) => boolean) | null;
-};
 
 type ChildNode = DOMNode["nextSibling"] & DOMNode["previousSibling"];
 
@@ -29,7 +25,12 @@ const isAdjacentToNonHollowText = (el: Element): boolean => {
     );
 };
 
-export const ProcessedHtml: React.FC<ProcessedHtmlProps> = ({
+interface ProcessedHtmlProps {
+    htmlString: string;
+    onLinkClick?: ((e: React.MouseEvent<HTMLAnchorElement>) => boolean) | null;
+}
+
+export const ProcessedHtml: FC<ProcessedHtmlProps> = ({
     htmlString,
     onLinkClick,
 }) => {
@@ -47,9 +48,11 @@ export const ProcessedHtml: React.FC<ProcessedHtmlProps> = ({
                     }
                 }
 
-                // Ckeditor 5 automatically changes the html structure in Source editing mode. Automatically add the p tag surrounding the child tags.
-                // So we have to normalize the HTML structure to work with Antd Image component.
-                // Otherwise CKEditor changes will cause errors in console.
+                // Ckeditor 5 automatically changes the html structure in Source
+                // editing mode. Automatically add the p tag surrounding the
+                // child tags. So we have to normalize the HTML structure to
+                // work with Antd Image component. Otherwise CKEditor changes
+                // will cause errors in console.
                 const isParagraphInFigure =
                     el.name === "figure" &&
                     el.firstChild &&

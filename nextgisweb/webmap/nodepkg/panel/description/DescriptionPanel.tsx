@@ -51,6 +51,7 @@ const DescriptionPanel = observer<PanelPluginWidgetProps<DescriptionStore>>(
             >
                 <DescriptionHtml
                     className="content"
+                    variant="compact"
                     content={content ?? ""}
                     elementRef={nodeRef}
                     onLinkClick={handleOnLinkClick}
