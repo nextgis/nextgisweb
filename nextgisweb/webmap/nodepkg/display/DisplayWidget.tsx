@@ -2,9 +2,7 @@ import classNames from "classnames";
 import { observer } from "mobx-react-lite";
 import { useCallback, useEffect, useState } from "react";
 
-import { Spin, Splitter } from "@nextgisweb/gui/antd";
-import { useRouteGet } from "@nextgisweb/pyramid/hook";
-import { Header } from "@nextgisweb/pyramid/layout/header/Header";
+import { Splitter } from "@nextgisweb/gui/antd";
 import type { DisplayConfig } from "@nextgisweb/webmap/type/api";
 import { WebMapTabs } from "@nextgisweb/webmap/webmap-tabs";
 
@@ -14,8 +12,6 @@ import { Display } from "./Display";
 import { MapPane } from "./component/MapPane";
 import { NavigationMenu } from "./component/NavigationMenu";
 import { PanelSwitcher } from "./component/PanelSwitcher";
-
-import { LoadingOutlined } from "@ant-design/icons";
 
 import "./DisplayWidget.css";
 import "./DisplayWidget.less";
@@ -108,24 +104,3 @@ export const DisplayWidget = observer(
     }
 );
 DisplayWidget.displayName = "Display";
-
-export function DisplayLoader({ id, title }: { id: number; title: string }) {
-    const { data: config, isLoading } = useRouteGet("webmap.display_config", {
-        id,
-    });
-
-    return (
-        <div className="ngw-webmap-display-loader">
-            <Header title={title} hideResourceFilter={true} hideMenu={true} />
-            {isLoading || !config ? (
-                <Spin
-                    size="large"
-                    fullscreen
-                    indicator={<LoadingOutlined spin />}
-                />
-            ) : (
-                <DisplayWidget config={config} />
-            )}
-        </div>
-    );
-}

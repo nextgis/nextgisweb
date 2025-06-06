@@ -16,7 +16,7 @@ interface BaseProps {
     hideMenu?: boolean;
     maxwidth?: boolean;
     maxheight?: boolean;
-    layoutMode?: "headerOnly" | "main" | "content";
+    layoutMode?: "headerOnly" | "main" | "content" | "nullSpace";
     entrypoint: string;
     breadcrumbs: BreadcrumbItem[];
     dynMenuItems: DynMenuItem[];
@@ -53,6 +53,10 @@ export function Base({
             <LazyBody {...entrypointProps} />
         </Suspense>
     );
+
+    if (layoutMode === "nullSpace") {
+        return renderBody;
+    }
 
     return (
         <div

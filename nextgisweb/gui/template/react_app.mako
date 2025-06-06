@@ -15,6 +15,8 @@
         maxheight=None if maxheight is UNDEFINED else maxheight,
         dynMenuItems=dynmenu.json(dynmenu_kwargs) if dynmenu is not UNDEFINED and dynmenu else None,
         breadcrumbs=breadcrumbs,
+        hideResourceFilter=hide_resource_filter if hide_resource_filter is not UNDEFINED else None,
+        hideMenu=hide_menu if hide_menu is not UNDEFINED else None,
     )
 %>
 

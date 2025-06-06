@@ -2,6 +2,7 @@ import { observer } from "mobx-react-lite";
 import { useCallback, useEffect, useState } from "react";
 
 import { Spin } from "@nextgisweb/gui/antd";
+import { routeURL } from "@nextgisweb/pyramid/api";
 import { useRouteGet } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
@@ -16,7 +17,7 @@ import { LoadingOutlined } from "@ant-design/icons";
 
 import "./DisplayTiny.css";
 
-const DisplayTinyComponent = observer(
+const DisplayTinyWidget = observer(
     ({ config, tinyConfig }: DisplayComponentProps) => {
         const [display] = useState<Display>(
             () =>
@@ -63,7 +64,6 @@ const DisplayTinyComponent = observer(
                     return;
                 }
                 display.panelManager.deactivatePanel();
-                // display.panelManager.activatePanel(activePanel);
             },
             [display.panelManager, panelsReady]
         );
@@ -90,18 +90,16 @@ const DisplayTinyComponent = observer(
         );
     }
 );
-DisplayTinyComponent.displayName = "Display";
+DisplayTinyWidget.displayName = "DisplayTinyWidget";
 
-export default function DisplayTinyLoader({
-    id,
-    tinyConfig,
-}: {
-    id: number;
-    tinyConfig: TinyConfig;
-}) {
+export default function DisplayTinyPage({ id }: { id: number }) {
     const { data: config, isLoading } = useRouteGet("webmap.display_config", {
         id,
     });
+
+    const [tinyConfig] = useState<TinyConfig>(() => ({
+        mainDisplayUrl: routeURL("webmap.display", id) + "?" + location.search,
+    }));
 
     if (isLoading || !config) {
         return (
@@ -112,5 +110,5 @@ export default function DisplayTinyLoader({
             />
         );
     }
-    return <DisplayTinyComponent config={config} tinyConfig={tinyConfig} />;
+    return <DisplayTinyWidget config={config} tinyConfig={tinyConfig} />;
 }
