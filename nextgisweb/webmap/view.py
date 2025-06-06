@@ -7,7 +7,6 @@ from nextgisweb.lib.dynmenu import Label, Link
 
 from nextgisweb.gui import react_renderer
 from nextgisweb.jsrealm import icon, jsentry
-from nextgisweb.pyramid import viewargs
 from nextgisweb.render.view import TMSLink
 from nextgisweb.resource import Resource, ResourceFactory, ResourceScope, Widget
 
@@ -61,40 +60,31 @@ def check_origin(request):
     return True
 
 
-def display_view(obj, request, *, entrypoint):
+def display_view(request, **kwargs):
     is_valid_or_error = check_origin(request)
     if is_valid_or_error is not True:
         return is_valid_or_error
 
     request.resource_permission(ResourceScope.read)
 
-    title = obj.display_name if obj.title is None else obj.title
-    return dict(
-        entrypoint=entrypoint,
-        obj=obj,
-        title=title,
-        custom_layout=True,
-    )
+    obj = request.context
+    th = obj.title if obj.title else obj.display_name
+    return dict(obj=obj, title=th, header=th, props=dict(id=obj.id), **kwargs)
 
 
-DISPLAY_JSENTRY = jsentry("@nextgisweb/webmap/display/DisplayWidget")
-DISPLAY_TINY_JSENTRY = jsentry("@nextgisweb/webmap/display-tiny")
-
-
-@viewargs(renderer="mako")
-def display(obj, request):
+@react_renderer("@nextgisweb/webmap/display/DisplayPage")
+def display(request):
     return display_view(
-        *(obj, request),
-        entrypoint=DISPLAY_JSENTRY,
+        request,
+        layout_mode="headerOnly",
+        hide_resource_filter=True,
+        hide_menu=True,
     )
 
 
-@viewargs(renderer="mako")
-def display_tiny(obj, request):
-    return display_view(
-        *(obj, request),
-        entrypoint=DISPLAY_TINY_JSENTRY,
-    )
+@react_renderer("@nextgisweb/webmap/display-tiny")
+def display_tiny(request):
+    return display_view(request, layout_mode="nullSpace")
 
 
 @react_renderer("@nextgisweb/webmap/clone-webmap")
@@ -107,7 +97,7 @@ def clone(request):
     )
 
 
-@viewargs(renderer="mako")
+@react_renderer("@nextgisweb/webmap/preview-embedded")
 def preview_embedded(request):
     iframe = None
     if "iframe" in request.POST:
@@ -115,8 +105,8 @@ def preview_embedded(request):
         request.response.headerlist.append(("X-XSS-Protection", "0"))
 
     return dict(
-        iframe=iframe,
         title=gettext("Embedded webmap preview"),
+        props=dict(iframe=iframe),
         limit_width=False,
     )
 

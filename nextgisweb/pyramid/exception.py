@@ -16,11 +16,12 @@ from nextgisweb.lib import json
 from nextgisweb.lib.logging import logger
 
 from nextgisweb.core.exception import IUserException, user_exception
+from nextgisweb.gui import REACT_RENDERER
 from nextgisweb.jsrealm import jsentry
 
 from .tomb.exception import MalformedJSONBody
 
-JSENTRY = jsentry("@nextgisweb/gui/error")
+JSENTRY = jsentry("@nextgisweb/pyramid/error-page")
 
 
 def includeme(config):
@@ -199,12 +200,12 @@ def json_error_response(request, err_info, exc, exc_info, debug=True):
 
 def html_error_response(request, err_info, exc, exc_info, debug=True):
     response = render_to_response(
-        "nextgisweb:pyramid/template/error.mako",
+        REACT_RENDERER,
         dict(
             entrypoint=JSENTRY,
-            error_json=json_error(request, err_info, exc, exc_info, debug=debug),
+            props=dict(error_json=json_error(request, err_info, exc, exc_info, debug=debug)),
+            layout_mode="headerOnly",
             title=err_info_attr(err_info, exc, "title"),
-            custom_layout=True,
         ),
         request=request,
     )

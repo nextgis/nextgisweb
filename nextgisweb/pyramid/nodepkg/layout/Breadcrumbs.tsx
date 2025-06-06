@@ -1,15 +1,16 @@
 import { useThemeVariables } from "@nextgisweb/gui/hook";
 import { SvgIcon } from "@nextgisweb/gui/svg-icon";
 
-// NOTE: Breadcrumbs.less is imported in layout.less as it's used during bootstrapping
-// import "./Breadcrumbs.less";
+import "./Breadcrumbs.less";
+
+export interface BreadcrumbItem {
+    link: string;
+    label: string;
+    icon: string | null;
+}
 
 export interface BreadcrumbsProps {
-    items: {
-        link: string;
-        label: string;
-        icon: string | null;
-    }[];
+    items: BreadcrumbItem[];
 }
 
 export function Breadcrumbs({ items }: BreadcrumbsProps) {

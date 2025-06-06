@@ -1,3 +1,3 @@
-import DisplayTinyComponent from "./DisplayTinyComponent";
+import DisplayTinyPage from "./DisplayTinyPage";
 
-export default DisplayTinyComponent;
+export default DisplayTinyPage;
