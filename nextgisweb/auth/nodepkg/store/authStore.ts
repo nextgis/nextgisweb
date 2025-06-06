@@ -1,9 +1,8 @@
 import { action, observable } from "mobx";
 
-import reactApp from "@nextgisweb/gui/react-app";
 import { BaseAPIError, route } from "@nextgisweb/pyramid/api";
 
-import type { Credentials, LoginFormProps } from "../login/type";
+import type { Credentials } from "../login/type";
 
 class AuthStore {
     @observable.ref accessor loginError = "";
@@ -48,10 +47,8 @@ class AuthStore {
     }
 
     @action
-    async runApp(props: LoginFormProps, el: HTMLDivElement) {
-        this.showLoginModal = false; // Do not show new modal on "Sign in" click
-        const { LoginBox } = await import("../login");
-        reactApp(LoginBox, props, el);
+    setShowLoginModal(val: boolean) {
+        this.showLoginModal = val;
     }
 
     @action

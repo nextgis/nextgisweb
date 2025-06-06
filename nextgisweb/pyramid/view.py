@@ -7,6 +7,7 @@ from itertools import chain
 from pathlib import Path
 from secrets import token_hex
 from time import sleep
+from types import SimpleNamespace
 from typing import Optional
 from warnings import warn
 
@@ -189,14 +190,15 @@ def swagger(request):
     )
 
 
-@viewargs(renderer="mako")
+@react_renderer("@nextgisweb/pyramid/control-panel")
 @inject()
 def control_panel(request, *, comp: PyramidComponent):
     if not request.user.is_administrator and len(request.user.effective_permissions) == 0:
         raise ForbiddenError
+    items = request.env.pyramid.control_panel.json(SimpleNamespace(request=request))
     return dict(
         title=gettext("Control panel"),
-        control_panel=request.env.pyramid.control_panel,
+        props=dict(items=items),
     )
 
 
@@ -911,8 +913,3 @@ def _setup_pyramid_mako(comp, config):
             cache_control.must_revalidate = True
 
     config.add_subscriber(mako_cache_control, BeforeRender)
-
-    # Work around the template lookup bug (test_not_found_unauthorized)
-    tsp = "template/error.mako"
-    base = Path(__file__).parent
-    config.override_asset(to_override=f"nextgisweb:pyramid/{tsp}", override_with=str(base / tsp))

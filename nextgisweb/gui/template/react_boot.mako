@@ -5,6 +5,7 @@
 <script type="text/javascript">(() => {
     %if element is None:
         const element = document.createElement("div");
+        element.classList.add("ngw-gui-react-boot");
         const current = document.currentScript;
         current.parentNode.insertBefore(element, current.nextSibling);
     %else:

@@ -11,7 +11,7 @@ import HeaderLogo from "./HeaderLogo";
 // import "./Header.less";
 
 export interface HeaderProps {
-    title?: string;
+    header: string;
     hideResourceFilter?: boolean;
     hideMenu?: boolean;
 }
@@ -19,7 +19,7 @@ export interface HeaderProps {
 const Menu = lazy(() => import("../Menu"));
 
 export const Header = observer<HeaderProps>((props: HeaderProps) => {
-    const { title, hideMenu = false } = props;
+    const { header, hideMenu = false } = props;
     const hideMenuRef = useRef(hideMenu);
 
     useEffect(() => {
@@ -29,7 +29,7 @@ export const Header = observer<HeaderProps>((props: HeaderProps) => {
     return (
         <div className="ngw-pyramid-layout-header">
             <HeaderLogo />
-            <div className="text">{title}</div>
+            <div className="text">{header}</div>
             <div className="container">
                 <HeaderComponents {...props} />
 

@@ -62,6 +62,16 @@ a[class*=" icon-"]:hover:before {
 
 /* -- Layout -- */
 
+body > .ngw-gui-react-boot {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+
+    > .ngw-pyramid-layout {
+        flex: 1;
+    }
+}
+
 .ngw-pyramid-layout {
     display: flex;
     position: relative;
@@ -165,4 +175,3 @@ a[class*=" icon-"]:hover:before {
 // To prevent FOUC, import this as soon as possible. When the SPA or global
 // spinner is done, switch to a normal import from Header.tsx.
 @import "../../pyramid/nodepkg/layout/header/Header.less";
-@import "../../pyramid/nodepkg/layout/Breadcrumbs.less";
