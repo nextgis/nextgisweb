@@ -74,18 +74,6 @@
     ${include_head | n}
 </head>
 
-<%def name="render_dynmenu()">
-    %if (dynmenu is not NODEFAULT) and dynmenu:
-        <div class="ngw-pyramid-layout-sidebar">
-            <%include file="nextgisweb:gui/template/react_boot.mako" args="
-                jsentry=LAYOUT_JSENTRY,
-                name='Dynmenu',
-                props={'items': dynmenu.json(dynmenu_kwargs)},
-            "/>
-        </div>
-    %endif
-</%def>
-
 <body>
     %if not effective_custom_layout:
         <%
@@ -98,15 +86,6 @@
             <div class="ngw-pyramid-layout-crow">
                 <div class="ngw-pyramid-layout-mwrapper">
                     <div id="main" class="ngw-pyramid-layout-main">
-                        %if len(breadcrumbs) > 0:
-                            <div id="breadcrumbs" class="ngw-pyramid-layout-breadcrumbs-stub"></div>
-                            <%include file="nextgisweb:gui/template/react_boot.mako" args="
-                                jsentry=LAYOUT_JSENTRY,
-                                name='Breadcrumbs',
-                                props={'items': breadcrumbs},
-                                element='breadcrumbs',
-                            "/>
-                        %endif
 
                         <h1 id="title" class="ngw-pyramid-layout-title">
                             ${tr(effective_title)}
@@ -119,7 +98,6 @@
                         %endif
                     </div>
                 </div>
-                ${render_dynmenu()}
             </div>
         </div>
     %else:
