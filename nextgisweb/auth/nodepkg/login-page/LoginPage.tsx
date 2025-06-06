@@ -11,18 +11,16 @@ export const LoginPage = observer((props: LoginFormProps) => {
         authStore.setShowLoginModal(false);
     }, []);
     return (
-        <div className="ngw-pyramid-layout">
-            <div
-                className="ngw-pyramid-layout-crow"
-                style={{
-                    justifyContent: "center",
-                    alignItems: "center",
-                    padding: "24px",
-                    backgroundColor: "#fafafa",
-                }}
-            >
-                <LoginBox {...props} />
-            </div>
+        <div
+            className="ngw-pyramid-layout-crow"
+            style={{
+                justifyContent: "center",
+                alignItems: "center",
+                padding: "24px",
+                backgroundColor: "#fafafa",
+            }}
+        >
+            <LoginBox {...props} />
         </div>
     );
 });
