@@ -1,21 +1,26 @@
 from pathlib import Path
 
+from nextgisweb.gui import react_renderer
 from nextgisweb.jsrealm import jsentry
 from nextgisweb.pyramid import viewargs
 
 JSENTRY = jsentry("@nextgisweb/jsrealm/testentry/runner")
 
 
+@react_renderer("@nextgisweb/jsrealm/testentry")
+def testentry_browse(request):
+    return dict(
+        title="Test entries",
+    )
+
+
 @viewargs(renderer="mako")
 def testentry(request):
-    selected = "/".join(request.matchdict["subpath"])
-    if selected == "":
-        selected = None
-
+    selected = "/".join(request.matchdict["selected"])
     return dict(
         entrypoint=JSENTRY,
         selected=selected,
-        title=selected or "Test entries",
+        title=selected,
     )
 
 
@@ -29,4 +34,5 @@ def setup_pyramid(comp, config):
         else:
             config.add_static_path(pn, p)
 
-    config.add_route("jsrealm.testentry", "/testentry/*subpath").add_view(testentry)
+    config.add_route("jsrealm.testentry.browse", "/testentry/").add_view(testentry_browse)
+    config.add_route("jsrealm.testentry", "/testentry/*selected").add_view(testentry)
