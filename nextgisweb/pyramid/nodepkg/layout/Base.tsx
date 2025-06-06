@@ -1,5 +1,6 @@
 import { Suspense, lazy, useMemo } from "react";
 
+import { Flex, Spin } from "@nextgisweb/gui/antd";
 import type { DynMenuItem } from "@nextgisweb/pyramid/layout/dynmenu/type";
 
 import { Breadcrumbs } from "./Breadcrumbs";
@@ -7,22 +8,36 @@ import type { BreadcrumbItem } from "./Breadcrumbs";
 import { Dynmenu } from "./dynmenu/Dynmenu";
 import { Header } from "./header/Header";
 
+import { LoadingOutlined } from "@ant-design/icons";
+
 interface BaseProps {
     title: string;
+    hideMenu?: boolean;
     maxwidth?: boolean;
     maxheight?: boolean;
     entrypoint: string;
-    dynMenuItems: DynMenuItem[];
     breadcrumbs: BreadcrumbItem[];
+    dynMenuItems: DynMenuItem[];
     entrypointProps: Record<string, any>;
+    hideResourceFilter?: boolean;
+}
+
+function EntrypointFallback() {
+    return (
+        <Flex style={{ padding: "4em 8em" }} vertical>
+            <Spin size="large" indicator={<LoadingOutlined spin />} />
+        </Flex>
+    );
 }
 
 export function Base({
+    hideResourceFilter = false,
     entrypointProps,
     dynMenuItems,
     breadcrumbs,
     entrypoint,
     maxheight,
+    hideMenu,
     maxwidth,
     title,
 }: BaseProps) {
@@ -40,8 +55,11 @@ export function Base({
 
     return (
         <div className={layoutClasses}>
-            <Header title={title} hideResourceFilter={true} hideMenu={true} />
-
+            <Header
+                title={title}
+                hideResourceFilter={hideResourceFilter}
+                hideMenu={hideMenu}
+            />
             <div className="ngw-pyramid-layout-crow">
                 <div className="ngw-pyramid-layout-mwrapper">
                     <div id="main" className="ngw-pyramid-layout-main">
@@ -58,14 +76,14 @@ export function Base({
                             className="content"
                             style={{ width: "100%" }}
                         >
-                            <Suspense fallback={null}>
+                            <Suspense fallback={<EntrypointFallback />}>
                                 <LazyBody {...entrypointProps} />
                             </Suspense>
                         </div>
                     </div>
                 </div>
 
-                {dynMenuItems.length > 0 && (
+                {dynMenuItems && dynMenuItems.length > 0 && (
                     <div className="ngw-pyramid-layout-sidebar">
                         <Dynmenu items={dynMenuItems} />
                     </div>
