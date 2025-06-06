@@ -16,9 +16,8 @@ from sqlalchemy.orm.exc import NoResultFound
 from nextgisweb.env import DBSession, gettext
 from nextgisweb.lib import dynmenu as dm
 
-from nextgisweb.gui import react_renderer
-from nextgisweb.jsrealm import jsentry
-from nextgisweb.pyramid import SessionStore, WebSession, viewargs
+from nextgisweb.gui import REACT_RENDERER, react_renderer
+from nextgisweb.pyramid import SessionStore, WebSession
 from nextgisweb.pyramid.view import ModelFactory
 
 from . import permission
@@ -27,8 +26,6 @@ from .model import Group, User
 from .oauth import AuthorizationException, InvalidTokenException
 from .policy import AuthProvider, AuthState, OnUserLogin
 from .util import reset_slg_cookie, sync_ulg_cookie
-
-STORE_JSENTRY = jsentry("@nextgisweb/auth/store")
 
 UserID = Annotated[int, Meta(ge=1, description="User ID", examples=[4])]
 GroupID = Annotated[int, Meta(ge=1, description="Group ID", examples=[5])]
@@ -51,14 +48,12 @@ user_factory = UserFactory(User, tdef=UserID)
 group_factory = ModelFactory(Group, tdef=GroupID)
 
 
-@viewargs(renderer="mako")
+@react_renderer("@nextgisweb/auth/login-page")
 def login(request):
     next_url = request.params.get("next", request.application_url)
     return dict(
-        entrypoint=STORE_JSENTRY,
         props=dict(reloadAfterLogin=False),
         title=gettext("Sign in to Web GIS"),
-        custom_layout=True,
         next_url=next_url,
     )
 
@@ -300,11 +295,10 @@ def forbidden_error_handler(request, err_info, exc, exc_info, **kwargs):
                 )
         else:
             response = render_to_response(
-                "nextgisweb:auth/template/login.mako",
+                REACT_RENDERER,
                 dict(
-                    entrypoint=STORE_JSENTRY,
-                    props=dict(reloadAfterLogin=True),
-                    custom_layout=True,
+                    entrypoint="@nextgisweb/auth/login-page",
+                    reloadAfterLogin=True,
                 ),
                 request=request,
             )
