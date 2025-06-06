@@ -1,17 +1,16 @@
 import { MVT } from "ol/format";
 import GeoJSON from "ol/format/GeoJSON";
-import Tile from "ol/layer/Tile";
 import VectorLayer from "ol/layer/Vector";
 import VectorTileLayer from "ol/layer/VectorTile";
 import WebGLTileLayer from "ol/layer/WebGLTile";
 import GeoTIFF from "ol/source/GeoTIFF";
 import VectorSource from "ol/source/Vector";
 import VectorTileSource from "ol/source/VectorTile";
-import XYZ from "ol/source/XYZ";
 import type { StyleLike } from "ol/style/Style";
 import { useMemo } from "react";
 
 import { routeURL } from "@nextgisweb/pyramid/api";
+import { createTileLayer } from "@nextgisweb/webmap/tile-adapter/createTileLayer";
 
 export type LayerType = "geojson" | "geotiff" | "XYZ" | "MVT";
 
@@ -40,13 +39,8 @@ const createGeoTIFFLayer = (resourceId: number) => {
 };
 
 const createXYZLayer = (resourceId: number) => {
-    const url =
-        routeURL("render.tile") +
-        `?resource=${resourceId}&x={x}&y={y}&z={z}&nd=204`;
-    const layer = new Tile({
-        source: new XYZ({ wrapX: false, url: url }),
-    });
-    return layer;
+    const layer = createTileLayer({ styleId: resourceId });
+    return layer.olLayer;
 };
 
 const createMVTLayer = (resourceId: number, layerOptions?: LayerOptions) => {
