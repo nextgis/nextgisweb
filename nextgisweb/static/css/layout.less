@@ -62,6 +62,16 @@ a[class*=" icon-"]:hover:before {
 
 /* -- Layout -- */
 
+body > div:has(> .ngw-pyramid-layout) {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+
+    > .ngw-pyramid-layout {
+        flex: 1;
+    }
+}
+
 .ngw-pyramid-layout {
     display: flex;
     position: relative;
