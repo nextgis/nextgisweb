@@ -77,16 +77,16 @@ export function PreviewLayer({
                     extentInterfaces.includes(iface)
                 )
             ) {
-                await extentRoute.get().then(setExtentData);
+                try {
+                    const data = await extentRoute.get();
+                    setExtentData(data);
+                } catch {
+                    // ignore
+                }
+                setIsExtentLoading(false);
             }
         };
-        loadExtent()
-            .catch(() => {
-                // ignore
-            })
-            .finally(() => {
-                setIsExtentLoading(false);
-            });
+        loadExtent();
     }, [extentRoute, resData]);
 
     const padding = useMemo(() => [20, 20, 20, 20], []);
