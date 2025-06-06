@@ -46,13 +46,7 @@ export function Base({
                 <div className="ngw-pyramid-layout-mwrapper">
                     <div id="main" className="ngw-pyramid-layout-main">
                         {breadcrumbs.length > 0 && (
-                            <>
-                                <div
-                                    id="breadcrumbs"
-                                    className="ngw-pyramid-layout-breadcrumbs-stub"
-                                />
-                                <Breadcrumbs items={breadcrumbs} />
-                            </>
+                            <Breadcrumbs items={breadcrumbs} />
                         )}
 
                         <h1 id="title" className="ngw-pyramid-layout-title">

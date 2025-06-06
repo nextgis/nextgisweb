@@ -8,18 +8,18 @@
 %>
 
 <%
-    if is_custom_layout is UNDEFINED and (c := getattr(next, "is_custom_layout", None)):
-        x_custom_layout = c()
+    if custom_layout is UNDEFINED and (c := getattr(next, "is_custom_layout", None)):
+        effective_custom_layout = c()
     else:
-        x_custom_layout = custom_layout
+        effective_custom_layout = custom_layout
 
     effective_title = None if title is UNDEFINED else title
-    bcpath = list()
+    breadcrumbs = list()
     if obj is not UNDEFINED:
-        bcpath = breadcrumb_path(obj, request)
-        if len(bcpath) > 0 and effective_title is None:
-            effective_title = bcpath[-1].label
-            bcpath = bcpath[:-1]
+        breadcrumbs = breadcrumb_path(obj, request)
+        if len(breadcrumbs) > 0 and effective_title is None:
+            effective_title = breadcrumbs[-1].label
+            breadcrumbs = breadcrumbs[:-1]
 
     system_name = request.env.core.system_full_name()
     head_title = (tr(effective_title) + " | " + system_name) if (effective_title is not None) else (system_name)
@@ -29,10 +29,6 @@
         if obj and (dynmenu := getattr(obj, "__dynmenu__", UNDEFINED)) is not UNDEFINED:
             dynmenu_kwargs.obj = obj
 %>
-
-<%def name="get_effective_title()"><% return effective_title %></%def>
-<%def name="get_dynmenu()"><% return dynmenu %></%def>
-<%def name="get_dynmenu_kwargs()"><% return dynmenu_kwargs %></%def>
 
 <html>
 <head>
@@ -91,7 +87,7 @@
 </%def>
 
 <body>
-    %if not x_custom_layout:
+    %if not effective_custom_layout:
         <%
             lclasses = ["ngw-pyramid-layout"]
             if maxwidth: lclasses += ["ngw-pyramid-layout-hstretch"]
@@ -102,12 +98,12 @@
             <div class="ngw-pyramid-layout-crow">
                 <div class="ngw-pyramid-layout-mwrapper">
                     <div id="main" class="ngw-pyramid-layout-main">
-                        %if len(bcpath) > 0:
+                        %if len(breadcrumbs) > 0:
                             <div id="breadcrumbs" class="ngw-pyramid-layout-breadcrumbs-stub"></div>
                             <%include file="nextgisweb:gui/template/react_boot.mako" args="
                                 jsentry=LAYOUT_JSENTRY,
                                 name='Breadcrumbs',
-                                props={'items': bcpath},
+                                props={'items': breadcrumbs},
                                 element='breadcrumbs',
                             "/>
                         %endif
@@ -127,7 +123,14 @@
             </div>
         </div>
     %else:
-        ${next.body()}
+        ${next.body(
+            effective_title=effective_title,
+            maxwidth=maxwidth,
+            maxheight=maxheight,
+            dynmenu=dynmenu,
+            dynmenu_kwargs=dynmenu_kwargs,
+            breadcrumbs=breadcrumbs,
+        )}
     %endif
 </body>
 </html>

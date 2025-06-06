@@ -1,35 +1,20 @@
-<%!
-
-    from msgspec import NODEFAULT
-    from nextgisweb.pyramid.view import LAYOUT_JSENTRY
-%>
-
+<%! from nextgisweb.pyramid.view import LAYOUT_JSENTRY %>
 
 <%inherit file='nextgisweb:pyramid/template/base.mako' />
+<%page args="effective_title, maxwidth, maxheight, dynmenu, dynmenu_kwargs, breadcrumbs" />
 
 <%def name="is_custom_layout()"><% return True %></%def>
 
-
 <%
     base_props = dict(
-        title=tr(self.get_effective_title()),
-        ## title="test",
+        entrypoint = entrypoint,
+        entrypointProps = props if props is not UNDEFINED else {},
+        title=tr(effective_title),
         maxwidth=None if maxwidth is UNDEFINED else maxwidth,
         maxheight=None if maxheight is UNDEFINED else maxheight,
-        breadcrumbs=[],
-        ## dynMenuItems=[],
-        ## breadcrumbs=bcpath,
+        dynMenuItems=dynmenu.json(dynmenu_kwargs) if dynmenu is not UNDEFINED and dynmenu else None,
+        breadcrumbs=breadcrumbs,
     )
-    dynmenu=self.get_dynmenu()
-    dynmenu_kwargs=self.get_dynmenu_kwargs()
-
-    if dynmenu is not UNDEFINED and dynmenu:
-        base_props['dynMenuItems'] = dynmenu.json(dynmenu_kwargs)
-    else:
-        base_props['dynMenuItems'] = []
-    base_props["entrypoint"] = entrypoint
-    base_props["entrypointProps"] = props if props is not UNDEFINED else {}
-    ## raise ValueError(base_props)
 %>
 
 <%include file="nextgisweb:gui/template/react_boot.mako" args="
@@ -37,7 +22,3 @@
     name='Base',
     props=base_props,
 "/>
-
-
-
-
