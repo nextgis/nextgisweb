@@ -66,40 +66,39 @@ export const DisplayWidget = observer(
         }, [display, mapRefs]);
 
         return (
-            <Splitter
-                className={classNames("ngw-webmap-display", className)}
-                onResize={setHorizontalPanelSize}
-            >
-                {display.panelManager.panels.size > 0 && (
-                    <Panel
-                        key="menu"
-                        resizable={false}
-                        size="50px"
-                        style={{ flexGrow: 0, flexShrink: 0 }}
-                    >
-                        <NavigationMenu store={display.panelManager} />
-                    </Panel>
-                )}
-                <Panel
-                    key="panels"
-                    size={activePanel ? horizontalPanelSize[0] : 0}
-                    resizable={!!activePanel}
-                >
-                    <PanelSwitcher display={display} />
-                </Panel>
-                <Panel key="main">
-                    <Splitter layout="vertical">
-                        <Panel key="map">
-                            <MapPane setMapRefs={setMapRefs} />
+            <div className={classNames("ngw-webmap-display", className)}>
+                <Splitter onResize={setHorizontalPanelSize}>
+                    {display.panelManager.panels.size > 0 && (
+                        <Panel
+                            key="menu"
+                            resizable={false}
+                            size="50px"
+                            style={{ flexGrow: 0, flexShrink: 0 }}
+                        >
+                            <NavigationMenu store={display.panelManager} />
                         </Panel>
-                        {display.tabsManager.tabs.length && (
-                            <Panel key="tabs">
-                                <WebMapTabs store={display.tabsManager} />
+                    )}
+                    <Panel
+                        key="panels"
+                        size={activePanel ? horizontalPanelSize[0] : 0}
+                        resizable={!!activePanel}
+                    >
+                        <PanelSwitcher display={display} />
+                    </Panel>
+                    <Panel key="main">
+                        <Splitter layout="vertical">
+                            <Panel key="map">
+                                <MapPane setMapRefs={setMapRefs} />
                             </Panel>
-                        )}
-                    </Splitter>
-                </Panel>
-            </Splitter>
+                            {display.tabsManager.tabs.length && (
+                                <Panel key="tabs">
+                                    <WebMapTabs store={display.tabsManager} />
+                                </Panel>
+                            )}
+                        </Splitter>
+                    </Panel>
+                </Splitter>
+            </div>
         );
     }
 );

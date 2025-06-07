@@ -15,8 +15,6 @@ import type { MapRefs, TinyConfig } from "../type";
 
 import { LoadingOutlined } from "@ant-design/icons";
 
-import "./DisplayTiny.css";
-
 const DisplayTinyWidget = observer(
     ({ config, tinyConfig }: DisplayComponentProps) => {
         const [display] = useState<Display>(
@@ -82,7 +80,7 @@ const DisplayTinyWidget = observer(
 
         return (
             <DisplayWidget
-                className="tiny tiny-panels"
+                className="ngw-webmap-display-tiny"
                 display={display}
                 config={config}
                 setMapRefs={setMapRefs}

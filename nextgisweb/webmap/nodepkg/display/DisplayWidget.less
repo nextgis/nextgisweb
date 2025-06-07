@@ -1,8 +1,15 @@
 .ngw-webmap-display {
+    position: relative;
     flex-grow: 1;
+    min-height: 0;
 
-    > .ant-splitter-panel,
-    > .ant-splitter-panel > .ant-splitter > .ant-splitter-panel {
-        padding: 0;
+    > .ant-splitter {
+        position: absolute;
+        inset: 0;
+
+        > .ant-splitter-panel,
+        > .ant-splitter-panel > .ant-splitter > .ant-splitter-panel {
+            padding: 0;
+        }
     }
 }
