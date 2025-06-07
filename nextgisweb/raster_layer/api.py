@@ -105,7 +105,7 @@ def export(
             response.content_disposition = content_disposition
             return response
 
-    source_filename = env.raster_layer.workdir_path(resource.fileobj)
+    source_filename = env.raster_layer.workdir_path(resource.fileobj, resource.fileobj_pam)
     if bands is not None and len(bands) != resource.band_count:
         with tempfile.NamedTemporaryFile(suffix=".tif") as tmp_file:
             gdal.Translate(tmp_file.name, str(source_filename), bandList=bands)

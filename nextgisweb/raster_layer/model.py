@@ -241,7 +241,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         cmd.extend(("-co", "COMPRESS=DEFLATE", "-co", "TILED=YES", "-co", "BIGTIFF=YES", filename))
 
         fobj = FileObj(component="raster_layer")
-        dst_file = str(comp.workdir_path(fobj, makedirs=True))
+        dst_file = str(comp.workdir_path(fobj, None, makedirs=True))
         self.fileobj = fobj
 
         self.cog = cog
@@ -421,7 +421,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
 
 
 def estimate_raster_layer_data(resource):
-    fn = env.raster_layer.workdir_path(resource.fileobj)
+    fn = env.raster_layer.workdir_path(resource.fileobj, resource.fileobj_pam)
     return fn.stat().st_size + (0 if resource.cog else fn.with_suffix(".ovr").stat().st_size)
 
 
@@ -458,7 +458,7 @@ class CogAttr(SColumn):
             return
 
         cur_size = estimate_raster_layer_data(srlzr.obj)
-        fn = env.raster_layer.workdir_path(srlzr.obj.fileobj)
+        fn = env.raster_layer.workdir_path(srlzr.obj.fileobj, srlzr.obj.fileobj_pam)
         srlzr.obj.load_file(fn, cog=value)
 
         new_size = estimate_raster_layer_data(srlzr.obj)

@@ -36,7 +36,7 @@ def test_load_file(source, band_count, srs_id, cog, ngw_data_path, ngw_env, ngw_
     fd = res.fileobj.filename()
     assert fd.exists() and not fd.is_symlink()
 
-    fw = Path(ngw_env.raster_layer.workdir_path(res.fileobj))
+    fw = Path(ngw_env.raster_layer.workdir_path(res.fileobj, res.fileobj_pam))
     assert fw.exists() and fw.is_symlink()
     assert fw.resolve() == fd.resolve()
     assert os.readlink(fw) == ("../" * 3) + "/".join(["file_storage", *fd.parts[-4:]])
