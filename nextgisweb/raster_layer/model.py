@@ -279,6 +279,9 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
             fobj_pam = fobj_pam.copy_from(aux_xml_file)
             self.fileobj_pam = fobj_pam
             comp.workdir_path(fobj, fobj_pam, makedirs=True)
+        else:
+            # Cleanup PAM FileObj reference on replace
+            self.fileobj_pam = None
 
         ds = gdal.Open(dst_file, gdalconst.GA_ReadOnly)
 
