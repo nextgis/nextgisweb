@@ -240,16 +240,9 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
 
         cmd.extend(("-co", "COMPRESS=DEFLATE", "-co", "TILED=YES", "-co", "BIGTIFF=YES", filename))
 
-        # GDAL Persistent Auxiliary Metadata (PAM)
-        fobj_pam = None
-        if gdal.VSIStatL(filename + ".aux.xml") is not None:
-            fobj_pam = FileObj(component="raster_layer")
-            self.fileobj_pam = fobj_pam
-
         fobj = FileObj(component="raster_layer")
+        dst_file = str(comp.workdir_path(fobj, makedirs=True))
         self.fileobj = fobj
-
-        dst_file = str(comp.workdir_path(fobj, fobj_pam, makedirs=True))
 
         self.cog = cog
         if not cog:
@@ -279,6 +272,14 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
                 )
                 subprocess.check_call(cmd)
                 os.unlink(tmp_file + ".ovr")
+
+        # GDAL Persistent Auxiliary Metadata (PAM)
+        if os.path.exists(aux_xml_file := dst_file + ".aux.xml"):
+            fobj_pam = FileObj(component="raster_layer")
+            fobj_pam = fobj_pam.copy_from(aux_xml_file)
+            self.fileobj_pam = fobj_pam
+            os.remove(aux_xml_file)
+            os.symlink(fobj_pam.filename(), aux_xml_file)
 
         ds = gdal.Open(dst_file, gdalconst.GA_ReadOnly)
 
