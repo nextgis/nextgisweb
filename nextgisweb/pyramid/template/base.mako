@@ -13,7 +13,10 @@
     else:
         effective_custom_layout = custom_layout
 
+    system_name = request.env.core.system_full_name()
     effective_title = None if title is UNDEFINED else title
+    effective_header = system_name if header is UNDEFINED else header
+
     breadcrumbs = list()
     if obj is not UNDEFINED:
         breadcrumbs = breadcrumb_path(obj, request)
@@ -21,13 +24,7 @@
             effective_title = breadcrumbs[-1].label
             breadcrumbs = breadcrumbs[:-1]
 
-    system_name = request.env.core.system_full_name()
-    head_title = (tr(effective_title) + " | " + system_name) if (effective_title is not None) else (system_name)
-
-    dynmenu_kwargs = SimpleNamespace(request=request)
-    if (dynmenu := context.get("dynmenu", UNDEFINED)) is UNDEFINED:
-        if obj and (dynmenu := getattr(obj, "__dynmenu__", UNDEFINED)) is not UNDEFINED:
-            dynmenu_kwargs.obj = obj
+    head_title = (tr(effective_title) + " | " + system_name) if (effective_title is not None) else system_name
 %>
 
 <html>
@@ -82,15 +79,13 @@
             if maxheight: lclasses += ["ngw-pyramid-layout-vstretch"]
         %>
         <div class="${' '.join(lclasses)}">
-            <%include file="nextgisweb:pyramid/template/header.mako" args="header=system_name"/>
+            <%include file="nextgisweb:pyramid/template/header.mako" args="header=effective_header"/>
             <div class="ngw-pyramid-layout-crow">
                 <div class="ngw-pyramid-layout-mwrapper">
                     <div id="main" class="ngw-pyramid-layout-main">
-
                         <h1 id="title" class="ngw-pyramid-layout-title">
                             ${tr(effective_title)}
                         </h1>
-
                         %if hasattr(next, 'body'):
                             <div id="content" class="content" style="width: 100%">
                                 ${next.body()}
@@ -102,12 +97,12 @@
         </div>
     %else:
         ${next.body(
-            effective_title=effective_title,
+            obj=obj,
+            title=effective_title,
+            header=effective_header,
+            breadcrumbs=breadcrumbs,
             maxwidth=maxwidth,
             maxheight=maxheight,
-            dynmenu=dynmenu,
-            dynmenu_kwargs=dynmenu_kwargs,
-            breadcrumbs=breadcrumbs,
         )}
     %endif
 </body>

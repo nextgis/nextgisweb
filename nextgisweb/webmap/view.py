@@ -68,8 +68,8 @@ def display_view(request, **kwargs):
     request.resource_permission(ResourceScope.read)
 
     obj = request.context
-    title = obj.display_name if obj.title is None else obj.title
-    return dict(obj=obj, title=title, props=dict(id=obj.id), **kwargs)
+    th = obj.title if obj.title else obj.display_name
+    return dict(obj=obj, title=th, header=th, props=dict(id=obj.id), **kwargs)
 
 
 @react_renderer("@nextgisweb/webmap/display/DisplayPage")

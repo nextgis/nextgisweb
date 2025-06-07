@@ -13,6 +13,7 @@ import { LoadingOutlined } from "@ant-design/icons";
 
 interface BaseProps {
     title: string;
+    header: string;
     hideMenu?: boolean;
     maxwidth?: boolean;
     maxheight?: boolean;
@@ -42,6 +43,7 @@ export function Base({
     maxheight,
     hideMenu,
     maxwidth,
+    header,
     title,
 }: BaseProps) {
     const LazyBody = useMemo(() => {
@@ -66,7 +68,7 @@ export function Base({
             })}
         >
             <Header
-                title={title}
+                header={header}
                 hideResourceFilter={hideResourceFilter}
                 hideMenu={hideMenu}
             />
