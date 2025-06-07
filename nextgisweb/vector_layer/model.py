@@ -154,6 +154,7 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin, FVersioni
                 dict(zip(GEOM_TYPE.enum, GEOM_TYPE_DISPLAY))[self.geometry_type],
             ),
             (gettext("Feature count"), self.feature_query()().total_count),
+            *self.fversioning_info(),
         )
 
     @property

@@ -287,6 +287,8 @@ def resource_section_main(obj, *, request, **kwargs):
 
     if get_info := getattr(obj, "get_info", None):
         for key, value in get_info():
+            if isinstance(value, bool):
+                value = gettext("Yes") if value else gettext("No")
             summary.append((tr(key), str(tr(value))))
 
     summary.append((tr(gettext("Owner")), tr(obj.owner_user.display_name_i18n)))

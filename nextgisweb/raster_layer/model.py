@@ -14,7 +14,7 @@ from msgspec import UNSET
 from osgeo import gdal, gdalconst, ogr, osr
 from zope.interface import implementer
 
-from nextgisweb.env import COMP_ID, Base, env, gettext, gettextf
+from nextgisweb.env import COMP_ID, Base, env, gettext, gettextf, ngettextf
 from nextgisweb.lib.logging import logger
 from nextgisweb.lib.osrhelper import SpatialReferenceError, sr_from_epsg, sr_from_wkt
 
@@ -363,10 +363,17 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         subprocess.check_call(cmd)
 
     def get_info(self):
-        s = super()
-        return (s.get_info() if hasattr(s, "get_info") else ()) + (
-            (gettext("Data type"), self.dtype),
-            (gettext("COG"), self.cog),
+        band_summary = ngettextf(
+            "{n} band with {t} data type",
+            "{n} bands with {t} data type",
+            self.band_count,
+        )
+        return (
+            *(s() if (s := getattr(super(), "get_info", None)) else ()),
+            (gettext("Band summary"), band_summary(n=self.band_count, t=self.dtype)),
+            (gettext("Pixel dimensions"), "{} × {}".format(self.xsize, self.ysize)),
+            (gettext("Cloud Optimized GeoTIFF (COG)"), bool(self.cog)),
+            (gettext("Persistent auxiliary metadata (PAM)"), bool(self.fileobj_pam)),
         )
 
     # IBboxLayer implementation:

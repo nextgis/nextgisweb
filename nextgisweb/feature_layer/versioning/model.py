@@ -12,7 +12,7 @@ from msgspec.inspect import StructType, type_info
 from sqlalchemy import inspect
 from zope.interface import classImplements
 
-from nextgisweb.env import Base
+from nextgisweb.env import Base, gettext
 
 from nextgisweb.auth import OnFindReferencesData, Principal, User
 from nextgisweb.resource import Resource
@@ -89,6 +89,9 @@ class FVersioningMixin:
         finally:
             # TODO: Discard it on exception?
             self.fversioning_close()
+
+    def fversioning_info(self):
+        return ((gettext("Feature versioning"), bool(self.fversioning)),)
 
 
 classImplements(FVersioningMixin, IVersionableFeatureLayer)
