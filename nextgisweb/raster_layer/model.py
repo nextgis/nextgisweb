@@ -74,6 +74,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
     __scope__ = DataScope
 
     fileobj_id = sa.Column(sa.ForeignKey(FileObj.id), nullable=True)
+    fileobj_pam_id = sa.Column(sa.ForeignKey(FileObj.id), nullable=True)
 
     xsize = sa.Column(sa.Integer, nullable=False)
     ysize = sa.Column(sa.Integer, nullable=False)
@@ -81,7 +82,8 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
     band_count = sa.Column(sa.Integer, nullable=False)
     cog = sa.Column(sa.Boolean, nullable=False, default=False)
 
-    fileobj = orm.relationship(FileObj, cascade="all")
+    fileobj = orm.relationship(FileObj, foreign_keys=fileobj_id, cascade="all")
+    fileobj_pam = orm.relationship(FileObj, foreign_keys=fileobj_pam_id, cascade="all")
 
     @classmethod
     def check_parent(cls, parent):
@@ -236,12 +238,18 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
                 )
             )
 
-        cmd.extend(("--config", "GDAL_PAM_ENABLED", "NO"))
         cmd.extend(("-co", "COMPRESS=DEFLATE", "-co", "TILED=YES", "-co", "BIGTIFF=YES", filename))
 
+        # GDAL Persistent Auxiliary Metadata (PAM)
+        fobj_pam = None
+        if gdal.VSIStatL(filename + ".aux.xml") is not None:
+            fobj_pam = FileObj(component="raster_layer")
+            self.fileobj_pam = fobj_pam
+
         fobj = FileObj(component="raster_layer")
-        dst_file = str(comp.workdir_path(fobj, makedirs=True))
         self.fileobj = fobj
+
+        dst_file = str(comp.workdir_path(fobj, fobj_pam, makedirs=True))
 
         self.cog = cog
         if not cog:

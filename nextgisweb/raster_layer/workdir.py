@@ -10,7 +10,9 @@ from nextgisweb.file_storage import FileObj
 
 
 class WorkdirMixin:
-    def workdir_path(self, fobj: FileObj, *, makedirs=False) -> Path:
+    def workdir_path(
+        self, fobj: FileObj, fobj_pam: FileObj = None, *, makedirs=False
+    ) -> Path:
         fdata = fobj.filename(makedirs=makedirs)
         parts = fdata.parts[-3:]
 
@@ -21,6 +23,10 @@ class WorkdirMixin:
             pwork.mkdir(parents=True, exist_ok=True)
             relative = relpath(fdata, fwork.parent)
             fwork.symlink_to(relative)
+
+            if fobj_pam is not None:
+                fpam = fobj_pam.filename(makedirs=makedirs)
+                fwork.with_suffix(".aux.xml").symlink_to(relpath(fpam, fwork.parent))
 
         return fwork
 
