@@ -5,12 +5,14 @@ from typing import Annotated, List, Literal, Union
 
 from msgspec import Meta, Struct
 from osgeo import gdal
+from pyramid.httpexceptions import HTTPNotFound
 from pyramid.response import FileIter, FileResponse, Response
 
 from nextgisweb.env import env, gettext
 from nextgisweb.lib.apitype import AnyOf, ContentType, Query, StatusCode
 
 from nextgisweb.core.exception import ValidationError
+from nextgisweb.pyramid import XMLType
 from nextgisweb.pyramid.util import set_output_buffering
 from nextgisweb.resource import DataScope, ResourceFactory
 from nextgisweb.spatial_ref_sys import SRS
@@ -103,7 +105,7 @@ def export(
             response.content_disposition = content_disposition
             return response
 
-    source_filename = env.raster_layer.workdir_path(resource.fileobj)
+    source_filename = env.raster_layer.workdir_path(resource.fileobj, resource.fileobj_pam)
     if bands is not None and len(bands) != resource.band_count:
         with tempfile.NamedTemporaryFile(suffix=".tif") as tmp_file:
             gdal.Translate(tmp_file.name, str(source_filename), bandList=bands)
@@ -184,6 +186,33 @@ def download(
     return response
 
 
+def pam_get(resource: RasterLayer, request) -> XMLType:
+    """GDAL Persistent Auxiliary Metadata (PAM)"""
+
+    request.resource_permission(DataScope.read)
+
+    if (fileobj_pam := resource.fileobj_pam) is not None:
+        pam_data = fileobj_pam.filename().read_text()
+    else:
+        raise HTTPNotFound()
+
+    return Response(pam_data, content_type="application/xml")
+
+
+def pam_head(resource: RasterLayer, request) -> Response:
+    """GDAL Persistent Auxiliary Metadata (PAM)"""
+
+    request.resource_permission(DataScope.read)
+
+    if resource.fileobj_pam is None:
+        raise HTTPNotFound()
+
+    return Response(
+        content_length=resource.fileobj_pam.size,
+        content_type="application/xml",
+    )
+
+
 def setup_pyramid(comp, config):
     config.add_view(
         export,
@@ -203,10 +232,26 @@ def setup_pyramid(comp, config):
     )
 
     config.add_route(
+        "raster_layer.pam_cog",
+        "/api/resource/{id}/cog.aux.xml",
+        factory=raster_layer_factory,
+        head=pam_head,
+        get=pam_get,
+    )
+
+    config.add_route(
         "raster_layer.download",
         "/api/resource/{id}/download",
         factory=raster_layer_factory,
         get=download,
+    )
+
+    config.add_route(
+        "raster_layer.pam",
+        "/api/resource/{id}/download.aux.xml",
+        factory=raster_layer_factory,
+        head=pam_head,
+        get=pam_get,
     )
 
     from . import api_identify

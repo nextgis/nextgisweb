@@ -1,4 +1,4 @@
-from nextgisweb.lib.apitype import AsJSON, JSONType
+from nextgisweb.lib.apitype import AsJSON, JSONType, XMLType
 
 from .component import PyramidComponent
 from .model import Session, SessionStore

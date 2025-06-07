@@ -17,6 +17,7 @@ from .util import annotate, disannotate, unannotate
 
 T = TypeVar("T")
 
+XMLType = Annotated[Any, ContentType.XML]
 JSONType = Annotated[Any, ContentType.JSON]
 AsJSON = Annotated[T, ContentType.JSON]
 

@@ -31,7 +31,7 @@ def test_cog(
     fdata = res.fileobj.filename()
     assert fdata.exists() and not fdata.is_symlink()
 
-    fwork = comp.workdir_path(res.fileobj)
+    fwork = comp.workdir_path(res.fileobj, res.fileobj_pam)
     ds = gdal.Open(str(fwork))
     cs = ds.GetRasterBand(1).Checksum()
 
@@ -44,7 +44,7 @@ def test_cog(
     assert resp["raster_layer"]["cog"] is True
 
     res = RasterLayer.filter_by(id=res.id).one()
-    cog_wd = comp.workdir_path(res.fileobj)
+    cog_wd = comp.workdir_path(res.fileobj, res.fileobj_pam)
     assert cog_wd != fwork and cog_wd.is_symlink()
     assert not cog_wd.with_suffix(".ovr").is_file()
 
@@ -63,7 +63,7 @@ def test_cog(
     assert resp["raster_layer"]["cog"] is False
 
     res = RasterLayer.filter_by(id=res.id).one()
-    ovr_wd = comp.workdir_path(res.fileobj)
+    ovr_wd = comp.workdir_path(res.fileobj, res.fileobj_pam)
     assert ovr_wd != cog_wd and ovr_wd.is_symlink()
     assert ovr_wd.with_suffix(".ovr").is_file()
 
