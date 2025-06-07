@@ -63,16 +63,17 @@ class FileUploadComponent(Component):
             except ValueError:
                 logger.warning(f"Unknown folder {dirpath}, skipping...")
                 continue
+
             abspath = os.path.join(self.path, dirpath)
-            files, bytes_ = stat_dir(abspath)
+            files, nbytes = stat_dir(abspath)
 
             if date_dir < date_keep:
                 rmtree(abspath)
                 deleted_files += files
-                deleted_bytes += bytes_
+                deleted_bytes += nbytes
             else:
                 kept_files += files
-                kept_bytes += bytes_
+                kept_bytes += nbytes
 
         logger.info("Deleted: %d files (%d bytes)", deleted_files, deleted_bytes)
         logger.info("Preserved: %d files (%d bytes)", kept_files, kept_bytes)

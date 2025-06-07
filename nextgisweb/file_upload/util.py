@@ -1,10 +1,11 @@
 import os
 
 
-def stat_dir(path):
-    files = bytes_ = 0
+def stat_dir(path: str) -> tuple[int, int]:
+    files = nbytes = 0
     for dirpath, dirnames, filenames in os.walk(path):
         for filename in filenames:
+            full_filename = os.path.join(dirpath, filename)
+            nbytes += os.stat(full_filename, follow_symlinks=False).st_size
             files += 1
-            bytes_ += os.stat(os.path.join(dirpath, filename)).st_size
-    return files, bytes_
+    return files, nbytes
