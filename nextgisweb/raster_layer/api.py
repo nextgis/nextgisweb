@@ -232,6 +232,14 @@ def setup_pyramid(comp, config):
     )
 
     config.add_route(
+        "raster_layer.pam_cog",
+        "/api/resource/{id}/cog.aux.xml",
+        factory=raster_layer_factory,
+        head=pam_head,
+        get=pam_get,
+    )
+
+    config.add_route(
         "raster_layer.download",
         "/api/resource/{id}/download",
         factory=raster_layer_factory,
@@ -240,15 +248,7 @@ def setup_pyramid(comp, config):
 
     config.add_route(
         "raster_layer.pam",
-        "/api/resource/{id}.aux.xml",
-        factory=raster_layer_factory,
-        head=pam_head,
-        get=pam_get,
-    )
-
-    config.add_route(
-        "raster_layer.pam_cog",
-        "/api/resource/{id}/cog.aux.xml",
+        "/api/resource/{id}/download.aux.xml",
         factory=raster_layer_factory,
         head=pam_head,
         get=pam_get,
