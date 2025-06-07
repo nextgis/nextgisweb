@@ -278,8 +278,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
             fobj_pam = FileObj(component="raster_layer")
             fobj_pam = fobj_pam.copy_from(aux_xml_file)
             self.fileobj_pam = fobj_pam
-            os.remove(aux_xml_file)
-            os.symlink(fobj_pam.filename(), aux_xml_file)
+            comp.workdir_path(fobj, fobj_pam, makedirs=True)
 
         ds = gdal.Open(dst_file, gdalconst.GA_ReadOnly)
 
@@ -307,7 +306,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         self.band_count = ds.RasterCount
 
     def gdal_dataset(self):
-        fn = env.raster_layer.workdir_path(self.fileobj)
+        fn = env.raster_layer.workdir_path(self.fileobj, self.fileobj_pam)
         return gdal.Open(str(fn), gdalconst.GA_ReadOnly)
 
     def build_overview(self, missing_only=False, fn=None):
@@ -315,7 +314,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
             return
 
         if fn is None:
-            fn = env.raster_layer.workdir_path(self.fileobj)
+            fn = env.raster_layer.workdir_path(self.fileobj, self.fileobj_pam)
 
         if missing_only and fn.with_suffix(".ovr").exists():
             return
