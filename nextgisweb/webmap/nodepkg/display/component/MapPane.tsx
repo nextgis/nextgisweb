@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 
+import { useThemeVariables } from "@nextgisweb/gui/hook";
 import type { MapRefs } from "@nextgisweb/webmap/type";
 
 import "./MapPane.less";
@@ -33,8 +34,16 @@ export function MapPane({
         }
     }, [setMapRefs]);
 
+    const themeVariables = useThemeVariables({
+        "theme-color-primary": "colorPrimary",
+    });
+
     return (
-        <div ref={mapRef} className="ngw-webmap-display-map-pane">
+        <div
+            ref={mapRef}
+            className="ngw-webmap-display-map-pane"
+            style={themeVariables}
+        >
             <div
                 ref={leftTopControlPaneRef}
                 className="control-pane control-pane--top control-pane--left"
