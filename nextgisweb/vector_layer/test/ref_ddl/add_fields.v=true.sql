@@ -1,0 +1,5 @@
+ALTER TABLE ct ADD COLUMN fld_i INT,
+    ADD COLUMN fld_d DATE;
+
+ALTER TABLE ht ADD COLUMN fld_i INT,
+    ADD COLUMN fld_d DATE;

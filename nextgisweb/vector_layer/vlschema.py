@@ -1,7 +1,7 @@
 import dataclasses as dc
 import re
 from functools import cached_property, lru_cache
-from typing import Iterable, Literal, Tuple, Union
+from typing import Iterable, Literal, Tuple
 
 from sqlalchemy.dialects.postgresql import ExcludeConstraint
 from sqlalchemy.ext.compiler import compiles
@@ -160,13 +160,13 @@ class VLSchema(MetaData):
         yield AlterGeomColumn(self.ctab, self.geom_column_type, new_value)
 
     def sql_add_fields(self, fields):
-        if self.versioning:
-            raise FVersioningNotImplemented
-        yield AlterFieldsColumns(
-            self.ctab,
-            [self.ctab.fields[i] for i in fields],
-            action="ADD",
-        )
+        tabs = (self.ctab, self.htab) if self.versioning else (self.ctab,)
+        for tab in tabs:
+            yield AlterFieldsColumns(
+                tab,
+                [tab.fields[i] for i in fields],
+                action="ADD",
+            )
 
     def sql_delete_fields(self, fields):
         if self.versioning:
@@ -644,7 +644,7 @@ def _compile_alter_geometry_column(element, compiler, **kw):
 class AlterFieldsColumns(DDLElement):
     table: Table
     fields: Iterable[Tuple[str, ...]]
-    action: Union[Literal["ADD"], Literal["DROP"]]
+    action: Literal["ADD", "DROP"]
 
     def _compile_column(self, column, *, compiler):
         if self.action == "ADD":

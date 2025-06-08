@@ -17,6 +17,7 @@ Changes
 - Support for raster layer identification on webmaps.
 - Improved handling of date and bigint fields in UI and HTTP API.
 - Creation of raster layers from ZIP-archives and PAM support. 
+- Support for adding fields to layers with versioning enabled.
 
 
 5.0.0

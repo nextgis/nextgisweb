@@ -41,6 +41,7 @@ def test_ref_ddl(versioning):
     vs = f"v={str(versioning).lower()}"
     sql_cmp(vls.sql_create(), f"ref_ddl/create.{vs}")
     sql_cmp(vls.sql_drop(), f"ref_ddl/drop.{vs}")
+    sql_cmp(vls.sql_add_fields(["i", "d"]), f"ref_ddl/add_fields.{vs}")
 
     if versioning:
         sql = vls.sql_versioning_enable()
@@ -52,7 +53,6 @@ def test_ref_ddl(versioning):
         sql = vls.sql_convert_geom_column_type(Geometry("MULTIPOINT", 3857))
         sql_cmp(sql, "ref_ddl/convert_geom_column_type")
 
-        sql_cmp(vls.sql_add_fields(["i", "d"]), "ref_ddl/add_fields")
         sql_cmp(vls.sql_delete_fields(["i", "d"]), "ref_ddl/delete_fields")
 
 
@@ -119,14 +119,20 @@ def test_aliased(ngw_txn):
     )
 
 
-def test_create(ngw_txn):
+@pytest.mark.parametrize("versioning", [False, True])
+def test_create(versioning, ngw_txn):
     res = VectorLayer(geometry_type="POINT").persist()
+    res.fversioning_configure(enabled=versioning)
+
     res.fields.append(vlfld("foo"))
     feature_query(res)
 
 
-def test_add_field(ngw_txn):
+@pytest.mark.parametrize("versioning", [False, True])
+def test_add_field(versioning, ngw_txn):
     res = VectorLayer(geometry_type="POINT").persist()
+    res.fversioning_configure(enabled=versioning)
+
     res.fields.append(vlfld("foo"))
     feature_query(res)
 
