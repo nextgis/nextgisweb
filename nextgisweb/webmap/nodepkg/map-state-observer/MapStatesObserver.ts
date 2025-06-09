@@ -111,6 +111,17 @@ export class MapStatesObserver {
         return true;
     }
 
+    destroy() {
+        for (const [key, state] of Object.entries(this._states)) {
+            state.control?.deactivate();
+            this.removeState(key);
+        }
+        if (this._defaultState) {
+            this._currentState = null;
+            this.activateState(this._defaultState);
+        }
+    }
+
     shouldAffectState(stateName: string): boolean {
         return !stateName.startsWith("~");
     }

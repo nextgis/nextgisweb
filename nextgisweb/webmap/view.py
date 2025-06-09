@@ -69,7 +69,7 @@ def display_view(request, **kwargs):
 
     obj = request.context
     th = obj.title if obj.title else obj.display_name
-    return dict(obj=obj, title=th, header=th, props=dict(id=obj.id), **kwargs)
+    return dict(obj=obj, title=th, header=th, props=dict(id=obj.id), adaptive=True, **kwargs)
 
 
 @react_renderer("@nextgisweb/webmap/display/DisplayPage")

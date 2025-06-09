@@ -278,14 +278,6 @@ export class Display {
 
         topic.publish("/webmap/tools/initialized", true);
 
-        // Resize OpenLayers Map on container resize
-        const resizeObserver = new ResizeObserver(() => {
-            this.map.olMap.updateSize();
-        });
-        resizeObserver.observe(this.mapNode);
-
-        // resizeObserver.disconnect();
-
         appendTo(this.mapNode);
         this.mapDeferred.resolve(true);
     }

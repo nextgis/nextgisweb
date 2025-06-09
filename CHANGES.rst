@@ -18,6 +18,7 @@ Changes
 - Improved handling of date and bigint fields in UI and HTTP API.
 - Creation of raster layers from ZIP-archives and PAM support. 
 - Support for adding fields to layers with versioning enabled.
+- Experimental adaptive layouts for webmaps on mobile and tablet devices.
 
 
 5.0.0
