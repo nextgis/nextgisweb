@@ -281,6 +281,6 @@ def git_dirty(path):
 def single_component():
     package = Package.loading.value.name
     prefix = "nextgisweb_"
-    assert package.startswith(prefix), "Package name must start with {prefix}"
+    assert package.startswith(prefix), f"Package name must start with {prefix}"
     component = package[len(prefix) :]
     return dict(components={component: package})
