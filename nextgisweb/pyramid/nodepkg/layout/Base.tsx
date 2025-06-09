@@ -8,6 +8,7 @@ import { Breadcrumbs } from "./Breadcrumbs";
 import type { BreadcrumbItem } from "./Breadcrumbs";
 import { Dynmenu } from "./dynmenu/Dynmenu";
 import { Header } from "./header/Header";
+import { useLayout } from "./useLayout";
 
 import { LoadingOutlined } from "@ant-design/icons";
 
@@ -50,6 +51,8 @@ export function Base({
         return lazy(() => window.ngwEntry(entrypoint));
     }, [entrypoint]);
 
+    const { isMobile } = useLayout();
+
     const renderBody = (
         <Suspense fallback={<EntrypointFallback />}>
             <LazyBody {...entrypointProps} />
@@ -88,6 +91,7 @@ export function Base({
                                     )}
 
                                     <h1
+                                        key="title"
                                         id="title"
                                         className="ngw-pyramid-layout-title"
                                     >
@@ -101,13 +105,26 @@ export function Base({
                                     >
                                         {renderBody}
                                     </div>
+                                    {isMobile && dynMenuItems.length > 0 && (
+                                        <Dynmenu
+                                            style={{
+                                                paddingTop: "10px",
+                                                paddingBottom: "10px",
+                                            }}
+                                            direction="horizontal"
+                                            items={dynMenuItems}
+                                        />
+                                    )}
                                 </>
                             )}
                         </div>
                     </div>
 
-                    {dynMenuItems && dynMenuItems.length > 0 && (
-                        <div className="ngw-pyramid-layout-sidebar">
+                    {!isMobile && dynMenuItems && dynMenuItems.length > 0 && (
+                        <div
+                            key={"sidebar"}
+                            className="ngw-pyramid-layout-sidebar"
+                        >
                             <Dynmenu items={dynMenuItems} />
                         </div>
                     )}
