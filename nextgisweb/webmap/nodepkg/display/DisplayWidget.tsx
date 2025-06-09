@@ -1,9 +1,10 @@
-import { Grid } from "antd";
 import classNames from "classnames";
 import { observer } from "mobx-react-lite";
 import { useCallback, useEffect, useState } from "react";
 
 import { Splitter } from "@nextgisweb/gui/antd";
+import { useLayout } from "@nextgisweb/pyramid/layout/useLayout";
+import type { Orientation } from "@nextgisweb/pyramid/layout/useLayout";
 import type { DisplayConfig } from "@nextgisweb/webmap/type/api";
 import { WebMapTabs } from "@nextgisweb/webmap/webmap-tabs";
 
@@ -18,7 +19,6 @@ import "./DisplayWidget.css";
 import "./DisplayWidget.less";
 
 const { Panel } = Splitter;
-const { useBreakpoint } = Grid;
 
 export interface DisplayComponentProps {
     config: DisplayConfig;
@@ -27,8 +27,6 @@ export interface DisplayComponentProps {
     display?: Display;
     setMapRefs?: (val: MapRefs) => void;
 }
-
-type Orientation = "portrait" | "landscape";
 
 const PANEL_MIN_HEIGHT = 20;
 const PANELS_DEF_LANDSCAPE_SIZE = 350;
@@ -54,9 +52,12 @@ export const DisplayWidget = observer(
                     config,
                 })
         );
-        const screens = useBreakpoint();
-        const isMobile = !screens.md;
-        const orientation: Orientation = isMobile ? "portrait" : "landscape";
+
+        const { orientation, isPortrait, isMobile } = useLayout();
+
+        useEffect(() => {
+            display.setIsMobile(isMobile);
+        }, [display, isMobile]);
 
         const setMapRefs = useCallback(
             (mapRefs_: MapRefs) => {
@@ -124,16 +125,12 @@ export const DisplayWidget = observer(
             panels.push(
                 <Panel
                     key="menu"
-                    size={orientation === "portrait" ? "40px" : "50px"}
+                    size={isPortrait ? "40px" : "50px"}
                     resizable={false}
                     style={{ flexGrow: 0, flexShrink: 0 }}
                 >
                     <NavigationMenu
-                        layout={
-                            orientation === "landscape"
-                                ? "vertical"
-                                : "horizontal"
-                        }
+                        layout={isPortrait ? "horizontal" : "vertical"}
                         store={display.panelManager}
                     />
                 </Panel>,
@@ -150,14 +147,11 @@ export const DisplayWidget = observer(
         panels.push(
             <Panel
                 key="main"
-                min={orientation === "portrait" ? 200 : 400}
+                min={isPortrait ? 200 : 400}
                 resizable={!!activePanel}
             >
                 <Splitter layout="vertical">
-                    <Panel
-                        key="map"
-                        min={orientation === "portrait" ? 200 : 400}
-                    >
+                    <Panel key="map" min={isPortrait ? 200 : 400}>
                         <MapPane setMapRefs={setMapRefs} />
                     </Panel>
                     {display.tabsManager.tabs.length && (
@@ -169,14 +163,12 @@ export const DisplayWidget = observer(
             </Panel>
         );
 
-        if (orientation === "portrait") panels.reverse();
+        if (isPortrait) panels.reverse();
 
         return (
             <div className={classNames("ngw-webmap-display", className)}>
                 <Splitter
-                    layout={
-                        orientation === "landscape" ? "horizontal" : "vertical"
-                    }
+                    layout={isPortrait ? "vertical" : "horizontal"}
                     onResize={onResize}
                     onResizeEnd={onResizeEnd}
                 >

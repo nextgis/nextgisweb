@@ -111,6 +111,8 @@ export class Display {
     @observable.shallow accessor item: StoreItem | null = null;
     @observable.shallow accessor itemConfig: LayerItemConfig | null = null;
 
+    @observable.ref accessor isMobile = false;
+
     constructor({
         config,
         tinyConfig,
@@ -243,6 +245,11 @@ export class Display {
     }
     _postCreate() {
         this._postCreateDeferred.resolve(true);
+    }
+
+    @action.bound
+    setIsMobile(val: boolean) {
+        this.isMobile = val;
     }
 
     // MAP & CONTROLS

@@ -62,9 +62,18 @@ export class PanelManager {
     }
 
     @computed
+    get visiblePanels() {
+        return [...this.sorted()].filter((panel) =>
+            this._display.isMobile ? !panel.desktopOnly : true
+        );
+    }
+
+    @computed
     get activePanel(): PanelStore | undefined {
         if (this.activePanelName) {
-            return this.panels.get(this.activePanelName);
+            return this.visiblePanels.find(
+                ({ name }) => name === this.activePanelName
+            );
         }
     }
 

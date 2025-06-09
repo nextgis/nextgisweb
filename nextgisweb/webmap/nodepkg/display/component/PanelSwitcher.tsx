@@ -26,7 +26,7 @@ const PanelRender = observer(({ panel }: { panel: PanelStore }) => {
 PanelRender.displayName = "PanelRender";
 
 export const PanelSwitcher = observer(({ display }: { display: Display }) => {
-    const { panels, activePanel } = display.panelManager;
+    const { visiblePanels, activePanel } = display.panelManager;
 
     const activeKey = useMemo(
         () => (activePanel ? activePanel.name : undefined),
@@ -34,16 +34,18 @@ export const PanelSwitcher = observer(({ display }: { display: Display }) => {
     );
 
     const items = useMemo<TabsProps["items"]>(() => {
-        return Array.from(panels.values()).map((panel) => {
-            const item: NonNullable<TabsProps["items"]>[0] = {
-                key: panel.name,
-                label: panel.title,
-                children: <PanelRender panel={panel} />,
-                ...panel.plugin.tab,
-            };
-            return item;
-        });
-    }, [panels]);
+        return Array.from(visiblePanels)
+
+            .map((panel) => {
+                const item: NonNullable<TabsProps["items"]>[0] = {
+                    key: panel.name,
+                    label: panel.title,
+                    children: <PanelRender panel={panel} />,
+                    ...panel.plugin.tab,
+                };
+                return item;
+            });
+    }, [visiblePanels]);
 
     return (
         <Tabs

@@ -8,6 +8,7 @@ registry.register(COMP_ID, {
     widget: () => import("./PrintPanel"),
     name: "print",
     title: gettext("Print map"),
+    desktopOnly: true,
     icon: <PrintIcon />,
     order: 70,
 });

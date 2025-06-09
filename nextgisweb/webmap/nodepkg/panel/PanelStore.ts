@@ -18,6 +18,7 @@ export class PanelStore {
 
     @observable.ref accessor title: string;
     @observable.ref accessor order: number;
+    @observable.ref accessor desktopOnly = false;
 
     private loadPromise?: Promise<React.FC<PanelWidgetProps<PanelStore>>>;
 
@@ -27,6 +28,9 @@ export class PanelStore {
 
         this.name = plugin.name;
         this.title = plugin.title;
+        if (plugin.desktopOnly !== undefined) {
+            this.desktopOnly = plugin.desktopOnly;
+        }
         this.order = plugin.order ?? Number.MAX_SAFE_INTEGER;
     }
 

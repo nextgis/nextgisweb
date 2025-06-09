@@ -32,7 +32,7 @@ export const NavigationMenu = observer<NavigationMenuProps>(
                     layout
                 )}
             >
-                {store.sorted().map(({ name, title, plugin }) => (
+                {store.visiblePanels.map(({ name, title, plugin }) => (
                     <div
                         key={name}
                         title={title}

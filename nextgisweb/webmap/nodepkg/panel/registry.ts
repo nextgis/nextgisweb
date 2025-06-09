@@ -31,6 +31,7 @@ export interface PanelPlugin<S extends PanelStore = PanelStore> {
     name: string;
     title: string;
     icon: ReactNode;
+    desktopOnly?: boolean;
     order?: number;
     applyToTinyMap?: boolean;
 
