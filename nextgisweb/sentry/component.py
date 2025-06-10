@@ -119,6 +119,6 @@ def _deprecated_options(options, *keys):
             if idx != 0:
                 logger.warning(
                     f"The '{key}' setting has been deprecated in 4.9.0.dev1 "
-                    f"and will be removed in 4.5.0, use '{keys[0]}' instead."
+                    f"and will be removed in 5.1.0, use '{keys[0]}' instead."
                 )
             return value
