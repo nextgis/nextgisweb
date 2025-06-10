@@ -40,11 +40,11 @@ msgstr "Растровые файлы без информации о проек�
 msgid "Mixed band data types are not supported."
 msgstr "Смешанные типы каналов не поддерживаются."
 
-#: model.py:188
+#: model.py:202
 msgid "GDAL was uanble to parse the raster coordinate system."
 msgstr "GDAL не смог обработать определение системы координат растра."
 
-#: model.py:193
+#: model.py:207
 msgid ""
 "The source raster has a local coordinate system and can't be reprojected to "
 "the target coordinate system."
@@ -52,15 +52,15 @@ msgstr ""
 "Исходный растр имеет локальную систему координат и не может быть "
 "перепроецирован в целевую."
 
-#: model.py:211
+#: model.py:225
 msgid "Failed to reproject the raster to the target coordinate system."
 msgstr "Не удалось перепроецировать растр в целевую систему координат."
 
-#: model.py:216
+#: model.py:230
 msgid "GDAL error message: %s"
 msgstr "Сообщение об ошибке GDAL: %s"
 
-#: model.py:231
+#: model.py:245
 msgid ""
 "The uncompressed raster size ({size}) exceeds the limit ({limit}) by {delta}."
 " Reduce raster size to fit the limit."
@@ -68,26 +68,26 @@ msgstr ""
 "Размер несжатого растра ({size}) превышает лимит ({limit}) на {delta}. "
 "Уменьшите растр, чтобы он вписывался в лимит."
 
-#: model.py:366
+#: model.py:380
 msgid "{n} band with {t} data type"
 msgid_plural "{n} bands with {t} data type"
 msgstr[0] "{n} канал с типом данных {t}"
 msgstr[1] "{n} канала с типом данных {t}"
 msgstr[2] "{n} каналов с типом данных {t}"
 
-#: model.py:373
+#: model.py:387
 msgid "Band summary"
 msgstr "Сводка по каналам"
 
-#: model.py:374
+#: model.py:388
 msgid "Pixel dimensions"
 msgstr "Размер в пикселях"
 
-#: model.py:375 nodepkg/editor-widget/EditorWidget.tsx:37
+#: model.py:389 nodepkg/editor-widget/EditorWidget.tsx:37
 msgid "Cloud Optimized GeoTIFF (COG)"
 msgstr "Cloud Optimized GeoTIFF (COG)"
 
-#: model.py:376
+#: model.py:390
 msgid "Persistent auxiliary metadata (PAM)"
 msgstr "Вспомогательные метаданные (PAM)"
 
@@ -96,8 +96,13 @@ msgid "Select a dataset"
 msgstr "Выберите растровый слой"
 
 #: nodepkg/editor-widget/EditorWidget.tsx:14
-msgid "Dataset should be in GeoTIFF or ZIP format."
-msgstr "Файл должен быть в формате GeoTIFF или ZIP."
+msgid ""
+"Supported formats: GeoTIFF, JPEG, and PNG with GDAL PAM metadata (.aux.xml "
+"files). Multi-file datasets should be uploaded as ZIP archives."
+msgstr ""
+"Поддерживаемые форматы: GeoTIFF, JPEG и PNG с метаданными GDAL PAM (файлы "
+".aux.xml). Многофайловые наборы данных должны быть загружены в виде "
+"ZIP-архивов."
 
 #: nodepkg/export-form/ExportForm.tsx:58
 msgid "Band"

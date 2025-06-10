@@ -19,6 +19,7 @@ Changes
 - Creation of raster layers from ZIP-archives and PAM support. 
 - Support for adding fields to layers with versioning enabled.
 - Experimental adaptive layouts for webmaps on mobile and tablet devices.
+- Support for GDAL PAM georeferenced (.aux.xml files) JPEG and PNG rasters.
 
 
 5.0.0

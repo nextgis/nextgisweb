@@ -11,8 +11,8 @@ import type { EditorStore } from "./EditorStore";
 // prettier-ignore
 const uploaderMessages = {
     uploadText: gettext("Select a dataset"),
-    helpText: gettext("Dataset should be in GeoTIFF or ZIP format."),
-}
+    helpText: gettext("Supported formats: GeoTIFF, JPEG, and PNG with GDAL PAM metadata (.aux.xml files). Multi-file datasets should be uploaded as ZIP archives."),
+};
 
 export const EditorWidget: IEditorWidget<EditorStore> = observer(
     ({ store }) => {

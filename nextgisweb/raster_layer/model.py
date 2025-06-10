@@ -1,11 +1,11 @@
+import glob
 import os
-import shutil
 import subprocess
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import List, Union
 from warnings import warn
-from zipfile import is_zipfile
+from zipfile import ZipFile, is_zipfile
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
@@ -42,7 +42,7 @@ Base.depends_on("resource")
 
 PYRAMID_TARGET_SIZE = 512
 
-SUPPORTED_DRIVERS = ("GTiff",)
+SUPPORTED_DRIVERS = ("GTiff", "PNG", "JPEG")
 
 COLOR_INTERPRETATION = {
     gdal.GCI_Undefined: "Undefined",
@@ -168,7 +168,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
                     band.GetNoDataValue() is not None
                 )
 
-        # convert the mask band to the alpha band
+        # Convert the mask band to the alpha band
         if mask_flags.count(gdal.GMF_PER_DATASET) == len(mask_flags):
             bands = [bidx for bidx in range(1, ds.RasterCount + 1)]
             bands.append("mask")
@@ -178,7 +178,21 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
                 ds = gdal.Translate(tf.name, ds, options=topts)
                 ds.GetRasterBand(alpha_band).SetColorInterpretation(gdal.GCI_AlphaBand)
                 ds = None
-                shutil.move(tf.name, filename)
+
+                # gdal.Translate may generate auxiliary files (e.g., .aux.xml)
+                # to store metadata or additional info - we include all such
+                # files in the ZIP archive to ensure nothing is lost.
+                base, _ = os.path.splitext(tf.name)
+                ds_files = glob.glob(base + ".*")
+                if filename.startswith("/vsizip/"):
+                    filename = filename[filename.find("{") + 1 : filename.find("}")]
+                with ZipFile(filename, "w") as zf:
+                    for file in ds_files:
+                        zf.write(file, arcname=os.path.basename(file))
+                        os.remove(file)
+
+                zip_filename = "/vsizip/{%s}" % filename
+                filename = f"{zip_filename}/{os.path.basename(tf.name)}"
                 ds = gdal.Open(filename, gdalconst.GA_ReadOnly)
 
         try:
