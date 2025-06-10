@@ -23,15 +23,15 @@ unquote_strict = partial(unquote_plus, errors="strict")
 def string_decoder(type: Any) -> StringDecoder:
     otype = unannotate(type, supertype=True)
 
-    if otype == str:
+    if otype is str:
         return _urlsafe(lambda val, type=type: convert(val, type), False)
     elif is_enum(otype):
         return _urlsafe(lambda val, type=type: convert(val, type), True)
-    elif otype == int:
+    elif otype is int:
         return _urlsafe(lambda val, type=type: convert(int(convert(val, StrInt)), type), True)
-    elif otype == float:
+    elif otype is float:
         return _urlsafe(lambda val, type=type: convert(float(convert(val, StrFloat)), type), True)
-    elif otype == bool:
+    elif otype is bool:
         return _urlsafe(lambda val: convert(val, StrBool) in ("true", "yes"), True)
     elif get_origin(otype) is Literal:
         args = get_args(otype)

@@ -183,7 +183,7 @@ def test_serialization(key, value, ngw_webtest_app, webapp_handler):
             return obj
 
         cmp = _tuple2list(value)
-        assert type(request.session[key]) == type(cmp)
+        assert type(request.session[key]) is type(cmp)
         assert request.session[key] == cmp
         return Response()
 

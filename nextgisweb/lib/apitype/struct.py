@@ -63,7 +63,7 @@ def derive(struct: ST, *spec) -> ST:
         fnmeta = list()
         control = None
         for m in fmeta:
-            if type(m) == Conditional:
+            if isinstance(m, Conditional):
                 for k, v in m.cond.items():
                     if k not in cond:
                         break
