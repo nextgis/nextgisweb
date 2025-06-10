@@ -19,6 +19,7 @@ class Point(Struct, kw_only=True):
 class RasterLayerIdentifyItem(Struct, kw_only=True):
     resource: ResourceRef
     color_interpretation: list[str]
+    pixel_class: list[str]
     values: list[Any]
 
 
@@ -43,15 +44,32 @@ def identify(
             if (values := val_at_coord(ds, point)) is None:
                 continue
 
-            color_interpretation = [
-                COLOR_INTERPRETATION[ds.GetRasterBand(bidx).GetRasterColorInterpretation()]
-                for bidx in range(1, res.band_count + 1)
-            ]
+            color_interpretation = []
+            pixel_class = []
+
+            for bidx in range(1, res.band_count + 1):
+                band = ds.GetRasterBand(bidx)
+                color_interpretation.append(
+                    COLOR_INTERPRETATION[band.GetRasterColorInterpretation()]
+                )
+
+                rat = band.GetDefaultRAT()
+                if (rat) is not None and rat.GetTableType() == gdal.GRTT_THEMATIC:
+                    rat_col = rat.GetColOfUsage(gdal.GFU_Name)
+                    rat_row = rat.GetRowOfValue(values[bidx - 1].item())
+                    if rat_col == -1 or rat_row == -1:
+                        pixel_class.append(None)
+                        continue
+                    pixel_class_value = rat.GetValueAsString(rat_row, rat_col)
+                    pixel_class.append(pixel_class_value)
+                else:
+                    pixel_class.append(None)
 
             items.append(
                 RasterLayerIdentifyItem(
                     resource=ResourceRef(id=res.id),
                     color_interpretation=color_interpretation,
+                    pixel_class=pixel_class,
                     values=values.flatten().tolist(),
                 )
             )
