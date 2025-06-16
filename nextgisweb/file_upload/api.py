@@ -257,7 +257,8 @@ def item_patch_tus(fupload: FileUpload, request) -> Annotated[None, StatusCode(2
         raise exc.HTTPBadRequest()
 
     # Don't upload more than declared file size.
-    if upload_offset + request.content_length > fupload.size:
+    content_length = request.content_length
+    if content_length and upload_offset + content_length > fupload.size:
         raise UploadedFileTooLarge()
 
     with fupload.data_path.open("ab") as fd:
