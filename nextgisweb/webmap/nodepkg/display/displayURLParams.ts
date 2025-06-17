@@ -1,22 +1,30 @@
 import type { LayerSymbols } from "../compat/type";
 import type { DisplayURLParams } from "../type";
+import type { URLParams } from "../utils/URL";
 import { UrlParams } from "../utils/UrlParams";
 
+const toFloat = (val: URLParams[0]) =>
+    typeof val === "string" ? parseFloat(val) : undefined;
+const toInt = (val: URLParams[0]) =>
+    typeof val === "string" ? parseInt(val) : undefined;
+
 export const displayURLParams = new UrlParams<DisplayURLParams>({
-    lon: { parse: parseFloat },
-    lat: { parse: parseFloat },
+    lon: { parse: toFloat },
+    lat: { parse: toFloat },
     base: {},
-    zoom: { parse: parseInt },
-    angle: { parse: parseInt },
+    zoom: { parse: toInt },
+    angle: { parse: toInt },
     annot: {},
     events: {},
     panel: {},
-    panels: { parse: (val) => val.split(",") },
+    panels: {
+        parse: (val) => (typeof val === "string" ? val.split(",") : []),
+    },
     styles: {
         // styles=1[0-5|8-12],2,3[-1] >>> { 1: ['0-5', '8-12'], 2: [], 3: '-1' }
         parse: (val) => {
             const result: Record<number, LayerSymbols> = {};
-            if (!val) return result;
+            if (!val || typeof val !== "string") return result;
 
             val.split(",").forEach((entry) => {
                 const match = entry.match(/^(\d+)(?:\[(.*?)\])?$/);
@@ -39,6 +47,8 @@ export const displayURLParams = new UrlParams<DisplayURLParams>({
     hl_val: {},
     hl_lid: {},
     hl_attr: {},
-    controls: { parse: (val) => val.split(",") },
+    controls: {
+        parse: (val) => (typeof val === "string" ? val.split(",") : []),
+    },
     linkMainMap: {},
 });

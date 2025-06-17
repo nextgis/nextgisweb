@@ -22,10 +22,8 @@ export function defaultPanelMapSettings(initTitleText: string) {
 }
 
 export function getPrintUrlSettings(): Partial<PrintMapSettings> {
-    const parsed = getURLParams() as Record<
-        keyof UrlPrintParams<PrintMapSettings>,
-        string
-    >;
+    const parsed =
+        getURLParams<Record<keyof UrlPrintParams<PrintMapSettings>, string>>();
 
     const settingsUrl: Record<string, unknown> = {};
     for (const [urlParam, urlValue] of Object.entries(parsed) as [
@@ -51,7 +49,11 @@ export function getPrintUrlSettings(): Partial<PrintMapSettings> {
 }
 
 export function getPrintMapLink(mapSettings: PrintMapSettings): string {
-    const parsed: Record<string, string> = getURLParams<PrintMapSettings>();
+    const parsed: Record<string, string> = {};
+
+    for (const [urlParam, value] of Object.entries(getURLParams())) {
+        parsed[urlParam] = String(value);
+    }
 
     for (const [urlParam, settingInfo] of Object.entries(urlPrintParams)) {
         const { setting } = settingInfo;

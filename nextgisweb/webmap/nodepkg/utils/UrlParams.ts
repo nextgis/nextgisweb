@@ -1,7 +1,8 @@
 import { getURLParams } from "./URL";
+import type { URLParams } from "./URL";
 
 interface ParamConfig<T> {
-    parse?: (value: string) => T;
+    parse?: (value: string | boolean) => T;
 }
 
 type ConfigOption<T> = ParamConfig<T>;
@@ -12,7 +13,7 @@ export class UrlParams<T extends object> {
     ) {}
 
     public values(): T {
-        const urlParams: Record<string, string> = getURLParams();
+        const urlParams: URLParams = getURLParams();
         const result = {} as T;
         for (const key in urlParams) {
             if (Object.prototype.hasOwnProperty.call(urlParams, key)) {
