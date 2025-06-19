@@ -109,7 +109,7 @@ export const EdiTable = observer(
         rowKey = "key",
         ...tableProps
     }: EdiTableProps<EdiTableStore<R>, R>) => {
-        const { moveRow, placeholder } = store;
+        const { canMoveRow, moveRow, placeholder } = store;
 
         const tableRef = useRef<TableRef | null>(null);
 
@@ -177,7 +177,7 @@ export const EdiTable = observer(
                 const overIndex = store.rows.findIndex(
                     (record) => record[rowKey as string] === over.id
                 );
-                if (row && overIndex !== -1 && moveRow) {
+                if (row && overIndex !== -1 && canMoveRow && moveRow) {
                     moveRow(row, overIndex);
                 }
             }
@@ -188,7 +188,7 @@ export const EdiTable = observer(
             const actsCell = { className: "row-actions" };
             const hideCell = { colSpan: 0 };
             const placeholderCell = {
-                colSpan: columns.length + 1 + (moveRow ? 1 : 0),
+                colSpan: columns.length + 1 + (canMoveRow ? 1 : 0),
                 className: "placeholder",
             };
 
@@ -211,7 +211,7 @@ export const EdiTable = observer(
                             style.minWidth = shrink;
                         }
 
-                        const moveSpan = idx === 0 && moveRow;
+                        const moveSpan = idx === 0 && canMoveRow;
                         result.onHeaderCell = () => ({
                             className,
                             colSpan: moveSpan ? 2 : 1,
@@ -257,7 +257,7 @@ export const EdiTable = observer(
                 },
             ];
 
-            if (moveRow) {
+            if (canMoveRow) {
                 resultColumns.unshift({
                     key: "sort",
                     onHeaderCell: () => hideCell,
@@ -270,7 +270,7 @@ export const EdiTable = observer(
             }
 
             return resultColumns;
-        }, [placeholder, columns, renderActs, moveRow]);
+        }, [placeholder, columns, renderActs, canMoveRow]);
 
         return (
             <DndContext

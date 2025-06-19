@@ -1,10 +1,10 @@
-import { clamp, remove } from "lodash-es";
-import { action, computed, observable, runInAction } from "mobx";
+import { action, computed, observable } from "mobx";
 
 import {
     EdiTableKeyValueRow,
     EdiTableKeyValueStore,
 } from "@nextgisweb/gui/edi-table";
+import type { EdiTableStore } from "@nextgisweb/gui/edi-table";
 import type {
     LookupTableCreate,
     LookupTableRead,
@@ -17,7 +17,8 @@ import { lookupTableIsSorted, lookupTableSort } from "../util/sort";
 export class EditorStore
     extends EdiTableKeyValueStore<string>
     implements
-        IEditorStore<LookupTableRead, LookupTableCreate, LookupTableUpdate>
+        IEditorStore<LookupTableRead, LookupTableCreate, LookupTableUpdate>,
+        EdiTableStore<EdiTableKeyValueRow<string>>
 {
     readonly identity = "lookup_table";
 
@@ -43,22 +44,18 @@ export class EditorStore
         return lookupTableIsSorted(this.items, this.sort);
     }
 
+    @action.bound
+    moveRow(row: EdiTableKeyValueRow<string>, index: number) {
+        index = Math.min(Math.max(index, 0), this.rows.length - 1);
+        const newRows = this.rows.filter((item) => item !== row);
+        newRows.splice(index, 0, row);
+        this.rows.splice(0, this.rows.length, ...newRows);
+        this.dirty = true;
+    }
+
     @computed
-    get moveRow() {
-        if (this.sort === "CUSTOM") {
-            return (row: any, index: number) => {
-                runInAction(() => {
-                    index = clamp(index, 0, this.rows.length - 1);
-                    const newRows = [...this.rows];
-                    remove(newRows, (i) => i === row);
-                    newRows.splice(index, 0, row);
-                    this.rows.splice(0, this.rows.length, ...newRows);
-                    this.dirty = true;
-                });
-            };
-        } else {
-            return undefined;
-        }
+    get canMoveRow() {
+        return this.sort === "CUSTOM";
     }
 
     @action
