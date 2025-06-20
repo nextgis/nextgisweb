@@ -84,13 +84,14 @@ export function updateKeysForGroup(
     keys: number[],
     storedKeys: number[]
 ) {
+    if (node.halfChecked) {
+        const deepChildren = getChildrenDeep(node);
+        return storedKeys.filter(
+            (k) => !deepChildren.map((c) => c.key).includes(k)
+        );
+    }
     if (isExclusiveGroup(node.treeItem)) {
-        if (node.halfChecked) {
-            const deepChildren = getChildrenDeep(node);
-            return storedKeys.filter(
-                (k) => !deepChildren.map((c) => c.key).includes(k)
-            );
-        } else if (!node.checked) {
+        if (!node.checked) {
             return [
                 ...storedKeys,
                 ...(node.children || []).map((c) => Number(c.key)),
