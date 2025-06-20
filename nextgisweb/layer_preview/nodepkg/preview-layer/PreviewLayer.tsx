@@ -64,17 +64,18 @@ export function PreviewLayer({
 
     useEffect(() => {
         const loadExtent = async () => {
-            if (
-                resData &&
-                resData.resource.interfaces.some((iface) =>
-                    extentInterfaces.includes(iface)
-                )
-            ) {
-                try {
-                    const data = await extentRoute.get();
-                    setExtentData(data);
-                } catch {
-                    // ignore
+            if (resData) {
+                if (
+                    resData.resource.interfaces.some((iface) =>
+                        extentInterfaces.includes(iface)
+                    )
+                ) {
+                    try {
+                        const data = await extentRoute.get();
+                        setExtentData(data);
+                    } catch {
+                        // ignore
+                    }
                 }
                 setIsExtentLoading(false);
             }
