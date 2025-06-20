@@ -34,23 +34,23 @@ msgstr "64K должно быть достаточно для логотипа."
 msgid "Your Web GIS at nextgis.com"
 msgstr "Ваши карты онлайн на nextgis.com"
 
-#: component.py:167
+#: component.py:168
 msgid "Request timeout"
 msgstr "Таймаут запроса"
 
-#: component.py:170
+#: component.py:171
 msgid "Enabled"
 msgstr "Включено"
 
-#: component.py:170
+#: component.py:171
 msgid "Disabled"
 msgstr "Отключено"
 
-#: exception.py:218
+#: exception.py:219
 msgid "Internal server error"
 msgstr "Внутренняя ошибка сервера"
 
-#: exception.py:219
+#: exception.py:220
 msgid ""
 "The server encountered an internal error or misconfiguration and was unable "
 "to complete your request."
@@ -58,37 +58,37 @@ msgstr ""
 "При обработке запроса возникла внутренняя ошибка или сервер настроен "
 "некорректно и не может обработать запрос."
 
-#: exception.py:252
+#: exception.py:253
 msgid "Bad request"
 msgstr "Некорректный запрос"
 
-#: exception.py:253
+#: exception.py:254
 msgid ""
 "The server could not comply with the request since it is either malformed or "
 "otherwise incorrect."
 msgstr "Сервер не может выполнить запрос. Возможно, в запросе ошибка."
 
-#: exception.py:261
+#: exception.py:262
 msgid "Payment required"
 msgstr "Необходима оплата"
 
-#: exception.py:262
+#: exception.py:263
 msgid "Access was denied for financial reasons."
 msgstr "Доступ закрыт по финансовым причинам."
 
-#: exception.py:267
+#: exception.py:268
 msgid "Forbidden"
 msgstr "Доступ запрещен"
 
-#: exception.py:268
+#: exception.py:269
 msgid "Access was denied to this resource."
 msgstr "У вас нет доступа к этому ресурсу."
 
-#: exception.py:273
+#: exception.py:274
 msgid "Page not found"
 msgstr "Страница не найдена"
 
-#: exception.py:274
+#: exception.py:275
 msgid ""
 "The page may have been deleted or an error in the address. Correct the "
 "address or go to the home page and try to find the desired page."
@@ -97,23 +97,23 @@ msgstr ""
 " вернитесь на главную страницу и попробуйте найти нужную страницу с помощью "
 "навигации."
 
-#: exception.py:282
+#: exception.py:283
 msgid "Unprocessable entity"
 msgstr "Необрабатываемая сущность"
 
-#: exception.py:283
+#: exception.py:284
 msgid "Unable to process the contained instructions."
 msgstr "Невозможно выполнить запрошенную операцию."
 
-#: exception.py:288 exception.py:289
+#: exception.py:289 exception.py:290
 msgid "Not implemented"
 msgstr "Не реализовано"
 
-#: exception.py:294
+#: exception.py:295
 msgid "Service unavailable"
 msgstr "Сервис недоступен"
 
-#: exception.py:295
+#: exception.py:296
 msgid "The server is currently unavailable. Please try again at a later time."
 msgstr ""
 "В настоящий момент сервер недоступен. Пожалуйста, попробуйте выполнить "
@@ -292,15 +292,15 @@ msgstr "Настройки пользователя"
 msgid "Sign out"
 msgstr "Выйти"
 
-#: nodepkg/layout/store.ts:51
+#: nodepkg/layout/store.ts:54
 msgid "Resources"
 msgstr "Ресурсы"
 
-#: nodepkg/layout/store.ts:57 view.py:178
+#: nodepkg/layout/store.ts:60 view.py:200
 msgid "Control panel"
 msgstr "Панель управления"
 
-#: nodepkg/layout/store.ts:64
+#: nodepkg/layout/store.ts:67
 msgid "Help"
 msgstr "Справка"
 
@@ -472,7 +472,7 @@ msgstr "Доступны обновления"
 msgid "Click to see what's new"
 msgstr "Нажмите и узнайте, что нового"
 
-#: permission.py:5 view.py:283 view.py:634
+#: permission.py:5 view.py:305 view.py:656
 msgid "Cross-origin resource sharing (CORS)"
 msgstr "Cross-origin resource sharing (CORS)"
 
@@ -545,74 +545,74 @@ msgstr ""
 "Если вы используете актуальную версию браузера, Веб ГИС будет работать "
 "нормально."
 
-#: tomb/config.py:99
+#: tomb/config.py:98
 msgid "Parameter required"
 msgstr "Требуется параметр"
 
-#: tomb/config.py:100
+#: tomb/config.py:99
 msgid "The '{}' query parameter is required."
 msgstr "Необходимо указать значение параметра '{}'."
 
-#: tomb/config.py:102
+#: tomb/config.py:101
 msgid "Invalid parameter"
 msgstr "Некорректный параметр"
 
-#: tomb/config.py:103
+#: tomb/config.py:102
 msgid "The '{}' query parameter has an invalid value."
 msgstr "Параметр запроса '{}' имеет недопустимое значение."
 
 #: tomb/exception.py:7
 msgid "Malformed JSON body"
-msgstr ""
+msgstr "Некорректное JSON тело"
 
 #: tomb/exception.py:8
 msgid "The JSON body of the request is malformed or invalid."
-msgstr ""
+msgstr "JSON тело запроса имеет некорректный или недопустимый формат."
 
-#: view.py:167
+#: view.py:188
 msgid "HTTP API documentation"
 msgstr "Документация HTTP API"
 
-#: view.py:232 view.py:643
+#: view.py:254 view.py:665
 msgid "System information"
 msgstr "Информация о системе"
 
-#: view.py:242 view.py:649
+#: view.py:264 view.py:671
 msgid "Font management"
 msgstr "Управление шрифтами"
 
-#: view.py:251 view.py:686
+#: view.py:273 view.py:708
 msgid "Storage"
 msgstr "Хранилище"
 
-#: view.py:265 view.py:693
+#: view.py:287 view.py:715
 msgid "Backups"
 msgstr "Резервные копии"
 
-#: view.py:293 view.py:661
+#: view.py:315 view.py:683
 msgid "Custom CSS"
 msgstr "Пользовательские стили CSS"
 
-#: view.py:302 view.py:667
+#: view.py:324 view.py:689
 msgid "Custom logo"
 msgstr "Логотип"
 
-#: view.py:311 view.py:655
+#: view.py:333 view.py:677
 msgid "Web GIS name"
 msgstr "Название Веб ГИС"
 
-#: view.py:320 view.py:673
+#: view.py:342 view.py:695
 msgid "Home path"
 msgstr "Стартовая страница"
 
-#: view.py:329 view.py:679
+#: view.py:351 view.py:701
 msgid "Metrics and analytics"
 msgstr "Метрики и аналитика"
 
-#: view.py:623
+#: view.py:645
 msgid "Info"
 msgstr "Информация"
 
-#: view.py:624
+#: view.py:646
 msgid "Settings"
 msgstr "Настройки"

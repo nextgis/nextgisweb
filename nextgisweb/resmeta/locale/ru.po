@@ -1,43 +1,49 @@
-#: model.py:60 nodepkg/editor/EditorWidget.tsx:98
-msgid "String"
-msgstr "Строка"
-
-#: model.py:61 nodepkg/editor/EditorWidget.tsx:99
-msgid "Number"
-msgstr "Число"
-
-#: model.py:62 nodepkg/editor/EditorWidget.tsx:100
-msgid "Boolean"
-msgstr "Логический"
-
-#: model.py:63 nodepkg/editor/EditorWidget.tsx:101
-msgid "Empty"
-msgstr "Пусто"
-
-#: nodepkg/editor/EditorWidget.tsx:22
-msgid "Type here to add a new key..."
-msgstr "Введите новый ключ здесь..."
-
-#: nodepkg/editor/EditorWidget.tsx:79 template/resource_section.mako:21
+#: nodepkg/editor/EditorWidget.tsx:45
+#: nodepkg/resource-section/ResmetaResourceSection.tsx:29
 msgid "False"
 msgstr "Ложь"
 
-#: nodepkg/editor/EditorWidget.tsx:80 template/resource_section.mako:21
+#: nodepkg/editor/EditorWidget.tsx:46
+#: nodepkg/resource-section/ResmetaResourceSection.tsx:29
 msgid "True"
 msgstr "Истина"
 
-#: nodepkg/editor/EditorWidget.tsx:109 template/resource_section.mako:12
+#: nodepkg/editor/EditorWidget.tsx:68
+#: nodepkg/resource-section/ResmetaResourceSection.tsx:13
+msgid "String"
+msgstr "Строка"
+
+#: nodepkg/editor/EditorWidget.tsx:69
+#: nodepkg/resource-section/ResmetaResourceSection.tsx:15
+msgid "Number"
+msgstr "Число"
+
+#: nodepkg/editor/EditorWidget.tsx:70
+#: nodepkg/resource-section/ResmetaResourceSection.tsx:17
+msgid "Boolean"
+msgstr "Логический"
+
+#: nodepkg/editor/EditorWidget.tsx:71
+#: nodepkg/resource-section/ResmetaResourceSection.tsx:11
+msgid "Empty"
+msgstr "Пусто"
+
+#: nodepkg/editor/EditorWidget.tsx:82
+#: nodepkg/resource-section/ResmetaResourceSection.tsx:43
 msgid "Key"
 msgstr "Ключ"
 
-#: nodepkg/editor/EditorWidget.tsx:115 template/resource_section.mako:13
+#: nodepkg/editor/EditorWidget.tsx:88
+#: nodepkg/resource-section/ResmetaResourceSection.tsx:49
 msgid "Type"
 msgstr "Тип"
 
-#: nodepkg/editor/EditorWidget.tsx:121 template/resource_section.mako:14
+#: nodepkg/editor/EditorWidget.tsx:94
+#: nodepkg/resource-section/ResmetaResourceSection.tsx:56
 msgid "Value"
 msgstr "Значение"
 
-#: nodepkg/editor/EditorWidget.tsx:135 view.py:14
+#: nodepkg/editor/EditorWidget.tsx:114
+#: nodepkg/resource-section/ResmetaResourceSection.tsx:85
 msgid "Metadata"
 msgstr "Метаданные"
