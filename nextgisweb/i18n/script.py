@@ -13,8 +13,9 @@ from tempfile import NamedTemporaryFile
 from time import sleep
 from typing import List, Union
 
-from babel.messages.catalog import Catalog
+from babel.messages.catalog import Catalog, Message
 from babel.messages.mofile import write_mo
+from babel.messages.plurals import get_plural
 from babel.messages.pofile import read_po
 from msgspec import Struct, to_builtins
 from poeditor import POEditorAPI
@@ -416,6 +417,46 @@ def cmd_stat(args):
         print_records(data, ("package",), title="PACKAGE SUMMARY")
 
 
+class POEditorDescription:
+    def __init__(self, client, project_id):
+        self.client = client
+        self.project_id = project_id
+        self.populate()
+
+    def populate(self):
+        details = self.client.view_project_details(self.project_id)
+        self.packages = json.loads(re.search(r"\((.+?)\)", details["description"]).group(1))
+
+    def update(self, pversions):
+        self.packages.update(pversions)
+        description = "[//]: # (%s)" % (json.dumps(self.packages))
+        self.client.update_project(project_id=self.project_id, description=description)
+
+
+def _to_poeditor_context(comp_id: str, context: str | None) -> str:
+    return comp_id if not context else f"{comp_id}:{context}"
+
+
+def _from_poeditor_context(context: str) -> tuple[str, str | None]:
+    parts = context.split(":", maxsplit=1)
+    return parts[0], parts[1] if len(parts) > 1 else None
+
+
+def _poeditor_translation(term: dict, num_plurals: int):
+    content = term["translation"]["content"]
+    if isinstance(content, str):
+        return content
+
+    result = (content.get("one", ""),)
+    if num_plurals >= 1:
+        result += (content.get("few", ""),)
+    if num_plurals >= 2:
+        result += (content.get("many", ""),)
+    if num_plurals >= 3:
+        result += (content.get("other", ""),)
+    return result
+
+
 def cmd_poeditor_sync(args):
     opts = env.core.options.with_prefix("locale.poeditor")
 
@@ -442,15 +483,15 @@ def cmd_poeditor_sync(args):
 
         if meta.pkg not in pversions:
             local_ver = pkginfo.packages[meta.pkg].version
-            if (remote_ver := description.packages.get(meta.pkg)) and pkg_version.parse(
-                local_ver
-            ) < pkg_version.parse(remote_ver):
+            remote_ver = description.packages.get(meta.pkg)
+            if remote_ver and pkg_version.parse(local_ver) < pkg_version.parse(remote_ver):
                 raise RuntimeError(
                     "Version of the '%s' package must be not lower "
                     "than %s in order to use translations from the POEditor "
                     "(current version: %s)." % (meta.pkg, remote_ver, local_ver)
                 )
-            pversions[meta.pkg] = local_ver
+            if local_ver != remote_ver:
+                pversions[meta.pkg] = local_ver
 
         cmd_update(
             Namespace(
@@ -473,7 +514,7 @@ def cmd_poeditor_sync(args):
                         reference_catalogs[locale] = ref_catalog
                     with po_path.open("r") as po_fd:
                         for m in read_po(po_fd, locale=to_gettext_locale(locale)):
-                            m.context = meta.comp
+                            m.context = _to_poeditor_context(meta.comp, m.context)
                             ref_catalog[m.id] = m
                 continue
 
@@ -481,12 +522,28 @@ def cmd_poeditor_sync(args):
             if not terms:
                 logger.debug("Fetching translations from POEditor for locale [%s]...", locale)
                 terms = client.view_project_terms(
-                    poeditor_project_id, language_code=to_http_locale(locale)
+                    poeditor_project_id,
+                    language_code=to_http_locale(locale),
                 )
                 poeditor_terms[locale] = terms
 
-            # Filter terms by context
-            terms = [term for term in terms if meta.comp == term["context"]]
+            poeditor_messages = dict[tuple[str | None, str | tuple[str, str]], Message]()
+            poeditor_num_plurals = get_plural(to_gettext_locale(locale))[0]
+            for term in terms:
+                term_domain, term_context = _from_poeditor_context(term["context"])
+                if term_domain != meta.comp:
+                    continue
+
+                poeditor_message_id = term["term"]
+                if poeditor_plural := term.get("plural"):
+                    poeditor_message_id = (poeditor_message_id, poeditor_plural)
+
+                poeditor_message_translation = _poeditor_translation(term, poeditor_num_plurals)
+                poeditor_messages[(term_context, poeditor_message_id)] = Message(
+                    poeditor_message_id,
+                    poeditor_message_translation,
+                    context=term_context,
+                )
 
             po_path = catalog_filename(meta.comp, locale)
 
@@ -499,20 +556,13 @@ def cmd_poeditor_sync(args):
             updated = 0
 
             for msg in po:
-                for term in terms:
-                    if msg.id == term["term"]:
-                        cur_tr = msg.string
-                        new_tr = term["translation"]["content"]
-
-                        if cur_tr != new_tr:
-                            msg.string = new_tr
-                            updated += 1
-
-                        break
+                if poeditor_message := poeditor_messages.get((msg.context, msg.id)):
+                    if msg.string != poeditor_message.string:
+                        msg.string = poeditor_message.string
+                        updated += 1
 
             if updated != 0:
                 write_po(po_path, po)
-
                 logger.info(
                     "%d messages translated for component [%s] locale [%s]",
                     updated,
@@ -521,13 +571,14 @@ def cmd_poeditor_sync(args):
                 )
 
     # Synchronize terms
+
     remote_terms = defaultdict(set)
-    target_state = defaultdict(dict)
+    for term in client.view_project_terms(poeditor_project_id):
+        term_domain, term_context = _from_poeditor_context(term["context"])
+        term_plural = term["plural"] or None
+        remote_terms[term_domain].add((term_context, term["term"], term_plural))
 
-    for item in client.view_project_terms(poeditor_project_id):
-        remote_terms[item["term"]].add(item["context"])
-
-    comps = []
+    local_terms = defaultdict(set)
     for meta in components_and_locales(args, work_in_progress=True):
         if not meta.external:
             continue
@@ -535,97 +586,84 @@ def cmd_poeditor_sync(args):
         pot_path = catalog_filename(meta.comp, "", ext="pot")
         with pot_path.open("r") as fd:
             pot = read_po(fd)
+
         for msg in pot:
             if msg.id == "":
                 continue
-            target_state[msg.id][meta.comp] = True
-        comps.append(meta.comp)
+            local_terms[meta.comp].add(
+                (msg.context, *((msg.id, None) if not msg.pluralizable else msg.id))
+            )
 
-    for comp_id in comps:
-        for msg_id in target_state:
-            if comp_id not in target_state[msg_id]:
-                target_state[msg_id][comp_id] = False
+    to_add = []
+    to_del = []
+    for comp_id, local in local_terms.items():
+        remote = remote_terms[comp_id]
 
-    terms_to_add = []
-    terms_to_del = []
-    for msg_id in target_state:
-        if msg_id not in remote_terms:
-            for comp_id in target_state[msg_id]:
-                if target_state[msg_id][comp_id]:
-                    logger.debug("ADD (%s, %s)", comp_id, msg_id)
-                    terms_to_add.append(dict(term=msg_id, context=comp_id))
-            continue
+        to_add_comp = local.difference(remote)
+        to_del_comp = remote.difference(local)
 
-        for comp_id in target_state[msg_id]:
-            if target_state[msg_id][comp_id] and comp_id not in remote_terms[msg_id]:
-                logger.debug("ADD (%s, %s)", comp_id, msg_id)
-                terms_to_add.append(dict(term=msg_id, context=comp_id))
-            if not target_state[msg_id][comp_id] and comp_id in remote_terms[msg_id]:
-                logger.debug("DEL (%s, %s)", comp_id, msg_id)
-                terms_to_del.append(dict(term=msg_id, context=comp_id))
-
-    for msg_id, contexts in remote_terms.items():
-        if msg_id not in target_state:
-            for comp_id in contexts:
-                if comp_id in comps:
-                    logger.debug("DEL (%s, %s)", comp_id, msg_id)
-                    terms_to_del.append(dict(term=msg_id, context=comp_id))
-
-    if len(terms_to_add) > 0 and args.no_dry_run:
-        client.add_terms(poeditor_project_id, terms_to_add)
-    logger.info("%d messages added to the POEditor", len(terms_to_add))
-
-    if len(terms_to_del) > 0 and args.no_dry_run:
-        client.delete_terms(poeditor_project_id, terms_to_del)
-    logger.info("%d messages deleted from the POEditor", len(terms_to_del))
-
-    if len(reference_catalogs) > 0:
-        logger.info(
-            "Upload the following reference translations to POEditor: "
-            + ", ".join(reference_catalogs.keys())
+        to_add.extend(
+            (_to_poeditor_context(comp_id, context), message, plural)
+            for context, message, plural in to_add_comp
         )
-        if args.no_dry_run:
-            wait_for_rate_limit = False
-            for locale, catalog in reference_catalogs.items():
-                with NamedTemporaryFile(suffix=".po") as fd:
-                    write_po(Path(fd.name), catalog)
-                    logger.debug("Uploading %s reference translation...", locale)
 
-                    # Free account allows doing 1 upload per 20 seconds
-                    sleep(20 if wait_for_rate_limit else 0)
-                    wait_for_rate_limit = True
+        to_del.extend(
+            (_to_poeditor_context(comp_id, context), message, plural)
+            for context, message, plural in to_del_comp
+        )
 
-                    client.update_terms_translations(
-                        project_id=poeditor_project_id,
-                        language_code=locale.replace("-", "_"),
-                        overwrite=True,
-                        sync_terms=False,
-                        file_path=fd.name,
-                    )
+    # Show changes
 
-    if len(terms_to_add) > 0 or len(terms_to_del) > 0:
-        for pname, local_ver in pversions.items():
-            logger.info("Set '%s' package version to %s in the POEditor.", pname, local_ver)
-        if args.no_dry_run:
-            description.update(pversions)
+    if not to_add and not to_del:
+        print("POEditor is already up-to-date!")
+        return
 
-    # TODO: Russian language as a reference
+    if to_add:
+        print("Terms to ADD:", *(f" + {i[0]:26} {i[1]}" for i in to_add), "", sep="\n")
+    if to_del:
+        print("Terms to DELETE:", *(f" - {i[0]:26} {i[1]}" for i in to_del), "", sep="\n")
+    if pversions:
+        f = (f" * {p} to {v}" for p, v in pversions.items())
+        print("Package version changes:", *f, "", sep="\n")
 
+    # Apply changes
 
-class POEditorDescription:
-    def __init__(self, client, project_id):
-        self.client = client
-        self.project_id = project_id
-        self.populate()
+    if not args.no_dry_run:
+        print("Use --no-dry-run option to apply these changes!")
+        return
 
-    def populate(self):
-        details = self.client.view_project_details(self.project_id)
-        self.packages = json.loads(re.search(r"\((.+?)\)", details["description"]).group(1))
+    _to_term = lambda item: dict(zip(("context", "term", "plural"), item))
 
-    def update(self, pversions):
-        self.packages.update(pversions)
-        description = "[//]: # (%s)" % (json.dumps(self.packages))
-        self.client.update_project(project_id=self.project_id, description=description)
+    if to_add:
+        logger.info("Adding %d terms to POEditor...", len(to_add))
+        client.add_terms(poeditor_project_id, [_to_term(i) for i in to_add])
+
+    if to_del:
+        logger.info("Deleting %d terms to POEditor...", len(to_del))
+        client.delete_terms(poeditor_project_id, [_to_term(i) for i in to_del])
+
+    if pversions:
+        logger.info("Updating %d package versions in POEditor...", len(pversions))
+        description.update(pversions)
+
+    if reference_catalogs:
+        wait_for_rate_limit = False
+        for locale, catalog in reference_catalogs.items():
+            logger.info("Uploading %s POEditor reference translation...", locale)
+            with NamedTemporaryFile(suffix=".po") as fd:
+                write_po(Path(fd.name), catalog)
+
+                # Free account allows doing 1 upload per 20 seconds
+                sleep(20 if wait_for_rate_limit else 0)
+                wait_for_rate_limit = True
+
+                client.update_terms_translations(
+                    project_id=poeditor_project_id,
+                    language_code=to_gettext_locale(locale),
+                    overwrite=True,
+                    sync_terms=False,
+                    file_path=fd.name,
+                )
 
 
 def main(argv=sys.argv):
