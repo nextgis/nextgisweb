@@ -67,7 +67,7 @@ def sql_compare(sql, file):
     if not has_sqlglot:
         pytest.skip("sqlglot not installed")
 
-    from sqlglot import ParseError, transpile
+    from sqlglot import transpile
 
     sqlglot_kwargs = dict(read="postgres", write="postgres", pretty=True)
     sqlglot_kwargs.update(indent=4, pad=4, normalize_functions=False)
@@ -76,12 +76,7 @@ def sql_compare(sql, file):
     out = list()
     for s in sql:
         c = _compile_sql(s)
-        try:
-            f = "".join(tr(c))
-        except ParseError:
-            # The INCLUDE and EXCLUDE keywords for indexes are not supported:
-            # https://github.com/tobymao/sqlglot/issues/2855
-            f = c.replace("\t", "    ")
+        f = "".join(tr(c))
         out.append(f.strip(" \n") + ";\n")
     norm_sql = "\n".join(out)
 

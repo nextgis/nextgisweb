@@ -34,6 +34,7 @@ SELECT
     'С'
 FROM ct;
 
-ALTER TABLE ct ADD     CONSTRAINT ct_id_fk FOREIGN KEY (id) REFERENCES et (
-        fid
-    ) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ct 
+    ADD     CONSTRAINT ct_id_fk FOREIGN KEY (id) REFERENCES et (
+            fid
+        ) DEFERRABLE INITIALLY DEFERRED;

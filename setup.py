@@ -70,7 +70,7 @@ extras_require = dict(
         "pytest-watch",
         "pytest==7.3.*",
         "ruff>=0.9.0",
-        "sqlglot",
+        "sqlglot==26.30.0",
         "webtest",
     ]
 )
