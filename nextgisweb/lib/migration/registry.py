@@ -1,7 +1,8 @@
 import json
 import re
 from datetime import datetime
-from importlib.machinery import SourceFileLoader
+from functools import cached_property
+from importlib.util import module_from_spec, spec_from_file_location
 from pathlib import Path
 from textwrap import dedent
 
@@ -96,13 +97,25 @@ class PythonModuleMigration(Migration):
 
         return (fwpath,)
 
+    @cached_property
+    def module(self):
+        spec = spec_from_file_location("", self._mod_path)
+        assert spec is not None
+
+        module = module_from_spec(spec)
+        loader = spec.loader
+        assert loader is not None
+
+        loader.exec_module(module)
+        return module
+
     @property
     def forward_callable(self):
-        return getattr(SourceFileLoader("", self._mod_path).load_module(), "forward")
+        return getattr(self.module, "forward")
 
     @property
     def rewind_callable(self):
-        return getattr(SourceFileLoader("", self._mod_path).load_module(), "rewind")
+        return getattr(self.module, "rewind")
 
 
 class SQLScriptMigration(Migration):
