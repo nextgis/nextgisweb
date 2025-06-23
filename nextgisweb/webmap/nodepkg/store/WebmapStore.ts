@@ -122,8 +122,17 @@ export class WebmapStore {
     private _prepareChecked = (checkedKeysValue: number[]) => {
         const updatedCheckedKeys = [];
         const skip: number[] = [];
+        const allWebmapItems: TreeItemConfig[] = [];
+        this.webmapItems.forEach((item) => {
+            const allChildren = getChildrenDeep(item);
+            allWebmapItems.push(...[item, ...allChildren]);
+        });
+        const onlyLayers = checkedKeysValue.filter((key) => {
+            const webmapItem = allWebmapItems.find((item) => item.key === key);
+            return webmapItem && webmapItem.type === "layer";
+        });
 
-        for (const key of checkedKeysValue) {
+        for (const key of onlyLayers) {
             if (skip.includes(key)) {
                 continue;
             }
