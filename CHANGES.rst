@@ -4,22 +4,22 @@ Changes
 5.1.0
 -----
 
-- Configurable default basemaps for on-premises installations.
-- Support for dash patterns in user-defined styles.
-- OpenLayers library upgraded to 10.4.
-- Refined resource picker behaviour for single and multi-selection.
-- Ability to configure panels and tools individually for each webmap.
-- Configurable lookup table items order, including manual ordering.
+- Identification of raster layers on webmaps.
 - Improved webmap links, preserving legend symbols in URLs.
-- Improved handling of `geom` fields in feature layers.
-- Python 3.10+ is now the minimum required version.
-- Clean up unreferenced file objects during maintenance by default.
-- Support for raster layer identification on webmaps.
-- Improved handling of date and bigint fields in UI and HTTP API.
-- Creation of raster layers from ZIP-archives and PAM support. 
-- Support for adding fields to layers with versioning enabled.
+- Ability to configure panels and tools individually for each webmap.
+- Refined resource picker behavior for single and multi-selection.
+- Configurable lookup table item order, including manual ordering.
 - Experimental adaptive layouts for webmaps on mobile and tablet devices.
-- Support for GDAL PAM georeferenced (.aux.xml files) JPEG and PNG rasters.
+- Support for dash patterns in user-defined styles.
+- Support for adding fields to layers with versioning enabled.
+- Creation of raster layers from ZIP archives and PAM support. 
+- Support for GDAL PAM georeferenced (.aux.xml) JPEG and PNG rasters.
+- Configurable default basemaps for on-premises installations.
+- Improved handling of date and bigint fields in UI and HTTP API.
+- Improved handling of `geom` fields in feature layers.
+- Clean up unreferenced file objects during maintenance by default.
+- Python 3.10+ is now the minimum required version.
+- OpenLayers library upgraded to 10.4.
 
 
 5.0.0
