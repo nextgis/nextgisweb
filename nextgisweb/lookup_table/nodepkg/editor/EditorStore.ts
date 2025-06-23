@@ -1,4 +1,4 @@
-import { clamp, remove } from "lodash-es";
+import { clamp } from "lodash-es";
 import { action, computed, observable, runInAction } from "mobx";
 
 import {
@@ -49,8 +49,7 @@ export class EditorStore
             return (row: any, index: number) => {
                 runInAction(() => {
                     index = clamp(index, 0, this.rows.length - 1);
-                    const newRows = [...this.rows];
-                    remove(newRows, (i) => i === row);
+                    const newRows = this.rows.filter((item) => item !== row);
                     newRows.splice(index, 0, row);
                     this.rows.splice(0, this.rows.length, ...newRows);
                     this.dirty = true;
