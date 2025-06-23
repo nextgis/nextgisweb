@@ -29,14 +29,14 @@
 
 .ol-swipe,
 .ol-swipe button {
-    cursor: ew-resize;
+    cursor: ew-resize !important;
 }
 
 .ol-swipe button,
 .ol-swipe button:hover,
 .ol-swipe button:focus,
 .ol-swipe button:active {
-    background-color: var(--accent);
+    background-color: var(--accent) !important;
 }
 
 .ol-swipe.horizontal,
