@@ -15,10 +15,17 @@ import type { CoreLayer } from "../ol/layer/CoreLayer";
 import type { TreeChildrenItemConfig, TreeItemConfig } from "../type/TreeItems";
 import { restoreSymbols } from "../utils/symbolsIntervals";
 
+interface BlockItem {
+    key: string | number;
+    reason: string;
+    unblock?: () => void;
+}
+
 export class WebmapStore {
     @observable.shallow private accessor _webmapItems: TreeItemConfig[] = [];
     @observable.shallow private accessor _checked: number[] = [];
     @observable.shallow private accessor _expanded: number[] = [];
+    @observable.shallow accessor selectableBlock: BlockItem[] = [];
 
     private _itemStore: CustomItemFileWriteStore;
     @observable.shallow private accessor _layers: Record<string, CoreLayer> =
@@ -83,6 +90,35 @@ export class WebmapStore {
     /** @deprecated Use {@link webmapItems} instead */
     getWebmapItems(): TreeItemConfig[] {
         return this.webmapItems;
+    }
+
+    @action
+    addSelectableBlock(val: BlockItem) {
+        const exist = this.selectableBlock.find((item) => item.key === val.key);
+        if (!exist) {
+            this.selectableBlock = [...this.selectableBlock, val];
+        }
+    }
+    @action
+    removeSelectableBlock(key: string | number) {
+        const block = this.selectableBlock.find((item) => item.key === key);
+        if (block) {
+            this.selectableBlock = this.selectableBlock.filter(
+                (item) => item.key !== key
+            );
+            if (block.unblock) {
+                block.unblock();
+            }
+        }
+    }
+    @action
+    clearSelectableBlock() {
+        for (const block of this.selectableBlock) {
+            if (block.unblock) {
+                block.unblock();
+            }
+        }
+        this.selectableBlock = [];
     }
 
     @action

@@ -1,5 +1,7 @@
+import { Tooltip } from "antd";
 import { observer } from "mobx-react-lite";
 
+import { gettext } from "@nextgisweb/pyramid/i18n";
 import type ZoomToWebmapPlugin from "@nextgisweb/webmap/plugin/zoom-to-webmap";
 
 import { LayersTree } from "../../layers-tree/LayersTree";
@@ -8,6 +10,8 @@ import type { PanelPluginWidgetProps } from "../registry";
 
 import { BasemapSelector } from "./BasemapSelector";
 import { LayersDropdown } from "./LayersDropdown";
+
+import AttentionIcon from "@nextgisweb/icon/material/error/outline";
 
 import "./LayersPanel.less";
 
@@ -21,6 +25,8 @@ const LayersPanel = observer<PanelPluginWidgetProps>(
             }
         };
 
+        const selectableBlock = store.display.webmapStore.selectableBlock;
+
         return (
             <PanelContainer
                 title={
@@ -33,6 +39,37 @@ const LayersPanel = observer<PanelPluginWidgetProps>(
                                 }
                             }}
                         />
+                        {!!selectableBlock.length && (
+                            <Tooltip
+                                title={() => {
+                                    const reasonPart = selectableBlock
+                                        .map((item) => item.reason)
+                                        .join(", ");
+                                    const hasUnblockAction =
+                                        selectableBlock.some(
+                                            (item) => item.unblock
+                                        );
+                                    return (
+                                        <>
+                                            {reasonPart}
+                                            {hasUnblockAction && (
+                                                <div>
+                                                    {gettext(
+                                                        "Click for unblock"
+                                                    )}
+                                                </div>
+                                            )}
+                                        </>
+                                    );
+                                }}
+                            >
+                                <AttentionIcon
+                                    onClick={() => {
+                                        store.display.webmapStore.clearSelectableBlock();
+                                    }}
+                                />
+                            </Tooltip>
+                        )}
                     </>
                 }
                 close={store.close}

@@ -1,3 +1,5 @@
+import { reaction } from "mobx";
+
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { iconHtml } from "@nextgisweb/pyramid/icon";
 import type { Display } from "@nextgisweb/webmap/display";
@@ -38,15 +40,37 @@ export class ToolSwipe extends ToolBase {
         this.control = new Swipe({ orientation: this.orientation });
 
         this.updateControlLayers();
+
+        reaction(() => this.display.itemConfig, this.toggleEnabled.bind(this), {
+            fireImmediately: true,
+        });
     }
 
     activate() {
         this.display.map.olMap.addControl(this.control);
+
+        this.display.webmapStore.addSelectableBlock({
+            reason: gettext(
+                "Layer selection is disabled while the swipe tool is active."
+            ),
+            key: "swipeVertical",
+            unblock: () => {
+                this.display.mapStates.deactivateState("swipeVertical");
+            },
+        });
+
         this.updateControlLayers();
     }
 
     deactivate() {
         this.display.map.olMap.removeControl(this.control);
+        this.display.webmapStore.removeSelectableBlock("swipeVertical");
+    }
+
+    private toggleEnabled() {
+        if (this.toolbarBtn) {
+            this.toolbarBtn.setDisabled(!this.display.itemConfig);
+        }
     }
 
     private updateControlLayers() {

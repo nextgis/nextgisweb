@@ -63,13 +63,25 @@ export const LayersTree = observer(
         checkable = true,
         expandable = true,
         draggable = true,
-        selectable = true,
+        selectable: selectableProp = true,
         showLine = true,
     }: LayersTreeProps) => {
         const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
         const [moreClickId, setMoreClickId] = useState<number>();
         const [update, setUpdate] = useState(false);
-        const { webmapItems, checked, layersWithoutLegendInfo } = store;
+        const {
+            webmapItems,
+            checked,
+            layersWithoutLegendInfo,
+            selectableBlock,
+        } = store;
+
+        const selectable = useMemo(() => {
+            if (selectableBlock.length) {
+                return false;
+            }
+            return selectableProp;
+        }, [selectableProp, selectableBlock]);
 
         const { onDrop, allowDrop } = useDrag({ store, setLayerZIndex });
 
