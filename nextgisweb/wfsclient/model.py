@@ -8,7 +8,6 @@ import sqlalchemy as sa
 import sqlalchemy.orm as orm
 from lxml import etree
 from osgeo import ogr
-from owslib.crs import Crs
 from requests.exceptions import RequestException
 from shapely.geometry import box
 from zope.interface import implementer
@@ -110,12 +109,14 @@ def geom_from_gml(el):
     return Geometry.from_ogr(ogr_geom)
 
 
-def get_srid(value):
-    try:
-        crs = Crs(value)
-        return crs.code
-    except Exception:
-        return None
+def get_srid(value: str):
+    # https://github.com/geopython/OWSLib/blob/297bc48af4f3fb360765f93534742b1ad6b4b570/owslib/crs.py#L1733
+    values = value.split(":")
+    if value.find("/def/crs/") != 1 or value.find("#") != -1 or len(values) > 1:
+        try:
+            return int(values[-1])
+        except ValueError:
+            pass
 
 
 def fid_int(el_feature, layer_name):
