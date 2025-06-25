@@ -11,7 +11,7 @@ import { useMapControl } from "../hook/useMapControl";
 import type { ControlProps } from "./MapControl";
 
 export function AttributionControl({
-    position,
+    position = "bottom-right",
     ...props
 }: ControlProps<Options>) {
     const context = useMapContext();
