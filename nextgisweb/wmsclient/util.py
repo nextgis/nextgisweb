@@ -1,12 +1,5 @@
-def _ns_trim(value):
-    pos = max(value.find("}"), value.rfind(":"))
-    return value[pos + 1 :]
-
-
 def find_tags(el, tag):
-    for child in el:
-        if _ns_trim(child.tag) == tag:
-            yield child
+    return el.iterchildren(tag="{*}%s" % tag)
 
 
 def find_tag(el, tag, *, must=False):
@@ -27,7 +20,7 @@ def get_capability_formats(el_cap):
 
 def _layer_bbox(el, *, version):
     if version == "1.3.0":
-        if exbbox := find_tag(el, "EX_GeographicBoundingBox"):
+        if (exbbox := find_tag(el, "EX_GeographicBoundingBox")) is not None:
             return [
                 float(find_tag(exbbox, tag).text)
                 for tag in (
