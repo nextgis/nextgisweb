@@ -4,6 +4,6 @@
     "type": "module",
     "dependencies": {
         "html-to-image": "1.11.11",
-        "react-rnd": "10.3.7"
+        "react-rnd": "^10.5.2"
     }
 }

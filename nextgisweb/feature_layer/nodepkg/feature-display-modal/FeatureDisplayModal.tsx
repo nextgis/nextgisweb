@@ -35,7 +35,7 @@ export function FeatureDisplayModal({
                 width="" // Do not set the default (520px) width
                 centered={true}
                 open={open}
-                destroyOnClose
+                destroyOnHidden
                 footer={null}
                 closable
                 onCancel={onCancel}

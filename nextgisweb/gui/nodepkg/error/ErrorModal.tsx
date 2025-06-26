@@ -53,7 +53,7 @@ export function ErrorModal({
             {...props}
             title={title}
             open={open}
-            destroyOnClose
+            destroyOnHidden
             onCancel={() => setOpen(false)}
             footer={<Footer onOk={close} {...{ tinfo, setTinfo }} />}
         >

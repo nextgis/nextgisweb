@@ -1,4 +1,4 @@
-import type { ForwardRefRenderFunction, FunctionComponent } from "react";
+import type { FunctionComponent } from "react";
 
 import type { CompositeWidgetOperation } from "@nextgisweb/resource/type/api";
 
@@ -18,8 +18,7 @@ interface EditorWidgetOptions {
     order?: number;
 }
 
-export type EditorWidget<S extends EditorStore, P = EditorWidgetProps<S>> = (
-    | FunctionComponent<P>
-    | ForwardRefRenderFunction<unknown, P>
-) &
-    EditorWidgetOptions;
+export type EditorWidget<
+    S extends EditorStore,
+    P = EditorWidgetProps<S>,
+> = FunctionComponent<P> & EditorWidgetOptions;

@@ -75,7 +75,7 @@ function ResourcePickerModal<V extends SelectValue = SelectValue>({
         <Modal
             className="resource-picker-modal"
             open={open}
-            destroyOnClose
+            destroyOnHidden
             footer={null}
             closable={false}
             onCancel={() => setOpen(false)}

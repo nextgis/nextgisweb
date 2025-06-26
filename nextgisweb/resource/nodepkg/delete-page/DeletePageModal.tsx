@@ -14,7 +14,7 @@ export function DeleteConfirmModal({
         <Modal
             footer={null}
             closable={false}
-            destroyOnClose
+            destroyOnHidden
             title={gettext("Confirmation required")}
             {...props}
         >

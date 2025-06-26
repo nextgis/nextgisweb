@@ -33,7 +33,7 @@ export function ToggleControl({
     const context = useMapContext();
     const [instance, setInstance] = useState<IToggleControl>();
     const [status, setStatus] = useState(options.status ?? false);
-    const prevOptionsRef = useRef<ToggleControlOptions>();
+    const prevOptionsRef = useRef<ToggleControlOptions>(null);
 
     useMapControl({ context, instance, position });
 

@@ -27,7 +27,7 @@ export interface UseFeatureTableProps {
     version?: number;
     orderBy?: OrderBy;
     pageSize: number;
-    tbodyRef?: RefObject<HTMLDivElement>;
+    tbodyRef?: RefObject<HTMLDivElement | null>;
     resourceId: number;
     rowMinHeight: number;
     visibleFields: number[];
@@ -107,7 +107,7 @@ export function useFeatureTable({
 
     const { makeSignal, abort } = useAbortController();
 
-    const loaderCache = useRef<LoaderCache<FeatureAttrs[]>>();
+    const loaderCache = useRef<LoaderCache<FeatureAttrs[]>>(null);
 
     const [data, setData_] = useState<FeatureAttrs[]>([]);
 

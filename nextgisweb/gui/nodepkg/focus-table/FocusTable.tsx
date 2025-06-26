@@ -59,7 +59,7 @@ export function FocusTable<
     renderDetail: Detail,
     rootClassName,
 }: FocusTableProps<I, C, S>) {
-    const environmentRef = useRef<ComplexTreeEnvironment<I>>(null);
+    const environmentRef = useRef<ComplexTreeEnvironment<I>>(null!);
     const [selected, setSelected] = useState<I | null>(null);
     const [showDetails, setShowDetails] = useState(false);
 

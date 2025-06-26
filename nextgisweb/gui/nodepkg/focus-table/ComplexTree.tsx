@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import { observer } from "mobx-react-lite";
 import { useCallback, useEffect, useMemo, useRef } from "react";
-import type { CSSProperties, MutableRefObject, ReactNode, Ref } from "react";
+import type { CSSProperties, MutableRefObject, ReactNode, Ref, RefObject } from "react";
 import {
     InteractionMode,
     Tree,
@@ -235,7 +235,7 @@ export function ComplexTree<
     type CTE = ComplexTreeEnvironment<I>;
 
     const provider = useDataProvider<I>({ store, rootItem: root });
-    const environmentRef = useRef<CTE>() as MutableRefObject<CTE>;
+    const environmentRef = useRef<CTE>(null) as RefObject<CTE>;
 
     const environmentMergeRefs = useCallback(
         (value: TreeEnvironmentRef<I> | null) => {

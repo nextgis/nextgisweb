@@ -32,7 +32,7 @@ export function LayersDropdown({
         <Dropdown
             menu={menuProps}
             trigger={["click"]}
-            destroyPopupOnHide
+            destroyOnHidden
             placement="bottomRight"
         >
             <PanelTitle.Button

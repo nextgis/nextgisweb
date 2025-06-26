@@ -65,7 +65,7 @@ export function useEventListener<
     element?: RefObject<T>,
     options?: boolean | AddEventListenerOptions
 ): void {
-    const savedHandler = useRef<Handler<KW, KH, KM>>();
+    const savedHandler = useRef<Handler<KW, KH, KM>>(null);
 
     useLayoutEffect(() => {
         savedHandler.current = handler;

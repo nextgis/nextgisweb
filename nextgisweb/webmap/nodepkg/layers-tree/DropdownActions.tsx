@@ -44,7 +44,7 @@ export function DropdownActions({
     }
 
     const menuItems: MenuProps["items"] = [];
-    const customMenuItems: JSX.Element[] = [];
+    const customMenuItems: React.ReactElement[] = [];
     const plugins = getWebmapPlugins();
     for (const keyPlugin in plugins) {
         const plugin = plugins[keyPlugin];
@@ -99,10 +99,10 @@ export function DropdownActions({
                 setMoreClickId(undefined);
             }}
             trigger={["click"]}
-            destroyPopupOnHide
+            destroyOnHidden
             open
             placement="bottomRight"
-            dropdownRender={(menu) => (
+            popupRender={(menu) => (
                 <div className="dropdown-content">
                     {menu}
                     {customMenuItems.length && (

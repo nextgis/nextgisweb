@@ -49,7 +49,7 @@ export const ScalesSelect: FC<ScalesSelectProps> = ({
         if (customScale && selectedValue !== customScale) onChange(customScale);
     };
 
-    const onVisibleChange = (open: boolean) => {
+    const onOpenChange = (open: boolean) => {
         setOpen(open);
     };
 
@@ -59,7 +59,7 @@ export const ScalesSelect: FC<ScalesSelectProps> = ({
         }
     }, [open, inputRef]);
 
-    const dropdownRender = (menu: ReactNode) => (
+    const popupRender = (menu: ReactNode) => (
         <>
             {menu}
             <Divider style={{ margin: "5px 0" }} />
@@ -88,9 +88,9 @@ export const ScalesSelect: FC<ScalesSelectProps> = ({
     return (
         <Select
             style={{ width: "100%" }}
-            dropdownRender={dropdownRender}
+            popupRender={popupRender}
             onChange={onChange}
-            onDropdownVisibleChange={onVisibleChange}
+            onOpenChange={onOpenChange}
             value={selectedValue}
             options={scales}
         ></Select>

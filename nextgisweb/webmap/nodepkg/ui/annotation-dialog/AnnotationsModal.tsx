@@ -145,7 +145,7 @@ export function AnnotationsModal({
             {...DEFAULTS}
             title={title}
             open={open}
-            destroyOnClose
+            destroyOnHidden
             onCancel={handleClose}
             footer={
                 <div>

@@ -108,13 +108,13 @@ export function ResourceSelect<V extends number = number>({
             open={open}
             value={value}
             loading={resourceLoading}
-            onDropdownVisibleChange={(visible) => {
+            onOpenChange={(visible) => {
                 if (!visible || !readOnly) {
                     setOpen(visible);
                 }
             }}
             suffixIcon={readOnly ? <></> : undefined}
-            dropdownRender={() => <></>}
+            popupRender={() => <></>}
             onClear={() => {
                 onPick(undefined);
             }}

@@ -118,7 +118,9 @@ export function ResourcesFilter({
         <>
             <AutoCompleteHoneypot />
             <AutoComplete
-                popupClassName="ngw-resource-resource-filter-dropdown"
+                classNames={{
+                    popup: { root: "ngw-resource-resource-filter-dropdown" },
+                }}
                 popupMatchSelectWidth={290}
                 style={{ width: "100%" }}
                 onSelect={onSelect}

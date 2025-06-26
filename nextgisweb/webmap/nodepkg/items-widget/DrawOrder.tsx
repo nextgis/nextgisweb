@@ -118,7 +118,9 @@ export function DrawOrderTable({ store, close }: DrawOrderTableProps) {
         return new DrawOrderStore(store.items);
     }, [store]);
 
-    const environmentRef = useRef<ComplexTreeEnvironment<DrawOrderLayer>>(null);
+    const environmentRef = useRef<ComplexTreeEnvironment<DrawOrderLayer>>(
+        null!
+    );
 
     useEffect(() => {
         store.drawOrderEnabled.value = true;

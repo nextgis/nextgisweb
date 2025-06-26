@@ -26,9 +26,9 @@ export function usePrintMapLayout({
     onZoomChange,
     onCenterChange,
 }: PrintMapCompProps) {
-    const resizeObserver = useRef<ResizeObserver>();
-    const printMapComp = useRef<Comp>();
-    const printMapEl = useRef<HTMLElement>();
+    const resizeObserver = useRef<ResizeObserver>(undefined);
+    const printMapComp = useRef<Comp>(undefined);
+    const printMapEl = useRef<HTMLElement>(undefined);
 
     const destroy = useCallback(() => {
         // Schedule cleanup to avoid synchronous unmounting

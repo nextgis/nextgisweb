@@ -42,7 +42,7 @@ export function useRouteGet<
     let mergedOptions: RequestOptions<N, RT>;
     let shouldLoadOnInit: boolean;
 
-    const onError = useRef<((err: unknown) => void) | undefined>();
+    const onError = useRef<(err: unknown) => void>(undefined);
     const showErrorModal = useRef(false);
 
     if (typeof nameOrProps === "string") {

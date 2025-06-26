@@ -55,9 +55,9 @@ const formatLocaleNumber = (value: number, locale: string): string => {
 
 const makeDomResult = (
     value: string,
-    postfix: JSX.Element | string,
+    postfix: React.ReactElement | string,
     format: "html-string" | "jsx"
-): string | JSX.Element => {
+): string | React.ReactElement => {
     const domResult = (
         <>
             {value} {postfix}
@@ -74,7 +74,7 @@ const makeDomResult = (
 
 interface MetersResult {
     value: number;
-    postfix: JSX.Element | string;
+    postfix: React.ReactElement | string;
 }
 
 const metersLengthToUnit = (

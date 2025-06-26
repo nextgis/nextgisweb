@@ -61,7 +61,7 @@ export function useCodeMirror({
 }: CodeOptions) {
     const [editor, setEditor] = useState<Editor | null>(null);
 
-    const destroy = useRef<() => void>();
+    const destroy = useRef<() => void>(null);
 
     const getExtensions = useCallback(async () => {
         const langExtension = await getLang(lang);
