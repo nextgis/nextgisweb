@@ -12,9 +12,9 @@ export function useResourcePicker({
     doNotSavePosition,
     initParentId,
 }: ResourcePickerHookProps = {}) {
-    const pickerParentIdRef = useRef<number>();
+    const pickerParentIdRef = useRef<number>(null);
     const pickerModal =
-        useRef<ReturnType<typeof showResourcePickerOriginal<any>>>();
+        useRef<ReturnType<typeof showResourcePickerOriginal<any>>>(null);
 
     const updatePickerOptions = useCallback(
         <V extends SelectValue>(options: ResourcePickerModalProps<V>) => {

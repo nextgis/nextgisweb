@@ -227,7 +227,7 @@ export function Journal() {
     const [blocks, setBlocks] = useState<AuditArrayLogEntry[][]>([]);
     const [pointer, setPointer] = useState<string | false>();
 
-    const refLoading = useRef<Promise<AuditDbaseQueryGetResponse>>();
+    const refLoading = useRef<Promise<AuditDbaseQueryGetResponse>>(undefined);
     const refParent = useRef<HTMLDivElement | null>(null);
     const refTable = useRef<HTMLTableElement | null>(null);
 

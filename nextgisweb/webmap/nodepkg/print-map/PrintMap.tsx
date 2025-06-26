@@ -133,7 +133,7 @@ export const PrintMap = observer<PrintMapProps>(
         const { legendCoords, titleCoords, mapCoords } = printMapStore;
 
         const printMapRef = useRef<HTMLDivElement>(null);
-        const printMap = useRef<OlMap>();
+        const printMap = useRef<OlMap>(null);
 
         const [mapScaleControl, setMapScaleControl] =
             useState<MapScaleControl>();

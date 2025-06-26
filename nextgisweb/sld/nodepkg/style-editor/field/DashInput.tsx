@@ -100,7 +100,7 @@ export const DashPatternInput: React.FC<DashPatternInputProps> = ({
     };
 
     const renderInputFields = () => {
-        const fields: JSX.Element[] = [];
+        const fields: React.ReactElement[] = [];
         for (let i = 0; i < dashPattern.length + 2; i += 2) {
             const isLastRow = i >= dashPattern.length;
 

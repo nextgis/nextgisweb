@@ -9,7 +9,7 @@ export function useFit({
     deps?: DependencyList;
 }) {
     const [isFit, setIsFit] = useState(true);
-    const isFitStopRef = useRef<number>();
+    const isFitStopRef = useRef<number>(undefined);
 
     const checkFit = useCallback(() => {
         const element = ref.current;

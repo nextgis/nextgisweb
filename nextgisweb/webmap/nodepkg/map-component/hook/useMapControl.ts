@@ -15,7 +15,7 @@ export function useMapControl({
     position?: ControlPosition;
 }) {
     // const [container, setContainer] = useState<HTMLElement>();
-    const added = useRef<Control>();
+    const added = useRef<Control>(null);
     const mapStore = useMemo(() => {
         return context?.mapStore;
     }, [context?.mapStore]);

@@ -118,7 +118,7 @@ export const WmsClientLayerWidget: EditorWidget<WmsClientLayerStore> = observer(
                         onClick={() => {
                             showModal(VendorParamsModal, {
                                 value: store.vendor_params.value || undefined,
-                                destroyOnClose: true,
+                                destroyOnHidden: true,
                                 onChange: (value?: Record<string, string>) => {
                                     store.vendor_params.value = value;
                                 },

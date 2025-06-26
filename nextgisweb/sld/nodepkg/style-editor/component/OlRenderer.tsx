@@ -59,8 +59,8 @@ export const OlRenderer: React.FC<OlRendererProps> = ({
     symbolizers,
 }) => {
     /** reference to the underlying OpenLayers map */
-    const map = useRef<OlMap>();
-    const layer = useRef<OlLayerVector<OlSourceVector>>();
+    const map = useRef<OlMap>(null);
+    const layer = useRef<OlLayerVector<OlSourceVector>>(null);
     const [mapId] = useState(_uniqueId("map_"));
 
     const target = useRef<HTMLDivElement>(null);

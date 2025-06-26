@@ -34,7 +34,7 @@ const msgTogglePanorama = gettext("Toggle panorama viewer");
 // Based on https://github.com/akiran/react-slick/issues/1195#issuecomment-1746192879
 const SlickButtonFix = (
     props: {
-        children: JSX.Element;
+        children: React.ReactElement;
         currentSlide?: number;
         slideCount?: number;
     } & object

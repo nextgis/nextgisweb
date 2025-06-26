@@ -17,7 +17,7 @@ export function useThemeVariables(
     const { token, hashId } = useToken();
 
     type MemoKey = { hashId: string; mapping: typeof mapping };
-    const memo = useRef<[MemoKey, CSSProperties] | undefined>();
+    const memo = useRef<[MemoKey, CSSProperties]>(undefined);
 
     if (!memo.current || !isEqual(memo.current[0], { hashId, mapping })) {
         memo.current = [

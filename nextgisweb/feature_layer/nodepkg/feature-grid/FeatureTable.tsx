@@ -2,13 +2,13 @@ import { debounce } from "lodash-es";
 import { observer } from "mobx-react-lite";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
-import Draggable from "react-draggable";
 
 import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
 import { useThemeVariables } from "@nextgisweb/gui/hook";
 import { assert } from "@nextgisweb/jsrealm/error";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
+import { DraggableColumn } from "./DraggableColumn";
 import { FeatureTableRows } from "./FeatureTableRows";
 import SortIcon from "./component/SortIcon";
 import { $FID, KEY_FIELD_ID, LAST_CHANGED_FIELD_ID } from "./constant";
@@ -282,12 +282,8 @@ const FeatureTable = observer(
                         }
                         cumWidth += width;
                         return (
-                            <Draggable
+                            <DraggableColumn
                                 key={id}
-                                axis="x"
-                                defaultClassName="handle"
-                                defaultClassNameDragging="handle-dragging"
-                                defaultClassNameDragged="handle-dragged"
                                 onStop={(_, { lastX }) => {
                                     setTimeout(() => {
                                         setUserDefinedWidths((prev) => ({
@@ -296,15 +292,11 @@ const FeatureTable = observer(
                                         }));
                                     });
                                 }}
-                            >
-                                <div
-                                    style={{
-                                        left:
-                                            cumWidth - RESIZE_HANDLE_WIDTH / 2,
-                                        width: RESIZE_HANDLE_WIDTH,
-                                    }}
-                                ></div>
-                            </Draggable>
+                                style={{
+                                    left: cumWidth - RESIZE_HANDLE_WIDTH / 2,
+                                    width: RESIZE_HANDLE_WIDTH,
+                                }}
+                            />
                         );
                     })}
                 </>

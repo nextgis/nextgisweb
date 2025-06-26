@@ -30,7 +30,7 @@ export function CarouselModal({
             footer={null}
             closeIcon={<CloseIcon />}
             onCancel={close}
-            destroyOnClose
+            destroyOnHidden
             width="100%"
         >
             <CarouselRender

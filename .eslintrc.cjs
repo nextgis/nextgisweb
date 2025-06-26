@@ -185,7 +185,7 @@ const config = {
         },
     ],
     settings: {
-        "react": { version: "18" },
+        "react": { version: "19" },
         "componentWrapperFunctions": ["observer"],
         "import/internal-regex": "^@nextgisweb/",
     },

@@ -16,6 +16,7 @@ export function useActionToolbar({
 }: UseActionToolbarProps) {
     const createButtonAction = useCallback(
         ({
+            key,
             icon,
             title,
             disabled,
@@ -46,12 +47,16 @@ export function useActionToolbar({
             if (!isFit && icon) {
                 return (
                     <Tooltip title={title}>
-                        <Button {...btnAction} />
+                        <Button key={key} {...btnAction} />
                     </Tooltip>
                 );
             }
 
-            return <Button {...btnAction}>{title}</Button>;
+            return (
+                <Button key={key} {...btnAction}>
+                    {title}
+                </Button>
+            );
         },
         [props, size, isFit]
     );

@@ -25,7 +25,7 @@ export interface LegendPrintMapProps {
 }
 
 export interface RndCompProps {
-    children: string | JSX.Element | JSX.Element[];
+    children: string | React.ReactElement | React.ReactElement[];
     coords: RndCoords;
     displayed: boolean;
     onChange: (coords: RndCoords) => void;

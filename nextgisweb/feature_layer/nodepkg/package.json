@@ -3,6 +3,6 @@
     "version": "0.0.0",
     "type": "module",
     "dependencies": {
-        "react-draggable": "^4.4.5"
+        "react-draggable": "^4.5.0"
     }
 }

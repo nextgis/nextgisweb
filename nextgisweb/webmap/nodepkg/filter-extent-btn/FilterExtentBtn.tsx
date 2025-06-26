@@ -247,7 +247,7 @@ export const FilterExtentBtn = ({
     size = "middle",
     onGeomChange,
 }: FilterExtentBtnProps) => {
-    const interactionInfo = useRef<InteractionInfo>();
+    const interactionInfo = useRef<InteractionInfo>(undefined);
     const [geomType, setGeomType] = useState<string>();
     const [visibleGeom, setVisibleGeom] = useState<boolean>(true);
     const [drawEnd, setDrawEnd] = useState<DrawEvent>();
@@ -285,7 +285,7 @@ export const FilterExtentBtn = ({
         };
     }, [clearInteraction]);
 
-    const prevGeometryWKT = useRef<string>();
+    const prevGeometryWKT = useRef<string>(undefined);
     useEffect(() => {
         if (!drawEnd) return;
 
