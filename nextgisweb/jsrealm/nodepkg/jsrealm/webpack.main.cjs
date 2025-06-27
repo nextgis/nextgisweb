@@ -477,6 +477,7 @@ const webpackConfig = defaults("main", (env) => ({
                   new ESLintPlugin({
                       quiet: true,
                       extensions: ["js", "ts", "tsx"],
+                      configType: "flat",
                   }),
               ]
             : []),
