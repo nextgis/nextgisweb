@@ -2,30 +2,18 @@ const fs = require("fs");
 const glob = require("glob");
 const path = require("path");
 
+const { EsbuildPlugin } = require("esbuild-loader");
 const ESLintPlugin = require("eslint-webpack-plugin");
 const ForkTsCheckerPlugin = require("fork-ts-checker-webpack-plugin");
 const { sortBy } = require("lodash");
 const { DefinePlugin } = require("webpack");
 
-const babelOptions = require("./babelrc.cjs");
 const config = require("./config.cjs");
 const iconUtil = require("./icon/util.cjs");
 const tagParser = require("./tag-parser.cjs");
 const defaults = require("./webpack/defaults.cjs");
 const fontWeightFix = require("./webpack/font-weight-fix.cjs");
 const { stripIndex } = require("./webpack/util.cjs");
-
-const presetEnvOptIndex = babelOptions.presets.findIndex(
-    (item) => typeof item[0] === "string" && item[0] === "@babel/preset-env"
-);
-
-if (presetEnvOptIndex !== -1) {
-    const presetEnvOpt = babelOptions.presets[presetEnvOptIndex];
-    if (presetEnvOpt && typeof presetEnvOpt[1] === "object") {
-        presetEnvOpt[1].targets = config.jsrealm.targets;
-        babelOptions.presets[presetEnvOptIndex] = presetEnvOpt;
-    }
-}
 
 function scanForEntries() {
     const result = [];
@@ -393,11 +381,6 @@ fs.writeFileSync(
         .join("\n")
 );
 
-const babelLoader = {
-    loader: "babel-loader",
-    options: babelOptions,
-};
-
 /** @type {import("webpack").Configuration} */
 const webpackConfig = defaults("main", (env) => ({
     entry: { "ngwEntry": require.resolve("@nextgisweb/jsrealm/ngwEntry.js") },
@@ -412,7 +395,10 @@ const webpackConfig = defaults("main", (env) => ({
                     ? /node_modules/
                     : /node_modules\/(core-js|react|react-dom)/,
                 resolve: { fullySpecified: false },
-                use: babelLoader,
+                loader: "esbuild-loader",
+                options: {
+                    target: "es2022",
+                },
             },
             {
                 test: /\.css$/i,
@@ -430,7 +416,13 @@ const webpackConfig = defaults("main", (env) => ({
             {
                 test: /\.svg$/i,
                 use: [
-                    babelLoader,
+                    {
+                        loader: "esbuild-loader",
+                        options: {
+                            loader: "tsx",
+                            target: "es2022",
+                        },
+                    },
                     {
                         loader: "svg-sprite-loader",
                         options: {
@@ -449,7 +441,13 @@ const webpackConfig = defaults("main", (env) => ({
             },
             {
                 test: /\.po$/,
-                use: [babelLoader, require.resolve("./i18n/loader.cjs")],
+                use: [
+                    {
+                        loader: "esbuild-loader",
+                        options: { loader: "tsx", target: "es2022" },
+                    },
+                    require.resolve("./i18n/loader.cjs"),
+                ],
             },
         ],
     },
@@ -489,19 +487,10 @@ const webpackConfig = defaults("main", (env) => ({
             minSize: 0,
         },
         minimizer: [
-            {
-                apply: (compiler) => {
-                    const TerserPlugin = require("terser-webpack-plugin");
-                    new TerserPlugin({
-                        terserOptions: {
-                            // Webpack default options
-                            compress: { passes: 2 },
-                            // Keep class names for exceptions and Sentry
-                            keep_classnames: true,
-                        },
-                    }).apply(compiler);
-                },
-            },
+            new EsbuildPlugin({
+                target: config.jsrealm.targets || "es2022",
+                keepNames: true,
+            }),
         ],
     },
 }));
