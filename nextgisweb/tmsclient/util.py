@@ -1,4 +1,4 @@
-from math import log
+from math import log2
 
 
 class SCHEME:
@@ -20,11 +20,13 @@ def render_zoom(srs, extent, size, tilesize):
     res_x = (extent[2] - extent[0]) / size[0]
     res_y = (extent[3] - extent[1]) / size[1]
 
-    zoom = log(min((srs.maxx - srs.minx) / res_x, (srs.maxy - srs.miny) / res_y) / tilesize, 2)
+    width = (srs.maxx - srs.minx) / res_x
+    height = (srs.maxy - srs.miny) / res_y
+
+    zoom = log2(min(width, height) / tilesize)
 
     if zoom % 1 > 0.9:
-        zoom += 1
-
+        return int(zoom + 1)
     return int(zoom)
 
 

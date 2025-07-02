@@ -102,14 +102,18 @@ class RenderRequest:
         self.style = style
         self.srs = srs
 
+    def _check_zoom(self, zoom):
+        return self.style.tileset_zmin <= zoom <= self.style.tileset_zmax
+
     def render_extent(self, extent, size):
         zoom = render_zoom(self.srs, extent, size, TILE_SIZE)
-        zoom = min(max(zoom, self.style.tileset_zmin), self.style.tileset_zmax)
+        if not self._check_zoom(zoom):
+            return None
         return self.style.render_image(extent, size, self.srs, zoom)
 
     def render_tile(self, tile, size):
         zoom = tile[0]
-        if not (self.style.tileset_zmin <= zoom <= self.style.tileset_zmax):
+        if not self._check_zoom(zoom):
             return None
         extent = self.srs.tile_extent(tile)
         return self.style.render_image(extent, (size, size), self.srs, zoom)
