@@ -28,7 +28,6 @@ requires = [
     "numpy<2",
     "networkx",
     "orjson==3.9.9",
-    "OWSLib==0.29.2",
     "passlib==1.7.4",
     "pillow==10.2.0",
     "poeditor",

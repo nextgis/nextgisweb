@@ -1,4 +1,3 @@
-import json
 import re
 from datetime import datetime
 from io import BytesIO
@@ -10,12 +9,12 @@ import requests
 import sqlalchemy as sa
 import sqlalchemy.dialects.postgresql as sa_pg
 import sqlalchemy.orm as orm
-from owslib.wms import WebMapService
+from lxml import etree
 from requests.exceptions import RequestException
 from zope.interface import implementer
 
 from nextgisweb.env import Base, env, gettext
-from nextgisweb.lib import saext
+from nextgisweb.lib import json, saext
 
 from nextgisweb.core.exception import ExternalServiceError, ValidationError
 from nextgisweb.jsrealm import TSExport
@@ -34,6 +33,8 @@ from nextgisweb.resource import (
     SRelationship,
     SResource,
 )
+
+from .util import find_tag, get_capability_formats, get_capability_layers
 
 Base.depends_on("resource")
 
@@ -107,34 +108,19 @@ class Connection(Base, Resource):
         response = self.request_wms("GetCapabilities")
         self.capcache_xml = response.content
 
-        service = WebMapService(
-            url=self.url,
-            version=self.version,
-            username=self.username,
-            password=self.password,
-            xml=self.capcache_xml,
-            timeout=env.wmsclient.options["timeout"].total_seconds(),
-        )
+        root = etree.parse(BytesIO(self.capcache_xml)).getroot()
 
-        layers = []
-        for lid, layer in service.contents.items():
-            layers.append(
-                {
-                    "id": lid,
-                    "title": layer.title,
-                    "index": [int(i) for i in layer.index.split(".")],
-                    "bbox": layer.boundingBoxWGS84,  # may be None
-                }
-            )
+        version = root.attrib["version"]
+        if version not in WMS_VERSIONS:
+            raise ValidationError(f"WMS version {version} not supported.")
 
-        layers.sort(key=lambda i: i["index"])
+        el_cap = find_tag(root, "Capability", must=True)
 
-        for layer in layers:
-            del layer["index"]
+        data = dict()
+        data["formats"] = get_capability_formats(el_cap)
+        data["layers"] = get_capability_layers(el_cap, version=version)
 
-        data = dict(formats=service.getOperationByName("GetMap").formatOptions, layers=layers)
-
-        self.capcache_json = json.dumps(data, ensure_ascii=False)
+        self.capcache_json = json.dumps(data)
 
     def get_info(self):
         s = super()
