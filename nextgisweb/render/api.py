@@ -31,7 +31,7 @@ RenderResource = Annotated[
     ),
 ]
 
-TileZ = Annotated[int, Meta(ge=0, le=22, description="Tile zoom level")]
+TileZ = Annotated[int, Meta(ge=0, le=24, description="Tile zoom level")]
 TileX = Annotated[int, Meta(ge=0, description="Tile X coordinate")]
 TileY = Annotated[int, Meta(ge=0, description="Tile Y coordinate")]
 

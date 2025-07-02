@@ -27,7 +27,7 @@ type MapperLayerCreate = NullableProps<
     } | null;
 };
 
-const zoomLimit = { min: 0, max: 22 };
+const zoomLimit = { min: 0, max: 24 };
 
 const {
     connection,

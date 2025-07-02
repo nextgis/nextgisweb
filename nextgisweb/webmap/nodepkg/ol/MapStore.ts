@@ -71,7 +71,7 @@ export class MapStore extends Watchable<MapWatchableProps> {
         const { target, extent, ...rest } = this.options;
         const view = new View({
             minZoom: 3,
-            maxZoom: 22,
+            maxZoom: 24,
             constrainResolution: true,
             extent,
         });
