@@ -6,7 +6,9 @@
 import "@ant-design/v5-patch-for-react-19";
 
 import classNames from "classnames";
+import { useEffect } from "react";
 
+import { Modal } from "@nextgisweb/gui/antd";
 import type { DynMenuItem } from "@nextgisweb/pyramid/layout/dynmenu/type";
 
 import { EntrypointSuspense } from "../component/EntrypointSuspense";
@@ -15,6 +17,7 @@ import { Breadcrumbs } from "./Breadcrumbs";
 import type { BreadcrumbItem } from "./Breadcrumbs";
 import { Dynmenu } from "./dynmenu/Dynmenu";
 import { Header } from "./header/Header";
+import { layoutStore } from "./store";
 
 interface BaseProps {
     title: string;
@@ -43,6 +46,12 @@ export function Base({
     header,
     title,
 }: BaseProps) {
+    const [modal, contextHolder] = Modal.useModal();
+
+    useEffect(() => {
+        layoutStore.setModal(modal);
+    }, [modal]);
+
     const renderBody = (
         <EntrypointSuspense entrypoint={entrypoint} props={entrypointProps} />
     );
@@ -103,6 +112,8 @@ export function Base({
 
     return (
         <>
+            {contextHolder}
+
             <title>{title}</title>
             {layoutMode === "nullSpace" ? renderBody : <PyramidLayout />}
         </>
