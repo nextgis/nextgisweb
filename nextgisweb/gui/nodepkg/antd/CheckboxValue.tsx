@@ -1,27 +1,29 @@
 import { Checkbox } from "antd";
 import type { CheckboxProps, CheckboxRef } from "antd";
-import { forwardRef } from "react";
 
 export interface CheckboxValueProps
     extends Omit<CheckboxProps, "value" | "checked" | "onChange"> {
     value?: boolean;
     onChange?: (value: boolean) => void;
+    ref?: React.Ref<CheckboxRef>;
 }
 
-export const CheckboxValue = forwardRef<CheckboxRef, CheckboxValueProps>(
-    ({ value, onChange, ...props }, ref) => {
-        const onChangeEvent: CheckboxProps["onChange"] = (evt) => {
-            onChange?.(evt.target.checked);
-        };
-        return (
-            <Checkbox
-                ref={ref}
-                checked={value}
-                onChange={onChangeEvent}
-                {...props}
-            />
-        );
-    }
-);
+export function CheckboxValue({
+    ref,
+    value = false,
+    onChange,
+    ...props
+}: CheckboxValueProps) {
+    const onChangeEvent: CheckboxProps["onChange"] = (evt) => {
+        onChange?.(evt.target.checked);
+    };
 
-CheckboxValue.displayName = "CheckboxValue";
+    return (
+        <Checkbox
+            ref={ref}
+            checked={value}
+            onChange={onChangeEvent}
+            {...props}
+        />
+    );
+}

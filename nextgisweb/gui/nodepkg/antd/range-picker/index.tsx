@@ -2,14 +2,21 @@ import type { RangePickerProps } from "antd/es/date-picker";
 import generatePicker from "antd/es/date-picker/generatePicker";
 import type { PickerRef } from "rc-picker";
 import dayjsGenerateConfig from "rc-picker/es/generate/dayjs";
-import { forwardRef } from "react";
+import type { Ref } from "react";
 
 import { disableNonPositiveYears } from "../date";
 
 const DatePicker = generatePicker(dayjsGenerateConfig);
 
-const RangePicker = forwardRef<PickerRef, RangePickerProps>((props, ref) => {
-    const { disabledDate = disableNonPositiveYears, ...restProps } = props;
+export interface RangePickerPropsWithRef extends RangePickerProps {
+    ref?: Ref<PickerRef>;
+}
+
+export function RangePicker({
+    ref,
+    disabledDate = disableNonPositiveYears,
+    ...restProps
+}: RangePickerPropsWithRef) {
     return (
         <DatePicker.RangePicker
             ref={ref}
@@ -17,7 +24,7 @@ const RangePicker = forwardRef<PickerRef, RangePickerProps>((props, ref) => {
             {...restProps}
         />
     );
-});
+}
 
 RangePicker.displayName = "RangePicker";
 
