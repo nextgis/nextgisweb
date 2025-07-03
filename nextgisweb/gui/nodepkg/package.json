@@ -7,7 +7,6 @@
         "*.less"
     ],
     "dependencies": {
-        "@ant-design/v5-patch-for-react-19": "^1.0.3",
         "@ckeditor/ckeditor5-react": "9.5.0",
         "@codemirror/commands": "^6.2.1",
         "@codemirror/lang-css": "^6.0.2",
@@ -25,7 +24,7 @@
         "@dnd-kit/sortable": "^10.0.0",
         "@dnd-kit/utilities": "^3.2.2",
         "@ngneat/falso": "8.0.1",
-        "antd": "5.26.2",
+        "antd": "~5.26.2",
         "classnames": "^2.5.1",
         "html-react-parser": "5.2.5",
         "react-complex-tree": "^2.6.0"

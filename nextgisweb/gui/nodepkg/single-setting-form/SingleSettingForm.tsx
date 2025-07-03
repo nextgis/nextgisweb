@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 
-import { Input, Space, message } from "@nextgisweb/gui/antd";
+import { Input, Space } from "@nextgisweb/gui/antd";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
 import { route } from "@nextgisweb/pyramid/api";
 import type { KeysWithMethods } from "@nextgisweb/pyramid/api/type";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import { layoutStore } from "@nextgisweb/pyramid/layout";
 
 import type { ParamsOf } from "../type";
 
@@ -66,7 +67,7 @@ export function SingleSettingForm({
                 json: { [component]: json },
             });
             if (saveSuccesText) {
-                message.success(
+                layoutStore.message?.success(
                     [saveSuccesText, saveSuccesReloadText]
                         .filter(Boolean)
                         .join(" ")

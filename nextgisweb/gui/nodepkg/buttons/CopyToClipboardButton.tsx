@@ -1,6 +1,7 @@
-import { Button, message } from "@nextgisweb/gui/antd";
+import { Button } from "@nextgisweb/gui/antd";
 import type { ButtonProps } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import { layoutStore } from "@nextgisweb/pyramid/layout";
 
 import ContentCopyIcon from "@nextgisweb/icon/material/content_copy";
 
@@ -20,7 +21,9 @@ export function CopyToClipboardButton({
 }: CopyToClipboardButtonProps) {
     const copyToClipboard = async () => {
         await navigator.clipboard.writeText(getTextToCopy());
-        message.info(messageInfo || gettext("Copied to clipboard"));
+        layoutStore.message?.info(
+            messageInfo || gettext("Copied to clipboard")
+        );
     };
 
     let buttonContent: React.ReactNode | null = null;
