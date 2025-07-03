@@ -27,16 +27,21 @@
     height: 4px;
 }
 
-.ol-swipe,
-.ol-swipe button {
-    cursor: ew-resize;
+.ol-swipe:not(.horizontal),
+.ol-swipe:not(.horizontal) button {
+    cursor: ew-resize !important;
+}
+
+.ol-swipe.horizontal,
+.ol-swipe.horizontal button {
+    cursor: ns-resize !important;
 }
 
 .ol-swipe button,
 .ol-swipe button:hover,
 .ol-swipe button:focus,
 .ol-swipe button:active {
-    background-color: var(--accent);
+    background-color: var(--accent) !important;
 }
 
 .ol-swipe.horizontal,
