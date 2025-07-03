@@ -633,11 +633,11 @@ export class Display {
 
     // FEATURE
     @action
-    setItemConfig(itemConfig: LayerItemConfig) {
+    setItemConfig(itemConfig: LayerItemConfig | null) {
         this.itemConfig = itemConfig;
     }
     @action
-    setItem(item: StoreItem) {
+    setItem(item: StoreItem | null) {
         this.item = item;
     }
 
@@ -649,6 +649,8 @@ export class Display {
     }
     handleSelect(selectedKeys: number[]) {
         if (selectedKeys.length === 0 || selectedKeys.length < 1) {
+            this.setItemConfig(null);
+            this.setItem(null);
             return;
         }
         const itemId = selectedKeys[0];

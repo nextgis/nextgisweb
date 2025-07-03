@@ -95,9 +95,12 @@ export class ToggleControl extends WidgetBase {
     }
 
     setChecked(checked: boolean): void {
-        if (this.checked !== checked && !this.disabled) {
-            this.checked = checked;
-            this._updateState();
+        const isValid = this.tool?.validate?.(checked) ?? true;
+        if (isValid) {
+            if (this.checked !== checked && !this.disabled) {
+                this.checked = checked;
+                this._updateState();
+            }
         }
     }
 
@@ -138,7 +141,6 @@ export class ToggleControl extends WidgetBase {
         if (this.changeEventHandler) {
             this.changeEventHandler(this.checked);
         }
-
         if (this.checked) {
             this.tool?.activate?.();
         } else {

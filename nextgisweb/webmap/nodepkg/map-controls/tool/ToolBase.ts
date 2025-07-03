@@ -27,4 +27,6 @@ export abstract class ToolBase {
     deactivate() {}
 
     destroy?(): void;
+
+    validate?(status: boolean): boolean;
 }

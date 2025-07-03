@@ -10,7 +10,7 @@ msgstr "Изображение"
 msgid "Main web map"
 msgstr "Основная веб-карта"
 
-#: favorite.py:6 view.py:194
+#: favorite.py:6 view.py:183
 msgid "Display"
 msgstr "Открыть"
 
@@ -18,7 +18,7 @@ msgstr "Открыть"
 msgid "Fragment"
 msgstr "Фрагмент"
 
-#: model.py:47 model.py:65 view.py:189 view.py:216
+#: model.py:47 model.py:65 view.py:178 view.py:205
 msgid "Web map"
 msgstr "Веб-карта"
 
@@ -37,7 +37,7 @@ msgctxt "permission"
 msgid "Manage annotations"
 msgstr "Управление аннотациями"
 
-#: nodepkg/clone-webmap/CloneWebmap.tsx:21 view.py:204
+#: nodepkg/clone-webmap/CloneWebmap.tsx:21 view.py:193
 msgid "Clone"
 msgstr "Клонировать"
 
@@ -71,15 +71,15 @@ msgstr "Свернуть"
 msgid "Disable"
 msgstr "Отключить"
 
-#: nodepkg/display-tiny/DisplayTinyComponent.tsx:45
+#: nodepkg/display-tiny/DisplayTinyPage.tsx:44
 msgid "Open full map"
 msgstr "Открыть карту целиком"
 
-#: nodepkg/display/Display.ts:693
+#: nodepkg/display/Display.ts:695
 msgid "Object not found"
 msgstr "Объект не найден"
 
-#: nodepkg/display/Display.ts:694
+#: nodepkg/display/Display.ts:696
 msgid "Object from URL parameters not found"
 msgstr "Объект из параметров строки запроса не найден"
 
@@ -238,7 +238,7 @@ msgstr "Показывать легенду"
 msgid "Hide legend"
 msgstr "Скрывать легенду"
 
-#: nodepkg/map-component/UrlLayer.tsx:11
+#: nodepkg/map-component/UrlLayer.tsx:12
 msgid "Unable to load tile"
 msgstr "Ошибка загрузки тайла"
 
@@ -300,7 +300,7 @@ msgstr "Измерение расстояния"
 msgid "Measure area"
 msgstr "Измерение площади"
 
-#: nodepkg/map-controls/map-tools.ts:51 nodepkg/map-controls/tool/Swipe.ts:30
+#: nodepkg/map-controls/map-tools.ts:51 nodepkg/map-controls/tool/Swipe.ts:40
 msgid "Vertical swipe"
 msgstr "Вертикальная шторка"
 
@@ -312,7 +312,31 @@ msgstr "Координаты курсора / охвата"
 msgid "Identify"
 msgstr "Идентификация"
 
-#: nodepkg/map-controls/tool/Swipe.ts:34
+#: nodepkg/map-controls/tool/Swipe.ts:14
+msgid "Please select a layer before using this tool."
+msgstr "Пожалуйста, выберите слой перед использованием этого инструмента."
+
+#: nodepkg/map-controls/tool/Swipe.ts:15
+msgid "No layer selected"
+msgstr "Слой не выбран"
+
+#: nodepkg/map-controls/tool/Swipe.ts:16
+msgid "Please select a layer, not a group."
+msgstr "Пожалуйста, выберите слой, а не группу."
+
+#: nodepkg/map-controls/tool/Swipe.ts:17
+msgid "Please make the layer visible before using this tool."
+msgstr "Пожалуйста, сделайте слой видимым перед использованием этого инструмента."
+
+#: nodepkg/map-controls/tool/Swipe.ts:18
+msgid "Invalid selection type"
+msgstr "Неверный тип выделения"
+
+#: nodepkg/map-controls/tool/Swipe.ts:19
+msgid "Layer is not visible"
+msgstr "Слой не включен"
+
+#: nodepkg/map-controls/tool/Swipe.ts:44
 msgid "Horizontal swipe"
 msgstr "Горизонтальная шторка"
 
@@ -699,6 +723,26 @@ msgstr "Завершить редактирование"
 msgid "Zoom to layer"
 msgstr "Увеличить до слоя"
 
+#: nodepkg/preview-embedded/PreviewEmbedded.tsx:9
+msgid "This page is for a preview of the web map to be embedded on the site."
+msgstr ""
+"Эта страница предназначена для предпросмотра веб карты, которую необходимо "
+"встроить на сайт."
+
+#: nodepkg/preview-embedded/PreviewEmbedded.tsx:10
+msgid ""
+"Most likely, you went from the \"Share\" section of the web map and refreshed"
+" the page."
+msgstr ""
+"Скорее всего, вы перешли из секции \"Поделиться\" веб карты и обновили "
+"страницу."
+
+#: nodepkg/preview-embedded/PreviewEmbedded.tsx:11
+msgid "To generate a preview, go back to the web map page and click \"Preview\"."
+msgstr ""
+"Для генерации предпросмотра вернитесь на страницу веб карты и нажмите "
+"\"Предпросмотр\"."
+
 #: nodepkg/settings-widget/OptionsWidget.tsx:13
 msgid "Auto"
 msgstr "Авто"
@@ -1054,34 +1098,14 @@ msgstr "Встраивание веб-карты не разрешено для 
 msgid "View the map on %s"
 msgstr "Посмотреть карту на %s"
 
-#: template/preview_embedded.mako:15
-msgid "This page is for a preview of the web map to be embedded on the site."
-msgstr ""
-"Эта страница предназначена для предпросмотра веб карты, которую необходимо "
-"встроить на сайт."
-
-#: template/preview_embedded.mako:16
-msgid ""
-"Most likely, you went from the \"Share\" section of the web map and refreshed"
-" the page."
-msgstr ""
-"Скорее всего, вы перешли из секции \"Поделиться\" веб карты и обновили "
-"страницу."
-
-#: template/preview_embedded.mako:17
-msgid "To generate a preview, go back to the web map page and click \"Preview\"."
-msgstr ""
-"Для генерации предпросмотра вернитесь на страницу веб карты и нажмите "
-"\"Предпросмотр\"."
-
-#: view.py:107
+#: view.py:96
 msgid "Clone web map"
 msgstr "Клонировать веб-карту"
 
-#: view.py:120
+#: view.py:108
 msgid "Embedded webmap preview"
 msgstr "Просмотр встроенной веб-карты"
 
-#: view.py:129
+#: view.py:118
 msgid "Web map settings"
 msgstr "Настройки веб-карты"
