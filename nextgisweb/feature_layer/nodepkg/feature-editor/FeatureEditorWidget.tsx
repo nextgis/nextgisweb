@@ -22,6 +22,8 @@ import { useUnsavedChanges } from "@nextgisweb/gui/hook";
 import { assert } from "@nextgisweb/jsrealm/error";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
+import { GEOMETRY_KEY } from "../geometry-editor/constant";
+
 import { FeatureEditorStore } from "./FeatureEditorStore";
 import { ATTRIBUTES_KEY } from "./constant";
 import { registry } from "./registry";
@@ -45,6 +47,7 @@ const msgNoChanges = gettext("No changes to save");
 
 export const FeatureEditorWidget = observer(
     ({
+        showGeometryTab = true,
         resourceId,
         featureId,
         okBtnMsg = msgOk,
@@ -74,10 +77,15 @@ export const FeatureEditorWidget = observer(
                     parentStore: store,
                 });
 
-                if (key !== ATTRIBUTES_KEY) {
-                    store.addExtensionStore(key, widgetStore);
-                } else {
+                if (key === ATTRIBUTES_KEY) {
                     store.attachAttributeStore(widgetStore);
+                } else if (key === GEOMETRY_KEY) {
+                    if (!showGeometryTab) {
+                        return;
+                    }
+                    store.attachGeometryStore(widgetStore);
+                } else {
+                    store.addExtensionStore(key, widgetStore);
                 }
 
                 const Widget = lazy(async () => await newEditorWidget.widget());
@@ -104,14 +112,19 @@ export const FeatureEditorWidget = observer(
                     ),
                 };
             },
-            [store]
+            [showGeometryTab, store]
         );
 
         useEffect(() => {
             const loadWidgets = async () => {
-                const newTabs = await Promise.all(
-                    registry.queryAll().map(createEditorTab)
-                );
+                const newTabs: TabItem[] = [];
+
+                for (const reg of registry.queryAll()) {
+                    const tab = await createEditorTab(reg);
+                    if (tab) {
+                        newTabs.push(tab);
+                    }
+                }
                 newTabs.sort((a, b) => (a.order ?? 100) - (b.order ?? 100));
                 setItems(newTabs);
             };

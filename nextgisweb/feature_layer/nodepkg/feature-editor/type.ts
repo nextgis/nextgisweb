@@ -13,6 +13,7 @@ export interface AttributesFormProps {
 export type FeatureEditorMode = "save" | "return";
 
 export interface FeatureEditorWidgetProps {
+    showGeometryTab?: boolean;
     resourceId?: number;
     featureId?: number;
     okBtnMsg?: string;
