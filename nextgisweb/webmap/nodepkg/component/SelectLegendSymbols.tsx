@@ -10,8 +10,6 @@ const options = [
     { value: "disable", label: gettext("Disable") },
 ];
 
-export interface SelectLegendSymbolsProps extends SelectProps {}
-
-export function SelectLegendSymbols(props: SelectLegendSymbolsProps) {
+export function SelectLegendSymbols(props: SelectProps) {
     return <Select options={options} placeholder={msgPlaceholder} {...props} />;
 }

@@ -17,7 +17,7 @@ export interface ControlInfo extends ControlBase<Control> {
     postCreate?: (display: Display, control: Control) => void;
 }
 
-export interface ToolInfo extends ControlBase<ToolBase> {}
+export type ToolInfo = ControlBase<ToolBase>;
 
 export type ControlsInfo = ControlInfo | ToolInfo;
 type Control = OlControl | ToolBase;

@@ -167,7 +167,9 @@ export const EdiTable = observer(
         // There is no way to append a placeholder row by overriding components
         // property. It works in general, but looses focus on inputs. So we add
         // placeholders to rows and customize rendering via hooks.
-        placeholder && tableDataSource.push(placeholder);
+        if (placeholder) {
+            tableDataSource.push(placeholder);
+        }
 
         const onDragEnd = ({ active, over }: DragEndEvent) => {
             if (active && over && active.id !== over.id) {

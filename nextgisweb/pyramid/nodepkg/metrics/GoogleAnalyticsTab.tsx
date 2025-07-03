@@ -20,7 +20,9 @@ const GoogleAnalyticsTab: FC<TabProps<"google_analytics">> = ({
     const update = (k: string, v: unknown) => {
         const newIvalue = { ...ivalue, [k]: v };
         setIvalue(newIvalue);
-        onChange && onChange(newIvalue.id ? newIvalue : null);
+        if (onChange) {
+            onChange(newIvalue.id ? newIvalue : null);
+        }
     };
 
     return (

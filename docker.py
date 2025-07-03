@@ -42,5 +42,5 @@ def on_user_dir(event):
 def on_virtualenv(event):
     event.after_install(
         "ln -s package/nextgisweb/.prettierrc.cjs $NGWROOT/",
-        "ln -s package/nextgisweb/.eslintrc.cjs $NGWROOT/",
+        "ln -s package/nextgisweb/eslint.config.cjs $NGWROOT/",
     )

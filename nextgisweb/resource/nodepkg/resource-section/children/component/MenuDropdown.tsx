@@ -185,8 +185,9 @@ export function MenuDropdown({
                     : gettext("Show resources volume"),
                 onClick: () => {
                     setVolumeVisible(!volumeVisible);
-                    !volumeVisible &&
+                    if (!volumeVisible) {
                         loadVolumes({ data, setState: setVolumeValues });
+                    }
                 },
             });
         }

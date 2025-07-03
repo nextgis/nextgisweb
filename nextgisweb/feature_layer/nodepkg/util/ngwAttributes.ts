@@ -1,4 +1,4 @@
-import dayjs from "dayjs";
+import dayjs, { isDayjs } from "dayjs";
 import type { Dayjs } from "dayjs";
 
 import type { FeatureLayerFieldDatatype } from "@nextgisweb/feature-layer/type/api";
@@ -63,9 +63,7 @@ export function marshalFieldValue(
     if (value === null) {
         return null;
     } else if (isDateTimeFieldType(datatype)) {
-        const dayjsValue = dayjs.isDayjs(value)
-            ? value
-            : parseDate(value as string);
+        const dayjsValue = isDayjs(value) ? value : parseDate(value as string);
         if (datatype === "DATE") {
             return dayjsValue.format("YYYY-MM-DD");
         } else if (datatype === "TIME") {

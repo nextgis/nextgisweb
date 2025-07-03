@@ -53,7 +53,9 @@ const ResourceSelectMultiple = ({
                 newIds.push(addId);
             }
         }
-        onChange && onChange(newIds);
+        if (onChange) {
+            onChange(newIds);
+        }
         setIds(newIds);
     };
 

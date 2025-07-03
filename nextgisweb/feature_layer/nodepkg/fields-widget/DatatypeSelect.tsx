@@ -13,8 +13,7 @@ const VALUES = [
 
 const OPTIONS = VALUES.map((i) => ({ value: i, label: i }));
 
-interface DatatypeSelectProps
-    extends Omit<SelectProps<string | undefined>, "options"> {}
+type DatatypeSelectProps = Omit<SelectProps<string | undefined>, "options">;
 
 export function DatatypeSelect({
     value,

@@ -26,7 +26,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-import OlStyleParser from "geostyler-openlayers-parser";
+import OlGeoStyleParser from "geostyler-openlayers-parser";
 import type { Style, Symbolizer, SymbolizerKind } from "geostyler-style";
 import { get as _get, uniqueId as _uniqueId } from "lodash-es";
 import OlFeature from "ol/Feature";
@@ -143,7 +143,7 @@ export const OlRenderer: React.FC<OlRendererProps> = ({
         if (!newSymbolizers) {
             return undefined;
         }
-        const styleParser = new OlStyleParser();
+        const styleParser = new OlGeoStyleParser();
 
         // we have to wrap the symbolizer in a Style object since the writeStyle
         // only accepts a Style object

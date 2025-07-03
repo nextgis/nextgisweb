@@ -151,7 +151,7 @@ export async function addBasemaps(
             if (layer) {
                 layers.push(layer);
             }
-        } catch (err) {
+        } catch {
             //
         }
     }

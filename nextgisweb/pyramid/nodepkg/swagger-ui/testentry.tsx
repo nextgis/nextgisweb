@@ -48,7 +48,7 @@ export default function SwaggerTestEntry() {
             if (weight) {
                 const w = weights[weight];
                 if (w === null) {
-                    true;
+                    // ignore
                 } else if (w === "normal") {
                     weightNormal.push(...selectors);
                 } else if (w === "bold") {

@@ -106,7 +106,11 @@ const PrintPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
     }, [mapSettings]);
 
     useEffect(() => {
-        visible ? show() : hide();
+        if (visible) {
+            show();
+        } else {
+            hide();
+        }
     }, [hide, show, visible]);
 
     useEffect(() => {

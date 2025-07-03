@@ -100,7 +100,7 @@ export function ModelForm(props: ModelFormProps) {
             } catch (err) {
                 errorModal(err);
             }
-        } catch (err) {
+        } catch {
             message.error(gettext("Fix the form errors first"));
         } finally {
             setStatus(null);

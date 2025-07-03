@@ -31,7 +31,7 @@ function lunkwillCheckResponse(lwResp: Response) {
 async function responseJson(response: Response) {
     try {
         return response.json();
-    } catch (err) {
+    } catch {
         throw new InvalidResponseError();
     }
 }
@@ -57,7 +57,7 @@ async function lunkwillResponseUrl(lwResp: Response) {
         try {
             lwResp = await fetch(sum, { credentials: "same-origin" });
             lwData = await lwResp.json();
-        } catch (err) {
+        } catch {
             failed = true;
             continue;
         }
@@ -88,7 +88,7 @@ async function lunkwillResponseUrl(lwResp: Response) {
 async function lunkwillFetch(lwRespUrl: string) {
     try {
         return await window.fetch(lwRespUrl, { credentials: "same-origin" });
-    } catch (err) {
+    } catch {
         throw new NetworkResponseError();
     }
 }

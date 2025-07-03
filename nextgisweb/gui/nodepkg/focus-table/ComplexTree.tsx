@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import { observer } from "mobx-react-lite";
 import { useCallback, useEffect, useMemo, useRef } from "react";
-import type { CSSProperties, MutableRefObject, ReactNode, Ref, RefObject } from "react";
+import type { CSSProperties, ReactNode, Ref, RefObject } from "react";
 import {
     InteractionMode,
     Tree,
@@ -143,7 +143,7 @@ function columnWidthStyle(width?: ColumnWidth): CSSProperties {
 
 function setRefCurrent<T>(ref?: Ref<T>, val?: T) {
     if (!ref) return;
-    const cast = ref as MutableRefObject<T | undefined>;
+    const cast = ref as RefObject<T | undefined>;
     cast.current = val ? val : undefined;
 }
 

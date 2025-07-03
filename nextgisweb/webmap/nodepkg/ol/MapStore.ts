@@ -212,7 +212,7 @@ export class MapStore extends Watchable<MapWatchableProps> {
         this.olMap.removeLayer(layer.getLayer());
         const layers = { ...this.layers };
         delete layers[layer.name];
-        this.layers === layers;
+        this.layers = layers;
     }
 
     getScaleForResolution(res: number, mpu: number): number {

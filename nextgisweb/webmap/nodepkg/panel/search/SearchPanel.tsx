@@ -385,6 +385,15 @@ const SearchPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
         AbortControllerHelper | undefined
     >(undefined);
 
+    const clearResults = () => {
+        if (searchController) {
+            searchController.abort();
+            setSearchController(undefined);
+        }
+        setSearchResults(undefined);
+        setLoading(false);
+    };
+
     const _search = useCallback(
         debounce(async (searchText: string) => {
             clearResults();
@@ -464,15 +473,6 @@ const SearchPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
         const indicator = <LoadingOutlined style={{ fontSize: 30 }} spin />;
         results = <Spin className="loading" indicator={indicator} />;
     }
-
-    const clearResults = () => {
-        if (searchController) {
-            searchController.abort();
-            setSearchController(undefined);
-        }
-        setSearchResults(undefined);
-        setLoading(false);
-    };
 
     const clearSearchText = () => {
         setSearchText(undefined);

@@ -3,7 +3,7 @@ import { BaseRegistry } from "./registry";
 type Value = NonNullable<unknown>;
 type Metadata = NonNullable<unknown>;
 
-interface NoMetadata {}
+type NoMetadata = object;
 
 type PromiseLoader<V extends Value> = (...args: []) => Promise<V>;
 type ImportLoader<V extends Value> = PromiseLoader<{ default: V }>;

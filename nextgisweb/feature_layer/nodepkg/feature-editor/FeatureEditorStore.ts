@@ -1,6 +1,5 @@
 import { action, computed, observable } from "mobx";
 
-import type { FeatureItemExtensions } from "@nextgisweb/feature-layer/type";
 import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
 import { route } from "@nextgisweb/pyramid/api";
 import type { RouteBody } from "@nextgisweb/pyramid/api/type";
@@ -8,7 +7,11 @@ import { AbortControllerHelper } from "@nextgisweb/pyramid/util/abort";
 import type { CompositeRead } from "@nextgisweb/resource/type/api";
 
 import type { NgwAttributeValue } from "../attribute-editor/type";
-import type { EditorStore, FeatureItem as FeatureItem_ } from "../type";
+import type {
+    EditorStore,
+    FeatureItemExtensions,
+    FeatureItem as FeatureItem_,
+} from "../type";
 
 import type { FeatureEditorStoreOptions } from "./type";
 

@@ -86,7 +86,7 @@ export const FeatureGridActions = observer(
                 if (onDelete) {
                     onDelete(featureIds);
                 }
-            } catch (err) {
+            } catch {
                 if (deleteError) {
                     deleteError(featureIds);
                 }

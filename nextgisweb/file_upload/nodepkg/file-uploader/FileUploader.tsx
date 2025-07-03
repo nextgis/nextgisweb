@@ -111,7 +111,9 @@ export function FileUploader<M extends boolean = false>({
         });
 
     useEffect(() => {
-        onUploading && onUploading(uploading);
+        if (onUploading) {
+            onUploading(uploading);
+        }
     }, [uploading, onUploading]);
 
     return (

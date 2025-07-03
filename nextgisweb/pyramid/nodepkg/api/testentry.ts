@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 import type { UserReadBrief } from "@nextgisweb/auth/type/api";
 
 import { route } from "./route";

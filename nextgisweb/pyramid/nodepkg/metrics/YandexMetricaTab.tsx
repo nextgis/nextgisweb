@@ -21,7 +21,9 @@ const YandexMetricaTab: FC<TabProps<"yandex_metrica">> = ({
     const update = (k: string, v: unknown) => {
         const newIvalue = { ...ivalue, [k]: v };
         setIvalue(newIvalue);
-        onChange && onChange(newIvalue.id ? newIvalue : null);
+        if (onChange) {
+            onChange(newIvalue.id ? newIvalue : null);
+        }
     };
 
     return (

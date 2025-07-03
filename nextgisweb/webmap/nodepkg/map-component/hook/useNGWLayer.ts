@@ -3,7 +3,7 @@ import GeoJSON from "ol/format/GeoJSON";
 import VectorLayer from "ol/layer/Vector";
 import VectorTileLayer from "ol/layer/VectorTile";
 import WebGLTileLayer from "ol/layer/WebGLTile";
-import GeoTIFF from "ol/source/GeoTIFF";
+import GeoTIFFSource from "ol/source/GeoTIFF";
 import VectorSource from "ol/source/Vector";
 import VectorTileSource from "ol/source/VectorTile";
 import type { StyleLike } from "ol/style/Style";
@@ -33,7 +33,7 @@ const createGeoJsonLayer = (
 const createGeoTIFFLayer = (resourceId: number) => {
     const url = routeURL("raster_layer.cog", resourceId);
     const layer = new WebGLTileLayer({
-        source: new GeoTIFF({ sources: [{ url: url }] }),
+        source: new GeoTIFFSource({ sources: [{ url: url }] }),
     });
     return layer;
 };

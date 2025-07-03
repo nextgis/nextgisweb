@@ -128,7 +128,6 @@ export class PermissionStoreItem {
                 this.permission = null;
             }
         }
-        this.store.validate && this.error;
         this.store.dirty = true;
 
         this.store.rotatePlaceholder();

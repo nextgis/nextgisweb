@@ -38,7 +38,9 @@ function potFlagged(comp) {
 module.exports = function (source) {
     const comp = compFromPath(this.resourcePath);
     const flagged = potFlagged(comp);
-    flagged || console.warn(`POT-file for '${comp}' component not found`);
+    if (!flagged) {
+        console.warn(`POT-file for '${comp}' component not found`);
+    }
 
     // Parse main translations
     const translations = po.parse(source).translations;
