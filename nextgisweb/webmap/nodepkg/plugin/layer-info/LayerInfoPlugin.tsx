@@ -14,10 +14,10 @@ export class LayerInfoPlugin extends PluginBase {
         const infoConfig = this.display.itemConfig;
         const data = infoConfig?.plugin[
             this.identity
-        ] as DescriptionWebMapPluginConfig;
+        ] as DescriptionWebMapPluginConfig | null;
         return {
             ...state,
-            enabled: !!(state.enabled && data.description),
+            enabled: !!(state.enabled && data?.description),
         };
     }
 
