@@ -7,3 +7,5 @@ export { Breadcrumbs } from "./Breadcrumbs";
 export { Base } from "./Base";
 export { Header } from "./header/Header";
 export { layoutStore } from "./store";
+export { useLayoutContext } from "./context/useLayoutContext";
+export { confirm, confirmDelete } from "./util/confirm";
