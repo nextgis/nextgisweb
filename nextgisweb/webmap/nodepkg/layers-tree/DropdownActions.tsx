@@ -34,7 +34,9 @@ export function DropdownActions({
         return (
             <span
                 className="more"
-                onClick={() => {
+                onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
                     setMoreClickId(id);
                 }}
             >
@@ -94,7 +96,12 @@ export function DropdownActions({
 
     return (
         <Dropdown
-            menu={{ items: menuItems }}
+            menu={{
+                items: menuItems,
+                onClick: ({ domEvent }) => {
+                    domEvent.stopPropagation();
+                },
+            }}
             onOpenChange={() => {
                 setMoreClickId(undefined);
             }}
@@ -103,7 +110,12 @@ export function DropdownActions({
             open
             placement="bottomRight"
             popupRender={(menu) => (
-                <div className="dropdown-content">
+                <div
+                    className="dropdown-content"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                    }}
+                >
                     {menu}
                     {customMenuItems.length && (
                         <>
@@ -116,7 +128,13 @@ export function DropdownActions({
                 </div>
             )}
         >
-            <span className="more">
+            <span
+                className="more"
+                onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }}
+            >
                 <MoreVertIcon />
             </span>
         </Dropdown>

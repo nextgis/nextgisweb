@@ -1,4 +1,5 @@
 import { observer } from "mobx-react-lite";
+import { useCallback } from "react";
 
 import type ZoomToWebmapPlugin from "@nextgisweb/webmap/plugin/zoom-to-webmap";
 
@@ -20,6 +21,13 @@ const LayersPanel = observer<PanelPluginWidgetProps>(
                 (plugin as ZoomToWebmapPlugin).zoomToAllLayers();
             }
         };
+
+        const onSelect = useCallback(
+            (keys: number[]) => {
+                display.handleSelect(keys);
+            },
+            [display]
+        );
 
         return (
             <PanelContainer
@@ -44,7 +52,7 @@ const LayersPanel = observer<PanelPluginWidgetProps>(
             >
                 <LayersTree
                     store={display.webmapStore}
-                    onSelect={display.handleSelect.bind(display)}
+                    onSelect={onSelect}
                     setLayerZIndex={display.map.setLayerZIndex.bind(display)}
                     getWebmapPlugins={() => ({ ...display.plugins })}
                     {...props}
