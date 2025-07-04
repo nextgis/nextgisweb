@@ -42,6 +42,7 @@ def test_ref_ddl(versioning):
     sql_cmp(vls.sql_create(), f"ref_ddl/create.{vs}")
     sql_cmp(vls.sql_drop(), f"ref_ddl/drop.{vs}")
     sql_cmp(vls.sql_add_fields(["i", "d"]), f"ref_ddl/add_fields.{vs}")
+    sql_cmp(vls.sql_delete_fields(["i", "d"]), f"ref_ddl/delete_fields.{vs}")
 
     if versioning:
         sql = vls.sql_versioning_enable()
@@ -52,8 +53,6 @@ def test_ref_ddl(versioning):
 
         sql = vls.sql_convert_geom_column_type(Geometry("MULTIPOINT", 3857))
         sql_cmp(sql, "ref_ddl/convert_geom_column_type")
-
-        sql_cmp(vls.sql_delete_fields(["i", "d"]), "ref_ddl/delete_fields")
 
 
 @pytest.mark.parametrize("versioning", [False, True])

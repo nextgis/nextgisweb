@@ -41,8 +41,6 @@ from sqlalchemy.types import CHAR, Integer
 
 from nextgisweb.lib import saext
 
-from nextgisweb.feature_layer.versioning import FVersioningNotImplemented
-
 from .util import SCHEMA
 
 
@@ -169,13 +167,13 @@ class VLSchema(MetaData):
             )
 
     def sql_delete_fields(self, fields):
-        if self.versioning:
-            raise FVersioningNotImplemented
-        yield AlterFieldsColumns(
-            self.ctab,
-            [self.ctab.fields[i] for i in fields],
-            action="DROP",
-        )
+        tabs = (self.ctab, self.htab) if self.versioning else (self.ctab,)
+        for tab in tabs:
+            yield AlterFieldsColumns(
+                tab,
+                [tab.fields[i] for i in fields],
+                action="DROP",
+            )
 
     # Queries
 
