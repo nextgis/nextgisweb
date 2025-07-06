@@ -1,20 +1,14 @@
-// Since React 19 adjusted the export method of react-dom, antd cannot directly use the ReactDOM.render method.
-// Therefore, using antd will encounter the following problems:
-// – Wave effect does not show
-// – Static methods of Modal, Notification, Message not working
-// https://ant.design/docs/react/v5-for-19
-import "@ant-design/v5-patch-for-react-19";
-
 import classNames from "classnames";
 import { useEffect } from "react";
 
-import { Modal } from "@nextgisweb/gui/antd";
+import { Modal, message } from "@nextgisweb/gui/antd";
 import type { DynMenuItem } from "@nextgisweb/pyramid/layout/dynmenu/type";
 
 import { EntrypointSuspense } from "../component/EntrypointSuspense";
 
 import { Breadcrumbs } from "./Breadcrumbs";
 import type { BreadcrumbItem } from "./Breadcrumbs";
+import { LayoutContext } from "./context/useLayoutContext";
 import { Dynmenu } from "./dynmenu/Dynmenu";
 import { Header } from "./header/Header";
 import { layoutStore } from "./store";
@@ -46,11 +40,13 @@ export function Base({
     header,
     title,
 }: BaseProps) {
-    const [modal, contextHolder] = Modal.useModal();
+    const [modalApi, modalContextHolder] = Modal.useModal();
+    const [messageApi, contextHolder] = message.useMessage();
 
     useEffect(() => {
-        layoutStore.setModal(modal);
-    }, [modal]);
+        layoutStore.setModalApi(modalApi);
+        layoutStore.setMessageApi(messageApi);
+    }, [modalApi, messageApi]);
 
     const renderBody = (
         <EntrypointSuspense entrypoint={entrypoint} props={entrypointProps} />
@@ -112,10 +108,12 @@ export function Base({
 
     return (
         <>
+            {modalContextHolder}
             {contextHolder}
-
-            <title>{title}</title>
-            {layoutMode === "nullSpace" ? renderBody : <PyramidLayout />}
+            <LayoutContext value={{ modal: modalApi, message: messageApi }}>
+                <title>{title}</title>
+                {layoutMode === "nullSpace" ? renderBody : <PyramidLayout />}
+            </LayoutContext>
         </>
     );
 }

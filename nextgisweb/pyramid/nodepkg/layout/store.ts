@@ -1,16 +1,13 @@
 import { action, computed, observable } from "mobx";
 import type { ReactNode } from "react";
 
-import type { Modal } from "@nextgisweb/gui/antd";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import settings from "@nextgisweb/pyramid/client-settings";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { url } from "../nextgis";
 
-type ModalHookResult = ReturnType<typeof Modal.useModal>;
-
-type ModalAPI = ModalHookResult[0];
+import type { MessageAPI, ModalAPI } from "./type";
 
 const NOTIFICATION_ORDER = ["success", "danger"];
 
@@ -26,10 +23,15 @@ class LayoutStore {
     @observable.ref accessor hideMenu = false;
 
     @observable.shallow accessor modal: ModalAPI | null = null;
+    @observable.shallow accessor message: MessageAPI | null = null;
 
     @action.bound
-    setModal(modal: ModalAPI | null) {
+    setModalApi(modal: ModalAPI | null) {
         this.modal = modal;
+    }
+    @action.bound
+    setMessageApi(message: MessageAPI | null) {
+        this.message = message;
     }
 
     @action.bound
