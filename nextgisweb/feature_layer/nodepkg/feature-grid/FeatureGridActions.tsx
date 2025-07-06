@@ -7,11 +7,11 @@ import type {
     CreateButtonActionProps,
 } from "@nextgisweb/gui/action-toolbar";
 import { Button, Input, Space, Tooltip } from "@nextgisweb/gui/antd";
-import { confirmDelete } from "@nextgisweb/gui/confirm";
 import { DeleteIcon, EditIcon, OpenInNewIcon } from "@nextgisweb/gui/icon";
 import showModal from "@nextgisweb/gui/showModal";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import { confirmDelete } from "@nextgisweb/pyramid/layout";
 import type Routes from "@nextgisweb/pyramid/type/route";
 import { useResource } from "@nextgisweb/resource/hook/useResource";
 

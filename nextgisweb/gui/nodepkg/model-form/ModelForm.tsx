@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 
-import { Button, Form, Popconfirm, Space, message } from "@nextgisweb/gui/antd";
+import { Button, Form, Popconfirm, Space } from "@nextgisweb/gui/antd";
 import type { FormInstance } from "@nextgisweb/gui/antd";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
@@ -14,6 +14,7 @@ import type {
 } from "@nextgisweb/pyramid/api/type";
 import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import { useLayoutContext } from "@nextgisweb/pyramid/layout";
 
 import { useKeydownListener } from "../hook/useKeydownListener";
 
@@ -59,6 +60,8 @@ export function ModelForm(props: ModelFormProps) {
         ...formProps
     } = props;
 
+    const { message } = useLayoutContext();
+
     const allowDelete = allowDelete_ ?? true;
     const operation = id !== undefined ? "edit" : "create";
 
@@ -101,7 +104,7 @@ export function ModelForm(props: ModelFormProps) {
                 errorModal(err);
             }
         } catch {
-            message.error(gettext("Fix the form errors first"));
+            message?.error(gettext("Fix the form errors first"));
         } finally {
             setStatus(null);
         }

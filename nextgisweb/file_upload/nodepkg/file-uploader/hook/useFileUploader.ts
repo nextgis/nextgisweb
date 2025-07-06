@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { message } from "@nextgisweb/gui/antd";
 import type { UploadFile } from "@nextgisweb/gui/antd";
 import { errorModalUnlessAbort } from "@nextgisweb/gui/error";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 import { gettextf } from "@nextgisweb/pyramid/i18n";
+import { useLayoutContext } from "@nextgisweb/pyramid/layout";
 
 import type {
     FileUploaderOptions,
@@ -30,6 +30,8 @@ export function useFileUploader<M extends boolean = false>({
     afterUpload = [],
 }: UseFileUploaderProps<M>) {
     const { makeSignal, abort } = useAbortController();
+
+    const { message } = useLayoutContext();
 
     const docTitle = useRef(document.title);
 
@@ -164,7 +166,7 @@ export function useFileUploader<M extends boolean = false>({
                     upload(info.fileList.map((f) => f.originFileObj as File));
                     setFileList([]);
                 } else if (error) {
-                    message.error(`${info.file.name} file upload failed.`);
+                    message?.error(`${info.file.name} file upload failed.`);
                 }
             },
             ...restInputProps,
@@ -172,6 +174,7 @@ export function useFileUploader<M extends boolean = false>({
         [
             upload,
             accept,
+            message,
             multiple,
             fileList,
             showUploadList,

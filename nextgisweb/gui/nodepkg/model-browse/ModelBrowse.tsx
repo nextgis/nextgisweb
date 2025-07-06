@@ -6,13 +6,11 @@ import {
     Button,
     Col,
     Input,
-    Modal,
     Popconfirm,
     Row,
     Space,
     Table,
     Tooltip,
-    message,
 } from "@nextgisweb/gui/antd";
 import type {
     ButtonProps,
@@ -35,6 +33,7 @@ import type {
 } from "@nextgisweb/pyramid/api/type";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import { useLayoutContext } from "@nextgisweb/pyramid/layout";
 
 import VisibilityIcon from "@nextgisweb/icon/material/visibility";
 
@@ -98,6 +97,8 @@ export function ModelBrowse<Data extends ModalBrowseData = ModalBrowseData>({
     collectionOptions,
     ...tableProps
 }: ModelBrowseProps<Data>) {
+    const { message, modal } = useLayoutContext();
+
     const model: Model =
         typeof m === "string"
             ? ({
@@ -156,7 +157,7 @@ export function ModelBrowse<Data extends ModalBrowseData = ModalBrowseData>({
             const newSelectedRows = selected.filter((row) => row !== id);
             setRows(newRows);
             setSelected(newSelectedRows);
-            message.success(deleteSuccess);
+            message?.success(deleteSuccess);
             if (callbacks && callbacks.deleteModelItem) {
                 callbacks.deleteModelItem();
             }
@@ -179,7 +180,7 @@ export function ModelBrowse<Data extends ModalBrowseData = ModalBrowseData>({
                 }
             }
             if (deleteError.length) {
-                Modal.confirm({
+                modal?.confirm({
                     type: "error",
                     title: gettext("The errors occurred during execution"),
                     content: (
@@ -195,7 +196,7 @@ export function ModelBrowse<Data extends ModalBrowseData = ModalBrowseData>({
             const newRows = rows.filter((row) => !deleted.includes(row.id));
             setSelected([]);
             setRows(newRows);
-            message.success(deleteBatchSuccess);
+            message?.success(deleteBatchSuccess);
             if (callbacks && callbacks.deleteSelected) {
                 callbacks.deleteSelected();
             }
@@ -207,7 +208,7 @@ export function ModelBrowse<Data extends ModalBrowseData = ModalBrowseData>({
     };
 
     const onDeleteSelectedBtnClick = async () => {
-        Modal.confirm({
+        modal?.confirm({
             title: gettext("Do you want to delete these items?"),
             onOk() {
                 deleteSelected();

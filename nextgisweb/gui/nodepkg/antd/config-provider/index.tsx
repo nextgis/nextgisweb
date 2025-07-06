@@ -30,6 +30,7 @@ const components: Theme["components"] = {
 const defaults: Props = {
     locale: antd,
     theme: { token, components },
+    wave: { disabled: true },
 };
 
 export default function ConfigProvider(props: Props) {
