@@ -3,14 +3,14 @@ import { useEffect, useMemo, useRef } from "react";
 
 import type { ControlPosition } from "@nextgisweb/webmap/control-container/ControlContainer";
 
-import type { MapAdapterRef } from "../context/useMapContext";
+import type { MapContextValue } from "../context/useMapContext";
 
 export function useMapControl({
     context,
     instance,
     position = "top-left",
 }: {
-    context: MapAdapterRef | null;
+    context: MapContextValue | null;
     instance?: Control;
     position?: ControlPosition;
 }) {

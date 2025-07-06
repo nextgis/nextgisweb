@@ -5,7 +5,7 @@ import type React from "react";
 import { assert } from "@nextgisweb/jsrealm/error";
 import type { MapStore } from "@nextgisweb/webmap/ol/MapStore";
 
-import { MapProvider } from "./context/useMapContext";
+import { MapContext } from "./context/useMapContext";
 import { useMapAdapter } from "./hook/useMapAdapter";
 import type { MapExtent } from "./hook/useMapAdapter";
 
@@ -66,10 +66,10 @@ export function MapComponent({
     }, [createMapAdapter, whenCreated]);
 
     return (
-        <MapProvider value={{ mapStore: mapRef.current }}>
+        <MapContext value={{ mapStore: mapRef.current }}>
             <div ref={mapContainerRef} style={style} className="map" {...props}>
                 {children}
             </div>
-        </MapProvider>
+        </MapContext>
     );
 }

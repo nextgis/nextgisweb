@@ -2,15 +2,13 @@ import { createContext, useContext } from "react";
 
 import type { MapStore } from "@nextgisweb/webmap/ol/MapStore";
 
-export interface MapAdapterRef {
+export interface MapContextValue {
     mapStore: MapStore | null;
 }
 
-export const MapContext = createContext<MapAdapterRef | null>(null);
+export const MapContext = createContext<MapContextValue | null>(null);
 
-export const MapProvider = MapContext.Provider;
-
-export function useMapContext(): MapAdapterRef {
+export function useMapContext(): MapContextValue {
     const context = useContext(MapContext);
     if (context === null) {
         throw new Error(
