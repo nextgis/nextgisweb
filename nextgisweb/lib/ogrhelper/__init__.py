@@ -62,6 +62,15 @@ def read_dataset(filename, **kw):
             for i in range(ogrds.GetLayerCount()):
                 layer = ogrds.GetLayer(i)
                 vrt_layers += OGR_VRT_LAYER.format(layer.GetName(), dst_path)
+        elif suffix == ".gpkg":
+            tempdir = AutoCleaningTemporaryDirectory()
+
+            # GDAL < 3.7.1 doesn't recognize GeoPackage 1.4 files unless they
+            # have a *.gpkg extension. To work around this, symlink is created.
+            dst_path = Path(tempdir.name) / Path(filename).with_suffix(suffix).name
+            dst_path.symlink_to(filename)
+
+            filename = dst_path
 
     kw["allowed_drivers"] = allowed_drivers
 
