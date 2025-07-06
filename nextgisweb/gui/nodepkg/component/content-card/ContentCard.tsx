@@ -1,15 +1,17 @@
 import classNames from "classnames";
-import { forwardRef } from "react";
-import type { HTMLAttributes } from "react";
+import type { ComponentPropsWithRef } from "react";
 
 import { useThemeVariables } from "@nextgisweb/gui/hook";
 
 import "./ContentCard.less";
 
-export const ContentCard = forwardRef<
-    HTMLDivElement,
-    HTMLAttributes<HTMLDivElement>
->(({ className, style, children, ...restProps }, ref) => {
+export function ContentCard({
+    className,
+    style,
+    children,
+    ref,
+    ...restProps
+}: ComponentPropsWithRef<"div">) {
     const themeVariables = useThemeVariables({
         "theme-color-border-secondary": "colorBorderSecondary",
         "theme-border-radius": "borderRadius",
@@ -26,6 +28,4 @@ export const ContentCard = forwardRef<
             {children}
         </div>
     );
-});
-
-ContentCard.displayName = "ContentCard";
+}

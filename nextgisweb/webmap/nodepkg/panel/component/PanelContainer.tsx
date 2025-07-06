@@ -1,11 +1,10 @@
 import classNames from "classnames";
-import { forwardRef } from "react";
 import type {
-    ComponentPropsWithoutRef,
-    ForwardRefExoticComponent,
+    ComponentPropsWithRef,
     FunctionComponent,
     PropsWithChildren,
     ReactNode,
+    Ref,
 } from "react";
 
 import { useThemeVariables } from "@nextgisweb/gui/hook";
@@ -15,14 +14,15 @@ import type { PanelTitleProps } from "./PanelTitle";
 
 import "./PanelContainer.less";
 
-export interface PanelContainerCompoents {
+export interface PanelContainerComponents {
     title?: FunctionComponent<PanelTitleProps>;
-    prolog?: ForwardRefExoticComponent<ComponentPropsWithoutRef<"div">>;
-    content?: ForwardRefExoticComponent<ComponentPropsWithoutRef<"div">>;
-    epilog?: ForwardRefExoticComponent<ComponentPropsWithoutRef<"div">>;
+    prolog?: FunctionComponent<ComponentPropsWithRef<"div">>;
+    content?: FunctionComponent<ComponentPropsWithRef<"div">>;
+    epilog?: FunctionComponent<ComponentPropsWithRef<"div">>;
 }
 
 export interface PanelContainerProps extends PropsWithChildren {
+    ref?: Ref<HTMLDivElement>;
     className?: string;
     title?: ReactNode;
     suffix?: ReactNode;
@@ -30,28 +30,30 @@ export interface PanelContainerProps extends PropsWithChildren {
     prolog?: ReactNode;
     epilog?: ReactNode;
     sectionAccent?: boolean;
-    components?: PanelContainerCompoents;
+    components?: PanelContainerComponents;
 }
 
-const Padded = forwardRef<HTMLDivElement, ComponentPropsWithoutRef<"div">>(
-    ({ className, ...props }, ref) => (
+export function Padded({
+    className,
+    ref,
+    ...props
+}: ComponentPropsWithRef<"div">) {
+    return (
         <div
             ref={ref}
             className={classNames(className, "ngw-webmap-panel-padded")}
             {...props}
         />
-    )
-);
+    );
+}
 
-Padded.displayName = "PanelContainer.Padded";
-
-const Unpadded = forwardRef<HTMLDivElement, ComponentPropsWithoutRef<"div">>(
-    ({ className, ...props }, ref) => (
-        <div ref={ref} className={classNames(className)} {...props} />
-    )
-);
-
-Unpadded.displayName = "PanelContainer.Unpadded";
+export function Unpadded({
+    ref,
+    className,
+    ...props
+}: ComponentPropsWithRef<"div">) {
+    return <div ref={ref} className={classNames(className)} {...props} />;
+}
 
 export function PanelContainer({
     className,
@@ -63,6 +65,7 @@ export function PanelContainer({
     sectionAccent,
     components = {},
     children,
+    ref,
 }: PanelContainerProps) {
     const {
         title: Title = PanelTitle,
@@ -77,6 +80,7 @@ export function PanelContainer({
 
     return (
         <div
+            ref={ref}
             className={classNames(
                 "ngw-webmap-panel-container",
                 { "ngw-webmap-panel-section-accent": sectionAccent },

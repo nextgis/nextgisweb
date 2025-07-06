@@ -1,13 +1,6 @@
 import classNames from "classnames";
-import {
-    Fragment,
-    forwardRef,
-    isValidElement,
-    useCallback,
-    useMemo,
-    useRef,
-} from "react";
-import type { ForwardedRef, ReactElement, Ref } from "react";
+import { Fragment, isValidElement, useCallback, useMemo, useRef } from "react";
+import type { Ref } from "react";
 
 import { useToken } from "../antd";
 import { useFit } from "../hook/useFit";
@@ -22,22 +15,20 @@ import type {
 
 import "./ActionToolbar.less";
 
-function ActionToolbarInput<
-    P extends Record<string, unknown> = Record<string, unknown>,
->(
-    {
-        size,
-        style,
-        pad = false,
-        borderBlockStart = false,
-        borderBlockEnd = false,
-        actions = [],
-        rightActions = [],
-        actionProps,
-        children,
-    }: ActionToolbarProps<P>,
-    ref: ForwardedRef<HTMLDivElement>
-) {
+export function ActionToolbar<
+    P extends Record<string, any> = Record<string, any>,
+>({
+    ref,
+    size,
+    style,
+    pad = false,
+    borderBlockStart = false,
+    borderBlockEnd = false,
+    actions = [],
+    rightActions = [],
+    actionProps,
+    children,
+}: ActionToolbarProps<P> & { ref?: Ref<HTMLDivElement> }) {
     const toolbarRef = useRef<HTMLDivElement | null>(null);
     const isFit = useFit({
         ref: toolbarRef,
@@ -140,11 +131,3 @@ function ActionToolbarInput<
         </div>
     );
 }
-
-type ActionToolbarType = <P extends Record<string, any> = Record<string, any>>(
-    props: ActionToolbarProps<P> & { ref?: Ref<HTMLDivElement> }
-) => ReactElement;
-
-export const ActionToolbar = forwardRef(
-    ActionToolbarInput
-) as ActionToolbarType;

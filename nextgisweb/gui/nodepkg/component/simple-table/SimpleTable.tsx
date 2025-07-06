@@ -1,15 +1,21 @@
 import classNames from "classnames";
-import { forwardRef } from "react";
-import type { HTMLAttributes } from "react";
+import type { HTMLAttributes, Ref } from "react";
 
 import { useThemeVariables } from "@nextgisweb/gui/hook";
 
 import "./SimpleTable.less";
 
-export const SimpleTable = forwardRef<
-    HTMLTableElement,
-    HTMLAttributes<HTMLTableElement>
->(({ className, style, children, ...rest }, ref) => {
+export interface SimpleTableProps extends HTMLAttributes<HTMLTableElement> {
+    ref?: Ref<HTMLTableElement>;
+}
+
+export function SimpleTable({
+    ref,
+    className,
+    style,
+    children,
+    ...rest
+}: SimpleTableProps) {
     const themeVariables = useThemeVariables({
         "theme-color-border-secondary": "colorBorderSecondary",
         "theme-border-radius": "borderRadius",
@@ -25,6 +31,4 @@ export const SimpleTable = forwardRef<
             {children}
         </table>
     );
-});
-
-SimpleTable.displayName = "SimpleTable";
+}

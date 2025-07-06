@@ -3,29 +3,28 @@ import type { AnyObject } from "antd/es/_util/type";
 import type { TableProps as AntTableProps } from "antd/es/table";
 import classNames from "classnames";
 import type { Reference } from "rc-table";
-import { forwardRef } from "react";
+import type { Ref } from "react";
 
 import "./index.less";
+
+export type TableRef = Reference;
 
 export interface TableProps<D = any> extends AntTableProps<D> {
     card?: boolean;
     parentHeight?: boolean;
+    ref?: Ref<TableRef>;
 }
 
-export type TableRef = Reference;
-
-function TableInner<D extends AnyObject = AnyObject>(
-    {
-        className,
-        style,
-        card,
-        parentHeight,
-        bordered,
-        pagination = false,
-        ...props
-    }: TableProps<D>,
-    ref: React.Ref<TableRef>
-) {
+export function Table<D extends AnyObject = AnyObject>({
+    ref,
+    className,
+    style,
+    card,
+    parentHeight,
+    bordered,
+    pagination = false,
+    ...props
+}: TableProps<D>) {
     className = classNames(className, {
         "ant-table-card": card,
         "ant-table-parent-height": parentHeight,
@@ -43,14 +42,6 @@ function TableInner<D extends AnyObject = AnyObject>(
 
     return <TableBase {...tableProps} ref={ref} />;
 }
-
-type ForwardTable = <D extends AnyObject = AnyObject>(
-    props: TableProps<D> & React.RefAttributes<Reference>
-) => React.ReactElement | null;
-
-const Table = forwardRef<Reference, TableProps<any>>(
-    TableInner
-) as unknown as ForwardTable & typeof TableBase;
 
 Table.EXPAND_COLUMN = TableBase.EXPAND_COLUMN;
 Table.SELECTION_ALL = TableBase.SELECTION_ALL;
