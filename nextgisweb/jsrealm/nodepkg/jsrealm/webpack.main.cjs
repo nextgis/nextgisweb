@@ -98,7 +98,9 @@ entrypoints
 
         const code = [
             `/* eslint-disable prettier/prettier */`,
-            `/* eslint-disable import/order */`,
+            `/* eslint-disable import-x/order */`,
+            `/* eslint-disable import-x/namespace */`,
+            `/* eslint-disable @typescript-eslint/no-unused-expressions */`,
             ``,
             `import { registry } from "${entry}";`,
             ...plugins.map((f, i) => `import * as p${i + 1} from "${f}";`),
@@ -312,8 +314,9 @@ for (const { code: lang, nplurals, plural } of config.i18n.languages) {
         pofiles.push(...glob.sync(path + `/locale/${lang}.po`));
     });
 
-    config.i18n.external &&
+    if (config.i18n.external) {
         pofiles.push(...glob.sync(config.i18n.external + `/*/*/${lang}.po`));
+    }
 
     const code = [
         "/* eslint-disable eqeqeq */",
@@ -477,6 +480,9 @@ const webpackConfig = defaults("main", (env) => ({
                   new ESLintPlugin({
                       quiet: true,
                       extensions: ["js", "ts", "tsx"],
+                      configType: "flat",
+                      failOnError: false,
+                      failOnWarning: false,
                   }),
               ]
             : []),

@@ -89,7 +89,7 @@ export class EdiTableKeyValueRow<V> implements RowData<V> {
                 } else {
                     try {
                         val = JSON.parse(val as string);
-                    } catch (err) {
+                    } catch {
                         // Do nothing
                     }
                 }

@@ -58,7 +58,7 @@ export function ModelLogoForm({
                 } else {
                     throw new Error("The logo is not set");
                 }
-            } catch (err) {
+            } catch {
                 // ignore error
             } finally {
                 setStatus(null);

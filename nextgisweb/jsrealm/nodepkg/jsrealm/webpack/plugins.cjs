@@ -11,12 +11,14 @@ module.exports = ({ once, clean, compress, bundleAnalyzer } = {}) => {
     const result = [];
     const add = (plugin) => result.push(plugin);
 
-    clean !== false && add(new CleanWebpackPlugin());
+    if (clean !== false) {
+        add(new CleanWebpackPlugin());
+    }
 
     if (compress || (!debug && compress !== false)) {
         const compressRegExp = /\.(js|css|html|json|svg)$/i;
 
-        pyramid.compression.gzip &&
+        if (pyramid.compression.gzip) {
             add(
                 new CompressionPlugin({
                     test: compressRegExp,
@@ -30,8 +32,9 @@ module.exports = ({ once, clean, compress, bundleAnalyzer } = {}) => {
                     compressionOptions: { level: debug ? 1 : 9 },
                 })
             );
+        }
 
-        pyramid.compression.br &&
+        if (pyramid.compression.br) {
             add(
                 new CompressionPlugin({
                     test: compressRegExp,
@@ -47,10 +50,12 @@ module.exports = ({ once, clean, compress, bundleAnalyzer } = {}) => {
                     },
                 })
             );
+        }
     }
 
-    (bundleAnalyzer || (!debug && bundleAnalyzer !== false)) &&
+    if (bundleAnalyzer || (!debug && bundleAnalyzer !== false)) {
         add(new BundleAnalyzerPlugin({ analyzerMode: "static" }));
+    }
 
     if (once) {
         // Enable only for permanent builds, as it's slow

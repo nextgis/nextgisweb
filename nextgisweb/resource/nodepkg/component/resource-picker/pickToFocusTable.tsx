@@ -37,7 +37,9 @@ export function pickToFocusTable<I extends FocusTableItem>(
                         for (const item of items) {
                             base = placeItem(env.store, item, base);
                         }
-                        base && env.select(base);
+                        if (base) {
+                            env.select(base);
+                        }
                     }
                 );
             },

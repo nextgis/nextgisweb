@@ -203,7 +203,7 @@ def install(
     ngw_root = pkginfo.packages["nextgisweb"]._path.parent
     pkg_root = ngw_root.parent
     if len(list(pkg_root.glob("nextgisweb_*"))) > 0:
-        linters_configs = [".eslintrc.cjs", ".prettierrc.cjs", ".editorconfig"]
+        linters_configs = ["eslint.config.cjs", ".prettierrc.cjs", ".editorconfig"]
         for lc in linters_configs:
             tf = pkg_root / lc
             if tf.exists():

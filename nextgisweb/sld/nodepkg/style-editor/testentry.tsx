@@ -1,7 +1,7 @@
 /** @testentry react */
 import { useEffect, useState } from "react";
 
-import StyleEditor from "./StyleEditor";
+import { StyleEditor } from "./StyleEditor";
 import { SymbolizerCard } from "./component/SymbolizerCard";
 import { TypeSelect } from "./component/TypeSelect";
 import type { Symbolizer, SymbolizerType } from "./type/Style";

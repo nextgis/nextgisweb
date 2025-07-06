@@ -1,4 +1,4 @@
-import Papa from "papaparse";
+import { parse } from "papaparse";
 import type { ParseConfig, ParseResult } from "papaparse";
 
 export async function parseCsv<T>(
@@ -6,7 +6,7 @@ export async function parseCsv<T>(
     options?: ParseConfig<T>
 ): Promise<ParseResult<T>> {
     if (typeof file === "string") {
-        return Papa.parse(file, options);
+        return parse(file, options);
     }
     return new Promise((resolve, reject) => {
         const textType = /text.*/;

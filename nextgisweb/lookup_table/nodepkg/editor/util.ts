@@ -1,4 +1,4 @@
-import Papa from "papaparse";
+import { unparse } from "papaparse";
 
 import { downloadCsv } from "@nextgisweb/gui/util";
 import type { LookupTableRead } from "@nextgisweb/lookup-table/type/api";
@@ -13,7 +13,7 @@ export function exportToCsv(items: RowData[]) {
         return [item.key as string, item.value as string];
     });
 
-    const csvContent = Papa.unparse<string[]>(serializedItems);
+    const csvContent = unparse<string[]>(serializedItems);
 
     downloadCsv(csvContent, "lookup_table.csv");
 }

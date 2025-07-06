@@ -62,7 +62,9 @@ export class PermissionsStore implements EdiTableStore<Item> {
     @action
     rotatePlaceholder() {
         if (this.placeholder && this.placeholder.action === null) return;
-        this.placeholder && this.items.push(this.placeholder);
+        if (this.placeholder) {
+            this.items.push(this.placeholder);
+        }
         this.placeholder = new Item(this);
     }
 

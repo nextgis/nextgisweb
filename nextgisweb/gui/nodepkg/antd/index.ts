@@ -1,3 +1,4 @@
+/* eslint-disable import-x/export */
 export {
     Affix,
     Alert,

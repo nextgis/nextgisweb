@@ -1,6 +1,6 @@
 import { errorModal } from "@nextgisweb/gui/error";
 import { route } from "@nextgisweb/pyramid/api";
-import i18n from "@nextgisweb/pyramid/i18n";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { PluginBase } from "../PluginBase";
 
@@ -15,7 +15,7 @@ export class ZoomToLayerPlugin extends PluginBase {
     getMenuItem() {
         return {
             icon: <Icon />,
-            title: i18n.gettext("Zoom to layer"),
+            title: gettext("Zoom to layer"),
             onClick: () => {
                 this.run();
             },

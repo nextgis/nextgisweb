@@ -2,8 +2,6 @@
 import { loaderRegistry } from "../../plugin";
 import type { ImportCallback } from "../../plugin";
 
-export interface DriverValue {}
-
 export const registry = loaderRegistry<
     (value: any, element: HTMLElement) => void,
     { identity: string }

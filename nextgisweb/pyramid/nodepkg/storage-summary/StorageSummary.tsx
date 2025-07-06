@@ -51,9 +51,10 @@ export function StorageSummary() {
     const [isEstimating, setIsEstimating] = useState(false);
 
     const load = useCallback(async (waitForEstimation: boolean) => {
-        waitForEstimation && (await sleep(5000));
+        if (waitForEstimation) {
+            await sleep(5000);
+        }
 
-        // eslint-disable-next-line no-constant-condition
         while (true) {
             const resp = await route("pyramid.estimate_storage").get();
             const newIsEstimating = resp.active;

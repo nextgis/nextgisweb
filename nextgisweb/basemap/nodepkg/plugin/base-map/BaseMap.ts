@@ -48,7 +48,7 @@ export class BaseMap extends PluginBase {
 
                 const opts = prepareBaselayerConfig(bm);
                 await addBaselayer({ ...opts, map });
-            } catch (err) {
+            } catch {
                 //
             }
         }

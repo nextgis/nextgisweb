@@ -1,6 +1,6 @@
 import reactApp from "@nextgisweb/gui/react-app";
 import type { ReactAppReturn } from "@nextgisweb/gui/react-app";
-import i18n from "@nextgisweb/pyramid/i18n";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 import { iconHtml } from "@nextgisweb/pyramid/icon";
 import type { Display } from "@nextgisweb/webmap/display";
 import type { ToggleControl } from "@nextgisweb/webmap/map-toolbar/ToggleControl";
@@ -25,7 +25,7 @@ export class ToolViewerInfo extends ToolBase {
 
     constructor({ display }: ViewerInfoOptions) {
         super({ display });
-        this.label = i18n.gettext("Show cursor coordinates / extent");
+        this.label = gettext("Show cursor coordinates / extent");
         this.customIcon = `
             <span class="ol-control__icon">
                 ${iconHtml(Icon)}

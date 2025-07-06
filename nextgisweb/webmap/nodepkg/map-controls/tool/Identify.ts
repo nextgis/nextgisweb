@@ -8,7 +8,7 @@ import Interaction from "ol/interaction/Interaction";
 
 import { route } from "@nextgisweb/pyramid/api/route";
 import type { RouteQuery } from "@nextgisweb/pyramid/api/type";
-import i18n from "@nextgisweb/pyramid/i18n";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { RasterLayerIdentifyResponse } from "@nextgisweb/raster-layer/type/api";
 import webmapSettings from "@nextgisweb/webmap/client-settings";
 import topic from "@nextgisweb/webmap/compat/topic";
@@ -62,7 +62,7 @@ interface Request {
 }
 
 export class Identify extends ToolBase {
-    label = i18n.gettext("Identify");
+    label = gettext("Identify");
     iconClass = "iconIdentify";
     pixelRadius: number = webmapSettings.identify_radius || 10;
     map: MapStore;
