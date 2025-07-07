@@ -1,12 +1,3 @@
-#: amd/ngw-feature-attachment/DisplayWidget.js:9
-#: nodepkg/attachment-bundle/ol-control/control.ts:21
-#: nodepkg/attachment-bundle/ol-control/control.ts:37
-#: nodepkg/attachment-bundle/plugin/plugin.ts:16
-#: nodepkg/attachment-editor/plugin.ts:8
-#: nodepkg/attachment-table-view/AttachmentTableView.tsx:23
-msgid "Attachments"
-msgstr "Вложения"
-
 #: component.py:13
 msgid "Feature attachments"
 msgstr "Прикрепленные к объектам файлы"
@@ -22,6 +13,14 @@ msgstr "Вложение с id = %d не найдено в объекте с id 
 #: exception.py:9
 msgid "The attachment may have been deleted or an error in the address."
 msgstr "Вложение могло быть удалено, либо допущена ошибка в адресе."
+
+#: nodepkg/attachment-bundle/ol-control/control.ts:22
+#: nodepkg/attachment-bundle/ol-control/control.ts:38
+#: nodepkg/attachment-bundle/plugin/plugin.ts:16
+#: nodepkg/attachment-editor/plugin.ts:8
+#: nodepkg/attachment-table-view/AttachmentTableView.tsx:23
+msgid "Attachments"
+msgstr "Вложения"
 
 #: nodepkg/attachment-bundle/tab/AttachmentsTab.tsx:34
 msgid "Draw the geometry on the map to visualize the attachments to the objects"
@@ -47,22 +46,22 @@ msgstr "Нет вложений"
 msgid "Download all attachments"
 msgstr "Скачать все вложения"
 
-#: nodepkg/attachment-editor/AttachmentEditor.tsx:160
-#: nodepkg/attachment-table/AttachmentTable.tsx:45
+#: nodepkg/attachment-editor/AttachmentEditor.tsx:139
+#: nodepkg/attachment-table/AttachmentTable.tsx:40
 msgid "File name"
 msgstr "Имя файла"
 
-#: nodepkg/attachment-editor/AttachmentEditor.tsx:166
-#: nodepkg/attachment-table/AttachmentTable.tsx:63
+#: nodepkg/attachment-editor/AttachmentEditor.tsx:145
+#: nodepkg/attachment-table/AttachmentTable.tsx:58
 msgid "Size"
 msgstr "Размер"
 
-#: nodepkg/attachment-editor/AttachmentEditor.tsx:172
-#: nodepkg/attachment-table/AttachmentTable.tsx:78
+#: nodepkg/attachment-editor/AttachmentEditor.tsx:151
+#: nodepkg/attachment-table/AttachmentTable.tsx:73
 msgid "Description"
 msgstr "Описание"
 
-#: nodepkg/attachment-form/AttachmentForm.tsx:56
+#: nodepkg/attachment-form/AttachmentForm.tsx:54
 msgid ""
 "Use export to copy feature attachments between different layers or to create "
 "a backup. The resulting ZIP archive will contain all of the attachments put "
@@ -74,27 +73,27 @@ msgstr ""
 " директориях с именами объектов. Метаданные вложений сохраняются в отдельном "
 "JSON-файле."
 
-#: nodepkg/attachment-form/AttachmentForm.tsx:66
+#: nodepkg/attachment-form/AttachmentForm.tsx:64
 msgid "Export attachments to ZIP archive"
 msgstr "Экспортировать вложения в ZIP-архив"
 
-#: nodepkg/attachment-form/AttachmentForm.tsx:84
+#: nodepkg/attachment-form/AttachmentForm.tsx:82
 msgid "Back to resource"
 msgstr "Назад к ресурсу"
 
-#: nodepkg/attachment-form/AttachmentForm.tsx:86
+#: nodepkg/attachment-form/AttachmentForm.tsx:84
 msgid "Close"
 msgstr "Закрыть"
 
-#: nodepkg/attachment-form/AttachmentForm.tsx:89
+#: nodepkg/attachment-form/AttachmentForm.tsx:87
 msgid "The archive has been successfully imported."
 msgstr "Импорт архива выполнен успешно."
 
-#: nodepkg/attachment-form/AttachmentForm.tsx:91
+#: nodepkg/attachment-form/AttachmentForm.tsx:89
 msgid "Attachments imported - {i}, skipped - {s}."
 msgstr "Импортировано вложений - {i}, пропущено - {s}."
 
-#: nodepkg/attachment-form/AttachmentForm.tsx:126
+#: nodepkg/attachment-form/AttachmentForm.tsx:124
 msgid ""
 "Upload a ZIP archive to batch append attachments to existing features. An "
 "archive must contain directories named after feature IDs. Each folder can "
@@ -105,37 +104,41 @@ msgstr ""
 "объектов. Каждая директория может содержать одно или несколько вложений. "
 "Дубликаты будут пропущены."
 
-#: nodepkg/attachment-form/AttachmentForm.tsx:135
+#: nodepkg/attachment-form/AttachmentForm.tsx:133
 msgid "Delete existing attachments"
 msgstr "Удалить существующие вложения"
 
-#: nodepkg/attachment-form/AttachmentForm.tsx:160
+#: nodepkg/attachment-form/AttachmentForm.tsx:158
 msgid "Import attachments from ZIP archive"
 msgstr "Импортировать вложения из ZIP-архива."
 
-#: nodepkg/attachment-form/AttachmentForm.tsx:172
+#: nodepkg/attachment-form/AttachmentForm.tsx:170
 msgid "Export"
 msgstr "Экспорт"
 
-#: nodepkg/attachment-form/AttachmentForm.tsx:177
+#: nodepkg/attachment-form/AttachmentForm.tsx:175
 msgid "Import"
 msgstr "Импорт"
 
-#: nodepkg/attachment-table/AttachmentTable.tsx:55
+#: nodepkg/attachment-table/AttachmentTable.tsx:50
 msgid "Unnamed"
 msgstr "Безымянный"
 
-#: nodepkg/attachment-table/AttachmentTable.tsx:72
+#: nodepkg/attachment-table/AttachmentTable.tsx:67
 msgid "MIME type"
 msgstr "Тип MIME"
 
-#: nodepkg/image-thumbnail/component/CarouselRender.tsx:32
+#: nodepkg/image-thumbnail/component/AttachmentPreviewToolbar.tsx:28
 msgid "Toggle panorama viewer"
 msgstr "Переключить просмотр панорам"
 
-#: nodepkg/image-thumbnail/component/CarouselSlide.tsx:70
-msgid "Failed to upload image"
-msgstr "Не удалось загрузить изображение"
+#: nodepkg/image-thumbnail/component/AttachmentPreviewToolbar.tsx:92
+msgid "Show less"
+msgstr "Скрыть"
+
+#: nodepkg/image-thumbnail/component/AttachmentPreviewToolbar.tsx:92
+msgid "Show more"
+msgstr "Показать полностью"
 
 #: util.py:26
 msgid "Invalid ZIP archive."
@@ -173,6 +176,9 @@ msgstr "Не удалось определить идентификатор об
 msgid "File '{}' isn't found in the archive."
 msgstr "Файл '{}' не найден в архиве."
 
-#: view.py:20 view.py:43
+#: view.py:21 view.py:45
 msgid "Manage attachments"
 msgstr "Управление вложениями"
+
+#~ msgid "Failed to upload image"
+#~ msgstr "Не удалось загрузить изображение"
