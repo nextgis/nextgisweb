@@ -291,15 +291,16 @@ export class LayerEditor extends PluginBase {
 
     private async onClickTreeItem(): Promise<boolean> {
         const itemConfig = this.display.itemConfig;
-        assert(itemConfig);
+
         const isPreviousEditing = this.editingItem !== undefined;
 
-        this.selectedResourceId = itemConfig.layerId;
+        this.selectedResourceId = itemConfig?.layerId ?? null;
         if (isPreviousEditing) {
             this.mapStates.activateDefaultState();
         }
 
         const isResourceSupportEditing =
+            itemConfig &&
             itemConfig.type === "layer" &&
             itemConfig.plugin[this.identity] &&
             (itemConfig.plugin[this.identity] as LayerEditorWebMapPluginConfig)
@@ -311,7 +312,9 @@ export class LayerEditor extends PluginBase {
             return true;
         }
 
-        this.editingItem = this.store.get(this.selectedResourceId);
+        this.editingItem = this.selectedResourceId
+            ? this.store.get(this.selectedResourceId)
+            : this.editingItem;
         if (this.editingItem) {
             this.showEditingControls();
             this.setEditingMode(this.lastEditingState);
