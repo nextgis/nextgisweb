@@ -1,9 +1,8 @@
 import type { ReactElement } from "react";
-import { createRoot } from "react-dom/client";
 
-import { ConfigProvider } from "@nextgisweb/gui/antd";
 import type { Modal } from "@nextgisweb/gui/antd";
 import type { ParamsOf } from "@nextgisweb/gui/type";
+import { layoutStore } from "@nextgisweb/pyramid/layout";
 
 type ModalParams = ParamsOf<typeof Modal>;
 
@@ -17,63 +16,59 @@ export function showModalBase<T extends ShowModalOptions>(
     renderContent: (props: T) => ReactElement,
     config: T
 ) {
-    const container = document.createDocumentFragment();
-    const root = createRoot(container);
+    const id = `modal-${Math.random().toString(36).slice(2)}`;
 
-    const {
-        onCancel: originalOnCancel,
-        afterClose: originalAfterClose,
-        ...restConfig
-    } = config;
-
-    const destroy = () => {
-        // To avoid attempt to synchronously unmount a root while React was already rendering.
-        Promise.resolve().then(() => {
-            root.unmount();
-        });
-    };
-
-    const render = (props: T) => {
-        root.render(<ConfigProvider>{renderContent(props)}</ConfigProvider>);
-    };
-
-    let currentConfig: T;
-
-    const close = () => {
-        currentConfig = {
-            ...currentConfig,
-            open: false,
-        };
-        render(currentConfig);
-    };
-
-    function update(configUpdate: T | ((conf: T) => T)) {
-        if (typeof configUpdate === "function") {
-            currentConfig = configUpdate(currentConfig);
-        } else {
-            currentConfig = {
-                ...currentConfig,
-                ...configUpdate,
-            };
-        }
-        render(currentConfig);
-    }
-
-    currentConfig = {
-        ...restConfig,
+    let currentConfig = {
+        ...config,
         open: config.open ?? true,
-        afterClose: () => {
-            originalAfterClose?.();
-            destroy();
-        },
-        onCancel: (e) => {
-            originalOnCancel?.(e);
-            close();
-        },
-        close,
     } as T;
 
-    render(currentConfig);
+    const destroy = () => {
+        layoutStore.removeModalItem(id);
+    };
+
+    const update = (configUpdate: T | ((prev: T) => T)) => {
+        currentConfig =
+            typeof configUpdate === "function"
+                ? (configUpdate as (prev: T) => T)(currentConfig)
+                : { ...currentConfig, ...configUpdate };
+
+        layoutStore.updateModalItem(
+            id,
+            // eslint-disable-next-line @typescript-eslint/no-use-before-define
+            render()
+        );
+    };
+
+    function close() {
+        update({ open: false } as T);
+    }
+
+    const render = (): ReactElement => {
+        const {
+            onCancel: originalOnCancel,
+            afterClose: originalAfterClose,
+            ...restConfig
+        } = currentConfig;
+
+        const propsForRender = {
+            ...restConfig,
+            open: currentConfig.open!,
+            onCancel: (e) => {
+                originalOnCancel?.(e);
+                update({ open: false } as T);
+            },
+            afterClose: () => {
+                originalAfterClose?.();
+                destroy();
+            },
+            close: () => update({ open: false } as T),
+        } as T;
+
+        return renderContent(propsForRender);
+    };
+
+    layoutStore.addModalItem({ id, element: render() });
 
     return {
         destroy,

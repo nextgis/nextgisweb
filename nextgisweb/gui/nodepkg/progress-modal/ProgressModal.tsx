@@ -2,15 +2,22 @@ import { Button, Col, Modal, Progress, Row } from "@nextgisweb/gui/antd";
 import type { ParamsOf } from "@nextgisweb/gui/type";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
+import type { ShowModalOptions } from "../showModalBase";
+
 const msgInProgress = gettext("Operation in progress");
 const msgCancel = gettext("Cancel");
 
 type ProgressModal = ParamsOf<typeof Progress>;
 
-type ModalParams = ParamsOf<typeof Modal>;
 type ModalParamsForProgress = Pick<
-    ModalParams,
-    "open" | "visible" | "closable" | "title" | "okText" | "onCancel"
+    ShowModalOptions,
+    | "open"
+    | "closable"
+    | "close"
+    | "afterClose"
+    | "title"
+    | "okText"
+    | "onCancel"
 >;
 
 export type ProgressModalProps = ModalParamsForProgress &
@@ -21,20 +28,23 @@ export const ProgressModal = ({
     type = "line",
     percent = 0,
     open = true,
-    visible = true,
     closable = false,
     okText = null,
+    afterClose,
     onCancel,
+    close,
     title = msgInProgress,
     cancelText = msgCancel,
     ...restProps
 }: ProgressModalProps) => {
-    const modalOptions: ModalParams & Pick<ModalParams, "footer"> = {
-        open: open ?? visible,
+    const modalOptions: ShowModalOptions & Pick<ShowModalOptions, "footer"> = {
+        open,
         title,
         okText,
         closable,
+        afterClose,
         onCancel,
+        close,
     };
     if (onCancel) {
         modalOptions.footer = (

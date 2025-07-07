@@ -1,5 +1,6 @@
 import classNames from "classnames";
-import { useEffect } from "react";
+import { observer } from "mobx-react-lite";
+import React, { useEffect } from "react";
 
 import { Modal, message } from "@nextgisweb/gui/antd";
 import type { DynMenuItem } from "@nextgisweb/pyramid/layout/dynmenu/type";
@@ -26,6 +27,14 @@ interface BaseProps {
     entrypointProps: Record<string, any>;
     hideResourceFilter?: boolean;
 }
+
+const ShowModals = observer(() => {
+    const { modalItems } = layoutStore;
+    return modalItems.map(({ element, id }) => (
+        <React.Fragment key={id}>{element}</React.Fragment>
+    ));
+});
+ShowModals.displayName = "ShowModals";
 
 export function Base({
     hideResourceFilter = false,
@@ -108,10 +117,11 @@ export function Base({
 
     return (
         <>
-            {modalContextHolder}
-            {contextHolder}
+            <title>{title}</title>
             <LayoutContext value={{ modal: modalApi, message: messageApi }}>
-                <title>{title}</title>
+                {modalContextHolder}
+                {contextHolder}
+                <ShowModals />
                 {layoutMode === "nullSpace" ? renderBody : <PyramidLayout />}
             </LayoutContext>
         </>
