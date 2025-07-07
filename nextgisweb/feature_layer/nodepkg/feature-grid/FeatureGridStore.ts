@@ -19,6 +19,7 @@ export class FeatureGridStore {
     @observable.ref accessor editOnNewPage: boolean = false;
     @observable.ref accessor cleanSelectedOnFilter: boolean = true;
     @observable.ref accessor settingsOpen: boolean = false;
+    @observable.ref accessor isExportAllowed: boolean = true;
 
     @observable.shallow accessor selectedIds: number[] = [];
     @observable.shallow accessor queryParams: QueryParams | null = null;
