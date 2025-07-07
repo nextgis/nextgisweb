@@ -65,7 +65,7 @@ class RasterMosaic(Base, Resource, SpatialLayerMixin):
                 workdir_path = env.raster_mosaic.workdir_path
                 ds = gdal.BuildVRT(
                     "",
-                    [str(workdir_path(item.fileobj)) for item in items],
+                    [str(workdir_path(item.fileobj, None)) for item in items],
                     options=gdal.BuildVRTOptions(
                         xRes=(xmax - xmin) / width,
                         yRes=(ymax - ymin) / height,
@@ -178,7 +178,7 @@ class RasterMosaicItem(Base):
         self.footprint = ga.elements.WKBElement(bytearray(geom.wkb), srid=4326)
         self.fileobj = env.file_storage.fileobj(component="raster_mosaic")
 
-        dst_file = env.raster_mosaic.workdir_path(self.fileobj, makedirs=True)
+        dst_file = env.raster_mosaic.workdir_path(self.fileobj, None, makedirs=True)
         co = ["COMPRESS=DEFLATE", "TILED=YES", "BIGTIFF=YES"]
         if reproject:
             gdal.Warp(
@@ -201,7 +201,7 @@ class RasterMosaicItem(Base):
         self.build_overview()
 
     def build_overview(self, missing_only=False):
-        fn = env.raster_mosaic.workdir_path(self.fileobj)
+        fn = env.raster_mosaic.workdir_path(self.fileobj, None)
         if missing_only and fn.with_suffix(".ovr").exists():
             return
 
