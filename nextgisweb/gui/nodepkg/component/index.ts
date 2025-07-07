@@ -5,6 +5,7 @@ export { InputScaleDenom } from "./InputScaleDenom";
 export { LoadingWrapper } from "./LoadingWrapper";
 export { SaveButton } from "./SaveButton";
 export { TemplateLink } from "./TemplateLink";
+export { CentralLoading } from "./CentralLoading";
 
 export * from "./content-card";
 export * from "./extent-row";
