@@ -107,7 +107,6 @@ export const ResourceSectionChildren = ({
             {creationDateVisible && (
                 <Column
                     title={gettext("Created")}
-                    responsive={["xl"]}
                     className="creationDate"
                     dataIndex="creationDate"
                     sorter={sorterFactory("creationDate")}
