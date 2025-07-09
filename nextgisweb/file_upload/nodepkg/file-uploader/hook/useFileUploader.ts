@@ -4,7 +4,6 @@ import type { UploadFile } from "@nextgisweb/gui/antd";
 import { errorModalUnlessAbort } from "@nextgisweb/gui/error";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 import { gettextf } from "@nextgisweb/pyramid/i18n";
-import { useLayoutContext } from "@nextgisweb/pyramid/layout";
 
 import type {
     FileUploaderOptions,
@@ -19,19 +18,18 @@ const msgProgressFmt = gettextf("{} uploaded...");
 
 export function useFileUploader<M extends boolean = false>({
     accept,
-    fileMeta: initMeta,
     multiple = false as M,
-    onChange,
+    fileMeta: initMeta,
     inputProps = {},
+    afterUpload = [],
     setFileMeta: setInitMeta,
     showUploadList = false,
     openFileDialogOnClick = true,
     showProgressInDocTitle = false,
-    afterUpload = [],
+    onChange,
+    onError,
 }: UseFileUploaderProps<M>) {
     const { makeSignal, abort } = useAbortController();
-
-    const { message } = useLayoutContext();
 
     const docTitle = useRef(document.title);
 
@@ -166,15 +164,15 @@ export function useFileUploader<M extends boolean = false>({
                     upload(info.fileList.map((f) => f.originFileObj as File));
                     setFileList([]);
                 } else if (error) {
-                    message?.error(`${info.file.name} file upload failed.`);
+                    onError?.(`${info.file.name} file upload failed.`);
                 }
             },
             ...restInputProps,
         }),
         [
+            onError,
             upload,
             accept,
-            message,
             multiple,
             fileList,
             showUploadList,

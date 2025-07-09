@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Select, Space } from "@nextgisweb/gui/antd";
 import { useObjectState } from "@nextgisweb/gui/hook";
 import { OpenInNewIcon } from "@nextgisweb/gui/icon";
+import { useShowModal } from "@nextgisweb/gui/index";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { ResourceIcon } from "@nextgisweb/resource/icon";
 
@@ -23,8 +24,10 @@ export function ResourceSelect<V extends number = number>({
     ...selectOptions
 }: ResourceSelectProps<V>) {
     const [value, setValue] = useState<V | undefined>(valueProp);
+    const { modalHolder, modalStore } = useShowModal();
     const [open, setOpen] = useState(false);
     const { showResourcePicker } = useResourcePicker({
+        modalStore,
         initParentId:
             pickerOptionsProp?.initParentId || pickerOptionsProp?.parentId,
     });
@@ -104,31 +107,37 @@ export function ResourceSelect<V extends number = number>({
     );
 
     return (
-        <Select
-            open={open}
-            value={value}
-            loading={resourceLoading}
-            onOpenChange={(visible) => {
-                if (!visible || !readOnly) {
-                    setOpen(visible);
-                }
-            }}
-            suffixIcon={readOnly ? <></> : undefined}
-            popupRender={() => <></>}
-            onClear={() => {
-                onPick(undefined);
-            }}
-            allowClear={!readOnly && allowClear}
-            style={{ cursor: readOnly ? "unset" : undefined, ...(style || {}) }}
-            {...selectOptions}
-        >
-            {options.map(({ label, value, cls }) => {
-                return (
-                    <Select.Option key={value} value={value} label={label}>
-                        {optionRender({ label, cls, value })}
-                    </Select.Option>
-                );
-            })}
-        </Select>
+        <>
+            {modalHolder}
+            <Select
+                open={open}
+                value={value}
+                loading={resourceLoading}
+                onOpenChange={(visible) => {
+                    if (!visible || !readOnly) {
+                        setOpen(visible);
+                    }
+                }}
+                suffixIcon={readOnly ? <></> : undefined}
+                popupRender={() => <></>}
+                onClear={() => {
+                    onPick(undefined);
+                }}
+                allowClear={!readOnly && allowClear}
+                style={{
+                    cursor: readOnly ? "unset" : undefined,
+                    ...(style || {}),
+                }}
+                {...selectOptions}
+            >
+                {options.map(({ label, value, cls }) => {
+                    return (
+                        <Select.Option key={value} value={value} label={label}>
+                            {optionRender({ label, cls, value })}
+                        </Select.Option>
+                    );
+                })}
+            </Select>
+        </>
     );
 }

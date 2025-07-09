@@ -1,13 +1,10 @@
-import { Suspense, lazy, useCallback, useState } from "react";
-
 import { Button } from "@nextgisweb/gui/antd";
 import { AddIcon } from "@nextgisweb/gui/icon";
+import { useShowModal } from "@nextgisweb/gui/show-modal/useShowModal";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { ResourceCls } from "@nextgisweb/resource/type/api";
 
 const msgCreateResource = gettext("Create resource");
-
-const LazyModal = lazy(() => import("./CreateResourceModal"));
 
 interface CreateResourceButtonProps {
     resourceId: number;
@@ -18,38 +15,25 @@ export function CreateResourceButton({
     resourceId,
     creatable,
 }: CreateResourceButtonProps) {
-    const [modalOpen, setModalOpen] = useState(false);
-    const [modalWasOpen, setModalWasOpen] = useState(false);
-
-    const showModal = useCallback(() => {
-        setModalOpen(true);
-        setModalWasOpen(true);
-    }, []);
-
-    const hideModal = useCallback(() => {
-        setModalOpen(false);
-    }, []);
+    const { modalHolder, lazyModal, isLoading } = useShowModal();
 
     return (
         <>
+            {modalHolder}
             <Button
                 type="primary"
                 size="large"
+                loading={isLoading}
                 icon={<AddIcon />}
-                onClick={showModal}
+                onClick={() =>
+                    lazyModal(() => import("./CreateResourceModal"), {
+                        resourceId,
+                        creatable,
+                    })
+                }
             >
                 {msgCreateResource}
             </Button>
-            {modalWasOpen && (
-                <Suspense>
-                    <LazyModal
-                        resourceId={resourceId}
-                        creatable={creatable}
-                        open={modalOpen}
-                        onCancel={hideModal}
-                    />
-                </Suspense>
-            )}
         </>
     );
 }

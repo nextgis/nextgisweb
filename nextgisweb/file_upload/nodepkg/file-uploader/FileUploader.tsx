@@ -2,7 +2,7 @@ import { useCallback, useEffect } from "react";
 import { Balancer } from "react-wrap-balancer";
 
 import settings from "@nextgisweb/file-upload/client-settings";
-import { Button, Upload } from "@nextgisweb/gui/antd";
+import { Button, Upload, message } from "@nextgisweb/gui/antd";
 import { formatSize } from "@nextgisweb/gui/util/formatSize";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
@@ -98,6 +98,8 @@ export function FileUploader<M extends boolean = false>({
     showProgressInDocTitle = true,
     ...rest
 }: FileUploaderProps<M>) {
+    const [messageApi, contextHolder] = message.useMessage();
+
     const { abort, progressText, props, meta, uploading, clearMeta } =
         useFileUploader<M>({
             showProgressInDocTitle,
@@ -107,6 +109,7 @@ export function FileUploader<M extends boolean = false>({
             fileMeta,
             multiple,
             onChange,
+            onError: messageApi.error,
             accept,
         });
 
@@ -117,19 +120,22 @@ export function FileUploader<M extends boolean = false>({
     }, [uploading, onUploading]);
 
     return (
-        <Dragger
-            {...props}
-            className="ngw-file-upload-file-uploader"
-            height={height}
-            style={style}
-            disabled={progressText !== null}
-            accept={accept}
-        >
-            {progressText !== null ? (
-                <ProgressText abort={abort} progressText={progressText} />
-            ) : (
-                <InputText {...rest} meta={meta} clearMeta={clearMeta} />
-            )}
-        </Dragger>
+        <>
+            {contextHolder}
+            <Dragger
+                {...props}
+                className="ngw-file-upload-file-uploader"
+                height={height}
+                style={style}
+                disabled={progressText !== null}
+                accept={accept}
+            >
+                {progressText !== null ? (
+                    <ProgressText abort={abort} progressText={progressText} />
+                ) : (
+                    <InputText {...rest} meta={meta} clearMeta={clearMeta} />
+                )}
+            </Dragger>
+        </>
     );
 }

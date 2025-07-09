@@ -1,16 +1,20 @@
 import { useCallback, useEffect, useRef } from "react";
 
+import type { ModalStore } from "@nextgisweb/gui/show-modal/ModalStore";
+
 import { showResourcePicker as showResourcePickerOriginal } from "..";
 import type { ResourcePickerModalProps, SelectValue } from "../type";
 
 export interface ResourcePickerHookProps {
     doNotSavePosition?: boolean;
     initParentId?: number;
+    modalStore?: ModalStore;
 }
 
 export function useResourcePicker({
     doNotSavePosition,
     initParentId,
+    modalStore,
 }: ResourcePickerHookProps = {}) {
     const pickerParentIdRef = useRef<number>(null);
     const pickerModal =
@@ -18,7 +22,7 @@ export function useResourcePicker({
 
     const updatePickerOptions = useCallback(
         <V extends SelectValue>(options: ResourcePickerModalProps<V>) => {
-            const updatedOptions = { ...options };
+            const updatedOptions = { ...options, modalStore };
             if (!doNotSavePosition) {
                 const pickerOptions = updatedOptions.pickerOptions
                     ? { ...updatedOptions.pickerOptions }
@@ -37,7 +41,7 @@ export function useResourcePicker({
             }
             return updatedOptions;
         },
-        [doNotSavePosition, initParentId]
+        [doNotSavePosition, initParentId, modalStore]
     );
 
     const showResourcePicker = useCallback(

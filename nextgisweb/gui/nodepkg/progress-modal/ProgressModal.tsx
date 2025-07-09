@@ -2,7 +2,7 @@ import { Button, Col, Modal, Progress, Row } from "@nextgisweb/gui/antd";
 import type { ParamsOf } from "@nextgisweb/gui/type";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import type { ShowModalOptions } from "../showModalBase";
+import type { ShowModalOptions } from "../show-modal/showModalBase";
 
 const msgInProgress = gettext("Operation in progress");
 const msgCancel = gettext("Cancel");

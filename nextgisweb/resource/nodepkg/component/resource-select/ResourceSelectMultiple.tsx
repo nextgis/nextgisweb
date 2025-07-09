@@ -1,6 +1,7 @@
 import { uniq } from "lodash-es";
 import { useCallback, useEffect, useState } from "react";
 
+import { useShowModal } from "@nextgisweb/gui";
 import { Button, Space, Table } from "@nextgisweb/gui/antd";
 import { RemoveIcon } from "@nextgisweb/gui/icon";
 import type { ParamsOf } from "@nextgisweb/gui/type";
@@ -33,8 +34,9 @@ const ResourceSelectMultiple = ({
     const [ids, setIds] = useState(() => uniq(initResourceIds));
     const [resources, setResources] = useState<ResourceRead[]>([]);
     const [loading, setLoading] = useState(false);
-
+    const { modalHolder, modalStore } = useShowModal();
     const { showResourcePicker } = useResourcePicker({
+        modalStore,
         initParentId: pickerOptions.initParentId || pickerOptions.parentId,
     });
 
@@ -142,30 +144,36 @@ const ResourceSelectMultiple = ({
     }, [ids, loadResources]);
 
     return (
-        <Space.Compact>
-            <div style={{ width: "100%" }}>
-                <div style={{ marginBottom: 16 }}>
-                    <Space>
-                        <Button
-                            disabled={!selectedRowKeys.length}
-                            onClick={removeSelected}
-                            icon={<RemoveIcon />}
-                        />
-                        <Button onClick={onClick} icon={<ManageSearchIcon />} />
-                    </Space>
+        <>
+            {modalHolder}
+            <Space.Compact>
+                <div style={{ width: "100%" }}>
+                    <div style={{ marginBottom: 16 }}>
+                        <Space>
+                            <Button
+                                disabled={!selectedRowKeys.length}
+                                onClick={removeSelected}
+                                icon={<RemoveIcon />}
+                            />
+                            <Button
+                                onClick={onClick}
+                                icon={<ManageSearchIcon />}
+                            />
+                        </Space>
+                    </div>
+                    <Table
+                        rowKey="id"
+                        expandable={{ childrenColumnName: "children_" }}
+                        rowSelection={rowSelection}
+                        dataSource={resources}
+                        columns={columns}
+                        showHeader={false}
+                        loading={loading}
+                        pagination={false}
+                    />
                 </div>
-                <Table
-                    rowKey="id"
-                    expandable={{ childrenColumnName: "children_" }}
-                    rowSelection={rowSelection}
-                    dataSource={resources}
-                    columns={columns}
-                    showHeader={false}
-                    loading={loading}
-                    pagination={false}
-                />
-            </div>
-        </Space.Compact>
+            </Space.Compact>
+        </>
     );
 };
 

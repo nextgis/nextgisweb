@@ -1,6 +1,7 @@
 import { action, computed, observable } from "mobx";
 import type { ReactNode } from "react";
 
+import { ModalStore } from "@nextgisweb/gui/show-modal/ModalStore";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import settings from "@nextgisweb/pyramid/client-settings";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -24,33 +25,13 @@ export interface ModalItem {
 }
 
 class LayoutStore {
+    readonly modalStore: ModalStore = new ModalStore();
+
     @observable.shallow accessor menuItems: MenuItem[] = [];
     @observable.ref accessor hideMenu = false;
 
     @observable.shallow accessor modal: ModalAPI | null = null;
     @observable.shallow accessor message: MessageAPI | null = null;
-
-    @observable.shallow accessor modalItems: ModalItem[] = [];
-
-    @action.bound
-    addModalItem(modalItem: ModalItem) {
-        this.modalItems = [...this.modalItems, modalItem];
-    }
-
-    @action.bound
-    updateModalItem(id: string, element: React.ReactNode) {
-        const modalItems = [...this.modalItems];
-        const modalItem = modalItems.find((e) => e.id === id);
-        if (modalItem) {
-            modalItem.element = element;
-        }
-        this.modalItems = modalItems;
-    }
-
-    @action.bound
-    removeModalItem(id: string) {
-        this.modalItems = this.modalItems.filter((e) => e.id !== id);
-    }
 
     @action.bound
     setModalApi(modal: ModalAPI | null) {

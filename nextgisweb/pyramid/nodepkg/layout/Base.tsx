@@ -1,8 +1,8 @@
 import classNames from "classnames";
-import { observer } from "mobx-react-lite";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 
 import { Modal, message } from "@nextgisweb/gui/antd";
+import { useShowModal } from "@nextgisweb/gui/show-modal/useShowModal";
 import type { DynMenuItem } from "@nextgisweb/pyramid/layout/dynmenu/type";
 
 import { EntrypointSuspense } from "../component/EntrypointSuspense";
@@ -28,14 +28,6 @@ interface BaseProps {
     hideResourceFilter?: boolean;
 }
 
-const ShowModals = observer(() => {
-    const { modalItems } = layoutStore;
-    return modalItems.map(({ element, id }) => (
-        <React.Fragment key={id}>{element}</React.Fragment>
-    ));
-});
-ShowModals.displayName = "ShowModals";
-
 export function Base({
     hideResourceFilter = false,
     entrypointProps,
@@ -51,6 +43,10 @@ export function Base({
 }: BaseProps) {
     const [modalApi, modalContextHolder] = Modal.useModal();
     const [messageApi, contextHolder] = message.useMessage();
+
+    const { modalHolder } = useShowModal({
+        modalStore: layoutStore.modalStore,
+    });
 
     useEffect(() => {
         layoutStore.setModalApi(modalApi);
@@ -121,7 +117,7 @@ export function Base({
             <LayoutContext value={{ modal: modalApi, message: messageApi }}>
                 {modalContextHolder}
                 {contextHolder}
-                <ShowModals />
+                {modalHolder}
                 {layoutMode === "nullSpace" ? renderBody : <PyramidLayout />}
             </LayoutContext>
         </>
