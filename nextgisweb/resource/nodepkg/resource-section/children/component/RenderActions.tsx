@@ -3,18 +3,18 @@ import { Tooltip } from "@nextgisweb/gui/antd";
 import { SvgIconLink } from "@nextgisweb/gui/svg-icon";
 import type { SvgIconLink as SvgIconLinkProps } from "@nextgisweb/gui/svg-icon/type";
 import { useResourceNotify } from "@nextgisweb/resource/hook/useResourceNotify";
-
 import type {
-    ChildrenResourceAction as Action,
-    ChildrenResource,
-} from "../type";
+    ResourceChildAction,
+    ResourceChildItem,
+} from "@nextgisweb/resource/type/api";
+
 import { isDeleteAction } from "../util/isDeleteAction";
 import { isPreviewAction } from "../util/isPreviewAction";
 
 interface RenderActionsProps {
-    actions: Action[];
+    actions: ResourceChildAction[];
     id: number;
-    setTableItems: React.Dispatch<React.SetStateAction<ChildrenResource[]>>;
+    setTableItems: React.Dispatch<React.SetStateAction<ResourceChildItem[]>>;
 }
 
 export function RenderActions({

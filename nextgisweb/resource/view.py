@@ -1,6 +1,5 @@
 import warnings
 from dataclasses import dataclass
-from types import SimpleNamespace
 from typing import Annotated
 
 import zope.event
@@ -11,7 +10,6 @@ from sqlalchemy.orm import joinedload, with_polymorphic
 from sqlalchemy.orm.exc import NoResultFound
 
 from nextgisweb.env import DBSession, env, gettext
-from nextgisweb.lib import dynmenu as dm
 from nextgisweb.lib.dynmenu import DynMenu, Label, Link
 
 from nextgisweb.auth import OnUserLogin
@@ -21,6 +19,7 @@ from nextgisweb.jsrealm import icon, jsentry
 from nextgisweb.pyramid import JSONType
 from nextgisweb.pyramid.breadcrumb import Breadcrumb
 
+from .children import build_children_payload
 from .event import OnChildClasses, OnDeletePrompt
 from .exception import ResourceNotFound
 from .extaccess import ExternalAccessLink
@@ -303,46 +302,7 @@ def resource_section_children(obj, *, request, **kwargs):
     if len(obj.children) == 0:
         return
 
-    tr = request.localizer.translate
-
-    resources = [
-        resource
-        for resource in obj.children
-        if (ResourceScope.read in resource.permissions(request.user))
-    ]
-
-    resources.sort(key=lambda res: (res.cls_order, res.display_name))
-
-    payload = list()
-    for item in resources:
-        idata = dict(
-            id=item.id,
-            displayName=item.display_name,
-            cls=item.cls,
-            clsDisplayName=tr(item.cls_display_name),
-            creationDate=item.creation_date,
-            ownerUserDisplayName=tr(item.owner_user.display_name_i18n),
-        )
-
-        iacts = idata["actions"] = list()
-        args = SimpleNamespace(obj=item, request=request)
-        for menu_item in item.__dynmenu__.build(args):
-            if (
-                isinstance(menu_item, dm.Link)
-                and menu_item.important
-                and menu_item.icon is not None
-            ):
-                iacts.append(
-                    dict(
-                        href=menu_item.url(args),
-                        target=menu_item.target,
-                        title=tr(menu_item.label),
-                        icon=menu_item.icon,
-                        key=menu_item.key,
-                    )
-                )
-
-        payload.append(idata)
+    payload = build_children_payload(obj, request)
 
     return {"resourceChildren": payload}
 

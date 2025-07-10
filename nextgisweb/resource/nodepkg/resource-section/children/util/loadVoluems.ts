@@ -1,10 +1,11 @@
 import { route } from "@nextgisweb/pyramid/api";
-import type { ResourceVolume } from "@nextgisweb/resource/type/api";
-
-import type { ChildrenResource } from "../type";
+import type {
+    ResourceChildItem,
+    ResourceVolume,
+} from "@nextgisweb/resource/type/api";
 
 interface LoadVoluemsParams {
-    data: ChildrenResource[];
+    data: ResourceChildItem[];
     setState: React.Dispatch<React.SetStateAction<Record<number, number>>>;
     signal?: AbortSignal;
 }

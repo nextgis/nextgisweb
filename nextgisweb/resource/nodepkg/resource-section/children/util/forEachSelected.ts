@@ -1,8 +1,7 @@
 import { errorModal } from "@nextgisweb/gui/error";
 import { showProgressModal } from "@nextgisweb/gui/progress-modal";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-
-import type { ChildrenResource } from "../type";
+import type { ResourceChildItem } from "@nextgisweb/resource/type/api";
 
 const msgInProgress = gettext("Operation in progress");
 
@@ -10,7 +9,7 @@ interface ForEachSelectedProps {
     selected: number[];
     title: string;
     executer: (val: { selectedId: number; signal?: AbortSignal }) => void;
-    setItems: React.Dispatch<React.SetStateAction<ChildrenResource[]>>;
+    setItems: React.Dispatch<React.SetStateAction<ResourceChildItem[]>>;
     onComplate: (successIds: number[], errorIds: number[]) => void;
     setSelected: React.Dispatch<React.SetStateAction<number[]>>;
     setInProgress?: (val: boolean) => void;
@@ -49,7 +48,7 @@ export async function forEachSelected({
                 setSelected((old) => {
                     return old.filter((row) => !sucessIds.includes(row));
                 });
-                setItems((old: ChildrenResource[]) => {
+                setItems((old: ResourceChildItem[]) => {
                     return old.filter((row) => !sucessIds.includes(row.id));
                 });
             } catch (err) {

@@ -38,6 +38,7 @@ from nextgisweb.pyramid import AsJSON, JSONType
 from nextgisweb.pyramid.api import csetting, require_storage_enabled
 
 from .category import ResourceCategory, ResourceCategoryIdentity
+from .children import ResourceChildrenList, build_children_payload
 from .composite import CompositeSerializer
 from .event import AfterResourceCollectionPost, AfterResourcePut, OnDeletePrompt
 from .exception import (
@@ -950,6 +951,11 @@ def widget(
         raise NotImplementedError
 
 
+
+def children_list(context, request) -> ResourceChildrenList:
+    request.resource_permission(ResourceScope.read, context)
+    return {"children": build_children_payload(context, request)}
+
 # Component settings
 
 ResourceExport = Annotated[
@@ -1020,6 +1026,13 @@ def setup_pyramid(comp, config):
         "resource.quota_check",
         "/api/component/resource/check_quota",
         post=quota_check,
+    )
+
+    config.add_route(
+        "resource.children",
+        "/api/resource/{id}/children",
+        factory=resource_factory,
+        get=children_list,
     )
 
     from .favorite import api as favorite_api
