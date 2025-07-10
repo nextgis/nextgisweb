@@ -23,7 +23,7 @@ type ModalParamsForProgress = Pick<
 export type ProgressModalProps = ModalParamsForProgress &
     ProgressModal & { cancelText?: string };
 
-export const ProgressModal = ({
+const ProgressModal = ({
     status = "active",
     type = "line",
     percent = 0,
@@ -72,3 +72,5 @@ export const ProgressModal = ({
         </Modal>
     );
 };
+
+export default ProgressModal;

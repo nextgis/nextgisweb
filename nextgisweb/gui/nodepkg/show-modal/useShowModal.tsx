@@ -28,7 +28,7 @@ export function useShowModal({
 
     function lazyModal<P extends ShowModalOptions>(
         getModalComponent: () => Promise<{ default: ComponentType<P> }>,
-        config: P
+        config?: P
     ) {
         setIsLoading(true);
 

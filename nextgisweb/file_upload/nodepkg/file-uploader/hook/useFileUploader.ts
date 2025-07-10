@@ -16,6 +16,10 @@ import { fileUploader } from "../util/fileUploader";
 
 const msgProgressFmt = gettextf("{} uploaded...");
 
+export interface UploadOptions {
+    onProgress?: (evt: Progress) => void;
+}
+
 export function useFileUploader<M extends boolean = false>({
     accept,
     multiple = false as M,
@@ -104,12 +108,20 @@ export function useFileUploader<M extends boolean = false>({
     );
 
     const upload = useCallback(
-        async (files: File[]) => {
+        async (
+            files: File[],
+            { onProgress: onPropgressProp }: UploadOptions = {}
+        ) => {
             setUploading(true);
             try {
                 const uploadedFiles = await fileUploaderWrapper({
                     files,
-                    onProgress,
+                    onProgress: (e) => {
+                        if (onPropgressProp) {
+                            onPropgressProp(e);
+                        }
+                        onProgress(e);
+                    },
                 });
                 uploadedFiles.forEach((f, i) => {
                     f._file = files[i];
@@ -128,6 +140,7 @@ export function useFileUploader<M extends boolean = false>({
                         onChange?.(metaToSet);
                     }
                 }
+                return uploadedFiles;
             } catch (err) {
                 errorModalUnlessAbort(err);
             } finally {
