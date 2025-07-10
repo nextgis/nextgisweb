@@ -25,10 +25,10 @@ from nextgisweb.pyramid import JSONType
 from nextgisweb.pyramid.tomb import UnsafeFileResponse
 from nextgisweb.resource import DataScope, Resource, ResourceFactory
 
+from .api_import import attachments_import
 from .exception import AttachmentNotFound
 from .exif import EXIF_ORIENTATION_TAG, ORIENTATIONS
 from .model import FeatureAttachment
-from .util import attachments_import
 
 ResourceID = Annotated[int, Meta(ge=0, description="Resource ID")]
 AttachmentID = Annotated[int, Meta(description="Attachment ID")]

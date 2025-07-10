@@ -2,6 +2,7 @@ import transaction
 
 from nextgisweb.env import Component, gettext, require
 from nextgisweb.lib.config import Option
+from nextgisweb.lib.pilhelper import heif_init
 
 from nextgisweb.core import KindOfData
 
@@ -16,6 +17,7 @@ class FeatureAttachmentData(KindOfData):
 class FeatureAttachmentComponent(Component):
     @require("feature_layer")
     def initialize(self):
+        heif_init()
         from . import extension, plugin  # noqa: F401
 
     def setup_pyramid(self, config):

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import re
 from datetime import datetime
+from io import BytesIO
 from typing import Any, Dict, Union
 
 import sqlalchemy as sa
@@ -22,6 +23,8 @@ from nextgisweb.feature_layer.versioning import (
 from nextgisweb.file_storage import FileObj
 from nextgisweb.file_upload import FileUpload
 from nextgisweb.resource import Resource
+
+from .util import change_suffix
 
 Base.depends_on("resource", "feature_layer")
 
@@ -133,13 +136,23 @@ class FeatureAttachment(Base, FVersioningExtensionMixin):
 
         if (file_upload := data.get("file_upload")) is not None:
             file_upload_obj = FileUpload(file_upload)
-            self.fileobj = file_upload_obj.to_fileobj()
 
             for k in ("name", "mime_type"):
                 if k in file_upload:
                     setattr(self, k, file_upload[k])
 
-            self.size = file_upload_obj.data_path.stat().st_size
+            if self.mime_type == "image/heic":
+                img = Image.open(file_upload_obj.data_path, formats=("HEIF",))
+                buf = BytesIO()
+                img.save(buf, "jpeg")
+                self.fileobj = FileObj().from_content(buf.getvalue())
+                self.mime_type = "image/jpeg"
+                if self.name is not None:
+                    self.name = change_suffix(self.name, ".jpg")
+            else:
+                self.fileobj = file_upload_obj.to_fileobj()
+
+            self.size = self.fileobj.size
             self.extract_meta()
             updated = True
 

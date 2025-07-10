@@ -259,25 +259,36 @@ def test_import_multiple(layer_id, ngw_file_upload, ngw_webtest_app):
 # name = '{feature_id}/{file_name}'
 # TODO: Update whenever the structure of file_meta changes; add images without xmp meta
 def test_import_image(layer_id, clear, ngw_file_upload, ngw_webtest_app, ngw_data_path):
-    file_path = ngw_data_path / "panorama-image.jpg"
-    with open(file_path, mode="rb") as f:
-        files = [
-            dict(name="00003/image", content=f.read())
-        ]  # fails to work as a tuple for whatever reason
-        upload_meta = generate_archive(files, ngw_file_upload)
-        resp = ngw_webtest_app.put_json(
-            f"/api/resource/{layer_id}/feature_attachment/import",
-            dict(source=upload_meta),
-            status=200,
-        )
-        assert resp.json == dict(imported=1, skipped=0)
+    img_data = (ngw_data_path / "panorama-image.jpg").read_bytes()
+    files = (dict(name="00003/image", content=img_data),)
+    upload_meta = generate_archive(files, ngw_file_upload)
+    resp = ngw_webtest_app.put_json(
+        f"/api/resource/{layer_id}/feature_attachment/import",
+        dict(source=upload_meta),
+        status=200,
+    )
+    assert resp.json == dict(imported=1, skipped=0)
 
-        with transaction.manager:
-            obj = FeatureAttachment.filter_by(resource_id=layer_id, feature_id=3).one()
-            assert obj.file_meta == {
-                "timestamp": "2020-02-21T20:33:54",
-                "panorama": {"ProjectionType": "equirectangular"},
-            }
+    with transaction.manager:
+        obj = FeatureAttachment.filter_by(resource_id=layer_id, feature_id=3).one()
+        assert obj.file_meta == {
+            "timestamp": "2020-02-21T20:33:54",
+            "panorama": {"ProjectionType": "equirectangular"},
+        }
+
+
+def test_heic(layer_id, clear, ngw_file_upload, ngw_webtest_app, ngw_data_path):
+    img_path = ngw_data_path / "sample.heic"
+    upload_meta = ngw_file_upload(img_path)
+    upload_meta["name"] = img_path.name
+
+    url = f"/api/resource/{layer_id}/feature/1/attachment/"
+    resp = ngw_webtest_app.post_json(url, dict(file_upload=upload_meta), status=200)
+    aid = resp.json["id"]
+
+    resp = ngw_webtest_app.get(url + str(aid), status=200)
+    assert resp.json["mime_type"] == "image/jpeg"
+    assert resp.json["name"] == "sample.jpg"
 
 
 @pytest.fixture(scope="module")
