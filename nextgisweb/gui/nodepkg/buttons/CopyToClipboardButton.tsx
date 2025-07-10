@@ -1,7 +1,6 @@
-import { Button } from "@nextgisweb/gui/antd";
+import { Button, message } from "@nextgisweb/gui/antd";
 import type { ButtonProps } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { layoutStore } from "@nextgisweb/pyramid/layout";
 
 import ContentCopyIcon from "@nextgisweb/icon/material/content_copy";
 
@@ -19,11 +18,11 @@ export function CopyToClipboardButton({
     iconOnly,
     ...restParams
 }: CopyToClipboardButtonProps) {
+    const [messageApi, contextHolder] = message.useMessage();
+
     const copyToClipboard = async () => {
         await navigator.clipboard.writeText(getTextToCopy());
-        layoutStore.message?.info(
-            messageInfo || gettext("Copied to clipboard")
-        );
+        messageApi.info(messageInfo || gettext("Copied to clipboard"));
     };
 
     let buttonContent: React.ReactNode | null = null;
@@ -32,14 +31,17 @@ export function CopyToClipboardButton({
     }
 
     return (
-        <Button
-            icon={<ContentCopyIcon />}
-            onClick={() => {
-                copyToClipboard();
-            }}
-            {...restParams}
-        >
-            {buttonContent}
-        </Button>
+        <>
+            {contextHolder}
+            <Button
+                icon={<ContentCopyIcon />}
+                onClick={() => {
+                    copyToClipboard();
+                }}
+                {...restParams}
+            >
+                {buttonContent}
+            </Button>
+        </>
     );
 }

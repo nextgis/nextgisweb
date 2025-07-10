@@ -3,13 +3,12 @@ import { useEffect, useState } from "react";
 import { ImageUploader } from "@nextgisweb/file-upload";
 import type { UploaderMeta } from "@nextgisweb/file-upload/file-uploader";
 import type { ImageUploaderProps } from "@nextgisweb/file-upload/image-uploader";
-import { Space } from "@nextgisweb/gui/antd";
+import { Space, message } from "@nextgisweb/gui/antd";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
 import { route } from "@nextgisweb/pyramid/api";
 import type { KeysWithMethods } from "@nextgisweb/pyramid/api/type";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { useLayoutContext } from "@nextgisweb/pyramid/layout";
 
 interface ModelLogoFormProps extends ImageUploaderProps {
     component: string;
@@ -40,7 +39,7 @@ export function ModelLogoForm({
     );
     const [logo, setLogo] = useState<string>();
     const [fileMeta, setFileMeta] = useState<UploaderMeta | null>(null);
-    const { message } = useLayoutContext();
+    const [messageApi, contextHolder] = message.useMessage();
 
     const msg = { ...defaultMessages, ...messages };
 
@@ -78,7 +77,7 @@ export function ModelLogoForm({
                     },
                 },
             });
-            message?.success(msg.saveSuccess);
+            messageApi.success(msg.saveSuccess);
         } catch (err) {
             errorModal(err);
         } finally {
@@ -92,6 +91,7 @@ export function ModelLogoForm({
 
     return (
         <Space direction="vertical" style={{ width: "100%" }}>
+            {contextHolder}
             <ImageUploader
                 helpText={msg.helpText}
                 uploadText={msg.uploadText}

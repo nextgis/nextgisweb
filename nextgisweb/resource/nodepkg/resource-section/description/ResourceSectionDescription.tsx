@@ -1,6 +1,5 @@
-import { FeatureDisplayModal } from "@nextgisweb/feature-layer/feature-display-modal";
+import { useShowModal } from "@nextgisweb/gui";
 import { DescriptionHtml } from "@nextgisweb/gui/description";
-import showModal from "@nextgisweb/gui/showModal";
 import { assert } from "@nextgisweb/jsrealm/error";
 
 import type { ResourceSection } from "../type";
@@ -9,6 +8,7 @@ export const ResourceSectionDescription: ResourceSection = ({
     resourceData,
 }) => {
     const description = resourceData.resource.description;
+    const { lazyModal, modalHolder } = useShowModal();
     assert(description);
 
     const handleOnLinkClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -19,20 +19,26 @@ export const ResourceSectionDescription: ResourceSection = ({
             e.preventDefault();
             e.stopPropagation();
             const [resourceId, featureId] = href.split(":").map(Number);
-            showModal(FeatureDisplayModal, {
-                featureId,
-                resourceId,
-            });
+            lazyModal(
+                () => import("@nextgisweb/feature-layer/feature-display-modal"),
+                {
+                    featureId,
+                    resourceId,
+                }
+            );
             return true;
         }
         return false;
     };
 
     return (
-        <DescriptionHtml
-            content={description}
-            onLinkClick={handleOnLinkClick}
-        />
+        <>
+            {modalHolder}
+            <DescriptionHtml
+                content={description}
+                onLinkClick={handleOnLinkClick}
+            />
+        </>
     );
 };
 

@@ -4,6 +4,7 @@ import type React from "react";
 import type { CustomFont, SystemFont } from "@nextgisweb/core/type/api";
 import { FileUploaderButton } from "@nextgisweb/file-upload/file-uploader";
 import type { FileMeta } from "@nextgisweb/file-upload/file-uploader";
+import { useShowModal } from "@nextgisweb/gui";
 import {
     Button,
     CheckboxValue,
@@ -15,7 +16,6 @@ import {
 import type { ModalProps, TableColumnType } from "@nextgisweb/gui/antd";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
-import showModal from "@nextgisweb/gui/showModal";
 import type { FontCUpdateBody } from "@nextgisweb/pyramid/type/api";
 
 import { route } from "../api";
@@ -78,6 +78,7 @@ export function FontsPanel() {
     const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
 
     const { data, isLoading } = useRouteGet("pyramid.font");
+    const { showModal, modalHolder, modalStore } = useShowModal();
 
     // Generate synthetic keys for system fonts
     const dataWithKeys = useMemo(() => {
@@ -132,10 +133,10 @@ export function FontsPanel() {
                         await waitForRestart(resp.timestamp);
                     }
                 } catch (err) {
-                    errorModal(err);
+                    errorModal(err, { modalStore });
                 }
         },
-        [modal]
+        [modal, modalStore, showModal]
     );
 
     const onFileChange = useCallback(
@@ -154,6 +155,7 @@ export function FontsPanel() {
     return (
         <div>
             {contextHolder}
+            {modalHolder}
             <Flex
                 align="center"
                 gap={"0.5rem"}

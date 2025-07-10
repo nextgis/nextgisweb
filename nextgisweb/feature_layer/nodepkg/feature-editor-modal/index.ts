@@ -1,1 +1,1 @@
-export { FeatureEditorModal } from "./FeatureEditorModal";
+export { FeatureEditorModal as default } from "./FeatureEditorModal";

@@ -10,7 +10,7 @@ import { Draw, Modify, Select, Snap } from "ol/interaction";
 import type { Interaction } from "ol/interaction";
 import { Vector as VectorSource } from "ol/source";
 
-import { FeatureEditorModal } from "@nextgisweb/feature-layer/feature-editor-modal";
+import FeatureEditorModal from "@nextgisweb/feature-layer/feature-editor-modal";
 import type { FeaureLayerGeometryType } from "@nextgisweb/feature-layer/type/api";
 import { errorModal, isAbortError } from "@nextgisweb/gui/error";
 import { EditIcon } from "@nextgisweb/gui/icon";

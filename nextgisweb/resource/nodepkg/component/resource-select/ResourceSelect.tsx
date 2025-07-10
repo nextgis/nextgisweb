@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { useShowModal } from "@nextgisweb/gui";
 import { Select, Space } from "@nextgisweb/gui/antd";
 import { useObjectState } from "@nextgisweb/gui/hook";
 import { OpenInNewIcon } from "@nextgisweb/gui/icon";
-import { useShowModal } from "@nextgisweb/gui/index";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { ResourceIcon } from "@nextgisweb/resource/icon";
 

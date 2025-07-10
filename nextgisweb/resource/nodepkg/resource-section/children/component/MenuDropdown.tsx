@@ -5,6 +5,7 @@ import type { MenuProps } from "@nextgisweb/gui/antd";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { useResourcePicker } from "@nextgisweb/resource/component/resource-picker/hook";
+import { useResourceNotify } from "@nextgisweb/resource/hook/useResourceNotify";
 import type { CompositeRead } from "@nextgisweb/resource/type/api";
 
 import type { ChildrenResource } from "../type";
@@ -12,13 +13,6 @@ import { createResourceTableItemOptions } from "../util/createResourceTableItemO
 import { forEachSelected } from "../util/forEachSelected";
 import { isDeleteAction } from "../util/isDeleteAction";
 import { loadVolumes } from "../util/loadVoluems";
-import {
-    confirmThenDelete,
-    notifyMoveAbsolutError,
-    notifyMoveWithError,
-    notifySuccessfulDeletion,
-    notifySuccessfulMove,
-} from "../util/notify";
 
 import MoreVertIcon from "@nextgisweb/icon/material/more_vert";
 import PriorityHighIcon from "@nextgisweb/icon/material/priority_high";
@@ -64,6 +58,14 @@ export function MenuDropdown({
     setItems,
 }: MenuDropdownProps) {
     const { showResourcePicker } = useResourcePicker();
+    const {
+        contextHolder,
+        confirmThenDelete,
+        notifyMoveWithError,
+        notifySuccessfulMove,
+        notifyMoveAbsolutError,
+        notifySuccessfulDeletion,
+    } = useResourceNotify();
 
     const selectedAllowedForFeatureExport = useMemo(() => {
         const allowedToFeatureExport = [];
@@ -125,7 +127,14 @@ export function MenuDropdown({
                 },
             });
         },
-        [selected, setItems, setSelected]
+        [
+            notifyMoveAbsolutError,
+            notifySuccessfulMove,
+            notifyMoveWithError,
+            setSelected,
+            setItems,
+            selected,
+        ]
     );
 
     const selectedAllowedForDelete = useMemo(() => {
@@ -161,8 +170,9 @@ export function MenuDropdown({
     }, [
         selectedAllowedForDelete,
         setBatchDeletingInProgress,
-        setItems,
+        notifySuccessfulDeletion,
         setSelected,
+        setItems,
     ]);
 
     const menuItems = useMemo(() => {
@@ -300,6 +310,7 @@ export function MenuDropdown({
         moveSelectedTo,
         setVolumeValues,
         setVolumeVisible,
+        confirmThenDelete,
         showResourcePicker,
         setCreationDateVisible,
     ]);
@@ -309,10 +320,13 @@ export function MenuDropdown({
     }
 
     return (
-        <Dropdown menu={{ items: menuItems }} trigger={["click"]}>
-            <a>
-                <MoreVertIcon />
-            </a>
-        </Dropdown>
+        <>
+            {contextHolder}
+            <Dropdown menu={{ items: menuItems }} trigger={["click"]}>
+                <a>
+                    <MoreVertIcon />
+                </a>
+            </Dropdown>
+        </>
     );
 }

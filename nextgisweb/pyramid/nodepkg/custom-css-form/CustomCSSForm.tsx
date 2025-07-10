@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { Col, Row, Space, Typography } from "@nextgisweb/gui/antd";
+import { Col, Row, Space, Typography, message } from "@nextgisweb/gui/antd";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { Code } from "@nextgisweb/gui/component/code";
 import { errorModal } from "@nextgisweb/gui/error";
@@ -8,14 +8,12 @@ import { route } from "@nextgisweb/pyramid/api";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import { useLayoutContext } from "../layout";
-
 export function CustomCSSForm() {
     const [saving, setSaving] = useState(false);
     const [initial, setInitial] = useState<string>();
     const [data, setData] = useState<string>();
 
-    const { message } = useLayoutContext();
+    const [messageApi, contextHolder] = message.useMessage();
 
     const { data: initialData, isLoading } = useRouteGet({
         name: "pyramid.csettings",
@@ -41,7 +39,7 @@ export function CustomCSSForm() {
             errorModal(err);
         } finally {
             // prettier-ignore
-            message?.success(gettext("Custom styles saved. Reload the page to get them applied."));
+            messageApi.success(gettext("Custom styles saved. Reload the page to get them applied."));
             setSaving(false);
         }
     };
@@ -52,6 +50,7 @@ export function CustomCSSForm() {
 
     return (
         <Space direction="vertical" style={{ width: "100%" }}>
+            {contextHolder}
             <Row gutter={[16, 16]}>
                 <Col span={14} style={{ height: "300px" }}>
                     <Code

@@ -8,7 +8,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { url } from "../nextgis";
 
-import type { MessageAPI, ModalAPI } from "./type";
+import type { ModalAPI } from "./type";
 
 const NOTIFICATION_ORDER = ["success", "danger"];
 
@@ -31,15 +31,10 @@ class LayoutStore {
     @observable.ref accessor hideMenu = false;
 
     @observable.shallow accessor modal: ModalAPI | null = null;
-    @observable.shallow accessor message: MessageAPI | null = null;
 
     @action.bound
     setModalApi(modal: ModalAPI | null) {
         this.modal = modal;
-    }
-    @action.bound
-    setMessageApi(message: MessageAPI | null) {
-        this.message = message;
     }
 
     @action.bound

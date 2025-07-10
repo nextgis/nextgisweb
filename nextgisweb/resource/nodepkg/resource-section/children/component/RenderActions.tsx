@@ -1,9 +1,8 @@
+import { useShowModal } from "@nextgisweb/gui";
 import { Tooltip } from "@nextgisweb/gui/antd";
-import showModal from "@nextgisweb/gui/showModal";
-import showModalLazy from "@nextgisweb/gui/showModalLazy";
 import { SvgIconLink } from "@nextgisweb/gui/svg-icon";
 import type { SvgIconLink as SvgIconLinkProps } from "@nextgisweb/gui/svg-icon/type";
-import { DeleteConfirmModal } from "@nextgisweb/resource/delete-page/DeletePageModal";
+import { useResourceNotify } from "@nextgisweb/resource/hook/useResourceNotify";
 
 import type {
     ChildrenResourceAction as Action,
@@ -11,7 +10,6 @@ import type {
 } from "../type";
 import { isDeleteAction } from "../util/isDeleteAction";
 import { isPreviewAction } from "../util/isPreviewAction";
-import { notifySuccessfulDeletion } from "../util/notify";
 
 interface RenderActionsProps {
     actions: Action[];
@@ -24,56 +22,68 @@ export function RenderActions({
     id,
     setTableItems,
 }: RenderActionsProps) {
+    const { notifySuccessfulDeletion, contextHolder } = useResourceNotify();
+    const { lazyModal, modalHolder } = useShowModal();
+
     const deleteModelItem = () => {
-        const { destroy } = showModal(DeleteConfirmModal, {
-            onCancelDelete: () => {
-                destroy();
-            },
-            onOkDelete: () => {
-                destroy();
-                setTableItems((old) => old.filter((x) => x.id !== id));
-                notifySuccessfulDeletion(1);
-            },
-            // modal mask not clickable without onCancel
-            onCancel: () => {
-                destroy();
-            },
-            resources: [id],
-        });
+        const { destroy } = lazyModal(
+            () => import("@nextgisweb/resource/delete-page/DeletePageModal"),
+            {
+                onCancelDelete: () => {
+                    destroy();
+                },
+                onOkDelete: () => {
+                    destroy();
+                    setTableItems((old) => old.filter((x) => x.id !== id));
+                    notifySuccessfulDeletion(1);
+                },
+                // modal mask not clickable without onCancel
+                onCancel: () => {
+                    destroy();
+                },
+                resources: [id],
+            }
+        );
     };
 
-    return actions.map((action) => {
-        const { target, href, icon, title } = action;
+    return (
+        <>
+            {contextHolder}
+            {modalHolder}
+            {actions.map((action) => {
+                const { target, href, icon, title } = action;
 
-        const createActionBtn = (props_: SvgIconLinkProps) => (
-            <Tooltip key={title} title={title}>
-                <SvgIconLink
-                    {...props_}
-                    icon={icon}
-                    fill="currentColor"
-                ></SvgIconLink>
-            </Tooltip>
-        );
-        if (isPreviewAction(action)) {
-            return createActionBtn({
-                onClick: () => {
-                    const { destroy } = showModalLazy(
-                        () => import("./PreviewModal"),
-                        {
-                            resourceId: id,
-                            href: href,
-                            open: true,
-                            onCancel: () => destroy(),
-                        }
-                    );
-                },
-            });
-        } else if (isDeleteAction(action)) {
-            return createActionBtn({
-                onClick: () => deleteModelItem(),
-            });
-        } else {
-            return createActionBtn({ href, target });
-        }
-    });
+                const createActionBtn = (props_: SvgIconLinkProps) => (
+                    <Tooltip key={title} title={title}>
+                        <SvgIconLink
+                            {...props_}
+                            icon={icon}
+                            fill="currentColor"
+                        ></SvgIconLink>
+                    </Tooltip>
+                );
+                if (isPreviewAction(action)) {
+                    return createActionBtn({
+                        onClick: () => {
+                            const { destroy } = lazyModal(
+                                () => import("./PreviewModal"),
+                                {
+                                    resourceId: id,
+                                    href: href,
+                                    open: true,
+                                    onCancel: () => destroy(),
+                                }
+                            );
+                        },
+                    });
+                } else if (isDeleteAction(action)) {
+                    return createActionBtn({
+                        onClick: () => deleteModelItem(),
+                    });
+                } else {
+                    return createActionBtn({ href, target });
+                }
+            })}
+        </>
+    );
 }
