@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Table } from "@nextgisweb/gui/antd";
 import type { TableProps } from "@nextgisweb/gui/antd";
@@ -13,6 +13,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { ResourceChildItem } from "@nextgisweb/resource/type/api";
 import topic from "@nextgisweb/webmap/compat/topic";
 
+import { EasyCreateDropWrap } from "../easy-create/EasyCreateDropWrap";
 import type { ResourceCompositeAddEvent } from "../main/CreateResourceButton";
 import type { ResourceSectionProps } from "../type";
 
@@ -58,47 +59,55 @@ export const ResourceSectionChildren = ({
         });
     }, [items]);
 
+    const appendTree = useCallback(
+        async ({ id, cls, parent }: ResourceCompositeAddEvent) => {
+            if (parent !== parent) {
+                return;
+            }
+            setItems((old) => [
+                ...old,
+                {
+                    id,
+                    cls,
+                    displayName: "...",
+                    actions: [],
+                },
+            ]);
+            try {
+                const resp = await route("resource.children", {
+                    id: resourceId,
+                }).get({
+                    signal: makeSignal(),
+                });
+                const newChildren = resp.children.find(
+                    (children) => children.id === id
+                );
+                if (newChildren) {
+                    setItems((old) => {
+                        const withoutLoaded = old.filter(
+                            (item) => item.id !== id
+                        );
+                        return [...withoutLoaded, newChildren];
+                    });
+                }
+            } catch {
+                setItems((old) => {
+                    return old.filter((item) => item.id !== id);
+                });
+            }
+        },
+        [makeSignal, resourceId]
+    );
+
     useEffect(() => {
         const subscription = topic.subscribe(
             "resource/composite/add",
-            async ({ id, cls }: ResourceCompositeAddEvent) => {
-                setItems((old) => [
-                    ...old,
-                    {
-                        id,
-                        cls,
-                        displayName: "...",
-                        actions: [],
-                    },
-                ]);
-                try {
-                    const resp = await route("resource.children", {
-                        id: resourceId,
-                    }).get({
-                        signal: makeSignal(),
-                    });
-                    const newChildren = resp.children.find(
-                        (children) => children.id === id
-                    );
-                    if (newChildren) {
-                        setItems((old) => {
-                            const withoutLoaded = old.filter(
-                                (item) => item.id !== id
-                            );
-                            return [...withoutLoaded, newChildren];
-                        });
-                    }
-                } catch {
-                    setItems((old) => {
-                        return old.filter((item) => item.id !== id);
-                    });
-                }
-            }
+            appendTree
         );
         return () => {
             subscription.remove();
         };
-    }, [items, makeSignal, resourceId]);
+    }, [appendTree]);
 
     const rowSelection = useMemo<TableProps["rowSelection"] | undefined>(() => {
         return allowBatch
@@ -116,107 +125,111 @@ export const ResourceSectionChildren = ({
     }, [allowBatch, selected, batchDeletingInProgress]);
 
     return (
-        <Table
-            className="ngw-resource-resource-section-children"
-            size="middle"
-            card={true}
-            dataSource={items}
-            rowKey="id"
-            rowSelection={rowSelection}
-        >
-            <Column
-                title={gettext("Display name")}
-                className="displayName"
-                dataIndex="displayName"
-                sorter={sorterFactory("displayName")}
-                render={(value, record: ResourceChildItem) => (
-                    <SvgIconLink
-                        href={routeURL("resource.show", record.id)}
-                        icon={`rescls-${record.cls}`}
-                    >
-                        {value}
-                    </SvgIconLink>
-                )}
-            />
-            <Column
-                title={gettext("Type")}
-                responsive={["md"]}
-                className="cls"
-                dataIndex="clsDisplayName"
-                sorter={sorterFactory("clsDisplayName")}
-            />
-            <Column
-                title={gettext("Owner")}
-                responsive={["xl"]}
-                className="ownerUser"
-                dataIndex="ownerUserDisplayName"
-                sorter={sorterFactory("ownerUserDisplayName")}
-            />
-            {creationDateVisible && (
+        <EasyCreateDropWrap parent={resourceId}>
+            <Table
+                className="ngw-resource-resource-section-children"
+                size="middle"
+                card={true}
+                dataSource={items}
+                rowKey="id"
+                rowSelection={rowSelection}
+            >
                 <Column
-                    title={gettext("Created")}
-                    className="creationDate"
-                    dataIndex="creationDate"
-                    sorter={sorterFactory("creationDate")}
-                    render={(text) => {
-                        if (text && !text.startsWith("1970")) {
-                            return (
-                                <div style={{ whiteSpace: "nowrap" }}>
-                                    {utc(text).local().format("L LTS")}
-                                </div>
-                            );
-                        }
-                        return "";
-                    }}
+                    title={gettext("Display name")}
+                    className="displayName"
+                    dataIndex="displayName"
+                    sorter={sorterFactory("displayName")}
+                    render={(value, record: ResourceChildItem) => (
+                        <SvgIconLink
+                            href={routeURL("resource.show", record.id)}
+                            icon={`rescls-${record.cls}`}
+                        >
+                            {value}
+                        </SvgIconLink>
+                    )}
                 />
-            )}
-            {storageEnabled && volumeVisible && (
                 <Column
-                    title={gettext("Volume")}
-                    className="volume"
-                    sorter={(a: ResourceChildItem, b: ResourceChildItem) =>
-                        volumeValues[a.id] - volumeValues[b.id]
-                    }
-                    render={(_, record: ResourceChildItem) => {
-                        if (volumeValues[record.id] !== undefined) {
-                            return formatSize(volumeValues[record.id]);
-                        } else {
+                    title={gettext("Type")}
+                    responsive={["md"]}
+                    className="cls"
+                    dataIndex="clsDisplayName"
+                    sorter={sorterFactory("clsDisplayName")}
+                />
+                <Column
+                    title={gettext("Owner")}
+                    responsive={["xl"]}
+                    className="ownerUser"
+                    dataIndex="ownerUserDisplayName"
+                    sorter={sorterFactory("ownerUserDisplayName")}
+                />
+                {creationDateVisible && (
+                    <Column
+                        title={gettext("Created")}
+                        className="creationDate"
+                        dataIndex="creationDate"
+                        sorter={sorterFactory("creationDate")}
+                        render={(text) => {
+                            if (text && !text.startsWith("1970")) {
+                                return (
+                                    <div style={{ whiteSpace: "nowrap" }}>
+                                        {utc(text).local().format("L LTS")}
+                                    </div>
+                                );
+                            }
                             return "";
-                        }
-                    }}
-                />
-            )}
-            <Column
-                title={
-                    <MenuDropdown
-                        data={resourceChildren}
-                        items={items}
-                        selected={selected}
-                        allowBatch={allowBatch}
-                        resourceId={resourceId}
-                        volumeVisible={volumeVisible}
-                        storageEnabled={storageEnabled}
-                        creationDateVisible={creationDateVisible}
-                        setBatchDeletingInProgress={setBatchDeletingInProgress}
-                        setCreationDateVisible={setCreationDateVisible}
-                        setVolumeVisible={setVolumeVisible}
-                        setVolumeValues={setVolumeValues}
-                        setAllowBatch={setAllowBatch}
-                        setSelected={setSelected}
-                        setItems={setItems}
-                    />
-                }
-                className="actions"
-                dataIndex="actions"
-                render={(actions, record: ResourceChildItem) => (
-                    <RenderActions
-                        actions={actions}
-                        id={record.id}
-                        setTableItems={setItems}
+                        }}
                     />
                 )}
-            />
-        </Table>
+                {storageEnabled && volumeVisible && (
+                    <Column
+                        title={gettext("Volume")}
+                        className="volume"
+                        sorter={(a: ResourceChildItem, b: ResourceChildItem) =>
+                            volumeValues[a.id] - volumeValues[b.id]
+                        }
+                        render={(_, record: ResourceChildItem) => {
+                            if (volumeValues[record.id] !== undefined) {
+                                return formatSize(volumeValues[record.id]);
+                            } else {
+                                return "";
+                            }
+                        }}
+                    />
+                )}
+                <Column
+                    title={
+                        <MenuDropdown
+                            data={resourceChildren}
+                            items={items}
+                            selected={selected}
+                            allowBatch={allowBatch}
+                            resourceId={resourceId}
+                            volumeVisible={volumeVisible}
+                            storageEnabled={storageEnabled}
+                            creationDateVisible={creationDateVisible}
+                            setBatchDeletingInProgress={
+                                setBatchDeletingInProgress
+                            }
+                            setCreationDateVisible={setCreationDateVisible}
+                            setVolumeVisible={setVolumeVisible}
+                            setVolumeValues={setVolumeValues}
+                            setAllowBatch={setAllowBatch}
+                            setSelected={setSelected}
+                            setItems={setItems}
+                        />
+                    }
+                    className="actions"
+                    dataIndex="actions"
+                    render={(actions, record: ResourceChildItem) => (
+                        <RenderActions
+                            actions={actions}
+                            id={record.id}
+                            setTableItems={setItems}
+                        />
+                    )}
+                />
+            </Table>
+        </EasyCreateDropWrap>
     );
 };
 

@@ -15,6 +15,7 @@ interface CreateResourceButtonProps {
 export interface ResourceCompositeAddEvent {
     id: number;
     cls: ResourceCls;
+    parent: number;
 }
 
 export function CreateResourceButton({
@@ -55,7 +56,7 @@ export function CreateResourceButton({
                                         onSubmit: ({ id }) => {
                                             compositeModal.close();
                                             const eventData: ResourceCompositeAddEvent =
-                                                { id, cls };
+                                                { id, cls, parent: resourceId };
                                             topic.publish(
                                                 "resource/composite/add",
                                                 eventData

@@ -1,6 +1,6 @@
 import showModal from "@nextgisweb/gui/showModal";
 
-import { ProgressModal } from "./ProgressModal";
+import ProgressModal from "./ProgressModal";
 import type { ProgressModalProps } from "./ProgressModal";
 
 export function showProgressModal(props: ProgressModalProps) {

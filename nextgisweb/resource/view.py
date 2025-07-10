@@ -299,8 +299,6 @@ def resource_section_main(obj, *, request, **kwargs):
 
 @resource_sections("@nextgisweb/resource/resource-section/children", order=-50)
 def resource_section_children(obj, *, request, **kwargs):
-    if len(obj.children) == 0:
-        return
 
     payload = build_children_payload(obj, request)
 

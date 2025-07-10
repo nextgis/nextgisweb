@@ -30,7 +30,7 @@ export function showModalBase<T extends ShowModalOptions>(
         store.remove(id);
     };
 
-    const update = (configUpdate: T | ((prev: T) => T)) => {
+    const update = (configUpdate: Partial<T> | ((prev: T) => T)) => {
         currentConfig =
             typeof configUpdate === "function"
                 ? (configUpdate as (prev: T) => T)(currentConfig)

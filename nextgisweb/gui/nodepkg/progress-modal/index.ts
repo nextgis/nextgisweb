@@ -1,2 +1,2 @@
-export { ProgressModal } from "./ProgressModal";
+export { default as ProgressModal } from "./ProgressModal";
 export { showProgressModal } from "./showProgressModal";
