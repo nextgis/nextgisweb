@@ -6,9 +6,11 @@ import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { useResourcePicker } from "@nextgisweb/resource/component/resource-picker/hook";
 import { useResourceNotify } from "@nextgisweb/resource/hook/useResourceNotify";
-import type { CompositeRead } from "@nextgisweb/resource/type/api";
+import type {
+    CompositeRead,
+    ResourceChildItem,
+} from "@nextgisweb/resource/type/api";
 
-import type { ChildrenResource } from "../type";
 import { createResourceTableItemOptions } from "../util/createResourceTableItemOptions";
 import { forEachSelected } from "../util/forEachSelected";
 import { isDeleteAction } from "../util/isDeleteAction";
@@ -18,8 +20,8 @@ import MoreVertIcon from "@nextgisweb/icon/material/more_vert";
 import PriorityHighIcon from "@nextgisweb/icon/material/priority_high";
 
 interface MenuDropdownProps {
-    data: ChildrenResource[];
-    items: ChildrenResource[];
+    data: ResourceChildItem[];
+    items: ResourceChildItem[];
     selected: number[];
     allowBatch: boolean;
     resourceId: number;
@@ -34,7 +36,7 @@ interface MenuDropdownProps {
     >;
     setAllowBatch: React.Dispatch<React.SetStateAction<boolean>>;
     setSelected: React.Dispatch<React.SetStateAction<number[]>>;
-    setItems: React.Dispatch<React.SetStateAction<ChildrenResource[]>>;
+    setItems: React.Dispatch<React.SetStateAction<ResourceChildItem[]>>;
 }
 
 type MenuItems = NonNullable<MenuProps["items"]>;

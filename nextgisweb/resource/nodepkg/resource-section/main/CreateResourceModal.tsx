@@ -27,6 +27,7 @@ interface CreateResourceModalProps
     extends Omit<ModalProps, "footer" | "classNames"> {
     resourceId: number;
     creatable: ResourceCls[];
+    onSelect: (val: { cls: ResourceCls }) => void;
 }
 
 export default function CreateResourceModal({
@@ -34,6 +35,7 @@ export default function CreateResourceModal({
     creatable,
     style,
     open,
+    onSelect,
     ...props
 }: CreateResourceModalProps) {
     const [curCatIdentity, setCurCatIdentity] = useState(ALL_RESOURCES);
@@ -141,6 +143,12 @@ export default function CreateResourceModal({
                         <Button
                             key={i.key}
                             href={i.url}
+                            onClick={(e) => {
+                                e.preventDefault();
+                                if (onSelect) {
+                                    onSelect({ cls: i.key });
+                                }
+                            }}
                             icon={i.icon}
                             size="large"
                         >

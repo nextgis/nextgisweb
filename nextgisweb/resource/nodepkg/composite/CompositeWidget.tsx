@@ -12,13 +12,14 @@ import { SaveButton, TabsLabelBadge } from "@nextgisweb/gui/component";
 import { ErrorModal, errorModal } from "@nextgisweb/gui/error";
 import { useThemeVariables, useUnsavedChanges } from "@nextgisweb/gui/hook";
 import { EditIcon } from "@nextgisweb/gui/icon";
+import { assert } from "@nextgisweb/jsrealm/error";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import type { ActiveOnOptions, EditorStore } from "../type";
 
 import { CompositeStore } from "./CompositeStore";
-import type { CompositeSetup } from "./CompositeStore";
+import type { CompositeStoreOptions } from "./CompositeStore";
 
 import { LoadingOutlined } from "@ant-design/icons";
 
@@ -53,16 +54,39 @@ const TabsLabel = observer<TabsLabelProps>(({ composite, member, title }) => {
 
 TabsLabel.displayName = "TabsLabel";
 
-export interface CompositeWidgetProps {
-    setup: CompositeSetup;
+interface CompositeWidtetBaseProps {
+    onSubmit?: (val: { id: number }) => void;
+    rightActions?: ActionToolbarAction[];
 }
+export interface CompositeWidgetStoreProps extends CompositeWidtetBaseProps {
+    store: CompositeStore;
+}
+export type CompositeWidgetProps = Partial<
+    CompositeStoreOptions & CompositeWidgetStoreProps & CompositeWidtetBaseProps
+>;
 
-const CompositeWidget = observer(({ setup }: CompositeWidgetProps) => {
+function CompositeWidget({ setup }: CompositeStoreOptions): React.ReactElement;
+function CompositeWidget({
+    store,
+}: CompositeWidgetStoreProps): React.ReactElement;
+function CompositeWidget({
+    setup,
+    store,
+    rightActions,
+    onSubmit,
+}: CompositeWidgetProps) {
     const [activeKey, setActiveKey] = useState<string>();
-    const [composite] = useState(() => new CompositeStore({ setup }));
+
+    const [composite] = useState(() => {
+        if (store) {
+            return store;
+        }
+        assert(setup);
+        return new CompositeStore({ setup });
+    });
     const [redirecting, setRedirecting] = useState(false);
 
-    const { operation } = setup;
+    const { operation } = composite;
     const { members, dirty } = composite;
     const { disable: disableUnsavedChanges } = useUnsavedChanges({ dirty });
 
@@ -107,7 +131,7 @@ const CompositeWidget = observer(({ setup }: CompositeWidgetProps) => {
         async (edit: boolean = false) => {
             setRedirecting(true);
 
-            let id;
+            let id: number;
             try {
                 ({ id } = await composite.submit());
             } catch (err) {
@@ -117,10 +141,15 @@ const CompositeWidget = observer(({ setup }: CompositeWidgetProps) => {
             }
 
             disableUnsavedChanges();
-            const routeName = edit ? "resource.update" : "resource.show";
-            window.location.href = route(routeName, { id }).url();
+
+            if (onSubmit) {
+                onSubmit({ id });
+            } else {
+                const routeName = edit ? "resource.update" : "resource.show";
+                window.location.href = route(routeName, { id }).url();
+            }
         },
-        [composite, disableUnsavedChanges]
+        [composite, onSubmit, disableUnsavedChanges]
     );
 
     const inProgress = composite.loading || composite.saving || redirecting;
@@ -196,11 +225,9 @@ const CompositeWidget = observer(({ setup }: CompositeWidgetProps) => {
                 parentHeight
             />
 
-            <ActionToolbar {...toolbarProps} />
+            <ActionToolbar {...toolbarProps} rightActions={rightActions} />
         </div>
     );
-});
+}
 
-CompositeWidget.displayName = "CompositeWidget";
-
-export default CompositeWidget;
+export default observer(CompositeWidget);
