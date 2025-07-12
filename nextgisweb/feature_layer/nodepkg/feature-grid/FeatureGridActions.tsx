@@ -7,13 +7,19 @@ import type {
     CreateButtonActionProps,
 } from "@nextgisweb/gui/action-toolbar";
 import { Button, Input, Space, Tooltip } from "@nextgisweb/gui/antd";
-import { DeleteIcon, EditIcon, OpenInNewIcon } from "@nextgisweb/gui/icon";
+import {
+    AddIcon,
+    DeleteIcon,
+    EditIcon,
+    OpenInNewIcon,
+} from "@nextgisweb/gui/icon";
 import showModal from "@nextgisweb/gui/showModal";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { confirmDelete } from "@nextgisweb/pyramid/layout";
 import type Routes from "@nextgisweb/pyramid/type/route";
 import { useResource } from "@nextgisweb/resource/hook/useResource";
+import type { CompositeRead } from "@nextgisweb/resource/type/api";
 
 import { FeatureDisplayModal } from "../feature-display-modal";
 import { FeatureEditorModal } from "../feature-editor-modal";
@@ -28,6 +34,7 @@ const msgOpenOnNewPage = gettext("Open on a new page");
 const msgDeleteTitle = gettext("Delete");
 const msgEditTitle = gettext("Edit");
 const msgEditOnNewPage = gettext("Edit on a new page");
+const msgCreate = gettext("Create");
 
 const msgSearchPlaceholder = gettext("Search...");
 
@@ -50,7 +57,7 @@ export const FeatureGridActions = observer(
             beforeDelete,
             deleteError,
             onDelete,
-            onSave,
+            onSave: onSaveProp,
             onOpen,
         } = store;
 
@@ -109,6 +116,16 @@ export const FeatureGridActions = observer(
             }
         }, [selectedIds, onOpen, id]);
 
+        const onSave = useCallback(
+            (item?: CompositeRead) => {
+                if (onSaveProp) {
+                    onSaveProp(item);
+                }
+                store.bumpVersion();
+            },
+            [onSaveProp, store]
+        );
+
         const defActions: ActionToolbarAction<ActionProps>[] = [
             (props: CreateButtonActionProps) => (
                 <Space.Compact key="feature-item-open">
@@ -143,6 +160,22 @@ export const FeatureGridActions = observer(
                 ...[
                     (props: CreateButtonActionProps) => (
                         <Space.Compact key="feature-item-edit">
+                            <Tooltip title={!props.isFit && msgCreate}>
+                                <Button
+                                    size={size}
+                                    icon={<AddIcon />}
+                                    onClick={() => {
+                                        showModal(FeatureEditorModal, {
+                                            editorOptions: {
+                                                resourceId: id,
+                                                onSave,
+                                            },
+                                        });
+                                    }}
+                                >
+                                    {props.isFit && msgCreate}
+                                </Button>
+                            </Tooltip>
                             <Tooltip title={!props.isFit && msgEditTitle}>
                                 <Button
                                     disabled={!selectedIds.length}
@@ -155,12 +188,7 @@ export const FeatureGridActions = observer(
                                                 editorOptions: {
                                                     featureId,
                                                     resourceId: id,
-                                                    onSave: (e) => {
-                                                        if (onSave) {
-                                                            onSave(e);
-                                                        }
-                                                        store.bumpVersion();
-                                                    },
+                                                    onSave,
                                                 },
                                             });
                                         }

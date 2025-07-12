@@ -14,7 +14,6 @@ export function useMapControl({
     instance?: Control;
     position?: ControlPosition;
 }) {
-    // const [container, setContainer] = useState<HTMLElement>();
     const added = useRef<Control>(null);
     const mapStore = useMemo(() => {
         return context?.mapStore;
@@ -25,8 +24,6 @@ export function useMapControl({
                 const control = mapStore.addControl(instance, position);
                 if (control) {
                     added.current = control;
-                    // if (control.getContainer)
-                    //     setContainer(control.getContainer());
                 }
             }
 
@@ -36,10 +33,6 @@ export function useMapControl({
                 }
             };
         },
-        [context, mapStore, instance, position]
+        [mapStore, instance, position]
     );
-
-    // return {
-    //     container,
-    // };
 }

@@ -1,4 +1,4 @@
-import { StrictMode, useCallback, useReducer } from "react";
+import { StrictMode, useMemo, useReducer } from "react";
 
 import { convertNgwExtentToWSEN } from "@nextgisweb/gui/util/extent";
 
@@ -16,27 +16,34 @@ export function PreviewMap({
 }: MapComponentProps) {
     const [basemap, toggleBaseMap] = useReducer((state) => !state, basemapProp);
 
-    const styleToggleBtn = useCallback(
-        (status: boolean) => (status ? undefined : { color: "gray" }),
-        []
+    const styleToggleBtn = useMemo(
+        () => (basemap ? { color: "inherit" } : { color: "gray" }),
+        [basemap]
     );
+
+    const maxZoom =
+        props.mapExtent && props.mapExtent.maxZoom !== undefined
+            ? props.mapExtent.maxZoom
+            : 18;
 
     return (
         <StrictMode>
-            <MapComponent basemap={basemap} {...props}>
+            <MapComponent basemap={basemap} maxZoom={maxZoom} {...props}>
                 <ZoomControl
                     extent={
                         props.mapExtent
                             ? convertNgwExtentToWSEN(props.mapExtent.extent)
                             : undefined
                     }
-                    fitOptions={{ maxZoom: props.mapExtent?.maxZoom }}
+                    fitOptions={{
+                        maxZoom,
+                    }}
                     position="top-left"
                 />
                 <ToggleControl
                     position="top-left"
                     style={styleToggleBtn}
-                    status={!!basemap}
+                    status={basemap}
                     onClick={toggleBaseMap}
                 >
                     <MapIcon />

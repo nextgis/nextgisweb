@@ -83,6 +83,7 @@ export function FeatureEditorModal({
                 {...modalProps}
             >
                 <FeatureEditorWidget
+                    {...editorOptions}
                     resourceId={resourceId}
                     featureId={featureId}
                     store={store}
