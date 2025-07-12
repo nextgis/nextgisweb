@@ -9,6 +9,9 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { useLayoutContext } from "@nextgisweb/pyramid/layout";
 import type { ResourceExport } from "@nextgisweb/resource/type/api";
 
+// prettier-ignore
+const msgNote = gettext("* This will not affect REST API use which will continue to be governed by permissions.")
+
 export function ExportSettings() {
     const [saving, setSaving] = useState(false);
 
@@ -80,9 +83,7 @@ export function ExportSettings() {
                         type="secondary"
                         style={{ marginTop: "8em" }}
                     >
-                        {gettext(
-                            "* This will not affect REST API use which will continue to be governed by permissions."
-                        )}
+                        {msgNote}
                     </Typography.Text>
                 </Col>
             </Row>

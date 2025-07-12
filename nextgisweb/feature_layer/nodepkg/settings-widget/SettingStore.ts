@@ -1,10 +1,9 @@
 import { action, computed, observable } from "mobx";
 
+import type { FeatureLayerRead } from "@nextgisweb/feature-layer/type/api";
 import type { EditorStore } from "@nextgisweb/resource/type";
 
-interface Value {
-    versioning?: { enabled?: boolean };
-}
+type Value = Pick<FeatureLayerRead, "versioning">;
 
 export class SettingStore implements EditorStore<Value> {
     readonly identity = "feature_layer";

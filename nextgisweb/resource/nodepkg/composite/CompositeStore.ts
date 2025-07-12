@@ -9,6 +9,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import type {
     CompositeCreate,
     CompositeMembersConfig,
+    CompositeRead,
     CompositeUpdate,
     CompositeWidgetOperation,
     ResourceCls,
@@ -49,6 +50,7 @@ export class CompositeStore {
     #parent: number | null | undefined = undefined;
     #ownerUser: number | undefined = undefined;
     #sdnBase: string | null | undefined = undefined;
+    #initialValue: CompositeRead | null | undefined = undefined;
 
     @observable.ref accessor validate = false;
     @observable.ref accessor members: WidgetMember[] | undefined = undefined;
@@ -104,6 +106,9 @@ export class CompositeStore {
 
     get sdnBase() {
         return this.initializationGuard(this.#sdnBase);
+    }
+    get initialValue() {
+        return this.initializationGuard(this.#initialValue);
     }
 
     @action
@@ -179,6 +184,10 @@ export class CompositeStore {
         const item = await route("resource.item", {
             id: this.resourceId,
         }).get();
+
+        runInAction(() => {
+            this.#initialValue = item;
+        });
 
         for (const member of this.initializationGuard(this.members)) {
             const identity = member.store.identity;
