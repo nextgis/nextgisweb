@@ -13,11 +13,11 @@ import {
 
 export function DrawInteraction({
     source,
-    singleMode = true,
+    multiGeometry = false,
     geometryType,
 }: {
     source: VectorSource;
-    singleMode?: boolean;
+    multiGeometry?: boolean;
     geometryType: FeaureLayerGeometryType;
 }) {
     const { mapStore } = useMapContext();
@@ -41,7 +41,7 @@ export function DrawInteraction({
             deleteCondition: (e) => shiftKeyOnly(e) && singleClick(e),
         });
 
-        if (singleMode) {
+        if (!multiGeometry) {
             draw.on("drawstart", () => {
                 source.clear();
             });
@@ -56,7 +56,7 @@ export function DrawInteraction({
 
             source.clear();
         };
-    }, [mapStore, source, geometryType, singleMode]);
+    }, [mapStore, source, geometryType, multiGeometry]);
 
     return null;
 }

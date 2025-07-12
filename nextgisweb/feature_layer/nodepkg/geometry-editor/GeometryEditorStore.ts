@@ -26,6 +26,7 @@ import type { FeatureEditorStore } from "../feature-editor/FeatureEditorStore";
 import { featuresToWkt } from "../util/featuresToWKT";
 
 export type FeatureGeometry = FeatureItem["geom"];
+type NonMultiGeometryType = Exclude<FeaureLayerGeometryType, `MULTI${string}`>;
 
 class GeometryEditorStore implements EditorStore<FeatureGeometry | null> {
     readonly _parentStore?: FeatureEditorStore;
@@ -102,19 +103,19 @@ class GeometryEditorStore implements EditorStore<FeatureGeometry | null> {
     }
 
     @computed
-    get geometryType(): FeaureLayerGeometryType | undefined {
+    get geometryType(): NonMultiGeometryType | undefined {
         // Strip the MULTI prefix so geometries are edited as single features (Point, LineString, Polygon).
         // Otherwise, every edit would result in a MULTI* geometry containing just one member.
         // The store’s onSourceChange will rebuild MULTI geometries when serializing to WKT.
         return this.vectorLayerGeometryType?.replace(
             "MULTI",
             ""
-        ) as FeaureLayerGeometryType;
+        ) as NonMultiGeometryType;
     }
 
     @computed
-    get singleMode(): boolean | undefined {
-        return !this.vectorLayerGeometryType?.startsWith("MULTI");
+    get multiGeometry(): boolean | undefined {
+        return this.vectorLayerGeometryType?.startsWith("MULTI");
     }
 
     @computed
@@ -146,7 +147,7 @@ class GeometryEditorStore implements EditorStore<FeatureGeometry | null> {
             return;
         }
 
-        const wkt = featuresToWkt(feats, type, this.singleMode ?? true);
+        const wkt = featuresToWkt(feats, type, this.multiGeometry);
 
         this.setValue(wkt);
     };

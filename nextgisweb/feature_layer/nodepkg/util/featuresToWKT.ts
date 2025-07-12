@@ -14,7 +14,7 @@ import { getOlLayout } from "@nextgisweb/webmap/utils/geometry-types";
 export function featuresToWkt(
     features: Feature<Geometry>[],
     type: FeaureLayerGeometryType,
-    singleMode: boolean
+    multiGeometry?: boolean
 ): string | null {
     const wkt = new WKT();
     if (features.length === 0) {
@@ -24,7 +24,7 @@ export function featuresToWkt(
     const layout = getOlLayout(type);
 
     let outGeom: Geometry;
-    if (singleMode) {
+    if (!multiGeometry) {
         outGeom = olGeoms[0];
     } else if (type.includes("POINT")) {
         outGeom = new MultiPoint(

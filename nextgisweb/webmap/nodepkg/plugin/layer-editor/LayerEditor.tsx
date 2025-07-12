@@ -383,6 +383,7 @@ export class LayerEditor extends PluginBase {
             e.feature.set("layer_id", this.selectedResourceId);
             if (this.selectedResourceId) {
                 showModal(FeatureEditorModal, {
+                    skipDirtyCheck: true,
                     editorOptions: {
                         mode: "return",
                         showGeometryTab: false,
