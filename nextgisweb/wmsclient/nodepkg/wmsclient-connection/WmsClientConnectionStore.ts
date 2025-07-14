@@ -4,7 +4,10 @@ import { action, computed, observable } from "mobx";
 import { mapper } from "@nextgisweb/gui/arm";
 import type { NullableProps } from "@nextgisweb/gui/type";
 import type { EditorStore } from "@nextgisweb/resource/type";
-import type { ConnectionCreate } from "@nextgisweb/wmsclient/type/api";
+import type {
+    ConnectionCreate,
+    ConnectionRead,
+} from "@nextgisweb/wmsclient/type/api";
 
 type MapperConnectionCreate = Omit<
     ConnectionCreate,
@@ -28,7 +31,7 @@ const {
 });
 
 export class WmsClientConnectionStore
-    implements EditorStore<ConnectionCreate, ConnectionCreate>
+    implements EditorStore<ConnectionRead, ConnectionCreate, ConnectionCreate>
 {
     readonly identity = "wmsclient_connection";
 
@@ -36,27 +39,35 @@ export class WmsClientConnectionStore
     readonly username = username.init(null, this);
     readonly password = password.init(null, this);
     readonly version = version.init("1.1.1", this);
+    /**  capcache is different for read and create/update:
+     * - on dump - instruction flag (CapCacheEnum; default "query") to tell the server what to do (TODO: describe what server actually do)
+     * - on load - contains the actual data
+     */
     readonly capcache = capcache.init("query", this);
 
-    private _initValue?: ConnectionCreate;
+    private _initValue?: Partial<ConnectionCreate>;
     @observable.ref accessor validate = false;
 
     @action
-    load(val: ConnectionCreate) {
+    load(val: ConnectionRead) {
         const { capcache, ...value_ } = val;
         mapperLoad(this, value_);
-        this._initValue = { ...value_ };
+        this._initValue = { ...value_, capcache: "query" };
     }
 
     @computed
     get deserializeValue() {
-        return {
+        const payload = {
             ...this.url.jsonPart(),
             ...this.username.jsonPart(),
             ...this.password.jsonPart(),
             ...this.version.jsonPart(),
-            ...this.capcache.jsonPart(),
         } as ConnectionCreate;
+        if (this.capcache.value) {
+            payload.capcache = this.capcache.value;
+        }
+
+        return payload;
     }
 
     @computed

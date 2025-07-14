@@ -5,10 +5,16 @@ import { LotMV } from "@nextgisweb/gui/arm";
 import { Area } from "@nextgisweb/gui/mayout";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { EditorWidget } from "@nextgisweb/resource/type";
+import type { ConnectionCreate } from "@nextgisweb/wmsclient/type/api";
 
 import type { WmsClientConnectionStore } from "./WmsClientConnectionStore";
 
-const capcacheOptions = [
+export interface Option {
+    label: string;
+    value: ConnectionCreate["capcache"];
+}
+
+const capcacheOptions: Option[] = [
     { label: gettext("Query"), value: "query" },
     { label: gettext("Clear"), value: "clear" },
     { label: gettext("Do not query"), value: undefined },
@@ -64,7 +70,10 @@ export const WmsClientConnectionWidget: EditorWidget<WmsClientConnectionStore> =
                     component={Select}
                     value={store.capcache}
                     props={{
-                        options: capcacheOptions,
+                        options: capcacheOptions.map((opt) => ({
+                            ...opt,
+                            value: opt.value ?? "",
+                        })),
                         style: { width: "100%" },
                     }}
                 />

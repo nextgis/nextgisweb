@@ -11,10 +11,10 @@ import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { ResourceSelectRef } from "@nextgisweb/resource/component";
 import type { EditorWidget } from "@nextgisweb/resource/type";
+import type { WMSConnectionLayer } from "@nextgisweb/wmsclient/type/api";
 
 import type { WmsClientLayerStore } from "./WmsClientLayerStore";
 import { VendorParamsModal } from "./component/VendorParamsModal";
-import type { WMSConnectionLayer } from "./type";
 
 function LayersSelect({
     value,
@@ -67,10 +67,12 @@ export const WmsClientLayerWidget: EditorWidget<WmsClientLayerStore> = observer(
                         signal: makeSignal(),
                     });
                     const capcache = wmsclient_connection?.capcache;
-                    const options = mapLayers(capcache.layers);
-                    const formats = mapFormats(capcache.formats);
-                    setFormats(formats);
-                    setLayers(options);
+                    if (capcache) {
+                        const options = mapLayers(capcache.layers);
+                        const formats = mapFormats(capcache.formats);
+                        setFormats(formats);
+                        setLayers(options);
+                    }
                 }
             };
             getCapcache();
