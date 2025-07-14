@@ -43,6 +43,9 @@ export const WmsClientConnectionWidget: EditorWidget<WmsClientConnectionStore> =
                     span={1}
                     label={gettext("Username")}
                     component={InputValue}
+                    props={{
+                        autoComplete: "new-password",
+                    }}
                     value={store.username}
                 />
 
@@ -50,6 +53,9 @@ export const WmsClientConnectionWidget: EditorWidget<WmsClientConnectionStore> =
                     span={1}
                     label={gettext("Password")}
                     component={PasswordValue}
+                    props={{
+                        autoComplete: "new-password",
+                    }}
                     value={store.password}
                 />
 
