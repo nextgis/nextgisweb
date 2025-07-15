@@ -2,7 +2,7 @@ import { observer } from "mobx-react-lite";
 import { useEffect, useMemo, useState } from "react";
 
 import settings from "@nextgisweb/basemap/client-settings";
-import { InputValue, Slider } from "@nextgisweb/gui/antd";
+import { InputInteger, InputValue, Slider } from "@nextgisweb/gui/antd";
 import { LotMV } from "@nextgisweb/gui/arm";
 import { Area, Lot } from "@nextgisweb/gui/mayout";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -82,6 +82,8 @@ export const LayerWidget: EditorWidget<LayerStore> = observer(({ store }) => {
                                 store.copyrightUrl.value =
                                     service.copyright_url;
                                 store.qms.value = JSON.stringify(service);
+                                store.maxzoom.value = service.z_max;
+                                store.minzoom.value = service.z_min;
                             }}
                         ></QMSSelect>
                     </Lot>
@@ -107,6 +109,30 @@ export const LayerWidget: EditorWidget<LayerStore> = observer(({ store }) => {
                         value={store.copyrightUrl}
                         component={InputValue}
                         props={{ disabled }}
+                    />
+                    <LotMV
+                        help={disabled ? msgDisabled : undefined}
+                        label={gettext("Min zoom level")}
+                        value={store.minzoom}
+                        component={InputInteger}
+                        props={{
+                            disabled,
+                            min: 0,
+                            max: 24,
+                            style: { width: "100%" },
+                        }}
+                    />
+                    <LotMV
+                        help={disabled ? msgDisabled : undefined}
+                        label={gettext("Max zoom level")}
+                        value={store.maxzoom}
+                        component={InputInteger}
+                        props={{
+                            disabled,
+                            min: 0,
+                            max: 24,
+                            style: { width: "100%" },
+                        }}
                     />
                 </Area>
             </div>
@@ -148,6 +174,10 @@ export const LayerWidget: EditorWidget<LayerStore> = observer(({ store }) => {
                                     ? `<a href="${store.copyrightUrl.value}" target="_blank">${store.copyrightText.value}</a>`
                                     : store.copyrightText.value
                             }
+                            sourceOptions={{
+                                minZoom: store.minzoom.value ?? undefined,
+                                maxZoom: store.maxzoom.value ?? undefined,
+                            }}
                         />
                     </PreviewMap>
                 </div>
