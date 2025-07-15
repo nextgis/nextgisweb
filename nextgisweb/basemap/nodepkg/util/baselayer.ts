@@ -11,6 +11,8 @@ import type { LayerOptions } from "@nextgisweb/webmap/ol/layer/CoreLayer";
 import type QuadKey from "@nextgisweb/webmap/ol/layer/QuadKey";
 import type XYZ from "@nextgisweb/webmap/ol/layer/XYZ";
 
+import { DEFAULT_MAX_ZOOM } from "../constant";
+
 let idx = 0;
 
 export function prepareBaselayerConfig(
@@ -77,6 +79,17 @@ export function prepareBaselayerConfig(
         if (copyright_url) {
             source.attributions = `<a href="${copyright_url}">${source.attributions}</a>`;
         }
+    }
+
+    if ("z_min" in config && typeof config.z_min === "number") {
+        source.minZoom = config.z_min;
+    }
+    if ("z_max" in config && typeof config.z_max === "number") {
+        source.maxZoom = config.z_max;
+    }
+
+    if (source.maxZoom === undefined) {
+        source.maxZoom = DEFAULT_MAX_ZOOM;
     }
 
     layer.opacity = config.opacity ? config.opacity : undefined;

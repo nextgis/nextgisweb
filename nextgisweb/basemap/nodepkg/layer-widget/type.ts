@@ -25,6 +25,8 @@ export interface BasemapConfig {
     enabled?: boolean;
     copyright_text?: string | null;
     copyright_url?: string | null;
+    z_min?: number | null;
+    z_max?: number | null;
 }
 
 export interface QMSSearch {
