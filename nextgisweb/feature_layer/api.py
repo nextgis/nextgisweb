@@ -16,7 +16,6 @@ from nextgisweb.pyramid import JSONType
 from nextgisweb.resource import DataScope, Resource, ResourceFactory
 from nextgisweb.spatial_ref_sys import SRS
 
-from .biutil import BIGINT_DUMPERS, BigIntFormat, bigint_loader
 from .dtutil import DT_DATATYPES, DT_DUMPERS, DT_LOADERS, DtFormat
 from .exception import FeatureNotFound
 from .extension import FeatureExtension
@@ -29,6 +28,7 @@ from .interface import (
     IVersionableFeatureLayer,
     IWritableFeatureLayer,
 )
+from .numutil import BIGINT_DUMPERS, BigIntFormat, bigint_loader, int_loader
 from .versioning import FVersioningNotEnabled, FVersioningOutOfRange
 
 FeatureID = Annotated[int, Meta(description="Feature ID")]
@@ -81,6 +81,8 @@ class Loader:
             fld_datatype = fld.datatype
             if fld_datatype in DT_DATATYPES:
                 fld_load = DT_LOADERS[self.params.dt_format][fld_datatype]
+            elif fld_datatype == FIELD_TYPE.INTEGER:
+                fld_load = int_loader
             elif fld_datatype == FIELD_TYPE.BIGINT:
                 fld_load = bigint_loader
             else:

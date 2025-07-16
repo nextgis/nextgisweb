@@ -8,7 +8,14 @@ from nextgisweb.env import DBSession
 from nextgisweb.vector_layer import VectorLayer
 from nextgisweb.vector_layer import test as vector_layer_test
 
-from ..biutil import MAX_INT64, MAX_SAFE_INTEGER, MIN_INT64, MIN_SAFE_INTEGER
+from ..numutil import (
+    MAX_INT32,
+    MAX_INT64,
+    MAX_SAFE_INTEGER,
+    MIN_INT32,
+    MIN_INT64,
+    MIN_SAFE_INTEGER,
+)
 
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
 
@@ -66,6 +73,52 @@ def test_datetime_valid(type, format, value, type_layer, ngw_webtest_app):
 
 
 @pytest.fixture
+def int_layer():
+    with transaction.manager:
+        layer = VectorLayer(geometry_type="POINT").persist()
+        layer.setup_from_fields([dict(keyname="f", datatype="INTEGER")])
+        DBSession.flush()
+        DBSession.expunge(layer)
+    yield layer.id
+
+
+@pytest.mark.parametrize(
+    "value,expected",
+    (
+        pytest.param(2.6, 3, id="float-round-up"),
+        pytest.param(2.4, 2, id="float-round-down"),
+        pytest.param(MAX_INT32, MAX_INT32, id="int32-max"),
+        pytest.param(MIN_INT32, MIN_INT32, id="int32-min"),
+        pytest.param("-42", -42, id="str"),
+    ),
+)
+def test_int_valid(value, expected, bigint_layer, ngw_webtest_app):
+    url = f"/api/resource/{bigint_layer}/feature/"
+    feature = dict(geom="POINT (0 0)", fields=dict(f=value))
+    resp = ngw_webtest_app.post_json(url, feature, status=200)
+    fid = resp.json["id"]
+
+    resp = ngw_webtest_app.get(url + str(fid), status=200)
+    v = resp.json["fields"]["f"]
+    assert type(v) is type(expected)
+    assert v == expected
+
+
+@pytest.mark.parametrize(
+    "value",
+    (
+        pytest.param("qwerty", id="invalid"),
+        pytest.param(MAX_INT32 + 1, id="int32-max-overflow"),
+        pytest.param(str(MIN_INT32 - 1), id="int32-min-overflow"),
+    ),
+)
+def test_int_invalid(value, int_layer, ngw_webtest_app):
+    url = f"/api/resource/{int_layer}/feature/"
+    feature = dict(geom="POINT (0 0)", fields=dict(f=value))
+    ngw_webtest_app.post_json(url, feature, status=422)
+
+
+@pytest.fixture
 def bigint_layer():
     with transaction.manager:
         layer = VectorLayer(geometry_type="POINT").persist()
@@ -78,7 +131,7 @@ def bigint_layer():
 @pytest.mark.parametrize(
     "value,cases",
     (
-        pytest.param(-1.5, {None: -2}, id="float-round-up"),
+        pytest.param(-1.6, {None: -2}, id="float-round-up"),
         pytest.param(-1.4, {None: -1}, id="float-round-down"),
         pytest.param(
             MAX_INT64,
@@ -153,7 +206,7 @@ def test_bigint_valid(value, cases, bigint_layer, ngw_webtest_app):
         pytest.param(str(MIN_INT64 - 1), id="int64-min-overflow"),
     ),
 )
-def test_bigint(value, bigint_layer, ngw_webtest_app):
+def test_bigint_invalid(value, bigint_layer, ngw_webtest_app):
     url = f"/api/resource/{bigint_layer}/feature/"
     feature = dict(geom="POINT (0 0)", fields=dict(f=value))
     ngw_webtest_app.post_json(url, feature, status=422)

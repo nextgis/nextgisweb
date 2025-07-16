@@ -1,12 +1,12 @@
-#: api.py:107 api_identify.py:27
+#: api.py:109 api_identify.py:27
 msgid "Geometry is not valid."
 msgstr "Невалидная геометрия"
 
-#: api.py:365
+#: api.py:367
 msgid "Unknown spatial reference system"
 msgstr "Неизвестная система координат"
 
-#: api.py:440 api_export.py:206
+#: api.py:442 api_export.py:206
 msgid "Parameter 'intersects' geometry is not valid."
 msgstr "Параметр 'intersects' содержит невалидную геометрию."
 
@@ -25,14 +25,6 @@ msgstr "Не удалось перепроецировать геометрию 
 #: api_export.py:428
 msgid "File name parameter '{}' is not valid."
 msgstr "Недопустимое имя файла '{}'."
-
-#: biutil.py:25
-msgid "Got an invalid BIGINT value: {}."
-msgstr "Получено некорректное значение BIGINT: {}."
-
-#: biutil.py:26
-msgid "The value must be within the inclusive range of {min} to {max}."
-msgstr "Значение должно находиться в диапазоне от {min} до {max} включительно."
 
 #: dtutil.py:28
 msgid "Got an invalid date-time value in the legacy format: {}."
@@ -308,7 +300,7 @@ msgstr "Охват (xMax)"
 msgid "Extent (yMax)"
 msgstr "Охват (yMax)"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:11
+#: nodepkg/settings-widget/SettingsWidget.tsx:11 versioning/model.py:94
 msgid "Feature versioning"
 msgstr "Версионирование объектов"
 
@@ -327,6 +319,18 @@ msgstr ""
 #: nodepkg/settings-widget/SettingsWidget.tsx:50
 msgid "Settings"
 msgstr "Настройки"
+
+#: numutil.py:28
+msgid "The value must be within the inclusive range of {min} to {max}."
+msgstr "Значение должно находиться в диапазоне от {min} до {max} включительно."
+
+#: numutil.py:43
+msgid "Got an invalid INTEGER value: {}."
+msgstr "Получено некорректное значение INTEGER: {}."
+
+#: numutil.py:49
+msgid "Got an invalid BIGINT value: {}."
+msgstr "Получено некорректное значение BIGINT: {}."
 
 #: transaction/exception.py:7
 msgid "Transaction not found"
