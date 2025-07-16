@@ -5,12 +5,10 @@ import sys
 import threading
 import warnings
 from collections import defaultdict
-from importlib.metadata import metadata
+from importlib.metadata import entry_points, metadata
 
 from nextgisweb.lib.imptool import module_path
 from nextgisweb.lib.logging import logger
-
-from .compat import entry_points
 
 _version_re = re.compile(r"(.+)\+(?:git)?([0-9a-f]{4,})(\.dirty)?$", re.IGNORECASE)
 _qualifications = False

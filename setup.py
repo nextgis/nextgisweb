@@ -13,7 +13,7 @@ except CalledProcessError:
 requires = [
     "affine==2.4.0",
     "babel==2.12.1",
-    "backports-datetime-fromisoformat",
+    'backports-datetime-fromisoformat; python_version<"3.11"',
     "cachetools==5.3.1",
     "cryptography==42.0.5",
     "defusedxml==0.7.1",
@@ -21,7 +21,6 @@ requires = [
     "geoalchemy2==0.14.1",
     "httpx[http2]==0.24.1",
     "humanize==4.6.0",
-    'importlib-metadata==4.6; python_version<"3.10"',
     "lxml==4.9.3",
     "nh3==0.2.20",
     "msgspec==0.17.0",
