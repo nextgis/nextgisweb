@@ -1,7 +1,7 @@
 import re
 from datetime import datetime
 from io import BytesIO
-from typing import Annotated, Any, Dict, Literal, Union
+from typing import Annotated, Dict, List, Literal, Union
 from urllib.parse import parse_qsl, quote, urlencode, urlparse, urlunparse
 
 import PIL
@@ -10,6 +10,7 @@ import sqlalchemy as sa
 import sqlalchemy.dialects.postgresql as sa_pg
 import sqlalchemy.orm as orm
 from lxml import etree
+from msgspec import Struct
 from requests.exceptions import RequestException
 from zope.interface import implementer
 
@@ -169,9 +170,18 @@ CapCacheEnum = Annotated[
     TSExport("CapCacheEnum"),
 ]
 
+class WMSConnectionLayer(Struct):
+    id: str
+    title: str
+    bbox: tuple[float, float, float, float]
+
+class CapCache(Struct):
+    formats: List[str]
+    layers: List[WMSConnectionLayer]
+
 
 class CapCacheAttr(SAttribute):
-    def get(self, srlzr: Serializer) -> Any:
+    def get(self, srlzr: Serializer) -> CapCache:
         return srlzr.obj.capcache_dict
 
     def set(self, srlzr: Serializer, value: CapCacheEnum, *, create: bool):

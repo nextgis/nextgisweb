@@ -108,6 +108,7 @@ def preview_embedded(request):
         title=gettext("Embedded webmap preview"),
         props=dict(iframe=iframe),
         limit_width=False,
+        adaptive=True,
     )
 
 
