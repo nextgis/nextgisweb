@@ -221,7 +221,7 @@ def openapi(introspector, prefix="/api/", *, comp: PyramidComponent):
     # Expand schema references
     schemas, components["schemas"] = schema_components(
         [i[0] for i in schema_refs],
-        "#/components/schemas/{name}",
+        ref_template="#/components/schemas/{name}",
     )
 
     for pschema, r in zip(schemas, [i[1] for i in schema_refs]):
