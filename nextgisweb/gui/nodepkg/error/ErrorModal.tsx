@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Modal } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
+import type { ModalStore } from "../show-modal/ModalStore";
 import showModal from "../showModal";
 import type { ParamsOf } from "../type";
 
@@ -65,6 +66,7 @@ export function ErrorModal({
 
 interface ErrorModalOpts extends Partial<ErrorModalProps> {
     ignoreAbort?: boolean;
+    modalStore?: ModalStore;
 }
 
 export function errorModal(error: unknown, opts?: ErrorModalOpts): boolean {

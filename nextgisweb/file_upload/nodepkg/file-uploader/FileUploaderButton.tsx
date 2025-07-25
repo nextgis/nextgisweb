@@ -1,4 +1,4 @@
-import { Button, Upload } from "@nextgisweb/gui/antd";
+import { Button, message, Upload } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { useFileUploader } from "./hook/useFileUploader";
@@ -20,6 +20,8 @@ export function FileUploaderButton<M extends boolean = false>({
     multiple = false as M,
     accept,
 }: FileUploaderProps<M>) {
+    const [messageApi, contextHolder] = message.useMessage();
+
     const { uploading, props } = useFileUploader({
         showProgressInDocTitle,
         showUploadList,
@@ -29,14 +31,18 @@ export function FileUploaderButton<M extends boolean = false>({
         fileMeta,
         onChange,
         multiple,
+        onError: messageApi.error,
         accept,
     });
 
     return (
-        <Upload {...props}>
-            <Button icon={<InboxOutlined />} loading={uploading}>
-                {uploadText}
-            </Button>
-        </Upload>
+        <>
+            {contextHolder}
+            <Upload {...props}>
+                <Button icon={<InboxOutlined />} loading={uploading}>
+                    {uploadText}
+                </Button>
+            </Upload>
+        </>
     );
 }

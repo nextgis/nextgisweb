@@ -4,27 +4,30 @@ import type { Modal } from "@nextgisweb/gui/antd";
 import type { ParamsOf } from "@nextgisweb/gui/type";
 import { layoutStore } from "@nextgisweb/pyramid/layout";
 
+import type { ModalStore } from "./ModalStore";
+
 type ModalParams = ParamsOf<typeof Modal>;
 
 export interface ShowModalOptions extends ModalParams {
     open?: boolean;
-
     close?: () => void;
+    modalStore?: ModalStore;
 }
 
 export function showModalBase<T extends ShowModalOptions>(
     renderContent: (props: T) => ReactElement,
-    config: T
+    { modalStore, ...config }: T = {} as T
 ) {
     const id = `modal-${Math.random().toString(36).slice(2)}`;
 
+    const store = modalStore || layoutStore.modalStore;
     let currentConfig = {
         ...config,
-        open: config.open ?? true,
+        open: config?.open ?? true,
     } as T;
 
     const destroy = () => {
-        layoutStore.removeModalItem(id);
+        store.remove(id);
     };
 
     const update = (configUpdate: T | ((prev: T) => T)) => {
@@ -33,7 +36,7 @@ export function showModalBase<T extends ShowModalOptions>(
                 ? (configUpdate as (prev: T) => T)(currentConfig)
                 : { ...currentConfig, ...configUpdate };
 
-        layoutStore.updateModalItem(
+        store.update(
             id,
             // eslint-disable-next-line @typescript-eslint/no-use-before-define
             render()
@@ -68,7 +71,7 @@ export function showModalBase<T extends ShowModalOptions>(
         return renderContent(propsForRender);
     };
 
-    layoutStore.addModalItem({ id, element: render() });
+    store.add({ id, element: render() });
 
     return {
         destroy,

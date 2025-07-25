@@ -1,8 +1,8 @@
 import { Suspense, lazy } from "react";
 import type { ComponentType } from "react";
 
-import { showModalBase } from "./showModalBase";
-import type { ShowModalOptions } from "./showModalBase";
+import { showModalBase } from "./show-modal/showModalBase";
+import type { ShowModalOptions } from "./show-modal/showModalBase";
 
 export { ShowModalOptions };
 

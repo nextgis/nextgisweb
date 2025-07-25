@@ -1,4 +1,5 @@
 import type { CardProps, TableRowSelection } from "@nextgisweb/gui/antd";
+import type { ModalStore } from "@nextgisweb/gui/show-modal/ModalStore";
 import type {
     CompositeRead,
     ResourceCls,
@@ -78,8 +79,7 @@ export interface UsePickerModalProps {
 export interface ResourcePickerModalProps<V extends SelectValue = SelectValue>
     extends UsePickerModalProps {
     open?: boolean;
-    /**@deprecated use open instead */
-    visible?: boolean;
+    modalStore?: ModalStore;
     store?: ResourcePickerStore;
     onSelect?: (val: V) => void;
     onPick?: (val: CompositeRead | CompositeRead[]) => void;

@@ -28,6 +28,7 @@ export interface UseFileUploaderProps<
 > {
     /** File types that can be accepted. See input accept {@link https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#accept Attribute}  */
     accept?: string;
+    onError?: (err: string) => void;
     fileMeta?: F;
     multiple?: M;
     onChange?: (meta?: F) => void;
