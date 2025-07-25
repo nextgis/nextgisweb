@@ -20,6 +20,7 @@ export interface MapComponentProps extends ViewOptions {
     whenCreated?: (mapStore: MapStore | null) => void;
     mapExtent?: MapExtent;
     resetView?: boolean;
+    showZoomLevel?: boolean;
 }
 
 export function MapComponent({
