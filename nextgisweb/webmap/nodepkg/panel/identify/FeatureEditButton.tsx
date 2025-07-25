@@ -1,8 +1,7 @@
 import { useMemo } from "react";
 
-import { FeatureEditorModal } from "@nextgisweb/feature-layer/feature-editor-modal";
+import { useShowModal } from "@nextgisweb/gui";
 import { Button } from "@nextgisweb/gui/antd";
-import showModal from "@nextgisweb/gui/showModal";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import topic from "@nextgisweb/webmap/compat/topic";
 import type { Display } from "@nextgisweb/webmap/display";
@@ -47,34 +46,42 @@ export const FeatureEditButton = ({
         () => editLayerEnabled(display, resourceId),
         [display, resourceId]
     );
+    const { lazyModal, modalHolder, isLoading } = useShowModal();
 
     if (!editEnabled) {
         return null;
     }
 
     const edit = () => {
-        showModal(FeatureEditorModal, {
-            editorOptions: {
-                featureId,
-                resourceId,
-                onSave: () => {
-                    onUpdate();
-                    topic.publish("feature.updated", {
-                        resourceId,
-                        featureId,
-                    });
+        lazyModal(
+            () => import("@nextgisweb/feature-layer/feature-editor-modal"),
+            {
+                editorOptions: {
+                    featureId,
+                    resourceId,
+                    onSave: () => {
+                        onUpdate();
+                        topic.publish("feature.updated", {
+                            resourceId,
+                            featureId,
+                        });
+                    },
                 },
-            },
-        });
+            }
+        );
     };
 
     return (
-        <Button
-            type="text"
-            size="small"
-            icon={<EditIcon />}
-            title={gettext("Edit feature")}
-            onClick={edit}
-        />
+        <>
+            {modalHolder}
+            <Button
+                type="text"
+                size="small"
+                loading={isLoading}
+                icon={<EditIcon />}
+                title={gettext("Edit feature")}
+                onClick={edit}
+            />
+        </>
     );
 };

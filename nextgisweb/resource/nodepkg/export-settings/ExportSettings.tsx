@@ -1,18 +1,24 @@
 import { useEffect, useState } from "react";
 
-import { Col, Radio, Row, Space, Typography } from "@nextgisweb/gui/antd";
+import {
+    Col,
+    Radio,
+    Row,
+    Space,
+    Typography,
+    message,
+} from "@nextgisweb/gui/antd";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
 import { route } from "@nextgisweb/pyramid/api";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { useLayoutContext } from "@nextgisweb/pyramid/layout";
 import type { ResourceExport } from "@nextgisweb/resource/type/api";
 
 export function ExportSettings() {
     const [saving, setSaving] = useState(false);
 
-    const { message } = useLayoutContext();
+    const [messageApi, contextHolder] = message.useMessage();
 
     const { data, isLoading } = useRouteGet({
         name: "pyramid.csettings",
@@ -28,7 +34,7 @@ export function ExportSettings() {
             await route("pyramid.csettings").put({
                 json: { resource: { resource_export: value } },
             });
-            message?.success(gettext("The setting is saved."));
+            messageApi.success(gettext("The setting is saved."));
         } catch (err) {
             errorModal(err);
         } finally {
@@ -48,6 +54,7 @@ export function ExportSettings() {
 
     return (
         <Space direction="vertical">
+            {contextHolder}
             <Typography.Text>
                 {gettext(
                     'Select the category of users who can use the "Save as" link to download resource data.'

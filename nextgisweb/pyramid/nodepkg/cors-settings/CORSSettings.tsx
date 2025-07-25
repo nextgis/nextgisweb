@@ -1,13 +1,18 @@
 import { useMemo, useState } from "react";
 
-import { Col, Form, Input, Row, Typography } from "@nextgisweb/gui/antd";
+import {
+    Col,
+    Form,
+    Input,
+    Row,
+    Typography,
+    message,
+} from "@nextgisweb/gui/antd";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
 import { route } from "@nextgisweb/pyramid/api";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-
-import { useLayoutContext } from "../layout";
 
 interface CORSSettingsForm {
     cors: string;
@@ -26,7 +31,7 @@ export function CORSSettings(props: { readonly: boolean }) {
     const [form] = Form.useForm<CORSSettingsForm>();
     const [status, setStatus] = useState<string>();
 
-    const { message } = useLayoutContext();
+    const [messageApi, contextHolder] = message.useMessage();
 
     const corsRoute = useRouteGet({
         name: "pyramid.csettings",
@@ -51,12 +56,12 @@ export function CORSSettings(props: { readonly: boolean }) {
                 await route("pyramid.csettings").put({
                     json: { pyramid: { allow_origin: list || null } },
                 });
-                message?.success(gettext("CORS settings updated"));
+                messageApi.success(gettext("CORS settings updated"));
             } catch (err) {
                 errorModal(err);
             }
         } catch {
-            message?.error(gettext("Fix the form errors first"));
+            messageApi.error(gettext("Fix the form errors first"));
         } finally {
             setStatus(undefined);
         }
@@ -86,6 +91,7 @@ export function CORSSettings(props: { readonly: boolean }) {
 
     return (
         <>
+            {contextHolder}
             <Row gutter={[16, 16]}>
                 <Col flex="auto">
                     <Form

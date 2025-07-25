@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 
-import { Button, Input } from "@nextgisweb/gui/antd";
+import { Button, Input, message } from "@nextgisweb/gui/antd";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
 import { LanguageSelect } from "@nextgisweb/gui/component/language-select";
 import { errorModal } from "@nextgisweb/gui/error";
@@ -12,7 +12,6 @@ import type {
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { useRouteGet } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { useLayoutContext } from "@nextgisweb/pyramid/layout";
 
 import oauth from "../oauth";
 
@@ -45,7 +44,7 @@ export function SettingsForm() {
     const [isSaving, setSaving] = useState(false);
     const { data: profile, isLoading } = useRouteGet("auth.profile");
 
-    const { message } = useLayoutContext();
+    const [messageApi, contextHolder] = message.useMessage();
 
     const fields = useMemo<FormField[]>(() => {
         const result = [];
@@ -76,7 +75,7 @@ export function SettingsForm() {
         setSaving(true);
         try {
             await route("auth.profile").put({ json });
-            message?.success(gettext("Saved"));
+            messageApi.success(gettext("Saved"));
         } catch (err) {
             errorModal(err);
         } finally {
@@ -89,6 +88,7 @@ export function SettingsForm() {
     };
     return (
         <LoadingWrapper loading={isLoading} rows={fields.length} title={false}>
+            {contextHolder}
             <FieldsForm
                 fields={fields}
                 onChange={onChange}

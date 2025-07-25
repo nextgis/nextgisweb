@@ -30,7 +30,7 @@ const columns: EdiTableColumn<EdiTableKeyValueRow<string>>[] = [
     },
 ];
 
-export function VendorParamsModal({
+function VendorParamsModal({
     value,
     onChange,
     open: open_,
@@ -73,3 +73,5 @@ export function VendorParamsModal({
         </Modal>
     );
 }
+
+export default VendorParamsModal;

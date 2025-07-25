@@ -1,11 +1,11 @@
 import { observer } from "mobx-react-lite";
 import { useEffect, useState } from "react";
 
+import { useShowModal } from "@nextgisweb/gui";
 import { Button, Select } from "@nextgisweb/gui/antd";
 import type { OptionType } from "@nextgisweb/gui/antd";
 import { LotMV } from "@nextgisweb/gui/arm";
 import { Area, Lot } from "@nextgisweb/gui/mayout";
-import showModal from "@nextgisweb/gui/showModal";
 import { route } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -14,7 +14,6 @@ import type { EditorWidget } from "@nextgisweb/resource/type";
 import type { WMSConnectionLayer } from "@nextgisweb/wmsclient/type/api";
 
 import type { WmsClientLayerStore } from "./WmsClientLayerStore";
-import { VendorParamsModal } from "./component/VendorParamsModal";
 
 function LayersSelect({
     value,
@@ -38,7 +37,7 @@ export const WmsClientLayerWidget: EditorWidget<WmsClientLayerStore> = observer(
     ({ store }) => {
         const [layers, setLayers] = useState<OptionType[]>();
         const [formats, setFormats] = useState<OptionType[]>();
-
+        const { lazyModal, modalHolder } = useShowModal();
         const { makeSignal } = useAbortController();
 
         const mapLayers = (value: WMSConnectionLayer[]) => {
@@ -80,6 +79,7 @@ export const WmsClientLayerWidget: EditorWidget<WmsClientLayerStore> = observer(
 
         return (
             <Area pad cols={["1fr", "1fr"]}>
+                {modalHolder}
                 <LotMV
                     row
                     label={gettext("WMS Connection")}
@@ -118,13 +118,19 @@ export const WmsClientLayerWidget: EditorWidget<WmsClientLayerStore> = observer(
                 <Lot row label={gettext("Vendor parameters")}>
                     <Button
                         onClick={() => {
-                            showModal(VendorParamsModal, {
-                                value: store.vendor_params.value || undefined,
-                                destroyOnHidden: true,
-                                onChange: (value?: Record<string, string>) => {
-                                    store.vendor_params.value = value;
-                                },
-                            });
+                            lazyModal(
+                                () => import("./component/VendorParamsModal"),
+                                {
+                                    value:
+                                        store.vendor_params.value || undefined,
+                                    destroyOnHidden: true,
+                                    onChange: (
+                                        value?: Record<string, string>
+                                    ) => {
+                                        store.vendor_params.value = value;
+                                    },
+                                }
+                            );
                         }}
                         style={{ width: "100%" }}
                     >

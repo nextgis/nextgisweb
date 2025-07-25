@@ -1,22 +1,19 @@
 import { observer } from "mobx-react-lite";
 import { useCallback, useMemo } from "react";
 
+import { useShowModal } from "@nextgisweb/gui";
 import { ActionToolbar } from "@nextgisweb/gui/action-toolbar";
 import type {
     ActionToolbarAction,
     CreateButtonActionProps,
 } from "@nextgisweb/gui/action-toolbar";
 import { Button, Input, Space, Tooltip } from "@nextgisweb/gui/antd";
+import { useConfirm } from "@nextgisweb/gui/hook/useConfirm";
 import { DeleteIcon, EditIcon, OpenInNewIcon } from "@nextgisweb/gui/icon";
-import showModal from "@nextgisweb/gui/showModal";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { confirmDelete } from "@nextgisweb/pyramid/layout";
 import type Routes from "@nextgisweb/pyramid/type/route";
 import { useResource } from "@nextgisweb/resource/hook/useResource";
-
-import { FeatureDisplayModal } from "../feature-display-modal";
-import { FeatureEditorModal } from "../feature-editor-modal";
 
 import type { FeatureGridStore } from "./FeatureGridStore";
 import { deleteFeatures } from "./api/deleteFeatures";
@@ -55,6 +52,9 @@ export const FeatureGridActions = observer(
         } = store;
 
         const { isExportAllowed } = useResource({ id });
+
+        const { confirmDelete, contextHolder } = useConfirm();
+        const { lazyModal, modalHolder } = useShowModal();
 
         const goTo = useCallback(
             (
@@ -101,13 +101,13 @@ export const FeatureGridActions = observer(
                 if (onOpen) {
                     onOpen({ featureId, resourceId: id });
                 } else {
-                    showModal(FeatureDisplayModal, {
+                    lazyModal(() => import("../feature-display-modal"), {
                         featureId,
                         resourceId: id,
                     });
                 }
             }
-        }, [selectedIds, onOpen, id]);
+        }, [selectedIds, onOpen, id, lazyModal]);
 
         const defActions: ActionToolbarAction<ActionProps>[] = [
             (props: CreateButtonActionProps) => (
@@ -151,18 +151,24 @@ export const FeatureGridActions = observer(
                                     onClick={() => {
                                         if (selectedIds.length) {
                                             const featureId = selectedIds[0];
-                                            showModal(FeatureEditorModal, {
-                                                editorOptions: {
-                                                    featureId,
-                                                    resourceId: id,
-                                                    onSave: (e) => {
-                                                        if (onSave) {
-                                                            onSave(e);
-                                                        }
-                                                        store.bumpVersion();
+                                            lazyModal(
+                                                () =>
+                                                    import(
+                                                        "../feature-editor-modal"
+                                                    ),
+                                                {
+                                                    editorOptions: {
+                                                        featureId,
+                                                        resourceId: id,
+                                                        onSave: (e) => {
+                                                            if (onSave) {
+                                                                onSave(e);
+                                                            }
+                                                            store.bumpVersion();
+                                                        },
                                                     },
-                                                },
-                                            });
+                                                }
+                                            );
                                         }
                                     }}
                                 >
@@ -224,6 +230,8 @@ export const FeatureGridActions = observer(
                 rightActions={rightActions}
                 actionProps={actionProps}
             >
+                {contextHolder}
+                {modalHolder}
                 <div>
                     <Input
                         value={queryParams?.ilike}
