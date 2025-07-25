@@ -12,7 +12,7 @@ System requirements
 - Modern Linux distribution like Ubuntu Linux 22.04:
 
   - We expect that NextGIS Web can be installed on most modern Linux
-    distributions. But we run it under LTS-version Ubuntu Linux, and this
+    distributions. But we run it under LTS-version of Ubuntu Linux, and this
     instruction was tested on Ubuntu Linux 22.04.
   
   - We don't provide community support for running NextGIS Web on other
