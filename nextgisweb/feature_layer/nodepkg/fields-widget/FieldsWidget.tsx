@@ -1,10 +1,12 @@
 import { observer } from "mobx-react-lite";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 
-import { CheckboxValue, InputValue } from "@nextgisweb/gui/antd";
+import { CheckboxValue, InputValue, Modal } from "@nextgisweb/gui/antd";
 import { LotMV } from "@nextgisweb/gui/arm";
 import { FocusTable, Toggle, action } from "@nextgisweb/gui/focus-table";
+import type { FocusTableAction } from "@nextgisweb/gui/focus-table";
 import { Area } from "@nextgisweb/gui/mayout";
+import { LunkwillParam } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { ResourceSelectRef } from "@nextgisweb/resource/component";
 import type { EditorWidget } from "@nextgisweb/resource/type";
@@ -90,7 +92,15 @@ const FieldWidget = observer<{
     );
 });
 
+// prettier-ignore
+const [msgDeleteFieldTitle, msgDeleteFieldContent] = [
+    gettext("Delete field?"),
+    gettext("Deleting this field will permanently erase all its version history from this layer."),
+];
+
 export const FieldsWidget: EditorWidget<FieldsStore> = observer(({ store }) => {
+    const [modal, contextHolder] = Modal.useModal();
+
     const createField = useCallback(() => {
         let seqnum = 0;
         let suffix = "";
@@ -123,42 +133,79 @@ export const FieldsWidget: EditorWidget<FieldsStore> = observer(({ store }) => {
     // TODO: Use interfaces and capabilities to get available actions
     const isVectorLayer = store.composite.cls === "vector_layer";
 
+    const itemActions = useMemo<FocusTableAction<Field>[]>(() => {
+        if (isVectorLayer) {
+            const deleteAction = action.deleteItem<Field>();
+
+            const originalCb = deleteAction.callback;
+            deleteAction.callback = async (item, env) => {
+                const lunkwill = new LunkwillParam();
+                const dump = await store.composite.dump(lunkwill);
+                const layerNotNew = item.id.value !== undefined;
+                const versioningInitially =
+                    store.composite.initialValue?.feature_layer?.versioning
+                        ?.enabled;
+                const versioningNow =
+                    dump?.feature_layer?.versioning?.enabled ??
+                    versioningInitially;
+
+                if (layerNotNew && versioningNow) {
+                    modal.confirm({
+                        title: msgDeleteFieldTitle,
+                        content: msgDeleteFieldContent,
+                        onOk: () => originalCb(item, env),
+                    });
+                } else {
+                    originalCb(item, env);
+                }
+            };
+
+            return [deleteAction];
+        }
+        return [];
+    }, [isVectorLayer, store.composite, modal]);
+
     return (
-        <FocusTable<Field>
-            store={store}
-            title={(item) => item.displayName.value}
-            columns={[
-                {
-                    render: (item) => item.keyname.value,
-                    width: ["20%", "30%"],
-                },
-                { render: (item) => item.datatype.value },
-                {
-                    render: (item) => (
-                        <>
-                            <Toggle
-                                {...item.gridVisibility.cprops()}
-                                icon={<GridVisibilityIcon />}
-                                title={msgGridVisibility}
-                            />
-                            <Toggle
-                                {...item.textSearch.cprops()}
-                                icon={<TextSearchIcon />}
-                                title={msgTextSearch}
-                            />
-                            <Toggle
-                                {...item.labelField.cprops()}
-                                icon={<LabelFieldIcon />}
-                                title={msgLabelField}
-                            />
-                        </>
-                    ),
-                },
-            ]}
-            tableActions={isVectorLayer ? [action.addItem(createField)] : []}
-            itemActions={isVectorLayer ? [action.deleteItem()] : []}
-            renderDetail={({ item }) => <FieldWidget item={item} />}
-        />
+        <>
+            {contextHolder}
+            <FocusTable<Field>
+                store={store}
+                title={(item) => item.displayName.value}
+                columns={[
+                    {
+                        render: (item) => item.keyname.value,
+                        width: ["20%", "30%"],
+                    },
+                    { render: (item) => item.datatype.value },
+                    {
+                        render: (item) => (
+                            <>
+                                <Toggle
+                                    {...item.gridVisibility.cprops()}
+                                    icon={<GridVisibilityIcon />}
+                                    title={msgGridVisibility}
+                                />
+                                <Toggle
+                                    {...item.textSearch.cprops()}
+                                    icon={<TextSearchIcon />}
+                                    title={msgTextSearch}
+                                />
+                                <Toggle
+                                    {...item.labelField.cprops()}
+                                    icon={<LabelFieldIcon />}
+                                    title={msgLabelField}
+                                />
+                            </>
+                        ),
+                    },
+                ]}
+                tableActions={
+                    isVectorLayer ? [action.addItem(createField)] : []
+                }
+                itemActions={itemActions}
+                renderDetail={({ item }) => <FieldWidget item={item} />}
+            />
+        </>
     );
 });
 
