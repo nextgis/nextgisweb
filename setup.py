@@ -21,7 +21,7 @@ requires = [
     "geoalchemy2==0.17.1",
     "httpx[http2]==0.28.1",
     "humanize==4.12.3",
-    "lxml==6.0.0",
+    "lxml>5.0,<6.1",
     "nh3==0.2.22",
     "msgspec==0.19.0",
     "numpy<2",
