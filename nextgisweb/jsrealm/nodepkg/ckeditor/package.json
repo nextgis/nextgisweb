@@ -3,36 +3,6 @@
     "version": "0.0.0",
     "type": "module",
     "dependencies": {
-        "@ckeditor/ckeditor5-adapter-ckfinder": "42.0.0",
-        "@ckeditor/ckeditor5-autoformat": "42.0.0",
-        "@ckeditor/ckeditor5-basic-styles": "42.0.0",
-        "@ckeditor/ckeditor5-block-quote": "42.0.0",
-        "@ckeditor/ckeditor5-ckbox": "42.0.0",
-        "@ckeditor/ckeditor5-ckfinder": "42.0.0",
-        "@ckeditor/ckeditor5-dev-translations": "40.2.3",
-        "@ckeditor/ckeditor5-dev-utils": "40.2.3",
-        "@ckeditor/ckeditor5-easy-image": "42.0.0",
-        "@ckeditor/ckeditor5-editor-classic": "42.0.0",
-        "@ckeditor/ckeditor5-essentials": "42.0.0",
-        "@ckeditor/ckeditor5-heading": "42.0.0",
-        "@ckeditor/ckeditor5-image": "42.0.0",
-        "@ckeditor/ckeditor5-indent": "42.0.0",
-        "@ckeditor/ckeditor5-link": "42.0.0",
-        "@ckeditor/ckeditor5-list": "42.0.0",
-        "@ckeditor/ckeditor5-paragraph": "42.0.0",
-        "@ckeditor/ckeditor5-paste-from-office": "42.0.0",
-        "@ckeditor/ckeditor5-source-editing": "42.0.0",
-        "@ckeditor/ckeditor5-table": "42.0.0",
-        "@ckeditor/ckeditor5-theme-lark": "42.0.0",
-        "@ckeditor/ckeditor5-typing": "42.0.0",
-        "@ckeditor/ckeditor5-upload": "42.0.0",
-        "postcss-loader": "^4.3.0",
-        "raw-loader": "^4.0.2",
-        "terser-webpack-plugin": "^4.2.3"
-    },
-    "nextgisweb": {
-        "webpackConfigs": {
-            "ckeditor": "webpack.cjs"
-        }
+        "ckeditor5": "42.0.2"
     }
 }
