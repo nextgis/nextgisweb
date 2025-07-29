@@ -63,9 +63,10 @@ export const LayerWidget: EditorWidget<LayerStore> = observer(({ store }) => {
             }}
         >
             <div style={{ flex: "none" }}>
-                <Area pad style={{ height: "100%" }}>
+                <Area pad style={{ height: "100%" }} cols={["1fr", "1fr"]}>
                     <Lot
                         label={msgPickQms}
+                        row
                         help={() => (
                             <>
                                 {msgPickQmsHelpMainPart}
@@ -94,6 +95,7 @@ export const LayerWidget: EditorWidget<LayerStore> = observer(({ store }) => {
 
                     <LotMV
                         help={disabled ? msgDisabled : undefined}
+                        row
                         value={store.url}
                         component={InputValue}
                         label={gettext("URL")}
@@ -102,6 +104,7 @@ export const LayerWidget: EditorWidget<LayerStore> = observer(({ store }) => {
 
                     <LotMV
                         help={disabled ? msgDisabled : undefined}
+                        row
                         label={gettext("Copyright text")}
                         value={store.copyrightText}
                         component={InputValue}
@@ -109,15 +112,16 @@ export const LayerWidget: EditorWidget<LayerStore> = observer(({ store }) => {
                     />
                     <LotMV
                         help={disabled ? msgDisabled : undefined}
+                        row
                         label={gettext("Copyright URL")}
                         value={store.copyrightUrl}
                         component={InputValue}
                         props={{ disabled }}
                     />
                     <LotMV
-                        help={disabled ? msgDisabled : msgMaxZoomHelp}
-                        label={gettext("Max zoom level")}
-                        value={store.maxzoom}
+                        help={disabled ? msgDisabled : msgMinZoomHelp}
+                        label={gettext("Min zoom level")}
+                        value={store.minzoom}
                         component={InputInteger}
                         props={{
                             disabled,
@@ -127,9 +131,9 @@ export const LayerWidget: EditorWidget<LayerStore> = observer(({ store }) => {
                         }}
                     />
                     <LotMV
-                        help={disabled ? msgDisabled : msgMinZoomHelp}
-                        label={gettext("Min zoom level")}
-                        value={store.minzoom}
+                        help={disabled ? msgDisabled : msgMaxZoomHelp}
+                        label={gettext("Max zoom level")}
+                        value={store.maxzoom}
                         component={InputInteger}
                         props={{
                             disabled,
