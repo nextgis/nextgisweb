@@ -23,21 +23,22 @@ export interface MapComponentProps extends ViewOptions {
 }
 
 export function MapComponent({
-    children,
-    style,
-    basemap,
-    zoom = 0,
-    center = [0, 0],
-    mapExtent,
     whenCreated,
-    ...props
+    zoom = 0,
+    style,
+    center = [0, 0],
+    basemap,
+    maxZoom,
+    children,
+    mapExtent,
 }: MapComponentProps) {
     const mapRef = useRef<MapStore | null>(null);
     const { createMapAdapter } = useMapAdapter({
-        center,
-        zoom,
         mapExtent,
         basemap,
+        maxZoom,
+        center,
+        zoom,
     });
 
     const mapContainerRef = useRef<HTMLDivElement>(null);
@@ -67,7 +68,7 @@ export function MapComponent({
 
     return (
         <MapContext value={{ mapStore: mapRef.current }}>
-            <div ref={mapContainerRef} style={style} className="map" {...props}>
+            <div ref={mapContainerRef} style={style} className="map">
                 {children}
             </div>
         </MapContext>
