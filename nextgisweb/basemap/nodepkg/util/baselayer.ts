@@ -92,6 +92,16 @@ export function prepareBaselayerConfig(
         source.maxZoom = DEFAULT_MAX_ZOOM;
     }
 
+    if (source.minZoom !== undefined) {
+        // Put minZoom in layer options (not source options, as with maxZoom) to avoid triggering
+        // an avalanche of high‑zoom tiles when zoomed out. Below this zoom, the layer is simply
+        // hidden instead of trying to fetch zoom‑18 tiles at zoom‑0, for example.
+        // Although this differs from maxZoom’s upscaling behavior, but it makes the map more stable
+        // and since minZoom is realy rarely used, it shouldn't cause any problems.
+        layer.minZoom = source.minZoom;
+        delete source.minZoom;
+    }
+
     layer.opacity = config.opacity ? config.opacity : undefined;
     layer.visible = config.enabled;
 

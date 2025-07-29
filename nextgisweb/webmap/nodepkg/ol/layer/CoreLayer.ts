@@ -13,6 +13,7 @@ export interface LayerOptions {
     opacity?: number;
     maxResolution?: number;
     minResolution?: number;
+    minZoom?: number;
     style?: Style;
 }
 
