@@ -1,7 +1,9 @@
+import type { Options as XYZSourceOptions } from "ol/source/XYZ";
 import { useEffect, useRef, useState } from "react";
 
 import { createTileLayer } from "@nextgisweb/basemap/util/baselayer";
 import { isValidURL } from "@nextgisweb/gui/arm/validate";
+import { useObjectState } from "@nextgisweb/gui/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { tileLoadFunction } from "@nextgisweb/pyramid/util";
 import type QuadKey from "@nextgisweb/webmap/ol/layer/QuadKey";
@@ -38,12 +40,16 @@ export function UrlLayer({
     url,
     opacity,
     attributions,
+    sourceOptions,
 }: {
     url: string;
     opacity?: number;
     attributions?: string | null;
+    sourceOptions?: Pick<XYZSourceOptions, "minZoom" | "maxZoom">;
 }) {
     const { mapStore } = useMapContext();
+
+    const [source] = useObjectState(sourceOptions);
 
     const [layer, setLayer] = useState<QuadKey | XYZ | undefined>(undefined);
     const layerRef = useRef<QuadKey | XYZ | undefined>(undefined);
@@ -75,6 +81,7 @@ export function UrlLayer({
                                 img.src = emptyTile;
                             });
                     },
+                    ...source,
                 },
             }).then((tileLayer) => {
                 if (!abortController.signal.aborted && tileLayer) {
@@ -92,7 +99,7 @@ export function UrlLayer({
                 layerRef.current.dispose();
             }
         };
-    }, [mapStore, attributions, url]);
+    }, [mapStore, attributions, source, url]);
 
     useEffect(() => {
         if (layer && opacity !== undefined) {
