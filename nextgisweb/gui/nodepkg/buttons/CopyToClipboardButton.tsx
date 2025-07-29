@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import type { MouseEventHandler } from "react";
 
 import { Button, message } from "@nextgisweb/gui/antd";
@@ -46,10 +47,26 @@ export function CopyToClipboardButton({
     ...restParams
 }: CopyToClipboardButtonProps) {
     const [messageApi, contextHolder] = message.useMessage();
+    const isMounted = useRef(true);
+
+    useEffect(() => {
+        isMounted.current = true;
+        return () => {
+            isMounted.current = false;
+        };
+    }, []);
 
     const copyToClipboard = async () => {
-        await navigator.clipboard.writeText(getTextToCopy());
-        messageApi.info(messageInfo || gettext("Copied to clipboard"));
+        await _copyToClipboard(getTextToCopy(), {
+            onSuccess: () => {
+                if (!isMounted.current) return;
+                messageApi.info(messageInfo || gettext("Copied to clipboard"));
+            },
+            onError: () => {
+                if (!isMounted.current) return;
+                messageApi.error(gettext("Failed to copy to clipboard"));
+            },
+        });
     };
 
     let buttonContent: React.ReactNode | null = null;
@@ -69,13 +86,7 @@ export function CopyToClipboardButton({
     return (
         <>
             {contextHolder}
-            <Button
-                icon={<ContentCopyIcon />}
-                onClick={() => {
-                    copyToClipboard();
-                }}
-                {...restParams}
-            >
+            <Button icon={<ContentCopyIcon />} {...eventProps} {...restParams}>
                 {buttonContent}
             </Button>
         </>

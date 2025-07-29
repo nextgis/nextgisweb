@@ -36,15 +36,15 @@ msgstr "Значение не уникально"
 msgid "Invalid URL"
 msgstr "Некорректный URL"
 
-#: nodepkg/buttons/CopyToClipboardButton.tsx:44
+#: nodepkg/buttons/CopyToClipboardButton.tsx:63
 msgid "Copied to clipboard"
 msgstr "Скопировано в буфер обмена"
 
-#: nodepkg/buttons/CopyToClipboardButton.tsx:49
-msgid "Failed to copy to clipboard. Please try again."
-msgstr "Ошибка копирования в буфер обмена. Пожалуйста, попробуйте еще раз."
+#: nodepkg/buttons/CopyToClipboardButton.tsx:67
+msgid "Failed to copy to clipboard"
+msgstr "Ошибка копирования в буфер обмена"
 
-#: nodepkg/buttons/CopyToClipboardButton.tsx:57
+#: nodepkg/buttons/CopyToClipboardButton.tsx:74
 msgid "Copy to clipboard"
 msgstr "Копировать в буфер обмена"
 
@@ -52,7 +52,7 @@ msgstr "Копировать в буфер обмена"
 msgid "Not set"
 msgstr "Не установлен"
 
-#: nodepkg/component/SaveButton.tsx:19 nodepkg/model-form/ModelForm.tsx:47
+#: nodepkg/component/SaveButton.tsx:19 nodepkg/model-form/ModelForm.tsx:46
 msgid "Save"
 msgstr "Сохранить"
 
@@ -121,12 +121,12 @@ msgid "Clone"
 msgstr "Клонировать"
 
 #: nodepkg/edi-table/RowAction.tsx:79 nodepkg/focus-table/action.tsx:27
-#: nodepkg/model-browse/ModelBrowse.tsx:256
-#: nodepkg/model-browse/ModelBrowse.tsx:323 nodepkg/model-form/ModelForm.tsx:48
+#: nodepkg/hook/useConfirm.tsx:52 nodepkg/model-browse/ModelBrowse.tsx:258
+#: nodepkg/model-browse/ModelBrowse.tsx:325 nodepkg/model-form/ModelForm.tsx:47
 msgid "Delete"
 msgstr "Удалить"
 
-#: nodepkg/error/ErrorModal.tsx:48 nodepkg/error/extractError.ts:5
+#: nodepkg/error/ErrorModal.tsx:49 nodepkg/error/extractError.ts:5
 msgid "Error"
 msgstr "Ошибка"
 
@@ -142,7 +142,7 @@ msgstr "Техническая информация"
 msgid "Contact support"
 msgstr "Написать в поддержку"
 
-#: nodepkg/error/shared.tsx:81
+#: nodepkg/error/shared.tsx:81 nodepkg/hook/useConfirm.tsx:23
 msgid "OK"
 msgstr "OK"
 
@@ -166,51 +166,67 @@ msgstr "Скрыть детали"
 msgid "Add"
 msgstr "Добавить"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:114 nodepkg/model-form/ModelForm.tsx:70
+#: nodepkg/hook/useConfirm.tsx:20
+msgid "Confirmation required"
+msgstr "Требуется подтверждение"
+
+#: nodepkg/hook/useConfirm.tsx:21
+msgid "Please confirm this action."
+msgstr "Пожалуйста, подтвердите это действие."
+
+#: nodepkg/hook/useConfirm.tsx:51
+msgid "Please confirm the deletion."
+msgstr "Пожалуйста, подтвердите удаление."
+
+#: nodepkg/hook/useConfirm.tsx:53
+msgid "Failed to delete."
+msgstr "Не удалось удалить."
+
+#: nodepkg/model-browse/ModelBrowse.tsx:116 nodepkg/model-form/ModelForm.tsx:69
 msgid "Confirmation"
 msgstr "Подтверждение"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:115
+#: nodepkg/model-browse/ModelBrowse.tsx:117
 msgid "Item deleted"
 msgstr "Элемент удален"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:117
+#: nodepkg/model-browse/ModelBrowse.tsx:119
 msgid "Items deleted"
 msgstr "Элементы удалены"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:185
+#: nodepkg/model-browse/ModelBrowse.tsx:187
 msgid "The errors occurred during execution"
 msgstr "Во время выполнения возникли ошибки"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:189
+#: nodepkg/model-browse/ModelBrowse.tsx:191
 msgid "Failed to delete items:"
 msgstr "Не удалось удалить элементы:"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:212
+#: nodepkg/model-browse/ModelBrowse.tsx:214
 msgid "Do you want to delete these items?"
 msgstr "Вы хотите удалить эти элементы?"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:246
+#: nodepkg/model-browse/ModelBrowse.tsx:248
 msgid "Edit"
 msgstr "Изменить"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:246
+#: nodepkg/model-browse/ModelBrowse.tsx:248
 msgid "View"
 msgstr "Просмотр"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:279
+#: nodepkg/model-browse/ModelBrowse.tsx:281
 msgid "Search"
 msgstr "Поиск"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:301 nodepkg/model-form/ModelForm.tsx:46
+#: nodepkg/model-browse/ModelBrowse.tsx:303 nodepkg/model-form/ModelForm.tsx:45
 msgid "Create"
 msgstr "Создать"
 
-#: nodepkg/model-form/ModelForm.tsx:107
+#: nodepkg/model-form/ModelForm.tsx:106
 msgid "Fix the form errors first"
 msgstr "Необходимо исправить ошибки в форме"
 
-#: nodepkg/model-logo-form/ModelLogoForm.tsx:28
+#: nodepkg/model-logo-form/ModelLogoForm.tsx:27
 msgid "Logo saved. Reload the page to get them applied."
 msgstr "Логотип сохранен. Для просмотра изменений обновите страницу."
 
@@ -222,10 +238,10 @@ msgstr "Выполняется операция"
 msgid "Cancel"
 msgstr "Отмена"
 
-#: nodepkg/single-setting-form/SingleSettingForm.tsx:25
+#: nodepkg/single-setting-form/SingleSettingForm.tsx:24
 msgid "The setting is saved."
 msgstr "Настройка сохранена."
 
-#: nodepkg/single-setting-form/SingleSettingForm.tsx:26
+#: nodepkg/single-setting-form/SingleSettingForm.tsx:25
 msgid "Reload the page to get them applied."
 msgstr "Обновите страницу, чтобы настройки вступили в силу."
