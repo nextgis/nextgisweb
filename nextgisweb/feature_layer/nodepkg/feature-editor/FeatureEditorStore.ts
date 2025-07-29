@@ -25,6 +25,7 @@ export class FeatureEditorStore {
 
     @observable.ref accessor saving = false;
     @observable.ref accessor initLoading = false;
+    @observable.ref accessor skipDirtyCheck = false;
 
     @observable.shallow accessor fields: FeatureLayerFieldRead[] = [];
     @observable.shallow accessor vectorLayer: VectorLayerRead | null = null;
@@ -39,7 +40,14 @@ export class FeatureEditorStore {
         null;
     @observable.shallow private accessor _extensionStores: ExtensionStores = {};
 
-    constructor({ resourceId, featureId }: FeatureEditorStoreOptions) {
+    constructor({
+        resourceId,
+        featureId,
+        skipDirtyCheck,
+    }: FeatureEditorStoreOptions) {
+        if (skipDirtyCheck !== undefined) {
+            this.skipDirtyCheck = skipDirtyCheck;
+        }
         this.resourceId = resourceId;
         this.featureId = featureId;
 
@@ -51,15 +59,15 @@ export class FeatureEditorStore {
 
     @computed
     get dirty(): boolean {
-        if (this.featureId !== null) {
-            const stores: { dirty: boolean }[] = [];
-            if (this._attributeStore) stores.push(this._attributeStore);
-            if (this._geometryStore) stores.push(this._geometryStore);
-            stores.push(...Object.values(this._extensionStores));
-
-            return stores.some(({ dirty }) => dirty);
+        if (this.skipDirtyCheck) {
+            return true;
         }
-        return true;
+        const stores: { dirty: boolean }[] = [];
+        if (this._attributeStore) stores.push(this._attributeStore);
+        if (this._geometryStore) stores.push(this._geometryStore);
+        stores.push(...Object.values(this._extensionStores));
+
+        return stores.some(({ dirty }) => dirty);
     }
 
     @action
@@ -192,24 +200,22 @@ export class FeatureEditorStore {
 
     @action.bound
     reset() {
-        if (this._featureItem) {
-            this._setFeatureItem(this._featureItem);
-        }
+        this._setFeatureItem(this._featureItem);
     }
 
     @action
-    private _setStoreValues(featureItem: FeatureItem) {
-        this._setExtensionsValue(featureItem.extensions);
-        this._setAttributesValue(featureItem.fields);
-        this._setGeometryValue(featureItem.geom);
+    private _setStoreValues(featureItem?: FeatureItem) {
+        this._setExtensionsValue(featureItem ? featureItem.extensions : null);
+        this._setAttributesValue(featureItem ? featureItem.fields : null);
+        this._setGeometryValue(featureItem ? featureItem.geom : null);
     }
 
-    private _setAttributesValue(attributes: NgwAttributeValue) {
+    private _setAttributesValue(attributes: NgwAttributeValue | null) {
         if (this._attributeStore) {
             this._attributeStore.load(attributes);
         }
     }
-    private _setGeometryValue(geom: string) {
+    private _setGeometryValue(geom: string | null) {
         if (this._geometryStore) {
             this._geometryStore.load(geom);
         }
@@ -217,7 +223,7 @@ export class FeatureEditorStore {
 
     @action
     private _setExtensionsValue(
-        extensions: FeatureItemExtensions,
+        extensions: FeatureItemExtensions | null,
         { include }: { include?: string[] } = {}
     ) {
         for (const key in extensions) {
@@ -233,7 +239,7 @@ export class FeatureEditorStore {
     }
 
     @action
-    private _setFeatureItem(featureItem: FeatureItem): void {
+    private _setFeatureItem(featureItem?: FeatureItem): void {
         this._featureItem = featureItem;
         this._setStoreValues(featureItem);
     }

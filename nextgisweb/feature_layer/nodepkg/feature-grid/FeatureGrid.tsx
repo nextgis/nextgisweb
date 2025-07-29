@@ -7,6 +7,8 @@ import { LoadingWrapper } from "@nextgisweb/gui/component";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
+import type { FeatureEditorWidgetProps } from "../feature-editor/type";
+
 import { FeatureGridActions } from "./FeatureGridActions";
 import { FeatureGridStore } from "./FeatureGridStore";
 import FeatureTable from "./FeatureTable";
@@ -27,9 +29,11 @@ const loadingCol = () => "...";
 export const FeatureGrid = observer(
     ({
         store: storeProp,
+        editorProps,
         ...restProps
     }: {
         store?: FeatureGridStore;
+        editorProps?: FeatureEditorWidgetProps;
     } & FeatureGridProps) => {
         const [store] = useState(
             () => storeProp || new FeatureGridStore(restProps)
@@ -99,7 +103,7 @@ export const FeatureGrid = observer(
 
         return (
             <div className="ngw-feature-layer-feature-grid">
-                <FeatureGridActions store={store}>
+                <FeatureGridActions store={store} editorProps={editorProps}>
                     <Tooltip title={msgRefreshTitle}>
                         <Button
                             type="text"

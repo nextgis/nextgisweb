@@ -21,6 +21,8 @@ import type Routes from "@nextgisweb/pyramid/type/route";
 import { useResource } from "@nextgisweb/resource/hook/useResource";
 import type { CompositeRead } from "@nextgisweb/resource/type/api";
 
+import type { FeatureEditorWidgetProps } from "../feature-editor/type";
+
 import type { FeatureGridStore } from "./FeatureGridStore";
 import { deleteFeatures } from "./api/deleteFeatures";
 import { ExportAction } from "./component/ExportAction";
@@ -39,9 +41,11 @@ export const FeatureGridActions = observer(
     ({
         store,
         children,
+        editorProps,
     }: {
         store: FeatureGridStore;
         children?: React.ReactNode;
+        editorProps?: FeatureEditorWidgetProps;
     }) => {
         const {
             id,
@@ -174,6 +178,7 @@ export const FeatureGridActions = observer(
                                                 editorOptions: {
                                                     resourceId: id,
                                                     onSave,
+                                                    ...(editorProps ?? {}),
                                                 },
                                             }
                                         );
@@ -205,6 +210,7 @@ export const FeatureGridActions = observer(
                                                             }
                                                             store.bumpVersion();
                                                         },
+                                                        ...(editorProps ?? {}),
                                                     },
                                                 }
                                             );

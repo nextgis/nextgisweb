@@ -59,6 +59,7 @@ export const FeatureEditButton = ({
                 editorOptions: {
                     featureId,
                     resourceId,
+                    showGeometryTab: false,
                     onSave: () => {
                         onUpdate();
                         topic.publish("feature.updated", {

@@ -19,6 +19,7 @@ export interface MapComponentProps extends ViewOptions {
     basemap?: boolean;
     whenCreated?: (mapStore: MapStore | null) => void;
     mapExtent?: MapExtent;
+    initialMapExtent?: MapExtent;
     resetView?: boolean;
 }
 

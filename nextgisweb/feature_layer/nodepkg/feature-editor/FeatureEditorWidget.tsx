@@ -48,6 +48,7 @@ const msgNoChanges = gettext("No changes to save");
 export const FeatureEditorWidget = observer(
     ({
         showGeometryTab = true,
+        skipDirtyCheck,
         resourceId,
         featureId,
         okBtnMsg = msgOk,
@@ -62,7 +63,11 @@ export const FeatureEditorWidget = observer(
         const store = useState<FeatureEditorStore>(() => {
             if (storeProp) return storeProp;
             assert(resourceId && featureId);
-            return new FeatureEditorStore({ resourceId, featureId });
+            return new FeatureEditorStore({
+                resourceId,
+                featureId,
+                skipDirtyCheck,
+            });
         })[0];
 
         const { dirty, saving } = store;

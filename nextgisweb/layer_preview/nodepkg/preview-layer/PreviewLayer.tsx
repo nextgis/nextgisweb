@@ -4,12 +4,10 @@ import { LoadingWrapper } from "@nextgisweb/gui/component";
 import type { Extent } from "@nextgisweb/layer/type/api";
 import { useRoute } from "@nextgisweb/pyramid/hook";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
-import type { ResourceInterface } from "@nextgisweb/resource/type/api";
 import { NGWLayer, UrlLayer } from "@nextgisweb/webmap/map-component";
 import { PreviewMap } from "@nextgisweb/webmap/preview-map";
 
-const extentInterfaces: ResourceInterface[] = ["IBboxLayer"];
-const mvtInterfaces: ResourceInterface[] = ["IFeatureLayer"];
+import { extentInterfaces, mvtInterfaces } from "../constant";
 
 export function PreviewLayer({
     style,
