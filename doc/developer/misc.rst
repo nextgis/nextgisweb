@@ -199,7 +199,7 @@ Identify by polygon
 
 To get features intersected by a polygon execute following request.
 
-.. http:put:: /feature_layer/identify
+.. http:post:: /api/feature_layer/identify
 
    Identification request
 
@@ -214,7 +214,7 @@ To get features intersected by a polygon execute following request.
 
 .. sourcecode:: http
 
-   POST /feature_layer/identify HTTP/1.1
+   POST /api/feature_layer/identify HTTP/1.1
    Host: ngw_url
    Accept: */*
 
