@@ -2,6 +2,7 @@ const fs = require("fs");
 const glob = require("glob");
 const path = require("path");
 
+const ReactRefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin");
 const ESLintPlugin = require("eslint-webpack-plugin");
 const ForkTsCheckerPlugin = require("fork-ts-checker-webpack-plugin");
 const { sortBy } = require("lodash");
@@ -395,15 +396,21 @@ fs.writeFileSync(
         })
         .join("\n")
 );
+const useDevServer = true;
 
 const babelLoader = {
     loader: "babel-loader",
     options: babelOptions,
 };
 
+if (useDevServer) {
+    babelLoader.options.plugins.push(require.resolve("react-refresh/babel"));
+}
+
 /** @type {import("webpack").Configuration} */
 const webpackConfig = defaults("main", (env) => ({
     entry: { "ngwEntry": require.resolve("@nextgisweb/jsrealm/ngwEntry.js") },
+
     module: {
         rules: [
             {
@@ -463,6 +470,9 @@ const webpackConfig = defaults("main", (env) => ({
     },
 
     plugins: [
+        ...(useDevServer
+            ? [new ReactRefreshWebpackPlugin({ overlay: false })]
+            : []),
         new DefinePlugin({
             COMP_ID: DefinePlugin.runtimeValue(({ module }) => {
                 return JSON.stringify(config.pathToComponent(module.context));
@@ -488,28 +498,50 @@ const webpackConfig = defaults("main", (env) => ({
             : []),
     ],
 
-    optimization: {
-        splitChunks: {
-            // Generate as many chunks as possible
-            chunks: "all",
-            minSize: 0,
-        },
-        minimizer: [
-            {
-                apply: (compiler) => {
-                    const TerserPlugin = require("terser-webpack-plugin");
-                    new TerserPlugin({
-                        terserOptions: {
-                            // Webpack default options
-                            compress: { passes: 2 },
-                            // Keep class names for exceptions and Sentry
-                            keep_classnames: true,
-                        },
-                    }).apply(compiler);
-                },
-            },
-        ],
-    },
+    devServer: useDevServer
+        ? {
+              hot: true,
+              port: 3000,
+              headers: { "Access-Control-Allow-Origin": "*" },
+              proxy: [
+                  {
+                      context: ["/api"],
+                      target: "http://localhost:8000",
+                      changeOrigin: true,
+                      secure: false,
+                  },
+              ],
+              static: false,
+          }
+        : undefined,
+
+    optimization: useDevServer
+        ? {
+              runtimeChunk: false,
+              splitChunks: false,
+          }
+        : {
+              splitChunks: {
+                  // Generate as many chunks as possible
+                  chunks: "all",
+                  minSize: 0,
+              },
+              minimizer: [
+                  {
+                      apply: (compiler) => {
+                          const TerserPlugin = require("terser-webpack-plugin");
+                          new TerserPlugin({
+                              terserOptions: {
+                                  // Webpack default options
+                                  compress: { passes: 2 },
+                                  // Keep class names for exceptions and Sentry
+                                  keep_classnames: true,
+                              },
+                          }).apply(compiler);
+                      },
+                  },
+              ],
+          },
 }));
 
 module.exports = webpackConfig;
