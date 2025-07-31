@@ -197,9 +197,15 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
 
         try:
             src_osr = sr_from_wkt(dsproj)
+            if src_osr.IsLocal() and (code := src_osr.GetAuthorityCode(None)) is not None:
+                # The coordinate system may be interpreted as 'local' when the
+                # definitions from EPSG code and GeoTIFF keys are inconsistent.
+                # Starting with GDAL 3.5, the GTIFF_SRS_SOURCE configuration
+                # option can be used to control this behavior.
+                src_osr = sr_from_epsg(int(code))
         except SpatialReferenceError:
             raise ValidationError(
-                gettext("GDAL was uanble to parse the raster coordinate system.")
+                gettext("GDAL was unable to parse the raster coordinate system.")
             )
 
         if src_osr.IsLocal():
