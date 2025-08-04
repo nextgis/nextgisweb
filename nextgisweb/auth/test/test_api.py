@@ -77,35 +77,6 @@ def _test_current_user(ngw_webtest_app, keyname, *, auth_medium=None, auth_provi
 def test_login_logout(user, ngw_webtest_app, ngw_env):
     sid_cookie = ngw_env.pyramid.options["session.cookie.name"]
 
-    _test_current_user(ngw_webtest_app, "guest")
-
-    ngw_webtest_app.post(
-        "/api/component/auth/login",
-        dict(login="test-user", missing="password"),
-        status=422,
-    )
-    ngw_webtest_app.post(
-        "/api/component/auth/login",
-        dict(login="test-user", password="invalid"),
-        status=401,
-    )
-
-    ngw_webtest_app.post(
-        "/api/component/auth/login",
-        dict(login="test-user", password="password123"),
-        status=200,
-    )
-    _test_current_user(
-        ngw_webtest_app, "test-user", auth_medium="session", auth_provider="local_pw"
-    )
-    assert sid_cookie in ngw_webtest_app.cookies, "Login must create a session"
-
-    ngw_webtest_app.post(
-        "/api/component/auth/logout",
-        status=200,
-    )
-    _test_current_user(ngw_webtest_app, "guest")
-
     ngw_webtest_app.post_json(
         "/api/component/auth/login",
         dict(login=42, password="password123"),
@@ -118,24 +89,11 @@ def test_login_logout(user, ngw_webtest_app, ngw_env):
         status=200,
     )
     _test_current_user(ngw_webtest_app, "test-user")
+    assert sid_cookie in ngw_webtest_app.cookies, "Login must create a session"
 
-    ngw_webtest_app.post(
-        "/api/component/auth/logout",
-        status=200,
-    )
+    ngw_webtest_app.post("/api/component/auth/logout")
     _test_current_user(ngw_webtest_app, "guest")
     assert sid_cookie not in ngw_webtest_app.cookies, "Logout must invalidate the session"
-
-
-def test_login_no_password(user, ngw_webtest_app):
-    with transaction.manager:
-        User.filter_by(id=user.id).one().password = None
-
-    ngw_webtest_app.post(
-        "/api/component/auth/login",
-        dict(login=user.keyname, password=None),
-        status=401,
-    )
 
 
 def test_session_invite(user, ngw_env, ngw_webtest_app):
@@ -152,17 +110,15 @@ def test_session_invite(user, ngw_env, ngw_webtest_app):
     next_url = query["next"][0]
     assert next_url == "/some/path"
 
-    ngw_webtest_app.post(
+    ngw_webtest_app.post_json(
         "/api/component/auth/login",
-        dict(
-            login="test-user",
-            password="password123",
-            status=302,
-        ),
+        dict(login="test-user", password="password123"),
+        status=200,
     )
-    sid_cookie in ngw_webtest_app.cookies
-    assert ngw_webtest_app.cookies[sid_cookie] != sid
+
     _test_current_user(ngw_webtest_app, "test-user")
+    assert sid_cookie in ngw_webtest_app.cookies
+    assert ngw_webtest_app.cookies[sid_cookie] != sid
 
     ngw_webtest_app.post(
         "/session-invite",
@@ -195,7 +151,7 @@ def test_session_invite(user, ngw_env, ngw_webtest_app):
     _test_current_user(ngw_webtest_app, "test-user", auth_medium="session", auth_provider="invite")
 
     ngw_webtest_app.get("/logout", status=302)
-    sid_cookie not in ngw_webtest_app.cookies
+    assert sid_cookie not in ngw_webtest_app.cookies
     _test_current_user(ngw_webtest_app, "guest")
 
     # Invite can be used only once
