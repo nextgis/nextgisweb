@@ -353,7 +353,7 @@ def export_single(
 GEOJSON_DRIVER = EXPORT_FORMAT_OGR["GeoJSON"]
 
 
-def view_geojson(resource, request) -> Annotated[Response, ContentType(GEOJSON_DRIVER.mime)]:
+def view_geojson_get(resource, request) -> Annotated[Response, ContentType(GEOJSON_DRIVER.mime)]:
     """Export feature layer in GeoJSON format"""
     request.resource_permission(DataScope.read)
 
@@ -372,10 +372,6 @@ def view_geojson(resource, request) -> Annotated[Response, ContentType(GEOJSON_D
         )
         response.content_disposition = f"attachment; filename={filename}"
         return response
-
-
-def view_geojson_head(resource, request):
-    return view_geojson(resource, request)
 
 
 def export_multi_get(
@@ -446,15 +442,12 @@ def export_multi(
 def setup_pyramid(comp, config):
     feature_layer_factory = ResourceFactory(context=IFeatureLayer)
 
-    geojson_route = config.add_route(
+    config.add_route(
         "feature_layer.geojson",
         "/api/resource/{id}/geojson",
         factory=feature_layer_factory,
-        get=view_geojson,
+        get=view_geojson_get,
     )
-
-    # HEAD method is required for GDAL /vsicurl/ and QGIS connect
-    geojson_route.head(view_geojson_head, deprecated=True)
 
     config.add_view(
         export_single,
