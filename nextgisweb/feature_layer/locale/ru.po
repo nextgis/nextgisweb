@@ -167,6 +167,162 @@ msgstr "Объект сохранен"
 msgid "No changes to save"
 msgstr "Внесите изменения, чтобы сохранить их"
 
+#: nodepkg/feature-filter/FeatureFilterEditor.tsx:15
+msgid "Constructor"
+msgstr "Конструктор"
+
+#: nodepkg/feature-filter/FeatureFilterEditor.tsx:16
+msgid "JSON"
+msgstr "JSON"
+
+#: nodepkg/feature-filter/FeatureFilterEditor.tsx:17
+msgid "Apply"
+msgstr "Применить"
+
+#: nodepkg/feature-filter/FeatureFilterEditor.tsx:35
+msgid "Filter is invalid. Please fix errors before applying."
+msgstr "Фильтр некорректный. Пожалуйста, исправьте ошибки перед применением."
+
+#: nodepkg/feature-filter/FeatureFilterEditor.tsx:45
+msgid "Filter applied successfully"
+msgstr "Фильтр применен успешно"
+
+#: nodepkg/feature-filter/FeatureFilterEditor.tsx:47
+msgid "Failed to apply filter"
+msgstr "Не удалось применить фильтр"
+
+#: nodepkg/feature-filter/component/ConstructorTab.tsx:105
+msgid "Dragging"
+msgstr "Перетаскивание"
+
+#: nodepkg/feature-filter/component/FeatureFilterJsonTab.tsx:23
+msgid "Loading editor..."
+msgstr "Загрузка редактора..."
+
+#: nodepkg/feature-filter/component/FilterCondition.tsx:23
+msgid "Delete Condition"
+msgstr "Удалить условие"
+
+#: nodepkg/feature-filter/component/FilterCondition.tsx:41
+msgid "Any value"
+msgstr "Любое значение"
+
+#: nodepkg/feature-filter/component/FilterCondition.tsx:42
+msgid "No value"
+msgstr "Нет значения"
+
+#: nodepkg/feature-filter/component/FilterCondition.tsx:95
+msgid "Invalid field"
+msgstr "Некорректное поле"
+
+#: nodepkg/feature-filter/component/FilterCondition.tsx:96
+msgid "Field not found"
+msgstr "Поле не найдено"
+
+#: nodepkg/feature-filter/component/FilterCondition.tsx:124
+msgid "Enter values and press Enter"
+msgstr "Введите значения и нажмите Enter"
+
+#: nodepkg/feature-filter/component/FilterCondition.tsx:138
+msgid "Enter integer"
+msgstr "Введите целое число"
+
+#: nodepkg/feature-filter/component/FilterCondition.tsx:151
+msgid "Enter big integer"
+msgstr "Введите большое целое число"
+
+#: nodepkg/feature-filter/component/FilterCondition.tsx:165
+msgid "Enter number"
+msgstr "Введите число"
+
+#: nodepkg/feature-filter/component/FilterCondition.tsx:178
+msgid "Select date"
+msgstr "Выберите дату"
+
+#: nodepkg/feature-filter/component/FilterCondition.tsx:191
+msgid "Select time"
+msgstr "Выберите время"
+
+#: nodepkg/feature-filter/component/FilterCondition.tsx:204
+msgid "Select date and time"
+msgstr "Выберите дату и время"
+
+#: nodepkg/feature-filter/component/FilterCondition.tsx:217
+msgid "Enter value"
+msgstr "Введите значение"
+
+#: nodepkg/feature-filter/component/FilterCondition.tsx:240
+msgid "Select field"
+msgstr "Выберите поле"
+
+#: nodepkg/feature-filter/component/FilterCondition.tsx:256
+msgid "Operator"
+msgstr "Оператор"
+
+#: nodepkg/feature-filter/component/FilterGroup.tsx:92
+msgid "ALL"
+msgstr "ВСЕ"
+
+#: nodepkg/feature-filter/component/FilterGroup.tsx:95
+msgid "ANY"
+msgstr "ЛЮБОЙ"
+
+#: nodepkg/feature-filter/component/FilterGroup.tsx:104
+msgid "Condition"
+msgstr "Условие"
+
+#: nodepkg/feature-filter/component/FilterGroup.tsx:111
+msgid "Group"
+msgstr "Группа"
+
+#: nodepkg/feature-filter/testentry.tsx:111
+msgid "Output JSON"
+msgstr "Вывод JSON"
+
+#: nodepkg/feature-filter/testentry.tsx:112
+msgid "Current Filter State"
+msgstr "Текущее состояние фильтра"
+
+#: nodepkg/feature-filter/type.ts:54
+msgid "Equal"
+msgstr "Равно"
+
+#: nodepkg/feature-filter/type.ts:67
+msgid "Not equal"
+msgstr "Не равно"
+
+#: nodepkg/feature-filter/type.ts:80
+msgid "Greater"
+msgstr "Больше"
+
+#: nodepkg/feature-filter/type.ts:92
+msgid "Less"
+msgstr "Меньше"
+
+#: nodepkg/feature-filter/type.ts:104
+msgid "Greater or equal"
+msgstr "Больше или равно"
+
+#: nodepkg/feature-filter/type.ts:116
+msgid "Less or equal"
+msgstr "Меньше или равно"
+
+#: nodepkg/feature-filter/type.ts:128
+msgid "In"
+msgstr "Содержит одно из значений"
+
+#: nodepkg/feature-filter/type.ts:133
+msgid "Not in"
+msgstr "Не содержит одно из значений"
+
+#: nodepkg/feature-filter/type.ts:138
+msgid "Has value"
+msgstr "Содержит значение"
+
+#: nodepkg/feature-filter/type.ts:143
+msgid "Not has value"
+msgstr "Не содержит значения"
+
 #: nodepkg/feature-grid/FeatureGrid.tsx:24
 msgid "Open table settings"
 msgstr "Открыть настройки таблицы"
