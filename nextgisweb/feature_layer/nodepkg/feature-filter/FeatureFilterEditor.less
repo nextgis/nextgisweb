@@ -1,0 +1,119 @@
+.ngw-feature-filter-editor {
+    .error-message {
+        margin-top: 8px;
+        color: #ff4d4f;
+        font-size: 12px;
+    }
+
+    .ant-tabs-content-holder {
+        min-height: 200px;
+    }
+
+    .ant-tabs-tabpane {
+        padding: 16px 0;
+    }
+
+    .filter-constructor {
+        .filter-root {
+            margin-bottom: 16px;
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+        }
+    }
+
+    .filter-group {
+        border: 1px solid #d9d9d9;
+        border-radius: 6px;
+        margin-bottom: 8px;
+        background: #fafafa;
+
+        .filter-group-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: #f0f0f0;
+            border-bottom: 1px solid #d9d9d9;
+            border-radius: 6px 6px 0 0;
+
+            .filter-drag-handle {
+                color: #bfbfbf;
+                cursor: move;
+                margin-right: 8px;
+
+                &:hover {
+                    color: #8c8c8c;
+                }
+            }
+
+            .ant-radio-group {
+                margin-right: auto;
+            }
+        }
+
+        .filter-condition {
+            margin-bottom: 8px;
+            padding: 8px;
+            background: white;
+            border: 1px solid #e8e8e8;
+            border-radius: 4px;
+
+            .filter-drag-handle {
+                color: #bfbfbf;
+                cursor: move;
+                margin-right: 8px;
+
+                &:hover {
+                    color: #8c8c8c;
+                }
+            }
+
+            .ant-space {
+                display: flex;
+                align-items: center;
+                width: 100%;
+
+                .ant-space-item {
+                    flex-shrink: 0;
+
+                    &:nth-child(4) {
+                        flex: 1;
+                        min-width: 0;
+
+                        .ant-input,
+                        .ant-input-number,
+                        .ant-picker,
+                        .ant-picker-input,
+                        .ant-picker-panel-container {
+                            width: 100%;
+                        }
+                    }
+                }
+            }
+        }
+
+        .filter-group-actions {
+            border-top: 1px solid #e8e8e8;
+        }
+
+    }
+
+    .filter-tabs {
+        .ant-tabs-content-holder {
+            padding: 16px 0;
+        }
+    }
+
+    .filter-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        margin-top: 16px;
+        padding-top: 16px;
+        border-top: 1px solid #e8e8e8;
+    }
+}
