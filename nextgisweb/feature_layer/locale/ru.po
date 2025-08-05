@@ -23,6 +23,7 @@ msgid "Failed to reproject 'intersects' geometry."
 msgstr "Не удалось перепроецировать геометрию 'intersects'."
 
 #: api_export.py:424
+#: api_export.py:424
 msgid "File name parameter '{}' is not valid."
 msgstr "Недопустимое имя файла '{}'."
 
@@ -167,7 +168,136 @@ msgstr "Объект сохранен"
 msgid "No changes to save"
 msgstr "Внесите изменения, чтобы сохранить их"
 
-#: nodepkg/feature-grid/FeatureGrid.tsx:24
+#: nodepkg/feature-filter/FeatureFilterEditor.tsx:15
+msgid "Constructor"
+msgstr "Конструктор"
+
+#: nodepkg/feature-filter/FeatureFilterEditor.tsx:16
+msgid "JSON"
+msgstr "JSON"
+
+#: nodepkg/feature-filter/FeatureFilterEditor.tsx:17
+msgid "Apply"
+msgstr "Применить"
+
+#: nodepkg/feature-filter/FeatureFilterEditor.tsx:36
+msgid "Filter applied successfully"
+msgstr "Фильтр применен успешно"
+
+#: nodepkg/feature-filter/FeatureFilterEditor.tsx:38
+msgid "Failed to apply filter"
+msgstr "Не удалось применить фильтр"
+
+#: nodepkg/feature-filter/component/FilterCondition.tsx:23
+msgid "Delete Condition"
+msgstr "Удалить условие"
+
+#: nodepkg/feature-filter/component/FilterCondition.tsx:70
+#: nodepkg/feature-filter/component/FilterCondition.tsx:129
+msgid "Enter value"
+msgstr "Введите значение"
+
+#: nodepkg/feature-filter/component/FilterCondition.tsx:80
+msgid "Enter integer"
+msgstr "Введите целое число"
+
+#: nodepkg/feature-filter/component/FilterCondition.tsx:88
+msgid "Enter big integer"
+msgstr "Введите большое целое число"
+
+#: nodepkg/feature-filter/component/FilterCondition.tsx:97
+msgid "Enter number"
+msgstr "Введите число"
+
+#: nodepkg/feature-filter/component/FilterCondition.tsx:105
+msgid "Select date"
+msgstr "Выберите дату"
+
+#: nodepkg/feature-filter/component/FilterCondition.tsx:113
+msgid "Select time"
+msgstr "Выберите время"
+
+#: nodepkg/feature-filter/component/FilterCondition.tsx:121
+msgid "Select date and time"
+msgstr "Выберите дату и время"
+
+#: nodepkg/feature-filter/component/FilterCondition.tsx:149
+msgid "Select field"
+msgstr "Выберите поле"
+
+#: nodepkg/feature-filter/component/FilterCondition.tsx:165
+msgid "Operator"
+msgstr "Оператор"
+
+#: nodepkg/feature-filter/component/FilterGroup.tsx:21
+msgid "ALL"
+msgstr "Все"
+
+#: nodepkg/feature-filter/component/FilterGroup.tsx:22
+msgid "ANY"
+msgstr "Любой"
+
+#: nodepkg/feature-filter/component/FilterGroup.tsx:23
+msgid "Add Condition"
+msgstr "Добавить условие"
+
+#: nodepkg/feature-filter/component/FilterGroup.tsx:24
+msgid "Add Group"
+msgstr "Добавить группу"
+
+#: nodepkg/feature-filter/component/FilterGroup.tsx:25
+msgid "Delete Group"
+msgstr "Удалить группу"
+
+#: nodepkg/feature-filter/testentry.tsx:111
+msgid "Output JSON"
+msgstr "Вывод JSON"
+
+#: nodepkg/feature-filter/testentry.tsx:112
+msgid "Current Filter State"
+msgstr "Текущее состояние фильтра"
+
+#: nodepkg/feature-filter/type.ts:39
+msgid "Equal"
+msgstr "Равно"
+
+#: nodepkg/feature-filter/type.ts:52
+msgid "Not equal"
+msgstr "Не равно"
+
+#: nodepkg/feature-filter/type.ts:65
+msgid "Greater"
+msgstr "Больше"
+
+#: nodepkg/feature-filter/type.ts:77
+msgid "Less"
+msgstr "Меньше"
+
+#: nodepkg/feature-filter/type.ts:89
+msgid "Greater or equal"
+msgstr "Больше или равно"
+
+#: nodepkg/feature-filter/type.ts:101
+msgid "Less or equal"
+msgstr "Меньше или равно"
+
+#: nodepkg/feature-filter/type.ts:113
+msgid "In"
+msgstr "Содержит одно из значений"
+
+#: nodepkg/feature-filter/type.ts:118
+msgid "Not in"
+msgstr "Не содержит одно из значений"
+
+#: nodepkg/feature-filter/type.ts:123
+msgid "Has value"
+msgstr "Содержит значение"
+
+#: nodepkg/feature-filter/type.ts:128
+msgid "Not has value"
+msgstr "Не содержит значения"
+
+#: nodepkg/feature-grid/FeatureGrid.tsx:22
 msgid "Open table settings"
 msgstr "Открыть настройки таблицы"
 
