@@ -21,6 +21,7 @@ from .interface import (
     IFeatureQueryOrderBy,
     IFeatureQuerySimplify,
     IFieldEditableFeatureLayer,
+    IFilterableFeatureLayer,
     IGeometryEditableFeatureLayer,
     IVersionableFeatureLayer,
     IWritableFeatureLayer,

@@ -2,7 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import settings from "@nextgisweb/feature-layer/client-settings";
 import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
-import { Checkbox, Input, Select } from "@nextgisweb/gui/antd";
+import { useShowModal } from "@nextgisweb/gui";
+import { Button, Checkbox, Input, Select } from "@nextgisweb/gui/antd";
 import {
     ExtentRow,
     LoadingWrapper,
@@ -47,6 +48,7 @@ interface FormProps extends ExportFeatureLayerOptions {
     zipped: boolean;
     extent: (null | number)[];
     ilike: string;
+    filter?: string;
 }
 
 type FormPropsKey = Extract<keyof FormProps, string>;
@@ -102,12 +104,20 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
     const [srsOptions, setSrsOptions] = useState<SrsOption[]>([]);
     const [fieldOptions, setFieldOptions] = useState<FieldOption[]>([]);
     const [defaultSrs, setDefaultSrs] = useState<number>();
+    const [isFilterFeatureLayer, setIsFilterFeatureLayer] = useState(false);
     const [format, setFormat] = useState(exportFormats[0].name);
     const [fields, setFields] = useState<FormField<FormPropsKey>[]>([]);
     const [isReady, setIsReady] = useState(false);
+    const [filterExpression, setFilterExpression] = useState<
+        string | undefined
+    >();
+    const [layerFields, setLayerFields] = useState<FeatureLayerFieldRead[]>([]);
     const form = Form.useForm<FormProps>()[0];
 
     const loading = staffLoading || exportLoading;
+
+    const { lazyModal, modalHolder } = useShowModal();
+
 
     const initialValues = useMemo(() => {
         const initialVals: Partial<FormProps> = {
@@ -118,10 +128,34 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
             encoding: "UTF-8",
             display_name: false,
             zipped: !!multiple,
+            filter: filterExpression,
             ...urlParams,
         };
         return initialVals;
-    }, [defaultSrs, fieldOptions, format, multiple, urlParams]);
+    }, [
+        defaultSrs,
+        fieldOptions,
+        format,
+        multiple,
+        urlParams,
+        filterExpression,
+    ]);
+
+    const handleFilterApply = useCallback(
+        (filter: string | undefined) => {
+            setFilterExpression(filter);
+            form.setFieldValue("filter", filter);
+        },
+        [form]
+    );
+
+    const handleFilterClick = useCallback(() => {
+        lazyModal(() => import("../feature-filter/FeatureFilterModalLazy"), {
+            fields: layerFields,
+            value: filterExpression,
+            onApply: handleFilterApply,
+        });
+    }, [lazyModal, layerFields, filterExpression, handleFilterApply]);
 
     const load = useCallback(async () => {
         try {
@@ -142,9 +176,14 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
                     if (vectorLayer) {
                         setDefaultSrs(vectorLayer.srs.id);
                     }
-                    setFieldOptions(
-                        fieldListToOptions(itemInfo.feature_layer.fields)
+                    setIsFilterFeatureLayer(
+                        itemInfo.resource.interfaces?.includes(
+                            "IFilterableFeatureLayer"
+                        ) ?? false
                     );
+                    const fields = itemInfo.feature_layer.fields;
+                    setLayerFields(fields);
+                    setFieldOptions(fieldListToOptions(fields));
                 } else {
                     const defSrs = srsInfo.find((srs) => srs.id === 3857);
                     if (defSrs) {
@@ -163,6 +202,7 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
         const {
             resources: resStr,
             fields: fieldsStr,
+            filter: filterStr,
             ...rest
         } = Object.fromEntries(new URL(location.href).searchParams.entries());
         const urlParamsToset: Record<string, string | number[]> = { ...rest };
@@ -172,12 +212,21 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
         if (fieldsStr) {
             urlParamsToset.fields = fieldsStr.split(",").map(Number);
         }
+        if (filterStr) {
+            setFilterExpression(filterStr);
+        }
         setUrlParams(urlParamsToset);
     }, []);
 
     useEffect(() => {
         load();
     }, [load]);
+
+    useEffect(() => {
+        if (isReady && filterExpression !== undefined) {
+            form.setFieldValue("filter", filterExpression);
+        }
+    }, [filterExpression, isReady, form]);
 
     useEffect(() => {
         const exportFormat = exportFormats.find((f) => f.name === format);
@@ -279,6 +328,21 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
                 label: gettext("Filter text"),
             },
             {
+                name: "filter",
+                formItem: (
+                    <Button
+                        onClick={handleFilterClick}
+                        type={filterExpression ? "primary" : "default"}
+                    >
+                        {filterExpression
+                            ? gettext("Filter Applied")
+                            : gettext("Set Filter")}
+                    </Button>
+                ),
+                label: gettext("Filter"),
+                included: !multiple && isFilterFeatureLayer,
+            },
+            {
                 name: "zipped",
                 label: gettext("Zip archive"),
                 formItem: (
@@ -295,37 +359,51 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
         ];
 
         setFields(fieldsToSet);
-    }, [srsOptions, fieldOptions, format, isReady, form, multiple, pick]);
+    }, [
+        srsOptions,
+        fieldOptions,
+        format,
+        isReady,
+        form,
+        multiple,
+        pick,
+        handleFilterClick,
+        filterExpression,
+        isFilterFeatureLayer,
+    ]);
 
     if (loading) {
         return <LoadingWrapper />;
     }
 
     return (
-        <FieldsForm
-            fields={fields}
-            form={form}
-            whenReady={() => {
-                setIsReady(true);
-            }}
-            onChange={(e) => {
-                if ("format" in e.value) {
-                    setFormat(e.value.format);
-                }
-            }}
-            initialValues={initialValues}
-            labelCol={{ span: 6 }}
-        >
-            <Form.Item>
-                <SaveButton
-                    onClick={() => {
-                        exportFeatureLayer(form.getFieldsValue());
-                    }}
-                    icon={null}
-                >
-                    {gettext("Save")}
-                </SaveButton>
-            </Form.Item>
-        </FieldsForm>
+        <>
+            {modalHolder}
+            <FieldsForm
+                fields={fields}
+                form={form}
+                whenReady={() => {
+                    setIsReady(true);
+                }}
+                onChange={(e) => {
+                    if ("format" in e.value) {
+                        setFormat(e.value.format);
+                    }
+                }}
+                initialValues={initialValues}
+                labelCol={{ span: 6 }}
+            >
+                <Form.Item>
+                    <SaveButton
+                        onClick={() => {
+                            exportFeatureLayer(form.getFieldsValue());
+                        }}
+                        icon={null}
+                    >
+                        {gettext("Save")}
+                    </SaveButton>
+                </Form.Item>
+            </FieldsForm>
+        </>
     );
 }

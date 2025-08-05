@@ -23,6 +23,7 @@ from nextgisweb.feature_layer import (
     FeaureLayerGeometryType,
     IFeatureLayer,
     IFieldEditableFeatureLayer,
+    IFilterableFeatureLayer,
     IGeometryEditableFeatureLayer,
     IWritableFeatureLayer,
     LayerField,
@@ -52,6 +53,7 @@ from nextgisweb.resource import (
     SRelationship,
 )
 
+from ..feature_layer.filter import FilterParser
 from .feature_query import FeatureQueryBase, calculate_extent
 from .kind_of_data import VectorLayerData
 from .ogrloader import (
@@ -121,6 +123,7 @@ def _vlschema_autoflush(res):
 
 @implementer(
     IFeatureLayer,
+    IFilterableFeatureLayer,
     IFieldEditableFeatureLayer,
     IGeometryEditableFeatureLayer,
     IWritableFeatureLayer,
@@ -298,6 +301,10 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin, FVersioni
             layer = self
 
         return BoundFeatureQuery
+
+    @property
+    def filter_parser(self):
+        return FilterParser.from_resource(self)
 
     def field_by_keyname(self, keyname):
         for f in self.fields:

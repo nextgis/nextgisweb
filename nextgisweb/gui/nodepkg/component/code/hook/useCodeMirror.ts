@@ -63,6 +63,8 @@ export function useCodeMirror({
 
     const destroy = useRef<() => void>(null);
 
+    const docRef = useRef(doc);
+
     const getExtensions = useCallback(async () => {
         const langExtension = await getLang(lang);
         const setup = await customSetup({ lineNumbers, readOnly, fold });
@@ -81,8 +83,8 @@ export function useCodeMirror({
                     // If transaction is market as remote we don't have to call `onChange` handler again
                     !vu.transactions.some((tr) => tr.annotation(External))
                 ) {
-                    const doc = vu.state.doc;
-                    const value = doc.toString();
+                    const docState = vu.state.doc;
+                    const value = docState.toString();
                     onChange(value, vu);
                 }
             });
@@ -109,7 +111,7 @@ export function useCodeMirror({
         const parent = target && target.current;
         if (parent) {
             const state = EditorState.create({
-                doc,
+                doc: docRef.current,
             });
             const cm = new EditorView({
                 state,
@@ -126,7 +128,24 @@ export function useCodeMirror({
             };
             return cm;
         }
-    }, [doc, target]);
+    }, [target]);
+
+    useEffect(() => {
+        docRef.current = doc;
+
+        if (editor) {
+            const cm = editor.source;
+            const current = cm.state.doc.toString();
+            const next = doc ?? "";
+
+            if (current === next) return;
+
+            cm.dispatch({
+                changes: { from: 0, to: cm.state.doc.length, insert: next },
+                annotations: [External.of(true)],
+            });
+        }
+    }, [editor, doc]);
 
     useEffect(() => {
         if (editor) {

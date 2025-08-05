@@ -16,6 +16,7 @@ import {
     OpenInNewIcon,
 } from "@nextgisweb/gui/icon";
 import { routeURL } from "@nextgisweb/pyramid/api";
+import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type Routes from "@nextgisweb/pyramid/type/route";
 import { useResource } from "@nextgisweb/resource/hook/useResource";
@@ -28,6 +29,8 @@ import { deleteFeatures } from "./api/deleteFeatures";
 import { ExportAction } from "./component/ExportAction";
 import type { ActionProps } from "./type";
 
+import FilterAltIcon from "@nextgisweb/icon/material/filter_alt/outline";
+
 const msgOpenTitle = gettext("Open");
 const msgOpenOnNewPage = gettext("Open on a new page");
 const msgDeleteTitle = gettext("Delete");
@@ -36,6 +39,7 @@ const msgEditOnNewPage = gettext("Edit on a new page");
 const msgCreate = gettext("Create");
 
 const msgSearchPlaceholder = gettext("Search...");
+const msgFilterTitle = gettext("Advanced filter");
 
 export const FeatureGridActions = observer(
     ({
@@ -61,9 +65,12 @@ export const FeatureGridActions = observer(
             onDelete,
             onSave: onSaveProp,
             onOpen,
+            fields,
+            filterExpression,
         } = store;
 
         const { isExportAllowed } = useResource({ id });
+        const { data: resourceData } = useRouteGet("resource.item", { id });
 
         const { confirmDelete, contextHolder } = useConfirm();
         const { lazyModal, modalHolder } = useShowModal();
@@ -130,6 +137,29 @@ export const FeatureGridActions = observer(
             },
             [onSaveProp, store]
         );
+
+        const handleFilterApply = useCallback(
+            (filter: string | undefined) => {
+                store.setFilterExpression(filter);
+                store.setQueryParams({
+                    ...store.queryParams,
+                    filter,
+                });
+                store.bumpVersion();
+            },
+            [store]
+        );
+
+        const handleAdvancedFilterClick = useCallback(() => {
+            lazyModal(
+                () => import("../feature-filter/FeatureFilterModalLazy"),
+                {
+                    fields,
+                    value: filterExpression || undefined,
+                    onApply: handleFilterApply,
+                }
+            );
+        }, [lazyModal, fields, filterExpression, handleFilterApply]);
 
         const defActions: ActionToolbarAction<ActionProps>[] = [
             (props: CreateButtonActionProps) => (
@@ -271,6 +301,24 @@ export const FeatureGridActions = observer(
             [selectedIds, id]
         );
 
+        let advancedButton = undefined;
+        if (
+            resourceData?.resource?.interfaces?.includes(
+                "IFilterableFeatureLayer"
+            )
+        ) {
+            advancedButton = (
+                <Tooltip title={msgFilterTitle}>
+                    <Button
+                        icon={<FilterAltIcon />}
+                        onClick={handleAdvancedFilterClick}
+                        size={size}
+                        type={filterExpression ? "primary" : "default"}
+                    />
+                </Tooltip>
+            );
+        }
+
         return (
             <ActionToolbar
                 size={size}
@@ -281,18 +329,21 @@ export const FeatureGridActions = observer(
                 {contextHolder}
                 {modalHolder}
                 <div>
-                    <Input
-                        value={queryParams?.ilike}
-                        placeholder={msgSearchPlaceholder}
-                        onChange={(e) =>
-                            store.setQueryParams({
-                                ...store.queryParams,
-                                ilike: e.target.value,
-                            })
-                        }
-                        allowClear
-                        size={size}
-                    />
+                    <Space.Compact>
+                        <Input
+                            value={queryParams?.ilike}
+                            placeholder={msgSearchPlaceholder}
+                            onChange={(e) =>
+                                store.setQueryParams({
+                                    ...store.queryParams,
+                                    ilike: e.target.value,
+                                })
+                            }
+                            allowClear
+                            size={size}
+                        />
+                        {advancedButton}
+                    </Space.Compact>
                 </div>
                 {children}
             </ActionToolbar>

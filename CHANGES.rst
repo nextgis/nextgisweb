@@ -1,6 +1,12 @@
 Changes
 =======
 
+5.3.0
+-----
+
+- Advanced feature filtering capabilities.
+
+
 5.2.0
 -----
 

@@ -11,6 +11,7 @@ type FeatureLayerQuery =
         like?: string;
         ilike?: string;
         intersects?: string;
+        filter?: string;
     };
 
 export interface FetchFeaturesOptions {
@@ -25,6 +26,7 @@ export interface FetchFeaturesOptions {
     cache?: boolean;
     ilike?: string;
     like?: string;
+    filter?: string;
     label?: boolean;
 }
 
@@ -40,6 +42,7 @@ export function fetchFeaturesItems({
     cache,
     like,
     ilike,
+    filter,
     label,
 }: FetchFeaturesOptions) {
     const query: FeatureLayerQuery = {
@@ -68,6 +71,10 @@ export function fetchFeaturesItems({
 
     if (label) {
         query.label = true;
+    }
+
+    if (filter) {
+        query.filter = filter;
     }
 
     return route("feature_layer.feature.collection", resourceId).get<

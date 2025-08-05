@@ -57,6 +57,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
         self._filter_by = None
         self._like = None
         self._ilike = None
+        self._filter_program = None
 
         self._order_by = None
 
@@ -100,6 +101,9 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
     def filter_by(self, **kwargs):
         self._filter_by = kwargs
 
+    def set_filter_program(self, program):
+        self._filter_program = program
+
     def order_by(self, *args):
         self._order_by = args
 
@@ -119,6 +123,9 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
         idcol = table.columns.fid
         geomcol = table.columns.geom
         fields = table.fields
+        columns_mapping = {"id": idcol}
+        columns_mapping.update(fields)
+        columns_mapping_ref = columns_mapping
         columns = []
         where = []
 
@@ -220,6 +227,11 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
             if len(_where_filter) > 0:
                 where.append(sa.and_(*_where_filter))
 
+        if self._filter_program is not None:
+            clause = self._filter_program.to_clause(columns_mapping)
+            if clause is not None:
+                where.append(clause)
+
         if self._like or self._ilike:
             operands = []
             text_seach_fields = set(f.keyname for f in self.layer.fields if f.text_search)
@@ -270,6 +282,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
         class QueryFeatureSet(FeatureSet):
             layer = self.layer
+            columns_mapping = columns_mapping_ref
 
             _geom = self._geom
             _geom_format = self._geom_format

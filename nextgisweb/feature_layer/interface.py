@@ -117,6 +117,10 @@ else:
     ]
 
 
+class IFilterableFeatureLayer(IResourceBase):
+    filter_parser = Attribute("""Filter parser for feature layer""")
+
+
 class IFeatureLayer(IResourceBase):
     geometry_type = Attribute(""" Layer geometry type GEOM_TYPE """)
     fields = Attribute(""" List of fields """)

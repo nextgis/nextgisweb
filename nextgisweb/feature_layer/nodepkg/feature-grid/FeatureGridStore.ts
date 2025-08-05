@@ -25,6 +25,7 @@ export class FeatureGridStore {
     @observable.shallow accessor queryParams: QueryParams | null = null;
     @observable.shallow accessor visibleFields: number[] = [KEY_FIELD_ID];
     @observable.shallow accessor fields: FeatureLayerFieldRead[] = [];
+    @observable.ref accessor filterExpression: string | undefined = undefined;
 
     @observable.ref accessor beforeDelete:
         | ((featureIds: number[]) => void)
@@ -148,6 +149,11 @@ export class FeatureGridStore {
     @action.bound
     setOnSave(onSave: ((value: CompositeRead | undefined) => void) | null) {
         this.onSave = onSave;
+    }
+
+    @action.bound
+    setFilterExpression(filterExpression: string | undefined) {
+        this.filterExpression = filterExpression;
     }
 
     @action.bound
