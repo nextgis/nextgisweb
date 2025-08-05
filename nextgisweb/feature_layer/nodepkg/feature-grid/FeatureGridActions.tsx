@@ -28,6 +28,8 @@ import { deleteFeatures } from "./api/deleteFeatures";
 import { ExportAction } from "./component/ExportAction";
 import type { ActionProps } from "./type";
 
+import MoreVertIcon from "@nextgisweb/icon/material/more_vert/outline";
+
 const msgOpenTitle = gettext("Open");
 const msgOpenOnNewPage = gettext("Open on a new page");
 const msgDeleteTitle = gettext("Delete");
@@ -36,6 +38,7 @@ const msgEditOnNewPage = gettext("Edit on a new page");
 const msgCreate = gettext("Create");
 
 const msgSearchPlaceholder = gettext("Search...");
+const msgFilterTitle = gettext("Filter");
 
 export const FeatureGridActions = observer(
     ({
@@ -61,6 +64,8 @@ export const FeatureGridActions = observer(
             onDelete,
             onSave: onSaveProp,
             onOpen,
+            fields,
+            filterExpression,
         } = store;
 
         const { isExportAllowed } = useResource({ id });
@@ -130,6 +135,29 @@ export const FeatureGridActions = observer(
             },
             [onSaveProp, store]
         );
+
+        const handleFilterApply = useCallback(
+            (filter: string | undefined) => {
+                store.setFilterExpression(filter);
+                store.setQueryParams({
+                    ...store.queryParams,
+                    filter,
+                });
+                store.bumpVersion();
+            },
+            [store]
+        );
+
+        const handleFilterClick = useCallback(() => {
+            lazyModal(
+                () => import("../feature-filter/FeatureFilterModalLazy"),
+                {
+                    fields,
+                    value: filterExpression || undefined,
+                    onApply: handleFilterApply,
+                }
+            );
+        }, [lazyModal, fields, filterExpression, handleFilterApply]);
 
         const defActions: ActionToolbarAction<ActionProps>[] = [
             (props: CreateButtonActionProps) => (
@@ -281,18 +309,28 @@ export const FeatureGridActions = observer(
                 {contextHolder}
                 {modalHolder}
                 <div>
-                    <Input
-                        value={queryParams?.ilike}
-                        placeholder={msgSearchPlaceholder}
-                        onChange={(e) =>
-                            store.setQueryParams({
-                                ...store.queryParams,
-                                ilike: e.target.value,
-                            })
-                        }
-                        allowClear
-                        size={size}
-                    />
+                    <Space.Compact>
+                        <Input
+                            value={queryParams?.ilike}
+                            placeholder={msgSearchPlaceholder}
+                            onChange={(e) =>
+                                store.setQueryParams({
+                                    ...store.queryParams,
+                                    ilike: e.target.value,
+                                })
+                            }
+                            allowClear
+                            size={size}
+                        />
+                        <Tooltip title={msgFilterTitle}>
+                            <Button
+                                icon={<MoreVertIcon />}
+                                onClick={handleFilterClick}
+                                size={size}
+                                type={filterExpression ? "primary" : "default"}
+                            />
+                        </Tooltip>
+                    </Space.Compact>
                 </div>
                 {children}
             </ActionToolbar>
