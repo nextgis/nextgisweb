@@ -1,5 +1,21 @@
+from typing import Union
+
+from msgspec import Struct
+
 from nextgisweb.env import Component, require
 from nextgisweb.lib.config import Option
+
+
+class BasemapConfig(Struct):
+    keyname: str
+    display_name: str
+    url: str
+    copyright_text: Union[str, None]
+    copyright_url: Union[str, None]
+    enabled: Union[bool, None]
+    epsg: Union[str, None] = None
+    z_max: Union[int, None] = None
+    z_min: Union[int, None] = None
 
 
 class BasemapComponent(Component):
@@ -32,13 +48,14 @@ class BasemapComponent(Component):
 
         if len(keys) == 0:
             return [
-                dict(
+                BasemapConfig(
                     keyname="osm-mapnik",
                     display_name="OpenStreetMap",
                     url="https://{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png",
                     copyright_text="© OpenStreetMap contributors",
                     copyright_url="https://www.openstreetmap.org/copyright",
                     enabled=True,
+                    z_max=19,
                 )
             ]
 
@@ -56,7 +73,7 @@ class BasemapComponent(Component):
                     has_enabled = True
 
             result.append(
-                dict(
+                BasemapConfig(
                     keyname=prefixed.get(f"{k}.keyname"),
                     display_name=prefixed.get(f"{k}.display_name"),
                     url=prefixed.get(f"{k}.url"),
@@ -64,6 +81,8 @@ class BasemapComponent(Component):
                     copyright_text=prefixed.get(f"{k}.copyright_text"),
                     copyright_url=prefixed.get(f"{k}.copyright_url"),
                     enabled=enabled,
+                    z_max=prefixed.get(f"{k}.z_max"),
+                    z_min=prefixed.get(f"{k}.z_min"),
                 )
             )
 
@@ -79,6 +98,8 @@ class BasemapComponent(Component):
         Option("preset.*.copyright_text", str, default=None, doc="Preset basemap copyright text"),
         Option("preset.*.copyright_url", str, default=None, doc="Preset basemap copyright URL"),
         Option("preset.*.enabled", bool, default=None, doc="Preset basemap default flag"),
+        Option("preset.*.z_max", int, default=None, doc="Preset basemap maximum zoom level"),
+        Option("preset.*.z_min", int, default=None, doc="Preset basemap minimum zoom level"),
         Option("qms_url", default="https://qms.nextgis.com"),
         Option("qms_geoservices_url", default="https://qms.nextgis.com/api/v1/geoservices/"),
         Option("qms_icons_url", default="https://qms.nextgis.com/api/v1/icons/"),

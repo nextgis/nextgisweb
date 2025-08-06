@@ -11,6 +11,8 @@ import type { LayerOptions } from "@nextgisweb/webmap/ol/layer/CoreLayer";
 import type QuadKey from "@nextgisweb/webmap/ol/layer/QuadKey";
 import type XYZ from "@nextgisweb/webmap/ol/layer/XYZ";
 
+import { DEFAULT_MAX_ZOOM } from "../constant";
+
 let idx = 0;
 
 export function prepareBaselayerConfig(
@@ -77,6 +79,27 @@ export function prepareBaselayerConfig(
         if (copyright_url) {
             source.attributions = `<a href="${copyright_url}">${source.attributions}</a>`;
         }
+    }
+
+    if ("z_min" in config && typeof config.z_min === "number") {
+        source.minZoom = config.z_min;
+    }
+    if ("z_max" in config && typeof config.z_max === "number") {
+        source.maxZoom = config.z_max;
+    }
+
+    if (source.maxZoom === undefined) {
+        source.maxZoom = DEFAULT_MAX_ZOOM;
+    }
+
+    if (source.minZoom !== undefined) {
+        // Put minZoom in layer options (not source options, as with maxZoom) to avoid triggering
+        // an avalanche of high‑zoom tiles when zoomed out. Below this zoom, the layer is simply
+        // hidden instead of trying to fetch zoom‑18 tiles at zoom‑0, for example.
+        // Although this differs from maxZoom’s upscaling behavior, but it makes the map more stable
+        // and since minZoom is realy rarely used, it shouldn't cause any problems.
+        layer.minZoom = source.minZoom;
+        delete source.minZoom;
     }
 
     layer.opacity = config.opacity ? config.opacity : undefined;

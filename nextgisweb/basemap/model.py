@@ -29,6 +29,8 @@ class BasemapLayer(Base, Resource):
     qms = sa.Column(sa.Unicode)
     copyright_text = sa.Column(sa.Unicode)
     copyright_url = sa.Column(sa.Unicode)
+    z_min = sa.Column(sa.Integer)
+    z_max = sa.Column(sa.Integer)
 
     @classmethod
     def check_parent(cls, parent):
@@ -40,6 +42,8 @@ class BasemapLayerSerializer(Serializer, resource=BasemapLayer):
     qms = SColumn(read=DataScope.read, write=DataScope.write)
     copyright_text = SColumn(read=DataScope.read, write=DataScope.write)
     copyright_url = SColumn(read=DataScope.read, write=DataScope.write)
+    z_min = SColumn(read=DataScope.read, write=DataScope.write)
+    z_max = SColumn(read=DataScope.read, write=DataScope.write)
 
 
 class BasemapWebMap(Base):

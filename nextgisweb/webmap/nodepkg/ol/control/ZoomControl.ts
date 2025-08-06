@@ -1,3 +1,4 @@
+import type { Map } from "ol";
 import type { FitOptions } from "ol/View";
 import Zoom from "ol/control/Zoom";
 import type { Options } from "ol/control/Zoom";
@@ -10,10 +11,13 @@ import { iconHtml } from "@nextgisweb/pyramid/icon";
 
 import InitialExtentIcon from "@nextgisweb/icon/material/home";
 
+import "./ZoomControl.less";
+
 export interface ZoomControlOptions extends Options {
     extent?: Extent;
     fitOptions?: FitOptions;
     extentProjection?: ProjectionLike;
+    showZoomLevel?: boolean;
 }
 
 export class ZoomControl extends Zoom {
@@ -22,6 +26,7 @@ export class ZoomControl extends Zoom {
     private fitOptions: FitOptions;
     private extentProjection: ProjectionLike;
     private isAdded: boolean = false;
+    private zoomLevelDisplay?: HTMLSpanElement;
 
     constructor(options: ZoomControlOptions) {
         super(options);
@@ -44,6 +49,41 @@ export class ZoomControl extends Zoom {
         );
 
         this.updateHomeButtonVisibility();
+
+        if (options.showZoomLevel) {
+            this.zoomLevelDisplay = document.createElement("span");
+            this.zoomLevelDisplay.className = "zoom-level-display";
+            this.zoomLevelDisplay.title = gettext("Current zoom level");
+
+            const zoomInButton = this.element.querySelector(".ol-zoom-in");
+            const zoomOutButton = this.element.querySelector(".ol-zoom-out");
+
+            if (zoomInButton && zoomOutButton) {
+                this.element.insertBefore(this.zoomLevelDisplay, zoomOutButton);
+            } else {
+                this.element.appendChild(this.zoomLevelDisplay);
+            }
+        }
+    }
+
+    setMap(map: Map | null): void {
+        super.setMap(map);
+        if (map && this.zoomLevelDisplay) {
+            const view = map.getView();
+            this.updateZoomLevel(view.getZoom() ?? 0);
+            view.on("change:resolution", () => {
+                this.updateZoomLevel(view.getZoom() ?? 0);
+            });
+        }
+    }
+
+    private updateZoomLevel(zoom: number): void {
+        if (this.zoomLevelDisplay) {
+            const rounded = parseFloat(zoom.toFixed(1));
+            this.zoomLevelDisplay.textContent = Number.isInteger(rounded)
+                ? String(rounded.toFixed(0))
+                : String(rounded);
+        }
     }
 
     setExtent(extent: Extent | undefined): void {

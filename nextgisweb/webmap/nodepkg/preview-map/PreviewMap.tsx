@@ -12,6 +12,7 @@ import MapIcon from "@nextgisweb/icon/material/map/outline";
 export function PreviewMap({
     children,
     basemap: basemapProp = false,
+    showZoomLevel,
     ...props
 }: MapComponentProps) {
     const [basemap, toggleBaseMap] = useReducer((state) => !state, basemapProp);
@@ -31,6 +32,7 @@ export function PreviewMap({
                             : undefined
                     }
                     fitOptions={{ maxZoom: props.mapExtent?.maxZoom }}
+                    showZoomLevel={showZoomLevel}
                     position="top-left"
                 />
                 <ToggleControl

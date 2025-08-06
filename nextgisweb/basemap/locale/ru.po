@@ -1,28 +1,40 @@
-#: model.py:25
+#: model.py:24 nodepkg/layer-widget/LayerWidget.tsx:202
 msgid "Basemap"
 msgstr "Подложка веб-карты"
 
-#: nodepkg/layer-widget/LayerWidget.tsx:20
+#: nodepkg/layer-widget/LayerWidget.tsx:17
 msgid "Pick from QMS"
 msgstr "Выбрать из QMS"
 
-#: nodepkg/layer-widget/LayerWidget.tsx:22
+#: nodepkg/layer-widget/LayerWidget.tsx:19
 msgid "Search for geoservices provided by "
 msgstr "Искать геосервисы, предоставленные "
 
-#: nodepkg/layer-widget/LayerWidget.tsx:23
+#: nodepkg/layer-widget/LayerWidget.tsx:20
 msgid "You can search by name or ID"
 msgstr "Можно искать по имени или по ID"
 
-#: nodepkg/layer-widget/LayerWidget.tsx:26
+#: nodepkg/layer-widget/LayerWidget.tsx:24
 msgid "If a service from QMS is selected, this field cannot be edited."
 msgstr "Пока выбран сервис из QMS, редактирование этих полей отключено."
 
-#: nodepkg/layer-widget/LayerWidget.tsx:95
+#: nodepkg/layer-widget/LayerWidget.tsx:25
+msgid ""
+"Above this zoom level, no new tiles are fetched but tiles from the nearest "
+"allowed zoom are displayed and upscaled."
+msgstr ""
+"Выше этого уровня зума новые тайлы не загружаются, вместо этого показываются "
+"тайлы с ближайшего доступного уровня с увеличением масштаба."
+
+#: nodepkg/layer-widget/LayerWidget.tsx:26
+msgid "Below this zoom level, the layer is hidden and no new tiles are fetched."
+msgstr "Ниже этого уровня зума слой не показывается, и новые тайлы не загружаются."
+
+#: nodepkg/layer-widget/LayerWidget.tsx:99
 msgid "URL"
 msgstr "URL"
 
-#: nodepkg/layer-widget/LayerWidget.tsx:103
+#: nodepkg/layer-widget/LayerWidget.tsx:105
 msgid "Copyright text"
 msgstr "Текст для копирайта"
 
@@ -30,27 +42,34 @@ msgstr "Текст для копирайта"
 msgid "Copyright URL"
 msgstr "Ссылка на копирайт"
 
-#: nodepkg/layer-widget/LayerWidget.tsx:168
-#: nodepkg/webmap-widget/WebMapWidget.tsx:108
-msgid "Basemaps"
-msgstr "Подложки"
+#: nodepkg/layer-widget/LayerWidget.tsx:119
+msgid "Max zoom level"
+msgstr "Макс. зум"
 
-#: nodepkg/plugin/base-map/BaseMap.ts:56
+#: nodepkg/layer-widget/LayerWidget.tsx:131
+msgid "Min zoom level"
+msgstr "Мин. зум"
+
+#: nodepkg/plugin/base-map/BaseMap.ts:59
 msgid "No basemap"
 msgstr "Без подложки"
 
-#: nodepkg/webmap-widget/WebMapWidget.tsx:27
+#: nodepkg/webmap-widget/WebMapWidget.tsx:24
 msgid "Display name"
 msgstr "Наименование"
 
-#: nodepkg/webmap-widget/WebMapWidget.tsx:34
+#: nodepkg/webmap-widget/WebMapWidget.tsx:31
 msgid "Default basemap"
 msgstr "Подложка по умолчанию"
 
-#: nodepkg/webmap-widget/WebMapWidget.tsx:37
+#: nodepkg/webmap-widget/WebMapWidget.tsx:34
 msgid "Opacity"
 msgstr "Непрозрачность"
 
-#: nodepkg/webmap-widget/WebMapWidget.tsx:42
+#: nodepkg/webmap-widget/WebMapWidget.tsx:39
 msgid "Resource"
 msgstr "Ресурс"
+
+#: nodepkg/webmap-widget/WebMapWidget.tsx:103
+msgid "Basemaps"
+msgstr "Подложки"

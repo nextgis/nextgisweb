@@ -2,12 +2,12 @@ import { observer } from "mobx-react-lite";
 import { useEffect, useMemo, useState } from "react";
 
 import settings from "@nextgisweb/basemap/client-settings";
-import { InputValue, Slider } from "@nextgisweb/gui/antd";
+import { InputInteger, InputValue, Slider } from "@nextgisweb/gui/antd";
 import { LotMV } from "@nextgisweb/gui/arm";
 import { Area, Lot } from "@nextgisweb/gui/mayout";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { EditorWidget } from "@nextgisweb/resource/type";
-import { MapControl, UrlLayer } from "@nextgisweb/webmap/map-component";
+import { MapControl, URLLayer } from "@nextgisweb/webmap/map-component";
 import { PreviewMap } from "@nextgisweb/webmap/preview-map";
 
 import type { LayerStore } from "./LayerStore";
@@ -20,7 +20,11 @@ const msgPickQmsHelpMainPart = gettext("Search for geoservices provided by ");
 const msgPickQmsHelpTodoPart = gettext("You can search by name or ID");
 
 // prettier-ignore
-const msgDisabled = gettext("If a service from QMS is selected, this field cannot be edited.");
+const [msgDisabled, msgMaxZoomHelp, msgMinZoomHelp ] = [
+    gettext("If a service from QMS is selected, this field cannot be edited."),
+    gettext("Above this zoom level, no new tiles are fetched but tiles from the nearest allowed zoom are displayed and upscaled."),
+    gettext("Below this zoom level, the layer is hidden and no new tiles are fetched.")
+];
 
 export const LayerWidget: EditorWidget<LayerStore> = observer(({ store }) => {
     const [qmsId, setQmsId] = useState<number>();
@@ -59,9 +63,10 @@ export const LayerWidget: EditorWidget<LayerStore> = observer(({ store }) => {
             }}
         >
             <div style={{ flex: "none" }}>
-                <Area pad style={{ height: "100%" }}>
+                <Area pad style={{ height: "100%" }} cols={["1fr", "1fr"]}>
                     <Lot
                         label={msgPickQms}
+                        row
                         help={() => (
                             <>
                                 {msgPickQmsHelpMainPart}
@@ -82,12 +87,15 @@ export const LayerWidget: EditorWidget<LayerStore> = observer(({ store }) => {
                                 store.copyrightUrl.value =
                                     service.copyright_url;
                                 store.qms.value = JSON.stringify(service);
+                                store.maxzoom.value = service.z_max;
+                                store.minzoom.value = service.z_min;
                             }}
                         ></QMSSelect>
                     </Lot>
 
                     <LotMV
                         help={disabled ? msgDisabled : undefined}
+                        row
                         value={store.url}
                         component={InputValue}
                         label={gettext("URL")}
@@ -96,6 +104,7 @@ export const LayerWidget: EditorWidget<LayerStore> = observer(({ store }) => {
 
                     <LotMV
                         help={disabled ? msgDisabled : undefined}
+                        row
                         label={gettext("Copyright text")}
                         value={store.copyrightText}
                         component={InputValue}
@@ -103,10 +112,35 @@ export const LayerWidget: EditorWidget<LayerStore> = observer(({ store }) => {
                     />
                     <LotMV
                         help={disabled ? msgDisabled : undefined}
+                        row
                         label={gettext("Copyright URL")}
                         value={store.copyrightUrl}
                         component={InputValue}
                         props={{ disabled }}
+                    />
+                    <LotMV
+                        help={disabled ? msgDisabled : msgMinZoomHelp}
+                        label={gettext("Min zoom level")}
+                        value={store.minzoom}
+                        component={InputInteger}
+                        props={{
+                            disabled,
+                            min: 0,
+                            max: 24,
+                            style: { width: "100%" },
+                        }}
+                    />
+                    <LotMV
+                        help={disabled ? msgDisabled : msgMaxZoomHelp}
+                        label={gettext("Max zoom level")}
+                        value={store.maxzoom}
+                        component={InputInteger}
+                        props={{
+                            disabled,
+                            min: 0,
+                            max: 24,
+                            style: { width: "100%" },
+                        }}
                     />
                 </Area>
             </div>
@@ -118,6 +152,7 @@ export const LayerWidget: EditorWidget<LayerStore> = observer(({ store }) => {
                     }}
                 >
                     <PreviewMap
+                        showZoomLevel
                         style={{
                             height: "100%",
                             borderRadius: "4px",
@@ -139,7 +174,7 @@ export const LayerWidget: EditorWidget<LayerStore> = observer(({ store }) => {
                                 />
                             </div>
                         </MapControl>
-                        <UrlLayer
+                        <URLLayer
                             url={store.url.value}
                             key={qmsId}
                             opacity={opacity}
@@ -148,6 +183,17 @@ export const LayerWidget: EditorWidget<LayerStore> = observer(({ store }) => {
                                     ? `<a href="${store.copyrightUrl.value}" target="_blank">${store.copyrightText.value}</a>`
                                     : store.copyrightText.value
                             }
+                            layerOptions={{
+                                // Put minZoom in layerOptions (not sourceOptions, as with maxZoom) to avoid triggering
+                                // an avalanche of high‑zoom tiles when zoomed out. Below this zoom, the layer is simply
+                                // hidden instead of trying to fetch zoom‑18 tiles at zoom‑0, for example.
+                                // Although this differs from maxZoom’s upscaling behavior, but it makes the map more stable
+                                // and since minZoom is realy rarely used, it shouldn't cause any problems.
+                                minZoom: store.minzoom.value ?? undefined,
+                            }}
+                            sourceOptions={{
+                                maxZoom: store.maxzoom.value ?? undefined,
+                            }}
                         />
                     </PreviewMap>
                 </div>

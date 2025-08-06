@@ -13,6 +13,8 @@ const {
     url,
     copyright_text: copyrightText,
     copyright_url: copyrightUrl,
+    z_min: minzoom,
+    z_max: maxzoom,
     $load: mapperLoad,
     $dump: mapperDump,
     $dirty: mapperDirty,
@@ -32,6 +34,8 @@ export class LayerStore
     readonly qms = qms.init(null, this);
     readonly copyrightText = copyrightText.init("", this);
     readonly copyrightUrl = copyrightUrl.init(null, this);
+    readonly minzoom = minzoom.init(null, this);
+    readonly maxzoom = maxzoom.init(null, this);
 
     @observable.ref accessor loaded = false;
     @observable.ref accessor validate = false;

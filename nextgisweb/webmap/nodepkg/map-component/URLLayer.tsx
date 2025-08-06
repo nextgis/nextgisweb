@@ -1,9 +1,12 @@
+import type { Options as XYZSourceOptions } from "ol/source/XYZ";
 import { useEffect, useRef, useState } from "react";
 
 import { createTileLayer } from "@nextgisweb/basemap/util/baselayer";
 import { isValidURL } from "@nextgisweb/gui/arm/validate";
+import { useObjectState } from "@nextgisweb/gui/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { tileLoadFunction } from "@nextgisweb/pyramid/util";
+import type { LayerOptions } from "@nextgisweb/webmap/ol/layer/CoreLayer";
 import type QuadKey from "@nextgisweb/webmap/ol/layer/QuadKey";
 import type XYZ from "@nextgisweb/webmap/ol/layer/XYZ";
 
@@ -34,16 +37,26 @@ function createEmptyTile(
 
 const emptyTile = createEmptyTile();
 
-export function UrlLayer({
-    url,
-    opacity,
-    attributions,
-}: {
+export interface URLLayerProps {
     url: string;
     opacity?: number;
     attributions?: string | null;
-}) {
+    layerOptions?: LayerOptions;
+    sourceOptions?: Pick<XYZSourceOptions, "minZoom" | "maxZoom">;
+}
+
+export function URLLayer({
+    url,
+    opacity,
+    attributions,
+    layerOptions: layerOptionsProp,
+    sourceOptions: sourceOptionsProp,
+}: URLLayerProps) {
     const { mapStore } = useMapContext();
+
+    const [sourceOptions] = useObjectState(sourceOptionsProp);
+    const [layerOptions] = useObjectState(layerOptionsProp || {});
+    const layerOptionsRef = useRef(layerOptionsProp);
 
     const [layer, setLayer] = useState<QuadKey | XYZ | undefined>(undefined);
     const layerRef = useRef<QuadKey | XYZ | undefined>(undefined);
@@ -52,6 +65,7 @@ export function UrlLayer({
         const abortController = new AbortController();
         if (mapStore && url && isValidURL(url)) {
             createTileLayer({
+                layer: layerOptionsRef.current,
                 source: {
                     attributions: attributions ?? undefined,
                     url,
@@ -75,6 +89,7 @@ export function UrlLayer({
                                 img.src = emptyTile;
                             });
                     },
+                    ...sourceOptions,
                 },
             }).then((tileLayer) => {
                 if (!abortController.signal.aborted && tileLayer) {
@@ -92,7 +107,19 @@ export function UrlLayer({
                 layerRef.current.dispose();
             }
         };
-    }, [mapStore, attributions, url]);
+    }, [mapStore, attributions, sourceOptions, url]);
+
+    useEffect(() => {
+        if (layer) {
+            layerOptionsRef.current = layerOptions;
+        }
+    }, [layer, layerOptions]);
+
+    useEffect(() => {
+        if (layer && layerOptions.minZoom !== undefined) {
+            layer.getLayer().setMinZoom(layerOptions.minZoom);
+        }
+    }, [layer, layerOptions.minZoom]);
 
     useEffect(() => {
         if (layer && opacity !== undefined) {

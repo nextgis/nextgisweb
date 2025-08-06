@@ -12,7 +12,7 @@ import {
     MapComponent,
     NGWLayer,
     ToggleControl,
-    UrlLayer,
+    URLLayer,
     ZoomControl,
 } from "@nextgisweb/webmap/map-component";
 
@@ -130,7 +130,7 @@ export function PreviewLayer({
                 </ToggleControl>
 
                 {url ? (
-                    <UrlLayer url={url} attributions={attributions} />
+                    <URLLayer url={url} attributions={attributions} />
                 ) : (
                     <NGWLayer
                         resourceId={id}

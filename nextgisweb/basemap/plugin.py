@@ -12,6 +12,8 @@ class BasemapPlugin(WebmapPlugin):
             dict(
                 url=bm.resource.url,
                 qms=bm.resource.qms,
+                z_min=bm.resource.z_min,
+                z_max=bm.resource.z_max,
                 copyright_text=bm.resource.copyright_text,
                 copyright_url=bm.resource.copyright_url,
                 **bm.to_dict(),
