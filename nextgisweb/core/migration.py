@@ -204,7 +204,7 @@ class MigrationContext:
                 m(self)
             elif isinstance(mig, SQLScriptMigration):
                 s = getattr(mig, "{}_script".format(operation.opname))
-                DBSession.connection().execute(sa.text(s()))
+                DBSession.connection().exec_driver_sql(s())
 
         return operation.apply(state)
 
