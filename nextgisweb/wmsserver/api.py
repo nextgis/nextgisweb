@@ -30,6 +30,7 @@ from nextgisweb.render import (
 )
 from nextgisweb.resource import DataScope, ResourceFactory, ServiceScope
 from nextgisweb.spatial_ref_sys import SRS
+from nextgisweb.spatial_ref_sys.model import BOUNDS_EPSG_3857
 
 from .model import Service
 
@@ -56,7 +57,7 @@ def layer_by_keyname(service, keyname):
     )
 
 
-def handler(obj, request):
+def wms_handler(obj, request):
     """WMS endpoint"""
     try:
         request.resource_permission(ServiceScope.connect)
@@ -528,6 +529,94 @@ def error_renderer(request, err_info, exc, exc_info, debug=True):
     )
 
 
+def wmts_handler(obj, request):
+    """WMTS endpoint"""
+    try:
+        request.resource_permission(ServiceScope.connect)
+    except InsufficientPermissions:
+        if request.authenticated_userid is None:
+            return Response(status_code=401, headers={"WWW-Authenticate": "Basic"})
+        raise
+
+    NS_OWS = "http://www.opengis.net/ows/1.1"
+    E = ElementMaker(
+        nsmap={
+            None: "http://www.opengis.net/wmts/1.0",
+            "ows": NS_OWS,
+            "xlink": "http://www.w3.org/1999/xlink",
+            "xsi": "http://www.w3.org/2001/XMLSchema-instance",
+            "gml": "http://www.opengis.net/gml",
+        },
+    )
+    E_OWS = ElementMaker(namespace=NS_OWS)
+
+    tile_matrix_id = "EPSG:3857"
+
+    # Don't need urlencode here
+    resource_url = request.route_url("render.tile")
+    resource_url += "?resource=%d&z={TileMatrix}&x={TileCol}&y={TileRow}"
+
+    layers = []
+    for layer in obj.layers:
+        layers.append(
+            E.Layer(
+                E_OWS.Title(layer.display_name),
+                E_OWS.Identifier(layer.keyname),
+                E_OWS.WGS84BoundingBox(
+                    E_OWS.LowerCorner("-180 -85.051129"),
+                    E_OWS.UpperCorner("180 85.051129"),
+                    crs="urn:ogc:def:crs:OGC:2:84",
+                ),
+                E.Style(E_OWS.Identifier(layer.keyname), isDefault="true"),
+                E.Format("image/png"),
+                E.TileMatrixSetLink(E.TileMatrixSet(tile_matrix_id)),
+                E.ResourceURL(
+                    format="image/png",
+                    resourceType="tile",
+                    template=resource_url % layer.resource_id,
+                ),
+            )
+        )
+
+    tile_matrix_set = E.TileMatrixSet(
+        E_OWS.Identifier(tile_matrix_id),
+        E_OWS.SupportedCRS("http://www.opengis.net/def/crs/EPSG/0/3857"),
+    )
+    tile_size = 256
+    srs_left, srs_bottom, srs_right, srs_top = BOUNDS_EPSG_3857
+    extent_size = srs_right - srs_left
+    mpi = 0.00028
+    for i in range(25):
+        row_size = 2**i
+        scale_denom = extent_size / tile_size / row_size / mpi
+        tile_matrix_set.append(
+            E.TileMatrix(
+                E_OWS.Identifier(str(i)),
+                E.ScaleDenominator("%.6f" % scale_denom),
+                E.TopLeftCorner("%.2f %.2f" % (srs_left, srs_top)),
+                E.TileWidth(str(tile_size)),
+                E.TileHeight(str(tile_size)),
+                E.MatrixWidth(str(row_size)),
+                E.MatrixHeight(str(row_size)),
+            )
+        )
+    contents = E.Contents(*layers, tile_matrix_set)
+
+    capabilities = E.Capabilities(
+        dict(version="1.0.0"),
+        E_OWS.ServiceIdentification(
+            E_OWS.Title(obj.display_name),
+            E_OWS.ServiceType("OGC WMTS"),
+            E_OWS.ServiceTypeVersion("1.0.0"),
+        ),
+        contents,
+    )
+
+    return Response(
+        etree.tostring(capabilities, encoding="utf-8"), content_type="text/xml", charset="utf-8"
+    )
+
+
 def setup_pyramid(comp, config):
     service_factory = ResourceFactory(context=Service)
 
@@ -536,6 +625,14 @@ def setup_pyramid(comp, config):
         "/api/resource/{id}/wms",
         factory=service_factory,
         error_renderer=error_renderer,
-        get=handler,
-        post=handler,
+        get=wms_handler,
+        post=wms_handler,
+    )
+
+    config.add_route(
+        "wmsserver.wmts",
+        "/api/resource/{id}/WMTSCapabilities.xml",
+        factory=service_factory,
+        error_renderer=error_renderer,
+        get=wmts_handler,
     )
