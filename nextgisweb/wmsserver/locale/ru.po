@@ -1,34 +1,51 @@
-#: model.py:21 nodepkg/service-widget/ServiceWidget.tsx:119 view.py:16
+#: model.py:20 nodepkg/service-widget/ServiceWidget.tsx:127 view.py:17
 msgid "WMS service"
 msgstr "Сервис WMS"
 
-#: nodepkg/service-widget/ServiceWidget.tsx:30
+#: nodepkg/service-widget/ServiceWidget.tsx:27
 msgid "Display name"
 msgstr "Наименование"
 
-#: nodepkg/service-widget/ServiceWidget.tsx:35
+#: nodepkg/service-widget/ServiceWidget.tsx:32
 msgid "Keyname"
 msgstr "Ключ"
 
-#: nodepkg/service-widget/ServiceWidget.tsx:40
+#: nodepkg/service-widget/ServiceWidget.tsx:37
 msgid "Min scale"
 msgstr "Мин. масштаб"
 
-#: nodepkg/service-widget/ServiceWidget.tsx:45
+#: nodepkg/service-widget/ServiceWidget.tsx:42
 msgid "Max scale"
 msgstr "Макс. масштаб"
 
-#: nodepkg/service-widget/ServiceWidget.tsx:50
+#: nodepkg/service-widget/ServiceWidget.tsx:47
 msgid "Resource"
 msgstr "Ресурс"
 
-#: view.py:17
+#: view.py:19
 msgid ""
 "Web Map Service (WMS) is a standard protocol developed by the Open Geospatial"
-" Consortium for serving georeferenced map images. These images are typically "
-"produced by a map server from data provided by a GIS database."
+" Consortium for serving dynamically rendered, georeferenced map images. These"
+" images are generated on demand, allowing flexible styling and query "
+"capabilities."
 msgstr ""
-"Web Map Service (WMS) - это стандартный протокол, разработанный Open "
-"Geospatial Consortium для предоставления географически привязанных "
-"изображений. Эти изображения обычно генерируются картографическим сервером из"
-" данных базы данных ГИС."
+"Web Map Service (WMS) - стандартный протокол, разработанный Open Geospatial "
+"Consortium для предоставления динамически формируемых геопривязанных "
+"картографических изображений. Эти изображения создаются по запросу, что "
+"обеспечивает гибкое оформление и возможности выполнения запросов."
+
+#: view.py:31
+msgid "WMTS service"
+msgstr "Сервис WMTS"
+
+#: view.py:33
+msgid ""
+"Web Map Tile Service (WMTS) is a standard protocol developed by the Open "
+"Geospatial Consortium for serving georeferenced map tiles. These tiles are "
+"retrieved from a server in fixed sizes and zoom levels, enabling fast and "
+"efficient display of maps."
+msgstr ""
+"Web Map Tile Service (WMTS) - стандартный протокол, разработанный Open "
+"Geospatial Consortium для предоставления геопривязанных картографических "
+"тайлов. Эти тайлы загружаются с сервера в фиксированных размерах и уровнях "
+"масштабирования, что обеспечивает быстрое и эффективное отображение карт."

@@ -16,7 +16,7 @@ class ServiceWidget(Widget):
 class WMSLink(ExternalAccessLink):
     title = gettext("WMS service")
     help = gettext(
-        "Web Map Service (WMS) is a standard protocol developed by the Open Geospatial Consortium for serving georeferenced map images. These images are typically produced by a map server from data provided by a GIS database."
+        "Web Map Service (WMS) is a standard protocol developed by the Open Geospatial Consortium for serving dynamically rendered, georeferenced map images. These images are generated on demand, allowing flexible styling and query capabilities."
     )
     docs_url = "docs_ngweb/source/layers.html#using-wms-service-connection"
 
@@ -25,6 +25,20 @@ class WMSLink(ExternalAccessLink):
     @classmethod
     def url_factory(cls, obj, request) -> str:
         return request.route_url("wmsserver.wms", id=obj.id)
+
+
+class WMTSLink(ExternalAccessLink):
+    title = gettext("WMTS service")
+    help = gettext(
+        "Web Map Tile Service (WMTS) is a standard protocol developed by the Open Geospatial Consortium for serving georeferenced map tiles. These tiles are retrieved from a server in fixed sizes and zoom levels, enabling fast and efficient display of maps."
+    )
+    docs_url = None
+
+    resource = Service
+
+    @classmethod
+    def url_factory(cls, obj, request) -> str:
+        return request.route_url("wmsserver.wmts", id=obj.id)
 
 
 def setup_pyramid(comp, config):
