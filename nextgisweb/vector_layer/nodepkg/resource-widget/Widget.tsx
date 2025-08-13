@@ -158,10 +158,10 @@ export const Widget: EditorWidget<Store> = observer(({ store }) => {
             add("file", gettext("Load features from file"));
             add("empty", gettext("Create empty layer"));
         } else {
-            add("keep", gettext("Keep existing layer features"));
+            add("keep", gettext("Keep existing features"));
             add("gtype", gettext("Change geometry type"));
-            add("file", gettext("Replace layer features from file"));
-            add("delete", gettext("Delete all features from layer"));
+            add("file", gettext("Replace features from file"));
+            add("delete", gettext("Delete all features"));
         }
 
         return result;

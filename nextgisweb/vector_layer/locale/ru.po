@@ -1,4 +1,4 @@
-#: api.py:23 model.py:710
+#: api.py:23 model.py:711
 msgid "GDAL library failed to open file."
 msgstr "Библиотеке GDAL не удалось открыть файл."
 
@@ -70,23 +70,23 @@ msgstr "Тип геометрии"
 msgid "Feature count"
 msgstr "Количество объектов"
 
-#: model.py:713
+#: model.py:714
 msgid "Unsupport OGR driver: %s."
 msgstr "Драйвер OGR '%s' не поддерживается."
 
-#: model.py:722
+#: model.py:723
 msgid "Dataset doesn't contain layers."
 msgstr "Набор данных не содержит ни одного слоя."
 
-#: model.py:725
+#: model.py:726
 msgid "Dataset contains more than one layer."
 msgstr "Набор данных содержит более одного слоя."
 
-#: model.py:730
+#: model.py:731
 msgid "Unable to open layer."
 msgstr "Не удалось открыть слой."
 
-#: model.py:743
+#: model.py:744
 msgid "Layer doesn't contain coordinate system information."
 msgstr "Слой не содержит информации о системе координат."
 
@@ -182,7 +182,7 @@ msgid "Create empty layer"
 msgstr "Создать пустой слой"
 
 #: nodepkg/resource-widget/Widget.tsx:161
-msgid "Keep existing layer features"
+msgid "Keep existing features"
 msgstr "Оставить существующие объекты"
 
 #: nodepkg/resource-widget/Widget.tsx:162
@@ -190,12 +190,12 @@ msgid "Change geometry type"
 msgstr "Изменить тип геометрии"
 
 #: nodepkg/resource-widget/Widget.tsx:163
-msgid "Replace layer features from file"
-msgstr "Заменить объекты слоя из файла"
+msgid "Replace features from file"
+msgstr "Заменить объекты из файла"
 
 #: nodepkg/resource-widget/Widget.tsx:164
-msgid "Delete all features from layer"
-msgstr "Удалить все объекты из слоя"
+msgid "Delete all features"
+msgstr "Удалить все объекты"
 
 #: nodepkg/resource-widget/Widget.tsx:180
 msgid "current"
@@ -213,7 +213,7 @@ msgstr "Дополнительные параметры"
 msgid "Could not determine a geometry type."
 msgstr "Не удалось определить тип геометрии."
 
-#: ogrloader.py:313
+#: ogrloader.py:314
 msgid "Source layer contains no features satisfying the conditions."
 msgstr "Слой не содержит объектов, удовлетворяющих условиям."
 
@@ -245,7 +245,7 @@ msgstr "Кодировка поля '%s(?)' повреждена."
 msgid "Unsupported field type: %r."
 msgstr "Тип поля %r не поддерживается."
 
-#: ogrloader.py:415
+#: ogrloader.py:416
 msgid ""
 "The source layer has a local coordinate system and can't be reprojected to "
 "the target coordinate system."
@@ -253,7 +253,7 @@ msgstr ""
 "Исходный слой имеет локальную систему координат и не может быть "
 "перепроецирован в целевую."
 
-#: ogrloader.py:498
+#: ogrloader.py:499
 msgid ""
 "Feature #%d has a geometry that can't be reprojected to target coordinate "
 "system"
@@ -293,7 +293,7 @@ msgstr "Объект #%d содержит пустые кольца."
 msgid "Feature #%d has unclosed rings."
 msgstr "Объект #%d содержит незамкнутые кольца."
 
-#: ogrloader.py:698
+#: ogrloader.py:699
 msgid "Feature #%d has less than 3 points in a polygon ring."
 msgstr "Объект #%d содержит меньше 3-х точек в кольце полигона."
 
