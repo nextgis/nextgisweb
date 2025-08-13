@@ -1,14 +1,11 @@
-export interface Credentials {
-    login?: string;
-    password?: string;
-}
+import type { LoginBody } from "@nextgisweb/auth/type/api";
 
 export interface LoginFormProps {
-    onChange?: (creds: Credentials | undefined) => void;
+    onChange?: (creds: LoginBody | undefined) => void;
     reloadAfterLogin?: boolean;
 }
 
 export interface CredsOnChangeOptions {
-    value: Credentials;
+    value: LoginBody;
     isValid: () => Promise<boolean>;
 }

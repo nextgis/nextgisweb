@@ -1,8 +1,7 @@
 import { action, observable } from "mobx";
 
+import type { LoginBody } from "@nextgisweb/auth/type/api";
 import { BaseAPIError, route } from "@nextgisweb/pyramid/api";
-
-import type { Credentials } from "../login/type";
 
 class AuthStore {
     @observable.ref accessor loginError = "";
@@ -14,7 +13,7 @@ class AuthStore {
     @observable.ref accessor showLoginModal = true;
 
     @action
-    async login(creds: Credentials) {
+    async login(creds: LoginBody) {
         this._logout();
         this._cleanErrors();
         try {
