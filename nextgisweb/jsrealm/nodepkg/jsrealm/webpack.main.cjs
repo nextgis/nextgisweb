@@ -513,7 +513,11 @@ const webpackConfig = defaults("main", (env) => ({
                       secure: false,
                   },
               ],
+              //   liveReload: true,
               static: false,
+              client: {
+                  overlay: false,
+              },
           }
         : undefined,
 
@@ -521,6 +525,7 @@ const webpackConfig = defaults("main", (env) => ({
         ? {
               runtimeChunk: false,
               splitChunks: false,
+              emitOnErrors: true,
           }
         : {
               splitChunks: {

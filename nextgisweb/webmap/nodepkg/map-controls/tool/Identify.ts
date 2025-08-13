@@ -199,7 +199,7 @@ export class Identify extends ToolBase {
     }
 
     async execute(pixel: number[]): Promise<void> {
-        const olMap = this.display.map.olMap;
+        const olMap = this.map.olMap;
         const point = olMap.getCoordinateFromPixel(pixel);
 
         const request: Request = {
@@ -209,7 +209,7 @@ export class Identify extends ToolBase {
         };
 
         const items = await this.display.getVisibleItems();
-        const mapResolution = this.display.map.resolution;
+        const mapResolution = this.map.resolution;
 
         const rasterLayers: number[] = [];
 

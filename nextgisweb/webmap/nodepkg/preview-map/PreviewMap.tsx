@@ -5,7 +5,7 @@ import { convertNgwExtentToWSEN } from "@nextgisweb/gui/util/extent";
 import { ToggleControl, ZoomControl } from "../map-component";
 import { MapComponent } from "../map-component/MapComponent";
 import type { MapComponentProps } from "../map-component/MapComponent";
-import { AttributionControl } from "../map-component/control/AttributionControl";
+import AttributionControl from "../map-component/control/AttributionControl";
 
 import MapIcon from "@nextgisweb/icon/material/map/outline";
 

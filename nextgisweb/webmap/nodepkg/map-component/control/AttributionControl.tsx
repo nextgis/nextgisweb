@@ -3,6 +3,7 @@ import type Control from "ol/control/Control";
 import { useEffect, useState } from "react";
 
 import { useObjectState } from "@nextgisweb/gui/hook";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 import { Attribution } from "@nextgisweb/webmap/ol/control/Attribution";
 
 import { useMapContext } from "../context/useMapContext";
@@ -10,7 +11,7 @@ import { useMapControl } from "../hook/useMapControl";
 
 import type { ControlProps } from "./MapControl";
 
-export function AttributionControl({
+export default function AttributionControl({
     position,
     ...props
 }: ControlProps<Options>) {
@@ -21,7 +22,12 @@ export function AttributionControl({
     useMapControl({ context, instance, position });
 
     useEffect(() => {
-        setInstance(new Attribution(contpolProps));
+        setInstance(
+            new Attribution({
+                tipLabel: gettext("Attributions"),
+                ...contpolProps,
+            })
+        );
     }, [contpolProps]);
 
     return null;

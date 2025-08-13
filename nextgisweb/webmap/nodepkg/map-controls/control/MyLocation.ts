@@ -8,14 +8,14 @@ import { Circle as CircleStyle, Fill, Stroke, Style } from "ol/style";
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { iconHtml } from "@nextgisweb/pyramid/icon";
-import type { Display } from "@nextgisweb/webmap/display";
+import type { MapStore } from "@nextgisweb/webmap/ol/MapStore";
 
 import Icon from "@nextgisweb/icon/material/my_location";
 
 interface GeolocationControlOptions {
     target?: HTMLElement;
     tipLabel?: string;
-    display: Display;
+    map: MapStore;
 }
 
 const zIndexLocationLayer = 6000;
@@ -34,7 +34,7 @@ const positionFeatureStyle = new Style({
 });
 
 export class MyLocation extends Control {
-    private display: GeolocationControlOptions["display"];
+    private readonly map: MapStore;
     private geolocation?: Geolocation;
     private geolocationLayer?: VectorLayer<VectorSource>;
     private positionFeature?: Feature;
@@ -42,7 +42,7 @@ export class MyLocation extends Control {
     private _shouldZoom: boolean = false;
     private button: HTMLButtonElement;
 
-    constructor({ display, target, tipLabel }: GeolocationControlOptions) {
+    constructor({ map, target, tipLabel }: GeolocationControlOptions) {
         const element = document.createElement("div");
         element.className = "ol-control ol-unselectable";
 
@@ -69,7 +69,7 @@ export class MyLocation extends Control {
             target,
         });
 
-        this.display = display;
+        this.map = map;
         this.button = button;
 
         element.addEventListener("click", this._onClick);
@@ -112,7 +112,7 @@ export class MyLocation extends Control {
             trackingOptions: {
                 enableHighAccuracy: true,
             },
-            projection: this.display.map.olMap.getView().getProjection(),
+            projection: this.map.olMap.getView().getProjection(),
             tracking: true,
         });
 
@@ -131,7 +131,7 @@ export class MyLocation extends Control {
         this.accuracyFeature = new Feature();
 
         this.geolocationLayer = new VectorLayer({
-            map: this.display.map.olMap,
+            map: this.map.olMap,
             source: new VectorSource({
                 features: [this.accuracyFeature, this.positionFeature],
             }),
@@ -174,6 +174,6 @@ export class MyLocation extends Control {
         if (!this.positionFeature || !this.positionFeature.getGeometry())
             return;
         const extent = this.positionFeature.getGeometry()!.getExtent();
-        this.display.map.zoomToExtent(extent);
+        this.map.zoomToExtent(extent);
     }
 }

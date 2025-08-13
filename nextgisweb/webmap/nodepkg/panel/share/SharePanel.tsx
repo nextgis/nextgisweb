@@ -26,7 +26,7 @@ import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { useFavorites } from "@nextgisweb/resource/favorite/useFavorites";
 import settings from "@nextgisweb/webmap/client-settings";
-import { getControls } from "@nextgisweb/webmap/map-controls";
+// import { getControls } from "@nextgisweb/webmap/map-controls";
 import type { PanelStore } from "@nextgisweb/webmap/panel";
 import { getPermalink } from "@nextgisweb/webmap/utils/permalink";
 
@@ -78,14 +78,14 @@ const CodeArea = (props: TextAreaProps) => {
     );
 };
 
-const toolsOptions = getControls()
-    .filter((c) => c.embeddedShowMode === "customize")
-    .map((c) => {
-        return {
-            label: c.label,
-            value: c.key,
-        };
-    });
+// const toolsOptions = getControls()
+//     .filter((c) => c.embeddedShowMode === "customize")
+//     .map((c) => {
+//         return {
+//             label: c.label,
+//             value: c.key,
+//         };
+//     });
 
 const ToolsSelect = (props: SelectProps) => {
     return (
@@ -96,7 +96,7 @@ const ToolsSelect = (props: SelectProps) => {
                 width: "100%",
             }}
             placeholder={gettext("Select tools")}
-            options={toolsOptions}
+            // options={toolsOptions}
             {...props}
         />
     );

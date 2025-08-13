@@ -13,32 +13,36 @@ import "ol/ol.css";
 import "./MapComponent.less";
 
 export interface MapComponentProps extends ViewOptions {
-    children?: React.ReactNode;
-    target?: string;
     style?: React.CSSProperties;
+    target?: string;
     basemap?: boolean;
-    whenCreated?: (mapStore: MapStore | null) => void;
+    children?: React.ReactNode;
+    mapStore?: MapStore;
+    className?: string;
     mapExtent?: MapExtent;
     resetView?: boolean;
     showZoomLevel?: boolean;
+    whenCreated?: (mapStore: MapStore | null) => void;
 }
 
 export function MapComponent({
-    children,
-    style,
-    basemap,
     zoom = 0,
+    style,
     center = [0, 0],
+    basemap,
+    mapStore: mapStoreProp,
+    children,
+    className,
     mapExtent,
     whenCreated,
     ...props
 }: MapComponentProps) {
-    const mapRef = useRef<MapStore | null>(null);
-    const { createMapAdapter } = useMapAdapter({
-        center,
+    const { mapStore } = useMapAdapter({
         zoom,
-        mapExtent,
+        center,
         basemap,
+        mapStore: mapStoreProp,
+        mapExtent,
     });
 
     const mapContainerRef = useRef<HTMLDivElement>(null);
@@ -46,29 +50,33 @@ export function MapComponent({
     useEffect(() => {
         let observer: ResizeObserver | undefined = undefined;
         assert(mapContainerRef.current);
-        if (!mapRef.current) {
-            const adapter = createMapAdapter({
-                target: mapContainerRef.current,
-            });
-            mapRef.current = adapter;
+
+        mapStore.startup(mapContainerRef.current).then(() => {
             if (whenCreated) {
-                whenCreated(adapter);
+                whenCreated(mapStore);
             }
-        }
-        observer = new ResizeObserver(() => {
-            mapRef.current?.updateSize();
+
+            observer = new ResizeObserver(() => {
+                mapStore.updateSize();
+            });
+            observer.observe(mapStore.getTargetElement());
         });
-        observer.observe(mapRef.current.getTargetElement());
+
         return () => {
             if (observer) {
                 observer.disconnect();
             }
         };
-    }, [createMapAdapter, whenCreated]);
+    }, [mapStore, whenCreated]);
 
     return (
-        <MapContext value={{ mapStore: mapRef.current }}>
-            <div ref={mapContainerRef} style={style} className="map" {...props}>
+        <MapContext value={{ mapStore }}>
+            <div
+                ref={mapContainerRef}
+                style={style}
+                className={className}
+                {...props}
+            >
                 {children}
             </div>
         </MapContext>

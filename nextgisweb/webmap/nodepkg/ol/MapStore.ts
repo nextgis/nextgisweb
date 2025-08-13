@@ -1,4 +1,4 @@
-import { action, computed, observable, runInAction } from "mobx";
+import { action, computed, observable } from "mobx";
 import type { Feature } from "ol";
 import OlMap from "ol/Map";
 import type { MapOptions as OlMapOptions } from "ol/Map";
@@ -31,6 +31,7 @@ import "ol/ol.css";
 interface MapOptions extends OlMapOptions {
     logo?: boolean;
     extent?: Extent;
+    initialExtent?: Extent;
 }
 
 export interface Position {
@@ -56,6 +57,7 @@ export class MapStore extends Watchable<MapWatchableProps> {
     private readonly SMART_ZOOM = 12;
 
     private readonly _panelControl: PanelControl;
+    private readonly initialExtent?: Extent;
 
     readonly olMap: OlMap;
     @observable.shallow accessor layers: Layers = {};
@@ -65,16 +67,18 @@ export class MapStore extends Watchable<MapWatchableProps> {
     @observable.struct accessor center: number[] | null = null;
     @observable.ref accessor zoom: number | null = null;
     @observable.struct accessor position: Position | null = null;
+    @observable.struct accessor rotation: number = 0;
 
     constructor(private options: MapOptions) {
         super();
-        const { target, extent, ...rest } = this.options;
+        const { target, extent, initialExtent, ...rest } = this.options;
+        this.initialExtent = initialExtent;
         const view = new View({
-            minZoom: 3,
             maxZoom: 24,
             constrainResolution: true,
             extent,
         });
+
         this.olMap = new OlMap({ ...rest, view });
         this._panelControl = new PanelControl();
         this.olMap.addControl(this._panelControl);
@@ -117,30 +121,43 @@ export class MapStore extends Watchable<MapWatchableProps> {
     async startup(target: string | HTMLElement): Promise<void> {
         return new Promise((resolve) => {
             const olMap = this.olMap;
-            olMap.setTarget(target);
+
             const olView = olMap.getView();
 
-            olView.on("change:resolution", () => {
-                runInAction(() => {
-                    this.setResolution(olView.getResolution() ?? null);
-                });
-            });
-
-            olView.on("change:center", () => {
-                runInAction(() => {
-                    this.setCenter(olView.getCenter() ?? null);
-                });
-            });
-
-            olMap.on("moveend", () => {
+            const setResolution = () =>
+                this.setResolution(olView.getResolution() ?? null);
+            const setCenter = () => {
+                this.setCenter(olView.getCenter() ?? null);
+            };
+            const setPosition = () => {
                 this.setPosition(this.getPosition());
-            });
+            };
+            const setRotation = () => {
+                const r = olView.getRotation();
+                this.setRotation(typeof r === "number" ? r : 0);
+            };
+
+            olView.on("change:resolution", setResolution);
+            olView.on("change:center", setCenter);
+            olView.on("change:rotation", setRotation);
+
+            olMap.on("moveend", setPosition);
+
+            const applyInitialState = () => {
+                setResolution();
+                setCenter();
+                setPosition();
+            };
+
+            olMap.once("rendercomplete", applyInitialState);
+
             // Workaround to skip first map move event on start
             olMap.once("movestart", () => {
                 // Map ready only then first move happend
                 resolve();
                 mapStartup({ olMap, queue: imageQueue });
             });
+            olMap.setTarget(target);
         });
     }
 
@@ -176,6 +193,10 @@ export class MapStore extends Watchable<MapWatchableProps> {
         const oldZoom = this.zoom;
         this.zoom = zoom;
         this.notify("zoom", oldZoom, zoom);
+    }
+    @action
+    setRotation(rad: number) {
+        this.rotation = rad;
     }
 
     @action
@@ -293,6 +314,12 @@ export class MapStore extends Watchable<MapWatchableProps> {
             }
         } else {
             view.fit(extent, options);
+        }
+    }
+
+    zoomToInitialExtent() {
+        if (this.initialExtent) {
+            this.olMap.getView().fit(this.initialExtent);
         }
     }
 

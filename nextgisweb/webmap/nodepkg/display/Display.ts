@@ -6,13 +6,12 @@ import type { Geometry } from "ol/geom";
 import { fromLonLat, transformExtent } from "ol/proj";
 
 import { errorModal } from "@nextgisweb/gui/error";
-import { assert } from "@nextgisweb/jsrealm/error";
-import { appendTo } from "@nextgisweb/pyramid/company-logo";
+// import { assert } from "@nextgisweb/jsrealm/error";
+// import { appendTo } from "@nextgisweb/pyramid/company-logo";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { layoutStore } from "@nextgisweb/pyramid/layout";
 import topic from "@nextgisweb/webmap/compat/topic";
-import { buildControls } from "@nextgisweb/webmap/map-controls";
-import MapToolbar from "@nextgisweb/webmap/map-toolbar";
+// import { buildControls } from "@nextgisweb/webmap/map-controls";
 import type {
     DisplayConfig,
     LayerItemConfig,
@@ -43,7 +42,6 @@ import type {
     DisplayURLParams,
     Entrypoint,
     MapPlugin,
-    MapRefs,
     Mid,
     TinyConfig,
 } from "../type";
@@ -65,7 +63,7 @@ export class Display {
     tiny?: boolean;
 
     readonly map: MapStore;
-    mapNode?: HTMLElement;
+    // mapNode?: HTMLElement;
     private _extent: Extent;
     private _extentConst: Extent | null;
     private readonly _layerOrder: number[] = []; // Layers from back to front
@@ -75,7 +73,7 @@ export class Display {
     tabsManager: WebMapTabsStore;
     panelManager: PanelManager;
     mapStates: IMapStatesObserver;
-    mapToolbar?: MapToolbar;
+    // mapToolbar?: MapToolbar;
 
     identify?: Identify;
     featureHighlighter: FeatureHighlighter;
@@ -102,11 +100,11 @@ export class Display {
     private _startupDeferred: LoggedDeferred;
     private _itemStoreDeferred: LoggedDeferred;
 
-    // UI Control Panes
-    leftTopControlPane?: HTMLElement;
-    leftBottomControlPane?: HTMLElement;
-    rightTopControlPane?: HTMLElement;
-    rightBottomControlPane?: HTMLElement;
+    // // UI Control Panes
+    // leftTopControlPane?: HTMLElement;
+    // leftBottomControlPane?: HTMLElement;
+    // rightTopControlPane?: HTMLElement;
+    // rightBottomControlPane?: HTMLElement;
 
     @observable.shallow accessor item: StoreItem | null = null;
     @observable.shallow accessor itemConfig: LayerItemConfig | null = null;
@@ -155,6 +153,7 @@ export class Display {
         this.map = new MapStore({
             logo: false,
             controls: [],
+            initialExtent: this._extent,
             extent: this._extentConst || undefined,
         });
 
@@ -227,18 +226,7 @@ export class Display {
             }
         );
     }
-    startup({
-        target,
-        leftTopControlPane,
-        leftBottomControlPane,
-        rightTopControlPane,
-        rightBottomControlPane,
-    }: MapRefs) {
-        this.mapNode = target;
-        this.leftTopControlPane = leftTopControlPane;
-        this.leftBottomControlPane = leftBottomControlPane;
-        this.rightTopControlPane = rightTopControlPane;
-        this.rightBottomControlPane = rightBottomControlPane;
+    startup() {
         this._hideNavMenuForGuest();
         this._startupDeferred.resolve(true);
         this._postCreate();
@@ -256,48 +244,42 @@ export class Display {
 
     @action
     _mapSetup() {
-        assert(this.mapNode);
+        // this.mapToolbar = new MapToolbar({
+        //     display: this,
+        //     target: this.leftBottomControlPane,
+        // });
 
-        this.mapToolbar = new MapToolbar({
-            display: this,
-            target: this.leftBottomControlPane,
-        });
+        // const controlsReady = buildControls(this);
 
-        this.map.startup(this.mapNode).then(() => {
-            this.setMapReady(true);
-        });
-
-        const controlsReady = buildControls(this);
-
-        if (controlsReady.has("id")) {
-            const controlObj = controlsReady.get("id");
-            if (
-                controlObj &&
-                controlObj.control &&
-                controlObj.control instanceof Identify
-            ) {
-                this.identify = controlObj.control;
-                this.mapStates.addState("identifying", this.identify);
-                this.mapStates.setDefaultState("identifying", true);
-                this._identifyFeatureByAttrValue();
-            }
-        }
+        // if (controlsReady.has("id")) {
+        //     const controlObj = controlsReady.get("id");
+        //     if (
+        //         controlObj &&
+        //         controlObj.control &&
+        //         controlObj.control instanceof Identify
+        //     ) {
+        //         this.identify = controlObj.control;
+        //         this.mapStates.addState("identifying", this.identify);
+        //         this.mapStates.setDefaultState("identifying", true);
+        //         this._identifyFeatureByAttrValue();
+        //     }
+        // }
 
         topic.publish("/webmap/tools/initialized", true);
 
-        appendTo(this.mapNode);
+        // appendTo(this.mapNode);
         this.mapDeferred.resolve(true);
     }
 
-    @action
-    private setMapReady(status: boolean) {
+    @action.bound
+    setMapReady(status: boolean) {
         this.mapReady = status;
     }
 
-    _mapAddControls(controls: Control[]) {
-        controls.forEach((control) => {
-            this.map?.olMap.addControl(control);
-        });
+    _mapAddControls(_controls: Control[]) {
+        // controls.forEach((control) => {
+        //     this.map?.olMap.addControl(control);
+        // });
     }
     _mapAddLayer(id: number) {
         const layer = this.webmapStore.getLayer(id);

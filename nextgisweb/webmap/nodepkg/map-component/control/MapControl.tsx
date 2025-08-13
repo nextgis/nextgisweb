@@ -10,7 +10,7 @@ import type {
 import { useMapContext } from "../context/useMapContext";
 import { useMapControl } from "../hook/useMapControl";
 
-export type ControlProps<P> = P & {
+export type ControlProps<P = unknown> = P & {
     position?: ControlPosition;
 };
 

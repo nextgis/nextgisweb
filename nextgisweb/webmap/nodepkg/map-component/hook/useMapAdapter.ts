@@ -24,39 +24,50 @@ export interface MapExtent extends FitOptions {
 export interface MapProps extends ViewOptions {
     mapSRS?: SRSRef;
     basemap?: boolean;
+    mapStore?: MapStore;
     mapExtent?: MapExtent;
 }
 
+const createMapAdapter = ({
+    target,
+    viewOptions,
+}: {
+    target?: HTMLElement | string;
+    viewOptions?: ViewOptions;
+} = {}) => {
+    const view = new View(viewOptions);
+
+    const adapter = new MapStore({
+        view,
+        target,
+        controls: [],
+    });
+
+    return adapter;
+};
+
 export function useMapAdapter({
+    zoom,
     center: centerProp,
     mapSRS = { id: 3857 },
-    zoom,
     basemap = true,
     minZoom,
     maxZoom,
+    mapStore: mapStoreProp,
     mapExtent: mapExtentProp,
 }: MapProps) {
-    const [mapStore, setMapStore] = useState<MapStore>();
+    const [mapStore] = useState<MapStore>(() => {
+        if (mapStoreProp) {
+            return mapStoreProp;
+        }
+        return createMapAdapter({
+            viewOptions: { projection: `EPSG:${mapSRS.id}` },
+        });
+    });
     const baseRef = useRef<QuadKey | XYZ | undefined>(undefined);
 
     const [center] = useObjectState(centerProp);
     const [mapExtent] = useObjectState(mapExtentProp);
-
-    const createMapAdapter = useCallback(
-        ({ target }: { target: HTMLElement | string }) => {
-            const view = new View({
-                projection: `EPSG:${mapSRS.id}`,
-            });
-            const adapter = new MapStore({
-                target,
-                view,
-                controls: [],
-            });
-            setMapStore(adapter);
-            return adapter;
-        },
-        [mapSRS.id]
-    );
 
     const setView = useCallback((): void => {
         if (!mapStore?.olMap) return;
@@ -125,11 +136,11 @@ export function useMapAdapter({
 
     useEffect(() => {
         return () => {
-            if (mapStore?.olMap) {
+            if (!mapStoreProp && mapStore?.olMap) {
                 mapStore.olMap.dispose();
             }
         };
-    }, [mapStore]);
+    }, [mapStore, mapStoreProp]);
 
-    return { createMapAdapter };
+    return { mapStore };
 }

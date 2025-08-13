@@ -1,20 +1,20 @@
 import { Control } from "ol/control";
 
 import { iconHtml } from "@nextgisweb/pyramid/icon";
-import type { Display } from "@nextgisweb/webmap/display";
+import type { MapStore } from "@nextgisweb/webmap/ol/MapStore";
 
 import Icon from "@nextgisweb/icon/material/home";
 
 interface HomeControlOptions {
     target?: HTMLElement;
     tipLabel?: string;
-    display: Display;
+    map: MapStore;
 }
 
 export class InitialExtent extends Control {
-    private display: Display;
+    private map: MapStore;
 
-    constructor({ target, display, tipLabel }: HomeControlOptions) {
+    constructor({ target, map, tipLabel }: HomeControlOptions) {
         const element = document.createElement("div");
         element.className = "ol-control ol-unselectable";
 
@@ -36,10 +36,10 @@ export class InitialExtent extends Control {
             target,
         });
 
-        this.display = display;
+        this.map = map;
 
         element.addEventListener("click", () => {
-            this.display._zoomToInitialExtent();
+            this.map.zoomToInitialExtent();
         });
     }
 }

@@ -8,6 +8,9 @@ export interface MapControl {
     remove?(): void;
 }
 
+type PositionsContainers = {
+    [key in ControlPosition]: HTMLElement;
+};
 export interface CreateControlOptions {
     bar?: boolean;
     margin?: boolean;
@@ -31,28 +34,25 @@ export class ControlContainer {
     private readonly classPrefix: string = "mapadapter";
     private readonly addClass?: string;
     private readonly mapStore?: MapStore;
-    private _container: HTMLElement;
-    private _positionsContainers: {
-        [key in ControlPosition]: HTMLElement | null;
-    } = {
-        "bottom-left": null,
-        "bottom-right": null,
-        "top-left": null,
-        "top-right": null,
-    };
+    private readonly _container: HTMLElement;
+    private readonly _positionsContainers: PositionsContainers;
 
     constructor(opt: ControlContainerOptions = {}) {
         this.classPrefix = opt.classPrefix || this.classPrefix;
         this.addClass = opt.addClass;
         this.mapStore = opt.mapStore;
-        this._container = this.createContainerElement();
+        const { element, positionsContainers } = this._preparePositions();
+        this._container = element;
+        this._positionsContainers = positionsContainers;
     }
 
     addTo(el: HTMLElement | string): this {
         const el_ = this.getElement(el);
-        if (el_) {
-            el_.appendChild(this._container);
+        if (!el_) {
+            console.warn("ControlContainer target element not found:", el);
+            return this;
         }
+        el_.appendChild(this._container);
         return this;
     }
 
@@ -67,32 +67,30 @@ export class ControlContainer {
         return this._container;
     }
 
-    getPositionContainer(position: ControlPosition): HTMLElement | undefined {
+    getPositionContainer(position: ControlPosition): HTMLElement {
         const positionContainer = this._positionsContainers[position];
-        if (positionContainer) {
-            return positionContainer;
-        }
+
+        return positionContainer;
     }
 
-    newPositionContainer(position: ControlPosition): HTMLElement | undefined {
+    newPositionContainer(position: ControlPosition): HTMLElement {
         const positionContainer = this.getPositionContainer(position);
-        if (positionContainer) {
-            const newContainer = document.createElement("div");
-            newContainer.className = "openlayers-ctrl";
-            // reserve place for async loaded containers
-            if (
-                position.indexOf("bottom") !== -1 &&
-                positionContainer.childElementCount
-            ) {
-                positionContainer.insertBefore(
-                    newContainer,
-                    positionContainer.firstChild
-                );
-            } else {
-                positionContainer.appendChild(newContainer);
-            }
-            return newContainer;
+
+        const newContainer = document.createElement("div");
+        newContainer.className = "openlayers-ctrl";
+        // reserve place for async loaded containers
+        if (
+            position.indexOf("bottom") !== -1 &&
+            positionContainer.childElementCount
+        ) {
+            positionContainer.insertBefore(
+                newContainer,
+                positionContainer.firstChild
+            );
+        } else {
+            positionContainer.appendChild(newContainer);
         }
+        return newContainer;
     }
 
     addControl(control: MapControl, position: ControlPosition): void {
@@ -106,11 +104,13 @@ export class ControlContainer {
         const positionContainer = this._positionsContainers[position];
         if (positionContainer) {
             if (typeof element === "string") {
-                const el = document.createElement("div");
-                el.outerHTML = element;
-                element = el;
+                const tpl = document.createElement("template");
+                tpl.innerHTML = element.trim();
+                const node = tpl.content.firstElementChild;
+                if (node) positionContainer.appendChild(node);
+            } else {
+                positionContainer.appendChild(element);
             }
-            positionContainer.appendChild(element);
         }
     }
 
@@ -129,7 +129,12 @@ export class ControlContainer {
         return el;
     }
 
-    private createContainerElement(): HTMLElement {
+    private _preparePositions(): {
+        element: HTMLElement;
+        positionsContainers: {
+            [key in ControlPosition]: HTMLElement;
+        };
+    } {
         const element = document.createElement("div");
         element.className =
             `${this.classPrefix}-control-container` +
@@ -141,13 +146,16 @@ export class ControlContainer {
             "bottom-right",
             "bottom-left",
         ];
+        const positionsContainers = {} as {
+            [key in ControlPosition]: HTMLElement;
+        };
         positions.forEach((x) => {
             const positionContainer = this._createPositionContainer(x);
-            this._positionsContainers[x] = positionContainer;
+            positionsContainers[x] = positionContainer;
             element.appendChild(positionContainer);
         });
 
-        return element;
+        return { element, positionsContainers };
     }
 
     private _createPositionContainer(position: ControlPosition): HTMLElement {

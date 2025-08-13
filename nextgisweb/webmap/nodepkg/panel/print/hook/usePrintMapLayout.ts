@@ -49,7 +49,8 @@ export function usePrintMapLayout({
     }, []);
 
     const createPrintMapComp = useCallback(() => {
-        assert(display.mapNode);
+        const mapNode = display.map.getTargetElement();
+        assert(mapNode);
 
         const div = document.createElement("div");
         div.classList.add("print-map-pane");
@@ -62,7 +63,7 @@ export function usePrintMapLayout({
             div.style.top = `${top}px`;
         });
 
-        resizeObserver_.observe(display.mapNode);
+        resizeObserver_.observe(mapNode);
 
         const comp: ReturnType<typeof reactApp<PrintMapCompProps>> = reactApp(
             PrintMap,

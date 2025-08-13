@@ -1,6 +1,17 @@
+import type { FC } from "react";
+
+import { iconHtml } from "@nextgisweb/pyramid/icon";
+
 import type { Display } from "../display";
 
 import type { ControlsInfo } from "./type";
+
+export const getLabel = (Icon: FC & { id: string }): HTMLElement => {
+    const labelEl = document.createElement("span");
+    labelEl.innerHTML = iconHtml(Icon);
+    labelEl.classList.add("ol-control__icon");
+    return labelEl;
+};
 
 export const getControlsInfo = <T extends ControlsInfo>(
     display: Display,
