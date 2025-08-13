@@ -412,6 +412,8 @@ const webpackConfig = defaults("main", (env) => ({
     entry: { "ngwEntry": require.resolve("@nextgisweb/jsrealm/ngwEntry.js") },
 
     module: {
+        noParse: /node_modules\/mocha\/mocha\.js/, // This is already build UMD
+
         rules: [
             {
                 test: /\.(m?js|tsx?)$/,
