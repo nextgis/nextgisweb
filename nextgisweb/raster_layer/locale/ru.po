@@ -22,7 +22,7 @@ msgstr "Растровый слой"
 msgid "No supported files found in the archive."
 msgstr "В архиве не обнаружены файлы поддерживаемых форматов."
 
-#: model.py:116
+#: model.py:117
 msgid "The archive contains multiple supported files: {supported_zip_items}."
 msgstr ""
 "В архиве обнаружено несколько файлов поддерживаемых форматов: "
@@ -40,11 +40,11 @@ msgstr "Растровые файлы без информации о проек�
 msgid "Mixed band data types are not supported."
 msgstr "Смешанные типы каналов не поддерживаются."
 
-#: model.py:202
-msgid "GDAL was uanble to parse the raster coordinate system."
+#: model.py:208
+msgid "GDAL was unable to parse the raster coordinate system."
 msgstr "GDAL не смог обработать определение системы координат растра."
 
-#: model.py:207
+#: model.py:214
 msgid ""
 "The source raster has a local coordinate system and can't be reprojected to "
 "the target coordinate system."
@@ -52,15 +52,15 @@ msgstr ""
 "Исходный растр имеет локальную систему координат и не может быть "
 "перепроецирован в целевую."
 
-#: model.py:225
+#: model.py:232
 msgid "Failed to reproject the raster to the target coordinate system."
 msgstr "Не удалось перепроецировать растр в целевую систему координат."
 
-#: model.py:230
+#: model.py:236
 msgid "GDAL error message: %s"
 msgstr "Сообщение об ошибке GDAL: %s"
 
-#: model.py:245
+#: model.py:252
 msgid ""
 "The uncompressed raster size ({size}) exceeds the limit ({limit}) by {delta}."
 " Reduce raster size to fit the limit."
@@ -68,26 +68,26 @@ msgstr ""
 "Размер несжатого растра ({size}) превышает лимит ({limit}) на {delta}. "
 "Уменьшите растр, чтобы он вписывался в лимит."
 
-#: model.py:380
+#: model.py:387
 msgid "{n} band with {t} data type"
 msgid_plural "{n} bands with {t} data type"
 msgstr[0] "{n} канал с типом данных {t}"
 msgstr[1] "{n} канала с типом данных {t}"
 msgstr[2] "{n} каналов с типом данных {t}"
 
-#: model.py:387
+#: model.py:393
 msgid "Band summary"
 msgstr "Сводка по каналам"
 
-#: model.py:388
+#: model.py:394
 msgid "Pixel dimensions"
 msgstr "Размер в пикселях"
 
-#: model.py:389 nodepkg/editor-widget/EditorWidget.tsx:37
+#: model.py:395 nodepkg/editor-widget/EditorWidget.tsx:37
 msgid "Cloud Optimized GeoTIFF (COG)"
 msgstr "Cloud Optimized GeoTIFF (COG)"
 
-#: model.py:390
+#: model.py:396
 msgid "Persistent auxiliary metadata (PAM)"
 msgstr "Вспомогательные метаданные (PAM)"
 
@@ -132,7 +132,7 @@ msgstr "Сохранить как"
 msgid "Cloud Optimized GeoTIFF"
 msgstr "Cloud Optimized GeoTIFF"
 
-#: view.py:34
+#: view.py:35
 msgid ""
 "A Cloud Optimized GeoTIFF (COG) is a regular GeoTIFF file, aimed at being "
 "hosted on a HTTP file server, with an internal organization that enables more"

@@ -22,7 +22,7 @@ msgstr "Лимит экспорта составляет {limit} объекто�
 msgid "Failed to reproject 'intersects' geometry."
 msgstr "Не удалось перепроецировать геометрию 'intersects'."
 
-#: api_export.py:428
+#: api_export.py:424
 msgid "File name parameter '{}' is not valid."
 msgstr "Недопустимое имя файла '{}'."
 
@@ -131,71 +131,75 @@ msgid "Zip archive"
 msgstr "Zip архив"
 
 #: nodepkg/export-form/ExportForm.tsx:326
-#: nodepkg/feature-editor/FeatureEditorWidget.tsx:39
+#: nodepkg/feature-editor/FeatureEditorWidget.tsx:41
 msgid "Save"
 msgstr "Сохранить"
 
-#: nodepkg/feature-editor-modal/FeatureEditorModal.tsx:19
+#: nodepkg/feature-editor-modal/FeatureEditorModal.tsx:20
 msgid "Cancel"
 msgstr "Отмена"
 
-#: nodepkg/feature-editor-modal/FeatureEditorModal.tsx:21
+#: nodepkg/feature-editor-modal/FeatureEditorModal.tsx:22
 msgid "Are you sure?"
 msgstr "Вы уверены?"
 
-#: nodepkg/feature-editor-modal/FeatureEditorModal.tsx:22
+#: nodepkg/feature-editor-modal/FeatureEditorModal.tsx:23
 msgid "Unsaved changes will be lost if you close the window."
 msgstr "Несохраненные изменения будут потеряны, если вы закроете окно."
 
-#: nodepkg/feature-editor/FeatureEditorWidget.tsx:38
+#: nodepkg/feature-editor/FeatureEditorWidget.tsx:40
 msgid "Loading..."
 msgstr "Загрузка..."
 
-#: nodepkg/feature-editor/FeatureEditorWidget.tsx:40
+#: nodepkg/feature-editor/FeatureEditorWidget.tsx:42
 msgid "OK"
 msgstr "OK"
 
-#: nodepkg/feature-editor/FeatureEditorWidget.tsx:41
+#: nodepkg/feature-editor/FeatureEditorWidget.tsx:43
 msgid "Reset"
 msgstr "Сбросить"
 
-#: nodepkg/feature-editor/FeatureEditorWidget.tsx:43
+#: nodepkg/feature-editor/FeatureEditorWidget.tsx:45
 msgid "Feature saved"
 msgstr "Объект сохранен"
 
-#: nodepkg/feature-editor/FeatureEditorWidget.tsx:44
+#: nodepkg/feature-editor/FeatureEditorWidget.tsx:46
 msgid "No changes to save"
 msgstr "Внесите изменения, чтобы сохранить их"
 
-#: nodepkg/feature-grid/FeatureGrid.tsx:22
+#: nodepkg/feature-grid/FeatureGrid.tsx:24
 msgid "Open table settings"
 msgstr "Открыть настройки таблицы"
 
-#: nodepkg/feature-grid/FeatureGrid.tsx:23
+#: nodepkg/feature-grid/FeatureGrid.tsx:25
 msgid "Refresh table"
 msgstr "Обновить таблицу"
 
-#: nodepkg/feature-grid/FeatureGridActions.tsx:23
+#: nodepkg/feature-grid/FeatureGridActions.tsx:31
 msgid "Open"
 msgstr "Открыть"
 
-#: nodepkg/feature-grid/FeatureGridActions.tsx:24
+#: nodepkg/feature-grid/FeatureGridActions.tsx:32
 msgid "Open on a new page"
 msgstr "Открывать на новой странице"
 
-#: nodepkg/feature-grid/FeatureGridActions.tsx:25
+#: nodepkg/feature-grid/FeatureGridActions.tsx:33
 msgid "Delete"
 msgstr "Удалить"
 
-#: nodepkg/feature-grid/FeatureGridActions.tsx:26
+#: nodepkg/feature-grid/FeatureGridActions.tsx:34
 msgid "Edit"
 msgstr "Редактировать"
 
-#: nodepkg/feature-grid/FeatureGridActions.tsx:27
+#: nodepkg/feature-grid/FeatureGridActions.tsx:35
 msgid "Edit on a new page"
 msgstr "Редактировать на новой странице"
 
-#: nodepkg/feature-grid/FeatureGridActions.tsx:29
+#: nodepkg/feature-grid/FeatureGridActions.tsx:36
+msgid "Create"
+msgstr "Создать"
+
+#: nodepkg/feature-grid/FeatureGridActions.tsx:38
 msgid "Search..."
 msgstr "Поиск..."
 
@@ -269,6 +273,18 @@ msgstr "Удаление этого поля навсегда сотрёт вс�
 #: nodepkg/fields-widget/FieldsWidget.tsx:123
 msgid "Field"
 msgstr "Поле"
+
+#: nodepkg/geometry-editor/GeometryEditor.tsx:145
+msgid "Clear"
+msgstr "Очистить"
+
+#: nodepkg/geometry-editor/plugin.ts:10
+msgid "Geometry"
+msgstr "Геометрия"
+
+#: nodepkg/geometry-editor/util/component/ZoomToResourceBtn.tsx:36
+msgid "Zoom to layer extent"
+msgstr "Перейти к охвату слоя"
 
 #: nodepkg/geometry-info/GeometryInfo.tsx:46
 msgid "Load geometry info..."

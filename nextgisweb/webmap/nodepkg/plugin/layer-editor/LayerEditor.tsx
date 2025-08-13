@@ -5,7 +5,6 @@ import type { FeatureLike } from "ol/Feature";
 import { never, shiftKeyOnly, singleClick } from "ol/events/condition";
 import WKT from "ol/format/WKT";
 import type { Geometry } from "ol/geom";
-import type { Type as OlGeometryType } from "ol/geom/Geometry";
 import { Draw, Modify, Select, Snap } from "ol/interaction";
 import type { Interaction } from "ol/interaction";
 import { Vector as VectorSource } from "ol/source";
@@ -29,6 +28,10 @@ import type {
     PluginState,
 } from "@nextgisweb/webmap/type";
 import type { LayerItemConfig } from "@nextgisweb/webmap/type/api";
+import {
+    getOlGeometryType,
+    getOlLayout,
+} from "@nextgisweb/webmap/utils/geometry-types";
 
 import { EditingToolbar } from "../../map-controls/control/editing/EditingToolbar";
 import MapStatesObserverSingleton from "../../map-state-observer";
@@ -368,50 +371,22 @@ export class LayerEditor extends PluginBase {
         const pluginGeometryType =
             pluginConfig.geometry_type as FeaureLayerGeometryType;
 
-        const getGeometryType = () => {
-            const mapping: Record<FeaureLayerGeometryType, OlGeometryType> = {
-                POINT: "Point",
-                LINESTRING: "LineString",
-                POLYGON: "Polygon",
-                MULTIPOINT: "MultiPoint",
-                MULTILINESTRING: "MultiLineString",
-                MULTIPOLYGON: "MultiPolygon",
-                POINTZ: "Point",
-                LINESTRINGZ: "LineString",
-                POLYGONZ: "Polygon",
-                MULTIPOINTZ: "MultiPoint",
-                MULTILINESTRINGZ: "MultiLineString",
-                MULTIPOLYGONZ: "MultiPolygon",
-            };
-            return mapping[pluginGeometryType];
-        };
-
-        const getLayout = (): Draw["geometryLayout_"] => {
-            const zTypes: FeaureLayerGeometryType[] = [
-                "POINTZ",
-                "LINESTRINGZ",
-                "POLYGONZ",
-                "MULTIPOINTZ",
-                "MULTILINESTRINGZ",
-                "MULTIPOLYGONZ",
-            ];
-            return zTypes.includes(pluginGeometryType) ? "XYZ" : "XY";
-        };
-
         const draw = new Draw({
             source: this.source,
             features: editingItem.features,
-            type: getGeometryType(),
+            type: getOlGeometryType(pluginGeometryType),
             freehandCondition: never,
-            geometryLayout: getLayout(),
+            geometryLayout: getOlLayout(pluginGeometryType),
         });
 
         draw.on("drawend", (e) => {
             e.feature.set("layer_id", this.selectedResourceId);
             if (this.selectedResourceId) {
                 showModal(FeatureEditorModal, {
+                    skipDirtyCheck: true,
                     editorOptions: {
                         mode: "return",
+                        showGeometryTab: false,
                         resourceId:
                             this.selectedResourceId !== null
                                 ? this.selectedResourceId

@@ -45,6 +45,8 @@ export function WebMapFeatureGridTab({
         ] as FeatureLayerWebMapPluginConfig
     );
 
+    const [editorProps] = useState(() => ({ showGeometryTab: false }));
+
     const reloadLayer = useCallback(async () => {
         // It is possible to have few webmap layers for one resource id
         const layers = await display.current?.webmapStore.filterLayers({
@@ -73,6 +75,7 @@ export function WebMapFeatureGridTab({
                 readonly: data.current?.readonly ?? true,
                 size: "small",
                 cleanSelectedOnFilter: false,
+                canCreate: false,
                 onDelete: reloadLayer,
                 onSave: () => {
                     reloadLayer();
@@ -254,5 +257,5 @@ export function WebMapFeatureGridTab({
         return unsubscribe;
     }, [subscribe, layerId, store]);
 
-    return <FeatureGrid id={layerId} store={store} />;
+    return <FeatureGrid id={layerId} store={store} editorProps={editorProps} />;
 }

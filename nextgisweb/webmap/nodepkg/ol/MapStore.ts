@@ -7,10 +7,12 @@ import type { FitOptions } from "ol/View";
 import type Control from "ol/control/Control";
 import * as olExtent from "ol/extent";
 import type { Extent } from "ol/extent";
+import { fromExtent } from "ol/geom/Polygon";
 import * as olProj from "ol/proj";
 
 import type { NgwExtent } from "@nextgisweb/feature-layer/type/api";
 import { imageQueue } from "@nextgisweb/pyramid/util";
+import type { SRSRef } from "@nextgisweb/spatial-ref-sys/type/api";
 
 import { Watchable } from "../compat/Watchable";
 import type {
@@ -27,6 +29,11 @@ import { PanelControl } from "./panel-control/PanelControl";
 import { mapStartup } from "./util/mapStartup";
 
 import "ol/ol.css";
+
+export interface MapExtent extends FitOptions {
+    extent: NgwExtent;
+    srs: SRSRef;
+}
 
 interface MapOptions extends OlMapOptions {
     logo?: boolean;
@@ -263,6 +270,27 @@ export class MapStore extends Watchable<MapWatchableProps> {
         }
 
         return extent;
+    }
+
+    fitNGWExtent(mapExtent: MapExtent) {
+        const view = this.olMap.getView();
+        const { extent, srs, ...fitOptions } = mapExtent;
+        const bbox = [
+            extent.minLon,
+            extent.minLat,
+            extent.maxLon,
+            extent.maxLat,
+        ];
+        view.fitInternal(
+            fromExtent(
+                olProj.transformExtent(
+                    bbox,
+                    `EPSG:${srs.id}`,
+                    view.getProjection()
+                )
+            ),
+            fitOptions
+        );
     }
 
     zoomToFeature(feature: Feature, options?: FitOptions): void {

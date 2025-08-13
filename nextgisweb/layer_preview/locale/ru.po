@@ -1,7 +1,3 @@
-#: favorite.py:5 view.py:21 view.py:46
+#: favorite.py:6 view.py:21 view.py:56
 msgid "Preview"
 msgstr "Просмотр"
-
-#: nodepkg/preview-layer/PreviewLayer.tsx:99
-msgid "Toggle basemap"
-msgstr "Переключить подложку"

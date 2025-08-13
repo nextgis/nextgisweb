@@ -13,9 +13,9 @@ import { PreviewMap } from "@nextgisweb/webmap/preview-map";
 
 import type { GeometryInfo } from "../../type/GeometryInfo";
 
-function getFeatureStyle(
+export function getFeatureStyle(
     feature: FeatureLike,
-    isHighlighted: boolean
+    isHighlighted?: boolean
 ): Style | void {
     const strokeAlpha = isHighlighted ? 1 : 0.1;
     const fillAlpha = isHighlighted ? 0.25 : 0.05;

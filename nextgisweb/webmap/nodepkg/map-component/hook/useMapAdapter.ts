@@ -1,7 +1,5 @@
 import View from "ol/View";
-import type { FitOptions, ViewOptions } from "ol/View";
-import { fromExtent } from "ol/geom/Polygon";
-import { transformExtent } from "ol/proj";
+import type { ViewOptions } from "ol/View";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import settings from "@nextgisweb/basemap/client-settings";
@@ -9,17 +7,12 @@ import {
     addBaselayer,
     prepareBaselayerConfig,
 } from "@nextgisweb/basemap/util/baselayer";
-import type { NgwExtent } from "@nextgisweb/feature-layer/type/api";
 import { useObjectState } from "@nextgisweb/gui/hook";
 import type { SRSRef } from "@nextgisweb/spatial-ref-sys/type/api";
 import { MapStore } from "@nextgisweb/webmap/ol/MapStore";
+import type { MapExtent } from "@nextgisweb/webmap/ol/MapStore";
 import type QuadKey from "@nextgisweb/webmap/ol/layer/QuadKey";
 import type XYZ from "@nextgisweb/webmap/ol/layer/XYZ";
-
-export interface MapExtent extends FitOptions {
-    extent: NgwExtent;
-    srs: SRSRef;
-}
 
 export interface MapProps extends ViewOptions {
     mapSRS?: SRSRef;
@@ -71,19 +64,7 @@ export function useMapAdapter({
         }
 
         if (mapExtent) {
-            const { extent, srs, ...fitOptions } = mapExtent;
-            const bbox = [
-                extent.minLon,
-                extent.minLat,
-                extent.maxLon,
-                extent.maxLat,
-            ];
-            curView.fitInternal(
-                fromExtent(
-                    transformExtent(bbox, `EPSG:${srs.id}`, `EPSG:${mapSRS.id}`)
-                ),
-                fitOptions
-            );
+            mapStore.fitNGWExtent(mapExtent);
         } else {
             if (center) {
                 curView.setCenter(center);
@@ -92,7 +73,7 @@ export function useMapAdapter({
                 curView.setZoom(zoom);
             }
         }
-    }, [mapStore, center, zoom, minZoom, maxZoom, mapExtent, mapSRS.id]);
+    }, [mapStore, center, zoom, minZoom, maxZoom, mapExtent]);
 
     useEffect(() => {
         setView();

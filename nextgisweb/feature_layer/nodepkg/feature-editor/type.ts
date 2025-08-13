@@ -13,6 +13,8 @@ export interface AttributesFormProps {
 export type FeatureEditorMode = "save" | "return";
 
 export interface FeatureEditorWidgetProps {
+    showGeometryTab?: boolean;
+    skipDirtyCheck?: boolean;
     resourceId?: number;
     featureId?: number;
     okBtnMsg?: string;
@@ -27,6 +29,7 @@ export interface FeatureEditorWidgetProps {
 }
 
 export interface FeatureEditorStoreOptions {
+    skipDirtyCheck?: boolean;
     resourceId: number;
     featureId: number | null;
     mode?: FeatureEditorMode;

@@ -26,14 +26,16 @@ export function ToggleControl({
     position,
     children,
     render,
+    status: statusProp,
     style,
     ...toggleOptions
 }: ToggleControlProps) {
+    const statusRef = useRef(statusProp);
+
     const [options] = useObjectState(toggleOptions);
     const context = useMapContext();
     const [instance, setInstance] = useState<IToggleControl>();
-    const [status, setStatus] = useState(options.status ?? false);
-    const prevOptionsRef = useRef<ToggleControlOptions>(null);
+    const [status, setStatus] = useState(statusProp ?? false);
 
     useMapControl({ context, instance, position });
 
@@ -42,6 +44,7 @@ export function ToggleControl({
     const createControl = useCallback(() => {
         return createToggleControl({
             ...options,
+            status: statusRef.current,
             html: portal.current,
             onClick: async (newStatus) => {
                 setStatus(newStatus);
@@ -62,11 +65,10 @@ export function ToggleControl({
     }, [createControl]);
 
     useEffect(() => {
-        if (!instance || !options) return;
-
-        instance.changeStatus(options.status);
-        prevOptionsRef.current = options;
-    }, [instance, options]);
+        statusRef.current = status;
+        if (!instance) return;
+        instance.changeStatus(status);
+    }, [instance, status]);
 
     useEffect(() => {
         if (!instance) return;

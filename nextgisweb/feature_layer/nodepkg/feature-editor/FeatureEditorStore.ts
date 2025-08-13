@@ -5,6 +5,7 @@ import { route } from "@nextgisweb/pyramid/api";
 import type { RouteBody } from "@nextgisweb/pyramid/api/type";
 import { AbortControllerHelper } from "@nextgisweb/pyramid/util/abort";
 import type { CompositeRead } from "@nextgisweb/resource/type/api";
+import type { VectorLayerRead } from "@nextgisweb/vector-layer/type/api";
 
 import type { NgwAttributeValue } from "../attribute-editor/type";
 import type {
@@ -24,8 +25,10 @@ export class FeatureEditorStore {
 
     @observable.ref accessor saving = false;
     @observable.ref accessor initLoading = false;
+    @observable.ref accessor skipDirtyCheck = false;
 
     @observable.shallow accessor fields: FeatureLayerFieldRead[] = [];
+    @observable.shallow accessor vectorLayer: VectorLayerRead | null = null;
 
     private _featureItem?: FeatureItem;
 
@@ -33,9 +36,18 @@ export class FeatureEditorStore {
 
     @observable.shallow private accessor _attributeStore: EditorStore | null =
         null;
+    @observable.shallow private accessor _geometryStore: EditorStore | null =
+        null;
     @observable.shallow private accessor _extensionStores: ExtensionStores = {};
 
-    constructor({ resourceId, featureId }: FeatureEditorStoreOptions) {
+    constructor({
+        resourceId,
+        featureId,
+        skipDirtyCheck,
+    }: FeatureEditorStoreOptions) {
+        if (skipDirtyCheck !== undefined) {
+            this.skipDirtyCheck = skipDirtyCheck;
+        }
         this.resourceId = resourceId;
         this.featureId = featureId;
 
@@ -46,25 +58,16 @@ export class FeatureEditorStore {
     }
 
     @computed
-    get route() {
-        if (typeof this.featureId === "number") {
-            return route("feature_layer.feature.item", {
-                id: this.resourceId,
-                fid: this.featureId,
-            });
-        }
-    }
-
-    @computed
     get dirty(): boolean {
-        if (this.featureId !== null) {
-            const stores: { dirty: boolean }[] = [];
-            if (this._attributeStore) stores.push(this._attributeStore);
-            stores.push(...Object.values(this._extensionStores));
-
-            return stores.some(({ dirty }) => dirty);
+        if (this.skipDirtyCheck) {
+            return true;
         }
-        return true;
+        const stores: { dirty: boolean }[] = [];
+        if (this._attributeStore) stores.push(this._attributeStore);
+        if (this._geometryStore) stores.push(this._geometryStore);
+        stores.push(...Object.values(this._extensionStores));
+
+        return stores.some(({ dirty }) => dirty);
     }
 
     @action
@@ -74,6 +77,10 @@ export class FeatureEditorStore {
     @action
     setFields(fields: FeatureLayerFieldRead[]): void {
         this.fields = fields;
+    }
+    @action
+    setVectorLayer(vectorLayer: VectorLayerRead | null): void {
+        this.vectorLayer = vectorLayer;
     }
     @action
     setSaving(saving: boolean): void {
@@ -88,12 +95,19 @@ export class FeatureEditorStore {
         const resp = await route("resource.item", this.resourceId).get({
             signal,
         });
-        const fields = resp && resp.feature_layer && resp.feature_layer.fields;
-        if (fields) {
-            this.setFields(fields);
+        if (resp) {
+            const fields = resp.feature_layer && resp.feature_layer.fields;
+            if (fields) {
+                this.setFields(fields);
+            }
+            this.setVectorLayer(resp.vector_layer ?? null);
         }
-        if (this.route) {
-            const featureItem = await this.route.get<FeatureItem>({
+
+        if (typeof this.featureId === "number") {
+            const featureItem = await route("feature_layer.feature.item", {
+                id: this.resourceId,
+                fid: this.featureId,
+            }).get<FeatureItem>({
                 signal,
                 query: { dt_format: "iso" },
             });
@@ -109,28 +123,43 @@ export class FeatureEditorStore {
             extensions[key] = storeExtension.value;
         }
 
-        const json: RouteBody<"feature_layer.feature.item", "put"> = {
+        const json:
+            | RouteBody<"feature_layer.feature.item", "put">
+            | RouteBody<"feature_layer.feature.collection", "patch"> = {
             extensions,
         };
 
         if (this._attributeStore && this._attributeStore.dirty) {
             json.fields = this._attributeStore.value;
         }
+        if (this._geometryStore && this._geometryStore.dirty) {
+            json.geom = this._geometryStore.value;
+        }
         return json;
     };
 
     @action.bound
     async save(): Promise<CompositeRead | undefined> {
-        if (!this.route) {
-            return;
-        }
-
         try {
             this.setSaving(true);
-            await this.route.put({
-                query: { dt_format: "iso" },
-                json: this.preparePayload(),
-            });
+            const json = this.preparePayload();
+            if (typeof this.featureId !== "number") {
+                await route("feature_layer.feature.collection", {
+                    id: this.resourceId,
+                }).patch({
+                    // @ts-expect-error TODO: define patch payload for feature_layer.feature.collection
+                    json: [json],
+                    query: { dt_format: "iso" },
+                });
+            } else {
+                await route("feature_layer.feature.item", {
+                    id: this.resourceId,
+                    fid: this.featureId,
+                }).put({
+                    query: { dt_format: "iso" },
+                    json,
+                });
+            }
             // To update initial feature value
             const resp = await this._initialize();
             return resp;
@@ -151,6 +180,13 @@ export class FeatureEditorStore {
             this._setAttributesValue(this._featureItem.fields);
         }
     }
+    @action.bound
+    attachGeometryStore(geometryStore: EditorStore) {
+        this._geometryStore = geometryStore;
+        if (this._featureItem) {
+            this._setGeometryValue(this._featureItem.geom);
+        }
+    }
 
     @action.bound
     addExtensionStore(key: string, extensionStore: EditorStore) {
@@ -164,27 +200,30 @@ export class FeatureEditorStore {
 
     @action.bound
     reset() {
-        if (this._featureItem) {
-            this._setFeatureItem(this._featureItem);
-        }
+        this._setFeatureItem(this._featureItem);
     }
 
     @action
-    private _setStoreValues(featureItem: FeatureItem) {
-        this._setExtensionsValue(featureItem.extensions);
-        this._setAttributesValue(featureItem.fields);
+    private _setStoreValues(featureItem?: FeatureItem) {
+        this._setExtensionsValue(featureItem ? featureItem.extensions : null);
+        this._setAttributesValue(featureItem ? featureItem.fields : null);
+        this._setGeometryValue(featureItem ? featureItem.geom : null);
     }
 
-    @action
-    private _setAttributesValue(attributes: NgwAttributeValue) {
+    private _setAttributesValue(attributes: NgwAttributeValue | null) {
         if (this._attributeStore) {
             this._attributeStore.load(attributes);
+        }
+    }
+    private _setGeometryValue(geom: string | null) {
+        if (this._geometryStore) {
+            this._geometryStore.load(geom);
         }
     }
 
     @action
     private _setExtensionsValue(
-        extensions: FeatureItemExtensions,
+        extensions: FeatureItemExtensions | null,
         { include }: { include?: string[] } = {}
     ) {
         for (const key in extensions) {
@@ -200,7 +239,7 @@ export class FeatureEditorStore {
     }
 
     @action
-    private _setFeatureItem(featureItem: FeatureItem): void {
+    private _setFeatureItem(featureItem?: FeatureItem): void {
         this._featureItem = featureItem;
         this._setStoreValues(featureItem);
     }

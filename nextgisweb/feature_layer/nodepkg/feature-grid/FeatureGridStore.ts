@@ -16,6 +16,7 @@ export class FeatureGridStore {
     @observable.ref accessor actions: ActionToolbarAction<ActionProps>[] = [];
     @observable.ref accessor version: number = 0;
     @observable.ref accessor readonly: boolean = true;
+    @observable.ref accessor canCreate: boolean = true;
     @observable.ref accessor editOnNewPage: boolean = false;
     @observable.ref accessor cleanSelectedOnFilter: boolean = true;
     @observable.ref accessor settingsOpen: boolean = false;

@@ -3,11 +3,10 @@ import { useEffect, useRef } from "react";
 import type React from "react";
 
 import { assert } from "@nextgisweb/jsrealm/error";
-import type { MapStore } from "@nextgisweb/webmap/ol/MapStore";
+import type { MapExtent, MapStore } from "@nextgisweb/webmap/ol/MapStore";
 
 import { MapContext } from "./context/useMapContext";
 import { useMapAdapter } from "./hook/useMapAdapter";
-import type { MapExtent } from "./hook/useMapAdapter";
 
 import "ol/ol.css";
 import "./MapComponent.less";
@@ -19,26 +18,28 @@ export interface MapComponentProps extends ViewOptions {
     basemap?: boolean;
     whenCreated?: (mapStore: MapStore | null) => void;
     mapExtent?: MapExtent;
+    initialMapExtent?: MapExtent;
     resetView?: boolean;
     showZoomLevel?: boolean;
 }
 
 export function MapComponent({
-    children,
-    style,
-    basemap,
-    zoom = 0,
-    center = [0, 0],
-    mapExtent,
     whenCreated,
-    ...props
+    zoom = 0,
+    style,
+    center = [0, 0],
+    basemap,
+    maxZoom,
+    children,
+    mapExtent,
 }: MapComponentProps) {
     const mapRef = useRef<MapStore | null>(null);
     const { createMapAdapter } = useMapAdapter({
-        center,
-        zoom,
         mapExtent,
         basemap,
+        maxZoom,
+        center,
+        zoom,
     });
 
     const mapContainerRef = useRef<HTMLDivElement>(null);
@@ -68,7 +69,7 @@ export function MapComponent({
 
     return (
         <MapContext value={{ mapStore: mapRef.current }}>
-            <div ref={mapContainerRef} style={style} className="map" {...props}>
+            <div ref={mapContainerRef} style={style} className="map">
                 {children}
             </div>
         </MapContext>

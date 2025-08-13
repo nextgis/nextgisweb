@@ -40,6 +40,7 @@ export interface FeatureGridProps {
     actions?: ActionToolbarAction<ActionProps>[];
     version?: number;
     readonly?: boolean;
+    canCreate?: boolean;
     queryParams?: QueryParams;
     selectedIds?: number[];
     editOnNewPage?: boolean;

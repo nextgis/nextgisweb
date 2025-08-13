@@ -10,7 +10,7 @@ msgstr "Изображение"
 msgid "Main web map"
 msgstr "Основная веб-карта"
 
-#: favorite.py:6 view.py:183
+#: favorite.py:6 view.py:184
 msgid "Display"
 msgstr "Открыть"
 
@@ -18,7 +18,7 @@ msgstr "Открыть"
 msgid "Fragment"
 msgstr "Фрагмент"
 
-#: model.py:47 model.py:65 view.py:178 view.py:205
+#: model.py:47 model.py:65 view.py:179 view.py:206
 msgid "Web map"
 msgstr "Веб-карта"
 
@@ -37,7 +37,7 @@ msgctxt "permission"
 msgid "Manage annotations"
 msgstr "Управление аннотациями"
 
-#: nodepkg/clone-webmap/CloneWebmap.tsx:21 view.py:193
+#: nodepkg/clone-webmap/CloneWebmap.tsx:21 view.py:194
 msgid "Clone"
 msgstr "Клонировать"
 
@@ -107,7 +107,7 @@ msgstr "Прямоугольник"
 
 #: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:102
 #: nodepkg/panel/annotations/AnnotationsPanel.tsx:166
-#: nodepkg/utils/geometry-types.ts:15
+#: nodepkg/utils/geometry-types.ts:19
 msgid "Polygon"
 msgstr "Полигон"
 
@@ -238,7 +238,7 @@ msgstr "Показывать легенду"
 msgid "Hide legend"
 msgstr "Скрывать легенду"
 
-#: nodepkg/map-component/UrlLayer.tsx:12
+#: nodepkg/map-component/URLLayer.tsx:15
 msgid "Unable to load tile"
 msgstr "Ошибка загрузки тайла"
 
@@ -364,9 +364,13 @@ msgstr "Показывать охват"
 msgid "Show cursor coordinates"
 msgstr "Показывать координаты курсора"
 
-#: nodepkg/ol/control/ZoomControl.ts:40
+#: nodepkg/ol/control/ZoomControl.ts:45
 msgid "Back to the initial extent"
 msgstr "Вернуться к начальному охвату"
+
+#: nodepkg/ol/control/ZoomControl.ts:56
+msgid "Current zoom level"
+msgstr "Текущий зум"
 
 #: nodepkg/panel/annotations/AnnotationsPanel.tsx:121
 msgid "Show annotations"
@@ -387,7 +391,7 @@ msgid "With messages"
 msgstr "С сообщениями"
 
 #: nodepkg/panel/annotations/AnnotationsPanel.tsx:139
-#: nodepkg/plugin/layer-editor/LayerEditor.tsx:133
+#: nodepkg/plugin/layer-editor/LayerEditor.tsx:136
 msgid "Edit"
 msgstr "Редактировать"
 
@@ -400,7 +404,7 @@ msgid "Geometry type"
 msgstr "Тип геометрии"
 
 #: nodepkg/panel/annotations/AnnotationsPanel.tsx:159
-#: nodepkg/utils/geometry-types.ts:6
+#: nodepkg/utils/geometry-types.ts:10
 msgid "Point"
 msgstr "Точка"
 
@@ -443,7 +447,7 @@ msgstr "Увеличить до точки идентификации"
 msgid "Copy identification point coordinates"
 msgstr "Скопировать координаты точки идентификации"
 
-#: nodepkg/panel/identify/FeatureEditButton.tsx:76
+#: nodepkg/panel/identify/FeatureEditButton.tsx:83
 msgid "Edit feature"
 msgstr "Редактировать объект"
 
@@ -511,16 +515,16 @@ msgstr "Печать"
 msgid "Save as"
 msgstr "Сохранить как"
 
-#: nodepkg/panel/print/PrintPanel.tsx:129
+#: nodepkg/panel/print/PrintPanel.tsx:133
 msgid "Elements"
 msgstr "Элементы"
 
-#: nodepkg/panel/print/PrintPanel.tsx:136
+#: nodepkg/panel/print/PrintPanel.tsx:140
 #: nodepkg/panel/print/component/PrintScaleSettings.tsx:75
 msgid "Scale"
 msgstr "Масштаб"
 
-#: nodepkg/panel/print/PrintPanel.tsx:152
+#: nodepkg/panel/print/PrintPanel.tsx:156
 msgid "Copy link to the print map"
 msgstr "Скопировать ссылку на карту для печати"
 
@@ -605,11 +609,11 @@ msgstr "Распечатать карту"
 msgid "Enter at least 2 characters"
 msgstr "Введите минимум 2 символа"
 
-#: nodepkg/panel/search/SearchPanel.tsx:450
+#: nodepkg/panel/search/SearchPanel.tsx:459
 msgid "Not found"
 msgstr "Не найдено"
 
-#: nodepkg/panel/search/SearchPanel.tsx:455
+#: nodepkg/panel/search/SearchPanel.tsx:464
 msgid "Refine search criterion. Displayed first 100 search results."
 msgstr "Уточните критерий поиска. Отображены первые 100 результатов поиска."
 
@@ -715,7 +719,7 @@ msgstr "Поделиться"
 msgid "Feature table"
 msgstr "Таблица объектов"
 
-#: nodepkg/plugin/layer-editor/LayerEditor.tsx:133
+#: nodepkg/plugin/layer-editor/LayerEditor.tsx:136
 msgid "Stop editing"
 msgstr "Завершить редактирование"
 
@@ -1034,27 +1038,27 @@ msgstr "га"
 msgid "ac"
 msgstr "акр"
 
-#: nodepkg/utils/geometry-types.ts:9
+#: nodepkg/utils/geometry-types.ts:13
 msgid "LineString"
 msgstr "Линия"
 
-#: nodepkg/utils/geometry-types.ts:12
+#: nodepkg/utils/geometry-types.ts:16
 msgid "LinearRing"
 msgstr "Замкнутый контур"
 
-#: nodepkg/utils/geometry-types.ts:18
+#: nodepkg/utils/geometry-types.ts:22
 msgid "MultiPoint"
 msgstr "Мультиточка"
 
-#: nodepkg/utils/geometry-types.ts:21
+#: nodepkg/utils/geometry-types.ts:25
 msgid "MultiLineString"
 msgstr "Мультилиния"
 
-#: nodepkg/utils/geometry-types.ts:24
+#: nodepkg/utils/geometry-types.ts:28
 msgid "MultiPolygon"
 msgstr "Мультиполигон"
 
-#: nodepkg/utils/geometry-types.ts:27
+#: nodepkg/utils/geometry-types.ts:31
 msgid "GeometryCollection"
 msgstr "Коллекция геометрий"
 
@@ -1062,7 +1066,7 @@ msgstr "Коллекция геометрий"
 msgid "Go to"
 msgstr "Перейти"
 
-#: nodepkg/webmap-feature-grid-tab/WebMapFeatureGridTab.tsx:149
+#: nodepkg/webmap-feature-grid-tab/WebMapFeatureGridTab.tsx:151
 msgid "Selected feature has no geometry"
 msgstr "Выбранный объект не имеет геометрии"
 
@@ -1106,6 +1110,6 @@ msgstr "Клонировать веб-карту"
 msgid "Embedded webmap preview"
 msgstr "Просмотр встроенной веб-карты"
 
-#: view.py:118
+#: view.py:119
 msgid "Web map settings"
 msgstr "Настройки веб-карты"

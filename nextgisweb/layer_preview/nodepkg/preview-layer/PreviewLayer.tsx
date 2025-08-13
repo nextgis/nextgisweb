@@ -1,25 +1,13 @@
-import { useCallback, useEffect, useMemo, useReducer, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { LoadingWrapper } from "@nextgisweb/gui/component";
-import { convertNgwExtentToWSEN } from "@nextgisweb/gui/util/extent";
 import type { Extent } from "@nextgisweb/layer/type/api";
 import { useRoute } from "@nextgisweb/pyramid/hook";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
-import { gettext } from "@nextgisweb/pyramid/i18n";
-import type { ResourceInterface } from "@nextgisweb/resource/type/api";
-import {
-    AttributionControl,
-    MapComponent,
-    NGWLayer,
-    ToggleControl,
-    URLLayer,
-    ZoomControl,
-} from "@nextgisweb/webmap/map-component";
+import { NGWLayer, URLLayer } from "@nextgisweb/webmap/map-component";
+import { PreviewMap } from "@nextgisweb/webmap/preview-map";
 
-import MapIcon from "@nextgisweb/icon/material/map/outline";
-
-const extentInterfaces: ResourceInterface[] = ["IBboxLayer"];
-const mvtInterfaces: ResourceInterface[] = ["IFeatureLayer"];
+import { extentInterfaces, mvtInterfaces } from "../constant";
 
 export function PreviewLayer({
     style,
@@ -30,8 +18,6 @@ export function PreviewLayer({
     children?: React.ReactNode;
     resourceId: number;
 }) {
-    const [basemap, toggleBaseMap] = useReducer((state) => !state, true);
-
     const { data: resData, isLoading: isResLoading } = useRouteGet(
         "resource.item",
         { id }
@@ -96,39 +82,16 @@ export function PreviewLayer({
         [extentData, padding]
     );
 
-    const styleToggleBtn = useCallback(
-        (status: boolean) => (status ? undefined : { color: "gray" }),
-        []
-    );
-
     if (isResLoading || isExtentLoading) {
         return <LoadingWrapper />;
     }
     return (
         <div style={{ position: "relative" }}>
-            <MapComponent
+            <PreviewMap
                 mapExtent={mapExtent}
                 style={{ height: "75vh", ...style }}
-                basemap={basemap}
+                basemap
             >
-                <ZoomControl
-                    position="top-left"
-                    extent={
-                        extentData && convertNgwExtentToWSEN(extentData.extent)
-                    }
-                    fitOptions={{ padding }}
-                />
-                <AttributionControl position="bottom-right" />
-                <ToggleControl
-                    position="top-left"
-                    style={styleToggleBtn}
-                    status={!!basemap}
-                    onClick={toggleBaseMap}
-                    title={gettext("Toggle basemap")}
-                >
-                    <MapIcon />
-                </ToggleControl>
-
                 {url ? (
                     <URLLayer url={url} attributions={attributions} />
                 ) : (
@@ -139,7 +102,7 @@ export function PreviewLayer({
                     />
                 )}
                 {children}
-            </MapComponent>
+            </PreviewMap>
         </div>
     );
 }

@@ -13,6 +13,7 @@ import "./FeatureEditorModal.less";
 export type ModalProps = Parameters<typeof Modal>[0];
 
 export interface FeatureEditorModalProps extends ModalProps {
+    skipDirtyCheck?: boolean;
     editorOptions?: FeatureEditorWidgetProps;
 }
 
@@ -24,6 +25,7 @@ const [msgConfirmTitle, msgConfirmContent] = [
 
 export function FeatureEditorModal({
     open: openProp,
+    skipDirtyCheck,
     editorOptions,
     onCancel,
     ...modalProps
@@ -37,6 +39,7 @@ export function FeatureEditorModal({
         () =>
             new FeatureEditorStore({
                 resourceId,
+                skipDirtyCheck,
                 featureId: typeof featureId === "number" ? featureId : null,
             })
     );
@@ -83,6 +86,7 @@ export function FeatureEditorModal({
                 {...modalProps}
             >
                 <FeatureEditorWidget
+                    {...editorOptions}
                     resourceId={resourceId}
                     featureId={featureId}
                     store={store}
