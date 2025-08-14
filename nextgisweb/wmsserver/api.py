@@ -94,7 +94,9 @@ def wms_handler(obj, request):
 
 
 def _get_capabilities(obj, params, request):
-    E = ElementMaker()
+    E = ElementMaker(
+        nsmap={"xlink": NS_XLINK}
+    )
 
     OnlineResource = lambda url: E.OnlineResource(
         {"{%s}type" % NS_XLINK: "simple", "{%s}href" % NS_XLINK: url}
@@ -543,7 +545,7 @@ def wmts_handler(obj, request):
         nsmap={
             None: "http://www.opengis.net/wmts/1.0",
             "ows": NS_OWS,
-            "xlink": "http://www.w3.org/1999/xlink",
+            "xlink": NS_XLINK,
             "xsi": "http://www.w3.org/2001/XMLSchema-instance",
             "gml": "http://www.opengis.net/gml",
         },
