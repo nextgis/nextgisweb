@@ -33,7 +33,6 @@ requires = [
     "poeditor",
     "psutil==7.0.0",
     "psycopg2==2.9.10",
-    "pygdal" + (f"=={gv}.*," if gv else "") + ">=3.4",
     "pyproj==3.7.1",
     "pyramid==2.0.2",
     "pyramid-mako==1.1.0",
@@ -54,6 +53,12 @@ requires = [
     "zope.interface==7.2",
     "zope.event==5.1",
 ]
+
+if gv is not None:
+    gv_major, gv_minor = map(int, gv.split(".")[:2])
+    gdal_pkg = "gdal[numpy]" if (gv_major >= 3 and gv_minor >= 8) else "pygdal"
+
+requires.append(gdal_pkg + (f"=={gv}.*," if gv else "") + ">=3.4")
 
 extras_require = dict(
     development=[
