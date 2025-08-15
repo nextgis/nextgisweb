@@ -1,10 +1,14 @@
-from nextgisweb.env import Component, require
+import transaction
+from osgeo import gdal
+from sqlalchemy.sql import or_
+
+from nextgisweb.env import Component, DBSession, require
 from nextgisweb.lib.config import Option, SizeInBytes
 from nextgisweb.lib.logging import logger
 
 from .gdaldriver import GDAL_DRIVER_NAME_2_EXPORT_FORMATS
 from .kind_of_data import RasterLayerData
-from .model import RasterLayer, estimate_raster_layer_data
+from .model import RasterBand, RasterLayer, RasterLayerMeta, estimate_raster_layer_data
 from .workdir import WorkdirMixin
 
 
@@ -30,6 +34,7 @@ class RasterLayerComponent(Component, WorkdirMixin):
     def maintenance(self):
         super().maintenance()
         self.build_missing_overviews()
+        self.populate_missing_columns()
         self.workdir_cleanup()
 
     def check_integrity(self):
@@ -46,6 +51,37 @@ class RasterLayerComponent(Component, WorkdirMixin):
         for resource in RasterLayer.query():
             size = estimate_raster_layer_data(resource)
             yield RasterLayerData, resource.id, size
+
+    def populate_missing_columns(self):
+        with transaction.manager:
+            for resource in DBSession.query(RasterLayer).filter(
+                or_(
+                    RasterLayer.geo_transform.is_(None),
+                    RasterLayer.meta.is_(None),
+                )
+            ):
+                ds = resource.gdal_dataset()
+
+                if resource.geo_transform is None:
+                    resource.geo_transform = list(ds.GetGeoTransform())
+
+                if resource.meta is None:
+                    bands = []
+                    for bidx in range(1, ds.RasterCount + 1):
+                        band = ds.GetRasterBand(bidx)
+                        minval, maxval = band.ComputeRasterMinMax(True)
+                        bands.append(
+                            RasterBand(
+                                color_interp=gdal.GetColorInterpretationName(
+                                    band.GetColorInterpretation()
+                                ),
+                                no_data=band.GetNoDataValue(),
+                                rat=band.GetDefaultRAT() is not None,
+                                min=minval,
+                                max=maxval,
+                            )
+                        )
+                    resource.meta = RasterLayerMeta(bands=bands)
 
     option_annotations = (
         Option("cog_enabled", bool, default=True),

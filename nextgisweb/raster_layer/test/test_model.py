@@ -9,7 +9,7 @@ from osgeo import gdal
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.spatial_ref_sys import SRS
 
-from ..model import RasterLayer
+from ..model import RasterBand, RasterLayer, RasterLayerMeta
 from .validate_cloud_optimized_geotiff import validate
 
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults")
@@ -31,7 +31,24 @@ def test_load_file(source, band_count, srs_id, cog, ngw_data_path, ngw_env, ngw_
     res = RasterLayer(srs=SRS.filter_by(id=srs_id).one()).persist()
 
     res.load_file(ngw_data_path / source, cog=cog)
+    ds = res.gdal_dataset()
     assert res.band_count == band_count
+    assert res.geo_transform == list(ds.GetGeoTransform())
+
+    bands = []
+    for bidx in range(1, band_count + 1):
+        band = ds.GetRasterBand(bidx)
+        minval, maxval = band.ComputeRasterMinMax(True)
+        bands.append(
+            RasterBand(
+                color_interp=gdal.GetColorInterpretationName(band.GetColorInterpretation()),
+                no_data=band.GetNoDataValue(),
+                rat=band.GetDefaultRAT() is not None,
+                min=minval,
+                max=maxval,
+            )
+        )
+    assert res.meta == RasterLayerMeta(bands=bands)
 
     fd = res.fileobj.filename()
     assert fd.exists() and not fd.is_symlink()
