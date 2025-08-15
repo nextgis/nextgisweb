@@ -17,6 +17,8 @@ def test_python_module_migration():
     migs = list(PythonModuleMigration.scandir("default", data_mformat))
 
     assert len(migs) == 2
+
+    migs = sorted(migs, key=lambda m: m.key)
     m1, m2 = migs
 
     assert m1.key == mk("00000001")
