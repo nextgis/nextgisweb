@@ -11,6 +11,7 @@ PRESERVE = {
     "two-paragraphs": "<p>T</p><p>Text</p>",
     "data-url-img": '<img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=">',
     "img-dims": '<img width="64" height="64" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=">',
+    "figure-img": '<figure><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw="><figcaption>Caption</figcaption></figure>',
     "1c-link": '<a href="e1c://server">Text</a>',
     "data-colon": '<a href="https://domain.org/path/data:colon"></a>',
     "feature-link": '<a href="123:456">Feature #456 of resource #123</a>',
