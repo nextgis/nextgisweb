@@ -33,8 +33,12 @@ export const testContent = `
 <p>${randParagraph()}</p>
 <p>${randParagraph()}</p>
 
+<h4>Figure + paragraph + </h4>
+
 <figure>
-    <img src="${createTestImage(256)}">
+    <p>
+        <img src="${createTestImage(256)}">
+    </p>
 </figure>
 
 <h3>Heading H3</h3>
@@ -85,5 +89,34 @@ export const testContent = `
 
 <figure>
     <img src="${createTestImage(2048)}">
+</figure>
+
+<h4>32px resized to 2048px figure</h4>
+
+<figure>
+    <img src="${createTestImage(32)}" width="2048" height="2048">
+</figure>
+
+
+<h4>32px resized to 2048px figure with caption</h4>
+
+<figure>
+    <img src="${createTestImage(32)}" width="2048" height="2048">
+    <figcaption>Figure caption</figcaption>
+</figure>
+
+<h4>64px resized to 16px inline image</h4>
+
+<p>
+    ${randParagraph()}
+    <img src="${createTestImage(64)}" width="16" height="16">
+</p>
+
+<h4>32px resized to 2048px CKEditor-style figure</h4>
+
+<figure>
+    <p>
+        <img src="${createTestImage(32)}" width="2048" height="2048">
+    </p>
 </figure>
 `;

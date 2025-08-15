@@ -40,11 +40,26 @@ export const ProcessedHtml: FC<ProcessedHtmlProps> = ({
                 const el = node;
 
                 if (el.name === "img") {
-                    const { src, alt } = el.attribs;
+                    const { src, alt, width, height } = el.attribs;
+
                     if (isAdjacentToNonHollowText(el)) {
-                        return <img src={src} alt={alt} />;
+                        return (
+                            <img
+                                src={src}
+                                alt={alt}
+                                width={`${width}px`}
+                                height={`${height}px`}
+                            />
+                        );
                     } else {
-                        return <Image src={src} alt={alt} />;
+                        return (
+                            <Image
+                                src={src}
+                                alt={alt}
+                                width={`${width}px`}
+                                height={`${height}px`}
+                            />
+                        );
                     }
                 }
 
