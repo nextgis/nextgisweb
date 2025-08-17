@@ -1,5 +1,6 @@
-from functools import partial
+from functools import cache, partial
 from importlib.util import find_spec
+from typing import Sequence
 
 import pytest
 from sqlalchemy.dialects import postgresql
@@ -7,6 +8,8 @@ from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.sql.expression import BindParameter
 
 from nextgisweb.env.package import pkginfo
+
+from ..environment import Env, env
 
 
 def pytest_addoption(parser):
@@ -27,20 +30,35 @@ def ngw_skip_disabled_component(request):
             pytest.skip(f"{comp} disabled")
 
 
-def _env_initialize():
-    from ..environment import Env, env
-
-    result = env()
-    if result:
-        return result
-    result = Env(initialize=True, set_global=True)
+@cache
+def _env() -> Env:
+    result = env() or Env(set_global=True)
     result.running_tests = True
     return result
 
 
+@cache
+def genereate_components() -> Sequence[str]:
+    """Return a sequence of enabled component IDs in the test environment. This
+    can be used during the test generation stage, for example, to generate
+    per-component tests:
+
+    .. code-block:: python
+
+        @pytest.mark.parametrize("component", genereate_components()) def
+        test_component(component):
+            ...
+    """
+
+    return tuple(c.identity for c in _env().chain("initialize"))
+
+
 @pytest.fixture(scope="session")
 def ngw_env():
-    return _env_initialize()
+    env = _env()
+    if not env.initialized:
+        env.initialize()
+    return env
 
 
 @pytest.fixture(scope="module")

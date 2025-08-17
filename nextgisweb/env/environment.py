@@ -4,7 +4,7 @@ import os
 from functools import partial
 from inspect import isclass
 from types import MappingProxyType
-from typing import Mapping
+from typing import TYPE_CHECKING, Mapping
 
 import sqlalchemy as sa
 import sqlalchemy.event as sa_event
@@ -23,6 +23,7 @@ _OPTIONS_LOGGING_LEVELS = ("critical", "error", "warning", "info", "debug")
 
 class Env(Container):
     components: Mapping[str, Component]
+    initialized: bool = False
     running_tests: bool = False
 
     def __init__(
@@ -164,6 +165,8 @@ class Env(Container):
 
         for c in list(self.chain("configure")):
             c.configure()
+
+        self.initialized = True
 
     def metadata(self):
         """Returns object sa.MetaData that combines metadata
@@ -317,13 +320,23 @@ class EnvMetaClass(type):
         return _env
 
 
-class env(metaclass=EnvMetaClass):
-    """Proxy-class for global environment access. Use it only
-    where it is impossible to get access to current environment
-    by other means. However in any case, simultaneous work with
-    multiple environments is currently not supported an will hardly
-    ever be needed. To get original object for which messages are
-    proxied one can use constructor ``env()``."""
+if TYPE_CHECKING:
+
+    class EnvProxy(Env):
+        def __call__(self) -> Env:
+            ...
+
+    env: EnvProxy
+
+else:
+
+    class env(metaclass=EnvMetaClass):
+        """Proxy-class for global environment access. Use it only
+        where it is impossible to get access to current environment
+        by other means. However in any case, simultaneous work with
+        multiple environments is currently not supported an will hardly
+        ever be needed. To get original object for which messages are
+        proxied one can use constructor ``env()``."""
 
 
 def _filter_by_prefix(cfg, prefix):

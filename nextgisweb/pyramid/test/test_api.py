@@ -3,15 +3,10 @@ from copy import deepcopy
 
 import pytest
 
-from nextgisweb.env import Component, load_all
+from nextgisweb.env import Component
+from nextgisweb.env.test import genereate_components
 
 pytestmark = pytest.mark.usefixtures("ngw_auth_administrator")
-
-
-def pytest_generate_tests(metafunc):
-    if "component" in metafunc.fixturenames:
-        load_all()
-        metafunc.parametrize("component", Component.registry.keys())
 
 
 @pytest.fixture(scope="module")
@@ -51,6 +46,7 @@ def test_malformed_json(webtest):
     assert resp.json["exception"].endswith(".MalformedJSONBody")
 
 
+@pytest.mark.parametrize("component", genereate_components())
 def test_settings(component, webtest):
     if hasattr(Component.registry[component], "client_settings"):
         webtest.get("/api/component/pyramid/settings?component={}".format(component))
