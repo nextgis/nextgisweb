@@ -8,13 +8,10 @@ import type { UploaderMeta } from "@nextgisweb/file-upload/file-uploader/type";
 import { ActionToolbar } from "@nextgisweb/gui/action-toolbar";
 import { Button, Input, Table, Upload, message } from "@nextgisweb/gui/antd";
 import { RemoveIcon } from "@nextgisweb/gui/icon";
-import showModal from "@nextgisweb/gui/showModal";
 import { formatSize } from "@nextgisweb/gui/util";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import { ImageThumbnail } from "../image-thumbnail/ImageThumbnail";
-import { CarouselModal } from "../image-thumbnail/component/CarouselModal";
-
+import { AttachmentEditorPreview } from "./AttachmentEditorPreview";
 import AttachmentEditorStore from "./AttachmentEditorStore";
 import type { DataSource } from "./type";
 import { isFileImage } from "./util/isFileImage";
@@ -124,31 +121,13 @@ const AttachmentEditor = observer(
                                             isFileImage(r._file))
                                     ) {
                                         return (
-                                            <ImageThumbnail
+                                            <AttachmentEditorPreview
                                                 attachment={r}
+                                                attachments={dataSource}
                                                 resourceId={store_.resourceId}
                                                 featureId={store_.featureId}
                                                 width={width}
                                                 height={width}
-                                                onClick={() => {
-                                                    const container =
-                                                        previewRef.current;
-                                                    if (container) {
-                                                        showModal(
-                                                            CarouselModal,
-                                                            {
-                                                                dataSource,
-                                                                attachment: r,
-                                                                featureId:
-                                                                    store_.featureId,
-                                                                resourceId:
-                                                                    store_.resourceId,
-                                                                getContainer:
-                                                                    container,
-                                                            }
-                                                        );
-                                                    }
-                                                }}
                                             />
                                         );
                                     }

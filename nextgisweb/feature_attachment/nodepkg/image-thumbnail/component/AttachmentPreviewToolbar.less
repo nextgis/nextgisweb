@@ -1,0 +1,41 @@
+.ngw-feature-attachment-image-thumbnail-toolbar {
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--theme-border-radius);
+    background-color: rgba(0, 0, 0, 0.25);
+    padding: var(--theme-padding-xs);
+    color: var(--theme-color-text-light-solid);
+
+    > .name-or-description {
+        margin-bottom: var(--theme-padding-xs);
+        color: var(--theme-color-text-light-solid);
+
+        .ant-typography-expand,
+        .ant-typography-collapse {
+            opacity: 0.5;
+            color: var(--theme-color-text-light-solid);
+        }
+    }
+
+    > .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+
+        .ant-btn {
+            &,
+            &:hover,
+            &:active {
+                color: var(--theme-color-text-light-solid);
+            }
+
+            svg.icon {
+                font-size: 125%;
+            }
+        }
+
+        .ant-btn:disabled {
+            opacity: 0.5;
+        }
+    }
+}

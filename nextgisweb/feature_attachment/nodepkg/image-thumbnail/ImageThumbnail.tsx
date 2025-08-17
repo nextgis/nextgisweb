@@ -1,12 +1,14 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 
-import type { DataSource, FileMetaToUpload } from "../attachment-editor/type";
-import type { FeatureAttachment } from "../type";
+import { Image } from "@nextgisweb/gui/antd";
+import type { GetProp } from "@nextgisweb/gui/antd";
+import { useKeydownListener } from "@nextgisweb/gui/hook";
 
-import { getFeatureImage } from "./util/getFeatureImage";
-import { getFileImage } from "./util/getFileImage";
+import type { DataSource } from "../attachment-editor/type";
 
-import { EyeOutlined } from "@ant-design/icons";
+import { AttachmentPreviewContext } from "./component/AttachmentPreviewGroup";
+import { getImageURL } from "./util/getImageURL";
+
 import "./ImageThumbnail.less";
 
 export type ImageThumbnailProps = {
@@ -17,63 +19,76 @@ export type ImageThumbnailProps = {
     width?: number;
     height?: number;
     onClick?: (attachment: DataSource) => void;
+    preview?: GetProp<typeof Image, "preview">;
 };
 
-export function isFeatureAttachment(file: unknown): file is FeatureAttachment {
-    return (file as FeatureAttachment).file_meta !== undefined;
-}
-
 export const ImageThumbnail = ({
-    onClick,
     width = 80,
     height,
+    preview,
     featureId,
     resourceId,
     attachment,
 }: ImageThumbnailProps) => {
-    const [url, setUrl] = useState<string>();
+    const [thumbUrl, setThumbUrl] = useState<string>();
+    const [selfImageVisible, setSelfImageVisible] = useState(false);
+
+    const ctx = useContext(AttachmentPreviewContext);
+
+    // When an image is rendered inside Image.PreviewGroup, the built-in
+    // Image.preview.onVisibleChange callback does not fire.
+    // Instead, we rely on the AttachmentPreviewContext context
+    // to track the current preview visibility state in group.
+    const previewVisible = useMemo(
+        () => (ctx ? ctx.visible : selfImageVisible),
+        [ctx, selfImageVisible]
+    );
+
+    const imageUrl = useMemo(() => thumbUrl?.split("?")[0], [thumbUrl]);
+
     useEffect(() => {
         async function fetchImage() {
-            if (!isFeatureAttachment(attachment)) {
-                const newAttachment = attachment as FileMetaToUpload;
-                const file_ = newAttachment._file as File;
-                const url_ = await getFileImage(file_);
-                setUrl(url_);
-            } else if (typeof featureId === "number") {
-                const attachment_ = attachment as FeatureAttachment;
-                const { url: url_ } = getFeatureImage({
-                    featureId,
-                    resourceId,
-                    attachment: attachment_,
-                    height: height,
-                    width: width,
-                });
-                setUrl(url_);
-            }
+            const url = await getImageURL({
+                source: attachment,
+                featureId,
+                resourceId,
+                height,
+                width,
+            });
+            setThumbUrl(url);
         }
         fetchImage();
     }, [attachment, featureId, height, resourceId, width]);
 
+    const ctrlPressed = useKeydownListener("Control");
+
+    const isCtrlMode = ctrlPressed && !previewVisible;
+
+    const previewProps = useMemo(() => {
+        return isCtrlMode
+            ? false
+            : preview !== undefined
+              ? preview
+              : {
+                    src: imageUrl,
+                    onVisibleChange: setSelfImageVisible,
+                };
+    }, [isCtrlMode, preview, imageUrl]);
+
     return (
-        <div
-            className="ngw-feature-attachment-image-thumbnail"
-            style={{ width: width }}
-            onClick={(event) => {
-                if (event.ctrlKey && url) {
+        <Image
+            src={thumbUrl}
+            width={width}
+            onClick={() => {
+                if (isCtrlMode && imageUrl) {
                     window.open(
-                        url.split("?")[0],
+                        imageUrl,
                         "_feature_attachment",
                         `location=${window.location.href}`
                     );
-                } else {
-                    if (onClick) onClick(attachment);
                 }
             }}
-        >
-            <div className="overlay">
-                <EyeOutlined />
-            </div>
-            <img width="100%" height="auto" src={url} draggable={false} />
-        </div>
+            preview={previewProps}
+        />
     );
 };

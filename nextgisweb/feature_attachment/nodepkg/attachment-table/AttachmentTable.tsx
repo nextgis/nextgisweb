@@ -1,19 +1,18 @@
-import { useMemo, useRef } from "react";
+import { useMemo } from "react";
 
 import { Table } from "@nextgisweb/gui/antd";
 import type { TableProps } from "@nextgisweb/gui/antd";
-import showModal from "@nextgisweb/gui/showModal";
 import { formatSize } from "@nextgisweb/gui/util";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import ImageThumbnail from "../image-thumbnail";
-import { CarouselModal } from "../image-thumbnail/component/CarouselModal";
 import type { FeatureAttachment } from "../type";
+
+import { AttachmentImages } from "./AttachmentImages";
 
 import "./AttachmentTable.less";
 
-interface AttachmentTableProps {
+export interface AttachmentTableProps {
     attachments: FeatureAttachment[];
     featureId: number;
     resourceId: number;
@@ -26,9 +25,6 @@ export function AttachmentTable({
     resourceId,
     isSmall,
 }: AttachmentTableProps) {
-    const previewRef = useRef<HTMLDivElement>(null);
-    const size = isSmall ? 64 : 128;
-
     const [images, others] = useMemo(
         () => [
             attachments.filter((a) => a.is_image),
@@ -85,31 +81,13 @@ export function AttachmentTable({
     return (
         <div className="ngw-feature-attachment-attachment-table">
             {images.length > 0 && (
-                <div ref={previewRef} className="images">
-                    {images.map((attachment, index) => {
-                        return (
-                            <ImageThumbnail
-                                key={index}
-                                attachment={attachment}
-                                resourceId={resourceId}
-                                featureId={featureId}
-                                width={size}
-                                height={size}
-                                onClick={() => {
-                                    const container = previewRef.current;
-                                    if (container) {
-                                        showModal(CarouselModal, {
-                                            dataSource: attachments,
-                                            attachment: attachment,
-                                            featureId: featureId,
-                                            resourceId: resourceId,
-                                            getContainer: container,
-                                        });
-                                    }
-                                }}
-                            />
-                        );
-                    })}
+                <div className="images">
+                    <AttachmentImages
+                        attachments={images}
+                        resourceId={resourceId}
+                        featureId={featureId}
+                        isSmall={isSmall}
+                    />
                 </div>
             )}
             {others.length > 0 && (

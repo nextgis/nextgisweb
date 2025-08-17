@@ -1,15 +1,22 @@
 import { Viewer } from "@photo-sphere-viewer/core";
+import type { ViewerConfig } from "@photo-sphere-viewer/core";
 import { useEffect, useRef } from "react";
 
 import "@photo-sphere-viewer/core/index.css";
 import "./PhotospherePreview.less";
 
-interface PhotospherePreviewProps {
+export interface PhotospherePreviewProps
+    extends Omit<ViewerConfig, "container"> {
     url: string | Promise<string>;
+    onReady?: (viewer: Viewer | null) => void;
 }
 
-export default function PhotospherePreview({ url }: PhotospherePreviewProps) {
-    const photosphereWrapper = useRef<HTMLDivElement | null>(null);
+export default function PhotospherePreview({
+    url,
+    onReady,
+    ...viewerConfig
+}: PhotospherePreviewProps) {
+    const photosphereWrapper = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         let viewer: Viewer | undefined;
@@ -19,15 +26,18 @@ export default function PhotospherePreview({ url }: PhotospherePreviewProps) {
                 panorama: url,
                 size: { height: "100%", width: "100%" },
                 navbar: ["zoom", "fullscreen"],
+                ...viewerConfig,
             });
+            onReady?.(viewer);
         }
 
         return () => {
             if (viewer) {
                 viewer.destroy();
+                onReady?.(null);
             }
         };
-    }, [url]);
+    }, [onReady, url, viewerConfig]);
 
     return (
         <div

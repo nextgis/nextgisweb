@@ -1,21 +1,27 @@
-.ngw-feature-attachment-image-thumbnail {
-    display: flex;
-    position: relative;
-    margin: 8px;
-    height: max-content;
-
-    > .overlay {
-        display: none;
-        position: absolute;
-        cursor: pointer;
-        inset: 0;
-        background-color: rgba(0, 0, 0, 0.25);
-        color: white;
+.ngw-feature-attachment-image-thumbnail-preview {
+    .ant-image-preview-mask {
+        background-color: #333;
     }
 
-    &:hover > .overlay {
-        display: flex;
-        justify-content: center;
-        align-items: center;
+    .ant-image-preview-close {
+        inset-block-start: 12px;
+        inset-inline-end: 12px;
+    }
+
+    .ant-image-preview-footer {
+        inset-block-end: 12px;
+    }
+
+    // Override percentage-based padding with pixel values for images, but not
+    // for panoramas, which do not contain an img tag.
+
+    .ant-image-preview-img-wrapper:has(img) {
+        padding-inline: 64px;
+        padding-block: 64px 128px;
+
+        > .ant-image-preview-img {
+            max-width: 100%;
+            max-height: 100%;
+        }
     }
 }
