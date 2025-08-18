@@ -1,4 +1,4 @@
-import { action, computed, observable, runInAction } from "mobx";
+import { action, computed, observable } from "mobx";
 import type { Feature } from "ol";
 import OlMap from "ol/Map";
 import type { MapOptions as OlMapOptions } from "ol/Map";
@@ -16,16 +16,15 @@ import type { SRSRef } from "@nextgisweb/spatial-ref-sys/type/api";
 
 import { Watchable } from "../compat/Watchable";
 import type {
-    ControlPosition,
     CreateControlOptions,
     MapControl,
+    TargetPosition,
 } from "../control-container/ControlContainer";
 
-import { createButtonControl } from "./control/createButtonControl";
-import type { ButtonControlOptions } from "./control/createButtonControl";
 import { createControl } from "./control/createControl";
 import type { CoreLayer, ExtendedOlLayer } from "./layer/CoreLayer";
 import { PanelControl } from "./panel-control/PanelControl";
+import type { ControlOptions } from "./panel-control/PanelControl";
 import { mapStartup } from "./util/mapStartup";
 
 import "ol/ol.css";
@@ -38,6 +37,8 @@ export interface MapExtent extends FitOptions {
 interface MapOptions extends OlMapOptions {
     logo?: boolean;
     extent?: Extent;
+    measureSrsId?: number | null;
+    initialExtent?: Extent;
 }
 
 export interface Position {
@@ -63,6 +64,7 @@ export class MapStore extends Watchable<MapWatchableProps> {
     private readonly SMART_ZOOM = 12;
 
     private readonly _panelControl: PanelControl;
+    private readonly initialExtent?: Extent;
 
     readonly olMap: OlMap;
     @observable.shallow accessor layers: Layers = {};
@@ -71,17 +73,25 @@ export class MapStore extends Watchable<MapWatchableProps> {
     @observable.ref accessor resolution: number | null = null;
     @observable.struct accessor center: number[] | null = null;
     @observable.ref accessor zoom: number | null = null;
+    @observable.ref accessor measureSrsId: number | null = null;
     @observable.struct accessor position: Position | null = null;
+    @observable.struct accessor rotation: number = 0;
+
+    @observable.ref accessor mapState: string | null = null;
+    @observable.ref accessor defaultMapState: string | null = null;
 
     constructor(private options: MapOptions) {
         super();
-        const { target, extent, ...rest } = this.options;
+        const { target, extent, initialExtent, measureSrsId, ...rest } =
+            this.options;
+        this.measureSrsId = measureSrsId ?? null;
+        this.initialExtent = initialExtent;
         const view = new View({
-            minZoom: 3,
             maxZoom: 24,
             constrainResolution: true,
             extent,
         });
+
         this.olMap = new OlMap({ ...rest, view });
         this._panelControl = new PanelControl();
         this.olMap.addControl(this._panelControl);
@@ -96,6 +106,16 @@ export class MapStore extends Watchable<MapWatchableProps> {
             return "blank";
         }
         return this.baseLayer.name;
+    }
+
+    @action.bound
+    setMapState(val: string | null) {
+        this.mapState = val;
+    }
+
+    @action.bound
+    setDefaultMapState(val: string | null) {
+        this.defaultMapState = val;
     }
 
     @action
@@ -124,30 +144,43 @@ export class MapStore extends Watchable<MapWatchableProps> {
     async startup(target: string | HTMLElement): Promise<void> {
         return new Promise((resolve) => {
             const olMap = this.olMap;
-            olMap.setTarget(target);
+
             const olView = olMap.getView();
 
-            olView.on("change:resolution", () => {
-                runInAction(() => {
-                    this.setResolution(olView.getResolution() ?? null);
-                });
-            });
-
-            olView.on("change:center", () => {
-                runInAction(() => {
-                    this.setCenter(olView.getCenter() ?? null);
-                });
-            });
-
-            olMap.on("moveend", () => {
+            const setResolution = () =>
+                this.setResolution(olView.getResolution() ?? null);
+            const setCenter = () => {
+                this.setCenter(olView.getCenter() ?? null);
+            };
+            const setPosition = () => {
                 this.setPosition(this.getPosition());
-            });
+            };
+            const setRotation = () => {
+                const r = olView.getRotation();
+                this.setRotation(typeof r === "number" ? r : 0);
+            };
+
+            olView.on("change:resolution", setResolution);
+            olView.on("change:center", setCenter);
+            olView.on("change:rotation", setRotation);
+
+            olMap.on("moveend", setPosition);
+
+            const applyInitialState = () => {
+                setResolution();
+                setCenter();
+                setPosition();
+            };
+
+            olMap.once("rendercomplete", applyInitialState);
+
             // Workaround to skip first map move event on start
             olMap.once("movestart", () => {
                 // Map ready only then first move happend
                 resolve();
                 mapStartup({ olMap, queue: imageQueue });
             });
+            olMap.setTarget(target);
         });
     }
 
@@ -183,6 +216,10 @@ export class MapStore extends Watchable<MapWatchableProps> {
         const oldZoom = this.zoom;
         this.zoom = zoom;
         this.notify("zoom", oldZoom, zoom);
+    }
+    @action
+    setRotation(rad: number) {
+        this.rotation = rad;
     }
 
     @action
@@ -324,6 +361,12 @@ export class MapStore extends Watchable<MapWatchableProps> {
         }
     }
 
+    zoomToInitialExtent() {
+        if (this.initialExtent) {
+            this.olMap.getView().fit(this.initialExtent);
+        }
+    }
+
     zoomToNgwExtent(
         ngwExtent: NgwExtent,
         {
@@ -372,15 +415,16 @@ export class MapStore extends Watchable<MapWatchableProps> {
         return createControl(control, options, this);
     }
 
-    createButtonControl(options: ButtonControlOptions): Control {
-        return createButtonControl(options);
+    addControl(options: ControlOptions): Control | undefined {
+        this._panelControl.addControl(options);
+        return options.control;
     }
-
-    addControl(
+    updateControlPlacement(
         control: Control,
-        position: ControlPosition
+        position: TargetPosition,
+        order?: number
     ): Control | undefined {
-        this._panelControl.addControl(control, position);
+        this._panelControl.updateControlPlacement(control, position, order);
         return control;
     }
 

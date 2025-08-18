@@ -3,9 +3,8 @@ import { Rotate } from "ol/control";
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import { getLabel } from "../map-controls/map-controls";
-
 import NorthIcon from "@nextgisweb/icon/material/arrow_upward";
+import { getLabel } from "../map-controls/utils";
 
 export const mmToPx = (mm: number): number => {
     return (mm / 10) * (96 / 2.54);

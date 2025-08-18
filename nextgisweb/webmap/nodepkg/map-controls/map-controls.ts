@@ -1,163 +1,131 @@
-import { orderBy } from "lodash-es";
-import { Control } from "ol/control";
-import Attribution from "ol/control/Attribution";
-import Rotate from "ol/control/Rotate";
-import ScaleLine from "ol/control/ScaleLine";
-import Zoom from "ol/control/Zoom";
-import type { FC } from "react";
+/** @plugin */
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { iconHtml } from "@nextgisweb/pyramid/icon";
+import {
+    mapControlRegistry,
+    olControlRegistry,
+} from "@nextgisweb/webmap/display/component/map-panel/registry";
 
-import type { Display } from "../display";
-
-import { InfoScale } from "./control/InfoScale";
-import { InitialExtent } from "./control/InitialExtent";
-import { MyLocation } from "./control/MyLocation";
-import { ToolsInfo, buildTools, getToolsInfo } from "./map-tools";
-import { Identify } from "./tool/Identify";
-import type { ControlInfo, ControlReady } from "./type";
-import { getControlsInfo } from "./utils";
-
-import ZoomInIcon from "@nextgisweb/icon/material/add";
-import NorthIcon from "@nextgisweb/icon/material/arrow_upward";
-import ZoomOutIcon from "@nextgisweb/icon/material/remove";
-
-export const getLabel = (Icon: FC & { id: string }): HTMLElement => {
-    const labelEl = document.createElement("span");
-    labelEl.innerHTML = iconHtml(Icon);
-    labelEl.classList.add("ol-control__icon");
-    return labelEl;
-};
-
-export const ControlsInfo: ControlInfo[] = [
-    {
-        key: "z",
-        ctor: (display) => {
-            return new Zoom({
-                zoomInLabel: getLabel(ZoomInIcon),
-                zoomOutLabel: getLabel(ZoomOutIcon),
-                zoomInTipLabel: gettext("Zoom in"),
-                zoomOutTipLabel: gettext("Zoom out"),
-                target: display.leftTopControlPane,
-            });
-        },
-        embeddedShowMode: "always",
-        olMapControl: true,
+mapControlRegistry(COMP_ID, {
+    key: "at",
+    order: 1000,
+    component: () => import("../map-component/control/MapToolbarControl"),
+    label: gettext("Attibution Toolbar"),
+    position: "bottom-right",
+    props: {
+        id: "attribution-toolbar",
+        direction: "horizontal",
+        align: "center",
+        gap: 10,
     },
-    {
-        key: "attr",
-        ctor: (display) => {
-            return new Attribution({
-                tipLabel: gettext("Attributions"),
-                target: display.rightBottomControlPane,
-                collapsible: false,
-            });
-        },
-        embeddedShowMode: "always",
-        olMapControl: true,
-    },
-    {
-        key: "rot",
-        ctor: (display) => {
-            return new Rotate({
-                tipLabel: gettext("Reset rotation"),
-                target: display.leftTopControlPane,
-                label: getLabel(NorthIcon),
-            });
-        },
-        olMapControl: true,
-    },
-    {
-        key: "sl",
-        ctor: (display) => {
-            return new ScaleLine({
-                target: display.rightBottomControlPane,
-                minWidth: 48,
-            });
-        },
-        label: gettext("Scale line"),
-        embeddedShowMode: "customize",
-        olMapControl: true,
-    },
-    {
-        key: "is",
-        ctor: (display) => {
-            return new InfoScale({
-                display: display,
-                target: display.rightBottomControlPane,
-            });
-        },
-        label: gettext("Info scale"),
-        embeddedShowMode: "customize",
-        olMapControl: true,
-    },
-    {
-        key: "ie",
-        ctor: (display) => {
-            return new InitialExtent({
-                display: display,
-                target: display.leftTopControlPane,
-                tipLabel: gettext("Initial extent"),
-            });
-        },
-        label: gettext("Initial extent"),
-        embeddedShowMode: "customize",
-        olMapControl: true,
-    },
-    {
-        key: "ml",
-        ctor: (display) => {
-            return new MyLocation({
-                display: display,
-                target: display.leftTopControlPane,
-                tipLabel: gettext("Locate me"),
-            });
-        },
-        label: gettext("Locate me"),
-        embeddedShowMode: "customize",
-        olMapControl: true,
-    },
-    {
-        label: gettext("Identification"),
-        ctor: (display) => {
-            return new Identify({ display });
-        },
-        key: "id",
-        mapStateKey: "identifying",
-        embeddedShowMode: "customize",
-        olMapControl: false,
-    },
-];
+});
 
-export const buildControls = (display: Display): Map<string, ControlReady> => {
-    const controlsMap = new Map<string, ControlReady>();
+mapControlRegistry(COMP_ID, {
+    key: "mt",
+    component: () => import("../map-component/control/MapToolbarControl"),
+    label: gettext("Map Toolbar"),
+    position: "bottom-left",
+    props: { id: "map-toolbar", direction: "horizontal" },
+});
 
-    const controlsInfo = getControlsInfo<ControlInfo>(display, ControlsInfo);
-    const controlsToMap: Control[] = [];
-    controlsInfo.forEach((c: ControlInfo) => {
-        const control = c.ctor(display);
-        if (c.postCreate) {
-            c.postCreate(display, control);
-        }
-        controlsMap.set(c.key, { info: c, control });
+mapControlRegistry(COMP_ID, {
+    key: "z",
+    order: 10,
+    component: () => import("../map-component/control/ZoomControl"),
+    embeddedShowMode: "always",
+    position: "top-left",
+});
 
-        if (control instanceof Control) {
-            controlsToMap.push(control);
-        }
-    });
-    display._mapAddControls(controlsToMap);
+mapControlRegistry(COMP_ID, {
+    key: "rot",
+    order: 30,
+    component: () => import("../map-component/control/RotateControl"),
+    position: "top-left",
+});
 
-    const toolsInfo = getToolsInfo(display);
-    const mapToolbar = buildTools(display, toolsInfo, controlsMap);
-    if (mapToolbar) {
-        display._mapAddControls([mapToolbar]);
-    }
+mapControlRegistry(COMP_ID, {
+    key: "attr",
+    order: 10,
+    component: () => import("../map-component/control/AttributionControl"),
+    embeddedShowMode: "always",
+    position: { inside: "attribution-toolbar" },
+});
 
-    return controlsMap;
-};
+mapControlRegistry(COMP_ID, {
+    key: "is",
+    order: 30,
+    component: () => import("../map-component/control/InfoScaleControl"),
+    label: gettext("Info scale"),
+    embeddedShowMode: "customize",
+    position: { inside: "attribution-toolbar" },
+});
+olControlRegistry(COMP_ID, {
+    key: "sl",
+    order: 20,
+    ctor: () =>
+        import("ol/control/ScaleLine").then(
+            (mod) =>
+                new mod.default({
+                    minWidth: 48,
+                })
+        ),
+    embeddedShowMode: "customize",
+    position: { inside: "attribution-toolbar" },
+});
 
-export const getControls = () => {
-    const controls = [...ControlsInfo, ...ToolsInfo];
-    return orderBy(controls, ["label"]);
-};
+mapControlRegistry(COMP_ID, {
+    key: "ie",
+    order: 60,
+    component: () => import("../map-component/control/InitialExtentControl"),
+    label: gettext("Initial extent"),
+    embeddedShowMode: "customize",
+    position: "top-left",
+});
+mapControlRegistry(COMP_ID, {
+    key: "ml",
+    order: 70,
+    component: () => import("../map-component/control/MyLocationControl"),
+    label: gettext("Locate me"),
+    embeddedShowMode: "customize",
+    position: "top-left",
+});
+
+mapControlRegistry(COMP_ID, {
+    key: "id",
+    component: () => import("../map-component/control/IdentifyControl"),
+    label: gettext("Identification"),
+    embeddedShowMode: "customize",
+    props: { isDefaultGroupId: true, groupId: "identifying" },
+});
+
+// export const buildControls = (display: Display): Map<string, ControlReady> => {
+//     const controlsMap = new Map<string, ControlReady>();
+
+//     const controlsInfo = getControlsInfo<ControlInfo>(display, ControlsInfo);
+//     const controlsToMap: Control[] = [];
+//     controlsInfo.forEach((c: ControlInfo) => {
+//         const control = c.ctor(display);
+//         if (c.postCreate) {
+//             c.postCreate(display, control);
+//         }
+//         controlsMap.set(c.key, { info: c, control });
+
+//         if (control instanceof Control) {
+//             controlsToMap.push(control);
+//         }
+//     });
+//     display._mapAddControls(controlsToMap);
+
+//     const toolsInfo = getToolsInfo(display);
+//     const mapToolbar = buildTools(display, toolsInfo, controlsMap);
+//     if (mapToolbar) {
+//         display._mapAddControls([mapToolbar]);
+//     }
+
+//     return controlsMap;
+// };
+
+// export const getControls = () => {
+//     const controls = [...ControlsInfo, ...ToolsInfo];
+//     return orderBy(controls, ["label"]);
+// };

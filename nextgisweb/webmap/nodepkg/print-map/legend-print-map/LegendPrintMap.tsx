@@ -2,7 +2,7 @@ import { useCallback, useEffect } from "react";
 
 import LayersTree from "../../layers-tree";
 import type { TreeWebmapItem } from "../../layers-tree/LayersTree";
-import type WebmapStore from "../../store";
+import type { WebmapStore } from "../../store";
 import { printMapStore } from "../PrintMapStore";
 import RndComp from "../rnd-comp";
 import type { LegendPrintMapProps, RndCoords } from "../type";

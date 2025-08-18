@@ -1,5 +1,5 @@
-export * from "./AttributionControl";
+export { default as AttributionControl } from "./AttributionControl";
 export * from "./ButtonControl";
 export * from "./MapControl";
 export * from "./ToggleControl";
-export * from "./ZoomControl";
+export { default as ZoomControl } from "./ZoomControl";

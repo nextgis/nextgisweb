@@ -41,6 +41,8 @@ import { showFinishEditingDialog } from "../../ui/finish-editing-dialog";
 import { PluginBase } from "../PluginBase";
 import type { LayerEditorWebMapPluginConfig } from "../type";
 
+import { EDITING_STATES, INTERACTION_KEYS } from "./constant";
+import type { EditingState } from "./constant";
 import type {
     EditingItem,
     FeatureInfo,
@@ -49,12 +51,12 @@ import type {
 } from "./type";
 
 export class LayerEditor extends PluginBase {
-    private static readonly CREATING_STATE_KEY = "creatingFeatures";
-    private static readonly MODIFYING_STATE_KEY = "modifyingFeatures";
-    private static readonly DELETING_STATE_KEY = "deletingFeatures";
-    private static readonly DRAW_KEY_INTERACTION = "draw";
-    private static readonly MODIFY_KEY_INTERACTION = "modify";
-    private static readonly SNAP_KEY_INTERACTION = "snap";
+    private static readonly CREATING_STATE_KEY = EDITING_STATES.CREATING;
+    private static readonly MODIFYING_STATE_KEY = EDITING_STATES.MODIFYING;
+    private static readonly DELETING_STATE_KEY = EDITING_STATES.DELETING;
+    private static readonly DRAW_KEY_INTERACTION = INTERACTION_KEYS.DRAW;
+    private static readonly MODIFY_KEY_INTERACTION = INTERACTION_KEYS.MODIFY;
+    private static readonly SNAP_KEY_INTERACTION = INTERACTION_KEYS.SNAP;
 
     private wkt = new WKT();
     private source!: VectorSource;
@@ -66,7 +68,7 @@ export class LayerEditor extends PluginBase {
 
     private elEditToolbar!: HTMLElement;
 
-    private lastEditingState: string | null = null;
+    private lastEditingState: EditingState | null = null;
     private selectedResourceId: number | null = null;
     private disabled = true;
     private isDisplayingEditingControls = false;
@@ -484,7 +486,7 @@ export class LayerEditor extends PluginBase {
         this.setModifyingMode();
     }
 
-    private setEditingMode(modeKey: string | null): void {
+    private setEditingMode(modeKey: EditingState | null): void {
         if (
             !modeKey ||
             ![
