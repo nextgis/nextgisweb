@@ -1,4 +1,4 @@
-import { routeURL } from "@nextgisweb/pyramid/api";
+import { route } from "@nextgisweb/pyramid/api";
 
 import type { FeatureAttachment } from "../../type";
 
@@ -17,11 +17,16 @@ export function getFeatureImage({
     height,
     width,
 }: GetFeatureImageProps) {
-    const imageUrl = routeURL("feature_attachment.image", {
+    const query =
+        width && height
+            ? { size: `${width}x${height}`, crop: true }
+            : undefined;
+
+    const url = route("feature_attachment.image", {
         id: resourceId,
         fid: featureId,
         aid: attachment.id,
-    });
+    }).url({ query });
 
     let projection: string | null = null;
     if ("file_meta" in attachment) {
@@ -32,11 +37,7 @@ export function getFeatureImage({
         }
     }
 
-    const sizeRequest = width && height ? `?size=${width}x${height}` : "";
-    const url = imageUrl + sizeRequest;
-
     const isPanorama = projection === "equirectangular";
-
     const fileName = attachment.name;
     const description = attachment.description;
 
