@@ -29,6 +29,7 @@ from .api_import import attachments_import
 from .exception import AttachmentNotFound
 from .exif import EXIF_ORIENTATION_TAG, ORIENTATIONS
 from .model import FeatureAttachment
+from .util import crop_to_aspect_ratio
 
 ResourceID = Annotated[int, Meta(ge=0, description="Resource ID")]
 AttachmentID = Annotated[int, Meta(description="Attachment ID")]
@@ -87,7 +88,15 @@ def download(
     return response
 
 
-def image(resource, request, fid: FeatureID, aid: AttachmentID):
+def image(
+    resource,
+    request,
+    fid: FeatureID,
+    aid: AttachmentID,
+    *,
+    size: Annotated[str, Meta(pattern=r"^\d+x\d+$")] = "",
+    crop: bool = False,
+):
     request.resource_permission(DataScope.read)
 
     obj = attachment_or_not_found(resource, fid, aid)
@@ -106,8 +115,12 @@ def image(resource, request, fid: FeatureID, aid: AttachmentID):
             orientation = ORIENTATIONS.get(otag)
             image = image.transpose(orientation.degrees)
 
-    if "size" in request.GET:
-        image.thumbnail(list(map(int, request.GET["size"].split("x"))), Image.LANCZOS)
+    if size != "":
+        width, height = map(int, size.split("x", maxsplit=1))
+        if crop:
+            aspect_ratio = width / height
+            image = crop_to_aspect_ratio(image, aspect_ratio)
+        image.thumbnail((width, height), Image.LANCZOS)
 
     buf = BytesIO()
     image.save(buf, ext)
