@@ -41,7 +41,12 @@
     />
 
     <link href="${request.route_url('pyramid.asset.favicon')}" rel="shortcut icon" type="image/x-icon" />
-    <link href="${request.static_url('stylesheet/layout.css')}" rel="stylesheet" type="text/css" />
+
+    % if True:
+        <link href="http://localhost:3000/layout.css" rel="stylesheet" type="text/css" />
+    % else:
+        <link href="${request.static_url('stylesheet/layout.css')}" rel="stylesheet" type="text/css" />
+    % endif
 
     <%
         custom_css_url = request.route_url('pyramid.asset.css', _query=dict(
@@ -50,7 +55,13 @@
     <link href="${custom_css_url}" rel="stylesheet" type="text/css"/>
 
     <%include file="nextgisweb:pyramid/template/client_config.mako" />
-    <script src="${request.static_url('main/ngwEntry.js')}"></script>
+    
+    % if True:
+        <script src="http://localhost:3000/ngwEntry.js"></script>
+    % else:
+        <script src="${request.static_url('main/ngwEntry.js')}"></script>
+    % endif
+
     
     %if hasattr(self, 'head'):
         ${self.head()}
