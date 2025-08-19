@@ -7,7 +7,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { FilterEditorStore } from "./FilterEditorStore";
 import { ConstructorTab } from "./component/ConstructorTab";
-import { JsonTab } from "./component/JsonTab";
+import { FeatureFilterJsonTab } from "./component/FeatureFilterJsonTab";
 import type { FeatureFilterEditorProps } from "./type";
 
 import "./FeatureFilterEditor.less";
@@ -19,7 +19,7 @@ const msgApply = gettext("Apply");
 export const FeatureFilterEditor = observer(
     ({ fields, value, onChange }: FeatureFilterEditorProps) => {
         const [store] = useState(
-            () => new FilterEditorStore({ fields, value, onChange })
+            () => new FilterEditorStore({ fields, value })
         );
         const [messageApi, contextHolder] = message.useMessage();
 
@@ -49,7 +49,7 @@ export const FeatureFilterEditor = observer(
             {
                 key: "json",
                 label: msgJson,
-                children: <JsonTab store={store} />,
+                children: <FeatureFilterJsonTab store={store} />,
             },
         ];
 

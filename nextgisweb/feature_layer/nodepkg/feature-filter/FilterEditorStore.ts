@@ -8,7 +8,6 @@ import type { FilterCondition, FilterGroup, MapLibreExpression } from "./type";
 export interface FilterEditorStoreOptions {
     fields: FeatureLayerFieldRead[];
     value?: any[];
-    onChange?: (value: any[]) => void;
 }
 
 export class FilterEditorStore {
@@ -19,15 +18,14 @@ export class FilterEditorStore {
         conditions: [],
         groups: [],
     };
-    @observable.ref accessor activeTab: string = "constructor";
-    @observable.ref accessor jsonValue: string = "";
+    @observable accessor activeTab: string = "constructor";
+    @observable accessor jsonValue: string | undefined = undefined;
+    @observable accessor isValid: boolean = true;
 
-    private onChange?: (value: any[]) => void;
     private transientIdCounter = 0;
 
     constructor(options: FilterEditorStoreOptions) {
         this.fields = options.fields;
-        this.onChange = options.onChange;
 
         if (options.value) {
             this.loadFilter(options.value);
@@ -40,7 +38,7 @@ export class FilterEditorStore {
     }
 
     @action.bound
-    setJsonValue(value: string) {
+    setJsonValue(value: string | undefined) {
         this.jsonValue = value;
     }
 
@@ -49,12 +47,13 @@ export class FilterEditorStore {
         try {
             const filterState = this.parseMapLibreExpression(expression);
             this.filterState = filterState;
-            this.jsonValue = JSON.stringify(expression, null, 2);
+            this.isValid = true;
         } catch (error) {
             console.error("Failed to parse filter expression:", error);
             this.activeTab = "json";
-            this.jsonValue = JSON.stringify(expression, null, 2);
+            this.isValid = false;
         }
+        this.jsonValue = JSON.stringify(expression, null, 2);
     }
 
     @action.bound
@@ -170,7 +169,9 @@ export class FilterEditorStore {
     toMapLibreExpression(): MapLibreExpression {
         if (this.activeTab === "json") {
             try {
-                return JSON.parse(this.jsonValue);
+                return this.jsonValue !== undefined
+                    ? JSON.parse(this.jsonValue)
+                    : [];
             } catch (_error) {
                 throw new Error("Invalid JSON", { cause: _error });
             }
