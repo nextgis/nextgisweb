@@ -34,15 +34,15 @@ interface FilterConditionProps {
 export const FilterCondition = observer(
     ({ condition, store, dragHandleProps }: FilterConditionProps) => {
         const handleFieldChange = (field: string) => {
-            store.updateConditionField(condition.id, field);
+            store.updateCondition(condition.id, { field });
         };
 
         const handleOperatorChange = (operator: string) => {
-            store.updateConditionOperator(condition.id, operator);
+            store.updateCondition(condition.id, { operator });
         };
 
         const handleValueChange = (value: any) => {
-            store.updateConditionValue(condition.id, value);
+            store.updateCondition(condition.id, { value });
         };
 
         const handleDelete = () => {

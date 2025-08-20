@@ -13,7 +13,7 @@ export interface FilterEditorStoreOptions {
 export class FilterEditorStore {
     @observable.shallow accessor fields: FeatureLayerFieldRead[] = [];
     @observable.deep accessor filterState: FilterGroup = {
-        id: this.generateTransientId(),
+        id: 0,
         operator: "all",
         conditions: [],
         groups: [],
@@ -26,14 +26,57 @@ export class FilterEditorStore {
 
     constructor(options: FilterEditorStoreOptions) {
         this.fields = options.fields;
-
-        if (options.value) {
+        if (options.value && options.value.length > 0) {
             this.loadFilter(options.value);
+        } else {
+            this.filterState.id = this.generateTransientId();
         }
     }
 
     @action.bound
     setActiveTab(tab: string) {
+        if (tab === this.activeTab) {
+            return;
+        }
+
+        if (tab === "json") {
+            try {
+                const expression = this.convertToMapLibreExpression(
+                    this.filterState
+                );
+                this.jsonValue = JSON.stringify(expression, null, 2);
+                this.isValid = true;
+            } catch (error) {
+                console.error(
+                    "Failed to generate JSON from filter state:",
+                    error
+                );
+                this.isValid = false;
+            }
+        }
+
+        if (tab === "constructor") {
+            if (this.jsonValue) {
+                try {
+                    const parsedJson = JSON.parse(this.jsonValue);
+                    const newFilterState =
+                        this.parseMapLibreExpression(parsedJson);
+                    this.filterState = newFilterState;
+                    this.isValid = true;
+                } catch (error) {
+                    console.error(
+                        "Failed to parse JSON, falling back to JSON tab.",
+                        error
+                    );
+                    this.isValid = false;
+                    return;
+                }
+            } else {
+                this.filterState = this.parseMapLibreExpression([]);
+                this.isValid = true;
+            }
+        }
+
         this.activeTab = tab;
     }
 
@@ -43,8 +86,136 @@ export class FilterEditorStore {
     }
 
     @action.bound
+    addCondition(groupId: number, conditionData?: Omit<FilterCondition, "id">) {
+        const defaultCondition = conditionData || {
+            field: this.fields[0]?.keyname || "",
+            operator: "==",
+            value: "",
+        };
+
+        const newCondition: FilterCondition = {
+            ...defaultCondition,
+            id: this.generateTransientId(),
+        };
+        const group = this._findGroupById(this.filterState, groupId);
+        if (group) {
+            group.conditions.push(newCondition);
+        }
+    }
+
+    @action.bound
+    addGroup(parentGroupId: number, operator: "all" | "any" = "all") {
+        const newGroup: FilterGroup = {
+            id: this.generateTransientId(),
+            operator,
+            conditions: [],
+            groups: [],
+        };
+        const parentGroup = this._findGroupById(
+            this.filterState,
+            parentGroupId
+        );
+        if (parentGroup) {
+            parentGroup.groups.push(newGroup);
+        }
+    }
+
+    @action.bound
+    updateCondition(conditionId: number, updates: Partial<FilterCondition>) {
+        this._updateConditionInTree(this.filterState, conditionId, updates);
+    }
+
+    @action.bound
+    updateGroupOperator(groupId: number, operator: "all" | "any") {
+        const group = this._findGroupById(this.filterState, groupId);
+        if (group) {
+            group.operator = operator;
+        }
+    }
+
+    @action.bound
+    deleteCondition(conditionId: number) {
+        this._findAndRemoveCondition(this.filterState, conditionId);
+    }
+
+    @action.bound
+    deleteGroup(groupId: number) {
+        if (groupId === this.filterState.id) {
+            console.warn("Cannot delete the root group.");
+            return;
+        }
+        this._findAndRemoveGroup(this.filterState, groupId);
+    }
+
+    @action.bound
+    moveConditionToGroup(
+        conditionId: number,
+        sourceGroupId: number,
+        targetGroupId: number,
+        overItemId: number | null
+    ) {
+        const conditionToMove = this._findAndRemoveCondition(
+            this.filterState,
+            conditionId
+        );
+        if (!conditionToMove) return;
+
+        const targetGroup = this._findGroupById(
+            this.filterState,
+            targetGroupId
+        );
+        if (!targetGroup) return;
+
+        if (overItemId) {
+            const targetIndex = targetGroup.conditions.findIndex(
+                (c) => c.id === overItemId
+            );
+            if (targetIndex !== -1) {
+                targetGroup.conditions.splice(targetIndex, 0, conditionToMove);
+            } else {
+                targetGroup.conditions.push(conditionToMove);
+            }
+        } else {
+            targetGroup.conditions.push(conditionToMove);
+        }
+    }
+
+    @action.bound
+    moveGroupToGroup(
+        groupId: number,
+        sourceGroupId: number | null,
+        targetGroupId: number,
+        overItemId: number | null
+    ) {
+        if (groupId === targetGroupId) return;
+
+        const groupToMove = this._findAndRemoveGroup(this.filterState, groupId);
+        if (!groupToMove) return;
+
+        const targetGroup = this._findGroupById(
+            this.filterState,
+            targetGroupId
+        );
+        if (!targetGroup) return;
+
+        if (overItemId) {
+            const targetIndex = targetGroup.groups.findIndex(
+                (g) => g.id === overItemId
+            );
+            if (targetIndex !== -1) {
+                targetGroup.groups.splice(targetIndex, 0, groupToMove);
+            } else {
+                targetGroup.groups.push(groupToMove);
+            }
+        } else {
+            targetGroup.groups.push(groupToMove);
+        }
+    }
+
+    @action.bound
     loadFilter(expression: any[]) {
         try {
+            this.transientIdCounter = Date.now();
             const filterState = this.parseMapLibreExpression(expression);
             this.filterState = filterState;
             this.isValid = true;
@@ -56,293 +227,37 @@ export class FilterEditorStore {
         this.jsonValue = JSON.stringify(expression, null, 2);
     }
 
-    @action.bound
-    addCondition(groupId: number, condition: Omit<FilterCondition, "id">) {
-        const newCondition: FilterCondition = {
-            ...condition,
-            id: this.generateTransientId(),
-        };
-
-        this.addConditionToGroup(this.filterState, groupId, newCondition);
-    }
-
-    @action.bound
-    updateCondition(conditionId: number, updates: Partial<FilterCondition>) {
-        this.updateConditionInGroup(this.filterState, conditionId, updates);
-    }
-
-    @action.bound
-    updateConditionField(conditionId: number, field: string) {
-        this.updateConditionInGroup(this.filterState, conditionId, { field });
-    }
-
-    @action.bound
-    updateConditionOperator(conditionId: number, operator: string) {
-        this.updateConditionInGroup(this.filterState, conditionId, {
-            operator,
-        });
-    }
-
-    @action.bound
-    updateConditionValue(conditionId: number, value: any) {
-        this.updateConditionInGroup(this.filterState, conditionId, { value });
-    }
-
-    @action.bound
-    updateGroupOperator(groupId: number, operator: "all" | "any") {
-        this.updateGroupInGroup(this.filterState, groupId, { operator });
-    }
-
-    @action.bound
-    deleteCondition(conditionId: number) {
-        this.removeConditionFromGroup(this.filterState, conditionId);
-    }
-
-    @action.bound
-    deleteGroup(groupId: number) {
-        this.removeGroupFromGroup(this.filterState, groupId);
-    }
-
-    @action.bound
-    removeCondition(conditionId: number) {
-        this.removeConditionFromGroup(this.filterState, conditionId);
-    }
-
-    @action.bound
-    addGroup(parentGroupId: number, operator: "all" | "any" = "all") {
-        const newGroup: FilterGroup = {
-            id: this.generateTransientId(),
-            operator,
-            conditions: [],
-            groups: [],
-        };
-
-        this.addGroupToGroup(this.filterState, parentGroupId, newGroup);
-    }
-
-    @action.bound
-    updateGroup(groupId: number, updates: Partial<FilterGroup>) {
-        this.updateGroupInGroup(this.filterState, groupId, updates);
-    }
-
-    @action.bound
-    removeGroup(groupId: number) {
-        this.removeGroupFromGroup(this.filterState, groupId);
-    }
-
-    @action.bound
-    moveCondition(conditionId: number, groupId: number, newIndex: number) {
-        this.moveConditionInGroup(
-            this.filterState,
-            conditionId,
-            groupId,
-            newIndex
-        );
-    }
-
-    @action.bound
-    moveConditionBetweenGroups(
-        conditionId: number,
-        sourceGroupId: number,
-        targetGroupId: number,
-        newIndex: number
-    ) {
-        this.moveConditionBetweenGroupsInGroup(
-            this.filterState,
-            conditionId,
-            sourceGroupId,
-            targetGroupId,
-            newIndex
-        );
-    }
-
-    @action.bound
-    moveGroup(groupId: number, targetGroupId: number, newIndex: number) {
-        this.moveGroupInGroup(
-            this.filterState,
-            groupId,
-            targetGroupId,
-            newIndex
-        );
-    }
-
     toMapLibreExpression(): MapLibreExpression {
-        if (this.activeTab === "json") {
+        if (this.activeTab === "json" && this.jsonValue) {
             try {
-                return this.jsonValue !== undefined
-                    ? JSON.parse(this.jsonValue)
-                    : [];
+                const parsed = JSON.parse(this.jsonValue);
+                this.isValid = true;
+                return parsed;
             } catch (_error) {
+                this.isValid = false;
                 throw new Error("Invalid JSON", { cause: _error });
             }
         }
-
         return this.convertToMapLibreExpression(this.filterState);
     }
 
     private generateTransientId(): number {
-        this.transientIdCounter += 1;
-        return this.transientIdCounter;
+        return ++this.transientIdCounter;
     }
 
-    private addConditionToGroup(
+    private _findGroupById(
         group: FilterGroup,
-        targetGroupId: number,
-        condition: FilterCondition
-    ): boolean {
-        if (group.id === targetGroupId) {
-            group.conditions.push(condition);
-            return true;
-        }
-
+        groupId: number
+    ): FilterGroup | null {
+        if (group.id === groupId) return group;
         for (const childGroup of group.groups) {
-            if (
-                this.addConditionToGroup(childGroup, targetGroupId, condition)
-            ) {
-                return true;
-            }
+            const found = this._findGroupById(childGroup, groupId);
+            if (found) return found;
         }
-
-        return false;
+        return null;
     }
 
-    private updateConditionInGroup(
-        group: FilterGroup,
-        conditionId: number,
-        updates: Partial<FilterCondition>
-    ): boolean {
-        const condition = group.conditions.find((c) => c.id === conditionId);
-        if (condition) {
-            if (updates.field !== undefined) condition.field = updates.field;
-            if (updates.operator !== undefined)
-                condition.operator = updates.operator;
-            if (updates.value !== undefined) condition.value = updates.value;
-            return true;
-        }
-
-        for (const childGroup of group.groups) {
-            if (this.updateConditionInGroup(childGroup, conditionId, updates)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private removeConditionFromGroup(
-        group: FilterGroup,
-        conditionId: number
-    ): boolean {
-        const index = group.conditions.findIndex((c) => c.id === conditionId);
-        if (index !== -1) {
-            group.conditions.splice(index, 1);
-            return true;
-        }
-
-        for (const childGroup of group.groups) {
-            if (this.removeConditionFromGroup(childGroup, conditionId)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private moveConditionInGroup(
-        group: FilterGroup,
-        conditionId: number,
-        targetGroupId: number,
-        newIndex: number
-    ): boolean {
-        if (group.id === targetGroupId) {
-            const oldIndex = group.conditions.findIndex(
-                (c) => c.id === conditionId
-            );
-            if (oldIndex !== -1) {
-                const condition = group.conditions.splice(oldIndex, 1)[0];
-                const adjustedIndex =
-                    newIndex > oldIndex ? newIndex - 1 : newIndex;
-                group.conditions.splice(adjustedIndex, 0, condition);
-                return true;
-            }
-        }
-
-        for (const childGroup of group.groups) {
-            if (
-                this.moveConditionInGroup(
-                    childGroup,
-                    conditionId,
-                    targetGroupId,
-                    newIndex
-                )
-            ) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private moveConditionBetweenGroupsInGroup(
-        group: FilterGroup,
-        conditionId: number,
-        sourceGroupId: number,
-        targetGroupId: number,
-        newIndex: number
-    ): boolean {
-        if (group.id === sourceGroupId) {
-            const sourceIndex = group.conditions.findIndex(
-                (c) => c.id === conditionId
-            );
-            if (sourceIndex !== -1) {
-                const condition = group.conditions.splice(sourceIndex, 1)[0];
-
-                if (group.id === targetGroupId) {
-                    const adjustedIndex =
-                        sourceIndex < newIndex ? newIndex - 1 : newIndex;
-                    group.conditions.splice(adjustedIndex, 0, condition);
-                } else {
-                    const targetGroup = group.groups.find(
-                        (g) => g.id === targetGroupId
-                    );
-                    if (targetGroup) {
-                        targetGroup.conditions.splice(newIndex, 0, condition);
-                        return true;
-                    }
-                }
-                return true;
-            }
-        }
-
-        if (group.id === targetGroupId) {
-            const condition = this.findAndRemoveConditionFromGroup(
-                group,
-                conditionId
-            );
-            if (condition) {
-                group.conditions.splice(newIndex, 0, condition);
-                return true;
-            }
-        }
-
-        for (const childGroup of group.groups) {
-            if (
-                this.moveConditionBetweenGroupsInGroup(
-                    childGroup,
-                    conditionId,
-                    sourceGroupId,
-                    targetGroupId,
-                    newIndex
-                )
-            ) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private findAndRemoveConditionFromGroup(
+    private _findAndRemoveCondition(
         group: FilterGroup,
         conditionId: number
     ): FilterCondition | null {
@@ -350,125 +265,43 @@ export class FilterEditorStore {
         if (index !== -1) {
             return group.conditions.splice(index, 1)[0];
         }
-
         for (const childGroup of group.groups) {
-            const condition = this.findAndRemoveConditionFromGroup(
-                childGroup,
-                conditionId
-            );
-            if (condition) {
-                return condition;
-            }
+            const found = this._findAndRemoveCondition(childGroup, conditionId);
+            if (found) return found;
         }
-
         return null;
     }
 
-    private moveGroupInGroup(
+    private _findAndRemoveGroup(
         group: FilterGroup,
-        groupId: number,
-        targetGroupId: number,
-        newIndex: number
-    ): boolean {
-        if (group.id === targetGroupId) {
-            const sourceIndex = group.groups.findIndex((g) => g.id === groupId);
-            if (sourceIndex !== -1) {
-                const groupToMove = group.groups.splice(sourceIndex, 1)[0];
-                const adjustedIndex =
-                    sourceIndex < newIndex ? newIndex - 1 : newIndex;
-                group.groups.splice(adjustedIndex, 0, groupToMove);
-                return true;
-            }
-        }
-
-        const sourceIndex = group.groups.findIndex((g) => g.id === groupId);
-        if (sourceIndex !== -1) {
-            const groupToMove = group.groups.splice(sourceIndex, 1)[0];
-
-            if (group.id === targetGroupId) {
-                const adjustedIndex =
-                    sourceIndex < newIndex ? newIndex - 1 : newIndex;
-                group.groups.splice(adjustedIndex, 0, groupToMove);
-                return true;
-            } else {
-                const targetGroup = group.groups.find(
-                    (g) => g.id === targetGroupId
-                );
-                if (targetGroup) {
-                    targetGroup.groups.splice(newIndex, 0, groupToMove);
-                    return true;
-                }
-            }
-        }
-
-        for (const childGroup of group.groups) {
-            if (
-                this.moveGroupInGroup(
-                    childGroup,
-                    groupId,
-                    targetGroupId,
-                    newIndex
-                )
-            ) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private addGroupToGroup(
-        group: FilterGroup,
-        targetGroupId: number,
-        newGroup: FilterGroup
-    ): boolean {
-        if (group.id === targetGroupId) {
-            group.groups.push(newGroup);
-            return true;
-        }
-
-        for (const childGroup of group.groups) {
-            if (this.addGroupToGroup(childGroup, targetGroupId, newGroup)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private updateGroupInGroup(
-        group: FilterGroup,
-        groupId: number,
-        updates: Partial<FilterGroup>
-    ): boolean {
-        if (group.id === groupId) {
-            if (updates.operator !== undefined)
-                group.operator = updates.operator;
-            return true;
-        }
-
-        for (const childGroup of group.groups) {
-            if (this.updateGroupInGroup(childGroup, groupId, updates)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private removeGroupFromGroup(group: FilterGroup, groupId: number): boolean {
+        groupId: number
+    ): FilterGroup | null {
         const index = group.groups.findIndex((g) => g.id === groupId);
         if (index !== -1) {
-            group.groups.splice(index, 1);
+            return group.groups.splice(index, 1)[0];
+        }
+        for (const childGroup of group.groups) {
+            const found = this._findAndRemoveGroup(childGroup, groupId);
+            if (found) return found;
+        }
+        return null;
+    }
+
+    private _updateConditionInTree(
+        group: FilterGroup,
+        conditionId: number,
+        updates: Partial<FilterCondition>
+    ): boolean {
+        const condition = group.conditions.find((c) => c.id === conditionId);
+        if (condition) {
+            Object.assign(condition, updates);
             return true;
         }
-
         for (const childGroup of group.groups) {
-            if (this.removeGroupFromGroup(childGroup, groupId)) {
+            if (this._updateConditionInTree(childGroup, conditionId, updates)) {
                 return true;
             }
         }
-
         return false;
     }
 
@@ -491,7 +324,6 @@ export class FilterEditorStore {
                 conditions: [],
                 groups: [],
             };
-
             for (const arg of args) {
                 if (Array.isArray(arg) && arg.length > 0) {
                     if (this.isConditionExpression(arg)) {
@@ -503,8 +335,16 @@ export class FilterEditorStore {
                     }
                 }
             }
-
             return group;
+        }
+
+        if (this.isConditionExpression(expression)) {
+            return {
+                id: this.generateTransientId(),
+                operator: "all",
+                conditions: [this.parseConditionExpression(expression)],
+                groups: [],
+            };
         }
 
         return {
@@ -516,53 +356,43 @@ export class FilterEditorStore {
     }
 
     private isConditionExpression(expression: any[]): boolean {
-        if (!Array.isArray(expression) || expression.length < 3) {
-            return false;
-        }
-        const [operator] = expression;
-        return ValidOperators.includes(operator);
+        if (!Array.isArray(expression) || expression.length < 2) return false;
+        return ValidOperators.includes(expression[0]);
     }
 
     private parseConditionExpression(expression: any[]): FilterCondition {
         const [operator, fieldExpression, value] = expression;
-
         let field = "";
         if (Array.isArray(fieldExpression) && fieldExpression[0] === "get") {
             field = fieldExpression[1];
         }
-
-        return {
-            id: this.generateTransientId(),
-            field,
-            operator,
-            value,
-        };
+        return { id: this.generateTransientId(), field, operator, value };
     }
 
     private convertToMapLibreExpression(
         group: FilterGroup
     ): MapLibreExpression {
-        const expressions: any[] = [];
+        const expressions: MapLibreExpression[] = [];
 
         for (const condition of group.conditions) {
-            expressions.push([
-                condition.operator,
-                ["get", condition.field],
-                condition.value,
-            ]);
+            if (condition.field) {
+                expressions.push([
+                    condition.operator,
+                    ["get", condition.field],
+                    condition.value,
+                ]);
+            }
         }
 
         for (const childGroup of group.groups) {
-            expressions.push(this.convertToMapLibreExpression(childGroup));
+            const childExpression =
+                this.convertToMapLibreExpression(childGroup);
+            if (childExpression.length > 0) {
+                expressions.push(childExpression);
+            }
         }
 
-        if (expressions.length === 0) {
-            return [];
-        }
-
-        if (expressions.length === 1) {
-            return expressions[0];
-        }
+        if (expressions.length === 0) return [];
 
         return [group.operator, ...expressions];
     }

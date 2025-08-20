@@ -42,12 +42,12 @@ const FeatureFilterJson = ({
 }: FeatureFilterJsonProps) => {
     const [internalValue, setInternalValue] = useState(value);
     const [isReady, setIsReady] = useState(false);
+    const [updateJsonEditor, setUpdateJsonEditor] = useState(true);
 
     useEffect(() => {
-        console.log(value);
-        console.log(internalValue);
         if (value !== internalValue) {
             setInternalValue(value);
+            setUpdateJsonEditor(!updateJsonEditor);
         }
     }, [value]);
 
@@ -77,7 +77,7 @@ const FeatureFilterJson = ({
                 />
             </Suspense>
         ),
-        [isReady]
+        [isReady, updateJsonEditor]
     );
 
     return (
