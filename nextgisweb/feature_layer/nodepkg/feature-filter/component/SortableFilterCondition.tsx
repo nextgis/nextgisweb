@@ -10,10 +10,11 @@ import { FilterCondition } from "./FilterCondition";
 interface SortableFilterConditionProps {
     condition: FilterConditionType;
     store: FilterEditorStore;
+    parentGroupId: number;
 }
 
 export const SortableFilterCondition = observer(
-    ({ condition, store }: SortableFilterConditionProps) => {
+    ({ condition, store, parentGroupId }: SortableFilterConditionProps) => {
         const {
             attributes,
             listeners,
@@ -21,7 +22,13 @@ export const SortableFilterCondition = observer(
             transform,
             transition,
             isDragging,
-        } = useSortable({ id: condition.id });
+        } = useSortable({
+            id: condition.id,
+            data: {
+                type: "condition",
+                parentGroupId: parentGroupId,
+            },
+        });
 
         const style = {
             transform: CSS.Transform.toString(transform),
