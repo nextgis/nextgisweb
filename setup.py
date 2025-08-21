@@ -1,14 +1,10 @@
 import io
+from packaging.version import Version
 from setuptools import find_packages, setup
 from subprocess import CalledProcessError, check_output
 
 with io.open("VERSION", "r") as fd:
     VERSION = fd.read().rstrip()
-
-try:
-    gv = check_output(["gdal-config", "--version"], universal_newlines=True).strip()
-except CalledProcessError:
-    gv = None
 
 requires = [
     "affine==2.4.0",
@@ -33,7 +29,6 @@ requires = [
     "poeditor",
     "psutil==7.0.0",
     "psycopg2==2.9.10",
-    "pygdal" + (f"=={gv}.*," if gv else "") + ">=3.4",
     "pyproj==3.7.1",
     "pyramid==2.0.2",
     "pyramid-mako==1.1.0",
@@ -54,6 +49,13 @@ requires = [
     "zope.interface==7.2",
     "zope.event==5.1",
 ]
+
+try:
+    gv = check_output(["gdal-config", "--version"], universal_newlines=True).strip()
+    gdal_pkg = f"pygdal=={gv}.*" if Version(gv) < Version("3.7") else f"gdal=={gv}.*"
+except CalledProcessError:
+    gdal_pkg = "pygdal>=3.4"
+requires.append(gdal_pkg)
 
 extras_require = dict(
     development=[
