@@ -3,7 +3,7 @@ from collections import defaultdict
 from .. import Resource
 
 
-def test_requirement_ordering(resource_cls):
+def test_requirement_ordering():
     for resource_cls in Resource.registry.values():
         requirements = resource_cls.class_requirements()
 
