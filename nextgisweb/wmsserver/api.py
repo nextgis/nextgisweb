@@ -79,18 +79,22 @@ def wms_handler(obj, request):
     req = params.get("REQUEST", "").upper()
     service = params.get("SERVICE", "").upper()
 
-    if req == "GETCAPABILITIES":
-        if service != "WMS":
-            raise HTTPBadRequest(explanation="Invalid SERVICE parameter value.")
-        return _get_capabilities(obj, params, request)
-    elif req == "GETMAP" or req == "MAP":
-        return _get_map(obj, params, request)
-    elif req == "GETFEATUREINFO":
-        return _get_feature_info(obj, params, request)
-    elif req == "GETLEGENDGRAPHIC":
-        return _get_legend_graphic(obj, params, request)
-    else:
+    if service == "WMS":
+        if req == "GETCAPABILITIES":
+            return _get_capabilities(obj, params, request)
+        elif req == "GETMAP" or req == "MAP":
+            return _get_map(obj, params, request)
+        elif req == "GETFEATUREINFO":
+            return _get_feature_info(obj, params, request)
+        elif req == "GETLEGENDGRAPHIC":
+            return _get_legend_graphic(obj, params, request)
         raise HTTPBadRequest(explanation="Invalid REQUEST parameter value.")
+    elif service == "WMTS":
+        if req == "GETCAPABILITIES":
+            return _get_wmts_capabilities(obj, params, request)
+        raise HTTPBadRequest(explanation="Invalid REQUEST parameter value.")
+
+    raise HTTPBadRequest(explanation="Invalid SERVICE parameter value.")
 
 
 def _get_capabilities(obj, params, request):
@@ -141,6 +145,8 @@ def _get_capabilities(obj, params, request):
     )
 
     for lyr in obj.layers:
+        if not lyr.resource.has_permission(DataScope.read, request.user):
+            continue
         queryable = "1" if lyr.is_queryable else "0"
 
         lnode = E.Layer(
@@ -531,15 +537,7 @@ def error_renderer(request, err_info, exc, exc_info, debug=True):
     )
 
 
-def wmts_handler(obj, request):
-    """WMTS endpoint"""
-    try:
-        request.resource_permission(ServiceScope.connect)
-    except InsufficientPermissions:
-        if request.authenticated_userid is None:
-            return Response(status_code=401, headers={"WWW-Authenticate": "Basic"})
-        raise
-
+def _get_wmts_capabilities(obj, params, request):
     NS_OWS = "http://www.opengis.net/ows/1.1"
     E = ElementMaker(
         nsmap={
@@ -560,6 +558,8 @@ def wmts_handler(obj, request):
 
     layers = []
     for layer in obj.layers:
+        if not layer.resource.has_permission(DataScope.read, request.user):
+            continue
         layers.append(
             E.Layer(
                 E_OWS.Title(layer.display_name),
@@ -629,12 +629,4 @@ def setup_pyramid(comp, config):
         error_renderer=error_renderer,
         get=wms_handler,
         post=wms_handler,
-    )
-
-    config.add_route(
-        "wmsserver.wmts",
-        "/api/resource/{id}/WMTSCapabilities.xml",
-        factory=service_factory,
-        error_renderer=error_renderer,
-        get=wmts_handler,
     )
