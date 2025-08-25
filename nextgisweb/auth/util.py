@@ -33,8 +33,7 @@ _re_secret = re.compile(r"(?:^|.+_)(?:password|secret)(?:_.+|$)")
 _re_thin = re.compile(r"(?:^|.+_)(?:token(?!_type$)|code)(?:_.+|$)")
 
 
-@lazy_str
-def log_lazy_data(value):
+def _prepare_data(value, *, first=False):
     if isinstance(value, str):
         result = []
         for p in value.split("."):
@@ -44,17 +43,29 @@ def log_lazy_data(value):
             else:
                 result.append(p[0:c] + "*" + p[-c:])
         return ".".join(result)
+
+    if isinstance(value, list):
+        result = list()
+        for v in value:
+            result.append(_prepare_data(v))
     elif isinstance(value, dict):
         result = dict()
         for k, v in value.items():
-            if type(v) in (str, dict):
+            if type(v) in (str, list, dict):
                 if _re_secret.search(k):
                     v = "*"
                 elif _re_thin.search(k):
-                    v = str(log_lazy_data(v))
+                    v = _prepare_data(v)
             result[k] = v
-        return json_dumps(result)
-    raise NotImplementedError
+    else:
+        raise NotImplementedError
+
+    return json_dumps(result) if first else result
+
+
+@lazy_str
+def log_lazy_data(value):
+    return _prepare_data(value, first=True)
 
 
 def sync_ulg_cookie_callback(request, response):
