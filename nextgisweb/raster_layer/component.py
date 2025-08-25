@@ -1,5 +1,4 @@
 import transaction
-from osgeo import gdal
 from sqlalchemy.sql import or_
 
 from nextgisweb.env import Component, DBSession, require
@@ -9,6 +8,7 @@ from nextgisweb.lib.logging import logger
 from .gdaldriver import GDAL_DRIVER_NAME_2_EXPORT_FORMATS
 from .kind_of_data import RasterLayerData
 from .model import RasterBand, RasterLayer, RasterLayerMeta, estimate_raster_layer_data
+from .util import band_color_interp
 from .workdir import WorkdirMixin
 
 
@@ -72,9 +72,7 @@ class RasterLayerComponent(Component, WorkdirMixin):
                         minval, maxval = band.ComputeRasterMinMax(True)
                         bands.append(
                             RasterBand(
-                                color_interp=gdal.GetColorInterpretationName(
-                                    band.GetColorInterpretation()
-                                ),
+                                color_interp=band_color_interp(band),
                                 no_data=band.GetNoDataValue(),
                                 rat=band.GetDefaultRAT() is not None,
                                 min=minval,

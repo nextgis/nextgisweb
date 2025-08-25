@@ -9,6 +9,7 @@ from nextgisweb.lib.apitype import Query
 from nextgisweb.resource import DataScope, ResourceRef
 
 from .model import RasterLayer
+from .util import band_color_interp
 
 
 class Point(Struct, kw_only=True):
@@ -49,8 +50,7 @@ def identify(
 
             for bidx in range(1, res.band_count + 1):
                 band = ds.GetRasterBand(bidx)
-                color_interpretation.append(res.meta.bands[bidx - 1]["color_interp"])
-
+                color_interpretation.append(band_color_interp(band))
                 rat = band.GetDefaultRAT()
                 if (rat) is not None and rat.GetTableType() == gdal.GRTT_THEMATIC:
                     rat_col = rat.GetColOfUsage(gdal.GFU_Name)

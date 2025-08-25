@@ -1,6 +1,7 @@
 import glob
 import os
 import subprocess
+from functools import cached_property
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import List, Literal, Union
@@ -38,7 +39,7 @@ from nextgisweb.resource import (
 )
 
 from .kind_of_data import RasterLayerData
-from .util import calc_overviews_levels, raster_size
+from .util import band_color_interp, calc_overviews_levels, raster_size
 
 Base.depends_on("resource")
 
@@ -335,7 +336,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
             minval, maxval = band.ComputeRasterMinMax(True)
             bands.append(
                 RasterBand(
-                    color_interp=gdal.GetColorInterpretationName(band.GetColorInterpretation()),
+                    color_interp=band_color_interp(band),
                     no_data=band.GetNoDataValue(),
                     rat=band.GetDefaultRAT() is not None,
                     min=minval,
@@ -517,21 +518,32 @@ class GeoTransform(SAttribute):
     ctypes = CRUTypes(List[str], List[str], List[str])
 
     def get(self, srlzr: Serializer) -> List[str]:
-        return srlzr.obj.geo_transform
+        return (
+            srlzr.obj.geo_transform
+            if srlzr.obj.geo_transform is not None
+            else list(srlzr._gdal_dataset.GetGeoTransform())
+        )
 
 
 class Bands(SAttribute):
     ctypes = CRUTypes(List[str], List[str], List[str])
 
     def get(self, srlzr: Serializer) -> List[str]:
-        return srlzr.obj.meta.bands
+        return srlzr.obj.meta.bands if srlzr.obj.meta is not None else []
 
 
 class ColorInterpretation(SAttribute):
     ctypes = CRUTypes(List[str], List[str], List[str])
 
     def get(self, srlzr: Serializer) -> List[str]:
-        return [band.color_interp for band in srlzr.obj.meta.bands]
+        return (
+            [band.color_interp for band in srlzr.obj.meta.bands]
+            if srlzr.obj.meta is not None
+            else [
+                band_color_interp(srlzr._gdal_dataset.GetRasterBand(bidx))
+                for bidx in range(1, srlzr._gdal_dataset.RasterCount + 1)
+            ]
+        )
 
 
 class RasterLayerSerializer(Serializer, resource=RasterLayer):
@@ -552,3 +564,10 @@ class RasterLayerSerializer(Serializer, resource=RasterLayer):
     # is populated, update the frontend to use the 'bands' property
     # and remove 'color_interpretation' from the API
     color_interpretation = ColorInterpretation(read=ResourceScope.read)
+
+    # TODO: Remove when metadata columns are consistently populated
+    @cached_property
+    def _gdal_dataset(self):
+        obj = self.obj
+        assert obj.meta is None and obj.geo_transform is None
+        return obj.gdal_dataset()

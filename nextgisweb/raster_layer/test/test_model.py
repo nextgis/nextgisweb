@@ -10,6 +10,7 @@ from nextgisweb.core.exception import ValidationError
 from nextgisweb.spatial_ref_sys import SRS
 
 from ..model import RasterBand, RasterLayer, RasterLayerMeta
+from ..util import band_color_interp
 from .validate_cloud_optimized_geotiff import validate
 
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults")
@@ -41,7 +42,7 @@ def test_load_file(source, band_count, srs_id, cog, ngw_data_path, ngw_env, ngw_
         minval, maxval = band.ComputeRasterMinMax(True)
         bands.append(
             RasterBand(
-                color_interp=gdal.GetColorInterpretationName(band.GetColorInterpretation()),
+                color_interp=band_color_interp(band),
                 no_data=band.GetNoDataValue(),
                 rat=band.GetDefaultRAT() is not None,
                 min=minval,

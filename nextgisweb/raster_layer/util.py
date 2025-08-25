@@ -23,3 +23,9 @@ def raster_size(ds, aux_bands=0, data_type=None):
     data_type_bytes = gdal.GetDataTypeSize(data_type) // 8
     size = ds.RasterXSize * ds.RasterYSize * data_type_bytes * (ds.RasterCount + aux_bands)
     return size
+
+
+def band_color_interp(band) -> str:
+    return gdal.GetColorInterpretationName(
+        band.GetColorInterpretation(),
+    )
