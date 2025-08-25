@@ -278,6 +278,9 @@ class AuthComponent(Component):
 
     def maintenance(self):
         with transaction.manager:
+            if self.options["oauth.server.sync"]:
+                self.oauth.sync_users()
+
             # Add additional minute for clock skew
             exp = datetime.utcnow() + timedelta(seconds=60)
             tstamp = exp.timestamp()

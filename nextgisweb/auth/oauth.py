@@ -1,5 +1,6 @@
 import itertools
 import re
+from base64 import b64encode
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from functools import lru_cache
@@ -62,6 +63,7 @@ class OAuthHelper:
             _set("server.token_endpoint", f"{oauth_url}/token/")
             _set("server.auth_endpoint", f"{oauth_url}/authorize/")
             _set("server.introspection_endpoint", f"{oauth_url}/introspect/")
+            _set("server.sync_endpoint", f"{base_url}/api/v1/teams/")
             _set("profile.subject.attr", "sub")
             _set("profile.keyname.attr", "username")
             _set("profile.display_name.attr", "first_name, last_name")
@@ -360,6 +362,49 @@ class OAuthHelper:
 
         return user
 
+    def sync_users(self):
+        if not self.options["server.sync"]:
+            raise RuntimeError("Users synchronization not enabled.")
+        if self.options["server.type"] != "nextgisid":
+            return RuntimeError("OAuth server type not supported.")
+
+        params = dict(instance_guid=env.core.instance_id)
+        s = self.options["client.id"] + ":" + self.options["client.secret"]
+        token = b64encode(s.encode()).decode("ascii")
+        oauth_tstamp = datetime.utcnow()
+        data = self._server_request("sync", params, default_method="GET", access_token=token)
+
+        if len(data) != 1:
+            raise RuntimeError("Only one NextGIS ID team expected, got %d." % len(data))
+
+        subs = set()
+        with DBSession.no_autoflush:
+            for udata in data[0]["users"]:
+                sub = udata.pop("nextgis_guid")
+                lang = udata.pop("locale")
+                subs.add(sub)
+
+                user = User.filter_by(oauth_subject=sub).first()
+                if user is not None:
+                    if user.disabled:
+                        user.disabled = False
+                else:
+                    user = User(oauth_subject=sub).persist()
+                    if lang in env.core.locale_available:
+                        user.language = lang
+
+                self._update_user(user, udata)
+                user.oauth_tstamp = oauth_tstamp
+
+            for user in User.filter(
+                sa.not_(User.disabled),
+                User.oauth_subject.is_not(None),
+                User.oauth_subject.not_in(subs),
+            ):
+                user.disabled = True
+
+        env.auth.check_user_limit()
+
     def _server_request(self, endpoint, params, *, default_method="POST", access_token=None):
         url = self.options["server.{}_endpoint".format(endpoint)]
         method = self.options.get("server.{}_method".format(endpoint), default_method).lower()
@@ -434,7 +479,7 @@ class OAuthHelper:
         )
 
     def _update_user(self, user, tdata, *, access_token=None):
-        if self.options["server.userinfo_endpoint"]:
+        if self.options["server.userinfo_endpoint"] and access_token is not None:
             tdata = self._server_request(
                 "userinfo",
                 dict(),
@@ -564,6 +609,8 @@ class OAuthHelper:
             "maximum access token lifetime due to introspection caching.")),
         Option("server.logout_endpoint", default=None, doc="OAuth logout endpoint URL."),
         Option("server.insecure", bool, default=False, doc="Skip SSL certificates validaion."),
+        Option("server.sync", bool, default=False, doc="Allow users synchronization."),
+        Option("server.sync_endpoint", default=None, doc="Users synchronization endpoint URL."),
         Option("profile.endpoint", default=None, doc="OpenID Connect endpoint URL"),
 
         Option("profile.subject.attr", default="sub", doc="OAuth profile subject identifier"),

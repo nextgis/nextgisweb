@@ -31,3 +31,17 @@ def authenticate(
 
     url = auth.session_invite(keyname, base_url)
     print(url)
+
+
+@cli.group(name="auth")
+class grauth:
+    pass
+
+
+@grauth.command()
+def sync(
+    self: InTransactionCommand,
+    *,
+    auth: AuthComponent,
+):
+    auth.oauth.sync_users()
