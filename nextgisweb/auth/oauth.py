@@ -371,6 +371,7 @@ class OAuthHelper:
         params = dict(instance_guid=env.core.instance_id)
         s = self.options["client.id"] + ":" + self.options["client.secret"]
         token = b64encode(s.encode()).decode("ascii")
+        oauth_tstamp = datetime.utcnow()
         data = self._server_request("sync", params, default_method="GET", access_token=token)
 
         if len(data) != 1:
@@ -393,6 +394,7 @@ class OAuthHelper:
                         user.language = lang
 
                 self._update_user(user, udata)
+                user.oauth_tstamp = oauth_tstamp
 
             for user in User.filter(
                 sa.not_(User.disabled),
@@ -402,7 +404,6 @@ class OAuthHelper:
                 user.disabled = True
 
         env.auth.check_user_limit()
-
 
     def _server_request(self, endpoint, params, *, default_method="POST", access_token=None):
         url = self.options["server.{}_endpoint".format(endpoint)]
