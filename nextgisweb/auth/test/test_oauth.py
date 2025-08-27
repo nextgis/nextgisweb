@@ -331,10 +331,9 @@ def test_authorization_code(server_response_mock, freezegun, ngw_webtest_app, ng
     ngw_webtest_app.post("/api/component/auth/logout")
 
     with patch.object(ngw_env.auth.oauth, "local_auth", new=True):
-        ngw_webtest_app.post_json(
+        ngw_webtest_app.post(
             "/api/component/auth/login",
             dict(login=user["keyname"], password="test-password"),
-            status=200,
         )
 
         user_auth_local = dict(user, auth_provider="local_pw")
@@ -344,7 +343,7 @@ def test_authorization_code(server_response_mock, freezegun, ngw_webtest_app, ng
     # Disable local authentication for OAuth users
 
     with patch.object(ngw_env.auth.oauth, "local_auth", new=False):
-        ngw_webtest_app.post_json(
+        ngw_webtest_app.post(
             "/api/component/auth/login",
             dict(login=user["keyname"], password="test-password"),
             status=401,
@@ -372,10 +371,9 @@ def test_authorization_code(server_response_mock, freezegun, ngw_webtest_app, ng
         "password",
         new=True,
     ):
-        ngw_webtest_app.post_json(
+        ngw_webtest_app.post(
             "/api/component/auth/login",
             dict(login=ouser1["keyname"], password=ouser1["pwd"]),
-            status=200,
         )
         user_auth_provider = dict(user, auth_provider="oauth_pw")
         assert ngw_webtest_app.get("/api/component/auth/current_user").json == user_auth_provider
@@ -419,10 +417,7 @@ def local_user():
 
 
 def test_bind(local_user, server_response_mock, ngw_webtest_app):
-    ngw_webtest_app.post_json(
-        "/api/component/auth/login",
-        dict(login="bindme", password="bindme"),
-    )
+    ngw_webtest_app.post("/api/component/auth/login", dict(login="bindme", password="bindme"))
 
     resp = ngw_webtest_app.get("/oauth", params=dict(bind="1"), status=302)
     redirect = resp.headers["Location"]
@@ -647,15 +642,13 @@ def test_password_token_session(server_response_mock, freezegun, ngw_webtest_app
             refresh_expires_in=REFRESH_TOKEN_LIFETIME,
         ),
     ), server_response_mock(
-        "introspection",
-        dict(token=access_token),
-        response=introspection_response(),
+        "introspection", dict(token=access_token), response=introspection_response()
     ):
-        ngw_webtest_app.post_json("/api/component/auth/login", creds)
+        ngw_webtest_app.post("/api/component/auth/login", creds)
 
     # Check caching: it'll fail if server request occurs
     ngw_webtest_app.post("/api/component/auth/logout", creds)
-    ngw_webtest_app.post_json("/api/component/auth/login", creds)
+    ngw_webtest_app.post("/api/component/auth/login", creds)
 
     # Expire access token, refresh token will be used
     freezegun.tick(ACCESS_TOKEN_LIFETIME + 5)

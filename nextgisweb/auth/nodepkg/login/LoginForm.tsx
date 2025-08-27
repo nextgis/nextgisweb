@@ -1,7 +1,6 @@
 import { observer } from "mobx-react-lite";
 import { useEffect, useMemo, useState } from "react";
 
-import type { LoginBody } from "@nextgisweb/auth/type/api";
 import { Alert, Button, Form, Input } from "@nextgisweb/gui/antd";
 import { errorModal } from "@nextgisweb/gui/error";
 import { FieldsForm } from "@nextgisweb/gui/fields-form";
@@ -13,7 +12,7 @@ import { gettext, gettextf } from "@nextgisweb/pyramid/i18n";
 import oauth from "../oauth";
 import { authStore } from "../store";
 
-import type { CredsOnChangeOptions, LoginFormProps } from "./type";
+import type { Credentials, CredsOnChangeOptions, LoginFormProps } from "./type";
 
 import LoginIcon from "@nextgisweb/icon/material/login";
 
@@ -26,13 +25,13 @@ const msgSignIn = gettext("Sign in");
 const isLoginLocation = location.pathname === routeURL("auth.login");
 
 export const LoginForm = observer((props: LoginFormProps) => {
-    const [creds, setCreds] = useState<LoginBody>({ login: "", password: "" });
+    const [creds, setCreds] = useState<Credentials>({});
 
     const form = Form.useForm()[0];
     const queryParams = new URLSearchParams(location.search);
     const nextQueryParam = queryParams.get("next");
 
-    const fields = useMemo<FormField<keyof LoginBody>[]>(
+    const fields = useMemo<FormField<keyof Credentials>[]>(
         () => [
             {
                 name: "login",

@@ -41,9 +41,8 @@ def test_http_basic(ngw_webtest_app):
 
 
 def test_api_login_logout(ngw_webtest_app):
-    resp = ngw_webtest_app.post_json(
-        "/api/component/auth/login",
-        dict(login="administrator", password="admin"),
+    resp = ngw_webtest_app.post(
+        "/api/component/auth/login", dict(login="administrator", password="admin")
     )
     assert resp.status_code == 200
     assert resp.json["keyname"] == "administrator"
@@ -64,10 +63,11 @@ def test_local_refresh(ngw_webtest_app, ngw_env):
     with freeze_time() as dt:
         start = dt()
 
-        ngw_webtest_app.post_json(
+        resp = ngw_webtest_app.post(
             "/api/component/auth/login",
             dict(login="administrator", password="admin"),
         )
+        assert resp.status_code == 200
 
         dt.tick(lifetime + epsilon)
         _dummy_auth_request(ngw_webtest_app, 403)
@@ -109,7 +109,7 @@ def test_forget_user(ngw_webtest_factory, user):
     app1.authorization = ("Basic", ("administrator", "admin"))
 
     app2 = ngw_webtest_factory()
-    app2.post_json(
+    app2.post(
         "/api/component/auth/login",
         dict(login=user.keyname, password="password123"),
     )
