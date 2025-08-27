@@ -1,12 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useShowModal } from "@nextgisweb/gui";
-import { Select, Space } from "@nextgisweb/gui/antd";
+import { Select } from "@nextgisweb/gui/antd";
 import { useObjectState } from "@nextgisweb/gui/hook";
-import { OpenInNewIcon } from "@nextgisweb/gui/icon";
-import { routeURL } from "@nextgisweb/pyramid/api";
-import { ResourceIcon } from "@nextgisweb/resource/icon";
 
+import { ResourceLabel } from "../ResourceLabel";
 import { useResourcePicker } from "../resource-picker/hook";
 import type { ResourcePickerStoreOptions } from "../resource-picker/type";
 
@@ -86,22 +84,11 @@ export function ResourceSelect<V extends number = number>({
 
     const optionRender = useCallback(
         ({ label, cls, value }: ResourceSelectOption) => (
-            <Space>
-                <ResourceIcon identity={cls} />
-                {label}
-                {!hideGoto && (
-                    <a
-                        href={routeURL("resource.show", value)}
-                        target="_blank"
-                        onMouseDown={(evt) => {
-                            // Prevent from opening picker
-                            evt.stopPropagation();
-                        }}
-                    >
-                        <OpenInNewIcon />
-                    </a>
-                )}
-            </Space>
+            <ResourceLabel
+                label={label}
+                cls={cls}
+                resourceId={hideGoto ? value : undefined}
+            />
         ),
         [hideGoto]
     );
