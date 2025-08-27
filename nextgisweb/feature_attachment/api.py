@@ -100,27 +100,35 @@ def image(
     request.resource_permission(DataScope.read)
 
     obj = attachment_or_not_found(resource, fid, aid)
-    image = Image.open(obj.fileobj.filename())
-    ext = image.format
 
-    exif = None
+    data = obj.fileobj.filename().read_bytes()
+    image = Image.open(BytesIO(data))
+    ext = image.format
+    modified = False
+
     try:
         exif = image._getexif()
     except Exception:
         pass
-
-    if exif is not None:
-        otag = exif.get(EXIF_ORIENTATION_TAG)
-        if otag in (3, 6, 8):
-            orientation = ORIENTATIONS.get(otag)
-            image = image.transpose(orientation.degrees)
+    else:
+        if exif is not None:
+            otag = exif.get(EXIF_ORIENTATION_TAG)
+            if otag in (3, 6, 8):
+                orientation = ORIENTATIONS.get(otag)
+                image = image.transpose(orientation.degrees)
+                modified = True
 
     if size != "":
         width, height = map(int, size.split("x", maxsplit=1))
-        if crop:
-            aspect_ratio = width / height
-            image = crop_to_aspect_ratio(image, aspect_ratio)
-        image.thumbnail((width, height), Image.LANCZOS)
+        if (width, height) != image.size:
+            if crop:
+                aspect_ratio = width / height
+                image = crop_to_aspect_ratio(image, aspect_ratio)
+            image.thumbnail((width, height), Image.LANCZOS)
+            modified = True
+
+    if not modified:
+        return Response(data, content_type=obj.mime_type)
 
     buf = BytesIO()
     image.save(buf, ext)
