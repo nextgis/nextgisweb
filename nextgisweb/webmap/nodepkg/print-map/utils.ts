@@ -3,7 +3,7 @@ import { Rotate } from "ol/control";
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import { getLabel } from "../map-controls/map-controls";
+import { getLabel } from "../map-controls/utils";
 
 import NorthIcon from "@nextgisweb/icon/material/arrow_upward";
 

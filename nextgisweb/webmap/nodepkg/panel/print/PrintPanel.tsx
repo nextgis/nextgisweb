@@ -13,9 +13,9 @@ import type { PanelPluginWidgetProps } from "../registry";
 
 import PrintMapExport from "./PrintMapExport";
 import { PrintElementsSettings } from "./component/PrintElementsSettings";
+import { PrintMapPortal } from "./component/PrintMapLayout";
 import { PrintPaperSettings } from "./component/PrintPaperSettings";
 import { PrintScaleSettings } from "./component/PrintScaleSettings";
-import { usePrintMapLayout } from "./hook/usePrintMapLayout";
 import {
     defaultPanelMapSettings,
     getPrintMapLink,
@@ -38,6 +38,8 @@ const getCenterUrlSettings = (): Coordinate | null => {
 
 const PrintPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
     const mapInit = useRef(false);
+
+    const printMapEl = useRef<HTMLDivElement | null>(null);
 
     const { close, title, visible } = store;
 
@@ -69,27 +71,14 @@ const PrintPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
         return getCenterUrlSettings();
     }, []);
 
-    const { createPrintMapComp, printMapEl, destroy } = usePrintMapLayout({
-        settings: mapSettings,
-        display,
-        onZoomChange: setZoom,
-        onScaleChange: setPrintMapScale,
-        onCenterChange: setCenter,
-        getCenterFromUrl,
-    });
-
     const show = useCallback(() => {
         if (!mapInit.current) {
-            createPrintMapComp();
-
             mapInit.current = true;
         }
-    }, [createPrintMapComp]);
+    }, []);
 
     const hide = useCallback(() => {
         if (mapInit.current) {
-            destroy();
-
             // Sync the main map's view with last print preview position before closing
             const mainMapView = display.map.olMap.getView();
             mainMapView.setCenter(mapPositionRef.current.center);
@@ -99,7 +88,7 @@ const PrintPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
 
             mapInit.current = false;
         }
-    }, [destroy, display]);
+    }, [display]);
 
     const getTextToCopy = useCallback(() => {
         return getPrintMapLink(mapSettings);
@@ -121,44 +110,57 @@ const PrintPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
     }, [center, updateMapSettings]);
 
     return (
-        <PanelContainer title={title} close={close}>
-            <PanelSection flex>
-                <PrintPaperSettings
+        <>
+            {visible && (
+                <PrintMapPortal
+                    ref={printMapEl}
                     display={display}
-                    mapSettings={mapSettings}
-                    updateMapSettings={updateMapSettings}
+                    settings={mapSettings}
+                    onZoomChange={setZoom}
+                    onScaleChange={setPrintMapScale}
+                    onCenterChange={setCenter}
+                    getCenterFromUrl={getCenterFromUrl}
                 />
-            </PanelSection>
-
-            <PanelSection title={gettext("Elements")} flex>
-                <PrintElementsSettings
-                    mapSettings={mapSettings}
-                    updateMapSettings={updateMapSettings}
-                />
-            </PanelSection>
-
-            <PanelSection title={gettext("Scale")} flex>
-                <PrintScaleSettings
-                    printMapScale={printMapScale}
-                    mapSettings={mapSettings}
-                    updateMapSettings={updateMapSettings}
-                />
-                <Space.Compact>
-                    <PrintMapExport
+            )}
+            <PanelContainer title={title} close={close}>
+                <PanelSection flex>
+                    <PrintPaperSettings
                         display={display}
                         mapSettings={mapSettings}
-                        printMapEl={printMapEl.current}
+                        updateMapSettings={updateMapSettings}
                     />
-                    <CopyToClipboardButton
-                        type="default"
-                        getTextToCopy={getTextToCopy}
-                        icon={<ShareAltOutlined />}
-                        title={gettext("Copy link to the print map")}
-                        iconOnly
+                </PanelSection>
+
+                <PanelSection title={gettext("Elements")} flex>
+                    <PrintElementsSettings
+                        mapSettings={mapSettings}
+                        updateMapSettings={updateMapSettings}
                     />
-                </Space.Compact>
-            </PanelSection>
-        </PanelContainer>
+                </PanelSection>
+
+                <PanelSection title={gettext("Scale")} flex>
+                    <PrintScaleSettings
+                        printMapScale={printMapScale}
+                        mapSettings={mapSettings}
+                        updateMapSettings={updateMapSettings}
+                    />
+                    <Space.Compact>
+                        <PrintMapExport
+                            display={display}
+                            mapSettings={mapSettings}
+                            printMapEl={printMapEl.current}
+                        />
+                        <CopyToClipboardButton
+                            type="default"
+                            getTextToCopy={getTextToCopy}
+                            icon={<ShareAltOutlined />}
+                            title={gettext("Copy link to the print map")}
+                            iconOnly
+                        />
+                    </Space.Compact>
+                </PanelSection>
+            </PanelContainer>
+        </>
     );
 });
 

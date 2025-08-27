@@ -1,3 +1,5 @@
+import { useTransition } from "react";
+
 import { Button, Modal, Space } from "@nextgisweb/gui/antd";
 import type { ShowModalOptions } from "@nextgisweb/gui/showModal";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -8,7 +10,7 @@ export interface FinishEditingModalProps extends ShowModalOptions {
     onContinue?: () => void;
 }
 
-export function FinishEditingModal({
+export default function FinishEditingModal({
     close,
     onSave,
     onUndo,
@@ -16,6 +18,15 @@ export function FinishEditingModal({
     onContinue,
     ...rest
 }: FinishEditingModalProps) {
+    const [isSaving, startTransition] = useTransition();
+
+    const onSaveClick = () => {
+        startTransition(() => {
+            onSave?.();
+            close?.();
+        });
+    };
+
     return (
         <Modal
             title={gettext("Stopping editing")}
@@ -49,10 +60,8 @@ export function FinishEditingModal({
                         </Button>
                         <Button
                             type="primary"
-                            onClick={() => {
-                                onSave?.();
-                                close?.();
-                            }}
+                            loading={isSaving}
+                            onClick={onSaveClick}
                         >
                             {gettext("Save")}
                         </Button>

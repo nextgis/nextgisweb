@@ -1,6 +1,6 @@
 export interface Credentials {
-    login?: string;
-    password?: string;
+    login: string;
+    password: string;
 }
 
 export interface LoginFormProps {
