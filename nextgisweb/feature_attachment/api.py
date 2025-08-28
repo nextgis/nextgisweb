@@ -101,8 +101,8 @@ def image(
 
     obj = attachment_or_not_found(resource, fid, aid)
 
-    data = obj.fileobj.filename().read_bytes()
-    image = Image.open(BytesIO(data))
+    fp = obj.fileobj.filename()
+    image = Image.open(fp)
     ext = image.format
     modified = False
 
@@ -128,7 +128,7 @@ def image(
             modified = True
 
     if not modified:
-        return Response(data, content_type=obj.mime_type)
+        return FileResponse(fp, request=request, content_type=obj.mime_type)
 
     buf = BytesIO()
     image.save(buf, ext)
