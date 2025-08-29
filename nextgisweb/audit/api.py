@@ -1,5 +1,4 @@
 import csv
-from datetime import datetime
 from enum import Enum
 from io import StringIO
 from typing import Annotated, Dict, List, Optional, Tuple, Union
@@ -12,6 +11,7 @@ from pyramid.response import Response
 
 from nextgisweb.env import DBSession, inject
 from nextgisweb.lib.apitype import AnyOf, AsJSON, ContentType
+from nextgisweb.lib.datetime import utcnow_naive
 
 from nextgisweb.jsrealm import TSExport
 
@@ -136,7 +136,7 @@ def dbase(
     else:
         terms = [dcol]
 
-    oldest = datetime.utcnow() - comp.backends["dbase"].options["retention"]
+    oldest = utcnow_naive() - comp.backends["dbase"].options["retention"]
     q = sa.select(tcol, *terms).where(
         tcol >= oldest,
         *(

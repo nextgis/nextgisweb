@@ -1,5 +1,4 @@
 import os
-from datetime import datetime
 from uuid import UUID
 
 import sqlalchemy as sa
@@ -9,6 +8,7 @@ from zope.sqlalchemy import mark_changed
 
 from nextgisweb.env import Component, DBSession, gettext, require
 from nextgisweb.lib.config import Option
+from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.logging import logger
 
 from nextgisweb.core import KindOfData
@@ -59,7 +59,7 @@ class RenderComponent(Component):
         tile_cache_path = os.path.abspath(self.tile_cache_path)
         deleted_tiles = deleted_files = deleted_tables = 0
         uuid_keep = []
-        now_unix = int((datetime.utcnow() - TIMESTAMP_EPOCH).total_seconds())
+        now_unix = int((utcnow_naive() - TIMESTAMP_EPOCH).total_seconds())
 
         # Drop tables and collect tile cache UUIDs that should remain
         with transaction.manager:

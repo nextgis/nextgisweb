@@ -1,4 +1,3 @@
-from datetime import datetime as dt
 from datetime import timedelta
 from os import environ
 
@@ -8,6 +7,7 @@ from babel.core import UnknownLocaleError
 
 from nextgisweb.env import Component, gettext, require
 from nextgisweb.lib.config import Option, OptionAnnotations
+from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.imptool import module_path
 from nextgisweb.lib.logging import logger
 
@@ -20,7 +20,7 @@ from .util import StaticMap, gensecret
 class PyramidComponent(Component):
     def make_app(self, settings={}):
         settings = dict(self._settings, **settings)
-        settings["pyramid.started"] = dt.utcnow().timestamp()
+        settings["pyramid.started"] = utcnow_naive().timestamp()
         settings["pyramid.static_map"] = StaticMap()
         config = Configurator(settings=settings)
 
@@ -151,7 +151,7 @@ class PyramidComponent(Component):
         logger.info("Cleaning up sessions...")
 
         with transaction.manager:
-            actual_date = dt.utcnow() - self.options["session.cookie.max_age"]
+            actual_date = utcnow_naive() - self.options["session.cookie.max_age"]
             deleted_sessions = Session.filter(Session.last_activity < actual_date).delete()
 
         logger.info("Deleted: %d sessions", deleted_sessions)

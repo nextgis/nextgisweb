@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from contextlib import contextmanager
-from datetime import datetime
 from typing import Annotated, Any, List, Literal, TypeVar, Union
 
 import sqlalchemy as sa
@@ -13,6 +12,7 @@ from sqlalchemy import inspect
 from zope.interface import classImplements
 
 from nextgisweb.env import Base, gettext
+from nextgisweb.lib.datetime import utcnow_naive
 
 from nextgisweb.auth import OnFindReferencesData, Principal, User
 from nextgisweb.resource import Resource
@@ -181,7 +181,7 @@ class FVersioningObj(Base):
 
         self.resource = resource
         self.version_id = version_id
-        self.tstamp = datetime.utcnow()
+        self.tstamp = utcnow_naive()
         self.user = user
 
         self.is_open = True

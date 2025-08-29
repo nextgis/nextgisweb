@@ -2,7 +2,7 @@ import itertools
 import re
 from base64 import b64encode
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import timedelta
 from functools import lru_cache
 from hashlib import sha512
 from secrets import token_hex
@@ -19,6 +19,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from nextgisweb.env import DBSession, env, gettext, gettextf
 from nextgisweb.lib.config import Option, OptionAnnotations
+from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.logging import lazy_str, logger
 
 from nextgisweb.core.exception import UserException
@@ -345,7 +346,7 @@ class OAuthHelper:
 
             if user.oauth_tstamp is not None and (
                 (min_oauth_tstamp and user.oauth_tstamp > min_oauth_tstamp)
-                or (user.oauth_tstamp + self.options["profile.sync_timedelta"]) > datetime.utcnow()
+                or (user.oauth_tstamp + self.options["profile.sync_timedelta"]) > utcnow_naive()
             ):
                 return user  # Just skip profile synchronization
             elif bind_user is None:
@@ -355,7 +356,7 @@ class OAuthHelper:
                     )
                 self._update_user(user, _atoken().data, access_token=access_token)
 
-            user.oauth_tstamp = datetime.utcnow()
+            user.oauth_tstamp = utcnow_naive()
 
             event = OnAccessTokenToUser(user, _atoken().data)
             zope.event.notify(event)
@@ -371,7 +372,7 @@ class OAuthHelper:
         params = dict(instance_guid=env.core.instance_id)
         s = self.options["client.id"] + ":" + self.options["client.secret"]
         token = b64encode(s.encode()).decode("ascii")
-        oauth_tstamp = datetime.utcnow()
+        oauth_tstamp = utcnow_naive()
         data = self._server_request("sync", params, default_method="GET", access_token=token)
 
         if len(data) != 1:

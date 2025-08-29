@@ -15,6 +15,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from nextgisweb.env import DBSession, gettext
 from nextgisweb.lib import dynmenu as dm
+from nextgisweb.lib.datetime import utcnow_naive
 
 from nextgisweb.gui import REACT_RENDERER, react_renderer
 from nextgisweb.jsrealm import jsentry
@@ -91,7 +92,7 @@ def session_invite(request):
         exp = datetime.fromtimestamp(state.exp)
         if expires != exp or state.ref != 0:
             raise InvalidCredentialsException(message=gettext("Invalid 'expires' parameter."))
-        if exp <= datetime.utcnow():
+        if exp <= utcnow_naive():
             raise InvalidCredentialsException(message=gettext("Session expired."))
 
         cookie_settings = WebSession.cookie_settings(request)

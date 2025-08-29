@@ -7,6 +7,7 @@ from pyramid.httpexceptions import HTTPNotFound
 
 from nextgisweb.env import DBSession
 from nextgisweb.lib.apitype import AsJSON, EmptyObject
+from nextgisweb.lib.datetime import utcnow_naive
 
 from nextgisweb.jsrealm import TSExport
 from nextgisweb.resource import ResourceCls, ResourceRef
@@ -65,7 +66,7 @@ def cpost(request, body: ResourceFavoriteCreate) -> ResourceFavoriteRef:
 
     obj = Model.filter_by(**kwargs).first()
     if obj is None:
-        obj = Model(created=datetime.utcnow(), **kwargs).persist()
+        obj = Model(created=utcnow_naive(), **kwargs).persist()
         DBSession.flush()
 
     return ResourceFavoriteRef(id=obj.id)

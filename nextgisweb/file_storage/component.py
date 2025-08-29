@@ -1,8 +1,8 @@
 import os
 import os.path
 import re
+from datetime import timedelta, timezone
 from datetime import datetime as dt
-from datetime import timedelta
 from operator import itemgetter
 from pathlib import Path
 from shutil import copyfileobj
@@ -12,6 +12,7 @@ import transaction
 
 from nextgisweb.env import Component, DBSession
 from nextgisweb.lib.config import Option
+from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.logging import logger
 from nextgisweb.lib.saext import query_unreferenced
 
@@ -141,7 +142,10 @@ class FileStorageComponent(Component):
                 obj = FileObj.filter_by(uuid=fn).first()
                 stat = os.stat(fullfn)
 
-                if obj is None and (dt.utcnow() - dt.utcfromtimestamp(stat.st_ctime) > delta):
+                if obj is None and (
+                    utcnow_naive() - dt.fromtimestamp(stat.st_ctime, tz=timezone.utc).replace(tzinfo=None)
+                    > delta
+                ):
                     if not dry_run:
                         os.remove(fullfn)
                         relist = True

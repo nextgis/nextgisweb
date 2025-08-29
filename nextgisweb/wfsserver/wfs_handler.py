@@ -13,6 +13,7 @@ from shapely.geometry import box
 from sqlalchemy import and_
 from sqlalchemy.orm.exc import NoResultFound
 
+from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.geometry import Geometry, GeometryNotValid, Transformer
 from nextgisweb.lib.ows import (
     FIELD_TYPE_WFS,
@@ -1153,7 +1154,7 @@ class WFSHandler:
             root.set("numberReturned", "0" if self.p_resulttype == "hits" else str(count))
 
         if self.p_version >= v110:
-            root.set("timeStamp", datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.%f"))
+            root.set("timeStamp", utcnow_naive().strftime("%Y-%m-%dT%H:%M:%S.%f"))
 
         return root
 

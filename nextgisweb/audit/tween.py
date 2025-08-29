@@ -1,8 +1,7 @@
-from datetime import datetime
-
 from zope.event import notify
 
 from nextgisweb.env import inject
+from nextgisweb.lib.datetime import utcnow_naive
 
 from .component import AuditComponent
 
@@ -59,7 +58,7 @@ def factory(handler, registry, *, comp: AuditComponent):
                 ctx.append((cman, cman.__enter__()))
 
             response = handler(request)
-            timestamp = datetime.utcnow()
+            timestamp = utcnow_naive()
 
             body = dict()
 

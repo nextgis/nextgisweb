@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 from urllib.parse import urlencode, urlparse
 
 import sqlalchemy as sa
@@ -9,6 +9,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from nextgisweb.env import Component, DBSession, gettext, gettextf, inject
 from nextgisweb.lib.config import Option, OptionAnnotations
+from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.logging import logger
 
 from nextgisweb.core import CoreComponent
@@ -98,7 +99,7 @@ class AuthComponent(Component):
 
                 delta = self.options["activity_delta"]
                 if (
-                    user_la is None or (datetime.utcnow() - user_la) > delta
+                    user_la is None or (utcnow_naive() - user_la) > delta
                 ) and not request.session.get("invite", False):
 
                     def update_last_activity(request):
@@ -106,7 +107,7 @@ class AuthComponent(Component):
                             DBSession.query(User).filter_by(
                                 principal_id=user_id,
                                 last_activity=user_la,
-                            ).update(dict(last_activity=datetime.utcnow()))
+                            ).update(dict(last_activity=utcnow_naive()))
 
                     request.add_finished_callback(update_last_activity)
 
@@ -232,7 +233,7 @@ class AuthComponent(Component):
         result = urlparse(url)
 
         sid = gensecret(32)
-        now = datetime.utcnow()
+        now = utcnow_naive()
         expires = (now + timedelta(minutes=30)).replace(microsecond=0)
 
         state = AuthState(AuthProvider.INVITE, user.id, int(expires.timestamp()), 0)
@@ -282,7 +283,7 @@ class AuthComponent(Component):
                 self.oauth.sync_users()
 
             # Add additional minute for clock skew
-            exp = datetime.utcnow() + timedelta(seconds=60)
+            exp = utcnow_naive() + timedelta(seconds=60)
             tstamp = exp.timestamp()
             logger.debug("Cleaning up access and password tokens (exp < %s)", exp)
 

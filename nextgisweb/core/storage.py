@@ -1,4 +1,3 @@
-from datetime import datetime
 from threading import Thread
 from typing import ClassVar, Mapping, Type
 
@@ -8,6 +7,7 @@ import transaction
 from zope.sqlalchemy import mark_changed
 
 from nextgisweb.env import DBSession, gettext
+from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.i18n import TrStr
 from nextgisweb.lib.logging import logger
 from nextgisweb.lib.registry import dict_registry
@@ -157,7 +157,7 @@ class StorageComponentMixin:
             logger.warning("Nothing to do because storage stat isn't enabled!")
             return
 
-        timestamp = datetime.utcnow()
+        timestamp = utcnow_naive()
         try:
             logger.debug("Starting estimation...")
             with transaction.manager:
@@ -237,7 +237,7 @@ class StorageComponentMixin:
         sinfo = session.info
 
         if reservations := sinfo.get("storage.res"):
-            tstamp = datetime.utcnow()
+            tstamp = utcnow_naive()
             session.connection().execute(
                 storage_stat_delta.insert(),
                 [

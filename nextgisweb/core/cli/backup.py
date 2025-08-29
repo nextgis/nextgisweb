@@ -12,6 +12,7 @@ from zipfile import ZipFile, is_zipfile
 import transaction
 
 from nextgisweb.env.cli import EnvCommand, arg, cli, opt
+from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.logging import logger
 
 from .. import backup as mod
@@ -44,7 +45,7 @@ def backup(
 
     to_stdout = target == "-"
 
-    started_at = datetime.utcnow()
+    started_at = utcnow_naive()
     tmp_root = opts.get("tmpdir", None if to_stdout else path_split(target)[0])
 
     if not to_stdout and path_exists(target):

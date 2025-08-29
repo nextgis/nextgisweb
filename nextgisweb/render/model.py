@@ -21,6 +21,7 @@ from zope.sqlalchemy import mark_changed
 
 from nextgisweb.env import Base, DBSession, env
 from nextgisweb.lib import saext
+from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.logging import logger
 
 from nextgisweb.resource import CRUTypes, Resource, ResourceScope, SAttribute, Serializer
@@ -165,7 +166,7 @@ class TilestorWriter:
 
                     while data is not None and data["db_path"] == db_path:
                         z, x, y = data["tile"]
-                        tstamp = int((datetime.utcnow() - TIMESTAMP_EPOCH).total_seconds())
+                        tstamp = int((utcnow_naive() - TIMESTAMP_EPOCH).total_seconds())
 
                         img = data["img"]
                         if img is not None and img.mode != "RGBA":
@@ -374,7 +375,7 @@ class ResourceTileCache(Base):
 
         if self.ttl is not None:
             expdt = TIMESTAMP_EPOCH + timedelta(seconds=tstamp + self.ttl)
-            if expdt <= datetime.utcnow():
+            if expdt <= utcnow_naive():
                 return False, None
 
         if color is not None:

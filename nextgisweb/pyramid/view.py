@@ -1,7 +1,7 @@
 import os
 import os.path
 from base64 import b64decode
-from datetime import datetime, timedelta
+from datetime import timedelta
 from hashlib import md5
 from itertools import chain
 from pathlib import Path
@@ -23,6 +23,7 @@ from nextgisweb.env import DBSession, env, gettext, inject
 from nextgisweb.env.package import pkginfo
 from nextgisweb.lib import dynmenu as dm
 from nextgisweb.lib.apitype import JSONType, QueryString
+from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.i18n import trstr_factory
 from nextgisweb.lib.imptool import module_path
 from nextgisweb.lib.json import dumps
@@ -400,20 +401,20 @@ def test_timeout(request):
     interval = float(request.GET["i"]) if "i" in request.GET else None
     buffering = (request.GET["b"].lower() in ("true", "1", "yes")) if "b" in request.GET else None
 
-    start = datetime.utcnow()
+    start = utcnow_naive()
     finish = start + timedelta(seconds=duration)
 
     def generator():
         idx = 0
         while True:
-            time_to_sleep = (finish - datetime.utcnow()).total_seconds()
+            time_to_sleep = (finish - utcnow_naive()).total_seconds()
             if interval is not None:
                 time_to_sleep = min(time_to_sleep, interval)
             if time_to_sleep < 0:
                 break
             sleep(time_to_sleep)
             idx += 1
-            current = datetime.utcnow()
+            current = utcnow_naive()
             elapsed = (current - start).total_seconds()
             line = "idx = {}, elapsed = {:.3f}, timestamp = {}".format(
                 idx, elapsed, current.isoformat()

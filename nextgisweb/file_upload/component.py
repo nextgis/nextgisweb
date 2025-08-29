@@ -4,6 +4,7 @@ from shutil import rmtree
 
 from nextgisweb.env import Component
 from nextgisweb.lib.config import Option, SizeInBytes
+from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.logging import logger
 
 from .util import stat_dir
@@ -55,7 +56,7 @@ class FileUploadComponent(Component):
         deleted_files = deleted_bytes = 0
         kept_files = kept_bytes = 0
 
-        date_keep = datetime.utcnow().date() - timedelta(days=1)
+        date_keep = utcnow_naive().date() - timedelta(days=1)
 
         for dirpath in os.listdir(self.path):
             try:

@@ -1,9 +1,10 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 import transaction
 from freezegun import freeze_time
 
 from nextgisweb.env import DBSession
+from nextgisweb.lib.datetime import utcnow_naive
 
 from ..model import User
 
@@ -11,7 +12,7 @@ from ..model import User
 def test_last_activity(ngw_env, ngw_webtest_app):
     with transaction.manager:
         for keyname, last_activity in (
-            ("guest", datetime.utcnow()),
+            ("guest", utcnow_naive()),
             ("administrator", None),
         ):
             DBSession.query(User).filter_by(keyname=keyname).update(

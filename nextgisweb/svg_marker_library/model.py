@@ -1,6 +1,5 @@
 import os.path
 import zipfile
-from datetime import datetime
 from typing import Annotated, Dict, List, Union
 
 import magic
@@ -9,6 +8,7 @@ import sqlalchemy.orm as orm
 from msgspec import UNSET, Meta, Struct, UnsetType
 
 from nextgisweb.env import Base, gettext, gettextf
+from nextgisweb.lib.datetime import utcnow_naive
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.file_storage import FileObj
@@ -99,7 +99,7 @@ def validate_mime(fn, buf):
 
 class ArchiveAttr(SAttribute):
     def set(self, srlzr, value: FileUploadRef, *, create: bool):
-        srlzr.obj.tstamp = datetime.utcnow()
+        srlzr.obj.tstamp = utcnow_naive()
 
         # Delete all existing files, do flush due to delete before insert
         srlzr.obj.files[:] = []
@@ -121,7 +121,7 @@ class FilesAttr(SAttribute):
         return [FilesItemRead(name=f.name) for f in srlzr.obj.files]
 
     def set(self, srlzr, value: List[FilesItemUpdate], *, create):
-        srlzr.obj.tstamp = datetime.utcnow()
+        srlzr.obj.tstamp = utcnow_naive()
 
         files_info: Dict[str, FilesItemUpdate] = dict()
         for f in value:

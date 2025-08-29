@@ -1,10 +1,9 @@
-from datetime import datetime
-
 from msgspec import UNSET
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.response import Response
 from shapely.geometry import box
 
+from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.geometry import Geometry
 
 import nextgisweb.feature_layer.api as feature_layer_api
@@ -233,7 +232,7 @@ def items(resource, request) -> JSONType:
             items = dict(
                 type="FeatureCollection",
                 features=features,
-                timeStamp=datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
+                timeStamp=utcnow_naive().strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
                 links=[
                     {
                         "rel": "self",

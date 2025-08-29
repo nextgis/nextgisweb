@@ -27,6 +27,7 @@ from nextgisweb.env import Component, DBSession, gettext
 from nextgisweb.env.package import enable_qualifications, pkginfo
 from nextgisweb.lib import json
 from nextgisweb.lib.config import Option, SizeInBytes
+from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.logging import logger
 
 from nextgisweb.i18n import Localizer, Translations
@@ -172,14 +173,14 @@ class CoreComponent(StorageComponentMixin, Component):
         if (
             (delta := self.options["backup.interval"]) is not None
             and (last := self.settings_get(self.identity, "last_backup", None)) is not None
-            and (datetime.utcnow() - datetime.fromisoformat(last)) > delta
+            and (utcnow_naive() - datetime.fromisoformat(last)) > delta
         ):
             return dict(success=False, message="Backup has not been performed on time.")
 
         if (
             (delta := self.options["maintenance.interval"]) is not None
             and (last := self.settings_get(self.identity, "last_maintenance", None)) is not None
-            and (datetime.utcnow() - datetime.fromisoformat(last)) > delta
+            and (utcnow_naive() - datetime.fromisoformat(last)) > delta
         ):
             return dict(success=False, message="Maintenance has not been performed on time.")
 

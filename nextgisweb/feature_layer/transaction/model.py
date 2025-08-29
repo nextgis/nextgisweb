@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import Any, Generator, List, Tuple, Union
 
 import sqlalchemy as sa
@@ -8,6 +7,7 @@ from sqlalchemy.dialects import postgresql as pg
 from zope.sqlalchemy import mark_changed
 
 from nextgisweb.env import Base
+from nextgisweb.lib.datetime import utcnow_naive
 
 from nextgisweb.auth import User
 from nextgisweb.resource import Resource
@@ -22,7 +22,7 @@ class FeatureLayerTransaction(Base):
     resource_id = sa.Column(sa.ForeignKey(Resource.id, ondelete="CASCADE"), nullable=False)
     epoch = sa.Column(sa.Integer, nullable=True)
     user_id = sa.Column(sa.ForeignKey(User.id, ondelete="CASCADE"), nullable=False)
-    started = sa.Column(sa.DateTime, nullable=False, default=datetime.utcnow)
+    started = sa.Column(sa.DateTime, nullable=False, default=utcnow_naive)
     committed = sa.Column(sa.DateTime, nullable=True)
 
     resource = orm.relationship(Resource)

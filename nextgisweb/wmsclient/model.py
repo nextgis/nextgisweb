@@ -1,5 +1,4 @@
 import re
-from datetime import datetime
 from io import BytesIO
 from typing import Annotated, Dict, List, Literal, Union
 from urllib.parse import parse_qsl, quote, urlencode, urlparse, urlunparse
@@ -16,6 +15,7 @@ from zope.interface import implementer
 
 from nextgisweb.env import Base, env, gettext
 from nextgisweb.lib import json, saext
+from nextgisweb.lib.datetime import utcnow_naive
 
 from nextgisweb.core.exception import ExternalServiceError, ValidationError
 from nextgisweb.jsrealm import TSExport
@@ -104,7 +104,7 @@ class Connection(Base, Resource):
             raise ExternalServiceError
 
     def capcache_query(self):
-        self.capcache_tstamp = datetime.utcnow()
+        self.capcache_tstamp = utcnow_naive()
 
         response = self.request_wms("GetCapabilities")
         self.capcache_xml = response.content
@@ -170,10 +170,12 @@ CapCacheEnum = Annotated[
     TSExport("CapCacheEnum"),
 ]
 
+
 class WMSConnectionLayer(Struct):
     id: str
     title: str
     bbox: tuple[float, float, float, float]
+
 
 class CapCache(Struct):
     formats: List[str]

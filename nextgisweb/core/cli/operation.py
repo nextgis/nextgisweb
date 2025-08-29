@@ -7,6 +7,7 @@ import transaction
 
 from nextgisweb.env import DBSession
 from nextgisweb.env.cli import EnvCommand, UninitializedEnvCommand, arg, cli, opt
+from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.logging import logger
 
 from ..backup import pg_connection_options
@@ -128,7 +129,7 @@ def maintenance(
             core.settings_set(
                 core.identity,
                 "last_maintenance",
-                datetime.utcnow().isoformat(),
+                utcnow_naive().isoformat(),
             )
 
     if estimate_storage:

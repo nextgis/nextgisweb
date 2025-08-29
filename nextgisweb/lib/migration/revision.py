@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from nextgisweb.lib.datetime import utcnow_naive
+
 REVID_LENGTH = 8
 REVID_ZERO = "0" * REVID_LENGTH
 
@@ -10,7 +12,7 @@ EPOCH_DELTA = (EPOCH_END - EPOCH_START).total_seconds() / (16**REVID_LENGTH - 1)
 
 def revid(date=None):
     if date is None:
-        date = datetime.utcnow()
+        date = utcnow_naive()
 
     if date < EPOCH_START or date > EPOCH_END:
         raise ValueError("Date must be between {} and {}".format(EPOCH_START, EPOCH_END))

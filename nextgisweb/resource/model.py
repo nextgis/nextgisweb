@@ -1,5 +1,4 @@
 from collections import namedtuple
-from datetime import datetime
 from types import MappingProxyType
 from typing import Annotated, ClassVar, List, Literal, Tuple, Type, Union
 
@@ -10,6 +9,7 @@ from sqlalchemy import event, func, text
 
 from nextgisweb.env import Base, DBSession, env, gettext, gettextf
 from nextgisweb.lib.apitype import Gap
+from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.i18n import TrStr
 from nextgisweb.lib.registry import DictRegistry
 from nextgisweb.lib.safehtml import sanitize
@@ -108,7 +108,7 @@ class Resource(Base, metaclass=ResourceMeta):
 
     keyname = sa.Column(sa.Unicode, unique=True)
     display_name = sa.Column(sa.Unicode, nullable=False)
-    creation_date = sa.Column(sa.TIMESTAMP, nullable=False, default=datetime.utcnow)
+    creation_date = sa.Column(sa.TIMESTAMP, nullable=False, default=utcnow_naive)
 
     owner_user_id = sa.Column(sa.ForeignKey(User.id), nullable=False)
 
@@ -360,7 +360,7 @@ def resource_after_delete(mapper, connection, target):
         ) t
         WHERE resource_id = :resource_id
         GROUP BY component, kind_of_data
-    """), dict(timestamp=datetime.utcnow(), resource_id=target.id))
+    """), dict(timestamp=utcnow_naive(), resource_id=target.id))
     # fmt: on
 
 

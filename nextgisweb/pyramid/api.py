@@ -31,6 +31,7 @@ from nextgisweb.lib.apitype import (
     StatusCode,
     fillgap,
 )
+from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.imptool import module_from_stack
 
 from nextgisweb.auth import Permission
@@ -209,7 +210,7 @@ class PingResponse(Struct, kw_only=True):
 def ping(request) -> PingResponse:
     """Simple but useful request"""
     return PingResponse(
-        current=datetime.utcnow().timestamp(),
+        current=utcnow_naive().timestamp(),
         started=request.registry.settings["pyramid.started"],
     )
 
@@ -368,7 +369,7 @@ def font_cupdate(request, *, body: FontCUpdateBody) -> FontCUpdateResponse:
 
     return FontCUpdateResponse(
         restarted=restarted,
-        timestamp=datetime.utcnow().timestamp(),
+        timestamp=utcnow_naive().timestamp(),
     )
 
 

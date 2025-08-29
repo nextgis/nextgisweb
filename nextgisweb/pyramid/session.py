@@ -1,11 +1,10 @@
-from datetime import datetime
-
 import transaction
 from pyramid.interfaces import ISession
 from sqlalchemy.orm.exc import NoResultFound
 from zope.interface import implementer
 
 from nextgisweb.env import DBSession
+from nextgisweb.lib.datetime import utcnow_naive
 
 from .model import Session, SessionStore
 from .util import datetime_to_unix, gensecret
@@ -25,7 +24,7 @@ class WebSession(dict):
 
         if self._session_id is not None:
             try:
-                actual_date = datetime.utcnow() - self._cookie_max_age
+                actual_date = utcnow_naive() - self._cookie_max_age
                 session = Session.filter(
                     Session.id == self._session_id, Session.last_activity > actual_date
                 ).one()
@@ -37,13 +36,13 @@ class WebSession(dict):
 
         if self._session_id is None:
             self.new = True
-            self.created = datetime_to_unix(datetime.utcnow())
+            self.created = datetime_to_unix(utcnow_naive())
 
         def check_save(request, response):
             update_cookie = False
 
             with transaction.manager:
-                utcnow = datetime.utcnow()
+                utcnow = utcnow_naive()
 
                 if self._session_id is not None:
                     if self._cleared:

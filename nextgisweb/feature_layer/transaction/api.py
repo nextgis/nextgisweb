@@ -5,6 +5,7 @@ from msgspec import UNSET, Meta, Struct, UnsetType, convert
 
 from nextgisweb.env import DBSession
 from nextgisweb.lib.apitype import AsJSON
+from nextgisweb.lib.datetime import utcnow_naive
 
 from nextgisweb.resource import DataScope, ResourceFactory
 from nextgisweb.resource.exception import ResourceInterfaceNotSupported
@@ -194,7 +195,7 @@ def ipost(txn: Transaction, request) -> AsJSON[Union[CommitErrors, CommitSuccess
             result = executor.execute(operation)
             txn.write_result(seqnum, result)
 
-    txn.committed = datetime.utcnow()
+    txn.committed = utcnow_naive()
     return CommitSuccess(committed=txn.committed)
 
 

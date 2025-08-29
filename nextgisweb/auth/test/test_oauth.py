@@ -10,6 +10,7 @@ import transaction
 from freezegun import freeze_time
 
 from nextgisweb.env import DBSession
+from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.logging import logger
 
 from ..model import Group, User
@@ -260,7 +261,7 @@ def test_authorization_code(server_response_mock, freezegun, ngw_webtest_app, ng
     refresh_token = token_urlsafe(32)
 
     def introspection_response(user):
-        start_tstamp = int(datetime.utcnow().timestamp())
+        start_tstamp = int(utcnow_naive().timestamp())
         return dict(
             exp=start_tstamp + ACCESS_TOKEN_LIFETIME,
             sub=user["sub"],
@@ -482,7 +483,7 @@ def test_scope(scope, ok, server_response_mock, ngw_webtest_app):
     access_token = token_urlsafe(32)
     refresh_token = token_urlsafe(32)
 
-    start_tstamp = int(datetime.utcnow().timestamp())
+    start_tstamp = int(utcnow_naive().timestamp())
     with server_response_mock(
         "token",
         dict(grant_type="authorization_code"),
@@ -540,7 +541,7 @@ def test_password_token_basic(
     creds = dict(login="chapaev", password=token_urlsafe(4))
 
     def introspection_response():
-        start_tstamp = int(datetime.utcnow().timestamp())
+        start_tstamp = int(utcnow_naive().timestamp())
         return dict(
             exp=start_tstamp + ACCESS_TOKEN_LIFETIME,
             refresh_expires_in=REFRESH_TOKEN_LIFETIME,
@@ -629,7 +630,7 @@ def test_password_token_session(server_response_mock, freezegun, ngw_webtest_app
     creds = dict(login="vasechkin", password=token_urlsafe(4))
 
     def introspection_response():
-        start_tstamp = int(datetime.utcnow().timestamp())
+        start_tstamp = int(utcnow_naive().timestamp())
         return dict(exp=start_tstamp + ACCESS_TOKEN_LIFETIME, sub="vasechkin")
 
     with server_response_mock(

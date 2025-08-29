@@ -1,5 +1,5 @@
 from contextlib import contextmanager
-from datetime import datetime, timedelta
+from datetime import timedelta
 from functools import partial
 
 import transaction
@@ -8,6 +8,7 @@ from zope.sqlalchemy import mark_changed
 
 from nextgisweb.env import DBSession
 from nextgisweb.lib import json
+from nextgisweb.lib.datetime import utcnow_naive
 
 from ..component import AuditComponent
 from ..model import tab_journal
@@ -44,7 +45,7 @@ class DatabaseBackend(BackendBase):
     def maintenance(self):
         super().maintenance()
         with transaction.manager:
-            ts = datetime.utcnow() - self.options["retention"]
+            ts = utcnow_naive() - self.options["retention"]
             q_delete = tab_journal.delete().where(tab_journal.c.tstamp < ts)
             DBSession.connection().execute(q_delete)
             mark_changed(DBSession())
