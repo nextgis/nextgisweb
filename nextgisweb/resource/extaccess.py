@@ -1,10 +1,11 @@
 from __future__ import annotations
 
-from typing import Optional, Type
+from typing import Type
 
 from pyramid.request import Request
 from zope.interface import Interface
 
+from nextgisweb.lib.i18n import Translatable
 from nextgisweb.lib.registry import list_registry
 
 from .model import Resource
@@ -12,13 +13,13 @@ from .model import Resource
 
 @list_registry
 class ExternalAccessLink:
-    title: str
-    help: Optional[str] = None
-    docs_url: Optional[str] = None
+    title: Translatable
+    help: Translatable | None = None
+    docs_url: str | None = None
 
-    resource: Optional[Type[Resource]] = None
-    interface: Optional[Type[Interface]] = None
-    attr_name: Optional[str] = None
+    resource: Type[Resource] | None = None
+    interface: Type[Interface] | None = None
+    attr_name: str | None = None
 
     url: str
 
@@ -26,7 +27,7 @@ class ExternalAccessLink:
         self.url = url
 
     @classmethod
-    def factory(cls, obj: Resource, request: Request) -> Optional[ExternalAccessLink]:
+    def factory(cls, obj: Resource, request: Request) -> ExternalAccessLink | None:
         if cls.is_applicable(obj, request):
             return cls(cls.url_factory(obj, request))
 
