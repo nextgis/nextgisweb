@@ -40,6 +40,14 @@ def on_user_dir(event):
 
 @AppImage.on_virtualenv.handler
 def on_virtualenv(event):
+    pip_install = f"{event.path}/bin/pip install --no-cache-dir"
+    event.before_install(
+        f"{pip_install} setuptools packaging",
+        f"gdal_numpy_spec=$(cd package/nextgisweb; {event.path}/bin/python setup.py gdal_numpy_spec)",
+        f"{pip_install} \"$(echo $gdal_numpy_spec | cut -d ' ' -f 2)\"",
+        f"{pip_install} --no-build-isolation \"$(echo $gdal_numpy_spec | cut -d ' ' -f 1)\"",
+    )
+
     event.after_install(
         "ln -s package/nextgisweb/.prettierrc.cjs $NGWROOT/",
         "ln -s package/nextgisweb/eslint.config.cjs $NGWROOT/",
