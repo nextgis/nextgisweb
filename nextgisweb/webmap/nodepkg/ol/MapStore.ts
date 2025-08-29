@@ -2,9 +2,11 @@ import { action, computed, observable } from "mobx";
 import type { Feature } from "ol";
 import OlMap from "ol/Map";
 import type { MapOptions as OlMapOptions } from "ol/Map";
+import { unByKey } from "ol/Observable";
 import View from "ol/View";
 import type { FitOptions } from "ol/View";
 import type Control from "ol/control/Control";
+import type { EventsKey } from "ol/events";
 import * as olExtent from "ol/extent";
 import type { Extent } from "ol/extent";
 import { fromExtent } from "ol/geom/Polygon";
@@ -58,15 +60,20 @@ interface MapWatchableProps {
 }
 
 export class MapStore extends Watchable<MapWatchableProps> {
+    readonly panelControl: PanelControl;
+
     private readonly DPI = 1000 / 39.37 / 0.28;
     private readonly IPM = 39.37;
     private readonly SMART_ZOOM_EXTENT = 100;
     private readonly SMART_ZOOM = 12;
 
-    private readonly _panelControl: PanelControl;
     private readonly initialExtent?: Extent;
 
     readonly olMap: OlMap;
+    @observable.ref accessor olView: View;
+
+    @observable.ref accessor ready = false;
+
     @observable.shallow accessor layers: Layers = {};
 
     @observable.shallow accessor baseLayer: CoreLayer | null = null;
@@ -80,21 +87,26 @@ export class MapStore extends Watchable<MapWatchableProps> {
     @observable.ref accessor mapState: string | null = null;
     @observable.ref accessor defaultMapState: string | null = null;
 
+    private _viewUnbindKeys: EventsKey[] = [];
+    private _mapUnbindKeys: EventsKey[] = [];
+
     constructor(private options: MapOptions) {
         super();
-        const { target, extent, initialExtent, measureSrsId, ...rest } =
+        const { target, extent, initialExtent, measureSrsId, ...viewOptions } =
             this.options;
         this.measureSrsId = measureSrsId ?? null;
         this.initialExtent = initialExtent;
-        const view = new View({
-            maxZoom: 24,
-            constrainResolution: true,
-            extent,
-        });
-
-        this.olMap = new OlMap({ ...rest, view });
-        this._panelControl = new PanelControl();
-        this.olMap.addControl(this._panelControl);
+        if (!viewOptions.view) {
+            viewOptions.view = new View({
+                maxZoom: 24,
+                constrainResolution: true,
+                extent,
+            });
+        }
+        this.olMap = new OlMap(viewOptions);
+        this.olView = this.olMap.getView();
+        this.panelControl = new PanelControl();
+        this.olMap.addControl(this.panelControl);
         if (target) {
             this.startup(target);
         }
@@ -143,83 +155,81 @@ export class MapStore extends Watchable<MapWatchableProps> {
 
     async startup(target: string | HTMLElement): Promise<void> {
         return new Promise((resolve) => {
+            if (this._mapUnbindKeys.length) {
+                this.detach();
+            }
+
             const olMap = this.olMap;
 
             const olView = olMap.getView();
 
-            const setResolution = () =>
-                this.setResolution(olView.getResolution() ?? null);
-            const setCenter = () => {
-                this.setCenter(olView.getCenter() ?? null);
-            };
-            const setPosition = () => {
-                this.setPosition(this.getPosition());
-            };
-            const setRotation = () => {
-                const r = olView.getRotation();
-                this.setRotation(typeof r === "number" ? r : 0);
-            };
-
-            olView.on("change:resolution", setResolution);
-            olView.on("change:center", setCenter);
-            olView.on("change:rotation", setRotation);
-
-            olMap.on("moveend", setPosition);
+            const s = this.getSetters(olView);
 
             const applyInitialState = () => {
-                setResolution();
-                setCenter();
-                setPosition();
+                s.setResolution();
+                s.setCenter();
+                s.setPosition();
+                s.setRotation();
             };
+            this._viewUnbindKeys.push(
+                olView.on("change:resolution", s.setResolution),
+                olView.on("change:center", s.setCenter),
+                olView.on("change:rotation", s.setRotation)
+            );
+            this._mapUnbindKeys.push(
+                olMap.on("moveend", s.setPosition),
 
-            olMap.once("rendercomplete", applyInitialState);
+                olMap.once("rendercomplete", applyInitialState),
 
-            // Workaround to skip first map move event on start
-            olMap.once("movestart", () => {
-                // Map ready only then first move happend
-                resolve();
-                mapStartup({ olMap, queue: imageQueue });
-            });
+                // Workaround to skip first map move event on start
+                olMap.once("movestart", () => {
+                    // Map ready only then first move happend
+                    resolve();
+                    this.setReady(true);
+                    mapStartup({ olMap, queue: imageQueue });
+                })
+            );
+
             olMap.setTarget(target);
         });
     }
 
-    getLayersArray() {
-        return this.olMap.getLayers().getArray() as ExtendedOlLayer[];
+    setView(view: View): void {
+        this.unView();
+        const s = this.getSetters(view);
+        this._viewUnbindKeys.push(
+            view.on("change:resolution", s.setResolution),
+            view.on("change:center", s.setCenter),
+            view.on("change:rotation", s.setRotation)
+        );
+        this.olMap.setView(view);
+        this._setView(view);
     }
 
     @action
-    setResolution(resolution: number | null) {
-        const oldResolution = this.resolution;
-        this.resolution = resolution;
-        this.notify("resolution", oldResolution, resolution);
+    private _setView(view: View) {
+        this.olView = view;
     }
-    @action
-    setPosition(position: Position | null) {
-        const oldPosition = this.position;
-        this.position = position;
-        if (position) {
-            const { zoom, center } = position;
-            this.setZoom(zoom);
-            this.setCenter(center);
+
+    private unView() {
+        if (this._viewUnbindKeys) {
+            this._viewUnbindKeys.forEach(unByKey);
         }
-        this.notify("position", oldPosition, position);
+        this._viewUnbindKeys = [];
     }
-    @action
-    setCenter(center: number[] | null) {
-        const oldCenter = this.center;
-        this.center = center;
-        this.notify("center", oldCenter, center);
+
+    detach(): void {
+        this.unView();
+        if (this._mapUnbindKeys) {
+            this._mapUnbindKeys.forEach(unByKey);
+        }
+        this._mapUnbindKeys = [];
+        this.setReady(false);
+        this.olMap.setTarget(undefined);
     }
-    @action
-    setZoom(zoom: number) {
-        const oldZoom = this.zoom;
-        this.zoom = zoom;
-        this.notify("zoom", oldZoom, zoom);
-    }
-    @action
-    setRotation(rad: number) {
-        this.rotation = rad;
+
+    getLayersArray() {
+        return this.olMap.getLayers().getArray() as ExtendedOlLayer[];
     }
 
     @action
@@ -260,8 +270,16 @@ export class MapStore extends Watchable<MapWatchableProps> {
         this.layers = layers;
     }
 
-    getScaleForResolution(res: number, mpu: number): number {
-        return parseFloat(res.toString()) * (mpu * this.IPM * this.DPI);
+    @computed
+    get scaleForResolution(): number | undefined {
+        const val = this.resolution;
+        if (val === null) return;
+        const view = this.olMap.getView();
+        const projection = view.getProjection();
+        const mpu = projection?.getMetersPerUnit?.() ?? 1;
+        return Math.round(
+            parseFloat(val.toString()) * (mpu * this.IPM * this.DPI)
+        );
     }
 
     getResolutionForScale(
@@ -409,7 +427,7 @@ export class MapStore extends Watchable<MapWatchableProps> {
     }
 
     getControlContainer(): HTMLElement {
-        return this._panelControl.getContainer();
+        return this.panelControl.getContainer();
     }
 
     createControl(control: MapControl, options: CreateControlOptions): Control {
@@ -417,7 +435,7 @@ export class MapStore extends Watchable<MapWatchableProps> {
     }
 
     addControl(options: ControlOptions): Control | undefined {
-        this._panelControl.addControl(options);
+        this.panelControl.addControl(options);
         return options.control;
     }
     updateControlPlacement(
@@ -425,12 +443,12 @@ export class MapStore extends Watchable<MapWatchableProps> {
         position: TargetPosition,
         order?: number
     ): Control | undefined {
-        this._panelControl.updateControlPlacement(control, position, order);
+        this.panelControl.updateControlPlacement(control, position, order);
         return control;
     }
 
     removeControl(control: Control): void {
-        this._panelControl.removeControl(control);
+        this.panelControl.removeControl(control);
     }
 
     getTargetElement() {
@@ -439,5 +457,60 @@ export class MapStore extends Watchable<MapWatchableProps> {
 
     updateSize() {
         this.olMap.updateSize();
+    }
+
+    @action
+    private setReady(val: boolean) {
+        this.ready = val;
+    }
+
+    @action
+    private setResolution(resolution: number | null) {
+        const oldResolution = this.resolution;
+        this.resolution = resolution;
+        this.notify("resolution", oldResolution, resolution);
+    }
+    @action
+    private setPosition(position: Position | null) {
+        const oldPosition = this.position;
+        this.position = position;
+        if (position) {
+            const { zoom, center } = position;
+            this.setZoom(zoom);
+            this.setCenter(center);
+        }
+        this.notify("position", oldPosition, position);
+    }
+    @action
+    private setCenter(center: number[] | null) {
+        const oldCenter = this.center;
+        this.center = center;
+        this.notify("center", oldCenter, center);
+    }
+    @action
+    private setZoom(zoom: number) {
+        const oldZoom = this.zoom;
+        this.zoom = zoom;
+        this.notify("zoom", oldZoom, zoom);
+    }
+    @action
+    private setRotation(rad: number) {
+        this.rotation = typeof rad === "number" ? rad : 0;
+    }
+
+    private getSetters(olView: View) {
+        return {
+            setResolution: () =>
+                this.setResolution(olView.getResolution() ?? null),
+            setCenter: () => {
+                this.setCenter(olView.getCenter() ?? null);
+            },
+            setPosition: () => {
+                this.setPosition(this.getPosition());
+            },
+            setRotation: () => {
+                this.setRotation(olView.getRotation());
+            },
+        };
     }
 }

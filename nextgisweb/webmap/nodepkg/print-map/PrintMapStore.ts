@@ -12,7 +12,7 @@ import { mmToPx } from "./utils";
 
 const DEFAULT_MARGIN = 10;
 
-class PrintMapStore {
+export class PrintMapStore {
     @observable.shallow accessor legendCoords: LegendRndCoords = {
         x: 0,
         y: 0,
@@ -142,5 +142,3 @@ class PrintMapStore {
         this.legendCoords = { ...this.legendCoords, legendColumns };
     }
 }
-
-export const printMapStore = new PrintMapStore();

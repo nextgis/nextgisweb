@@ -49,32 +49,41 @@ export const MapComponent = observer(
             mapExtent,
         });
 
-        const { mapState, defaultMapState, setMapState, setDefaultMapState } =
-            mapStore;
-
         const mapContainerRef = useRef<HTMLDivElement>(null);
 
         useEffect(() => {
             let observer: ResizeObserver | undefined = undefined;
-            assert(mapContainerRef.current);
+            if (mapStore) {
+                assert(mapContainerRef.current);
 
-            mapStore.startup(mapContainerRef.current).then(() => {
-                if (whenCreated) {
-                    whenCreated(mapStore);
-                }
+                const target = mapContainerRef.current;
 
-                observer = new ResizeObserver(() => {
-                    mapStore.updateSize();
+                mapStore.startup(target).then(() => {
+                    if (whenCreated) {
+                        whenCreated(mapStore);
+                    }
+
+                    observer = new ResizeObserver(() => {
+                        mapStore.updateSize();
+                    });
+                    observer.observe(mapStore.getTargetElement());
                 });
-                observer.observe(mapStore.getTargetElement());
-            });
+            }
 
             return () => {
                 if (observer) {
                     observer.disconnect();
                 }
+                mapStore?.detach();
             };
         }, [mapStore, whenCreated]);
+
+        if (!mapStore) {
+            return null;
+        }
+
+        const { mapState, defaultMapState, setMapState, setDefaultMapState } =
+            mapStore;
 
         return (
             <ToggleGroup

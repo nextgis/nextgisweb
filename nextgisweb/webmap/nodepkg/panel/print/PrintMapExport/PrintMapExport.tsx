@@ -7,7 +7,7 @@ import type { MenuProps } from "@nextgisweb/gui/antd";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { Display } from "@nextgisweb/webmap/display";
-import { printMapStore } from "@nextgisweb/webmap/print-map/PrintMapStore";
+import type { PrintMapStore } from "@nextgisweb/webmap/print-map/PrintMapStore";
 import type { PrintMapSettings } from "@nextgisweb/webmap/print-map/type";
 import type { PrintBody, PrintFormat } from "@nextgisweb/webmap/type/api";
 
@@ -22,7 +22,7 @@ interface ExportProps {
     format: PrintFormat;
     element: HTMLElement;
     settings: PrintMapSettings;
-    printMapStore: typeof printMapStore;
+    printMapStore: PrintMapStore;
     setLoad: (loading: boolean) => void;
     print?: boolean;
 }
@@ -103,10 +103,16 @@ interface PrintMapExportProps {
     mapSettings: PrintMapSettings;
     printMapEl?: HTMLElement | null;
     display: Display;
+    printMapStore: PrintMapStore;
 }
 
 export const PrintMapExport = observer(
-    ({ printMapEl, mapSettings, display }: PrintMapExportProps) => {
+    ({
+        printMapEl,
+        mapSettings,
+        display,
+        printMapStore,
+    }: PrintMapExportProps) => {
         const [loadingFile, setLoadingFile] = useState(false);
         const [loadingPrint, setLoadingPrint] = useState(false);
 

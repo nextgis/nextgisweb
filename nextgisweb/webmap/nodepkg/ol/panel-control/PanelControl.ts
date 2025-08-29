@@ -82,6 +82,10 @@ export class PanelControl extends Control {
         this.panelContainer.changePlacement(wrapperEl, position, order);
     }
 
+    getTarget(control: Control): HTMLElement | undefined {
+        return this.targets.get(control);
+    }
+
     removeControl(control: Control): void {
         const map = this.getMap();
         if (map) {

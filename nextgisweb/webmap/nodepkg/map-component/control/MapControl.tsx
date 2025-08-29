@@ -1,11 +1,9 @@
-import type Control from "ol/control/Control";
 import {
     createContext,
     useCallback,
     useContext,
     useEffect,
     useMemo,
-    useState,
 } from "react";
 import type React from "react";
 import type { ReactNode } from "react";
@@ -17,7 +15,6 @@ import type {
     CreateControlOptions,
     TargetPosition,
 } from "../../control-container/ControlContainer";
-import { useMapContext } from "../context/useMapContext";
 import { useMapControl } from "../hook/useMapControl";
 
 export type ControlProps<P = unknown> = P & {
@@ -42,27 +39,16 @@ export function useMapControlContext() {
     return useContext(MapControlContext);
 }
 
-export function MapControl(props: MapControlProps) {
-    const { id, bar, order, style, children, className, targetStyle } = props;
-    const context = useMapContext();
-    const { mapStore } = useMapContext();
-
-    const parent = useMapControlContext();
-    const inside = parent && parent.id;
-
-    const [position, margin] = useMemo<
-        [TargetPosition | undefined, boolean | undefined]
-    >(() => {
-        if (inside) {
-            return [{ inside }, false];
-        }
-        return [props.position, props.margin];
-    }, [props, inside]);
+export function MapControl({ children, ...props }: MapControlProps) {
+    const { margin, bar, style, className, setInstance, context, instance } =
+        useMapControl({
+            ...props,
+        });
 
     const createControl = useCallback(() => {
-        return mapStore?.createControl(
+        return context.mapStore.createControl(
             {
-                id,
+                id: props.id,
                 onAdd() {
                     return undefined;
                 },
@@ -72,14 +58,11 @@ export function MapControl(props: MapControlProps) {
             },
             {}
         );
-    }, [id, mapStore]);
-
-    const [instance, setInstance] = useState<Control>();
-    useMapControl({ context, instance, position, order, targetStyle, id });
+    }, [props.id, context.mapStore]);
 
     useEffect(() => {
         setInstance(createControl());
-    }, [createControl]);
+    }, [createControl, setInstance]);
 
     const element = useMemo<HTMLElement | null>(() => {
         // @ts-expect-error element is protected property

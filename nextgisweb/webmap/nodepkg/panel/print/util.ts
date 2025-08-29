@@ -5,6 +5,10 @@ import type { PrintMapSettings } from "../../print-map/type";
 import { urlPrintParams } from "./options";
 import type { UrlPrintParams } from "./options";
 
+export function formatScaleNumber(scale: number): string {
+    return new Intl.NumberFormat("ru-RU").format(scale);
+}
+
 export function defaultPanelMapSettings(initTitleText: string) {
     return {
         height: 297,

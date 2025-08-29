@@ -33,6 +33,7 @@ export const PrintScaleSettings: FC<PrintScaleSettings> = ({
             return;
         }
 
+        updateMapSettings({ scale: printMapScale });
         const scaleInList = scalesList.some((s) => s.value === printMapScale);
         if (scaleInList) {
             setScales(scalesList);
@@ -47,7 +48,6 @@ export const PrintScaleSettings: FC<PrintScaleSettings> = ({
 
         const newScales = [customScale, ...scalesList];
         setScales(newScales);
-        updateMapSettings({ scale: printMapScale });
     }, [printMapScale, updateMapSettings]);
 
     return (

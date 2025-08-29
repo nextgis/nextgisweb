@@ -6,10 +6,10 @@ import { Divider, InputNumber, Select } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import type { Scale } from "../options";
+import { formatScaleNumber } from "../util";
 
 import "./ScalesSelect.css";
 
-const numberFormat = new Intl.NumberFormat("ru-RU");
 const validateCustomScale = (value: number | null) =>
     value && Number.isInteger(value) && value > 0;
 
@@ -72,10 +72,10 @@ export const ScalesSelect: FC<ScalesSelectProps> = ({
                         max={1000000000}
                         placeholder={gettext("Custom scale")}
                         value={customScale}
-                        onChange={(v) => debouncedOnChange(v)}
+                        onChange={debouncedOnChange}
                         formatter={(value) => {
                             if (!value) return "";
-                            return numberFormat.format(value);
+                            return formatScaleNumber(value);
                         }}
                         onPressEnter={onPressEnter}
                         style={{ width: "100%" }}

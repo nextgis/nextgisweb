@@ -17,11 +17,13 @@ export default function MapToolbarControl({
     direction = "horizontal",
     children,
     align = "center",
+    style,
     gap,
     ...rest
 }: MapToolbarControlProps) {
-    const style = useMemo<React.CSSProperties>(
+    const calcStyle = useMemo<React.CSSProperties>(
         () => ({
+            ...style,
             display: "flex",
             flexDirection: direction === "horizontal" ? "row" : "column",
             alignItems: align,
@@ -29,13 +31,13 @@ export default function MapToolbarControl({
                 ? { gap: typeof gap === "number" ? `${gap}px` : gap }
                 : {}),
         }),
-        [align, direction, gap]
+        [align, direction, style, gap]
     );
 
     return (
         <MapControl
             {...rest}
-            style={style}
+            style={calcStyle}
             className={classNames({ dense: gap === 0 || gap === "0px" })}
         >
             {children}

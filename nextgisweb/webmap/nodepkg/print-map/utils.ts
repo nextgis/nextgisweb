@@ -1,64 +1,174 @@
-import type OlMap from "ol/Map";
-import { Rotate } from "ol/control";
+import { View } from "ol";
+import { get as getProjection } from "ol/proj";
 
-import { gettext } from "@nextgisweb/pyramid/i18n";
-
-import { getLabel } from "../map-controls/utils";
-
-import NorthIcon from "@nextgisweb/icon/material/arrow_upward";
+import type { MapStore } from "../ol/MapStore";
 
 export const mmToPx = (mm: number): number => {
     return (mm / 10) * (96 / 2.54);
 };
 
-export function setMapScale(scale: number, olMap: OlMap): void {
-    const view = olMap.getView();
-    const center = view.getCenter();
-    if (!center) {
+export const PRINT_SCALES = [
+    5000, 10000, 20000, 25000, 50000, 100000, 200000, 500000, 1000000, 2000000,
+    5000000, 10000000,
+];
+
+export function scaleToResolution(
+    scale: number,
+    projCode = "EPSG:3857"
+): number {
+    const mpu = getProjection(projCode)?.getMetersPerUnit() ?? 1;
+    // 0.00028 - pizel size in meters
+    return scale * 0.00028 * mpu;
+}
+
+export function buildResolutions(
+    scales: number[],
+    projCode = "EPSG:3857"
+): number[] {
+    return [...scales.map((s) => scaleToResolution(s, projCode))].sort(
+        (a, b) => b - a
+    );
+}
+
+export function replaceViewResolutions(mapStore: MapStore, scales: number[]) {
+    const olMap = mapStore.olMap;
+    const oldView = olMap.getView();
+    const proj = oldView.getProjection();
+    const newRes = buildResolutions(scales, proj?.getCode?.() ?? "EPSG:3857");
+
+    const currRes = oldView.getResolutions?.();
+    if (
+        Array.isArray(currRes) &&
+        currRes.length === newRes.length &&
+        currRes.every((r, i) => r === newRes[i])
+    ) {
         return;
     }
-    const cosh = (value: number) => {
-        return (Math.exp(value) + Math.exp(-value)) / 2;
-    };
-    const pointResolution3857 = cosh(center[1] / 6378137);
-    const resolution = pointResolution3857 * (scale / (96 * 39.3701));
-    olMap.getView().setResolution(resolution);
+
+    const center = oldView.getCenter();
+    const zoom = oldView.getZoom();
+    const rotation = oldView.getRotation();
+
+    const newView = new View({
+        projection: proj,
+        resolutions: newRes,
+        constrainResolution: true,
+    });
+
+    if (center) newView.setCenter(center);
+    if (zoom !== undefined) newView.setZoom(zoom);
+    if (rotation) newView.setRotation(rotation);
+
+    mapStore.setView(newView);
 }
 
-export function getMapScale(olMap: OlMap): number | undefined {
-    const view = olMap.getView();
-    const center = view.getCenter();
-    const resolution = view.getResolution();
-
-    if (!center || !resolution) {
-        return;
-    }
-
-    const cosh = (value: number) => {
-        return (Math.exp(value) + Math.exp(-value)) / 2;
-    };
-
-    const pointResolution3857 = cosh(center[1] / 6378137);
-    const scale = (resolution * (96 * 39.3701)) / pointResolution3857;
-    return scale;
+export interface PrintStyleParams {
+    widthPage: number;
+    heightPage: number;
+    widthMap: number;
+    heightMap: number;
+    margin: number;
 }
 
-export function switchRotateControl(olMap: OlMap, show: boolean): void {
-    const controls = olMap.getControls();
-    const rotateControl = controls
-        .getArray()
-        .find((control) => control instanceof Rotate);
-
-    if (!rotateControl && show) {
-        const rotateControl = new Rotate({
-            tipLabel: gettext("Reset rotation"),
-            label: getLabel(NorthIcon),
-            autoHide: false,
-        });
-        olMap.addControl(rotateControl);
+export const buildPrintStyle = (params: PrintStyleParams): string => {
+    return `
+    .print-map-page {
+      width: ${params.widthPage}px;
+      height: ${params.heightPage}px;
+      padding: 0;
+      background-color: white;
+      box-shadow: 0 0 6px 0 rgb(23, 68, 107);
     }
 
-    if (rotateControl && !show) {
-        olMap.removeControl(rotateControl);
+    .print-map-export-wrapper {
+      width: ${params.widthPage}px;
+      height: ${params.heightPage}px;
+      padding: 0;
     }
-}
+
+    .print-map-page .print-map img.map-logo {
+        position: absolute;
+        z-index: 9999999;
+        top: 2px;
+        right: 2px;
+    }
+
+    .print-map {
+        width: ${params.widthMap}px !important;
+        height: ${params.heightMap}px !important;
+        padding: 0 !important;
+        overflow: hidden !important;
+        margin: ${params.margin}px;
+        top: 0;
+        left: 0;
+    }
+
+    .print-olmap {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100%;
+        height: 100%;
+    }
+
+    @page {
+        size: ${params.widthPage}px ${params.heightPage}px;
+        margin: ${params.margin}px;
+    }
+
+    @media print {
+        html, body {
+            width: ${params.widthPage}px !important;
+            height: ${params.heightPage}px !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            min-width: ${params.widthPage}px !important;
+            max-width: ${params.widthPage}px !important;
+        }
+
+        body > * {
+            display: none !important;
+        }
+
+        body .print-map-pane  {
+          display: block !important;
+          width: ${params.widthPage}px !important;
+          height: ${params.heightPage}px !important;
+          overflow: hidden !important;
+          left: 0 !important;
+          top: 0 !important;
+          padding: 0 !important;
+        }
+
+        .print-map-pane .print-map-page-wrapper {
+          box-shadow: none !important;
+          margin: 0 !important;
+          padding: 0 !important;
+        }
+
+        .print-map-pane .map-container {
+            left: 0px !important;
+            top: 0px !important;
+            width: ${params.widthPage}px !important;
+            height: ${params.heightPage}px !important;
+        }
+
+        .print-map-pane .print-map-export-wrapper,
+        .print-map-pane .print-map-page,
+        .print-map-pane .print-map {
+          width: ${params.widthMap}px !important;
+          height: ${params.heightMap}px !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          overflow: hidden !important;
+        }
+
+        .print-map-pane div.print-map-export-wrapper {
+          position: absolute;
+          margin: ${params.margin}px !important;
+        }
+
+        #webmap-wrapper {
+          top: 0 !important;
+        }
+    }`;
+};
