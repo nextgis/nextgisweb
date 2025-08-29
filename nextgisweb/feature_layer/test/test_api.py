@@ -4,6 +4,7 @@ from itertools import product
 
 import pytest
 import transaction
+from mapbox_vector_tile import decode as mvt_decode
 
 from nextgisweb.env import DBSession
 from nextgisweb.lib.geometry import Geometry
@@ -250,7 +251,22 @@ def test_mvt(extent, simplification, padding, ngw_webtest_app, vector_layer_id):
         simplification=simplification,
         padding=padding,
     )
-    ngw_webtest_app.get("/api/component/feature_layer/mvt", params, status=200)
+    resp = ngw_webtest_app.get("/api/component/feature_layer/mvt", params, status=200)
+    data = mvt_decode(resp.body)
+
+    ldata = data[f"ngw:{vector_layer_id}"]
+
+    assert ldata["version"] == 2
+    assert ldata["extent"] == extent
+    assert ldata["type"] == "FeatureCollection"
+
+    features = ldata["features"]
+    assert len(features) == 2
+
+    assert features[0]["properties"]["name"] == "feature1"
+    assert features[0]["geometry"]["type"] == "Point"
+    assert features[1]["properties"]["name"] == "feature2"
+    assert features[1]["geometry"]["type"] == "Point"
 
 
 @pytest.mark.parametrize(

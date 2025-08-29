@@ -65,6 +65,7 @@ extras_require = dict(
         "flake8-future-import",
         "flake8",
         "freezegun",
+        "mapbox-vector-tile",
         "pre-commit",
         "pyramid-debugtoolbar==4.10",
         "pytest-flake8",
