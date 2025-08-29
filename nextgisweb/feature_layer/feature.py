@@ -87,10 +87,10 @@ class Feature:
 
         for k, v in self.fields.items():
             name = k if aliases is None else aliases[k]
-            ogr_feature[name] = v
+            ogr_feature.SetField(name, v)
 
         if fid is not None:
-            ogr_feature[fid] = self.id
+            ogr_feature.SetField(fid, self.id)
 
         return ogr_feature
 
