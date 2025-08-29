@@ -1,5 +1,6 @@
 import math
 from io import BytesIO
+from urllib.parse import quote
 
 import numpy
 from lxml import etree, html
@@ -57,8 +58,7 @@ def layer_by_keyname(service, keyname):
     )
 
 
-def wms_handler(obj, request):
-    """WMS endpoint"""
+def _wms_auth(request):
     try:
         request.resource_permission(ServiceScope.connect)
     except InsufficientPermissions:
@@ -69,34 +69,42 @@ def wms_handler(obj, request):
 
             # TODO: Maybe it should be implemented in the error handler with an
             # additional option to enable this behavior.
-
             return Response(status_code=401, headers={"WWW-Authenticate": "Basic"})
-        else:
-            raise
+
+        raise
+
+
+def wms_handler(obj, request):
+    """WMS/WMTS endpoint"""
+    _wms_auth(request)
 
     params, root_body = parse_request(request)
 
     req = params.get("REQUEST", "").upper()
     service = params.get("SERVICE", "").upper()
 
-    if req == "GETCAPABILITIES":
-        if service != "WMS":
-            raise HTTPBadRequest(explanation="Invalid SERVICE parameter value.")
-        return _get_capabilities(obj, params, request)
-    elif req == "GETMAP" or req == "MAP":
-        return _get_map(obj, params, request)
-    elif req == "GETFEATUREINFO":
-        return _get_feature_info(obj, params, request)
-    elif req == "GETLEGENDGRAPHIC":
-        return _get_legend_graphic(obj, params, request)
-    else:
+    if service == "WMS":
+        if req == "GETCAPABILITIES":
+            return _get_capabilities(obj, params, request)
+        elif req == "GETMAP" or req == "MAP":
+            return _get_map(obj, params, request)
+        elif req == "GETFEATUREINFO":
+            return _get_feature_info(obj, params, request)
+        elif req == "GETLEGENDGRAPHIC":
+            return _get_legend_graphic(obj, params, request)
         raise HTTPBadRequest(explanation="Invalid REQUEST parameter value.")
+    elif service == "WMTS":
+        if req == "GETCAPABILITIES":
+            return _get_wmts_capabilities(obj, request)
+        elif req == "GETTILE":
+            return _get_wmts_tile(obj, params, request)
+        raise HTTPBadRequest(explanation="Invalid REQUEST parameter value.")
+
+    raise HTTPBadRequest(explanation="Invalid SERVICE parameter value.")
 
 
 def _get_capabilities(obj, params, request):
-    E = ElementMaker(
-        nsmap={"xlink": NS_XLINK}
-    )
+    E = ElementMaker(nsmap={"xlink": NS_XLINK})
 
     OnlineResource = lambda url: E.OnlineResource(
         {"{%s}type" % NS_XLINK: "simple", "{%s}href" % NS_XLINK: url}
@@ -141,6 +149,8 @@ def _get_capabilities(obj, params, request):
     )
 
     for lyr in obj.layers:
+        if not lyr.resource.has_permission(DataScope.read, request.user):
+            continue
         queryable = "1" if lyr.is_queryable else "0"
 
         lnode = E.Layer(
@@ -469,7 +479,7 @@ def _get_legend_graphic(obj, params, request):
 
     img = layer.resource.render_legend()
 
-    return Response(body_file=img, content_type="image/png")
+    return Response(body_file=img, content_type=IMAGE_FORMAT.PNG)
 
 
 def error_renderer(request, err_info, exc, exc_info, debug=True):
@@ -531,15 +541,14 @@ def error_renderer(request, err_info, exc, exc_info, debug=True):
     )
 
 
-def wmts_handler(obj, request):
-    """WMTS endpoint"""
-    try:
-        request.resource_permission(ServiceScope.connect)
-    except InsufficientPermissions:
-        if request.authenticated_userid is None:
-            return Response(status_code=401, headers={"WWW-Authenticate": "Basic"})
-        raise
+def wmts_rest_handler(obj, request):
+    """WMTS REST endpoint"""
+    _wms_auth(request)
 
+    return _get_wmts_capabilities(obj, request)
+
+
+def _get_wmts_capabilities(obj, request):
     NS_OWS = "http://www.opengis.net/ows/1.1"
     E = ElementMaker(
         nsmap={
@@ -552,14 +561,39 @@ def wmts_handler(obj, request):
     )
     E_OWS = ElementMaker(namespace=NS_OWS)
 
+    service_url = request.route_url("wmsserver.wms", id=obj.id) + "?"
+
+    operations_metadata = E_OWS.OperationsMetadata()
+    for op in ("GetCapabilities", "GetTile"):
+        operations_metadata.append(
+            E_OWS.Operation(
+                E_OWS.DCP(
+                    E_OWS.HTTP(
+                        E_OWS.Get(
+                            E_OWS.Constraint(
+                                E_OWS.AllowedValues(E_OWS.Value("KVP")),
+                                name="GetEncoding",
+                            ),
+                            {"{%s}href" % NS_XLINK: service_url},
+                        )
+                    )
+                ),
+                name=op,
+            )
+        )
+
     tile_matrix_id = "EPSG:3857"
 
     # Don't need urlencode here
-    resource_url = request.route_url("render.tile")
-    resource_url += "?resource=%d&z={TileMatrix}&x={TileCol}&y={TileRow}"
+    tile_url = (
+        service_url
+        + "service=WMTS&request=GetTile&layer=%s&TileMatrix={TileMatrix}&TileCol={TileCol}&TileRow={TileRow}"
+    )
 
     layers = []
     for layer in obj.layers:
+        if not layer.resource.has_permission(DataScope.read, request.user):
+            continue
         layers.append(
             E.Layer(
                 E_OWS.Title(layer.display_name),
@@ -570,12 +604,12 @@ def wmts_handler(obj, request):
                     crs="urn:ogc:def:crs:OGC:2:84",
                 ),
                 E.Style(E_OWS.Identifier(layer.keyname), isDefault="true"),
-                E.Format("image/png"),
+                E.Format(IMAGE_FORMAT.PNG),
                 E.TileMatrixSetLink(E.TileMatrixSet(tile_matrix_id)),
                 E.ResourceURL(
-                    format="image/png",
+                    format=IMAGE_FORMAT.PNG,
                     resourceType="tile",
-                    template=resource_url % layer.resource_id,
+                    template=tile_url % quote(layer.keyname),
                 ),
             )
         )
@@ -611,12 +645,34 @@ def wmts_handler(obj, request):
             E_OWS.ServiceType("OGC WMTS"),
             E_OWS.ServiceTypeVersion("1.0.0"),
         ),
+        operations_metadata,
         contents,
     )
 
     return Response(
         etree.tostring(capabilities, encoding="utf-8"), content_type="text/xml", charset="utf-8"
     )
+
+
+def _get_wmts_tile(obj, params, request):
+    layer = layer_by_keyname(obj, params["LAYER"])
+    z = int(params["TILEMATRIX"])
+    x = int(params["TILECOL"])
+    y = int(params["TILEROW"])
+
+    res = layer.resource
+    request.resource_permission(DataScope.read, res)
+
+    srs = SRS.filter_by(id=3857).one()
+
+    req = res.render_request(srs)
+    img = req.render_tile((z, x, y), 256)
+
+    buf = BytesIO()
+    image_encoder_png(img, buf)
+    buf.seek(0)
+
+    return Response(body_file=buf, content_type=IMAGE_FORMAT.PNG)
 
 
 def setup_pyramid(comp, config):
@@ -632,9 +688,9 @@ def setup_pyramid(comp, config):
     )
 
     config.add_route(
-        "wmsserver.wmts",
-        "/api/resource/{id}/WMTSCapabilities.xml",
+        "wmsserver.wmts_rest",
+        "/api/resource/{id}/wms/1.0.0/WMTSCapabilities.xml",
         factory=service_factory,
         error_renderer=error_renderer,
-        get=wmts_handler,
+        get=wmts_rest_handler,
     )
