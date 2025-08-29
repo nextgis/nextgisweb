@@ -24,7 +24,7 @@ class WMSLink(ExternalAccessLink):
 
     @classmethod
     def url_factory(cls, obj, request) -> str:
-        return request.route_url("wmsserver.wms", id=obj.id)
+        return request.route_url("wmsserver.wms", id=obj.id, _query=dict(service="WMS"))
 
 
 class WMTSLink(ExternalAccessLink):
@@ -38,7 +38,7 @@ class WMTSLink(ExternalAccessLink):
 
     @classmethod
     def url_factory(cls, obj, request) -> str:
-        return request.route_url("wmsserver.wmts", id=obj.id)
+        return request.route_url("wmsserver.wms", id=obj.id, _query=dict(service="WMTS"))
 
 
 def setup_pyramid(comp, config):
