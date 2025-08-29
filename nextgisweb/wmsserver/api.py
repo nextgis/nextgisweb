@@ -688,7 +688,7 @@ def setup_pyramid(comp, config):
     )
 
     config.add_route(
-        "wmsserver.wmts",
+        "wmsserver.wmts_rest",
         "/api/resource/{id}/wms/1.0.0/WMTSCapabilities.xml",
         factory=service_factory,
         error_renderer=error_renderer,
