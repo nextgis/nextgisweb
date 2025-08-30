@@ -62,7 +62,10 @@ const ToolSwipe = observer(
                         });
                         return false;
                     } else {
-                        if (itemConfig.type !== "layer") {
+                        if (
+                            itemConfig.type !== "layer" &&
+                            itemConfig.type !== "group"
+                        ) {
                             modal.info({
                                 title: msg.invalidTypeTitle,
                                 content: msg.invalidTypeContent,
@@ -85,12 +88,21 @@ const ToolSwipe = observer(
         );
 
         const layers = useMemo(() => {
-            if (itemConfig && itemConfig.type === "layer") {
-                const l = map.layers[itemConfig.id]?.olLayer;
-                return l ? [l] : [];
+            if (itemConfig) {
+                if (itemConfig.type === "layer") {
+                    const l = map.layers[itemConfig.id]?.olLayer;
+                    return l ? [l] : [];
+                } else if (itemConfig.type === "group") {
+                    const desc = display.itemStore.getDescendants(
+                        itemConfig.id
+                    );
+                    return desc
+                        .map((d) => map.layers[d.id]?.olLayer)
+                        .filter(Boolean);
+                }
             }
             return [];
-        }, [itemConfig, map]);
+        }, [display.itemStore, itemConfig, map.layers]);
 
         const [active, setActive] = useState(false);
 
