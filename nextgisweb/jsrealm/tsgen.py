@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import re
 from datetime import datetime, time
+from importlib.metadata._itertools import unique_everseen
 from itertools import count
 from textwrap import indent
 from types import UnionType
@@ -21,7 +22,6 @@ from typing import (
     get_origin,
 )
 
-from importlib_metadata._itertools import unique_everseen
 from msgspec import UNSET, Struct, UnsetType, field
 from typing_extensions import Protocol
 
