@@ -365,9 +365,10 @@ class OAuthHelper:
 
     def sync_users(self):
         if not self.options["server.sync"]:
-            raise RuntimeError("Users synchronization not enabled.")
-        if self.options["server.type"] != "nextgisid":
-            return RuntimeError("OAuth server type not supported.")
+            raise OAuthSyncNotEnabled("OAuth user synchronization is not enabled")
+
+        if (st := self.options["server.type"]) != "nextgisid":
+            raise NotImplementedError(f"OAuth user synchronization is not implemented: {st}")
 
         params = dict(instance_guid=env.core.instance_id)
         s = self.options["client.id"] + ":" + self.options["client.secret"]
@@ -376,7 +377,7 @@ class OAuthHelper:
         data = self._server_request("sync", params, default_method="GET", access_token=token)
 
         if len(data) != 1:
-            raise RuntimeError("Only one NextGIS ID team expected, got %d." % len(data))
+            raise RuntimeError(f"Only one NextGIS ID team expected, got {len(data)} teams")
 
         subs = set()
         with DBSession.no_autoflush:
@@ -711,6 +712,10 @@ class OAuthATokenRefreshException(UserException):
 class OAuthAccessTokenExpiredException(UserException):
     title = gettext("OAuth access token is expired")
     http_status_code = 401
+
+
+class OAuthSyncNotEnabled(RuntimeError):
+    pass
 
 
 def _fallback_value(*args):

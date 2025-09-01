@@ -1,7 +1,9 @@
 from nextgisweb.env.cli import InTransactionCommand, arg, cli
+from nextgisweb.lib.logging import logger
 
 from .component import AuthComponent
 from .model import User
+from .oauth import OAuthSyncNotEnabled
 
 
 @cli.command()
@@ -44,4 +46,8 @@ def sync(
     *,
     auth: AuthComponent,
 ):
-    auth.oauth.sync_users()
+    try:
+        auth.oauth.sync_users()
+    except OAuthSyncNotEnabled as exc:
+        logger.warning(str(exc))
+        exit(1)
