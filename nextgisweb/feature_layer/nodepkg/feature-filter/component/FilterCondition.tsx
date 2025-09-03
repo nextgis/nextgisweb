@@ -31,6 +31,19 @@ interface FilterConditionProps {
     };
 }
 
+const getPlaceholder = (
+    condition: FilterConditionType,
+    defaultPlaceholder: string,
+    isValueInputDisabled: boolean
+): string => {
+    if (isValueInputDisabled) {
+        return condition.operator === "has"
+            ? gettext("Any value")
+            : gettext("No value");
+    }
+    return defaultPlaceholder;
+};
+
 export const FilterCondition = observer(
     ({ condition, store, dragHandleProps }: FilterConditionProps) => {
         const handleFieldChange = (field: string) => {
@@ -38,7 +51,17 @@ export const FilterCondition = observer(
         };
 
         const handleOperatorChange = (operator: string) => {
-            store.updateCondition(condition.id, { operator });
+            const updates: Partial<FilterConditionType> = { operator };
+
+            const wantsArray = ["in", "!in"].includes(operator);
+            const wantsNoValue = ["has", "!has"].includes(operator);
+            const isCurrentlyArray = Array.isArray(condition.value);
+
+            if (isCurrentlyArray && !wantsArray) updates.value = undefined;
+            if (wantsArray && !isCurrentlyArray) updates.value = [];
+            if (wantsNoValue) updates.value = undefined;
+
+            store.updateCondition(condition.id, updates);
         };
 
         const handleValueChange = (value: any) => {
@@ -58,18 +81,51 @@ export const FilterCondition = observer(
             );
         };
 
+        const isValueInputDisabled = ["has", "!has"].includes(
+            condition.operator
+        );
+
         const renderValueInput = () => {
             const field = store.fields.find(
                 (f) => f.keyname === condition.field
             );
-            if (!field)
+            if (!field) {
                 return (
                     <InputValue
-                        value={condition.value}
-                        onChange={handleValueChange}
-                        placeholder={gettext("Enter value")}
+                        value={gettext("Invalid field")}
+                        placeholder={gettext("Field not found")}
+                        disabled={true}
+                        status="error"
                     />
                 );
+            }
+
+            if (["in", "!in"].includes(condition.operator)) {
+                const numericTypes = ["INTEGER", "BIGINT", "REAL"];
+                const isNumeric =
+                    field && numericTypes.includes(field.datatype);
+
+                const handleTagChange = (values: string[]) => {
+                    let processedValues: (string | number)[] = values;
+                    if (isNumeric) {
+                        processedValues = values
+                            .map((val) => parseFloat(val))
+                            .filter((num) => !isNaN(num));
+                    }
+                    handleValueChange(processedValues);
+                };
+
+                return (
+                    <Select
+                        mode="tags"
+                        value={condition.value || []}
+                        onChange={handleTagChange}
+                        style={{ width: "100%" }}
+                        placeholder={gettext("Enter values and press Enter")}
+                        tokenSeparators={[","]}
+                    />
+                );
+            }
 
             switch (field.datatype) {
                 case "INTEGER":
@@ -77,7 +133,12 @@ export const FilterCondition = observer(
                         <InputInteger
                             value={condition.value}
                             onChange={handleValueChange}
-                            placeholder={gettext("Enter integer")}
+                            placeholder={getPlaceholder(
+                                condition,
+                                gettext("Enter integer"),
+                                isValueInputDisabled
+                            )}
+                            disabled={isValueInputDisabled}
                         />
                     );
                 case "BIGINT":
@@ -85,7 +146,12 @@ export const FilterCondition = observer(
                         <InputBigInteger
                             value={condition.value}
                             onChange={handleValueChange}
-                            placeholder={gettext("Enter big integer")}
+                            placeholder={getPlaceholder(
+                                condition,
+                                gettext("Enter big integer"),
+                                isValueInputDisabled
+                            )}
+                            disabled={isValueInputDisabled}
                         />
                     );
                 case "REAL":
@@ -94,7 +160,12 @@ export const FilterCondition = observer(
                             value={condition.value}
                             onChange={handleValueChange}
                             step={0.01}
-                            placeholder={gettext("Enter number")}
+                            placeholder={getPlaceholder(
+                                condition,
+                                gettext("Enter number"),
+                                isValueInputDisabled
+                            )}
+                            disabled={isValueInputDisabled}
                         />
                     );
                 case "DATE":
@@ -102,7 +173,12 @@ export const FilterCondition = observer(
                         <DatePicker
                             value={condition.value}
                             onChange={handleValueChange}
-                            placeholder={gettext("Select date")}
+                            placeholder={getPlaceholder(
+                                condition,
+                                gettext("Select date"),
+                                isValueInputDisabled
+                            )}
+                            disabled={isValueInputDisabled}
                         />
                     );
                 case "TIME":
@@ -110,7 +186,12 @@ export const FilterCondition = observer(
                         <TimePicker
                             value={condition.value}
                             onChange={handleValueChange}
-                            placeholder={gettext("Select time")}
+                            placeholder={getPlaceholder(
+                                condition,
+                                gettext("Select time"),
+                                isValueInputDisabled
+                            )}
+                            disabled={isValueInputDisabled}
                         />
                     );
                 case "DATETIME":
@@ -118,7 +199,12 @@ export const FilterCondition = observer(
                         <DateTimePicker
                             value={condition.value}
                             onChange={handleValueChange}
-                            placeholder={gettext("Select date and time")}
+                            placeholder={getPlaceholder(
+                                condition,
+                                gettext("Select date and time"),
+                                isValueInputDisabled
+                            )}
+                            disabled={isValueInputDisabled}
                         />
                     );
                 default:
@@ -126,7 +212,12 @@ export const FilterCondition = observer(
                         <InputValue
                             value={condition.value}
                             onChange={handleValueChange}
-                            placeholder={gettext("Enter value")}
+                            placeholder={getPlaceholder(
+                                condition,
+                                gettext("Enter value"),
+                                isValueInputDisabled
+                            )}
+                            disabled={isValueInputDisabled}
                         />
                     );
             }

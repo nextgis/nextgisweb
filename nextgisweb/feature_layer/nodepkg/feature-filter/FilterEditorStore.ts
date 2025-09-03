@@ -2,7 +2,7 @@ import { action, observable } from "mobx";
 
 import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
 
-import { ValidOperators } from "./type";
+import { OPERATORS, ValidOperators } from "./type";
 import type { FilterCondition, FilterGroup, MapLibreExpression } from "./type";
 
 export interface FilterEditorStoreOptions {
@@ -21,6 +21,7 @@ export class FilterEditorStore {
     @observable accessor activeTab: string = "constructor";
     @observable accessor jsonValue: string | undefined = undefined;
     @observable accessor isValid: boolean = true;
+    @observable accessor validationError: string | undefined = undefined;
 
     private transientIdCounter = 0;
 
@@ -30,6 +31,7 @@ export class FilterEditorStore {
             this.loadFilter(options.value);
         } else {
             this.filterState.id = this.generateTransientId();
+            this.validateCurrentState();
         }
     }
 
@@ -59,6 +61,7 @@ export class FilterEditorStore {
             if (this.jsonValue) {
                 try {
                     const parsedJson = JSON.parse(this.jsonValue);
+                    this.validateMapLibreExpression(parsedJson);
                     const newFilterState =
                         this.parseMapLibreExpression(parsedJson);
                     this.filterState = newFilterState;
@@ -83,6 +86,7 @@ export class FilterEditorStore {
     @action.bound
     setJsonValue(value: string | undefined) {
         this.jsonValue = value;
+        this.validateCurrentState();
     }
 
     @action.bound
@@ -100,6 +104,7 @@ export class FilterEditorStore {
         const group = this._findGroupById(this.filterState, groupId);
         if (group) {
             group.conditions.push(newCondition);
+            this.validateCurrentState();
         }
     }
 
@@ -117,12 +122,14 @@ export class FilterEditorStore {
         );
         if (parentGroup) {
             parentGroup.groups.push(newGroup);
+            this.validateCurrentState();
         }
     }
 
     @action.bound
     updateCondition(conditionId: number, updates: Partial<FilterCondition>) {
         this._updateConditionInTree(this.filterState, conditionId, updates);
+        this.validateCurrentState();
     }
 
     @action.bound
@@ -130,12 +137,14 @@ export class FilterEditorStore {
         const group = this._findGroupById(this.filterState, groupId);
         if (group) {
             group.operator = operator;
+            this.validateCurrentState();
         }
     }
 
     @action.bound
     deleteCondition(conditionId: number) {
         this._findAndRemoveCondition(this.filterState, conditionId);
+        this.validateCurrentState();
     }
 
     @action.bound
@@ -145,6 +154,7 @@ export class FilterEditorStore {
             return;
         }
         this._findAndRemoveGroup(this.filterState, groupId);
+        this.validateCurrentState();
     }
 
     @action.bound
@@ -178,6 +188,7 @@ export class FilterEditorStore {
         } else {
             targetGroup.conditions.push(conditionToMove);
         }
+        this.validateCurrentState();
     }
 
     @action.bound
@@ -210,12 +221,14 @@ export class FilterEditorStore {
         } else {
             targetGroup.groups.push(groupToMove);
         }
+        this.validateCurrentState();
     }
 
     @action.bound
     loadFilter(expression: any[]) {
         try {
             this.transientIdCounter = Date.now();
+            this.validateMapLibreExpression(expression);
             const filterState = this.parseMapLibreExpression(expression);
             this.filterState = filterState;
             this.isValid = true;
@@ -223,6 +236,8 @@ export class FilterEditorStore {
             console.error("Failed to parse filter expression:", error);
             this.activeTab = "json";
             this.isValid = false;
+            this.validationError =
+                error instanceof Error ? error.message : "Invalid filter value";
         }
         this.jsonValue = JSON.stringify(expression, null, 2);
     }
@@ -231,14 +246,19 @@ export class FilterEditorStore {
         if (this.activeTab === "json" && this.jsonValue) {
             try {
                 const parsed = JSON.parse(this.jsonValue);
+                this.validateMapLibreExpression(parsed);
                 this.isValid = true;
                 return parsed;
             } catch (_error) {
                 this.isValid = false;
-                throw new Error("Invalid JSON", { cause: _error });
+                throw new Error("Invalid JSON or filter structure", {
+                    cause: _error,
+                });
             }
         }
-        return this.convertToMapLibreExpression(this.filterState);
+        const expression = this.convertToMapLibreExpression(this.filterState);
+        this.validateMapLibreExpression(expression);
+        return expression;
     }
 
     private generateTransientId(): number {
@@ -362,9 +382,14 @@ export class FilterEditorStore {
 
     private parseConditionExpression(expression: any[]): FilterCondition {
         const [operator, fieldExpression, value] = expression;
+        console.log(operator, fieldExpression, value);
         let field = "";
         if (Array.isArray(fieldExpression) && fieldExpression[0] === "get") {
             field = fieldExpression[1];
+        } else if (operator === "has" || operator === "!has") {
+            if (Array.isArray(expression[1]) && expression[1][0] === "get") {
+                field = expression[1][1];
+            }
         }
         return { id: this.generateTransientId(), field, operator, value };
     }
@@ -376,18 +401,28 @@ export class FilterEditorStore {
 
         for (const condition of group.conditions) {
             if (condition.field) {
-                expressions.push([
-                    condition.operator,
-                    ["get", condition.field],
-                    condition.value,
-                ]);
+                if (
+                    condition.operator === "has" ||
+                    condition.operator === "!has"
+                ) {
+                    expressions.push([
+                        condition.operator,
+                        ["get", condition.field],
+                    ]);
+                } else {
+                    expressions.push([
+                        condition.operator,
+                        ["get", condition.field],
+                        condition.value,
+                    ]);
+                }
             }
         }
 
         for (const childGroup of group.groups) {
             const childExpression =
                 this.convertToMapLibreExpression(childGroup);
-            if (childExpression.length > 0) {
+            if (childExpression.length > 1) {
                 expressions.push(childExpression);
             }
         }
@@ -395,5 +430,129 @@ export class FilterEditorStore {
         if (expressions.length === 0) return [];
 
         return [group.operator, ...expressions];
+    }
+
+    @action.bound
+    private validateCurrentState() {
+        try {
+            if (this.activeTab === "json" && this.jsonValue) {
+                const parsed = JSON.parse(this.jsonValue);
+                this.validateMapLibreExpression(parsed);
+            } else {
+                const expression = this.convertToMapLibreExpression(
+                    this.filterState
+                );
+                this.validateMapLibreExpression(expression);
+            }
+            this.isValid = true;
+            this.validationError = undefined;
+        } catch (error) {
+            this.isValid = false;
+            this.validationError =
+                error instanceof Error ? error.message : "Validation failed";
+        }
+    }
+
+    private validateMapLibreExpression(expression: any[]): void {
+        if (!Array.isArray(expression)) {
+            throw new Error("Expression must be an array");
+        }
+
+        if (expression.length === 0) {
+            return;
+        }
+
+        const [operator, ...args] = expression;
+
+        if (operator === "all" || operator === "any") {
+            if (args.length === 0) {
+                throw new Error(
+                    "Group operator must have at least one argument"
+                );
+            }
+            for (const arg of args) {
+                if (!Array.isArray(arg)) {
+                    throw new Error(
+                        "All arguments to group operator must be arrays"
+                    );
+                }
+                this.validateMapLibreExpression(arg);
+            }
+            return;
+        }
+
+        if (this.isConditionExpression(expression)) {
+            this.validateConditionExpression(expression);
+            return;
+        }
+
+        throw new Error(`Unknown or invalid root operator: ${operator}`);
+    }
+
+    private validateConditionExpression(expression: any[]): void {
+        const [operator, fieldExpression, value] = expression;
+
+        if (!ValidOperators.includes(operator)) {
+            throw new Error(`Invalid operator: ${operator}`);
+        }
+
+        if (operator === "has" || operator === "!has") {
+            if (expression.length !== 2) {
+                throw new Error(
+                    `Operator '${operator}' expects 1 argument, but got ${expression.length - 1}`
+                );
+            }
+        } else {
+            if (expression.length !== 3) {
+                throw new Error(
+                    `Operator '${operator}' expects 2 arguments, but got ${expression.length - 1}`
+                );
+            }
+        }
+
+        if (!Array.isArray(fieldExpression) || fieldExpression[0] !== "get") {
+            throw new Error("Field expression must be ['get', fieldName]");
+        }
+
+        if (typeof fieldExpression[1] !== "string") {
+            throw new Error("Field name must be a string");
+        }
+
+        const fieldName = fieldExpression[1];
+        const field = this.fields.find((f) => f.keyname === fieldName);
+        if (!field) {
+            throw new Error(`Unknown field: ${fieldName}`);
+        }
+
+        const operatorOption = OPERATORS.find((op) => op.value === operator);
+        if (
+            operatorOption &&
+            !operatorOption.supportedTypes.includes(field.datatype)
+        ) {
+            throw new Error(
+                `Operator '${operator}' is not supported for field type '${field.datatype}'`
+            );
+        }
+
+        if (operator === "in" || operator === "!in") {
+            if (!Array.isArray(value)) {
+                throw new Error(
+                    `Value for operator '${operator}' must be an array.`
+                );
+            }
+        } else if (operator !== "has" && operator !== "!has") {
+            const valueType = typeof value;
+            const fieldType = field.datatype;
+            if (
+                (fieldType === "INTEGER" ||
+                    fieldType === "BIGINT" ||
+                    fieldType === "REAL") &&
+                valueType !== "number"
+            ) {
+                throw new Error(
+                    `Field '${fieldName}' expects a number, but got a ${valueType}.`
+                );
+            }
+        }
     }
 }

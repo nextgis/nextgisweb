@@ -30,6 +30,15 @@ export const FeatureFilterEditor = observer(
         }, [value, store]);
 
         const handleApply = () => {
+            if (!store.isValid) {
+                messageApi.error(
+                    gettext(
+                        "Filter is invalid. Please fix errors before applying."
+                    )
+                );
+                return;
+            }
+
             try {
                 const expression = store.toMapLibreExpression();
                 onChange?.(expression);
@@ -64,9 +73,24 @@ export const FeatureFilterEditor = observer(
                     items={items}
                 />
                 <div style={{ marginTop: "16px", textAlign: "right" }}>
-                    <Button type="primary" onClick={handleApply}>
+                    <Button
+                        type="primary"
+                        onClick={handleApply}
+                        disabled={!store.isValid}
+                    >
                         {msgApply}
                     </Button>
+                    {!store.isValid && store.validationError && (
+                        <div
+                            style={{
+                                marginTop: "8px",
+                                color: "#ff4d4f",
+                                fontSize: "12px",
+                            }}
+                        >
+                            {store.validationError}
+                        </div>
+                    )}
                 </div>
             </div>
         );
