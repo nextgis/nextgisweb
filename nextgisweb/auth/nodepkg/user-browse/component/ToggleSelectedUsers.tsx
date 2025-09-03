@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { Badge, Button } from "@nextgisweb/gui/antd";
+import { errorModal } from "@nextgisweb/gui/error";
 import type { ControlProps } from "@nextgisweb/gui/model-browse/ModelBrowse";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -36,8 +37,8 @@ export const ToggleSelectedUsers = ({
                     json,
                 });
                 toggledUsers.push(u);
-            } catch {
-                // ignore
+            } catch (err) {
+                errorModal(err);
             }
         }
         const newRows = [];
