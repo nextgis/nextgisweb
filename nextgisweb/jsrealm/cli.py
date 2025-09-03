@@ -189,6 +189,7 @@ def install(
 
     package_json["scripts"] = scripts = dict()
     scripts["build"] = "webpack --progress --config {}".format(webpack_root)
+    scripts["start"] = "webpack serve --progress --config {}".format(webpack_root)
     scripts["watch"] = "webpack --progress --watch --config {}".format(webpack_root)
 
     scripts["watch:types"] = "npx tsc --watch -p tsconfig.json"
