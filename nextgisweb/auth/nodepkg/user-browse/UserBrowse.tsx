@@ -1,5 +1,6 @@
 import { useCallback, useMemo } from "react";
 
+import settings from "@nextgisweb/auth/client-settings";
 import { AdministratorIcon, RegularUserIcon } from "@nextgisweb/auth/icon";
 import { Alert, Tooltip } from "@nextgisweb/gui/antd";
 import type { TableProps } from "@nextgisweb/gui/antd";
@@ -129,6 +130,8 @@ export function UserBrowse({ readonly }: UserBrowseProps) {
         []
     );
 
+    console.log("asrfgvasf", Number(settings?.user_limit?.local));
+
     return (
         <div className="ngw-auth-user-browse">
             <ModelBrowse
@@ -136,6 +139,7 @@ export function UserBrowse({ readonly }: UserBrowseProps) {
                 readonly={readonly}
                 columns={columns}
                 messages={messages}
+                showCreate={(settings?.user_limit?.local || 0) > 0}
                 collectionOptions={{ query: { brief: true } }}
                 collectionFilter={collectionFilter}
                 headerControls={(tmBtn && [() => tmBtn]) || []}

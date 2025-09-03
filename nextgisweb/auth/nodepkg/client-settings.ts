@@ -13,6 +13,10 @@ interface OAuth {
 export interface AuthSettings {
     alink: boolean;
     oauth: OAuth;
+    user_limit?: {
+        local?: number;
+        total?: number | null;
+    };
 }
 
 export default await fetchSettings<AuthSettings>(COMP_ID);
