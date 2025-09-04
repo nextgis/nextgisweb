@@ -14,39 +14,51 @@ msgstr "Субъект с наименованием '%s' уже существ�
 msgid "Password is not set."
 msgstr "Пароль не установлен."
 
-#: api.py:602
+#: api.py:210
+msgid "To disable the user '{dn}', remove them from the team."
+msgstr "Чтобы отключить пользователя '{dn}', исключите его из команды."
+
+#: api.py:212
+msgid "To enable the user '{dn}', add them to the team."
+msgstr "Чтобы включить пользователя '{dn}', добавьте его в команду."
+
+#: api.py:615
 msgid "User '%s' can't be a member of a group."
 msgstr "Пользователь '%s' не может быть участником группы."
 
-#: api.py:608
+#: api.py:622
 msgid "System principals can't be deleted."
 msgstr "Системные субъекты не могут быть удалены."
 
-#: api.py:623
+#: api.py:630
+msgid "To delete the user '{dn}', remove them from the team first."
+msgstr "Чтобы удалить пользователя '{dn}', сперва исключите его из команды."
+
+#: api.py:648
 msgid "User is referenced with resources"
 msgstr "Пользователь связан с ресурсами"
 
-#: api.py:625
+#: api.py:650
 msgid "Group is referenced with resources"
 msgstr "Группа связана с ресурсами"
 
-#: api.py:631
+#: api.py:656
 msgid "Administrator required"
 msgstr "Только для администраторов"
 
-#: api.py:632
+#: api.py:657
 msgid "The 'administrators' group must have at least one enabled member."
 msgstr "Группа 'administrators' должна иметь хотя бы одного включенного участника."
 
-#: component.py:50
+#: component.py:51
 msgid "Administrator"
 msgstr "Администратор"
 
-#: component.py:259
+#: component.py:261
 msgid "Maximum number of users is reached. Your current plan user number limit is %d."
 msgstr "Превышено максимальное количество пользователей. Лимит текущего плана - %d."
 
-#: component.py:274
+#: component.py:276
 msgid ""
 "Maximum number of local users is reached. Your current plan local user number"
 " limit is {}."
@@ -125,7 +137,7 @@ msgstr "Да"
 msgid "No"
 msgstr "Нет"
 
-#: nodepkg/group-widget/GroupWidget.tsx:41 view.py:327 view.py:416
+#: nodepkg/group-widget/GroupWidget.tsx:41 view.py:328 view.py:417
 msgid "Users"
 msgstr "Пользователи"
 
@@ -145,7 +157,7 @@ msgstr "Описание"
 msgid "Sign in with {}"
 msgstr "Войти через {}"
 
-#: nodepkg/login/LoginForm.tsx:22 view.py:59
+#: nodepkg/login/LoginForm.tsx:22 view.py:60
 msgid "Sign in to Web GIS"
 msgstr "Войти в Веб ГИС"
 
@@ -153,7 +165,7 @@ msgstr "Войти в Веб ГИС"
 msgid "Sign in"
 msgstr "Войти"
 
-#: nodepkg/login/LoginForm.tsx:38 nodepkg/settings-form/SettingsForm.tsx:52
+#: nodepkg/login/LoginForm.tsx:38 nodepkg/settings-form/SettingsForm.tsx:54
 #: nodepkg/user-browse/UserBrowse.tsx:25 nodepkg/user-widget/UserWidget.tsx:48
 msgid "Login"
 msgstr "Логин"
@@ -183,11 +195,11 @@ msgstr "Привязать аккаунт"
 msgid "Account not bound"
 msgstr "Аккаунт не привязан"
 
-#: nodepkg/settings-form/SettingsForm.tsx:60 nodepkg/user-widget/UserWidget.tsx:106
+#: nodepkg/settings-form/SettingsForm.tsx:62 nodepkg/user-widget/UserWidget.tsx:106
 msgid "Language"
 msgstr "Язык"
 
-#: nodepkg/settings-form/SettingsForm.tsx:76
+#: nodepkg/settings-form/SettingsForm.tsx:78
 msgid "Saved"
 msgstr "Сохранено"
 
@@ -252,7 +264,7 @@ msgstr "Для изменения пароля заполните это пол�
 msgid "Authorization link"
 msgstr "Авторизация по ссылке"
 
-#: nodepkg/user-widget/UserWidget.tsx:89 view.py:358 view.py:422
+#: nodepkg/user-widget/UserWidget.tsx:89 view.py:359 view.py:423
 msgid "Groups"
 msgstr "Группы"
 
@@ -287,11 +299,11 @@ msgstr "Сгенерированная ссылка будет доступна 
 msgid "{name} only"
 msgstr "Только {name}"
 
-#: oauth.py:323
+#: oauth.py:326
 msgid "{} binding error"
 msgstr "Ошибка привязки {}"
 
-#: oauth.py:324
+#: oauth.py:328
 msgid ""
 "This {dn} account ({sub}) is already bound to the different user ({id}). Log "
 "in using this account instead of binding it."
@@ -299,27 +311,27 @@ msgstr ""
 "Этот аккаунт {dn} ({sub}) уже привязан к другому пользователю ({id}). Войдите"
 " с использованием этого аккаунта вместо привязки."
 
-#: oauth.py:639
+#: oauth.py:688
 msgid "OAuth authorization error"
 msgstr "Ошибка авторизации OAuth"
 
-#: oauth.py:644
+#: oauth.py:693
 msgid "Invalid OAuth token"
 msgstr "Некорректный токен OAuth"
 
-#: oauth.py:649
+#: oauth.py:698
 msgid "Invalid OAuth scope"
 msgstr "Некорректный скоуп OAuth"
 
-#: oauth.py:654
+#: oauth.py:703
 msgid "OAuth password grant type failed"
 msgstr "Не удалось получить доступ по паролю OAuth"
 
-#: oauth.py:659
+#: oauth.py:708
 msgid "OAuth token refresh failed"
 msgstr "Не удалось выполнить обновление токена OAuth"
 
-#: oauth.py:664
+#: oauth.py:713
 msgid "OAuth access token is expired"
 msgstr "Срок действия токена OAuth истек"
 
@@ -331,27 +343,27 @@ msgstr "Просмотр"
 msgid "Manage"
 msgstr "Управление"
 
-#: permission.py:39 view.py:412
+#: permission.py:39 view.py:413
 msgid "Groups and users"
 msgstr "Группы и пользователи"
 
-#: view.py:72
+#: view.py:73
 msgid "Invitation session"
 msgstr "Сессия по приглашению"
 
-#: view.py:89
+#: view.py:90
 msgid "Session not found."
 msgstr "Сессия не найдена."
 
-#: view.py:93
+#: view.py:94
 msgid "Invalid 'expires' parameter."
 msgstr "Некорректный параметр 'expires'."
 
-#: view.py:95
+#: view.py:96
 msgid "Session expired."
 msgstr "Сессия устарела."
 
-#: view.py:114
+#: view.py:116
 msgid ""
 "Failed to authenticate using the given authorization link. Please check the "
 "link and contact the administrator."
@@ -359,15 +371,15 @@ msgstr ""
 "Не удалось выполнить авторизацию с использованием указанной авторизационной "
 "ссылки. Пожалуйста, проверьте ссылку и свяжитесь с администратором."
 
-#: view.py:125
+#: view.py:126
 msgid "Usage of authorization link is forbidden for administrators."
 msgstr "Использование авторизационных ссылок запрещено для администраторов."
 
-#: view.py:164
+#: view.py:165
 msgid "Team membership required"
 msgstr "Необходимо участие в команде"
 
-#: view.py:165
+#: view.py:167
 msgid ""
 "You are not a member of this Web GIS team. Contact Web GIS administrator and "
 "ask to be added to the team."
@@ -375,14 +387,14 @@ msgstr ""
 "Вы не являетесь участником команды этой Веб ГИС. Свяжитесь с администратором "
 "Веб ГИС для добавления в команду."
 
-#: view.py:319
+#: view.py:320
 msgid "User settings"
 msgstr "Настройки пользователя"
 
-#: view.py:337
+#: view.py:338
 msgid "Create new user"
 msgstr "Создать нового пользователя"
 
-#: view.py:369
+#: view.py:370
 msgid "Create new group"
 msgstr "Создать новую группу"

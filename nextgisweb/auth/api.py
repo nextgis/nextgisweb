@@ -9,7 +9,7 @@ from pyramid.request import Request
 from pyramid.security import forget
 from sqlalchemy.orm import aliased, undefer
 
-from nextgisweb.env import DBSession, gettext, inject
+from nextgisweb.env import DBSession, gettext, gettextf, inject
 from nextgisweb.lib.apitype import (
     OP,
     AnyOf,
@@ -200,13 +200,26 @@ def deserialize_principal(
         obj.persist()
         DBSession.flush()
 
-    if is_user and not obj.disabled:
-        if create or "disabled" in updated:
-            auth.check_user_limit(obj.id)
-        if obj.password_hash is not None and (
-            create or "password" in updated or "disabled" in updated
+    if is_user:
+        if (
+            auth.options["oauth.server.sync"]
+            and obj.oauth_subject is not None
+            and "disabled" in updated
         ):
-            auth.check_user_limit_local(obj.id)
+            msgf = (
+                gettextf("To disable the user '{dn}', remove them from the team.")
+                if obj.disabled
+                else gettextf("To enable the user '{dn}', add them to the team.")
+            )
+            raise ValidationError(msgf(dn=obj.display_name))
+
+        if not obj.disabled:
+            if create or "disabled" in updated:
+                auth.check_user_limit(obj.id)
+            if obj.password_hash is not None and (
+                create or "password" in updated or "disabled" in updated
+            ):
+                auth.check_user_limit_local(obj.id)
 
     return updated
 
@@ -603,9 +616,21 @@ def validate_members(obj, members):
         raise ValidationError(message=m % user.display_name)
 
 
-def check_principal_delete(obj):
+@inject()
+def check_principal_delete(obj, *, auth: AuthComponent):
     if obj.system:
         raise ValidationError(message=gettext("System principals can't be deleted."))
+    if (
+        isinstance(obj, User)
+        and auth.options["oauth.server.sync"]
+        and obj.oauth_subject is not None
+        and not obj.disabled
+    ):
+        raise ValidationError(
+            gettextf("To delete the user '{dn}', remove them from the team first.")(
+                dn=obj.display_name
+            )
+        )
     check_principal_references(obj)
 
 
