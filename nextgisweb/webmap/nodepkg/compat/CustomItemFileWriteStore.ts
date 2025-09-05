@@ -187,10 +187,12 @@ export class CustomItemFileWriteStore extends EventEmitter {
             if (options.onComplete) {
                 options.onComplete(results);
             }
+            return results;
         } catch (err) {
             if (options.onError) {
                 options.onError(err as Error);
             }
+            return [];
         }
     }
 
@@ -318,6 +320,23 @@ export class CustomItemFileWriteStore extends EventEmitter {
         }
 
         return obj as StoreItemConfig;
+    }
+
+    getDescendants(parentId: number): CustomStoreItem[] {
+        const descendants: CustomStoreItem[] = [];
+        const queue = [...this.getChildren(parentId)];
+
+        for (let i = 0; i < queue.length; i++) {
+            const node = queue[i];
+            descendants.push(node);
+
+            const children = this.getChildren(node.id);
+            if (children.length) {
+                queue.push(...children);
+            }
+        }
+
+        return descendants;
     }
 
     private getChildren(parentId: number): CustomStoreItem[] {

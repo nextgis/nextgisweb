@@ -11,6 +11,7 @@ import { layoutStore } from "@nextgisweb/pyramid/layout";
 import topic from "@nextgisweb/webmap/compat/topic";
 import type {
     DisplayConfig,
+    GroupItemConfig,
     LayerItemConfig,
     MidConfig,
 } from "@nextgisweb/webmap/type/api";
@@ -41,7 +42,7 @@ import type {
     Mid,
     TinyConfig,
 } from "../type";
-import type { TreeItemConfig } from "../type/TreeItems";
+import type { TreeChildrenItemConfig, TreeItemConfig } from "../type/TreeItems";
 import { setURLParam } from "../utils/URL";
 import { normalizeExtent } from "../utils/normalizeExtent";
 
@@ -97,7 +98,10 @@ export class Display {
     private _itemStoreDeferred: LoggedDeferred;
 
     @observable.shallow accessor item: StoreItem | null = null;
-    @observable.shallow accessor itemConfig: LayerItemConfig | null = null;
+    @observable.shallow accessor itemConfig:
+        | GroupItemConfig
+        | LayerItemConfig
+        | null = null;
 
     @observable.ref accessor isMobile = false;
 
@@ -587,7 +591,7 @@ export class Display {
 
     // FEATURE
     @action
-    setItemConfig(itemConfig: LayerItemConfig | null) {
+    setItemConfig(itemConfig: TreeChildrenItemConfig | null) {
         this.itemConfig = itemConfig;
     }
     @action
@@ -611,11 +615,15 @@ export class Display {
         this.itemStore.fetchItemByIdentity({
             identity: itemId,
             onItem: (item) => {
-                this.setItemConfig(
-                    this._itemConfigById[itemId] as LayerItemConfig
-                );
-
-                this.setItem(item as StoreItem);
+                if (item) {
+                    const itemConfig = this._itemConfigById[itemId];
+                    this.setItemConfig(
+                        itemConfig.type !== "root" ? itemConfig : null
+                    );
+                } else {
+                    this.setItemConfig(null);
+                }
+                this.setItem(item);
             },
         });
     }
