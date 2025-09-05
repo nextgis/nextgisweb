@@ -1,4 +1,4 @@
-import { action, observable } from "mobx";
+import { action, computed, observable } from "mobx";
 import { Feature } from "ol";
 import type { Control } from "ol/control";
 import type { Extent } from "ol/extent";
@@ -6,13 +6,9 @@ import type { Geometry } from "ol/geom";
 import { fromLonLat, transformExtent } from "ol/proj";
 
 import { errorModal } from "@nextgisweb/gui/error";
-import { assert } from "@nextgisweb/jsrealm/error";
-import { appendTo } from "@nextgisweb/pyramid/company-logo";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { layoutStore } from "@nextgisweb/pyramid/layout";
 import topic from "@nextgisweb/webmap/compat/topic";
-import { buildControls } from "@nextgisweb/webmap/map-controls";
-import MapToolbar from "@nextgisweb/webmap/map-toolbar";
 import type {
     DisplayConfig,
     LayerItemConfig,
@@ -31,19 +27,17 @@ import { LoggedDeferred } from "../compat/LoggedDeferred";
 import type { StoreGroupConfig, StoreItemConfig } from "../compat/type";
 import { entrypointsLoader } from "../compat/util/entrypointLoader";
 import { FeatureHighlighter } from "../feature-highlighter/FeatureHighlighter";
-import { Identify } from "../map-controls/tool/Identify";
 import MapStatesObserver from "../map-state-observer";
 import type { MapStatesObserver as IMapStatesObserver } from "../map-state-observer/MapStatesObserver";
 import { MapStore } from "../ol/MapStore";
 import type { PanelStore } from "../panel";
 import { PanelManager } from "../panel/PanelManager";
 import type { PluginBase } from "../plugin/PluginBase";
-import WebmapStore from "../store";
+import { Identify, WebmapStore } from "../store";
 import type {
     DisplayURLParams,
     Entrypoint,
     MapPlugin,
-    MapRefs,
     Mid,
     TinyConfig,
 } from "../type";
@@ -65,19 +59,19 @@ export class Display {
     tiny?: boolean;
 
     readonly map: MapStore;
-    mapNode?: HTMLElement;
+    // mapNode?: HTMLElement;
     private _extent: Extent;
     private _extentConst: Extent | null;
     private readonly _layerOrder: number[] = []; // Layers from back to front
 
+    identify: Identify;
     itemStore: CustomItemFileWriteStore;
     webmapStore: WebmapStore;
     tabsManager: WebMapTabsStore;
     panelManager: PanelManager;
     mapStates: IMapStatesObserver;
-    mapToolbar?: MapToolbar;
+    // mapToolbar?: MapToolbar;
 
-    identify?: Identify;
     featureHighlighter: FeatureHighlighter;
     readonly plugins: Record<string, PluginBase> = {};
     readonly _adapters: Record<string, LayerDisplayAdapter> = {};
@@ -101,12 +95,6 @@ export class Display {
     private _postCreateDeferred: LoggedDeferred;
     private _startupDeferred: LoggedDeferred;
     private _itemStoreDeferred: LoggedDeferred;
-
-    // UI Control Panes
-    leftTopControlPane?: HTMLElement;
-    leftBottomControlPane?: HTMLElement;
-    rightTopControlPane?: HTMLElement;
-    rightBottomControlPane?: HTMLElement;
 
     @observable.shallow accessor item: StoreItem | null = null;
     @observable.shallow accessor itemConfig: LayerItemConfig | null = null;
@@ -155,8 +143,11 @@ export class Display {
         this.map = new MapStore({
             logo: false,
             controls: [],
+            initialExtent: this._extent,
             extent: this._extentConst || undefined,
+            measureSrsId: this.config.measureSrsId,
         });
+        this.identify = new Identify({ display: this });
 
         this.featureHighlighter = new FeatureHighlighter(this.map);
 
@@ -227,18 +218,7 @@ export class Display {
             }
         );
     }
-    startup({
-        target,
-        leftTopControlPane,
-        leftBottomControlPane,
-        rightTopControlPane,
-        rightBottomControlPane,
-    }: MapRefs) {
-        this.mapNode = target;
-        this.leftTopControlPane = leftTopControlPane;
-        this.leftBottomControlPane = leftBottomControlPane;
-        this.rightTopControlPane = rightTopControlPane;
-        this.rightBottomControlPane = rightBottomControlPane;
+    startup() {
         this._hideNavMenuForGuest();
         this._startupDeferred.resolve(true);
         this._postCreate();
@@ -256,48 +236,22 @@ export class Display {
 
     @action
     _mapSetup() {
-        assert(this.mapNode);
-
-        this.mapToolbar = new MapToolbar({
-            display: this,
-            target: this.leftBottomControlPane,
-        });
-
-        this.map.startup(this.mapNode).then(() => {
-            this.setMapReady(true);
-        });
-
-        const controlsReady = buildControls(this);
-
-        if (controlsReady.has("id")) {
-            const controlObj = controlsReady.get("id");
-            if (
-                controlObj &&
-                controlObj.control &&
-                controlObj.control instanceof Identify
-            ) {
-                this.identify = controlObj.control;
-                this.mapStates.addState("identifying", this.identify);
-                this.mapStates.setDefaultState("identifying", true);
-                this._identifyFeatureByAttrValue();
-            }
-        }
+        this._identifyFeatureByAttrValue();
 
         topic.publish("/webmap/tools/initialized", true);
 
-        appendTo(this.mapNode);
         this.mapDeferred.resolve(true);
     }
 
-    @action
-    private setMapReady(status: boolean) {
+    @action.bound
+    setMapReady(status: boolean) {
         this.mapReady = status;
     }
 
-    _mapAddControls(controls: Control[]) {
-        controls.forEach((control) => {
-            this.map?.olMap.addControl(control);
-        });
+    _mapAddControls(_controls: Control[]) {
+        // controls.forEach((control) => {
+        //     this.map?.olMap.addControl(control);
+        // });
     }
     _mapAddLayer(id: number) {
         const layer = this.webmapStore.getLayer(id);
@@ -570,11 +524,11 @@ export class Display {
         plugins: Record<string, MapPlugin | { default: MapPlugin }>
     ) {
         Object.keys(plugins).forEach((key) => {
-            if (this.isTinyMode() && !this.isTinyModePlugin(key)) {
+            if (this.isTinyMode && !this.isTinyModePlugin(key)) {
                 return;
             }
 
-            if (this.isTinyMode() && !this.isTinyModePlugin(key)) {
+            if (this.isTinyMode && !this.isTinyModePlugin(key)) {
                 return;
             }
 
@@ -699,8 +653,8 @@ export class Display {
     }
 
     //  UI
-
-    isTinyMode() {
+    @computed
+    get isTinyMode() {
         return this.tinyConfig !== undefined;
     }
 
@@ -719,7 +673,7 @@ export class Display {
         };
 
         let allowPanels;
-        if (this.isTinyMode()) {
+        if (this.isTinyMode) {
             allowPanels = this.urlParams.panels || [];
         }
 

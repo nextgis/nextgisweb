@@ -101,7 +101,7 @@ const runExport = ({
 
 interface PrintMapExportProps {
     mapSettings: PrintMapSettings;
-    printMapEl?: HTMLElement;
+    printMapEl?: HTMLElement | null;
     display: Display;
 }
 
