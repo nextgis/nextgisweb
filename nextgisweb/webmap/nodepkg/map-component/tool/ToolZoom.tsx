@@ -17,13 +17,13 @@ export default function ToolZoom({ out = false, ...rest }: ToolZoomProps) {
     const { mapStore } = useMapContext();
     const interactionRef = useRef<DragZoom | null>(null);
 
+    const { targetElement, olMap } = mapStore;
     const title = useMemo(
         () => (out ? gettext("Zoom out") : gettext("Zoom in")),
         [out]
     );
 
     useEffect(() => {
-        const olMap = mapStore.olMap;
         const dz = new DragZoom({ condition: always, out });
         dz.setActive(false);
         olMap.addInteraction(dz);
@@ -35,20 +35,20 @@ export default function ToolZoom({ out = false, ...rest }: ToolZoomProps) {
                 olMap.removeInteraction(dz);
             } finally {
                 interactionRef.current = null;
-                const el = olMap.getTargetElement?.();
+                const el = targetElement;
                 if (el) {
                     el.style.cursor = "auto";
                 }
             }
         };
-    }, [mapStore, out]);
+    }, [olMap, targetElement, out]);
 
     const setActive = useCallback(
         (active: boolean) => {
             const dz = interactionRef.current;
             if (!dz) return;
             dz.setActive(active);
-            const el = mapStore.olMap.getTargetElement?.();
+            const el = targetElement;
             if (el)
                 el.style.cursor = active
                     ? out
@@ -56,7 +56,7 @@ export default function ToolZoom({ out = false, ...rest }: ToolZoomProps) {
                         : "zoom-in"
                     : "auto";
         },
-        [mapStore, out]
+        [targetElement, out]
     );
 
     return (

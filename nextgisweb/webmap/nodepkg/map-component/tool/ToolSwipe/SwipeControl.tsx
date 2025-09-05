@@ -33,6 +33,7 @@ export default function SwipeControl({
     onRotateRequest,
 }: SwipeControlProps) {
     const { mapStore } = useMapContext();
+    const { olMap, targetElement } = mapStore;
 
     const [position, setPosition] = useState(positionProp);
     const [orientation, setOrientation] =
@@ -53,14 +54,14 @@ export default function SwipeControl({
 
         const control = new Control({ element: el });
         controlRef.current = control;
-        mapStore.olMap.addControl(control);
+        olMap.addControl(control);
 
         return () => {
-            mapStore.olMap.removeControl(control);
+            olMap.removeControl(control);
             controlRef.current = null;
             setElement(null);
         };
-    }, [className, mapStore.olMap]);
+    }, [className, olMap]);
 
     useEffect(() => {
         const updateControlStyle = () => {
@@ -81,15 +82,15 @@ export default function SwipeControl({
             }
         };
         updateControlStyle();
-        mapStore.olMap.render();
-    }, [position, orientation, isReversed, mapStore.olMap, element]);
+        olMap.render();
+    }, [position, orientation, isReversed, olMap, element]);
 
     useEffect(() => {
         precomposeRef.current = (e: RenderEvent) => {
             precompose(e, { orientation, isReversed, position });
         };
-        mapStore.olMap.render();
-    }, [orientation, isReversed, position, mapStore.olMap]);
+        olMap.render();
+    }, [orientation, isReversed, position, olMap]);
 
     useEffect(() => {
         const pre = (e: RenderEvent) => precomposeRef.current?.(e);
@@ -98,16 +99,16 @@ export default function SwipeControl({
             layer.on("prerender", pre);
             layer.on("postrender", postcompose);
         });
-        mapStore.olMap.render();
+        olMap.render();
 
         return () => {
             layers.forEach((layer) => {
                 layer.un("prerender", pre);
                 layer.un("postrender", postcompose);
             });
-            mapStore.olMap.render();
+            olMap.render();
         };
-    }, [layers, mapStore.olMap]);
+    }, [layers, olMap]);
 
     useEffect(() => {
         const onMouseDown = (e: MouseEvent) => {
@@ -118,10 +119,9 @@ export default function SwipeControl({
 
         const onMouseMove = (e: MouseEvent) => {
             if (!isDragging) return;
-            const mapElement = mapStore.olMap.getTargetElement();
-            if (!mapElement) return;
+            if (!targetElement) return;
 
-            const rect = mapElement.getBoundingClientRect();
+            const rect = targetElement.getBoundingClientRect();
             let next: number;
             if (orientation === "vertical") {
                 const pageX = e.clientX - rect.left;
@@ -146,7 +146,7 @@ export default function SwipeControl({
             window.removeEventListener("mousemove", onMouseMove);
             window.removeEventListener("mouseup", onMouseUp);
         };
-    }, [element, isDragging, mapStore.olMap, orientation]);
+    }, [element, isDragging, targetElement, orientation]);
 
     const onToggleRotate = useCallback(() => {
         const states: Array<{ orientation: Orientation; isReversed: boolean }> =

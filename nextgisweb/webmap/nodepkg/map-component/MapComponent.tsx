@@ -66,7 +66,7 @@ export const MapComponent = observer(
                     observer = new ResizeObserver(() => {
                         mapStore.updateSize();
                     });
-                    observer.observe(mapStore.getTargetElement());
+                    observer.observe(target);
                 });
             }
 

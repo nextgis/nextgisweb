@@ -70,14 +70,14 @@ export class MapStore extends Watchable<MapWatchableProps> {
 
     private readonly initialExtent?: Extent;
 
-    readonly olMap: OlMap;
+    @observable.ref accessor olMap: OlMap;
     @observable.ref accessor olView: View;
 
     @observable.ref accessor ready = false;
 
     @observable.shallow accessor layers: Layers = {};
 
-    @observable.shallow accessor baseLayer: CoreLayer | null = null;
+    @observable.ref accessor baseLayer: CoreLayer | null = null;
     @observable.ref accessor resolution: number | null = null;
     @observable.struct accessor center: number[] | null = null;
     @observable.ref accessor zoom: number | null = null;
@@ -450,8 +450,12 @@ export class MapStore extends Watchable<MapWatchableProps> {
         this.panelControl.removeControl(control);
     }
 
-    getTargetElement() {
-        return this.olMap.getTargetElement();
+    @computed
+    get targetElement() {
+        if (this.ready) {
+            return this.olMap.getTargetElement();
+        }
+        return null;
     }
 
     updateSize() {

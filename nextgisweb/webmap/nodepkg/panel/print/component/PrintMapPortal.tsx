@@ -35,7 +35,7 @@ export function PrintMapPortal({
     const [isMount, setIsMount] = useState(false);
 
     useEffect(() => {
-        const mapEl = display.map.getTargetElement();
+        const mapEl = display.map.targetElement;
         assert(mapEl, "Map target element is not available");
         mapElRef.current = mapEl;
 
@@ -67,7 +67,7 @@ export function PrintMapPortal({
             setIsMount(false);
             setRef(ref, null);
         };
-    }, [display, ref]);
+    }, [display, display.map.targetElement, ref]);
 
     if (!isMount || !containerRef.current) {
         return null;

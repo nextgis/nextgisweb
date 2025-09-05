@@ -3,7 +3,7 @@ import type { MapEvent } from "ol";
 import type { ViewStateLayerStateExtent } from "ol/View";
 import { equals } from "ol/array";
 import { toPromise } from "ol/functions";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect,  useState } from "react";
 import type React from "react";
 
 import { Modal } from "@nextgisweb/gui/antd";
@@ -22,6 +22,16 @@ export interface AttributionControlProps extends MapControlProps {
     expandClassName?: string;
     attributions?: string | string[];
     smallBreakpointPx?: number;
+}
+
+function AttributionList({ items }: { items: string[] }) {
+    return (
+        <ul>
+            {items.map((html, i) => (
+                <li key={i} dangerouslySetInnerHTML={{ __html: html }} />
+            ))}
+        </ul>
+    );
 }
 
 export default function AttributionControl({
@@ -44,9 +54,9 @@ export default function AttributionControl({
 
     useEffect(() => {
         const map = mapStore.olMap;
-        if (!map) return;
+        if (!map || !mapStore.targetElement) return;
 
-        const container = map.getTargetElement();
+        const container = mapStore.targetElement;
 
         const ro = new ResizeObserver((entries) => {
             const w = entries[0]?.contentRect?.width ?? container!.clientWidth;
@@ -59,7 +69,7 @@ export default function AttributionControl({
         return () => {
             ro.disconnect();
         };
-    }, [mapStore, smallBreakpointPx]);
+    }, [mapStore, mapStore.targetElement, smallBreakpointPx]);
 
     const collectSourceAttributions = useCallback(
         (frameState: ViewStateLayerStateExtent) => {
@@ -119,17 +129,6 @@ export default function AttributionControl({
         };
     }, [mapStore, update]);
 
-    const AttributionList = useMemo(
-        () => (
-            <ul>
-                {items.map((html, i) => (
-                    <li key={i} dangerouslySetInnerHTML={{ __html: html }} />
-                ))}
-            </ul>
-        ),
-        [items]
-    );
-
     const onClickInfo = useCallback(() => {
         if (!isSmall) return;
         modal.info({
@@ -139,11 +138,11 @@ export default function AttributionControl({
                     <div style={{ fontWeight: 600, marginBottom: 8 }}>
                         {tipLabel}
                     </div>
-                    {AttributionList}
+                    <AttributionList items={items} />
                 </div>
             ),
         });
-    }, [isSmall, modal, tipLabel, AttributionList]);
+    }, [isSmall, modal, tipLabel, items]);
 
     return (
         <MapControl {...mapControlProps}>
@@ -167,7 +166,7 @@ export default function AttributionControl({
                         {label}
                     </div>
                 ) : (
-                    AttributionList
+                    <AttributionList items={items} />
                 )}
             </div>
         </MapControl>
