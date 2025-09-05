@@ -2,6 +2,7 @@ import { observer } from "mobx-react-lite";
 import type { Options as OlRotateOptions } from "ol/control/Rotate";
 import { easeOut } from "ol/easing";
 import { useCallback, useMemo } from "react";
+import type React from "react";
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
@@ -14,20 +15,23 @@ import NorthIcon from "@nextgisweb/icon/material/arrow_upward";
 
 import "./RotateControl.less";
 
-type RotateControlOptions = Pick<
-    OlRotateOptions,
-    "tipLabel" | "duration" | "autoHide"
->;
+interface RotateControlOptions
+    extends Pick<OlRotateOptions, "tipLabel" | "duration" | "autoHide"> {
+    style?: React.CSSProperties;
+    className?: string;
+}
 
 export type RotateControlProps = ControlProps<RotateControlOptions>;
 
 const RotateControl = observer(
     ({
         order,
+        style,
         position,
         tipLabel = gettext("Reset rotation"),
         duration = 250,
         autoHide = true,
+        className,
     }: RotateControlProps) => {
         const { mapStore } = useMapContext();
         const { rotation } = mapStore;
@@ -70,6 +74,8 @@ const RotateControl = observer(
                 position={position}
                 order={order}
                 title={tipLabel}
+                style={style}
+                className={className}
             >
                 <span
                     className="ol-compass"

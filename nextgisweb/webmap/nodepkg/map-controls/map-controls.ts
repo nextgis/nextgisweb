@@ -1,10 +1,7 @@
 /** @plugin */
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import {
-    mapControlRegistry,
-    olControlRegistry,
-} from "@nextgisweb/webmap/display/component/map-panel/registry";
+import { mapControlRegistry } from "@nextgisweb/webmap/display/component/map-panel/registry";
 
 mapControlRegistry(COMP_ID, {
     key: "at",
@@ -62,19 +59,14 @@ mapControlRegistry(COMP_ID, {
     component: () => import("../map-component/control/InfoScaleControl"),
 });
 
-olControlRegistry(COMP_ID, {
+mapControlRegistry(COMP_ID, {
     key: "sl",
     order: 20,
     label: gettext("Scale line"),
+    props: { scaleOptions: { minWidth: 48 } },
     position: { inside: "attribution-toolbar" },
     embeddedShowMode: "customize",
-    ctor: () =>
-        import("ol/control/ScaleLine").then(
-            (mod) =>
-                new mod.default({
-                    minWidth: 48,
-                })
-        ),
+    component: () => import("../map-component/control/ScaleLineControl"),
 });
 
 mapControlRegistry(COMP_ID, {

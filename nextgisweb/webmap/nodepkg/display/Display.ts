@@ -452,28 +452,21 @@ export class Display {
         const data = this._itemConfigById[store.getValue(item, "id")];
         if (data.type === "layer") {
             const adapter = this._adapters[data.adapter];
-            const metersPerUnit = this.map.olMap
-                .getView()
-                .getProjection()
-                .getMetersPerUnit();
-            if (metersPerUnit !== undefined) {
-                if (data.maxScaleDenom !== null) {
-                    const minResolution = this.map.getResolutionForScale(
-                        data.maxScaleDenom,
-                        metersPerUnit
-                    );
-                    if (minResolution !== undefined) {
-                        data.minResolution = minResolution;
-                    }
+
+            if (data.maxScaleDenom !== null) {
+                const minResolution = this.map.resolutionForScale(
+                    data.maxScaleDenom
+                );
+                if (minResolution !== undefined) {
+                    data.minResolution = minResolution;
                 }
-                if (data.minScaleDenom !== null) {
-                    const maxResolution = this.map.getResolutionForScale(
-                        data.minScaleDenom,
-                        metersPerUnit
-                    );
-                    if (maxResolution !== undefined) {
-                        data.maxResolution = maxResolution;
-                    }
+            }
+            if (data.minScaleDenom !== null) {
+                const maxResolution = this.map.resolutionForScale(
+                    data.minScaleDenom
+                );
+                if (maxResolution !== undefined) {
+                    data.maxResolution = maxResolution;
                 }
             }
 

@@ -30,8 +30,8 @@ export type TargetPosition = ControlPosition | { inside: string };
 
 export interface ControlContainerOptions {
     target?: string;
-    classPrefix?: string;
     mapStore?: MapStore;
+    classPrefix?: string;
 }
 
 type PendingItem = { element: HTMLElement; order: number };

@@ -1,18 +1,11 @@
 import { action, observable } from "mobx";
 
-import type { TreeWebmapItem } from "../layers-tree/LayersTree";
+import type { LegendRndCoords, PrintMapSettings, RndCoords } from "../type";
+import { mmToPx } from "../utils";
 
-import type {
-    LegendRndCoords,
-    PrintMapPaper,
-    PrintMapSettings,
-    RndCoords,
-} from "./type";
-import { mmToPx } from "./utils";
+export class PrintLayoutStore {
+    defaultMargin = 10;
 
-const DEFAULT_MARGIN = 10;
-
-class PrintMapStore {
     @observable.shallow accessor legendCoords: LegendRndCoords = {
         x: 0,
         y: 0,
@@ -38,25 +31,36 @@ class PrintMapStore {
         displayed: false,
     };
 
-    @observable.shallow accessor printMapPaper: PrintMapPaper | null = null;
-
-    @observable.shallow accessor webMapItems: TreeWebmapItem[] = [];
-
     @action
-    setWebMapItems(webMapItems: TreeWebmapItem[]) {
-        this.webMapItems = webMapItems;
+    updateCoordinates(
+        type: "legendCoords" | "titleCoords" | "mapCoords",
+        coords: RndCoords | LegendRndCoords
+    ) {
+        if (type === "legendCoords") {
+            this.legendCoords = coords as LegendRndCoords;
+        } else {
+            this[type] = coords;
+        }
     }
 
     @action
-    makeLayout(settings: PrintMapSettings) {
-        const {
-            width,
-            height,
-            margin = 0,
-            legend,
-            legendColumns,
-            title,
-        } = settings;
+    updateColumnsCount(legendColumns: number) {
+        this.legendCoords = { ...this.legendCoords, legendColumns };
+    }
+
+    @action
+    makeLayout({
+        width,
+        title,
+        height,
+        margin = 0,
+        legend,
+        legendColumns,
+    }: Pick<
+        PrintMapSettings,
+        "width" | "height" | "margin" | "legend" | "legendColumns" | "title"
+    >) {
+        const defMargin = this.defaultMargin;
 
         const widthPx = Math.round(mmToPx(width - margin * 2));
         const heightPx = Math.round(mmToPx(height - margin * 2));
@@ -81,7 +85,7 @@ class PrintMapStore {
                 legendColumns,
             };
         } else if (isPortrait) {
-            const legendHeight = Math.ceil(heightPx / 4) + DEFAULT_MARGIN;
+            const legendHeight = Math.ceil(heightPx / 4) + defMargin;
             this.legendCoords = {
                 x: 0,
                 y: heightPx - legendHeight,
@@ -91,13 +95,11 @@ class PrintMapStore {
                 legendColumns,
             };
         } else {
-            const legendWidth = Math.ceil(widthPx / 4) + DEFAULT_MARGIN;
+            const legendWidth = Math.ceil(widthPx / 4) + defMargin;
             this.legendCoords = {
                 x: widthPx - legendWidth,
-                y: title ? titleHeight + DEFAULT_MARGIN : 0,
-                height: title
-                    ? heightPx - titleHeight - DEFAULT_MARGIN
-                    : heightPx,
+                y: title ? titleHeight + defMargin : 0,
+                height: title ? heightPx - titleHeight - defMargin : heightPx,
                 width: legendWidth,
                 displayed: true,
                 legendColumns,
@@ -106,41 +108,23 @@ class PrintMapStore {
 
         let widthMap = widthPx;
         if (legend && !isPortrait) {
-            widthMap = widthPx - this.legendCoords.width - DEFAULT_MARGIN;
+            widthMap = widthPx - this.legendCoords.width - defMargin;
         }
 
         let heightMap = heightPx;
         if (title) {
-            heightMap = heightPx - (this.titleCoords.height + DEFAULT_MARGIN);
+            heightMap = heightPx - (this.titleCoords.height + defMargin);
         }
         if (legend && isPortrait) {
-            heightMap = heightMap - (this.legendCoords.height + DEFAULT_MARGIN);
+            heightMap = heightMap - (this.legendCoords.height + defMargin);
         }
 
         this.mapCoords = {
             x: 0,
-            y: title ? titleHeight + DEFAULT_MARGIN : 0,
+            y: title ? titleHeight + defMargin : 0,
             width: widthMap,
             height: heightMap,
             displayed: true,
         };
     }
-    @action
-    updateCoordinates(
-        type: "legendCoords" | "titleCoords" | "mapCoords",
-        coords: RndCoords | LegendRndCoords
-    ) {
-        if (type === "legendCoords") {
-            this.legendCoords = coords as LegendRndCoords;
-        } else {
-            this[type] = coords;
-        }
-    }
-
-    @action
-    updateColumnsCount(legendColumns: number) {
-        this.legendCoords = { ...this.legendCoords, legendColumns };
-    }
 }
-
-export const printMapStore = new PrintMapStore();

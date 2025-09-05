@@ -1,75 +1,45 @@
 import { observer } from "mobx-react-lite";
-import type { Coordinate } from "ol/coordinate";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { Space } from "@nextgisweb/gui/antd";
 import { CopyToClipboardButton } from "@nextgisweb/gui/buttons";
-import { useObjectState } from "@nextgisweb/gui/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import { PrintMapStore } from "@nextgisweb/webmap/print-map/store";
 
-import type { PrintMapSettings } from "../../print-map/type";
 import { PanelContainer, PanelSection } from "../component";
 import type { PanelPluginWidgetProps } from "../registry";
 
 import PrintMapExport from "./PrintMapExport";
 import { PrintElementsSettings } from "./component/PrintElementsSettings";
-import { PrintMapPortal } from "./component/PrintMapLayout";
+import { PrintMapPortal } from "./component/PrintMapPortal";
 import { PrintPaperSettings } from "./component/PrintPaperSettings";
 import { PrintScaleSettings } from "./component/PrintScaleSettings";
-import {
-    defaultPanelMapSettings,
-    getPrintMapLink,
-    getPrintUrlSettings,
-} from "./util";
+import { getPrintMapLink, getPrintUrlSettings } from "./util";
 
 import { ShareAltOutlined } from "@ant-design/icons";
 
 import "./PrintPanel.less";
 
-let isCenterFromUrlRead = false;
-const getCenterUrlSettings = (): Coordinate | null => {
-    if (isCenterFromUrlRead) return null;
-
-    const urlSettings = getPrintUrlSettings();
-    isCenterFromUrlRead = true;
-
-    return urlSettings.center || null;
-};
-
 const PrintPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
     const mapInit = useRef(false);
-
+    const [printMapStore] = useState(
+        () =>
+            new PrintMapStore({
+                titleText: display.config.webmapTitle,
+                initCenter: getPrintUrlSettings().center,
+            })
+    );
     const printMapEl = useRef<HTMLDivElement | null>(null);
 
     const { close, title, visible } = store;
 
-    const [zoom, setZoom] = useState<number>();
-    const [center, setCenter] = useState<Coordinate>();
-    const [printMapScale, setPrintMapScale] = useState<number>();
+    const { center, scale } = printMapStore;
 
-    const mapPositionRef = useRef({ center, zoom });
+    const mapPositionRef = useRef({ center, scale });
 
     useEffect(() => {
-        mapPositionRef.current = { center, zoom };
-    }, [center, zoom]);
-
-    const [mapSettings, setMapSettings] = useObjectState<PrintMapSettings>(() =>
-        defaultPanelMapSettings(display.config.webmapTitle)
-    );
-
-    const updateMapSettings = useCallback(
-        (updateSettings: Partial<PrintMapSettings>) => {
-            setMapSettings((old) => ({ ...old, ...updateSettings }));
-        },
-        [setMapSettings]
-    );
-
-    const getCenterFromUrl = useCallback((): Coordinate | null => {
-        if (mapInit.current) {
-            return null;
-        }
-        return getCenterUrlSettings();
-    }, []);
+        mapPositionRef.current = { center, scale };
+    }, [center, scale]);
 
     const show = useCallback(() => {
         if (!mapInit.current) {
@@ -81,9 +51,13 @@ const PrintPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
         if (mapInit.current) {
             // Sync the main map's view with last print preview position before closing
             const mainMapView = display.map.olMap.getView();
-            mainMapView.setCenter(mapPositionRef.current.center);
-            if (mapPositionRef.current.zoom) {
-                mainMapView.setZoom(mapPositionRef.current.zoom);
+            if (mapPositionRef.current.center) {
+                mainMapView.setCenter(mapPositionRef.current.center);
+            }
+            if (mapPositionRef.current.scale) {
+                mainMapView.setResolution(
+                    display.map.resolutionForScale(mapPositionRef.current.scale)
+                );
             }
 
             mapInit.current = false;
@@ -91,8 +65,8 @@ const PrintPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
     }, [display]);
 
     const getTextToCopy = useCallback(() => {
-        return getPrintMapLink(mapSettings);
-    }, [mapSettings]);
+        return getPrintMapLink(printMapStore);
+    }, [printMapStore]);
 
     useEffect(() => {
         if (visible) {
@@ -102,53 +76,34 @@ const PrintPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
         }
     }, [hide, show, visible]);
 
-    useEffect(() => {
-        if (!center) {
-            return;
-        }
-        updateMapSettings({ center });
-    }, [center, updateMapSettings]);
-
     return (
         <>
             {visible && (
                 <PrintMapPortal
                     ref={printMapEl}
                     display={display}
-                    settings={mapSettings}
-                    onZoomChange={setZoom}
-                    onScaleChange={setPrintMapScale}
-                    onCenterChange={setCenter}
-                    getCenterFromUrl={getCenterFromUrl}
+                    printMapStore={printMapStore}
                 />
             )}
             <PanelContainer title={title} close={close}>
                 <PanelSection flex>
                     <PrintPaperSettings
                         display={display}
-                        mapSettings={mapSettings}
-                        updateMapSettings={updateMapSettings}
+                        printMapStore={printMapStore}
                     />
                 </PanelSection>
 
                 <PanelSection title={gettext("Elements")} flex>
-                    <PrintElementsSettings
-                        mapSettings={mapSettings}
-                        updateMapSettings={updateMapSettings}
-                    />
+                    <PrintElementsSettings printMapStore={printMapStore} />
                 </PanelSection>
 
                 <PanelSection title={gettext("Scale")} flex>
-                    <PrintScaleSettings
-                        printMapScale={printMapScale}
-                        mapSettings={mapSettings}
-                        updateMapSettings={updateMapSettings}
-                    />
+                    <PrintScaleSettings printMapStore={printMapStore} />
                     <Space.Compact>
                         <PrintMapExport
                             display={display}
-                            mapSettings={mapSettings}
                             printMapEl={printMapEl.current}
+                            printMapStore={printMapStore}
                         />
                         <CopyToClipboardButton
                             type="default"

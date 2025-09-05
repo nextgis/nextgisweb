@@ -58,7 +58,6 @@ mapControlRegistry(COMP_ID, {
     position: { inside: "map-toolbar" },
     embeddedShowMode: "customize",
 });
-
 mapControlRegistry(COMP_ID, {
     key: "ed",
     order: 100,

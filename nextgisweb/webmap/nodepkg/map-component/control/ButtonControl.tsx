@@ -11,6 +11,7 @@ interface ButtonControlOptions extends CreateControlOptions {
     disabled?: boolean;
     children?: ReactNode;
     title?: string;
+    btnStyle?: React.CSSProperties;
     onClick?: () => void | Promise<void>;
 }
 
@@ -21,6 +22,7 @@ export function ButtonControl({
     title,
     style,
     margin = true,
+    btnStyle,
     children,
     disabled,
     className,
@@ -34,8 +36,9 @@ export function ButtonControl({
 
     return (
         <MapControl
-            margin={margin}
             bar={bar}
+            style={style}
+            margin={margin}
             className={classNames(
                 "ol-unselectable",
                 "mapadapter-btn-ctrl",
@@ -44,12 +47,12 @@ export function ButtonControl({
             {...rest}
         >
             <button
-                style={style}
                 title={title}
                 disabled={disabled}
-                className={classNames("custom-button-control", className)}
+                className={classNames("custom-button-control")}
                 aria-label={title}
                 onClick={onBtnClick}
+                style={btnStyle}
             >
                 {children === 0 ? "0" : children}
             </button>

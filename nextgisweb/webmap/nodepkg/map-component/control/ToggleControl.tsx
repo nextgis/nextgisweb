@@ -59,7 +59,7 @@ export function ToggleControl({
             {...rest}
             title={btnTitle}
             className={classNames(className, getVal(statusClassName, value))}
-            style={btnStyle}
+            btnStyle={btnStyle}
             onClick={toggle}
         >
             {children}

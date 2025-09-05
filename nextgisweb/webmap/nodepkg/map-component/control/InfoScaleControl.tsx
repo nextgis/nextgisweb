@@ -1,44 +1,37 @@
-import { useEffect, useState } from "react";
+import { observer } from "mobx-react-lite";
+import type React from "react";
+
+import { formatScaleNumber } from "@nextgisweb/webmap/panel/print/util";
 
 import { useMapContext } from "../context/useMapContext";
 
 import { MapControl } from "./MapControl";
 import type { MapControlProps } from "./MapControl";
 
-export default function InfoScaleControl(props: MapControlProps) {
-    const { mapStore } = useMapContext();
-    const [scale, setScale] = useState<number | null>(null);
-
-    useEffect(() => {
-        const updateScale = (val: number | null) => {
-            if (val === null) return;
-            const view = mapStore.olMap.getView();
-            const projection = view.getProjection();
-            const mpu = projection?.getMetersPerUnit?.() ?? 1;
-            setScale(Math.round(mapStore.getScaleForResolution(val, mpu)));
-        };
-
-        const unsubscribe = mapStore.watch(
-            "resolution",
-            (_attr, _oldVal, newVal) => {
-                updateScale(newVal);
-            }
-        );
-        const view = mapStore.olMap.getView();
-        updateScale(view.getResolution() || null);
-        return () => {
-            if (unsubscribe) unsubscribe();
-        };
-    }, [mapStore]);
-
-    return (
-        <MapControl {...props}>
-            <span
-                className="ol-control ol-scaleInfo ol-unselectable"
-                style={{ whiteSpace: "nowrap" }}
-            >
-                {scale ? `1 : ${scale}` : ""}
-            </span>
-        </MapControl>
-    );
+export interface InfoScaleControlProps extends MapControlProps {
+    renderNumber?: (val: number) => React.ReactNode;
 }
+
+const InfoScaleControl = observer(
+    ({ renderNumber, ...props }: InfoScaleControlProps) => {
+        const { mapStore } = useMapContext();
+        const { scale } = mapStore;
+
+        return (
+            <MapControl {...props}>
+                <span
+                    className="ol-control ol-scaleInfo ol-unselectable"
+                    style={{ whiteSpace: "nowrap" }}
+                >
+                    {scale
+                        ? `1 : ${renderNumber ? renderNumber(scale) : formatScaleNumber(scale)}`
+                        : ""}
+                </span>
+            </MapControl>
+        );
+    }
+);
+
+InfoScaleControl.displayName = "InfoScaleControl";
+
+export default InfoScaleControl;

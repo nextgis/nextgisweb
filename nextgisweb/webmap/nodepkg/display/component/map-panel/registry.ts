@@ -6,7 +6,7 @@ import { pluginRegistry } from "@nextgisweb/jsrealm/plugin";
 import type { ImportCallback } from "@nextgisweb/jsrealm/plugin";
 import type { TargetPosition } from "@nextgisweb/webmap/control-container/ControlContainer";
 import type { ControlProps } from "@nextgisweb/webmap/map-component";
-import type { MapControlProps } from "@nextgisweb/webmap/map-component/control/OlControl";
+import type { OlControlProps } from "@nextgisweb/webmap/map-component/control/OlControl";
 
 export type MapControlPluginWidget<P> = ImportCallback<FC<ControlProps<P>>>;
 
@@ -37,7 +37,7 @@ export async function olControlRegistry<T extends Control>(
         key,
         ctor,
         ...props
-    }: Omit<MapControlPlugin, "component" | "props"> & MapControlProps<T>
+    }: Omit<MapControlPlugin, "component" | "props"> & OlControlProps<T>
 ) {
     mapControlRegistry(compId, {
         key,

@@ -61,7 +61,6 @@ export const MapPane = observer(
                 className="ngw-webmap-display-map-pane"
                 mapStore={display.map}
                 style={themeVariables}
-                basemap={false}
                 whenCreated={whenCreated}
             >
                 {lazyControls.map(({ key, LazyControl, props }) => (
