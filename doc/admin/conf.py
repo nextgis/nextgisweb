@@ -1,18 +1,17 @@
+templates_path = ["_template"]
+exclude_patterns = ["_build"]
 
-templates_path = ['_template']
-exclude_patterns = ['_build']
+source_suffix = ".rst"
+master_doc = "toc"
 
-source_suffix = '.rst'
-master_doc = 'toc'
+project = "nextgisweb"
+copyright = "2014-2020, NextGIS"
 
-project = u'nextgisweb'
-copyright = u'2014-2020, NextGIS'
+version = "2"
+release = "2"
 
-version = '2'
-release = '2'
+language = "en"
 
-language = 'en'
-
-pygments_style = 'sphinx'
+pygments_style = "sphinx"
 
 # -- Options for HTML output ----------------------------------------------

@@ -1,8 +1,8 @@
 import os
 import os.path
 import re
-from datetime import timedelta, timezone
 from datetime import datetime as dt
+from datetime import timedelta, timezone
 from operator import itemgetter
 from pathlib import Path
 from shutil import copyfileobj
@@ -143,7 +143,8 @@ class FileStorageComponent(Component):
                 stat = os.stat(fullfn)
 
                 if obj is None and (
-                    utcnow_naive() - dt.fromtimestamp(stat.st_ctime, tz=timezone.utc).replace(tzinfo=None)
+                    utcnow_naive()
+                    - dt.fromtimestamp(stat.st_ctime, tz=timezone.utc).replace(tzinfo=None)
                     > delta
                 ):
                     if not dry_run:
