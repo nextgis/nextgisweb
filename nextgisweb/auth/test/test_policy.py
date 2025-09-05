@@ -6,16 +6,7 @@ from freezegun import freeze_time
 
 from .. import User
 
-
-@pytest.fixture(scope="module", autouse=True)
-def disable_oauth(ngw_env):
-    auth = ngw_env.auth
-
-    prev_helper = auth.oauth
-    with auth.options.override({"oauth.enabled": False}):
-        auth.oauth = None
-        yield
-    auth.oauth = prev_helper
+pytestmark = pytest.mark.usefixtures("disable_oauth")
 
 
 def test_fixture(ngw_webtest_app, ngw_auth_administrator):

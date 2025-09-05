@@ -277,6 +277,12 @@ class AuthComponent(Component):
                     ).format(limit)
                 )
 
+    def healthcheck(self):
+        if self.oauth is not None:
+            if error_message := self.oauth.auth_form_check():
+                return dict(success=False, message=f"OAuth code request failed: {error_message}.")
+        return dict(success=True)
+
     def maintenance(self):
         with transaction.manager:
             if self.options["oauth.server.sync"]:
