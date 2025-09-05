@@ -12,6 +12,7 @@ import requests
 import sqlalchemy as sa
 import zope.event
 from passlib.hash import sha256_crypt
+from pyramid.threadlocal import get_current_request
 from requests.exceptions import InvalidJSONError
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.orm import defer, joinedload, load_only
@@ -406,6 +407,21 @@ class OAuthHelper:
                 user.disabled = True
 
         env.auth.check_user_limit()
+
+    def auth_form_check(self) -> str | None:
+        request = get_current_request()
+        oauth_url = request.route_url("auth.oauth")
+        ac_url = self.authorization_code_url(oauth_url)
+
+        response = requests.get(
+            ac_url,
+            allow_redirects=False,
+            timeout=self.options["timeout"].total_seconds(),
+            verify=not self.options["server.insecure"],
+        )
+
+        if response.status_code != 302:
+            return f"Invalid response code: {response.status_code}."
 
     def _server_request(self, endpoint, params, *, default_method="POST", access_token=None):
         url = self.options["server.{}_endpoint".format(endpoint)]

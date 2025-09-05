@@ -22,7 +22,7 @@ def test_pkg_version(webtest):
     webtest.get("/api/component/pyramid/pkg_version")
 
 
-def test_healthcheck(webtest):
+def test_healthcheck(webtest, disable_oauth):
     webtest.get("/api/component/pyramid/healthcheck")
 
 

@@ -20,3 +20,14 @@ def ngw_auth_administrator(ngw_pyramid_config):
 
     with patch.object(policy, "_authenticate_request", _policy_authenticate):
         yield
+
+
+@pytest.fixture()
+def disable_oauth(ngw_env):
+    auth = ngw_env.auth
+
+    prev_helper = auth.oauth
+    with auth.options.override({"oauth.enabled": False}):
+        auth.oauth = None
+        yield
+    auth.oauth = prev_helper
