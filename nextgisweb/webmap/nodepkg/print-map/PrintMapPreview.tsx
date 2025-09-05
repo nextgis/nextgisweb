@@ -15,6 +15,7 @@ import type { Display } from "../display";
 import type { AnnotationsPopup } from "../layer/annotations/AnnotationsPopup";
 import { MapComponent } from "../map-component";
 import RotateControl from "../map-component/control/RotateControl";
+import { GraticuleLayer } from "../map-component/layer/GraticuleLayer";
 import { MapStore } from "../ol/MapStore";
 
 import { PrintScaleToolbar } from "./PrintScaleToolar";
@@ -51,6 +52,7 @@ export const PrintMapPreview = observer(
             width,
             height,
             margin,
+            graticule,
             scaleLine,
             scaleValue,
             initCenter,
@@ -201,6 +203,7 @@ export const PrintMapPreview = observer(
                         style={{ borderRadius: "50px" }}
                     />
                 )}
+                {graticule && <GraticuleLayer showLabels />}
                 <PrintScaleToolbar
                     scaleLine={scaleLine}
                     scaleValue={scaleValue}

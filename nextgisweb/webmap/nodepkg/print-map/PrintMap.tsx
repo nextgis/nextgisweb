@@ -11,21 +11,6 @@ import "./PrintMap.less";
 
 export const PrintMap = observer<PrintMapProps>(
     ({ display, printMapStore }) => {
-        // const {
-        //     width,
-        //     height,
-        //     margin,
-        //     legend,
-        //     legendColumns,
-        //     title,
-        //     titleText,
-        // } = settings;
-
-        // const settingsRef = useRef({ ...settings });
-        // useEffect(() => {
-        //     settingsRef.current = { ...settings };
-        // }, [settings]);
-
         const {
             width,
             height,

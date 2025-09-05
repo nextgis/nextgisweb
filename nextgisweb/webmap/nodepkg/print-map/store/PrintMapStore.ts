@@ -21,6 +21,7 @@ export class PrintMapStore implements PrintMapSettings {
     @observable.ref accessor titleText = "";
     @observable.ref accessor scaleValue = false;
     @observable.ref accessor legendColumns = 1;
+    @observable.ref accessor graticule = false;
 
     @observable.shallow accessor center: Coordinate | undefined = undefined;
     @observable.shallow accessor initCenter: Coordinate | undefined = undefined;

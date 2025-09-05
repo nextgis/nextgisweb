@@ -70,6 +70,16 @@ export const PrintElementsSettings = observer<PrintElementsSettingsProps>(
                         {gettext("North Arrow")}
                     </span>
                 </div>
+                <div className="input-group">
+                    <Switch
+                        size="small"
+                        checked={printMapStore.graticule}
+                        onChange={(v) => printMapStore.update({ graticule: v })}
+                    />
+                    <span className="checkbox__label">
+                        {gettext("Graticule")}
+                    </span>
+                </div>
             </>
         );
     }

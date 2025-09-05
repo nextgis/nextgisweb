@@ -40,15 +40,16 @@ export interface PrintMapPaper {
 }
 
 export interface PrintMapSettings extends PrintMapPaper {
+    scale?: number;
+    arrow: boolean;
+    title?: boolean;
+    legend: boolean;
+    graticule?: boolean;
+    center?: Coordinate | null;
+    titleText?: string;
     scaleLine: boolean;
     scaleValue: boolean;
-    arrow: boolean;
-    legend: boolean;
     legendColumns: number;
-    center?: Coordinate | null;
-    title?: boolean;
-    titleText?: string;
-    scale?: number;
 }
 
 export interface PrintMapProps {
