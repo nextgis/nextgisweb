@@ -1,3 +1,4 @@
+import { debounce } from "lodash-es";
 import { observer } from "mobx-react-lite";
 import { Collection } from "ol";
 import type { Feature as OlFeature } from "ol";
@@ -23,8 +24,10 @@ import Style from "ol/style/Style";
 import type { StyleFunction } from "ol/style/Style";
 import { useEffect, useRef, useState, useTransition } from "react";
 
+import type { FeatureItem } from "@nextgisweb/feature-layer/type";
 import { errorModal } from "@nextgisweb/gui/error";
 import { useShowModal } from "@nextgisweb/gui/index";
+import { route } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { useDisplayContext } from "@nextgisweb/webmap/display/context";
 
@@ -59,6 +62,11 @@ export const EditableItem = observer(
         const { olMap } = map;
         const { lazyModal, modalStore, modalHolder } = useShowModal();
         const { makeSignal } = useAbortController();
+
+        const editingModeRef = useRef(editingMode);
+        useEffect(() => {
+            editingModeRef.current = editingMode;
+        }, [editingMode]);
 
         const [isLoading, startTransition] = useTransition();
 
@@ -149,28 +157,67 @@ export const EditableItem = observer(
                 ...selectOptions,
             });
 
-            // FIXME: For unnown reason the `select` event executet two times in row
-            const onSelect = (ev: SelectEvent) => {
+            const onSelect = async (ev: SelectEvent) => {
                 const feature = ev.selected[0];
 
                 if (feature) {
-                    feature.set("deleted", true);
-                    // source.removeFeature(feature);
-
-                    onUndoActionAddRef.current?.(() => {
-                        feature.set("deleted", false);
-                        if (!source.hasFeature(feature)) {
-                            // source.addFeature(feature);
+                    if (
+                        editingModeRef.current ===
+                        EDITING_STATES.ATTRIBUTE_EDITING
+                    ) {
+                        let featureItem: FeatureItem =
+                            feature.get("attribution");
+                        const featureId: number = feature.get("id");
+                        if (!featureItem && typeof featureId === "number") {
+                            featureItem = await route(
+                                "feature_layer.feature.item",
+                                {
+                                    id: resourceId,
+                                    fid: featureId,
+                                }
+                            ).get<FeatureItem>({
+                                signal: makeSignal(),
+                                query: { dt_format: "iso" },
+                            });
                         }
-                        select.getFeatures().clear();
-                        hoverSelect.getFeatures().clear();
-                    });
+
+                        lazyModal(
+                            () =>
+                                import(
+                                    "@nextgisweb/feature-layer/feature-editor-modal"
+                                ),
+                            {
+                                skipDirtyCheck: true,
+                                editorOptions: {
+                                    mode: "return",
+                                    showGeometryTab: false,
+                                    resourceId,
+                                    featureItem,
+                                    onOk: (_, item) => {
+                                        feature.set("attribution", item);
+                                    },
+                                },
+                            }
+                        );
+                    } else {
+                        feature.set("deleted", true);
+
+                        onUndoActionAddRef.current?.(() => {
+                            feature.set("deleted", false);
+
+                            select.getFeatures().clear();
+                            hoverSelect.getFeatures().clear();
+                        });
+                    }
                     select.getFeatures().clear();
                     hoverSelect.getFeatures().clear();
                 }
             };
 
-            select.on("select", onSelect);
+            // FIXME: For unnown reason the `select` event executet two times in row
+            const onSelectDebounced = debounce(onSelect, 10);
+
+            select.on("select", onSelectDebounced);
 
             hoverSelect.on("select", (e) => {
                 if (isDragging) return;
@@ -196,7 +243,6 @@ export const EditableItem = observer(
             });
 
             draw.on("drawend", (e) => {
-                e.feature.set("layer_id", resourceId);
                 lazyModal(
                     () =>
                         import(
@@ -208,8 +254,8 @@ export const EditableItem = observer(
                             mode: "return",
                             showGeometryTab: false,
                             resourceId,
-                            onOk: (value) => {
-                                e.feature.set("attribution", value);
+                            onOk: (_, item) => {
+                                e.feature.set("attribution", item);
                                 onUndoActionAddRef.current?.(() => {
                                     source.removeFeature(e.feature);
                                 });
@@ -238,10 +284,7 @@ export const EditableItem = observer(
             const preModify = new WeakMap<OlFeature<Geometry>, Geometry>();
 
             const onModifyStart = (e: ModifyEvent) => {
-                const feats = (e.features ?? features) as Collection<
-                    OlFeature<Geometry>
-                >;
-                feats.forEach((f) => {
+                e.features.forEach((f) => {
                     const g = f.getGeometry();
                     if (g) {
                         preModify.set(f, g.clone());
@@ -249,10 +292,7 @@ export const EditableItem = observer(
                 });
             };
             const onModifyEnd = (e: ModifyEvent) => {
-                const feats = (e.features ?? features) as Collection<
-                    OlFeature<Geometry>
-                >;
-                feats.forEach((f) => {
+                e.features.forEach((f) => {
                     const before = preModify.get(f);
                     if (!before) return;
 
@@ -319,7 +359,7 @@ export const EditableItem = observer(
             };
 
             return () => {
-                select.un("select", onSelect);
+                select.un("select", onSelectDebounced);
 
                 setInteractions((prev) => {
                     if (prev) {
@@ -367,6 +407,10 @@ export const EditableItem = observer(
                 case EDITING_STATES.MOVING:
                     interactions.get("hoverSelect")?.setActive(true);
                     interactions.get("move")?.setActive(true);
+                    break;
+                case EDITING_STATES.ATTRIBUTE_EDITING:
+                    interactions.get("select")?.setActive(true);
+                    interactions.get("hoverSelect")?.setActive(true);
                     break;
                 case EDITING_STATES.DELETING:
                     interactions.get("select")?.setActive(true);

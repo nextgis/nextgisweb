@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Spin } from "@nextgisweb/gui/antd";
 import { errorModal } from "@nextgisweb/gui/error";
+import { useUnsavedChanges } from "@nextgisweb/gui/hook";
 import { DeleteIcon, EditIcon } from "@nextgisweb/gui/icon";
 import { useShowModal } from "@nextgisweb/gui/index";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -26,6 +27,7 @@ import { setItemsEditable } from "./util/setItemsEditable";
 import { LoadingOutlined } from "@ant-design/icons";
 import type { IconComponent } from "@nextgisweb/icon/index";
 import CreateIcon from "@nextgisweb/icon/material/add_box";
+import AttributeIcon from "@nextgisweb/icon/material/docs";
 import SnapIcon from "@nextgisweb/icon/material/join";
 import ExitIcon from "@nextgisweb/icon/material/logout";
 import MoveIcon from "@nextgisweb/icon/material/open_with";
@@ -33,11 +35,16 @@ import UndoIcon from "@nextgisweb/icon/material/undo";
 
 type ToolEditorProps = MapControlProps & { groupId: string };
 
-const modes: [string, IconComponent][] = [
-    [EDITING_STATES.MODIFYING, EditIcon],
-    [EDITING_STATES.MOVING, MoveIcon],
-    [EDITING_STATES.CREATING, CreateIcon],
-    [EDITING_STATES.DELETING, DeleteIcon],
+const modes: [mode: string, IconComponent, title: string][] = [
+    [EDITING_STATES.MODIFYING, EditIcon, gettext("Modifying")],
+    [EDITING_STATES.MOVING, MoveIcon, gettext("Moving")],
+    [EDITING_STATES.CREATING, CreateIcon, gettext("Creating")],
+    [EDITING_STATES.DELETING, DeleteIcon, gettext("Deleting")],
+    [
+        EDITING_STATES.ATTRIBUTE_EDITING,
+        AttributeIcon,
+        gettext("Attribute editing"),
+    ],
 ];
 
 const ToolEditor = observer(
@@ -184,11 +191,27 @@ const ToolEditor = observer(
             });
         }, [selectedInTreeItem?.id]);
 
+        const dirty = useMemo(() => {
+            for (const actions of undoActions.values()) {
+                if (actions.length > 0) return true;
+            }
+            return false;
+        }, [undoActions]);
+
+        useUnsavedChanges({ dirty });
+
         if (!editableItems.length) {
             return null;
         }
         return (
-            <>
+            <MapToolbarControl
+                order={order}
+                position={position}
+                margin
+                direction="vertical"
+                gap={2}
+                id="editor-toolbar"
+            >
                 {modalHolder}
                 {editableItems.map(({ id, layerId }) => (
                     <EditableItem
@@ -214,22 +237,16 @@ const ToolEditor = observer(
                 {editableItems.find(
                     (item) => item.id === selectedInTreeItem?.id
                 ) && (
-                    <MapToolbarControl
-                        order={order}
-                        position={position}
-                        margin
-                        direction="vertical"
-                        gap={2}
-                        id="editor-toolbar"
-                    >
+                    <>
                         <ToggleGroup
                             onChange={onChange}
                             value={activeMode}
                             nonEmpty
                         >
-                            {modes.map(([groupId, Icon], i) => (
+                            {modes.map(([groupId, Icon, title], i) => (
                                 <ToggleControl
                                     key={groupId}
+                                    title={title}
                                     groupId={groupId}
                                     order={i}
                                 >
@@ -289,9 +306,9 @@ const ToolEditor = observer(
                                 <UndoIcon />
                             </ButtonControl>
                         )}
-                    </MapToolbarControl>
+                    </>
                 )}
-            </>
+            </MapToolbarControl>
         );
     }
 );

@@ -99,20 +99,20 @@ function getFeaturesToSave({
 
         let featureToSave: Partial<FeatureToSave> | undefined = undefined;
 
+        const attribution = feature.get("attribution") || {};
         if (isNew) {
-            const attribution = feature.get("attribution") || {};
             featureToSave = { ...attribution };
         } else if (isModified || isDeleted) {
-            featureToSave = { id: feature.get("id") };
+            featureToSave = { ...attribution, id: feature.get("id") };
         }
 
         if (featureToSave) {
-            featureToSave.geom = wkt.writeGeometry(feature.getGeometry()!);
+            const geom = wkt.writeGeometry(feature.getGeometry()!);
 
             if (isDeleted) {
-                featuresToDelete.push(featureToSave as FeatureToSave);
+                featuresToDelete.push({ ...featureToSave, geom });
             } else {
-                featuresToPatch.push(featureToSave as FeatureToSave);
+                featuresToPatch.push({ ...featureToSave, geom });
             }
         }
     });
