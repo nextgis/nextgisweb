@@ -100,7 +100,8 @@ export class MapStore extends Watchable<MapWatchableProps> {
         if (!viewOptions.view) {
             viewOptions.view = new View({
                 maxZoom: 24,
-                // constrainResolution: true,
+                // Must always be true for correct tile caching with image adapters
+                constrainResolution: true,
                 extent,
             });
         }

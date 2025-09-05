@@ -14,7 +14,7 @@ import { PrintElementsSettings } from "./component/PrintElementsSettings";
 import { PrintMapPortal } from "./component/PrintMapPortal";
 import { PrintPaperSettings } from "./component/PrintPaperSettings";
 import { PrintScaleSettings } from "./component/PrintScaleSettings";
-import { getPrintMapLink, getPrintUrlSettings } from "./util";
+import { getPrintMapLink } from "./util";
 
 import { ShareAltOutlined } from "@ant-design/icons";
 
@@ -22,13 +22,11 @@ import "./PrintPanel.less";
 
 const PrintPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
     const mapInit = useRef(false);
-    const [printMapStore] = useState(
-        () =>
-            new PrintMapStore({
-                titleText: display.config.webmapTitle,
-                initCenter: getPrintUrlSettings().center,
-            })
-    );
+    const [printMapStore] = useState(() => {
+        return new PrintMapStore({
+            titleText: display.config.webmapTitle,
+        });
+    });
     const printMapEl = useRef<HTMLDivElement | null>(null);
 
     const { close, title, visible } = store;
@@ -43,14 +41,21 @@ const PrintPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
 
     const show = useCallback(() => {
         if (!mapInit.current) {
+            const mainMapView = display.map.olView;
+
+            printMapStore.update({
+                center: mainMapView.getCenter(),
+                scale: display.map.scale,
+            });
+
             mapInit.current = true;
         }
-    }, []);
+    }, [display.map.olView, display.map.scale, printMapStore]);
 
     const hide = useCallback(() => {
         if (mapInit.current) {
             // Sync the main map's view with last print preview position before closing
-            const mainMapView = display.map.olMap.getView();
+            const mainMapView = display.map.olView;
             if (mapPositionRef.current.center) {
                 mainMapView.setCenter(mapPositionRef.current.center);
             }

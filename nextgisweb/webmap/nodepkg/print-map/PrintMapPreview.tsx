@@ -3,8 +3,7 @@ import { observer } from "mobx-react-lite";
 import { View } from "ol";
 import type { Map as OlMap } from "ol";
 import { unByKey } from "ol/Observable";
-import { useCallback, useEffect, useRef, useState } from "react";
-import type React from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import CompanyLogoControl from "@nextgisweb/pyramid/company-logo/CompanyLogoControl";
 import { useDebounce } from "@nextgisweb/pyramid/hook";
@@ -36,9 +35,11 @@ export interface PrintMapPreviewProps {
 export const PrintMapPreview = observer(
     ({ display, printMapStore }: PrintMapPreviewProps) => {
         const [mapStore] = useState(() => {
+            const viewMainMap = display.map.olView;
             const view = new View({
                 projection: display.map.olView.getProjection(),
                 constrainResolution: false,
+                center: printMapStore.center ?? viewMainMap.getCenter(),
             });
             return new MapStore({
                 view,
@@ -55,7 +56,6 @@ export const PrintMapPreview = observer(
             graticule,
             scaleLine,
             scaleValue,
-            initCenter,
         } = printMapStore;
 
         const onChangeScale = useCallback(
@@ -66,11 +66,6 @@ export const PrintMapPreview = observer(
         );
 
         const debouncedOnScaleChange = useDebounce(onChangeScale, 200);
-
-        const initCenterRef = useRef(initCenter);
-        useEffect(() => {
-            initCenterRef.current = initCenter;
-        }, [initCenter]);
 
         useEffect(
             function redrawLayers() {
@@ -131,18 +126,17 @@ export const PrintMapPreview = observer(
             if (!mapStore.ready) return;
 
             const viewPrintMap = mapStore.olView;
-            const viewMainMap = display.map.olView;
 
-            const center = initCenterRef.current ?? viewMainMap.getCenter();
+            const center = printMapStore.center;
             if (center) {
                 viewPrintMap.setCenter(center);
             }
 
-            if (!initCenterRef.current) {
-                const mainResolution = viewMainMap.getResolution();
-                if (mainResolution !== undefined) {
-                    viewPrintMap.setResolution(mainResolution);
-                }
+            const mainResolution =
+                printMapStore.scale &&
+                mapStore.resolutionForScale(printMapStore.scale);
+            if (mainResolution !== undefined) {
+                viewPrintMap.setResolution(mainResolution);
             }
 
             const fireChangeCenter = () => {
@@ -161,13 +155,7 @@ export const PrintMapPreview = observer(
             return () => {
                 unByKey(unCenterKey);
             };
-        }, [
-            mapStore,
-            mapStore.ready,
-            mapStore.olView,
-            display.map.olView,
-            printMapStore,
-        ]);
+        }, [mapStore, mapStore.ready, mapStore.olView, printMapStore]);
 
         useEffect(() => {
             if (scale) {

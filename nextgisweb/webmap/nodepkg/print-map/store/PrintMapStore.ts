@@ -24,13 +24,10 @@ export class PrintMapStore implements PrintMapSettings {
     @observable.ref accessor graticule = false;
 
     @observable.shallow accessor center: Coordinate | undefined = undefined;
-    @observable.shallow accessor initCenter: Coordinate | undefined = undefined;
 
     layout: PrintLayoutStore;
 
-    constructor(
-        options: Partial<PrintMapSettings> & { initCenter?: Coordinate | null }
-    ) {
+    constructor(options: Partial<PrintMapSettings>) {
         this.layout = new PrintLayoutStore();
         this.update(options);
     }
