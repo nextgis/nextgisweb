@@ -243,6 +243,9 @@ export const EditableItem = observer(
             });
 
             draw.on("drawend", (e) => {
+                onUndoActionAddRef.current?.(() => {
+                    source.removeFeature(e.feature);
+                });
                 lazyModal(
                     () =>
                         import(
@@ -255,16 +258,9 @@ export const EditableItem = observer(
                             showGeometryTab: false,
                             resourceId,
                             onOk: (_, item) => {
+                                e.feature.set("layer_id", resourceId);
                                 e.feature.set("attribution", item);
-                                onUndoActionAddRef.current?.(() => {
-                                    source.removeFeature(e.feature);
-                                });
                             },
-                        },
-                        onCancel: () => {
-                            onUndoActionAddRef.current?.(() => {
-                                source.removeFeature(e.feature);
-                            });
                         },
                     }
                 );
