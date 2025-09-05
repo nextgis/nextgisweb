@@ -1,8 +1,6 @@
-import type { ReactNode, SVGProps } from "react";
+import type { ReactNode } from "react";
 
-export interface SvgIconProps extends SVGProps<SVGSVGElement> {
-    icon?: string;
-}
+import type { SvgIconProps } from "./SvgIcon";
 
 export interface SvgIconLink
     extends React.DetailedHTMLProps<

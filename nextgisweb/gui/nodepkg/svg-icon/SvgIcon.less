@@ -5,43 +5,19 @@ svg.icon {
     height: 1em;
     line-height: 1;
 
-    &-s {
+    &-s,
+    &-small {
         font-size: 16px;
     }
 
-    &-m {
+    &-m,
+    &-middle {
         font-size: 24px;
     }
 
-    &-l {
+    &-l,
+    &-large {
         font-size: 32px;
-    }
-}
-
-.withIcon {
-    display: flex;
-    align-items: center;
-
-    & > svg.icon:first-child {
-        flex-shrink: 0;
-    }
-
-    &-s {
-        gap: 4px;
-
-        & > svg.icon {
-            width: 16px;
-            height: 16px;
-        }
-    }
-
-    &-m {
-        gap: 6px;
-
-        & > svg.icon {
-            width: 24px;
-            height: 24px;
-        }
     }
 }
 

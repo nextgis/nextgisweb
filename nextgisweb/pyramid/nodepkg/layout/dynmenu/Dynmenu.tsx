@@ -39,8 +39,8 @@ export function Dynmenu({ items }: DynmenuProps) {
                                 {item.label}
                                 {item.icon_suffix && (
                                     <SvgIcon
-                                        className="icon-s"
                                         icon={item.icon_suffix}
+                                        size="small"
                                         fill="currentColor"
                                     />
                                 )}

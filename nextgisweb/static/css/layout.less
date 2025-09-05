@@ -7,7 +7,6 @@
 @import (css) "@{node_modules}/@fontsource/roboto/700.css";
 @import (css) "@{node_modules}/@fontsource/roboto/900.css";
 
-@import "blocks/_icons.less";
 @import "blocks/_links.less";
 @import "blocks/_list.less";
 @import "blocks/_typography.less";
@@ -29,34 +28,6 @@ body {
 
 *:focus {
     outline: none;
-}
-
-/* -- Icons --*/
-[class^="icon-"],
-[class*=" icon-"] {
-    text-decoration: none;
-
-    &:before {
-        margin-right: 0;
-        margin-left: 0;
-        color: inherit;
-    }
-}
-
-a:hover [class^="icon-"]:before,
-a:hover [class*=" icon-"]:before,
-a[class^="icon-"]:hover:before,
-a[class*=" icon-"]:hover:before {
-    color: var(--primary);
-}
-
-.middle-text {
-    font-weight: bold;
-    font-size: 16px;
-}
-
-.label-text {
-    margin-right: 5px;
 }
 
 /* -- Layout -- */
@@ -153,17 +124,6 @@ body > .ngw-gui-react-boot {
     padding: 24px 12px 24px 24px;
     width: 25%;
     min-width: 25ch;
-}
-
-.overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    z-index: 500;
-    background-color: rgba(0, 0, 0, 0.6);
 }
 
 @import "override-antd.less";
