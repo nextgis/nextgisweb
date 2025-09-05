@@ -108,7 +108,10 @@ def collection_post(
     request,
     *,
     core: CoreComponent,
-) -> AnyOf[Annotated[FileUploadFormPost, StatusCode(200)], Annotated[None, StatusCode(201)],]:
+) -> AnyOf[
+    Annotated[FileUploadFormPost, StatusCode(200)],
+    Annotated[None, StatusCode(201)],
+]:
     """Upload one or more small files or start new TUS upload
 
     Small files can be encoded as `multipart/form-data`. For TUS uploads, refer

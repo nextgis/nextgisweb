@@ -13,12 +13,10 @@ class DynMenu:
         self._filters = list()
 
     @overload
-    def add(self, *items: "Item"):
-        ...
+    def add(self, *items: "Item"): ...
 
     @overload
-    def add(self, item: DynMenuFactory, /):
-        ...
+    def add(self, item: DynMenuFactory, /): ...
 
     def add(self, *items):
         self._items.extend(items)

@@ -1,9 +1,8 @@
-""" {
+"""{
     "revision": "3803b726", "parents": ["00000000"],
     "date": "2022-08-29T05:23:39",
     "message": "Cleanup prev format"
-} """
-
+}"""
 
 import os
 import re

@@ -1,8 +1,8 @@
-""" {
+"""{
     "revision": "42a4e9bb", "parents": ["2978ca7f"],
     "date": "2024-02-11T01:03:48",
     "message": "Add size column"
-} """
+}"""
 
 from itertools import islice
 from pathlib import Path

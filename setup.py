@@ -71,7 +71,6 @@ requires = [
 
 extras_require = dict(
     development=[
-        "black<24",
         "bump2version",
         "coverage",
         "flake8-future-import",
@@ -83,7 +82,7 @@ extras_require = dict(
         "pytest-flake8",
         "pytest-watch",
         "pytest==7.3.*",
-        "ruff>=0.9.0",
+        "ruff>=0.12.12",
         "sqlglot==26.30.0",
         "webtest",
     ]

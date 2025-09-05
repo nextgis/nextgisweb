@@ -85,7 +85,10 @@ def change_check(
     target: Union[Annotated[int, Meta(ge=1)], None] = None,
     epoch: Union[Annotated[int, Meta(ge=1)], None] = None,
     extensions: List[Extension] = [],
-) -> AnyOf[ChangesCheckResponse, Annotated[None, StatusCode(204)],]:
+) -> AnyOf[
+    ChangesCheckResponse,
+    Annotated[None, StatusCode(204)],
+]:
     """Check for changes between versions
 
     :param initial: Initial already fetched version, 0 if not set

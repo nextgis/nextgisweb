@@ -238,19 +238,19 @@ def test_create(filename, options, checks, ngw_txn, ngw_data_path):
 
         if "geometry_type" in checks:
             exp_geometry_type = checks["geometry_type"]
-            assert (
-                obj.geometry_type == exp_geometry_type
-            ), "Expected geometry type was {} but actually got {}".format(
-                exp_geometry_type, obj.geometry_type
+            assert obj.geometry_type == exp_geometry_type, (
+                "Expected geometry type was {} but actually got {}".format(
+                    exp_geometry_type, obj.geometry_type
+                )
             )
 
         if "feature_count" in checks:
             exp_feature_count = checks["feature_count"]
             query = obj.feature_query()
             feature_count = query().total_count
-            assert (
-                feature_count == exp_feature_count
-            ), "Expected feature count was {} but got {}".format(exp_feature_count, feature_count)
+            assert feature_count == exp_feature_count, (
+                "Expected feature count was {} but got {}".format(exp_feature_count, feature_count)
+            )
 
         if "fields" in checks:
             exp_fields = checks["fields"]

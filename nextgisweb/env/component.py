@@ -54,9 +54,9 @@ class ComponentMeta(type):
                     2,
                 )
 
-            assert (
-                name.lower() == identity.replace("_", "").lower() + "component"
-            ), f"Class name '{name}' doesn't match the '{identity}' identity."
+            assert name.lower() == identity.replace("_", "").lower() + "component", (
+                f"Class name '{name}' doesn't match the '{identity}' identity."
+            )
             nmspc["basename"] = name[: -len("Component")]
 
         return super().__new__(mcls, name, bases, nmspc)

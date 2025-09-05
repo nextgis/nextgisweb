@@ -210,11 +210,16 @@ class VLSchema(MetaData):
 
         for t in (et, ht):
             vid, fid = t.c.vid, t.c.fid
-            yield select(fid.distinct().label("fid")).where(
-                vid > p_initial,
-                vid <= p_target,
-                sql_or(p_fid_last.is_(None), fid > p_fid_last),
-            ).order_by(fid).limit(p_fid_limit)
+            yield (
+                select(fid.distinct().label("fid"))
+                .where(
+                    vid > p_initial,
+                    vid <= p_target,
+                    sql_or(p_fid_last.is_(None), fid > p_fid_last),
+                )
+                .order_by(fid)
+                .limit(p_fid_limit)
+            )
 
     def query_changes(self):
         ct, et, ht = self._aliased_tabs()

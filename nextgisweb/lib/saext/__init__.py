@@ -54,7 +54,7 @@ def query_unreferenced(Model, column):
 
     if sa_set != db_set:
         raise RuntimeError(
-            "Database and SQLAlchemy references mismatch: " "{} != {}".format(db_set, sa_set)
+            "Database and SQLAlchemy references mismatch: {} != {}".format(db_set, sa_set)
         )
 
     query = DBSession.query(Model)

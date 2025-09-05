@@ -114,9 +114,10 @@ class TileFetcher:
             limits=Limits(max_keepalive_connections=8),
             http2=True,
         )
-        async with AsyncClient(**params) as client, AsyncClient(
-            verify=False, **params
-        ) as client_insecure:
+        async with (
+            AsyncClient(**params) as client,
+            AsyncClient(verify=False, **params) as client_insecure,
+        ):
             while True:
                 if self._shutdown:
                     break

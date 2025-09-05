@@ -219,7 +219,7 @@ class TilestorWriter:
 
                     time_taken += time() - ptime
                     logger.debug(
-                        "%d tiles were written in %0.3f seconds (%0.1f per " "second, qsize = %d)",
+                        "%d tiles were written in %0.3f seconds (%0.1f per second, qsize = %d)",
                         tiles_written,
                         time_taken,
                         tiles_written / time_taken,
@@ -264,7 +264,7 @@ class TilestorWriter:
             return True
 
         logger.debug(
-            "Waiting for shutdown of tile cache writer for %d seconds " "(qsize = %d)...",
+            "Waiting for shutdown of tile cache writer for %d seconds (qsize = %d)...",
             timeout,
             self.queue.qsize(),
         )

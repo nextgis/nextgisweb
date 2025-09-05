@@ -1,7 +1,7 @@
-""" {
+"""{
     "revision": "2bfa05b4", "parents": ["00000000"],
     "message": "Create table foo_b"
-} """
+}"""
 
 
 def forward(ctx):

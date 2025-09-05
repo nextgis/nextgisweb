@@ -9,8 +9,7 @@ from ..logging import logger
 
 
 class Translatable(Protocol):
-    def __translate__(self, translator: Translator) -> str:
-        ...
+    def __translate__(self, translator: Translator) -> str: ...
 
 
 class Translator(Protocol):
@@ -22,8 +21,7 @@ class Translator(Protocol):
         number: Union[int, None] = None,
         context: Union[str, None] = None,
         domain: str,
-    ) -> str:
-        ...
+    ) -> str: ...
 
 
 TranslatableOrStr = Union[Translatable, str]

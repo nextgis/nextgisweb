@@ -258,13 +258,12 @@ class OperationGraph:
         for s in skeys:
             w(
                 "  S{} [".format(skeys[s]) + "shape=plaintext label=<" + ""
-                '<table border="0" cellborder="1" cellpadding="4" cellspacing="0"><tr>' + ""
-                '<td port="F" bgcolor="{1}">{0}</td>'.format(
+                '<table border="0" cellborder="1" cellpadding="4" cellspacing="0"><tr>'
+                + '<td port="F" bgcolor="{1}">{0}</td>'.format(
                     sc(fstate.get(s), False), "gray" if tstate.get(s) is False else "white"
                 )
-                + ""
-                "<td>{}</td>".format(s) + ""
-                '<td port="T" bgcolor="{1}">{0}</td>'.format(
+                + "<td>{}</td>".format(s)
+                + '<td port="T" bgcolor="{1}">{0}</td>'.format(
                     sc(fstate.get(s), True), "gray" if tstate.get(s) is True else "white"
                 )
                 + ""

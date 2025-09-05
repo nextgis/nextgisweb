@@ -76,9 +76,7 @@ class PythonModuleMigration(Migration):
                         """
                     def forward(ctx):
                         pass  # {}
-                """.format(
-                            PLACEHOLDER
-                        )
+                """.format(PLACEHOLDER)
                     )
                 )
 
@@ -89,9 +87,7 @@ class PythonModuleMigration(Migration):
                         """
                     def rewind(ctx):
                         pass  # {}
-                """.format(
-                            PLACEHOLDER
-                        )
+                """.format(PLACEHOLDER)
                     )
                 )
 

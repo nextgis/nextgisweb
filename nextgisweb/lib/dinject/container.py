@@ -111,5 +111,5 @@ class ContainerNotWiredError(Exception):
 class ContainerWiredError(Exception):
     def __init__(self, cls: TContainer, new: Container) -> None:
         super().__init__(
-            f"{cls!r} is already wired to {cls._instance!r} " f"but trying to wire to {new!r}"
+            f"{cls!r} is already wired to {cls._instance!r} but trying to wire to {new!r}"
         )

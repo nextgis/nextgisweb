@@ -97,7 +97,7 @@ class Env(Container):
         for identity, comp_class in Component.registry.items():
             if identity not in loaded_components:
                 logger.warning(
-                    "Component '%s' was imported unexpectedly and won't " "be initialized!",
+                    "Component '%s' was imported unexpectedly and won't be initialized!",
                     identity,
                 )
                 continue
@@ -323,8 +323,7 @@ class EnvMetaClass(type):
 if TYPE_CHECKING:
 
     class EnvProxy(Env):
-        def __call__(self) -> Env:
-            ...
+        def __call__(self) -> Env: ...
 
     env: EnvProxy
 

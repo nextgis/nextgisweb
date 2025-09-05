@@ -160,12 +160,10 @@ class User(Principal):
         )
 
     @overload
-    def has_permission(self, perm: Permission) -> bool:
-        ...
+    def has_permission(self, perm: Permission) -> bool: ...
 
     @overload
-    def has_permission(self, fn: Callable[[Iterable[bool]], bool], *perms: Permission) -> bool:
-        ...
+    def has_permission(self, fn: Callable[[Iterable[bool]], bool], *perms: Permission) -> bool: ...
 
     def has_permission(self, *args) -> bool:
         if self.superuser or self.is_administrator:
@@ -176,12 +174,10 @@ class User(Principal):
         return fn(p in effective_permissions for p in perms)
 
     @overload
-    def require_permission(self, perm: Permission):
-        ...
+    def require_permission(self, perm: Permission): ...
 
     @overload
-    def require_permission(self, fn: Callable[[Iterable[bool]], bool], *perms: Permission):
-        ...
+    def require_permission(self, fn: Callable[[Iterable[bool]], bool], *perms: Permission): ...
 
     def require_permission(self, *args):
         if not self.has_permission(*args):

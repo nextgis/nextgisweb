@@ -1,11 +1,11 @@
-""" {
+"""{
     "revision": "2bfa0320", "parents": ["00000000"],
     "message": "Drop foo table foreign key",
     "dependencies": [
         ["foo==2bfa06fe", "this"],
         ["this", "foo==2bfa061e"]
     ]
-} """
+}"""
 
 from textwrap import dedent
 

@@ -68,8 +68,7 @@ class UserException(Exception):
         detail: Union[TranslatableOrStr, None] = None,
         data: Union[Dict[str, Any], None] = None,
         http_status_code: Union[int, None] = None,
-    ):
-        ...
+    ): ...
 
     @overload
     def __init__(
@@ -80,8 +79,7 @@ class UserException(Exception):
         detail: Union[TranslatableOrStr, None] = None,
         data: Union[Dict[str, Any], None] = None,
         http_status_code: Union[int, None] = None,
-    ):
-        ...
+    ): ...
 
     def __init__(self, *args, **kwargs):
         if len(args) == 1:

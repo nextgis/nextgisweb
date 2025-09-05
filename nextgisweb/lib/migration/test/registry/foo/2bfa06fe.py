@@ -1,6 +1,6 @@
-""" {
+"""{
     "revision": "2bfa06fe", "parents": ["2bfa061e"]
-} """
+}"""
 
 from textwrap import dedent
 
