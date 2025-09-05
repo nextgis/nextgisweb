@@ -32,6 +32,7 @@ import SnapIcon from "@nextgisweb/icon/material/join";
 import ExitIcon from "@nextgisweb/icon/material/logout";
 import MoveIcon from "@nextgisweb/icon/material/open_with";
 import UndoIcon from "@nextgisweb/icon/material/undo";
+import { useEffectDebugger } from "@nextgisweb/gui/hook/useEffectDebugger";
 
 type ToolEditorProps = MapControlProps & { groupId: string };
 
@@ -50,7 +51,7 @@ const modes: [mode: string, IconComponent, title: string][] = [
 const ToolEditor = observer(
     ({ order = 0, position, groupId }: ToolEditorProps) => {
         const { display } = useDisplayContext();
-        const group = useToggleGroupItem(groupId);
+        const groupItem = useToggleGroupItem(groupId);
 
         const { lazyModal, modalStore, modalHolder } = useShowModal();
 
@@ -80,13 +81,9 @@ const ToolEditor = observer(
         const { webmapStore } = display;
         const { webmapItems } = webmapStore;
 
-        const onChange = useCallback(
-            (val: string | null) => {
-                group.activate();
-                setEditingMode(val as EditingState);
-            },
-            [group]
-        );
+        const onChange = useCallback((val: string | null) => {
+            setEditingMode(val as EditingState);
+        }, []);
 
         const prevEditableRef = useRef<LayerItemConfig[]>(editableItems);
         useEffect(() => {
@@ -144,11 +141,11 @@ const ToolEditor = observer(
             } else {
                 proceed();
             }
-        }, [display, lazyModal, modalStore, source, webmapItems, webmapStore]);
+        }, [source, display, modalStore, webmapItems, webmapStore, lazyModal]);
 
         const activeMode = useMemo(() => {
-            return group.isActive ? editingMode : null;
-        }, [editingMode, group.isActive]);
+            return groupItem.isActive ? editingMode : null;
+        }, [editingMode, groupItem.isActive]);
 
         const selectedInTreeItem = useMemo(() => {
             return display.item;
@@ -197,6 +194,24 @@ const ToolEditor = observer(
             }
             return false;
         }, [undoActions]);
+
+        useEffectDebugger(() => {
+            if (editingMode && editableItems.length) {
+                const curentSelectedIsEditable =
+                    selectedInTreeItem &&
+                    editableItems.find((it) => selectedInTreeItem.id === it.id);
+                if (curentSelectedIsEditable) {
+                    groupItem.activate();
+                    return;
+                }
+            }
+            groupItem.deactivate();
+        }, [
+            editableItems,
+            editableItems.length,
+            editingMode,
+            selectedInTreeItem,
+        ]);
 
         useUnsavedChanges({ dirty });
 
