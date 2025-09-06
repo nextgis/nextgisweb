@@ -102,7 +102,7 @@ msgstr "Прошедший проверку"
 msgid "Owner"
 msgstr "Владелец"
 
-#: model.py:206
+#: model.py:202
 msgid "Administrators"
 msgstr "Администраторы"
 
@@ -137,7 +137,7 @@ msgstr "Да"
 msgid "No"
 msgstr "Нет"
 
-#: nodepkg/group-widget/GroupWidget.tsx:41 view.py:328 view.py:417
+#: nodepkg/group-widget/GroupWidget.tsx:41 view.py:342 view.py:431
 msgid "Users"
 msgstr "Пользователи"
 
@@ -248,11 +248,11 @@ msgstr ""
 "пользователей прошедших аутентификацию для управления правами участников "
 "команды."
 
-#: nodepkg/user-browse/component/ToggleSelectedUsers.tsx:64
+#: nodepkg/user-browse/component/ToggleSelectedUsers.tsx:65
 msgid "Disable"
 msgstr "Отключить"
 
-#: nodepkg/user-browse/component/ToggleSelectedUsers.tsx:64
+#: nodepkg/user-browse/component/ToggleSelectedUsers.tsx:65
 msgid "Enable"
 msgstr "Включить"
 
@@ -264,7 +264,7 @@ msgstr "Для изменения пароля заполните это пол�
 msgid "Authorization link"
 msgstr "Авторизация по ссылке"
 
-#: nodepkg/user-widget/UserWidget.tsx:89 view.py:359 view.py:423
+#: nodepkg/user-widget/UserWidget.tsx:89 view.py:373 view.py:437
 msgid "Groups"
 msgstr "Группы"
 
@@ -343,7 +343,7 @@ msgstr "Просмотр"
 msgid "Manage"
 msgstr "Управление"
 
-#: permission.py:39 view.py:413
+#: permission.py:39 view.py:427
 msgid "Groups and users"
 msgstr "Группы и пользователи"
 
@@ -387,14 +387,28 @@ msgstr ""
 "Вы не являетесь участником команды этой Веб ГИС. Свяжитесь с администратором "
 "Веб ГИС для добавления в команду."
 
-#: view.py:320
+#: view.py:187
+msgid ""
+"The authorization state cookie is either missing or invalid. Ensure that "
+"cookies are not blocked in your browser and try to log in again."
+msgstr ""
+"Cookie состояния авторизации отсутствует или недействителен. Убедитесь, что "
+"файлы cookie не заблокированы в вашем браузере, и попробуйте войти снова."
+
+#: view.py:198
+msgid "Unable to bind unauthenticated user. Ensure you are logged in and try again."
+msgstr ""
+"Невозможно привязать неаутентифицированного пользователя. Убедитесь, что вы "
+"вошли в систему, и попробуйте снова."
+
+#: view.py:334
 msgid "User settings"
 msgstr "Настройки пользователя"
 
-#: view.py:338
+#: view.py:352
 msgid "Create new user"
 msgstr "Создать нового пользователя"
 
-#: view.py:370
+#: view.py:384
 msgid "Create new group"
 msgstr "Создать новую группу"

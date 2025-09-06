@@ -171,22 +171,36 @@ def oauth(request):
         raise AuthorizationException(title=title, message=message)
 
     elif "code" in request.params and "state" in request.params:
-        # Extract data from state named cookie
-        state = request.params["state"]
-        try:
-            data = dict(parse_qsl(request.cookies[cookie_name(state)]))
-        except ValueError:
-            raise AuthorizationException("State cookie parse error")
-
         tpair = oaserver.grant_type_authorization_code(request.params["code"], oauth_url)
-
         atoken = oaserver.query_introspection(tpair.access_token)
         if atoken is None:
             raise InvalidTokenException()
 
-        bind_user = (
-            request.user if data["bind"] == "1" and request.user.keyname != "guest" else None
-        )
+        # Extract data from state named cookie
+        state_query_param = request.params["state"]
+        state_cookie_name = cookie_name(state_query_param)
+        try:
+            data = dict(parse_qsl(request.cookies[state_cookie_name]))
+        except (ValueError, KeyError):
+            raise AuthorizationException(
+                gettext(
+                    "The authorization state cookie is either missing or "
+                    "invalid. Ensure that cookies are not blocked in your "
+                    "browser and try to log in again."
+                )
+            )
+
+        bind_user = None
+        if data.get("bind") == "1":
+            if not request.authenticated_userid:
+                raise AuthorizationException(
+                    gettext(
+                        "Unable to bind unauthenticated user. Ensure you are "
+                        "logged in and try again."
+                    )
+                )
+            bind_user = request.user
+
         user = oaserver.access_token_to_user(
             atoken,
             bind_user=bind_user,
@@ -203,7 +217,7 @@ def oauth(request):
         reset_slg_cookie(request)
 
         response = HTTPFound(location=event.next_url, headers=headers)
-        response.delete_cookie(cookie_name(state), path=oauth_path)
+        response.delete_cookie(cookie_name(state_query_param), path=oauth_path)
         return response
 
     else:
@@ -213,17 +227,17 @@ def oauth(request):
         )
 
         alphabet = string.ascii_letters + string.digits
-        state = "".join(secrets.choice(alphabet) for i in range(16))
-        ac_url = oaserver.authorization_code_url(oauth_url, state=state)
+        state_query_param = "".join(secrets.choice(alphabet) for i in range(16))
+        ac_url = oaserver.authorization_code_url(oauth_url, state=state_query_param)
 
         response = HTTPFound(location=ac_url)
 
         # Store data in state named cookie
         response.set_cookie(
-            cookie_name(state),
+            cookie_name(state_query_param),
             value=urlencode(data),
             path=oauth_path,
-            max_age=600,
+            max_age=1800,
             httponly=True,
         )
 
