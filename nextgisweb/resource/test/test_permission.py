@@ -18,19 +18,13 @@ pytestmark = pytest.mark.usefixtures("ngw_auth_administrator")
 @pytest.fixture(scope="module")
 def user_id(ngw_resource_group):
     with transaction.manager:
-        user = User(
-            keyname="test_user",
-            display_name="Test User",
-        ).persist()
+        user = User.test_instance().persist()
 
     DBSession.query(Resource).filter_by(
         id=ngw_resource_group,
     ).update(dict(owner_user_id=user.id))
 
     yield user.id
-
-    with transaction.manager:
-        DBSession.delete(User.filter_by(id=user.id).one())
 
 
 def test_change_owner(ngw_resource_group_sub, user_id, ngw_webtest_app):
@@ -141,20 +135,12 @@ def test_permission_requirement(ngw_txn, resolve):
 @pytest.fixture
 def admin():
     with transaction.manager:
-        admin = User(
-            keyname="test_admin",
-            display_name="Test admin",
-            member_of=[Group.filter_by(keyname="administrators").one()],
-        ).persist()
-    try:
-        yield admin.id
-    finally:
-        with transaction.manager:
-            ResourceACLRule.filter_by(principal_id=admin.id).delete()
-            DBSession.delete(User.filter_by(id=admin.id).one())
+        administrators = Group.filter_by(keyname="administrators").one()
+        admin = User.test_instance(member_of=[administrators]).persist()
+    yield admin.id
 
 
-def test_admin_permissions(admin, ngw_webtest_app, ngw_resource_group):
+def test_admin_permissions(admin, ngw_webtest_app, ngw_resource_group, ngw_cleanup):
     permissions = ngw_webtest_app.get("/api/resource/0").json["resource"]["permissions"]
 
     def check(data, status_expected, *, resource_id=0):
@@ -167,11 +153,13 @@ def test_admin_permissions(admin, ngw_webtest_app, ngw_resource_group):
             scope="",
         )
         perm_data.update(data)
-        ngw_webtest_app.put_json(
-            f"/api/resource/{resource_id}",
-            dict(resource=dict(permissions=permissions + [perm_data])),
-            status=status_expected,
-        )
+
+        with ngw_cleanup.disable():
+            ngw_webtest_app.put_json(
+                f"/api/resource/{resource_id}",
+                dict(resource=dict(permissions=permissions + [perm_data])),
+                status=status_expected,
+            )
 
     check(dict(), 422)
     check(dict(), 422, resource_id=ngw_resource_group)

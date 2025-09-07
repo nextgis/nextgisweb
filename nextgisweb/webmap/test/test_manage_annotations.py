@@ -2,8 +2,6 @@ import geoalchemy2 as ga
 import pytest
 import transaction
 
-from nextgisweb.env import DBSession
-
 from nextgisweb.auth import User
 from nextgisweb.resource import ResourceACLRule, ResourceGroup
 
@@ -49,9 +47,6 @@ def user():
 
     yield user
 
-    with transaction.manager:
-        DBSession.delete(User.filter_by(id=user.id).one())
-
 
 @pytest.fixture(scope="module")
 def webmap(user, ngw_resource_group):
@@ -76,10 +71,6 @@ def webmap(user, ngw_resource_group):
         make_annotation(webmap, public=False, user_id=user.id)
 
     yield webmap
-
-    with transaction.manager:
-        DBSession.query(ResourceACLRule).filter(ResourceACLRule.principal_id == user.id).delete()
-        DBSession.delete(WebMap.filter_by(id=webmap.id).one())
 
 
 def test_regular_user(webmap, user, ngw_webtest_app):

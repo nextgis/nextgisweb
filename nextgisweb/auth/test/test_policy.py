@@ -4,8 +4,6 @@ import pytest
 import transaction
 from freezegun import freeze_time
 
-from nextgisweb.env import DBSession
-
 from .. import User
 
 
@@ -92,11 +90,7 @@ def _dummy_auth_request(ngw_webtest_app, status_code=200):
 def user():
     with transaction.manager:
         user = User.test_instance().persist()
-
     yield user
-
-    with transaction.manager:
-        DBSession.delete(user)
 
 
 def test_forget_user(ngw_webtest_factory, user):

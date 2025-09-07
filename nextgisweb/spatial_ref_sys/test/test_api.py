@@ -34,10 +34,6 @@ def srs_ids():
 
     yield dict({"EPSG:4326": 4326, "EPSG:3857": 3857}, **srs_add)
 
-    with transaction.manager:
-        for srs_id in srs_add.values():
-            DBSession.delete(SRS.filter_by(id=srs_id).one())
-
 
 @pytest.fixture(scope="module")
 def wrong_srs_ids():
@@ -51,10 +47,6 @@ def wrong_srs_ids():
             srs_wrong[display_name] = obj.id
 
     yield srs_wrong
-
-    with transaction.manager:
-        for srs_id in srs_wrong.values():
-            DBSession.delete(SRS.filter_by(id=srs_id).one())
 
 
 def test_protected(ngw_webtest_app, ngw_auth_administrator):

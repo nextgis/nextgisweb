@@ -49,9 +49,6 @@ def user(group1, ngw_resource_group):
 
     yield user
 
-    with transaction.manager:
-        DBSession.delete(user)
-
 
 def test_delete(group1, group2, user, ngw_webtest_app):
     url = f"/api/resource/delete?resources={group1},{group2}"

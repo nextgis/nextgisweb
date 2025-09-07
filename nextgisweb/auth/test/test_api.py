@@ -7,8 +7,6 @@ import sqlalchemy as sa
 import transaction
 from freezegun import freeze_time
 
-from nextgisweb.env import DBSession
-
 from nextgisweb.auth import Group, User
 
 
@@ -41,22 +39,14 @@ def group_url(group_id=None):
 def user():
     with transaction.manager:
         user = User.test_instance().persist()
-
     yield user
-
-    with transaction.manager:
-        DBSession.delete(User.filter_by(id=user.id).one())
 
 
 @pytest.fixture()
 def group():
     with transaction.manager:
         group = Group.test_instance().persist()
-
     yield group
-
-    with transaction.manager:
-        DBSession.delete(Group.filter_by(id=group.id).one())
 
 
 def _test_current_user(ngw_webtest_app, keyname, *, auth_medium=None, auth_provider=None):

@@ -53,17 +53,6 @@ def setup_oauth(ngw_env, request):
     auth.oauth = prev_helper
 
 
-@pytest.fixture(scope="module", autouse=True)
-def cleanup(ngw_env):
-    existing = [row.id for row in DBSession.query(User.id)]
-
-    yield
-
-    with transaction.manager:
-        for user in User.filter(User.id.notin_(existing)):
-            DBSession.delete(user)
-
-
 @pytest.fixture()
 def server_response_mock():
     hooks = []
@@ -417,7 +406,6 @@ def test_authorization_code(server_response_mock, freezegun, ngw_webtest_app, ng
 def local_user():
     with transaction.manager:
         user = User.test_instance().persist()
-
     yield user
 
 
@@ -520,11 +508,7 @@ def test_scope(scope, ok, server_response_mock, ngw_webtest_app):
 def disabled_local_user():
     with transaction.manager:
         user = User.test_instance(disabled=True).persist()
-
     yield user
-
-    with transaction.manager:
-        DBSession.delete(User.filter_by(id=user.id).one())
 
 
 @pytest.mark.parametrize("setup_oauth", [{"oauth.server.password": True}], indirect=True)
@@ -689,7 +673,6 @@ def test_password_token_session(server_response_mock, freezegun, ngw_webtest_app
 def oauth_user():
     with transaction.manager:
         user = User.test_instance(oauth_subject=token_hex()).persist()
-
     yield user.id
 
 
