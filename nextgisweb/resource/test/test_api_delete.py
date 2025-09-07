@@ -39,11 +39,7 @@ def _add_perm(user_id, resource_id, permission):
 @pytest.fixture(scope="module")
 def user(group1, ngw_resource_group):
     with transaction.manager:
-        user = User(
-            keyname="duser",
-            password="dpass",
-            display_name="test-resource-delete",
-        ).persist()
+        user = User.test_instance().persist()
 
         DBSession.flush()
 
@@ -51,7 +47,7 @@ def user(group1, ngw_resource_group):
         _add_perm(user.id, ngw_resource_group, "read")
         _add_perm(user.id, group1, "read")
 
-    yield user.id
+    yield user
 
     with transaction.manager:
         DBSession.delete(user)
@@ -78,7 +74,7 @@ def test_delete(group1, group2, user, ngw_webtest_app):
         unaffected=dict(count=2, resources=dict(resource=2)),
     )
 
-    ngw_webtest_app.authorization = ("Basic", ("duser", "dpass"))
+    ngw_webtest_app.authorization = ("Basic", (user.keyname, user.password_plaintext))
 
     assert req_get() == dict(
         affected=dict(count=0, resources=dict()),
@@ -86,13 +82,13 @@ def test_delete(group1, group2, user, ngw_webtest_app):
     )
 
     with transaction.manager:
-        _add_perm(user, group1, "delete")
-        _add_perm(user, group1, "manage_children")
-    data = dict(
+        _add_perm(user.id, group1, "delete")
+        _add_perm(user.id, group1, "manage_children")
+
+    assert req_get() == dict(
         affected=dict(count=1, resources=dict(resource_group=1)),
         unaffected=dict(count=1, resources=dict(resource=1)),
     )
-    assert req_get() == data
 
     req_post(partial=False, status=403)
     assert req_post(partial=True, status=200) == dict()

@@ -1,6 +1,7 @@
 from collections import namedtuple
 from functools import cached_property, lru_cache
 from itertools import chain
+from secrets import token_hex, token_urlsafe
 from typing import Callable, ClassVar, FrozenSet, Iterable, Mapping, Union, overload
 
 import sqlalchemy as sa
@@ -101,6 +102,10 @@ class User(Principal):
 
     __mapper_args__ = dict(polymorphic_identity="U")
 
+    __table_args__ = (
+        sa.Index("auth_user_lower_keyname_idx", sa.func.lower(keyname), unique=True),
+    )
+
     def __init__(self, password=None, **kwargs):
         super().__init__(**kwargs)
         if password:
@@ -108,6 +113,15 @@ class User(Principal):
 
     def __str__(self):
         return self.display_name
+
+    @classmethod
+    def test_instance(cls, **kwargs):
+        """Create and return a test user with randomized attributes"""
+
+        rnd = token_hex(8)
+        obj = cls(keyname=f"user_{rnd}", display_name=f"User {rnd}", **kwargs)
+        obj.password = obj.password_plaintext = token_urlsafe()
+        return obj
 
     def compare(self, other):
         """Compare two users regarding special users"""
@@ -183,10 +197,6 @@ class User(Principal):
         if not self.has_permission(*args):
             raise ForbiddenError
 
-    __table_args__ = (
-        sa.Index("auth_user_lower_keyname_idx", sa.func.lower(keyname), unique=True),
-    )
-
 
 class Group(Principal):
     __tablename__ = "auth_group"
@@ -213,6 +223,14 @@ class Group(Principal):
 
     def __str__(self):
         return self.display_name
+
+    @classmethod
+    def test_instance(cls, **kwargs):
+        """Create and return a test group with randomized attributes"""
+
+        rnd = token_hex(8)
+        obj = cls(keyname=f"group_{rnd}", display_name=f"Group {rnd}", **kwargs)
+        return obj
 
     def is_member(self, user):
         if self.keyname == "authorized":

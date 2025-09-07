@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta
 from itertools import product
 from urllib.parse import parse_qs, urlparse
-from uuid import uuid4
 
 import pytest
 import sqlalchemy as sa
@@ -38,13 +37,10 @@ def group_url(group_id=None):
     return "/api/component/auth/group/" + (str(group_id) if group_id else "")
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture()
 def user():
     with transaction.manager:
-        user = User(
-            keyname="test-user", display_name="test-user", password="password123"
-        ).persist()
-        DBSession.flush()
+        user = User.test_instance().persist()
 
     yield user
 
@@ -52,14 +48,10 @@ def user():
         DBSession.delete(User.filter_by(id=user.id).one())
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture()
 def group():
     with transaction.manager:
-        group = Group(
-            keyname="test-group",
-            display_name="test-group",
-        ).persist()
-        DBSession.flush()
+        group = Group.test_instance().persist()
 
     yield group
 
@@ -81,43 +73,46 @@ def test_login_logout(user, ngw_webtest_app, ngw_env):
 
     ngw_webtest_app.post(
         "/api/component/auth/login",
-        dict(login="test-user", missing="password"),
+        dict(login=user.keyname, missing="missing"),
         status=422,
     )
+
     ngw_webtest_app.post(
         "/api/component/auth/login",
-        dict(login="test-user", password="invalid"),
+        dict(login=user.keyname, password="invalid"),
         status=401,
     )
 
     ngw_webtest_app.post(
         "/api/component/auth/login",
-        dict(login="test-user", password="password123"),
+        dict(login=user.keyname, password=user.password_plaintext),
         status=200,
     )
+
     _test_current_user(
-        ngw_webtest_app, "test-user", auth_medium="session", auth_provider="local_pw"
+        ngw_webtest_app,
+        user.keyname,
+        auth_medium="session",
+        auth_provider="local_pw",
     )
+
     assert sid_cookie in ngw_webtest_app.cookies, "Login must create a session"
 
-    ngw_webtest_app.post(
-        "/api/component/auth/logout",
-        status=200,
-    )
+    ngw_webtest_app.post("/api/component/auth/logout", status=200)
     _test_current_user(ngw_webtest_app, "guest")
 
     ngw_webtest_app.post_json(
         "/api/component/auth/login",
-        dict(login=42, password="password123"),
+        dict(login=user.id, password=user.password_plaintext),
         status=422,
     )
 
     ngw_webtest_app.post_json(
         "/api/component/auth/login",
-        dict(login="test-user", password="password123"),
+        dict(login=user.keyname, password=user.password_plaintext),
         status=200,
     )
-    _test_current_user(ngw_webtest_app, "test-user")
+    _test_current_user(ngw_webtest_app, user.keyname)
 
     ngw_webtest_app.post(
         "/api/component/auth/logout",
@@ -155,14 +150,14 @@ def test_session_invite(user, ngw_env, ngw_webtest_app):
     ngw_webtest_app.post(
         "/api/component/auth/login",
         dict(
-            login="test-user",
-            password="password123",
+            login=user.keyname,
+            password=user.password_plaintext,
             status=302,
         ),
     )
-    sid_cookie in ngw_webtest_app.cookies
+    assert sid_cookie in ngw_webtest_app.cookies
     assert ngw_webtest_app.cookies[sid_cookie] != sid
-    _test_current_user(ngw_webtest_app, "test-user")
+    _test_current_user(ngw_webtest_app, user.keyname)
 
     ngw_webtest_app.post(
         "/session-invite",
@@ -192,10 +187,12 @@ def test_session_invite(user, ngw_env, ngw_webtest_app):
 
     assert sid_cookie in ngw_webtest_app.cookies
     assert ngw_webtest_app.cookies[sid_cookie] == sid
-    _test_current_user(ngw_webtest_app, "test-user", auth_medium="session", auth_provider="invite")
+    _test_current_user(
+        ngw_webtest_app, user.keyname, auth_medium="session", auth_provider="invite"
+    )
 
     ngw_webtest_app.get("/logout", status=302)
-    sid_cookie not in ngw_webtest_app.cookies
+    assert sid_cookie not in ngw_webtest_app.cookies
     _test_current_user(ngw_webtest_app, "guest")
 
     # Invite can be used only once
@@ -226,47 +223,46 @@ def disable_users():
     with transaction.manager:
         for user in User.filter(User.id.in_(active_uids)).all():
             user.disabled = False
-        DBSession.flush()
 
 
-def _user_obj(keyname: str):
+def _user_data():
+    obj = User.test_instance()
     return dict(
-        keyname=keyname,
-        display_name=" ".join(s.capitalize() for s in keyname.split("-")),
-        password=uuid4().hex,
-        disabled=False,
+        keyname=obj.keyname,
+        display_name=obj.display_name,
+        password=obj.password_plaintext,
+        disabled=bool(obj.disabled),
     )
 
 
 def test_user_limit(ngw_env, ngw_webtest_app, ngw_auth_administrator, disable_users):
     with ngw_env.auth.options.override(dict(user_limit=2)):
-        vasya = _user_obj("test-vasya")
-        res = ngw_webtest_app.post_json(user_url(), vasya, status=201)
-        vasya_id = res.json["id"]
+        user1 = _user_data()
+        res = ngw_webtest_app.post_json(user_url(), user1, status=201)
+        user1_id = res.json["id"]
 
-        petya = _user_obj("test-petya")
-        ngw_webtest_app.post_json(user_url(), petya, status=422)
+        user2 = _user_data()
+        ngw_webtest_app.post_json(user_url(), user2, status=422)
 
-        vasya["disabled"] = True
-        ngw_webtest_app.put_json(user_url(vasya_id), vasya, status=200)
+        user1["disabled"] = True
+        ngw_webtest_app.put_json(user_url(user1_id), user1, status=200)
 
-        res = ngw_webtest_app.post_json(user_url(), petya, status=201)
-        petya_id = res.json["id"]
+        res = ngw_webtest_app.post_json(user_url(), user2, status=201)
+        user2_id = res.json["id"]
 
-        masha = _user_obj("test-masha")
-        ngw_webtest_app.post_json(user_url(), masha, status=422)
+        user3 = _user_data()
+        ngw_webtest_app.post_json(user_url(), user3, status=422)
 
-        ngw_webtest_app.delete(user_url(vasya_id), status=200)
-        ngw_webtest_app.delete(user_url(petya_id), status=200)
+        ngw_webtest_app.delete(user_url(user1_id), status=200)
+        ngw_webtest_app.delete(user_url(user2_id), status=200)
 
 
 def test_user_over_limit(ngw_env, ngw_webtest_app, ngw_auth_administrator, disable_users):
-    user1 = _user_obj("test-user1")
-    res = ngw_webtest_app.post_json(user_url(), user1)
-    user1_id = res.json["id"]
-    user2 = _user_obj("test-user2")
-    res = ngw_webtest_app.post_json(user_url(), user2)
-    user2_id = res.json["id"]
+    user1 = _user_data()
+    user1_id = ngw_webtest_app.post_json(user_url(), user1).json["id"]
+
+    user2 = _user_data()
+    user2_id = ngw_webtest_app.post_json(user_url(), user2).json["id"]
 
     with ngw_env.auth.options.override(dict(user_limit=2)):
         ngw_webtest_app.put_json(
@@ -300,62 +296,63 @@ def test_user_over_limit(ngw_env, ngw_webtest_app, ngw_auth_administrator, disab
 
 def test_user_limit_local(ngw_env, ngw_webtest_app, ngw_auth_administrator, disable_users):
     with ngw_env.auth.options.override(dict(user_limit_local=2)):
-        vasya = _user_obj("test-vasya")
-        res = ngw_webtest_app.post_json(user_url(), vasya, status=201)
-        vasya_id = res.json["id"]
+        u1 = _user_data()
+        u1_id = ngw_webtest_app.post_json(user_url(), u1, status=201).json["id"]
 
-        petya = _user_obj("test-petya")
-        ngw_webtest_app.post_json(user_url(), petya, status=422)
+        u2 = _user_data()
+        ngw_webtest_app.post_json(user_url(), u2, status=422)
 
-        vasya["disabled"] = True
-        ngw_webtest_app.put_json(user_url(vasya_id), vasya, status=200)
+        u1["disabled"] = True
+        ngw_webtest_app.put_json(user_url(u1_id), u1, status=200)
 
-        res = ngw_webtest_app.post_json(user_url(), petya, status=201)
-        petya_id = res.json["id"]
+        u2_id = ngw_webtest_app.post_json(user_url(), u2, status=201).json["id"]
 
-        masha = _user_obj("test-masha")
-        ngw_webtest_app.post_json(user_url(), masha, status=422)
+        u3 = _user_data()
+        ngw_webtest_app.post_json(user_url(), u3, status=422)
 
-        masha["password"] = False
-        res = ngw_webtest_app.post_json(user_url(), masha, status=201)
-        masha_id = res.json["id"]
+        u3["password"] = False
+        u3_id = ngw_webtest_app.post_json(user_url(), u3, status=201).json["id"]
 
-        vasya["disabled"] = False
-        ngw_webtest_app.put_json(user_url(vasya_id), vasya, status=422)
+        u1["disabled"] = False
+        ngw_webtest_app.put_json(user_url(u1_id), u1, status=422)
 
-        ngw_webtest_app.delete(user_url(vasya_id), status=200)
-        ngw_webtest_app.delete(user_url(petya_id), status=200)
-        ngw_webtest_app.delete(user_url(masha_id), status=200)
+        ngw_webtest_app.delete(user_url(u1_id), status=200)
+        ngw_webtest_app.delete(user_url(u2_id), status=200)
+        ngw_webtest_app.delete(user_url(u3_id), status=200)
 
 
 def test_unique(ngw_webtest_app, ngw_auth_administrator):
-    petya = dict(keyname="test-petya", display_name="Test Petya", password="qwerty")
-    res = ngw_webtest_app.post_json(user_url(), petya, status=201)
-    petya["id"] = res.json["id"]
+    u1 = _user_data()
+    u1["id"] = ngw_webtest_app.post_json(user_url(), u1, status=201).json["id"]
 
-    vasya = dict(keyname="TEST-petya", display_name="test petya", password="qwerty")
-    ngw_webtest_app.post_json(user_url(), vasya, status=422)
-    vasya["display_name"] = "Test Vasya"
-    ngw_webtest_app.post_json(user_url(), vasya, status=422)
-    vasya["keyname"] = "test-vasya"
-    res = ngw_webtest_app.post_json(user_url(), vasya, status=201)
-    vasya["id"] = res.json["id"]
+    u2 = _user_data()
+    u2["keyname"] = u1["keyname"].swapcase()
+    u2["display_name"] = u1["display_name"].swapcase()
+    ngw_webtest_app.post_json(user_url(), u2, status=422)
 
-    drones = dict(keyname="drones-club", display_name="Drones Club")
-    res = ngw_webtest_app.post_json(group_url(), drones, status=201)
-    drones["id"] = res.json["id"]
-    petya_grp = dict(keyname="Drones-Club", display_name="Drones club")
-    ngw_webtest_app.post_json(group_url(), petya_grp, status=422)
-    petya_grp["display_name"] = "Test Petya"
-    res = ngw_webtest_app.post_json(group_url(), petya_grp, status=422)
-    petya_grp["keyname"] = "test-petya-group"
-    res = ngw_webtest_app.post_json(group_url(), petya_grp, status=201)
-    petya_grp["id"] = res.json["id"]
+    u2["keyname"] = User.test_instance().keyname
+    ngw_webtest_app.post_json(user_url(), u2, status=422)
 
-    ngw_webtest_app.delete(user_url(petya["id"]))
-    ngw_webtest_app.delete(user_url(vasya["id"]))
-    ngw_webtest_app.delete(group_url(drones["id"]))
-    ngw_webtest_app.delete(group_url(petya_grp["id"]))
+    u2["display_name"] = User.test_instance().display_name
+    u2["id"] = ngw_webtest_app.post_json(user_url(), u2, status=201).json["id"]
+
+    g1_obj = Group.test_instance()
+    g1 = dict(keyname=g1_obj.keyname, display_name=g1_obj.display_name)
+    g1["id"] = ngw_webtest_app.post_json(group_url(), g1, status=201).json["id"]
+
+    g2 = dict(keyname=g1_obj.keyname.swapcase(), display_name=g1_obj.display_name.swapcase())
+    ngw_webtest_app.post_json(group_url(), g2, status=422)
+
+    g2["keyname"] = Group.test_instance().keyname
+    ngw_webtest_app.post_json(group_url(), g2, status=422)
+
+    g2["display_name"] = Group.test_instance().display_name
+    g2["id"] = ngw_webtest_app.post_json(group_url(), g2, status=201).json["id"]
+
+    ngw_webtest_app.delete(user_url(u1["id"]))
+    ngw_webtest_app.delete(user_url(u2["id"]))
+    ngw_webtest_app.delete(group_url(g1["id"]))
+    ngw_webtest_app.delete(group_url(g2["id"]))
 
 
 class TestKeyname:
@@ -446,10 +443,7 @@ class TestSystemPrincipal:
 
 @pytest.mark.parametrize(
     "password_before, password",
-    product(
-        ("old-T3ST", None),
-        ("new-secret-test-password", True, False),
-    ),
+    product(("old", None), ("new", True, False)),
 )
 def test_password(password_before, password, user, ngw_webtest_app, ngw_auth_administrator):
     with transaction.manager:

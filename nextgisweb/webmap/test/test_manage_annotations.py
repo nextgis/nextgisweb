@@ -1,21 +1,15 @@
-from unittest.mock import patch
-
 import geoalchemy2 as ga
 import pytest
 import transaction
-from pyramid.interfaces import ISecurityPolicy
 
 from nextgisweb.env import DBSession
 
 from nextgisweb.auth import User
-from nextgisweb.auth.policy import AuthMedium, AuthProvider, AuthResult
 from nextgisweb.resource import ResourceACLRule, ResourceGroup
 
 from ..model import WebMap, WebMapAnnotation, WebMapItem
 
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults")
-
-TEST_USER_KEYNAME = "test_webmap"
 
 
 def make_annotation_json(public: bool):
@@ -49,13 +43,19 @@ def append_acl(resource, action, principal, scope, permission, identity):
 
 
 @pytest.fixture(scope="module")
-def webmap_id(ngw_resource_group):
+def user():
     with transaction.manager:
-        user = User(
-            keyname=TEST_USER_KEYNAME,
-            display_name="Test User",
-        ).persist()
+        user = User.test_instance().persist()
 
+    yield user
+
+    with transaction.manager:
+        DBSession.delete(User.filter_by(id=user.id).one())
+
+
+@pytest.fixture(scope="module")
+def webmap(user, ngw_resource_group):
+    with transaction.manager:
         test_root_resource = ResourceGroup.filter_by(id=0).one()
         append_acl(test_root_resource, "allow", user, "resource", "read", ResourceGroup.identity)
 
@@ -75,33 +75,16 @@ def webmap_id(ngw_resource_group):
         make_annotation(webmap, public=True, user_id=user.id)
         make_annotation(webmap, public=False, user_id=user.id)
 
-    DBSession.flush()
-
-    yield webmap.id
+    yield webmap
 
     with transaction.manager:
         DBSession.query(ResourceACLRule).filter(ResourceACLRule.principal_id == user.id).delete()
         DBSession.delete(WebMap.filter_by(id=webmap.id).one())
-        DBSession.delete(User.filter_by(id=user.id).one())
 
 
-@pytest.fixture()
-def ngw_auth_test_user(ngw_pyramid_config):
-    policy = ngw_pyramid_config.registry.getUtility(ISecurityPolicy)
-
-    def _policy_authenticate(request):
-        return AuthResult(
-            User.by_keyname(TEST_USER_KEYNAME).id, AuthMedium.SESSION, AuthProvider.LOCAL_PW
-        )
-
-    with patch.object(policy, "_authenticate_request", _policy_authenticate):
-        yield
-
-
-def test_no_admin_annotations_should_view_only_public_annotations_and_own_private(
-    ngw_webtest_app, ngw_auth_test_user, webmap_id
-):
-    annotations = ngw_webtest_app.get("/api/resource/%d/annotation/" % webmap_id).json
+def test_regular_user(webmap, user, ngw_webtest_app):
+    ngw_webtest_app.authorization = ("Basic", (user.keyname, user.password_plaintext))
+    annotations = ngw_webtest_app.get("/api/resource/%d/annotation/" % webmap.id).json
     assert len(annotations) == 3
 
     public_annotations = list(filter(lambda a: a["public"] is True, annotations))
@@ -111,10 +94,8 @@ def test_no_admin_annotations_should_view_only_public_annotations_and_own_privat
     assert len(private_annotations) == 1
 
 
-def test_admin_annotations_should_view_all_annotations(
-    ngw_webtest_app, ngw_auth_administrator, webmap_id
-):
-    annotations = ngw_webtest_app.get("/api/resource/%d/annotation/" % webmap_id).json
+def test_admin(webmap, ngw_auth_administrator, ngw_webtest_app):
+    annotations = ngw_webtest_app.get("/api/resource/%d/annotation/" % webmap.id).json
     assert len(annotations) == 4
 
     public_annotations = list(filter(lambda a: a["public"] is True, annotations))

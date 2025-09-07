@@ -91,12 +91,7 @@ def _dummy_auth_request(ngw_webtest_app, status_code=200):
 @pytest.fixture
 def user():
     with transaction.manager:
-        user = User(
-            keyname="test-user",
-            display_name="test-user",
-            password="password123",
-        ).persist()
-        DBSession.flush()
+        user = User.test_instance().persist()
 
     yield user
 
@@ -111,14 +106,14 @@ def test_forget_user(ngw_webtest_factory, user):
     app2 = ngw_webtest_factory()
     app2.post(
         "/api/component/auth/login",
-        dict(login=user.keyname, password="password123"),
+        dict(login=user.keyname, password=user.password_plaintext),
     )
     resp = app2.get("/api/component/auth/current_user")
     assert resp.json["keyname"] == user.keyname
 
     app1.put_json(
         f"/api/component/auth/user/{user.id}",
-        dict(password="other-password"),
+        dict(password=User.test_instance().password_plaintext),
     )
 
     resp = app2.get("/api/component/auth/current_user")
