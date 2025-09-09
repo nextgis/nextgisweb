@@ -7,6 +7,8 @@ import type {
 
 import type { MapStore } from "../MapStore";
 
+import { updateControlAppearance } from "./updateControlAppearance";
+
 export function createControl(
     control: MapControl,
     options: CreateControlOptions = {},
@@ -15,18 +17,14 @@ export function createControl(
     class NewControl extends Control {
         constructor() {
             const element = document.createElement("div");
-            element.className =
-                (options.addClass ? options.addClass + " " : "") +
-                "ol-unselectable" +
-                (options.bar ? " webmap-ctrl-group" : "") +
-                (options.margin ? " ol-control-margin" : "");
+            const createElement = () => {
+                updateControlAppearance(element, options);
+                return element;
+            };
 
-            const content = control.onAdd(map);
-            if (content) {
-                element.appendChild(content);
-            }
+            control.onAdd(map);
 
-            super({ element });
+            super({ element: createElement() });
         }
     }
 

@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect, useState } from "react";
+import { Suspense, lazy, useCallback, useEffect, useState } from "react";
 import type { ComponentType } from "react";
 
 import { ModalHolder } from "./ModalHolder";
@@ -15,42 +15,48 @@ export function useShowModal({
 
     const [isLoading, setIsLoading] = useState(false);
 
-    function showModal<P extends ShowModalOptions>(
-        ModalComponent: ComponentType<P>,
-        config?: P
-    ) {
-        return showModalBase(
-            (props: P) => <ModalComponent {...props} />,
+    const showModal = useCallback(
+        <P extends ShowModalOptions>(
+            ModalComponent: ComponentType<P>,
+            config?: P
+        ) => {
+            return showModalBase(
+                (props: P) => <ModalComponent {...props} />,
 
-            { modalStore, ...(config || ({} as P)) }
-        );
-    }
+                { modalStore, ...(config || ({} as P)) }
+            );
+        },
+        [modalStore]
+    );
 
-    function lazyModal<P extends ShowModalOptions>(
-        getModalComponent: () => Promise<{ default: ComponentType<P> }>,
-        config: P
-    ) {
-        setIsLoading(true);
+    const lazyModal = useCallback(
+        <P extends ShowModalOptions>(
+            getModalComponent: () => Promise<{ default: ComponentType<P> }>,
+            config: P
+        ) => {
+            setIsLoading(true);
 
-        const wrappedLoader = async () => {
-            try {
-                return await getModalComponent();
-            } finally {
-                setIsLoading(false);
-            }
-        };
+            const wrappedLoader = async () => {
+                try {
+                    return await getModalComponent();
+                } finally {
+                    setIsLoading(false);
+                }
+            };
 
-        const ModalComponent = lazy(wrappedLoader);
+            const ModalComponent = lazy(wrappedLoader);
 
-        return showModalBase(
-            (props: P) => (
-                <Suspense fallback={null}>
-                    <ModalComponent {...props} />
-                </Suspense>
-            ),
-            { modalStore, ...(config || ({} as P)) }
-        );
-    }
+            return showModalBase(
+                (props: P) => (
+                    <Suspense fallback={null}>
+                        <ModalComponent {...props} />
+                    </Suspense>
+                ),
+                { modalStore, ...(config || ({} as P)) }
+            );
+        },
+        [modalStore]
+    );
 
     useEffect(() => {
         return () => {

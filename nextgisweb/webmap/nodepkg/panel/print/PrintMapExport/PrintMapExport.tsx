@@ -7,7 +7,7 @@ import type { MenuProps } from "@nextgisweb/gui/antd";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { Display } from "@nextgisweb/webmap/display";
-import { printMapStore } from "@nextgisweb/webmap/print-map/PrintMapStore";
+import type { PrintMapStore } from "@nextgisweb/webmap/print-map/store";
 import type { PrintMapSettings } from "@nextgisweb/webmap/print-map/type";
 import type { PrintBody, PrintFormat } from "@nextgisweb/webmap/type/api";
 
@@ -21,8 +21,8 @@ interface ExportProps {
     display: Display;
     format: PrintFormat;
     element: HTMLElement;
-    settings: PrintMapSettings;
-    printMapStore: typeof printMapStore;
+    settings: Pick<PrintMapSettings, "width" | "height" | "margin">;
+    printMapStore: PrintMapStore;
     setLoad: (loading: boolean) => void;
     print?: boolean;
 }
@@ -50,24 +50,27 @@ const runExport = ({
             const { width, height, margin } = settings;
 
             let legend;
-            if (printMapStore.legendCoords.displayed) {
+            if (printMapStore.layout.legendCoords.displayed) {
                 const legendItems = legendItemsToModel(
                     printMapStore.webMapItems
                 );
-                legend = legendToModel(legendItems, printMapStore.legendCoords);
+                legend = legendToModel(
+                    legendItems,
+                    printMapStore.layout.legendCoords
+                );
             }
 
             let title;
-            if (printMapStore.titleCoords.displayed) {
+            if (printMapStore.layout.titleCoords.displayed) {
                 const [titleEl] = document.querySelectorAll(
                     "#printMap .print-title"
                 );
                 const content = titleEl.innerHTML;
-                title = { ...printMapStore.titleCoords, content };
+                title = { ...printMapStore.layout.titleCoords, content };
             }
 
             const content = dataUrl.substring("data:image/png;base64,".length);
-            const map = { ...printMapStore.mapCoords, content };
+            const map = { ...printMapStore.layout.mapCoords, content };
 
             const body: PrintBody = {
                 width,
@@ -100,15 +103,17 @@ const runExport = ({
 };
 
 interface PrintMapExportProps {
-    mapSettings: PrintMapSettings;
-    printMapEl?: HTMLElement;
+    printMapEl?: HTMLElement | null;
     display: Display;
+    printMapStore: PrintMapStore;
 }
 
 export const PrintMapExport = observer(
-    ({ printMapEl, mapSettings, display }: PrintMapExportProps) => {
+    ({ printMapEl, display, printMapStore }: PrintMapExportProps) => {
         const [loadingFile, setLoadingFile] = useState(false);
         const [loadingPrint, setLoadingPrint] = useState(false);
+
+        const { height, margin, width } = printMapStore;
 
         const exportToFormat = (
             format: PrintFormat,
@@ -124,7 +129,7 @@ export const PrintMapExport = observer(
                 format,
                 element: viewport as HTMLElement,
                 print,
-                settings: mapSettings,
+                settings: { height, margin, width },
                 printMapStore,
                 setLoad,
             });

@@ -155,7 +155,10 @@ export const FeatureEditorWidget = observer(
                     errorModal(err);
                 }
             } else if (onOk) {
-                onOk(store.preparePayload());
+                onOk(
+                    store.preparePayload(),
+                    store.preparePayload({ ignoreDirty: true })
+                );
             }
         }, [dirty, messageApi, mode, onOk, onSave, store]);
 

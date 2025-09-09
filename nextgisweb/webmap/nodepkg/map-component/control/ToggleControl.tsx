@@ -1,87 +1,67 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type React from "react";
-import { createPortal } from "react-dom";
+import classNames from "classnames";
+import { useMemo } from "react";
 
-import { useObjectState } from "@nextgisweb/gui/hook";
-import { createToggleControl } from "@nextgisweb/webmap/ol/control/createToggleControl";
-import type {
-    ToggleControl as IToggleControl,
-    ToggleControlOptions,
-} from "@nextgisweb/webmap/ol/control/createToggleControl";
-
-import { useMapContext } from "../context/useMapContext";
-import { useMapControl } from "../hook/useMapControl";
-
+import { ButtonControl } from "./ButtonControl";
+import type { ButtonControlProps } from "./ButtonControl";
 import type { ControlProps } from "./MapControl";
+import { useToggleControl } from "./hook/useToggleControl";
+import type {
+    ToggleActiveProp,
+    UseToggleControlOptions,
+} from "./hook/useToggleControl";
 
-export type ToggleControlProps = Omit<
-    ControlProps<ToggleControlOptions>,
-    "html"
+import "./ToggleControl.less";
+
+function getVal<T>(
+    val: ToggleActiveProp<T> | undefined,
+    v: boolean
+): T | undefined {
+    return typeof val === "function"
+        ? (val as (s: boolean) => T)(v)
+        : (val as T | undefined);
+}
+
+type ToggleControlOptions = Omit<
+    ButtonControlProps,
+    "title" | "style" | "onChange"
 > & {
-    children?: React.ReactNode;
-    render?: (status: boolean) => React.ReactNode;
-};
+    title?: ToggleActiveProp<string | undefined>;
+    style?: ToggleActiveProp<React.CSSProperties | undefined>;
+    className?: string;
+    statusClassName?: ToggleActiveProp<string | undefined>;
+    onChange?: (value: boolean) => void | Promise<void>;
+} & Omit<UseToggleControlOptions, "toggle">;
+
+export type ToggleControlProps = ControlProps<ToggleControlOptions>;
 
 export function ToggleControl({
-    position,
+    statusClassName,
+    className,
     children,
-    render,
-    status: statusProp,
     style,
-    ...toggleOptions
+    title,
+    onChange,
+    ...rest
 }: ToggleControlProps) {
-    const statusRef = useRef(statusProp);
+    const { value, toggle } = useToggleControl({ ...rest, onChange });
 
-    const [options] = useObjectState(toggleOptions);
-    const context = useMapContext();
-    const [instance, setInstance] = useState<IToggleControl>();
-    const [status, setStatus] = useState(statusProp ?? false);
+    const btnTitle = getVal(title, value);
+    const btnStyle = useMemo(
+        () => (style ? getVal(style, value) : {}),
+        [value, style]
+    );
 
-    useMapControl({ context, instance, position });
-
-    const portal = useRef(document.createElement("div"));
-
-    const createControl = useCallback(() => {
-        return createToggleControl({
-            ...options,
-            status: statusRef.current,
-            html: portal.current,
-            onClick: async (newStatus) => {
-                setStatus(newStatus);
-                if (options.onClick) {
-                    await options.onClick(newStatus);
-                }
-            },
-        });
-    }, [options]);
-
-    useEffect(() => {
-        const control = createControl();
-        setInstance(control);
-
-        return () => {
-            control.setMap(null);
-        };
-    }, [createControl]);
-
-    useEffect(() => {
-        statusRef.current = status;
-        if (!instance) return;
-        instance.changeStatus(status);
-    }, [instance, status]);
-
-    useEffect(() => {
-        if (!instance) return;
-
-        instance.setStyle(style);
-    }, [instance, style]);
-
-    const content = useMemo(() => {
-        if (render) {
-            return render(status);
-        }
-        return children;
-    }, [render, children, status]);
-
-    return createPortal(content, portal.current);
+    return (
+        <ButtonControl
+            {...rest}
+            title={btnTitle}
+            className={classNames(className, getVal(statusClassName, value), {
+                "toggle-on": value,
+            })}
+            btnStyle={btnStyle}
+            onClick={toggle}
+        >
+            {children}
+        </ButtonControl>
+    );
 }

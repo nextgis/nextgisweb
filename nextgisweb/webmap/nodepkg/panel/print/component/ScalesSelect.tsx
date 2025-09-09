@@ -1,43 +1,40 @@
-import { debounce } from "lodash-es";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { FC, ReactNode } from "react";
 
 import { Divider, InputNumber, Select } from "@nextgisweb/gui/antd";
+import { useDebounce } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
+import { scaleToLabel } from "../options";
 import type { Scale } from "../options";
+import { formatScaleNumber } from "../util";
 
 import "./ScalesSelect.css";
 
-const numberFormat = new Intl.NumberFormat("ru-RU");
-const validateCustomScale = (value: number | null) =>
-    value && Number.isInteger(value) && value > 0;
+const validateCustomScale = (value: number | null): boolean =>
+    value !== null && Number.isInteger(value) && value > 0;
 
 interface ScalesSelectProps {
-    selectedValue: number | undefined;
+    value: number | undefined;
     scales: Scale[];
     onChange: (scale: number) => void;
 }
 
 export const ScalesSelect: FC<ScalesSelectProps> = ({
-    selectedValue,
+    value,
     scales,
     onChange,
 }) => {
-    const [customScale, setCustomScale] = useState<number | null>(null);
     const [open, setOpen] = useState<boolean>(false);
     const inputRef = useRef<HTMLInputElement>(null);
 
-    useEffect(() => {
-        if (customScale === null) return;
-        onChange(customScale);
-    }, [customScale, onChange]);
+    const changeCustomScale = (val: number | null) => {
+        if (validateCustomScale(val) && val !== null && val !== value) {
+            onChange(val);
+        }
+    };
 
-    const changeCustomScale = useCallback((value: number | null) => {
-        setCustomScale(validateCustomScale(value) ? value : null);
-    }, []);
-
-    const debouncedOnChange = debounce(changeCustomScale, 500);
+    const debouncedOnChange = useDebounce(changeCustomScale, 500);
 
     const onPressEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
         e.stopPropagation();
@@ -46,18 +43,15 @@ export const ScalesSelect: FC<ScalesSelectProps> = ({
             ""
         );
         changeCustomScale(Number(inputValue));
-        if (customScale && selectedValue !== customScale) onChange(customScale);
-    };
-
-    const onOpenChange = (open: boolean) => {
-        setOpen(open);
     };
 
     useEffect(() => {
-        if (open && inputRef.current) {
-            setTimeout(() => inputRef.current?.focus(), 100);
+        if (open) {
+            setTimeout(() => {
+                inputRef.current?.focus();
+            }, 100);
         }
-    }, [open, inputRef]);
+    }, [open]);
 
     const popupRender = (menu: ReactNode) => (
         <>
@@ -71,11 +65,11 @@ export const ScalesSelect: FC<ScalesSelectProps> = ({
                         min={1}
                         max={1000000000}
                         placeholder={gettext("Custom scale")}
-                        value={customScale}
-                        onChange={(v) => debouncedOnChange(v)}
+                        value={value}
+                        onChange={debouncedOnChange}
                         formatter={(value) => {
                             if (!value) return "";
-                            return numberFormat.format(value);
+                            return formatScaleNumber(value);
                         }}
                         onPressEnter={onPressEnter}
                         style={{ width: "100%" }}
@@ -90,8 +84,9 @@ export const ScalesSelect: FC<ScalesSelectProps> = ({
             style={{ width: "100%" }}
             popupRender={popupRender}
             onChange={onChange}
-            onOpenChange={onOpenChange}
-            value={selectedValue}
+            onOpenChange={setOpen}
+            value={value}
+            labelRender={(e) => scaleToLabel(Number(e.value))}
             options={scales}
         ></Select>
     );
