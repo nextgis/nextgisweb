@@ -97,6 +97,20 @@ export class Identify extends ToolBase {
         this.highlightedFeature = highlightedFeature;
     }
 
+    @action.bound
+    clear() {
+        this.highlightedFeature = null;
+        this.identifyInfo = null;
+        topic.publish("feature.unhighlight");
+
+        const pm = this.display.panelManager;
+        const pkey = "identify";
+        const panel = pm.getPanel<IdentifyStore>(pkey);
+        if (panel) {
+            panel.setIdentifyInfo(undefined);
+        }
+    }
+
     async highlightFeature(
         identifyInfo: IdentifyInfo,
         featureInfo: FeatureInfo,
