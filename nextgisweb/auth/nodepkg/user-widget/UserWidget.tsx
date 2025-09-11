@@ -50,22 +50,30 @@ export function UserWidget({ id, readonly }: UserWidgetProps) {
                 rules: [KeynameRule],
                 formItem: <Input />,
             },
-            {
-                name: "password",
-                label: gettext("Password"),
-                formItem: isNewUser ? (
-                    <Input.Password
-                        autoComplete="new-password"
-                        placeholder={gettext("Enter new password here")}
-                    />
-                ) : (
-                    <UserWidgetPassword
-                        autoComplete="new-password"
-                        placeholder={gettext("Enter new password here")}
-                    />
-                ),
-                required: true,
-            },
+            ...(settings?.user_limit?.local
+                ? [
+                      {
+                          name: "password",
+                          label: gettext("Password"),
+                          formItem: isNewUser ? (
+                              <Input.Password
+                                  autoComplete="new-password"
+                                  placeholder={gettext(
+                                      "Enter new password here"
+                                  )}
+                              />
+                          ) : (
+                              <UserWidgetPassword
+                                  autoComplete="new-password"
+                                  placeholder={gettext(
+                                      "Enter new password here"
+                                  )}
+                              />
+                          ),
+                          required: true,
+                      },
+                  ]
+                : []),
             {
                 name: "oauth_subject",
                 label: oauth.name,
