@@ -101,10 +101,12 @@ const createStatusColumn = (): Col => ({
     sorter: (a, b) => (a.disabled > b.disabled ? 1 : -1),
 });
 
+const showOauthColumns = oauth.enabled && settings?.user_limit?.local;
+
 const columns: TableProps["columns"] = [
     createFullNameColumn(),
     createLoginColumn(),
-    ...(oauth.enabled ? createOauthColumns() : []),
+    ...(showOauthColumns ? createOauthColumns() : []),
     createLastActivityColumn(),
     createStatusColumn(),
 ];
@@ -139,7 +141,7 @@ export function UserBrowse({ readonly }: UserBrowseProps) {
                 readonly={readonly}
                 columns={columns}
                 messages={messages}
-                showCreate={(settings?.user_limit?.local || 0) > 0}
+                showCreate={!!settings?.user_limit?.local}
                 collectionOptions={{ query: { brief: true } }}
                 collectionFilter={collectionFilter}
                 headerControls={(tmBtn && [() => tmBtn]) || []}
