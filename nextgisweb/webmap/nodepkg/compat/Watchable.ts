@@ -16,11 +16,13 @@ export abstract class Watchable<WatchableProps extends Record<string, any>> {
             oldVal: WatchableProps[T],
             newVal: WatchableProps[T]
         ) => void
-    ): void {
+    ): () => void {
         if (!this.watchHandlers[attr]) {
             this.watchHandlers[attr] = [];
         }
         this.watchHandlers[attr]!.push(callback);
+
+        return () => this.unwatch(attr, callback);
     }
 
     unwatch<T extends keyof WatchableProps>(

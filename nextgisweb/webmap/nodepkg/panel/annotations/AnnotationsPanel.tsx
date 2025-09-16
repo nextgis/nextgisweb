@@ -50,16 +50,16 @@ const AnnotationsPanel = observer<PanelPluginWidgetProps>(
         const changeEdit = useCallback(
             (beginEdit: boolean) => {
                 if (beginEdit) {
-                    display.mapStates.activateState(ADD_ANNOTATION_STATE_KEY);
+                    display.map.setMapState(ADD_ANNOTATION_STATE_KEY);
                     changeVisible("messages");
                     topic.publish("webmap/annotations/add/activate", geomType);
                 } else {
-                    display.mapStates.deactivateState(ADD_ANNOTATION_STATE_KEY);
+                    display.map.deactivateMapState(ADD_ANNOTATION_STATE_KEY);
                     topic.publish("webmap/annotations/add/deactivate");
                 }
                 setEdit(beginEdit);
             },
-            [changeVisible, display.mapStates, geomType]
+            [changeVisible, display.map, geomType]
         );
 
         const changeGeomType = useCallback((type: GeometryType): void => {
@@ -89,24 +89,18 @@ const AnnotationsPanel = observer<PanelPluginWidgetProps>(
 
             const _editable = scope.write;
             setEditable(_editable);
-            if (_editable) display.mapStates.addState(ADD_ANNOTATION_STATE_KEY);
         }, [changeVisible, display]);
 
         useEffect(() => {
             if (
-                visible === "no" &&
-                edit &&
-                display.mapStates.getActiveState() === ADD_ANNOTATION_STATE_KEY
+                display.map.mapState !== ADD_ANNOTATION_STATE_KEY ||
+                (visible === "no" && edit)
             ) {
                 changeEdit(false);
             }
-        }, [visible, edit, changeEdit, display.mapStates]);
+        }, [visible, edit, display.map.mapState, changeEdit]);
 
-        if (
-            visible === undefined ||
-            display.mapStates === undefined ||
-            annScope === undefined
-        ) {
+        if (visible === undefined || annScope === undefined) {
             return null;
         }
 
@@ -141,7 +135,7 @@ const AnnotationsPanel = observer<PanelPluginWidgetProps>(
                             <Switch
                                 size="small"
                                 checked={edit}
-                                onChange={(v) => changeEdit(v)}
+                                onChange={changeEdit}
                             />
                             <span className="label">
                                 {gettext("Edit annotations")}

@@ -1,7 +1,7 @@
 import type { TreeProps } from "@nextgisweb/gui/antd";
 import { countNodes, traverseTree } from "@nextgisweb/gui/util/tree";
 
-import type WebmapStore from "../../store";
+import type { WebmapStore } from "../../store";
 import type {
     TreeChildrenItemConfig,
     TreeItemConfig,

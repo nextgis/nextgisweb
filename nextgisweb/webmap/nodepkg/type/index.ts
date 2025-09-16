@@ -1,5 +1,4 @@
 import type Feature from "ol/Feature";
-import type OlControl from "ol/control/Control";
 
 import type { LayerItemConfig } from "@nextgisweb/webmap/type/api";
 
@@ -7,7 +6,6 @@ import type { LayerDisplayAdapterCtor } from "../DisplayLayerAdapter";
 import type { CustomItemFileWriteStore } from "../compat/CustomItemFileWriteStore";
 import type { LayerSymbols } from "../compat/type";
 import type { Display } from "../display";
-import type { ToolBase } from "../map-controls/tool/ToolBase";
 import type { MapStore } from "../ol/MapStore";
 import type { PluginBase } from "../plugin/PluginBase";
 import type { AnnotationVisibleMode } from "../store/annotations/AnnotationsStore";
@@ -46,16 +44,6 @@ export interface Mid {
     adapter: AdapterModules;
     plugin: PluginModules;
     wmplugin: WMPluginModules;
-}
-
-export type MapControl = OlControl | ToolBase;
-
-export interface MapRefs {
-    target: HTMLElement;
-    leftTopControlPane: HTMLElement;
-    leftBottomControlPane: HTMLElement;
-    rightTopControlPane: HTMLElement;
-    rightBottomControlPane: HTMLElement;
 }
 
 export interface DisplayURLParams {

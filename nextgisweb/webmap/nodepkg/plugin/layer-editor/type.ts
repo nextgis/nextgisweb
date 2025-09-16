@@ -23,6 +23,8 @@ export interface FeatureToSave {
 }
 
 export interface FeaturesToSave {
-    patch: FeatureToSave[];
-    delete: FeatureToSave[];
+    toPatch: FeatureToSave[];
+    toDelete: FeatureToSave[];
 }
+
+export type UndoAction = () => void;

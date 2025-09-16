@@ -1,86 +1,95 @@
-import { useCallback, useEffect, useState } from "react";
-import type { FC } from "react";
+import { observer } from "mobx-react-lite";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Switch } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import type { PrintMapStore } from "@nextgisweb/webmap/print-map/store";
 import type { PrintMapSettings } from "@nextgisweb/webmap/print-map/type";
 
 import { ScalesSelect } from "../component/ScalesSelect";
 import { scaleToLabel, scalesList } from "../options";
+import type { Scale } from "../options";
 
 interface PrintScaleSettings {
-    printMapScale?: number;
-    mapSettings: PrintMapSettings;
-    updateMapSettings: (updateSettings: Partial<PrintMapSettings>) => void;
+    printMapStore: PrintMapStore;
 }
 
-export const PrintScaleSettings: FC<PrintScaleSettings> = ({
-    printMapScale,
-    mapSettings,
-    updateMapSettings,
-}) => {
-    const [scales, setScales] = useState(scalesList);
+export const PrintScaleSettings = observer<PrintScaleSettings>(
+    ({ printMapStore }) => {
+        const [customScale, setCustomScale] = useState<Scale | null>(null);
 
-    const updateMapScale = useCallback(
-        (scale: PrintMapSettings["scale"]) => {
-            updateMapSettings({ scale });
-        },
-        [updateMapSettings]
-    );
+        const { scale, scaleLine, scaleValue } = printMapStore;
 
-    useEffect(() => {
-        if (!printMapScale) {
-            return;
-        }
+        const scalesToShow = useMemo(() => {
+            if (customScale) {
+                return [customScale, ...scalesList];
+            }
+            return scalesList;
+        }, [customScale]);
 
-        const scaleInList = scalesList.some((s) => s.value === printMapScale);
-        if (scaleInList) {
-            setScales(scalesList);
-            return;
-        }
+        const updateMapScale = useCallback(
+            (scale: PrintMapSettings["scale"]) => {
+                printMapStore.update({ scale });
+            },
+            [printMapStore]
+        );
 
-        const customScale = {
-            value: printMapScale,
-            label: scaleToLabel(printMapScale),
-            disabled: true,
-        };
+        useEffect(() => {
+            if (!scale) {
+                return;
+            }
 
-        const newScales = [customScale, ...scalesList];
-        setScales(newScales);
-        updateMapSettings({ scale: printMapScale });
-    }, [printMapScale, updateMapSettings]);
+            const scaleInList = scalesList.some((s) => s.value === scale);
+            if (scaleInList) {
+                setCustomScale(null);
+                return;
+            }
 
-    return (
-        <>
-            <div className="input-group">
-                <Switch
-                    size="small"
-                    checked={mapSettings.scaleValue}
-                    onChange={(v) => updateMapSettings({ scaleValue: v })}
-                />
-                <span className="checkbox__label">
-                    {gettext("Scale value")}
-                </span>
-            </div>
-            <div className="input-group">
-                <Switch
-                    size="small"
-                    checked={mapSettings.scaleLine}
-                    onChange={(v) => updateMapSettings({ scaleLine: v })}
-                />
-                <span className="checkbox__label">{gettext("Scale bar")}</span>
-            </div>
+            const newCustomScale = {
+                value: scale,
+                label: scaleToLabel(scale),
+                disabled: true,
+            };
 
-            <div className="input-group column">
-                <label>{gettext("Scale")}</label>
-                <ScalesSelect
-                    selectedValue={mapSettings.scale}
-                    scales={scales}
-                    onChange={updateMapScale}
-                />
-            </div>
-        </>
-    );
-};
+            setCustomScale(newCustomScale);
+        }, [scale]);
+
+        return (
+            <>
+                <div className="input-group">
+                    <Switch
+                        size="small"
+                        checked={scaleValue}
+                        onChange={(v) =>
+                            printMapStore.update({ scaleValue: v })
+                        }
+                    />
+                    <span className="checkbox__label">
+                        {gettext("Scale value")}
+                    </span>
+                </div>
+                <div className="input-group">
+                    <Switch
+                        size="small"
+                        checked={scaleLine}
+                        onChange={(v) => printMapStore.update({ scaleLine: v })}
+                    />
+                    <span className="checkbox__label">
+                        {gettext("Scale bar")}
+                    </span>
+                </div>
+
+                <div className="input-group column">
+                    <label>{gettext("Scale")}</label>
+                    <ScalesSelect
+                        value={scale}
+                        scales={scalesToShow}
+                        onChange={updateMapScale}
+                    />
+                </div>
+            </>
+        );
+    }
+);
 
 PrintScaleSettings.displayName = "PrintScaleSettings";

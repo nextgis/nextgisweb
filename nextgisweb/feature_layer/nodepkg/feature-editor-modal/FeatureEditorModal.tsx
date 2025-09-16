@@ -13,7 +13,6 @@ import "./FeatureEditorModal.less";
 export type ModalProps = Parameters<typeof Modal>[0];
 
 export interface FeatureEditorModalProps extends ModalProps {
-    skipDirtyCheck?: boolean;
     editorOptions?: FeatureEditorWidgetProps;
 }
 
@@ -25,22 +24,22 @@ const [msgConfirmTitle, msgConfirmContent] = [
 
 export function FeatureEditorModal({
     open: openProp,
-    skipDirtyCheck,
     editorOptions,
     onCancel,
     ...modalProps
 }: FeatureEditorModalProps) {
     const [open, setOpen] = useState(openProp);
-    const { resourceId, featureId, onSave, mode, onOk } = editorOptions || {};
+    const { resourceId, featureId, featureItem, onSave, mode, onOk } =
+        editorOptions || {};
     const [modal, contextHolder] = Modal.useModal();
 
     assert(typeof resourceId === "number");
     const [store] = useState(
         () =>
             new FeatureEditorStore({
-                resourceId,
-                skipDirtyCheck,
                 featureId: typeof featureId === "number" ? featureId : null,
+                resourceId,
+                featureItem,
             })
     );
 
@@ -95,9 +94,9 @@ export function FeatureEditorModal({
                         close();
                         onSave?.(e);
                     }}
-                    onOk={(e) => {
+                    onOk={(dirtyValue, item) => {
                         close();
-                        onOk?.(e);
+                        onOk?.(dirtyValue, item);
                     }}
                     toolbar={{
                         rightActions: [

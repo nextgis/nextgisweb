@@ -48,7 +48,7 @@ const msgNoChanges = gettext("No changes to save");
 export const FeatureEditorWidget = observer(
     ({
         showGeometryTab = true,
-        skipDirtyCheck,
+        allowEmpty,
         resourceId,
         featureId,
         okBtnMsg = msgOk,
@@ -66,7 +66,6 @@ export const FeatureEditorWidget = observer(
             return new FeatureEditorStore({
                 resourceId,
                 featureId,
-                skipDirtyCheck,
             });
         })[0];
 
@@ -155,7 +154,10 @@ export const FeatureEditorWidget = observer(
                     errorModal(err);
                 }
             } else if (onOk) {
-                onOk(store.preparePayload());
+                onOk(
+                    store.preparePayload(),
+                    store.preparePayload({ ignoreDirty: true })
+                );
             }
         }, [dirty, messageApi, mode, onOk, onSave, store]);
 
@@ -164,7 +166,7 @@ export const FeatureEditorWidget = observer(
         const toolbarProps: Partial<ActionToolbarProps> = useMemo(() => {
             const actions: ActionToolbarAction[] = [
                 <SaveButton
-                    disabled={!dirty}
+                    disabled={allowEmpty ? false : !dirty}
                     key="save"
                     loading={saving}
                     onClick={onSaveClick}
