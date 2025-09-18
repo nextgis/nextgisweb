@@ -87,7 +87,17 @@ class Feature:
 
         for k, v in self.fields.items():
             name = k if aliases is None else aliases[k]
-            ogr_feature.SetField(name, v)
+            match v:
+                case None:
+                    pass
+                case int() | float() | str():
+                    ogr_feature.SetField(name, v)
+                case datetime():
+                    ogr_feature.SetField(name, v.year, v.month, v.day, v.hour, v.minute, v.second, 0)
+                case date():
+                    ogr_feature.SetField(name, v.year, v.month, v.day, 0, 0, 0, 0)
+                case time():
+                    ogr_feature.SetField(name, 0, 0, 0, v.hour, v.minute, v.second, 0)
 
         if fid is not None:
             ogr_feature.SetField(fid, self.id)
