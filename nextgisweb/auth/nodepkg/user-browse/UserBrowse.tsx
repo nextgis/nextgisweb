@@ -1,5 +1,6 @@
 import { useCallback, useMemo } from "react";
 
+import settings from "@nextgisweb/auth/client-settings";
 import { AdministratorIcon, RegularUserIcon } from "@nextgisweb/auth/icon";
 import { Alert, Tooltip } from "@nextgisweb/gui/antd";
 import type { TableProps } from "@nextgisweb/gui/antd";
@@ -100,10 +101,13 @@ const createStatusColumn = (): Col => ({
     sorter: (a, b) => (a.disabled > b.disabled ? 1 : -1),
 });
 
+const usersLimitNotZero = settings?.user_limit?.local !== 0;
+const showOauthColumns = oauth.enabled && usersLimitNotZero;
+
 const columns: TableProps["columns"] = [
     createFullNameColumn(),
     createLoginColumn(),
-    ...(oauth.enabled ? createOauthColumns() : []),
+    ...(showOauthColumns ? createOauthColumns() : []),
     createLastActivityColumn(),
     createStatusColumn(),
 ];
@@ -136,6 +140,7 @@ export function UserBrowse({ readonly }: UserBrowseProps) {
                 readonly={readonly}
                 columns={columns}
                 messages={messages}
+                showCreate={usersLimitNotZero}
                 collectionOptions={{ query: { brief: true } }}
                 collectionFilter={collectionFilter}
                 headerControls={(tmBtn && [() => tmBtn]) || []}

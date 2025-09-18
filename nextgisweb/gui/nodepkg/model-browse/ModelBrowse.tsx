@@ -74,6 +74,7 @@ interface ModelBrowseProps<Data extends ModalBrowseData = ModalBrowseData>
     };
     readonly?: boolean;
     showActionColumn?: boolean;
+    showCreate?: boolean;
     customRowSelection?: TableRowSelection<Data>;
 
     createProps?: ButtonProps;
@@ -83,6 +84,10 @@ interface ModelBrowseProps<Data extends ModalBrowseData = ModalBrowseData>
     collectionFilter?: (item: Data) => boolean;
 }
 
+interface TableControlProps {
+    showCreate: boolean;
+}
+
 export function ModelBrowse<Data extends ModalBrowseData = ModalBrowseData>({
     model: m,
     columns,
@@ -90,6 +95,7 @@ export function ModelBrowse<Data extends ModalBrowseData = ModalBrowseData>({
     callbacks = {},
     itemProps = {},
     showActionColumn = true,
+    showCreate = true,
     customRowSelection,
     createProps = {},
     headerControls = [],
@@ -274,7 +280,7 @@ export function ModelBrowse<Data extends ModalBrowseData = ModalBrowseData>({
         });
     }
 
-    const TableControl = () => (
+    const TableControl = ({ showCreate }: TableControlProps) => (
         <Row justify="space-between">
             <Col>
                 <Input
@@ -294,14 +300,17 @@ export function ModelBrowse<Data extends ModalBrowseData = ModalBrowseData>({
                             <Control {...{ selected, rows, setRows }} />
                         </Fragment>
                     ))}
-                    <Button
-                        icon={<AddIcon />}
-                        onClick={goToCreatePage}
-                        {...createProps}
-                        type="primary"
-                    >
-                        {gettext("Create")}
-                    </Button>
+
+                    {showCreate && (
+                        <Button
+                            icon={<AddIcon />}
+                            onClick={goToCreatePage}
+                            {...createProps}
+                            type="primary"
+                        >
+                            {gettext("Create")}
+                        </Button>
+                    )}
                 </Space>
             </Col>
         </Row>
@@ -350,7 +359,9 @@ export function ModelBrowse<Data extends ModalBrowseData = ModalBrowseData>({
 
     let headSection;
     if (!readonly) {
-        headSection = selected.length ? SelectedControl() : TableControl();
+        headSection = selected.length
+            ? SelectedControl()
+            : TableControl({ showCreate });
     }
 
     return (

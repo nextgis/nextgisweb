@@ -35,6 +35,8 @@ export function UserWidget({ id, readonly }: UserWidgetProps) {
 
     const isNewUser = useMemo(() => id === undefined, [id]);
 
+    const showFullColumns = settings?.user_limit?.local !== 0;
+
     const fields = useMemo<FormField[]>(() => {
         return [
             {
@@ -50,22 +52,28 @@ export function UserWidget({ id, readonly }: UserWidgetProps) {
                 rules: [KeynameRule],
                 formItem: <Input />,
             },
-            {
-                name: "password",
-                label: gettext("Password"),
-                formItem: isNewUser ? (
-                    <Input.Password
-                        autoComplete="new-password"
-                        placeholder={gettext("Enter new password here")}
-                    />
-                ) : (
-                    <UserWidgetPassword
-                        autoComplete="new-password"
-                        placeholder={gettext("Enter new password here")}
-                    />
-                ),
-                required: true,
-            },
+            ...(showFullColumns
+                ? [
+                      {
+                          name: "password",
+                          label: gettext("Password"),
+                          formItem: isNewUser ? (
+                              <Input.Password
+                                  autoComplete="new-password"
+                                  // prettier-ignore
+                                  placeholder={gettext("Enter new password here")}
+                              />
+                          ) : (
+                              <UserWidgetPassword
+                                  autoComplete="new-password"
+                                  // prettier-ignore
+                                  placeholder={gettext("Enter new password here")}
+                              />
+                          ),
+                          required: true,
+                      },
+                  ]
+                : []),
             {
                 name: "oauth_subject",
                 label: oauth.name,
@@ -113,7 +121,7 @@ export function UserWidget({ id, readonly }: UserWidgetProps) {
                 formItem: <Input.TextArea />,
             },
         ];
-    }, [group, isNewUser]);
+    }, [group, isNewUser, showFullColumns]);
 
     const infoNGID = useMemo(
         () =>
