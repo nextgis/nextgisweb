@@ -333,7 +333,7 @@ class RasterLayer(Base, Resource, SpatialLayerMixin):
         bands = []
         for bidx in range(1, ds.RasterCount + 1):
             band = ds.GetRasterBand(bidx)
-            minval, maxval = band.ComputeRasterMinMax(approx_ok=False)
+            minval, maxval = band.ComputeRasterMinMax(False)
             bands.append(
                 RasterBand(
                     color_interp=band_color_interp(band),
