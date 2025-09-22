@@ -1,17 +1,23 @@
 import type { MapStore } from "../ol/MapStore";
-import "./ControlContainer.css";
+import "./ControlContainer.less";
 
 export interface MapControl {
+    id?: string;
+
     onAdd(map?: MapStore): HTMLElement | undefined;
     onRemove(map?: MapStore): unknown;
     getContainer?(): HTMLElement;
     remove?(): void;
 }
 
+type PositionsContainers = {
+    [key in ControlPosition]: HTMLElement;
+};
 export interface CreateControlOptions {
     bar?: boolean;
+    style?: React.CSSProperties;
     margin?: boolean;
-    addClass?: string;
+    className?: string;
 }
 
 export type ControlPosition =
@@ -20,39 +26,40 @@ export type ControlPosition =
     | "bottom-right"
     | "bottom-left";
 
+export type TargetPosition = ControlPosition | { inside: string };
+
 export interface ControlContainerOptions {
     target?: string;
-    classPrefix?: string;
-    addClass?: string;
     mapStore?: MapStore;
+    classPrefix?: string;
 }
+
+type PendingItem = { element: HTMLElement; order: number };
 
 export class ControlContainer {
     private readonly classPrefix: string = "mapadapter";
-    private readonly addClass?: string;
     private readonly mapStore?: MapStore;
-    private _container: HTMLElement;
-    private _positionsContainers: {
-        [key in ControlPosition]: HTMLElement | null;
-    } = {
-        "bottom-left": null,
-        "bottom-right": null,
-        "top-left": null,
-        "top-right": null,
-    };
+    private readonly _container: HTMLElement;
+    private readonly _positionsContainers: PositionsContainers;
+
+    private readonly _idContainers: Map<string, HTMLElement> = new Map();
+    private readonly _pendingChildren: Map<string, PendingItem[]> = new Map();
 
     constructor(opt: ControlContainerOptions = {}) {
         this.classPrefix = opt.classPrefix || this.classPrefix;
-        this.addClass = opt.addClass;
         this.mapStore = opt.mapStore;
-        this._container = this.createContainerElement();
+        const { element, positionsContainers } = this._preparePositions();
+        this._container = element;
+        this._positionsContainers = positionsContainers;
     }
 
     addTo(el: HTMLElement | string): this {
         const el_ = this.getElement(el);
-        if (el_) {
-            el_.appendChild(this._container);
+        if (!el_) {
+            console.warn("ControlContainer target element not found:", el);
+            return this;
         }
+        el_.appendChild(this._container);
         return this;
     }
 
@@ -67,50 +74,89 @@ export class ControlContainer {
         return this._container;
     }
 
-    getPositionContainer(position: ControlPosition): HTMLElement | undefined {
-        const positionContainer = this._positionsContainers[position];
-        if (positionContainer) {
-            return positionContainer;
+    getPositionContainer(position: ControlPosition): HTMLElement {
+        return this._positionsContainers[position];
+    }
+
+    changePlacement(
+        wrapperEl: HTMLElement,
+        position: TargetPosition,
+        order: number = 0
+    ): void {
+        const nextContainer = this._resolveTargetContainer(position);
+        if (nextContainer) {
+            this._insertSorted(nextContainer, wrapperEl, order);
+        } else if (typeof position !== "string") {
+            this._appendPending(position.inside, wrapperEl, order);
         }
     }
 
-    newPositionContainer(position: ControlPosition): HTMLElement | undefined {
-        const positionContainer = this.getPositionContainer(position);
-        if (positionContainer) {
-            const newContainer = document.createElement("div");
-            newContainer.className = "openlayers-ctrl";
-            // reserve place for async loaded containers
-            if (
-                position.indexOf("bottom") !== -1 &&
-                positionContainer.childElementCount
-            ) {
-                positionContainer.insertBefore(
-                    newContainer,
-                    positionContainer.firstChild
-                );
-            } else {
-                positionContainer.appendChild(newContainer);
-            }
-            return newContainer;
+    registerIDContainer(id: string, controlRoot: HTMLElement) {
+        this._idContainers.set(id, controlRoot);
+
+        this._flushPending(id, controlRoot);
+    }
+
+    unregisterIDContainer(id: string): void {
+        const container = this._idContainers.get(id);
+        if (!container) return;
+
+        while (container.firstChild) {
+            container.removeChild(container.firstChild);
+        }
+
+        this._idContainers.delete(id);
+
+        if (container.parentElement) {
+            container.parentElement.removeChild(container);
         }
     }
 
-    addControl(control: MapControl, position: ControlPosition): void {
-        const controlContainer = control.onAdd(this.mapStore);
-        if (controlContainer instanceof HTMLElement) {
-            this.append(controlContainer, position);
+    append(
+        element: HTMLElement | string,
+        position: TargetPosition,
+        order: number = 0
+    ): void {
+        const targetContainer = this._resolveTargetContainer(position);
+
+        const node =
+            typeof element === "string"
+                ? (() => {
+                      const tpl = document.createElement("template");
+                      tpl.innerHTML = element.trim();
+                      return tpl.content
+                          .firstElementChild as HTMLElement | null;
+                  })()
+                : element;
+
+        if (!node) return;
+
+        if (targetContainer) {
+            this._insertSorted(targetContainer, node, order);
+        } else if (typeof position !== "string") {
+            this._appendPending(position.inside, node, order);
         }
     }
 
-    append(element: HTMLElement | string, position: ControlPosition): void {
-        const positionContainer = this._positionsContainers[position];
-        if (positionContainer) {
-            if (typeof element === "string") {
-                const el = document.createElement("div");
-                el.outerHTML = element;
-                element = el;
-            }
-            positionContainer.appendChild(element);
+    private _insertSorted(
+        positionContainer: HTMLElement,
+        el: HTMLElement,
+        order: number
+    ) {
+        el.dataset.order = String(order);
+        el.style.order = String(order);
+        const children = Array.from(
+            positionContainer.children
+        ) as HTMLElement[];
+        const beforeEl = children.find((c) => {
+            const v = Number(c.dataset.order ?? Number.POSITIVE_INFINITY);
+            return v > order;
+        });
+
+        if (beforeEl) {
+            positionContainer.insertBefore(el, beforeEl);
+        } else {
+            positionContainer.appendChild(el);
         }
     }
 
@@ -129,11 +175,14 @@ export class ControlContainer {
         return el;
     }
 
-    private createContainerElement(): HTMLElement {
+    private _preparePositions(): {
+        element: HTMLElement;
+        positionsContainers: {
+            [key in ControlPosition]: HTMLElement;
+        };
+    } {
         const element = document.createElement("div");
-        element.className =
-            `${this.classPrefix}-control-container` +
-            (this.addClass ? " " + this.addClass : "");
+        element.className = `${this.classPrefix}-control-container`;
 
         const positions: ControlPosition[] = [
             "top-right",
@@ -141,18 +190,52 @@ export class ControlContainer {
             "bottom-right",
             "bottom-left",
         ];
+        const positionsContainers = {} as {
+            [key in ControlPosition]: HTMLElement;
+        };
         positions.forEach((x) => {
             const positionContainer = this._createPositionContainer(x);
-            this._positionsContainers[x] = positionContainer;
+            positionsContainers[x] = positionContainer;
             element.appendChild(positionContainer);
         });
 
-        return element;
+        return { element, positionsContainers };
     }
 
     private _createPositionContainer(position: ControlPosition): HTMLElement {
         const positionContainer = document.createElement("div");
         positionContainer.className = `${this.classPrefix}-ctrl-${position}`;
         return positionContainer;
+    }
+
+    private _resolveTargetContainer(
+        position: TargetPosition
+    ): HTMLElement | undefined {
+        if (typeof position === "string") {
+            return this._positionsContainers[position];
+        } else {
+            return this._idContainers.get(position.inside);
+        }
+    }
+
+    private _appendPending(
+        parentName: string,
+        element: HTMLElement,
+        order: number
+    ) {
+        const list = this._pendingChildren.get(parentName) ?? [];
+        list.push({ element, order });
+        list.sort((a, b) => a.order - b.order);
+        this._pendingChildren.set(parentName, list);
+    }
+
+    private _flushPending(parentName: string, targetContainer: HTMLElement) {
+        const list = this._pendingChildren.get(parentName);
+        if (!list || !list.length) return;
+
+        for (const { element, order } of list) {
+            this._insertSorted(targetContainer, element, order);
+        }
+        this._pendingChildren.delete(parentName);
     }
 }

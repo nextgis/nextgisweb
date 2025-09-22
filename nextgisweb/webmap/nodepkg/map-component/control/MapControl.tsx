@@ -1,61 +1,84 @@
-import type Control from "ol/control/Control";
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+    createContext,
+    useCallback,
+    useContext,
+    useEffect,
+    useMemo,
+} from "react";
+import type React from "react";
 import type { ReactNode } from "react";
 import { createPortal } from "react-dom";
 
+import { updateControlAppearance } from "@nextgisweb/webmap/ol/control/updateControlAppearance";
+
 import type {
-    ControlPosition,
     CreateControlOptions,
+    TargetPosition,
 } from "../../control-container/ControlContainer";
-import { useMapContext } from "../context/useMapContext";
 import { useMapControl } from "../hook/useMapControl";
 
-export type ControlProps<P> = P & {
-    position?: ControlPosition;
+export type ControlProps<P = unknown> = P & {
+    position?: TargetPosition;
+    order?: number;
+    id?: string;
 };
 
 export type ControlOptions = CreateControlOptions &
     ControlProps<{
-        id?: string;
-
-        style?: Partial<CSSStyleDeclaration>;
-
+        style?: React.CSSProperties;
         className?: string;
-        placeholder?: ReactNode;
+        targetStyle?: React.CSSProperties;
     }>;
 
-interface MapControlProps extends ControlOptions {
+export interface MapControlProps extends ControlOptions {
     children?: ReactNode;
 }
 
-export function MapControl(props: MapControlProps) {
-    const { bar, margin, addClass, children, position } = props;
-    const context = useMapContext();
+export const MapControlContext = createContext<MapControlProps | null>(null);
+export function useMapControlContext() {
+    return useContext(MapControlContext);
+}
 
-    const portal = useRef(document.createElement("div"));
+export function MapControl({ children, ...props }: MapControlProps) {
+    const { margin, bar, style, className, setInstance, context, instance } =
+        useMapControl({
+            ...props,
+        });
 
     const createControl = useCallback(() => {
-        return context?.mapStore?.createControl(
+        return context.mapStore.createControl(
             {
+                id: props.id,
                 onAdd() {
-                    return portal.current;
+                    return undefined;
                 },
-
                 onRemove() {
-                    //
+                    // ignore
                 },
             },
-            { bar, margin, addClass }
+            {}
         );
-    }, [context?.mapStore, bar, margin, addClass]);
-
-    const [instance, setInstance] = useState<Control>();
-
-    useMapControl({ context, instance, position });
+    }, [props.id, context.mapStore]);
 
     useEffect(() => {
         setInstance(createControl());
-    }, [createControl]);
+    }, [createControl, setInstance]);
 
-    return createPortal(children, portal.current);
+    const element = useMemo<HTMLElement | null>(() => {
+        // @ts-expect-error element is protected property
+        return instance?.element ?? null;
+    }, [instance]);
+
+    useEffect(() => {
+        if (element) {
+            updateControlAppearance(element, { bar, margin, className, style });
+        }
+    }, [element, bar, className, margin, style]);
+
+    if (!element || !children) return null;
+
+    return createPortal(
+        <MapControlContext value={props}>{children}</MapControlContext>,
+        element
+    );
 }

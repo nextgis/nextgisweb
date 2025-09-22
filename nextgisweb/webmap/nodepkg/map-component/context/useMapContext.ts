@@ -3,7 +3,7 @@ import { createContext, useContext } from "react";
 import type { MapStore } from "@nextgisweb/webmap/ol/MapStore";
 
 export interface MapContextValue {
-    mapStore: MapStore | null;
+    mapStore: MapStore;
 }
 
 export const MapContext = createContext<MapContextValue | null>(null);

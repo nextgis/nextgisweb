@@ -25,7 +25,10 @@ const msgSignIn = gettext("Sign in");
 const isLoginLocation = location.pathname === routeURL("auth.login");
 
 export const LoginForm = observer((props: LoginFormProps) => {
-    const [creds, setCreds] = useState<Credentials>({});
+    const [creds, setCreds] = useState<Credentials>({
+        login: "",
+        password: "",
+    });
 
     const form = Form.useForm()[0];
     const queryParams = new URLSearchParams(location.search);

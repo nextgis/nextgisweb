@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Spin } from "@nextgisweb/gui/antd";
 import { routeURL } from "@nextgisweb/pyramid/api";
@@ -10,8 +10,8 @@ import { handlePostMessage } from "../compat/util/handlePostMessage";
 import { Display } from "../display";
 import { DisplayWidget } from "../display/DisplayWidget";
 import type { DisplayComponentProps } from "../display/DisplayWidget";
-import { LinkToMainMap } from "../map-controls/control/LinkToMainMap";
-import type { MapRefs, TinyConfig } from "../type";
+import { LinkToControl } from "../map-component/control/LinkToMainMap";
+import type { TinyConfig } from "../type";
 
 import { LoadingOutlined } from "@ant-design/icons";
 
@@ -26,30 +26,6 @@ const DisplayTinyWidget = observer(
         );
 
         const { ready: panelsReady } = display.panelManager;
-
-        const [mapRefs, setMapRefs] = useState<MapRefs>();
-
-        const addLinkToMainMap = useCallback(() => {
-            if (
-                !tinyConfig ||
-                display.urlParams.linkMainMap !== "true" ||
-                !mapRefs
-            ) {
-                return;
-            }
-            display.map.olMap.addControl(
-                new LinkToMainMap({
-                    url: tinyConfig.mainDisplayUrl,
-                    target: mapRefs.rightTopControlPane,
-                    tipLabel: gettext("Open full map"),
-                })
-            );
-        }, [
-            display.urlParams.linkMainMap,
-            display.map.olMap,
-            mapRefs,
-            tinyConfig,
-        ]);
 
         useEffect(
             function buildTinyPanels() {
@@ -66,24 +42,25 @@ const DisplayTinyWidget = observer(
             [display.panelManager, panelsReady]
         );
 
-        const handleTinyDisplayMode = useCallback(() => {
-            addLinkToMainMap();
-            handlePostMessage(display);
-        }, [addLinkToMainMap, display]);
-
         useEffect(() => {
-            if (mapRefs) {
-                display.startup(mapRefs);
-                handleTinyDisplayMode();
-            }
-        }, [display, handleTinyDisplayMode, mapRefs]);
+            handlePostMessage(display);
+        }, [display]);
 
         return (
             <DisplayWidget
                 className="ngw-webmap-display-tiny"
                 display={display}
                 config={config}
-                setMapRefs={setMapRefs}
+                mapChildren={
+                    !!tinyConfig &&
+                    display.urlParams.linkMainMap === "true" && (
+                        <LinkToControl
+                            url={tinyConfig.mainDisplayUrl}
+                            position="top-right"
+                            title={gettext("Open full map")}
+                        />
+                    )
+                }
             />
         );
     }

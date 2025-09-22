@@ -18,10 +18,10 @@ class FeatureAttachmentComponent(Component):
     @require("feature_layer")
     def initialize(self):
         heif_init()
-        from . import extension, plugin  # noqa: F401
+        from . import extension  # noqa: F401
 
     def setup_pyramid(self, config):
-        from . import api, plugin, view  # noqa: F401
+        from . import api, view  # noqa: F401
 
         api.setup_pyramid(self, config)
         view.setup_pyramid(self, config)

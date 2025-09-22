@@ -37,7 +37,6 @@ const tipLabel = gettext(
 
 interface AttachmentsTabProps {
     display: Display;
-    label: string;
 }
 
 interface FeatureAttachmentView {

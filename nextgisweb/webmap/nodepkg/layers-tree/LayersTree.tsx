@@ -6,7 +6,7 @@ import type { TreeProps } from "@nextgisweb/gui/antd";
 import { findNode } from "@nextgisweb/gui/util/tree";
 
 import type { PluginBase } from "../plugin/PluginBase";
-import type WebmapStore from "../store";
+import type { WebmapStore } from "../store";
 import type { TreeItemConfig } from "../type/TreeItems";
 
 import { DropdownActions } from "./DropdownActions";

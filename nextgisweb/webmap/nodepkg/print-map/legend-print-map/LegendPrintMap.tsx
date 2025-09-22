@@ -2,8 +2,7 @@ import { useCallback, useEffect } from "react";
 
 import LayersTree from "../../layers-tree";
 import type { TreeWebmapItem } from "../../layers-tree/LayersTree";
-import type WebmapStore from "../../store";
-import { printMapStore } from "../PrintMapStore";
+import type { WebmapStore } from "../../store";
 import RndComp from "../rnd-comp";
 import type { LegendPrintMapProps, RndCoords } from "../type";
 
@@ -58,9 +57,10 @@ const filterTreeItems = (store: WebmapStore, layersItems: TreeWebmapItem[]) => {
 };
 
 export const LegendPrintMap = ({
-    display,
     show,
+    display,
     legendCoords,
+    printMapStore,
     onChange,
 }: LegendPrintMapProps) => {
     const { webmapStore } = display;

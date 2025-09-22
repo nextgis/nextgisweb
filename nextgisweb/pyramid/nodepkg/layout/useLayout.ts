@@ -6,11 +6,13 @@ export type Orientation = "portrait" | "landscape";
 
 export function useLayout() {
     const screens = useBreakpoint();
+
     const isMobile = !screens.md;
     const orientation: Orientation = isMobile ? "portrait" : "landscape";
 
     return {
         isMobile,
+        screenReady: Object.keys(screens).length,
         orientation,
         isPortrait: orientation === "portrait",
         isLandscape: orientation === "landscape",

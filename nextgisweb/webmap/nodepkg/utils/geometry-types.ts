@@ -1,8 +1,7 @@
-import type { Type as OlGeometryType } from "ol/geom/Geometry";
+import type { GeometryLayout, Type as OlGeometryType } from "ol/geom/Geometry";
 
 import type { FeaureLayerGeometryType } from "@nextgisweb/feature-layer/type/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { Draw } from "ol/interaction";
 
 export const getGeometryTypeTitle = (geometryType: string) => {
     switch (geometryType) {
@@ -64,8 +63,6 @@ export const zTypes: FeaureLayerGeometryType[] = [
     "MULTIPOLYGONZ",
 ];
 
-export function getOlLayout(
-    type: FeaureLayerGeometryType
-): Draw["geometryLayout_"] {
+export function getOlLayout(type: FeaureLayerGeometryType): GeometryLayout {
     return zTypes.includes(type) ? "XYZ" : "XY";
 }

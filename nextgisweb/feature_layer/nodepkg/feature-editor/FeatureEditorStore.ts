@@ -25,7 +25,6 @@ export class FeatureEditorStore {
 
     @observable.ref accessor saving = false;
     @observable.ref accessor initLoading = false;
-    @observable.ref accessor skipDirtyCheck = false;
 
     @observable.shallow accessor fields: FeatureLayerFieldRead[] = [];
     @observable.shallow accessor vectorLayer: VectorLayerRead | null = null;
@@ -41,15 +40,16 @@ export class FeatureEditorStore {
     @observable.shallow private accessor _extensionStores: ExtensionStores = {};
 
     constructor({
-        resourceId,
         featureId,
-        skipDirtyCheck,
+        resourceId,
+        featureItem,
     }: FeatureEditorStoreOptions) {
-        if (skipDirtyCheck !== undefined) {
-            this.skipDirtyCheck = skipDirtyCheck;
-        }
         this.resourceId = resourceId;
-        this.featureId = featureId;
+        if (featureItem) {
+            this._setFeatureItem(featureItem);
+        } else {
+            this.featureId = featureId;
+        }
 
         this.setInitLoading(true);
         this._initialize().finally(() => {
@@ -59,9 +59,6 @@ export class FeatureEditorStore {
 
     @computed
     get dirty(): boolean {
-        if (this.skipDirtyCheck) {
-            return true;
-        }
         const stores: { dirty: boolean }[] = [];
         if (this._attributeStore) stores.push(this._attributeStore);
         if (this._geometryStore) stores.push(this._geometryStore);
@@ -116,7 +113,7 @@ export class FeatureEditorStore {
         return resp;
     }
 
-    preparePayload = () => {
+    preparePayload = ({ ignoreDirty }: { ignoreDirty?: boolean } = {}) => {
         const extensions: Record<string, unknown> = {};
         for (const key in this._extensionStores) {
             const storeExtension = this._extensionStores[key];
@@ -129,10 +126,13 @@ export class FeatureEditorStore {
             extensions,
         };
 
-        if (this._attributeStore && this._attributeStore.dirty) {
+        if (
+            this._attributeStore &&
+            (ignoreDirty || this._attributeStore.dirty)
+        ) {
             json.fields = this._attributeStore.value;
         }
-        if (this._geometryStore && this._geometryStore.dirty) {
+        if (this._geometryStore && (ignoreDirty || this._geometryStore.dirty)) {
             json.geom = this._geometryStore.value;
         }
         return json;

@@ -22,10 +22,9 @@ function PreviewModal({
 }: PreviewModalProps) {
     const [open, close] = useReducer(() => false, open_ ?? true);
 
-    const onOpenNewClick = useCallback(
-        () => window.open(href, "_blank"),
-        [href]
-    );
+    const onOpenNewClick = useCallback(() => {
+        window.open(href, "_blank");
+    }, [href]);
 
     return (
         <Modal

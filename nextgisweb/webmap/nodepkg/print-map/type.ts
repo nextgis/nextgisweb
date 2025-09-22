@@ -2,7 +2,7 @@ import type { Coordinate } from "ol/coordinate";
 
 import type { Display } from "../display";
 
-import type { printMapStore } from "./PrintMapStore";
+import type { PrintMapStore } from "./store";
 
 export interface RndCoords {
     x: number;
@@ -18,7 +18,7 @@ export interface LegendRndCoords extends RndCoords {
 
 export interface LegendPrintMapProps {
     display: Display;
-    printMapStore: typeof printMapStore;
+    printMapStore: PrintMapStore;
     legendCoords: LegendRndCoords;
     show: boolean;
     onChange: (coords: LegendRndCoords) => void;
@@ -40,22 +40,19 @@ export interface PrintMapPaper {
 }
 
 export interface PrintMapSettings extends PrintMapPaper {
+    scale?: number;
+    arrow: boolean;
+    title?: boolean;
+    legend: boolean;
+    graticule?: boolean;
+    center?: Coordinate | null;
+    titleText?: string;
     scaleLine: boolean;
     scaleValue: boolean;
-    arrow: boolean;
-    legend: boolean;
     legendColumns: number;
-    center?: Coordinate | null;
-    title?: boolean;
-    titleText?: string;
-    scale?: number;
 }
 
 export interface PrintMapProps {
-    settings: PrintMapSettings;
-    initCenter: Coordinate | null;
+    printMapStore: PrintMapStore;
     display: Display;
-    onScaleChange: (scale: number) => void;
-    onZoomChange: (zoom: number) => void;
-    onCenterChange: (center: Coordinate) => void;
 }

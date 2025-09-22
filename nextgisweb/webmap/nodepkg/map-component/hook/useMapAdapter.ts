@@ -1,4 +1,3 @@
-import View from "ol/View";
 import type { ViewOptions } from "ol/View";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -8,48 +7,55 @@ import {
     prepareBaselayerConfig,
 } from "@nextgisweb/basemap/util/baselayer";
 import { useObjectState } from "@nextgisweb/gui/hook";
-import type { SRSRef } from "@nextgisweb/spatial-ref-sys/type/api";
-import { MapStore } from "@nextgisweb/webmap/ol/MapStore";
-import type { MapExtent } from "@nextgisweb/webmap/ol/MapStore";
+import type { MapExtent, MapStore } from "@nextgisweb/webmap/ol/MapStore";
 import type QuadKey from "@nextgisweb/webmap/ol/layer/QuadKey";
 import type XYZ from "@nextgisweb/webmap/ol/layer/XYZ";
 
+import { createMapAdapter } from "../util/createMapAdapter";
+
 export interface MapProps extends ViewOptions {
-    mapSRS?: SRSRef;
+    mapSRSId?: number;
     basemap?: boolean;
+    mapStore?: MapStore;
     mapExtent?: MapExtent;
 }
 
 export function useMapAdapter({
-    center: centerProp,
-    mapSRS = { id: 3857 },
     zoom,
-    basemap = true,
+    center: centerProp,
+    mapSRSId = 3857,
+    basemap = false,
     minZoom,
     maxZoom,
+    mapStore: mapStoreProp,
     mapExtent: mapExtentProp,
 }: MapProps) {
-    const [mapStore, setMapStore] = useState<MapStore>();
+    const [mapStore, setMapStore] = useState<MapStore | null>(null);
     const baseRef = useRef<QuadKey | XYZ | undefined>(undefined);
 
     const [center] = useObjectState(centerProp);
     const [mapExtent] = useObjectState(mapExtentProp);
 
-    const createMapAdapter = useCallback(
-        ({ target }: { target: HTMLElement | string }) => {
-            const view = new View({
-                projection: `EPSG:${mapSRS.id}`,
+    useEffect(() => {
+        setMapStore(() => {
+            if (mapStoreProp) {
+                return mapStoreProp;
+            } else {
+                return createMapAdapter({
+                    viewOptions: { projection: `EPSG:${mapSRSId}` },
+                });
+            }
+        });
+
+        return () => {
+            setMapStore((prev) => {
+                if (!mapStoreProp && prev?.olMap) {
+                    prev?.olMap.dispose();
+                }
+                return null;
             });
-            const adapter = new MapStore({
-                target,
-                view,
-                controls: [],
-            });
-            setMapStore(adapter);
-            return adapter;
-        },
-        [mapSRS.id]
-    );
+        };
+    }, [mapSRSId, mapStoreProp]);
 
     const setView = useCallback((): void => {
         if (!mapStore?.olMap) return;
@@ -104,13 +110,5 @@ export function useMapAdapter({
         };
     }, [basemap, mapStore]);
 
-    useEffect(() => {
-        return () => {
-            if (mapStore?.olMap) {
-                mapStore.olMap.dispose();
-            }
-        };
-    }, [mapStore]);
-
-    return { createMapAdapter };
+    return { mapStore };
 }

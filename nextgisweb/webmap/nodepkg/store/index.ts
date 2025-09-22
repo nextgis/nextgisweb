@@ -1,3 +1,3 @@
-import { WebmapStore } from "./WebmapStore";
+export { WebmapStore } from "./WebmapStore";
+export { Identify } from "./Identify";
 
-export default WebmapStore;

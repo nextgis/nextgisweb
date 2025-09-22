@@ -14,7 +14,7 @@ import EditIcon from "@nextgisweb/icon/material/edit/fill";
 const isLayerReadOnly = (display: Display, config: TreeItemConfig): boolean => {
     const pluginName = "@nextgisweb/webmap/plugin/feature-layer";
 
-    if (display.isTinyMode() && !display.isTinyModePlugin(pluginName)) {
+    if (display.isTinyMode && !display.isTinyModePlugin(pluginName)) {
         return false;
     }
     if (config.type === "layer") {

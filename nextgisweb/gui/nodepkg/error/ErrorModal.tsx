@@ -70,7 +70,7 @@ interface ErrorModalOpts extends Partial<ErrorModalProps> {
 }
 
 export function errorModal(error: unknown, opts?: ErrorModalOpts): boolean {
-    const { ignoreAbort, ...props } = opts ?? {};
+    const { ignoreAbort = true, ...props } = opts ?? {};
     if (ignoreAbort && isAbortError(error)) return false;
 
     if (window.ngwSentry && error instanceof Error) {

@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { DependencyList, MutableRefObject } from "react";
+import type { DependencyList, RefObject } from "react";
 
 export function useFit({
     ref,
     deps = [],
 }: {
-    ref: MutableRefObject<HTMLDivElement | null>;
+    ref: RefObject<HTMLDivElement | null>;
     deps?: DependencyList;
 }) {
     const [isFit, setIsFit] = useState(true);
@@ -61,7 +61,6 @@ export function useFit({
                 resizeObserver.unobserve(element);
             };
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [checkFit, ref, ...deps]);
 
     return isFit;

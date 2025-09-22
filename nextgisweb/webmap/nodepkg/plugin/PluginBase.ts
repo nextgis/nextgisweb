@@ -28,6 +28,16 @@ export abstract class PluginBase {
         };
     }
 
+    getPlugin<P>(layerId: number): P | null {
+        const itemFromStore = Object.values(
+            this.display.itemStore.fetch({ query: { type: "layer", layerId } })
+        )[0];
+        if (!itemFromStore) return null;
+        const infoConfig = this.display.getItemConfig()[itemFromStore.id];
+        if (infoConfig.type !== "layer") return null;
+        return infoConfig?.plugin[this.identity] as P | null;
+    }
+
     postCreate() {}
 
     startup() {}

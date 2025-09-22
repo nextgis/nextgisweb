@@ -1,11 +1,10 @@
 export const EDITING_STATES = {
+    HOLE: "cutingHoles",
+    MOVING: "movingFeatures",
     CREATING: "creatingFeatures",
-    MODIFYING: "modifyingFeatures",
     DELETING: "deletingFeatures",
+    MODIFYING: "modifyingFeatures",
+    ATTRIBUTE_EDITING: "editingAttribute",
 } as const;
 
-export const INTERACTION_KEYS = {
-    DRAW: "draw",
-    MODIFY: "modify",
-    SNAP: "snap",
-} as const;
+export type EditingState = (typeof EDITING_STATES)[keyof typeof EDITING_STATES];

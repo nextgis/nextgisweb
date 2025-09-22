@@ -24,6 +24,7 @@ import LayersIcon from "@nextgisweb/icon/material/layers";
 import LocationOnIcon from "@nextgisweb/icon/material/location_on";
 import PublicIcon from "@nextgisweb/icon/material/public";
 import "./SearchPanel.less";
+import type { FeatureLayerWebMapPluginConfig } from "@nextgisweb/webmap/plugin/type";
 
 interface SearchResult {
     label: string;
@@ -109,8 +110,9 @@ const searchByLayers: SearchFunction = async (
         if (itmConfig.type !== "layer") {
             return;
         }
-        const pluginConfig =
-            itmConfig.plugin["@nextgisweb/webmap/plugin/feature-layer"];
+        const pluginConfig = itmConfig.plugin[
+            "@nextgisweb/webmap/plugin/feature-layer"
+        ] as FeatureLayerWebMapPluginConfig;
 
         if (pluginConfig === undefined || !pluginConfig.likeSearch) return;
 

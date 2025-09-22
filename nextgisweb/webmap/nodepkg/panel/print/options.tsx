@@ -1,6 +1,9 @@
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import { PRINT_SCALES } from "@nextgisweb/webmap/print-map/utils";
 
 import type { PrintMapSettings } from "../../print-map/type";
+
+import { formatScaleNumber } from "./util";
 
 import {
     FileImageOutlined,
@@ -47,19 +50,12 @@ addPageFormat("A4", 210, 297);
 addPageFormat("A3", 297, 420);
 pageFormats.push({ value: "custom", label: gettext("Custom size") });
 
-const scalesValues = [
-    5000, 10000, 20000, 25000, 50000, 100000, 200000, 500000, 1000000, 2000000,
-    5000000, 10000000,
-];
-
-const numberFormat = new Intl.NumberFormat("ru-RU");
-
 export const scaleToLabel = (scale: number) => {
-    return `1 : ${numberFormat.format(scale)}`;
+    return `1 : ${formatScaleNumber(scale)}`;
 };
 
 export const scalesList: Scale[] = [];
-scalesValues.forEach((value) => {
+PRINT_SCALES.forEach((value) => {
     const label = scaleToLabel(value);
     scalesList.push({
         value,
@@ -125,5 +121,6 @@ export const urlPrintParams: UrlPrintParams<PrintMapSettings> = {
         setting: "titleText",
     },
     print_legend: { fromParam: (v) => v === "true", setting: "legend" },
+    print_graticule: { fromParam: (v) => v === "true", setting: "graticule" },
     print_legendColumns: { fromParam: parseNumber, setting: "legendColumns" },
 };

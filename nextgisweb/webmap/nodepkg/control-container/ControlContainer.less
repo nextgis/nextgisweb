@@ -1,0 +1,97 @@
+.mapadapter-ctrl-top-left,
+.mapadapter-ctrl-top-right,
+.mapadapter-ctrl-bottom-left,
+.mapadapter-ctrl-bottom-right {
+    display: flex;
+    position: absolute;
+    flex-direction: column;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.mapadapter-ctrl-top-left {
+    top: 0;
+    left: 0;
+
+    .mapadapter-ctrl.mapadapter-ctrl-margin {
+        margin-inline-start: 8px;
+        margin-block-start: 8px;
+    }
+}
+
+.mapadapter-ctrl-top-right {
+    top: 0;
+    right: 0;
+
+    .mapadapter-ctrl.mapadapter-ctrl-margin {
+        margin-inline-end: 8px;
+        margin-block-start: 8px;
+    }
+}
+
+.mapadapter-ctrl-bottom-left {
+    bottom: 0;
+    left: 0;
+
+    .mapadapter-ctrl.mapadapter-ctrl-margin {
+        margin-inline-start: 8px;
+        margin-block-end: 8px;
+    }
+}
+
+.mapadapter-ctrl-bottom-right {
+    right: 0;
+    bottom: 0;
+    align-items: flex-end;
+    gap: 4px;
+
+    > div:last-child > .mapadapter-ctrl {
+        background-color: var(--ol-partial-background-color);
+        color: var(--ol-subtle-foreground-color);
+
+        .mapadapter-ctrl-margin {
+            margin-inline-end: 8px;
+            margin-block-end: 8px;
+        }
+    }
+}
+
+.mapadapter-ctrl {
+    display: inline-block;
+    pointer-events: auto;
+}
+
+.mapadapter-ctrl-group {
+    border-radius: 2px;
+    background: #fff;
+
+    &:not(:empty) {
+        box-shadow: 0 3px 7px rgba(2, 34, 60, 0.16);
+    }
+
+    button {
+        display: block;
+        cursor: pointer;
+        cursor: pointer;
+        box-sizing: border-box;
+        outline: none;
+        border: 0;
+        background-color: transparent;
+        padding: 0;
+        width: 28px;
+        height: 28px;
+        color: var(--primary);
+
+        & + button {
+            border-top: 1px solid #ddd;
+        }
+
+        &:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        > svg.icon {
+            font-size: 125%;
+        }
+    }
+}

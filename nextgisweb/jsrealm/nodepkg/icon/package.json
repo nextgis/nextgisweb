@@ -3,7 +3,7 @@
     "version": "0.0.0",
     "type": "module",
     "dependencies": {
-        "@material-symbols/svg-500": "^0.20.0",
+        "@material-symbols/svg-500": "^0.35.0",
         "@mdi/svg": "^7.2.96"
     }
 }

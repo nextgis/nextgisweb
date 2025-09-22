@@ -26,7 +26,7 @@ import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { useFavorites } from "@nextgisweb/resource/favorite/useFavorites";
 import settings from "@nextgisweb/webmap/client-settings";
-import { getControls } from "@nextgisweb/webmap/map-controls";
+import { registry } from "@nextgisweb/webmap/display/component/map-panel/registry";
 import type { PanelStore } from "@nextgisweb/webmap/panel";
 import { getPermalink } from "@nextgisweb/webmap/utils/permalink";
 
@@ -78,7 +78,8 @@ const CodeArea = (props: TextAreaProps) => {
     );
 };
 
-const toolsOptions = getControls()
+const toolsOptions = registry
+    .queryAll()
     .filter((c) => c.embeddedShowMode === "customize")
     .map((c) => {
         return {

@@ -5,20 +5,8 @@ import type { PrintMapSettings } from "../../print-map/type";
 import { urlPrintParams } from "./options";
 import type { UrlPrintParams } from "./options";
 
-export function defaultPanelMapSettings(initTitleText: string) {
-    return {
-        height: 297,
-        width: 210,
-        margin: 10,
-        scale: undefined,
-        scaleLine: false,
-        scaleValue: false,
-        legend: false,
-        legendColumns: 1,
-        arrow: false,
-        title: undefined,
-        titleText: initTitleText,
-    };
+export function formatScaleNumber(scale: number): string {
+    return new Intl.NumberFormat("ru-RU").format(scale);
 }
 
 export function getPrintUrlSettings(): Partial<PrintMapSettings> {
@@ -48,7 +36,9 @@ export function getPrintUrlSettings(): Partial<PrintMapSettings> {
     return settingsUrl as Partial<PrintMapSettings>;
 }
 
-export function getPrintMapLink(mapSettings: PrintMapSettings): string {
+export function getPrintMapLink(
+    mapSettings: Partial<PrintMapSettings>
+): string {
     const parsed: Record<string, string> = {};
 
     for (const [urlParam, value] of Object.entries(getURLParams())) {

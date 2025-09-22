@@ -17,7 +17,6 @@ import { CloseIcon } from "@nextgisweb/gui/icon";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import type { Display } from "../display";
-import type { StateControl } from "../map-state-observer/MapStatesObserver";
 
 import ExtentIcon from "@nextgisweb/icon/material/crop_free/outline";
 import DrawIcon from "@nextgisweb/icon/material/draw/outline";
@@ -142,15 +141,13 @@ interface InteractionInfo {
     layer: OlVectorLayer<OlVectorSource>;
     source: OlVectorSource;
     mapStateKey?: string;
-    control: StateControl;
 }
 
 const buildInteraction = (
     display: Display,
     uniqueLayerId: number | string,
     geomType: string,
-    onDrawEnd?: (event: DrawEvent) => void,
-    onTerminate?: () => void
+    onDrawEnd?: (event: DrawEvent) => void
 ): InteractionInfo | undefined => {
     if (!display || !geomType) return;
 
@@ -192,20 +189,14 @@ const buildInteraction = (
     });
 
     const mapStateKey = `filterExtent-${uniqueLayerId}`;
-    const control: StateControl = {
-        activate: () => {},
-        deactivate: () => {
-            if (onTerminate) onTerminate();
-        },
-    };
-    display.mapStates.addState(mapStateKey, control, true);
+
+    display.map.setMapState(mapStateKey);
 
     const interactionInfo: InteractionInfo = {
         interaction: drawInteraction,
         layer: vectorLayer,
         source,
         mapStateKey,
-        control,
     };
 
     return interactionInfo;
@@ -222,13 +213,9 @@ const clearDrawInteraction = (
         olMap.removeInteraction(interactionInfo.interaction);
     }
 
-    const { mapStates } = display;
     const { mapStateKey } = interactionInfo;
     if (mapStateKey) {
-        if (mapStates.getActiveState() === mapStateKey) {
-            display.mapStates.deactivateState(mapStateKey);
-        }
-        display.mapStates.removeState(mapStateKey);
+        display.map.deactivateMapState(mapStateKey);
     }
 
     const newInteractionInfo: InteractionInfo = {

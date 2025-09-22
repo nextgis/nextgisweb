@@ -1,0 +1,42 @@
+.mapadapter-control-container {
+    --ol-partial-background-color: rgba(255, 255, 255, 0.5);
+    --ol-subtle-background-color: rgba(255, 255, 255, 0.5);
+
+    .ol-control {
+        position: relative;
+        top: inherit;
+        right: inherit;
+        bottom: inherit;
+        left: inherit;
+    }
+
+    .ol-attribution {
+        right: inherit;
+        bottom: inherit;
+        margin: 0 !important;
+        padding: 0;
+        max-width: 100%;
+        white-space: nowrap;
+
+        &:not(.ol-collapsed) {
+            background: unset;
+        }
+
+        &.ol-uncollapsible {
+            right: inherit;
+            bottom: inherit;
+        }
+    }
+
+    .ol-scale-line {
+        position: unset;
+        bottom: unset;
+        left: unset;
+        background: unset;
+
+        > .ol-scale-line-inner {
+            float: unset;
+            color: var(--ol-subtle-foreground-color);
+        }
+    }
+}

@@ -1,44 +1,65 @@
-import type Control from "ol/control/Control";
-import { useCallback, useEffect, useRef, useState } from "react";
-import type { ReactNode } from "react";
-import { createPortal } from "react-dom";
+import classNames from "classnames";
+import type { MouseEvent, ReactNode } from "react";
 
-import { useObjectState } from "@nextgisweb/gui/hook";
-import type { ButtonControlOptions } from "@nextgisweb/webmap/ol/control/createButtonControl";
+import type { CreateControlOptions } from "@nextgisweb/webmap/control-container/ControlContainer";
 
-import { useMapContext } from "../context/useMapContext";
-import { useMapControl } from "../hook/useMapControl";
-
+import { MapControl } from "./MapControl";
 import type { ControlProps } from "./MapControl";
 
-type ButtonControlComponentOptions = ControlProps<
-    Omit<ButtonControlOptions, "html">
->;
+import "./ButtonControl.less";
 
-interface MapControlProps extends ButtonControlComponentOptions {
+interface ButtonControlOptions extends CreateControlOptions {
+    disabled?: boolean;
     children?: ReactNode;
+    title?: string;
+    btnStyle?: React.CSSProperties;
+    btnClassName?: string;
+    onClick?: () => void | Promise<void>;
 }
 
-export function ButtonControl({ children, ...props }: MapControlProps) {
-    const [propState] = useObjectState(props);
-    const context = useMapContext();
+export type ButtonControlProps = ControlProps<ButtonControlOptions>;
 
-    const portal = useRef(document.createElement("div"));
+export function ButtonControl({
+    bar = true,
+    title,
+    style,
+    margin = true,
+    btnStyle,
+    children,
+    disabled,
+    className,
+    btnClassName,
+    onClick,
+    ...rest
+}: ButtonControlProps) {
+    const onBtnClick = async (e: MouseEvent<HTMLButtonElement>) => {
+        e.preventDefault();
+        if (onClick) await onClick();
+    };
 
-    const createControl = useCallback(() => {
-        return context.mapStore?.createButtonControl({
-            html: portal.current,
-            ...propState,
-        });
-    }, [context.mapStore, propState]);
-
-    const [instance, setInstance] = useState<Control | undefined>();
-
-    useMapControl({ context, instance, position: propState.position });
-
-    useEffect(() => {
-        setInstance(createControl());
-    }, [createControl]);
-
-    return createPortal(children === 0 ? "0" : children, portal.current);
+    return (
+        <MapControl
+            bar={bar}
+            style={style}
+            margin={margin}
+            className={classNames(
+                "ol-unselectable",
+                "mapadapter-btn-ctrl",
+                "mapadapter-ctrl-group",
+                className
+            )}
+            {...rest}
+        >
+            <button
+                title={title}
+                disabled={disabled}
+                className={btnClassName}
+                aria-label={title}
+                onClick={onBtnClick}
+                style={btnStyle}
+            >
+                {children}
+            </button>
+        </MapControl>
+    );
 }
