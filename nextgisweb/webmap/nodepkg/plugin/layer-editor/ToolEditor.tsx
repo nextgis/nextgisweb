@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { errorModal } from "@nextgisweb/gui/error";
 import { useShowModal } from "@nextgisweb/gui/index";
+import { traverseTree } from "@nextgisweb/gui/util/tree";
 import { gettextf } from "@nextgisweb/pyramid/i18n";
 import { useDisplayContext } from "@nextgisweb/webmap/display/context";
 import { ButtonControl } from "@nextgisweb/webmap/map-component";
@@ -55,11 +56,12 @@ const ToolEditor = observer(
             const prev = prevEditableRef.current;
 
             const items: LayerItemConfig[] = [];
-            for (const item of webmapItems) {
+
+            traverseTree(webmapItems, (item) => {
                 if (item.type === "layer" && item.editable) {
                     items.push(item);
                 }
-            }
+            });
 
             const currKeys = new Set(items.map(getKey));
             const stopped = prev
