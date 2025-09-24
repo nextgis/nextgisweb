@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="360" height="180">
+    <rect x="50" y="7" width="250" height="150" rx="40" fill="url(#g)" stroke="#000" stroke-width="4" stroke-dasharray="8 4" />
+    <text x="100" y="100" font-family="Open Sans" font-size="72" font-weight="700" fill="#00FFFF" fill-opacity=".5" stroke="#FF00FF" stroke-width="3" stroke-dasharray="6 3">SVG</text>
+</svg>

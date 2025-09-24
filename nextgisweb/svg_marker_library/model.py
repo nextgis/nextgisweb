@@ -2,9 +2,9 @@ import os.path
 import zipfile
 from typing import Annotated, Dict, List, Union
 
-import magic
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
+from lxml import etree
 from msgspec import UNSET, Meta, Struct, UnsetType
 
 from nextgisweb.env import Base, gettext, gettextf
@@ -17,7 +17,7 @@ from nextgisweb.resource import Resource, ResourceGroup, ResourceScope, SAttribu
 
 Base.depends_on("resource")
 
-mime_valid = "image/svg+xml"
+tag_valid = r"{http://www.w3.org/2000/svg}svg"
 
 
 class SVGMarkerLibrary(Base, Resource):
@@ -44,7 +44,7 @@ class SVGMarkerLibrary(Base, Resource):
                 validate_ext(filename, ext)
 
                 with archive.open(filename, "r") as sf:
-                    validate_mime(filename, sf.read(1024))
+                    validate_mime(filename, sf)
                     sf.seek(0)
 
                     fileobj = FileObj().copy_from(sf)
@@ -91,9 +91,17 @@ def validate_ext(fn, ext):
         raise ValidationError(gettextf("File '{}' has an invalid extension.")(fn))
 
 
-def validate_mime(fn, buf):
-    mime = magic.from_buffer(buf, mime=True)
-    if mime != mime_valid:
+def _check_mime(fd):
+    try:
+        el = etree.parse(fd)
+    except etree.XMLSyntaxError:
+        return False
+    tag = el.getroot().tag
+    return tag == tag_valid
+
+
+def validate_mime(fn, fd):
+    if not _check_mime(fd):
         raise ValidationError(gettextf("File '{}' has a format different from SVG.")(fn))
 
 
@@ -131,7 +139,7 @@ class FilesAttr(SAttribute):
 
         def to_fileobj(fu: FileUpload, name: str):
             with fu.data_path.open("rb") as fd:
-                validate_mime(name, fd.read(1024))
+                validate_mime(name, fd)
             return fu.to_fileobj()
 
         removed_files = list()
