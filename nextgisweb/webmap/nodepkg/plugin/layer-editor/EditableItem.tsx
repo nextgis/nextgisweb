@@ -74,7 +74,10 @@ export const EditableItem = observer(
                 return undefined;
             };
 
-            const layer = new VectorLayer({ style: filteredStyle });
+            const layer = new VectorLayer({
+                style: filteredStyle,
+                zIndex: 9999,
+            });
             layer.setSource(source);
 
             source.forEachFeature((f) => {
