@@ -65,11 +65,14 @@ export const EditableItem = observer(
         const { layer, source, features } = useMemo(() => {
             const source = outerSource ?? new VectorSource();
             const features = new Collection<OlFeature<Geometry>>();
-            const { layerStyle } = generateStyleForId({ id: id ?? 0 });
+            const { layerStyle, vertexStyle } = generateStyleForId({
+                id: id ?? 0,
+            });
 
             const filteredStyle: StyleFunction = (feature) => {
                 if (id === undefined || feature.get("layer_id") === id) {
-                    if (!feature.get("deleted")) return layerStyle;
+                    if (!feature.get("deleted"))
+                        return [layerStyle, vertexStyle];
                 }
                 return undefined;
             };

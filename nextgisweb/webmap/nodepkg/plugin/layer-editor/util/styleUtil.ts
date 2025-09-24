@@ -1,3 +1,12 @@
+import type { Coordinate } from "ol/coordinate";
+import {
+    LineString,
+    MultiLineString,
+    MultiPoint,
+    MultiPolygon,
+    Polygon,
+} from "ol/geom";
+import type { Geometry } from "ol/geom";
 import { Fill, Stroke, Style } from "ol/style";
 import CircleStyle from "ol/style/Circle";
 import type { Options as StyleOptions } from "ol/style/Style";
@@ -29,6 +38,44 @@ export function generateStyleForId({ id }: { id: number | string }) {
         }),
         zIndex: 100,
     });
+
+    const vertexStyle = new Style({
+        image: new CircleStyle({
+            radius: 3,
+            fill: new Fill({ color: c.fill }),
+            stroke: new Stroke({ color: c.stroke, width: 1 }),
+        }),
+        geometry: (feature) => {
+            const geom = feature.getGeometry() as Geometry | null;
+            if (!geom) return undefined;
+
+            const pts: Coordinate[] = [];
+
+            if (geom instanceof Polygon) {
+                for (const ring of geom.getCoordinates()) {
+                    pts.push(...ring.slice(0, -1));
+                }
+            } else if (geom instanceof MultiPolygon) {
+                for (const poly of geom.getCoordinates()) {
+                    for (const ring of poly) {
+                        pts.push(...ring.slice(0, -1));
+                    }
+                }
+            } else if (geom instanceof LineString) {
+                pts.push(...geom.getCoordinates());
+            } else if (geom instanceof MultiLineString) {
+                for (const line of geom.getCoordinates()) {
+                    pts.push(...line);
+                }
+            } else {
+                return undefined;
+            }
+
+            return pts.length ? new MultiPoint(pts) : undefined;
+        },
+        zIndex: 150,
+    });
+
     const selectStyleOptions: StyleOptions = {
         stroke: new Stroke({ color: c.stroke, width: 3 }),
         fill: new Fill({ color: c.fillSelect }),
@@ -42,6 +89,7 @@ export function generateStyleForId({ id }: { id: number | string }) {
     const selectStyle = new Style(selectStyleOptions);
     return {
         layerStyle,
+        vertexStyle,
         selectStyle,
         selectStyleOptions,
     };
