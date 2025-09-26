@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import type { FeatureItem } from "@nextgisweb/feature-layer/type";
 import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
+import { useAbortController } from "@nextgisweb/pyramid/hook";
 
 import { KeyValueTable } from "../KeyValueTable";
 import { fieldValuesToDataSource, getFieldsInfo } from "../fields";
@@ -17,6 +18,8 @@ export function FieldsTable({ featureItem, resourceId }: FieldsTableProps) {
         useState<Map<string, FeatureLayerFieldRead>>();
     const [dataSource, setDataSource] = useState<FieldDataItem[]>();
 
+    const { makeSignal } = useAbortController();
+
     useEffect(() => {
         async function load() {
             const fields = await getFieldsInfo(resourceId);
@@ -30,19 +33,14 @@ export function FieldsTable({ featureItem, resourceId }: FieldsTableProps) {
         if (!fieldsInfo) {
             return;
         }
-        const abortController = new AbortController();
+
         const { fields } = featureItem;
         fieldValuesToDataSource(fields, fieldsInfo, {
-            signal: abortController.signal,
+            signal: makeSignal(),
         }).then((dataItems) => {
             setDataSource(dataItems);
         });
-        return () => {
-            if (abortController) {
-                abortController.abort();
-            }
-        };
-    }, [featureItem, fieldsInfo]);
+    }, [featureItem, makeSignal, fieldsInfo]);
 
     if (dataSource) {
         return <KeyValueTable data={dataSource} />;

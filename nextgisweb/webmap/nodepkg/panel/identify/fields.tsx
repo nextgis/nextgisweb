@@ -54,8 +54,7 @@ export async function fieldValuesToDataSource(
     let key = 0;
     const dataSource = [];
 
-    for (const k in fields) {
-        const field = fieldsInfo.get(k);
+    for (const [k, field] of fieldsInfo.entries()) {
         if (!field) continue;
         let val = unmarshalFieldValue(field.datatype, fields[k]);
         if (val !== null && isDateTimeFieldType(field.datatype)) {
