@@ -124,8 +124,9 @@ export const EditableResource = observer(
             });
             const clearSource = () => {
                 if (outerSource) {
-                    features.forEach((feature) => {
-                        source.removeFeature(feature);
+                    source.forEachFeature((f) => {
+                        if (f.get("layer_id") === resourceId)
+                            source.removeFeature(f);
                     });
                 } else {
                     source.clear();
