@@ -88,16 +88,26 @@ def image_zoom(extent, size, srs):
     if srs.id != 3857:
         return None
 
-    epsilon = 1e-9
+    ext_w = extent[2] - extent[0]
+    ext_h = extent[3] - extent[1]
 
-    res_x = (extent[2] - extent[0]) / size[0]
-    res_y = (extent[3] - extent[1]) / size[1]
-    if abs(res_x - res_y) > epsilon:
+    srs_w = srs.maxx - srs.minx
+    srs_h = srs.maxy - srs.miny
+
+    zx = log2(srs_w * size[0] / TILE_SIZE / ext_w)
+    zy = log2(srs_h * size[1] / TILE_SIZE / ext_h)
+
+    zoom = round(zx)
+    if round(zy) != zoom:
         return None
 
-    z = log2((srs.maxx - srs.minx) / (TILE_SIZE * res_x))
-    rz = round(z)
-    if abs(rz - z) > epsilon:
-        return None
+    grid_pixels = 2**zoom * TILE_SIZE
+    for ext_side, srs_side, cmp in (
+        (ext_w, srs_w, size[0]),
+        (ext_h, srs_h, size[1]),
+    ):
+        image_side = grid_pixels * ext_side / srs_side
+        if round(image_side) != cmp:
+            return None
 
-    return rz
+    return zoom
