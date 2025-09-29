@@ -1,4 +1,4 @@
-import { StrictMode, useReducer, useRef } from "react";
+import { StrictMode, useRef, useState } from "react";
 
 import { DEFAULT_MAX_ZOOM } from "@nextgisweb/basemap/constant";
 import { convertNgwExtentToWSEN } from "@nextgisweb/gui/util/extent";
@@ -19,7 +19,7 @@ export function PreviewMap({
     ...props
 }: MapComponentProps) {
     const extent = useRef(initialExtent || mapExtent);
-    const [basemap, toggleBaseMap] = useReducer((state) => !state, basemapProp);
+    const [basemap, setBaseMap] = useState(basemapProp);
 
     const maxZoom =
         mapExtent && mapExtent.maxZoom !== undefined
@@ -47,7 +47,7 @@ export function PreviewMap({
                 <ToggleControl
                     position="top-left"
                     value={basemap}
-                    onClick={toggleBaseMap}
+                    onChange={setBaseMap}
                 >
                     <MapIcon />
                 </ToggleControl>

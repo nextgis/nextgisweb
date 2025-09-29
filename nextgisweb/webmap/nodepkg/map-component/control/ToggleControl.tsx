@@ -25,7 +25,7 @@ function getVal<T>(
 
 type ToggleControlOptions = Omit<
     ButtonControlProps,
-    "title" | "style" | "onChange"
+    "title" | "style" | "onChange" | "onClick"
 > & {
     title?: ToggleActiveProp<string | undefined>;
     style?: ToggleActiveProp<React.CSSProperties | undefined>;
