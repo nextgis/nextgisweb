@@ -13,8 +13,6 @@ import { FieldsTable } from "./FieldsTable";
 import ListIcon from "@nextgisweb/icon/material/list/outline";
 import EarthIcon from "@nextgisweb/icon/material/public/outline";
 
-const msgLoading = gettext("Loading...");
-
 export interface FeatureInfoSectionProps {
     resourceId: number;
     featureItem: FeatureItem;
@@ -47,16 +45,11 @@ export function FeatureInfoSection({
             extensionsComp.forEach((comp, key) => {
                 const ExtensionComponent = lazy(comp);
                 newExtComps.push(
-                    <Suspense
+                    <ExtensionComponent
                         key={key}
-                        // FIXME: Not informative. It became 'Loading...loading...Loading'
-                        fallback={msgLoading}
-                    >
-                        <ExtensionComponent
-                            featureItem={featureItem}
-                            resourceId={resourceId}
-                        ></ExtensionComponent>
-                    </Suspense>
+                        featureItem={featureItem}
+                        resourceId={resourceId}
+                    ></ExtensionComponent>
                 );
             });
             setExtComps(newExtComps);
@@ -113,5 +106,10 @@ export function FeatureInfoSection({
         resourceId,
     ]);
 
-    return <>{[...items, ...extComps]}</>;
+    return (
+        <>
+            {items}
+            <Suspense fallback={null}>{extComps}</Suspense>
+        </>
+    );
 }
