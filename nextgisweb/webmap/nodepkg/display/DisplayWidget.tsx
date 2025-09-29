@@ -5,7 +5,6 @@ import type React from "react";
 
 import { Splitter } from "@nextgisweb/gui/antd";
 import { useLayout } from "@nextgisweb/pyramid/layout/useLayout";
-import type { Orientation } from "@nextgisweb/pyramid/layout/useLayout";
 import type { DisplayConfig } from "@nextgisweb/webmap/type/api";
 import { WebMapTabs } from "@nextgisweb/webmap/webmap-tabs";
 
@@ -33,10 +32,8 @@ const PANEL_MIN_HEIGHT = 20;
 const PANELS_DEF_LANDSCAPE_SIZE = 350;
 const PANELS_DEF_PORTRAIT_SIZE = "50%";
 
-function getDefultPanelSize(orientation: Orientation) {
-    return orientation === "portrait"
-        ? PANELS_DEF_PORTRAIT_SIZE
-        : PANELS_DEF_LANDSCAPE_SIZE;
+function getDefultPanelSize(isPortrait: boolean) {
+    return isPortrait ? PANELS_DEF_PORTRAIT_SIZE : PANELS_DEF_LANDSCAPE_SIZE;
 }
 
 export const DisplayWidget = observer(
@@ -54,7 +51,7 @@ export const DisplayWidget = observer(
                 })
         );
 
-        const { orientation, isPortrait, screenReady, isMobile } = useLayout();
+        const { isMobile, screenReady, isPortrait } = useLayout();
 
         useEffect(() => {
             display.startup();
@@ -68,14 +65,14 @@ export const DisplayWidget = observer(
         const { tabs } = display.tabsManager;
 
         const [panelSize, setPanelsSize] = useState<string | number>(
-            getDefultPanelSize(orientation)
+            getDefultPanelSize(isPortrait)
         );
 
         useEffect(() => {
             setPanelsSize(() => {
-                return getDefultPanelSize(orientation);
+                return getDefultPanelSize(isPortrait);
             });
-        }, [orientation, screenReady]);
+        }, [isPortrait, screenReady]);
 
         const onResize = useCallback(
             (sizes: number[]) => {
@@ -92,11 +89,11 @@ export const DisplayWidget = observer(
                 if (activePanel) {
                     if (newPanelSize < PANEL_MIN_HEIGHT) {
                         display.panelManager.closePanel();
-                        setPanelsSize(getDefultPanelSize(orientation));
+                        setPanelsSize(getDefultPanelSize(isPortrait));
                     }
                 }
             },
-            [activePanel, display.panelManager, orientation]
+            [activePanel, display.panelManager, isPortrait]
         );
 
         const panelsToShow = useMemo(() => {

@@ -29,9 +29,9 @@ export interface MapComponentProps extends ViewOptions {
 
 export const MapComponent = observer(
     ({
-        zoom = 0,
+        zoom,
         style,
-        center = [0, 0],
+        center,
         basemap,
         maxZoom,
         mapStore: mapStoreProp,
