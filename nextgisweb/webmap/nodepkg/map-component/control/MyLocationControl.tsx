@@ -6,7 +6,7 @@ import { Point } from "ol/geom";
 import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
 import { Circle as CircleStyle, Fill, Stroke, Style } from "ol/style";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
@@ -148,12 +148,12 @@ export const MyLocationControl = observer(
             setEnabled(false);
         }, [teardown]);
 
-        const onChange = useCallback(() => {
+        useEffect(() => {
             if (!supported) return;
             if (enabled) {
-                disable();
-            } else {
                 enable();
+            } else {
+                disable();
             }
         }, [supported, enabled, enable, disable]);
 
@@ -163,9 +163,10 @@ export const MyLocationControl = observer(
 
         return (
             <ToggleControl
+                value={enabled}
                 position={position}
                 order={order}
-                onChange={onChange}
+                onChange={setEnabled}
                 title={title}
             >
                 <LocationIcon />
