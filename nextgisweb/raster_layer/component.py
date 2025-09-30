@@ -69,7 +69,7 @@ class RasterLayerComponent(Component, WorkdirMixin):
                     bands = []
                     for bidx in range(1, ds.RasterCount + 1):
                         band = ds.GetRasterBand(bidx)
-                        minval, maxval = band.ComputeRasterMinMax(True)
+                        minval, maxval = band.ComputeRasterMinMax(False)
                         bands.append(
                             RasterBand(
                                 color_interp=band_color_interp(band),

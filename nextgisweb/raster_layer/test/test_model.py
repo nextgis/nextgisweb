@@ -39,7 +39,7 @@ def test_load_file(source, band_count, srs_id, cog, ngw_data_path, ngw_env, ngw_
     bands = []
     for bidx in range(1, band_count + 1):
         band = ds.GetRasterBand(bidx)
-        minval, maxval = band.ComputeRasterMinMax(True)
+        minval, maxval = band.ComputeRasterMinMax(False)
         bands.append(
             RasterBand(
                 color_interp=band_color_interp(band),
