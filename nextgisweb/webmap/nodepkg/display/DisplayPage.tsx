@@ -1,3 +1,5 @@
+import { StrictMode } from "react";
+
 import { Spin } from "@nextgisweb/gui/antd";
 import { useRouteGet } from "@nextgisweb/pyramid/hook";
 
@@ -11,7 +13,7 @@ export default function DisplayPage({ id }: { id: number }) {
     });
 
     return (
-        <>
+        <StrictMode>
             {isLoading || !config ? (
                 <Spin
                     size="large"
@@ -21,6 +23,6 @@ export default function DisplayPage({ id }: { id: number }) {
             ) : (
                 <DisplayWidget config={config} />
             )}
-        </>
+        </StrictMode>
     );
 }
