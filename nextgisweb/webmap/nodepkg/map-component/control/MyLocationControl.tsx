@@ -148,7 +148,7 @@ export const MyLocationControl = observer(
             setEnabled(false);
         }, [teardown]);
 
-        const onClick = useCallback(() => {
+        const onChange = useCallback(() => {
             if (!supported) return;
             if (enabled) {
                 disable();
@@ -165,7 +165,7 @@ export const MyLocationControl = observer(
             <ToggleControl
                 position={position}
                 order={order}
-                onClick={onClick}
+                onChange={onChange}
                 title={title}
             >
                 <LocationIcon />
