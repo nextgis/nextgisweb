@@ -77,13 +77,6 @@ export const FeatureFilterModal = observer(
                     </Button>,
                 ]}
                 {...modalProps}
-                className="filter-editor-modal"
-                styles={{
-                    body: {
-                        maxHeight: "calc(50vh)",
-                        overflowY: "auto",
-                    },
-                }}
             >
                 <FeatureFilterEditor
                     fields={fields}

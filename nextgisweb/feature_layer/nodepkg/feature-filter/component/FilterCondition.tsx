@@ -1,3 +1,4 @@
+import type { Dayjs } from "dayjs";
 import { observer } from "mobx-react-lite";
 
 import {
@@ -14,9 +15,20 @@ import {
 } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
+import type { NgwAttributeType } from "../../type";
+import {
+    marshalFieldValue,
+    unmarshalFieldValue,
+} from "../../util/ngwAttributes";
 import type { FilterEditorStore } from "../FilterEditorStore";
 import { OPERATORS } from "../type";
-import type { FilterCondition as FilterConditionType } from "../type";
+import type {
+    CmpOp,
+    EqNeOp,
+    FilterCondition as FilterConditionType,
+    HasOp,
+    InOp,
+} from "../type";
 
 import { DeleteOutlined, DragOutlined } from "@ant-design/icons";
 
@@ -51,7 +63,9 @@ export const FilterCondition = observer(
         };
 
         const handleOperatorChange = (operator: string) => {
-            const updates: Partial<FilterConditionType> = { operator };
+            const updates: Partial<FilterConditionType> = {
+                operator: operator as EqNeOp | CmpOp | InOp | HasOp,
+            };
 
             const wantsArray = ["in", "!in"].includes(operator);
             const wantsNoValue = ["has", "!has"].includes(operator);
@@ -65,7 +79,14 @@ export const FilterCondition = observer(
         };
 
         const handleValueChange = (value: any) => {
-            store.updateCondition(condition.id, { value });
+            const field = store.fields.find(
+                (f) => f.keyname === condition.field
+            );
+            if (!field) {
+                return;
+            }
+            const serializedValue = marshalFieldValue(field.datatype, value);
+            store.updateCondition(condition.id, { value: serializedValue });
         };
 
         const handleDelete = () => {
@@ -100,6 +121,11 @@ export const FilterCondition = observer(
                 );
             }
 
+            const displayValue = unmarshalFieldValue(
+                field.datatype,
+                condition.value as NgwAttributeType
+            );
+
             if (["in", "!in"].includes(condition.operator)) {
                 const numericTypes = ["INTEGER", "BIGINT", "REAL"];
                 const isNumeric =
@@ -115,10 +141,14 @@ export const FilterCondition = observer(
                     handleValueChange(processedValues);
                 };
 
+                const value = (
+                    (condition.value as Array<string | number>) || []
+                ).map(String);
+
                 return (
                     <Select
                         mode="tags"
-                        value={condition.value || []}
+                        value={value}
                         onChange={handleTagChange}
                         style={{ width: "100%" }}
                         placeholder={gettext("Enter values and press Enter")}
@@ -131,7 +161,7 @@ export const FilterCondition = observer(
                 case "INTEGER":
                     return (
                         <InputInteger
-                            value={condition.value}
+                            value={displayValue as number}
                             onChange={handleValueChange}
                             placeholder={getPlaceholder(
                                 condition,
@@ -144,7 +174,7 @@ export const FilterCondition = observer(
                 case "BIGINT":
                     return (
                         <InputBigInteger
-                            value={condition.value}
+                            value={displayValue as string}
                             onChange={handleValueChange}
                             placeholder={getPlaceholder(
                                 condition,
@@ -157,7 +187,7 @@ export const FilterCondition = observer(
                 case "REAL":
                     return (
                         <InputNumber
-                            value={condition.value}
+                            value={displayValue as number}
                             onChange={handleValueChange}
                             step={0.01}
                             placeholder={getPlaceholder(
@@ -171,7 +201,7 @@ export const FilterCondition = observer(
                 case "DATE":
                     return (
                         <DatePicker
-                            value={condition.value}
+                            value={displayValue as Dayjs}
                             onChange={handleValueChange}
                             placeholder={getPlaceholder(
                                 condition,
@@ -184,7 +214,7 @@ export const FilterCondition = observer(
                 case "TIME":
                     return (
                         <TimePicker
-                            value={condition.value}
+                            value={displayValue as Dayjs}
                             onChange={handleValueChange}
                             placeholder={getPlaceholder(
                                 condition,
@@ -197,7 +227,7 @@ export const FilterCondition = observer(
                 case "DATETIME":
                     return (
                         <DateTimePicker
-                            value={condition.value}
+                            value={displayValue as Dayjs}
                             onChange={handleValueChange}
                             placeholder={getPlaceholder(
                                 condition,
@@ -210,7 +240,7 @@ export const FilterCondition = observer(
                 default:
                     return (
                         <InputValue
-                            value={condition.value}
+                            value={displayValue as string}
                             onChange={handleValueChange}
                             placeholder={getPlaceholder(
                                 condition,

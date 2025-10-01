@@ -1,12 +1,18 @@
 .ngw-feature-filter-editor {
     .error-message {
-        margin-top: 8px;
+        margin-top: 16px;
+        padding: 8px 12px;
         color: #ff4d4f;
         font-size: 12px;
+        background-color: #fff2f0;
+        border: 1px solid #ffccc7;
+        border-radius: 4px;
     }
 
     .ant-tabs-content-holder {
         min-height: 200px;
+        max-height: calc(50vh - 120px);
+        overflow-y: auto;
     }
 
     .ant-tabs-tabpane {
