@@ -93,16 +93,17 @@ export const FeatureFilterEditor = observer(
                     items={items}
                 />
 
+                {hasErrors && (
+                    <div className="error-message">
+                        {store.validationError}
+                    </div>
+                )}
+
                 {showFooter && (
                     <div
                         className="filter-footer"
                         style={{ marginTop: "16px", textAlign: "right" }}
                     >
-                        {hasErrors && (
-                            <div className="error-message">
-                                {store.validationError}
-                            </div>
-                        )}
                         <Button
                             type="primary"
                             onClick={handleApply}

@@ -9,11 +9,8 @@ export interface FeatureFilterEditorProps {
     showFooter?: boolean;
 }
 
-export interface FilterCondition {
-    id: number;
-    field: string;
-    operator: string;
-    value: any;
+export interface FilterState {
+    rootGroup: FilterGroup;
 }
 
 export interface FilterGroup {
@@ -23,9 +20,20 @@ export interface FilterGroup {
     groups: FilterGroup[];
 }
 
-export interface FilterState {
-    groups: FilterGroup[];
-}
+export type FilterCondition =
+    | {
+          id: number;
+          field: string;
+          operator: EqNeOp | CmpOp;
+          value: ConditionValue;
+      }
+    | {
+          id: number;
+          field: string;
+          operator: InOp;
+          value: Array<string | number>;
+      }
+    | { id: number; field: string; operator: HasOp; value: undefined };
 
 export type GetExpr = ["get", string];
 
@@ -59,7 +67,7 @@ export const ValidOperators = [
     "!in",
     "has",
     "!has",
-] as const;
+];
 
 export type Operator = (typeof ValidOperators)[number];
 
@@ -157,11 +165,27 @@ export const OPERATORS: OperatorOption[] = [
     {
         value: "has",
         label: gettext("Has value"),
-        supportedTypes: ["STRING", "INTEGER", "BIGINT", "REAL"],
+        supportedTypes: [
+            "STRING",
+            "INTEGER",
+            "BIGINT",
+            "REAL",
+            "DATE",
+            "TIME",
+            "DATETIME",
+        ],
     },
     {
         value: "!has",
         label: gettext("Not has value"),
-        supportedTypes: ["STRING", "INTEGER", "BIGINT", "REAL"],
+        supportedTypes: [
+            "STRING",
+            "INTEGER",
+            "BIGINT",
+            "REAL",
+            "DATE",
+            "TIME",
+            "DATETIME",
+        ],
     },
 ];

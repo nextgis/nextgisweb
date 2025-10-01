@@ -50,7 +50,6 @@ export const ConstructorTab = observer(({ store }: ConstructorTabProps) => {
         const overIsGroup = overData.type === "group";
 
         if (activeIsCondition) {
-            const sourceGroupId = activeData.parentGroupId;
             const targetGroupId = overIsCondition
                 ? overData.parentGroupId
                 : over.id;
@@ -58,14 +57,12 @@ export const ConstructorTab = observer(({ store }: ConstructorTabProps) => {
 
             store.moveConditionToGroup(
                 active.id as number,
-                sourceGroupId,
                 targetGroupId,
                 overItemId as number | null
             );
         }
 
         if (activeIsGroup) {
-            const sourceGroupId = activeData.parentGroupId;
             const targetGroupId = overIsCondition
                 ? overData.parentGroupId
                 : over.id;
@@ -75,7 +72,6 @@ export const ConstructorTab = observer(({ store }: ConstructorTabProps) => {
 
             store.moveGroupToGroup(
                 active.id as number,
-                sourceGroupId,
                 targetGroupId,
                 overItemId as number | null
             );
@@ -96,7 +92,7 @@ export const ConstructorTab = observer(({ store }: ConstructorTabProps) => {
                     collisionDetection={pointerWithin}
                 >
                     <FilterGroup
-                        group={store.filterState}
+                        group={store.filterState.rootGroup}
                         store={store}
                         parentGroupId={null}
                         isRoot
