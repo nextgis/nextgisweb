@@ -33,14 +33,12 @@ export interface FeatureFilterJsonProps {
     value: string | undefined;
     onChange: (value: string | undefined) => void;
     isValid?: boolean;
-    validationError?: string;
 }
 
 const FeatureFilterJson = ({
     value,
     onChange,
     isValid = true,
-    validationError,
 }: FeatureFilterJsonProps) => {
     const [internalValue, setInternalValue] = useState(value);
     const [isReady, setIsReady] = useState(false);
@@ -83,24 +81,7 @@ const FeatureFilterJson = ({
     );
 
     return (
-        <div className={`editor ${isValid ? "" : "invalid"}`}>
-            {jsonEditor}
-            {!isValid && validationError && (
-                <div
-                    style={{
-                        marginTop: "8px",
-                        color: "#ff4d4f",
-                        fontSize: "12px",
-                        padding: "4px 8px",
-                        backgroundColor: "#fff2f0",
-                        border: "1px solid #ffccc7",
-                        borderRadius: "4px",
-                    }}
-                >
-                    {validationError}
-                </div>
-            )}
-        </div>
+        <div className={`editor ${isValid ? "" : "invalid"}`}>{jsonEditor}</div>
     );
 };
 
@@ -119,7 +100,6 @@ export const FeatureFilterJsonTab = observer(({ store }: JsonTabProps) => {
                 value={store.jsonValue}
                 onChange={handleJsonChange}
                 isValid={store.isValid}
-                validationError={store.validationError}
             />
         </div>
     );

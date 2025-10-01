@@ -6,10 +6,13 @@ import { OPERATORS, ValidOperators } from "./type";
 import type {
     CmpOp,
     ConditionExpr,
+    ConditionValue,
     EqNeOp,
     FilterCondition,
     FilterGroup,
+    FilterState,
     GroupExpr,
+    HasOp,
     InOp,
     MapLibreExpression,
 } from "./type";
@@ -21,11 +24,13 @@ export interface FilterEditorStoreOptions {
 
 export class FilterEditorStore {
     @observable.shallow accessor fields: FeatureLayerFieldRead[] = [];
-    @observable.deep accessor filterState: FilterGroup = {
-        id: 0,
-        operator: "all",
-        conditions: [],
-        groups: [],
+    @observable.deep accessor filterState: FilterState = {
+        rootGroup: {
+            id: 0,
+            operator: "all",
+            conditions: [],
+            groups: [],
+        }
     };
     @observable accessor activeTab: string = "constructor";
     @observable accessor jsonValue: string | undefined = undefined;
@@ -40,7 +45,7 @@ export class FilterEditorStore {
         if (options.value) {
             this.loadFilter(options.value);
         } else {
-            this.filterState.id = this.generateTransientId();
+            this.filterState.rootGroup.id = this.generateTransientId();
             this.validateCurrentState();
         }
     }
@@ -54,7 +59,7 @@ export class FilterEditorStore {
         if (tab === "json") {
             try {
                 const expression = this.convertToMapLibreExpression(
-                    this.filterState
+                    this.filterState.rootGroup
                 );
                 this.jsonValue = JSON.stringify(expression, null, 2);
                 this.isValid = true;
@@ -74,7 +79,7 @@ export class FilterEditorStore {
                     this.validateMapLibreExpression(parsedJson);
                     const newFilterState =
                         this.parseMapLibreExpression(parsedJson);
-                    this.filterState = newFilterState;
+                    this.filterState = { rootGroup: newFilterState };
                     this.isValid = true;
                 } catch (error) {
                     console.error(
@@ -85,7 +90,7 @@ export class FilterEditorStore {
                     return;
                 }
             } else {
-                this.filterState = this.parseMapLibreExpression([]);
+                this.filterState = { rootGroup: this.parseMapLibreExpression([]) };
                 this.isValid = true;
             }
         }
@@ -100,20 +105,16 @@ export class FilterEditorStore {
     }
 
     @action.bound
-    addCondition(groupId: number, conditionData?: Omit<FilterCondition, "id">) {
-        const defaultCondition = conditionData || {
-            field: this.fields[0]?.keyname || "",
-            operator: "==",
-            value: "",
-        };
-
+    addCondition(groupId: number) {
         const newCondition: FilterCondition = {
-            ...defaultCondition,
             id: this.generateTransientId(),
+            field: this.fields[0]?.keyname || "",
+            operator: "==" as EqNeOp,
+            value: null,
         };
-        const group = this._findGroupById(this.filterState, groupId);
+        const group = this._findGroupById(this.filterState.rootGroup, groupId);
         if (group) {
-            group.conditions.push(newCondition);
+            group.conditions.push(newCondition as FilterCondition);
             this.validateCurrentState();
         }
     }
@@ -127,7 +128,7 @@ export class FilterEditorStore {
             groups: [],
         };
         const parentGroup = this._findGroupById(
-            this.filterState,
+            this.filterState.rootGroup,
             parentGroupId
         );
         if (parentGroup) {
@@ -138,13 +139,13 @@ export class FilterEditorStore {
 
     @action.bound
     updateCondition(conditionId: number, updates: Partial<FilterCondition>) {
-        this._updateConditionInTree(this.filterState, conditionId, updates);
+        this._updateConditionInTree(this.filterState.rootGroup, conditionId, updates);
         this.validateCurrentState();
     }
 
     @action.bound
     updateGroupOperator(groupId: number, operator: "all" | "any") {
-        const group = this._findGroupById(this.filterState, groupId);
+        const group = this._findGroupById(this.filterState.rootGroup, groupId);
         if (group) {
             group.operator = operator;
             this.validateCurrentState();
@@ -153,35 +154,34 @@ export class FilterEditorStore {
 
     @action.bound
     deleteCondition(conditionId: number) {
-        this._findAndRemoveCondition(this.filterState, conditionId);
+        this._findAndRemoveCondition(this.filterState.rootGroup, conditionId);
         this.validateCurrentState();
     }
 
     @action.bound
     deleteGroup(groupId: number) {
-        if (groupId === this.filterState.id) {
+        if (groupId === this.filterState.rootGroup.id) {
             console.warn("Cannot delete the root group.");
             return;
         }
-        this._findAndRemoveGroup(this.filterState, groupId);
+        this._findAndRemoveGroup(this.filterState.rootGroup, groupId);
         this.validateCurrentState();
     }
 
     @action.bound
     moveConditionToGroup(
         conditionId: number,
-        sourceGroupId: number,
         targetGroupId: number,
         overItemId: number | null
     ) {
         const conditionToMove = this._findAndRemoveCondition(
-            this.filterState,
+            this.filterState.rootGroup,
             conditionId
         );
         if (!conditionToMove) return;
 
         const targetGroup = this._findGroupById(
-            this.filterState,
+            this.filterState.rootGroup,
             targetGroupId
         );
         if (!targetGroup) return;
@@ -204,17 +204,16 @@ export class FilterEditorStore {
     @action.bound
     moveGroupToGroup(
         groupId: number,
-        sourceGroupId: number | null,
         targetGroupId: number,
         overItemId: number | null
     ) {
         if (groupId === targetGroupId) return;
 
-        const groupToMove = this._findAndRemoveGroup(this.filterState, groupId);
+        const groupToMove = this._findAndRemoveGroup(this.filterState.rootGroup, groupId);
         if (!groupToMove) return;
 
         const targetGroup = this._findGroupById(
-            this.filterState,
+            this.filterState.rootGroup,
             targetGroupId
         );
         if (!targetGroup) return;
@@ -241,7 +240,7 @@ export class FilterEditorStore {
             const expression = JSON.parse(value);
             this.validateMapLibreExpression(expression);
             const filterState = this.parseMapLibreExpression(expression);
-            this.filterState = filterState;
+            this.filterState = { rootGroup: filterState };
             this.isValid = true;
             this.activeTab = "constructor";
         } catch (error) {
@@ -268,7 +267,7 @@ export class FilterEditorStore {
                 });
             }
         }
-        const expression = this.convertToMapLibreExpression(this.filterState);
+        const expression = this.convertToMapLibreExpression(this.filterState.rootGroup);
         this.validateMapLibreExpression(expression);
         return expression;
     }
@@ -287,7 +286,7 @@ export class FilterEditorStore {
                 });
             }
         }
-        const expression = this.convertToMapLibreExpression(this.filterState);
+        const expression = this.convertToMapLibreExpression(this.filterState.rootGroup);
         this.validateMapLibreExpression(expression);
         return JSON.stringify(expression);
     }
@@ -425,7 +424,39 @@ export class FilterEditorStore {
                 field = expression[1][1];
             }
         }
-        return { id: this.generateTransientId(), field, operator, value };
+
+        const baseCondition = {
+            id: this.generateTransientId(),
+            field,
+            operator,
+            value,
+        };
+
+        if (operator === "has" || operator === "!has") {
+            return {
+                ...baseCondition,
+                operator: operator as HasOp,
+                value: undefined,
+            };
+        } else if (operator === "in" || operator === "!in") {
+            return {
+                ...baseCondition,
+                operator: operator as InOp,
+                value: Array.isArray(value) ? value : [],
+            };
+        } else if (operator === "==" || operator === "!=") {
+            return {
+                ...baseCondition,
+                operator: operator as EqNeOp,
+                value: value as ConditionValue,
+            };
+        } else {
+            return {
+                ...baseCondition,
+                operator: operator as CmpOp,
+                value: value as ConditionValue,
+            };
+        }
     }
 
     private convertToMapLibreExpression(
@@ -444,11 +475,31 @@ export class FilterEditorStore {
                         ["get", condition.field],
                     ]);
                 } else {
-                    expressions.push([
-                        condition.operator as EqNeOp | CmpOp | InOp,
-                        ["get", condition.field],
-                        condition.value,
-                    ]);
+                    if (
+                        condition.operator === "in" ||
+                        condition.operator === "!in"
+                    ) {
+                        expressions.push([
+                            condition.operator as InOp,
+                            ["get", condition.field],
+                            condition.value as Array<string | number>,
+                        ]);
+                    } else if (
+                        condition.operator === "==" ||
+                        condition.operator === "!="
+                    ) {
+                        expressions.push([
+                            condition.operator as EqNeOp,
+                            ["get", condition.field],
+                            condition.value as ConditionValue,
+                        ]);
+                    } else {
+                        expressions.push([
+                            condition.operator as CmpOp,
+                            ["get", condition.field],
+                            condition.value as string | number,
+                        ]);
+                    }
                 }
             }
         }
@@ -475,7 +526,7 @@ export class FilterEditorStore {
                 this.validateMapLibreExpression(parsed);
                 expression = parsed;
             } else {
-                expression = this.convertToMapLibreExpression(this.filterState);
+                expression = this.convertToMapLibreExpression(this.filterState.rootGroup);
                 this.validateMapLibreExpression(expression);
             }
             this.isValid = true;
