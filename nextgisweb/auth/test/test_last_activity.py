@@ -9,7 +9,7 @@ from nextgisweb.lib.datetime import utcnow_naive
 from ..model import User
 
 
-def test_last_activity(ngw_env, ngw_webtest_app):
+def test_last_activity(ngw_env, ngw_webtest_app, disable_oauth, ngw_administrator_password):
     with transaction.manager:
         for keyname, last_activity in (
             ("guest", utcnow_naive()),

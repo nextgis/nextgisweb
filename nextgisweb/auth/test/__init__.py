@@ -1,6 +1,7 @@
 from unittest.mock import patch
 
 import pytest
+import transaction
 from pyramid.interfaces import ISecurityPolicy
 
 from ..model import User
@@ -20,6 +21,19 @@ def ngw_auth_administrator(ngw_pyramid_config):
 
     with patch.object(policy, "_authenticate_request", _policy_authenticate):
         yield
+
+
+@pytest.fixture
+def ngw_administrator_password():
+    with transaction.manager:
+        admin = User.by_keyname("administrator")
+        mem = admin.password_hash
+        admin.password = "admin"
+
+    yield
+
+    with transaction.manager:
+        User.by_keyname("administrator").password_hash = mem
 
 
 @pytest.fixture()

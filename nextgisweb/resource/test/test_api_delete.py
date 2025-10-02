@@ -7,7 +7,9 @@ from nextgisweb.auth import User
 
 from .. import ResourceACLRule, ResourceGroup
 
-pytestmark = pytest.mark.usefixtures("ngw_resource_defaults")
+pytestmark = pytest.mark.usefixtures(
+    "ngw_resource_defaults", "disable_oauth", "ngw_administrator_password"
+)
 
 
 @pytest.fixture(scope="module")

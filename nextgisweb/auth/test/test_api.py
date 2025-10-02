@@ -285,7 +285,9 @@ def test_user_over_limit(ngw_env, ngw_webtest_app, ngw_auth_administrator, disab
 
 
 def test_user_limit_local(ngw_env, ngw_webtest_app, ngw_auth_administrator, disable_users):
-    with ngw_env.auth.options.override(dict(user_limit_local=2)):
+    admin = User.filter_by(keyname="administrator").one()
+    limit = 2 if admin.password_hash is not None else 1
+    with ngw_env.auth.options.override(dict(user_limit_local=limit)):
         u1 = _user_data()
         u1_id = ngw_webtest_app.post_json(user_url(), u1, status=201).json["id"]
 

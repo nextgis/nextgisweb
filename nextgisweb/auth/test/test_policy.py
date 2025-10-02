@@ -6,7 +6,7 @@ from freezegun import freeze_time
 
 from .. import User
 
-pytestmark = pytest.mark.usefixtures("disable_oauth")
+pytestmark = pytest.mark.usefixtures("disable_oauth", "ngw_administrator_password")
 
 
 def test_fixture(ngw_webtest_app, ngw_auth_administrator):
