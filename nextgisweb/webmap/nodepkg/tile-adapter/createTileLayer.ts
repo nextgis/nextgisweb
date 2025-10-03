@@ -26,7 +26,6 @@ export function createTileLayer(item: CreateLayerOptions) {
 
                 tileLoadFunction({
                     src,
-                    cache: "force-cache",
                 })
                     .then((imageUrl) => {
                         img.src = imageUrl;
