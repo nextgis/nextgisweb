@@ -49,6 +49,7 @@ class WebMapComponent(Component):
                 for i in WebMapAdapter.registry.values()
             ),
             check_origin=self.options["check_origin"],
+            nonimatim_url=self.options["nominatim.url"].rstrip("/"),
         )
 
         return result
@@ -73,5 +74,6 @@ class WebMapComponent(Component):
         Option("check_origin", bool, default=False, doc="Check iframe Referer header."),
         Option("legend_symbols", LegendSymbolsEnum, default=LegendSymbolsEnum.COLLAPSE),
         Option("print.max_size", int, default=500, doc="Maximum paper size for printing web map in mm"),
+        Option("nominatim.url", str, default="https://nominatim.openstreetmap.org"),
     )
     # fmt: on

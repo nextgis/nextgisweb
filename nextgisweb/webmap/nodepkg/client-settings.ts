@@ -30,6 +30,7 @@ export interface WebmapSettings {
     measurement_srid: number;
     legend_symbols: unknown;
     hide_nav_menu: boolean;
+    nonimatim_url: string;
 }
 
 export default await fetchSettings<WebmapSettings>(COMP_ID);

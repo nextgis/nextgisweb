@@ -13,6 +13,7 @@ import webmapSettings from "@nextgisweb/webmap/client-settings";
 import { lonLatToDM } from "@nextgisweb/webmap/coordinates/formatter";
 import { parse } from "@nextgisweb/webmap/coordinates/parser";
 import type { Display } from "@nextgisweb/webmap/display";
+import type { FeatureLayerWebMapPluginConfig } from "@nextgisweb/webmap/plugin/type";
 
 import { PanelContainer, PanelTitle } from "../component";
 import type { PanelTitleProps } from "../component";
@@ -23,8 +24,8 @@ import BackspaceIcon from "@nextgisweb/icon/material/backspace";
 import LayersIcon from "@nextgisweb/icon/material/layers";
 import LocationOnIcon from "@nextgisweb/icon/material/location_on";
 import PublicIcon from "@nextgisweb/icon/material/public";
+
 import "./SearchPanel.less";
-import type { FeatureLayerWebMapPluginConfig } from "@nextgisweb/webmap/plugin/type";
 
 interface SearchResult {
     label: string;
@@ -196,11 +197,11 @@ const searchByNominatim: SearchFunction = async (
         query.countrycodes = webmapSettings.nominatim_countrycodes;
     }
 
-    const NOMINATIM_SEARCH_URL = "https://nominatim.openstreetmap.org/search";
+    const searchUrl = `${webmapSettings.nonimatim_url}/search`;
     const headers = { "X-Requested-With": "null" };
     const global = true;
     const signal = controller.makeSignal();
-    const geojson = (await request(NOMINATIM_SEARCH_URL, {
+    const geojson = (await request(searchUrl, {
         query,
         headers,
         signal,

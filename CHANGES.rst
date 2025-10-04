@@ -19,6 +19,7 @@ Changes
 - Improved attachment preview with zoom support.
 - Improved MVT generation performance.
 - Many new feature editing tools on webmaps.
+- Configurable Nominatim endpoint for self-hosted installations.
 
 
 5.1.0
