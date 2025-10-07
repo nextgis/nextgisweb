@@ -20,6 +20,7 @@ export interface MapControlPlugin<P = any> {
     label?: string;
     position?: TargetPosition;
     hideOnMobile?: boolean;
+    showOnPreview?: boolean;
     embeddedShowMode?: EmbeddedShowMode;
 }
 

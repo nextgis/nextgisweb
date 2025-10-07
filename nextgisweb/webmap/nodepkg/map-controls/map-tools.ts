@@ -32,6 +32,7 @@ mapControlRegistry(COMP_ID, {
     label: gettext("Measure distance"),
     position: { inside: "map-toolbar" },
     embeddedShowMode: "customize",
+    showOnPreview: true,
     props: { type: "LineString", groupId: "measuringLength" },
 });
 mapControlRegistry(COMP_ID, {
@@ -41,6 +42,7 @@ mapControlRegistry(COMP_ID, {
     label: gettext("Measure area"),
     position: { inside: "map-toolbar" },
     embeddedShowMode: "customize",
+    showOnPreview: true,
     props: { type: "Polygon", groupId: "measuringArea" },
 });
 mapControlRegistry(COMP_ID, {
@@ -62,6 +64,7 @@ mapControlRegistry(COMP_ID, {
     },
     position: { inside: "map-toolbar" },
     hideOnMobile: true,
+    showOnPreview: true,
     embeddedShowMode: "customize",
 });
 mapControlRegistry(COMP_ID, {
