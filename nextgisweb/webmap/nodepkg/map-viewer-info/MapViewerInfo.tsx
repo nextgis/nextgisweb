@@ -28,10 +28,9 @@ const CoordsDisplay = ({ coord, round = 0 }: CoordPairProps) => {
 
 export interface MapViewerInfoProps {
     map: Map;
-    show: boolean;
 }
 
-export function MapViewerInfo({ map, show }: MapViewerInfoProps) {
+export function MapViewerInfo({ map }: MapViewerInfoProps) {
     const [type, setType] = useState<"mouse" | "extent">("mouse");
     const [coord, setCoord] = useState<number[] | undefined>(
         map.getView().getCenter()
@@ -45,10 +44,6 @@ export function MapViewerInfo({ map, show }: MapViewerInfoProps) {
     }, []);
 
     useEffect(() => {
-        if (!show) {
-            return;
-        }
-
         let callbackKey: EventsKey | undefined;
 
         const clearCallback = () => {
@@ -74,7 +69,7 @@ export function MapViewerInfo({ map, show }: MapViewerInfoProps) {
 
         bindEvents();
         return clearCallback;
-    }, [type, show, map]);
+    }, [type, map]);
 
     const icon = useMemo(
         () => (type === "mouse" ? <MouseIcon /> : <CropFreeIcon />),
@@ -87,10 +82,6 @@ export function MapViewerInfo({ map, show }: MapViewerInfoProps) {
                 : gettext("Show cursor coordinates"),
         [type]
     );
-
-    if (!show) {
-        return null;
-    }
 
     const DisplayPosition = () => {
         if (type === "mouse") {

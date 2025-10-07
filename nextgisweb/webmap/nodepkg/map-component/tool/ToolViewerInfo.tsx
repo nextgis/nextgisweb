@@ -45,7 +45,7 @@ export default function ToolViewerInfo({
                 <Icon />
             </button>
 
-            <MapViewerInfoComp show={value} map={mapStore.olMap} />
+            {value && <MapViewerInfoComp map={mapStore.olMap} />}
         </MapControl>
     );
 }
