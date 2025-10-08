@@ -20,6 +20,7 @@ from .dtutil import DT_DATATYPES, DT_DUMPERS, DT_LOADERS, DtFormat
 from .exception import FeatureNotFound
 from .extension import FeatureExtension
 from .feature import Feature
+from .filter import FilterValidationError
 from .interface import (
     FIELD_TYPE,
     IFeatureLayer,
@@ -224,7 +225,7 @@ class Dumper:
         return query
 
     def __call__(self, feature: Feature) -> Any:
-        result = dict(id=feature.id)
+        result: dict[str, Any] = dict(id=feature.id)
 
         if (vid := feature.version) is not None:
             result["vid"] = vid
@@ -451,6 +452,9 @@ def cget(
     order_by: Union[str, None] = None,
     limit: Union[Annotated[int, Meta(ge=0)], None] = None,
     offset: Annotated[int, Meta(ge=0)] = 0,
+    filter: Annotated[
+        Union[str, None], Meta(description="Filter expression (JSON string)")
+    ] = None,
 ) -> JSONType:
     """Read features"""
     request.resource_permission(DataScope.read)
@@ -461,6 +465,19 @@ def cget(
     # Paging
     if limit is not None:
         query.limit(limit, offset)
+
+    if filter is not None:
+        from .filter import FilterParser
+
+        parser = FilterParser(resource)
+        try:
+            filter_result = parser.parse(filter)
+            if filter_result:
+                query.filter(filter_result)
+        except FilterValidationError:
+            raise
+        except Exception as e:
+            raise ValidationError(message=gettext("Error parsing filter"), detail=str(e))
 
     apply_fields_filter(query, request)
     apply_intersect_filter(query, request, resource)

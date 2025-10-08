@@ -53,8 +53,7 @@ export type ConditionExpr = EqNeExpr | CmpExpr | InExpr | HasExpr;
 
 export type LogicalOp = "all" | "any";
 export type GroupExpr = [LogicalOp, ...(ConditionExpr | GroupExpr)[]];
-
-export type MapLibreExpression = [] | GroupExpr | ConditionExpr;
+export type FilterExpression = [] | GroupExpr;
 
 export const ValidOperators = [
     "==",

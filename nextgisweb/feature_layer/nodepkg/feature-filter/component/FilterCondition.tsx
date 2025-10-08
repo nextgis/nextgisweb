@@ -1,6 +1,7 @@
 import type { Dayjs } from "dayjs";
 import { observer } from "mobx-react-lite";
 
+import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
 import {
     Button,
     DatePicker,
@@ -56,10 +57,48 @@ const getPlaceholder = (
     return defaultPlaceholder;
 };
 
+const getDefaultValue = (
+    fields: FeatureLayerFieldRead[],
+    field: string,
+    condition: FilterConditionType
+) => {
+    const newField = fields.find((f) => f.keyname === field);
+    const wantsNoValue = ["has", "!has"].includes(condition.operator);
+    const wantsArray = ["in", "!in"].includes(condition.operator);
+
+    let defaultValue: any = undefined;
+    if (!wantsNoValue && newField) {
+        if (wantsArray) {
+            defaultValue = [];
+        } else {
+            switch (newField.datatype) {
+                case "INTEGER":
+                case "REAL":
+                    defaultValue = 0;
+                    break;
+                case "BIGINT":
+                    defaultValue = "0";
+                    break;
+                case "STRING":
+                    defaultValue = "";
+                    break;
+                default:
+                    defaultValue = null;
+            }
+        }
+    }
+    return defaultValue;
+};
+
 export const FilterCondition = observer(
     ({ condition, store, dragHandleProps }: FilterConditionProps) => {
         const handleFieldChange = (field: string) => {
-            store.updateCondition(condition.id, { field });
+            const defaultValue = getDefaultValue(
+                store.fields,
+                field,
+                condition
+            );
+            store.updateCondition(condition.id, { field, value: defaultValue });
         };
 
         const handleOperatorChange = (operator: string) => {
