@@ -89,6 +89,7 @@ class ExportOptions(Struct):
     fid_field: Union[str, None] = None
     use_display_name: bool = False
     ilike: Union[str, None] = None
+    filter: Union[str, None] = None
 
     def for_fields(self, ogr_fields: List[str]) -> "ExportOptions":
         opts = ExportOptions(
@@ -102,6 +103,7 @@ class ExportOptions(Struct):
             fid_field=self.fid_field,
             use_display_name=self.use_display_name,
             ilike=self.ilike,
+            filter=self.filter,
         )
 
         if opts.fid_field is not None:
@@ -172,6 +174,10 @@ class ExportParams(Struct, kw_only=True):
         Union[str, UnsetType],
         Meta(description="Filter features using ILIKE condition"),
     ] = UNSET
+    filter: Annotated[
+        Union[str, UnsetType],
+        Meta(description="Filter features using filter expression"),
+    ] = UNSET
 
     def to_options(self) -> ExportOptions:
         driver = EXPORT_FORMAT_OGR[self.format]
@@ -211,6 +217,9 @@ class ExportParams(Struct, kw_only=True):
 
         if self.ilike is not UNSET:
             opts.ilike = self.ilike
+
+        if self.filter is not UNSET:
+            opts.filter = self.filter
 
         return opts
 
@@ -264,6 +273,14 @@ def export(resource: IFeatureLayer, options: ExportOptions, filepath: str):
 
     if options.ilike is not None and IFeatureQueryIlike.providedBy(query):
         query.ilike(options.ilike)
+
+    if options.filter is not None:
+        from .filter import FilterParser
+
+        parser = FilterParser(resource)
+        filter_result = parser.parse(options.filter)
+        if filter_result:
+            query.filter(filter_result)
 
     if options.fields is not None:
         query.fields(*options.fields)

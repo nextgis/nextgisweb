@@ -172,8 +172,17 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                 where.append((idcol if k == "id" else fields[k]) == v)
 
         if self._filter:
-            _where_filter = []
-            for k, o, v in self._filter:
+
+            def build_clause(filter_item):
+                """Recursively build SQL clause from filter item."""
+                if isinstance(filter_item, tuple) and len(filter_item) == 2:
+                    logical_op, sub_items = filter_item
+                    if logical_op in ("all", "any"):
+                        clauses = [build_clause(item) for item in sub_items]
+                        return sa.and_(*clauses) if logical_op == "all" else sa.or_(*clauses)
+
+                # Condition tuple: (field, operator, value)
+                k, o, v = filter_item
                 supported_operators = (
                     "eq",
                     "ne",
@@ -196,13 +205,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                 if v and o in ["in", "notin"]:
                     v = v.split(",")
 
-                if o in [
-                    "ilike",
-                    "in",
-                    "like",
-                    "notin",
-                    "startswith",
-                ]:
+                if o in ["ilike", "in", "like", "notin", "startswith"]:
                     o += "_op"
                 elif o == "isnull":
                     if v == "yes":
@@ -215,10 +218,22 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
                 op = getattr(sa.sql.operators, o)
                 column = idcol if k == "id" else fields[k]
-                _where_filter.append(op(column, v))
+                return op(column, v)
 
-            if len(_where_filter) > 0:
-                where.append(sa.and_(*_where_filter))
+            # Single structured group or backward-compatible flat list
+            if len(self._filter) == 1 and isinstance(self._filter[0], tuple):
+                first = self._filter[0]
+                if len(first) == 2 and first[0] in ("all", "any"):
+                    # New format: (logical_op, [sub_items])
+                    where.append(build_clause(first))
+                else:
+                    # Backward compatibility: single condition tuple (field, op, value)
+                    where.append(build_clause(first))
+            else:
+                # Backward compatibility: flat list of condition tuples
+                _where_filter = [build_clause(item) for item in self._filter]
+                if _where_filter:
+                    where.append(sa.and_(*_where_filter))
 
         if self._like or self._ilike:
             operands = []

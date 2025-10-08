@@ -9,12 +9,12 @@ import type {
     ConditionValue,
     EqNeOp,
     FilterCondition,
+    FilterExpression,
     FilterGroup,
     FilterState,
     GroupExpr,
     HasOp,
     InOp,
-    MapLibreExpression,
 } from "./type";
 
 export interface FilterEditorStoreOptions {
@@ -30,7 +30,7 @@ export class FilterEditorStore {
             operator: "all",
             conditions: [],
             groups: [],
-        }
+        },
     };
     @observable accessor activeTab: string = "constructor";
     @observable accessor jsonValue: string | undefined = undefined;
@@ -90,7 +90,9 @@ export class FilterEditorStore {
                     return;
                 }
             } else {
-                this.filterState = { rootGroup: this.parseMapLibreExpression([]) };
+                this.filterState = {
+                    rootGroup: this.parseMapLibreExpression([]),
+                };
                 this.isValid = true;
             }
         }
@@ -139,7 +141,11 @@ export class FilterEditorStore {
 
     @action.bound
     updateCondition(conditionId: number, updates: Partial<FilterCondition>) {
-        this._updateConditionInTree(this.filterState.rootGroup, conditionId, updates);
+        this._updateConditionInTree(
+            this.filterState.rootGroup,
+            conditionId,
+            updates
+        );
         this.validateCurrentState();
     }
 
@@ -209,7 +215,10 @@ export class FilterEditorStore {
     ) {
         if (groupId === targetGroupId) return;
 
-        const groupToMove = this._findAndRemoveGroup(this.filterState.rootGroup, groupId);
+        const groupToMove = this._findAndRemoveGroup(
+            this.filterState.rootGroup,
+            groupId
+        );
         if (!groupToMove) return;
 
         const targetGroup = this._findGroupById(
@@ -253,7 +262,7 @@ export class FilterEditorStore {
         this.jsonValue = value;
     }
 
-    toMapLibreExpression(): MapLibreExpression {
+    toMapLibreExpression(): FilterExpression {
         if (this.activeTab === "json" && this.jsonValue) {
             try {
                 const parsed = JSON.parse(this.jsonValue);
@@ -267,7 +276,9 @@ export class FilterEditorStore {
                 });
             }
         }
-        const expression = this.convertToMapLibreExpression(this.filterState.rootGroup);
+        const expression = this.convertToMapLibreExpression(
+            this.filterState.rootGroup
+        );
         this.validateMapLibreExpression(expression);
         return expression;
     }
@@ -286,7 +297,9 @@ export class FilterEditorStore {
                 });
             }
         }
-        const expression = this.convertToMapLibreExpression(this.filterState.rootGroup);
+        const expression = this.convertToMapLibreExpression(
+            this.filterState.rootGroup
+        );
         this.validateMapLibreExpression(expression);
         return JSON.stringify(expression);
     }
@@ -459,9 +472,7 @@ export class FilterEditorStore {
         }
     }
 
-    private convertToMapLibreExpression(
-        group: FilterGroup
-    ): MapLibreExpression {
+    private convertToMapLibreExpression(group: FilterGroup): FilterExpression {
         const expressions: (ConditionExpr | GroupExpr)[] = [];
 
         for (const condition of group.conditions) {
@@ -520,13 +531,15 @@ export class FilterEditorStore {
     @action.bound
     private validateCurrentState() {
         try {
-            let expression: MapLibreExpression;
+            let expression: FilterExpression;
             if (this.activeTab === "json" && this.jsonValue) {
                 const parsed = JSON.parse(this.jsonValue);
                 this.validateMapLibreExpression(parsed);
                 expression = parsed;
             } else {
-                expression = this.convertToMapLibreExpression(this.filterState.rootGroup);
+                expression = this.convertToMapLibreExpression(
+                    this.filterState.rootGroup
+                );
                 this.validateMapLibreExpression(expression);
             }
             this.isValid = true;
@@ -628,17 +641,26 @@ export class FilterEditorStore {
                 );
             }
         } else if (operator !== "has" && operator !== "!has") {
-            const valueType = typeof value;
             const fieldType = field.datatype;
-            if (
-                (fieldType === "INTEGER" ||
-                    fieldType === "BIGINT" ||
-                    fieldType === "REAL") &&
-                valueType !== "number"
-            ) {
-                throw new Error(
-                    `Field '${fieldName}' expects a number, but got a ${valueType}.`
-                );
+            const isTemporalField = ["DATE", "TIME", "DATETIME"].includes(
+                fieldType
+            );
+
+            if (value !== null && value !== undefined && !isTemporalField) {
+                const valueType = typeof value;
+                if (
+                    (fieldType === "INTEGER" || fieldType === "REAL") &&
+                    valueType !== "number"
+                ) {
+                    throw new Error(
+                        `Field '${fieldName}' expects a number, but got a ${valueType}.`
+                    );
+                }
+                if (fieldType === "BIGINT" && valueType !== "string") {
+                    throw new Error(
+                        `Field '${fieldName}' expects a string, but got a ${valueType}.`
+                    );
+                }
             }
         }
     }
