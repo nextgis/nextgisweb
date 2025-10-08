@@ -104,6 +104,7 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
     const [srsOptions, setSrsOptions] = useState<SrsOption[]>([]);
     const [fieldOptions, setFieldOptions] = useState<FieldOption[]>([]);
     const [defaultSrs, setDefaultSrs] = useState<number>();
+    const [isVectorLayer, setIsVectorLayer] = useState(false);
     const [format, setFormat] = useState(exportFormats[0].name);
     const [fields, setFields] = useState<FormField<FormPropsKey>[]>([]);
     const [isReady, setIsReady] = useState(false);
@@ -116,6 +117,7 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
     const loading = staffLoading || exportLoading;
 
     const { lazyModal, modalHolder } = useShowModal();
+
 
     const initialValues = useMemo(() => {
         const initialVals: Partial<FormProps> = {
@@ -170,6 +172,9 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
 
                 if (itemInfo && itemInfo.feature_layer) {
                     const cls = itemInfo.resource.cls as "vector_layer";
+                    if (cls === "vector_layer") {
+                        setIsVectorLayer(true);
+                    }
                     const vectorLayer = itemInfo[cls];
                     if (vectorLayer) {
                         setDefaultSrs(vectorLayer.srs.id);
@@ -333,7 +338,7 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
                     </Button>
                 ),
                 label: gettext("Filter"),
-                included: !multiple,
+                included: !multiple && isVectorLayer,
             },
             {
                 name: "zipped",
