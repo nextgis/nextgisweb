@@ -16,6 +16,7 @@ import {
     OpenInNewIcon,
 } from "@nextgisweb/gui/icon";
 import { routeURL } from "@nextgisweb/pyramid/api";
+import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type Routes from "@nextgisweb/pyramid/type/route";
 import { useResource } from "@nextgisweb/resource/hook/useResource";
@@ -28,7 +29,7 @@ import { deleteFeatures } from "./api/deleteFeatures";
 import { ExportAction } from "./component/ExportAction";
 import type { ActionProps } from "./type";
 
-import MoreVertIcon from "@nextgisweb/icon/material/more_vert/outline";
+import FilterAltIcon from "@nextgisweb/icon/material/filter_alt/outline";
 
 const msgOpenTitle = gettext("Open");
 const msgOpenOnNewPage = gettext("Open on a new page");
@@ -38,7 +39,7 @@ const msgEditOnNewPage = gettext("Edit on a new page");
 const msgCreate = gettext("Create");
 
 const msgSearchPlaceholder = gettext("Search...");
-const msgFilterTitle = gettext("Filter");
+const msgFilterTitle = gettext("Advanced filter");
 
 export const FeatureGridActions = observer(
     ({
@@ -69,6 +70,7 @@ export const FeatureGridActions = observer(
         } = store;
 
         const { isExportAllowed } = useResource({ id });
+        const { data: resourceData } = useRouteGet("resource.item", { id });
 
         const { confirmDelete, contextHolder } = useConfirm();
         const { lazyModal, modalHolder } = useShowModal();
@@ -148,7 +150,7 @@ export const FeatureGridActions = observer(
             [store]
         );
 
-        const handleFilterClick = useCallback(() => {
+        const handleAdvancedFilterClick = useCallback(() => {
             lazyModal(
                 () => import("../feature-filter/FeatureFilterModalLazy"),
                 {
@@ -299,6 +301,20 @@ export const FeatureGridActions = observer(
             [selectedIds, id]
         );
 
+        let advancedButton = undefined;
+        if (resourceData?.resource?.cls === "vector_layer") {
+            advancedButton = (
+                <Tooltip title={msgFilterTitle}>
+                    <Button
+                        icon={<FilterAltIcon />}
+                        onClick={handleAdvancedFilterClick}
+                        size={size}
+                        type={filterExpression ? "primary" : "default"}
+                    />
+                </Tooltip>
+            );
+        }
+
         return (
             <ActionToolbar
                 size={size}
@@ -322,14 +338,7 @@ export const FeatureGridActions = observer(
                             allowClear
                             size={size}
                         />
-                        <Tooltip title={msgFilterTitle}>
-                            <Button
-                                icon={<MoreVertIcon />}
-                                onClick={handleFilterClick}
-                                size={size}
-                                type={filterExpression ? "primary" : "default"}
-                            />
-                        </Tooltip>
+                        {advancedButton}
                     </Space.Compact>
                 </div>
                 {children}

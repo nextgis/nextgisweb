@@ -62,16 +62,17 @@ const getDefaultValue = (
     field: string,
     condition: FilterConditionType
 ) => {
-    const newField = fields.find((f) => f.keyname === field);
+    const fieldInfo = fields.find((f) => f.keyname === field);
     const wantsNoValue = ["has", "!has"].includes(condition.operator);
     const wantsArray = ["in", "!in"].includes(condition.operator);
 
     let defaultValue: any = undefined;
-    if (!wantsNoValue && newField) {
+
+    if (!wantsNoValue && fieldInfo) {
         if (wantsArray) {
             defaultValue = [];
         } else {
-            switch (newField.datatype) {
+            switch (fieldInfo.datatype) {
                 case "INTEGER":
                 case "REAL":
                     defaultValue = 0;
@@ -83,7 +84,7 @@ const getDefaultValue = (
                     defaultValue = "";
                     break;
                 default:
-                    defaultValue = null;
+                    defaultValue = undefined;
             }
         }
     }
@@ -101,20 +102,18 @@ export const FilterCondition = observer(
             store.updateCondition(condition.id, { field, value: defaultValue });
         };
 
-        const handleOperatorChange = (operator: string) => {
-            const updates: Partial<FilterConditionType> = {
-                operator: operator as EqNeOp | CmpOp | InOp | HasOp,
-            };
-
-            const wantsArray = ["in", "!in"].includes(operator);
-            const wantsNoValue = ["has", "!has"].includes(operator);
-            const isCurrentlyArray = Array.isArray(condition.value);
-
-            if (isCurrentlyArray && !wantsArray) updates.value = undefined;
-            if (wantsArray && !isCurrentlyArray) updates.value = [];
-            if (wantsNoValue) updates.value = undefined;
-
-            store.updateCondition(condition.id, updates);
+        const handleOperatorChange = (
+            operator: EqNeOp | CmpOp | InOp | HasOp
+        ) => {
+            const defaultValue = getDefaultValue(
+                store.fields,
+                condition.field,
+                condition
+            );
+            store.updateCondition(condition.id, {
+                operator,
+                value: defaultValue,
+            });
         };
 
         const handleValueChange = (value: any) => {
@@ -160,9 +159,12 @@ export const FilterCondition = observer(
                 );
             }
 
+            const conditionValue =
+                condition.value === undefined ? null : condition.value;
+
             const displayValue = unmarshalFieldValue(
                 field.datatype,
-                condition.value as NgwAttributeType
+                conditionValue as NgwAttributeType
             );
 
             if (["in", "!in"].includes(condition.operator)) {

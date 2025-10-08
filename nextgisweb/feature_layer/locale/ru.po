@@ -152,63 +152,62 @@ msgstr "В векторном слое нет атрибутов"
 msgid "Attributes"
 msgstr "Атрибуты"
 
-#: nodepkg/export-form/ExportForm.tsx:236
+#: nodepkg/export-form/ExportForm.tsx:245
 msgid "Resources"
 msgstr "Ресурсы"
 
-#: nodepkg/export-form/ExportForm.tsx:258
+#: nodepkg/export-form/ExportForm.tsx:267
 msgid "Format"
 msgstr "Формат"
 
-#: nodepkg/export-form/ExportForm.tsx:271
+#: nodepkg/export-form/ExportForm.tsx:280
 msgid "SRS"
 msgstr "Система координат"
 
-#: nodepkg/export-form/ExportForm.tsx:276
+#: nodepkg/export-form/ExportForm.tsx:285
 msgid "Encoding"
 msgstr "Кодировка"
 
-#: nodepkg/export-form/ExportForm.tsx:290
+#: nodepkg/export-form/ExportForm.tsx:299
 msgid "FID field"
 msgstr "Поле FID"
 
-#: nodepkg/export-form/ExportForm.tsx:294
+#: nodepkg/export-form/ExportForm.tsx:303
 msgid "Use field display names instead of keynames"
 msgstr "Использовать наименования полей вместо ключей"
 
-#: nodepkg/export-form/ExportForm.tsx:300
+#: nodepkg/export-form/ExportForm.tsx:309
 #: nodepkg/fields-widget/FieldsWidget.tsx:213
 #: nodepkg/resource-section/FeatureLayerResourceSection.tsx:51
 msgid "Fields"
 msgstr "Поля"
 
-#: nodepkg/export-form/ExportForm.tsx:306
+#: nodepkg/export-form/ExportForm.tsx:315
 msgid "Limit by extent"
 msgstr "Ограничить охватом"
 
-#: nodepkg/export-form/ExportForm.tsx:312
+#: nodepkg/export-form/ExportForm.tsx:321
 msgid "Filter text"
 msgstr "Текстовый фильтр"
 
-#: nodepkg/export-form/ExportForm.tsx:321
+#: nodepkg/export-form/ExportForm.tsx:331
 msgid "Filter Applied"
 msgstr "Фильтр применен"
 
-#: nodepkg/export-form/ExportForm.tsx:321
+#: nodepkg/export-form/ExportForm.tsx:332
 msgid "Set Filter"
 msgstr "Установить фильтр"
 
-#: nodepkg/export-form/ExportForm.tsx:324
+#: nodepkg/export-form/ExportForm.tsx:335
 #: nodepkg/feature-filter/FeatureFilterModal.tsx:11
-#: nodepkg/feature-grid/FeatureGridActions.tsx:41
 msgid "Filter"
 msgstr "Фильтр"
 
-#: nodepkg/export-form/ExportForm.tsx:329
+#: nodepkg/export-form/ExportForm.tsx:340
 msgid "Zip archive"
 msgstr "Zip архив"
 
-#: nodepkg/export-form/ExportForm.tsx:384
+#: nodepkg/export-form/ExportForm.tsx:395
 #: nodepkg/feature-editor/FeatureEditorWidget.tsx:41
 msgid "Save"
 msgstr "Сохранить"
@@ -280,63 +279,63 @@ msgstr "Перетаскивание"
 msgid "Loading editor..."
 msgstr "Загрузка редактора..."
 
-#: nodepkg/feature-filter/component/FilterCondition.tsx:35
+#: nodepkg/feature-filter/component/FilterCondition.tsx:36
 msgid "Delete Condition"
 msgstr "Удалить условие"
 
-#: nodepkg/feature-filter/component/FilterCondition.tsx:53
+#: nodepkg/feature-filter/component/FilterCondition.tsx:54
 msgid "Any value"
 msgstr "Любое значение"
 
-#: nodepkg/feature-filter/component/FilterCondition.tsx:54
+#: nodepkg/feature-filter/component/FilterCondition.tsx:55
 msgid "No value"
 msgstr "Нет значения"
 
-#: nodepkg/feature-filter/component/FilterCondition.tsx:116
+#: nodepkg/feature-filter/component/FilterCondition.tsx:154
 msgid "Invalid field"
 msgstr "Некорректное поле"
 
-#: nodepkg/feature-filter/component/FilterCondition.tsx:117
+#: nodepkg/feature-filter/component/FilterCondition.tsx:155
 msgid "Field not found"
 msgstr "Поле не найдено"
 
-#: nodepkg/feature-filter/component/FilterCondition.tsx:154
+#: nodepkg/feature-filter/component/FilterCondition.tsx:195
 msgid "Enter values and press Enter"
 msgstr "Введите значения и нажмите Enter"
 
-#: nodepkg/feature-filter/component/FilterCondition.tsx:168
+#: nodepkg/feature-filter/component/FilterCondition.tsx:209
 msgid "Enter integer"
 msgstr "Введите целое число"
 
-#: nodepkg/feature-filter/component/FilterCondition.tsx:181
+#: nodepkg/feature-filter/component/FilterCondition.tsx:222
 msgid "Enter big integer"
 msgstr "Введите большое целое число"
 
-#: nodepkg/feature-filter/component/FilterCondition.tsx:195
+#: nodepkg/feature-filter/component/FilterCondition.tsx:236
 msgid "Enter number"
 msgstr "Введите число"
 
-#: nodepkg/feature-filter/component/FilterCondition.tsx:208
+#: nodepkg/feature-filter/component/FilterCondition.tsx:249
 msgid "Select date"
 msgstr "Выберите дату"
 
-#: nodepkg/feature-filter/component/FilterCondition.tsx:221
+#: nodepkg/feature-filter/component/FilterCondition.tsx:262
 msgid "Select time"
 msgstr "Выберите время"
 
-#: nodepkg/feature-filter/component/FilterCondition.tsx:234
+#: nodepkg/feature-filter/component/FilterCondition.tsx:275
 msgid "Select date and time"
 msgstr "Выберите дату и время"
 
-#: nodepkg/feature-filter/component/FilterCondition.tsx:247
+#: nodepkg/feature-filter/component/FilterCondition.tsx:288
 msgid "Enter value"
 msgstr "Введите значение"
 
-#: nodepkg/feature-filter/component/FilterCondition.tsx:270
+#: nodepkg/feature-filter/component/FilterCondition.tsx:311
 msgid "Select field"
 msgstr "Выберите поле"
 
-#: nodepkg/feature-filter/component/FilterCondition.tsx:286
+#: nodepkg/feature-filter/component/FilterCondition.tsx:327
 msgid "Operator"
 msgstr "Оператор"
 
@@ -412,33 +411,37 @@ msgstr "Открыть настройки таблицы"
 msgid "Refresh table"
 msgstr "Обновить таблицу"
 
-#: nodepkg/feature-grid/FeatureGridActions.tsx:33
+#: nodepkg/feature-grid/FeatureGridActions.tsx:34
 msgid "Open"
 msgstr "Открыть"
 
-#: nodepkg/feature-grid/FeatureGridActions.tsx:34
+#: nodepkg/feature-grid/FeatureGridActions.tsx:35
 msgid "Open on a new page"
 msgstr "Открывать на новой странице"
 
-#: nodepkg/feature-grid/FeatureGridActions.tsx:35
+#: nodepkg/feature-grid/FeatureGridActions.tsx:36
 msgid "Delete"
 msgstr "Удалить"
 
-#: nodepkg/feature-grid/FeatureGridActions.tsx:36
+#: nodepkg/feature-grid/FeatureGridActions.tsx:37
 msgid "Edit"
 msgstr "Редактировать"
 
-#: nodepkg/feature-grid/FeatureGridActions.tsx:37
+#: nodepkg/feature-grid/FeatureGridActions.tsx:38
 msgid "Edit on a new page"
 msgstr "Редактировать на новой странице"
 
-#: nodepkg/feature-grid/FeatureGridActions.tsx:38
+#: nodepkg/feature-grid/FeatureGridActions.tsx:39
 msgid "Create"
 msgstr "Создать"
 
-#: nodepkg/feature-grid/FeatureGridActions.tsx:40
+#: nodepkg/feature-grid/FeatureGridActions.tsx:41
 msgid "Search..."
 msgstr "Поиск..."
+
+#: nodepkg/feature-grid/FeatureGridActions.tsx:42
+msgid "Advanced filter"
+msgstr "Расширенный фильтр"
 
 #: nodepkg/feature-grid/FeatureTable.tsx:95
 #: nodepkg/feature-grid/component/TableConfigModal.tsx:53
