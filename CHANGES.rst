@@ -4,22 +4,22 @@ Changes
 5.2.0
 -----
 
-- React library upgraded to 19.
-- Improved WMS client compatibility and performance.
-- Maximum webmap zoom level increased to 24.
-- Improved swipe tool: vertical and horizontal swipes in any direction.
-- Support for field deletion for versioned layers.
-- GeoPackage 1.4 compatibility improvements.
-- Automatic HEIF-to-JPEG conversion for feature attachments.
-- Better handling of inconsistent spatial reference systems in GeoTIFF files.
-- Dropped support for GeoJSON response streaming.
-- WMTS protocol support in WMS server (KVP and REST).
-- Basic support for geometry editing on feature pages.
-- Improved handling of image dimensions in descriptions.
-- Improved attachment preview with zoom support.
-- Improved MVT generation performance.
 - Many new feature editing tools on webmaps.
+- Improved swipe tool: vertical and horizontal swipes in any direction.
+- Maximum webmap zoom level increased to 24.
+- Geometry editing on feature pages.
+- Zoom support for attachment preview.
+- Automatic HEIF-to-JPEG conversion for feature attachments.
+- Improved handling of image dimensions in descriptions.
+- Support for field deletion for versioned layers.
+- Better handling of inconsistent spatial reference systems in GeoTIFF files.
 - Configurable Nominatim endpoint for self-hosted installations.
+- WMTS protocol support in WMS server (KVP and REST).
+- Improved WMS client compatibility and performance.
+- Improved MVT generation performance.
+- GeoPackage 1.4 compatibility improvements.
+- Dropped support for GeoJSON response streaming.
+- React library upgraded to 19.
 
 
 5.1.0
