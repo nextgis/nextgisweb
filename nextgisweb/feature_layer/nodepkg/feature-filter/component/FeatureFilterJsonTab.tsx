@@ -8,10 +8,9 @@ import {
     useState,
 } from "react";
 
-import { Spin } from "@nextgisweb/gui/antd";
-import { gettext } from "@nextgisweb/pyramid/i18n";
-
 import type { FilterEditorStore } from "../FilterEditorStore";
+
+import { LoadingOutlined } from "@ant-design/icons";
 
 const AsyncCode = lazy(() => import("./CodeLazy"));
 
@@ -20,12 +19,11 @@ const CodeLoadingFallback = () => (
         className="code-loading-fallback"
         style={{ textAlign: "center", padding: "20px" }}
     >
-        <Spin tip={gettext("Loading editor...")} size="large">
-            <div
-                className="loading-content"
-                style={{ height: "200px", width: "100%" }}
-            />
-        </Spin>
+        <LoadingOutlined style={{ fontSize: 24 }} />
+        <div
+            className="loading-content"
+            style={{ height: "200px", width: "100%" }}
+        />
     </div>
 );
 
