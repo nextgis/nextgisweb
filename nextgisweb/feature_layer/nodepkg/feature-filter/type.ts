@@ -7,6 +7,8 @@ export interface FeatureFilterEditorProps {
     onChange?: (value: string | undefined) => void;
     onValidityChange?: (isValid: boolean) => void;
     showFooter?: boolean;
+    onApply?: (value: string | undefined) => void;
+    onCancel?: (value: string | undefined) => void;
 }
 
 export interface FilterState {

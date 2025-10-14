@@ -1,5 +1,5 @@
 /** @testentry react */
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
 import { Button, Tabs } from "@nextgisweb/gui/antd";
@@ -112,9 +112,12 @@ const msgOutputJson = gettext("Output JSON");
 const msgCurrentState = gettext("Current Filter State");
 
 function FeatureFilterEditorTest() {
-    const [currentFilter, setCurrentFilter] = useState<string | undefined>(
+    const [initialValue, setInitialValue] = useState<string | undefined>(
         sampleFilters.complex
     );
+    const [currentInlineFilter, setCurrentInlineFilter] = useState<
+        string | undefined
+    >(initialValue);
     const [outputJson, setOutputJson] = useState("");
     const [modalOpen, setModalOpen] = useState(false);
 
@@ -126,27 +129,26 @@ function FeatureFilterEditorTest() {
             "Filter contains transient IDs:",
             filter?.includes("ui_") || false
         );
-        setCurrentFilter(filter);
-        setOutputJson(filter || "");
+        setCurrentInlineFilter(filter);
     };
 
     const handleTestSimple = () => {
-        setCurrentFilter(sampleFilters.simple);
+        setInitialValue(sampleFilters.simple);
         setOutputJson(sampleFilters.simple);
     };
 
     const handleTestComplex = () => {
-        setCurrentFilter(sampleFilters.complex);
+        setInitialValue(sampleFilters.complex);
         setOutputJson(sampleFilters.complex);
     };
 
     const handleTestNested = () => {
-        setCurrentFilter(sampleFilters.nested);
+        setInitialValue(sampleFilters.nested);
         setOutputJson(sampleFilters.nested);
     };
 
     const handleTestEmpty = () => {
-        setCurrentFilter(sampleFilters.empty);
+        setInitialValue(sampleFilters.empty);
         setOutputJson(sampleFilters.empty);
     };
 
@@ -154,8 +156,8 @@ function FeatureFilterEditorTest() {
         setOutputJson("");
     };
 
-    const handleModalApply = (filter: string | undefined) => {
-        setCurrentFilter(filter);
+    const handleApply = (filter: string | undefined) => {
+        setInitialValue(filter);
         setOutputJson(filter || "");
         setModalOpen(false);
     };
@@ -164,7 +166,7 @@ function FeatureFilterEditorTest() {
         {
             key: "output-json",
             label: msgOutputJson,
-            children: <Code lang="json" value={outputJson} />,
+            children: <Code lang="json" readOnly value={outputJson} />,
         },
         {
             key: "current-state",
@@ -172,15 +174,44 @@ function FeatureFilterEditorTest() {
             children: (
                 <Code
                     lang="json"
+                    readOnly
                     value={
-                        currentFilter
-                            ? JSON.stringify(JSON.parse(currentFilter), null, 2)
+                        currentInlineFilter
+                            ? JSON.stringify(
+                                  JSON.parse(currentInlineFilter),
+                                  null,
+                                  2
+                              )
                             : ""
                     }
                 />
             ),
         },
     ];
+
+    const filterComponent = useMemo(() => {
+        return (
+            <FeatureFilterEditor
+                fields={sampleFields}
+                value={initialValue}
+                showFooter={true}
+                onChange={(filter) => handleFilterChange(filter)}
+                onApply={handleApply}
+            />
+        );
+    }, [initialValue]);
+
+    const filterModalComponent = useMemo(() => {
+        return (
+            <FeatureFilterModal
+                open={modalOpen}
+                fields={sampleFields}
+                value={initialValue}
+                onApply={handleApply}
+                onCancel={() => setModalOpen(false)}
+            />
+        );
+    }, [initialValue, modalOpen]);
 
     return (
         <div style={{ padding: "20px", maxWidth: "1200px" }}>
@@ -218,12 +249,7 @@ function FeatureFilterEditorTest() {
 
             <div style={{ width: "100%", marginBottom: "20px" }}>
                 <h4 style={{ marginBottom: "8px" }}>Filter Editor</h4>
-                <FeatureFilterEditor
-                    fields={sampleFields}
-                    value={currentFilter}
-                    onChange={handleFilterChange}
-                    showFooter={true}
-                />
+                {filterComponent}
             </div>
 
             <div style={{ width: "100%" }}>
@@ -236,13 +262,7 @@ function FeatureFilterEditorTest() {
                 />
             </div>
 
-            <FeatureFilterModal
-                open={modalOpen}
-                fields={sampleFields}
-                value={currentFilter}
-                onApply={handleModalApply}
-                onCancel={() => setModalOpen(false)}
-            />
+            {filterModalComponent}
         </div>
     );
 }
