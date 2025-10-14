@@ -24,11 +24,13 @@ export const FeatureFilterEditor = observer(
         onChange,
         onValidityChange,
         showFooter = false,
+        onApply,
+        onCancel,
     }: FeatureFilterEditorProps) => {
         const [initialValue] = useState<string | undefined>(value);
         const store = useMemo(
-            () => new FilterEditorStore({ fields }),
-            [fields]
+            () => new FilterEditorStore({ fields, value }),
+            [fields, value]
         );
         const [messageApi, contextHolder] = message.useMessage();
 
@@ -41,7 +43,7 @@ export const FeatureFilterEditor = observer(
         useEffect(() => {
             onValidityChange?.(store.isValid);
             onChange?.(store.validJsonValue);
-        }, [store.isValid, onValidityChange, store.validJsonValue]);
+        }, [store.isValid, store.validJsonValue, onValidityChange, onChange]);
 
         const handleApply = () => {
             if (!store.isValid) {
@@ -56,6 +58,7 @@ export const FeatureFilterEditor = observer(
             try {
                 const jsonString = store.toJsonString();
                 onChange?.(jsonString);
+                onApply?.(jsonString);
                 messageApi.success(gettext("Filter applied successfully"));
             } catch (error) {
                 messageApi.error(gettext("Failed to apply filter"));
@@ -65,6 +68,7 @@ export const FeatureFilterEditor = observer(
 
         const handleCancel = () => {
             onChange?.(initialValue);
+            onCancel?.(initialValue);
         };
 
         const items: TabsProps["items"] = [
@@ -94,9 +98,7 @@ export const FeatureFilterEditor = observer(
                 />
 
                 {hasErrors && (
-                    <div className="error-message">
-                        {store.validationError}
-                    </div>
+                    <div className="error-message">{store.validationError}</div>
                 )}
 
                 {showFooter && (

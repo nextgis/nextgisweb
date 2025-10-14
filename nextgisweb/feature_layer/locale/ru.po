@@ -152,62 +152,62 @@ msgstr "В векторном слое нет атрибутов"
 msgid "Attributes"
 msgstr "Атрибуты"
 
-#: nodepkg/export-form/ExportForm.tsx:245
+#: nodepkg/export-form/ExportForm.tsx:250
 msgid "Resources"
 msgstr "Ресурсы"
 
-#: nodepkg/export-form/ExportForm.tsx:267
+#: nodepkg/export-form/ExportForm.tsx:272
 msgid "Format"
 msgstr "Формат"
 
-#: nodepkg/export-form/ExportForm.tsx:280
+#: nodepkg/export-form/ExportForm.tsx:285
 msgid "SRS"
 msgstr "Система координат"
 
-#: nodepkg/export-form/ExportForm.tsx:285
+#: nodepkg/export-form/ExportForm.tsx:290
 msgid "Encoding"
 msgstr "Кодировка"
 
-#: nodepkg/export-form/ExportForm.tsx:299
+#: nodepkg/export-form/ExportForm.tsx:304
 msgid "FID field"
 msgstr "Поле FID"
 
-#: nodepkg/export-form/ExportForm.tsx:303
+#: nodepkg/export-form/ExportForm.tsx:308
 msgid "Use field display names instead of keynames"
 msgstr "Использовать наименования полей вместо ключей"
 
-#: nodepkg/export-form/ExportForm.tsx:309
+#: nodepkg/export-form/ExportForm.tsx:314
 #: nodepkg/fields-widget/FieldsWidget.tsx:213
 #: nodepkg/resource-section/FeatureLayerResourceSection.tsx:51
 msgid "Fields"
 msgstr "Поля"
 
-#: nodepkg/export-form/ExportForm.tsx:315
+#: nodepkg/export-form/ExportForm.tsx:320
 msgid "Limit by extent"
 msgstr "Ограничить охватом"
 
-#: nodepkg/export-form/ExportForm.tsx:321
+#: nodepkg/export-form/ExportForm.tsx:326
 msgid "Filter text"
 msgstr "Текстовый фильтр"
 
-#: nodepkg/export-form/ExportForm.tsx:331
+#: nodepkg/export-form/ExportForm.tsx:336
 msgid "Filter Applied"
 msgstr "Фильтр применен"
 
-#: nodepkg/export-form/ExportForm.tsx:332
+#: nodepkg/export-form/ExportForm.tsx:337
 msgid "Set Filter"
 msgstr "Установить фильтр"
 
-#: nodepkg/export-form/ExportForm.tsx:335
+#: nodepkg/export-form/ExportForm.tsx:340
 #: nodepkg/feature-filter/FeatureFilterModal.tsx:11
 msgid "Filter"
 msgstr "Фильтр"
 
-#: nodepkg/export-form/ExportForm.tsx:340
+#: nodepkg/export-form/ExportForm.tsx:345
 msgid "Zip archive"
 msgstr "Zip архив"
 
-#: nodepkg/export-form/ExportForm.tsx:395
+#: nodepkg/export-form/ExportForm.tsx:400
 #: nodepkg/feature-editor/FeatureEditorWidget.tsx:41
 msgid "Save"
 msgstr "Сохранить"
@@ -271,13 +271,91 @@ msgstr "Фильтр применен успешно"
 msgid "Failed to apply filter"
 msgstr "Не удалось применить фильтр"
 
+#: nodepkg/feature-filter/FilterEditorStore.ts:69
+msgid "Failed to generate JSON from filter state:"
+msgstr "Ошибка при генерации JSON из состояния фильтра:"
+
+#: nodepkg/feature-filter/FilterEditorStore.ts:87
+msgid "Failed to parse JSON, falling back to JSON tab."
+msgstr "Ошибка при парсинге JSON, возвращаемся к вкладке JSON."
+
+#: nodepkg/feature-filter/FilterEditorStore.ts:173
+msgid "Cannot delete the root group."
+msgstr "Невозможно удалить корневую группу."
+
+#: nodepkg/feature-filter/FilterEditorStore.ts:259
+msgid "Failed to parse filter expression:"
+msgstr "Ошибка при парсинге выражения фильтра:"
+
+#: nodepkg/feature-filter/FilterEditorStore.ts:265
+msgid "Invalid filter value"
+msgstr "Некорректное значение фильтра"
+
+#: nodepkg/feature-filter/FilterEditorStore.ts:279
+#: nodepkg/feature-filter/FilterEditorStore.ts:300
+msgid "Invalid JSON or filter structure"
+msgstr "Некорректный JSON или структура фильтра"
+
+#: nodepkg/feature-filter/FilterEditorStore.ts:558
+msgid "Validation failed"
+msgstr "Ошибка валидации"
+
+#: nodepkg/feature-filter/FilterEditorStore.ts:565
+msgid "Expression must be an array"
+msgstr "Выражение должно быть массивом"
+
+#: nodepkg/feature-filter/FilterEditorStore.ts:577
+msgid "Group operator must have at least one argument"
+msgstr "Групповой оператор должен иметь хотя бы один аргумент"
+
+#: nodepkg/feature-filter/FilterEditorStore.ts:583
+msgid "All arguments to group operator must be arrays"
+msgstr "Все аргументы группового оператора должны быть массивами"
+
+#: nodepkg/feature-filter/FilterEditorStore.ts:599
+msgid "Unknown or invalid root operator: '{operator}'"
+msgstr "Неизвестный или некорректный корневой оператор: '{operator}'"
+
+#: nodepkg/feature-filter/FilterEditorStore.ts:610
+msgid "Invalid operator: '{operator}'"
+msgstr "Некорректный оператор: '{operator}'"
+
+#: nodepkg/feature-filter/FilterEditorStore.ts:617
+#: nodepkg/feature-filter/FilterEditorStore.ts:625
+msgid "Operator '{operator}' expects 1 argument, but got '{length}'"
+msgstr "Оператор '{operator}' ожидает 1 аргумент, но получено '{length}'"
+
+#: nodepkg/feature-filter/FilterEditorStore.ts:634
+msgid "Field expression must be ['get', fieldName]"
+msgstr "Выражение поля должно быть ['get', fieldName]"
+
+#: nodepkg/feature-filter/FilterEditorStore.ts:639
+msgid "Field name must be a string"
+msgstr "Имя поля должно быть строкой"
+
+#: nodepkg/feature-filter/FilterEditorStore.ts:645
+msgid "Unknown field: '{fieldName}'"
+msgstr "Неизвестное поле: '{fieldName}'"
+
+#: nodepkg/feature-filter/FilterEditorStore.ts:655
+msgid "Operator '{operator}' is not supported for field type '{fieldType}'"
+msgstr "Оператор '{operator}' не поддерживается для типа поля '{fieldType}'"
+
+#: nodepkg/feature-filter/FilterEditorStore.ts:664
+msgid "Value for operator '{operator}' must be an array."
+msgstr "Значение для оператора '{operator}' должно быть массивом."
+
+#: nodepkg/feature-filter/FilterEditorStore.ts:682
+msgid "Field '{fieldName}' expects a number, but got '{valueType}'"
+msgstr "Поле '{fieldName}' ожидает число, но получено '{valueType}'"
+
+#: nodepkg/feature-filter/FilterEditorStore.ts:689
+msgid "Field '{fieldName}' expects a string, but got '{valueType}'"
+msgstr "Поле '{fieldName}' ожидает строку, но получено '{valueType}'"
+
 #: nodepkg/feature-filter/component/ConstructorTab.tsx:101
 msgid "Dragging"
 msgstr "Перетаскивание"
-
-#: nodepkg/feature-filter/component/FeatureFilterJsonTab.tsx:23
-msgid "Loading editor..."
-msgstr "Загрузка редактора..."
 
 #: nodepkg/feature-filter/component/FilterCondition.tsx:36
 msgid "Delete Condition"
@@ -674,3 +752,6 @@ msgstr "Объекты"
 #: view.py:168
 msgid "Table"
 msgstr "Таблица"
+
+#~ msgid "Loading editor..."
+#~ msgstr "Загрузка редактора..."

@@ -60,15 +60,17 @@ const getPlaceholder = (
 const getDefaultValue = (
     fields: FeatureLayerFieldRead[],
     field: string,
-    condition: FilterConditionType
+    operator: EqNeOp | CmpOp | InOp | HasOp
 ) => {
     const fieldInfo = fields.find((f) => f.keyname === field);
-    const wantsNoValue = ["has", "!has"].includes(condition.operator);
-    const wantsArray = ["in", "!in"].includes(condition.operator);
+    const wantsNoValue = ["has", "!has"].includes(operator);
+    const wantsArray = ["in", "!in"].includes(operator);
 
     let defaultValue: any = undefined;
 
-    if (!wantsNoValue && fieldInfo) {
+    if (wantsArray) {
+        defaultValue = [];
+    } else if (!wantsNoValue && fieldInfo) {
         if (wantsArray) {
             defaultValue = [];
         } else {
@@ -97,7 +99,7 @@ export const FilterCondition = observer(
             const defaultValue = getDefaultValue(
                 store.fields,
                 field,
-                condition
+                condition.operator
             );
             store.updateCondition(condition.id, { field, value: defaultValue });
         };
@@ -108,7 +110,7 @@ export const FilterCondition = observer(
             const defaultValue = getDefaultValue(
                 store.fields,
                 condition.field,
-                condition
+                operator
             );
             store.updateCondition(condition.id, {
                 operator,
