@@ -10,6 +10,7 @@ from pathlib import Path
 import sqlalchemy as sa
 
 from nextgisweb.env import DBSession
+from nextgisweb.lib.logging import logger
 
 
 def forward(ctx):
@@ -24,12 +25,17 @@ def forward(ctx):
         filename = lambda ref: Path(ctx.env.file_storage.filename(ref))
         for id, component, uuid in con.execute(qsel):
             ref = (component, uuid)
-            yield (id, filename(ref).stat().st_size)
+            fpath = filename(ref)
+            if fpath.exists():
+                yield (id, fpath.stat().st_size)
+            else:
+                logger.warning("File '%s' not found", str(fpath))
 
     sizes = iter(_iter_sizes())
     while chunk := [dict(k=id, v=size) for id, size in islice(sizes, 100)]:
         con.execute(qupd, chunk)
 
+    con.execute(sa.text("UPDATE fileobj SET size = 0 WHERE size IS NULL"))
     con.execute(sa.text("ALTER TABLE fileobj ALTER COLUMN size SET NOT NULL"))
 
 
