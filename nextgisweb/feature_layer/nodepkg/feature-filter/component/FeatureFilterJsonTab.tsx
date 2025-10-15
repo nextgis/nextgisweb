@@ -1,12 +1,5 @@
 import { observer } from "mobx-react-lite";
-import {
-    Suspense,
-    lazy,
-    useCallback,
-    useEffect,
-    useMemo,
-    useState,
-} from "react";
+import { Suspense, lazy, useCallback, useMemo } from "react";
 
 import type { FilterEditorStore } from "../FilterEditorStore";
 
@@ -38,21 +31,10 @@ const FeatureFilterJson = ({
     onChange,
     isValid = true,
 }: FeatureFilterJsonProps) => {
-    const [internalValue, setInternalValue] = useState(value);
-    const [isReady, setIsReady] = useState(false);
-    const [updateJsonEditor, setUpdateJsonEditor] = useState(true);
-
-    useEffect(() => {
-        if (value !== internalValue) {
-            setInternalValue(value);
-            setUpdateJsonEditor(!updateJsonEditor);
-        }
-    }, [value]);
-
     const onChangeHandle = useCallback(
         (val: string) => {
             const newValue = val === "" ? undefined : val;
-            setInternalValue(newValue);
+
             if (!onChange) return;
             onChange(newValue);
         },
@@ -63,19 +45,14 @@ const FeatureFilterJson = ({
         () => (
             <Suspense fallback={<CodeLoadingFallback />}>
                 <AsyncCode
-                    value={isReady ? internalValue : undefined}
-                    whenReady={() => {
-                        setTimeout(() => {
-                            setIsReady(true);
-                        }, 100);
-                    }}
+                    value={value}
                     onChange={onChangeHandle}
                     lang="json"
                     lineNumbers
                 />
             </Suspense>
         ),
-        [isReady, updateJsonEditor]
+        [onChangeHandle, value]
     );
 
     return (
@@ -88,9 +65,12 @@ interface JsonTabProps {
 }
 
 export const FeatureFilterJsonTab = observer(({ store }: JsonTabProps) => {
-    const handleJsonChange = (v: string | undefined) => {
-        store.setJsonValue(v);
-    };
+    const handleJsonChange = useCallback(
+        (v: string | undefined) => {
+            store.setJsonValue(v);
+        },
+        [store]
+    );
 
     return (
         <div className="filter-json">
