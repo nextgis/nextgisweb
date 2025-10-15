@@ -7,7 +7,7 @@ Changes
 - Many new feature editing tools on webmaps.
 - Improved swipe tool: vertical and horizontal swipes in any direction.
 - Maximum webmap zoom level increased to 24.
-- Geometry editing on feature pages.
+- Geometry tab on feature pages.
 - Zoom support for attachment preview.
 - Automatic HEIF-to-JPEG conversion for feature attachments.
 - Improved handling of image dimensions in descriptions.
@@ -18,7 +18,7 @@ Changes
 - Improved WMS client compatibility and performance.
 - Improved MVT generation performance.
 - GeoPackage 1.4 compatibility improvements.
-- Dropped support for GeoJSON response streaming.
+- Dropped support for GeoJSON range requests.
 - React library upgraded to 19.
 
 
