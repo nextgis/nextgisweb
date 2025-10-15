@@ -52,25 +52,41 @@ const GeometryEditor = observer(
         const [extent] = useState(() => {
             return initExtent ? convertWSENToNgwExtent(initExtent) : undefined;
         });
+        const [initialExtentLoading, setInitialExtentLoading] =
+            useState(!initExtent);
         const [initialExtent, setInitialExtent] = useState(extent);
         const featureId = store._parentStore?.featureId;
 
-        const getchLayerExtent = useCallback(async () => {
+        const fetchLayerExtent = useCallback(async () => {
             abort();
             const resourceId = store._parentStore?.resourceId;
             if (resourceId !== undefined) {
                 const signal = makeSignal();
-                return fetchResourceExtent({ signal, resourceId });
+                const resExtent = await fetchResourceExtent({
+                    signal,
+                    resourceId,
+                });
+                if (
+                    !resExtent ||
+                    Object.values(resExtent).some((v) => v === null)
+                ) {
+                    return undefined;
+                }
+                return resExtent;
             }
         }, [abort, makeSignal, store]);
 
         useEffect(() => {
             if (initExtent === undefined) {
-                getchLayerExtent().then((extent) => {
-                    setInitialExtent(extent);
-                });
+                fetchLayerExtent()
+                    .then((ext) => {
+                        setInitialExtent(ext);
+                    })
+                    .finally(() => {
+                        setInitialExtentLoading(false);
+                    });
             }
-        }, [getchLayerExtent, initExtent]);
+        }, [fetchLayerExtent, initExtent]);
 
         const layerOptions = useMemo<LayerOptions>(() => {
             return {
@@ -95,17 +111,7 @@ const GeometryEditor = observer(
                 : undefined;
         }, [initialExtent]);
 
-        const mapExtent = useMemo(() => {
-            return extent
-                ? {
-                      extent,
-                      padding: DEFAULT_PADDING,
-                      srs: DEFAULT_SRS,
-                  }
-                : undefined;
-        }, [extent]);
-
-        if (!isReady || !geometryType || !initialExtent) {
+        if (!isReady || !geometryType || initialExtentLoading) {
             return <LoadingWrapper />;
         }
 
@@ -114,7 +120,6 @@ const GeometryEditor = observer(
                 style={{ width: "100%", height: "100%" }}
                 basemap
                 initialMapExtent={initialMapExtent}
-                mapExtent={mapExtent}
             >
                 <EditableVectorLayer source={source} />
                 <DrawInteraction

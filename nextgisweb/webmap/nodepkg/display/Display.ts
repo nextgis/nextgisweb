@@ -49,7 +49,10 @@ import { displayURLParams } from "./displayURLParams";
 export class Display {
     private readonly emptyModeURLValue = "none";
     readonly _itemConfigById: Record<string, TreeItemConfig> = {};
+
+    /** @deprecated - use {@link MapStore.displayProjection} instead */
     displayProjection = "EPSG:3857";
+    /** @deprecated - use {@link MapStore.lonlatProjection} instead */
     lonlatProjection = "EPSG:4326";
 
     config: DisplayConfig;
@@ -144,6 +147,8 @@ export class Display {
             initialExtent: this._extent,
             extent: this._extentConst || undefined,
             measureSrsId: this.config.measureSrsId,
+            displayProjection: this.displayProjection,
+            lonlatProjection: this.lonlatProjection,
         });
         this.identify = new Identify({ display: this });
 

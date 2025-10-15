@@ -9,8 +9,8 @@ import type Control from "ol/control/Control";
 import type { EventsKey } from "ol/events";
 import * as olExtent from "ol/extent";
 import type { Extent } from "ol/extent";
-import { fromExtent } from "ol/geom/Polygon";
 import * as olProj from "ol/proj";
+import type { ProjectionLike } from "ol/proj";
 
 import type { NgwExtent } from "@nextgisweb/feature-layer/type/api";
 import { imageQueue } from "@nextgisweb/pyramid/util";
@@ -42,6 +42,8 @@ interface MapOptions extends OlMapOptions {
     extent?: Extent;
     measureSrsId?: number | null;
     initialExtent?: Extent;
+    lonlatProjection?: string;
+    displayProjection?: string;
 }
 
 export interface Position {
@@ -70,10 +72,14 @@ export class MapStore extends Watchable<MapWatchableProps> {
 
     private readonly initialExtent?: Extent;
 
+    readonly displayProjection = "EPSG:3857";
+    readonly lonlatProjection = "EPSG:4326";
+
     @observable.ref accessor olMap: OlMap;
     @observable.ref accessor olView: View;
 
     @observable.ref accessor ready = false;
+    @observable.ref accessor started = false;
 
     @observable.shallow accessor layers: Layers = {};
 
@@ -100,6 +106,7 @@ export class MapStore extends Watchable<MapWatchableProps> {
         if (!viewOptions.view) {
             viewOptions.view = new View({
                 maxZoom: 24,
+                projection: this.displayProjection,
                 // Must always be true for correct tile caching with image adapters
                 constrainResolution: true,
                 extent,
@@ -194,6 +201,8 @@ export class MapStore extends Watchable<MapWatchableProps> {
             );
 
             olMap.setTarget(target);
+
+            this.setStarted(true);
         });
     }
 
@@ -232,6 +241,7 @@ export class MapStore extends Watchable<MapWatchableProps> {
         this._mapUnbindKeys = [];
         this.setReady(false);
         this.olMap.setTarget(undefined);
+        this.setStarted(false);
     }
 
     getLayersArray() {
@@ -335,24 +345,19 @@ export class MapStore extends Watchable<MapWatchableProps> {
     }
 
     fitNGWExtent(mapExtent: MapExtent) {
-        const view = this.olMap.getView();
         const { extent, srs, ...fitOptions } = mapExtent;
-        const bbox = [
+
+        const bbox: number[] = [
             extent.minLon,
             extent.minLat,
             extent.maxLon,
             extent.maxLat,
         ];
-        view.fitInternal(
-            fromExtent(
-                olProj.transformExtent(
-                    bbox,
-                    `EPSG:${srs.id}`,
-                    view.getProjection()
-                )
-            ),
-            fitOptions
-        );
+
+        this.zoomToExtent(bbox, {
+            ...fitOptions,
+            ...(srs ? { projection: `EPSG:${srs.id}` } : {}),
+        });
     }
 
     zoomToFeature(feature: Feature, options?: FitOptions): void {
@@ -365,8 +370,23 @@ export class MapStore extends Watchable<MapWatchableProps> {
         this.zoomToExtent(extent, options);
     }
 
-    zoomToExtent(extent: number[], options?: FitOptions): void {
+    zoomToExtent(
+        extent: number[],
+        {
+            projection,
+            ...fitOpts
+        }: FitOptions & { projection?: ProjectionLike } = {}
+    ): void {
         const view = this.olMap.getView();
+
+        if (projection) {
+            extent = olProj.transformExtent(
+                extent,
+                projection,
+                view.getProjection()
+            );
+        }
+
         const widthExtent = olExtent.getWidth(extent);
         const heightExtent = olExtent.getHeight(extent);
 
@@ -378,11 +398,11 @@ export class MapStore extends Watchable<MapWatchableProps> {
             view.setCenter(center);
 
             const zoom = view.getZoom();
-            if (zoom !== undefined && zoom < this.SMART_ZOOM) {
+            if (zoom === undefined || zoom < this.SMART_ZOOM) {
                 view.setZoom(this.SMART_ZOOM);
             }
         } else {
-            view.fit(extent, options);
+            view.fit(extent, fitOpts);
         }
     }
 
@@ -472,6 +492,10 @@ export class MapStore extends Watchable<MapWatchableProps> {
     @action
     private setReady(val: boolean) {
         this.ready = val;
+    }
+    @action
+    private setStarted(val: boolean) {
+        this.started = val;
     }
 
     @action

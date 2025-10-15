@@ -1,5 +1,6 @@
 import type { ViewOptions } from "ol/View";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { get as getProjection } from "ol/proj";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 
 import settings from "@nextgisweb/basemap/client-settings";
 import {
@@ -7,9 +8,11 @@ import {
     prepareBaselayerConfig,
 } from "@nextgisweb/basemap/util/baselayer";
 import { useObjectState } from "@nextgisweb/gui/hook";
+import { convertWSENToNgwExtent } from "@nextgisweb/gui/util/extent";
 import type { MapExtent, MapStore } from "@nextgisweb/webmap/ol/MapStore";
 import type QuadKey from "@nextgisweb/webmap/ol/layer/QuadKey";
 import type XYZ from "@nextgisweb/webmap/ol/layer/XYZ";
+import type { ExtentWSEN } from "@nextgisweb/webmap/type/api";
 
 import { createMapAdapter } from "../util/createMapAdapter";
 
@@ -30,35 +33,43 @@ export function useMapAdapter({
     mapStore: mapStoreProp,
     mapExtent: mapExtentProp,
 }: MapProps) {
-    const [mapStore, setMapStore] = useState<MapStore | null>(null);
     const baseRef = useRef<QuadKey | XYZ | undefined>(undefined);
 
     const [center] = useObjectState(centerProp);
     const [mapExtent] = useObjectState(mapExtentProp);
 
-    useEffect(() => {
-        setMapStore(() => {
-            if (mapStoreProp) {
-                return mapStoreProp;
-            } else {
-                return createMapAdapter({
-                    viewOptions: { projection: `EPSG:${mapSRSId}` },
-                });
-            }
-        });
+    const effectiveExtent = useMemo(() => {
+        // Default to maximum extent
+        const fullExtent = getProjection(`EPSG:${mapSRSId}`)?.getExtent();
+        return (
+            mapExtent ||
+            (fullExtent && {
+                extent: convertWSENToNgwExtent(fullExtent as ExtentWSEN),
+                srs: { id: mapSRSId },
+            })
+        );
+    }, [mapExtent, mapSRSId]);
 
-        return () => {
-            setMapStore((prev) => {
-                if (!mapStoreProp && prev?.olMap) {
-                    prev?.olMap.dispose();
-                }
-                return null;
+    const mapStore = useMemo(() => {
+        if (mapStoreProp) {
+            return mapStoreProp;
+        } else {
+            return createMapAdapter({
+                viewOptions: { projection: `EPSG:${mapSRSId}` },
             });
-        };
+        }
     }, [mapSRSId, mapStoreProp]);
 
+    useEffect(() => {
+        return () => {
+            if (!mapStoreProp && mapStore?.olMap) {
+                mapStore.olMap.dispose();
+            }
+        };
+    }, [mapStore, mapStoreProp]);
+
     const setView = useCallback((): void => {
-        if (!mapStore?.olMap) return;
+        if (!mapStore.olMap) return;
 
         const curView = mapStore.olMap.getView();
 
@@ -69,8 +80,8 @@ export function useMapAdapter({
             curView.setMaxZoom(maxZoom);
         }
 
-        if (mapExtent) {
-            mapStore.fitNGWExtent(mapExtent);
+        if (effectiveExtent) {
+            mapStore.fitNGWExtent(effectiveExtent);
         } else {
             if (center) {
                 curView.setCenter(center);
@@ -79,11 +90,13 @@ export function useMapAdapter({
                 curView.setZoom(zoom);
             }
         }
-    }, [mapStore, center, zoom, minZoom, maxZoom, mapExtent]);
+    }, [mapStore, center, zoom, minZoom, maxZoom, effectiveExtent]);
 
     useEffect(() => {
-        setView();
-    }, [setView]);
+        if (mapStore.started) {
+            setView();
+        }
+    }, [mapStore.started, setView]);
 
     useEffect(() => {
         if (mapStore && basemap) {

@@ -3,7 +3,6 @@ import type { FitOptions } from "ol/View";
 import type { Options as OlZoomControlOptions } from "ol/control/Zoom";
 import { easeOut } from "ol/easing";
 import type { Extent } from "ol/extent";
-import { transformExtent } from "ol/proj";
 import type { ProjectionLike } from "ol/proj";
 import { useCallback, useEffect, useState } from "react";
 
@@ -137,13 +136,10 @@ export const ZoomControl = observer(
 
         const goHome = useCallback(() => {
             if (!extent) return;
-            const view = mapStore.olMap.getView();
-            const projected = transformExtent(
-                extent,
-                extentProjection,
-                view.getProjection()
-            );
-            view.fit(projected, { ...(fitOptions || {}) });
+            mapStore.zoomToExtent(extent, {
+                ...fitOptions,
+                projection: extentProjection,
+            });
         }, [mapStore, extent, extentProjection, fitOptions]);
 
         return (

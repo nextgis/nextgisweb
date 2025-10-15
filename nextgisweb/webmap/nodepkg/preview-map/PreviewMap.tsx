@@ -18,12 +18,17 @@ export function PreviewMap({
     initialMapExtent: initialExtent,
     ...props
 }: MapComponentProps) {
-    const extent = useRef(initialExtent || mapExtent);
+    const effectiveExtent = useMemo(
+        () => mapExtent ?? initialExtent,
+        [initialExtent, mapExtent]
+    );
+
+    const homeExtent = useRef(initialExtent || mapExtent);
     const [basemap, setBaseMap] = useState(basemapProp);
 
     const maxZoom =
-        mapExtent && mapExtent.maxZoom !== undefined
-            ? mapExtent.maxZoom
+        effectiveExtent && effectiveExtent.maxZoom !== undefined
+            ? effectiveExtent.maxZoom
             : DEFAULT_MAX_ZOOM;
 
     const lazyControls = useMemo(() => {
@@ -43,18 +48,26 @@ export function PreviewMap({
             <MapComponent
                 basemap={basemap}
                 maxZoom={maxZoom}
-                mapExtent={mapExtent}
+                mapExtent={effectiveExtent}
                 {...props}
             >
                 <ZoomControl
                     order={-1}
                     extent={
-                        extent.current
-                            ? convertNgwExtentToWSEN(extent.current.extent)
+                        homeExtent.current
+                            ? convertNgwExtentToWSEN(homeExtent.current.extent)
                             : undefined
                     }
                     showZoomLevel={showZoomLevel}
-                    fitOptions={{ maxZoom }}
+                    extentProjection={
+                        homeExtent.current?.srs.id
+                            ? `EPSG:${homeExtent.current.srs.id}`
+                            : undefined
+                    }
+                    fitOptions={{
+                        maxZoom,
+                        padding: homeExtent.current?.padding,
+                    }}
                     position="top-left"
                 />
                 <ToggleControl

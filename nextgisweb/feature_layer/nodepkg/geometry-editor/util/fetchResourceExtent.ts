@@ -23,7 +23,6 @@ export async function fetchResourceExtent({
             ) {
                 const data = await route("layer.extent", id).get({
                     signal,
-                    cache: true,
                 });
 
                 return data.extent;
