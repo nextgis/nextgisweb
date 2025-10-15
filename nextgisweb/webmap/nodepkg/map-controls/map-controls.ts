@@ -14,6 +14,7 @@ mapControlRegistry(COMP_ID, {
         gap: 8,
     },
     position: "bottom-right",
+    showOnPreview: true,
     embeddedShowMode: "always",
     component: () => import("../map-component/control/MapToolbarControl"),
 });
@@ -23,6 +24,7 @@ mapControlRegistry(COMP_ID, {
     label: gettext("Map Toolbar"),
     props: { id: "map-toolbar", direction: "horizontal" },
     position: "bottom-left",
+    showOnPreview: true,
     embeddedShowMode: "always",
     component: () => import("../map-component/control/MapToolbarControl"),
 });
@@ -39,6 +41,7 @@ mapControlRegistry(COMP_ID, {
     key: "rot",
     order: 30,
     position: "top-left",
+    showOnPreview: true,
     component: () => import("../map-component/control/RotateControl"),
 });
 
@@ -46,6 +49,7 @@ mapControlRegistry(COMP_ID, {
     key: "attr",
     order: 10,
     position: { inside: "attribution-toolbar" },
+    showOnPreview: true,
     embeddedShowMode: "always",
     component: () => import("../map-component/control/AttributionControl"),
 });
@@ -66,6 +70,7 @@ mapControlRegistry(COMP_ID, {
     label: gettext("Scale line"),
     props: { scaleOptions: { minWidth: 48 } },
     position: { inside: "attribution-toolbar" },
+    showOnPreview: true,
     embeddedShowMode: "customize",
     component: () => import("../map-component/control/ScaleLineControl"),
 });
@@ -84,6 +89,7 @@ mapControlRegistry(COMP_ID, {
     order: 70,
     label: gettext("Locate me"),
     position: "top-left",
+    showOnPreview: true,
     embeddedShowMode: "customize",
     component: () => import("../map-component/control/MyLocationControl"),
 });
