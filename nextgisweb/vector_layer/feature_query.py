@@ -57,6 +57,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
         self._filter_by = None
         self._like = None
         self._ilike = None
+        self._filter_program = None
 
         self._order_by = None
 
@@ -100,6 +101,9 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
     def filter_by(self, **kwargs):
         self._filter_by = kwargs
 
+    def set_filter_program(self, program):
+        self._filter_program = program
+
     def order_by(self, *args):
         self._order_by = args
 
@@ -119,6 +123,9 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
         idcol = table.columns.fid
         geomcol = table.columns.geom
         fields = table.fields
+        columns_mapping = {"id": idcol}
+        columns_mapping.update(fields)
+        columns_mapping_ref = columns_mapping
         columns = []
         where = []
 
@@ -172,17 +179,8 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                 where.append((idcol if k == "id" else fields[k]) == v)
 
         if self._filter:
-
-            def build_clause(filter_item):
-                """Recursively build SQL clause from filter item."""
-                if isinstance(filter_item, tuple) and len(filter_item) == 2:
-                    logical_op, sub_items = filter_item
-                    if logical_op in ("all", "any"):
-                        clauses = [build_clause(item) for item in sub_items]
-                        return sa.and_(*clauses) if logical_op == "all" else sa.or_(*clauses)
-
-                # Condition tuple: (field, operator, value)
-                k, o, v = filter_item
+            _where_filter = []
+            for k, o, v in self._filter:
                 supported_operators = (
                     "eq",
                     "ne",
@@ -205,7 +203,13 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                 if v and o in ["in", "notin"]:
                     v = v.split(",")
 
-                if o in ["ilike", "in", "like", "notin", "startswith"]:
+                if o in [
+                    "ilike",
+                    "in",
+                    "like",
+                    "notin",
+                    "startswith",
+                ]:
                     o += "_op"
                 elif o == "isnull":
                     if v == "yes":
@@ -218,22 +222,15 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
                 op = getattr(sa.sql.operators, o)
                 column = idcol if k == "id" else fields[k]
-                return op(column, v)
+                _where_filter.append(op(column, v))
 
-            # Single structured group or backward-compatible flat list
-            if len(self._filter) == 1 and isinstance(self._filter[0], tuple):
-                first = self._filter[0]
-                if len(first) == 2 and first[0] in ("all", "any"):
-                    # New format: (logical_op, [sub_items])
-                    where.append(build_clause(first))
-                else:
-                    # Backward compatibility: single condition tuple (field, op, value)
-                    where.append(build_clause(first))
-            else:
-                # Backward compatibility: flat list of condition tuples
-                _where_filter = [build_clause(item) for item in self._filter]
-                if _where_filter:
-                    where.append(sa.and_(*_where_filter))
+            if len(_where_filter) > 0:
+                where.append(sa.and_(*_where_filter))
+
+        if self._filter_program is not None:
+            clause = self._filter_program.to_clause(columns_mapping)
+            if clause is not None:
+                where.append(clause)
 
         if self._like or self._ilike:
             operands = []
@@ -285,6 +282,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
         class QueryFeatureSet(FeatureSet):
             layer = self.layer
+            columns_mapping = columns_mapping_ref
 
             _geom = self._geom
             _geom_format = self._geom_format

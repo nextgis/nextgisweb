@@ -38,10 +38,12 @@ from nextgisweb.feature_layer import (
     IFeatureQueryIntersects,
     IFeatureQueryLike,
     IFeatureQueryOrderBy,
+    IFilterableFeatureLayer,
     IWritableFeatureLayer,
     LayerField,
     LayerFieldsMixin,
 )
+from nextgisweb.feature_layer.filter_expr import FilterParser
 from nextgisweb.layer import IBboxLayer, SpatialLayerMixin
 from nextgisweb.resource import (
     ConnectionScope,
@@ -257,7 +259,7 @@ class PostgisLayerField(Base, LayerField):
     column_name = sa.Column(sa.Unicode, nullable=False)
 
 
-@implementer(IFeatureLayer, IWritableFeatureLayer, IBboxLayer)
+@implementer(IFeatureLayer, IFilterableFeatureLayer, IWritableFeatureLayer, IBboxLayer)
 class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     identity = "postgis_layer"
     cls_display_name = gettext("PostGIS layer")
@@ -447,6 +449,10 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
         return BoundFeatureQuery
 
+    @property
+    def filter_parser(self):
+        return FilterParser.from_resource(self)
+
     def field_by_keyname(self, keyname):
         for f in self.fields:
             if f.keyname == keyname:
@@ -613,6 +619,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
         self._filter_by = None
         self._like = None
         self._ilike = None
+        self._filter_program = None
 
         self._order_by = None
 
@@ -641,6 +648,9 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
     def filter_by(self, **kwargs):
         self._filter_by = kwargs
 
+    def set_filter_program(self, program):
+        self._filter_program = program
+
     def order_by(self, *args):
         self._order_by = args
 
@@ -658,6 +668,10 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
         where = [idcol.isnot(None)]
 
         geomcol = tab.columns[self.layer.column_geom]
+
+        columns_mapping = {"id": idcol}
+        for field in self.layer.fields:
+            columns_mapping[field.keyname] = getattr(tab.columns, field.column_name)
 
         srs = self.layer.srs if self._srs is None else self._srs
 
@@ -732,6 +746,11 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
             if len(_where_filter) > 0:
                 where.append(sa.and_(*_where_filter))
+
+        if self._filter_program is not None:
+            clause = self._filter_program.to_clause(columns_mapping)
+            if clause is not None:
+                where.append(clause)
 
         if self._like or self._ilike:
             operands = [

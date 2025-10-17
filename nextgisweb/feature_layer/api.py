@@ -20,12 +20,12 @@ from .dtutil import DT_DATATYPES, DT_DUMPERS, DT_LOADERS, DtFormat
 from .exception import FeatureNotFound
 from .extension import FeatureExtension
 from .feature import Feature
-from .filter import FilterValidationError
 from .interface import (
     FIELD_TYPE,
     IFeatureLayer,
     IFeatureQueryIlike,
     IFeatureQueryLike,
+    IFilterableFeatureLayer,
     IVersionableFeatureLayer,
     IWritableFeatureLayer,
 )
@@ -225,7 +225,7 @@ class Dumper:
         return query
 
     def __call__(self, feature: Feature) -> Any:
-        result: dict[str, Any] = dict(id=feature.id)
+        result = dict(id=feature.id)
 
         if (vid := feature.version) is not None:
             result["vid"] = vid
@@ -424,6 +424,18 @@ def apply_fields_filter(query, request):
         query.ilike(request.GET["ilike"])
 
 
+def apply_filter_expression(query, resource, filter_expression):
+    if filter_expression in (None, ""):
+        return
+
+    if not IFilterableFeatureLayer.providedBy(resource):
+        return
+
+    filter_parser = resource.filter_parser
+    filter_program = filter_parser.parse(filter_expression)
+    query.set_filter_program(filter_program)
+
+
 def apply_intersect_filter(query, request, resource):
     # Filtering by extent
     if "intersects" in request.GET:
@@ -452,7 +464,7 @@ def cget(
     order_by: Union[str, None] = None,
     limit: Union[Annotated[int, Meta(ge=0)], None] = None,
     offset: Annotated[int, Meta(ge=0)] = 0,
-    filter: Annotated[
+    filter_expression: Annotated[
         Union[str, None], Meta(description="Filter expression (JSON string)")
     ] = None,
 ) -> JSONType:
@@ -466,21 +478,9 @@ def cget(
     if limit is not None:
         query.limit(limit, offset)
 
-    if filter is not None:
-        from .filter import FilterParser
-
-        parser = FilterParser(resource)
-        try:
-            filter_result = parser.parse(filter)
-            if filter_result:
-                query.filter(filter_result)
-        except FilterValidationError:
-            raise
-        except Exception as e:
-            raise ValidationError(message=gettext("Error parsing filter"), detail=str(e))
-
     apply_fields_filter(query, request)
     apply_intersect_filter(query, request, resource)
+    apply_filter_expression(query, resource, filter_expression)
 
     # Ordering
     order_by_ = []
@@ -624,6 +624,7 @@ def cextent(resource, request) -> NgwExtent:
 
     apply_fields_filter(query, request)
     apply_intersect_filter(query, request, resource)
+    apply_filter_expression(query, resource, request.GET.get("filter_expression"))
 
     extent = query().extent
     return NgwExtent(**extent)

@@ -302,7 +302,11 @@ export const FeatureGridActions = observer(
         );
 
         let advancedButton = undefined;
-        if (resourceData?.resource?.cls === "vector_layer") {
+        if (
+            resourceData?.resource?.interfaces?.includes(
+                "IFilterableFeatureLayer"
+            )
+        ) {
             advancedButton = (
                 <Tooltip title={msgFilterTitle}>
                     <Button
