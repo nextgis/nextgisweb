@@ -104,7 +104,7 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
     const [srsOptions, setSrsOptions] = useState<SrsOption[]>([]);
     const [fieldOptions, setFieldOptions] = useState<FieldOption[]>([]);
     const [defaultSrs, setDefaultSrs] = useState<number>();
-    const [isVectorLayer, setIsVectorLayer] = useState(false);
+    const [isFilterFeatureLayer, setIsFilterFeatureLayer] = useState(false);
     const [format, setFormat] = useState(exportFormats[0].name);
     const [fields, setFields] = useState<FormField<FormPropsKey>[]>([]);
     const [isReady, setIsReady] = useState(false);
@@ -172,13 +172,15 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
 
                 if (itemInfo && itemInfo.feature_layer) {
                     const cls = itemInfo.resource.cls as "vector_layer";
-                    if (cls === "vector_layer") {
-                        setIsVectorLayer(true);
-                    }
                     const vectorLayer = itemInfo[cls];
                     if (vectorLayer) {
                         setDefaultSrs(vectorLayer.srs.id);
                     }
+                    setIsFilterFeatureLayer(
+                        itemInfo.resource.interfaces?.includes(
+                            "IFilterableFeatureLayer"
+                        ) ?? false
+                    );
                     const fields = itemInfo.feature_layer.fields;
                     setLayerFields(fields);
                     setFieldOptions(fieldListToOptions(fields));
@@ -338,7 +340,7 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
                     </Button>
                 ),
                 label: gettext("Filter"),
-                included: !multiple && isVectorLayer,
+                included: !multiple && isFilterFeatureLayer,
             },
             {
                 name: "zipped",
@@ -367,6 +369,7 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
         pick,
         handleFilterClick,
         filterExpression,
+        isFilterFeatureLayer,
     ]);
 
     if (loading) {
