@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import { action, observable } from "mobx";
 
 import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
@@ -17,6 +18,24 @@ import type {
     HasOp,
     InOp,
 } from "./type";
+
+type TemporalDatatype = Extract<
+    FeatureLayerFieldRead["datatype"],
+    "DATE" | "TIME" | "DATETIME"
+>;
+
+const TEMPORAL_FORMATS: Record<TemporalDatatype, string> = {
+    DATE: "YYYY-MM-DD",
+    TIME: "HH:mm:ss",
+    DATETIME: "YYYY-MM-DDTHH:mm:ss",
+};
+
+const TEMPORAL_TYPES = Object.keys(TEMPORAL_FORMATS) as TemporalDatatype[];
+
+const isTemporalDatatype = (
+    datatype: FeatureLayerFieldRead["datatype"]
+): datatype is TemporalDatatype =>
+    TEMPORAL_TYPES.includes(datatype as TemporalDatatype);
 
 export interface FilterEditorStoreOptions {
     fields: FeatureLayerFieldRead[];
@@ -601,6 +620,47 @@ export class FilterEditorStore {
         );
     }
 
+    private validateDateTimeValue(
+        fieldType: FeatureLayerFieldRead["datatype"],
+        value: any,
+        fieldName: string
+    ): void {
+        if (value === null || value === undefined) {
+            return;
+        }
+
+        if (typeof value !== "string") {
+            throw new Error(
+                gettextf(
+                    "Field '{fieldName}' expects a string for {fieldType}, but got '{valueType}'"
+                )({ fieldName, fieldType, valueType: typeof value })
+            );
+        }
+
+        if (!isTemporalDatatype(fieldType)) {
+            return;
+        }
+
+        const format = TEMPORAL_FORMATS[fieldType];
+        if (!format) {
+            return;
+        }
+
+        const dayjsValue = dayjs(value, format, true);
+        if (!dayjsValue.isValid()) {
+            throw new Error(
+                gettextf(
+                    "Field '{fieldName}' expects {fieldType} format '{expectedFormat}', but got '{value}'"
+                )({
+                    fieldName,
+                    fieldType,
+                    expectedFormat: format,
+                    value,
+                })
+            );
+        }
+    }
+
     private validateConditionExpression(expression: any[]): void {
         const [operator, fieldExpression, value] = expression;
 
@@ -667,30 +727,37 @@ export class FilterEditorStore {
                     )({ operator })
                 );
             }
+            if (isTemporalDatatype(field.datatype)) {
+                for (const item of value) {
+                    this.validateDateTimeValue(field.datatype, item, fieldName);
+                }
+            }
         } else if (operator !== "has" && operator !== "!has") {
             const fieldType = field.datatype;
-            const isTemporalField = ["DATE", "TIME", "DATETIME"].includes(
-                fieldType
-            );
+            const isTemporalField = isTemporalDatatype(fieldType);
 
-            if (value !== null && value !== undefined && !isTemporalField) {
-                const valueType = typeof value;
-                if (
-                    (fieldType === "INTEGER" || fieldType === "REAL") &&
-                    valueType !== "number"
-                ) {
-                    throw new Error(
-                        gettextf(
-                            "Field '{fieldName}' expects a number, but got '{valueType}'"
-                        )({ fieldName, valueType })
-                    );
-                }
-                if (fieldType === "BIGINT" && valueType !== "string") {
-                    throw new Error(
-                        gettextf(
-                            "Field '{fieldName}' expects a string, but got '{valueType}'"
-                        )({ fieldName, valueType })
-                    );
+            if (value !== null && value !== undefined) {
+                if (isTemporalField) {
+                    this.validateDateTimeValue(fieldType, value, fieldName);
+                } else {
+                    const valueType = typeof value;
+                    if (
+                        (fieldType === "INTEGER" || fieldType === "REAL") &&
+                        valueType !== "number"
+                    ) {
+                        throw new Error(
+                            gettextf(
+                                "Field '{fieldName}' expects a number, but got '{valueType}'"
+                            )({ fieldName, valueType })
+                        );
+                    }
+                    if (fieldType === "BIGINT" && valueType !== "string") {
+                        throw new Error(
+                            gettextf(
+                                "Field '{fieldName}' expects a string, but got '{valueType}'"
+                            )({ fieldName, valueType })
+                        );
+                    }
                 }
             }
         }
