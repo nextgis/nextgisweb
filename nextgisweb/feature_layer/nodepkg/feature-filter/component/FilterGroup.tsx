@@ -8,6 +8,7 @@ import { observer } from "mobx-react-lite";
 import type React from "react";
 
 import { Button, Radio, Space } from "@nextgisweb/gui/antd";
+import { AddIcon, RemoveIcon } from "@nextgisweb/gui/icon";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import type { FilterEditorStore } from "../FilterEditorStore";
@@ -15,7 +16,7 @@ import type { FilterCondition as FilterConditionType } from "../type";
 
 import { SortableFilterCondition } from "./SortableFilterCondition";
 
-import { DeleteOutlined, DragOutlined, PlusOutlined } from "@ant-design/icons";
+import DragHandleIcon from "@nextgisweb/icon/material/drag_indicator";
 
 interface FilterGroupType {
     id: number;
@@ -75,7 +76,7 @@ export const FilterGroup = observer(
                     }}
                 >
                     {!isRoot && (
-                        <DragOutlined
+                        <DragHandleIcon
                             {...attributes}
                             {...listeners}
                             style={{ cursor: "move", marginRight: "8px" }}
@@ -97,14 +98,14 @@ export const FilterGroup = observer(
                     </Radio.Group>
                     <Space style={{ marginLeft: "auto" }}>
                         <Button
-                            icon={<PlusOutlined />}
+                            icon={<AddIcon />}
                             onClick={() => store.addCondition(group.id)}
                             size="small"
                         >
                             {gettext("Condition")}
                         </Button>
                         <Button
-                            icon={<PlusOutlined />}
+                            icon={<AddIcon />}
                             onClick={() => store.addGroup(group.id)}
                             size="small"
                         >
@@ -112,7 +113,7 @@ export const FilterGroup = observer(
                         </Button>
                         {!isRoot && (
                             <Button
-                                icon={<DeleteOutlined />}
+                                icon={<RemoveIcon />}
                                 onClick={() => store.deleteGroup(group.id)}
                                 size="small"
                             />

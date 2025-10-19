@@ -14,6 +14,7 @@ import {
     Space,
     TimePicker,
 } from "@nextgisweb/gui/antd";
+import { RemoveIcon } from "@nextgisweb/gui/icon";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import type { NgwAttributeType } from "../../type";
@@ -31,7 +32,7 @@ import type {
     InOp,
 } from "../type";
 
-import { DeleteOutlined, DragOutlined } from "@ant-design/icons";
+import DragHandleIcon from "@nextgisweb/icon/material/drag_indicator";
 
 const msgDeleteCondition = gettext("Delete Condition");
 
@@ -299,7 +300,7 @@ export const FilterCondition = observer(
         return (
             <div className="filter-condition">
                 <Space>
-                    <DragOutlined
+                    <DragHandleIcon
                         className="filter-drag-handle"
                         style={{ cursor: "move" }}
                         {...dragHandleProps?.attributes}
@@ -339,7 +340,7 @@ export const FilterCondition = observer(
 
                     <Button
                         type="text"
-                        icon={<DeleteOutlined />}
+                        icon={<RemoveIcon />}
                         onClick={handleDelete}
                         size="small"
                         title={msgDeleteCondition}
