@@ -42,7 +42,12 @@ const IdentifyControl = observer(
         const interaction = useMemo(() => {
             const handleEvent = (evt: MapBrowserEvent<any>) => {
                 if (evt.type === "singleclick") {
-                    display.identify.execute(evt.pixel);
+                    display.identify.execute(
+                        evt.pixel,
+                        evt.originalEvent.pointerType === "touch"
+                            ? 2
+                            : undefined
+                    );
                     evt.preventDefault?.();
                 }
                 return true;

@@ -215,13 +215,13 @@ export class Identify {
         return true;
     }
 
-    async execute(pixel: number[]): Promise<void> {
+    async execute(pixel: number[], radiusScale?: number): Promise<void> {
         const olMap = this.map.olMap;
         const point = olMap.getCoordinateFromPixel(pixel);
 
         const request: Request = {
             srs: 3857,
-            geom: this._requestGeomString(pixel),
+            geom: this._requestGeomString(pixel, radiusScale),
             layers: [],
         };
 
@@ -289,16 +289,17 @@ export class Identify {
         });
     }
 
-    private _requestGeomString(pixel: number[]): string {
+    private _requestGeomString(pixel: number[], radiusScale = 1): string {
         const olMap = this.map.olMap;
+        const radius = this.pixelRadius * radiusScale;
         const bounds = boundingExtent([
             olMap.getCoordinateFromPixel([
-                pixel[0] - this.pixelRadius,
-                pixel[1] - this.pixelRadius,
+                pixel[0] - radius,
+                pixel[1] - radius,
             ]),
             olMap.getCoordinateFromPixel([
-                pixel[0] + this.pixelRadius,
-                pixel[1] + this.pixelRadius,
+                pixel[0] + radius,
+                pixel[1] + radius,
             ]),
         ]);
 
