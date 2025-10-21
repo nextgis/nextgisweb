@@ -1,33 +1,25 @@
 import pyramidSettings from "@nextgisweb/pyramid/client-settings";
-import { gettext } from "@nextgisweb/pyramid/i18n";
 import { MapControl } from "@nextgisweb/webmap/map-component";
 import type { MapControlProps } from "@nextgisweb/webmap/map-component";
 
 import { routeURL } from "../api";
+import { url } from "../nextgis";
 
 import "./CompanyLogoControl.less";
 
-const settings = pyramidSettings.company_logo;
+const { enabled, link, ckey } = pyramidSettings.company_logo;
+
+const aHref = enabled && link ? url(link) : undefined;
+const aProps = aHref ? { href: aHref, target: "_blank" } : {};
+
+const iSrc = `${routeURL("pyramid.asset.blogo")}?ckey=${ckey}`;
 
 export default function CompanyLogoControl(props: MapControlProps) {
-    if (!settings?.enabled) return null;
-
-    const imgSrc = `${routeURL("pyramid.asset.blogo")}?ckey=${settings.ckey}`;
-
-    const href = settings.link?.trim();
-
-    const isNextGisCloude = href ? /(^|[^\w])nextgis\.com/i.test(href) : false;
-
-    const alt = isNextGisCloude
-        ? gettext("Get your own Web GIS at nextgis.com")
-        : undefined;
-
-    const aProps = href ? { href, target: "_blank" } : {};
-
+    if (!enabled) return null;
     return (
         <MapControl {...props} margin>
             <a className="map-logo company-logo" {...aProps}>
-                <img src={imgSrc} alt={alt} />
+                <img src={iSrc} />
             </a>
         </MapControl>
     );

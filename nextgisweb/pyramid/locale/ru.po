@@ -1,8 +1,8 @@
-#: api.py:264
+#: api.py:265
 msgid "Storage management is not enabled on this server."
 msgstr "Управление хранилищем не включено на этом сервере."
 
-#: api.py:350
+#: api.py:352
 msgid ""
 "Invalid font file name: '{}'. Only latin letters, digits, hyphens and "
 "underscores are allowed. The *.ttf or *.otf extension is required."
@@ -10,11 +10,11 @@ msgstr ""
 "Недопустимое имя файла шрифта: '{}'. Разрешены только латинские буквы, цифры,"
 " дефисы и подчеркивания. Требуется расширение *.ttf или *.otf."
 
-#: api.py:358
+#: api.py:359
 msgid "Font '{0}' is larger than {1} bytes."
 msgstr "Шрифт '{0}' больше {1} байт."
 
-#: api.py:553
+#: api.py:555
 msgid ""
 "The '{}' query parameter should not contain additional values if 'all' is "
 "specified."
@@ -22,15 +22,15 @@ msgstr ""
 "Параметр запроса '{}' не должен содержать дополнительных значений, если "
 "указано 'all'."
 
-#: api.py:681
+#: api.py:682
 msgid "Got an unsupported MIME type: '{}'."
 msgstr "Получен неподдерживаемый тип MIME: '{}'."
 
-#: api.py:684
+#: api.py:685
 msgid "64K should be enough for a logo."
 msgstr "64K должно быть достаточно для логотипа."
 
-#: api.py:856
+#: api.py:857
 msgid "Your Web GIS at nextgis.com"
 msgstr "Ваши карты онлайн на nextgis.com"
 
@@ -50,7 +50,7 @@ msgstr "Отключено"
 msgid "Internal server error"
 msgstr "Внутренняя ошибка сервера"
 
-#: exception.py:220
+#: exception.py:221
 msgid ""
 "The server encountered an internal error or misconfiguration and was unable "
 "to complete your request."
@@ -62,7 +62,7 @@ msgstr ""
 msgid "Bad request"
 msgstr "Некорректный запрос"
 
-#: exception.py:254
+#: exception.py:255
 msgid ""
 "The server could not comply with the request since it is either malformed or "
 "otherwise incorrect."
@@ -88,7 +88,7 @@ msgstr "У вас нет доступа к этому ресурсу."
 msgid "Page not found"
 msgstr "Страница не найдена"
 
-#: exception.py:275
+#: exception.py:276
 msgid ""
 "The page may have been deleted or an error in the address. Correct the "
 "address or go to the home page and try to find the desired page."
@@ -177,10 +177,6 @@ msgstr "Время (UTC)"
 msgid "Size"
 msgstr "Размер"
 
-#: nodepkg/company-logo.ts:31
-msgid "Get your own Web GIS at nextgis.com"
-msgstr "Создайте свою Веб ГИС на nextgis.com"
-
 #: nodepkg/cors-settings/CORSSettings.tsx:23
 msgid ""
 "Enter allowed origins for cross domain requests to use HTTP API of this Web "
@@ -200,23 +196,23 @@ msgstr ""
 " www.example.com) считаются разными источниками. Символ подстановки (*) "
 "допустим для доменов третьего уровня и выше."
 
-#: nodepkg/cors-settings/CORSSettings.tsx:57
+#: nodepkg/cors-settings/CORSSettings.tsx:59
 msgid "CORS settings updated"
 msgstr "Настройки CORS обновлены"
 
-#: nodepkg/cors-settings/CORSSettings.tsx:62
+#: nodepkg/cors-settings/CORSSettings.tsx:64
 msgid "Fix the form errors first"
 msgstr "Вначале исправьте ошибку в форме"
 
-#: nodepkg/cors-settings/CORSSettings.tsx:78
+#: nodepkg/cors-settings/CORSSettings.tsx:80
 msgid "The value entered is not valid"
 msgstr "Введенное значение некорректно"
 
-#: nodepkg/custom-css-form/CustomCSSForm.tsx:40
+#: nodepkg/custom-css-form/CustomCSSForm.tsx:42
 msgid "Custom styles saved. Reload the page to get them applied."
 msgstr "Изменения в стилях сохранены. Обновите страницу, чтобы увидеть изменения."
 
-#: nodepkg/custom-css-form/CustomCSSForm.tsx:62
+#: nodepkg/custom-css-form/CustomCSSForm.tsx:65
 msgid ""
 "Enter custom CSS rules here. They will be used to redefine styles, design for"
 " all pages of your Web GIS."
@@ -244,23 +240,23 @@ msgstr "Пользовательский"
 msgid "System"
 msgstr "Системный"
 
-#: nodepkg/fonts/FontsPanel.tsx:104
+#: nodepkg/fonts/FontsPanel.tsx:105
 msgid "Font"
 msgstr "Шрифт"
 
-#: nodepkg/fonts/FontsPanel.tsx:109
+#: nodepkg/fonts/FontsPanel.tsx:110
 msgid "Format"
 msgstr "Формат"
 
-#: nodepkg/fonts/FontsPanel.tsx:114
+#: nodepkg/fonts/FontsPanel.tsx:115
 msgid "Type"
 msgstr "Тип"
 
-#: nodepkg/fonts/FontsPanel.tsx:174
+#: nodepkg/fonts/FontsPanel.tsx:176
 msgid "Delete"
 msgstr "Удалить"
 
-#: nodepkg/fonts/FontsPanel.tsx:181
+#: nodepkg/fonts/FontsPanel.tsx:183
 msgid "Show system fonts"
 msgstr "Показать системные шрифты"
 
@@ -292,15 +288,15 @@ msgstr "Настройки пользователя"
 msgid "Sign out"
 msgstr "Выйти"
 
-#: nodepkg/layout/store.ts:54
+#: nodepkg/layout/store.ts:71
 msgid "Resources"
 msgstr "Ресурсы"
 
-#: nodepkg/layout/store.ts:60 view.py:200
+#: nodepkg/layout/store.ts:77 view.py:201
 msgid "Control panel"
 msgstr "Панель управления"
 
-#: nodepkg/layout/store.ts:67
+#: nodepkg/layout/store.ts:84
 msgid "Help"
 msgstr "Справка"
 
@@ -312,7 +308,7 @@ msgstr "Рекомендуемая высота 45 px и ширина до 200 p
 msgid "Only PNG and SVG images are supported."
 msgstr "Поддерживаются только изображения PNG и SVG."
 
-#: nodepkg/metrics/GoogleAnalyticsTab.tsx:28
+#: nodepkg/metrics/GoogleAnalyticsTab.tsx:30
 msgid "Measurement ID"
 msgstr "Идентификатор потока данных"
 
@@ -340,11 +336,11 @@ msgstr ""
 "HTML-код этих счетчиков будет встроен в каждую страницу и позволит "
 "отслеживать активность пользователей."
 
-#: nodepkg/metrics/YandexMetricaTab.tsx:29
+#: nodepkg/metrics/YandexMetricaTab.tsx:31
 msgid "Tag number"
 msgstr "Номер счетчика"
 
-#: nodepkg/metrics/YandexMetricaTab.tsx:48
+#: nodepkg/metrics/YandexMetricaTab.tsx:50
 msgid "Webvisor"
 msgstr "Вебвизор"
 
@@ -380,23 +376,23 @@ msgstr ""
 msgid "Storage usage hasn't been estimated yet."
 msgstr "Использование хранилища еще не было полностью оценено."
 
-#: nodepkg/storage-summary/StorageSummary.tsx:115
+#: nodepkg/storage-summary/StorageSummary.tsx:116
 msgid "Kind of data"
 msgstr "Вид данных"
 
-#: nodepkg/storage-summary/StorageSummary.tsx:121
+#: nodepkg/storage-summary/StorageSummary.tsx:122
 msgid "Volume"
 msgstr "Размер"
 
-#: nodepkg/storage-summary/StorageSummary.tsx:141
+#: nodepkg/storage-summary/StorageSummary.tsx:142
 msgid "Total"
 msgstr "Итого"
 
-#: nodepkg/storage-summary/StorageSummary.tsx:146
+#: nodepkg/storage-summary/StorageSummary.tsx:147
 msgid "of"
 msgstr "из"
 
-#: nodepkg/storage-summary/StorageSummary.tsx:211
+#: nodepkg/storage-summary/StorageSummary.tsx:212
 msgid "Estimate storage"
 msgstr "Оценка хранилища"
 
@@ -472,7 +468,7 @@ msgstr "Доступны обновления"
 msgid "Click to see what's new"
 msgstr "Нажмите и узнайте, что нового"
 
-#: permission.py:5 view.py:305 view.py:656
+#: permission.py:5 view.py:306 view.py:657
 msgid "Cross-origin resource sharing (CORS)"
 msgstr "Cross-origin resource sharing (CORS)"
 
@@ -569,50 +565,50 @@ msgstr "Некорректное JSON тело"
 msgid "The JSON body of the request is malformed or invalid."
 msgstr "JSON тело запроса имеет некорректный или недопустимый формат."
 
-#: view.py:188
+#: view.py:189
 msgid "HTTP API documentation"
 msgstr "Документация HTTP API"
 
-#: view.py:254 view.py:665
+#: view.py:255 view.py:666
 msgid "System information"
 msgstr "Информация о системе"
 
-#: view.py:264 view.py:671
+#: view.py:265 view.py:672
 msgid "Font management"
 msgstr "Управление шрифтами"
 
-#: view.py:273 view.py:708
+#: view.py:274 view.py:709
 msgid "Storage"
 msgstr "Хранилище"
 
-#: view.py:287 view.py:715
+#: view.py:288 view.py:716
 msgid "Backups"
 msgstr "Резервные копии"
 
-#: view.py:315 view.py:683
+#: view.py:316 view.py:684
 msgid "Custom CSS"
 msgstr "Пользовательские стили CSS"
 
-#: view.py:324 view.py:689
+#: view.py:325 view.py:690
 msgid "Custom logo"
 msgstr "Логотип"
 
-#: view.py:333 view.py:677
+#: view.py:334 view.py:678
 msgid "Web GIS name"
 msgstr "Название Веб ГИС"
 
-#: view.py:342 view.py:695
+#: view.py:343 view.py:696
 msgid "Home path"
 msgstr "Стартовая страница"
 
-#: view.py:351 view.py:701
+#: view.py:352 view.py:702
 msgid "Metrics and analytics"
 msgstr "Метрики и аналитика"
 
-#: view.py:645
+#: view.py:646
 msgid "Info"
 msgstr "Информация"
 
-#: view.py:646
+#: view.py:647
 msgid "Settings"
 msgstr "Настройки"

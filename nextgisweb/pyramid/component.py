@@ -199,7 +199,7 @@ class PyramidComponent(Component):
 
         Option("logo", default=str(module_path("nextgisweb.pyramid") / "asset/nextgis_logo_s.svg")),
         Option("favicon", default=str(module_path("nextgisweb.pyramid") / "asset/favicon.ico")),
-        Option("company_url", default="https://nextgis.com"),
+        Option("company_url", default="https://nextgis.com/redirect/{lang}/"),
         Option("desktop_gis_example", default="NextGIS QGIS"),
         Option("nextgis_external_docs_links", default=True),
 
