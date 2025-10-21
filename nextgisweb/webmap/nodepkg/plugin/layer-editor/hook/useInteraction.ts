@@ -1,5 +1,5 @@
 import type { Interaction } from "ol/interaction";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo } from "react";
 
 import { useEditorContext } from "../context/useEditorContext";
 
@@ -8,9 +8,9 @@ export function useInteraction<T extends Interaction>(
     active: boolean,
     factory: () => T
 ): T {
-    const { olMap, interactionsRef } = useEditorContext();
+    const { olMap, interactionsRef, interactionsVersion } = useEditorContext();
 
-    const [interaction] = useState<T>(() => {
+    const interaction = useMemo(() => {
         /**
          * IMPORTANT: re-creating interaction with the SAME
          * Feature or Source multiple times tends to makes editing laggy.
@@ -18,6 +18,7 @@ export function useInteraction<T extends Interaction>(
          * A better fix would be to properly "clean" the features before attaching a new interaction.
          * I tried approaches with `feature.clone()`, but it's became too complex.
          */
+        void interactionsVersion;
         const exist = interactionsRef.current.get(key);
         if (exist) {
             return exist as T;
@@ -26,7 +27,7 @@ export function useInteraction<T extends Interaction>(
             interactionsRef.current.set(key, inter);
             return inter;
         }
-    });
+    }, [factory, interactionsRef, interactionsVersion, key]);
 
     useEffect(() => {
         olMap.addInteraction(interaction);

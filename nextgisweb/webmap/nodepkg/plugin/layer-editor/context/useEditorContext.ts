@@ -23,6 +23,7 @@ export type EditorContextValue = {
     selectStyle: Style;
     interactionsRef: React.RefObject<Map<string, Interaction>>;
     selectStyleOptions: StyleOptions;
+    interactionsVersion: number;
     addUndo: (fn: UndoAction) => void;
 };
 
