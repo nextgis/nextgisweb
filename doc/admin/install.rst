@@ -301,7 +301,7 @@ and timer (``/etc/systemd/system/ngw-maintenance.timer``) files:
   WantedBy=multi-user.target
 
 .. code-block:: ini
-  :caption: File ``/etc/systemd/system/ngw-maintenance.service``
+  :caption: File ``/etc/systemd/system/ngw-maintenance.timer``
 
   [Unit]
   Description=NextGIS Web maintenance timer
