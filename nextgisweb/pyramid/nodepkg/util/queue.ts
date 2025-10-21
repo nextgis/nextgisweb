@@ -63,7 +63,6 @@ export class RequestQueue {
         this.queue.length = 0;
         this.activeRequests.length = 0;
         this._clearTimeout();
-        this._clearResumeTimer();
         this.checkIdle();
     }
 
