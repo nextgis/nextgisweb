@@ -247,13 +247,21 @@ function FeatureFilterEditorTest() {
                 </div>
             </div>
 
-            <div style={{ width: "100%", marginBottom: "20px" }}>
-                <h4 style={{ marginBottom: "8px" }}>Filter Editor</h4>
+            <div
+                style={{
+                    width: "100%",
+                    marginBottom: "20px",
+                    height: "400px",
+                    display: "flex",
+                    flexDirection: "column",
+                }}
+            >
+                <h3 style={{ marginBottom: "8px" }}>Filter Editor</h3>
                 {filterComponent}
             </div>
 
             <div style={{ width: "100%" }}>
-                <h4 style={{ marginBottom: "8px" }}>Output & State</h4>
+                <h3 style={{ marginBottom: "8px" }}>Output & State</h3>
                 <Tabs
                     type="card"
                     size="small"

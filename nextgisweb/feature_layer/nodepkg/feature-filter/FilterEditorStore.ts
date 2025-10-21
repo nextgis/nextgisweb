@@ -13,6 +13,7 @@ import type {
     FilterCondition,
     FilterExpression,
     FilterGroup,
+    FilterGroupChild,
     FilterState,
     GroupExpr,
     HasOp,
@@ -50,6 +51,7 @@ export class FilterEditorStore {
             operator: "all",
             conditions: [],
             groups: [],
+            childrenOrder: [],
         },
     };
     @observable accessor activeTab: string = "constructor";
@@ -139,6 +141,10 @@ export class FilterEditorStore {
         const group = this._findGroupById(this.filterState.rootGroup, groupId);
         if (group) {
             group.conditions.push(newCondition as FilterCondition);
+            group.childrenOrder.push({
+                type: "condition",
+                id: newCondition.id,
+            });
             this.validateCurrentState();
         }
     }
@@ -150,6 +156,7 @@ export class FilterEditorStore {
             operator,
             conditions: [],
             groups: [],
+            childrenOrder: [],
         };
         const parentGroup = this._findGroupById(
             this.filterState.rootGroup,
@@ -157,6 +164,7 @@ export class FilterEditorStore {
         );
         if (parentGroup) {
             parentGroup.groups.push(newGroup);
+            parentGroup.childrenOrder.push({ type: "group", id: newGroup.id });
             this.validateCurrentState();
         }
     }
@@ -214,18 +222,13 @@ export class FilterEditorStore {
         );
         if (!targetGroup) return;
 
-        if (overItemId) {
-            const targetIndex = targetGroup.conditions.findIndex(
-                (c) => c.id === overItemId
-            );
-            if (targetIndex !== -1) {
-                targetGroup.conditions.splice(targetIndex, 0, conditionToMove);
-            } else {
-                targetGroup.conditions.push(conditionToMove);
-            }
-        } else {
-            targetGroup.conditions.push(conditionToMove);
-        }
+        this._insertChild(
+            targetGroup,
+            { type: "condition", id: conditionToMove.id },
+            (group) => group.conditions,
+            conditionToMove,
+            overItemId
+        );
         this.validateCurrentState();
     }
 
@@ -249,25 +252,20 @@ export class FilterEditorStore {
         );
         if (!targetGroup) return;
 
-        if (overItemId) {
-            const targetIndex = targetGroup.groups.findIndex(
-                (g) => g.id === overItemId
-            );
-            if (targetIndex !== -1) {
-                targetGroup.groups.splice(targetIndex, 0, groupToMove);
-            } else {
-                targetGroup.groups.push(groupToMove);
-            }
-        } else {
-            targetGroup.groups.push(groupToMove);
-        }
+        this._insertChild(
+            targetGroup,
+            { type: "group", id: groupToMove.id },
+            (group) => group.groups,
+            groupToMove,
+            overItemId
+        );
         this.validateCurrentState();
     }
 
     @action.bound
     loadFilter(value: string) {
         try {
-            this.transientIdCounter = Date.now();
+            this.transientIdCounter = 0;
             const expression = JSON.parse(value);
             this.validateFilterExpression(expression);
             const filterState = this.parseFilterExpression(expression);
@@ -354,7 +352,12 @@ export class FilterEditorStore {
     ): FilterCondition | null {
         const index = group.conditions.findIndex((c) => c.id === conditionId);
         if (index !== -1) {
-            return group.conditions.splice(index, 1)[0];
+            const [removed] = group.conditions.splice(index, 1);
+            group.childrenOrder = group.childrenOrder.filter(
+                (child) =>
+                    !(child.type === "condition" && child.id === removed.id)
+            );
+            return removed;
         }
         for (const childGroup of group.groups) {
             const found = this._findAndRemoveCondition(childGroup, conditionId);
@@ -369,7 +372,11 @@ export class FilterEditorStore {
     ): FilterGroup | null {
         const index = group.groups.findIndex((g) => g.id === groupId);
         if (index !== -1) {
-            return group.groups.splice(index, 1)[0];
+            const [removed] = group.groups.splice(index, 1);
+            group.childrenOrder = group.childrenOrder.filter(
+                (child) => !(child.type === "group" && child.id === removed.id)
+            );
+            return removed;
         }
         for (const childGroup of group.groups) {
             const found = this._findAndRemoveGroup(childGroup, groupId);
@@ -403,6 +410,7 @@ export class FilterEditorStore {
                 operator: "all",
                 conditions: [],
                 groups: [],
+                childrenOrder: [],
             };
         }
 
@@ -414,15 +422,24 @@ export class FilterEditorStore {
                 operator,
                 conditions: [],
                 groups: [],
+                childrenOrder: [],
             };
             for (const arg of args) {
                 if (Array.isArray(arg) && arg.length > 0) {
                     if (this.isConditionExpression(arg)) {
-                        group.conditions.push(
-                            this.parseConditionExpression(arg)
-                        );
+                        const condition = this.parseConditionExpression(arg);
+                        group.conditions.push(condition);
+                        group.childrenOrder.push({
+                            type: "condition",
+                            id: condition.id,
+                        });
                     } else {
-                        group.groups.push(this.parseFilterExpression(arg));
+                        const childGroup = this.parseFilterExpression(arg);
+                        group.groups.push(childGroup);
+                        group.childrenOrder.push({
+                            type: "group",
+                            id: childGroup.id,
+                        });
                     }
                 }
             }
@@ -430,11 +447,13 @@ export class FilterEditorStore {
         }
 
         if (this.isConditionExpression(expression)) {
+            const condition = this.parseConditionExpression(expression);
             return {
                 id: this.generateTransientId(),
                 operator: "all",
-                conditions: [this.parseConditionExpression(expression)],
+                conditions: [condition],
                 groups: [],
+                childrenOrder: [{ type: "condition", id: condition.id }],
             };
         }
 
@@ -443,6 +462,7 @@ export class FilterEditorStore {
             operator: "all",
             conditions: [],
             groups: [],
+            childrenOrder: [],
         };
     }
 
@@ -499,7 +519,7 @@ export class FilterEditorStore {
     private convertToFilterExpression(group: FilterGroup): FilterExpression {
         const expressions: (ConditionExpr | GroupExpr)[] = [];
 
-        for (const condition of group.conditions) {
+        const appendCondition = (condition: FilterCondition) => {
             if (condition.field) {
                 if (
                     condition.operator === "has" ||
@@ -537,12 +557,28 @@ export class FilterEditorStore {
                     }
                 }
             }
-        }
+        };
 
-        for (const childGroup of group.groups) {
+        const appendGroup = (childGroup: FilterGroup) => {
             const childExpression = this.convertToFilterExpression(childGroup);
             if (childExpression.length > 1) {
                 expressions.push(childExpression as GroupExpr);
+            }
+        };
+
+        for (const child of group.childrenOrder) {
+            if (child.type === "condition") {
+                const condition = group.conditions.find(
+                    (c) => c.id === child.id
+                );
+                if (condition) {
+                    appendCondition(condition);
+                }
+            } else {
+                const childGroup = group.groups.find((g) => g.id === child.id);
+                if (childGroup) {
+                    appendGroup(childGroup);
+                }
             }
         }
 
@@ -761,5 +797,62 @@ export class FilterEditorStore {
                 }
             }
         }
+    }
+
+    private _insertChild<T extends FilterCondition | FilterGroup>(
+        targetGroup: FilterGroup,
+        descriptor: FilterGroupChild,
+        collectionSelector: (group: FilterGroup) => T[],
+        item: T,
+        overItemId: number | null
+    ) {
+        const collection = collectionSelector(targetGroup);
+        const itemsById = new Map<number, T>();
+        for (const existing of collection) {
+            itemsById.set(existing.id, existing);
+        }
+        itemsById.set(item.id, item);
+
+        const existingOrderIndex = targetGroup.childrenOrder.findIndex(
+            (child) =>
+                child.type === descriptor.type && child.id === descriptor.id
+        );
+        if (existingOrderIndex !== -1) {
+            targetGroup.childrenOrder.splice(existingOrderIndex, 1);
+        }
+
+        const insertAt = this._findInsertionIndex(targetGroup, overItemId);
+
+        if (insertAt === -1) {
+            targetGroup.childrenOrder.push(descriptor);
+        } else {
+            targetGroup.childrenOrder.splice(insertAt, 0, descriptor);
+        }
+
+        const orderedIds = targetGroup.childrenOrder
+            .filter((child) => child.type === descriptor.type)
+            .map((child) => child.id);
+        const orderedItems = orderedIds
+            .map((id) => itemsById.get(id))
+            .filter((value): value is T => Boolean(value));
+
+        collection.splice(0, collection.length, ...orderedItems);
+    }
+
+    private _findInsertionIndex(
+        group: FilterGroup,
+        overItemId: number | null
+    ): number {
+        if (overItemId === null) {
+            return -1;
+        }
+
+        const overIndex = group.childrenOrder.findIndex(
+            (child) => child.id === overItemId
+        );
+        if (overIndex === -1) {
+            return group.childrenOrder.length;
+        }
+        return Math.min(overIndex, group.childrenOrder.length);
     }
 }

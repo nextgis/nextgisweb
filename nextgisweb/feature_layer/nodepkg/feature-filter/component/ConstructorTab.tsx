@@ -3,8 +3,6 @@ import type { DragEndEvent, DragStartEvent } from "@dnd-kit/core";
 import { observer } from "mobx-react-lite";
 import { useState } from "react";
 
-import { gettext } from "@nextgisweb/pyramid/i18n";
-
 import type { FilterEditorStore } from "../FilterEditorStore";
 
 import { FilterGroup } from "./FilterGroup";
@@ -32,14 +30,14 @@ export const ConstructorTab = observer(({ store }: ConstructorTabProps) => {
             return;
         }
 
-        if (active.id === over.id) {
-            return;
-        }
-
         const activeData = active.data.current;
         const overData = over.data.current;
 
         if (!activeData || !overData) {
+            return;
+        }
+
+        if (active.id === over.id) {
             return;
         }
 
@@ -49,31 +47,52 @@ export const ConstructorTab = observer(({ store }: ConstructorTabProps) => {
         const overIsCondition = overData.type === "condition";
         const overIsGroup = overData.type === "group";
 
+        const resolveTargetGroupId = (): number | null => {
+            if (overIsGroup) {
+                return over.id as number;
+            }
+            if (overIsCondition) {
+                return overData.parentGroupId;
+            }
+            return null;
+        };
+
+        const resolveOverItemId = (): number | null => {
+            if (overIsCondition || overIsGroup) {
+                return over.id as number;
+            }
+            return null;
+        };
+
         if (activeIsCondition) {
-            const targetGroupId = overIsCondition
-                ? overData.parentGroupId
-                : over.id;
-            const overItemId = overIsCondition ? over.id : null;
+            const targetGroupId = resolveTargetGroupId();
+            const overItemId = resolveOverItemId();
+
+            if (targetGroupId === null) {
+                return;
+            }
 
             store.moveConditionToGroup(
                 active.id as number,
                 targetGroupId,
-                overItemId as number | null
+                overItemId
             );
         }
 
         if (activeIsGroup) {
-            const targetGroupId = overIsCondition
-                ? overData.parentGroupId
-                : over.id;
-            const overItemId = overIsCondition || overIsGroup ? over.id : null;
+            const targetGroupId = resolveTargetGroupId();
+            const overItemId = resolveOverItemId();
+
+            if (targetGroupId === null) {
+                return;
+            }
 
             if (active.id === targetGroupId) return;
 
             store.moveGroupToGroup(
                 active.id as number,
                 targetGroupId,
-                overItemId as number | null
+                overItemId
             );
         }
     };
@@ -98,7 +117,9 @@ export const ConstructorTab = observer(({ store }: ConstructorTabProps) => {
                         isRoot
                     />
                     <DragOverlay>
-                        {activeId ? <div>{gettext("Dragging")}</div> : null}
+                        {activeId ? (
+                            <div className="drag-overlay-ghost"></div>
+                        ) : null}
                     </DragOverlay>
                 </DndContext>
             </div>

@@ -2,15 +2,11 @@ import { observer } from "mobx-react-lite";
 import { useEffect, useState } from "react";
 
 import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
-import { Button, Modal } from "@nextgisweb/gui/antd";
+import { Modal } from "@nextgisweb/gui/antd";
 import type { ShowModalOptions } from "@nextgisweb/gui/showModal";
-import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { FeatureFilterEditor } from "./FeatureFilterEditor";
-
-const msgFilter = gettext("Filter");
-const msgCancel = gettext("Cancel");
-const msgApply = gettext("Apply");
+import "./FeatureFilterModal.less";
 
 export interface FeatureFilterModalProps extends ShowModalOptions {
     fields: FeatureLayerFieldRead[];
@@ -30,7 +26,6 @@ export const FeatureFilterModal = observer(
         ...modalProps
     }: FeatureFilterModalProps) => {
         const [open, setOpen] = useState(openProp ?? true);
-        const [isValid, setIsValid] = useState(false);
         const [filter, setFilter] = useState<string | undefined>(value);
 
         useEffect(() => {
@@ -49,41 +44,27 @@ export const FeatureFilterModal = observer(
             handleClose();
         };
 
-        const onValidityChange = (isValid: boolean) => {
-            setIsValid(isValid);
-        };
-
         const changeFilter = (filter: string | undefined) => {
             setFilter(filter);
         };
 
         return (
             <Modal
-                title={msgFilter}
+                className="ngw-feature-filter-modal"
+                width="" // Do not set the default (520px) width
                 open={open}
                 onCancel={handleClose}
-                width={800}
+                centered
                 destroyOnHidden
-                footer={[
-                    <Button key="cancel" onClick={handleClose}>
-                        {msgCancel}
-                    </Button>,
-                    <Button
-                        key="apply"
-                        onClick={handleApply}
-                        disabled={!isValid}
-                    >
-                        {msgApply}
-                    </Button>,
-                ]}
+                footer={null}
                 {...modalProps}
             >
                 <FeatureFilterEditor
                     fields={fields}
                     value={value}
                     onChange={changeFilter}
-                    onValidityChange={onValidityChange}
-                    showFooter={false}
+                    onApply={handleApply}
+                    onCancel={handleClose}
                 />
             </Modal>
         );

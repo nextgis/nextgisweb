@@ -1,0 +1,44 @@
+.ngw-feature-filter-modal.ant-modal {
+    margin: 1em;
+    padding: 0;
+    width: 60%;
+    min-width: 40em;
+    max-width: 80em;
+    height: 80%;
+    min-height: 40em;
+    max-height: calc(100vh - 2em);
+
+    >div {
+        height: 100%;
+
+        >.ant-modal-content {
+            height: 100%;
+
+            >.ant-modal-body {
+                height: 100%;
+            }
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .ngw-feature-filter-modal.ant-modal {
+        margin: 0;
+        width: 100%;
+        min-width: auto;
+        max-width: auto;
+        height: 100%;
+        min-height: auto;
+
+        >div {
+            >.ant-modal-content {
+                border-radius: 0;
+            }
+
+            .ant-form-item-label {
+                padding-bottom: 0;
+                padding-top: 1rem;
+            }
+        }
+    }
+}

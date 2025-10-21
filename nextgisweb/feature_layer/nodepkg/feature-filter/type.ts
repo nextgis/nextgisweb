@@ -20,7 +20,12 @@ export interface FilterGroup {
     operator: "all" | "any";
     conditions: FilterCondition[];
     groups: FilterGroup[];
+    childrenOrder: FilterGroupChild[];
 }
+
+export type FilterGroupChild =
+    | { type: "condition"; id: number }
+    | { type: "group"; id: number };
 
 export type FilterCondition =
     | {

@@ -1,8 +1,14 @@
 import { observer } from "mobx-react-lite";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { ActionToolbar } from "@nextgisweb/gui/action-toolbar";
+import type {
+    ActionToolbarAction,
+    ActionToolbarProps,
+} from "@nextgisweb/gui/action-toolbar";
 import { Button, Tabs, message } from "@nextgisweb/gui/antd";
 import type { TabsProps } from "@nextgisweb/gui/antd";
+import { SaveButton } from "@nextgisweb/gui/component";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { FilterEditorStore } from "./FilterEditorStore";
@@ -23,7 +29,6 @@ export const FeatureFilterEditor = observer(
         value,
         onChange,
         onValidityChange,
-        showFooter = false,
         onApply,
         onCancel,
     }: FeatureFilterEditorProps) => {
@@ -45,7 +50,7 @@ export const FeatureFilterEditor = observer(
             onChange?.(store.validJsonValue);
         }, [store.isValid, store.validJsonValue, onValidityChange, onChange]);
 
-        const handleApply = () => {
+        const handleApply = useCallback(() => {
             if (!store.isValid) {
                 messageApi.error(
                     gettext(
@@ -64,12 +69,12 @@ export const FeatureFilterEditor = observer(
                 messageApi.error(gettext("Failed to apply filter"));
                 console.error("Filter application error:", error);
             }
-        };
+        }, [store, messageApi, onChange, onApply]);
 
-        const handleCancel = () => {
+        const handleCancel = useCallback(() => {
             onChange?.(initialValue);
             onCancel?.(initialValue);
-        };
+        }, [initialValue, onChange, onCancel]);
 
         const items: TabsProps["items"] = [
             {
@@ -86,6 +91,29 @@ export const FeatureFilterEditor = observer(
 
         const hasErrors = !store.isValid && store.validationError;
 
+        const toolbarProps: Partial<ActionToolbarProps> = useMemo(() => {
+            const actions: ActionToolbarAction[] = [
+                <SaveButton
+                    disabled={!store.isValid}
+                    key="save"
+                    onClick={handleApply}
+                >
+                    {msgApply}
+                </SaveButton>,
+            ];
+            const rightActions: ActionToolbarAction[] = [];
+            rightActions.push(
+                <Button key="cancel" onClick={handleCancel}>
+                    {msgCancel}
+                </Button>
+            );
+
+            return {
+                actions: [...actions],
+                rightActions: [...rightActions],
+            };
+        }, [handleApply, handleCancel, store.isValid]);
+
         return (
             <div className="ngw-feature-filter-editor">
                 {contextHolder}
@@ -95,29 +123,14 @@ export const FeatureFilterEditor = observer(
                     activeKey={store.activeTab}
                     onChange={store.setActiveTab}
                     items={items}
+                    parentHeight
                 />
 
                 {hasErrors && (
                     <div className="error-message">{store.validationError}</div>
                 )}
 
-                {showFooter && (
-                    <div
-                        className="filter-footer"
-                        style={{ marginTop: "16px", textAlign: "right" }}
-                    >
-                        <Button
-                            type="primary"
-                            onClick={handleApply}
-                            disabled={!store.isValid}
-                        >
-                            {msgApply}
-                        </Button>
-                        <Button type="primary" onClick={handleCancel}>
-                            {msgCancel}
-                        </Button>
-                    </div>
-                )}
+                <ActionToolbar {...toolbarProps} />
             </div>
         );
     }
