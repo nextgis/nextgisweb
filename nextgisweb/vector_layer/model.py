@@ -53,7 +53,7 @@ from nextgisweb.resource import (
     SRelationship,
 )
 
-from ..feature_layer.filter_expr import FilterParser
+from ..feature_layer.filter import FilterParser
 from .feature_query import FeatureQueryBase, calculate_extent
 from .kind_of_data import VectorLayerData
 from .ogrloader import (

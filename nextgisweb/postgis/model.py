@@ -43,7 +43,7 @@ from nextgisweb.feature_layer import (
     LayerField,
     LayerFieldsMixin,
 )
-from nextgisweb.feature_layer.filter_expr import FilterParser
+from nextgisweb.feature_layer.filter import FilterParser
 from nextgisweb.layer import IBboxLayer, SpatialLayerMixin
 from nextgisweb.resource import (
     ConnectionScope,

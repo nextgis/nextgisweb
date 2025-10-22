@@ -1,6 +1,6 @@
 import pytest
 
-from nextgisweb.feature_layer.filter_expr import FilterExpressionError
+from nextgisweb.feature_layer.filter import FilterExpressionError
 from nextgisweb.postgis import PostgisLayer
 
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")

@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from nextgisweb.feature_layer.filter_expr import FilterExpressionError
+from nextgisweb.feature_layer.filter import FilterExpressionError
 from nextgisweb.vector_layer import VectorLayer
 
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
@@ -13,14 +13,14 @@ def test_layer_id(vector_layer_filter_dataset):
     return vector_layer_filter_dataset
 
 
-def fetch_filtered_ids(resource, filter_expression):
+def fetch_filtered_ids(resource, filter):
     query = resource.feature_query()
-    query.set_filter_program(resource.filter_parser.parse(filter_expression))
+    query.set_filter_program(resource.filter_parser.parse(filter))
     return [feature.id for feature in query()]
 
 
-def fetch_filtered_ids_from_string(resource, filter_expression):
-    program = resource.filter_parser.parse(json.dumps(filter_expression))
+def fetch_filtered_ids_from_string(resource, filter):
+    program = resource.filter_parser.parse(json.dumps(filter))
     query = resource.feature_query()
     query.set_filter_program(program)
     return [feature.id for feature in query()]
@@ -32,44 +32,44 @@ def load_layer(layer_id):
 
 def test_filter_all_single_condition(test_layer_id):
     layer = load_layer(test_layer_id)
-    filter_expr = ["all", ["==", ["get", "name"], "Alice"]]
+    filter = ["all", ["==", ["get", "name"], "Alice"]]
 
-    ids = fetch_filtered_ids(layer, filter_expr)
+    ids = fetch_filtered_ids(layer, filter)
 
     assert ids == [1]
 
 
 def test_filter_all_multiple_conditions(test_layer_id):
     layer = load_layer(test_layer_id)
-    filter_expr = ["all", ["==", ["get", "city"], "NYC"], [">", ["get", "age"], 26]]
+    filter = ["all", ["==", ["get", "city"], "NYC"], [">", ["get", "age"], 26]]
 
-    ids = fetch_filtered_ids(layer, filter_expr)
+    ids = fetch_filtered_ids(layer, filter)
 
     assert ids == [3, 5]
 
 
 def test_filter_any_multiple_conditions(test_layer_id):
     layer = load_layer(test_layer_id)
-    filter_expr = [
+    filter = [
         "any",
         ["==", ["get", "name"], "Alice"],
         ["==", ["get", "name"], "Bob"],
     ]
 
-    ids = fetch_filtered_ids(layer, filter_expr)
+    ids = fetch_filtered_ids(layer, filter)
 
     assert ids == [1, 2]
 
 
 def test_filter_nested_groups(test_layer_id):
     layer = load_layer(test_layer_id)
-    filter_expr = [
+    filter = [
         "all",
         ["==", ["get", "city"], "NYC"],
         ["any", ["<", ["get", "age"], 27], [">", ["get", "age"], 33]],
     ]
 
-    ids = fetch_filtered_ids(layer, filter_expr)
+    ids = fetch_filtered_ids(layer, filter)
 
     assert ids == [1, 3]
 
@@ -85,25 +85,25 @@ def test_filter_comparison_operators(test_layer_id):
 
 def test_filter_in_operator(test_layer_id):
     layer = load_layer(test_layer_id)
-    filter_expr = ["all", ["in", ["get", "name"], ["Alice", "Bob", "Charlie"]]]
+    filter = ["all", ["in", ["get", "name"], ["Alice", "Bob", "Charlie"]]]
 
-    ids = fetch_filtered_ids(layer, filter_expr)
+    ids = fetch_filtered_ids(layer, filter)
 
     assert ids == [1, 2, 3]
 
 
 def test_filter_not_in_operator(test_layer_id):
     layer = load_layer(test_layer_id)
-    filter_expr = ["all", ["!in", ["get", "city"], ["NYC", "LA"]]]
+    filter = ["all", ["!in", ["get", "city"], ["NYC", "LA"]]]
 
-    ids = fetch_filtered_ids(layer, filter_expr)
+    ids = fetch_filtered_ids(layer, filter)
 
     assert ids == [4]
 
 
 def test_filter_complex_nested(test_layer_id):
     layer = load_layer(test_layer_id)
-    filter_expr = [
+    filter = [
         "all",
         [">", ["get", "age"], 26],
         [
@@ -113,7 +113,7 @@ def test_filter_complex_nested(test_layer_id):
         ],
     ]
 
-    ids = fetch_filtered_ids(layer, filter_expr)
+    ids = fetch_filtered_ids(layer, filter)
 
     assert ids == [2, 3]
 
@@ -128,80 +128,80 @@ def test_filter_empty_expression(test_layer_id):
 
 def test_filter_json_string_expression(test_layer_id):
     layer = load_layer(test_layer_id)
-    filter_expr = ["all", ["==", ["get", "city"], "SF"]]
+    filter = ["all", ["==", ["get", "city"], "SF"]]
 
-    ids = fetch_filtered_ids_from_string(layer, filter_expr)
+    ids = fetch_filtered_ids_from_string(layer, filter)
 
     assert ids == [4]
 
 
 def test_filter_date_field(test_layer_id):
     layer = load_layer(test_layer_id)
-    filter_expr = ["all", ["<", ["get", "birth_date"], "1995-01-01"]]
+    filter = ["all", ["<", ["get", "birth_date"], "1995-01-01"]]
 
-    ids = fetch_filtered_ids(layer, filter_expr)
+    ids = fetch_filtered_ids(layer, filter)
 
     assert ids == [2, 3, 5]
 
 
 def test_filter_date_equality(test_layer_id):
     layer = load_layer(test_layer_id)
-    filter_expr = ["all", ["==", ["get", "birth_date"], "1998-05-15"]]
+    filter = ["all", ["==", ["get", "birth_date"], "1998-05-15"]]
 
-    ids = fetch_filtered_ids(layer, filter_expr)
+    ids = fetch_filtered_ids(layer, filter)
 
     assert ids == [1]
 
 
 def test_filter_datetime_field(test_layer_id):
     layer = load_layer(test_layer_id)
-    filter_expr = ["all", [">", ["get", "created_at"], "2023-03-01T00:00:00"]]
+    filter = ["all", [">", ["get", "created_at"], "2023-03-01T00:00:00"]]
 
-    ids = fetch_filtered_ids(layer, filter_expr)
+    ids = fetch_filtered_ids(layer, filter)
 
     assert ids == [3, 5]
 
 
 def test_filter_datetime_range(test_layer_id):
     layer = load_layer(test_layer_id)
-    filter_expr = [
+    filter = [
         "all",
         [">=", ["get", "created_at"], "2023-01-01T00:00:00"],
         ["<", ["get", "created_at"], "2023-02-01T00:00:00"],
     ]
 
-    ids = fetch_filtered_ids(layer, filter_expr)
+    ids = fetch_filtered_ids(layer, filter)
 
     assert ids == [1, 4]
 
 
 def test_filter_time_field(test_layer_id):
     layer = load_layer(test_layer_id)
-    filter_expr = ["all", ["<", ["get", "work_start"], "09:00:00"]]
+    filter = ["all", ["<", ["get", "work_start"], "09:00:00"]]
 
-    ids = fetch_filtered_ids(layer, filter_expr)
+    ids = fetch_filtered_ids(layer, filter)
 
     assert ids == [3, 5]
 
 
 def test_filter_time_equality(test_layer_id):
     layer = load_layer(test_layer_id)
-    filter_expr = ["all", ["==", ["get", "work_start"], "09:00:00"]]
+    filter = ["all", ["==", ["get", "work_start"], "09:00:00"]]
 
-    ids = fetch_filtered_ids(layer, filter_expr)
+    ids = fetch_filtered_ids(layer, filter)
 
     assert ids == [1]
 
 
 def test_filter_mixed_date_and_string(test_layer_id):
     layer = load_layer(test_layer_id)
-    filter_expr = [
+    filter = [
         "all",
         ["==", ["get", "city"], "NYC"],
         [">", ["get", "birth_date"], "1990-01-01"],
     ]
 
-    ids = fetch_filtered_ids(layer, filter_expr)
+    ids = fetch_filtered_ids(layer, filter)
 
     assert ids == [1, 5]
 

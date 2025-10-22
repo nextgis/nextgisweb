@@ -3,7 +3,7 @@ import json
 import pytest
 import sqlalchemy as sa
 
-from ..filter_expr import FieldInfo, FilterExpressionError, FilterParser
+from ..filter import FieldInfo, FilterExpressionError, FilterParser
 from ..interface import FIELD_TYPE
 
 

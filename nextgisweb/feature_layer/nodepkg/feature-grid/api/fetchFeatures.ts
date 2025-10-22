@@ -74,7 +74,7 @@ export function fetchFeaturesItems({
     }
 
     if (filter) {
-        query.filter_expression = filter;
+        query.filter = filter;
     }
 
     return route("feature_layer.feature.collection", resourceId).get<
