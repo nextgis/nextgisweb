@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import { Input, Select, Space } from "@nextgisweb/gui/antd";
 import { gettext, gettextf } from "@nextgisweb/pyramid/i18n";
@@ -22,6 +22,7 @@ const modes = [
     },
 ];
 
+type Mode = "keep" | "assign" | "turn_off";
 type PasswordInputProps = Parameters<typeof Input.Password>[0];
 
 type InputProps = Omit<PasswordInputProps, "value" | "onChange"> & {
@@ -34,22 +35,33 @@ export const UserWidgetPassword = ({
     onChange,
     ...inputProps
 }: InputProps) => {
-    const [mode, setMode] = useState(value === false ? "turn_off" : "keep");
+    const [mode, setMode] = useState<Mode>(
+        value === false ? "turn_off" : "keep"
+    );
     const [password, setPassword] = useState<boolean | string>(
         mode === "assign" ? (value ?? "") : ""
     );
 
-    useEffect(() => {
-        if (onChange) {
-            if (mode === "assign") {
-                onChange(password);
-            } else if (mode === "keep") {
-                onChange(true);
-            } else if (mode === "turn_off") {
-                onChange(false);
-            }
+    const onModeChange = (nextMode: Mode) => {
+        setMode(nextMode);
+        if (!onChange) return;
+
+        if (nextMode === "assign") {
+            onChange(password);
+        } else if (nextMode === "keep") {
+            onChange(true);
+        } else {
+            onChange(false);
         }
-    }, [mode, onChange, password]);
+    };
+
+    const onPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const v = e.target.value;
+        setPassword(v);
+        if (mode === "assign") {
+            onChange?.(v);
+        }
+    };
 
     // Hide "keep" item if password wasn't assigned.
     const availableModes = useMemo(() => {
@@ -59,7 +71,7 @@ export const UserWidgetPassword = ({
     return (
         <Space.Compact style={{ display: "flex", width: "100%" }}>
             <Select
-                onChange={setMode}
+                onChange={onModeChange}
                 popupMatchSelectWidth={false}
                 value={mode}
             >
@@ -73,7 +85,7 @@ export const UserWidgetPassword = ({
                 <Input.Password
                     style={{ flexGrow: "1" }}
                     value={mode === "assign" ? String(password) : ""}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={onPasswordChange}
                     disabled={mode !== "assign"}
                     {...inputProps}
                 ></Input.Password>
