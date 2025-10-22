@@ -853,6 +853,6 @@ export class FilterEditorStore {
         if (overIndex === -1) {
             return group.childrenOrder.length;
         }
-        return Math.min(overIndex, group.childrenOrder.length);
+        return Math.min(overIndex + 1, group.childrenOrder.length);
     }
 }
