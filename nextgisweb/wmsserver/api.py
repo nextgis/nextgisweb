@@ -29,6 +29,7 @@ from nextgisweb.render import (
     image_encoder_factory,
     scale_range_intersection,
 )
+from nextgisweb.render.api import EMPTY_TILE_256x256
 from nextgisweb.resource import DataScope, ResourceFactory, ServiceScope
 from nextgisweb.spatial_ref_sys import SRS
 from nextgisweb.spatial_ref_sys.model import BOUNDS_EPSG_3857
@@ -667,6 +668,9 @@ def _get_wmts_tile(obj, params, request):
 
     req = res.render_request(srs)
     img = req.render_tile((z, x, y), 256)
+
+    if img is None:
+        return Response(EMPTY_TILE_256x256, content_type=IMAGE_FORMAT.PNG)
 
     buf = BytesIO()
     image_encoder_png(img, buf)

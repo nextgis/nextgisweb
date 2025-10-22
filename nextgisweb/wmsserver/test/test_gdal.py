@@ -87,10 +87,8 @@ def _color(img, tolerance=None):
     return tuple(b[0] for b in extrema)
 
 
-def _test_rounds_dataset(ds, tolerance=None):
-    band_count = ds.RasterCount
-
-    for bbox, crs, expected in (
+def _test_data(alpha):
+    for *rest, colour in (
         ((558728, 5789851, 1242296, 7544030), "EPSG:3857", (255, 0, 0)),
         ((5.02, 46.06, 11.16, 55.93), "EPSG:4326", (255, 0, 0)),
         ((4600000, 6800000, 4600010, 6800010), "EPSG:3857", (0, 255, 0)),
@@ -98,17 +96,31 @@ def _test_rounds_dataset(ds, tolerance=None):
         ((454962, 2593621, 2239863, 3771499), "EPSG:3857", (0, 0, 255)),
         ((4.09, 22.68, 20.12, 32.06), "EPSG:4326", (0, 0, 255)),
     ):
+        if alpha:
+            colour += (255,)
+        yield *rest, colour
+
+    if alpha:
+        for v in (((-20037508, 20037400, -20037400, 20037508), "EPSG:3857", (0, 0, 0, 0)),):
+            yield v
+
+
+def _test_rounds_dataset(ds, alpha=True):
+    tolerance = None if alpha else 1
+
+    for bbox, crs, expected in _test_data(alpha):
         img = _read_image(ds, *bbox, crs)
         c = _color(img, tolerance)
-        if band_count == 4:
-            expected = expected + (255,)
         if tolerance is not None:
             expected = pytest.approx(expected, abs=tolerance)
         assert c == expected
 
 
-def test_wms(service_id, ngw_httptest_app):
-    wms_path = "WMS:{}/api/resource/{}/wms".format(ngw_httptest_app.base_url, service_id)
+@pytest.mark.parametrize("transparent", (True, False))
+def test_wms(transparent, service_id, ngw_httptest_app):
+    wms_path = "WMS:{}/api/resource/{}/wms{}".format(
+        ngw_httptest_app.base_url, service_id, "?Transparent=TRUE" if transparent else ""
+    )
 
     ds = gdal.Open(wms_path, gdalconst.GA_ReadOnly)
     assert ds is not None, gdal.GetLastErrorMsg()
@@ -120,11 +132,10 @@ def test_wms(service_id, ngw_httptest_app):
     assert name == "test-rounds"
 
     ds = gdal.Open(url, gdalconst.GA_ReadOnly)
-    assert ds.RasterCount == 3
+    bands_expected = 4 if transparent else 3
+    assert ds.RasterCount == bands_expected
 
-    # TODO channel values change for some reason
-    tolerance = 1
-    _test_rounds_dataset(ds, tolerance)
+    _test_rounds_dataset(ds, transparent)
 
 
 @pytest.mark.parametrize(
