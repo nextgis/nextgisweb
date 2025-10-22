@@ -479,7 +479,7 @@ export class MapStore extends Watchable<MapWatchableProps> {
 
     @computed
     get targetElement() {
-        if (this.ready) {
+        if (this.started) {
             return this.olMap.getTargetElement();
         }
         return null;

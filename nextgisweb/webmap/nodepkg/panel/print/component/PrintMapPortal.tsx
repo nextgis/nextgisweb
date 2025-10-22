@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
-import { assert } from "@nextgisweb/jsrealm/error";
 import type { Display } from "@nextgisweb/webmap/display";
 import PrintMap from "@nextgisweb/webmap/print-map";
 import type { PrintMapStore } from "@nextgisweb/webmap/print-map/store";
@@ -36,7 +35,8 @@ export function PrintMapPortal({
 
     useEffect(() => {
         const mapEl = display.map.targetElement;
-        assert(mapEl, "Map target element is not available");
+
+        if (!mapEl) return;
         mapElRef.current = mapEl;
 
         const container = document.createElement("div");
