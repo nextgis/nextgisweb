@@ -128,7 +128,6 @@ export function AttachmentPreviewGroup({
                     <Suspense fallback={<CentralLoading />}>
                         <PhotospherePreview
                             url={info.image.url}
-                            navbar={[]}
                             onReady={(viewer) => {
                                 if (viewer) {
                                     panoramaStore.add(info.current, viewer);
