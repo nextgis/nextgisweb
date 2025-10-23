@@ -106,7 +106,9 @@ export class FeatureEditorStore {
                 fid: this.featureId,
             }).get<FeatureItem>({
                 signal,
-                query: { dt_format: "iso" },
+                query: {
+                    dt_format: "iso",
+                },
             });
             this._setFeatureItem(featureItem);
         }

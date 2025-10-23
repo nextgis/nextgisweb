@@ -14,8 +14,8 @@ import { useToggleGroupItem } from "@nextgisweb/webmap/map-component/control/tog
 import type { LayerItemConfig } from "@nextgisweb/webmap/type/api";
 
 import { EditableResource } from "./EditableResource";
-import { EDITING_STATES } from "./constant";
 import { saveChanges } from "./editor-api";
+import { DrawMode } from "./modes/DrawMode";
 import { setItemsEditable } from "./util/setItemsEditable";
 
 import ExitIcon from "@nextgisweb/icon/material/save";
@@ -29,7 +29,7 @@ const ToolEditor = observer(
 
         const [canSnap, setCanSnap] = useState(true);
         const [editingMode, setEditingMode] = useState<string | null>(
-            EDITING_STATES.CREATING
+            DrawMode.displayName
         );
 
         const groupItemRef = useRef(groupItem);

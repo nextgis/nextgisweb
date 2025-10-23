@@ -15,9 +15,9 @@ import {
     ToggleControl,
 } from "@nextgisweb/webmap/map-component";
 
-import { EDITING_STATES } from "../constant";
 import { useEditorContext } from "../context/useEditorContext";
 import { useInteraction } from "../hook/useInteraction";
+import type { LayerEditorMode } from "../type";
 
 import { DrawControl } from "./component/DrawControl";
 
@@ -25,7 +25,7 @@ import HoleIcon from "@nextgisweb/icon/material/content_cut";
 
 const msgEmptyClick = gettext("Click inside a polygon to start cutting a hole");
 
-export function HoleMode({ order }: { order?: number }) {
+export const HoleMode: LayerEditorMode = ({ order }) => {
     const [messageApi, contextHolder] = message.useMessage();
 
     const { olMap, layer, addUndo, selectStyle, selectStyleOptions } =
@@ -104,7 +104,7 @@ export function HoleMode({ order }: { order?: number }) {
     }, [layer, selectStyle, selectStyleOptions]);
 
     const hoverInteraction = useInteraction(
-        `${EDITING_STATES.HOLE}-hover`,
+        `${HoleMode.displayName}-hover`,
         active,
         createHover
     );
@@ -187,7 +187,7 @@ export function HoleMode({ order }: { order?: number }) {
     ]);
 
     const draw = useInteraction(
-        `${EDITING_STATES.HOLE}-draw`,
+        `${HoleMode.displayName}-draw`,
         active,
         createDrawHole
     );
@@ -216,7 +216,7 @@ export function HoleMode({ order }: { order?: number }) {
                 gap={2}
             >
                 <ToggleControl
-                    groupId={EDITING_STATES.HOLE}
+                    groupId={HoleMode.displayName}
                     title={gettext("Cut hole")}
                     order={-1}
                     onChange={onChange}
@@ -227,4 +227,6 @@ export function HoleMode({ order }: { order?: number }) {
             </MapToolbarControl>
         </>
     );
-}
+};
+
+HoleMode.displayName = "HoleMode";

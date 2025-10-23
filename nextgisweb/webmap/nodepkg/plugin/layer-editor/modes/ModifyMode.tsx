@@ -9,11 +9,11 @@ import { EditIcon } from "@nextgisweb/gui/icon";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { ToggleControl } from "@nextgisweb/webmap/map-component";
 
-import { EDITING_STATES } from "../constant";
 import { useEditorContext } from "../context/useEditorContext";
 import { useInteraction } from "../hook/useInteraction";
+import type { LayerEditorMode } from "../type";
 
-export function ModifyMode({ order }: { order: number }) {
+export const ModifyMode: LayerEditorMode = ({ order }) => {
     const { features, addUndo, selectStyle } = useEditorContext();
 
     const [active, setActive] = useState(false);
@@ -45,11 +45,11 @@ export function ModifyMode({ order }: { order: number }) {
         return modify;
     }, [addUndo, features, selectStyle]);
 
-    useInteraction(EDITING_STATES.MODIFYING, active, createInteraction);
+    useInteraction(ModifyMode.displayName, active, createInteraction);
 
     return (
         <ToggleControl
-            groupId={EDITING_STATES.MODIFYING}
+            groupId={ModifyMode.displayName}
             title={gettext("Modify")}
             order={order}
             onChange={setActive}
@@ -57,4 +57,6 @@ export function ModifyMode({ order }: { order: number }) {
             <EditIcon />
         </ToggleControl>
     );
-}
+};
+
+ModifyMode.displayName = "ModifyMode";

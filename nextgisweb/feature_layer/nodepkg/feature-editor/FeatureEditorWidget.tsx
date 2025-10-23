@@ -197,7 +197,16 @@ export const FeatureEditorWidget = observer(
                     ...(toolbar?.rightActions || []),
                 ],
             };
-        }, [dirty, saving, onSaveClick, mode, okBtnMsg, toolbar, store]);
+        }, [
+            allowEmpty,
+            dirty,
+            saving,
+            onSaveClick,
+            mode,
+            okBtnMsg,
+            toolbar,
+            store,
+        ]);
 
         return (
             <div className="ngw-feature-layer-editor">

@@ -151,13 +151,16 @@ export const EditableResource = observer(
                         id={resourceId}
                         source={source}
                         enabled={enabled}
-                        geomType={geomConfig.type}
-                        geomLayout={geomConfig.layout}
                         editingMode={editingMode}
                         onEditingMode={setEditingMode}
                         onDirtyChange={onDirtyChange}
                     >
-                        <DrawMode order={1} onDrawend={onDrawend} />
+                        <DrawMode
+                            order={1}
+                            onDrawend={onDrawend}
+                            geomType={geomConfig.type}
+                            geomLayout={geomConfig.layout}
+                        />
                         <ModifyMode order={2} />
                         <MoveMode order={3} />
                         {geomConfig.type.includes("Polygon") && (

@@ -1,6 +1,5 @@
 import type { Collection, Feature as OlFeature, Map as OlMap } from "ol";
 import type { Geometry } from "ol/geom";
-import type { GeometryLayout, Type as OlGeometryType } from "ol/geom/Geometry";
 import type { Interaction } from "ol/interaction";
 import type VectorLayer from "ol/layer/Vector";
 import type VectorSource from "ol/source/Vector";
@@ -17,8 +16,6 @@ export type EditorContextValue = {
     dirty: boolean;
     source: VectorSource;
     features: Collection<OlFeature<Geometry>>;
-    geomType: OlGeometryType;
-    geomLayout?: GeometryLayout;
     layerStyle: Style;
     selectStyle: Style;
     interactionsRef: React.RefObject<Map<string, Interaction>>;
