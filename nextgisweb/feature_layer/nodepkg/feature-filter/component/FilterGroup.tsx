@@ -1,10 +1,5 @@
-import { useDndContext, useDroppable } from "@dnd-kit/core";
-import type { Active, Over } from "@dnd-kit/core";
-import {
-    SortableContext,
-    useSortable,
-    verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
+import { useDndContext } from "@dnd-kit/core";
+import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { observer } from "mobx-react-lite";
 import type React from "react";
@@ -30,26 +25,6 @@ interface FilterGroupProps {
     parentGroupId: number | null;
 }
 
-const getActiveType = (active: Active | null) => {
-    if (!active) {
-        return undefined;
-    }
-    return active.data.current?.type as "condition" | "group" | undefined;
-};
-
-const isOverInsideGroup = (over: Over | null, group: FilterGroupModel) => {
-    const overData = over?.data?.current as
-        | { type?: string; parentGroupId?: number; groupId?: number }
-        | undefined;
-
-    return (
-        overData &&
-        (overData.parentGroupId === group.id ||
-            (overData.type === "group-dropzone" &&
-                overData.groupId === group.id))
-    );
-};
-
 export const FilterGroup = observer(
     ({ group, store, isRoot = false, parentGroupId }: FilterGroupProps) => {
         const { active, over } = useDndContext();
@@ -65,36 +40,10 @@ export const FilterGroup = observer(
             data: {
                 type: "group",
                 parentGroupId: parentGroupId,
+                item: group,
             },
             disabled: isRoot,
         });
-
-        const dropZoneId = `group-dropzone-${group.id}`;
-        const { setNodeRef: setDropZoneNodeRef } = useDroppable({
-            id: dropZoneId,
-            data: { type: "group-dropzone", groupId: group.id },
-        });
-
-        const activeType = getActiveType(active);
-        const overMatchesGroup = over?.id === group.id;
-        const overMatchesDropZone = over?.id === dropZoneId;
-        const overInsideGroup = isOverInsideGroup(over, group);
-        const isConditionDrag = activeType === "condition";
-        const isGroupDrag = activeType === "group";
-
-        const isCurrentGroupHovered =
-            overMatchesGroup || overMatchesDropZone || overInsideGroup;
-
-        const isDropTarget =
-            isCurrentGroupHovered && (isConditionDrag || isGroupDrag);
-
-        const showPlaceholder =
-            (isConditionDrag || isGroupDrag) &&
-            (overMatchesDropZone || group.childrenOrder.length === 0);
-
-        const placeholderText = isGroupDrag
-            ? gettext("Drop group here")
-            : gettext("Drop condition here");
 
         const style: React.CSSProperties = {
             transform: CSS.Transform.toString(transform),
@@ -106,17 +55,6 @@ export const FilterGroup = observer(
             margin: "5px 0",
             backgroundColor: "#ffffff",
         };
-
-        const childItems = group.childrenOrder.map(
-            (item: FilterGroupChild) => item.id
-        );
-
-        const dropTargetClassName = isDropTarget ? " drop-target" : "";
-        const emptyClassName = group.childrenOrder.length === 0 ? " empty" : "";
-        const childContainerClassName = `filter-group-children${dropTargetClassName}${emptyClassName}`;
-        const dropZoneClassName = `group-drop-zone${overMatchesDropZone ? " active" : ""}${
-            showPlaceholder ? " with-placeholder" : ""
-        }`;
 
         const renderChild = (child: FilterGroupChild) => {
             if (child.type === "condition") {
@@ -150,11 +88,15 @@ export const FilterGroup = observer(
             );
         };
 
+        const isDropTarget = over?.id === group.id && over?.id !== active?.id;
+        const dropTargetClassName = isDropTarget ? " drop-target" : "";
+        const emptyClassName = group.childrenOrder.length === 0 ? " empty" : "";
+
         return (
             <div
                 ref={setNodeRef}
                 style={style}
-                className={`filter-group${isDropTarget ? " drop-target" : ""}`}
+                className={`filter-group ${dropTargetClassName}`}
             >
                 <div
                     style={{
@@ -162,7 +104,6 @@ export const FilterGroup = observer(
                         alignItems: "center",
                         marginBottom: "12px",
                     }}
-                    className={dropZoneClassName}
                 >
                     {
                         <DragHandleIcon
@@ -210,22 +151,12 @@ export const FilterGroup = observer(
                     </Space>
                 </div>
 
-                <div className={childContainerClassName}>
-                    <SortableContext
-                        items={childItems}
-                        strategy={verticalListSortingStrategy}
-                    >
-                        {group.childrenOrder.map((child: FilterGroupChild) =>
-                            renderChild(child)
-                        )}
-                    </SortableContext>
-                    <div
-                        ref={setDropZoneNodeRef}
-                        className={dropZoneClassName}
-                        data-placeholder={
-                            showPlaceholder ? placeholderText : undefined
-                        }
-                    />
+                <div
+                    className={`filter-group-children ${dropTargetClassName} ${emptyClassName}`}
+                >
+                    {group.childrenOrder.map((child: FilterGroupChild) =>
+                        renderChild(child)
+                    )}
                 </div>
             </div>
         );

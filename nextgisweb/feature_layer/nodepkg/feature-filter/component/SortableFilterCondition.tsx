@@ -27,6 +27,7 @@ export const SortableFilterCondition = observer(
             data: {
                 type: "condition",
                 parentGroupId: parentGroupId,
+                item: condition,
             },
         });
 

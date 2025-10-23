@@ -1,3 +1,4 @@
+import { useDndContext } from "@dnd-kit/core";
 import type { Dayjs } from "dayjs";
 import { observer } from "mobx-react-lite";
 
@@ -96,6 +97,9 @@ const getDefaultValue = (
 
 export const FilterCondition = observer(
     ({ condition, store, dragHandleProps }: FilterConditionProps) => {
+        const { active, over } = useDndContext();
+        const isDropTarget = over?.id === condition.id && over?.id !== active?.id;
+
         const handleFieldChange = (field: string) => {
             const defaultValue = getDefaultValue(
                 store.fields,
@@ -297,8 +301,10 @@ export const FilterCondition = observer(
             }
         };
 
+        const dropTargetClassName = isDropTarget ? "drop-target" : "";
+
         return (
-            <div className="filter-condition">
+            <div className={`filter-condition ${dropTargetClassName}`}>
                 <Space>
                     <DragHandleIcon
                         className="filter-drag-handle"

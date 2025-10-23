@@ -43,6 +43,16 @@ export interface FilterEditorStoreOptions {
     value?: string;
 }
 
+export interface MoveFilterItem {
+    id: number;
+    parentGroupId: number;
+}
+
+export interface MoveTargetFilterItem {
+    id?: number;
+    parentGroupId: number;
+}
+
 export class FilterEditorStore {
     @observable.shallow accessor fields: FeatureLayerFieldRead[] = [];
     @observable.deep accessor filterState: FilterState = {
@@ -140,8 +150,8 @@ export class FilterEditorStore {
         };
         const group = this._findGroupById(this.filterState.rootGroup, groupId);
         if (group) {
-            group.conditions.push(newCondition as FilterCondition);
-            group.childrenOrder.push({
+            group.conditions.unshift(newCondition as FilterCondition);
+            group.childrenOrder.unshift({
                 type: "condition",
                 id: newCondition.id,
             });
@@ -163,8 +173,11 @@ export class FilterEditorStore {
             parentGroupId
         );
         if (parentGroup) {
-            parentGroup.groups.push(newGroup);
-            parentGroup.childrenOrder.push({ type: "group", id: newGroup.id });
+            parentGroup.groups.unshift(newGroup);
+            parentGroup.childrenOrder.unshift({
+                type: "group",
+                id: newGroup.id,
+            });
             this.validateCurrentState();
         }
     }
@@ -263,6 +276,30 @@ export class FilterEditorStore {
     }
 
     @action.bound
+    moveFilterItem(
+        sourceItem: MoveFilterItem,
+        target: MoveTargetFilterItem,
+        filterType: "group" | "condition",
+        position: "before" | "after"
+    ) {
+        if (sourceItem.id === target.id) return;
+
+        const pendingItem = this._removeItemFromGroup(
+            sourceItem.parentGroupId,
+            sourceItem.id,
+            filterType
+        );
+        if (!pendingItem) return;
+
+        this._movePendingItemToGroupByPosition(
+            target.parentGroupId,
+            pendingItem,
+            target.id,
+            position
+        );
+    }
+
+    @action.bound
     loadFilter(value: string) {
         try {
             this.transientIdCounter = 0;
@@ -332,6 +369,83 @@ export class FilterEditorStore {
 
     private generateTransientId(): number {
         return ++this.transientIdCounter;
+    }
+
+    @action.bound
+    private _removeItemFromGroup(
+        groupId: number,
+        itemId: number,
+        filterType: "group" | "condition"
+    ): FilterCondition | FilterGroup | undefined {
+        const group = this._findGroupById(this.filterState.rootGroup, groupId);
+        if (!group) return undefined;
+
+        let index = -1;
+        let item;
+        if (filterType === "condition") {
+            index = group.conditions.findIndex((c) => c.id === itemId);
+            if (index === -1) return undefined;
+            [item] = group.conditions.splice(index, 1);
+            group.childrenOrder = group.childrenOrder.filter(
+                (child) => !(child.type === "condition" && child.id === itemId)
+            );
+        } else {
+            index = group.groups.findIndex((c) => c.id === itemId);
+            if (index === -1) return undefined;
+            [item] = group.groups.splice(index, 1);
+            group.childrenOrder = group.childrenOrder.filter(
+                (child) => !(child.type === "group" && child.id === itemId)
+            );
+        }
+        return item;
+    }
+
+    @action.bound
+    private _movePendingItemToGroupByPosition(
+        targetGroupId: number,
+        pendingItem: FilterCondition | FilterGroup,
+        targetItemId?: number,
+        position: "before" | "after" = "after"
+    ) {
+        const filterType = "conditions" in pendingItem ? "group" : "condition";
+        const group = this._findGroupById(
+            this.filterState.rootGroup,
+            targetGroupId
+        );
+        if (!group) return;
+
+        group.childrenOrder = group.childrenOrder.filter(
+            (child) =>
+                !(child.type === filterType && child.id === pendingItem.id)
+        );
+
+        const anchorIndex =
+            targetItemId === undefined
+                ? -1
+                : group.childrenOrder.findIndex(
+                      (child) => child.id === targetItemId
+                  );
+        const insertIndex =
+            anchorIndex === -1
+                ? group.childrenOrder.length
+                : anchorIndex + (position === "after" ? 1 : 0);
+
+        group.childrenOrder.splice(insertIndex, 0, {
+            type: filterType,
+            id: pendingItem.id,
+        });
+
+        const items =
+            filterType === "condition" ? group.conditions : group.groups;
+        const existingIdx = items.findIndex((c) => c.id === pendingItem.id);
+        if (existingIdx === -1 && pendingItem) {
+            if (filterType === "condition") {
+                group.conditions.push(pendingItem as FilterCondition);
+            } else {
+                group.groups.push(pendingItem as FilterGroup);
+            }
+        }
+        this.validateCurrentState();
     }
 
     private _findGroupById(

@@ -178,10 +178,10 @@ function FeatureFilterEditorTest() {
                     value={
                         currentInlineFilter
                             ? JSON.stringify(
-                                  JSON.parse(currentInlineFilter),
-                                  null,
-                                  2
-                              )
+                                JSON.parse(currentInlineFilter),
+                                null,
+                                2
+                            )
                             : ""
                     }
                 />
@@ -251,7 +251,7 @@ function FeatureFilterEditorTest() {
                 style={{
                     width: "100%",
                     marginBottom: "20px",
-                    height: "400px",
+                    height: "500px",
                     display: "flex",
                     flexDirection: "column",
                 }}
