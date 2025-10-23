@@ -214,38 +214,42 @@ msgid "Could not determine a geometry type."
 msgstr "Не удалось определить тип геометрии."
 
 #: ogrloader.py:314
-msgid "Source layer contains no features satisfying the conditions."
-msgstr "Слой не содержит объектов, удовлетворяющих условиям."
+msgid ""
+"The source layer contains no suitable features, or contains features of "
+"different geometry types."
+msgstr ""
+"Исходный слой не содержит подходящих объектов или содержит объекты разных "
+"типов геометрий."
 
-#: ogrloader.py:331
+#: ogrloader.py:332
 msgid "Field '%s' is out of int32 range."
 msgstr "Значение поля '%s' находится за пределами диапазона int32."
 
-#: ogrloader.py:339
+#: ogrloader.py:340
 msgid "Field '%s' contains non-unique or empty values."
 msgstr "Значение поля '%s' содержит неуникальное или пустое значение."
 
-#: ogrloader.py:356
+#: ogrloader.py:357
 msgid "Parameter 'fid_field' is missing."
 msgstr "Отсутствует параметр 'fid_field'"
 
-#: ogrloader.py:359
+#: ogrloader.py:360
 msgid "Fields %s not found."
 msgstr "Поле %s не найдено"
 
-#: ogrloader.py:361
+#: ogrloader.py:362
 msgid "None of fields %s are integer."
 msgstr "Ни одно из полей %d не является целочисленным."
 
-#: ogrloader.py:375
+#: ogrloader.py:376
 msgid "Field '%s(?)' encoding is broken."
 msgstr "Кодировка поля '%s(?)' повреждена."
 
-#: ogrloader.py:390
+#: ogrloader.py:391
 msgid "Unsupported field type: %r."
 msgstr "Тип поля %r не поддерживается."
 
-#: ogrloader.py:416
+#: ogrloader.py:417
 msgid ""
 "The source layer has a local coordinate system and can't be reprojected to "
 "the target coordinate system."
@@ -253,7 +257,7 @@ msgstr ""
 "Исходный слой имеет локальную систему координат и не может быть "
 "перепроецирован в целевую."
 
-#: ogrloader.py:499
+#: ogrloader.py:500
 msgid ""
 "Feature #%d has a geometry that can't be reprojected to target coordinate "
 "system"
@@ -261,50 +265,50 @@ msgstr ""
 "Геометрия объект #%d не может быть перепроецирована в целевую систему "
 "координат."
 
-#: ogrloader.py:544
+#: ogrloader.py:545
 msgid "Vector layer cannot be written due to errors."
 msgstr "Векторный слой не может быть записан из-за ошибок."
 
-#: ogrloader.py:570
+#: ogrloader.py:571
 msgid "Feature (seq. #%d) doesn't have a FID field '%s'."
 msgstr "Объект (ном. #%d) не содержит поле FID '%s'."
 
-#: ogrloader.py:574
+#: ogrloader.py:575
 msgid "Feature (seq. #%d) FID field '%s' is null."
 msgstr "Объект (ном. #%d) содержит пустое поле FID '%s'."
 
-#: ogrloader.py:621 ogrloader.py:660
+#: ogrloader.py:622 ogrloader.py:661
 msgid "Feature #%d has multiple geometries satisfying the conditions."
 msgstr "Объект #%d содержит несколько геометрий, удовлетворяющих условиям."
 
-#: ogrloader.py:631
+#: ogrloader.py:632
 msgid "Feature #%d has unknown geometry type: %d (%s)."
 msgstr "Объект #%d содержит неизвестный тип геометрии: %d (%s)."
 
-#: ogrloader.py:640
+#: ogrloader.py:641
 msgid "Feature #%d has unsuitable geometry type: %d (%s)."
 msgstr "Объект #%d содержит неподходящий тип геометрии: %d (%s)."
 
-#: ogrloader.py:678
+#: ogrloader.py:679
 msgid "Feature #%d has empty rings."
 msgstr "Объект #%d содержит пустые кольца."
 
-#: ogrloader.py:689
+#: ogrloader.py:690
 msgid "Feature #%d has unclosed rings."
 msgstr "Объект #%d содержит незамкнутые кольца."
 
-#: ogrloader.py:699
+#: ogrloader.py:700
 msgid "Feature #%d has less than 3 points in a polygon ring."
 msgstr "Объект #%d содержит меньше 3-х точек в кольце полигона."
 
-#: ogrloader.py:711
+#: ogrloader.py:712
 msgid "Feature #%d contains an empty linestring."
 msgstr "Объект #%d содержит пустую линию."
 
-#: ogrloader.py:717
+#: ogrloader.py:718
 msgid "Feature #%d has less than 2 points in a linestring."
 msgstr "Объект #%d содержит меньше 2-х точек в линии."
 
-#: ogrloader.py:734
+#: ogrloader.py:735
 msgid "Feature #%d contains a broken encoding of field '%s'."
 msgstr "Объект #%d содержит поврежденную кодировку поля '%s'."

@@ -311,7 +311,8 @@ class OGRLoader:
             err_msg = gettext("Could not determine a geometry type.")
             if len(geom_filter) == 0:
                 err_msg += " " + gettext(
-                    "Source layer contains no features satisfying the conditions."
+                    "The source layer contains no suitable features, or "
+                    "contains features of different geometry types."
                 )
             raise VE(message=err_msg)
 
