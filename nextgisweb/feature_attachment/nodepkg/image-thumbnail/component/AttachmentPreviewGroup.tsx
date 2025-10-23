@@ -123,9 +123,11 @@ export function AttachmentPreviewGroup({
             },
 
             imageRender: (originalNode, info) => {
-                return previewImages[info.current].isPanorama &&
-                    panoramaMode ? (
-                    <Suspense fallback={<CentralLoading />}>
+                const current = previewImages[info.current];
+                const key = current.name ?? info.current;
+
+                return current.isPanorama && panoramaMode ? (
+                    <Suspense key={key} fallback={<CentralLoading />}>
                         <PhotospherePreview
                             url={info.image.url}
                             onReady={(viewer) => {
@@ -138,7 +140,7 @@ export function AttachmentPreviewGroup({
                         />
                     </Suspense>
                 ) : (
-                    originalNode
+                    <div key={key}>{originalNode}</div>
                 );
             },
             onVisibleChange,

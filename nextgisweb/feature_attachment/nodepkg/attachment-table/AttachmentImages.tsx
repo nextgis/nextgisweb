@@ -20,7 +20,9 @@ export function AttachmentImages({
             {attachments.map((attachment, index) => {
                 return (
                     <ImageThumbnail
-                        key={index}
+                        key={
+                            attachment.id ?? attachment.name ?? `index-${index}`
+                        }
                         attachment={attachment}
                         resourceId={resourceId}
                         featureId={featureId}
