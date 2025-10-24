@@ -79,6 +79,7 @@ class CoreComponent(StorageComponentMixin, Component):
                 options="-c lock_timeout=%d" % lock_timeout_ms,
             ),
             pool_pre_ping=opt_db["pool.pre_ping"],
+            future=True,
         )
         if "pool.recycle" in opt_db:
             args["pool_recycle"] = int(opt_db["pool.recycle"].total_seconds())

@@ -29,7 +29,7 @@ def creds(ngw_env):
     )
 
     engine_url = make_engine_url(EngineURL.create("postgresql+psycopg2", **con_args))
-    engine = sa.create_engine(engine_url)
+    engine = sa.create_engine(engine_url, future=True)
 
     with engine.connect() as conn:
         with conn.begin():

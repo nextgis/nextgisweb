@@ -27,6 +27,7 @@ class DatabaseBackend(BackendBase):
             json_deserializer=json.loads,
             isolation_level="AUTOCOMMIT",
             pool_pre_ping=True,
+            future=True,
         )
 
         self.insert = tab_journal.insert()

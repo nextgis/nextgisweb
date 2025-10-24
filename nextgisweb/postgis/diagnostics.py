@@ -176,7 +176,11 @@ class PostgresCheck(ConnectionCheck):
         if self.sslmode is not None:
             connect_args["sslmode"] = self.sslmode.value
         engine = create_engine(
-            url, client_encoding="utf-8", poolclass=NullPool, connect_args=connect_args
+            url,
+            client_encoding="utf-8",
+            poolclass=NullPool,
+            connect_args=connect_args,
+            future=True,
         )
         try:
             conn = self._conn = engine.connect()
