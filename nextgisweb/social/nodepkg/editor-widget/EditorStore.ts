@@ -25,6 +25,7 @@ export class EditorStore
         this.composite = composite;
     }
 
+    @action.bound
     load(value: apitype.SocialRead) {
         this.imageUpdated = null;
         if (value.image_exists && this.composite.resourceId !== null) {

@@ -19,7 +19,7 @@ import AddCircleIcon from "@nextgisweb/icon/material/add_circle";
 
 export interface DrawModeProps {
     geomType: OlGeometryType;
-    geomLayout: GeometryLayout;
+    geomLayout?: GeometryLayout;
     clearPrevious?: boolean;
     onDrawend?: (ev: DrawEvent) => Promise<void>;
     onDrawstart?: (ev: DrawEvent) => void;

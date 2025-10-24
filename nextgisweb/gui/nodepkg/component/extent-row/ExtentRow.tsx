@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { useCallback, useState } from "react";
+import { useCallback, useState, useTransition } from "react";
 
 import { Button, InputNumber, Space } from "@nextgisweb/gui/antd";
 import type { InputNumberProps } from "@nextgisweb/gui/antd";
@@ -9,8 +9,13 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { useResourcePicker } from "@nextgisweb/resource/component/resource-picker/hook";
 import type { ResourcePickerStoreOptions } from "@nextgisweb/resource/component/resource-picker/type";
 
+import { ExtentEditorModal } from "../extent-editor-modal";
+
+import { unionExtents } from "./util";
+
 import ClearIcon from "@nextgisweb/icon/material/close";
 import LayersIconOutlined from "@nextgisweb/icon/material/layers";
+import MapIcon from "@nextgisweb/icon/material/map";
 
 import "./ExtentRow.less";
 
@@ -80,7 +85,9 @@ export const ExtentRow = observer(
         hideResourcePicker,
         labelType = "geo",
     }: ExtentRowProps) => {
-        const [loading, setIsLoading] = useState(false);
+        const [loading, startTransition] = useTransition();
+
+        const [editOpen, setEditOpen] = useState(false);
 
         const { makeSignal } = useAbortController();
 
@@ -90,21 +97,27 @@ export const ExtentRow = observer(
             showResourcePicker({
                 pickerOptions: {
                     requireInterface: "IBboxLayer",
+                    multiple: true,
                     ...pickerOptions,
                 },
-                onSelect: async (resourceId: number) => {
-                    setIsLoading(true);
-                    try {
-                        const res = await getExtentFromLayer({
-                            resourceId,
-                            signal: makeSignal(),
-                        });
-                        if (onChange) {
-                            onChange(res);
+                onSelect: (resourceIds: number[]) => {
+                    startTransition(async () => {
+                        try {
+                            const signal = makeSignal();
+                            const extents = await Promise.all(
+                                resourceIds.map((id) =>
+                                    getExtentFromLayer({
+                                        resourceId: id,
+                                        signal,
+                                    }).catch(() => ({}) as ExtentRowValue)
+                                )
+                            );
+                            const combined = unionExtents(extents);
+                            onChange?.(combined);
+                        } catch {
+                            onChange?.({});
                         }
-                    } finally {
-                        setIsLoading(false);
-                    }
+                    });
                 },
             });
         }, [makeSignal, onChange, pickerOptions, showResourcePicker]);
@@ -118,7 +131,7 @@ export const ExtentRow = observer(
                             icon={<LayersIconOutlined />}
                             onClick={onSetFromLayerClick}
                         >
-                            {gettext("From layer")}
+                            {gettext("From layers")}
                         </Button>
                         <Button
                             title={gettext("Clean")}
@@ -150,6 +163,23 @@ export const ExtentRow = observer(
                         />
                     ))}
                 </Space.Compact>
+
+                <Button
+                    title={gettext("Edit on map")}
+                    icon={<MapIcon />}
+                    onClick={() => setEditOpen(true)}
+                />
+                {editOpen && (
+                    <ExtentEditorModal
+                        open={editOpen}
+                        onClose={() => setEditOpen(false)}
+                        value={value}
+                        onChange={(ext) => {
+                            onChange?.(ext);
+                            setEditOpen(false);
+                        }}
+                    />
+                )}
             </div>
         );
     }

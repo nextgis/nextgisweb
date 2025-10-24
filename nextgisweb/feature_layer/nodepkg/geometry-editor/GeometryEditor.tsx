@@ -9,7 +9,7 @@ import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { MapToolbarControl, NGWLayer } from "@nextgisweb/webmap/map-component";
 import type { LayerOptions } from "@nextgisweb/webmap/map-component/hook/useNGWLayer";
 import { EditableItem } from "@nextgisweb/webmap/plugin/layer-editor/EditableItem";
-import { ClearAllMode } from "@nextgisweb/webmap/plugin/layer-editor/modes/ClearAll";
+import { ClearAllBtn } from "@nextgisweb/webmap/plugin/layer-editor/modes/ClearAllBtn";
 import { DeleteMode } from "@nextgisweb/webmap/plugin/layer-editor/modes/DeleteMode";
 import { DrawMode } from "@nextgisweb/webmap/plugin/layer-editor/modes/DrawMode";
 import { HoleMode } from "@nextgisweb/webmap/plugin/layer-editor/modes/HoleMode";
@@ -169,7 +169,7 @@ const GeometryEditor = observer(
                                 {store.multiGeometry && (
                                     <DeleteMode order={6} />
                                 )}
-                                <ClearAllMode order={8} />
+                                <ClearAllBtn order={8} />
                             </>
                         )}
                     </EditableItem>
