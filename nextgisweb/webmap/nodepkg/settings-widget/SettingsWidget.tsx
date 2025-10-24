@@ -1,7 +1,14 @@
 import { observer } from "mobx-react-lite";
 import { useState } from "react";
 
-import { Badge, Button, InputValue, Modal, Select } from "@nextgisweb/gui/antd";
+import {
+    Badge,
+    Button,
+    InputValue,
+    Modal,
+    Select,
+    Space,
+} from "@nextgisweb/gui/antd";
 import { ExtentRow } from "@nextgisweb/gui/component";
 import { Area, Lot } from "@nextgisweb/gui/mayout";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -15,6 +22,7 @@ import { SelectLegendSymbols } from "../component";
 
 import { OptionsWidget } from "./OptionsWidget";
 import type { SettingStore } from "./SettingStore";
+import { ComputeWebmapExtent } from "./component/ComputeWebmapExtent";
 
 const { annotation } = settings;
 
@@ -54,30 +62,49 @@ const editingOptions = [
 export const SettingsWidget: EditorWidget<SettingStore> = observer(
     ({ store }) => {
         const [optionsModal, setOptionsModal] = useState(false);
+
         return (
             <>
                 <Area pad cols={["1fr", "1fr"]}>
                     <Lot row label={msgInitExtent} help={msgInitExtentHelp}>
-                        <ExtentRow
-                            pickerOptions={{
-                                parentId: store.composite.parent || undefined,
-                            }}
-                            value={store.initialExtent}
-                            onChange={(value) => {
-                                store.setExtent(value);
-                            }}
-                        />
+                        <Space.Compact direction="horizontal">
+                            <ExtentRow
+                                pickerOptions={{
+                                    parentId:
+                                        store.composite.parent || undefined,
+                                }}
+                                value={store.initialExtent}
+                                onChange={(value) => {
+                                    store.setExtent(value);
+                                }}
+                            />
+                            <ComputeWebmapExtent
+                                store={store}
+                                onDone={(extent) => {
+                                    store.setExtent(extent);
+                                }}
+                            />
+                        </Space.Compact>
                     </Lot>
                     <Lot row label={msgConstrExtent} help={msgConstrExtentHelp}>
-                        <ExtentRow
-                            pickerOptions={{
-                                parentId: store.composite.parent ?? undefined,
-                            }}
-                            value={store.constrainingExtent}
-                            onChange={(value) => {
-                                store.setConstrainedExtent(value);
-                            }}
-                        />
+                        <Space.Compact direction="horizontal">
+                            <ExtentRow
+                                pickerOptions={{
+                                    parentId:
+                                        store.composite.parent ?? undefined,
+                                }}
+                                value={store.constrainingExtent}
+                                onChange={(value) => {
+                                    store.setConstrainedExtent(value);
+                                }}
+                            />
+                            <ComputeWebmapExtent
+                                store={store}
+                                onDone={(extent) => {
+                                    store.setConstrainedExtent(extent);
+                                }}
+                            />
+                        </Space.Compact>
                     </Lot>
                     <Lot row label={msgTitle}>
                         <InputValue

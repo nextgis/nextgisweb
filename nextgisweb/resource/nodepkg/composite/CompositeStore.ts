@@ -155,6 +155,23 @@ export class CompositeStore {
         return this.members?.every((member) => member.store.isValid) ?? true;
     }
 
+    async getValue() {
+        const data: CompositeCreate | CompositeUpdate = {};
+
+        for (const { store } of this.initializationGuard(this.members)) {
+            const { identity, getValue } = store;
+            if (!identity || !getValue) continue;
+
+            const result = await getValue();
+            if (result === undefined) continue;
+
+            const current = get(data, identity);
+            set(data, identity, current ? { ...current, ...result } : result);
+        }
+
+        return data;
+    }
+
     async dump(
         lunkwill: LunkwillParam
     ): Promise<CompositeCreate | CompositeUpdate> {
