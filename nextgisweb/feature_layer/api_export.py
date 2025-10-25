@@ -71,7 +71,7 @@ def _ogr_layer_from_features(
         f_kw["aliases"] = aliases
 
     for f in features:
-        if make_valid:
+        if make_valid and f.geom is not None:
             f.geom = Geometry(ogr=f.geom.ogr.MakeValid())
         ogr_layer.CreateFeature(f.to_ogr(layer_defn, **f_kw))
 
