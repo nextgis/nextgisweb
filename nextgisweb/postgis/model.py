@@ -302,7 +302,14 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
     def setup(self):
         fdata = dict()
         for f in self.fields:
-            fdata[f.keyname] = dict(display_name=f.display_name, grid_visibility=f.grid_visibility)
+            fdata[f.keyname] = dict(
+                (k, getattr(f, k))
+                for k in (
+                    "display_name",
+                    "grid_visibility",
+                    "lookup_table_id",
+                )
+            )
 
         for f in list(self.fields):
             self.fields.remove(f)
@@ -409,7 +416,8 @@ class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
                         continue
 
                     fopts = dict(display_name=column["name"])
-                    fopts.update(fdata.get(column["name"], dict()))
+                    if prev := fdata.get(column["name"]):
+                        fopts.update(prev)
                     self.fields.append(
                         PostgisLayerField(
                             keyname=column["name"],
