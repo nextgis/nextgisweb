@@ -2,7 +2,14 @@ import { Fill, Stroke, Style } from "ol/style";
 import CircleStyle from "ol/style/Circle";
 import type { Options as StyleOptions } from "ol/style/Style";
 
-export function colorForLayer(id: number | string) {
+export interface LayerColor {
+    fillSelect: string;
+    baseColor: string;
+    stroke: string;
+    fill: string;
+}
+
+export function colorForLayer(id: number | string): LayerColor {
     const numId =
         typeof id === "number"
             ? id
@@ -14,7 +21,7 @@ export function colorForLayer(id: number | string) {
     const base = `hsl(${hue} ${s}% ${l}%)`;
     const fill = `hsl(${hue} ${s}% ${Math.max(30, l - 18)}% / 0.3)`;
     const fillSelect = `hsl(${hue} ${s}% ${Math.max(30, l - 12)}% / 0.7)`;
-    return { stroke: base, fill, fillSelect };
+    return { baseColor: base, stroke: base, fill, fillSelect };
 }
 
 export function generateStyleForId({ id }: { id: number | string }) {
@@ -41,6 +48,7 @@ export function generateStyleForId({ id }: { id: number | string }) {
     };
     const selectStyle = new Style(selectStyleOptions);
     return {
+        color: c,
         layerStyle,
         selectStyle,
         selectStyleOptions,

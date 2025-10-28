@@ -4,18 +4,25 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type { EditorWidgetProps } from "@nextgisweb/feature-layer/feature-editor/type";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
 import type { SizeType } from "@nextgisweb/gui/fields-form";
-import { DeleteIcon } from "@nextgisweb/gui/icon";
 import { convertWSENToNgwExtent } from "@nextgisweb/gui/util/extent";
 import { useAbortController } from "@nextgisweb/pyramid/hook";
-import { gettext } from "@nextgisweb/pyramid/i18n";
-import { ButtonControl, NGWLayer } from "@nextgisweb/webmap/map-component";
+import { MapToolbarControl, NGWLayer } from "@nextgisweb/webmap/map-component";
 import type { LayerOptions } from "@nextgisweb/webmap/map-component/hook/useNGWLayer";
+import { EditableItem } from "@nextgisweb/webmap/plugin/layer-editor/EditableItem";
+import { ClearAllBtn } from "@nextgisweb/webmap/plugin/layer-editor/modes/ClearAllBtn";
+import { DeleteMode } from "@nextgisweb/webmap/plugin/layer-editor/modes/DeleteMode";
+import { DrawMode } from "@nextgisweb/webmap/plugin/layer-editor/modes/DrawMode";
+import { HoleMode } from "@nextgisweb/webmap/plugin/layer-editor/modes/HoleMode";
+import { ModifyMode } from "@nextgisweb/webmap/plugin/layer-editor/modes/ModifyMode";
+import { MoveMode } from "@nextgisweb/webmap/plugin/layer-editor/modes/MoveMode";
 import { PreviewMap } from "@nextgisweb/webmap/preview-map";
+import {
+    getOlGeometryType,
+    getOlLayout,
+} from "@nextgisweb/webmap/utils/geometry-types";
 
 import { getFeatureStyle } from "../geometry-info/component/GeometryInfoPreview";
 
-import { DrawInteraction } from "./DrawInteraction";
-import { EditableVectorLayer } from "./EditableVectorLayer";
 import GeometryEditorStore from "./GeometryEditorStore";
 import type { FeatureGeometry } from "./GeometryEditorStore";
 import { DEFAULT_PADDING, DEFAULT_SRS } from "./constant";
@@ -41,14 +48,11 @@ const GeometryEditor = observer(
             return new GeometryEditorStore();
         });
 
-        const {
-            isReady,
-            geometryType,
-            multiGeometry,
-            source,
-            value,
-            initExtent,
-        } = store;
+        const [mode, setMode] = useState<string | null>(() =>
+            store.value ? ModifyMode.displayName : DrawMode.displayName
+        );
+
+        const { isReady, geometryType, source, value, initExtent } = store;
         const [extent] = useState(() => {
             return initExtent ? convertWSENToNgwExtent(initExtent) : undefined;
         });
@@ -121,12 +125,6 @@ const GeometryEditor = observer(
                 basemap
                 initialMapExtent={initialMapExtent}
             >
-                <EditableVectorLayer source={source} />
-                <DrawInteraction
-                    source={source}
-                    geometryType={geometryType}
-                    multiGeometry={multiGeometry}
-                />
                 {store._parentStore?.resourceId && (
                     <>
                         {initExtent && (
@@ -141,17 +139,41 @@ const GeometryEditor = observer(
                         />
                     </>
                 )}
-                {value && (
-                    <ButtonControl
-                        position="top-left"
-                        onClick={() => {
-                            store.source.clear();
-                        }}
-                        title={gettext("Clear")}
+                <MapToolbarControl
+                    position="top-right"
+                    margin
+                    direction="vertical"
+                    gap={4}
+                    id="editor-toolbar"
+                >
+                    <EditableItem
+                        source={source}
+                        enabled
+                        editingMode={mode}
+                        onEditingMode={setMode}
                     >
-                        <DeleteIcon />
-                    </ButtonControl>
-                )}
+                        <DrawMode
+                            order={1}
+                            geomType={getOlGeometryType(geometryType)}
+                            geomLayout={getOlLayout(geometryType)}
+                            clearPrevious={!store.multiGeometry}
+                        />
+
+                        {value && (
+                            <>
+                                <ModifyMode order={2} />
+                                <MoveMode order={3} />
+                                {geometryType.includes("POLYGON") && (
+                                    <HoleMode order={4} />
+                                )}
+                                {store.multiGeometry && (
+                                    <DeleteMode order={6} />
+                                )}
+                                <ClearAllBtn order={8} />
+                            </>
+                        )}
+                    </EditableItem>
+                </MapToolbarControl>
             </PreviewMap>
         );
     }

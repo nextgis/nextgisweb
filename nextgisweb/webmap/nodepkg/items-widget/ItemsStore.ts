@@ -61,8 +61,7 @@ export class ItemsStore
         this._loaded = true;
     }
 
-    dump(): PickMy<WebMapUpdate> | undefined {
-        if (!this.dirty) return undefined;
+    getValue = (): PickMy<WebMapUpdate> | undefined => {
         return {
             ...this.drawOrderEnabled.jsonPart(),
             root_item: {
@@ -70,6 +69,11 @@ export class ItemsStore
                 children: this.items.map((i) => i.dump()),
             },
         };
+    };
+
+    dump(): PickMy<WebMapUpdate> | undefined {
+        if (!this.dirty) return undefined;
+        return this.getValue();
     }
 
     @action

@@ -7,11 +7,11 @@ import { DeleteIcon } from "@nextgisweb/gui/icon";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { ToggleControl } from "@nextgisweb/webmap/map-component";
 
-import { EDITING_STATES } from "../constant";
 import { useEditorContext } from "../context/useEditorContext";
 import { useInteraction } from "../hook/useInteraction";
+import type { LayerEditorMode } from "../type";
 
-export function DeleteMode({ order }: { order?: number }) {
+export const DeleteMode: LayerEditorMode = ({ order }) => {
     const { layer, addUndo, selectStyle, selectStyleOptions } =
         useEditorContext();
 
@@ -36,7 +36,7 @@ export function DeleteMode({ order }: { order?: number }) {
     }, [layer, selectStyle, selectStyleOptions]);
 
     const hover = useInteraction(
-        `${EDITING_STATES.DELETING}-hover`,
+        `${DeleteMode.displayName}-hover`,
         active,
         creatHoverSelect
     );
@@ -62,11 +62,11 @@ export function DeleteMode({ order }: { order?: number }) {
         return select;
     }, [addUndo, hover, layer, selectStyle]);
 
-    useInteraction(`${EDITING_STATES.DELETING}-select`, active, createSelect);
+    useInteraction(`${DeleteMode.displayName}-select`, active, createSelect);
 
     return (
         <ToggleControl
-            groupId={EDITING_STATES.DELETING}
+            groupId={DeleteMode.displayName}
             title={gettext("Delete")}
             order={order}
             onChange={setActive}
@@ -74,4 +74,6 @@ export function DeleteMode({ order }: { order?: number }) {
             <DeleteIcon />
         </ToggleControl>
     );
-}
+};
+
+DeleteMode.displayName = "DeleteMode";

@@ -8,13 +8,13 @@ import { useCallback, useRef, useState } from "react";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { ToggleControl } from "@nextgisweb/webmap/map-component";
 
-import { EDITING_STATES } from "../constant";
 import { useEditorContext } from "../context/useEditorContext";
 import { useInteraction } from "../hook/useInteraction";
+import type { LayerEditorMode } from "../type";
 
 import MoveIcon from "@nextgisweb/icon/material/open_with";
 
-export function MoveMode({ order }: { order?: number }) {
+export const MoveMode: LayerEditorMode = ({ order, disabled }) => {
     const { layer, addUndo, selectStyle, selectStyleOptions } =
         useEditorContext();
 
@@ -42,7 +42,7 @@ export function MoveMode({ order }: { order?: number }) {
     }, [layer, selectStyle, selectStyleOptions]);
 
     const hover = useInteraction(
-        `${EDITING_STATES.MOVING}-hover`,
+        `${MoveMode.displayName}-hover`,
         active,
         createHover
     );
@@ -80,19 +80,22 @@ export function MoveMode({ order }: { order?: number }) {
     }, [addUndo, hover, layer]);
 
     useInteraction(
-        `${EDITING_STATES.MOVING}-translate`,
+        `${MoveMode.displayName}-translate`,
         active,
         createTranslate
     );
 
     return (
         <ToggleControl
-            groupId={EDITING_STATES.MOVING}
+            groupId={MoveMode.displayName}
             title={gettext("Move")}
             order={order}
             onChange={setActive}
+            disabled={disabled}
         >
             <MoveIcon />
         </ToggleControl>
     );
-}
+};
+
+MoveMode.displayName = "MoveMode";

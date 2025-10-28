@@ -10,19 +10,16 @@ import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { ToggleControl } from "@nextgisweb/webmap/map-component";
 
-import { EDITING_STATES } from "../constant";
 import { useEditorContext } from "../context/useEditorContext";
 import { useInteraction } from "../hook/useInteraction";
+import type { LayerEditorMode } from "../type";
 
 import ListIcon from "@nextgisweb/icon/material/list/outline";
 
-export function AttributeMode({
+export const AttributeMode: LayerEditorMode<{ resourceId: number }> = ({
     order,
     resourceId,
-}: {
-    order?: number;
-    resourceId: number;
-}) {
+}) => {
     const { layer, addUndo, selectStyle } = useEditorContext();
     const { modalHolder, lazyModal } = useShowModal();
     const { makeSignal } = useAbortController();
@@ -38,7 +35,7 @@ export function AttributeMode({
     }, [layer, selectStyle]);
 
     const hover = useInteraction(
-        `${EDITING_STATES.ATTRIBUTE_EDITING}-hoverselect`,
+        `${AttributeMode.displayName}-hoverselect`,
         active,
         createHoverSelect
     );
@@ -116,17 +113,13 @@ export function AttributeMode({
         return select;
     }, [addUndo, hover, layer, onUpdate, selectStyle]);
 
-    useInteraction(
-        `${EDITING_STATES.ATTRIBUTE_EDITING}-select`,
-        active,
-        createSelect
-    );
+    useInteraction(`${AttributeMode.displayName}-select`, active, createSelect);
 
     return (
         <>
             {modalHolder}
             <ToggleControl
-                groupId={EDITING_STATES.ATTRIBUTE_EDITING}
+                groupId={AttributeMode.displayName}
                 title={gettext("Edit attributes")}
                 order={order}
                 onChange={setActive}
@@ -135,4 +128,6 @@ export function AttributeMode({
             </ToggleControl>
         </>
     );
-}
+};
+
+AttributeMode.displayName = "AttributeMode";

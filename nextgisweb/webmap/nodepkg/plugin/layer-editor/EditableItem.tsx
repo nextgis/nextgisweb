@@ -2,7 +2,6 @@ import { observer } from "mobx-react-lite";
 import { Collection } from "ol";
 import type { Feature as OlFeature } from "ol";
 import type { Geometry } from "ol/geom";
-import type { GeometryLayout, Type as OlGeometryType } from "ol/geom/Geometry";
 import type { Interaction } from "ol/interaction";
 import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
@@ -29,12 +28,20 @@ export interface EditableItemProps {
 
     enabled?: boolean;
     children?: React.ReactNode;
-    geomType: OlGeometryType;
-    geomLayout?: GeometryLayout;
-    editingMode: string | null;
+
+    editingMode?: string | null;
 
     onDirtyChange?: (val: boolean) => void;
-    onEditingMode: (val: string | null) => void;
+    onEditingMode?: (val: string | null) => void;
+}
+
+function once<T extends (...args: any[]) => any>(fn: T): T {
+    let called = false;
+    return ((...args: Parameters<T>) => {
+        if (called) return;
+        called = true;
+        return fn(...args);
+    }) as T;
 }
 
 export const EditableItem = observer(
@@ -43,8 +50,6 @@ export const EditableItem = observer(
         source: outerSource,
         enabled,
         children,
-        geomType,
-        geomLayout,
         editingMode,
         onEditingMode,
         onDirtyChange,
@@ -56,7 +61,8 @@ export const EditableItem = observer(
         const [interactionsVersion, setInteractionsVersion] = useState(0);
 
         const [undo, setUndo] = useState<UndoAction[]>([]);
-        const addUndo = (fn: UndoAction) => setUndo((prev) => [...prev, fn]);
+        const addUndo = (fn: UndoAction) =>
+            setUndo((prev) => [...prev, once(fn)]);
         const dirty = undo.length > 0;
 
         const [style] = useState(() => generateStyleForId({ id: id ?? 0 }));
@@ -82,8 +88,9 @@ export const EditableItem = observer(
             layer.setSource(source);
 
             source.forEachFeature((f) => {
-                if (id === undefined || f.get("layer_id") === id)
+                if (id === undefined || f.get("layer_id") === id) {
                     features.push(f);
+                }
             });
 
             return { layer, source, features };
@@ -115,6 +122,20 @@ export const EditableItem = observer(
             setLayerOpacityDebounced(enabled && editingMode ? 1 : 0.4);
         }, [editingMode, enabled, setLayerOpacityDebounced]);
 
+        const onUndoClick = useCallback(() => {
+            setUndo((prev) => {
+                const next = [...prev];
+                const toUndo = next.pop();
+                // The undo action modifies the map source, which can trigger re-renders
+                // in parent components and lead to rendering conflicts.
+                setTimeout(() => {
+                    toUndo?.();
+                });
+
+                return next;
+            });
+        }, []);
+
         useUnsavedChanges({ dirty });
 
         return (
@@ -125,9 +146,10 @@ export const EditableItem = observer(
                     layer,
                     dirty,
                     source,
-                    geomType,
+
                     features,
-                    geomLayout,
+
+                    layerColor: style.color,
                     layerStyle: style.layerStyle,
                     selectStyle: style.selectStyle,
                     interactionsRef,
@@ -146,22 +168,14 @@ export const EditableItem = observer(
                             {children}
                         </ToggleGroup>
 
-                        {dirty && (
-                            <ButtonControl
-                                order={200}
-                                title={gettext("Undo the last change")}
-                                onClick={() => {
-                                    setUndo((prev) => {
-                                        const next = [...prev];
-                                        const u = next.pop();
-                                        u?.();
-                                        return next;
-                                    });
-                                }}
-                            >
-                                <UndoIcon />
-                            </ButtonControl>
-                        )}
+                        <ButtonControl
+                            disabled={!dirty}
+                            order={200}
+                            title={gettext("Undo the last change")}
+                            onClick={onUndoClick}
+                        >
+                            <UndoIcon />
+                        </ButtonControl>
                     </>
                 )}
             </EditorContext>

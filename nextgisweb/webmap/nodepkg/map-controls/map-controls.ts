@@ -47,7 +47,7 @@ mapControlRegistry(COMP_ID, {
 
 mapControlRegistry(COMP_ID, {
     key: "attr",
-    order: 10,
+    order: 30,
     position: { inside: "attribution-toolbar" },
     showOnPreview: true,
     embeddedShowMode: "always",
@@ -56,7 +56,7 @@ mapControlRegistry(COMP_ID, {
 
 mapControlRegistry(COMP_ID, {
     key: "is",
-    order: 30,
+    order: 10,
     label: gettext("Info scale"),
     position: { inside: "attribution-toolbar" },
     hideOnMobile: true,

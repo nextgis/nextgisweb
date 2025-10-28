@@ -19,6 +19,8 @@ export interface EditorStore<READ = any, CREATE = READ, UPDATE = CREATE> {
 
     load: (value: READ) => unknown;
 
+    getValue?: () => CREATE | UPDATE | undefined;
+
     dump: (val: DumpParams) => CREATE | UPDATE | undefined;
 
     dirty: boolean;

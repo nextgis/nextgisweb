@@ -22,6 +22,7 @@
 .mapadapter-ctrl-top-right {
     top: 0;
     right: 0;
+    align-items: end;
 
     .mapadapter-ctrl.mapadapter-ctrl-margin {
         margin-inline-end: 8px;
@@ -88,6 +89,14 @@
 
         &:hover {
             background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        &:disabled {
+            cursor: default;
+            opacity: 0.4;
+            color: var(--ol-subtle-foreground-color);
+            background-color: transparent;
+            pointer-events: none;
         }
 
         > svg.icon {

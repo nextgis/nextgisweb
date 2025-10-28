@@ -1,7 +1,7 @@
 import { Feature as OlFeature } from "ol";
 import WKT from "ol/format/WKT";
 import type { Geometry } from "ol/geom";
-import type { Type as OlGeometryType } from "ol/geom/Geometry";
+import type { GeometryLayout, Type as OlGeometryType } from "ol/geom/Geometry";
 import type VectorSource from "ol/source/Vector";
 
 import { route } from "@nextgisweb/pyramid/api";
@@ -52,7 +52,7 @@ export async function fetchResourceOlFeature({
 
 export interface GeomConfig {
     type: OlGeometryType;
-    layout: ReturnType<typeof getOlLayout>;
+    layout: GeometryLayout;
 }
 
 export async function getGeomConfig({

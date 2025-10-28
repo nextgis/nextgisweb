@@ -4,6 +4,10 @@ import type React from "react";
 
 import { MapControl } from "./MapControl";
 import type { MapControlProps } from "./MapControl";
+import {
+    MapToolbarControlContext,
+    useMapToolbarControl,
+} from "./MapToolbarControlContext";
 
 type Direction = "horizontal" | "vertical";
 
@@ -15,32 +19,48 @@ interface MapToolbarControlProps extends MapControlProps {
 
 export default function MapToolbarControl({
     direction = "horizontal",
+    position,
     children,
     align,
     style,
     gap,
     ...rest
 }: MapToolbarControlProps) {
-    const calcStyle = useMemo<React.CSSProperties>(
-        () => ({
+    const toolbarContext = useMapToolbarControl();
+
+    position = position || toolbarContext?.position;
+
+    const calcStyle = useMemo<React.CSSProperties>(() => {
+        const isRight =
+            typeof position === "string" && position.includes("right");
+        const isRightToLeft = direction === "horizontal" && isRight;
+
+        return {
             ...style,
             display: "flex",
-            flexDirection: direction === "horizontal" ? "row" : "column",
-            alignItems: align,
+            flexDirection:
+                direction === "horizontal"
+                    ? isRightToLeft
+                        ? "row-reverse"
+                        : "row"
+                    : "column",
+            alignItems: (align ?? isRight) ? "end" : undefined,
             ...(gap !== undefined
                 ? { gap: typeof gap === "number" ? `${gap}px` : gap }
                 : {}),
-        }),
-        [align, direction, style, gap]
-    );
+        };
+    }, [align, direction, style, gap, position]);
 
     return (
-        <MapControl
-            {...rest}
-            style={calcStyle}
-            className={classNames({ dense: gap === 0 || gap === "0px" })}
-        >
-            {children}
-        </MapControl>
+        <MapToolbarControlContext value={{ position, direction }}>
+            <MapControl
+                {...rest}
+                style={calcStyle}
+                className={classNames({ dense: gap === 0 || gap === "0px" })}
+                position={position}
+            >
+                {children}
+            </MapControl>
+        </MapToolbarControlContext>
     );
 }
