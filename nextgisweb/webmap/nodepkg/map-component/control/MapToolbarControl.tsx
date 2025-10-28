@@ -38,6 +38,7 @@ export default function MapToolbarControl({
         return {
             ...style,
             display: "flex",
+            pointerEvents: "none",
             flexDirection:
                 direction === "horizontal"
                     ? isRightToLeft
