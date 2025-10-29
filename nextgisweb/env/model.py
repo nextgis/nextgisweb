@@ -69,6 +69,7 @@ def _base_factory(comp_id):
             result.metadata.dependencies.append(cid)
 
     result.depends_on = depends_on
+    result.__allow_unmapped__ = True
     return result
 
 
