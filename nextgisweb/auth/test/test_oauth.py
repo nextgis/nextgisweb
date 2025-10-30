@@ -14,7 +14,7 @@ from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.logging import logger
 
 from ..model import Group, User
-from ..oauth import OAuthErrorResponse, OAuthHelper
+from ..oauth import OAuthErrorResponse, OAuthHelper, _member_of_from_token
 
 CLIENT_ID = token_hex()
 CLIENT_SECRET = token_urlsafe()
@@ -181,6 +181,29 @@ def principals():
         DBSession.delete(user)
         for keyname, _ in groups:
             DBSession.delete(Group.filter_by(keyname=keyname).one())
+
+
+@pytest.mark.parametrize(
+    "tdata, key, expected",
+    (
+        pytest.param(dict(simple="role"), "simple", {"role"}, id="simple"),
+        pytest.param(
+            dict(deep1=dict(deep2=dict(deep3=["role1", "role2"]))),
+            "deep1.deep2.deep3",
+            {"role1", "role2"},
+            id="deep",
+        ),
+        pytest.param(
+            dict(list=[dict(role="role1"), dict(role="role2")]),
+            "list.role",
+            {"role1", "role2"},
+            id="list",
+        ),
+    ),
+)
+def test_member_of_parse(tdata, key, expected):
+    result = _member_of_from_token(tdata, key)
+    assert result == expected
 
 
 @pytest.mark.parametrize(
