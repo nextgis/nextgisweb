@@ -30,6 +30,7 @@ import { ExportAction } from "./component/ExportAction";
 import type { ActionProps } from "./type";
 
 import FilterAltIcon from "@nextgisweb/icon/material/filter_alt/outline";
+import FilteredCount from "../filtered-count/FilteredCount";
 
 const msgOpenTitle = gettext("Open");
 const msgOpenOnNewPage = gettext("Open on a new page");
@@ -286,7 +287,9 @@ export const FeatureGridActions = observer(
             );
         }
 
-        const rightActions: ActionToolbarAction<ActionProps>[] = [];
+        const rightActions: ActionToolbarAction<ActionProps>[] = [
+            <FilteredCount store={store} key="filtered-count" />
+        ];
         if (isExportAllowed) {
             rightActions.push((props) => (
                 <ExportAction queryParams={queryParams} {...props} />

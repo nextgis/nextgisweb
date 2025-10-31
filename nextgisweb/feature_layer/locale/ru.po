@@ -1,12 +1,12 @@
-#: api.py:110 api_identify.py:27
+#: api.py:111 api_identify.py:27
 msgid "Geometry is not valid."
 msgstr "Невалидная геометрия"
 
-#: api.py:368
+#: api.py:369
 msgid "Unknown spatial reference system"
 msgstr "Неизвестная система координат"
 
-#: api.py:455 api_export.py:212
+#: api.py:456 api_export.py:212
 msgid "Parameter 'intersects' geometry is not valid."
 msgstr "Параметр 'intersects' содержит невалидную геометрию."
 
@@ -72,7 +72,7 @@ msgstr "Невозможно восстановить объект #{} поск�
 msgid "Feature table"
 msgstr "Таблица объектов"
 
-#: filter.py:20
+#: filter.py:32
 msgid "Invalid filter expression"
 msgstr "Некорректное выражение фильтра"
 
@@ -201,7 +201,6 @@ msgid "Apply"
 msgstr "Применить"
 
 #: nodepkg/feature-filter/FeatureFilterEditor.tsx:25
-#: nodepkg/geometry-editor/GeometryEditor.tsx:150
 msgid "Clear"
 msgstr "Очистить"
 
@@ -445,35 +444,35 @@ msgstr "Открыть настройки таблицы"
 msgid "Refresh table"
 msgstr "Обновить таблицу"
 
-#: nodepkg/feature-grid/FeatureGridActions.tsx:34
+#: nodepkg/feature-grid/FeatureGridActions.tsx:35
 msgid "Open"
 msgstr "Открыть"
 
-#: nodepkg/feature-grid/FeatureGridActions.tsx:35
+#: nodepkg/feature-grid/FeatureGridActions.tsx:36
 msgid "Open on a new page"
 msgstr "Открывать на новой странице"
 
-#: nodepkg/feature-grid/FeatureGridActions.tsx:36
+#: nodepkg/feature-grid/FeatureGridActions.tsx:37
 msgid "Delete"
 msgstr "Удалить"
 
-#: nodepkg/feature-grid/FeatureGridActions.tsx:37
+#: nodepkg/feature-grid/FeatureGridActions.tsx:38
 msgid "Edit"
 msgstr "Редактировать"
 
-#: nodepkg/feature-grid/FeatureGridActions.tsx:38
+#: nodepkg/feature-grid/FeatureGridActions.tsx:39
 msgid "Edit on a new page"
 msgstr "Редактировать на новой странице"
 
-#: nodepkg/feature-grid/FeatureGridActions.tsx:39
+#: nodepkg/feature-grid/FeatureGridActions.tsx:40
 msgid "Create"
 msgstr "Создать"
 
-#: nodepkg/feature-grid/FeatureGridActions.tsx:41
+#: nodepkg/feature-grid/FeatureGridActions.tsx:42
 msgid "Search..."
 msgstr "Поиск..."
 
-#: nodepkg/feature-grid/FeatureGridActions.tsx:42
+#: nodepkg/feature-grid/FeatureGridActions.tsx:43
 msgid "Advanced filter"
 msgstr "Расширенный фильтр"
 
@@ -547,6 +546,15 @@ msgstr "Удаление этого поля навсегда сотрёт вс�
 #: nodepkg/fields-widget/FieldsWidget.tsx:123
 msgid "Field"
 msgstr "Поле"
+
+#: nodepkg/filtered-count/FilteredCount.tsx:67
+#: nodepkg/filtered-count/FilteredCount.tsx:109
+msgid "Features count"
+msgstr "Количество объектов"
+
+#: nodepkg/filtered-count/FilteredCount.tsx:72
+msgid "{filtered_count} of {total_count}"
+msgstr "{filtered_count} из {total_count}"
 
 #: nodepkg/geometry-editor/plugin.ts:10
 msgid "Geometry"
