@@ -23,6 +23,7 @@ import { useResource } from "@nextgisweb/resource/hook/useResource";
 import type { CompositeRead } from "@nextgisweb/resource/type/api";
 
 import type { FeatureEditorWidgetProps } from "../feature-editor/type";
+import FilteredCount from "../filtered-count/FilteredCount";
 
 import type { FeatureGridStore } from "./FeatureGridStore";
 import { deleteFeatures } from "./api/deleteFeatures";
@@ -30,7 +31,6 @@ import { ExportAction } from "./component/ExportAction";
 import type { ActionProps } from "./type";
 
 import FilterAltIcon from "@nextgisweb/icon/material/filter_alt/outline";
-import FilteredCount from "../filtered-count/FilteredCount";
 
 const msgOpenTitle = gettext("Open");
 const msgOpenOnNewPage = gettext("Open on a new page");
@@ -287,23 +287,6 @@ export const FeatureGridActions = observer(
             );
         }
 
-        const rightActions: ActionToolbarAction<ActionProps>[] = [
-            <FilteredCount store={store} key="filtered-count" />
-        ];
-        if (isExportAllowed) {
-            rightActions.push((props) => (
-                <ExportAction queryParams={queryParams} {...props} />
-            ));
-        }
-
-        const actionProps: ActionProps = useMemo(
-            () => ({
-                selectedIds,
-                id,
-            }),
-            [selectedIds, id]
-        );
-
         let advancedButton = undefined;
         if (
             resourceData?.resource?.interfaces?.includes(
@@ -322,6 +305,40 @@ export const FeatureGridActions = observer(
             );
         }
 
+        const rightActions: ActionToolbarAction<ActionProps>[] = [
+            <FilteredCount store={store} key="filtered-count" />,
+            <div key="search">
+                <Space.Compact>
+                    <Input
+                        value={queryParams?.ilike}
+                        placeholder={msgSearchPlaceholder}
+                        onChange={(e) =>
+                            store.setQueryParams({
+                                ...store.queryParams,
+                                ilike: e.target.value,
+                            })
+                        }
+                        allowClear
+                        size={size}
+                    />
+                    {advancedButton}
+                </Space.Compact>
+            </div>,
+        ];
+        if (isExportAllowed) {
+            rightActions.push((props) => (
+                <ExportAction queryParams={queryParams} {...props} />
+            ));
+        }
+
+        const actionProps: ActionProps = useMemo(
+            () => ({
+                selectedIds,
+                id,
+            }),
+            [selectedIds, id]
+        );
+
         return (
             <ActionToolbar
                 size={size}
@@ -331,23 +348,6 @@ export const FeatureGridActions = observer(
             >
                 {contextHolder}
                 {modalHolder}
-                <div>
-                    <Space.Compact>
-                        <Input
-                            value={queryParams?.ilike}
-                            placeholder={msgSearchPlaceholder}
-                            onChange={(e) =>
-                                store.setQueryParams({
-                                    ...store.queryParams,
-                                    ilike: e.target.value,
-                                })
-                            }
-                            allowClear
-                            size={size}
-                        />
-                        {advancedButton}
-                    </Space.Compact>
-                </div>
                 {children}
             </ActionToolbar>
         );
