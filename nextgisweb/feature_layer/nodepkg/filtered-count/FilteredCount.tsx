@@ -64,7 +64,7 @@ const FilteredCountExpanded = observer(
             };
         }, [abort]);
 
-        let displayText = gettext("Features count");
+        let displayText = undefined;
         if (countData) {
             const { total_count, filtered_count } = countData;
             displayText =
@@ -75,15 +75,15 @@ const FilteredCountExpanded = observer(
                       })
                     : `${total_count}`;
         }
+        const tooltipText = displayText || gettext("Features count");
 
         return (
-            <Tooltip title={displayText}>
+            <Tooltip title={tooltipText}>
                 <Button
                     type="default"
                     size={size}
                     icon={<TagIcon />}
                     onClick={handleToggle}
-                    loading={!countData}
                 >
                     {displayText}
                 </Button>
