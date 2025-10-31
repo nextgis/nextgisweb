@@ -12,7 +12,7 @@ import type {
     ResourceInterface,
 } from "@nextgisweb/resource/type/api";
 
-import { renderResourceCls } from "../../util/renderResourceCls";
+import { ResourceLabel } from "../ResourceLabel";
 
 import usePickerCard from "./hook/usePickerCard";
 import type {
@@ -197,8 +197,9 @@ function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
                 className: "displayName",
                 dataIndex: "display_name",
                 sorter: sorterFactory("display_name"),
-                render: (value, { cls }: PickerResource) =>
-                    renderResourceCls({ name: value, cls }),
+                render: (value, { cls, id }: PickerResource) => (
+                    <ResourceLabel label={value} resourceId={id} cls={cls} />
+                ),
             },
             {
                 className: "actions",
