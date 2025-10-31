@@ -47,6 +47,26 @@ export function Base({
     });
 
     useEffect(() => {
+        let meta = document.querySelector('meta[name="theme-color"]');
+        if (!meta) {
+            meta = document.createElement("meta");
+            meta.setAttribute("name", "theme-color");
+            document.head.appendChild(meta);
+        }
+
+        const primaryColor = getComputedStyle(document.documentElement)
+            .getPropertyValue("--primary")
+            .trim();
+
+        if (primaryColor) {
+            meta.setAttribute("content", primaryColor);
+        }
+
+        document.documentElement.style.backgroundColor = "var(--primary)";
+        document.body.style.backgroundColor = "#fff";
+    }, []);
+
+    useEffect(() => {
         layoutStore.setModalApi(modalApi);
     }, [modalApi]);
 
