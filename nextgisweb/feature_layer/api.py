@@ -20,6 +20,7 @@ from .dtutil import DT_DATATYPES, DT_DUMPERS, DT_LOADERS, DtFormat
 from .exception import FeatureNotFound
 from .extension import FeatureExtension
 from .feature import Feature
+from .filter import str_contains_filter
 from .interface import (
     FIELD_TYPE,
     IFeatureLayer,
@@ -425,7 +426,7 @@ def apply_fields_filter(query, request):
 
 
 def apply_filter_expression(query, resource, filter):
-    if filter in (None, ""):
+    if not str_contains_filter(filter):
         return
 
     if not IFilterableFeatureLayer.providedBy(resource):
@@ -580,18 +581,51 @@ def cdelete(resource, request) -> JSONType:
     return result
 
 
+def has_filters(request, filter):
+    if str_contains_filter(filter):
+        return True
+    if "intersects" in request.GET:
+        return True
+    if request.content_type == "application/json" and "intersects" in request.json_body:
+        return True
+    for param in request.GET.keys():
+        if param.startswith("fld_") or param == "id" or param.startswith("id__"):
+            return True
+        if param in ("like", "ilike"):
+            return True
+    return False
+
+
 class CountResponse(Struct, kw_only=True):
-    total_count: int
+    total_count: Annotated[int, Meta(description="Total number of features")]
+    filtered_count: Annotated[
+        Union[int, UnsetType], Meta(description="Filtered number of features")
+    ] = UNSET
 
 
-def count(resource, request) -> CountResponse:
-    """Count total number of features"""
+def count(
+    resource,
+    request,
+    *,
+    filter: Annotated[
+        Union[str, None], Meta(description="Filter expression (JSON string)")
+    ] = None,
+) -> CountResponse:
     request.resource_permission(DataScope.read)
 
     query = resource.feature_query()
     total_count = query().total_count
 
-    return CountResponse(total_count=total_count)
+    result = CountResponse(total_count=total_count)
+
+    if has_filters(request, filter):
+        filtered_query = resource.feature_query()
+        apply_fields_filter(filtered_query, request)
+        apply_intersect_filter(filtered_query, request, resource)
+        apply_filter_expression(filtered_query, resource, filter)
+        result.filtered_count = filtered_query().total_count
+
+    return result
 
 
 class NgwExtent(Struct):
