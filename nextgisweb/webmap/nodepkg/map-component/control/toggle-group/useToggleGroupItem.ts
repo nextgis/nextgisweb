@@ -1,42 +1,55 @@
-import { useContext, useMemo } from "react";
+import { useCallback, useContext, useEffect, useMemo, useRef } from "react";
 
 import { ToggleGroupContext } from "./ToggleGroupContext";
 
 export function useToggleGroupItem(id?: string) {
     const group = useContext(ToggleGroupContext);
 
-    return useMemo(() => {
-        if (!group || !id) {
-            return {
-                inGroup: false,
-                isActive: false,
-                activate: () => {},
-                deactivate: () => {},
-                toggle: () => {},
-                makeDefault: () => {},
-            };
-        }
-        const isActive = group.isActive(id);
+    const activeId = group?.activeId;
 
-        return {
-            inGroup: true,
+    const activeIdRef = useRef<string | null | undefined>(activeId);
+    useEffect(() => {
+        activeIdRef.current = activeId;
+    }, [activeId]);
+
+    const setActiveId = group?.setActiveId;
+    const setDefaultId = group?.setDefaultId;
+
+    const inGroup = !!(group && id);
+
+    const activate = useCallback(() => {
+        if (!inGroup || !setActiveId || !id) return;
+        setActiveId(id);
+    }, [inGroup, setActiveId, id]);
+
+    const deactivate = useCallback(() => {
+        if (!inGroup || !setActiveId) return;
+        setActiveId(null);
+    }, [inGroup, setActiveId]);
+
+    const makeDefault = useCallback(() => {
+        if (!inGroup || !setDefaultId || !id) return;
+        setDefaultId(id);
+    }, [inGroup, setDefaultId, id]);
+
+    const toggle = useCallback(() => {
+        if (!inGroup || !setActiveId || !id) return;
+        const isActiveNow = activeIdRef.current === id;
+        setActiveId(isActiveNow ? null : id);
+    }, [inGroup, setActiveId, id]);
+
+    const isActive = group && id ? group.activeId === id : false;
+
+    return useMemo(
+        () => ({
+            inGroup,
             isActive,
-            activate: () => {
-                group.setActiveId(id);
-            },
-            deactivate: () => {
-                group.setActiveId(null);
-            },
-            makeDefault: () => {
-                group.setDefaultId?.(id);
-            },
-            toggle: () => {
-                if (isActive) {
-                    group.setActiveId(null);
-                } else {
-                    group.setActiveId(id);
-                }
-            },
-        };
-    }, [group, id]);
+            makeDefault,
+            deactivate,
+            activate,
+            toggle,
+        }),
+
+        [inGroup, isActive, activate, deactivate, toggle, makeDefault]
+    );
 }

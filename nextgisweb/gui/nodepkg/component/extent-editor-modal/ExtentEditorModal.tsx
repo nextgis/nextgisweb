@@ -1,5 +1,4 @@
 import Feature from "ol/Feature";
-import { unByKey } from "ol/Observable";
 import Polygon, { fromExtent as polygonFromExtent } from "ol/geom/Polygon";
 import { transformExtent } from "ol/proj";
 import VectorSource from "ol/source/Vector";
@@ -9,23 +8,18 @@ import {
     DEFAULT_PADDING,
     DEFAULT_SRS,
 } from "@nextgisweb/feature-layer/geometry-editor/constant";
-import { CloseIcon, DeleteIcon } from "@nextgisweb/gui/icon";
+import { CloseIcon } from "@nextgisweb/gui/icon";
 import { convertWSENToNgwExtent } from "@nextgisweb/gui/util/extent";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import {
-    ButtonControl,
-    MapToolbarControl,
-} from "@nextgisweb/webmap/map-component";
+import { ButtonControl } from "@nextgisweb/webmap/map-component";
 import type { MapExtent } from "@nextgisweb/webmap/ol/MapStore";
-import { EditableItem } from "@nextgisweb/webmap/plugin/layer-editor/EditableItem";
-import { ClearAllBtn } from "@nextgisweb/webmap/plugin/layer-editor/modes/ClearAllBtn";
-import { MoveMode } from "@nextgisweb/webmap/plugin/layer-editor/modes/MoveMode";
-import { RectEditMode } from "@nextgisweb/webmap/plugin/layer-editor/modes/RectEditMode";
 import { PreviewMap } from "@nextgisweb/webmap/preview-map";
 
 import type { ExtentRowValue } from "../extent-row";
 import { PreviewMapModal } from "../preview-map-modal/PreviewMapModal";
 import type { PreviewMapModalProps } from "../preview-map-modal/PreviewMapModal";
+
+import { ExtentEditorControlPanel } from "./ExtentEditorControlPanel";
 
 import CheckIcon from "@nextgisweb/icon/material/check";
 
@@ -66,20 +60,7 @@ export function ExtentEditorModal({
     const initialOlExtent = useMemo(() => toOlExtent(value), [value]);
 
     const [source] = useState(() => new VectorSource());
-    const [featuresLength, setFeaturesLength] = useState<number | null>(null);
 
-    const [editingMode, setEditingMode] = useState<string | null>(
-        RectEditMode.displayName
-    );
-    useEffect(() => {
-        const unChange = source.on("change", () => {
-            const len = source.getFeatures().length;
-            setFeaturesLength(len);
-        });
-        return () => {
-            unByKey(unChange);
-        };
-    }, [source]);
     useEffect(() => {
         source.clear();
         if (initialOlExtent) {
@@ -140,31 +121,7 @@ export function ExtentEditorModal({
                     <CheckIcon />
                 </ButtonControl>
 
-                <MapToolbarControl
-                    order={10}
-                    id="extent-toolbar"
-                    position="top-right"
-                    margin
-                    direction="vertical"
-                    style={{ paddingTop: "20px" }}
-                    gap={4}
-                >
-                    <EditableItem
-                        enabled
-                        source={source}
-                        editingMode={editingMode}
-                        onEditingMode={setEditingMode}
-                        onDirtyChange={() => {}}
-                    >
-                        <RectEditMode order={1} clearPrevious />
-                        <MoveMode disabled={!featuresLength} order={2} />
-                        <ClearAllBtn
-                            disabled={!featuresLength}
-                            order={4}
-                            icon={<DeleteIcon />}
-                        />
-                    </EditableItem>
-                </MapToolbarControl>
+                <ExtentEditorControlPanel source={source} />
             </PreviewMap>
         </PreviewMapModal>
     );

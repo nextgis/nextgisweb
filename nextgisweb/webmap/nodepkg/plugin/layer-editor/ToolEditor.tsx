@@ -25,17 +25,12 @@ type ToolEditorProps = MapControlProps & { groupId: string };
 const ToolEditor = observer(
     ({ order = 0, position, groupId }: ToolEditorProps) => {
         const { display } = useDisplayContext();
-        const groupItem = useToggleGroupItem(groupId);
+        const { activate, deactivate, isActive } = useToggleGroupItem(groupId);
 
         const [canSnap, setCanSnap] = useState(true);
         const [editingMode, setEditingMode] = useState<string | null>(
             DrawMode.displayName
         );
-
-        const groupItemRef = useRef(groupItem);
-        useEffect(() => {
-            groupItemRef.current = groupItem;
-        }, [groupItem]);
 
         const { lazyModal, modalStore, modalHolder } = useShowModal();
 
@@ -120,16 +115,18 @@ const ToolEditor = observer(
         useEffect(() => {
             if (editingMode && editableItems.length) {
                 if (curentSelectedIsEditable) {
-                    groupItemRef.current.activate();
+                    activate();
                     return;
                 }
             }
-            groupItemRef.current.deactivate();
+            deactivate();
         }, [
             curentSelectedIsEditable,
             editableItems.length,
             editableItems,
             editingMode,
+            deactivate,
+            activate,
         ]);
 
         if (!editableItems.length) {
@@ -141,7 +138,8 @@ const ToolEditor = observer(
                 position={position}
                 margin
                 direction="vertical"
-                gap={4}
+                gap={2}
+                style={{ paddingTop: "20px" }}
                 id="editor-toolbar"
             >
                 {modalHolder}
@@ -152,7 +150,7 @@ const ToolEditor = observer(
                         canSnap={canSnap}
                         enabled={display.item?.id === id}
                         resourceId={layerId}
-                        editingMode={groupItem.isActive ? editingMode : null}
+                        editingMode={isActive ? editingMode : null}
                         onCanSnap={setCanSnap}
                         onEditingMode={setEditingMode}
                         onDirtyChange={(val) => {
