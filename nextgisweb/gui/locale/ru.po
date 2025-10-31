@@ -56,43 +56,55 @@ msgstr "Не установлен"
 msgid "Save"
 msgstr "Сохранить"
 
-#: nodepkg/component/extent-row/ExtentRow.tsx:55
+#: nodepkg/component/extent-editor-modal/ExtentEditorModal.tsx:129
+msgid "Close"
+msgstr "Закрыть"
+
+#: nodepkg/component/extent-editor-modal/ExtentEditorModal.tsx:138
+msgid "Apply"
+msgstr "Применить"
+
+#: nodepkg/component/extent-row/ExtentRow.tsx:62
 msgid "Left"
 msgstr "Лево"
 
-#: nodepkg/component/extent-row/ExtentRow.tsx:56
+#: nodepkg/component/extent-row/ExtentRow.tsx:63
 msgid "Bottom"
 msgstr "Низ"
 
-#: nodepkg/component/extent-row/ExtentRow.tsx:57
+#: nodepkg/component/extent-row/ExtentRow.tsx:64
 msgid "Right"
 msgstr "Право"
 
-#: nodepkg/component/extent-row/ExtentRow.tsx:58
+#: nodepkg/component/extent-row/ExtentRow.tsx:65
 msgid "Top"
 msgstr "Верх"
 
-#: nodepkg/component/extent-row/ExtentRow.tsx:61
+#: nodepkg/component/extent-row/ExtentRow.tsx:68
 msgid "West"
 msgstr "Запад"
 
-#: nodepkg/component/extent-row/ExtentRow.tsx:62
+#: nodepkg/component/extent-row/ExtentRow.tsx:69
 msgid "South"
 msgstr "Юг"
 
-#: nodepkg/component/extent-row/ExtentRow.tsx:63
+#: nodepkg/component/extent-row/ExtentRow.tsx:70
 msgid "East"
 msgstr "Восток"
 
-#: nodepkg/component/extent-row/ExtentRow.tsx:64
+#: nodepkg/component/extent-row/ExtentRow.tsx:71
 msgid "North"
 msgstr "Север"
 
-#: nodepkg/component/extent-row/ExtentRow.tsx:121
-msgid "From layer"
-msgstr "По слою"
+#: nodepkg/component/extent-row/ExtentRow.tsx:137
+msgid "From layers"
+msgstr "Из слоев"
 
-#: nodepkg/component/extent-row/ExtentRow.tsx:124
+#: nodepkg/component/extent-row/ExtentRow.tsx:162
+msgid "Edit on map"
+msgstr "Редактировать на карте"
+
+#: nodepkg/component/extent-row/ExtentRow.tsx:167
 msgid "Clean"
 msgstr "Очистить"
 
@@ -121,8 +133,8 @@ msgid "Clone"
 msgstr "Клонировать"
 
 #: nodepkg/edi-table/RowAction.tsx:79 nodepkg/focus-table/action.tsx:27
-#: nodepkg/hook/useConfirm.tsx:52 nodepkg/model-browse/ModelBrowse.tsx:258
-#: nodepkg/model-browse/ModelBrowse.tsx:325 nodepkg/model-form/ModelForm.tsx:47
+#: nodepkg/hook/useConfirm.tsx:52 nodepkg/model-browse/ModelBrowse.tsx:264
+#: nodepkg/model-browse/ModelBrowse.tsx:334 nodepkg/model-form/ModelForm.tsx:47
 msgid "Delete"
 msgstr "Удалить"
 
@@ -182,43 +194,43 @@ msgstr "Пожалуйста, подтвердите удаление."
 msgid "Failed to delete."
 msgstr "Не удалось удалить."
 
-#: nodepkg/model-browse/ModelBrowse.tsx:116 nodepkg/model-form/ModelForm.tsx:69
+#: nodepkg/model-browse/ModelBrowse.tsx:122 nodepkg/model-form/ModelForm.tsx:69
 msgid "Confirmation"
 msgstr "Подтверждение"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:117
+#: nodepkg/model-browse/ModelBrowse.tsx:123
 msgid "Item deleted"
 msgstr "Элемент удален"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:119
+#: nodepkg/model-browse/ModelBrowse.tsx:125
 msgid "Items deleted"
 msgstr "Элементы удалены"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:187
+#: nodepkg/model-browse/ModelBrowse.tsx:193
 msgid "The errors occurred during execution"
 msgstr "Во время выполнения возникли ошибки"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:191
+#: nodepkg/model-browse/ModelBrowse.tsx:197
 msgid "Failed to delete items:"
 msgstr "Не удалось удалить элементы:"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:214
+#: nodepkg/model-browse/ModelBrowse.tsx:220
 msgid "Do you want to delete these items?"
 msgstr "Вы хотите удалить эти элементы?"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:248
+#: nodepkg/model-browse/ModelBrowse.tsx:254
 msgid "Edit"
 msgstr "Изменить"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:248
+#: nodepkg/model-browse/ModelBrowse.tsx:254
 msgid "View"
 msgstr "Просмотр"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:281
+#: nodepkg/model-browse/ModelBrowse.tsx:287
 msgid "Search"
 msgstr "Поиск"
 
-#: nodepkg/model-browse/ModelBrowse.tsx:303 nodepkg/model-form/ModelForm.tsx:45
+#: nodepkg/model-browse/ModelBrowse.tsx:311 nodepkg/model-form/ModelForm.tsx:45
 msgid "Create"
 msgstr "Создать"
 
