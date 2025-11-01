@@ -58,12 +58,6 @@ const FilteredCountExpanded = observer(
             false
         );
 
-        useEffect(() => {
-            return () => {
-                abort?.();
-            };
-        }, [abort]);
-
         let displayText = undefined;
         if (countData) {
             const { total_count, filtered_count } = countData;
