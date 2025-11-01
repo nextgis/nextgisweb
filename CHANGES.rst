@@ -6,6 +6,7 @@ Changes
 
 - Advanced feature filtering capabilities.
 - Enhanced extent selector widget.
+- Display total and filtered feature counts in feature tables.
 
 
 5.2.0
