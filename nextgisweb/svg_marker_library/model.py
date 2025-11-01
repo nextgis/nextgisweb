@@ -126,7 +126,7 @@ class FilesItemUpdate(FilesItemRead, kw_only=True):
 
 class FilesAttr(SAttribute):
     def get(self, srlzr) -> List[FilesItemRead]:
-        return [FilesItemRead(name=f.name) for f in srlzr.obj.files]
+        return [FilesItemRead(name=f.name) for f in sorted(srlzr.obj.files, key=lambda f: f.name)]
 
     def set(self, srlzr, value: List[FilesItemUpdate], *, create):
         srlzr.obj.tstamp = utcnow_naive()
