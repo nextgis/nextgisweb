@@ -15,6 +15,18 @@ from nextgisweb.core.exception import ValidationError
 from .interface import FIELD_TYPE
 
 
+def str_contains_filter(filter_str: str | None) -> bool:
+    if not filter_str:
+        return False
+    try:
+        data = json.loads(filter_str)
+        if data in ({}, []):
+            return False
+        return True
+    except (json.JSONDecodeError, TypeError):
+        raise FilterExpressionError()
+
+
 class FilterExpressionError(ValidationError):
     def __init__(self, *, data: Dict[str, Any] | None = None):
         super().__init__(message=gettext("Invalid filter expression"), data=data)
