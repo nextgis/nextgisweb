@@ -549,7 +549,7 @@ msgstr "Поле"
 
 #: nodepkg/filtered-count/FilteredCount.tsx:67
 #: nodepkg/filtered-count/FilteredCount.tsx:109
-msgid "Features count"
+msgid "Feature count"
 msgstr "Количество объектов"
 
 #: nodepkg/filtered-count/FilteredCount.tsx:72

@@ -75,7 +75,7 @@ const FilteredCountExpanded = observer(
                       })
                     : `${total_count}`;
         }
-        const tooltipText = displayText || gettext("Features count");
+        const tooltipText = displayText || gettext("Feature count");
 
         return (
             <Tooltip title={tooltipText}>
@@ -106,7 +106,7 @@ const FilteredCount = observer(({ store }: FilteredCountProps) => {
 
     if (!expanded) {
         return (
-            <Tooltip title={gettext("Features count")}>
+            <Tooltip title={gettext("Feature count")}>
                 <Button
                     type="default"
                     size={size}
