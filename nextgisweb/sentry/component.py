@@ -32,6 +32,7 @@ class SentryComponent(Component):
         import sentry_sdk
         from sentry_sdk.integrations.pyramid import PyramidIntegration
         from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
+        from sentry_sdk.scope import add_global_event_processor
 
         # Patch MAX_STRING_LENGTH to prevent clipping of big error messages,
         # especially for mako template tracebacks.
@@ -88,9 +89,8 @@ class SentryComponent(Component):
                 event["user"] = event_user
             return event
 
-        with sentry_sdk.configure_scope() as scope:
-            scope.add_event_processor(stringify_i18n)
-            scope.add_event_processor(add_instance_id)
+        add_global_event_processor(stringify_i18n)
+        add_global_event_processor(add_instance_id)
 
     def setup_pyramid(self, config):
         from . import view  # noqa: F401

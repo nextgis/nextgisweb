@@ -55,7 +55,7 @@ requires = [
     "python-magic==0.4.27",
     "python-ulid==3.0.0",
     "requests==2.32.4",
-    "sentry-sdk==1.45.0",
+    "sentry-sdk>2,<3",
     "shapely==2.1.1",
     "SQLAlchemy==1.4.54",
     "transaction==5.0",
