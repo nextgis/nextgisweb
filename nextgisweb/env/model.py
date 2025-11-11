@@ -6,7 +6,7 @@ from zope.sqlalchemy import register
 from .component import component_utility
 from .package import pkginfo
 
-DBSession = scoped_session(sessionmaker(expire_on_commit=False))
+DBSession = scoped_session(sessionmaker(expire_on_commit=False, future=True))
 register(DBSession)
 
 
