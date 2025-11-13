@@ -267,6 +267,7 @@ class CoreComponent(StorageComponentMixin, Component):
 
     def sys_info(self):
         result = []
+        sysinfo_host_config = self.options["sysinfo_host_config"]
 
         def try_check_output(cmd):
             try:
@@ -275,25 +276,26 @@ class CoreComponent(StorageComponentMixin, Component):
                 msg = "Failed to get sys info with command: '%s'" % " ".join(cmd)
                 logger.error(msg, exc_info=True)
 
-        result.append((gettext("Linux kernel"), platform.release()))
-        os_distribution = try_check_output(["lsb_release", "-ds"])
-        if os_distribution is not None:
-            result.append((gettext("OS distribution"), os_distribution))
-
-        def get_cpu_model():
-            cpuinfo = try_check_output(["cat", "/proc/cpuinfo"])
-            if cpuinfo is not None:
+        def cpu_info():
+            count = multiprocessing.cpu_count()
+            model = None
+            if cpuinfo := try_check_output(["cat", "/proc/cpuinfo"]):
                 for line in cpuinfo.split("\n"):
-                    if line.startswith("model name"):
-                        match = re.match(r"model name\s*:?(.*)", line)
-                        return match.group(1).strip()
-            return platform.processor()
+                    if match := re.match(r"model name\s*:?(.*)", line):
+                        model = match.group(1).strip()
+            if not model:
+                model = platform.processor()
+            model = re.sub(r"\(?(TM|R)\)", "", model)
+            return f"{count} × {model}"
 
-        cpu_model = re.sub(r"\(?(TM|R)\)", "", get_cpu_model())
-        result.append((gettext("CPU"), "{} × {}".format(multiprocessing.cpu_count(), cpu_model)))
+        if sysinfo_host_config:
+            result.append((gettext("CPU"), cpu_info()))
+            mem_bytes = os.sysconf("SC_PAGE_SIZE") * os.sysconf("SC_PHYS_PAGES")
+            result.append((gettext("RAM"), f"{mem_bytes >> 20} MiB"))
 
-        mem_bytes = os.sysconf("SC_PAGE_SIZE") * os.sysconf("SC_PHYS_PAGES")
-        result.append((gettext("RAM"), "%d MB" % (float(mem_bytes) / 2**20)))
+            result.append((gettext("Linux kernel"), platform.release()))
+            if os_distribution := try_check_output(["lsb_release", "-ds"]):
+                result.append((gettext("OS distribution"), os_distribution))
 
         result.append(("Python", ".".join(map(str, sys.version_info[0:3]))))
 
@@ -539,7 +541,9 @@ class CoreComponent(StorageComponentMixin, Component):
         Option("provision.instance_id", default=None),
         Option("provision.system.title", default=None),
         Option("maintenance.interval", timedelta, default=None, doc=(
-            "Planned maintenance interval, if exceeded, heathcheck will fail.")),
+            "Planned maintenance interval, if exceeded, healthcheck will fail.")),
+        Option("sysinfo_host_config", bool, default=True, doc=(
+            "Show host configuration info in system information.")),
         # Debug settings
         Option("debug", bool, default=False, doc=("Enable additional debug tools.")),
     )
