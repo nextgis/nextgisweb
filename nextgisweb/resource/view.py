@@ -281,7 +281,12 @@ def resource_section_main(obj, *, request, **kwargs):
     result = {"resourceId": obj.id}
 
     summary = result["summary"] = []
+
+    if obj.id != 0:
+        summary.append((tr(gettext("Resource ID")), str(obj.id)))
+
     summary.append((tr(gettext("Type")), f"{tr(obj.cls_display_name)} ({obj.cls})"))
+
     if keyname := obj.keyname:
         summary.append((tr(gettext("Keyname")), keyname))
 
