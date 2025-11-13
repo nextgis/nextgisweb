@@ -1,13 +1,16 @@
+from __future__ import annotations
+
 import re
 from datetime import timedelta
 from enum import Enum
+from typing import Any
 
 
 class OptionType:
-    OTYPE_MAPPING = {}
+    OTYPE_MAPPING: dict[Any, OptionType] = {}
 
     @classmethod
-    def normalize(cls, otype):
+    def normalize(cls, otype) -> OptionType:
         if isinstance(otype, OptionType):
             return otype
         elif issubclass(otype, OptionType):
@@ -19,13 +22,13 @@ class OptionType:
         else:
             raise TypeError("Invalid option type!")
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "unknown"
 
-    def loads(self, value):
+    def loads(self, value: str) -> Any:
         raise NotImplementedError()
 
-    def dumps(self, value):
+    def dumps(self, value: Any) -> str:
         raise NotImplementedError()
 
 
@@ -113,6 +116,7 @@ class Timedelta(OptionType):
         for a, m in self._parts:
             if seconds % m == 0:
                 return "{}{}".format(seconds // m, a)
+        raise NotImplementedError
 
 
 class SizeInBytes(OptionType):
@@ -138,6 +142,7 @@ class SizeInBytes(OptionType):
             m = 1024**power
             if value % m == 0:
                 return "{:d}{:s}".format(value // m, suf)
+        raise NotImplementedError
 
 
 class Choice(OptionType):

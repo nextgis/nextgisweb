@@ -1,6 +1,7 @@
 import warnings
 from collections import defaultdict
 from contextlib import contextmanager
+from typing import Any
 
 from msgspec import UNSET
 
@@ -10,12 +11,12 @@ from .otype import OptionType
 class Option:
     def __init__(
         self,
-        key,
-        otype=str,
-        default=UNSET,
-        required=False,
-        secure=False,
-        doc=None,
+        key: str | None,
+        otype: Any = str,
+        default: Any = UNSET,
+        required: bool = False,
+        secure: bool = False,
+        doc: str | None = None,
     ):
         self._key = key
         self._otype = OptionType.normalize(otype)
@@ -30,7 +31,7 @@ class Option:
 
     @property
     def otype(self):
-        return OptionType.normalize(self._otype)
+        return self._otype
 
     @property
     def default(self):
