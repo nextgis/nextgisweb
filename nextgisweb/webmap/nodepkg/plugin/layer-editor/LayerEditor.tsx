@@ -1,6 +1,7 @@
 import { EditIcon } from "@nextgisweb/gui/icon";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { EDITING_ID } from "@nextgisweb/webmap/constant";
+import type { TreeLayerStore } from "@nextgisweb/webmap/store/tree-store/TreeItemStore";
 import type {
     PluginMenuItem,
     PluginParams,
@@ -19,7 +20,7 @@ export class LayerEditor extends PluginBase {
     constructor(options: PluginParams) {
         super(options);
 
-        if (this.display.tiny) return;
+        if (this.display.isTinyMode) return;
 
         if (!this.display.config.webmapEditable) {
             this.disabled = true;
@@ -29,7 +30,7 @@ export class LayerEditor extends PluginBase {
         this.disabled = false;
     }
 
-    getPluginState(nodeData: LayerItemConfig): PluginState {
+    getPluginState(nodeData: TreeLayerStore): PluginState {
         const state = super.getPluginState(nodeData);
         return {
             ...state,
@@ -46,12 +47,13 @@ export class LayerEditor extends PluginBase {
     }
 
     async run(nodeData: LayerItemConfig): Promise<undefined> {
-        const store = this.display.webmapStore;
+        const store = this.display.treeStore;
         if (nodeData.editable) {
             setItemsEditable(store, [nodeData.id], false);
-            const isStillEditing = store.webmapItems.some(
-                (item) => item.type === "layer" && item.editable
-            );
+            const isStillEditing = store.filter({
+                "type": "layer",
+                "editable": true,
+            }).length;
             if (!isStillEditing) {
                 this.display.map.setMapState(null);
             }

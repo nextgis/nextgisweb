@@ -1,7 +1,7 @@
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type DescriptionStore from "@nextgisweb/webmap/panel/description/DescriptionStore";
+import type { TreeLayerStore } from "@nextgisweb/webmap/store/tree-store/TreeItemStore";
 import type { PluginState } from "@nextgisweb/webmap/type";
-import type { LayerItemConfig } from "@nextgisweb/webmap/type/api";
 
 import { PluginBase } from "../PluginBase";
 import type { DescriptionWebMapPluginConfig } from "../type";
@@ -10,7 +10,7 @@ import DescriptioIcon from "@nextgisweb/icon/material/article";
 
 export class LayerInfoPlugin extends PluginBase {
     data: DescriptionWebMapPluginConfig | null = null;
-    getPluginState(nodeData: LayerItemConfig): PluginState {
+    getPluginState(nodeData: TreeLayerStore): PluginState {
         const state = super.getPluginState(nodeData);
         const data = this.getPlugin<DescriptionWebMapPluginConfig>(
             nodeData.layerId

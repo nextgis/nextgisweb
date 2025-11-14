@@ -1,61 +1,17 @@
 import { observer } from "mobx-react-lite";
-import { Suspense, lazy, useCallback, useMemo } from "react";
-import type React from "react";
+import { fromLonLat } from "ol/proj";
+import { useCallback } from "react";
 
 import { useThemeVariables } from "@nextgisweb/gui/hook";
-import { useContainerWidth } from "@nextgisweb/gui/hook/useContainerWidth";
 import { MapComponent } from "@nextgisweb/webmap/map-component";
 
 import type { Display } from "../../Display";
 
-import { registry } from "./registry";
+import { MapControls } from "./MapControls";
+import { MapHighlight } from "./MapHighlight";
+import { WebmapLayers } from "./WebmapLayers";
+
 import "./MapPane.less";
-
-const MapControls = observer(({ display }: { display: Display }) => {
-    const width = useContainerWidth(display.map.targetElement);
-    const isMobile = width < 500;
-
-    const lazyControls = useMemo(() => {
-        let reg = registry.queryAll();
-
-        const urlParams = display.getUrlParams();
-        const urlKeys = urlParams.controls;
-
-        if (display.isTinyMode) {
-            if (urlKeys) {
-                reg = reg.filter(({ key, embeddedShowMode }) => {
-                    const matchToUrlKey = key ? urlKeys.includes(key) : false;
-                    const alwaysEmbeddedShow = embeddedShowMode === "always";
-                    return matchToUrlKey || alwaysEmbeddedShow;
-                });
-            } else {
-                reg = reg.filter((r) => r.embeddedShowMode === "always");
-            }
-        }
-
-        if (isMobile) {
-            reg = reg.filter((r) => !r.hideOnMobile);
-        }
-
-        return reg
-            .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-            .map(({ component, key, props, order, position }) => ({
-                key,
-                LazyControl: lazy(component),
-                props: { order, position, ...props },
-            }));
-    }, [display, isMobile]);
-
-    return (
-        <Suspense>
-            {lazyControls.map(({ key, LazyControl, props }) => (
-                <LazyControl key={key} {...props} />
-            ))}
-        </Suspense>
-    );
-});
-
-MapControls.displayName = "MapControls";
 
 export const MapPane = observer(
     ({
@@ -71,6 +27,30 @@ export const MapPane = observer(
 
         const whenCreated = useCallback(() => {
             display.setMapReady(true);
+
+            const urlParams = display.urlParams;
+
+            if (
+                !(
+                    "zoom" in urlParams &&
+                    "lon" in urlParams &&
+                    "lat" in urlParams
+                )
+            ) {
+                display.map.zoomToInitialExtent();
+            } else {
+                const view = display.map.olView;
+                if (urlParams.lon && urlParams.lat) {
+                    view.setCenter(fromLonLat([urlParams.lon, urlParams.lat]));
+                }
+                if (urlParams.zoom !== undefined) {
+                    view.setZoom(urlParams.zoom);
+                }
+
+                if ("angle" in urlParams && urlParams.angle !== undefined) {
+                    view.setRotation(urlParams.angle);
+                }
+            }
         }, [display]);
 
         return (
@@ -80,7 +60,18 @@ export const MapPane = observer(
                 style={themeVariables}
                 whenCreated={whenCreated}
             >
-                <MapControls display={display} />
+                <MapControls
+                    mapStore={display.map}
+                    isTinyMode={display.isTinyMode}
+                />
+                <WebmapLayers
+                    mapStore={display.map}
+                    treeStore={display.treeStore}
+                />
+                <MapHighlight
+                    mapStore={display.map}
+                    highlightStore={display.highlighter}
+                />
                 {children}
             </MapComponent>
         );

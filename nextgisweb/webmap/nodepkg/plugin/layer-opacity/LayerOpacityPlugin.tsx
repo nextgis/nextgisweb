@@ -5,9 +5,7 @@ import { PluginBase } from "../PluginBase";
 
 export class LayerOpacityPlugin extends PluginBase {
     render({ nodeData }: PluginState) {
-        const { transparency, id } = nodeData;
-
-        const store = this.display.webmapStore;
+        const { transparency } = nodeData;
 
         const defaultValue = 100 - Number(transparency);
 
@@ -15,8 +13,7 @@ export class LayerOpacityPlugin extends PluginBase {
             <LayerOpacitySlider
                 defaultValue={defaultValue}
                 onChange={(val) => {
-                    nodeData.transparency = 100 - val;
-                    store.setLayerOpacity(Number(id), val / 100);
+                    nodeData.update({ transparency: 100 - val });
                 }}
             ></LayerOpacitySlider>
         );

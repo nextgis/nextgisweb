@@ -104,14 +104,12 @@ const searchByLayers: SearchFunction = async (
 ) => {
     const visibleItems = await display.getVisibleItems();
     const requests: Promise<FeatureResponse[]>[] = [];
-    visibleItems.forEach((i) => {
-        const id = display.itemStore.getValue(i, "id");
-        const layerId = display.itemStore.getValue(i, "layerId");
-        const itmConfig = display._itemConfigById[id];
-        if (itmConfig.type !== "layer") {
+    visibleItems.forEach((item) => {
+        const layerId = item.layerId;
+        if (!item.isLayer()) {
             return;
         }
-        const pluginConfig = itmConfig.plugin[
+        const pluginConfig = item.plugin[
             "@nextgisweb/webmap/plugin/feature-layer"
         ] as FeatureLayerWebMapPluginConfig;
 
@@ -422,7 +420,10 @@ const SearchPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
 
     const selectResult = (resultInfo: SearchResult) => {
         setResultSelected(resultInfo);
-        display.highlightGeometry(resultInfo.geometry);
+
+        display.map.zoomToGeom(resultInfo.geometry);
+
+        display.highlighter.highlight({ olGeometry: resultInfo.geometry });
     };
 
     const makeResult = (resultInfo: SearchResult) => {

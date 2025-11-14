@@ -13,57 +13,41 @@ interface NavigationPanelInfo {
     source: Source;
 }
 
-class Deferred<T> {
-    promise: Promise<T>;
-    resolve!: (value: T | PromiseLike<T>) => void;
-    reject!: (reason: unknown) => void;
-
-    constructor() {
-        this.promise = new Promise<T>((resolve, reject) => {
-            this.resolve = resolve;
-            this.reject = reject;
-        });
-    }
-}
-
 export class PanelManager {
     private _display: Display;
-    private _allowPanels?: string[];
 
-    /** @deprecated use observable {@link PanelManager.ready} instead */
-    private _panelsReady = new Deferred<void>();
-    private _onChangePanel: (panel?: PanelStore) => void;
+    private _onChangePanel?: (panel?: PanelStore) => void;
 
-    @observable.ref accessor ready = false;
+    @observable.ref accessor allowPanels: string[] | null;
+
     @observable.shallow accessor panels = new Map<string, PanelStore>();
     @observable.shallow accessor active: NavigationPanelInfo = {
         active: undefined,
         source: "init",
     };
 
-    constructor(
-        display: Display,
-        activePanelKey: string | undefined,
-        allowPanels: string[] | undefined,
-        onChangePanel: (panel?: PanelStore) => void
-    ) {
+    constructor({
+        display,
+        activePanelKey,
+        allowPanels,
+        onChangePanel,
+    }: {
+        display: Display;
+        activePanelKey?: string | undefined;
+        allowPanels?: string[] | undefined;
+        onChangePanel?: (panel?: PanelStore) => void;
+    }) {
         this._display = display;
         if (activePanelKey) {
             this.active = { active: activePanelKey, source: "init" };
         }
-        this._allowPanels = allowPanels;
+        this.allowPanels = allowPanels ?? null;
         this._onChangePanel = onChangePanel;
-        this.buildPlugins();
-    }
-
-    /** @deprecated use observable {@link PanelManager.ready} instead */
-    get panelsReady(): Deferred<void> {
-        return this._panelsReady;
     }
 
     @computed
     get visiblePanels() {
-        return [...this.sorted()].filter((panel) =>
+        return [...this.sorted].filter((panel) =>
             this._display.isMobile ? !panel.desktopOnly : true
         );
     }
@@ -82,19 +66,9 @@ export class PanelManager {
         return this.active.active;
     }
 
-    private async buildPlugins() {
-        const allowPanels = this._allowPanels;
-        const plugins = registry.queryAll(({ name, isEnabled }) => {
-            return (
-                (!allowPanels || allowPanels.includes(name)) &&
-                (!isEnabled || isEnabled(this._display))
-            );
-        });
-        plugins.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
-        for (const plugin of plugins) {
-            await this.registerPlugin(plugin);
-        }
-        this._handlePanelActivation();
+    @action.bound
+    setAllowPanels(val: string[] | null) {
+        this.allowPanels = val;
     }
 
     async registerPlugin(
@@ -116,7 +90,7 @@ export class PanelManager {
             runInAction(() => {
                 this.panels = panels;
             });
-            this._handleInitActive();
+            // this._handleInitActive();
             return panel;
         }
     }
@@ -152,32 +126,10 @@ export class PanelManager {
         this.closePanel();
     }
 
-    sorted(): PanelStore[] {
+    @computed
+    get sorted(): PanelStore[] {
         return Array.from(this.panels.values()).sort(
             (a, b) => a.order - b.order
         );
-    }
-
-    @action
-    private _handleInitActive(): void {
-        this.ready = true;
-        this._panelsReady.resolve();
-    }
-
-    private _handlePanelActivation(): void {
-        if (
-            (!this.active.active || !this.panels.has(this.active.active)) &&
-            this.active.active !== "none"
-        ) {
-            this._activateFirstPanel();
-        }
-        this._handleInitActive();
-    }
-
-    private _activateFirstPanel(): void {
-        const firstPanelKey = this.panels.keys().next().value;
-        if (firstPanelKey) {
-            this.setActive(firstPanelKey, "init");
-        }
     }
 }

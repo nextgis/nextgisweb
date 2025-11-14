@@ -1,29 +1,22 @@
-import { findNode } from "@nextgisweb/gui/util/tree";
-import type { WebmapStore } from "@nextgisweb/webmap/store";
+import type { TreeStore } from "@nextgisweb/webmap/store/tree-store/TreeStore";
 
 export function setItemsEditable(
-    webmapStore: WebmapStore,
+    treeStore: TreeStore,
     itemIds: number[],
     status: boolean
 ): number[] {
-    const webmapItems = [...webmapStore.webmapItems];
-
     const changed: number[] = [];
 
     for (const id of itemIds) {
-        const editableItem = findNode(webmapItems, (item) => item.id === id);
+        const editableItem = treeStore.getItemById(id);
         if (
             editableItem &&
-            editableItem.type === "layer" &&
+            editableItem.isLayer() &&
             editableItem.editable !== status
         ) {
-            editableItem.editable = status;
+            editableItem.update({ editable: status });
             changed.push(id);
         }
-    }
-
-    if (changed.length > 0) {
-        webmapStore.setWebmapItems(webmapItems);
     }
 
     return changed;

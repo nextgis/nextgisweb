@@ -37,7 +37,7 @@ const ToolSwipe = observer(
     }: ToolSwipeProps) => {
         const { display } = useDisplayContext();
         const [modal, contextHolder] = Modal.useModal();
-        const { itemConfig, map } = display;
+        const { item, map } = display;
 
         const [orientation, setOrientation] =
             useState<Orientation>(orientationProp);
@@ -55,25 +55,21 @@ const ToolSwipe = observer(
         const validate = useCallback(
             (status: boolean): boolean => {
                 if (status) {
-                    if (!itemConfig) {
+                    if (!item) {
                         modal.info({
                             title: msg.noLayerSelectedTitle,
                             content: msg.noLayerSelectedContent,
                         });
                         return false;
                     } else {
-                        if (
-                            itemConfig.type !== "layer" &&
-                            itemConfig.type !== "group"
-                        ) {
+                        if (item.type !== "layer" && item.type !== "group") {
                             modal.info({
                                 title: msg.invalidTypeTitle,
                                 content: msg.invalidTypeContent,
                             });
                             return false;
                         }
-                        const layer = map.layers[itemConfig.id];
-                        if (layer && !layer.visibility) {
+                        if (item.isLayer() && !item.visibility) {
                             modal.info({
                                 title: msg.layerHiddenTitle,
                                 content: msg.layerHiddenContent,
@@ -84,25 +80,23 @@ const ToolSwipe = observer(
                 }
                 return true;
             },
-            [itemConfig, map.layers, modal]
+            [item, modal]
         );
 
         const layers = useMemo(() => {
-            if (itemConfig) {
-                if (itemConfig.type === "layer") {
-                    const l = map.layers[itemConfig.id]?.olLayer;
+            if (item) {
+                if (item.type === "layer") {
+                    const l = map.layers[item.id]?.olLayer;
                     return l ? [l] : [];
-                } else if (itemConfig.type === "group") {
-                    const desc = display.itemStore.getDescendants(
-                        itemConfig.id
-                    );
+                } else if (item.type === "group") {
+                    const desc = display.treeStore.getDescendants(item.id);
                     return desc
                         .map((d) => map.layers[d.id]?.olLayer)
                         .filter(Boolean);
                 }
             }
             return [];
-        }, [display.itemStore, itemConfig, map.layers]);
+        }, [display.treeStore, item, map.layers]);
 
         const [active, setActive] = useState(false);
 

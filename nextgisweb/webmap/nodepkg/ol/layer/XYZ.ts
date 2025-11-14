@@ -1,4 +1,3 @@
-import { action } from "mobx";
 import TileLayer from "ol/layer/Tile";
 import XYZSource from "ol/source/XYZ";
 import type { Options as XYZSourceOptions } from "ol/source/XYZ";
@@ -32,7 +31,6 @@ export default class XYZ extends CoreLayer<
         return new TileLayer(options);
     }
 
-    @action
     override setSymbols(symbols: string[]): void {
         super.setSymbols(symbols);
         this.updateSymbols(symbols);

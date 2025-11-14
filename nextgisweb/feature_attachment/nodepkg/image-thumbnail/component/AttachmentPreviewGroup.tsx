@@ -127,7 +127,14 @@ export function AttachmentPreviewGroup({
                 const key = current.name ?? info.current;
 
                 return current.isPanorama && panoramaMode ? (
-                    <Suspense key={key} fallback={<CentralLoading />}>
+                    <Suspense
+                        key={key}
+                        fallback={
+                            <CentralLoading
+                                indicatorStyle={{ color: "white" }}
+                            />
+                        }
+                    >
                         <PhotospherePreview
                             url={info.image.url}
                             onReady={(viewer) => {

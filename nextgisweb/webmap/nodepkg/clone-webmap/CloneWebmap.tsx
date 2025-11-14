@@ -48,11 +48,7 @@ export function CloneWebmap({
 }: CloneWebmapProps) {
     const form = Form.useForm<CloneProps>()[0];
 
-    const { data, isLoading } = useRouteGet(
-        "resource.item",
-        { id },
-        { cache: true }
-    );
+    const { data, isLoading } = useRouteGet("resource.item", { id });
 
     const { makeSignal } = useAbortController();
 

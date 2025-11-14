@@ -10,22 +10,17 @@ import type { RouteQuery } from "@nextgisweb/pyramid/api/type";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { RasterLayerIdentifyResponse } from "@nextgisweb/raster-layer/type/api";
 import webmapSettings from "@nextgisweb/webmap/client-settings";
-import topic from "@nextgisweb/webmap/compat/topic";
 import type { Display } from "@nextgisweb/webmap/display";
 import type { MapStore } from "@nextgisweb/webmap/ol/MapStore";
 import type IdentifyStore from "@nextgisweb/webmap/panel/identify/IdentifyStore";
 import type {
-    FeatureHighlightEvent,
     FeatureInfo,
     FeatureResponse,
     IdentifyInfo,
     IdentifyResponse,
 } from "@nextgisweb/webmap/panel/identify/identification";
-import type { LayerItemConfig } from "@nextgisweb/webmap/type/api";
 
 const wkt = new WKT();
-// shortcut
-type FHE = FeatureHighlightEvent;
 
 interface IdentifyOptions {
     display: Display;
@@ -47,14 +42,11 @@ export class Identify {
 
     @observable.ref accessor active = true;
     @observable.ref accessor control: Interaction | null = null;
-    @observable.shallow accessor identifyInfo: IdentifyInfo | null = null;
-    @observable.shallow accessor highlightedFeature: FHE | null = null;
+    @observable.ref accessor identifyInfo: IdentifyInfo | null = null;
 
     constructor(options: IdentifyOptions) {
         this.display = options.display;
         this.map = this.display.map;
-
-        this._bindEvents();
 
         reaction(
             () => this.control,
@@ -96,15 +88,9 @@ export class Identify {
     }
 
     @action.bound
-    setHighlightedFeature(highlightedFeature: FeatureHighlightEvent | null) {
-        this.highlightedFeature = highlightedFeature;
-    }
-
-    @action.bound
     clear() {
-        this.highlightedFeature = null;
         this.identifyInfo = null;
-        topic.publish("feature.unhighlight");
+        this.display.highlighter.unhighlight();
 
         const pm = this.display.panelManager;
         const pkey = "identify";
@@ -123,26 +109,17 @@ export class Identify {
 
         if ("features" in layerResponse) {
             const featureResponse = layerResponse.features[featureInfo.idx];
-            this.setHighlightedFeature(null);
+
             const featureItem = await route("feature_layer.feature.item", {
                 id: featureResponse.layerId,
                 fid: featureResponse.id,
             }).get({ query: { dt_format: "iso" }, ...opt });
 
-            const { label } = featureInfo;
-
-            const featureHightlight: FeatureHighlightEvent = {
+            this.display.highlighter.highlight({
                 geom: featureItem.geom,
                 featureId: featureItem.id,
                 layerId: featureInfo.layerId,
-                featureInfo: { ...featureItem, labelWithLayer: label },
-            };
-            this.setHighlightedFeature(featureHightlight);
-
-            topic.publish<FeatureHighlightEvent>(
-                "feature.highlight",
-                featureHightlight
-            );
+            });
 
             return featureItem;
         }
@@ -230,11 +207,7 @@ export class Identify {
 
         const rasterLayers: number[] = [];
 
-        items.forEach((i) => {
-            const item = this.display._itemConfigById[
-                this.display.itemStore.getValue(i, "id")
-            ] as LayerItemConfig;
-
+        items.forEach((item) => {
             if (
                 mapResolution === null ||
                 !(
@@ -257,9 +230,9 @@ export class Identify {
 
         const layerLabels: Record<number, string | null> = {};
         items.forEach((i) => {
-            const layerId = this.display.itemStore.getValue(i, "layerId");
+            const layerId = i.layerId;
 
-            layerLabels[layerId] = this.display.itemStore.getValue(i, "label");
+            layerLabels[layerId] = i.label;
         });
 
         let features;
@@ -277,16 +250,6 @@ export class Identify {
         }
 
         this.openIdentifyPanel({ features, point, layerLabels, raster });
-    }
-
-    private _bindEvents(): void {
-        topic.subscribe("webmap/tool/identify/on", () => {
-            this.activate();
-        });
-
-        topic.subscribe("webmap/tool/identify/off", () => {
-            this.deactivate();
-        });
     }
 
     private _requestGeomString(pixel: number[], radiusScale = 1): string {
@@ -319,13 +282,11 @@ export class Identify {
         layerLabels: Record<string, string | null>;
         raster?: RasterLayerIdentifyResponse;
     }): void {
-        this.highlightedFeature = null;
-
         const response: IdentifyResponse = features || { featureCount: 0 };
 
         if (response.featureCount === 0) {
             this.identifyInfo = null;
-            topic.publish("feature.unhighlight");
+            this.display.highlighter.unhighlight();
         }
 
         if (raster) {

@@ -1,32 +1,13 @@
-import type Feature from "ol/Feature";
-
-import type { LayerItemConfig } from "@nextgisweb/webmap/type/api";
-
 import type { LayerDisplayAdapterCtor } from "../DisplayLayerAdapter";
-import type { CustomItemFileWriteStore } from "../compat/CustomItemFileWriteStore";
 import type { LayerSymbols } from "../compat/type";
 import type { Display } from "../display";
 import type { MapStore } from "../ol/MapStore";
 import type { PluginBase } from "../plugin/PluginBase";
 import type { AnnotationVisibleMode } from "../store/annotations/AnnotationsStore";
+import type { TreeLayerStore } from "../store/tree-store/TreeItemStore";
+import type { TreeStore } from "../store/tree-store/TreeStore";
 
 export * from "./DisplayConfig";
-
-export interface HighlightFeatureData {
-    geom: string;
-    featureId: number;
-    layerId: number;
-}
-
-export interface FeatureHighlighter {
-    highlightFeature: (data: HighlightFeatureData) => void;
-    getHighlighted: () => Feature[];
-    unhighlightFeature: (filter: (feature: Feature) => boolean) => void;
-    highlightFeatureById: (
-        featureId: number,
-        layerId: number
-    ) => PromiseLike<Feature>;
-}
 
 export interface AdapterModules {
     [key: string]: LayerDisplayAdapterCtor;
@@ -41,8 +22,6 @@ export interface WMPluginModules {
 }
 
 export interface Mid {
-    adapter: AdapterModules;
-    plugin: PluginModules;
     wmplugin: WMPluginModules;
 }
 
@@ -79,12 +58,12 @@ export interface PluginMenuItem {
 export interface PluginParams {
     identity: string;
     display: Display;
-    itemStore: CustomItemFileWriteStore | boolean;
+    treeStore: TreeStore | boolean;
 }
 
 export interface PluginState {
     enabled: boolean;
-    nodeData: LayerItemConfig;
+    nodeData: TreeLayerStore;
     map: MapStore;
     active?: boolean;
 }

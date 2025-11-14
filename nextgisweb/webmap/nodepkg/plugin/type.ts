@@ -16,7 +16,6 @@ declare module "@nextgisweb/webmap/type/TreeItems" {
         "@nextgisweb/webmap/plugin/layer-info": DescriptionWebMapPluginConfig;
         "@nextgisweb/webmap/plugin/layer-opacity": Record<string, never>;
         "@nextgisweb/webmap/plugin/zoom-to-layer": Record<string, never>;
-        "@nextgisweb/webmap/plugin/zoom-to-webmap": Record<string, never>;
         "@nextgisweb/feature-attachment/attachment-bundle/plugin": Record<
             string,
             never

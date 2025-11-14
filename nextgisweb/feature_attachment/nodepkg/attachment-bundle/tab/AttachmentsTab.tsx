@@ -54,12 +54,11 @@ interface LayerItemView {
 type IdentifyFeatureFunc = (featureId: number, layerId: number) => void;
 
 const getLayersInfo = (display: Display) => {
-    const checked = display.webmapStore.checked;
-    const itemConfig = display.getItemConfig();
+    const checked = display.treeStore.visibleLayerIds;
 
     const layersResourceIds = new Map<number, TreeItemConfig>();
     checked.forEach((itemId) => {
-        const itemInfo = itemConfig[itemId];
+        const itemInfo = display.treeStore.getItemById(itemId);
         if (
             itemInfo &&
             itemInfo.type === "layer" &&
@@ -200,7 +199,7 @@ const layerItems = (
     }
 
     const identifyFeature = (featureId: number, layerId: number) => {
-        display.identify?.identifyFeatureByAttrValue(layerId, "id", featureId);
+        display.identify.identifyFeatureByAttrValue(layerId, "id", featureId);
     };
 
     return layerAttachments?.map((l) => {

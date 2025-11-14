@@ -1,8 +1,9 @@
 import { useCallback, useEffect } from "react";
 
+import type { TreeStore } from "@nextgisweb/webmap/store";
+
 import LayersTree from "../../layers-tree";
 import type { TreeWebmapItem } from "../../layers-tree/LayersTree";
-import type { WebmapStore } from "../../store";
 import RndComp from "../rnd-comp";
 import type { LegendPrintMapProps, RndCoords } from "../type";
 
@@ -20,7 +21,7 @@ const handleTreeItem = (
 
         const hasLegend =
             layersItem.legendIcon ||
-            (layersItem.treeItem.type === "layer" &&
+            (layersItem.treeItem.isLayer() &&
                 layersItem.treeItem.legendInfo.open);
 
         if (hasLegend) {
@@ -43,9 +44,9 @@ const handleTreeItem = (
     }
 };
 
-const filterTreeItems = (store: WebmapStore, layersItems: TreeWebmapItem[]) => {
+const filterTreeItems = (store: TreeStore, layersItems: TreeWebmapItem[]) => {
     const newLayersItems: TreeWebmapItem[] = [];
-    const checked = new Set(store.getChecked());
+    const checked = new Set(store.visibleLayerIds);
     const expanded = new Set(store.expanded);
     layersItems.forEach((item) => {
         const newTreeItem = handleTreeItem(checked, expanded, item);
@@ -63,8 +64,8 @@ export const LegendPrintMap = ({
     printMapStore,
     onChange,
 }: LegendPrintMapProps) => {
-    const { webmapStore } = display;
-    const { visibleLayers } = webmapStore;
+    const { treeStore } = display;
+    const { visibleLayers } = treeStore;
 
     useEffect(() => {
         if (!show) {
@@ -77,25 +78,24 @@ export const LegendPrintMap = ({
     useEffect(() => {
         if (show) {
             const visibleLayersWithoutSymbols = visibleLayers.filter(
-                webmapStore.shouldHaveLegendInfo
+                treeStore.shouldHaveLegendInfo
             );
             if (visibleLayersWithoutSymbols.length) {
-                webmapStore.updateResourceLegendSymbols(
+                treeStore.updateResourceLegendSymbols(
                     visibleLayersWithoutSymbols.map((layer) => layer.styleId)
                 );
             }
         }
-    }, [show, webmapStore, visibleLayers]);
+    }, [show, treeStore, visibleLayers]);
 
     const fakeCb = useCallback(() => {}, []);
-    const fakeCbObj = useCallback(() => ({}), []);
     const onFilterItems = useCallback(
-        (store: WebmapStore, layersItems: TreeWebmapItem[]) => {
+        (store: TreeStore, layersItems: TreeWebmapItem[]) => {
             const filteredItems = filterTreeItems(store, layersItems);
             printMapStore.setWebMapItems(filteredItems);
             return filteredItems;
         },
-        []
+        [printMapStore]
     );
 
     if (!show) {
@@ -116,9 +116,7 @@ export const LegendPrintMap = ({
         >
             <div className="legend" style={style}>
                 <LayersTree
-                    store={webmapStore}
-                    setLayerZIndex={fakeCb}
-                    getWebmapPlugins={fakeCbObj}
+                    store={treeStore}
                     onReady={fakeCb}
                     showDropdown={false}
                     draggable={false}

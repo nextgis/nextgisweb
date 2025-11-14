@@ -9,6 +9,7 @@ import type Control from "ol/control/Control";
 import type { EventsKey } from "ol/events";
 import * as olExtent from "ol/extent";
 import type { Extent } from "ol/extent";
+import { GeoJSON, WKT } from "ol/format";
 import * as olProj from "ol/proj";
 import type { ProjectionLike } from "ol/proj";
 
@@ -16,7 +17,6 @@ import type { NgwExtent } from "@nextgisweb/feature-layer/type/api";
 import { imageQueue } from "@nextgisweb/pyramid/util";
 import type { SRSRef } from "@nextgisweb/spatial-ref-sys/type/api";
 
-import { Watchable } from "../compat/Watchable";
 import type {
     CreateControlOptions,
     MapControl,
@@ -31,19 +31,21 @@ import { mapStartup } from "./util/mapStartup";
 import { scaleForResolution } from "./util/resolutionUtil";
 
 import "ol/ol.css";
+import type { Geometry } from "ol/geom";
 
 export interface MapExtent extends FitOptions {
     extent: NgwExtent;
     srs: SRSRef;
 }
 
-interface MapOptions extends OlMapOptions {
+interface MapOptions extends Omit<OlMapOptions, "target"> {
     logo?: boolean;
-    extent?: Extent;
+    constrainingExtent?: Extent;
     measureSrsId?: number | null;
     initialExtent?: Extent;
     lonlatProjection?: string;
     displayProjection?: string;
+    target?: string | HTMLElement;
 }
 
 export interface Position {
@@ -55,14 +57,7 @@ interface Layers {
     [key: string]: CoreLayer;
 }
 
-interface MapWatchableProps {
-    resolution: number | null;
-    center: number[] | null;
-    position: Position | null;
-    zoom: number | null;
-}
-
-export class MapStore extends Watchable<MapWatchableProps> {
+export class MapStore {
     readonly panelControl: PanelControl;
 
     private readonly DPI = 1000 / 39.37 / 0.28;
@@ -70,7 +65,8 @@ export class MapStore extends Watchable<MapWatchableProps> {
     private readonly SMART_ZOOM_EXTENT = 100;
     private readonly SMART_ZOOM = 12;
 
-    private readonly initialExtent?: Extent;
+    readonly initialExtent?: Extent;
+    readonly constrainingExtent?: Extent;
 
     readonly displayProjection = "EPSG:3857";
     readonly lonlatProjection = "EPSG:4326";
@@ -81,7 +77,7 @@ export class MapStore extends Watchable<MapWatchableProps> {
     @observable.ref accessor ready = false;
     @observable.ref accessor started = false;
 
-    @observable.shallow accessor layers: Layers = {};
+    @observable.ref accessor layers: Layers = {};
 
     @observable.ref accessor baseLayer: CoreLayer | null = null;
     @observable.ref accessor resolution: number | null = null;
@@ -89,27 +85,33 @@ export class MapStore extends Watchable<MapWatchableProps> {
     @observable.ref accessor zoom: number | null = null;
     @observable.ref accessor measureSrsId: number | null = null;
     @observable.struct accessor position: Position | null = null;
-    @observable.struct accessor rotation: number = 0;
+    @observable.ref accessor rotation: number = 0;
 
     @observable.ref accessor mapState: string | null = null;
+    @observable.ref accessor isLoading: boolean = false;
     @observable.ref accessor defaultMapState: string | null = null;
 
     private _viewUnbindKeys: EventsKey[] = [];
     private _mapUnbindKeys: EventsKey[] = [];
 
     constructor(private options: MapOptions) {
-        super();
-        const { target, extent, initialExtent, measureSrsId, ...viewOptions } =
-            this.options;
+        const {
+            target,
+            constrainingExtent,
+            initialExtent,
+            measureSrsId,
+            ...viewOptions
+        } = this.options;
         this.measureSrsId = measureSrsId ?? null;
         this.initialExtent = initialExtent;
+        this.constrainingExtent = constrainingExtent;
         if (!viewOptions.view) {
             viewOptions.view = new View({
                 maxZoom: 24,
                 projection: this.displayProjection,
                 // Must always be true for correct tile caching with image adapters
                 constrainResolution: true,
-                extent,
+                extent: constrainingExtent,
             });
         }
         this.olMap = new OlMap(viewOptions);
@@ -151,6 +153,11 @@ export class MapStore extends Watchable<MapWatchableProps> {
     }
 
     @action
+    setIsLoading(val: boolean) {
+        this.isLoading = val;
+    }
+
+    @action
     switchBasemap = (basemapLayerKey: string) => {
         if (!(basemapLayerKey in this.layers)) {
             return false;
@@ -188,6 +195,14 @@ export class MapStore extends Watchable<MapWatchableProps> {
             };
             this.bindView(olView);
             this._mapUnbindKeys.push(
+                olMap.on("loadstart", () => {
+                    this.setIsLoading(true);
+                }),
+
+                olMap.on("loadend", () => {
+                    this.setIsLoading(false);
+                }),
+
                 olMap.on("moveend", s.setPosition),
                 olMap.once("rendercomplete", applyInitialState),
 
@@ -244,17 +259,23 @@ export class MapStore extends Watchable<MapWatchableProps> {
         this.setStarted(false);
     }
 
+    getLayer(id: number): CoreLayer | undefined {
+        return this.layers[id];
+    }
+
     getLayersArray() {
         return this.olMap.getLayers().getArray() as ExtendedOlLayer[];
     }
 
     @action
-    addLayer(layer: CoreLayer): void {
+    addLayer(layer: CoreLayer, order?: number): void {
         const layers = { ...this.layers, [layer.name]: layer };
         this.layers = layers;
         const olLayer = layer.getLayer();
         if (layer.isBaseLayer) {
             olLayer.setZIndex(-1);
+        } else if (order !== undefined) {
+            olLayer.setZIndex(order);
         }
         this.olMap.addLayer(olLayer);
     }
@@ -370,6 +391,29 @@ export class MapStore extends Watchable<MapWatchableProps> {
         this.zoomToExtent(extent, options);
     }
 
+    zoomToGeom(
+        geom: string | Geometry,
+        opts: {
+            srs?: string;
+            format?: "wkt" | "geojson";
+            fit?: FitOptions;
+        } = { srs: "EPSG:3857", format: "wkt" }
+    ): void {
+        const dataProjection = opts.srs ?? "EPSG:3857";
+        const viewProj = this.olView.getProjection();
+        const isWkt = opts.format === "wkt";
+
+        const geometry =
+            typeof geom === "string"
+                ? (isWkt ? new WKT() : new GeoJSON()).readGeometry(geom, {
+                      dataProjection,
+                      featureProjection: viewProj,
+                  })
+                : geom;
+
+        this.zoomToExtent(geometry.getExtent(), opts?.fit);
+    }
+
     zoomToExtent(
         extent: number[],
         {
@@ -438,12 +482,13 @@ export class MapStore extends Watchable<MapWatchableProps> {
         this.zoomToExtent(extent, options);
     }
 
-    getMaxZIndex(): number {
-        const layers = this.olMap.getLayers().getArray();
+    @computed
+    get maxZIndex(): number {
+        const layers = Object.values(this.layers);
         let maxZIndex = 0;
 
         layers.forEach((layer) => {
-            const zIndex = layer.getZIndex();
+            const zIndex = layer.olLayer.getZIndex();
             if (zIndex !== undefined && zIndex > maxZIndex) {
                 maxZIndex = zIndex;
             }
@@ -500,32 +545,24 @@ export class MapStore extends Watchable<MapWatchableProps> {
 
     @action
     private setResolution(resolution: number | null) {
-        const oldResolution = this.resolution;
         this.resolution = resolution;
-        this.notify("resolution", oldResolution, resolution);
     }
     @action
     private setPosition(position: Position | null) {
-        const oldPosition = this.position;
         this.position = position;
         if (position) {
             const { zoom, center } = position;
             this.setZoom(zoom);
             this.setCenter(center);
         }
-        this.notify("position", oldPosition, position);
     }
     @action
     private setCenter(center: number[] | null) {
-        const oldCenter = this.center;
         this.center = center;
-        this.notify("center", oldCenter, center);
     }
     @action
     private setZoom(zoom: number) {
-        const oldZoom = this.zoom;
         this.zoom = zoom;
-        this.notify("zoom", oldZoom, zoom);
     }
     @action
     private setRotation(rad: number) {

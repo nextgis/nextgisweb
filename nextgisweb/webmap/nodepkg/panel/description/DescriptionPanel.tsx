@@ -16,10 +16,10 @@ const zoomToFeature = (
     resourceId: number,
     featureId: number
 ) => {
-    display.featureHighlighter
-        .highlightFeatureById(featureId, resourceId)
-        .then((feature) => {
-            display.map.zoomToFeature(feature);
+    display.highlighter
+        .highlightById(featureId, resourceId)
+        .then(({ geom }) => {
+            display.map.zoomToGeom(geom);
         });
 };
 

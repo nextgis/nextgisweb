@@ -1,6 +1,7 @@
+import { observer } from "mobx-react-lite";
 import Feature from "ol/Feature";
 import WKT from "ol/format/WKT";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { FeatureGrid } from "@nextgisweb/feature-layer/feature-grid/FeatureGrid";
 import { FeatureGridStore } from "@nextgisweb/feature-layer/feature-grid/FeatureGridStore";
@@ -29,244 +30,243 @@ interface WebMapFeatureGridTabProps {
     topic: typeof topic;
 }
 
-export function WebMapFeatureGridTab({
-    topic,
-    plugin,
-    layerId,
-}: WebMapFeatureGridTabProps) {
-    const topicHandlers = useRef<ReturnType<typeof topic.subscribe>[]>([]);
-    const { display } = useDisplayContext();
+export const WebMapFeatureGridTab = observer(
+    ({ topic, plugin, layerId }: WebMapFeatureGridTabProps) => {
+        const topicHandlers = useRef<ReturnType<typeof topic.subscribe>[]>([]);
+        const { display } = useDisplayContext();
 
-    const [editorProps] = useState(() => ({ showGeometryTab: false }));
+        const [editorProps] = useState(() => ({ showGeometryTab: false }));
 
-    const [featureStore, setFeatureStore] = useState<FeatureGridStore | null>(
-        null
-    );
+        const [featureStore, setFeatureStore] =
+            useState<FeatureGridStore | null>(null);
 
-    const [messageApi, contextHolder] = message.useMessage();
+        const [messageApi, contextHolder] = message.useMessage();
 
-    useEffect(() => {
-        const itemFromStore = Object.values(
-            display.itemStore.fetch({ query: { type: "layer", layerId } })
-        )[0];
-        if (!itemFromStore) return;
-        const item = display.getItemConfig()[itemFromStore.id];
-        if (!item || item.type !== "layer") return;
-
-        const data = item.plugin[
-            plugin.identity
-        ] as FeatureLayerWebMapPluginConfig;
-
-        const showMessage = (type: NoticeType, content: string) => {
-            messageApi.open({
-                type: type,
-                content: content,
-            });
-        };
-
-        const reloadLayer = async () => {
+        const reloadLayer = useCallback(async () => {
             // It is possible to have few webmap layers for one resource id
-            const layers = await display.webmapStore.filterLayers({
-                query: { layerId },
+            const layers = await display.treeStore.filter({
+                type: "layer",
+                layerId,
             });
 
             layers?.forEach((item) => {
-                const layer = display.webmapStore.getLayer(item.id);
-                layer?.reload();
+                display.map.getLayer(item.id)?.reload();
             });
-        };
+        }, [display.map, display.treeStore, layerId]);
 
-        const store = new FeatureGridStore({
-            id: layerId,
-            readonly: data.readonly ?? true,
-            size: "small",
-            cleanSelectedOnFilter: false,
-            canCreate: false,
-            onDelete: reloadLayer,
-            onSave: reloadLayer,
+        const store = useMemo(() => {
+            const item = Object.values(
+                display.treeStore.filter({ type: "layer", layerId })
+            )[0];
+            if (!item) return;
 
-            onOpen: ({ featureId, resourceId }) => {
-                display.identify.identifyFeatureByAttrValue(
-                    resourceId,
-                    "id",
-                    featureId
-                );
-            },
+            if (!item || item.type !== "layer") return;
 
-            onSelect: (newVal) => {
-                store.setSelectedIds(newVal);
-                const fid = newVal[0];
-                if (fid !== undefined) {
-                    route("feature_layer.feature.item", {
-                        id: layerId,
-                        fid,
-                    })
-                        .get<FeatureItem>({
-                            query: {
-                                dt_format: "iso",
-                                fields: [],
-                                extensions: [],
-                            },
+            const data = item.plugin[
+                plugin.identity
+            ] as FeatureLayerWebMapPluginConfig;
+
+            const showMessage = (type: NoticeType, content: string) => {
+                messageApi.open({
+                    type,
+                    content,
+                });
+            };
+
+            const store = new FeatureGridStore({
+                id: layerId,
+                readonly: data.readonly ?? true,
+                size: "small",
+                cleanSelectedOnFilter: false,
+                canCreate: false,
+                onDelete: reloadLayer,
+                onSave: reloadLayer,
+
+                onOpen: ({ featureId, resourceId }) => {
+                    display.identify.identifyFeatureByAttrValue(
+                        resourceId,
+                        "id",
+                        featureId
+                    );
+                },
+
+                onSelect: (newVal) => {
+                    store.setSelectedIds(newVal);
+                    const fid = newVal[0];
+                    if (fid !== undefined) {
+                        route("feature_layer.feature.item", {
+                            id: layerId,
+                            fid,
                         })
-                        .then((feature) => {
-                            display.featureHighlighter.highlightFeature({
-                                geom: feature.geom,
-                                featureId: feature.id,
-                                layerId,
-                            });
-                        });
-                } else {
-                    display.featureHighlighter.unhighlightFeature(
-                        (f) => f?.getProperties?.()?.layerId === layerId
-                    );
-                }
-            },
-            actions: [
-                {
-                    title: msgGoto,
-                    icon: <GoToIcon />,
-                    disabled: (params) => !params?.selectedIds?.length,
-                    action: () => {
-                        const wkt = new WKT();
-                        const fid = store.selectedIds[0];
-                        if (fid !== undefined) {
-                            route("feature_layer.feature.item", {
-                                id: layerId,
-                                fid,
+                            .get<FeatureItem>({
+                                query: {
+                                    dt_format: "iso",
+                                    fields: [],
+                                    extensions: [],
+                                },
                             })
-                                .get<FeatureItem>({
-                                    query: {
-                                        dt_format: "iso",
-                                        fields: [],
-                                        extensions: [],
-                                    },
+                            .then((feature) => {
+                                display.highlighter.highlight({
+                                    geom: feature.geom,
+                                    featureId: feature.id,
+                                    layerId,
+                                });
+                            });
+                    } else {
+                        display.highlighter.unhighlight(
+                            (e) => e.layerId === layerId
+                        );
+                    }
+                },
+                actions: [
+                    {
+                        title: msgGoto,
+                        icon: <GoToIcon />,
+                        disabled: (params) => !params?.selectedIds?.length,
+                        action: () => {
+                            const wkt = new WKT();
+                            const fid = store.selectedIds[0];
+                            if (fid !== undefined) {
+                                route("feature_layer.feature.item", {
+                                    id: layerId,
+                                    fid,
                                 })
-                                .then((feature) => {
-                                    if (feature.geom !== null) {
-                                        const geometry = wkt.readGeometry(
-                                            feature.geom
-                                        );
-                                        display.map.zoomToFeature(
-                                            new Feature({ geometry })
-                                        );
-                                    } else {
-                                        showMessage(
-                                            "warning",
-                                            gettext(
-                                                "Selected feature has no geometry"
-                                            )
-                                        );
-                                    }
-                                });
-                        }
+                                    .get<FeatureItem>({
+                                        query: {
+                                            dt_format: "iso",
+                                            fields: [],
+                                            extensions: [],
+                                        },
+                                    })
+                                    .then((feature) => {
+                                        if (feature.geom !== null) {
+                                            const geometry = wkt.readGeometry(
+                                                feature.geom
+                                            );
+                                            display.map.zoomToFeature(
+                                                new Feature({ geometry })
+                                            );
+                                        } else {
+                                            showMessage(
+                                                "warning",
+                                                gettext(
+                                                    "Selected feature has no geometry"
+                                                )
+                                            );
+                                        }
+                                    });
+                            }
+                        },
                     },
-                },
-                "separator",
-                (props) => (
-                    <>
-                        <ZoomToFilteredBtn
-                            {...props}
-                            queryParams={store.queryParams}
-                            onZoomToFiltered={(ngwExtent: NgwExtent) => {
-                                display.map.zoomToNgwExtent(ngwExtent, {
-                                    displayProjection:
-                                        display.displayProjection,
-                                });
-                            }}
-                        />
-                    </>
-                ),
-                (props: ActionProps) => {
-                    return (
-                        <FilterExtentBtn
-                            {...props}
-                            display={display}
-                            onGeomChange={(_, geomWKT) => {
-                                store.setQueryParams((prev) => ({
-                                    ...prev,
-                                    intersects: geomWKT,
-                                }));
-                            }}
-                        />
-                    );
-                },
-            ],
-        });
+                    "separator",
+                    (props) => (
+                        <>
+                            <ZoomToFilteredBtn
+                                {...props}
+                                queryParams={store.queryParams}
+                                onZoomToFiltered={(ngwExtent: NgwExtent) => {
+                                    display.map.zoomToNgwExtent(ngwExtent, {
+                                        displayProjection:
+                                            display.displayProjection,
+                                    });
+                                }}
+                            />
+                        </>
+                    ),
+                    (props: ActionProps) => {
+                        return (
+                            <FilterExtentBtn
+                                {...props}
+                                display={display}
+                                onGeomChange={(_, geomWKT) => {
+                                    store.setQueryParams((prev) => ({
+                                        ...prev,
+                                        intersects: geomWKT,
+                                    }));
+                                }}
+                            />
+                        );
+                    },
+                ],
+            });
 
-        const featureUpdatedEvent = ({
-            resourceId,
-        }: {
-            resourceId: number;
-        }) => {
-            if (layerId === resourceId) {
-                store.bumpVersion();
-                reloadLayer();
-            }
-        };
+            return store;
+        }, [display, layerId, messageApi, plugin.identity, reloadLayer]);
 
-        const featureHighlightedEvent = ({
-            featureId,
-            layerId: eventLayerId,
-        }: {
-            featureId: number;
-            layerId: number;
-        }) => {
-            if (featureId !== undefined && eventLayerId === layerId) {
-                store.setSelectedIds([featureId]);
-            } else {
-                store.setSelectedIds([]);
-            }
-        };
-
-        const subscribe = () => {
-            topicHandlers.current.push(
-                topic.subscribe("feature.highlight", featureHighlightedEvent),
-                topic.subscribe(
-                    "feature.unhighlight",
-                    store.setSelectedIds.bind(null, [])
-                ),
-                topic.subscribe("feature.updated", featureUpdatedEvent),
-                topic.subscribe("/webmap/feature-table/refresh", () => {
-                    store.setQueryParams(null);
+        useEffect(() => {
+            if (!store) return;
+            const featureUpdatedEvent = ({
+                resourceId,
+            }: {
+                resourceId: number;
+            }) => {
+                if (layerId === resourceId) {
                     store.bumpVersion();
-                })
-            );
-        };
+                    reloadLayer();
+                }
+            };
 
-        const unsubscribe = () => {
-            topicHandlers.current.forEach((handler) => handler.remove());
-            topicHandlers.current = [];
-        };
+            const subscribe = () => {
+                topicHandlers.current.push(
+                    topic.subscribe("feature.updated", featureUpdatedEvent),
+                    topic.subscribe("/webmap/feature-table/refresh", () => {
+                        store.setQueryParams(null);
+                        store.bumpVersion();
+                    })
+                );
+            };
 
-        subscribe();
+            const unsubscribe = () => {
+                topicHandlers.current.forEach((handler) => handler.remove());
+                topicHandlers.current = [];
+            };
 
-        const highlightedFeatures = display.featureHighlighter.getHighlighted();
-        const selected: number[] = highlightedFeatures
-            .filter((f) => f.getProperties?.()?.layerId === layerId)
-            .map((f) => f.getProperties().featureId);
+            subscribe();
 
-        store.setSelectedIds(selected);
+            setFeatureStore(store);
 
-        setFeatureStore(store);
+            return () => {
+                setFeatureStore(null);
+                unsubscribe();
+            };
+        }, [
+            topic,
+            display,
+            layerId,
+            messageApi,
+            plugin.identity,
+            store,
+            reloadLayer,
+        ]);
 
-        return () => {
-            setFeatureStore(null);
-            unsubscribe();
-        };
-    }, [topic, display, layerId, messageApi, plugin.identity]);
+        useEffect(() => {
+            if (!store) return;
+            const highlightedFeatures = display.highlighter.highlighted;
+            const selected: number[] = [];
+            highlightedFeatures.forEach((e) => {
+                if (e.layerId === layerId && e.featureId) {
+                    selected.push(Number(e.featureId));
+                }
+            });
 
-    if (!featureStore) {
-        return null;
+            store.setSelectedIds(selected);
+        }, [store, display.highlighter.highlighted, layerId]);
+
+        if (!featureStore) {
+            return null;
+        }
+
+        return (
+            <>
+                {contextHolder}
+                <FeatureGrid
+                    id={layerId}
+                    store={featureStore}
+                    editorProps={editorProps}
+                />
+            </>
+        );
     }
+);
 
-    return (
-        <>
-            {contextHolder}
-            <FeatureGrid
-                id={layerId}
-                store={featureStore}
-                editorProps={editorProps}
-            />
-        </>
-    );
-}
+WebMapFeatureGridTab.displayName = "WebMapFeatureGridTab";

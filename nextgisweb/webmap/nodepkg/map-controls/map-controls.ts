@@ -76,6 +76,18 @@ mapControlRegistry(COMP_ID, {
 });
 
 mapControlRegistry(COMP_ID, {
+    key: "li",
+    order: 30,
+    label: gettext("Loading indicator"),
+    props: {},
+    position: { inside: "attribution-toolbar" },
+    showOnPreview: true,
+    embeddedShowMode: "customize",
+    component: () =>
+        import("../map-component/control/MapLoadingIndicatorControl"),
+});
+
+mapControlRegistry(COMP_ID, {
     key: "ie",
     order: 60,
     label: gettext("Initial extent"),

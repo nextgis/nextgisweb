@@ -9,9 +9,7 @@ import { executeWithMinDelay } from "@nextgisweb/gui/util/executeWithMinDelay";
 import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import webmapSettings from "@nextgisweb/webmap/client-settings";
-import topic from "@nextgisweb/webmap/compat/topic";
 import type { Display } from "@nextgisweb/webmap/display";
-import type { HighlightEvent } from "@nextgisweb/webmap/feature-highlighter/FeatureHighlighter";
 
 import { PanelContainer } from "../component";
 import type { PanelPluginWidgetProps } from "../registry";
@@ -46,7 +44,7 @@ const loadFeatureItem = async (
 ) => {
     if (display.identify) {
         const featureItem = await executeWithMinDelay(
-            display.identify?.highlightFeature(identifyInfo, featureInfo, opt),
+            display.identify.highlightFeature(identifyInfo, featureInfo, opt),
             {
                 minDelay: 700,
                 signal: opt?.signal,
@@ -88,12 +86,12 @@ const IdentifyPanel = observer<PanelPluginWidgetProps<IdentifyStore>>(
                 if (!featureInfo || featureInfo.type !== "feature_layer") {
                     if (identifyInfo?.point) {
                         const [x, y] = identifyInfo.point;
-                        const highlightEvent: HighlightEvent = {
+
+                        display.highlighter.highlight({
                             coordinates: [x, y],
-                        };
-                        topic.publish("feature.highlight", highlightEvent);
+                        });
                     } else {
-                        topic.publish("feature.unhighlight");
+                        display.highlighter.unhighlight();
                     }
 
                     return;

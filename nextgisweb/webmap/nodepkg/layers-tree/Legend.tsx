@@ -2,18 +2,16 @@ import { useMemo } from "react";
 
 import { Checkbox, ConfigProvider, useToken } from "@nextgisweb/gui/antd";
 
-import type { WebmapStore } from "../store";
-import type { TreeItemConfig } from "../type/TreeItems";
+import type { TreeItemStore } from "../store/tree-store/TreeItemStore";
 import { restoreSymbols } from "../utils/symbolsIntervals";
 import "./Legend.less";
 
 interface LegendProps {
-    nodeData: TreeItemConfig;
-    store: WebmapStore;
+    nodeData: TreeItemStore;
     checkable: boolean;
 }
 
-export function Legend({ nodeData, store, checkable }: LegendProps) {
+export function Legend({ nodeData, checkable }: LegendProps) {
     const { token } = useToken();
 
     const legendInfo = "legendInfo" in nodeData && nodeData.legendInfo;
@@ -21,15 +19,14 @@ export function Legend({ nodeData, store, checkable }: LegendProps) {
     const intervals = useMemo<
         Record<number, boolean> | "-1" | undefined
     >(() => {
-        const storeItem = store.getStoreItem(nodeData.id);
-        if (storeItem && storeItem.type === "layer") {
-            if (Array.isArray(storeItem.symbols)) {
-                return restoreSymbols(storeItem.symbols);
-            } else if (storeItem.symbols === "-1") {
+        if (nodeData && nodeData.isLayer()) {
+            if (Array.isArray(nodeData.symbols)) {
+                return restoreSymbols(nodeData.symbols);
+            } else if (nodeData.symbols === "-1") {
                 return "-1";
             }
         }
-    }, [nodeData.id, store]);
+    }, [nodeData]);
 
     if (!nodeData || !legendInfo || !legendInfo.open) {
         return <></>;
@@ -50,8 +47,6 @@ export function Legend({ nodeData, store, checkable }: LegendProps) {
                 }}
             >
                 {legendInfo.symbols?.map((s, idx) => {
-                    const id = nodeData.id;
-
                     const render =
                         intervals === "-1"
                             ? false
@@ -67,8 +62,7 @@ export function Legend({ nodeData, store, checkable }: LegendProps) {
                                     style={{ width: "16px" }}
                                     defaultChecked={render}
                                     onChange={(e) => {
-                                        store.setLayerLegendSymbol(
-                                            id,
+                                        nodeData.setLayerLegendSymbol(
                                             s.index,
                                             e.target.checked
                                         );

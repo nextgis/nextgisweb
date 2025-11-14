@@ -1,14 +1,14 @@
 import type { Coordinate } from "ol/coordinate";
 import { toLonLat } from "ol/proj";
 
-import type { StoreItem } from "../compat/CustomItemFileWriteStore";
 import type { Display } from "../display";
 import type { AnnotationVisibleMode } from "../store/annotations/AnnotationsStore";
+import type { TreeItemStore } from "../store/tree-store/TreeItemStore";
 import type { DisplayURLParams } from "../type";
 
 export interface GetPermalinkOptions {
     display: Display;
-    visibleItems: StoreItem[];
+    visibleItems: TreeItemStore[];
     visibleMode?: AnnotationVisibleMode | null;
     center?: Coordinate;
     additionalParams?: Record<string, string | number | boolean | string[]>;
@@ -29,8 +29,7 @@ export const getPermalink = ({
 }: GetPermalinkOptions): string => {
     // { 1: ['0-5', '8-12'], 2: [], 3: '-1' } >>> 1[0-5|8-12],2,3[-1]
     const visibleStyles: string[] = [];
-    visibleItems.forEach((i) => {
-        const item = display.itemStore.dumpItem(i);
+    visibleItems.forEach((item) => {
         if ("styleId" in item) {
             let styleStr = String(item.styleId);
             if (item.symbols && item.symbols.length) {

@@ -26,14 +26,12 @@ const isLayerReadOnly = (display: Display, config: TreeItemConfig): boolean => {
 };
 
 const editLayerEnabled = (display: Display, layerId: number): boolean => {
-    const configs = Object.values(display.getItemConfig());
-    return configs.some((c) => {
-        return (
-            c.type === "layer" &&
-            c.layerId === layerId &&
-            isLayerReadOnly(display, c)
-        );
-    });
+    return display.treeStore
+        .filter({
+            type: "layer",
+            layerId,
+        })
+        .some((c) => isLayerReadOnly(display, c));
 };
 
 export const FeatureEditButton = ({

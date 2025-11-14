@@ -7,7 +7,7 @@ import type VectorSource from "ol/source/Vector";
 import { route } from "@nextgisweb/pyramid/api";
 import topic from "@nextgisweb/webmap/compat/topic";
 import type { Display } from "@nextgisweb/webmap/display";
-import type { LayerItemConfig } from "@nextgisweb/webmap/type/api";
+import type { TreeLayerStore } from "@nextgisweb/webmap/store/tree-store/TreeItemStore";
 import {
     getOlGeometryType,
     getOlLayout,
@@ -163,7 +163,7 @@ export async function saveChanges({
     source,
     display,
 }: {
-    item: LayerItemConfig;
+    item: TreeLayerStore;
     display: Display;
     source: VectorSource;
 }): Promise<void> {
@@ -179,11 +179,7 @@ export async function saveChanges({
             deleteFeaturesOnServer({ resourceId, features: toDelete }),
         ]);
 
-        const layer = display.webmapStore.getLayer(item.id);
-
-        if (layer) {
-            layer.reload();
-        }
+        display.map.getLayer(item.id)?.reload();
 
         topic.publish("/webmap/feature-table/refresh", item.layerId);
     } catch (err) {

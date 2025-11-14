@@ -18,10 +18,10 @@ export function FeatureSelector({
 
     const zoomTo = () => {
         if (!featureItem) return;
-        display.featureHighlighter
-            .highlightFeatureById(featureItem.id, featureInfo.layerId)
-            .then((feature) => {
-                display.map.zoomToFeature(feature);
+        display.highlighter
+            .highlightById(featureItem.id, featureInfo.layerId)
+            .then(({ geom }) => {
+                display.map.zoomToGeom(geom);
             });
     };
 

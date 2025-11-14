@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { Spin } from "@nextgisweb/gui/antd";
 import { routeURL } from "@nextgisweb/pyramid/api";
@@ -25,26 +25,27 @@ const DisplayTinyWidget = observer(
                 })
         );
 
-        const { ready: panelsReady } = display.panelManager;
-
         useEffect(
             function buildTinyPanels() {
-                if (panelsReady) {
-                    return;
-                }
-
-                const activePanel = display.panelManager.getActivePanelName();
+                const activePanel = display.panelManager.getActivePanelName;
                 if (!activePanel) {
                     return;
                 }
                 display.panelManager.deactivatePanel();
             },
-            [display.panelManager, panelsReady]
+            [display.panelManager, display.panelManager.getActivePanelName]
         );
 
+        const positionRef = useRef(display.map.position);
+
         useEffect(() => {
-            handlePostMessage(display);
-        }, [display]);
+            handlePostMessage(
+                display,
+                display.map.position,
+                positionRef.current
+            );
+            positionRef.current = display.map.position;
+        }, [display, display.map.position]);
 
         return (
             <DisplayWidget

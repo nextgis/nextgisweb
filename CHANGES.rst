@@ -7,6 +7,8 @@ Changes
 - Advanced feature filtering capabilities.
 - Enhanced extent selector widget.
 - Display total and filtered feature counts in feature tables.
+- Dimmed out-of-scale-range layers in the tree on webmaps.
+- Map loading indicator on webmaps.
 
 
 5.2.0

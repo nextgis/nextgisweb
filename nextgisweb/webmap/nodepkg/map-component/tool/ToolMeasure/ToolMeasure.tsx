@@ -1,4 +1,5 @@
 import debounce from "lodash/debounce";
+import { observer } from "mobx-react-lite";
 import { unByKey } from "ol/Observable";
 import type { EventsKey } from "ol/events";
 import type { Geometry } from "ol/geom";
@@ -45,14 +46,10 @@ type TooltipState = MeasureTooltipProps & {
     id: string;
 };
 
-export default function ToolMeasure({
-    type,
-    groupId,
-    ...rest
-}: ToolMeasureProps) {
+const ToolMeasure = observer(({ type, groupId, ...rest }: ToolMeasureProps) => {
     const { mapStore } = useMapContext();
 
-    const olMap = mapStore.olMap;
+    const { olMap, maxZIndex } = mapStore;
 
     const [currentTooltipId, setCurrentTooltipId] = useState<string | null>(
         null
@@ -61,6 +58,7 @@ export default function ToolMeasure({
     const vectorRef = useRef<VectorLayer<VectorSource> | null>(null);
     const interactionRef = useRef<Draw | null>(null);
     const changeListenerRef = useRef<EventsKey | null>(null);
+    const maxZIndexRef = useRef(maxZIndex);
 
     const [tooltips, setTooltips] = useState<Map<string, TooltipState>>(
         new Map()
@@ -121,7 +119,7 @@ export default function ToolMeasure({
         const debouncedMap = debouncedRef.current;
 
         olMap.addLayer(vector);
-        vector.setZIndex(mapStore.getMaxZIndex() + 1);
+        vector.setZIndex(maxZIndexRef.current + 100);
 
         const interaction = new Draw({ source, type, style });
         interaction.setActive(false);
@@ -237,6 +235,11 @@ export default function ToolMeasure({
         };
     }, [closeTooltip, mapStore, olMap, type, updateTooltip]);
 
+    useEffect(() => {
+        vectorRef.current?.setZIndex(maxZIndex + 1);
+        maxZIndexRef.current = maxZIndex;
+    }, [maxZIndex]);
+
     const setActive = useCallback((active: boolean) => {
         const interaction = interactionRef.current;
         if (!interaction) return;
@@ -274,4 +277,7 @@ export default function ToolMeasure({
             ))}
         </>
     );
-}
+});
+
+ToolMeasure.displayName = "ToolMeasure";
+export default ToolMeasure;

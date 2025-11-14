@@ -50,14 +50,22 @@ export class AnnotationsManager {
         this._annotationsDialog = new AnnotationsDialog();
         this._editable = this._display.config.annotations.scope.write;
 
-        this._display.layersDeferred.then(() => this._init());
+        this._init();
 
         reaction(
-            () => display.webmapStore.layers,
+            () => display.treeStore.items,
             () => {
                 if (this._annotationsLayer) {
                     this._annotationsLayer.setZIndex(
-                        Object.keys(display.webmapStore.layers).length * 2 // Multiply by two for insurance
+                        Math.max(
+                            ...display.treeStore.items
+                                .values()
+                                .map((item) =>
+                                    item.isLayer()
+                                        ? item.drawOrderPosition || 0
+                                        : 0
+                                )
+                        ) * 2 // Multiply by two for insurance
                     );
                 }
             }

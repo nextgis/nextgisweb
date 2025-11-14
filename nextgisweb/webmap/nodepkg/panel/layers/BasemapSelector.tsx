@@ -1,5 +1,4 @@
 import { observer } from "mobx-react-lite";
-import { useMemo } from "react";
 
 import { Select } from "@nextgisweb/gui/antd";
 import type { OptionType } from "@nextgisweb/gui/antd";
@@ -14,16 +13,13 @@ interface BasemapSelectorProps {
 export const BasemapSelector = observer(({ map }: BasemapSelectorProps) => {
     const { baseLayers, activeBasemapKey, switchBasemap } = map;
 
-    const options = useMemo<OptionType[]>(() => {
-        const options_ = [];
-        for (const [key, layer] of Object.entries(baseLayers)) {
-            options_.push({
-                label: layer.title,
-                value: key,
-            });
-        }
-        return options_;
-    }, [baseLayers]);
+    const options: OptionType[] = [];
+    for (const [key, layer] of Object.entries(baseLayers)) {
+        options.push({
+            label: layer.title,
+            value: key,
+        });
+    }
 
     return (
         <Select

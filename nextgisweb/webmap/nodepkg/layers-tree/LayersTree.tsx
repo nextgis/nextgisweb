@@ -1,24 +1,20 @@
 import { observer } from "mobx-react-lite";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { Col, Row, Tree } from "@nextgisweb/gui/antd";
+import { Tree } from "@nextgisweb/gui/antd";
 import type { TreeProps } from "@nextgisweb/gui/antd";
+import { EditIcon } from "@nextgisweb/gui/icon";
 import { findNode } from "@nextgisweb/gui/util/tree";
 
-import type { PluginBase } from "../plugin/PluginBase";
-import type { WebmapStore } from "../store";
-import type { TreeItemConfig } from "../type/TreeItems";
+import type { TreeStore } from "../store";
+import type {
+    TreeItemStore,
+    TreeLayerStore,
+} from "../store/tree-store/TreeItemStore";
 
-import { DropdownActions } from "./DropdownActions";
-import { Legend } from "./Legend";
-import { LegendAction } from "./LegendAction";
+import { LayerTreeItemTitle } from "./LayerTreeItemTitle";
 import { useDrag } from "./hook/useDrag";
-import { useWebmapItems } from "./hook/useWebmapItems";
-import {
-    keyInMutuallyExclusiveGroupDeep,
-    updateKeysForGroup,
-    updateKeysForMutualExclusivity,
-} from "./util/treeItems";
+import { updateKeysForGroup } from "./util/treeItems";
 
 import "./LayersTree.less";
 
@@ -28,52 +24,152 @@ export type TreeWebmapItem = TreeNodeData & {
     key: number;
     children?: TreeWebmapItem[];
     legendIcon?: React.ReactNode;
-    treeItem: TreeItemConfig;
+    treeItem: TreeItemStore;
 };
 
 interface LayersTreeProps {
-    store: WebmapStore;
-    onSelect?: (keys: number[]) => void;
-    setLayerZIndex: (id: number, zIndex: number) => void;
-    getWebmapPlugins: () => Record<string, PluginBase>;
-    onReady?: () => void;
-    onFilterItems?: (
-        store: WebmapStore,
-        layersItems: TreeWebmapItem[]
-    ) => TreeWebmapItem[];
-    showLegend?: boolean;
-    showDropdown?: boolean;
-    expandable?: boolean;
+    store: TreeStore;
+    showLine?: boolean;
     checkable?: boolean;
     draggable?: boolean;
     selectable?: boolean;
-    showLine?: boolean;
+    showLegend?: boolean;
+    expandable?: boolean;
+    showDropdown?: boolean;
+    onFilterItems?: (
+        store: TreeStore,
+        layersItems: TreeWebmapItem[]
+    ) => TreeWebmapItem[];
+    onSelect?: (keys: number[]) => void;
+    onReady?: () => void;
 }
+
+const LegendIcon = observer(({ treeItem }: { treeItem: TreeLayerStore }) => {
+    const { legendInfo } = treeItem;
+    if (legendInfo) {
+        if (
+            legendInfo &&
+            legendInfo.visible &&
+            legendInfo.single &&
+            legendInfo.symbols
+        ) {
+            return (
+                <img
+                    width={20}
+                    height={20}
+                    src={
+                        "data:image/png;base64," +
+                        legendInfo.symbols[0].icon.data
+                    }
+                />
+            );
+        }
+    }
+});
+
+LegendIcon.displayName = "LegendIcon";
+
+const ItemIcon = observer(({ treeItem }: { treeItem: TreeLayerStore }) => {
+    if (treeItem.editable === true) {
+        return <EditIcon />;
+    } else {
+        return <LegendIcon treeItem={treeItem} />;
+    }
+});
+
+ItemIcon.displayName = "ItemIcon";
 
 export const LayersTree = observer(
     ({
         store,
-        onSelect,
-        setLayerZIndex,
-        getWebmapPlugins,
-        onReady,
-        onFilterItems,
-        showLegend = true,
-        showDropdown = true,
+        showLine = true,
+        draggable = true,
         checkable = true,
         expandable = true,
-        draggable = true,
         selectable = true,
-        showLine = true,
+        showLegend = true,
+        showDropdown = true,
+        onFilterItems,
+        onSelect: onSelectProp,
+        onReady,
     }: LayersTreeProps) => {
         const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
-        const [moreClickId, setMoreClickId] = useState<number>();
-        const [update, setUpdate] = useState(false);
-        const { webmapItems, checked, layersWithoutLegendInfo } = store;
 
-        const { onDrop, allowDrop } = useDrag({ store, setLayerZIndex });
+        const {
+            visibleLayerIds,
+            childrenIds,
+            treeStructureStamp,
+            layersWithoutLegendInfo,
+        } = store;
 
-        const { preparedWebMapItems } = useWebmapItems({ webmapItems });
+        const { onDrop, allowDrop } = useDrag({ store });
+
+        const onSelect = useCallback(
+            (selectedKeysValue: React.Key[]) => {
+                const val = selectedKeysValue.map(Number);
+                setSelectedKeys(val);
+                if (onSelectProp) onSelectProp(val);
+            },
+            [onSelectProp]
+        );
+
+        const handleWebMapItem = useCallback(
+            (treeItem: TreeItemStore): TreeWebmapItem => {
+                const { id, title, parentId } = treeItem;
+
+                let inExclusiveGroup = false;
+
+                if (store.hasExclusiveGroup && parentId !== null) {
+                    const parentItem = store.getItemById(parentId);
+                    inExclusiveGroup =
+                        !!parentItem &&
+                        parentItem.isGroup() &&
+                        parentItem.exclusive;
+                }
+
+                const item: TreeWebmapItem = {
+                    key: id,
+                    title,
+                    treeItem: treeItem,
+                    className: inExclusiveGroup ? "exclusive-child" : undefined,
+                };
+                if (treeItem.isLayer()) {
+                    item.isLeaf = true;
+
+                    item.icon = <ItemIcon treeItem={treeItem} />;
+
+                    item.title = (
+                        <LayerTreeItemTitle
+                            treeItem={treeItem}
+                            checkable={checkable}
+                            showLegend={showLegend}
+                            showDropdown={showDropdown}
+                            onSelect={onSelect}
+                        />
+                    );
+                }
+
+                if (treeItem.isGroup()) {
+                    const children: TreeWebmapItem[] = [];
+                    treeItem.childrenIds.toReversed().forEach((cid) => {
+                        const it = store.getItemById(cid);
+                        if (it) {
+                            children.push(handleWebMapItem(it));
+                        }
+                    });
+                    item.children = children;
+                }
+                return item;
+            },
+            [checkable, store, showLegend, showDropdown, onSelect]
+        );
+
+        const preparedWebMapItems = useMemo(() => {
+            void treeStructureStamp;
+            return store
+                .getChildren({ childrenIds: childrenIds.toReversed() })
+                .map(handleWebMapItem);
+        }, [childrenIds, treeStructureStamp, handleWebMapItem, store]);
 
         const treeItems = useMemo(() => {
             if (onFilterItems) {
@@ -82,10 +178,7 @@ export const LayersTree = observer(
             return preparedWebMapItems;
         }, [onFilterItems, preparedWebMapItems, store]);
 
-        const hasGroups = useMemo(
-            () => webmapItems.some((item) => item.type === "group"),
-            [webmapItems]
-        );
+        const hasGroups = useMemo(() => store.some({ type: "group" }), [store]);
 
         useEffect(() => {
             if (onReady) {
@@ -115,123 +208,25 @@ export const LayersTree = observer(
                     : checkedKeysValue.checked
             ).map(Number);
 
-            const mutuallyExclusiveParents = keyInMutuallyExclusiveGroupDeep(
-                checkedItem.treeItem.key,
-                treeItems.map((t) => t.treeItem)
-            );
-
             let updatedCheckedKeys = checkedKeys;
 
-            if (mutuallyExclusiveParents) {
-                updatedCheckedKeys = updateKeysForMutualExclusivity(
-                    checkedItem,
-                    mutuallyExclusiveParents,
-                    checkedKeys
-                );
-            } else if (checkedItem.treeItem.type === "group") {
+            if (checkedItem.treeItem.isGroup()) {
                 updatedCheckedKeys = updateKeysForGroup(
                     checkedItem,
                     checkedKeys,
-                    store.checked
+                    store.visibleLayerIds
                 );
             }
 
-            store.handleCheckChanged(updatedCheckedKeys);
+            store.setVisibleIds(updatedCheckedKeys);
         };
 
-        const _onSelect = useCallback(
-            (selectedKeysValue: React.Key[]) => {
-                const val = selectedKeysValue.map(Number);
-                setSelectedKeys(val);
-                if (onSelect) onSelect(val);
-            },
-            [onSelect]
-        );
-
-        const titleRender = useCallback(
-            (nodeData: TreeWebmapItem) => {
-                const { title } = nodeData.treeItem;
-                const shouldActions = showLegend || showDropdown;
-
-                let actions;
-
-                if (shouldActions) {
-                    let legendAction;
-                    if (nodeData.treeItem.type === "layer") {
-                        const treeLayer = nodeData.treeItem;
-
-                        legendAction = treeLayer.legendInfo.symbols &&
-                            treeLayer.legendInfo.symbols.length > 1 &&
-                            showLegend && (
-                                <LegendAction
-                                    nodeData={treeLayer}
-                                    onClick={() => setUpdate(!update)}
-                                />
-                            );
-                    }
-
-                    const dropdownAction = showDropdown && (
-                        <DropdownActions
-                            nodeData={nodeData.treeItem}
-                            getWebmapPlugins={getWebmapPlugins}
-                            setMoreClickId={(id) => {
-                                if (id !== undefined) {
-                                    _onSelect([id]);
-                                }
-                                setMoreClickId(id);
-                            }}
-                            moreClickId={moreClickId}
-                            update={update}
-                            setUpdate={setUpdate}
-                        />
-                    );
-                    actions = (
-                        <Col
-                            className="tree-item-action"
-                            style={{ alignItems: "center" }}
-                        >
-                            {legendAction}
-                            {dropdownAction}
-                        </Col>
-                    );
-                }
-
-                return (
-                    <>
-                        <Row wrap={false}>
-                            <Col flex="auto" className="tree-item-title">
-                                {title}
-                            </Col>
-                            {actions}
-                        </Row>
-                        {showLegend && (
-                            <Legend
-                                checkable={checkable}
-                                nodeData={nodeData.treeItem}
-                                store={store}
-                            />
-                        )}
-                    </>
-                );
-            },
-            [
-                _onSelect,
-                checkable,
-                getWebmapPlugins,
-                moreClickId,
-                showDropdown,
-                showLegend,
-                store,
-                update,
-            ]
-        );
-
         const checkedKeys = useMemo(() => {
-            const ch = checked.filter((id) =>
+            const ch = visibleLayerIds.filter((id) =>
                 findNode(treeItems, (node) => node.key === id)
             );
             return ch;
-        }, [checked, treeItems]);
+        }, [visibleLayerIds, treeItems]);
 
         const shouldShowLine = showLine && hasGroups;
 
@@ -240,6 +235,7 @@ export const LayersTree = observer(
                 className={
                     "ngw-webmap-layers-tree" + (!shouldShowLine ? " flat" : "")
                 }
+                treeData={treeItems}
                 virtual={false}
                 motion={false}
                 checkable={checkable}
@@ -251,10 +247,8 @@ export const LayersTree = observer(
                 autoExpandParent={false}
                 onCheck={onCheck}
                 checkedKeys={checkedKeys}
-                onSelect={_onSelect}
+                onSelect={onSelect}
                 selectedKeys={selectedKeys}
-                treeData={treeItems}
-                titleRender={titleRender}
                 allowDrop={allowDrop}
                 draggable={draggable && { icon: false }}
                 onDrop={onDrop}

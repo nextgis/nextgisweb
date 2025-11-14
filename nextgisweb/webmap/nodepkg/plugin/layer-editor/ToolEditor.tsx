@@ -4,14 +4,13 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { errorModal } from "@nextgisweb/gui/error";
 import { useShowModal } from "@nextgisweb/gui/index";
-import { traverseTree } from "@nextgisweb/gui/util/tree";
 import { gettextf } from "@nextgisweb/pyramid/i18n";
 import { useDisplayContext } from "@nextgisweb/webmap/display/context";
 import { ButtonControl } from "@nextgisweb/webmap/map-component";
 import type { MapControlProps } from "@nextgisweb/webmap/map-component";
 import MapToolbarControl from "@nextgisweb/webmap/map-component/control/MapToolbarControl";
 import { useToggleGroupItem } from "@nextgisweb/webmap/map-component/control/toggle-group";
-import type { LayerItemConfig } from "@nextgisweb/webmap/type/api";
+import type { TreeLayerStore } from "@nextgisweb/webmap/store/tree-store/TreeItemStore";
 
 import { EditableResource } from "./EditableResource";
 import { saveChanges } from "./editor-api";
@@ -36,27 +35,20 @@ const ToolEditor = observer(
 
         const [source] = useState(() => new VectorSource());
 
-        const [editableItems, setEditableItems] = useState<LayerItemConfig[]>(
+        const [editableItems, setEditableItems] = useState<TreeLayerStore[]>(
             []
         );
 
         const dirtyRef = useRef<Map<number, boolean>>(new Map());
 
-        const { webmapStore } = display;
-        const { webmapItems } = webmapStore;
+        const { treeStore } = display;
 
-        const prevEditableRef = useRef<LayerItemConfig[]>(editableItems);
+        const prevEditableRef = useRef<TreeLayerStore[]>(editableItems);
         useEffect(() => {
-            const getKey = (i: LayerItemConfig) => i.id;
+            const getKey = (i: TreeLayerStore) => i.id;
             const prev = prevEditableRef.current;
 
-            const items: LayerItemConfig[] = [];
-
-            traverseTree(webmapItems, (item) => {
-                if (item.type === "layer" && item.editable) {
-                    items.push(item);
-                }
-            });
+            const items = treeStore.editableLayers;
 
             const currKeys = new Set(items.map(getKey));
             const stopped = prev
@@ -92,7 +84,7 @@ const ToolEditor = observer(
                         onUndo: proceed,
                         onContinue: () => {
                             setItemsEditable(
-                                webmapStore,
+                                treeStore,
                                 stopped.map((it) => it.id),
                                 true
                             );
@@ -102,7 +94,14 @@ const ToolEditor = observer(
             } else {
                 proceed();
             }
-        }, [source, display, modalStore, webmapItems, webmapStore, lazyModal]);
+        }, [
+            source,
+            display,
+            modalStore,
+            lazyModal,
+            treeStore.editableLayers,
+            treeStore,
+        ]);
 
         const curentSelectedIsEditable = useMemo(() => {
             const itemId = display.item?.id;
@@ -168,7 +167,7 @@ const ToolEditor = observer(
                             onClick={() => {
                                 if (display.item) {
                                     setItemsEditable(
-                                        webmapStore,
+                                        treeStore,
                                         [display.item.id],
                                         false
                                     );
