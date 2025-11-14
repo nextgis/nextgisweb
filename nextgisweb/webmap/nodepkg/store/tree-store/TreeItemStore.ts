@@ -81,7 +81,7 @@ export class TreeLayerStore
     @observable.ref accessor identification: LayerIdentification | null;
     @observable.ref accessor drawOrderPosition: number | null;
 
-    @observable.ref accessor isOutOfRange = false;
+    @observable.ref accessor isOutOfScaleRange = false;
 
     constructor(init: LayerItemConfig, parentId: number | null) {
         super(init, parentId);

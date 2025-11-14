@@ -4,6 +4,7 @@ import { Checkbox, ConfigProvider, useToken } from "@nextgisweb/gui/antd";
 
 import type { TreeItemStore } from "../store/tree-store/TreeItemStore";
 import { restoreSymbols } from "../utils/symbolsIntervals";
+
 import "./Legend.less";
 
 interface LegendProps {

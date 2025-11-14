@@ -89,6 +89,7 @@ const WebmapLayer = observer(
                 layer.setSymbols(symbols);
             }
         }, [layer, symbols]);
+
         useEffect(() => {
             if (layer && drawOrderPosition !== null) {
                 layer.setZIndex(drawOrderPosition);
@@ -100,10 +101,10 @@ const WebmapLayer = observer(
             if (!layer || r === null) return;
             const ol = layer.olLayer;
 
-            const isOutOfRange =
+            const isOutOfScaleRange =
                 r < ol.getMinResolution() || r >= ol.getMaxResolution();
 
-            layerItemRef.current.update({ isOutOfRange });
+            layerItemRef.current.update({ isOutOfScaleRange });
         }, [layer, resolutionDebounced]);
 
         return null;

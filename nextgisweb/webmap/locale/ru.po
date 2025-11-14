@@ -71,15 +71,15 @@ msgstr "Свернуть"
 msgid "Disable"
 msgstr "Отключить"
 
-#: nodepkg/display-tiny/DisplayTinyPage.tsx:61
+#: nodepkg/display-tiny/DisplayTinyPage.tsx:54
 msgid "Open full map"
 msgstr "Открыть карту целиком"
 
-#: nodepkg/display/Display.ts:243
+#: nodepkg/display/Display.ts:250
 msgid "Object not found"
 msgstr "Объект не найден"
 
-#: nodepkg/display/Display.ts:244
+#: nodepkg/display/Display.ts:251
 msgid "Object from URL parameters not found"
 msgstr "Объект из параметров строки запроса не найден"
 
@@ -230,6 +230,12 @@ msgstr "Публичная аннотация"
 #: nodepkg/layer/annotations/AnnotationFeature.ts:194
 msgid "My private annotation"
 msgstr "Моя приватная аннотация"
+
+#: nodepkg/layers-tree/LayerTreeItemTitle.tsx:16
+msgid ""
+"This layer is not visible at the current map scale. Zoom to make the layer "
+"visible."
+msgstr "Слой не виден на текущем масштабе карты. Измените масштаб, чтобы увидеть слой."
 
 #: nodepkg/layers-tree/LegendAction.tsx:10
 msgid "Show legend"
@@ -502,7 +508,7 @@ msgstr "Растр"
 msgid "N/A"
 msgstr "Н/Д"
 
-#: nodepkg/panel/identify/plugin.tsx:12 nodepkg/store/Identify.ts:36
+#: nodepkg/panel/identify/plugin.tsx:12 nodepkg/store/Identify.ts:40
 msgid "Identify"
 msgstr "Идентификация"
 
@@ -620,11 +626,11 @@ msgstr "Распечатать карту"
 msgid "Enter at least 2 characters"
 msgstr "Введите минимум 2 символа"
 
-#: nodepkg/panel/search/SearchPanel.tsx:463
+#: nodepkg/panel/search/SearchPanel.tsx:460
 msgid "Not found"
 msgstr "Не найдено"
 
-#: nodepkg/panel/search/SearchPanel.tsx:468
+#: nodepkg/panel/search/SearchPanel.tsx:465
 msgid "Refine search criterion. Displayed first 100 search results."
 msgstr "Уточните критерий поиска. Отображены первые 100 результатов поиска."
 

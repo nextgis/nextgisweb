@@ -1,7 +1,9 @@
+import classNames from "classnames";
 import { observer } from "mobx-react-lite";
 import { useState } from "react";
 
 import { Col, Row } from "@nextgisweb/gui/antd";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import type { TreeItemStore } from "../store/tree-store/TreeItemStore";
 
@@ -10,6 +12,10 @@ import { Legend } from "./Legend";
 import { LegendAction } from "./LegendAction";
 
 import "./LayersTree.less";
+
+const msgOutOfScaleRange = gettext(
+    "This layer is not visible at the current map scale. Zoom to make the layer visible."
+);
 
 export interface LayerTreeItemTitleProps {
     treeItem: TreeItemStore;
@@ -33,13 +39,13 @@ export const LayerTreeItemTitle = observer(
         const shouldActions = showLegend || showDropdown;
 
         let actions;
-        let isOutOfRange = false;
+        let isOutOfScaleRange = false;
         if (shouldActions) {
             let legendAction;
             if (treeItem.isLayer()) {
                 const treeLayer = treeItem;
 
-                isOutOfRange = treeItem.isOutOfRange;
+                isOutOfScaleRange = treeItem.isOutOfScaleRange;
                 legendAction = treeLayer.legendInfo.symbols &&
                     treeLayer.legendInfo.symbols.length > 1 &&
                     showLegend && (
@@ -77,11 +83,16 @@ export const LayerTreeItemTitle = observer(
 
         return (
             <>
-                <Row
-                    wrap={false}
-                    style={{ opacity: isOutOfRange ? 0.4 : undefined }}
-                >
-                    <Col flex="auto" className="tree-item-title">
+                <Row wrap={false}>
+                    <Col
+                        className={classNames("tree-item-title", {
+                            "out-of-scale-range": isOutOfScaleRange,
+                        })}
+                        flex="auto"
+                        title={
+                            isOutOfScaleRange ? msgOutOfScaleRange : undefined
+                        }
+                    >
                         {treeItem.title}
                     </Col>
                     {actions}
