@@ -26,8 +26,18 @@ mapControlRegistry(COMP_ID, {
     props: { out: true, groupId: "zoomingOut" },
 });
 mapControlRegistry(COMP_ID, {
-    key: "md",
+    key: "sv",
     order: 30,
+    component: () => import("../map-component/tool/ToolSwipe"),
+    label: gettext("Vertical swipe"),
+    position: { inside: "map-toolbar" },
+    hideOnMobile: true,
+    embeddedShowMode: "customize",
+    props: { orientation: "vertical", groupId: "swipeVertical" },
+});
+mapControlRegistry(COMP_ID, {
+    key: "md",
+    order: 40,
     component: () => import("../map-component/tool/ToolMeasure"),
     label: gettext("Measure distance"),
     position: { inside: "map-toolbar" },
@@ -37,23 +47,13 @@ mapControlRegistry(COMP_ID, {
 });
 mapControlRegistry(COMP_ID, {
     key: "ma",
-    order: 40,
+    order: 50,
     component: () => import("../map-component/tool/ToolMeasure"),
     label: gettext("Measure area"),
     position: { inside: "map-toolbar" },
     embeddedShowMode: "customize",
     showOnPreview: true,
     props: { type: "Polygon", groupId: "measuringArea" },
-});
-mapControlRegistry(COMP_ID, {
-    key: "sv",
-    order: 50,
-    component: () => import("../map-component/tool/ToolSwipe"),
-    label: gettext("Vertical swipe"),
-    position: { inside: "map-toolbar" },
-    hideOnMobile: true,
-    embeddedShowMode: "customize",
-    props: { orientation: "vertical", groupId: "swipeVertical" },
 });
 mapControlRegistry(COMP_ID, {
     key: "tv",
