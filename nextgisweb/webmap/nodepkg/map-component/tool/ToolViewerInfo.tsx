@@ -1,5 +1,7 @@
-import MapViewerInfoComp from "@nextgisweb/webmap/map-viewer-info";
-
+import MapViewerInfoComp, {
+    CoordinateSystemDisplay,
+} from "../../map-viewer-info";
+import { useMeasurementToolsActive } from "../../map-viewer-info/hook/useMeasurementToolsActive";
 import { useMapContext } from "../context/useMapContext";
 import { MapControl } from "../control";
 import type { MapControlProps } from "../control";
@@ -28,6 +30,8 @@ export default function ToolViewerInfo({
         onChange,
         canToggle,
     });
+    const isMeasurementActive = useMeasurementToolsActive();
+    const shouldShowCoordinateSystem = isMeasurementActive || value;
 
     return (
         <MapControl
@@ -46,6 +50,8 @@ export default function ToolViewerInfo({
             </button>
 
             {value && <MapViewerInfoComp map={mapStore.olMap} />}
+
+            {shouldShowCoordinateSystem && <CoordinateSystemDisplay />}
         </MapControl>
     );
 }
