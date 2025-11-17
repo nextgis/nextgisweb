@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import { useEffect } from "react";
 
-import { Modal } from "@nextgisweb/gui/antd";
+import { Modal, useToken } from "@nextgisweb/gui/antd";
 import { useShowModal } from "@nextgisweb/gui/show-modal/useShowModal";
 import type { DynMenuItem } from "@nextgisweb/pyramid/layout/dynmenu/type";
 
@@ -45,6 +45,19 @@ export function Base({
     const { modalHolder } = useShowModal({
         modalStore: layoutStore.modalStore,
     });
+
+    const { token } = useToken();
+
+    useEffect(() => {
+        let meta = document.querySelector('meta[name="theme-color"]');
+        if (!meta) {
+            meta = document.createElement("meta");
+            meta.setAttribute("name", "theme-color");
+            document.head.appendChild(meta);
+        }
+
+        meta.setAttribute("content", token.colorPrimary);
+    }, [token.colorBgBase, token.colorPrimary]);
 
     useEffect(() => {
         layoutStore.setModalApi(modalApi);

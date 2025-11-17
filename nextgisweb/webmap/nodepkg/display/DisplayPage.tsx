@@ -1,6 +1,6 @@
 import { StrictMode, useEffect } from "react";
 
-import { Spin } from "@nextgisweb/gui/antd";
+import { Spin, useToken } from "@nextgisweb/gui/antd";
 import { useRouteGet } from "@nextgisweb/pyramid/hook";
 
 import { DisplayWidget } from "./DisplayWidget";
@@ -12,21 +12,31 @@ export default function DisplayPage({ id }: { id: number }) {
         id,
     });
 
+    const { token } = useToken();
+
     useEffect(() => {
         const html = document.documentElement;
         const body = document.body;
 
         const prevHtmlBehavior = html.style.overscrollBehaviorY;
         const prevBodyBehavior = body.style.overscrollBehaviorY;
+        const prevBgColor = html.style.backgroundColor;
+        const prevBodyBg = body.style.backgroundColor;
 
         html.style.overscrollBehaviorY = "contain";
         body.style.overscrollBehaviorY = "contain";
 
+        html.style.backgroundColor = token.colorPrimary;
+        body.style.backgroundColor = token.colorBgBase;
+
         return () => {
             html.style.overscrollBehaviorY = prevHtmlBehavior;
             body.style.overscrollBehaviorY = prevBodyBehavior;
+
+            html.style.backgroundColor = prevBgColor;
+            body.style.backgroundColor = prevBodyBg;
         };
-    }, []);
+    }, [token]);
 
     return (
         <StrictMode>

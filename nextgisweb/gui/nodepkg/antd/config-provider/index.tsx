@@ -1,4 +1,5 @@
 import Base from "antd/es/config-provider";
+import color from "color";
 
 import { antd } from "@nextgisweb/jsrealm/i18n/lang";
 
@@ -7,7 +8,17 @@ import type { ParamsOf } from "../../type";
 type Props = ParamsOf<typeof Base>;
 
 const computed = window.getComputedStyle(document.body);
-const cvar = (name: string): string => computed.getPropertyValue("--" + name);
+
+const cvar = (name: string): string => {
+    const val = computed.getPropertyValue("--" + name);
+
+    try {
+        const parsedColor = color(val);
+        return parsedColor.hex();
+    } catch {
+        return val;
+    }
+};
 
 type Theme = NonNullable<Props["theme"]>;
 
