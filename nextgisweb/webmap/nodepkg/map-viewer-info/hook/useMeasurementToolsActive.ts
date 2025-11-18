@@ -1,5 +1,6 @@
-import { debounce } from "lodash-es";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
+
+import { useMemoDebounce } from "@nextgisweb/pyramid/hook/useMemoDebounce";
 
 import { useToggleGroupItem } from "../../map-component/control/toggle-group/useToggleGroupItem";
 
@@ -12,28 +13,5 @@ export function useMeasurementToolsActive() {
         [measuringLength.isActive, measuringArea.isActive]
     );
 
-    const [debouncedActive, setDebouncedActive] = useState(isActive);
-
-    const setDebouncedFalse = useMemo(
-        () =>
-            debounce(() => {
-                setDebouncedActive(false);
-            }, 100),
-        []
-    );
-
-    useEffect(() => {
-        if (isActive) {
-            setDebouncedFalse.cancel();
-            setDebouncedActive(true);
-        } else {
-            setDebouncedFalse();
-        }
-
-        return () => {
-            setDebouncedFalse.cancel();
-        };
-    }, [isActive, setDebouncedFalse]);
-
-    return debouncedActive;
+    return useMemoDebounce(isActive, 100);
 }
