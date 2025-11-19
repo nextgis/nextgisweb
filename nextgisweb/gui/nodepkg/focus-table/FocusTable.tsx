@@ -63,6 +63,14 @@ export function FocusTable<
     const [selected, setSelected] = useState<I | null>(null);
     const [showDetails, setShowDetails] = useState(false);
 
+    const [detailKey, setDetailKey] = useState<number | string | null>(null);
+
+    const setSelectedWrapper = (val: I | null) => {
+        setDetailKey(val !== null ? environmentRef.current.indexFor(val) : val);
+
+        setSelected(val);
+    };
+
     const hideDetail = useMemo((): FocusTableAction<
         I | null,
         ComplexTreeEnvironment<I>
@@ -105,13 +113,13 @@ export function FocusTable<
                         showColumns={!showDetails}
                         showActions={!showDetails}
                         showErrors={true}
-                        onSelect={setSelected}
+                        onSelect={setSelectedWrapper}
                         onPrimaryAction={() => setShowDetails(true)}
                     />
                 </div>
             </Splitter.Panel>
 
-            {showDetails && selected && environmentRef.current && (
+            {showDetails && selected && detailKey !== null && (
                 <Splitter.Panel className="detail" min="20%" defaultSize="65%">
                     <FocusToolbar
                         actions={[hideDetail, ...itemActionsArray]}
@@ -119,7 +127,7 @@ export function FocusTable<
                         selected={selected}
                         hideEmpty
                     />
-                    <Fragment key={environmentRef.current.indexFor(selected)}>
+                    <Fragment key={detailKey}>
                         <Detail item={selected} />
                     </Fragment>
                 </Splitter.Panel>

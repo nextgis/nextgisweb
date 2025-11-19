@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useReducer } from "react";
+import { useEffect, useMemo, useReducer, useRef } from "react";
 
 import { isAbortError } from "@nextgisweb/gui/error";
 import { arraySequenceIndexer } from "@nextgisweb/gui/util";
@@ -49,7 +49,7 @@ export function useCache<
     R extends NonNullable<unknown> | null,
 >(fn: UseCacheFn<A, R>): UseCacheHook<A, R> {
     const { index } = useMemo(() => arraySequenceIndexer<A>(), []);
-    const cache = useMemo<Record<number, [CacheObject<R>]>>(() => ({}), []);
+    const cache = useRef<Record<number, [CacheObject<R>]>>({});
 
     // TODO: Rerender only if relevant elements updated
     const rerender = useReducer((i) => i + 1, 0)[1];
@@ -59,7 +59,7 @@ export function useCache<
 
     const fetch = (args: A, opts: UseCacheHookOpts = {}) => {
         const id = index(args);
-        let record = cache[id];
+        let record = cache.current[id];
         let promise: Promise<R> | undefined;
 
         if (record === undefined) {
@@ -69,7 +69,7 @@ export function useCache<
             } else {
                 record = [MISSING];
             }
-            cache[id] = record;
+            cache.current[id] = record;
         } else if (!opts.cachedOnly && record[0].status === "missing") {
             promise = fn(args, { signal: abort.signal });
             record[0] = { status: "loading" as const, promise };
@@ -83,7 +83,7 @@ export function useCache<
             });
             promise.catch((error) => {
                 if (isAbortError(error)) {
-                    delete cache[id];
+                    delete cache.current[id];
                 } else {
                     record[0] = { status: "error" as const, error };
                     rerender();

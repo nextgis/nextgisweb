@@ -1,32 +1,32 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 import { AbortControllerHelper } from "@nextgisweb/pyramid/util/abort";
 
 export function useAbortController() {
-    const abortHelper = useRef<AbortControllerHelper | null>(null);
+    const abortHelperRef = useRef<AbortControllerHelper | null>(null);
 
-    const makeSignal = useRef(() => {
-        if (!abortHelper.current) {
-            abortHelper.current = new AbortControllerHelper();
+    const ensureHelper = useCallback(() => {
+        if (!abortHelperRef.current) {
+            abortHelperRef.current = new AbortControllerHelper();
         }
-        return abortHelper.current.makeSignal();
-    });
-
-    const abort = useRef((reason?: string) => {
-        if (abortHelper.current) {
-            abortHelper.current.abort(reason);
-        }
-    });
-
-    useEffect(() => {
-        if (!abortHelper.current) {
-            abortHelper.current = new AbortControllerHelper();
-        }
-        const abortHelper_ = abortHelper.current;
-        return () => {
-            abortHelper_.abort();
-        };
+        return abortHelperRef.current;
     }, []);
 
-    return { makeSignal: makeSignal.current, abort: abort.current };
+    const makeSignal = useCallback(() => {
+        const helper = ensureHelper();
+        return helper.makeSignal();
+    }, [ensureHelper]);
+
+    const abort = useCallback((reason?: string) => {
+        abortHelperRef.current?.abort(reason);
+    }, []);
+
+    useEffect(() => {
+        const helper = ensureHelper();
+        return () => {
+            helper.abort();
+        };
+    }, [ensureHelper]);
+
+    return { makeSignal, abort };
 }

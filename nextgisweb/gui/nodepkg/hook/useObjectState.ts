@@ -28,6 +28,7 @@ export function useObjectState<O>(
                 : obj;
 
         if (!isEqualFn(currentObj, prevVal.current)) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setLocalObj(currentObj);
         }
         prevVal.current = currentObj;

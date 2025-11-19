@@ -19,6 +19,7 @@ module.exports = {
         ],
     ],
     "plugins": [
+        "babel-plugin-react-compiler",
         "@babel/plugin-transform-runtime",
         ["@babel/plugin-proposal-decorators", { "version": "2023-11" }],
     ],

@@ -8,6 +8,7 @@ module.exports = function ({ symbol, config, context }) {
     const symbolRequest = stringifyRequest({ context }, symbolModule);
 
     return `
+        "use no memo";
         import Symbol from ${symbolRequest};
         import sprite from ${spriteRequest};
 

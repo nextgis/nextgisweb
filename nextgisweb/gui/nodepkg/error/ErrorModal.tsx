@@ -25,23 +25,19 @@ const DEFAULTS = {
     maskTransitionName: "",
 };
 
-export function ErrorModal({
-    error,
-    open: open_,
-    visible,
-    ...props
-}: ErrorModalProps) {
-    const [open, setOpen] = useState(visible ?? open_ ?? true);
+export function ErrorModal({ error, open: open_, ...props }: ErrorModalProps) {
+    const [open, setOpen] = useState(open_ ?? true);
     const [tinfo, setTinfo] = useState(false);
 
     const close = () => setOpen(false);
 
     useEffect(() => {
-        const isOpen = visible ?? open_;
+        const isOpen = open_;
         if (typeof isOpen === "boolean") {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setOpen(isOpen);
         }
-    }, [visible, open_]);
+    }, [open_]);
 
     const title =
         "title" in error && typeof error.title === "string"

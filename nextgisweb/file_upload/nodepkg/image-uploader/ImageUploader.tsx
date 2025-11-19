@@ -17,6 +17,45 @@ type OriginFileObj = UploadFile["originFileObj"];
 const msgUpload = gettext("Select a file");
 const msgDelete = gettext("Delete");
 
+function Preview({
+    height,
+    backgroundImage,
+    clean,
+}: {
+    height: number;
+    backgroundImage: string;
+    clean: () => void;
+}) {
+    return (
+        <div className="uploader--image uploader--complete">
+            <div
+                className="uploader__dropzone"
+                style={{
+                    height: height + "px",
+                    backgroundImage,
+                    width: "100%",
+                    position: "relative",
+                }}
+            >
+                <Button
+                    shape="round"
+                    ghost
+                    danger
+                    icon={<RemoveIcon />}
+                    style={{
+                        position: "absolute",
+                        top: "10px",
+                        right: "10px",
+                    }}
+                    onClick={clean}
+                >
+                    {msgDelete}
+                </Button>
+            </div>
+        </div>
+    );
+}
+
 export function ImageUploader<M extends boolean = boolean>({
     inputProps: inputPropsParam,
     onClean = () => {},
@@ -67,6 +106,7 @@ export function ImageUploader<M extends boolean = boolean>({
 
     useEffect(() => {
         if (image) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setBackgroundImage(`url(${image})`);
         }
     }, [image]);
@@ -77,41 +117,14 @@ export function ImageUploader<M extends boolean = boolean>({
         }
     }, [chosenFile, fileMeta]);
 
-    const Preview = () => {
-        return (
-            <div className="uploader--image uploader--complete">
-                <div
-                    className="uploader__dropzone"
-                    style={{
-                        height: height + "px",
-                        backgroundImage,
-                        width: "100%",
-                        position: "relative",
-                    }}
-                >
-                    <Button
-                        shape="round"
-                        ghost
-                        danger
-                        icon={<RemoveIcon />}
-                        style={{
-                            position: "absolute",
-                            top: "10px",
-                            right: "10px",
-                        }}
-                        onClick={() => clean()}
-                    >
-                        {msgDelete}
-                    </Button>
-                </div>
-            </div>
-        );
-    };
-
     return (
         <>
             {backgroundImage ? (
-                <Preview />
+                <Preview
+                    clean={clean}
+                    backgroundImage={backgroundImage}
+                    height={height}
+                />
             ) : (
                 <FileUploader
                     file={file}

@@ -1,4 +1,4 @@
-import { use } from "react";
+import { createElement, use } from "react";
 
 export function EntrypointLoader({
     entrypoint,
@@ -9,5 +9,5 @@ export function EntrypointLoader({
 }) {
     const mod = use(window.ngwEntry(entrypoint));
     const Component = (mod as any).default ?? mod;
-    return <Component {...props} />;
+    return createElement(Component, props);
 }
