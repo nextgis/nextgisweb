@@ -56,11 +56,15 @@ msgstr "Не установлен"
 msgid "Save"
 msgstr "Сохранить"
 
-#: nodepkg/component/extent-editor-modal/ExtentEditorModal.tsx:129
+#: nodepkg/component/collapsible-text/CollapsibleText.tsx:59
+msgid "collapse"
+msgstr "свернуть"
+
+#: nodepkg/component/extent-editor-modal/ExtentEditorModal.tsx:110
 msgid "Close"
 msgstr "Закрыть"
 
-#: nodepkg/component/extent-editor-modal/ExtentEditorModal.tsx:138
+#: nodepkg/component/extent-editor-modal/ExtentEditorModal.tsx:119
 msgid "Apply"
 msgstr "Применить"
 

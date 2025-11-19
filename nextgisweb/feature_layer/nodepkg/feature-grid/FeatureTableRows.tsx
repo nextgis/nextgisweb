@@ -14,6 +14,7 @@ import type {
     SetValue,
 } from "./type";
 import { renderFeatureFieldValue } from "./util/renderFeatureFieldValue";
+import { CollapsibleText } from "@nextgisweb/gui/component";
 
 interface VersionProps {
     resourceId: number;
@@ -100,6 +101,16 @@ export function FeatureTableRows({
                             val !== undefined
                                 ? renderFeatureFieldValue(f, val)
                                 : loadingCol();
+
+                        if (typeof renderValue === "string") {
+                            renderValue = (
+                                <CollapsibleText
+                                    text={renderValue}
+                                    maxChars={200}
+                                />
+                            );
+
+                        }
                     }
 
                     return (

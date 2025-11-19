@@ -5,6 +5,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { FieldDataItem } from "./fields";
 
 import "./KeyValueTable.less";
+import { CollapsibleText } from "@nextgisweb/gui/component";
 
 export function KeyValueTable({ data }: { data: FieldDataItem[] }) {
     const columns: TableColumnsType<FieldDataItem> = [
@@ -21,14 +22,21 @@ export function KeyValueTable({ data }: { data: FieldDataItem[] }) {
         },
     ];
 
+    const dataSource: FieldDataItem[] = data.map(({ key, value, attr }) => ({
+        key,
+        value:
+            typeof value === "string" ? (
+                <CollapsibleText text={value} />
+            ) : (
+                value
+            ),
+        attr: attr ?? (key ? String(key) : undefined),
+    }));
+
     return (
         <Table
             className="ngw-webmap-panel-identify-kv-table"
-            dataSource={data.map(({ key, value, attr }) => ({
-                key,
-                value,
-                attr: attr ?? (key ? String(key) : undefined),
-            }))}
+            dataSource={dataSource}
             columns={columns}
             bordered={true}
             size="small"
