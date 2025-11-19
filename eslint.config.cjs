@@ -12,9 +12,6 @@ const tseslint = require("typescript-eslint");
 const babelConfigPath = require.resolve("@nextgisweb/jsrealm/babelrc.cjs");
 
 const browserGlobals = { ...globals.browser };
-// Use this fix because CKEditor installs old version of globals with this bug
-// https://github.com/sindresorhus/globals/issues/239
-delete browserGlobals["AudioWorkletGlobalScope "];
 
 /**
  * @type {import("eslint").Linter.ParserOptions["ecmaVersion"]}
@@ -31,7 +28,8 @@ const noUnusedVarsOptions = {
     destructuredArrayIgnorePattern: "^_",
 };
 
-module.exports = tseslint.config(
+/** @type {import("eslint").Linter.Config[]} */
+const config = [
     {
         ignores: [
             "doc/",
@@ -44,7 +42,7 @@ module.exports = tseslint.config(
     },
 
     js.configs.recommended,
-    tseslint.configs.recommended,
+    ...tseslint.configs.recommended,
 
     {
         languageOptions: {
@@ -74,9 +72,6 @@ module.exports = tseslint.config(
     reactPlugin.configs.flat["jsx-runtime"],
     reactHooksPlugin.configs["recommended-latest"],
     {
-        plugins: {
-            react: reactPlugin,
-        },
         rules: {
             "react/prop-types": "off", // Use TypeScript instead
             "react/jsx-no-target-blank": "off", // Unsupported browsers
@@ -239,5 +234,6 @@ module.exports = tseslint.config(
             },
             "import-x/internal-regex": "^@nextgisweb/",
         },
-    }
-);
+    },
+];
+module.exports = config;
