@@ -32,10 +32,12 @@ export function useMapAdapter({
     maxZoom,
     mapStore: mapStoreProp,
     mapExtent: mapExtentProp,
+    ...restViewOptions
 }: MapProps) {
     const baseRef = useRef<QuadKey | XYZ | undefined>(undefined);
 
     const [center] = useObjectState(centerProp);
+    const [viewOptions] = useObjectState(restViewOptions);
     const [mapExtent] = useObjectState(mapExtentProp);
 
     const effectiveExtent = useMemo(() => {
@@ -55,10 +57,13 @@ export function useMapAdapter({
             return mapStoreProp;
         } else {
             return createMapAdapter({
-                viewOptions: { projection: `EPSG:${mapSRSId}` },
+                viewOptions: {
+                    projection: `EPSG:${mapSRSId}`,
+                    ...viewOptions,
+                },
             });
         }
-    }, [mapSRSId, mapStoreProp]);
+    }, [mapSRSId, mapStoreProp, viewOptions]);
 
     useEffect(() => {
         return () => {

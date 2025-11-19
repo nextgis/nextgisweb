@@ -10,6 +10,7 @@ import type { EventsKey } from "ol/events";
 import * as olExtent from "ol/extent";
 import type { Extent } from "ol/extent";
 import { GeoJSON, WKT } from "ol/format";
+import type { Geometry } from "ol/geom";
 import * as olProj from "ol/proj";
 import type { ProjectionLike } from "ol/proj";
 
@@ -31,7 +32,6 @@ import { mapStartup } from "./util/mapStartup";
 import { scaleForResolution } from "./util/resolutionUtil";
 
 import "ol/ol.css";
-import type { Geometry } from "ol/geom";
 
 export interface MapExtent extends FitOptions {
     extent: NgwExtent;

@@ -3,13 +3,13 @@ import type { ViewOptions } from "ol/View";
 
 import { MapStore } from "@nextgisweb/webmap/ol/MapStore";
 
-export const createMapAdapter = ({
+export function createMapAdapter({
     target,
     viewOptions = { projection: `EPSG:3857` },
 }: {
     target?: HTMLElement | string;
     viewOptions?: ViewOptions;
-} = {}) => {
+} = {}) {
     const view = new View(viewOptions);
 
     const adapter = new MapStore({
@@ -19,4 +19,4 @@ export const createMapAdapter = ({
     });
 
     return adapter;
-};
+}

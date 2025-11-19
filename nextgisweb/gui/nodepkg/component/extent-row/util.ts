@@ -1,3 +1,5 @@
+import type { ExtentWSEN } from "@nextgisweb/webmap/type/api";
+
 import type { ExtentRowValue } from "./ExtentRow";
 
 export function unionExtents(extents: ExtentRowValue[]): ExtentRowValue {
@@ -12,4 +14,12 @@ export function unionExtents(extents: ExtentRowValue[]): ExtentRowValue {
         right: Math.max(...rights),
         top: Math.max(...tops),
     };
+}
+
+export function toOlExtent(v?: ExtentRowValue): ExtentWSEN | undefined {
+    if (!v) return undefined;
+    const { left, bottom, right, top } = v;
+    if ([left, bottom, right, top].some((x) => x === null || x === undefined))
+        return undefined;
+    return [left!, bottom!, right!, top!];
 }

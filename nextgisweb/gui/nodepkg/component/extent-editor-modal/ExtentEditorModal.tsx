@@ -1,6 +1,7 @@
 import Feature from "ol/Feature";
+import type { Extent } from "ol/extent";
 import Polygon, { fromExtent as polygonFromExtent } from "ol/geom/Polygon";
-import { transformExtent } from "ol/proj";
+import { get as getProjection, transformExtent } from "ol/proj";
 import VectorSource from "ol/source/Vector";
 import { useEffect, useMemo, useState } from "react";
 
@@ -9,13 +10,19 @@ import {
     DEFAULT_SRS,
 } from "@nextgisweb/feature-layer/geometry-editor/constant";
 import { CloseIcon } from "@nextgisweb/gui/icon";
-import { convertWSENToNgwExtent } from "@nextgisweb/gui/util/extent";
+import {
+    clampExtent,
+    convertWSENToNgwExtent,
+} from "@nextgisweb/gui/util/extent";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { ButtonControl } from "@nextgisweb/webmap/map-component";
 import type { MapExtent } from "@nextgisweb/webmap/ol/MapStore";
 import { PreviewMap } from "@nextgisweb/webmap/preview-map";
+import type { ExtentWSEN } from "@nextgisweb/webmap/type/api";
+import { normalizeExtent } from "@nextgisweb/webmap/utils/normalizeExtent";
 
 import type { ExtentRowValue } from "../extent-row";
+import { toOlExtent } from "../extent-row/util";
 import { PreviewMapModal } from "../preview-map-modal/PreviewMapModal";
 import type { PreviewMapModalProps } from "../preview-map-modal/PreviewMapModal";
 
@@ -23,31 +30,37 @@ import { ExtentEditorControlPanel } from "./ExtentEditorControlPanel";
 
 import CheckIcon from "@nextgisweb/icon/material/check";
 
-function toOlExtent(
-    v?: ExtentRowValue
-): [number, number, number, number] | undefined {
-    if (!v) return undefined;
-    const { left, bottom, right, top } = v;
-    if ([left, bottom, right, top].some((x) => x === null || x === undefined))
-        return undefined;
-    return [left!, bottom!, right!, top!];
-}
-
-function polygonToWSEN(poly: Polygon): ExtentRowValue {
-    const ext3857 = poly.getExtent();
-    const ext = transformExtent(ext3857, "EPSG:3857", "EPSG:4326");
-    return {
-        left: ext[0],
-        bottom: ext[1],
-        right: ext[2],
-        top: ext[3],
-    };
-}
-
 interface ExtentEditorModalProps extends PreviewMapModalProps {
     value?: ExtentRowValue;
     onClose: () => void;
     onChange: (v: ExtentRowValue) => void;
+}
+
+function extentsEqual(a?: Extent, b?: Extent, epsilon = 1e-6): boolean {
+    if (!a || !b) {
+        return false;
+    }
+    return (
+        Math.abs(a[0] - b[0]) < epsilon &&
+        Math.abs(a[1] - b[1]) < epsilon &&
+        Math.abs(a[2] - b[2]) < epsilon &&
+        Math.abs(a[3] - b[3]) < epsilon
+    );
+}
+
+function clampExtentToProj(extent: ExtentWSEN): ExtentWSEN {
+    const proj = getProjection("EPSG:3857");
+    const projExtent = proj?.getExtent();
+    if (!projExtent) {
+        return extent;
+    }
+    const projExtent4326 = transformExtent(
+        projExtent,
+        "EPSG:3857",
+        "EPSG:4326"
+    );
+
+    return clampExtent(extent, projExtent4326) as ExtentWSEN;
 }
 
 export function ExtentEditorModal({
@@ -57,20 +70,38 @@ export function ExtentEditorModal({
     onChange,
     ...props
 }: ExtentEditorModalProps) {
-    const initialOlExtent = useMemo(() => toOlExtent(value), [value]);
+    const initialOlExtent = useMemo(() => {
+        const wsen = toOlExtent(value);
+        if (wsen) {
+            return clampExtentToProj(normalizeExtent(wsen));
+        }
+    }, [value]);
 
-    const [source] = useState(() => new VectorSource());
+    const projExtent = useMemo(() => {
+        const proj = getProjection("EPSG:3857");
+        return proj?.getExtent();
+    }, []);
+
+    const [source] = useState(() => new VectorSource({ wrapX: false }));
 
     useEffect(() => {
         source.clear();
         if (initialOlExtent) {
-            const poly = polygonFromExtent(
-                transformExtent(initialOlExtent, "EPSG:4326", "EPSG:3857")
+            const extent3857 = transformExtent(
+                initialOlExtent,
+                "EPSG:4326",
+                "EPSG:3857"
             );
+
+            if (projExtent && extentsEqual(extent3857, projExtent)) {
+                return;
+            }
+
+            const poly = polygonFromExtent(extent3857);
             const f = new Feature({ geometry: poly });
             source.addFeature(f);
         }
-    }, [initialOlExtent, source]);
+    }, [initialOlExtent, projExtent, source]);
 
     const initialMapExtent = useMemo<MapExtent | undefined>(() => {
         if (initialOlExtent) {
@@ -93,7 +124,18 @@ export function ExtentEditorModal({
             onChange({});
             return;
         }
-        onChange(polygonToWSEN(poly));
+
+        const ext3857 = poly.getExtent();
+        const ext = clampExtentToProj(
+            transformExtent(ext3857, "EPSG:3857", "EPSG:4326") as ExtentWSEN
+        );
+
+        onChange({
+            left: ext[0],
+            bottom: ext[1],
+            right: ext[2],
+            top: ext[3],
+        });
     };
 
     return (
@@ -102,6 +144,8 @@ export function ExtentEditorModal({
                 style={{ height: "60vh", width: "60vw" }}
                 basemap
                 initialMapExtent={initialMapExtent}
+                multiWorld={false}
+                extent={projExtent}
             >
                 <ButtonControl
                     order={1}
