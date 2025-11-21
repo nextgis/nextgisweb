@@ -5,6 +5,7 @@ import { Modal, useToken } from "@nextgisweb/gui/antd";
 import { useShowModal } from "@nextgisweb/gui/show-modal/useShowModal";
 import type { DynMenuItem } from "@nextgisweb/pyramid/layout/dynmenu/type";
 
+import { CBlock } from "../cblock";
 import { EntrypointSuspense } from "../component/EntrypointSuspense";
 
 import { Breadcrumbs } from "./Breadcrumbs";
@@ -12,6 +13,13 @@ import type { BreadcrumbItem } from "./Breadcrumbs";
 import { Dynmenu } from "./dynmenu/Dynmenu";
 import { Header } from "./header/Header";
 import { layoutStore } from "./store";
+
+declare module "@nextgisweb/pyramid/cblock" {
+    interface CBlocks {
+        // Banner at the top of the page above the header
+        "pyramid.banner": undefined;
+    }
+}
 
 interface BaseProps {
     title: string;
@@ -74,6 +82,8 @@ export function Base({
                 "ngw-pyramid-layout-vstretch": maxheight,
             })}
         >
+            <CBlock slot="pyramid.banner" />
+
             <Header
                 header={header}
                 hideResourceFilter={hideResourceFilter}
