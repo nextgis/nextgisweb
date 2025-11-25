@@ -2,6 +2,8 @@ import TileLayer from "ol/layer/Tile";
 import XYZSource from "ol/source/XYZ";
 import type { Options as XYZSourceOptions } from "ol/source/XYZ";
 
+import type { LayerSymbols } from "@nextgisweb/webmap/compat/type";
+
 import { CoreLayer } from "./CoreLayer";
 import type { LayerOptions } from "./CoreLayer";
 
@@ -17,11 +19,7 @@ export default class XYZ extends CoreLayer<
 > {
     protected createSource(options: XYZSourceOptions): XYZSource {
         const source = new XYZSource(options);
-
-        if (Array.isArray(this.symbols) && this.symbols.length) {
-            this.updateSymbols(this.symbols);
-        }
-
+        this.updateSymbols(this.symbols);
         return source;
     }
 
@@ -31,22 +29,26 @@ export default class XYZ extends CoreLayer<
         return new TileLayer(options);
     }
 
-    override setSymbols(symbols: string[]): void {
+    override setSymbols(symbols: LayerSymbols): void {
         super.setSymbols(symbols);
         this.updateSymbols(symbols);
     }
 
-    private updateSymbols(symbols: string[]) {
-        const urls = this.olSource.getUrls();
-        if (urls && urls.length > 0) {
-            const updatedUrls = urls.map((url) =>
-                this.updateUrl(url, symbols[0])
-            );
-            this.olSource.setUrls(updatedUrls);
+    private updateSymbols(symbols: LayerSymbols) {
+        const val =
+            Array.isArray(symbols) && symbols.length ? symbols[0] : null;
+        if (val) {
+            const urls = this.olSource.getUrls();
+            if (urls && urls.length > 0) {
+                const updatedUrls = urls.map((url) =>
+                    this.updateUrl(url, val[0])
+                );
+                this.olSource.setUrls(updatedUrls);
+            }
         }
     }
 
-    private updateUrl(src: string, value: string): string {
+    private updateUrl(src: string, value?: string): string {
         const url = new URL(src, window.location.href);
         const params = this.parseUrlParams(url.search);
 
