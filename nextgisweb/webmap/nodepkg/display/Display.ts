@@ -91,7 +91,9 @@ export class Display {
             display: this,
         });
 
-        this.treeStore = new TreeStore(this.config.rootItem);
+        this.treeStore = new TreeStore(this.config.rootItem, {
+            drawOrderEnabled: this.config.drawOrderEnabled,
+        });
 
         this._pluginsSetup();
         this._identifyFeatureByAttrValue();

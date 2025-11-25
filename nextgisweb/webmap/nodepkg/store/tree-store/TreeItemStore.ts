@@ -79,7 +79,7 @@ export class TreeLayerStore
     @observable.ref accessor minResolution: number | null;
     @observable.ref accessor maxResolution: number | null;
     @observable.ref accessor identification: LayerIdentification | null;
-    @observable.ref accessor drawOrderPosition: number | null;
+    @observable.ref accessor drawOrderPosition: number;
 
     @observable.ref accessor isOutOfScaleRange = false;
 

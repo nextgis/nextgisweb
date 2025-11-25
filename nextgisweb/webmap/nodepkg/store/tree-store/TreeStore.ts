@@ -19,6 +19,9 @@ import type {
 import { filterItems, someItem, validateVisible } from "./treeStoreUtil";
 import type { ConfigByType, NodeByType } from "./treeStoreUtil";
 
+interface TreeStoreOptions {
+    drawOrderEnabled?: boolean;
+}
 export class TreeStore {
     rootId: number;
 
@@ -26,12 +29,14 @@ export class TreeStore {
     @observable.shallow accessor childrenIds: number[] = [];
     @observable.ref accessor visibleLayerIds: number[] = [];
 
+    @observable.ref accessor drawOrderEnabled = false;
+
     private readonly _loadingResourceSymbols = new Set<number>();
 
-    constructor(rootItem: RootItemConfig) {
+    constructor(rootItem: RootItemConfig, options?: TreeStoreOptions) {
         this.rootId = rootItem.id;
+        this.drawOrderEnabled = options?.drawOrderEnabled ?? false;
         this.load(rootItem);
-
         reaction(
             () => this.treeStructureStamp,
 
@@ -92,7 +97,28 @@ export class TreeStore {
 
         this.childrenIds = [];
         this.visibleLayerIds = [];
-        [...children].reverse().forEach((child) => this.addItem(child));
+        [...children].reverse().forEach((child) => {
+            this.addItem(child);
+        });
+
+        if (this.drawOrderEnabled) {
+            const layers: TreeLayerStore[] = [];
+            for (const item of this.items.values()) {
+                if (item.isLayer()) {
+                    layers.push(item);
+                }
+            }
+            if (layers.length) {
+                const sorted = [...layers].sort(
+                    (a, b) => a.drawOrderPosition - b.drawOrderPosition
+                );
+                const lastIndex = sorted.length - 1;
+                sorted.forEach((layer, idx) => {
+                    const newPos = lastIndex - idx + 1;
+                    layer.update({ drawOrderPosition: newPos });
+                });
+            }
+        }
     }
 
     nextId() {
