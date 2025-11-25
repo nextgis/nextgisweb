@@ -8,7 +8,6 @@ import {
     useReducer,
     useState,
 } from "react";
-import type React from "react";
 
 import type { DataSource } from "@nextgisweb/feature-attachment/attachment-editor/type";
 import { Image } from "@nextgisweb/gui/antd";
@@ -18,6 +17,8 @@ import { AttachmentPreviewToolbar } from "../component/AttachmentPreviewToolbar"
 import { getImageURL } from "../util/getImageURL";
 
 import { PanoramaStore } from "./PanoramaStore";
+
+import "./AttachmentPreviewGroup.less";
 
 type PreviewGroupProps = GetProps<typeof Image.PreviewGroup>;
 type PreviewProps = PreviewGroupProps["preview"];
@@ -147,9 +148,12 @@ export function AttachmentPreviewGroup({
                         />
                     </Suspense>
                 ) : (
-                    <div key={key}>{originalNode}</div>
+                    <div key={key} className="ngw-preview-img-wrapper">
+                        {originalNode}
+                    </div>
                 );
             },
+
             onVisibleChange,
         };
     }, [
