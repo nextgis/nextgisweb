@@ -186,7 +186,6 @@ function FeatureTable({
             newEffectiveWidths[id] =
                 columnRef.current[id].getBoundingClientRect().width;
         }
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         setEffectiveWidths(newEffectiveWidths);
     }, [columns, tableWidth, userDefinedWidths]);
 
