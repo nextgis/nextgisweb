@@ -92,7 +92,7 @@ export class TreeStore {
 
         this.childrenIds = [];
         this.visibleLayerIds = [];
-        children.toReversed().forEach((child) => this.addItem(child));
+        [...children].reverse().forEach((child) => this.addItem(child));
     }
 
     nextId() {
@@ -143,7 +143,7 @@ export class TreeStore {
     @computed.struct
     get treeStructureStamp(): number[] {
         const result: number[] = [];
-        const stack: number[] = this.childrenIds.toReversed();
+        const stack: number[] = [...this.childrenIds].reverse();
 
         while (stack.length) {
             const id = stack.pop()!;
@@ -151,7 +151,7 @@ export class TreeStore {
 
             const node = this.items.get(id);
             if (node?.isGroup() && node.childrenIds.length) {
-                stack.push(...node.childrenIds.toReversed());
+                stack.push(...[...node.childrenIds].reverse());
             }
         }
         return result;
@@ -198,7 +198,7 @@ export class TreeStore {
     @computed.struct
     get layersInExpandedGroupIds(): number[] {
         const result: number[] = [];
-        const stack: number[] = this.childrenIds.toReversed();
+        const stack: number[] = [...this.childrenIds].reverse();
 
         while (stack.length) {
             const id = stack.pop()!;
@@ -209,7 +209,7 @@ export class TreeStore {
                 if (!node.expanded) continue;
                 const kids = node.childrenIds;
                 if (kids?.length) {
-                    stack.push(...kids.toReversed());
+                    stack.push(...[...kids].reverse());
                 }
                 continue;
             }
@@ -317,7 +317,7 @@ export class TreeStore {
         this.insert(id, parentId);
 
         if (type === "group") {
-            cfg.children.toReversed().forEach((c) => this.addItem(c, id));
+            [...cfg.children].reverse().forEach((c) => this.addItem(c, id));
         }
 
         return node;

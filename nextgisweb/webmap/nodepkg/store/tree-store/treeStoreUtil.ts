@@ -140,7 +140,7 @@ export function validateVisible(
     groups.sort((a, b) => groupDepth(b, store) - groupDepth(a, store));
 
     for (const g of groups) {
-        const direct = g.childrenIds.toReversed();
+        const direct = [...g.childrenIds].reverse();
 
         const activeNow: number[] = [];
         const withNew: number[] = [];

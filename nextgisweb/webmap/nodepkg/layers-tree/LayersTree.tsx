@@ -151,7 +151,7 @@ export const LayersTree = observer(
 
                 if (treeItem.isGroup()) {
                     const children: TreeWebmapItem[] = [];
-                    treeItem.childrenIds.toReversed().forEach((cid) => {
+                    [...treeItem.childrenIds].reverse().forEach((cid) => {
                         const it = store.getItemById(cid);
                         if (it) {
                             children.push(handleWebMapItem(it));
@@ -167,7 +167,7 @@ export const LayersTree = observer(
         const preparedWebMapItems = useMemo(() => {
             void treeStructureStamp;
             return store
-                .getChildren({ childrenIds: childrenIds.toReversed() })
+                .getChildren({ childrenIds: [...childrenIds].reverse() })
                 .map(handleWebMapItem);
         }, [childrenIds, treeStructureStamp, handleWebMapItem, store]);
 

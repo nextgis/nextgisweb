@@ -43,7 +43,7 @@ export function useDrag({ store }: UseDragProps) {
                     ? store.getChildren(store as any)
                     : store.getChildren(targetParentId);
 
-            const uiSiblings = siblingsStore.slice().toReversed();
+            const uiSiblings = [...siblingsStore].reverse();
             const uiIndex = uiSiblings.findIndex((n) => n.id === dropItem.id);
             if (uiIndex < 0) return;
 
