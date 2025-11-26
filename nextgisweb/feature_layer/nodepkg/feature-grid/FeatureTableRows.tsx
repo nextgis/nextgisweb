@@ -3,7 +3,6 @@ import classNames from "classnames";
 import { useMemo } from "react";
 import type { Key, ReactNode } from "react";
 
-import { ExpandableText } from "@nextgisweb/gui/component";
 import { utc } from "@nextgisweb/gui/dayjs";
 import { useRouteGet } from "@nextgisweb/pyramid/hook";
 
@@ -102,9 +101,16 @@ export function FeatureTableRows({
                                 ? renderFeatureFieldValue(f, val)
                                 : loadingCol();
 
-                        if (typeof renderValue === "string") {
-                            renderValue = <ExpandableText text={renderValue} />;
-                        }
+                        // I tried using Antd Paragraph (ExpandableText), but it breaks in a virtualized table.
+                        // After spending several hours debugging, I found only one stable solution for future –
+                        // using a JS character limit instead of line calculation or built-in ellipsis mechanics.
+                        //
+                        // TODO: find better solution
+                        //
+                        // If you still want to try — uncomment this at your own risk:
+                        // if (typeof renderValue === "string") {
+                        //     renderValue = <ExpandableText text={renderValue} />;
+                        // }
                     }
 
                     return (
