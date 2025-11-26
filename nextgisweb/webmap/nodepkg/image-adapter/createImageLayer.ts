@@ -1,12 +1,12 @@
 import { getUid } from "ol/util";
 
+import { isAbortError } from "@nextgisweb/gui/error";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import {
     imageQueue,
     tileLoadFunction,
     transparentImage,
 } from "@nextgisweb/pyramid/util";
-import { QUEUE_ABORT_REASON } from "@nextgisweb/pyramid/util/queue";
 import Image from "@nextgisweb/webmap/ol/layer/Image";
 
 import type { CreateLayerOptions } from "../type/CreateLayerOptions";
@@ -87,7 +87,7 @@ export function createImageLayer(item: CreateLayerOptions) {
                                     img.src = imageUrl;
                                 })
                                 .catch((error) => {
-                                    if (error !== QUEUE_ABORT_REASON) {
+                                    if (!isAbortError(error)) {
                                         console.error(error);
                                     }
                                     img.src = transparentImage;
