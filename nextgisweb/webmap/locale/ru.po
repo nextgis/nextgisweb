@@ -747,11 +747,11 @@ msgstr "Завершить редактирование"
 
 #: nodepkg/plugin/layer-editor/SnapToggle.tsx:31
 msgid "Disable snapping"
-msgstr "Отключить привязку"
+msgstr "Отключить прилипание"
 
 #: nodepkg/plugin/layer-editor/SnapToggle.tsx:32
 msgid "Enable snapping"
-msgstr "Включить привязку"
+msgstr "Включить прилипание"
 
 #: nodepkg/plugin/layer-editor/ToolEditor.tsx:163
 msgid "Stop editing layer: {layer}"
