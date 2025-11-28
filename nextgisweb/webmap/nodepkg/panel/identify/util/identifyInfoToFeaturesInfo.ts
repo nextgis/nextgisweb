@@ -14,7 +14,9 @@ export function identifyInfoToFeaturesInfo(
     const layersResponse = Object.keys(response);
     const featuresInfo: (FeatureInfo | RasterInfo)[] = [];
 
-    const items = display.treeStore.filter({ type: "layer" });
+    const items = display.treeStore
+        .filter({ type: "layer" })
+        .sort((a, b) => b.drawOrderPosition - a.drawOrderPosition);
     items.forEach(({ layerId }) => {
         const layerIdx = layersResponse.indexOf(layerId.toString());
 
