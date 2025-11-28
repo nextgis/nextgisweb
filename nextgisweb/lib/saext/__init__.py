@@ -1,5 +1,3 @@
-from typing import TYPE_CHECKING, Annotated, ClassVar, TypeVar
-
 from sqlalchemy import exists, sql, text
 
 from nextgisweb.env import DBSession, env
@@ -8,12 +6,6 @@ from .enum import Enum
 from .geometry import Geometry
 from .msgspec import Msgspec
 from .uuid import UUID
-
-if TYPE_CHECKING:
-    T = TypeVar("T")
-    NonMapped = Annotated[T, ...]
-else:
-    NonMapped = ClassVar
 
 
 def query_unreferenced(Model, column):
