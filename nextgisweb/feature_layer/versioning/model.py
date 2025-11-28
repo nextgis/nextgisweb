@@ -1,7 +1,15 @@
 from __future__ import annotations
 
 from contextlib import contextmanager
-from typing import Annotated, Any, List, Literal, TypeVar, Union
+from typing import (
+    Annotated,
+    Any,
+    ClassVar,  # noqa: F401
+    List,
+    Literal,
+    TypeVar,
+    Union,
+)
 
 import sqlalchemy as sa
 import sqlalchemy.event as sa_event
@@ -13,6 +21,7 @@ from zope.interface import classImplements
 
 from nextgisweb.env import Base, gettext
 from nextgisweb.lib.datetime import utcnow_naive
+from nextgisweb.lib.saext import NonMapped
 
 from nextgisweb.auth import OnFindReferencesData, Principal, User
 from nextgisweb.resource import Resource
@@ -112,7 +121,7 @@ class FVersioningMeta(Base):
         ),
     )
 
-    vobj: Union[FVersioningObj, None] = None
+    vobj: NonMapped[Union[FVersioningObj, None]] = None
 
     def next(self):
         insp = inspect(self)
@@ -172,9 +181,9 @@ class FVersioningObj(Base):
 
     has_changes: bool = False
     unflushed_changes: bool = False
-    features_deleted: List[int]
-    features_restored: List[int]
-    features_truncated: bool
+    features_deleted: NonMapped[List[int]]
+    features_restored: NonMapped[List[int]]
+    features_truncated: NonMapped[bool]
 
     def __init__(self, resource, version_id, /, user=None) -> None:
         assert resource and version_id

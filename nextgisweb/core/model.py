@@ -1,6 +1,9 @@
+from typing import Any
+
 import sqlalchemy as sa
 import sqlalchemy.dialects.postgresql as sa_pg
 import sqlalchemy.event as sa_event
+from sqlalchemy.orm import Mapped, mapped_column
 
 from nextgisweb.env import Base
 
@@ -8,23 +11,23 @@ from nextgisweb.env import Base
 class CState(Base):
     __tablename__ = "core_cstate"
 
-    component = sa.Column(sa.Unicode, primary_key=True)
-    heads = sa.Column(sa.Unicode, nullable=False)
+    component: Mapped[str] = mapped_column(primary_key=True)
+    heads: Mapped[str]
 
 
 class Migration(Base):
     __tablename__ = "core_migration"
 
-    component = sa.Column(sa.Unicode, primary_key=True)
-    revision = sa.Column(sa.Unicode, primary_key=True)
+    component: Mapped[str] = mapped_column(primary_key=True)
+    revision: Mapped[str] = mapped_column(primary_key=True)
 
 
 class Setting(Base):
     __tablename__ = "setting"
 
-    component = sa.Column(sa.Unicode, primary_key=True)
-    name = sa.Column(sa.Unicode, primary_key=True)
-    value = sa.Column(sa_pg.JSONB, nullable=False)
+    component: Mapped[str] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(primary_key=True)
+    value: Mapped[Any] = mapped_column(sa_pg.JSONB)
 
 
 storage_stat_dimension = sa.Table(
