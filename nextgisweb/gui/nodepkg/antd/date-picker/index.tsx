@@ -1,16 +1,16 @@
+import type { PickerRef } from "@rc-component/picker";
+import dayjsGenerateConfig from "@rc-component/picker/es/generate/dayjs";
 import type { DatePickerProps } from "antd";
 import generatePicker from "antd/es/date-picker/generatePicker";
 import dayjs from "dayjs";
-import type { PickerRef } from "rc-picker";
-import dayjsGenerateConfig from "rc-picker/es/generate/dayjs";
-import type { Ref } from "react";
 
 import { disableNonPositiveYears } from "../date";
 
 const AntDatePicker = generatePicker(dayjsGenerateConfig);
 
+export type { PickerRef };
 export interface DatePickerPropsWithRef extends DatePickerProps {
-    ref?: Ref<PickerRef>;
+    ref?: React.Ref<PickerRef>;
 }
 
 export function DatePicker({

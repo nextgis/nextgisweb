@@ -1,7 +1,7 @@
+import type { PickerRef } from "@rc-component/picker";
+import dayjsGenerateConfig from "@rc-component/picker/es/generate/dayjs";
 import type { RangePickerProps } from "antd/es/date-picker";
 import generatePicker from "antd/es/date-picker/generatePicker";
-import type { PickerRef } from "rc-picker";
-import dayjsGenerateConfig from "rc-picker/es/generate/dayjs";
 import type { Ref } from "react";
 
 import { disableNonPositiveYears } from "../date";

@@ -166,7 +166,9 @@ const makeAttachmentsList = (
 
     return (
         <div className="attachments-list" key={layerItemView.layerLabel}>
-            <Divider orientation="left">{layerItemView.layerLabel}</Divider>
+            <Divider orientation="horizontal">
+                {layerItemView.layerLabel}
+            </Divider>
             <List
                 size="small"
                 bordered

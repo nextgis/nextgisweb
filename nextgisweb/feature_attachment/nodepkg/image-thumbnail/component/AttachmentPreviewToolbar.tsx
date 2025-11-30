@@ -28,7 +28,7 @@ type PreviewProps = GetProp<typeof Image.PreviewGroup, "preview">;
 
 export type ImagePreviewProp = Exclude<PreviewProps, boolean>;
 export type ToolbarRenderInfoType = Parameters<
-    NonNullable<ImagePreviewProp["toolbarRender"]>
+    NonNullable<ImagePreviewProp["actionsRender"]>
 >[1];
 
 const msgTogglePanorama = gettext("Toggle panorama viewer");

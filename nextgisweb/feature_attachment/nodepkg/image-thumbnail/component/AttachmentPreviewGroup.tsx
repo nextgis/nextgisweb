@@ -107,7 +107,7 @@ export function AttachmentPreviewGroup({
 
             countRender: () => undefined,
 
-            toolbarRender: (_, toolbarProps) => {
+            actionsRender: (_, toolbarProps) => {
                 const currentImage = previewImages[toolbarProps.current];
 
                 return (

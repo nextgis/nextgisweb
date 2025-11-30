@@ -1,6 +1,6 @@
+import dayjsGenerateConfig from "@rc-component/picker/es/generate/dayjs";
 import type { CalendarProps } from "antd";
 import generateCalendar from "antd/es/calendar/generateCalendar";
-import dayjsGenerateConfig from "rc-picker/es/generate/dayjs";
 
 import type dayjs from "@nextgisweb/gui/dayjs";
 
