@@ -3,7 +3,7 @@
 <svg version="1.1" id="Слой_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 24 24" style="enable-background:new 0 0 24 24;" xml:space="preserve">
 <g>
-	<path d="M3,0l0.1,24H21l0-18l-6-6H3z" shape-rendering="crispEdges" fill="#E1EAEF"/>
-	<path d="M15,6V0l6,6H15z" fill="#81B0DC"/>
+	<path d="M3,0l0.1,24H21l0-18l-6-6H3z" shape-rendering="crispEdges" fill="var(--icon-color-primary)" fill-opacity="0.25"/>
+	<path d="M15,6V0l6,6H15z" fill="var(--icon-color-primary)" fill-opacity="0.55"/>
 </g>
 </svg>
