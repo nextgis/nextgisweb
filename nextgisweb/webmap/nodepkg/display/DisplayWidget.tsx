@@ -179,13 +179,9 @@ export const DisplayWidget = observer(
                 );
             }
             showPanels.push(
-                <Panel
-                    key="main"
-                    min={isPortrait ? 200 : 400}
-                    resizable={!!activePanel}
-                >
+                <Panel key="main" min={200} resizable={!!activePanel}>
                     <Splitter layout="vertical">
-                        <Panel key="map" min={isPortrait ? 200 : 400}>
+                        <Panel key="map" min={200}>
                             <MapPane display={display}>{mapChildren}</MapPane>
                         </Panel>
                         {tabs.length && (
