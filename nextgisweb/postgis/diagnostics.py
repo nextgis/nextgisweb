@@ -180,7 +180,6 @@ class PostgresCheck(ConnectionCheck):
             client_encoding="utf-8",
             poolclass=NullPool,
             connect_args=connect_args,
-            future=True,
         )
         try:
             conn = self._conn = engine.connect()

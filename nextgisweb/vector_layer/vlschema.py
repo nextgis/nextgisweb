@@ -638,7 +638,7 @@ def _compile_alter_geometry_column(element, compiler, **kw):
 
     return "ALTER TABLE {} ALTER COLUMN geom TYPE {} USING {}".format(
         compiler.preparer.format_table(element.table),
-        element.new_type.compile(compiler),
+        element.new_type.compile(compiler.dialect),
         expr,
     )
 

@@ -180,7 +180,6 @@ class PostgisConnection(Base, Resource):
                 connect_timeout=connect_timeout,
                 options="-c statement_timeout=%d" % statement_timeout_ms,
             ),
-            future=True,
         )
         if self.sslmode is not None:
             args["connect_args"]["sslmode"] = self.sslmode.value

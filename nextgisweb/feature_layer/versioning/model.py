@@ -112,7 +112,13 @@ class FVersioningMeta(Base):
         ),
     )
 
-    vobj: Union[FVersioningObj, None] = None
+    @property
+    def vobj(self) -> FVersioningObj | None:
+        return getattr(self, "_vobj", None)
+
+    @vobj.setter
+    def vobj(self, value: FVersioningObj | None):
+        setattr(self, "_vobj", value)
 
     def next(self):
         insp = inspect(self)
@@ -172,9 +178,6 @@ class FVersioningObj(Base):
 
     has_changes: bool = False
     unflushed_changes: bool = False
-    features_deleted: List[int]
-    features_restored: List[int]
-    features_truncated: bool
 
     def __init__(self, resource, version_id, /, user=None) -> None:
         assert resource and version_id
@@ -185,8 +188,8 @@ class FVersioningObj(Base):
         self.user = user
 
         self.is_open = True
-        self.features_deleted = list()
-        self.features_restored = list()
+        self.features_deleted = list[int]()
+        self.features_restored = list[int]()
         self.features_truncated = False
 
     def mark_changed(self):
