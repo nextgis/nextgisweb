@@ -124,7 +124,7 @@ export abstract class CoreLayer<
     ) {
         if (symbols === "-1") {
             layer.setSource(null);
-        } else if (this.symbols === "-1") {
+        } else {
             layer.setSource(source);
         }
     }
