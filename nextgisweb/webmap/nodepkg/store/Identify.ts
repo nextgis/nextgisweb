@@ -203,27 +203,17 @@ export class Identify {
         };
 
         const items = await this.display.getVisibleItems();
-        const mapResolution = this.map.resolution;
 
         const rasterLayers: number[] = [];
 
         items.forEach((item) => {
-            if (
-                mapResolution === null ||
-                !(
-                    !item.identifiable ||
-                    (item.maxResolution !== null &&
-                        mapResolution >= item.maxResolution) ||
-                    (item.minResolution !== null &&
-                        mapResolution < item.minResolution)
-                )
-            ) {
-                if (item.identification) {
-                    if (item.identification.mode === "feature_layer") {
-                        request.layers.push(item.identification.resource.id);
-                    } else if (item.identification.mode === "raster_layer") {
-                        rasterLayers.push(item.identification.resource.id);
-                    }
+            const shouldIdentify = item.identifiable && !item.isOutOfScaleRange;
+
+            if (shouldIdentify && item.identification) {
+                if (item.identification.mode === "feature_layer") {
+                    request.layers.push(item.identification.resource.id);
+                } else if (item.identification.mode === "raster_layer") {
+                    rasterLayers.push(item.identification.resource.id);
                 }
             }
         });
