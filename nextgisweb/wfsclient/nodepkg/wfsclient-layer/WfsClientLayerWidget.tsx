@@ -5,6 +5,7 @@ import type { FeaureLayerGeometryType } from "@nextgisweb/feature-layer/type/api
 import { InputNumber, Select } from "@nextgisweb/gui/antd";
 import { LotMV } from "@nextgisweb/gui/arm";
 import { AutoCompleteInput } from "@nextgisweb/gui/component";
+import type { AutoCompleteInputProps } from "@nextgisweb/gui/component/AutoCompleteInput";
 import { Area, Lot } from "@nextgisweb/gui/mayout";
 import { route } from "@nextgisweb/pyramid/api";
 import { useCache } from "@nextgisweb/pyramid/hook";
@@ -130,7 +131,9 @@ export const WfsClientLayerWidget: EditorWidget<WfsClientLayerStore> = observer(
                 field: NonNullable<FocusedField>,
                 { status }: { status: unknown | "skipped" },
                 options: { label: string; value: string }[] | undefined
-            ) => ({
+            ): AutoCompleteInputProps => ({
+                value: store[field].value,
+                status: store[field].error ? "error" : undefined,
                 onFocus: () => setFocusedField(field),
                 onBlur: () => setFocusedField(null),
                 loading:
@@ -140,7 +143,7 @@ export const WfsClientLayerWidget: EditorWidget<WfsClientLayerStore> = observer(
                 style: { width: "100%" },
                 options,
             }),
-            [focusedField]
+            [focusedField, store]
         );
 
         const updateGeometryType = (value: FeaureLayerGeometryType) => {
@@ -173,9 +176,8 @@ export const WfsClientLayerWidget: EditorWidget<WfsClientLayerStore> = observer(
                     }}
                 />
 
-                <Lot label={gettext("Layer")}>
+                <Lot error={store.columnGeom.error} label={gettext("Layer")}>
                     <AutoCompleteInput
-                        value={store.layerName.value}
                         {...autocompleteProps(
                             "layerName",
                             connectionInfo,
@@ -196,9 +198,11 @@ export const WfsClientLayerWidget: EditorWidget<WfsClientLayerStore> = observer(
                         style: { width: "100%" },
                     }}
                 />
-                <Lot label={gettext("Geometry column")}>
+                <Lot
+                    error={store.columnGeom.error}
+                    label={gettext("Geometry column")}
+                >
                     <AutoCompleteInput
-                        value={store.columnGeom.value}
                         {...autocompleteProps(
                             "columnGeom",
                             layerInfo,

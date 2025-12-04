@@ -13,9 +13,9 @@ const {
     database,
     $load: load,
     $error: error,
+    $dirty: dirty,
 } = mapper<ConnectionStore, Required<PostgisConnectionRead>>({
     validateIf: (o) => o.validate,
-    onChange: (o) => o.markDirty(),
 });
 
 hostname.validate(validate.string({ minLength: 1 }));
@@ -33,13 +33,11 @@ export class ConnectionStore implements EditorStore<PostgisConnectionRead> {
     readonly password = password.init("", this);
     readonly database = database.init("", this);
 
-    @observable.ref accessor dirty = false;
     @observable.ref accessor validate = false;
 
     @action
     load(value: PostgisConnectionRead) {
         load(this, value);
-        this.dirty = false;
     }
 
     dump(): PostgisConnectionRead | undefined {
@@ -54,9 +52,9 @@ export class ConnectionStore implements EditorStore<PostgisConnectionRead> {
         };
     }
 
-    @action
-    markDirty() {
-        this.dirty = true;
+    @computed
+    get dirty(): boolean {
+        return dirty(this);
     }
 
     @computed

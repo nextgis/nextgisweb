@@ -11,11 +11,12 @@ const spinner = <Spin indicator={<LoadingOutlined spin />} size="small" />;
 
 export function AutoCompleteInput({
     loading,
+    status,
     ...props
 }: AutoCompleteInputProps) {
     return (
         <AutoComplete {...props}>
-            <Input suffix={loading ? spinner : <span />} />
+            <Input suffix={loading ? spinner : <span />} status={status} />
         </AutoComplete>
     );
 }

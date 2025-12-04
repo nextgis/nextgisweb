@@ -62,7 +62,7 @@ export class WfsClientConnectionStore
 
     @computed
     get dirty(): boolean {
-        return this.composite.operation === "create" ? true : mapperDirty(this);
+        return mapperDirty(this);
     }
 
     dump() {

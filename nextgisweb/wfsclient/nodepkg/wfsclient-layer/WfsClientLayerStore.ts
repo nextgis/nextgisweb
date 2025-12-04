@@ -100,7 +100,7 @@ export class WfsClientLayerStore
 
     @computed
     get dirty(): boolean {
-        return this.composite.operation === "create" ? true : dirty(this);
+        return dirty(this);
     }
 
     @computed

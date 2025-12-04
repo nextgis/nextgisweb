@@ -1,6 +1,6 @@
 import { action, computed, observable } from "mobx";
 
-import { mapper } from "@nextgisweb/gui/arm";
+import { mapper, validate } from "@nextgisweb/gui/arm";
 import type { CompositeStore } from "@nextgisweb/resource/composite";
 import type {
     EditorStore,
@@ -26,9 +26,22 @@ const {
     $error: mapperError,
 } = mapper<TmsClientConnectionStore, ConnectionCreate>({
     validateIf: (o) => o.validate,
-    properties: {
-        url_template: { url: true },
-    },
+});
+
+url_template.validate((v, store) => {
+    if (store.capmode.value !== "nextgis_geoservices") {
+        const [valid, message] = validate.required()(v, store);
+        return !valid
+            ? [valid, message]
+            : validate.string({ url: true })(v as string, store);
+    }
+    return [true, undefined];
+});
+apikey.validate((v, store) => {
+    if (store.capmode.value === "nextgis_geoservices") {
+        return validate.required()(v, store);
+    }
+    return [true, undefined];
 });
 
 export class TmsClientConnectionStore
@@ -67,7 +80,7 @@ export class TmsClientConnectionStore
 
     @computed
     get dirty(): boolean {
-        return this.composite.operation === "create" ? true : mapperDirty(this);
+        return mapperDirty(this);
     }
 
     @computed
