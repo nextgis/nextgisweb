@@ -12,7 +12,7 @@ from nextgisweb.env import env, gettext
 
 from nextgisweb.core.exception import ExternalServiceError
 
-from .util import SCHEME, quad_key, toggle_tms_xyz_y
+from .util import SCHEME, quad_key, split_url_query, toggle_tms_xyz_y
 
 SHUTDOWN_TIMEOUT = 1
 
@@ -65,6 +65,7 @@ class TileFetcher:
         req_kw,
         scheme,
         url_template,
+        query,
         zoom,
         xmin,
         xmax,
@@ -76,9 +77,11 @@ class TileFetcher:
                 ytile = toggle_tms_xyz_y(zoom, ytile)
 
             url = url_template.format(x=xtile, y=ytile, z=zoom, q=quad_key(xtile, ytile, zoom))
+            url, add_query = split_url_query(url)
+            query.update(add_query)
 
             try:
-                response = await client.get(url, **req_kw)
+                response = await client.get(url, params=query, **req_kw)
             except (RemoteProtocolError, SSLCertVerificationError) as exc:
                 raise ExternalServiceError(
                     gettext("Unable to get a response from the remote server."),
@@ -151,6 +154,7 @@ class TileFetcher:
         data = dict(
             scheme=connection.scheme,
             url_template=url_template,
+            query=connection.query_params,
             zoom=zoom,
             xmin=xmin,
             xmax=xmax,
@@ -158,7 +162,6 @@ class TileFetcher:
             ymax=ymax,
         )
         data["req_kw"] = dict(
-            params=connection.query_params,
             timeout=Timeout(timeout=self._request_timeout),
         )
         if connection.username is not None:

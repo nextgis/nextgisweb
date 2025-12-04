@@ -1,4 +1,5 @@
 from math import log2
+from urllib.parse import parse_qsl, urlparse
 
 
 class SCHEME:
@@ -45,3 +46,9 @@ def quad_key(x, y, z):
 
 def toggle_tms_xyz_y(z, y):
     return (1 << z) - y - 1
+
+
+def split_url_query(url: str) -> tuple[str, dict[str, str]]:
+    presult = urlparse(url, allow_fragments=False)
+    query = dict(parse_qsl(presult.query))
+    return presult._replace(query="").geturl(), query
