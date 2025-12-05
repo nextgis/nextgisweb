@@ -56,6 +56,7 @@ export const WfsClientConnectionWidget: EditorWidget<WfsClientConnectionStore> =
         );
     });
 
+WfsClientConnectionWidget.displayName = "WfsClientConnectionWidget";
+WfsClientConnectionWidget.activateOn = { create: true };
 WfsClientConnectionWidget.title = gettext("WFS connection");
 WfsClientConnectionWidget.order = 10;
-WfsClientConnectionWidget.displayName = "WfsClientConnectionWidget";
