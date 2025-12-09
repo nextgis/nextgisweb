@@ -21,6 +21,7 @@ export function useActionToolbar({
             title,
             disabled,
             action,
+            tooltip,
             ...rest
         }: CreateButtonActionOptions) => {
             const btnAction: ButtonProps = { size, ...rest };
@@ -52,11 +53,21 @@ export function useActionToolbar({
                 );
             }
 
-            return (
+            const button = (
                 <Button key={key} {...btnAction}>
                     {title}
                 </Button>
             );
+
+            if (tooltip) {
+                return (
+                    <Tooltip title={tooltip}>
+                        {button}
+                    </Tooltip>
+                );
+            }
+            return button;
+
         },
         [props, size, isFit]
     );

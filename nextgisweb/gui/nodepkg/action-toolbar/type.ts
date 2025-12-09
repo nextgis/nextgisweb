@@ -17,6 +17,7 @@ export interface CreateButtonActionOptions<
     icon?: ReactNode;
     action?: (val?: P) => void;
     disabled?: ((val?: P) => boolean) | boolean;
+    tooltip?: string;
 }
 
 export type ActionToolbarAction<

@@ -21,6 +21,7 @@ export interface FocusTableAction<
     icon?: ReactNode;
     placement?: "left" | "right";
     danger?: boolean;
+    tooltip?: string;
     callback: (ctx: C, env: E) => void;
 }
 
