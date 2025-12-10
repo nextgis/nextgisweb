@@ -51,7 +51,9 @@ export class TreeStore {
                 void this.treeStructureStamp;
                 const ids: number[] = [];
                 for (const it of this.items.values()) {
-                    if (it.isLayer() && it.visibility) ids.push(it.id);
+                    if (it.isLayer() && it.visibility) {
+                        ids.push(it.id);
+                    }
                 }
                 return ids;
             },
@@ -210,7 +212,7 @@ export class TreeStore {
         return res;
     }
 
-    @computed.struct
+    @computed
     get expanded(): number[] {
         const res: number[] = [];
         for (const n of this.items.values()) {

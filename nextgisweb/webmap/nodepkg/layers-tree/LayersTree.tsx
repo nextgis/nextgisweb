@@ -96,8 +96,9 @@ export const LayersTree = observer(
         const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
 
         const {
-            visibleLayerIds,
+            expanded,
             childrenIds,
+            visibleLayerIds,
             treeStructureStamp,
             layersWithoutLegendInfo,
         } = store;
@@ -243,8 +244,9 @@ export const LayersTree = observer(
                 showIcon
                 showLine={shouldShowLine}
                 onExpand={onExpand}
-                expandedKeys={store.expanded}
+                expandedKeys={expanded}
                 autoExpandParent={false}
+                defaultExpandParent={false}
                 onCheck={onCheck}
                 checkedKeys={checkedKeys}
                 onSelect={onSelect}

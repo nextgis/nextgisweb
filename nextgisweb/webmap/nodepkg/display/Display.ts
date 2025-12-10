@@ -143,8 +143,6 @@ export class Display {
             });
             store.setVisibleIds(checked);
         }
-
-        store.setExpanded(this.config.expandedItems);
     }
 
     // PLUGINS
