@@ -156,12 +156,13 @@ export const SettingsWidget: EditorWidget<SettingStore> = observer(
                     </Lot>
                     <Lot row label={msgMeasurementSrs}>
                         <SrsSelect
+                            style={{ width: "100%" }}
                             value={store.measureSrs}
+                            allowClear
+                            placeholder={msgDefault}
                             onChange={(v: number) => {
                                 store.update({ measureSrs: v });
                             }}
-                            placeholder={msgDefault}
-                            style={{ width: "100%" }}
                         />
                     </Lot>
                     <Lot label={msgLayersEditing}>
