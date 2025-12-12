@@ -199,12 +199,25 @@ export class MapStore {
                 s.setRotation();
             };
             this.bindView(olView);
+
+            let loadedStartTime: number | undefined = undefined;
+
             this._mapUnbindKeys.push(
                 olMap.on("loadstart", () => {
+                    loadedStartTime = performance.now();
+
                     this.setIsLoading(true);
                 }),
 
                 olMap.on("loadend", () => {
+                    if (loadedStartTime !== undefined) {
+                        const startedAt = loadedStartTime;
+                        const finishedAt = performance.now();
+                        const durationMs = finishedAt - startedAt;
+                        console.log(`Loaded in ${durationMs.toFixed(1)} ms`);
+                        loadedStartTime = undefined;
+                    }
+
                     this.setIsLoading(false);
                 }),
 
