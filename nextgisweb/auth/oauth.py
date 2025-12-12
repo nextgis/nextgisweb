@@ -369,7 +369,9 @@ class OAuthHelper:
             raise OAuthSyncNotEnabled("OAuth user synchronization is not enabled")
 
         if (st := self.options["server.type"]) != "nextgisid":
-            raise NotImplementedError(f"OAuth user synchronization is not implemented: {st}")
+            raise NotImplementedError(
+                f"OAuth user synchronization is not implemented on {st} server"
+            )
 
         params = dict(instance_guid=env.core.instance_id)
         s = self.options["client.id"] + ":" + self.options["client.secret"]
@@ -377,12 +379,16 @@ class OAuthHelper:
         oauth_tstamp = utcnow_naive()
         data = self._server_request("sync", params, default_method="GET", access_token=token)
 
-        if len(data) != 1:
-            raise RuntimeError(f"Only one NextGIS ID team expected, got {len(data)} teams")
+        if (tc := len(data)) == 0:
+            logger.warning("NextGIS ID team missing")
+            return
+        elif tc != 1:
+            raise RuntimeError(f"Only one NextGIS ID team expected, got {tc} teams")
 
+        team = data[0]
         subs = set()
         with DBSession.no_autoflush:
-            for udata in data[0]["users"]:
+            for udata in team["users"]:
                 sub = udata.pop("nextgis_guid")
                 lang = udata.pop("locale")
                 subs.add(sub)
