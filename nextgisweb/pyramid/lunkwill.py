@@ -26,10 +26,17 @@ class LunkwillNotConfigured(NotConfigured):
     message = gettext("The Lunkwill extension is not configured on this server.")
 
 
+class LunkwillIntercepionExpected(NotConfigured):
+    title = gettext("Interception expected")
+    message = gettext("The Lunkwill extension expects external request interception.")
+
+
 @inject()
-def require_lunkwill_configured(*, comp: PyramidComponent):
+def ensure_proxy(*, comp: PyramidComponent):
     if not comp.options["lunkwill.enabled"]:
         raise LunkwillNotConfigured
+    if not comp.options["lunkwill.proxy"]:
+        raise LunkwillIntercepionExpected
 
 
 class Cipher:
@@ -94,7 +101,7 @@ def setup_pyramid(comp, config):
 
     opts = comp.options.with_prefix("lunkwill")
 
-    if opts["enabled"]:
+    if opts["enabled"] and opts["proxy"]:
         st = config.registry.settings
 
         def lunkwill_url(*, host=opts["host"], path, query):
@@ -153,7 +160,7 @@ def tween_factory(handler, registry):
 
 
 def proxy(request):
-    require_lunkwill_configured()
+    ensure_proxy()
 
     lw_request_id = None
     if crypto := request.registry.settings.get("lunkwill.crypto"):

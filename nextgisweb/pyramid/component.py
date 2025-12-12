@@ -1,5 +1,5 @@
 from datetime import timedelta
-from os import environ
+from os import getenv
 
 import transaction
 from babel import Locale
@@ -63,7 +63,7 @@ class PyramidComponent(Component):
             import uwsgi
 
             if rt_not_set:
-                if ev := environ.get("UWSGI_HARAKIRI_ORIGINAL"):
+                if ev := getenv("UWSGI_HARAKIRI_ORIGINAL"):
                     # Even if lunkwill is disabled it can override uWSGI option
                     self.options["request_timeout"] = timedelta(seconds=int(ev))
                 elif ev := uwsgi.opt.get("harakiri"):
@@ -78,21 +78,38 @@ class PyramidComponent(Component):
             self.options["lunkwill.enabled"] = lunkwill_rpc
 
         if self.options["lunkwill.enabled"]:
-            if self.options["lunkwill.host"] is None:
-                self.options["lunkwill.host"] = environ.get("LUNKWILL_HOST", "127.0.0.1")
+            if self.options["lunkwill.proxy"]:
+                for optk, optt, optd in (("host", str, "127.0.0.1"), ("port", int, 8042)):
+                    optn = f"lunkwill.{optk}"
+                    if self.options[optn] is not None:
+                        continue
+                    opte = f"LUNKWILL_{optk.upper()}"
+                    if optv := getenv(opte):
+                        logger.debug("Using %s = %s (from %s)", optn, optv, opte)
+                        self.options[optn] = optt(optv)
+                    else:
+                        logger.debug("Using %s = %s (default)", optn, str(optd))
+                        self.options[optn] = optd
+                logger.debug(
+                    "Lunkwill extension proxy to %s:%d",
+                    self.options["lunkwill.host"],
+                    self.options["lunkwill.port"],
+                )
 
-            if self.options["lunkwill.port"] is None:
-                self.options["lunkwill.port"] = int(environ.get("LUNKWILL_PORT", "8042"))
+            else:
+                logger.debug("Lunkwill extension with external interception")
+                if self.options["lunkwill.secret"]:
+                    raise NotImplementedError(
+                        "External interception mode does not support "
+                        "distributed Lunkwill deployment"
+                    )
 
-            logger.debug(
-                "Lunkwill extension enabled: %s:%d",
-                self.options["lunkwill.host"],
-                self.options["lunkwill.port"],
-            )
             if uwsgi is None:
                 raise RuntimeError("Lunkwill requires uWSGI stack loaded")
+
             if not lunkwill_rpc:
                 raise RuntimeError("Lunkwill RPC missing in uWSGI stack")
+
         else:
             logger.debug("Lunkwill extension disabled")
 
@@ -232,6 +249,7 @@ class PyramidComponent(Component):
         Option("legacy_locale_switcher", bool, default=False),
 
         Option("lunkwill.enabled", bool, default=None),
+        Option("lunkwill.proxy", bool, default=True),
         Option("lunkwill.host", str, default=None),
         Option("lunkwill.port", int, default=None),
         Option("lunkwill.secret", str, secure=True, default=None),

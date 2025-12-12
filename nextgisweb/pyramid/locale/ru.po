@@ -34,15 +34,15 @@ msgstr "64K должно быть достаточно для логотипа."
 msgid "Your Web GIS at nextgis.com"
 msgstr "Ваши карты онлайн на nextgis.com"
 
-#: component.py:168
+#: component.py:185
 msgid "Request timeout"
 msgstr "Таймаут запроса"
 
-#: component.py:171
+#: component.py:188
 msgid "Enabled"
 msgstr "Включено"
 
-#: component.py:171
+#: component.py:188
 msgid "Disabled"
 msgstr "Отключено"
 
@@ -126,6 +126,14 @@ msgstr "Lunkwill не включен"
 #: lunkwill.py:26
 msgid "The Lunkwill extension is not configured on this server."
 msgstr "Расширение Lunkwill не настроено на этом сервере."
+
+#: lunkwill.py:30
+msgid "Interception expected"
+msgstr "Ожидается перехват"
+
+#: lunkwill.py:31
+msgid "The Lunkwill extension expects external request interception."
+msgstr "Расширение Lunkwill ожидает перехват внешних запросов."
 
 #: nodepkg/api/error.ts:18 nodepkg/api/error.ts:39
 msgid "Something went wrong."
