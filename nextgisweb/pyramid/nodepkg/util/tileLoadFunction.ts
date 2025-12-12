@@ -5,15 +5,17 @@ export const transparentImage =
 
 interface TileLoadFunctionOptions extends RequestInit {
     src: string;
+    hmux?: boolean;
     noDataStatuses?: number[];
 }
 
 export async function tileLoadFunction({
     src,
+    hmux,
     noDataStatuses = [204],
     ...requestInit
 }: TileLoadFunctionOptions): Promise<string> {
-    const response = await lunkwilFetch(src, {
+    const response = await (hmux ? lunkwilFetch : fetch)(src, {
         method: "GET",
         ...requestInit,
     });

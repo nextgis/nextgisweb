@@ -7,28 +7,6 @@ const pending = new Map<
     { resolve: (resp: Response) => void; reject: (err: any) => void }
 >();
 
-const ws = new WebSocket(routeURL("lunkwill.hmux"));
-
-const wsOpenPromise = new Promise<void>((resolve, reject) => {
-    ws.onopen = (event) => {
-        console.info("WebSocket opened", event);
-        resolve();
-    };
-    ws.onerror = (event) => {
-        console.error("WebSocket error", event);
-        reject(new Error("WebSocket error"));
-    };
-});
-
-ws.onclose = (event) => {
-    console.warn("closed", event);
-    const err = new Error("WebSocket closed");
-    for (const [, { reject }] of pending) {
-        reject(err);
-    }
-    pending.clear();
-};
-
 function findHeaderEnd(bytes: Uint8Array): number {
     // \n\n: 0x0a 0x0a
     for (let i = 0; i < bytes.length - 1; i++) {
@@ -68,48 +46,122 @@ function parseHeaders(headersText: string): ResponseHeaders {
     return headers;
 }
 
-ws.onmessage = async (event: MessageEvent) => {
-    const data = event.data;
+function parseResponse(respHeaders: string): {
+    id: number;
+    status: number;
+    statusText: string;
+    headers: ResponseHeaders;
+} {
+    const lines = respHeaders.split(/\r?\n/);
+    const first = lines[0]?.trim() ?? "";
+    const second = lines[1]?.trim() ?? "";
 
-    const buffer = await data.arrayBuffer();
-    const bytes = new Uint8Array(buffer);
+    const m = first.match(/^RESPONSE\s+(\d+)\s*$/);
+    if (!m) {
+        throw new Error("WebSocket response parse error");
+    }
+    const sm = second.match(/^(\d{3})\s*(.*)$/);
+    const headers = parseHeaders(respHeaders);
+    return {
+        id: Number(m[1]),
+        status: sm ? Number(sm[1]) : 200,
+        statusText: sm ? sm[2] || "" : "",
+        headers,
+    };
+}
 
-    const headerEnd = findHeaderEnd(bytes);
-    if (headerEnd === -1) {
-        return;
+let _ws: WebSocket | null = null;
+let _wsOpenPromise: Promise<WebSocket> | null = null;
+
+function createConnection() {
+    if (_ws && _ws.readyState === WebSocket.OPEN) {
+        return Promise.resolve(_ws);
     }
 
-    const headerBytes = bytes.slice(0, headerEnd);
-    const bodyBytes = bytes.slice(headerEnd);
+    if (_wsOpenPromise) {
+        return _wsOpenPromise;
+    }
 
-    const decoder = new TextDecoder("utf-8", { fatal: false });
-    const respHeaders = decoder.decode(headerBytes);
+    const newWs = new WebSocket(routeURL("lunkwill.hmux"));
 
-    const id = Number(/RESPONSE\s+(\d+)/.exec(respHeaders)?.[1]);
-    const headers = parseHeaders(respHeaders);
+    _wsOpenPromise = new Promise<WebSocket>((resolve, reject) => {
+        newWs.onopen = () => {
+            resolve(newWs);
+        };
 
-    const pendingReq = pending.get(id);
-    if (!pendingReq) return;
-    pending.delete(id);
-
-    const contentType = headers["Content-Type"];
-
-    const blob = new Blob([bodyBytes], { type: contentType });
-
-    const resp = new Response(blob, {
-        status: 200,
-        statusText: "OK",
-        headers: { "Content-Type": contentType },
+        newWs.onerror = () => {
+            reject(new Error("WebSocket error"));
+        };
+    }).finally(() => {
+        _wsOpenPromise = null;
     });
 
-    pendingReq.resolve(resp);
-};
+    newWs.onclose = () => {
+        for (const [, { reject }] of pending) {
+            reject(new Error("WebSocket closed"));
+        }
+        pending.clear();
+
+        _ws = null;
+        _wsOpenPromise = null;
+    };
+
+    newWs.onmessage = async (event: MessageEvent) => {
+        const data = event.data;
+
+        const buffer = await data.arrayBuffer();
+        const bytes = new Uint8Array(buffer);
+
+        const headerEnd = findHeaderEnd(bytes);
+
+        let headerBytes = bytes;
+        let bodyBytes: Uint8Array<ArrayBuffer> | undefined = undefined;
+
+        if (headerEnd !== -1) {
+            headerBytes = bytes.slice(0, headerEnd);
+            bodyBytes = bytes.slice(headerEnd);
+        }
+
+        const decoder = new TextDecoder("utf-8", { fatal: false });
+        const respHeaders = decoder.decode(headerBytes);
+
+        const { id, status, statusText, headers } = parseResponse(respHeaders);
+
+        const pendingReq = pending.get(id);
+        if (!pendingReq) {
+            return;
+        }
+        pending.delete(id);
+
+        const contentType = headers["Content-Type"];
+
+        if (!bodyBytes) {
+            const resp = new Response(null, {
+                status,
+                statusText,
+                headers: { "Content-Type": contentType },
+            });
+            pendingReq.resolve(resp);
+        } else {
+            const blob = new Blob([bodyBytes], { type: contentType });
+
+            const resp = new Response(blob, {
+                status: 200,
+                statusText,
+                headers: { "Content-Type": contentType },
+            });
+            pendingReq.resolve(resp);
+        }
+    };
+    _ws = newWs;
+    return _wsOpenPromise;
+}
 
 export async function lunkwilFetch(
     input: string | URL,
     init?: RequestInit
 ): Promise<Response> {
-    await wsOpenPromise;
+    const ws = await createConnection();
 
     const url =
         typeof input === "string"
@@ -129,7 +181,9 @@ export async function lunkwilFetch(
 
         const onAbort = () => {
             const pendingReq = pending.get(id);
-            if (!pendingReq) return;
+            if (!pendingReq) {
+                return;
+            }
 
             pending.delete(id);
 

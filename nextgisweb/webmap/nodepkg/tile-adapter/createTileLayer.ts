@@ -2,9 +2,13 @@ import { routeURL } from "@nextgisweb/pyramid/api";
 import { tileLoadFunction, transparentImage } from "@nextgisweb/pyramid/util";
 import XYZ from "@nextgisweb/webmap/ol/layer/XYZ";
 
+import type { CreateDisplayAdapterLayerOptions } from "../DisplayLayerAdapter";
 import type { CreateLayerOptions } from "../type/CreateLayerOptions";
 
-export function createTileLayer(item: CreateLayerOptions) {
+export function createTileLayer(
+    item: CreateLayerOptions,
+    options?: CreateDisplayAdapterLayerOptions
+) {
     const name =
         item.id !== undefined
             ? String(item.id)
@@ -26,6 +30,7 @@ export function createTileLayer(item: CreateLayerOptions) {
 
                 tileLoadFunction({
                     src,
+                    hmux: options?.hmux,
                 })
                     .then((imageUrl) => {
                         img.src = imageUrl;

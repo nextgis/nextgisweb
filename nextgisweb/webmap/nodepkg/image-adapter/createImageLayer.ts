@@ -9,6 +9,7 @@ import {
 } from "@nextgisweb/pyramid/util";
 import Image from "@nextgisweb/webmap/ol/layer/Image";
 
+import type { CreateDisplayAdapterLayerOptions } from "../DisplayLayerAdapter";
 import type { CreateLayerOptions } from "../type/CreateLayerOptions";
 
 interface QueryParams {
@@ -33,7 +34,10 @@ function parseQueryParams(queryString: string): QueryParams {
     return params;
 }
 
-export function createImageLayer(item: CreateLayerOptions) {
+export function createImageLayer(
+    item: CreateLayerOptions,
+    options?: CreateDisplayAdapterLayerOptions
+) {
     const name =
         item.id !== undefined
             ? String(item.id)
@@ -80,6 +84,7 @@ export function createImageLayer(item: CreateLayerOptions) {
                         ({ signal }) =>
                             tileLoadFunction({
                                 src: newSrc,
+                                hmux: options?.hmux,
                                 cache: "no-cache",
                                 signal,
                             })
