@@ -339,7 +339,7 @@ export class TreeStore {
         parentId: number | null = null
     ): TreeItemStore {
         const { id, type } = cfg;
-        const node = createTreeItemStore(cfg, parentId);
+        const node = createTreeItemStore(cfg, parentId, this.drawOrderEnabled);
         this.items.set(id, node);
 
         this.insert(id, parentId);
