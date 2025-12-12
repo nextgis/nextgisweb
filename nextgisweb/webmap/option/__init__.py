@@ -27,3 +27,13 @@ class IdentificationGeometryOption(WebMapOption):
     @classmethod
     def default(cls):
         return cls.csetting("show_geometry_info")
+
+
+class HmuxOption(WebMapOption):
+    name = "hmux"
+    label = gettext("Request multiplexing")
+    category = MiscellaneousCategory
+
+    @classmethod
+    def default(cls):
+        return False
