@@ -12,6 +12,8 @@ import { useProjections } from "./hook/useProjections";
 
 import CropFreeIcon from "@nextgisweb/icon/material/crop_free";
 import MouseIcon from "@nextgisweb/icon/material/mouse";
+import { useDebounce } from "@nextgisweb/pyramid/hook";
+
 import "./MapViewerInfo.less";
 
 interface CoordPairProps {
@@ -36,8 +38,17 @@ export function MapViewerInfo({ map }: MapViewerInfoProps) {
         map.getView().getCenter()
     );
     const [extent, setExtent] = useState<number[]>();
-    const { transformCoords, transformMapExtent, roundDecPlaces } =
-        useProjections(map);
+
+    const handleMouseMove = useDebounce((evt: any) => {
+        setCoord(evt.coordinate);
+    }, 50);
+
+    const handleExtentChange = useDebounce(() => {
+        setExtent(map.getView().calculateExtent(map.getSize()));
+    }, 300);
+
+    const { transformedCoord, transformedExtent, roundDecPlaces } =
+        useProjections(coord, extent, type);
 
     const changeType = useCallback(() => {
         setType((prevType) => (prevType === "mouse" ? "extent" : "mouse"));
@@ -50,20 +61,16 @@ export function MapViewerInfo({ map }: MapViewerInfoProps) {
             if (callbackKey) {
                 unByKey(callbackKey);
             }
-        };
-
-        const updateExtent = () => {
-            setExtent(map.getView().calculateExtent(map.getSize()));
+            handleMouseMove.cancel();
+            handleExtentChange.cancel();
         };
 
         const bindEvents = () => {
             if (type === "mouse") {
-                callbackKey = map.on("pointermove", (evt) =>
-                    setCoord(evt.coordinate)
-                );
+                callbackKey = map.on("pointermove", handleMouseMove);
             } else {
-                updateExtent();
-                callbackKey = map.getView().on("change", updateExtent);
+                setExtent(map.getView().calculateExtent(map.getSize()));
+                callbackKey = map.getView().on("change", handleExtentChange);
             }
         };
 
@@ -85,24 +92,24 @@ export function MapViewerInfo({ map }: MapViewerInfoProps) {
 
     const DisplayPosition = () => {
         if (type === "mouse") {
-            return coord ? (
+            return transformedCoord ? (
                 <CoordsDisplay
-                    coord={transformCoords(coord)}
+                    coord={transformedCoord}
                     round={roundDecPlaces}
                 />
             ) : (
                 <></>
             );
         } else {
-            if (!extent) {
+            if (!transformedExtent) {
                 return <></>;
             }
-            const [e0, e1, e2, e3] = transformMapExtent(extent);
+            const [x1, y1, x2, y2] = transformedExtent;
             return (
                 <>
-                    <CoordsDisplay coord={[e0, e1]} round={roundDecPlaces} />
-                    <span>:</span>
-                    <CoordsDisplay coord={[e2, e3]} round={roundDecPlaces} />
+                    <CoordsDisplay coord={[x1, y1]} round={roundDecPlaces} />
+                    <span> : </span>
+                    <CoordsDisplay coord={[x2, y2]} round={roundDecPlaces} />
                 </>
             );
         }

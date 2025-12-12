@@ -205,12 +205,16 @@ export const formatCoordinatesValue = (
  * @return {number} Decimal places to rounding
  */
 export const getDecPlacesRoundCoordByProj = (proj: Projection): number => {
-    const extent = proj.getExtent();
-    const max = Math.max.apply(
-        null,
-        extent.map((e) => Math.abs(e))
-    );
-    return max < 1000 ? 2 : 0;
+    const units = proj.getUnits();
+    switch (units) {
+        case "degrees":
+            return 2;
+        case "m":
+        case "ft":
+        case "us-ft":
+        default:
+            return 0;
+    }
 };
 
 /**
