@@ -1,3 +1,5 @@
+import { lunkwilFetch } from "./lunkwilFetch";
+
 export const transparentImage =
     "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEAAAAALAAAAAABAAEAAAIBAAA=";
 
@@ -9,10 +11,9 @@ interface TileLoadFunctionOptions extends RequestInit {
 export async function tileLoadFunction({
     src,
     noDataStatuses = [204],
-
     ...requestInit
 }: TileLoadFunctionOptions): Promise<string> {
-    const response = await fetch(src, {
+    const response = await lunkwilFetch(src, {
         method: "GET",
         ...requestInit,
     });
