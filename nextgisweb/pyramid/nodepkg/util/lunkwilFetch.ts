@@ -5,7 +5,7 @@ const pending = new Map<
     { resolve: (resp: Response) => void; reject: (err: any) => void }
 >();
 
-const ws = new WebSocket("ws://localhost:8042/hmux");
+const ws = new WebSocket("/api/lunkwill/hmux");
 
 const wsOpenPromise = new Promise<void>((resolve, reject) => {
     ws.onopen = (event) => {
