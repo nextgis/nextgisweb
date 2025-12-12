@@ -32,7 +32,7 @@ class LunkwillIntercepionExpected(NotConfigured):
 
 
 @inject()
-def ensure_proxy(*, comp: PyramidComponent):
+def ensure_interception(*, comp: PyramidComponent):
     if not comp.options["lunkwill.enabled"]:
         raise LunkwillNotConfigured
     if not comp.options["lunkwill.proxy"]:
@@ -166,7 +166,7 @@ def tween_factory(handler, registry):
 
 
 def proxy(request):
-    ensure_proxy()
+    ensure_interception()
 
     lw_request_id = None
     if crypto := request.registry.settings.get("lunkwill.crypto"):
