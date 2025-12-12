@@ -99,6 +99,12 @@ def setup_pyramid(comp, config):
         get=proxy,
     )
 
+    config.add_route(
+        "lunkwill.hmux",
+        "/api/lunkwill/hmux",
+        get=hmux,
+    )
+
     opts = comp.options.with_prefix("lunkwill")
 
     if opts["enabled"] and opts["proxy"]:
@@ -190,3 +196,8 @@ def proxy(request):
     else:
         resp_kw = dict(app_iter=resp.stream())
     return Response(status=resp.status, headerlist=resp.headers.items(), **resp_kw)
+
+
+def hmux(request):
+    ensure_interception()
+    assert False, "Unreachable"
