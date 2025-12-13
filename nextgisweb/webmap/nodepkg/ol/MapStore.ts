@@ -213,8 +213,8 @@ export class MapStore {
                     if (loadedStartTime !== undefined) {
                         const startedAt = loadedStartTime;
                         const finishedAt = performance.now();
-                        const durationMs = finishedAt - startedAt;
-                        console.log(`Loaded in ${durationMs.toFixed(1)} ms`);
+                        const durationMs = (finishedAt - startedAt).toFixed(0);
+                        console.log(`Map layers loaded in ${durationMs} ms`);
                         loadedStartTime = undefined;
                     }
 
