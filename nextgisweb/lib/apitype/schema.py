@@ -1,13 +1,4 @@
-from typing import (
-    TYPE_CHECKING,
-    Annotated,
-    Any,
-    NewType,
-    TypeVar,
-    Union,
-    get_args,
-    get_origin,
-)
+from typing import TYPE_CHECKING, Annotated, Any, NewType, TypeVar, Union, get_args, get_origin
 from warnings import warn
 
 from msgspec import NODEFAULT
@@ -37,7 +28,8 @@ else:
 if TYPE_CHECKING:
     Gap = NewType
 
-elif type(NewType) is type:
+else:
+    assert type(NewType) is type  # Python 3.10+, was function before
 
     class Gap(NewType):
         def __init__(self, name: str, type: Any) -> None:
@@ -63,23 +55,6 @@ elif type(NewType) is type:
                 return value
             else:
                 return super().__getattribute__(name)
-
-else:
-
-    def Gap(name: str, type: Any):
-        def new_type(*args, **kwargs):
-            return new_type.__supertype__(*args, **kwargs)
-
-        def __fillgap__(type: Any):
-            new_type.__supertype__ = annotate(type, new_type._extras)
-
-        new_type.__name__ = name
-        new_type.__supertype__ = NODEFAULT
-
-        new_type.__fillgap__ = __fillgap__
-        new_type._falback, new_type._extras = disannotate(type)
-
-        return new_type
 
 
 def fillgap(placeholder: Any, type: Any):
