@@ -93,7 +93,9 @@ class Feature:
                 case int() | float() | str():
                     ogr_feature.SetField(name, v)
                 case datetime():
-                    ogr_feature.SetField(name, v.year, v.month, v.day, v.hour, v.minute, v.second, 0)
+                    ogr_feature.SetField(
+                        name, v.year, v.month, v.day, v.hour, v.minute, v.second, 0
+                    )
                 case date():
                     ogr_feature.SetField(name, v.year, v.month, v.day, 0, 0, 0, 0)
                 case time():
