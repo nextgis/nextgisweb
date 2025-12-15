@@ -71,11 +71,12 @@ def collection_put(
         copyfileobj(request.body_file, fd)
         fupload.size = fd.tell()
 
-    cntdisp = request.headers.get("Content-Disposition")
-    if cntdisp:
-        match = re.match(r'^.*filename="{0,1}(.*?)"{0,1}$', cntdisp)
-        if match:
-            fupload.name = match.group(1)
+    if (
+        (content_disposition := request.headers.get("Content-Disposition"))
+        and (match := re.match(r'^.*filename="?(.+?)"?$', content_disposition))
+        and (name := _sanitize_name(match.group(1)))
+    ):
+        fupload.name = name
 
     # If MIME-type was not declared on upload, define independently by running
     # file. Standard mimetypes package does it only using extension but we don't
@@ -147,7 +148,7 @@ def _collection_post_form(request, *, comp: FileUploadComponent):
         if size > comp.max_size:
             raise UploadedFileTooLarge()
 
-        fupload = FileUpload(size=size, name=ufile.filename, mime_type=ufile.type)
+        fupload = FileUpload(size=size, name=_sanitize_name(ufile.filename), mime_type=ufile.type)
         with fupload.data_path.open("wb") as fd:
             copyfileobj(ufile.file, fd)
 
@@ -177,7 +178,7 @@ def _collection_post_tus(request, *, comp: FileUploadComponent):
 
     fupload = FileUpload(
         size=upload_length,
-        name=upload_metadata.get("name"),
+        name=_sanitize_name(upload_metadata.get("name")),
         mime_type=upload_metadata.get("mime_type"),
         incomplete=upload_length > 0,
     )
@@ -303,6 +304,13 @@ def item_delete(fupload: FileUpload, request) -> Annotated[None, StatusCode(204)
     fupload.meta_path.unlink()
 
     return _tus_response(204)  # type: ignore
+
+
+def _sanitize_name(name: str | None):
+    if name is None:
+        return None
+    name = re.sub(r"^.*[\/\\]", "", name).strip()
+    return name if name else None
 
 
 def _tus_resumable_header(request, *, require=False):
