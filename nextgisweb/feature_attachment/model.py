@@ -125,6 +125,27 @@ class FeatureAttachment(Base, FVersioningExtensionMixin):
             "file_meta": self.file_meta,
         }
 
+    def load_file_upload(self, source: FileUpload):
+        for k in ("name", "mime_type"):
+            if v := getattr(source, k, None):
+                setattr(self, k, v)
+
+        if source.mime_type == "image/heic":
+            img = Image.open(source.data_path, formats=("HEIF",))
+            buf = BytesIO()
+            img.save(buf, "jpeg")
+            buf.seek(0)
+            self.fileobj = FileObj().copy_from(buf)
+            self.mime_type = "image/jpeg"
+            if self.name is not None:
+                self.name = change_suffix(self.name, ".jpg")
+        else:
+            self.fileobj = source.to_fileobj()
+
+        self.size = self.fileobj.size
+        self.extract_meta()
+        return self
+
     def deserialize(self, data):
         updated = False
         for k in ("name", "keyname", "mime_type", "description"):
@@ -135,25 +156,7 @@ class FeatureAttachment(Base, FVersioningExtensionMixin):
                     updated = True
 
         if (file_upload := data.get("file_upload")) is not None:
-            file_upload_obj = FileUpload(file_upload)
-
-            for k in ("name", "mime_type"):
-                if k in file_upload:
-                    setattr(self, k, file_upload[k])
-
-            if self.mime_type == "image/heic":
-                img = Image.open(file_upload_obj.data_path, formats=("HEIF",))
-                buf = BytesIO()
-                img.save(buf, "jpeg")
-                self.fileobj = FileObj().from_content(buf.getvalue())
-                self.mime_type = "image/jpeg"
-                if self.name is not None:
-                    self.name = change_suffix(self.name, ".jpg")
-            else:
-                self.fileobj = file_upload_obj.to_fileobj()
-
-            self.size = self.fileobj.size
-            self.extract_meta()
+            self.load_file_upload(FileUpload(file_upload))
             updated = True
 
         return updated
@@ -166,10 +169,13 @@ class FeatureAttachment(Base, FVersioningExtensionMixin):
         aid: int,
         vid: int,
         values: Dict[str, Any],
-    ) -> Union[AttachmentCreate, AttachmentUpdate, AttachmentDelete]:
-        if action in ("C", "U"):
+    ) -> Union[AttachmentCreate, AttachmentUpdate, AttachmentDelete, AttachmentRestore]:
+        if action in ("C", "U", "R"):
             if action == "C":
                 cid = AttachmentCreate
+                values = {k: v for k, v in values.items() if v is not None}
+            elif action == "R":
+                cid = AttachmentRestore
                 values = {k: v for k, v in values.items() if v is not None}
             else:
                 cid = AttachmentUpdate
@@ -215,3 +221,16 @@ class AttachmentDelete(Struct, kw_only=True, tag="attachment.delete", tag_field=
     fid: int
     vid: int
     aid: int
+
+
+@register_change
+@auto_description
+class AttachmentRestore(Struct, kw_only=True, tag="attachment.restore", tag_field="action"):
+    fid: int
+    vid: int
+    aid: int
+    fileobj: int
+    keyname: Union[str, UnsetType] = UNSET
+    name: Union[str, UnsetType] = UNSET
+    mime_type: str
+    description: Union[str, UnsetType] = UNSET

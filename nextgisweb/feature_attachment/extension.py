@@ -4,6 +4,7 @@ import sqlalchemy as sa
 
 from nextgisweb.feature_layer import FeatureExtension
 
+from . import transaction  # noqa: F401
 from .model import FeatureAttachment as Attachment
 
 

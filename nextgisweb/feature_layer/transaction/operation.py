@@ -20,7 +20,7 @@ class OperationExecutor(abc.ABC):
     input_types: ClassVar[Dict[str, Type[Struct]]] = dict()
     result_types: ClassVar[Dict[str, Type[Struct]]] = dict()
 
-    def __init__(self, resource: Resource, *, vobj: Union[FVersioningMeta, None]):
+    def __init__(self, resource: Resource, *, vobj: FVersioningMeta | None):
         self.resource = resource
         self.vobj = vobj
 
@@ -42,6 +42,23 @@ class OperationExecutor(abc.ABC):
     @abc.abstractmethod
     def execute(self, operation: Struct) -> Struct:
         pass
+
+    @cached_property
+    def _feature_query_first(self):
+        result = self.resource.feature_query()
+        result.limit(1)
+        return result
+
+    def require_versioning(self):
+        if self.vobj is None:
+            raise OperationError(VersioningRequired())
+
+    def require_feature(self, fid: int) -> Feature:
+        self._feature_query_first.filter_by(id=fid)
+        for feat in self._feature_query_first():
+            return feat
+        else:
+            raise OperationError(FeatureNotFound())
 
 
 S = TypeVar("S", bound=Type[Struct])
@@ -160,11 +177,7 @@ OperationUnion = Union[FeatureCreate, FeatureUpdate, FeatureDelete, FeatureResto
 class FeatureLayerExecutor(OperationExecutor):
     def prepare(self, operation: OperationUnion):
         if isinstance(operation, (FeatureUpdate, FeatureDelete)):
-            self.fq_exists.filter_by(id=operation.fid)
-            for feat in self.fq_exists():
-                break
-            else:
-                raise OperationError(FeatureNotFound())
+            feat = self.require_feature(operation.fid)
             if (vid := operation.vid) is not UNSET:
                 if vid != feat.version:
                     raise OperationError(FeatureConflict())
@@ -208,12 +221,6 @@ class FeatureLayerExecutor(OperationExecutor):
             resource.feature_restore(feature)
             return FeatureRestoreResult()
 
-    @cached_property
-    def fq_exists(self):
-        result = self.resource.feature_query()
-        result.limit(1)
-        return result
-
 
 FeatureLayerExecutor.register(FeatureCreate, FeatureCreateResult)
 FeatureLayerExecutor.register(FeatureUpdate, FeatureUpdateResult)
@@ -222,6 +229,12 @@ FeatureLayerExecutor.register(FeatureRestore, FeatureRestoreResult)
 
 
 # Operation errors
+
+
+@OperationError.register
+class VersioningRequired(Struct, tag="versioning_required", tag_field="error"):
+    status_code: int = 422
+    message: str = "Feature versioning is required for this operation"
 
 
 @OperationError.register

@@ -58,7 +58,15 @@ def test_ref_create_table(cls):
 
 
 @pytest.mark.parametrize("cls", [Simple, Complex])
-@pytest.mark.parametrize("name", [a for a in dir(ExtensionQueries) if not a.startswith("_")])
+@pytest.mark.parametrize(
+    "name",
+    [
+        name
+        for name in dir(ExtensionQueries)
+        if (prop := getattr(ExtensionQueries, name, None)) is not None
+        and getattr(prop, "_cached_query", False)
+    ],
+)
 def test_ref_sql_queries(name, cls):
     query = getattr(cls.fversioning_queries, name)
     ref_file = Path(__file__).parent / f"ref_sql/{name}.{cls.__tablename__}.sql"

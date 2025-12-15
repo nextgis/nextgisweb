@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+from collections.abc import Sequence
 from functools import cached_property, partial
-from typing import Any, ClassVar, Dict, Literal, NamedTuple, Sequence, Tuple, Type, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, NamedTuple, Type
 
 import sqlalchemy as sa
 import sqlalchemy.dialects.postgresql as sa_pg
@@ -16,6 +17,15 @@ from ..interface import IVersionableFeatureLayer
 from .exception import VersioningContextRequired
 from .model import ActColValue, FVersioningMeta, FVersioningObj
 
+if TYPE_CHECKING:
+    cached_query = cached_property
+else:
+
+    def cached_query(func):
+        result = cached_property(func)
+        result._cached_query = True
+        return result
+
 
 class VersioningTables(NamedTuple):
     ct: sa.Table
@@ -24,52 +34,137 @@ class VersioningTables(NamedTuple):
 
 
 class ExtensionQueries:
-    def __init__(self, tables: VersioningTables, *, has_id: bool, cols: Tuple[str]):
+    p_rid = sa.bindparam("p_rid")
+    p_fid = sa.bindparam("p_fid")
+    p_eid = sa.bindparam("p_eid")
+
+    # Current version and operation
+    p_vid = sa.bindparam("p_vid")
+
+    # Previous version and operation
+    p_pid = sa.bindparam("p_pid")
+    p_pop = sa.bindparam("p_pop")
+
+    # Initial and target versions for changes
+    p_initial = sa.bindparam("p_initial")
+    p_target = sa.bindparam("p_target")
+
+    # Last obtained ID and limits for changed FIDs
+    p_fid_last = sa.bindparam("p_fid_last")
+    p_fid_min = sa.bindparam("p_fid_min")
+    p_fid_max = sa.bindparam("p_fid_max")
+    p_fid_limit = sa.bindparam("p_fid_limit")
+
+    def __init__(self, tables: VersioningTables, *, has_id: bool, cols: tuple[str, ...]):
         self.tables = tables
         self.has_id = has_id
         self.cols = cols
 
-    @cached_property
+    @cached_query
     def after_insert(self):
         values = dict()
         if self.has_id:
-            values["extension_id"] = sa.bindparam("p_eid")
-        values["resource_id"] = sa.bindparam("p_rid")
-        values["feature_id"] = sa.bindparam("p_fid")
-        values["version_id"] = sa.bindparam("p_vid")
+            values["extension_id"] = self.p_eid
+        values["resource_id"] = self.p_rid
+        values["feature_id"] = self.p_fid
+        values["version_id"] = self.p_vid
         values["version_op"] = sa.bindparam("p_vop", "C")
         return self.tables.et.insert().values(values)
 
-    @cached_property
+    @cached_query
     def before_update(self):
         return self.__update_delete_query("U")
 
-    @cached_property
+    @cached_query
     def before_delete(self):
         return self.__update_delete_query("D")
 
-    @cached_property
+    @cached_query
+    def before_restore(self):
+        et, ht = self._aliased_tables[1:]
+
+        for_eid = lambda x: (x(),) if self.has_id else ()
+
+        qet = (
+            sa.select(
+                et.c.feature_id,
+                *for_eid(lambda: et.c.extension_id),
+                et.c.version_id,
+            )
+            .where(
+                et.c.resource_id == self.p_rid,
+                et.c.feature_id == self.p_fid,
+                *(for_eid(lambda: et.c.extension_id == self.p_eid)),
+                et.c.version_op == sa.text("'D'"),
+            )
+            .cte("qet")
+        )
+
+        hir = sa.func.int4range(ht.c.version_id, ht.c.version_nid)
+        eir = sa.func.int4range(qet.c.version_id.op("-")(sa.text("1")), qet.c.version_id)
+        sht = sa.select(
+            ht.c.feature_id,
+            *for_eid(lambda: ht.c.extension_id),
+            ht.c.version_nid,
+            ht.c.version_nop,
+            *(getattr(ht.c, c) for c in self.cols),
+        ).where(
+            ht.c.resource_id == self.p_rid,
+            ht.c.feature_id == qet.c.feature_id,
+            *for_eid(lambda: ht.c.extension_id == qet.c.extension_id),
+            hir.op("&&")(eir),
+        )
+
+        return sht
+
+    @cached_query
+    def after_restore(self):
+        et, ht = self.tables[1:]
+
+        extension_id = dict(extension_id=self.p_eid) if self.has_id else dict()
+        values_ht = dict(
+            resource_id=self.p_rid,
+            feature_id=self.p_fid,
+            **extension_id,
+            version_id=self.p_pid,
+            version_op=self.p_pop,
+            version_nid=self.p_vid,
+            version_nop=sa.text("'R'"),
+        )
+
+        iht = sa.insert(ht).values(values_ht)
+        iht = iht.returning(ht.c.feature_id).cte("iht")
+
+        uet = (
+            sa.update(et)
+            .values(dict(version_id=self.p_vid, version_op=sa.text("'R'")))
+            .where(et.c.resource_id == self.p_rid, et.c.feature_id == iht.c.feature_id)
+        )
+
+        if self.has_id:
+            uet = uet.where(et.c.extension_id == self.p_eid)
+
+        return uet
+
+    @cached_query
     def delete_ctab(self):
         return self.__update_delete_query("O")
 
-    @cached_property
+    @cached_query
     def initfill(self):
         ct, et, _ = self.tables
-        cs = sa.select().where(ct.c.resource_id == sa.bindparam("p_rid"))
+        cs = sa.select().where(ct.c.resource_id == self.p_rid)
         cols = ["resource_id", "feature_id", "version_id", "version_op"]
         if self.has_id:
             cs = cs.add_columns(ct.c.id)
             cols.insert(0, "extension_id")
         cs = cs.add_columns(ct.c.resource_id, ct.c.feature_id)
-        cs = cs.add_columns(sa.bindparam("p_vid"), sa.bindparam("p_vop", "E"))
+        cs = cs.add_columns(self.p_vid, sa.bindparam("p_vop", "E"))
         return sa.insert(et).from_select(cols, cs)
 
-    @cached_property
+    @cached_query
     def feature_pit(self):
         ct, et, ht = self._aliased_tables
-        p_vid = sa.bindparam("p_vid")
-        p_fid = sa.bindparam("p_fid")
-        p_rid = sa.bindparam("p_rid")
         qh = sa.select(
             *((ht.c.extension_id,) if self.has_id else ()),
             ht.c.version_id,
@@ -77,19 +172,19 @@ class ExtensionQueries:
         )
 
         rng_resource_id = sa.literal_column("int4range(resource_id, resource_id, '[]')")
-        qh = qh.where(rng_resource_id.op("@>", precedence=4)(p_rid))
+        qh = qh.where(rng_resource_id.op("@>", precedence=4)(self.p_rid))
         rng_version_id = sa.literal_column("int4range(version_id, version_nid)")
-        qh = qh.where(rng_version_id.op("@>", precedence=4)(p_vid))
+        qh = qh.where(rng_version_id.op("@>", precedence=4)(self.p_vid))
         rng_feature_id = sa.literal_column("int4range(feature_id, feature_id, '[]')")
-        qh = qh.where(rng_feature_id.op("@>", precedence=4)(p_fid))
+        qh = qh.where(rng_feature_id.op("@>", precedence=4)(self.p_fid))
 
         qe = sa.select(
             *((et.c.extension_id,) if self.has_id else ()),
             et.c.version_id,
             *(getattr(ct.c, c) for c in self.cols),
         )
-        qe = qe.where(et.c.feature_id == p_fid, et.c.resource_id == p_rid)
-        qe = qe.where(et.c.version_id <= p_vid)
+        qe = qe.where(et.c.feature_id == self.p_fid, et.c.resource_id == self.p_rid)
+        qe = qe.where(et.c.version_id <= self.p_vid)
         qe = qe.join(
             ct,
             sa.and_(
@@ -103,35 +198,37 @@ class ExtensionQueries:
         query = sa.union_all(qh, qe)
         return query
 
-    @cached_property
-    def changed_fids(self):
-        p_rid = sa.bindparam("p_rid")
-        p_initial, p_target = sa.bindparam("p_initial"), sa.bindparam("p_target")
-        p_fid_limit, p_fid_last = sa.bindparam("p_fid_limit"), sa.bindparam("p_fid_last")
+    @cached_query
+    def feature_vid(self):
+        _, et, _ = self._aliased_tables
+        return sa.select(et.c.version_id.label("vid")).where(
+            et.c.resource_id == self.p_rid,
+            et.c.feature_id == self.p_fid,
+            *((et.c.extension_id == self.p_eid,) if self.has_id else ()),
+        )
 
+    @cached_query
+    def changed_fids(self):
         result = []
         for t in self._aliased_tables[1:]:
             query = (
                 sa.select(t.c.feature_id.distinct().label("fid"))
                 .where(
-                    t.c.resource_id == p_rid,
-                    t.c.version_id > p_initial,
-                    t.c.version_id <= p_target,
-                    sql_or(p_fid_last.is_(None), t.c.feature_id > p_fid_last),
+                    t.c.resource_id == self.p_rid,
+                    t.c.version_id > self.p_initial,
+                    t.c.version_id <= self.p_target,
+                    sql_or(self.p_fid_last.is_(None), t.c.feature_id > self.p_fid_last),
                 )
                 .order_by(t.c.feature_id)
-                .limit(p_fid_limit)
+                .limit(self.p_fid_limit)
             )
             result.append(query)
         return tuple(result)
 
-    @cached_property
+    @cached_query
     def changes(self):
         ct, et, ht = self._aliased_tables
         lc = sa.literal_column
-        p_rid = sa.bindparam("p_rid")
-        p_initial, p_target = sa.bindparam("p_initial"), sa.bindparam("p_target")
-        p_fid_min, p_fid_max = sa.bindparam("p_fid_min"), sa.bindparam("p_fid_max")
 
         lc_resource_range = lambda s: sa.func.int4range(
             s.c.resource_id,
@@ -145,9 +242,9 @@ class ExtensionQueries:
             + (s.c.version_id.label("vid"),)
         )
 
-        where_resource = lambda s: lc_resource_range(s).op("@>", precedence=4)(p_rid)
+        where_resource = lambda s: lc_resource_range(s).op("@>", precedence=4)(self.p_rid)
         where_range = lc("int4range(version_id, version_nid)").op("@>", precedence=4)
-        where_fid = lambda s: (s.c.feature_id >= p_fid_min, s.c.feature_id <= p_fid_max)
+        where_fid = lambda s: (s.c.feature_id >= self.p_fid_min, s.c.feature_id <= self.p_fid_max)
 
         # Initial version (without etab)
         qi = (
@@ -156,7 +253,7 @@ class ExtensionQueries:
                 ht.c.version_op.op("=")(sa.text("'D'")).label("deleted"),
                 *(getattr(ht.c, c) for c in self.cols),
             )
-            .where(where_resource(ht), where_range(p_initial), *where_fid(ht))
+            .where(where_resource(ht), where_range(self.p_initial), *where_fid(ht))
             .subquery("qi")
         )
 
@@ -170,23 +267,23 @@ class ExtensionQueries:
             .join(
                 ct,
                 sa.and_(
-                    ct.c.resource_id == p_rid,
+                    ct.c.resource_id == self.p_rid,
                     ct.c.feature_id == et.c.feature_id,
                     *([ct.c.id == et.c.extension_id] if self.has_id else ()),
                 ),
                 isouter=True,
             )
             .where(
-                et.c.resource_id == p_rid,
-                et.c.version_id > p_initial,
-                et.c.version_id <= p_target,
+                et.c.resource_id == self.p_rid,
+                et.c.version_id > self.p_initial,
+                et.c.version_id <= self.p_target,
                 *where_fid(et),
             ),
             sa.select(
                 *hcolumns(ht),
                 ht.c.version_op.op("=")(sa.text("'D'")).label("deleted"),
                 *(getattr(ht.c, c) for c in self.cols),
-            ).where(where_resource(ht), where_range(p_target), *where_fid(ht)),
+            ).where(where_resource(ht), where_range(self.p_target), *where_fid(ht)),
         ).subquery("qt")
 
         lat_pr = sa.select(
@@ -247,13 +344,10 @@ class ExtensionQueries:
         ct, et, ht = self.tables
         return (ct.alias("ct"), et.alias("et"), ht.alias("ht"))
 
-    def __update_delete_query(self, vop: Union[Literal["U"], Literal["D"], Literal["O"]]):
+    def __update_delete_query(self, vop: Literal["U", "D", "O"]):
         ct, et, ht = self.tables
         trailer = sa.literal_column(", ".join(self.cols))
 
-        p_rid = sa.bindparam("p_rid")
-        p_fid = sa.bindparam("p_fid")
-        p_vid = sa.bindparam("p_vid")
         default_vop = "U" if vop == "U" else "D"
         p_vop = sa.bindparam("p_vop", default_vop)
 
@@ -277,14 +371,13 @@ class ExtensionQueries:
             cs = cs.add_columns(et.c.extension_id)
             cs = cs.where(ct.c.id == et.c.extension_id)
             if vop != "O":
-                p_eid = sa.bindparam("p_eid")
-                cs = cs.where(et.c.extension_id == p_eid)
+                cs = cs.where(et.c.extension_id == self.p_eid)
         cs = cs.add_columns(et.c.resource_id, et.c.feature_id, et.c.version_id, et.c.version_op)
-        cs = cs.add_columns(p_vid.label("version_nid"), p_vop.label("version_nop"), trailer)
+        cs = cs.add_columns(self.p_vid.label("version_nid"), p_vop.label("version_nop"), trailer)
 
         cs = cs.where(
-            et.c.resource_id == p_rid,
-            et.c.feature_id == p_fid,
+            et.c.resource_id == self.p_rid,
+            et.c.feature_id == self.p_fid,
             ct.c.resource_id == et.c.resource_id,
             ct.c.feature_id == et.c.feature_id,
         ).cte("cs")
@@ -303,7 +396,7 @@ class ExtensionQueries:
             cs,
         )
 
-        eq = sa.update(et).values(version_id=p_vid, version_op=p_vop)
+        eq = sa.update(et).values(version_id=self.p_vid, version_op=p_vop)
 
         hi = hi.returning(*returning(ht)).cte("hi")
         eq = eq.where(*join_on(hi, et)).returning(*returning(et))
@@ -318,7 +411,7 @@ class ExtensionQueries:
 
 
 class FVersioningExtensionMixin:
-    fversioning_registry: ClassVar[Dict[str, Type[FVersioningExtensionMixin]]] = dict()
+    fversioning_registry: ClassVar[dict[str, Type[FVersioningExtensionMixin]]] = dict()
 
     # Class attributes, descendants must define them
     fversioning_metadata_version: ClassVar[int]
@@ -327,8 +420,9 @@ class FVersioningExtensionMixin:
     fversioning_htab_args: ClassVar[Sequence[Any]] = tuple()
 
     # Instance attributes, used internaly
-    fversioning_vobj: Union[FVersioningObj, None] = None
+    fversioning_vobj: FVersioningObj | None = None
     fversioning_initializing: bool
+    fversioning_restored: tuple[int, str]
 
     def __init_subclass__(cls) -> None:
         cls.fversioning_registry[cls.fversioning_extension] = cls
@@ -346,8 +440,7 @@ class FVersioningExtensionMixin:
         return instance
 
     def delete(self):
-        session = sa.inspect(self).session
-        if not session:
+        if not (session := sa.inspect(self).session):
             raise VersioningContextRequired
 
         session.delete(self)
@@ -357,12 +450,54 @@ class FVersioningExtensionMixin:
 
         self.fversioning_track(resource)
 
+    @classmethod
+    def restore(cls, resource, feature_id: int, id: int | None = None):
+        if not (session := sa.inspect(resource).session):
+            raise VersioningContextRequired
+
+        params = dict(p_rid=resource.id, p_fid=feature_id)
+        if cls.fversioning_has_id:
+            params["p_eid"] = id
+
+        query = cls.fversioning_queries.before_restore
+        row = session.execute(query, params).one()
+
+        obj = cls(
+            resource=resource,
+            feature_id=feature_id,
+            **({"id": id} if cls.fversioning_has_id else {}),
+            **{c: getattr(row, c) for c in cls.fversioning_columns},
+        )
+
+        obj.fversioning_restored = (row.version_nid, row.version_nop)
+        obj.fversioning_track(resource)
+        session.add(obj)
+
+        return obj
+
     def fversioning_track(self, resource):
         if (vobj := resource.fversioning_vobj) is None:
             raise VersioningContextRequired
 
         self.fversioning_vobj = vobj
         vobj.mark_changed()
+
+    @classmethod
+    def fversioning_vid(cls, resource, fid: int, eid: int | None = None) -> int:
+        if cls.fversioning_has_id and eid is None:
+            raise ValueError(f"eid is required for {cls.__name__}")
+
+        session = sa.inspect(resource).session
+        if not session:
+            raise VersioningContextRequired
+
+        params = dict(p_rid=resource.id, p_fid=fid)
+        if eid is not None:
+            params["p_eid"] = eid
+
+        query = cls.fversioning_queries.feature_vid
+        row = session.execute(query, params).one_or_none()
+        return row.vid if row else 0
 
     @classmethod
     def fversioning_changed_fids(cls):
@@ -396,7 +531,7 @@ class FVersioningExtensionMixin:
         fid: int,
         eid: None,
         vid: int,
-        values: Dict[str, Any],
+        values: dict[str, Any],
     ) -> Type[Struct]:
         raise NotImplementedError
 
@@ -586,7 +721,12 @@ class FVersioningExtensionMixin:
             p_vid=vobj.version_id,
         )
 
-        query = getattr(target.fversioning_queries, hook)
+        if r := getattr(target, "fversioning_restored", None):
+            query = target.fversioning_queries.after_restore
+            params.update(p_pid=r[0], p_pop=r[1])
+        else:
+            query = getattr(target.fversioning_queries, hook)
+
         connection.execute(query, params)
         target.fversioning_vobj = None
 

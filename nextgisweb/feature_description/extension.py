@@ -4,6 +4,7 @@ from nextgisweb.lib.safehtml import sanitize
 
 from nextgisweb.feature_layer import FeatureExtension
 
+from . import transaction  # noqa: F401
 from .model import FeatureDescription as Description
 
 

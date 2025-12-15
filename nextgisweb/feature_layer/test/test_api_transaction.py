@@ -9,6 +9,7 @@ from nextgisweb.lib.geometry import Geometry
 from nextgisweb.vector_layer.model import VectorLayer, VectorLayerField
 
 from ..feature import Feature
+from . import FeatureLayerAPI, TransactionAPI
 
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
 
@@ -57,99 +58,98 @@ def ptz(x, y, z):
         pytest.param(True, id="flist"),
     ],
 )
-def test_basic(versioning, fdict, mkres, ngw_webtest_app):
+def test_workflow(versioning, fdict, mkres, ngw_webtest_app):
     (res, epoch, fld), web = mkres(versioning, fdict), ngw_webtest_app
-    txn_create = dict(epoch=epoch) if versioning else dict()
 
-    burl = f"/api/resource/{res}/feature/transaction"
-    furl = f"/api/resource/{res}/feature"
+    fapi = FeatureLayerAPI(web, res)
+    vid = lambda v: ({"vid": v} if versioning else {})
 
-    resp = web.post_json(f"{burl}/", txn_create).json
-    txn_id = resp.pop("id", None)
-    assert txn_id > 0
-    turl = f"{burl}/{txn_id}"
+    with TransactionAPI(web, res, epoch=epoch) as txn:
+        # Repeats of the same data should also report 200 OK
+        for _ in range(2):
+            txn.put(1, _create(geom=ptz(0, 0, 5), fields=fld("Inserted")))
 
-    op_1 = [1, _create(geom=ptz(0, 0, 5), fields=fld("Inserted"))]
-    resp = web.put_json(turl, [op_1])
+        # But another operation should report 409 Conflict
+        txn.put(1, _delete(fid=1), status=409)
 
-    # Repeats of the same data should also report 200 OK
-    resp = web.put_json(turl, [op_1])
+        # Update the first and delete the second
+        txn.put(2, _update(fid=1, geom=ptz(1, 1, 1), fields=fld("Updated")))
+        txn.put(3, _delete(fid=2))
+        txn.put(4, _update(fid=3))
+        txn.put(5, _update(fid=4, geom=None))
 
-    # But another operation should report 409 Conflict
-    op_1 = [1, _delete(fid=1)]
-    data = [op_1]
-    resp = web.put_json(turl, data, status=409)
+        # Results aren't available until commit happens
+        txn.results(status=422)
 
-    # Update the first and delete the second
-    op_2 = [2, _update(fid=1, geom=ptz(1, 1, 1), fields=fld("Updated"))]
-    op_3 = [3, _delete(fid=2)]
-    op_4 = [4, _update(fid=3)]
-    op_5 = [5, _update(fid=4, geom=None)]
-    web.put_json(turl, [op_2, op_3, op_4, op_5])
+        # Now commit the transaction twice, it's safe
+        resp_a = txn.commit()
+        resp_b = txn.commit()
+        assert resp_a == resp_b
 
-    # Results aren't available until commit happens
-    web.get(turl, status=422)
+        # Compare results
+        assert txn.results() == [
+            [1, _create(fid=5)],
+            [2, _update()],
+            [3, _delete()],
+            [4, _update()],
+            [5, _update()],
+        ]
 
-    # Now commit the transaction twice, it's safe
-    resp_a = web.post(turl).json
-    resp_b = web.post(turl).json
-    assert resp_a == resp_b
-
-    # Fetch the results
-    resp = web.get(turl, status=200).json
-    assert resp == [
-        [1, _create(fid=5)],
-        [2, _update()],
-        [3, _delete()],
-        [4, _update()],
-        [5, _update()],
-    ]
+    # No results after dispose
+    txn.results(status=404)
 
     # Validate resource features
-    resp_c = web.get(f"{furl}/?extensions=", status=200).json
-    assert len(resp_c) == 4
+    assert len(fapi.feature_list(status=200)) == 4
 
-    resp_1 = web.get(f"{furl}/1?extensions=", status=200).json
-    assert not versioning or resp_1.pop("vid")
-    assert resp_1 == dict(id=1, geom="POINT Z (1 1 1)", fields=dict(foo="Updated"))
+    assert fapi.feature_get(1) == {
+        "id": 1,
+        **vid(2),
+        "geom": "POINT Z (1 1 1)",
+        "fields": {"foo": "Updated"},
+    }
 
-    resp_2 = web.get(f"{furl}/2?extensions=", status=404).json
-    assert "title" in resp_2 and "message" in resp_2
+    assert set(fapi.feature_get(2, status=404).keys()).issuperset({"title", "message"})
 
-    resp_3 = web.get(f"{furl}/3?extensions=", status=200).json
-    assert not versioning or resp_3.pop("vid")
-    assert resp_3 == dict(id=3, geom="POINT Z (0 0 3)", fields=dict(foo="Original"))
+    assert fapi.feature_get(3) == {
+        "id": 3,
+        **vid(2),
+        "geom": "POINT Z (0 0 3)",
+        "fields": {"foo": "Original"},
+    }
 
-    resp_4 = web.get(f"{furl}/4?extensions=", status=200).json
-    assert not versioning or resp_4.pop("vid")
-    assert resp_4 == dict(id=4, geom=None, fields=dict(foo="Original"))
+    assert fapi.feature_get(4) == {
+        "id": 4,
+        **vid(2),
+        "geom": None,
+        "fields": {"foo": "Original"},
+    }
 
-    resp_5 = web.get(f"{furl}/5?extensions=", status=200).json
-    assert not versioning or resp_5.pop("vid")
-    assert resp_5 == dict(id=5, geom="POINT Z (0 0 5)", fields=dict(foo="Inserted"))
+    assert fapi.feature_get(5) == {
+        "id": 5,
+        **vid(2),
+        "geom": "POINT Z (0 0 5)",
+        "fields": {"foo": "Inserted"},
+    }
 
-    # Dispose transaction
-    web.delete(turl, status=200)
-    web.get(turl, status=404)
+    if not versioning:
+        return
 
-    if versioning:
-        resp = web.post_json(f"{burl}/", txn_create).json
-        txn_id = resp.pop("id", None)
-        assert txn_id > 0
-        turl = f"{burl}/{txn_id}"
+    with TransactionAPI(web, res, epoch=epoch) as txn:
+        # Restore the deleted feature
+        txn.put(1, _restore(fid=2, fields=fld("Restored")))
 
-        op_1 = [1, _restore(fid=2, fields=dict(foo="Restored"))]
-        web.put_json(turl, [op_1])
+        txn.commit()
 
-        web.post(turl)
-        resp = web.get(turl, status=200).json
-
-        assert resp == [
+        assert txn.results() == [
             [1, _restore()],
         ]
 
-        resp = web.get(f"{furl}/2?extensions=", status=200).json
-        assert resp == dict(id=2, vid=3, geom="POINT Z (0 0 2)", fields=dict(foo="Restored"))
+    assert fapi.feature_get(2) == {
+        "id": 2,
+        **vid(3),
+        "geom": "POINT Z (0 0 2)",
+        "fields": {"foo": "Restored"},
+    }
 
 
 @pytest.mark.parametrize(
@@ -168,75 +168,82 @@ def test_basic(versioning, fdict, mkres, ngw_webtest_app):
 )
 def test_errors(versioning, fdict, mkres, ngw_webtest_app):
     (res, epoch, fld), web = mkres(versioning, fdict), ngw_webtest_app
-    txn_create = dict(epoch=epoch) if versioning else dict()
 
-    burl = f"/api/resource/{res}/feature/transaction"
-    furl = f"/api/resource/{res}/feature"
+    fapi = FeatureLayerAPI(web, res)
+    vid = lambda v: ({"vid": v} if versioning else {})
 
-    resp = web.post_json(f"{burl}/", txn_create).json
-    txn_id = resp.pop("id", None)
-    assert txn_id > 0
-    turl = f"{burl}/{txn_id}"
+    with TransactionAPI(web, res, epoch=epoch) as txn:
+        txn.put(1, _update(fid=10, fields=fld("Updated")))
+        txn.put(2, _update(fid=11, fields=fld("Omitted")))
 
-    op_1 = [1, _update(fid=10, fields=fld("Updated"))]
-    op_2 = [2, _update(fid=11, fields=fld("Omitted"))]
-    resp = web.put_json(turl, [op_1, op_2])
+        # Repeated commits should report the same
+        status = txn.commit_try(status="errors")
+        assert status == txn.commit_try()
 
-    # Commit should report errors
-    resp_a = web.post(turl).json
-    assert resp_a["status"] == "errors"
-    assert len(resp_a["errors"]) == 2
+        assert status == {
+            "status": "errors",
+            "errors": [
+                [
+                    1,
+                    {
+                        "error": "feature.not_found",
+                        "message": "Feature not found",
+                        "status_code": 404,
+                    },
+                ],
+                [
+                    2,
+                    {
+                        "error": "feature.not_found",
+                        "message": "Feature not found",
+                        "status_code": 404,
+                    },
+                ],
+            ],
+        }
 
-    first_error = dict(resp_a["errors"][0][1])
-    first_error.pop("message")
-    assert first_error == dict(error="feature.not_found", status_code=404)
+        # Results are not available
+        txn.results(status=422)
 
-    # Repeated commits should report the same
-    resp_b = web.post(turl).json
-    assert resp_a == resp_b
+        # Fix the first, drop the second, and commit
+        txn.put(1, _update(fid=1, fields=fld("Updated")))
+        txn.put(2, None)
+        txn.commit()
 
-    # Results are not available
-    web.get(turl, status=422)
+        assert txn.results() == [
+            [1, _update()],
+        ]
 
-    # Fix the first, drop the second, and commit
-    op_1 = [1, _update(fid=1, fields=fld("Updated"))]
-    op_2 = [2, None]
-    web.put_json(turl, [op_1, op_2])
-    resp = web.post(turl).json
-    assert resp["status"] == "committed"
+    assert fapi.feature_get(1) == {
+        "id": 1,
+        **vid(2),
+        "geom": "POINT Z (0 0 1)",
+        "fields": {"foo": "Updated"},
+    }
 
-    # Read results
-    resp = web.get(turl, status=200).json
-    assert resp == [[1, _update()]]
+    if not versioning:
+        return
 
-    # Validate
-    resp_1 = web.get(f"{furl}/1?extensions=", status=200).json
-    assert not versioning or resp_1.pop("vid")
-    assert resp_1 == dict(id=1, geom="POINT Z (0 0 1)", fields=dict(foo="Updated"))
+    with TransactionAPI(web, res, epoch=epoch) as txn:
+        # Cause a version conflict
+        txn.put(1, _update(fid=1, vid=0, fields=fld("Updated")))
+        assert txn.commit_try(status="errors") == {
+            "status": "errors",
+            "errors": [
+                [
+                    1,
+                    {
+                        "error": "feature.conflict",
+                        "message": "Feature version conflict",
+                        "status_code": 409,
+                    },
+                ]
+            ],
+        }
 
-    # Dispose transaction
-    web.delete(turl, status=200)
-    web.get(turl, status=404)
-
-    if versioning:
-        resp = web.post_json(f"{burl}/", txn_create).json
-        txn_id = resp.pop("id", None)
-        turl = f"{burl}/{txn_id}"
-
-        # The 1st feature was changed in 2nd version
-        op_1 = [1, _update(fid=1, vid=1, fields=fld("Updated"))]
-        web.put_json(turl, [op_1])
-
-        resp = web.post(turl).json
-        assert resp["status"] == "errors"
-        assert len(resp["errors"]) == 1
-        assert resp["errors"][0][1]["error"] == "feature.conflict"
-
-        op_1 = [1, _update(fid=1, vid=2, fields=fld("Updated"))]
-        web.put_json(turl, [op_1])
-
-        resp = web.post(turl).json
-        assert resp["status"] == "committed"
+        # Fix and commit
+        txn.put(1, _update(fid=1, vid=2, fields=fld("Updated")))
+        txn.commit()
 
 
 _create = lambda **kwargs: dict(action="feature.create", **kwargs)
