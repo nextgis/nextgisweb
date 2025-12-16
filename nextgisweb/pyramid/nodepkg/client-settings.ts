@@ -21,6 +21,7 @@ interface PyramidSettings {
     storage_enabled: boolean;
     storage_limit?: number;
     lunkwill_enabled: boolean;
+    lunkwill_hmux: boolean;
 }
 
 export default await fetchSettings<PyramidSettings>(COMP_ID);

@@ -95,6 +95,8 @@ class PyramidComponent(Component):
                     self.options["lunkwill.host"],
                     self.options["lunkwill.port"],
                 )
+                if self.options["lunkwill.hmux"]:
+                    raise NotImplementedError("Lunkwill hmux requires external interception mode")
 
             else:
                 logger.debug("Lunkwill extension with external interception")
@@ -143,6 +145,7 @@ class PyramidComponent(Component):
         result["storage_enabled"] = self.env.core.options["storage.enabled"]
         result["storage_limit"] = self.env.core.options["storage.limit"]
         result["lunkwill_enabled"] = self.options["lunkwill.enabled"]
+        result["lunkwill_hmux"] = result["lunkwill_enabled"] and self.options["lunkwill.hmux"]
         result["instance_id"] = self.env.core.instance_id
 
         return result
@@ -250,6 +253,7 @@ class PyramidComponent(Component):
 
         Option("lunkwill.enabled", bool, default=None),
         Option("lunkwill.proxy", bool, default=True),
+        Option("lunkwill.hmux", bool, default=False),
         Option("lunkwill.host", str, default=None),
         Option("lunkwill.port", int, default=None),
         Option("lunkwill.secret", str, secure=True, default=None),
