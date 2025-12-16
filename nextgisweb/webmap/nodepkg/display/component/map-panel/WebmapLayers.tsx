@@ -23,6 +23,7 @@ const WebmapLayer = observer(
 
         const { visibility, transparency, symbols, drawOrderPosition } =
             layerItem;
+        const { hmux } = mapStore;
 
         const resolutionDebounced = useMemoDebounce(mapStore.resolution, 100);
 
@@ -53,7 +54,9 @@ const WebmapLayer = observer(
                     }
                     item.update({ minResolution, maxResolution });
 
-                    existLayer = new Adapter().createLayer(item);
+                    existLayer = new Adapter().createLayer(item, {
+                        hmux: hmux ?? undefined,
+                    });
 
                     mapStore.addLayer(
                         existLayer,
@@ -70,7 +73,7 @@ const WebmapLayer = observer(
                     mapStore.removeLayer(existLayer);
                 }
             };
-        }, [mapStore]);
+        }, [mapStore, hmux]);
 
         useEffect(() => {
             if (layer) {

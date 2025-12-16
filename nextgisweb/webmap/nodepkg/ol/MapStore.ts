@@ -46,6 +46,7 @@ interface MapOptions extends Omit<OlMapOptions, "target"> {
     lonlatProjection?: string;
     displayProjection?: string;
     target?: string | HTMLElement;
+    hmux?: boolean;
 }
 
 export interface Position {
@@ -70,6 +71,8 @@ export class MapStore {
 
     readonly displayProjection = "EPSG:3857";
     readonly lonlatProjection = "EPSG:4326";
+
+    @observable.ref accessor hmux: boolean | null;
 
     @observable.ref accessor olMap: OlMap;
     @observable.ref accessor olView: View;
@@ -96,12 +99,14 @@ export class MapStore {
 
     constructor(private options: MapOptions) {
         const {
+            hmux,
             target,
-            constrainingExtent,
-            initialExtent,
             measureSrsId,
+            initialExtent,
+            constrainingExtent,
             ...viewOptions
         } = this.options;
+        this.hmux = hmux ?? null;
         this.measureSrsId = measureSrsId ?? null;
         this.initialExtent = initialExtent;
         this.constrainingExtent = constrainingExtent;
@@ -194,12 +199,25 @@ export class MapStore {
                 s.setRotation();
             };
             this.bindView(olView);
+
+            let loadedStartTime: number | undefined = undefined;
+
             this._mapUnbindKeys.push(
                 olMap.on("loadstart", () => {
+                    loadedStartTime = performance.now();
+
                     this.setIsLoading(true);
                 }),
 
                 olMap.on("loadend", () => {
+                    if (loadedStartTime !== undefined) {
+                        const startedAt = loadedStartTime;
+                        const finishedAt = performance.now();
+                        const durationMs = (finishedAt - startedAt).toFixed(0);
+                        console.log(`Map layers loaded in ${durationMs} ms`);
+                        loadedStartTime = undefined;
+                    }
+
                     this.setIsLoading(false);
                 }),
 

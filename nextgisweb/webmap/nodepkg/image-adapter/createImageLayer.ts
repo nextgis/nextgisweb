@@ -1,14 +1,15 @@
 import { getUid } from "ol/util";
 
+import { isAbortError } from "@nextgisweb/gui/error";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import {
     imageQueue,
     tileLoadFunction,
     transparentImage,
 } from "@nextgisweb/pyramid/util";
-import { QUEUE_ABORT_REASON } from "@nextgisweb/pyramid/util/queue";
 import Image from "@nextgisweb/webmap/ol/layer/Image";
 
+import type { CreateDisplayAdapterLayerOptions } from "../DisplayLayerAdapter";
 import type { CreateLayerOptions } from "../type/CreateLayerOptions";
 
 interface QueryParams {
@@ -33,7 +34,10 @@ function parseQueryParams(queryString: string): QueryParams {
     return params;
 }
 
-export function createImageLayer(item: CreateLayerOptions) {
+export function createImageLayer(
+    item: CreateLayerOptions,
+    options?: CreateDisplayAdapterLayerOptions
+) {
     const name =
         item.id !== undefined
             ? String(item.id)
@@ -80,6 +84,7 @@ export function createImageLayer(item: CreateLayerOptions) {
                         ({ signal }) =>
                             tileLoadFunction({
                                 src: newSrc,
+                                hmux: options?.hmux,
                                 cache: "no-cache",
                                 signal,
                             })
@@ -87,7 +92,7 @@ export function createImageLayer(item: CreateLayerOptions) {
                                     img.src = imageUrl;
                                 })
                                 .catch((error) => {
-                                    if (error !== QUEUE_ABORT_REASON) {
+                                    if (!isAbortError(error)) {
                                         console.error(error);
                                     }
                                     img.src = transparentImage;

@@ -1,18 +1,21 @@
+import { hmuxFetch } from "./hmux";
+
 export const transparentImage =
     "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEAAAAALAAAAAABAAEAAAIBAAA=";
 
 interface TileLoadFunctionOptions extends RequestInit {
     src: string;
+    hmux?: boolean;
     noDataStatuses?: number[];
 }
 
 export async function tileLoadFunction({
     src,
+    hmux,
     noDataStatuses = [204],
-
     ...requestInit
 }: TileLoadFunctionOptions): Promise<string> {
-    const response = await fetch(src, {
+    const response = await (hmux ? hmuxFetch : fetch)(src, {
         method: "GET",
         ...requestInit,
     });

@@ -3,6 +3,7 @@ import type { Extent } from "ol/extent";
 import { transformExtent } from "ol/proj";
 
 import { errorModal } from "@nextgisweb/gui/error";
+import pyramidSettings from "@nextgisweb/pyramid/client-settings";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { layoutStore } from "@nextgisweb/pyramid/layout";
 import type { DisplayConfig } from "@nextgisweb/webmap/type/api";
@@ -84,6 +85,9 @@ export class Display {
             measureSrsId: this.config.measureSrsId,
             displayProjection: this.displayProjection,
             lonlatProjection: this.lonlatProjection,
+            hmux:
+                pyramidSettings.lunkwill_hmux &&
+                this.config.options["webmap.hmux"],
         });
         this.identify = new Identify({ display: this });
 
