@@ -71,15 +71,15 @@ msgstr "Свернуть"
 msgid "Disable"
 msgstr "Отключить"
 
-#: nodepkg/display-tiny/DisplayTinyPage.tsx:54
+#: nodepkg/display-tiny/DisplayTinyPage.tsx:61
 msgid "Open full map"
 msgstr "Открыть карту целиком"
 
-#: nodepkg/display/Display.ts:250
+#: nodepkg/display/Display.ts:247
 msgid "Object not found"
 msgstr "Объект не найден"
 
-#: nodepkg/display/Display.ts:251
+#: nodepkg/display/Display.ts:248
 msgid "Object from URL parameters not found"
 msgstr "Объект из параметров строки запроса не найден"
 
@@ -284,12 +284,12 @@ msgid "Back to the initial extent"
 msgstr "Вернуться к начальному охвату"
 
 #: nodepkg/map-component/tool/ToolMeasure/ToolMeasure.tsx:71
-#: nodepkg/map-controls/map-tools.ts:32
+#: nodepkg/map-controls/map-tools.ts:42
 msgid "Measure distance"
 msgstr "Измерение расстояния"
 
 #: nodepkg/map-component/tool/ToolMeasure/ToolMeasure.tsx:72
-#: nodepkg/map-controls/map-tools.ts:42
+#: nodepkg/map-controls/map-tools.ts:52
 msgid "Measure area"
 msgstr "Измерение площади"
 
@@ -322,7 +322,7 @@ msgid "Layer is not visible"
 msgstr "Слой не включен"
 
 #: nodepkg/map-component/tool/ToolSwipe/ToolSwipe.tsx:48
-#: nodepkg/map-controls/map-tools.ts:52
+#: nodepkg/map-controls/map-tools.ts:32
 msgid "Vertical swipe"
 msgstr "Вертикальная шторка"
 
@@ -373,11 +373,11 @@ msgstr "Координаты курсора / охвата"
 msgid "Editor"
 msgstr "Редактор"
 
-#: nodepkg/map-viewer-info/MapViewerInfo.tsx:81
+#: nodepkg/map-viewer-info/MapViewerInfo.tsx:88
 msgid "Show extent"
 msgstr "Показывать охват"
 
-#: nodepkg/map-viewer-info/MapViewerInfo.tsx:82
+#: nodepkg/map-viewer-info/MapViewerInfo.tsx:89
 msgid "Show cursor coordinates"
 msgstr "Показывать координаты курсора"
 
@@ -476,11 +476,11 @@ msgstr "Получение информации об объекте..."
 msgid "No objects were found at the click location."
 msgstr "Объекты в месте клика не найдены."
 
-#: nodepkg/panel/identify/KeyValueTable.tsx:13
+#: nodepkg/panel/identify/KeyValueTable.tsx:14
 msgid "Attribute"
 msgstr "Атрибут"
 
-#: nodepkg/panel/identify/KeyValueTable.tsx:18
+#: nodepkg/panel/identify/KeyValueTable.tsx:19
 msgid "Value"
 msgstr "Значение"
 
@@ -508,7 +508,7 @@ msgstr "Растр"
 msgid "N/A"
 msgstr "Н/Д"
 
-#: nodepkg/panel/identify/plugin.tsx:12 nodepkg/store/Identify.ts:40
+#: nodepkg/panel/identify/plugin.tsx:12 nodepkg/store/Identify.ts:36
 msgid "Identify"
 msgstr "Идентификация"
 
@@ -626,11 +626,11 @@ msgstr "Распечатать карту"
 msgid "Enter at least 2 characters"
 msgstr "Введите минимум 2 символа"
 
-#: nodepkg/panel/search/SearchPanel.tsx:460
+#: nodepkg/panel/search/SearchPanel.tsx:463
 msgid "Not found"
 msgstr "Не найдено"
 
-#: nodepkg/panel/search/SearchPanel.tsx:465
+#: nodepkg/panel/search/SearchPanel.tsx:468
 msgid "Refine search criterion. Displayed first 100 search results."
 msgstr "Уточните критерий поиска. Отображены первые 100 результатов поиска."
 
@@ -873,7 +873,7 @@ msgstr "Показать с сообщениями"
 msgid "Enable"
 msgstr "Включить"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:203
+#: nodepkg/settings-widget/SettingsWidget.tsx:204
 msgid "Settings"
 msgstr "Настройки"
 
@@ -1145,6 +1145,10 @@ msgstr "Атрибуты объектов"
 #: option/__init__.py:24
 msgid "Geometry info"
 msgstr "Информация о геометрии"
+
+#: option/__init__.py:34
+msgid "Request multiplexing"
+msgstr "Мультиплексирование запросов"
 
 #: option/base.py:36
 msgid "Tools"
