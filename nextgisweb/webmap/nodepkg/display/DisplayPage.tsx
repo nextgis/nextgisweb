@@ -20,21 +20,13 @@ export default function DisplayPage({ id }: { id: number }) {
 
         const prevHtmlBehavior = html.style.overscrollBehaviorY;
         const prevBodyBehavior = body.style.overscrollBehaviorY;
-        const prevBgColor = html.style.backgroundColor;
-        const prevBodyBg = body.style.backgroundColor;
 
         html.style.overscrollBehaviorY = "contain";
         body.style.overscrollBehaviorY = "contain";
 
-        html.style.backgroundColor = token.colorPrimary;
-        body.style.backgroundColor = token.colorBgBase;
-
         return () => {
             html.style.overscrollBehaviorY = prevHtmlBehavior;
             body.style.overscrollBehaviorY = prevBodyBehavior;
-
-            html.style.backgroundColor = prevBgColor;
-            body.style.backgroundColor = prevBodyBg;
         };
     }, [token]);
 
