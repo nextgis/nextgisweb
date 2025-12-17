@@ -135,9 +135,9 @@ def test_workflow(versioning, mkres, ngw_webtest_app):
 
     changes = fapi.changes(epoch=epoch, initial=1, filter=["description."])
     assert changes == [
+        {"action": "description.put", "fid": 1, "vid": 4, "value": "Foo"},
         {"action": "description.put", "fid": 2, "vid": 3, "value": "Qux"},
         {"action": "description.put", "fid": 3, "vid": 3, "value": "Ham"},
-        {"action": "description.put", "fid": 1, "vid": 4, "value": "Foo"},
     ]
 
     changes = fapi.changes(epoch=epoch, initial=2, filter=["description."])

@@ -262,18 +262,21 @@ class VLSchema(MetaData):
             ).where(where_range(p_target), *where_fid(ht)),
         ).subquery("qt")
 
-        q = select(
-            *_lc_changes_head,
-            _lc_changes_bits(field_count),
-            _lc_changes_geom(),
-            *_lc_changes_fields(field_count),
-        ).where(text("pi != pt OR upd"))
-
-        q = q.select_from(
-            qi.join(qt, qi.c.fid == qt.c.fid, full=True)
-            .join(_lat_changes_p(), _sql_true)
-            .join(_lat_changes_d(field_count), _sql_true)
-            .join(_lat_changes_u(field_count), _sql_true)
+        q = (
+            select(
+                *_lc_changes_head,
+                _lc_changes_bits(field_count),
+                _lc_changes_geom(),
+                *_lc_changes_fields(field_count),
+            )
+            .select_from(
+                qi.join(qt, qi.c.fid == qt.c.fid, full=True)
+                .join(_lat_changes_p(), _sql_true)
+                .join(_lat_changes_d(field_count), _sql_true)
+                .join(_lat_changes_u(field_count), _sql_true)
+            )
+            .where(text("pi != pt OR upd"))
+            .order_by(_lc_changes_fid.asc())
         )
 
         return q, fmap
@@ -514,6 +517,7 @@ _lc_op_upd = literal_column("'U'")
 _lc_op_del = literal_column("'D'")
 _lc_op_rst = literal_column("'R'")
 
+_lc_changes_fid = literal_column("COALESCE(qi.fid, qt.fid)").label("fid")
 _lc_changes_act = literal_column(
     "CASE "
     "WHEN NOT pi AND pt AND NOT di THEN 'C' "
@@ -523,9 +527,8 @@ _lc_changes_act = literal_column(
     "END"
 ).label("op")
 
-
 _lc_changes_head = (
-    literal_column("COALESCE(qi.fid, qt.fid)").label("fid"),
+    _lc_changes_fid,
     literal_column("qt.vid").label("vid"),
     _lc_changes_act,
 )

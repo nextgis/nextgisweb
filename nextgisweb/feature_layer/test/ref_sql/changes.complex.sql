@@ -91,4 +91,7 @@ JOIN LATERAL (
 ) AS lat_up
     ON TRUE
 WHERE
-    pi <> pt OR up;
+    pi <> pt OR up
+ORDER BY
+    COALESCE(qi.fid, qt.fid) ASC,
+    COALESCE(qi.eid, qt.eid) ASC;

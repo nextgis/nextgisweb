@@ -91,4 +91,6 @@ JOIN LATERAL (
 ) AS lat_u
     ON TRUE
 WHERE
-    pi <> pt OR upd;
+    pi <> pt OR upd
+ORDER BY
+    fid ASC;

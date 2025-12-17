@@ -317,6 +317,11 @@ class ExtensionQueries:
             *(lc(tpl_sg.format(c)).label(c) for c in self.cols),
         ).where(sa.text("pi != pt OR up"))
 
+        q = q.order_by(
+            lc("COALESCE(qi.fid, qt.fid)").asc(),
+            *((lc("COALESCE(qi.eid, qt.eid)").asc(),) if self.has_id else ()),
+        )
+
         it_join = [qi.c.fid == qt.c.fid] + ([qi.c.eid == qt.c.eid] if self.has_id else [])
         q = q.select_from(
             qi.join(qt, sql_and(*it_join), full=True)
