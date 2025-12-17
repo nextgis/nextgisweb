@@ -6,6 +6,7 @@ from .model import (
     FeatureDelete,
     FeatureRestore,
     FeatureUpdate,
+    FVersioningFeatureSummary,
     FVersioningMeta,
     FVersioningMixin,
     FVersioningObj,

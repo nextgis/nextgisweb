@@ -1,6 +1,7 @@
 from base64 import urlsafe_b64decode, urlsafe_b64encode
-from datetime import datetime
-from typing import TYPE_CHECKING, Annotated, List, Literal, Union
+from datetime import datetime, timedelta
+from itertools import islice
+from typing import TYPE_CHECKING, Annotated, Generator, List, Literal, Union
 
 import sqlalchemy as sa
 from msgspec import Meta, Struct
@@ -11,7 +12,7 @@ from pyramid.response import Response
 from nextgisweb.env import DBSession
 from nextgisweb.lib.apitype import AnyOf, AsJSON, StatusCode
 
-from nextgisweb.auth.api import UserReadBrief, serialize_principal
+from nextgisweb.auth.api import UserReadBrief, UserRef, serialize_principal
 from nextgisweb.resource import DataScope, resource_factory
 
 from ..interface import (
@@ -27,9 +28,22 @@ from .exception import (
     FVersioningNotEnabled,
     FVersioningOutOfRange,
 )
-from .model import FeatureCreate, FeatureDelete, FeatureUpdate, FVersioningObj, registry
+from .model import (
+    FeatureCreate,
+    FeatureDelete,
+    FeatureUpdate,
+    FVersioningFeatureSummary,
+    FVersioningObj,
+    registry,
+)
 
+Epoch = Annotated[int, Meta(gt=0, description="Versioning epoch")]
 VersionID = Annotated[int, Meta(ge=0, description="Version ID")]
+VersionTstamp = Annotated[datetime, Meta(tz=False, description="Version timestamp")]
+
+# TODO: Switch to datetime type when it will be supported for query parameters
+TIMESTAMP_PATTERN = r"^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]{1,6})?$"
+TimestampParam = Annotated[str, Meta(pattern=TIMESTAMP_PATTERN)]
 
 
 class FieldSummary(Struct, kw_only=True):
@@ -43,9 +57,9 @@ class SRSReference(Struct, kw_only=True):
 
 
 class ChangesCheckResponse(Struct, kw_only=True):
-    epoch: Annotated[int, Meta(gt=0)]
-    initial: Annotated[int, Meta(ge=0)]
-    target: Annotated[int, Meta(gt=0)]
+    epoch: Epoch
+    initial: VersionID
+    target: VersionID
     tstamp: datetime
     geometry_type: FeaureLayerGeometryType
     srs: SRSReference
@@ -81,9 +95,9 @@ def change_check(
     resource,
     request,
     *,
-    initial: int = 0,
-    target: Union[Annotated[int, Meta(ge=1)], None] = None,
-    epoch: Union[Annotated[int, Meta(ge=1)], None] = None,
+    initial: VersionID = 0,
+    target: VersionID | None = None,
+    epoch: Epoch | None = None,
     extensions: List[Extension] = [],
 ) -> AnyOf[
     ChangesCheckResponse,
@@ -173,9 +187,9 @@ def change_fetch(
     resource,
     request,
     *,
-    epoch: int,
-    initial: int,
-    target: int,
+    epoch: Epoch,
+    initial: VersionID,
+    target: VersionID,
     cursor: str,
 ) -> AsJSON[List[Union[ChangesContinue, ChangeTypes]]]:
     """Fetch changes incrementally
@@ -263,9 +277,193 @@ def change_fetch(
     return operations
 
 
+VersionCGetOrder = Annotated[
+    Literal["asc", "desc"],
+    Meta(
+        description="Order of versions: `asc` for ascending (oldest to newest), "
+        "`desc` for descending (newest to oldest)",
+    ),
+]
+
+VersionCGetCursor = Annotated[
+    str,
+    Meta(min_length=1),
+    Meta(description="Opaque pagination cursor"),
+]
+
+
+class VersionCGetVersion(Struct, kw_only=True, tag="version"):
+    id: VersionID
+    tstamp: VersionTstamp
+    user: UserRef | None
+    feature: FVersioningFeatureSummary
+
+    def cursor(self, *, order: VersionCGetOrder) -> str:
+        return str(self.id)
+
+
+class VersionCGetGroup(Struct, kw_only=True, tag="group"):
+    id: tuple[VersionID, VersionID]
+    tstamp: tuple[VersionTstamp, VersionTstamp]
+    user: UserRef | None
+    feature: FVersioningFeatureSummary
+
+    def cursor(self, *, order: VersionCGetOrder) -> str:
+        return str(self.id[1] if order == "asc" else self.id[0])
+
+
+VersionCGetItem = VersionCGetVersion | VersionCGetGroup
+
+
+class VersionCGetResponse(Struct, kw_only=True):
+    cursor: VersionCGetCursor | None
+    items: List[VersionCGetItem]
+
+    @classmethod
+    def from_generator(
+        cls,
+        gen: Generator[VersionCGetItem, None, None],
+        *,
+        order: VersionCGetOrder,
+        limit: int,
+    ):
+        items = list(islice(gen, limit))
+        cursor = items[-1].cursor(order=order) if len(items) == limit else None
+        return cls(cursor=cursor, items=items)
+
+
+def version_cget(
+    resource,
+    request,
+    *,
+    epoch: Epoch,
+    order: VersionCGetOrder,
+    group: Annotated[
+        bool,
+        Meta(description="Group consecutive versions by the same user"),
+    ] = False,
+    tstamp_ge: Annotated[
+        TimestampParam | None,
+        Meta(description="Minimum timestamp (inclusive)"),
+    ] = None,
+    tstamp_lt: Annotated[
+        TimestampParam | None,
+        Meta(description="Maximum timestamp (exclusive)"),
+    ] = None,
+    limit: Annotated[
+        int,
+        Meta(ge=1, le=500),
+        Meta(description="Limit the number of items returned"),
+    ] = 50,
+    cursor: VersionCGetCursor | None = None,
+) -> VersionCGetResponse:
+    """Read versions metadata"""
+
+    request.resource_permission(DataScope.read)
+
+    FVersioningEpochMismatch.disprove(resource, epoch)
+
+    def _reader(page_size=50):
+        vid_col = FVersioningObj.version_id
+        cnt = vid_col.op(">") if order == "asc" else vid_col.op("<")
+        ord = vid_col.asc() if order == "asc" else vid_col.desc()
+
+        query = FVersioningObj.filter_by(resource_id=resource.id).order_by(ord)
+        if tstamp_ge is not None:
+            query = query.filter(FVersioningObj.tstamp >= datetime.fromisoformat(tstamp_ge))
+        if tstamp_lt is not None:
+            query = query.filter(FVersioningObj.tstamp < datetime.fromisoformat(tstamp_lt))
+
+        last_id = int(cursor) if cursor else None
+
+        while True:
+            fquery = query.filter(cnt(last_id)) if last_id else query
+            num = 0
+            for obj in fquery.limit(page_size):
+                last_id = obj.version_id
+                yield obj
+                num += 1
+            if num != page_size:
+                break
+
+    def _summary(vid_min: int, vid_max: int) -> FVersioningFeatureSummary:
+        initial, target = vid_min - 1, vid_max
+        fid_queries = [*resource.fversioning_changed_fids()]
+
+        # TODO: Consider extensions summary too
+
+        lit_fid = sa.literal_column("fid")
+        qfid = sa.union_all(*fid_queries).subquery()
+        qfid = (sa.select(qfid.c.fid).group_by(lit_fid).order_by(lit_fid)).subquery()
+        qfid = sa.select(sa.literal_column("MIN(fid), MAX(fid)")).select_from(qfid)
+        fid_min, fid_max = DBSession.execute(
+            qfid,
+            dict(
+                p_rid=resource.id,
+                p_initial=initial,
+                p_target=target,
+                p_fid_last=None,
+                p_fid_limit=(1 << 32) - 1,
+            ),
+        ).first()
+        return resource.fversioning_summary(
+            initial=initial,
+            target=target,
+            fid_min=fid_min,
+            fid_max=fid_max,
+        )
+
+    def _group(tstamp_max_gap=timedelta(seconds=120).total_seconds()):
+        head = tail = None
+        swap = (lambda a, b: (a, b)) if order == "asc" else (lambda a, b: (b, a))
+        for row in _reader():
+            if head is None:
+                head = tail = row
+            elif (
+                row.user_id == tail.user_id
+                and abs((tail.tstamp - row.tstamp).total_seconds()) <= tstamp_max_gap
+            ):
+                tail = row
+            else:
+                assert head and tail
+                yield swap(head, tail)
+                head = tail = row
+        if head and tail:
+            yield swap(head, tail)
+
+    pairs = ((vobj, vobj) for vobj in _reader()) if not group else _group()
+
+    generator = (
+        (
+            VersionCGetVersion(
+                id=vmin.version_id,
+                tstamp=vmin.tstamp,
+                user=UserRef(id=vmin.user_id) if vmin.user_id else None,
+                feature=_summary(vmin.version_id, vmin.version_id),
+            )
+            if (vmin == vmax)
+            else (
+                VersionCGetGroup(
+                    id=(vmin.version_id, vmax.version_id),
+                    tstamp=(vmin.tstamp, vmax.tstamp),
+                    user=UserRef(id=vmin.user_id) if vmin.user_id else None,
+                    feature=_summary(vmin.version_id, vmax.version_id),
+                )
+            )
+        )
+        for (vmin, vmax) in pairs
+    )
+
+    return VersionCGetResponse.from_generator(
+        generator,
+        order=order,
+        limit=limit,
+    )
+
+
 class VersionRead(Struct, kw_only=True):
     id: VersionID
-    tstamp: datetime
+    tstamp: VersionTstamp
     user: Union[UserReadBrief, None]
 
 
@@ -301,6 +499,12 @@ def setup_pyramid(comp, config):
         "/api/resource/{id:uint}/feature/changes/fetch",
         factory=resource_factory,
     ).get(change_fetch, context=IVersionableFeatureLayer)
+
+    config.add_route(
+        "feature_layer.version.collection",
+        "/api/resource/{id:uint}/feature/version/",
+        factory=resource_factory,
+    ).get(version_cget, context=IVersionableFeatureLayer)
 
     config.add_route(
         "feature_layer.version.item",

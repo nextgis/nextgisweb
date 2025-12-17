@@ -227,6 +227,13 @@ class FVersioningObj(Base):
         self.is_open = False
 
 
+class FVersioningFeatureSummary(Struct, kw_only=True):
+    create: Annotated[int, Meta(ge=0, description="Number of created features")]
+    update: Annotated[int, Meta(ge=0, description="Number of updated features")]
+    delete: Annotated[int, Meta(ge=0, description="Number of deleted features")]
+    restore: Annotated[int, Meta(ge=0, description="Number of restored features")]
+
+
 FieldID = Annotated[int, Meta(title="FieldID")]
 FeatureID = Annotated[int, Meta(title="FeatureID")]
 VersionID = Annotated[int, Meta(title="VersionID")]

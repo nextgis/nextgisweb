@@ -221,7 +221,7 @@ class VLSchema(MetaData):
                 .limit(p_fid_limit)
             )
 
-    def query_changes(self):
+    def query_changes(self, *, summary=False):
         ct, et, ht = self._aliased_tabs()
         p_initial, p_target = bindparam("p_initial"), bindparam("p_target")
         p_fid_min, p_fid_max = bindparam("p_fid_min"), bindparam("p_fid_max")
@@ -262,22 +262,22 @@ class VLSchema(MetaData):
             ).where(where_range(p_target), *where_fid(ht)),
         ).subquery("qt")
 
-        q = (
-            select(
+        if not summary:
+            q = select(
                 *_lc_changes_head,
                 _lc_changes_bits(field_count),
                 _lc_changes_geom(),
                 *_lc_changes_fields(field_count),
-            )
-            .select_from(
-                qi.join(qt, qi.c.fid == qt.c.fid, full=True)
-                .join(_lat_changes_p(), _sql_true)
-                .join(_lat_changes_d(field_count), _sql_true)
-                .join(_lat_changes_u(field_count), _sql_true)
-            )
-            .where(text("pi != pt OR upd"))
-            .order_by(_lc_changes_fid.asc())
-        )
+            ).order_by(_lc_changes_fid.asc())
+        else:
+            q = select(_lc_changes_act, _lc_count_cnt).group_by(_lc_op)
+
+        q = q.select_from(
+            qi.join(qt, qi.c.fid == qt.c.fid, full=True)
+            .join(_lat_changes_p(), _sql_true)
+            .join(_lat_changes_d(field_count), _sql_true)
+            .join(_lat_changes_u(field_count), _sql_true)
+        ).where(text("pi != pt OR upd"))
 
         return q, fmap
 
@@ -526,6 +526,9 @@ _lc_changes_act = literal_column(
     "WHEN NOT pi AND pt AND di THEN 'R' "
     "END"
 ).label("op")
+
+_lc_op = literal_column("op").label("op")
+_lc_count_cnt = literal_column("COUNT(*)").label("cnt")
 
 _lc_changes_head = (
     _lc_changes_fid,

@@ -35,6 +35,7 @@ from nextgisweb.feature_layer.versioning import (
     FeatureDelete,
     FeatureRestore,
     FeatureUpdate,
+    FVersioningFeatureSummary,
     FVersioningMixin,
     FVersioningNotImplemented,
     OperationFieldValue,
@@ -543,6 +544,48 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin, FVersioni
                 )
             else:
                 raise NotImplementedError
+
+    def fversioning_summary(
+        self, *, initial, target, fid_min, fid_max
+    ) -> FVersioningFeatureSummary:
+        fields = {fld.id: (fld.fld_uuid, FIELD_TYPE_2_DB[fld.datatype]) for fld in self.fields}
+        query, _ = self.vlschema(fields=fields).query_changes(summary=True)
+
+        result = DBSession.execute(
+            query,
+            dict(
+                p_initial=initial,
+                p_target=target,
+                p_fid_min=fid_min,
+                p_fid_max=fid_max,
+            ),
+        )
+
+        create = update = delete = restore = 0
+        for op, cnt in result:
+            assert cnt > 0
+            match op:
+                case "C":
+                    assert create == 0
+                    create = cnt
+                case "U":
+                    assert update == 0
+                    update = cnt
+                case "D":
+                    assert delete == 0
+                    delete = cnt
+                case "R":
+                    assert restore == 0
+                    restore = cnt
+                case _:
+                    raise NotImplementedError
+
+        return FVersioningFeatureSummary(
+            create=create,
+            update=update,
+            delete=delete,
+            restore=restore,
+        )
 
     # Internals
 
