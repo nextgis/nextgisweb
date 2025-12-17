@@ -68,7 +68,7 @@ msgstr "Объект не удален"
 msgid "Unable to restore the #{} feature as it is not deleted."
 msgstr "Невозможно восстановить объект #{} поскольку он не удален."
 
-#: favorite.py:6 nodepkg/fields-widget/FieldsWidget.tsx:26 view.py:39
+#: favorite.py:6 nodepkg/fields-widget/FieldsWidget.tsx:26 view.py:40
 msgid "Feature table"
 msgstr "Таблица объектов"
 
@@ -476,13 +476,13 @@ msgstr "Поиск..."
 msgid "Advanced filter"
 msgstr "Расширенный фильтр"
 
-#: nodepkg/feature-grid/FeatureTable.tsx:95
+#: nodepkg/feature-grid/FeatureTable.tsx:89
 #: nodepkg/feature-grid/component/TableConfigModal.tsx:53
 msgid "Last changed"
 msgstr "Последнее изменение"
 
-#: nodepkg/feature-grid/component/ExportAction.tsx:30 view.py:82 view.py:92
-#: view.py:179
+#: nodepkg/feature-grid/component/ExportAction.tsx:30 view.py:83 view.py:107
+#: view.py:211
 msgid "Save as"
 msgstr "Сохранить как"
 
@@ -547,14 +547,14 @@ msgstr "Удаление этого поля навсегда сотрёт вс�
 msgid "Field"
 msgstr "Поле"
 
-#: nodepkg/filtered-count/FilteredCount.tsx:67
-#: nodepkg/filtered-count/FilteredCount.tsx:109
-msgid "Feature count"
-msgstr "Количество объектов"
-
-#: nodepkg/filtered-count/FilteredCount.tsx:72
+#: nodepkg/filtered-count/FilteredCount.tsx:66
 msgid "{filtered_count} of {total_count}"
 msgstr "{filtered_count} из {total_count}"
+
+#: nodepkg/filtered-count/FilteredCount.tsx:72
+#: nodepkg/filtered-count/FilteredCount.tsx:103
+msgid "Feature count"
+msgstr "Количество объектов"
 
 #: nodepkg/geometry-editor/plugin.ts:10
 msgid "Geometry"
@@ -624,6 +624,84 @@ msgstr ""
 msgid "Settings"
 msgstr "Настройки"
 
+#: nodepkg/version-history/VersionHistory.tsx:66
+msgid "Date and time"
+msgstr "Дата и время"
+
+#: nodepkg/version-history/VersionHistory.tsx:73
+msgid "User"
+msgstr "Пользователь"
+
+#: nodepkg/version-history/VersionHistory.tsx:84 view.py:188
+msgid "Features"
+msgstr "Объекты"
+
+#: nodepkg/version-history/VersionHistory.tsx:87
+msgctxt "column"
+msgid "Created"
+msgstr "Добавлено"
+
+#: nodepkg/version-history/VersionHistory.tsx:94
+msgctxt "column"
+msgid "Updated"
+msgstr "Изменено"
+
+#: nodepkg/version-history/VersionHistory.tsx:101
+msgctxt "column"
+msgid "Deleted"
+msgstr "Удалено"
+
+#: nodepkg/version-history/VersionHistory.tsx:108
+msgctxt "column"
+msgid "Restored"
+msgstr "Востановлено"
+
+#: nodepkg/version-history/VersionHistoryGroupDetails.tsx:33
+msgid "Created"
+msgstr "Добавлен"
+
+#: nodepkg/version-history/VersionHistoryGroupDetails.tsx:35
+msgid "Updated"
+msgstr "Изменен"
+
+#: nodepkg/version-history/VersionHistoryGroupDetails.tsx:37
+msgid "Deleted"
+msgstr "Удален"
+
+#: nodepkg/version-history/VersionHistoryGroupDetails.tsx:39
+msgid "Restored"
+msgstr "Восстановлен"
+
+#: nodepkg/version-history/VersionHistoryGroupDetails.tsx:97
+msgid "Updated geometry"
+msgstr "Изменена геометрия"
+
+#: nodepkg/version-history/VersionHistoryGroupDetails.tsx:101
+msgid "Updated {} attribute"
+msgid_plural "Updated {} attributes"
+msgstr[0] "Изменен {} атрибут"
+msgstr[1] "Изменено {} атрибута"
+msgstr[2] "Изменено {} атрибутов"
+
+#: nodepkg/version-history/VersionHistoryGroupDetails.tsx:107
+msgid "{} attribute"
+msgid_plural "{} attributes"
+msgstr[0] "{} атрибут"
+msgstr[1] "{} атрибута"
+msgstr[2] "{} атрибутов"
+
+#: nodepkg/version-history/VersionHistoryGroupDetails.tsx:117
+msgid "and"
+msgstr "и"
+
+#: nodepkg/version-history/VersionHistoryGroupDetails.tsx:126
+msgid "Feature"
+msgstr "Объект"
+
+#: nodepkg/version-history/VersionHistoryGroupDetails.tsx:132
+msgid "Action"
+msgstr "Действие"
+
 #: numutil.py:28
 msgid "The value must be within the inclusive range of {min} to {max}."
 msgstr "Значение должно находиться в диапазоне от {min} до {max} включительно."
@@ -689,15 +767,19 @@ msgstr "Версия за пределами диапазона"
 msgid "Invalid range"
 msgstr "Некорректный диапазон"
 
-#: view.py:55 view.py:70
+#: view.py:56 view.py:71
 msgid "Feature #%d"
 msgstr "Объект #%d"
 
-#: view.py:99
+#: view.py:96 view.py:203
+msgid "Version history"
+msgstr "История изменений"
+
+#: view.py:114
 msgid "MVT Vector Tiles"
 msgstr "Векторные тайлы MVT"
 
-#: view.py:101
+#: view.py:116
 msgid ""
 "The Mapbox Vector Tile is an efficient encoding for map data into vector "
 "tiles that can be rendered dynamically."
@@ -705,10 +787,27 @@ msgstr ""
 "Векторные тайлы MVT это эффективное кодирование данных карты в векторные "
 "тайлы которые могут быть динамически отрисованы."
 
-#: view.py:163
-msgid "Features"
-msgstr "Объекты"
-
-#: view.py:168
+#: view.py:193
 msgid "Table"
 msgstr "Таблица"
+
+#~ msgid "changed {} field"
+#~ msgid_plural "changed {} fields"
+#~ msgstr[0] "Изменено {} поле"
+#~ msgstr[1] "Изменено {} поля"
+#~ msgstr[2] "Изменено {} полей"
+
+#~ msgid "Changed {} field"
+#~ msgid_plural "Changed {} fields"
+#~ msgstr[0] "Изменено {} поле"
+#~ msgstr[1] "Изменено {} поля"
+#~ msgstr[2] "Изменено {} полей"
+
+#~ msgid "Changed geometry"
+#~ msgstr "Изменена геометрия"
+
+#~ msgid "Changed {} attribute"
+#~ msgid_plural "Changed {} attributes"
+#~ msgstr[0] "Изменен {} атрибут"
+#~ msgstr[1] "Изменено {} атрибута"
+#~ msgstr[2] "Изменено {} атрибутов"

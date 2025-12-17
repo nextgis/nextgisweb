@@ -11,6 +11,7 @@ from nextgisweb.resource.view import resource_sections
 
 from .interface import IFeatureLayer, IVersionableFeatureLayer
 from .ogrdriver import MVT_DRIVER_EXIST
+from .versioning import FVersioningNotEnabled
 
 
 class FeatureLayerFieldsWidget(Widget):
@@ -85,6 +86,20 @@ def export(request):
     )
 
 
+@react_renderer("@nextgisweb/feature-layer/version-history")
+def history(request):
+    request.resource_permission(DataScope.read)
+    if not IVersionableFeatureLayer.providedBy(request.context) or not request.context.fversioning:
+        raise FVersioningNotEnabled()
+    return dict(
+        obj=request.context,
+        title=gettext("Version history"),
+        props=dict(id=request.context.id),
+        maxwidth=True,
+        maxheight=True,
+    )
+
+
 @react_renderer("@nextgisweb/feature-layer/export-form")
 def export_multiple(request):
     return dict(
@@ -145,6 +160,15 @@ def setup_pyramid(comp, config):
         factory=resource_factory,
     ).add_view(feature_update, context=IFeatureLayer)
 
+    config.add_route(
+        "resource.history",
+        r"/resource/{id:uint}/history",
+        factory=resource_factory,
+    ).add_view(
+        history,
+        context=IFeatureLayer,
+    )
+
     config.add_view(
         export,
         route_name="resource.export.page",
@@ -152,6 +176,7 @@ def setup_pyramid(comp, config):
     )
 
     icon_feature_browse = icon("material/table")
+    icon_history = icon("material/history")
     icon_export = icon("material/download")
 
     # Layer menu extension
@@ -172,6 +197,13 @@ def setup_pyramid(comp, config):
                 important=True,
                 icon=icon_feature_browse,
             )
+            if IVersionableFeatureLayer.providedBy(args.obj) and args.obj.fversioning:
+                yield Link(
+                    "feature_layer/history",
+                    gettext("Version history"),
+                    lambda args: args.request.route_url("resource.history", id=args.obj.id),
+                    icon=icon_history,
+                )
 
         if args.obj.has_export_permission(args.request.user):
             yield Link(
