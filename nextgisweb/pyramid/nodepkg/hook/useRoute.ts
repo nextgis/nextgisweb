@@ -69,10 +69,11 @@ export function useRoute<N extends RouteName>(
             ) => {
                 dispatchLoadingCounter("increment");
                 try {
-                    return originalMethod({
+                    const res = await originalMethod({
                         signal: makeSignal(),
                         ...requestOptions,
                     });
+                    return res;
                 } finally {
                     dispatchLoadingCounter("decrement");
                 }
