@@ -20,7 +20,6 @@ export interface LegendPrintMapProps {
     display: Display;
     printMapStore: PrintMapStore;
     legendCoords: LegendRndCoords;
-    show: boolean;
     onChange: (coords: LegendRndCoords) => void;
 }
 

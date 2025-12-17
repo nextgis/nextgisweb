@@ -6,7 +6,6 @@ import type { TreeChildrenItemConfig } from "@nextgisweb/webmap/type/TreeItems";
 import type {
     GroupItemConfig,
     LayerItemConfig,
-    LegendInfo,
     RootItemConfig,
 } from "@nextgisweb/webmap/type/api";
 
@@ -523,17 +522,7 @@ export class TreeStore {
                 item.legendInfo.has_legend &&
                 !item.legendInfo.symbols
             ) {
-                const single = !!symbols && symbols.length === 1;
-                const legendInfo: LegendInfo = {
-                    ...item.legendInfo,
-                    symbols: symbols ?? [],
-                    single,
-                };
-                if (!single) {
-                    legendInfo.open = legendInfo.visible === "expand";
-                }
-                item.update({ legendInfo });
-
+                item.legendInfo.setSymbols(symbols ?? []);
                 return true;
             }
             return false;

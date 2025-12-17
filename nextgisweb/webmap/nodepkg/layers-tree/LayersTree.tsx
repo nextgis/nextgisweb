@@ -23,7 +23,6 @@ type TreeNodeData = NonNullable<TreeProps["treeData"]>[0];
 export type TreeWebmapItem = TreeNodeData & {
     key: number;
     children?: TreeWebmapItem[];
-    legendIcon?: React.ReactNode;
     treeItem: TreeItemStore;
 };
 

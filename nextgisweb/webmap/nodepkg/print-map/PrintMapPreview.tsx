@@ -11,6 +11,7 @@ import { imageQueue } from "@nextgisweb/pyramid/util";
 import { mapStartup } from "@nextgisweb/webmap/ol/util/mapStartup";
 
 import type { Display } from "../display";
+import { WebmapLayers } from "../display/component/map-panel/WebmapLayers";
 import type { AnnotationsPopup } from "../layer/annotations/AnnotationsPopup";
 import { MapComponent } from "../map-component";
 import RotateControl from "../map-component/control/RotateControl";
@@ -36,8 +37,9 @@ export const PrintMapPreview = observer(
     ({ display, printMapStore }: PrintMapPreviewProps) => {
         const [mapStore] = useState(() => {
             const viewMainMap = display.map.olView;
+            const projection = display.map.olView.getProjection();
             const view = new View({
-                projection: display.map.olView.getProjection(),
+                projection,
                 constrainResolution: false,
                 center: printMapStore.center ?? viewMainMap.getCenter(),
             });
@@ -58,15 +60,6 @@ export const PrintMapPreview = observer(
             scaleValue,
         } = printMapStore;
 
-        const onChangeScale = useCallback(
-            (scale: number) => {
-                printMapStore.update({ scale });
-            },
-            [printMapStore]
-        );
-
-        const debouncedOnScaleChange = useDebounce(onChangeScale, 200);
-
         useEffect(
             function redrawLayers() {
                 const printMap = mapStore.olMap;
@@ -74,20 +67,23 @@ export const PrintMapPreview = observer(
 
                 clearOlMap(printMap);
 
+                // TODO: Create an independent baselayer for the print map from the display config,
+                // not by cloning it from the main map (WebmapLayers), because the main map may not be exist.
                 display.map.getLayersArray().forEach((layer) => {
                     if (layer.getVisible() && layer.printingCopy) {
-                        const copyLayer = layer.printingCopy();
-
                         const matchedLayerEntry = Object.values(
                             display.map.layers
                         ).find(
                             (entry) =>
-                                entry.getLayer && entry.getLayer() === layer
+                                entry.getLayer &&
+                                entry.getLayer() === layer &&
+                                entry.isBaseLayer
                         );
-                        if (matchedLayerEntry?.isBaseLayer) {
+                        if (matchedLayerEntry) {
+                            const copyLayer = layer.printingCopy();
                             copyLayer.setZIndex(-1);
+                            printMap.addLayer(copyLayer);
                         }
-                        printMap.addLayer(copyLayer);
                     }
                 });
 
@@ -165,6 +161,13 @@ export const PrintMapPreview = observer(
             }
         }, [mapStore, mapStore.olView, scale]);
 
+        const onChangeScale = useCallback(
+            (scale: number) => {
+                printMapStore.update({ scale });
+            },
+            [printMapStore]
+        );
+        const debouncedOnScaleChange = useDebounce(onChangeScale, 200);
         useEffect(() => {
             if (mapStore.scale !== undefined) {
                 debouncedOnScaleChange(mapStore.scale);
@@ -183,6 +186,10 @@ export const PrintMapPreview = observer(
                 style={{ width: "100%", height: "100%" }}
                 mapStore={mapStore}
             >
+                <WebmapLayers
+                    mapStore={mapStore}
+                    treeStore={display.treeStore}
+                />
                 <CompanyLogoControl position="bottom-right" />
                 {arrow && (
                     <RotateControl

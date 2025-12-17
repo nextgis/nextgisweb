@@ -1,5 +1,6 @@
-import { action, observable } from "mobx";
+import { action, computed, observable } from "mobx";
 
+import type { LegendSymbol } from "@nextgisweb/render/type/api";
 import type { CompositeMembersConfig } from "@nextgisweb/resource/type/api";
 import type { LayerSymbols } from "@nextgisweb/webmap/compat/type";
 import type { TreeChildrenItemConfig } from "@nextgisweb/webmap/type/TreeItems";
@@ -58,6 +59,41 @@ abstract class BaseTreeItemStore {
 
 let order = 0;
 
+export class LegendInfoStore implements LegendInfo {
+    @observable.ref accessor visible: LegendInfo["visible"];
+    @observable.ref accessor has_legend: LegendInfo["has_legend"];
+
+    @observable.ref accessor symbols: LegendSymbol[] | null = null;
+
+    constructor({ visible, has_legend }: LegendInfo) {
+        this.visible = visible;
+        this.has_legend = has_legend;
+    }
+
+    @action
+    setVisible(val: LegendInfo["visible"]) {
+        this.visible = val;
+    }
+
+    @action
+    toggleVisible() {
+        this.visible = this.visible === "collapse" ? "expand" : "collapse";
+    }
+
+    @action
+    setSymbols(val: LegendSymbol[]) {
+        this.symbols = val;
+    }
+    @computed
+    get single() {
+        return !!this.symbols && this.symbols.length === 1;
+    }
+    @computed
+    get open() {
+        return !this.single && this.visible === "expand";
+    }
+}
+
 export class TreeLayerStore
     extends BaseTreeItemStore
     implements LayerItemConfig
@@ -70,7 +106,7 @@ export class TreeLayerStore
     @observable.ref accessor styleId: number;
     @observable.ref accessor symbols: LayerSymbols | null = null;
     @observable.ref accessor editable: boolean | null;
-    @observable.ref accessor legendInfo: LegendInfo;
+    @observable.ref accessor legendInfo: LegendInfoStore;
     @observable.ref accessor visibility: boolean;
     @observable.ref accessor identifiable: boolean;
     @observable.ref accessor transparency: number | null;
@@ -105,7 +141,7 @@ export class TreeLayerStore
             this.drawOrderEnabled && typeof init.drawOrderPosition === "number"
                 ? init.drawOrderPosition
                 : order++;
-        this.legendInfo = init.legendInfo;
+        this.legendInfo = new LegendInfoStore(init.legendInfo);
         this.adapter = init.adapter;
         this.plugin = init.plugin;
         this.minResolution = init.minResolution ?? null;
@@ -118,11 +154,6 @@ export class TreeLayerStore
         const legendInfo = {
             visible: this.legendInfo.visible,
             has_legend: this.legendInfo.has_legend,
-            symbols: this.legendInfo.symbols
-                ? [...this.legendInfo.symbols]
-                : null,
-            single: this.legendInfo.single ?? null,
-            open: this.legendInfo.open ?? null,
         } satisfies LegendInfo;
 
         return {

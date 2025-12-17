@@ -122,17 +122,9 @@ export const WebmapLayers = observer(
             type: "layer",
         });
 
-        return (
-            <>
-                {layerItems.map((it) => (
-                    <WebmapLayer
-                        key={it.id}
-                        layerItem={it}
-                        mapStore={mapStore}
-                    />
-                ))}
-            </>
-        );
+        return layerItems.map((it) => (
+            <WebmapLayer key={it.id} layerItem={it} mapStore={mapStore} />
+        ));
     }
 );
 

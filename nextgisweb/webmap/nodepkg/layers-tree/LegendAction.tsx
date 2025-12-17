@@ -27,7 +27,7 @@ export function LegendAction({
 
     const click = (evt: MouseEvent) => {
         evt.stopPropagation();
-        nodeData.legendInfo.open = !nodeData.legendInfo.open;
+        nodeData.legendInfo.toggleVisible();
         onClick(nodeData.id);
     };
 

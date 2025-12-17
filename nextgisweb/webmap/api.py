@@ -451,11 +451,6 @@ LegendVisibleMode = Literal["collapse", "expand"]
 class LegendInfo(Struct, kw_only=True):
     visible: LegendVisibleMode
     has_legend: bool
-    # FIXME: The attributes below exist only for TypeScript types. We need to
-    # refactor them and remove these.
-    symbols: Union[List[LegendSymbol], None] = None
-    single: Union[bool, None] = None
-    open: Union[bool, None] = None
 
 
 class AnnotationsPermissions(Struct, kw_only=True):

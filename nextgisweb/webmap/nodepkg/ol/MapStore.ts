@@ -563,6 +563,7 @@ export class MapStore {
 
     @action
     private setResolution(resolution: number | null) {
+        if (!this.ready) return;
         this.resolution = resolution;
     }
     @action

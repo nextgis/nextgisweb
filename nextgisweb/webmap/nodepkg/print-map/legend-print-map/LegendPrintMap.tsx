@@ -8,21 +8,24 @@ import RndComp from "../rnd-comp";
 import type { LegendPrintMapProps, RndCoords } from "../type";
 
 const handleTreeItem = (
-    checked: Set<number>,
-    expanded: Set<number>,
+    checked: number[],
+    expanded: number[],
     layersItem: TreeWebmapItem
 ) => {
     const { key } = layersItem;
 
     if (layersItem.isLeaf) {
-        if (!checked.has(key)) {
+        if (!checked.includes(key)) {
             return null;
         }
 
+        const legendInfo =
+            layersItem.treeItem.isLayer() && layersItem.treeItem.legendInfo;
+
         const hasLegend =
-            layersItem.legendIcon ||
-            (layersItem.treeItem.isLayer() &&
-                layersItem.treeItem.legendInfo.open);
+            legendInfo &&
+            (legendInfo.open || legendInfo.single) &&
+            legendInfo.symbols;
 
         if (hasLegend) {
             return layersItem;
@@ -31,7 +34,7 @@ const handleTreeItem = (
         }
     }
 
-    if (layersItem.children && expanded.has(key)) {
+    if (layersItem.children && expanded.includes(key)) {
         const newLayersItems: TreeWebmapItem[] = [];
         (layersItem.children as TreeWebmapItem[]).forEach((item) => {
             const newTreeItem = handleTreeItem(checked, expanded, item);
@@ -46,10 +49,13 @@ const handleTreeItem = (
 
 const filterTreeItems = (store: TreeStore, layersItems: TreeWebmapItem[]) => {
     const newLayersItems: TreeWebmapItem[] = [];
-    const checked = new Set(store.visibleLayerIds);
-    const expanded = new Set(store.expanded);
+
     layersItems.forEach((item) => {
-        const newTreeItem = handleTreeItem(checked, expanded, item);
+        const newTreeItem = handleTreeItem(
+            store.visibleLayerIds,
+            store.expanded,
+            item
+        );
         if (newTreeItem) {
             newLayersItems.push(newTreeItem);
         }
@@ -58,7 +64,6 @@ const filterTreeItems = (store: TreeStore, layersItems: TreeWebmapItem[]) => {
 };
 
 export const LegendPrintMap = ({
-    show,
     display,
     legendCoords,
     printMapStore,
@@ -68,25 +73,21 @@ export const LegendPrintMap = ({
     const { visibleLayers } = treeStore;
 
     useEffect(() => {
-        if (!show) {
-            if (legendCoords.displayed) {
-                onChange({ ...legendCoords, displayed: false });
-            }
+        if (legendCoords.displayed) {
+            onChange({ ...legendCoords, displayed: false });
         }
-    }, [legendCoords, onChange, show]);
+    }, [legendCoords, onChange]);
 
     useEffect(() => {
-        if (show) {
-            const visibleLayersWithoutSymbols = visibleLayers.filter(
-                treeStore.shouldHaveLegendInfo
+        const visibleLayersWithoutSymbols = visibleLayers.filter(
+            treeStore.shouldHaveLegendInfo
+        );
+        if (visibleLayersWithoutSymbols.length) {
+            treeStore.updateResourceLegendSymbols(
+                visibleLayersWithoutSymbols.map((layer) => layer.styleId)
             );
-            if (visibleLayersWithoutSymbols.length) {
-                treeStore.updateResourceLegendSymbols(
-                    visibleLayersWithoutSymbols.map((layer) => layer.styleId)
-                );
-            }
         }
-    }, [show, treeStore, visibleLayers]);
+    }, [treeStore, visibleLayers]);
 
     const fakeCb = useCallback(() => {}, []);
     const onFilterItems = useCallback(
@@ -97,10 +98,6 @@ export const LegendPrintMap = ({
         },
         [printMapStore]
     );
-
-    if (!show) {
-        return null;
-    }
 
     const style = { columnCount: legendCoords.legendColumns };
 
