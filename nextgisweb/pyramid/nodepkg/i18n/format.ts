@@ -1,3 +1,5 @@
+import { uniq } from "lodash-es";
+
 type Param<T = never> = string | number | T;
 export type FormatArray<T = never> = [...args: Param<T>[]];
 export type FormatObject<T = never> = Record<string, Param<T>>;
@@ -42,7 +44,7 @@ export function compile(template: string): Compiled {
 
     if (numMatches && numMatches.length > 0) {
         const compileArray = <A = never>(...args: FormatArray<A>): string[] => {
-            if (args.length < numMatches.length) {
+            if (args.length < uniq(numMatches).length) {
                 throw new Error(
                     `Expected ${numMatches.length} arguments but got ${args.length}`
                 );
@@ -71,7 +73,7 @@ export function compile(template: string): Compiled {
         const compileObject = <A = never>(param: FormatObject<A>): string[] => {
             const entries = Object.entries(param);
 
-            if (entries.length < stringMatches.length) {
+            if (entries.length < uniq(stringMatches).length) {
                 throw new Error(
                     `Expected ${stringMatches.length} arguments but got ${entries.length}`
                 );
@@ -83,7 +85,6 @@ export function compile(template: string): Compiled {
 
                 if (isParam) {
                     const argKey = substring.slice(1, -1);
-
                     return param[argKey];
                 } else {
                     return substring;

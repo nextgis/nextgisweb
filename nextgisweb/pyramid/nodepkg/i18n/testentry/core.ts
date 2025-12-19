@@ -15,11 +15,13 @@ export default () => {
     describe("Gettext implementation", () => {
         it("gettextf implementation", () => {
             const f = _gettextf("Hello, {first} {last}");
-
             assert.equal(
                 f({ first: "Arthur", last: "Dent" }),
                 "Hello, Arthur Dent"
             );
+
+            const g = _gettextf("{name}? Who is {name}?");
+            assert.equal(g({ name: "Roosta" }), "Roosta? Who is Roosta?");
         });
 
         it("pgettext returns something", () => {
