@@ -1,10 +1,10 @@
-import type { TableProps as AntTableProps } from "antd/es/table";
 import type { Dayjs } from "dayjs";
 import {
     useCallback,
     useEffect,
     useLayoutEffect,
     useMemo,
+    useReducer,
     useRef,
     useState,
 } from "react";
@@ -13,20 +13,24 @@ import type {
     VersionCGetGroup,
     VersionCGetVersion,
 } from "@nextgisweb/feature-layer/type/api";
-import { RangePicker, Table } from "@nextgisweb/gui/antd";
-import { utc } from "@nextgisweb/gui/dayjs";
+import { Button, RangePicker, Table } from "@nextgisweb/gui/antd";
 import type { RouteQuery } from "@nextgisweb/pyramid/api/type";
 import { useRoute, useRouteGet } from "@nextgisweb/pyramid/hook";
-import { gettext, pgettext } from "@nextgisweb/pyramid/i18n";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 import { PageTitle } from "@nextgisweb/pyramid/layout";
+import { LoaderCache } from "@nextgisweb/pyramid/util";
 
-import { HistoryGroupDetails } from "./VersionHistoryGroupDetails";
+import { HistoryGroupDetails } from "./component/VersionHistoryGroupDetails";
+import { useColumns } from "./hook/useColumns";
 
 import { LoadingOutlined } from "@ant-design/icons";
+import RefreshIcon from "@nextgisweb/icon/material/refresh";
 
 import "./VersionHistory.less";
 
 const BLOCK_SIZE = 30;
+
+const cache = new LoaderCache();
 
 type VersionItem = VersionCGetVersion | VersionCGetGroup;
 
@@ -34,86 +38,9 @@ function getRowKey(row: VersionItem): string {
     return row.type === "group" ? row.id.join("-") : String(row.id);
 }
 
-function format_tstamp(tstamp: string) {
-    return utc(tstamp).local().format("L LTS");
-}
-function formatTstamp(v: VersionItem): string {
-    return v.type === "group"
-        ? format_tstamp(v.tstamp[1])
-        : format_tstamp(v.tstamp);
-}
-
 function dayjsToApi(v: Dayjs) {
     return v.local().millisecond(0).toISOString().replace(/Z$/, "");
 }
-
-function UserCell({ userId }: { userId: number }) {
-    const { data, isLoading } = useRouteGet(
-        "auth.user.item",
-        {
-            id: userId,
-        },
-        { cache: true }
-    );
-    if (isLoading) {
-        return "...";
-    }
-    return data ? data.display_name : `#${userId}`;
-}
-
-const columns: AntTableProps<VersionItem>["columns"] = [
-    {
-        title: gettext("Date and time"),
-        dataIndex: "tstamp",
-        key: "tstamp",
-        width: 250,
-        render: (_, row) => formatTstamp(row),
-    },
-    {
-        title: gettext("User"),
-        dataIndex: "user",
-        key: "user",
-        render: (_, row) =>
-            typeof row.user?.id === "number" ? (
-                <UserCell userId={row.user?.id} />
-            ) : (
-                ""
-            ),
-    },
-    {
-        title: gettext("Features"),
-        children: [
-            {
-                title: pgettext("column", "Created"),
-                key: "create",
-                width: 200,
-                align: "end",
-                render: (_, row) => row.feature.create,
-            },
-            {
-                title: pgettext("column", "Updated"),
-                key: "update",
-                width: 200,
-                align: "end",
-                render: (_, row) => row.feature.update,
-            },
-            {
-                title: pgettext("column", "Deleted"),
-                key: "delete",
-                width: 200,
-                align: "end",
-                render: (_, row) => row.feature.delete,
-            },
-            {
-                title: pgettext("column", "Restored"),
-                key: "restore",
-                width: 200,
-                align: "end",
-                render: (_, row) => row.feature.restore,
-            },
-        ],
-    },
-];
 
 export function VersionHistory({ id }: { id: number }) {
     const { data: res, isLoading: isItemLoading } = useRouteGet(
@@ -138,6 +65,7 @@ export function VersionHistory({ id }: { id: number }) {
     const [hasMore, setHasMore] = useState(true);
 
     const [expandedRowKeys, setExpandedRowKeys] = useState<React.Key[]>([]);
+    const [reloadKey, bumpReloadKey] = useReducer((x: number) => x + 1, 0);
 
     const [tableHeight, setTableHeight] = useState<number>(0);
     const [scrollY, setScrollY] = useState(0);
@@ -146,6 +74,12 @@ export function VersionHistory({ id }: { id: number }) {
 
     const cursorRef = useRef(cursor);
     const loadingRef = useRef(false);
+
+    const columns = useColumns({ epoch, id, bumpReloadKey });
+
+    useEffect(() => {
+        cache.clean();
+    }, [reloadKey]);
 
     useEffect(() => {
         cursorRef.current = cursor;
@@ -158,7 +92,7 @@ export function VersionHistory({ id }: { id: number }) {
         setGroups([]);
         setCursor(null);
         setHasMore(true);
-    }, [epoch, tstampGe, tstampLt]);
+    }, [epoch, tstampGe, tstampLt, reloadKey]);
 
     const loadBlock = useCallback(async () => {
         if (!epoch) return;
@@ -180,7 +114,7 @@ export function VersionHistory({ id }: { id: number }) {
 
             const resp = await versionRoute.get({
                 query,
-                cache: true,
+                cache,
             });
             const next = resp?.items ?? [];
             setGroups((cur) => cur.concat(next));
@@ -247,6 +181,12 @@ export function VersionHistory({ id }: { id: number }) {
                             setTstampGe(ge ? dayjsToApi(ge) : null);
                         }}
                     />
+                    <Button
+                        type="default"
+                        icon={<RefreshIcon />}
+                        onClick={bumpReloadKey}
+                        title={gettext("Refresh table")}
+                    ></Button>
                 </div>
             </PageTitle>
 

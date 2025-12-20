@@ -22,6 +22,7 @@ export function useConfirm() {
             okButtonProps = { danger: true, type: "primary" },
             okText = gettext("OK"),
             autoFocusButton = "cancel",
+            ...rest
         }: ConfirmOptions) => {
             modal.confirm({
                 onOk: async () => {
@@ -41,6 +42,7 @@ export function useConfirm() {
                 content,
                 okButtonProps,
                 autoFocusButton,
+                ...rest,
             });
         },
         [messageApi, modal]

@@ -41,6 +41,7 @@ export function useRouteGet<
     let mergedParams: GetRouteParam<N>;
     let mergedOptions: RequestOptions<N, RT>;
     let shouldLoadOnInit: boolean;
+    let enabled = true;
 
     const onError = useRef<(err: unknown) => void>(undefined);
     const showErrorModal = useRef(false);
@@ -55,6 +56,7 @@ export function useRouteGet<
         mergedParams = { ...nameOrProps.params, ...params } as GetRouteParam<N>;
         mergedOptions = { ...nameOrProps.options, ...options };
         shouldLoadOnInit = nameOrProps.loadOnInit ?? loadOnInit;
+        enabled = nameOrProps.enabled ?? true;
         onError.current = nameOrProps.onError;
         showErrorModal.current = !!nameOrProps.showErrorModal;
     }
@@ -103,8 +105,9 @@ export function useRouteGet<
     }, [abort, route, routerOptions]);
 
     useEffect(() => {
+        if (!enabled) return;
         refresh();
-    }, [refresh]);
+    }, [refresh, enabled]);
 
     return { data, error, isLoading, abort, refresh };
 }

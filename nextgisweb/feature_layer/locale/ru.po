@@ -441,6 +441,7 @@ msgid "Open table settings"
 msgstr "Открыть настройки таблицы"
 
 #: nodepkg/feature-grid/FeatureGrid.tsx:25
+#: nodepkg/version-history/VersionHistory.tsx:188
 msgid "Refresh table"
 msgstr "Обновить таблицу"
 
@@ -604,7 +605,7 @@ msgstr "Охват (xMax)"
 msgid "Extent (yMax)"
 msgstr "Охват (yMax)"
 
-#: nodepkg/settings-widget/SettingsWidget.tsx:11 versioning/model.py:94
+#: nodepkg/settings-widget/SettingsWidget.tsx:11 versioning/model.py:106
 msgid "Feature versioning"
 msgstr "Версионирование объектов"
 
@@ -624,83 +625,106 @@ msgstr ""
 msgid "Settings"
 msgstr "Настройки"
 
-#: nodepkg/version-history/VersionHistory.tsx:66
-msgid "Date and time"
-msgstr "Дата и время"
-
-#: nodepkg/version-history/VersionHistory.tsx:73
-msgid "User"
-msgstr "Пользователь"
-
-#: nodepkg/version-history/VersionHistory.tsx:84 view.py:188
-msgid "Features"
-msgstr "Объекты"
-
-#: nodepkg/version-history/VersionHistory.tsx:87
-msgctxt "column"
-msgid "Created"
-msgstr "Добавлено"
-
-#: nodepkg/version-history/VersionHistory.tsx:94
-msgctxt "column"
-msgid "Updated"
-msgstr "Изменено"
-
-#: nodepkg/version-history/VersionHistory.tsx:101
-msgctxt "column"
-msgid "Deleted"
-msgstr "Удалено"
-
-#: nodepkg/version-history/VersionHistory.tsx:108
-msgctxt "column"
-msgid "Restored"
-msgstr "Востановлено"
-
-#: nodepkg/version-history/VersionHistoryGroupDetails.tsx:33
+#: nodepkg/version-history/component/VersionHistoryGroupDetails.tsx:33
 msgid "Created"
 msgstr "Добавлен"
 
-#: nodepkg/version-history/VersionHistoryGroupDetails.tsx:35
+#: nodepkg/version-history/component/VersionHistoryGroupDetails.tsx:35
 msgid "Updated"
 msgstr "Изменен"
 
-#: nodepkg/version-history/VersionHistoryGroupDetails.tsx:37
+#: nodepkg/version-history/component/VersionHistoryGroupDetails.tsx:37
 msgid "Deleted"
 msgstr "Удален"
 
-#: nodepkg/version-history/VersionHistoryGroupDetails.tsx:39
+#: nodepkg/version-history/component/VersionHistoryGroupDetails.tsx:39
 msgid "Restored"
 msgstr "Восстановлен"
 
-#: nodepkg/version-history/VersionHistoryGroupDetails.tsx:97
+#: nodepkg/version-history/component/VersionHistoryGroupDetails.tsx:97
 msgid "Updated geometry"
 msgstr "Изменена геометрия"
 
-#: nodepkg/version-history/VersionHistoryGroupDetails.tsx:101
+#: nodepkg/version-history/component/VersionHistoryGroupDetails.tsx:101
 msgid "Updated {} attribute"
 msgid_plural "Updated {} attributes"
 msgstr[0] "Изменен {} атрибут"
 msgstr[1] "Изменено {} атрибута"
 msgstr[2] "Изменено {} атрибутов"
 
-#: nodepkg/version-history/VersionHistoryGroupDetails.tsx:107
+#: nodepkg/version-history/component/VersionHistoryGroupDetails.tsx:107
 msgid "{} attribute"
 msgid_plural "{} attributes"
 msgstr[0] "{} атрибут"
 msgstr[1] "{} атрибута"
 msgstr[2] "{} атрибутов"
 
-#: nodepkg/version-history/VersionHistoryGroupDetails.tsx:117
+#: nodepkg/version-history/component/VersionHistoryGroupDetails.tsx:117
 msgid "and"
 msgstr "и"
 
-#: nodepkg/version-history/VersionHistoryGroupDetails.tsx:126
+#: nodepkg/version-history/component/VersionHistoryGroupDetails.tsx:126
 msgid "Feature"
 msgstr "Объект"
 
-#: nodepkg/version-history/VersionHistoryGroupDetails.tsx:132
+#: nodepkg/version-history/component/VersionHistoryGroupDetails.tsx:132
 msgid "Action"
 msgstr "Действие"
+
+#: nodepkg/version-history/component/VersionHistoryRowMenu.tsx:78
+msgid "Reverted"
+msgstr "Восстановлено"
+
+#: nodepkg/version-history/component/VersionHistoryRowMenu.tsx:104
+msgid "Confirmation required"
+msgstr "Требуется подтверждение"
+
+#: nodepkg/version-history/component/VersionHistoryRowMenu.tsx:106
+msgid ""
+"Please confirm reversion of the layer to version {timestamp} by {author}. "
+"This will revert all feature changes made after {timestamp}, but the changes "
+"will be kept in the history."
+msgstr ""
+
+#: nodepkg/version-history/component/VersionHistoryRowMenu.tsx:109
+msgid "Revert"
+msgstr "Восстановить"
+
+#: nodepkg/version-history/component/VersionHistoryRowMenu.tsx:117
+msgid "Revert to this version"
+msgstr "Восстанвить до этой версии"
+
+#: nodepkg/version-history/hook/useColumns.tsx:42
+msgid "Date and time"
+msgstr "Дата и время"
+
+#: nodepkg/version-history/hook/useColumns.tsx:49
+msgid "User"
+msgstr "Пользователь"
+
+#: nodepkg/version-history/hook/useColumns.tsx:60 view.py:188
+msgid "Features"
+msgstr "Объекты"
+
+#: nodepkg/version-history/hook/useColumns.tsx:63
+msgctxt "column"
+msgid "Created"
+msgstr "Добавлено"
+
+#: nodepkg/version-history/hook/useColumns.tsx:70
+msgctxt "column"
+msgid "Updated"
+msgstr "Изменено"
+
+#: nodepkg/version-history/hook/useColumns.tsx:77
+msgctxt "column"
+msgid "Deleted"
+msgstr "Удалено"
+
+#: nodepkg/version-history/hook/useColumns.tsx:84
+msgctxt "column"
+msgid "Restored"
+msgstr "Востановлено"
 
 #: numutil.py:28
 msgid "The value must be within the inclusive range of {min} to {max}."
