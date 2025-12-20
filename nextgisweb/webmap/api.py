@@ -21,7 +21,6 @@ from nextgisweb.layer import IBboxLayer
 from nextgisweb.pyramid import AsJSON, JSONType
 from nextgisweb.pyramid.api import csetting
 from nextgisweb.render import IRenderableScaleRange
-from nextgisweb.render.api import LegendSymbol
 from nextgisweb.render.legend import ILegendSymbols
 from nextgisweb.render.util import scale_range_intersection
 from nextgisweb.resource import DataScope, ResourceFactory, ResourceRef, ResourceScope
