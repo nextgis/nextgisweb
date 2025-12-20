@@ -19,8 +19,9 @@ from nextgisweb.resource import Resource
 
 from ..interface import IVersionableFeatureLayer
 from .exception import VersioningException
+from .util import fversioning_guard
 
-ActColValue = Union[Literal["C"], Literal["U"], Literal["D"]]
+ActColValue = Literal["C", "U", "D"]
 
 
 class FVersioningMixin:
@@ -89,6 +90,17 @@ class FVersioningMixin:
         finally:
             # TODO: Discard it on exception?
             self.fversioning_close()
+
+    @fversioning_guard
+    def fversioning_revert_layer(self, version: int):
+        from .extension import FVersioningExtensionMixin
+
+        self.fversioning_revert_layer_features(version)
+        for cls in FVersioningExtensionMixin.fversioning_registry.values():
+            cls.fversioning_revert_layer(self, version)
+
+    def fversioning_revert_layer_features(self, version: int):
+        raise NotImplementedError
 
     def fversioning_info(self):
         return ((gettext("Feature versioning"), bool(self.fversioning)),)

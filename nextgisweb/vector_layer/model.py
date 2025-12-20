@@ -587,6 +587,54 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin, FVersioni
             restore=restore,
         )
 
+    def fversioning_revert_layer_features(self, version: int):
+        vls = self.vlschema()
+
+        vobj = self.fversioning_vobj
+        assert vobj is not None
+
+        new_vid = vobj.version_id
+        query = vls.query_revert(version)
+
+        p_fid = sa.bindparam("p_fid")
+        update_query, update_bmap = vls.dml_update(id=p_fid, with_geom=True, geom_raw=True)
+        delete_query = vls.dml_delete(filter_by=dict(fid=p_fid))
+        restore_query, restore_bmap = vls.dml_restore(with_geom=True, geom_raw=True)
+
+        session = sa.inspect(self).session
+        result = False
+        for row in session.execute(query, dict(vid=version)).all():
+            if not row.current and row.previous:
+                data = dict(
+                    p_fid=row.fid,
+                    p_vid=new_vid,
+                    geom=row.geom,
+                    **{restore_bmap[k]: getattr(row, query.fields[k].name) for k in restore_bmap},
+                )
+                restore_result = session.execute(restore_query, data)
+                assert restore_result.rowcount == 1
+                result = result or True
+            elif row.current and not row.previous:
+                data = dict(p_fid=row.fid, vid=new_vid)
+                delete_result = session.execute(delete_query, data)
+                assert delete_result.rowcount == 1
+                result = result or True
+            else:
+                data = dict(
+                    p_fid=row.fid,
+                    vid=new_vid,
+                    geom=row.geom,
+                    **{update_bmap[k]: getattr(row, query.fields[k].name) for k in update_bmap},
+                )
+                update_result = session.execute(update_query, data)
+                result = result or (update_result.rowcount == 1)
+
+        if result:
+            vobj.mark_changed()
+            mark_changed(session)
+
+        return result
+
     # Internals
 
     def _vlschema_wipe(self):

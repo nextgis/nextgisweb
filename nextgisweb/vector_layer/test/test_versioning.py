@@ -1,5 +1,6 @@
 import itertools
 from pathlib import Path
+from random import shuffle
 
 import pytest
 import transaction
@@ -177,13 +178,17 @@ CHANGES_TESTS = [
 ]
 
 
-@pytest.fixture(scope="module")
-def vres():
+def play_script(steps: int | None = None) -> tuple[int, int]:
+    if steps is None:
+        steps = len(CHANGES_SCRIPT[F1])
+    else:
+        assert steps <= len(CHANGES_SCRIPT[F1])
+
     with transaction.manager:
         res = VectorLayer(geometry_type="POINTZ").persist()
         res.fields = [VectorLayerField(keyname="foo", datatype="STRING", display_name="foo")]
         res.fversioning_configure(enabled=True)
-        for vid in range(1, len(CHANGES_SCRIPT[1]) + 1):
+        for vid in range(1, steps + 1):
             if vid != 1:
                 res.fversioning_open()
             for fid, seq in CHANGES_SCRIPT.items():
@@ -209,7 +214,12 @@ def vres():
             res.fversioning.vobj.mark_changed()
             res.fversioning_close()
 
-    yield res.id
+    return res.id, steps
+
+
+@pytest.fixture(scope="module")
+def vres():
+    return play_script(len(CHANGES_SCRIPT[F1]))[0]
 
 
 @pytest.mark.parametrize(
@@ -229,3 +239,40 @@ def test_changes(initial, target, expected, vres):
         assert action == eaction, f"#{fid} action: got {action} instead of {eaction}"
 
     assert expected == dict()
+
+
+def test_revert():
+    res_id, steps = play_script()
+
+    version_all = list(range(0, steps + 1))
+    version_all.reverse()
+
+    versions_shuffled = list(version_all)
+    shuffle(versions_shuffled)
+
+    def snapshot(res: VectorLayer, version: int | None):
+        fq = res.feature_query()
+        fq.pit(version)
+        return [
+            {
+                "id": feat.id,
+                "geom": feat.geom.wkt if feat.geom else None,
+                "fields": dict(feat.fields),
+            }
+            for feat in fq()
+        ]
+
+    # Take snapshots of all versions for comparison
+    with transaction.manager:
+        res = VectorLayer.filter_by(id=res_id).one()
+        snapshots = {v: snapshot(res, v) for v in version_all}
+
+    # Revert to each version in reversed and shuffled order and compare
+    for v in version_all + versions_shuffled:
+        with transaction.manager:
+            res = VectorLayer.filter_by(id=res_id).one()
+            with res.fversioning_context():
+                res.fversioning_revert_layer(v)
+        with transaction.manager:
+            res = VectorLayer.filter_by(id=res_id).one()
+            assert snapshot(res, None) == snapshots[v]

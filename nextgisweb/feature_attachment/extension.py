@@ -16,7 +16,7 @@ class FeatureAttachmentExtension(FeatureExtension):
         filter_by = dict(resource_id=self.layer.id, feature_id=feature.id)
         if version is None:
             query = Attachment.filter_by(**filter_by)
-            itm = list(map(lambda itm: itm.serialize(), query))
+            itm = [itm.serialize() for itm in query]
             return itm if len(itm) > 0 else None
         else:
             result = []
@@ -24,7 +24,9 @@ class FeatureAttachmentExtension(FeatureExtension):
             params = dict(p_rid=self.layer.id, p_fid=feature.id, p_vid=version)
             qresult = session.execute(query, params)
             for mid, vid, fileobj_id, keyname, name, mime_type, description in qresult:
-                itm = dict(id=mid, version=vid, fileobj=dict(id=fileobj_id))
+                itm = dict(id=mid, version=vid)
+                if fileobj_id is not None:
+                    itm["fileobj"] = dict(id=fileobj_id)
                 if keyname is not None:
                     itm["keyname"] = keyname
                 if name is not None:

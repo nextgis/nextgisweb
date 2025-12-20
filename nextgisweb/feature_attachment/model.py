@@ -188,6 +188,19 @@ class FeatureAttachment(Base, FVersioningExtensionMixin):
         else:
             raise NotImplementedError(f"{action=}")
 
+    def fversioning_on_revert(self):
+        super().fversioning_on_revert()
+
+        session = sa.inspect(self).session
+        assert session is not None
+
+        query_fileobj = sa.select(FileObj).where(FileObj.id == self.fileobj_id)
+        with session.no_autoflush:
+            self.fileobj = session.execute(query_fileobj).scalar_one()
+
+        self.size = self.fileobj.size
+        self.extract_meta()
+
 
 @register_change
 @auto_description

@@ -75,17 +75,33 @@ class OperationError(Exception):
         return struct
 
 
-# Feature layer operaions
-
-FeatureID = int
-
 VIDCompare = Annotated[
     Union[int, UnsetType],
     Meta(
-        description="The version ID for optimistic locking: if the feature is "
-        "changed after this version, the operation will raise an error."
+        description="The version ID for optimistic locking: if there are any "
+        "changes after this version, the operation will raise an error."
     ),
 ]
+
+
+# Layer operations
+
+
+class Revert(Struct, kw_only=True, tag="revert", tag_field="action"):
+    """Revert the entire layer to a previous version."""
+
+    vid: VIDCompare = UNSET
+    tid: Annotated[int, Meta(description="Target version to revert to")]
+
+
+class RevertResult(Struct, kw_only=True, tag="revert", tag_field="action"):
+    pass
+
+
+# Feature operations
+
+FeatureID = int
+
 
 Geom = Annotated[
     Union[bytes, None, UnsetType],
@@ -171,12 +187,14 @@ class FeatureRestoreResult(Struct, kw_only=True, tag="feature.restore", tag_fiel
     pass
 
 
-OperationUnion = Union[FeatureCreate, FeatureUpdate, FeatureDelete, FeatureRestore]
+OperationUnion = Union[Revert, FeatureCreate, FeatureUpdate, FeatureDelete, FeatureRestore]
 
 
 class FeatureLayerExecutor(OperationExecutor):
     def prepare(self, operation: OperationUnion):
-        if isinstance(operation, (FeatureUpdate, FeatureDelete)):
+        if isinstance(operation, Revert):
+            self.require_versioning()
+        elif isinstance(operation, (FeatureUpdate, FeatureDelete)):
             feat = self.require_feature(operation.fid)
             if (vid := operation.vid) is not UNSET:
                 if vid != feat.version:
@@ -184,6 +202,11 @@ class FeatureLayerExecutor(OperationExecutor):
 
     def execute(self, operation):
         resource = self.resource
+
+        if isinstance(operation, Revert):
+            resource.fversioning_revert_layer(operation.tid)
+            return RevertResult()
+
         feature = Feature(resource)
 
         if isinstance(operation, (FeatureUpdate, FeatureDelete, FeatureRestore)):
@@ -222,6 +245,7 @@ class FeatureLayerExecutor(OperationExecutor):
             return FeatureRestoreResult()
 
 
+FeatureLayerExecutor.register(Revert, RevertResult)
 FeatureLayerExecutor.register(FeatureCreate, FeatureCreateResult)
 FeatureLayerExecutor.register(FeatureUpdate, FeatureUpdateResult)
 FeatureLayerExecutor.register(FeatureDelete, FeatureDeleteResult)

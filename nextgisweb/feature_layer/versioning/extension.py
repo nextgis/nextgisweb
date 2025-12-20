@@ -2,14 +2,16 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from functools import cached_property, partial
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, NamedTuple, Type
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, NamedTuple, Type, cast
 
 import sqlalchemy as sa
 import sqlalchemy.dialects.postgresql as sa_pg
+import sqlalchemy.orm as orm
 from msgspec import Struct
 from sqlalchemy import event, inspect
 from sqlalchemy.sql import and_ as sql_and
 from sqlalchemy.sql import or_ as sql_or
+from typing_extensions import Self
 
 from nextgisweb.env import DBSession
 
@@ -55,10 +57,23 @@ class ExtensionQueries:
     p_fid_max = sa.bindparam("p_fid_max")
     p_fid_limit = sa.bindparam("p_fid_limit")
 
-    def __init__(self, tables: VersioningTables, *, has_id: bool, cols: tuple[str, ...]):
-        self.tables = tables
-        self.has_id = has_id
-        self.cols = cols
+    def __init__(self, mapper: Type[FVersioningExtensionMixin]):
+        self.mapper = mapper
+        self.has_id = hasattr(mapper, "id")
+        self.cols = mapper.fversioning_columns
+        self.tables = VersioningTables(
+            mapper.__table__,
+            mapper.fversioning_etab,
+            mapper.fversioning_htab,
+        )
+
+    @cached_query
+    def get(self):
+        return sa.select(self.mapper).where(
+            self.mapper.resource_id == self.p_rid,
+            self.mapper.feature_id == self.p_fid,
+            *((self.mapper.id == self.p_eid,) if self.has_id else ()),
+        )
 
     @cached_query
     def after_insert(self):
@@ -83,36 +98,33 @@ class ExtensionQueries:
     def before_restore(self):
         et, ht = self._aliased_tables[1:]
 
-        for_eid = lambda x: (x(),) if self.has_id else ()
-
         qet = (
             sa.select(
                 et.c.feature_id,
-                *for_eid(lambda: et.c.extension_id),
+                (et.c.extension_id if self.has_id else sa.null().label("extension_id")),
                 et.c.version_id,
             )
             .where(
                 et.c.resource_id == self.p_rid,
                 et.c.feature_id == self.p_fid,
-                *(for_eid(lambda: et.c.extension_id == self.p_eid)),
+                et.c.extension_id == self.p_eid if self.has_id else sa.true(),
                 et.c.version_op == sa.text("'D'"),
             )
             .cte("qet")
         )
 
-        hir = sa.func.int4range(ht.c.version_id, ht.c.version_nid)
         eir = sa.func.int4range(qet.c.version_id.op("-")(sa.text("1")), qet.c.version_id)
         sht = sa.select(
             ht.c.feature_id,
-            *for_eid(lambda: ht.c.extension_id),
+            (ht.c.extension_id if self.has_id else sa.null().label("extension_id")),
             ht.c.version_nid,
             ht.c.version_nop,
             *(getattr(ht.c, c) for c in self.cols),
         ).where(
             ht.c.resource_id == self.p_rid,
             ht.c.feature_id == qet.c.feature_id,
-            *for_eid(lambda: ht.c.extension_id == qet.c.extension_id),
-            hir.op("&&")(eir),
+            (ht.c.extension_id == qet.c.extension_id if self.has_id else sa.true()),
+            self.version_range(ht).op("&&")(eir),
         )
 
         return sht
@@ -163,20 +175,56 @@ class ExtensionQueries:
         return sa.insert(et).from_select(cols, cs)
 
     @cached_query
+    def revert(self):
+        et, ht = self._aliased_tables[1:]
+        present_op = lambda t: t.c.version_op.not_in(sa.text("('D', 'O')"))
+        q = (
+            sa.select(
+                et.c.feature_id,
+                (et.c.extension_id if self.has_id else sa.null()).label("extension_id"),
+                present_op(et).label("current"),
+                sa.func.coalesce(present_op(ht), sa.false()).label("previous"),
+                et.c.version_id,
+                et.c.version_op,
+                *(getattr(ht.c, c) for c in self.cols),
+            )
+            .where(et.c.resource_id == self.p_rid, et.c.version_id > self.p_vid)
+            .select_from(et)
+            .join(
+                ht,
+                sa.and_(
+                    ht.c.resource_id == et.c.resource_id,
+                    ht.c.feature_id == et.c.feature_id,
+                    ht.c.extension_id == et.c.extension_id if self.has_id else sa.true(),
+                    self.version_range(ht).op("@>", precedence=4)(self.p_vid),
+                ),
+                isouter=True,
+            )
+            .subquery("sub")
+        )
+
+        return sa.select(
+            q.c.feature_id,
+            q.c.extension_id,
+            q.c.current,
+            q.c.previous,
+            q.c.version_id,
+            q.c.version_op,
+            *(getattr(q.c, c) for c in self.cols),
+        ).where(sa.text("current != previous OR (current AND previous)"))
+
+    @cached_query
     def feature_pit(self):
         ct, et, ht = self._aliased_tables
         qh = sa.select(
             *((ht.c.extension_id,) if self.has_id else ()),
             ht.c.version_id,
             *(getattr(ht.c, c) for c in self.cols),
+        ).where(
+            self.resource_range(ht).op("@>", precedence=4)(self.p_rid),
+            self.version_range(ht).op("@>", precedence=4)(self.p_vid),
+            self.feature_range(ht).op("@>", precedence=4)(self.p_fid),
         )
-
-        rng_resource_id = sa.literal_column("int4range(resource_id, resource_id, '[]')")
-        qh = qh.where(rng_resource_id.op("@>", precedence=4)(self.p_rid))
-        rng_version_id = sa.literal_column("int4range(version_id, version_nid)")
-        qh = qh.where(rng_version_id.op("@>", precedence=4)(self.p_vid))
-        rng_feature_id = sa.literal_column("int4range(feature_id, feature_id, '[]')")
-        qh = qh.where(rng_feature_id.op("@>", precedence=4)(self.p_fid))
 
         qe = sa.select(
             *((et.c.extension_id,) if self.has_id else ()),
@@ -194,6 +242,7 @@ class ExtensionQueries:
                 if self.has_id
                 else (ct.c.resource_id == et.c.resource_id),
             ),
+            isouter=True,
         )
         query = sa.union_all(qh, qe)
         return query
@@ -230,19 +279,13 @@ class ExtensionQueries:
         ct, et, ht = self._aliased_tables
         lc = sa.literal_column
 
-        lc_resource_range = lambda s: sa.func.int4range(
-            s.c.resource_id,
-            s.c.resource_id,
-            sa.text("'[]'"),
-        )
-
         hcolumns = (
             lambda s: (s.c.feature_id.label("fid"),)
             + ((s.c.extension_id.label("eid"),) if self.has_id else ())
             + (s.c.version_id.label("vid"),)
         )
 
-        where_resource = lambda s: lc_resource_range(s).op("@>", precedence=4)(self.p_rid)
+        where_resource = lambda s: self.resource_range(s).op("@>", precedence=4)(self.p_rid)
         where_range = lc("int4range(version_id, version_nid)").op("@>", precedence=4)
         where_fid = lambda s: (s.c.feature_id >= self.p_fid_min, s.c.feature_id <= self.p_fid_max)
 
@@ -348,6 +391,18 @@ class ExtensionQueries:
     def _aliased_tables(self):
         ct, et, ht = self.tables
         return (ct.alias("ct"), et.alias("et"), ht.alias("ht"))
+
+    @staticmethod
+    def resource_range(table):
+        return sa.func.int4range(table.c.resource_id, table.c.resource_id, sa.text("'[]'"))
+
+    @staticmethod
+    def feature_range(table):
+        return sa.func.int4range(table.c.feature_id, table.c.feature_id, sa.text("'[]'"))
+
+    @staticmethod
+    def version_range(table):
+        return sa.func.int4range(table.c.version_id, table.c.version_nid)
 
     def __update_delete_query(self, vop: Literal["U", "D", "O"]):
         ct, et, ht = self.tables
@@ -460,7 +515,7 @@ class FVersioningExtensionMixin:
         if not (session := sa.inspect(resource).session):
             raise VersioningContextRequired
 
-        params = dict(p_rid=resource.id, p_fid=feature_id)
+        params = dict[str, Any](p_rid=resource.id, p_fid=feature_id)
         if cls.fversioning_has_id:
             params["p_eid"] = id
 
@@ -479,6 +534,78 @@ class FVersioningExtensionMixin:
         session.add(obj)
 
         return obj
+
+    @classmethod
+    def fversioning_get(
+        cls,
+        resource,
+        feature_id: int,
+        id: int | None = None,
+        *,
+        session: orm.Session,
+    ) -> Self | None:
+        params = dict[str, Any](p_rid=resource.id, p_fid=feature_id)
+        assert (id is not None) if cls.fversioning_has_id else id is None
+        if cls.fversioning_has_id:
+            params["p_eid"] = id
+
+        query = cls.fversioning_queries.get
+        obj = session.execute(query, params).scalar_one_or_none()
+        return cast(Self, obj) if obj else None
+
+    @classmethod
+    def fversioning_revert_layer(cls, resource, version: int):
+        session = sa.inspect(resource).session
+        assert session is not None
+
+        query = cls.fversioning_queries.revert
+        params = dict(p_rid=resource.id, p_vid=version)
+
+        result = False
+
+        for row in session.execute(query, params):
+            if not row.current and row.previous:
+                obj = cls(
+                    resource=resource,
+                    resource_id=resource.id,
+                    feature_id=row.feature_id,
+                    **({"id": row.extension_id} if cls.fversioning_has_id else {}),
+                    **{c: getattr(row, c) for c in cls.fversioning_columns},
+                )
+
+                obj.fversioning_restored = (row.version_id, row.version_op)
+                obj.fversioning_track(resource)
+                obj.fversioning_on_revert()
+                session.add(obj)
+                result = True
+            else:
+                obj = cls.fversioning_get(
+                    resource,
+                    row.feature_id,
+                    row.extension_id,
+                    session=session,
+                )
+                assert obj is not None
+
+                if row.current and not row.previous:
+                    obj.delete()
+                    result = True
+                else:
+                    obj_result = False
+                    for c in cls.fversioning_columns:
+                        cval = getattr(row, c)
+                        if getattr(obj, c) != cval:
+                            setattr(obj, c, cval)
+                            obj_result = True
+                    if obj_result:
+                        obj.fversioning_track(resource)
+                        obj.fversioning_on_revert()
+                        result = True
+
+        return result
+
+    def fversioning_on_revert(self):
+        pass
 
     def fversioning_track(self, resource):
         if (vobj := resource.fversioning_vobj) is None:
@@ -669,11 +796,7 @@ class FVersioningExtensionMixin:
     def __mapper_configured(cls, *args):
         cls.__setup_metadata()
 
-        cls.fversioning_queries = ExtensionQueries(
-            VersioningTables(cls.__table__, cls.fversioning_etab, cls.fversioning_htab),
-            has_id=cls.fversioning_has_id,
-            cols=cls.fversioning_cols,
-        )
+        cls.fversioning_queries = ExtensionQueries(cls)
 
         for col in cls.fversioning_cols:
             listener = partial(cls.__attribute_set, col=col)

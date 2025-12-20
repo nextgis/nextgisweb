@@ -65,6 +65,7 @@ def test_ref_ddl(versioning):
         "restore",
         "initfill",
         "query_pit",
+        "query_revert",
         "query_changed_fids",
         "query_changes",
     ],
@@ -91,6 +92,8 @@ def test_ref_dml(versioning, operation):
         sql_cmp(vls.dml_initfill(), "ref_dml/initfill")
     elif operation == "query_pit":
         sql_cmp(vls.query_pit(sa.bindparam("vid")), "ref_dml/query_pit")
+    elif operation == "query_revert":
+        sql_cmp(vls.query_revert(sa.bindparam("vid")), "ref_dml/query_revert")
     elif operation == "query_changed_fids":
         sql_cmp(vls.query_changed_fids(), "ref_dml/query_changed_fids")
     elif operation == "query_changes":

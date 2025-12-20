@@ -1,6 +1,7 @@
 WITH qet AS (
     SELECT
         et.feature_id AS feature_id,
+        NULL AS extension_id,
         et.version_id AS version_id
     FROM simple_et AS et
     WHERE
@@ -8,6 +9,7 @@ WITH qet AS (
 )
 SELECT
     ht.feature_id,
+    NULL AS extension_id,
     ht.version_nid,
     ht.version_nop,
     ht.value

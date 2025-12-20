@@ -52,16 +52,25 @@ class FeatureLayerAPI:
             status=status,
         ).json
 
+    def versioning(self):
+        data = self.client.get(f"{self.base_url}").json
+        return data["feature_layer"]["versioning"]
+
+    def transaction(self, *, epoch: int | None = None) -> TransactionAPI:
+        epoch = epoch if epoch is not None else self.versioning().get("epoch")
+        return TransactionAPI(self.client, self.resource_id, epoch=epoch)
+
     def changes(
         self,
         *,
-        epoch: int,
+        epoch: int | None = None,
         initial: int = 0,
         target: int | None = None,
         extensions: Sequence[str] | None = None,
         filter: Sequence[str] | None = None,
         status: int | None = None,
     ) -> list | dict:
+        epoch = epoch if epoch is not None else self.versioning()["epoch"]
         extensions = extensions if extensions is not None else self.extensions
         params = dict(
             epoch=str(epoch),

@@ -5,7 +5,7 @@ from nextgisweb.env import DBSession
 from nextgisweb.lib.geometry import Geometry
 
 from nextgisweb.feature_layer import Feature
-from nextgisweb.feature_layer.test import FeatureLayerAPI, TransactionAPI
+from nextgisweb.feature_layer.test import FeatureLayerAPI
 from nextgisweb.vector_layer import VectorLayer
 
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
@@ -17,15 +17,11 @@ def mkres():
         with transaction.manager:
             obj = VectorLayer(geometry_type="POINT").persist()
             obj.fversioning_configure(enabled=versioning)
-
             for _ in range(3):
                 feat = Feature(geom=Geometry.from_wkt("POINT(0 0)"))
                 obj.feature_create(feat)
-
             DBSession.flush()
-            epoch = obj.fversioning.epoch if versioning else None
-
-        return (obj.id, epoch)
+        return obj.id
 
     yield _mkres
 
@@ -47,14 +43,14 @@ def files(ngw_file_upload, ngw_data_path):
 )
 def test_workflow(versioning, files, mkres, ngw_webtest_app):
     web = ngw_webtest_app
-    res, epoch = mkres(versioning)
+    res = mkres(versioning)
 
     panorama_jpg, sample_heic = files
 
     furl = f"/api/resource/{res}/feature"
     fapi = FeatureLayerAPI(web, res, extensions=["attachment"])
 
-    with TransactionAPI(web, res, epoch=epoch) as txn:  # Version 2
+    with fapi.transaction() as txn:  # Version 2
         txn.put(
             1,
             dict(
@@ -83,7 +79,7 @@ def test_workflow(versioning, files, mkres, ngw_webtest_app):
         is_image=True,
     )
 
-    with TransactionAPI(web, res, epoch=epoch) as txn:  # Version 3
+    with fapi.transaction() as txn:  # Version 3
         op = dict(
             action="attachment.update",
             fid=1,
@@ -125,7 +121,7 @@ def test_workflow(versioning, files, mkres, ngw_webtest_app):
         file_meta={},
     )
 
-    assert not versioning or fapi.changes(epoch=epoch, initial=1, target=3) == [
+    assert not versioning or fapi.changes(initial=1, target=3) == [
         {
             "action": "attachment.create",
             "fid": 1,
@@ -138,7 +134,7 @@ def test_workflow(versioning, files, mkres, ngw_webtest_app):
         }
     ]
 
-    with TransactionAPI(web, res, epoch=epoch) as txn:  # Version 4
+    with fapi.transaction() as txn:  # Version 4
         op = dict(action="attachment.delete", fid=1, aid=aid, vid=0)
 
         txn.put(1, op)
@@ -158,7 +154,7 @@ def test_workflow(versioning, files, mkres, ngw_webtest_app):
 
     web.get(f"{furl}/1/attachment/{aid}", status=404)
 
-    assert not versioning or fapi.changes(epoch=epoch, initial=3, target=4) == [
+    assert not versioning or fapi.changes(initial=3, target=4) == [
         {
             "action": "attachment.delete",
             "fid": 1,
@@ -170,14 +166,14 @@ def test_workflow(versioning, files, mkres, ngw_webtest_app):
     if not versioning:
         return
 
-    with TransactionAPI(web, res, epoch=epoch) as txn:  # Version 5
+    with fapi.transaction() as txn:  # Version 5
         txn.put(1, dict(action="attachment.restore", fid=1, aid=aid))
         txn.commit()
 
         result = txn.results()[0][1]
         assert result["action"] == "attachment.restore"
 
-    assert fapi.changes(epoch=epoch, initial=4, target=5) == [
+    assert fapi.changes(initial=4, target=5) == [
         {
             "action": "attachment.restore",
             "fid": 1,
@@ -190,4 +186,36 @@ def test_workflow(versioning, files, mkres, ngw_webtest_app):
         }
     ]
 
-    assert fapi.changes(epoch=epoch, initial=3, target=5) == []
+    assert fapi.changes(initial=3, target=5) == []
+
+    def _normalize(data: list):
+        result = []
+        for item in data:
+            item.pop("vid", None)
+            attachment = item["extensions"]["attachment"]
+            if attachment is None:
+                attachment = []
+            else:
+                attachment = [a for a in attachment if "fileobj" in a]
+                for a in attachment:
+                    assert "file_meta" not in a
+                    a.pop("version", None)
+            item["extensions"]["attachment"] = attachment
+            result.append(item)
+        return result
+
+    latest_version = expected_version = fapi.versioning()["latest"]
+    snapshots = {v: _normalize(fapi.feature_list(version=v)) for v in range(1, latest_version + 1)}
+    snapshots[0] = []
+
+    for v in reversed(range(0, latest_version)):
+        with fapi.transaction() as txn:
+            txn.put(1, dict(action="revert", tid=v))
+            txn.commit()
+
+        expected_version += 1
+        latest_version = fapi.versioning()["latest"]
+        assert latest_version == expected_version
+
+        actual = _normalize(fapi.feature_list(version=expected_version))
+        assert actual == snapshots[v]

@@ -34,6 +34,7 @@ from sqlalchemy.sql import (
     union_all,
     update,
 )
+from sqlalchemy.sql import and_ as sql_and
 from sqlalchemy.sql import cast as sql_cast
 from sqlalchemy.sql import or_ as sql_or
 from sqlalchemy.sql.elements import BindParameter
@@ -203,6 +204,44 @@ class VLSchema(MetaData):
         qu.fields = {k: qu.c[n] for k, n in fnames.items()}
         return qu
 
+    def query_revert(self, version, *, where=lambda s: ()):
+        et, ht = self._aliased_tabs()[1:]
+        vid = version if isinstance(version, BindParameter) else bindparam("vid", version)
+
+        q = (
+            select(
+                et.c.fid,
+                literal_column("et.vop != 'D'").label("current"),
+                literal_column("COALESCE(ht.vop != 'D', FALSE)").label("previous"),
+            )
+            .where(et.c.vid > vid)
+            .select_from(et)
+            .join(
+                ht,
+                sql_and(
+                    ht.c.fid == et.c.fid,
+                    literal_column("int4range(ht.vid, ht.nid)").op("@>", precedence=4)(vid),
+                ),
+                isouter=True,
+            )
+        )
+        q = q.add_columns(
+            ht.c.geom,
+            *(fc.label(f"fld_{idx}") for idx, fc in enumerate(ht.fields.values(), start=1)),
+        ).subquery("sub")
+
+        q = select(
+            q.c.fid,
+            q.c.current,
+            q.c.previous,
+            q.c.geom,
+            *(getattr(q.c, f"fld_{idx}") for idx, fc in enumerate(ht.fields.values(), start=1)),
+        ).where(text("current != previous OR (current AND previous)"))
+
+        fnames = {k: f"fld_{idx}" for idx, k in enumerate(ht.fields.keys(), start=1)}
+        q.fields = {k: q.selected_columns[n] for k, n in fnames.items()}
+        return q
+
     def query_changed_fids(self):
         et, ht = self.etab.alias("et"), self.htab.alias("ht")
         p_initial, p_target = bindparam("p_initial"), bindparam("p_target")
@@ -310,12 +349,12 @@ class VLSchema(MetaData):
         iet = iet.returning(et.c.fid.label("id"))
         return iet, bmap
 
-    def dml_update(self, *, id, with_geom, fields=None):
+    def dml_update(self, *, id, with_geom, fields=None, geom_raw=False):
         ct = self.ctab
         bmap, values, dif = dict(), dict(), list()
 
         if with_geom:
-            values["geom"] = geom_value = self._geom_value()
+            values["geom"] = geom_value = self._geom_value(raw=geom_raw)
             dif.append(geom_value.is_distinct_from(_lc_geom))
 
         for idx, (k, v) in enumerate(ct.fields.items(), start=1):
@@ -384,7 +423,7 @@ class VLSchema(MetaData):
         uet = uet.where(iht.c.fid == et.c.fid)
         return uet.returning(iht.c.fid.label("id"))
 
-    def dml_restore(self, *, with_geom, fields=None):
+    def dml_restore(self, *, with_geom, fields=None, geom_raw=False):
         bmap = dict()
         ct, et, ht = self.ctab, self.etab, self.htab
         fid, vid = bindparam("p_fid"), bindparam("p_vid")
@@ -392,7 +431,7 @@ class VLSchema(MetaData):
         qet = select(et.c.fid, et.c.vid).where(et.c.fid == fid, et.c.vop == _lc_op_del)
         qet = qet.cte("qet")
 
-        cht = [self._geom_value().label("geom") if with_geom else ht.c.geom]
+        cht = [self._geom_value(raw=geom_raw).label("geom") if with_geom else ht.c.geom]
         for idx, (k, v) in enumerate(ct.fields.items(), start=1):
             if fields is None or k in fields:
                 bmap[k] = bpn = f"fld_{idx}"
@@ -479,10 +518,14 @@ class VLSchema(MetaData):
             postgresql_using="gist",
         )
 
-    def _geom_value(self, name="geom"):
-        return func.ST_GeomFromWKB(
-            bindparam(name),
-            literal_column(str(self.geom_column_type.srid)),
+    def _geom_value(self, name="geom", raw=False):
+        return (
+            bindparam(name)
+            if raw
+            else func.ST_GeomFromWKB(
+                bindparam(name),
+                text(str(self.geom_column_type.srid)),
+            )
         )
 
     def _columns_from_fields(self):
