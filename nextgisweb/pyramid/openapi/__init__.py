@@ -17,7 +17,7 @@ from nextgisweb.lib.apitype.util import decompose_union
 
 from ..component import PyramidComponent
 from ..tomb import is_json_type, iter_routes
-from .docstring import Doctring
+from .docstring import Docstring
 
 
 def _apply_json_content_type(ct, tdef):
@@ -161,7 +161,7 @@ def openapi(introspector, prefix="/api/", *, comp: PyramidComponent):
             paths[oper_pattern][view.method.lower()] = oper
 
             # Parse function docstring
-            dstr = Doctring(view.func)
+            dstr = Docstring(view.func)
             oper["summary"] = dstr.short
             oper["description"] = dstr.long
 

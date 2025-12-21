@@ -3,7 +3,7 @@ from typing import Dict, Optional
 from docstring_parser import parse
 
 
-class Doctring:
+class Docstring:
     short: Optional[str] = None
     long: Optional[str] = None
     returns: Optional[str] = None
