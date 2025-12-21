@@ -3,10 +3,11 @@ import secrets
 import string
 from calendar import timegm
 from collections import defaultdict
+from collections.abc import Sequence
 from pathlib import Path
 from threading import Thread
 from time import sleep
-from typing import Any, Optional, Sequence, Tuple, Union
+from typing import Any, Optional, Tuple, Union
 
 from nextgisweb.lib.logging import logger
 

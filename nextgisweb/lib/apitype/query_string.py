@@ -1,6 +1,7 @@
+from collections.abc import Mapping, Sequence
 from functools import cached_property
 from itertools import groupby
-from typing import Any, Callable, Mapping, Optional, Sequence, Tuple
+from typing import Any, Callable, Optional, Tuple
 
 from msgspec import NODEFAULT, ValidationError
 

@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+from collections.abc import Mapping, Sequence
 from functools import partial
 from sys import _getframe
-from typing import Any, Mapping, Protocol, Sequence, Tuple, Union
+from typing import Any, Protocol, Tuple, Union
 from warnings import warn_explicit
 
 from ..logging import logger

@@ -1,6 +1,6 @@
+from collections.abc import Sequence
 from functools import cache, partial
 from importlib.util import find_spec
-from typing import Sequence
 
 import pytest
 from sqlalchemy.dialects import postgresql

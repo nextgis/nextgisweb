@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import abc
 from abc import abstractmethod
-from typing import Any, Mapping, Type
+from collections.abc import Mapping
+from typing import Any, Type
 
 from nextgisweb.lib.registry import dict_registry
 

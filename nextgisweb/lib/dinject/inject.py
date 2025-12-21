@@ -1,7 +1,8 @@
+from collections.abc import Sequence
 from functools import partial, update_wrapper
 from inspect import Signature, signature
 from types import MethodType
-from typing import Any, Callable, Dict, Hashable, Optional, Sequence, Type
+from typing import Any, Callable, Dict, Hashable, Optional, Type
 
 from .container import Argument, BoundArgument, Container
 

@@ -1,15 +1,5 @@
-from typing import (
-    TYPE_CHECKING,
-    Annotated,
-    Any,
-    ClassVar,
-    Dict,
-    List,
-    Literal,
-    Mapping,
-    Union,
-    cast,
-)
+from collections.abc import Mapping
+from typing import TYPE_CHECKING, Annotated, Any, ClassVar, Dict, List, Literal, Union, cast
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm

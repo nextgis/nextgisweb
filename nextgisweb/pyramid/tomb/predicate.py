@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
-from typing import Any, Callable, Mapping, Optional, Sequence, Tuple
+from typing import Any, Callable, Optional, Tuple
 
 from pyramid.predicates import RequestMethodPredicate as PyramidRequestMethodPredicate
 from pyramid.predicates import as_sorted_tuple  # type: ignore

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Sequence
 from datetime import datetime, time
 from importlib.metadata._itertools import unique_everseen
 from itertools import count
@@ -11,7 +12,6 @@ from typing import (
     Dict,
     List,
     Literal,
-    Sequence,
     Set,
     Tuple,
     Type,

@@ -1,10 +1,11 @@
 import logging
 import logging.config
 import os
+from collections.abc import Mapping
 from functools import partial
 from inspect import isclass
 from types import MappingProxyType
-from typing import TYPE_CHECKING, Mapping
+from typing import TYPE_CHECKING
 
 import sqlalchemy as sa
 import sqlalchemy.event as sa_event

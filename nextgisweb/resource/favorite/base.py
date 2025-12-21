@@ -1,5 +1,6 @@
 import re
-from typing import Annotated, ClassVar, Mapping, Type, TypeVar, Union
+from collections.abc import Mapping
+from typing import Annotated, ClassVar, Type, TypeVar, Union
 
 from msgspec import Struct, defstruct
 from msgspec import _utils as ms_utils

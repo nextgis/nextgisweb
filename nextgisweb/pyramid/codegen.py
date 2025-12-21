@@ -1,8 +1,9 @@
 from collections import defaultdict
+from collections.abc import Sequence
 from itertools import chain, count
 from json import dumps as json_dumps
 from textwrap import dedent
-from typing import Any, Dict, List, Literal, Sequence, Tuple, Type, Union, cast
+from typing import Any, Dict, List, Literal, Tuple, Type, Union, cast
 
 from msgspec import NODEFAULT, Struct, UnsetType, defstruct, field
 from pyramid.response import Response

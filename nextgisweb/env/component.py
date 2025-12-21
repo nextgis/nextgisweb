@@ -1,7 +1,8 @@
 import sys
+from collections.abc import Mapping
 from importlib.util import find_spec
 from pathlib import Path
-from typing import ClassVar, Mapping, Type
+from typing import ClassVar, Type
 from warnings import warn
 
 from nextgisweb.lib.config import ConfigOptions

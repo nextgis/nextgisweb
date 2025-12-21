@@ -1,5 +1,6 @@
+from collections.abc import Mapping
 from threading import Thread
-from typing import ClassVar, Mapping, Type
+from typing import ClassVar, Type
 
 import sqlalchemy as sa
 import sqlalchemy.event as sa_event

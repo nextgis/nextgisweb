@@ -1,5 +1,6 @@
 import re
-from typing import ClassVar, Mapping, Type
+from collections.abc import Mapping
+from typing import ClassVar, Type
 
 from typing_extensions import Self
 

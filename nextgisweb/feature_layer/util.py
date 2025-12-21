@@ -1,5 +1,5 @@
 import re
-from typing import Sequence
+from collections.abc import Sequence
 
 _suffix_pattern = re.compile(r"(.*)_(\d+)")
 
