@@ -1,18 +1,9 @@
 Modern JavaScript
 =================
 
-Since the beginning, the client-side part of NextGIS Web was based on the
-Dojo 1.x framework. It was simple enough and great in terms of modularity in
-those times. But times had changed and now we have modern JavaScript which Dojo
-1.x doesn't support. NextGIS Web is now in transition from old-style
-Dojo-based code to modern JavaScript with ES modules, Webpack, and lots of other
-stuff.
-
-The bad news is that the migration is hard and will take lots of resources, but
-the good news is interoperability between old-style and modern JavaScript
-code. Thus you can use modern code from old-style code and vice versa.
-
-The key points:
+Previously NextGIS Web client-side was based on Dojo 1.x framework and AMD
+modules, but now everything is based on up-to-date JavaScript with ES modules
+and Webpack. The key points:
 
 1. Each NextGIS Web component may own one (or more) corresponding Node
    package, which belongs to the ``@nextgisweb`` scope (true for NextGIS
@@ -25,14 +16,6 @@ The key points:
 
 3. There is a modular Webpack config on top of that. Some Node packages can
    have their modules, but most of them use the ``main`` Webpack module.
-
-4. Modules that are part of the ``main`` Webpack module should use modern
-   ESM module syntax. Webpack compiles them into ES5 compatible modules using
-   the Babel compiler.
-
-5. Each Node package can provide one or more entrypoint for the "main" Webpack
-   module. These entrypoints are compiled to AMD modules and can be loaded by
-   Dojo AMD loader on the client-side.
 
 On the NextGIS Web side, the ``jsrealm`` component manages this enviroment and
 provides some tools to work with it.
@@ -61,16 +44,11 @@ the following layout (some files are not shown):
 Working with packages
 ---------------------
 
-Let's say we have the following directory structure for component ``bar`` which
-already has Dojo-based JavaScript code in ``bar/amd/ngw-bar`` directory:
+Let's say we have the following directory structure for component ``bar``:
 
 .. code-block:: text
 
   🗁 ~ngw/package/nextgisweb_foo/nextgisweb_foo/bar
-  ├── 🗁 amd
-  │   └── 🗁 ngw-bar
-  │       ├── 🗎 module-one.js
-  │       └── 🗎 module-two.js
   └── 🗎 __init__.py
 
 To add ``bar`` package you should create ``bar/nodepkg`` directory and
@@ -101,7 +79,6 @@ After that it will look like this:
 .. code-block:: text
 
   🗁 ~ngw/package/nextgisweb_foo/nextgisweb_foo/bar
-  ├── 🗀 amd
   ├── 🗁 nodepkg
   │   └── 🗎 package.json
   └── 🗎 __init__.py
@@ -164,7 +141,7 @@ execute the following expression:
 
 .. code-block:: javascript
 
-  require(["@nextgisweb/bar/entrypoint"], function (entrypoint) {
+  ngwEntry("@nextgisweb/bar/entrypoint").then(function (entrypoint) {
       entrypoint.greet();
       entrypoint.lorem();
   })
@@ -196,14 +173,7 @@ component packages provides the following features:
 1. Compilation of modules to browser-compatible format using the Babel and
    CoreJS libraries.
 
-2. Automatic chunk generation and loading with Dojo AMD loader.
-
-3. Support of CSS imports like :code:`import "./resource.css"`.
-
-The ``external`` module delivers prebuilt libraries which are primarily used by
-old-style JavaScript code. Dojo  (``dojo``, ``dijit``, ``dojox``), libraries are
-delivered by this module. Before NextGIS Web was integrated with Webpack and
-Node, these libraries were included in NextGIS Web source tree.
+2. Support of CSS imports like :code:`import "./resource.css"`.
 
 The ``stylesheet`` module delivers compiled Less stylesheets and some fonts
 which are installed from NPM registry. Previously fonts were also included in
@@ -265,23 +235,3 @@ machinery and also supports expressions in module names:
       // NOTE: This method doesn't support relative entrypoint names!
       const dynamic = await entrypoint("@nextgisweb/bar/some-module");
   }
-
-Interoperability
-----------------
-
-It's possible to import old-style libraries from modern ones:
-
-.. code-block:: javascript
-
-  import { default as Dialog } from "dijit/Dialog";
-  import { add, remove } from "dojo/dom-class";
-
-And from old-style import entrypoints based on modern ones. As in the example
-above:
-
-.. code-block:: javascript
-
-  define(["@nextgisweb/bar/entrypoint"], function (entrypoint) {
-      entrypoint.greet();
-  });
-
