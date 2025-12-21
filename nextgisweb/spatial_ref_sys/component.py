@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.exc import NoResultFound
 
 from nextgisweb.env import Component
 from nextgisweb.lib.config import Option

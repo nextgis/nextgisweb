@@ -1,5 +1,5 @@
 from pyramid.response import FileResponse
-from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.exc import NoResultFound
 
 from nextgisweb.env import gettext
 

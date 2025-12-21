@@ -7,8 +7,8 @@ import zope.event
 import zope.event.classhandler
 from msgspec import Meta
 from pyramid.httpexceptions import HTTPFound
+from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import joinedload, with_polymorphic
-from sqlalchemy.orm.exc import NoResultFound
 
 from nextgisweb.env import DBSession, env, gettext
 from nextgisweb.lib import dynmenu as dm

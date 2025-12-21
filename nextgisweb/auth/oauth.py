@@ -15,8 +15,8 @@ from passlib.hash import sha256_crypt
 from pyramid.threadlocal import get_current_request
 from requests.exceptions import ConnectionError, InvalidJSONError, RequestException, Timeout
 from sqlalchemy.dialects.postgresql import insert as pg_insert
+from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import defer, joinedload, load_only
-from sqlalchemy.orm.exc import NoResultFound
 
 from nextgisweb.env import DBSession, env, gettext, gettextf
 from nextgisweb.lib.config import Option, OptionAnnotations

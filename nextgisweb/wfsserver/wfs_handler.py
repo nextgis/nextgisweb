@@ -11,7 +11,7 @@ from osgeo import ogr
 from pyramid.request import Request
 from shapely.geometry import box
 from sqlalchemy import and_
-from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.exc import NoResultFound
 
 from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.geometry import Geometry, GeometryNotValid, Transformer

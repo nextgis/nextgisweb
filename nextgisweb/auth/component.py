@@ -4,8 +4,8 @@ from urllib.parse import urlencode, urlparse
 import sqlalchemy as sa
 import transaction
 from pyramid.httpexceptions import HTTPForbidden
+from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import defer, undefer
-from sqlalchemy.orm.exc import NoResultFound
 
 from nextgisweb.env import Component, DBSession, gettext, gettextf, inject
 from nextgisweb.lib.config import Option, OptionAnnotations

@@ -19,9 +19,8 @@ from requests.exceptions import JSONDecodeError, RequestException
 from sqlalchemy import create_engine, text
 from sqlalchemy.engine.url import URL as EngineURL
 from sqlalchemy.engine.url import make_url as make_engine_url
-from sqlalchemy.exc import OperationalError
+from sqlalchemy.exc import NoResultFound, OperationalError
 from sqlalchemy.orm import configure_mappers
-from sqlalchemy.orm.exc import NoResultFound
 
 from nextgisweb.env import Component, DBSession, gettext
 from nextgisweb.env.package import enable_qualifications, pkginfo

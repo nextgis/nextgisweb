@@ -7,7 +7,7 @@ from osgeo import gdal, ogr
 from pyramid.httpexceptions import HTTPNoContent, HTTPNotFound
 from pyramid.response import Response
 from shapely.geometry import box
-from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.exc import NoResultFound
 
 from nextgisweb.lib.apitype import AnyOf, ContentType, StatusCode
 from nextgisweb.lib.geometry import Geometry

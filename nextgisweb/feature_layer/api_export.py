@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Annotated, Dict, Iterable, List, Literal, Tupl
 from msgspec import UNSET, Meta, Struct, UnsetType, field
 from osgeo import gdal, ogr
 from pyramid.response import FileResponse, Response
-from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.exc import NoResultFound
 
 from nextgisweb.env import env, gettext, gettextf
 from nextgisweb.lib.apitype import ContentType, Query

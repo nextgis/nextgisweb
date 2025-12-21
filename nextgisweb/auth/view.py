@@ -10,8 +10,8 @@ from pyramid.events import BeforeRender
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound, HTTPUnauthorized
 from pyramid.renderers import render_to_response
 from pyramid.security import forget, remember
+from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import undefer
-from sqlalchemy.orm.exc import NoResultFound
 
 from nextgisweb.env import DBSession, gettext
 from nextgisweb.lib import dynmenu as dm

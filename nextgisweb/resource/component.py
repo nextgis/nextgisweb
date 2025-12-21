@@ -2,7 +2,7 @@ import re
 from typing import Literal
 
 import sqlalchemy as sa
-from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.exc import NoResultFound
 
 from nextgisweb.env import Component, DBSession, gettext, require
 from nextgisweb.lib.apitype import fillgap

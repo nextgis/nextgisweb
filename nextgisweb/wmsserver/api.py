@@ -10,7 +10,7 @@ from PIL import Image, ImageColor, ImageDraw, ImageFont
 from pyramid.httpexceptions import HTTPBadRequest
 from pyramid.renderers import render as render_template
 from pyramid.response import Response
-from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.exc import NoResultFound
 
 from nextgisweb.lib.geometry import Geometry
 from nextgisweb.lib.imptool import module_path

@@ -9,8 +9,8 @@ from msgspec import Struct, convert, to_builtins
 from pyramid.authorization import ACLHelper
 from pyramid.interfaces import ISecurityPolicy
 from pyramid.request import Request
+from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import load_only
-from sqlalchemy.orm.exc import NoResultFound
 from zope.event import notify
 from zope.interface import implementer
 

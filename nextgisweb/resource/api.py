@@ -19,8 +19,8 @@ from msgspec import UNSET, DecodeError, Meta, Struct, UnsetType, defstruct, fiel
 from msgspec import ValidationError as MsgspecValidationError
 from msgspec.json import Decoder
 from pyramid.httpexceptions import HTTPBadRequest
+from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import with_polymorphic
-from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql import exists
 from sqlalchemy.sql import or_ as sa_or
 from sqlalchemy.sql.operators import eq as eq_op

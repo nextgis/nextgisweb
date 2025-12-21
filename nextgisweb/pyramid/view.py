@@ -16,7 +16,7 @@ from pyramid.events import BeforeRender
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 from pyramid.response import FileResponse, Response
 from sqlalchemy import text
-from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.exc import NoResultFound
 
 from nextgisweb.env import DBSession, env, gettext, inject
 from nextgisweb.env.package import pkginfo

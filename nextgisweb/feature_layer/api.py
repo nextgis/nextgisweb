@@ -5,7 +5,7 @@ from functools import cached_property, partial
 from typing import Annotated, Any, List, Literal, Union
 
 from msgspec import UNSET, Meta, Struct, UnsetType
-from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.exc import NoResultFound
 
 from nextgisweb.env import gettext
 from nextgisweb.lib.apitype import AsJSON, Query
