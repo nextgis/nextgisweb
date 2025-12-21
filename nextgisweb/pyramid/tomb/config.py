@@ -3,7 +3,7 @@ from inspect import signature
 from pathlib import Path
 from sys import _getframe
 from typing import Annotated, Any, Dict, Mapping, Optional, Tuple
-from warnings import warn, warn_explicit
+from warnings import warn
 
 from msgspec import NODEFAULT, Meta
 from msgspec import DecodeError as MsgspecDecodeError
@@ -11,6 +11,7 @@ from msgspec import ValidationError as MsgSpecValidationError
 from msgspec.inspect import IntType, Metadata, type_info
 from msgspec.json import Decoder
 from pyramid.config import Configurator as PyramidConfigurator
+from pyramid.exceptions import ConfigurationError
 
 from nextgisweb.env import gettext, gettextf
 from nextgisweb.env.package import pkginfo
@@ -407,19 +408,15 @@ class Configurator(PyramidConfigurator):
             methods = set()
             for view in route.views:
                 if is_api and not isinstance(view.method, str):
-                    _warn_from_info(
-                        f"View for route '{route.name}' has invalid or missing "
-                        f"request method ({view.method}), which is required "
-                        f"for API routes since 4.5.0.dev16.",
-                        view.info,
+                    raise ConfigurationError(
+                        f"View {view.func} for route '{route.name}' must have "
+                        f"a request method specified."
                     )
 
                 if is_api and not route.overloaded and view.method in methods:
-                    _warn_from_info(
-                        f"Route '{route.name}' seems to be overloaded. Route "
-                        f"predicate 'overloaded' is required for such routes "
-                        f"since 4.5.0.dev17.",
-                        view.info,
+                    raise ConfigurationError(
+                        f"Route '{route.name}' appears to be overloaded and "
+                        "requires the overloaded=True predicate."
                     )
 
                 methods.add(view.method)
@@ -451,13 +448,3 @@ class Configurator(PyramidConfigurator):
 def _request_path_param(request):
     matchdict = request.matchdict
     return {k: v(matchdict[k]) for k, v in request.path_param_decoders}
-
-
-def _warn_from_info(message, info):
-    warn_explicit(
-        message,
-        category=DeprecationWarning,
-        filename=info.file,
-        lineno=info.line,
-        module=__name__,
-    )
