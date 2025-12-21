@@ -87,10 +87,3 @@ def _log_startup_time(level=logging.INFO):
 
 # NOTE: For hot module replacement with deprecation warning:
 # deprecate("nextgisweb.some", "nextgisweb.lib.some", since="4.5.0.dev0", remove="4.6.0.dev0")
-
-deprecate(
-    "nextgisweb.resource.events",
-    "nextgisweb.resource.event",
-    since="4.9.0.dev16",
-    remove="5.0.0.dev0",
-)
