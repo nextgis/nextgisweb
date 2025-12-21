@@ -814,24 +814,3 @@ msgstr ""
 #: view.py:193
 msgid "Table"
 msgstr "Таблица"
-
-#~ msgid "changed {} field"
-#~ msgid_plural "changed {} fields"
-#~ msgstr[0] "Изменено {} поле"
-#~ msgstr[1] "Изменено {} поля"
-#~ msgstr[2] "Изменено {} полей"
-
-#~ msgid "Changed {} field"
-#~ msgid_plural "Changed {} fields"
-#~ msgstr[0] "Изменено {} поле"
-#~ msgstr[1] "Изменено {} поля"
-#~ msgstr[2] "Изменено {} полей"
-
-#~ msgid "Changed geometry"
-#~ msgstr "Изменена геометрия"
-
-#~ msgid "Changed {} attribute"
-#~ msgid_plural "Changed {} attributes"
-#~ msgstr[0] "Изменен {} атрибут"
-#~ msgstr[1] "Изменено {} атрибута"
-#~ msgstr[2] "Изменено {} атрибутов"
