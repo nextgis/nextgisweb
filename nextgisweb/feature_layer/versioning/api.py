@@ -10,7 +10,7 @@ from msgspec.msgpack import encode as msgspec_encode
 from pyramid.response import Response
 
 from nextgisweb.env import DBSession
-from nextgisweb.lib.apitype import AnyOf, AsJSON, StatusCode
+from nextgisweb.lib.apitype import AnyOf, AsJSON, DatetimeNaive, StatusCode
 
 from nextgisweb.auth.api import UserReadBrief, UserRef, serialize_principal
 from nextgisweb.resource import DataScope, resource_factory
@@ -40,10 +40,6 @@ from .model import (
 Epoch = Annotated[int, Meta(gt=0, description="Versioning epoch")]
 VersionID = Annotated[int, Meta(ge=0, description="Version ID")]
 VersionTstamp = Annotated[datetime, Meta(tz=False, description="Version timestamp")]
-
-# TODO: Switch to datetime type when it will be supported for query parameters
-TIMESTAMP_PATTERN = r"^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]{1,6})?$"
-TimestampParam = Annotated[str, Meta(pattern=TIMESTAMP_PATTERN)]
 
 
 class FieldSummary(Struct, kw_only=True):
@@ -343,11 +339,11 @@ def version_cget(
         Meta(description="Group consecutive versions by the same user"),
     ] = False,
     tstamp_ge: Annotated[
-        TimestampParam | None,
+        DatetimeNaive | None,
         Meta(description="Minimum timestamp (inclusive)"),
     ] = None,
     tstamp_lt: Annotated[
-        TimestampParam | None,
+        DatetimeNaive | None,
         Meta(description="Maximum timestamp (exclusive)"),
     ] = None,
     limit: Annotated[
@@ -370,9 +366,9 @@ def version_cget(
 
         query = FVersioningObj.filter_by(resource_id=resource.id).order_by(ord)
         if tstamp_ge is not None:
-            query = query.filter(FVersioningObj.tstamp >= datetime.fromisoformat(tstamp_ge))
+            query = query.filter(FVersioningObj.tstamp >= tstamp_ge)
         if tstamp_lt is not None:
-            query = query.filter(FVersioningObj.tstamp < datetime.fromisoformat(tstamp_lt))
+            query = query.filter(FVersioningObj.tstamp < tstamp_lt)
 
         last_id = int(cursor) if cursor else None
 

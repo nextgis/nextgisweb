@@ -1,7 +1,8 @@
+from datetime import datetime
 from typing import TYPE_CHECKING, Annotated, Any, NewType, TypeVar, Union, get_args, get_origin
 from warnings import warn
 
-from msgspec import NODEFAULT
+from msgspec import NODEFAULT, Meta
 
 from .http import ContentType
 from .util import annotate, disannotate, unannotate
@@ -11,6 +12,8 @@ T = TypeVar("T")
 XMLType = Annotated[Any, ContentType.XML]
 JSONType = Annotated[Any, ContentType.JSON]
 AsJSON = Annotated[T, ContentType.JSON]
+
+DatetimeNaive = Annotated[datetime, Meta(tz=False)]
 
 
 class _AnyOfRuntime:

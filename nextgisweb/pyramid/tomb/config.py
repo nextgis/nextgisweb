@@ -1,8 +1,9 @@
 import re
+from collections.abc import Mapping
 from inspect import signature
 from pathlib import Path
 from sys import _getframe
-from typing import Annotated, Any, Dict, Mapping, Optional, Tuple
+from typing import Annotated, Any
 from warnings import warn
 
 from msgspec import NODEFAULT, Meta
@@ -51,7 +52,7 @@ def _view_driver_factory(
     *,
     path_params: Mapping[str, PathParam],
     query_params: Mapping[str, QueryParam],
-    body: Optional[Tuple[str, Any]],
+    body: tuple[str, Any] | None,
     result: Any,
 ):
     extract = list()
@@ -138,7 +139,7 @@ def find_template(name, func=None, stack_level=1):
 
 
 PATH_TYPE_UNKNOWN = Annotated[str, Meta(description="Undocumented")]
-PATH_TYPES: Dict[str, Any] = dict(
+PATH_TYPES = dict[str, Any](
     # Basic types
     str=Annotated[str, Meta(extra=dict(route_pattern=r"[^/]+"))],
     any=Annotated[str, Meta(extra=dict(route_pattern=r".+"))],
@@ -302,13 +303,12 @@ class Configurator(PyramidConfigurator):
 
             sig = signature(view)
 
-            body_type = None
-            return_type = None
+            body_type = return_type = None
+            has_request = has_context = False
+            path_params = dict[str, PathParam]()
+            query_params = dict[str, QueryParam]()
+            body: tuple[str, Any] | None = None
 
-            has_request, has_context = False, False
-            path_params: Dict[str, PathParam] = dict()
-            query_params: Dict[str, QueryParam] = dict()
-            body: Optional[Tuple[str, Any]] = None
             for idx, (name, p) in enumerate(sig.parameters.items()):
                 if name == "request":
                     has_request = True

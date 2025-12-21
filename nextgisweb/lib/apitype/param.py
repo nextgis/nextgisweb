@@ -1,6 +1,9 @@
+from __future__ import annotations
+
+from collections.abc import Sequence
 from enum import Enum
 from functools import cached_property, partial
-from typing import Any, Optional, Sequence, Tuple, cast, get_args, get_origin
+from typing import Any, cast, get_args, get_origin
 
 from msgspec import NODEFAULT, UNSET, UnsetType
 from msgspec.inspect import StructType, type_info
@@ -36,16 +39,16 @@ class Location(Enum):
 
 
 class Param:
-    location: Optional[Location] = None
-    name: Optional[str] = None
-    spread: Optional[bool] = None
+    location: Location | None = None
+    name: str | None = None
+    spread: bool | None = None
 
     def __init__(
         self,
-        location: Optional[Location] = None,
+        location: Location | None = None,
         *,
-        name: Optional[str] = None,
-        spread: Optional[bool] = None,
+        name: str | None = None,
+        spread: bool | None = None,
     ):
         if location is not None:
             self.location = location
@@ -73,7 +76,7 @@ class PathParam:
     type: Any
 
     otype: Any
-    extras: Tuple[Any, ...]
+    extras: tuple[Any, ...]
     decoder: StringDecoder
 
     def __init__(self, name: str, type: Any, *, param: Param = Path()):
@@ -98,7 +101,7 @@ class QueryParam:
     required: bool
 
     otype: Any
-    extras: Tuple[Any, ...]
+    extras: tuple[Any, ...]
     shape: Shape
     style: Style
     decoder: QueryStringDecoder
@@ -107,7 +110,8 @@ class QueryParam:
         rest = []
         type, extras = disannotate(type)
         param = param.replace(*extras)
-        contains_none, contains_unset = False, False
+
+        contains_none = contains_unset = False
         for t in decompose_union(type, annotated=False):
             u = unannotate(t)
             if u is UnsetType:
@@ -136,7 +140,8 @@ class QueryParam:
             raise TypeError(f"Only unions of None and UnsetType supported, got {rest}")
 
         otype, oextras = disannotate(rest[0])
-        param = param.replace(*oextras)
+        extras = oextras + extras
+        param = param.replace(*extras)
         if (rename := param.name) is not None:
             name = rename
 
@@ -145,7 +150,7 @@ class QueryParam:
 
         self.type = annotate(otype, extras)
         self.otype = otype
-        self.extras = extras + oextras
+        self.extras = extras
         self.default = default
         self.required = default is NODEFAULT
 
@@ -198,7 +203,7 @@ class QueryParam:
             raise DefaultsNotSupported
 
     @cached_property
-    def spreaded(self) -> Sequence["QueryParam"]:
+    def spreaded(self) -> Sequence[QueryParam]:
         if self.param.spread:
             assert is_struct(self.otype)
             return [qp for _, qp in self._struct_query_params]
@@ -206,7 +211,7 @@ class QueryParam:
             return [self]
 
     @cached_property
-    def _struct_query_params(self) -> Sequence[Tuple[str, "QueryParam"]]:
+    def _struct_query_params(self) -> Sequence[tuple[str, QueryParam]]:
         hints = get_class_annotations(self.otype)
         fields = cast(StructType, type_info(self.otype)).fields
         return [
@@ -222,7 +227,7 @@ class QueryParam:
         ]
 
     @cached_property
-    def _struct_decoders(self) -> Sequence[Tuple[str, QueryStringDecoder]]:
+    def _struct_decoders(self) -> Sequence[tuple[str, QueryStringDecoder]]:
         return [(fn, qp.decoder) for fn, qp in self._struct_query_params]
 
 

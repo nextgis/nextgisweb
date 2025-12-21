@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+from collections.abc import Mapping
 from datetime import timedelta
 from types import MappingProxyType
-from typing import TYPE_CHECKING, Mapping, Optional
+from typing import TYPE_CHECKING
 
 from nextgisweb.env import Component
 from nextgisweb.lib.config import Option
@@ -12,7 +13,7 @@ if TYPE_CHECKING:
 
 
 class AuditComponent(Component):
-    backends: Optional[Mapping[str, BackendBase]] = None
+    backends: Mapping[str, BackendBase] | None = None
 
     def initialize(self):
         from .backend import registry

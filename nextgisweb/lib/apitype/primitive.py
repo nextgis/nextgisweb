@@ -1,7 +1,9 @@
 from builtins import type as builtins_type
+from collections.abc import Sequence
+from datetime import date, datetime
 from functools import partial
 from re import escape
-from typing import Annotated, Any, Callable, Literal, Sequence, Tuple, get_args, get_origin
+from typing import Annotated, Any, Callable, Literal, get_args, get_origin
 from urllib.parse import unquote_plus
 
 from msgspec import Meta, convert
@@ -33,6 +35,8 @@ def string_decoder(type: Any) -> StringDecoder:
         return _urlsafe(lambda val, type=type: convert(float(convert(val, StrFloat)), type), True)
     elif otype is bool:
         return _urlsafe(lambda val: convert(val, StrBool) in ("true", "yes"), True)
+    elif otype is date or otype is datetime:
+        return _urlsafe(lambda val, type=type: convert(val, type), True)
     elif get_origin(otype) is Literal:
         args = get_args(otype)
         types = set(builtins_type(a) for a in args)
@@ -89,7 +93,7 @@ def _heterogeneous_sequence(
     value: str,
     *,
     type: Any,
-    loads: Tuple[StringDecoder, ...],
+    loads: tuple[StringDecoder, ...],
     urlsafe: bool,
 ) -> Sequence[Any]:
     if value == "":

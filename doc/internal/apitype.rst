@@ -32,7 +32,7 @@ work.
 
 .. code-block:: python
 
-    from typing_extensions import Annotated
+    from typing import Annotated
     from msgspec import Meta
 
 
@@ -61,16 +61,16 @@ Supported types:
       - Basic types: ``str``, ``int``, ``bool``, ``float``
       - ``enum.Enum`` with string values only
       - ``typing.Literal`` with string and integer values
+      - ``datetime.datetime`` and ``datetime.date`` types
 - Sequences of primitive types:
-      - ``typing.List`` for variable-length uniform lists
-      - ``typing.Tuple`` for fixed-length non-uniform and uniform tuples
+      - ``list`` and ``typing.List`` for variable-length uniform lists
+      - ``tuple`` and ``typing.Tuple`` for fixed-length non-uniform and uniform tuples
 - Objects:
       - ``msgspec.Struct``
-      - ``typing.Dict``
+      - ``dict`` and ``typing.Dict``
 
 .. code-block:: python
 
-    from typing import Dict, List
     from msgspec import Struct
 
 
@@ -85,13 +85,13 @@ Supported types:
         txt: str,
         num: int = 0,
         flag: bool = False,
-        list_str: List[str],
-        list_int: List[int] = [1, 2, 3],
-        tuple_mixed: Tuple[str, int],
-        tuple_uniform: Tuple[float, ...],
+        list_str: list[str],
+        list_int: list[int] = [1, 2, 3],
+        tuple_mixed: tuple[str, int],
+        tuple_uniform: tuple[float, ...],
         struct: SomeStruct,
-        dict_str_int: Dict[str, int],
-        dict_list: Dict[str, List[int]],
+        dict_str_int: dict[str, int],
+        dict_list: dict[str, list[int]],
     ):
         ...
 
@@ -172,7 +172,7 @@ the actual response status code, you should use
 
 .. code-block:: python
 
-    from typing_extensions import Annotated
+    from typing import Annotated
     from msgspec import Struct
     from nextgisweb.lib.apitype import StatusCode
 

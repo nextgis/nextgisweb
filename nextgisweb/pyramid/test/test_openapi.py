@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Annotated, Union
+from typing import Annotated
 
 from msgspec import Meta
 
@@ -86,7 +86,7 @@ class EnumParam(Enum):
 def anyof(
     request,
 ) -> AnyOf[
-    AsJSON[Union[str, int, bool]],
+    AsJSON[str | int | bool],
     Annotated[str, StatusCode(201), ContentType("text/plain")],
 ]:
     """Respond with different content types and status codes"""

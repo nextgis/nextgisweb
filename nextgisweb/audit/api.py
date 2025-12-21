@@ -1,7 +1,7 @@
 import csv
 from enum import Enum
 from io import StringIO
-from typing import Annotated, Dict, List, Optional, Tuple, Union
+from typing import Annotated
 
 import sqlalchemy as sa
 import sqlalchemy.dialects.postgresql as sa_pg
@@ -10,7 +10,7 @@ from msgspec.json import decode as msgspec_decode
 from pyramid.response import Response
 
 from nextgisweb.env import DBSession, inject
-from nextgisweb.lib.apitype import AnyOf, AsJSON, ContentType
+from nextgisweb.lib.apitype import AnyOf, AsJSON, ContentType, DatetimeNaive
 from nextgisweb.lib.datetime import utcnow_naive
 
 from nextgisweb.jsrealm import TSExport
@@ -20,12 +20,10 @@ from .component import AuditComponent
 from .model import tab_journal
 
 MAX_ROWS = 1_000_000
-TIMESTAMP_PATTERN = r"^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]{1,6})?$"
 FIELD_PATTERN = r"^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)*$"
 
-Timestamp = Annotated[str, Meta(pattern=TIMESTAMP_PATTERN)]
 Field = Annotated[str, Meta(pattern=FIELD_PATTERN)]
-Filter = Dict[Field, Union[None, str, int, bool]]
+Filter = dict[Field, str | int | bool | None]
 
 
 class RequestObject(Struct):
@@ -48,13 +46,13 @@ class UserObject(Struct):
 class AuditObject(Struct):
     request: RequestObject
     response: ResponseObject
-    user: Optional[UserObject] = None
+    user: UserObject | None = None
 
 
 AuditArrayLogEntry = Annotated[
-    Tuple[
+    tuple[
         Annotated[str, Meta(description="Timestamp")],
-        Annotated[List[Union[str, int, None]], Meta(description="Fields")],
+        Annotated[list[str | int | None], Meta(description="Fields")],
     ],
     TSExport("AuditArrayLogEntry"),
 ]
@@ -85,31 +83,31 @@ def dbase(
     *,
     format: Annotated[QueryFormat, Meta(description="Response format")],
     eq: Annotated[
-        Union[Timestamp, None],
+        DatetimeNaive | None,
         Meta(description="Exact timestamp filter"),
     ] = None,
     gt: Annotated[
-        Union[Timestamp, None],
+        DatetimeNaive | None,
         Meta(description="Exclusive newer filter (greater)"),
     ] = None,
     ge: Annotated[
-        Union[Timestamp, None],
+        DatetimeNaive | None,
         Meta(description="Inclusive newer filter (greater or qual)"),
     ] = None,
     lt: Annotated[
-        Union[Timestamp, None],
+        DatetimeNaive | None,
         Meta(description="Exclusive older filter (less)"),
     ] = None,
     le: Annotated[
-        Union[Timestamp, None],
+        DatetimeNaive | None,
         Meta(description="Inclusive older filter (less or equal)"),
     ] = None,
     fields: Annotated[
-        List[Field],
+        list[Field],
         Meta(description="Fields to return for array and CSV format"),
     ] = [],
     filter: Annotated[
-        Union[str, None],
+        str | None,
         Meta(description="Custom filter"),
     ] = None,
     limit: Annotated[
@@ -118,8 +116,8 @@ def dbase(
     ] = MAX_ROWS,
     comp: AuditComponent,
 ) -> AnyOf[
-    AsJSON[List[AuditArrayLogEntry]],
-    AsJSON[List[AuditObject]],
+    AsJSON[list[AuditArrayLogEntry]],
+    AsJSON[list[AuditObject]],
     Annotated[str, ContentType("text/csv")],
 ]:
     """Read audit log entries from database storage
@@ -137,17 +135,19 @@ def dbase(
         terms = [dcol]
 
     oldest = utcnow_naive() - comp.backends["dbase"].options["retention"]
-    q = sa.select(tcol, *terms).where(
-        tcol >= oldest,
-        *(
-            ([tcol == eq] if eq else [])
-            + ([tcol > gt] if gt else [])
-            + ([tcol >= ge] if ge else [])
-            + ([tcol < lt] if lt else [])
-            + ([tcol <= le] if le else [])
-        ),
+    q = (
+        sa.select(tcol, *terms)
+        .where(
+            tcol >= oldest,
+            tcol == eq if eq else sa.true(),
+            tcol > gt if gt else sa.true(),
+            tcol >= ge if ge else sa.true(),
+            tcol < lt if lt else sa.true(),
+            tcol <= le if le else sa.true(),
+        )
+        .order_by(tcol.asc(), tab_journal.c.ident.asc())
+        .limit(limit)
     )
-    q = q.order_by(tcol.asc(), tab_journal.c.ident.asc()).limit(limit)
 
     if filter is not None:
         filter_obj = msgspec_decode(filter, type=Filter)

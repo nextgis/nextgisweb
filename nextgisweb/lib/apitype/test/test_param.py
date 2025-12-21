@@ -1,12 +1,14 @@
+from datetime import date, datetime
 from enum import Enum
 from itertools import chain, product
-from typing import Annotated, Literal, TypeVar, Union
+from typing import Annotated, Literal, TypeVar
 
 import pytest
 from msgspec import UNSET, Meta, Struct, UnsetType, field
 
 from ..param import DefaultsNotSupported, Query, QueryParam, Shape
 from ..query_string import QueryString
+from ..schema import DatetimeNaive
 
 T = TypeVar("T")
 
@@ -28,7 +30,7 @@ class EnumA(Enum):
 class StructA(Struct, kw_only=True):
     i: int
     b: bool = False
-    s: Union[str, None] = None
+    s: str | None = None
     t: tuple[float, float]
 
 
@@ -80,6 +82,11 @@ tc([1, 2], ExactlyTwo[int], TwoOrThree[int]).ok("1,2").err("", "1,2,3,4")
 tc(["foo,bar", "qux"], list[str]).ok("foo%2Cbar,qux")
 tc([], list[int], EmptyList[int]).ok("").err("foo")
 
+dt = datetime(2024, 1, 2, 15, 30, 45)
+tc(date(2024, 1, 2), date).ok("2024-01-02").err("2024-1-2")
+tc(dt, datetime).ok("2024-01-02T15:30:45").err("2024-01-02")
+tc(dt.replace(tzinfo=None), DatetimeNaive).ok("2024-01-02T15:30:45").err("2024-01-02T15:30:45Z")
+
 tc(StructA(i=1, b=True, s="foo", t=(0, 3.14)), StructA).ok("i=1&b=true&s=foo&t=0,3.14")
 tc(StructA(i=1, b=False, s="foo", t=(0, 0)), StructA).ok("i=1&s=foo&t=0,0")
 tc(StructA(i=1, b=False, s=None, t=(0, 0)), StructA).ok("i=1&t=0,0")
@@ -92,14 +99,22 @@ tc({0: [1]}, dict[int, list[int]]).ok("par[0]=1").err("par[0]=foo")
 tc({0: (1, 2)}, dict[int, tuple[int, int]]).ok("par[0]=1,2")
 
 
+@pytest.mark.parametrize(
+    "wrap",
+    [
+        pytest.param(lambda x: x, id="raw"),
+        pytest.param(lambda x: Annotated[x, Meta()], id="meta"),
+    ],
+)
 @pytest.mark.parametrize("tdef,raw,expected", chain(*(c.vproduct() for c in tc.registry)))
-def test_valid(tdef, raw, expected):
+def test_valid(wrap, tdef, raw, expected):
     if "=" not in raw:
         raw = "par=" + raw
 
     qs = QueryString(raw)
     qs_empty = QueryString("")
 
+    tdef = wrap(tdef)
     qp = QueryParam("par", tdef)
     assert qp.decoder(qs) == expected
 
@@ -108,8 +123,8 @@ def test_valid(tdef, raw, expected):
             qp.decoder(qs_empty)
 
         dec_default = QueryParam("par", tdef, expected).decoder
-        dec_none = QueryParam("par", Union[tdef, None], None).decoder
-        dec_unset = QueryParam("par", Union[tdef, UnsetType], UNSET).decoder
+        dec_none = QueryParam("par", tdef | None, None).decoder
+        dec_unset = QueryParam("par", tdef | UnsetType, UNSET).decoder
 
         assert dec_none(qs) == expected
         assert dec_default(qs_empty) == expected
@@ -120,12 +135,24 @@ def test_valid(tdef, raw, expected):
             QueryParam("par", tdef, expected)
 
 
+@pytest.mark.parametrize(
+    "wrap",
+    [
+        pytest.param(lambda x: x, id="raw"),
+        pytest.param(lambda x: Annotated[x, Meta()], id="meta"),
+        pytest.param(lambda x: Annotated[x | None, Meta()], id="query"),
+    ],
+)
 @pytest.mark.parametrize("tdef,raw", chain(*(c.iproduct() for c in tc.registry)))
-def test_invalid(tdef, raw):
+def test_invalid(wrap, tdef, raw):
     if "=" not in raw:
         raw = "par=" + raw
 
     qs = QueryString(raw)
-    qp = QueryParam("par", tdef)
+    tdef = wrap(tdef)
+    try:
+        qp = QueryParam("par", tdef)
+    except DefaultsNotSupported:
+        return
     with pytest.raises(Exception):
         qp.decoder(qs)
