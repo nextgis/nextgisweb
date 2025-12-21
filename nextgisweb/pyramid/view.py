@@ -9,7 +9,6 @@ from secrets import token_hex
 from time import sleep
 from types import SimpleNamespace
 from typing import Optional
-from warnings import warn
 
 from markupsafe import Markup
 from psutil import Process
@@ -834,20 +833,6 @@ def json_js(value, pretty=False):
     return Markup(dumps(value, pretty=pretty))
 
 
-def _legacy_underscore(factory):
-    def wrapped(msg, _gettext=factory.gettext):
-        warn(
-            "Usage of _ in Mako templates isn't encouraged since "
-            "nextgisweb >= 4.9.0.dev8 and it will be removed in 5.0.0. "
-            "Use gettext or gettextf instead.",
-            UserWarning,  # Mako supresses DeprecationWarning
-            stacklevel=2,
-        )
-        return _gettext(msg)
-
-    return wrapped
-
-
 def _m_gettext(_template_filename):
     head = _template_filename
     comp_id = None
@@ -869,7 +854,6 @@ def _m_gettext(_template_filename):
     factory = trstr_factory(comp_id)
 
     return {
-        "_": _legacy_underscore(factory),
         "gettext": factory.gettext,
         "gettextf": factory.gettextf,
         "ngettext": factory.ngettext,
@@ -891,7 +875,6 @@ def _setup_pyramid_mako(comp, config):
             [
                 f"{k} = _m['{k}']"
                 for k in (
-                    "_",
                     "gettext",
                     "gettextf",
                     "ngettext",
