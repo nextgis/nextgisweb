@@ -3,7 +3,7 @@ from __future__ import annotations
 import re
 from datetime import datetime
 from io import BytesIO
-from typing import Any, Dict, Union
+from typing import Any, Union
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
@@ -168,7 +168,7 @@ class FeatureAttachment(Base, FVersioningExtensionMixin):
         fid: int,
         aid: int,
         vid: int,
-        values: Dict[str, Any],
+        values: dict[str, Any],
     ) -> Union[AttachmentCreate, AttachmentUpdate, AttachmentDelete, AttachmentRestore]:
         if action in ("C", "U", "R"):
             if action == "C":

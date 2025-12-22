@@ -1,5 +1,5 @@
 from datetime import date, datetime, time
-from typing import Dict, Union
+from typing import Union
 
 from msgspec import UNSET, UnsetType
 from osgeo import ogr
@@ -56,7 +56,7 @@ class Feature:
         return self.label
 
     @property
-    def fields(self) -> Dict[str, Union[None, int, bool, float, str, date, time, datetime]]:
+    def fields(self) -> dict[str, Union[None, int, bool, float, str, date, time, datetime]]:
         return self._fields
 
     @property

@@ -1,5 +1,3 @@
-from typing import List
-
 from msgspec import Struct
 
 from nextgisweb.env import DBSession, gettext
@@ -15,7 +13,7 @@ from .interface import IFeatureLayer
 class IdentifyBody(Struct, kw_only=True):
     geom: str
     srs: int
-    layers: List[int]
+    layers: list[int]
 
 
 def identify(request, *, body: IdentifyBody) -> JSONType:

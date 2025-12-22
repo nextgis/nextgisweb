@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
-from typing import Any, Callable, Tuple
+from typing import Any, Callable
 
 from pyramid.predicates import RequestMethodPredicate as PyramidRequestMethodPredicate
 from pyramid.predicates import as_sorted_tuple  # type: ignore
@@ -56,8 +56,8 @@ class RouteMeta(MetaPredicateBase):
     itemplate: str
     ktemplate: str
     path_params: Mapping[str, PathParam]
-    path_decoders: Sequence[Tuple[str, Callable[[str], Any]]]
-    cors_headers: Tuple[str, ...] | None
+    path_decoders: Sequence[tuple[str, Callable[[str], Any]]]
+    cors_headers: tuple[str, ...] | None
 
 
 class ErrorRendererPredicate:

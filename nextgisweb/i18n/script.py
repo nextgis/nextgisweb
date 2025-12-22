@@ -11,7 +11,7 @@ from packaging import version as pkg_version
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 from time import sleep
-from typing import List, Union
+from typing import Union
 
 from babel.messages.catalog import Catalog, Message
 from babel.messages.mofile import write_mo
@@ -82,7 +82,7 @@ def catalog_filename(component, locale, ext="po", internal=False, mkdir=False):
 class ComponentMeta(Struct, kw_only=True):
     comp: str
     pkg: str
-    locales: List[str]
+    locales: list[str]
     external: bool
 
 

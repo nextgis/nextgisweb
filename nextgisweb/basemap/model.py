@@ -1,4 +1,4 @@
-from typing import Annotated, List, Union
+from typing import Annotated, Union
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
@@ -105,7 +105,7 @@ class BasemapWebMapItemWrite(Struct, kw_only=True):
 
 
 class BasemapsAttr(SAttribute):
-    def get(self, srlzr: Serializer) -> List[BasemapWebMapItemRead]:
+    def get(self, srlzr: Serializer) -> list[BasemapWebMapItemRead]:
         return [
             BasemapWebMapItemRead(
                 resource_id=i.resource_id,
@@ -116,7 +116,7 @@ class BasemapsAttr(SAttribute):
             for i in srlzr.obj.basemaps
         ]
 
-    def set(self, srlzr: Serializer, value: List[BasemapWebMapItemWrite], *, create: bool):
+    def set(self, srlzr: Serializer, value: list[BasemapWebMapItemWrite], *, create: bool):
         srlzr.obj.basemaps = [BasemapWebMap(**to_builtins(i)) for i in value]
 
 

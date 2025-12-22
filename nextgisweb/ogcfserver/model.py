@@ -1,4 +1,4 @@
-from typing import Annotated, List, Union
+from typing import Annotated, Union
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
@@ -54,7 +54,7 @@ class OGCFServerCollection(Struct, kw_only=True):
 
 
 class CollectionsAttr(SAttribute):
-    def get(self, srlzr) -> List[OGCFServerCollection]:
+    def get(self, srlzr) -> list[OGCFServerCollection]:
         return [
             OGCFServerCollection(
                 resource_id=layer.resource_id,
@@ -65,7 +65,7 @@ class CollectionsAttr(SAttribute):
             for layer in srlzr.obj.collections
         ]
 
-    def set(self, srlzr, value: List[OGCFServerCollection], *, create: bool):
+    def set(self, srlzr, value: list[OGCFServerCollection], *, create: bool):
         m = dict((layer.resource_id, layer) for layer in srlzr.obj.collections)
         keep = set()
         for cv in value:

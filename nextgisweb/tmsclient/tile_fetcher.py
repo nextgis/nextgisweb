@@ -4,7 +4,6 @@ from dataclasses import dataclass
 from queue import Empty, Queue
 from ssl import SSLCertVerificationError
 from threading import Thread
-from typing import Tuple
 
 from httpx import AsyncClient, Limits, RemoteProtocolError, Timeout, TimeoutException
 
@@ -28,7 +27,7 @@ class FetchResult:
     status: FetchStatus
 
     data: bytes | None = None
-    position: Tuple[int, int] | None = None
+    position: tuple[int, int] | None = None
 
     exception: Exception | None = None
 

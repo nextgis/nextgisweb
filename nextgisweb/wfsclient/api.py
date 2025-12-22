@@ -1,4 +1,4 @@
-from typing import Annotated, List, Tuple
+from typing import Annotated
 
 from msgspec import Meta, Struct
 
@@ -13,12 +13,12 @@ Lon = Annotated[float, Meta(ge=-180, le=180)]
 class LayerObject(Struct, kw_only=True):
     name: str
     srid: int
-    bbox: Tuple[Lon, Lat, Lon, Lat]
+    bbox: tuple[Lon, Lat, Lon, Lat]
 
 
 class InspectResponse(Struct, kw_only=True):
     version: str
-    layers: List[LayerObject]
+    layers: list[LayerObject]
 
 
 def inspect_connection(resource, request) -> InspectResponse:
@@ -29,11 +29,11 @@ def inspect_connection(resource, request) -> InspectResponse:
 
 class FieldObject(Struct, kw_only=True):
     name: str
-    type: Tuple[str, str]
+    type: tuple[str, str]
 
 
 class InspectLayerResponse(Struct, kw_only=True):
-    fields: List[FieldObject]
+    fields: list[FieldObject]
 
 
 def inspect_layer(resource, request) -> InspectLayerResponse:

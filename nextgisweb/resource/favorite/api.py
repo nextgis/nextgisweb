@@ -1,6 +1,6 @@
 from datetime import datetime
 from inspect import Parameter, signature
-from typing import Annotated, Dict, List, Union
+from typing import Annotated, Union
 
 from msgspec import UNSET, Struct, UnsetType, to_builtins
 from pyramid.httpexceptions import HTTPNotFound
@@ -23,7 +23,7 @@ class ResourceFavoriteSchemaItem(Struct):
     route: Union[str, None]
 
 
-def schema(request) -> AsJSON[Dict[str, ResourceFavoriteSchemaItem]]:
+def schema(request) -> AsJSON[dict[str, ResourceFavoriteSchemaItem]]:
     """Read resource favorites schema"""
     tr = request.translate
     return {
@@ -89,8 +89,8 @@ class ResourceFavoriteResourceInfo(Struct, kw_only=True):
 
 
 class ResourceFavoriteCollectionGetResponse(Struct):
-    items: List[ResourceFavoriteRead]
-    resources: List[ResourceFavoriteResourceInfo]
+    items: list[ResourceFavoriteRead]
+    resources: list[ResourceFavoriteResourceInfo]
 
 
 def cget(request) -> ResourceFavoriteCollectionGetResponse:
@@ -98,8 +98,8 @@ def cget(request) -> ResourceFavoriteCollectionGetResponse:
     request.require_authenticated()
 
     query = Model.filter_by(user_id=request.user.id)
-    items: List[ResourceFavoriteRead] = []
-    resources: Dict[int, ResourceFavoriteResourceInfo] = {}
+    items: list[ResourceFavoriteRead] = []
+    resources: dict[int, ResourceFavoriteResourceInfo] = {}
     for obj in query:
         cls = ResourceFavorite.registry[obj.identity]
         items.append(

@@ -4,7 +4,7 @@ import subprocess
 from functools import cached_property
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import List, Literal, Union
+from typing import Literal, Union
 from zipfile import ZipFile, is_zipfile
 
 import sqlalchemy as sa
@@ -508,9 +508,9 @@ class CogAttr(SColumn):
 
 
 class GeoTransform(SAttribute):
-    ctypes = CRUTypes(List[str], List[str], List[str])
+    ctypes = CRUTypes(list[str], list[str], list[str])
 
-    def get(self, srlzr: Serializer) -> List[str]:
+    def get(self, srlzr: Serializer) -> list[str]:
         return (
             srlzr.obj.geo_transform
             if srlzr.obj.geo_transform is not None
@@ -519,16 +519,16 @@ class GeoTransform(SAttribute):
 
 
 class Bands(SAttribute):
-    ctypes = CRUTypes(List[str], List[str], List[str])
+    ctypes = CRUTypes(list[str], list[str], list[str])
 
-    def get(self, srlzr: Serializer) -> List[str]:
+    def get(self, srlzr: Serializer) -> list[str]:
         return srlzr.obj.meta.bands if srlzr.obj.meta is not None else []
 
 
 class ColorInterpretation(SAttribute):
-    ctypes = CRUTypes(List[str], List[str], List[str])
+    ctypes = CRUTypes(list[str], list[str], list[str])
 
-    def get(self, srlzr: Serializer) -> List[str]:
+    def get(self, srlzr: Serializer) -> list[str]:
         return (
             [band.color_interp for band in srlzr.obj.meta.bands]
             if srlzr.obj.meta is not None

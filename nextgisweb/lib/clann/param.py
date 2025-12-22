@@ -3,7 +3,7 @@ from __future__ import annotations
 from enum import Enum
 from functools import partial
 from types import NoneType, UnionType
-from typing import Any, Tuple, Union, get_args, get_origin
+from typing import Any, Union, get_args, get_origin
 
 from msgspec import UNSET
 from typing_extensions import Protocol
@@ -52,7 +52,7 @@ class Param:
         args, kwargs = self._add_argument()
         parser.add_argument(*args, **kwargs)
 
-    def _add_argument(self) -> Tuple[list, dict]:
+    def _add_argument(self) -> tuple[list, dict]:
         assert self.name is not None
         assert self.annotation is not None
 

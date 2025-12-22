@@ -1,4 +1,4 @@
-from typing import ClassVar, Set, Union
+from typing import ClassVar, Union
 
 from msgspec import Struct
 from typing_extensions import Self
@@ -8,7 +8,7 @@ from nextgisweb.lib.imptool import module_from_stack
 
 
 class Icon(Struct, frozen=True):
-    registry: ClassVar[Set[Self]] = set()
+    registry: ClassVar[set[Self]] = set()
 
     collection: str
     glyph: str

@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import Union
 
 from msgspec import Struct
 from PIL.Image import Image
@@ -16,4 +16,4 @@ class LegendSymbol(Struct, kw_only=True):
 
 
 class ILegendSymbols(IResourceBase):
-    def legend_symbols(self, icon_size: int) -> List[LegendSymbol]: ...
+    def legend_symbols(self, icon_size: int) -> list[LegendSymbol]: ...

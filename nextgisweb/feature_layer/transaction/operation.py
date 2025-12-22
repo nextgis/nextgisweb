@@ -1,7 +1,7 @@
 import abc
 import dataclasses as dc
 from functools import cached_property
-from typing import Annotated, Any, ClassVar, Dict, List, Tuple, Type, TypeVar, Union
+from typing import Annotated, Any, ClassVar, Type, TypeVar, Union
 
 from msgspec import UNSET, Meta, Struct, UnsetType
 from msgspec.inspect import StructType, type_info
@@ -16,9 +16,9 @@ from ..versioning import FVersioningMeta
 
 class OperationExecutor(abc.ABC):
     # FIXME: Overcomplicated registries, simplify me please!
-    executors: ClassVar[Dict[str, Type["OperationExecutor"]]] = dict()
-    input_types: ClassVar[Dict[str, Type[Struct]]] = dict()
-    result_types: ClassVar[Dict[str, Type[Struct]]] = dict()
+    executors: ClassVar[dict[str, Type["OperationExecutor"]]] = dict()
+    input_types: ClassVar[dict[str, Type[Struct]]] = dict()
+    result_types: ClassVar[dict[str, Type[Struct]]] = dict()
 
     def __init__(self, resource: Resource, *, vobj: FVersioningMeta | None):
         self.resource = resource
@@ -66,7 +66,7 @@ S = TypeVar("S", bound=Type[Struct])
 
 @dc.dataclass
 class OperationError(Exception):
-    registry: ClassVar[List[Type[Struct]]] = list()
+    registry: ClassVar[list[Type[Struct]]] = list()
     value: Struct
 
     @classmethod
@@ -114,7 +114,7 @@ Geom = Annotated[
 ]
 
 FieldList = Annotated[
-    List[Tuple[int, Any]],
+    list[tuple[int, Any]],
     Meta(
         description="Field values as an array of pairs. The first item in the "
         "pair is a system-wide FieldID, and the second is its value. This "
@@ -125,7 +125,7 @@ FieldList = Annotated[
 ]
 
 FieldMap = Annotated[
-    Dict[str, Any],
+    dict[str, Any],
     Meta(
         description="Field values as an object. Keys are field keynames, and "
         "values are their values. It is better not to use this format and "

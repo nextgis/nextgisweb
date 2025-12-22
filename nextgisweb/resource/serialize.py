@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import re
 from collections.abc import Mapping
-from typing import Any, ClassVar, Literal, Tuple, Type, Union, cast, get_type_hints
+from typing import Any, ClassVar, Literal, Type, Union, cast, get_type_hints
 from warnings import warn
 
 from msgspec import UNSET, Struct, UnsetType, defstruct
@@ -30,7 +30,7 @@ class Serializer:
     registry: ClassVar[Mapping[str, Type[Serializer]]]
     identity: ClassVar[str]
     resclass: ClassVar[Type[model.Resource]]
-    proptab: ClassVar[Tuple[Tuple[str, SAttribute], ...]]
+    proptab: ClassVar[tuple[tuple[str, SAttribute], ...]]
     model_prefix: ClassVar[Union[str, None]]
 
     def __init_subclass__(

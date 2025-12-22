@@ -1,5 +1,5 @@
 from functools import partial
-from typing import List, Union
+from typing import Union
 
 import pytest
 
@@ -38,7 +38,7 @@ def test_bool():
 
 
 def test_list():
-    assert o(list[str]) == o(List[str]) == dict(type=str, default=[], action="append")
+    assert o(list[str]) == o(list[str]) == dict(type=str, default=[], action="append")
     assert (
         o(list[str] | None)
         == o(Union[list[str], None])

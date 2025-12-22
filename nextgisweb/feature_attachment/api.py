@@ -3,7 +3,7 @@ from io import BytesIO
 from itertools import count
 from mimetypes import guess_extension
 from tempfile import NamedTemporaryFile
-from typing import Annotated, List
+from typing import Annotated
 from urllib.parse import quote_plus
 from zipfile import ZIP_DEFLATED, ZipFile
 
@@ -260,7 +260,7 @@ class BundleItem(Struct, kw_only=True):
 
 
 class BundleBody(Struct, kw_only=True):
-    items: List[BundleItem]
+    items: list[BundleItem]
 
 
 def bundle(request, body: BundleBody) -> Annotated[Response, ContentType("application/zip")]:

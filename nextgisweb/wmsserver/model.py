@@ -1,5 +1,5 @@
 import re
-from typing import Annotated, List, Union
+from typing import Annotated, Union
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
@@ -71,7 +71,7 @@ class WMSServiceLayer(Struct, kw_only=True):
 
 
 class LayersAttr(SAttribute):
-    def get(self, srlzr) -> List[WMSServiceLayer]:
+    def get(self, srlzr) -> list[WMSServiceLayer]:
         return [
             WMSServiceLayer(
                 resource_id=layer.resource_id,
@@ -83,7 +83,7 @@ class LayersAttr(SAttribute):
             for layer in srlzr.obj.layers
         ]
 
-    def set(self, srlzr, value: List[WMSServiceLayer], *, create: bool):
+    def set(self, srlzr, value: list[WMSServiceLayer], *, create: bool):
         srlzr.obj.layers = [Layer(**to_builtins(obj)) for obj in value]
 
 

@@ -2,7 +2,7 @@ import re
 from contextlib import contextmanager
 from dataclasses import dataclass
 from functools import cached_property, partial
-from typing import Annotated, Any, List, Literal, Union
+from typing import Annotated, Any, Literal, Union
 
 from msgspec import UNSET, Meta, Struct, UnsetType
 from sqlalchemy.exc import NoResultFound
@@ -141,11 +141,11 @@ class DumperParams(Struct, kw_only=True):
     dt_format: ParamDtFormat = "obj"
     bigint_format: ParamBigIntFormat = "compat"
     fields: Annotated[
-        Union[List[str], None],
+        Union[list[str], None],
         Meta(description="Field keynames to return, all fields returned by default"),
     ] = None
     extensions: Annotated[
-        Union[List[str], None],
+        Union[list[str], None],
         Meta(description="Extensions to return, all extensions returned by default"),
     ] = None
     srs: Annotated[ParamSrs, Meta(description="SRS ID of output geometry")] = None
@@ -524,13 +524,13 @@ def cpatch(
     request,
     *,
     loader_params: Annotated[LoaderParams, Query(spread=True)],
-) -> AsJSON[List[FeatureChangeResult]]:
+) -> AsJSON[list[FeatureChangeResult]]:
     """Update features"""
     request.resource_permission(DataScope.write)
 
     loader = Loader(resource, loader_params)
 
-    result: List[FeatureChangeResult] = list()
+    result: list[FeatureChangeResult] = list()
     with versioning(resource, request) as vobj:
         for fdata in request.json_body:
             if "id" not in fdata:

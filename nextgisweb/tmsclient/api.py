@@ -1,4 +1,4 @@
-from typing import Annotated, List, Tuple
+from typing import Annotated
 
 import requests
 from msgspec import Meta, Struct
@@ -20,11 +20,11 @@ class LayerObject(Struct, kw_only=True):
     tilesize: Annotated[int, Meta(ge=1)]
     minzoom: Zoom
     maxzoom: Zoom
-    bounds: Tuple[Lon, Lat, Lon, Lat]
+    bounds: tuple[Lon, Lat, Lon, Lat]
 
 
 class InspectResponse(Struct, kw_only=True):
-    layers: List[LayerObject]
+    layers: list[LayerObject]
 
 
 def inspect_connection(resource, request) -> InspectResponse:

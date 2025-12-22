@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Dict, List, Literal, Tuple, Union
+from typing import Literal, Union
 
 import sqlalchemy as sa
 from msgspec import UNSET, UnsetType
@@ -33,7 +33,7 @@ class LookupTable(Base, Resource):
     identity = "lookup_table"
     cls_display_name = gettext("Lookup table")
 
-    value = sa.Column(saext.Msgspec(List[Tuple[str, str]]), nullable=False, default=list)
+    value = sa.Column(saext.Msgspec(list[tuple[str, str]]), nullable=False, default=list)
     sort = sa.Column(saext.Enum(SortEnum), nullable=False, default=SortEnum.KEY_ASC)
 
     @classmethod
@@ -81,19 +81,19 @@ class SortAttr(SColumn):
 
 
 class ItemsAttr(SAttribute):
-    def get(self, srlzr) -> Dict[str, str]:
+    def get(self, srlzr) -> dict[str, str]:
         return dict(srlzr.obj.value)
 
-    def set(self, srlzr, value: Dict[str, str], *, create: bool):
+    def set(self, srlzr, value: dict[str, str], *, create: bool):
         items = [(k, v) for k, v in value.items()]
         srlzr.obj.value = srlzr._sort_items(items)
 
 
 class OrderAttr(SAttribute):
-    def get(self, srlzr) -> List[str]:
+    def get(self, srlzr) -> list[str]:
         return [k for k, v in srlzr.obj.value]
 
-    def set(self, srlzr, value: Union[List[str], UnsetType], *, create: bool):
+    def set(self, srlzr, value: Union[list[str], UnsetType], *, create: bool):
         pass
 
 

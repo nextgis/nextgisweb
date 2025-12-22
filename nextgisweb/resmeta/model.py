@@ -1,4 +1,4 @@
-from typing import Annotated, Dict, Union
+from typing import Annotated, Union
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
@@ -56,7 +56,7 @@ class ResourceMetadataItem(Base):
 
 
 ItemKey = Annotated[str, Meta(max_length=255)]
-ItemsType = Dict[ItemKey, Union[str, int, bool, float, None]]
+ItemsType = dict[ItemKey, Union[str, int, bool, float, None]]
 
 
 class ItemsAttr(SAttribute):

@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import TYPE_CHECKING, Annotated, Any, Dict, List, Tuple, Type, Union
+from typing import TYPE_CHECKING, Annotated, Any, Type, Union
 
 from msgspec import UNSET, Meta, Struct, UnsetType, convert
 
@@ -108,17 +108,17 @@ if not TYPE_CHECKING:
     ResultType = Union[tuple(OperationExecutor.result_types.values())]
 
 
-def iget(txn: Transaction, request) -> AsJSON[List[Tuple[SeqNum, ResultType]]]:
+def iget(txn: Transaction, request) -> AsJSON[list[tuple[SeqNum, ResultType]]]:
     """Read transaction results"""
 
     TransactionNotCommitted.disprove(txn)
     return list(txn.read_results())
 
 
-OperationItem = Tuple[SeqNum, Annotated[InputType, Meta(title="Payload")]]
+OperationItem = tuple[SeqNum, Annotated[InputType, Meta(title="Payload")]]
 
 
-def iput(txn: Transaction, request, *, body: AsJSON[List[OperationItem]]) -> AsJSON[None]:
+def iput(txn: Transaction, request, *, body: AsJSON[list[OperationItem]]) -> AsJSON[None]:
     """Update transaction operations
 
     The API client is responsible for managing operation sequential numbers. Any
@@ -143,7 +143,7 @@ if not TYPE_CHECKING:
 class CommitErrors(Struct, kw_only=True, tag="errors", tag_field="status"):
     """Transaction could not be committed due to errors"""
 
-    errors: List[Tuple[SeqNum, ErrorType]]
+    errors: list[tuple[SeqNum, ErrorType]]
 
 
 class CommitSuccess(Struct, kw_only=True, tag="committed", tag_field="status"):
@@ -162,7 +162,7 @@ def ipost(txn: Transaction, request) -> AsJSON[Union[CommitErrors, CommitSuccess
 
     with versioning(txn.resource, request) as vobj:
         # Set up executors
-        executors: Dict[Type[OperationExecutor], OperationExecutor] = dict()
+        executors: dict[Type[OperationExecutor], OperationExecutor] = dict()
         for action in txn.actions():
             cls = OperationExecutor.executors[action]
             if cls not in executors:

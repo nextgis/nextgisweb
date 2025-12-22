@@ -1,6 +1,6 @@
 from functools import partial
 from itertools import product
-from typing import Dict, List, Literal, Union
+from typing import Literal, Union
 
 import sqlalchemy as sa
 from msgspec import Struct
@@ -64,7 +64,7 @@ class LoaderParams(Struct, kw_only=True, frozen=True):
     skip_errors: bool = False
     skip_other_geometry_types: bool = False
     fid_source: FidSource = "SEQUENCE"
-    fid_field: List[str] = msgspec_field(default_factory=list)
+    fid_field: list[str] = msgspec_field(default_factory=list)
     cast_geometry_type: CastGeometryType = None
     cast_is_multi: CastAutoYesNo = None
     cast_has_z: CastAutoYesNo = None
@@ -207,7 +207,7 @@ class UniquenessExplorer:
 class OGRLoader:
     geometry_type: str
     fid_field: Union[LoaderField, None]
-    fields: Dict[int, LoaderField]
+    fields: dict[int, LoaderField]
 
     def __init__(self, ogrlayer, params: LoaderParams):
         self.ogrlayer = ogrlayer
@@ -363,7 +363,7 @@ class OGRLoader:
 
         # Fields
 
-        fields: Dict[int, LoaderField] = dict()
+        fields: dict[int, LoaderField] = dict()
         for i in range(defn.GetFieldCount()):
             if i == fid_field_index:
                 continue
@@ -404,7 +404,7 @@ class OGRLoader:
         schema: str,
         table: str,
         sequence: str,
-        columns: Dict[int, str],
+        columns: dict[int, str],
         connection: sa.engine.Connection,
     ):
         ogrlayer = self.ogrlayer

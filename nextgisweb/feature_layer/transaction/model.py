@@ -1,4 +1,4 @@
-from typing import Any, Generator, List, Tuple, Union
+from typing import Any, Generator, Union
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
@@ -52,13 +52,13 @@ class FeatureLayerTransaction(Base):
         elif payload:
             self.__execute(_ins_operation, **p_values)
 
-    def actions(self) -> List[str]:
+    def actions(self) -> list[str]:
         return list(self.__execute(_sel_actions).scalars())
 
-    def errors(self) -> List[Tuple[int, Any]]:
+    def errors(self) -> list[tuple[int, Any]]:
         return [(sn, error) for sn, error in self.__execute(_sel_errors)]
 
-    def operations(self) -> Generator[Tuple[int, Any, Any], None, None]:
+    def operations(self) -> Generator[tuple[int, Any, Any], None, None]:
         yield from ((sn, pl, pr) for sn, pl, pr in self.__execute(_sel_operations))
 
     def write_error(self, seqnum, error: Any):
@@ -67,7 +67,7 @@ class FeatureLayerTransaction(Base):
     def write_result(self, seqnum: int, value: Struct):
         self.__execute(_ins_result, p_seqnum=seqnum, p_value=to_builtins(value))
 
-    def read_results(self) -> Generator[Tuple[int, Any], None, None]:
+    def read_results(self) -> Generator[tuple[int, Any], None, None]:
         yield from ((sn, val) for sn, val in self.__execute(_sel_result))
 
     def __execute(self, query, **kwargs):

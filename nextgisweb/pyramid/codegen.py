@@ -3,7 +3,7 @@ from collections.abc import Sequence
 from itertools import chain, count
 from json import dumps as json_dumps
 from textwrap import dedent
-from typing import Any, Dict, List, Literal, Tuple, Type, Union, cast
+from typing import Any, Literal, Type, Union, cast
 
 from msgspec import NODEFAULT, Struct, UnsetType, defstruct, field
 from pyramid.response import Response
@@ -19,7 +19,7 @@ counter = lambda c=count(1): next(c)
 
 
 class Operation(Struct, kw_only=True):
-    query: Dict[str, Any]
+    query: dict[str, Any]
     body: Any = UnsetType
     response: Any = UnsetType
     has_types: bool = False
@@ -49,17 +49,17 @@ class Operation(Struct, kw_only=True):
 
 
 class Route(Struct, kw_only=True):
-    path: Dict[str, Any] = field(default_factory=dict)
+    path: dict[str, Any] = field(default_factory=dict)
 
-    get: List[Operation] = field(default_factory=list)
-    post: List[Operation] = field(default_factory=list)
-    put: List[Operation] = field(default_factory=list)
-    delete: List[Operation] = field(default_factory=list)
-    patch: List[Operation] = field(default_factory=list)
+    get: list[Operation] = field(default_factory=list)
+    post: list[Operation] = field(default_factory=list)
+    put: list[Operation] = field(default_factory=list)
+    delete: list[Operation] = field(default_factory=list)
+    patch: list[Operation] = field(default_factory=list)
 
     basename: str = field(default_factory=lambda: f"_Route{counter()}")
 
-    def field(self, name: str) -> Tuple[str, Type[Struct], Any]:
+    def field(self, name: str) -> tuple[str, Type[Struct], Any]:
         fields = list()
         fields.append(("path_obj", self.type_path_obj(), field(name="pathObj")))
         fields.append(("path_arr", self.type_path_arr(), field(name="pathArr")))
@@ -83,8 +83,8 @@ def union(t: Sequence[Any]) -> Any:
     return t[0] if len(t) == 1 else Union[tuple(t)]  # type: ignore
 
 
-def eslint_disable(rules: Union[Sequence[str], bool]) -> List[str]:
-    result: List[str] = []
+def eslint_disable(rules: Union[Sequence[str], bool]) -> list[str]:
+    result: list[str] = []
 
     if rules is False:
         pass
@@ -100,7 +100,7 @@ def eslint_disable(rules: Union[Sequence[str], bool]) -> List[str]:
 
 
 def api_type_module(config) -> str:
-    routes: Dict[str, Route] = defaultdict(Route)
+    routes: dict[str, Route] = defaultdict(Route)
     for iroute in iter_routes(config.registry.introspector):
         is_api = iroute.itemplate.startswith("/api/")
         if not is_api and not iroute.client:
@@ -126,7 +126,7 @@ def api_type_module(config) -> str:
             if not op.is_empty():
                 method_attr = iview.method.lower()
                 if (meth := getattr(route, method_attr, None)) is not None:
-                    cast(List[Operation], meth).append(op)
+                    cast(list[Operation], meth).append(op)
 
     routes_struct = defstruct("Routes", [v.field(k) for k, v in routes.items()])
 

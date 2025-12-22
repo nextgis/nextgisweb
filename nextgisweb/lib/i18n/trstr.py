@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from functools import partial
 from sys import _getframe
-from typing import Any, Protocol, Tuple, Union
+from typing import Any, Protocol, Union
 from warnings import warn_explicit
 
 from ..logging import logger
@@ -27,7 +27,7 @@ class Translator(Protocol):
 
 TranslatableOrStr = Union[Translatable, str]
 ModScalar = Union[int, float, TranslatableOrStr]
-ModArgument = Union[ModScalar, Tuple[ModScalar], Mapping[str, ModScalar]]
+ModArgument = Union[ModScalar, tuple[ModScalar], Mapping[str, ModScalar]]
 
 
 class TrStr(Translatable):
@@ -97,7 +97,7 @@ class TrStrConcat(Translatable):
     def __init__(self, a: TranslatableOrStr, b: TranslatableOrStr):
         aitems = a.items if isinstance(a, TrStrConcat) else (a,)
         bitems = b.items if isinstance(b, TrStrConcat) else (b,)
-        self.items: Tuple[TranslatableOrStr, ...] = (aitems) + (bitems)
+        self.items: tuple[TranslatableOrStr, ...] = (aitems) + (bitems)
 
     def __str__(self) -> str:
         return "".join(str(i) for i in deep_cast_to_str(self.items))

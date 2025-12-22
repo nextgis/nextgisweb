@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from contextlib import contextmanager
-from typing import Annotated, Any, List, Literal, TypeVar, Union
+from typing import Annotated, Any, Literal, TypeVar, Union
 
 import sqlalchemy as sa
 import sqlalchemy.event as sa_event
@@ -319,7 +319,7 @@ Geom = Annotated[
     ),
 ]
 Fields = Annotated[
-    List[OperationFieldValue],
+    list[OperationFieldValue],
     Meta(
         description="Field values updated or specified during creation. NULL "
         "field values are ommited in case of feature creation.",

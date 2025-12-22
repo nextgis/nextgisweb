@@ -2,7 +2,7 @@ from io import BytesIO
 from itertools import product
 from math import ceil, floor
 from pathlib import Path
-from typing import Annotated, Dict, List, Literal, Union
+from typing import Annotated, Literal, Union
 
 from msgspec import UNSET, Meta, Struct, UnsetType
 from PIL import Image, ImageDraw, ImageFont
@@ -24,7 +24,7 @@ from .legend import ILegendSymbols
 from .util import TILE_SIZE, af_transform, image_zoom
 
 RenderResource = Annotated[
-    List[int],
+    list[int],
     Meta(
         min_length=1,
         description="Resources to render",
@@ -38,19 +38,19 @@ TileY = Annotated[int, Meta(ge=0, description="Tile Y coordinate")]
 # NOTE: Use lists instead of tuples as Swagger UI doesn't (Redoc does) support
 # arrays containing different types of values.
 RenderExtent = Annotated[
-    List[float],
+    list[float],
     Meta(min_length=4, max_length=4),
     Meta(description="Rendering extent"),
 ]
 ImageSize = Annotated[
-    List[Annotated[int, Meta(ge=1, le=8192)]],
+    list[Annotated[int, Meta(ge=1, le=8192)]],
     Meta(min_length=2, max_length=2),
     Meta(description="Image size in pixels"),
 ]
 
 SymbolRange = Annotated[str, Meta(pattern=r"^[0-9]{1,3}(-[0-9]{1,3})?$")]
 Symbols = Annotated[
-    Dict[int, Annotated[List[SymbolRange], Meta(min_length=1)]],
+    dict[int, Annotated[list[SymbolRange], Meta(min_length=1)]],
     Meta(examples=[dict()]),  # Just to stop Swagger UI make crazy defaults
 ]
 
@@ -134,7 +134,7 @@ def check_origin(request):
             raise InvalidOriginError()
 
 
-def process_symbols(value: Symbols) -> Dict[int, List[int]]:
+def process_symbols(value: Symbols) -> dict[int, list[int]]:
     result = dict()
     for k, s in value.items():
         result[k] = seq = list()
@@ -426,7 +426,7 @@ def legend(request) -> Annotated[Response, ContentType("image/png")]:
 
 
 ResourceLegendSymbolsResources = Annotated[
-    List[ResourceID],
+    list[ResourceID],
     Meta(
         min_length=1,
         description="Resource IDs for getting legend symbols",
@@ -473,18 +473,18 @@ class LegendSymbol(Struct, kw_only=True):
 class ResourceLegendSymbolsItem(Struct, kw_only=True):
     resource: ResourceRef
     legend_symbols: Annotated[
-        Union[List[LegendSymbol], UnsetType],
+        Union[list[LegendSymbol], UnsetType],
         Meta(description="Resource legend symbols if available"),
     ] = UNSET
 
 
 class ResourceLegendSymbolsResponse(Struct, kw_only=True):
-    items: List[ResourceLegendSymbolsItem]
+    items: list[ResourceLegendSymbolsItem]
 
 
 def legend_symbols(
     request, *, icon_size: ResourceLegendSymbolsIconSize = 24
-) -> AsJSON[List[LegendSymbol]]:
+) -> AsJSON[list[LegendSymbol]]:
     """Get resource legend symbols"""
     request.resource_permission(DataScope.read)
 
@@ -510,7 +510,7 @@ def resource_legend_symbols(
         missing = ", ".join(str(i) for i in missing_ids)
         raise ValidationError("Resources not found: {}!".format(missing))
 
-    items: List[ResourceLegendSymbolsItem] = []
+    items: list[ResourceLegendSymbolsItem] = []
     for res in query:
         request.resource_permission(DataScope.read, res)
 

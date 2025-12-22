@@ -1,7 +1,7 @@
 from base64 import urlsafe_b64decode, urlsafe_b64encode
 from datetime import datetime, timedelta
 from itertools import islice
-from typing import TYPE_CHECKING, Annotated, Generator, List, Literal, Union
+from typing import TYPE_CHECKING, Annotated, Generator, Literal, Union
 
 import sqlalchemy as sa
 from msgspec import Meta, Struct
@@ -59,13 +59,13 @@ class ChangesCheckResponse(Struct, kw_only=True):
     tstamp: datetime
     geometry_type: FeaureLayerGeometryType
     srs: SRSReference
-    fields: List[FieldSummary]
+    fields: list[FieldSummary]
     fetch: Annotated[str, Meta(description="URL to start fetching changes")]
 
 
 class ChangesCursor(Struct, kw_only=True, array_like=True):
-    fields: List[int]
-    extensions: List[str]
+    fields: list[int]
+    extensions: list[str]
     fid_last: Union[int, None] = None
 
     def encode(self):
@@ -94,7 +94,7 @@ def change_check(
     initial: VersionID = 0,
     target: VersionID | None = None,
     epoch: Epoch | None = None,
-    extensions: List[Extension] = [],
+    extensions: list[Extension] = [],
 ) -> AnyOf[
     ChangesCheckResponse,
     Annotated[None, StatusCode(204)],
@@ -187,7 +187,7 @@ def change_fetch(
     initial: VersionID,
     target: VersionID,
     cursor: str,
-) -> AsJSON[List[Union[ChangesContinue, ChangeTypes]]]:
+) -> AsJSON[list[Union[ChangesContinue, ChangeTypes]]]:
     """Fetch changes incrementally
 
     :param initial: Initial version
@@ -313,7 +313,7 @@ VersionCGetItem = VersionCGetVersion | VersionCGetGroup
 
 class VersionCGetResponse(Struct, kw_only=True):
     cursor: VersionCGetCursor | None
-    items: List[VersionCGetItem]
+    items: list[VersionCGetItem]
 
     @classmethod
     def from_generator(

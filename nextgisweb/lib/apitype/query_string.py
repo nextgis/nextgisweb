@@ -1,7 +1,7 @@
 from collections.abc import Mapping, Sequence
 from functools import cached_property
 from itertools import groupby
-from typing import Any, Callable, Tuple
+from typing import Any, Callable
 
 from msgspec import NODEFAULT, ValidationError
 
@@ -13,7 +13,7 @@ class QueryString:
         self.value = value
 
     @cached_property
-    def params(self) -> Sequence[Tuple[str, str]]:
+    def params(self) -> Sequence[tuple[str, str]]:
         return [
             (unquote_strict(nv[0]), nv[1])
             for nv in [p.split("=", maxsplit=1) for p in self.value.split("&")]

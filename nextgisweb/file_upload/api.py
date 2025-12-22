@@ -1,7 +1,7 @@
 import re
 from base64 import b64decode
 from shutil import copyfileobj
-from typing import Annotated, List, Union
+from typing import Annotated, Union
 
 import magic
 import pyramid.httpexceptions as exc
@@ -101,7 +101,7 @@ def collection_put(
 
 
 class FileUploadFormPost(Struct, kw_only=True):
-    upload_meta: List[FileUploadObject]
+    upload_meta: list[FileUploadObject]
 
 
 @inject()

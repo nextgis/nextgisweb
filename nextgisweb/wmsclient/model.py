@@ -1,6 +1,6 @@
 import re
 from io import BytesIO
-from typing import Annotated, Dict, List, Literal, Union
+from typing import Annotated, Literal, Union
 from urllib.parse import parse_qsl, quote, urlencode, urlparse, urlunparse
 
 import PIL
@@ -178,8 +178,8 @@ class WMSConnectionLayer(Struct):
 
 
 class CapCache(Struct):
-    formats: List[str]
-    layers: List[WMSConnectionLayer]
+    formats: list[str]
+    layers: list[WMSConnectionLayer]
 
 
 class CapCacheAttr(SAttribute):
@@ -303,7 +303,7 @@ DataScope.read.require(ConnectionScope.connect, attr="connection", cls=Layer)
 
 
 class VendorParamsAttr(SColumn):
-    ctypes = CRUTypes(Dict[str, str], Dict[str, str], Dict[str, str])
+    ctypes = CRUTypes(dict[str, str], dict[str, str], dict[str, str])
 
 
 class LayerSerializer(Serializer, resource=Layer):

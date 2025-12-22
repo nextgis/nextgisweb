@@ -50,6 +50,10 @@ section-order = [
 [tool.ruff.lint.flake8-tidy-imports.banned-api]
 "pkg_resources".msg = "Consider importlib.metadata or nextgisweb.imptool.module_path"
 "typing_extensions.Annotated".msg = "Import Annotated from typing directly"
+"typing.Dict".msg = "Use dict[X] instead of Dict[X]"
+"typing.List".msg = "Use list[X] instead of List[X]"
 "typing.Mapping".msg = "Import Mapping from collections.abc"
 "typing.Optional".msg = "Use X | None instead of Optional[X]"
 "typing.Sequence".msg = "Import Sequence from collections.abc"
+"typing.Set".msg = "Use set[X] instead of Set[X]"
+"typing.Tuple".msg = "Use tuple[X] instead of Tuple[X]"

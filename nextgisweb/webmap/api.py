@@ -3,7 +3,8 @@ from pathlib import Path
 from shutil import which
 from subprocess import check_call
 from tempfile import TemporaryDirectory
-from typing import Annotated, Any, Dict, List, Literal, Set, Union, cast
+from typing import Annotated, Any, Literal, Union, cast
+from typing import List as List  # noqa: TID251
 
 from geoalchemy2.shape import to_shape
 from msgspec import UNSET, Meta, Struct, UnsetType, ValidationError
@@ -39,7 +40,7 @@ class AnnotationRead(Struct, kw_only=True):
     public: bool
     own: bool
     description: str | None
-    style: Dict[str, Any] | None
+    style: dict[str, Any] | None
     user_id: Union[int, UnsetType] = UNSET
     user: Union[str, UnsetType] = UNSET
 
@@ -48,12 +49,12 @@ class AnnotationCreate(Struct, kw_only=True):
     geom: str
     public: bool
     description: Union[str, UnsetType] = UNSET
-    style: Union[Dict[str, Any], UnsetType] = UNSET
+    style: Union[dict[str, Any], UnsetType] = UNSET
 
 
 class AnnotationUpdate(Struct, kw_only=True):
     description: Union[str, UnsetType] = UNSET
-    style: Union[Dict[str, Any], UnsetType] = UNSET
+    style: Union[dict[str, Any], UnsetType] = UNSET
     geom: Union[str, UnsetType] = UNSET
 
 
@@ -99,7 +100,7 @@ def check_annotation_enabled(request) -> None:
         raise HTTPNotFound()
 
 
-def annotation_cget(resource, request) -> AsJSON[List[AnnotationRead]]:
+def annotation_cget(resource, request) -> AsJSON[list[AnnotationRead]]:
     """Read annotations"""
     check_annotation_enabled(request)
     request.resource_permission(WebMapScope.annotation_read)
@@ -240,7 +241,7 @@ class LegendTreeNode(Struct):
 
 class LegendElement(ElementSize):
     legend_columns: Annotated[int, Meta()]
-    legend_items: Union[List[LegendTreeNode], UnsetType] = UNSET
+    legend_items: Union[list[LegendTreeNode], UnsetType] = UNSET
 
 
 class MapContent(ElementSize):
@@ -278,18 +279,18 @@ def to_legend_view_model(legend_node: LegendTreeNode, level: int) -> LegendViewM
 
 
 def handle_legend_node(
-    node: LegendTreeNode, level: int, legend_tree: List[LegendViewModel]
+    node: LegendTreeNode, level: int, legend_tree: list[LegendViewModel]
 ) -> None:
     legend_tree.append(to_legend_view_model(node, level))
     for child in node.children:
         handle_legend_node(child, level + 1, legend_tree)
 
 
-def handle_legend_tree(legend: LegendElement) -> List[LegendViewModel]:
+def handle_legend_tree(legend: LegendElement) -> list[LegendViewModel]:
     if legend.legend_items is UNSET:
         return []
-    nodes: List[LegendTreeNode] = legend.legend_items
-    legend_tree: List[LegendViewModel] = []
+    nodes: list[LegendTreeNode] = legend.legend_items
+    legend_tree: list[LegendViewModel] = []
     for node in nodes:
         handle_legend_node(node, 0, legend_tree)
     return legend_tree
@@ -465,8 +466,8 @@ class AnnotationsConfig(Struct, kw_only=True):
 
 
 class MidConfig(Struct, kw_only=True):
-    adapter: Set[str]
-    plugin: Set[str]
+    adapter: set[str]
+    plugin: set[str]
 
 
 class BaseItem(Struct, kw_only=True):
@@ -492,7 +493,7 @@ class LayerItemConfig(BaseItem, tag="layer", tag_field="type"):
     drawOrderPosition: Union[int, None]
     legendInfo: LegendInfo
     adapter: str
-    plugin: Dict[str, Any]
+    plugin: dict[str, Any]
     minResolution: Union[float, None] = None
     maxResolution: Union[float, None] = None
     editable: Union[bool, None] = None
@@ -502,22 +503,22 @@ class LayerItemConfig(BaseItem, tag="layer", tag_field="type"):
 class GroupItemConfig(BaseItem, tag="group", tag_field="type"):
     expanded: bool
     exclusive: bool
-    children: List[Union["GroupItemConfig", LayerItemConfig]]
+    children: list[Union["GroupItemConfig", LayerItemConfig]]
 
 
 class RootItemConfig(BaseItem, tag="root", tag_field="type"):
-    children: List[Union[GroupItemConfig, LayerItemConfig]]
+    children: list[Union[GroupItemConfig, LayerItemConfig]]
 
 
 class DisplayConfig(Struct, kw_only=True):
     webmapId: int
     webmapTitle: str
-    webmapPlugin: Dict[str, Any]
+    webmapPlugin: dict[str, Any]
     initialExtent: ExtentWSEN
     constrainingExtent: Union[ExtentWSEN, None]
     rootItem: RootItemConfig
-    checkedItems: Set[int]
-    expandedItems: Set[int]
+    checkedItems: set[int]
+    expandedItems: set[int]
     mid: MidConfig
     annotations: AnnotationsConfig
     webmapDescription: str
@@ -528,7 +529,7 @@ class DisplayConfig(Struct, kw_only=True):
     # units: str
     printMaxSize: int
     bookmarkLayerId: Union[Any, None] = None
-    options: Dict[str, bool]
+    options: dict[str, bool]
 
 
 def _extent_wsen_from_attrs(obj, prefix) -> Union[ExtentWSEN, None]:
@@ -559,8 +560,8 @@ def display_config(obj, request) -> DisplayConfig:
         return result
 
     mid = MidConfig(adapter=set(), plugin=set())
-    checked_items: Set[int] = set()
-    expanded_items: Set[int] = set()
+    checked_items: set[int] = set()
+    expanded_items: set[int] = set()
 
     def traverse(item):
         data = dict(

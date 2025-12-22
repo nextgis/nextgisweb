@@ -2,7 +2,7 @@ import re
 from datetime import date, datetime, time
 from os import path
 from tempfile import NamedTemporaryFile
-from typing import Dict, Union
+from typing import Union
 
 from lxml import etree, html
 from lxml.builder import ElementMaker
@@ -1333,7 +1333,7 @@ def datetime_from_iso(value):
 # Sets feature fields from string represented values and XML element geometry
 def set_feature_data(
     feature: Feature,
-    field_data: Dict[str, Union[str, None]],
+    field_data: dict[str, Union[str, None]],
     geom_data: Union[etree.Element, None, UnsetType],
     feature_layer: IFeatureLayer,
 ):

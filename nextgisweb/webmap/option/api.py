@@ -1,5 +1,3 @@
-from typing import Dict
-
 from msgspec import Struct
 
 from .base import WebMapOption, WebMapOptionCategory
@@ -20,8 +18,8 @@ class WebMapOptionCategoryItem(Struct, kw_only=True):
 
 
 class WebMapOptionSchema(Struct, kw_only=True):
-    options: Dict[str, WebMapOptionItem]
-    categories: Dict[str, WebMapOptionCategoryItem]
+    options: dict[str, WebMapOptionItem]
+    categories: dict[str, WebMapOptionCategoryItem]
 
 
 def schema(request) -> WebMapOptionSchema:

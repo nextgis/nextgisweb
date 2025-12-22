@@ -1,4 +1,4 @@
-from typing import Annotated, List, Union
+from typing import Annotated, Union
 
 from msgspec import UNSET, Meta, Struct, UnsetType
 from msgspec.structs import asdict
@@ -19,11 +19,11 @@ from .util import coltype_as_str
 
 class SchemaObject(Struct, kw_only=True):
     schema: str
-    views: List[str]
-    tables: List[str]
+    views: list[str]
+    tables: list[str]
 
 
-def inspect_connection(request) -> AsJSON[List[SchemaObject]]:
+def inspect_connection(request) -> AsJSON[list[SchemaObject]]:
     request.resource_permission(ConnectionScope.connect)
 
     connection = request.context
@@ -61,7 +61,7 @@ class ColumnObject(Struct, kw_only=True):
     type: str
 
 
-def inspect_table(request) -> AsJSON[List[ColumnObject]]:
+def inspect_table(request) -> AsJSON[list[ColumnObject]]:
     request.resource_permission(ConnectionScope.connect)
 
     connection = request.context
@@ -109,7 +109,7 @@ class LayerObject(Struct):
     column_geom: Union[str, UnsetType] = UNSET
     geometry_type: Union[str, UnsetType] = UNSET
     geometry_srid: Union[int, UnsetType] = UNSET
-    fields: Union[List[FieldObject], UnsetType] = UNSET
+    fields: Union[list[FieldObject], UnsetType] = UNSET
 
 
 class CheckBody(Struct, kw_only=True):
@@ -126,12 +126,12 @@ class CheckResult(Struct, kw_only=True):
     status: StatusEnum
     group: str
     title: Union[str, UnsetType] = UNSET
-    messages: List[CheckMessage]
+    messages: list[CheckMessage]
 
 
 class CheckResponse(Struct, kw_only=True):
     status: Union[StatusEnum, None]
-    checks: List[CheckResult]
+    checks: list[CheckResult]
 
 
 def diagnostics(request, *, body: CheckBody) -> CheckResponse:

@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Annotated, List, Union
+from typing import Annotated, Union
 
 import sqlalchemy as sa
 from lxml.builder import ElementMaker
@@ -12,7 +12,7 @@ from nextgisweb.lib.saext import Msgspec
 Color = Union[Annotated[str, Meta(pattern=r"#[0-9A-F]{6}")], UnsetType]
 Opacity = Union[Annotated[float, Meta(ge=0, le=1)], UnsetType]
 Size = Union[Annotated[float, Meta(ge=0)], UnsetType]
-DashPattern = Union[Annotated[List[Annotated[float, Meta(ge=0)]], Meta(min_length=2)], UnsetType]
+DashPattern = Union[Annotated[list[Annotated[float, Meta(ge=0)]], Meta(min_length=2)], UnsetType]
 
 NS_SLD = "http://www.opengis.net/sld"
 
@@ -202,7 +202,7 @@ Symbolizer = Union[PointSymbolizer, LineSymbolizer, PolygonSymbolizer, RasterSym
 
 
 class Rule(Struct):
-    symbolizers: Annotated[List[Symbolizer], Meta(min_length=1, max_length=1)]
+    symbolizers: Annotated[list[Symbolizer], Meta(min_length=1, max_length=1)]
 
     def xml(self):
         _rule = E.Rule()
@@ -212,7 +212,7 @@ class Rule(Struct):
 
 
 class Style(Struct):
-    rules: Annotated[List[Rule], Meta(min_length=1, max_length=1)]
+    rules: Annotated[list[Rule], Meta(min_length=1, max_length=1)]
 
     def xml(self):
         _feature_type_style = E.FeatureTypeStyle()

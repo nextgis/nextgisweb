@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Annotated, Dict, List, Literal, Type, Union
+from typing import Annotated, Literal, Type, Union
 
 import geoalchemy2 as ga
 import sqlalchemy as sa
@@ -91,7 +91,7 @@ class WebMap(Base, Resource):
     )
     legend_symbols = sa.Column(saext.Enum(LegendSymbolsEnum), nullable=True)
     measure_srs_id = sa.Column(sa.ForeignKey(SRS.id, ondelete="SET NULL"), nullable=True)
-    options = sa.Column(saext.Msgspec(Dict[str, bool]), nullable=False, default=dict)
+    options = sa.Column(saext.Msgspec(dict[str, bool]), nullable=False, default=dict)
 
     root_item = orm.relationship("WebMapItem", cascade="all")
 
@@ -309,7 +309,7 @@ class WebMapAnnotation(Base):
 
 
 def _children_from_model(obj):
-    result: List[Union["WebMapItemGroupRead", "WebMapItemLayerRead"]] = []
+    result: list[Union["WebMapItemGroupRead", "WebMapItemLayerRead"]] = []
     for c in obj.children:
         if c.item_type == "layer":
             s = WebMapItemLayerRead.from_model(c)
@@ -375,7 +375,7 @@ class WebMapItemGroupRead(Struct, kw_only=True, tag="group", tag_field="item_typ
     display_name: str
     group_expanded: bool
     group_exclusive: bool
-    children: List[Union["WebMapItemGroupRead", "WebMapItemLayerRead"]]
+    children: list[Union["WebMapItemGroupRead", "WebMapItemLayerRead"]]
 
     @classmethod
     def from_model(cls, obj):
@@ -404,7 +404,7 @@ class WebMapItemGroupWrite(Struct, kw_only=True, tag="group", tag_field="item_ty
     display_name: str
     group_expanded: bool = False
     group_exclusive: bool = False
-    children: List[Union["WebMapItemGroupWrite", "WebMapItemLayerWrite"]] = []
+    children: list[Union["WebMapItemGroupWrite", "WebMapItemLayerWrite"]] = []
 
     def to_model(self):
         asdict = struct_asdict(self)
@@ -417,7 +417,7 @@ class WebMapItemGroupWrite(Struct, kw_only=True, tag="group", tag_field="item_ty
 
 class WebMapItemRootRead(Struct, kw_only=True):
     item_type: Literal["root"]
-    children: List[Union["WebMapItemGroupRead", "WebMapItemLayerRead"]]
+    children: list[Union["WebMapItemGroupRead", "WebMapItemLayerRead"]]
 
     @classmethod
     def from_model(cls, obj):
@@ -429,7 +429,7 @@ class WebMapItemRootRead(Struct, kw_only=True):
 
 class WebMapItemRootWrite(Struct, kw_only=True):
     item_type: Literal["root"] = "root"
-    children: List[Union["WebMapItemGroupWrite", "WebMapItemLayerWrite"]] = []
+    children: list[Union["WebMapItemGroupWrite", "WebMapItemLayerWrite"]] = []
 
     def to_model(self, obj):
         assert obj.item_type == self.item_type
@@ -501,10 +501,10 @@ class ExtentAttr(SAttribute):
 
 
 class OptionsAttr(SAttribute):
-    def get(self, srlzr: Serializer) -> Dict[str, bool]:
+    def get(self, srlzr: Serializer) -> dict[str, bool]:
         return srlzr.obj.options
 
-    def set(self, srlzr: Serializer, value: Dict[str, bool], *, create: bool):
+    def set(self, srlzr: Serializer, value: dict[str, bool], *, create: bool):
         for k in value.keys():
             if k not in WebMapOption.registry:
                 raise ValidationError("Unknown web map option '{}'.".format(k))

@@ -1,6 +1,6 @@
 import os.path
 import zipfile
-from typing import Annotated, Dict, List, Union
+from typing import Annotated, Union
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
@@ -125,13 +125,13 @@ class FilesItemUpdate(FilesItemRead, kw_only=True):
 
 
 class FilesAttr(SAttribute):
-    def get(self, srlzr) -> List[FilesItemRead]:
+    def get(self, srlzr) -> list[FilesItemRead]:
         return [FilesItemRead(name=f.name) for f in sorted(srlzr.obj.files, key=lambda f: f.name)]
 
-    def set(self, srlzr, value: List[FilesItemUpdate], *, create):
+    def set(self, srlzr, value: list[FilesItemUpdate], *, create):
         srlzr.obj.tstamp = utcnow_naive()
 
-        files_info: Dict[str, FilesItemUpdate] = dict()
+        files_info: dict[str, FilesItemUpdate] = dict()
         for f in value:
             filename = f.name
             validate_filename(filename)

@@ -3,7 +3,6 @@ from dataclasses import dataclass
 from importlib import abc
 from importlib.util import spec_from_loader
 from pathlib import Path
-from typing import Dict
 from warnings import filterwarnings, warn
 
 # Prevent warning about missing __init__.py in migration directory. Is's OK
@@ -83,7 +82,7 @@ class Loader(abc.Loader):
 
 
 class MetaPathFinder(abc.MetaPathFinder):
-    registry: Dict[str, Record]
+    registry: dict[str, Record]
 
     def __init__(self):
         self.registry = dict()

@@ -1,5 +1,3 @@
-from typing import List
-
 from msgspec import Struct
 
 from nextgisweb.env import gettext
@@ -11,7 +9,7 @@ from .util import read_dataset_vector
 
 
 class InspectResponse(Struct, kw_only=True):
-    layers: List[str]
+    layers: list[str]
 
 
 def inspect(request, *, body: FileUploadRef) -> InspectResponse:

@@ -3,16 +3,16 @@ from __future__ import annotations
 from collections import defaultdict
 from dataclasses import dataclass
 from inspect import formatannotationrelativeto
-from typing import Any, Callable, Dict, Hashable, List, Tuple, Type, TypeVar
+from typing import Any, Callable, Hashable, Type, TypeVar
 
-KeyType = Tuple[Hashable, ...]
+KeyType = tuple[Hashable, ...]
 TContainer = TypeVar("TContainer", bound="Container")
 
 
 class Container:
     _instance: Container | None = None
-    _container_registry: Dict[KeyType, Any]
-    _container_invalidate: Dict[KeyType, List[Callable[[], None]]]
+    _container_registry: dict[KeyType, Any]
+    _container_invalidate: dict[KeyType, list[Callable[[], None]]]
 
     def __init__(self) -> None:
         self._container_registry = dict()
@@ -42,7 +42,7 @@ class Container:
         tdef: Hashable,
         value: Any,
         *,
-        selector: Tuple[Hashable, ...] = (),
+        selector: tuple[Hashable, ...] = (),
     ) -> None:
         key = (tdef,) + selector
         self._invalidate_key(key)
@@ -52,7 +52,7 @@ class Container:
         self,
         tdef: Hashable,
         *,
-        selector: Tuple[Hashable, ...] = (),
+        selector: tuple[Hashable, ...] = (),
     ) -> None:
         key = (tdef,) + selector
         self._invalidate_key(key)
@@ -65,7 +65,7 @@ class Container:
     @classmethod
     def _from_container(
         cls,
-        key: Tuple[Hashable, ...],
+        key: tuple[Hashable, ...],
         invalidate: Callable[[], None],
     ) -> Any:
         instance = cls._instance

@@ -1,7 +1,7 @@
 import dataclasses as dc
 import re
 from functools import cached_property, lru_cache
-from typing import Iterable, Literal, Tuple
+from typing import Iterable, Literal
 
 from sqlalchemy.dialects.postgresql import ExcludeConstraint
 from sqlalchemy.ext.compiler import compiles
@@ -695,7 +695,7 @@ def _compile_alter_geometry_column(element, compiler, **kw):
 @dc.dataclass
 class AlterFieldsColumns(DDLElement):
     table: Table
-    fields: Iterable[Tuple[str, ...]]
+    fields: Iterable[tuple[str, ...]]
     action: Literal["ADD", "DROP"]
 
     def _compile_column(self, column, *, compiler):

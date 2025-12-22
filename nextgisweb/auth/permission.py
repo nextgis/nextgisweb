@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import ClassVar, Dict, Literal, Union
+from typing import ClassVar, Literal, Union
 
 from nextgisweb.env import gettext
 from nextgisweb.env.package import pkginfo
@@ -8,7 +8,7 @@ from nextgisweb.lib.i18n import Translatable, TrStr
 from nextgisweb.lib.imptool import module_from_stack
 
 WellKnownSuffix = Literal["view", "manage"]
-WellKnownLabel: Dict[WellKnownSuffix, Translatable] = {
+WellKnownLabel: dict[WellKnownSuffix, Translatable] = {
     "view": gettext("View"),
     "manage": gettext("Manage"),
 }
@@ -18,7 +18,7 @@ class Permission:
     identity: str
     label: Translatable
 
-    registry: ClassVar[Dict[str, Permission]] = dict()
+    registry: ClassVar[dict[str, Permission]] = dict()
 
     def __init__(
         self,

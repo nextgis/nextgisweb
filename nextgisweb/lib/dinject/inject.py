@@ -2,7 +2,7 @@ from collections.abc import Sequence
 from functools import partial, update_wrapper
 from inspect import Signature, signature
 from types import MethodType
-from typing import Any, Callable, Dict, Hashable, Type
+from typing import Any, Callable, Hashable, Type
 
 from .container import Argument, BoundArgument, Container
 
@@ -11,7 +11,7 @@ TAutoProvide = Callable[[Hashable], bool]
 
 
 def inject(
-    auto_provide: Dict[Type[Container], TAutoProvide] | None = None,
+    auto_provide: dict[Type[Container], TAutoProvide] | None = None,
 ) -> Callable[[TFunc], TFunc]:
     def _auto_provide(annotation: Hashable) -> Argument | None:
         if auto_provide is None:
@@ -55,8 +55,8 @@ def inject(
 
 
 class inject_wrapper:
-    _inj_values: Dict[str, Any]
-    _bound_args: Dict[str, BoundArgument]
+    _inj_values: dict[str, Any]
+    _bound_args: dict[str, BoundArgument]
 
     def __init__(
         self,

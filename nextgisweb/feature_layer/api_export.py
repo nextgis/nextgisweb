@@ -1,7 +1,7 @@
 import os
 import tempfile
 import zipfile
-from typing import TYPE_CHECKING, Annotated, Dict, Iterable, List, Literal, Tuple, Union
+from typing import TYPE_CHECKING, Annotated, Iterable, Literal, Union
 
 from msgspec import UNSET, Meta, Struct, UnsetType, field
 from osgeo import gdal, ogr
@@ -30,12 +30,12 @@ def _ogr_memory_ds():
     return gdal.GetDriverByName("Memory").Create("", 0, 0, 0, gdal.GDT_Unknown)
 
 
-FieldMap = List[Tuple[str, LayerField]]
+FieldMap = list[tuple[str, LayerField]]
 
 
 # Returns an ordered list with OGR field name and LayerField pair
 def get_field_map(
-    fields: Union[List[str], None], layer_fields: List[LayerField], use_display_name: bool
+    fields: Union[list[str], None], layer_fields: list[LayerField], use_display_name: bool
 ) -> FieldMap:
     if fields is not None:
         layer_fields = sorted(
@@ -80,18 +80,18 @@ def _ogr_layer_from_features(
 
 class ExportOptions(Struct):
     driver: OGRDriverT
-    dsco: List[str] = field(default_factory=list)
-    lco: List[str] = field(default_factory=list)
+    dsco: list[str] = field(default_factory=list)
+    lco: list[str] = field(default_factory=list)
     srs: Union[SRS, None] = None
     intersects_geom: Union[Geometry, None] = None
     intersects_srs: Union[SRS, None] = None
-    fields: Union[List[str], None] = None
+    fields: Union[list[str], None] = None
     fid_field: Union[str, None] = None
     use_display_name: bool = False
     ilike: Union[str, None] = None
     filter: Union[str, None] = None
 
-    def for_fields(self, ogr_fields: List[str]) -> "ExportOptions":
+    def for_fields(self, ogr_fields: list[str]) -> "ExportOptions":
         opts = ExportOptions(
             driver=self.driver,
             dsco=self.dsco.copy(),
@@ -151,7 +151,7 @@ class ExportParams(Struct, kw_only=True):
         Meta(description="Field name to store original feature ID"),
     ] = UNSET
     fields: Annotated[
-        Union[List[str], UnsetType],
+        Union[list[str], UnsetType],
         Meta(description="Field keynames to export"),
     ] = UNSET
     display_name: Annotated[
@@ -234,7 +234,7 @@ class ResourceParam(Struct, kw_only=True):
 
 class ExportParamsPost(ExportParams):
     resources: Annotated[
-        Annotated[List[ResourceParam], Meta(min_length=1)],
+        Annotated[list[ResourceParam], Meta(min_length=1)],
         Meta(description="Resources to export"),
     ]
 
@@ -395,12 +395,12 @@ def export_multi_get(
     request,
     *,
     resources: Annotated[
-        Annotated[List[ResourceID], Meta(min_length=1)],
+        Annotated[list[ResourceID], Meta(min_length=1)],
         Meta(description="IDs of resources to export"),
     ],
     export_params: Annotated[ExportParams, Query(spread=True)],
     name: Annotated[
-        Dict[ResourceID, str],
+        dict[ResourceID, str],
         Meta(description="Optional names for layers, resource IDs used by default"),
     ],
 ) -> ExportZipResponse:
@@ -422,7 +422,7 @@ def export_multi_post(
 
 def export_multi(
     request,
-    params_resources: List[ResourceParam],
+    params_resources: list[ResourceParam],
     export_params: ExportParams,
 ):
     options = export_params.to_options()

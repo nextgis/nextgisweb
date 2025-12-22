@@ -1,5 +1,5 @@
 import re
-from typing import Annotated, List, Union
+from typing import Annotated, Union
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
@@ -69,7 +69,7 @@ class WFSServerLayer(Struct, kw_only=True):
 
 
 class LayersAttr(SAttribute):
-    def get(self, srlzr) -> List[WFSServerLayer]:
+    def get(self, srlzr) -> list[WFSServerLayer]:
         return [
             WFSServerLayer(
                 resource_id=layer.resource_id,
@@ -80,7 +80,7 @@ class LayersAttr(SAttribute):
             for layer in srlzr.obj.layers
         ]
 
-    def set(self, srlzr, value: List[WFSServerLayer], *, create: bool):
+    def set(self, srlzr, value: list[WFSServerLayer], *, create: bool):
         m = dict((layer.resource_id, layer) for layer in srlzr.obj.layers)
         keep = set()
         for lv in value:

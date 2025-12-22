@@ -1,4 +1,4 @@
-from typing import ClassVar, Set
+from typing import ClassVar
 
 from msgspec import Struct
 from typing_extensions import Self
@@ -8,7 +8,7 @@ from nextgisweb.lib.imptool import module_from_stack
 
 
 class JSEntry(Struct, frozen=True):
-    registry: ClassVar[Set[Self]] = set()
+    registry: ClassVar[set[Self]] = set()
 
     component: str
     module: str

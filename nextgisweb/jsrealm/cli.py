@@ -4,7 +4,6 @@ import shutil
 from itertools import chain
 from pathlib import Path
 from subprocess import check_call
-from typing import Dict
 
 from nextgisweb.env import Env
 from nextgisweb.env.cli import UninitializedEnvCommand, comp_cli, opt
@@ -20,7 +19,7 @@ from .component import JSRealmComponent
 from .util import scan_for_nodepkgs
 
 
-def create_tsconfig(npkgs: Dict[str, Path], *, debug):
+def create_tsconfig(npkgs: dict[str, Path], *, debug):
     paths = {"react": ["./node_modules/@types/react"]}
 
     compiler_options = dict(

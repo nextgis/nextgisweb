@@ -1,5 +1,3 @@
-from typing import Dict
-
 from docstring_parser import parse
 
 
@@ -7,7 +5,7 @@ class Docstring:
     short: str | None = None
     long: str | None = None
     returns: str | None = None
-    params: Dict[str, str]
+    params: dict[str, str]
 
     def __init__(self, func):
         doc = func.__doc__

@@ -4,7 +4,7 @@ import json
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from datetime import date, datetime, time
-from typing import Any, Callable, Dict, Iterable, List
+from typing import Any, Callable, Iterable
 
 import sqlalchemy as sa
 from sqlalchemy.sql.elements import ClauseElement
@@ -29,7 +29,7 @@ def str_contains_filter(filter_str: str | None) -> bool:
 
 
 class FilterExpressionError(ValidationError):
-    def __init__(self, *, data: Dict[str, Any] | None = None):
+    def __init__(self, *, data: dict[str, Any] | None = None):
         super().__init__(message=gettext("Invalid filter expression"), data=data)
 
 
@@ -91,7 +91,7 @@ class ConditionNode(FilterNode):
         return _CONDITION_BUILDERS[self.operator](column, self.value)
 
 
-def _ensure_list(value: Any) -> List[Any]:
+def _ensure_list(value: Any) -> list[Any]:
     if isinstance(value, list):
         return value
     raise FilterExpressionError()
@@ -203,7 +203,7 @@ def _op_not_has(column, _value):
     return column.is_(None)
 
 
-_CONDITION_BUILDERS: Dict[str, Callable[[sa.sql.ColumnElement[Any], Any], ClauseElement]] = {
+_CONDITION_BUILDERS: dict[str, Callable[[sa.sql.ColumnElement[Any], Any], ClauseElement]] = {
     "==": _op_eq,
     "!=": _op_ne,
     ">": _op_gt,

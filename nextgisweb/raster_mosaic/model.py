@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List, Union
+from typing import Union
 
 import geoalchemy2 as ga
 import sqlalchemy as sa
@@ -243,7 +243,7 @@ class RasterMosaicItemWrite(Struct, kw_only=True):
 
 
 class ItemsAttr(SAttribute):
-    def get(self, srlzr: Serializer) -> List[RasterMosaicItemRead]:
+    def get(self, srlzr: Serializer) -> list[RasterMosaicItemRead]:
         return [
             RasterMosaicItemRead(
                 id=i.id,
@@ -252,7 +252,7 @@ class ItemsAttr(SAttribute):
             for i in srlzr.obj.items
         ]
 
-    def set(self, srlzr: Serializer, value: List[RasterMosaicItemWrite], *, create: bool):
+    def set(self, srlzr: Serializer, value: list[RasterMosaicItemWrite], *, create: bool):
         srlzr.obj.items = []
         for item in value:
             if (file_upload := item.file_upload) is not UNSET:

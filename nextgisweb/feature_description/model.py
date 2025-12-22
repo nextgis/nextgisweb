@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Dict
+from typing import Any
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
@@ -45,7 +45,7 @@ class FeatureDescription(Base, FVersioningExtensionMixin):
         fid: int,
         eid: None,
         vid: int,
-        values: Dict[str, Any],
+        values: dict[str, Any],
     ) -> DescriptionPut:
         if act in ("C", "U"):
             return DescriptionPut(fid=fid, vid=vid, **values)

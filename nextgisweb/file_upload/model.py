@@ -1,6 +1,6 @@
 import pickle
 from pathlib import Path
-from typing import Annotated, Tuple, Union, overload
+from typing import Annotated, Union, overload
 
 from msgspec import UNSET, Meta, Struct, UnsetType
 from ulid import ULID
@@ -119,7 +119,7 @@ class FileUpload:
         return FileObj(component=component).copy_from(self.data_path)
 
 
-def _filenames(id: FileUploadID, makedirs=False) -> Tuple[Path, Path]:
+def _filenames(id: FileUploadID, makedirs=False) -> tuple[Path, Path]:
     ulid = ULID.from_hex(id)
     levels = (ulid.datetime.strftime(r"%Y-%m-%d"), id[-2:], id[-4:-2])
     level_path = Path(env.file_upload.path, *levels)
