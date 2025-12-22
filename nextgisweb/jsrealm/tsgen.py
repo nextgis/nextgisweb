@@ -92,27 +92,30 @@ class TSGenerator:
             result = TSPrimitive(keyword="boolean", **defaults)
         elif otype is str:
             result = TSPrimitive(keyword="string", **defaults)
+        elif otype is dict:
+            # For dicts without args use Record<string, any>
+            result = TSMapping(args=(str, Any), **defaults)
         elif otype in (bytes, datetime, time):
             result = TSPrimitive(keyword="string", comment=otype.__name__, **defaults)
         elif is_enum_type(otype):
             result = TSEnum(args=[m.value for m in otype], **defaults)
         elif is_struct_type(otype):
             result = TSStruct(cls=otype, **defaults)
-        elif (origin := get_origin(otype)) in (UnionType, Union):
-            result = TSUnion(args=get_args(otype), **defaults)
-        elif origin in (list, set):
-            comment = None if origin is list else origin.__name__
-            result = TSList(arg=get_args(otype)[0], comment=comment, **defaults)
-        elif origin is tuple:
-            result = TSTuple(args=get_args(otype), **defaults)
-        elif origin is dict:
-            result = TSMapping(args=get_args(otype), **defaults)
-        elif otype is dict:
-            result = TSMapping(args=(str, Any), **defaults)
-        elif origin is Literal:
-            result = TSEnum(args=get_args(otype), **defaults)
         else:
-            result = TSPrimitive(keyword="unknown", comment=str(otype), **defaults)
+            origin = get_origin(otype)
+            if origin in (UnionType, Union):
+                result = TSUnion(args=get_args(otype), **defaults)
+            elif origin in (list, set):
+                comment = None if origin is list else origin.__name__
+                result = TSList(arg=get_args(otype)[0], comment=comment, **defaults)
+            elif origin is tuple:
+                result = TSTuple(args=get_args(otype), **defaults)
+            elif origin is dict:
+                result = TSMapping(args=get_args(otype), **defaults)
+            elif origin is Literal:
+                result = TSEnum(args=get_args(otype), **defaults)
+            else:
+                result = TSPrimitive(keyword="unknown", comment=str(otype), **defaults)
         return result
 
     def register(self, ts: TSType):
