@@ -7,20 +7,7 @@ from importlib.metadata._itertools import unique_everseen
 from itertools import count
 from textwrap import indent
 from types import UnionType
-from typing import (
-    Any,
-    Dict,
-    List,
-    Literal,
-    Set,
-    Tuple,
-    Type,
-    TypeVar,
-    Union,
-    cast,
-    get_args,
-    get_origin,
-)
+from typing import Any, Literal, Type, TypeVar, Union, cast, get_args, get_origin
 
 from msgspec import UNSET, Struct, UnsetType, field
 from typing_extensions import Protocol
@@ -41,7 +28,7 @@ from .util import indented
 
 ModuleName = str
 TypeName = str
-Export = Tuple[ModuleName, TypeName]
+Export = tuple[ModuleName, TypeName]
 
 # FIXME: Placeholder to indicate a field is defined in __post_init__. However,
 # this approach is problematic and likely requires refactoring, as MsgSpec
@@ -51,8 +38,8 @@ POST_INIT = cast(Any, UNSET)
 
 
 class TSGenerator:
-    modules: Dict[str, TSModule]
-    types: Dict[Any, TSType]
+    modules: dict[str, TSModule]
+    types: dict[Any, TSType]
 
     def __init__(self):
         self.counter = count(0)
@@ -65,7 +52,7 @@ class TSGenerator:
             self.modules[name] = module
         return module
 
-    def add(self, tdef: Any, *, export: Union[Export, None] = None) -> TSType:
+    def add(self, tdef: Any, *, export: Export | None = None) -> TSType:
         otype, annotations = disannotate(tdef, supertype=True)
         if (result := self.types.get(otype)) is None:
             result = self.translate(otype)
@@ -140,10 +127,10 @@ class TSModule(Struct, kw_only=True, dict=True):
     name: ModuleName
     unique: int = POST_INIT
 
-    imports: Set[TSModule] = field(default_factory=set)
-    declared: List[TSType] = field(default_factory=list)
-    exported: List[Tuple[TSType, TypeName]] = field(default_factory=list)
-    code: Union[str, None] = None
+    imports: set[TSModule] = field(default_factory=set)
+    declared: list[TSType] = field(default_factory=list)
+    exported: list[tuple[TSType, TypeName]] = field(default_factory=list)
+    code: str | None = None
 
     def __post_init__(self):
         self.unique = next(self.generator.counter)
@@ -187,9 +174,9 @@ class TSType(Struct, kw_only=True, dict=True):
     unique: int = POST_INIT
     type: Any
 
-    module: Union[TSModule, None] = None
-    name: Union[TypeName, None] = None
-    comment: Union[str, None] = None
+    module: TSModule | None = None
+    name: TypeName | None = None
+    comment: str | None = None
 
     auto_export: bool = False
 
@@ -204,7 +191,7 @@ class TSType(Struct, kw_only=True, dict=True):
     def __hash__(self) -> int:
         return hash((id(self.generator), self.unique))
 
-    def add_export(self, value: Tuple[ModuleName, TypeName]):
+    def add_export(self, value: tuple[ModuleName, TypeName]):
         module = self.generator.module(value[0])
         if self.module is None:
             self.module, self.name = module, value[1]
@@ -240,8 +227,8 @@ class TSPrimitive(TSType, kw_only=True):
 
 class TSUnion(TSType, kw_only=True):
     args: Sequence[Any]
-    items: Tuple[TSType, ...] = POST_INIT
-    undefided_excluded: Union[TSType, None] = POST_INIT
+    items: tuple[TSType, ...] = POST_INIT
+    undefided_excluded: TSType | None = POST_INIT
 
     def __tstype_init__(self):
         super().__tstype_init__()
@@ -269,7 +256,7 @@ class TSUnion(TSType, kw_only=True):
 
 
 class TSEnum(TSType, kw_only=True):
-    args: Sequence[Union[str, int, bool]]
+    args: Sequence[str | int | bool]
     auto_export = True
 
     def inline(self, module) -> str:
@@ -289,8 +276,8 @@ class TSList(TSType, kw_only=True):
 
 
 class TSTuple(TSType, kw_only=True):
-    args: Tuple[Any, ...]
-    items: Tuple[TSType, ...] = POST_INIT
+    args: tuple[Any, ...]
+    items: tuple[TSType, ...] = POST_INIT
 
     def __tstype_init__(self):
         super().__tstype_init__()
@@ -320,14 +307,14 @@ KEYWORDS = frozenset(
 
 class TSStruct(TSType, kw_only=True):
     cls: Type[Struct]
-    fields: Tuple[TSStructField, ...] = POST_INIT
-    tag: Union[Tuple[str, Union[str, int]], None] = POST_INIT
+    fields: tuple[TSStructField, ...] = POST_INIT
+    tag: tuple[str, str | int] | None = POST_INIT
     array_like: bool = POST_INIT
     auto_export = True
 
     def __tstype_init__(self):
         super().__tstype_init__()
-        fields: List[TSStructField] = list()
+        fields: list[TSStructField] = list()
         for k, v in struct_fields_encoded(self.cls):
             if all(((unannotate(s) is UnsetType) for s in decompose_union(v))):
                 continue
@@ -369,7 +356,7 @@ class TSStruct(TSType, kw_only=True):
 
 
 class TSMapping(TSType, kw_only=True):
-    args: Tuple[Any, Any]
+    args: tuple[Any, Any]
     ktype: TSType = POST_INIT
     vtype: TSType = POST_INIT
 
@@ -385,14 +372,14 @@ T = TypeVar("T")
 
 
 class TSExport:
-    name: Union[str, None]
+    name: str | None
     module: str
 
     def __init__(
         self,
-        name: Union[str, None] = None,
+        name: str | None = None,
         *,
-        component: Union[str, None] = None,
+        component: str | None = None,
         module: str = "type/api",
         depth: int = 0,
     ):
@@ -409,12 +396,12 @@ class TSExport:
     def __hash__(self):
         return hash((self.module, self.name))
 
-    def name_for(self, type: Any) -> str:
+    def name_for(self, tdef: Any) -> str:
         if (name := self.name) is not None:
             return name
-        if (name := getattr(type, "__name__", None)) is not None:
+        if (name := getattr(tdef, "__name__", None)) is not None:
             return name
-        raise TypeError(f"Unable to determine name for {type}")
+        raise TypeError(f"Unable to determine name for {tdef}")
 
 
 def component_tsmodule(component: str, module: str = "type/api") -> str:
@@ -422,7 +409,7 @@ def component_tsmodule(component: str, module: str = "type/api") -> str:
     return "/".join(parts)
 
 
-def struct_fields_encoded(otype) -> Tuple[Tuple[str, Any], ...]:
+def struct_fields_encoded(otype) -> tuple[tuple[str, Any], ...]:
     hints = get_class_annotations(otype)
     return tuple(
         (en, hints[fn])
