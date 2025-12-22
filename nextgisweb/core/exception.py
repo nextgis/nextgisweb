@@ -1,4 +1,4 @@
-from typing import Any, Dict, NamedTuple, Optional, Union, overload
+from typing import Any, Dict, NamedTuple, Union, overload
 
 from zope.interface import Attribute, Interface, classImplements, implementer
 from zope.interface.interface import adapter_hooks
@@ -20,7 +20,7 @@ class UserExceptionObject(NamedTuple):
     message: Union[TranslatableOrStr, None]
     detail: Union[TranslatableOrStr, None]
     data: Dict[str, Any]
-    http_status_code: Optional[int]
+    http_status_code: int | None
 
 
 classImplements(UserExceptionObject, IUserException)
@@ -57,7 +57,7 @@ class UserException(Exception):
     message: Union[TranslatableOrStr, None]
     detail: Union[TranslatableOrStr, None]
     data: Dict[str, Any]
-    http_status_code: Optional[int]
+    http_status_code: int | None
 
     @overload
     def __init__(

@@ -1,6 +1,6 @@
 import pickle
 from pathlib import Path
-from typing import Annotated, Optional, Tuple, Union, overload
+from typing import Annotated, Tuple, Union, overload
 
 from msgspec import UNSET, Meta, Struct, UnsetType
 from ulid import ULID
@@ -30,8 +30,8 @@ class FileUploadRef(Struct, kw_only=True):
 class FileUpload:
     id: FileUploadID
     size: int
-    name: Optional[str]
-    mime_type: Optional[str]
+    name: str | None
+    mime_type: str | None
     incomplete: bool
 
     data_path: Path
@@ -46,8 +46,8 @@ class FileUpload:
         self,
         *,
         size: int,
-        name: Optional[str] = None,
-        mime_type: Optional[str] = None,
+        name: str | None = None,
+        mime_type: str | None = None,
         incomplete: bool = False,
     ):
         """Create new FileUpload"""
@@ -114,7 +114,7 @@ class FileUpload:
 
         self.meta_path.write_bytes(pickle.dumps(meta))
 
-    def to_fileobj(self, *, component: Optional[str] = None) -> FileObj:
+    def to_fileobj(self, *, component: str | None = None) -> FileObj:
         component = FileObj.component_from_stack(1) if component is None else component
         return FileObj(component=component).copy_from(self.data_path)
 

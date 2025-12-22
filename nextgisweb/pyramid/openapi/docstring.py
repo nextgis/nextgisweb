@@ -1,12 +1,12 @@
-from typing import Dict, Optional
+from typing import Dict
 
 from docstring_parser import parse
 
 
 class Docstring:
-    short: Optional[str] = None
-    long: Optional[str] = None
-    returns: Optional[str] = None
+    short: str | None = None
+    long: str | None = None
+    returns: str | None = None
     params: Dict[str, str]
 
     def __init__(self, func):

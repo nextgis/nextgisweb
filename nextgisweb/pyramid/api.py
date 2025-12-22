@@ -2,19 +2,7 @@ import re
 from datetime import datetime
 from enum import Enum
 from inspect import Parameter, signature
-from typing import (
-    TYPE_CHECKING,
-    Annotated,
-    Any,
-    ClassVar,
-    Dict,
-    List,
-    Literal,
-    Optional,
-    Tuple,
-    Type,
-    Union,
-)
+from typing import TYPE_CHECKING, Annotated, Any, ClassVar, Dict, List, Literal, Tuple, Type, Union
 
 from msgspec import UNSET, Meta, Struct, UnsetType, convert, defstruct, field, to_builtins
 from pyramid.interfaces import IRoutesMapper
@@ -296,8 +284,8 @@ StorageResponse = Gap("StorageResponse", Type[Struct])
 
 
 class StorageValue(Struct, kw_only=True):
-    estimated: Optional[Annotated[datetime, Meta(tz=False)]]
-    updated: Optional[Annotated[datetime, Meta(tz=False)]]
+    estimated: Annotated[datetime, Meta(tz=False)] | None
+    updated: Annotated[datetime, Meta(tz=False)] | None
     data_volume: Annotated[int, Meta(gt=0)]
 
 
@@ -398,8 +386,8 @@ class csetting:
     gtype: SType
     stype: SType
     default: SValue
-    read: Optional[Permission]
-    write: Optional[Permission]
+    read: Permission | None
+    write: Permission | None
     skey: Tuple[str, str]
     ckey: Union[bool, Tuple[str, str]]
 
@@ -411,10 +399,10 @@ class csetting:
         type: Union[Any, Tuple[Any, Any]],
         *,
         default: Any = None,
-        read: Optional[Permission] = None,
-        write: Optional[Permission] = None,
-        skey: Optional[Tuple[str, str]] = None,
-        ckey: Optional[Union[bool, Tuple[str, str]]] = None,
+        read: Permission | None = None,
+        write: Permission | None = None,
+        skey: Tuple[str, str] | None = None,
+        ckey: Union[bool, Tuple[str, str]] | None = None,
         register: bool = True,
         stacklevel: int = 0,
     ):
@@ -456,7 +444,7 @@ class csetting:
 
         cls(name, type, default=default, stacklevel=1)
 
-    def normalize(self, value: SValue) -> Optional[SValue]:
+    def normalize(self, value: SValue) -> SValue | None:
         return value
 
     @inject()
@@ -468,7 +456,7 @@ class csetting:
         return convert(value, self.gtype)
 
     @inject()
-    def setter(self, value: Optional[SValue], *, core: CoreComponent):
+    def setter(self, value: SValue | None, *, core: CoreComponent):
         if value is not None:
             value = self.normalize(value)
 
@@ -640,7 +628,7 @@ class allow_origin(csetting):
     write = cors_manage
     skey = (COMP_ID, "cors_allow_origin")
 
-    def normalize(self, value: AllowOrigin) -> Optional[AllowOrigin]:
+    def normalize(self, value: AllowOrigin) -> AllowOrigin | None:
         value = [itm.rstrip("/").lower() for itm in value]
         result = list()
         for itm in value:
@@ -658,7 +646,7 @@ class custom_css(csetting):
     default = ""
     ckey = True
 
-    def normalize(self, value: str) -> Optional[str]:
+    def normalize(self, value: str) -> str | None:
         if re.match(r"^\s*$", value, re.MULTILINE):
             return None
         return value
@@ -674,7 +662,7 @@ class header_logo(csetting):
     skey = (COMP_ID, "logo")
     ckey = True
 
-    def normalize(self, value: FileUploadRef) -> Optional[Tuple[LogoMimeType, bytes]]:
+    def normalize(self, value: FileUploadRef) -> Tuple[LogoMimeType, bytes] | None:
         fupload = value()
         try:
             mime_type = LogoMimeType(fupload.mime_type)
@@ -700,8 +688,8 @@ class Metrics(Struct):
     yandex_metrica: Union[YandexMetrica, UnsetType] = UNSET
 
 
-csetting("full_name", Optional[str], skey=("core", "system.full_name"))
-csetting("home_path", Optional[str])
+csetting("full_name", str | None, skey=("core", "system.full_name"))
+csetting("home_path", str | None)
 csetting("metrics", Metrics, default={})
 
 

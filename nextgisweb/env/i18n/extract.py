@@ -7,7 +7,7 @@ from importlib.util import find_spec
 from os import scandir
 from os.path import join as path_join
 from pathlib import Path
-from typing import List, Optional, Set
+from typing import List, Set
 
 from ..package import pkginfo
 
@@ -29,8 +29,8 @@ class FileMapping:
 
 @dataclass
 class DirectoryMapping:
-    pattern: Optional[re.Pattern] = None
-    tags: List[str] = field(default_factory=set)
+    pattern: re.Pattern | None = None
+    tags: Set[str] = field(default_factory=set)
     ignores: List[re.Pattern] = field(default_factory=list)
     dmap: List[DirectoryMapping] = field(default_factory=list)
     fmap: List[FileMapping] = field(default_factory=list)
@@ -38,13 +38,13 @@ class DirectoryMapping:
     def ignore(self, pattern: str):
         self.ignores.append(re.compile(pattern))
 
-    def dir(self, pattern: str, tags: Optional[Set[str]] = None) -> DirectoryMapping:
+    def dir(self, pattern: str, tags: Set[str] | None = None) -> DirectoryMapping:
         tags = set() if tags is None else tags
         res = DirectoryMapping(re.compile(pattern), tags)
         self.dmap.append(res)
         return res
 
-    def file(self, pattern: str, method: str, tags: Optional[Set[str]] = None) -> FileMapping:
+    def file(self, pattern: str, method: str, tags: Set[str] | None = None) -> FileMapping:
         tags = set() if tags is None else tags
         res = FileMapping(re.compile(pattern), tags, method)
         self.fmap.append(res)

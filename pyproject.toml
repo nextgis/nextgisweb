@@ -51,4 +51,5 @@ section-order = [
 "pkg_resources".msg = "Consider importlib.metadata or nextgisweb.imptool.module_path"
 "typing_extensions.Annotated".msg = "Import Annotated from typing directly"
 "typing.Mapping".msg = "Import Mapping from collections.abc"
+"typing.Optional".msg = "Use X | None instead of Optional[X]"
 "typing.Sequence".msg = "Import Sequence from collections.abc"

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from inspect import signature
-from typing import Callable, Optional, Union
+from typing import Callable, Union
 
 from docstring_parser import parse as docstring_parse
 
@@ -17,11 +17,11 @@ class Command:
         self,
         cmd_cls: type,
         *,
-        parent: Optional[Command] = None,
-        name: Optional[str] = None,
-        short_desc: Optional[str] = None,
-        long_desc: Optional[str] = None,
-        decorator: Optional[Callable] = None,
+        parent: Command | None = None,
+        name: str | None = None,
+        short_desc: str | None = None,
+        long_desc: str | None = None,
+        decorator: Callable | None = None,
     ):
         self.cmd_cls = cmd_cls
         self.parent = parent

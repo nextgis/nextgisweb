@@ -3,7 +3,7 @@ from __future__ import annotations
 from enum import Enum
 from functools import partial
 from types import NoneType, UnionType
-from typing import Any, Optional, Tuple, Union, get_args, get_origin
+from typing import Any, Tuple, Union, get_args, get_origin
 
 from msgspec import UNSET
 from typing_extensions import Protocol
@@ -26,9 +26,9 @@ class Param:
         ptype: ParamType,
         default: Any = UNSET,
         *,
-        short: Optional[str] = None,
+        short: str | None = None,
         flag: bool = False,
-        doc: Optional[str] = None,
+        doc: str | None = None,
         **extra,
     ) -> None:
         self.ptype = ptype
@@ -141,9 +141,9 @@ class OptArgFactory(Protocol):
         self,
         default: Any = UNSET,
         *,
-        short: Optional[str] = None,
+        short: str | None = None,
         flag: bool = False,
-        doc: Optional[str] = None,
+        doc: str | None = None,
         **extra,
     ) -> Any:
         pass

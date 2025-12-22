@@ -7,15 +7,15 @@ from collections.abc import Sequence
 from pathlib import Path
 from threading import Thread
 from time import sleep
-from typing import Any, Optional, Tuple, Union
+from typing import Any, Tuple, Union
 
 from nextgisweb.lib.logging import logger
 
 
 def viewargs(
     *,
-    renderer: Optional[str] = None,
-    query_params: Optional[Sequence[Union[Tuple[str, Any], Tuple[str, Any, Any]]]] = None,
+    renderer: str | None = None,
+    query_params: Sequence[Union[Tuple[str, Any], Tuple[str, Any, Any]]] | None = None,
 ):
     def wrap(func):
         if renderer is not None:

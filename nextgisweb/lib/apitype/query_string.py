@@ -1,7 +1,7 @@
 from collections.abc import Mapping, Sequence
 from functools import cached_property
 from itertools import groupby
-from typing import Any, Callable, Optional, Tuple
+from typing import Any, Callable, Tuple
 
 from msgspec import NODEFAULT, ValidationError
 
@@ -31,7 +31,7 @@ class QueryString:
             )
         }
 
-    def last(self, name: str) -> Optional[str]:
+    def last(self, name: str) -> str | None:
         return None if (v := self.grouped.get(name)) is None else v[-1]
 
 

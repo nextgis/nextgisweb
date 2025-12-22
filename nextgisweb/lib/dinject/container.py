@@ -3,14 +3,14 @@ from __future__ import annotations
 from collections import defaultdict
 from dataclasses import dataclass
 from inspect import formatannotationrelativeto
-from typing import Any, Callable, Dict, Hashable, List, Optional, Tuple, Type, TypeVar
+from typing import Any, Callable, Dict, Hashable, List, Tuple, Type, TypeVar
 
 KeyType = Tuple[Hashable, ...]
 TContainer = TypeVar("TContainer", bound="Container")
 
 
 class Container:
-    _instance: Optional[Container] = None
+    _instance: Container | None = None
     _container_registry: Dict[KeyType, Any]
     _container_invalidate: Dict[KeyType, List[Callable[[], None]]]
 

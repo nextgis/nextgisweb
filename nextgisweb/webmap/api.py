@@ -3,7 +3,7 @@ from pathlib import Path
 from shutil import which
 from subprocess import check_call
 from tempfile import TemporaryDirectory
-from typing import Annotated, Any, Dict, List, Literal, Optional, Set, Union, cast
+from typing import Annotated, Any, Dict, List, Literal, Set, Union, cast
 
 from geoalchemy2.shape import to_shape
 from msgspec import UNSET, Meta, Struct, UnsetType, ValidationError
@@ -38,8 +38,8 @@ class AnnotationRead(Struct, kw_only=True):
     geom: str
     public: bool
     own: bool
-    description: Optional[str]
-    style: Optional[Dict[str, Any]]
+    description: str | None
+    style: Dict[str, Any] | None
     user_id: Union[int, UnsetType] = UNSET
     user: Union[str, UnsetType] = UNSET
 
@@ -433,13 +433,13 @@ csetting("show_geometry_info", bool, default=False)
 csetting("address_search_enabled", bool, default=True)
 csetting("address_search_extent", bool, default=False)
 csetting("address_geocoder", AddressGeocoder, default="nominatim")
-csetting("yandex_api_geocoder_key", Optional[str], default=None)
-csetting("nominatim_countrycodes", Optional[str], default=None)
+csetting("yandex_api_geocoder_key", str | None, default=None)
+csetting("nominatim_countrycodes", str | None, default=None)
 csetting("units_length", LengthUnits, default="m")
 csetting("units_area", AreaUnits, default="sq_m")
 csetting("degree_format", DegreeFormat, default="dd")
 csetting("measurement_srid", int, default=4326)
-csetting("legend_symbols", Optional[str], default=None)
+csetting("legend_symbols", str | None, default=None)
 csetting("hide_nav_menu", bool, default=False)
 
 

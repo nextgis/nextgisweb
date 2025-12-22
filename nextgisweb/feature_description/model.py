@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
@@ -59,7 +59,7 @@ class FeatureDescription(Base, FVersioningExtensionMixin):
 class DescriptionPut(Struct, kw_only=True, tag="description.put", tag_field="action"):
     fid: int
     vid: int
-    value: Optional[str]
+    value: str | None
 
 
 DescriptionPut.__doc__ = (

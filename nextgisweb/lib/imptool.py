@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from importlib import abc
 from importlib.util import spec_from_loader
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Dict
 from warnings import filterwarnings, warn
 
 # Prevent warning about missing __init__.py in migration directory. Is's OK
@@ -69,8 +69,8 @@ def module_from_stack(depth=0, skip=None):
 class Record:
     name: str
     repl: str
-    since: Optional[str] = None
-    remove: Optional[str] = None
+    since: str | None = None
+    remove: str | None = None
 
 
 class Loader(abc.Loader):
