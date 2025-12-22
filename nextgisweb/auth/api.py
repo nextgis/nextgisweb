@@ -1,5 +1,4 @@
-from datetime import datetime
-from typing import TYPE_CHECKING, Annotated, Dict, List, Literal, Optional, TypeVar, Union
+from typing import TYPE_CHECKING, Annotated, Literal
 
 import sqlalchemy as sa
 from msgspec import UNSET, Meta, Struct, UnsetType
@@ -11,17 +10,11 @@ from sqlalchemy.orm import aliased, undefer
 
 from nextgisweb.env import DBSession, gettext, gettextf, inject
 from nextgisweb.lib.apitype import (
-    OP,
     AnyOf,
     AsJSON,
-    Default,
-    Derived,
+    DatetimeNaive,
     EmptyObject,
-    ReadOnly,
-    Required,
     StatusCode,
-    flag,
-    omit,
     struct_items,
 )
 
@@ -38,13 +31,10 @@ from .policy import AuthMedium, AuthProvider
 from .util import reset_slg_cookie, sync_ulg_cookie
 from .view import GroupID, UserID, group_factory, user_factory
 
-T = TypeVar("T")
+KEYNAME_PATTERN = r"^[A-Za-z][A-Za-z0-9_\-]*$"
 
-BRIEF = flag("Brief")
-DefaultNonBrief = Default[Annotated[T, omit(BRIEF)]]
-ReadOnlyNonBrief = ReadOnly[Annotated[T, omit(BRIEF)]]
-
-Keyname = Annotated[str, Meta(pattern=r"^[A-Za-z][A-Za-z0-9_\-]*$")]
+KeynameUser = Annotated[str, Meta(pattern=KEYNAME_PATTERN, examples=["administrator", "guest"])]
+KeynameGroup = Annotated[str, Meta(pattern=KEYNAME_PATTERN, examples=["administrators"])]
 DisplayName = Annotated[str, Meta(min_length=1)]
 Description = Annotated[str, Meta(examples=[None])]
 Language = Annotated[str, Meta(pattern=r"^[a-z]{2,3}(\-[a-z]{2,3})?$", examples=["en", "zh-cn"])]
@@ -235,32 +225,62 @@ class UserRef(Struct, kw_only=True):
     id: UserID
 
 
-class _User(Struct, kw_only=True):
-    id: ReadOnly[UserID]
-    system: ReadOnly[Annotated[bool, Meta(examples=[False, True])]]
-    keyname: Required[Annotated[Keyname, Meta(examples=["administrator", "guest"])]]
-    display_name: Required[Annotated[DisplayName, Meta(examples=["Administrator", "Guest"])]]
-    description: DefaultNonBrief[Optional[Description]]
-    superuser: ReadOnlyNonBrief[bool]
-    disabled: Default[bool]
-    password: Default[Union[bool, str]]
-    last_activity: ReadOnly[Optional[datetime]]
-    language: DefaultNonBrief[Optional[Language]]
-    oauth_subject: ReadOnly[Optional[OAuthSubject]]
-    oauth_tstamp: ReadOnlyNonBrief[Optional[datetime]]
-    member_of: DefaultNonBrief[List[GroupID]]
-    permissions: DefaultNonBrief[List[PermissionItem]]
-    alink: DefaultNonBrief[Union[bool, str]]
-    is_administrator: ReadOnly[bool]
+class UserCreate(Struct, kw_only=True):
+    keyname: KeynameUser
+    display_name: DisplayName
+    description: Description | None | UnsetType = UNSET
+    disabled: bool | UnsetType = UNSET
+    password: bool | str | UnsetType = UNSET
+    alink: bool | UnsetType = UNSET
+    language: Language | None | UnsetType = UNSET
+    member_of: list[GroupID] | UnsetType = UNSET
+    permissions: list[PermissionItem] | UnsetType = UNSET
 
 
-UserCreate = Derived[_User, OP.CREATE]
-UserRead = Derived[_User, OP.READ]
-UserUpdate = Derived[_User, OP.UPDATE]
-UserReadBrief = Derived[_User, OP.READ, BRIEF]
+class UserRead(Struct, kw_only=True):
+    id: UserID
+    system: bool
+    keyname: KeynameUser
+    display_name: DisplayName
+    is_administrator: bool
+    superuser: bool
+    disabled: bool
+    password: bool
+    alink: str | None
+    description: Description | None
+    language: Language | None
+    last_activity: DatetimeNaive | None
+    oauth_subject: OAuthSubject | None
+    oauth_tstamp: DatetimeNaive | None
+    member_of: list[GroupID]
+    permissions: list[PermissionItem]
 
 
-UserCGetResponse = AnyOf[AsJSON[List[UserRead]], AsJSON[List[UserReadBrief]]]
+class UserReadBrief(Struct, kw_only=True):
+    id: UserID
+    system: bool
+    keyname: KeynameUser
+    display_name: DisplayName
+    is_administrator: bool
+    disabled: bool
+    password: bool
+    last_activity: DatetimeNaive | None
+    oauth_subject: OAuthSubject | None
+
+
+class UserUpdate(Struct, kw_only=True):
+    keyname: KeynameUser | UnsetType = UNSET
+    display_name: DisplayName | UnsetType = UNSET
+    description: Description | None | UnsetType = UNSET
+    disabled: bool | UnsetType = UNSET
+    password: bool | str | UnsetType = UNSET
+    alink: bool | UnsetType = UNSET
+    language: Language | None | UnsetType = UNSET
+    member_of: list[GroupID] | UnsetType = UNSET
+    permissions: list[PermissionItem] | UnsetType = UNSET
+
+
+UserCGetResponse = AnyOf[AsJSON[list[UserRead]], AsJSON[list[UserReadBrief]]]
 UserIGetResponse = AnyOf[UserRead, UserReadBrief]
 
 
@@ -337,24 +357,46 @@ class GroupRef(Struct, kw_only=True):
     id: GroupID
 
 
-class _Group(Struct, kw_only=True):
-    id: ReadOnly[GroupID]
-    system: ReadOnly[Annotated[bool, Meta(examples=[True])]]
-    keyname: Required[Annotated[Keyname, Meta(examples=["administrators"])]]
-    display_name: Required[Annotated[DisplayName, Meta(examples=["Administrators"])]]
-    description: DefaultNonBrief[Optional[Description]]
-    register: DefaultNonBrief[bool]
-    oauth_mapping: DefaultNonBrief[bool]
-    members: DefaultNonBrief[List[UserID]]
-    permissions: DefaultNonBrief[List[PermissionItem]]
+class GroupCreate(Struct, kw_only=True):
+    keyname: KeynameGroup
+    display_name: DisplayName
+    description: Description | None | UnsetType = UNSET
+    register: bool | UnsetType = UNSET
+    oauth_mapping: bool | UnsetType = UNSET
+    members: list[UserID] | UnsetType = UNSET
+    permissions: list[PermissionItem] | UnsetType = UNSET
 
 
-GroupCreate = Derived[_Group, OP.CREATE]
-GroupRead = Derived[_Group, OP.READ]
-GroupUpdate = Derived[_Group, OP.UPDATE]
-GroupReadBrief = Derived[_Group, OP.READ, BRIEF]
+class GroupRead(Struct, kw_only=True):
+    id: GroupID
+    system: bool
+    keyname: KeynameGroup
+    display_name: DisplayName
+    description: Description | None
+    register: bool
+    oauth_mapping: bool
+    members: list[UserID]
+    permissions: list[PermissionItem]
 
-GroupCGetResponse = AnyOf[AsJSON[List[GroupRead]], AsJSON[List[GroupReadBrief]]]
+
+class GroupReadBrief(Struct, kw_only=True):
+    id: GroupID
+    system: bool
+    keyname: KeynameGroup
+    display_name: DisplayName
+
+
+class GroupUpdate(Struct, kw_only=True):
+    keyname: KeynameGroup | UnsetType = UNSET
+    display_name: DisplayName | UnsetType = UNSET
+    description: Description | None | UnsetType = UNSET
+    register: bool | UnsetType = UNSET
+    oauth_mapping: bool | UnsetType = UNSET
+    members: list[UserID] | UnsetType = UNSET
+    permissions: list[PermissionItem] | UnsetType = UNSET
+
+
+GroupCGetResponse = AnyOf[AsJSON[list[GroupRead]], AsJSON[list[GroupReadBrief]]]
 GroupIGetResponse = AnyOf[GroupRead, GroupReadBrief]
 
 
@@ -416,14 +458,14 @@ def group_idelete(obj, request) -> EmptyObject:
     DBSession.delete(obj)
 
 
-class Profile(Struct, kw_only=True):
-    keyname: ReadOnly[str]
-    oauth_subject: ReadOnly[Optional[str]]
-    language: Default[Optional[Language]]
+class ProfileRead(Struct, kw_only=True):
+    keyname: KeynameUser
+    oauth_subject: OAuthSubject | None
+    language: Language | None
 
 
-ProfileRead = Derived[Profile, OP.READ]
-ProfileUpdate = Derived[Profile, OP.UPDATE]
+class ProfileUpdate(Struct, kw_only=True):
+    language: Language | UnsetType = UNSET
 
 
 def profile_get(request) -> ProfileRead:
@@ -446,11 +488,11 @@ def profile_put(request, body: ProfileUpdate) -> EmptyObject:
 
 class CurrentUser(Struct, kw_only=True):
     id: UserID
-    keyname: Annotated[Keyname, Meta(examples=["administrator"])]
+    keyname: KeynameUser
     display_name: Annotated[DisplayName, Meta(examples=["Administrator"])]
     language: Language
-    auth_medium: Optional[AuthMedium]
-    auth_provider: Optional[AuthProvider]
+    auth_medium: AuthMedium | None
+    auth_provider: AuthProvider | None
 
 
 def current_user(
@@ -491,9 +533,9 @@ def current_user(
 
 class LoginResponse(Struct, kw_only=True):
     id: UserID
-    keyname: Keyname
+    keyname: KeynameUser
     display_name: DisplayName
-    home_url: Union[str, UnsetType] = UNSET
+    home_url: str | UnsetType = UNSET
 
 
 def login(request) -> LoginResponse:
@@ -534,7 +576,7 @@ def logout(request) -> EmptyObject:
     request.response.headerlist.extend(headers)
 
 
-def permission(request) -> AsJSON[Dict[PermissionItem, str]]:
+def permission(request) -> AsJSON[dict[PermissionItem, str]]:
     """Read user permission schema"""
     tr = request.translate
     return {k: tr(v.label) for k, v in Permission.registry.items()}

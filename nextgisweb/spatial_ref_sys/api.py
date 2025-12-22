@@ -1,5 +1,5 @@
 import json
-from typing import Annotated, Any, Dict, List, Literal, Union
+from typing import Annotated, Any, Literal
 
 import requests
 from msgspec import UNSET, Meta, Struct, UnsetType
@@ -7,7 +7,7 @@ from requests.exceptions import RequestException
 from sqlalchemy import sql
 
 from nextgisweb.env import DBSession, env, gettext, gettextf
-from nextgisweb.lib.apitype import OP, AsJSON, Derived, EmptyObject, ReadOnly, Required, StatusCode
+from nextgisweb.lib.apitype import AsJSON, EmptyObject, StatusCode
 from nextgisweb.lib.geometry import Geometry, Transformer, geom_area, geom_length
 
 from nextgisweb.core.exception import ExternalServiceError, ValidationError
@@ -36,7 +36,7 @@ GeomWKT = Annotated[
     ),
 ]
 GeomGeoJSON = Annotated[
-    Dict[str, Any],
+    dict[str, Any],
     Meta(
         description="Geometry in GeoJSON format",
         examples=[{"type": "LineString", "coordinates": [[30, 10], [10, 30], [40, 40]]}],
@@ -48,21 +48,26 @@ class SRSRef(Struct, kw_only=True):
     id: SRSID
 
 
-class _SRS(Struct, kw_only=True):
-    id: ReadOnly[SRSID]
-    display_name: Required[DisplayName]
-    auth_name: ReadOnly[Annotated[Union[str, None], AuthNameMeta]]
-    auth_srid: ReadOnly[Annotated[Union[int, None], AuthSRIDMeta]]
-    wkt: Required[SRSWKT]
-    catalog_id: ReadOnly[Annotated[Union[CatalogID, None], CatalogIDMeta]]
-    system: ReadOnly[SRSSystem]
-    protected: ReadOnly[SRSProtected]
-    geographic: ReadOnly[SRSGeographic]
+class SRSCreate(Struct, kw_only=True):
+    display_name: DisplayName
+    wkt: SRSWKT
 
 
-SRSCreate = Derived[_SRS, OP.CREATE]
-SRSRead = Derived[_SRS, OP.READ]
-SRSUpdate = Derived[_SRS, OP.UPDATE]
+class SRSRead(Struct, kw_only=True):
+    id: SRSID
+    display_name: DisplayName
+    auth_name: Annotated[str | None, AuthNameMeta]
+    auth_srid: Annotated[int | None, AuthSRIDMeta]
+    wkt: SRSWKT
+    catalog_id: Annotated[CatalogID | None, CatalogIDMeta]
+    system: SRSSystem
+    protected: SRSProtected
+    geographic: SRSGeographic
+
+
+class SRSUpdate(Struct, kw_only=True):
+    display_name: DisplayName | UnsetType = UNSET
+    wkt: SRSWKT | UnsetType = UNSET
 
 
 def serialize(obj: SRS) -> SRSRead:
@@ -93,7 +98,7 @@ def deserialize(obj, data: SRSCreate, *, create: bool):
         obj.wkt = wkt
 
 
-def cget(request) -> AsJSON[List[SRSRead]]:
+def cget(request) -> AsJSON[list[SRSRead]]:
     """Read spatial reference systems"""
     return [serialize(obj) for obj in SRS.query()]
 
@@ -174,20 +179,20 @@ def geom_transform(srs_to, request, *, body: GeomTransformBody) -> GeomTransform
 
 class GeomTransformBatchBody(Struct, kw_only=True):
     srs_from: Annotated[SRSID, Meta(description="Source SRS to reproject from")]
-    srs_to: Annotated[List[SRSID], Meta(description="Target SRSs to reproject to")]
+    srs_to: Annotated[list[SRSID], Meta(description="Target SRSs to reproject to")]
     geom: Annotated[GeomWKT, Meta(description="Geometry")]
 
 
 class GeomTransformBatchResponse(Struct, kw_only=True):
     srs_id: SRSWKT
-    geom: Annotated[Union[GeomWKT, None], Meta(description="Transformed geometry")]
+    geom: Annotated[GeomWKT | None, Meta(description="Transformed geometry")]
 
 
 def geom_transform_batch(
     request,
     *,
     body: GeomTransformBatchBody,
-) -> AsJSON[List[GeomTransformBatchResponse]]:
+) -> AsJSON[list[GeomTransformBatchResponse]]:
     """Reproject geometry to multiple SRS"""
     srs_from = SRS.filter_by(id=body.srs_from).one()
     srs_to = SRS.filter(SRS.id.in_([int(s) for s in body.srs_to]))
@@ -217,9 +222,9 @@ GeometryPropertyGeomFormat = Annotated[
 
 
 class GeometryPropertyBody(Struct, kw_only=True):
-    srs: Union[SRSID, UnsetType] = UNSET
-    geom_format: Union[GeometryPropertyGeomFormat, UnsetType] = UNSET
-    geom: Union[GeomWKT, GeomGeoJSON]
+    srs: SRSID | UnsetType = UNSET
+    geom_format: GeometryPropertyGeomFormat | UnsetType = UNSET
+    geom: GeomWKT | GeomGeoJSON
 
 
 def geom_calc(srs_to: SRS, data: GeometryPropertyBody, measure_fun):
@@ -277,12 +282,12 @@ class SRSCatalogItem(Struct, kw_only=True):
 
 
 QueryStr = Annotated[
-    Union[str, None],
+    str | None,
     Meta(description="Query for name or code based search", examples=["UTM Zone 42N", "4326"]),
 ]
 
-QueryLat = Annotated[Union[float, None], Meta(description="Latitude", examples=[27.9881])]
-QueryLon = Annotated[Union[float, None], Meta(description="Longitude", examples=[86.9250])]
+QueryLat = Annotated[float | None, Meta(description="Latitude", examples=[27.9881])]
+QueryLon = Annotated[float | None, Meta(description="Longitude", examples=[86.9250])]
 
 
 def catalog_collection(
@@ -291,7 +296,7 @@ def catalog_collection(
     q: QueryStr = None,
     lat: QueryLat = None,
     lon: QueryLon = None,
-) -> AsJSON[List[SRSCatalogRecord]]:
+) -> AsJSON[list[SRSCatalogRecord]]:
     """Search SRS in catalog"""
     request.require_administrator()
     require_catalog_configured()
