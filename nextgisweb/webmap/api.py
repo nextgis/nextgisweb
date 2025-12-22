@@ -3,8 +3,7 @@ from pathlib import Path
 from shutil import which
 from subprocess import check_call
 from tempfile import TemporaryDirectory
-from typing import Annotated, Any, Literal, Union, cast
-from typing import List as List  # noqa: TID251
+from typing import TYPE_CHECKING, Annotated, Any, ForwardRef, Literal, TypeAlias, Union, cast
 
 from geoalchemy2.shape import to_shape
 from msgspec import UNSET, Meta, Struct, UnsetType, ValidationError
@@ -231,11 +230,17 @@ class ElementContent(ElementSize):
     content: str
 
 
+if TYPE_CHECKING:
+    LegendTreeNodeAlias: TypeAlias = "LegendTreeNode"
+else:
+    LegendTreeNodeAlias = ForwardRef("LegendTreeNode")
+
+
 class LegendTreeNode(Struct):
     title: str
     is_group: bool
     is_legend: bool
-    children: List["LegendTreeNode"]
+    children: list[LegendTreeNodeAlias]
     icon: Union[str, UnsetType] = UNSET
 
 
