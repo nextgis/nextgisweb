@@ -39,7 +39,7 @@ function getRowKey(row: VersionItem): string {
 }
 
 function dayjsToApi(v: Dayjs) {
-    return v.local().millisecond(0).toISOString().replace(/Z$/, "");
+    return v.utc().millisecond(0).toISOString().replace(/Z$/, "");
 }
 
 export function VersionHistory({ id }: { id: number }) {
@@ -125,9 +125,8 @@ export function VersionHistory({ id }: { id: number }) {
             if (!nextCursor || next.length < BLOCK_SIZE) {
                 setHasMore(false);
             }
-            loadingRef.current = false;
         } finally {
-            // ignore
+            loadingRef.current = false;
         }
     }, [epoch, hasMore, tstampGe, tstampLt, versionRoute]);
 
