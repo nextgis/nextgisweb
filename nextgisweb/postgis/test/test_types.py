@@ -1,10 +1,9 @@
 import pytest
 import sqlalchemy as sa
 import transaction
-from sqlalchemy.engine.url import URL as EngineURL
-from sqlalchemy.engine.url import make_url as make_engine_url
 
 from nextgisweb.env import DBSession
+from nextgisweb.lib.saext import postgres_url
 
 from .. import PostgisConnection, PostgisLayer
 from ..diagnostics import StatusEnum
@@ -27,8 +26,7 @@ def creds(ngw_env):
         username=opts_db["user"],
         password=opts_db["password"],
     )
-
-    engine_url = make_engine_url(EngineURL.create("postgresql+psycopg2", **con_args))
+    engine_url = postgres_url(**con_args)
     engine = sa.create_engine(engine_url)
 
     with engine.connect() as conn:

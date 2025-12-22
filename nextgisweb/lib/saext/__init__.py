@@ -1,4 +1,4 @@
-from sqlalchemy import exists, sql, text
+from sqlalchemy import URL, exists, sql, text
 
 from nextgisweb.env import DBSession, env
 
@@ -64,3 +64,14 @@ def query_unreferenced(Model, column):
         query = query.filter(~exists().where(Model.id == c))
 
     return query
+
+
+def postgres_url(*, host, port, database, username, password=None) -> URL:
+    return URL.create(
+        "postgresql+psycopg2",
+        username=username,
+        password=password,
+        database=database,
+        host=host,
+        port=port,
+    )

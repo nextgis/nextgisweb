@@ -17,8 +17,6 @@ import sqlalchemy.dialects.postgresql as sa_pg
 from msgspec import UNSET
 from requests.exceptions import JSONDecodeError, RequestException
 from sqlalchemy import create_engine, text
-from sqlalchemy.engine.url import URL as EngineURL
-from sqlalchemy.engine.url import make_url as make_engine_url
 from sqlalchemy.exc import NoResultFound, OperationalError
 from sqlalchemy.orm import configure_mappers
 
@@ -28,6 +26,7 @@ from nextgisweb.lib import json
 from nextgisweb.lib.config import Option, SizeInBytes
 from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.logging import logger
+from nextgisweb.lib.saext import postgres_url
 
 from nextgisweb.i18n import Localizer, Translations
 
@@ -414,7 +413,7 @@ class CoreComponent(StorageComponentMixin, Component):
 
     def _engine_url(self, error_on_pwfile=False):
         con_args = self._db_connection_args(error_on_pwfile=error_on_pwfile)
-        return make_engine_url(EngineURL.create("postgresql+psycopg2", **con_args))
+        return postgres_url(**con_args)
 
     def get_backups(self):
         backup_path = Path(self.options["backup.path"])

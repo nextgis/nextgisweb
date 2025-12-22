@@ -12,8 +12,6 @@ from sqlalchemy import alias, bindparam, cast, func, select, sql, text
 from sqlalchemy import and_ as sql_and
 from sqlalchemy import or_ as sql_or
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.engine.url import URL as EngineURL
-from sqlalchemy.engine.url import make_url as make_engine_url
 from sqlalchemy.exc import NoSuchTableError, OperationalError, SQLAlchemyError
 from zope.interface import implementer
 
@@ -21,6 +19,7 @@ from nextgisweb.env import Base, env, gettext
 from nextgisweb.lib import saext
 from nextgisweb.lib.geometry import Geometry
 from nextgisweb.lib.logging import logger
+from nextgisweb.lib.saext import postgres_url
 
 from nextgisweb.core.exception import ForbiddenError, ValidationError
 from nextgisweb.feature_layer import (
@@ -184,15 +183,12 @@ class PostgisConnection(Base, Resource):
         if self.sslmode is not None:
             args["connect_args"]["sslmode"] = self.sslmode.value
 
-        engine_url = make_engine_url(
-            EngineURL.create(
-                "postgresql+psycopg2",
-                host=self.hostname,
-                port=self.port,
-                database=self.database,
-                username=self.username,
-                password=self.password,
-            )
+        engine_url = postgres_url(
+            host=self.hostname,
+            port=self.port,
+            database=self.database,
+            username=self.username,
+            password=self.password,
         )
         engine = sa.create_engine(engine_url, **args)
 

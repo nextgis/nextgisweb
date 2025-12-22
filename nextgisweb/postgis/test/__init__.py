@@ -6,12 +6,11 @@ import pytest
 import sqlalchemy as sa
 import transaction
 from osgeo import ogr
-from sqlalchemy.engine.url import URL as EngineURL
-from sqlalchemy.engine.url import make_url as make_engine_url
 
 import nextgisweb.lib.saext as saext
 from nextgisweb.env import DBSession, env
 from nextgisweb.lib.ogrhelper import FIELD_GETTER
+from nextgisweb.lib.saext import postgres_url
 
 from nextgisweb.auth import User
 from nextgisweb.feature_layer import GEOM_TYPE_OGR_2_GEOM_TYPE
@@ -29,16 +28,13 @@ def create_feature_layer(ogrlayer, parent_id, **kwargs):
         if o not in opts_db:
             pytest.skip(f"Option test.database.{o} isn't set")
 
-    con_args = dict(
+    engine_url = postgres_url(
         host=opts_db["host"],
         port=opts_db["port"],
         database=opts_db["name"],
         username=opts_db["user"],
         password=opts_db["password"],
     )
-
-    engine_url = make_engine_url(EngineURL.create("postgresql+psycopg2", **con_args))
-
     engine = sa.create_engine(engine_url)
     meta = sa.MetaData()
 

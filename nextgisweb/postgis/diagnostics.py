@@ -4,7 +4,6 @@ from socket import gaierror, gethostbyname
 import geoalchemy2 as ga
 from sqlalchemy import func, inspect, select, sql
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.engine import URL as EngineURL
 from sqlalchemy.engine import Connection, create_engine
 from sqlalchemy.exc import OperationalError, SQLAlchemyError
 from sqlalchemy.pool import NullPool
@@ -20,6 +19,7 @@ from sqlalchemy.types import (
 
 from nextgisweb.env import gettext, gettextf
 from nextgisweb.lib.logging import logger
+from nextgisweb.lib.saext import postgres_url
 
 from nextgisweb.feature_layer import FIELD_TYPE
 
@@ -163,20 +163,18 @@ class PostgresCheck(ConnectionCheck):
             self.error(gettextf("Host name resolution failed: {}.")(exc.strerror.lower()))
             return
 
-        url = EngineURL.create(
-            "postgresql+psycopg2",
+        engine_url = postgres_url(
             host=self.hostname,
             port=self.port,
             database=self.database,
             username=self.username,
             password=self.password,
         )
-
         connect_args = dict(connect_timeout=5)
         if self.sslmode is not None:
             connect_args["sslmode"] = self.sslmode.value
         engine = create_engine(
-            url,
+            engine_url,
             client_encoding="utf-8",
             poolclass=NullPool,
             connect_args=connect_args,
