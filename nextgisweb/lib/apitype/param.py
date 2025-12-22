@@ -17,7 +17,7 @@ from .util import (
     decompose_union,
     disannotate,
     get_class_annotations,
-    is_struct,
+    is_struct_type,
     unannotate,
 )
 
@@ -157,7 +157,7 @@ class QueryParam:
         origin = get_origin(otype)
         args = get_args(otype)
 
-        if is_struct(otype):
+        if is_struct_type(otype):
             self.style = Style.FORM
             self.shape = Shape.OBJECT
             self.decoder = partial(
@@ -205,7 +205,7 @@ class QueryParam:
     @cached_property
     def spreaded(self) -> Sequence[QueryParam]:
         if self.param.spread:
-            assert is_struct(self.otype)
+            assert is_struct_type(self.otype)
             return [qp for _, qp in self._struct_query_params]
         else:
             return [self]

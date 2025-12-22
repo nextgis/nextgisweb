@@ -6,7 +6,7 @@ from typing import Annotated, Any, Literal, Union
 import sqlalchemy as sa
 from msgspec import Struct
 
-from nextgisweb.lib.apitype.util import is_enum
+from nextgisweb.lib.apitype.util import is_enum_type
 from nextgisweb.lib.msext import DEPRECATED
 
 from .serialize import CRUTypes, SAttribute
@@ -22,7 +22,7 @@ class SColumn(SAttribute):
             self.types = self.ctypes
         else:
             type = self.column.type.python_type
-            if is_enum(type):
+            if is_enum_type(type):
                 pass
             else:
                 if type not in (str, int, float, bool, date, datetime):

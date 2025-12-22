@@ -39,7 +39,7 @@ requires = [
     "humanize==4.12.3",
     "lxml>5.0,<6.1",
     "nh3==0.2.22",
-    "msgspec==0.19.0",
+    "msgspec==0.20.0",
     "networkx",
     "orjson==3.11.0",
     "passlib==1.7.4",

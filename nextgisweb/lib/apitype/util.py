@@ -1,38 +1,42 @@
+from collections.abc import Sequence
+from enum import EnumMeta
 from types import UnionType
-from typing import (
-    TYPE_CHECKING,
-    Annotated,
-    Any,
-    Iterable,
-    Optional,
-    Tuple,
-    Type,
-    TypeVar,
-    Union,
-    cast,
-    get_args,
-    get_origin,
-)
+from typing import TYPE_CHECKING, Annotated, Any, TypeVar, Union, get_args, get_origin
 
 from msgspec import Struct
 from msgspec import _utils as ms_utils
 from msgspec.inspect import Metadata, type_info
-from msgspec.inspect import _is_enum as is_enum  # noqa: F401
-from msgspec.inspect import _is_struct as is_struct  # noqa: F401
+
+try:
+    # Msgspec >= 0.20.0
+    from msgspec.inspect import is_struct_type as _is_struct_type
+except ImportError:
+    # Msgspec < 0.20.0, drop eventually
+    from msgspec.inspect import _is_struct as _is_struct_type  # type: ignore
+
 
 get_class_annotations = ms_utils.get_class_annotations
 NoneType = type(None)
 
-T = TypeVar("T", bound=Type)
+T = TypeVar("T", bound=type)
 
 
-def annotate(tdef: T, annotations: Iterable[Any]) -> T:
+def is_struct_type(tdef: type) -> bool:
+    """Determine if type definition is a msgspec.Struct type"""
+    return _is_struct_type(tdef)
+
+
+def is_enum_type(tdef: type) -> bool:
+    """Determine if type definition is an enum.Enum type"""
+    return type(tdef) is EnumMeta
+
+
+def annotate(tdef: T, annotations: Sequence[Any]) -> T:
     """Construct annotated type"""
 
-    annotations = tuple(annotations)
     if len(annotations) == 0:
         return tdef
-    return Annotated[(tdef,) + annotations]  # type: ignore
+    return Annotated[(tdef, *annotations)]  # type: ignore
 
 
 def unannotate(tdef: T, *, supertype: bool = False) -> T:
@@ -41,7 +45,7 @@ def unannotate(tdef: T, *, supertype: bool = False) -> T:
     return disannotate(tdef, supertype=supertype)[0]
 
 
-def disannotate(tdef: T, *, supertype: bool = False) -> Tuple[T, Tuple[Any, ...]]:
+def disannotate(tdef: T, *, supertype: bool = False) -> tuple[T, tuple[Any, ...]]:
     """Disassamble annotated type to original type and annotations"""
 
     if supertype and (sdef := getattr(tdef, "__supertype__", None)):
@@ -53,39 +57,18 @@ def disannotate(tdef: T, *, supertype: bool = False) -> Tuple[T, Tuple[Any, ...]
         if supertype:
             result_type, supertype_extras = disannotate(result_type, supertype=True)
             result_extras = supertype_extras + result_extras
-
         return result_type, result_extras
 
     return tdef, ()
 
 
-def decompose_union(tdef: Type, *, annotated: bool = True) -> Tuple[Type, ...]:
+def decompose_union(tdef: type, *, annotated: bool = True) -> tuple[type, ...]:
     if annotated:
         tdef = unannotate(tdef)
-
     if get_origin(tdef) in (UnionType, Union):
         return get_args(tdef)
     else:
         return (tdef,)
-
-
-def is_optional(tdef: Type) -> Tuple[bool, Type]:
-    """Determine if type definition is an optional type"""
-
-    tdef = unannotate(tdef)
-    if get_origin(tdef) in (UnionType, Union):
-        result = (False,)
-        args = []
-        for a in get_args(tdef):
-            u = unannotate(a)
-            if u is NoneType:
-                result = True
-            else:
-                args.append(a)
-        if result:
-            ndef = args[0] if len(args) == 1 else Union[tuple(args)]  # type: ignore
-            return True, cast(Type, ndef)
-    return False, tdef
 
 
 def msgspec_metadata(tdef):
@@ -100,7 +83,7 @@ class EmptyObjectStruct(Struct, kw_only=True):
 
 
 if TYPE_CHECKING:
-    EmptyObject = Optional[EmptyObjectStruct]
+    EmptyObject = EmptyObjectStruct | None
 else:
     EmptyObjectStruct.__name__ = "EmptyObject"
     EmptyObject = EmptyObjectStruct

@@ -8,7 +8,7 @@ from urllib.parse import unquote_plus
 
 from msgspec import Meta, convert
 
-from .util import is_enum, unannotate
+from .util import is_enum_type, unannotate
 
 Unquoted = str
 Quoted = str
@@ -27,7 +27,7 @@ def string_decoder(type: Any) -> StringDecoder:
 
     if otype is str:
         return _urlsafe(lambda val, type=type: convert(val, type), False)
-    elif is_enum(otype):
+    elif is_enum_type(otype):
         return _urlsafe(lambda val, type=type: convert(val, type), True)
     elif otype is int:
         return _urlsafe(lambda val, type=type: convert(int(convert(val, StrInt)), type), True)

@@ -19,7 +19,7 @@ from nextgisweb.env.package import pkginfo
 from nextgisweb.lib.apitype import ContentType, EmptyObject, JSONType, PathParam, QueryParam
 from nextgisweb.lib.apitype.query_string import QueryParamError, QueryParamRequired
 from nextgisweb.lib.apitype.schema import _AnyOfRuntime
-from nextgisweb.lib.apitype.util import disannotate, is_struct
+from nextgisweb.lib.apitype.util import disannotate, is_struct_type
 from nextgisweb.lib.imptool import module_from_stack, module_path
 from nextgisweb.lib.logging import logger
 
@@ -326,7 +326,7 @@ class Configurator(PyramidConfigurator):
                     assert p.annotation is not p.empty, f"Type hint required for {name}"
                     body_type = p.annotation
                     body_base, body_extras = disannotate(body_type)
-                    if is_struct(body_base) or (ContentType.JSON in body_extras):
+                    if is_struct_type(body_base) or (ContentType.JSON in body_extras):
                         bextract = _json_msgspec_factory(body_type)
                     else:
                         err = f"Body type not supported: {body_base}"
@@ -352,7 +352,7 @@ class Configurator(PyramidConfigurator):
                 return_concrete, return_extras = disannotate(return_type, supertype=True)
                 if (
                     return_concrete is EmptyObject
-                    or is_struct(return_concrete)
+                    or is_struct_type(return_concrete)
                     or ContentType.JSON in return_extras
                     or _AnyOfRuntime in return_extras
                 ):

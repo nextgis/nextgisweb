@@ -31,8 +31,8 @@ from nextgisweb.lib.apitype.util import (
     NoneType,
     decompose_union,
     get_class_annotations,
-    is_enum,
-    is_struct,
+    is_enum_type,
+    is_struct_type,
 )
 from nextgisweb.lib.imptool import module_from_stack
 from nextgisweb.lib.json import dumps
@@ -107,9 +107,9 @@ class TSGenerator:
             result = TSPrimitive(keyword="string", **defaults)
         elif otype in (bytes, datetime, time):
             result = TSPrimitive(keyword="string", comment=otype.__name__, **defaults)
-        elif is_enum(otype):
+        elif is_enum_type(otype):
             result = TSEnum(args=[m.value for m in otype], **defaults)
-        elif is_struct(otype):
+        elif is_struct_type(otype):
             result = TSStruct(cls=otype, **defaults)
         elif (origin := get_origin(otype)) in (UnionType, Union):
             result = TSUnion(args=get_args(otype), **defaults)
