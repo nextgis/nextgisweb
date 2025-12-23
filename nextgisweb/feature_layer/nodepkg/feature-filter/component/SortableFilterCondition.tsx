@@ -3,6 +3,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { observer } from "mobx-react-lite";
 
 import type { FilterEditorStore } from "../FilterEditorStore";
+import { useAutoScroll } from "../hooks/useAutoScroll";
 import type { FilterCondition as FilterConditionType } from "../type";
 
 import { FilterCondition } from "./FilterCondition";
@@ -31,6 +32,9 @@ export const SortableFilterCondition = observer(
             },
         });
 
+        const domId = `filter-condition-${condition.id}`;
+        useAutoScroll(condition.id, store, domId);
+
         const style = {
             transform: CSS.Transform.toString(transform),
             transition,
@@ -38,7 +42,7 @@ export const SortableFilterCondition = observer(
         };
 
         return (
-            <div ref={setNodeRef} style={style}>
+            <div ref={setNodeRef} style={style} id={domId}>
                 <FilterCondition
                     condition={condition}
                     store={store}

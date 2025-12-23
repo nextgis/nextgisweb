@@ -8,13 +8,13 @@
     min-height: 40em;
     max-height: calc(100vh - 2em);
 
-    >div {
+    > div {
         height: 100%;
 
-        >.ant-modal-content {
+        > .ant-modal-content {
             height: 100%;
 
-            >.ant-modal-body {
+            > .ant-modal-body {
                 height: 100%;
             }
         }
@@ -25,19 +25,20 @@
     .ngw-feature-filter-modal.ant-modal {
         margin: 0;
         width: 100%;
-        min-width: auto;
-        max-width: auto;
+        min-width: 0;
+        max-width: none;
         height: 100%;
-        min-height: auto;
+        min-height: 0;
+        max-height: none;
 
-        >div {
-            >.ant-modal-content {
+        > div {
+            > .ant-modal-content {
                 border-radius: 0;
             }
 
             .ant-form-item-label {
-                padding-bottom: 0;
                 padding-top: 1rem;
+                padding-bottom: 0;
             }
         }
     }

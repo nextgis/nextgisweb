@@ -9,6 +9,7 @@ import { AddIcon, RemoveIcon } from "@nextgisweb/gui/icon";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import type { FilterEditorStore } from "../FilterEditorStore";
+import { useAutoScroll } from "../hooks/useAutoScroll";
 import type {
     FilterGroupChild,
     FilterGroup as FilterGroupModel,
@@ -49,11 +50,6 @@ export const FilterGroup = observer(
             transform: CSS.Transform.toString(transform),
             transition,
             opacity: isDragging ? 0.5 : 1,
-            border: "1px solid #d9d9d9",
-            borderRadius: "4px",
-            padding: "5px",
-            margin: "5px 0",
-            backgroundColor: "#ffffff",
         };
 
         const renderChild = (child: FilterGroupChild) => {
@@ -89,29 +85,36 @@ export const FilterGroup = observer(
         };
 
         const isDropTarget = over?.id === group.id && over?.id !== active?.id;
-        const dropTargetClassName = isDropTarget ? " drop-target" : "";
-        const emptyClassName = group.childrenOrder.length === 0 ? " empty" : "";
+        const domId = `filter-group-${group.id}`;
+
+        useAutoScroll(group.id, store, domId);
+
+        let containerClassName = "filter-group";
+        if (isRoot) containerClassName += " root-filter-group";
+        if (isDropTarget) containerClassName += " drop-target";
+
+        let childrenClassName = "filter-group-children";
+        if (isDropTarget) childrenClassName += " drop-target";
+        if (group.childrenOrder.length === 0) childrenClassName += " empty";
 
         return (
             <div
                 ref={setNodeRef}
                 style={style}
-                className={`filter-group ${dropTargetClassName}`}
+                id={domId}
+                className={containerClassName}
             >
                 <div
-                    style={{
-                        display: "flex",
-                        alignItems: "center",
-                        marginBottom: "12px",
-                    }}
+                    className="filter-group-header"
+                    style={!isRoot ? { marginBottom: "12px" } : undefined}
                 >
-                    {
+                    {!isRoot && (
                         <DragHandleIcon
                             {...attributes}
                             {...listeners}
-                            style={{ cursor: "move", marginRight: "8px" }}
+                            className="filter-drag-handle"
                         />
-                    }
+                    )}
                     <Radio.Group
                         value={group.operator}
                         onChange={(e) =>
@@ -151,9 +154,7 @@ export const FilterGroup = observer(
                     </Space>
                 </div>
 
-                <div
-                    className={`filter-group-children ${dropTargetClassName} ${emptyClassName}`}
-                >
+                <div className={childrenClassName}>
                     {group.childrenOrder.map((child: FilterGroupChild) =>
                         renderChild(child)
                     )}

@@ -72,6 +72,7 @@ export class FilterEditorStore {
     @observable accessor isValid: boolean = true;
     @observable accessor validationError: string | undefined = undefined;
     @observable accessor validJsonValue: string | undefined = undefined;
+    @observable accessor scrollToItemId: number | null = null;
 
     private transientIdCounter = 0;
 
@@ -167,12 +168,13 @@ export class FilterEditorStore {
         };
         const group = this._findGroupById(this.filterState.rootGroup, groupId);
         if (group) {
-            group.conditions.unshift(newCondition as FilterCondition);
-            group.childrenOrder.unshift({
+            group.conditions.push(newCondition as FilterCondition);
+            group.childrenOrder.push({
                 type: "condition",
                 id: newCondition.id,
             });
             this.validateCurrentState();
+            this.setScrollToItemId(newCondition.id);
         }
     }
 
@@ -190,12 +192,13 @@ export class FilterEditorStore {
             parentGroupId
         );
         if (parentGroup) {
-            parentGroup.groups.unshift(newGroup);
-            parentGroup.childrenOrder.unshift({
+            parentGroup.groups.push(newGroup);
+            parentGroup.childrenOrder.push({
                 type: "group",
                 id: newGroup.id,
             });
             this.validateCurrentState();
+            this.setScrollToItemId(newGroup.id);
         }
     }
 
@@ -384,6 +387,11 @@ export class FilterEditorStore {
         }
         this.validateFilterExpression(expression);
         return JSON.stringify(expression);
+    }
+
+    @action.bound
+    setScrollToItemId(id: number | null) {
+        this.scrollToItemId = id;
     }
 
     getValidJsonValue(): string | undefined {

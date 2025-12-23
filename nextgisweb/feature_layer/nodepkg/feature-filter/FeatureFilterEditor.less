@@ -4,15 +4,31 @@
     gap: 1em;
     height: 100%;
 
-    >.ant-tabs {
+    > .ant-tabs {
         flex-grow: 1;
         height: 100%;
+        overflow: hidden;
+
+        :global(.ant-tabs-content),
+        :global(.ant-tabs-tabpane) {
+            height: 100%;
+        }
 
         .filter-constructor {
+            display: flex;
+            flex-direction: column;
             box-sizing: border-box;
             padding: 1rem;
             height: 100%;
-            overflow-y: auto;
+            overflow: hidden;
+
+            .filter-root {
+                height: 100%;
+
+                .root-filter-group {
+                    height: 100%;
+                }
+            }
         }
     }
 
@@ -32,22 +48,45 @@
     }
 
     .filter-group {
+        display: flex;
+        flex-direction: column;
         transition:
             border-color 0.2s ease,
             box-shadow 0.2s ease;
         margin-bottom: 8px;
+        background: #fafafa;
         border: 1px solid #d9d9d9;
         border-radius: 6px;
-        background: #fafafa;
+        padding: 7px;
+
+        &.root-filter-group {
+            flex: 1;
+            margin: 0;
+            box-shadow: none;
+            border: none;
+            background: transparent;
+            padding: 0;
+            height: auto;
+            min-height: 0;
+            overflow: hidden;
+            border-radius: 0;
+
+            > .filter-group-header {
+                flex-shrink: 0;
+                margin-bottom: 12px;
+                padding-right: 8px;
+            }
+
+            > .filter-group-children {
+                flex-grow: 1;
+                min-height: 0;
+                overflow-y: auto;
+            }
+        }
 
         .filter-group-header {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #d9d9d9;
-            border-radius: 6px 6px 0 0;
-            background: #f0f0f0;
-            padding: 8px 12px;
 
             .filter-drag-handle {
                 cursor: move;
@@ -61,14 +100,12 @@
 
             .ant-radio-group {
                 margin-right: auto;
+                padding-left: 5px;
             }
         }
 
         .filter-condition {
             margin-bottom: 8px;
-            border: 1px solid #e8e8e8;
-            border-radius: 4px;
-            background: white;
             padding: 8px;
 
             .filter-drag-handle {
@@ -114,7 +151,10 @@
                 background-color 0.15s ease,
                 border-color 0.15s ease;
             border-radius: 4px;
-            padding: 12px 12px 12px 24px;
+            padding: 4px;
+        }
+
+        .filter-group-children.empty {
             min-height: 40px;
         }
 
