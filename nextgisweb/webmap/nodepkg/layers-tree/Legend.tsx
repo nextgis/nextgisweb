@@ -1,21 +1,73 @@
+import { observer } from "mobx-react-lite";
 import { useMemo } from "react";
 
 import { Checkbox, ConfigProvider, useToken } from "@nextgisweb/gui/antd";
+import type { LegendSymbol as NGWLegendSymbol } from "@nextgisweb/render/type/api";
 
-import type { TreeItemStore } from "../store/tree-store/TreeItemStore";
+import type { TreeLayerStore } from "../store/tree-store/TreeItemStore";
 import { restoreSymbols } from "../utils/symbolsIntervals";
 
 import "./Legend.less";
 
 interface LegendProps {
-    nodeData: TreeItemStore;
+    nodeData: TreeLayerStore;
     checkable: boolean;
 }
 
-export function Legend({ nodeData, checkable }: LegendProps) {
+interface LegendSymbolProps {
+    render: boolean | null;
+    symbol: NGWLegendSymbol;
+    nodeData: TreeLayerStore;
+    checkable: boolean;
+}
+
+const LegendSymbol = observer(
+    ({ render, symbol, nodeData, checkable }: LegendSymbolProps) => {
+        if (!render && !checkable) {
+            return null;
+        }
+        const { opacity } = nodeData;
+        let checkbox;
+        if (checkable) {
+            checkbox =
+                render !== null ? (
+                    <Checkbox
+                        style={{ width: "16px" }}
+                        defaultChecked={render}
+                        onChange={(e) => {
+                            nodeData.setLayerLegendSymbol(
+                                symbol.index,
+                                e.target.checked
+                            );
+                        }}
+                        onClick={(evt) => evt.stopPropagation()}
+                    />
+                ) : (
+                    <div style={{ flex: "0 0 16px" }} />
+                );
+        }
+
+        return (
+            <div className="legend-symbol" title={symbol.display_name}>
+                {checkbox}
+                <img
+                    width={20}
+                    height={20}
+                    src={"data:image/png;base64," + symbol.icon.data}
+                    style={{ opacity: opacity ?? undefined }}
+                />
+                <div className="legend-title">{symbol.display_name}</div>
+            </div>
+        );
+    }
+);
+
+LegendSymbol.displayName = "LegendSymbol";
+
+export const Legend = observer(({ nodeData, checkable }: LegendProps) => {
     const { token } = useToken();
 
-    const legendInfo = "legendInfo" in nodeData && nodeData.legendInfo;
+    const { legendInfo } = nodeData;
 
     const intervals = useMemo<
         Record<number, boolean> | "-1" | undefined
@@ -29,7 +81,7 @@ export function Legend({ nodeData, checkable }: LegendProps) {
         }
     }, [nodeData]);
 
-    if (!nodeData || !legendInfo || !legendInfo.open) {
+    if (!legendInfo.open) {
         return <></>;
     }
 
@@ -55,43 +107,19 @@ export function Legend({ nodeData, checkable }: LegendProps) {
                               ? !!intervals[s.index]
                               : s.render;
 
-                    let checkbox;
-                    if (checkable) {
-                        checkbox =
-                            render !== null ? (
-                                <Checkbox
-                                    style={{ width: "16px" }}
-                                    defaultChecked={render}
-                                    onChange={(e) => {
-                                        nodeData.setLayerLegendSymbol(
-                                            s.index,
-                                            e.target.checked
-                                        );
-                                    }}
-                                    onClick={(evt) => evt.stopPropagation()}
-                                />
-                            ) : (
-                                <div style={{ flex: "0 0 16px" }} />
-                            );
-                    }
-
                     return (
-                        <div
+                        <LegendSymbol
                             key={idx}
-                            className="legend-symbol"
-                            title={s.display_name}
-                        >
-                            {checkbox}
-                            <img
-                                width={20}
-                                height={20}
-                                src={"data:image/png;base64," + s.icon.data}
-                            />
-                            <div className="legend-title">{s.display_name}</div>
-                        </div>
+                            symbol={s}
+                            checkable={checkable}
+                            render={render}
+                            nodeData={nodeData}
+                        />
                     );
                 })}
             </ConfigProvider>
         </div>
     );
-}
+});
+
+Legend.displayName = "Legend";

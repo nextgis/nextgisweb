@@ -218,6 +218,11 @@ export class TreeLayerStore
         }
     };
 
+    @computed
+    get opacity() {
+        return this.transparency !== null ? 1 - this.transparency / 100 : null;
+    }
+
     @action
     setItemSymbols(intervals: string[]) {
         this.symbols = intervals.length ? intervals : "-1";

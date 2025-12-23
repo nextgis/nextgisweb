@@ -1,6 +1,5 @@
+import { observer } from "mobx-react-lite";
 import { useCallback, useEffect } from "react";
-
-import type { TreeStore } from "@nextgisweb/webmap/store";
 
 import LayersTree from "../../layers-tree";
 import type { TreeWebmapItem } from "../../layers-tree/LayersTree";
@@ -47,83 +46,82 @@ const handleTreeItem = (
     }
 };
 
-const filterTreeItems = (store: TreeStore, layersItems: TreeWebmapItem[]) => {
-    const newLayersItems: TreeWebmapItem[] = [];
+export const LegendPrintMap = observer(
+    ({ display, legendCoords, printMapStore }: LegendPrintMapProps) => {
+        const { treeStore } = display;
+        const { visibleLayers, visibleInRangeIds, expanded } = treeStore;
 
-    layersItems.forEach((item) => {
-        const newTreeItem = handleTreeItem(
-            store.visibleLayerIds,
-            store.expanded,
-            item
-        );
-        if (newTreeItem) {
-            newLayersItems.push(newTreeItem);
-        }
-    });
-    return newLayersItems;
-};
-
-export const LegendPrintMap = ({
-    display,
-    legendCoords,
-    printMapStore,
-    onChange,
-}: LegendPrintMapProps) => {
-    const { treeStore } = display;
-    const { visibleLayers } = treeStore;
-
-    useEffect(() => {
-        if (legendCoords.displayed) {
-            onChange({ ...legendCoords, displayed: false });
-        }
-    }, [legendCoords, onChange]);
-
-    useEffect(() => {
-        const visibleLayersWithoutSymbols = visibleLayers.filter(
-            treeStore.shouldHaveLegendInfo
-        );
-        if (visibleLayersWithoutSymbols.length) {
-            treeStore.updateResourceLegendSymbols(
-                visibleLayersWithoutSymbols.map((layer) => layer.styleId)
+        useEffect(() => {
+            const visibleLayersWithoutSymbols = visibleLayers.filter(
+                treeStore.shouldHaveLegendInfo
             );
-        }
-    }, [treeStore, visibleLayers]);
+            if (visibleLayersWithoutSymbols.length) {
+                treeStore.updateResourceLegendSymbols(
+                    visibleLayersWithoutSymbols.map((layer) => layer.styleId)
+                );
+            }
+        }, [treeStore, visibleLayers]);
 
-    const fakeCb = useCallback(() => {}, []);
-    const onFilterItems = useCallback(
-        (store: TreeStore, layersItems: TreeWebmapItem[]) => {
-            const filteredItems = filterTreeItems(store, layersItems);
-            printMapStore.setWebMapItems(filteredItems);
-            return filteredItems;
-        },
-        [printMapStore]
-    );
+        const filterTreeItems = useCallback(
+            (layersItems: TreeWebmapItem[]) => {
+                const newLayersItems: TreeWebmapItem[] = [];
 
-    const style = { columnCount: legendCoords.legendColumns };
+                layersItems.forEach((item) => {
+                    const newTreeItem = handleTreeItem(
+                        visibleInRangeIds,
+                        expanded,
+                        item
+                    );
+                    if (newTreeItem) {
+                        newLayersItems.push(newTreeItem);
+                    }
+                });
+                return newLayersItems;
+            },
+            [expanded, visibleInRangeIds]
+        );
 
-    return (
-        <RndComp
-            coords={legendCoords}
-            onChange={(rndCoords: RndCoords) => {
-                const { legendColumns } = legendCoords;
-                onChange({ ...rndCoords, displayed: true, legendColumns });
-            }}
-            className="legend-rnd"
-            displayed
-        >
-            <div className="legend" style={style}>
-                <LayersTree
-                    store={treeStore}
-                    onReady={fakeCb}
-                    showDropdown={false}
-                    draggable={false}
-                    checkable={false}
-                    selectable={false}
-                    showLine={false}
-                    expandable={false}
-                    onFilterItems={onFilterItems}
-                />
-            </div>
-        </RndComp>
-    );
-};
+        const onFilterItems = useCallback(
+            (layersItems: TreeWebmapItem[]) => {
+                const filteredItems = filterTreeItems(layersItems);
+                printMapStore.setWebMapItems(filteredItems);
+                return filteredItems;
+            },
+            [filterTreeItems, printMapStore]
+        );
+
+        const style = { columnCount: legendCoords.legendColumns };
+
+        return (
+            <RndComp
+                coords={legendCoords}
+                onChange={(rndCoords: RndCoords) => {
+                    const { legendColumns } = legendCoords;
+
+                    printMapStore.layout.updateCoordinates("legendCoords", {
+                        ...rndCoords,
+                        displayed: true,
+                        legendColumns,
+                    });
+                }}
+                className="legend-rnd"
+                displayed
+            >
+                <div className="legend" style={style}>
+                    <LayersTree
+                        store={treeStore}
+                        showDropdown={false}
+                        draggable={false}
+                        checkable={false}
+                        selectable={false}
+                        showLine={false}
+                        expandable={false}
+                        onFilterItems={onFilterItems}
+                    />
+                </div>
+            </RndComp>
+        );
+    }
+);
+
+LegendPrintMap.displayName = "LegendPrintMap";

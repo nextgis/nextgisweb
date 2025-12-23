@@ -191,6 +191,12 @@ export class TreeStore {
         ) as TreeLayerStore[];
     }
     @computed
+    get visibleInRangeIds(): number[] {
+        return this.visibleLayers
+            .filter((l) => !l.isOutOfScaleRange)
+            .map((l) => l.id);
+    }
+    @computed
     get hasExclusiveGroup(): boolean {
         for (const n of this.items.values()) {
             if (n.isGroup() && n.exclusive) {

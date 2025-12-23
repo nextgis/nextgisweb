@@ -35,16 +35,13 @@ interface LayersTreeProps {
     showLegend?: boolean;
     expandable?: boolean;
     showDropdown?: boolean;
-    onFilterItems?: (
-        store: TreeStore,
-        layersItems: TreeWebmapItem[]
-    ) => TreeWebmapItem[];
+    onFilterItems?: (layersItems: TreeWebmapItem[]) => TreeWebmapItem[];
     onSelect?: (keys: number[]) => void;
     onReady?: () => void;
 }
 
 const LegendIcon = observer(({ treeItem }: { treeItem: TreeLayerStore }) => {
-    const { legendInfo } = treeItem;
+    const { legendInfo, opacity } = treeItem;
     if (legendInfo) {
         if (
             legendInfo &&
@@ -60,6 +57,7 @@ const LegendIcon = observer(({ treeItem }: { treeItem: TreeLayerStore }) => {
                         "data:image/png;base64," +
                         legendInfo.symbols[0].icon.data
                     }
+                    style={{ opacity: opacity ?? undefined }}
                 />
             );
         }
@@ -173,10 +171,10 @@ export const LayersTree = observer(
 
         const treeItems = useMemo(() => {
             if (onFilterItems) {
-                return onFilterItems(store, preparedWebMapItems);
+                return onFilterItems(preparedWebMapItems);
             }
             return preparedWebMapItems;
-        }, [onFilterItems, preparedWebMapItems, store]);
+        }, [onFilterItems, preparedWebMapItems]);
 
         const hasGroups = useMemo(() => store.some({ type: "group" }), [store]);
 
