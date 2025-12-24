@@ -1,4 +1,10 @@
+import { assert } from "@nextgisweb/jsrealm/error";
+
 import { routeURL } from "../api";
+
+const asciiDecoder = new TextDecoder("ascii");
+const asciiDecode = (data: Uint8Array) => asciiDecoder.decode(data);
+const blankToNull = (line: string) => (line === "" ? null : line);
 
 let nextRequestId = 1;
 
@@ -6,60 +12,6 @@ const pending = new Map<
     number,
     { resolve: (resp: Response) => void; reject: (err: any) => void }
 >();
-
-function findHeaderEnd(bytes: Uint8Array): number {
-    // \n\n: 0x0a 0x0a
-    for (let i = 0; i < bytes.length - 1; i++) {
-        if (bytes[i] === 0x0a && bytes[i + 1] === 0x0a) {
-            return i + 2;
-        }
-    }
-
-    return -1;
-}
-
-interface ResponseHeaders {
-    "Content-Type"?: string;
-}
-
-function parseHeaders(headersText: string): ResponseHeaders {
-    const lines = headersText.split(/\r?\n/).slice(1);
-    const headers = {} as ResponseHeaders;
-
-    for (const line of lines) {
-        const idx = line.indexOf(":");
-        if (idx === -1) continue;
-        const key = line.slice(0, idx).trim() as keyof ResponseHeaders;
-        const value = line.slice(idx + 1).trim();
-        if (key in headers) headers[key] = value;
-    }
-
-    return headers;
-}
-
-function parseResponse(respHeaders: string): {
-    id: number;
-    status: number;
-    statusText: string;
-    headers: ResponseHeaders;
-} {
-    const lines = respHeaders.split(/\r?\n/);
-    const first = lines[0]?.trim() ?? "";
-    const second = lines[1]?.trim() ?? "";
-
-    const m = first.match(/^RESPONSE\s+(\d+)\s*$/);
-    if (!m) {
-        throw new Error("WebSocket response parse error");
-    }
-    const sm = second.match(/^(\d{3})\s*(.*)$/);
-    const headers = parseHeaders(respHeaders);
-    return {
-        id: Number(m[1]),
-        status: sm ? Number(sm[1]) : 200,
-        statusText: sm ? sm[2] || "" : "",
-        headers,
-    };
-}
 
 let _ws: WebSocket | null = null;
 let _wsOpenPromise: Promise<WebSocket> | null = null;
@@ -74,6 +26,7 @@ function createConnection() {
     }
 
     const newWs = new WebSocket(routeURL("lunkwill.hmux"));
+    newWs.binaryType = "arraybuffer";
 
     _wsOpenPromise = new Promise<WebSocket>((resolve, reject) => {
         newWs.onopen = () => {
@@ -98,45 +51,61 @@ function createConnection() {
     };
 
     newWs.onmessage = async (event: MessageEvent) => {
-        const data = event.data;
-
-        const buffer = await data.arrayBuffer();
+        const buffer = event.data as ArrayBuffer;
         const bytes = new Uint8Array(buffer);
 
-        const headerEnd = findHeaderEnd(bytes);
+        let pos = 0;
+        const length = bytes.length;
 
-        let headerBytes = bytes;
-        let bodyBytes: Uint8Array<ArrayBuffer> | undefined = undefined;
-
-        if (headerEnd !== -1) {
-            headerBytes = bytes.slice(0, headerEnd);
-            bodyBytes = bytes.slice(headerEnd);
-        }
-
-        const decoder = new TextDecoder("utf-8", { fatal: false });
-        const respHeaders = decoder.decode(headerBytes);
-
-        const { id, status, statusText, headers } = parseResponse(respHeaders);
-
-        const pendingReq = pending.get(id);
-        if (!pendingReq) {
-            return;
-        }
-        pending.delete(id);
-
-        const contentType = headers["Content-Type"];
-
-        const resp = new Response(
-            bodyBytes ? new Blob([bodyBytes], { type: contentType }) : null,
-            {
-                status,
-                statusText,
-                headers: contentType
-                    ? { "Content-Type": contentType }
-                    : undefined,
+        const readLine = () => {
+            for (let i = pos; i < length; i++) {
+                if (bytes[i] === 0x0a) {
+                    const line = asciiDecode(bytes.slice(pos, i));
+                    pos = i + 1;
+                    return blankToNull(line);
+                } else if (i === length - 1) {
+                    const line = asciiDecode(bytes.slice(pos, length));
+                    pos = length;
+                    return blankToNull(line);
+                }
             }
-        );
-        pendingReq.resolve(resp);
+            return null;
+        };
+
+        const cmdLine = readLine();
+        assert(cmdLine);
+
+        const [cmd, ...args] = cmdLine.split(/\s+/);
+        assert(cmd === "RESPONSE", `Unexpected command: ${cmd}`);
+        const requestId = Number(args[0]);
+
+        const statusLine = readLine();
+        assert(statusLine, "Status line expected");
+        const [statusString, statusText] = statusLine.split(/\s+/, 2);
+        const status = Number(statusString);
+
+        const headers: [string, string][] = [];
+        while (true) {
+            const line = readLine();
+            if (!line) break;
+            const [k, v] = line.split(/\s*:\s*/, 2);
+            headers.push([k, v]);
+        }
+
+        const body = pos < length ? new DataView(buffer, pos) : null;
+        assert(body || status === 204, `Body expected for status ${status}`);
+
+        const pendingReq = pending.get(requestId);
+        if (pendingReq) {
+            pending.delete(requestId);
+            pendingReq.resolve(
+                new Response(body, {
+                    status,
+                    statusText,
+                    headers,
+                })
+            );
+        }
     };
     _ws = newWs;
     return _wsOpenPromise;

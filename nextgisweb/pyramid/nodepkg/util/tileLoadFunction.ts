@@ -20,10 +20,8 @@ export async function tileLoadFunction({
         ...requestInit,
     });
     if (response.status === 200) {
-        const arrayBuffer = await response.arrayBuffer();
-        const blob = new Blob([arrayBuffer]);
-        const urlCreator = window.URL || window.webkitURL;
-        return urlCreator.createObjectURL(blob);
+        const blob = await response.blob();
+        return window.URL.createObjectURL(blob);
     } else if (noDataStatuses.includes(response.status)) {
         return transparentImage;
     }
