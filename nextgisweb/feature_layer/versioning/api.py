@@ -66,7 +66,7 @@ class ChangesCheckResponse(Struct, kw_only=True):
 class ChangesCursor(Struct, kw_only=True, array_like=True):
     fields: list[int]
     extensions: list[str]
-    fid_last: Union[int, None] = None
+    fid_last: int | None = None
 
     def encode(self):
         mp = msgspec_encode(self)
@@ -174,7 +174,7 @@ ChangesContinue.__doc__ = (
     "fetched. Repeat until receive a response without a marker."
 )
 
-ChangeTypes = Union[FeatureCreate, FeatureUpdate, FeatureDelete]
+ChangeTypes = FeatureCreate | FeatureUpdate | FeatureDelete
 if not TYPE_CHECKING:
     ChangeTypes = Union[tuple(registry)]
 
@@ -187,7 +187,7 @@ def change_fetch(
     initial: VersionID,
     target: VersionID,
     cursor: str,
-) -> AsJSON[list[Union[ChangesContinue, ChangeTypes]]]:
+) -> AsJSON[list[ChangesContinue | ChangeTypes]]:
     """Fetch changes incrementally
 
     :param initial: Initial version
@@ -460,7 +460,7 @@ def version_cget(
 class VersionRead(Struct, kw_only=True):
     id: VersionID
     tstamp: VersionTstamp
-    user: Union[UserReadBrief, None]
+    user: UserReadBrief | None
 
 
 def version_iget(resource, request, vid: VersionID) -> VersionRead:

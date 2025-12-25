@@ -1,7 +1,7 @@
 import os
 import tempfile
 import zipfile
-from typing import TYPE_CHECKING, Annotated, Iterable, Literal, Union
+from typing import TYPE_CHECKING, Annotated, Iterable, Literal
 
 from msgspec import UNSET, Meta, Struct, UnsetType, field
 from osgeo import gdal, ogr
@@ -35,7 +35,7 @@ FieldMap = list[tuple[str, LayerField]]
 
 # Returns an ordered list with OGR field name and LayerField pair
 def get_field_map(
-    fields: Union[list[str], None], layer_fields: list[LayerField], use_display_name: bool
+    fields: list[str] | None, layer_fields: list[LayerField], use_display_name: bool
 ) -> FieldMap:
     if fields is not None:
         layer_fields = sorted(
@@ -50,8 +50,8 @@ def _ogr_layer_from_features(
     *,
     ds: gdal.Dataset,
     name: str = "",
-    field_map: Union[FieldMap, None] = None,
-    fid: Union[str, None] = None,
+    field_map: FieldMap | None = None,
+    fid: str | None = None,
     make_valid: bool = False,
 ) -> ogr.Layer:
     if field_map is not None:
@@ -82,14 +82,14 @@ class ExportOptions(Struct):
     driver: OGRDriverT
     dsco: list[str] = field(default_factory=list)
     lco: list[str] = field(default_factory=list)
-    srs: Union[SRS, None] = None
-    intersects_geom: Union[Geometry, None] = None
-    intersects_srs: Union[SRS, None] = None
-    fields: Union[list[str], None] = None
-    fid_field: Union[str, None] = None
+    srs: SRS | None = None
+    intersects_geom: Geometry | None = None
+    intersects_srs: SRS | None = None
+    fields: list[str] | None = None
+    fid_field: str | None = None
     use_display_name: bool = False
-    ilike: Union[str, None] = None
-    filter: Union[str, None] = None
+    ilike: str | None = None
+    filter: str | None = None
 
     def for_fields(self, ogr_fields: list[str]) -> "ExportOptions":
         opts = ExportOptions(
@@ -143,39 +143,39 @@ else:
 class ExportParams(Struct, kw_only=True):
     format: ExportFormat
     srs: Annotated[
-        Union[SRSID, UnsetType],
+        SRSID | UnsetType,
         Meta(description="Spatial Reference System ID for output"),
     ] = UNSET
     fid: Annotated[
-        Union[str, UnsetType],
+        str | UnsetType,
         Meta(description="Field name to store original feature ID"),
     ] = UNSET
     fields: Annotated[
-        Union[list[str], UnsetType],
+        list[str] | UnsetType,
         Meta(description="Field keynames to export"),
     ] = UNSET
     display_name: Annotated[
-        Union[bool, UnsetType],
+        bool | UnsetType,
         Meta(description="Use display name for fields, otherwise keyname"),
     ] = UNSET
-    encoding: Union[str, UnsetType] = UNSET
+    encoding: str | UnsetType = UNSET
 
     # Filters
 
     intersects: Annotated[
-        Union[str, UnsetType],
+        str | UnsetType,
         Meta(description="Filter features using WKT geometry"),
     ] = UNSET
     intersects_srs: Annotated[
-        Union[SRSID, UnsetType],
+        SRSID | UnsetType,
         Meta(description="SRS ID for intersecting geometry"),
     ] = UNSET
     ilike: Annotated[
-        Union[str, UnsetType],
+        str | UnsetType,
         Meta(description="Filter features using ILIKE condition"),
     ] = UNSET
     filter: Annotated[
-        Union[str, UnsetType],
+        str | UnsetType,
         Meta(description="Filter features using expression"),
     ] = UNSET
 
@@ -227,7 +227,7 @@ class ExportParams(Struct, kw_only=True):
 class ResourceParam(Struct, kw_only=True):
     id: ResourceID
     name: Annotated[
-        Union[str, None],
+        str | None,
         Meta(description="Optional output layer name, resource ID used by default"),
     ] = None
 

@@ -1,4 +1,4 @@
-from typing import Callable, Union
+from typing import Callable
 
 from msgspec import Struct
 
@@ -8,7 +8,7 @@ from nextgisweb.jsrealm import jsentry
 class PageSection(Struct, kw_only=True):
     jsentry: str
     order: int
-    callback: Union[Callable, None] = None
+    callback: Callable | None = None
 
 
 class PageSections:

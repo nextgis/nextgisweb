@@ -1,5 +1,5 @@
 from collections.abc import Mapping
-from typing import TYPE_CHECKING, Annotated, Any, ClassVar, Literal, Union, cast
+from typing import TYPE_CHECKING, Annotated, Any, ClassVar, Literal, cast
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
@@ -183,7 +183,7 @@ def item_delete(context, request) -> EmptyObject:
 def collection_get(
     request,
     *,
-    parent: Union[int, None] = None,
+    parent: int | None = None,
 ) -> AsJSON[list[CompositeRead]]:
     """Read children resources"""
     query = (
@@ -365,7 +365,7 @@ else:
     EffectivePermissions = defstruct(
         "EffectivePermissions",
         [
-            ((sid, struct) if sid == "resource" else (sid, Union[(struct, UnsetType)], UNSET))
+            ((sid, struct) if sid == "resource" else (sid, struct | UnsetType, UNSET))
             for sid, struct in scope_permissions_struct.items()
         ],
     )
@@ -375,7 +375,7 @@ def permission(
     resource,
     request,
     *,
-    user: Union[UserID, None] = None,
+    user: UserID | None = None,
 ) -> EffectivePermissions:
     """Get resource effective permissions"""
     request.resource_permission(ResourceScope.read)
@@ -491,12 +491,12 @@ def permission_explain(request) -> JSONType:
 
 class SearchRootParams(Struct, kw_only=True):
     root: Annotated[
-        Union[ResourceID, UnsetType],
+        ResourceID | UnsetType,
         Meta(description="Starting resource ID for recursive search"),
     ] = UNSET
 
     parent_id__recursive: Annotated[
-        Union[ResourceID, UnsetType],
+        ResourceID | UnsetType,
         Meta(description="Use `root` instead"),
         DEPRECATED,
     ] = UNSET
@@ -526,143 +526,143 @@ class SearchRootParams(Struct, kw_only=True):
 
 class SearchAttrParams(Struct, kw_only=True):
     id: Annotated[
-        Union[ResourceID, UnsetType],
+        ResourceID | UnsetType,
         Meta(description="Filter by exact ID"),
     ] = UNSET
 
     id__eq: Annotated[
-        Union[ResourceID, UnsetType],
+        ResourceID | UnsetType,
         Meta(description="Use `id` instead"),
         DEPRECATED,
     ] = UNSET
 
     id__in: Annotated[
-        Union[list[ResourceID], UnsetType],
+        list[ResourceID] | UnsetType,
         Meta(description="Filter by list of IDs"),
     ] = UNSET
 
     cls: Annotated[
-        Union[str, UnsetType],
+        str | UnsetType,
         Meta(description="Filter by exact type"),
     ] = UNSET
 
     cls__eq: Annotated[
-        Union[str, UnsetType],
+        str | UnsetType,
         Meta(description="Use `cls` instead"),
         DEPRECATED,
     ] = UNSET
 
     cls__like: Annotated[
-        Union[str, UnsetType],
+        str | UnsetType,
         Meta(description="Filter by type pattern with case sensitivity"),
         DEPRECATED,
     ] = UNSET
 
     cls__ilike: Annotated[
-        Union[str, UnsetType],
+        str | UnsetType,
         Meta(description="Filter by type pattern without case sensitivity"),
         DEPRECATED,
     ] = UNSET
 
     cls__in: Annotated[
-        Union[list[str], UnsetType],
+        list[str] | UnsetType,
         Meta(description="Filter by list of types"),
     ] = UNSET
 
     parent: Annotated[
-        Union[ResourceID, UnsetType],
+        ResourceID | UnsetType,
         Meta(description="Filter by exact parent ID"),
     ] = UNSET
 
     parent__in: Annotated[
-        Union[list[ResourceID], UnsetType],
+        list[ResourceID] | UnsetType,
         Meta(description="Filter by list of parent IDs"),
     ] = UNSET
 
     parent_id: Annotated[
-        Union[ResourceID, UnsetType],
+        ResourceID | UnsetType,
         Meta(description="Use `parent` instead"),
         DEPRECATED,
     ] = UNSET
 
     parent_id__eq: Annotated[
-        Union[ResourceID, UnsetType],
+        ResourceID | UnsetType,
         Meta(description="Use `parent` instead"),
         DEPRECATED,
     ] = UNSET
 
     parent_id__in: Annotated[
-        Union[list[ResourceID], UnsetType],
+        list[ResourceID] | UnsetType,
         Meta(description="Use `parent__in` instead"),
         DEPRECATED,
     ] = UNSET
 
     keyname: Annotated[
-        Union[str, UnsetType],
+        str | UnsetType,
         Meta(description="Filter by exact keyname"),
     ] = UNSET
 
     keyname__eq: Annotated[
-        Union[str, UnsetType],
+        str | UnsetType,
         Meta(description="Use `keyname` instead"),
         DEPRECATED,
     ] = UNSET
 
     keyname__in: Annotated[
-        Union[list[str], UnsetType],
+        list[str] | UnsetType,
         Meta(description="Filter by list of keynames"),
     ] = UNSET
 
     display_name: Annotated[
-        Union[str, UnsetType],
+        str | UnsetType,
         Meta(description="Filter by exact display name"),
     ] = UNSET
 
     display_name__eq: Annotated[
-        Union[str, UnsetType],
+        str | UnsetType,
         Meta(description="Use `display_name` instead"),
         DEPRECATED,
     ] = UNSET
 
     display_name__like: Annotated[
-        Union[str, UnsetType],
+        str | UnsetType,
         Meta(description="Filter by display name pattern with case sensitivity"),
     ] = UNSET
 
     display_name__ilike: Annotated[
-        Union[str, UnsetType],
+        str | UnsetType,
         Meta(description="Filter by display name pattern without case sensitivity"),
     ] = UNSET
 
     display_name__in: Annotated[
-        Union[list[str], UnsetType],
+        list[str] | UnsetType,
         Meta(description="Filter by list of display names"),
     ] = UNSET
 
     owner_user: Annotated[
-        Union[UserID, UnsetType],
+        UserID | UnsetType,
         Meta(description="Filter by owner user ID"),
     ] = UNSET
 
     owner_user__in: Annotated[
-        Union[list[UserID], UnsetType],
+        list[UserID] | UnsetType,
         Meta(description="Filter by list of owner user IDs"),
     ] = UNSET
 
     owner_user_id: Annotated[
-        Union[UserID, UnsetType],
+        UserID | UnsetType,
         Meta(description="Use `owner_user` instead"),
         DEPRECATED,
     ] = UNSET
 
     owner_user_id__eq: Annotated[
-        Union[UserID, UnsetType],
+        UserID | UnsetType,
         Meta(description="Use `owner_user` instead"),
         DEPRECATED,
     ] = UNSET
 
     owner_user_id__in: Annotated[
-        Union[list[UserID], UnsetType],
+        list[UserID] | UnsetType,
         Meta(description="Use `owner_user__in` instead"),
         DEPRECATED,
     ] = UNSET
@@ -735,7 +735,7 @@ class SearchResmetaParams(Struct, kw_only=True):
         ),
     ] = field(name="resmeta__ilike")
 
-    vdecoder: ClassVar = Decoder(Union[str, int, float, bool])
+    vdecoder: ClassVar = Decoder(str | int | float | bool)
 
     def filters(self, id):
         from nextgisweb.resmeta.model import ResourceMetadataItem as RMI
@@ -848,7 +848,7 @@ class QuotaCheckSuccess(Struct, kw_only=True):
 
 
 class QuotaCheckFailure(Struct, kw_only=True):
-    cls: Union[str, None]
+    cls: str | None
     required: int
     available: int
     message: str
@@ -886,13 +886,13 @@ class CompositeOperationCreate(Struct, kw_only=True, tag="create", tag_field="op
     parent: ResourceID
     owner_user: UserID
     members: CompositeMembersConfig
-    suggested_display_name: Annotated[Union[str, None], Meta(description="Suggested display name")]
+    suggested_display_name: Annotated[str | None, Meta(description="Suggested display name")]
 
 
 class CompositeOperationUpdate(Struct, kw_only=True, tag="update", tag_field="operation"):
     id: ResourceID
     cls: ResourceCls
-    parent: Union[ResourceID, None]
+    parent: ResourceID | None
     owner_user: UserID
     members: CompositeMembersConfig
 
@@ -901,10 +901,10 @@ def widget(
     request,
     *,
     operation: CompositeWidgetOperation,
-    id: Union[ResourceID, None] = None,
-    cls: Union[ResourceCls, None] = None,
-    parent: Union[ResourceID, None] = None,
-) -> AsJSON[Union[CompositeOperationCreate, CompositeOperationUpdate]]:
+    id: ResourceID | None = None,
+    cls: ResourceCls | None = None,
+    parent: ResourceID | None = None,
+) -> AsJSON[CompositeOperationCreate | CompositeOperationUpdate]:
     if operation == "create":
         if id is not None or cls is None or parent is None:
             raise HTTPBadRequest()

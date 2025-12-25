@@ -1,6 +1,6 @@
 from functools import partial
 from itertools import product
-from typing import Literal, Union
+from typing import Literal
 
 import sqlalchemy as sa
 from msgspec import Struct
@@ -29,10 +29,10 @@ MIN_INT32 = -(2**31)
 MAX_INT32 = 2**31 - 1
 ERROR_LIMIT = 10
 
-FixErrors = Union[Literal["NONE"], Literal["SAFE"], Literal["LOSSY"]]
-FidSource = Union[Literal["AUTO"], Literal["SEQUENCE"], Literal["FIELD"]]
-CastAutoYesNo = Union[None, bool]
-CastGeometryType = Union[None, Literal["POINT"], Literal["LINESTRING"], Literal["POLYGON"]]
+FixErrors = Literal["NONE"] | Literal["SAFE"] | Literal["LOSSY"]
+FidSource = Literal["AUTO"] | Literal["SEQUENCE"] | Literal["FIELD"]
+CastAutoYesNo = None | bool
+CastGeometryType = None | Literal["POINT"] | Literal["LINESTRING"] | Literal["POLYGON"]
 
 
 class FIX_ERRORS:
@@ -206,7 +206,7 @@ class UniquenessExplorer:
 
 class OGRLoader:
     geometry_type: str
-    fid_field: Union[LoaderField, None]
+    fid_field: LoaderField | None
     fields: dict[int, LoaderField]
 
     def __init__(self, ogrlayer, params: LoaderParams):

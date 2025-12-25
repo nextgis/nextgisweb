@@ -1,5 +1,4 @@
 from datetime import date, datetime, time
-from typing import Union
 
 from msgspec import UNSET, UnsetType
 from osgeo import ogr
@@ -23,21 +22,21 @@ class Feature:
         return self._layer
 
     @property
-    def id(self) -> Union[int, None]:
+    def id(self) -> int | None:
         return self._id
 
     @id.setter
-    def id(self, value: Union[int, None]):
+    def id(self, value: int | None):
         if self._id is not None and self._id != int(value):
             raise ValueError("Existing feature ID can't be changed.")
         self._id = value
 
     @property
-    def version(self) -> Union[int, None]:
+    def version(self) -> int | None:
         return self._version
 
     @property
-    def label(self) -> Union[str, None]:
+    def label(self) -> str | None:
         if self._layer and self._layer.feature_label_field:
             # If object is linked to a layer and naming field is set for a layer
             # use it for naming.
@@ -56,15 +55,15 @@ class Feature:
         return self.label
 
     @property
-    def fields(self) -> dict[str, Union[None, int, bool, float, str, date, time, datetime]]:
+    def fields(self) -> dict[str, None | int | bool | float | str | date | time | datetime]:
         return self._fields
 
     @property
-    def geom(self) -> Union[Geometry, None, UnsetType]:
+    def geom(self) -> Geometry | None | UnsetType:
         return self._geom
 
     @geom.setter
-    def geom(self, value: Union[Geometry, None, UnsetType]):
+    def geom(self, value: Geometry | None | UnsetType):
         self._geom = value
 
     @property

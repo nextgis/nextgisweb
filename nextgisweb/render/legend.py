@@ -1,5 +1,3 @@
-from typing import Union
-
 from msgspec import Struct
 from PIL.Image import Image
 
@@ -10,8 +8,8 @@ from nextgisweb.resource import IResourceBase
 
 class LegendSymbol(Struct, kw_only=True):
     index: int
-    render: Union[bool, None]
-    display_name: Union[str, TrStr]
+    render: bool | None
+    display_name: str | TrStr
     icon: Image
 
 

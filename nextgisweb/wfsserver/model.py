@@ -1,5 +1,5 @@
 import re
-from typing import Annotated, Union
+from typing import Annotated
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
@@ -65,7 +65,7 @@ class WFSServerLayer(Struct, kw_only=True):
     resource_id: int
     keyname: Annotated[str, Meta(pattern=KEYNAME_RE.pattern)]
     display_name: Annotated[str, Meta(min_length=1)]
-    maxfeatures: Union[Annotated[int, Meta(ge=1)], None]
+    maxfeatures: Annotated[int, Meta(ge=1)] | None
 
 
 class LayersAttr(SAttribute):

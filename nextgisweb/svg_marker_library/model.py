@@ -1,6 +1,6 @@
 import os.path
 import zipfile
-from typing import Annotated, Union
+from typing import Annotated
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
@@ -121,7 +121,7 @@ class FilesItemRead(Struct, kw_only=True):
 
 
 class FilesItemUpdate(FilesItemRead, kw_only=True):
-    id: Union[FileUploadID, UnsetType] = UNSET
+    id: FileUploadID | UnsetType = UNSET
 
 
 class FilesAttr(SAttribute):

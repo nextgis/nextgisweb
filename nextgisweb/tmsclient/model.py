@@ -74,7 +74,7 @@ class Connection(Base, Resource):
 
 
 class UrlTemplateAttr(SColumn):
-    ctypes = CRUTypes(Union[str, None], str, Union[str, None])
+    ctypes = CRUTypes(str | None, str, str | None)
 
     def set(self, srlzr: Serializer, value: str, *, create: bool):
         if value is not None:
@@ -93,7 +93,7 @@ class UrlTemplateAttr(SColumn):
         super().set(srlzr, value, create=create)
 
 
-Capmode = Union[Literal["nextgis_geoservices"], None]
+Capmode = Literal["nextgis_geoservices"] | None
 Scheme = Union[tuple(Literal[i] for i in SCHEME.enum)]  # type: ignore
 
 
@@ -114,7 +114,7 @@ class CapmodeAttr(SColumn):
 
 
 class SchemeAttr(SColumn):
-    ctypes = CRUTypes(Union[Scheme, None], Scheme, Union[Scheme, None])
+    ctypes = CRUTypes(Scheme | None, Scheme, Scheme | None)
 
 
 class ConnectionSerializer(Serializer, resource=Connection):
@@ -292,9 +292,9 @@ DataScope.read.require(
 
 
 class LayerNameAttr(SColumn):
-    ctypes = CRUTypes(Union[str, None], Union[str, None], Union[str, None])
+    ctypes = CRUTypes(str | None, str | None, str | None)
 
-    def set(self, srlzr: Serializer, value: Union[str, None], *, create: bool):
+    def set(self, srlzr: Serializer, value: str | None, *, create: bool):
         if srlzr.obj.id is None or srlzr.obj.layer_name != value:
             if (
                 value is None or len(value) == 0

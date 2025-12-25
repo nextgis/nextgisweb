@@ -1,6 +1,6 @@
 from collections import namedtuple
 from types import MappingProxyType
-from typing import Annotated, ClassVar, Literal, Type, Union
+from typing import Annotated, ClassVar, Literal, Type
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
@@ -88,7 +88,7 @@ class ResourceMeta(orm.DeclarativeMeta):
         resource_registry.register(cls)
 
 
-ResourceScopeType = Union[tuple[Type[Scope], ...], Type[Scope]]
+ResourceScopeType = tuple[Type[Scope], ...] | Type[Scope]
 
 
 class Resource(Base, metaclass=ResourceMeta):
@@ -438,7 +438,7 @@ class ClsAttr(SColumn):
     def get(self, srlzr) -> ResourceCls:
         return super().get(srlzr)
 
-    def set(self, srlzr, value: Union[ResourceCls, UnsetType], *, create: bool):
+    def set(self, srlzr, value: ResourceCls | UnsetType, *, create: bool):
         assert create and value is not UNSET
         assert srlzr.obj.cls == value
 
@@ -512,7 +512,7 @@ REQUIRED_PERMISSIONS_FOR_ADMINISTATORS = [
 class ACLRule(Struct, kw_only=True):
     action: Annotated[Literal["allow", "deny"], TSExport("ACLRuleAction")]
     principal: PrincipalRef
-    identity: Union[ResourceCls, Literal[""]]
+    identity: ResourceCls | Literal[""]
     scope: str
     permission: str
     propagate: bool
@@ -571,9 +571,9 @@ class ACLAttr(SAttribute):
 
 
 class DescriptionAttr(SColumn):
-    ctypes = CRUTypes(Union[str, None], Union[str, None], Union[str, None])
+    ctypes = CRUTypes(str | None, str | None, str | None)
 
-    def set(self, srlzr: Serializer, value: Union[str, None], *, create: bool):
+    def set(self, srlzr: Serializer, value: str | None, *, create: bool):
         if value is not None:
             value = sanitize(value)
         super().set(srlzr, value, create=create)

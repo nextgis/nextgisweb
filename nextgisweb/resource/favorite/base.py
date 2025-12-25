@@ -1,6 +1,6 @@
 import re
 from collections.abc import Mapping
-from typing import Annotated, ClassVar, Type, TypeVar, Union
+from typing import Annotated, ClassVar, Type, TypeVar
 
 from msgspec import Struct, defstruct
 from msgspec import _utils as ms_utils
@@ -19,7 +19,7 @@ Field = Annotated[T, FM]
 
 class ResourceFavoriteMeta(type):
     identity: str
-    route: Union[str, None]
+    route: str | None
 
     @property
     def ctype(self) -> Type[Struct]:
@@ -28,7 +28,7 @@ class ResourceFavoriteMeta(type):
 
         fields = [("resource", ResourceRef)]
         if self.route is None:
-            fields.append(("label", Union[str, None], None))  # type: ignore
+            fields.append(("label", str | None, None))  # type: ignore
 
         for k, v in ms_utils.get_class_annotations(self).items():
             _, extras = disannotate(v)
@@ -54,7 +54,7 @@ class ResourceFavorite(metaclass=ResourceFavoriteMeta):
     component: ClassVar[str]
 
     kind: ClassVar[str]
-    route: ClassVar[Union[str, None]] = None
+    route: ClassVar[str | None] = None
     label: ClassVar[TrStr]
     icon: ClassVar[str]
 

@@ -1,7 +1,7 @@
 import os
 import tempfile
 from io import DEFAULT_BUFFER_SIZE
-from typing import Annotated, Literal, Union
+from typing import Annotated, Literal
 
 from msgspec import Meta, Struct
 from osgeo import gdal
@@ -22,9 +22,10 @@ from .model import RasterLayer
 
 
 class ExportParams(Struct, kw_only=True):
-    srs: Annotated[Union[int, None], Meta(description="SRS ID")] = None
+    srs: Annotated[int | None, Meta(description="SRS ID")] = None
     bands: Annotated[
-        Union[list[Annotated[int, Meta(ge=1)]], None], Meta(description="list of bands")
+        list[Annotated[int, Meta(ge=1)]] | None,
+        Meta(description="list of bands"),
     ] = None
     format: Annotated[
         Literal[tuple(EXPORT_FORMAT_GDAL)],

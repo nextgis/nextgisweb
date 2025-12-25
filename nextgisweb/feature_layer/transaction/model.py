@@ -1,4 +1,4 @@
-from typing import Any, Generator, Union
+from typing import Any, Generator
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
@@ -31,8 +31,8 @@ class FeatureLayerTransaction(Base):
     def put_operation(
         self,
         seqnum: int,
-        payload: Union[Struct, None],
-        params: Union[Struct, UnsetType],
+        payload: Struct | None,
+        params: Struct | UnsetType,
     ):
         p_values = dict(
             p_seqnum=seqnum,

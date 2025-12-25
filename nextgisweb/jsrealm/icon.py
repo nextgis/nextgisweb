@@ -1,4 +1,4 @@
-from typing import ClassVar, Union
+from typing import ClassVar
 
 from msgspec import Struct
 from typing_extensions import Self
@@ -12,10 +12,10 @@ class Icon(Struct, frozen=True):
 
     collection: str
     glyph: str
-    variant: Union[str, None]
+    variant: str | None
 
 
-def icon(name: str, *, variant: Union[str, None] = None, depth: int = 0) -> str:
+def icon(name: str, *, variant: str | None = None, depth: int = 0) -> str:
     parts = name.split("/", maxsplit=1)
     if len(parts) == 1:
         py_module = module_from_stack(depth, (__name__))

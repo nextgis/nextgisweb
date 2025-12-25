@@ -1,7 +1,7 @@
 import abc
 import dataclasses as dc
 from functools import cached_property
-from typing import Annotated, Any, ClassVar, Type, TypeVar, Union
+from typing import Annotated, Any, ClassVar, Type, TypeVar
 
 from msgspec import UNSET, Meta, Struct, UnsetType
 from msgspec.inspect import StructType, type_info
@@ -76,7 +76,7 @@ class OperationError(Exception):
 
 
 VIDCompare = Annotated[
-    Union[int, UnsetType],
+    int | UnsetType,
     Meta(
         description="The version ID for optimistic locking: if there are any "
         "changes after this version, the operation will raise an error."
@@ -104,7 +104,7 @@ FeatureID = int
 
 
 Geom = Annotated[
-    Union[bytes, None, UnsetType],
+    bytes | None | UnsetType,
     Meta(
         description="A WKB-encoded geometry or NULL in the layer spatial "
         "reference system. Be aware of NULL values because it sets a feature "
@@ -134,7 +134,7 @@ FieldMap = Annotated[
 ]
 
 FieldsType = Annotated[
-    Union[FieldList, FieldMap, UnsetType],
+    FieldList | FieldMap | UnsetType,
     Meta(description="Feature field values which should be set."),
 ]
 
@@ -187,7 +187,7 @@ class FeatureRestoreResult(Struct, kw_only=True, tag="feature.restore", tag_fiel
     pass
 
 
-OperationUnion = Union[Revert, FeatureCreate, FeatureUpdate, FeatureDelete, FeatureRestore]
+OperationUnion = Revert | FeatureCreate | FeatureUpdate | FeatureDelete | FeatureRestore
 
 
 class FeatureLayerExecutor(OperationExecutor):

@@ -3,7 +3,7 @@ from __future__ import annotations
 import re
 from datetime import datetime
 from io import BytesIO
-from typing import Any, Union
+from typing import Any
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
@@ -169,7 +169,7 @@ class FeatureAttachment(Base, FVersioningExtensionMixin):
         aid: int,
         vid: int,
         values: dict[str, Any],
-    ) -> Union[AttachmentCreate, AttachmentUpdate, AttachmentDelete, AttachmentRestore]:
+    ) -> AttachmentCreate | AttachmentUpdate | AttachmentDelete | AttachmentRestore:
         if action in ("C", "U", "R"):
             if action == "C":
                 cid = AttachmentCreate
@@ -209,10 +209,10 @@ class AttachmentCreate(Struct, kw_only=True, tag="attachment.create", tag_field=
     aid: int
     vid: int
     fileobj: int
-    keyname: Union[str, UnsetType] = UNSET
-    name: Union[str, UnsetType] = UNSET
+    keyname: str | UnsetType = UNSET
+    name: str | UnsetType = UNSET
     mime_type: str
-    description: Union[str, UnsetType] = UNSET
+    description: str | UnsetType = UNSET
 
 
 @register_change
@@ -221,11 +221,11 @@ class AttachmentUpdate(Struct, kw_only=True, tag="attachment.update", tag_field=
     fid: int
     aid: int
     vid: int
-    fileobj: Union[int, UnsetType] = UNSET
-    keyname: Union[str, None, UnsetType] = UNSET
-    name: Union[str, None, UnsetType] = UNSET
-    mime_type: Union[str, UnsetType] = UNSET
-    description: Union[str, None, UnsetType] = UNSET
+    fileobj: int | UnsetType = UNSET
+    keyname: str | None | UnsetType = UNSET
+    name: str | None | UnsetType = UNSET
+    mime_type: str | UnsetType = UNSET
+    description: str | None | UnsetType = UNSET
 
 
 @register_change
@@ -243,7 +243,7 @@ class AttachmentRestore(Struct, kw_only=True, tag="attachment.restore", tag_fiel
     vid: int
     aid: int
     fileobj: int
-    keyname: Union[str, UnsetType] = UNSET
-    name: Union[str, UnsetType] = UNSET
+    keyname: str | UnsetType = UNSET
+    name: str | UnsetType = UNSET
     mime_type: str
-    description: Union[str, UnsetType] = UNSET
+    description: str | UnsetType = UNSET

@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Annotated, Literal, Type, Union
+from typing import Annotated, Literal, Type
 
 import geoalchemy2 as ga
 import sqlalchemy as sa
@@ -309,7 +309,7 @@ class WebMapAnnotation(Base):
 
 
 def _children_from_model(obj):
-    result: list[Union["WebMapItemGroupRead", "WebMapItemLayerRead"]] = []
+    result: list[WebMapItemGroupRead | WebMapItemLayerRead] = []
     for c in obj.children:
         if c.item_type == "layer":
             s = WebMapItemLayerRead.from_model(c)
@@ -325,14 +325,14 @@ class WebMapItemLayerRead(Struct, kw_only=True, tag="layer", tag_field="item_typ
     display_name: str
     layer_enabled: bool
     layer_identifiable: bool
-    layer_transparency: Union[float, None]
+    layer_transparency: float | None
     layer_style_id: int
-    style_parent_id: Union[int, None]
-    layer_min_scale_denom: Union[float, None]
-    layer_max_scale_denom: Union[float, None]
+    style_parent_id: int | None
+    layer_min_scale_denom: float | None
+    layer_max_scale_denom: float | None
     layer_adapter: str
-    draw_order_position: Union[int, None]
-    legend_symbols: Union[LegendSymbolsEnum, None]
+    draw_order_position: int | None
+    legend_symbols: LegendSymbolsEnum | None
 
     @classmethod
     def from_model(cls, obj):
@@ -359,13 +359,13 @@ class WebMapItemLayerWrite(Struct, kw_only=True, tag="layer", tag_field="item_ty
     display_name: str
     layer_enabled: bool = False
     layer_identifiable: bool = True
-    layer_transparency: Union[float, None] = None
+    layer_transparency: float | None = None
     layer_style_id: int
-    layer_min_scale_denom: Union[float, None] = None
-    layer_max_scale_denom: Union[float, None] = None
+    layer_min_scale_denom: float | None = None
+    layer_max_scale_denom: float | None = None
     layer_adapter: str
-    draw_order_position: Union[int, None] = None
-    legend_symbols: Union[LegendSymbolsEnum, None] = None
+    draw_order_position: int | None = None
+    legend_symbols: LegendSymbolsEnum | None = None
 
     def to_model(self):
         return WebMapItem(item_type="layer", **struct_asdict(self))
@@ -375,7 +375,7 @@ class WebMapItemGroupRead(Struct, kw_only=True, tag="group", tag_field="item_typ
     display_name: str
     group_expanded: bool
     group_exclusive: bool
-    children: list[Union["WebMapItemGroupRead", "WebMapItemLayerRead"]]
+    children: "list[WebMapItemGroupRead | WebMapItemLayerRead]"
 
     @classmethod
     def from_model(cls, obj):
@@ -404,7 +404,7 @@ class WebMapItemGroupWrite(Struct, kw_only=True, tag="group", tag_field="item_ty
     display_name: str
     group_expanded: bool = False
     group_exclusive: bool = False
-    children: list[Union["WebMapItemGroupWrite", "WebMapItemLayerWrite"]] = []
+    children: "list[WebMapItemGroupWrite | WebMapItemLayerWrite]" = []
 
     def to_model(self):
         asdict = struct_asdict(self)
@@ -417,7 +417,7 @@ class WebMapItemGroupWrite(Struct, kw_only=True, tag="group", tag_field="item_ty
 
 class WebMapItemRootRead(Struct, kw_only=True):
     item_type: Literal["root"]
-    children: list[Union["WebMapItemGroupRead", "WebMapItemLayerRead"]]
+    children: "list[WebMapItemGroupRead | WebMapItemLayerRead]"
 
     @classmethod
     def from_model(cls, obj):
@@ -429,7 +429,7 @@ class WebMapItemRootRead(Struct, kw_only=True):
 
 class WebMapItemRootWrite(Struct, kw_only=True):
     item_type: Literal["root"] = "root"
-    children: list[Union["WebMapItemGroupWrite", "WebMapItemLayerWrite"]] = []
+    children: "list[WebMapItemGroupWrite | WebMapItemLayerWrite]" = []
 
     def to_model(self, obj):
         assert obj.item_type == self.item_type
@@ -462,9 +462,9 @@ class ExtentPartAttr(SColumn):
 
         self.required = False
         self.types = CRUTypes(
-            Annotated[Union[None, base], DEPRECATED],  # type: ignore
-            Annotated[Union[None, base], DEPRECATED],  # type: ignore
-            Annotated[Union[None, base], DEPRECATED],  # type: ignore
+            Annotated[None | base, DEPRECATED],  # type: ignore
+            Annotated[None | base, DEPRECATED],  # type: ignore
+            Annotated[None | base, DEPRECATED],  # type: ignore
         )
 
 
@@ -485,12 +485,12 @@ class ExtentAttr(SAttribute):
         else:
             raise NotImplementedError
 
-    def get(self, srlzr: Serializer) -> Union[ExtentWSEN, None]:
+    def get(self, srlzr: Serializer) -> ExtentWSEN | None:
         obj = srlzr.obj
         parts = [getattr(obj, a) for a in self.attrs]
         return ExtentWSEN(*parts) if None not in parts else None
 
-    def set(self, srlzr: Serializer, value: Union[ExtentWSEN, None], *, create: bool):
+    def set(self, srlzr: Serializer, value: ExtentWSEN | None, *, create: bool):
         obj = srlzr.obj
         if value is None:
             for a in self.attrs:

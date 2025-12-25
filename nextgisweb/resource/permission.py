@@ -1,6 +1,6 @@
 from collections import UserList
 from functools import reduce
-from typing import ClassVar, Type, Union
+from typing import ClassVar, Type
 
 from nextgisweb.lib.i18n import TrStr
 from nextgisweb.lib.registry import DictRegistry
@@ -44,8 +44,8 @@ class Requirement:
         self,
         dst: "Permission",
         src: "Permission",
-        attr: Union[str, None] = None,
-        cls: Union[Type, None] = None,
+        attr: str | None = None,
+        cls: Type | None = None,
         attr_empty: bool = False,
     ):
         self.dst = dst

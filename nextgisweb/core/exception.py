@@ -1,4 +1,4 @@
-from typing import Any, NamedTuple, Union, overload
+from typing import Any, NamedTuple, overload
 
 from zope.interface import Attribute, Interface, classImplements, implementer
 from zope.interface.interface import adapter_hooks
@@ -17,8 +17,8 @@ class IUserException(Interface):
 
 class UserExceptionObject(NamedTuple):
     title: TranslatableOrStr
-    message: Union[TranslatableOrStr, None]
-    detail: Union[TranslatableOrStr, None]
+    message: TranslatableOrStr | None
+    detail: TranslatableOrStr | None
     data: dict[str, Any]
     http_status_code: int | None
 
@@ -30,10 +30,10 @@ def user_exception(
     exc,
     *,
     title: TranslatableOrStr,
-    message: Union[TranslatableOrStr, None] = None,
-    detail: Union[TranslatableOrStr, None] = None,
-    data: Union[dict[str, Any], None] = None,
-    http_status_code: Union[int, None] = None,
+    message: TranslatableOrStr | None = None,
+    detail: TranslatableOrStr | None = None,
+    data: dict[str, Any] | None = None,
+    http_status_code: int | None = None,
 ):
     exc.__user_exception__ = UserExceptionObject(
         title=title,
@@ -54,8 +54,8 @@ def adapt_exception_to_user_exception(iface, obj):
 @implementer(IUserException)
 class UserException(Exception):
     title: TranslatableOrStr
-    message: Union[TranslatableOrStr, None]
-    detail: Union[TranslatableOrStr, None]
+    message: TranslatableOrStr | None
+    detail: TranslatableOrStr | None
     data: dict[str, Any]
     http_status_code: int | None
 
@@ -64,21 +64,21 @@ class UserException(Exception):
         self,
         message: TranslatableOrStr,
         /,
-        title: Union[TranslatableOrStr, None] = None,
-        detail: Union[TranslatableOrStr, None] = None,
-        data: Union[dict[str, Any], None] = None,
-        http_status_code: Union[int, None] = None,
+        title: TranslatableOrStr | None = None,
+        detail: TranslatableOrStr | None = None,
+        data: dict[str, Any] | None = None,
+        http_status_code: int | None = None,
     ): ...
 
     @overload
     def __init__(
         self,
         *,
-        title: Union[TranslatableOrStr, None] = None,
-        message: Union[TranslatableOrStr, None] = None,
-        detail: Union[TranslatableOrStr, None] = None,
-        data: Union[dict[str, Any], None] = None,
-        http_status_code: Union[int, None] = None,
+        title: TranslatableOrStr | None = None,
+        message: TranslatableOrStr | None = None,
+        detail: TranslatableOrStr | None = None,
+        data: dict[str, Any] | None = None,
+        http_status_code: int | None = None,
     ): ...
 
     def __init__(self, *args, **kwargs):

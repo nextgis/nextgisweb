@@ -1,5 +1,4 @@
 import re
-from typing import Union
 
 from sqlalchemy import BigInteger, func, select
 
@@ -10,7 +9,7 @@ from nextgisweb.auth import OnUserLogin, User
 from .model import ResourceACLRule, ResourceGroup
 
 
-def parent_group(create=False) -> Union[ResourceGroup, None]:
+def parent_group(create=False) -> ResourceGroup | None:
     comp = env.resource
     res = ResourceGroup.filter_by(keyname=comp.options["home.keyname"]).first()
 
@@ -37,7 +36,7 @@ def parent_group(create=False) -> Union[ResourceGroup, None]:
     return res
 
 
-def user_group(user, create=False) -> Union[ResourceGroup, None]:
+def user_group(user, create=False) -> ResourceGroup | None:
     if (parent := parent_group()) is None:
         return None
 

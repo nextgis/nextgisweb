@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import ClassVar, Literal, Union
+from typing import ClassVar, Literal
 
 from nextgisweb.env import gettext
 from nextgisweb.env.package import pkginfo
@@ -24,7 +24,7 @@ class Permission:
         self,
         name: str,
         label: Translatable,
-        suffix: Union[WellKnownSuffix, None] = None,
+        suffix: WellKnownSuffix | None = None,
     ) -> None:
         mod = module_from_stack(skip=(__name__,))
         cid = pkginfo.component_by_module(mod)

@@ -1,5 +1,5 @@
 from collections.abc import Sequence
-from typing import Literal, Union
+from typing import Literal
 
 from msgspec import UNSET, Struct, UnsetType
 
@@ -12,10 +12,10 @@ class FieldDefn(Struct, kw_only=True):
     keyname: str
     datatype: str
     display_name: str
-    label_field: Union[Literal[True], UnsetType] = UNSET
-    lookup_table: Union[LookupTable, None, UnsetType] = UNSET
-    grid_visibility: Union[bool, UnsetType] = UNSET
-    text_search: Union[bool, UnsetType] = UNSET
+    label_field: Literal[True] | UnsetType = UNSET
+    lookup_table: LookupTable | None | UnsetType = UNSET
+    grid_visibility: bool | UnsetType = UNSET
+    text_search: bool | UnsetType = UNSET
 
 
 class SetupFieldsResult(Struct, kw_only=True):

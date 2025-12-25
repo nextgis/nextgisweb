@@ -20,7 +20,7 @@ class ResourceFavoriteSchemaItem(Struct):
     identity: str
     label: str
     icon: str
-    route: Union[str, None]
+    route: str | None
 
 
 def schema(request) -> AsJSON[dict[str, ResourceFavoriteSchemaItem]]:
@@ -76,7 +76,7 @@ class ResourceFavoriteRead(Struct, kw_only=True):
     id: int
     identity: str
     resource: ResourceRef
-    label: Union[str, None]
+    label: str | None
     created: datetime
     url: str
 
@@ -84,7 +84,7 @@ class ResourceFavoriteRead(Struct, kw_only=True):
 class ResourceFavoriteResourceInfo(Struct, kw_only=True):
     id: int
     cls: ResourceCls
-    parent: Union[ResourceRef, None]
+    parent: ResourceRef | None
     display_name: str
 
 
@@ -128,7 +128,7 @@ def cget(request) -> ResourceFavoriteCollectionGetResponse:
 
 
 class FeatureFavoriteItemPutBody(Struct, kw_only=True):
-    label: Union[str, None, UnsetType] = UNSET
+    label: str | None | UnsetType = UNSET
 
 
 def iput(request, id: int, body: FeatureFavoriteItemPutBody) -> EmptyObject:

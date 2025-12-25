@@ -1,4 +1,4 @@
-from typing import Any, Union
+from typing import Any
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
@@ -121,20 +121,20 @@ class FeatureLayerFieldRead(Struct, kw_only=True):
     label_field: bool
     grid_visibility: bool
     text_search: bool
-    lookup_table: Union[ResourceRef, None]
+    lookup_table: ResourceRef | None
 
 
 class FeatureLayerFieldWrite(Struct, kw_only=True):
-    id: Union[int, UnsetType] = UNSET
-    delete: Union[bool, UnsetType] = UNSET
-    keyname: Union[str, UnsetType] = UNSET
-    display_name: Union[str, UnsetType] = UNSET
-    datatype: Union[FeatureLayerFieldDatatype, UnsetType] = UNSET
-    typemod: Union[Any, UnsetType] = UNSET
-    label_field: Union[bool, UnsetType] = UNSET
-    grid_visibility: Union[bool, UnsetType] = UNSET
-    text_search: Union[bool, UnsetType] = UNSET
-    lookup_table: Union[ResourceRef, None, UnsetType] = UNSET
+    id: int | UnsetType = UNSET
+    delete: bool | UnsetType = UNSET
+    keyname: str | UnsetType = UNSET
+    display_name: str | UnsetType = UNSET
+    datatype: FeatureLayerFieldDatatype | UnsetType = UNSET
+    typemod: Any | UnsetType = UNSET
+    label_field: bool | UnsetType = UNSET
+    grid_visibility: bool | UnsetType = UNSET
+    text_search: bool | UnsetType = UNSET
+    lookup_table: ResourceRef | None | UnsetType = UNSET
 
 
 class FieldsAttr(SAttribute):
@@ -223,16 +223,16 @@ class FieldsAttr(SAttribute):
 
 class FVersioningRead(Struct, kw_only=True):
     enabled: bool
-    epoch: Union[int, UnsetType]
-    latest: Union[int, UnsetType]
+    epoch: int | UnsetType
+    latest: int | UnsetType
 
 
 class FVersioningUpdate(Struct, kw_only=True):
-    enabled: Union[bool, UnsetType] = UNSET
+    enabled: bool | UnsetType = UNSET
 
 
 class FVersioningAttr(SAttribute):
-    def get(self, srlzr: Serializer) -> Union[FVersioningRead, None]:
+    def get(self, srlzr: Serializer) -> FVersioningRead | None:
         obj = srlzr.obj
         if not IVersionableFeatureLayer.providedBy(obj):
             return None

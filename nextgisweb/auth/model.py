@@ -3,7 +3,7 @@ from collections.abc import Mapping
 from functools import cached_property, lru_cache
 from itertools import chain
 from secrets import token_hex, token_urlsafe
-from typing import Callable, ClassVar, Iterable, Union, overload
+from typing import Callable, ClassVar, Iterable, overload
 
 import sqlalchemy as sa
 import sqlalchemy.dialects.postgresql as sa_pg
@@ -72,7 +72,7 @@ class Principal(Base):
     __mapper_args__ = dict(polymorphic_on=cls, with_polymorphic="*")
 
     @property
-    def display_name_i18n(self) -> Union[TrStr, str]:
+    def display_name_i18n(self) -> TrStr | str:
         if self.system and (value := self.system_display_name.get(self.keyname)):
             return value
         return self.display_name

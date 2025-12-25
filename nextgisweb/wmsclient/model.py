@@ -166,7 +166,7 @@ class VersionAttr(SColumn):
 
 
 CapCacheEnum = Annotated[
-    Union[Literal["query"], Literal["clear"]],
+    Literal["query"] | Literal["clear"],
     TSExport("CapCacheEnum"),
 ]
 

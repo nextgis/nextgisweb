@@ -3,7 +3,7 @@ from pathlib import Path
 from shutil import which
 from subprocess import check_call
 from tempfile import TemporaryDirectory
-from typing import TYPE_CHECKING, Annotated, Any, ForwardRef, Literal, TypeAlias, Union, cast
+from typing import TYPE_CHECKING, Annotated, Any, ForwardRef, Literal, TypeAlias, cast
 
 from geoalchemy2.shape import to_shape
 from msgspec import UNSET, Meta, Struct, UnsetType, ValidationError
@@ -40,21 +40,21 @@ class AnnotationRead(Struct, kw_only=True):
     own: bool
     description: str | None
     style: dict[str, Any] | None
-    user_id: Union[int, UnsetType] = UNSET
-    user: Union[str, UnsetType] = UNSET
+    user_id: int | UnsetType = UNSET
+    user: str | UnsetType = UNSET
 
 
 class AnnotationCreate(Struct, kw_only=True):
     geom: str
     public: bool
-    description: Union[str, UnsetType] = UNSET
-    style: Union[dict[str, Any], UnsetType] = UNSET
+    description: str | UnsetType = UNSET
+    style: dict[str, Any] | UnsetType = UNSET
 
 
 class AnnotationUpdate(Struct, kw_only=True):
-    description: Union[str, UnsetType] = UNSET
-    style: Union[dict[str, Any], UnsetType] = UNSET
-    geom: Union[str, UnsetType] = UNSET
+    description: str | UnsetType = UNSET
+    style: dict[str, Any] | UnsetType = UNSET
+    geom: str | UnsetType = UNSET
 
 
 class AnnotationCreateResponse(Struct, kw_only=True):
@@ -82,7 +82,7 @@ def to_annot_read(obj: WebMapAnnotation, request, with_user_info=False) -> Annot
 
 def prepare_annotation(
     obj: WebMapAnnotation,
-    data: Union[AnnotationCreate, AnnotationUpdate],
+    data: AnnotationCreate | AnnotationUpdate,
 ) -> None:
     if isinstance(data, AnnotationCreate):
         obj.public = data.public
@@ -241,12 +241,12 @@ class LegendTreeNode(Struct):
     is_group: bool
     is_legend: bool
     children: list[LegendTreeNodeAlias]
-    icon: Union[str, UnsetType] = UNSET
+    icon: str | UnsetType = UNSET
 
 
 class LegendElement(ElementSize):
     legend_columns: Annotated[int, Meta()]
-    legend_items: Union[list[LegendTreeNode], UnsetType] = UNSET
+    legend_items: list[LegendTreeNode] | UnsetType = UNSET
 
 
 class MapContent(ElementSize):
@@ -259,8 +259,8 @@ class PrintBody(Struct):
     margin: Annotated[int, Meta(ge=0)]
     map: MapContent
     format: PrintFormat
-    legend: Union[LegendElement, UnsetType] = UNSET
-    title: Union[ElementContent, UnsetType] = UNSET
+    legend: LegendElement | UnsetType = UNSET
+    title: ElementContent | UnsetType = UNSET
 
 
 class LegendViewModel(Struct):
@@ -268,7 +268,7 @@ class LegendViewModel(Struct):
     level: int
     group: bool
     legend: bool
-    icon: Union[str, UnsetType] = UNSET
+    icon: str | UnsetType = UNSET
 
 
 def to_legend_view_model(legend_node: LegendTreeNode, level: int) -> LegendViewModel:
@@ -492,27 +492,27 @@ class LayerItemConfig(BaseItem, tag="layer", tag_field="type"):
     styleId: int
     visibility: bool
     identifiable: bool
-    transparency: Union[float, None]
-    minScaleDenom: Union[float, None]
-    maxScaleDenom: Union[float, None]
-    drawOrderPosition: Union[int, None]
+    transparency: float | None
+    minScaleDenom: float | None
+    maxScaleDenom: float | None
+    drawOrderPosition: int | None
     legendInfo: LegendInfo
     adapter: str
     plugin: dict[str, Any]
-    minResolution: Union[float, None] = None
-    maxResolution: Union[float, None] = None
-    editable: Union[bool, None] = None
-    identification: Union[LayerIdentification, None] = None
+    minResolution: float | None = None
+    maxResolution: float | None = None
+    editable: bool | None = None
+    identification: LayerIdentification | None = None
 
 
 class GroupItemConfig(BaseItem, tag="group", tag_field="type"):
     expanded: bool
     exclusive: bool
-    children: list[Union["GroupItemConfig", LayerItemConfig]]
+    children: "list[GroupItemConfig | LayerItemConfig]"
 
 
 class RootItemConfig(BaseItem, tag="root", tag_field="type"):
-    children: list[Union[GroupItemConfig, LayerItemConfig]]
+    children: list[GroupItemConfig | LayerItemConfig]
 
 
 class DisplayConfig(Struct, kw_only=True):
@@ -520,7 +520,7 @@ class DisplayConfig(Struct, kw_only=True):
     webmapTitle: str
     webmapPlugin: dict[str, Any]
     initialExtent: ExtentWSEN
-    constrainingExtent: Union[ExtentWSEN, None]
+    constrainingExtent: ExtentWSEN | None
     rootItem: RootItemConfig
     checkedItems: set[int]
     expandedItems: set[int]
@@ -529,15 +529,15 @@ class DisplayConfig(Struct, kw_only=True):
     webmapDescription: str
     webmapEditable: bool
     webmapLegendVisible: str
-    drawOrderEnabled: Union[Any, None] = None
-    measureSrsId: Union[int, None] = None
+    drawOrderEnabled: Any | None = None
+    measureSrsId: int | None = None
     # units: str
     printMaxSize: int
-    bookmarkLayerId: Union[Any, None] = None
+    bookmarkLayerId: Any | None = None
     options: dict[str, bool]
 
 
-def _extent_wsen_from_attrs(obj, prefix) -> Union[ExtentWSEN, None]:
+def _extent_wsen_from_attrs(obj, prefix) -> ExtentWSEN | None:
     attrs = tuple((prefix + i) for i in ("left", "bottom", "right", "top"))
     parts = [getattr(obj, a) for a in attrs]
     return ExtentWSEN(*parts) if None not in parts else None

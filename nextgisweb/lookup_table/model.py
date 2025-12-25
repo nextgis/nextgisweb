@@ -93,7 +93,7 @@ class OrderAttr(SAttribute):
     def get(self, srlzr) -> list[str]:
         return [k for k, v in srlzr.obj.value]
 
-    def set(self, srlzr, value: Union[list[str], UnsetType], *, create: bool):
+    def set(self, srlzr, value: list[str] | UnsetType, *, create: bool):
         pass
 
 

@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Union
 
 import geoalchemy2 as ga
 import sqlalchemy as sa
@@ -233,13 +232,13 @@ class RasterMosaicItem(Base):
 
 class RasterMosaicItemRead(Struct, kw_only=True):
     id: int
-    display_name: Union[str, None]
+    display_name: str | None
 
 
 class RasterMosaicItemWrite(Struct, kw_only=True):
-    id: Union[int, UnsetType] = UNSET
-    display_name: Union[str, None, UnsetType] = UNSET
-    file_upload: Union[FileUploadRef, UnsetType] = UNSET
+    id: int | UnsetType = UNSET
+    display_name: str | None | UnsetType = UNSET
+    file_upload: FileUploadRef | UnsetType = UNSET
 
 
 class ItemsAttr(SAttribute):

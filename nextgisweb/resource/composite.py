@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Type, Union
+from typing import Type
 
 from msgspec import UNSET, Struct, UnsetType, convert, defstruct
 
@@ -12,7 +12,7 @@ from .serialize import CRUTypes, Serializer
 
 
 class CompositeSerializer:
-    def __init__(self, *, keys: Union[tuple[str, ...], None] = None, user: User):
+    def __init__(self, *, keys: tuple[str, ...] | None = None, user: User):
         self.user = user
         self.members: tuple[tuple[str, Type[Serializer]], ...] = tuple(
             (identity, srlzrcls)
@@ -69,9 +69,9 @@ class CompositeSerializer:
                 create.append((k, t.create))
                 read.append((k, t.read))
             else:
-                create.append((k, Union[t.create, UnsetType], UNSET))
-                read.append((k, Union[t.read, UnsetType], UNSET))
-            update.append((k, Union[t.update, UnsetType], UNSET))
+                create.append((k, t.create | UnsetType, UNSET))
+                read.append((k, t.read | UnsetType, UNSET))
+            update.append((k, t.update | UnsetType, UNSET))
         return CRUTypes(
             defstruct("CompositeCreate", create),
             defstruct("CompositeRead", read),

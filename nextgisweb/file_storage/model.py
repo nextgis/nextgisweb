@@ -4,7 +4,7 @@ import io
 import uuid
 from pathlib import Path
 from shutil import copyfile, copyfileobj
-from typing import Any, Union
+from typing import Any
 
 import sqlalchemy as sa
 import sqlalchemy.event as sa_event
@@ -57,7 +57,7 @@ class FileObj(Base):
         assert not (not_exists and result.exists())
         return result
 
-    def copy_from(self, source: Union[Path, str, Any]) -> FileObj:
+    def copy_from(self, source: Path | str | Any) -> FileObj:
         dest = self.filename(makedirs=True, not_exists=True)
         if isinstance(source, (str, Path)):
             copyfile(source, dest)

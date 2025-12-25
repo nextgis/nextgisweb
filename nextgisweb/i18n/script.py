@@ -11,7 +11,6 @@ from packaging import version as pkg_version
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 from time import sleep
-from typing import Union
 
 from babel.messages.catalog import Catalog, Message
 from babel.messages.mofile import write_mo
@@ -260,9 +259,9 @@ def cmd_compile(args):
 
 
 class StatRecord(Struct, kw_only=True):
-    package: Union[str, None] = None
-    component: Union[str, None] = None
-    locale: Union[str, None] = None
+    package: str | None = None
+    component: str | None = None
+    locale: str | None = None
 
     count: int = 0
     translated: int = 0

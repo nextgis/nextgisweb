@@ -609,21 +609,21 @@ class WFSLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
 class GeometryTypeAttr(SAttribute):
     ctypes = CRUTypes(
-        Union[FeaureLayerGeometryType, None],
+        FeaureLayerGeometryType | None,
         FeaureLayerGeometryType,
-        Union[FeaureLayerGeometryType, None],
+        FeaureLayerGeometryType | None,
     )
 
 
 class GeometrySridAttr(SAttribute):
-    ctypes = CRUTypes(Union[int, None], int, Union[int, None])
+    ctypes = CRUTypes(int | None, int, int | None)
 
 
 class FieldsAttr(SAttribute):
     def set(
         self,
         srlzr: Serializer,
-        value: Union[Literal["update"], Literal["keep"]],
+        value: Literal["update"] | Literal["keep"],
         *,
         create: bool,
     ):

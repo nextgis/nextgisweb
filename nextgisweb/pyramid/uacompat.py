@@ -1,7 +1,6 @@
 from binascii import crc32
 from dataclasses import dataclass
 from functools import lru_cache
-from typing import Union
 
 from pyramid.events import NewRequest
 from pyramid.httpexceptions import HTTPSeeOther
@@ -18,7 +17,7 @@ FAMILIES = dict()
 class Family:
     identity: str
     alias: str
-    required: Union[int, bool]
+    required: int | bool
 
 
 class VersionOptionType(OptionType):

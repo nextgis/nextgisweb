@@ -1,6 +1,6 @@
 import pickle
 from pathlib import Path
-from typing import Annotated, Union, overload
+from typing import Annotated, overload
 
 from msgspec import UNSET, Meta, Struct, UnsetType
 from ulid import ULID
@@ -58,9 +58,9 @@ class FileUpload:
 
     def __init__(
         self,
-        src: Union[dict, UnsetType] = UNSET,
+        src: dict | UnsetType = UNSET,
         *,
-        id: Union[FileUploadID, UnsetType] = UNSET,
+        id: FileUploadID | UnsetType = UNSET,
         incomplete_ok: bool = False,
         **kwargs,
     ):

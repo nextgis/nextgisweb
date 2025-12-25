@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from inspect import signature
-from typing import Callable, Union
+from typing import Callable
 
 from docstring_parser import parse as docstring_parse
 
@@ -130,7 +130,7 @@ class Group(Command):
 class ArgumentParser(_ArgumentParser):
     def __init__(
         self,
-        cmd_or_grp: Union[Group, Command, None] = None,
+        cmd_or_grp: Group | Command | None = None,
         *args,
         **kwargs,
     ):

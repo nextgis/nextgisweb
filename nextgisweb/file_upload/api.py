@@ -1,7 +1,7 @@
 import re
 from base64 import b64decode
 from shutil import copyfileobj
-from typing import Annotated, Union
+from typing import Annotated
 
 import magic
 import pyramid.httpexceptions as exc
@@ -28,8 +28,8 @@ class UploadedFileTooLarge(UserException):
 class FileUploadObject(Struct, kw_only=True):
     id: FileUploadID
     size: Annotated[int, Meta(ge=0)]
-    name: Union[str, UnsetType] = UNSET
-    mime_type: Union[str, UnsetType] = UNSET
+    name: str | UnsetType = UNSET
+    mime_type: str | UnsetType = UNSET
 
 
 @inject()

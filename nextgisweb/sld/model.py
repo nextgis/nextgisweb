@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Annotated, Union
+from typing import Annotated
 
 import sqlalchemy as sa
 from lxml.builder import ElementMaker
@@ -9,10 +9,10 @@ from msgspec import UNSET, Meta, Struct, UnsetType, convert, to_builtins
 from nextgisweb.env import Base
 from nextgisweb.lib.saext import Msgspec
 
-Color = Union[Annotated[str, Meta(pattern=r"#[0-9A-F]{6}")], UnsetType]
-Opacity = Union[Annotated[float, Meta(ge=0, le=1)], UnsetType]
-Size = Union[Annotated[float, Meta(ge=0)], UnsetType]
-DashPattern = Union[Annotated[list[Annotated[float, Meta(ge=0)]], Meta(min_length=2)], UnsetType]
+Color = Annotated[str, Meta(pattern=r"#[0-9A-F]{6}")] | UnsetType
+Opacity = Annotated[float, Meta(ge=0, le=1)] | UnsetType
+Size = Annotated[float, Meta(ge=0)] | UnsetType
+DashPattern = Annotated[list[Annotated[float, Meta(ge=0)]], Meta(min_length=2)] | UnsetType
 
 NS_SLD = "http://www.opengis.net/sld"
 
@@ -71,9 +71,9 @@ class WellKnownName(Enum):
 
 
 class Mark(Struct):
-    well_known_name: Union[WellKnownName, UnsetType] = UNSET
-    fill: Union[Fill, UnsetType] = UNSET
-    stroke: Union[Stroke, UnsetType] = UNSET
+    well_known_name: WellKnownName | UnsetType = UNSET
+    fill: Fill | UnsetType = UNSET
+    stroke: Stroke | UnsetType = UNSET
 
     def xml(self):
         _mark = E.Mark()
@@ -88,7 +88,7 @@ class Mark(Struct):
 
 class Graphic(Struct):
     opacity: Opacity = UNSET
-    mark: Union[Mark, UnsetType] = UNSET
+    mark: Mark | UnsetType = UNSET
     size: Size = UNSET
 
     def xml(self):
@@ -117,8 +117,8 @@ class LineSymbolizer(Struct, tag="line"):
 
 
 class PolygonSymbolizer(Struct, tag="polygon"):
-    stroke: Union[Stroke, UnsetType] = UNSET
-    fill: Union[Fill, UnsetType] = UNSET
+    stroke: Stroke | UnsetType = UNSET
+    fill: Fill | UnsetType = UNSET
 
     def xml_items(self):
         result = []
@@ -164,13 +164,13 @@ class ContrastEnhancement(Struct):
 
 class Channel(Struct):
     source_channel: int
-    contrast_enhancement: Union[ContrastEnhancement, UnsetType] = UNSET
+    contrast_enhancement: ContrastEnhancement | UnsetType = UNSET
 
 
 class Channels(Struct):
-    red: Union[Channel, UnsetType] = UNSET
-    green: Union[Channel, UnsetType] = UNSET
-    blue: Union[Channel, UnsetType] = UNSET
+    red: Channel | UnsetType = UNSET
+    green: Channel | UnsetType = UNSET
+    blue: Channel | UnsetType = UNSET
 
     def xml(self):
         _channel_selection = E.ChannelSelection()
@@ -198,7 +198,7 @@ class RasterSymbolizer(Struct, tag="raster"):
         return [_raster_symbolizer]
 
 
-Symbolizer = Union[PointSymbolizer, LineSymbolizer, PolygonSymbolizer, RasterSymbolizer]
+Symbolizer = PointSymbolizer | LineSymbolizer | PolygonSymbolizer | RasterSymbolizer
 
 
 class Rule(Struct):

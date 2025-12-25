@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from contextlib import contextmanager
-from typing import Annotated, Any, Literal, TypeVar, Union
+from typing import Annotated, Any, Literal, TypeVar
 
 import sqlalchemy as sa
 import sqlalchemy.event as sa_event
@@ -34,7 +34,7 @@ class FVersioningMixin:
         )
 
     @property
-    def fversioning_vobj(self) -> Union[FVersioningObj, None]:
+    def fversioning_vobj(self) -> FVersioningObj | None:
         if fversioning := self.fversioning:
             return fversioning.vobj
         return None
@@ -311,7 +311,7 @@ class OperationFieldValue(Struct, array_like=True, forbid_unknown_fields=True):
 
 
 Geom = Annotated[
-    Union[bytes, None],
+    bytes | None,
     Meta(
         description="WKB-encoded geometry or NULL if feature geometry was "
         "modified during update or specified during creation. NULL geometries "
@@ -332,8 +332,8 @@ Fields = Annotated[
 class FeatureCreate(Struct, kw_only=True, tag="feature.create", tag_field="action"):
     fid: FeatureID
     vid: VersionID
-    geom: Union[Geom, UnsetType] = UNSET
-    fields: Union[Fields, UnsetType] = UNSET
+    geom: Geom | UnsetType = UNSET
+    fields: Fields | UnsetType = UNSET
 
 
 @register_change
@@ -341,8 +341,8 @@ class FeatureCreate(Struct, kw_only=True, tag="feature.create", tag_field="actio
 class FeatureUpdate(Struct, kw_only=True, tag="feature.update", tag_field="action"):
     fid: FeatureID
     vid: VersionID
-    geom: Union[Geom, UnsetType] = UNSET
-    fields: Union[Fields, UnsetType] = UNSET
+    geom: Geom | UnsetType = UNSET
+    fields: Fields | UnsetType = UNSET
 
 
 @register_change
@@ -357,8 +357,8 @@ class FeatureDelete(Struct, kw_only=True, tag="feature.delete", tag_field="actio
 class FeatureRestore(Struct, kw_only=True, tag="feature.restore", tag_field="action"):
     fid: FeatureID
     vid: VersionID
-    geom: Union[Geom, UnsetType] = UNSET
-    fields: Union[Fields, UnsetType] = UNSET
+    geom: Geom | UnsetType = UNSET
+    fields: Fields | UnsetType = UNSET
 
 
 @Principal.on_find_references.handler

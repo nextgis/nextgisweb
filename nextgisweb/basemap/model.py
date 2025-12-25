@@ -1,4 +1,4 @@
-from typing import Annotated, Union
+from typing import Annotated
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
@@ -94,14 +94,14 @@ class BasemapWebMapItemRead(Struct, kw_only=True):
     resource_id: int
     display_name: Annotated[str, Meta(min_length=1)]
     enabled: bool
-    opacity: Union[OpacityFloat, None]
+    opacity: OpacityFloat | None
 
 
 class BasemapWebMapItemWrite(Struct, kw_only=True):
     resource_id: int
     display_name: Annotated[str, Meta(min_length=1)]
-    enabled: Union[bool, UnsetType] = UNSET
-    opacity: Union[OpacityFloat, None, UnsetType] = UNSET
+    enabled: bool | UnsetType = UNSET
+    opacity: OpacityFloat | None | UnsetType = UNSET
 
 
 class BasemapsAttr(SAttribute):

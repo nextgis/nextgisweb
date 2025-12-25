@@ -2,7 +2,7 @@ from io import BytesIO
 from itertools import product
 from math import ceil, floor
 from pathlib import Path
-from typing import Annotated, Literal, Union
+from typing import Annotated, Literal
 
 from msgspec import UNSET, Meta, Struct, UnsetType
 from PIL import Image, ImageDraw, ImageFont
@@ -453,7 +453,7 @@ class LegendIcon(Struct, kw_only=True):
 
 class LegendSymbol(Struct, kw_only=True):
     index: int
-    render: Union[bool, None]
+    render: bool | None
     display_name: str
     icon: LegendIcon
 
@@ -473,7 +473,7 @@ class LegendSymbol(Struct, kw_only=True):
 class ResourceLegendSymbolsItem(Struct, kw_only=True):
     resource: ResourceRef
     legend_symbols: Annotated[
-        Union[list[LegendSymbol], UnsetType],
+        list[LegendSymbol] | UnsetType,
         Meta(description="Resource legend symbols if available"),
     ] = UNSET
 

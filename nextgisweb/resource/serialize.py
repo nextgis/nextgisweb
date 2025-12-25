@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import re
 from collections.abc import Mapping
-from typing import Any, ClassVar, Literal, Type, Union, cast, get_type_hints
+from typing import Any, ClassVar, Literal, Type, cast, get_type_hints
 from warnings import warn
 
 from msgspec import UNSET, Struct, UnsetType, defstruct
@@ -31,15 +31,15 @@ class Serializer:
     identity: ClassVar[str]
     resclass: ClassVar[Type[model.Resource]]
     proptab: ClassVar[tuple[tuple[str, SAttribute], ...]]
-    model_prefix: ClassVar[Union[str, None]]
+    model_prefix: ClassVar[str | None]
     create: ClassVar[bool]
 
     def __init_subclass__(
         cls,
         *,
         resource: Type[model.Resource],
-        model_prefix: Union[str, None] = None,
-        force_create: Union[Literal[True], None] = None,
+        model_prefix: str | None = None,
+        force_create: Literal[True] | None = None,
     ):
         super().__init_subclass__()
 
@@ -109,7 +109,7 @@ class Serializer:
             pt = pv.types
             if pv.write is not None:
                 if not getattr(pv, "required", False):
-                    fcreate.append((pn, Union[pt.create, UnsetType], UNSET))
+                    fcreate.append((pn, pt.create | UnsetType, UNSET))
                 elif UnsetType in decompose_union(pt.create):
                     fcreate.append((pn, pt.create, UNSET))
                 else:
@@ -125,12 +125,12 @@ class Serializer:
                     else:
                         fread.append((pn, pt.read))
                 else:
-                    fread.append((pn, Union[pt.read, UnsetType], UNSET))
+                    fread.append((pn, pt.read | UnsetType, UNSET))
             if pv.write is not None:
                 # Any attribute can be ommited during update. Attributes of
                 # UnsetType are skipped entirely.
                 if pt.update != UnsetType:
-                    fupdate.append((pn, Union[pt.update, UnsetType], UNSET))
+                    fupdate.append((pn, pt.update | UnsetType, UNSET))
 
         skwa: Any = dict(kw_only=True, module=cls.__module__)
         return CRUTypes(
@@ -150,14 +150,14 @@ class Serializer:
 
 
 class SAttribute:
-    ctypes: ClassVar[Union[CRUTypes, None]] = None
+    ctypes: ClassVar[CRUTypes | None] = None
 
     srlzrcls: Type[Serializer]
     attrname: str
     model_attr: str
     types: CRUTypes
 
-    def __init_subclass__(cls, apitype: Union[bool, None] = None) -> None:
+    def __init_subclass__(cls, apitype: bool | None = None) -> None:
         assert (apitype is None) or (apitype is True)
 
         super().__init_subclass__()
@@ -171,10 +171,10 @@ class SAttribute:
 
     def __init__(
         self,
-        read: Union[Permission, None] = None,
-        write: Union[Permission, None] = None,
-        required: Union[bool, None] = None,
-        model_attr: Union[str, None] = None,
+        read: Permission | None = None,
+        write: Permission | None = None,
+        required: bool | None = None,
+        model_attr: str | None = None,
     ):
         self.read = read
         self.write = write

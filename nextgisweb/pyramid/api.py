@@ -2,7 +2,7 @@ import re
 from datetime import datetime
 from enum import Enum
 from inspect import Parameter, signature
-from typing import TYPE_CHECKING, Annotated, Any, ClassVar, Literal, Type, Union
+from typing import TYPE_CHECKING, Annotated, Any, ClassVar, Literal, Type
 
 from msgspec import UNSET, Meta, Struct, UnsetType, convert, defstruct, field, to_builtins
 from pyramid.interfaces import IRoutesMapper
@@ -302,7 +302,7 @@ def storage(request, *, core: CoreComponent) -> StorageResponse:
     return StorageResponse(**{k: StorageValue(**v) for k, v in data.items()})
 
 
-def font_cread(request) -> AsJSON[list[Union[SystemFont, CustomFont]]]:
+def font_cread(request) -> AsJSON[list[SystemFont | CustomFont]]:
     """Get information about available fonts"""
     request.require_administrator()
     unordered = request.env.core.fontconfig.enumerate()
@@ -389,20 +389,20 @@ class csetting:
     read: Permission | None
     write: Permission | None
     skey: tuple[str, str]
-    ckey: Union[bool, tuple[str, str]]
+    ckey: bool | tuple[str, str]
 
     registry: ClassVar[dict[str, dict[str, "csetting"]]] = dict()
 
     def __init__(
         self,
         name: str,
-        type: Union[Any, tuple[Any, Any]],
+        type: Any | tuple[Any, Any],
         *,
         default: Any = None,
         read: Permission | None = None,
         write: Permission | None = None,
         skey: tuple[str, str] | None = None,
-        ckey: Union[bool, tuple[str, str]] | None = None,
+        ckey: bool | tuple[str, str] | None = None,
         register: bool = True,
         stacklevel: int = 0,
     ):
@@ -473,8 +473,8 @@ class csetting:
 
 def setup_pyramid_csettings(comp, config):
     NoneDefault = Annotated[None, Meta(description="Resets the setting to its default value.")]
-    fld_unset = lambda n, t: (n, Union[t, UnsetType], UNSET)
-    fld_reset = lambda n, t: (n, Union[t, NoneDefault, UnsetType], UNSET)
+    fld_unset = lambda n, t: (n, t | UnsetType, UNSET)
+    fld_reset = lambda n, t: (n, t | NoneDefault | UnsetType, UNSET)
 
     rfields, ufields = list(), list()
     getters, setters = dict(), dict()
@@ -684,8 +684,8 @@ class YandexMetrica(Struct):
 
 
 class Metrics(Struct):
-    google_analytics: Union[GoogleAnalytics, UnsetType] = UNSET
-    yandex_metrica: Union[YandexMetrica, UnsetType] = UNSET
+    google_analytics: GoogleAnalytics | UnsetType = UNSET
+    yandex_metrica: YandexMetrica | UnsetType = UNSET
 
 
 csetting("full_name", str | None, skey=("core", "system.full_name"))
@@ -763,13 +763,11 @@ def setup_pyramid(comp, config):
             [
                 (
                     "total",
-                    Annotated[
-                        Union[StorageValue, UnsetType], Meta(description="Total storage usage")
-                    ],
+                    Annotated[StorageValue | UnsetType, Meta(description="Total storage usage")],
                     UNSET,
                 )
             ]
-            + [(i, Union[StorageValue, UnsetType], UNSET) for i in KindOfData.registry.keys()],
+            + [(i, StorageValue | UnsetType, UNSET) for i in KindOfData.registry.keys()],
             kw_only=True,
             rename={"total": ""},
         ),

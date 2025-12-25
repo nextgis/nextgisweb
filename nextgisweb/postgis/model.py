@@ -1,7 +1,7 @@
 import re
 from contextlib import contextmanager
 from enum import Enum
-from typing import Literal, Union
+from typing import Literal
 
 import sqlalchemy as sa
 import sqlalchemy.event as sa_event
@@ -233,7 +233,7 @@ class PostgisConnection(Base, Resource):
 
 
 class SSLModeAttr(SColumn):
-    ctypes = CRUTypes(Union[SSLMode, None], Union[SSLMode, None], Union[SSLMode, None])
+    ctypes = CRUTypes(SSLMode | None, SSLMode | None, SSLMode | None)
 
 
 class PostgisConnectionSerializer(Serializer, resource=PostgisConnection):
@@ -559,21 +559,21 @@ DataScope.read.require(ConnectionScope.connect, attr="connection", cls=PostgisLa
 
 class GeometryTypeAttr(SAttribute):
     ctypes = CRUTypes(
-        Union[FeaureLayerGeometryType, None],
+        FeaureLayerGeometryType | None,
         FeaureLayerGeometryType,
-        Union[FeaureLayerGeometryType, None],
+        FeaureLayerGeometryType | None,
     )
 
 
 class GeometrySridAttr(SAttribute):
-    ctypes = CRUTypes(Union[int, None], int, Union[int, None])
+    ctypes = CRUTypes(int | None, int, int | None)
 
 
 class FieldsAttr(SAttribute):
     def set(
         self,
         srlzr: Serializer,
-        value: Union[Literal["update"], Literal["keep"]],
+        value: Literal["update"] | Literal["keep"],
         *,
         create: bool,
     ):

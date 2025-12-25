@@ -62,7 +62,7 @@ class TransactionFactory(ResourceFactory):
 
 
 class TransactionCreateBody(Struct, kw_only=True):
-    epoch: Union[int, UnsetType] = UNSET
+    epoch: int | UnsetType = UNSET
 
 
 class TransactionCreatedResponse(Struct, kw_only=True):
@@ -152,7 +152,7 @@ class CommitSuccess(Struct, kw_only=True, tag="committed", tag_field="status"):
     committed: Commited
 
 
-def ipost(txn: Transaction, request) -> AsJSON[Union[CommitErrors, CommitSuccess]]:
+def ipost(txn: Transaction, request) -> AsJSON[CommitErrors | CommitSuccess]:
     """Commit transaction"""
 
     if txn.committed:

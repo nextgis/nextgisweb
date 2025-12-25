@@ -2,7 +2,6 @@ from base64 import b64decode
 from contextlib import contextmanager
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Union
 
 import sqlalchemy as sa
 from msgspec import Struct, convert, to_builtins
@@ -53,7 +52,7 @@ class AuthState(Struct, omit_defaults=True):
     prv: AuthProvider
     uid: int
     exp: int
-    ref: Union[int, None] = None
+    ref: int | None = None
 
     @classmethod
     def from_dict(cls, data):

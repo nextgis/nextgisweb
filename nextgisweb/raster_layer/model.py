@@ -4,7 +4,7 @@ import subprocess
 from functools import cached_property
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import Literal, Union
+from typing import Literal
 from zipfile import ZipFile, is_zipfile
 
 import sqlalchemy as sa
@@ -483,9 +483,9 @@ class SourceAttr(SAttribute):
 
 
 class CogAttr(SColumn):
-    ctypes = CRUTypes(Union[bool, None], bool, Union[bool, None])
+    ctypes = CRUTypes(bool | None, bool, bool | None)
 
-    def set(self, srlzr: Serializer, value: Union[bool, None], *, create: bool):
+    def set(self, srlzr: Serializer, value: bool | None, *, create: bool):
         if srlzr.data.source is not UNSET or create:
             return  # Just do nothing, SourceAttr will set the cog attribute
 

@@ -1,5 +1,5 @@
 from packaging import version
-from typing import Annotated, Union
+from typing import Annotated
 from uuid import uuid4
 
 from msgspec import UNSET, Meta, UnsetType
@@ -44,7 +44,7 @@ def mvt(
     x: TileX,
     y: TileY,
     extent: int = 4096,
-    simplification: Union[float, UnsetType] = UNSET,
+    simplification: float | UnsetType = UNSET,
     padding: Annotated[float, Meta(ge=0, le=0.5)] = 0.05,
 ) -> AnyOf[
     Annotated[None, ContentType("application/vnd.mapbox-vector-tile")],

@@ -83,7 +83,7 @@ def union(t: Sequence[Any]) -> Any:
     return t[0] if len(t) == 1 else Union[tuple(t)]  # type: ignore
 
 
-def eslint_disable(rules: Union[Sequence[str], bool]) -> list[str]:
+def eslint_disable(rules: Sequence[str] | bool) -> list[str]:
     result: list[str] = []
 
     if rules is False:
@@ -117,7 +117,7 @@ def api_type_module(config) -> str:
 
             op = Operation(
                 query={
-                    p.name: p.type if (p.default is NODEFAULT) else Union[(p.type, UnsetType)]
+                    p.name: p.type if (p.default is NODEFAULT) else (p.type | UnsetType)
                     for p in chain(*(p.spreaded for p in iview.query_params.values()))
                 }
             )
@@ -178,7 +178,7 @@ def dynmenu(config) -> str:
     tsgen.add(dm.Label.JSON, export=(route_tsmodule, "DynMenuLabel"))
     tsgen.add(dm.Link.JSON, export=(route_tsmodule, "DynMenuLink"))
     tsgen.add(
-        Union[dm.Label.JSON, dm.Link.JSON],
+        dm.Label.JSON | dm.Link.JSON,
         export=(route_tsmodule, "DynMenuItem"),
     )
 

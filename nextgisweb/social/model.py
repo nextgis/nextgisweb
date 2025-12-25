@@ -1,5 +1,4 @@
 from io import BytesIO
-from typing import Union
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
@@ -35,7 +34,7 @@ class ResourceSocial(Base):
 
 
 class FileUploadAttr(SAttribute):
-    def set(self, srlzr, value: Union[FileUploadRef, None], *, create: bool):
+    def set(self, srlzr, value: FileUploadRef | None, *, create: bool):
         if srlzr.obj.social is None:
             srlzr.obj.social = ResourceSocial()
 
@@ -65,11 +64,11 @@ class ImageExistsAttr(SAttribute):
 
 
 class DescriptionAttr(SAttribute):
-    def get(self, srlzr) -> Union[str, None]:
+    def get(self, srlzr) -> str | None:
         social = srlzr.obj.social
         return social.preview_description if social is not None else None
 
-    def set(self, srlzr, value: Union[str, None], *, create: bool):
+    def set(self, srlzr, value: str | None, *, create: bool):
         if srlzr.obj.social is None:
             srlzr.obj.social = ResourceSocial()
         srlzr.obj.social.preview_description = value

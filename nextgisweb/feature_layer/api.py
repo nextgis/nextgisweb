@@ -2,7 +2,7 @@ import re
 from contextlib import contextmanager
 from dataclasses import dataclass
 from functools import cached_property, partial
-from typing import Annotated, Any, Literal, Union
+from typing import Annotated, Any, Literal
 
 from msgspec import UNSET, Meta, Struct, UnsetType
 from sqlalchemy.exc import NoResultFound
@@ -52,9 +52,9 @@ ParamBigIntFormat = Annotated[
     BigIntFormat,
     Meta(description="Big integer serialization format"),
 ]
-ParamSrs = Union[Annotated[int, Meta(gt=0)], None]
+ParamSrs = Annotated[int, Meta(gt=0)] | None
 
-csetting("versioning_default", Union[bool, None], default=None)
+csetting("versioning_default", bool | None, default=None)
 
 
 class LoaderParams(Struct, kw_only=True):
@@ -144,16 +144,16 @@ class DumperParams(Struct, kw_only=True):
     dt_format: ParamDtFormat = "obj"
     bigint_format: ParamBigIntFormat = "compat"
     fields: Annotated[
-        Union[list[str], None],
+        list[str] | None,
         Meta(description="Field keynames to return, all fields returned by default"),
     ] = None
     extensions: Annotated[
-        Union[list[str], None],
+        list[str] | None,
         Meta(description="Extensions to return, all extensions returned by default"),
     ] = None
     srs: Annotated[ParamSrs, Meta(description="SRS ID of output geometry")] = None
-    version: Union[Annotated[int, Meta(gt=0)], None] = None
-    epoch: Union[Annotated[int, Meta(gt=0)], None] = None
+    version: Annotated[int, Meta(gt=0)] | None = None
+    epoch: Annotated[int, Meta(gt=0)] | None = None
 
 
 @dataclass
@@ -300,7 +300,7 @@ def iget(
 
 class FeatureChangeResult(Struct, kw_only=True):
     id: FeatureID
-    version: Union[int, UnsetType] = UNSET
+    version: int | UnsetType = UNSET
 
     def version_from(self, vobj):
         if vobj:
@@ -465,12 +465,10 @@ def cget(
     request,
     *,
     dumper_params: Annotated[DumperParams, Query(spread=True)],
-    order_by: Union[str, None] = None,
-    limit: Union[Annotated[int, Meta(ge=0)], None] = None,
+    order_by: str | None = None,
+    limit: Annotated[int, Meta(ge=0)] | None = None,
     offset: Annotated[int, Meta(ge=0)] = 0,
-    filter: Annotated[
-        Union[str, None], Meta(description="Filter expression (JSON string)")
-    ] = None,
+    filter: Annotated[str | None, Meta(description="Filter expression (JSON string)")] = None,
 ) -> JSONType:
     """Read features"""
     request.resource_permission(DataScope.read)
@@ -601,18 +599,16 @@ def has_filters(request, filter):
 
 class CountResponse(Struct, kw_only=True):
     total_count: Annotated[int, Meta(description="Total number of features")]
-    filtered_count: Annotated[
-        Union[int, UnsetType], Meta(description="Filtered number of features")
-    ] = UNSET
+    filtered_count: Annotated[int | UnsetType, Meta(description="Filtered number of features")] = (
+        UNSET
+    )
 
 
 def count(
     resource,
     request,
     *,
-    filter: Annotated[
-        Union[str, None], Meta(description="Filter expression (JSON string)")
-    ] = None,
+    filter: Annotated[str | None, Meta(description="Filter expression (JSON string)")] = None,
 ) -> CountResponse:
     request.resource_permission(DataScope.read)
 
@@ -639,7 +635,7 @@ class NgwExtent(Struct):
 
 
 class FeatureItemExtent(Struct, kw_only=True):
-    extent: Union[NgwExtent, None]
+    extent: NgwExtent | None
 
 
 def iextent(resource, request, fid: FeatureID) -> FeatureItemExtent:

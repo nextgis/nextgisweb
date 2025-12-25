@@ -1,5 +1,3 @@
-from typing import Union
-
 from msgspec import Struct
 
 from nextgisweb.env import Component, require
@@ -10,12 +8,12 @@ class BasemapConfig(Struct):
     keyname: str
     display_name: str
     url: str
-    copyright_text: Union[str, None]
-    copyright_url: Union[str, None]
-    enabled: Union[bool, None]
-    epsg: Union[str, None] = None
-    z_max: Union[int, None] = None
-    z_min: Union[int, None] = None
+    copyright_text: str | None
+    copyright_url: str | None
+    enabled: bool | None
+    epsg: str | None = None
+    z_max: int | None = None
+    z_min: int | None = None
 
 
 class BasemapComponent(Component):

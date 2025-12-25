@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from functools import partial
 from sys import _getframe
-from typing import Any, Protocol, Union
+from typing import Any, Protocol
 from warnings import warn_explicit
 
 from ..logging import logger
@@ -18,16 +18,16 @@ class Translator(Protocol):
         self,
         msg: str,
         *,
-        plural: Union[str, None] = None,
-        number: Union[int, None] = None,
-        context: Union[str, None] = None,
+        plural: str | None = None,
+        number: int | None = None,
+        context: str | None = None,
         domain: str,
     ) -> str: ...
 
 
-TranslatableOrStr = Union[Translatable, str]
-ModScalar = Union[int, float, TranslatableOrStr]
-ModArgument = Union[ModScalar, tuple[ModScalar], Mapping[str, ModScalar]]
+TranslatableOrStr = Translatable | str
+ModScalar = int | float | TranslatableOrStr
+ModArgument = ModScalar | tuple[ModScalar] | Mapping[str, ModScalar]
 
 
 class TrStr(Translatable):
@@ -37,9 +37,9 @@ class TrStr(Translatable):
         self,
         msg: str,
         *,
-        plural: Union[str, None] = None,
-        number: Union[int, None] = None,
-        context: Union[str, None] = None,
+        plural: str | None = None,
+        number: int | None = None,
+        context: str | None = None,
         domain: str,
         stacklevel: int = 1,
     ):
@@ -119,9 +119,9 @@ class TrTpl(Translatable):
         self,
         msg: str,
         *,
-        plural: Union[str, None] = None,
-        number: Union[int, None] = None,
-        context: Union[str, None] = None,
+        plural: str | None = None,
+        number: int | None = None,
+        context: str | None = None,
         domain: str,
     ):
         self.msg = msg

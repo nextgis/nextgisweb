@@ -1,4 +1,4 @@
-from typing import Annotated, Union
+from typing import Annotated
 
 import pytest
 
@@ -11,7 +11,7 @@ from ..util import annotate, disannotate, unannotate
         [str, str, ()],
         [str, Annotated[str, 1, 2], (1, 2)],
         [str, Annotated[Annotated[str, 1], 2], (1, 2)],
-        [Union[str, int], Annotated[Union[str, int], 1, 2], (1, 2)],
+        [str | int, Annotated[str | int, 1, 2], (1, 2)],
     ],
 )
 def test_annotated(origin, tdef, annotations):

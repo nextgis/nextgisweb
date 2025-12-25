@@ -1,4 +1,4 @@
-from typing import Annotated, Union
+from typing import Annotated
 
 from msgspec import UNSET, Meta, Struct, UnsetType
 from msgspec.structs import asdict
@@ -87,12 +87,12 @@ def inspect_table(request) -> AsJSON[list[ColumnObject]]:
 
 
 class ConnectionObject(Struct):
-    id: Union[Annotated[int, Meta(ge=0)], UnsetType] = UNSET
-    hostname: Union[str, UnsetType] = UNSET
-    port: Union[int, UnsetType] = UNSET
-    database: Union[str, UnsetType] = UNSET
-    username: Union[str, UnsetType] = UNSET
-    password: Union[str, UnsetType] = UNSET
+    id: Annotated[int, Meta(ge=0)] | UnsetType = UNSET
+    hostname: str | UnsetType = UNSET
+    port: int | UnsetType = UNSET
+    database: str | UnsetType = UNSET
+    username: str | UnsetType = UNSET
+    password: str | UnsetType = UNSET
 
 
 class FieldObject(Struct):
@@ -102,35 +102,35 @@ class FieldObject(Struct):
 
 
 class LayerObject(Struct):
-    id: Union[Annotated[int, Meta(ge=0)], UnsetType] = UNSET
-    schema: Union[str, UnsetType] = UNSET
-    table: Union[str, UnsetType] = UNSET
-    column_id: Union[str, UnsetType] = UNSET
-    column_geom: Union[str, UnsetType] = UNSET
-    geometry_type: Union[str, UnsetType] = UNSET
-    geometry_srid: Union[int, UnsetType] = UNSET
-    fields: Union[list[FieldObject], UnsetType] = UNSET
+    id: Annotated[int, Meta(ge=0)] | UnsetType = UNSET
+    schema: str | UnsetType = UNSET
+    table: str | UnsetType = UNSET
+    column_id: str | UnsetType = UNSET
+    column_geom: str | UnsetType = UNSET
+    geometry_type: str | UnsetType = UNSET
+    geometry_srid: int | UnsetType = UNSET
+    fields: list[FieldObject] | UnsetType = UNSET
 
 
 class CheckBody(Struct, kw_only=True):
-    connection: Union[ConnectionObject, None] = None
-    layer: Union[LayerObject, None] = None
+    connection: ConnectionObject | None = None
+    layer: LayerObject | None = None
 
 
 class CheckMessage(Struct, kw_only=True):
-    status: Union[StatusEnum, None] = None
-    text: Union[str, UnsetType] = UNSET
+    status: StatusEnum | None = None
+    text: str | UnsetType = UNSET
 
 
 class CheckResult(Struct, kw_only=True):
     status: StatusEnum
     group: str
-    title: Union[str, UnsetType] = UNSET
+    title: str | UnsetType = UNSET
     messages: list[CheckMessage]
 
 
 class CheckResponse(Struct, kw_only=True):
-    status: Union[StatusEnum, None]
+    status: StatusEnum | None
     checks: list[CheckResult]
 
 
