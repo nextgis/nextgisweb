@@ -1,5 +1,6 @@
 import { action, computed, observable } from "mobx";
 
+import settings from "@nextgisweb/feature-layer/client-settings";
 import type { FeatureLayerRead } from "@nextgisweb/feature-layer/type/api";
 import type { EditorStore } from "@nextgisweb/resource/type";
 
@@ -10,7 +11,7 @@ export class SettingStore implements EditorStore<Value> {
 
     @observable.ref accessor dirty = false;
 
-    @observable.ref accessor versioningEnabled = false;
+    @observable.ref accessor versioningEnabled = settings.versioning.default;
     @observable.ref accessor versioningExisting = false;
 
     @action

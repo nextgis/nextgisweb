@@ -505,10 +505,9 @@ class TileCacheSerializer(Serializer, resource=Resource):
     max_z = TileCacheAttr(read=ResourceScope.read, write=ResourceScope.update)
     ttl = TileCacheAttr(read=ResourceScope.read, write=ResourceScope.update)
 
-    def is_applicable(self):
-        return IRenderableStyle.providedBy(self.obj) and not IRenderableNonCached.providedBy(
-            self.obj
-        )
+    @classmethod
+    def is_applicable(cls, obj):
+        return IRenderableStyle.providedBy(obj) and not IRenderableNonCached.providedBy(obj)
 
     def deserialize(self):
         super().deserialize()

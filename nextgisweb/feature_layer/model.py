@@ -7,7 +7,7 @@ from osgeo import ogr
 from sqlalchemy.ext.orderinglist import ordering_list
 from sqlalchemy.orm import declared_attr
 
-from nextgisweb.env import Base, gettext
+from nextgisweb.env import Base, env, gettext
 from nextgisweb.lib import saext
 from nextgisweb.lib.geometry import Transformer
 
@@ -253,11 +253,21 @@ class FVersioningAttr(SAttribute):
                 obj.fversioning_configure(enabled=value.enabled, source=srlzr)
 
 
-class FeatureLayerSerializer(Serializer, resource=LayerFieldsMixin):
+class FeatureLayerSerializer(Serializer, resource=LayerFieldsMixin, force_create=True):
     identity = "feature_layer"
 
     fields = FieldsAttr(read=ResourceScope.read, write=ResourceScope.update)
     versioning = FVersioningAttr(read=ResourceScope.read, write=ResourceScope.update)
+
+    def deserialize(self):
+        if self.obj.id is None and IVersionableFeatureLayer.providedBy(self.obj):
+            fv = self.data.versioning
+            if fv is UNSET:
+                fv = self.data.versioning = FVersioningUpdate()
+            if fv.enabled is UNSET:
+                fv.enabled = env.feature_layer.versioning_default
+
+        super().deserialize()
 
 
 class FeatureQueryIntersectsMixin:

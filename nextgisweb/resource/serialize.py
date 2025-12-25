@@ -32,17 +32,15 @@ class Serializer:
     resclass: ClassVar[Type[model.Resource]]
     proptab: ClassVar[tuple[tuple[str, SAttribute], ...]]
     model_prefix: ClassVar[Union[str, None]]
+    create: ClassVar[bool]
 
     def __init_subclass__(
         cls,
         *,
-        resource: Union[Type[model.Resource], None] = None,
-        apitype: Union[bool, None] = None,
+        resource: Type[model.Resource],
         model_prefix: Union[str, None] = None,
+        force_create: Union[Literal[True], None] = None,
     ):
-        assert resource is not None
-        assert (apitype is None) or (apitype is True)
-
         super().__init_subclass__()
 
         cls.resclass = resource
@@ -54,19 +52,23 @@ class Serializer:
         cls.model_prefix = model_prefix
 
         proptab = []
+        create = bool(force_create)
         for pn, pv in cls.__dict__.items():
             if isinstance(pv, SAttribute):
                 pv.bind(cls, pn)
                 proptab.append((pn, pv))
+                create = create or bool(pv.required)
         cls.proptab = tuple(proptab)
+        cls.create = create
+
+    @classmethod
+    def is_applicable(cls, obj: model.Resource) -> bool:
+        return isinstance(obj, cls.resclass)
 
     def __init__(self, obj: model.Resource, user: User, data=None):
         self.obj = obj
         self.user = user
         self.data = dict() if data is None else data
-
-    def is_applicable(self) -> bool:
-        return isinstance(self.obj, self.resclass)
 
     def serialize(self) -> None:
         for _, pv in self.proptab:

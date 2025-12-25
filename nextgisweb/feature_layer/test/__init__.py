@@ -1,7 +1,13 @@
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
+from contextlib import contextmanager
 from typing import Literal
+from unittest.mock import PropertyMock, patch
+
+import pytest
+
+from ..component import FeatureLayerComponent
 
 
 class FeatureLayerAPI:
@@ -142,3 +148,26 @@ class TransactionAPI:
     def __exit__(self, exc_type, exc_value, traceback) -> None:
         if self.url:
             self.client.delete(self.url, status=(200, 404))
+
+
+@pytest.fixture(scope="session", autouse=True)
+def ngw_fversioning_default():
+    current = False  # Disable by default in tests
+
+    @contextmanager
+    def override(value: bool):
+        nonlocal current
+        previous = current
+        current = value
+        try:
+            yield
+        finally:
+            current = previous
+
+    with patch.object(
+        FeatureLayerComponent,
+        "versioning_default",
+        new_callable=PropertyMock,
+    ) as mock_versioning_default:
+        mock_versioning_default.side_effect = lambda: current
+        yield override

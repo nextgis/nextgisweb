@@ -8,9 +8,14 @@ interface Exportformat {
     dsco_configurable?: string | null;
 }
 
+interface Versioning {
+    default: boolean;
+}
+
 export interface FeatureLayerSettings {
     export_formats: Exportformat[];
     datatypes: string[];
+    versioning: Versioning;
 }
 
 export default await fetchSettings<FeatureLayerSettings>(COMP_ID);

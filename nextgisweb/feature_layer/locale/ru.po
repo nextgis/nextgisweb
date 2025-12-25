@@ -1,12 +1,12 @@
-#: api.py:111 api_identify.py:27
+#: api.py:114 api_identify.py:27
 msgid "Geometry is not valid."
 msgstr "Невалидная геометрия"
 
-#: api.py:369
+#: api.py:372
 msgid "Unknown spatial reference system"
 msgstr "Неизвестная система координат"
 
-#: api.py:456 api_export.py:212
+#: api.py:459 api_export.py:212
 msgid "Parameter 'intersects' geometry is not valid."
 msgstr "Параметр 'intersects' содержит невалидную геометрию."
 
@@ -152,6 +152,7 @@ msgstr "Zip архив"
 
 #: nodepkg/export-form/ExportForm.tsx:403
 #: nodepkg/feature-editor/FeatureEditorWidget.tsx:41
+#: nodepkg/versioning-settings/VersioningForm.tsx:45
 msgid "Save"
 msgstr "Сохранить"
 
@@ -483,7 +484,7 @@ msgid "Last changed"
 msgstr "Последнее изменение"
 
 #: nodepkg/feature-grid/component/ExportAction.tsx:30 view.py:83 view.py:107
-#: view.py:211
+#: view.py:220
 msgid "Save as"
 msgstr "Сохранить как"
 
@@ -606,6 +607,7 @@ msgid "Extent (yMax)"
 msgstr "Охват (yMax)"
 
 #: nodepkg/settings-widget/SettingsWidget.tsx:11 versioning/model.py:106
+#: view.py:143 view.py:236
 msgid "Feature versioning"
 msgstr "Версионирование объектов"
 
@@ -702,7 +704,7 @@ msgstr "Дата и время"
 msgid "User"
 msgstr "Пользователь"
 
-#: nodepkg/version-history/hook/useColumns.tsx:60 view.py:188
+#: nodepkg/version-history/hook/useColumns.tsx:60 view.py:197
 msgid "Features"
 msgstr "Объекты"
 
@@ -725,6 +727,14 @@ msgstr "Удалено"
 msgctxt "column"
 msgid "Restored"
 msgstr "Востановлено"
+
+#: nodepkg/versioning-settings/VersioningForm.tsx:29
+msgid "Enable by default"
+msgstr "Включить по умолчанию"
+
+#: nodepkg/versioning-settings/VersioningSettings.tsx:49
+msgid "Settings saved"
+msgstr "Настройки сохранены"
 
 #: numutil.py:28
 msgid "The value must be within the inclusive range of {min} to {max}."
@@ -795,7 +805,7 @@ msgstr "Некорректный диапазон"
 msgid "Feature #%d"
 msgstr "Объект #%d"
 
-#: view.py:96 view.py:203
+#: view.py:96 view.py:212
 msgid "Version history"
 msgstr "История изменений"
 
@@ -811,6 +821,6 @@ msgstr ""
 "Векторные тайлы MVT это эффективное кодирование данных карты в векторные "
 "тайлы которые могут быть динамически отрисованы."
 
-#: view.py:193
+#: view.py:202
 msgid "Table"
 msgstr "Таблица"

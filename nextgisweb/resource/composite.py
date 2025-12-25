@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Type, Union
 
-from msgspec import UNSET, Struct, UnsetType, defstruct
+from msgspec import UNSET, Struct, UnsetType, convert, defstruct
 
 from nextgisweb.auth import User
 from nextgisweb.core.exception import IUserException
@@ -23,8 +23,8 @@ class CompositeSerializer:
     def serialize(self, obj: Resource, cls: Type[Struct]) -> Struct:
         result = dict()
         for identity, srlzrcls in self.members:
-            srlzr = srlzrcls(obj, user=self.user, data=None)
-            if srlzr.is_applicable():
+            if srlzrcls.is_applicable(obj):
+                srlzr = srlzrcls(obj, user=self.user, data=None)
                 try:
                     srlzr.serialize()
                     result[identity] = srlzr.data
@@ -35,15 +35,19 @@ class CompositeSerializer:
 
     def deserialize(self, obj: Resource, value: Struct):
         for identity, srlzrcls in self.members:
-            sdata = getattr(value, identity)
-            if sdata is not UNSET and sdata is not None:
+            if srlzrcls.is_applicable(obj):
+                sdata = getattr(value, identity)
+                if sdata is UNSET or sdata is None:
+                    if not (obj.id is None and srlzrcls.create):
+                        continue
+                    sdata = convert(dict(), srlzrcls.types().create)
+
                 srlzr = srlzrcls(obj, user=self.user, data=sdata)
-                if srlzr.is_applicable():
-                    try:
-                        srlzr.deserialize()
-                    except Exception as exc:
-                        self.annotate_exception(exc, srlzr)
-                        raise
+                try:
+                    srlzr.deserialize()
+                except Exception as exc:
+                    self.annotate_exception(exc, srlzr)
+                    raise
 
     def annotate_exception(self, exc, mobj):
         """Adds information about serializer that called the exception to the exception"""

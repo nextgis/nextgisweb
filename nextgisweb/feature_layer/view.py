@@ -136,6 +136,15 @@ def resource_section_fields(obj, **kwargs):
     return IFeatureLayer.providedBy(obj)
 
 
+@react_renderer("@nextgisweb/feature-layer/versioning-settings")
+def versioning_settings(request):
+    request.require_administrator()
+    return dict(
+        title=gettext("Feature versioning"),
+        dynmenu=request.env.pyramid.control_panel,
+    )
+
+
 def setup_pyramid(comp, config):
     config.add_route(
         "feature_layer.export_multiple",
@@ -211,4 +220,19 @@ def setup_pyramid(comp, config):
                 gettext("Save as"),
                 lambda args: args.request.route_url("resource.export.page", id=args.obj.id),
                 icon=icon_export,
+            )
+
+    config.add_route(
+        "feature_layer.control_panel.versioning",
+        "/control-panel/versioning",
+        get=versioning_settings,
+    )
+
+    @comp.env.pyramid.control_panel.add
+    def _control_panel(args):
+        if args.request.user.is_administrator:
+            yield Link(
+                "settings.versioning",
+                gettext("Feature versioning"),
+                lambda args: args.request.route_url("feature_layer.control_panel.versioning"),
             )

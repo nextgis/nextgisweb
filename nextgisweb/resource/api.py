@@ -219,7 +219,10 @@ def collection_post(
 
     resource.persist()
     with DBSession.no_autoflush:
-        serializer.deserialize(resource, body)
+        try:
+            serializer.deserialize(resource, body)
+        except MsgspecValidationError as exc:
+            raise ValidationError(message=exc.args[0]) from exc
 
     DBSession.flush()
 

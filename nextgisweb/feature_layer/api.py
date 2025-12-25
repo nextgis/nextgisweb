@@ -13,6 +13,7 @@ from nextgisweb.lib.geometry import Geometry, GeometryNotValid, Transformer, geo
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.pyramid import JSONType
+from nextgisweb.pyramid.api import csetting
 from nextgisweb.resource import DataScope, Resource, ResourceFactory
 from nextgisweb.spatial_ref_sys import SRS
 
@@ -52,6 +53,8 @@ ParamBigIntFormat = Annotated[
     Meta(description="Big integer serialization format"),
 ]
 ParamSrs = Union[Annotated[int, Meta(gt=0)], None]
+
+csetting("versioning_default", Union[bool, None], default=None)
 
 
 class LoaderParams(Struct, kw_only=True):

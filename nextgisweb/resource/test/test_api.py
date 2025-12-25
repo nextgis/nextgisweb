@@ -68,6 +68,23 @@ def test_disable_resources(disable, ngw_webtest_app, ngw_resource_group):
         create_resource_group("disable.resource_group", 422)
 
 
+@pytest.mark.parametrize("cls", ("vector_layer", "postgis_connection"))
+def test_incomplete_create(request, cls, ngw_resource_group, ngw_webtest_app):
+    # Vector layer and PostGIS connection require some mandatory fields on
+    # creation, and omission of these fields must cause validation errors.
+    ngw_webtest_app.post_json(
+        "/api/resource/",
+        dict(
+            resource=dict(
+                cls=cls,
+                parent=dict(id=ngw_resource_group),
+                display_name=request.node.name,
+            )
+        ),
+        status=422,
+    )
+
+
 @pytest.fixture(scope="module")
 def resource():
     with transaction.manager:
