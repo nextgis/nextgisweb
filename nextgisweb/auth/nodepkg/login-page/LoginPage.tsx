@@ -1,11 +1,10 @@
-import { observer } from "mobx-react-lite";
 import { useEffect } from "react";
 
 import { LoginBox } from "../login";
 import type { LoginFormProps } from "../login/type";
 import { authStore } from "../store";
 
-export const LoginPage = observer((props: LoginFormProps) => {
+export function LoginPage(props: LoginFormProps) {
     useEffect(() => {
         // Do not show new modal on "Sign in" click
         authStore.setShowLoginModal(false);
@@ -23,6 +22,4 @@ export const LoginPage = observer((props: LoginFormProps) => {
             <LoginBox {...props} />
         </div>
     );
-});
-
-LoginPage.displayName = "LoginPage";
+}

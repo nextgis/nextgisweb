@@ -70,7 +70,7 @@ export const LoginForm = observer((props: LoginFormProps) => {
         try {
             const resp = await authStore.login(creds);
             if (props.reloadAfterLogin) {
-                location.reload();
+                location.replace(location.href);
             } else {
                 // Query next param takes precedence over user's home URL.
                 const next = nextQueryParam || resp.home_url || location.origin;
