@@ -573,7 +573,7 @@ class FieldsAttr(SAttribute):
     def set(
         self,
         srlzr: Serializer,
-        value: Literal["update"] | Literal["keep"],
+        value: Literal["update", "keep"],
         *,
         create: bool,
     ):

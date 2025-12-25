@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import date, datetime
-from typing import Annotated, Any, Literal, Union
+from typing import Annotated, Any, Literal
 
 import sqlalchemy as sa
 from msgspec import Struct
@@ -30,7 +30,7 @@ class SColumn(SAttribute):
 
                 col_type = self.column.type
                 if isinstance(col_type, sa.Enum):
-                    type = Union[tuple(Literal[i] for i in col_type.enums)]  # type: ignore
+                    type = Literal[tuple(col_type.enums)]
 
             if self.column.nullable:
                 type = type | None

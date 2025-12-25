@@ -1,6 +1,6 @@
 import re
 from io import BytesIO
-from typing import Literal, Union
+from typing import Literal
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
@@ -94,7 +94,7 @@ class UrlTemplateAttr(SColumn):
 
 
 Capmode = Literal["nextgis_geoservices"] | None
-Scheme = Union[tuple(Literal[i] for i in SCHEME.enum)]  # type: ignore
+Scheme = Literal[tuple(SCHEME.enum)]
 
 
 class CapmodeAttr(SColumn):

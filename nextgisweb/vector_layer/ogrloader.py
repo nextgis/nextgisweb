@@ -29,10 +29,10 @@ MIN_INT32 = -(2**31)
 MAX_INT32 = 2**31 - 1
 ERROR_LIMIT = 10
 
-FixErrors = Literal["NONE"] | Literal["SAFE"] | Literal["LOSSY"]
-FidSource = Literal["AUTO"] | Literal["SEQUENCE"] | Literal["FIELD"]
+FixErrors = Literal["NONE", "SAFE", "LOSSY"]
+FidSource = Literal["AUTO", "SEQUENCE", "FIELD"]
 CastAutoYesNo = None | bool
-CastGeometryType = None | Literal["POINT"] | Literal["LINESTRING"] | Literal["POLYGON"]
+CastGeometryType = None | Literal["POINT", "LINESTRING", "POLYGON"]
 
 
 class FIX_ERRORS:

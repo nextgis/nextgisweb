@@ -1,7 +1,7 @@
 import re
 from datetime import date, datetime, time
 from io import BytesIO
-from typing import Annotated, Literal, Union
+from typing import Annotated, Literal
 
 import requests
 import sqlalchemy as sa
@@ -450,7 +450,7 @@ class PathAttr(SColumn):
 
 
 VersionEnum = Annotated[
-    Union[tuple(Literal[i] for i in WFS_VERSIONS_SUPPORTED)],  # type: ignore
+    Literal[tuple(WFS_VERSIONS_SUPPORTED)],
     TSExport("VersionEnum"),
 ]
 
@@ -623,7 +623,7 @@ class FieldsAttr(SAttribute):
     def set(
         self,
         srlzr: Serializer,
-        value: Literal["update"] | Literal["keep"],
+        value: Literal["update", "keep"],
         *,
         create: bool,
     ):

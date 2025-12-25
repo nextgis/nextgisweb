@@ -1,6 +1,6 @@
 import re
 from io import BytesIO
-from typing import Annotated, Literal, Union
+from typing import Annotated, Literal
 from urllib.parse import parse_qsl, quote, urlencode, urlparse, urlunparse
 
 import PIL
@@ -156,7 +156,7 @@ class UrlAttr(SColumn):
 
 
 VersionEnum = Annotated[
-    Union[tuple(Literal[i] for i in WMS_VERSIONS)],  # type: ignore
+    Literal[tuple(WMS_VERSIONS)],
     TSExport("VersionEnum"),
 ]
 
@@ -166,7 +166,7 @@ class VersionAttr(SColumn):
 
 
 CapCacheEnum = Annotated[
-    Literal["query"] | Literal["clear"],
+    Literal["query", "clear"],
     TSExport("CapCacheEnum"),
 ]
 
