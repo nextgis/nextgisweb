@@ -39,6 +39,8 @@ export const PrintMapPreview = observer(
             const viewMainMap = display.map.olView;
             const projection = display.map.olView.getProjection();
             const view = new View({
+                maxZoom: display.map.maxZoom,
+                extent: display.map.constrainingExtent,
                 projection,
                 constrainResolution: false,
                 center: printMapStore.center ?? viewMainMap.getCenter(),

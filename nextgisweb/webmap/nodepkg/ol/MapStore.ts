@@ -69,6 +69,8 @@ export class MapStore {
     readonly initialExtent?: Extent;
     readonly constrainingExtent?: Extent;
 
+    readonly maxZoom = 24;
+
     readonly displayProjection = "EPSG:3857";
     readonly lonlatProjection = "EPSG:4326";
 
@@ -112,7 +114,7 @@ export class MapStore {
         this.constrainingExtent = constrainingExtent;
         if (!viewOptions.view) {
             viewOptions.view = new View({
-                maxZoom: 24,
+                maxZoom: this.maxZoom,
                 projection: this.displayProjection,
                 // Must always be true for correct tile caching with image adapters
                 constrainResolution: true,
