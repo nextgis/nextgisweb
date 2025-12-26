@@ -14,6 +14,7 @@ from nextgisweb.lib.apitype import AnyOf, AsJSON, DatetimeNaive, StatusCode
 
 from nextgisweb.auth.api import UserReadBrief, UserRef, serialize_principal
 from nextgisweb.resource import DataScope, resource_factory
+from nextgisweb.spatial_ref_sys import SRSRef
 
 from ..interface import (
     FeatureLayerFieldDatatype,
@@ -48,17 +49,13 @@ class FieldSummary(Struct, kw_only=True):
     datatype: FeatureLayerFieldDatatype
 
 
-class SRSReference(Struct, kw_only=True):
-    id: int
-
-
 class ChangesCheckResponse(Struct, kw_only=True):
     epoch: Epoch
     initial: VersionID
     target: VersionID
     tstamp: datetime
     geometry_type: FeatureLayerGeometryType
-    srs: SRSReference
+    srs: SRSRef
     fields: list[FieldSummary]
     fetch: Annotated[str, Meta(description="URL to start fetching changes")]
 
@@ -159,7 +156,7 @@ def change_check(
         target=target,
         tstamp=tstamp,
         geometry_type=resource.geometry_type,
-        srs=SRSReference(id=resource.srs.id),
+        srs=SRSRef(id=resource.srs.id),
         fields=fields,
         fetch=fetch,
     )

@@ -13,7 +13,7 @@ from nextgisweb.lib.geometry import Geometry, Transformer, geom_area, geom_lengt
 from nextgisweb.core.exception import ExternalServiceError, ValidationError
 from nextgisweb.jsrealm import TSExport
 
-from .model import SRS, WKT_EPSG_4326
+from .model import SRS, WKT_EPSG_4326, SRSRef
 from .pyramid import SRSID, require_catalog_configured, srs_factory
 from .util import SRSFormat, convert_to_wkt
 
@@ -42,10 +42,6 @@ GeomGeoJSON = Annotated[
         examples=[{"type": "LineString", "coordinates": [[30, 10], [10, 30], [40, 40]]}],
     ),
 ]
-
-
-class SRSRef(Struct, kw_only=True):
-    id: SRSID
 
 
 class SRSCreate(Struct, kw_only=True):

@@ -15,8 +15,7 @@ from nextgisweb.core.exception import ValidationError
 from nextgisweb.lookup_table import LookupTable
 from nextgisweb.resource import Resource, ResourceScope, SAttribute, Serializer
 from nextgisweb.resource.model import ResourceRef
-from nextgisweb.spatial_ref_sys import SRS
-from nextgisweb.spatial_ref_sys.api import SRSRef
+from nextgisweb.spatial_ref_sys import SRS, SRSRef
 
 from .interface import (
     FIELD_TYPE,

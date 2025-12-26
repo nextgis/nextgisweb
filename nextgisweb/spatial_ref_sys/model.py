@@ -1,6 +1,9 @@
+from typing import Annotated
+
 import sqlalchemy as sa
 import sqlalchemy.event as sa_event
 import sqlalchemy.orm as orm
+from msgspec import Meta, Struct
 from sqlalchemy.orm import declared_attr
 from zope.sqlalchemy import mark_changed
 
@@ -18,6 +21,16 @@ WKT_EPSG_3857 = 'PROJCS["WGS 84 / Pseudo-Mercator",GEOGCS["WGS 84",DATUM["WGS_19
 
 BOUNDS_EPSG_4326 = (-180, -90, 180, 90)
 BOUNDS_EPSG_3857 = (-20037508.34, -20037508.34, 20037508.34, 20037508.34)
+
+SRSID = Annotated[
+    int,
+    Meta(ge=1, le=SRID_MAX, description="Spatial reference system ID"),
+    Meta(examples=[4326]),
+]
+
+
+class SRSRef(Struct, kw_only=True):
+    id: SRSID
 
 
 class SRS(Base):
