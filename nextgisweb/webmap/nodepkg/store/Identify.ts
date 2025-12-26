@@ -1,7 +1,13 @@
 import { action, observable, reaction } from "mobx";
 import type { Coordinate } from "ol/coordinate";
-import { boundingExtent, getCenter } from "ol/extent";
+import {
+    boundingExtent,
+    containsCoordinate,
+    getCenter,
+    wrapX,
+} from "ol/extent";
 import { WKT } from "ol/format";
+import { MultiPolygon } from "ol/geom";
 import { fromExtent } from "ol/geom/Polygon";
 import type Interaction from "ol/interaction/Interaction";
 
@@ -193,12 +199,19 @@ export class Identify {
     }
 
     async execute(pixel: number[], radiusScale?: number): Promise<void> {
-        const olMap = this.map.olMap;
+        const { olMap, olView } = this.map;
         const point = olMap.getCoordinateFromPixel(pixel);
+        const projection = olView.getProjection();
+
+        const projExtent = projection.getExtent();
+        // Workaround for identify outside the 180 meridian.
+        const outside = projExtent
+            ? !containsCoordinate(projExtent, point)
+            : false;
 
         const request: Request = {
             srs: 3857,
-            geom: this._requestGeomString(pixel, radiusScale),
+            geom: this._requestGeomString(pixel, radiusScale, outside),
             layers: [],
         };
 
@@ -221,16 +234,16 @@ export class Identify {
         const layerLabels: Record<number, string | null> = {};
         items.forEach((i) => {
             const layerId = i.layerId;
-
             layerLabels[layerId] = i.label;
         });
 
-        let features;
+        let features: FeatureResponse | undefined = undefined;
         if (request.layers.length) {
             features = await route("feature_layer.identify").post({
                 json: request,
             });
         }
+
         let raster: RasterLayerIdentifyResponse | undefined;
         if (rasterLayers.length) {
             const [x, y] = olMap.getCoordinateFromPixel([pixel[0], pixel[1]]);
@@ -242,7 +255,11 @@ export class Identify {
         this.openIdentifyPanel({ features, point, layerLabels, raster });
     }
 
-    private _requestGeomString(pixel: number[], radiusScale = 1): string {
+    private _requestGeomString(
+        pixel: number[],
+        radiusScale = 1,
+        outside = false
+    ): string {
         const olMap = this.map.olMap;
         const radius = this.pixelRadius * radiusScale;
         const bounds = boundingExtent([
@@ -255,8 +272,22 @@ export class Identify {
                 pixel[1] + radius,
             ]),
         ]);
+        const rangeGeom = fromExtent(bounds);
 
-        return new WKT().writeGeometry(fromExtent(bounds));
+        if (outside) {
+            const projection = olMap.getView().getProjection();
+            const wrapped = wrapX(bounds, projection);
+            const wrappedPoly = fromExtent(wrapped);
+
+            const multi = new MultiPolygon([
+                rangeGeom.getCoordinates(),
+                wrappedPoly.getCoordinates(),
+            ]);
+
+            return wkt.writeGeometry(multi);
+        }
+
+        return wkt.writeGeometry(rangeGeom);
     }
 
     @action.bound
