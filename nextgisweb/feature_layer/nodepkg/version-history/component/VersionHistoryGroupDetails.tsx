@@ -62,16 +62,13 @@ function toRows(items: ChangesFetchResp): Row[] {
         const action = item.action;
         if (!action || action === "continue") continue;
 
-        // @ts-expect-error fid is not typing for "feature.create" but exist
         const fid = item.fid;
         let key: string;
 
         if (action === "attachment.create") {
             key = String(ATTACHMENT_ID++);
         } else {
-            // @ts-expect-error vid is not typing
             const vid = item.vid;
-
             key = `${fid}-${action}-${vid}`;
         }
 

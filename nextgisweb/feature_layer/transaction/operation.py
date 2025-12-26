@@ -87,7 +87,7 @@ VIDCompare = Annotated[
 # Layer operations
 
 
-class Revert(Struct, kw_only=True, tag="revert", tag_field="action"):
+class RevertOperation(Struct, kw_only=True, tag="revert", tag_field="action"):
     """Revert the entire layer to a previous version."""
 
     vid: VIDCompare = UNSET
@@ -100,6 +100,7 @@ class RevertResult(Struct, kw_only=True, tag="revert", tag_field="action"):
 
 # Feature operations
 
+action_tag = lambda base: dict(tag=f"feature.{base}", tag_field="action")
 FeatureID = int
 
 
@@ -139,7 +140,7 @@ FieldsType = Annotated[
 ]
 
 
-class FeatureCreate(Struct, kw_only=True, tag="feature.create", tag_field="action"):
+class FeatureCreateOperation(Struct, kw_only=True, **action_tag("create")):
     """Create feature from geometry and field values"""
 
     geom: Geom = UNSET
@@ -150,7 +151,7 @@ class FeatureCreateResult(Struct, kw_only=True, tag="feature.create", tag_field=
     fid: Annotated[FeatureID, Meta(description="ID of the created feature.")]
 
 
-class FeatureUpdate(Struct, kw_only=True, tag="feature.update", tag_field="action"):
+class FeatureUpdateOperation(Struct, kw_only=True, **action_tag("update")):
     """Update feature"""
 
     fid: Annotated[FeatureID, Meta(description="ID of the feature to update.")]
@@ -159,22 +160,22 @@ class FeatureUpdate(Struct, kw_only=True, tag="feature.update", tag_field="actio
     fields: FieldsType = UNSET
 
 
-class FeatureUpdateResult(Struct, kw_only=True, tag="feature.update", tag_field="action"):
+class FeatureUpdateResult(Struct, kw_only=True, **action_tag("update")):
     pass
 
 
-class FeatureDelete(Struct, kw_only=True, tag="feature.delete", tag_field="action"):
+class FeatureDeleteOperation(Struct, kw_only=True, **action_tag("delete")):
     """Delete feature"""
 
     fid: Annotated[FeatureID, Meta(description="ID of the feature to delete.")]
     vid: VIDCompare = UNSET
 
 
-class FeatureDeleteResult(Struct, kw_only=True, tag="feature.delete", tag_field="action"):
+class FeatureDeleteResult(Struct, kw_only=True, **action_tag("delete")):
     pass
 
 
-class FeatureRestore(Struct, kw_only=True, tag="feature.restore", tag_field="action"):
+class FeatureRestoreOperation(Struct, kw_only=True, **action_tag("restore")):
     """Restore feature"""
 
     fid: Annotated[FeatureID, Meta(description="ID of the feature to update.")]
@@ -183,18 +184,24 @@ class FeatureRestore(Struct, kw_only=True, tag="feature.restore", tag_field="act
     fields: FieldsType = UNSET
 
 
-class FeatureRestoreResult(Struct, kw_only=True, tag="feature.restore", tag_field="action"):
+class FeatureRestoreResult(Struct, kw_only=True, **action_tag("restore")):
     pass
 
 
-OperationUnion = Revert | FeatureCreate | FeatureUpdate | FeatureDelete | FeatureRestore
+OperationUnion = (
+    RevertOperation
+    | FeatureCreateOperation
+    | FeatureUpdateOperation
+    | FeatureDeleteOperation
+    | FeatureRestoreOperation
+)
 
 
 class FeatureLayerExecutor(OperationExecutor):
     def prepare(self, operation: OperationUnion):
-        if isinstance(operation, Revert):
+        if isinstance(operation, RevertOperation):
             self.require_versioning()
-        elif isinstance(operation, (FeatureUpdate, FeatureDelete)):
+        elif isinstance(operation, (FeatureUpdateOperation, FeatureDeleteOperation)):
             feat = self.require_feature(operation.fid)
             if (vid := operation.vid) is not UNSET:
                 if vid != feat.version:
@@ -203,16 +210,22 @@ class FeatureLayerExecutor(OperationExecutor):
     def execute(self, operation):
         resource = self.resource
 
-        if isinstance(operation, Revert):
+        if isinstance(operation, RevertOperation):
             resource.fversioning_revert_layer(operation.tid)
             return RevertResult()
 
         feature = Feature(resource)
 
-        if isinstance(operation, (FeatureUpdate, FeatureDelete, FeatureRestore)):
+        if isinstance(
+            operation,
+            (FeatureUpdateOperation, FeatureDeleteOperation, FeatureRestoreOperation),
+        ):
             feature.id = operation.fid
 
-        if isinstance(operation, (FeatureCreate, FeatureUpdate, FeatureRestore)):
+        if isinstance(
+            operation,
+            (FeatureCreateOperation, FeatureUpdateOperation, FeatureRestoreOperation),
+        ):
             if (geom := operation.geom) is not UNSET:
                 feature.geom = Geometry.from_wkb(geom) if geom else None
 
@@ -228,28 +241,28 @@ class FeatureLayerExecutor(OperationExecutor):
                 else:
                     raise NotImplementedError
 
-        if isinstance(operation, FeatureCreate):
+        if isinstance(operation, FeatureCreateOperation):
             fid = resource.feature_create(feature)
             return FeatureCreateResult(fid=fid)
 
-        elif isinstance(operation, FeatureUpdate):
+        elif isinstance(operation, FeatureUpdateOperation):
             resource.feature_put(feature)
             return FeatureUpdateResult()
 
-        elif isinstance(operation, FeatureDelete):
+        elif isinstance(operation, FeatureDeleteOperation):
             resource.feature_delete(operation.fid)
             return FeatureDeleteResult()
 
-        elif isinstance(operation, FeatureRestore):
+        elif isinstance(operation, FeatureRestoreOperation):
             resource.feature_restore(feature)
             return FeatureRestoreResult()
 
 
-FeatureLayerExecutor.register(Revert, RevertResult)
-FeatureLayerExecutor.register(FeatureCreate, FeatureCreateResult)
-FeatureLayerExecutor.register(FeatureUpdate, FeatureUpdateResult)
-FeatureLayerExecutor.register(FeatureDelete, FeatureDeleteResult)
-FeatureLayerExecutor.register(FeatureRestore, FeatureRestoreResult)
+FeatureLayerExecutor.register(RevertOperation, RevertResult)
+FeatureLayerExecutor.register(FeatureCreateOperation, FeatureCreateResult)
+FeatureLayerExecutor.register(FeatureUpdateOperation, FeatureUpdateResult)
+FeatureLayerExecutor.register(FeatureDeleteOperation, FeatureDeleteResult)
+FeatureLayerExecutor.register(FeatureRestoreOperation, FeatureRestoreResult)
 
 
 # Operation errors

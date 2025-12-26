@@ -9,7 +9,7 @@ from .model import FeatureDescription as Description
 action_tag = lambda base: dict(tag=f"description.{base}", tag_field="action")
 
 
-class DescriptionPut(Struct, kw_only=True, **action_tag("put")):
+class DescriptionPutOperation(Struct, kw_only=True, **action_tag("put")):
     """Put description"""
 
     fid: int
@@ -21,7 +21,7 @@ class DescriptionPutResult(Struct, kw_only=True, **action_tag("put")):
     pass
 
 
-class DescriptionRestore(Struct, kw_only=True, **action_tag("restore")):
+class DescriptionRestoreOperation(Struct, kw_only=True, **action_tag("restore")):
     """Restore description"""
 
     fid: int
@@ -33,12 +33,12 @@ class DescriptionRestoreResult(Struct, kw_only=True, **action_tag("restore")):
     pass
 
 
-OperationUnion = DescriptionPut | DescriptionRestore
+OperationUnion = DescriptionPutOperation | DescriptionRestoreOperation
 
 
 class DescriptionExecutor(OperationExecutor):
     def prepare(self, operation: OperationUnion):
-        if isinstance(operation, (DescriptionPut, DescriptionRestore)):
+        if isinstance(operation, (DescriptionPutOperation, DescriptionRestoreOperation)):
             self.require_feature(operation.fid)
             if (vid := operation.vid) is not UNSET:
                 self.require_versioning()
@@ -46,7 +46,7 @@ class DescriptionExecutor(OperationExecutor):
                     raise OperationError(DescriptionConflict())
 
     def execute(self, operation):
-        if isinstance(operation, DescriptionPut):
+        if isinstance(operation, DescriptionPutOperation):
             obj = Description.filter_by(
                 resource_id=self.resource.id,
                 feature_id=operation.fid,
@@ -68,7 +68,7 @@ class DescriptionExecutor(OperationExecutor):
                 obj.delete()
             return DescriptionPutResult()
 
-        if isinstance(operation, DescriptionRestore):
+        if isinstance(operation, DescriptionRestoreOperation):
             obj = Description.restore(self.resource, operation.fid)
             if (value := operation.value) is not UNSET:
                 obj.value = sanitize(value)
@@ -84,5 +84,5 @@ class DescriptionConflict(Struct, tag="description.conflict", tag_field="error")
     message: str = "Description version conflict"
 
 
-DescriptionExecutor.register(DescriptionPut, DescriptionPutResult)
-DescriptionExecutor.register(DescriptionRestore, DescriptionRestoreResult)
+DescriptionExecutor.register(DescriptionPutOperation, DescriptionPutResult)
+DescriptionExecutor.register(DescriptionRestoreOperation, DescriptionRestoreResult)
