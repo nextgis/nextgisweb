@@ -7,7 +7,7 @@ from importlib.metadata._itertools import unique_everseen
 from itertools import count
 from textwrap import indent
 from types import UnionType
-from typing import Any, Literal, Type, TypeVar, Union, cast, get_args, get_origin
+from typing import TYPE_CHECKING, Any, Literal, Type, TypeVar, Union, cast, get_args, get_origin
 
 from msgspec import UNSET, Struct, UnsetType, field
 from typing_extensions import Protocol
@@ -30,10 +30,7 @@ ModuleName = str
 TypeName = str
 Export = tuple[ModuleName, TypeName]
 
-# FIXME: Placeholder to indicate a field is defined in __post_init__. However,
-# this approach is problematic and likely requires refactoring, as MsgSpec
-# 0.19.0 introduced a change where __post_init__ is now called not only during
-# construction but also during conversion (deserialization).
+# Placeholder for a field is defined in __post_init__
 POST_INIT = cast(Any, UNSET)
 
 
@@ -128,8 +125,10 @@ class TSGenerator:
 class TSModule(Struct, kw_only=True, dict=True):
     generator: TSGenerator
     name: ModuleName
-    unique: int = POST_INIT
-    ns: str = POST_INIT
+
+    if TYPE_CHECKING:
+        unique: int = POST_INIT
+        ns: str = POST_INIT
 
     imports: set[TSModule] = field(default_factory=set)
     declared: list[TSType] = field(default_factory=list)
@@ -178,7 +177,6 @@ class TSModuleCompiled(Protocol):
 
 class TSType(Struct, kw_only=True, dict=True):
     generator: TSGenerator
-    unique: int = POST_INIT
     type: Any
 
     module: TSModule | None = None
@@ -186,6 +184,9 @@ class TSType(Struct, kw_only=True, dict=True):
     comment: str | None = None
 
     auto_export: bool = False
+
+    if TYPE_CHECKING:
+        unique: int = POST_INIT
 
     def __post_init__(self):
         self.unique = next(self.generator.counter)
@@ -234,8 +235,10 @@ class TSPrimitive(TSType, kw_only=True):
 
 class TSUnion(TSType, kw_only=True):
     args: Sequence[Any]
-    items: tuple[TSType, ...] = POST_INIT
-    undefided_excluded: TSType | None = POST_INIT
+
+    if TYPE_CHECKING:
+        items: tuple[TSType, ...] = POST_INIT
+        undefided_excluded: TSType | None = POST_INIT
 
     def __tstype_init__(self):
         super().__tstype_init__()
@@ -272,7 +275,9 @@ class TSEnum(TSType, kw_only=True):
 
 class TSList(TSType, kw_only=True):
     arg: Any
-    item: TSType = POST_INIT
+
+    if TYPE_CHECKING:
+        item: TSType = POST_INIT
 
     def __tstype_init__(self):
         super().__tstype_init__()
@@ -284,7 +289,9 @@ class TSList(TSType, kw_only=True):
 
 class TSTuple(TSType, kw_only=True):
     args: tuple[Any, ...]
-    items: tuple[TSType, ...] = POST_INIT
+
+    if TYPE_CHECKING:
+        items: tuple[TSType, ...] = POST_INIT
 
     def __tstype_init__(self):
         super().__tstype_init__()
@@ -314,10 +321,12 @@ KEYWORDS = frozenset(
 
 class TSStruct(TSType, kw_only=True):
     cls: Type[Struct]
-    fields: tuple[TSStructField, ...] = POST_INIT
-    tag: tuple[str, str | int] | None = POST_INIT
-    array_like: bool = POST_INIT
     auto_export = True
+
+    if TYPE_CHECKING:
+        fields: tuple[TSStructField, ...] = POST_INIT
+        tag: tuple[str, str | int] | None = POST_INIT
+        array_like: bool = POST_INIT
 
     def __tstype_init__(self):
         super().__tstype_init__()
@@ -364,8 +373,10 @@ class TSStruct(TSType, kw_only=True):
 
 class TSMapping(TSType, kw_only=True):
     args: tuple[Any, Any]
-    ktype: TSType = POST_INIT
-    vtype: TSType = POST_INIT
+
+    if TYPE_CHECKING:
+        ktype: TSType = POST_INIT
+        vtype: TSType = POST_INIT
 
     def __tstype_init__(self):
         super().__tstype_init__()
