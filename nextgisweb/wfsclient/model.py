@@ -24,9 +24,9 @@ from nextgisweb.feature_layer import (
     GEOM_TYPE,
     GEOM_TYPE_OGR_2_GEOM_TYPE,
     Feature,
+    FeatureLayerGeometryType,
     FeatureQueryIntersectsMixin,
     FeatureSet,
-    FeaureLayerGeometryType,
     IFeatureLayer,
     IFeatureQuery,
     IFeatureQueryFilter,
@@ -609,9 +609,9 @@ class WFSLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
 
 class GeometryTypeAttr(SAttribute):
     ctypes = CRUTypes(
-        FeaureLayerGeometryType | None,
-        FeaureLayerGeometryType,
-        FeaureLayerGeometryType | None,
+        FeatureLayerGeometryType | None,
+        FeatureLayerGeometryType,
+        FeatureLayerGeometryType | None,
     )
 
 

@@ -17,7 +17,7 @@ from nextgisweb.resource import DataScope, resource_factory
 
 from ..interface import (
     FeatureLayerFieldDatatype,
-    FeaureLayerGeometryType,
+    FeatureLayerGeometryType,
     IVersionableFeatureLayer,
 )
 from ..versioning import FVersioningExtensionMixin
@@ -57,7 +57,7 @@ class ChangesCheckResponse(Struct, kw_only=True):
     initial: VersionID
     target: VersionID
     tstamp: datetime
-    geometry_type: FeaureLayerGeometryType
+    geometry_type: FeatureLayerGeometryType
     srs: SRSReference
     fields: list[FieldSummary]
     fetch: Annotated[str, Meta(description="URL to start fetching changes")]

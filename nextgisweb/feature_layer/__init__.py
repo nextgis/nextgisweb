@@ -9,7 +9,8 @@ from .interface import (
     GEOM_TYPE_OGR,
     GEOM_TYPE_OGR_2_GEOM_TYPE,
     FeatureLayerFieldDatatype,
-    FeaureLayerGeometryType,
+    FeatureLayerGeometryType,
+    FeaureLayerGeometryType,  # FIXME: Drop this after all references are converted
     IFeatureLayer,
     IFeatureQuery,
     IFeatureQueryClipByBox,

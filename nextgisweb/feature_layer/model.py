@@ -22,7 +22,7 @@ from .interface import (
     FIELD_TYPE,
     FIELD_TYPE_OGR,
     FeatureLayerFieldDatatype,
-    FeaureLayerGeometryType,
+    FeatureLayerGeometryType,
     IVersionableFeatureLayer,
 )
 
@@ -145,8 +145,8 @@ class SrsAttr(SAttribute):
 
 
 class GeometryTypeAttr(SAttribute):
-    def get(self, srlzr: Serializer) -> FeaureLayerGeometryType:
-        return cast(FeaureLayerGeometryType, srlzr.obj.geometry_type)
+    def get(self, srlzr: Serializer) -> FeatureLayerGeometryType:
+        return cast(FeatureLayerGeometryType, srlzr.obj.geometry_type)
 
 
 class FieldsAttr(SAttribute):

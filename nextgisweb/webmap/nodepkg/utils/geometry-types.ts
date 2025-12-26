@@ -1,6 +1,6 @@
 import type { GeometryLayout, Type as OlGeometryType } from "ol/geom/Geometry";
 
-import type { FeaureLayerGeometryType } from "@nextgisweb/feature-layer/type/api";
+import type { FeatureLayerGeometryType } from "@nextgisweb/feature-layer/type/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 export const getGeometryTypeTitle = (geometryType: string) => {
@@ -33,7 +33,7 @@ export const getGeometryTypeTitle = (geometryType: string) => {
 };
 
 export const geometryTypeAliases: Record<
-    FeaureLayerGeometryType,
+    FeatureLayerGeometryType,
     OlGeometryType
 > = {
     POINT: "Point",
@@ -50,11 +50,11 @@ export const geometryTypeAliases: Record<
     MULTIPOLYGONZ: "MultiPolygon",
 };
 
-export function getOlGeometryType(type: FeaureLayerGeometryType) {
+export function getOlGeometryType(type: FeatureLayerGeometryType) {
     return geometryTypeAliases[type];
 }
 
-export const zTypes: FeaureLayerGeometryType[] = [
+export const zTypes: FeatureLayerGeometryType[] = [
     "POINTZ",
     "LINESTRINGZ",
     "POLYGONZ",
@@ -63,6 +63,6 @@ export const zTypes: FeaureLayerGeometryType[] = [
     "MULTIPOLYGONZ",
 ];
 
-export function getOlLayout(type: FeaureLayerGeometryType): GeometryLayout {
+export function getOlLayout(type: FeatureLayerGeometryType): GeometryLayout {
     return zTypes.includes(type) ? "XYZ" : "XY";
 }

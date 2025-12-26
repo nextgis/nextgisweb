@@ -20,7 +20,7 @@ from nextgisweb.core.exception import ValidationError as VE
 from nextgisweb.feature_layer import (
     FIELD_TYPE,
     GEOM_TYPE,
-    FeaureLayerGeometryType,
+    FeatureLayerGeometryType,
     IFeatureLayer,
     IFieldEditableFeatureLayer,
     IFilterableFeatureLayer,
@@ -888,10 +888,10 @@ class LoaderAttr(SAttribute):
 
 
 class GeometryTypeAttr(SAttribute):
-    def get(self, srlzr: Serializer) -> FeaureLayerGeometryType:
+    def get(self, srlzr: Serializer) -> FeatureLayerGeometryType:
         return super().get(srlzr)
 
-    def set(self, srlzr: Serializer, value: FeaureLayerGeometryType, *, create: bool):
+    def set(self, srlzr: Serializer, value: FeatureLayerGeometryType, *, create: bool):
         if srlzr.obj.id is None:
             srlzr.obj.geometry_type = value
         elif srlzr.obj.geometry_type == value:

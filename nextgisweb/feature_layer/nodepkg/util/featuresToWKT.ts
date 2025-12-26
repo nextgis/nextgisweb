@@ -8,12 +8,12 @@ import {
 } from "ol/geom";
 import type { Geometry, LineString, Point, Polygon } from "ol/geom";
 
-import type { FeaureLayerGeometryType } from "@nextgisweb/feature-layer/type/api";
+import type { FeatureLayerGeometryType } from "@nextgisweb/feature-layer/type/api";
 import { getOlLayout } from "@nextgisweb/webmap/utils/geometry-types";
 
 export function featuresToWkt(
     features: Feature<Geometry>[],
-    type: FeaureLayerGeometryType,
+    type: FeatureLayerGeometryType,
     multiGeometry?: boolean
 ): string | null {
     const wkt = new WKT();

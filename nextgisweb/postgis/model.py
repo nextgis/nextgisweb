@@ -26,9 +26,9 @@ from nextgisweb.feature_layer import (
     FIELD_TYPE,
     GEOM_TYPE,
     Feature,
+    FeatureLayerGeometryType,
     FeatureQueryIntersectsMixin,
     FeatureSet,
-    FeaureLayerGeometryType,
     IFeatureLayer,
     IFeatureQuery,
     IFeatureQueryFilter,
@@ -560,9 +560,9 @@ DataScope.read.require(ConnectionScope.connect, attr="connection", cls=PostgisLa
 
 class GeometryTypeAttr(SAttribute):
     ctypes = CRUTypes(
-        FeaureLayerGeometryType | None,
-        FeaureLayerGeometryType,
-        FeaureLayerGeometryType | None,
+        FeatureLayerGeometryType | None,
+        FeatureLayerGeometryType,
+        FeatureLayerGeometryType | None,
     )
 
 
