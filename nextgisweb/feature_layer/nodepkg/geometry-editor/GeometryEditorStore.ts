@@ -98,7 +98,7 @@ class GeometryEditorStore implements EditorStore<FeatureGeometry | null> {
     @computed
     get vectorLayerGeometryType(): FeaureLayerGeometryType | undefined {
         if (this._parentStore) {
-            return this._parentStore.vectorLayer?.geometry_type;
+            return this._parentStore.featureLayer?.geometry_type;
         }
     }
 

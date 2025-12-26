@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, cast
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
@@ -16,11 +16,13 @@ from nextgisweb.lookup_table import LookupTable
 from nextgisweb.resource import Resource, ResourceScope, SAttribute, Serializer
 from nextgisweb.resource.model import ResourceRef
 from nextgisweb.spatial_ref_sys import SRS
+from nextgisweb.spatial_ref_sys.api import SRSRef
 
 from .interface import (
     FIELD_TYPE,
     FIELD_TYPE_OGR,
     FeatureLayerFieldDatatype,
+    FeaureLayerGeometryType,
     IVersionableFeatureLayer,
 )
 
@@ -135,6 +137,16 @@ class FeatureLayerFieldWrite(Struct, kw_only=True):
     grid_visibility: bool | UnsetType = UNSET
     text_search: bool | UnsetType = UNSET
     lookup_table: ResourceRef | None | UnsetType = UNSET
+
+
+class SrsAttr(SAttribute):
+    def get(self, srlzr: Serializer) -> SRSRef:
+        return SRSRef(id=srlzr.obj.srs.id)
+
+
+class GeometryTypeAttr(SAttribute):
+    def get(self, srlzr: Serializer) -> FeaureLayerGeometryType:
+        return cast(FeaureLayerGeometryType, srlzr.obj.geometry_type)
 
 
 class FieldsAttr(SAttribute):
@@ -256,6 +268,8 @@ class FVersioningAttr(SAttribute):
 class FeatureLayerSerializer(Serializer, resource=LayerFieldsMixin, force_create=True):
     identity = "feature_layer"
 
+    srs = SrsAttr(read=ResourceScope.read)
+    geometry_type = GeometryTypeAttr(read=ResourceScope.read)
     fields = FieldsAttr(read=ResourceScope.read, write=ResourceScope.update)
     versioning = FVersioningAttr(read=ResourceScope.read, write=ResourceScope.update)
 

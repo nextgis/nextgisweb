@@ -68,10 +68,10 @@ export async function getGeomConfig({
         query: { fields: [], extensions: [] },
         signal,
     });
-    if (!resp.vector_layer) {
-        throw new Error(`Resource ${resourceId} is not a vector layer`);
+    if (!resp.feature_layer) {
+        throw new Error(`Resource ${resourceId} is not a feature layer`);
     }
-    const type = resp.vector_layer.geometry_type;
+    const type = resp.feature_layer.geometry_type;
     return {
         type: getOlGeometryType(type),
         layout: getOlLayout(type),

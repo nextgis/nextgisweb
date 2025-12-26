@@ -1,11 +1,13 @@
 import { action, computed, observable } from "mobx";
 
-import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
+import type {
+    FeatureLayerFieldRead,
+    FeatureLayerRead,
+} from "@nextgisweb/feature-layer/type/api";
 import { route } from "@nextgisweb/pyramid/api";
 import type { RouteBody } from "@nextgisweb/pyramid/api/type";
 import { AbortControllerHelper } from "@nextgisweb/pyramid/util/abort";
 import type { CompositeRead } from "@nextgisweb/resource/type/api";
-import type { VectorLayerRead } from "@nextgisweb/vector-layer/type/api";
 
 import type { NgwAttributeValue } from "../attribute-editor/type";
 import type {
@@ -27,7 +29,7 @@ export class FeatureEditorStore {
     @observable.ref accessor initLoading = false;
 
     @observable.shallow accessor fields: FeatureLayerFieldRead[] = [];
-    @observable.shallow accessor vectorLayer: VectorLayerRead | null = null;
+    @observable.shallow accessor featureLayer: FeatureLayerRead | null = null;
 
     private _featureItem?: FeatureItem;
 
@@ -76,8 +78,8 @@ export class FeatureEditorStore {
         this.fields = fields;
     }
     @action
-    setVectorLayer(vectorLayer: VectorLayerRead | null): void {
-        this.vectorLayer = vectorLayer;
+    setFeatureLayer(featureLayer: FeatureLayerRead | null): void {
+        this.featureLayer = featureLayer;
     }
     @action
     setSaving(saving: boolean): void {
@@ -97,7 +99,7 @@ export class FeatureEditorStore {
             if (fields) {
                 this.setFields(fields);
             }
-            this.setVectorLayer(resp.vector_layer ?? null);
+            this.setFeatureLayer(resp.feature_layer ?? null);
         }
 
         if (typeof this.featureId === "number") {

@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite";
 import VectorSource from "ol/source/Vector";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { errorModal } from "@nextgisweb/gui/error";
 import { useShowModal } from "@nextgisweb/gui/index";
@@ -62,9 +62,7 @@ const ToolEditor = observer(
             if (stopped.length) {
                 lazyModal(
                     () =>
-                        import(
-                            "@nextgisweb/webmap/ui/finish-editing-dialog/FinishEditingDialog"
-                        ),
+                        import("@nextgisweb/webmap/ui/finish-editing-dialog/FinishEditingDialog"),
                     {
                         onSave: async () => {
                             try {
@@ -103,6 +101,22 @@ const ToolEditor = observer(
             treeStore,
         ]);
 
+        const stopEditing = useCallback(() => {
+            if (display.item) {
+                setItemsEditable(treeStore, [display.item.id], false);
+            }
+        }, [display.item, treeStore]);
+
+        const onError = useCallback(
+            (er: unknown) => {
+                errorModal(er, {
+                    modalStore,
+                    afterClose: stopEditing,
+                });
+            },
+            [modalStore, stopEditing]
+        );
+
         const curentSelectedIsEditable = useMemo(() => {
             const itemId = display.item?.id;
             return (
@@ -132,53 +146,49 @@ const ToolEditor = observer(
             return null;
         }
         return (
-            <MapToolbarControl
-                order={order}
-                position={position}
-                margin
-                direction="vertical"
-                gap={2}
-                style={{ paddingTop: "20px" }}
-                id="editor-toolbar"
-            >
+            <>
                 {modalHolder}
-                {editableItems.map(({ id, layerId }) => (
-                    <EditableResource
-                        key={id}
-                        source={source}
-                        canSnap={canSnap}
-                        enabled={display.item?.id === id}
-                        resourceId={layerId}
-                        editingMode={isActive ? editingMode : null}
-                        onCanSnap={setCanSnap}
-                        onEditingMode={setEditingMode}
-                        onDirtyChange={(val) => {
-                            dirtyRef.current.set(id, val);
-                        }}
-                    />
-                ))}
-                {curentSelectedIsEditable && (
-                    <>
-                        <ButtonControl
-                            title={gettextf("Stop editing layer: {layer}")({
-                                layer: display.item?.label || "",
-                            })}
-                            order={100}
-                            onClick={() => {
-                                if (display.item) {
-                                    setItemsEditable(
-                                        treeStore,
-                                        [display.item.id],
-                                        false
-                                    );
-                                }
+
+                <MapToolbarControl
+                    order={order}
+                    position={position}
+                    margin
+                    direction="vertical"
+                    gap={2}
+                    style={{ paddingTop: "20px" }}
+                    id="editor-toolbar"
+                >
+                    {editableItems.map(({ id, layerId }) => (
+                        <EditableResource
+                            key={id}
+                            source={source}
+                            canSnap={canSnap}
+                            enabled={display.item?.id === id}
+                            resourceId={layerId}
+                            editingMode={isActive ? editingMode : null}
+                            onCanSnap={setCanSnap}
+                            onEditingMode={setEditingMode}
+                            onDirtyChange={(val) => {
+                                dirtyRef.current.set(id, val);
                             }}
-                        >
-                            <ExitIcon />
-                        </ButtonControl>
-                    </>
-                )}
-            </MapToolbarControl>
+                            onError={onError}
+                        />
+                    ))}
+                    {curentSelectedIsEditable && (
+                        <>
+                            <ButtonControl
+                                title={gettextf("Stop editing layer: {layer}")({
+                                    layer: display.item?.label || "",
+                                })}
+                                order={100}
+                                onClick={stopEditing}
+                            >
+                                <ExitIcon />
+                            </ButtonControl>
+                        </>
+                    )}
+                </MapToolbarControl>
+            </>
         );
     }
 );

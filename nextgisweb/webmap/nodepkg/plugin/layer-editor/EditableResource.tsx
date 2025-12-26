@@ -7,7 +7,6 @@ import VectorSource from "ol/source/Vector";
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 
 import { Spin } from "@nextgisweb/gui/antd";
-import { errorModal } from "@nextgisweb/gui/error";
 import { useShowModal } from "@nextgisweb/gui/index";
 import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { ButtonControl } from "@nextgisweb/webmap/map-component";
@@ -26,10 +25,13 @@ import { MoveMode } from "./modes/MoveMode";
 
 import { LoadingOutlined } from "@ant-design/icons";
 
-export interface EditableResourceProps
-    extends Omit<EditableItemProps, "geomType" | "geomLayout"> {
+export interface EditableResourceProps extends Omit<
+    EditableItemProps,
+    "geomType" | "geomLayout"
+> {
     resourceId: number;
     canSnap: boolean;
+    onError: (er: unknown) => void;
     onCanSnap: (val: boolean) => void;
 }
 
@@ -41,6 +43,7 @@ export const EditableResource = observer(
         enabled,
         source: outerSource,
         onCanSnap: setCanSnap,
+        onError,
         onDirtyChange,
         onEditingMode: setEditingMode,
     }: EditableResourceProps) => {
@@ -65,9 +68,7 @@ export const EditableResource = observer(
                 return new Promise<void>((resolve, reject) => {
                     lazyModal(
                         () =>
-                            import(
-                                "@nextgisweb/feature-layer/feature-editor-modal"
-                            ),
+                            import("@nextgisweb/feature-layer/feature-editor-modal"),
                         {
                             editorOptions: {
                                 mode: "return",
@@ -99,10 +100,10 @@ export const EditableResource = observer(
                     });
                     setGeometryConfig(config);
                 } catch (er) {
-                    errorModal(er, { modalStore });
+                    onError(er);
                 }
             });
-        }, [makeSignal, modalStore, resourceId]);
+        }, [makeSignal, onError, modalStore, resourceId]);
 
         useEffect(() => {
             if (!geomConfig) return;
@@ -118,8 +119,8 @@ export const EditableResource = observer(
                     features.extend(olFeatures);
                     source.addFeatures(olFeatures);
                     setSource(source);
-                } catch (err) {
-                    errorModal(err, { modalStore });
+                } catch (er) {
+                    onError(er);
                 }
             });
             const clearSource = () => {
@@ -134,7 +135,14 @@ export const EditableResource = observer(
             };
 
             return clearSource;
-        }, [geomConfig, makeSignal, modalStore, outerSource, resourceId]);
+        }, [
+            modalStore,
+            geomConfig,
+            resourceId,
+            outerSource,
+            makeSignal,
+            onError,
+        ]);
 
         return (
             <>
