@@ -291,3 +291,45 @@ def test_filtered_extent(
                 assert actual_extent[k] is None
             else:
                 assert abs(expected_extent[k] - actual_extent[k]) < 1e-6
+
+
+@pytest.mark.parametrize(
+    "create_resource",
+    (
+        pytest.param(create_vector_layer, id="vector_layer"),
+        pytest.param(create_postgis_layer, id="postgis_layer"),
+    ),
+)
+def test_edit(
+    create_resource,
+    ngw_resource_group_sub,
+    ngw_httptest_app,
+    ngw_data_path,
+):
+    ds = ogr.Open(str(ngw_data_path / "points.geojson"))
+    ogrlayer = ds.GetLayer(0)
+
+    with create_resource(
+        ogrlayer, ngw_resource_group_sub, ngw_httptest_app=ngw_httptest_app
+    ) as layer:
+        layer.persist()
+
+        fid = 2
+        feature = None
+        for f in layer.feature_query()():
+            if f.id != fid:
+                assert f.fields["string"] == "Foo bar"
+            else:
+                assert feature is None
+                assert f.fields["string"] == "Boo far"
+                feature = f
+        assert feature is not None, f"Feature #{fid} not found"
+
+        expected = feature.fields["string"] = "test-edit"
+        layer.feature_put(feature)
+
+        for f in layer.feature_query()():
+            if f.id != fid:
+                assert f.fields["string"] == "Foo bar"
+            else:
+                assert f.fields["string"] == expected

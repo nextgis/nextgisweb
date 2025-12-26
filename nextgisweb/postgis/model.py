@@ -225,7 +225,8 @@ class PostgisConnection(Base, Resource):
             raise ValidationError(gettext("Cannot connect to the database!"))
 
         try:
-            yield conn
+            with conn.begin():
+                yield conn
         except SQLAlchemyError as exc:
             raise ExternalDatabaseError(sa_error=exc)
         finally:
