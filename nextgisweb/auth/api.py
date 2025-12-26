@@ -33,12 +33,61 @@ from .view import GroupID, UserID, group_factory, user_factory
 
 KEYNAME_PATTERN = r"^[A-Za-z][A-Za-z0-9_\-]*$"
 
-KeynameUser = Annotated[str, Meta(pattern=KEYNAME_PATTERN, examples=["administrator", "guest"])]
-KeynameGroup = Annotated[str, Meta(pattern=KEYNAME_PATTERN, examples=["administrators"])]
-DisplayName = Annotated[str, Meta(min_length=1)]
-Description = Annotated[str, Meta(examples=[None])]
-Language = Annotated[str, Meta(pattern=r"^[a-z]{2,3}(\-[a-z]{2,3})?$", examples=["en", "zh-cn"])]
-OAuthSubject = Annotated[str, Meta(examples=["a223836c-2678-4096-8608-0bd7a12bd25f"])]
+KeynameUser = Annotated[
+    str,
+    Meta(
+        pattern=KEYNAME_PATTERN,
+        description="User name (login)",
+        examples=["administrator", "guest"],
+    ),
+]
+
+KeynameGroup = Annotated[
+    str,
+    Meta(
+        pattern=KEYNAME_PATTERN,
+        description="Group name",
+        examples=["administrators"],
+    ),
+]
+
+DisplayName = Annotated[
+    str,
+    Meta(
+        min_length=1,
+        description="Display name (full name)",
+    ),
+]
+
+Description = Annotated[
+    str,
+    Meta(
+        description="Free-form description",
+        examples=[None],
+    ),
+]
+
+OAuthSubject = Annotated[
+    str,
+    Meta(
+        description="Unique OAuth user identifier",
+        examples=["a223836c-2678-4096-8608-0bd7a12bd25f"],
+    ),
+]
+
+Language = Annotated[
+    str,
+    Meta(
+        pattern=r"^[a-z]{2,3}(\-[a-z]{2,3})?$",
+        description="Language or locale code in lowercase",
+        examples=["en", "zh-cn"],
+    ),
+]
+
+LanguageAutodetect = Annotated[
+    None,
+    Meta(description="Auto-detected language, e.g. browser default"),
+]
 
 Brief = Annotated[bool, Meta(description="Return limited set of attributes")]
 
@@ -232,7 +281,7 @@ class UserCreate(Struct, kw_only=True):
     disabled: bool | UnsetType = UNSET
     password: bool | str | UnsetType = UNSET
     alink: bool | UnsetType = UNSET
-    language: Language | None | UnsetType = UNSET
+    language: Language | LanguageAutodetect | UnsetType = UNSET
     member_of: list[GroupID] | UnsetType = UNSET
     permissions: list[PermissionItem] | UnsetType = UNSET
 
@@ -248,7 +297,7 @@ class UserRead(Struct, kw_only=True):
     password: bool
     alink: str | None
     description: Description | None
-    language: Language | None
+    language: Language | LanguageAutodetect
     last_activity: DatetimeNaive | None
     oauth_subject: OAuthSubject | None
     oauth_tstamp: DatetimeNaive | None
@@ -275,7 +324,7 @@ class UserUpdate(Struct, kw_only=True):
     disabled: bool | UnsetType = UNSET
     password: bool | str | UnsetType = UNSET
     alink: bool | UnsetType = UNSET
-    language: Language | None | UnsetType = UNSET
+    language: Language | LanguageAutodetect | UnsetType = UNSET
     member_of: list[GroupID] | UnsetType = UNSET
     permissions: list[PermissionItem] | UnsetType = UNSET
 
@@ -461,11 +510,11 @@ def group_idelete(obj, request) -> EmptyObject:
 class ProfileRead(Struct, kw_only=True):
     keyname: KeynameUser
     oauth_subject: OAuthSubject | None
-    language: Language | None
+    language: Language | LanguageAutodetect
 
 
 class ProfileUpdate(Struct, kw_only=True):
-    language: Language | UnsetType = UNSET
+    language: Language | LanguageAutodetect | UnsetType = UNSET
 
 
 def profile_get(request) -> ProfileRead:
