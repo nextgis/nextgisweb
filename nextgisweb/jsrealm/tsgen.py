@@ -129,6 +129,7 @@ class TSModule(Struct, kw_only=True, dict=True):
     generator: TSGenerator
     name: ModuleName
     unique: int = POST_INIT
+    ns: str = POST_INIT
 
     imports: set[TSModule] = field(default_factory=set)
     declared: list[TSType] = field(default_factory=list)
@@ -137,13 +138,16 @@ class TSModule(Struct, kw_only=True, dict=True):
 
     def __post_init__(self):
         self.unique = next(self.generator.counter)
+        ns = self.name.lower()
+        ns = re.sub(r"^@nextgisweb/", "", ns)
+        ns = re.sub(r"^([^/]+)/type/api$", r"\1", ns)
+        ns = re.sub(r"[^\w\d]+", "_", ns)
+        ns = re.sub(r"_{2,}", "_", ns)
+        assert re.fullmatch(r"\w[\w\d]*", ns)
+        self.ns = f"_{ns}"
 
     def __hash__(self) -> int:
         return hash((id(self.generator), self.unique))
-
-    @property
-    def ns(self) -> str:
-        return f"ns{self.unique}"
 
     def compile(self) -> TSModuleCompiled:
         declarations = ["export {};"]
@@ -156,7 +160,7 @@ class TSModule(Struct, kw_only=True, dict=True):
             else:
                 exports.append(f"export type {name} = {t.reference(self)};")
 
-        imports = [f'import type * as {m.ns} from "{m.name}";' for m in self.imports]
+        imports = sorted(f'import type * as {m.ns} from "{m.name}";' for m in self.imports)
 
         lines = list()
         for a in (imports, declarations, exports):
