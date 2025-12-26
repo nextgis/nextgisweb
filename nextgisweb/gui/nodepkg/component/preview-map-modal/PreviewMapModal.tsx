@@ -1,26 +1,23 @@
 import type React from "react";
 
 import { Modal } from "@nextgisweb/gui/antd";
-import type { ShowModalOptions } from "@nextgisweb/gui/showModal";
-
+import type { ParamsOf } from "@nextgisweb/gui/type";
 import "./PreviewMapModal.less";
 
-export type PreviewMapModalProps = ShowModalOptions & {
+export type PreviewMapModalProps = ParamsOf<typeof Modal> & {
     children?: React.ReactNode;
 };
 
 export function PreviewMapModal({
-    open,
     children,
-    close,
+    onCancel,
     ...props
 }: PreviewMapModalProps) {
     return (
         <Modal
             className="map-preview-modal"
-            open={open}
             {...props}
-            onCancel={close}
+            onCancel={onCancel}
             closeIcon={false}
             footer={null}
             width={"60vw"}

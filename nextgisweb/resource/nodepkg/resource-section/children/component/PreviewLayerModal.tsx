@@ -1,4 +1,4 @@
-import { useCallback, useReducer } from "react";
+import { useCallback } from "react";
 
 import { PreviewMapModal } from "@nextgisweb/gui/component/preview-map-modal/PreviewMapModal";
 import type { PreviewMapModalProps } from "@nextgisweb/gui/component/preview-map-modal/PreviewMapModal";
@@ -11,29 +11,29 @@ type PreviewLayerModalProps = PreviewMapModalProps & {
     resourceId: number;
     href?: string;
     target?: string;
+    onCancel: () => void;
 };
 
 function PreviewLayerModal({
     resourceId,
     href,
-    open: openProp,
     children,
+    onCancel,
     ...props
 }: PreviewLayerModalProps) {
-    const [open, close] = useReducer(() => false, openProp ?? true);
     const onOpenNewClick = useCallback(() => {
         window.open(href, "_blank");
     }, [href]);
 
     return (
-        <PreviewMapModal open={open} {...props}>
+        <PreviewMapModal open onCancel={onCancel} {...props}>
             <PreviewLayer
                 style={{ height: "60vh", width: "60vw" }}
                 resourceId={resourceId}
             >
                 <ButtonControl
                     position="top-right"
-                    onClick={close}
+                    onClick={onCancel}
                     title={gettext("Close")}
                 >
                     <CloseIcon />
