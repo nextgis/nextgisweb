@@ -3,18 +3,7 @@ root = true
 [*]
 charset = utf-8
 
-[*.{js,less,css}]
-indent_style = space
-trim_trailing_whitespace = false
-insert_final_newline = false
-
-[*.{js,less}]
-indent_size = 4
-
-[*.{css}]
-indent_size = 2
-
-[**/nodepkg/**.{js,jsx,cjs,ts,tsx,css,less}]
+[*.{js,jsx,cjs,ts,tsx,css,less}]
 indent_style = space
 trim_trailing_whitespace = true
 insert_final_newline = true
