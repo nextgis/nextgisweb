@@ -1,8 +1,15 @@
+import re
+
 import nh3
 from lxml.html import document_fromstring
 
+URL_SCHEMES = nh3.ALLOWED_URL_SCHEMES | {"e1c"}
+URL_PATTERN = r"^(?:(?:(?:{})\:)|\/)(?:[^\s].*|)$".format(
+    "|".join(re.escape(s) for s in sorted(URL_SCHEMES))
+)
+
 # Let "data" scheme pass inner filter, then handle on attribute_filter
-url_schemes = nh3.ALLOWED_URL_SCHEMES | {"data", "e1c"}
+URL_SCHEMES_WITH_DATA = URL_SCHEMES | {"data"}
 
 
 def attribute_filter(tag, attr, value):
@@ -20,7 +27,7 @@ def sanitize(text, *, validate=False):
     cleaned = nh3.clean(
         text,
         link_rel=None,
-        url_schemes=url_schemes,
+        url_schemes=URL_SCHEMES_WITH_DATA,
         attribute_filter=attribute_filter,
     )
 

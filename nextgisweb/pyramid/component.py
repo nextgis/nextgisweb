@@ -10,6 +10,7 @@ from nextgisweb.lib.config import Option, OptionAnnotations
 from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.imptool import module_path
 from nextgisweb.lib.logging import logger
+from nextgisweb.lib.safehtml import URL_PATTERN
 
 from . import uacompat
 from .model import Session, SessionStore
@@ -122,7 +123,7 @@ class PyramidComponent(Component):
 
     def client_settings(self, request):
         result = dict()
-
+        result["safe_url_pattern"] = URL_PATTERN
         result["support_url"] = self.env.core.support_url_view(request)
         result["help_page_url"] = self.env.pyramid.help_page_url_view(request)
         result["company_logo"] = dict(
