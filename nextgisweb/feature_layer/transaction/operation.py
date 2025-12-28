@@ -1,17 +1,45 @@
 import abc
 import dataclasses as dc
 from functools import cached_property
-from typing import Annotated, Any, ClassVar, Type, TypeVar
+from typing import Annotated, Any, ClassVar, Literal, Type, TypeVar
 
 from msgspec import UNSET, Meta, Struct, UnsetType
 from msgspec.inspect import StructType, type_info
 
 from nextgisweb.lib.geometry import Geometry
 
-from nextgisweb.resource import Resource
-
 from ..feature import Feature
+from ..transaction import FeatureLayerTransaction
 from ..versioning import FVersioningMeta
+
+SeqNum = Annotated[
+    int,
+    Meta(title="SeqNum", ge=0, le=2147483647),
+    Meta(description="Operation sequential number"),
+]
+
+FeatureID = int
+
+FeatureIDExisting = Annotated[
+    FeatureID,
+    Meta(description="ID of an existing feature"),
+]
+
+
+class FeatureIDFromOperation(Struct, kw_only=True):
+    """Reference to feature ID created by preceding operation"""
+
+    sn: SeqNum
+
+
+FeatureIDOrSeqNum = Annotated[
+    FeatureIDExisting | FeatureIDFromOperation,
+    Meta(
+        description="Feature ID or operation sequential number returning the "
+        "feature ID. This allows to refer to features created earlier in the "
+        "same transaction."
+    ),
+]
 
 
 class OperationExecutor(abc.ABC):
@@ -20,8 +48,9 @@ class OperationExecutor(abc.ABC):
     input_types: ClassVar[dict[str, Type[Struct]]] = dict()
     result_types: ClassVar[dict[str, Type[Struct]]] = dict()
 
-    def __init__(self, resource: Resource, *, vobj: FVersioningMeta | None):
-        self.resource = resource
+    def __init__(self, *, txn: FeatureLayerTransaction, vobj: FVersioningMeta | None):
+        self.txn = txn
+        self.resource = txn.resource
         self.vobj = vobj
 
     @classmethod
@@ -36,11 +65,11 @@ class OperationExecutor(abc.ABC):
         cls.result_types[insp.tag] = rtype
 
     @abc.abstractmethod
-    def prepare(self, operation: Struct):
+    def prepare(self, seqnum: SeqNum, operation: Struct):
         pass
 
     @abc.abstractmethod
-    def execute(self, operation: Struct) -> Struct:
+    def execute(self, seqnum: SeqNum, operation: Struct) -> Struct:
         pass
 
     @cached_property
@@ -53,12 +82,34 @@ class OperationExecutor(abc.ABC):
         if self.vobj is None:
             raise OperationError(VersioningRequired())
 
-    def require_feature(self, fid: int) -> Feature:
+    def require_feature(self, fid: FeatureIDOrSeqNum, seqnum: SeqNum) -> Literal[True]:
+        if isinstance(fid, int):
+            self._feature_query_first.filter_by(id=fid)
+            for _ in self._feature_query_first():
+                return True
+            raise OperationError(FeatureNotFound())
+
+        if fid.sn >= seqnum:
+            raise OperationError(InvalidSeqNum())
+
+        action = self.txn.get_action(fid.sn)
+        if action != "feature.create":
+            raise OperationError(InvalidSeqNum())
+        return True
+
+    def get_feature(self, fid: FeatureID, *, seqnum: SeqNum) -> Feature:
         self._feature_query_first.filter_by(id=fid)
         for feat in self._feature_query_first():
             return feat
-        else:
-            raise OperationError(FeatureNotFound())
+        raise OperationError(FeatureNotFound())
+
+    def get_feature_id(self, fid: FeatureIDOrSeqNum, *, seqnum: SeqNum) -> int:
+        if isinstance(fid, int):
+            return fid
+
+        result = self.txn.get_result_fid(fid.sn)
+        assert result is not None
+        return result
 
 
 S = TypeVar("S", bound=Type[Struct])
@@ -101,7 +152,6 @@ class RevertResult(Struct, kw_only=True, tag="revert", tag_field="action"):
 # Feature operations
 
 action_tag = lambda base: dict(tag=f"feature.{base}", tag_field="action")
-FeatureID = int
 
 
 Geom = Annotated[
@@ -198,16 +248,16 @@ OperationUnion = (
 
 
 class FeatureLayerExecutor(OperationExecutor):
-    def prepare(self, operation: OperationUnion):
+    def prepare(self, seqnum: SeqNum, operation: OperationUnion):
         if isinstance(operation, RevertOperation):
             self.require_versioning()
         elif isinstance(operation, (FeatureUpdateOperation, FeatureDeleteOperation)):
-            feat = self.require_feature(operation.fid)
+            feat = self.get_feature(operation.fid, seqnum=seqnum)
             if (vid := operation.vid) is not UNSET:
                 if vid != feat.version:
                     raise OperationError(FeatureConflict())
 
-    def execute(self, operation):
+    def execute(self, seqnum: SeqNum, operation):
         resource = self.resource
 
         if isinstance(operation, RevertOperation):
@@ -272,6 +322,12 @@ FeatureLayerExecutor.register(FeatureRestoreOperation, FeatureRestoreResult)
 class VersioningRequired(Struct, tag="versioning_required", tag_field="error"):
     status_code: int = 422
     message: str = "Feature versioning is required for this operation"
+
+
+@OperationError.register
+class InvalidSeqNum(Struct, tag="invalid_seqnum", tag_field="error"):
+    status_code = 422
+    message = "Invalid operation sequential number"
 
 
 @OperationError.register

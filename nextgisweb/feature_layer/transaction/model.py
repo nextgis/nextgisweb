@@ -52,6 +52,12 @@ class FeatureLayerTransaction(Base):
         elif payload:
             self.__execute(_ins_operation, **p_values)
 
+    def get_action(self, seqnum: int) -> str | None:
+        return self.__execute(_sel_action, p_seqnum=seqnum).scalar_one_or_none()
+
+    def get_result_fid(self, seqnum: int) -> int | None:
+        return self.__execute(_sel_result_fid, p_seqnum=seqnum).scalar_one_or_none()
+
     def actions(self) -> list[str]:
         return list(self.__execute(_sel_actions).scalars())
 
@@ -117,6 +123,10 @@ _sel_existing = sa.select(
     _tab_operation.c.error.isnot(None).label("is_error"),
 ).filter_by(transaction_id=_p_transaction_id, seqnum=_p_seqnum)
 
+_sel_action = sa.select(_tab_operation.c.payload.op("->")(sa.text("'action'"))).filter_by(
+    transaction_id=_p_transaction_id, seqnum=_p_seqnum
+)
+
 _ins_operation = sa.insert(_tab_operation).values(
     transaction_id=_p_transaction_id,
     seqnum=_p_seqnum,
@@ -172,4 +182,11 @@ _sel_result = (
     sa.select(_tab_result.c.seqnum, _tab_result.c.value)
     .filter_by(transaction_id=_p_transaction_id)
     .order_by(_tab_result.c.seqnum)
+)
+
+_sel_result_fid = sa.select(
+    _tab_result.c.value.op("->>")(sa.text("'fid'")),
+).filter_by(
+    transaction_id=_p_transaction_id,
+    seqnum=_p_seqnum,
 )

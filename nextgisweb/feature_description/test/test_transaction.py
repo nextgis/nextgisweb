@@ -142,6 +142,22 @@ def test_workflow(versioning, mkres, ngw_webtest_app):
         {"action": "description.put", "fid": 3, "vid": 3, "value": "Ham"},
     ]
 
+    with fapi.transaction() as txn:  # Version 5
+        txn.put(1, dict(action="feature.create"))
+        txn.put(2, dict(action="description.put", fid=dict(sn=1), value="New"))
+        txn.commit()
+
+        assert txn.results() == [
+            [1, dict(action="feature.create", fid=4)],
+            [2, dict(action="description.put")],
+        ]
+
+    changes = fapi.changes(initial=4)
+    assert changes == [
+        {"action": "feature.create", "fid": 4, "vid": 5, "fields": []},
+        {"action": "description.put", "fid": 4, "vid": 5, "value": "New"},
+    ]
+
     def _vstrip(data: list):
         result = []
         for item in data:

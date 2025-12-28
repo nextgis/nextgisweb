@@ -2,7 +2,13 @@ from msgspec import UNSET, Struct, UnsetType
 
 from nextgisweb.lib.safehtml import sanitize
 
-from nextgisweb.feature_layer.transaction import OperationError, OperationExecutor, VIDCompare
+from nextgisweb.feature_layer.transaction import (
+    FeatureIDOrSeqNum,
+    OperationError,
+    OperationExecutor,
+    SeqNum,
+    VIDCompare,
+)
 
 from .model import FeatureDescription as Description
 
@@ -12,7 +18,7 @@ action_tag = lambda base: dict(tag=f"description.{base}", tag_field="action")
 class DescriptionPutOperation(Struct, kw_only=True, **action_tag("put")):
     """Put description"""
 
-    fid: int
+    fid: FeatureIDOrSeqNum
     vid: VIDCompare = UNSET
     value: str | None
 
@@ -37,19 +43,20 @@ OperationUnion = DescriptionPutOperation | DescriptionRestoreOperation
 
 
 class DescriptionExecutor(OperationExecutor):
-    def prepare(self, operation: OperationUnion):
+    def prepare(self, seqnum: SeqNum, operation: OperationUnion):
         if isinstance(operation, (DescriptionPutOperation, DescriptionRestoreOperation)):
-            self.require_feature(operation.fid)
+            self.require_feature(operation.fid, seqnum=seqnum)
             if (vid := operation.vid) is not UNSET:
                 self.require_versioning()
                 if Description.fversioning_vid(self.resource, operation.fid, vid) != vid:
                     raise OperationError(DescriptionConflict())
 
-    def execute(self, operation):
+    def execute(self, seqnum: SeqNum, operation: OperationUnion):
         if isinstance(operation, DescriptionPutOperation):
+            fid = self.get_feature_id(operation.fid, seqnum=seqnum)
             obj = Description.filter_by(
                 resource_id=self.resource.id,
-                feature_id=operation.fid,
+                feature_id=fid,
             ).first()
 
             data = operation.value
@@ -61,7 +68,7 @@ class DescriptionExecutor(OperationExecutor):
                 else:
                     obj = Description(
                         resource=self.resource,
-                        feature_id=operation.fid,
+                        feature_id=fid,
                     ).persist()
                     obj.value = sanitize(data)
             elif obj:

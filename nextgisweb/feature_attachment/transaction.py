@@ -6,8 +6,10 @@ from sqlalchemy.exc import NoResultFound
 
 from nextgisweb.feature_layer.transaction import (
     FeatureID,
+    FeatureIDOrSeqNum,
     OperationError,
     OperationExecutor,
+    SeqNum,
     VIDCompare,
 )
 from nextgisweb.file_storage import FileObj
@@ -41,7 +43,7 @@ class SourceFileUploadRef(FileUploadRef, kw_only=True, tag="file_upload"):
 class AttachmentCreateOperation(Struct, CopyToMixin, kw_only=True, **action_tag("create")):
     """Create attachment"""
 
-    fid: FeatureID
+    fid: FeatureIDOrSeqNum
     source: SourceFileUploadRef
     keyname: str | None | UnsetType = UNSET
     name: str | None | UnsetType = UNSET
@@ -109,8 +111,8 @@ OperationUnion = (
 
 
 class AttachmentExecutor(OperationExecutor):
-    def prepare(self, operation: OperationUnion):
-        self.require_feature(operation.fid)
+    def prepare(self, seqnum: SeqNum, operation: OperationUnion):
+        self.require_feature(operation.fid, seqnum=seqnum)
         if isinstance(operation, (AttachmentUpdateOperation, AttachmentDeleteOperation)):
             self.require_attachment(operation.fid, operation.aid)
         if isinstance(
@@ -124,13 +126,14 @@ class AttachmentExecutor(OperationExecutor):
                 ) != vid:
                     raise OperationError(AttachmentConflict())
 
-    def execute(self, operation: OperationUnion):
+    def execute(self, seqnum: SeqNum, operation: OperationUnion):
         if isinstance(operation, (AttachmentUpdateOperation, AttachmentDeleteOperation)):
             obj = self.require_attachment(operation.fid, operation.aid)
         elif isinstance(operation, AttachmentCreateOperation):
+            fid = self.get_feature_id(operation.fid, seqnum=seqnum)
             obj = Attachment(
                 resource=self.resource,
-                feature_id=operation.fid,
+                feature_id=fid,
             ).persist()
         elif isinstance(operation, AttachmentRestoreOperation):
             obj = Attachment.restore(self.resource, operation.fid, operation.aid)

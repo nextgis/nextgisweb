@@ -15,19 +15,13 @@ from ..interface import IFeatureLayer
 from ..versioning.exception import FVersioningEpochMismatch, FVersioningEpochRequired
 from .exception import TransactionNotCommitted, TransactionNotFound
 from .model import FeatureLayerTransaction as Transaction
-from .operation import OperationError, OperationExecutor
+from .operation import OperationError, OperationExecutor, SeqNum
 
 ERROR_LIMIT = 10
 
 TransactionID = Annotated[int, Meta(description="Transaction ID")]
 Started = Annotated[datetime, Meta(description="Start timestamp", tz=False)]
 Commited = Annotated[datetime, Meta(description="Commit timestamp", tz=False)]
-
-SeqNum = Annotated[
-    int,
-    Meta(title="SeqNum", ge=0, le=2147483647),
-    Meta(description="Operation sequential number"),
-]
 
 
 class TransactionFactory(ResourceFactory):
@@ -162,11 +156,11 @@ def ipost(txn: Transaction, request) -> AsJSON[CommitErrors | CommitSuccess]:
 
     with versioning(txn.resource, request) as vobj:
         # Set up executors
-        executors: dict[Type[OperationExecutor], OperationExecutor] = dict()
+        executors = dict[Type[OperationExecutor], OperationExecutor]()
         for action in txn.actions():
             cls = OperationExecutor.executors[action]
             if cls not in executors:
-                executors[cls] = cls(txn.resource, vobj=vobj)
+                executors[cls] = cls(txn=txn, vobj=vobj)
 
         # Check and lock
         operations, errors = list(), list()
@@ -177,7 +171,7 @@ def ipost(txn: Transaction, request) -> AsJSON[CommitErrors | CommitSuccess]:
             operation = convert(payload, input_type)
 
             try:
-                executor.prepare(operation)
+                executor.prepare(seqnum, operation)
             except OperationError as exc:
                 error = (seqnum, exc.value)
                 txn.write_error(*error)
@@ -192,7 +186,7 @@ def ipost(txn: Transaction, request) -> AsJSON[CommitErrors | CommitSuccess]:
 
         # Apply changes
         for seqnum, executor, operation, params in operations:
-            result = executor.execute(operation)
+            result = executor.execute(seqnum, operation)
             txn.write_result(seqnum, result)
 
     txn.committed = utcnow_naive()

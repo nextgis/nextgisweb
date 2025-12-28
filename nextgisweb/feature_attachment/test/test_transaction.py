@@ -1,3 +1,5 @@
+from unittest.mock import ANY
+
 import pytest
 import transaction
 
@@ -187,6 +189,23 @@ def test_workflow(versioning, files, mkres, ngw_webtest_app):
     ]
 
     assert fapi.changes(initial=3, target=5) == []
+
+    with fapi.transaction() as txn:  # Version 6
+        txn.put(1, dict(action="feature.create"))
+        txn.put(
+            2,
+            dict(
+                action="attachment.create",
+                fid=dict(sn=1),
+                source=dict(type="file_upload", **panorama_jpg),
+            ),
+        )
+
+        txn.commit()
+        assert txn.results() == [
+            [1, dict(action="feature.create", fid=4)],
+            [2, dict(action="attachment.create", aid=ANY, fileobj=ANY)],
+        ]
 
     def _normalize(data: list):
         result = []
