@@ -9,6 +9,7 @@ from nextgisweb.lib.geometry import Geometry
 from nextgisweb.lib.json import dumpb
 
 from nextgisweb.feature_layer import Feature
+from nextgisweb.feature_layer.test import parametrize_versioning
 from nextgisweb.vector_layer import VectorLayer
 
 from .. import FeatureAttachment
@@ -296,13 +297,7 @@ def panorama_jpg(ngw_file_upload, ngw_data_path):
     yield dict(ngw_file_upload(ngw_data_path / "panorama.jpg"))
 
 
-@pytest.mark.parametrize(
-    "versioning",
-    [
-        pytest.param(False, id="fversioning_disabled"),
-        pytest.param(True, id="fversioning_enabled"),
-    ],
-)
+@parametrize_versioning()
 def test_feature_layer_and_feature_attachment_api(versioning, panorama_jpg, ngw_webtest_app):
     web = ngw_webtest_app
     vcur = itertools.count(start=1)

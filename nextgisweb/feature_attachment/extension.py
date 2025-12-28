@@ -23,17 +23,17 @@ class FeatureAttachmentExtension(FeatureExtension):
             query = Attachment.fversioning_queries.feature_pit
             params = dict(p_rid=self.layer.id, p_fid=feature.id, p_vid=version)
             qresult = session.execute(query, params)
-            for mid, vid, fileobj_id, keyname, name, mime_type, description in qresult:
-                itm = dict(id=mid, version=vid)
-                if fileobj_id is not None:
+            for row in qresult:
+                itm = dict(id=row.extension_id, version=row.version_id)
+                if (fileobj_id := row.fileobj_id) is not None:
                     itm["fileobj"] = dict(id=fileobj_id)
-                if keyname is not None:
+                if (keyname := row.keyname) is not None:
                     itm["keyname"] = keyname
-                if name is not None:
+                if (name := row.name) is not None:
                     itm["name"] = name
-                if mime_type is not None:
+                if (mime_type := row.mime_type) is not None:
                     itm["mime_type"] = mime_type
-                if description is not None:
+                if (description := row.description) is not None:
                     itm["description"] = description
                 result.append(itm)
 

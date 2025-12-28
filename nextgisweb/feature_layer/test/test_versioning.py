@@ -18,7 +18,7 @@ class Simple(Base, FVersioningExtensionMixin):
 
     fversioning_metadata_version = 1
     fversioning_extension = "simple"
-    fversioning_columns = ["value"]
+    fversioning_columns = ("value",)
     fversioning_registry = registry
 
     resource_id = sa.Column(sa.Integer, primary_key=True)
@@ -31,7 +31,7 @@ class Complex(Base, FVersioningExtensionMixin):
 
     fversioning_metadata_version = 1
     fversioning_extension = "complex"
-    fversioning_columns = ["column_a", "column_b"]
+    fversioning_columns = ("column_a", "column_b")
     fversioning_registry = registry
 
     id = sa.Column(sa.Integer, primary_key=True)

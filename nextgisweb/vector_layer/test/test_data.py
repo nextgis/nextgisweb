@@ -1,10 +1,12 @@
 from datetime import date, datetime, time
+from unittest.mock import ANY
 
 import pytest
 from osgeo import ogr, osr
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.feature_layer import FIELD_TYPE
+from nextgisweb.feature_layer.test import FeatureLayerAPI, parametrize_versioning
 
 from .. import VectorLayer
 from ..ogrloader import ERROR_LIMIT, FID_SOURCE, FIX_ERRORS
@@ -189,6 +191,115 @@ def test_source_layer(ngw_webtest_app, ngw_resource_group_sub, ngw_file_upload, 
     )
 
     ngw_webtest_app.get(f"{layer_url}/feature/2", status=404)
+
+
+@parametrize_versioning()
+def test_copy(versioning, ngw_webtest_app, ngw_resource_group_sub, ngw_file_upload, ngw_data_path):
+    upload_meta = ngw_file_upload(ngw_data_path / "layer.geojson")
+    extensions = ["attachment", "description"]
+
+    source = ngw_webtest_app.post_json(
+        "/api/resource/",
+        dict(
+            resource=dict(
+                cls="vector_layer",
+                display_name="Source",
+                parent=dict(id=ngw_resource_group_sub),
+            ),
+            feature_layer=dict(
+                versioning=dict(enabled=versioning),
+            ),
+            vector_layer=dict(
+                srs=dict(id=3857),
+                source=upload_meta,
+            ),
+        ),
+        status=201,
+    ).json
+
+    source_fapi = FeatureLayerAPI(ngw_webtest_app, source["id"], extensions=extensions)
+
+    def _expected():
+        result = []
+        for i in source_fapi.feature_list():
+            if versioning:
+                i["vid"] = 1
+            if isinstance(i["extensions"]["attachment"], list):
+                for a in i["extensions"]["attachment"]:
+                    a.update(id=ANY, file_meta=ANY)
+            result.append(i)
+        return result
+
+    expected_v1 = _expected()
+
+    source_fapi.feature_update(
+        1,
+        dict(
+            extensions=dict(
+                attachment=[dict(file_upload=upload_meta)],
+                description="Example description",
+            )
+        ),
+    )
+
+    feature = source_fapi.feature_get(1)
+    extensions = feature["extensions"]
+
+    assert extensions["attachment"][0]["name"] == "layer.geojson"
+    assert extensions["description"] == "Example description"
+
+    expected_v2 = _expected()
+
+    dest = ngw_webtest_app.post_json(
+        "/api/resource/",
+        dict(
+            resource=dict(
+                cls="vector_layer",
+                display_name="Latest",
+                parent=dict(id=ngw_resource_group_sub),
+            ),
+            feature_layer=dict(
+                versioning=dict(enabled=versioning),
+            ),
+            vector_layer=dict(
+                srs=dict(id=3857),
+                feature_layer=dict(resource=source),
+            ),
+        ),
+        status=201,
+    ).json
+
+    dest_fapi = FeatureLayerAPI(ngw_webtest_app, dest["id"], extensions=extensions)
+    assert dest_fapi.feature_list() == expected_v2
+
+    resp = dest_fapi.feature_create(dict())
+    assert resp["id"] == 2
+
+    if not versioning:
+        return
+
+    for version, expected in ((1, expected_v1), (2, expected_v2)):
+        dest = ngw_webtest_app.post_json(
+            "/api/resource/",
+            dict(
+                resource=dict(
+                    cls="vector_layer",
+                    display_name=f"Version {version}",
+                    parent=dict(id=ngw_resource_group_sub),
+                ),
+                feature_layer=dict(
+                    versioning=dict(enabled=versioning),
+                ),
+                vector_layer=dict(
+                    srs=dict(id=3857),
+                    feature_layer=dict(resource=source, version=version),
+                ),
+            ),
+            status=201,
+        ).json
+
+        dest_fapi = FeatureLayerAPI(ngw_webtest_app, dest["id"], extensions=extensions)
+        assert dest_fapi.feature_list() == expected
 
 
 def test_geometry_type_change(

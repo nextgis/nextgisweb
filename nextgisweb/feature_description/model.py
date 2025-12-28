@@ -27,7 +27,7 @@ class FeatureDescription(Base, FVersioningExtensionMixin):
 
     fversioning_metadata_version = 1
     fversioning_extension = "description"
-    fversioning_columns = ["value"]
+    fversioning_columns = ("value",)
 
     resource = orm.relationship(
         Resource,

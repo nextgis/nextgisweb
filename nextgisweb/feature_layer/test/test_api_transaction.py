@@ -9,7 +9,7 @@ from nextgisweb.lib.geometry import Geometry
 from nextgisweb.vector_layer.model import VectorLayer, VectorLayerField
 
 from ..feature import Feature
-from . import FeatureLayerAPI, TransactionAPI
+from . import FeatureLayerAPI, TransactionAPI, parametrize_versioning
 
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
 
@@ -44,20 +44,18 @@ def ptz(x, y, z):
     return wkb64(f"POINT Z ({x} {y} {z})")
 
 
-@pytest.mark.parametrize(
-    "versioning",
-    [
-        pytest.param(False, id="versioning_disabled"),
-        pytest.param(True, id="versioning_enabled"),
-    ],
-)
-@pytest.mark.parametrize(
-    "fdict",
-    [
-        pytest.param(False, id="fdict"),
-        pytest.param(True, id="flist"),
-    ],
-)
+def parametrize_fdict():
+    return pytest.mark.parametrize(
+        "fdict",
+        [
+            pytest.param(False, id="fdict"),
+            pytest.param(True, id="flist"),
+        ],
+    )
+
+
+@parametrize_versioning()
+@parametrize_fdict()
 def test_workflow(versioning, fdict, mkres, ngw_webtest_app):
     (res, epoch, fld), web = mkres(versioning, fdict), ngw_webtest_app
 
@@ -152,20 +150,8 @@ def test_workflow(versioning, fdict, mkres, ngw_webtest_app):
     }
 
 
-@pytest.mark.parametrize(
-    "versioning",
-    [
-        pytest.param(False, id="versioning_disabled"),
-        pytest.param(True, id="versioning_enabled"),
-    ],
-)
-@pytest.mark.parametrize(
-    "fdict",
-    [
-        pytest.param(False, id="fdict"),
-        pytest.param(True, id="flist"),
-    ],
-)
+@parametrize_versioning()
+@parametrize_fdict()
 def test_errors(versioning, fdict, mkres, ngw_webtest_app):
     (res, epoch, fld), web = mkres(versioning, fdict), ngw_webtest_app
 

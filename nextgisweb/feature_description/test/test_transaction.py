@@ -5,7 +5,7 @@ from nextgisweb.env import DBSession
 from nextgisweb.lib.geometry import Geometry
 
 from nextgisweb.feature_layer import Feature
-from nextgisweb.feature_layer.test import FeatureLayerAPI
+from nextgisweb.feature_layer.test import FeatureLayerAPI, parametrize_versioning
 from nextgisweb.vector_layer import VectorLayer
 
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
@@ -26,13 +26,7 @@ def mkres():
     yield _mkres
 
 
-@pytest.mark.parametrize(
-    "versioning",
-    [
-        pytest.param(False, id="versioning_disabled"),
-        pytest.param(True, id="versioning_enabled"),
-    ],
-)
+@parametrize_versioning()
 def test_workflow(versioning, mkres, ngw_webtest_app):
     web = ngw_webtest_app
     res = mkres(versioning)

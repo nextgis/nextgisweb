@@ -27,12 +27,11 @@ class FeatureLayerAPI:
     ) -> list[dict]:
         extensions = extensions if extensions is not None else self.extensions
         params = dict(
-            extensions=",".join(extensions),
             **({"version": str(version)} if version else {}),
             **params,
         )
         return self.client.get(
-            f"{self.base_url}/feature/",
+            f"{self.base_url}/feature/?extensions={','.join(extensions)}",
             params=params,
             status=status,
         ).json
@@ -48,13 +47,26 @@ class FeatureLayerAPI:
     ) -> dict:
         extensions = extensions if extensions is not None else self.extensions
         params = dict(
-            extensions=",".join(extensions),
             **({"version": str(version)} if version else {}),
             **params,
         )
         return self.client.get(
-            f"{self.base_url}/feature/{fid}",
+            f"{self.base_url}/feature/{fid}?extensions={','.join(extensions)}",
             params=params,
+            status=status,
+        ).json
+
+    def feature_create(self, feature: dict, *, status: int | None = None) -> dict:
+        return self.client.post_json(
+            f"{self.base_url}/feature/",
+            feature,
+            status=status,
+        ).json
+
+    def feature_update(self, fid: int, feature: dict, *, status: int | None = None) -> dict:
+        return self.client.put_json(
+            f"{self.base_url}/feature/{fid}",
+            feature,
             status=status,
         ).json
 
@@ -171,3 +183,13 @@ def ngw_fversioning_default():
     ) as mock_versioning_default:
         mock_versioning_default.side_effect = lambda: current
         yield override
+
+
+def parametrize_versioning():
+    return pytest.mark.parametrize(
+        "versioning",
+        [
+            pytest.param(False, id="versioning_disabled"),
+            pytest.param(True, id="versioning_enabled"),
+        ],
+    )

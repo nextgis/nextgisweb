@@ -62,10 +62,12 @@ class VLSchema(MetaData):
             metadata=self,
         )
 
+    def cseq_fn(self):
+        return ".".join(([self.schema] if self.schema else []) + [self.cseq.name])
+
     @cached_property
     def cnextval(self):
-        cseq_fn = ".".join(([self.schema] if self.schema else []) + [self.cseq.name])
-        return text(f"nextval('{cseq_fn}')")
+        return text(f"nextval('{self.cseq_fn()}')")
 
     @cached_property
     def ctab(self):
@@ -322,9 +324,9 @@ class VLSchema(MetaData):
 
     # DML
 
-    def dml_insert(self, *, fields=None):
+    def dml_insert(self, *, fields=None, with_fid=False):
         bmap, values = dict(), dict()
-        values["fid"] = self.cnextval
+        values["fid"] = bindparam("p_fid") if with_fid else self.cnextval
         values["geom"] = self._geom_value()
 
         ct = self.ctab
@@ -474,6 +476,16 @@ class VLSchema(MetaData):
         sel_e = select(ct.c.fid, vid.label("vid"), _lc_op_ins)
         ins_e = insert(et).from_select(["fid", "vid", "vop"], sel_e)
         return ins_e
+
+    def dml_reset_seq(self):
+        fid = self.ctab.c.fid if not self.versioning else self.etab.c.fid
+        sub = select(func.max(fid).label("fid")).scalar_subquery()
+        return select(
+            func.setval(
+                text(f"'{self.cseq_fn()}'"),
+                func.coalesce(sub, text("0")),
+            ).label("fid")
+        )
 
     # Utilities
 

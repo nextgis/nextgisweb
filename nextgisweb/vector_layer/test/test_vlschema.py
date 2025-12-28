@@ -63,6 +63,7 @@ def test_ref_ddl(versioning):
         "update",
         "delete",
         "restore",
+        "reset_seq",
         "initfill",
         "query_pit",
         "query_revert",
@@ -75,13 +76,17 @@ def test_ref_dml(versioning, operation):
     vs = f"v={versioning}"
     bpid = sa.bindparam("id")
     if operation == "insert":
-        sql_cmp(vls.dml_insert(), f"ref_dml/insert.{vs}")
+        for wf in (False, True):
+            sql = vls.dml_insert(with_fid=wf)
+            sql_cmp(sql, f"ref_dml/insert.{vs}.wf={wf}")
     elif operation == "update":
         for wg in (False, True):
             sql = vls.dml_update(id=bpid, with_geom=wg)
             sql_cmp(sql, f"ref_dml/update.{vs}.wg={wg}")
     elif operation == "delete":
         sql_cmp(vls.dml_delete(filter_by=dict(fid=bpid)), f"ref_dml/delete.{vs}")
+    elif operation == "reset_seq":
+        sql_cmp(vls.dml_reset_seq(), f"ref_dml/reset_seq.{vs}")
     elif not versioning:
         return  # Skip rest, versioning specific
     elif operation == "restore":

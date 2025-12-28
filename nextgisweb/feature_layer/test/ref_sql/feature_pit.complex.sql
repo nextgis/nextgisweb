@@ -1,4 +1,5 @@
 SELECT
+    ht.feature_id,
     ht.extension_id,
     ht.version_id,
     ht.column_a,
@@ -10,6 +11,7 @@ WHERE
     AND int4range(ht.feature_id, ht.feature_id, '[]') @> :p_fid
 UNION ALL
 SELECT
+    et.feature_id,
     et.extension_id,
     et.version_id,
     ct.column_a,
@@ -20,4 +22,4 @@ LEFT OUTER JOIN complex AS ct
     AND ct.feature_id = et.feature_id
     AND ct.id = et.extension_id
 WHERE
-    et.feature_id = :p_fid AND et.resource_id = :p_rid AND et.version_id <= :p_vid;
+    et.resource_id = :p_rid AND et.feature_id = :p_fid AND et.version_id <= :p_vid;

@@ -1,4 +1,4 @@
-#: api.py:23 model.py:711
+#: api.py:21 model.py:821
 msgid "GDAL library failed to open file."
 msgstr "Библиотеке GDAL не удалось открыть файл."
 
@@ -6,103 +6,103 @@ msgstr "Библиотеке GDAL не удалось открыть файл."
 msgid "Vector layer features"
 msgstr "Объекты векторного слоя"
 
-#: model.py:71 nodepkg/resource-widget/Widget.tsx:54
-#: nodepkg/resource-widget/Widget.tsx:184
+#: model.py:78 nodepkg/resource-widget/Widget.tsx:55
+#: nodepkg/resource-widget/Widget.tsx:186
 msgid "Point"
 msgstr "Точка"
 
-#: model.py:72 nodepkg/resource-widget/Widget.tsx:55
-#: nodepkg/resource-widget/Widget.tsx:185
+#: model.py:79 nodepkg/resource-widget/Widget.tsx:56
+#: nodepkg/resource-widget/Widget.tsx:187
 msgid "Line"
 msgstr "Линия"
 
-#: model.py:73 nodepkg/resource-widget/Widget.tsx:56
-#: nodepkg/resource-widget/Widget.tsx:186
+#: model.py:80 nodepkg/resource-widget/Widget.tsx:57
+#: nodepkg/resource-widget/Widget.tsx:188
 msgid "Polygon"
 msgstr "Полигон"
 
-#: model.py:74 nodepkg/resource-widget/Widget.tsx:187
+#: model.py:81 nodepkg/resource-widget/Widget.tsx:189
 msgid "Multipoint"
 msgstr "Мультиточка"
 
-#: model.py:75 nodepkg/resource-widget/Widget.tsx:188
+#: model.py:82 nodepkg/resource-widget/Widget.tsx:190
 msgid "Multiline"
 msgstr "Мультилиния"
 
-#: model.py:76 nodepkg/resource-widget/Widget.tsx:189
+#: model.py:83 nodepkg/resource-widget/Widget.tsx:191
 msgid "Multipolygon"
 msgstr "Мультиполигон"
 
-#: model.py:77 nodepkg/resource-widget/Widget.tsx:190
+#: model.py:84 nodepkg/resource-widget/Widget.tsx:192
 msgid "Point Z"
 msgstr "Точка Z"
 
-#: model.py:78 nodepkg/resource-widget/Widget.tsx:191
+#: model.py:85 nodepkg/resource-widget/Widget.tsx:193
 msgid "Line Z"
 msgstr "Линия Z"
 
-#: model.py:79 nodepkg/resource-widget/Widget.tsx:192
+#: model.py:86 nodepkg/resource-widget/Widget.tsx:194
 msgid "Polygon Z"
 msgstr "Полигон Z"
 
-#: model.py:80 nodepkg/resource-widget/Widget.tsx:193
+#: model.py:87 nodepkg/resource-widget/Widget.tsx:195
 msgid "Multipoint Z"
 msgstr "Мультиточка Z"
 
-#: model.py:81 nodepkg/resource-widget/Widget.tsx:194
+#: model.py:88 nodepkg/resource-widget/Widget.tsx:196
 msgid "Multiline Z"
 msgstr "Мультилиния Z"
 
-#: model.py:82 nodepkg/resource-widget/Widget.tsx:195
+#: model.py:89 nodepkg/resource-widget/Widget.tsx:197
 msgid "Multipolygon Z"
 msgstr "Мультиполигон Z"
 
-#: model.py:131 nodepkg/resource-widget/Widget.tsx:320
+#: model.py:139 nodepkg/resource-widget/Widget.tsx:335
 msgid "Vector layer"
 msgstr "Векторный слой"
 
-#: model.py:153 nodepkg/resource-widget/Widget.tsx:108
-#: nodepkg/resource-widget/Widget.tsx:285
+#: model.py:161 nodepkg/resource-widget/Widget.tsx:109
+#: nodepkg/resource-widget/Widget.tsx:300
 msgid "Geometry type"
 msgstr "Тип геометрии"
 
-#: model.py:156
+#: model.py:164
 msgid "Feature count"
 msgstr "Количество объектов"
 
-#: model.py:714
+#: model.py:824
 msgid "Unsupport OGR driver: %s."
 msgstr "Драйвер OGR '%s' не поддерживается."
 
-#: model.py:723
+#: model.py:833
 msgid "Dataset doesn't contain layers."
 msgstr "Набор данных не содержит ни одного слоя."
 
-#: model.py:726
+#: model.py:836
 msgid "Dataset contains more than one layer."
 msgstr "Набор данных содержит более одного слоя."
 
-#: model.py:731
+#: model.py:841
 msgid "Unable to open layer."
 msgstr "Не удалось открыть слой."
 
-#: model.py:744
+#: model.py:854
 msgid "Layer doesn't contain coordinate system information."
 msgstr "Слой не содержит информации о системе координат."
 
-#: nodepkg/resource-widget/Store.tsx:199
+#: nodepkg/resource-widget/Store.tsx:212
 msgid "Confirm deletion of existing features"
 msgstr "Подтвердить удаление существующих объектов"
 
-#: nodepkg/resource-widget/Store.tsx:206
+#: nodepkg/resource-widget/Store.tsx:219
 msgid "Confirm change of geometry type"
 msgstr "Подтвердить изменение типа геометрии"
 
-#: nodepkg/resource-widget/Widget.tsx:31
+#: nodepkg/resource-widget/Widget.tsx:32
 msgid "Select a dataset"
 msgstr "Выберите набор данных"
 
-#: nodepkg/resource-widget/Widget.tsx:32
+#: nodepkg/resource-widget/Widget.tsx:33
 msgid ""
 "ESRI Shapefile (zip), GeoPackage, GeoJSON, GML, KML, CSV or XLSX formats are "
 "supported. For CSV and XLSX only points are supported, coordinates must be "
@@ -112,100 +112,104 @@ msgstr ""
 "GeoJSON, GML, KML, CSV или XLSX. Для CSV и XLSX поддерживаются только точки, "
 "координаты должны быть в колонках lat и lon."
 
-#: nodepkg/resource-widget/Widget.tsx:35
+#: nodepkg/resource-widget/Widget.tsx:36
 msgid "Files uploaded, post-processing on the server in progress..."
 msgstr "Файлы загружены, выполняется постобработка на сервере..."
 
-#: nodepkg/resource-widget/Widget.tsx:45
+#: nodepkg/resource-widget/Widget.tsx:46
 msgid "Whenever possible"
 msgstr "Если возможно"
 
-#: nodepkg/resource-widget/Widget.tsx:46
+#: nodepkg/resource-widget/Widget.tsx:47
 msgid "Without losing data"
 msgstr "Без потери данных"
 
-#: nodepkg/resource-widget/Widget.tsx:47
+#: nodepkg/resource-widget/Widget.tsx:48
 msgid "None"
 msgstr "Нет"
 
-#: nodepkg/resource-widget/Widget.tsx:53 nodepkg/resource-widget/Widget.tsx:62
-#: nodepkg/resource-widget/Widget.tsx:70
+#: nodepkg/resource-widget/Widget.tsx:54 nodepkg/resource-widget/Widget.tsx:63
+#: nodepkg/resource-widget/Widget.tsx:71
 msgid "Auto"
 msgstr "Авто"
 
-#: nodepkg/resource-widget/Widget.tsx:63
+#: nodepkg/resource-widget/Widget.tsx:64
 msgid "Yes"
 msgstr "Да"
 
-#: nodepkg/resource-widget/Widget.tsx:64
+#: nodepkg/resource-widget/Widget.tsx:65
 msgid "No"
 msgstr "Нет"
 
-#: nodepkg/resource-widget/Widget.tsx:71
+#: nodepkg/resource-widget/Widget.tsx:72
 msgid "Sequence"
 msgstr "Нумерация"
 
-#: nodepkg/resource-widget/Widget.tsx:72
+#: nodepkg/resource-widget/Widget.tsx:73
 msgid "Field"
 msgstr "Из поля"
 
-#: nodepkg/resource-widget/Widget.tsx:100
+#: nodepkg/resource-widget/Widget.tsx:101
 msgid "Fix errors"
 msgstr "Исправлять ошибки"
 
-#: nodepkg/resource-widget/Widget.tsx:104
+#: nodepkg/resource-widget/Widget.tsx:105
 msgid "Skip features with unfixable errors"
 msgstr "Пропускать объекты с неустранимыми ошибками"
 
-#: nodepkg/resource-widget/Widget.tsx:119
+#: nodepkg/resource-widget/Widget.tsx:120
 msgid "Skip features with other geometry types"
 msgstr "Пропустить объекты с другими типами геометрий"
 
-#: nodepkg/resource-widget/Widget.tsx:123
+#: nodepkg/resource-widget/Widget.tsx:124
 msgid "Multi-geometry"
 msgstr "Мульти-геометрия"
 
-#: nodepkg/resource-widget/Widget.tsx:126
+#: nodepkg/resource-widget/Widget.tsx:127
 msgid "Z-coordinate"
 msgstr "Координата Z"
 
-#: nodepkg/resource-widget/Widget.tsx:129
+#: nodepkg/resource-widget/Widget.tsx:130
 msgid "FID source"
 msgstr "Источник FID"
 
-#: nodepkg/resource-widget/Widget.tsx:158
+#: nodepkg/resource-widget/Widget.tsx:159
 msgid "Load features from file"
 msgstr "Загрузить объекты из файла"
 
-#: nodepkg/resource-widget/Widget.tsx:159
+#: nodepkg/resource-widget/Widget.tsx:160
+msgid "Copy features from layer"
+msgstr "Скопировать объекты из слоя"
+
+#: nodepkg/resource-widget/Widget.tsx:161
 msgid "Create empty layer"
 msgstr "Создать пустой слой"
 
-#: nodepkg/resource-widget/Widget.tsx:161
+#: nodepkg/resource-widget/Widget.tsx:163
 msgid "Keep existing features"
 msgstr "Оставить существующие объекты"
 
-#: nodepkg/resource-widget/Widget.tsx:162
+#: nodepkg/resource-widget/Widget.tsx:164
 msgid "Change geometry type"
 msgstr "Изменить тип геометрии"
 
-#: nodepkg/resource-widget/Widget.tsx:163
+#: nodepkg/resource-widget/Widget.tsx:165
 msgid "Replace features from file"
 msgstr "Заменить объекты из файла"
 
-#: nodepkg/resource-widget/Widget.tsx:164
+#: nodepkg/resource-widget/Widget.tsx:166
 msgid "Delete all features"
 msgstr "Удалить все объекты"
 
-#: nodepkg/resource-widget/Widget.tsx:180
+#: nodepkg/resource-widget/Widget.tsx:182
 msgid "current"
 msgstr "текущий"
 
-#: nodepkg/resource-widget/Widget.tsx:272
+#: nodepkg/resource-widget/Widget.tsx:274 nodepkg/resource-widget/Widget.tsx:287
 msgid "Source layer"
 msgstr "Исходный слой"
 
-#: nodepkg/resource-widget/Widget.tsx:309
+#: nodepkg/resource-widget/Widget.tsx:324
 msgid "Advanced options"
 msgstr "Дополнительные параметры"
 

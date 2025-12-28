@@ -6,18 +6,13 @@ import transaction
 from nextgisweb.lib.geometry import Geometry
 
 from nextgisweb.feature_layer import Feature
+from nextgisweb.feature_layer.test import parametrize_versioning
 from nextgisweb.vector_layer import VectorLayer
 
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
 
 
-@pytest.mark.parametrize(
-    "versioning",
-    [
-        pytest.param(False, id="fversioning_disabled"),
-        pytest.param(True, id="fversioning_enabled"),
-    ],
-)
+@parametrize_versioning()
 def test_feature_layer_api(versioning, ngw_webtest_app):
     web = ngw_webtest_app
     vcur = itertools.count(start=1)

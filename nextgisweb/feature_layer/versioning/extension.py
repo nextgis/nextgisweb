@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from functools import cached_property, partial
 from typing import TYPE_CHECKING, Any, ClassVar, Literal, NamedTuple, Type, cast
 
@@ -37,6 +37,7 @@ class VersioningTables(NamedTuple):
 
 class ExtensionQueries:
     p_rid = sa.bindparam("p_rid")
+    p_sid = sa.bindparam("p_sid")
     p_fid = sa.bindparam("p_fid")
     p_eid = sa.bindparam("p_eid")
 
@@ -214,38 +215,43 @@ class ExtensionQueries:
         ).where(sa.text("current != previous OR (current AND previous)"))
 
     @cached_query
-    def feature_pit(self):
-        ct, et, ht = self._aliased_tables
-        qh = sa.select(
-            *((ht.c.extension_id,) if self.has_id else ()),
-            ht.c.version_id,
-            *(getattr(ht.c, c) for c in self.cols),
-        ).where(
-            self.resource_range(ht).op("@>", precedence=4)(self.p_rid),
-            self.version_range(ht).op("@>", precedence=4)(self.p_vid),
-            self.feature_range(ht).op("@>", precedence=4)(self.p_fid),
+    def copy_ctab(self):
+        ct = self.tables.ct
+        extra = self.mapper.fversioning_extra
+        return sa.insert(ct).from_select(
+            ("resource_id", "feature_id", *self.cols, *extra.keys()),
+            sa.select(
+                self.p_rid.label("resource_id"),
+                ct.c.feature_id,
+                *(getattr(ct.c, c) for c in self.cols),
+                *extra.values(),
+            ).where(ct.c.resource_id == self.p_sid),
         )
 
-        qe = sa.select(
-            *((et.c.extension_id,) if self.has_id else ()),
-            et.c.version_id,
-            *(getattr(ct.c, c) for c in self.cols),
-        )
-        qe = qe.where(et.c.feature_id == self.p_fid, et.c.resource_id == self.p_rid)
-        qe = qe.where(et.c.version_id <= self.p_vid)
-        qe = qe.join(
-            ct,
-            sa.and_(
-                ct.c.resource_id == et.c.resource_id,
-                ct.c.feature_id == et.c.feature_id,
-                (ct.c.id == et.c.extension_id)
-                if self.has_id
-                else (ct.c.resource_id == et.c.resource_id),
+    @cached_query
+    def copy_pit(self):
+        ct = self.tables.ct
+        pit = self.__pit_query(rid=self.p_sid, fid=False).subquery("pit")
+        extra = self.mapper.fversioning_extra
+        return sa.insert(ct).from_select(
+            (
+                "resource_id",
+                "feature_id",
+                *self.cols,
+                *extra.keys(),
             ),
-            isouter=True,
+            sa.select(
+                self.p_rid.label("resource_id"),
+                pit.c.feature_id,
+                *(getattr(pit.c, c) for c in self.cols),
+                *extra.values(),
+            ),
+            include_defaults=False,
         )
-        query = sa.union_all(qh, qe)
-        return query
+
+    @cached_query
+    def feature_pit(self):
+        return self.__pit_query(rid=self.p_rid, fid=True)
 
     @cached_query
     def feature_vid(self):
@@ -469,6 +475,43 @@ class ExtensionQueries:
         dc = dc.returning(*returning(ct))
         return dc
 
+    def __pit_query(self, *, rid: sa.BindParameter, fid: bool):
+        ct, et, ht = self._aliased_tables
+        qh = sa.select(
+            ht.c.feature_id,
+            *((ht.c.extension_id,) if self.has_id else ()),
+            ht.c.version_id,
+            *(getattr(ht.c, c) for c in self.cols),
+        ).where(
+            self.resource_range(ht).op("@>", precedence=4)(rid),
+            self.version_range(ht).op("@>", precedence=4)(self.p_vid),
+            self.feature_range(ht).op("@>", precedence=4)(self.p_fid) if fid else sa.true(),
+        )
+
+        qe = sa.select(
+            et.c.feature_id,
+            *((et.c.extension_id,) if self.has_id else ()),
+            et.c.version_id,
+            *(getattr(ct.c, c) for c in self.cols),
+        ).where(
+            et.c.resource_id == rid,
+            et.c.feature_id == self.p_fid if fid else sa.true(),
+            et.c.version_id <= self.p_vid,
+        )
+        qe = qe.join(
+            ct,
+            sa.and_(
+                ct.c.resource_id == et.c.resource_id,
+                ct.c.feature_id == et.c.feature_id,
+                (ct.c.id == et.c.extension_id)
+                if self.has_id
+                else (ct.c.resource_id == et.c.resource_id),
+            ),
+            isouter=True,
+        )
+        query = sa.union_all(qh, qe)
+        return query
+
 
 class FVersioningExtensionMixin:
     fversioning_registry: ClassVar[dict[str, Type[FVersioningExtensionMixin]]] = dict()
@@ -477,6 +520,7 @@ class FVersioningExtensionMixin:
     fversioning_metadata_version: ClassVar[int]
     fversioning_extension: ClassVar[str]
     fversioning_columns: ClassVar[Sequence[str]]
+    fversioning_extra: ClassVar[Mapping[str, Any]] = dict()
     fversioning_htab_args: ClassVar[Sequence[Any]] = tuple()
 
     # Instance attributes, used internaly
@@ -601,6 +645,34 @@ class FVersioningExtensionMixin:
                         obj.fversioning_track(resource)
                         obj.fversioning_on_revert()
                         result = True
+
+        return result
+
+    @classmethod
+    def fversioning_copy(cls, source, dest, *, version: int | None = None) -> bool:
+        session = sa.inspect(source).session
+        assert session is not None
+
+        if version is None:
+            qres = session.execute(
+                cls.fversioning_queries.copy_ctab,
+                dict(p_sid=source.id, p_rid=dest.id),
+            )
+        else:
+            qres = session.execute(
+                cls.fversioning_queries.copy_pit,
+                dict(p_sid=source.id, p_rid=dest.id, p_vid=version),
+            )
+
+        result = qres.rowcount > 0
+        if result and (vobj := dest.fversioning_vobj):
+            vid = vobj.version_id
+            assert vid == 1
+            session.execute(
+                cls.fversioning_queries.initfill,
+                dict(p_rid=dest.id, p_vid=vid, p_vop="E"),
+            )
+            vobj.mark_changed()
 
         return result
 

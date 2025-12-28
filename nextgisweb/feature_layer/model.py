@@ -6,6 +6,7 @@ from msgspec import UNSET, Struct, UnsetType
 from osgeo import ogr
 from sqlalchemy.ext.orderinglist import ordering_list
 from sqlalchemy.orm import declared_attr
+from typing_extensions import Self
 
 from nextgisweb.env import Base, env, gettext
 from nextgisweb.lib import saext
@@ -63,6 +64,17 @@ class LayerField(Base):
 
     def __str__(self):
         return self.display_name
+
+    @classmethod
+    def copy_from(cls, source: "LayerField") -> Self:
+        return cls(
+            keyname=source.keyname,
+            datatype=source.datatype,
+            display_name=source.display_name,
+            grid_visibility=source.grid_visibility,
+            text_search=source.text_search,
+            lookup_table=source.lookup_table,
+        )
 
 
 class LayerFieldsMixin:

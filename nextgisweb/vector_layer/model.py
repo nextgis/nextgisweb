@@ -7,7 +7,7 @@ from typing import Any
 import sqlalchemy as sa
 import sqlalchemy.event as sa_event
 import sqlalchemy.orm as orm
-from msgspec import UNSET
+from msgspec import UNSET, Struct, UnsetType
 from osgeo import gdal, ogr
 from sqlalchemy import inspect, select, text
 from zope.interface import implementer
@@ -35,9 +35,12 @@ from nextgisweb.feature_layer.versioning import (
     FeatureDelete,
     FeatureRestore,
     FeatureUpdate,
+    FVersioningExtensionMixin,
     FVersioningFeatureSummary,
     FVersioningMixin,
+    FVersioningNotEnabled,
     FVersioningNotImplemented,
+    FVersioningOutOfRange,
     OperationFieldValue,
     fversioning_guard,
 )
@@ -48,6 +51,7 @@ from nextgisweb.resource import (
     DataScope,
     Resource,
     ResourceGroup,
+    ResourceRef,
     ResourceScope,
     SAttribute,
     Serializer,
@@ -347,12 +351,16 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin, FVersioni
 
     @vlschema_autoflush
     @fversioning_guard
-    def feature_create(self, feature):
+    def feature_create(self, feature, with_fid=False):
         vls = self.vlschema()
         session = inspect(self).session
 
         data = dict()
-        query, bmap = vls.dml_insert(fields=feature.fields.keys())
+        query, bmap = vls.dml_insert(fields=feature.fields.keys(), with_fid=with_fid)
+
+        if with_fid:
+            assert feature.id is not None
+            data["p_fid"] = feature.id
 
         geom = feature.geom
         data["geom"] = geom.wkb if geom not in (None, UNSET) else None
@@ -650,6 +658,10 @@ class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin, FVersioni
         geometry_type = geometry_type if geometry_type else self.geometry_type
         return saext.Geometry(geometry_type, self.srs.id)
 
+    def _reset_seq(self):
+        session = sa.inspect(self).session
+        session.execute(self.vlschema().dml_reset_seq())
+
 
 # Create vector_layer schema on table creation
 sa_event.listen(
@@ -887,6 +899,55 @@ class LoaderAttr(SAttribute):
         pass  # Handled by the `source` attribute
 
 
+class FeatureLayerAttr(SAttribute):
+    class FeatureLayerSource(Struct, kw_only=True):
+        resource: ResourceRef
+        version: int | UnsetType = UNSET
+
+    def setup_types(self):
+        self.types = CRUTypes(self.FeatureLayerSource, UnsetType, UnsetType)
+
+    def set(self, srlzr: Serializer, value: FeatureLayerSource, *, create: bool):
+        assert create
+
+        obj = srlzr.obj
+        session = inspect(obj).session
+
+        source = Resource.filter_by(id=value.resource.id).one_or_none()
+        if (
+            source is None
+            or not IFeatureLayer.providedBy(source)
+            or not source.has_permission(DataScope.read, srlzr.user)
+        ):
+            raise VE
+
+        version = None
+        if value.version is not UNSET:
+            FVersioningNotEnabled.disprove(source)
+            FVersioningOutOfRange.disprove(source, value.version)
+            version = value.version
+
+        obj.geometry_type = source.geometry_type
+        obj.fields[:] = [VectorLayerField.copy_from(lf) for lf in source.fields]
+
+        session.flush()
+
+        query = source.feature_query()
+        if version:
+            query.pit(version)
+        query.geom()
+
+        max_fid = 0
+        for feat in query():
+            obj.feature_create(feat, with_fid=True)
+            max_fid = max(max_fid, feat.id)
+
+        obj._reset_seq()
+
+        for extension in FVersioningExtensionMixin.fversioning_registry.values():
+            extension.fversioning_copy(source, srlzr.obj, version=version)
+
+
 class GeometryTypeAttr(SAttribute):
     def get(self, srlzr: Serializer) -> FeatureLayerGeometryType:
         return super().get(srlzr)
@@ -925,6 +986,8 @@ class VectorLayerSerializer(Serializer, resource=VectorLayer):
     cast_has_z = LoaderAttr(CastAutoYesNo)
     fid_source = LoaderAttr(FidSource)
     fid_field = LoaderAttr(list[str] | str)
+
+    feature_layer = FeatureLayerAttr(write=DataScope.write)
 
     geometry_type = GeometryTypeAttr(read=ResourceScope.read, write=ResourceScope.update)
     fields = FieldsAttr(write=DataScope.write)

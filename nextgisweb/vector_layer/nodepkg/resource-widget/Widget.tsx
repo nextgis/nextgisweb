@@ -15,6 +15,7 @@ import type { RadioGroupProps, SelectProps } from "@nextgisweb/gui/antd";
 import { errorModal, isAbortError } from "@nextgisweb/gui/error";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import { ResourceSelectRef } from "@nextgisweb/resource/component";
 import type { EditorWidget } from "@nextgisweb/resource/type";
 
 import type { Mode, Store } from "./Store";
@@ -156,6 +157,7 @@ export const Widget: EditorWidget<Store> = observer(({ store }) => {
             result.push({ label, value });
         if (operation === "create") {
             add("file", gettext("Load features from file"));
+            add("copy", gettext("Copy features from layer"));
             add("empty", gettext("Create empty layer"));
         } else {
             add("keep", gettext("Keep existing features"));
@@ -278,6 +280,19 @@ export const Widget: EditorWidget<Store> = observer(({ store }) => {
                             />
                         </>
                     )}
+                </>
+            )}
+            {mode === "copy" && (
+                <>
+                    <label>{gettext("Source layer")}</label>
+                    <ResourceSelectRef
+                        className="row"
+                        pickerOptions={{
+                            requireInterface: "IFeatureLayer",
+                            initParentId: store.composite.parent,
+                        }}
+                        {...bval("copyResource")}
+                    />
                 </>
             )}
             {["empty", "gtype"].includes(mode || "") && (

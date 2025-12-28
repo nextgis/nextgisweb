@@ -45,8 +45,10 @@ class FeatureAttachment(Base, FVersioningExtensionMixin):
     mime_type = sa.Column(sa.Unicode, nullable=False)
     description = sa.Column(sa.Unicode, nullable=True)
 
-    size = sa.Column(sa.BigInteger, nullable=False)
     file_meta = sa.Column(pg.JSONB, nullable=True)
+
+    # TODO: Drop this column, fileobj.size is used instead
+    size = sa.Column(sa.BigInteger, nullable=False, default=-1)
 
     __table_args__ = (
         sa.Index("feature_attachment_resource_id_feature_id_idx", resource_id, feature_id),
@@ -62,7 +64,8 @@ class FeatureAttachment(Base, FVersioningExtensionMixin):
 
     fversioning_metadata_version = 1
     fversioning_extension = "attachment"
-    fversioning_columns = ["fileobj_id", "keyname", "name", "mime_type", "description"]
+    fversioning_columns = ("fileobj_id", "keyname", "name", "mime_type", "description")
+    fversioning_extra = dict(size=sa.text("-1"), file_meta=sa.null())
     fversioning_htab_args = [
         sa.ForeignKeyConstraint(
             ["fileobj_id"],
@@ -118,7 +121,7 @@ class FeatureAttachment(Base, FVersioningExtensionMixin):
             "id": self.id,
             "name": self.name,
             "keyname": self.keyname,
-            "size": self.size,
+            "size": self.fileobj.size,
             "mime_type": self.mime_type,
             "description": self.description,
             "is_image": self.is_image,
@@ -142,7 +145,6 @@ class FeatureAttachment(Base, FVersioningExtensionMixin):
         else:
             self.fileobj = source.to_fileobj()
 
-        self.size = self.fileobj.size
         self.extract_meta()
         return self
 
@@ -198,7 +200,6 @@ class FeatureAttachment(Base, FVersioningExtensionMixin):
         with session.no_autoflush:
             self.fileobj = session.execute(query_fileobj).scalar_one()
 
-        self.size = self.fileobj.size
         self.extract_meta()
 
 

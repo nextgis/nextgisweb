@@ -9,10 +9,11 @@ import type {
     EditorStore,
     EditorStoreOptions,
 } from "@nextgisweb/resource/type";
+import type { ResourceRef } from "@nextgisweb/resource/type/api";
 import srsSettings from "@nextgisweb/spatial-ref-sys/client-settings";
 import type * as apitype from "@nextgisweb/vector-layer/type/api";
 
-export type Mode = "empty" | "gtype" | "file" | "keep" | "delete";
+export type Mode = "file" | "copy" | "empty" | "gtype" | "keep" | "delete";
 export type GeometryType = Required<apitype.VectorLayerUpdate>["geometry_type"];
 
 type SourceOptions = Required<
@@ -41,6 +42,7 @@ export class Store
     readonly composite: CompositeStore;
 
     @observable.ref accessor mode: Mode | null = "file";
+    @observable.ref accessor copyResource: ResourceRef | null = null;
     @observable.shallow accessor source: FileMeta | null = null;
     @observable.ref accessor sourceLayer: string | null = null;
     @observable.shallow accessor sourceOptions: SourceOptions = {
@@ -109,10 +111,18 @@ export class Store
             ayn("cast_is_multi");
             ayn("cast_has_z");
             Object.assign(result, so);
+        } else if (this.mode === "copy") {
+            lunkwill.suggest(true);
+            return {
+                srs: srsSettings.default,
+                feature_layer: { resource: this.copyResource! },
+            } satisfies apitype.VectorLayerCreate;
         } else if (this.mode === "empty") {
-            result.fields = [];
-            result.geometry_type = this.geometryType!;
-            result.srs = srsSettings.default;
+            return {
+                srs: srsSettings.default,
+                geometry_type: this.geometryType!,
+                fields: [],
+            } satisfies apitype.VectorLayerCreate;
         } else if (this.mode === "gtype") {
             if (this.geometryType !== this.geometryTypeInitial) {
                 result.geometry_type = this.geometryType!;
@@ -145,6 +155,9 @@ export class Store
             return (
                 !this.uploading && !!this.source && this.sourceLayer !== null
             );
+        }
+        if (this.mode === "copy") {
+            return !!this.copyResource;
         }
         return true;
     }

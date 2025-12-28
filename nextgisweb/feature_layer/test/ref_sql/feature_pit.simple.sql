@@ -1,4 +1,5 @@
 SELECT
+    ht.feature_id,
     ht.version_id,
     ht.value
 FROM simple_ht AS ht
@@ -8,6 +9,7 @@ WHERE
     AND int4range(ht.feature_id, ht.feature_id, '[]') @> :p_fid
 UNION ALL
 SELECT
+    et.feature_id,
     et.version_id,
     ct.value
 FROM simple_et AS et
@@ -16,4 +18,4 @@ LEFT OUTER JOIN simple AS ct
     AND ct.feature_id = et.feature_id
     AND ct.resource_id = et.resource_id
 WHERE
-    et.feature_id = :p_fid AND et.resource_id = :p_rid AND et.version_id <= :p_vid;
+    et.resource_id = :p_rid AND et.feature_id = :p_fid AND et.version_id <= :p_vid;

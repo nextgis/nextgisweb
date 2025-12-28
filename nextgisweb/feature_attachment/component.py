@@ -38,7 +38,7 @@ class FeatureAttachmentComponent(Component):
 
     def estimate_storage(self):
         for obj in FeatureAttachment.query():
-            yield FeatureAttachmentData, obj.resource_id, obj.size
+            yield FeatureAttachmentData, obj.resource_id, obj.fileobj.size
 
     # fmt: off
     option_annotations = (
