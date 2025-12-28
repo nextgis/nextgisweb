@@ -1,7 +1,10 @@
 import enum
 from inspect import isclass
+from typing import Literal, get_args, get_origin
 
 import sqlalchemy as sa
+
+from nextgisweb.lib.apitype import unannotate
 
 
 class Enum(sa.Enum):
@@ -21,9 +24,16 @@ class Enum(sa.Enum):
 
         if len(args) > 0:
             if isclass(std_enum := args[0]) and issubclass(std_enum, enum.Enum):
+                assert len(args) == 1
                 # By default SA uses Enum's names instead of values (as orjson
                 # does). So, swap names and values.
                 kwargs["values_callable"] = lambda o: [i.value for i in o]
+            else:
+                otype = unannotate(args[0])
+                if get_origin(otype) is Literal:
+                    assert len(args) == 1
+                    args = get_args(otype)
+                    assert all(isinstance(i, str) for i in args)
 
         if "length" not in kwargs:
             kwargs["length"] = 50
