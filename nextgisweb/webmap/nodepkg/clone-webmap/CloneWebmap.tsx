@@ -8,6 +8,7 @@ import { routeURL } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import { getUniqueName } from "@nextgisweb/pyramid/util";
 import { ResourceSelect } from "@nextgisweb/resource/component";
 import type {
     CompositeCreate,
@@ -16,7 +17,6 @@ import type {
 } from "@nextgisweb/resource/type/api";
 
 import { cloneResource } from "./util/cloneResource";
-import { getUniqueName } from "./util/getUniqName";
 
 const msgSaveButtonTitle = gettext("Clone");
 

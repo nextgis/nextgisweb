@@ -101,9 +101,10 @@ export const useColumns = function ({
                 render: (_, row) =>
                     epoch && (
                         <VersionHistoryRowMenu
-                            resourceId={id}
-                            epoch={epoch}
                             item={row}
+                            epoch={epoch}
+                            versionId={row.id}
+                            resourceId={id}
                             bumpReloadKey={bumpReloadKey}
                         />
                     ),
@@ -111,5 +112,5 @@ export const useColumns = function ({
         }
 
         return columns;
-    }, [epoch, id, canRevert, bumpReloadKey]);
+    }, [canRevert, epoch, id, bumpReloadKey]);
 };

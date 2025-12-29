@@ -1,6 +1,7 @@
 import { RequestQueue } from "./queue";
 
 export { tileLoadFunction, transparentImage } from "./tileLoadFunction";
+export { getUniqueName } from "./getUniqName";
 export * from "./loader";
 export * from "./abort";
 
