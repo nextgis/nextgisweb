@@ -174,6 +174,7 @@ class AuthComponent(Component):
     def query_stat(self):
         return dict(
             user_count=_ucnt(),
+            local_count=_ucnt(User.password_hash.is_not(None)),
             oauth_count=_ucnt(User.oauth_subject.is_not(None)),
             last_activity=dict(
                 everyone=_ula(),
