@@ -3,7 +3,6 @@ from itertools import product
 from urllib.parse import parse_qs, urlparse
 
 import pytest
-import sqlalchemy as sa
 import transaction
 from freezegun import freeze_time
 
@@ -193,28 +192,6 @@ def test_session_invite(user, ngw_env, ngw_webtest_app):
     )
 
 
-@pytest.fixture()
-def disable_users():
-    active_uids = []
-
-    with transaction.manager:
-        for user in User.filter(
-            sa.and_(
-                User.keyname != "administrator",
-                sa.not_(User.disabled),
-                sa.not_(User.system),
-            )
-        ).all():
-            user.disabled = True
-            active_uids.append(user.id)
-
-    yield
-
-    with transaction.manager:
-        for user in User.filter(User.id.in_(active_uids)).all():
-            user.disabled = False
-
-
 def _user_data():
     obj = User.test_instance()
     return dict(
@@ -228,8 +205,7 @@ def _user_data():
 def test_user_limit(ngw_env, ngw_webtest_app, ngw_auth_administrator, disable_users):
     with ngw_env.auth.options.override(dict(user_limit=2)):
         user1 = _user_data()
-        res = ngw_webtest_app.post_json(user_url(), user1, status=201)
-        user1_id = res.json["id"]
+        user1_id = ngw_webtest_app.post_json(user_url(), user1, status=201).json["id"]
 
         user2 = _user_data()
         ngw_webtest_app.post_json(user_url(), user2, status=422)
@@ -237,14 +213,10 @@ def test_user_limit(ngw_env, ngw_webtest_app, ngw_auth_administrator, disable_us
         user1["disabled"] = True
         ngw_webtest_app.put_json(user_url(user1_id), user1, status=200)
 
-        res = ngw_webtest_app.post_json(user_url(), user2, status=201)
-        user2_id = res.json["id"]
+        ngw_webtest_app.post_json(user_url(), user2, status=201)
 
         user3 = _user_data()
         ngw_webtest_app.post_json(user_url(), user3, status=422)
-
-        ngw_webtest_app.delete(user_url(user1_id), status=200)
-        ngw_webtest_app.delete(user_url(user2_id), status=200)
 
 
 def test_user_over_limit(ngw_env, ngw_webtest_app, ngw_auth_administrator, disable_users):
@@ -252,7 +224,7 @@ def test_user_over_limit(ngw_env, ngw_webtest_app, ngw_auth_administrator, disab
     user1_id = ngw_webtest_app.post_json(user_url(), user1).json["id"]
 
     user2 = _user_data()
-    user2_id = ngw_webtest_app.post_json(user_url(), user2).json["id"]
+    ngw_webtest_app.post_json(user_url(), user2)
 
     with ngw_env.auth.options.override(dict(user_limit=2)):
         ngw_webtest_app.put_json(
@@ -280,9 +252,6 @@ def test_user_over_limit(ngw_env, ngw_webtest_app, ngw_auth_administrator, disab
             status=200,
         )
 
-    ngw_webtest_app.delete(user_url(user1_id), status=200)
-    ngw_webtest_app.delete(user_url(user2_id), status=200)
-
 
 def test_user_limit_local(ngw_env, ngw_webtest_app, ngw_auth_administrator, disable_users):
     admin = User.filter_by(keyname="administrator").one()
@@ -297,20 +266,16 @@ def test_user_limit_local(ngw_env, ngw_webtest_app, ngw_auth_administrator, disa
         u1["disabled"] = True
         ngw_webtest_app.put_json(user_url(u1_id), u1, status=200)
 
-        u2_id = ngw_webtest_app.post_json(user_url(), u2, status=201).json["id"]
+        ngw_webtest_app.post_json(user_url(), u2, status=201)
 
         u3 = _user_data()
         ngw_webtest_app.post_json(user_url(), u3, status=422)
 
         u3["password"] = False
-        u3_id = ngw_webtest_app.post_json(user_url(), u3, status=201).json["id"]
+        ngw_webtest_app.post_json(user_url(), u3, status=201)
 
         u1["disabled"] = False
         ngw_webtest_app.put_json(user_url(u1_id), u1, status=422)
-
-        ngw_webtest_app.delete(user_url(u1_id), status=200)
-        ngw_webtest_app.delete(user_url(u2_id), status=200)
-        ngw_webtest_app.delete(user_url(u3_id), status=200)
 
 
 def test_unique(ngw_webtest_app, ngw_auth_administrator):
@@ -340,11 +305,6 @@ def test_unique(ngw_webtest_app, ngw_auth_administrator):
 
     g2["display_name"] = Group.test_instance().display_name
     g2["id"] = ngw_webtest_app.post_json(group_url(), g2, status=201).json["id"]
-
-    ngw_webtest_app.delete(user_url(u1["id"]))
-    ngw_webtest_app.delete(user_url(u2["id"]))
-    ngw_webtest_app.delete(group_url(g1["id"]))
-    ngw_webtest_app.delete(group_url(g2["id"]))
 
 
 class TestKeyname:

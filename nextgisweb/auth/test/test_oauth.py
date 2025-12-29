@@ -1,4 +1,4 @@
-from contextlib import contextmanager
+from contextlib import contextmanager, nullcontext
 from datetime import datetime, timezone
 from secrets import token_hex, token_urlsafe
 from unittest.mock import patch
@@ -38,6 +38,7 @@ def setup_oauth(ngw_env, request):
         "oauth.server.token_endpoint": "http://oauth/token",
         "oauth.server.auth_endpoint": "http://oauth/auth",
         "oauth.server.introspection_endpoint": "http://oauth/introspect",
+        "oauth.server.userinfo_endpoint": None,
         "oauth.profile.subject.attr": "sub",
         "oauth.profile.keyname.attr": None,
         "oauth.profile.display_name.attr": None,
@@ -64,7 +65,9 @@ def server_response_mock():
             self.response = response
             self.counter = 0
 
-    def server_request_interceptor(self, endpoint, params):
+    def server_request_interceptor(
+        self, endpoint, params, *, default_method=None, access_token=None
+    ):
         for hobj in hooks:
             if hobj.endpoint != endpoint:
                 continue
@@ -711,3 +714,48 @@ def test_oauth_sync(oauth_user, ngw_auth_administrator, ngw_webtest_app):
 
     ngw_webtest_app.put_json(url, dict(disabled=False), status=422)
     ngw_webtest_app.delete(url, status=200)
+
+
+@pytest.mark.parametrize(
+    "setup_oauth",
+    [{"oauth.server.password": True, "oauth.server.userinfo_endpoint": "http://oauth/me"}],
+    indirect=True,
+)
+@pytest.mark.parametrize("user_limit, ok", ((1, False), (2, True)))
+def test_register_limit(
+    user_limit, ok, ngw_env, server_response_mock, ngw_webtest_app, disable_users
+):
+    access_token = token_urlsafe()
+    refresh_token = token_urlsafe()
+    sub = "sub_" + token_hex()
+
+    def introspection_response():
+        start_tstamp = int(utcnow_naive().timestamp())
+        return dict(exp=start_tstamp + ACCESS_TOKEN_LIFETIME, sub=sub)
+
+    user = User.test_instance()
+    creds = dict(login=user.keyname, password=user.password_plaintext)
+
+    if ok:
+        userinfo_mock = server_response_mock("userinfo", dict(), response=dict())
+    else:
+        userinfo_mock = nullcontext()
+
+    with (
+        server_response_mock(
+            "token",
+            dict(grant_type="password"),
+            response=dict(
+                access_token=access_token,
+                expires_in=ACCESS_TOKEN_LIFETIME,
+                refresh_token=refresh_token,
+                refresh_expires_in=REFRESH_TOKEN_LIFETIME,
+            ),
+        ),
+        server_response_mock(
+            "introspection", dict(token=access_token), response=introspection_response()
+        ),
+        userinfo_mock,
+    ):
+        with ngw_env.auth.options.override(dict(user_limit=user_limit)):
+            ngw_webtest_app.post("/api/component/auth/login", creds, status=200 if ok else 422)

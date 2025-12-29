@@ -337,8 +337,8 @@ class OAuthHelper:
             if user is None:
                 # Register new user with default groups
                 if self.options["register"]:
+                    env.auth.check_user_limit(add=1)
                     user = User(oauth_subject=_atoken().sub).persist()
-                    env.auth.check_user_limit()
                     user.member_of = Group.filter_by(register=True).all()
                 else:
                     return None
