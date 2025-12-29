@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import type { Dayjs } from "dayjs";
 import {
     useCallback,
@@ -14,6 +15,7 @@ import type {
     VersionCGetVersion,
 } from "@nextgisweb/feature-layer/type/api";
 import { Button, RangePicker, Table } from "@nextgisweb/gui/antd";
+import type { TimeRangePickerProps } from "@nextgisweb/gui/antd";
 import type { RouteQuery } from "@nextgisweb/pyramid/api/type";
 import { useRoute, useRouteGet } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -76,6 +78,35 @@ export function VersionHistory({ id }: { id: number }) {
     const loadingRef = useRef(false);
 
     const columns = useColumns({ epoch, id, bumpReloadKey });
+
+    const presets = useMemo(() => {
+        const now = dayjs();
+
+        const today = [now.startOf("day"), now];
+        const y = now.subtract(1, "day");
+        const yesterday = [y.startOf("day"), y.endOf("day")];
+        const last24h = [now.subtract(24, "hour"), now];
+        const last3d = [now.subtract(3, "day"), now];
+        const lastWeek = [now.subtract(7, "day"), now];
+        const lastMonthRolling = [now.subtract(30, "day"), now];
+        const thisMonth = [now.startOf("month"), now];
+        const prevMonthBase = now.subtract(1, "month");
+        const prevMonth = [
+            prevMonthBase.startOf("month"),
+            prevMonthBase.endOf("month"),
+        ];
+
+        return [
+            { label: gettext("Today"), value: today },
+            { label: gettext("Yesterday"), value: yesterday },
+            { label: gettext("Last 24 hours"), value: last24h },
+            { label: gettext("Last 3 days"), value: last3d },
+            { label: gettext("Last week"), value: lastWeek },
+            { label: gettext("Last month"), value: lastMonthRolling },
+            { label: gettext("This month"), value: thisMonth },
+            { label: gettext("Previous month"), value: prevMonth },
+        ] as TimeRangePickerProps["presets"];
+    }, []);
 
     useEffect(() => {
         cache.clean();
@@ -174,6 +205,7 @@ export function VersionHistory({ id }: { id: number }) {
                     <RangePicker
                         allowEmpty={[true, true]}
                         showTime
+                        presets={presets}
                         onChange={(dates) => {
                             const [ge, lt] = dates ? dates : [null, null];
                             setTstampLt(lt ? dayjsToApi(lt) : null);

@@ -627,6 +627,38 @@ msgstr ""
 msgid "Settings"
 msgstr "Настройки"
 
+#: nodepkg/version-history/VersionHistory.tsx:100
+msgid "Today"
+msgstr "Сегодня"
+
+#: nodepkg/version-history/VersionHistory.tsx:101
+msgid "Yesterday"
+msgstr "Вчера"
+
+#: nodepkg/version-history/VersionHistory.tsx:102
+msgid "Last 24 hours"
+msgstr "За 24 часа"
+
+#: nodepkg/version-history/VersionHistory.tsx:103
+msgid "Last 3 days"
+msgstr "За 3 дня"
+
+#: nodepkg/version-history/VersionHistory.tsx:104
+msgid "Last week"
+msgstr "За неделю"
+
+#: nodepkg/version-history/VersionHistory.tsx:105
+msgid "Last month"
+msgstr "За месяц"
+
+#: nodepkg/version-history/VersionHistory.tsx:106
+msgid "This month"
+msgstr "Этот месяц"
+
+#: nodepkg/version-history/VersionHistory.tsx:107
+msgid "Previous month"
+msgstr "Предыдущий месяц"
+
 #: nodepkg/version-history/component/VersionHistoryGroupDetails.tsx:33
 msgid "Created"
 msgstr "Добавлен"
