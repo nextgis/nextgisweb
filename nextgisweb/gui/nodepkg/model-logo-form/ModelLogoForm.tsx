@@ -8,6 +8,7 @@ import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
 import { route } from "@nextgisweb/pyramid/api";
 import type { KeysWithMethods } from "@nextgisweb/pyramid/api/type";
+import pyramidSettings from "@nextgisweb/pyramid/client-settings";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 interface ModelLogoFormProps extends ImageUploaderProps {
@@ -96,10 +97,12 @@ export function ModelLogoForm({
                 helpText={msg.helpText}
                 uploadText={msg.uploadText}
                 dragAndDropText={msg.dragAndDropText}
-                onChange={(meta?: UploaderMeta) => setFileMeta(meta || null)}
                 image={logo}
                 accept={accept}
-            ></ImageUploader>
+                maxSize={pyramidSettings.logoMaxSize}
+                showMaxSize={true}
+                onChange={(meta?: UploaderMeta) => setFileMeta(meta || null)}
+            />
             <SaveButton onClick={save} loading={status === "saving"} />
         </Space>
     );

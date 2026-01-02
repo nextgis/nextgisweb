@@ -18,7 +18,6 @@ const { Dragger } = Upload;
 
 const msgUpload = gettext("Select a file");
 const msgDragAndDrop = gettext("or drag and drop here");
-const msgMaxSize = formatSize(settings.maxSize) + " " + gettext("max");
 const msgStop = gettext("Stop");
 
 function ProgressText({
@@ -50,6 +49,7 @@ function InputText<M extends boolean = false>({
     helpText,
     clearMeta,
     uploadText = msgUpload,
+    maxSize = settings.maxSize,
     showMaxSize = false,
     dragAndDropText = msgDragAndDrop,
 }: FileUploaderProps & {
@@ -71,7 +71,8 @@ function InputText<M extends boolean = false>({
             />
         </p>
     ) : (
-        // This component cause the console error on tab switch: Uncaught ResizeObserver loop completed with undelivered notifications.
+        // This component cause the console error on tab switch: Uncaught
+        // ResizeObserver loop completed with undelivered notifications.
         // https://github.com/shuding/react-wrap-balancer/issues/82
         <Balancer ratio={0.62}>
             <p className="ant-upload-text">
@@ -79,7 +80,11 @@ function InputText<M extends boolean = false>({
                 {dragAndDropText}
             </p>
             {helpText ? <p className="ant-upload-hint">{helpText}</p> : ""}
-            {showMaxSize && <p className="ant-upload-hint">{msgMaxSize}</p>}
+            {showMaxSize && (
+                <p className="ant-upload-hint">
+                    {formatSize(maxSize) + " " + gettext("max")}
+                </p>
+            )}
         </Balancer>
     );
 }
@@ -90,12 +95,13 @@ export function FileUploader<M extends boolean = false>({
     height = 220,
     fileMeta,
     multiple,
-    onChange,
     inputProps = {},
     afterUpload,
-    onUploading,
     setFileMeta,
     showProgressInDocTitle = true,
+    maxSize = settings.maxSize,
+    onUploading,
+    onChange,
     ...rest
 }: FileUploaderProps<M>) {
     const [messageApi, contextHolder] = message.useMessage();
@@ -108,9 +114,10 @@ export function FileUploader<M extends boolean = false>({
             inputProps,
             fileMeta,
             multiple,
+            accept,
+            maxSize,
             onChange,
             onError: messageApi.error,
-            accept,
         });
 
     useEffect(() => {
@@ -133,7 +140,12 @@ export function FileUploader<M extends boolean = false>({
                 {progressText !== null ? (
                     <ProgressText abort={abort} progressText={progressText} />
                 ) : (
-                    <InputText {...rest} meta={meta} clearMeta={clearMeta} />
+                    <InputText<M>
+                        meta={meta}
+                        maxSize={maxSize}
+                        clearMeta={clearMeta}
+                        {...rest}
+                    />
                 )}
             </Dragger>
         </>

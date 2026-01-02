@@ -36,6 +36,8 @@ from .tomb.predicate import RouteMeta
 from .tomb.response import UnsafeFileResponse
 from .util import gensecret, parse_origin, restart_delayed
 
+LOGO_MAX_SIZE = 128 * (1 << 10)  # 128 KB
+
 
 def _get_cors_olist():
     try:
@@ -669,8 +671,9 @@ class header_logo(csetting):
         except ValueError:
             msg = gettextf("Got an unsupported MIME type: '{}'.")(fupload.mime_type)
             raise ValidationError(msg)
-        if fupload.size > 64 * 1024:
-            raise ValidationError(message=gettext("64K should be enough for a logo."))
+        if fupload.size > LOGO_MAX_SIZE:
+            msg = gettextf("{}KiB should be enough for a logo.")(LOGO_MAX_SIZE // 1024)
+            raise ValidationError(msg)
         return mime_type, value().data_path.read_bytes()
 
 

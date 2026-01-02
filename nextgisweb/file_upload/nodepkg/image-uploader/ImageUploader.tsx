@@ -1,36 +1,43 @@
 import type { UploadFile } from "antd";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Button } from "@nextgisweb/gui/antd";
 import { RemoveIcon } from "@nextgisweb/gui/icon";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { FileUploader } from "../file-uploader";
-import type { UploadProps, UploaderMeta } from "../file-uploader/type";
-
-import type { ImageUploaderProps } from "./type";
+import type {
+    FileUploaderProps,
+    UploadProps,
+    UploaderMeta,
+} from "../file-uploader/type";
 
 import "./ImageUploader.less";
 
 type OriginFileObj = UploadFile["originFileObj"];
 
 const msgUpload = gettext("Select a file");
-const msgDelete = gettext("Delete");
+const msgClear = gettext("Clear");
 
-export function ImageUploader<M extends boolean = boolean>({
+const height = 220;
+
+export interface ImageUploaderProps extends FileUploaderProps<false> {
+    image?: Blob | string | null;
+    onClear?: () => void;
+}
+
+export function ImageUploader({
     inputProps: inputPropsParam,
-    onClean = () => {},
     file,
     image,
+    onClear,
     ...rest
-}: ImageUploaderProps<M>) {
-    const [backgroundImage, setBackgroundImage] = useState<string>();
+}: ImageUploaderProps) {
+    const [imageSrc, setImageSrc] = useState<string>();
     const [chosenFile, setChosenFile] = useState<OriginFileObj[]>();
-    const [fileMeta, setFileMeta] = useState<UploaderMeta<M>>();
+    const [fileMeta, setFileMeta] = useState<UploaderMeta<false>>();
 
     const inputPropsOnChange = inputPropsParam?.onChange;
-
-    const height = 220;
 
     const inputProps = useMemo<UploadProps>(() => {
         return {
@@ -50,24 +57,23 @@ export function ImageUploader<M extends boolean = boolean>({
         };
     }, [inputPropsOnChange, inputPropsParam]);
 
-    const clean = () => {
+    const clear = useCallback(() => {
         setFileMeta(undefined);
-        setBackgroundImage(undefined);
-        onClean();
-    };
+        setImageSrc(undefined);
+        onClear?.();
+    }, [onClear]);
 
-    const readImage = (image_: File | Blob | (File | Blob)[]) => {
-        const f = Array.isArray(image_) ? image_[0] : image_;
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            setBackgroundImage(`url(${reader.result}`);
-        };
-        reader.readAsDataURL(f);
+    const readImage = (value: Blob | Blob[]) => {
+        const first = Array.isArray(value) ? value[0] : value;
+        const blobUrl = URL.createObjectURL(first);
+        setImageSrc(`${blobUrl}`);
     };
 
     useEffect(() => {
-        if (image) {
-            setBackgroundImage(`url(${image})`);
+        if (image instanceof Blob) {
+            readImage(image);
+        } else if (image) {
+            setImageSrc(image);
         }
     }, [image]);
 
@@ -77,41 +83,24 @@ export function ImageUploader<M extends boolean = boolean>({
         }
     }, [chosenFile, fileMeta]);
 
-    const Preview = () => {
-        return (
-            <div className="uploader--image uploader--complete">
-                <div
-                    className="uploader__dropzone"
-                    style={{
-                        height: height + "px",
-                        backgroundImage,
-                        width: "100%",
-                        position: "relative",
-                    }}
-                >
-                    <Button
-                        shape="round"
-                        ghost
-                        danger
-                        icon={<RemoveIcon />}
-                        style={{
-                            position: "absolute",
-                            top: "10px",
-                            right: "10px",
-                        }}
-                        onClick={() => clean()}
-                    >
-                        {msgDelete}
-                    </Button>
-                </div>
-            </div>
-        );
-    };
-
     return (
         <>
-            {backgroundImage ? (
-                <Preview />
+            {imageSrc ? (
+                <div
+                    className="ngw-file-upload-image-uploader completed"
+                    style={{ height }}
+                >
+                    <img src={imageSrc} />
+                    <Button
+                        className="clear-button"
+                        size="small"
+                        variant="filled"
+                        icon={<RemoveIcon />}
+                        onClick={() => clear()}
+                    >
+                        {msgClear}
+                    </Button>
+                </div>
             ) : (
                 <FileUploader
                     file={file}

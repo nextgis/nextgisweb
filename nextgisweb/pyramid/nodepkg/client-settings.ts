@@ -13,6 +13,7 @@ interface Companylogo {
 
 interface PyramidSettings {
     _esModule: boolean;
+    logoMaxSize: number;
     safe_url_pattern: string;
     support_url?: string;
     help_page_url?: string;

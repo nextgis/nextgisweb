@@ -122,7 +122,10 @@ class PyramidComponent(Component):
             logger.debug("Request timeout %s detected from uWSGI", str(ev))
 
     def client_settings(self, request):
+        from .api import LOGO_MAX_SIZE
+
         result = dict()
+        result["logoMaxSize"] = LOGO_MAX_SIZE
         result["safe_url_pattern"] = URL_PATTERN
         result["support_url"] = self.env.core.support_url_view(request)
         result["help_page_url"] = self.env.pyramid.help_page_url_view(request)

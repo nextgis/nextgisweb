@@ -38,7 +38,7 @@ export const EditorWidget: IEditorWidget<EditorStore> = observer(
                             imageUpdated: value === undefined ? null : value,
                         });
                     }}
-                    onClean={() => {
+                    onClear={() => {
                         store.update({
                             imageExisting: null,
                             imageUpdated: undefined,

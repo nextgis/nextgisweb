@@ -1,8 +1,8 @@
-#: api.py:265
+#: api.py:255
 msgid "Storage management is not enabled on this server."
 msgstr "Управление хранилищем не включено на этом сервере."
 
-#: api.py:352
+#: api.py:342
 msgid ""
 "Invalid font file name: '{}'. Only latin letters, digits, hyphens and "
 "underscores are allowed. The *.ttf or *.otf extension is required."
@@ -10,11 +10,11 @@ msgstr ""
 "Недопустимое имя файла шрифта: '{}'. Разрешены только латинские буквы, цифры,"
 " дефисы и подчеркивания. Требуется расширение *.ttf или *.otf."
 
-#: api.py:359
+#: api.py:349
 msgid "Font '{0}' is larger than {1} bytes."
 msgstr "Шрифт '{0}' больше {1} байт."
 
-#: api.py:555
+#: api.py:545
 msgid ""
 "The '{}' query parameter should not contain additional values if 'all' is "
 "specified."
@@ -22,27 +22,27 @@ msgstr ""
 "Параметр запроса '{}' не должен содержать дополнительных значений, если "
 "указано 'all'."
 
-#: api.py:682
+#: api.py:672
 msgid "Got an unsupported MIME type: '{}'."
 msgstr "Получен неподдерживаемый тип MIME: '{}'."
 
-#: api.py:685
-msgid "64K should be enough for a logo."
-msgstr "64K должно быть достаточно для логотипа."
+#: api.py:675
+msgid "{}KiB should be enough for a logo."
+msgstr "{}KiB должно быть достаточно для логотипа."
 
-#: api.py:857
+#: api.py:846
 msgid "Your Web GIS at nextgis.com"
 msgstr "Ваши карты онлайн на nextgis.com"
 
-#: component.py:185
+#: component.py:192
 msgid "Request timeout"
 msgstr "Таймаут запроса"
 
-#: component.py:188
+#: component.py:195
 msgid "Enabled"
 msgstr "Включено"
 
-#: component.py:188
+#: component.py:195
 msgid "Disabled"
 msgstr "Отключено"
 
@@ -300,7 +300,7 @@ msgstr "Выйти"
 msgid "Resources"
 msgstr "Ресурсы"
 
-#: nodepkg/layout/store.ts:77 view.py:201
+#: nodepkg/layout/store.ts:77 view.py:199
 msgid "Control panel"
 msgstr "Панель управления"
 
@@ -476,7 +476,7 @@ msgstr "Доступны обновления"
 msgid "Click to see what's new"
 msgstr "Нажмите и узнайте, что нового"
 
-#: permission.py:5 view.py:306 view.py:657
+#: permission.py:5 view.py:304 view.py:655
 msgid "Cross-origin resource sharing (CORS)"
 msgstr "Cross-origin resource sharing (CORS)"
 
@@ -549,19 +549,19 @@ msgstr ""
 "Если вы используете актуальную версию браузера, Веб ГИС будет работать "
 "нормально."
 
-#: tomb/config.py:98
+#: tomb/config.py:100
 msgid "Parameter required"
 msgstr "Требуется параметр"
 
-#: tomb/config.py:99
+#: tomb/config.py:101
 msgid "The '{}' query parameter is required."
 msgstr "Необходимо указать значение параметра '{}'."
 
-#: tomb/config.py:101
+#: tomb/config.py:103
 msgid "Invalid parameter"
 msgstr "Некорректный параметр"
 
-#: tomb/config.py:102
+#: tomb/config.py:104
 msgid "The '{}' query parameter has an invalid value."
 msgstr "Параметр запроса '{}' имеет недопустимое значение."
 
@@ -573,50 +573,50 @@ msgstr "Некорректное JSON тело"
 msgid "The JSON body of the request is malformed or invalid."
 msgstr "JSON тело запроса имеет некорректный или недопустимый формат."
 
-#: view.py:189
+#: view.py:187
 msgid "HTTP API documentation"
 msgstr "Документация HTTP API"
 
-#: view.py:255 view.py:666
+#: view.py:253 view.py:664
 msgid "System information"
 msgstr "Информация о системе"
 
-#: view.py:265 view.py:672
+#: view.py:263 view.py:670
 msgid "Font management"
 msgstr "Управление шрифтами"
 
-#: view.py:274 view.py:709
+#: view.py:272 view.py:707
 msgid "Storage"
 msgstr "Хранилище"
 
-#: view.py:288 view.py:716
+#: view.py:286 view.py:714
 msgid "Backups"
 msgstr "Резервные копии"
 
-#: view.py:316 view.py:684
+#: view.py:314 view.py:682
 msgid "Custom CSS"
 msgstr "Пользовательские стили CSS"
 
-#: view.py:325 view.py:690
+#: view.py:323 view.py:688
 msgid "Custom logo"
 msgstr "Логотип"
 
-#: view.py:334 view.py:678
+#: view.py:332 view.py:676
 msgid "Web GIS name"
 msgstr "Название Веб ГИС"
 
-#: view.py:343 view.py:696
+#: view.py:341 view.py:694
 msgid "Home path"
 msgstr "Стартовая страница"
 
-#: view.py:352 view.py:702
+#: view.py:350 view.py:700
 msgid "Metrics and analytics"
 msgstr "Метрики и аналитика"
 
-#: view.py:646
+#: view.py:644
 msgid "Info"
 msgstr "Информация"
 
-#: view.py:647
+#: view.py:645
 msgid "Settings"
 msgstr "Настройки"

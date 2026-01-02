@@ -28,16 +28,17 @@ export interface UseFileUploaderProps<
 > {
     /** File types that can be accepted. See input accept {@link https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#accept Attribute}  */
     accept?: string;
-    onError?: (err: string) => void;
     fileMeta?: F;
     multiple?: M;
-    onChange?: (meta?: F) => void;
     inputProps?: UploadProps;
     setFileMeta?: (meta?: F) => void;
     showUploadList?: boolean;
     openFileDialogOnClick?: boolean;
     showProgressInDocTitle?: boolean;
     afterUpload?: AfterFileUploadOperation[];
+    maxSize?: number;
+    onChange?: (meta?: F) => void;
+    onError?: (err: string) => void;
 }
 
 export interface FileUploaderProps<M extends boolean = boolean>

@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import settings from "@nextgisweb/file-upload/client-settings";
 import type { UploadFile } from "@nextgisweb/gui/antd";
 import { errorModalUnlessAbort } from "@nextgisweb/gui/error";
+import { makeAbortError } from "@nextgisweb/gui/error/util";
+import { formatSize } from "@nextgisweb/gui/util";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 import { gettextf } from "@nextgisweb/pyramid/i18n";
 
@@ -15,6 +18,7 @@ import type {
 import { fileUploader } from "../util/fileUploader";
 
 const msgProgressFmt = gettextf("{} uploaded...");
+const msgFileToLarge = gettextf("File is too large, the limit size is {}.");
 
 export function useFileUploader<M extends boolean = false>({
     accept,
@@ -26,6 +30,7 @@ export function useFileUploader<M extends boolean = false>({
     showUploadList = false,
     openFileDialogOnClick = true,
     showProgressInDocTitle = false,
+    maxSize = settings.maxSize,
     onChange,
     onError,
 }: UseFileUploaderProps<M>) {
@@ -79,6 +84,13 @@ export function useFileUploader<M extends boolean = false>({
 
     const fileUploaderWrapper = useCallback(
         async (options: FileUploaderOptions) => {
+            for (const f of options.files) {
+                if (f.size > maxSize) {
+                    onError?.(msgFileToLarge(formatSize(maxSize)));
+                    throw makeAbortError();
+                }
+            }
+
             abort();
             const signal = makeSignal();
             const uploadedFiles = await fileUploader({
@@ -100,7 +112,7 @@ export function useFileUploader<M extends boolean = false>({
 
             return signal.aborted ? [] : uploadedFiles;
         },
-        [abort, makeSignal, afterUpload]
+        [abort, makeSignal, afterUpload, maxSize, onError]
     );
 
     const upload = useCallback(
