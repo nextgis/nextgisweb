@@ -178,10 +178,10 @@ function FeatureFilterEditorTest() {
                     value={
                         currentInlineFilter
                             ? JSON.stringify(
-                                JSON.parse(currentInlineFilter),
-                                null,
-                                2
-                            )
+                                  JSON.parse(currentInlineFilter),
+                                  null,
+                                  2
+                              )
                             : ""
                     }
                 />

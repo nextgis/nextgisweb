@@ -4,6 +4,7 @@ import type { EventsKey } from "ol/events";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Button } from "@nextgisweb/gui/antd";
+import { useDebounce } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { roundValue } from "../utils/format-units";
@@ -12,7 +13,6 @@ import { useProjections } from "./hook/useProjections";
 
 import CropFreeIcon from "@nextgisweb/icon/material/crop_free";
 import MouseIcon from "@nextgisweb/icon/material/mouse";
-import { useDebounce } from "@nextgisweb/pyramid/hook";
 
 import "./MapViewerInfo.less";
 

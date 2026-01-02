@@ -1,4 +1,4 @@
-import { Button, message, Upload } from "@nextgisweb/gui/antd";
+import { Button, Upload, message } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { useFileUploader } from "./hook/useFileUploader";

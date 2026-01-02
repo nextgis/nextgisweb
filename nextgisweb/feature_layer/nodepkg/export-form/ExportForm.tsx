@@ -118,7 +118,6 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
 
     const { lazyModal, modalHolder } = useShowModal();
 
-
     const initialValues = useMemo(() => {
         const initialVals: Partial<FormProps> = {
             format,

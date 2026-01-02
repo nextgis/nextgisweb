@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { Input, message, Space } from "@nextgisweb/gui/antd";
+import { Input, Space, message } from "@nextgisweb/gui/antd";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
 import { route } from "@nextgisweb/pyramid/api";

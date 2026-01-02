@@ -1,5 +1,5 @@
 import WKT from "ol/format/WKT";
-import { Point } from "ol/geom";
+import type { Point } from "ol/geom";
 import { fromExtent } from "ol/geom/Polygon";
 
 const wktFormat = new WKT();

@@ -60,14 +60,9 @@ export function useActionToolbar({
             );
 
             if (tooltip) {
-                return (
-                    <Tooltip title={tooltip}>
-                        {button}
-                    </Tooltip>
-                );
+                return <Tooltip title={tooltip}>{button}</Tooltip>;
             }
             return button;
-
         },
         [props, size, isFit]
     );

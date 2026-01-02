@@ -1,11 +1,11 @@
 .custom-scale {
     display: flex;
     position: relative;
+    column-gap: 5px;
     align-items: baseline;
     clear: both;
     padding: 4px 10px;
     max-width: 100%;
-    column-gap: 5px;
 
     .prefix {
         white-space: nowrap;
