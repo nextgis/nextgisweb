@@ -70,20 +70,21 @@ body > .ngw-gui-react-boot {
                 padding: 24px 12px 12px 12px;
                 max-width: 1000px;
 
-                h1.ngw-pyramid-layout-title {
+                .ngw-pyramid-layout-title {
                     display: flex;
                     align-items: center;
-                    gap: 8px;
-                    margin: 0 0 12px 0;
+                    gap: 12px;
+                    margin-block-end: 8px;
                     min-height: 40px;
 
-                    & > *:not(.ant-btn) {
-                        font-weight: initial;
-                        font-size: initial;
+                    > h1 {
+                        margin-inline: 0 8px;
+                        margin-block: 0;
+                        line-height: 32px;
                     }
 
-                    &.pull-right > *:first-child {
-                        margin-left: auto;
+                    &.pull-right > h1 {
+                        margin-inline-end: auto;
                     }
                 }
             }

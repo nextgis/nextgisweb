@@ -19,17 +19,17 @@ export function PageTitle({ title, pullRight, children }: PageTitleProps) {
 
     useLayoutEffect(() => {
         // Delete existing header if it isn't replaced
-        titleRef.current?.remove();
+        titleRef.current?.parentElement?.remove();
     }, []);
 
     return (
-        <h1
+        <div
             className={classNames("ngw-pyramid-layout-title", {
                 "pull-right": pullRight,
             })}
         >
-            {ititle}
+            <h1>{ititle}</h1>
             {children}
-        </h1>
+        </div>
     );
 }

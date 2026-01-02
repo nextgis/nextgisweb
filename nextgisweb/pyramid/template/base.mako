@@ -86,9 +86,9 @@
             <div class="ngw-pyramid-layout-crow">
                 <div class="ngw-pyramid-layout-mwrapper">
                     <div id="main" class="ngw-pyramid-layout-main">
-                        <h1 id="title" class="ngw-pyramid-layout-title">
-                            ${tr(effective_title)}
-                        </h1>
+                        <div class="ngw-pyramid-layout-title">
+                            <h1 id="title">${tr(effective_title)}</h1>
+                        </div>
                         %if hasattr(next, 'body'):
                             <div id="content" class="content" style="width: 100%">
                                 ${next.body()}

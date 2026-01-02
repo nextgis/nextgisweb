@@ -301,52 +301,50 @@ export function Journal() {
     return (
         <>
             <PageTitle>
-                <div className="ngw-audit-journal-page-title">
-                    <RangePicker
-                        allowEmpty={[true, true]}
-                        showTime={{ minuteStep: 5, secondStep: 5 }}
-                        onChange={(dates) => {
-                            const [ge, lt] = dates ? dates : [null, null];
-                            setParams({
-                                ...params,
-                                ge: ge ? dayjsToApi(ge) : undefined,
-                                lt: lt ? dayjsToApi(lt) : undefined,
-                            });
-                        }}
-                        presets={[
-                            rangePresetLast(5, "minute"),
-                            rangePresetLast(15, "minute"),
-                            rangePresetLast(1, "hour"),
-                            rangePresetLast(6, "hour"),
-                            rangePresetLast(12, "hour"),
-                            rangePresetLast(24, "hour"),
-                            rangePresetLast(2, "day"),
-                            rangePresetLast(7, "day"),
-                        ]}
-                    />
-                    <PrincipalSelect
-                        model="user"
-                        systemUsers={["guest"]}
-                        onChange={(value) => {
-                            setParams({
-                                ...params,
-                                ...(value === null
-                                    ? { user: undefined }
-                                    : { user: value }),
-                            });
-                        }}
-                        placeholder={gettext("Filter by user")}
-                        style={{ minWidth: "25ch" }}
-                    />
-                    <Button
-                        onClick={exportCsv}
-                        type="primary"
-                        style={{ marginLeft: "auto" }}
-                        ghost
-                    >
-                        {gettext("Export CSV")}
-                    </Button>
-                </div>
+                <RangePicker
+                    allowEmpty={[true, true]}
+                    showTime={{ minuteStep: 5, secondStep: 5 }}
+                    onChange={(dates) => {
+                        const [ge, lt] = dates ? dates : [null, null];
+                        setParams({
+                            ...params,
+                            ge: ge ? dayjsToApi(ge) : undefined,
+                            lt: lt ? dayjsToApi(lt) : undefined,
+                        });
+                    }}
+                    presets={[
+                        rangePresetLast(5, "minute"),
+                        rangePresetLast(15, "minute"),
+                        rangePresetLast(1, "hour"),
+                        rangePresetLast(6, "hour"),
+                        rangePresetLast(12, "hour"),
+                        rangePresetLast(24, "hour"),
+                        rangePresetLast(2, "day"),
+                        rangePresetLast(7, "day"),
+                    ]}
+                />
+                <PrincipalSelect
+                    model="user"
+                    systemUsers={["guest"]}
+                    onChange={(value) => {
+                        setParams({
+                            ...params,
+                            ...(value === null
+                                ? { user: undefined }
+                                : { user: value }),
+                        });
+                    }}
+                    placeholder={gettext("Filter by user")}
+                    style={{ minWidth: "25ch" }}
+                />
+                <Button
+                    style={{ marginInlineStart: "auto" }}
+                    type="primary"
+                    ghost={true}
+                    onClick={exportCsv}
+                >
+                    {gettext("Export CSV")}
+                </Button>
             </PageTitle>
             <div className="ngw-audit-journal" style={themeVariables}>
                 <div className="wrapper">

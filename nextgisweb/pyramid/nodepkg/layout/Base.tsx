@@ -103,12 +103,9 @@ export function Base({
                                     {breadcrumbs.length > 0 && (
                                         <Breadcrumbs items={breadcrumbs} />
                                     )}
-                                    <h1
-                                        id="title"
-                                        className="ngw-pyramid-layout-title"
-                                    >
-                                        {title}
-                                    </h1>{" "}
+                                    <div className="ngw-pyramid-layout-title">
+                                        <h1 id="title">{title}</h1>
+                                    </div>{" "}
                                     <div
                                         id="content"
                                         className="content"

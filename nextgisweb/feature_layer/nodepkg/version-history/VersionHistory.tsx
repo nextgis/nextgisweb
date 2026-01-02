@@ -201,24 +201,23 @@ export function VersionHistory({ id }: { id: number }) {
             }}
         >
             <PageTitle>
-                <div style={{ display: "flex", flexGrow: 1, gap: "8px" }}>
-                    <RangePicker
-                        allowEmpty={[true, true]}
-                        showTime
-                        presets={presets}
-                        onChange={(dates) => {
-                            const [ge, lt] = dates ? dates : [null, null];
-                            setTstampLt(lt ? dayjsToApi(lt) : null);
-                            setTstampGe(ge ? dayjsToApi(ge) : null);
-                        }}
-                    />
-                    <Button
-                        type="default"
-                        icon={<RefreshIcon />}
-                        onClick={bumpReloadKey}
-                        title={gettext("Refresh table")}
-                    ></Button>
-                </div>
+                <RangePicker
+                    allowEmpty={[true, true]}
+                    showTime
+                    presets={presets}
+                    onChange={(dates) => {
+                        const [ge, lt] = dates ? dates : [null, null];
+                        setTstampLt(lt ? dayjsToApi(lt) : null);
+                        setTstampGe(ge ? dayjsToApi(ge) : null);
+                    }}
+                />
+                <Button
+                    style={{ marginInlineStart: "auto" }}
+                    type="text"
+                    icon={<RefreshIcon />}
+                    onClick={bumpReloadKey}
+                    title={gettext("Refresh table")}
+                />
             </PageTitle>
 
             <div
