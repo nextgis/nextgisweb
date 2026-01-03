@@ -33,7 +33,6 @@ import ArrowIcon from "@nextgisweb/icon/material/keyboard_arrow_right";
 
 import "./ComplexTree.less";
 
-const TREE_ID = "main";
 const getItemTitleStub = () => "STUB";
 
 const arrowCollapsed = <ArrowIcon />;
@@ -63,18 +62,26 @@ class EnvironmentAdapter<I extends FocusTableItem>
     readonly target: TreeEnvironmentRef<I>;
     readonly store: FocusTableStore<I>;
     readonly provider: DataProvider<I>;
+    readonly treeId: string;
 
     constructor(
         target: TreeEnvironmentRef<I>,
-        opts: { store: FocusTableStore<I>; provider: DataProvider<I> }
+        opts: {
+            store: FocusTableStore<I>;
+            provider: DataProvider<I>;
+            treeId: string;
+        }
     ) {
         this.target = target;
         this.store = opts.store;
         this.provider = opts.provider;
+        this.treeId = opts.treeId;
     }
 
     get selected(): I | null {
-        const state = this.target.viewState[TREE_ID] as IndividualTreeViewState;
+        const state = this.target.viewState[
+            this.treeId
+        ] as IndividualTreeViewState;
         const selectedItems = state.selectedItems ?? [];
         return this.provider.indexer.lookup(selectedItems[0]) ?? null;
     }
@@ -82,16 +89,17 @@ class EnvironmentAdapter<I extends FocusTableItem>
     select = (item: I | null) => {
         if (item) {
             const index = this.provider.indexer.index(item);
-            this.target.selectItems([index], TREE_ID);
+            this.target.selectItems([index], this.treeId);
         } else {
-            this.target.selectItems([], TREE_ID);
+            this.target.selectItems([], this.treeId);
         }
     };
 
     expand = (items: I[]) => {
+        console.log(this.target.treeIds);
         items.forEach((item) => {
             const index = this.provider.indexer.index(item);
-            this.target.expandItem(index, TREE_ID);
+            this.target.expandItem(index, this.treeId);
         });
     };
 
@@ -101,7 +109,9 @@ class EnvironmentAdapter<I extends FocusTableItem>
 
     isExpanded = (item: I | null) => {
         if (item === null) return true;
-        const state = this.target.viewState[TREE_ID] as IndividualTreeViewState;
+        const state = this.target.viewState[
+            this.treeId
+        ] as IndividualTreeViewState;
         const expandedItems = state.expandedItems ?? [];
         return expandedItems.indexOf(this.indexFor(item)) >= 0;
     };
@@ -212,6 +222,8 @@ export interface ComplexTreeProps<
     rootClassName?: string;
 }
 
+let treeIdCounter = 0;
+
 export function ComplexTree<
     I extends FocusTableItem,
     C extends string = string,
@@ -236,19 +248,17 @@ export function ComplexTree<
 
     const provider = useDataProvider<I>({ store, rootItem: root });
     const environmentRef = useRef<CTE>(null) as RefObject<CTE>;
+    const treeId = useMemo(() => `ComplexTree-${++treeIdCounter}`, []);
 
     const environmentMergeRefs = useCallback(
         (value: TreeEnvironmentRef<I> | null) => {
             const newValue = value
-                ? new EnvironmentAdapter(value, {
-                      store,
-                      provider,
-                  })
+                ? new EnvironmentAdapter(value, { store, provider, treeId })
                 : undefined;
             setRefCurrent(environmentRef, newValue);
             setRefCurrent(propsEnvironment, newValue);
         },
-        [propsEnvironment, provider, store]
+        [propsEnvironment, provider, store, treeId]
     );
 
     const getActions = useActionsCallback(actions, undefined);
@@ -487,7 +497,7 @@ export function ComplexTree<
             renderItemArrow={renderItemArrow}
             renderDragBetweenLine={renderDragBetweenLine}
         >
-            <Tree treeId={TREE_ID} rootItem={root} />
+            <Tree treeId={treeId} rootItem={root} />
         </UncontrolledTreeEnvironment>
     );
 }
