@@ -133,7 +133,7 @@ def setup_pyramid(comp, config):
 
         config.add_tween(
             "nextgisweb.pyramid.lunkwill.tween_factory",
-            under=["nextgisweb.pyramid.api.cors_tween_factory"],
+            under=["nextgisweb.pyramid.api_cors.tween_factory"],
         )
 
 
