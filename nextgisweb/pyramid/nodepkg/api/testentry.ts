@@ -23,8 +23,7 @@ export const test = async () => {
     const data = await route("pyramid.settings").get({
         query: { component: "pyramid" },
     });
-    data.key;
-    data.key;
+    data.component;
 
     // @ts-expect-error An argument for 'options' was not provided
     route("pyramid.settings").get();

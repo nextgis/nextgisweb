@@ -26,7 +26,7 @@ function OAuthStatus({ oauthSubject }: OauthStatusProps) {
                 {gettext("Account bound")} <span>({oauthSubject})</span>
             </>
         );
-    } else if (oauth.bind) {
+    } else if (oauth.userBind) {
         const bindUrl =
             routeURL("auth.oauth") +
             "?" +

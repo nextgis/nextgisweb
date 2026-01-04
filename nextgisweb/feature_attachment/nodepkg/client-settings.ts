@@ -1,9 +1,5 @@
+import { assert } from "@nextgisweb/jsrealm/error";
 import { fetchSettings } from "@nextgisweb/pyramid/settings";
 
-export interface FeatureAttachmentSettings {
-    webmap: {
-        bundle: boolean;
-    };
-}
-
-export default await fetchSettings<FeatureAttachmentSettings>(COMP_ID);
+assert(COMP_ID === "feature_attachment"); // Narrow COMP_ID type
+export default await fetchSettings(COMP_ID);

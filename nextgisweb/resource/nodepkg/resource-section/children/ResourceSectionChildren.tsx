@@ -20,7 +20,7 @@ import "./ResourceSectionChildren.less";
 
 const { Column } = Table;
 
-const storageEnabled = pyramidSettings.storage_enabled;
+const storageEnabled = pyramidSettings.storage.enabled;
 
 interface ResourceSectionChildrenProps extends ResourceSectionProps {
     resourceChildren: Resource[];

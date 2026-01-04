@@ -9,7 +9,7 @@ import { Alert, Input, Spin } from "@nextgisweb/gui/antd";
 import { request, route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { AbortControllerHelper } from "@nextgisweb/pyramid/util/abort";
-import webmapSettings from "@nextgisweb/webmap/client-settings";
+import settings from "@nextgisweb/webmap/client-settings";
 import { lonLatToDM } from "@nextgisweb/webmap/coordinates/formatter";
 import { parse } from "@nextgisweb/webmap/coordinates/parser";
 import type { Display } from "@nextgisweb/webmap/display";
@@ -172,8 +172,8 @@ const searchByNominatim: SearchFunction = async (
 ) => {
     const searchResults: SearchResult[] = [];
     if (
-        !webmapSettings.address_search_enabled ||
-        webmapSettings.address_geocoder !== "nominatim"
+        !settings.address_search_enabled ||
+        settings.address_geocoder !== "nominatim"
     ) {
         return [limit, searchResults, false];
     }
@@ -185,17 +185,17 @@ const searchByNominatim: SearchFunction = async (
         polygon_geojson: 1,
     };
 
-    if (webmapSettings.address_search_extent) {
+    if (settings.address_search_extent) {
         const extent = display.config.initialExtent;
         query.bounded = "1";
         query.viewbox = extent.join(",");
     }
 
-    if (webmapSettings.nominatim_countrycodes) {
-        query.countrycodes = webmapSettings.nominatim_countrycodes;
+    if (settings.nominatim_countrycodes) {
+        query.countrycodes = settings.nominatim_countrycodes;
     }
 
-    const searchUrl = `${webmapSettings.nonimatim_url}/search`;
+    const searchUrl = `${settings.nominatimUrl}/search`;
     const headers = { "X-Requested-With": "null" };
     const global = true;
     const signal = controller.makeSignal();
@@ -240,20 +240,20 @@ const searchByYandex: SearchFunction = async (
 ) => {
     const searchResults: SearchResult[] = [];
     if (
-        !webmapSettings.address_search_enabled ||
-        webmapSettings.address_geocoder !== "yandex"
+        !settings.address_search_enabled ||
+        settings.address_geocoder !== "yandex"
     ) {
         return [limit, searchResults, false];
     }
 
-    const apikey = webmapSettings.yandex_api_geocoder_key;
+    const apikey = settings.yandex_api_geocoder_key;
     const query: YandexGeocoderQuery = {
         apikey,
         geocode: criteria,
         format: "json",
     };
 
-    if (webmapSettings.address_search_extent && display.config.initialExtent) {
+    if (settings.address_search_extent && display.config.initialExtent) {
         const extent = display.config.initialExtent;
         query.bbox = `${extent[0]},${extent[1]}~${extent[2]},${extent[3]}`;
     }

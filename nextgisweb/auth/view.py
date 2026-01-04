@@ -5,7 +5,7 @@ from typing import Annotated
 from urllib.parse import parse_qsl, urlencode
 
 import zope.event
-from msgspec import Meta
+from msgspec import Meta, Struct
 from pyramid.events import BeforeRender
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound, HTTPUnauthorized
 from pyramid.renderers import render_to_response
@@ -19,10 +19,11 @@ from nextgisweb.lib.datetime import utcnow_naive
 
 from nextgisweb.gui import REACT_RENDERER, react_renderer
 from nextgisweb.jsrealm import jsentry
-from nextgisweb.pyramid import SessionStore, WebSession
+from nextgisweb.pyramid import SessionStore, WebSession, client_setting
 from nextgisweb.pyramid.view import ModelFactory
 
 from . import permission
+from .component import AuthComponent
 from .exception import ALinkException, InvalidCredentialsException, UserDisabledException
 from .model import Group, User
 from .oauth import AuthorizationException, InvalidTokenException
@@ -400,6 +401,59 @@ def group_edit(request):
         props=dict(id=obj.id, readonly=readonly),
         title=obj.display_name,
         dynmenu=request.env.pyramid.control_panel,
+    )
+
+
+@client_setting("alink")
+def cs_alink(comp: AuthComponent, request) -> bool:
+    return comp.options["alink"]
+
+
+class AuthUserLimitClientSetting(Struct, kw_only=True):
+    total: int | None
+    local: int | None
+
+
+@client_setting("userLimit")
+def cs_user_limit(comp: AuthComponent, request) -> AuthUserLimitClientSetting:
+    return AuthUserLimitClientSetting(
+        total=comp.options["user_limit"],
+        local=comp.options["user_limit_local"],
+    )
+
+
+class AuthOAuthClientSetting(Struct, kw_only=True, rename="camel"):
+    enabled: bool
+    base_url: str | None
+    name: str | None
+    server_type: str | None
+    is_default: bool | None
+    user_bind: bool | None
+    group_mapping: bool | None
+
+
+@client_setting("oauth")
+def cs_oauth(comp: AuthComponent, request) -> AuthOAuthClientSetting:
+    if (comp.oauth is None) or not comp.oauth.authorization_code:
+        return AuthOAuthClientSetting(
+            enabled=False,
+            base_url=None,
+            name=None,
+            server_type=None,
+            is_default=None,
+            user_bind=None,
+            group_mapping=None,
+        )
+
+    opts = comp.oauth.options
+    return AuthOAuthClientSetting(
+        enabled=True,
+        base_url=opts["server.base_url"] if ("server.base_url" in opts) else None,
+        name=opts["server.display_name"],
+        server_type=opts["server.type"],
+        is_default=bool(opts["default"]),
+        user_bind=bool(opts["bind"]),
+        group_mapping=bool(opts["profile.member_of.attr"] is not None),
     )
 
 

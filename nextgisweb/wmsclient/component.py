@@ -3,8 +3,6 @@ from datetime import timedelta
 from nextgisweb.env import Component
 from nextgisweb.lib.config import Option
 
-from .model import WMS_VERSIONS
-
 
 class WMSClientComponent(Component):
     def initialize(self):
@@ -16,9 +14,6 @@ class WMSClientComponent(Component):
         from . import view
 
         view.setup_pyramid(self, config)
-
-    def client_settings(self, request):
-        return dict(wms_versions=WMS_VERSIONS)
 
     # fmt: off
     option_annotations = (

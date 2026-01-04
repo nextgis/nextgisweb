@@ -144,33 +144,6 @@ class AuthComponent(Component):
         view.setup_pyramid(self, config)
         api.setup_pyramid(self, config)
 
-    def client_settings(self, request):
-        enabled = (self.oauth is not None) and self.oauth.authorization_code
-        return dict(
-            alink=self.options["alink"],
-            user_limit=dict(
-                total=self.options["user_limit"],
-                local=self.options["user_limit_local"],
-            ),
-            oauth=dict(
-                enabled=enabled,
-                default=self.oauth.options["default"] if enabled else None,
-                bind=self.oauth.options["bind"] if enabled else None,
-                server_type=self.oauth.options["server.type"] if enabled else None,
-                display_name=self.oauth.options["server.display_name"] if enabled else None,
-                base_url=(
-                    self.oauth.options["server.base_url"]
-                    if (enabled and "server.base_url" in self.oauth.options)
-                    else None
-                ),
-                group_mapping=(
-                    (self.oauth.options["profile.member_of.attr"] is not None)
-                    if enabled
-                    else False
-                ),
-            ),
-        )
-
     def query_stat(self):
         return dict(
             user_count=_ucnt(),

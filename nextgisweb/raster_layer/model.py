@@ -470,7 +470,7 @@ class SourceAttr(SAttribute):
 
         cog = srlzr.data.cog
         if cog is UNSET or cog is None:
-            cog = env.raster_layer.cog_enabled if cog is None or create else srlzr.obj.cog
+            cog = env.raster_layer.cog_default if cog is None or create else srlzr.obj.cog
         srlzr.obj.load_file(value().data_path, cog=cog)
 
         new_size = estimate_raster_layer_data(srlzr.obj)
@@ -490,7 +490,7 @@ class CogAttr(SColumn):
             return  # Just do nothing, SourceAttr will set the cog attribute
 
         if value is None:
-            value = env.raster_layer.cog_enabled
+            value = env.raster_layer.cog_default
         if srlzr.obj.cog == value:
             return
 

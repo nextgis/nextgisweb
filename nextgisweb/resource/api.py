@@ -16,7 +16,7 @@ from sqlalchemy.sql import or_ as sa_or
 from sqlalchemy.sql.operators import eq as eq_op
 from sqlalchemy.sql.operators import ilike_op, in_op, like_op
 
-from nextgisweb.env import DBSession, gettext
+from nextgisweb.env import COMP_ID, DBSession, gettext
 from nextgisweb.lib.apitype import AnyOf, EmptyObject, Query, StatusCode, annotate
 from nextgisweb.lib.msext import DEPRECATED
 
@@ -24,10 +24,11 @@ from nextgisweb.auth import User
 from nextgisweb.auth.api import UserID
 from nextgisweb.core.exception import InsufficientPermissions, UserException, ValidationError
 from nextgisweb.jsrealm import TSExport
-from nextgisweb.pyramid import AsJSON, JSONType
+from nextgisweb.pyramid import AsJSON, JSONType, client_setting
 from nextgisweb.pyramid.api import csetting, require_storage_enabled
 
 from .category import ResourceCategory, ResourceCategoryIdentity
+from .component import ResourceComponent
 from .composite import CompositeSerializer
 from .event import AfterResourceCollectionPost, AfterResourcePut, OnDeletePrompt
 from .exception import (
@@ -949,7 +950,13 @@ ResourceExport = Annotated[
     Literal["data_read", "data_write", "administrators"],
     TSExport("ResourceExport"),
 ]
+
 csetting("resource_export", ResourceExport, default="data_read")
+
+
+@client_setting("resourceExport")
+def cs_resource_export(comp: ResourceComponent, request) -> ResourceExport:
+    return csetting.registry[COMP_ID]["resource_export"].getter()
 
 
 def setup_pyramid(comp, config):

@@ -20,9 +20,9 @@ export interface BasemapConfig {
     keyname: string;
     url: string;
     display_name: string;
-    epsg?: number;
-    opacity?: number;
-    enabled?: boolean;
+    epsg?: number | null;
+    opacity?: number | null;
+    enabled?: boolean | null;
     copyright_text?: string | null;
     copyright_url?: string | null;
     z_min?: number | null;

@@ -1,3 +1,4 @@
+from msgspec import Struct, field
 from pyramid.httpexceptions import HTTPNotFound
 
 from nextgisweb.env import gettext
@@ -5,9 +6,12 @@ from nextgisweb.lib import dynmenu as dm
 
 from nextgisweb.gui import react_renderer
 from nextgisweb.jsrealm import icon, jsentry
+from nextgisweb.pyramid import client_setting
 from nextgisweb.resource import Resource, Widget
 from nextgisweb.resource.extaccess import ExternalAccessLink
 
+from .component import RasterLayerComponent
+from .gdaldriver import GDAL_DRIVER_NAME_2_EXPORT_FORMATS
 from .model import RasterLayer
 
 
@@ -41,6 +45,23 @@ class COGLink(ExternalAccessLink):
     @classmethod
     def url_factory(cls, obj, request) -> str:
         return request.route_url("raster_layer.cog", id=obj.id)
+
+
+class RasterLayerExportFormatClientSetting(Struct, kw_only=True):
+    name: str
+    display_name: str = field(name="alias")
+
+
+@client_setting("exportFormats")
+def cs_export_formats(
+    comp: RasterLayerComponent, request
+) -> list[RasterLayerExportFormatClientSetting]:
+    return [RasterLayerExportFormatClientSetting(**i) for i in GDAL_DRIVER_NAME_2_EXPORT_FORMATS]
+
+
+@client_setting("cogDefault")
+def cs_cog_default(comp: RasterLayerComponent, request) -> bool:
+    return comp.cog_default
 
 
 def setup_pyramid(comp, config):

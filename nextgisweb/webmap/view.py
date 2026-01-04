@@ -1,15 +1,20 @@
 from urllib.parse import unquote, urljoin, urlparse
 
+from msgspec import Struct
 from pyramid.renderers import render_to_response
 
-from nextgisweb.env import gettext
+from nextgisweb.env import COMP_ID, gettext
 from nextgisweb.lib.dynmenu import Label, Link
 
 from nextgisweb.gui import react_renderer
 from nextgisweb.jsrealm import icon, jsentry
+from nextgisweb.pyramid import client_setting
+from nextgisweb.pyramid.api import csetting
 from nextgisweb.render.view import TMSLink
 from nextgisweb.resource import Resource, ResourceFactory, ResourceScope, Widget
 
+from .adapter import WebMapAdapter
+from .component import WebMapComponent
 from .model import WebMap
 from .util import webmap_items_to_tms_ids_list
 
@@ -131,6 +136,38 @@ class WebMapTMSLink(TMSLink):
         return request.route_url("render.tile") + "?resource=" + rids + "&nd=204&z={z}&x={x}&y={y}"
 
 
+class WebMapAdapterCS(Struct, kw_only=True):
+    display_name: str
+
+
+@client_setting("adapters")
+def cs_adapters(comp: WebMapComponent, request) -> dict[str, WebMapAdapterCS]:
+    return {
+        i.identity: WebMapAdapterCS(display_name=request.localizer.translate(i.display_name))
+        for i in WebMapAdapter.registry.values()
+    }
+
+
+@client_setting("editing")
+def cs_editing(comp: WebMapComponent, request) -> bool:
+    return comp.options["editing"]
+
+
+@client_setting("annotation")
+def cs_annotation(comp: WebMapComponent, request) -> bool:
+    return comp.options["annotation"]
+
+
+@client_setting("checkOrigin")
+def cs_check_origin(comp: WebMapComponent, request) -> bool:
+    return comp.options["check_origin"]
+
+
+@client_setting("nominatimUrl")
+def cs_nominatim_url(comp: WebMapComponent, request) -> str:
+    return comp.options["nominatim.url"].rstrip("/")
+
+
 def setup_pyramid(comp, config):
     resource_factory = ResourceFactory(context=WebMap)
 
@@ -167,6 +204,14 @@ def setup_pyramid(comp, config):
         "/control-panel/webmap-settings",
         get=settings,
     )
+
+    for k, v in csetting.registry[COMP_ID].items():
+
+        def cs_k(comp: WebMapComponent, request) -> v.gtype:  # type: ignore
+            return v.getter()
+
+        cs_k.__name__ = f"cs_{k}"
+        client_setting(k)(cs_k)
 
     icon_display = icon("display")
     icon_clone = icon("material/content_copy")

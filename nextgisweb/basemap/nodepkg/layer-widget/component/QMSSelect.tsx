@@ -33,7 +33,7 @@ function QMSLabel({ name, id }: { name: string; id: number }) {
             {name}
             <a
                 style={{ paddingLeft: "3px" }}
-                href={`${settings.qms_url}/geoservices/${id}`}
+                href={`${settings.qms.url}/geoservices/${id}`}
                 target="_blank"
             >
                 <OpenInNewIcon />

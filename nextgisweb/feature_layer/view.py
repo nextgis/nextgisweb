@@ -1,3 +1,4 @@
+from msgspec import Struct
 from pyramid.httpexceptions import HTTPNotFound
 
 from nextgisweb.env import gettext
@@ -5,12 +6,14 @@ from nextgisweb.lib.dynmenu import Label, Link
 
 from nextgisweb.gui import react_renderer
 from nextgisweb.jsrealm import icon, jsentry
+from nextgisweb.pyramid import client_setting
 from nextgisweb.resource import DataScope, Resource, Widget, resource_factory
 from nextgisweb.resource.extaccess import ExternalAccessLink
 from nextgisweb.resource.view import resource_sections
 
+from .component import FeatureLayerComponent
 from .interface import IFeatureLayer, IVersionableFeatureLayer
-from .ogrdriver import MVT_DRIVER_EXIST
+from .ogrdriver import MVT_DRIVER_EXIST, OGR_DRIVER_NAME_2_EXPORT_FORMATS
 from .versioning import FVersioningNotEnabled
 
 
@@ -143,6 +146,30 @@ def versioning_settings(request):
         title=gettext("Feature versioning"),
         dynmenu=request.env.pyramid.control_panel,
     )
+
+
+class FeatureLayerExportFormatClientSetting(Struct, kw_only=True):
+    name: str
+    display_name: str
+    single_file: bool
+    lco_configurable: bool | None
+    dsco_configurable: str | None
+
+
+@client_setting("exportFormats")
+def cs_export_formats(
+    comp: FeatureLayerComponent, request
+) -> list[FeatureLayerExportFormatClientSetting]:
+    return [FeatureLayerExportFormatClientSetting(**i) for i in OGR_DRIVER_NAME_2_EXPORT_FORMATS]
+
+
+class FeatureLayerVersioningClientSetting(Struct, kw_only=True):
+    default: bool
+
+
+@client_setting("versioning")
+def cs_versioning(comp: FeatureLayerComponent, request) -> FeatureLayerVersioningClientSetting:
+    return FeatureLayerVersioningClientSetting(default=comp.versioning_default)
 
 
 def setup_pyramid(comp, config):

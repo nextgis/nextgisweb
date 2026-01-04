@@ -27,7 +27,7 @@ export function AttachmentForm({ id }: { id: number }) {
 
     const doExport = async () => {
         const apiUrl = routeURL("feature_attachment.export", id);
-        if (pyramidSettings.lunkwill_enabled) {
+        if (pyramidSettings.lunkwill.enabled) {
             const lunkwillParam = new LunkwillParam();
             lunkwillParam.require();
             try {

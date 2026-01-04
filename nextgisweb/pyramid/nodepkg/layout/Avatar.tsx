@@ -28,7 +28,7 @@ export const Avatar = observer(() => {
     );
 
     const showLoginModal = () => {
-        if (oauth.enabled && oauth.default) {
+        if (oauth.enabled && oauth.isDefault) {
             const qs = new URLSearchParams([["next", window.location.href]]);
             window.open(routeURL("auth.oauth") + "?" + qs.toString(), "_self");
         } else {

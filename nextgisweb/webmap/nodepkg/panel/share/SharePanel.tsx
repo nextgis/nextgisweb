@@ -53,7 +53,7 @@ const makeIframeTag = (iframeSrc: string, height: number, width: number) => {
 };
 
 const CORSWarning = () => {
-    if (!settings["check_origin"]) return <></>;
+    if (!settings.checkOrigin) return <></>;
     return (
         <Alert
             type="warning"

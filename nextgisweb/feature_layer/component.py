@@ -2,8 +2,6 @@ from nextgisweb.env import Component, require
 from nextgisweb.lib.config import Option
 
 from .extension import FeatureExtension
-from .interface import FIELD_TYPE
-from .ogrdriver import OGR_DRIVER_NAME_2_EXPORT_FORMATS
 
 
 class FeatureLayerComponent(Component):
@@ -26,16 +24,9 @@ class FeatureLayerComponent(Component):
     @property
     def versioning_default(self):
         return self.env.core.settings_get(
-            self.identity, "versioning_default", self.options["versioning.default"]
-        )
-
-    def client_settings(self, request):
-        return dict(
-            export_formats=OGR_DRIVER_NAME_2_EXPORT_FORMATS,
-            datatypes=FIELD_TYPE.enum,
-            versioning=dict(
-                default=self.versioning_default,
-            ),
+            self.identity,
+            "versioning_default",
+            self.options["versioning.default"],
         )
 
     # fmt: off

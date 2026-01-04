@@ -1,9 +1,13 @@
+from msgspec import Struct
+
 from nextgisweb.env import gettext
 from nextgisweb.lib import dynmenu as dm
 
 from nextgisweb.gui import react_renderer
+from nextgisweb.pyramid import client_setting
 
-from .model import SRS
+from .component import SpatialRefSysComponent
+from .model import SRS, SRSRef
 from .pyramid import require_catalog_configured, srs_factory
 
 
@@ -64,6 +68,27 @@ def catalog_import(request):
         title=gettext("Spatial reference system") + " #%d" % catalog_id,
         props=dict(url=item_url, id=catalog_id),
         dynmenu=request.env.pyramid.control_panel,
+    )
+
+
+@client_setting("default")
+def cs_default(comp: SpatialRefSysComponent, request) -> SRSRef:
+    return SRSRef(id=3857)
+
+
+class SpatialRefSysCatalogClientSetting(Struct, kw_only=True, rename="camel"):
+    enabled: bool
+    url: str | None
+    coordinates_search: bool
+
+
+@client_setting("catalog")
+def cs_catalog(comp: SpatialRefSysComponent, request) -> SpatialRefSysCatalogClientSetting:
+    cat_opts = comp.options.with_prefix("catalog")
+    return SpatialRefSysCatalogClientSetting(
+        enabled=cat_opts["enabled"],
+        url=cat_opts["url"] if cat_opts["enabled"] else None,
+        coordinates_search=cat_opts["coordinates_search"],
     )
 
 

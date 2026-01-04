@@ -38,13 +38,6 @@ class RenderComponent(Component):
         api.setup_pyramid(self, config)
         view.setup_pyramid(self, config)
 
-    def client_settings(self, request):
-        return dict(
-            tile_cache=dict(
-                enabled=self.tile_cache_enabled,
-            ),
-        )
-
     def sys_info(self):
         from .imgcodec import has_fpng
 

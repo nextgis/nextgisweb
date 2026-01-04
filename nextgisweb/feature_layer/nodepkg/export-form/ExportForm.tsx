@@ -53,7 +53,7 @@ interface FormProps extends ExportFeatureLayerOptions {
 
 type FormPropsKey = Extract<keyof FormProps, string>;
 
-const exportFormats = settings.export_formats;
+const { exportFormats } = settings;
 
 const srsListToOptions = (srsList: SRSRead[]): SrsOption[] =>
     srsList.map((srs) => ({

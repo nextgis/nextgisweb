@@ -4,16 +4,14 @@ import type { QMSSearch, QMSService } from "../type";
 
 type QMSType = "tms" | "wms";
 
+const geoservicesApiUrl = `${settings.qms.url}/api/v1/geoservices`;
+
 export async function get(
     id: number,
     options?: RequestInit
 ): Promise<QMSService> {
-    const url = `${settings.qms_geoservices_url}${id}/?format=json`;
-
-    const response = await fetch(url, {
-        method: "GET",
-        ...options,
-    });
+    const url = `${geoservicesApiUrl}/${id}/?format=json`;
+    const response = await fetch(url, { method: "GET", ...options });
 
     if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -36,7 +34,7 @@ export async function search(
     };
 
     const queryString = new URLSearchParams(queryOptions).toString();
-    const url = `${settings.qms_geoservices_url}?${queryString}&format=json`;
+    const url = `${geoservicesApiUrl}/?${queryString}&format=json`;
 
     const response = await fetch(url, {
         method: "GET",

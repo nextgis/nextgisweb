@@ -18,6 +18,7 @@ import CachedIcon from "@nextgisweb/icon/material/cached";
 import "./StorageSummary.less";
 
 const kindOfData = await route("pyramid.kind_of_data").get({ cache: true });
+const storageLimit = settings.storage.limit;
 
 const [msgDelayed, msgEstF, msgEstFU, msgEstU, msgEstN] = [
     gettext("Some changes may be reflected only after full estimation."),
@@ -135,18 +136,17 @@ export function StorageSummary() {
 
         const Summary = Table.Summary;
         const { Row, Cell } = Summary;
-        const limit = settings.storage_limit;
         return (
             <Summary fixed>
                 <Row>
                     <Cell index={0}>{gettext("Total")}</Cell>
                     <Cell index={1} align="right">
                         {formatSize(total.data_volume || 0)}
-                        {(limit && (
+                        {(storageLimit && (
                             <>
                                 {" " + gettext("of") + " "}
-                                {formatSize(limit) + " MiB"} (
-                                {((100 * total.data_volume) / limit)
+                                {formatSize(storageLimit) + " MiB"} (
+                                {((100 * total.data_volume) / storageLimit)
                                     .toFixed(0)
                                     .toString() + " %"}
                                 )

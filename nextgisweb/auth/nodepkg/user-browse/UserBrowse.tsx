@@ -101,7 +101,7 @@ const createStatusColumn = (): Col => ({
     sorter: (a, b) => (a.disabled > b.disabled ? 1 : -1),
 });
 
-const usersLimitNotZero = settings?.user_limit?.local !== 0;
+const usersLimitNotZero = settings?.userLimit?.local !== 0;
 const showOauthColumns = oauth.enabled && usersLimitNotZero;
 
 const columns: TableProps["columns"] = [

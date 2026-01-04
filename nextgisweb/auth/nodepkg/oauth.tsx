@@ -5,15 +5,20 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 
 const {
     enabled,
-    default: sDefault,
-    bind,
-    server_type: type,
-    display_name: name,
-    base_url: baseUrl,
-    group_mapping,
+    baseUrl,
+    name: nameRaw,
+    serverType,
+    isDefault: isDefaultRaw,
+    userBind: userBindRaw,
+    groupMapping: groupMappingRaw,
 } = settings.oauth;
 
-const isNGID = type === "nextgisid";
+const name = nameRaw || "OAuth";
+const isDefault = isDefaultRaw || false;
+const groupMapping = groupMappingRaw || false;
+const userBind = userBindRaw || false;
+
+const isNGID = serverType === "nextgisid";
 
 export function makeTeamManageButton(props?: ButtonProps) {
     if (isNGID && baseUrl) {
@@ -33,10 +38,10 @@ export function makeTeamManageButton(props?: ButtonProps) {
 
 export default {
     enabled,
-    default: sDefault,
-    bind,
     name,
-    type,
+    serverType,
     isNGID,
-    group_mapping,
+    isDefault,
+    userBind,
+    groupMapping,
 };

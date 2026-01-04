@@ -70,7 +70,7 @@ export const LayerWidget: EditorWidget<LayerStore> = observer(({ store }) => {
                         help={() => (
                             <>
                                 {msgPickQmsHelpMainPart}
-                                <a href={settings.qms_url} target="_blank">
+                                <a href={settings.qms.url} target="_blank">
                                     NextGIS QMS
                                 </a>
                                 . {msgPickQmsHelpTodoPart}.

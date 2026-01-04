@@ -79,12 +79,6 @@ class FileUploadComponent(Component):
         logger.info("Deleted: %d files (%d bytes)", deleted_files, deleted_bytes)
         logger.info("Preserved: %d files (%d bytes)", kept_files, kept_bytes)
 
-    def client_settings(self, request):
-        return dict(
-            maxSize=self.max_size,
-            chunkSize=self.chunk_size,
-        )
-
     # fmt: off
     option_annotations = (
         Option("path", default=None),

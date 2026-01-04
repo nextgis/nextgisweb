@@ -4,7 +4,7 @@ import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import settings from "@nextgisweb/resource/client-settings";
 import type { DataScopePermissions } from "@nextgisweb/resource/type/api";
 
-const resourceExportSetting = settings.resource_export;
+const { resourceExport } = settings;
 
 export function useResource({ id }: { id: number }) {
     const { data } = useRouteGet<{ data: DataScopePermissions }>(
@@ -20,9 +20,9 @@ export function useResource({ id }: { id: number }) {
         }
         if (data) {
             const { read, write } = data.data;
-            if (resourceExportSetting === "data_write" && write) {
+            if (resourceExport === "data_write" && write) {
                 return true;
-            } else if (resourceExportSetting === "data_read" && read) {
+            } else if (resourceExport === "data_read" && read) {
                 return true;
             }
         }

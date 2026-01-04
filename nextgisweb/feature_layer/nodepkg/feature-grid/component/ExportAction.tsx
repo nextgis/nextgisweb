@@ -20,7 +20,7 @@ interface ExportActionProps {
     isFit?: boolean;
 }
 
-const exportFormats = settings.export_formats;
+const { exportFormats } = settings;
 
 const formatItems = exportFormats.map((format) => ({
     key: format.name,

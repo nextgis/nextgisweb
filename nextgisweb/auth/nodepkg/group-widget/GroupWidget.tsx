@@ -65,7 +65,7 @@ export function GroupWidget({ id, readonly }: GroupWidgetProps) {
                 label: gettextf("{dn} mapping")({ dn: oauth.name }),
                 valuePropName: "checked",
                 formItem: <Checkbox />,
-                included: oauth.group_mapping,
+                included: oauth.groupMapping,
             },
             {
                 name: "description",

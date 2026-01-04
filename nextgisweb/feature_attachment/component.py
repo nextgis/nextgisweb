@@ -26,11 +26,6 @@ class FeatureAttachmentComponent(Component):
         api.setup_pyramid(self, config)
         view.setup_pyramid(self, config)
 
-    def client_settings(self, request):
-        return dict(
-            webmap=dict(bundle=self.options["webmap.bundle"]),
-        )
-
     def maintenance(self):
         with transaction.manager:
             for obj in FeatureAttachment.filter_by(file_meta=None):

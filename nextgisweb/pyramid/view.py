@@ -2,6 +2,7 @@ import os
 import os.path
 from base64 import b64decode
 from datetime import timedelta
+from functools import cache
 from hashlib import md5
 from itertools import chain
 from pathlib import Path
@@ -9,7 +10,10 @@ from secrets import token_hex
 from time import sleep
 from types import SimpleNamespace
 
+from babel import Locale
+from babel.core import UnknownLocaleError
 from markupsafe import Markup
+from msgspec import Struct
 from psutil import Process
 from pyramid.events import BeforeRender
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound
@@ -26,6 +30,7 @@ from nextgisweb.lib.i18n import trstr_factory
 from nextgisweb.lib.imptool import module_path
 from nextgisweb.lib.json import dumps
 from nextgisweb.lib.logging import logger
+from nextgisweb.lib.safehtml import URL_PATTERN
 
 from nextgisweb.core import CoreComponent
 from nextgisweb.core.exception import ForbiddenError, UserException
@@ -33,6 +38,7 @@ from nextgisweb.gui import react_renderer
 from nextgisweb.jsrealm import jsentry
 
 from . import exception, permission, renderer
+from .client import client_setting
 from .component import PyramidComponent
 from .openapi import openapi
 from .session import WebSession
@@ -424,6 +430,94 @@ def test_timeout(request):
     resp = Response(app_iter=generator(), content_type="text/plain")
     set_output_buffering(request, resp, buffering, strict=True)
     return resp
+
+
+@client_setting("urlSafePattern")
+def cs_url_safe_pattern(comp: PyramidComponent, request) -> str:
+    return URL_PATTERN
+
+
+@client_setting("support_url")
+def cs_support_url(comp: PyramidComponent, request) -> str | None:
+    return request.env.core.support_url_view(request)
+
+
+@client_setting("help_page_url")
+def cs_help_page_url(comp: PyramidComponent, request) -> str | None:
+    return comp.help_page_url_view(request)
+
+
+class PyramidCompanyLogoClientSetting(Struct, kw_only=True):
+    enabled: bool
+    link: str | None
+    ckey: str | None
+
+
+@client_setting("company_logo")
+def cs_company_logo(comp: PyramidComponent, request) -> PyramidCompanyLogoClientSetting:
+    return PyramidCompanyLogoClientSetting(
+        enabled=comp.company_logo_enabled(request),
+        ckey=request.env.core.settings_get("pyramid", "company_logo.ckey"),
+        link=comp.company_url_view(request),
+    )
+
+
+class PyramidI18nClientSetting(Struct, kw_only=True, rename="camel"):
+    class Language(Struct, kw_only=True, rename="camel"):
+        code: str
+        endonym: str
+
+        @classmethod
+        @cache
+        def from_code(cls, code: str) -> "PyramidI18nClientSetting.Language":
+            try:
+                babel_locale = Locale.parse(code, sep="-")
+            except UnknownLocaleError:
+                endonym = code
+            else:
+                endonym = babel_locale.get_display_name().title()
+            return cls(code=code, endonym=endonym)
+
+    languages: list[Language]
+    contribute_url: str | None
+
+
+@client_setting("i18n")
+def cs_i18n(comp: PyramidComponent, request) -> PyramidI18nClientSetting:
+    return PyramidI18nClientSetting(
+        languages=[
+            PyramidI18nClientSetting.Language.from_code(language_code)
+            for language_code in request.env.core.locale_available
+        ],
+        contribute_url=request.env.core.options["locale.contribute_url"],
+    )
+
+
+class PyramidStorageClientSetting(Struct, kw_only=True):
+    enabled: bool
+    limit: int | None
+
+
+@client_setting("storage")
+def cs_storage(comp: PyramidComponent, request) -> PyramidStorageClientSetting:
+    return PyramidStorageClientSetting(
+        enabled=request.env.core.options["storage.enabled"],
+        limit=request.env.core.options["storage.limit"],
+    )
+
+
+class PyramidLunkwillClientSetting(Struct, kw_only=True):
+    enabled: bool
+    hmux: bool
+
+
+@client_setting("lunkwill")
+def cs_lunkwill(comp: PyramidComponent, request) -> PyramidLunkwillClientSetting:
+    enabled = comp.options["lunkwill.enabled"]
+    return PyramidLunkwillClientSetting(
+        enabled=enabled,
+        hmux=enabled and comp.options["lunkwill.hmux"],
+    )
 
 
 def setup_pyramid(comp, config):

@@ -82,10 +82,12 @@ export function ExportForm({ id }: { id: number }) {
                 label: gettext("Format"),
                 formItem: (
                     <Select
-                        options={settings.export_formats.map((format) => ({
-                            value: format.name,
-                            label: format.display_name,
-                        }))}
+                        options={settings.exportFormats.map(
+                            ({ name, alias }) => ({
+                                value: name,
+                                label: alias,
+                            })
+                        )}
                     />
                 ),
             },
@@ -123,7 +125,7 @@ export function ExportForm({ id }: { id: number }) {
             initialValues={{
                 srs: defaultSrs,
                 bands: bandOptions.map((band) => band.value),
-                format: settings.export_formats[0].name,
+                format: settings.exportFormats[0].name,
             }}
             labelCol={{ span: 6 }}
         >

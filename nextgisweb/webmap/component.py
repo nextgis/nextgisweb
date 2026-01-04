@@ -1,11 +1,10 @@
 import sqlalchemy as sa
 
-from nextgisweb.env import COMP_ID, Component, DBSession, gettext, require
+from nextgisweb.env import Component, DBSession, gettext, require
 from nextgisweb.lib.config import Option
 
 from nextgisweb.auth import User
 
-from .adapter import WebMapAdapter
 from .model import LegendSymbolsEnum, WebMap, WebMapItem
 
 
@@ -36,23 +35,6 @@ class WebMapComponent(Component):
 
         api.setup_pyramid(self, config)
         view.setup_pyramid(self, config)
-
-    def client_settings(self, request):
-        from nextgisweb.pyramid.api import csetting
-
-        result = dict(
-            {k: v.getter() for k, v in csetting.registry[COMP_ID].items()},
-            editing=self.options["editing"],
-            annotation=self.options["annotation"],
-            adapters=dict(
-                (i.identity, dict(display_name=request.localizer.translate(i.display_name)))
-                for i in WebMapAdapter.registry.values()
-            ),
-            check_origin=self.options["check_origin"],
-            nonimatim_url=self.options["nominatim.url"].rstrip("/"),
-        )
-
-        return result
 
     def query_stat(self):
         query_item_type = DBSession.query(

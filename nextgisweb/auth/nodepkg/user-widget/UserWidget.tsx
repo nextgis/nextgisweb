@@ -35,7 +35,7 @@ export function UserWidget({ id, readonly }: UserWidgetProps) {
 
     const isNewUser = useMemo(() => id === undefined, [id]);
 
-    const showFullColumns = settings?.user_limit?.local !== 0;
+    const showFullColumns = settings.userLimit.local !== 0;
 
     const fields = useMemo<FormField[]>(() => {
         return [

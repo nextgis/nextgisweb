@@ -75,7 +75,7 @@ export function useExportFeatureLayer({ id }: UseExportFeatureLayerProps) {
             }
 
             if (apiUrl) {
-                if (pyramidSettings.lunkwill_enabled) {
+                if (pyramidSettings.lunkwill.enabled) {
                     const lunkwillParam = new LunkwillParam();
                     lunkwillParam.require();
                     try {

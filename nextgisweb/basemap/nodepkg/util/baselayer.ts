@@ -103,7 +103,7 @@ export function prepareBaselayerConfig(
     }
 
     layer.opacity = config.opacity ? config.opacity : undefined;
-    layer.visible = config.enabled;
+    layer.visible = config.enabled ?? undefined;
 
     source.crossOrigin = "anonymous";
     return { source, layer, keyname };

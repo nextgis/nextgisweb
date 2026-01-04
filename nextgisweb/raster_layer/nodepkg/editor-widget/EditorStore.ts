@@ -19,7 +19,7 @@ export class EditorStore
 
     @observable.ref accessor source: FileUploadObject | undefined = undefined;
     @observable.ref accessor uploading = false;
-    @observable.ref accessor cog = settings.cog_enabled;
+    @observable.ref accessor cog = settings.cogDefault;
     @observable.ref accessor cogInitial: boolean | undefined = undefined;
 
     @observable.ref accessor dirty = false;

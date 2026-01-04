@@ -35,7 +35,7 @@ export function GroupBrowse({ readonly }: GroupBrowseProps) {
         },
     ];
 
-    if (oauth.group_mapping) {
+    if (oauth.groupMapping) {
         columns.push({
             title: oauth.name,
             dataIndex: "oauth_mapping",

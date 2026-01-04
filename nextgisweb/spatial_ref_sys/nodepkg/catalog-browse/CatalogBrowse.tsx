@@ -20,6 +20,8 @@ import type { SRSRead } from "@nextgisweb/spatial-ref-sys/type/api";
 
 import InputOutlineIcon from "@nextgisweb/icon/material/input";
 
+const { coordinatesSearch } = settings.catalog;
+
 interface Query {
     q?: string;
     lat?: number;
@@ -142,7 +144,7 @@ export function CatalogBrowse() {
                     allowClear
                 />
             </Form.Item>
-            {settings.catalog.coordinates_search ? (
+            {coordinatesSearch ? (
                 <>
                     <Form.Item style={{ height: "100%" }}>
                         <Divider type="vertical" />

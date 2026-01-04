@@ -3,17 +3,12 @@ from datetime import timedelta
 from nextgisweb.env import Component, require
 from nextgisweb.lib.config import Option
 
-from .model import SCHEME
-
 
 class TMSClientComponent(Component):
     def initialize(self):
         super().initialize()
 
         self.headers = {"User-Agent": self.options["user_agent"]}
-
-    def client_settings(self, request):
-        return dict(schemes=SCHEME.enum)
 
     @require("resource")
     def setup_pyramid(self, config):

@@ -4,14 +4,14 @@ from nextgisweb.env import Component, require
 from nextgisweb.lib.config import Option
 
 
-class BasemapConfig(Struct):
+class BasemapConfig(Struct, kw_only=True):
     keyname: str
     display_name: str
     url: str
     copyright_text: str | None
     copyright_url: str | None
     enabled: bool | None
-    epsg: str | None = None
+    epsg: int | None = None
     z_max: int | None = None
     z_min: int | None = None
 
@@ -25,14 +25,6 @@ class BasemapComponent(Component):
     @require("resource", "webmap")
     def setup_pyramid(self, config):
         from . import plugin, view  # noqa: F401
-
-    def client_settings(self, request):
-        return dict(
-            basemaps=self.basemaps,
-            qms_geoservices_url=self.options["qms_geoservices_url"],
-            qms_icons_url=self.options["qms_icons_url"],
-            qms_url=self.options["qms_url"],
-        )
 
     def _basemaps(self):
         if self.options["no_preset"]:
@@ -98,8 +90,6 @@ class BasemapComponent(Component):
         Option("preset.*.enabled", bool, default=None, doc="Preset basemap default flag"),
         Option("preset.*.z_max", int, default=None, doc="Preset basemap maximum zoom level"),
         Option("preset.*.z_min", int, default=None, doc="Preset basemap minimum zoom level"),
-        Option("qms_url", default="https://qms.nextgis.com"),
-        Option("qms_geoservices_url", default="https://qms.nextgis.com/api/v1/geoservices/"),
-        Option("qms_icons_url", default="https://qms.nextgis.com/api/v1/icons/"),
+        Option("qms_url", str, default="https://qms.nextgis.com"),
     )
     # fmt: on

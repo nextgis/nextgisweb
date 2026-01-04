@@ -150,16 +150,6 @@ class ResourceComponent(Component):
     def template_include(self):
         return ("nextgisweb:resource/template/favorite.mako",)
 
-    def client_settings(self, request):
-        result = dict()
-        try:
-            result["resource_export"] = request.env.core.settings_get(
-                "resource", "resource_export"
-            )
-        except KeyError:
-            result["resource_export"] = "data_read"
-        return result
-
     def query_stat(self):
         query = DBSession.query(Resource.cls, sa.func.count(Resource.id)).group_by(Resource.cls)
 

@@ -5,7 +5,6 @@ from nextgisweb.env import Component, DBSession, require
 from nextgisweb.lib.config import Option, SizeInBytes
 from nextgisweb.lib.logging import logger
 
-from .gdaldriver import GDAL_DRIVER_NAME_2_EXPORT_FORMATS
 from .kind_of_data import RasterLayerData
 from .model import RasterBand, RasterLayer, RasterLayerMeta, estimate_raster_layer_data
 from .util import band_color_interp
@@ -16,19 +15,13 @@ class RasterLayerComponent(Component, WorkdirMixin):
     def initialize(self):
         self.env.core.mksdir(self)
         self.wdir = self.env.core.gtsdir(self)
-        self.cog_enabled = self.options["cog_enabled"]
+        self.cog_default = self.options["cog_default"]
 
     def setup_pyramid(self, config):
         from . import api, view
 
         view.setup_pyramid(self, config)
         api.setup_pyramid(self, config)
-
-    def client_settings(self, request):
-        return dict(
-            export_formats=GDAL_DRIVER_NAME_2_EXPORT_FORMATS,
-            cog_enabled=self.cog_enabled,
-        )
 
     @require("file_storage")
     def maintenance(self):
@@ -82,6 +75,6 @@ class RasterLayerComponent(Component, WorkdirMixin):
                     resource.meta = RasterLayerMeta(bands=bands)
 
     option_annotations = (
-        Option("cog_enabled", bool, default=True),
+        Option("cog_default", bool, default=True),
         Option("size_limit", SizeInBytes, default=None),
     )

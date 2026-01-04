@@ -86,7 +86,7 @@ export class Display {
             displayProjection: this.displayProjection,
             lonlatProjection: this.lonlatProjection,
             hmux:
-                pyramidSettings.lunkwill_hmux &&
+                pyramidSettings.lunkwill.hmux &&
                 this.config.options["webmap.hmux"],
         });
         this.identify = new Identify({ display: this });

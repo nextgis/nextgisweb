@@ -2,7 +2,7 @@ import re
 from datetime import datetime
 from enum import Enum
 from inspect import Parameter, signature
-from typing import TYPE_CHECKING, Annotated, Any, ClassVar, Literal, Type
+from typing import TYPE_CHECKING, Annotated, Any, ClassVar, Literal, NewType, Type, Union
 
 from msgspec import UNSET, Meta, Struct, UnsetType, convert, defstruct, field, to_builtins
 from pyramid.response import Response
@@ -29,6 +29,8 @@ from nextgisweb.file_upload import FileUpload, FileUploadRef
 from nextgisweb.jsrealm import TSExport
 from nextgisweb.resource import Resource, ResourceScope
 
+from . import client
+from .client import client_setting
 from .component import PyramidComponent
 from .permission import cors_manage, cors_view
 from .tomb.response import UnsafeFileResponse
@@ -42,11 +44,54 @@ SettingsComponentGap = Annotated[
     Meta(description="Component identity"),
 ]
 
+SettingsResponseTypedGap = Gap("SettingsResponseTypedGap", Type[Struct])
+SettingsResponseUntyped = NewType("SettingsResponseUntyped", dict[str, Any])
 
-def settings(request, *, component: SettingsComponentGap) -> AsJSON[dict[str, Any]]:
+
+def settings(
+    request,
+    *,
+    component: SettingsComponentGap,
+) -> AsJSON[AnyOf[SettingsResponseTypedGap, SettingsResponseUntyped]]:
     """Read component settings"""
     comp = request.env.components[component]
+    if st := request.env.pyramid._client_settings_struct_types.get(component):
+        comp = request.env.components[component]
+        return client.evaluate(comp, request, struct_type=st)
     return comp.client_settings(request)
+
+
+def setup_pyramid_client_settings(comp, config):
+    struct_types = dict[str, Any]()
+    comp_ids = tuple[str]()
+    for comp_id, comp_obj in comp.env.components.items():
+        if comp_struct_type := client.struct_type(comp_obj):
+            struct_types[comp_id] = comp_struct_type
+            assert not hasattr(comp_obj, "client_settings")
+        elif not hasattr(comp_obj, "client_settings"):
+            continue
+        comp_ids = (*comp_ids, comp_id)
+
+    fillgap(
+        SettingsComponentGap,
+        Literal[comp_ids],
+    )
+
+    fillgap(
+        SettingsResponseTypedGap,
+        Annotated[
+            Union[tuple(struct_types.values())],
+            TSExport("PyramidSettingsResponseTyped"),
+        ],
+    )
+
+    comp._client_settings_struct_types = struct_types
+
+    config.add_route(
+        "pyramid.settings",
+        "/api/component/pyramid/settings",
+        get=settings,
+    )
 
 
 def route(request) -> AsJSON[dict[str, Annotated[list[str], Meta(min_length=1)]]]:
@@ -563,20 +608,15 @@ csetting("home_path", str | None)
 csetting("metrics", Metrics, default={})
 
 
+@client_setting("logoMaxSize")
+def cs_logo_max_size(comp: PyramidComponent, request) -> int:
+    return LOGO_MAX_SIZE
+
+
 def setup_pyramid(comp, config):
     from . import api_cors
 
     config.include(api_cors)
-
-    comps = comp.env.components.values()
-    comp_ids = [comp.identity for comp in comps if hasattr(comp, "client_settings")]
-    fillgap(SettingsComponentGap, Literal[tuple(comp_ids)])
-
-    config.add_route(
-        "pyramid.settings",
-        "/api/component/pyramid/settings",
-        get=settings,
-    )
 
     config.add_route(
         "pyramid.route",

@@ -47,17 +47,6 @@ class SpatialRefSysComponent(Component):
         view.setup_pyramid(self, config)
         api.setup_pyramid(self, config)
 
-    def client_settings(self, request):
-        cat_opts = self.options.with_prefix("catalog")
-        return dict(
-            default=dict(id=3857),
-            catalog=dict(
-                enabled=cat_opts["enabled"],
-                url=cat_opts["url"] if cat_opts["enabled"] else None,
-                coordinates_search=cat_opts["coordinates_search"],
-            ),
-        )
-
     def query_stat(self):
         return dict(count=SRS.query().count())
 
