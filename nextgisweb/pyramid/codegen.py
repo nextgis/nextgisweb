@@ -135,13 +135,7 @@ def api_type_module(config) -> str:
     tsgen.add(routes_struct, export=(route_tsmodule, "Routes"))
     tsgen.add(routes_struct, export=(route_tsmodule, "default"))
 
-    eslint = eslint_disable(
-        (
-            "prettier/prettier",
-            "import/newline-after-import",
-            "import/order",
-        )
-    )
+    eslint = eslint_disable(("prettier/prettier",))
 
     return "\n".join(eslint + [m.code for m in tsgen.compile()] + [""])
 

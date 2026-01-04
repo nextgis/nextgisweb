@@ -205,7 +205,9 @@ class TSType(Struct, kw_only=True, dict=True):
             self.module, self.name = module, value[1]
             module.declared.append(self)
         elif value != (self.module.name, self.name):
-            module.exported.append((self, value[1]))
+            item = (self, value[1])
+            if item not in self.module.exported:
+                self.module.exported.append(item)
 
     def render(self, module: TSModule) -> str:
         if self.module is None or isinstance(self, TSPrimitive):
