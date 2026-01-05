@@ -12,7 +12,7 @@ from requests.exceptions import RequestException
 from shapely.geometry import box
 from zope.interface import implementer
 
-from nextgisweb.env import COMP_ID, Base, env, gettext
+from nextgisweb.env import COMP_ID, env, gettext
 from nextgisweb.lib import saext
 from nextgisweb.lib.geometry import Geometry
 from nextgisweb.lib.logging import logger
@@ -134,7 +134,7 @@ def fid_str(fid, layer_name):
     return "%s.%d" % (ns_trim(layer_name), fid)
 
 
-class WFSConnection(Base, Resource):
+class WFSConnection(Resource):
     identity = COMP_ID + "_connection"
     cls_display_name = gettext("WFS connection")
 
@@ -478,7 +478,7 @@ class WFSConnectionSerializer(Serializer, resource=WFSConnection):
     version = VersionAttr(read=ConnectionScope.read, write=ConnectionScope.write)
 
 
-class WFSLayerField(Base, LayerField):
+class WFSLayerField(LayerField):
     identity = layer_identity
 
     __tablename__ = LayerField.__tablename__ + "_" + identity
@@ -490,7 +490,7 @@ class WFSLayerField(Base, LayerField):
 
 
 @implementer(IFeatureLayer, IBboxLayer)
-class WFSLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
+class WFSLayer(Resource, SpatialLayerMixin, LayerFieldsMixin):
     identity = layer_identity
     cls_display_name = gettext("WFS layer")
 

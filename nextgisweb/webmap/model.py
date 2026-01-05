@@ -60,7 +60,7 @@ class LegendSymbolsEnum(Enum):
         return self if other is None else other
 
 
-class WebMap(Base, Resource):
+class WebMap(Resource):
     identity = "webmap"
     cls_display_name = gettext("Web map")
     cls_category = MapsAndServicesCategory

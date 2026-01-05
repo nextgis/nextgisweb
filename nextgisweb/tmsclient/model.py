@@ -42,7 +42,7 @@ url_template_pattern = re.compile(
 )
 
 
-class Connection(Base, Resource):
+class Connection(Resource):
     identity = "tmsclient_connection"
     cls_display_name = gettext("TMS connection")
 
@@ -152,7 +152,7 @@ class RenderRequest:
 
 
 @implementer(IRenderableStyle, IBboxLayer)
-class Layer(Base, Resource, SpatialLayerMixin):
+class Layer(Resource, SpatialLayerMixin):
     identity = "tmsclient_layer"
     cls_display_name = gettext("TMS layer")
 

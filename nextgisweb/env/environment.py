@@ -16,7 +16,7 @@ from nextgisweb.lib.dinject import inject as _inject
 from nextgisweb.lib.logging import logger
 
 from .component import Component, load_all
-from .model import BaseClass
+from .model import Base
 from .package import pkginfo
 
 _OPTIONS_LOGGING_LEVELS = ("critical", "error", "warning", "info", "debug")
@@ -112,8 +112,7 @@ class Env(Container):
 
             setattr(self, identity, instance)
 
-        # Protect from new model registrations
-        BaseClass.seal_base()
+        Base.loaded(self)
 
         if initialize:
             self.initialize()
@@ -128,9 +127,7 @@ class Env(Container):
 
         :param meth: Name of the method to build sequence for."""
 
-        seq = [
-            first,
-        ]
+        seq = [first]
 
         def traverse(components):
             for c in components:

@@ -29,7 +29,7 @@ class SortEnum(Enum):
     CUSTOM = "CUSTOM"
 
 
-class LookupTable(Base, Resource):
+class LookupTable(Resource):
     identity = "lookup_table"
     cls_display_name = gettext("Lookup table")
 

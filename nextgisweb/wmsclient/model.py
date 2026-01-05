@@ -47,7 +47,7 @@ url_pattern = re.compile(
 )
 
 
-class Connection(Base, Resource):
+class Connection(Resource):
     identity = "wmsclient_connection"
     cls_display_name = gettext("WMS connection")
 
@@ -217,7 +217,7 @@ class RenderRequest:
 
 
 @implementer(IRenderableStyle, IBboxLayer)
-class Layer(Base, Resource, SpatialLayerMixin):
+class Layer(Resource, SpatialLayerMixin):
     identity = "wmsclient_layer"
     cls_display_name = gettext("WMS layer")
 

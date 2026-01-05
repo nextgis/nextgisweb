@@ -35,7 +35,7 @@ class RenderRequest:
 
 
 @implementer(IRenderableStyle, ILegendableStyle)
-class RasterStyle(Base, Resource):
+class RasterStyle(Resource):
     identity = "raster_style"
     cls_display_name = gettext("Raster style")
 

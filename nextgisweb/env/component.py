@@ -230,14 +230,17 @@ def load_all(packages=None, components=None, enable_disabled=False):
 def component_utility(factory):
     memo = {}
 
-    def get(depth=1):
-        mod = module_from_stack(depth, ("nextgisweb.env.",))
-        component_id = pkginfo.component_by_module(mod)
+    def get(depth=1, *, cident=None):
+        if cident is None:
+            mod = module_from_stack(depth, ("nextgisweb.env.",))
+            cident = pkginfo.component_by_module(mod)
+            assert cident is not None
 
         try:
-            return memo[component_id]
+            return memo[cident]
         except KeyError:
-            result = memo[component_id] = factory(component_id)
+            result = memo[cident] = factory(cident)
+            assert result is not None
             return result
 
     get.memo = memo

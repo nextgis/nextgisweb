@@ -15,7 +15,7 @@ Base.depends_on("resource", "feature_layer")
 KEYNAME_RE = re.compile(r"^[A-Za-z][\w]*$")
 
 
-class Service(Base, Resource):
+class Service(Resource):
     identity = "wfsserver_service"
     cls_display_name = gettext("WFS service")
 

@@ -20,7 +20,7 @@ Base.depends_on("resource")
 tag_valid = r"{http://www.w3.org/2000/svg}svg"
 
 
-class SVGMarkerLibrary(Base, Resource):
+class SVGMarkerLibrary(Resource):
     identity = "svg_marker_library"
     cls_display_name = gettext("SVG marker library")
 

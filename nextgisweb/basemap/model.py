@@ -19,7 +19,7 @@ from nextgisweb.resource import (
 from nextgisweb.webmap import WebMap
 
 
-class BasemapLayer(Base, Resource):
+class BasemapLayer(Resource):
     identity = "basemap_layer"
     cls_display_name = gettext("Basemap")
 

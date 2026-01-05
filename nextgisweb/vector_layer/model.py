@@ -90,7 +90,7 @@ GEOM_TYPE_DISPLAY = (
 )
 
 
-class VectorLayerField(Base, LayerField):
+class VectorLayerField(LayerField):
     identity = "vector_layer"
 
     __tablename__ = LayerField.__tablename__ + "_" + identity
@@ -134,7 +134,7 @@ def _vlschema_autoflush(res):
     IWritableFeatureLayer,
     IBboxLayer,
 )
-class VectorLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin, FVersioningMixin):
+class VectorLayer(Resource, SpatialLayerMixin, LayerFieldsMixin, FVersioningMixin):
     identity = "vector_layer"
     cls_display_name = gettext("Vector layer")
     cls_order = 60

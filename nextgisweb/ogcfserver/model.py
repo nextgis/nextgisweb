@@ -11,7 +11,7 @@ from nextgisweb.resource import Resource, ResourceGroup, SAttribute, Serializer,
 Base.depends_on("resource", "feature_layer")
 
 
-class Service(Base, Resource):
+class Service(Resource):
     identity = "ogcfserver_service"
     cls_display_name = gettext("OGC API Features service")
 

@@ -131,7 +131,7 @@ class SSLMode(Enum):
     verify_full = "verify-full"
 
 
-class PostgisConnection(Base, Resource):
+class PostgisConnection(Resource):
     identity = "postgis_connection"
     cls_display_name = gettext("PostGIS connection")
 
@@ -246,7 +246,7 @@ class PostgisConnectionSerializer(Serializer, resource=PostgisConnection):
     database = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
 
 
-class PostgisLayerField(Base, LayerField):
+class PostgisLayerField(LayerField):
     identity = "postgis_layer"
 
     __tablename__ = LayerField.__tablename__ + "_" + identity
@@ -257,7 +257,7 @@ class PostgisLayerField(Base, LayerField):
 
 
 @implementer(IFeatureLayer, IFilterableFeatureLayer, IWritableFeatureLayer, IBboxLayer)
-class PostgisLayer(Base, Resource, SpatialLayerMixin, LayerFieldsMixin):
+class PostgisLayer(Resource, SpatialLayerMixin, LayerFieldsMixin):
     identity = "postgis_layer"
     cls_display_name = gettext("PostGIS layer")
 
