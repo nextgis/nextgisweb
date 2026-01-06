@@ -33,21 +33,24 @@ function toOlFeature(
         f.setStyle(crossStyle);
         return f;
     }
+    try {
+        const geometry = e.olGeometry
+            ? e.olGeometry
+            : e.geom
+              ? wkt.readGeometry(e.geom)
+              : e.coordinates;
 
-    const geometry = e.olGeometry
-        ? e.olGeometry
-        : e.geom
-          ? wkt.readGeometry(e.geom)
-          : e.coordinates;
-
-    if (geometry) {
-        const f = new Feature<Geometry>({
-            geometry,
-            layerId: e.layerId,
-            featureId: e.featureId,
-        });
-        f.setStyle(highlightStyle);
-        return f;
+        if (geometry) {
+            const f = new Feature<Geometry>({
+                geometry,
+                layerId: e.layerId,
+                featureId: e.featureId,
+            });
+            f.setStyle(highlightStyle);
+            return f;
+        }
+    } catch {
+        return null;
     }
 
     return null;
