@@ -77,7 +77,7 @@ extras_require = dict(
         "mapbox-vector-tile",
         "pre-commit",
         "pyramid-debugtoolbar==4.10",
-        "pytest==7.3.*",
+        "pytest==9.0.*",
         "ruff>=0.12.12",
         "sqlglot==26.30.0",
         "webtest",
