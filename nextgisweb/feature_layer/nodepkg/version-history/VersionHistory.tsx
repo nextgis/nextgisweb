@@ -14,7 +14,13 @@ import type {
     VersionCGetGroup,
     VersionCGetVersion,
 } from "@nextgisweb/feature-layer/type/api";
-import { Button, RangePicker, Table } from "@nextgisweb/gui/antd";
+import {
+    Button,
+    RangePicker,
+    Space,
+    Switch,
+    Table,
+} from "@nextgisweb/gui/antd";
 import type { TimeRangePickerProps } from "@nextgisweb/gui/antd";
 import type { RouteQuery } from "@nextgisweb/pyramid/api/type";
 import { useRoute, useRouteGet } from "@nextgisweb/pyramid/hook";
@@ -62,8 +68,10 @@ export function VersionHistory({ id }: { id: number }) {
     const [tstampGe, setTstampGe] = useState<string | null>(null);
     const [tstampLt, setTstampLt] = useState<string | null>(null);
 
+    const [groupEdits, setGroupEdits] = useState(true);
+
     const [groups, setGroups] = useState<VersionItem[]>([]);
-    const [cursor, setCursor] = useState<string | null>(null);
+
     const [hasMore, setHasMore] = useState(true);
 
     const [expandedRowKeys, setExpandedRowKeys] = useState<React.Key[]>([]);
@@ -74,7 +82,7 @@ export function VersionHistory({ id }: { id: number }) {
 
     const tableWrapRef = useRef<HTMLDivElement | null>(null);
 
-    const cursorRef = useRef(cursor);
+    const cursorRef = useRef<string | null>(null);
     const loadingRef = useRef(false);
 
     const columns = useColumns({ epoch, id, bumpReloadKey });
@@ -113,17 +121,14 @@ export function VersionHistory({ id }: { id: number }) {
     }, [reloadKey]);
 
     useEffect(() => {
-        cursorRef.current = cursor;
-    }, [cursor]);
-    useEffect(() => {
         loadingRef.current = isVersionLoading;
     }, [isVersionLoading]);
 
     useEffect(() => {
         setGroups([]);
-        setCursor(null);
+        cursorRef.current = null;
         setHasMore(true);
-    }, [epoch, tstampGe, tstampLt, reloadKey]);
+    }, [epoch, tstampGe, tstampLt, groupEdits, reloadKey]);
 
     const loadBlock = useCallback(async () => {
         if (!epoch) return;
@@ -135,7 +140,7 @@ export function VersionHistory({ id }: { id: number }) {
                 {
                     epoch,
                     order: "desc",
-                    group: true,
+                    group: groupEdits,
                     limit: BLOCK_SIZE,
                     cursor: cursorRef.current ?? undefined,
                 };
@@ -151,7 +156,7 @@ export function VersionHistory({ id }: { id: number }) {
             setGroups((cur) => cur.concat(next));
 
             const nextCursor = resp?.cursor;
-            setCursor(nextCursor);
+            cursorRef.current = nextCursor;
 
             if (!nextCursor || next.length < BLOCK_SIZE) {
                 setHasMore(false);
@@ -159,13 +164,12 @@ export function VersionHistory({ id }: { id: number }) {
         } finally {
             loadingRef.current = false;
         }
-    }, [epoch, hasMore, tstampGe, tstampLt, versionRoute]);
+    }, [epoch, hasMore, tstampGe, tstampLt, groupEdits, versionRoute]);
 
     useEffect(() => {
         loadBlock();
-
         return abort;
-    }, [loadBlock, abort]);
+    }, [loadBlock, reloadKey, abort]);
 
     useEffect(() => {
         const element = tableWrapRef.current;
@@ -211,6 +215,10 @@ export function VersionHistory({ id }: { id: number }) {
                         setTstampGe(ge ? dayjsToApi(ge) : null);
                     }}
                 />
+                <Space>
+                    <Switch checked={groupEdits} onChange={setGroupEdits} />
+                    {gettext("Group edits")}
+                </Space>
                 <Button
                     style={{ marginInlineStart: "auto" }}
                     type="text"

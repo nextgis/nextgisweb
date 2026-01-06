@@ -68,7 +68,7 @@ msgstr "Объект не удален"
 msgid "Unable to restore the #{} feature as it is not deleted."
 msgstr "Невозможно восстановить объект #{} поскольку он не удален."
 
-#: favorite.py:6 nodepkg/fields-widget/FieldsWidget.tsx:26 view.py:40
+#: favorite.py:6 nodepkg/fields-widget/FieldsWidget.tsx:26 view.py:43
 msgid "Feature table"
 msgstr "Таблица объектов"
 
@@ -96,61 +96,61 @@ msgstr "В векторном слое нет атрибутов"
 msgid "Attributes"
 msgstr "Атрибуты"
 
-#: nodepkg/export-form/ExportForm.tsx:252
+#: nodepkg/export-form/ExportForm.tsx:251
 msgid "Resources"
 msgstr "Ресурсы"
 
-#: nodepkg/export-form/ExportForm.tsx:274
+#: nodepkg/export-form/ExportForm.tsx:273
 msgid "Format"
 msgstr "Формат"
 
-#: nodepkg/export-form/ExportForm.tsx:287
+#: nodepkg/export-form/ExportForm.tsx:286
 msgid "SRS"
 msgstr "Система координат"
 
-#: nodepkg/export-form/ExportForm.tsx:292
+#: nodepkg/export-form/ExportForm.tsx:291
 msgid "Encoding"
 msgstr "Кодировка"
 
-#: nodepkg/export-form/ExportForm.tsx:306
+#: nodepkg/export-form/ExportForm.tsx:305
 msgid "FID field"
 msgstr "Поле FID"
 
-#: nodepkg/export-form/ExportForm.tsx:310
+#: nodepkg/export-form/ExportForm.tsx:309
 msgid "Use field display names instead of keynames"
 msgstr "Использовать наименования полей вместо ключей"
 
-#: nodepkg/export-form/ExportForm.tsx:316
+#: nodepkg/export-form/ExportForm.tsx:315
 #: nodepkg/fields-widget/FieldsWidget.tsx:213
 #: nodepkg/resource-section/FeatureLayerResourceSection.tsx:51
 msgid "Fields"
 msgstr "Поля"
 
-#: nodepkg/export-form/ExportForm.tsx:322
+#: nodepkg/export-form/ExportForm.tsx:321
 msgid "Limit by extent"
 msgstr "Ограничить охватом"
 
-#: nodepkg/export-form/ExportForm.tsx:328
+#: nodepkg/export-form/ExportForm.tsx:327
 msgid "Filter text"
 msgstr "Текстовый фильтр"
 
-#: nodepkg/export-form/ExportForm.tsx:338
+#: nodepkg/export-form/ExportForm.tsx:337
 msgid "Filter Applied"
 msgstr "Фильтр применен"
 
-#: nodepkg/export-form/ExportForm.tsx:339
+#: nodepkg/export-form/ExportForm.tsx:338
 msgid "Set Filter"
 msgstr "Установить фильтр"
 
-#: nodepkg/export-form/ExportForm.tsx:342
+#: nodepkg/export-form/ExportForm.tsx:341
 msgid "Filter"
 msgstr "Фильтр"
 
-#: nodepkg/export-form/ExportForm.tsx:347
+#: nodepkg/export-form/ExportForm.tsx:346
 msgid "Zip archive"
 msgstr "Zip архив"
 
-#: nodepkg/export-form/ExportForm.tsx:403
+#: nodepkg/export-form/ExportForm.tsx:402
 #: nodepkg/feature-editor/FeatureEditorWidget.tsx:41
 #: nodepkg/versioning-settings/VersioningForm.tsx:45
 msgid "Save"
@@ -442,7 +442,7 @@ msgid "Open table settings"
 msgstr "Открыть настройки таблицы"
 
 #: nodepkg/feature-grid/FeatureGrid.tsx:25
-#: nodepkg/version-history/VersionHistory.tsx:219
+#: nodepkg/version-history/VersionHistory.tsx:227
 msgid "Refresh table"
 msgstr "Обновить таблицу"
 
@@ -483,8 +483,8 @@ msgstr "Расширенный фильтр"
 msgid "Last changed"
 msgstr "Последнее изменение"
 
-#: nodepkg/feature-grid/component/ExportAction.tsx:30 view.py:83 view.py:107
-#: view.py:220
+#: nodepkg/feature-grid/component/ExportAction.tsx:30 view.py:86 view.py:110
+#: view.py:247
 msgid "Save as"
 msgstr "Сохранить как"
 
@@ -608,7 +608,7 @@ msgid "Extent (yMax)"
 msgstr "Охват (yMax)"
 
 #: nodepkg/settings-widget/SettingsWidget.tsx:11 versioning/model.py:106
-#: view.py:143 view.py:236
+#: view.py:146 view.py:263
 msgid "Feature versioning"
 msgstr "Версионирование объектов"
 
@@ -628,37 +628,41 @@ msgstr ""
 msgid "Settings"
 msgstr "Настройки"
 
-#: nodepkg/version-history/VersionHistory.tsx:100
+#: nodepkg/version-history/VersionHistory.tsx:108
 msgid "Today"
 msgstr "Сегодня"
 
-#: nodepkg/version-history/VersionHistory.tsx:101
+#: nodepkg/version-history/VersionHistory.tsx:109
 msgid "Yesterday"
 msgstr "Вчера"
 
-#: nodepkg/version-history/VersionHistory.tsx:102
+#: nodepkg/version-history/VersionHistory.tsx:110
 msgid "Last 24 hours"
 msgstr "За 24 часа"
 
-#: nodepkg/version-history/VersionHistory.tsx:103
+#: nodepkg/version-history/VersionHistory.tsx:111
 msgid "Last 3 days"
 msgstr "За 3 дня"
 
-#: nodepkg/version-history/VersionHistory.tsx:104
+#: nodepkg/version-history/VersionHistory.tsx:112
 msgid "Last week"
 msgstr "За неделю"
 
-#: nodepkg/version-history/VersionHistory.tsx:105
+#: nodepkg/version-history/VersionHistory.tsx:113
 msgid "Last month"
 msgstr "За месяц"
 
-#: nodepkg/version-history/VersionHistory.tsx:106
+#: nodepkg/version-history/VersionHistory.tsx:114
 msgid "This month"
 msgstr "Этот месяц"
 
-#: nodepkg/version-history/VersionHistory.tsx:107
+#: nodepkg/version-history/VersionHistory.tsx:115
 msgid "Previous month"
 msgstr "Предыдущий месяц"
+
+#: nodepkg/version-history/VersionHistory.tsx:220
+msgid "Group edits"
+msgstr "Группировать правки"
 
 #: nodepkg/version-history/component/VersionHistoryGroupDetails.tsx:33
 msgid "Created"
@@ -734,6 +738,9 @@ msgid ""
 "This will revert all feature changes made after {timestamp}, but the changes "
 "will be kept in the history."
 msgstr ""
+"Пожалуйста, подтвердите восстановление слоя до версии {timestamp} от "
+"{author}. Это отменит все изменения объектов, внесенные после {timestamp}, "
+"однако изменения останутся в истории."
 
 #: nodepkg/version-history/component/menu-items/useRevertMenuItem.tsx:106
 msgid "Revert"
@@ -751,7 +758,7 @@ msgstr "Дата и время"
 msgid "User"
 msgstr "Пользователь"
 
-#: nodepkg/version-history/hook/useColumns.tsx:60 view.py:197
+#: nodepkg/version-history/hook/useColumns.tsx:60 view.py:224
 msgid "Features"
 msgstr "Объекты"
 
@@ -848,19 +855,19 @@ msgstr "Версия за пределами диапазона"
 msgid "Invalid range"
 msgstr "Некорректный диапазон"
 
-#: view.py:56 view.py:71
+#: view.py:59 view.py:74
 msgid "Feature #%d"
 msgstr "Объект #%d"
 
-#: view.py:96 view.py:212
+#: view.py:99 view.py:239
 msgid "Version history"
 msgstr "История изменений"
 
-#: view.py:114
+#: view.py:117
 msgid "MVT Vector Tiles"
 msgstr "Векторные тайлы MVT"
 
-#: view.py:116
+#: view.py:119
 msgid ""
 "The Mapbox Vector Tile is an efficient encoding for map data into vector "
 "tiles that can be rendered dynamically."
@@ -868,6 +875,6 @@ msgstr ""
 "Векторные тайлы MVT это эффективное кодирование данных карты в векторные "
 "тайлы которые могут быть динамически отрисованы."
 
-#: view.py:202
+#: view.py:229
 msgid "Table"
 msgstr "Таблица"
