@@ -10,8 +10,8 @@ Python:
 -  Indentation: 4 spaces
 -  Quotes: double
 -  Line length: 100
--  Linter: Ruff and Flake8
--  Formatter: Black
+-  Linter: Ruff
+-  Formatter: Ruff
 -  Import sorting: Ruff
 
 JavaScript and TypeScript:
