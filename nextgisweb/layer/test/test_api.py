@@ -5,6 +5,7 @@ from osgeo import gdalconst, ogr
 
 from nextgisweb.feature_layer import test as feature_layer_test
 from nextgisweb.postgis.test import create_feature_layer as create_postgis_layer
+from nextgisweb.pyramid.test import WebTestApp
 from nextgisweb.vector_layer.test import create_feature_layer as create_vector_layer
 
 pytestmark = pytest.mark.usefixtures("ngw_auth_administrator")
@@ -41,7 +42,7 @@ def layer_product():
 
 
 @pytest.mark.parametrize("create_resource, ds", layer_product())
-def test_extent(create_resource, ds, ngw_resource_group_sub, ngw_webtest_app):
+def test_extent(create_resource, ds, ngw_resource_group_sub, ngw_webtest_app: WebTestApp):
     ogrlayer = ds.GetLayer(0)
     with create_resource(ogrlayer, ngw_resource_group_sub) as layer:
         resp = ngw_webtest_app.get("/api/resource/%d/extent" % layer.id, status=200)

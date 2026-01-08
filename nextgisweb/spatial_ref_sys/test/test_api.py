@@ -4,6 +4,8 @@ import transaction
 from nextgisweb.env import DBSession
 from nextgisweb.lib.geometry import Geometry
 
+from nextgisweb.pyramid.test import WebTestApp
+
 from ..model import SRS
 from .data import (
     srs_def,
@@ -29,7 +31,6 @@ def srs_ids():
                 wkt=srs_info["wkt"],
             ).persist()
             DBSession.flush()
-            DBSession.expunge(obj)
             srs_add[display_name] = obj.id
 
     yield dict({"EPSG:4326": 4326, "EPSG:3857": 3857}, **srs_add)
@@ -43,39 +44,38 @@ def wrong_srs_ids():
             display_name = srs_info["display_name"]
             obj = SRS(display_name=display_name, wkt=srs_info["wkt"]).persist()
             DBSession.flush()
-            DBSession.expunge(obj)
             srs_wrong[display_name] = obj.id
 
     yield srs_wrong
 
 
-def test_protected(ngw_webtest_app, ngw_auth_administrator):
+def test_protected(ngw_webtest_app: WebTestApp, ngw_auth_administrator):
     data = dict(wkt=srs_def[0]["wkt"])
-    ngw_webtest_app.put_json("/api/component/spatial_ref_sys/3857", data, status=422)
+    ngw_webtest_app.put("/api/component/spatial_ref_sys/3857", json=data, status=422)
 
 
-def test_geom_transform(ngw_webtest_app):
-    result = ngw_webtest_app.post_json(
+def test_geom_transform(ngw_webtest_app: WebTestApp):
+    result = ngw_webtest_app.post(
         "/api/component/spatial_ref_sys/%d/geom_transform" % 3857,
-        dict(geom=MOSCOW_VLADIVOSTOK, srs=4326),
+        json={"geom": MOSCOW_VLADIVOSTOK, "srs": 4326},
     )
     g1 = Geometry.from_wkt(result.json["geom"])
     g2 = Geometry.from_wkt("LINESTRING(4187839.2436 7508807.8513,14683040.8356 5330254.9437)")
     assert g2.shape.equals_exact(g1.shape, 5e-05)
 
-    result = ngw_webtest_app.post_json(
+    result = ngw_webtest_app.post(
         "/api/component/spatial_ref_sys/%d/geom_transform" % 4326,
-        dict(geom=result.json["geom"], srs=3857),
+        json={"geom": result.json["geom"], "srs": 3857},
     )
     g1 = Geometry.from_wkt(result.json["geom"])
     g2 = Geometry.from_wkt(MOSCOW_VLADIVOSTOK)
     assert g2.shape.equals_exact(g1.shape, 5e-07)
 
 
-def test_geom_transform_batch(srs_ids, ngw_webtest_app):
-    result = ngw_webtest_app.post_json(
+def test_geom_transform_batch(srs_ids, ngw_webtest_app: WebTestApp):
+    result = ngw_webtest_app.post(
         "/api/component/spatial_ref_sys/geom_transform",
-        transform_batch_input(srs_ids),
+        json=transform_batch_input(srs_ids),
     ).json
 
     for i, expected_item in enumerate(transform_batch_expected(srs_ids)):
@@ -86,19 +86,19 @@ def test_geom_transform_batch(srs_ids, ngw_webtest_app):
         assert g_expected.shape.equals_exact(g_actual.shape, 5e-03)
 
 
-def test_geom_transform_batch_return_empty_if_srs_to_wrong(srs_ids, ngw_webtest_app):
-    result = ngw_webtest_app.post_json(
+def test_geom_transform_batch_return_empty_if_srs_to_wrong(srs_ids, ngw_webtest_app: WebTestApp):
+    result = ngw_webtest_app.post(
         "/api/component/spatial_ref_sys/geom_transform",
-        transform_batch_input_wrong_srs_to(srs_ids),
+        json=transform_batch_input_wrong_srs_to(srs_ids),
     ).json
 
     assert len(result) == 0
 
 
-def test_return_none_if_calculation_failed(wrong_srs_ids, ngw_webtest_app):
-    result = ngw_webtest_app.post_json(
+def test_return_none_if_calculation_failed(wrong_srs_ids, ngw_webtest_app: WebTestApp):
+    result = ngw_webtest_app.post(
         "/api/component/spatial_ref_sys/geom_transform",
-        {
+        json={
             "geom": "POINT(30 60)",
             "srs_from": 4326,
             "srs_to": [wrong_srs_ids["INVALID_SRS_1"]],
@@ -110,10 +110,10 @@ def test_return_none_if_calculation_failed(wrong_srs_ids, ngw_webtest_app):
     assert result[0]["geom"] is None
 
 
-def test_return_none_for_multiple_invalid_srs(wrong_srs_ids, ngw_webtest_app):
-    result = ngw_webtest_app.post_json(
+def test_return_none_for_multiple_invalid_srs(wrong_srs_ids, ngw_webtest_app: WebTestApp):
+    result = ngw_webtest_app.post(
         "/api/component/spatial_ref_sys/geom_transform",
-        {
+        json={
             "geom": "POINT(30 60)",
             "srs_from": 4326,
             "srs_to": [
@@ -129,10 +129,10 @@ def test_return_none_for_multiple_invalid_srs(wrong_srs_ids, ngw_webtest_app):
         assert item["geom"] is None
 
 
-def test_mixed_valid_invalid_srs(srs_ids, wrong_srs_ids, ngw_webtest_app):
-    result = ngw_webtest_app.post_json(
+def test_mixed_valid_invalid_srs(srs_ids, wrong_srs_ids, ngw_webtest_app: WebTestApp):
+    result = ngw_webtest_app.post(
         "/api/component/spatial_ref_sys/geom_transform",
-        {
+        json={
             "geom": "POINT(30 60)",
             "srs_from": 4326,
             "srs_to": [
@@ -149,10 +149,10 @@ def test_mixed_valid_invalid_srs(srs_ids, wrong_srs_ids, ngw_webtest_app):
     assert result[1]["geom"] is None
 
 
-def test_multiple_different_invalid_srs(wrong_srs_ids, ngw_webtest_app):
-    result = ngw_webtest_app.post_json(
+def test_multiple_different_invalid_srs(wrong_srs_ids, ngw_webtest_app: WebTestApp):
+    result = ngw_webtest_app.post(
         "/api/component/spatial_ref_sys/geom_transform",
-        {
+        json={
             "geom": "POINT(30 60)",
             "srs_from": 4326,
             "srs_to": [
@@ -169,22 +169,22 @@ def test_multiple_different_invalid_srs(wrong_srs_ids, ngw_webtest_app):
         assert item["srs_id"] in wrong_srs_ids.values()
 
 
-def test_geom_length(ngw_webtest_app):
-    result = ngw_webtest_app.post_json(
+def test_geom_length(ngw_webtest_app: WebTestApp):
+    result = ngw_webtest_app.post(
         "/api/component/spatial_ref_sys/%d/geom_length" % 4326,
-        dict(geom=MOSCOW_VLADIVOSTOK),
+        json={"geom": MOSCOW_VLADIVOSTOK},
     )
     assert abs(result.json["value"] - LENGTH_SPHERE) < 1e-6
 
-    result = ngw_webtest_app.post_json(
+    result = ngw_webtest_app.post(
         "/api/component/spatial_ref_sys/%d/geom_length" % 4326,
-        dict(geom=MOSCOW_VLADIVOSTOK),
+        json={"geom": MOSCOW_VLADIVOSTOK},
     )
     assert abs(result.json["value"] - LENGTH_SPHERE) < 1e-6
 
-    result = ngw_webtest_app.post_json(
+    result = ngw_webtest_app.post(
         "/api/component/spatial_ref_sys/%d/geom_length" % 3857,
-        dict(geom=MOSCOW_VLADIVOSTOK, srs=4326),
+        json={"geom": MOSCOW_VLADIVOSTOK, "srs": 4326},
     )
     assert abs(result.json["value"] - LENGTH_FLAT) < 1e-6
 
@@ -203,9 +203,9 @@ def test_geom_length(ngw_webtest_app):
         ),
     ],
 )
-def test_geom_area(wkt, srs_geom, srs_calc, area, srs_ids, ngw_webtest_app):
-    result = ngw_webtest_app.post_json(
+def test_geom_area(wkt, srs_geom, srs_calc, area, srs_ids, ngw_webtest_app: WebTestApp):
+    result = ngw_webtest_app.post(
         "/api/component/spatial_ref_sys/%d/geom_area" % srs_ids[srs_calc],
-        dict(geom=wkt, srs=srs_ids[srs_geom]),
+        json={"geom": wkt, "srs": srs_ids[srs_geom]},
     )
     assert result.json["value"] == pytest.approx(area, rel=0.025)

@@ -81,14 +81,14 @@ def postgis_filter_geojson():
 
 
 @pytest.fixture(scope="module")
-def postgis_filter_layer_id(ngw_env, postgis_filter_geojson):
+def postgis_filter_layer_id(ngw_env, postgis_filter_geojson, ngw_resource_group):
     opts_db = ngw_env.core.options.with_prefix("test.database")
     for key in ("host", "name", "user"):
         if key not in opts_db:
             pytest.skip(f"Option test.database.{key} isn't set")
 
     # Use the helper from postgis.test/__init__.py
-    from . import create_feature_layer  # type: ignore
+    from . import create_feature_layer
 
     ogr_dr = "Memory"
     from osgeo import ogr, osr
@@ -130,11 +130,5 @@ def postgis_filter_layer_id(ngw_env, postgis_filter_geojson):
         ogr_feat.SetField("work_start", props["work_start"])
         layer.CreateFeature(ogr_feat)
 
-    from nextgisweb.resource import ResourceGroup
-
-    root_group = ResourceGroup.filter_by(parent_id=None).first()
-    if root_group is None:
-        pytest.skip("Root resource group is not available")
-
-    with create_feature_layer(layer, parent_id=root_group.id) as res:
+    with create_feature_layer(layer, parent_id=ngw_resource_group) as res:
         yield res.id

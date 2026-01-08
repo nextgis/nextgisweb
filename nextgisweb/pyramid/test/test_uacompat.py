@@ -2,6 +2,8 @@ from urllib.parse import parse_qs, urlparse
 
 import pytest
 
+from nextgisweb.pyramid.test import WebTestApp
+
 from ..uacompat import parse_header
 
 
@@ -51,7 +53,7 @@ def test_parser(value, expected):
     assert parsed == expected
 
 
-def test_redirect(ngw_env, ngw_webtest_app, ngw_auth_administrator):
+def test_redirect(ngw_env, ngw_webtest_app: WebTestApp, ngw_auth_administrator):
     user_agent = "Mozilla/5.0 (Windows NT 10.0; Trident/7.0; rv:11.0) like Gecko"
     with ngw_env.pyramid.options.override(
         {

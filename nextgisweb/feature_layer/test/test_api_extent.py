@@ -7,6 +7,7 @@ from osgeo import ogr
 from nextgisweb.env import DBSession
 
 from nextgisweb.postgis.test import create_feature_layer as create_postgis_layer
+from nextgisweb.pyramid.test import WebTestApp
 from nextgisweb.vector_layer import VectorLayer
 from nextgisweb.vector_layer.test import create_feature_layer as create_vector_layer
 
@@ -83,7 +84,7 @@ item_check_list = [[1, item_one_extent], [2, item_two_extent]]
 
 
 @pytest.mark.parametrize("fid, extent", item_check_list)
-def test_item_extent(ngw_webtest_app, vector_layer_id, extent, fid):
+def test_item_extent(ngw_webtest_app: WebTestApp, vector_layer_id, extent, fid):
     req_str = "/api/resource/%d/feature/%d/extent" % (vector_layer_id, fid)
     resp = ngw_webtest_app.get(req_str)
     for coord, value in resp.json["extent"].items():
@@ -104,7 +105,7 @@ def test_filtered_extent(
     filter_,
     expected,
     ngw_resource_group_sub,
-    ngw_webtest_app,
+    ngw_webtest_app: WebTestApp,
     ngw_data_path,
 ):
     data = ngw_data_path / "filter-extent-layer.geojson"

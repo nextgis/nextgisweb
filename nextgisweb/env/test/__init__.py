@@ -1,6 +1,9 @@
 from collections.abc import Sequence
+from contextvars import ContextVar
 from functools import cache, partial
 from importlib.util import find_spec
+from pathlib import Path
+from typing import Generator
 
 import pytest
 from sqlalchemy.dialects import postgresql
@@ -19,6 +22,26 @@ def pytest_addoption(parser):
         default=False,
         help="Update reference data, like SQL queries",
     )
+
+
+current_request = ContextVar("current_request")
+
+
+@pytest.fixture(autouse=True)
+def _current_request(request):
+    token = current_request.set(request)
+    try:
+        yield
+    finally:
+        current_request.reset(token)
+
+
+def fixture_value(name: str, *alt: str):
+    names = (name, *alt)
+    request = current_request.get()
+    for name in names:
+        return request.getfixturevalue(name)
+    raise ValueError(f"No fixture found for names: {names}")
 
 
 @pytest.fixture(autouse=True)
@@ -54,7 +77,7 @@ def genereate_components() -> Sequence[str]:
 
 
 @pytest.fixture(scope="session")
-def ngw_env():
+def ngw_env() -> Env:
     env = _env()
     if not env.initialized:
         env.initialize()
@@ -62,12 +85,12 @@ def ngw_env():
 
 
 @pytest.fixture(scope="module")
-def ngw_data_path(request):
+def ngw_data_path(request) -> Path:
     parent = request.path.parent
     assert parent.name == "test"
     result = parent / "data"
     assert result.is_dir()
-    yield result
+    return result
 
 
 @pytest.fixture(scope="session", autouse=True)

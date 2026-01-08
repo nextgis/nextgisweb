@@ -10,6 +10,7 @@ from nextgisweb.env import DBSession
 from nextgisweb.lib.geometry import Geometry
 
 from nextgisweb.feature_layer import FIELD_TYPE
+from nextgisweb.pyramid.test import WebTestApp
 from nextgisweb.vector_layer import VectorLayer
 
 from .. import Feature
@@ -42,7 +43,7 @@ def layer_id():
 
 
 @pytest.fixture()
-def update_field(layer_id, ngw_webtest_app):
+def update_field(layer_id, ngw_webtest_app: WebTestApp):
     def wrapped(**field):
         if "keyname" not in field:
             field["keyname"] = "keyname"
@@ -54,15 +55,16 @@ def update_field(layer_id, ngw_webtest_app):
         assert len(fields) == 1
 
         fields[0].update(field)
-        ngw_webtest_app.put_json(
-            f"/api/resource/{layer_id}", dict(feature_layer=dict(fields=fields))
+        ngw_webtest_app.put(
+            f"/api/resource/{layer_id}",
+            json={"feature_layer": {"fields": fields}},
         )
 
     return wrapped
 
 
 @pytest.fixture()
-def export_geojson(layer_id, ngw_webtest_app):
+def export_geojson(layer_id, ngw_webtest_app: WebTestApp):
     def wrapped(display_name=False, fid=None, intersects=None, intersects_srs=None):
         qs = dict(
             format="GeoJSON",
@@ -76,7 +78,7 @@ def export_geojson(layer_id, ngw_webtest_app):
             qs["intersects_srs"] = intersects_srs
         if fid is not None:
             qs["fid"] = fid
-        resp = ngw_webtest_app.get(f"/api/resource/{layer_id}/export", qs)
+        resp = ngw_webtest_app.get(f"/api/resource/{layer_id}/export", query=qs)
         return resp.json
 
     return wrapped
@@ -172,10 +174,13 @@ def resources():
         for label, driver in EXPORT_FORMAT_OGR.items()
     ],
 )
-def test_export_multi(driver_label, resources, ngw_webtest_app):
+def test_export_multi(driver_label, resources, ngw_webtest_app: WebTestApp):
     driver = EXPORT_FORMAT_OGR[driver_label]
-    params = dict(format=driver_label, resources=resources)
-    response = ngw_webtest_app.post_json("/api/component/feature_layer/export", params, status=200)
+    response = ngw_webtest_app.post(
+        "/api/component/feature_layer/export",
+        json={"format": driver_label, "resources": resources},
+        status=200,
+    )
 
     with NamedTemporaryFile(suffix=".zip") as t:
         t.write(response.body)

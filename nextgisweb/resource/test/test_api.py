@@ -1,4 +1,5 @@
 from contextlib import contextmanager
+from secrets import token_urlsafe
 
 import pytest
 import transaction
@@ -6,7 +7,10 @@ from sqlalchemy import func
 
 from nextgisweb.env import DBSession
 
+from nextgisweb.pyramid.test import WebTestApp
+
 from .. import Resource, ResourceGroup
+from . import ResourceAPI
 
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
 
@@ -19,8 +23,10 @@ def disable(ngw_env):
     def _disable(*resource_cls):
         mem = resource.disabled_resource_cls
         resource.disabled_resource_cls = list(set(mem).union(set(resource_cls)))
-        yield
-        resource.disabled_resource_cls = mem
+        try:
+            yield
+        finally:
+            resource.disabled_resource_cls = mem
 
     return _disable
 
@@ -48,41 +54,21 @@ def quota(ngw_env):
     return _quota
 
 
-def test_disable_resources(disable, ngw_webtest_app, ngw_resource_group):
-    def create_resource_group(display_name, expected_status):
-        ngw_webtest_app.post_json(
-            "/api/resource/",
-            dict(
-                resource=dict(
-                    cls="resource_group",
-                    parent=dict(id=ngw_resource_group),
-                    display_name=display_name,
-                )
-            ),
-            status=expected_status,
-        )
-
-    create_resource_group("disable.resource_group", 201)
+@pytest.mark.usefixtures("ngw_webtest_app")
+def test_disable_resources(disable):
+    rapi = ResourceAPI()
+    rapi.create_request("resource_group", {}, status=201)
 
     with disable("resource_group"):
-        create_resource_group("disable.resource_group", 422)
+        rapi.create_request("resource_group", {}, status=422)
 
 
 @pytest.mark.parametrize("cls", ("vector_layer", "postgis_connection"))
-def test_incomplete_create(request, cls, ngw_resource_group, ngw_webtest_app):
+@pytest.mark.usefixtures("ngw_webtest_app")
+def test_incomplete_create(cls):
     # Vector layer and PostGIS connection require some mandatory fields on
     # creation, and omission of these fields must cause validation errors.
-    ngw_webtest_app.post_json(
-        "/api/resource/",
-        dict(
-            resource=dict(
-                cls=cls,
-                parent=dict(id=ngw_resource_group),
-                display_name=request.node.name,
-            )
-        ),
-        status=422,
-    )
+    ResourceAPI().create_request(cls, {}, status=422)
 
 
 @pytest.fixture(scope="module")
@@ -92,87 +78,63 @@ def resource():
             display_name="狗子有佛性也無",
             keyname="Test-Keyname",
         ).persist()
-
-        DBSession.flush()
-        DBSession.expunge(obj)
-
     yield obj
 
 
-def test_resource_search(resource, ngw_webtest_app):
-    url = "/api/resource/search/"
+def test_resource_search(resource, ngw_webtest_app: WebTestApp):
+    api = ngw_webtest_app.with_url("/api/resource/search/")
 
-    resp = ngw_webtest_app.get(url, dict(display_name="狗子有佛性也無"), status=200)
-    assert len(resp.json) == 1
+    resp_json = api.get(query=dict(display_name="狗子有佛性也無")).json
+    assert len(resp_json) == 1
 
-    resp = ngw_webtest_app.get(url, dict(display_name="狗子有佛性也無", keyname="foo"), status=200)
-    assert len(resp.json) == 0
+    resp_json = api.get(query=dict(display_name="狗子有佛性也無", keyname="foo")).json
+    assert resp_json == []
 
-    resp = ngw_webtest_app.get(url, dict(display_name__ilike="%佛%"), status=200)
-    assert len(resp.json) == 1
-    assert resp.json[0]["resource"]["display_name"] == resource.display_name
+    resp_json = api.get(query=dict(display_name__ilike="%佛%")).json
+    assert len(resp_json) == 1
+    assert resp_json[0]["resource"]["display_name"] == resource.display_name
 
 
 @pytest.fixture(scope="module")
 def resources():
+    prefix = f"test_{token_urlsafe(6)}"
     # R - A
     #   - B - C
     #       - D
     with transaction.manager:
-        res_R = ResourceGroup(
-            display_name="Test resource ROOT",
-            keyname="test_res_R",
-        ).persist()
+        r = ResourceGroup(keyname=f"{prefix}_R").persist()
+        ResourceGroup(parent=r, keyname=f"{prefix}_A").persist()
 
-        ResourceGroup(
-            parent=res_R,
-            display_name="Test resource A",
-            keyname="test_res_A",
-        ).persist()
+        b = ResourceGroup(parent=r, keyname=f"{prefix}_B").persist()
 
-        res_B = ResourceGroup(
-            parent=res_R,
-            display_name="Test resource B",
-            keyname="test_res_B",
-        ).persist()
+        ResourceGroup(parent=b, keyname=f"{prefix}_C").persist()
+        ResourceGroup(parent=b, keyname=f"{prefix}_D").persist()
 
-        ResourceGroup(
-            parent=res_B,
-            display_name="Test resource C",
-            keyname="test_res_C",
-        ).persist()
-
-        ResourceGroup(
-            parent=res_B,
-            display_name="Test resource D",
-            keyname="test_res_D",
-        ).persist()
-
-        DBSession.flush()
-
-    yield
+    yield prefix
 
 
 @pytest.mark.parametrize(
     "root_keyname, keynames_expected",
     (
-        ("test_res_R", {"test_res_R", "test_res_A", "test_res_B", "test_res_C", "test_res_D"}),
-        ("test_res_B", {"test_res_B", "test_res_C", "test_res_D"}),
+        ("R", {"R", "A", "B", "C", "D"}),
+        ("B", {"B", "C", "D"}),
     ),
 )
 def test_resource_search_parent_id_recursive(
     resources,
     root_keyname,
     keynames_expected,
-    ngw_webtest_app,
+    ngw_webtest_app: WebTestApp,
 ):
-    response = ngw_webtest_app.get("/api/resource/search/", dict(keyname=root_keyname))
-    root_id = response.json[0]["resource"]["id"]
+    prefix = resources
+    api = ngw_webtest_app.with_url("/api/resource/search/")
 
-    data = ngw_webtest_app.get("/api/resource/search/", dict(parent_id__recursive=root_id)).json
-    keynames = {item["resource"]["keyname"] for item in data}
+    resp = api.get(query={"keyname": f"{prefix}_{root_keyname}"})
+    root_id = resp.json[0]["resource"]["id"]
 
-    assert keynames == keynames_expected
+    resp = api.get(query={"parent_id__recursive": root_id})
+    keynames = {item["resource"]["keyname"] for item in resp.json}
+    assert keynames == {f"{prefix}_{item}" for item in keynames_expected}
 
 
 @pytest.fixture
@@ -189,86 +151,83 @@ def resource_stat():
     yield total, cls_count
 
 
-def test_quota(quota, disable, resource_stat, ngw_resource_group, ngw_webtest_app):
+def test_quota(quota, disable, resource_stat, ngw_webtest_app: WebTestApp):
     total, cls_count = resource_stat
+    rapi = ResourceAPI()
 
-    def rgrp(display_name, expected_status):
-        resp = ngw_webtest_app.post_json(
-            "/api/resource/",
-            dict(
-                resource=dict(
-                    cls="resource_group",
-                    parent=dict(id=ngw_resource_group),
-                    display_name=display_name,
-                )
-            ),
-            status=expected_status,
-        )
-
+    def create_resource_group(status):
+        resp = rapi.create_request("resource_group", {}, status=status)
         if resp.status_code == 201:
-            resource_id = resp.json["id"]
-            ngw_webtest_app.delete(f"/api/resource/{resource_id}")
+            rapi.delete(resp.json["id"])
 
-    def check(data, expected_status, expected_result=None):
-        resp = ngw_webtest_app.post_json(
+    def check(data, status, expected_result=None):
+        resp = ngw_webtest_app.post(
             "/api/component/resource/check_quota",
-            data,
-            status=expected_status,
+            json=data,
+            status=status,
         )
         if expected_result is not None:
             assert expected_result.items() <= resp.json.items()
 
     with quota():
-        check(dict(resource_group=999), 200)
-        rgrp("No quota", 201)
+        check({"resource_group": 999}, 200)
+        create_resource_group(201)  # No quota limits
 
-        check(dict(non_existent=1), 422)
-        check(dict(non_existent=0), 422)
+        check({"invalid": 1}, 422)  # Resource class validated
+        check({"invalid": 0}, 422)  # Even if zero
 
         with disable("resource_group"):
-            rgrp("Disabled", 422)
-            check(dict(resource_group=0), 200)
+            create_resource_group(422)  # Disabled classes can't be created
+            check({"resource_group": 0}, 200)  # Zero passes quota check
+            check({"resource_group": 1}, 422)  # And fails for non-zero
 
     with quota(limit=total):
-        check(dict(resource_group=0), 200)
-        check(dict(resource_group=1), 402, dict(cls=None, required=1, available=0))
-        rgrp("Quota exceeded", 402)
+        check({"resource_group": 0}, 200)
+        check({"resource_group": 1}, 402, {"cls": None, "required": 1, "available": 0})
+        create_resource_group(402)
 
     rg_count = cls_count.get("resource_group", 0)
 
     with quota(limit=rg_count, resource_cls=["resource_group"]):
-        check(dict(resource_group=0), 200)
-        check(dict(resource_group=1), 402, dict(cls=None, required=1, available=0))
-        rgrp("Quota exceeded resource_group", 402)
+        check({"resource_group": 0}, 200)
+        check({"resource_group": 1}, 402, {"cls": None, "required": 1, "available": 0})
+        create_resource_group(402)
 
+    # Quota set for another resource classes shouldn't affect resource_group
     with quota(limit=rg_count, resource_cls=["another_resource_cls"]):
-        check(dict(resource_group=999), 200)
-        rgrp("Quota exceeded another cls", 201)
+        check({"resource_group": 999}, 200)
+        create_resource_group(201)
 
+    # Quota set to exact current count should block any new creations
     with quota(resource_by_cls=dict(resource_group=rg_count)):
-        check(dict(resource_group=0), 200)
-        check(dict(resource_group=1), 402, dict(cls="resource_group", required=1, available=0))
-        rgrp("Quota by cls exceeded", 402)
+        check({"resource_group": 0}, 200)
+        check({"resource_group": 1}, 402, {"cls": "resource_group", "required": 1, "available": 0})
+        create_resource_group(402)
 
+    # Quota set for another resource classes shouldn't affect resource_group
     with quota(resource_by_cls=dict(another_resource_cls=rg_count)):
-        check(dict(resource_group=999), 200)
-        rgrp("Quota by cls exceeded another cls", 201)
+        check({"resource_group": 999}, 200)
+        create_resource_group(201)
 
+    # Quota slightly above current count should allow some creations
     with quota(limit=total + 5):
-        check(dict(resource_group=5), 200)
-        check(dict(resource_group=6), 402, dict(cls=None, required=6, available=5))
+        check({"resource_group": 5}, 200)
+        check({"resource_group": 6}, 402, {"cls": None, "required": 6, "available": 5})
 
+    # Same, but quota only for resource_group
     with quota(limit=rg_count + 5, resource_cls=["resource_group"]):
-        check(dict(resource_group=5), 200)
-        check(dict(resource_group=7), 402, dict(cls=None, required=7, available=5))
+        check({"resource_group": 5}, 200)
+        check({"resource_group": 7}, 402, {"cls": None, "required": 7, "available": 5})
 
 
-def test_description_sanitization(ngw_resource_group, ngw_webtest_app):
+@pytest.mark.usefixtures("ngw_webtest_app")
+def test_description_sanitization():
+    rapi = ResourceAPI()
     description_unsafe = '<a href="javascript:alert(0)">Link'
-    ngw_webtest_app.put_json(
-        f"/api/resource/{ngw_resource_group}",
-        dict(resource=dict(description=description_unsafe)),
-    ).json
+    res_id = rapi.create(
+        "resource_group",
+        {"resource": {"description": description_unsafe}},
+    )
 
-    resp = ngw_webtest_app.get(f"/api/resource/{ngw_resource_group}").json
-    assert resp["resource"]["description"] == "<a>Link</a>"
+    description_written = rapi.read(res_id)["resource"]["description"]
+    assert description_written == "<a>Link</a>"

@@ -6,81 +6,84 @@ import pytest
 from nextgisweb.env import Component
 from nextgisweb.env.test import genereate_components
 
+from nextgisweb.pyramid.test import WebTestApp
+
 pytestmark = pytest.mark.usefixtures("ngw_auth_administrator")
 
 
-@pytest.fixture(scope="module")
-def webtest(ngw_webtest_factory):
-    return ngw_webtest_factory()
+def test_route(ngw_webtest_app: WebTestApp):
+    ngw_webtest_app.get("/api/component/pyramid/route")
 
 
-def test_route(webtest):
-    webtest.get("/api/component/pyramid/route")
+def test_pkg_version(ngw_webtest_app: WebTestApp):
+    ngw_webtest_app.get("/api/component/pyramid/pkg_version")
 
 
-def test_pkg_version(webtest):
-    webtest.get("/api/component/pyramid/pkg_version")
+def test_healthcheck(disable_oauth, ngw_webtest_app: WebTestApp):
+    ngw_webtest_app.get("/api/component/pyramid/healthcheck")
 
 
-def test_healthcheck(webtest, disable_oauth):
-    webtest.get("/api/component/pyramid/healthcheck")
-
-
-def test_malformed_json(webtest):
+def test_malformed_json(ngw_webtest_app: WebTestApp):
     # Login uses request.json_body
-    resp = webtest.post(
+    resp = ngw_webtest_app.post(
         "/api/component/auth/login",
-        params="{ /* INVALID JSON */ }",
-        content_type="application/json",
+        data="{ /* INVALID JSON */ }",
+        headers={"Content-Type": "application/json"},
         status=400,
     )
     assert resp.json["exception"].endswith(".MalformedJSONBody")
 
     # Resource APIs use Msgspec
-    resp = webtest.put(
+    resp = ngw_webtest_app.put(
         "/api/resource/0",
-        params="{ /* INVALID JSON */ }",
-        content_type="application/json",
+        data="{ /* INVALID JSON */ }",
+        headers={"Content-Type": "application/json"},
         status=400,
     )
     assert resp.json["exception"].endswith(".MalformedJSONBody")
 
 
 @pytest.mark.parametrize("component", genereate_components())
-def test_settings(component, webtest):
+def test_settings(component, ngw_webtest_app: WebTestApp):
     if hasattr(Component.registry[component], "client_settings"):
-        webtest.get("/api/component/pyramid/settings?component={}".format(component))
+        ngw_webtest_app.get(
+            "/api/component/pyramid/settings",
+            query={"component": component},
+        )
 
 
-def test_settings_param_required(webtest):
-    webtest.get("/api/component/pyramid/settings", status=422)
+def test_settings_param_required(ngw_webtest_app: WebTestApp):
+    ngw_webtest_app.get(
+        "/api/component/pyramid/settings",
+        status=422,
+    )
 
 
-def test_settings_param_invalid(webtest):
-    webtest.get("/api/component/pyramid/settings?component=invalid", status=422)
+def test_settings_param_invalid(ngw_webtest_app: WebTestApp):
+    ngw_webtest_app.get(
+        "/api/component/pyramid/settings",
+        query={"component": "invalid"},
+        status=422,
+    )
 
 
 @pytest.fixture()
 def override(ngw_core_settings_override):
     @contextmanager
     def wrapped(comp, key):
-        with ngw_core_settings_override(
-            [
-                (comp, key, None),
-            ]
-        ):
+        with ngw_core_settings_override([(comp, key, None)]):
             yield
 
     return wrapped
 
 
-def test_csettings(webtest):
+def test_csettings(ngw_webtest_app: WebTestApp):
     url = "/api/component/pyramid/csettings"
-    orig = webtest.get(f"{url}?pyramid=all").json
+    orig = ngw_webtest_app.get(url, query={"pyramid": "all"}).json
     body = deepcopy(orig)
     body["pyramid"].pop("header_logo", None)
-    webtest.put_json(url, body)
-    resp = webtest.get(f"{url}?pyramid=all").json
+    ngw_webtest_app.put(url, json=body)
+    resp = ngw_webtest_app.get(url, query={"pyramid": "all"}).json
     assert resp == orig
 
-    webtest.put_json(url, dict(pyramid=None), status=422)
+    ngw_webtest_app.put(url, json={"pyramid": None}, status=422)

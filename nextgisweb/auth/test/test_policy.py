@@ -4,47 +4,45 @@ import pytest
 import transaction
 from freezegun import freeze_time
 
+from nextgisweb.pyramid.test import WebTestApp
+
 from .. import User
 
 pytestmark = pytest.mark.usefixtures("disable_oauth", "ngw_administrator_password")
 
 
-def test_fixture(ngw_webtest_app, ngw_auth_administrator):
-    resp = ngw_webtest_app.get("/api/component/auth/current_user")
-    assert resp.status_code == 200
+def test_fixture(ngw_webtest_app: WebTestApp, ngw_auth_administrator):
+    resp = ngw_webtest_app.get("/api/component/auth/current_user", status=200)
     assert resp.json["keyname"] == "administrator"
 
 
-def test_http_basic(ngw_webtest_app):
-    resp = ngw_webtest_app.get("/api/component/auth/user/", expect_errors=True)
-    assert resp.status_code == 403
+def test_http_basic(ngw_webtest_app: WebTestApp):
+    ngw_webtest_app.get("/api/component/auth/user/", status=403)
 
     ngw_webtest_app.authorization = ("Basic", ("administrator", "admin"))
-    resp = ngw_webtest_app.get("/api/component/auth/current_user")
-    assert resp.status_code == 200
+    resp = ngw_webtest_app.get("/api/component/auth/current_user", status=200)
     assert resp.json["keyname"] == "administrator"
 
     ngw_webtest_app.authorization = ("Basic", ("administrator", "invalid"))
-    resp = ngw_webtest_app.get("/api/component/auth/current_user", expect_errors=True)
-    assert resp.status_code == 401
+    ngw_webtest_app.get("/api/component/auth/current_user", status=401)
 
 
-def test_api_login_logout(ngw_webtest_app):
+def test_api_login_logout(ngw_webtest_app: WebTestApp):
     resp = ngw_webtest_app.post(
-        "/api/component/auth/login", dict(login="administrator", password="admin")
+        "/api/component/auth/login",
+        json={"login": "administrator", "password": "admin"},
+        status=200,
     )
-    assert resp.status_code == 200
     assert resp.json["keyname"] == "administrator"
 
-    _dummy_auth_request(ngw_webtest_app)
+    ngw_webtest_app.get("/api/component/auth/user/", status=200)
 
     resp = ngw_webtest_app.post("/api/component/auth/logout")
     assert resp.json == dict()
-    resp = ngw_webtest_app.get("/api/component/auth/user/", expect_errors=True)
-    assert resp.status_code == 403
+    ngw_webtest_app.get("/api/component/auth/user/", status=403)
 
 
-def test_local_refresh(ngw_webtest_app, ngw_env):
+def test_local_refresh(ngw_webtest_app: WebTestApp, ngw_env):
     lifetime = ngw_env.auth.options["policy.local.lifetime"]
     refresh = ngw_env.auth.options["policy.local.refresh"]
     epsilon = timedelta(seconds=5)
@@ -52,29 +50,21 @@ def test_local_refresh(ngw_webtest_app, ngw_env):
     with freeze_time() as dt:
         start = dt()
 
-        resp = ngw_webtest_app.post(
+        ngw_webtest_app.post(
             "/api/component/auth/login",
-            dict(login="administrator", password="admin"),
+            json={"login": "administrator", "password": "admin"},
+            status=200,
         )
-        assert resp.status_code == 200
 
         dt.tick(lifetime + epsilon)
-        _dummy_auth_request(ngw_webtest_app, 403)
+        ngw_webtest_app.get("/api/component/auth/user/", status=403)
 
         dt.move_to(start)
         dt.tick(refresh)
-        _dummy_auth_request(ngw_webtest_app, 200)
+        ngw_webtest_app.get("/api/component/auth/user/", status=200)
 
         dt.tick(lifetime - epsilon)
-        _dummy_auth_request(ngw_webtest_app, 200)
-
-
-def _dummy_auth_request(ngw_webtest_app, status_code=200):
-    resp = ngw_webtest_app.get(
-        "/api/component/auth/user/",
-        expect_errors=status_code < 200 or status_code >= 300,
-    )
-    assert resp.status_code == status_code
+        ngw_webtest_app.get("/api/component/auth/user/", status=200)
 
 
 @pytest.fixture
@@ -91,14 +81,14 @@ def test_forget_user(ngw_webtest_factory, user):
     app2 = ngw_webtest_factory()
     app2.post(
         "/api/component/auth/login",
-        dict(login=user.keyname, password=user.password_plaintext),
+        json={"login": user.keyname, "password": user.password_plaintext},
     )
     resp = app2.get("/api/component/auth/current_user")
     assert resp.json["keyname"] == user.keyname
 
-    app1.put_json(
+    app1.put(
         f"/api/component/auth/user/{user.id}",
-        dict(password=User.test_instance().password_plaintext),
+        json={"password": User.test_instance().password_plaintext},
     )
 
     resp = app2.get("/api/component/auth/current_user")

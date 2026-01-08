@@ -1,7 +1,6 @@
 import pytest
 import transaction
 
-from nextgisweb.env import DBSession
 from nextgisweb.lib.geometry import Geometry
 
 from nextgisweb.feature_layer import Feature
@@ -20,17 +19,16 @@ def mkres():
             for _ in range(3):
                 feat = Feature(geom=Geometry.from_wkt("POINT(0 0)"))
                 obj.feature_create(feat)
-            DBSession.flush()
+
         return obj.id
 
     yield _mkres
 
 
 @parametrize_versioning()
-def test_workflow(versioning, mkres, ngw_webtest_app):
-    web = ngw_webtest_app
+def test_workflow(versioning, mkres):
     res = mkres(versioning)
-    fapi = FeatureLayerAPI(web, res, extensions=["description"])
+    fapi = FeatureLayerAPI(res, extensions=["description"])
     vid = lambda v: ({"vid": v} if versioning else {})
 
     with fapi.transaction() as txn:  # Version 2

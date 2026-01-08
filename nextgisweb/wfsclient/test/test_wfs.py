@@ -7,6 +7,7 @@ from shapely.geometry import Polygon
 
 from nextgisweb.env import DBSession
 
+from nextgisweb.pyramid.test import WebTestApp
 from nextgisweb.vector_layer import VectorLayer
 from nextgisweb.vector_layer import test as vector_layer_test
 from nextgisweb.wfsserver.model import Layer as WFS_Service_Layer
@@ -24,25 +25,22 @@ def wfs_service_path(ngw_httptest_app):
     with transaction.manager:
         vl_type = VectorLayer().persist().from_ogr(DATA / "type.geojson")
 
-        DBSession.flush()
-
         # NOTE: GDAL doesn't support time fields in GML / WFS. It completely breaks
         # XSD schema parsing. Delete the time field to pass tests.
         DBSession.delete(vl_type.field_by_keyname("time"))
 
-        wfs_service = WFSService().persist()
-        wfs_service.layers.append(
-            WFS_Service_Layer(
-                resource=vl_type, keyname="type", display_name="type", maxfeatures=1000
-            )
-        )
+        obj = WFSService(
+            layers=[
+                WFS_Service_Layer(
+                    resource=vl_type,
+                    keyname="type",
+                    display_name="type",
+                    maxfeatures=1000,
+                ),
+            ]
+        ).persist()
 
-        DBSession.flush()
-
-        DBSession.expunge(vl_type)
-        DBSession.expunge(wfs_service)
-
-    path = "{}/api/resource/{}/wfs".format(ngw_httptest_app.base_url, wfs_service.id)
+    path = "{}/api/resource/{}/wfs".format(ngw_httptest_app.base_url, obj.id)
     yield path
 
 
@@ -50,7 +48,10 @@ def wfs_service_path(ngw_httptest_app):
 def connection_id(wfs_service_path):
     with transaction.manager:
         obj = WFSConnection(
-            path=wfs_service_path, username="administrator", password="admin", version="2.0.2"
+            path=wfs_service_path,
+            username="administrator",
+            password="admin",
+            version="2.0.2",
         ).persist()
 
     yield obj.id
@@ -86,15 +87,23 @@ def test_connection(connection_id, ngw_webtest_app):
         assert pytest.approx(c1) == c2
 
     ngw_webtest_app.get(
-        "/api/resource/%d/wfsclient/inspect/%s" % (connection_id, "type"), status=200
+        "/api/resource/%d/wfsclient/inspect/%s" % (connection_id, "type"),
+        status=200,
     )
 
 
-def test_layer(layer_id, ngw_webtest_app):
+def test_layer(layer_id, ngw_webtest_app: WebTestApp):
     layer_url = "/api/resource/%d" % layer_id
 
-    feature1 = ngw_webtest_app.get("%s/feature/1" % layer_url, dict(geom_format="geojson")).json
-    feature2 = ngw_webtest_app.get("%s/feature/2" % layer_url, dict(geom_format="geojson")).json
+    feature1 = ngw_webtest_app.get(
+        "%s/feature/1" % layer_url,
+        query=dict(geom_format="geojson"),
+    ).json
+
+    feature2 = ngw_webtest_app.get(
+        "%s/feature/2" % layer_url,
+        query=dict(geom_format="geojson"),
+    ).json
 
     # Intersects
     x, y = feature1["geom"]["coordinates"]
@@ -110,7 +119,7 @@ def test_layer(layer_id, ngw_webtest_app):
 
     res = ngw_webtest_app.get(
         "%s/feature/" % layer_url,
-        dict(geom_format="geojson", intersects=poly.wkt),
+        query=dict(geom_format="geojson", intersects=poly.wkt),
     )
     assert res.json == [feature1]
 
@@ -118,25 +127,25 @@ def test_layer(layer_id, ngw_webtest_app):
 
     res = ngw_webtest_app.get(
         "%s/feature/" % layer_url,
-        dict(geom_format="geojson", intersects=poly.wkt),
+        query=dict(geom_format="geojson", intersects=poly.wkt),
     )
     assert len(res.json) == 0
 
     # Limit, offset
     res = ngw_webtest_app.get(
         "%s/feature/" % layer_url,
-        dict(geom_format="geojson", limit=0),
+        query=dict(geom_format="geojson", limit=0),
     )
     assert len(res.json) == 0
 
     res = ngw_webtest_app.get(
         "%s/feature/" % layer_url,
-        dict(geom_format="geojson", limit=1, offset=1),
+        query=dict(geom_format="geojson", limit=1, offset=1),
     )
     assert res.json == [feature2]
 
     res = ngw_webtest_app.get(
         "%s/feature/" % layer_url,
-        dict(geom_format="geojson", limit=1, offset=0),
+        query=dict(geom_format="geojson", limit=1, offset=0),
     )
     assert res.json == [feature1]

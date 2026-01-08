@@ -1,23 +1,25 @@
 import pytest
 import transaction
 
+from nextgisweb.resource.test import ResourceAPI
+
 from .. import LookupTable
 
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
 
 
 @pytest.fixture(scope="module")
-def lt_id():
+def resource_id():
     with transaction.manager:
-        items = [
-            ("z", "b"),
-            ("a", "x"),
-            ("l", "p"),
-            ("k", "a"),
-        ]
-        res = LookupTable(value=items).persist()
-
-    yield res.id
+        res = LookupTable(
+            value=[
+                ("z", "b"),
+                ("a", "x"),
+                ("l", "p"),
+                ("k", "a"),
+            ]
+        ).persist()
+    return res.id
 
 
 def items_product():
@@ -61,14 +63,11 @@ def items_product():
 
 
 @pytest.mark.parametrize("data, expected", items_product())
-def test_update(data, expected, lt_id, ngw_webtest_app):
-    url = f"/api/resource/{lt_id}"
+def test_update(data, expected, resource_id):
+    rapi = ResourceAPI()
 
-    pdata = dict(lookup_table=data)
-    ngw_webtest_app.put_json(url, pdata)
-
-    resp = ngw_webtest_app.get(url, status=200)
-    ltdata = resp.json["lookup_table"]
+    rapi.update(resource_id, {"lookup_table": data})
+    ltdata = rapi.read(resource_id)["lookup_table"]
 
     assert ltdata["sort"] == data["sort"]
 

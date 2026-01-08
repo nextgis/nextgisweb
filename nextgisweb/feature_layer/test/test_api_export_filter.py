@@ -4,6 +4,8 @@ from tempfile import NamedTemporaryFile
 import pytest
 from osgeo import gdal
 
+from nextgisweb.pyramid.test import WebTestApp
+
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
 
 
@@ -13,7 +15,7 @@ def test_layer_id(feature_layer_filter_dataset):
 
 
 @pytest.fixture()
-def export_geojson(test_layer_id, ngw_webtest_app):
+def export_geojson(test_layer_id, ngw_webtest_app: WebTestApp):
     def wrapped(filter=None, **kwargs):
         qs = dict(
             format="GeoJSON",
@@ -23,7 +25,7 @@ def export_geojson(test_layer_id, ngw_webtest_app):
         )
         if filter is not None:
             qs["filter"] = json.dumps(filter)
-        resp = ngw_webtest_app.get(f"/api/resource/{test_layer_id}/export", qs)
+        resp = ngw_webtest_app.get(f"/api/resource/{test_layer_id}/export", query=qs)
         return resp.json
 
     return wrapped
@@ -117,28 +119,28 @@ def test_export_filter_empty_expression(export_geojson):
     assert len(geojson["features"]) == 5
 
 
-def test_export_filter_invalid_format(test_layer_id, ngw_webtest_app):
+def test_export_filter_invalid_format(test_layer_id, ngw_webtest_app: WebTestApp):
     filter = json.dumps(["unsupported", ["get", "name"], "Alice"])
     qs = dict(format="GeoJSON", srs="3857", zipped="false", filter=filter)
 
-    ngw_webtest_app.get(f"/api/resource/{test_layer_id}/export", qs, status=422)
+    ngw_webtest_app.get(f"/api/resource/{test_layer_id}/export", query=qs, status=422)
 
 
-def test_export_filter_invalid_json(test_layer_id, ngw_webtest_app):
+def test_export_filter_invalid_json(test_layer_id, ngw_webtest_app: WebTestApp):
     # Invalid JSON
     qs = dict(format="GeoJSON", srs="3857", zipped="false", filter="not valid json {")
 
-    ngw_webtest_app.get(f"/api/resource/{test_layer_id}/export", qs, status=422)
+    ngw_webtest_app.get(f"/api/resource/{test_layer_id}/export", query=qs, status=422)
 
 
-def test_export_filter_unknown_field(test_layer_id, ngw_webtest_app):
+def test_export_filter_unknown_field(test_layer_id, ngw_webtest_app: WebTestApp):
     filter = json.dumps(["all", ["==", ["get", "nonexistent"], "value"]])
     qs = dict(format="GeoJSON", srs="3857", zipped="false", filter=filter)
 
-    ngw_webtest_app.get(f"/api/resource/{test_layer_id}/export", qs, status=422)
+    ngw_webtest_app.get(f"/api/resource/{test_layer_id}/export", query=qs, status=422)
 
 
-def test_export_filter_with_ilike(export_geojson, test_layer_id, ngw_webtest_app):
+def test_export_filter_with_ilike(export_geojson, test_layer_id, ngw_webtest_app: WebTestApp):
     # Combine filter with ilike - filter first, then ilike should further filter
     filter = ["all", ["==", ["get", "city"], "NYC"]]
     qs = dict(
@@ -149,14 +151,14 @@ def test_export_filter_with_ilike(export_geojson, test_layer_id, ngw_webtest_app
         ilike="Alice",
     )
 
-    geojson = ngw_webtest_app.get(f"/api/resource/{test_layer_id}/export", qs).json
+    geojson = ngw_webtest_app.get(f"/api/resource/{test_layer_id}/export", query=qs).json
 
     # Should only match Alice (in NYC and name contains "Alice")
     assert len(geojson["features"]) == 1
     assert geojson["features"][0]["properties"]["name"] == "Alice"
 
 
-def test_export_filter_with_intersects(export_geojson, test_layer_id, ngw_webtest_app):
+def test_export_filter_with_intersects(export_geojson, test_layer_id, ngw_webtest_app: WebTestApp):
     # Combine filter with intersects geometry
     filter = ["all", [">", ["get", "age"], 25]]
     qs = dict(
@@ -168,7 +170,7 @@ def test_export_filter_with_intersects(export_geojson, test_layer_id, ngw_webtes
         intersects_srs="3857",
     )
 
-    geojson = ngw_webtest_app.get(f"/api/resource/{test_layer_id}/export", qs).json
+    geojson = ngw_webtest_app.get(f"/api/resource/{test_layer_id}/export", query=qs).json
 
     # Should match features with age > 25 AND within the polygon
     # Bob (30, at 1,1) and Charlie (35, at 2,2) but not Alice (25)
@@ -258,11 +260,15 @@ def test_export_filter_mixed_date_and_string(export_geojson):
     assert names == {"Alice", "Eve"}
 
 
-def test_export_gpkg_with_filter(test_layer_id, ngw_webtest_app):
+def test_export_gpkg_with_filter(test_layer_id, ngw_webtest_app: WebTestApp):
     filter = json.dumps(["all", ["==", ["get", "city"], "NYC"]])
     qs = dict(format="GPKG", srs="3857", filter=filter)
 
-    response = ngw_webtest_app.get(f"/api/resource/{test_layer_id}/export", qs, status=200)
+    response = ngw_webtest_app.get(
+        f"/api/resource/{test_layer_id}/export",
+        query=qs,
+        status=200,
+    )
 
     with NamedTemporaryFile(suffix=".zip") as t:
         t.write(response.body)
@@ -277,11 +283,15 @@ def test_export_gpkg_with_filter(test_layer_id, ngw_webtest_app):
         assert layer.GetFeatureCount() == 3  # Alice, Charlie, Eve in NYC
 
 
-def test_export_shapefile_with_filter(test_layer_id, ngw_webtest_app):
+def test_export_shapefile_with_filter(test_layer_id, ngw_webtest_app: WebTestApp):
     filter = json.dumps(["all", [">", ["get", "age"], 30]])
     qs = dict(format="ESRI Shapefile", srs="3857", filter=filter)
 
-    response = ngw_webtest_app.get(f"/api/resource/{test_layer_id}/export", qs, status=200)
+    response = ngw_webtest_app.get(
+        f"/api/resource/{test_layer_id}/export",
+        query=qs,
+        status=200,
+    )
 
     with NamedTemporaryFile(suffix=".zip") as t:
         t.write(response.body)

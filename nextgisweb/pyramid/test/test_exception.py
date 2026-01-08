@@ -4,6 +4,7 @@ from pyramid.response import Response
 from zope.interface import implementer
 
 from nextgisweb.core.exception import IUserException
+from nextgisweb.pyramid.test import WebTestApp
 
 from .. import exception
 
@@ -23,8 +24,6 @@ class ExceptionTest(Exception):
 
 @pytest.fixture(scope="module")
 def app():
-    from webtest import TestApp
-
     settings = dict()
     settings["error.err_response"] = exception.json_error_response
     settings["error.exc_response"] = exception.json_error_response
@@ -53,10 +52,10 @@ def app():
     config.add_route("json", "/json")
     config.add_view(view_json, route_name="json")
 
-    yield TestApp(config.make_wsgi_app())
+    yield WebTestApp(config.make_wsgi_app())
 
 
-def test_error(app):
+def test_error(app: WebTestApp):
     resp = app.get("/error", status=418)
     rjson = resp.json
 
@@ -73,7 +72,7 @@ def test_error(app):
     )
 
 
-def test_exception(app):
+def test_exception(app: WebTestApp):
     resp = app.get("/exception", status=500)
     rjson = resp.json
 
@@ -91,17 +90,17 @@ def test_exception(app):
     )
 
 
-def test_json(app):
+def test_json(app: WebTestApp):
     headers = {"Content-Type": "application/json"}
 
     data = r'{"almost": "json" . }'
-    app.post("/json", data, headers, status=400)
+    app.post("/json", data=data, headers=headers, status=400)
 
     data = r'{"correct": "json"}'
-    app.post("/json", data, headers, status=200)
+    app.post("/json", data=data, headers=headers, status=200)
 
 
-def test_not_found_unauthorized(ngw_webtest_app):
+def test_not_found_unauthorized(ngw_webtest_app: WebTestApp):
     ngw_webtest_app.authorization = ("Basic", ("administrator", "invalid"))
     ngw_webtest_app.get("/invalid", status=404)
     ngw_webtest_app.get("/api/invalid", status=404)

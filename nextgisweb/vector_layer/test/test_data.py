@@ -7,6 +7,8 @@ from osgeo import ogr, osr
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.feature_layer import FIELD_TYPE
 from nextgisweb.feature_layer.test import FeatureLayerAPI, parametrize_versioning
+from nextgisweb.pyramid.test import WebTestApp
+from nextgisweb.resource.test import ResourceAPI
 
 from .. import VectorLayer
 from ..ogrloader import ERROR_LIMIT, FID_SOURCE, FIX_ERRORS
@@ -149,79 +151,62 @@ def test_fid(fid_source, fid_field, id_expect, ngw_txn, ngw_data_path):
     assert query().total_count == 1
 
 
-def test_source_layer(ngw_webtest_app, ngw_resource_group_sub, ngw_file_upload, ngw_data_path):
+def test_source_layer(
+    ngw_webtest_app: WebTestApp,
+    ngw_file_upload,
+    ngw_data_path,
+):
+    rapi = ResourceAPI()
     upload_meta = ngw_file_upload(ngw_data_path / "two-layers.zip")
 
-    resp = ngw_webtest_app.post_json(
+    resp = ngw_webtest_app.post(
         "/api/component/vector_layer/inspect",
-        dict(id=upload_meta["id"]),
+        json={"id": upload_meta["id"]},
         status=200,
     )
 
     layers = resp.json["layers"]
     assert layers == ["layer1", "layer2"]
 
-    resp = ngw_webtest_app.post_json(
-        "/api/resource/",
-        dict(
-            resource=dict(
-                cls="vector_layer",
-                display_name="test two layers",
-                parent=dict(id=ngw_resource_group_sub),
-            ),
-            vector_layer=dict(
-                source=upload_meta,
-                source_layer="layer1",
-                srs=dict(id=3857),
-                fid_source="AUTO",
-                fid_field="id",
-            ),
-        ),
-        status=201,
+    res_id = rapi.create(
+        "vector_layer",
+        {
+            "vector_layer": {
+                "srs": {"id": 3857},
+                "source": upload_meta,
+                "source_layer": "layer1",
+                "fid_source": "AUTO",
+                "fid_field": "id",
+            },
+        },
     )
 
-    layer_url = f"/api/resource/{resp.json['id']}"
-    second = ngw_webtest_app.get(f"{layer_url}/feature/2", status=200).json
-    assert second["fields"] == dict(name_point="Point two")
+    fapi = FeatureLayerAPI(res_id)
+    assert fapi.feature_get(2)["fields"] == dict(name_point="Point two")
 
-    resp = ngw_webtest_app.put_json(
-        layer_url,
-        dict(vector_layer=dict(delete_all_features=True)),
-        status=200,
-    )
-
-    ngw_webtest_app.get(f"{layer_url}/feature/2", status=404)
+    rapi.update(res_id, {"vector_layer": {"delete_all_features": True}})
+    fapi.feature_get(2, status=404)
 
 
 @parametrize_versioning()
-def test_copy(versioning, ngw_webtest_app, ngw_resource_group_sub, ngw_file_upload, ngw_data_path):
+def test_copy(versioning, ngw_webtest_app: WebTestApp, ngw_file_upload, ngw_data_path):
+    rapi = ResourceAPI(ngw_webtest_app)
     upload_meta = ngw_file_upload(ngw_data_path / "layer.geojson")
     extensions = ["attachment", "description"]
 
-    source = ngw_webtest_app.post_json(
-        "/api/resource/",
-        dict(
-            resource=dict(
-                cls="vector_layer",
-                display_name="Source",
-                parent=dict(id=ngw_resource_group_sub),
-            ),
-            feature_layer=dict(
-                versioning=dict(enabled=versioning),
-            ),
-            vector_layer=dict(
-                srs=dict(id=3857),
-                source=upload_meta,
-            ),
-        ),
-        status=201,
-    ).json
+    src_id = rapi.create(
+        "vector_layer",
+        {
+            "feature_layer": {"versioning": {"enabled": versioning}},
+            "vector_layer": {"srs": {"id": 3857}, "source": upload_meta},
+        },
+    )
 
-    source_fapi = FeatureLayerAPI(ngw_webtest_app, source["id"], extensions=extensions)
+    src_fapi = FeatureLayerAPI(src_id, extensions=extensions)
 
     def _expected():
         result = []
-        for i in source_fapi.feature_list():
+        for i in src_fapi.feature_list():
             if versioning:
                 i["vid"] = 1
             if isinstance(i["extensions"]["attachment"], list):
@@ -232,7 +217,7 @@ def test_copy(versioning, ngw_webtest_app, ngw_resource_group_sub, ngw_file_uplo
 
     expected_v1 = _expected()
 
-    source_fapi.feature_update(
+    src_fapi.feature_update(
         1,
         dict(
             extensions=dict(
@@ -242,119 +227,86 @@ def test_copy(versioning, ngw_webtest_app, ngw_resource_group_sub, ngw_file_uplo
         ),
     )
 
-    feature = source_fapi.feature_get(1)
-    extensions = feature["extensions"]
+    feature = src_fapi.feature_get(1)
 
-    assert extensions["attachment"][0]["name"] == "layer.geojson"
-    assert extensions["description"] == "Example description"
+    assert feature["extensions"]["attachment"][0]["name"] == "layer.geojson"
+    assert feature["extensions"]["description"] == "Example description"
 
     expected_v2 = _expected()
 
-    dest = ngw_webtest_app.post_json(
-        "/api/resource/",
-        dict(
-            resource=dict(
-                cls="vector_layer",
-                display_name="Latest",
-                parent=dict(id=ngw_resource_group_sub),
-            ),
-            feature_layer=dict(
-                versioning=dict(enabled=versioning),
-            ),
-            vector_layer=dict(
-                srs=dict(id=3857),
-                feature_layer=dict(resource=source),
-            ),
-        ),
-        status=201,
-    ).json
+    dst_id = rapi.create(
+        "vector_layer",
+        {
+            "feature_layer": {"versioning": {"enabled": versioning}},
+            "vector_layer": {
+                "srs": {"id": 3857},
+                "feature_layer": {"resource": {"id": src_id}},
+            },
+        },
+    )
 
-    dest_fapi = FeatureLayerAPI(ngw_webtest_app, dest["id"], extensions=extensions)
-    assert dest_fapi.feature_list() == expected_v2
+    dst_fapi = FeatureLayerAPI(dst_id, extensions=extensions)
+    assert dst_fapi.feature_list() == expected_v2
 
-    resp = dest_fapi.feature_create(dict())
+    resp = dst_fapi.feature_create(dict())
     assert resp["id"] == 2
 
     if not versioning:
         return
 
     for version, expected in ((1, expected_v1), (2, expected_v2)):
-        dest = ngw_webtest_app.post_json(
-            "/api/resource/",
-            dict(
-                resource=dict(
-                    cls="vector_layer",
-                    display_name=f"Version {version}",
-                    parent=dict(id=ngw_resource_group_sub),
-                ),
-                feature_layer=dict(
-                    versioning=dict(enabled=versioning),
-                ),
-                vector_layer=dict(
-                    srs=dict(id=3857),
-                    feature_layer=dict(resource=source, version=version),
-                ),
-            ),
-            status=201,
-        ).json
+        dst_id = rapi.create(
+            "vector_layer",
+            {
+                "feature_layer": {"versioning": {"enabled": versioning}},
+                "vector_layer": {
+                    "srs": {"id": 3857},
+                    "feature_layer": {"resource": {"id": src_id}, "version": version},
+                },
+            },
+        )
 
-        dest_fapi = FeatureLayerAPI(ngw_webtest_app, dest["id"], extensions=extensions)
-        assert dest_fapi.feature_list() == expected
+        dst_fapi = FeatureLayerAPI(dst_id, extensions=extensions)
+        assert dst_fapi.feature_list() == expected
 
 
-def test_geometry_type_change(
-    ngw_webtest_app,
-    ngw_resource_group_sub,
-    ngw_file_upload,
-    ngw_data_path,
-):
+def test_geometry_type_change(ngw_webtest_app: WebTestApp, ngw_file_upload, ngw_data_path):
+    rapi = ResourceAPI(ngw_webtest_app)
     upload_meta = ngw_file_upload(ngw_data_path / "pointz.geojson")
 
-    resp = ngw_webtest_app.post_json(
-        "/api/resource/",
-        dict(
-            resource=dict(
-                cls="vector_layer",
-                display_name="test_geometry_type_change",
-                parent=dict(id=ngw_resource_group_sub),
-            ),
-            vector_layer=dict(
-                source=upload_meta,
-                srs=dict(id=3857),
-            ),
-        ),
-        status=201,
+    res_id = rapi.create(
+        "vector_layer",
+        {
+            "vector_layer": {
+                "source": upload_meta,
+                "srs": {"id": 3857},
+            },
+        },
     )
 
-    url = f"/api/resource/{resp.json['id']}"
-    assert ngw_webtest_app.get(url).json["vector_layer"]["geometry_type"] == "POINTZ"
-    ngw_webtest_app.put_json(url, dict(vector_layer=dict(geometry_type="LINESTRINGZ")), status=422)
-    ngw_webtest_app.put_json(url, dict(vector_layer=dict(geometry_type="MULTIPOINT")), status=200)
+    assert rapi.read(res_id)["vector_layer"]["geometry_type"] == "POINTZ"
+
+    rapi.update_request(res_id, {"vector_layer": {"geometry_type": "LINESTRINGZ"}}, status=422)
+    rapi.update_request(res_id, {"vector_layer": {"geometry_type": "MULTIPOINT"}}, status=200)
 
 
-def test_replace_file(ngw_webtest_app, ngw_resource_group_sub, ngw_file_upload, ngw_data_path):
+def test_replace_file(ngw_webtest_app: WebTestApp, ngw_file_upload, ngw_data_path):
+    rapi = ResourceAPI(ngw_webtest_app)
     pointz_geojson = ngw_file_upload(ngw_data_path / "pointz.geojson")
-    type_geojson = ngw_file_upload(ngw_data_path / "type.geojson")
 
-    resp = ngw_webtest_app.post_json(
-        "/api/resource/",
-        dict(
-            resource=dict(
-                cls="vector_layer",
-                display_name="test_replace_file",
-                parent=dict(id=ngw_resource_group_sub),
-            ),
-            vector_layer=dict(
-                source=pointz_geojson,
-                srs=dict(id=3857),
-            ),
-        ),
-        status=201,
+    res_id = rapi.create(
+        "vector_layer",
+        {
+            "vector_layer": {
+                "source": pointz_geojson,
+                "srs": {"id": 3857},
+            },
+        },
     )
 
-    url = f"/api/resource/{resp.json['id']}"
-    ngw_webtest_app.put_json(url, dict(vector_layer=dict(source=type_geojson)))
-    assert ngw_webtest_app.get(url).json["vector_layer"]["geometry_type"] == "POINT"
+    type_geojson = ngw_file_upload(ngw_data_path / "type.geojson")
+    rapi.update(res_id, {"vector_layer": {"source": type_geojson}})
+    assert rapi.read(res_id)["vector_layer"]["geometry_type"] == "POINT"
 
 
 def test_error_limit():
@@ -397,14 +349,7 @@ def test_geom_field(ngw_data_path):
     assert list(feature.fields.keys()) == ["geom"]
 
 
-@pytest.mark.parametrize(
-    "data",
-    (
-        "int64",
-        "id-non-uniq",
-        "id-empty",
-    ),
-)
+@pytest.mark.parametrize("data", ("int64", "id-non-uniq", "id-empty"))
 def test_id_field(data, ngw_data_path):
     res = VectorLayer().persist()
     src = ngw_data_path / f"{data}.geojson"

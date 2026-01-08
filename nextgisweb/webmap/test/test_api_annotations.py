@@ -1,6 +1,8 @@
 import pytest
 import transaction
 
+from nextgisweb.pyramid.test import WebTestApp
+
 from .. import WebMap, WebMapItem
 
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
@@ -60,12 +62,11 @@ def invalid_annotations_geom():
 
 
 @pytest.fixture(scope="function")
-def created_annotations(webmap, ngw_webtest_app, annotations_data):
+def created_annotations(webmap, ngw_webtest_app: WebTestApp, annotations_data):
     collection_url = f"/api/resource/{webmap}/annotation/"
     created = []
     for annotation_payload in annotations_data:
-        response = ngw_webtest_app.post_json(collection_url, annotation_payload)
-        assert response.status_code == 200
+        response = ngw_webtest_app.post(collection_url, json=annotation_payload, status=200)
         assert "id" in response.json
         created.append({"id": response.json["id"], "data": annotation_payload})
 
@@ -76,12 +77,11 @@ def created_annotations(webmap, ngw_webtest_app, annotations_data):
         ngw_webtest_app.delete(item_url, status=[200, 404])
 
 
-def test_post_annotation(webmap, ngw_webtest_app, annotations_data):
+def test_post_annotation(webmap, ngw_webtest_app: WebTestApp, annotations_data):
     collection_url = f"/api/resource/{webmap}/annotation/"
     annotation_payload = annotations_data[0]
 
-    response = ngw_webtest_app.post_json(collection_url, annotation_payload)
-    assert response.status_code == 200
+    response = ngw_webtest_app.post(collection_url, json=annotation_payload, status=200)
     assert "id" in response.json
     annotation_id = response.json["id"]
 
@@ -89,22 +89,20 @@ def test_post_annotation(webmap, ngw_webtest_app, annotations_data):
     ngw_webtest_app.delete(item_url, status=200)
 
 
-def test_get_annotations_collection(webmap, ngw_webtest_app, created_annotations):
+def test_get_annotations_collection(webmap, ngw_webtest_app: WebTestApp, created_annotations):
     collection_url = f"/api/resource/{webmap}/annotation/"
-    response = ngw_webtest_app.get(collection_url)
-    assert response.status_code == 200
+    response = ngw_webtest_app.get(collection_url, status=200)
     assert len(response.json) >= len(created_annotations)
 
 
-def test_get_single_annotation(webmap, ngw_webtest_app, created_annotations):
+def test_get_single_annotation(webmap, ngw_webtest_app: WebTestApp, created_annotations):
     collection_url = f"/api/resource/{webmap}/annotation/"
     for annotation_info in created_annotations:
         annotation_id = annotation_info["id"]
         original_data = annotation_info["data"]
         item_url = f"{collection_url}{annotation_id}"
 
-        response = ngw_webtest_app.get(item_url)
-        assert response.status_code == 200
+        response = ngw_webtest_app.get(item_url, status=200)
         retrieved_data = response.json
 
         assert retrieved_data["description"] == original_data["description"]
@@ -113,7 +111,7 @@ def test_get_single_annotation(webmap, ngw_webtest_app, created_annotations):
         assert retrieved_data["style"] == original_data["style"]
 
 
-def test_put_annotation(webmap, ngw_webtest_app, created_annotations):
+def test_put_annotation(webmap, ngw_webtest_app: WebTestApp, created_annotations):
     collection_url = f"/api/resource/{webmap}/annotation/"
     annotation_to_update = created_annotations[0]
     annotation_id = annotation_to_update["id"]
@@ -126,11 +124,9 @@ def test_put_annotation(webmap, ngw_webtest_app, created_annotations):
         "style": original_data["style"],
     }
 
-    response = ngw_webtest_app.put_json(item_url, update_payload)
-    assert response.status_code == 200
+    ngw_webtest_app.put(item_url, json=update_payload, status=200)
 
-    get_response = ngw_webtest_app.get(item_url)
-    assert get_response.status_code == 200
+    get_response = ngw_webtest_app.get(item_url, status=200)
     updated_data = get_response.json
 
     assert updated_data["description"] == update_payload["description"]
@@ -138,7 +134,7 @@ def test_put_annotation(webmap, ngw_webtest_app, created_annotations):
     assert updated_data["public"] == original_data["public"]
 
 
-def test_patch_annotation(webmap, ngw_webtest_app, created_annotations):
+def test_patch_annotation(webmap, ngw_webtest_app: WebTestApp, created_annotations):
     collection_url = f"/api/resource/{webmap}/annotation/"
     annotation_to_patch = created_annotations[0]
     annotation_id = annotation_to_patch["id"]
@@ -146,27 +142,21 @@ def test_patch_annotation(webmap, ngw_webtest_app, created_annotations):
 
     new_style = {"circle": {"fill": {"color": "#9C27B0"}, "radius": 8}}
     patch_payload = {"style": new_style}
-    response = ngw_webtest_app.put_json(item_url, patch_payload)
-    assert response.status_code == 200
-    get_response = ngw_webtest_app.get(item_url)
-    assert get_response.status_code == 200
+    ngw_webtest_app.put(item_url, json=patch_payload, status=200)
+    get_response = ngw_webtest_app.get(item_url, status=200)
     patched_data = get_response.json
     assert patched_data["style"] == new_style
 
     updated_description = "Updated annotation 0 for style patch"
     description_update_payload = {"description": updated_description}
-    response = ngw_webtest_app.put_json(item_url, description_update_payload)
-    assert response.status_code == 200
-    get_response = ngw_webtest_app.get(item_url)
-    assert get_response.status_code == 200
+    ngw_webtest_app.put(item_url, json=description_update_payload, status=200)
+    get_response = ngw_webtest_app.get(item_url, status=200)
     description_updated_data = get_response.json
     assert description_updated_data["description"] == updated_description
 
     updated_geom = "POINT (50 50)"
     geom_update_payload = {"geom": updated_geom}
-    response = ngw_webtest_app.put_json(item_url, geom_update_payload)
-    assert response.status_code == 200
-    get_response = ngw_webtest_app.get(item_url)
-    assert get_response.status_code == 200
+    ngw_webtest_app.put(item_url, json=geom_update_payload, status=200)
+    get_response = ngw_webtest_app.get(item_url, status=200)
     geom_updated_data = get_response.json
     assert geom_updated_data["geom"] == updated_geom

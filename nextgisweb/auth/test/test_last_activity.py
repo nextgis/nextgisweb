@@ -1,15 +1,19 @@
 from datetime import timedelta
 
+import pytest
 import transaction
 from freezegun import freeze_time
 
 from nextgisweb.env import DBSession
 from nextgisweb.lib.datetime import utcnow_naive
 
+from nextgisweb.pyramid.test import WebTestApp
+
 from ..model import User
 
 
-def test_last_activity(ngw_env, ngw_webtest_app, disable_oauth, ngw_administrator_password):
+@pytest.mark.usefixtures("disable_oauth", "ngw_administrator_password")
+def test_last_activity(ngw_env, ngw_webtest_app: WebTestApp):
     with transaction.manager:
         for keyname, last_activity in (
             ("guest", utcnow_naive()),

@@ -3,6 +3,7 @@ import pytest
 import transaction
 
 from nextgisweb.auth import User
+from nextgisweb.pyramid.test import WebTestApp
 from nextgisweb.resource import ResourceACLRule, ResourceGroup
 
 from ..model import WebMap, WebMapAnnotation, WebMapItem
@@ -73,7 +74,7 @@ def webmap(user, ngw_resource_group):
     yield webmap
 
 
-def test_regular_user(webmap, user, ngw_webtest_app):
+def test_regular_user(webmap, user, ngw_webtest_app: WebTestApp):
     ngw_webtest_app.authorization = ("Basic", (user.keyname, user.password_plaintext))
     annotations = ngw_webtest_app.get("/api/resource/%d/annotation/" % webmap.id).json
     assert len(annotations) == 3
@@ -85,7 +86,7 @@ def test_regular_user(webmap, user, ngw_webtest_app):
     assert len(private_annotations) == 1
 
 
-def test_admin(webmap, ngw_auth_administrator, ngw_webtest_app):
+def test_admin(webmap, ngw_auth_administrator, ngw_webtest_app: WebTestApp):
     annotations = ngw_webtest_app.get("/api/resource/%d/annotation/" % webmap.id).json
     assert len(annotations) == 4
 

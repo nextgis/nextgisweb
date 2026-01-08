@@ -9,7 +9,7 @@ from nextgisweb.lib.geometry import Geometry
 from nextgisweb.vector_layer.model import VectorLayer, VectorLayerField
 
 from ..feature import Feature
-from . import FeatureLayerAPI, TransactionAPI, parametrize_versioning
+from . import FeatureLayerAPI, parametrize_versioning
 
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
 
@@ -56,13 +56,13 @@ def parametrize_fdict():
 
 @parametrize_versioning()
 @parametrize_fdict()
-def test_workflow(versioning, fdict, mkres, ngw_webtest_app):
-    (res, epoch, fld), web = mkres(versioning, fdict), ngw_webtest_app
+def test_workflow(versioning, fdict, mkres):
+    (res, epoch, fld) = mkres(versioning, fdict)
 
-    fapi = FeatureLayerAPI(web, res)
+    fapi = FeatureLayerAPI(res)
     vid = lambda v: ({"vid": v} if versioning else {})
 
-    with TransactionAPI(web, res, epoch=epoch) as txn:
+    with fapi.transaction(epoch=epoch) as txn:
         # Repeats of the same data should also report 200 OK
         for _ in range(2):
             txn.put(1, _create(geom=ptz(0, 0, 5), fields=fld("Inserted")))
@@ -132,7 +132,7 @@ def test_workflow(versioning, fdict, mkres, ngw_webtest_app):
     if not versioning:
         return
 
-    with TransactionAPI(web, res, epoch=epoch) as txn:
+    with fapi.transaction(epoch=epoch) as txn:
         # Restore the deleted feature
         txn.put(1, _restore(fid=2, fields=fld("Restored")))
 
@@ -152,13 +152,13 @@ def test_workflow(versioning, fdict, mkres, ngw_webtest_app):
 
 @parametrize_versioning()
 @parametrize_fdict()
-def test_errors(versioning, fdict, mkres, ngw_webtest_app):
-    (res, epoch, fld), web = mkres(versioning, fdict), ngw_webtest_app
+def test_errors(versioning, fdict, mkres):
+    (res, epoch, fld) = mkres(versioning, fdict)
 
-    fapi = FeatureLayerAPI(web, res)
+    fapi = FeatureLayerAPI(res)
     vid = lambda v: ({"vid": v} if versioning else {})
 
-    with TransactionAPI(web, res, epoch=epoch) as txn:
+    with fapi.transaction(epoch=epoch) as txn:
         txn.put(1, _update(fid=10, fields=fld("Updated")))
         txn.put(2, _update(fid=11, fields=fld("Omitted")))
 
@@ -210,7 +210,7 @@ def test_errors(versioning, fdict, mkres, ngw_webtest_app):
     if not versioning:
         return
 
-    with TransactionAPI(web, res, epoch=epoch) as txn:
+    with fapi.transaction(epoch=epoch) as txn:
         # Cause a version conflict
         txn.put(1, _update(fid=1, vid=0, fields=fld("Updated")))
         assert txn.commit_try(status="errors") == {

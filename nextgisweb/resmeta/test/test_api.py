@@ -1,59 +1,38 @@
 import pytest
-import transaction
 
-from nextgisweb.env import DBSession
+from nextgisweb.resource.test import ResourceAPI
 
-from nextgisweb.resource import ResourceGroup
-
-pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
-
-
-@pytest.fixture
-def resource_id():
-    with transaction.manager:
-        res = ResourceGroup().persist()
-
-        DBSession.flush()
-        DBSession.expunge(res)
-
-    yield res.id
+pytestmark = pytest.mark.usefixtures(
+    "ngw_auth_administrator",
+    "ngw_resource_defaults",
+    "ngw_webtest_app",
+)
 
 
-def test_items(ngw_webtest_app, resource_id):
-    items = dict(key1="text1", key2="text2")
+def test_items():
+    rapi = ResourceAPI()
+    res_id = rapi.create("resource_group", {})
+    assert rapi.read(res_id)["resmeta"]["items"] == dict()
 
-    res_url = "/api/resource/%d" % resource_id
+    items = {"key1": "foo", "key2": "bar"}
+    rapi.update(res_id, {"resmeta": {"items": items}})
+    assert rapi.read(res_id)["resmeta"]["items"] == items
 
-    resp = ngw_webtest_app.get(res_url, status=200)
-    assert resp.json["resmeta"]["items"] == dict()
-
-    data = dict(resmeta=dict(items=items))
-    ngw_webtest_app.put_json(res_url, data, status=200)
-
-    resp = ngw_webtest_app.get(res_url, status=200)
-    assert resp.json["resmeta"]["items"] == items
-
-    del items["key2"]
-    ngw_webtest_app.put_json(res_url, data, status=200)
-
-    resp = ngw_webtest_app.get(res_url, status=200)
-    assert resp.json["resmeta"]["items"] == items
+    items = {"key1": "foo"}
+    rapi.update(res_id, {"resmeta": {"items": items}})
+    assert rapi.read(res_id)["resmeta"]["items"] == items
 
 
 @pytest.mark.parametrize(
     "value",
     ("text", -123, 4.5, True, False, None),
 )
-def test_item_type(value, ngw_webtest_app, resource_id):
-    res_url = "/api/resource/%d" % resource_id
-
+def test_item_type(value):
+    rapi = ResourceAPI()
     items = dict(key=value)
-    data = dict(resmeta=dict(items=items))
 
-    ngw_webtest_app.put_json(res_url, data, status=200)
-
-    resp = ngw_webtest_app.get(res_url, status=200)
-    value_saved = resp.json["resmeta"]["items"]["key"]
+    res_id = rapi.create("resource_group", {"resmeta": {"items": items}})
+    value_saved = rapi.read(res_id)["resmeta"]["items"]["key"]
 
     if value is None:
         assert value_saved is None

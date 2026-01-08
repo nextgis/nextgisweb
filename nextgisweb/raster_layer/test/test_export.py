@@ -4,6 +4,8 @@ import pytest
 import transaction
 from osgeo import gdal, osr
 
+from nextgisweb.pyramid.test import WebTestApp
+
 from ..model import RasterLayer
 
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
@@ -19,13 +21,13 @@ def raster_layer_id(ngw_data_path, ngw_env):
 
 
 @pytest.mark.parametrize("epsg", [3857, 4326])
-def test_export_srs(epsg, ngw_webtest_app, raster_layer_id):
+def test_export_srs(epsg, raster_layer_id, ngw_webtest_app: WebTestApp):
     srs_expected = osr.SpatialReference()
     srs_expected.ImportFromEPSG(epsg)
 
     resp = ngw_webtest_app.get(
         "/api/resource/%d/export" % raster_layer_id,
-        params={"srs": epsg},
+        query={"srs": epsg},
     )
     with NamedTemporaryFile() as f:
         f.write(resp.body)
@@ -36,10 +38,10 @@ def test_export_srs(epsg, ngw_webtest_app, raster_layer_id):
 
 
 @pytest.mark.parametrize("format", ["GTiff", "RMF", "HFA"])
-def test_export_format(format, ngw_webtest_app, raster_layer_id):
+def test_export_format(format, raster_layer_id, ngw_webtest_app: WebTestApp):
     resp = ngw_webtest_app.get(
         "/api/resource/%d/export" % raster_layer_id,
-        params={"format": format, "bands": "1,2,3"},
+        query={"format": format, "bands": "1,2,3"},
     )
 
     with NamedTemporaryFile() as f:

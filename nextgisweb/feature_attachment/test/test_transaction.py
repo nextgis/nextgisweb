@@ -3,11 +3,11 @@ from unittest.mock import ANY
 import pytest
 import transaction
 
-from nextgisweb.env import DBSession
 from nextgisweb.lib.geometry import Geometry
 
 from nextgisweb.feature_layer import Feature
 from nextgisweb.feature_layer.test import FeatureLayerAPI, parametrize_versioning
+from nextgisweb.pyramid.test import WebTestApp
 from nextgisweb.vector_layer import VectorLayer
 
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
@@ -22,7 +22,7 @@ def mkres():
             for _ in range(3):
                 feat = Feature(geom=Geometry.from_wkt("POINT(0 0)"))
                 obj.feature_create(feat)
-            DBSession.flush()
+
         return obj.id
 
     yield _mkres
@@ -37,14 +37,13 @@ def files(ngw_file_upload, ngw_data_path):
 
 
 @parametrize_versioning()
-def test_workflow(versioning, files, mkres, ngw_webtest_app):
-    web = ngw_webtest_app
+def test_workflow(versioning, files, mkres, ngw_webtest_app: WebTestApp):
     res = mkres(versioning)
 
     panorama_jpg, sample_heic = files
 
     furl = f"/api/resource/{res}/feature"
-    fapi = FeatureLayerAPI(web, res, extensions=["attachment"])
+    fapi = FeatureLayerAPI(res, extensions=["attachment"])
 
     with fapi.transaction() as txn:  # Version 2
         txn.put(
@@ -63,7 +62,7 @@ def test_workflow(versioning, files, mkres, ngw_webtest_app):
         aid = result.get("aid")
         assert isinstance(aid, int)
 
-    resp = web.get(f"{furl}/1/attachment/{aid}").json
+    resp = ngw_webtest_app.get(f"{furl}/1/attachment/{aid}").json
     assert isinstance(resp.pop("file_meta"), dict)
     assert resp == dict(
         id=aid,
@@ -103,7 +102,7 @@ def test_workflow(versioning, files, mkres, ngw_webtest_app):
         fileobj = result.pop("fileobj", None)
         assert isinstance(fileobj, int)
 
-    resp = web.get(f"{furl}/1/attachment/{aid}").json
+    resp = ngw_webtest_app.get(f"{furl}/1/attachment/{aid}").json
     jpeg_size = resp.get("size", None)
     assert isinstance(jpeg_size, int)
     assert resp == dict(
@@ -148,7 +147,7 @@ def test_workflow(versioning, files, mkres, ngw_webtest_app):
         result = txn.results()[0][1]
         assert result["action"] == "attachment.delete"
 
-    web.get(f"{furl}/1/attachment/{aid}", status=404)
+    ngw_webtest_app.get(f"{furl}/1/attachment/{aid}", status=404)
 
     assert not versioning or fapi.changes(initial=3, target=4) == [
         {

@@ -6,8 +6,6 @@ import transaction
 from osgeo import gdal, gdal_array, gdalconst
 from PIL import Image, ImageStat
 
-from nextgisweb.env import DBSession
-
 from nextgisweb.raster_layer import RasterLayer
 from nextgisweb.raster_style import RasterStyle
 
@@ -17,48 +15,23 @@ pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administ
 
 
 @pytest.fixture(scope="module")
-def rlayer_id(ngw_env):
+def service_id():
+    from nextgisweb.raster_layer import test as raster_layer_test
+
     with transaction.manager:
-        obj = RasterLayer().persist()
+        layer = RasterLayer().persist()
+        layer.load_file(Path(raster_layer_test.__file__).parent / "data/rounds.tif")
+        service = Service(
+            layers=[
+                Layer(
+                    resource=RasterStyle(parent=layer),
+                    keyname="test_rounds",
+                    display_name="test-rounds",
+                ),
+            ],
+        ).persist()
 
-        from nextgisweb.raster_layer import test as raster_layer_test
-
-        path = Path(raster_layer_test.__file__).parent / "data/rounds.tif"
-
-        obj.load_file(path)
-
-        DBSession.flush()
-        DBSession.expunge(obj)
-
-    yield obj.id
-
-
-@pytest.fixture(scope="module")
-def rstyle_id(ngw_env, rlayer_id):
-    with transaction.manager:
-        obj = RasterStyle(parent_id=rlayer_id).persist()
-
-        DBSession.flush()
-        DBSession.expunge(obj)
-
-    yield obj.id
-
-
-@pytest.fixture(scope="module")
-def service_id(rstyle_id):
-    with transaction.manager:
-        obj = Service().persist()
-
-        DBSession.flush()
-
-        obj.layers.append(
-            Layer(resource_id=rstyle_id, keyname="test_rounds", display_name="test-rounds")
-        )
-
-        DBSession.flush()
-        DBSession.expunge(obj)
-
-    yield obj.id
+    yield service.id
 
 
 def _read_image(ds, x1, y1, x2, y2, srs):

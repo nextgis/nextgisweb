@@ -6,6 +6,7 @@ import transaction
 from PIL import Image, ImageDraw
 from pyramid.response import Response
 
+from nextgisweb.pyramid.test import WebTestApp
 from nextgisweb.spatial_ref_sys.model import BOUNDS_EPSG_3857, SRS
 
 from ..model import Connection, Layer
@@ -60,7 +61,7 @@ def layer(connection):
     return resource.id
 
 
-def test_layer(layer, ngw_webtest_app, ngw_resource_group):
+def test_layer(layer, ngw_webtest_app: WebTestApp, ngw_resource_group):
     ngw_webtest_app.get(f"/api/component/render/tile?z={4}&x=0&y=0&resource={layer}", status=422)
 
     res = Layer.filter_by(id=layer).one()

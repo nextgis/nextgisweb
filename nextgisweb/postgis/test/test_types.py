@@ -5,6 +5,8 @@ import transaction
 from nextgisweb.env import DBSession
 from nextgisweb.lib.saext import postgres_url
 
+from nextgisweb.pyramid.test import WebTestApp
+
 from .. import PostgisConnection, PostgisLayer
 from ..diagnostics import StatusEnum
 
@@ -67,7 +69,7 @@ def creds(ngw_env):
                 conn.execute(sa.text("DROP TABLE test_types;"))
 
 
-def test_types(creds, ngw_webtest_app):
+def test_types(creds, ngw_webtest_app: WebTestApp):
     with transaction.manager:
         connection = PostgisConnection(
             hostname=creds["host"],
@@ -89,8 +91,8 @@ def test_types(creds, ngw_webtest_app):
 
         DBSession.flush()
 
-    resp = ngw_webtest_app.post_json(
+    resp = ngw_webtest_app.post(
         "/api/component/postgis/check",
-        dict(layer=dict(id=layer.id)),
+        json=dict(layer=dict(id=layer.id)),
     )
     assert StatusEnum(resp.json["status"]) is StatusEnum.SUCCESS

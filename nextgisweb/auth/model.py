@@ -3,7 +3,7 @@ from collections.abc import Mapping
 from functools import cached_property, lru_cache
 from itertools import chain
 from secrets import token_hex, token_urlsafe
-from typing import Callable, ClassVar, Iterable, overload
+from typing import TYPE_CHECKING, Callable, ClassVar, Iterable, overload
 
 import sqlalchemy as sa
 import sqlalchemy.dialects.postgresql as sa_pg
@@ -12,7 +12,7 @@ from passlib.hash import sha256_crypt
 from zope.event import notify
 from zope.event.classhandler import handler
 
-from nextgisweb.env import Base, gettext
+from nextgisweb.env import Base, DBSession, gettext
 from nextgisweb.lib.i18n import TrStr
 
 from nextgisweb.core.exception import ForbiddenError
@@ -119,8 +119,15 @@ class User(Principal):
     def test_instance(cls, **kwargs):
         """Create and return a test user with randomized attributes"""
 
+        if TYPE_CHECKING:
+
+            class UserWithPassword(cls):
+                password_plaintext: str
+        else:
+            UserWithPassword = cls
+
         rnd = token_hex(8)
-        obj = cls(keyname=f"user_{rnd}", display_name=f"User {rnd}", **kwargs)
+        obj = UserWithPassword(keyname=f"user_{rnd}", display_name=f"User {rnd}", **kwargs)
         obj.password = obj.password_plaintext = token_urlsafe()
         return obj
 
@@ -161,7 +168,8 @@ class User(Principal):
 
     @classmethod
     def by_keyname(cls, keyname):
-        return cls.filter(sa.func.lower(User.keyname) == keyname.lower()).one()
+        with DBSession.no_autoflush:
+            return cls.filter(sa.func.lower(User.keyname) == keyname.lower()).one()
 
     @cached_property
     def effective_permissions(self) -> frozenset[Permission]:

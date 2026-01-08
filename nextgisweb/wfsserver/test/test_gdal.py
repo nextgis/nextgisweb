@@ -62,20 +62,14 @@ def service():
     with transaction.manager:
         vl_type = VectorLayer().persist().from_ogr(DATA / "type.geojson")
 
-        DBSession.flush()
-
         # NOTE: GDAL doesn't support time fields in GML / WFS. It completely breaks
         # XSD schema parsing. Delete the time field to pass tests.
         DBSession.delete(vl_type.field_by_keyname("time"))
 
         vl_pointz = VectorLayer().persist().from_ogr(DATA / "pointz.geojson")
 
-        DBSession.flush()
-
-        res_wfs = WFSService().persist()
-
-        res_wfs.layers.extend(
-            (
+        obj = WFSService(
+            layers=[
                 WFSLayer(
                     resource=vl_type,
                     keyname="type",
@@ -88,16 +82,10 @@ def service():
                     display_name="pointz",
                     maxfeatures=1000,
                 ),
-            )
-        )
+            ]
+        ).persist()
 
-        DBSession.flush()
-
-        DBSession.expunge(vl_type)
-        DBSession.expunge(vl_pointz)
-        DBSession.expunge(res_wfs)
-
-    yield res_wfs.id
+    yield obj.id
 
 
 @pytest.fixture()

@@ -3,8 +3,7 @@ from pathlib import Path
 import pytest
 import transaction
 
-from nextgisweb.env import DBSession
-
+from nextgisweb.pyramid.test import WebTestApp
 from nextgisweb.vector_layer import VectorLayer
 from nextgisweb.vector_layer import test as vector_layer_test
 
@@ -26,8 +25,6 @@ DATA = Path(vector_layer_test.__file__).parent / "data"
 def type_layer():
     with transaction.manager:
         vl_type = VectorLayer().persist().from_ogr(DATA / "type.geojson")
-        DBSession.flush()
-        DBSession.expunge(vl_type)
     yield vl_type.id
 
 
@@ -45,9 +42,9 @@ def type_layer():
         pytest.param("datetime", "iso", "2001-01-01T00:00:00T"),
     ],
 )
-def test_datetime_invalid(type, format, value, type_layer, ngw_webtest_app):
+def test_datetime_invalid(type, format, value, type_layer, ngw_webtest_app: WebTestApp):
     api_url = f"/api/resource/{type_layer}/feature/1?dt_format={format}"
-    ngw_webtest_app.put_json(api_url, {"fields": {type: value}}, status=422)
+    ngw_webtest_app.put(api_url, json={"fields": {type: value}}, status=422)
 
 
 date_obj = {"year": 2001, "month": 1, "day": 1}
@@ -65,9 +62,9 @@ time_obj = {"hour": 16, "minute": 20, "second": 0}
         pytest.param("datetime", "iso", "2001-01-01T16:20:00"),
     ],
 )
-def test_datetime_valid(type, format, value, type_layer, ngw_webtest_app):
+def test_datetime_valid(type, format, value, type_layer, ngw_webtest_app: WebTestApp):
     api_url = f"/api/resource/{type_layer}/feature/1?dt_format={format}"
-    ngw_webtest_app.put_json(api_url, {"fields": {type: value}}, status=200)
+    ngw_webtest_app.put(api_url, json={"fields": {type: value}}, status=200)
     resp = ngw_webtest_app.get(api_url, status=200)
     assert resp.json["fields"][type] == value
 
@@ -77,8 +74,6 @@ def int_layer():
     with transaction.manager:
         layer = VectorLayer(geometry_type="POINT").persist()
         layer.setup_from_fields([dict(keyname="f", datatype="INTEGER")])
-        DBSession.flush()
-        DBSession.expunge(layer)
     yield layer.id
 
 
@@ -92,10 +87,10 @@ def int_layer():
         pytest.param("-42", -42, id="str"),
     ),
 )
-def test_int_valid(value, expected, bigint_layer, ngw_webtest_app):
+def test_int_valid(value, expected, bigint_layer, ngw_webtest_app: WebTestApp):
     url = f"/api/resource/{bigint_layer}/feature/"
-    feature = dict(geom="POINT (0 0)", fields=dict(f=value))
-    resp = ngw_webtest_app.post_json(url, feature, status=200)
+    feature = {"geom": "POINT (0 0)", "fields": {"f": value}}
+    resp = ngw_webtest_app.post(url, json=feature, status=200)
     fid = resp.json["id"]
 
     resp = ngw_webtest_app.get(url + str(fid), status=200)
@@ -112,10 +107,10 @@ def test_int_valid(value, expected, bigint_layer, ngw_webtest_app):
         pytest.param(str(MIN_INT32 - 1), id="int32-min-overflow"),
     ),
 )
-def test_int_invalid(value, int_layer, ngw_webtest_app):
+def test_int_invalid(value, int_layer, ngw_webtest_app: WebTestApp):
     url = f"/api/resource/{int_layer}/feature/"
     feature = dict(geom="POINT (0 0)", fields=dict(f=value))
-    ngw_webtest_app.post_json(url, feature, status=422)
+    ngw_webtest_app.post(url, json=feature, status=422)
 
 
 @pytest.fixture
@@ -123,8 +118,6 @@ def bigint_layer():
     with transaction.manager:
         layer = VectorLayer(geometry_type="POINT").persist()
         layer.setup_from_fields([dict(keyname="f", datatype="BIGINT")])
-        DBSession.flush()
-        DBSession.expunge(layer)
     yield layer.id
 
 
@@ -182,17 +175,17 @@ def bigint_layer():
         ),
     ),
 )
-def test_bigint_valid(value, cases, bigint_layer, ngw_webtest_app):
+def test_bigint_valid(value, cases, bigint_layer, ngw_webtest_app: WebTestApp):
     url = f"/api/resource/{bigint_layer}/feature/"
-    feature = dict(geom="POINT (0 0)", fields=dict(f=value))
-    resp = ngw_webtest_app.post_json(url, feature, status=200)
+    feature = {"geom": "POINT (0 0)", "fields": {"f": value}}
+    resp = ngw_webtest_app.post(url, json=feature, status=200)
     fid = resp.json["id"]
 
     for bi_fmt, expected in cases.items():
         q = dict()
         if bi_fmt is not None:
             q["bigint_format"] = bi_fmt
-        resp = ngw_webtest_app.get(url + str(fid), q, status=200)
+        resp = ngw_webtest_app.get(url + str(fid), query=q, status=200)
         v = resp.json["fields"]["f"]
         assert type(v) is type(expected)
         assert v == expected
@@ -206,7 +199,7 @@ def test_bigint_valid(value, cases, bigint_layer, ngw_webtest_app):
         pytest.param(str(MIN_INT64 - 1), id="int64-min-overflow"),
     ),
 )
-def test_bigint_invalid(value, bigint_layer, ngw_webtest_app):
+def test_bigint_invalid(value, bigint_layer, ngw_webtest_app: WebTestApp):
     url = f"/api/resource/{bigint_layer}/feature/"
-    feature = dict(geom="POINT (0 0)", fields=dict(f=value))
-    ngw_webtest_app.post_json(url, feature, status=422)
+    feature = {"geom": "POINT (0 0)", "fields": {"f": value}}
+    ngw_webtest_app.post(url, json=feature, status=422)

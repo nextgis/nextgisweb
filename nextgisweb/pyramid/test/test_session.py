@@ -5,7 +5,8 @@ import pytest
 import transaction
 from freezegun import freeze_time
 from pyramid.response import Response
-from webtest import TestApp as BaseTestApp
+
+from nextgisweb.pyramid.test import WebTestApp
 
 from .. import Session, SessionStore
 
@@ -36,7 +37,7 @@ def cwebapp(ngw_env):
         test_session_kv, request_method="POST"
     )
 
-    yield BaseTestApp(config.make_wsgi_app())
+    yield WebTestApp(config.make_wsgi_app())
 
     with transaction.manager:
         pattern = "%s%%" % prefix
@@ -75,25 +76,25 @@ def read_store(session_id):
     return result
 
 
-def test_session_store(cwebapp, get_session_id, session_headers):
+def test_session_store(cwebapp: WebTestApp, get_session_id, session_headers):
     kv = dict(_test_A="A", _test_B="B1")
-    res = cwebapp.post_json("/test/session_kv", kv)
+    res = cwebapp.post("/test/session_kv", json=kv)
     session_id = get_session_id(res)
     assert session_id is not None
     assert read_store(session_id) == kv
 
     headers = session_headers(session_id)
     kv["_test_B"] = "B2"
-    cwebapp.post_json("/test/session_kv", kv, headers=headers)
+    cwebapp.post("/test/session_kv", json=kv, headers=headers)
     assert get_session_id(res) == session_id
     assert read_store(session_id) == kv
 
     part = dict(_test_B="B2")
-    cwebapp.post_json("/test/session_kv", part, headers=headers)
+    cwebapp.post("/test/session_kv", json=part, headers=headers)
     kv.update(part)
     assert read_store(session_id) == kv
 
-    cwebapp.post_json("/test/session_kv", dict(_test_B=None), headers=headers)
+    cwebapp.post("/test/session_kv", json=dict(_test_B=None), headers=headers)
     del kv["_test_B"]
     assert read_store(session_id) == kv
 
@@ -109,26 +110,33 @@ def save_options(ngw_env):
         yield
 
 
-def test_session_lifetime(ngw_env, cwebapp, save_options, get_session_id, session_headers):
+def test_session_lifetime(
+    cwebapp: WebTestApp,
+    save_options,
+    get_session_id,
+    session_headers,
+    ngw_env,
+):
     cwebapp.reset()
 
     ngw_env.pyramid.options["session.cookie.max_age"] = timedelta(seconds=100)
     ngw_env.pyramid.options["session.activity_delta"] = timedelta(seconds=0)
+
     with freeze_time(datetime(year=2011, month=1, day=1)) as frozen_dt:
-        res = cwebapp.post_json("/test/session_kv", dict(_test_var=1))
+        res = cwebapp.post("/test/session_kv", json=dict(_test_var=1))
         session_id = get_session_id(res)
 
         frozen_dt.tick(timedelta(seconds=90))
         headers = session_headers(session_id)
-        res = cwebapp.post_json("/test/session_kv", dict(_test_var=2), headers=headers)
+        res = cwebapp.post("/test/session_kv", json=dict(_test_var=2), headers=headers)
         assert session_id == get_session_id(res)
 
         frozen_dt.tick(timedelta(seconds=90))
-        res = cwebapp.post_json("/test/session_kv", dict(_test_var=3), headers=headers)
+        res = cwebapp.post("/test/session_kv", json=dict(_test_var=3), headers=headers)
         assert session_id == get_session_id(res)
 
         frozen_dt.tick(timedelta(seconds=101))
-        res = cwebapp.post_json("/test/session_kv", dict(_test_var=4), headers=headers)
+        res = cwebapp.post("/test/session_kv", json=dict(_test_var=4), headers=headers)
         new_session_id = get_session_id(res)
         assert new_session_id is not None
         assert session_id != new_session_id
@@ -136,16 +144,16 @@ def test_session_lifetime(ngw_env, cwebapp, save_options, get_session_id, sessio
         ngw_env.pyramid.options["session.cookie.max_age"] = timedelta(seconds=110)
         frozen_dt.tick(timedelta(seconds=100))
         headers = session_headers(new_session_id)
-        res = cwebapp.post_json("/test/session_kv", dict(_test_var=5), headers=headers)
+        res = cwebapp.post("/test/session_kv", json=dict(_test_var=5), headers=headers)
         assert new_session_id == get_session_id(res)
 
         ngw_env.pyramid.options["session.activity_delta"] = timedelta(seconds=65)
         frozen_dt.tick(timedelta(seconds=60))
-        res = cwebapp.post_json("/test/session_kv", dict(_test_var=6), headers=headers)
+        res = cwebapp.post("/test/session_kv", json=dict(_test_var=6), headers=headers)
         assert get_session_id(res) is None
 
         frozen_dt.tick(timedelta(seconds=60))
-        res = cwebapp.post_json("/test/session_kv", dict(_test_var=7), headers=headers)
+        res = cwebapp.post("/test/session_kv", json=dict(_test_var=7), headers=headers)
         session_id = get_session_id(res)
         assert session_id is not None
         assert new_session_id != session_id
@@ -166,7 +174,7 @@ def test_session_lifetime(ngw_env, cwebapp, save_options, get_session_id, sessio
         pytest.param("k" * 1024, "v" * 1024, id="long"),
     ),
 )
-def test_serialization(key, value, ngw_webtest_app, webapp_handler):
+def test_serialization(key, value, ngw_webtest_app: WebTestApp, webapp_handler):
     def _set(request):
         request.session[key] = value
         return Response()
@@ -205,7 +213,7 @@ def test_serialization(key, value, ngw_webtest_app, webapp_handler):
         ngw_webtest_app.get("/test/request/")
 
 
-def test_set_del(ngw_webtest_app, webapp_handler):
+def test_set_del(ngw_webtest_app: WebTestApp, webapp_handler):
     def _set(request):
         request.session["foo"] = 1
         request.session["bar"] = 1
@@ -230,7 +238,7 @@ def test_set_del(ngw_webtest_app, webapp_handler):
             ngw_webtest_app.get("/test/request/")
 
 
-def test_exception(ngw_webtest_app, webapp_handler):
+def test_exception(ngw_webtest_app: WebTestApp, webapp_handler):
     def _handler(request):
         with pytest.raises(KeyError):
             request.session["invalid"]
@@ -255,7 +263,7 @@ def test_exception(ngw_webtest_app, webapp_handler):
         ("clear", False),
     ),
 )
-def test_session_start(handler, expect, ngw_webtest_app, webapp_handler, ngw_env):
+def test_session_start(handler, expect, ngw_webtest_app: WebTestApp, webapp_handler, ngw_env):
     def _handler(request):
         if handler == "empty":
             pass

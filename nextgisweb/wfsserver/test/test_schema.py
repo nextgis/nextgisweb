@@ -3,8 +3,7 @@ import json
 import pytest
 import transaction
 
-from nextgisweb.env import DBSession
-
+from nextgisweb.pyramid.test import WebTestApp
 from nextgisweb.vector_layer import VectorLayer
 
 from ..model import Layer as WFSLayer
@@ -46,22 +45,20 @@ def service_id():
             ],
         }
 
-        res_vl = VectorLayer().persist().from_ogr(json.dumps(geojson))
-        DBSession.flush()
+        layer = VectorLayer().persist().from_ogr(json.dumps(geojson))
 
-        res_wfs = WFSService().persist()
-        res_wfs.layers.append(
-            WFSLayer(
-                resource=res_vl,
-                keyname="test",
-                display_name="test",
-                maxfeatures=1000,
-            )
-        )
+        obj = WFSService(
+            layers=[
+                WFSLayer(
+                    resource=layer,
+                    keyname="test",
+                    display_name="test",
+                    maxfeatures=1000,
+                ),
+            ],
+        ).persist()
 
-        DBSession.flush()
-
-    yield res_wfs.id
+    yield obj.id
 
 
 XML_VALID_FIXTURES = []
@@ -88,7 +85,11 @@ for version in TEST_WFS_VERSIONS:
 
 
 @pytest.mark.parametrize("version, query", XML_VALID_FIXTURES)
-def test_schema(version, query, service_id, ngw_webtest_app):
+def test_schema(version, query, service_id, ngw_webtest_app: WebTestApp):
     query["VERSION"] = version
     query["VALIDATESCHEMA"] = "1"
-    ngw_webtest_app.get("/api/resource/%d/wfs" % service_id, query, status=200)
+    ngw_webtest_app.get(
+        "/api/resource/%d/wfs" % service_id,
+        query=query,
+        status=200,
+    )

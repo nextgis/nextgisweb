@@ -4,8 +4,6 @@ import pytest
 import transaction
 from osgeo import gdal, ogr
 
-from nextgisweb.env import DBSession
-
 from nextgisweb.vector_layer import VectorLayer
 
 from ..model import Layer as WFSLayer
@@ -55,28 +53,26 @@ def vlayer_id():
             ],
         }
 
-        res_vl = VectorLayer().persist().from_ogr(json.dumps(geojson))
-        DBSession.flush()
+        obj = VectorLayer().persist().from_ogr(json.dumps(geojson))
 
-    yield res_vl.id
+    yield obj.id
 
 
 @pytest.fixture(scope="module")
 def service_id(vlayer_id):
     with transaction.manager:
-        res_wfs = WFSService().persist()
-        res_wfs.layers.append(
-            WFSLayer(
-                resource_id=vlayer_id,
-                keyname="test",
-                display_name="test",
-                maxfeatures=1000,
-            )
-        )
+        obj = WFSService(
+            layers=[
+                WFSLayer(
+                    resource_id=vlayer_id,
+                    keyname="test",
+                    display_name="test",
+                    maxfeatures=1000,
+                ),
+            ],
+        ).persist()
 
-        DBSession.flush()
-
-    yield res_wfs.id
+    yield obj.id
 
 
 def test_cyrillic(service_id, vlayer_id, ngw_httptest_app):

@@ -55,9 +55,8 @@ def make_webmap_items(layers_styles):
 def make_layer_style(num):
     layer = RasterLayer(xsize=100, ysize=100, dtype="Byte", band_count=3).persist()
     style = RasterStyle(parent=layer).persist()
-    DBSession.flush()
-    DBSession.expunge(style)
 
+    DBSession.flush()
     return layer.id, style.id
 
 

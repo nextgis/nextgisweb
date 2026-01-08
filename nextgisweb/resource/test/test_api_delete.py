@@ -4,11 +4,15 @@ import transaction
 from nextgisweb.env import DBSession
 
 from nextgisweb.auth import User
+from nextgisweb.pyramid.test import WebTestApp
 
 from .. import ResourceACLRule, ResourceGroup
+from . import ResourceAPI
 
 pytestmark = pytest.mark.usefixtures(
-    "ngw_resource_defaults", "disable_oauth", "ngw_administrator_password"
+    "disable_oauth",
+    "ngw_administrator_password",
+    "ngw_resource_defaults",
 )
 
 
@@ -52,52 +56,43 @@ def user(group1, ngw_resource_group):
     yield user
 
 
-def test_delete(group1, group2, user, ngw_webtest_app):
-    url = f"/api/resource/delete?resources={group1},{group2}"
+def test_delete(group1, group2, user, ngw_webtest_app: WebTestApp):
+    rapi = ResourceAPI()
+    api = ngw_webtest_app.with_url("/api/resource/delete")
+    query_base = dict(resources=[group1, group2])
 
-    def req_get():
-        resp = ngw_webtest_app.get(url, status=200)
-        return resp.json
+    _get_json = lambda: api.get(query=dict(query_base)).json
 
-    def req_post(*, partial, status):
-        resp = ngw_webtest_app.post(
-            url + "&partial=" + ("yes" if partial else "no"), status=status
-        )
-        return resp.json
-
-    def check_exists(rid, exists):
-        ngw_webtest_app.get(f"/api/resource/{rid}", status=200 if exists else 404)
-
-    assert req_get() == dict(
-        affected=dict(count=0, resources=dict()),
-        unaffected=dict(count=2, resources=dict(resource=2)),
-    )
+    assert _get_json() == {
+        "affected": {"count": 0, "resources": {}},
+        "unaffected": {"count": 2, "resources": {"resource": 2}},
+    }
 
     ngw_webtest_app.authorization = ("Basic", (user.keyname, user.password_plaintext))
 
-    assert req_get() == dict(
-        affected=dict(count=0, resources=dict()),
-        unaffected=dict(count=2, resources=dict(resource=1, resource_group=1)),
-    )
+    assert _get_json() == {
+        "affected": {"count": 0, "resources": {}},
+        "unaffected": {"count": 2, "resources": {"resource": 1, "resource_group": 1}},
+    }
 
     with transaction.manager:
         _add_perm(user.id, group1, "delete")
         _add_perm(user.id, group1, "manage_children")
 
-    assert req_get() == dict(
-        affected=dict(count=1, resources=dict(resource_group=1)),
-        unaffected=dict(count=1, resources=dict(resource=1)),
-    )
+    assert _get_json() == {
+        "affected": {"count": 1, "resources": {"resource_group": 1}},
+        "unaffected": {"count": 1, "resources": {"resource": 1}},
+    }
 
-    req_post(partial=False, status=403)
-    assert req_post(partial=True, status=200) == dict()
+    api.post(query=dict(query_base, partial=False), status=403)
+    assert api.post(query=dict(query_base, partial=True)).json == {}
 
     ngw_webtest_app.authorization = ("Basic", ("administrator", "admin"))
 
-    check_exists(group1, False)
-    check_exists(group2, True)
+    rapi.read_request(group1, status=404)
+    rapi.read_request(group2, status=200)
 
-    assert req_get() == dict(
-        affected=dict(count=1, resources=dict(resource_group=1)),
-        unaffected=dict(count=1, resources=dict(resource=1)),
-    )
+    assert _get_json() == {
+        "affected": {"count": 1, "resources": {"resource_group": 1}},
+        "unaffected": {"count": 1, "resources": {"resource": 1}},
+    }

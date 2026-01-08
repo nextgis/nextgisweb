@@ -4,6 +4,7 @@ from osgeo import gdal
 
 from nextgisweb.env import inject
 
+from nextgisweb.pyramid.test import WebTestApp
 from nextgisweb.spatial_ref_sys import SRS
 
 from ..component import RasterLayerComponent
@@ -18,7 +19,7 @@ pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administ
 def test_cog(
     srs_id,
     ngw_data_path,
-    ngw_webtest_app,
+    ngw_webtest_app: WebTestApp,
     ngw_env,
     ngw_httptest_app,
     *,
@@ -35,9 +36,9 @@ def test_cog(
     ds = gdal.Open(str(fwork))
     cs = ds.GetRasterBand(1).Checksum()
 
-    ngw_webtest_app.put_json(
+    ngw_webtest_app.put(
         f"/api/resource/{res.id}",
-        dict(raster_layer=dict(cog=True)),
+        json={"raster_layer": {"cog": True}},
     )
 
     resp = ngw_webtest_app.get(f"/api/resource/{res.id}").json
@@ -54,9 +55,9 @@ def test_cog(
     )
     assert len(errors) == 0 and len(warnings) == 0
 
-    ngw_webtest_app.put_json(
+    ngw_webtest_app.put(
         f"/api/resource/{res.id}",
-        dict(raster_layer=dict(cog=False)),
+        json={"raster_layer": {"cog": False}},
     )
 
     resp = ngw_webtest_app.get(f"/api/resource/{res.id}").json

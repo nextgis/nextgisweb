@@ -4,7 +4,6 @@ from random import shuffle
 
 import pytest
 import transaction
-import webtest
 from msgspec import to_builtins
 
 from nextgisweb.env import DBSession
@@ -12,6 +11,8 @@ from nextgisweb.lib.geometry import Geometry
 
 from nextgisweb.feature_layer import Feature
 from nextgisweb.feature_layer.exception import FeatureNotFound, RestoreNotDeleted
+from nextgisweb.pyramid.test import WebTestApp
+from nextgisweb.resource.test import ResourceAPI
 
 from ..model import VectorLayer, VectorLayerField
 
@@ -118,35 +119,19 @@ def test_model(ngw_txn):
     assert res.fversioning.latest == next(vcur)
 
 
-def test_ogrloader(ngw_webtest_app, ngw_resource_group_sub):
-    web = ngw_webtest_app
+def test_ogrloader(ngw_webtest_app: WebTestApp, ngw_resource_group_sub, ngw_file_upload):
+    rapi = ResourceAPI(ngw_webtest_app)
+    upload_meta = ngw_file_upload(DATA_PATH / "pointz.geojson")
 
-    upload_meta = web.post(
-        "/api/component/file_upload/",
-        dict(file=webtest.Upload(str(DATA_PATH / "pointz.geojson"))),
-    ).json["upload_meta"][0]
+    res_id = rapi.create(
+        "vector_layer",
+        {
+            "feature_layer": {"versioning": {"enabled": True}},
+            "vector_layer": {"srs": {"id": 3857}, "source": upload_meta},
+        },
+    )
 
-    res_id = web.post_json(
-        "/api/resource/",
-        dict(
-            resource=dict(
-                cls="vector_layer",
-                display_name="test_ogrloader",
-                parent=dict(id=ngw_resource_group_sub),
-            ),
-            feature_layer=dict(
-                versioning=dict(enabled=True),
-            ),
-            vector_layer=dict(
-                source=upload_meta,
-                srs=dict(id=3857),
-            ),
-        ),
-        status=201,
-    ).json["id"]
-
-    url = f"/api/resource/{res_id}"
-    flv = web.get(url).json["feature_layer"]["versioning"]
+    flv = rapi.read(res_id)["feature_layer"]["versioning"]
     assert flv.pop("epoch", None)
     assert flv == dict(enabled=True, latest=1)
 

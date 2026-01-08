@@ -14,7 +14,7 @@ def ngw_file_upload(ngw_webtest_factory):
 
         resp = uploader.post(
             "/api/component/file_upload/",
-            dict(file=webtest.Upload(arg)),
+            data={"file": webtest.Upload(arg)},
         )
         return resp.json["upload_meta"][0]
 

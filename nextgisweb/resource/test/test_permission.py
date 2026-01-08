@@ -1,16 +1,17 @@
-from secrets import token_urlsafe
-
 import pytest
 import sqlalchemy.sql as sql
 import transaction
+from sqlalchemy.exc import OperationalError
 
 from nextgisweb.env import DBSession
 
 from nextgisweb.auth import Group, User
+from nextgisweb.pyramid.test import WebTestApp
 
 from ..model import Resource, ResourceACLRule, ResourceGroup
 from ..presolver import PermissionResolver
 from ..scope import ResourceScope
+from . import ResourceAPI
 
 pytestmark = pytest.mark.usefixtures("ngw_auth_administrator")
 
@@ -27,15 +28,14 @@ def user_id(ngw_resource_group):
     yield user.id
 
 
-def test_change_owner(ngw_resource_group_sub, user_id, ngw_webtest_app):
-    url = "/api/resource/%d" % ngw_resource_group_sub
-
-    def owner_data(owner_id):
-        return dict(resource=dict(owner_user=dict(id=owner_id)))
+@pytest.mark.usefixtures("ngw_webtest_app")
+def test_change_owner(ngw_resource_group_sub, user_id):
+    rapi = ResourceAPI()
 
     admin = User.filter_by(keyname="administrator").one()
 
-    ngw_webtest_app.put_json(url, owner_data(admin.id), status=200)
+    payload = {"resource": {"owner_user": {"id": user_id}}}
+    rapi.update_request(ngw_resource_group_sub, payload, status=200)
 
     with transaction.manager:
         ResourceACLRule(
@@ -47,7 +47,7 @@ def test_change_owner(ngw_resource_group_sub, user_id, ngw_webtest_app):
             action="deny",
         ).persist()
 
-    ngw_webtest_app.put_json(url, owner_data(user_id), status=403)
+    rapi.update_request(ngw_resource_group_sub, payload, status=403)
 
 
 @pytest.mark.parametrize(
@@ -60,9 +60,21 @@ def test_change_owner(ngw_resource_group_sub, user_id, ngw_webtest_app):
         ),
     ),
 )
-def test_permission_requirement(ngw_txn, resolve):
+@pytest.mark.usefixtures("ngw_txn")
+def test_permission_requirement(resolve):
     # Temporary allow creating custom resource roots
-    DBSession.execute(sql.text("ALTER TABLE resource DROP CONSTRAINT resource_check"))
+    try:
+        DBSession.execute(
+            sql.text(
+                "SET LOCAL lock_timeout = 1;"
+                "ALTER TABLE resource DROP CONSTRAINT resource_check;"
+                "SET LOCAL lock_timeout TO DEFAULT;"
+            )
+        )
+    except OperationalError as exc:
+        if exc.orig.__class__.__name__ == "LockNotAvailable":
+            pytest.skip("Unable to acquire lock to alter resource table")
+        raise
 
     administrators = Group.filter_by(keyname="administrators").one()
     administrator = User.filter_by(keyname="administrator").one()
@@ -140,10 +152,12 @@ def admin():
     yield admin.id
 
 
-def test_admin_permissions(admin, ngw_webtest_app, ngw_resource_group, ngw_cleanup):
-    permissions = ngw_webtest_app.get("/api/resource/0").json["resource"]["permissions"]
+@pytest.mark.usefixtures("ngw_webtest_app")
+def test_admin_permissions(admin, ngw_resource_group, ngw_cleanup):
+    rapi = ResourceAPI()
+    permissions = rapi.read(0)["resource"]["permissions"]
 
-    def check(data, status_expected, *, resource_id=0):
+    def check(data, status, *, resource_id=0):
         perm_data = dict(
             action="deny",
             identity="",
@@ -155,64 +169,59 @@ def test_admin_permissions(admin, ngw_webtest_app, ngw_resource_group, ngw_clean
         perm_data.update(data)
 
         with ngw_cleanup.disable():
-            ngw_webtest_app.put_json(
-                f"/api/resource/{resource_id}",
-                dict(resource=dict(permissions=permissions + [perm_data])),
-                status=status_expected,
+            rapi.update_request(
+                resource_id,
+                {"resource": {"permissions": permissions + [perm_data]}},
+                status=status,
             )
 
-    check(dict(), 422)
-    check(dict(), 422, resource_id=ngw_resource_group)
-    check(dict(permission="manage_children"), 200)
-    check(dict(scope="metadata", permission="read"), 200)
-    check(dict(scope="resource", permission="read"), 422)
-    check(dict(scope="resource", permission="update"), 422)
-    check(dict(scope="resource", permission="change_permissions"), 422)
+    check({}, 422)
+    check({}, 422, resource_id=ngw_resource_group)
+    check({"permission": "manage_children"}, 200)
+    check({"scope": "metadata", "permission": "read"}, 200)
+    check({"scope": "resource", "permission": "read"}, 422)
+    check({"scope": "resource", "permission": "update"}, 422)
+    check({"scope": "resource", "permission": "change_permissions"}, 422)
 
 
 @pytest.mark.parametrize("permission", ["create", "manage_children"])
-def test_create(permission, ngw_resource_group_sub, ngw_resource_group, ngw_webtest_app):
-    pid, sid = ngw_resource_group, ngw_resource_group_sub
+def test_create(
+    permission, ngw_resource_group_sub, ngw_resource_group, ngw_webtest_app: WebTestApp
+):
     uid = ngw_webtest_app.get("/api/component/auth/current_user").json["id"]
+    rapi = ResourceAPI()
 
-    ngw_webtest_app.put_json(
-        f"/api/resource/{sid}",
-        dict(
-            resource=dict(
-                permissions=[
-                    dict(
-                        action="deny",
-                        identity="resource_group",
-                        scope="resource",
-                        permission=permission,
-                        propagate=True,
-                        principal=dict(id=uid),
-                    ),
+    rapi.update_request(
+        ngw_resource_group_sub,
+        {
+            "resource": {
+                "permissions": [
+                    {
+                        "action": "deny",
+                        "identity": "resource_group",
+                        "scope": "resource",
+                        "permission": permission,
+                        "propagate": True,
+                        "principal": {"id": uid},
+                    },
                 ],
-            ),
-        ),
+            },
+        },
     )
 
-    # Create new resource
-
-    dn = token_urlsafe(8)
-    ngw_webtest_app.post_json(
-        "/api/resource/",
-        dict(resource=dict(cls="resource_group", parent=dict(id=sid), display_name=dn)),
+    # Create new resource inside
+    rapi.create_request(
+        "resource_group",
+        {"resource": {"parent": {"id": ngw_resource_group_sub}}},
         status=403,
     )
 
     # Move existing resource
-
-    dn = token_urlsafe(8)
-    cid = ngw_webtest_app.post_json(
-        "/api/resource/",
-        dict(resource=dict(cls="resource_group", parent=dict(id=pid), display_name=dn)),
-        status=201,
-    ).json["id"]
-
-    ngw_webtest_app.put_json(
-        f"/api/resource/{cid}",
-        dict(resource=dict(parent=dict(id=sid))),
+    rapi.update_request(
+        rapi.create(
+            "resource_group",
+            {"resource": {"parent": {"id": ngw_resource_group}}},
+        ),
+        {"resource": {"parent": {"id": ngw_resource_group_sub}}},
         status=403,
     )
