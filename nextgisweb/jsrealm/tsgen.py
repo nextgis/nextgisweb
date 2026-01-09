@@ -353,14 +353,14 @@ class TSStruct(TSType, kw_only=True):
             self.tag = None
 
     def inline(self, module: TSModule) -> str:
-        if len(self.fields) == 0:
-            return "[]" if self.array_like else "Record<string, never>"
         quote = any((not IDENT_RE.fullmatch(f.name) or f.name in KEYWORDS) for f in self.fields)
         quote = (lambda v: dumps(v)) if quote else (lambda v: v)
         parts = [f"{quote(self.tag[0])}: {dumps(self.tag[1])}"] if self.tag else []
         for fld in self.fields:
             name = quote(fld.name) + ("?" if fld.undefined else "")
             parts.append(f"{name}: {fld.tstype.render(module)}")
+        if len(parts) == 0:
+            return "[]" if self.array_like else "Record<string, never>"
         multiline = len(parts) > 1
         sep = ("," if self.array_like else ";") + ("\n" if multiline else " ")
         tail = sep[0] if multiline else ""
