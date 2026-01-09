@@ -1,5 +1,6 @@
 from datetime import timedelta
 from os import getenv
+from typing import Any
 
 import transaction
 
@@ -16,6 +17,10 @@ from .util import StaticMap, gensecret
 
 
 class PyramidComponent(Component):
+    def __init__(self, env, settings):
+        self.client_types: list[Any] = list()
+        super().__init__(env, settings)
+
     def make_app(self, settings={}):
         settings = dict(self._settings, **settings)
         settings["pyramid.started"] = utcnow_naive().timestamp()
@@ -124,9 +129,12 @@ class PyramidComponent(Component):
 
         nodepkg = self.root_path / "nodepkg"
         config = self.make_app(settings=dict())
-        (nodepkg / "api/type.inc.d.ts").write_text(m.api_type_module(config))
-        (nodepkg / "api/route.inc.ts").write_text(m.route(self))
-        (nodepkg / "layout/dynmenu/type.inc.d.ts").write_text(m.dynmenu(self))
+        (nodepkg / "api/type.inc.d.ts").write_text(m.api_type(self, config))
+        (nodepkg / "api/route.inc.ts").write_text(m.route(self, config))
+        (nodepkg / "layout/dynmenu/type.inc.d.ts").write_text(m.dynmenu(self, config))
+
+    def client_type(self, tdef: Any):
+        self.client_types.append(tdef)
 
     @property
     def template_include(self):
