@@ -5,8 +5,10 @@ import type { ResourceRef } from "@nextgisweb/resource/type/api";
 import { ResourceSelect } from "./ResourceSelect";
 import type { ResourceSelectProps } from "./type";
 
-export interface ResourceSelectRefProps
-    extends Omit<ResourceSelectProps<number>, "value" | "onChange"> {
+export interface ResourceSelectRefProps extends Omit<
+    ResourceSelectProps<number>,
+    "value" | "onChange"
+> {
     value?: ResourceRef | null;
     onChange?: (value: ResourceRef | null) => void;
 }

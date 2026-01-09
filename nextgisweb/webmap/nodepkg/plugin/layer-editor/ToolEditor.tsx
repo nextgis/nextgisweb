@@ -62,9 +62,7 @@ const ToolEditor = observer(
             if (stopped.length) {
                 lazyModal(
                     () =>
-                        import(
-                            "@nextgisweb/webmap/ui/finish-editing-dialog/FinishEditingDialog"
-                        ),
+                        import("@nextgisweb/webmap/ui/finish-editing-dialog/FinishEditingDialog"),
                     {
                         onSave: async () => {
                             try {

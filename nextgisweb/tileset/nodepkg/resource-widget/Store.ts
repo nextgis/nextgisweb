@@ -10,14 +10,11 @@ import type {
 import srsSettings from "@nextgisweb/spatial-ref-sys/client-settings";
 import type * as apitype from "@nextgisweb/tileset/type/api";
 
-export class Store
-    implements
-        EditorStore<
-            apitype.TilesetRead,
-            apitype.TilesetCreate,
-            apitype.TilesetUpdate
-        >
-{
+export class Store implements EditorStore<
+    apitype.TilesetRead,
+    apitype.TilesetCreate,
+    apitype.TilesetUpdate
+> {
     readonly identity = "tileset";
     readonly composite: CompositeStore;
 

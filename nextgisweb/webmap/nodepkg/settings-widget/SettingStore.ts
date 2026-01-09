@@ -15,9 +15,10 @@ import { convertExtentToArray, extractExtentFromArray } from "../utils/extent";
 type WithoutItems<T> = Omit<T, "root_item" | "draw_order_enabled">;
 type AnnotationDefault = WebMapRead["annotation_default"];
 
-export class SettingStore
-    implements EditorStore<WebMapRead, WithoutItems<WebMapUpdate>>
-{
+export class SettingStore implements EditorStore<
+    WebMapRead,
+    WithoutItems<WebMapUpdate>
+> {
     readonly identity = "webmap";
     readonly composite: CompositeStore;
 

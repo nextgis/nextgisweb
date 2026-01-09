@@ -6,8 +6,9 @@ import { lookupTableLoadItems } from "@nextgisweb/lookup-table/util/sort";
 import { useRouteGet } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-export interface LookupSelectProps<V extends number = number>
-    extends SelectProps {
+export interface LookupSelectProps<
+    V extends number = number,
+> extends SelectProps {
     value?: V;
     lookupId: number;
 }

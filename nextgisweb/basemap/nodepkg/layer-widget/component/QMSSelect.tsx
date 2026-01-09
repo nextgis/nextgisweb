@@ -14,8 +14,10 @@ import type { QMSSearch, QMSService } from "../type";
 const searchCache = new LoaderCache<QMSSearch[]>();
 const getCache = new LoaderCache<QMSService>();
 
-interface QMSSelectProps
-    extends Omit<SelectProps<number>, "options" | "children"> {
+interface QMSSelectProps extends Omit<
+    SelectProps<number>,
+    "options" | "children"
+> {
     onChange: (value: number | undefined) => void;
     onService?: (value: QMSService) => void;
     value: number | undefined;

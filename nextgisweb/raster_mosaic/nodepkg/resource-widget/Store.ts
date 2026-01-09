@@ -32,10 +32,11 @@ export class File {
     }
 }
 
-export class Store
-    implements
-        EditorStore<RasterMosaicRead, RasterMosaicCreate, RasterMosaicUpdate>
-{
+export class Store implements EditorStore<
+    RasterMosaicRead,
+    RasterMosaicCreate,
+    RasterMosaicUpdate
+> {
     readonly identity = "raster_mosaic";
     readonly composite: CompositeStore;
 

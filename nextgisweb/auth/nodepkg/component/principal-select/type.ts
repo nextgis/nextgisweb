@@ -3,8 +3,9 @@ import type { Select } from "@nextgisweb/gui/antd";
 
 type SelectProps<V> = Parameters<typeof Select<V>>[0];
 
-export interface PrincipalSelectProps<V extends number = number>
-    extends SelectProps<V> {
+export interface PrincipalSelectProps<
+    V extends number = number,
+> extends SelectProps<V> {
     editOnClick?: boolean;
     systemUsers?: boolean | string[];
     multiple?: boolean;

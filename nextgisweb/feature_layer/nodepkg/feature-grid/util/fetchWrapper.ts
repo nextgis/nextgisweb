@@ -6,11 +6,10 @@ import type { UseFeatureTableProps } from "../hook/useFeatureTable";
 import type { FeatureAttrs } from "../type";
 import { updateFeaturesValue } from "../util/updateFeaturesValue";
 
-interface FetchWrapperProps
-    extends Pick<
-        UseFeatureTableProps,
-        "columns" | "pageSize" | "orderBy" | "resourceId" | "queryParams"
-    > {
+interface FetchWrapperProps extends Pick<
+    UseFeatureTableProps,
+    "columns" | "pageSize" | "orderBy" | "resourceId" | "queryParams"
+> {
     page: number;
     signal: AbortSignal;
     key: string;

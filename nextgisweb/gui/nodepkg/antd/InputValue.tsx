@@ -3,8 +3,10 @@ import type { InputProps, InputRef } from "antd";
 import type { PasswordProps } from "antd/es/input";
 import type { Ref } from "react";
 
-export interface InputValueProps
-    extends Omit<InputProps, "value" | "onChange"> {
+export interface InputValueProps extends Omit<
+    InputProps,
+    "value" | "onChange"
+> {
     value?: string;
     onChange?: (value: string) => void;
     ref?: Ref<InputRef>;
@@ -24,8 +26,10 @@ export function InputValue({
     );
 }
 
-export interface PasswordValueProps
-    extends Omit<PasswordProps, "value" | "onChange"> {
+export interface PasswordValueProps extends Omit<
+    PasswordProps,
+    "value" | "onChange"
+> {
     value?: string;
     onChange?: (value: string) => void;
     ref?: Ref<InputRef>;

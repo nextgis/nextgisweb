@@ -37,10 +37,11 @@ const {
     },
 });
 
-export class WfsClientConnectionStore
-    implements
-        EditorStore<WFSConnectionRead, WFSConnectionRead, WFSConnectionUpdate>
-{
+export class WfsClientConnectionStore implements EditorStore<
+    WFSConnectionRead,
+    WFSConnectionRead,
+    WFSConnectionUpdate
+> {
     readonly identity = "wfsclient_connection";
     readonly composite: CompositeStore;
 

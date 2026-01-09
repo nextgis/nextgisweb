@@ -20,8 +20,10 @@ export type ColOrder = "asc" | "desc" | null;
 
 export type OrderBy = [keynme: string, ordering: ColOrder];
 
-export interface FeatureLayerFieldCol
-    extends Pick<FeatureLayerFieldRead, "id" | "display_name" | "datatype"> {
+export interface FeatureLayerFieldCol extends Pick<
+    FeatureLayerFieldRead,
+    "id" | "display_name" | "datatype"
+> {
     keyname?: string;
     flex?: string;
 }

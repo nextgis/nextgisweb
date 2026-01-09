@@ -36,10 +36,8 @@ export interface FocusTablePropsActions<I extends FocusTableItem> {
 }
 
 export interface FocusTableProps<I extends FocusTableItem, C extends string, S>
-    extends Pick<
-            ComplexTreeProps<I, C, S>,
-            "store" | "root" | "title" | "columns"
-        >,
+    extends
+        Pick<ComplexTreeProps<I, C, S>, "store" | "root" | "title" | "columns">,
         FocusTablePropsActions<I> {
     renderDetail: React.ComponentType<{ item: I }>;
     rootClassName?: string;

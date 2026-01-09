@@ -23,8 +23,10 @@ const msgSearchPlaceholder = gettext("Search");
 // FIXME: A better way exists to handle this!
 const ALL_RESOURCES = "" as ResourceCategoryIdentity;
 
-interface CreateResourceModalProps
-    extends Omit<ModalProps, "footer" | "classNames"> {
+interface CreateResourceModalProps extends Omit<
+    ModalProps,
+    "footer" | "classNames"
+> {
     resourceId: number;
     creatable: ResourceCls[];
 }

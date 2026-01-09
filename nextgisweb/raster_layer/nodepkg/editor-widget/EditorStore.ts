@@ -11,9 +11,10 @@ import type {
 } from "@nextgisweb/resource/type";
 import srsSettings from "@nextgisweb/spatial-ref-sys/client-settings";
 
-export class EditorStore
-    implements IEditorStore<apitype.RasterLayerRead, apitype.RasterLayerUpdate>
-{
+export class EditorStore implements IEditorStore<
+    apitype.RasterLayerRead,
+    apitype.RasterLayerUpdate
+> {
     readonly identity = "raster_layer";
     readonly composite: CompositeStore;
 

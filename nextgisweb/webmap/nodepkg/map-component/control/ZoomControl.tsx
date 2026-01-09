@@ -24,15 +24,10 @@ interface ShowZoomLevelOptions {
     displayDecimals?: boolean;
 }
 
-export interface ZoomControlOptions
-    extends Pick<
-        OlZoomControlOptions,
-        | "delta"
-        | "duration"
-        | "className"
-        | "zoomInTipLabel"
-        | "zoomOutTipLabel"
-    > {
+export interface ZoomControlOptions extends Pick<
+    OlZoomControlOptions,
+    "delta" | "duration" | "className" | "zoomInTipLabel" | "zoomOutTipLabel"
+> {
     extent?: Extent;
     fitOptions?: FitOptions;
     showZoomLevel?: boolean | ShowZoomLevelOptions;

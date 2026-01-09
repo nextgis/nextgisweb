@@ -61,9 +61,7 @@ export const AttributeMode: LayerEditorMode<{ resourceId: number }> = ({
                 await new Promise((resolve) => {
                     lazyModal(
                         () =>
-                            import(
-                                "@nextgisweb/feature-layer/feature-editor-modal"
-                            ),
+                            import("@nextgisweb/feature-layer/feature-editor-modal"),
                         {
                             editorOptions: {
                                 mode: "return",

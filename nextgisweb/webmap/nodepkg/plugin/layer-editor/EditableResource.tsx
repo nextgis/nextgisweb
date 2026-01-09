@@ -25,8 +25,10 @@ import { MoveMode } from "./modes/MoveMode";
 
 import { LoadingOutlined } from "@ant-design/icons";
 
-export interface EditableResourceProps
-    extends Omit<EditableItemProps, "geomType" | "geomLayout"> {
+export interface EditableResourceProps extends Omit<
+    EditableItemProps,
+    "geomType" | "geomLayout"
+> {
     resourceId: number;
     canSnap: boolean;
     onError: (er: unknown) => void;
@@ -66,9 +68,7 @@ export const EditableResource = observer(
                 return new Promise<void>((resolve, reject) => {
                     lazyModal(
                         () =>
-                            import(
-                                "@nextgisweb/feature-layer/feature-editor-modal"
-                            ),
+                            import("@nextgisweb/feature-layer/feature-editor-modal"),
                         {
                             editorOptions: {
                                 mode: "return",

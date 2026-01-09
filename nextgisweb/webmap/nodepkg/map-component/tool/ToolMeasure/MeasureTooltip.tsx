@@ -8,8 +8,10 @@ import { CloseIcon } from "@nextgisweb/gui/icon";
 
 import { useMapContext } from "../../context/useMapContext";
 
-export interface MeasureTooltipProps
-    extends Pick<OverlayOptions, "position" | "offset"> {
+export interface MeasureTooltipProps extends Pick<
+    OverlayOptions,
+    "position" | "offset"
+> {
     children?: React.ReactNode;
     staticMode?: boolean;
     onClose: () => void;

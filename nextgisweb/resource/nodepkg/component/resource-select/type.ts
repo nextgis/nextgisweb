@@ -14,11 +14,12 @@ export interface ResourceSelectOption {
     cls: ResourceCls;
 }
 
-export interface ResourceSelectProps<V extends SelectValue = SelectValue>
-    extends Omit<
-        SelectProps<V, ResourceSelectOption>,
-        "onChange" | "options" | "multiple"
-    > {
+export interface ResourceSelectProps<
+    V extends SelectValue = SelectValue,
+> extends Omit<
+    SelectProps<V, ResourceSelectOption>,
+    "onChange" | "options" | "multiple"
+> {
     value?: V;
     readOnly?: boolean;
     hideGoto?: boolean;

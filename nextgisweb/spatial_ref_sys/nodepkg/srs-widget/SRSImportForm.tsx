@@ -24,8 +24,10 @@ interface SrsFormValue {
     projStr: string;
 }
 
-interface SRSImportFromProps
-    extends Omit<FieldsFormProps, "fields" | "onChange" | "form"> {
+interface SRSImportFromProps extends Omit<
+    FieldsFormProps,
+    "fields" | "onChange" | "form"
+> {
     format: string;
     projStr: string;
     form: FormInstance<any>;

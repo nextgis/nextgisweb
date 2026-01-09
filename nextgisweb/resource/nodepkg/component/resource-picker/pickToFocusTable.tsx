@@ -11,8 +11,9 @@ import type { CompositeRead } from "@nextgisweb/resource/type/api";
 import { showResourcePicker } from "./showResourcePicker";
 import type { ResourcePickerStoreOptions } from "./type";
 
-export interface PickToFocusTableOptions<I>
-    extends Partial<Omit<FocusTableAction<I>, "callback">> {
+export interface PickToFocusTableOptions<I> extends Partial<
+    Omit<FocusTableAction<I>, "callback">
+> {
     pickerOptions?: ResourcePickerStoreOptions;
 }
 

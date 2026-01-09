@@ -24,10 +24,11 @@ const {
     properties: { url: { required: true, url: true } },
 });
 
-export class LayerStore
-    implements
-        EditorStore<BasemapLayerRead, BasemapLayerCreate, BasemapLayerUpdate>
-{
+export class LayerStore implements EditorStore<
+    BasemapLayerRead,
+    BasemapLayerCreate,
+    BasemapLayerUpdate
+> {
     readonly identity = "basemap_layer";
 
     readonly url = url.init("", this);

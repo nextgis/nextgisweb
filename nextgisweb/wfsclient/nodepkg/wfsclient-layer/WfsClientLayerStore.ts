@@ -55,9 +55,11 @@ fields.validate((v, s) => {
     return [true, undefined];
 });
 
-export class WfsClientLayerStore
-    implements EditorStore<WFSLayerRead, WFSLayerCreate, WFSLayerUpdate>
-{
+export class WfsClientLayerStore implements EditorStore<
+    WFSLayerRead,
+    WFSLayerCreate,
+    WFSLayerUpdate
+> {
     readonly identity = "wfsclient_layer";
     readonly composite: CompositeStore;
 

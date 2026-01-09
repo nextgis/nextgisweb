@@ -44,9 +44,11 @@ apikey.validate((v, store) => {
     return [true, undefined];
 });
 
-export class TmsClientConnectionStore
-    implements EditorStore<ConnectionCreate, ConnectionCreate, ConnectionUpdate>
-{
+export class TmsClientConnectionStore implements EditorStore<
+    ConnectionCreate,
+    ConnectionCreate,
+    ConnectionUpdate
+> {
     readonly identity = "tmsclient_connection";
     readonly composite: CompositeStore;
 

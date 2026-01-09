@@ -32,8 +32,9 @@ export interface ChildProps {
 
 export type NameType<N extends string = string> = N | `#${string}`;
 
-export interface FormItemProps<N extends string = string>
-    extends AntdFormItemProps {
+export interface FormItemProps<
+    N extends string = string,
+> extends AntdFormItemProps {
     name: NameType<N>;
     prepend?: ReactNode;
     append?: ReactNode;

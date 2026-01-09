@@ -33,9 +33,11 @@ const {
     },
 });
 
-export class WmsClientConnectionStore
-    implements EditorStore<ConnectionRead, ConnectionCreate, ConnectionCreate>
-{
+export class WmsClientConnectionStore implements EditorStore<
+    ConnectionRead,
+    ConnectionCreate,
+    ConnectionCreate
+> {
     readonly identity = "wmsclient_connection";
 
     readonly url = url.init(null, this);

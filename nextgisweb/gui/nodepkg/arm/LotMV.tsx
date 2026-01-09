@@ -7,8 +7,10 @@ import type { LotProps } from "@nextgisweb/gui/mayout";
 
 import type { MappedValue } from "./mapper";
 
-export interface LotMVProps<V, C extends (props: any) => ReactNode>
-    extends Omit<LotProps, "children"> {
+export interface LotMVProps<
+    V,
+    C extends (props: any) => ReactNode,
+> extends Omit<LotProps, "children"> {
     value: MappedValue<V>;
     component: C;
     props?: Omit<

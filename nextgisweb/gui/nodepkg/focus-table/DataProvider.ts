@@ -16,9 +16,9 @@ export const ROOT_ITEM = "root";
 
 const SHALLOW = { deep: false };
 
-class ProviderTreeItem<I extends FocusTableItem>
-    implements TreeItem<I | typeof ROOT_DATA>
-{
+class ProviderTreeItem<I extends FocusTableItem> implements TreeItem<
+    I | typeof ROOT_DATA
+> {
     index: TreeItemIndex;
     data: I | typeof ROOT_DATA;
     store: FocusTableStore<I>;
@@ -64,9 +64,9 @@ interface DataProviderOpts<I extends FocusTableItem> {
     rootItem: TreeItemIndex;
 }
 
-export class DataProvider<I extends FocusTableItem>
-    implements TreeDataProvider<I | typeof ROOT_DATA>
-{
+export class DataProvider<I extends FocusTableItem> implements TreeDataProvider<
+    I | typeof ROOT_DATA
+> {
     store: FocusTableStore<I>;
     indexer = scalarSequnceIndexer<I, TreeItemIndex>();
     rootItem: TreeItemIndex;

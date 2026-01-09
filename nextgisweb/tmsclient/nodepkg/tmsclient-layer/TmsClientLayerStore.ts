@@ -50,9 +50,11 @@ const {
     },
 });
 
-export class TmsClientLayerStore
-    implements EditorStore<LayerRead, LayerCreate, LayerUpdate>
-{
+export class TmsClientLayerStore implements EditorStore<
+    LayerRead,
+    LayerCreate,
+    LayerUpdate
+> {
     readonly identity = "tmsclient_layer";
     readonly composite: CompositeStore;
 

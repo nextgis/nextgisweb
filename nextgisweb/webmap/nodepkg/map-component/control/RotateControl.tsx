@@ -15,8 +15,10 @@ import NorthIcon from "@nextgisweb/icon/material/arrow_upward";
 
 import "./RotateControl.less";
 
-interface RotateControlOptions
-    extends Pick<OlRotateOptions, "tipLabel" | "duration" | "autoHide"> {
+interface RotateControlOptions extends Pick<
+    OlRotateOptions,
+    "tipLabel" | "duration" | "autoHide"
+> {
     style?: React.CSSProperties;
     className?: string;
 }

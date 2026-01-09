@@ -41,8 +41,9 @@ export interface UseFileUploaderProps<
     onError?: (err: string) => void;
 }
 
-export interface FileUploaderProps<M extends boolean = boolean>
-    extends UseFileUploaderProps<M> {
+export interface FileUploaderProps<
+    M extends boolean = boolean,
+> extends UseFileUploaderProps<M> {
     helpText?: string;
     uploadText?: string;
     dragAndDropText?: string;

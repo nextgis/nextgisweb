@@ -110,9 +110,9 @@ export class EdiTableKeyValueRow<V> implements RowData<V> {
     }
 }
 
-export class EdiTableKeyValueStore<V>
-    implements EdiTableStore<EdiTableKeyValueRow<V>>
-{
+export class EdiTableKeyValueStore<V> implements EdiTableStore<
+    EdiTableKeyValueRow<V>
+> {
     identity = "";
     defaultValue: V;
 

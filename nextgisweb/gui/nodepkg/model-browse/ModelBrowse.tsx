@@ -57,8 +57,9 @@ export interface ControlProps<Data extends ModalBrowseData = ModalBrowseData> {
     setRows: React.Dispatch<React.SetStateAction<Data[]>>;
 }
 
-interface ModelBrowseProps<Data extends ModalBrowseData = ModalBrowseData>
-    extends TableProps<Data> {
+interface ModelBrowseProps<
+    Data extends ModalBrowseData = ModalBrowseData,
+> extends TableProps<Data> {
     model: string | Model;
     messages?: {
         deleteConfirm?: string;

@@ -9,9 +9,10 @@ import type {
 } from "@nextgisweb/resource/type";
 import type apitype from "@nextgisweb/social/type/api";
 
-export class EditorStore
-    implements IEditorStore<apitype.SocialRead, apitype.SocialUpdate>
-{
+export class EditorStore implements IEditorStore<
+    apitype.SocialRead,
+    apitype.SocialUpdate
+> {
     readonly identity = "social";
     readonly composite: CompositeStore;
 

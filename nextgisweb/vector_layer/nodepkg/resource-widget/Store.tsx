@@ -30,14 +30,11 @@ type SourceOptions = Required<
     >
 >;
 
-export class Store
-    implements
-        EditorStore<
-            apitype.VectorLayerRead,
-            apitype.VectorLayerUpdate,
-            apitype.VectorLayerCreate
-        >
-{
+export class Store implements EditorStore<
+    apitype.VectorLayerRead,
+    apitype.VectorLayerUpdate,
+    apitype.VectorLayerCreate
+> {
     readonly identity = "vector_layer";
     readonly composite: CompositeStore;
 

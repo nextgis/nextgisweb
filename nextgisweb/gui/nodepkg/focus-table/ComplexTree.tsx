@@ -56,9 +56,9 @@ export interface ComplexTreeEnvironment<I extends FocusTableItem> {
     isExpanded: (item: I | null) => boolean;
 }
 
-class EnvironmentAdapter<I extends FocusTableItem>
-    implements ComplexTreeEnvironment<I>
-{
+class EnvironmentAdapter<
+    I extends FocusTableItem,
+> implements ComplexTreeEnvironment<I> {
     readonly target: TreeEnvironmentRef<I>;
     readonly store: FocusTableStore<I>;
     readonly provider: DataProvider<I>;

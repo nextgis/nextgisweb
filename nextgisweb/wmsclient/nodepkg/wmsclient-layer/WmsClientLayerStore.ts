@@ -38,9 +38,11 @@ const {
     },
 });
 
-export class WmsClientLayerStore
-    implements EditorStore<LayerRead, LayerCreate, LayerUpdate>
-{
+export class WmsClientLayerStore implements EditorStore<
+    LayerRead,
+    LayerCreate,
+    LayerUpdate
+> {
     readonly identity = "wmsclient_layer";
     readonly composite: CompositeStore;
 

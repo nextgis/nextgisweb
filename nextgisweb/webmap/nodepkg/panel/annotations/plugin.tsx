@@ -40,14 +40,12 @@ registry.register(COMP_ID, {
         }
         initialAnnotVisible = initialAnnotVisible || config.annotations.default;
 
-        const { default: annotationStore } = await import(
-            "@nextgisweb/webmap/store/annotations"
-        );
+        const { default: annotationStore } =
+            await import("@nextgisweb/webmap/store/annotations");
         annotationStore.setVisibleMode(initialAnnotVisible);
 
-        const { AnnotationsManager } = await import(
-            "@nextgisweb/webmap/ui/annotations-manager/AnnotationsManager"
-        );
+        const { AnnotationsManager } =
+            await import("@nextgisweb/webmap/ui/annotations-manager/AnnotationsManager");
 
         new AnnotationsManager({ display, initialAnnotVisible });
     },

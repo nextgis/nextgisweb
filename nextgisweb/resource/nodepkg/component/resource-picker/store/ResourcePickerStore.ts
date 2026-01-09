@@ -30,10 +30,10 @@ type Action = keyof Pick<
 const msgPickThis = gettext("Pick this group");
 const msgPickSelected = gettext("Pick selected");
 
-export class ResourcePickerStore
-    implements
-        Omit<ResourcePickerStoreOptions, "requireClass" | "requireInterface">
-{
+export class ResourcePickerStore implements Omit<
+    ResourcePickerStoreOptions,
+    "requireClass" | "requireInterface"
+> {
     static GLOBAL_PARENT_ID?: number = undefined;
     static resetGlobalParentId = () => {
         ResourcePickerStore.GLOBAL_PARENT_ID = undefined;
