@@ -25,14 +25,12 @@ from .event import OnChildClasses, OnDeletePrompt
 from .exception import ResourceNotFound
 from .extaccess import ExternalAccessLink
 from .interface import IResourceBase
-from .model import Resource
+from .model import Resource, ResourceID
 from .permission import Permission, Scope
 from .psection import PageSections
 from .scope import ResourceScope
 
 RESOURCE_FILTER_JSENTRY = jsentry("@nextgisweb/resource/resources-filter")
-
-ResourceID = Annotated[int, Meta(ge=0, description="Resource ID")]
 
 
 class ResourceFactory:

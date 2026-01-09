@@ -13,9 +13,8 @@ from nextgisweb.lib.apitype import ContentType, Query
 from nextgisweb.lib.geometry import Geometry, GeometryNotValid, Transformer
 
 from nextgisweb.core.exception import ValidationError
-from nextgisweb.resource import DataScope, Resource, ResourceFactory
+from nextgisweb.resource import DataScope, Resource, ResourceFactory, ResourceID
 from nextgisweb.resource.exception import ResourceNotFound
-from nextgisweb.resource.view import ResourceID
 from nextgisweb.spatial_ref_sys import SRS
 from nextgisweb.spatial_ref_sys.api import SRSID
 

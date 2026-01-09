@@ -7,6 +7,7 @@ from .model import (
     ResourceACLRule,
     ResourceCls,
     ResourceGroup,
+    ResourceID,
     ResourceInterfaceIdentity,
     ResourceScopeIdentity,
 )

@@ -37,11 +37,17 @@ from .exception import (
     ResourceNotFound,
     ResourceRootDeleteError,
 )
-from .model import Resource, ResourceCls, ResourceInterfaceIdentity, ResourceScopeIdentity
+from .model import (
+    Resource,
+    ResourceCls,
+    ResourceID,
+    ResourceInterfaceIdentity,
+    ResourceScopeIdentity,
+)
 from .presolver import ExplainACLRule, ExplainDefault, ExplainRequirement, PermissionResolver
 from .sattribute import ResourceRefOptional, ResourceRefWithParent
 from .scope import ResourceScope, Scope
-from .view import ResourceID, resource_factory
+from .view import resource_factory
 from .widget import CompositeWidget
 
 

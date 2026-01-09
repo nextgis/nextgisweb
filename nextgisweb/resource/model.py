@@ -4,7 +4,7 @@ from typing import Annotated, ClassVar, Literal, Type
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
-from msgspec import UNSET, Struct, UnsetType
+from msgspec import UNSET, Meta, Struct, UnsetType
 from sqlalchemy import event, func, text
 
 from nextgisweb.env import Base, DBSession, env, gettext, gettextf
@@ -25,6 +25,24 @@ from .permission import RequirementList
 from .sattribute import ResourceRef, SColumn, SRelationship, SResource
 from .scope import DataScope, ResourceScope, Scope
 from .serialize import CRUTypes, SAttribute, Serializer
+
+ResourceID = Annotated[int, Meta(ge=0, description="Resource ID")]
+
+ResourceCls = Annotated[
+    Gap("ResourceCls", str),
+    TSExport("ResourceCls"),
+]
+
+ResourceInterfaceIdentity = Annotated[
+    Gap("ResourceInterfaceIdentity", str),
+    TSExport("ResourceInterface"),
+]
+
+ResourceScopeIdentity = Annotated[
+    Gap("ResourceScopeIdentity", str),
+    TSExport("ResourceScope"),
+]
+
 
 Base.depends_on("auth")
 
@@ -411,22 +429,6 @@ class ResourceACLRule(Base):
             or (self.scope == pscope and self.permission == "")
             or (self.scope == pscope and self.permission == pname)
         )
-
-
-ResourceCls = Annotated[
-    Gap("ResourceCls", str),
-    TSExport("ResourceCls"),
-]
-
-ResourceInterfaceIdentity = Annotated[
-    Gap("ResourceInterfaceIdentity", str),
-    TSExport("ResourceInterface"),
-]
-
-ResourceScopeIdentity = Annotated[
-    Gap("ResourceScopeIdentity", str),
-    TSExport("ResourceScope"),
-]
 
 
 class ClsAttr(SColumn):

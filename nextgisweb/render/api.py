@@ -13,8 +13,14 @@ from nextgisweb.env import gettext
 from nextgisweb.lib.apitype import AnyOf, AsJSON, ContentType, StatusCode
 
 from nextgisweb.core.exception import UserException, ValidationError
-from nextgisweb.resource import DataScope, Resource, ResourceFactory, ResourceNotFound, ResourceRef
-from nextgisweb.resource.api import ResourceID
+from nextgisweb.resource import (
+    DataScope,
+    Resource,
+    ResourceFactory,
+    ResourceID,
+    ResourceNotFound,
+    ResourceRef,
+)
 from nextgisweb.spatial_ref_sys import SRS
 from nextgisweb.spatial_ref_sys.api import SRSID
 
