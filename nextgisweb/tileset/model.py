@@ -34,6 +34,7 @@ from nextgisweb.resource import (
     ResourceGroup,
     ResourceScope,
     SAttribute,
+    SColumn,
     Serializer,
     SRelationship,
 )
@@ -425,5 +426,5 @@ class SourceAttr(SAttribute):
 class TilesetSerializer(Serializer, resource=Tileset):
     srs = SRelationship(read=ResourceScope.read, write=ResourceScope.update)
     source = SourceAttr(write=DataScope.write)
-    zmin = SAttribute(read=ResourceScope.read, model_attr="tileset_zmin")
-    zmax = SAttribute(read=ResourceScope.read, model_attr="tileset_zmax")
+    zmin = SColumn(read=ResourceScope.read, model_attr="tileset_zmin")
+    zmax = SColumn(read=ResourceScope.read, model_attr="tileset_zmax")
