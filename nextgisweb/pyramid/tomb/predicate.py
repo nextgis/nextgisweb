@@ -52,7 +52,6 @@ class RouteMeta(MetaPredicateBase):
     component: str
     overloaded: bool
     client: bool
-    load_types: bool
     itemplate: str
     ktemplate: str
     path_params: Mapping[str, PathParam]

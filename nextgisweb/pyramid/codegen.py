@@ -2,7 +2,6 @@ from collections import defaultdict
 from collections.abc import Sequence
 from itertools import chain, count
 from json import dumps as json_dumps
-from textwrap import dedent
 from typing import Any, Literal, Type, Union, cast
 
 from msgspec import NODEFAULT, Struct, UnsetType, defstruct, field
@@ -138,32 +137,6 @@ def api_type_module(config) -> str:
     eslint = eslint_disable(("prettier/prettier",))
 
     return "\n".join(eslint + [m.code for m in tsgen.compile()] + [""])
-
-
-def api_load_module(config) -> str:
-    code = [*eslint_disable(("import/newline-after-import",))]
-
-    template = """
-        declare module "@nextgisweb/pyramid/api/load!{path}" {{
-            import type route from "@nextgisweb/pyramid/type/route";
-            const value: route["{name}"]["get"]["response"];
-            export = value;
-        }}
-    """
-    template = dedent(template).strip("\n") + "\n"
-
-    for iroute in iter_routes(config.registry.introspector):
-        if not iroute.load_types:
-            continue
-
-        code.append(
-            template.format(
-                path=iroute.itemplate,
-                name=iroute.name,
-            )
-        )
-
-    return "\n".join(code)
 
 
 def dynmenu(config) -> str:
