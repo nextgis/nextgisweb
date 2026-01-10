@@ -6,15 +6,20 @@ import { utc } from "@nextgisweb/gui/dayjs";
 import { SvgIconLink } from "@nextgisweb/gui/svg-icon";
 import { sorterFactory } from "@nextgisweb/gui/util";
 import { formatSize } from "@nextgisweb/gui/util/formatSize";
-import { routeURL } from "@nextgisweb/pyramid/api";
+import { route, routeURL } from "@nextgisweb/pyramid/api";
 import pyramidSettings from "@nextgisweb/pyramid/client-settings";
+import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import { resources } from "@nextgisweb/resource/blueprint";
+import { useResourceAttr } from "@nextgisweb/resource/hook/useResourceAttr";
 
 import type { ResourceSectionProps } from "../type";
 
 import { MenuDropdown } from "./component/MenuDropdown";
 import { RenderActions } from "./component/RenderActions";
-import type { ChildrenResource as Resource } from "./type";
+import type { ChildrenResource } from "./type";
+
+import { LoadingOutlined } from "@ant-design/icons";
 
 import "./ResourceSectionChildren.less";
 
@@ -23,33 +28,93 @@ const { Column } = Table;
 const storageEnabled = pyramidSettings.storage.enabled;
 
 interface ResourceSectionChildrenProps extends ResourceSectionProps {
-    resourceChildren: Resource[];
+    resourceChildren: ChildrenResource[];
 }
 
 export const ResourceSectionChildren = ({
     resourceId,
-    resourceChildren,
 }: ResourceSectionChildrenProps) => {
     const [volumeVisible, setVolumeVisible] = useState(false);
     const [creationDateVisible, setCreationDateVisible] = useState(false);
     const [batchDeletingInProgress, setBatchDeletingInProgress] =
         useState(false);
-
+    const [isDataLoading, setIsDataLoading] = useState(true);
     const [allowBatch, setAllowBatch] = useState(false);
     const [volumeValues, setVolumeValues] = useState<Record<number, number>>(
         {}
     );
-    const [items, setItems] = useState<Resource[]>([...resourceChildren]);
+    const [items, setItems] = useState<ChildrenResource[] | undefined>();
     const [selected, setSelected] = useState<number[]>([]);
+    const { makeSignal } = useAbortController();
+    const { fetchResourceAttr } = useResourceAttr();
 
     useEffect(() => {
-        setSelected((oldSelection) => {
-            const itemsIds = items.map((item) => item.id);
-            const updatedSelection = oldSelection.filter((selectedItem) =>
-                itemsIds.includes(selectedItem)
-            );
-            return updatedSelection;
-        });
+        (async () => {
+            setIsDataLoading(true);
+            try {
+                const items = await fetchResourceAttr({
+                    resources: { "type": "search", "parent": resourceId },
+                    attributes: [
+                        ["resource.cls"],
+                        ["resource.display_name"],
+                        ["resource.owner_user"],
+                    ],
+                });
+
+                const userNames = new Map<number, string | undefined>();
+
+                for (const it of items) {
+                    const userId = it[1][2];
+                    if (userId !== undefined) {
+                        userNames.set(userId.id, undefined);
+                    }
+                }
+                const signal = makeSignal();
+                await Promise.all(
+                    userNames.keys().map(async (id) => {
+                        const user = await route("auth.user.item", { id }).get({
+                            cache: true,
+                            signal,
+                        });
+                        userNames.set(id, user.display_name);
+                    })
+                );
+
+                const childrens: ChildrenResource[] = [];
+                for (const it of items) {
+                    const [id, [cls, display_name, owner_user]] = it;
+
+                    if (!cls || !display_name) continue;
+                    const item: ChildrenResource = {
+                        id,
+                        cls,
+                        displayName: display_name,
+                        clsDisplayName: resources[cls]?.label,
+                        ownerUserDisplayName:
+                            owner_user !== undefined
+                                ? userNames.get(owner_user.id)
+                                : `#${owner_user}`,
+                    };
+                    childrens.push(item);
+                }
+
+                setItems(childrens);
+            } finally {
+                setIsDataLoading(false);
+            }
+        })();
+    }, [fetchResourceAttr, makeSignal, resourceId]);
+
+    useEffect(() => {
+        if (items !== undefined) {
+            setSelected((oldSelection) => {
+                const itemsIds = items.map((item) => item.id);
+                const updatedSelection = oldSelection.filter((selectedItem) =>
+                    itemsIds.includes(selectedItem)
+                );
+                return updatedSelection;
+            });
+        }
     }, [items]);
 
     const rowSelection = useMemo<TableProps["rowSelection"] | undefined>(() => {
@@ -72,16 +137,20 @@ export const ResourceSectionChildren = ({
             className="ngw-resource-resource-section-children"
             size="middle"
             card={true}
+            loading={{
+                spinning: isDataLoading,
+                indicator: <LoadingOutlined />,
+            }}
             dataSource={items}
             rowKey="id"
             rowSelection={rowSelection}
         >
-            <Column
+            <Column<ChildrenResource>
                 title={gettext("Display name")}
                 className="displayName"
                 dataIndex="displayName"
                 sorter={sorterFactory("displayName")}
-                render={(value, record: Resource) => (
+                render={(value, record) => (
                     <SvgIconLink
                         href={routeURL("resource.show", record.id)}
                         icon={`rescls-${record.cls}`}
@@ -90,14 +159,14 @@ export const ResourceSectionChildren = ({
                     </SvgIconLink>
                 )}
             />
-            <Column
+            <Column<ChildrenResource>
                 title={gettext("Type")}
                 responsive={["md"]}
                 className="cls"
                 dataIndex="clsDisplayName"
                 sorter={sorterFactory("clsDisplayName")}
             />
-            <Column
+            <Column<ChildrenResource>
                 title={gettext("Owner")}
                 responsive={["xl"]}
                 className="ownerUser"
@@ -105,7 +174,7 @@ export const ResourceSectionChildren = ({
                 sorter={sorterFactory("ownerUserDisplayName")}
             />
             {creationDateVisible && (
-                <Column
+                <Column<ChildrenResource>
                     title={gettext("Created")}
                     className="creationDate"
                     dataIndex="creationDate"
@@ -123,13 +192,11 @@ export const ResourceSectionChildren = ({
                 />
             )}
             {storageEnabled && volumeVisible && (
-                <Column
+                <Column<ChildrenResource>
                     title={gettext("Volume")}
                     className="volume"
-                    sorter={(a: Resource, b: Resource) =>
-                        volumeValues[a.id] - volumeValues[b.id]
-                    }
-                    render={(_, record: Resource) => {
+                    sorter={(a, b) => volumeValues[a.id] - volumeValues[b.id]}
+                    render={(_, record) => {
                         if (volumeValues[record.id] !== undefined) {
                             return formatSize(volumeValues[record.id]);
                         } else {
@@ -138,10 +205,10 @@ export const ResourceSectionChildren = ({
                     }}
                 />
             )}
-            <Column
+            {/* <Column
                 title={
                     <MenuDropdown
-                        data={resourceChildren}
+                        data={[]}
                         items={items}
                         selected={selected}
                         allowBatch={allowBatch}
@@ -160,14 +227,14 @@ export const ResourceSectionChildren = ({
                 }
                 className="actions"
                 dataIndex="actions"
-                render={(actions, record: Resource) => (
+                render={(actions, record: ChildrenResource) => (
                     <RenderActions
                         actions={actions}
                         id={record.id}
                         setTableItems={setItems}
                     />
                 )}
-            />
+            /> */}
         </Table>
     );
 };

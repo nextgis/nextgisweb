@@ -239,51 +239,7 @@ def resource_section_main(obj, *, request, **kwargs):
 
 @resource_sections("@nextgisweb/resource/resource-section/children", order=-50)
 def resource_section_children(obj, *, request, **kwargs):
-    if len(obj.children) == 0:
-        return
-
-    tr = request.localizer.translate
-
-    resources = [
-        resource
-        for resource in obj.children
-        if (ResourceScope.read in resource.permissions(request.user))
-    ]
-
-    resources.sort(key=lambda res: (res.cls_order, res.display_name))
-
-    payload = list()
-    for item in resources:
-        idata = dict(
-            id=item.id,
-            displayName=item.display_name,
-            cls=item.cls,
-            clsDisplayName=tr(item.cls_display_name),
-            creationDate=item.creation_date,
-            ownerUserDisplayName=tr(item.owner_user.display_name_i18n),
-        )
-
-        iacts = idata["actions"] = list()
-        args = SimpleNamespace(obj=item, request=request)
-        for menu_item in item.__dynmenu__.build(args):
-            if (
-                isinstance(menu_item, dm.Link)
-                and menu_item.important
-                and menu_item.icon is not None
-            ):
-                iacts.append(
-                    dict(
-                        href=menu_item.url(args),
-                        target=menu_item.target,
-                        title=tr(menu_item.label),
-                        icon=menu_item.icon,
-                        key=menu_item.key,
-                    )
-                )
-
-        payload.append(idata)
-
-    return {"resourceChildren": payload}
+    return {"resourceId": obj.id}
 
 
 @resource_sections("@nextgisweb/resource/resource-section/description", order=-60)

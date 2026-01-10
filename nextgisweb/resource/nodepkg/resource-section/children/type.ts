@@ -10,10 +10,9 @@ export type ChildrenResourceAction = {
 
 export type ChildrenResource = {
     id: number;
-    displayName: string;
     cls: ResourceCls;
+    displayName: string;
     clsDisplayName?: string;
     creationDate?: string;
     ownerUserDisplayName?: string;
-    actions: ChildrenResourceAction[];
 };
