@@ -81,6 +81,7 @@ extras_require = dict(
         "pytest==9.0.*",
         "ruff>=0.12.12",
         "sqlglot==26.30.0",
+        "ty",
         "webtest",
     ]
 )
