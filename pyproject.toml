@@ -6,12 +6,12 @@ exclude = [
 ]
 
 [tool.ruff.lint]
-select = ["E", "F", "W", "I", "TID251"]
+select = ["E", "F", "W", "I", "TID251", "RUF022"]
 ignore = ["E501", "E731"]
 
 
 [tool.ruff.lint.per-file-ignores]
-"__init__.py" = ["F401"]
+"__init__.py" = ["F401", "F403"]
 
 [tool.ruff.lint.isort]
 variables = ["_"]

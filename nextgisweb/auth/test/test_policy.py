@@ -8,7 +8,7 @@ from nextgisweb.pyramid.test import WebTestApp
 
 from .. import User
 
-pytestmark = pytest.mark.usefixtures("disable_oauth", "ngw_administrator_password")
+pytestmark = pytest.mark.usefixtures("ngw_disable_oauth", "ngw_administrator_password")
 
 
 def test_fixture(ngw_webtest_app: WebTestApp, ngw_auth_administrator):

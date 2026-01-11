@@ -1,7 +1,8 @@
 import pytest
 
-from nextgisweb.env.test import genereate_components
 from nextgisweb.lib.migration import MigrationGraph, resolve
+
+from nextgisweb.pytest.env import generate_components
 
 from ..migration import MigrationRegistry
 
@@ -11,13 +12,13 @@ def graph(ngw_env):
     yield MigrationGraph(MigrationRegistry(ngw_env))
 
 
-@pytest.mark.parametrize("component", genereate_components())
+@pytest.mark.parametrize("component", generate_components())
 def test_one_tail(graph, component):
     tails = graph.select("tail", component=component)
     assert len(tails) <= 1
 
 
-@pytest.mark.parametrize("component", genereate_components())
+@pytest.mark.parametrize("component", generate_components())
 def test_one_head(graph, component):
     heads = graph.select("head", component=component)
     assert len(heads) <= 1

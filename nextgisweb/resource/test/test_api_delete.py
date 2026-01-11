@@ -10,8 +10,8 @@ from .. import ResourceACLRule, ResourceGroup
 from . import ResourceAPI
 
 pytestmark = pytest.mark.usefixtures(
-    "disable_oauth",
     "ngw_administrator_password",
+    "ngw_disable_oauth",
     "ngw_resource_defaults",
 )
 

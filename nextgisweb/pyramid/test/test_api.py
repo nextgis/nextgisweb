@@ -4,9 +4,9 @@ from copy import deepcopy
 import pytest
 
 from nextgisweb.env import Component
-from nextgisweb.env.test import genereate_components
 
 from nextgisweb.pyramid.test import WebTestApp
+from nextgisweb.pytest.env import generate_components
 
 pytestmark = pytest.mark.usefixtures("ngw_auth_administrator")
 
@@ -19,7 +19,7 @@ def test_pkg_version(ngw_webtest_app: WebTestApp):
     ngw_webtest_app.get("/api/component/pyramid/pkg_version")
 
 
-def test_healthcheck(disable_oauth, ngw_webtest_app: WebTestApp):
+def test_healthcheck(ngw_disable_oauth, ngw_webtest_app: WebTestApp):
     ngw_webtest_app.get("/api/component/pyramid/healthcheck")
 
 
@@ -43,7 +43,7 @@ def test_malformed_json(ngw_webtest_app: WebTestApp):
     assert resp.json["exception"].endswith(".MalformedJSONBody")
 
 
-@pytest.mark.parametrize("component", genereate_components())
+@pytest.mark.parametrize("component", generate_components())
 def test_settings(component, ngw_webtest_app: WebTestApp):
     if hasattr(Component.registry[component], "client_settings"):
         ngw_webtest_app.get(
