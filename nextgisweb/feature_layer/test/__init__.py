@@ -136,29 +136,6 @@ class TransactionAPI:
             self.client.delete(self.id, status=(200, 404))
 
 
-@pytest.fixture(scope="session", autouse=True)
-def ngw_fversioning_default():
-    current = False  # Disable by default in tests
-
-    @contextmanager
-    def override(value: bool):
-        nonlocal current
-        previous = current
-        current = value
-        try:
-            yield
-        finally:
-            current = previous
-
-    with patch.object(
-        FeatureLayerComponent,
-        "versioning_default",
-        new_callable=PropertyMock,
-    ) as mock_versioning_default:
-        mock_versioning_default.side_effect = lambda: current
-        yield override
-
-
 def parametrize_versioning():
     return pytest.mark.parametrize(
         "versioning",

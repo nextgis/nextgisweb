@@ -86,15 +86,7 @@ extras_require = dict(
 
 entry_points = {
     "paste.app_factory": ["main = nextgisweb:main"],
-    "pytest11": [
-        "nextgisweb.env = nextgisweb.env.test",
-        "nextgisweb.auth = nextgisweb.auth.test",
-        "nextgisweb.core = nextgisweb.core.test",
-        "nextgisweb.feature_layer = nextgisweb.feature_layer.test",
-        "nextgisweb.file_upload = nextgisweb.file_upload.test",
-        "nextgisweb.pyramid = nextgisweb.pyramid.test",
-        "nextgisweb.resource = nextgisweb.resource.test",
-    ],
+    "pytest11": ["nextgisweb.pytest = nextgisweb.pytest"],
     "nextgisweb.packages": [
         "nextgisweb = nextgisweb:pkginfo",
     ],

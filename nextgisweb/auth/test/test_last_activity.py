@@ -12,7 +12,7 @@ from nextgisweb.pyramid.test import WebTestApp
 from ..model import User
 
 
-@pytest.mark.usefixtures("disable_oauth", "ngw_administrator_password")
+@pytest.mark.usefixtures("ngw_disable_oauth", "ngw_administrator_password")
 def test_last_activity(ngw_env, ngw_webtest_app: WebTestApp):
     with transaction.manager:
         for keyname, last_activity in (

@@ -19,7 +19,7 @@ def test_pkg_version(ngw_webtest_app: WebTestApp):
     ngw_webtest_app.get("/api/component/pyramid/pkg_version")
 
 
-def test_healthcheck(disable_oauth, ngw_webtest_app: WebTestApp):
+def test_healthcheck(ngw_disable_oauth, ngw_webtest_app: WebTestApp):
     ngw_webtest_app.get("/api/component/pyramid/healthcheck")
 
 
