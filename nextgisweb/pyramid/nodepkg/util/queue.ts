@@ -32,6 +32,10 @@ export class RequestQueue {
         this.debounce = debounce;
     }
 
+    setLimit(limit: number) {
+        this.limit = limit;
+    }
+
     add(
         request: RequestFunc,
         options?: { abort?: Abort; id?: string | number }

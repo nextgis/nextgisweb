@@ -6,6 +6,7 @@ import { errorModal } from "@nextgisweb/gui/error";
 import pyramidSettings from "@nextgisweb/pyramid/client-settings";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { layoutStore } from "@nextgisweb/pyramid/layout";
+import { imageQueue } from "@nextgisweb/pyramid/util";
 import type { DisplayConfig } from "@nextgisweb/webmap/type/api";
 import { WebMapTabsStore } from "@nextgisweb/webmap/webmap-tabs";
 
@@ -77,6 +78,13 @@ export class Display {
             );
         }
 
+        const hmux =
+            pyramidSettings.lunkwill.hmux && this.config.options["webmap.hmux"];
+
+        if (hmux) {
+            imageQueue.setLimit(100);
+        }
+
         this.map = new MapStore({
             logo: false,
             controls: [],
@@ -85,9 +93,7 @@ export class Display {
             measureSrsId: this.config.measureSrsId,
             displayProjection: this.displayProjection,
             lonlatProjection: this.lonlatProjection,
-            hmux:
-                pyramidSettings.lunkwill.hmux &&
-                this.config.options["webmap.hmux"],
+            hmux,
         });
         this.identify = new Identify({ display: this });
 
