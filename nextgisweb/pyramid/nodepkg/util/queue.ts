@@ -51,7 +51,7 @@ export class RequestQueue {
             abortController: new AbortController(),
         };
         this.queue.push(queueItem);
-        this.debouncedNext();
+        this.debouncedStart();
         return queueItem;
     }
 
@@ -94,8 +94,12 @@ export class RequestQueue {
         this._next();
     }
 
-    private debouncedNext() {
+    private debouncedStart() {
         if (this.paused) return;
+        if (this.activeRequests.length > 0) {
+            this._next();
+            return;
+        }
         this._clearTimeout();
         this.timeoutId = setTimeout(() => this._next(), this.debounce);
     }
@@ -132,10 +136,10 @@ export class RequestQueue {
                         (req) => req !== requestItem
                     );
                     this.checkIdle();
-                    this.debouncedNext();
+                    this._next();
                 });
             } else {
-                this.debouncedNext();
+                this._next();
             }
         }
     }
@@ -148,6 +152,7 @@ export class RequestQueue {
             running.abortController.abort();
             running.abort?.();
             this.activeRequests.splice(idx, 1);
+            this._next();
         }
     }
 
