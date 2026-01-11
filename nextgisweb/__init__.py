@@ -1,13 +1,26 @@
 import logging
 import os
 import time
+from typing import TYPE_CHECKING
 from warnings import filterwarnings
 
-from nextgisweb.env import Env
-from nextgisweb.env.package import single_component
-from nextgisweb.lib.config import load_config
 from nextgisweb.lib.imptool import deprecate
-from nextgisweb.lib.logging import logger
+
+if TYPE_CHECKING:
+    from nextgisweb.env.package import single_component
+    from nextgisweb.lib.config import load_config
+
+
+def __getattr__(name: str):
+    match name:
+        case "single_component":
+            from nextgisweb.env.package import single_component as v
+        case "load_config":
+            from nextgisweb.lib.config import load_config as v
+        case _:
+            raise AttributeError
+    return v
+
 
 # Enable deprecation warnings for nextgisweb and nextgisweb_* packages.
 filterwarnings("once", module=r"^nextgisweb(_\w+)?(\..*|$)", category=DeprecationWarning)
@@ -69,6 +82,9 @@ def pkginfo():
 def main(global_config=None, **settings):
     """This function returns a Pyramid WSGI application."""
 
+    from nextgisweb.env import Env
+    from nextgisweb.lib.config import load_config
+
     env = Env(cfg=load_config(None, None), initialize=True, set_global=True)
     config = env.pyramid.make_app({})
     app = config.make_wsgi_app()
@@ -77,6 +93,7 @@ def main(global_config=None, **settings):
 
 
 def _log_startup_time(level=logging.INFO):
+    logger = logging.getLogger(__name__)
     if logger.isEnabledFor(level):
         from psutil import Process
 
