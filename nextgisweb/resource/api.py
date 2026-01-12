@@ -926,13 +926,14 @@ def widget(
             obj = Resource.registry[cls](parent=parent_obj, owner_user=request.user)
             composite = CompositeWidget(operation=operation, obj=obj, request=request)
             suggested_dn = obj.suggest_display_name(tr)
+            members = composite.config()
             obj.parent = None
 
         return CompositeOperationCreate(
             cls=cls,
             parent=parent_obj.id,
             owner_user=request.user.id,
-            members=composite.config(),
+            members=members,
             suggested_display_name=suggested_dn,
         )
 
