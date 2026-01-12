@@ -920,11 +920,14 @@ def widget(
             raise HTTPBadRequest()
 
         parent_obj = with_polymorphic(Resource, "*").filter_by(id=parent).one()
-
         tr = request.localizer.translate
-        obj = Resource.registry[cls](parent=parent_obj, owner_user=request.user)
-        composite = CompositeWidget(operation=operation, obj=obj, request=request)
-        suggested_dn = obj.suggest_display_name(tr)
+
+        with DBSession.no_autoflush:
+            obj = Resource.registry[cls](parent=parent_obj, owner_user=request.user)
+            composite = CompositeWidget(operation=operation, obj=obj, request=request)
+            suggested_dn = obj.suggest_display_name(tr)
+            obj.parent = None
+
         return CompositeOperationCreate(
             cls=cls,
             parent=parent_obj.id,
