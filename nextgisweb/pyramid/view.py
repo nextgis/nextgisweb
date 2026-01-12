@@ -5,7 +5,6 @@ from datetime import timedelta
 from functools import cache
 from hashlib import md5
 from itertools import chain
-from pathlib import Path
 from secrets import token_hex
 from time import sleep
 from types import SimpleNamespace
@@ -859,7 +858,7 @@ def _setup_static(comp, config):
 
     def add_static_path(self, suffix, path):
         self.registry.settings["pyramid.static_map"].add(suffix, path)
-        logger.debug("Static map: %s > %s", suffix, path.resolve().relative_to(Path().resolve()))
+        logger.debug("Static map: %s > %s", suffix, path.resolve())
 
     config.add_directive("add_static_path", add_static_path)
 
