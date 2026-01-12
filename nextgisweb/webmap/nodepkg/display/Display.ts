@@ -79,7 +79,8 @@ export class Display {
         }
 
         const hmux =
-            pyramidSettings.lunkwill.hmux && this.config.options["webmap.hmux"];
+            pyramidSettings.lunkwill?.hmux &&
+            this.config.options["webmap.hmux"];
 
         if (hmux) {
             imageQueue.setLimit(100);
@@ -135,7 +136,7 @@ export class Display {
         const urlStyles = this.urlParams.styles;
         if (urlStyles) {
             const checked: number[] = [];
-            store.items.values().forEach((item) => {
+            store.items.forEach((item) => {
                 let cond;
                 if (item.isLayer()) {
                     const styleId = item.styleId;
