@@ -1,3 +1,4 @@
+from functools import partial
 from urllib.parse import unquote, urljoin, urlparse
 
 from msgspec import Struct
@@ -207,11 +208,11 @@ def setup_pyramid(comp, config):
 
     for k, v in csetting.registry[COMP_ID].items():
 
-        def cs_k(comp: WebMapComponent, request) -> v.gtype:  # type: ignore
-            return v.getter()
+        def cs_k(comp: WebMapComponent, request, *, cs) -> v.gtype:  # type: ignore
+            return cs.getter()
 
         cs_k.__name__ = f"cs_{k}"
-        client_setting(k)(cs_k)
+        client_setting(k)(partial(cs_k, cs=v))
 
     icon_display = icon("display")
     icon_clone = icon("material/content_copy")
