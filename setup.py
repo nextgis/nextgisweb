@@ -74,6 +74,7 @@ extras_require = dict(
         "bump2version",
         "coverage",
         "freezegun",
+        "json5",
         "mapbox-vector-tile",
         "pre-commit",
         "pyramid-debugtoolbar==4.10",
