@@ -6,7 +6,7 @@ export function UserCell({ userId }: { userId: number }) {
         {
             id: userId,
         },
-        { cache: true }
+        { cache: true, query: { brief: true } }
     );
     if (isLoading) {
         return "...";
