@@ -42,13 +42,14 @@ export const useColumns = function ({
                 title: gettext("Date and time"),
                 dataIndex: "tstamp",
                 key: "tstamp",
-                width: 250,
+                width: 200,
                 render: (_, row) => formatTstamp(row),
             },
             {
                 title: gettext("User"),
                 dataIndex: "user",
                 key: "user",
+                width: 200,
                 render: (_, row) =>
                     typeof row.user?.id === "number" ? (
                         <UserCell userId={row.user?.id} />
