@@ -7,25 +7,44 @@ function check(m: { default: string; named: string }) {
 }
 
 export default () => {
-    describe("Webpack import", () => {
-        it("imports module by absolute path", async () => {
+    describe("Webpack imports", () => {
+        it("module by absolute path", async () => {
             const m = await import("@nextgisweb/jsrealm/testentry/mod/abs");
             check(m);
         });
 
-        it("imports module by relative path", async () => {
+        it("module by relative path", async () => {
             const m = await import("./mod/rel");
             check(m);
         });
 
-        it("imports entrypoint by relative path", async () => {
-            const m = await import("@nextgisweb/jsrealm/testentry/entry/abs");
+        it("async module", async () => {
+            const m = await import("./mod/async");
             check(m);
         });
+    });
 
-        it("imports entrypoint by absolute path", async () => {
-            const m = await import("./entry/rel");
-            check(m);
+    describe("Webpack fails", () => {
+        it("on module that throws", async () => {
+            let caught = false;
+            try {
+                await import("./mod/throw");
+            } catch (e) {
+                caught = true;
+                assert.equal((e as Error).message, "fail");
+            }
+            assert.isTrue(caught);
+        });
+
+        it("on async module that throws", async () => {
+            let caught = false;
+            try {
+                await import("./mod/athrow");
+            } catch (e) {
+                caught = true;
+                assert.equal((e as Error).message, "fail");
+            }
+            assert.isTrue(caught);
         });
     });
 };
