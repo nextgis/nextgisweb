@@ -579,12 +579,15 @@ def display_config(obj, request) -> DisplayConfig:
 
         if item.item_type == "layer":
             style = item.style
-            layer = style.parent if style.cls.endswith("_style") else style
 
             if not style.has_permission(DataScope.read, request.user):
                 # Skip webmap item if there are no necessary permissions, so it
                 # won't be shown in the tree.
                 return None
+
+            layer = style.parent if style.cls.endswith("_style") else style
+
+            is_feature_layer = IFeatureLayer.providedBy(layer)
 
             layer_enabled = bool(item.layer_enabled)
             if layer_enabled:
@@ -602,6 +605,7 @@ def display_config(obj, request) -> DisplayConfig:
                 styleId=style.id,
                 visibility=layer_enabled,
                 identifiable=item.layer_identifiable,
+                filterable=is_feature_layer,
                 transparency=item.layer_transparency,
                 minScaleDenom=scale_range[0],
                 maxScaleDenom=scale_range[1],
@@ -612,7 +616,7 @@ def display_config(obj, request) -> DisplayConfig:
             identification_mode = None
             if not item.layer_identifiable:
                 pass
-            elif IFeatureLayer.providedBy(layer):
+            elif is_feature_layer:
                 identification_mode = "feature_layer"
             elif layer.cls == "raster_layer":
                 identification_mode = "raster_layer"
