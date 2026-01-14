@@ -254,8 +254,6 @@ def image(
     check_origin(request)
 
     p_symbols = process_symbols(symbols) if symbols else dict()
-    if p_filter is None:
-        p_filter = dict()
     p_cache = cache and request.env.render.tile_cache_enabled
     srs_obj = SRS.filter_by(id=srs).one()
     if p_cache:
