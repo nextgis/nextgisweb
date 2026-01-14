@@ -748,7 +748,7 @@ msgstr "Восстановить"
 
 #: nodepkg/version-history/component/menu-items/useRevertMenuItem.tsx:114
 msgid "Revert to this version"
-msgstr "Восстанвить до этой версии"
+msgstr "Восстановить до этой версии"
 
 #: nodepkg/version-history/hook/useColumns.tsx:42
 msgid "Date and time"
@@ -780,7 +780,7 @@ msgstr "Удалено"
 #: nodepkg/version-history/hook/useColumns.tsx:84
 msgctxt "column"
 msgid "Restored"
-msgstr "Востановлено"
+msgstr "Восстановлено"
 
 #: nodepkg/versioning-settings/VersioningForm.tsx:29
 msgid "Enable by default"
