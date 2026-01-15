@@ -1,9 +1,8 @@
 import { Fragment, useEffect, useState } from "react";
 
 import { assert } from "@nextgisweb/jsrealm/error";
-import { useRoute } from "@nextgisweb/pyramid/hook";
 import { PageTitle } from "@nextgisweb/pyramid/layout";
-import { resourceAttr } from "@nextgisweb/resource/api/resource-attr";
+import { useResourceAttr } from "@nextgisweb/resource/hook/useResourceAttr";
 import type { ResourceCls } from "@nextgisweb/resource/type/api";
 
 import type { ResourceSection, ResourceSectionProps } from "../type";
@@ -17,24 +16,27 @@ const ResourceSectionMain: ResourceSection<ResourceSectionProps> = ({
 }) => {
     const [creatable, setCreatable] = useState<ResourceCls[]>();
     const [summary, setSummary] = useState<[string, string][]>();
-    const { route } = useRoute("resource.attr");
+    const { fetchResourceItems: fetchResourceAttr } = useResourceAttr();
 
     useEffect(() => {
         (async () => {
-            const items = await resourceAttr({
+            const items = await fetchResourceAttr({
                 resources: [resourceId],
                 attributes: [
                     ["resource.children_creatable"],
+                    ["resource.has_permission", "data.read"],
+                    ["resource.has_permission", "data.read"],
                     ["resource.summary"],
                 ],
-                route,
             });
-            assert(items[0][0] === resourceId);
-            const [dataCreatable, dataSummary] = items[0][1];
+            const item = items[0];
+            assert(item.id === resourceId);
+            const dataCreatable = item.get("resource.children_creatable");
+            const dataSummary = item.get("resource.summary");
             setCreatable(dataCreatable);
             setSummary(dataSummary);
         })();
-    }, [resourceId, route]);
+    }, [fetchResourceAttr, resourceId]);
 
     return (
         <>

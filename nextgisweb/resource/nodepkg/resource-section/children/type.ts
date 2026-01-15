@@ -1,19 +1,18 @@
+import type { ResourceAttrItem } from "@nextgisweb/resource/api/ResourceAttrItem";
+import type { Attributes } from "@nextgisweb/resource/api/resource-attr";
 import type { ResourceCls } from "@nextgisweb/resource/type/api";
 
-export type ChildrenResourceAction = {
-    href: string;
-    target?: "_self" | "_blank";
-    title: string;
-    icon: string;
-    key: string[];
-};
+import type { DefaultAttributes } from "./ResourceSectionChildren";
 
-export type ChildrenResource = {
+export interface ChildrenResource<
+    A extends Attributes[number][] = typeof DefaultAttributes,
+> {
     id: number;
-    displayName: string;
     cls: ResourceCls;
+    displayName: string;
     clsDisplayName?: string;
     creationDate?: string;
     ownerUserDisplayName?: string;
-    actions: ChildrenResourceAction[];
-};
+
+    it: ResourceAttrItem<A>;
+}
