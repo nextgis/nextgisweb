@@ -4,12 +4,18 @@ Changes
 5.3.0
 -----
 
-- Advanced feature filtering capabilities.
-- Enhanced extent selector widget.
+- Advanced feature table filtering capabilities.
+- Viewing feature versioning history in the UI.
+- Reverting versioned feature layers to previous states.
+- Ability to create vector layers from existing layers and versions.
+- Improved extent selector widget in webmap settings.
 - Display total and filtered feature counts in feature tables.
 - Dimmed out-of-scale-range layers in the tree on webmaps.
-- Map loading indicator on webmaps.
-- Display measurement SRS on webmaps.
+- Improvements to the printable webmap legend.
+- Display measurement spatial reference system on webmaps.
+- Transactional HTTP API for feature attachments and descriptions.
+- Fixed PostGIS layer editing on webmaps.
+- SQLAlchemy library upgraded to 2.0.
 
 
 5.2.0
