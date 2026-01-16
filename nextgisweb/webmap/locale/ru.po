@@ -6,11 +6,11 @@ msgstr "Тайлы"
 msgid "Image"
 msgstr "Изображение"
 
-#: component.py:26
+#: component.py:25
 msgid "Main web map"
 msgstr "Основная веб-карта"
 
-#: favorite.py:6 view.py:184
+#: favorite.py:6 view.py:230
 msgid "Display"
 msgstr "Открыть"
 
@@ -18,7 +18,7 @@ msgstr "Открыть"
 msgid "Fragment"
 msgstr "Фрагмент"
 
-#: model.py:47 model.py:65 view.py:179 view.py:206
+#: model.py:47 model.py:65 view.py:225 view.py:252
 msgid "Web map"
 msgstr "Веб-карта"
 
@@ -37,7 +37,7 @@ msgctxt "permission"
 msgid "Manage annotations"
 msgstr "Управление аннотациями"
 
-#: nodepkg/clone-webmap/CloneWebmap.tsx:21 view.py:194
+#: nodepkg/clone-webmap/CloneWebmap.tsx:21 view.py:240
 msgid "Clone"
 msgstr "Клонировать"
 
@@ -75,11 +75,11 @@ msgstr "Отключить"
 msgid "Open full map"
 msgstr "Открыть карту целиком"
 
-#: nodepkg/display/Display.ts:247
+#: nodepkg/display/Display.ts:254
 msgid "Object not found"
 msgstr "Объект не найден"
 
-#: nodepkg/display/Display.ts:248
+#: nodepkg/display/Display.ts:255
 msgid "Object from URL parameters not found"
 msgstr "Объект из параметров строки запроса не найден"
 
@@ -261,25 +261,25 @@ msgstr "Показать мое местоположение"
 msgid "Your location could not be determined"
 msgstr "Определить местоположение не удалось"
 
-#: nodepkg/map-component/control/RotateControl.tsx:31
+#: nodepkg/map-component/control/RotateControl.tsx:33
 msgid "Reset rotation"
 msgstr "Отменить поворот"
 
-#: nodepkg/map-component/control/ZoomControl.tsx:66
+#: nodepkg/map-component/control/ZoomControl.tsx:61
 msgid "Current zoom level"
 msgstr "Текущий зум"
 
-#: nodepkg/map-component/control/ZoomControl.tsx:86
+#: nodepkg/map-component/control/ZoomControl.tsx:81
 #: nodepkg/map-component/tool/ToolZoom.tsx:22 nodepkg/map-controls/map-tools.ts:12
 msgid "Zoom in"
 msgstr "Приблизить"
 
-#: nodepkg/map-component/control/ZoomControl.tsx:87
+#: nodepkg/map-component/control/ZoomControl.tsx:82
 #: nodepkg/map-component/tool/ToolZoom.tsx:22 nodepkg/map-controls/map-tools.ts:22
 msgid "Zoom out"
 msgstr "Отодвинуть"
 
-#: nodepkg/map-component/control/ZoomControl.tsx:186
+#: nodepkg/map-component/control/ZoomControl.tsx:181
 msgid "Back to the initial extent"
 msgstr "Вернуться к начальному охвату"
 
@@ -361,15 +361,15 @@ msgstr "Определить мое местоположение"
 
 #: nodepkg/map-controls/map-controls.ts:111
 #: nodepkg/map-controls/map-controls.ts:116 nodepkg/settings/SettingsForm.tsx:84
-#: option/base.py:41
+#: option/base.py:42
 msgid "Identification"
 msgstr "Идентификация"
 
-#: nodepkg/map-controls/map-tools.ts:63
+#: nodepkg/map-controls/map-tools.ts:62
 msgid "Cursor coordinates / extent"
 msgstr "Координаты курсора / охвата"
 
-#: nodepkg/map-controls/map-tools.ts:74
+#: nodepkg/map-controls/map-tools.ts:72
 msgid "Editor"
 msgstr "Редактор"
 
@@ -508,7 +508,7 @@ msgstr "Растр"
 msgid "N/A"
 msgstr "Н/Д"
 
-#: nodepkg/panel/identify/plugin.tsx:12 nodepkg/store/Identify.ts:36
+#: nodepkg/panel/identify/plugin.tsx:12 nodepkg/store/Identify.ts:42
 msgid "Identify"
 msgstr "Идентификация"
 
@@ -700,7 +700,7 @@ msgstr "px"
 msgid "Map tools"
 msgstr "Инструменты карты"
 
-#: nodepkg/panel/share/SharePanel.tsx:401 option/base.py:31
+#: nodepkg/panel/share/SharePanel.tsx:401 option/base.py:32
 msgid "Panels"
 msgstr "Панели"
 
@@ -753,11 +753,11 @@ msgstr "Отключить прилипание"
 msgid "Enable snapping"
 msgstr "Включить прилипание"
 
-#: nodepkg/plugin/layer-editor/ToolEditor.tsx:163
+#: nodepkg/plugin/layer-editor/ToolEditor.tsx:180
 msgid "Stop editing layer: {layer}"
 msgstr "Завершить редактирование слоя: {layer}"
 
-#: nodepkg/plugin/layer-editor/modes/AttributeMode.tsx:123
+#: nodepkg/plugin/layer-editor/modes/AttributeMode.tsx:121
 msgid "Edit attributes"
 msgstr "Редактировать атрибуты"
 
@@ -1150,11 +1150,11 @@ msgstr "Информация о геометрии"
 msgid "Request multiplexing"
 msgstr "Мультиплексирование запросов"
 
-#: option/base.py:36
+#: option/base.py:37
 msgid "Tools"
 msgstr "Инструменты"
 
-#: option/base.py:46
+#: option/base.py:47
 msgid "Miscellaneous"
 msgstr "Прочее"
 
@@ -1166,14 +1166,14 @@ msgstr "Встраивание веб-карты не разрешено для 
 msgid "View the map on %s"
 msgstr "Посмотреть карту на %s"
 
-#: view.py:96
+#: view.py:102
 msgid "Clone web map"
 msgstr "Клонировать веб-карту"
 
-#: view.py:108
+#: view.py:114
 msgid "Embedded webmap preview"
 msgstr "Просмотр встроенной веб-карты"
 
-#: view.py:119
+#: view.py:125
 msgid "Web map settings"
 msgstr "Настройки веб-карты"

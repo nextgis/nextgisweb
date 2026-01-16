@@ -59,9 +59,7 @@ mapControlRegistry(COMP_ID, {
     key: "tv",
     order: 60,
     component: () => import("../map-component/tool/ToolViewerInfo"),
-    props: {
-        label: gettext("Cursor coordinates / extent"),
-    },
+    label: gettext("Cursor coordinates / extent"),
     position: { inside: "map-toolbar" },
     hideOnMobile: true,
     showOnPreview: true,
