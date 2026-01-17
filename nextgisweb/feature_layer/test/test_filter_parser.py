@@ -162,9 +162,10 @@ def test_unsupported_operator(parser):
 
 
 def test_unknown_field(parser):
+    field_name = "unknown"
     with pytest.raises(FilterExpressionError) as exc:
-        parser.parse(["all", ["==", ["get", "unknown"], "value"]])
-    assert exc.value.data == {"field": "unknown"}
+        parser.parse(["all", ["==", ["get", field_name], "value"]])
+    assert exc.value.data == {"reason": f"Field '{field_name}' not found"}
 
 
 @pytest.mark.parametrize(
@@ -241,3 +242,24 @@ def test_in_operator_type_conversion(parser, columns):
 def test_boolean_not_allowed_for_integer(parser):
     with pytest.raises(FilterExpressionError):
         parser.parse(["all", ["==", ["get", "price"], True]])
+
+
+def test_get_supported_operators():
+    operators = sorted(FilterParser.get_supported_operators())
+    expected = sorted(
+        [
+            "all",
+            "any",
+            "==",
+            "!=",
+            ">",
+            ">=",
+            "<",
+            "<=",
+            "in",
+            "!in",
+            "has",
+            "!has",
+        ]
+    )
+    assert operators == expected
