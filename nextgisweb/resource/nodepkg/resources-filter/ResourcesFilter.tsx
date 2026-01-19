@@ -28,7 +28,7 @@ const resourcesToOptions = (resourcesInfo: CompositeRead[]) => {
         });
 
         return {
-            value: `${resource.display_name}`,
+            value: `${resource.id}`,
             key: `${resource.id}`,
             url: resourceUrl,
             label: (
