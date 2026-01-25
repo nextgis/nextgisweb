@@ -434,7 +434,7 @@ class OAuthHelper:
             logger.error(str(exc))
             return "unknown error"
 
-        if response.status_code != 302:
+        if response.status_code >= 400 or response.status_code < 200:
             return f"invalid response code - {response.status_code}"
 
     def _server_request(self, endpoint, params, *, default_method="POST", access_token=None):
