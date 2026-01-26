@@ -10,7 +10,7 @@ from pyramid.httpexceptions import HTTPBadRequest
 from pyramid.response import Response
 
 from nextgisweb.env import gettext
-from nextgisweb.lib.apitype import AnyOf, AsJSON, ContentType, StatusCode
+from nextgisweb.lib.apitype import AnyOf, AsJSON, ContentType, Query, StatusCode
 
 from nextgisweb.core.exception import UserException, ValidationError
 from nextgisweb.resource import (
@@ -59,6 +59,8 @@ Symbols = Annotated[
     dict[int, Annotated[list[SymbolRange], Meta(min_length=1)]],
     Meta(examples=[dict()]),  # Just to stop Swagger UI make crazy defaults
 ]
+
+Filter = Annotated[dict[int, str], Query(name="filter"), Meta(examples=[dict()])]
 
 NoDataStatusCode = Annotated[
     Literal[200, 204, 404],
@@ -163,6 +165,7 @@ def tile(
     x: TileX,
     y: TileY,
     symbols: Symbols,
+    p_filter: Filter,
     nd: NoDataStatusCode = 200,
     cache: TileCache = True,
 ) -> RenderResponse:
@@ -188,12 +191,14 @@ def tile(
         rimg = None  # Resulting resource image
 
         rsymbols = p_symbols.get(resid)
+        rfilter = p_filter.get(resid)
         tcache = obj.tile_cache
 
         # Is requested tile may be cached?
         cache_enabled = (
             p_cache
             and rsymbols is None
+            and rfilter is None
             and tcache is not None
             and tcache.enabled
             and (tcache.max_z is None or z <= tcache.max_z)
@@ -207,6 +212,8 @@ def tile(
             cond = dict()
             if rsymbols is not None:
                 cond["symbols"] = rsymbols
+            if rfilter is not None:
+                cond["filter"] = rfilter
             req = obj.render_request(srs_obj, cond=cond)
             rimg = req.render_tile((z, x, y), TILE_SIZE)
 
@@ -238,6 +245,7 @@ def image(
     extent: RenderExtent,
     size: ImageSize,
     symbols: Symbols,
+    p_filter: Filter,
     nd: NoDataStatusCode = 200,
     cache: TileCache = True,
     tdi: TileDebugInfo = False,
@@ -298,6 +306,7 @@ def image(
         rimg = None
 
         rsymbols = p_symbols.get(resid)
+        rfilter = p_filter.get(resid)
         tcache = obj.tile_cache
 
         # Is requested image may be cached via tiles?
@@ -305,6 +314,7 @@ def image(
             p_cache
             and cache_zoom is not None
             and rsymbols is None
+            and rfilter is None
             and tcache is not None
             and tcache.enabled
             and tcache.image_compose
@@ -346,6 +356,8 @@ def image(
             cond = dict()
             if rsymbols is not None:
                 cond["symbols"] = rsymbols
+            if rfilter is not None:
+                cond["filter"] = rfilter
             req = obj.render_request(srs_obj, cond=cond)
 
             if cache_enabled:
