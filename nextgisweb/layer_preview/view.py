@@ -8,6 +8,9 @@ from nextgisweb.jsrealm import icon
 from nextgisweb.raster_layer import RasterLayer
 from nextgisweb.render import IRenderableStyle
 from nextgisweb.resource import DataScope, Resource, resource_factory
+from nextgisweb.resource.attr.api import ResourceAttrRequestContext
+
+from .attr import LayerPreviewAttrAvailable
 
 
 @react_renderer("@nextgisweb/layer-preview/preview-layer")
@@ -45,12 +48,10 @@ def setup_pyramid(comp, config):
 
     @Resource.__dynmenu__.add
     def _resource_dynmenu(args):
-        if (
-            IFeatureLayer.providedBy(args.obj)
-            or IRenderableStyle.providedBy(args.obj)
-            or (isinstance(args.obj, RasterLayer) and args.obj.cog)
-            or (isinstance(args.obj, BasemapLayer))
-        ) and (args.obj.has_permission(DataScope.read, args.request.user)):
+        ctx = ResourceAttrRequestContext(request=args.request)
+        attr = LayerPreviewAttrAvailable()
+
+        if attr(args.obj, ctx=ctx):
             yield Link(
                 "extra/preview",
                 gettext("Preview"),
