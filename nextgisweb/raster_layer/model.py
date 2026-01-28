@@ -162,6 +162,9 @@ class RasterLayer(Resource, SpatialLayerMixin):
                     band.GetNoDataValue() is not None
                 )
 
+        # Check if this is an RGB or RGBA image with 8-bit color depth
+        is_rgba = data_type == gdal.GDT_Byte and ds.RasterCount in (3, 4)
+
         # Convert the mask band to the alpha band
         if mask_flags.count(gdal.GMF_PER_DATASET) == len(mask_flags):
             bands = [bidx for bidx in range(1, ds.RasterCount + 1)]
@@ -265,6 +268,8 @@ class RasterLayer(Resource, SpatialLayerMixin):
                 "BLOCKSIZE=256",
                 "-co",
                 "RESAMPLING=NEAREST",
+                "-co",
+                f"OVERVIEW_COMPRESS={'JPEG' if is_rgba else 'AUTO'}",
             )
         else:
             cmd_opts = (
