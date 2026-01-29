@@ -5,6 +5,8 @@ import type { ActionToolbarAction } from "@nextgisweb/gui/action-toolbar";
 import type { SizeType } from "@nextgisweb/gui/antd";
 import type { CompositeRead } from "@nextgisweb/resource/type/api";
 
+import type { FilterExpressionString } from "../feature-filter/type";
+
 import { KEY_FIELD_ID } from "./constant";
 import type { QueryParams } from "./hook/useFeatureTable";
 import type { ActionProps, FeatureGridProps, SetValue } from "./type";
@@ -25,7 +27,9 @@ export class FeatureGridStore {
     @observable.shallow accessor queryParams: QueryParams | null = null;
     @observable.shallow accessor visibleFields: number[] = [KEY_FIELD_ID];
     @observable.shallow accessor fields: FeatureLayerFieldRead[] = [];
-    @observable.ref accessor filterExpression: string | undefined = undefined;
+    @observable.ref accessor filterExpression:
+        | FilterExpressionString
+        | undefined = undefined;
 
     @observable.ref accessor beforeDelete:
         | ((featureIds: number[]) => void)
@@ -152,7 +156,7 @@ export class FeatureGridStore {
     }
 
     @action.bound
-    setFilterExpression(filterExpression: string | undefined) {
+    setFilterExpression(filterExpression: FilterExpressionString | undefined) {
         this.filterExpression = filterExpression;
     }
 

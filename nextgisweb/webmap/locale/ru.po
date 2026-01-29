@@ -165,6 +165,7 @@ msgid "Enabled"
 msgstr "Включен"
 
 #: nodepkg/items-widget/ItemsWidget.tsx:34
+#: nodepkg/plugin/layer-identifiable/LayerIdentifiablePlugin.tsx:19
 msgid "Identifiable"
 msgstr "Идентифицируемый"
 
@@ -231,7 +232,12 @@ msgstr "Публичная аннотация"
 msgid "My private annotation"
 msgstr "Моя приватная аннотация"
 
-#: nodepkg/layers-tree/LayerTreeItemTitle.tsx:16
+#: nodepkg/layers-tree/FilterAction.tsx:12
+#: nodepkg/plugin/layer-filter/LayerFilterPlugin.tsx:28
+msgid "Filter"
+msgstr "Фильтр"
+
+#: nodepkg/layers-tree/LayerTreeItemTitle.tsx:17
 msgid ""
 "This layer is not visible at the current map scale. Zoom to make the layer "
 "visible."
@@ -500,7 +506,7 @@ msgstr "Приблизить к объекту"
 msgid "Band {}"
 msgstr "Канал {}"
 
-#: nodepkg/panel/identify/component/RasterInfoSection.tsx:27
+#: nodepkg/panel/identify/component/RasterInfoSection.tsx:29
 msgid "Raster"
 msgstr "Растр"
 
@@ -1122,11 +1128,11 @@ msgstr "Мультиполигон"
 msgid "GeometryCollection"
 msgstr "Коллекция геометрий"
 
-#: nodepkg/webmap-feature-grid-tab/WebMapFeatureGridTab.tsx:25
+#: nodepkg/webmap-feature-grid-tab/WebMapFeatureGridTab.tsx:26
 msgid "Go to"
 msgstr "Перейти"
 
-#: nodepkg/webmap-feature-grid-tab/WebMapFeatureGridTab.tsx:152
+#: nodepkg/webmap-feature-grid-tab/WebMapFeatureGridTab.tsx:156
 msgid "Selected feature has no geometry"
 msgstr "Выбранный объект не имеет геометрии"
 

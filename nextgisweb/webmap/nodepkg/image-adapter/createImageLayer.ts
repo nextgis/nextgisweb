@@ -1,5 +1,6 @@
 import { getUid } from "ol/util";
 
+import type { FilterExpressionString } from "@nextgisweb/feature-layer/feature-filter/type";
 import { isAbortError } from "@nextgisweb/gui/error";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import {
@@ -15,6 +16,7 @@ import type { CreateLayerOptions } from "../type/CreateLayerOptions";
 interface QueryParams {
     resource: string;
     symbols?: string;
+    filter?: FilterExpressionString;
     BBOX?: string;
     WIDTH?: string;
     HEIGHT?: string;
@@ -26,6 +28,8 @@ function parseQueryParams(queryString: string): QueryParams {
     const params: QueryParams = {
         resource: urlParams.get("resource") || "",
         symbols: urlParams.get("symbols") || undefined,
+        filter:
+            (urlParams.get("filter") as FilterExpressionString) || undefined,
         BBOX: urlParams.get("BBOX") || undefined,
         WIDTH: urlParams.get("WIDTH") || undefined,
         HEIGHT: urlParams.get("HEIGHT") || undefined,
@@ -63,6 +67,11 @@ export function createImageLayer(
 
                 const resource = queryObject.resource;
                 const symbolsParam = queryObject.symbols;
+                const filterParam = queryObject.filter;
+
+                const filter = filterParam
+                    ? `&filter[${resource}]=${filterParam}`
+                    : "";
                 const symbols = symbolsParam
                     ? `&symbols[${resource}]=${symbolsParam === "-1" ? "" : symbolsParam}`
                     : "";
@@ -72,6 +81,7 @@ export function createImageLayer(
                     `&extent=${queryObject.BBOX}` +
                     `&size=${queryObject.WIDTH},${queryObject.HEIGHT}` +
                     "&nd=204" +
+                    filter +
                     symbols;
 
                 const img = imageTile.getImage() as HTMLImageElement;

@@ -3,6 +3,7 @@ import type { Layer } from "ol/layer";
 import type { Source } from "ol/source";
 import type { Style } from "ol/style";
 
+import type { FilterExpressionString } from "@nextgisweb/feature-layer/feature-filter/type";
 import type { LayerSymbols } from "@nextgisweb/webmap/compat/type";
 
 export interface LayerOptions {
@@ -94,6 +95,10 @@ export abstract class CoreLayer<
 
     setSymbols(symbols: LayerSymbols): void {
         this.toggleSourceBySymbols(symbols, this.olLayer, this.olSource);
+    }
+
+    setFilter(_filter: FilterExpressionString | null) {
+        //
     }
 
     setZIndex(zIndex: number) {

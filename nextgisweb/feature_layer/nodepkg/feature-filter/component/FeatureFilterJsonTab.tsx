@@ -2,6 +2,7 @@ import { observer } from "mobx-react-lite";
 import { Suspense, lazy, useCallback, useMemo } from "react";
 
 import type { FilterEditorStore } from "../FilterEditorStore";
+import type { FilterExpressionString } from "../type";
 
 import { LoadingOutlined } from "@ant-design/icons";
 
@@ -21,8 +22,8 @@ const CodeLoadingFallback = () => (
 );
 
 export interface FeatureFilterJsonProps {
-    value: string | undefined;
-    onChange: (value: string | undefined) => void;
+    value: FilterExpressionString | undefined;
+    onChange: (value: FilterExpressionString | undefined) => void;
     isValid?: boolean;
 }
 
@@ -36,7 +37,7 @@ const FeatureFilterJson = ({
             const newValue = val === "" ? undefined : val;
 
             if (!onChange) return;
-            onChange(newValue);
+            onChange(newValue as FilterExpressionString);
         },
         [onChange]
     );
@@ -66,7 +67,7 @@ interface JsonTabProps {
 
 export const FeatureFilterJsonTab = observer(({ store }: JsonTabProps) => {
     const handleJsonChange = useCallback(
-        (v: string | undefined) => {
+        (v: FilterExpressionString | undefined) => {
             store.setJsonValue(v);
         },
         [store]

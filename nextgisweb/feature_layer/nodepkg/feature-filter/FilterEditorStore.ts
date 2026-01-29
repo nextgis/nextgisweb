@@ -7,12 +7,14 @@ import { gettext, gettextf } from "@nextgisweb/pyramid/i18n";
 import { getDefaultValue } from "./component/FilterCondition";
 import { OPERATORS, ValidOperators } from "./type";
 import type {
+    ActiveTab,
     CmpOp,
     ConditionExpr,
     ConditionValue,
     EqNeOp,
     FilterCondition,
     FilterExpression,
+    FilterExpressionString,
     FilterGroup,
     FilterGroupChild,
     FilterState,
@@ -39,9 +41,17 @@ const isTemporalDatatype = (
 ): datatype is TemporalDatatype =>
     TEMPORAL_TYPES.includes(datatype as TemporalDatatype);
 
+function stringifyExpresion(
+    value: any,
+    replacer?: (string | number)[] | null | undefined,
+    space?: string | number | undefined
+): FilterExpressionString {
+    return JSON.stringify(value, replacer, space) as FilterExpressionString;
+}
+
 export interface FilterEditorStoreOptions {
     fields: FeatureLayerFieldRead[];
-    value?: string;
+    value?: FilterExpressionString;
 }
 
 export interface MoveFilterItem {
@@ -67,11 +77,13 @@ const EMPTY_FILTER_STATE: FilterState = {
 export class FilterEditorStore {
     @observable.shallow accessor fields: FeatureLayerFieldRead[] = [];
     @observable.deep accessor filterState: FilterState = EMPTY_FILTER_STATE;
-    @observable accessor activeTab: string = "constructor";
-    @observable accessor jsonValue: string | undefined = undefined;
+    @observable accessor activeTab: ActiveTab = "constructor";
+    @observable accessor jsonValue: FilterExpressionString | undefined =
+        undefined;
     @observable accessor isValid: boolean = true;
     @observable accessor validationError: string | undefined = undefined;
-    @observable accessor validJsonValue: string | undefined = undefined;
+    @observable accessor validJsonValue: FilterExpressionString | undefined =
+        undefined;
     @observable accessor scrollToItemId: number | null = null;
 
     private transientIdCounter = 0;
@@ -87,7 +99,7 @@ export class FilterEditorStore {
     }
 
     @action.bound
-    setActiveTab(tab: string) {
+    setActiveTab(tab: ActiveTab) {
         if (tab === this.activeTab) {
             return;
         }
@@ -97,7 +109,7 @@ export class FilterEditorStore {
                 const expression = this.convertToFilterExpression(
                     this.filterState.rootGroup
                 );
-                this.jsonValue = JSON.stringify(expression, null, 2);
+                this.jsonValue = stringifyExpresion(expression, null, 2);
                 this.isValid = true;
             } catch (error) {
                 console.error(
@@ -139,14 +151,14 @@ export class FilterEditorStore {
     }
 
     @action.bound
-    setJsonValue(value: string | undefined) {
+    setJsonValue(value: FilterExpressionString | undefined) {
         this.jsonValue = value;
         this.validateCurrentState();
     }
 
     @action.bound
     clear() {
-        this.jsonValue = JSON.stringify([]);
+        this.jsonValue = stringifyExpresion([]);
         this.filterState = EMPTY_FILTER_STATE;
         this.validateCurrentState();
     }
@@ -320,13 +332,13 @@ export class FilterEditorStore {
     }
 
     @action.bound
-    loadFilter(value: string) {
+    loadFilter(value: FilterExpressionString) {
         try {
             this.transientIdCounter = 0;
             const expression = JSON.parse(value);
             this.validateFilterExpression(expression);
             const filterState = this.parseFilterExpression(expression);
-            this.validJsonValue = JSON.stringify(expression);
+            this.validJsonValue = stringifyExpresion(expression);
             this.filterState = { rootGroup: filterState };
             this.isValid = true;
         } catch (error) {
@@ -362,7 +374,7 @@ export class FilterEditorStore {
         return expression;
     }
 
-    toJsonString(): string | undefined {
+    toJsonString(): FilterExpressionString | undefined {
         if (this.activeTab === "json" && this.jsonValue) {
             try {
                 const parsed = JSON.parse(this.jsonValue);
@@ -386,7 +398,7 @@ export class FilterEditorStore {
             return undefined;
         }
         this.validateFilterExpression(expression);
-        return JSON.stringify(expression);
+        return stringifyExpresion(expression);
     }
 
     @action.bound
@@ -749,7 +761,7 @@ export class FilterEditorStore {
             this.validJsonValue =
                 expression.length === 0
                     ? undefined
-                    : JSON.stringify(expression);
+                    : stringifyExpresion(expression);
             this.isValid = true;
             this.validationError = undefined;
         } catch (error) {

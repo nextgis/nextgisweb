@@ -19,6 +19,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { ResourceSelectMultiple } from "@nextgisweb/resource/component";
 import type { SRSRead } from "@nextgisweb/spatial-ref-sys/type/api";
 
+import type { FilterExpressionString } from "../feature-filter/type";
 import { useExportFeatureLayer } from "../hook/useExportFeatureLayer";
 import type { ExportFeatureLayerOptions } from "../hook/useExportFeatureLayer";
 
@@ -48,7 +49,7 @@ interface FormProps extends ExportFeatureLayerOptions {
     zipped: boolean;
     extent: (null | number)[];
     ilike: string;
-    filter?: string;
+    filter?: FilterExpressionString;
 }
 
 type FormPropsKey = Extract<keyof FormProps, string>;
@@ -109,7 +110,7 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
     const [fields, setFields] = useState<FormField<FormPropsKey>[]>([]);
     const [isReady, setIsReady] = useState(false);
     const [filterExpression, setFilterExpression] = useState<
-        string | undefined
+        FilterExpressionString | undefined
     >();
     const [layerFields, setLayerFields] = useState<FeatureLayerFieldRead[]>([]);
     const form = Form.useForm<FormProps>()[0];
@@ -141,7 +142,7 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
     ]);
 
     const handleFilterApply = useCallback(
-        (filter: string | undefined) => {
+        (filter: FilterExpressionString | undefined) => {
             setFilterExpression(filter);
             form.setFieldValue("filter", filter);
         },
@@ -212,7 +213,7 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
             urlParamsToset.fields = fieldsStr.split(",").map(Number);
         }
         if (filterStr) {
-            setFilterExpression(filterStr);
+            setFilterExpression(filterStr as FilterExpressionString);
         }
         setUrlParams(urlParamsToset);
     }, []);

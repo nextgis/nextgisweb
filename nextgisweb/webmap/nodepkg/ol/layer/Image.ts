@@ -3,6 +3,8 @@ import { Image as ImageLayer } from "ol/layer";
 import { ImageWMS } from "ol/source";
 import type { Options as ImageWMSOptions } from "ol/source/ImageWMS";
 
+import type { FilterExpressionString } from "@nextgisweb/feature-layer/feature-filter/type";
+
 import { CoreLayer } from "./CoreLayer";
 import type { LayerOptions } from "./CoreLayer";
 
@@ -32,6 +34,14 @@ export default class Image extends CoreLayer<
         super.setSymbols(symbols);
         this.olSource.updateParams({
             symbols,
+        });
+    }
+
+    @action
+    override setFilter(filter: FilterExpressionString | null): void {
+        super.setFilter(filter);
+        this.olSource.updateParams({
+            filter,
         });
     }
 }

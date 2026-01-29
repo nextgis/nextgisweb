@@ -3,7 +3,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { observer } from "mobx-react-lite";
 
 import type { FilterEditorStore } from "../FilterEditorStore";
-import { useAutoScroll } from "../hooks/useAutoScroll";
+import { useAutoScroll } from "../hook/useAutoScroll";
 import type { FilterCondition as FilterConditionType } from "../type";
 
 import { FilterCondition } from "./FilterCondition";

@@ -23,6 +23,7 @@ import { useResource } from "@nextgisweb/resource/hook/useResource";
 import type { CompositeRead } from "@nextgisweb/resource/type/api";
 
 import type { FeatureEditorWidgetProps } from "../feature-editor/type";
+import type { FilterExpressionString } from "../feature-filter/type";
 import FilteredCount from "../filtered-count/FilteredCount";
 
 import type { FeatureGridStore } from "./FeatureGridStore";
@@ -61,13 +62,13 @@ export const FeatureGridActions = observer(
             queryParams,
             selectedIds,
             editOnNewPage,
+            filterExpression,
             beforeDelete,
             deleteError,
             onDelete,
             onSave: onSaveProp,
             onOpen,
             fields,
-            filterExpression,
         } = store;
 
         const { isExportAllowed } = useResource({ id });
@@ -140,7 +141,7 @@ export const FeatureGridActions = observer(
         );
 
         const handleFilterApply = useCallback(
-            (filter: string | undefined) => {
+            (filter: FilterExpressionString | undefined) => {
                 store.setFilterExpression(filter);
                 store.setQueryParams({
                     ...store.queryParams,

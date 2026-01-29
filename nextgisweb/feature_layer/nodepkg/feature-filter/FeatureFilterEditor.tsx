@@ -14,7 +14,11 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { FilterEditorStore } from "./FilterEditorStore";
 import { ConstructorTab } from "./component/ConstructorTab";
 import { FeatureFilterJsonTab } from "./component/FeatureFilterJsonTab";
-import type { FeatureFilterEditorProps } from "./type";
+import type {
+    ActiveTab,
+    FeatureFilterEditorProps,
+    FilterExpressionString,
+} from "./type";
 
 import "./FeatureFilterEditor.less";
 
@@ -33,7 +37,9 @@ export const FeatureFilterEditor = observer(
         onApply,
         onCancel,
     }: FeatureFilterEditorProps) => {
-        const [initialValue] = useState<string | undefined>(value);
+        const [initialValue] = useState<FilterExpressionString | undefined>(
+            value
+        );
         const store = useMemo(
             () => new FilterEditorStore({ fields, value }),
             [fields, value]
@@ -62,7 +68,8 @@ export const FeatureFilterEditor = observer(
             }
 
             try {
-                const jsonString = store.toJsonString();
+                const jsonString =
+                    store.toJsonString() as FilterExpressionString;
                 onChange?.(jsonString);
                 onApply?.(jsonString);
                 messageApi.success(gettext("Filter applied successfully"));
@@ -128,7 +135,7 @@ export const FeatureFilterEditor = observer(
                     type="card"
                     size="large"
                     activeKey={store.activeTab}
-                    onChange={store.setActiveTab}
+                    onChange={(e) => store.setActiveTab(e as ActiveTab)}
                     items={items}
                     parentHeight
                 />

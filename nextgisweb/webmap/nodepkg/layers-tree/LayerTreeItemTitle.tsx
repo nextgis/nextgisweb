@@ -8,6 +8,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { TreeItemStore } from "../store/tree-store/TreeItemStore";
 
 import { DropdownActions } from "./DropdownActions";
+import { FilterAction } from "./FilterAction";
 import { Legend } from "./Legend";
 import { LegendAction } from "./LegendAction";
 
@@ -36,13 +37,17 @@ export const LayerTreeItemTitle = observer(
         const [moreClickId, setMoreClickId] = useState<number>();
         const [update, setUpdate] = useState(false);
 
-        const shouldActions = showLegend || showDropdown;
+        const isLayer = treeItem.isLayer();
+        const hasFilter = isLayer && treeItem.filter;
+
+        const shouldActions = showLegend || showDropdown || hasFilter;
 
         let actions;
         let isOutOfScaleRange = false;
         if (shouldActions) {
             let legendAction;
-            if (treeItem.isLayer()) {
+            let filterAction;
+            if (isLayer) {
                 const treeLayer = treeItem;
 
                 isOutOfScaleRange = treeItem.isOutOfScaleRange;
@@ -54,6 +59,13 @@ export const LayerTreeItemTitle = observer(
                             onClick={() => setUpdate((prev) => !prev)}
                         />
                     );
+
+                filterAction = hasFilter && (
+                    <FilterAction
+                        nodeData={treeItem}
+                        onClick={() => setUpdate((prev) => !prev)}
+                    />
+                );
             }
 
             const dropdownAction = showDropdown && (
@@ -75,6 +87,7 @@ export const LayerTreeItemTitle = observer(
                     className="tree-item-action"
                     style={{ alignItems: "center" }}
                 >
+                    {filterAction}
                     {legendAction}
                     {dropdownAction}
                 </Col>

@@ -21,7 +21,8 @@ const WebmapLayer = observer(
         const layerItemRef = useRef(layerItem);
         const [layer, setLayer] = useState<CoreLayer | null>(null);
 
-        const { visibility, opacity, symbols, drawOrderPosition } = layerItem;
+        const { visibility, opacity, symbols, filter, drawOrderPosition } =
+            layerItem;
         const { hmux } = mapStore;
 
         const resolutionDebounced = useMemoDebounce(mapStore.resolution, 100);
@@ -91,6 +92,12 @@ const WebmapLayer = observer(
                 layer.setSymbols(symbols);
             }
         }, [layer, symbols]);
+
+        useEffect(() => {
+            if (layer) {
+                layer.setFilter(filter);
+            }
+        }, [layer, filter]);
 
         useEffect(() => {
             if (layer && drawOrderPosition !== null) {

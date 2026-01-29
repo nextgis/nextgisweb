@@ -47,10 +47,10 @@ export const FeatureGrid = observer(
             queryParams,
             selectedIds,
             visibleFields,
+            filterExpression,
             cleanSelectedOnFilter,
             bumpVersion,
             onSelect,
-            filterExpression,
         } = store;
 
         const { data: totalData, refresh: refreshTotal } = useRouteGet(

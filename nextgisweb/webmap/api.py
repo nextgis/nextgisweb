@@ -490,6 +490,7 @@ class LayerIdentification(Struct, kw_only=True):
 class LayerItemConfig(BaseItem, tag="layer", tag_field="type"):
     layerId: int
     styleId: int
+    filterable: bool
     visibility: bool
     identifiable: bool
     transparency: float | None

@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
 import { Modal } from "@nextgisweb/gui/antd";
@@ -7,11 +7,12 @@ import type { ShowModalOptions } from "@nextgisweb/gui/showModal";
 
 import { FeatureFilterEditor } from "./FeatureFilterEditor";
 import "./FeatureFilterModal.less";
+import type { FilterExpressionString } from "./type";
 
 export interface FeatureFilterModalProps extends ShowModalOptions {
     fields: FeatureLayerFieldRead[];
-    value?: string | undefined;
-    onApply?: (filter: string | undefined) => void;
+    value?: FilterExpressionString | undefined;
+    onApply?: (filter: FilterExpressionString | undefined) => void;
     open?: boolean;
     onCancel?: (e?: any) => void;
 }
@@ -26,7 +27,9 @@ export const FeatureFilterModal = observer(
         ...modalProps
     }: FeatureFilterModalProps) => {
         const [open, setOpen] = useState(openProp ?? true);
-        const [filter, setFilter] = useState<string | undefined>(value);
+        const [filter, setFilter] = useState<
+            FilterExpressionString | undefined
+        >(value);
 
         useEffect(() => {
             if (openProp !== undefined) {
@@ -34,19 +37,15 @@ export const FeatureFilterModal = observer(
             }
         }, [openProp]);
 
-        const handleClose = () => {
+        const handleClose = useCallback(() => {
             setOpen(false);
             onCancel?.(undefined);
-        };
+        }, [onCancel]);
 
-        const handleApply = () => {
+        const handleApply = useCallback(() => {
             onApply?.(filter);
             handleClose();
-        };
-
-        const changeFilter = (filter: string | undefined) => {
-            setFilter(filter);
-        };
+        }, [filter, handleClose, onApply]);
 
         return (
             <Modal
@@ -62,7 +61,7 @@ export const FeatureFilterModal = observer(
                 <FeatureFilterEditor
                     fields={fields}
                     value={value}
-                    onChange={changeFilter}
+                    onChange={setFilter}
                     onApply={handleApply}
                     onCancel={handleClose}
                 />

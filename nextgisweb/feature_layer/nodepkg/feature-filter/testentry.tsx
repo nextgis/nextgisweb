@@ -7,6 +7,8 @@ import type { TabsProps } from "@nextgisweb/gui/antd";
 import { Code } from "@nextgisweb/gui/component/code";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
+import type { FilterExpressionString } from "./type";
+
 import { FeatureFilterEditor, FeatureFilterModal } from "./index";
 
 const sampleFields: FeatureLayerFieldRead[] = [
@@ -90,12 +92,16 @@ const sampleFields: FeatureLayerFieldRead[] = [
 ];
 
 const sampleFilters = {
-    simple: JSON.stringify([">", ["get", "population"], 1000000]),
+    simple: JSON.stringify([
+        ">",
+        ["get", "population"],
+        1000000,
+    ]) as FilterExpressionString,
     complex: JSON.stringify([
         "any",
         [">", ["get", "population"], 1000000],
         ["==", ["get", "type"], "city"],
-    ]),
+    ]) as FilterExpressionString,
     nested: JSON.stringify([
         "all",
         [">", ["get", "population"], 500000],
@@ -104,24 +110,24 @@ const sampleFilters = {
             ["==", ["get", "type"], "city"],
             ["==", ["get", "type"], "town"],
         ],
-    ]),
-    empty: JSON.stringify([]),
+    ]) as FilterExpressionString,
+    empty: JSON.stringify([]) as FilterExpressionString,
 };
 
 const msgOutputJson = gettext("Output JSON");
 const msgCurrentState = gettext("Current Filter State");
 
 function FeatureFilterEditorTest() {
-    const [initialValue, setInitialValue] = useState<string | undefined>(
-        sampleFilters.complex
-    );
+    const [initialValue, setInitialValue] = useState<
+        FilterExpressionString | undefined
+    >(sampleFilters.complex);
     const [currentInlineFilter, setCurrentInlineFilter] = useState<
         string | undefined
     >(initialValue);
     const [outputJson, setOutputJson] = useState("");
     const [modalOpen, setModalOpen] = useState(false);
 
-    const handleFilterChange = (filter: string | undefined) => {
+    const handleFilterChange = (filter: FilterExpressionString | undefined) => {
         console.log("Filter changed:", filter);
         console.log("Filter type:", typeof filter);
         console.log("Filter is string:", typeof filter === "string");
@@ -156,7 +162,7 @@ function FeatureFilterEditorTest() {
         setOutputJson("");
     };
 
-    const handleApply = (filter: string | undefined) => {
+    const handleApply = (filter: FilterExpressionString | undefined) => {
         setInitialValue(filter);
         setOutputJson(filter || "");
         setModalOpen(false);

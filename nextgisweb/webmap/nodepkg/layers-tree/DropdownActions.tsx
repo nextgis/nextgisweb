@@ -176,7 +176,7 @@ export function DropdownActions(props: DropdownActionsProps) {
     if (moreClickId === undefined || moreClickId !== id) {
         return (
             <span
-                className="more"
+                className="more action-btn"
                 onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();

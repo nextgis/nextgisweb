@@ -2,6 +2,7 @@ import TileLayer from "ol/layer/Tile";
 import XYZSource from "ol/source/XYZ";
 import type { Options as XYZSourceOptions } from "ol/source/XYZ";
 
+import type { FilterExpressionString } from "@nextgisweb/feature-layer/feature-filter/type";
 import type { LayerSymbols } from "@nextgisweb/webmap/compat/type";
 
 import { CoreLayer } from "./CoreLayer";
@@ -34,31 +35,52 @@ export default class XYZ extends CoreLayer<
         this.updateSymbols(symbols);
     }
 
+    override setFilter(filter: FilterExpressionString | null): void {
+        super.setFilter(filter);
+
+        const urls = this.olSource.getUrls();
+        if (urls && urls.length > 0) {
+            const updatedUrls = urls.map((url) =>
+                this.updateUrlParam(url, "filter", filter)
+            );
+            this.olSource.setUrls(updatedUrls);
+        }
+    }
+
     private updateSymbols(symbols: LayerSymbols) {
         const val =
-            Array.isArray(symbols) && symbols.length ? symbols[0] : null;
+            Array.isArray(symbols) && symbols.length ? symbols.join(",") : null;
         if (val) {
             const urls = this.olSource.getUrls();
             if (urls && urls.length > 0) {
                 const updatedUrls = urls.map((url) =>
-                    this.updateUrl(url, val[0])
+                    this.updateUrlParam(url, "symbols", val, (v) =>
+                        v !== "-1" ? v : ""
+                    )
                 );
                 this.olSource.setUrls(updatedUrls);
             }
         }
     }
 
-    private updateUrl(src: string, value?: string): string {
+    private updateUrlParam(
+        src: string,
+        param: string,
+        value: string | null | undefined,
+        normalize?: (v: string) => string | null
+    ): string {
         const url = new URL(src, window.location.href);
         const params = this.parseUrlParams(url.search);
 
         const resource = params["resource"];
-        const symbolsKey = `symbols[${resource}]`;
+        const key = `${param}[${resource}]`;
 
-        if (value) {
-            params[symbolsKey] = value !== "-1" ? value : "";
+        const finalValue = normalize ? normalize(value ?? "") : value;
+
+        if (finalValue) {
+            params[key] = finalValue;
         } else {
-            delete params[symbolsKey];
+            delete params[key];
         }
 
         url.search = this.buildQueryString(params);
@@ -73,10 +95,14 @@ export default class XYZ extends CoreLayer<
                 (acc, curr) => {
                     if (!curr) return acc;
 
-                    const [key, val] = curr.split("=").map(decodeURIComponent);
-                    if (key) {
-                        acc[key] = val || "";
+                    const i = curr.indexOf("=");
+
+                    if (i !== -1) {
+                        const key = decodeURIComponent(curr.slice(0, i));
+                        const val = decodeURIComponent(curr.slice(i + 1));
+                        acc[key] = val;
                     }
+
                     return acc;
                 },
                 { resource: "" }

@@ -9,7 +9,7 @@ import { AddIcon, RemoveIcon } from "@nextgisweb/gui/icon";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import type { FilterEditorStore } from "../FilterEditorStore";
-import { useAutoScroll } from "../hooks/useAutoScroll";
+import { useAutoScroll } from "../hook/useAutoScroll";
 import type {
     FilterGroupChild,
     FilterGroup as FilterGroupModel,

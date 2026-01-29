@@ -12,6 +12,8 @@ import {
 import type { QueryParams } from "@nextgisweb/pyramid/api";
 import pyramidSettings from "@nextgisweb/pyramid/client-settings";
 
+import type { FilterExpressionString } from "../feature-filter/type";
+
 interface UseExportFeatureLayerProps {
     id: number;
 }
@@ -21,7 +23,7 @@ export type ExportFeatureLayerOptions = {
     resources?: string[];
     intersects?: string;
     ilike?: string;
-    filter?: string;
+    filter?: FilterExpressionString;
     format?: string;
 };
 
