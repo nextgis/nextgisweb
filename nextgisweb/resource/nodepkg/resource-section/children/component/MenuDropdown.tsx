@@ -1,8 +1,9 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Badge, Dropdown, Tooltip } from "@nextgisweb/gui/antd";
 import type { MenuProps } from "@nextgisweb/gui/antd";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
+import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { useResourcePicker } from "@nextgisweb/resource/component/resource-picker/hook";
 import { useResourceNotify } from "@nextgisweb/resource/hook/useResourceNotify";
@@ -11,14 +12,12 @@ import type { CompositeRead } from "@nextgisweb/resource/type/api";
 import type { ChildrenResource } from "../type";
 import { createResourceTableItemOptions } from "../util/createResourceTableItemOptions";
 import { forEachSelected } from "../util/forEachSelected";
-import { isDeleteAction } from "../util/isDeleteAction";
 import { loadVolumes } from "../util/loadVoluems";
 
 import MoreVertIcon from "@nextgisweb/icon/material/more_vert";
 import PriorityHighIcon from "@nextgisweb/icon/material/priority_high";
 
 interface MenuDropdownProps {
-    data: ChildrenResource[];
     items: ChildrenResource[];
     selected: number[];
     allowBatch: boolean;
@@ -41,7 +40,6 @@ type MenuItems = NonNullable<MenuProps["items"]>;
 type MenuItem = MenuItems[0];
 
 export function MenuDropdown({
-    data,
     items,
     selected,
     allowBatch,
@@ -81,18 +79,19 @@ export function MenuDropdown({
     }, [selected, items]);
 
     const onNewGroup = useCallback(
-        (newGroup: CompositeRead) => {
+        async (newGroup: CompositeRead) => {
             if (newGroup) {
                 if (
                     newGroup.resource.parent &&
                     newGroup.resource.parent.id === resourceId
-                )
+                ) {
+                    const newItem = await createResourceTableItemOptions(
+                        newGroup.resource
+                    );
                     setItems((old) => {
-                        const newItem = createResourceTableItemOptions(
-                            newGroup.resource
-                        );
                         return [...old, newItem];
                     });
+                }
             }
         },
         [resourceId, setItems]
@@ -136,21 +135,29 @@ export function MenuDropdown({
             selected,
         ]
     );
+    const { makeSignal } = useAbortController();
+    const [selectedAllowedForDelete, setSelectedAllowedForDelete] = useState<
+        number[]
+    >([]);
 
-    const selectedAllowedForDelete = useMemo(() => {
-        const allowedToDelete = [];
-
-        for (const item of items) {
-            if (selected.includes(item.id)) {
-                const includeDelAction =
-                    item.actions && item.actions.some(isDeleteAction);
-                if (includeDelAction) {
-                    allowedToDelete.push(item.id);
+    useEffect(() => {
+        (async () => {
+            const allowedToDelete: number[] = [];
+            const signal = makeSignal();
+            for (const item of items) {
+                if (selected.includes(item.id)) {
+                    const includeDelAction = await item.it.fetch(
+                        [["resource.is_deletable"]],
+                        { signal }
+                    );
+                    if (includeDelAction[0]) {
+                        allowedToDelete.push(item.id);
+                    }
                 }
             }
-        }
-        return allowedToDelete;
-    }, [selected, items]);
+            setSelectedAllowedForDelete(allowedToDelete);
+        })();
+    }, [selected, makeSignal, items]);
 
     const deleteSelected = useCallback(() => {
         forEachSelected({
@@ -196,7 +203,7 @@ export function MenuDropdown({
                 onClick: () => {
                     setVolumeVisible(!volumeVisible);
                     if (!volumeVisible) {
-                        loadVolumes({ data, setState: setVolumeValues });
+                        loadVolumes({ items, setState: setVolumeValues });
                     }
                 },
             });
@@ -303,7 +310,7 @@ export function MenuDropdown({
         allowBatch,
         resourceId,
         selected,
-        data,
+        items,
         onNewGroup,
         setAllowBatch,
         deleteSelected,

@@ -1,32 +1,41 @@
-import { routeURL } from "@nextgisweb/pyramid/api";
-import { gettext } from "@nextgisweb/pyramid/i18n";
+import { assert } from "@nextgisweb/jsrealm/error";
+import { route } from "@nextgisweb/pyramid/api";
+import type { ResourceAttrItem } from "@nextgisweb/resource/api/ResourceAttrItem";
+import { resourceAttrItems } from "@nextgisweb/resource/api/resource-attr";
+import type { Attributes } from "@nextgisweb/resource/api/resource-attr";
 import type { ResourceRead } from "@nextgisweb/resource/type/api";
 
+import { DefaultAttributes } from "../ResourceSectionChildren";
+import { registry } from "../registry";
 import type { ChildrenResource } from "../type";
 
-const msgChange = gettext("Change");
-const msgDelete = gettext("Delete");
-
-export function createResourceTableItemOptions(
+export async function createResourceTableItemOptions(
     resource: ResourceRead
-): ChildrenResource {
+): Promise<ChildrenResource> {
+    const attrRoute = route("resource.attr");
+    const reg = registry.queryAll();
+
+    const attrs: [...Attributes] = [];
+    for (const { attributes } of reg) {
+        if (attributes) {
+            attrs.push(...attributes);
+        }
+    }
+
+    const items = await resourceAttrItems({
+        resources: [resource.id],
+        attributes: [...DefaultAttributes, ...attrs],
+        route: attrRoute,
+    });
+
+    const it = items[0];
+
+    assert(it);
+
     return {
-        actions: [
-            {
-                href: routeURL("resource.update", resource.id),
-                title: msgChange,
-                icon: "material-edit",
-                key: ["operation", "10-update"],
-            },
-            {
-                href: "",
-                title: msgDelete,
-                icon: "material-delete",
-                key: ["operation", "20-delete"],
-            },
-        ],
         cls: "resource_group",
         displayName: resource.display_name,
         id: resource.id,
+        it: it as ResourceAttrItem<typeof DefaultAttributes>,
     };
 }

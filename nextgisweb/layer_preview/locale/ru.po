@@ -1,3 +1,12 @@
-#: favorite.py:6 view.py:21 view.py:56
+#: favorite.py:6 nodepkg/resource-children-action-plugin.tsx:17 view.py:24
+#: view.py:57
 msgid "Preview"
 msgstr "Просмотр"
+
+#: nodepkg/preview-layer/PreviewLayerModal.tsx:37
+msgid "Close"
+msgstr "Закрыть"
+
+#: nodepkg/preview-layer/PreviewLayerModal.tsx:45
+msgid "Open in a new tab"
+msgstr "Открыть в новой вкладке"
