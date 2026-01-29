@@ -20,16 +20,14 @@ export class FeatureLayerPlugin extends PluginBase {
 
     private openFeatureGrid(item: TreeLayerStore) {
         if (item?.isLayer()) {
-            const layerId = item.layerId;
-
             this.display.tabsManager.addTab({
-                key: String(layerId),
+                key: String(item.styleId),
                 label: item.label,
                 component: () =>
                     import("@nextgisweb/webmap/webmap-feature-grid-tab"),
                 props: {
                     topic,
-                    layerId: layerId,
+                    item,
                     plugin: this,
                 },
             });

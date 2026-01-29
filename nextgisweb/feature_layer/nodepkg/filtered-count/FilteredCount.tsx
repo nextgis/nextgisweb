@@ -11,7 +11,7 @@ import TagIcon from "@nextgisweb/icon/material/tag";
 
 const buildCountQuery = (
     queryParams: FeatureGridStore["queryParams"],
-    filterExpression: FeatureGridStore["filterExpression"]
+    filterExpression?: FeatureGridStore["filterExpression"]
 ) => {
     const query: {
         filter?: string;
@@ -28,6 +28,7 @@ const buildCountQuery = (
         if (queryParams.like) query.like = queryParams.like;
         if (queryParams.ilike) query.ilike = queryParams.ilike;
         if (queryParams.intersects) query.intersects = queryParams.intersects;
+        if (queryParams.filter) query.filter = queryParams.filter;
     }
 
     return Object.keys(query).length > 0 ? query : undefined;
@@ -40,12 +41,11 @@ interface FilteredCountExpandedProps {
 
 const FilteredCountExpanded = observer(
     ({ store, handleToggle }: FilteredCountExpandedProps) => {
-        const { id, queryParams, filterExpression, size, version } = store;
+        const { id, queryParams, size, version } = store;
 
-        const countQuery = useMemo(
-            () => buildCountQuery(queryParams, filterExpression),
-            [queryParams, filterExpression]
-        );
+        const countQuery = useMemo(() => {
+            return buildCountQuery(queryParams);
+        }, [queryParams]);
 
         const options = useMemo(() => {
             return countQuery ? { query: countQuery, version } : { version };

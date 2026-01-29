@@ -1,4 +1,4 @@
-import { action, observable } from "mobx";
+import { action, computed, observable } from "mobx";
 
 import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
 import type { ActionToolbarAction } from "@nextgisweb/gui/action-toolbar";
@@ -24,9 +24,12 @@ export class FeatureGridStore {
     @observable.ref accessor settingsOpen: boolean = false;
 
     @observable.shallow accessor selectedIds: number[] = [];
-    @observable.shallow accessor queryParams: QueryParams | null = null;
+    @observable.shallow accessor _queryParams: QueryParams | null = null;
     @observable.shallow accessor visibleFields: number[] = [KEY_FIELD_ID];
     @observable.shallow accessor fields: FeatureLayerFieldRead[] = [];
+    @observable.ref accessor globalFilterExpression:
+        | FilterExpressionString
+        | undefined = undefined;
     @observable.ref accessor filterExpression:
         | FilterExpressionString
         | undefined = undefined;
@@ -58,6 +61,21 @@ export class FeatureGridStore {
                 Object.assign(this, { [k]: prop });
             }
         }
+    }
+
+    @computed
+    get queryParams(): QueryParams | null {
+        let filter = this.filterExpression;
+        if (this.globalFilterExpression) {
+            filter = `[${[
+                `"all"`,
+                this.globalFilterExpression,
+                this.filterExpression,
+            ]
+                .filter(Boolean)
+                .join(",")}]` as FilterExpressionString;
+        }
+        return { ...this._queryParams, filter };
     }
 
     @action.bound
@@ -112,7 +130,7 @@ export class FeatureGridStore {
 
     @action.bound
     setQueryParams(queryParams: SetValue<QueryParams | null>) {
-        this.setValue("queryParams", queryParams);
+        this.setValue("_queryParams", queryParams);
     }
 
     @action.bound
@@ -156,8 +174,19 @@ export class FeatureGridStore {
     }
 
     @action.bound
+    setGlobalFilterExpression(
+        filterExpression: FilterExpressionString | undefined
+    ) {
+        this.globalFilterExpression = filterExpression;
+    }
+
+    @action.bound
     setFilterExpression(filterExpression: FilterExpressionString | undefined) {
         this.filterExpression = filterExpression;
+        this.setQueryParams((prev) => ({
+            ...prev,
+            filterExpression,
+        }));
     }
 
     @action.bound

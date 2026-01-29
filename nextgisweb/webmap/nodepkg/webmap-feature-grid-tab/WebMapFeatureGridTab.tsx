@@ -19,6 +19,7 @@ import type topic from "../compat/topic";
 import { useDisplayContext } from "../display/context";
 import type { PluginBase } from "../plugin/PluginBase";
 import type { FeatureLayerWebMapPluginConfig } from "../plugin/type";
+import type { TreeLayerStore } from "../store/tree-store/TreeItemStore";
 
 import GoToIcon from "@nextgisweb/icon/material/center_focus_weak";
 
@@ -26,12 +27,14 @@ const msgGoto = gettext("Go to");
 
 interface WebMapFeatureGridTabProps {
     plugin: PluginBase;
-    layerId: number;
+    item: TreeLayerStore;
     topic: typeof topic;
 }
 
 export const WebMapFeatureGridTab = observer(
-    ({ topic, plugin, layerId }: WebMapFeatureGridTabProps) => {
+    ({ topic, plugin, item }: WebMapFeatureGridTabProps) => {
+        const { layerId, filter } = item;
+        const filterRef = useRef(filter);
         const topicHandlers = useRef<ReturnType<typeof topic.subscribe>[]>([]);
         const { display } = useDisplayContext();
 
@@ -42,9 +45,9 @@ export const WebMapFeatureGridTab = observer(
 
         const [messageApi, contextHolder] = message.useMessage();
 
-        const reloadLayer = useCallback(async () => {
+        const reloadLayer = useCallback(() => {
             // It is possible to have few webmap layers for one resource id
-            const layers = await display.treeStore.filter({
+            const layers = display.treeStore.filter({
                 type: "layer",
                 layerId,
             });
@@ -79,6 +82,7 @@ export const WebMapFeatureGridTab = observer(
                 size: "small",
                 cleanSelectedOnFilter: false,
                 canCreate: false,
+                globalFilterExpression: filterRef.current ?? undefined,
                 onDelete: reloadLayer,
                 onSave: reloadLayer,
 
@@ -192,6 +196,13 @@ export const WebMapFeatureGridTab = observer(
 
             return store;
         }, [display, layerId, messageApi, plugin.identity, reloadLayer]);
+
+        useEffect(() => {
+            if (store) {
+                store.setGlobalFilterExpression(filter ?? undefined);
+            }
+            filterRef.current = filter;
+        }, [store, filter]);
 
         useEffect(() => {
             if (!store) return;

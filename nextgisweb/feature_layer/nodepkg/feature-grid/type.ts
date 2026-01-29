@@ -3,6 +3,7 @@ import type { ActionToolbarAction } from "@nextgisweb/gui/action-toolbar";
 import type { SizeType } from "@nextgisweb/gui/antd";
 import type { CompositeRead } from "@nextgisweb/resource/type/api";
 
+import type { FilterExpressionString } from "../feature-filter/type";
 import type { NgwAttributeType } from "../type";
 
 import type { $FID, $VID } from "./constant";
@@ -47,6 +48,7 @@ export interface FeatureGridProps {
     selectedIds?: number[];
     editOnNewPage?: boolean;
     cleanSelectedOnFilter?: boolean;
+    globalFilterExpression?: FilterExpressionString;
     beforeDelete?: (featureIds: number[]) => void;
     deleteError?: (featureIds: number[]) => void;
     onSelect?: (selected: number[]) => void;

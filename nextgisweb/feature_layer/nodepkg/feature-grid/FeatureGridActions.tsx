@@ -143,10 +143,7 @@ export const FeatureGridActions = observer(
         const handleFilterApply = useCallback(
             (filter: FilterExpressionString | undefined) => {
                 store.setFilterExpression(filter);
-                store.setQueryParams({
-                    ...store.queryParams,
-                    filter,
-                });
+
                 store.bumpVersion();
             },
             [store]
