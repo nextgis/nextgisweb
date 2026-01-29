@@ -32,7 +32,6 @@ def factory(handler, registry, *, comp: AuditComponent):
         lambda req: not req.path_info.startswith(
             (
                 "/static/",
-                "/_debug_toolbar/",
                 "/favicon.ico",
             )
         )

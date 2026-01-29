@@ -26,13 +26,12 @@ JSENTRY = jsentry("@nextgisweb/pyramid/error-page")
 
 def includeme(config):
     TM_TFACTORY = "pyramid_tm.tm_tween_factory"
-    DT_TFACTORY = "pyramid_debugtoolbar.toolbar_tween_factory"
 
     ERR_TFACTORY = "nextgisweb.pyramid.exception.handled_exception_tween_factory"
     EXC_TFACTORY = "nextgisweb.pyramid.exception.unhandled_exception_tween_factory"
 
-    config.add_tween(ERR_TFACTORY, over=(TM_TFACTORY, "MAIN"), under=(DT_TFACTORY, "INGRESS"))
-    config.add_tween(EXC_TFACTORY, over=(DT_TFACTORY, ERR_TFACTORY))
+    config.add_tween(ERR_TFACTORY, over=(TM_TFACTORY, "MAIN"), under=("INGRESS",))
+    config.add_tween(EXC_TFACTORY, over=(ERR_TFACTORY,))
 
     # PYRAMID REDEFINED METHODS FOR ERROR HANDLING / CACHING
     @RequestLocalCache()

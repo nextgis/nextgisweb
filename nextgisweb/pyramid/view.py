@@ -26,7 +26,6 @@ from nextgisweb.lib import dynmenu as dm
 from nextgisweb.lib.apitype import JSONType, QueryString
 from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.i18n import trstr_factory
-from nextgisweb.lib.imptool import module_path
 from nextgisweb.lib.json import dumps
 from nextgisweb.lib.logging import logger
 from nextgisweb.lib.safehtml import URL_PATTERN
@@ -527,7 +526,6 @@ def setup_pyramid(comp, config):
     config.set_session_factory(WebSession)
 
     _setup_static(comp, config)
-    _setup_pyramid_debugtoolbar(comp, config)
     _setup_pyramid_tm(comp, config)
     _setup_pyramid_mako(comp, config)
 
@@ -868,33 +866,6 @@ def _setup_static(comp, config):
             config.add_static_path(f"asset/{cid}", asset_path)
 
 
-def _setup_pyramid_debugtoolbar(comp, config):
-    dt_opt = comp.options.with_prefix("debugtoolbar")
-    if not dt_opt.get("enabled", comp.env.core.debug):
-        return
-
-    try:
-        import pyramid_debugtoolbar
-    except ModuleNotFoundError:
-        if dt_opt.get("enabled", None) is True:
-            raise
-        logger.warning("Unable to load pyramid_debugtoolbar")
-        return
-
-    settings = config.registry.settings
-    if hosts := dt_opt.get("hosts", "0.0.0.0/0" if comp.env.core.debug else None):
-        settings["debugtoolbar.hosts"] = hosts
-    settings["debugtoolbar.exclude_prefixes"] = ["/static/", "/favicon.ico"]
-    settings["debugtoolbar.show_on_exc_only"] = True
-    settings["debugtoolbar.max_visible_requests"] = 25
-    config.include(pyramid_debugtoolbar)
-
-    config.add_static_path(
-        "pyramid_debugtoolbar:static",
-        module_path("pyramid_debugtoolbar") / "static",
-    )
-
-
 def _setup_pyramid_tm(comp, config):
     import pyramid_tm
 
@@ -904,7 +875,6 @@ def _setup_pyramid_tm(comp, config):
         "/static/",
         "/favicon.ico",
         "/api/component/pyramid/route",
-        "/_debug_toolbar/",
     )
 
     def activate_hook(request):

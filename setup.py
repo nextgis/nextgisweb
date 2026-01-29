@@ -77,7 +77,6 @@ extras_require = dict(
         "json5",
         "mapbox-vector-tile",
         "pre-commit",
-        "pyramid-debugtoolbar==4.10",
         "pytest-cov",
         "pytest==9.0.*",
         "ruff>=0.12.12",

@@ -223,9 +223,6 @@ class PyramidComponent(Component):
             "buffering as it's done in Nginx. See docs on proxy_buffering "
             "directive for ngx_http_proxy module for details.")),
 
-        Option("debugtoolbar.enabled", bool),
-        Option("debugtoolbar.hosts"),
-
         Option("legacy_locale_switcher", bool, default=False),
 
         Option("lunkwill.enabled", bool, default=None),

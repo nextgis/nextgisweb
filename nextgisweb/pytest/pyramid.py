@@ -15,8 +15,7 @@ import pytest
 
 @pytest.fixture(scope="session")
 def ngw_pyramid_config(ngw_env):
-    with ngw_env.pyramid.options.override({"debugtoolbar.enabled": False}):
-        yield ngw_env.pyramid.make_app({})
+    yield ngw_env.pyramid.make_app({})
 
 
 @pytest.fixture(scope="session")
