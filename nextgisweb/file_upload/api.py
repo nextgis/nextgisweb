@@ -56,9 +56,15 @@ def collection_put(
     comp: FileUploadComponent,
     core: CoreComponent,
 ) -> AsJSON[Annotated[FileUploadObject, StatusCode(201)],]:
-    """Upload small file via request body
+    """Upload small file using single PUT request
 
-    :returns: Uploaded file metadata"""
+    This method is provided for convenience when uploading small files without
+    requiring TUS protocol support on the client side. The maximum allowed file
+    size may vary depending on server configuration, but it is generally
+    intended for files smaller than 1 MiB.
+
+    :returns: Uploaded file metadata
+    """
 
     core.check_storage_limit()
 
@@ -78,7 +84,7 @@ def collection_put(
     ):
         fupload.name = name
 
-    # If MIME-type was not declared on upload, define independently by running
+    # If MIME type was not declared on upload, define independently by running
     # file. Standard mimetypes package does it only using extension but we don't
     # always know filename.
 
@@ -113,11 +119,17 @@ def collection_post(
     Annotated[FileUploadFormPost, StatusCode(200)],
     Annotated[None, StatusCode(201)],
 ]:
-    """Upload one or more small files or start new TUS upload
+    """Start new TUS upload
 
-    Small files can be encoded as `multipart/form-data`. For TUS uploads, refer
-    to [the specification](https://tus.io/protocols/resumable-upload#post) for
-    additional details."""
+    See [the specification](https://tus.io/protocols/resumable-upload#post) for
+    additional details. The file name and MIME type can be provided in the
+    `Upload-Metadata` header as `name` and `mime_type` fields. If no MIME type
+    is provided, it will be detected upon upload completion.
+
+    This endpoint also supports traditional form-based file uploads, but that
+    method is deprecated in favor of the TUS protocol or the PUT method for
+    single-file uploads of small files.
+    """
     core.check_storage_limit()
 
     return (
@@ -288,7 +300,7 @@ def item_patch_tus(fupload: FileUpload, request) -> Annotated[None, StatusCode(2
     if fupload.size == upload_offset:
         fupload.incomplete = False
 
-        # Detect MIME-type if missing
+        # Detect MIME type if missing
         if not fupload.mime_type:
             fupload.mime_type = magic.from_file(fupload.data_path, mime=True)
 
@@ -298,7 +310,12 @@ def item_patch_tus(fupload: FileUpload, request) -> Annotated[None, StatusCode(2
 
 
 def item_delete(fupload: FileUpload, request) -> Annotated[None, StatusCode(204)]:
-    """Dispose uploaded file on server"""
+    """Dispose uploaded file on server
+
+    Useful to cancel incomplete TUS uploads or delete files no longer needed.
+    Files which aren't disposed will be automatically removed during periodic
+    cleanup.
+    """
 
     fupload.data_path.unlink()
     fupload.meta_path.unlink()
