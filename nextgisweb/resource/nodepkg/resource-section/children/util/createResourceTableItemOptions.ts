@@ -6,7 +6,7 @@ import type { Attributes } from "@nextgisweb/resource/api/resource-attr";
 import type { ResourceRead } from "@nextgisweb/resource/type/api";
 
 import { DefaultAttributes } from "../ResourceSectionChildren";
-import { registry } from "../registry";
+import { registry } from "../../registry";
 import type { ChildrenResource } from "../type";
 
 export async function createResourceTableItemOptions(

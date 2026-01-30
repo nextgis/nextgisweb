@@ -1,7 +1,7 @@
 import { Suspense, memo, useMemo } from "react";
 
-import { registry } from "../registry";
-import type { ResourceChildrenAction } from "../registry";
+import { registry } from "../../registry";
+import type { ResourceAction } from "../../registry";
 import type { ChildrenResource } from "../type";
 
 import { ActionBtn } from "./ActionBtn";
@@ -12,7 +12,7 @@ interface RenderActionsProps {
     setTableItems: React.Dispatch<React.SetStateAction<ChildrenResource[]>>;
 }
 
-function byOrder(a: ResourceChildrenAction, b: ResourceChildrenAction) {
+function byOrder(a: ResourceAction, b: ResourceAction) {
     const ao = a.order ?? 0;
     const bo = b.order ?? 0;
     return bo - ao;
@@ -20,8 +20,8 @@ function byOrder(a: ResourceChildrenAction, b: ResourceChildrenAction) {
 
 function RenderActionsComp({ record, setTableItems }: RenderActionsProps) {
     const actions = useMemo(() => {
-        const reg = registry.queryAll() as ResourceChildrenAction[];
-        const out: ResourceChildrenAction[] = [];
+        const reg = registry.queryAll() as ResourceAction[];
+        const out: ResourceAction[] = [];
 
         for (const a of reg) {
             if (a.showInActionColumn === false) continue;

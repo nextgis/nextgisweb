@@ -3,14 +3,14 @@ import { lazy } from "react";
 
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { registerResourceChildrenAction } from "@nextgisweb/resource/resource-section/children/registry";
+import { registerResourceAction } from "@nextgisweb/resource/resource-section/registry";
 
 import DeleteIcon from "@nextgisweb/icon/material/delete";
 import EditIcon from "@nextgisweb/icon/material/edit";
 
 const DeleteActionLazy = lazy(() => import("./action/DeleteAction"));
 
-registerResourceChildrenAction(COMP_ID, {
+registerResourceAction(COMP_ID, {
     key: "delete",
     label: gettext("Delete"),
     icon: <DeleteIcon />,
@@ -20,7 +20,7 @@ registerResourceChildrenAction(COMP_ID, {
     widget: DeleteActionLazy,
 });
 
-registerResourceChildrenAction(COMP_ID, {
+registerResourceAction(COMP_ID, {
     key: "update",
     label: gettext("Update"),
     icon: <EditIcon />,

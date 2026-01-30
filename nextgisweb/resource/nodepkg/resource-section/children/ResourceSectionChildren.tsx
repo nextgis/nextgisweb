@@ -18,7 +18,7 @@ import type { ResourceSectionProps } from "../type";
 
 import { MenuDropdown } from "./component/MenuDropdown";
 import { RenderActions } from "./component/RenderActions";
-import { registry } from "./registry";
+import { registry } from "../registry";
 import type { ChildrenResource } from "./type";
 import { prepareResourceChildren } from "./util/prepareResourceChildren";
 

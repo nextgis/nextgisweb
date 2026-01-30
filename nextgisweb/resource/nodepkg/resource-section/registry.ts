@@ -7,18 +7,18 @@ import { pluginRegistry } from "@nextgisweb/jsrealm/plugin";
 import type { ResourceAttrItem } from "@nextgisweb/resource/api/ResourceAttrItem";
 import type { Attributes } from "@nextgisweb/resource/api/resource-attr";
 
-import type { DefaultAttributes } from "./ResourceSectionChildren";
-import type { ChildrenResource } from "./type";
+import type { DefaultAttributes } from "./children/ResourceSectionChildren";
+import type { ChildrenResource } from "./children/type";
 
-export type ResourceChildrenActionWidgetProps<P = unknown> = P &
-    Pick<ResourceChildrenAction, "label" | "icon"> &
+export type ResourceActionWidgetProps<P = unknown> = P &
+    Pick<ResourceAction, "label" | "icon"> &
     ChildrenResource & {
         target: React.ReactElement;
         setTableItems: React.Dispatch<React.SetStateAction<ChildrenResource[]>>;
     };
 
-export type ResourceChildrenActionWidget<P = unknown> = LazyExoticComponent<
-    FC<ResourceChildrenActionWidgetProps<P>>
+export type ResourceActionWidget<P = unknown> = LazyExoticComponent<
+    FC<ResourceActionWidgetProps<P>>
 >;
 
 type CustomChildrenRes<A extends Attributes = Attributes> = Omit<
@@ -26,7 +26,7 @@ type CustomChildrenRes<A extends Attributes = Attributes> = Omit<
     "it"
 > & { it: ResourceAttrItem<[...typeof DefaultAttributes, ...A]> };
 
-export interface ResourceChildrenAction<
+export interface ResourceAction<
     P = unknown,
     A extends Attributes = Attributes,
 > {
@@ -37,7 +37,7 @@ export interface ResourceChildrenAction<
     props?: P;
     label?: string;
     target?: "_self" | "_blank";
-    widget?: ResourceChildrenActionWidget<P>;
+    widget?: ResourceActionWidget<P>;
     attributes?: [...A];
     hideOnMobile?: boolean;
     showInActionColumn?: boolean;
@@ -45,11 +45,11 @@ export interface ResourceChildrenAction<
     onClick?: (opt: CustomChildrenRes<A>) => void;
 }
 
-export const registry = pluginRegistry<ResourceChildrenAction>(MODULE_NAME);
+export const registry = pluginRegistry<ResourceAction>(MODULE_NAME);
 
-export function registerResourceChildrenAction<P, A extends Attributes>(
+export function registerResourceAction<P, A extends Attributes>(
     compId: string,
-    action: ResourceChildrenAction<P, A>
+    action: ResourceAction<P, A>
 ) {
-    registry.register(compId, action as unknown as ResourceChildrenAction);
+    registry.register(compId, action as unknown as ResourceAction);
 }

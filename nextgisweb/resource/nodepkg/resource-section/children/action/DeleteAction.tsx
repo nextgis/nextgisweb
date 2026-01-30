@@ -4,14 +4,14 @@ import { useShowModal } from "@nextgisweb/gui/index";
 import { useResourceNotify } from "@nextgisweb/resource/hook/useResourceNotify";
 
 import { ActionBtn } from "../component/ActionBtn";
-import type { ResourceChildrenActionWidgetProps } from "../registry";
+import type { ResourceActionWidgetProps } from "../../registry";
 
 export default function DeleteAction({
     id,
     icon,
     label,
     setTableItems,
-}: ResourceChildrenActionWidgetProps) {
+}: ResourceActionWidgetProps) {
     const { lazyModal, modalHolder } = useShowModal();
     const { notifySuccessfulDeletion, contextHolder } = useResourceNotify();
     const deleteModelItem = useCallback(() => {

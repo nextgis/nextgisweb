@@ -1,11 +1,11 @@
 /** @plugin */
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { registerResourceChildrenAction } from "@nextgisweb/resource/resource-section/children/registry";
+import { registerResourceAction } from "@nextgisweb/resource/resource-section/registry";
 
 import TableIcon from "@nextgisweb/icon/material/table";
 
-registerResourceChildrenAction(COMP_ID, {
+registerResourceAction(COMP_ID, {
     key: "table",
     label: gettext("Table"),
     icon: <TableIcon />,

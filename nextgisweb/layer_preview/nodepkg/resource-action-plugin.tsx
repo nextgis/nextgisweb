@@ -4,7 +4,7 @@ import { Suspense, lazy } from "react";
 import showModal from "@nextgisweb/gui/showModal";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import { registerResourceChildrenAction } from "@nextgisweb/resource/resource-section/children/registry";
+import { registerResourceAction } from "@nextgisweb/resource/resource-section/registry";
 
 import PreviewIcon from "@nextgisweb/icon/material/preview";
 
@@ -12,7 +12,7 @@ const PreviewLayerModal = lazy(
     () => import("./preview-layer/PreviewLayerModal")
 );
 
-registerResourceChildrenAction(COMP_ID, {
+registerResourceAction(COMP_ID, {
     key: "preview",
     label: gettext("Preview"),
     icon: <PreviewIcon />,
