@@ -1,10 +1,11 @@
-import type { EventDataNode } from "rc-tree/lib/interface";
-
+import type { TreeProps } from "@nextgisweb/gui/antd";
 import { getChildrenDeep } from "@nextgisweb/gui/util/tree";
 
 import type { TreeWebmapItem } from "../LayersTree";
 
-type Node = EventDataNode<TreeWebmapItem>;
+type OnCheck = NonNullable<TreeProps<TreeWebmapItem>["onCheck"]>;
+type CheckInfoForWebmap = Parameters<OnCheck>[1];
+type Node = CheckInfoForWebmap["node"];
 
 export function updateKeysForGroup(
     node: Node,

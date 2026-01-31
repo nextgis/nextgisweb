@@ -1,7 +1,12 @@
 .map-preview-modal {
     width: fit-content;
+    &:focus-visible {
+        outline: none;
+        border-radius: 0;
+    }
 
-    .ant-modal-content {
+    .ant-modal-container {
+        border-radius: 0;
         padding: 0 !important;
     }
 }

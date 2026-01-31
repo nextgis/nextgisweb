@@ -66,7 +66,7 @@ export function Footer({
                     {gettext("Technical information")}
                 </Button>
             )}
-            <Space style={{ marginLeft: "auto" }} direction="horizontal">
+            <Space style={{ marginLeft: "auto" }} orientation="horizontal">
                 {settings.support_url && (
                     <Button
                         type="link"

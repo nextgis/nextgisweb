@@ -1,18 +1,16 @@
-import type { RangePickerProps } from "antd/es/date-picker";
+import dayjsGenerateConfig from "@rc-component/picker/es/generate/dayjs";
 import generatePicker from "antd/es/date-picker/generatePicker";
-import type { PickerRef } from "rc-picker";
-import dayjsGenerateConfig from "rc-picker/es/generate/dayjs";
-import type { Ref } from "react";
+import type { Dayjs } from "dayjs";
+
+import type { ParamsOf } from "@nextgisweb/gui/type";
 
 import { disableNonPositiveYears } from "../date";
 
-const DatePicker = generatePicker(dayjsGenerateConfig);
+const DatePicker = generatePicker<Dayjs>(dayjsGenerateConfig);
 
-export interface RangePickerPropsWithRef extends RangePickerProps {
-    ref?: Ref<PickerRef>;
-}
+type RangePickerPropsWithRef = ParamsOf<typeof DatePicker.RangePicker>;
 
-export function RangePicker({
+export default function RangePicker({
     ref,
     disabledDate = disableNonPositiveYears,
     ...restProps
@@ -25,7 +23,3 @@ export function RangePicker({
         />
     );
 }
-
-RangePicker.displayName = "RangePicker";
-
-export default RangePicker;

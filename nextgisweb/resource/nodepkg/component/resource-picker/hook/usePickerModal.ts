@@ -27,7 +27,11 @@ const usePickerModal = ({
         height: cardHeight,
         overflow: "auto",
     };
-    const bodyStyle = cardOptions.styles?.body || defaultCardBodyStyle;
+    const styles = cardOptions.styles;
+
+    const bodyStyle =
+        styles && "body" in styles ? styles.body : defaultCardBodyStyle;
+
     cardOptions.styles = { ...cardOptions.styles, body: bodyStyle };
     cardOptions.style = cardOptions.style || defaultCardStyle;
 

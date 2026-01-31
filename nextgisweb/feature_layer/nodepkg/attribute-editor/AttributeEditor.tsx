@@ -17,7 +17,7 @@ import {
     TimePicker,
     Tooltip,
 } from "@nextgisweb/gui/antd";
-import type { DatePickerProps } from "@nextgisweb/gui/antd";
+import type { DatePickerProps, TimePickerProps } from "@nextgisweb/gui/antd";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
 import { FieldsForm, Form } from "@nextgisweb/gui/fields-form";
 import type { FormField, SizeType } from "@nextgisweb/gui/fields-form";
@@ -87,12 +87,16 @@ const AttributeEditor = observer(
             }: {
                 placeholder?: string;
             }): Record<FeatureLayerFieldDatatype, React.ReactElement> => {
-                const dpProps: DatePickerProps = {
+                const common = {
                     style,
                     placeholder,
                     allowClear: false,
                     disabled: saving,
                 };
+
+                const dpProps: DatePickerProps = common;
+                const tpProps: TimePickerProps = common;
+
                 const inputProps = {
                     placeholder,
                     disabled: saving,
@@ -105,7 +109,7 @@ const AttributeEditor = observer(
                     BIGINT: <InputBigInteger {...inputProps} />,
                     DATETIME: <DateTimePicker {...dpProps} />,
                     DATE: <DatePicker {...dpProps} />,
-                    TIME: <TimePicker {...dpProps} />,
+                    TIME: <TimePicker {...tpProps} />,
                 };
             },
             [saving]

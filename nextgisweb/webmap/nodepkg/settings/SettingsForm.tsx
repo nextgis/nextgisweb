@@ -67,7 +67,7 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({
             <Row gutter={[16, 16]}>
                 <Col span={8}>
                     <Form.Item>
-                        <Space direction="horizontal">
+                        <Space orientation="horizontal">
                             <Form.Item
                                 noStyle
                                 name="hide_nav_menu"
@@ -86,7 +86,7 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({
             <Row gutter={[16, 16]}>
                 <Col span={8}>
                     <Form.Item>
-                        <Space direction="horizontal">
+                        <Space orientation="horizontal">
                             <Form.Item
                                 noStyle
                                 name="identify_attributes"
@@ -100,7 +100,7 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({
                 </Col>
                 <Col span={8}>
                     <Form.Item>
-                        <Space direction="horizontal">
+                        <Space orientation="horizontal">
                             <Form.Item
                                 noStyle
                                 name="show_geometry_info"
@@ -184,7 +184,7 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({
             <Row gutter={[16, 16]}>
                 <Col span={8}>
                     <Form.Item>
-                        <Space direction="horizontal">
+                        <Space orientation="horizontal">
                             <Form.Item
                                 noStyle
                                 name="address_search_enabled"
@@ -198,7 +198,7 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({
                 </Col>
                 <Col span={16}>
                     <Form.Item>
-                        <Space direction="horizontal">
+                        <Space orientation="horizontal">
                             <Form.Item
                                 noStyle
                                 name="address_search_extent"

@@ -37,7 +37,7 @@ function CodeTest() {
     ];
 
     return (
-        <Space direction="vertical">
+        <Space orientation="vertical">
             <FieldsForm
                 layout="inline"
                 labelCol={{ span: 16 }}

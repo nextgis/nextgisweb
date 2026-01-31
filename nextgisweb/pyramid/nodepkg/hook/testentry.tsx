@@ -13,7 +13,7 @@ export const UseRouterGetTest = () => {
         params: { id: resourceId },
     });
     return (
-        <Space direction="vertical">
+        <Space orientation="vertical">
             <ResourceSelect
                 value={resourceId}
                 onChange={(e) => {

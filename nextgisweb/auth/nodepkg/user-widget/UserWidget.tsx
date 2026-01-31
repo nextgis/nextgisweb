@@ -131,7 +131,7 @@ export function UserWidget({ id, readonly }: UserWidgetProps) {
                     type="info"
                     style={{ marginBottom: "1ex" }}
                     // prettier-ignore
-                    message={gettextf("Consider adding {name} user to your team instead of creating a new user with a password.")({ name: oauth.name })}
+                    title={gettextf("Consider adding {name} user to your team instead of creating a new user with a password.")({ name: oauth.name })}
                     action={makeTeamManageButton()}
                 />
             ),

@@ -141,20 +141,23 @@ export const ExtentRow = observer(
                 )}
                 <Space.Compact style={{ display: "flex" }}>
                     {parts.map(({ key, min, max }) => (
-                        <InputNumber
-                            key={key}
-                            value={value ? value[key] : undefined}
-                            onChange={(val) => {
-                                if (onChange) {
-                                    onChange({ ...value, [key]: val });
-                                }
-                            }}
-                            addonBefore={labelAliases[labelType][key]}
-                            precision={4}
-                            min={min}
-                            max={max}
-                            controls={false}
-                        />
+                        <Space.Compact key={key}>
+                            <Space.Addon>
+                                {labelAliases[labelType][key]}
+                            </Space.Addon>
+                            <InputNumber
+                                value={value ? value[key] : undefined}
+                                onChange={(val) => {
+                                    if (onChange) {
+                                        onChange({ ...value, [key]: val });
+                                    }
+                                }}
+                                precision={4}
+                                min={min}
+                                max={max}
+                                controls={false}
+                            />
+                        </Space.Compact>
                     ))}
                 </Space.Compact>
                 <Space.Compact style={{ display: "flex" }}>

@@ -57,7 +57,7 @@ const CORSWarning = () => {
     return (
         <Alert
             type="warning"
-            message={
+            title={
                 <TemplateLink
                     template={msgCORS}
                     link={routeURL("pyramid.control_panel.cors")}

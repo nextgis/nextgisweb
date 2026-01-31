@@ -459,13 +459,11 @@ const SearchPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
         const [resultsInfo, isExceeded] = searchResults;
         results = resultsInfo.map((r) => makeResult(r));
         if (resultsInfo.length === 0) {
-            info = (
-                <Alert message={gettext("Not found")} type="info" showIcon />
-            );
+            info = <Alert title={gettext("Not found")} type="info" showIcon />;
         } else if (isExceeded) {
             info = (
                 <Alert
-                    message={gettext(
+                    title={gettext(
                         "Refine search criterion. Displayed first 100 search results."
                     )}
                     type="warning"

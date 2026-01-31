@@ -7,15 +7,11 @@
     height: 80%;
     min-height: 40em;
 
-    > div {
+    .ant-modal-container {
         height: 100%;
 
-        > .ant-modal-content {
+        .ant-modal-body {
             height: 100%;
-
-            > .ant-modal-body {
-                height: 100%;
-            }
         }
     }
 }
@@ -29,13 +25,15 @@
         height: 100%;
         min-height: auto;
 
-        > div {
-            > .ant-modal-content {
-                border-radius: 0;
-            }
+        .ant-form-item-horizontal {
+            margin-bottom: 0.5rem;
+        }
+
+        .ant-modal-container {
+            border-radius: 0;
 
             .ant-form-item-label {
-                padding-top: 1rem;
+                margin-bottom: 0;
                 padding-bottom: 0;
             }
         }

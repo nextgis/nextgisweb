@@ -18,7 +18,7 @@ export const VersioningForm: React.FC<VersioningFormProps> = ({
     return (
         <Form initialValues={initialValues} onFinish={onFinish}>
             <Form.Item>
-                <Space direction="horizontal">
+                <Space orientation="horizontal">
                     <Form.Item
                         noStyle
                         name="versioning_default"
