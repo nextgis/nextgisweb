@@ -31,7 +31,6 @@ requires = [
     "babel==2.17.0",
     'backports-datetime-fromisoformat; python_version<"3.11"',
     "cachetools==6.1.0",
-    "cryptography==45.0.5",
     "defusedxml==0.7.1",
     "docstring-parser==0.16",
     "geoalchemy2==0.17.1",
