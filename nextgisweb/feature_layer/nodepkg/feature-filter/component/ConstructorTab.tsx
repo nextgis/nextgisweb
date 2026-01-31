@@ -9,7 +9,6 @@ import type {
     CollisionDetection,
     DragEndEvent,
     DragStartEvent,
-    DroppableContainer,
 } from "@dnd-kit/core";
 import { observer } from "mobx-react-lite";
 import { useRef, useState } from "react";
@@ -87,33 +86,33 @@ const getInsertionGroupPosition = (
     } else if (targetGroupOverItems.length === 1) {
         const overChildItem = targetGroupOverItems[0];
         const overChildData = overChildItem.data;
+        const id = Number(overChildItem.id);
         if (overChildData && "droppableContainer" in overChildData) {
-            const droppableContainer =
-                overChildData.droppableContainer as DroppableContainer;
+            const droppableContainer = overChildData.droppableContainer;
             const rect = droppableContainer.rect.current;
             if (!rect) {
                 return {
-                    id: overChildItem.id as number,
+                    id,
                     parentGroupId: targetGroup.id,
                     position: "after",
                 };
             }
             const overChildMidY = rect?.top + rect.height / 2;
             return {
-                id: overChildItem.id as number,
+                id,
                 parentGroupId: targetGroup.id,
                 position: activeMidY < overChildMidY ? "before" : "after",
             };
         }
         return {
-            id: overChildItem.id as number,
+            id,
             parentGroupId: targetGroup.id,
             position: "after",
         };
     } else if (targetGroupOverItems.length === 2) {
         let indexForBefore = -1;
         targetGroupOverItems.forEach((i) => {
-            const id = i.id as number;
+            const id = i.id;
             const index = targetGroup.childrenOrder.findIndex(
                 (i) => i.id === id
             );
@@ -126,7 +125,7 @@ const getInsertionGroupPosition = (
 
         if (indexForBefore !== -1) {
             return {
-                id: targetGroupOverItems[0].id as number,
+                id: Number(targetGroupOverItems[0].id),
                 parentGroupId: targetGroup.id,
                 position: "after",
             };
@@ -172,11 +171,11 @@ export const ConstructorTab = observer(({ store }: ConstructorTabProps) => {
             const position = getInsertionConditionPosition(event);
             store.moveFilterItem(
                 {
-                    id: active.id as number,
+                    id: Number(active.id),
                     parentGroupId: activeData.parentGroupId,
                 },
                 {
-                    id: over.id as number,
+                    id: Number(over.id),
                     parentGroupId: overData.parentGroupId,
                 },
                 activeData.type as "condition" | "group",

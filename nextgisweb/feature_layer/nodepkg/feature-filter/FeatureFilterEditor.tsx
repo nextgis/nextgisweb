@@ -41,8 +41,8 @@ export const FeatureFilterEditor = observer(
             value
         );
         const store = useMemo(
-            () => new FilterEditorStore({ fields, value }),
-            [fields, value]
+            () => new FilterEditorStore({ fields }),
+            [fields]
         );
         const [messageApi, contextHolder] = message.useMessage();
 

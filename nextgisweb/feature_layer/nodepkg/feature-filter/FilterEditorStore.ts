@@ -1,17 +1,13 @@
-import dayjs from "dayjs";
 import { action, observable } from "mobx";
 
 import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
-import { gettext, gettextf } from "@nextgisweb/pyramid/i18n";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { getDefaultValue } from "./component/FilterCondition";
-import { OPERATORS, ValidOperators } from "./type";
 import type {
     ActiveTab,
-    CmpOp,
     ConditionExpr,
     ConditionValue,
-    EqNeOp,
     FilterCondition,
     FilterExpression,
     FilterExpressionString,
@@ -19,30 +15,13 @@ import type {
     FilterGroupChild,
     FilterState,
     GroupExpr,
-    HasOp,
-    InOp,
+    LogicalOp,
 } from "./type";
-
-type TemporalDatatype = Extract<
-    FeatureLayerFieldRead["datatype"],
-    "DATE" | "TIME" | "DATETIME"
->;
-
-const TEMPORAL_FORMATS: Record<TemporalDatatype, string> = {
-    DATE: "YYYY-MM-DD",
-    TIME: "HH:mm:ss",
-    DATETIME: "YYYY-MM-DDTHH:mm:ss",
-};
-
-const TEMPORAL_TYPES = Object.keys(TEMPORAL_FORMATS) as TemporalDatatype[];
-
-const isTemporalDatatype = (
-    datatype: FeatureLayerFieldRead["datatype"]
-): datatype is TemporalDatatype =>
-    TEMPORAL_TYPES.includes(datatype as TemporalDatatype);
+import { parseFilterExpression } from "./util/parser";
+import { validateFilterExpression } from "./util/validator";
 
 function stringifyExpresion(
-    value: any,
+    value: FilterExpression,
     replacer?: (string | number)[] | null | undefined,
     space?: string | number | undefined
 ): FilterExpressionString {
@@ -64,19 +43,21 @@ export interface MoveTargetFilterItem {
     parentGroupId: number;
 }
 
-const EMPTY_FILTER_STATE: FilterState = {
+const generateEMptyFilterState = (): FilterState => ({
     rootGroup: {
         id: 0,
+        type: "group",
         operator: "all",
         conditions: [],
         groups: [],
         childrenOrder: [],
     },
-};
+});
 
 export class FilterEditorStore {
     @observable.shallow accessor fields: FeatureLayerFieldRead[] = [];
-    @observable.deep accessor filterState: FilterState = EMPTY_FILTER_STATE;
+    @observable.deep accessor filterState: FilterState =
+        generateEMptyFilterState();
     @observable accessor activeTab: ActiveTab = "constructor";
     @observable accessor jsonValue: FilterExpressionString | undefined =
         undefined;
@@ -124,11 +105,14 @@ export class FilterEditorStore {
             if (this.jsonValue) {
                 try {
                     const parsedJson = JSON.parse(this.jsonValue);
-                    this.validateFilterExpression(parsedJson);
-                    const newFilterState =
-                        this.parseFilterExpression(parsedJson);
-                    this.filterState = { rootGroup: newFilterState };
-                    this.isValid = true;
+                    if (validateFilterExpression(parsedJson, this.fields)) {
+                        const newFilterState = parseFilterExpression(
+                            parsedJson,
+                            this.generateTransientId
+                        );
+                        this.filterState = { rootGroup: newFilterState };
+                        this.isValid = true;
+                    }
                 } catch (error) {
                     console.error(
                         gettext(
@@ -141,7 +125,10 @@ export class FilterEditorStore {
                 }
             } else {
                 this.filterState = {
-                    rootGroup: this.parseFilterExpression([]),
+                    rootGroup: parseFilterExpression(
+                        [],
+                        this.generateTransientId
+                    ),
                 };
                 this.isValid = true;
             }
@@ -159,14 +146,14 @@ export class FilterEditorStore {
     @action.bound
     clear() {
         this.jsonValue = stringifyExpresion([]);
-        this.filterState = EMPTY_FILTER_STATE;
+        this.filterState = generateEMptyFilterState();
         this.validateCurrentState();
     }
 
     @action.bound
     addCondition(groupId: number) {
         const [firstField] = this.fields;
-        const operator = "==" as EqNeOp;
+        const operator = "==";
         let value: ConditionValue = null;
         if (firstField) {
             value = getDefaultValue(this.fields, firstField.keyname, operator);
@@ -174,13 +161,14 @@ export class FilterEditorStore {
 
         const newCondition: FilterCondition = {
             id: this.generateTransientId(),
+            type: "condition",
             field: firstField?.keyname || "",
             operator,
             value,
         };
         const group = this._findGroupById(this.filterState.rootGroup, groupId);
         if (group) {
-            group.conditions.push(newCondition as FilterCondition);
+            group.conditions.push(newCondition);
             group.childrenOrder.push({
                 type: "condition",
                 id: newCondition.id,
@@ -191,9 +179,10 @@ export class FilterEditorStore {
     }
 
     @action.bound
-    addGroup(parentGroupId: number, operator: "all" | "any" = "all") {
+    addGroup(parentGroupId: number, operator: LogicalOp = "all") {
         const newGroup: FilterGroup = {
             id: this.generateTransientId(),
+            type: "group",
             operator,
             conditions: [],
             groups: [],
@@ -225,7 +214,7 @@ export class FilterEditorStore {
     }
 
     @action.bound
-    updateGroupOperator(groupId: number, operator: "all" | "any") {
+    updateGroupOperator(groupId: number, operator: LogicalOp) {
         const group = this._findGroupById(this.filterState.rootGroup, groupId);
         if (group) {
             group.operator = operator;
@@ -336,11 +325,15 @@ export class FilterEditorStore {
         try {
             this.transientIdCounter = 0;
             const expression = JSON.parse(value);
-            this.validateFilterExpression(expression);
-            const filterState = this.parseFilterExpression(expression);
-            this.validJsonValue = stringifyExpresion(expression);
-            this.filterState = { rootGroup: filterState };
-            this.isValid = true;
+            if (validateFilterExpression(expression, this.fields)) {
+                const filterState = parseFilterExpression(
+                    expression,
+                    this.generateTransientId
+                );
+                this.validJsonValue = stringifyExpresion(expression);
+                this.filterState = { rootGroup: filterState };
+                this.isValid = true;
+            }
         } catch (error) {
             console.error(gettext("Failed to parse filter expression:"), error);
             this.activeTab = "json";
@@ -357,7 +350,7 @@ export class FilterEditorStore {
         if (this.activeTab === "json" && this.jsonValue) {
             try {
                 const parsed = JSON.parse(this.jsonValue);
-                this.validateFilterExpression(parsed);
+                validateFilterExpression(parsed, this.fields);
                 this.isValid = true;
                 return parsed;
             } catch (_error) {
@@ -370,7 +363,7 @@ export class FilterEditorStore {
         const expression = this.convertToFilterExpression(
             this.filterState.rootGroup
         );
-        this.validateFilterExpression(expression);
+        validateFilterExpression(expression, this.fields);
         return expression;
     }
 
@@ -381,7 +374,7 @@ export class FilterEditorStore {
                 if (Array.isArray(parsed) && parsed.length === 0) {
                     return undefined;
                 }
-                this.validateFilterExpression(parsed);
+                validateFilterExpression(parsed, this.fields);
                 this.isValid = true;
                 return this.jsonValue;
             } catch (_error) {
@@ -397,7 +390,7 @@ export class FilterEditorStore {
         if (expression.length === 0) {
             return undefined;
         }
-        this.validateFilterExpression(expression);
+        validateFilterExpression(expression, this.fields);
         return stringifyExpresion(expression);
     }
 
@@ -410,9 +403,9 @@ export class FilterEditorStore {
         return this.validJsonValue;
     }
 
-    private generateTransientId(): number {
+    private generateTransientId = (): number => {
         return ++this.transientIdCounter;
-    }
+    };
 
     @action.bound
     private _removeItemFromGroup(
@@ -450,7 +443,7 @@ export class FilterEditorStore {
         targetItemId?: number,
         position: "before" | "after" = "after"
     ) {
-        const filterType = "conditions" in pendingItem ? "group" : "condition";
+        const filterType = pendingItem.type;
         const group = this._findGroupById(
             this.filterState.rootGroup,
             targetGroupId
@@ -560,157 +553,28 @@ export class FilterEditorStore {
         return false;
     }
 
-    private parseFilterExpression(expression: any[]): FilterGroup {
-        if (!Array.isArray(expression) || expression.length === 0) {
-            return {
-                id: this.generateTransientId(),
-                operator: "all",
-                conditions: [],
-                groups: [],
-                childrenOrder: [],
-            };
-        }
-
-        const [operator, ...args] = expression;
-
-        if (operator === "all" || operator === "any") {
-            const group: FilterGroup = {
-                id: this.generateTransientId(),
-                operator,
-                conditions: [],
-                groups: [],
-                childrenOrder: [],
-            };
-            for (const arg of args) {
-                if (Array.isArray(arg) && arg.length > 0) {
-                    if (this.isConditionExpression(arg)) {
-                        const condition = this.parseConditionExpression(arg);
-                        group.conditions.push(condition);
-                        group.childrenOrder.push({
-                            type: "condition",
-                            id: condition.id,
-                        });
-                    } else {
-                        const childGroup = this.parseFilterExpression(arg);
-                        group.groups.push(childGroup);
-                        group.childrenOrder.push({
-                            type: "group",
-                            id: childGroup.id,
-                        });
-                    }
-                }
-            }
-            return group;
-        }
-
-        if (this.isConditionExpression(expression)) {
-            const condition = this.parseConditionExpression(expression);
-            return {
-                id: this.generateTransientId(),
-                operator: "all",
-                conditions: [condition],
-                groups: [],
-                childrenOrder: [{ type: "condition", id: condition.id }],
-            };
-        }
-
-        return {
-            id: this.generateTransientId(),
-            operator: "all",
-            conditions: [],
-            groups: [],
-            childrenOrder: [],
-        };
-    }
-
-    private isConditionExpression(expression: any[]): boolean {
-        if (!Array.isArray(expression) || expression.length < 2) return false;
-        return ValidOperators.includes(expression[0]);
-    }
-
-    private parseConditionExpression(expression: any[]): FilterCondition {
-        const [operator, fieldExpression, value] = expression;
-        let field = "";
-        if (Array.isArray(fieldExpression) && fieldExpression[0] === "get") {
-            field = fieldExpression[1];
-        } else if (operator === "has" || operator === "!has") {
-            if (Array.isArray(expression[1]) && expression[1][0] === "get") {
-                field = expression[1][1];
-            }
-        }
-
-        const baseCondition = {
-            id: this.generateTransientId(),
-            field,
-            operator,
-            value,
-        };
-
-        if (operator === "has" || operator === "!has") {
-            return {
-                ...baseCondition,
-                operator: operator as HasOp,
-                value: undefined,
-            };
-        } else if (operator === "in" || operator === "!in") {
-            return {
-                ...baseCondition,
-                operator: operator as InOp,
-                value: Array.isArray(value) ? value : [],
-            };
-        } else if (operator === "==" || operator === "!=") {
-            return {
-                ...baseCondition,
-                operator: operator as EqNeOp,
-                value: value as ConditionValue,
-            };
-        } else {
-            return {
-                ...baseCondition,
-                operator: operator as CmpOp,
-                value: value as ConditionValue,
-            };
-        }
-    }
-
     private convertToFilterExpression(group: FilterGroup): FilterExpression {
         const expressions: (ConditionExpr | GroupExpr)[] = [];
 
         const appendCondition = (condition: FilterCondition) => {
-            if (condition.field) {
-                if (
-                    condition.operator === "has" ||
-                    condition.operator === "!has"
-                ) {
-                    expressions.push([
-                        condition.operator,
-                        ["get", condition.field],
-                    ]);
-                } else {
-                    if (
-                        condition.operator === "in" ||
-                        condition.operator === "!in"
-                    ) {
-                        expressions.push([
-                            condition.operator as InOp,
-                            ["get", condition.field],
-                            condition.value as Array<string | number>,
-                        ]);
+            const { operator, field, value } = condition;
+            if (field) {
+                if (operator === "has" || operator === "!has") {
+                    expressions.push([operator, ["get", field]]);
+                } else if (value !== undefined && value !== null) {
+                    if (operator === "in" || operator === "!in") {
+                        if (Array.isArray(value)) {
+                            expressions.push([operator, ["get", field], value]);
+                        }
+                    } else if (operator === "==" || operator === "!=") {
+                        if (!Array.isArray(value)) {
+                            expressions.push([operator, ["get", field], value]);
+                        }
                     } else if (
-                        condition.operator === "==" ||
-                        condition.operator === "!="
+                        typeof value === "string" ||
+                        typeof value === "number"
                     ) {
-                        expressions.push([
-                            condition.operator as EqNeOp,
-                            ["get", condition.field],
-                            condition.value as ConditionValue,
-                        ]);
-                    } else {
-                        expressions.push([
-                            condition.operator as CmpOp,
-                            ["get", condition.field],
-                            condition.value as string | number,
-                        ]);
+                        expressions.push([operator, ["get", field], value]);
                     }
                 }
             }
@@ -750,13 +614,13 @@ export class FilterEditorStore {
             let expression: FilterExpression;
             if (this.activeTab === "json" && this.jsonValue) {
                 const parsed = JSON.parse(this.jsonValue);
-                this.validateFilterExpression(parsed);
+                validateFilterExpression(parsed, this.fields);
                 expression = parsed;
             } else {
                 expression = this.convertToFilterExpression(
                     this.filterState.rootGroup
                 );
-                this.validateFilterExpression(expression);
+                validateFilterExpression(expression, this.fields);
             }
             this.validJsonValue =
                 expression.length === 0
@@ -771,191 +635,6 @@ export class FilterEditorStore {
                     ? error.message
                     : gettext("Validation failed");
             this.validJsonValue = undefined;
-        }
-    }
-
-    private validateFilterExpression(expression: any[]): void {
-        if (!Array.isArray(expression)) {
-            throw new Error(gettext("Expression must be an array"));
-        }
-
-        if (expression.length === 0) {
-            return;
-        }
-
-        const [operator, ...args] = expression;
-
-        if (operator === "all" || operator === "any") {
-            if (args.length === 0) {
-                throw new Error(
-                    gettext("Group operator must have at least one argument")
-                );
-            }
-            for (const arg of args) {
-                if (!Array.isArray(arg)) {
-                    throw new Error(
-                        gettext(
-                            "All arguments to group operator must be arrays"
-                        )
-                    );
-                }
-                this.validateFilterExpression(arg);
-            }
-            return;
-        }
-
-        if (this.isConditionExpression(expression)) {
-            this.validateConditionExpression(expression);
-            return;
-        }
-
-        throw new Error(
-            gettextf("Unknown or invalid root operator: '{operator}'")({
-                operator,
-            })
-        );
-    }
-
-    private validateDateTimeValue(
-        fieldType: FeatureLayerFieldRead["datatype"],
-        value: any,
-        fieldName: string
-    ): void {
-        if (value === null || value === undefined) {
-            return;
-        }
-
-        if (typeof value !== "string") {
-            throw new Error(
-                gettextf(
-                    "Field '{fieldName}' expects a string for {fieldType}, but got '{valueType}'"
-                )({ fieldName, fieldType, valueType: typeof value })
-            );
-        }
-
-        if (!isTemporalDatatype(fieldType)) {
-            return;
-        }
-
-        const format = TEMPORAL_FORMATS[fieldType];
-        if (!format) {
-            return;
-        }
-
-        const dayjsValue = dayjs(value, format, true);
-        if (!dayjsValue.isValid()) {
-            throw new Error(
-                gettextf(
-                    "Field '{fieldName}' expects {fieldType} format '{expectedFormat}', but got '{value}'"
-                )({
-                    fieldName,
-                    fieldType,
-                    expectedFormat: format,
-                    value,
-                })
-            );
-        }
-    }
-
-    private validateConditionExpression(expression: any[]): void {
-        const [operator, fieldExpression, value] = expression;
-
-        if (!ValidOperators.includes(operator)) {
-            throw new Error(
-                gettextf("Invalid operator: '{operator}'")({ operator })
-            );
-        }
-
-        if (operator === "has" || operator === "!has") {
-            if (expression.length !== 2) {
-                throw new Error(
-                    gettextf(
-                        "Operator '{operator}' expects 1 argument, but got '{length}'"
-                    )({ operator, length: expression.length - 1 })
-                );
-            }
-        } else {
-            if (expression.length !== 3) {
-                throw new Error(
-                    gettextf(
-                        "Operator '{operator}' expects 1 argument, but got '{length}'"
-                    )({ operator, length: expression.length - 1 })
-                );
-            }
-        }
-
-        if (!Array.isArray(fieldExpression) || fieldExpression[0] !== "get") {
-            throw new Error(
-                gettext("Field expression must be ['get', fieldName]")
-            );
-        }
-
-        if (typeof fieldExpression[1] !== "string") {
-            throw new Error(gettext("Field name must be a string"));
-        }
-
-        const fieldName = fieldExpression[1];
-        const field = this.fields.find((f) => f.keyname === fieldName);
-        if (!field) {
-            throw new Error(
-                gettextf("Unknown field: '{fieldName}'")({ fieldName })
-            );
-        }
-
-        const operatorOption = OPERATORS.find((op) => op.value === operator);
-        if (
-            operatorOption &&
-            !operatorOption.supportedTypes.includes(field.datatype)
-        ) {
-            const fieldType = field.datatype;
-            throw new Error(
-                gettextf(
-                    "Operator '{operator}' is not supported for field type '{fieldType}'"
-                )({ operator, fieldType })
-            );
-        }
-
-        if (operator === "in" || operator === "!in") {
-            if (!Array.isArray(value)) {
-                throw new Error(
-                    gettextf(
-                        "Value for operator '{operator}' must be an array."
-                    )({ operator })
-                );
-            }
-            if (isTemporalDatatype(field.datatype)) {
-                for (const item of value) {
-                    this.validateDateTimeValue(field.datatype, item, fieldName);
-                }
-            }
-        } else if (operator !== "has" && operator !== "!has") {
-            const fieldType = field.datatype;
-            const isTemporalField = isTemporalDatatype(fieldType);
-
-            if (value !== null && value !== undefined) {
-                if (isTemporalField) {
-                    this.validateDateTimeValue(fieldType, value, fieldName);
-                } else {
-                    const valueType = typeof value;
-                    if (
-                        (fieldType === "INTEGER" || fieldType === "REAL") &&
-                        valueType !== "number"
-                    ) {
-                        throw new Error(
-                            gettextf(
-                                "Field '{fieldName}' expects a number, but got '{valueType}'"
-                            )({ fieldName, valueType })
-                        );
-                    }
-                    if (fieldType === "BIGINT" && valueType !== "string") {
-                        throw new Error(
-                            gettextf(
-                                "Field '{fieldName}' expects a string, but got '{valueType}'"
-                            )({ fieldName, valueType })
-                        );
-                    }
-                }
-            }
         }
     }
 

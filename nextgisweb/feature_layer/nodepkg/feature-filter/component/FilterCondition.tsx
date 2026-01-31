@@ -1,4 +1,6 @@
 import { useDndContext } from "@dnd-kit/core";
+import type { DraggableAttributes } from "@dnd-kit/core";
+import type { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
 import dayjs from "dayjs";
 import type { Dayjs } from "dayjs";
 import { observer } from "mobx-react-lite";
@@ -32,6 +34,7 @@ import type {
     FilterCondition as FilterConditionType,
     HasOp,
     InOp,
+    OperatorValueMap,
 } from "../type";
 
 import DragHandleIcon from "@nextgisweb/icon/material/drag_indicator";
@@ -42,8 +45,8 @@ interface FilterConditionProps {
     condition: FilterConditionType;
     store: FilterEditorStore;
     dragHandleProps?: {
-        attributes: any;
-        listeners: any;
+        attributes: DraggableAttributes;
+        listeners?: SyntheticListenerMap;
     };
 }
 
@@ -60,16 +63,16 @@ const getPlaceholder = (
     return defaultPlaceholder;
 };
 
-export const getDefaultValue = (
+export const getDefaultValue = <O extends keyof OperatorValueMap>(
     fields: FeatureLayerFieldRead[],
     field: string,
-    operator: EqNeOp | CmpOp | InOp | HasOp
-) => {
+    operator: O
+): OperatorValueMap[O] => {
     const fieldInfo = fields.find((f) => f.keyname === field);
     const wantsNoValue = ["has", "!has"].includes(operator);
     const wantsArray = ["in", "!in"].includes(operator);
 
-    let defaultValue: any = undefined;
+    let defaultValue = undefined;
 
     if (wantsArray) {
         defaultValue = [];
@@ -102,7 +105,7 @@ export const getDefaultValue = (
             }
         }
     }
-    return defaultValue;
+    return defaultValue as OperatorValueMap[O];
 };
 
 const calculateValue = (
