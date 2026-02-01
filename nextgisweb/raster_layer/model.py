@@ -38,7 +38,7 @@ from nextgisweb.resource import (
 )
 
 from .kind_of_data import RasterLayerData
-from .util import band_color_interp, calc_overviews_levels, raster_size
+from .util import band_color_interp, calc_overviews_levels, is_rgb, raster_size
 
 Base.depends_on("resource")
 
@@ -162,9 +162,6 @@ class RasterLayer(Resource, SpatialLayerMixin):
                     band.GetNoDataValue() is not None
                 )
 
-        # Check if this is an RGB or RGBA image with 8-bit color depth
-        is_rgba = data_type == gdal.GDT_Byte and ds.RasterCount in (3, 4)
-
         # Convert the mask band to the alpha band
         if mask_flags.count(gdal.GMF_PER_DATASET) == len(mask_flags):
             bands = [bidx for bidx in range(1, ds.RasterCount + 1)]
@@ -269,7 +266,7 @@ class RasterLayer(Resource, SpatialLayerMixin):
                 "-co",
                 "RESAMPLING=NEAREST",
                 "-co",
-                f"OVERVIEW_COMPRESS={'JPEG' if is_rgba else 'AUTO'}",
+                f"OVERVIEW_COMPRESS={'JPEG' if is_rgb(ds) else 'AUTO'}",
             )
         else:
             cmd_opts = (
@@ -357,6 +354,8 @@ class RasterLayer(Resource, SpatialLayerMixin):
         ds = gdal.Open(str(fn), gdalconst.GA_ReadOnly)
         levels = list(map(str, calc_overviews_levels(ds)))
 
+        use_jpeg_compression = is_rgb(ds)
+
         cmd = ["gdaladdo", "-q", "-clean", str(fn)]
 
         logger.debug("Removing existing overviews with command: " + " ".join(cmd))
@@ -371,6 +370,10 @@ class RasterLayer(Resource, SpatialLayerMixin):
         # resampling method. For now, using "nearest" is the safest option to
         # avoid altering pixel values.
         resampling = "nearest"
+
+        compression = "JPEG" if use_jpeg_compression else "DEFLATE"
+
+        band_count = ds.RasterCount
         ds = None
 
         cmd = [
@@ -381,15 +384,22 @@ class RasterLayer(Resource, SpatialLayerMixin):
             resampling,
             "--config",
             "COMPRESS_OVERVIEW",
-            "DEFLATE",
+            compression,
             "--config",
             "INTERLEAVE_OVERVIEW",
             "PIXEL",
             "--config",
             "BIGTIFF_OVERVIEW",
             "YES",
-            str(fn),
-        ] + levels
+        ]
+
+        # Use YCBCR photometric for 3-band RGB to align with COG driver behavior
+        if use_jpeg_compression and band_count == 3:
+            cmd.extend(["--config", "PHOTOMETRIC_OVERVIEW", "YCBCR"])
+
+        cmd.append(str(fn))
+
+        cmd.extend(levels)
 
         logger.debug("Building raster overview with command: " + " ".join(cmd))
         subprocess.check_call(cmd)
