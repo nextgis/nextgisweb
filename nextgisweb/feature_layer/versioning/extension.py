@@ -120,7 +120,7 @@ class ExtensionQueries:
             (ht.c.extension_id if self.has_id else sa.null().label("extension_id")),
             ht.c.version_nid,
             ht.c.version_nop,
-            *(getattr(ht.c, c) for c in self.cols),
+            *(ht.c[c] for c in self.cols),
         ).where(
             ht.c.resource_id == self.p_rid,
             ht.c.feature_id == qet.c.feature_id,
@@ -187,7 +187,7 @@ class ExtensionQueries:
                 sa.func.coalesce(present_op(ht), sa.false()).label("previous"),
                 et.c.version_id,
                 et.c.version_op,
-                *(getattr(ht.c, c) for c in self.cols),
+                *(ht.c[c] for c in self.cols),
             )
             .where(et.c.resource_id == self.p_rid, et.c.version_id > self.p_vid)
             .select_from(et)
@@ -211,7 +211,7 @@ class ExtensionQueries:
             q.c.previous,
             q.c.version_id,
             q.c.version_op,
-            *(getattr(q.c, c) for c in self.cols),
+            *(q.c[c] for c in self.cols),
         ).where(sa.text("current != previous OR (current AND previous)"))
 
     @cached_query
@@ -223,7 +223,7 @@ class ExtensionQueries:
             sa.select(
                 self.p_rid.label("resource_id"),
                 ct.c.feature_id,
-                *(getattr(ct.c, c) for c in self.cols),
+                *(ct.c[c] for c in self.cols),
                 *extra.values(),
             ).where(ct.c.resource_id == self.p_sid),
         )
@@ -243,7 +243,7 @@ class ExtensionQueries:
             sa.select(
                 self.p_rid.label("resource_id"),
                 pit.c.feature_id,
-                *(getattr(pit.c, c) for c in self.cols),
+                *(pit.c[c] for c in self.cols),
                 *extra.values(),
             ),
             include_defaults=False,
@@ -300,7 +300,7 @@ class ExtensionQueries:
             sa.select(
                 *hcolumns(ht),
                 ht.c.version_op.op("=")(sa.text("'D'")).label("deleted"),
-                *(getattr(ht.c, c) for c in self.cols),
+                *(ht.c[c] for c in self.cols),
             )
             .where(where_resource(ht), where_range(self.p_initial), *where_fid(ht))
             .subquery("qi")
@@ -311,7 +311,7 @@ class ExtensionQueries:
             sa.select(
                 *hcolumns(et),
                 ct.c.feature_id.is_(None).label("deleted"),
-                *(getattr(ct.c, c) for c in self.cols),
+                *(ct.c[c] for c in self.cols),
             )
             .join(
                 ct,
@@ -331,7 +331,7 @@ class ExtensionQueries:
             sa.select(
                 *hcolumns(ht),
                 ht.c.version_op.op("=")(sa.text("'D'")).label("deleted"),
-                *(getattr(ht.c, c) for c in self.cols),
+                *(ht.c[c] for c in self.cols),
             ).where(where_resource(ht), where_range(self.p_target), *where_fid(ht)),
         ).subquery("qt")
 
@@ -481,7 +481,7 @@ class ExtensionQueries:
             ht.c.feature_id,
             *((ht.c.extension_id,) if self.has_id else ()),
             ht.c.version_id,
-            *(getattr(ht.c, c) for c in self.cols),
+            *(ht.c[c] for c in self.cols),
         ).where(
             self.resource_range(ht).op("@>", precedence=4)(rid),
             self.version_range(ht).op("@>", precedence=4)(self.p_vid),
@@ -492,7 +492,7 @@ class ExtensionQueries:
             et.c.feature_id,
             *((et.c.extension_id,) if self.has_id else ()),
             et.c.version_id,
-            *(getattr(ct.c, c) for c in self.cols),
+            *(ct.c[c] for c in self.cols),
         ).where(
             et.c.resource_id == rid,
             et.c.feature_id == self.p_fid if fid else sa.true(),

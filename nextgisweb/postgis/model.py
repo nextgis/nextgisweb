@@ -95,7 +95,7 @@ def calculate_extent(layer, where=None, geomcol=None):
     tab = layer._sa_table(True)
 
     where_geom_exist = not (where is None and geomcol is None) and len(where) > 0
-    geomcol = geomcol if where_geom_exist else getattr(tab.columns, layer.column_geom)
+    geomcol = geomcol if where_geom_exist else tab.columns[layer.column_geom]
 
     # TODO: Why do we use ST_SetSRID(ST_Force2D(...), ...) here?
     extent_fn = st_extent(st_transform(st_setsrid(st_force2d(geomcol), layer.geometry_srid), 4326))
@@ -676,7 +676,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
         columns_mapping = {"id": idcol}
         for field in self.layer.fields:
-            columns_mapping[field.keyname] = getattr(tab.columns, field.column_name)
+            columns_mapping[field.keyname] = tab.columns[field.column_name]
 
         srs = self.layer.srs if self._srs is None else self._srs
 
@@ -697,7 +697,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
         for idx, fld in enumerate(self.layer.fields):
             if self._fields is None or fld.keyname in self._fields:
                 label = f"fld_{idx}"
-                columns.append(getattr(tab.columns, fld.column_name).label(label))
+                columns.append(tab.columns[fld.column_name].label(label))
                 selected_fields.append((fld.keyname, label))
 
         if self._filter_by:

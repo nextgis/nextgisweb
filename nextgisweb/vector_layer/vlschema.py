@@ -237,7 +237,7 @@ class VLSchema(MetaData):
             q.c.current,
             q.c.previous,
             q.c.geom,
-            *(getattr(q.c, f"fld_{idx}") for idx, fc in enumerate(ht.fields.values(), start=1)),
+            *(q.c[f"fld_{idx}"] for idx, fc in enumerate(ht.fields.values(), start=1)),
         ).where(text("current != previous OR (current AND previous)"))
 
         fnames = {k: f"fld_{idx}" for idx, k in enumerate(ht.fields.keys(), start=1)}
