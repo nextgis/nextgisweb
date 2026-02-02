@@ -24,7 +24,7 @@ def create_tsconfig(npkgs: dict[str, Path], *, debug):
 
     compiler_options = dict(
         target="es2017",
-        lib=["dom", "dom.iterable", "esnext"],
+        lib=["dom", "dom.iterable", "es2024"],
         allowJs=True,
         skipLibCheck=True,
         esModuleInterop=True,

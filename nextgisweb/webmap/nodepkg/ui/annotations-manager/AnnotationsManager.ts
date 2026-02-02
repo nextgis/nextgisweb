@@ -58,13 +58,12 @@ export class AnnotationsManager {
                 if (this._annotationsLayer) {
                     this._annotationsLayer.setZIndex(
                         Math.max(
-                            ...display.treeStore.items
-                                .values()
-                                .map((item) =>
+                            ...[...display.treeStore.items.values()].map(
+                                (item) =>
                                     item.isLayer()
                                         ? item.drawOrderPosition || 0
                                         : 0
-                                )
+                            )
                         ) * 2 // Multiply by two for insurance
                     );
                 }

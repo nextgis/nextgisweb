@@ -22,7 +22,7 @@ export async function prepareResourceChildren({
     }
 
     await Promise.all(
-        userNames.keys().map(async (id) => {
+        [...userNames.keys()].map(async (id) => {
             const user = await route("auth.user.item", { id }).get({
                 cache: true,
                 query: { brief: true },
