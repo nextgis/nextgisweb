@@ -3,22 +3,22 @@ import { useEffect, useMemo, useState } from "react";
 import { Table } from "@nextgisweb/gui/antd";
 import type { TableProps } from "@nextgisweb/gui/antd";
 import { utc } from "@nextgisweb/gui/dayjs";
-import { SvgIconLink } from "@nextgisweb/gui/svg-icon";
 import { sorterFactory } from "@nextgisweb/gui/util";
 import { formatSize } from "@nextgisweb/gui/util/formatSize";
-import { routeURL } from "@nextgisweb/pyramid/api";
 import pyramidSettings from "@nextgisweb/pyramid/client-settings";
 import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { ResourceAttrItem } from "@nextgisweb/resource/api/ResourceAttrItem";
+import { DefaultAttributes } from "@nextgisweb/resource/api/resource-attr";
 import type { Attributes } from "@nextgisweb/resource/api/resource-attr";
 import { useResourceAttr } from "@nextgisweb/resource/hook/useResourceAttr";
+import { useResourceIcon } from "@nextgisweb/resource/resource-icon/useResourceIcon";
 
+import { registry } from "../registry";
 import type { ResourceSectionProps } from "../type";
 
 import { MenuDropdown } from "./component/MenuDropdown";
 import { RenderActions } from "./component/RenderActions";
-import { registry } from "../registry";
 import type { ChildrenResource } from "./type";
 import { prepareResourceChildren } from "./util/prepareResourceChildren";
 
@@ -27,13 +27,6 @@ import { LoadingOutlined } from "@ant-design/icons";
 import "./ResourceSectionChildren.less";
 
 const { Column } = Table;
-
-export const DefaultAttributes = [
-    ["resource.cls"],
-    ["resource.display_name"],
-    ["resource.owner_user"],
-    ["resource.creation_date"],
-] as const satisfies Attributes;
 
 const storageEnabled = pyramidSettings.storage.enabled;
 
@@ -51,6 +44,7 @@ export function ResourceSectionChildren({ resourceId }: ResourceSectionProps) {
     const [selected, setSelected] = useState<number[]>([]);
     const { makeSignal } = useAbortController();
     const { fetchResourceItems } = useResourceAttr();
+    const { attributes: iconAttrs, getIcon } = useResourceIcon();
 
     useEffect(() => {
         (async () => {
@@ -58,7 +52,7 @@ export function ResourceSectionChildren({ resourceId }: ResourceSectionProps) {
             try {
                 const reg = registry.queryAll();
 
-                const attrs: [...Attributes] = [];
+                const attrs: [...Attributes] = [...iconAttrs];
                 for (const { attributes } of reg) {
                     if (attributes) {
                         attrs.push(...attributes);
@@ -77,7 +71,7 @@ export function ResourceSectionChildren({ resourceId }: ResourceSectionProps) {
                 setIsDataLoading(false);
             }
         })();
-    }, [fetchResourceItems, makeSignal, resourceId]);
+    }, [fetchResourceItems, makeSignal, iconAttrs, resourceId]);
 
     useEffect(() => {
         if (items !== undefined) {
@@ -128,14 +122,9 @@ export function ResourceSectionChildren({ resourceId }: ResourceSectionProps) {
                 className="displayName"
                 dataIndex="displayName"
                 sorter={sorterFactory("displayName")}
-                render={(value, record) => (
-                    <SvgIconLink
-                        href={routeURL("resource.show", record.id)}
-                        icon={`rescls-${record.cls}`}
-                    >
-                        {value}
-                    </SvgIconLink>
-                )}
+                render={(value, record) =>
+                    getIcon({ item: record.it, children: value })
+                }
             />
             <Column<ChildrenResource>
                 title={gettext("Type")}

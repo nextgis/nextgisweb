@@ -1,8 +1,8 @@
 import { route } from "@nextgisweb/pyramid/api";
 import type { ResourceAttrItem } from "@nextgisweb/resource/api/ResourceAttrItem";
+import type { DefaultAttributes } from "@nextgisweb/resource/api/resource-attr";
 import { resources } from "@nextgisweb/resource/blueprint";
 
-import type { DefaultAttributes } from "../ResourceSectionChildren";
 import type { ChildrenResource } from "../type";
 
 export async function prepareResourceChildren({

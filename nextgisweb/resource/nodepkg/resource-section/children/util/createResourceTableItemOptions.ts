@@ -1,11 +1,13 @@
 import { assert } from "@nextgisweb/jsrealm/error";
 import { route } from "@nextgisweb/pyramid/api";
 import type { ResourceAttrItem } from "@nextgisweb/resource/api/ResourceAttrItem";
-import { resourceAttrItems } from "@nextgisweb/resource/api/resource-attr";
+import {
+    DefaultAttributes,
+    resourceAttrItems,
+} from "@nextgisweb/resource/api/resource-attr";
 import type { Attributes } from "@nextgisweb/resource/api/resource-attr";
 import type { ResourceRead } from "@nextgisweb/resource/type/api";
 
-import { DefaultAttributes } from "../ResourceSectionChildren";
 import { registry } from "../../registry";
 import type { ChildrenResource } from "../type";
 

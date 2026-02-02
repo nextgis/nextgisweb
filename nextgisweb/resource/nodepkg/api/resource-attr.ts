@@ -18,6 +18,13 @@ export type Values<T extends [keyof ResourceAttrTypes, ...unknown[]][]> = {
         : never;
 };
 
+export const DefaultAttributes = [
+    ["resource.cls"],
+    ["resource.display_name"],
+    ["resource.owner_user"],
+    ["resource.creation_date"],
+] as const satisfies Attributes;
+
 export interface ResourceAttrOptions<A extends [...Attributes]> extends Pick<
     RequestOptions,
     "signal"
@@ -41,7 +48,12 @@ export async function resourceAttr<A extends [...Attributes]>({
     return [
         preparedAttrs,
         items.map(([id, values]) => {
-            return [id, values.map(([e, v]) => (e === 0 ? v : undefined))];
+            return [
+                id,
+                values.map((val) =>
+                    val ? (val[0] === 0 ? val[1] : undefined) : val
+                ),
+            ];
         }) as [number, Values<A>][],
     ];
 }

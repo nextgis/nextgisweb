@@ -1,13 +1,14 @@
 /** @registry */
 
-import type React from "react";
 import type { FC, LazyExoticComponent } from "react";
 
 import { pluginRegistry } from "@nextgisweb/jsrealm/plugin";
 import type { ResourceAttrItem } from "@nextgisweb/resource/api/ResourceAttrItem";
-import type { Attributes } from "@nextgisweb/resource/api/resource-attr";
+import type {
+    Attributes,
+    DefaultAttributes,
+} from "@nextgisweb/resource/api/resource-attr";
 
-import type { DefaultAttributes } from "./children/ResourceSectionChildren";
 import type { ChildrenResource } from "./children/type";
 
 export type ResourceActionWidgetProps<P = unknown> = P &
