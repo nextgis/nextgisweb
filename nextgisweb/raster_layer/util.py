@@ -29,3 +29,15 @@ def band_color_interp(band) -> str:
     return gdal.GetColorInterpretationName(
         band.GetColorInterpretation(),
     )
+
+
+def is_rgb(ds):
+    if ds.RasterCount not in (3, 4):
+        return False
+
+    for bidx in range(1, ds.RasterCount + 1):
+        band = ds.GetRasterBand(bidx)
+        if band.DataType != gdal.GDT_Byte:
+            return False
+
+    return True
