@@ -333,7 +333,7 @@ def print(request, *, body: PrintBody) -> Response:
         index_html = temp_dir / "index.html"
         index_html.write_text(
             render(
-                "template/print.mako",
+                "nextgisweb:webmap/template/print.mako",
                 {
                     "width": int(body.width),
                     "height": int(body.height),

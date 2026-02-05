@@ -527,7 +527,6 @@ def setup_pyramid(comp, config):
 
     _setup_static(comp, config)
     _setup_pyramid_tm(comp, config)
-    _setup_pyramid_mako(comp, config)
 
     # COMMON REQUEST'S ATTRIBUTES
 
@@ -622,6 +621,7 @@ def setup_pyramid(comp, config):
 
     config.add_renderer("json", renderer.JSON())
     config.add_renderer("msgspec", renderer.MsgSpec())
+    _setup_pyramid_mako(comp, config)
 
     # Filter for quick translation. Defines function tr, which we can use
     # instead of request.localizer.translate in mako templates.
@@ -924,10 +924,7 @@ def _m_gettext(_template_filename):
 
 
 def _setup_pyramid_mako(comp, config):
-    settings = config.registry.settings
-
-    settings["pyramid.reload_templates"] = comp.env.core.debug
-    settings["mako.imports"] = [
+    mako_imports = [
         "from markupsafe import Markup",
         "from nextgisweb.pyramid.view import json_js",
         "from nextgisweb.pyramid.view import _m_gettext",
@@ -946,16 +943,10 @@ def _setup_pyramid_mako(comp, config):
         ),
         "del _m, _m_gettext",
     ]
-    settings["mako.default_filters"] = ["h"]
 
-    import pyramid_mako
-
-    config.include(pyramid_mako)
-
-    def mako_cache_control(event):
-        if (ri := event.get("renderer_info")) and (ri.type in (".mako", ".mak")):
-            cache_control = event["request"].response.cache_control
-            cache_control.no_store = True
-            cache_control.must_revalidate = True
-
-    config.add_subscriber(mako_cache_control, BeforeRender)
+    opts = dict(
+        filesystem_checks=comp.env.core.debug,
+        default_filters=["h"],
+        imports=mako_imports,
+    )
+    config.add_renderer(".mako", renderer.Mako(opts))
