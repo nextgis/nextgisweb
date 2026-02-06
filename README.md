@@ -70,8 +70,7 @@ It combines a powerful spatial backend, a web-based interface for administration
   Use QGIS styles to visualize datasets.
 
 - **Hub for QGIS-centered teamwork**  
-  Publish QGIS projects to NextGIS Web and edit server-side data directly from QGIS using the **NextGIS Connect** plugin:  
-  https://github.com/nextgis/nextgis_connect
+  Publish QGIS projects to NextGIS Web and edit server-side data directly from QGIS using the **NextGIS Connect** plugin: https://github.com/nextgis/nextgis_connect
 
 ---
 
@@ -107,8 +106,7 @@ It combines a powerful spatial backend, a web-based interface for administration
   All functionality is accessible programmatically: users, layers, services, maps, permissions, and more.
 
 - **Frontend integration**  
-  Build custom web applications using **NextGIS JavaScript libraries**:  
-  https://github.com/nextgis/nextgisweb_frontend
+  Build custom web applications using **NextGIS JavaScript libraries**: https://github.com/nextgis/nextgisweb_frontend
 
 
 ## Documentation
