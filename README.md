@@ -73,10 +73,6 @@ It combines a powerful spatial backend, a web-based interface for administration
   Publish QGIS projects to NextGIS Web and edit server-side data directly from QGIS using the **NextGIS Connect** plugin:  
   https://github.com/nextgis/nextgis_connect
 
-- ****  
-  Track the full history of vector datasets — who changed what, when, and how.  
-  Roll back changes or audit edits without data loss.
-
 ---
 
 ### Built-in version control for vector data
