@@ -12,6 +12,22 @@
 
 It combines a powerful spatial backend, a web-based interface for administration and map publishing, and a full REST API. Suitable for projects ranging from small teams to enterprise-grade GIS infrastructures.
 
+## Table of contents
+
+- [Key capabilities](#key-capabilities)
+  - [Geospatial data management](#geospatial-data-management)
+  - [Web map and data publishing](#web-map-and-data-publishing)
+  - [QGIS-native collaboration](#qgis-native-collaboration)
+  - [Built-in version control for vector data](#built-in-version-control-for-vector-data)
+  - [Editing and attachments](#editing-and-attachments)
+  - [Security and access control](#security-and-access-control)
+  - [API and extensibility](#api-and-extensibility)
+- [Documentation](#documentation)
+- [Examples and live demo](#examples-and-live-demo)
+- [Community and ecosystem](#community-and-ecosystem)
+- [Commercial support](#commercial-support)
+- [License](#license)
+
 
 ## Key capabilities
 
