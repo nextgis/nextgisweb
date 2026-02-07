@@ -77,6 +77,8 @@ def register_sattributess():
         parts = s.split("_")
         return "".join(word.capitalize() for word in parts)
 
+    existing_attr_tags = {i.__struct_config__.tag for i in ResourceAttr.registry}
+
     for skey, scls in Serializer.registry.items():
         for sattr_key, sattr in scls.proptab:
             if not sattr.read:
@@ -88,12 +90,18 @@ def register_sattributess():
 
             name = scls.__name__.removesuffix("Serializer") + "Attr"
             name += _camelize(sattr_key)
+            tag = f"{skey}.{sattr_key}"
+
+            if tag in existing_attr_tags:
+                # Skip already registered attributes (e.g. from plugins), this
+                # may occur if running tests.
+                continue
 
             defstruct(
                 name,
                 (),
                 bases=(ResourceAttrSAttribute,),
-                tag=f"{skey}.{sattr_key}",
+                tag=tag,
                 module=scls.__module__,
                 namespace=dict(sattribute=sattr),
             )
