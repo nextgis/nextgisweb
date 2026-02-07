@@ -27,7 +27,7 @@ from .component import AuthComponent
 from .exception import ALinkException, InvalidCredentialsException, UserDisabledException
 from .model import Group, User
 from .oauth import AuthorizationException, InvalidTokenException
-from .policy import AuthProvider, AuthState, OnUserLogin
+from .policy import AP_OAUTH_AC, AuthState, OnUserLogin
 from .util import reset_slg_cookie, sync_ulg_cookie
 
 UserID = Annotated[int, Meta(ge=1, description="User ID", examples=[4])]
@@ -258,7 +258,7 @@ def logout(request):
             state = request.session.get("auth.state")
             if state is not None:
                 state = AuthState.from_dict(state)
-                if state.prv == AuthProvider.OAUTH_AC:
+                if state.prv == AP_OAUTH_AC:
                     qs = dict(redirect_uri=request.application_url)
                     location = logout_endpoint + "?" + urlencode(qs)
 

@@ -1,7 +1,7 @@
 from base64 import b64decode
 from contextlib import contextmanager
 from datetime import datetime, timedelta
-from enum import Enum
+from typing import TYPE_CHECKING, NewType, Protocol
 
 import sqlalchemy as sa
 from msgspec import Struct, convert, to_builtins
@@ -14,6 +14,7 @@ from zope.event import notify
 from zope.interface import implementer
 
 from nextgisweb.env import DBSession
+from nextgisweb.lib.apitype import declare_enum
 from nextgisweb.lib.config import Option, OptionAnnotations
 from nextgisweb.lib.logging import logger
 
@@ -34,18 +35,24 @@ from .oauth import (
 from .util import current_tstamp
 from .util import log_lazy_data as lf
 
+AuthProvider = NewType("AuthProvider", str)
+AuthMedium = NewType("AuthMedium", str)
+if TYPE_CHECKING:
 
-class AuthProvider(Enum):
-    LOCAL_PW = "local_pw"
-    OAUTH_AC = "oauth_ac"
-    OAUTH_PW = "oauth_pw"
-    INVITE = "invite"
+    def make_auth_provider(value: str) -> AuthProvider: ...
+    def make_auth_medium(value: str) -> AuthMedium: ...
+else:
+    AuthProvider, make_auth_provider = declare_enum(AuthProvider)
+    AuthMedium, make_auth_medium = declare_enum(AuthMedium)
 
+AP_LOCAL_PW = make_auth_provider("local_pw")
+AP_OAUTH_AC = make_auth_provider("oauth_ac")
+AP_OAUTH_PW = make_auth_provider("oauth_pw")
+AP_INVITE = make_auth_provider("invite")
 
-class AuthMedium(Enum):
-    SESSION = "session"
-    BASIC = "basic"
-    BEARER = "bearer"
+AM_SESSION = make_auth_medium("session")
+AM_BASIC = make_auth_medium("basic")
+AM_BEARER = make_auth_medium("bearer")
 
 
 class AuthState(Struct, omit_defaults=True):
@@ -72,6 +79,10 @@ class OnUserLogin(Struct):
     user: User
     request: Request
     next_url: str
+
+
+class AuthMethod(Protocol):
+    def __call__(self, request: Request, *, now: int) -> AuthResult | None: ...
 
 
 @implementer(ISecurityPolicy)
@@ -102,7 +113,7 @@ class SecurityPolicy:
         assert user_id is not None
 
         if tpair is None:
-            prv = AuthProvider.LOCAL_PW
+            prv = AP_LOCAL_PW
             now = current_tstamp()
             exp = int(now + self.options["local.lifetime"].total_seconds())
             ref = int(now + self.options["local.refresh"].total_seconds())
@@ -110,9 +121,9 @@ class SecurityPolicy:
             exp = tpair.access_exp
             ref = None
             if tpair.grant_type == "authorization_code":
-                prv = AuthProvider.OAUTH_AC
+                prv = AP_OAUTH_AC
             elif tpair.grant_type == "password":
-                prv = AuthProvider.OAUTH_PW
+                prv = AP_OAUTH_PW
             else:
                 raise ValueError
 
@@ -177,7 +188,7 @@ class SecurityPolicy:
         now = current_tstamp()
 
         # TODO:  Try headers first!
-        for m in (self._try_session, self._try_headers):
+        for m in (*self.comp.auth_methods(), self._try_session, self._try_headers):
             result = m(request, now=now)
             if result is not None:
                 return result
@@ -191,7 +202,7 @@ class SecurityPolicy:
 
         state = AuthState.from_dict(state_dict)
 
-        if state.prv in (AuthProvider.OAUTH_AC, AuthProvider.OAUTH_PW):
+        if state.prv in (AP_OAUTH_AC, AP_OAUTH_PW):
             if state.exp <= now or self.refresh_session:
                 # To avoid issues with concurrent token refreshes, particularly
                 # with NextGIS ID On-Premise, we implement a lock and adjust the
@@ -250,9 +261,9 @@ class SecurityPolicy:
                     self.forget(request)
                     return None
 
-            return AuthResult(state.uid, AuthMedium.SESSION, state.prv)
+            return AuthResult(state.uid, AM_SESSION, state.prv)
 
-        elif state.prv in (AuthProvider.LOCAL_PW, AuthProvider.INVITE):
+        elif state.prv in (AP_LOCAL_PW, AP_INVITE):
             if state.exp <= now:
                 return None
 
@@ -261,7 +272,7 @@ class SecurityPolicy:
                 state.ref = now + int(self.options["local.refresh"].total_seconds())
                 session["auth.state"] = state.to_dict()
 
-            return AuthResult(state.uid, AuthMedium.SESSION, state.prv)
+            return AuthResult(state.uid, AM_SESSION, state.prv)
 
         raise ValueError("Invalid authentication source")
 
@@ -286,7 +297,7 @@ class SecurityPolicy:
             user, prv, _ = self._validate_credentials(username, password)
             if user.id is None:
                 DBSession.flush()
-            return AuthResult(user.id, AuthMedium.BASIC, prv)
+            return AuthResult(user.id, AM_BASIC, prv)
 
         elif amode == "bearer" and self.oauth is not None:
             atoken = self.oauth.query_introspection(value)
@@ -299,7 +310,7 @@ class SecurityPolicy:
                 if user.id is None:
                     DBSession.flush()
 
-                return AuthResult(user.id, AuthMedium.BEARER, AuthProvider.OAUTH_AC)
+                return AuthResult(user.id, AM_BEARER, AP_OAUTH_AC)
 
         raise InvalidCredentialsException()
 
@@ -326,7 +337,7 @@ class SecurityPolicy:
                 if test_user.disabled:
                     raise UserDisabledException()
                 user = test_user
-                prv = AuthProvider.LOCAL_PW
+                prv = AP_LOCAL_PW
 
         # Step 2: Authentication with OAuth password if enabled
 
@@ -355,7 +366,7 @@ class SecurityPolicy:
                 if ptoken.user is None:
                     ptoken.user = user
 
-                prv = AuthProvider.OAUTH_PW
+                prv = AP_OAUTH_PW
 
                 if return_tpair:
                     tpair = OAuthGrantResponse(

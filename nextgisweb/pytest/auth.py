@@ -4,8 +4,6 @@ __all__ = [
     "ngw_disable_oauth",
 ]
 
-from unittest.mock import patch
-
 import pytest
 
 
@@ -21,23 +19,24 @@ def ngw_disable_oauth(ngw_env):
 
 
 @pytest.fixture()
-def ngw_auth_administrator(ngw_pyramid_config):
-    from pyramid.interfaces import ISecurityPolicy
-
+def ngw_auth_administrator(ngw_env):
     from nextgisweb.auth import User
-    from nextgisweb.auth.policy import AuthMedium, AuthProvider, AuthResult
+    from nextgisweb.auth.policy import AM_SESSION, AP_LOCAL_PW, AuthResult
 
-    policy = ngw_pyramid_config.registry.getUtility(ISecurityPolicy)
+    auth = ngw_env.auth
 
-    def _policy_authenticate(request):
+    def forever_admin(request, *, now):
         return AuthResult(
             User.by_keyname("administrator").id,
-            AuthMedium.SESSION,
-            AuthProvider.LOCAL_PW,
+            AM_SESSION,
+            AP_LOCAL_PW,
         )
 
-    with patch.object(policy, "_authenticate_request", _policy_authenticate):
+    auth.register_auth_method(forever_admin)
+    try:
         yield
+    finally:
+        auth.unregister_auth_method(forever_admin)
 
 
 @pytest.fixture

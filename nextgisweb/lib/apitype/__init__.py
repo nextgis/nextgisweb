@@ -1,3 +1,4 @@
+from .enum import declare_enum
 from .http import ContentType, StatusCode
 from .param import PathParam, Query, QueryParam
 from .primitive import StringDecoder

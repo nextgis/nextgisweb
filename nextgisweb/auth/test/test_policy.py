@@ -3,10 +3,12 @@ from datetime import timedelta
 import pytest
 import transaction
 from freezegun import freeze_time
+from sqlalchemy.exc import NoResultFound
 
 from nextgisweb.pyramid.test import WebTestApp
 
 from .. import User
+from ..policy import AuthMedium, AuthProvider, AuthResult
 
 pytestmark = pytest.mark.usefixtures("ngw_disable_oauth", "ngw_administrator_password")
 
@@ -92,4 +94,38 @@ def test_forget_user(ngw_webtest_factory, user):
     )
 
     resp = app2.get("/api/component/auth/current_user")
+    assert resp.json["keyname"] == "guest"
+
+
+@pytest.fixture
+def naive_guard(ngw_env):
+    auth = ngw_env.auth
+
+    def _naive_guard(request, *, now):
+        keyname = request.headers.get("X-Whoami")
+        try:
+            user = User.by_keyname(keyname)
+        except NoResultFound:
+            return None
+
+        return AuthResult(
+            user.id,
+            AuthMedium("test"),
+            AuthProvider("test"),
+        )
+
+    auth.register_auth_method(_naive_guard)
+    try:
+        yield
+    finally:
+        auth.unregister_auth_method(_naive_guard)
+
+
+def test_auth_method(user, naive_guard, ngw_webtest_app: WebTestApp):
+    api = ngw_webtest_app.with_url("/api/component/auth/current_user")
+
+    resp = api.get(headers={"X-Whoami": user.keyname})
+    assert resp.json["keyname"] == user.keyname
+
+    resp = api.get(headers={"X-Whoami": "invalid"})
     assert resp.json["keyname"] == "guest"

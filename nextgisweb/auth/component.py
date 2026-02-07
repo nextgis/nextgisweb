@@ -1,4 +1,5 @@
 from datetime import timedelta
+from typing import Iterator
 from urllib.parse import urlencode, urlparse
 
 import sqlalchemy as sa
@@ -20,7 +21,7 @@ from nextgisweb.pyramid.util import gensecret
 from .exception import UserDisabledException
 from .model import Group, User
 from .oauth import OAuthAToken, OAuthHelper, OAuthPToken
-from .policy import AuthProvider, AuthState, SecurityPolicy
+from .policy import AP_INVITE, AuthMethod, AuthState, SecurityPolicy
 
 
 class AuthComponent(Component):
@@ -31,6 +32,7 @@ class AuthComponent(Component):
             if self.options["oauth.enabled"]
             else None
         )
+        self._auth_methods = list[AuthMethod]()
 
     @inject()
     def initialize_db(self, *, core: CoreComponent):
@@ -58,6 +60,16 @@ class AuthComponent(Component):
             system=True,
             members=[admin],
         )
+
+    def auth_methods(self) -> Iterator[AuthMethod]:
+        return reversed(self._auth_methods)
+
+    def register_auth_method(self, m: AuthMethod):
+        assert m not in self._auth_methods
+        self._auth_methods.append(m)
+
+    def unregister_auth_method(self, m: AuthMethod):
+        self._auth_methods.remove(m)
 
     def setup_pyramid(self, config):
         from nextgisweb.auth import sync_ulg_cookie
@@ -210,7 +222,7 @@ class AuthComponent(Component):
         now = utcnow_naive()
         expires = (now + timedelta(minutes=30)).replace(microsecond=0)
 
-        state = AuthState(AuthProvider.INVITE, user.id, int(expires.timestamp()), 0)
+        state = AuthState(AP_INVITE, user.id, int(expires.timestamp()), 0)
 
         Session(id=sid, created=now, last_activity=now).persist()
         SessionStore(session_id=sid, key="auth.state", value=state.to_dict()).persist()
