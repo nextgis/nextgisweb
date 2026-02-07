@@ -1,7 +1,7 @@
 # NextGIS Web
 ![NextGIS logo](doc/images/nextgis_logo.png)
 
-[![License: GPL v2](https://img.shields.io/badge/license-GPLv2-blue.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
+[![License: GPL v3](https://img.shields.io/badge/license-GPLv3-blue.svg)]([https://www.gnu.org/licenses/old-licenses/gpl-3.0.en.html](https://www.gnu.org/licenses/gpl-3.0.en.html))
 [![Community](https://img.shields.io/badge/Community-Forum-brightgreen)](https://community.nextgis.com)
 [![Examples](https://img.shields.io/badge/Examples-Interactive-blueviolet)](https://demo.nextgis.com)
 [![SaaS](https://img.shields.io/badge/SaaS-nextgis.com-blue)](https://nextgis.com/pricing-base/)
@@ -158,4 +158,4 @@ Professional support, cloud and enterprise deployments, and consulting services 
 
 ## License
 
-NextGIS Web is released under the **GNU General Public License v2.0**.
+NextGIS Web is released under the **GNU General Public License v3.0**.
