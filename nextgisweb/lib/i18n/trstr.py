@@ -169,7 +169,7 @@ class TrStrModFormat(Translatable):
         targ = deep_translate(self.arg, translator)
         try:
             result = translated % targ
-        except TypeError as exc:
+        except (LookupError, TypeError) as exc:
             logger.exception(
                 "Unable to format translated message into '%s': %s",
                 getattr(translator, "locale", "unknown"),
@@ -208,7 +208,7 @@ class TrStrFormat(Translatable):
         tkwargs = deep_translate(self.kwargs, translator)
         try:
             result = translated.format(*targs, **tkwargs)
-        except (KeyError, IndexError) as exc:
+        except LookupError as exc:
             logger.exception(
                 "Unable to format translated message into '%s': %s",
                 getattr(translator, "locale", "unknown"),
@@ -218,7 +218,7 @@ class TrStrFormat(Translatable):
             translated = self.trstr.__translate__(dummy_translator)
             try:
                 result = translated.format(*targs, **tkwargs)
-            except (KeyError, IndexError):
+            except LookupError:
                 raise exc from None
         return result
 
