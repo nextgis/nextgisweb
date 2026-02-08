@@ -11,7 +11,7 @@
 
 It combines a powerful spatial backend, a web-based interface for administration and map publishing, and a full REST API. Suitable for projects ranging from small teams to enterprise-grade GIS infrastructures.
 
-![NextGIS logo](doc/images/nextgis_logo.png)
+![NextGIS logo](doc/images/nextgis_logo_blue.png)
 
 
 ## Table of contents
