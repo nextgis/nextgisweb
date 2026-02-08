@@ -1,5 +1,4 @@
 # NextGIS Web
-![NextGIS logo](doc/images/nextgis_logo.png)
 
 [![License: GPL v3](https://img.shields.io/badge/license-GPLv3-blue.svg)]([https://www.gnu.org/licenses/old-licenses/gpl-3.0.en.html](https://www.gnu.org/licenses/gpl-3.0.en.html))
 [![Community](https://img.shields.io/badge/Community-Forum-brightgreen)](https://community.nextgis.com)
@@ -11,6 +10,9 @@
 **NextGIS Web** is an open-source Web GIS server for **geospatial data management**, **web map publishing**, and **QGIS-centered collaborative workflows**.
 
 It combines a powerful spatial backend, a web-based interface for administration and map publishing, and a full REST API. Suitable for projects ranging from small teams to enterprise-grade GIS infrastructures.
+
+![NextGIS logo](doc/images/nextgis_logo.png)
+
 
 ## Table of contents
 
@@ -70,7 +72,9 @@ It combines a powerful spatial backend, a web-based interface for administration
   Use QGIS styles to visualize datasets.
 
 - **Hub for QGIS-centered teamwork**  
-  Publish QGIS projects to NextGIS Web and edit server-side data directly from QGIS using the **NextGIS Connect** plugin: https://github.com/nextgis/nextgis_connect
+  Publish QGIS projects to NextGIS Web and edit server-side data directly from QGIS using the [NextGIS Connect](https://github.com/nextgis/nextgis_connect) plugin.
+
+  See the NGW/QGIS integration extension: [nextgisweb_qgis](https://github.com/nextgis/nextgisweb_qgis) 
 
 ---
 
@@ -106,54 +110,44 @@ It combines a powerful spatial backend, a web-based interface for administration
   All functionality is accessible programmatically: users, layers, services, maps, permissions, and more.
 
 - **Frontend integration**  
-  Build custom web applications using **NextGIS JavaScript libraries**: https://github.com/nextgis/nextgisweb_frontend
+  Build custom web applications using [NextGIS JavaScript libraries](https://github.com/nextgis/nextgisweb_frontend)
 
 
 ## Documentation
 
-📘 User and admin documentation  
-https://docs.nextgis.com/docs_ngweb/source/index.html
+📘 [User and admin documentation](https://docs.nextgis.com/docs_ngweb/source/index.html)
 
-📗 REST API reference  
-https://docs.nextgis.com/docs_ngweb_dev/doc/toc.html
+📗 [REST API reference](https://docs.nextgis.com/docs_ngweb_dev/doc/toc.html)
 
 
 ## Examples and live demo
 
-- NextGIS Web interactive examples
-  https://demo.nextgis.com
+🧪 [NextGIS Web interactive examples](https://demo.nextgis.com)
 
-- NextGIS Web sandbox
-  https://sandbox.nextgis.com
+🏗️ [NextGIS Web sandbox](https://sandbox.nextgis.com)
 
 ## Community and ecosystem
 
-- NextGIS community forum
-  https://community.nextgis.com
+💬 [NextGIS community forum](https://community.nextgis.com)
 
-- GitHub issues and discussions  
-  https://github.com/nextgis/nextgisweb/issues
+🐞 [GitHub issues and discussions](https://github.com/nextgis/nextgisweb/issues)
 
-- QGIS integration plugin  
-  https://github.com/nextgis/nextgis_connect
+🧩 [NextGIS Connect - QGIS integration plugin](https://github.com/nextgis/nextgis_connect)
 
-- Frontend libraries  
-  https://github.com/nextgis/nextgisweb_frontend
+🎨 [Frontend libraries](https://github.com/nextgis/nextgisweb_frontend)
 
 
 ## Commercial support
 
 Professional support, cloud and enterprise deployments, and consulting services are available from the NextGIS team.
 
-- Ready-to-go cloud deployment:
-  https://nextgis.com/pricing-base/
+☁️ [Ready-to-go cloud](https://nextgis.com/pricing-base/)
 
-- On-premise deployment:
-  https://nextgis.com/pricing/
+🏢 [On-premise deployment](https://nextgis.com/pricing/)
 
-- Website: https://nextgis.com  
+🌍 [NextGIS Website](https://nextgis.com)  
 
-- Contact: https://nextgis.com/contact/
+✉️ [Contact us](https://nextgis.com/contact/)
 
 
 ## License
