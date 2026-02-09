@@ -33,7 +33,6 @@ def setup_vector_layer(*, versioning):
         feature_id=feature.id,
         fileobj=FileObj().from_content(b""),
         name="foo",
-        size=0,
         mime_type="application/octet-stream",
     ).persist()
 

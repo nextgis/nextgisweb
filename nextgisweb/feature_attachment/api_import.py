@@ -134,13 +134,14 @@ def attachments_import(resource, filename, *, replace):
                         resource_id=resource.id,
                         feature_id=src["feature_id"],
                         keyname=src["keyname"],
-                        size=src["info"].file_size,
                     ):
-                        fn_new = fileobj.filename()
-                        fn_existing = att_cmp.fileobj.filename()
-                        if filecmp.cmp(fn_new, fn_existing, False):
-                            skip = True
-                            break
+                        fileobj_cmp = att_cmp.fileobj
+                        if fileobj_cmp.size == src["info"].file_size:
+                            fn_new = fileobj.filename()
+                            fn_existing = fileobj_cmp.filename()
+                            if filecmp.cmp(fn_new, fn_existing, False):
+                                skip = True
+                                break
 
                 if not skip:
                     obj = FeatureAttachment(
@@ -150,7 +151,6 @@ def attachments_import(resource, filename, *, replace):
                         name=src["name"],
                         mime_type=src["mime_type"],
                         description=src["description"],
-                        size=src["info"].file_size,
                     ).persist()
                     obj.fileobj = fileobj.persist()
                     obj.extract_meta()

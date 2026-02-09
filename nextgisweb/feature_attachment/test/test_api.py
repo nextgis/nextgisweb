@@ -1,4 +1,5 @@
 import itertools
+from secrets import token_hex
 from tempfile import NamedTemporaryFile
 from zipfile import ZipFile
 
@@ -444,3 +445,25 @@ def test_feature_layer_and_feature_attachment_api(
 
             # Delete via FA API
             ngw_webtest_app.delete(f"{burl}/2/attachment/{aid}")
+
+
+def test_id_copy(layer_id, ngw_webtest_app: WebTestApp, ngw_file_upload, ngw_resource_group):
+    with NamedTemporaryFile() as f:
+        upload_meta = ngw_file_upload(f.name)
+    data = dict(extensions=dict(attachment=[dict(file_upload=upload_meta)]))
+    ngw_webtest_app.put(f"/api/resource/{layer_id}/feature/1", json=data, status=200)
+    resp = ngw_webtest_app.get(f"/api/resource/{layer_id}/feature/1", status=200)
+    aid = resp.json["extensions"]["attachment"][0]["id"]
+
+    data = dict(
+        resource=dict(
+            cls="vector_layer", display_name=token_hex(), parent=dict(id=ngw_resource_group)
+        ),
+        vector_layer=dict(feature_layer=dict(resource=dict(id=layer_id)), srs=dict(id=3857)),
+    )
+    resp = ngw_webtest_app.post("/api/resource/", json=data, status=201)
+    copy_layer_id = resp.json["id"]
+
+    resp = ngw_webtest_app.get(f"/api/resource/{copy_layer_id}/feature/1", status=200)
+    copy_aid = resp.json["extensions"]["attachment"][0]["id"]
+    assert copy_aid == aid

@@ -60,7 +60,7 @@ class ExtensionQueries:
 
     def __init__(self, mapper: Type[FVersioningExtensionMixin]):
         self.mapper = mapper
-        self.has_id = hasattr(mapper, "id")
+        self.has_id = hasattr(mapper, "extension_id")
         self.cols = mapper.fversioning_columns
         self.tables = VersioningTables(
             mapper.__table__,
@@ -73,7 +73,7 @@ class ExtensionQueries:
         return sa.select(self.mapper).where(
             self.mapper.resource_id == self.p_rid,
             self.mapper.feature_id == self.p_fid,
-            *((self.mapper.id == self.p_eid,) if self.has_id else ()),
+            *((self.mapper.extension_id == self.p_eid,) if self.has_id else ()),
         )
 
     @cached_query
@@ -169,7 +169,7 @@ class ExtensionQueries:
         cs = sa.select().where(ct.c.resource_id == self.p_rid)
         cols = ["resource_id", "feature_id", "version_id", "version_op"]
         if self.has_id:
-            cs = cs.add_columns(ct.c.id)
+            cs = cs.add_columns(ct.c.extension_id)
             cols.insert(0, "extension_id")
         cs = cs.add_columns(ct.c.resource_id, ct.c.feature_id)
         cs = cs.add_columns(self.p_vid, sa.bindparam("p_vop", "E"))
@@ -219,10 +219,17 @@ class ExtensionQueries:
         ct = self.tables.ct
         extra = self.mapper.fversioning_extra
         return sa.insert(ct).from_select(
-            ("resource_id", "feature_id", *self.cols, *extra.keys()),
+            (
+                "resource_id",
+                "feature_id",
+                *(("extension_id",) if self.has_id else ()),
+                *self.cols,
+                *extra.keys(),
+            ),
             sa.select(
                 self.p_rid.label("resource_id"),
                 ct.c.feature_id,
+                *((ct.c.extension_id,) if self.has_id else ()),
                 *(ct.c[c] for c in self.cols),
                 *extra.values(),
             ).where(ct.c.resource_id == self.p_sid),
@@ -237,12 +244,14 @@ class ExtensionQueries:
             (
                 "resource_id",
                 "feature_id",
+                *(("extension_id",) if self.has_id else ()),
                 *self.cols,
                 *extra.keys(),
             ),
             sa.select(
                 self.p_rid.label("resource_id"),
                 pit.c.feature_id,
+                *((pit.c.extension_id,) if self.has_id else ()),
                 *(pit.c[c] for c in self.cols),
                 *extra.values(),
             ),
@@ -285,8 +294,8 @@ class ExtensionQueries:
         ct, et, ht = self._aliased_tables
         lc = sa.literal_column
 
-        hcolumns = (
-            lambda s: (s.c.feature_id.label("fid"),)
+        hcolumns = lambda s: (
+            (s.c.feature_id.label("fid"),)
             + ((s.c.extension_id.label("eid"),) if self.has_id else ())
             + (s.c.version_id.label("vid"),)
         )
@@ -318,7 +327,7 @@ class ExtensionQueries:
                 sa.and_(
                     ct.c.resource_id == self.p_rid,
                     ct.c.feature_id == et.c.feature_id,
-                    *([ct.c.id == et.c.extension_id] if self.has_id else ()),
+                    *([ct.c.extension_id == et.c.extension_id] if self.has_id else ()),
                 ),
                 isouter=True,
             )
@@ -424,18 +433,21 @@ class ExtensionQueries:
         )
 
         if self.has_id:
-            returning = lambda s, ref=returning: ref(s) + (
-                s.c.id if s == ct else s.c.extension_id,
+            returning = lambda s, ref=returning: (
+                ref(s) + (s.c.extension_id if s == ct else s.c.extension_id,)
             )
-            join_on = lambda f, t, ref=join_on: ref(f, t) + (
-                (t.c.id if t == ct else t.c.extension_id)
-                == (f.c.id if f == ct else f.c.extension_id),
+            join_on = lambda f, t, ref=join_on: (
+                ref(f, t)
+                + (
+                    (t.c.extension_id if t == ct else t.c.extension_id)
+                    == (f.c.extension_id if f == ct else f.c.extension_id),
+                )
             )
 
         cs = sa.select()
         if self.has_id:
             cs = cs.add_columns(et.c.extension_id)
-            cs = cs.where(ct.c.id == et.c.extension_id)
+            cs = cs.where(ct.c.extension_id == et.c.extension_id)
             if vop != "O":
                 cs = cs.where(et.c.extension_id == self.p_eid)
         cs = cs.add_columns(et.c.resource_id, et.c.feature_id, et.c.version_id, et.c.version_op)
@@ -503,7 +515,7 @@ class ExtensionQueries:
             sa.and_(
                 ct.c.resource_id == et.c.resource_id,
                 ct.c.feature_id == et.c.feature_id,
-                (ct.c.id == et.c.extension_id)
+                (ct.c.extension_id == et.c.extension_id)
                 if self.has_id
                 else (ct.c.resource_id == et.c.resource_id),
             ),
@@ -569,7 +581,7 @@ class FVersioningExtensionMixin:
         obj = cls(
             resource=resource,
             feature_id=feature_id,
-            **({"id": id} if cls.fversioning_has_id else {}),
+            **({"extension_id": id} if cls.fversioning_has_id else {}),
             **{c: getattr(row, c) for c in cls.fversioning_columns},
         )
 
@@ -613,7 +625,7 @@ class FVersioningExtensionMixin:
                     resource=resource,
                     resource_id=resource.id,
                     feature_id=row.feature_id,
-                    **({"id": row.extension_id} if cls.fversioning_has_id else {}),
+                    **({"extension_id": row.extension_id} if cls.fversioning_has_id else {}),
                     **{c: getattr(row, c) for c in cls.fversioning_columns},
                 )
 
@@ -745,7 +757,7 @@ class FVersioningExtensionMixin:
 
         prefix = cls.__tablename__
         metadata = cls.metadata
-        cls.fversioning_has_id = hasattr(cls, "id")
+        cls.fversioning_has_id = hasattr(cls, "extension_id")
 
         cls.fversioning_etab = sa.Table(
             *(f"{prefix}_et", metadata),
@@ -913,7 +925,7 @@ class FVersioningExtensionMixin:
 
         params = dict()
         if target.fversioning_has_id:
-            params["p_eid"] = target.id
+            params["p_eid"] = target.extension_id
 
         params.update(
             p_rid=target.resource_id,

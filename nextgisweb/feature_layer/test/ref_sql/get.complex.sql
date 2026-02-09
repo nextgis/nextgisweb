@@ -6,6 +6,4 @@ SELECT
     complex.column_b
 FROM complex
 WHERE
-    complex.resource_id = :p_rid
-    AND complex.feature_id = :p_fid
-    AND complex.id = :p_eid;
+    complex.resource_id = :p_rid AND complex.feature_id = :p_fid;
