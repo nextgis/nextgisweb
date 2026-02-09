@@ -39,9 +39,9 @@ def attachment_or_not_found(resource, feature_id, attachment_id):
     """Return attachment filtered by id or raise AttachmentNotFound exception."""
 
     obj = FeatureAttachment.filter_by(
-        id=attachment_id,
         resource_id=resource.id,
         feature_id=feature_id,
+        extension_id=attachment_id,
     ).one_or_none()
 
     if obj is None:
@@ -68,7 +68,7 @@ def download(
     for tab in search_tables:
         query = select(tab.c.fileobj_id, tab.c.mime_type, tab.c.name)
         query = query.where(
-            tab.c.id == aid,
+            tab.c.extension_id == aid,
             tab.c.resource_id == resource.id,
             tab.c.feature_id == fid,
         )
@@ -158,7 +158,7 @@ def iput(resource, request, fid: FeatureID, aid: AttachmentID) -> JSONType:
         vinfo = dict(version=vobj.version_id) if vobj else dict()
         obj.deserialize(request.json_body)
 
-    return dict(id=obj.id, **vinfo)
+    return dict(id=obj.extension_id, **vinfo)
 
 
 def cget(resource, request, fid: FeatureID) -> JSONType:
@@ -180,14 +180,14 @@ def cpost(resource, request, fid: FeatureID) -> JSONType:
         obj.deserialize(request.json_body)
 
     DBSession.flush()
-    return dict(id=obj.id, **vinfo)
+    return dict(id=obj.extension_id, **vinfo)
 
 
 def export(resource, request):
     request.resource_permission(DataScope.read)
 
     query = FeatureAttachment.filter_by(resource_id=resource.id).order_by(
-        FeatureAttachment.feature_id, FeatureAttachment.id
+        FeatureAttachment.feature_id, FeatureAttachment.extension_id
     )
 
     metadata = dict()

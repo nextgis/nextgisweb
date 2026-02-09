@@ -164,7 +164,7 @@ class AttachmentExecutor(OperationExecutor):
 
         if isinstance(operation, AttachmentCreateOperation):
             result = AttachmentCreateResult(
-                aid=obj.id,
+                aid=obj.extension_id,
                 fileobj=obj.fileobj.id,
             )
         elif isinstance(operation, AttachmentUpdateOperation):
@@ -185,7 +185,7 @@ class AttachmentExecutor(OperationExecutor):
             return Attachment.filter_by(
                 resource_id=self.resource.id,
                 feature_id=fid,
-                id=aid,
+                extension_id=aid,
             ).one()
         except NoResultFound:
             raise OperationError(AttachmentNotFound())

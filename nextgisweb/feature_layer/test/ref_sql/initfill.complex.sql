@@ -1,12 +1,10 @@
 INSERT INTO complex_et (
-    extension_id,
     resource_id,
     feature_id,
     version_id,
     version_op
 )
 SELECT
-    complex.id,
     complex.resource_id,
     complex.feature_id,
     :p_vid AS anon_1,

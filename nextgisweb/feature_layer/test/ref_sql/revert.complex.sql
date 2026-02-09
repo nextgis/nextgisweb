@@ -10,7 +10,7 @@ SELECT
 FROM (
     SELECT
         et.feature_id AS feature_id,
-        et.extension_id AS extension_id,
+        NULL AS extension_id,
         (
             NOT et.version_op IN ('D', 'O')
         ) AS current,
@@ -25,7 +25,6 @@ FROM (
     LEFT OUTER JOIN complex_ht AS ht
         ON ht.resource_id = et.resource_id
         AND ht.feature_id = et.feature_id
-        AND ht.extension_id = et.extension_id
         AND int4range(ht.version_id, ht.version_nid) @> :p_vid
     WHERE
         et.resource_id = :p_rid AND et.version_id > :p_vid

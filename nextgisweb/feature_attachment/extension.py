@@ -49,7 +49,7 @@ class FeatureAttachmentExtension(FeatureExtension):
             resource_id=self.layer.id,
             feature_id=feature.id,
         ):
-            rest[fa.id] = fa
+            rest[fa.extension_id] = fa
 
         for itm in data:
             if "id" in itm:
