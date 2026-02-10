@@ -1,6 +1,6 @@
 <%!
     from pathlib import Path
-    from nextgisweb.auth.policy import AuthProvider
+    from nextgisweb.auth.policy import AP_INVITE
     from nextgisweb.resource.home import user_group
 
     svglogo_content = None
@@ -23,7 +23,7 @@
         user_display_name = user.display_name
 
         if auth_result := request.environ.get('auth.result'):
-            invitation_session = auth_result.prv == AuthProvider.INVITE
+            invitation_session = auth_result.prv == AP_INVITE
         else:
             invitation_session = False
 
