@@ -47,6 +47,6 @@ registry.register(COMP_ID, {
         const { AnnotationsManager } =
             await import("@nextgisweb/webmap/ui/annotations-manager/AnnotationsManager");
 
-        new AnnotationsManager({ display, initialAnnotVisible });
+        AnnotationsManager.getInstance({ display, initialAnnotVisible });
     },
 });

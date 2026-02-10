@@ -31,18 +31,21 @@ function annotationVisible(annot: AnnotationVisibleMode) {
 export class AnnotationsManager {
     private static instance: AnnotationsManager | null = null;
 
-    private _display!: Display;
-    private _annotationsLayer!: AnnotationsLayer;
-    private _editableLayer!: AnnotationsEditableLayer;
-    private _annotationsDialog!: AnnotationsDialog;
-    private _annotationsVisibleState!: AnnotationVisibleMode;
-    private _editable!: boolean;
-
-    constructor({ display, initialAnnotVisible }: ManagerOptions) {
-        if (AnnotationsManager.instance) {
-            return AnnotationsManager.instance;
+    static getInstance(options: ManagerOptions): AnnotationsManager {
+        if (!AnnotationsManager.instance) {
+            AnnotationsManager.instance = new AnnotationsManager(options);
         }
+        return AnnotationsManager.instance;
+    }
 
+    private _display: Display;
+    private _annotationsLayer: AnnotationsLayer;
+    private _editableLayer: AnnotationsEditableLayer;
+    private _annotationsDialog: AnnotationsDialog;
+    private _annotationsVisibleState: AnnotationVisibleMode;
+    private _editable: boolean;
+
+    private constructor({ display, initialAnnotVisible }: ManagerOptions) {
         assert(display);
 
         this._display = display;
@@ -50,23 +53,17 @@ export class AnnotationsManager {
         this._annotationsDialog = new AnnotationsDialog();
         this._editable = this._display.config.annotations.scope.write;
 
-        this._init();
+        const [annotationLayer, editableLayer] = this._buildAnnotationsLayers();
+        this._annotationsLayer = annotationLayer;
+        this._editableLayer = editableLayer;
+        this._setLayerZIndex();
+        this._loadAnnotations();
+        this._bindEvents();
 
         reaction(
             () => display.treeStore.items,
             () => {
-                if (this._annotationsLayer) {
-                    this._annotationsLayer.setZIndex(
-                        Math.max(
-                            ...[...display.treeStore.items.values()].map(
-                                (item) =>
-                                    item.isLayer()
-                                        ? item.drawOrderPosition || 0
-                                        : 0
-                            )
-                        ) * 2 // Multiply by two for insurance
-                    );
-                }
+                this._setLayerZIndex();
             }
         );
 
@@ -120,18 +117,16 @@ export class AnnotationsManager {
         }
     }
 
-    private _init(): void {
-        this._buildAnnotationsLayers();
-        this._loadAnnotations();
-        this._bindEvents();
-    }
-
-    private _buildAnnotationsLayers(): void {
-        this._annotationsLayer = new AnnotationsLayer({
+    private _buildAnnotationsLayers(): [
+        AnnotationsLayer,
+        AnnotationsEditableLayer,
+    ] {
+        const annotationsLayer = new AnnotationsLayer({
             visible: annotationVisible(this._annotationsVisibleState),
         });
-        this._annotationsLayer.addToMap(this._display.map);
-        this._editableLayer = new AnnotationsEditableLayer(this._display.map);
+        annotationsLayer.addToMap(this._display.map);
+        const editableLayer = new AnnotationsEditableLayer(this._display.map);
+        return [annotationsLayer, editableLayer];
     }
 
     private async _loadAnnotations(): Promise<void> {
@@ -324,5 +319,18 @@ export class AnnotationsManager {
             this._display.config.webmapId,
             updateInfo.id
         );
+    }
+
+    private _setLayerZIndex() {
+        if (this._annotationsLayer) {
+            this._annotationsLayer.setZIndex(
+                Math.max(
+                    ...[...this._display.treeStore.items.values()].map(
+                        (item) =>
+                            item.isLayer() ? item.drawOrderPosition || 0 : 0
+                    )
+                ) * 2 // Multiply by two for insurance
+            );
+        }
     }
 }
