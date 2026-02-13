@@ -1,4 +1,4 @@
-import { Suspense, lazy, useCallback, useEffect, useState } from "react";
+import { lazy, useCallback, useEffect, useState } from "react";
 import type { ComponentType } from "react";
 
 import { ModalHolder } from "./ModalHolder";
@@ -46,14 +46,10 @@ export function useShowModal({
 
             const ModalComponent = lazy(wrappedLoader);
 
-            return showModalBase(
-                (props: P) => (
-                    <Suspense fallback={null}>
-                        <ModalComponent {...props} />
-                    </Suspense>
-                ),
-                { modalStore, ...(config || ({} as P)) }
-            );
+            return showModalBase((props: P) => <ModalComponent {...props} />, {
+                modalStore,
+                ...(config || ({} as P)),
+            });
         },
         [modalStore]
     );

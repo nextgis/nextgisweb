@@ -1,3 +1,4 @@
+import { Suspense, useEffect } from "react";
 import type { ReactElement } from "react";
 
 import type { Modal } from "@nextgisweb/gui/antd";
@@ -9,16 +10,30 @@ import type { ModalStore } from "./ModalStore";
 type ModalParams = ParamsOf<typeof Modal>;
 
 export interface ShowModalOptions extends ModalParams {
+    id?: string | number;
     open?: boolean;
-    close?: () => void;
     modalStore?: ModalStore;
+    onReady?: () => void;
+    close?: () => void;
+}
+
+export function SuspenseFallback({ onReady }: { onReady: () => void }) {
+    useEffect(() => {
+        return () => {
+            onReady();
+        };
+    }, [onReady]);
+
+    return null;
 }
 
 export function showModalBase<T extends ShowModalOptions>(
     renderContent: (props: T) => ReactElement,
-    { modalStore, ...config }: T = {} as T
+    { modalStore, id: idProp, onReady, ...config }: T = {} as T
 ) {
-    const id = `modal-${Math.random().toString(36).slice(2)}`;
+    const id = idProp
+        ? String(idProp)
+        : `modal-${Math.random().toString(36).slice(2)}`;
 
     const store = modalStore || layoutStore.modalStore;
     let currentConfig = {
@@ -68,10 +83,27 @@ export function showModalBase<T extends ShowModalOptions>(
             close: () => update({ open: false } as T),
         } as T;
 
-        return renderContent(propsForRender);
+        return (
+            <Suspense
+                fallback={
+                    <SuspenseFallback
+                        onReady={() => {
+                            onReady?.();
+                        }}
+                    />
+                }
+            >
+                {renderContent(propsForRender)}
+            </Suspense>
+        );
     };
 
-    store.add({ id, element: render() });
+    const idFromProp = idProp !== undefined ? String(idProp) : undefined;
+    const alreadyExist = idFromProp !== undefined && store.has(idFromProp);
+
+    if (!alreadyExist) {
+        store.add({ id, element: render() });
+    }
 
     return {
         destroy,

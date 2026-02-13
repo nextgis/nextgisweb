@@ -151,6 +151,7 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
 
     const handleFilterClick = useCallback(() => {
         lazyModal(() => import("../feature-filter/FeatureFilterModalLazy"), {
+            id: "resource-filter",
             fields: layerFields,
             value: filterExpression,
             onApply: handleFilterApply,

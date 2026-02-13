@@ -18,7 +18,7 @@ export class LayerFilterPlugin extends PluginBase {
     }
 
     async run(nodeData: TreeLayerStore) {
-        openLayerFilter(nodeData);
+        await openLayerFilter(nodeData);
         return undefined;
     }
 

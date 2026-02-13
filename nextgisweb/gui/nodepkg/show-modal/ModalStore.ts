@@ -16,6 +16,10 @@ export interface ModalItem {
 export class ModalStore {
     @observable.shallow accessor modalItems: ModalItem[] = [];
 
+    has(id: string) {
+        return this.modalItems.find((item) => item.id === id);
+    }
+
     @action.bound
     add(modalItem: ModalItem) {
         this.modalItems = [...this.modalItems, modalItem];
