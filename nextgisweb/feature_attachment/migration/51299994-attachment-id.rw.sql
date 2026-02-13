@@ -24,6 +24,7 @@ CREATE TABLE feature_attachment
     CONSTRAINT feature_attachment_resource_id_fkey FOREIGN KEY (resource_id)
         REFERENCES resource (id)
 );
+ALTER SEQUENCE feature_attachment_id_seq OWNED BY feature_attachment.id;
 
 INSERT INTO feature_attachment (
     resource_id, feature_id, fileobj_id, keyname, name, mime_type, description, size
