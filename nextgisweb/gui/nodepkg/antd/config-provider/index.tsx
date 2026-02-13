@@ -42,6 +42,16 @@ const defaults: Props = {
     locale: antd,
     theme: { token, components },
     wave: { disabled: true },
+    modal: {
+        mask: {
+            blur: false,
+        },
+    },
+    drawer: {
+        mask: {
+            blur: false,
+        },
+    },
 };
 
 export default function ConfigProvider(props: Props) {

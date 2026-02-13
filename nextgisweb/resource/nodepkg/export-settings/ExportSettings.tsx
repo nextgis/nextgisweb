@@ -56,7 +56,7 @@ export function ExportSettings() {
     }
 
     return (
-        <Space direction="vertical">
+        <Space orientation="vertical">
             {contextHolder}
             <Typography.Text>
                 {gettext(
@@ -67,7 +67,7 @@ export function ExportSettings() {
                 value={value}
                 onChange={(e) => setValue(e.target.value)}
             >
-                <Space direction="vertical">
+                <Space orientation="vertical">
                     <Radio value="data_read">
                         {gettext('Users with "Data: Read" permission')}
                     </Radio>

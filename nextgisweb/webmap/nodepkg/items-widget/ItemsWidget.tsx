@@ -139,7 +139,7 @@ const LayerWidget = observer(({ item }: { item: Layer }) => {
                 label={msgTransparency}
                 value={item.layerTransparency}
                 component={InputOpacity}
-                props={{ mode: "transparency", valuePercent: true }}
+                props={{ alphaMode: "transparency", valuePercent: true }}
             />
         </Area>
     );

@@ -1,8 +1,8 @@
+import type { Reference } from "@rc-component/table";
 import { Table as TableBase } from "antd";
 import type { AnyObject } from "antd/es/_util/type";
 import type { TableProps as AntTableProps } from "antd/es/table";
 import classNames from "classnames";
-import type { Reference } from "rc-table";
 import type { Ref } from "react";
 
 import "./index.less";

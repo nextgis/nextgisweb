@@ -1,18 +1,16 @@
-import type { CalendarProps } from "antd";
+import dayjsGenerateConfig from "@rc-component/picker/es/generate/dayjs";
 import generateCalendar from "antd/es/calendar/generateCalendar";
-import dayjsGenerateConfig from "rc-picker/es/generate/dayjs";
+import type { Dayjs } from "dayjs";
 
-import type dayjs from "@nextgisweb/gui/dayjs";
+import type { ParamsOf } from "@nextgisweb/gui/type";
 
 import { disableNonPositiveYears } from "../date";
 
-const AntCalendar = generateCalendar(dayjsGenerateConfig);
+const AntCalendar = generateCalendar<Dayjs>(dayjsGenerateConfig);
 
-export function Calendar({
+export default function Calendar({
     disabledDate = disableNonPositiveYears,
     ...restProps
-}: CalendarProps<dayjs.Dayjs>) {
+}: ParamsOf<typeof AntCalendar>) {
     return <AntCalendar disabledDate={disabledDate} {...restProps} />;
 }
-
-export default Calendar;

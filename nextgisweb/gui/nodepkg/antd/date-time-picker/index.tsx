@@ -1,9 +1,9 @@
+import type { PickerRef } from "@rc-component/picker";
 import type { DatePickerProps } from "antd/es/date-picker";
-import type { PickerRef } from "rc-picker";
 import type { Ref } from "react";
 
 import dayjs from "../../dayjs";
-import DatePicker from "../date-picker";
+import { DatePicker } from "../date-picker";
 
 export interface DateTimePickerProps extends DatePickerProps {
     ref?: Ref<PickerRef>;

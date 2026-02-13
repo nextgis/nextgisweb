@@ -8,11 +8,11 @@ import "./NavigationMenu.less";
 
 export interface NavigationMenuProps {
     store: PanelManager;
-    layout?: "vertical" | "horizontal";
+    orientation?: "vertical" | "horizontal";
 }
 
 export const NavigationMenu = observer<NavigationMenuProps>(
-    ({ store, layout = "vertical" }) => {
+    ({ store, orientation = "vertical" }) => {
         const onClickItem = useCallback(
             (name: string) => {
                 if (store.activePanelName === name) {
@@ -29,7 +29,7 @@ export const NavigationMenu = observer<NavigationMenuProps>(
             <div
                 className={classNames(
                     "ngw-webmap-display-navigation-menu",
-                    layout
+                    orientation
                 )}
             >
                 {store.visiblePanels.map(({ name, title, plugin }) => (

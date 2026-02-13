@@ -116,7 +116,7 @@ export const LoginForm = observer((props: LoginFormProps) => {
 
             <div className="login-password">
                 {authStore.loginError && (
-                    <Alert type="error" message={authStore.loginError} />
+                    <Alert type="error" title={authStore.loginError} />
                 )}
                 <FieldsForm
                     form={form}

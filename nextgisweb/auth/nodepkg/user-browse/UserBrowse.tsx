@@ -123,7 +123,7 @@ export function UserBrowse({ readonly }: UserBrowseProps) {
     // prettier-ignore
     const infoNGID = useMemo(() => oauth.isNGID && <Alert
         type="info" style={{marginTop: "1ex"}}
-        message={gettextf("Your team members won't be shown here until their first logon. Set \"New users\" flag for a group to automatically assign new user to this group. You may also modify permission for authenticated users to manage access for your team members.")({ name: oauth.name })}
+        title={gettextf("Your team members won't be shown here until their first logon. Set \"New users\" flag for a group to automatically assign new user to this group. You may also modify permission for authenticated users to manage access for your team members.")({ name: oauth.name })}
     />, []);
 
     const tmBtn = makeTeamManageButton({ target: "_blank" });

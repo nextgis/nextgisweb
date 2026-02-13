@@ -10,7 +10,7 @@ import {
 } from "react";
 
 import type { DataSource } from "@nextgisweb/feature-attachment/attachment-editor/type";
-import { Image } from "@nextgisweb/gui/antd";
+import { ConfigProvider, Image } from "@nextgisweb/gui/antd";
 import { CentralLoading } from "@nextgisweb/gui/component";
 
 import { AttachmentPreviewToolbar } from "../component/AttachmentPreviewToolbar";
@@ -41,7 +41,7 @@ function isPanoramaAttachment(attachment: DataSource) {
 export type Attachment = DataSource & { isPanorama: boolean };
 
 interface PreviewContextValue {
-    visible: boolean;
+    open: boolean;
 }
 export const AttachmentPreviewContext =
     createContext<PreviewContextValue | null>(null);
@@ -53,7 +53,7 @@ export function AttachmentPreviewGroup({
     children,
     ...previewGroupProps
 }: AttachmentPreviewGroupProps) {
-    const [visible, setVisible] = useState(false);
+    const [open, setOpen] = useState(false);
     const [panoramaStore] = useState(() => new PanoramaStore());
 
     const [panoramaMode, togglePanoramaMode] = useReducer(
@@ -94,20 +94,10 @@ export function AttachmentPreviewGroup({
         [featureId, previewImages, resourceId]
     );
 
-    const onVisibleChange = useCallback(
-        (nextVisible: boolean) => {
-            setVisible(nextVisible);
-        },
-        [setVisible]
-    );
-
     const previewProps = useMemo<PreviewProps>(() => {
         return {
-            rootClassName: "ngw-feature-attachment-image-thumbnail-preview",
-
             countRender: () => undefined,
-
-            toolbarRender: (_, toolbarProps) => {
+            actionsRender: (_, toolbarProps) => {
                 const currentImage = previewImages[toolbarProps.current];
 
                 return (
@@ -154,21 +144,33 @@ export function AttachmentPreviewGroup({
                 );
             },
 
-            onVisibleChange,
+            onOpenChange: setOpen,
         };
-    }, [
-        onDownload,
-        onVisibleChange,
-        panoramaMode,
-        previewImages,
-        panoramaStore,
-    ]);
+    }, [onDownload, panoramaMode, previewImages, panoramaStore]);
 
     return (
-        <AttachmentPreviewContext value={{ visible }}>
-            <Image.PreviewGroup preview={previewProps} {...previewGroupProps}>
-                {children}
-            </Image.PreviewGroup>
-        </AttachmentPreviewContext>
+        <ConfigProvider
+            theme={{
+                token: {
+                    // Workaround by overriding ConfigProvider theme options
+                    // to prevent stuck overlay after closing preview (looks like Antd v6 bug)
+                    motion: true,
+                },
+            }}
+        >
+            <AttachmentPreviewContext value={{ open }}>
+                <Image.PreviewGroup
+                    preview={previewProps}
+                    classNames={{
+                        popup: {
+                            root: "ngw-feature-attachment-image-thumbnail-preview",
+                        },
+                    }}
+                    {...previewGroupProps}
+                >
+                    {children}
+                </Image.PreviewGroup>
+            </AttachmentPreviewContext>
+        </ConfigProvider>
     );
 }

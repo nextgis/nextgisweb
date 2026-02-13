@@ -239,6 +239,7 @@ export function VersionHistory({ id }: { id: number }) {
                 }}
             >
                 <Table
+                    style={{ height: "100%", width: "100%" }}
                     className="ngw-feature-layer-version-history"
                     virtual
                     scroll={{ y: scrollY }}

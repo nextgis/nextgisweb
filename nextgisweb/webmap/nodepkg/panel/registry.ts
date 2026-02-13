@@ -1,7 +1,7 @@
 /** @registry */
-import type { TabsProps } from "rc-tabs";
 import type { FC, ReactNode } from "react";
 
+import type { TabsProps } from "@nextgisweb/gui/antd";
 import { pluginRegistry } from "@nextgisweb/jsrealm/plugin";
 import type { ImportCallback } from "@nextgisweb/jsrealm/plugin";
 

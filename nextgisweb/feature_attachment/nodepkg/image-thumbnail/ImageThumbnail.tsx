@@ -1,4 +1,4 @@
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 
 import { Image } from "@nextgisweb/gui/antd";
 import type { GetProp } from "@nextgisweb/gui/antd";
@@ -22,27 +22,24 @@ export type ImageThumbnailProps = {
     preview?: GetProp<typeof Image, "preview">;
 };
 
-export const ImageThumbnail = ({
+export function ImageThumbnail({
     width = 80,
     height,
     preview,
     featureId,
     resourceId,
     attachment,
-}: ImageThumbnailProps) => {
+}: ImageThumbnailProps) {
     const [thumbUrl, setThumbUrl] = useState<string>();
-    const [selfImageVisible, setSelfImageVisible] = useState(false);
+    const [selfImageOpen, setSelfImageOpen] = useState(false);
 
     const ctx = useContext(AttachmentPreviewContext);
 
     // When an image is rendered inside Image.PreviewGroup, the built-in
-    // Image.preview.onVisibleChange callback does not fire.
+    // Image.preview.onOpenChange callback does not fire.
     // Instead, we rely on the AttachmentPreviewContext context
     // to track the current preview visibility state in group.
-    const previewVisible = useMemo(
-        () => (ctx ? ctx.visible : selfImageVisible),
-        [ctx, selfImageVisible]
-    );
+    const previewVisible = ctx ? ctx.open : selfImageOpen;
 
     const imageUrl = useMemo(() => thumbUrl?.split("?")[0], [thumbUrl]);
 
@@ -64,31 +61,35 @@ export const ImageThumbnail = ({
 
     const isCtrlMode = ctrlPressed && !previewVisible;
 
-    const previewProps = useMemo(() => {
-        return isCtrlMode
-            ? false
-            : preview !== undefined
-              ? preview
-              : {
-                    src: imageUrl,
-                    onVisibleChange: setSelfImageVisible,
-                };
-    }, [isCtrlMode, preview, imageUrl]);
+    const previewProps = useMemo<GetProp<typeof Image, "preview">>(() => {
+        if (preview !== undefined) return preview;
+
+        return {
+            src: imageUrl,
+            open: selfImageOpen,
+            onOpenChange: (nextOpen: boolean) => {
+                if (nextOpen && isCtrlMode) return;
+                setSelfImageOpen(nextOpen);
+            },
+        };
+    }, [preview, imageUrl, selfImageOpen, isCtrlMode]);
+
+    const onClick = useCallback(() => {
+        if (isCtrlMode && imageUrl) {
+            window.open(
+                imageUrl,
+                "_feature_attachment",
+                `location=${window.location.href}`
+            );
+        }
+    }, [imageUrl, isCtrlMode]);
 
     return (
         <Image
             src={thumbUrl}
             width={width}
-            onClick={() => {
-                if (isCtrlMode && imageUrl) {
-                    window.open(
-                        imageUrl,
-                        "_feature_attachment",
-                        `location=${window.location.href}`
-                    );
-                }
-            }}
+            onClick={onClick}
             preview={previewProps}
         />
     );
-};
+}

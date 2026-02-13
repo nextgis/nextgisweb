@@ -28,6 +28,8 @@ export function FieldsFormVirtualized<
         return (
             <div
                 key={item.name}
+                ref={rowVirtualizer.measureElement}
+                data-index={virtualItem.index}
                 style={{
                     position: "absolute",
                     top: 0,

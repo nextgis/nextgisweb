@@ -23,7 +23,7 @@ const SvgIconTest = () => {
     }, []);
 
     return (
-        <Space direction="vertical">
+        <Space orientation="vertical">
             <h4>All available resource icons</h4>
             <List
                 grid={{ gutter: 16, xs: 1, sm: 2, md: 4, lg: 4, xl: 6, xxl: 3 }}

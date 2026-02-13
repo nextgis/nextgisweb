@@ -158,7 +158,7 @@ export function CopyForm({
     if (isLoading) return null;
 
     return (
-        <Space direction="vertical" style={{ width: "100%", ...style }}>
+        <Space orientation="vertical" style={{ width: "100%", ...style }}>
             {modalHolder}
             <FieldsForm<CopyProps> form={form} fields={fields} />
             <SaveButton loading={saving} onClick={createCopy}>

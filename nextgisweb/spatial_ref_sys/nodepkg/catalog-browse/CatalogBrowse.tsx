@@ -150,28 +150,32 @@ export function CatalogBrowse() {
                         <Divider type="vertical" />
                     </Form.Item>
                     <Form.Item>
-                        <InputNumber
-                            style={{ maxWidth: "10em" }}
-                            placeholder={gettext("Latitude")}
-                            value={lat}
-                            type="number"
-                            onChange={(e) => {
-                                setLat(e);
-                            }}
-                            addonAfter="°"
-                        />
+                        <Space.Compact>
+                            <InputNumber
+                                style={{ maxWidth: "10em" }}
+                                placeholder={gettext("Latitude")}
+                                value={lat}
+                                type="number"
+                                onChange={(e) => {
+                                    setLat(e);
+                                }}
+                            />
+                            <Space.Addon>°</Space.Addon>
+                        </Space.Compact>
                     </Form.Item>
                     <Form.Item>
-                        <InputNumber
-                            style={{ maxWidth: "10em" }}
-                            placeholder={gettext("Longitude")}
-                            value={lon}
-                            type="number"
-                            onChange={(e) => {
-                                setLon(e);
-                            }}
-                            addonAfter="°"
-                        />
+                        <Space.Compact>
+                            <InputNumber
+                                style={{ maxWidth: "10em" }}
+                                placeholder={gettext("Longitude")}
+                                value={lon}
+                                type="number"
+                                onChange={(e) => {
+                                    setLon(e);
+                                }}
+                            />
+                            <Space.Addon>°</Space.Addon>
+                        </Space.Compact>
                     </Form.Item>
                 </>
             ) : null}
@@ -179,7 +183,7 @@ export function CatalogBrowse() {
     );
 
     return (
-        <Space direction="vertical" style={{ width: "100%" }}>
+        <Space orientation="vertical" style={{ width: "100%" }}>
             {TableControl()}
             <Table
                 rowKey="id"

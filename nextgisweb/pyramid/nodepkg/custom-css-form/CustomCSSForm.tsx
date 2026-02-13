@@ -49,7 +49,7 @@ export function CustomCSSForm() {
     }
 
     return (
-        <Space direction="vertical" style={{ width: "100%" }}>
+        <Space orientation="vertical" style={{ width: "100%" }}>
             {contextHolder}
             <Row gutter={[16, 16]}>
                 <Col span={14} style={{ height: "300px" }}>

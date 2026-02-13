@@ -295,7 +295,7 @@ export function ModelBrowse<Data extends ModalBrowseData = ModalBrowseData>({
                 />
             </Col>
             <Col>
-                <Space direction="horizontal">
+                <Space orientation="horizontal">
                     {headerControls.map((Control, idx) => (
                         <Fragment key={idx}>
                             <Control {...{ selected, rows, setRows }} />
@@ -318,7 +318,7 @@ export function ModelBrowse<Data extends ModalBrowseData = ModalBrowseData>({
     );
 
     const SelectedControl = () => (
-        <Space direction="horizontal">
+        <Space orientation="horizontal">
             {selectedControls.map((Control, idx) => (
                 <Fragment key={idx}>
                     <Control {...{ selected, rows, setRows }} />
@@ -367,7 +367,7 @@ export function ModelBrowse<Data extends ModalBrowseData = ModalBrowseData>({
 
     return (
         <Space
-            direction="vertical"
+            orientation="vertical"
             style={{ width: "100%" }}
             className="ngw-gui-model-browse"
         >

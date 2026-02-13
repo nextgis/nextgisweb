@@ -27,7 +27,7 @@ export default function reactApp<P extends PropsType = PropsType>(
     }
 
     root.render(
-        <ConfigProvider wave={{ disabled: true }}>
+        <ConfigProvider>
             <BalancedProvider>
                 <Component {...props} />
             </BalancedProvider>

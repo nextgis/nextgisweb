@@ -152,7 +152,7 @@ export function CloneWebmap({
     }
 
     return (
-        <Space direction="vertical" style={{ width: "100%" }}>
+        <Space orientation="vertical" style={{ width: "100%" }}>
             <FieldsForm<CloneProps>
                 {...fieldsFormProps}
                 form={form}

@@ -94,7 +94,7 @@ export default function CreateResourceModal({
 
     return (
         <Modal
-            classNames={{ content: "ngw-resource-create-resource-modal" }}
+            classNames={{ container: "ngw-resource-create-resource-modal" }}
             style={{ ...themeVariables, ...(style ? style : {}) }}
             title={
                 <>

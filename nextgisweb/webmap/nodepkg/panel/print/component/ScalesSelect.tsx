@@ -1,3 +1,4 @@
+import type { InputNumberRef as RcInputNumberRef } from "@rc-component/input-number";
 import { useEffect, useRef, useState } from "react";
 import type { FC, ReactNode } from "react";
 
@@ -26,7 +27,7 @@ export const ScalesSelect: FC<ScalesSelectProps> = ({
     onChange,
 }) => {
     const [open, setOpen] = useState<boolean>(false);
-    const inputRef = useRef<HTMLInputElement>(null);
+    const inputRef = useRef<RcInputNumberRef>(null);
 
     const changeCustomScale = (val: number | null) => {
         if (validateCustomScale(val) && val !== null && val !== value) {
