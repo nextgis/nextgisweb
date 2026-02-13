@@ -10,7 +10,7 @@ SELECT
         THEN 'R'
     END AS action,
     COALESCE(qi.fid, qt.fid) AS fid,
-    NULL AS eid,
+    COALESCE(qi.eid, qt.eid) AS eid,
     qt.vid AS vid,
     CONCAT(
         CASE WHEN sc_column_a THEN '1' ELSE '0' END,
@@ -21,6 +21,7 @@ SELECT
 FROM (
     SELECT
         ht.feature_id AS fid,
+        ht.extension_id AS eid,
         ht.version_id AS vid,
         ht.version_op = 'D' AS deleted,
         ht.column_a AS column_a,
@@ -35,13 +36,16 @@ FROM (
 FULL OUTER JOIN (
     SELECT
         et.feature_id AS fid,
+        et.extension_id AS eid,
         et.version_id AS vid,
         ct.feature_id IS NULL AS deleted,
         ct.column_a AS column_a,
         ct.column_b AS column_b
     FROM complex_et AS et
     LEFT OUTER JOIN complex AS ct
-        ON ct.resource_id = :p_rid AND ct.feature_id = et.feature_id
+        ON ct.resource_id = :p_rid
+        AND ct.feature_id = et.feature_id
+        AND ct.extension_id = et.extension_id
     WHERE
         et.resource_id = :p_rid
         AND et.version_id > :p_initial
@@ -51,6 +55,7 @@ FULL OUTER JOIN (
     UNION ALL
     SELECT
         ht.feature_id AS fid,
+        ht.extension_id AS eid,
         ht.version_id AS vid,
         ht.version_op = 'D' AS deleted,
         ht.column_a AS column_a,
@@ -62,7 +67,7 @@ FULL OUTER JOIN (
         AND ht.feature_id >= :p_fid_min
         AND ht.feature_id <= :p_fid_max
 ) AS qt
-    ON qi.fid = qt.fid
+    ON qi.fid = qt.fid AND qi.eid = qt.eid
 JOIN LATERAL (
     SELECT
         NOT qi.fid IS NULL AND NOT qi.deleted AS pi,
@@ -88,4 +93,5 @@ JOIN LATERAL (
 WHERE
     pi <> pt OR up
 ORDER BY
-    COALESCE(qi.fid, qt.fid) ASC;
+    COALESCE(qi.fid, qt.fid) ASC,
+    COALESCE(qi.eid, qt.eid) ASC;
