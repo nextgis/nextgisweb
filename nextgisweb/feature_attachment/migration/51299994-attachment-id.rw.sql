@@ -27,14 +27,12 @@ CREATE TABLE feature_attachment
 ALTER SEQUENCE feature_attachment_id_seq OWNED BY feature_attachment.id;
 
 INSERT INTO feature_attachment (
-    resource_id, feature_id, fileobj_id, keyname, name, mime_type, description, size
+    id, resource_id, feature_id, fileobj_id, keyname, name, mime_type, description, size
 )
-SELECT resource_id, feature_id, fileobj_id, keyname, name, mime_type, description, -1
+SELECT extension_id, resource_id, feature_id, fileobj_id, keyname, name, mime_type, description, -1
 FROM feature_attachment_tmp;
 
 DROP TABLE feature_attachment_tmp;
 
 CREATE INDEX feature_attachment_resource_id_feature_id_idx
-    ON feature_attachment USING btree
-    (resource_id ASC NULLS LAST, feature_id ASC NULLS LAST)
-    WITH (fillfactor=100);
+    ON feature_attachment USING btree(resource_id, feature_id);
