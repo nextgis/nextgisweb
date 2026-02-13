@@ -35,7 +35,7 @@ class Complex(Base, FVersioningExtensionMixin):
     fversioning_columns = ("column_a", "column_b")
     fversioning_registry = registry
 
-    id = sa.Column(sa.Integer, primary_key=True)
+    extension_id = sa.Column(sa.Integer, primary_key=True)
     resource_id = sa.Column(sa.Integer, nullable=False)
     feature_id = sa.Column(sa.Integer, nullable=False)
     column_a = sa.Column(sa.Unicode, nullable=True)
