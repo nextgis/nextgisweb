@@ -10,11 +10,15 @@ from .base import ResourceAttr
 
 
 class ResourceAttrParent(ResourceAttr, tag="resource.parent"):
+    mandatory = True
+
     def __call__(self, obj, *, ctx) -> ResourceRef | None:
         return ResourceRef(id=obj.parent_id) if obj.parent_id is not None else None
 
 
 class ResourceAttrParents(ResourceAttr, tag="resource.parents"):
+    mandatory = True
+
     def __call__(self, obj, *, ctx) -> list[ResourceRef]:
         result: list[ResourceRef] = []
         parent = obj.parent
@@ -28,6 +32,7 @@ ResourcePermissionGap = Gap("ResourcePermissionGap", str)
 
 
 class ResourceAttrHasPermission(ResourceAttr, tag="resource.has_permission"):
+    mandatory = True
     permission: ResourcePermissionGap
 
     def __call__(self, obj, *, ctx) -> bool:
@@ -37,6 +42,8 @@ class ResourceAttrHasPermission(ResourceAttr, tag="resource.has_permission"):
 
 
 class ResourceAttrChildrenCreatable(ResourceAttr, tag="resource.children_creatable"):
+    mandatory = True
+
     def __call__(self, obj, *, ctx) -> list[ResourceCls]:
         if ResourceScope.manage_children not in obj.permissions(ctx.user):
             return []
@@ -79,6 +86,8 @@ class ResourceAttrChildrenCreatable(ResourceAttr, tag="resource.children_creatab
 
 
 class ResourceAttrIsDeletable(ResourceAttr, tag="resource.is_deletable"):
+    mandatory = True
+
     def __call__(self, obj, *, ctx) -> bool:
         return obj.permissions(ctx.user).issuperset(
             {ResourceScope.delete, ResourceScope.manage_children},
@@ -86,6 +95,8 @@ class ResourceAttrIsDeletable(ResourceAttr, tag="resource.is_deletable"):
 
 
 class ResourceAttrSummary(ResourceAttr, tag="resource.summary"):
+    mandatory = True
+
     def __call__(self, obj, *, ctx) -> list[tuple[str, str]]:
         tr = ctx.translate
         result: list[tuple[str, str]] = []

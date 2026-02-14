@@ -1,9 +1,10 @@
 from typing import TYPE_CHECKING, Any, Protocol, Union
 
-from msgspec import Struct, defstruct
+from msgspec import Struct, UnsetType, defstruct
 from typing_extensions import ClassVar, Self, get_annotations
 
 from nextgisweb.auth import User
+from nextgisweb.resource.scope import ResourceScope
 
 from ..model import Resource, ResourceSerializer
 from ..serialize import SAttribute, Serializer
@@ -20,6 +21,11 @@ class ResourceAttrContext(Protocol):
 class ResourceAttr(Struct, array_like=True):
     registry: ClassVar[list[type[Self]]] = []
 
+    mandatory: ClassVar[bool] = False
+    """If true, the attribute is defined for any resource and can be read
+    without additional permission checks (only ResourceScope.read permission is
+    required)."""
+
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
         if cls.__name__ != "ResourceAttrSAttribute":
@@ -29,7 +35,8 @@ class ResourceAttr(Struct, array_like=True):
 
     @classmethod
     def return_type(cls) -> Any:
-        return get_annotations(cls.__call__, eval_str=True)["return"]
+        return_type = get_annotations(cls.__call__, eval_str=True).get("return")
+        return return_type if cls.mandatory else (return_type | UnsetType)
 
     @staticmethod
     def argument_type() -> Any:
@@ -69,7 +76,8 @@ class ResourceAttrSAttribute(ResourceAttr):
 
     @classmethod
     def return_type(cls):
-        return cls.sattribute.types.read
+        return_type = cls.sattribute.types.read
+        return return_type if cls.mandatory else (return_type | UnsetType)
 
 
 def register_sattributess():
@@ -80,28 +88,29 @@ def register_sattributess():
     existing_attr_tags = {i.__struct_config__.tag for i in ResourceAttr.registry}
 
     for skey, scls in Serializer.registry.items():
-        for sattr_key, sattr in scls.proptab:
-            if not sattr.read:
+        for sattribute_key, sattribute in scls.proptab:
+            if not sattribute.read:
                 # Skip write-only attributes
                 continue
-            if scls is ResourceSerializer and sattr_key in ("id", "parent", "permissions"):
+            if scls is ResourceSerializer and sattribute_key in ("id", "parent", "permissions"):
                 # ID make no sense here, parent is handled separately
                 continue
 
             name = scls.__name__.removesuffix("Serializer") + "Attr"
-            name += _camelize(sattr_key)
-            tag = f"{skey}.{sattr_key}"
+            name += _camelize(sattribute_key)
+            tag = f"{skey}.{sattribute_key}"
 
             if tag in existing_attr_tags:
                 # Skip already registered attributes (e.g. from plugins), this
                 # may occur if running tests.
                 continue
 
+            mandatory = scls is ResourceSerializer and sattribute.read == ResourceScope.read
             defstruct(
                 name,
                 (),
                 bases=(ResourceAttrSAttribute,),
                 tag=tag,
                 module=scls.__module__,
-                namespace=dict(sattribute=sattr),
+                namespace=dict(sattribute=sattribute, mandatory=mandatory),
             )

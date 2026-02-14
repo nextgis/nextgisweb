@@ -11,7 +11,7 @@ export type Value<S extends Attributes[number]> = S extends [
     ...unknown[],
 ]
     ? K extends keyof ResourceAttrTypes
-        ? ResourceAttrTypes[K] | undefined
+        ? ResourceAttrTypes[K]
         : never
     : never;
 

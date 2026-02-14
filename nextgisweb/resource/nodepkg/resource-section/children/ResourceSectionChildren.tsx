@@ -14,11 +14,11 @@ import type { ResourceAttrItem } from "@nextgisweb/resource/api/ResourceAttrItem
 import type { Attributes } from "@nextgisweb/resource/api/resource-attr";
 import { useResourceAttr } from "@nextgisweb/resource/hook/useResourceAttr";
 
+import { registry } from "../registry";
 import type { ResourceSectionProps } from "../type";
 
 import { MenuDropdown } from "./component/MenuDropdown";
 import { RenderActions } from "./component/RenderActions";
-import { registry } from "../registry";
 import type { ChildrenResource } from "./type";
 import { prepareResourceChildren } from "./util/prepareResourceChildren";
 

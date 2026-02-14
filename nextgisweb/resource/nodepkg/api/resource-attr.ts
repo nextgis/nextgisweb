@@ -13,7 +13,7 @@ export type Attributes = RouteBody<"resource.attr", "post">["attributes"];
 export type Values<T extends [keyof ResourceAttrTypes, ...unknown[]][]> = {
     [K in keyof T]: T[K] extends [infer Key, ...unknown[]]
         ? Key extends keyof ResourceAttrTypes
-            ? ResourceAttrTypes[Key] | undefined
+            ? ResourceAttrTypes[Key]
             : never
         : never;
 };

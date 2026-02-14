@@ -39,7 +39,6 @@ export async function prepareResourceChildren({
         const ownerUser = it.get("resource.owner_user");
         const creationDate = it.get("resource.creation_date");
 
-        if (!cls || !displayName) continue;
         const item: ChildrenResource = {
             id: it.id,
             cls,
