@@ -85,7 +85,7 @@ def test_filter_comparison_operators(test_layer_id):
 
 def test_filter_in_operator(test_layer_id):
     layer = load_layer(test_layer_id)
-    filter = ["all", ["in", ["get", "name"], ["Alice", "Bob", "Charlie"]]]
+    filter = ["all", ["in", ["get", "name"], "Alice", "Bob", "Charlie"]]
 
     ids = fetch_filtered_ids(layer, filter)
 
@@ -94,7 +94,7 @@ def test_filter_in_operator(test_layer_id):
 
 def test_filter_not_in_operator(test_layer_id):
     layer = load_layer(test_layer_id)
-    filter = ["all", ["!in", ["get", "city"], ["NYC", "LA"]]]
+    filter = ["all", ["!in", ["get", "city"], "NYC", "LA"]]
 
     ids = fetch_filtered_ids(layer, filter)
 

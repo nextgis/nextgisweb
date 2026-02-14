@@ -564,7 +564,11 @@ export class FilterEditorStore {
                 } else if (value !== undefined && value !== null) {
                     if (operator === "in" || operator === "!in") {
                         if (Array.isArray(value)) {
-                            expressions.push([operator, ["get", field], value]);
+                            expressions.push([
+                                operator,
+                                ["get", field],
+                                ...(value as (string | number)[]),
+                            ]);
                         }
                     } else if (operator === "==" || operator === "!=") {
                         if (!Array.isArray(value)) {

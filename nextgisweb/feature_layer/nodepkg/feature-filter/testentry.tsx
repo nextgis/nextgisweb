@@ -111,6 +111,13 @@ const sampleFilters = {
             ["==", ["get", "type"], "town"],
         ],
     ]) as FilterExpressionString,
+    variadic: JSON.stringify([
+        "in",
+        ["get", "type"],
+        "city",
+        "town",
+        "village",
+    ]) as FilterExpressionString,
     empty: JSON.stringify([]) as FilterExpressionString,
 };
 
@@ -151,6 +158,11 @@ function FeatureFilterEditorTest() {
     const handleTestNested = () => {
         setInitialValue(sampleFilters.nested);
         setOutputJson(sampleFilters.nested);
+    };
+
+    const handleTestVariadic = () => {
+        setInitialValue(sampleFilters.variadic);
+        setOutputJson(sampleFilters.variadic);
     };
 
     const handleTestEmpty = () => {
@@ -240,6 +252,9 @@ function FeatureFilterEditorTest() {
                     </Button>
                     <Button size="small" onClick={handleTestNested}>
                         Nested Filter
+                    </Button>
+                    <Button size="small" onClick={handleTestVariadic}>
+                        Variadic In
                     </Button>
                     <Button size="small" onClick={handleTestEmpty}>
                         Empty Filter

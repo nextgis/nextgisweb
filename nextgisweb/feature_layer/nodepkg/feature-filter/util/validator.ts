@@ -103,6 +103,15 @@ export function validateConditionExpression(
                 )({ operator, length: expression.length - 1 })
             );
         }
+    } else if (operator === "in" || operator === "!in") {
+        if (expression.length < 3) {
+            console.log(operator);
+            throw new Error(
+                gettextf(
+                    "Operator '{operator}' expects at least {min} value argument"
+                )({ operator, min: 1 })
+            );
+        }
     } else {
         if (expression.length !== 3) {
             throw new Error(
@@ -143,15 +152,18 @@ export function validateConditionExpression(
     }
 
     if (operator === "in" || operator === "!in") {
-        if (!Array.isArray(value)) {
-            throw new Error(
-                gettextf("Value for operator '{operator}' must be an array.")({
-                    operator,
-                })
-            );
+        const values = expression.slice(2);
+        for (const item of values) {
+            if (Array.isArray(item)) {
+                throw new Error(
+                    gettext(
+                        "Values for 'in' operator cannot be arrays (must be flattened) or property references."
+                    )
+                );
+            }
         }
         if (isTemporalDatatype(field.datatype)) {
-            for (const item of value) {
+            for (const item of values) {
                 validateDateTimeValue(field.datatype, item, fieldName);
             }
         }

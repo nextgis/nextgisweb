@@ -53,7 +53,7 @@ export type ConditionValue = string | number | boolean | null;
 
 export type EqNeExpr = [EqNeOp, GetExpr, ConditionValue];
 export type CmpExpr = [CmpOp, GetExpr, number | string];
-export type InExpr = [InOp, GetExpr, Array<string | number>];
+export type InExpr = [InOp, GetExpr, ...(string | number)[]];
 export type HasExpr = [HasOp, GetExpr];
 
 export type ConditionExpr = EqNeExpr | CmpExpr | InExpr | HasExpr;

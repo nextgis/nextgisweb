@@ -6,6 +6,8 @@ from osgeo import gdal
 
 from nextgisweb.pyramid.test import WebTestApp
 
+from .filter_cases import get_integration_cases, get_invalid_filter_cases
+
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
 
 
@@ -31,233 +33,58 @@ def export_geojson(test_layer_id, ngw_webtest_app: WebTestApp):
     return wrapped
 
 
-def test_export_filter_single_condition(export_geojson):
-    filter = ["all", ["==", ["get", "name"], "Alice"]]
-    geojson = export_geojson(filter=filter)
-
-    assert len(geojson["features"]) == 1
-    assert geojson["features"][0]["properties"]["name"] == "Alice"
+@pytest.mark.parametrize("expression, expected_names", get_integration_cases())
+def test_export_geojson(export_runner, expression, expected_names):
+    assert export_runner.fetch_names(expression) == expected_names
 
 
-def test_export_filter_all_multiple_conditions(export_geojson):
-    filter = ["all", ["==", ["get", "city"], "NYC"], [">", ["get", "age"], 26]]
-    geojson = export_geojson(filter=filter)
-
-    # Should match Charlie (35, NYC) and Eve (32, NYC), not Alice (25, NYC)
-    assert len(geojson["features"]) == 2
-    names = {f["properties"]["name"] for f in geojson["features"]}
-    assert names == {"Charlie", "Eve"}
+@pytest.mark.parametrize("expression, expected_names", get_integration_cases(only_auto_all=True))
+def test_export_geojson_with_all(export_runner, expression, expected_names):
+    assert export_runner.fetch_names(["all", expression]) == expected_names
 
 
-def test_export_filter_any_conditions(export_geojson):
-    filter = ["any", ["==", ["get", "name"], "Alice"], ["==", ["get", "name"], "Bob"]]
-    geojson = export_geojson(filter=filter)
-
-    assert len(geojson["features"]) == 2
-    names = {f["properties"]["name"] for f in geojson["features"]}
-    assert names == {"Alice", "Bob"}
+@pytest.fixture(params=[lambda e: e, lambda e: ["all", e]], ids=["raw", "all_wrapped"])
+def auto_all(request):
+    return request.param
 
 
-def test_export_filter_nested_groups(export_geojson):
-    filter = [
-        "all",
-        ["==", ["get", "city"], "NYC"],
-        ["any", ["<", ["get", "age"], 27], [">", ["get", "age"], 33]],
-    ]
-    geojson = export_geojson(filter=filter)
+@pytest.mark.parametrize("case", get_invalid_filter_cases())
+def test_export_filter_validation_errors(export_runner, auto_all, case):
+    expr = auto_all(case.expression) if case.auto_all else case.expression
 
-    # Should match: Alice (25, NYC) and Charlie (35, NYC)
-    assert len(geojson["features"]) == 2
-    names = {f["properties"]["name"] for f in geojson["features"]}
-    assert names == {"Alice", "Charlie"}
+    resp = export_runner.fetch_response(expr, status=case.export_status)
+
+    if hasattr(case, "error_pattern") and case.error_pattern:
+        error_message = resp.json.get("message", str(resp.json))
+        assert case.error_pattern.lower() in error_message.lower()
 
 
-def test_export_filter_comparison_operators(export_geojson):
-    # Greater than
-    filter = ["all", [">", ["get", "age"], 30]]
-    geojson = export_geojson(filter=filter)
-    assert len(geojson["features"]) == 2  # Charlie (35) and Eve (32)
+def test_export_filter_empty_expression(export_runner):
+    filter_expr = []
+    resp = export_runner.fetch_response(filter_expr)
+    geojson = resp.json
 
-    # Greater or equal
-    filter = ["all", [">=", ["get", "score"], 8.0]]
-    geojson = export_geojson(filter=filter)
-    assert len(geojson["features"]) == 3  # Alice (8.5), Charlie (9.0), Eve (8.0)
-
-    # Less than
-    filter = ["all", ["<", ["get", "age"], 30]]
-    geojson = export_geojson(filter=filter)
-    assert len(geojson["features"]) == 2  # Alice (25) and Diana (28)
-
-    # Not equal
-    filter = ["all", ["!=", ["get", "city"], "NYC"]]
-    geojson = export_geojson(filter=filter)
-    assert len(geojson["features"]) == 2  # Bob (LA) and Diana (SF)
-
-
-def test_export_filter_in_operator(export_geojson):
-    filter = ["all", ["in", ["get", "name"], ["Alice", "Bob", "Charlie"]]]
-    geojson = export_geojson(filter=filter)
-
-    assert len(geojson["features"]) == 3
-    names = {f["properties"]["name"] for f in geojson["features"]}
-    assert names == {"Alice", "Bob", "Charlie"}
-
-
-def test_export_filter_not_in_operator(export_geojson):
-    filter = ["all", ["!in", ["get", "city"], ["NYC", "LA"]]]
-    geojson = export_geojson(filter=filter)
-
-    assert len(geojson["features"]) == 1
-    assert geojson["features"][0]["properties"]["city"] == "SF"
-
-
-def test_export_filter_empty_expression(export_geojson):
-    filter = []
-    geojson = export_geojson(filter=filter)
-
-    # Empty filter should return all features
     assert len(geojson["features"]) == 5
 
 
-def test_export_filter_invalid_format(test_layer_id, ngw_webtest_app: WebTestApp):
-    filter = json.dumps(["unsupported", ["get", "name"], "Alice"])
-    qs = dict(format="GeoJSON", srs="3857", zipped="false", filter=filter)
+def test_export_filter_with_ilike(export_runner):
+    filter_expr = ["all", ["==", ["get", "city"], "NYC"]]
+    resp = export_runner.fetch_response(filter_expr, ilike="Alice")
+    geojson = resp.json
 
-    ngw_webtest_app.get(f"/api/resource/{test_layer_id}/export", query=qs, status=422)
-
-
-def test_export_filter_invalid_json(test_layer_id, ngw_webtest_app: WebTestApp):
-    # Invalid JSON
-    qs = dict(format="GeoJSON", srs="3857", zipped="false", filter="not valid json {")
-
-    ngw_webtest_app.get(f"/api/resource/{test_layer_id}/export", query=qs, status=422)
+    assert len(geojson["features"]) == 1
+    assert geojson["features"][0]["properties"]["name"] == "Alice"
 
 
-def test_export_filter_unknown_field(test_layer_id, ngw_webtest_app: WebTestApp):
-    filter = json.dumps(["all", ["==", ["get", "nonexistent"], "value"]])
-    qs = dict(format="GeoJSON", srs="3857", zipped="false", filter=filter)
-
-    ngw_webtest_app.get(f"/api/resource/{test_layer_id}/export", query=qs, status=422)
-
-
-def test_export_filter_with_ilike(export_geojson, test_layer_id, ngw_webtest_app: WebTestApp):
-    # Combine filter with ilike - filter first, then ilike should further filter
-    filter = ["all", ["==", ["get", "city"], "NYC"]]
-    qs = dict(
-        format="GeoJSON",
-        srs="3857",
-        zipped="false",
-        filter=json.dumps(filter),
-        ilike="Alice",
+def test_export_filter_with_intersects(export_runner):
+    filter_expr = ["all", [">", ["get", "age"], 25]]
+    resp = export_runner.fetch_response(
+        filter_expr, intersects="POLYGON((0 0, 0 2, 2 2, 2 0, 0 0))", intersects_srs="3857"
     )
+    geojson = resp.json
 
-    geojson = ngw_webtest_app.get(f"/api/resource/{test_layer_id}/export", query=qs).json
-
-    # Should only match Alice (in NYC and name contains "Alice")
-    assert len(geojson["features"]) == 1
-    assert geojson["features"][0]["properties"]["name"] == "Alice"
-
-
-def test_export_filter_with_intersects(export_geojson, test_layer_id, ngw_webtest_app: WebTestApp):
-    # Combine filter with intersects geometry
-    filter = ["all", [">", ["get", "age"], 25]]
-    qs = dict(
-        format="GeoJSON",
-        srs="3857",
-        zipped="false",
-        filter=json.dumps(filter),
-        intersects="POLYGON((0 0, 0 2, 2 2, 2 0, 0 0))",
-        intersects_srs="3857",
-    )
-
-    geojson = ngw_webtest_app.get(f"/api/resource/{test_layer_id}/export", query=qs).json
-
-    # Should match features with age > 25 AND within the polygon
-    # Bob (30, at 1,1) and Charlie (35, at 2,2) but not Alice (25)
     assert len(geojson["features"]) == 2
-    names = {f["properties"]["name"] for f in geojson["features"]}
-    assert names == {"Bob", "Charlie"}
-
-
-def test_export_filter_date_field(export_geojson):
-    # Filter by date - people born before 1995
-    filter = ["all", ["<", ["get", "birth_date"], "1995-01-01"]]
-    geojson = export_geojson(filter=filter)
-
-    # Should match Bob (1993-08-22) and Charlie (1988-12-01)
-    assert len(geojson["features"]) == 3
-    names = {f["properties"]["name"] for f in geojson["features"]}
-    assert names == {"Bob", "Charlie", "Eve"}
-
-
-def test_export_filter_date_equality(export_geojson):
-    # Filter by exact date
-    filter = ["all", ["==", ["get", "birth_date"], "1998-05-15"]]
-    geojson = export_geojson(filter=filter)
-
-    assert len(geojson["features"]) == 1
-    assert geojson["features"][0]["properties"]["name"] == "Alice"
-
-
-def test_export_filter_datetime_field(export_geojson):
-    # Filter by datetime - created after 2023-03-01
-    filter = ["all", [">", ["get", "created_at"], "2023-03-01T00:00:00"]]
-    geojson = export_geojson(filter=filter)
-
-    # Should match Charlie (2023-03-20) and Eve (2023-04-05)
-    assert len(geojson["features"]) == 2
-    names = {f["properties"]["name"] for f in geojson["features"]}
-    assert names == {"Charlie", "Eve"}
-
-
-def test_export_filter_datetime_range(export_geojson):
-    # Filter by datetime range - created in January 2023
-    filter = [
-        "all",
-        [">=", ["get", "created_at"], "2023-01-01T00:00:00"],
-        ["<", ["get", "created_at"], "2023-02-01T00:00:00"],
-    ]
-    geojson = export_geojson(filter=filter)
-
-    # Should match Alice (2023-01-10) and Diana (2023-01-25)
-    assert len(geojson["features"]) == 2
-    names = {f["properties"]["name"] for f in geojson["features"]}
-    assert names == {"Alice", "Diana"}
-
-
-def test_export_filter_time_field(export_geojson):
-    # Filter by time - work starts before 09:00
-    filter = ["all", ["<", ["get", "work_start"], "09:00:00"]]
-    geojson = export_geojson(filter=filter)
-
-    # Should match Charlie (08:00:00) and Eve (08:30:00)
-    assert len(geojson["features"]) == 2
-    names = {f["properties"]["name"] for f in geojson["features"]}
-    assert names == {"Charlie", "Eve"}
-
-
-def test_export_filter_time_equality(export_geojson):
-    # Filter by exact time
-    filter = ["all", ["==", ["get", "work_start"], "09:00:00"]]
-    geojson = export_geojson(filter=filter)
-
-    assert len(geojson["features"]) == 1
-    assert geojson["features"][0]["properties"]["name"] == "Alice"
-
-
-def test_export_filter_mixed_date_and_string(export_geojson):
-    # Combine date filter with string filter
-    filter = [
-        "all",
-        ["==", ["get", "city"], "NYC"],
-        [">", ["get", "birth_date"], "1990-01-01"],
-    ]
-    geojson = export_geojson(filter=filter)
-
-    # Should match Alice (NYC, 1998-05-15) and Eve (NYC, 1991-07-18)
-    assert len(geojson["features"]) == 2
-    names = {f["properties"]["name"] for f in geojson["features"]}
-    assert names == {"Alice", "Eve"}
+    assert {f["properties"]["name"] for f in geojson["features"]} == {"Bob", "Charlie"}
 
 
 def test_export_gpkg_with_filter(test_layer_id, ngw_webtest_app: WebTestApp):

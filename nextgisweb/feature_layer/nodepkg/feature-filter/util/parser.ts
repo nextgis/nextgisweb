@@ -11,7 +11,8 @@ export function parseConditionExpression(
     expression: ConditionExpr,
     nextId: () => number
 ): FilterCondition {
-    const [operator, fieldExpression, value] = expression;
+    const [operator, fieldExpression, ...rest] = expression;
+    const value = rest[0];
     let field = "";
     if (Array.isArray(fieldExpression) && fieldExpression[0] === "get") {
         field = fieldExpression[1];
@@ -37,7 +38,7 @@ export function parseConditionExpression(
     } else if (operator === "in" || operator === "!in") {
         return {
             ...baseCondition,
-            value: Array.isArray(value) ? value : [],
+            value: rest as Array<string | number>,
         };
     }
     return {

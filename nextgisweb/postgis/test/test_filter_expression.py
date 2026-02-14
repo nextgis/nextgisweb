@@ -72,7 +72,7 @@ def test_filter_comparison_operators(layer):
 def test_filter_in_operator(layer):
     ids = fetch_filtered_ids(
         layer,
-        ["all", ["in", ["get", "name"], ["Alice", "Bob", "Charlie"]]],
+        ["all", ["in", ["get", "name"], "Alice", "Bob", "Charlie"]],
     )
     assert ids == [1, 2, 3]
 
@@ -80,7 +80,7 @@ def test_filter_in_operator(layer):
 def test_filter_not_in_operator(layer):
     ids = fetch_filtered_ids(
         layer,
-        ["all", ["!in", ["get", "city"], ["NYC", "LA"]]],
+        ["all", ["!in", ["get", "city"], "NYC", "LA"]],
     )
     assert ids == [4]
 
