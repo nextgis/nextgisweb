@@ -10,9 +10,11 @@ import {
     Input,
     Radio,
     Select,
+    Space,
 } from "@nextgisweb/gui/antd";
 import type { RadioGroupProps, SelectProps } from "@nextgisweb/gui/antd";
 import { errorModal, isAbortError } from "@nextgisweb/gui/error";
+import { Area, Lot } from "@nextgisweb/gui/mayout";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { ResourceSelectRef } from "@nextgisweb/resource/component";
@@ -34,6 +36,14 @@ const uploaderMessages = {
 }
 // prettier-ignore
 const msgInspect = gettext("Files uploaded, post-processing on the server in progress...");
+
+const msgFixErrors = gettext("Fix errors");
+const msgSkipUnfixable = gettext("Skip features with unfixable errors");
+const msgGeomType = gettext("Geometry type");
+const msgGeomTypeSkip = gettext("Skip features with other geometry types");
+const msgGeomTypeMulti = gettext("Multi-geometry");
+const msgGeomTypeZ = gettext("Z-coordinate");
+const msgFidSource = gettext("FID source");
 
 const RadioGroup = (props: RadioGroupProps) => (
     <Radio.Group optionType="button" buttonStyle="outline" {...props} />
@@ -97,49 +107,61 @@ const SourceOptions = observer(({ store }: { store: Store }) => {
     };
 
     return (
-        <>
-            <label>{gettext("Fix errors")}</label>
-            <div className="group">
-                <RadioGroup options={optsFixErrors} {...brg("fix_errors")} />
-                <CheckboxValue {...bcb("skip_errors")}>
-                    <>{gettext("Skip features with unfixable errors")}</>
-                </CheckboxValue>
-            </div>
+        <Area>
+            <Lot label={msgFixErrors}>
+                <Space orientation="horizontal">
+                    <RadioGroup
+                        options={optsFixErrors}
+                        {...brg("fix_errors")}
+                    />
+                    <CheckboxValue {...bcb("skip_errors")}>
+                        {msgSkipUnfixable}
+                    </CheckboxValue>
+                </Space>
+            </Lot>
 
-            <label>{gettext("Geometry type")}</label>
-            <div className="group">
-                <RadioGroup
-                    options={optsGType}
-                    {...brg("cast_geometry_type")}
-                />
-                <CheckboxValue
-                    {...bcb("skip_other_geometry_types")}
-                    disabled={store.sourceOptions.cast_geometry_type === null}
-                >
-                    {/* prettier-ignore */}
-                    <>{gettext("Skip features with other geometry types")}</>
-                </CheckboxValue>
-            </div>
+            <Lot label={msgGeomType}>
+                <Space orientation="horizontal">
+                    <RadioGroup
+                        options={optsGType}
+                        {...brg("cast_geometry_type")}
+                    />
+                    <CheckboxValue
+                        {...bcb("skip_other_geometry_types")}
+                        disabled={
+                            store.sourceOptions.cast_geometry_type === null
+                        }
+                    >
+                        {msgGeomTypeSkip}
+                    </CheckboxValue>
+                </Space>
+            </Lot>
 
-            <label>{gettext("Multi-geometry")}</label>
-            <RadioGroup options={optsAutoYesNo} {...brg("cast_is_multi")} />
+            <Lot label={msgGeomTypeMulti}>
+                <RadioGroup options={optsAutoYesNo} {...brg("cast_is_multi")} />
+            </Lot>
 
-            <label>{gettext("Z-coordinate")}</label>
-            <RadioGroup options={optsAutoYesNo} {...brg("cast_has_z")} />
+            <Lot label={msgGeomTypeZ}>
+                <RadioGroup options={optsAutoYesNo} {...brg("cast_has_z")} />
+            </Lot>
 
-            <label>{gettext("FID source")}</label>
-            <div className="group">
-                <RadioGroup options={optsFidSource} {...brg("fid_source")} />
-                <Input
-                    value={so.fid_field}
-                    onChange={(e) => {
-                        store.updateSourceOptions({
-                            fid_field: e.target.value,
-                        });
-                    }}
-                />
-            </div>
-        </>
+            <Lot label={msgFidSource}>
+                <Space orientation="horizontal">
+                    <RadioGroup
+                        options={optsFidSource}
+                        {...brg("fid_source")}
+                    />
+                    <Input
+                        value={so.fid_field}
+                        onChange={(e) => {
+                            store.updateSourceOptions({
+                                fid_field: e.target.value,
+                            });
+                        }}
+                    />
+                </Space>
+            </Lot>
+        </Area>
     );
 });
 
@@ -318,6 +340,11 @@ export const Widget: EditorWidget<Store> = observer(({ store }) => {
             {mode === "file" && (
                 <Collapse
                     size="small"
+                    ghost={true}
+                    styles={{
+                        header: { paddingInline: 0, paddingBlockStart: 0 },
+                        body: { paddingInline: 0 },
+                    }}
                     items={[
                         {
                             key: "default",
