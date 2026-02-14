@@ -62,28 +62,24 @@ export const useColumns = function ({
                     {
                         title: pgettext("column", "Created"),
                         key: "create",
-                        width: 200,
                         align: "end",
                         render: (_, row) => row.feature.create,
                     },
                     {
                         title: pgettext("column", "Updated"),
                         key: "update",
-                        width: 200,
                         align: "end",
                         render: (_, row) => row.feature.update,
                     },
                     {
                         title: pgettext("column", "Deleted"),
                         key: "delete",
-                        width: 200,
                         align: "end",
                         render: (_, row) => row.feature.delete,
                     },
                     {
                         title: pgettext("column", "Restored"),
                         key: "restore",
-                        width: 200,
                         align: "end",
                         render: (_, row) => row.feature.restore,
                     },
