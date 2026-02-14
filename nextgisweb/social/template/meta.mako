@@ -1,9 +1,5 @@
 <%page args="site_name, title"/>
 <%
-    preview_link = request.env.pyramid.preview_link_view(request)
-    image = preview_link['image']
-    description = preview_link['description']
-
     tags = {"og:site_name": site_name}
     if title:
         tags["og:title"] = tr(title)
