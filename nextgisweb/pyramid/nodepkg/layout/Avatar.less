@@ -31,34 +31,32 @@
 }
 
 .ngw-pyramid-avatar-popover {
-    .ant-popover-content {
-        > .ant-popover-inner {
-            padding: 1ex;
+    .ant-popover-container {
+        padding: 8px;
 
-            .ant-popover-title {
+        > .ant-popover-title {
+            padding: 4px 8px;
+        }
+
+        > .ant-popover-content {
+            display: flex;
+            flex-direction: column;
+            gap: 1ex;
+            padding: 0px;
+
+            div.warning {
+                background-color: var(--surface-bg-danger);
                 padding: 4px 8px;
             }
 
-            .ant-popover-inner-content {
-                display: flex;
-                flex-direction: column;
-                gap: 1ex;
-                padding: 0px;
+            a {
+                display: block;
+                padding: 4px 8px;
+                color: var(--text-base);
+                text-decoration: none;
 
-                div.warning {
-                    background-color: var(--surface-bg-danger);
-                    padding: 4px 8px;
-                }
-
-                a {
-                    display: block;
-                    padding: 4px 8px;
-                    color: var(--text-base);
-                    text-decoration: none;
-
-                    &:hover {
-                        background-color: rgba(0, 0, 0, 0.04);
-                    }
+                &:hover {
+                    background-color: rgba(0, 0, 0, 0.04);
                 }
             }
         }
