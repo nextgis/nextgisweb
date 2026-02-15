@@ -1,17 +1,22 @@
 .ngw-resource-resource-section-children {
-    svg.icon {
-        margin: 0 2px;
-    }
-
-    .ant-table {
+    .ant-table > .ant-table-container > .ant-table-content {
         .displayName {
             width: 100%;
-            text-align: left !important;
+            text-align: left;
+        }
+
+        tr > td.displayName {
+            padding: 0;
 
             & > a {
                 display: flex;
                 align-items: center;
                 gap: 8px;
+                box-sizing: border-box;
+                padding-inline: var(--ant-table-cell-padding-inline-md);
+                padding-block: calc(
+                    1.25 * var(--ant-table-cell-padding-block-md)
+                );
                 color: black;
                 text-decoration: none;
                 overflow-wrap: anywhere;
@@ -30,11 +35,25 @@
 
         .actions,
         .volume {
-            text-align: right !important;
+            text-align: right;
         }
 
         .actions {
-            font-size: 24px;
+            > .container {
+                display: flex;
+                justify-content: flex-end;
+                gap: 4px;
+
+                > a {
+                    display: inline-block;
+                    line-height: 1;
+
+                    svg.icon {
+                        width: 24px;
+                        height: 24px;
+                    }
+                }
+            }
         }
 
         .cls,

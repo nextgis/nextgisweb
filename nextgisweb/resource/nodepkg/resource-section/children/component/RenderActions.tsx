@@ -34,7 +34,7 @@ function RenderActionsComp({ record, setTableItems }: RenderActionsProps) {
     }, [record]);
 
     return (
-        <>
+        <div className="container">
             {actions.map((action) => {
                 const props: ActionBtnProps = {
                     size: "small",
@@ -76,7 +76,7 @@ function RenderActionsComp({ record, setTableItems }: RenderActionsProps) {
 
                 return target;
             })}
-        </>
+        </div>
     );
 }
 
