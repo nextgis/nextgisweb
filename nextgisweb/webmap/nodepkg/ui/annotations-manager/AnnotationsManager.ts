@@ -323,14 +323,12 @@ export class AnnotationsManager {
 
     private _setLayerZIndex() {
         if (this._annotationsLayer) {
-            this._annotationsLayer.setZIndex(
-                Math.max(
-                    ...[...this._display.treeStore.items.values()].map(
-                        (item) =>
-                            item.isLayer() ? item.drawOrderPosition || 0 : 0
-                    )
-                ) * 2 // Multiply by two for insurance
+            const treeItems = [...this._display.treeStore.items.values()].map(
+                (item) => (item.isLayer() ? item.drawOrderPosition || 0 : 0)
             );
+            const maxZIndex = treeItems.length ? Math.max(...treeItems) * 2 : 2; // Multiply by two for insurance
+
+            this._annotationsLayer.setZIndex(maxZIndex);
         }
     }
 }

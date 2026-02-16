@@ -85,6 +85,13 @@ export const PrintMapPreview = observer(
                             const copyLayer = layer.printingCopy();
                             copyLayer.setZIndex(-1);
                             printMap.addLayer(copyLayer);
+                        } else if (
+                            ["annotations"].some(
+                                (title) => layer.get("title") === title
+                            )
+                        ) {
+                            const copyLayer = layer.printingCopy();
+                            printMap.addLayer(copyLayer);
                         }
                     }
                 });
