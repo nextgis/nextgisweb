@@ -239,8 +239,17 @@ export function VersionHistory({ id }: { id: number }) {
                 }}
             >
                 <Table
-                    style={{ height: "100%", width: "100%" }}
                     className="ngw-feature-layer-version-history"
+                    styles={{
+                        root: { width: "100%", height: "100%" },
+                        header: {
+                            cell: {
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                whiteSpace: "nowrap",
+                            },
+                        },
+                    }}
                     virtual
                     scroll={{ y: scrollY }}
                     onScroll={(e) => {
@@ -265,6 +274,7 @@ export function VersionHistory({ id }: { id: number }) {
                     expandable={{
                         columnWidth: 32,
                         expandedRowKeys,
+                        fixed: "start",
                         onExpandedRowsChange: (keys) => {
                             setExpandedRowKeys([...keys]);
                         },

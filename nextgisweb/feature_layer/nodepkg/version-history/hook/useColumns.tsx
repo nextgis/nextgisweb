@@ -1,4 +1,5 @@
 import type { TableProps as AntTableProps } from "antd/es/table";
+import { max } from "lodash-es";
 import { useMemo } from "react";
 
 import type {
@@ -12,16 +13,26 @@ import { gettext, pgettext } from "@nextgisweb/pyramid/i18n";
 import { UserCell } from "../component/UserCell";
 import { VersionHistoryRowMenu } from "../component/VersionHistoryRowMenu";
 
+const msgCreated = pgettext("column", "Created");
+const msgUpdated = pgettext("column", "Updated");
+const msgDeleted = pgettext("column", "Deleted");
+const msgRestored = pgettext("column", "Restored");
+
 export type VersionItem = VersionCGetVersion | VersionCGetGroup;
 
 function format_tstamp(tstamp: string) {
     return utc(tstamp).local().format("L LTS");
 }
+
 function formatTstamp(v: VersionItem): string {
     return v.type === "group"
         ? format_tstamp(v.tstamp[1])
         : format_tstamp(v.tstamp);
 }
+
+const [colCharWidth, colPadding] = [10, 16];
+const fcLabels = [msgCreated, msgUpdated, msgDeleted, msgRestored];
+const fcWidth = max(fcLabels.map((s) => s.length * colCharWidth + colPadding));
 
 export const useColumns = function ({
     id,
@@ -43,12 +54,14 @@ export const useColumns = function ({
                 dataIndex: "tstamp",
                 key: "tstamp",
                 width: 250,
+                fixed: "start",
                 render: (_, row) => formatTstamp(row),
             },
             {
                 title: gettext("User"),
                 dataIndex: "user",
                 key: "user",
+                width: 300,
                 render: (_, row) =>
                     typeof row.user?.id === "number" ? (
                         <UserCell userId={row.user?.id} />
@@ -60,30 +73,30 @@ export const useColumns = function ({
                 title: gettext("Features"),
                 children: [
                     {
-                        title: pgettext("column", "Created"),
+                        title: msgCreated,
                         key: "create",
-                        width: 200,
+                        width: fcWidth,
                         align: "end",
                         render: (_, row) => row.feature.create,
                     },
                     {
-                        title: pgettext("column", "Updated"),
+                        title: msgUpdated,
                         key: "update",
-                        width: 200,
+                        width: fcWidth,
                         align: "end",
                         render: (_, row) => row.feature.update,
                     },
                     {
-                        title: pgettext("column", "Deleted"),
+                        title: msgDeleted,
                         key: "delete",
-                        width: 200,
+                        width: fcWidth,
                         align: "end",
                         render: (_, row) => row.feature.delete,
                     },
                     {
-                        title: pgettext("column", "Restored"),
+                        title: msgRestored,
                         key: "restore",
-                        width: 200,
+                        width: fcWidth,
                         align: "end",
                         render: (_, row) => row.feature.restore,
                     },
@@ -96,7 +109,7 @@ export const useColumns = function ({
                 title: "",
                 key: "actions",
                 width: 44,
-                fixed: "right",
+                fixed: "end",
                 align: "center",
                 render: (_, row) =>
                     epoch && (
