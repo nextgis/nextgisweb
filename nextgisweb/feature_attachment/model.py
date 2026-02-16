@@ -35,16 +35,12 @@ KEYNAME_RE = re.compile(r"[a-z_][a-z0-9_]*", re.IGNORECASE)
 class FeatureAttachment(Base, FVersioningExtensionMixin):
     __tablename__ = "feature_attachment"
 
-    id_seq = sa.Sequence("feature_attachment_id_seq", metadata=Base.metadata)
-
     resource_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
     feature_id = sa.Column(sa.Integer, primary_key=True)
     extension_id = sa.Column(
         sa.Integer,
-        id_seq,
         primary_key=True,
-        autoincrement=False,
-        server_default=id_seq.next_value(),
+        autoincrement=True,
     )
 
     fileobj_id = sa.Column(sa.ForeignKey(FileObj.id), nullable=False)

@@ -4,6 +4,7 @@ ALTER TABLE feature_attachment DROP CONSTRAINT feature_attachment_pkey;
 ALTER TABLE feature_attachment DROP CONSTRAINT feature_attachment_keyname_unique;
 ALTER TABLE feature_attachment RENAME TO feature_attachment_tmp;
 
+ALTER SEQUENCE feature_attachment_extension_id_seq RENAME TO feature_attachment_id_seq;
 CREATE TABLE feature_attachment
 (
     id integer NOT NULL DEFAULT nextval('feature_attachment_id_seq'::regclass),
