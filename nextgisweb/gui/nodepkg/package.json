@@ -24,7 +24,7 @@
         "@dnd-kit/sortable": "^10.0.0",
         "@dnd-kit/utilities": "^3.2.2",
         "@ngneat/falso": "8.0.1",
-        "antd": "~6.2.3",
+        "antd": "~6.3.0",
         "classnames": "^2.5.1",
         "html-react-parser": "5.2.5",
         "react-complex-tree": "^2.6.0"

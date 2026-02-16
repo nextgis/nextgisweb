@@ -47,7 +47,7 @@ const Link = ({ title, help, docsUrl, url }: LinkProps) => (
         <div className="label">
             {title}{" "}
             <Popover
-                overlayClassName="ngw-resource-external-access-popover"
+                classNames={{ root: "ngw-resource-external-access-popover" }}
                 placement="right"
                 content={<Help help={help} docsUrl={docsUrl} />}
             >
