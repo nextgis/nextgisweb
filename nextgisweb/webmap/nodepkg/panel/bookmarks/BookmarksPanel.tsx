@@ -1,11 +1,12 @@
+import { useVirtualizer } from "@tanstack/react-virtual";
 import classNames from "classnames";
 import { sortBy } from "lodash-es";
 import { observer } from "mobx-react-lite";
-import { useMemo, useState } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 
 import { Spin } from "@nextgisweb/gui/antd";
 import { route } from "@nextgisweb/pyramid/api";
-import { useRouteGet } from "@nextgisweb/pyramid/hook";
+import { useAbortController, useRouteGet } from "@nextgisweb/pyramid/hook";
 
 import { PanelContainer } from "../component";
 import type { PanelPluginWidgetProps } from "../registry";
@@ -17,11 +18,49 @@ interface Bookmark {
     label: string;
 }
 
+type BookmarkRowProps = {
+    start: number;
+    bookmark: Bookmark;
+    selectedKey?: number;
+    onSelect: (b: Bookmark) => void;
+};
+
+function BookmarkRow({
+    start,
+    bookmark,
+    selectedKey,
+    onSelect,
+}: BookmarkRowProps) {
+    const isSelected = selectedKey === bookmark.key;
+
+    return (
+        <div
+            style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                transform: `translateY(${start}px)`,
+            }}
+        >
+            <div
+                className={classNames("bookmark", isSelected && "selected")}
+                onClick={() => !isSelected && onSelect(bookmark)}
+            >
+                <span>{bookmark.label}</span>
+            </div>
+        </div>
+    );
+}
+
 const BookmarksPanel = observer<PanelPluginWidgetProps>(
     ({ store, display }) => {
         const bookmarkLayerId = display.config.bookmarkLayerId;
 
+        const { makeSignal, abort } = useAbortController();
+
         const [bookmarkSelected, setBookmarkSelected] = useState<Bookmark>();
+        const selectedKey = bookmarkSelected?.key;
 
         const { data, isLoading } = useRouteGet({
             name: "feature_layer.feature.collection",
@@ -37,20 +76,33 @@ const BookmarksPanel = observer<PanelPluginWidgetProps>(
             },
         });
 
-        const bookmarks = useMemo(() => {
-            return sortBy(
-                // @ts-expect-error wait for server-side type definition
-                data?.map((f) => ({ key: f.id, label: f.label })),
-                ["label", "key"]
-            ) as Bookmark[];
+        const [isPending, startTransition] = useTransition();
+        const [bookmarks, setBookmarks] = useState<Bookmark[] | null>(null);
+
+        useEffect(() => {
+            if (!data) {
+                setBookmarks(null);
+                return;
+            }
+
+            startTransition(() => {
+                const prepared = sortBy(
+                    // @ts-expect-error wait for server-side type definition
+                    data.map((f) => ({ key: f.id, label: f.label })),
+                    ["label", "key"]
+                ) as Bookmark[];
+
+                setBookmarks(prepared);
+            });
         }, [data]);
 
         const selectBookmark = async (bookmark: Bookmark) => {
+            abort();
             const result = await route(
                 "feature_layer.feature.item_extent",
                 bookmarkLayerId,
                 bookmark.key
-            ).get();
+            ).get({ signal: makeSignal() });
 
             display.map.zoomToNgwExtent(
                 // @ts-expect-error Extent may be null for features without geometries
@@ -59,34 +111,49 @@ const BookmarksPanel = observer<PanelPluginWidgetProps>(
                     displayProjection: display.displayProjection,
                 }
             );
+
             setBookmarkSelected(bookmark);
         };
 
-        const makeBookmarkJsx = (bookmark: Bookmark) => {
-            const isSelected =
-                bookmarkSelected && bookmark.key === bookmarkSelected.key;
-            return (
-                <div
-                    key={bookmark.key}
-                    className={classNames("bookmark", isSelected && "selected")}
-                    onClick={() => selectBookmark(bookmark)}
-                >
-                    <span>{bookmark.label}</span>
-                </div>
-            );
-        };
+        const parentRef = useRef<HTMLDivElement | null>(null);
 
-        let bookmarksJsx = null;
-        if (bookmarks && !isLoading) {
-            bookmarksJsx = bookmarks.map(makeBookmarkJsx);
-        } else if (isLoading) {
-            bookmarksJsx = (
-                <Spin
-                    className="loading"
-                    styles={{ indicator: { fontSize: 30 } }}
-                />
-            );
-        }
+        const rowVirtualizer = useVirtualizer({
+            count: bookmarks?.length ?? 0,
+            getScrollElement: () => parentRef.current,
+            estimateSize: () => 34,
+            overscan: 8,
+        });
+
+        const shouldShowSpinner = isLoading || isPending || !bookmarks;
+
+        const content = shouldShowSpinner ? (
+            <Spin
+                className="loading"
+                styles={{ indicator: { fontSize: 30 } }}
+            />
+        ) : (
+            <div ref={parentRef} className="bookmarks-list">
+                <div
+                    style={{
+                        height: rowVirtualizer.getTotalSize(),
+                        position: "relative",
+                    }}
+                >
+                    {rowVirtualizer.getVirtualItems().map((virtualItem) => {
+                        const item = bookmarks[virtualItem.index];
+                        return (
+                            <BookmarkRow
+                                key={item.key}
+                                bookmark={item}
+                                start={virtualItem.start}
+                                selectedKey={selectedKey}
+                                onSelect={selectBookmark}
+                            />
+                        );
+                    })}
+                </div>
+            </div>
+        );
 
         return (
             <PanelContainer
@@ -95,7 +162,7 @@ const BookmarksPanel = observer<PanelPluginWidgetProps>(
                 close={store.close}
                 components={{ content: PanelContainer.Unpadded }}
             >
-                <div>{bookmarksJsx}</div>
+                {content}
             </PanelContainer>
         );
     }
