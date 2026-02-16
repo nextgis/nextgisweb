@@ -22,7 +22,6 @@ import type {
     SelectValue,
 } from "./type";
 
-import { LoadingOutlined } from "@ant-design/icons";
 import FolderOpenIcon from "@nextgisweb/icon/material/arrow_forward";
 import SelectFirstIcon from "@nextgisweb/icon/material/editor_choice";
 
@@ -259,9 +258,7 @@ function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
             columns={columns}
             rowKey="id"
             size="middle"
-            loading={
-                loading.setChildrenFor && { indicator: <LoadingOutlined /> }
-            }
+            loading={loading.setChildrenFor}
             rowSelection={rowSelection}
             onRow={onRow}
         />

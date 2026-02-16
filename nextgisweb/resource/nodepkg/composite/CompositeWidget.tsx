@@ -20,7 +20,7 @@ import type { ActiveOnOptions, EditorStore } from "../type";
 import { CompositeStore } from "./CompositeStore";
 import type { CompositeSetup } from "./CompositeStore";
 
-import { EllipsisOutlined, LoadingOutlined } from "@ant-design/icons";
+import { EllipsisOutlined } from "@ant-design/icons";
 
 import "./CompositeWidget.less";
 
@@ -187,8 +187,9 @@ const CompositeWidget = observer(({ setup }: CompositeWidgetProps) => {
             >
                 <Spin
                     size="large"
-                    indicator={<LoadingOutlined spin />}
-                    tip={composite.saving || redirecting ? msgSaving : ""}
+                    description={
+                        composite.saving || redirecting ? msgSaving : ""
+                    }
                 >
                     <div />
                 </Spin>

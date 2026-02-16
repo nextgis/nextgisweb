@@ -9,8 +9,6 @@ import type {
     ResourceSectionProps,
 } from "@nextgisweb/resource/resource-section";
 
-import { LoadingOutlined } from "@ant-design/icons";
-
 type SectionConfig = { module: string; props: NonNullable<unknown> };
 
 function useComponents(
@@ -84,7 +82,7 @@ export function ResourcePageShow({
     if (!sections) {
         return (
             <Flex style={{ padding: "4em 8em" }} vertical>
-                <Spin size="large" indicator={<LoadingOutlined spin />} />
+                <Spin size="large" />
             </Flex>
         );
     }

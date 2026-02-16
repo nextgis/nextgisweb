@@ -23,8 +23,6 @@ import { HoleMode } from "./modes/HoleMode";
 import { ModifyMode } from "./modes/ModifyMode";
 import { MoveMode } from "./modes/MoveMode";
 
-import { LoadingOutlined } from "@ant-design/icons";
-
 export interface EditableResourceProps extends Omit<
     EditableItemProps,
     "geomType" | "geomLayout"
@@ -149,10 +147,7 @@ export const EditableResource = observer(
                 {modalHolder}
                 {isLoading || !source || !geomConfig ? (
                     <ButtonControl order={90} disabled>
-                        <Spin
-                            indicator={<LoadingOutlined spin />}
-                            size="small"
-                        />
+                        <Spin size="small" />
                     </ButtonControl>
                 ) : (
                     <EditableItem

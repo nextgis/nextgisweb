@@ -31,7 +31,6 @@ import { LoaderCache } from "@nextgisweb/pyramid/util";
 import { HistoryGroupDetails } from "./component/VersionHistoryGroupDetails";
 import { useColumns } from "./hook/useColumns";
 
-import { LoadingOutlined } from "@ant-design/icons";
 import RefreshIcon from "@nextgisweb/icon/material/refresh";
 
 import "./VersionHistory.less";
@@ -267,10 +266,7 @@ export function VersionHistory({ id }: { id: number }) {
                     dataSource={groups}
                     pagination={false}
                     size="small"
-                    loading={{
-                        spinning: isItemLoading || isVersionLoading,
-                        indicator: <LoadingOutlined />,
-                    }}
+                    loading={isItemLoading || isVersionLoading}
                     expandable={{
                         columnWidth: 32,
                         expandedRowKeys,

@@ -10,8 +10,6 @@ import { useRouteGet } from "@nextgisweb/pyramid/hook";
 import { PanelContainer } from "../component";
 import type { PanelPluginWidgetProps } from "../registry";
 
-import { LoadingOutlined } from "@ant-design/icons";
-
 import "./BookmarksPanel.less";
 
 interface Bookmark {
@@ -80,10 +78,14 @@ const BookmarksPanel = observer<PanelPluginWidgetProps>(
 
         let bookmarksJsx = null;
         if (bookmarks && !isLoading) {
-            bookmarksJsx = bookmarks.map((b) => makeBookmarkJsx(b));
+            bookmarksJsx = bookmarks.map(makeBookmarkJsx);
         } else if (isLoading) {
-            const indicator = <LoadingOutlined style={{ fontSize: 30 }} spin />;
-            bookmarksJsx = <Spin className="loading" indicator={indicator} />;
+            bookmarksJsx = (
+                <Spin
+                    className="loading"
+                    styles={{ indicator: { fontSize: 30 } }}
+                />
+            );
         }
 
         return (

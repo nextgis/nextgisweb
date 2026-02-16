@@ -13,8 +13,6 @@ import type { DisplayComponentProps } from "../display/DisplayWidget";
 import { LinkToControl } from "../map-component/control/LinkToMainMap";
 import type { TinyConfig } from "../type";
 
-import { LoadingOutlined } from "@ant-design/icons";
-
 const DisplayTinyWidget = observer(
     ({ config, tinyConfig }: DisplayComponentProps) => {
         const [display] = useState<Display>(
@@ -78,13 +76,7 @@ export default function DisplayTinyPage({ id }: { id: number }) {
     }));
 
     if (isLoading || !config) {
-        return (
-            <Spin
-                indicator={<LoadingOutlined spin />}
-                size="large"
-                fullscreen
-            />
-        );
+        return <Spin size="large" fullscreen />;
     }
     return <DisplayTinyWidget config={config} tinyConfig={tinyConfig} />;
 }

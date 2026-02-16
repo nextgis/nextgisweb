@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import { useEffect } from "react";
 
-import { Modal, useToken } from "@nextgisweb/gui/antd";
+import { Modal, Spin, useToken } from "@nextgisweb/gui/antd";
 import { useShowModal } from "@nextgisweb/gui/show-modal/useShowModal";
 import type { DynMenuItem } from "@nextgisweb/pyramid/layout/dynmenu/type";
 
@@ -13,6 +13,10 @@ import type { BreadcrumbItem } from "./Breadcrumbs";
 import { Dynmenu } from "./dynmenu/Dynmenu";
 import { Header } from "./header/Header";
 import { layoutStore } from "./store";
+
+import { LoadingOutlined } from "@ant-design/icons";
+
+Spin.setDefaultIndicator(<LoadingOutlined />);
 
 declare module "@nextgisweb/pyramid/cblock" {
     interface CBlocks {

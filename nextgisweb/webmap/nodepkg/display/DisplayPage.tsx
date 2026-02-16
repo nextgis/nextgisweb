@@ -5,8 +5,6 @@ import { useRouteGet } from "@nextgisweb/pyramid/hook";
 
 import { DisplayWidget } from "./DisplayWidget";
 
-import { LoadingOutlined } from "@ant-design/icons";
-
 export default function DisplayPage({ id }: { id: number }) {
     const { data: config, isLoading } = useRouteGet("webmap.display_config", {
         id,
@@ -33,11 +31,7 @@ export default function DisplayPage({ id }: { id: number }) {
     return (
         <StrictMode>
             {isLoading || !config ? (
-                <Spin
-                    size="large"
-                    fullscreen
-                    indicator={<LoadingOutlined spin />}
-                />
+                <Spin size="large" fullscreen />
             ) : (
                 <DisplayWidget config={config} />
             )}

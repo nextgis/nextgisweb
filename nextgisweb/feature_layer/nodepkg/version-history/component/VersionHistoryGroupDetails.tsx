@@ -6,8 +6,6 @@ import type { RouteResp } from "@nextgisweb/pyramid/api/type";
 import { useRoute } from "@nextgisweb/pyramid/hook";
 import { gettext, ngettextf } from "@nextgisweb/pyramid/i18n";
 
-import { LoadingOutlined } from "@ant-design/icons";
-
 type Group = { id: number | [number, number] };
 
 type ChangesFetchResp = RouteResp<"feature_layer.changes_fetch", "get">;
@@ -246,10 +244,7 @@ export function HistoryGroupDetails(props: {
                         loadBlock();
                     }
                 }}
-                loading={{
-                    spinning: fetchIsLoading || checkIsLoading,
-                    indicator: <LoadingOutlined />,
-                }}
+                loading={fetchIsLoading || checkIsLoading}
                 columns={columns}
                 dataSource={rows}
                 pagination={false}

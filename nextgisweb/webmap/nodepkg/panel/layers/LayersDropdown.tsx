@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite";
 
-import { Dropdown } from "@nextgisweb/gui/antd";
+import { Dropdown, Spin } from "@nextgisweb/gui/antd";
 import type { MenuProps } from "@nextgisweb/gui/antd";
 import { useRoute } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -8,7 +8,6 @@ import type { Display } from "@nextgisweb/webmap/display";
 
 import { PanelTitle } from "../component";
 
-import { LoadingOutlined } from "@ant-design/icons";
 import MoreVertIcon from "@nextgisweb/icon/material/more_vert/outline";
 import RestoreIcon from "@nextgisweb/icon/material/settings_backup_restore/outline";
 import VisibilityOffIcon from "@nextgisweb/icon/material/visibility_off/outline";
@@ -41,11 +40,7 @@ export const LayersDropdown = observer(({ display }: { display: Display }) => {
     const menuItems: MenuProps["items"] = [
         {
             key: "zoomToAllLayers",
-            icon: isExtentLoading ? (
-                <LoadingOutlined spin />
-            ) : (
-                <ZoomInMapIcon />
-            ),
+            icon: isExtentLoading ? <Spin /> : <ZoomInMapIcon />,
             label: gettext("Zoom to all layers"),
             onClick: zoomToAllLayers,
         },

@@ -19,7 +19,6 @@ import { PanelContainer, PanelTitle } from "../component";
 import type { PanelTitleProps } from "../component";
 import type { PanelPluginWidgetProps } from "../registry";
 
-import { LoadingOutlined } from "@ant-design/icons";
 import BackspaceIcon from "@nextgisweb/icon/material/backspace";
 import LayersIcon from "@nextgisweb/icon/material/layers";
 import LocationOnIcon from "@nextgisweb/icon/material/location_on";
@@ -472,8 +471,7 @@ const SearchPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
             );
         }
     } else if (loading) {
-        const indicator = <LoadingOutlined style={{ fontSize: 30 }} spin />;
-        results = <Spin className="loading" indicator={indicator} />;
+        results = <Spin className="loading" style={{ fontSize: 30 }} />;
     }
 
     const clearSearchText = () => {

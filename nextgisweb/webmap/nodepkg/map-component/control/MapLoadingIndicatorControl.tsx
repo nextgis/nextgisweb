@@ -1,11 +1,11 @@
 import { observer } from "mobx-react-lite";
 
+import { Spin } from "@nextgisweb/gui/antd";
+
 import { useMapContext } from "../context/useMapContext";
 
 import { MapControl } from "./MapControl";
 import type { MapControlProps } from "./MapControl";
-
-import { LoadingOutlined } from "@ant-design/icons";
 
 const MapLoadingIndicatorControl = observer((props: MapControlProps) => {
     const { mapStore } = useMapContext();
@@ -20,7 +20,7 @@ const MapLoadingIndicatorControl = observer((props: MapControlProps) => {
                         paddingRight: "5px",
                     }}
                 >
-                    <LoadingOutlined spin />
+                    <Spin />
                 </div>
             </MapControl>
         )

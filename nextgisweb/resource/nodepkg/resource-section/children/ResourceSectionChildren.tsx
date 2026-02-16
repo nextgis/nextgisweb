@@ -22,8 +22,6 @@ import { RenderActions } from "./component/RenderActions";
 import type { ChildrenResource } from "./type";
 import { prepareResourceChildren } from "./util/prepareResourceChildren";
 
-import { LoadingOutlined } from "@ant-design/icons";
-
 import "./ResourceSectionChildren.less";
 
 const { Column } = Table;
@@ -115,10 +113,7 @@ export function ResourceSectionChildren({ resourceId }: ResourceSectionProps) {
             className="ngw-resource-resource-section-children"
             size="middle"
             card={true}
-            loading={{
-                spinning: isDataLoading,
-                indicator: <LoadingOutlined />,
-            }}
+            loading={isDataLoading}
             dataSource={items}
             rowKey="id"
             rowSelection={rowSelection}

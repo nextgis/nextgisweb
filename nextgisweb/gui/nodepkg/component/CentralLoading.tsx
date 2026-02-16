@@ -2,8 +2,6 @@ import type React from "react";
 
 import { Spin } from "../antd";
 
-import { LoadingOutlined } from "@ant-design/icons";
-
 export function CentralLoading({
     style,
     indicatorStyle,
@@ -22,17 +20,7 @@ export function CentralLoading({
                 ...style,
             }}
         >
-            <Spin
-                indicator={
-                    <LoadingOutlined
-                        style={{
-                            fontSize: 24,
-                            ...indicatorStyle,
-                        }}
-                        spin={true}
-                    />
-                }
-            />
+            <Spin styles={{ indicator: { fontSize: 24, ...indicatorStyle } }} />
         </div>
     );
 }

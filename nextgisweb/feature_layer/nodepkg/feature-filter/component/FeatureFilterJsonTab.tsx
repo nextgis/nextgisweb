@@ -1,10 +1,10 @@
 import { observer } from "mobx-react-lite";
 import { Suspense, lazy, useCallback, useMemo } from "react";
 
+import { Spin } from "@nextgisweb/gui/antd";
+
 import type { FilterEditorStore } from "../FilterEditorStore";
 import type { FilterExpressionString } from "../type";
-
-import { LoadingOutlined } from "@ant-design/icons";
 
 const AsyncCode = lazy(() => import("./CodeLazy"));
 
@@ -13,7 +13,7 @@ const CodeLoadingFallback = () => (
         className="code-loading-fallback"
         style={{ textAlign: "center", padding: "20px" }}
     >
-        <LoadingOutlined style={{ fontSize: 24 }} />
+        <Spin styles={{ indicator: { fontSize: 24 } }} />
         <div
             className="loading-content"
             style={{ height: "200px", width: "100%" }}
