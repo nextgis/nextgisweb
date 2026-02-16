@@ -55,6 +55,7 @@ requires = [
     "python-ulid==3.0.0",
     "requests==2.32.4",
     "sentry-sdk>2,<3",
+    "setuptools<82",  # Required by Pyramid for pkg_resources; see https://github.com/Pylons/pyramid/issues/3731
     "shapely==2.1.1",
     "SQLAlchemy==2.0.44",
     "transaction==5.0",
