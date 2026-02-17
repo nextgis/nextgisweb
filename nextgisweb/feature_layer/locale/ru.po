@@ -96,61 +96,61 @@ msgstr "В векторном слое нет атрибутов"
 msgid "Attributes"
 msgstr "Атрибуты"
 
-#: nodepkg/export-form/ExportForm.tsx:252
+#: nodepkg/export-form/ExportForm.tsx:253
 msgid "Resources"
 msgstr "Ресурсы"
 
-#: nodepkg/export-form/ExportForm.tsx:274
+#: nodepkg/export-form/ExportForm.tsx:275
 msgid "Format"
 msgstr "Формат"
 
-#: nodepkg/export-form/ExportForm.tsx:287
+#: nodepkg/export-form/ExportForm.tsx:288
 msgid "SRS"
 msgstr "Система координат"
 
-#: nodepkg/export-form/ExportForm.tsx:292
+#: nodepkg/export-form/ExportForm.tsx:293
 msgid "Encoding"
 msgstr "Кодировка"
 
-#: nodepkg/export-form/ExportForm.tsx:306
+#: nodepkg/export-form/ExportForm.tsx:307
 msgid "FID field"
 msgstr "Поле FID"
 
-#: nodepkg/export-form/ExportForm.tsx:310
+#: nodepkg/export-form/ExportForm.tsx:311
 msgid "Use field display names instead of keynames"
 msgstr "Использовать наименования полей вместо ключей"
 
-#: nodepkg/export-form/ExportForm.tsx:316
+#: nodepkg/export-form/ExportForm.tsx:317
 #: nodepkg/fields-widget/FieldsWidget.tsx:213
 #: nodepkg/resource-section/FeatureLayerResourceSection.tsx:51
 msgid "Fields"
 msgstr "Поля"
 
-#: nodepkg/export-form/ExportForm.tsx:322
+#: nodepkg/export-form/ExportForm.tsx:323
 msgid "Limit by extent"
 msgstr "Ограничить охватом"
 
-#: nodepkg/export-form/ExportForm.tsx:328
+#: nodepkg/export-form/ExportForm.tsx:329
 msgid "Filter text"
 msgstr "Текстовый фильтр"
 
-#: nodepkg/export-form/ExportForm.tsx:338
+#: nodepkg/export-form/ExportForm.tsx:339
 msgid "Filter Applied"
 msgstr "Фильтр применен"
 
-#: nodepkg/export-form/ExportForm.tsx:339
+#: nodepkg/export-form/ExportForm.tsx:340
 msgid "Set Filter"
 msgstr "Установить фильтр"
 
-#: nodepkg/export-form/ExportForm.tsx:342
+#: nodepkg/export-form/ExportForm.tsx:343
 msgid "Filter"
 msgstr "Фильтр"
 
-#: nodepkg/export-form/ExportForm.tsx:347
+#: nodepkg/export-form/ExportForm.tsx:348
 msgid "Zip archive"
 msgstr "Zip архив"
 
-#: nodepkg/export-form/ExportForm.tsx:403
+#: nodepkg/export-form/ExportForm.tsx:404
 #: nodepkg/feature-editor/FeatureEditorWidget.tsx:41
 #: nodepkg/versioning-settings/VersioningSettings.tsx:73
 msgid "Save"
@@ -454,7 +454,7 @@ msgid "Open table settings"
 msgstr "Открыть настройки таблицы"
 
 #: nodepkg/feature-grid/FeatureGrid.tsx:25
-#: nodepkg/version-history/VersionHistory.tsx:227
+#: nodepkg/version-history/VersionHistory.tsx:226
 msgid "Refresh table"
 msgstr "Обновить таблицу"
 
@@ -501,11 +501,11 @@ msgid "Save as"
 msgstr "Сохранить как"
 
 #: nodepkg/feature-grid/component/ExportAction.tsx:31
-msgid "Advanced Export"
+msgid "Advanced export"
 msgstr "Расширенный экспорт"
 
 #: nodepkg/feature-grid/component/ExportAction.tsx:32
-msgid "Quick Export"
+msgid "Quick export"
 msgstr "Быстрый экспорт"
 
 #: nodepkg/feature-grid/component/ExportAction.tsx:33
@@ -644,85 +644,85 @@ msgstr ""
 msgid "Settings"
 msgstr "Настройки"
 
-#: nodepkg/version-history/VersionHistory.tsx:108
+#: nodepkg/version-history/VersionHistory.tsx:107
 msgid "Today"
 msgstr "Сегодня"
 
-#: nodepkg/version-history/VersionHistory.tsx:109
+#: nodepkg/version-history/VersionHistory.tsx:108
 msgid "Yesterday"
 msgstr "Вчера"
 
-#: nodepkg/version-history/VersionHistory.tsx:110
+#: nodepkg/version-history/VersionHistory.tsx:109
 msgid "Last 24 hours"
 msgstr "За 24 часа"
 
-#: nodepkg/version-history/VersionHistory.tsx:111
+#: nodepkg/version-history/VersionHistory.tsx:110
 msgid "Last 3 days"
 msgstr "За 3 дня"
 
-#: nodepkg/version-history/VersionHistory.tsx:112
+#: nodepkg/version-history/VersionHistory.tsx:111
 msgid "Last week"
 msgstr "За неделю"
 
-#: nodepkg/version-history/VersionHistory.tsx:113
+#: nodepkg/version-history/VersionHistory.tsx:112
 msgid "Last month"
 msgstr "За месяц"
 
-#: nodepkg/version-history/VersionHistory.tsx:114
+#: nodepkg/version-history/VersionHistory.tsx:113
 msgid "This month"
 msgstr "Этот месяц"
 
-#: nodepkg/version-history/VersionHistory.tsx:115
+#: nodepkg/version-history/VersionHistory.tsx:114
 msgid "Previous month"
 msgstr "Предыдущий месяц"
 
-#: nodepkg/version-history/VersionHistory.tsx:220
+#: nodepkg/version-history/VersionHistory.tsx:219
 msgid "Group edits"
 msgstr "Группировать правки"
 
-#: nodepkg/version-history/component/VersionHistoryGroupDetails.tsx:33
+#: nodepkg/version-history/component/VersionHistoryGroupDetails.tsx:31
 msgid "Created"
 msgstr "Добавлен"
 
-#: nodepkg/version-history/component/VersionHistoryGroupDetails.tsx:35
+#: nodepkg/version-history/component/VersionHistoryGroupDetails.tsx:33
 msgid "Updated"
 msgstr "Изменен"
 
-#: nodepkg/version-history/component/VersionHistoryGroupDetails.tsx:37
+#: nodepkg/version-history/component/VersionHistoryGroupDetails.tsx:35
 msgid "Deleted"
 msgstr "Удален"
 
-#: nodepkg/version-history/component/VersionHistoryGroupDetails.tsx:39
+#: nodepkg/version-history/component/VersionHistoryGroupDetails.tsx:37
 msgid "Restored"
 msgstr "Восстановлен"
 
-#: nodepkg/version-history/component/VersionHistoryGroupDetails.tsx:94
+#: nodepkg/version-history/component/VersionHistoryGroupDetails.tsx:92
 msgid "Updated geometry"
 msgstr "Изменена геометрия"
 
-#: nodepkg/version-history/component/VersionHistoryGroupDetails.tsx:98
+#: nodepkg/version-history/component/VersionHistoryGroupDetails.tsx:96
 msgid "Updated {} attribute"
 msgid_plural "Updated {} attributes"
 msgstr[0] "Изменен {} атрибут"
 msgstr[1] "Изменено {} атрибута"
 msgstr[2] "Изменено {} атрибутов"
 
-#: nodepkg/version-history/component/VersionHistoryGroupDetails.tsx:104
+#: nodepkg/version-history/component/VersionHistoryGroupDetails.tsx:102
 msgid "{} attribute"
 msgid_plural "{} attributes"
 msgstr[0] "{} атрибут"
 msgstr[1] "{} атрибута"
 msgstr[2] "{} атрибутов"
 
-#: nodepkg/version-history/component/VersionHistoryGroupDetails.tsx:114
+#: nodepkg/version-history/component/VersionHistoryGroupDetails.tsx:112
 msgid "and"
 msgstr "и"
 
-#: nodepkg/version-history/component/VersionHistoryGroupDetails.tsx:123
+#: nodepkg/version-history/component/VersionHistoryGroupDetails.tsx:121
 msgid "Feature"
 msgstr "Объект"
 
-#: nodepkg/version-history/component/VersionHistoryGroupDetails.tsx:129
+#: nodepkg/version-history/component/VersionHistoryGroupDetails.tsx:127
 msgid "Action"
 msgstr "Действие"
 
@@ -766,37 +766,37 @@ msgstr "Восстановить"
 msgid "Revert to this version"
 msgstr "Восстановить до этой версии"
 
-#: nodepkg/version-history/hook/useColumns.tsx:42
-msgid "Date and time"
-msgstr "Дата и время"
-
-#: nodepkg/version-history/hook/useColumns.tsx:49
-msgid "User"
-msgstr "Пользователь"
-
-#: nodepkg/version-history/hook/useColumns.tsx:60 view.py:224
-msgid "Features"
-msgstr "Объекты"
-
-#: nodepkg/version-history/hook/useColumns.tsx:63
+#: nodepkg/version-history/hook/useColumns.tsx:16
 msgctxt "column"
 msgid "Created"
 msgstr "Добавлено"
 
-#: nodepkg/version-history/hook/useColumns.tsx:70
+#: nodepkg/version-history/hook/useColumns.tsx:17
 msgctxt "column"
 msgid "Updated"
 msgstr "Изменено"
 
-#: nodepkg/version-history/hook/useColumns.tsx:77
+#: nodepkg/version-history/hook/useColumns.tsx:18
 msgctxt "column"
 msgid "Deleted"
 msgstr "Удалено"
 
-#: nodepkg/version-history/hook/useColumns.tsx:84
+#: nodepkg/version-history/hook/useColumns.tsx:19
 msgctxt "column"
 msgid "Restored"
 msgstr "Восстановлено"
+
+#: nodepkg/version-history/hook/useColumns.tsx:53
+msgid "Date and time"
+msgstr "Дата и время"
+
+#: nodepkg/version-history/hook/useColumns.tsx:61
+msgid "User"
+msgstr "Пользователь"
+
+#: nodepkg/version-history/hook/useColumns.tsx:73 view.py:224
+msgid "Features"
+msgstr "Объекты"
 
 #: nodepkg/versioning-settings/VersioningSettings.tsx:14
 msgid ""
