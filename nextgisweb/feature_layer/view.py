@@ -4,6 +4,7 @@ from pyramid.httpexceptions import HTTPNotFound
 from nextgisweb.env import gettext
 from nextgisweb.lib.dynmenu import Label, Link
 
+from nextgisweb.feature_layer.api import query_feature_or_not_found
 from nextgisweb.gui import react_renderer
 from nextgisweb.jsrealm import icon, jsentry
 from nextgisweb.pyramid import client_setting
@@ -51,11 +52,13 @@ def feature_browse(request):
 def feature_show(request):
     request.resource_permission(DataScope.read)
 
+    resource_id = request.context.id
     feature_id = int(request.matchdict["feature_id"])
+    query_feature_or_not_found(request.context.feature_query(), resource_id, feature_id)
 
     return dict(
         obj=request.context,
-        props=dict(resourceId=request.context.id, featureId=feature_id),
+        props=dict(resourceId=resource_id, featureId=feature_id),
         title=gettext("Feature #%d") % feature_id,
         maxheight=True,
         dynmenu=False,
@@ -66,11 +69,13 @@ def feature_show(request):
 def feature_update(request):
     request.resource_permission(DataScope.write)
 
+    resource_id = request.context.id
     feature_id = int(request.matchdict["feature_id"])
+    query_feature_or_not_found(request.context.feature_query(), resource_id, feature_id)
 
     return dict(
         obj=request.context,
-        props=dict(resourceId=request.context.id, featureId=feature_id),
+        props=dict(resourceId=resource_id, featureId=feature_id),
         title=gettext("Feature #%d") % feature_id,
         maxheight=True,
         dynmenu=False,
