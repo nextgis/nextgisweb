@@ -65,6 +65,8 @@ export class FeatureGridStore {
 
     @computed
     get queryParams(): QueryParams | null {
+        const params = { ...this._queryParams };
+
         let filter = this.filterExpression;
         if (this.globalFilterExpression) {
             filter = `[${[
@@ -75,7 +77,12 @@ export class FeatureGridStore {
                 .filter(Boolean)
                 .join(",")}]` as FilterExpressionString;
         }
-        return { ...this._queryParams, filter };
+
+        if (filter) {
+            params["filter"] = filter;
+        }
+
+        return Object.keys(params).length > 0 ? params : null;
     }
 
     @action.bound
@@ -183,10 +190,6 @@ export class FeatureGridStore {
     @action.bound
     setFilterExpression(filterExpression: FilterExpressionString | undefined) {
         this.filterExpression = filterExpression;
-        this.setQueryParams((prev) => ({
-            ...prev,
-            filterExpression,
-        }));
     }
 
     @action.bound

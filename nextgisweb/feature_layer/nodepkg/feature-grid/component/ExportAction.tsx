@@ -28,8 +28,8 @@ const formatItems = exportFormats.map((format) => ({
 }));
 
 const msgExport = gettext("Save as");
-const msgExportAdvanced = gettext("Advanced Export");
-const msgExportQuick = gettext("Quick Export");
+const msgExportAdvanced = gettext("Advanced export");
+const msgExportQuick = gettext("Quick export");
 const msgFiltersApplied = gettext("Filters are applied");
 
 const settingsKey = "go-to-settings";

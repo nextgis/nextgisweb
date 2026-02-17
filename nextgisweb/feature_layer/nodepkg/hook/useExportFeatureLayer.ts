@@ -36,7 +36,9 @@ export function useExportFeatureLayer({ id }: UseExportFeatureLayerProps) {
             const params = new URLSearchParams({
                 ...(pageParams as Record<string, string>),
             });
-            window.open(`${url}?${params.toString()}`);
+            const qs = params.toString();
+            const finalUrl = qs ? `${url}?${qs}` : url;
+            window.open(finalUrl);
         },
         [id]
     );
