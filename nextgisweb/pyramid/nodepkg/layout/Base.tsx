@@ -7,6 +7,8 @@ import type { DynMenuItem } from "@nextgisweb/pyramid/layout/dynmenu/type";
 
 import { CBlock } from "../cblock";
 import { EntrypointSuspense } from "../component/EntrypointSuspense";
+import { ErrorBoundary } from "../error-boundary/ErrorBoundary";
+import ErrorPage from "../error-page";
 
 import { Breadcrumbs } from "./Breadcrumbs";
 import type { BreadcrumbItem } from "./Breadcrumbs";
@@ -39,18 +41,85 @@ interface BaseProps {
     hideResourceFilter?: boolean;
 }
 
-export function Base({
+interface PyramidLayoutProps extends Omit<
+    BaseProps,
+    "entrypointProps" | "entrypoint"
+> {
+    body: React.ReactNode;
+}
+
+function PyramidLayout({
     hideResourceFilter = false,
-    entrypointProps,
     dynMenuItems,
     breadcrumbs,
-    entrypoint,
     layoutMode = "content",
     maxheight,
     hideMenu,
     maxwidth,
     header,
     title,
+    body,
+}: PyramidLayoutProps) {
+    return (
+        <div
+            className={classNames("ngw-pyramid-layout", {
+                "ngw-pyramid-layout-hstretch": maxwidth,
+                "ngw-pyramid-layout-vstretch": maxheight,
+            })}
+        >
+            <CBlock slot="pyramid.banner" />
+
+            <Header
+                header={header}
+                hideResourceFilter={hideResourceFilter}
+                hideMenu={hideMenu}
+            />
+
+            {layoutMode === "headerOnly" ? (
+                body
+            ) : (
+                <div className="ngw-pyramid-layout-crow">
+                    <div className="ngw-pyramid-layout-mwrapper">
+                        <div id="main" className="ngw-pyramid-layout-main">
+                            {layoutMode === "main" ? (
+                                body
+                            ) : (
+                                <>
+                                    {breadcrumbs.length > 0 && (
+                                        <Breadcrumbs items={breadcrumbs} />
+                                    )}
+                                    <div className="ngw-pyramid-layout-title">
+                                        <h1 id="title">{title}</h1>
+                                    </div>{" "}
+                                    <div
+                                        id="content"
+                                        className="content"
+                                        style={{ width: "100%" }}
+                                    >
+                                        {body}
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                    </div>
+
+                    {dynMenuItems && dynMenuItems.length > 0 && (
+                        <div className="ngw-pyramid-layout-sidebar">
+                            <Dynmenu items={dynMenuItems} />
+                        </div>
+                    )}
+                </div>
+            )}
+        </div>
+    );
+}
+
+export function Base({
+    entrypointProps,
+    entrypoint,
+    layoutMode = "content",
+    title,
+    ...rest
 }: BaseProps) {
     const [modalApi, modalContextHolder] = Modal.useModal();
 
@@ -79,66 +148,31 @@ export function Base({
         <EntrypointSuspense entrypoint={entrypoint} props={entrypointProps} />
     );
 
-    const PyramidLayout = () => (
-        <div
-            className={classNames("ngw-pyramid-layout", {
-                "ngw-pyramid-layout-hstretch": maxwidth,
-                "ngw-pyramid-layout-vstretch": maxheight,
-            })}
-        >
-            <CBlock slot="pyramid.banner" />
-
-            <Header
-                header={header}
-                hideResourceFilter={hideResourceFilter}
-                hideMenu={hideMenu}
-            />
-
-            {layoutMode === "headerOnly" ? (
-                renderBody
-            ) : (
-                <div className="ngw-pyramid-layout-crow">
-                    <div className="ngw-pyramid-layout-mwrapper">
-                        <div id="main" className="ngw-pyramid-layout-main">
-                            {layoutMode === "main" ? (
-                                renderBody
-                            ) : (
-                                <>
-                                    {breadcrumbs.length > 0 && (
-                                        <Breadcrumbs items={breadcrumbs} />
-                                    )}
-                                    <div className="ngw-pyramid-layout-title">
-                                        <h1 id="title">{title}</h1>
-                                    </div>{" "}
-                                    <div
-                                        id="content"
-                                        className="content"
-                                        style={{ width: "100%" }}
-                                    >
-                                        {renderBody}
-                                    </div>
-                                </>
-                            )}
-                        </div>
-                    </div>
-
-                    {dynMenuItems && dynMenuItems.length > 0 && (
-                        <div className="ngw-pyramid-layout-sidebar">
-                            <Dynmenu items={dynMenuItems} />
-                        </div>
-                    )}
-                </div>
-            )}
-        </div>
-    );
-
     return (
-        <>
+        <ErrorBoundary
+            fallback={(err) => (
+                <PyramidLayout
+                    layoutMode={layoutMode}
+                    title={title}
+                    body={<ErrorPage error_json={err} />}
+                    {...rest}
+                />
+            )}
+        >
             <title>{title}</title>
 
             {modalContextHolder}
             {modalHolder}
-            {layoutMode === "nullSpace" ? renderBody : <PyramidLayout />}
-        </>
+            {layoutMode === "nullSpace" ? (
+                renderBody
+            ) : (
+                <PyramidLayout
+                    layoutMode={layoutMode}
+                    title={title}
+                    body={renderBody}
+                    {...rest}
+                />
+            )}
+        </ErrorBoundary>
     );
 }
