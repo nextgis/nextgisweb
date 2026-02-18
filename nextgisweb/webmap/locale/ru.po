@@ -10,7 +10,7 @@ msgstr "Изображение"
 msgid "Main web map"
 msgstr "Основная веб-карта"
 
-#: favorite.py:6 view.py:230
+#: favorite.py:6 nodepkg/display/resource-action-plugin.tsx:10 view.py:230
 msgid "Display"
 msgstr "Открыть"
 
@@ -71,7 +71,7 @@ msgstr "Свернуть"
 msgid "Disable"
 msgstr "Отключить"
 
-#: nodepkg/display-tiny/DisplayTinyPage.tsx:61
+#: nodepkg/display-tiny/DisplayTinyPage.tsx:59
 msgid "Open full map"
 msgstr "Открыть карту целиком"
 
@@ -337,11 +337,11 @@ msgid "Horizontal swipe"
 msgstr "Горизонтальная шторка"
 
 #: nodepkg/map-controls/map-controls.ts:9
-msgid "Attibution Toolbar"
+msgid "Attribution toolbar"
 msgstr "Панель атрибутов"
 
 #: nodepkg/map-controls/map-controls.ts:24
-msgid "Map Toolbar"
+msgid "Map toolbar"
 msgstr "Панель инструментов карты"
 
 #: nodepkg/map-controls/map-controls.ts:60
@@ -518,15 +518,15 @@ msgstr "Н/Д"
 msgid "Identify"
 msgstr "Идентификация"
 
-#: nodepkg/panel/layers/LayersDropdown.tsx:49
+#: nodepkg/panel/layers/LayersDropdown.tsx:44
 msgid "Zoom to all layers"
 msgstr "Увеличить до всех слоев"
 
-#: nodepkg/panel/layers/LayersDropdown.tsx:55
+#: nodepkg/panel/layers/LayersDropdown.tsx:50
 msgid "Hide all layers"
 msgstr "Скрыть все слои"
 
-#: nodepkg/panel/layers/LayersDropdown.tsx:62
+#: nodepkg/panel/layers/LayersDropdown.tsx:57
 msgid "Reset layers"
 msgstr "Восстановить исходное состояние"
 
@@ -565,7 +565,7 @@ msgid "Map title text"
 msgstr "Текст заголовка карты"
 
 #: nodepkg/panel/print/component/PrintElementsSettings.tsx:70
-msgid "North Arrow"
+msgid "North arrow"
 msgstr "Указатель севера"
 
 #: nodepkg/panel/print/component/PrintPaperSettings.tsx:82
@@ -592,7 +592,7 @@ msgstr "Значение масштаба"
 msgid "Scale bar"
 msgstr "Масштабная линейка"
 
-#: nodepkg/panel/print/component/ScalesSelect.tsx:67
+#: nodepkg/panel/print/component/ScalesSelect.tsx:68
 msgid "Custom scale"
 msgstr "Произвольный масштаб"
 
@@ -628,15 +628,15 @@ msgstr "PDF"
 msgid "Print map"
 msgstr "Распечатать карту"
 
-#: nodepkg/panel/search/SearchPanel.tsx:362
+#: nodepkg/panel/search/SearchPanel.tsx:361
 msgid "Enter at least 2 characters"
 msgstr "Введите минимум 2 символа"
 
-#: nodepkg/panel/search/SearchPanel.tsx:463
+#: nodepkg/panel/search/SearchPanel.tsx:461
 msgid "Not found"
 msgstr "Не найдено"
 
-#: nodepkg/panel/search/SearchPanel.tsx:468
+#: nodepkg/panel/search/SearchPanel.tsx:465
 msgid "Refine search criterion. Displayed first 100 search results."
 msgstr "Уточните критерий поиска. Отображены первые 100 результатов поиска."
 

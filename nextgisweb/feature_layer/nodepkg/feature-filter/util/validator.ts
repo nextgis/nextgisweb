@@ -84,7 +84,7 @@ export function validateConditionExpression(
     fields: FeatureLayerFieldRead[]
 ): expression is ConditionExpr {
     if (!Array.isArray(expression)) {
-        throw new Error(gettext("Condition Expression must be an array"));
+        throw new Error(gettext("Condition expression must be an array"));
     }
 
     const [operator, fieldExpression, value] = expression;

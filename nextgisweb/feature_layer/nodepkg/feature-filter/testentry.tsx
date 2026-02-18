@@ -122,7 +122,7 @@ const sampleFilters = {
 };
 
 const msgOutputJson = gettext("Output JSON");
-const msgCurrentState = gettext("Current Filter State");
+const msgCurrentState = gettext("Current filter state");
 
 function FeatureFilterEditorTest() {
     const [initialValue, setInitialValue] = useState<
@@ -233,10 +233,10 @@ function FeatureFilterEditorTest() {
 
     return (
         <div style={{ padding: "20px", maxWidth: "1200px" }}>
-            <h2>Feature Filter Editor Test</h2>
+            <h2>Feature filter editor test</h2>
 
             <div style={{ marginBottom: "16px" }}>
-                <h4 style={{ marginBottom: "8px" }}>Test Presets</h4>
+                <h4 style={{ marginBottom: "8px" }}>Test presets</h4>
                 <div
                     style={{
                         display: "flex",
@@ -245,25 +245,25 @@ function FeatureFilterEditorTest() {
                     }}
                 >
                     <Button size="small" onClick={handleTestSimple}>
-                        Simple Filter
+                        Simple filter
                     </Button>
                     <Button size="small" onClick={handleTestComplex}>
-                        Complex Filter
+                        Complex filter
                     </Button>
                     <Button size="small" onClick={handleTestNested}>
-                        Nested Filter
+                        Nested filter
                     </Button>
                     <Button size="small" onClick={handleTestVariadic}>
-                        Variadic In
+                        Variadic IN operator
                     </Button>
                     <Button size="small" onClick={handleTestEmpty}>
-                        Empty Filter
+                        Empty filter
                     </Button>
                     <Button size="small" onClick={handleClearOutput}>
-                        Clear Output
+                        Clear output
                     </Button>
                     <Button size="small" onClick={() => setModalOpen(true)}>
-                        Test Modal
+                        Test modal
                     </Button>
                 </div>
             </div>
@@ -277,12 +277,12 @@ function FeatureFilterEditorTest() {
                     flexDirection: "column",
                 }}
             >
-                <h3 style={{ marginBottom: "8px" }}>Filter Editor</h3>
+                <h3 style={{ marginBottom: "8px" }}>Filter editor</h3>
                 {filterComponent}
             </div>
 
             <div style={{ width: "100%" }}>
-                <h3 style={{ marginBottom: "8px" }}>Output & State</h3>
+                <h3 style={{ marginBottom: "8px" }}>Output & state</h3>
                 <Tabs
                     type="card"
                     size="small"

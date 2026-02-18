@@ -337,7 +337,7 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
                     >
                         {filterExpression
                             ? gettext("Filter applied")
-                            : gettext("Set Filter")}
+                            : gettext("Set filter")}
                     </Button>
                 ),
                 label: gettext("Filter"),

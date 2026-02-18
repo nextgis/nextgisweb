@@ -39,7 +39,7 @@ import type {
 
 import DragHandleIcon from "@nextgisweb/icon/material/drag_indicator";
 
-const msgDeleteCondition = gettext("Delete Condition");
+const msgDeleteCondition = gettext("Delete condition");
 
 interface FilterConditionProps {
     condition: FilterConditionType;

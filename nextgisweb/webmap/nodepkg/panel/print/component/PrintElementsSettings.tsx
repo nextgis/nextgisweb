@@ -67,7 +67,7 @@ export const PrintElementsSettings = observer<PrintElementsSettingsProps>(
                         onChange={(v) => printMapStore.update({ arrow: v })}
                     />
                     <span className="checkbox__label">
-                        {gettext("North Arrow")}
+                        {gettext("North arrow")}
                     </span>
                 </div>
                 {/* <div className="input-group">

@@ -139,7 +139,7 @@ msgid "Filter applied"
 msgstr "Фильтр применен"
 
 #: nodepkg/export-form/ExportForm.tsx:340
-msgid "Set Filter"
+msgid "Set filter"
 msgstr "Установить фильтр"
 
 #: nodepkg/export-form/ExportForm.tsx:343
@@ -247,7 +247,7 @@ msgid "Validation failed"
 msgstr "Ошибка валидации"
 
 #: nodepkg/feature-filter/component/FilterCondition.tsx:42
-msgid "Delete Condition"
+msgid "Delete condition"
 msgstr "Удалить условие"
 
 #: nodepkg/feature-filter/component/FilterCondition.tsx:60
@@ -327,7 +327,7 @@ msgid "Output JSON"
 msgstr "Вывод JSON"
 
 #: nodepkg/feature-filter/testentry.tsx:125
-msgid "Current Filter State"
+msgid "Current filter state"
 msgstr "Текущее состояние фильтра"
 
 #: nodepkg/feature-filter/type.ts:102
@@ -385,8 +385,8 @@ msgstr ""
 "получено '{value}'"
 
 #: nodepkg/feature-filter/util/validator.ts:87
-msgid "Condition Expression must be an array"
-msgstr ""
+msgid "Condition expression must be an array"
+msgstr "Выражение условия должно быть массивом"
 
 #: nodepkg/feature-filter/util/validator.ts:94
 msgid "Invalid operator: '{operator}'"
