@@ -6,11 +6,18 @@ import type {
     ActionToolbarAction,
     ActionToolbarProps,
 } from "@nextgisweb/gui/action-toolbar";
-import { Button, Dropdown, Space, Spin, Tabs } from "@nextgisweb/gui/antd";
+import {
+    Button,
+    Dropdown,
+    Space,
+    Spin,
+    Tabs,
+    theme,
+} from "@nextgisweb/gui/antd";
 import type { TabsProps } from "@nextgisweb/gui/antd";
 import { SaveButton, TabsLabelBadge } from "@nextgisweb/gui/component";
 import { ErrorModal, errorModal } from "@nextgisweb/gui/error";
-import { useThemeVariables, useUnsavedChanges } from "@nextgisweb/gui/hook";
+import { useUnsavedChanges } from "@nextgisweb/gui/hook";
 import { EditIcon } from "@nextgisweb/gui/icon";
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -170,30 +177,30 @@ const CompositeWidget = observer(({ setup }: CompositeWidgetProps) => {
         return { actions };
     }, [inProgress, operation, submit]);
 
-    const themeVariables = useThemeVariables({
-        "color-border-secondary": "colorBorderSecondary",
-        "border-radius": "borderRadius",
-    });
+    const { token } = theme.useToken();
 
     if (composite.error) {
         return <ErrorModal error={composite.error}></ErrorModal>;
     }
 
     return (
-        <div className="ngw-resource-composite" style={themeVariables}>
-            <div
-                style={{ display: inProgress ? undefined : "none" }}
-                className="spin"
-            >
-                <Spin
-                    size="large"
-                    description={
-                        composite.saving || redirecting ? msgSaving : ""
-                    }
-                >
-                    <div />
-                </Spin>
-            </div>
+        <div className="ngw-resource-composite">
+            <Spin
+                size="large"
+                styles={{
+                    root: {
+                        display: inProgress ? undefined : "none",
+                        flexGrow: 1,
+                        justifyContent: "center",
+                        border: `1px solid ${token.colorBorderSecondary}`,
+                        borderRadius: token.borderRadius,
+                    },
+                    // Fix gap between indicator and description, it doesn't
+                    // respect component size for some reason.
+                    section: { gap: token.paddingLG },
+                }}
+                description={composite.saving || redirecting ? msgSaving : ""}
+            />
             <Tabs
                 style={{ display: inProgress ? "none" : undefined }}
                 size="large"
