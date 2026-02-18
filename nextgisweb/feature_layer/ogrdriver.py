@@ -1,5 +1,6 @@
-from collections import namedtuple
+from typing import Callable
 
+from msgspec import Struct
 from osgeo import ogr
 
 from .interface import GEOM_TYPE
@@ -17,50 +18,18 @@ def test_driver_capability(name, capability):
 EXPORT_FORMAT_OGR = dict()
 
 
-OGRDriverT = namedtuple(
-    "OGRDriver",
-    [
-        "name",
-        "display_name",
-        "extension",
-        "options",
-        "mime",
-        "single_file",
-        "fid_support",
-        "lco_configurable",
-        "dsco_configurable",
-        "get_layer_name",
-        "geometry_types",
-    ],
-)
-
-
-def OGRDriver(
-    name,
-    display_name,
-    extension,
-    options=None,
-    mime="application/octet-stream",
-    single_file=True,
-    fid_support=False,
-    lco_configurable=None,
-    dsco_configurable=None,
-    get_layer_name=lambda x: x,
-    geometry_types=None,
-):
-    return OGRDriverT(
-        name,
-        display_name,
-        extension,
-        options,
-        mime,
-        single_file,
-        fid_support,
-        lco_configurable,
-        dsco_configurable,
-        get_layer_name,
-        geometry_types,
-    )
+class OGRDriver(Struct):
+    name: str
+    display_name: str
+    extension: str
+    options: tuple[str, ...] | None = None
+    mime: str = "application/octet-stream"
+    single_file: bool = True
+    fid_support: bool = False
+    lco_configurable: list[str] | None = None
+    dsco_configurable: list[str] | None = None
+    get_layer_name: Callable[[str], str] = lambda x: x
+    geometry_types: tuple[str, ...] | None = None
 
 
 def layer_name_gpkg(name):

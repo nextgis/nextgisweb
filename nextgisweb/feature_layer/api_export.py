@@ -21,7 +21,7 @@ from nextgisweb.spatial_ref_sys.api import SRSID
 from .feature import Feature
 from .interface import IFeatureLayer, IFeatureQueryIlike, IFilterableFeatureLayer
 from .model import LayerField
-from .ogrdriver import EXPORT_FORMAT_OGR, OGRDriverT
+from .ogrdriver import EXPORT_FORMAT_OGR, OGRDriver
 from .util import unique_name
 
 
@@ -78,7 +78,7 @@ def _ogr_layer_from_features(
 
 
 class ExportOptions(Struct):
-    driver: OGRDriverT
+    driver: OGRDriver
     dsco: list[str] = field(default_factory=list)
     lco: list[str] = field(default_factory=list)
     srs: SRS | None = None
