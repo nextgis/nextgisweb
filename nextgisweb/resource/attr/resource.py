@@ -2,7 +2,7 @@ from nextgisweb.env import gettext, inject
 from nextgisweb.lib.apitype import Gap
 
 from ..component import ResourceComponent
-from ..event import OnChildClasses
+from ..event import OnChildClasses, OnDeletePrompt
 from ..model import Resource, ResourceCls, ResourceRef
 from ..permission import Scope
 from ..scope import ResourceScope
@@ -89,8 +89,10 @@ class ResourceAttrIsDeletable(ResourceAttr, tag="resource.is_deletable"):
     mandatory = True
 
     def __call__(self, obj, *, ctx) -> bool:
-        return obj.permissions(ctx.user).issuperset(
-            {ResourceScope.delete, ResourceScope.manage_children},
+        return (
+            obj.has_permission(ResourceScope.delete, user=ctx.user)
+            and obj.parent.has_permission(ResourceScope.manage_children, user=ctx.user)
+            and OnDeletePrompt.apply(obj)
         )
 
 
