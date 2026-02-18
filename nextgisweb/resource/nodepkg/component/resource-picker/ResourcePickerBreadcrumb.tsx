@@ -8,9 +8,8 @@ import type {
     BreadcrumbItemProps,
     BreadcrumbProps,
 } from "@nextgisweb/gui/antd";
-import type { CompositeRead } from "@nextgisweb/resource/type/api";
 
-import type { ResourcePickerBreadcrumbProps } from "./type";
+import type { ResourcePickerAttr, ResourcePickerBreadcrumbProps } from "./type";
 
 import HomeFilledIcon from "@nextgisweb/icon/material/home";
 
@@ -34,16 +33,17 @@ export const ResourcePickerBreadcrumb = observer(
             };
 
             const createLabel = (
-                resItem: CompositeRead,
+                resItem: ResourcePickerAttr,
                 name?: string | ReactElement,
                 isActive = false
             ) => {
-                const displayName = name || resItem.resource.display_name;
+                const displayName =
+                    name || resItem.get("resource.display_name");
                 return (
                     <span className="resource-breadcrumb-item">
                         {allowMoveInside ? (
                             <a
-                                onClick={() => onClick(resItem.resource.id)}
+                                onClick={() => onClick(resItem.id)}
                                 className={classNames({ "active": isActive })}
                             >
                                 {displayName}
@@ -69,7 +69,7 @@ export const ResourcePickerBreadcrumb = observer(
                 );
                 const moveToMenuItems = breadcrumbsForMenu.map((item) => {
                     return {
-                        key: item.resource.id,
+                        key: item.id,
                         label: createLabel(item),
                     };
                 });
@@ -85,21 +85,23 @@ export const ResourcePickerBreadcrumb = observer(
                 let name: ReactElement | string | undefined;
                 const isActive = i >= breadcrumbItems.length - 1;
                 if (i === 0) {
+                    const displayName = parent.get("resource.display_name");
+
                     name =
                         breadcrumbItems.length > 1 ? (
-                            <Tooltip title={parent.resource.display_name}>
+                            <Tooltip title={displayName}>
                                 <HomeIcon />
                             </Tooltip>
                         ) : (
                             <Space>
                                 <HomeIcon />
-                                {parent.resource.display_name}
+                                {displayName}
                             </Space>
                         );
                 }
                 items.push({
                     title: createLabel(parent, name, isActive),
-                    key: parent.resource.id,
+                    key: parent.id,
                 });
                 if (i === 0 && packFirstItemsToMenu) {
                     items.push({

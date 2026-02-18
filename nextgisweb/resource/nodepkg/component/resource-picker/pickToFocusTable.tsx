@@ -6,10 +6,9 @@ import type {
 } from "@nextgisweb/gui/focus-table";
 import { AddIcon } from "@nextgisweb/gui/icon";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import type { CompositeRead } from "@nextgisweb/resource/type/api";
 
 import { showResourcePicker } from "./showResourcePicker";
-import type { ResourcePickerStoreOptions } from "./type";
+import type { ResourcePickerAttr, ResourcePickerStoreOptions } from "./type";
 
 export interface PickToFocusTableOptions<I> extends Partial<
     Omit<FocusTableAction<I>, "callback">
@@ -18,7 +17,7 @@ export interface PickToFocusTableOptions<I> extends Partial<
 }
 
 export function pickToFocusTable<I extends FocusTableItem>(
-    factory: (resource: CompositeRead) => I | Promise<I>,
+    factory: (resource: ResourcePickerAttr) => I | Promise<I>,
     options?: PickToFocusTableOptions<I | null>,
     showResourcePickerFunction = showResourcePicker
 ): FocusTableAction<I | null> {
@@ -33,16 +32,15 @@ export function pickToFocusTable<I extends FocusTableItem>(
 
             onPick: (resources) => {
                 if (!Array.isArray(resources)) resources = [resources];
-                Promise.all(resources.map((res) => factory(res))).then(
-                    (items) => {
-                        for (const item of items) {
-                            base = placeItem(env.store, item, base);
-                        }
-                        if (base) {
-                            env.select(base);
-                        }
+
+                Promise.all(resources.map(factory)).then((items) => {
+                    for (const item of items) {
+                        base = placeItem(env.store, item, base);
                     }
-                );
+                    if (base) {
+                        env.select(base);
+                    }
+                });
             },
         });
     };

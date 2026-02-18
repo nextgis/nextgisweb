@@ -74,20 +74,19 @@ export const ServiceWidget: EditorWidget<ServiceStore> = observer(
                 tableActions: [
                     pickToFocusTable(
                         async (res) => {
-                            const resourceId = res.resource.id;
-                            if (
-                                res.resource.cls.endsWith("_style") &&
-                                res.resource.parent
-                            ) {
+                            const resourceId = res.id;
+                            const { cls, parent, display_name } =
+                                res.toObj().resource;
+                            if (cls.endsWith("_style") && parent) {
                                 res = await route(
                                     "resource.item",
-                                    res.resource.parent?.id
+                                    parent.id
                                 ).get({ signal: makeSignal() });
                             }
                             return new Layer(store, {
                                 resource_id: resourceId,
-                                display_name: res.resource.display_name,
-                                keyname: generateResourceKeyname(res.resource),
+                                display_name: display_name,
+                                keyname: generateResourceKeyname(res),
                                 min_scale_denom: null,
                                 max_scale_denom: null,
                             });

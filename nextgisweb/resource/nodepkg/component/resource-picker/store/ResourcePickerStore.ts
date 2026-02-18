@@ -4,17 +4,21 @@ import type { ErrorInfo } from "@nextgisweb/gui/error/extractError";
 import { route } from "@nextgisweb/pyramid/api";
 import type { RequestOptions } from "@nextgisweb/pyramid/api/type";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import { resourceAttrItems } from "@nextgisweb/resource/api/resource-attr";
 import type {
     Blueprint,
     CompositeCreate,
-    CompositeRead,
     ResourceCls,
     ResourceInterface,
-    ResourceRead,
 } from "@nextgisweb/resource/type/api";
 import { loadParents } from "@nextgisweb/resource/util/loadParents";
 
-import type { OnNewGroupType, ResourcePickerStoreOptions } from "../type";
+import { ResourcePickerDefaultAttrs } from "../type";
+import type {
+    OnNewGroupType,
+    ResourcePickerAttr,
+    ResourcePickerStoreOptions,
+} from "../type";
 
 import { actionHandler } from "./decorator/actionHandler";
 
@@ -39,16 +43,16 @@ export class ResourcePickerStore implements Omit<
         ResourcePickerStore.GLOBAL_PARENT_ID = undefined;
     };
 
-    @observable.ref accessor parentItem: CompositeRead | null = null;
+    @observable.ref accessor parentItem: ResourcePickerAttr | null = null;
     @observable.ref accessor blueprint: Blueprint | null = null;
 
-    @observable.shallow accessor resources: CompositeRead[] | null = null;
+    @observable.shallow accessor resources: ResourcePickerAttr[] | null = null;
     @observable.shallow accessor allLoadedResources: Map<
         number,
-        CompositeRead
+        ResourcePickerAttr
     > = new Map();
     @observable.ref accessor parentId: number = 0;
-    @observable.shallow accessor breadcrumbItems: CompositeRead[] = [];
+    @observable.shallow accessor breadcrumbItems: ResourcePickerAttr[] = [];
     @observable.ref accessor hideUnavailable = false;
     @observable.shallow accessor disableResourceIds: number[] = [];
     @observable.shallow accessor requireClass: ResourceCls[] = [];
@@ -162,9 +166,9 @@ export class ResourcePickerStore implements Omit<
         return resourceClasses;
     };
 
-    checkEnabled = (resource: ResourceRead): boolean => {
+    checkEnabled = (item: ResourcePickerAttr): boolean => {
         return this._checkConditions({
-            resource,
+            item,
             requireClass: this.requireClass,
             requireInterface: this.requireInterface,
         });
@@ -205,20 +209,20 @@ export class ResourcePickerStore implements Omit<
     @actionHandler
     async selectFirstChildren(parentId: number) {
         this.selectChildren(parentId, (resources) =>
-            resources.length ? [resources[0].resource.id] : []
+            resources.length ? [resources[0].id] : []
         );
     }
 
     async selectAllChildren(parentId: number) {
         this.selectChildren(parentId, (resources) =>
-            resources.map((item) => item.resource.id)
+            resources.map((item) => item.id)
         );
     }
 
     @actionHandler
     async selectChildren(
         parentId: number,
-        getNewSelectedIds: (resource: CompositeRead[]) => number[]
+        getNewSelectedIds: (resource: ResourcePickerAttr[]) => number[]
     ) {
         if (this.multiple && !this.loadingParentsChildren.has(parentId)) {
             try {
@@ -233,8 +237,8 @@ export class ResourcePickerStore implements Omit<
                 });
                 const childrenResources = response.filter(
                     (child) =>
-                        this.checkEnabled(child.resource) &&
-                        !this.disableResourceIds.includes(child.resource.id)
+                        this.checkEnabled(child) &&
+                        !this.disableResourceIds.includes(child.id)
                 );
 
                 if (!this.resources || this.resources.length === 0) {
@@ -303,7 +307,7 @@ export class ResourcePickerStore implements Omit<
     }
 
     @action
-    setParentItem(parentItem: CompositeRead | null) {
+    setParentItem(parentItem: ResourcePickerAttr | null) {
         this.parentItem = parentItem;
     }
     @action
@@ -312,23 +316,23 @@ export class ResourcePickerStore implements Omit<
     }
 
     @action
-    setResources(resources: CompositeRead[]) {
+    setResources(resources: ResourcePickerAttr[]) {
         this.resources = resources;
 
         this.updateLoadedResources(resources);
     }
 
     @action
-    updateLoadedResources(resources: CompositeRead[]) {
+    updateLoadedResources(resources: ResourcePickerAttr[]) {
         const allResources = new Map(this.allLoadedResources);
         resources.forEach((resource) => {
-            allResources.set(resource.resource.id, resource);
+            allResources.set(resource.id, resource);
         });
         this.allLoadedResources = allResources;
     }
 
     @action
-    async setBreadcrumbItems(items: CompositeRead[]): Promise<void> {
+    async setBreadcrumbItems(items: ResourcePickerAttr[]): Promise<void> {
         this.breadcrumbItems = items;
     }
 
@@ -336,12 +340,18 @@ export class ResourcePickerStore implements Omit<
     async setBreadcrumbItemsFor(parent: number): Promise<void> {
         const abort = this._abortOperation("setBreadcrumbItemsFor", true);
 
-        this.setBreadcrumbItems(
-            await loadParents(parent, {
-                signal: abort.signal,
-                cache: true,
-            })
-        );
+        const parentIds = await loadParents(parent, {
+            signal: abort.signal,
+            cache: true,
+        });
+        const parentItems = await resourceAttrItems({
+            resources: [...parentIds, parent],
+            attributes: [...ResourcePickerDefaultAttrs],
+            signal: abort.signal,
+            cache: true,
+        });
+
+        this.setBreadcrumbItems(parentItems);
     }
 
     @actionHandler
@@ -353,13 +363,17 @@ export class ResourcePickerStore implements Omit<
             cache: true,
         });
 
-        const parentItem = await route("resource.item", parent).get({
+        const parentItems = await resourceAttrItems({
+            resources: [parent],
+            attributes: [...ResourcePickerDefaultAttrs],
             signal: abort.signal,
             cache: true,
         });
 
+        const parentItem = parentItems[0];
+
         this.setParentItem(parentItem);
-        this.updateLoadedResources([parentItem]);
+        this.updateLoadedResources(parentItems);
         const childrenResources = await this.fetchChildrenResources(parent, {
             signal: abort.signal,
         });
@@ -370,20 +384,21 @@ export class ResourcePickerStore implements Omit<
         parent: number,
         { signal }: RequestOptions = {}
     ) {
-        const resp = await route("resource.collection").get({
-            query: { parent: parent },
+        const resp = await resourceAttrItems({
+            resources: { type: "search", parent },
+            attributes: [...ResourcePickerDefaultAttrs],
             signal,
         });
 
         this.updateLoadedResources(resp);
 
-        return resp.filter((x: CompositeRead) =>
-            this._resourceVisible(x.resource)
-        );
+        return resp.filter((x) => this._resourceVisible(x));
     }
 
     @actionHandler
-    async createNewGroup(name: string): Promise<CompositeRead | undefined> {
+    async createNewGroup(
+        name: string
+    ): Promise<ResourcePickerAttr | undefined> {
         const abort = this._abortOperation("createNewGroup", true);
 
         const payload: CompositeCreate = {
@@ -404,9 +419,7 @@ export class ResourcePickerStore implements Omit<
         });
 
         await this.refresh();
-        const newItem = this.resources?.find(
-            (c) => c.resource.id === createdItem.id
-        );
+        const newItem = this.resources?.find((c) => c.id === createdItem.id);
 
         if (newItem) {
             if (this.onNewGroup) {
@@ -420,12 +433,10 @@ export class ResourcePickerStore implements Omit<
         const registry = new Map<number, { children: number[] }>();
 
         for (const selectedId of this.selected) {
-            const parentsChain: CompositeRead[] = await loadParents(
-                selectedId,
-                { cache: true }
-            );
-            for (const parentItem of parentsChain) {
-                const parentId = parentItem.resource.id;
+            const parentsChain: number[] = await loadParents(selectedId, {
+                cache: true,
+            });
+            for (const parentId of parentsChain) {
                 if (parentId !== selectedId) {
                     if (!registry.has(parentId)) {
                         registry.set(parentId, {
@@ -462,13 +473,13 @@ export class ResourcePickerStore implements Omit<
         this.changeParentTo(this.parentId);
     }
 
-    private _resourceVisible(resource: ResourceRead): boolean {
+    private _resourceVisible(resource: ResourcePickerAttr): boolean {
         return !this.hideUnavailable || this._resourceAvailable(resource);
     }
 
-    private _resourceAvailable(resource: ResourceRead): boolean {
+    private _resourceAvailable(item: ResourcePickerAttr): boolean {
         return this._checkConditions({
-            resource,
+            item,
             requireClass: this.requireClass,
             requireInterface: this.requireInterface,
             traverseClasses: this.traverseClasses,
@@ -476,17 +487,19 @@ export class ResourcePickerStore implements Omit<
     }
 
     private _checkConditions({
-        resource,
+        item,
         requireClass = [],
         requireInterface = [],
         traverseClasses,
     }: {
-        resource: ResourceRead;
+        item: ResourcePickerAttr;
         requireClass?: ResourceCls[];
         requireInterface?: ResourceInterface[];
         traverseClasses?: ResourceCls[] | null;
     }): boolean {
-        const { cls, interfaces } = resource;
+        const cls = item.get("resource.cls");
+        const interfaces = item.get("resource.interfaces");
+
         const checks: (() => boolean)[] = [];
         if (traverseClasses?.length) {
             checks.push(() =>

@@ -66,8 +66,8 @@ export const WebMapWidget: EditorWidget<WebMapStore> = observer(({ store }) => {
                 pickToFocusTable(
                     (res) => {
                         return new Basemap(store, {
-                            resource_id: res.resource.id,
-                            display_name: res.resource.display_name,
+                            resource_id: res.id,
+                            display_name: res.get("resource.display_name"),
                             enabled: !store.basemaps.some(
                                 (i) => i.enabled.value
                             ),

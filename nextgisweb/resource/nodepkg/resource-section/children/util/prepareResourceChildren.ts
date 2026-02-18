@@ -44,7 +44,7 @@ export async function prepareResourceChildren({
             cls,
             displayName,
             creationDate,
-            clsDisplayName: resources[cls]?.label,
+            clsDisplayName: resources[cls].label,
             ownerUserDisplayName:
                 ownerUser !== undefined
                     ? userNames.get(ownerUser.id)

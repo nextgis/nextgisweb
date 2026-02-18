@@ -1,12 +1,15 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { Modal } from "@nextgisweb/gui/antd";
-import type { CompositeRead } from "@nextgisweb/resource/type/api";
 
 import { ResourcePickerCard } from "./ResourcePickerCard";
 import usePickerModal from "./hook/usePickerModal";
 import { ResourcePickerStore } from "./store/ResourcePickerStore";
-import type { ResourcePickerModalProps, SelectValue } from "./type";
+import type {
+    ResourcePickerAttr,
+    ResourcePickerModalProps,
+    SelectValue,
+} from "./type";
 
 import "./ResourcePickerModal.less";
 
@@ -43,7 +46,7 @@ function ResourcePickerModal<V extends SelectValue = SelectValue>({
             if (onPickProp) {
                 if (store.allLoadedResources) {
                     if (Array.isArray(resourceId)) {
-                        const resourceItems: CompositeRead[] = [];
+                        const resourceItems: ResourcePickerAttr[] = [];
                         for (const id of resourceId) {
                             const item = store.allLoadedResources.get(id);
                             if (item) {

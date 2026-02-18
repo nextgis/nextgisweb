@@ -16,11 +16,11 @@ const ResourceSectionMain: ResourceSection<ResourceSectionProps> = ({
 }) => {
     const [creatable, setCreatable] = useState<ResourceCls[]>();
     const [summary, setSummary] = useState<[string, string][]>();
-    const { fetchResourceItems: fetchResourceAttr } = useResourceAttr();
+    const { fetchResourceItems } = useResourceAttr();
 
     useEffect(() => {
         (async () => {
-            const items = await fetchResourceAttr({
+            const items = await fetchResourceItems({
                 resources: [resourceId],
                 attributes: [
                     ["resource.children_creatable"],
@@ -36,7 +36,7 @@ const ResourceSectionMain: ResourceSection<ResourceSectionProps> = ({
             setCreatable(dataCreatable);
             setSummary(dataSummary);
         })();
-    }, [fetchResourceAttr, resourceId]);
+    }, [fetchResourceItems, resourceId]);
 
     return (
         <>

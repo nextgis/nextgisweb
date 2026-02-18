@@ -1,13 +1,22 @@
-interface PromiseDef<T = unknown> {
+interface PromiseDef<T = unknown, M = unknown> {
     fulfilled: boolean;
     loader: Promise<T>;
+    meta?: M;
 }
 
-export class LoaderCache<T = unknown> {
-    promises: Record<string, PromiseDef<T>> = {};
+export class LoaderCache<T = unknown, M = unknown> {
+    promises: Record<string, PromiseDef<T, M>> = {};
 
     constructor() {
         this.promises = {};
+    }
+
+    has(key: string): boolean {
+        return this.promises[key] !== undefined;
+    }
+
+    get(key: string): PromiseDef<T, M> {
+        return this.promises[key];
     }
 
     fulfilled(key: string): boolean {
@@ -18,12 +27,13 @@ export class LoaderCache<T = unknown> {
         return this.promises[key]?.loader;
     }
 
-    promiseFor(key: string, loader: () => Promise<T>) {
+    promiseFor(key: string, loader: () => Promise<T>, meta?: M) {
         let promise = this.promises[key];
         if (promise === undefined) {
             promise = {
                 fulfilled: false,
                 loader: loader(),
+                meta,
             };
             promise.loader
                 .then((result) => {

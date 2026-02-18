@@ -162,18 +162,18 @@ export const ItemsWidget: EditorWidget<ItemsStore> = observer(({ store }) => {
             tableActions: [
                 pickToFocusTable<ItemObject>(
                     async (res) => {
-                        const resourceId = res.resource.id;
+                        const resourceId = res.id;
+                        const parent = res.get("resource.parent");
                         if (
-                            res.resource.cls.endsWith("_style") &&
-                            res.resource.parent
+                            res.get("resource.cls").endsWith("_style") &&
+                            parent
                         ) {
-                            res = await route(
-                                "resource.item",
-                                res.resource.parent?.id
-                            ).get({ signal: makeSignal() });
+                            res = await route("resource.item", parent.id).get({
+                                signal: makeSignal(),
+                            });
                         }
                         return new Layer(store, {
-                            display_name: res.resource.display_name,
+                            display_name: res.get("resource.display_name"),
                             layer_style_id: resourceId,
                         });
                     },

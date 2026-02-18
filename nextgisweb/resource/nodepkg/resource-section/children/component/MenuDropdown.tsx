@@ -6,8 +6,8 @@ import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { useResourcePicker } from "@nextgisweb/resource/component/resource-picker/hook";
+import type { ResourcePickerAttr } from "@nextgisweb/resource/component/resource-picker/type";
 import { useResourceNotify } from "@nextgisweb/resource/hook/useResourceNotify";
-import type { CompositeRead } from "@nextgisweb/resource/type/api";
 
 import type { ChildrenResource } from "../type";
 import { createResourceTableItemOptions } from "../util/createResourceTableItemOptions";
@@ -79,14 +79,12 @@ export function MenuDropdown({
     }, [selected, items]);
 
     const onNewGroup = useCallback(
-        async (newGroup: CompositeRead) => {
+        async (newGroup: ResourcePickerAttr) => {
             if (newGroup) {
-                if (
-                    newGroup.resource.parent &&
-                    newGroup.resource.parent.id === resourceId
-                ) {
+                const parent = newGroup.get("resource.parent");
+                if (parent && parent.id === resourceId) {
                     const newItem = await createResourceTableItemOptions(
-                        newGroup.resource
+                        newGroup.id
                     );
                     setItems((old) => {
                         return [...old, newItem];
