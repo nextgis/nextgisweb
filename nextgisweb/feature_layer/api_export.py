@@ -247,6 +247,15 @@ def export(resource: IFeatureLayer, options: ExportOptions, filepath: str):
 
     options = options.for_fields([alias for alias, _ in field_map])
 
+    # Validate geometry type compatibility with export format
+    if options.driver.geometry_types is not None:
+        if resource.geometry_type not in options.driver.geometry_types:
+            raise ValidationError(
+                message=gettext("The selected format does not support {} geometry type.").format(
+                    resource.geometry_type
+                )
+            )
+
     query = resource.feature_query()
 
     if (export_limit := env.feature_layer.export_limit) is not None:

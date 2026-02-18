@@ -6,7 +6,7 @@ msgstr "Невалидная геометрия"
 msgid "Unknown spatial reference system"
 msgstr "Неизвестная система координат"
 
-#: api.py:459 api_export.py:211
+#: api.py:459 api_export.py:215
 msgid "Parameter 'intersects' geometry is not valid."
 msgstr "Параметр 'intersects' содержит невалидную геометрию."
 
@@ -15,18 +15,22 @@ msgid "Couldn't add FID field '{}'. Such field already exists."
 msgstr "Не удалось добавить поле FID '{}'. Такое поле уже существует."
 
 #: api_export.py:254
+msgid "The selected format does not support {} geometry type."
+msgstr "Выбранный формат не поддерживает тип геометрии {}."
+
+#: api_export.py:267
 msgid "The export limit is set to {limit} features, but the layer contains {count}."
 msgstr "Лимит экспорта составляет {limit} объектов, однако слой содержит {count}."
 
-#: api_export.py:267
+#: api_export.py:280
 msgid "Failed to reproject 'intersects' geometry."
 msgstr "Не удалось перепроецировать геометрию 'intersects'."
 
-#: api_export.py:278
+#: api_export.py:291
 msgid "Filter expressions are not supported."
 msgstr "Выражения фильтра не поддерживаются."
 
-#: api_export.py:440
+#: api_export.py:453
 msgid "File name parameter '{}' is not valid."
 msgstr "Недопустимое имя файла '{}'."
 
@@ -68,7 +72,7 @@ msgstr "Объект не удален"
 msgid "Unable to restore the #{} feature as it is not deleted."
 msgstr "Невозможно восстановить объект #{} поскольку он не удален."
 
-#: favorite.py:6 nodepkg/fields-widget/FieldsWidget.tsx:26 view.py:43
+#: favorite.py:6 nodepkg/fields-widget/FieldsWidget.tsx:26 view.py:44
 msgid "Feature table"
 msgstr "Таблица объектов"
 
@@ -495,8 +499,8 @@ msgstr "Расширенный фильтр"
 msgid "Last changed"
 msgstr "Последнее изменение"
 
-#: nodepkg/feature-grid/component/ExportAction.tsx:30 view.py:86 view.py:110
-#: view.py:247
+#: nodepkg/feature-grid/component/ExportAction.tsx:30 view.py:91 view.py:115
+#: view.py:252
 msgid "Save as"
 msgstr "Сохранить как"
 
@@ -619,12 +623,12 @@ msgstr "Охват (xMax)"
 msgid "Extent (yMax)"
 msgstr "Охват (yMax)"
 
-#: nodepkg/resource-action-plugin.tsx:10 view.py:229
+#: nodepkg/resource-action-plugin.tsx:10 view.py:234
 msgid "Table"
 msgstr "Таблица"
 
 #: nodepkg/settings-widget/SettingsWidget.tsx:11 versioning/model.py:106
-#: view.py:146 view.py:263
+#: view.py:151 view.py:268
 msgid "Feature versioning"
 msgstr "Версионирование объектов"
 
@@ -794,7 +798,7 @@ msgstr "Дата и время"
 msgid "User"
 msgstr "Пользователь"
 
-#: nodepkg/version-history/hook/useColumns.tsx:73 view.py:224
+#: nodepkg/version-history/hook/useColumns.tsx:73 view.py:229
 msgid "Features"
 msgstr "Объекты"
 
@@ -889,19 +893,19 @@ msgstr "Версия за пределами диапазона"
 msgid "Invalid range"
 msgstr "Некорректный диапазон"
 
-#: view.py:59 view.py:74
+#: view.py:62 view.py:79
 msgid "Feature #%d"
 msgstr "Объект #%d"
 
-#: view.py:99 view.py:239
+#: view.py:104 view.py:244
 msgid "Version history"
 msgstr "История изменений"
 
-#: view.py:117
+#: view.py:122
 msgid "MVT Vector Tiles"
 msgstr "Векторные тайлы MVT"
 
-#: view.py:119
+#: view.py:124
 msgid ""
 "The Mapbox Vector Tile is an efficient encoding for map data into vector "
 "tiles that can be rendered dynamically."
