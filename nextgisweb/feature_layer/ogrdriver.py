@@ -158,6 +158,14 @@ EXPORT_FORMAT_OGR["DXF"] = OGRDriver(
     mime="application/dxf",
 )
 
+EXPORT_FORMAT_OGR["GPX"] = OGRDriver(
+    "GPX",
+    "GPS Exchange Format (*.gpx)",
+    "gpx",
+    single_file=True,
+    mime="application/gpx+xml",
+)
+
 OGR_DRIVER_NAME_2_EXPORT_FORMATS = [
     {
         "name": format_id,
