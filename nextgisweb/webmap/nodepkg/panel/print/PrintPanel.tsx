@@ -27,6 +27,7 @@ const PrintPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
             titleText: display.config.webmapTitle,
         });
     });
+    const [ready, setReady] = useState(false);
     const printMapEl = useRef<HTMLDivElement | null>(null);
 
     const { close, title, visible } = store;
@@ -48,6 +49,9 @@ const PrintPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
                 scale: display.map.scale,
             });
 
+            // We use the `ready` flag to ensure the update above does not overwrite
+            // the URL params update from the Settings components.
+            setReady(true);
             mapInit.current = true;
         }
     }, [display.map.olView, display.map.scale, printMapStore]);
@@ -90,36 +94,39 @@ const PrintPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
                     printMapStore={printMapStore}
                 />
             )}
-            <PanelContainer title={title} close={close}>
-                <PanelSection flex>
-                    <PrintPaperSettings
-                        display={display}
-                        printMapStore={printMapStore}
-                    />
-                </PanelSection>
 
-                <PanelSection title={gettext("Elements")} flex>
-                    <PrintElementsSettings printMapStore={printMapStore} />
-                </PanelSection>
-
-                <PanelSection title={gettext("Scale")} flex>
-                    <PrintScaleSettings printMapStore={printMapStore} />
-                    <Space.Compact>
-                        <PrintMapExport
+            {ready && (
+                <PanelContainer title={title} close={close}>
+                    <PanelSection flex>
+                        <PrintPaperSettings
                             display={display}
-                            printMapEl={printMapEl.current}
                             printMapStore={printMapStore}
                         />
-                        <CopyToClipboardButton
-                            type="default"
-                            getTextToCopy={getTextToCopy}
-                            icon={<ShareAltOutlined />}
-                            title={gettext("Copy link to the print map")}
-                            iconOnly
-                        />
-                    </Space.Compact>
-                </PanelSection>
-            </PanelContainer>
+                    </PanelSection>
+
+                    <PanelSection title={gettext("Elements")} flex>
+                        <PrintElementsSettings printMapStore={printMapStore} />
+                    </PanelSection>
+
+                    <PanelSection title={gettext("Scale")} flex>
+                        <PrintScaleSettings printMapStore={printMapStore} />
+                        <Space.Compact>
+                            <PrintMapExport
+                                display={display}
+                                printMapEl={printMapEl.current}
+                                printMapStore={printMapStore}
+                            />
+                            <CopyToClipboardButton
+                                type="default"
+                                getTextToCopy={getTextToCopy}
+                                icon={<ShareAltOutlined />}
+                                title={gettext("Copy link to the print map")}
+                                iconOnly
+                            />
+                        </Space.Compact>
+                    </PanelSection>
+                </PanelContainer>
+            )}
         </>
     );
 });
