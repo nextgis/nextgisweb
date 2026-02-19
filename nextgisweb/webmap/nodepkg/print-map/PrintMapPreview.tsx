@@ -178,10 +178,10 @@ export const PrintMapPreview = observer(
         );
         const debouncedOnScaleChange = useDebounce(onChangeScale, 200);
         useEffect(() => {
-            if (mapStore.scale !== undefined) {
+            if (mapStore.scale !== undefined && mapStore.ready) {
                 debouncedOnScaleChange(mapStore.scale);
             }
-        }, [mapStore.scale, debouncedOnScaleChange]);
+        }, [mapStore.ready, mapStore.scale, debouncedOnScaleChange]);
 
         useEffect(() => {
             const printMap = mapStore.olMap;
