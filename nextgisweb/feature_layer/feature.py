@@ -84,24 +84,31 @@ class Feature:
         ogr_feature.SetFID(self.id)
         ogr_feature.SetGeometry(self.geom.ogr if self.geom else None)
 
+        fields_mapping = {
+            layer_defn.GetFieldDefn(i).GetName(): i for i in range(layer_defn.GetFieldCount())
+        }
+
         for k, v in self.fields.items():
             name = k if aliases is None else aliases[k]
+            fld_index = fields_mapping[name]
+
             match v:
                 case None:
                     pass
                 case int() | float() | str():
-                    ogr_feature.SetField(name, v)
+                    ogr_feature.SetField(fld_index, v)
                 case datetime():
                     ogr_feature.SetField(
-                        name, v.year, v.month, v.day, v.hour, v.minute, v.second, 0
+                        fld_index, v.year, v.month, v.day, v.hour, v.minute, v.second, 0
                     )
                 case date():
-                    ogr_feature.SetField(name, v.year, v.month, v.day, 0, 0, 0, 0)
+                    ogr_feature.SetField(fld_index, v.year, v.month, v.day, 0, 0, 0, 0)
                 case time():
-                    ogr_feature.SetField(name, 0, 0, 0, v.hour, v.minute, v.second, 0)
+                    ogr_feature.SetField(fld_index, 0, 0, 0, v.hour, v.minute, v.second, 0)
 
         if fid is not None:
-            ogr_feature.SetField(fid, self.id)
+            fid_index = fields_mapping[fid] if isinstance(fid, str) else fid
+            ogr_feature.SetField(fid_index, self.id)
 
         return ogr_feature
 
