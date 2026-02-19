@@ -49,7 +49,12 @@ const handleTreeItem = (
 export const LegendPrintMap = observer(
     ({ display, legendCoords, printMapStore }: LegendPrintMapProps) => {
         const { treeStore } = display;
-        const { visibleLayers, visibleInRangeIds, expanded } = treeStore;
+        const {
+            visibleLayers,
+            visibleInRangeIds,
+            expanded,
+            legendSymbolsStamp,
+        } = treeStore;
 
         useEffect(() => {
             const visibleLayersWithoutSymbols = visibleLayers.filter(
@@ -65,7 +70,7 @@ export const LegendPrintMap = observer(
         const filterTreeItems = useCallback(
             (layersItems: TreeWebmapItem[]) => {
                 const newLayersItems: TreeWebmapItem[] = [];
-
+                void legendSymbolsStamp;
                 layersItems.forEach((item) => {
                     const newTreeItem = handleTreeItem(
                         visibleInRangeIds,
@@ -78,7 +83,7 @@ export const LegendPrintMap = observer(
                 });
                 return newLayersItems;
             },
-            [expanded, visibleInRangeIds]
+            [expanded, visibleInRangeIds, legendSymbolsStamp]
         );
 
         const onFilterItems = useCallback(
