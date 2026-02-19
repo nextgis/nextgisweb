@@ -1,3 +1,4 @@
+import type { PrintMapStore } from "@nextgisweb/webmap/print-map/store";
 import { getURLParams } from "@nextgisweb/webmap/utils/URL";
 
 import type { PrintMapSettings } from "../../print-map/type";
@@ -36,9 +37,7 @@ export function getPrintUrlSettings(): Partial<PrintMapSettings> {
     return settingsUrl as Partial<PrintMapSettings>;
 }
 
-export function getPrintMapLink(
-    mapSettings: Partial<PrintMapSettings>
-): string {
+export function getPrintMapLink(mapSettings: PrintMapStore): string {
     const parsed: Record<string, string> = {};
 
     for (const [urlParam, value] of Object.entries(getURLParams())) {
@@ -50,13 +49,16 @@ export function getPrintMapLink(
         if (setting === undefined) {
             continue;
         }
-
-        const mapSettingValue = mapSettings[setting];
-        parsed[urlParam] = String(
-            settingInfo.toParam
-                ? settingInfo.toParam(mapSettingValue as never)
-                : mapSettingValue
-        );
+        if (setting === "layout") {
+            parsed[urlParam] = mapSettings.layout.layoutArrToStr();
+        } else {
+            const mapSettingValue = mapSettings[setting];
+            parsed[urlParam] = String(
+                settingInfo.toParam
+                    ? settingInfo.toParam(mapSettingValue as never)
+                    : mapSettingValue
+            );
+        }
     }
 
     const origin = window.location.origin;

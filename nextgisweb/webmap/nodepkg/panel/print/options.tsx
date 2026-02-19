@@ -123,4 +123,5 @@ export const urlPrintParams: UrlPrintParams<PrintMapSettings> = {
     print_legend: { fromParam: (v) => v === "true", setting: "legend" },
     print_graticule: { fromParam: (v) => v === "true", setting: "graticule" },
     print_legendColumns: { fromParam: parseNumber, setting: "legendColumns" },
+    print_layout: { fromParam: (v) => v, setting: "layout" },
 };
