@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite";
 import VectorSource from "ol/source/Vector";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { lazy, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { errorModal } from "@nextgisweb/gui/error";
 import { useShowModal } from "@nextgisweb/gui/index";
@@ -21,6 +21,11 @@ import ExitIcon from "@nextgisweb/icon/material/save";
 
 type ToolEditorProps = MapControlProps & { groupId: string };
 
+const FinishEditingDialogLazy = lazy(
+    () =>
+        import("@nextgisweb/webmap/ui/finish-editing-dialog/FinishEditingDialog")
+);
+
 const ToolEditor = observer(
     ({ order = 0, position, groupId }: ToolEditorProps) => {
         const { display } = useDisplayContext();
@@ -31,7 +36,7 @@ const ToolEditor = observer(
             DrawMode.displayName
         );
 
-        const { lazyModal, modalStore, modalHolder } = useShowModal();
+        const { showModal, modalStore, modalHolder } = useShowModal();
 
         const [source] = useState(() => new VectorSource());
 
@@ -42,6 +47,11 @@ const ToolEditor = observer(
         const dirtyRef = useRef<Map<number, boolean>>(new Map());
 
         const { treeStore } = display;
+
+        const displayItemIdRef = useRef<number | undefined>(undefined);
+        useEffect(() => {
+            displayItemIdRef.current = display.item?.id;
+        }, [display.item]);
 
         const prevEditableRef = useRef<TreeLayerStore[]>(editableItems);
         useEffect(() => {
@@ -60,52 +70,48 @@ const ToolEditor = observer(
                 prevEditableRef.current = items;
             };
             if (stopped.length) {
-                lazyModal(
-                    () =>
-                        import("@nextgisweb/webmap/ui/finish-editing-dialog/FinishEditingDialog"),
-                    {
-                        onSave: async () => {
-                            try {
-                                for (const item of stopped) {
-                                    await saveChanges({
-                                        display,
-                                        source,
-                                        item,
-                                    });
-                                }
-                            } catch (er) {
-                                errorModal(er, { modalStore });
-                            } finally {
-                                proceed();
+                showModal(FinishEditingDialogLazy, {
+                    onSave: async () => {
+                        try {
+                            for (const item of stopped) {
+                                await saveChanges({
+                                    display,
+                                    source,
+                                    item,
+                                });
                             }
-                        },
-                        onUndo: proceed,
-                        onContinue: () => {
-                            setItemsEditable(
-                                treeStore,
-                                stopped.map((it) => it.id),
-                                true
-                            );
-                        },
-                    }
-                );
+                        } catch (er) {
+                            errorModal(er, { modalStore });
+                        } finally {
+                            proceed();
+                        }
+                    },
+                    onUndo: proceed,
+                    onContinue: () => {
+                        setItemsEditable(
+                            treeStore,
+                            stopped.map((it) => it.id),
+                            true
+                        );
+                    },
+                });
             } else {
                 proceed();
             }
         }, [
             source,
             display,
-            modalStore,
-            lazyModal,
             treeStore.editableLayers,
             treeStore,
+            modalStore,
+            showModal,
         ]);
 
         const stopEditing = useCallback(() => {
-            if (display.item) {
-                setItemsEditable(treeStore, [display.item.id], false);
+            if (displayItemIdRef.current !== undefined) {
+                setItemsEditable(treeStore, [displayItemIdRef.current], false);
             }
-        }, [display.item, treeStore]);
+        }, [treeStore]);
 
         const onError = useCallback(
             (er: unknown) => {
