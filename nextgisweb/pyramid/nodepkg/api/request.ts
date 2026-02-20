@@ -6,6 +6,7 @@ import {
     InvalidResponseError,
     LunkwillError,
     LunkwillRequestCancelled,
+    LunkwillRequestTimeout,
     LunkwillRequestFailed,
     NetworkResponseError,
     ServerResponseError,
@@ -48,8 +49,12 @@ async function lunkwillResponseUrl(lwResp: Response) {
 
     let failed = false;
     let ready = false;
+    let deadline = null;
     while (!ready) {
         await sleep(failed ? retry : delay);
+        if (deadline !== null && Date.now() > deadline) {
+            throw new LunkwillRequestTimeout(undefined, {});
+        }
         failed = false;
 
         let lwResp: Response;
@@ -76,6 +81,9 @@ async function lunkwillResponseUrl(lwResp: Response) {
             case "processing":
             case "buffering":
                 delay = lwData.delay_ms;
+                if (lwData.deadline_ms) {
+                    deadline = Date.now() + lwData.deadline_ms;
+                }
                 break;
             default:
                 throw new LunkwillError(undefined, lwData);

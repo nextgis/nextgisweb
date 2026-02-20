@@ -77,4 +77,8 @@ export class LunkwillRequestCancelled extends LunkwillError {
     protected defaultMessage = gettext("Long-running request was cancelled.");
 }
 
+export class LunkwillRequestTimeout extends LunkwillError {
+    protected defaultMessage = gettext("Long-running request timeout.");
+}
+
 export class LunkwillRequestFailed extends LunkwillError {}

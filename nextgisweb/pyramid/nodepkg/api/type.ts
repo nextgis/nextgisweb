@@ -117,6 +117,7 @@ export type ApiRouteParams = Record<string, string>;
 export interface LunkwillData {
     status?: string;
     delay_ms?: number;
+    deadline_ms?: number;
 }
 
 export type RouteResp<
