@@ -240,14 +240,15 @@ export class Display {
         }
 
         this.identify
-            .identifyFeatureByAttrValue(
-                Number(urlParams.hl_lid),
-                urlParams.hl_attr,
-                urlParams.hl_val,
-                urlParams.zoom !== undefined
-                    ? Number(urlParams.zoom)
-                    : undefined
-            )
+            .identifyFeatureByAttrValue({
+                layerId: Number(urlParams.hl_lid),
+                attrName: urlParams.hl_attr,
+                attrValue: urlParams.hl_val,
+                zoom:
+                    urlParams.zoom !== undefined
+                        ? Number(urlParams.zoom)
+                        : undefined,
+            })
             .then((result) => {
                 if (result) return;
                 errorModal({

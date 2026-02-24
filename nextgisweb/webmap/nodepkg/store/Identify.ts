@@ -131,12 +131,19 @@ export class Identify {
         }
     }
 
-    async identifyFeatureByAttrValue(
-        layerId: number,
-        attrName: string,
-        attrValue: string | number,
-        zoom?: number
-    ): Promise<boolean> {
+    async identifyFeatureByAttrValue({
+        attrValue,
+        attrName,
+        layerId,
+        title,
+        zoom,
+    }: {
+        zoom?: number;
+        title?: string;
+        layerId: number;
+        attrName: string;
+        attrValue: string | number;
+    }): Promise<boolean> {
         const layerInfo = await route("resource.item", {
             id: layerId,
         }).get();
@@ -180,7 +187,7 @@ export class Identify {
         const center = getCenter(extent);
 
         const layerLabels: Record<number, string> = {};
-        layerLabels[responseLayerId] = layerInfo.resource.display_name;
+        layerLabels[responseLayerId] = title ?? layerInfo.resource.display_name;
 
         this.openIdentifyPanel({
             features: identifyResponse,

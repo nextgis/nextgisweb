@@ -33,7 +33,7 @@ interface WebMapFeatureGridTabProps {
 
 export const WebMapFeatureGridTab = observer(
     ({ topic, plugin, item }: WebMapFeatureGridTabProps) => {
-        const { layerId, filter } = item;
+        const { layerId, filter, label } = item;
         const filterRef = useRef(filter);
         const topicHandlers = useRef<ReturnType<typeof topic.subscribe>[]>([]);
         const { display } = useDisplayContext();
@@ -87,11 +87,12 @@ export const WebMapFeatureGridTab = observer(
                 onSave: reloadLayer,
 
                 onOpen: ({ featureId, resourceId }) => {
-                    display.identify.identifyFeatureByAttrValue(
-                        resourceId,
-                        "id",
-                        featureId
-                    );
+                    display.identify.identifyFeatureByAttrValue({
+                        layerId: resourceId,
+                        attrName: "id",
+                        attrValue: featureId,
+                        title: label,
+                    });
                 },
 
                 onSelect: (newVal) => {

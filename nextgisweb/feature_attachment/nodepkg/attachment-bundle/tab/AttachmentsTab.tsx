@@ -201,7 +201,11 @@ const layerItems = (
     }
 
     const identifyFeature = (featureId: number, layerId: number) => {
-        display.identify.identifyFeatureByAttrValue(layerId, "id", featureId);
+        display.identify.identifyFeatureByAttrValue({
+            layerId,
+            attrName: "id",
+            attrValue: featureId,
+        });
     };
 
     return layerAttachments?.map((l) => {
