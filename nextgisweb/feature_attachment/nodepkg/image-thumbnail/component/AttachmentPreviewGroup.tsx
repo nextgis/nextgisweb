@@ -10,7 +10,7 @@ import {
 } from "react";
 
 import type { DataSource } from "@nextgisweb/feature-attachment/attachment-editor/type";
-import { ConfigProvider, Image } from "@nextgisweb/gui/antd";
+import { Image } from "@nextgisweb/gui/antd";
 import { CentralLoading } from "@nextgisweb/gui/component";
 
 import { AttachmentPreviewToolbar } from "../component/AttachmentPreviewToolbar";
@@ -149,28 +149,18 @@ export function AttachmentPreviewGroup({
     }, [onDownload, panoramaMode, previewImages, panoramaStore]);
 
     return (
-        <ConfigProvider
-            theme={{
-                token: {
-                    // Workaround by overriding ConfigProvider theme options
-                    // to prevent stuck overlay after closing preview (looks like Antd v6 bug)
-                    motion: true,
-                },
-            }}
-        >
-            <AttachmentPreviewContext value={{ open }}>
-                <Image.PreviewGroup
-                    preview={previewProps}
-                    classNames={{
-                        popup: {
-                            root: "ngw-feature-attachment-image-thumbnail-preview",
-                        },
-                    }}
-                    {...previewGroupProps}
-                >
-                    {children}
-                </Image.PreviewGroup>
-            </AttachmentPreviewContext>
-        </ConfigProvider>
+        <AttachmentPreviewContext value={{ open }}>
+            <Image.PreviewGroup
+                preview={previewProps}
+                classNames={{
+                    popup: {
+                        root: "ngw-feature-attachment-image-thumbnail-preview",
+                    },
+                }}
+                {...previewGroupProps}
+            >
+                {children}
+            </Image.PreviewGroup>
+        </AttachmentPreviewContext>
     );
 }

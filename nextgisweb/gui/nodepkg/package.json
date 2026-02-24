@@ -28,5 +28,9 @@
         "classnames": "^2.5.1",
         "html-react-parser": "5.2.5",
         "react-complex-tree": "^2.6.0"
+    },
+    "resolutions": {
+        "#NGW-1855": "Lock @rc-component/motion to 1.1.6 to avoid duplicate version bug",
+        "@rc-component/motion": "1.1.6"
     }
 }
