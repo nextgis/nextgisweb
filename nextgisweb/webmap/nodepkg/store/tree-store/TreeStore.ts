@@ -30,6 +30,8 @@ export class TreeStore {
 
     @observable.ref accessor drawOrderEnabled = false;
 
+    @observable.ref accessor legendSymbolsStamp: number = 0;
+
     private readonly _loadingResourceSymbols = new Set<number>();
 
     constructor(rootItem: RootItemConfig, options?: TreeStoreOptions) {
@@ -529,6 +531,7 @@ export class TreeStore {
                 !item.legendInfo.symbols
             ) {
                 item.legendInfo.setSymbols(symbols ?? []);
+                this.legendSymbolsStamp++;
                 return true;
             }
             return false;
