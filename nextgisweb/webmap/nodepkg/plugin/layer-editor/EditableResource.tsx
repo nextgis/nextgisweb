@@ -4,7 +4,14 @@ import type { Feature as OlFeature } from "ol";
 import type { Geometry } from "ol/geom";
 import type { DrawEvent } from "ol/interaction/Draw";
 import VectorSource from "ol/source/Vector";
-import { useCallback, useEffect, useRef, useState, useTransition } from "react";
+import {
+    lazy,
+    useCallback,
+    useEffect,
+    useRef,
+    useState,
+    useTransition,
+} from "react";
 
 import { Spin } from "@nextgisweb/gui/antd";
 import { useShowModal } from "@nextgisweb/gui/index";
@@ -33,6 +40,10 @@ export interface EditableResourceProps extends Omit<
     onCanSnap: (val: boolean) => void;
 }
 
+const FeatureEditorModal = lazy(
+    () => import("@nextgisweb/feature-layer/feature-editor-modal")
+);
+
 export const EditableResource = observer(
     ({
         editingMode,
@@ -45,7 +56,7 @@ export const EditableResource = observer(
         onDirtyChange,
         onEditingMode: setEditingMode,
     }: EditableResourceProps) => {
-        const { modalStore, modalHolder, lazyModal } = useShowModal();
+        const { modalStore, modalHolder, showModal } = useShowModal();
         const { makeSignal } = useAbortController();
 
         const [source, setSource] = useState<VectorSource | null>(null);
@@ -64,28 +75,24 @@ export const EditableResource = observer(
         const onDrawend = useCallback(
             (ev: DrawEvent) => {
                 return new Promise<void>((resolve, reject) => {
-                    lazyModal(
-                        () =>
-                            import("@nextgisweb/feature-layer/feature-editor-modal"),
-                        {
-                            editorOptions: {
-                                mode: "return",
-                                allowEmpty: true,
-                                resourceId,
-                                showGeometryTab: false,
-                                onOk: (_, item) => {
-                                    ev.feature.set("attribution", item);
-                                    resolve(undefined);
-                                },
+                    showModal(FeatureEditorModal, {
+                        editorOptions: {
+                            mode: "return",
+                            allowEmpty: true,
+                            resourceId,
+                            showGeometryTab: false,
+                            onOk: (_, item) => {
+                                ev.feature.set("attribution", item);
+                                resolve(undefined);
                             },
-                            onCancel: () => {
-                                reject("Canceled by user");
-                            },
-                        }
-                    );
+                        },
+                        onCancel: () => {
+                            reject("Canceled by user");
+                        },
+                    });
                 });
             },
-            [lazyModal, resourceId]
+            [showModal, resourceId]
         );
 
         useEffect(() => {
