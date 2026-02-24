@@ -66,6 +66,11 @@ export const PrintPaperSettings = observer<PrintPaperSettingsProps>(
                         delete urlSettings[k];
                     });
                 }
+                if (urlSettings.layout) {
+                    printMapStore.layout.strToLayout(urlSettings.layout);
+                    printMapStore.layout.blocked = true;
+                    delete urlSettings.layout;
+                }
 
                 printMapStore.update(urlSettings);
                 setUrlParsed(true);

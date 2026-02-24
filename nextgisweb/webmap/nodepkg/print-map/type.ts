@@ -12,6 +12,20 @@ export interface RndCoords {
     displayed: boolean;
 }
 
+export type RndCoordsArr = [
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    displayed: 0 | 1,
+];
+
+export type LayoutArr = [
+    legend: RndCoordsArr,
+    title: RndCoordsArr,
+    map: RndCoordsArr,
+];
+
 export interface LegendRndCoords extends RndCoords {
     legendColumns: number;
 }
@@ -43,9 +57,10 @@ export interface PrintMapSettings extends PrintMapPaper {
     arrow: boolean;
     title?: boolean;
     legend: boolean;
-    graticule?: boolean;
+    layout?: string;
     center?: Coordinate | null;
     titleText?: string;
+    graticule?: boolean;
     scaleLine: boolean;
     scaleValue: boolean;
     legendColumns: number;

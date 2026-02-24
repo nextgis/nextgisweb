@@ -1,7 +1,18 @@
 import { action, observable } from "mobx";
 
-import type { LegendRndCoords, PrintMapSettings, RndCoords } from "../type";
+import type {
+    LayoutArr,
+    LegendRndCoords,
+    PrintMapSettings,
+    RndCoords,
+    RndCoordsArr,
+} from "../type";
 import { mmToPx } from "../utils";
+
+type Layout = keyof Pick<
+    PrintLayoutStore,
+    "legendCoords" | "titleCoords" | "mapCoords"
+>;
 
 export class PrintLayoutStore {
     defaultMargin = 10;
@@ -31,11 +42,10 @@ export class PrintLayoutStore {
         displayed: false,
     };
 
+    blocked = false;
+
     @action
-    updateCoordinates(
-        type: "legendCoords" | "titleCoords" | "mapCoords",
-        coords: RndCoords | LegendRndCoords
-    ) {
+    updateCoordinates(type: Layout, coords: RndCoords | LegendRndCoords) {
         if (type === "legendCoords") {
             this.legendCoords = coords as LegendRndCoords;
         } else {
@@ -60,6 +70,11 @@ export class PrintLayoutStore {
         PrintMapSettings,
         "width" | "height" | "margin" | "legend" | "legendColumns" | "title"
     >) {
+        if (this.blocked) {
+            this.blocked = false;
+            return;
+        }
+
         const defMargin = this.defaultMargin;
 
         const widthPx = Math.round(mmToPx(width - margin * 2));
@@ -126,5 +141,56 @@ export class PrintLayoutStore {
             height: heightMap,
             displayed: true,
         };
+    }
+
+    toLayoutArr(): LayoutArr {
+        const { legendCoords, titleCoords, mapCoords } = this;
+
+        return [legendCoords, titleCoords, mapCoords].map((l) => [
+            l.x,
+            l.y,
+            l.width,
+            l.height,
+            l.displayed ? 1 : 0,
+        ]) as LayoutArr;
+    }
+
+    @action.bound
+    applyLayoutArr(layoutArr: LayoutArr) {
+        const [l, t, m] = layoutArr;
+
+        const coordsMap: [Layout, RndCoordsArr][] = [
+            ["legendCoords", l],
+            ["titleCoords", t],
+            ["mapCoords", m],
+        ];
+
+        coordsMap.forEach(([key, arr]) => {
+            this.updateCoordinates(key, {
+                x: arr[0],
+                y: arr[1],
+                width: arr[2],
+                height: arr[3],
+                displayed: !!arr[4],
+            });
+        });
+    }
+
+    layoutArrToStr(): string {
+        return this.toLayoutArr()
+            .map((block) => block.join(","))
+            .join(";");
+    }
+
+    @action.bound
+    strToLayout(str: string): void {
+        const parts = str.split(";");
+        if (parts.length !== 3) return;
+
+        this.applyLayoutArr(
+            parts.map((p) => {
+                return p.split(",").map(Number);
+            }) as LayoutArr
+        );
     }
 }

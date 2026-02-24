@@ -6,7 +6,7 @@ import type { PrintMapPaper, PrintMapSettings } from "../type";
 
 import { PrintLayoutStore } from "./PrintLayoutStore";
 
-export class PrintMapStore implements PrintMapSettings {
+export class PrintMapStore implements Omit<PrintMapSettings, "layout"> {
     @observable.shallow accessor printMapPaper: PrintMapPaper | null = null;
     @observable.shallow accessor webMapItems: TreeWebmapItem[] = [];
 
