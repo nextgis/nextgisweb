@@ -251,12 +251,12 @@ msgid "Delete condition"
 msgstr "Удалить условие"
 
 #: nodepkg/feature-filter/component/FilterCondition.tsx:60
-msgid "Any value"
-msgstr "Любое значение"
-
-#: nodepkg/feature-filter/component/FilterCondition.tsx:61
 msgid "No value"
 msgstr "Нет значения"
+
+#: nodepkg/feature-filter/component/FilterCondition.tsx:61
+msgid "Any value"
+msgstr "Любое значение"
 
 #: nodepkg/feature-filter/component/FilterCondition.tsx:189
 msgid "Invalid field"
@@ -355,20 +355,20 @@ msgid "Less or equal"
 msgstr "Меньше или равно"
 
 #: nodepkg/feature-filter/type.ts:176
-msgid "In"
-msgstr "Содержит одно из значений"
+msgid "In list"
+msgstr "В списке"
 
 #: nodepkg/feature-filter/type.ts:181
-msgid "Not in"
-msgstr "Не содержит одно из значений"
+msgid "Not in list"
+msgstr "Не в списке"
 
 #: nodepkg/feature-filter/type.ts:186
-msgid "Has value"
-msgstr "Содержит значение"
+msgid "Is NULL"
+msgstr "NULL"
 
 #: nodepkg/feature-filter/type.ts:199
-msgid "Not has value"
-msgstr "Не содержит значения"
+msgid "Is not NULL"
+msgstr "Не NULL"
 
 #: nodepkg/feature-filter/util/validator.ts:52
 msgid "Field '{fieldName}' expects a string for {fieldType}, but got '{valueType}'"

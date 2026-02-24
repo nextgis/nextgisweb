@@ -201,11 +201,11 @@ class NotInNode(BinaryConditionNode, operators=("!in",)):
     is_list = True
 
 
-class HasNode(UnaryConditionNode, operators=("has",)):
+class IsNullNode(UnaryConditionNode, operators=("is_null",)):
     pass
 
 
-class NotHasNode(UnaryConditionNode, operators=("!has",)):
+class NotIsNullNode(UnaryConditionNode, operators=("!is_null",)):
     pass
 
 
@@ -250,11 +250,11 @@ class SQLAlchemyCompiler:
             case NotInNode(left=left, right=right):
                 return self._compile_in(left, right, negate=True)
 
-            case HasNode(field=field):
-                return self._get_column(field.field).is_not(None)
-
-            case NotHasNode(field=field):
+            case IsNullNode(field=field):
                 return self._get_column(field.field).is_(None)
+
+            case NotIsNullNode(field=field):
+                return self._get_column(field.field).is_not(None)
 
             case _:
                 raise NotImplementedError(f"Unknown node type: {type(node)}")

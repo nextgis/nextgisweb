@@ -104,8 +104,8 @@ def test_get_supported_operators():
             "<=",
             "in",
             "!in",
-            "has",
-            "!has",
+            "is_null",
+            "!is_null",
         ]
     )
     assert operators == expected

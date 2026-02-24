@@ -16,7 +16,7 @@ export function parseConditionExpression(
     let field = "";
     if (Array.isArray(fieldExpression) && fieldExpression[0] === "get") {
         field = fieldExpression[1];
-    } else if (operator === "has" || operator === "!has") {
+    } else if (operator === "is_null" || operator === "!is_null") {
         if (Array.isArray(expression[1]) && expression[1][0] === "get") {
             field = expression[1][1];
         }
@@ -30,7 +30,7 @@ export function parseConditionExpression(
         value,
     };
 
-    if (operator === "has" || operator === "!has") {
+    if (operator === "is_null" || operator === "!is_null") {
         return {
             ...baseCondition,
             value: undefined,

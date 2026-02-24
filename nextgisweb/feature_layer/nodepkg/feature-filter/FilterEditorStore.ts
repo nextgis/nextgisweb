@@ -559,7 +559,7 @@ export class FilterEditorStore {
         const appendCondition = (condition: FilterCondition) => {
             const { operator, field, value } = condition;
             if (field) {
-                if (operator === "has" || operator === "!has") {
+                if (operator === "is_null" || operator === "!is_null") {
                     expressions.push([operator, ["get", field]]);
                 } else if (value !== undefined && value !== null) {
                     if (operator === "in" || operator === "!in") {

@@ -47,16 +47,16 @@ export type GetExpr = ["get", string];
 export type EqNeOp = "==" | "!=";
 export type CmpOp = ">" | "<" | ">=" | "<=";
 export type InOp = "in" | "!in";
-export type HasOp = "has" | "!has";
+export type IsNullOp = "is_null" | "!is_null";
 
 export type ConditionValue = string | number | boolean | null;
 
 export type EqNeExpr = [EqNeOp, GetExpr, ConditionValue];
 export type CmpExpr = [CmpOp, GetExpr, number | string];
 export type InExpr = [InOp, GetExpr, ...(string | number)[]];
-export type HasExpr = [HasOp, GetExpr];
+export type IsNullExpr = [IsNullOp, GetExpr];
 
-export type ConditionExpr = EqNeExpr | CmpExpr | InExpr | HasExpr;
+export type ConditionExpr = EqNeExpr | CmpExpr | InExpr | IsNullExpr;
 
 export type LogicalOp = "all" | "any";
 export type GroupExpr = [LogicalOp, ...(ConditionExpr | GroupExpr)[]];
@@ -71,8 +71,8 @@ export const ValidOperators = [
     "<=",
     "in",
     "!in",
-    "has",
-    "!has",
+    "is_null",
+    "!is_null",
 ] as const;
 
 export type Operator = (typeof ValidOperators)[number];
@@ -86,8 +86,8 @@ export type OperatorValueMap = {
     "<=": number;
     "in": Array<string | number>;
     "!in": Array<string | number>;
-    "has": undefined;
-    "!has": undefined;
+    "is_null": undefined;
+    "!is_null": undefined;
 };
 
 export interface OperatorOption {
@@ -173,17 +173,17 @@ export const OPERATORS: OperatorOption[] = [
     },
     {
         value: "in",
-        label: gettext("In"),
+        label: gettext("In list"),
         supportedTypes: ["STRING", "INTEGER", "BIGINT", "REAL"],
     },
     {
         value: "!in",
-        label: gettext("Not in"),
+        label: gettext("Not in list"),
         supportedTypes: ["STRING", "INTEGER", "BIGINT", "REAL"],
     },
     {
-        value: "has",
-        label: gettext("Has value"),
+        value: "is_null",
+        label: gettext("Is NULL"),
         supportedTypes: [
             "STRING",
             "INTEGER",
@@ -195,8 +195,8 @@ export const OPERATORS: OperatorOption[] = [
         ],
     },
     {
-        value: "!has",
-        label: gettext("Not has value"),
+        value: "!is_null",
+        label: gettext("Is not NULL"),
         supportedTypes: [
             "STRING",
             "INTEGER",

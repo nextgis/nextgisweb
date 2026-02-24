@@ -95,7 +95,7 @@ export function validateConditionExpression(
         );
     }
 
-    if (operator === "has" || operator === "!has") {
+    if (operator === "is_null" || operator === "!is_null") {
         if (expression.length !== 2) {
             throw new Error(
                 gettextf(
@@ -105,7 +105,6 @@ export function validateConditionExpression(
         }
     } else if (operator === "in" || operator === "!in") {
         if (expression.length < 3) {
-            console.log(operator);
             throw new Error(
                 gettextf(
                     "Operator '{operator}' expects at least {min} value argument"
@@ -167,7 +166,7 @@ export function validateConditionExpression(
                 validateDateTimeValue(field.datatype, item, fieldName);
             }
         }
-    } else if (operator !== "has" && operator !== "!has") {
+    } else if (operator !== "is_null" && operator !== "!is_null") {
         const fieldType = field.datatype;
         const isTemporalField = isTemporalDatatype(fieldType);
 

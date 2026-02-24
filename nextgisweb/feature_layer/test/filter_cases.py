@@ -264,13 +264,13 @@ FILTER_REGISTRY: list[FilterCase] = [
     ),
     # Existence
     FilterCase(
-        "has_field",
-        ["has", ["get", "name"]],
+        "not_is_null_field",
+        ["!is_null", ["get", "name"]],
         {"Alice", "Bob", "Charlie", "Diana", "Eve"},
         "name IS NOT NULL",
         True,
     ),
-    FilterCase("not_has_field", ["!has", ["get", "name"]], set(), "name IS NULL", True),
+    FilterCase("is_null_field", ["is_null", ["get", "name"]], set(), "name IS NULL", True),
     # Column vs Column
     FilterCase(
         "gt_col",
@@ -365,7 +365,7 @@ INVALID_DATA_CASES = [
     ("get_wrong_keyword", ["==", ["fetch", "name"], "value"], True, _E),
     ("nested_get_in_field_name", ["==", ["get", ["get", "name"]], "value"], True, _E),
     ("eq_missing_right_operand", ["==", ["get", "name"]], True, _E),
-    ("has_with_extra_operand", ["has", ["get", "name"], "extra"], True, _E),
+    ("is_null_with_extra_operand", ["is_null", ["get", "name"], "extra"], True, _E),
     ("in_without_values", ["in", ["get", "name"]], True, _E),
     ("not_in_without_values", ["!in", ["get", "name"]], True, _E),
     ("in_nested_list_not_allowed", ["in", ["get", "name"], ["Alice", "Bob"]], True, _E),

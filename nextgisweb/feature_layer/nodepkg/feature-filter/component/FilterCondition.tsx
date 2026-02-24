@@ -32,8 +32,8 @@ import type {
     CmpOp,
     EqNeOp,
     FilterCondition as FilterConditionType,
-    HasOp,
     InOp,
+    IsNullOp,
     OperatorValueMap,
 } from "../type";
 
@@ -56,9 +56,9 @@ const getPlaceholder = (
     isValueInputDisabled: boolean
 ): string => {
     if (isValueInputDisabled) {
-        return condition.operator === "has"
-            ? gettext("Any value")
-            : gettext("No value");
+        return condition.operator === "is_null"
+            ? gettext("No value")
+            : gettext("Any value");
     }
     return defaultPlaceholder;
 };
@@ -69,7 +69,7 @@ export const getDefaultValue = <O extends keyof OperatorValueMap>(
     operator: O
 ): OperatorValueMap[O] => {
     const fieldInfo = fields.find((f) => f.keyname === field);
-    const wantsNoValue = ["has", "!has"].includes(operator);
+    const wantsNoValue = ["is_null", "!is_null"].includes(operator);
     const wantsArray = ["in", "!in"].includes(operator);
 
     let defaultValue = undefined;
@@ -138,7 +138,7 @@ export const FilterCondition = observer(
         };
 
         const handleOperatorChange = (
-            operator: EqNeOp | CmpOp | InOp | HasOp
+            operator: EqNeOp | CmpOp | InOp | IsNullOp
         ) => {
             const defaultValue = getDefaultValue(
                 store.fields,
@@ -175,7 +175,7 @@ export const FilterCondition = observer(
             );
         };
 
-        const isValueInputDisabled = ["has", "!has"].includes(
+        const isValueInputDisabled = ["is_null", "!is_null"].includes(
             condition.operator
         );
 
