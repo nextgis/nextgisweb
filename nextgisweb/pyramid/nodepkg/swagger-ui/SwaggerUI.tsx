@@ -9,10 +9,16 @@ import "./SwaggerUI.less";
 const allowTryItOutFor = () => (_: unknown, path: string) =>
   !path.match(/\?context=\w+$/i);
 
+const openApiJsonUrl = routeURL("pyramid.openapi_json");
+
 const Plugin = () => {
   return {
     components: {
-      InfoContainer: () => <></>,
+      InfoContainer: () => (
+        <a href={openApiJsonUrl} target="_blank">
+          {ngwConfig.applicationUrl + openApiJsonUrl}
+        </a>
+      ),
     },
     statePlugins: {
       // NOTE: Hide the "Try it out" button for overloaded paths
