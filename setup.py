@@ -79,7 +79,7 @@ extras_require = dict(
         "pre-commit",
         "pytest-cov",
         "pytest==9.0.*",
-        "ruff>=0.12.12",
+        "ruff==0.14.*",
         "sqlglot==26.30.0",
         "ty",
         "webtest",
