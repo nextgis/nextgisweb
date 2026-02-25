@@ -12,6 +12,9 @@ class Extent(Struct):
 
 
 def extent(resource, request) -> Extent:
+    """Get resource geographic extent
+
+    :returns: Geographic extent of the resource"""
     impl = resource.lookup_interface(IBboxLayer)
     if impl is None:
         return HTTPNotFound()

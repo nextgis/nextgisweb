@@ -99,7 +99,9 @@ class ResourceAttrResponse(Struct, kw_only=True):
 
 
 def attr(request, *, body: ResourceAttrRequest) -> ResourceAttrResponse:
-    """Fetch specific resource attributes"""
+    """Fetch specific resource attributes
+
+    :returns: Requested attribute values for the specified resources"""
     user = request.user
 
     others: list[tuple[int, ResourceAttr]] = []

@@ -169,7 +169,9 @@ def tile(
     nd: NoDataStatusCode = 200,
     cache: TileCache = True,
 ) -> RenderResponse:
-    """Render tile from one or more resources"""
+    """Render tile from one or more resources
+
+    :returns: Rendered PNG tile"""
     check_origin(request)
 
     p_symbols = process_symbols(symbols) if symbols else dict()
@@ -250,7 +252,9 @@ def image(
     cache: TileCache = True,
     tdi: TileDebugInfo = False,
 ) -> RenderResponse:
-    """Render image from one or more resources"""
+    """Render image from one or more resources
+
+    :returns: Rendered PNG image"""
     check_origin(request)
 
     p_symbols = process_symbols(symbols) if symbols else dict()
@@ -437,7 +441,9 @@ def image(
 
 
 def legend(request) -> Annotated[Response, ContentType("image/png")]:
-    """Get resource legend image"""
+    """Get resource legend image
+
+    :returns: Legend image for the resource"""
     request.resource_permission(DataScope.read)
     result = request.context.render_legend()
     return Response(body_file=result, content_type="image/png")
@@ -503,7 +509,9 @@ class ResourceLegendSymbolsResponse(Struct, kw_only=True):
 def legend_symbols(
     request, *, icon_size: ResourceLegendSymbolsIconSize = 24
 ) -> AsJSON[list[LegendSymbol]]:
-    """Get resource legend symbols"""
+    """Get resource legend symbols
+
+    :returns: List of legend symbol definitions for the resource"""
     request.resource_permission(DataScope.read)
 
     return LegendSymbol.from_resource(
@@ -519,7 +527,9 @@ def resource_legend_symbols(
     resources: ResourceLegendSymbolsResources,
     icon_size: ResourceLegendSymbolsIconSize = 24,
 ) -> ResourceLegendSymbolsResponse:
-    """Get legend symbols of multiple resources"""
+    """Get legend symbols of multiple resources
+
+    :returns: Legend symbols for the requested resources"""
 
     resources = list(set(resources))
     query = Resource.filter(Resource.id.in_(resources)).all()

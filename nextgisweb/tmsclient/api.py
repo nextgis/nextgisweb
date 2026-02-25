@@ -28,6 +28,9 @@ class InspectResponse(Struct, kw_only=True):
 
 
 def inspect_connection(resource, request) -> InspectResponse:
+    """Inspect TMS client connection
+
+    :returns: TMS client layer inspection result"""
     request.resource_permission(ConnectionScope.connect)
 
     layers = []

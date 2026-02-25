@@ -13,7 +13,9 @@ class InspectResponse(Struct, kw_only=True):
 
 
 def inspect(request, *, body: FileUploadRef) -> InspectResponse:
-    """Inspect uploaded file for layers"""
+    """Inspect uploaded file for layers
+
+    :returns: List of layers detected in the uploaded file"""
 
     fupload = body()
     ogrds = read_dataset_vector(str(fupload.data_path), source_filename=fupload.name)

@@ -129,6 +129,8 @@ def collection_post(
     This endpoint also supports traditional form-based file uploads, but that
     method is deprecated in favor of the TUS protocol or the PUT method for
     single-file uploads of small files.
+
+    :returns: Upload session details including the upload URL
     """
     core.check_storage_limit()
 
@@ -315,7 +317,8 @@ def item_delete(fupload: FileUpload, request) -> Annotated[None, StatusCode(204)
     Useful to cancel incomplete TUS uploads or delete files no longer needed.
     Files which aren't disposed will be automatically removed during periodic
     cleanup.
-    """
+
+    :returns: Uploaded file deleted successfully"""
 
     fupload.data_path.unlink()
     fupload.meta_path.unlink()

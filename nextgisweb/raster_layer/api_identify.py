@@ -34,7 +34,9 @@ def identify(
     resources: list[int],
     point: Annotated[Point, Query(spread=True)],
 ) -> RasterLayerIdentifyResponse:
-    """Get raster values at specific point for list of resources"""
+    """Get raster values at specific point for list of resources
+
+    :returns: Raster pixel values at the specified point per resource"""
 
     query = DBSession.query(RasterLayer).filter(RasterLayer.id.in_(resources))
 

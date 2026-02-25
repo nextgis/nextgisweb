@@ -23,7 +23,9 @@ class WebMapOptionSchema(Struct, kw_only=True):
 
 
 def schema(request) -> WebMapOptionSchema:
-    """Read webmap options schema"""
+    """Read webmap options schema
+
+    :returns: JSON schema for webmap options"""
     tr = request.translate
     options = {
         k: WebMapOptionItem(

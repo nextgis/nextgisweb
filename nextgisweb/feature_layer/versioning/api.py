@@ -101,7 +101,8 @@ def change_check(
     :param initial: Initial already fetched version, 0 if not set
     :param target: Target version to obtain, latest if not set
     :param epoch: Versioning epoch, required if initial > 0
-    :param extensions: Include feature extensions"""
+    :param extensions: Include feature extensions
+    :returns: Change summary between the specified versions"""
 
     request.resource_permission(DataScope.read)
     FVersioningNotEnabled.disprove(resource)
@@ -190,7 +191,8 @@ def change_fetch(
     :param initial: Initial version
     :param target: Target version
     :param epoch: Versioning epoch
-    :param cursor: Opaque pagination cursor"""
+    :param cursor: Opaque pagination cursor
+    :returns: Incremental change set between the specified versions"""
 
     request.resource_permission(DataScope.read)
 
@@ -350,7 +352,9 @@ def version_cget(
     ] = 50,
     cursor: VersionCGetCursor | None = None,
 ) -> VersionCGetResponse:
-    """Read versions metadata"""
+    """Read versions metadata
+
+    :returns: List of feature layer versions with metadata"""
 
     request.resource_permission(DataScope.read)
 
@@ -461,7 +465,9 @@ class VersionRead(Struct, kw_only=True):
 
 
 def version_iget(resource, request, vid: VersionID) -> VersionRead:
-    """Read version metadata"""
+    """Read version metadata
+
+    :returns: Feature layer version metadata"""
 
     request.resource_permission(DataScope.read)
 

@@ -100,7 +100,9 @@ def check_annotation_enabled(request) -> None:
 
 
 def annotation_cget(resource, request) -> AsJSON[list[AnnotationRead]]:
-    """Read annotations"""
+    """Read annotations
+
+    :returns: List of annotations for the resource"""
     check_annotation_enabled(request)
     request.resource_permission(WebMapScope.annotation_read)
 
@@ -120,7 +122,9 @@ def annotation_cpost(
     *,
     body: AnnotationCreate,
 ) -> AnnotationCreateResponse:
-    """Create annotation"""
+    """Create annotation
+
+    :returns: Created annotation"""
     check_annotation_enabled(request)
     request.resource_permission(WebMapScope.annotation_write)
 
@@ -138,7 +142,9 @@ def annotation_iget(
     request,
     annotation_id: int,
 ) -> AsJSON[AnnotationRead]:
-    """Read annotation"""
+    """Read annotation
+
+    :returns: Annotation details"""
     check_annotation_enabled(request)
     request.resource_permission(WebMapScope.annotation_read)
 
@@ -154,7 +160,9 @@ def annotation_iput(
     *,
     body: AnnotationUpdate,
 ) -> AnnotationCreateResponse:
-    """Update annotation"""
+    """Update annotation
+
+    :returns: Updated annotation"""
     check_annotation_enabled(request)
     request.resource_permission(WebMapScope.annotation_write)
 
@@ -168,7 +176,9 @@ def annotation_idelete(
     request,
     annotation_id: int,
 ) -> EmptyObject:
-    """Delete annotation"""
+    """Delete annotation
+
+    :returns: Annotation deleted successfully"""
     check_annotation_enabled(request)
     request.resource_permission(WebMapScope.annotation_write)
 
@@ -199,7 +209,9 @@ def add_extent(e1, e2):
 
 
 def get_webmap_extent(resource, request) -> JSONType:
-    """Calculate webmap layers' extent"""
+    """Calculate webmap layers' extent
+
+    :returns: Combined geographic extent of all webmap layers"""
     request.resource_permission(ResourceScope.read)
 
     def traverse(item, extent):
@@ -314,7 +326,9 @@ def check_page_max_size(request, body: PrintBody):
 
 
 def print(request, *, body: PrintBody) -> Response:
-    """Generate printable webmap document"""
+    """Generate printable webmap document
+
+    :returns: Printable webmap document"""
     check_page_max_size(request, body)
     with TemporaryDirectory() as temp_name:
         temp_dir = Path(temp_name)
@@ -545,7 +559,9 @@ def _extent_wsen_from_attrs(obj, prefix) -> ExtentWSEN | None:
 
 
 def display_config(obj, request) -> DisplayConfig:
-    """Generate webmap display widget configuration"""
+    """Generate webmap display widget configuration
+
+    :returns: Webmap widget display configuration"""
     request.resource_permission(ResourceScope.read)
 
     # Map level plugins

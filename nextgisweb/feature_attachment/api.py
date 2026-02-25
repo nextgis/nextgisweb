@@ -136,6 +136,9 @@ def image(
 
 
 def iget(resource, request, fid: FeatureID, aid: AttachmentID) -> JSONType:
+    """Read feature attachment
+
+    :returns: Feature attachment details"""
     request.resource_permission(DataScope.read)
 
     obj = attachment_or_not_found(resource, fid, aid)
@@ -143,6 +146,9 @@ def iget(resource, request, fid: FeatureID, aid: AttachmentID) -> JSONType:
 
 
 def idelete(resource, request, fid: FeatureID, aid: AttachmentID) -> JSONType:
+    """Delete feature attachment
+
+    :returns: Feature attachment deleted successfully"""
     request.resource_permission(DataScope.read)
 
     obj = attachment_or_not_found(resource, fid, aid)
@@ -151,6 +157,9 @@ def idelete(resource, request, fid: FeatureID, aid: AttachmentID) -> JSONType:
 
 
 def iput(resource, request, fid: FeatureID, aid: AttachmentID) -> JSONType:
+    """Update feature attachment
+
+    :returns: Updated feature attachment"""
     request.resource_permission(DataScope.write)
 
     obj = attachment_or_not_found(resource, fid, aid)
@@ -162,6 +171,9 @@ def iput(resource, request, fid: FeatureID, aid: AttachmentID) -> JSONType:
 
 
 def cget(resource, request, fid: FeatureID) -> JSONType:
+    """Read feature attachments
+
+    :returns: List of feature attachments"""
     request.resource_permission(DataScope.read)
 
     query = FeatureAttachment.filter_by(feature_id=fid, resource_id=resource.id)
@@ -171,6 +183,9 @@ def cget(resource, request, fid: FeatureID) -> JSONType:
 
 
 def cpost(resource, request, fid: FeatureID) -> JSONType:
+    """Create feature attachment
+
+    :returns: Created feature attachment"""
     request.resource_permission(DataScope.write)
 
     query_feature_or_not_found(resource.feature_query(), resource.id, fid)
@@ -246,6 +261,9 @@ def export(resource, request):
 
 
 def import_attachment(resource, request) -> JSONType:
+    """Import feature attachments
+
+    :returns: Feature attachments imported successfully"""
     request.resource_permission(DataScope.write)
 
     data = request.json_body
@@ -264,7 +282,9 @@ class BundleBody(Struct, kw_only=True):
 
 
 def bundle(request, body: BundleBody) -> Annotated[Response, ContentType("application/zip")]:
-    """Download specific attachments as ZIP archive"""
+    """Download specific attachments as ZIP archive
+
+    :returns: ZIP archive containing the requested feature attachments"""
     valid_rid = set()
     arc_names = set()
     re_idx = re.compile(r"^(.*?)((?:\.[a-z0-9]+)*)$", re.IGNORECASE)

@@ -114,7 +114,9 @@ def feature_from_ogc(loader: feature_layer_api.Loader, feature: Feature, data):
 
 
 def landing_page(resource, request) -> JSONType:
-    """OGC API Features endpoint"""
+    """OGC API Features endpoint
+
+    :returns: OGC API Features collection or item response"""
     request.resource_permission(ServiceScope.connect)
 
     def route_url(rname):

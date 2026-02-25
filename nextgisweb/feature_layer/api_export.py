@@ -343,7 +343,9 @@ def export_single(
         Meta(description="Compress exported file when using single-file formats"),
     ] = True,
 ) -> Response:
-    """Export feature layer"""
+    """Export feature layer
+
+    :returns: ZIP archive containing exported feature layer data"""
     request.resource_permission(DataScope.read)
 
     options = export_params.to_options()
@@ -403,7 +405,9 @@ def export_multi_get(
         Meta(description="Optional names for layers, resource IDs used by default"),
     ],
 ) -> ExportZipResponse:
-    """Export multiple feature layers"""
+    """Export multiple feature layers
+
+    :returns: ZIP archive containing exported feature layer data"""
     params_resources = [
         ResourceParam(id=rid, name=(name.get(rid) if name is not UNSET else None))
         for rid in resources
@@ -415,7 +419,9 @@ def export_multi_post(
     request,
     body: ExportParamsPost,
 ) -> ExportZipResponse:
-    """Export multiple feature layers"""
+    """Export multiple feature layers
+
+    :returns: ZIP archive containing exported feature layer data"""
     return export_multi(request, body.resources, body)
 
 

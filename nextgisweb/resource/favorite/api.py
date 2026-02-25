@@ -24,7 +24,9 @@ class ResourceFavoriteSchemaItem(Struct):
 
 
 def schema(request) -> AsJSON[dict[str, ResourceFavoriteSchemaItem]]:
-    """Read resource favorites schema"""
+    """Read resource favorites schema
+
+    :returns: JSON schema for the resource favorite object"""
     tr = request.translate
     return {
         k: ResourceFavoriteSchemaItem(
@@ -47,7 +49,9 @@ class ResourceFavoriteRef(Struct, kw_only=True):
 
 
 def cpost(request, body: ResourceFavoriteCreate) -> ResourceFavoriteRef:
-    """Create resource favorite"""
+    """Create resource favorite
+
+    :returns: Created resource favorite"""
     request.require_authenticated()
 
     data = to_builtins(body)
@@ -94,7 +98,9 @@ class ResourceFavoriteCollectionGetResponse(Struct):
 
 
 def cget(request) -> ResourceFavoriteCollectionGetResponse:
-    """Read resource favorites and related resources summary"""
+    """Read resource favorites and related resources summary
+
+    :returns: List of resource favorites with resource summaries"""
     request.require_authenticated()
 
     query = Model.filter_by(user_id=request.user.id)
@@ -132,7 +138,9 @@ class FeatureFavoriteItemPutBody(Struct, kw_only=True):
 
 
 def iput(request, id: int, body: FeatureFavoriteItemPutBody) -> EmptyObject:
-    """Update resource favorite"""
+    """Update resource favorite
+
+    :returns: Updated resource favorite"""
     request.require_authenticated()
 
     obj = Model.filter_by(id=id, user_id=request.user.id).first()
@@ -144,7 +152,9 @@ def iput(request, id: int, body: FeatureFavoriteItemPutBody) -> EmptyObject:
 
 
 def idelete(request, id: int) -> EmptyObject:
-    """Delete resource favorite"""
+    """Delete resource favorite
+
+    :returns: Resource favorite deleted successfully"""
     request.require_authenticated()
 
     if obj := Model.filter_by(id=id, user_id=request.user.id).first():

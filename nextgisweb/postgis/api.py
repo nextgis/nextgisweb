@@ -24,6 +24,9 @@ class SchemaObject(Struct, kw_only=True):
 
 
 def inspect_connection(request) -> AsJSON[list[SchemaObject]]:
+    """Inspect PostGIS connection
+
+    :returns: Inspection results for the resource"""
     request.resource_permission(ConnectionScope.connect)
 
     connection = request.context
@@ -62,6 +65,9 @@ class ColumnObject(Struct, kw_only=True):
 
 
 def inspect_table(request) -> AsJSON[list[ColumnObject]]:
+    """Inspect PostGIS table
+
+    :returns: Inspection results for the specified table"""
     request.resource_permission(ConnectionScope.connect)
 
     connection = request.context
@@ -135,6 +141,9 @@ class CheckResponse(Struct, kw_only=True):
 
 
 def diagnostics(request, *, body: CheckBody) -> CheckResponse:
+    """Run PostGIS diagnostics
+
+    :returns: PostGIS connection check result"""
     # Don't allow this for guest due to security reasons.
     request.require_authenticated()
 

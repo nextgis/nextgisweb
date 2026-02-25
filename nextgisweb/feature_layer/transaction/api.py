@@ -65,7 +65,9 @@ class TransactionCreatedResponse(Struct, kw_only=True):
 
 
 def cpost(resource, request, *, body: TransactionCreateBody) -> TransactionCreatedResponse:
-    """Start new transaction"""
+    """Start new transaction
+
+    :returns: New transaction details including the transaction ID"""
 
     request.resource_permission(DataScope.write)
 
@@ -103,7 +105,9 @@ if not TYPE_CHECKING:
 
 
 def iget(txn: Transaction, request) -> AsJSON[list[tuple[SeqNum, ResultType]]]:
-    """Read transaction results"""
+    """Read transaction results
+
+    :returns: Transaction results and status"""
 
     TransactionNotCommitted.disprove(txn)
     return list(txn.read_results())
@@ -116,14 +120,18 @@ def iput(txn: Transaction, request, *, body: AsJSON[list[OperationItem]]) -> AsJ
     """Update transaction operations
 
     The API client is responsible for managing operation sequential numbers. Any
-    integer from the 0...2147483647 range is OK, and gaps are allowed."""
+    integer from the 0...2147483647 range is OK, and gaps are allowed.
+
+    :returns: Updated transaction state"""
 
     for item in body:
         txn.put_operation(*item, UNSET)
 
 
 def idelete(txn, request) -> AsJSON[None]:
-    """Dispose transaction"""
+    """Dispose transaction
+
+    :returns: Transaction disposed successfully"""
 
     DBSession.delete(txn)
     return None
@@ -147,7 +155,9 @@ class CommitSuccess(Struct, kw_only=True, tag="committed", tag_field="status"):
 
 
 def ipost(txn: Transaction, request) -> AsJSON[CommitErrors | CommitSuccess]:
-    """Commit transaction"""
+    """Commit transaction
+
+    :returns: Committed transaction results"""
 
     if txn.committed:
         return CommitSuccess(committed=txn.committed)

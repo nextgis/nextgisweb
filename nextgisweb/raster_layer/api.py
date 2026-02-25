@@ -118,7 +118,9 @@ def export(
 def cog_head(
     resource: RasterLayer, request
 ) -> Annotated[Response, ContentType("image/tiff; application=geotiff; profile=cloud-optimized")]:
-    """Cloud optimized GeoTIFF endpoint"""
+    """Cloud optimized GeoTIFF endpoint
+
+    :returns: COG file metadata headers"""
     request.resource_permission(DataScope.read)
 
     if not resource.cog:
@@ -138,7 +140,9 @@ def cog_get(
     StatusCode(206),
     ContentType("image/tiff; application=geotiff; profile=cloud-optimized"),
 ]:
-    """Cloud optimized GeoTIFF endpoint"""
+    """Cloud optimized GeoTIFF endpoint
+
+    :returns: Partial COG content for the requested byte range"""
 
     request.resource_permission(DataScope.read)
 
@@ -173,7 +177,9 @@ def cog_get(
 def download(
     resource: RasterLayer, request
 ) -> Annotated[FileResponse, ContentType("image/tiff; application=geotiff")]:
-    """Download raster in internal representation format"""
+    """Download raster in internal representation format
+
+    :returns: Raster file in GeoTIFF format"""
 
     request.resource_permission(DataScope.read)
 
@@ -188,7 +194,9 @@ def download(
 
 
 def pam_get(resource: RasterLayer, request) -> XMLType:
-    """GDAL Persistent Auxiliary Metadata (PAM)"""
+    """GDAL Persistent Auxiliary Metadata (PAM)
+
+    :returns: GDAL PAM XML metadata for the COG resource"""
 
     request.resource_permission(DataScope.read)
 
@@ -201,7 +209,9 @@ def pam_get(resource: RasterLayer, request) -> XMLType:
 
 
 def pam_head(resource: RasterLayer, request) -> Response:
-    """GDAL Persistent Auxiliary Metadata (PAM)"""
+    """GDAL Persistent Auxiliary Metadata (PAM)
+
+    :returns: PAM XML file metadata headers"""
 
     request.resource_permission(DataScope.read)
 

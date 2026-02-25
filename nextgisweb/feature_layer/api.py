@@ -290,7 +290,9 @@ def iget(
     *,
     dumper_params: Annotated[DumperParams, Query(spread=True)],
 ) -> JSONType:
-    """Read feature"""
+    """Read feature
+
+    :returns: Feature details including geometry and attributes"""
     request.resource_permission(DataScope.read)
 
     dumper = Dumper(resource, dumper_params)
@@ -314,7 +316,9 @@ def iput(
     *,
     loader_params: Annotated[LoaderParams, Query(spread=True)],
 ) -> FeatureChangeResult:
-    """Update feature"""
+    """Update feature
+
+    :returns: Updated feature"""
     request.resource_permission(DataScope.write)
 
     query = resource.feature_query()
@@ -336,7 +340,9 @@ def iput(
 
 
 def idelete(resource, request, fid: FeatureID) -> FeatureChangeResult:
-    """Delete feature"""
+    """Delete feature
+
+    :returns: Feature deleted successfully"""
     request.resource_permission(DataScope.write)
 
     with versioning(resource, request) as vobj:
@@ -357,7 +363,9 @@ def get_box_bounds(resource, feature_id, srs_id):
 
 
 def geometry_info(resource, request, fid: FeatureID) -> JSONType:
-    """Read feature geometry properties"""
+    """Read feature geometry properties
+
+    :returns: Geometry properties including type, area, and length"""
     request.resource_permission(DataScope.read)
 
     query = resource.feature_query()
@@ -470,7 +478,9 @@ def cget(
     offset: Annotated[int, Meta(ge=0)] = 0,
     filter: Annotated[str | None, Meta(description="Filter expression (JSON string)")] = None,
 ) -> JSONType:
-    """Read features"""
+    """Read features
+
+    :returns: List of features"""
     request.resource_permission(DataScope.read)
 
     dumper = Dumper(resource, dumper_params)
@@ -505,7 +515,9 @@ def cpost(
     *,
     loader_params: Annotated[LoaderParams, Query(spread=True)],
 ) -> FeatureChangeResult:
-    """Create feature"""
+    """Create feature
+
+    :returns: Created feature"""
     request.resource_permission(DataScope.write)
 
     loader = Loader(resource, loader_params)
@@ -526,7 +538,9 @@ def cpatch(
     *,
     loader_params: Annotated[LoaderParams, Query(spread=True)],
 ) -> AsJSON[list[FeatureChangeResult]]:
-    """Update features"""
+    """Update features
+
+    :returns: Updated features"""
     request.resource_permission(DataScope.write)
 
     loader = Loader(resource, loader_params)
@@ -564,7 +578,9 @@ def cpatch(
 
 
 def cdelete(resource, request) -> JSONType:
-    """Delete features"""
+    """Delete features
+
+    :returns: Features deleted successfully"""
     request.resource_permission(DataScope.write)
 
     with versioning(resource, request):
@@ -610,6 +626,9 @@ def count(
     *,
     filter: Annotated[str | None, Meta(description="Filter expression (JSON string)")] = None,
 ) -> CountResponse:
+    """Count features
+
+    :returns: Total count of features in the resource"""
     request.resource_permission(DataScope.read)
 
     query = resource.feature_query()
@@ -639,7 +658,9 @@ class FeatureItemExtent(Struct, kw_only=True):
 
 
 def iextent(resource, request, fid: FeatureID) -> FeatureItemExtent:
-    """Get feature extent"""
+    """Get feature extent
+
+    :returns: Bounding box of the feature geometry"""
     request.resource_permission(DataScope.read)
     if bounds := get_box_bounds(resource, fid, 4326):
         minLon, minLat, maxLon, maxLat = bounds
@@ -650,7 +671,9 @@ def iextent(resource, request, fid: FeatureID) -> FeatureItemExtent:
 
 
 def cextent(resource, request) -> NgwExtent:
-    """Get extent of features"""
+    """Get extent of features
+
+    :returns: Bounding box of all features in the resource"""
     request.resource_permission(DataScope.read)
 
     query = resource.feature_query()

@@ -22,6 +22,9 @@ class InspectResponse(Struct, kw_only=True):
 
 
 def inspect_connection(resource, request) -> InspectResponse:
+    """Inspect WFS client connection
+
+    :returns: WFS client service inspection result"""
     request.resource_permission(ConnectionScope.connect)
 
     return resource.get_capabilities()
@@ -37,6 +40,9 @@ class InspectLayerResponse(Struct, kw_only=True):
 
 
 def inspect_layer(resource, request) -> InspectLayerResponse:
+    """Inspect WFS client layer
+
+    :returns: WFS client layer inspection result"""
     request.resource_permission(ConnectionScope.connect)
 
     layer_name = request.matchdict["layer"]

@@ -50,7 +50,9 @@ def mvt(
     Annotated[None, ContentType("application/vnd.mapbox-vector-tile")],
     Annotated[None, StatusCode(204)],
 ]:
-    """Get MVT tile for one or more resources"""
+    """Get MVT tile for one or more resources
+
+    :returns: Mapbox Vector Tile binary data"""
     if not MVT_DRIVER_EXIST:
         return HTTPNotFound(explanation="MVT GDAL driver not found")
 

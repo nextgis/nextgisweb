@@ -95,12 +95,16 @@ def deserialize(obj, data: SRSCreate, *, create: bool):
 
 
 def cget(request) -> AsJSON[list[SRSRead]]:
-    """Read spatial reference systems"""
+    """Read spatial reference systems
+
+    :returns: List of spatial reference systems"""
     return [serialize(obj) for obj in SRS.query()]
 
 
 def cpost(request, *, body: SRSCreate) -> Annotated[SRSRef, StatusCode(201)]:
-    """Create spatial reference system"""
+    """Create spatial reference system
+
+    :returns: Created spatial reference system"""
     request.user.require_permission(SRS.permissions.manage)
 
     obj = SRS().persist()
@@ -112,12 +116,16 @@ def cpost(request, *, body: SRSCreate) -> Annotated[SRSRef, StatusCode(201)]:
 
 
 def iget(srs, request) -> SRSRead:
-    """Read spatial reference system"""
+    """Read spatial reference system
+
+    :returns: Spatial reference system details"""
     return serialize(srs)
 
 
 def iput(srs, request, *, body: SRSUpdate) -> SRSRef:
-    """Update spatial reference system"""
+    """Update spatial reference system
+
+    :returns: Updated spatial reference system"""
     request.user.require_permission(SRS.permissions.manage)
 
     deserialize(srs, body, create=False)
@@ -125,7 +133,9 @@ def iput(srs, request, *, body: SRSUpdate) -> SRSRef:
 
 
 def idelete(srs, request) -> EmptyObject:
-    """Delete spatial reference system"""
+    """Delete spatial reference system
+
+    :returns: Spatial reference system deleted successfully"""
     request.user.require_permission(SRS.permissions.manage)
 
     if srs.system:
@@ -145,7 +155,9 @@ class ConvertResponse(Struct, kw_only=True):
 
 
 def convert(request, *, body: ConvertBody) -> ConvertResponse:
-    """Convert SRS definition into OGC WKT format"""
+    """Convert SRS definition into OGC WKT format
+
+    :returns: SRS definition in OGC WKT format"""
     wkt = convert_to_wkt(body.projStr, body.format, pretty=True)
     if not wkt:
         raise ValidationError(gettext("Invalid SRS definition!"))
@@ -163,7 +175,9 @@ class GeomTransformResponse(Struct, kw_only=True):
 
 
 def geom_transform(srs_to, request, *, body: GeomTransformBody) -> GeomTransformResponse:
-    """Transform geometry from one SRS to another"""
+    """Transform geometry from one SRS to another
+
+    :returns: Geometry reprojected into the target SRS"""
     srs_from = SRS.filter_by(id=body.srs).one()
     geom = Geometry.from_wkt(body.geom)
 
@@ -189,7 +203,9 @@ def geom_transform_batch(
     *,
     body: GeomTransformBatchBody,
 ) -> AsJSON[list[GeomTransformBatchResponse]]:
-    """Reproject geometry to multiple SRS"""
+    """Reproject geometry to multiple SRS
+
+    :returns: Geometry reprojected to the requested SRS"""
     srs_from = SRS.filter_by(id=body.srs_from).one()
     srs_to = SRS.filter(SRS.id.in_([int(s) for s in body.srs_to]))
 
@@ -251,7 +267,9 @@ def geom_length_post(
     *,
     body: GeometryPropertyBody,
 ) -> GeometryPropertyResponse:
-    """Calculate geometry length on SRS"""
+    """Calculate geometry length on SRS
+
+    :returns: Calculated length value in the SRS units"""
     return geom_calc(srs, body, geom_length)
 
 
@@ -261,7 +279,9 @@ def geom_area_post(
     *,
     body: GeometryPropertyBody,
 ) -> GeometryPropertyResponse:
-    """Calculate geometry area on SRS"""
+    """Calculate geometry area on SRS
+
+    :returns: Calculated area value in the SRS units"""
     return geom_calc(srs, body, geom_area)
 
 
@@ -293,7 +313,9 @@ def catalog_collection(
     lat: QueryLat = None,
     lon: QueryLon = None,
 ) -> AsJSON[list[SRSCatalogRecord]]:
-    """Search SRS in catalog"""
+    """Search SRS in catalog
+
+    :returns: List of matching spatial reference systems from the catalog"""
     request.require_administrator()
     require_catalog_configured()
 
@@ -329,7 +351,9 @@ def catalog_collection(
 
 
 def catalog_item(request, id: Annotated[CatalogID, CatalogIDMeta]) -> SRSCatalogItem:
-    """Read SRS from catalog"""
+    """Read SRS from catalog
+
+    :returns: Spatial reference system details from the catalog"""
     request.require_administrator()
     require_catalog_configured()
 
@@ -346,7 +370,9 @@ class SRSCatalogImportResponse(Struct, kw_only=True):
 
 
 def catalog_import(request, *, body: SRSCatalogImportBody) -> SRSCatalogImportResponse:
-    """Import SRS from catalog"""
+    """Import SRS from catalog
+
+    :returns: Imported spatial reference system"""
     request.require_administrator()
     require_catalog_configured()
 

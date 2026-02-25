@@ -85,7 +85,9 @@ class Blueprint(Struct):
 
 
 def blueprint(request) -> Blueprint:
-    """Read schema for resources, scopes, and categories"""
+    """Read schema for resources, scopes, and categories
+
+    :returns: Resource blueprint including schema, scopes, and categories"""
     tr = request.translate
     return Blueprint(
         resources={
@@ -145,7 +147,9 @@ else:
 
 
 def item_get(context, request) -> CompositeRead:
-    """Read resource"""
+    """Read resource
+
+    :returns: Resource details"""
     request.resource_permission(ResourceScope.read)
 
     serializer = CompositeSerializer(user=request.user)
@@ -153,7 +157,9 @@ def item_get(context, request) -> CompositeRead:
 
 
 def item_put(context, request, body: CompositeUpdate) -> EmptyObject:
-    """Update resource"""
+    """Update resource
+
+    :returns: Updated resource details"""
     request.resource_permission(ResourceScope.read)
 
     serializer = CompositeSerializer(user=request.user)
@@ -164,7 +170,9 @@ def item_put(context, request, body: CompositeUpdate) -> EmptyObject:
 
 
 def item_delete(context, request) -> EmptyObject:
-    """Delete resource"""
+    """Delete resource
+
+    :returns: Resource deleted successfully"""
 
     def delete(obj):
         request.resource_permission(ResourceScope.delete, obj)
@@ -192,7 +200,9 @@ def collection_get(
     *,
     parent: int | None = None,
 ) -> AsJSON[list[CompositeRead]]:
-    """Read children resources"""
+    """Read children resources
+
+    :returns: List of child resources"""
     query = (
         Resource.query()
         .filter_by(parent_id=parent)
@@ -216,7 +226,9 @@ def collection_get(
 def collection_post(
     request, body: CompositeCreate
 ) -> Annotated[ResourceRefWithParent, StatusCode(201)]:
-    """Create resource"""
+    """Create resource
+
+    :returns: Created resource"""
 
     request.env.core.check_storage_limit()
 
@@ -327,7 +339,9 @@ def _delete_multiple(request, resource_ids, partial, *, dry_run):
 
 
 def delete_get(request, *, resources: DeleteResources) -> ResourceDeleteGetResponse:
-    """Simulate deletion of multiple resources"""
+    """Simulate deletion of multiple resources
+
+    :returns: Dry-run result showing which resources would be deleted"""
     return _delete_multiple(request, resources, True, dry_run=True)
 
 
@@ -340,7 +354,9 @@ def delete_post(
         Meta(description="Skip non-deletable resources"),
     ] = False,
 ) -> EmptyObject:
-    """Delete multiple resources"""
+    """Delete multiple resources
+
+    :returns: Deletion result for each requested resource"""
 
     with DBSession.no_autoflush:
         _delete_multiple(request, resources, partial, dry_run=False)
@@ -384,7 +400,9 @@ def permission(
     *,
     user: UserID | None = None,
 ) -> EffectivePermissions:
-    """Get resource effective permissions"""
+    """Get resource effective permissions
+
+    :returns: Effective permission set for the current user on this resource"""
     request.resource_permission(ResourceScope.read)
 
     user_obj = User.filter_by(id=user).one() if (user is not None) else request.user
@@ -403,7 +421,9 @@ def permission(
 
 
 def permission_explain(request) -> JSONType:
-    """Explain effective resource permissions"""
+    """Explain effective resource permissions
+
+    :returns: Detailed explanation of how effective permissions are derived"""
     request.resource_permission(ResourceScope.read)
 
     req_scope = request.params.get("scope")
@@ -793,7 +813,9 @@ def search(
     attrs: Annotated[SearchAttrParams, Query(spread=True)],
     resmeta: Annotated[SearchResmetaParams, Query(spread=True)],
 ) -> AsJSON[list[CompositeRead]]:
-    """Search resources"""
+    """Search resources
+
+    :returns: List of resources matching the search criteria"""
 
     query = root.query()
     query = query.where(*attrs.filters(), *resmeta.filters(Resource.id))
@@ -819,7 +841,9 @@ def resource_volume(
     *,
     recursive: Annotated[bool, Meta(description="Include children resources")] = True,
 ) -> ResourceVolume:
-    """Get resource data volume"""
+    """Get resource data volume
+
+    :returns: Resource data volume in bytes"""
     require_storage_enabled()
 
     def _traverse(res):
@@ -868,7 +892,9 @@ def quota_check(
     Annotated[QuotaCheckSuccess, StatusCode.OK],
     Annotated[QuotaCheckFailure, StatusCode(cast(int, QuotaExceeded.http_status_code))],
 ]:
-    """Check for resource quota"""
+    """Check for resource quota
+
+    :returns: Quota check passed"""
     try:
         request.env.resource.quota_check(body)
     except QuotaExceeded as exc:
@@ -912,6 +938,9 @@ def widget(
     cls: ResourceCls | None = None,
     parent: ResourceID | None = None,
 ) -> AsJSON[CompositeOperationCreate | CompositeOperationUpdate]:
+    """Get resource widget configuration
+
+    :returns: Resource widget configuration data"""
     if operation == "create":
         if id is not None or cls is None or parent is None:
             raise HTTPBadRequest()

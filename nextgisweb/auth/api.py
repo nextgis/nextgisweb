@@ -390,7 +390,9 @@ def user_iput(obj, request, *, body: UserUpdate) -> UserRef:
 
 
 def user_idelete(obj, request) -> EmptyObject:
-    """Delete user"""
+    """Delete user
+
+    :returns: User deleted successfully"""
     if obj.is_administrator:
         request.require_administrator()
     else:
@@ -500,7 +502,9 @@ def group_iput(obj, request, *, body: GroupUpdate) -> GroupRef:
 
 
 def group_idelete(obj, request) -> EmptyObject:
-    """Delete group"""
+    """Delete group
+
+    :returns: Group deleted successfully"""
     request.user.require_permission(permission_manage)
 
     check_principal_delete(obj)
@@ -527,7 +531,9 @@ def profile_get(request) -> ProfileRead:
 
 
 def profile_put(request, body: ProfileUpdate) -> EmptyObject:
-    """Update profile of the current user"""
+    """Update profile of the current user
+
+    :returns: Updated user profile"""
     if request.user.keyname == "guest":
         raise HTTPUnauthorized()
 
@@ -591,7 +597,9 @@ def login(request) -> LoginResponse:
     """Log in into session
 
     Parameters `login` and `password` can be passed in a JSON encoded body or as
-    POST parameters (`application/x-www-form-urlencoded`)."""
+    POST parameters (`application/x-www-form-urlencoded`).
+
+    :returns: Session created, returns user info and session token"""
     if len(request.POST) > 0:
         login = request.POST.get("login")
         password = request.POST.get("password")
@@ -620,13 +628,17 @@ def login(request) -> LoginResponse:
 
 
 def logout(request) -> EmptyObject:
-    """Log out and close session"""
+    """Log out and close session
+
+    :returns: Session closed successfully"""
     headers = forget(request)
     request.response.headerlist.extend(headers)
 
 
 def permission(request) -> AsJSON[dict[PermissionItem, str]]:
-    """Read user permission schema"""
+    """Read user permission schema
+
+    :returns: List of user permission entries"""
     tr = request.translate
     return {k: tr(v.label) for k, v in Permission.registry.items()}
 

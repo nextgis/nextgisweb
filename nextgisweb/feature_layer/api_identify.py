@@ -17,7 +17,9 @@ class IdentifyBody(Struct, kw_only=True):
 
 
 def identify(request, *, body: IdentifyBody) -> JSONType:
-    """Find features intersecting geometry"""
+    """Find features intersecting geometry
+
+    :returns: Features intersecting the specified geometry"""
 
     try:
         geom = Geometry.from_wkt(body.geom, srid=body.srs)
