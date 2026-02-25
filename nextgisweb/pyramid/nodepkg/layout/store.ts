@@ -84,3 +84,10 @@ if (settings["help_page_url"]) {
     title: gettext("Help"),
   });
 }
+
+if (!ngwConfig.isGuest) {
+  layoutStore.addMenuItem({
+    href: routeURL("pyramid.swagger"),
+    title: gettext("OpenAPI documentation"),
+  });
+}

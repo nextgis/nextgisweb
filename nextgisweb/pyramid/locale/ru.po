@@ -175,7 +175,7 @@ msgstr "Длительный запрос был отменен."
 
 #: nodepkg/api/error.ts:85
 msgid "Long-running request timeout."
-msgstr ""
+msgstr "Тайм-аут длительного запроса."
 
 #: nodepkg/backup-browse/BackupBrowse.tsx:23
 msgid "Filename"
@@ -311,6 +311,10 @@ msgstr "Панель управления"
 #: nodepkg/layout/store.ts:84
 msgid "Help"
 msgstr "Справка"
+
+#: nodepkg/layout/store.ts:91 view.py:191
+msgid "OpenAPI documentation"
+msgstr "Документация OpenAPI"
 
 #: nodepkg/logo-form/LogoForm.tsx:5
 msgid "We recommend height of 45 px and width of up to 200 px."
@@ -576,10 +580,6 @@ msgstr "Некорректное JSON тело"
 #: tomb/exception.py:8
 msgid "The JSON body of the request is malformed or invalid."
 msgstr "JSON тело запроса имеет некорректный или недопустимый формат."
-
-#: view.py:191
-msgid "HTTP API documentation"
-msgstr "Документация HTTP API"
 
 #: view.py:257 view.py:755
 msgid "System information"

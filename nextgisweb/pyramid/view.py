@@ -188,7 +188,7 @@ def openapi_json_test(request) -> JSONType:
 @react_renderer("@nextgisweb/pyramid/swagger-ui")
 def swagger(request):
     return dict(
-        title=gettext("HTTP API documentation"),
+        title=gettext("OpenAPI documentation"),
         props=dict(url=request.route_url("pyramid.openapi_json")),
     )
 
