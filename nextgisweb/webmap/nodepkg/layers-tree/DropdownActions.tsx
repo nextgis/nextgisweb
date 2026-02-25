@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { Divider, Dropdown } from "@nextgisweb/gui/antd";
 import type { MenuProps } from "@nextgisweb/gui/antd";
@@ -21,94 +21,14 @@ interface DropdownActionsProps {
     setUpdate: (update: boolean) => void;
 }
 
+interface DropdownPluginsProps {
+    menuItems: MenuProps["items"];
+    customMenuItems: React.ReactElement[];
+    onOpenChange?: () => void;
+}
+
 const DropdownPlugins = observer(
-    ({ update, nodeData, setMoreClickId, setUpdate }: DropdownActionsProps) => {
-        const { display } = useDisplayContext();
-        const [menuItems, setMenuItems] = useState<MenuProps["items"]>([]);
-        const [isLoading, setIsLoading] = useState(true);
-        const [customMenuItems, setCustomMenuItems] = useState<
-            React.ReactElement[]
-        >([]);
-
-        useEffect(() => {
-            let canceled = false;
-            const startup = async () => {
-                if (nodeData.isLayer()) {
-                    try {
-                        const plugins = await display.installPlugins(
-                            Object.keys(nodeData.plugin)
-                        );
-                        if (canceled) return;
-
-                        const newMenuItems: MenuProps["items"] = [];
-                        const newCustomMenuItems: React.ReactElement[] = [];
-
-                        for (const keyPlugin in plugins) {
-                            const plugin = plugins[keyPlugin];
-                            if (!plugin || !plugin.getPluginState) {
-                                continue;
-                            }
-                            const { render } = plugin;
-                            const pluginInfo = plugin.getPluginState(nodeData);
-                            if (pluginInfo.enabled) {
-                                if (plugin.getMenuItem) {
-                                    const { icon, title, onClick } =
-                                        plugin.getMenuItem(nodeData);
-                                    const onClick_ = async () => {
-                                        if (plugin) {
-                                            if (onClick) {
-                                                onClick();
-                                            } else if (plugin.run) {
-                                                const result =
-                                                    await plugin.run(nodeData);
-                                                if (result !== undefined) {
-                                                    setUpdate(!update);
-                                                }
-                                            }
-                                        }
-                                        setMoreClickId(undefined);
-                                    };
-
-                                    newMenuItems.push({
-                                        key: keyPlugin,
-                                        onClick: onClick_,
-                                        icon:
-                                            typeof icon === "string" ? (
-                                                <SvgIcon
-                                                    className="icon"
-                                                    icon={icon}
-                                                    fill="currentColor"
-                                                />
-                                            ) : (
-                                                icon
-                                            ),
-                                        label: title,
-                                    });
-                                } else if (render) {
-                                    const RenderedPlugin = () =>
-                                        render.call(plugin, pluginInfo);
-                                    newCustomMenuItems.push(
-                                        <RenderedPlugin key={keyPlugin} />
-                                    );
-                                }
-                            }
-                        }
-
-                        setMenuItems(newMenuItems);
-                        setCustomMenuItems(newCustomMenuItems);
-                    } finally {
-                        setIsLoading(false);
-                    }
-                }
-            };
-
-            startup();
-
-            return () => {
-                canceled = true;
-            };
-        }, [update, display, nodeData, setMoreClickId, setUpdate]);
-
+    ({ customMenuItems, menuItems, onOpenChange }: DropdownPluginsProps) => {
         return (
             <Dropdown
                 menu={{
@@ -117,9 +37,7 @@ const DropdownPlugins = observer(
                         domEvent.stopPropagation();
                     },
                 }}
-                onOpenChange={() => {
-                    setMoreClickId(undefined);
-                }}
+                onOpenChange={onOpenChange}
                 trigger={["click"]}
                 destroyOnHidden
                 open
@@ -131,23 +49,17 @@ const DropdownPlugins = observer(
                             e.stopPropagation();
                         }}
                     >
-                        {isLoading ? (
-                            <CentralLoading
-                                style={{ width: "36px", height: "36px" }}
-                            />
-                        ) : (
-                            <>
-                                {menu}
-                                {!!customMenuItems.length && (
-                                    <>
-                                        <Divider style={{ margin: 0 }} />
-                                        <div className="ant-dropdown-menu">
-                                            {customMenuItems}
-                                        </div>
-                                    </>
-                                )}
-                            </>
-                        )}
+                        <>
+                            {menu}
+                            {!!customMenuItems.length && (
+                                <>
+                                    <Divider style={{ margin: 0 }} />
+                                    <div className="ant-dropdown-menu">
+                                        {customMenuItems}
+                                    </div>
+                                </>
+                            )}
+                        </>
                     </div>
                 )}
             >
@@ -168,11 +80,104 @@ const DropdownPlugins = observer(
 DropdownPlugins.displayName = "DropdownPlugins";
 
 export function DropdownActions(props: DropdownActionsProps) {
-    const { nodeData, moreClickId, setMoreClickId } = props;
+    const { nodeData, moreClickId, setMoreClickId, update, setUpdate } = props;
     const { id, type } = nodeData;
+    const { display } = useDisplayContext();
+
+    const [menuItems, setMenuItems] = useState<MenuProps["items"]>([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [customMenuItems, setCustomMenuItems] = useState<
+        React.ReactElement[]
+    >([]);
+
+    const canceledRef = useRef(false);
+
+    const isLoadingRef = useRef(false);
+
+    useEffect(() => {
+        canceledRef.current = false;
+        return () => {
+            canceledRef.current = true;
+        };
+    }, []);
+
+    const startup = useCallback(async () => {
+        if (!nodeData.isLayer() || isLoadingRef.current) return;
+        isLoadingRef.current = true;
+
+        try {
+            setIsLoading(true);
+            const plugins = await display.installPlugins(
+                Object.keys(nodeData.plugin)
+            );
+            if (canceledRef.current) return;
+
+            const newMenuItems: MenuProps["items"] = [];
+            const newCustomMenuItems: React.ReactElement[] = [];
+
+            for (const keyPlugin in plugins) {
+                const plugin = plugins[keyPlugin];
+                if (!plugin || !plugin.getPluginState) {
+                    continue;
+                }
+                const { render } = plugin;
+                const pluginInfo = plugin.getPluginState(nodeData);
+                if (pluginInfo.enabled) {
+                    if (plugin.getMenuItem) {
+                        const { icon, title, onClick } =
+                            plugin.getMenuItem(nodeData);
+                        const onClick_ = async () => {
+                            if (plugin) {
+                                if (onClick) {
+                                    onClick();
+                                } else if (plugin.run) {
+                                    const result = await plugin.run(nodeData);
+                                    if (result !== undefined) {
+                                        setUpdate(!update);
+                                    }
+                                }
+                            }
+                            setMoreClickId(undefined);
+                        };
+
+                        newMenuItems.push({
+                            key: keyPlugin,
+                            onClick: onClick_,
+                            icon:
+                                typeof icon === "string" ? (
+                                    <SvgIcon
+                                        className="icon"
+                                        icon={icon}
+                                        fill="currentColor"
+                                    />
+                                ) : (
+                                    icon
+                                ),
+                            label: title,
+                        });
+                    } else if (render) {
+                        const RenderedPlugin = () =>
+                            render.call(plugin, pluginInfo);
+                        newCustomMenuItems.push(
+                            <RenderedPlugin key={keyPlugin} />
+                        );
+                    }
+                }
+            }
+
+            setMenuItems(newMenuItems);
+            setCustomMenuItems(newCustomMenuItems);
+            setMoreClickId(id);
+        } finally {
+            isLoadingRef.current = false;
+            setIsLoading(false);
+        }
+    }, [display, id, nodeData, setMoreClickId, setUpdate, update]);
+
     if (type === "group") {
         return <></>;
     }
+
     if (moreClickId === undefined || moreClickId !== id) {
         return (
             <span
@@ -180,12 +185,21 @@ export function DropdownActions(props: DropdownActionsProps) {
                 onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    setMoreClickId(id);
+                    startup();
                 }}
             >
-                <MoreVertIcon />
+                {isLoading ? <CentralLoading /> : <MoreVertIcon />}
             </span>
         );
     }
-    return <DropdownPlugins {...props} />;
+
+    return (
+        <DropdownPlugins
+            onOpenChange={() => {
+                setMoreClickId(undefined);
+            }}
+            menuItems={menuItems}
+            customMenuItems={customMenuItems}
+        />
+    );
 }
