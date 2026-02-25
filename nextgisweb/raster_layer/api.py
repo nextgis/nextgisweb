@@ -68,6 +68,9 @@ def export(
     *,
     export_params: Annotated[ExportParams, Query(spread=True)],
 ) -> ExportResponse:  # type: ignore
+    """Export raster layer
+
+    :returns: Raster layer exported in the requested format"""
     request.resource_permission(DataScope.read)
 
     srs = (

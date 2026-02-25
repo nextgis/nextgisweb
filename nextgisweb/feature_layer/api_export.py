@@ -385,7 +385,9 @@ GEOJSON_DRIVER = EXPORT_FORMAT_OGR["GeoJSON"]
 
 
 def view_geojson_get(resource, request) -> Annotated[Response, ContentType(GEOJSON_DRIVER.mime)]:
-    """Export feature layer in GeoJSON format"""
+    """Export feature layer in GeoJSON format
+
+    :returns: Feature layer data in GeoJSON format"""
     request.resource_permission(DataScope.read)
 
     options = ExportOptions(driver=GEOJSON_DRIVER)

@@ -1,7 +1,10 @@
+from typing import Annotated
+
 from pyramid.response import FileResponse
 from sqlalchemy.exc import NoResultFound
 
 from nextgisweb.env import gettext
+from nextgisweb.lib.apitype import ContentType
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.resource import DataScope
@@ -9,7 +12,13 @@ from nextgisweb.resource import DataScope
 from .model import RasterMosaic, RasterMosaicItem
 
 
-def export(resource, request):
+def export(
+    resource,
+    request,
+) -> Annotated[FileResponse, ContentType("image/tiff; application=geotiff")]:
+    """Export raster mosaic item
+
+    :returns: Raster mosaic item exported as a GeoTIFF file"""
     request.resource_permission(DataScope.read)
 
     item_id = request.GET.get("item_id")

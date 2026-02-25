@@ -17,7 +17,9 @@ def file_download(
     request,
     name: Annotated[str, Meta(description="Marker name")],
 ) -> Annotated[Response, ContentType("image/svg+xml")]:
-    """Download marker SVG file"""
+    """Download marker SVG file
+
+    :returns: SVG marker file content"""
     request.resource_permission(ResourceScope.read)
 
     if (svg_marker := resource.find_svg_marker(name)) is None:
@@ -26,7 +28,9 @@ def file_download(
 
 
 def export(resource, request) -> Annotated[Response, ContentType("application/zip")]:
-    """Export library as ZIP archive"""
+    """Export library as ZIP archive
+
+    :returns: ZIP archive containing SVG marker library files"""
     request.resource_permission(ResourceScope.read)
 
     zip_stream = zipstream.ZipFile(mode="w", compression=zipstream.ZIP_DEFLATED, allowZip64=True)

@@ -13,7 +13,9 @@ def export(
     resource: Tileset,
     request,
 ) -> Annotated[Response, ContentType("application/vnd.sqlite3")]:
-    """Export tileset in internal representation format"""
+    """Export tileset in internal representation format
+
+    :returns: Tileset exported as an SQLite database"""
     request.resource_permission(DataScope.read)
 
     response = FileResponse(
