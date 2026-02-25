@@ -77,10 +77,8 @@ def openapi(introspector, prefix="/api/", *, comp: PyramidComponent):
 
     info = doc["info"] = dict()
     distr = comp.env.options.with_prefix("distribution")
-    if distr_description := distr.get("description"):
-        info["title"] = distr_description
-    if distr_version := distr.get("version"):
-        info["version"] = distr_version
+    info["title"] = distr.get("description", "NextGIS Web")
+    info["version"] = distr.get("version", "0.0.0.dev0")
 
     paths = doc["paths"] = defaultdict(dict)
     components = doc["components"] = dict()
