@@ -6,7 +6,7 @@ msgstr "Невалидная геометрия"
 msgid "Unknown spatial reference system"
 msgstr "Неизвестная система координат"
 
-#: api.py:459 api_export.py:211
+#: api.py:459 api_export.py:215
 msgid "Parameter 'intersects' geometry is not valid."
 msgstr "Параметр 'intersects' содержит невалидную геометрию."
 
@@ -15,18 +15,22 @@ msgid "Couldn't add FID field '{}'. Such field already exists."
 msgstr "Не удалось добавить поле FID '{}'. Такое поле уже существует."
 
 #: api_export.py:254
+msgid "The selected format does not support {} geometry type."
+msgstr "Выбранный формат не поддерживает тип геометрии {}."
+
+#: api_export.py:267
 msgid "The export limit is set to {limit} features, but the layer contains {count}."
 msgstr "Лимит экспорта составляет {limit} объектов, однако слой содержит {count}."
 
-#: api_export.py:267
+#: api_export.py:280
 msgid "Failed to reproject 'intersects' geometry."
 msgstr "Не удалось перепроецировать геометрию 'intersects'."
 
-#: api_export.py:278
+#: api_export.py:291
 msgid "Filter expressions are not supported."
 msgstr "Выражения фильтра не поддерживаются."
 
-#: api_export.py:440
+#: api_export.py:453
 msgid "File name parameter '{}' is not valid."
 msgstr "Недопустимое имя файла '{}'."
 

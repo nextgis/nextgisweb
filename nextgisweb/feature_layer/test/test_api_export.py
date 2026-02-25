@@ -199,6 +199,6 @@ def test_export_multi(driver_label, resources, ngw_webtest_app: WebTestApp):
             assert layer is not None
             assert layer.GetFeatureCount() == 1
 
-            if driver_label != "DXF":
+            if driver_label not in ("DXF", "GPX"):
                 f = layer.GetNextFeature()
                 assert f["fid"] == name

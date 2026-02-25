@@ -186,11 +186,15 @@ class ExportParams(Struct, kw_only=True):
         if driver.options is not None:
             opts.lco.extend(driver.options)
 
-        # KML should be created as WGS84
-        if driver.name == "LIBKML":
+        # KML and GPX should be created as WGS84
+        if driver.name in ("GPX", "LIBKML"):
             opts.srs = SRS.filter_by(id=4326).one()
         elif self.srs is not UNSET:
             opts.srs = SRS.filter_by(id=self.srs).one()
+
+        # GPX: Enable extensions to preserve all attributes
+        if driver.name == "GPX":
+            opts.dsco.append("GPX_USE_EXTENSIONS=YES")
 
         if self.fid is not UNSET and self.fid != "":
             opts.fid_field = self.fid
@@ -242,6 +246,15 @@ def export(resource: IFeatureLayer, options: ExportOptions, filepath: str):
     field_map = get_field_map(options.fields, resource.fields, options.use_display_name)
 
     options = options.for_fields([alias for alias, _ in field_map])
+
+    # Validate geometry type compatibility with export format
+    if options.driver.geometry_types is not None:
+        if resource.geometry_type not in options.driver.geometry_types:
+            raise ValidationError(
+                message=gettext("The selected format does not support {} geometry type.").format(
+                    resource.geometry_type
+                )
+            )
 
     query = resource.feature_query()
 
