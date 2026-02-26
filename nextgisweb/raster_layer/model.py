@@ -38,7 +38,7 @@ from nextgisweb.resource import (
 )
 
 from .kind_of_data import RasterLayerData
-from .util import band_color_interp, calc_overviews_levels, is_rgb, raster_size
+from .util import band_color_interp, calc_overviews_levels, get_predictor, is_rgb, raster_size
 
 Base.depends_on("resource")
 
@@ -256,9 +256,12 @@ class RasterLayer(Resource, SpatialLayerMixin):
         dst_file = str(comp.workdir_path(fobj, None, makedirs=True))
         self.fileobj = fobj
 
+        predictor = get_predictor(data_type)
+        use_jpeg_compression = is_rgb(ds)
+
         self.cog = cog
         if cog:
-            cmd_opts = (
+            cmd_opts = [
                 "-of",
                 "COG",
                 "-co",
@@ -266,8 +269,10 @@ class RasterLayer(Resource, SpatialLayerMixin):
                 "-co",
                 "RESAMPLING=NEAREST",
                 "-co",
-                f"OVERVIEW_COMPRESS={'JPEG' if is_rgb(ds) else 'DEFLATE'}",
-            )
+                f"OVERVIEW_COMPRESS={'JPEG' if use_jpeg_compression else 'DEFLATE'}",
+            ]
+            if not use_jpeg_compression and predictor is not None:
+                cmd_opts.extend(["-co", f"OVERVIEW_PREDICTOR={predictor}"])
         else:
             cmd_opts = (
                 "-of",
@@ -280,7 +285,11 @@ class RasterLayer(Resource, SpatialLayerMixin):
                 "BLOCKYSIZE=256",
             )
 
-        cmd.extend(("-co", "COMPRESS=DEFLATE", "-co", "BIGTIFF=YES", filename))
+        cmd.extend(("-co", "COMPRESS=DEFLATE", "-co", "BIGTIFF=YES"))
+        # Predictor for original resolution (both COG and non-COG)
+        if predictor is not None:
+            cmd.extend(("-co", f"PREDICTOR={predictor}"))
+        cmd.append(filename)
         cmd.extend(cmd_opts)
 
         subprocess.check_call(cmd + [dst_file])
@@ -355,6 +364,8 @@ class RasterLayer(Resource, SpatialLayerMixin):
         levels = list(map(str, calc_overviews_levels(ds)))
 
         use_jpeg_compression = is_rgb(ds)
+        data_type = ds.GetRasterBand(1).DataType
+        predictor = get_predictor(data_type)
 
         cmd = ["gdaladdo", "-q", "-clean", str(fn)]
 
@@ -392,6 +403,9 @@ class RasterLayer(Resource, SpatialLayerMixin):
             "BIGTIFF_OVERVIEW",
             "YES",
         ]
+
+        if not use_jpeg_compression and predictor is not None:
+            cmd.extend(["--config", "PREDICTOR_OVERVIEW", str(predictor)])
 
         # Use YCBCR photometric for 3-band RGB to align with COG driver behavior
         if use_jpeg_compression and band_count == 3:

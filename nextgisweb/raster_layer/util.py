@@ -41,3 +41,25 @@ def is_rgb(ds):
             return False
 
     return True
+
+
+def get_predictor(data_type):
+    if data_type in (gdal.GDT_Float32, gdal.GDT_Float64):
+        return 3
+
+    integer_types = [
+        gdal.GDT_Byte,
+        gdal.GDT_Int16,
+        gdal.GDT_UInt16,
+        gdal.GDT_Int32,
+        gdal.GDT_UInt32,
+    ]
+
+    # Only add 64-bit types if they exist (GDAL >= 3.5)
+    if hasattr(gdal, "GDT_Int64"):
+        integer_types.append(gdal.GDT_Int64)
+    if hasattr(gdal, "GDT_UInt64"):
+        integer_types.append(gdal.GDT_UInt64)
+
+    if data_type in integer_types:
+        return 2
