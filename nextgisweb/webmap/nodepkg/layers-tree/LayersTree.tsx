@@ -20,7 +20,7 @@ import "./LayersTree.less";
 
 type TreeNodeData = NonNullable<TreeProps["treeData"]>[0];
 
-export type TreeWebmapItem = TreeNodeData & {
+export type TreeWebmapItem = Omit<TreeNodeData, "icon"> & {
     key: number;
     children?: TreeWebmapItem[];
     treeItem: TreeItemStore;
@@ -134,10 +134,9 @@ export const LayersTree = observer(
                 if (treeItem.isLayer()) {
                     item.isLeaf = true;
 
-                    item.icon = <ItemIcon treeItem={treeItem} />;
-
                     item.title = (
                         <LayerTreeItemTitle
+                            icon={<ItemIcon treeItem={treeItem} />}
                             treeItem={treeItem}
                             checkable={checkable}
                             showLegend={showLegend}
@@ -238,7 +237,7 @@ export const LayersTree = observer(
                 motion={false}
                 checkable={checkable}
                 selectable={selectable}
-                showIcon
+                showIcon={false}
                 showLine={shouldShowLine}
                 onExpand={onExpand}
                 expandedKeys={expanded}

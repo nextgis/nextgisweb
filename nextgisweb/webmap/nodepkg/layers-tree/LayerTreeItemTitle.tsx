@@ -19,6 +19,7 @@ const msgOutOfScaleRange = gettext(
 );
 
 export interface LayerTreeItemTitleProps {
+    icon?: React.ReactNode;
     treeItem: TreeItemStore;
     checkable: boolean;
     showLegend: boolean;
@@ -28,6 +29,7 @@ export interface LayerTreeItemTitleProps {
 
 export const LayerTreeItemTitle = observer(
     ({
+        icon,
         treeItem,
         checkable,
         showLegend,
@@ -96,7 +98,8 @@ export const LayerTreeItemTitle = observer(
 
         return (
             <>
-                <Row wrap={false}>
+                <Row wrap={false} gutter={6}>
+                    {icon && <Col className="tree-item-title-icon">{icon}</Col>}
                     <Col
                         className={classNames("tree-item-title", {
                             "out-of-scale-range": isOutOfScaleRange,

@@ -81,22 +81,6 @@
             background-color: transparent;
         }
 
-        .ant-tree-iconEle.ant-tree-icon__customize {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            width: auto;
-            height: 28px;
-
-            &:empty {
-                display: none;
-            }
-
-            img {
-                display: block;
-            }
-        }
-
         .ant-tree-title {
             width: 100%;
             min-width: 0;
@@ -116,6 +100,24 @@
                 display: flex;
                 flex-direction: row;
                 justify-content: end;
+            }
+
+            .tree-item-title-icon {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+
+                width: 28px;
+                height: 28px;
+
+                &:empty {
+                    display: none;
+                }
+
+                img {
+                    display: block;
+                }
             }
 
             .more,
