@@ -2,19 +2,19 @@ import { route } from "@nextgisweb/pyramid/api";
 import type { ResourceAttrItem } from "@nextgisweb/resource/api/ResourceAttrItem";
 import { resources } from "@nextgisweb/resource/blueprint";
 
-import type { DefaultAttributes } from "../ResourceSectionChildren";
+import type { DefaultResourceSectionAttrs } from "../../type";
 import type { ChildrenResource } from "../type";
 
 export async function prepareResourceChildren({
-    items,
+    attrItems,
     signal,
 }: {
-    items: ResourceAttrItem<typeof DefaultAttributes>[];
+    attrItems: ResourceAttrItem<typeof DefaultResourceSectionAttrs>[];
     signal: AbortSignal;
 }) {
     const userNames = new Map<number, string | undefined>();
 
-    for (const it of items) {
+    for (const it of attrItems) {
         const userId = it.get("resource.owner_user");
         if (userId !== undefined) {
             userNames.set(userId.id, undefined);
@@ -33,15 +33,15 @@ export async function prepareResourceChildren({
     );
 
     const children: ChildrenResource[] = [];
-    for (const it of items) {
+    for (const it of attrItems) {
         const cls = it.get("resource.cls");
         const displayName = it.get("resource.display_name");
         const ownerUser = it.get("resource.owner_user");
         const creationDate = it.get("resource.creation_date");
 
         const item: ChildrenResource = {
-            id: it.id,
             cls,
+            resourceId: it.id,
             displayName,
             creationDate,
             clsDisplayName: resources[cls].label,

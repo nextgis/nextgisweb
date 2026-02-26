@@ -4,12 +4,14 @@ import { useEffect } from "react";
 import { Modal, Spin, useToken } from "@nextgisweb/gui/antd";
 import { useShowModal } from "@nextgisweb/gui/show-modal/useShowModal";
 import type { DynMenuItem } from "@nextgisweb/pyramid/layout/dynmenu/type";
+import type { CompositeWidgetOperation } from "@nextgisweb/resource/type/api";
 
 import { CBlock } from "../cblock";
 import { EntrypointSuspense } from "../component/EntrypointSuspense";
 
 import { Breadcrumbs } from "./Breadcrumbs";
 import type { BreadcrumbItem } from "./Breadcrumbs";
+import { Attrmenu } from "./attrmenu/Attrmenu";
 import { Dynmenu } from "./dynmenu/Dynmenu";
 import { Header } from "./header/Header";
 import { layoutStore } from "./store";
@@ -35,7 +37,9 @@ interface BaseProps {
     entrypoint: string;
     breadcrumbs: BreadcrumbItem[];
     dynMenuItems: DynMenuItem[];
-    entrypointProps: Record<string, any>;
+    entrypointProps: Record<string, unknown> & { resourceId?: number } & {
+        setup?: { operation: CompositeWidgetOperation; id: number };
+    };
     hideResourceFilter?: boolean;
 }
 
@@ -59,6 +63,9 @@ export function Base({
     });
 
     const { token } = useToken();
+
+    const resourceId =
+        entrypointProps?.resourceId ?? entrypointProps?.setup?.id;
 
     useEffect(() => {
         let meta = document.querySelector('meta[name="theme-color"]');
@@ -122,10 +129,17 @@ export function Base({
                         </div>
                     </div>
 
-                    {dynMenuItems && dynMenuItems.length > 0 && (
+                    {resourceId !== undefined ? (
                         <div className="ngw-pyramid-layout-sidebar">
-                            <Dynmenu items={dynMenuItems} />
+                            <Attrmenu resourceId={resourceId} />
                         </div>
+                    ) : (
+                        dynMenuItems &&
+                        dynMenuItems.length > 0 && (
+                            <div className="ngw-pyramid-layout-sidebar">
+                                <Dynmenu items={dynMenuItems} />
+                            </div>
+                        )
                     )}
                 </div>
             )}

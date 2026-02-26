@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { Tooltip } from "@nextgisweb/gui/antd";
+import { Space, Tooltip } from "@nextgisweb/gui/antd";
 import type { ButtonProps } from "@nextgisweb/gui/antd";
 
 export interface ActionBtnProps extends ButtonProps {
@@ -20,8 +20,10 @@ export function ActionBtn({
 }: ActionBtnProps) {
     const btn = (
         <a href={href} target={target} onClick={onClick}>
-            {icon}
-            {showLabel ? label : null}
+            <Space>
+                {icon}
+                {showLabel ? label : null}
+            </Space>
         </a>
     );
 

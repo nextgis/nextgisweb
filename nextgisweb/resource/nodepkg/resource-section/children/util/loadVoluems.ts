@@ -15,7 +15,7 @@ export async function loadVolumes({
     setState,
 }: LoadVoluemsParams) {
     setState({});
-    for (const { id } of items) {
+    for (const { resourceId: id } of items) {
         const v = await route("resource.volume", id).get<ResourceVolume>({
             signal,
         });

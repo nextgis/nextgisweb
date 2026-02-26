@@ -7,51 +7,53 @@ import {
 } from "@nextgisweb/resource/resource-section/registry";
 import { hasExportPermission } from "@nextgisweb/resource/util/hasExportPermission";
 
-import DownloadIcon from "@nextgisweb/icon/material/download";
-import TableIcon from "@nextgisweb/icon/material/table";
+import ExportIcon from "@nextgisweb/icon/material/download";
+import DownloadIcon from "@nextgisweb/icon/material/download_for_offline";
 
 declare module "@nextgisweb/resource/resource-section/registry" {
     interface ResourceActionGroupIdMap {
-        feature_layer: true;
+        raster_layer: true;
     }
 }
 
 registerResourceActionGroup({
-    key: "feature_layer",
-    label: gettext("Features"),
+    key: "raster_layer",
+    label: gettext("Raster layer"),
     order: 100,
 });
 
 registerResourceAction(COMP_ID, {
-    key: "table",
-    icon: <TableIcon />,
-    label: gettext("Table"),
-    order: 0,
-    group: "feature_layer",
-    important: true,
-    attributes: [
-        ["resource.interfaces"],
-        ["resource.has_permission", "data.read"],
-    ],
-    condition: (it) =>
-        !!it.get("resource.has_permission", "data.read") &&
-        !!it.get("resource.interfaces")?.includes("IFeatureLayer"),
-    href: (it) => route("feature_layer.feature.browse", it.id).url(),
-});
-
-registerResourceAction(COMP_ID, {
-    key: "export",
+    key: "download",
     icon: <DownloadIcon />,
-    label: gettext("Save as"),
-    order: 10,
-    group: "feature_layer",
+    label: gettext("Download"),
+    order: 0,
+    group: "raster_layer",
     attributes: [
-        ["resource.interfaces"],
         ["resource.has_permission", "data.read"],
         ["resource.has_permission", "data.write"],
     ],
     condition: (it) => {
-        if (!it.get("resource.interfaces").includes("IFeatureLayer")) {
+        if (it.get("resource.cls") !== "raster_layer") {
+            return false;
+        }
+
+        return hasExportPermission(it);
+    },
+    href: (it) => route("raster_layer.download", it.id).url(),
+});
+
+registerResourceAction(COMP_ID, {
+    key: "export",
+    icon: <ExportIcon />,
+    label: gettext("Save as"),
+    order: 10,
+    group: "raster_layer",
+    attributes: [
+        ["resource.has_permission", "data.read"],
+        ["resource.has_permission", "data.write"],
+    ],
+    condition: (it) => {
+        if (it.get("resource.cls") !== "raster_layer") {
             return false;
         }
 

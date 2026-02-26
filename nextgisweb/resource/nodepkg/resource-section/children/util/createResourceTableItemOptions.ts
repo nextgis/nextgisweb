@@ -1,16 +1,14 @@
-import { assert } from "@nextgisweb/jsrealm/error";
 import { route } from "@nextgisweb/pyramid/api";
-import type { ResourceAttrItem } from "@nextgisweb/resource/api/ResourceAttrItem";
-import { resourceAttrItems } from "@nextgisweb/resource/api/resource-attr";
+import { resourceAttrItem } from "@nextgisweb/resource/api/resource-attr";
 import type { Attributes } from "@nextgisweb/resource/api/resource-attr";
 
 import { registry } from "../../registry";
-import { DefaultAttributes } from "../ResourceSectionChildren";
-import type { ChildrenResource } from "../type";
+import { DefaultResourceSectionAttrs } from "../../type";
+import type { DefaultResourceAttrItem } from "../../type";
 
 export async function createResourceTableItemOptions(
     resourceId: number
-): Promise<ChildrenResource> {
+): Promise<DefaultResourceAttrItem> {
     const attrRoute = route("resource.attr");
     const reg = registry.queryAll();
 
@@ -21,23 +19,11 @@ export async function createResourceTableItemOptions(
         }
     }
 
-    const items = await resourceAttrItems({
-        resources: [resourceId],
-        attributes: [...DefaultAttributes, ...attrs],
+    const item = (await resourceAttrItem({
+        resource: resourceId,
+        attributes: [...DefaultResourceSectionAttrs, ...attrs],
         route: attrRoute,
-    });
+    })) as DefaultResourceAttrItem;
 
-    const it = items[0];
-
-    assert(it);
-
-    const displayName = it.get("resource.display_name");
-    assert(displayName);
-
-    return {
-        cls: "resource_group",
-        displayName,
-        id: it.id,
-        it: it as ResourceAttrItem<typeof DefaultAttributes>,
-    };
+    return item;
 }

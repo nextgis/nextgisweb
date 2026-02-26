@@ -1,12 +1,25 @@
 import classNames from "classnames";
 
 import { SvgIcon } from "@nextgisweb/gui/svg-icon";
-import type { DynMenuItem } from "@nextgisweb/pyramid/layout/dynmenu/type";
+import type {
+    DynMenuLabel,
+    DynMenuLink,
+} from "@nextgisweb/pyramid/layout/dynmenu/type";
 
 import "./Dynmenu.less";
 
+export interface CustomDynMenuLink extends Omit<
+    DynMenuLink,
+    "icon" | "icon_suffix"
+> {
+    icon?: React.ReactNode;
+    icon_suffix?: React.ReactNode;
+}
+
+export type CustomDynMenuItem = DynMenuLabel | CustomDynMenuLink;
+
 export interface DynmenuProps {
-    items: DynMenuItem[];
+    items: CustomDynMenuItem[];
 }
 
 export function Dynmenu({ items }: DynmenuProps) {
@@ -30,19 +43,23 @@ export function Dynmenu({ items }: DynmenuProps) {
                             key={item.url}
                         >
                             <a href={item.url} target={item.target}>
-                                {item.icon && (
+                                {typeof item.icon === "string" ? (
                                     <SvgIcon
                                         icon={item.icon}
                                         fill="currentColor"
                                     />
+                                ) : (
+                                    item.icon
                                 )}
                                 {item.label}
-                                {item.icon_suffix && (
+                                {typeof item.icon_suffix === "string" ? (
                                     <SvgIcon
                                         icon={item.icon_suffix}
                                         size="small"
                                         fill="currentColor"
                                     />
+                                ) : (
+                                    item.icon_suffix
                                 )}
                             </a>
                         </li>

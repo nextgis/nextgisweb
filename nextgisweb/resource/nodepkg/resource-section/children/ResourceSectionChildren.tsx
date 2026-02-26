@@ -10,12 +10,12 @@ import { routeURL } from "@nextgisweb/pyramid/api";
 import pyramidSettings from "@nextgisweb/pyramid/client-settings";
 import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import type { ResourceAttrItem } from "@nextgisweb/resource/api/ResourceAttrItem";
 import type { Attributes } from "@nextgisweb/resource/api/resource-attr";
 import { useResourceAttr } from "@nextgisweb/resource/hook/useResourceAttr";
 
 import { registry } from "../registry";
-import type { ResourceSectionProps } from "../type";
+import { DefaultResourceSectionAttrs } from "../type";
+import type { DefaultResourceAttrItem, ResourceSectionProps } from "../type";
 
 import { MenuDropdown } from "./component/MenuDropdown";
 import { RenderActions } from "./component/RenderActions";
@@ -25,13 +25,6 @@ import { prepareResourceChildren } from "./util/prepareResourceChildren";
 import "./ResourceSectionChildren.less";
 
 const { Column } = Table;
-
-export const DefaultAttributes = [
-    ["resource.cls"],
-    ["resource.display_name"],
-    ["resource.owner_user"],
-    ["resource.creation_date"],
-] as const satisfies Attributes;
 
 const storageEnabled = pyramidSettings.storage.enabled;
 
@@ -45,49 +38,68 @@ export function ResourceSectionChildren({ resourceId }: ResourceSectionProps) {
     const [volumeValues, setVolumeValues] = useState<Record<number, number>>(
         {}
     );
-    const [items, setItems] = useState<ChildrenResource[]>([]);
+    const [dataSource, setDataSource] = useState<ChildrenResource[]>([]);
+    const [attrItems, setAttrItems] = useState<DefaultResourceAttrItem[]>([]);
     const [selected, setSelected] = useState<number[]>([]);
     const { makeSignal } = useAbortController();
     const { fetchResourceItems } = useResourceAttr();
+
+    const attributes = useMemo(() => {
+        const reg = registry.queryAll();
+
+        const attrs: [...Attributes] = [];
+        for (const { attributes } of reg) {
+            if (attributes) {
+                attrs.push(...attributes);
+            }
+        }
+        return [...DefaultResourceSectionAttrs, ...attrs] as [
+            ...typeof DefaultResourceSectionAttrs,
+        ];
+    }, []);
 
     useEffect(() => {
         (async () => {
             setIsDataLoading(true);
             try {
-                const reg = registry.queryAll();
-
-                const attrs: [...Attributes] = [];
-                for (const { attributes } of reg) {
-                    if (attributes) {
-                        attrs.push(...attributes);
-                    }
-                }
                 const items = (await fetchResourceItems({
                     resources: { "type": "search", "parent": resourceId },
-                    attributes: [...DefaultAttributes, ...attrs],
-                })) as ResourceAttrItem<typeof DefaultAttributes>[];
-                const children = await prepareResourceChildren({
-                    items,
-                    signal: makeSignal(),
-                });
-                setItems(children);
+                    attributes,
+                })) as DefaultResourceAttrItem[];
+
+                setAttrItems(items);
             } finally {
                 setIsDataLoading(false);
             }
         })();
-    }, [fetchResourceItems, makeSignal, resourceId]);
+    }, [fetchResourceItems, makeSignal, resourceId, attributes]);
 
     useEffect(() => {
-        if (items !== undefined) {
+        (async () => {
+            try {
+                //
+                const children = await prepareResourceChildren({
+                    attrItems,
+                    signal: makeSignal(),
+                });
+                setDataSource(children);
+            } finally {
+                //
+            }
+        })();
+    }, [attrItems, makeSignal]);
+
+    useEffect(() => {
+        if (dataSource !== undefined) {
             setSelected((oldSelection) => {
-                const itemsIds = items.map((item) => item.id);
+                const itemsIds = dataSource.map((item) => item.resourceId);
                 const updatedSelection = oldSelection.filter((selectedItem) =>
                     itemsIds.includes(selectedItem)
                 );
                 return updatedSelection;
             });
         }
-    }, [items]);
+    }, [dataSource]);
 
     const rowSelection = useMemo<TableProps["rowSelection"] | undefined>(() => {
         return allowBatch
@@ -104,7 +116,7 @@ export function ResourceSectionChildren({ resourceId }: ResourceSectionProps) {
             : undefined;
     }, [allowBatch, selected, batchDeletingInProgress]);
 
-    if (!items.length) {
+    if (!dataSource.length) {
         return;
     }
 
@@ -114,8 +126,8 @@ export function ResourceSectionChildren({ resourceId }: ResourceSectionProps) {
             size="middle"
             card={true}
             loading={isDataLoading}
-            dataSource={items}
-            rowKey="id"
+            dataSource={dataSource}
+            rowKey="resourceId"
             rowSelection={rowSelection}
         >
             <Column<ChildrenResource>
@@ -125,7 +137,7 @@ export function ResourceSectionChildren({ resourceId }: ResourceSectionProps) {
                 sorter={sorterFactory("displayName")}
                 render={(value, record) => (
                     <SvgIconLink
-                        href={routeURL("resource.show", record.id)}
+                        href={routeURL("resource.show", record.resourceId)}
                         icon={`rescls-${record.cls}`}
                     >
                         {value}
@@ -168,10 +180,12 @@ export function ResourceSectionChildren({ resourceId }: ResourceSectionProps) {
                 <Column<ChildrenResource>
                     title={gettext("Volume")}
                     className="volume"
-                    sorter={(a, b) => volumeValues[a.id] - volumeValues[b.id]}
+                    sorter={(a, b) =>
+                        volumeValues[a.resourceId] - volumeValues[b.resourceId]
+                    }
                     render={(_, record) => {
-                        if (volumeValues[record.id] !== undefined) {
-                            return formatSize(volumeValues[record.id]);
+                        if (volumeValues[record.resourceId] !== undefined) {
+                            return formatSize(volumeValues[record.resourceId]);
                         } else {
                             return "";
                         }
@@ -181,7 +195,7 @@ export function ResourceSectionChildren({ resourceId }: ResourceSectionProps) {
             <Column<ChildrenResource>
                 title={
                     <MenuDropdown
-                        items={items}
+                        items={dataSource}
                         selected={selected}
                         allowBatch={allowBatch}
                         resourceId={resourceId}
@@ -193,13 +207,17 @@ export function ResourceSectionChildren({ resourceId }: ResourceSectionProps) {
                         setVolumeVisible={setVolumeVisible}
                         setVolumeValues={setVolumeValues}
                         setAllowBatch={setAllowBatch}
+                        setAttrItems={setAttrItems}
                         setSelected={setSelected}
-                        setItems={setItems}
                     />
                 }
                 className="actions"
                 render={(_, record) => (
-                    <RenderActions record={record} setTableItems={setItems} />
+                    <RenderActions
+                        record={record}
+                        attributes={attributes}
+                        setAttrItems={setAttrItems}
+                    />
                 )}
             />
         </Table>
