@@ -8,12 +8,12 @@ import { InputOpacity, InputScaleDenom } from "@nextgisweb/gui/component";
 import { FocusTable, action } from "@nextgisweb/gui/focus-table";
 import type { FocusTableAction } from "@nextgisweb/gui/focus-table";
 import { Area, Lot } from "@nextgisweb/gui/mayout";
-import { route } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { ResourceSelect } from "@nextgisweb/resource/component";
 import { useFocusTablePicker } from "@nextgisweb/resource/component/resource-picker/hook/useFocusTablePicker";
 import type { EditorWidget } from "@nextgisweb/resource/type";
+import { getEffectiveDisplayName } from "@nextgisweb/resource/util/getEffectiveDisplayName";
 import settings from "@nextgisweb/webmap/client-settings";
 
 import { SelectLegendSymbols } from "../component";
@@ -162,19 +162,12 @@ export const ItemsWidget: EditorWidget<ItemsStore> = observer(({ store }) => {
             tableActions: [
                 pickToFocusTable<ItemObject>(
                     async (res) => {
-                        const resourceId = res.resource.id;
-                        if (
-                            res.resource.cls.endsWith("_style") &&
-                            res.resource.parent
-                        ) {
-                            res = await route(
-                                "resource.item",
-                                res.resource.parent?.id
-                            ).get({ signal: makeSignal() });
-                        }
+                        const displayName = await getEffectiveDisplayName(res, {
+                            signal: makeSignal(),
+                        });
                         return new Layer(store, {
-                            display_name: res.resource.display_name,
-                            layer_style_id: resourceId,
+                            display_name: displayName,
+                            layer_style_id: res.id,
                         });
                     },
                     {

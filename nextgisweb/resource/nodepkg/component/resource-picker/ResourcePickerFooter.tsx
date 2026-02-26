@@ -114,7 +114,7 @@ function MoveControlInner<V extends SelectValue = SelectValue>({
 
     const pickThisGroupAllowed = useMemo(() => {
         if (parentItem) {
-            const { disabled } = getCheckboxProps(parentItem.resource);
+            const { disabled } = getCheckboxProps(parentItem);
             return !disabled;
         }
         return false;
@@ -122,9 +122,8 @@ function MoveControlInner<V extends SelectValue = SelectValue>({
 
     const possibleToCreate = useMemo(() => {
         if (parentItem) {
-            return getResourceClasses([parentItem.resource.cls]).includes(
-                "resource_group"
-            );
+            const cls = parentItem.get("resource.cls");
+            return getResourceClasses([cls]).includes("resource_group");
         }
         return false;
     }, [getResourceClasses, parentItem]);

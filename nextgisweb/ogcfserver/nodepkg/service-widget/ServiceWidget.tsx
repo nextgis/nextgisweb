@@ -70,9 +70,9 @@ export const ServiceWidget: EditorWidget<ServiceStore> = observer(
                     pickToFocusTable(
                         (res) =>
                             new Collection(store, {
-                                resource_id: res.resource.id,
-                                display_name: res.resource.display_name,
-                                keyname: generateResourceKeyname(res.resource),
+                                resource_id: res.id,
+                                display_name: res.get("resource.display_name"),
+                                keyname: generateResourceKeyname(res),
                                 maxfeatures: 1000,
                             }),
                         {

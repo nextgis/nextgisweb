@@ -7,20 +7,18 @@ import { RemoveIcon } from "@nextgisweb/gui/icon";
 import type { ParamsOf } from "@nextgisweb/gui/type";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
-import type {
-    CompositeRead,
-    ResourceRead,
-} from "@nextgisweb/resource/type/api";
+import { resourceAttrItems } from "@nextgisweb/resource/api/resource-attr";
 
 import { ResourcePickerStore } from "../resource-picker";
 import { useResourcePicker } from "../resource-picker/hook";
-import type { SelectValue } from "../resource-picker/type";
+import { ResourcePickerDefaultAttrs } from "../resource-picker/type";
+import type { ResourcePickerAttr, SelectValue } from "../resource-picker/type";
 
 import type { ResourceSelectProps } from "./type";
 
 import ManageSearchIcon from "@nextgisweb/icon/material/manage_search";
 
-type TableProps = ParamsOf<typeof Table>;
+type TableProps = ParamsOf<typeof Table<ResourcePickerAttr>>;
 type ColumnParams = NonNullable<TableProps["columns"]>;
 type RowSelection = NonNullable<TableProps["rowSelection"]>;
 
@@ -32,7 +30,7 @@ const ResourceSelectMultiple = ({
     const { makeSignal, abort } = useAbortController();
     const [selectedRowKeys, setSelectedRowKeys] = useState<number[]>([]);
     const [ids, setIds] = useState(() => uniq(initResourceIds));
-    const [resources, setResources] = useState<ResourceRead[]>([]);
+    const [resources, setResources] = useState<ResourcePickerAttr[]>([]);
     const [loading, setLoading] = useState(false);
     const { modalHolder, modalStore } = useShowModal();
     const { showResourcePicker } = useResourcePicker({
@@ -65,24 +63,20 @@ const ResourceSelectMultiple = ({
         abort();
         setLoading(true);
 
-        const promises: Promise<CompositeRead>[] = [];
         const getOpt = {
             cache: true,
             signal: makeSignal(),
         };
-        for (const id of ids) {
-            const promise = route("resource.item", id).get(getOpt);
-            promises.push(promise);
-        }
+
         try {
-            const resp = await Promise.all(promises);
-            const resources_ = resp.map((r) => {
-                const res = r.resource;
-                return res;
+            const resp = await resourceAttrItems({
+                resources: ids,
+                attributes: [...ResourcePickerDefaultAttrs],
+                route: route("resource.attr"),
+                ...getOpt,
             });
-            const enabledResources = resources_.filter((r) =>
-                store.checkEnabled(r)
-            );
+
+            const enabledResources = resp.filter((r) => store.checkEnabled(r));
             setResources(enabledResources);
         } finally {
             setLoading(false);
@@ -96,10 +90,7 @@ const ResourceSelectMultiple = ({
             render: (text, row) => {
                 return (
                     <a
-                        href={routeURL(
-                            "resource.show",
-                            (row as ResourceRead).id
-                        )}
+                        href={routeURL("resource.show", row.id)}
                         onClick={(evt) => evt.stopPropagation()}
                         target="_blank"
                         rel="noreferrer"
