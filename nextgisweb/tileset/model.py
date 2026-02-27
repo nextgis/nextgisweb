@@ -103,19 +103,12 @@ class RenderRequest:
         self.style = style
         self.srs = srs
 
-    def _check_zoom(self, zoom):
-        return self.style.tileset_zmin <= zoom <= self.style.tileset_zmax
-
     def render_extent(self, extent, size):
         zoom = render_zoom(self.srs, extent, size, TILE_SIZE)
-        if not self._check_zoom(zoom):
-            return None
         return self.style.render_image(extent, size, self.srs, zoom)
 
     def render_tile(self, tile, size):
         zoom = tile[0]
-        if not self._check_zoom(zoom):
-            return None
         extent = self.srs.tile_extent(tile)
         return self.style.render_image(extent, (size, size), self.srs, zoom)
 
@@ -155,6 +148,16 @@ class Tileset(Resource, SpatialLayerMixin):
 
     def render_image(self, extent, size, srs, zoom):
         assert srs.id == self.srs.id == 3857
+
+        # Don't assemble lower zoom levels, as they can require reading many
+        # tiles and allocate very large images in memory.
+        if zoom < self.tileset_zmin:
+            return None
+
+        # Upscaling is allowed, but we need to clamp zoom to max zoom level. Not
+        # the best solution, but it's better than returning nothing.
+        if zoom > self.tileset_zmax:
+            zoom = self.tileset_zmax
 
         xtile_from, ytile_from, xtile_to, ytile_to = self.srs.extent_tile_range(extent, zoom)
 
