@@ -1,8 +1,6 @@
 import pytest
 from sqlalchemy.exc import IntegrityError
 
-from nextgisweb.env import DBSession
-
 from nextgisweb.auth import User
 
 from .. import Resource, ResourceGroup
@@ -29,4 +27,4 @@ def test_same_display_name(ngw_txn, ngw_resource_group):
     with pytest.raises(IntegrityError, match='"resource_parent_id_display_name_key"'):
         ResourceGroup(**margs).persist()
         ResourceGroup(**margs).persist()
-        DBSession.flush()
+        ngw_txn.commit()

@@ -135,7 +135,13 @@ class Resource(Base, metaclass=ResourceMeta):
     __mapper_args__ = dict(polymorphic_on=cls)
     __table_args__ = (
         sa.CheckConstraint("parent_id IS NOT NULL OR id = 0"),
-        sa.UniqueConstraint(parent_id, display_name),
+        sa.UniqueConstraint(
+            parent_id,
+            display_name,
+            deferrable=True,
+            initially="DEFERRED",
+            name="resource_parent_id_display_name_key",
+        ),
     )
 
     parent = orm.relationship(
