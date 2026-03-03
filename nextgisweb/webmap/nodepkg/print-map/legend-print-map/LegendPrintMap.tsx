@@ -41,8 +41,10 @@ const handleTreeItem = (
                 newLayersItems.push(newTreeItem);
             }
         });
-        layersItem.children = newLayersItems;
-        return layersItem.children.length ? layersItem : null;
+
+        return newLayersItems.length
+            ? { ...layersItem, children: newLayersItems }
+            : null;
     }
 };
 
