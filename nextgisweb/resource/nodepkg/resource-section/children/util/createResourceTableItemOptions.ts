@@ -3,14 +3,13 @@ import { route } from "@nextgisweb/pyramid/api";
 import type { ResourceAttrItem } from "@nextgisweb/resource/api/ResourceAttrItem";
 import { resourceAttrItems } from "@nextgisweb/resource/api/resource-attr";
 import type { Attributes } from "@nextgisweb/resource/api/resource-attr";
-import type { ResourceRead } from "@nextgisweb/resource/type/api";
 
 import { registry } from "../../registry";
 import { DefaultAttributes } from "../ResourceSectionChildren";
 import type { ChildrenResource } from "../type";
 
 export async function createResourceTableItemOptions(
-    resource: ResourceRead
+    resourceId: number
 ): Promise<ChildrenResource> {
     const attrRoute = route("resource.attr");
     const reg = registry.queryAll();
@@ -23,7 +22,7 @@ export async function createResourceTableItemOptions(
     }
 
     const items = await resourceAttrItems({
-        resources: [resource.id],
+        resources: [resourceId],
         attributes: [...DefaultAttributes, ...attrs],
         route: attrRoute,
     });
@@ -32,10 +31,13 @@ export async function createResourceTableItemOptions(
 
     assert(it);
 
+    const displayName = it.get("resource.display_name");
+    assert(displayName);
+
     return {
         cls: "resource_group",
-        displayName: resource.display_name,
-        id: resource.id,
+        displayName,
+        id: it.id,
         it: it as ResourceAttrItem<typeof DefaultAttributes>,
     };
 }

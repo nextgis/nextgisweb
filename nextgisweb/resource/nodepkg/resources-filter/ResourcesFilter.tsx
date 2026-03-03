@@ -127,13 +127,13 @@ export function ResourcesFilter({
                 options={options}
                 status={acStatus}
                 notFoundContent={gettext("Resources not found")}
+                value={search}
+                showSearch={{ onSearch: setSearch }}
                 {...rest}
             >
                 <Input.Search
                     size="middle"
                     placeholder={gettext("Search resources")}
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
                     loading={loading}
                 />
             </AutoComplete>

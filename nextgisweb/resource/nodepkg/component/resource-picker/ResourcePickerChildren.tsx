@@ -7,6 +7,7 @@ import { Badge, Button, Table } from "@nextgisweb/gui/antd";
 import type { TableColumnProps, TableProps } from "@nextgisweb/gui/antd";
 import { sorterFactory } from "@nextgisweb/gui/util";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import { resources } from "@nextgisweb/resource/blueprint";
 import type {
     ResourceCls,
     ResourceInterface,
@@ -38,7 +39,7 @@ function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
         loading,
         multiple,
         selected,
-        resources,
+        resources: res,
         allowSelection,
         traverseClasses,
         allowMoveInside,
@@ -52,10 +53,26 @@ function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
     );
     const { getCheckboxProps } = usePickerCard({ store });
 
-    const dataSource = useMemo(
-        () => (resources ? resources.map((x) => x.resource) : []),
-        [resources]
-    );
+    const dataSource = useMemo(() => {
+        if (res) {
+            return [...res].sort((a, b) => {
+                const acls = a.get("resource.cls");
+                const bcls = b.get("resource.cls");
+
+                const orderA = resources[acls]?.order ?? 0;
+                const orderB = resources[bcls]?.order ?? 0;
+
+                if (orderA !== orderB) {
+                    return orderA - orderB;
+                }
+
+                return a
+                    .get("resource.display_name")
+                    .localeCompare(b.get("resource.display_name"));
+            });
+        }
+        return [];
+    }, [res]);
 
     const rowSelection = useMemo(() => {
         if (!allowSelection) return;
@@ -97,12 +114,15 @@ function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
 
     const canTraverse = useCallback(
         (record: PickerResource) => {
-            const classes = getResourceClasses([record.cls]);
+            const cls = record.get("resource.cls");
+            const classes = getResourceClasses([cls]);
             const isGroup = classes.some((cls) => cls === "resource_group");
             const disabled =
                 traverseClasses &&
                 !classes.some((cls) => traverseClasses.includes(cls));
-            const allowMoveToEmpty = isGroup ? true : !!record.children;
+            const allowMoveToEmpty = isGroup
+                ? true
+                : !!record.get("resource.children");
             return !(disabled || !allowMoveToEmpty || !allowMoveInside);
         },
         [allowMoveInside, getResourceClasses, traverseClasses]
@@ -149,10 +169,13 @@ function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
                 ];
                 const findFirstClasses: ResourceCls[] = ["raster_layer"];
 
+                const interfaces = record.get("resource.interfaces") || [];
+                const cls = record.get("resource.cls");
+
                 const canSelectFirstChildren =
-                    record.interfaces.some((resInterface) =>
+                    interfaces.some((resInterface) =>
                         findFirstInterfaces.includes(resInterface)
-                    ) || findFirstClasses.includes(record.cls);
+                    ) || findFirstClasses.includes(cls);
 
                 if (!selectedParent && canSelectFirstChildren && multiple) {
                     selectFirstBtn = (
@@ -194,11 +217,18 @@ function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
             {
                 title: msgDislpayName,
                 className: "displayName",
-                dataIndex: "display_name",
                 sorter: sorterFactory("display_name"),
-                render: (value, { cls, id }: PickerResource) => (
-                    <ResourceLabel label={value} resourceId={id} cls={cls} />
-                ),
+                render: (_, item: PickerResource) => {
+                    const displayName = item.get("resource.display_name");
+                    const cls = item.get("resource.cls");
+                    return (
+                        <ResourceLabel
+                            label={displayName}
+                            resourceId={item.id}
+                            cls={cls}
+                        />
+                    );
+                },
             },
             {
                 className: "actions",

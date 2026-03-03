@@ -7,13 +7,13 @@ import { InputScaleDenom } from "@nextgisweb/gui/component";
 import { FocusTable, action } from "@nextgisweb/gui/focus-table";
 import type { FocusTablePropsActions } from "@nextgisweb/gui/focus-table";
 import { Area } from "@nextgisweb/gui/mayout";
-import { route } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { ResourceSelect } from "@nextgisweb/resource/component";
 import { useFocusTablePicker } from "@nextgisweb/resource/component/resource-picker";
 import type { EditorWidget } from "@nextgisweb/resource/type";
 import { generateResourceKeyname } from "@nextgisweb/resource/util/generateResourceKeyname";
+import { getEffectiveDisplayName } from "@nextgisweb/resource/util/getEffectiveDisplayName";
 
 import { Layer } from "./Layer";
 import type { ServiceStore } from "./ServiceStore";
@@ -74,20 +74,16 @@ export const ServiceWidget: EditorWidget<ServiceStore> = observer(
                 tableActions: [
                     pickToFocusTable(
                         async (res) => {
-                            const resourceId = res.resource.id;
-                            if (
-                                res.resource.cls.endsWith("_style") &&
-                                res.resource.parent
-                            ) {
-                                res = await route(
-                                    "resource.item",
-                                    res.resource.parent?.id
-                                ).get({ signal: makeSignal() });
-                            }
+                            const displayName = await getEffectiveDisplayName(
+                                res,
+                                {
+                                    signal: makeSignal(),
+                                }
+                            );
                             return new Layer(store, {
-                                resource_id: resourceId,
-                                display_name: res.resource.display_name,
-                                keyname: generateResourceKeyname(res.resource),
+                                resource_id: res.id,
+                                display_name: displayName,
+                                keyname: generateResourceKeyname(res),
                                 min_scale_denom: null,
                                 max_scale_denom: null,
                             });
