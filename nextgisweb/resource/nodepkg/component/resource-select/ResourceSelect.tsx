@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useShowModal } from "@nextgisweb/gui";
-import { Select } from "@nextgisweb/gui/antd";
+import { Select, Space } from "@nextgisweb/gui/antd";
 import { useObjectState } from "@nextgisweb/gui/hook";
 
 import { ResourceLabel } from "../ResourceLabel";
+import { ResourceLink } from "../ResourceLink";
 import { useResourcePicker } from "../resource-picker/hook";
 import type { ResourcePickerStoreOptions } from "../resource-picker/type";
 
@@ -85,39 +86,41 @@ export function ResourceSelect<V extends number = number>({
     return (
         <>
             {modalHolder}
-            <Select
-                open={open}
-                value={value}
-                loading={resourceLoading}
-                onOpenChange={(visible) => {
-                    if (!visible || !readOnly) {
-                        setOpen(visible);
-                    }
-                }}
-                suffixIcon={readOnly ? <></> : undefined}
-                popupRender={() => <></>}
-                onClear={() => {
-                    onPick(undefined);
-                }}
-                allowClear={!readOnly && allowClear}
-                style={{
-                    cursor: readOnly ? "unset" : undefined,
-                    ...(style || {}),
-                }}
-                {...selectOptions}
-            >
-                {options.map(({ label, value, cls }) => {
-                    return (
-                        <Select.Option key={value} value={value} label={label}>
-                            <ResourceLabel
-                                label={label}
-                                cls={cls}
-                                resourceId={hideGoto ? undefined : value}
-                            />
-                        </Select.Option>
-                    );
-                })}
-            </Select>
+            <Space.Compact style={{ width: "100%" }}>
+                <Select
+                    open={open}
+                    value={value}
+                    loading={resourceLoading}
+                    onOpenChange={(visible) => {
+                        if (!visible || !readOnly) {
+                            setOpen(visible);
+                        }
+                    }}
+                    suffixIcon={readOnly ? <></> : undefined}
+                    popupRender={() => <></>}
+                    onClear={() => {
+                        onPick(undefined);
+                    }}
+                    allowClear={!readOnly && allowClear}
+                    style={{
+                        cursor: readOnly ? "unset" : undefined,
+                        ...(style || {}),
+                    }}
+                    options={options}
+                    labelRender={(e) => (
+                        <ResourceLabel
+                            label={e.label}
+                            cls={resource?.resource.cls}
+                        />
+                    )}
+                    {...selectOptions}
+                />
+                {value !== undefined && !hideGoto && (
+                    <Space.Addon>
+                        <ResourceLink resourceId={value} />
+                    </Space.Addon>
+                )}
+            </Space.Compact>
         </>
     );
 }
