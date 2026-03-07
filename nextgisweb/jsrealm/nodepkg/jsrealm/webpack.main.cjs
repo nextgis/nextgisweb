@@ -413,7 +413,7 @@ const webpackConfig = defaults("main", (env) => ({
                 // packages for better browser compatibility.
                 exclude: config.debug
                     ? /node_modules/
-                    : /node_modules\/(core-js|react|react-dom)/,
+                    : /node_modules\/(core-js|react|react-dom)|\.min\.js$/,
                 resolve: { fullySpecified: false },
                 use: babelLoader,
             },
