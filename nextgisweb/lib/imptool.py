@@ -5,6 +5,13 @@ from importlib.util import spec_from_loader
 from pathlib import Path
 from warnings import filterwarnings, warn
 
+# Deprecated pkg_registry is used extensively by Pyramid, setuptools is pinned.
+filterwarnings(
+    "ignore",
+    r"^pkg_resources is deprecated as an API.*$",
+    category=UserWarning,
+)
+
 # Prevent warning about missing __init__.py in migration directory. Is's OK
 # and migration directory is intended for migration scripts.
 filterwarnings(
