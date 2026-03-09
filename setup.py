@@ -61,7 +61,6 @@ requires = [
     "transaction==5.0",
     "typing-extensions",
     "ua-parser[re2]==1.0.*",
-    "urllib3<2",
     "waitress==2.1.2",
     "zipstream-new==1.1.8",
     "zope.sqlalchemy==4.1",
