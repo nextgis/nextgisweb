@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import re
-from datetime import timedelta
+from datetime import datetime, timedelta
 from enum import Enum
 from typing import Any
 
@@ -97,6 +97,22 @@ class List(OptionType):
         return ", ".join(self._otype.dumps(v) for v in value) if value is not None else ""
 
 
+class DateTime(OptionType):
+    def __str__(self):
+        return "datetime"
+
+    def loads(self, value):
+        if not value:
+            return None
+        result = datetime.fromisoformat(value)
+        if result.tzinfo is not None:
+            raise ValueError("Timezone-aware datetimes are not supported")
+        return result
+
+    def dumps(self, value):
+        return value.isoformat() if value is not None else ""
+
+
 class Timedelta(OptionType):
     _parts = (("d", 24 * 60 * 60), ("h", 60 * 60), ("m", 60), ("", 1))
 
@@ -161,4 +177,5 @@ OptionType.OTYPE_MAPPING[bool] = Boolean()
 OptionType.OTYPE_MAPPING[int] = Integer()
 OptionType.OTYPE_MAPPING[float] = Float()
 OptionType.OTYPE_MAPPING[list] = List()
+OptionType.OTYPE_MAPPING[datetime] = DateTime()
 OptionType.OTYPE_MAPPING[timedelta] = Timedelta()

@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import datetime, timedelta
 from enum import Enum
 from inspect import isclass
 
@@ -21,6 +21,10 @@ class EnumTest(Enum):
         (Integer, "42", 42),
         (bool, "yes", True),
         (bool, "no", False),
+        (datetime, "2026-05-01T18:38:00", datetime(2026, 5, 1, 18, 38, 0)),
+        (datetime, "2026-05-01T18:38", datetime(2026, 5, 1, 18, 38)),
+        (datetime, "2026-05-01T00:00:00Z", ValueError),
+        (datetime, "2026-13-01T00:00:00", ValueError),
         (timedelta, "92d", timedelta(days=92)),
         (timedelta, "24h", timedelta(days=1)),
         (timedelta, "1440m", timedelta(days=1)),
