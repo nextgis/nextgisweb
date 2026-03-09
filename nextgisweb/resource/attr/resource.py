@@ -90,7 +90,8 @@ class ResourceAttrIsDeletable(ResourceAttr, tag="resource.is_deletable"):
 
     def __call__(self, obj, *, ctx) -> bool:
         return (
-            obj.has_permission(ResourceScope.delete, user=ctx.user)
+            obj.parent is not None
+            and obj.has_permission(ResourceScope.delete, user=ctx.user)
             and obj.parent.has_permission(ResourceScope.manage_children, user=ctx.user)
             and OnDeletePrompt.apply(obj)
         )
