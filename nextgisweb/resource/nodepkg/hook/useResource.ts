@@ -7,27 +7,27 @@ import type { DataScopePermissions } from "@nextgisweb/resource/type/api";
 const { resourceExport } = settings;
 
 export function useResource({ id }: { id: number }) {
-    const { data } = useRouteGet<{ data: DataScopePermissions }>(
-        "resource.permission",
-        { id }
-    );
+  const { data } = useRouteGet<{ data: DataScopePermissions }>(
+    "resource.permission",
+    { id }
+  );
 
-    const isUserAdministrator = ngwConfig.isAdministrator;
+  const isUserAdministrator = ngwConfig.isAdministrator;
 
-    const isExportAllowed = useMemo(() => {
-        if (isUserAdministrator) {
-            return true;
-        }
-        if (data) {
-            const { read, write } = data.data;
-            if (resourceExport === "data_write" && write) {
-                return true;
-            } else if (resourceExport === "data_read" && read) {
-                return true;
-            }
-        }
-        return false;
-    }, [data, isUserAdministrator]);
+  const isExportAllowed = useMemo(() => {
+    if (isUserAdministrator) {
+      return true;
+    }
+    if (data) {
+      const { read, write } = data.data;
+      if (resourceExport === "data_write" && write) {
+        return true;
+      } else if (resourceExport === "data_read" && read) {
+        return true;
+      }
+    }
+    return false;
+  }, [data, isUserAdministrator]);
 
-    return { isExportAllowed };
+  return { isExportAllowed };
 }

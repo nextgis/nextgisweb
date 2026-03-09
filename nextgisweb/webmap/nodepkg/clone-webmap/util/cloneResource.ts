@@ -3,49 +3,49 @@ import { route } from "@nextgisweb/pyramid/api";
 import type { CompositeCreate } from "@nextgisweb/resource/type/api";
 
 interface CloneResourceOptions {
-    resourceItem: CompositeCreate;
-    displayName: string;
-    parentId: number;
-    signal: AbortSignal;
+  resourceItem: CompositeCreate;
+  displayName: string;
+  parentId: number;
+  signal: AbortSignal;
 }
 
 export async function cloneResource({
-    resourceItem,
-    displayName,
-    parentId,
-    signal,
+  resourceItem,
+  displayName,
+  parentId,
+  signal,
 }: CloneResourceOptions) {
-    const { resource, resmeta, webmap, ...rest } = JSON.parse(
-        JSON.stringify(resourceItem)
-    );
+  const { resource, resmeta, webmap, ...rest } = JSON.parse(
+    JSON.stringify(resourceItem)
+  );
 
-    // Doesn't work
-    delete rest.social;
+  // Doesn't work
+  delete rest.social;
 
-    // Read-only
-    delete resource.id;
-    delete resource.scopes;
-    delete resource.children;
-    delete resource.interfaces;
-    delete resource.creation_date;
+  // Read-only
+  delete resource.id;
+  delete resource.scopes;
+  delete resource.children;
+  delete resource.interfaces;
+  delete resource.creation_date;
 
-    // Security
-    delete resource.owner_user;
-    delete resource.permissions;
+  // Security
+  delete resource.owner_user;
+  delete resource.permissions;
 
-    // Update
-    resource.keyname = null;
-    resource.display_name = displayName;
-    resource.parent = { id: parentId };
+  // Update
+  resource.keyname = null;
+  resource.display_name = displayName;
+  resource.parent = { id: parentId };
 
-    try {
-        const newResPayload = { resource, resmeta, webmap, ...rest };
-        const cloneItem = await route("resource.collection").post({
-            json: newResPayload,
-            signal,
-        });
-        return cloneItem;
-    } catch (err) {
-        errorModal(err);
-    }
+  try {
+    const newResPayload = { resource, resmeta, webmap, ...rest };
+    const cloneItem = await route("resource.collection").post({
+      json: newResPayload,
+      signal,
+    });
+    return cloneItem;
+  } catch (err) {
+    errorModal(err);
+  }
 }

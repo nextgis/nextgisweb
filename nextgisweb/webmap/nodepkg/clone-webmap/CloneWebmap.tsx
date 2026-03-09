@@ -11,9 +11,9 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { getUniqueName } from "@nextgisweb/pyramid/util";
 import { ResourceSelect } from "@nextgisweb/resource/component";
 import type {
-    CompositeCreate,
-    CompositeRead,
-    ResourceRefWithParent,
+  CompositeCreate,
+  CompositeRead,
+  ResourceRefWithParent,
 } from "@nextgisweb/resource/type/api";
 
 import { cloneResource } from "./util/cloneResource";
@@ -21,146 +21,143 @@ import { cloneResource } from "./util/cloneResource";
 const msgSaveButtonTitle = gettext("Clone");
 
 interface CloneProps {
-    name: string;
-    parent: number;
+  name: string;
+  parent: number;
 }
 
 export interface AfterCloneOptions {
-    item: ResourceRefWithParent;
+  item: ResourceRefWithParent;
 }
 interface CloneWebmapProps {
-    id: number;
-    fieldsFormProps?: Omit<FieldsFormProps, "fields" | "form">;
-    saveButtonTitle?: string;
-    afterClone?: (opt: AfterCloneOptions) => void;
-    beforeClone?: (
-        resourceItem: CompositeRead,
-        options?: { signal?: AbortSignal }
-    ) => Promise<CompositeCreate>;
+  id: number;
+  fieldsFormProps?: Omit<FieldsFormProps, "fields" | "form">;
+  saveButtonTitle?: string;
+  afterClone?: (opt: AfterCloneOptions) => void;
+  beforeClone?: (
+    resourceItem: CompositeRead,
+    options?: { signal?: AbortSignal }
+  ) => Promise<CompositeCreate>;
 }
 
 export function CloneWebmap({
-    id,
-    afterClone,
-    beforeClone,
-    saveButtonTitle = msgSaveButtonTitle,
-    fieldsFormProps,
+  id,
+  afterClone,
+  beforeClone,
+  saveButtonTitle = msgSaveButtonTitle,
+  fieldsFormProps,
 }: CloneWebmapProps) {
-    const form = Form.useForm<CloneProps>()[0];
+  const form = Form.useForm<CloneProps>()[0];
 
-    const { data, isLoading } = useRouteGet("resource.item", { id });
+  const { data, isLoading } = useRouteGet("resource.item", { id });
 
-    const { makeSignal } = useAbortController();
+  const { makeSignal } = useAbortController();
 
-    const [nameLoading, setNameLoading] = useState(false);
-    const [parentId, setParentId] = useState<number>();
-    const [saving, setSaving] = useState(false);
+  const [nameLoading, setNameLoading] = useState(false);
+  const [parentId, setParentId] = useState<number>();
+  const [saving, setSaving] = useState(false);
 
-    const fields = useMemo<FormField<keyof CloneProps>[]>(
-        () => [
-            {
-                name: "parent",
-                label: gettext("Resource group"),
-                formItem: (
-                    <ResourceSelect
-                        value={parentId}
-                        pickerOptions={{
-                            traverseClasses: ["resource_group"],
-                            hideUnavailable: true,
-                        }}
-                    />
-                ),
-                required: true,
-            },
-            {
-                name: "name",
-                disabled: nameLoading,
-                label: gettext("Display name"),
-                formItem: <Input />,
-                required: true,
-            },
-        ],
-        [nameLoading, parentId]
-    );
+  const fields = useMemo<FormField<keyof CloneProps>[]>(
+    () => [
+      {
+        name: "parent",
+        label: gettext("Resource group"),
+        formItem: (
+          <ResourceSelect
+            value={parentId}
+            pickerOptions={{
+              traverseClasses: ["resource_group"],
+              hideUnavailable: true,
+            }}
+          />
+        ),
+        required: true,
+      },
+      {
+        name: "name",
+        disabled: nameLoading,
+        label: gettext("Display name"),
+        formItem: <Input />,
+        required: true,
+      },
+    ],
+    [nameLoading, parentId]
+  );
 
-    const setUniqName = useCallback(
-        async (resname: string, parentId_: number) => {
-            setNameLoading(true);
-            try {
-                const newName = await getUniqueName({
-                    signal: makeSignal(),
-                    parentId: parentId_,
-                    defaultName: resname,
-                });
-                form.setFieldsValue({ name: newName });
-            } finally {
-                setNameLoading(false);
-            }
-        },
-        [form, makeSignal]
-    );
+  const setUniqName = useCallback(
+    async (resname: string, parentId_: number) => {
+      setNameLoading(true);
+      try {
+        const newName = await getUniqueName({
+          signal: makeSignal(),
+          parentId: parentId_,
+          defaultName: resname,
+        });
+        form.setFieldsValue({ name: newName });
+      } finally {
+        setNameLoading(false);
+      }
+    },
+    [form, makeSignal]
+  );
 
-    useEffect(() => {
-        if (data && data.resource) {
-            const parentId =
-                ngwConfig.resourceHome && "id" in ngwConfig.resourceHome
-                    ? ngwConfig.resourceHome.id
-                    : data.resource.parent?.id;
-            if (typeof parentId === "number") {
-                form.setFieldsValue({ parent: parentId });
-                setParentId(parentId);
-                setUniqName(data.resource.display_name, parentId);
-            }
-        }
-    }, [data, form, setUniqName]);
-
-    const clone = useCallback(async () => {
-        try {
-            if (data) {
-                setSaving(true);
-
-                const resourceItem = beforeClone
-                    ? await beforeClone(data)
-                    : (data as CompositeCreate);
-
-                const { name, parent } = form.getFieldsValue();
-                const cloneItem = await cloneResource({
-                    displayName: name,
-                    parentId: parent,
-                    resourceItem,
-                    signal: makeSignal(),
-                });
-                if (cloneItem) {
-                    if (afterClone) {
-                        afterClone({ item: cloneItem });
-                    } else {
-                        const newItemDetailUrl = routeURL(
-                            "resource.update",
-                            cloneItem.id
-                        );
-                        window.open(newItemDetailUrl, "_self");
-                    }
-                }
-            }
-        } finally {
-            setSaving(false);
-        }
-    }, [data, beforeClone, form, makeSignal, afterClone]);
-
-    if (isLoading) {
-        return <LoadingWrapper></LoadingWrapper>;
+  useEffect(() => {
+    if (data && data.resource) {
+      const parentId =
+        ngwConfig.resourceHome && "id" in ngwConfig.resourceHome
+          ? ngwConfig.resourceHome.id
+          : data.resource.parent?.id;
+      if (typeof parentId === "number") {
+        form.setFieldsValue({ parent: parentId });
+        setParentId(parentId);
+        setUniqName(data.resource.display_name, parentId);
+      }
     }
+  }, [data, form, setUniqName]);
 
-    return (
-        <Space orientation="vertical" style={{ width: "100%" }}>
-            <FieldsForm<CloneProps>
-                {...fieldsFormProps}
-                form={form}
-                fields={fields}
-            ></FieldsForm>
-            <SaveButton loading={saving} onClick={clone}>
-                {saveButtonTitle}
-            </SaveButton>
-        </Space>
-    );
+  const clone = useCallback(async () => {
+    try {
+      if (data) {
+        setSaving(true);
+
+        const resourceItem = beforeClone
+          ? await beforeClone(data)
+          : (data as CompositeCreate);
+
+        const { name, parent } = form.getFieldsValue();
+        const cloneItem = await cloneResource({
+          displayName: name,
+          parentId: parent,
+          resourceItem,
+          signal: makeSignal(),
+        });
+        if (cloneItem) {
+          if (afterClone) {
+            afterClone({ item: cloneItem });
+          } else {
+            const newItemDetailUrl = routeURL("resource.update", cloneItem.id);
+            window.open(newItemDetailUrl, "_self");
+          }
+        }
+      }
+    } finally {
+      setSaving(false);
+    }
+  }, [data, beforeClone, form, makeSignal, afterClone]);
+
+  if (isLoading) {
+    return <LoadingWrapper></LoadingWrapper>;
+  }
+
+  return (
+    <Space orientation="vertical" style={{ width: "100%" }}>
+      <FieldsForm<CloneProps>
+        {...fieldsFormProps}
+        form={form}
+        fields={fields}
+      ></FieldsForm>
+      <SaveButton loading={saving} onClick={clone}>
+        {saveButtonTitle}
+      </SaveButton>
+    </Space>
+  );
 }

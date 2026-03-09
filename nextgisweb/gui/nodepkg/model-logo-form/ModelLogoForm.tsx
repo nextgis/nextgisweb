@@ -12,98 +12,96 @@ import pyramidSettings from "@nextgisweb/pyramid/client-settings";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 interface ModelLogoFormProps extends ImageUploaderProps {
-    component: string;
-    model: KeysWithMethods<["get", "put"]>;
-    settingName: string;
+  component: string;
+  model: KeysWithMethods<["get", "put"]>;
+  settingName: string;
 
-    messages?: {
-        saveSuccess?: string;
-        helpText?: string;
-        uploadText?: string;
-        dragAndDropText?: string;
-    };
+  messages?: {
+    saveSuccess?: string;
+    helpText?: string;
+    uploadText?: string;
+    dragAndDropText?: string;
+  };
 }
 
 const defaultMessages = {
-    saveSuccess: gettext("Logo saved. Reload the page to get them applied."),
+  saveSuccess: gettext("Logo saved. Reload the page to get them applied."),
 };
 
 export function ModelLogoForm({
-    component,
-    model,
-    settingName,
-    messages = {},
-    accept = ".png, .svg",
+  component,
+  model,
+  settingName,
+  messages = {},
+  accept = ".png, .svg",
 }: ModelLogoFormProps) {
-    const [status, setStatus] = useState<"loading" | "saving" | null>(
-        "loading"
-    );
-    const [logo, setLogo] = useState<string>();
-    const [fileMeta, setFileMeta] = useState<UploaderMeta | null>(null);
-    const [messageApi, contextHolder] = message.useMessage();
+  const [status, setStatus] = useState<"loading" | "saving" | null>("loading");
+  const [logo, setLogo] = useState<string>();
+  const [fileMeta, setFileMeta] = useState<UploaderMeta | null>(null);
+  const [messageApi, contextHolder] = message.useMessage();
 
-    const msg = { ...defaultMessages, ...messages };
+  const msg = { ...defaultMessages, ...messages };
 
-    useEffect(() => {
-        const initLogo = async () => {
-            try {
-                const resp = await route(model).get<
-                    Record<string, Record<string, [string, string]>>
-                >({
-                    query: {
-                        [component]: settingName,
-                    },
-                });
-                if (resp[component][settingName]) {
-                    const [mimeType, file] = resp[component][settingName];
-                    setLogo(`data:${mimeType};base64,` + file);
-                } else {
-                    throw new Error("The logo is not set");
-                }
-            } catch {
-                // ignore error
-            } finally {
-                setStatus(null);
-            }
-        };
-        initLogo();
-    }, [component, model, settingName]);
-
-    const save = async () => {
-        try {
-            await route(model).put({
-                json: {
-                    [component]: {
-                        [settingName]: fileMeta,
-                    },
-                },
-            });
-            messageApi.success(msg.saveSuccess);
-        } catch (err) {
-            errorModal(err);
-        } finally {
-            setStatus(null);
+  useEffect(() => {
+    const initLogo = async () => {
+      try {
+        const resp = await route(model).get<
+          Record<string, Record<string, [string, string]>>
+        >({
+          query: {
+            [component]: settingName,
+          },
+        });
+        if (resp[component][settingName]) {
+          const [mimeType, file] = resp[component][settingName];
+          setLogo(`data:${mimeType};base64,` + file);
+        } else {
+          throw new Error("The logo is not set");
         }
+      } catch {
+        // ignore error
+      } finally {
+        setStatus(null);
+      }
     };
+    initLogo();
+  }, [component, model, settingName]);
 
-    if (status === "loading") {
-        return <LoadingWrapper />;
+  const save = async () => {
+    try {
+      await route(model).put({
+        json: {
+          [component]: {
+            [settingName]: fileMeta,
+          },
+        },
+      });
+      messageApi.success(msg.saveSuccess);
+    } catch (err) {
+      errorModal(err);
+    } finally {
+      setStatus(null);
     }
+  };
 
-    return (
-        <Space orientation="vertical" style={{ width: "100%" }}>
-            {contextHolder}
-            <ImageUploader
-                helpText={msg.helpText}
-                uploadText={msg.uploadText}
-                dragAndDropText={msg.dragAndDropText}
-                image={logo}
-                accept={accept}
-                maxSize={pyramidSettings.logoMaxSize}
-                showMaxSize={true}
-                onChange={(meta?: UploaderMeta) => setFileMeta(meta || null)}
-            />
-            <SaveButton onClick={save} loading={status === "saving"} />
-        </Space>
-    );
+  if (status === "loading") {
+    return <LoadingWrapper />;
+  }
+
+  return (
+    <Space orientation="vertical" style={{ width: "100%" }}>
+      {contextHolder}
+      <ImageUploader
+        helpText={msg.helpText}
+        uploadText={msg.uploadText}
+        dragAndDropText={msg.dragAndDropText}
+        image={logo}
+        accept={accept}
+        maxSize={pyramidSettings.logoMaxSize}
+        showMaxSize={true}
+        onChange={(meta?: UploaderMeta) => setFileMeta(meta || null)}
+      />
+      <SaveButton onClick={save} loading={status === "saving"} />
+    </Space>
+  );
 }

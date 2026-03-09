@@ -7,33 +7,33 @@ import type { ResourceCls } from "@nextgisweb/resource/type/api";
 const msgCreateResource = gettext("Create resource");
 
 interface CreateResourceButtonProps {
-    resourceId: number;
-    creatable: ResourceCls[];
+  resourceId: number;
+  creatable: ResourceCls[];
 }
 
 export function CreateResourceButton({
-    resourceId,
-    creatable,
+  resourceId,
+  creatable,
 }: CreateResourceButtonProps) {
-    const { modalHolder, lazyModal, isLoading } = useShowModal();
+  const { modalHolder, lazyModal, isLoading } = useShowModal();
 
-    return (
-        <>
-            {modalHolder}
-            <Button
-                type="primary"
-                size="large"
-                loading={isLoading}
-                icon={<AddIcon />}
-                onClick={() =>
-                    lazyModal(() => import("./CreateResourceModal"), {
-                        resourceId,
-                        creatable,
-                    })
-                }
-            >
-                {msgCreateResource}
-            </Button>
-        </>
-    );
+  return (
+    <>
+      {modalHolder}
+      <Button
+        type="primary"
+        size="large"
+        loading={isLoading}
+        icon={<AddIcon />}
+        onClick={() =>
+          lazyModal(() => import("./CreateResourceModal"), {
+            resourceId,
+            creatable,
+          })
+        }
+      >
+        {msgCreateResource}
+      </Button>
+    </>
+  );
 }

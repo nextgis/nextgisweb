@@ -9,57 +9,57 @@ import type { ControlProps } from "./MapControl";
 import "./ButtonControl.less";
 
 interface ButtonControlOptions extends CreateControlOptions {
-    disabled?: boolean;
-    children?: ReactNode;
-    title?: string;
-    btnStyle?: React.CSSProperties;
-    btnClassName?: string;
-    onClick?: () => void | Promise<void>;
+  disabled?: boolean;
+  children?: ReactNode;
+  title?: string;
+  btnStyle?: React.CSSProperties;
+  btnClassName?: string;
+  onClick?: () => void | Promise<void>;
 }
 
 export type ButtonControlProps = ControlProps<ButtonControlOptions>;
 
 export function ButtonControl({
-    bar = true,
-    title,
-    style,
-    margin = true,
-    btnStyle,
-    children,
-    disabled,
-    className,
-    btnClassName,
-    onClick,
-    ...rest
+  bar = true,
+  title,
+  style,
+  margin = true,
+  btnStyle,
+  children,
+  disabled,
+  className,
+  btnClassName,
+  onClick,
+  ...rest
 }: ButtonControlProps) {
-    const onBtnClick = async (e: MouseEvent<HTMLButtonElement>) => {
-        e.preventDefault();
-        if (onClick) await onClick();
-    };
+  const onBtnClick = async (e: MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    if (onClick) await onClick();
+  };
 
-    return (
-        <MapControl
-            bar={bar}
-            style={style}
-            margin={margin}
-            className={classNames(
-                "ol-unselectable",
-                "mapadapter-btn-ctrl",
-                "mapadapter-ctrl-group",
-                className
-            )}
-            {...rest}
-        >
-            <button
-                title={title}
-                disabled={disabled}
-                className={btnClassName}
-                aria-label={title}
-                onClick={onBtnClick}
-                style={btnStyle}
-            >
-                {children}
-            </button>
-        </MapControl>
-    );
+  return (
+    <MapControl
+      bar={bar}
+      style={style}
+      margin={margin}
+      className={classNames(
+        "ol-unselectable",
+        "mapadapter-btn-ctrl",
+        "mapadapter-ctrl-group",
+        className
+      )}
+      {...rest}
+    >
+      <button
+        title={title}
+        disabled={disabled}
+        className={btnClassName}
+        aria-label={title}
+        onClick={onBtnClick}
+        style={btnStyle}
+      >
+        {children}
+      </button>
+    </MapControl>
+  );
 }

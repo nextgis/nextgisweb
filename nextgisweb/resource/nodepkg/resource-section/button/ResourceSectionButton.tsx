@@ -9,21 +9,21 @@ import { ContentCard } from "@nextgisweb/gui/component";
 import "./ResourceSectionButton.less";
 
 interface ResourceSectionButtonProps extends ButtonProps {
-    label: ReactNode;
+  label: ReactNode;
 }
 
 export function ResourceSectionButton({
-    children,
-    className,
-    label,
-    ...props
+  children,
+  className,
+  label,
+  ...props
 }: ResourceSectionButtonProps) {
-    return (
-        <ContentCard
-            className={classNames("ngw-resource-section-button", className)}
-        >
-            <Balancer ratio={0.62}>{children}</Balancer>
-            <Button {...props}>{label}</Button>
-        </ContentCard>
-    );
+  return (
+    <ContentCard
+      className={classNames("ngw-resource-section-button", className)}
+    >
+      <Balancer ratio={0.62}>{children}</Balancer>
+      <Button {...props}>{label}</Button>
+    </ContentCard>
+  );
 }

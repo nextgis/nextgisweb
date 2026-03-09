@@ -21,133 +21,132 @@ const msgDragAndDrop = gettext("or drag and drop here");
 const msgStop = gettext("Stop");
 
 function ProgressText({
-    abort,
-    progressText,
+  abort,
+  progressText,
 }: {
-    abort: (reason?: string | undefined) => void;
-    progressText: string;
+  abort: (reason?: string | undefined) => void;
+  progressText: string;
 }) {
-    const doAbort = useCallback(() => {
-        abort();
-    }, [abort]);
-    return (
-        <div>
-            <span>
-                <p className="ant-upload-text">{progressText}</p>
-            </span>
-            <span>
-                <Button shape="round" icon={<CancelIcon />} onClick={doAbort}>
-                    {msgStop}
-                </Button>
-            </span>
-        </div>
-    );
+  const doAbort = useCallback(() => {
+    abort();
+  }, [abort]);
+  return (
+    <div>
+      <span>
+        <p className="ant-upload-text">{progressText}</p>
+      </span>
+      <span>
+        <Button shape="round" icon={<CancelIcon />} onClick={doAbort}>
+          {msgStop}
+        </Button>
+      </span>
+    </div>
+  );
 }
 
 function InputText<M extends boolean = false>({
-    meta,
-    helpText,
-    clearMeta,
-    uploadText = msgUpload,
-    maxSize = settings.maxSize,
-    showMaxSize = false,
-    dragAndDropText = msgDragAndDrop,
+  meta,
+  helpText,
+  clearMeta,
+  uploadText = msgUpload,
+  maxSize = settings.maxSize,
+  showMaxSize = false,
+  dragAndDropText = msgDragAndDrop,
 }: FileUploaderProps & {
-    meta?: UploaderMeta<M>;
-    clearMeta?: () => void;
+  meta?: UploaderMeta<M>;
+  clearMeta?: () => void;
 }) {
-    const firstMeta = (Array.isArray(meta) ? meta[0] : meta) as FileMeta;
-    return firstMeta ? (
-        <p className="ant-upload-text">
-            {firstMeta.name}{" "}
-            <span className="size">{formatSize(firstMeta.size)}</span>
-            <Button
-                onClick={(e) => {
-                    e.stopPropagation();
-                    clearMeta?.();
-                }}
-                type="link"
-                icon={<BackspaceIcon />}
-            />
+  const firstMeta = (Array.isArray(meta) ? meta[0] : meta) as FileMeta;
+  return firstMeta ? (
+    <p className="ant-upload-text">
+      {firstMeta.name}{" "}
+      <span className="size">{formatSize(firstMeta.size)}</span>
+      <Button
+        onClick={(e) => {
+          e.stopPropagation();
+          clearMeta?.();
+        }}
+        type="link"
+        icon={<BackspaceIcon />}
+      />
+    </p>
+  ) : (
+    // This component cause the console error on tab switch: Uncaught
+    // ResizeObserver loop completed with undelivered notifications.
+    // https://github.com/shuding/react-wrap-balancer/issues/82
+    <Balancer ratio={0.62}>
+      <p className="ant-upload-text">
+        <span className="clickable">{uploadText}</span> {dragAndDropText}
+      </p>
+      {helpText ? <p className="ant-upload-hint">{helpText}</p> : ""}
+      {showMaxSize && (
+        <p className="ant-upload-hint">
+          {formatSize(maxSize) + " " + gettext("max")}
         </p>
-    ) : (
-        // This component cause the console error on tab switch: Uncaught
-        // ResizeObserver loop completed with undelivered notifications.
-        // https://github.com/shuding/react-wrap-balancer/issues/82
-        <Balancer ratio={0.62}>
-            <p className="ant-upload-text">
-                <span className="clickable">{uploadText}</span>{" "}
-                {dragAndDropText}
-            </p>
-            {helpText ? <p className="ant-upload-hint">{helpText}</p> : ""}
-            {showMaxSize && (
-                <p className="ant-upload-hint">
-                    {formatSize(maxSize) + " " + gettext("max")}
-                </p>
-            )}
-        </Balancer>
-    );
+      )}
+    </Balancer>
+  );
 }
 
 export function FileUploader<M extends boolean = false>({
-    style,
-    accept,
-    height = 220,
-    fileMeta,
-    multiple,
-    inputProps = {},
-    afterUpload,
-    setFileMeta,
-    showProgressInDocTitle = true,
-    maxSize = settings.maxSize,
-    onUploading,
-    onChange,
-    ...rest
+  style,
+  accept,
+  height = 220,
+  fileMeta,
+  multiple,
+  inputProps = {},
+  afterUpload,
+  setFileMeta,
+  showProgressInDocTitle = true,
+  maxSize = settings.maxSize,
+  onUploading,
+  onChange,
+  ...rest
 }: FileUploaderProps<M>) {
-    const [messageApi, contextHolder] = message.useMessage();
+  const [messageApi, contextHolder] = message.useMessage();
 
-    const { abort, progressText, props, meta, uploading, clearMeta } =
-        useFileUploader<M>({
-            showProgressInDocTitle,
-            afterUpload,
-            setFileMeta,
-            inputProps,
-            fileMeta,
-            multiple,
-            accept,
-            maxSize,
-            onChange,
-            onError: messageApi.error,
-        });
+  const { abort, progressText, props, meta, uploading, clearMeta } =
+    useFileUploader<M>({
+      showProgressInDocTitle,
+      afterUpload,
+      setFileMeta,
+      inputProps,
+      fileMeta,
+      multiple,
+      accept,
+      maxSize,
+      onChange,
+      onError: messageApi.error,
+    });
 
-    useEffect(() => {
-        if (onUploading) {
-            onUploading(uploading);
-        }
-    }, [uploading, onUploading]);
+  useEffect(() => {
+    if (onUploading) {
+      onUploading(uploading);
+    }
+  }, [uploading, onUploading]);
 
-    return (
-        <>
-            {contextHolder}
-            <Dragger
-                {...props}
-                className="ngw-file-upload-file-uploader"
-                height={height}
-                style={style}
-                disabled={progressText !== null}
-                accept={accept}
-            >
-                {progressText !== null ? (
-                    <ProgressText abort={abort} progressText={progressText} />
-                ) : (
-                    <InputText<M>
-                        meta={meta}
-                        maxSize={maxSize}
-                        clearMeta={clearMeta}
-                        {...rest}
-                    />
-                )}
-            </Dragger>
-        </>
-    );
+  return (
+    <>
+      {contextHolder}
+      <Dragger
+        {...props}
+        className="ngw-file-upload-file-uploader"
+        height={height}
+        style={style}
+        disabled={progressText !== null}
+        accept={accept}
+      >
+        {progressText !== null ? (
+          <ProgressText abort={abort} progressText={progressText} />
+        ) : (
+          <InputText<M>
+            meta={meta}
+            maxSize={maxSize}
+            clearMeta={clearMeta}
+            {...rest}
+          />
+        )}
+      </Dragger>
+    </>
+  );
 }

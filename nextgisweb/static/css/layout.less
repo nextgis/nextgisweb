@@ -15,116 +15,116 @@
 
 body,
 html {
-    height: 100%;
-    font-family: var(--ngw-text-font-family);
+  height: 100%;
+  font-family: var(--ngw-text-font-family);
 }
 
 body {
-    margin: 0;
-    color: var(--text-base);
-    font-size: 14px;
-    line-height: 1.55;
+  margin: 0;
+  color: var(--text-base);
+  font-size: 14px;
+  line-height: 1.55;
 }
 
 *:focus {
-    outline: none;
+  outline: none;
 }
 
 /* -- Layout -- */
 
 body > .ngw-gui-react-boot {
-    display: flex;
-    flex-direction: column;
-    min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
 
-    > .ngw-pyramid-layout {
-        flex: 1;
-    }
+  > .ngw-pyramid-layout {
+    flex: 1;
+  }
 }
 
 .ngw-pyramid-layout {
-    display: flex;
-    position: relative;
-    flex-direction: column;
-    min-height: 100%;
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  min-height: 100%;
 
-    > .ngw-pyramid-layout-crow {
+  > .ngw-pyramid-layout-crow {
+    display: flex;
+    flex-grow: 1;
+    margin: 0;
+    padding: 0;
+
+    > .ngw-pyramid-layout-mwrapper {
+      display: flex;
+      flex-grow: 1;
+      justify-content: center;
+      align-items: stretch;
+      min-width: 0;
+
+      > .ngw-pyramid-layout-main {
         display: flex;
         flex-grow: 1;
-        margin: 0;
-        padding: 0;
+        flex-direction: column;
+        gap: 6px;
+        box-sizing: border-box;
+        padding: 24px 12px 12px 12px;
+        max-width: 1000px;
 
-        > .ngw-pyramid-layout-mwrapper {
-            display: flex;
-            flex-grow: 1;
-            justify-content: center;
-            align-items: stretch;
-            min-width: 0;
+        .ngw-pyramid-layout-title {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          margin-block-end: 8px;
+          min-height: 40px;
 
-            > .ngw-pyramid-layout-main {
-                display: flex;
-                flex-grow: 1;
-                flex-direction: column;
-                gap: 6px;
-                box-sizing: border-box;
-                padding: 24px 12px 12px 12px;
-                max-width: 1000px;
+          > h1 {
+            margin-inline: 0 8px;
+            margin-block: 0;
+            line-height: 32px;
+          }
 
-                .ngw-pyramid-layout-title {
-                    display: flex;
-                    align-items: center;
-                    gap: 12px;
-                    margin-block-end: 8px;
-                    min-height: 40px;
-
-                    > h1 {
-                        margin-inline: 0 8px;
-                        margin-block: 0;
-                        line-height: 32px;
-                    }
-
-                    &.pull-right > h1 {
-                        margin-inline-end: auto;
-                    }
-                }
-            }
+          &.pull-right > h1 {
+            margin-inline-end: auto;
+          }
         }
+      }
     }
+  }
 
-    &.ngw-pyramid-layout-hstretch {
-        > .ngw-pyramid-layout-crow
-            > .ngw-pyramid-layout-mwrapper
-            > .ngw-pyramid-layout-main {
-            max-width: 100%;
-        }
+  &.ngw-pyramid-layout-hstretch {
+    > .ngw-pyramid-layout-crow
+      > .ngw-pyramid-layout-mwrapper
+      > .ngw-pyramid-layout-main {
+      max-width: 100%;
     }
+  }
 
-    &.ngw-pyramid-layout-vstretch {
-        > .ngw-pyramid-layout-crow
-            > .ngw-pyramid-layout-mwrapper
-            > .ngw-pyramid-layout-main
-            > .content {
-            flex-grow: 1;
-            min-height: 400px;
+  &.ngw-pyramid-layout-vstretch {
+    > .ngw-pyramid-layout-crow
+      > .ngw-pyramid-layout-mwrapper
+      > .ngw-pyramid-layout-main
+      > .content {
+      flex-grow: 1;
+      min-height: 400px;
 
-            > * {
-                box-sizing: border-box;
-            }
-        }
+      > * {
+        box-sizing: border-box;
+      }
     }
+  }
 }
 
 /* Sidebar */
 
 .ngw-pyramid-layout-sidebar {
-    position: relative;
-    flex-shrink: 0.5;
-    box-sizing: border-box;
-    border-left: 1px solid var(--divider-color);
-    background: white;
-    padding: 24px 12px 24px 24px;
-    width: 25%;
-    min-width: 25ch;
+  position: relative;
+  flex-shrink: 0.5;
+  box-sizing: border-box;
+  border-left: 1px solid var(--divider-color);
+  background: white;
+  padding: 24px 12px 24px 24px;
+  width: 25%;
+  min-width: 25ch;
 }
 
 @import "override-antd.less";

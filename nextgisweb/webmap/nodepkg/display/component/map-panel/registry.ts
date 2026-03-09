@@ -13,39 +13,39 @@ export type MapControlPluginWidget<P> = ImportCallback<FC<ControlProps<P>>>;
 export type EmbeddedShowMode = "always" | "customize";
 
 export interface MapControlPlugin<P = any> {
-    component: MapControlPluginWidget<P>;
-    key: string;
-    order?: number;
-    props?: ControlProps<P>;
-    label?: string;
-    position?: TargetPosition;
-    hideOnMobile?: boolean;
-    showOnPreview?: boolean;
-    embeddedShowMode?: EmbeddedShowMode;
+  component: MapControlPluginWidget<P>;
+  key: string;
+  order?: number;
+  props?: ControlProps<P>;
+  label?: string;
+  position?: TargetPosition;
+  hideOnMobile?: boolean;
+  showOnPreview?: boolean;
+  embeddedShowMode?: EmbeddedShowMode;
 }
 
 export const registry = pluginRegistry<MapControlPlugin>(MODULE_NAME);
 
 export function mapControlRegistry<P>(
-    compId: string,
-    plugin: MapControlPlugin<P>
+  compId: string,
+  plugin: MapControlPlugin<P>
 ) {
-    registry.register(compId, plugin as unknown as MapControlPlugin<P>);
+  registry.register(compId, plugin as unknown as MapControlPlugin<P>);
 }
 
 export async function olControlRegistry<T extends Control>(
-    compId: string,
-    {
-        key,
-        ctor,
-        ...props
-    }: Omit<MapControlPlugin, "component" | "props"> & OlControlProps<T>
+  compId: string,
+  {
+    key,
+    ctor,
+    ...props
+  }: Omit<MapControlPlugin, "component" | "props"> & OlControlProps<T>
 ) {
-    mapControlRegistry(compId, {
-        key,
-        component: () =>
-            import("@nextgisweb/webmap/map-component/control/OlControl"),
-        props: { ctor },
-        ...props,
-    });
+  mapControlRegistry(compId, {
+    key,
+    component: () =>
+      import("@nextgisweb/webmap/map-component/control/OlControl"),
+    props: { ctor },
+    ...props,
+  });
 }

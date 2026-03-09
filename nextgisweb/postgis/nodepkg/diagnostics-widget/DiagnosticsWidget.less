@@ -1,63 +1,63 @@
 .ngw-postgis-diagnostics-widget {
-    .check {
-        margin-bottom: 1rem;
-        box-shadow: 0 1px 2px rgba(57, 70, 78, 0.3);
+  .check {
+    margin-bottom: 1rem;
+    box-shadow: 0 1px 2px rgba(57, 70, 78, 0.3);
+    border-radius: 4px;
+    background: white;
+
+    div.check-header {
+      display: flex;
+      align-items: center;
+      padding: 0.5rem;
+
+      .check-title {
+        flex-grow: 1;
+        font-size: larger;
+      }
+
+      .check-status {
+        flex-grow: 0;
         border-radius: 4px;
-        background: white;
-
-        div.check-header {
-            display: flex;
-            align-items: center;
-            padding: 0.5rem;
-
-            .check-title {
-                flex-grow: 1;
-                font-size: larger;
-            }
-
-            .check-status {
-                flex-grow: 0;
-                border-radius: 4px;
-                background-color: var(--status-color);
-                padding: 0.1rem 0.5rem;
-                width: var(--status-length);
-                color: white;
-                font-weight: bold;
-                text-align: center;
-                text-transform: uppercase;
-            }
-        }
-
-        ul.check-messages {
-            margin: 0;
-            border-top: 1px solid rgba(57, 70, 78, 0.15);
-            padding: 0.5rem;
-            list-style: none;
-
-            li > svg.icon {
-                margin-right: 0.5rem;
-                color: var(--status-color);
-            }
-        }
-
-        &.success,
-        li.success {
-            --status-color: var(--success);
-        }
-
-        &.warning,
-        li.warning {
-            --status-color: var(--warning);
-        }
-
-        &.error,
-        li.error {
-            --status-color: var(--error);
-        }
-
-        &.unknown,
-        li.unknown {
-            --status-color: gray;
-        }
+        background-color: var(--status-color);
+        padding: 0.1rem 0.5rem;
+        width: var(--status-length);
+        color: white;
+        font-weight: bold;
+        text-align: center;
+        text-transform: uppercase;
+      }
     }
+
+    ul.check-messages {
+      margin: 0;
+      border-top: 1px solid rgba(57, 70, 78, 0.15);
+      padding: 0.5rem;
+      list-style: none;
+
+      li > svg.icon {
+        margin-right: 0.5rem;
+        color: var(--status-color);
+      }
+    }
+
+    &.success,
+    li.success {
+      --status-color: var(--success);
+    }
+
+    &.warning,
+    li.warning {
+      --status-color: var(--warning);
+    }
+
+    &.error,
+    li.error {
+      --status-color: var(--error);
+    }
+
+    &.unknown,
+    li.unknown {
+      --status-color: gray;
+    }
+  }
 }

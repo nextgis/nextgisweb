@@ -5,12 +5,12 @@ import type { Geometry } from "ol/geom";
 import type { DrawEvent } from "ol/interaction/Draw";
 import VectorSource from "ol/source/Vector";
 import {
-    lazy,
-    useCallback,
-    useEffect,
-    useRef,
-    useState,
-    useTransition,
+  lazy,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useTransition,
 } from "react";
 
 import { Spin } from "@nextgisweb/gui/antd";
@@ -31,165 +31,149 @@ import { ModifyMode } from "./modes/ModifyMode";
 import { MoveMode } from "./modes/MoveMode";
 
 export interface EditableResourceProps extends Omit<
-    EditableItemProps,
-    "geomType" | "geomLayout"
+  EditableItemProps,
+  "geomType" | "geomLayout"
 > {
-    resourceId: number;
-    canSnap: boolean;
-    onError: (er: unknown) => void;
-    onCanSnap: (val: boolean) => void;
+  resourceId: number;
+  canSnap: boolean;
+  onError: (er: unknown) => void;
+  onCanSnap: (val: boolean) => void;
 }
 
 const FeatureEditorModal = lazy(
-    () => import("@nextgisweb/feature-layer/feature-editor-modal")
+  () => import("@nextgisweb/feature-layer/feature-editor-modal")
 );
 
 export const EditableResource = observer(
-    ({
-        editingMode,
-        resourceId,
-        canSnap,
-        enabled,
-        source: outerSource,
-        onCanSnap: setCanSnap,
-        onError,
-        onDirtyChange,
-        onEditingMode: setEditingMode,
-    }: EditableResourceProps) => {
-        const { modalStore, modalHolder, showModal } = useShowModal();
-        const { makeSignal } = useAbortController();
+  ({
+    editingMode,
+    resourceId,
+    canSnap,
+    enabled,
+    source: outerSource,
+    onCanSnap: setCanSnap,
+    onError,
+    onDirtyChange,
+    onEditingMode: setEditingMode,
+  }: EditableResourceProps) => {
+    const { modalStore, modalHolder, showModal } = useShowModal();
+    const { makeSignal } = useAbortController();
 
-        const [source, setSource] = useState<VectorSource | null>(null);
+    const [source, setSource] = useState<VectorSource | null>(null);
 
-        const [isLoading, startTransition] = useTransition();
+    const [isLoading, startTransition] = useTransition();
 
-        const [geomConfig, setGeometryConfig] = useState<GeomConfig | null>(
-            null
-        );
+    const [geomConfig, setGeometryConfig] = useState<GeomConfig | null>(null);
 
-        const editingModeRef = useRef(editingMode);
-        useEffect(() => {
-            editingModeRef.current = editingMode;
-        }, [editingMode]);
+    const editingModeRef = useRef(editingMode);
+    useEffect(() => {
+      editingModeRef.current = editingMode;
+    }, [editingMode]);
 
-        const onDrawend = useCallback(
-            (ev: DrawEvent) => {
-                return new Promise<void>((resolve, reject) => {
-                    showModal(FeatureEditorModal, {
-                        editorOptions: {
-                            mode: "return",
-                            allowEmpty: true,
-                            resourceId,
-                            showGeometryTab: false,
-                            onOk: (_, item) => {
-                                ev.feature.set("attribution", item);
-                                resolve(undefined);
-                            },
-                        },
-                        onCancel: () => {
-                            reject("Canceled by user");
-                        },
-                    });
-                });
+    const onDrawend = useCallback(
+      (ev: DrawEvent) => {
+        return new Promise<void>((resolve, reject) => {
+          showModal(FeatureEditorModal, {
+            editorOptions: {
+              mode: "return",
+              allowEmpty: true,
+              resourceId,
+              showGeometryTab: false,
+              onOk: (_, item) => {
+                ev.feature.set("attribution", item);
+                resolve(undefined);
+              },
             },
-            [showModal, resourceId]
-        );
+            onCancel: () => {
+              reject("Canceled by user");
+            },
+          });
+        });
+      },
+      [showModal, resourceId]
+    );
 
-        useEffect(() => {
-            startTransition(async () => {
-                setGeometryConfig(null);
-                try {
-                    const config = await getGeomConfig({
-                        resourceId,
-                        signal: makeSignal(),
-                    });
-                    setGeometryConfig(config);
-                } catch (er) {
-                    onError(er);
-                }
-            });
-        }, [makeSignal, onError, modalStore, resourceId]);
-
-        useEffect(() => {
-            if (!geomConfig) return;
-
-            const source = outerSource || new VectorSource();
-            const features = new Collection<OlFeature<Geometry>>();
-            startTransition(async () => {
-                try {
-                    const olFeatures = await fetchResourceOlFeature({
-                        resourceId,
-                        signal: makeSignal(),
-                    });
-                    features.extend(olFeatures);
-                    source.addFeatures(olFeatures);
-                    setSource(source);
-                } catch (er) {
-                    onError(er);
-                }
-            });
-            const clearSource = () => {
-                if (outerSource) {
-                    source.forEachFeature((f) => {
-                        if (f.get("layer_id") === resourceId)
-                            source.removeFeature(f);
-                    });
-                } else {
-                    source.clear();
-                }
-            };
-
-            return clearSource;
-        }, [
-            modalStore,
-            geomConfig,
+    useEffect(() => {
+      startTransition(async () => {
+        setGeometryConfig(null);
+        try {
+          const config = await getGeomConfig({
             resourceId,
-            outerSource,
-            makeSignal,
-            onError,
-        ]);
+            signal: makeSignal(),
+          });
+          setGeometryConfig(config);
+        } catch (er) {
+          onError(er);
+        }
+      });
+    }, [makeSignal, onError, modalStore, resourceId]);
 
-        return (
-            <>
-                {modalHolder}
-                {isLoading || !source || !geomConfig ? (
-                    <ButtonControl order={90} disabled>
-                        <Spin size="small" />
-                    </ButtonControl>
-                ) : (
-                    <EditableItem
-                        id={resourceId}
-                        source={source}
-                        enabled={enabled}
-                        editingMode={editingMode}
-                        onEditingMode={setEditingMode}
-                        onDirtyChange={onDirtyChange}
-                    >
-                        <DrawMode
-                            order={1}
-                            onDrawend={onDrawend}
-                            geomType={geomConfig.type}
-                            geomLayout={geomConfig.layout}
-                        />
-                        <ModifyMode order={2} />
-                        <MoveMode order={3} />
-                        {geomConfig.type.includes("Polygon") && (
-                            <HoleMode order={4} />
-                        )}
-                        <AttributeMode order={5} resourceId={resourceId} />
-                        <DeleteMode order={6} />
-                        {!geomConfig.type.includes("Point") && (
-                            <SnapToggle
-                                order={7}
-                                value={canSnap}
-                                onChange={setCanSnap}
-                            />
-                        )}
-                    </EditableItem>
-                )}
-            </>
-        );
-    }
+    useEffect(() => {
+      if (!geomConfig) return;
+
+      const source = outerSource || new VectorSource();
+      const features = new Collection<OlFeature<Geometry>>();
+      startTransition(async () => {
+        try {
+          const olFeatures = await fetchResourceOlFeature({
+            resourceId,
+            signal: makeSignal(),
+          });
+          features.extend(olFeatures);
+          source.addFeatures(olFeatures);
+          setSource(source);
+        } catch (er) {
+          onError(er);
+        }
+      });
+      const clearSource = () => {
+        if (outerSource) {
+          source.forEachFeature((f) => {
+            if (f.get("layer_id") === resourceId) source.removeFeature(f);
+          });
+        } else {
+          source.clear();
+        }
+      };
+
+      return clearSource;
+    }, [modalStore, geomConfig, resourceId, outerSource, makeSignal, onError]);
+
+    return (
+      <>
+        {modalHolder}
+        {isLoading || !source || !geomConfig ? (
+          <ButtonControl order={90} disabled>
+            <Spin size="small" />
+          </ButtonControl>
+        ) : (
+          <EditableItem
+            id={resourceId}
+            source={source}
+            enabled={enabled}
+            editingMode={editingMode}
+            onEditingMode={setEditingMode}
+            onDirtyChange={onDirtyChange}
+          >
+            <DrawMode
+              order={1}
+              onDrawend={onDrawend}
+              geomType={geomConfig.type}
+              geomLayout={geomConfig.layout}
+            />
+            <ModifyMode order={2} />
+            <MoveMode order={3} />
+            {geomConfig.type.includes("Polygon") && <HoleMode order={4} />}
+            <AttributeMode order={5} resourceId={resourceId} />
+            <DeleteMode order={6} />
+            {!geomConfig.type.includes("Point") && (
+              <SnapToggle order={7} value={canSnap} onChange={setCanSnap} />
+            )}
+          </EditableItem>
+        )}
+      </>
+    );
+  }
 );
 
 EditableResource.displayName = "EditableResource";

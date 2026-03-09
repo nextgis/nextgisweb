@@ -8,27 +8,27 @@ import DescriptionEditorStore from "./DescriptionEditorStore";
 import type EditorStore from "./DescriptionEditorStore";
 
 const DescriptionEditor = observer(
-    ({ store }: EditorWidgetProps<EditorStore>) => {
-        const [store_] = useState<DescriptionEditorStore>(() => {
-            if (store) return store;
-            return new DescriptionEditorStore();
-        });
+  ({ store }: EditorWidgetProps<EditorStore>) => {
+    const [store_] = useState<DescriptionEditorStore>(() => {
+      if (store) return store;
+      return new DescriptionEditorStore();
+    });
 
-        const onChange = useCallback(
-            (val: string) => {
-                store_.update(val ? val : null);
-            },
-            [store_]
-        );
+    const onChange = useCallback(
+      (val: string) => {
+        store_.update(val ? val : null);
+      },
+      [store_]
+    );
 
-        return (
-            <TextEditor
-                value={store_.value || ""}
-                onChange={onChange}
-                border={false}
-            />
-        );
-    }
+    return (
+      <TextEditor
+        value={store_.value || ""}
+        onChange={onChange}
+        border={false}
+      />
+    );
+  }
 );
 
 DescriptionEditor.displayName = "DescriptionEditor";

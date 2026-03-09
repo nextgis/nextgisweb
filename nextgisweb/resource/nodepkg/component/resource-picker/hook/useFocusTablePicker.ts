@@ -10,17 +10,17 @@ import { useResourcePicker } from "./useResourcePicker";
 import type { ResourcePickerHookProps } from "./useResourcePicker";
 
 export function useFocusTablePicker(props?: ResourcePickerHookProps) {
-    const { showResourcePicker } = useResourcePicker(props);
+  const { showResourcePicker } = useResourcePicker(props);
 
-    const pickToFocusTable = useCallback(
-        <I extends FocusTableItem>(
-            factory: (resource: ResourcePickerAttr) => I | Promise<I>,
-            options?: PickToFocusTableOptions<I | null>
-        ) => pickToFocusTableOriginal(factory, options, showResourcePicker),
-        [showResourcePicker]
-    );
+  const pickToFocusTable = useCallback(
+    <I extends FocusTableItem>(
+      factory: (resource: ResourcePickerAttr) => I | Promise<I>,
+      options?: PickToFocusTableOptions<I | null>
+    ) => pickToFocusTableOriginal(factory, options, showResourcePicker),
+    [showResourcePicker]
+  );
 
-    return {
-        pickToFocusTable,
-    };
+  return {
+    pickToFocusTable,
+  };
 }

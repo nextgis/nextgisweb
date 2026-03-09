@@ -1,10 +1,10 @@
 {
-    "name": "@nextgisweb/sld",
-    "version": "0.0.0",
-    "type": "module",
-    "dependencies": {
-        "@types/color": "^3.0.3",
-        "geostyler-style": "^7.3.1",
-        "geostyler-openlayers-parser": "^3.2.0"
-    }
+  "name": "@nextgisweb/sld",
+  "version": "0.0.0",
+  "type": "module",
+  "dependencies": {
+    "@types/color": "^3.0.3",
+    "geostyler-style": "^7.3.1",
+    "geostyler-openlayers-parser": "^3.2.0"
+  }
 }

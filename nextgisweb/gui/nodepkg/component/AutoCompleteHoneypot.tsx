@@ -4,11 +4,11 @@
  * https://bugs.chromium.org/p/chromium/issues/detail?id=914451 for details.
  * */
 export function AutoCompleteHoneypot() {
-    const invisible = { display: "none" };
-    return (
-        <>
-            <input style={invisible} name="username" type="text" />
-            <input style={invisible} name="password" type="password" />
-        </>
-    );
+  const invisible = { display: "none" };
+  return (
+    <>
+      <input style={invisible} name="username" type="text" />
+      <input style={invisible} name="password" type="password" />
+    </>
+  );
 }

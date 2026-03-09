@@ -14,68 +14,50 @@ import { WebmapLayers } from "./WebmapLayers";
 import "./MapPane.less";
 
 export const MapPane = observer(
-    ({
-        display,
-        children,
-    }: {
-        display: Display;
-        children: React.ReactNode;
-    }) => {
-        const themeVariables = useThemeVariables({
-            "theme-color-primary": "colorPrimary",
-        });
+  ({ display, children }: { display: Display; children: React.ReactNode }) => {
+    const themeVariables = useThemeVariables({
+      "theme-color-primary": "colorPrimary",
+    });
 
-        const whenCreated = useCallback(() => {
-            display.setMapReady(true);
+    const whenCreated = useCallback(() => {
+      display.setMapReady(true);
 
-            const urlParams = display.urlParams;
+      const urlParams = display.urlParams;
 
-            if (
-                !(
-                    "zoom" in urlParams &&
-                    "lon" in urlParams &&
-                    "lat" in urlParams
-                )
-            ) {
-                display.map.zoomToInitialExtent();
-            } else {
-                const view = display.map.olView;
-                if (urlParams.lon && urlParams.lat) {
-                    view.setCenter(fromLonLat([urlParams.lon, urlParams.lat]));
-                }
-                if (urlParams.zoom !== undefined) {
-                    view.setZoom(urlParams.zoom);
-                }
+      if (!("zoom" in urlParams && "lon" in urlParams && "lat" in urlParams)) {
+        display.map.zoomToInitialExtent();
+      } else {
+        const view = display.map.olView;
+        if (urlParams.lon && urlParams.lat) {
+          view.setCenter(fromLonLat([urlParams.lon, urlParams.lat]));
+        }
+        if (urlParams.zoom !== undefined) {
+          view.setZoom(urlParams.zoom);
+        }
 
-                if ("angle" in urlParams && urlParams.angle !== undefined) {
-                    view.setRotation(urlParams.angle);
-                }
-            }
-        }, [display]);
+        if ("angle" in urlParams && urlParams.angle !== undefined) {
+          view.setRotation(urlParams.angle);
+        }
+      }
+    }, [display]);
 
-        return (
-            <MapComponent
-                className="ngw-webmap-display-map-pane"
-                mapStore={display.map}
-                style={themeVariables}
-                whenCreated={whenCreated}
-            >
-                <MapControls
-                    mapStore={display.map}
-                    isTinyMode={display.isTinyMode}
-                />
-                <WebmapLayers
-                    mapStore={display.map}
-                    treeStore={display.treeStore}
-                />
-                <MapHighlight
-                    mapStore={display.map}
-                    highlightStore={display.highlighter}
-                />
-                {children}
-            </MapComponent>
-        );
-    }
+    return (
+      <MapComponent
+        className="ngw-webmap-display-map-pane"
+        mapStore={display.map}
+        style={themeVariables}
+        whenCreated={whenCreated}
+      >
+        <MapControls mapStore={display.map} isTinyMode={display.isTinyMode} />
+        <WebmapLayers mapStore={display.map} treeStore={display.treeStore} />
+        <MapHighlight
+          mapStore={display.map}
+          highlightStore={display.highlighter}
+        />
+        {children}
+      </MapComponent>
+    );
+  }
 );
 
 MapPane.displayName = "MapPane";

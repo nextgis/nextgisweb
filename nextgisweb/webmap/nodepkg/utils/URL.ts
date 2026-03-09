@@ -1,110 +1,110 @@
 export interface URLParams {
-    [key: string]: string | boolean;
+  [key: string]: string | boolean;
 }
 
 interface StateData {
-    url: string;
-    params?: Record<string, string>;
-    type?: string;
+  url: string;
+  params?: Record<string, string>;
+  type?: string;
 }
 
 interface PushStateData {
-    state: StateData;
-    url: string;
+  state: StateData;
+  url: string;
 }
 
 function _pushState(data: PushStateData): void {
-    if (history) {
-        history.replaceState(data.state, document.title, data.url);
-    }
+  if (history) {
+    history.replaceState(data.state, document.title, data.url);
+  }
 }
 
 export function getURLParams<U = URLParams>(): Record<
-    keyof U,
-    string | boolean
+  keyof U,
+  string | boolean
 > {
-    const params: URLParams = {};
+  const params: URLParams = {};
 
-    window.location.href.replace(
-        /[?&]+(\w+)([^&]*)/gi,
-        function (m: string, key: string): string {
-            params[key] = true;
-            return ""; // does not matter
-        }
-    );
+  window.location.href.replace(
+    /[?&]+(\w+)([^&]*)/gi,
+    function (m: string, key: string): string {
+      params[key] = true;
+      return ""; // does not matter
+    }
+  );
 
-    window.location.href.replace(
-        /[?&]+([^=&]+)=([^&]*)/gi,
-        function (m: string, key: string, value: string): string {
-            params[key] = decodeURIComponent(value);
-            return ""; // does not matter
-        }
-    );
+  window.location.href.replace(
+    /[?&]+([^=&]+)=([^&]*)/gi,
+    function (m: string, key: string, value: string): string {
+      params[key] = decodeURIComponent(value);
+      return ""; // does not matter
+    }
+  );
 
-    return params as Record<keyof U, string | boolean>;
+  return params as Record<keyof U, string | boolean>;
 }
 
 export function removeURLParameter(key: string): PushStateData {
-    const sourceUrl = location.search;
-    let rtn = sourceUrl.split("?")[0];
-    let param: string;
-    let paramsArr: string[];
-    const queryString =
-        sourceUrl.indexOf("?") !== -1 ? sourceUrl.split("?")[1] : "";
+  const sourceUrl = location.search;
+  let rtn = sourceUrl.split("?")[0];
+  let param: string;
+  let paramsArr: string[];
+  const queryString =
+    sourceUrl.indexOf("?") !== -1 ? sourceUrl.split("?")[1] : "";
 
-    if (queryString !== "") {
-        paramsArr = queryString.split("&");
-        for (let i = paramsArr.length - 1; i >= 0; i -= 1) {
-            param = paramsArr[i].split("=")[0];
-            if (param === key) {
-                paramsArr.splice(i, 1);
-            }
-        }
-        rtn = rtn + "?" + paramsArr.join("&");
+  if (queryString !== "") {
+    paramsArr = queryString.split("&");
+    for (let i = paramsArr.length - 1; i >= 0; i -= 1) {
+      param = paramsArr[i].split("=")[0];
+      if (param === key) {
+        paramsArr.splice(i, 1);
+      }
     }
+    rtn = rtn + "?" + paramsArr.join("&");
+  }
 
-    const data = {
-        state: { url: rtn, type: "remove" },
-        url: rtn,
-    };
+  const data = {
+    state: { url: rtn, type: "remove" },
+    url: rtn,
+  };
 
-    _pushState(data);
+  _pushState(data);
 
-    return data;
+  return data;
 }
 
 export function setURLParam(
-    name: string,
-    value: string
+  name: string,
+  value: string
 ): PushStateData | undefined {
-    if (value) {
-        let search: string;
-        const urlComponent = encodeURIComponent(value);
-        const urlParams = getURLParams();
-        const existUrlParam = urlParams[name];
+  if (value) {
+    let search: string;
+    const urlComponent = encodeURIComponent(value);
+    const urlParams = getURLParams();
+    const existUrlParam = urlParams[name];
 
-        if (existUrlParam) {
-            search = location.search.replace(
-                new RegExp("([?|&]" + name + "=)" + "(.+?)(&|$)"),
-                "$1" + urlComponent + "$3"
-            );
-        } else if (location.search.length) {
-            search = location.search + "&" + name + "=" + urlComponent;
-        } else {
-            search = "?" + name + "=" + urlComponent;
-        }
-
-        const params: Record<string, string> = {};
-        params[name] = value;
-
-        const data = {
-            state: { url: search, params: params },
-            url: search,
-        };
-
-        _pushState(data);
-        return data;
+    if (existUrlParam) {
+      search = location.search.replace(
+        new RegExp("([?|&]" + name + "=)" + "(.+?)(&|$)"),
+        "$1" + urlComponent + "$3"
+      );
+    } else if (location.search.length) {
+      search = location.search + "&" + name + "=" + urlComponent;
     } else {
-        return removeURLParameter(name);
+      search = "?" + name + "=" + urlComponent;
     }
+
+    const params: Record<string, string> = {};
+    params[name] = value;
+
+    const data = {
+      state: { url: search, params: params },
+      url: search,
+    };
+
+    _pushState(data);
+    return data;
+  } else {
+    return removeURLParameter(name);
+  }
 }

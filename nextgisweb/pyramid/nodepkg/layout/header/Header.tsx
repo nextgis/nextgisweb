@@ -11,38 +11,38 @@ import HeaderLogo from "./HeaderLogo";
 // import "./Header.less";
 
 export interface HeaderProps {
-    header: string;
-    hideResourceFilter?: boolean;
-    hideMenu?: boolean;
+  header: string;
+  hideResourceFilter?: boolean;
+  hideMenu?: boolean;
 }
 
 const Menu = lazy(() => import("../Menu"));
 
 export const Header = observer<HeaderProps>((props: HeaderProps) => {
-    const { header, hideMenu = false } = props;
-    const hideMenuRef = useRef(hideMenu);
+  const { header, hideMenu = false } = props;
+  const hideMenuRef = useRef(hideMenu);
 
-    useEffect(() => {
-        layoutStore.setHideMenu(hideMenuRef.current);
-    }, []);
+  useEffect(() => {
+    layoutStore.setHideMenu(hideMenuRef.current);
+  }, []);
 
-    return (
-        <div className="ngw-pyramid-layout-header">
-            <HeaderLogo />
-            <div className="text">{header}</div>
-            <div className="container">
-                <HeaderComponents {...props} />
+  return (
+    <div className="ngw-pyramid-layout-header">
+      <HeaderLogo />
+      <div className="text">{header}</div>
+      <div className="container">
+        <HeaderComponents {...props} />
 
-                <Avatar />
+        <Avatar />
 
-                {!layoutStore.hideMenu && (
-                    <Suspense fallback={null}>
-                        <Menu {...props} />
-                    </Suspense>
-                )}
-            </div>
-        </div>
-    );
+        {!layoutStore.hideMenu && (
+          <Suspense fallback={null}>
+            <Menu {...props} />
+          </Suspense>
+        )}
+      </div>
+    </div>
+  );
 });
 
 Header.displayName = "Header";

@@ -14,49 +14,49 @@ import { useInteraction } from "../hook/useInteraction";
 import type { LayerEditorMode } from "../type";
 
 export const ModifyMode: LayerEditorMode = ({ order }) => {
-    const { features, addUndo, selectStyle } = useEditorContext();
+  const { features, addUndo, selectStyle } = useEditorContext();
 
-    const [active, setActive] = useState(false);
+  const [active, setActive] = useState(false);
 
-    const createInteraction = useCallback(() => {
-        const pre = new WeakMap<OlFeature<Geometry>, Geometry>();
+  const createInteraction = useCallback(() => {
+    const pre = new WeakMap<OlFeature<Geometry>, Geometry>();
 
-        const modify = new Modify({
-            features,
-            style: selectStyle,
-            deleteCondition: (evt) => shiftKeyOnly(evt) && singleClick(evt),
-        });
-        modify.on("modifystart", (e: ModifyEvent) => {
-            e.features.forEach((f) => {
-                const g = f.getGeometry();
-                if (g) pre.set(f, g.clone());
-            });
-        });
+    const modify = new Modify({
+      features,
+      style: selectStyle,
+      deleteCondition: (evt) => shiftKeyOnly(evt) && singleClick(evt),
+    });
+    modify.on("modifystart", (e: ModifyEvent) => {
+      e.features.forEach((f) => {
+        const g = f.getGeometry();
+        if (g) pre.set(f, g.clone());
+      });
+    });
 
-        modify.on("modifyend", (e: ModifyEvent) => {
-            e.features.forEach((f) => {
-                const before = pre.get(f);
-                if (before) {
-                    addUndo(() => f.setGeometry(before.clone()));
-                    pre.delete(f);
-                }
-            });
-        });
-        return modify;
-    }, [addUndo, features, selectStyle]);
+    modify.on("modifyend", (e: ModifyEvent) => {
+      e.features.forEach((f) => {
+        const before = pre.get(f);
+        if (before) {
+          addUndo(() => f.setGeometry(before.clone()));
+          pre.delete(f);
+        }
+      });
+    });
+    return modify;
+  }, [addUndo, features, selectStyle]);
 
-    useInteraction(ModifyMode.displayName, active, createInteraction);
+  useInteraction(ModifyMode.displayName, active, createInteraction);
 
-    return (
-        <ToggleControl
-            groupId={ModifyMode.displayName}
-            title={gettext("Modify")}
-            order={order}
-            onChange={setActive}
-        >
-            <EditIcon />
-        </ToggleControl>
-    );
+  return (
+    <ToggleControl
+      groupId={ModifyMode.displayName}
+      title={gettext("Modify")}
+      order={order}
+      onChange={setActive}
+    >
+      <EditIcon />
+    </ToggleControl>
+  );
 };
 
 ModifyMode.displayName = "ModifyMode";

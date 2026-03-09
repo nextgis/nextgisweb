@@ -9,127 +9,123 @@ import type { PanelPlugin } from "./registry";
 type Source = "init" | "menu" | "manager";
 
 interface NavigationPanelInfo {
-    active?: string;
-    source: Source;
+  active?: string;
+  source: Source;
 }
 
 export class PanelManager {
-    private _display: Display;
+  private _display: Display;
 
-    private _onChangePanel?: (panel?: PanelStore) => void;
+  private _onChangePanel?: (panel?: PanelStore) => void;
 
-    @observable.ref accessor allowPanels: string[] | null;
+  @observable.ref accessor allowPanels: string[] | null;
 
-    @observable.shallow accessor panels = new Map<string, PanelStore>();
-    @observable.shallow accessor active: NavigationPanelInfo = {
-        active: undefined,
-        source: "init",
-    };
+  @observable.shallow accessor panels = new Map<string, PanelStore>();
+  @observable.shallow accessor active: NavigationPanelInfo = {
+    active: undefined,
+    source: "init",
+  };
 
-    constructor({
-        display,
-        activePanelKey,
-        allowPanels,
-        onChangePanel,
-    }: {
-        display: Display;
-        activePanelKey?: string | undefined;
-        allowPanels?: string[] | undefined;
-        onChangePanel?: (panel?: PanelStore) => void;
-    }) {
-        this._display = display;
-        if (activePanelKey) {
-            this.active = { active: activePanelKey, source: "init" };
-        }
-        this.allowPanels = allowPanels ?? null;
-        this._onChangePanel = onChangePanel;
+  constructor({
+    display,
+    activePanelKey,
+    allowPanels,
+    onChangePanel,
+  }: {
+    display: Display;
+    activePanelKey?: string | undefined;
+    allowPanels?: string[] | undefined;
+    onChangePanel?: (panel?: PanelStore) => void;
+  }) {
+    this._display = display;
+    if (activePanelKey) {
+      this.active = { active: activePanelKey, source: "init" };
     }
+    this.allowPanels = allowPanels ?? null;
+    this._onChangePanel = onChangePanel;
+  }
 
-    @computed
-    get visiblePanels() {
-        return [...this.sorted].filter((panel) =>
-            this._display.isMobile ? !panel.desktopOnly : true
-        );
+  @computed
+  get visiblePanels() {
+    return [...this.sorted].filter((panel) =>
+      this._display.isMobile ? !panel.desktopOnly : true
+    );
+  }
+
+  @computed
+  get activePanel(): PanelStore | undefined {
+    if (this.activePanelName) {
+      return this.visiblePanels.find(
+        ({ name }) => name === this.activePanelName
+      );
     }
+  }
 
-    @computed
-    get activePanel(): PanelStore | undefined {
-        if (this.activePanelName) {
-            return this.visiblePanels.find(
-                ({ name }) => name === this.activePanelName
-            );
-        }
+  @computed
+  get activePanelName(): string | undefined {
+    return this.active.active;
+  }
+
+  @action.bound
+  setAllowPanels(val: string[] | null) {
+    this.allowPanels = val;
+  }
+
+  async registerPlugin(
+    pluginDef: PanelPlugin<PanelStore> | string
+  ): Promise<PanelStore | undefined> {
+    let plugin: PanelPlugin<PanelStore> | undefined = undefined;
+    if (typeof pluginDef === "string") {
+      plugin = registry.queryOne(({ name }) => name === pluginDef);
+    } else {
+      plugin = pluginDef;
     }
-
-    @computed
-    get activePanelName(): string | undefined {
-        return this.active.active;
+    if (plugin) {
+      const Cls = plugin.store ? (await plugin.store()).default : PanelStore;
+      const panel = new Cls({ plugin, display: this._display });
+      const panels = new Map(this.panels);
+      panels.set(plugin.name, panel);
+      runInAction(() => {
+        this.panels = panels;
+      });
+      // this._handleInitActive();
+      return panel;
     }
+  }
 
-    @action.bound
-    setAllowPanels(val: string[] | null) {
-        this.allowPanels = val;
+  @action
+  setActive(active: string | undefined, source: Source): void {
+    const currentActive = this.active.active;
+    this.active = { active, source };
+    if (currentActive !== active) {
+      if (this._onChangePanel) {
+        this._onChangePanel(this.activePanel);
+      }
     }
+  }
 
-    async registerPlugin(
-        pluginDef: PanelPlugin<PanelStore> | string
-    ): Promise<PanelStore | undefined> {
-        let plugin: PanelPlugin<PanelStore> | undefined = undefined;
-        if (typeof pluginDef === "string") {
-            plugin = registry.queryOne(({ name }) => name === pluginDef);
-        } else {
-            plugin = pluginDef;
-        }
-        if (plugin) {
-            const Cls = plugin.store
-                ? (await plugin.store()).default
-                : PanelStore;
-            const panel = new Cls({ plugin, display: this._display });
-            const panels = new Map(this.panels);
-            panels.set(plugin.name, panel);
-            runInAction(() => {
-                this.panels = panels;
-            });
-            // this._handleInitActive();
-            return panel;
-        }
-    }
+  closePanel = (): void => {
+    this.setActive(undefined, "manager");
+  };
 
-    @action
-    setActive(active: string | undefined, source: Source): void {
-        const currentActive = this.active.active;
-        this.active = { active, source };
-        if (currentActive !== active) {
-            if (this._onChangePanel) {
-                this._onChangePanel(this.activePanel);
-            }
-        }
-    }
+  getActivePanelName(): string | undefined {
+    return this.activePanelName;
+  }
 
-    closePanel = (): void => {
-        this.setActive(undefined, "manager");
-    };
+  getPanel<T extends PanelStore = PanelStore>(name: string): T | undefined {
+    return this.panels.get(name) as T;
+  }
 
-    getActivePanelName(): string | undefined {
-        return this.activePanelName;
-    }
+  activatePanel(name: string): void {
+    this.setActive(name, "manager");
+  }
 
-    getPanel<T extends PanelStore = PanelStore>(name: string): T | undefined {
-        return this.panels.get(name) as T;
-    }
+  deactivatePanel(): void {
+    this.closePanel();
+  }
 
-    activatePanel(name: string): void {
-        this.setActive(name, "manager");
-    }
-
-    deactivatePanel(): void {
-        this.closePanel();
-    }
-
-    @computed
-    get sorted(): PanelStore[] {
-        return Array.from(this.panels.values()).sort(
-            (a, b) => a.order - b.order
-        );
-    }
+  @computed
+  get sorted(): PanelStore[] {
+    return Array.from(this.panels.values()).sort((a, b) => a.order - b.order);
+  }
 }

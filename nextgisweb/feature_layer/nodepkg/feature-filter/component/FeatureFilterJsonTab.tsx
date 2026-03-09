@@ -9,79 +9,79 @@ import type { FilterExpressionString } from "../type";
 const AsyncCode = lazy(() => import("./CodeLazy"));
 
 const CodeLoadingFallback = () => (
+  <div
+    className="code-loading-fallback"
+    style={{ textAlign: "center", padding: "20px" }}
+  >
+    <Spin styles={{ indicator: { fontSize: 24 } }} />
     <div
-        className="code-loading-fallback"
-        style={{ textAlign: "center", padding: "20px" }}
-    >
-        <Spin styles={{ indicator: { fontSize: 24 } }} />
-        <div
-            className="loading-content"
-            style={{ height: "200px", width: "100%" }}
-        />
-    </div>
+      className="loading-content"
+      style={{ height: "200px", width: "100%" }}
+    />
+  </div>
 );
 
 export interface FeatureFilterJsonProps {
-    value: FilterExpressionString | undefined;
-    onChange: (value: FilterExpressionString | undefined) => void;
-    isValid?: boolean;
+  value: FilterExpressionString | undefined;
+  onChange: (value: FilterExpressionString | undefined) => void;
+  isValid?: boolean;
 }
 
 const FeatureFilterJson = ({
-    value,
-    onChange,
-    isValid = true,
+  value,
+  onChange,
+  isValid = true,
 }: FeatureFilterJsonProps) => {
-    const onChangeHandle = useCallback(
-        (val: string) => {
-            const newValue = val === "" ? undefined : val;
+  const onChangeHandle = useCallback(
+    (val: string) => {
+      const newValue = val === "" ? undefined : val;
 
-            if (!onChange) return;
-            onChange(newValue as FilterExpressionString);
-        },
-        [onChange]
-    );
+      if (!onChange) return;
+      onChange(newValue as FilterExpressionString);
+    },
+    [onChange]
+  );
 
-    const jsonEditor = useMemo(
-        () => (
-            <Suspense fallback={<CodeLoadingFallback />}>
-                <AsyncCode
-                    value={value}
-                    onChange={onChangeHandle}
-                    lang="json"
-                    lineNumbers
-                />
-            </Suspense>
-        ),
-        [onChangeHandle, value]
-    );
+  const jsonEditor = useMemo(
+    () => (
+      <Suspense fallback={<CodeLoadingFallback />}>
+        <AsyncCode
+          value={value}
+          onChange={onChangeHandle}
+          lang="json"
+          lineNumbers
+        />
+      </Suspense>
+    ),
+    [onChangeHandle, value]
+  );
 
-    return (
-        <div className={`editor ${isValid ? "" : "invalid"}`}>{jsonEditor}</div>
-    );
+  return (
+    <div className={`editor ${isValid ? "" : "invalid"}`}>{jsonEditor}</div>
+  );
 };
 
 interface JsonTabProps {
-    store: FilterEditorStore;
+  store: FilterEditorStore;
 }
 
 export const FeatureFilterJsonTab = observer(({ store }: JsonTabProps) => {
-    const handleJsonChange = useCallback(
-        (v: FilterExpressionString | undefined) => {
-            store.setJsonValue(v);
-        },
-        [store]
-    );
+  const handleJsonChange = useCallback(
+    (v: FilterExpressionString | undefined) => {
+      store.setJsonValue(v);
+    },
+    [store]
+  );
 
-    return (
-        <div className="filter-json">
-            <FeatureFilterJson
-                value={store.jsonValue}
-                onChange={handleJsonChange}
-                isValid={store.isValid}
-            />
-        </div>
-    );
+  return (
+    <div className="filter-json">
+      <FeatureFilterJson
+        value={store.jsonValue}
+        onChange={handleJsonChange}
+        isValid={store.isValid}
+      />
+    </div>
+  );
 });
 
 FeatureFilterJsonTab.displayName = "FeatureFilterJsonTab";

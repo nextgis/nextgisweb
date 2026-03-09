@@ -16,87 +16,85 @@ import { Basemap } from "./Basemap";
 import type { WebMapStore } from "./WebMapStore";
 
 const BasemapWidget = observer<{
-    item: Basemap;
+  item: Basemap;
 }>(({ item }) => {
-    return (
-        <Area pad>
-            <LotMV
-                label={gettext("Display name")}
-                value={item.displayName}
-                component={InputValue}
-            />
-            <LotMV
-                value={item.enabled}
-                component={CheckboxValue}
-                props={{ children: gettext("Default basemap") }}
-            />
-            <LotMV
-                label={gettext("Opacity")}
-                value={item.opacity}
-                component={InputOpacity}
-            />
-            <LotMV
-                label={gettext("Resource")}
-                value={item.resourceId}
-                component={ResourceSelect}
-                props={{
-                    readOnly: true,
-                    style: { width: "100%" },
-                    pickerOptions: {
-                        initParentId: item.store.composite.parent,
-                    },
-                }}
-            />
-        </Area>
-    );
+  return (
+    <Area pad>
+      <LotMV
+        label={gettext("Display name")}
+        value={item.displayName}
+        component={InputValue}
+      />
+      <LotMV
+        value={item.enabled}
+        component={CheckboxValue}
+        props={{ children: gettext("Default basemap") }}
+      />
+      <LotMV
+        label={gettext("Opacity")}
+        value={item.opacity}
+        component={InputOpacity}
+      />
+      <LotMV
+        label={gettext("Resource")}
+        value={item.resourceId}
+        component={ResourceSelect}
+        props={{
+          readOnly: true,
+          style: { width: "100%" },
+          pickerOptions: {
+            initParentId: item.store.composite.parent,
+          },
+        }}
+      />
+    </Area>
+  );
 });
 
 BasemapWidget.displayName = "BasemapWidget";
 
 export const WebMapWidget: EditorWidget<WebMapStore> = observer(({ store }) => {
-    const { pickToFocusTable } = useFocusTablePicker({
-        initParentId: store.composite.parent || undefined,
-    });
+  const { pickToFocusTable } = useFocusTablePicker({
+    initParentId: store.composite.parent || undefined,
+  });
 
-    const { tableActions, itemActions } = useMemo<
-        FocusTablePropsActions<Basemap>
-    >(
-        () => ({
-            tableActions: [
-                pickToFocusTable(
-                    (res) => {
-                        return new Basemap(store, {
-                            resource_id: res.id,
-                            display_name: res.get("resource.display_name"),
-                            enabled: !store.basemaps.some(
-                                (i) => i.enabled.value
-                            ),
-                            opacity: null,
-                        });
-                    },
-                    {
-                        pickerOptions: {
-                            requireClass: "basemap_layer",
-                            multiple: true,
-                        },
-                    }
-                ),
-            ],
-            itemActions: [action.deleteItem()],
-        }),
-        [pickToFocusTable, store]
-    );
+  const { tableActions, itemActions } = useMemo<
+    FocusTablePropsActions<Basemap>
+  >(
+    () => ({
+      tableActions: [
+        pickToFocusTable(
+          (res) => {
+            return new Basemap(store, {
+              resource_id: res.id,
+              display_name: res.get("resource.display_name"),
+              enabled: !store.basemaps.some((i) => i.enabled.value),
+              opacity: null,
+            });
+          },
+          {
+            pickerOptions: {
+              requireClass: "basemap_layer",
+              multiple: true,
+            },
+          }
+        ),
+      ],
+      itemActions: [action.deleteItem()],
+    }),
+    [pickToFocusTable, store]
+  );
 
-    return (
-        <FocusTable<Basemap>
-            store={store}
-            title={(item) => item.displayName.value}
-            columns={[]}
-            tableActions={tableActions}
-            itemActions={itemActions}
-            renderDetail={({ item }) => <BasemapWidget item={item} />}
-        />
-    );
+  return (
+    <FocusTable<Basemap>
+      store={store}
+      title={(item) => item.displayName.value}
+      columns={[]}
+      tableActions={tableActions}
+      itemActions={itemActions}
+      renderDetail={({ item }) => <BasemapWidget item={item} />}
+    />
+  );
 });
 
 WebMapWidget.displayName = "WebMapWidget";

@@ -8,43 +8,43 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import ZoomInMap from "@nextgisweb/icon/material/zoom_in_map";
 
 interface ZoomToFilteredBtnProps {
-    id: number;
-    queryParams: QueryParams | null;
-    size?: SizeType;
-    onZoomToFiltered?: (val: NgwExtent) => void;
+  id: number;
+  queryParams: QueryParams | null;
+  size?: SizeType;
+  onZoomToFiltered?: (val: NgwExtent) => void;
 }
 
 const msgZoomToFiltered = gettext("Zoom to filtered features");
 
 export const ZoomToFilteredBtn = ({
-    id,
-    queryParams,
-    size = "middle",
-    onZoomToFiltered,
+  id,
+  queryParams,
+  size = "middle",
+  onZoomToFiltered,
 }: ZoomToFilteredBtnProps) => {
-    const { route, isLoading } = useRoute("feature_layer.feature.extent", {
-        id,
+  const { route, isLoading } = useRoute("feature_layer.feature.extent", {
+    id,
+  });
+
+  const click = async () => {
+    if (!onZoomToFiltered) {
+      return;
+    }
+    const resp = await route.get({
+      query: queryParams || undefined,
+      cache: true,
     });
+    onZoomToFiltered(resp);
+  };
 
-    const click = async () => {
-        if (!onZoomToFiltered) {
-            return;
-        }
-        const resp = await route.get({
-            query: queryParams || undefined,
-            cache: true,
-        });
-        onZoomToFiltered(resp);
-    };
-
-    return (
-        <Button
-            type="text"
-            title={msgZoomToFiltered}
-            icon={<ZoomInMap />}
-            onClick={click}
-            size={size}
-            loading={isLoading}
-        />
-    );
+  return (
+    <Button
+      type="text"
+      title={msgZoomToFiltered}
+      icon={<ZoomInMap />}
+      onClick={click}
+      size={size}
+      loading={isLoading}
+    />
+  );
 };

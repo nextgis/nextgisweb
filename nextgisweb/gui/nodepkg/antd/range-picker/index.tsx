@@ -11,15 +11,15 @@ const DatePicker = generatePicker<Dayjs>(dayjsGenerateConfig);
 type RangePickerPropsWithRef = ParamsOf<typeof DatePicker.RangePicker>;
 
 export default function RangePicker({
-    ref,
-    disabledDate = disableNonPositiveYears,
-    ...restProps
+  ref,
+  disabledDate = disableNonPositiveYears,
+  ...restProps
 }: RangePickerPropsWithRef) {
-    return (
-        <DatePicker.RangePicker
-            ref={ref}
-            disabledDate={disabledDate}
-            {...restProps}
-        />
-    );
+  return (
+    <DatePicker.RangePicker
+      ref={ref}
+      disabledDate={disabledDate}
+      {...restProps}
+    />
+  );
 }

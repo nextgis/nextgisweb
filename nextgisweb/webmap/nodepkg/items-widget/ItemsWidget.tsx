@@ -44,189 +44,187 @@ const msgDrawOrderEdit = gettext("Edit draw order");
 const msgDrawOrderCustomize = gettext("Customize draw order");
 
 const GroupWidget = observer(({ item }: { item: Group }) => {
-    return (
-        <Area pad>
-            <LotMV
-                label={msgDisplayName}
-                value={item.displayName}
-                component={InputValue}
-            />
-            <Lot>
-                <Space size="middle">
-                    <CheckboxValue {...item.groupExpanded.cprops()}>
-                        {msgExpanded}
-                    </CheckboxValue>
-                    <CheckboxValue {...item.groupExclusive.cprops()}>
-                        {msgExclusive}
-                    </CheckboxValue>
-                </Space>
-            </Lot>
-        </Area>
-    );
+  return (
+    <Area pad>
+      <LotMV
+        label={msgDisplayName}
+        value={item.displayName}
+        component={InputValue}
+      />
+      <Lot>
+        <Space size="middle">
+          <CheckboxValue {...item.groupExpanded.cprops()}>
+            {msgExpanded}
+          </CheckboxValue>
+          <CheckboxValue {...item.groupExclusive.cprops()}>
+            {msgExclusive}
+          </CheckboxValue>
+        </Space>
+      </Lot>
+    </Area>
+  );
 });
 
 const adapterOptions = sortBy(
-    Object.entries(adapters).map(([k, v]) => ({
-        value: k,
-        label: v.display_name,
-    })),
-    "value"
+  Object.entries(adapters).map(([k, v]) => ({
+    value: k,
+    label: v.display_name,
+  })),
+  "value"
 );
 
 const LayerWidget = observer(({ item }: { item: Layer }) => {
-    return (
-        <Area pad cols={2}>
-            <LotMV
-                row
-                label={msgDisplayName}
-                value={item.displayName}
-                component={InputValue}
-            />
-            <Lot row>
-                <Space size="middle">
-                    <CheckboxValue {...item.layerEnabled.cprops()}>
-                        {msgEnabled}
-                    </CheckboxValue>
-                    <CheckboxValue {...item.layerIdentifiable.cprops()}>
-                        {msgIdentifiable}
-                    </CheckboxValue>
-                </Space>
-            </Lot>
-            <LotMV
-                row
-                label={msgResource}
-                value={item.layerStyleId}
-                component={ResourceSelect}
-                props={{
-                    readOnly: true,
-                    style: { width: "100%" },
-                    pickerOptions: {
-                        initParentId: item.store.composite.parent,
-                    },
-                }}
-            />
-            <LotMV
-                label={msgMinScaleDenom}
-                value={item.layerMinScaleDenom}
-                component={InputScaleDenom}
-                props={{ style: { width: "100%" } }}
-            />
-            <LotMV
-                label={msgMaxScaleDenom}
-                value={item.layerMaxScaleDenom}
-                component={InputScaleDenom}
-                props={{ style: { width: "100%" } }}
-            />
-            <LotMV
-                row
-                label={msgLegendSymbols}
-                value={item.layerLegendSymbols}
-                component={SelectLegendSymbols}
-                props={{ allowClear: true, style: { width: "100%" } }}
-            />
-            <LotMV
-                row
-                label={msgAdapter}
-                value={item.layerAdapter}
-                component={Select<string>}
-                props={{
-                    style: { width: "100%" },
-                    options: adapterOptions,
-                }}
-            />
-            <LotMV
-                row
-                label={msgTransparency}
-                value={item.layerTransparency}
-                component={InputOpacity}
-                props={{ alphaMode: "transparency", valuePercent: true }}
-            />
-        </Area>
-    );
+  return (
+    <Area pad cols={2}>
+      <LotMV
+        row
+        label={msgDisplayName}
+        value={item.displayName}
+        component={InputValue}
+      />
+      <Lot row>
+        <Space size="middle">
+          <CheckboxValue {...item.layerEnabled.cprops()}>
+            {msgEnabled}
+          </CheckboxValue>
+          <CheckboxValue {...item.layerIdentifiable.cprops()}>
+            {msgIdentifiable}
+          </CheckboxValue>
+        </Space>
+      </Lot>
+      <LotMV
+        row
+        label={msgResource}
+        value={item.layerStyleId}
+        component={ResourceSelect}
+        props={{
+          readOnly: true,
+          style: { width: "100%" },
+          pickerOptions: {
+            initParentId: item.store.composite.parent,
+          },
+        }}
+      />
+      <LotMV
+        label={msgMinScaleDenom}
+        value={item.layerMinScaleDenom}
+        component={InputScaleDenom}
+        props={{ style: { width: "100%" } }}
+      />
+      <LotMV
+        label={msgMaxScaleDenom}
+        value={item.layerMaxScaleDenom}
+        component={InputScaleDenom}
+        props={{ style: { width: "100%" } }}
+      />
+      <LotMV
+        row
+        label={msgLegendSymbols}
+        value={item.layerLegendSymbols}
+        component={SelectLegendSymbols}
+        props={{ allowClear: true, style: { width: "100%" } }}
+      />
+      <LotMV
+        row
+        label={msgAdapter}
+        value={item.layerAdapter}
+        component={Select<string>}
+        props={{
+          style: { width: "100%" },
+          options: adapterOptions,
+        }}
+      />
+      <LotMV
+        row
+        label={msgTransparency}
+        value={item.layerTransparency}
+        component={InputOpacity}
+        props={{ alphaMode: "transparency", valuePercent: true }}
+      />
+    </Area>
+  );
 });
 
 GroupWidget.displayName = "GroupWidget";
 LayerWidget.displayName = "LayerWidget";
 
 export const ItemsWidget: EditorWidget<ItemsStore> = observer(({ store }) => {
-    const { makeSignal } = useAbortController();
-    const [drawOrderEdit, setDrawOrderEdit] = useState(false);
+  const { makeSignal } = useAbortController();
+  const [drawOrderEdit, setDrawOrderEdit] = useState(false);
 
-    const { pickToFocusTable } = useFocusTablePicker({
-        initParentId: store.composite.parent || undefined,
-    });
+  const { pickToFocusTable } = useFocusTablePicker({
+    initParentId: store.composite.parent || undefined,
+  });
 
-    const drawOrderEnabled = store.drawOrderEnabled.value;
-    const { tableActions, itemActions } = useMemo(
-        () => ({
-            tableActions: [
-                pickToFocusTable<ItemObject>(
-                    async (res) => {
-                        const displayName = await getEffectiveDisplayName(res, {
-                            signal: makeSignal(),
-                        });
-                        return new Layer(store, {
-                            display_name: displayName,
-                            layer_style_id: res.id,
-                        });
-                    },
-                    {
-                        title: msgLayer,
-                        pickerOptions: {
-                            requireInterface: "IRenderableStyle",
-                            multiple: true,
-                        },
-                    }
-                ),
-                action.addItem<ItemObject, Group>(
-                    () =>
-                        new Group(store, {
-                            display_name: gettext(msgGroup),
-                        }),
-                    {
-                        key: "add_group",
-                        title: msgGroup,
-                    }
-                ),
-                (
-                    context: ItemObject | null
-                ): FocusTableAction<ItemObject | null>[] => {
-                    if (context) return [];
-                    return [
-                        {
-                            key: "draw_order",
-                            title: drawOrderEnabled
-                                ? msgDrawOrderEdit
-                                : msgDrawOrderCustomize,
-                            icon: <ReorderIcon />,
-                            placement: "left",
-                            callback: () => setDrawOrderEdit(true),
-                        },
-                    ];
-                },
-            ],
-            itemActions: [action.deleteItem<ItemObject>()],
-        }),
-        [drawOrderEnabled, makeSignal, pickToFocusTable, store]
-    );
+  const drawOrderEnabled = store.drawOrderEnabled.value;
+  const { tableActions, itemActions } = useMemo(
+    () => ({
+      tableActions: [
+        pickToFocusTable<ItemObject>(
+          async (res) => {
+            const displayName = await getEffectiveDisplayName(res, {
+              signal: makeSignal(),
+            });
+            return new Layer(store, {
+              display_name: displayName,
+              layer_style_id: res.id,
+            });
+          },
+          {
+            title: msgLayer,
+            pickerOptions: {
+              requireInterface: "IRenderableStyle",
+              multiple: true,
+            },
+          }
+        ),
+        action.addItem<ItemObject, Group>(
+          () =>
+            new Group(store, {
+              display_name: gettext(msgGroup),
+            }),
+          {
+            key: "add_group",
+            title: msgGroup,
+          }
+        ),
+        (context: ItemObject | null): FocusTableAction<ItemObject | null>[] => {
+          if (context) return [];
+          return [
+            {
+              key: "draw_order",
+              title: drawOrderEnabled
+                ? msgDrawOrderEdit
+                : msgDrawOrderCustomize,
+              icon: <ReorderIcon />,
+              placement: "left",
+              callback: () => setDrawOrderEdit(true),
+            },
+          ];
+        },
+      ],
+      itemActions: [action.deleteItem<ItemObject>()],
+    }),
+    [drawOrderEnabled, makeSignal, pickToFocusTable, store]
+  );
 
-    return drawOrderEdit ? (
-        <DrawOrderTable store={store} close={() => setDrawOrderEdit(false)} />
-    ) : (
-        <FocusTable<ItemObject>
-            store={store}
-            title={(item) => item.displayName.value}
-            tableActions={tableActions}
-            itemActions={itemActions}
-            renderDetail={({ item }) =>
-                item instanceof Group ? (
-                    <GroupWidget item={item} />
-                ) : (
-                    <LayerWidget item={item} />
-                )
-            }
-        />
-    );
+  return drawOrderEdit ? (
+    <DrawOrderTable store={store} close={() => setDrawOrderEdit(false)} />
+  ) : (
+    <FocusTable<ItemObject>
+      store={store}
+      title={(item) => item.displayName.value}
+      tableActions={tableActions}
+      itemActions={itemActions}
+      renderDetail={({ item }) =>
+        item instanceof Group ? (
+          <GroupWidget item={item} />
+        ) : (
+          <LayerWidget item={item} />
+        )
+      }
+    />
+  );
 });
 
 ItemsWidget.displayName = "ItemsWidget";

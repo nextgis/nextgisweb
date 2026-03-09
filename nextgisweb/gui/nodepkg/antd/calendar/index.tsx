@@ -9,8 +9,8 @@ import { disableNonPositiveYears } from "../date";
 const AntCalendar = generateCalendar<Dayjs>(dayjsGenerateConfig);
 
 export default function Calendar({
-    disabledDate = disableNonPositiveYears,
-    ...restProps
+  disabledDate = disableNonPositiveYears,
+  ...restProps
 }: ParamsOf<typeof AntCalendar>) {
-    return <AntCalendar disabledDate={disabledDate} {...restProps} />;
+  return <AntCalendar disabledDate={disabledDate} {...restProps} />;
 }

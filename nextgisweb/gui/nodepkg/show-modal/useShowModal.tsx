@@ -7,64 +7,64 @@ import { showModalBase } from "./showModalBase";
 import type { ShowModalOptions } from "./showModalBase";
 
 export function useShowModal({
-    modalStore: modalStoreProp,
+  modalStore: modalStoreProp,
 }: {
-    modalStore?: ModalStore;
+  modalStore?: ModalStore;
 } = {}) {
-    const [modalStore] = useState(() => modalStoreProp || new ModalStore());
+  const [modalStore] = useState(() => modalStoreProp || new ModalStore());
 
-    const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-    const showModal = useCallback(
-        <P extends ShowModalOptions>(
-            ModalComponent: ComponentType<P>,
-            config?: P
-        ) => {
-            return showModalBase(
-                (props: P) => <ModalComponent {...props} />,
+  const showModal = useCallback(
+    <P extends ShowModalOptions>(
+      ModalComponent: ComponentType<P>,
+      config?: P
+    ) => {
+      return showModalBase(
+        (props: P) => <ModalComponent {...props} />,
 
-                { modalStore, ...(config || ({} as P)) }
-            );
-        },
-        [modalStore]
-    );
+        { modalStore, ...(config || ({} as P)) }
+      );
+    },
+    [modalStore]
+  );
 
-    const lazyModal = useCallback(
-        <P extends ShowModalOptions>(
-            getModalComponent: () => Promise<{ default: ComponentType<P> }>,
-            config: P
-        ) => {
-            setIsLoading(true);
+  const lazyModal = useCallback(
+    <P extends ShowModalOptions>(
+      getModalComponent: () => Promise<{ default: ComponentType<P> }>,
+      config: P
+    ) => {
+      setIsLoading(true);
 
-            const wrappedLoader = async () => {
-                try {
-                    return await getModalComponent();
-                } finally {
-                    setIsLoading(false);
-                }
-            };
+      const wrappedLoader = async () => {
+        try {
+          return await getModalComponent();
+        } finally {
+          setIsLoading(false);
+        }
+      };
 
-            const ModalComponent = lazy(wrappedLoader);
+      const ModalComponent = lazy(wrappedLoader);
 
-            return showModalBase((props: P) => <ModalComponent {...props} />, {
-                modalStore,
-                ...(config || ({} as P)),
-            });
-        },
-        [modalStore]
-    );
-
-    useEffect(() => {
-        return () => {
-            modalStore.clean();
-        };
-    }, [modalStore]);
-
-    return {
-        showModal,
-        lazyModal,
-        isLoading,
+      return showModalBase((props: P) => <ModalComponent {...props} />, {
         modalStore,
-        modalHolder: <ModalHolder store={modalStore} />,
+        ...(config || ({} as P)),
+      });
+    },
+    [modalStore]
+  );
+
+  useEffect(() => {
+    return () => {
+      modalStore.clean();
     };
+  }, [modalStore]);
+
+  return {
+    showModal,
+    lazyModal,
+    isLoading,
+    modalStore,
+    modalHolder: <ModalHolder store={modalStore} />,
+  };
 }

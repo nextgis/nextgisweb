@@ -4,9 +4,9 @@ import { LoginForm } from "./LoginForm";
 import type { LoginFormProps } from "./type";
 
 export function LoginBox(props: LoginFormProps) {
-    return (
-        <ContentCard style={{ width: "350px" }}>
-            <LoginForm {...props} />
-        </ContentCard>
-    );
+  return (
+    <ContentCard style={{ width: "350px" }}>
+      <LoginForm {...props} />
+    </ContentCard>
+  );
 }

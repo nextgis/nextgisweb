@@ -1,77 +1,77 @@
 .ngw-pyramid-menu-icon {
-    display: inline-block;
-    position: relative;
-    vertical-align: middle;
-    cursor: pointer;
-    border-radius: 2px;
-    width: 32px;
-    height: 32px;
-    color: var(--primary);
-    line-height: 32px;
-    text-align: center;
+  display: inline-block;
+  position: relative;
+  vertical-align: middle;
+  cursor: pointer;
+  border-radius: 2px;
+  width: 32px;
+  height: 32px;
+  color: var(--primary);
+  line-height: 32px;
+  text-align: center;
+
+  > svg.icon {
+    color: inherit;
+    font-size: 32px;
+  }
+
+  > span.main {
+    color: inherit;
+    line-height: 34px;
+  }
+
+  > span.more {
+    display: block;
+    position: absolute;
+    top: -9.5px;
+    right: 0px;
 
     > svg.icon {
-        color: inherit;
-        font-size: 32px;
+      font-size: 10px;
+      line-height: 1;
     }
 
-    > span.main {
-        color: inherit;
-        line-height: 34px;
+    &-success {
+      color: var(--success);
     }
 
-    > span.more {
-        display: block;
-        position: absolute;
-        top: -9.5px;
-        right: 0px;
-
-        > svg.icon {
-            font-size: 10px;
-            line-height: 1;
-        }
-
-        &-success {
-            color: var(--success);
-        }
-
-        &-danger {
-            color: var(--danger);
-        }
+    &-danger {
+      color: var(--danger);
     }
+  }
 }
 
 .ngw-pyramid-menu-drawer {
-    .ant-drawer-header {
-        border-bottom: 1px solid rgba(0, 0, 0, 0.04);
-        padding: 16px 12px;
+  .ant-drawer-header {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+    padding: 16px 12px;
 
-        .ant-drawer-header-title .ant-drawer-close {
-            margin-left: auto;
-        }
+    .ant-drawer-header-title .ant-drawer-close {
+      margin-left: auto;
     }
+  }
 
-    .ant-drawer-body {
-        padding: 0px;
+  .ant-drawer-body {
+    padding: 0px;
 
-        a {
-            display: block;
-            padding: 12px 24px;
-            color: var(--text-base);
-            line-height: 1.25;
-            text-decoration: none;
+    a {
+      display: block;
+      padding: 12px 24px;
+      color: var(--text-base);
+      line-height: 1.25;
+      text-decoration: none;
 
-            &:hover {
-                background-color: rgba(0, 0, 0, 0.04);
-            }
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.04);
+      }
 
-            &.notification-success {
-                background-color: var(--surface-bg-success);
-            }
+      &.notification-success {
+        background-color: var(--surface-bg-success);
+      }
 
-            &.notification-danger {
-                background-color: var(--surface-bg-danger);
-            }
-        }
+      &.notification-danger {
+        background-color: var(--surface-bg-danger);
+      }
     }
+  }
 }

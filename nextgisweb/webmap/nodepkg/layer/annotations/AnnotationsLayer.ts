@@ -11,160 +11,160 @@ import type { AnnotationInfo } from "./AnnotationFeature";
 import type { AnnotationsPopup } from "./AnnotationsPopup";
 
 export interface AccessFilter {
-    public: boolean;
-    own: boolean;
-    private: boolean;
+  public: boolean;
+  own: boolean;
+  private: boolean;
 }
 
 export class AnnotationsLayer {
-    private _layer: VectorLayerClass;
-    private _source: VectorSource;
-    private _map: MapStore | null = null;
-    private _popupsVisible: boolean | null = null;
-    private _editable = false;
-    private _filter: AccessFilter = {
-        public: true,
-        own: true,
-        private: false,
+  private _layer: VectorLayerClass;
+  private _source: VectorSource;
+  private _map: MapStore | null = null;
+  private _popupsVisible: boolean | null = null;
+  private _editable = false;
+  private _filter: AccessFilter = {
+    public: true,
+    own: true,
+    private: false,
+  };
+
+  constructor({
+    editable,
+    visible,
+  }: {
+    editable?: boolean;
+    visible?: boolean;
+  } = {}) {
+    this._editable = editable ?? false;
+    this._source = new VectorSource();
+    this._layer = new VectorLayerClass("", {
+      title: "annotations",
+      visible,
+    });
+    this._layer.getLayer().setSource(this._source);
+
+    const olLayer = this._layer.getLayer() as ExtendedOlLayer;
+    olLayer.printingCopy = () => {
+      const newSource = new VectorSource({
+        features: this._source.getFeatures().map((feature) => {
+          const clonedFeature = feature.clone();
+          const annFeature = feature.get("annFeature");
+          if (annFeature) {
+            clonedFeature.set("annFeature", annFeature);
+          }
+
+          const popup = feature.get("popup");
+          if (popup) {
+            clonedFeature.set("popup", popup);
+          }
+          clonedFeature.setStyle(feature.getStyle());
+          return clonedFeature;
+        }),
+      });
+
+      const newLayer = new VectorLayer({
+        source: newSource,
+        visible: this._layer.getLayer().getVisible(),
+        opacity: this._layer.getLayer().getOpacity(),
+        zIndex: this._layer.getLayer().getZIndex(),
+      });
+
+      return newLayer;
     };
+  }
 
-    constructor({
-        editable,
-        visible,
-    }: {
-        editable?: boolean;
-        visible?: boolean;
-    } = {}) {
-        this._editable = editable ?? false;
-        this._source = new VectorSource();
-        this._layer = new VectorLayerClass("", {
-            title: "annotations",
-            visible,
-        });
-        this._layer.getLayer().setSource(this._source);
+  addToMap(map: MapStore): void {
+    this._map = map;
+    map.addLayer(this._layer);
+  }
 
-        const olLayer = this._layer.getLayer() as ExtendedOlLayer;
-        olLayer.printingCopy = () => {
-            const newSource = new VectorSource({
-                features: this._source.getFeatures().map((feature) => {
-                    const clonedFeature = feature.clone();
-                    const annFeature = feature.get("annFeature");
-                    if (annFeature) {
-                        clonedFeature.set("annFeature", annFeature);
-                    }
+  getSource(): VectorSource {
+    return this._source;
+  }
 
-                    const popup = feature.get("popup");
-                    if (popup) {
-                        clonedFeature.set("popup", popup);
-                    }
-                    clonedFeature.setStyle(feature.getStyle());
-                    return clonedFeature;
-                }),
-            });
+  fillAnnotations(annotationsInfo: AnnotationInfo[]): void {
+    const annotationFeatures = annotationsInfo.map(
+      (annotationInfo) =>
+        new AnnotationFeature({
+          annotationInfo,
+          editable: this._editable,
+        })
+    );
 
-            const newLayer = new VectorLayer({
-                source: newSource,
-                visible: this._layer.getLayer().getVisible(),
-                opacity: this._layer.getLayer().getOpacity(),
-                zIndex: this._layer.getLayer().getZIndex(),
-            });
+    annotationFeatures.forEach((annotationFeature) => {
+      const feature = annotationFeature.getFeature();
+      if (feature) {
+        this._source.addFeature(feature);
+      }
+    });
 
-            return newLayer;
-        };
+    this.redrawFilter();
+  }
+
+  getLayer(): VectorLayerClass {
+    return this._layer;
+  }
+
+  showPopups(): void {
+    this._popupsVisible = true;
+    this.redrawFilter();
+  }
+
+  showPopup(annotationFeature: AnnotationFeature): void {
+    if (this._map) {
+      annotationFeature.togglePopup(true, this._map);
     }
+  }
 
-    addToMap(map: MapStore): void {
-        this._map = map;
-        map.addLayer(this._layer);
+  setZIndex(zIndex: number) {
+    this._layer.setZIndex(zIndex);
+  }
+
+  hidePopups(): void {
+    const features = this._source.getFeatures();
+    features.forEach((feature) => {
+      const annFeature = feature.get("annFeature") as AnnotationFeature;
+      annFeature.togglePopup(false);
+    });
+    this._popupsVisible = false;
+  }
+
+  removeAnnFeature(annFeature: AnnotationFeature): void {
+    const olFeature = annFeature.getFeature();
+    if (olFeature) {
+      const popup = olFeature.get("popup") as AnnotationsPopup;
+      popup.remove();
+      this._source.removeFeature(olFeature);
+      annFeature.clearOlFeature();
     }
+  }
 
-    getSource(): VectorSource {
-        return this._source;
-    }
+  getFilter(): AccessFilter {
+    return this._filter;
+  }
 
-    fillAnnotations(annotationsInfo: AnnotationInfo[]): void {
-        const annotationFeatures = annotationsInfo.map(
-            (annotationInfo) =>
-                new AnnotationFeature({
-                    annotationInfo,
-                    editable: this._editable,
-                })
-        );
+  applyFilter(filter: AccessFilter): void {
+    this._filter = filter;
+    this.redrawFilter();
+  }
 
-        annotationFeatures.forEach((annotationFeature) => {
-            const feature = annotationFeature.getFeature();
-            if (feature) {
-                this._source.addFeature(feature);
-            }
-        });
+  redrawFilter(): void {
+    const features = this._source.getFeatures();
+    const filter = this._filter;
 
-        this.redrawFilter();
-    }
+    features.forEach((feature: Feature) => {
+      const annFeature = feature.get("annFeature") as AnnotationFeature;
+      const accessType = annFeature.getAccessType();
 
-    getLayer(): VectorLayerClass {
-        return this._layer;
-    }
+      if (!accessType) return;
 
-    showPopups(): void {
-        this._popupsVisible = true;
-        this.redrawFilter();
-    }
+      const visible = filter ? filter[accessType] : true;
 
-    showPopup(annotationFeature: AnnotationFeature): void {
-        if (this._map) {
-            annotationFeature.togglePopup(true, this._map);
-        }
-    }
-
-    setZIndex(zIndex: number) {
-        this._layer.setZIndex(zIndex);
-    }
-
-    hidePopups(): void {
-        const features = this._source.getFeatures();
-        features.forEach((feature) => {
-            const annFeature = feature.get("annFeature") as AnnotationFeature;
-            annFeature.togglePopup(false);
-        });
-        this._popupsVisible = false;
-    }
-
-    removeAnnFeature(annFeature: AnnotationFeature): void {
-        const olFeature = annFeature.getFeature();
-        if (olFeature) {
-            const popup = olFeature.get("popup") as AnnotationsPopup;
-            popup.remove();
-            this._source.removeFeature(olFeature);
-            annFeature.clearOlFeature();
-        }
-    }
-
-    getFilter(): AccessFilter {
-        return this._filter;
-    }
-
-    applyFilter(filter: AccessFilter): void {
-        this._filter = filter;
-        this.redrawFilter();
-    }
-
-    redrawFilter(): void {
-        const features = this._source.getFeatures();
-        const filter = this._filter;
-
-        features.forEach((feature: Feature) => {
-            const annFeature = feature.get("annFeature") as AnnotationFeature;
-            const accessType = annFeature.getAccessType();
-
-            if (!accessType) return;
-
-            const visible = filter ? filter[accessType] : true;
-
-            annFeature.toggleVisible(visible);
-            annFeature.togglePopup(
-                this._popupsVisible ? visible : false,
-                this._map ?? undefined
-            );
-        });
-    }
+      annFeature.toggleVisible(visible);
+      annFeature.togglePopup(
+        this._popupsVisible ? visible : false,
+        this._map ?? undefined
+      );
+    });
+  }
 }

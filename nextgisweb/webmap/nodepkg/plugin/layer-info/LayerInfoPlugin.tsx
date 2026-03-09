@@ -9,48 +9,48 @@ import type { DescriptionWebMapPluginConfig } from "../type";
 import DescriptioIcon from "@nextgisweb/icon/material/article";
 
 export class LayerInfoPlugin extends PluginBase {
-    data: DescriptionWebMapPluginConfig | null = null;
-    getPluginState(nodeData: TreeLayerStore): PluginState {
-        const state = super.getPluginState(nodeData);
-        const data = this.getPlugin<DescriptionWebMapPluginConfig>(
-            nodeData.layerId
-        );
-        this.data = data;
-        return {
-            ...state,
-            enabled: !!(state.enabled && data?.description),
-        };
-    }
+  data: DescriptionWebMapPluginConfig | null = null;
+  getPluginState(nodeData: TreeLayerStore): PluginState {
+    const state = super.getPluginState(nodeData);
+    const data = this.getPlugin<DescriptionWebMapPluginConfig>(
+      nodeData.layerId
+    );
+    this.data = data;
+    return {
+      ...state,
+      enabled: !!(state.enabled && data?.description),
+    };
+  }
 
-    async run() {
-        this.openLayerInfo();
-        return undefined;
-    }
+  async run() {
+    this.openLayerInfo();
+    return undefined;
+  }
 
-    getMenuItem() {
-        return {
-            icon: <DescriptioIcon />,
-            title: gettext("Description"),
-            onClick: () => {
-                return this.run();
-            },
-        };
-    }
+  getMenuItem() {
+    return {
+      icon: <DescriptioIcon />,
+      title: gettext("Description"),
+      onClick: () => {
+        return this.run();
+      },
+    };
+  }
 
-    private async openLayerInfo() {
-        const pm = this.display.panelManager;
-        const pkey = "info";
-        const data = this.data;
+  private async openLayerInfo() {
+    const pm = this.display.panelManager;
+    const pkey = "info";
+    const data = this.data;
 
-        if (data !== null) {
-            let panel = pm.getPanel<DescriptionStore>(pkey);
-            if (!panel) {
-                panel = (await pm.registerPlugin(pkey)) as DescriptionStore;
-            }
-            if (panel) {
-                panel.setContent(data.description);
-            }
-            pm.activatePanel(pkey);
-        }
+    if (data !== null) {
+      let panel = pm.getPanel<DescriptionStore>(pkey);
+      if (!panel) {
+        panel = (await pm.registerPlugin(pkey)) as DescriptionStore;
+      }
+      if (panel) {
+        panel.setContent(data.description);
+      }
+      pm.activatePanel(pkey);
     }
+  }
 }

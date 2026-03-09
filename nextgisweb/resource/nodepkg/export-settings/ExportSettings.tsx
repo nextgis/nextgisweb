@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 
 import {
-    Col,
-    Radio,
-    Row,
-    Space,
-    Typography,
-    message,
+  Col,
+  Radio,
+  Row,
+  Space,
+  Typography,
+  message,
 } from "@nextgisweb/gui/antd";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
@@ -19,81 +19,73 @@ import type { ResourceExport } from "@nextgisweb/resource/type/api";
 const msgNote = gettext("* This will not affect REST API use which will continue to be governed by permissions.")
 
 export function ExportSettings() {
-    const [saving, setSaving] = useState(false);
+  const [saving, setSaving] = useState(false);
 
-    const [messageApi, contextHolder] = message.useMessage();
+  const [messageApi, contextHolder] = message.useMessage();
 
-    const { data, isLoading } = useRouteGet({
-        name: "pyramid.csettings",
-        options: {
-            query: { resource: ["resource_export"] },
-        },
-    });
-    const [value, setValue] = useState<ResourceExport>();
+  const { data, isLoading } = useRouteGet({
+    name: "pyramid.csettings",
+    options: {
+      query: { resource: ["resource_export"] },
+    },
+  });
+  const [value, setValue] = useState<ResourceExport>();
 
-    async function save() {
-        setSaving(true);
-        try {
-            await route("pyramid.csettings").put({
-                json: { resource: { resource_export: value } },
-            });
-            messageApi.success(gettext("The setting is saved."));
-        } catch (err) {
-            errorModal(err);
-        } finally {
-            setSaving(false);
-        }
+  async function save() {
+    setSaving(true);
+    try {
+      await route("pyramid.csettings").put({
+        json: { resource: { resource_export: value } },
+      });
+      messageApi.success(gettext("The setting is saved."));
+    } catch (err) {
+      errorModal(err);
+    } finally {
+      setSaving(false);
     }
+  }
 
-    useEffect(() => {
-        if (data?.resource) {
-            setValue(data.resource.resource_export);
-        }
-    }, [data]);
-
-    if (isLoading) {
-        return <LoadingWrapper />;
+  useEffect(() => {
+    if (data?.resource) {
+      setValue(data.resource.resource_export);
     }
+  }, [data]);
 
-    return (
+  if (isLoading) {
+    return <LoadingWrapper />;
+  }
+
+  return (
+    <Space orientation="vertical">
+      {contextHolder}
+      <Typography.Text>
+        {gettext(
+          'Select the category of users who can use the "Save as" link to download resource data.'
+        )}
+      </Typography.Text>
+      <Radio.Group value={value} onChange={(e) => setValue(e.target.value)}>
         <Space orientation="vertical">
-            {contextHolder}
-            <Typography.Text>
-                {gettext(
-                    'Select the category of users who can use the "Save as" link to download resource data.'
-                )}
-            </Typography.Text>
-            <Radio.Group
-                value={value}
-                onChange={(e) => setValue(e.target.value)}
-            >
-                <Space orientation="vertical">
-                    <Radio value="data_read">
-                        {gettext('Users with "Data: Read" permission')}
-                    </Radio>
-                    <Radio value="data_write">
-                        {gettext('Users with "Data: Modify" permission')}
-                    </Radio>
-                    <Radio value="administrators">
-                        {gettext("Administrators")}
-                    </Radio>
-                </Space>
-            </Radio.Group>
-            <Row align="middle" style={{ marginTop: "1em" }}>
-                <Col flex="none">
-                    <SaveButton onClick={save} loading={saving}>
-                        {gettext("Save")}
-                    </SaveButton>
-                </Col>
-                <Col flex="auto" style={{ marginLeft: "4em" }}>
-                    <Typography.Text
-                        type="secondary"
-                        style={{ marginTop: "8em" }}
-                    >
-                        {msgNote}
-                    </Typography.Text>
-                </Col>
-            </Row>
+          <Radio value="data_read">
+            {gettext('Users with "Data: Read" permission')}
+          </Radio>
+          <Radio value="data_write">
+            {gettext('Users with "Data: Modify" permission')}
+          </Radio>
+          <Radio value="administrators">{gettext("Administrators")}</Radio>
         </Space>
-    );
+      </Radio.Group>
+      <Row align="middle" style={{ marginTop: "1em" }}>
+        <Col flex="none">
+          <SaveButton onClick={save} loading={saving}>
+            {gettext("Save")}
+          </SaveButton>
+        </Col>
+        <Col flex="auto" style={{ marginLeft: "4em" }}>
+          <Typography.Text type="secondary" style={{ marginTop: "8em" }}>
+            {msgNote}
+          </Typography.Text>
+        </Col>
+      </Row>
+    </Space>
+  );
 }

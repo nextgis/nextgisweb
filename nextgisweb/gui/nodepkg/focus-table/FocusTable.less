@@ -1,28 +1,28 @@
 .ngw-gui-focus-table {
+  height: 100%;
+
+  > .table {
+    display: flex;
+    flex-direction: column;
     height: 100%;
 
-    > .table {
-        display: flex;
-        flex-direction: column;
-        height: 100%;
+    > .items {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      scrollbar-gutter: stable;
+      scrollbar-width: thin;
+    }
+  }
 
-        > .items {
-            flex: 1;
-            min-height: 0;
-            overflow-y: auto;
-            scrollbar-gutter: stable;
-            scrollbar-width: thin;
-        }
+  > .detail {
+    > .action-toolbar {
+      flex: 1;
+      min-width: 0;
     }
 
-    > .detail {
-        > .action-toolbar {
-            flex: 1;
-            min-width: 0;
-        }
-
-        > .focus {
-            padding: 1em;
-        }
+    > .focus {
+      padding: 1em;
     }
+  }
 }

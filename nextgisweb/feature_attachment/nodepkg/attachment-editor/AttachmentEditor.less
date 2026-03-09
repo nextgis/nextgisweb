@@ -1,58 +1,58 @@
 .ngw-feature-attachment-editor {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 
-    > span {
-        display: block;
-        flex-grow: 1;
-        min-height: 0;
+  > span {
+    display: block;
+    flex-grow: 1;
+    min-height: 0;
 
-        > .ant-upload {
-            display: block;
-            height: 100%;
-        }
+    > .ant-upload {
+      display: block;
+      height: 100%;
     }
+  }
 
-    .ant-table table {
-        > thead > tr,
-        > tbody > tr {
-            td {
-                vertical-align: top;
-            }
+  .ant-table table {
+    > thead > tr,
+    > tbody > tr {
+      td {
+        vertical-align: top;
+      }
 
-            .preview {
-                padding: 0;
-                width: 0;
+      .preview {
+        padding: 0;
+        width: 0;
 
-                &::before {
-                    display: none;
-                }
-
-                .ant-image {
-                    margin: 8px;
-                }
-            }
-
-            .name {
-                width: 40%;
-            }
-
-            .description {
-                padding-right: 0;
-                width: 60%;
-
-                &::before {
-                    display: none;
-                }
-            }
-
-            .size {
-                width: 0;
-                line-height: 32px;
-                text-align: right;
-                white-space: nowrap;
-            }
+        &::before {
+          display: none;
         }
+
+        .ant-image {
+          margin: 8px;
+        }
+      }
+
+      .name {
+        width: 40%;
+      }
+
+      .description {
+        padding-right: 0;
+        width: 60%;
+
+        &::before {
+          display: none;
+        }
+      }
+
+      .size {
+        width: 0;
+        line-height: 32px;
+        text-align: right;
+        white-space: nowrap;
+      }
     }
+  }
 }

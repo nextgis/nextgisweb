@@ -1,139 +1,139 @@
 .ngw-webmap-layers-tree.ant-tree {
-    &.ant-tree-show-line {
-        --ngw-webmap-layers-tree-indent: 20px;
-        --ngw-webmap-layers-tree-switcher: 24px;
-    }
+  &.ant-tree-show-line {
+    --ngw-webmap-layers-tree-indent: 20px;
+    --ngw-webmap-layers-tree-switcher: 24px;
+  }
 
-    .exclusive-child .ant-tree-checkbox {
-        border-radius: 50%;
-    }
+  .exclusive-child .ant-tree-checkbox {
+    border-radius: 50%;
+  }
 
-    .ant-tree-treenode {
-        margin: 0;
-        padding: 0;
+  .ant-tree-treenode {
+    margin: 0;
+    padding: 0;
 
-        > .ant-tree-indent {
-            > .ant-tree-indent-unit {
-                width: var(--ngw-webmap-layers-tree-indent);
+    > .ant-tree-indent {
+      > .ant-tree-indent-unit {
+        width: var(--ngw-webmap-layers-tree-indent);
 
-                &::before {
-                    inset-inline-end: 8px;
-                }
-            }
+        &::before {
+          inset-inline-end: 8px;
         }
-
-        > .ant-tree-switcher {
-            margin-inline-end: 0;
-            width: var(--ngw-webmap-layers-tree-switcher, 6px);
-
-            > .ant-tree-switcher-leaf-line {
-                &::after {
-                    width: 6px;
-                    height: 14px;
-                }
-            }
-        }
-
-        &.ant-tree-treenode-leaf-last {
-            > .ant-tree-switcher {
-                > .ant-tree-switcher-leaf-line {
-                    &::before {
-                        height: 14px !important;
-                    }
-                }
-            }
-        }
-
-        &.ant-tree-treenode-selected {
-            background-color: #e6f0f8;
-        }
+      }
     }
 
-    .ant-tree-switcher-line-icon {
-        vertical-align: -0.3em;
+    > .ant-tree-switcher {
+      margin-inline-end: 0;
+      width: var(--ngw-webmap-layers-tree-switcher, 6px);
+
+      > .ant-tree-switcher-leaf-line {
+        &::after {
+          width: 6px;
+          height: 14px;
+        }
+      }
     }
 
-    .ant-tree-checkbox {
-        flex-shrink: 0;
-        align-self: start;
-        scale: 0.75;
-        margin-top: 6px;
+    &.ant-tree-treenode-leaf-last {
+      > .ant-tree-switcher {
+        > .ant-tree-switcher-leaf-line {
+          &::before {
+            height: 14px !important;
+          }
+        }
+      }
     }
 
-    .ant-tree-node-content-wrapper {
-        display: flex;
-        column-gap: 6px;
-        align-items: start;
-        padding-left: 0;
-        width: 100%;
+    &.ant-tree-treenode-selected {
+      background-color: #e6f0f8;
+    }
+  }
+
+  .ant-tree-switcher-line-icon {
+    vertical-align: -0.3em;
+  }
+
+  .ant-tree-checkbox {
+    flex-shrink: 0;
+    align-self: start;
+    scale: 0.75;
+    margin-top: 6px;
+  }
+
+  .ant-tree-node-content-wrapper {
+    display: flex;
+    column-gap: 6px;
+    align-items: start;
+    padding-left: 0;
+    width: 100%;
+    min-width: 0;
+    line-height: 28px;
+
+    &:hover {
+      background: transparent;
+    }
+
+    .ant-row {
+      margin: 0;
+    }
+
+    &.ant-tree-node-selected {
+      background-color: transparent;
+    }
+
+    .ant-tree-title {
+      width: 100%;
+      min-width: 0;
+
+      .tree-item-title {
         min-width: 0;
-        line-height: 28px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+
+        &.out-of-scale-range {
+          opacity: 0.5;
+        }
+      }
+
+      .tree-item-action {
+        display: flex;
+        flex-direction: row;
+        justify-content: end;
+      }
+
+      .tree-item-title-icon {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+
+        width: 28px;
+        height: 28px;
+
+        &:empty {
+          display: none;
+        }
+
+        img {
+          display: block;
+        }
+      }
+
+      .more,
+      .action-btn {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        justify-items: center;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
 
         &:hover {
-            background: transparent;
+          background: #076dbf21;
         }
-
-        .ant-row {
-            margin: 0;
-        }
-
-        &.ant-tree-node-selected {
-            background-color: transparent;
-        }
-
-        .ant-tree-title {
-            width: 100%;
-            min-width: 0;
-
-            .tree-item-title {
-                min-width: 0;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-
-                &.out-of-scale-range {
-                    opacity: 0.5;
-                }
-            }
-
-            .tree-item-action {
-                display: flex;
-                flex-direction: row;
-                justify-content: end;
-            }
-
-            .tree-item-title-icon {
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-
-                width: 28px;
-                height: 28px;
-
-                &:empty {
-                    display: none;
-                }
-
-                img {
-                    display: block;
-                }
-            }
-
-            .more,
-            .action-btn {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                justify-items: center;
-                border-radius: 50%;
-                width: 24px;
-                height: 24px;
-
-                &:hover {
-                    background: #076dbf21;
-                }
-            }
-        }
+      }
     }
+  }
 }

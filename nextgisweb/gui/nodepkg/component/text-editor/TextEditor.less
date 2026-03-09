@@ -1,44 +1,44 @@
 .ngw-gui-component-text-editor {
-    &.borderless {
-        .ck.ck-rounded-corners {
-            .ck-sticky-panel > .ck-sticky-panel__content {
-                border-width: 0px;
-                border-bottom-width: 1px;
-            }
-            .ck-content:not(.ck-focused) {
-                box-shadow: none;
-                border-color: transparent;
-                & + div > textarea {
-                    border-color: transparent;
-                }
-            }
+  &.borderless {
+    .ck.ck-rounded-corners {
+      .ck-sticky-panel > .ck-sticky-panel__content {
+        border-width: 0px;
+        border-bottom-width: 1px;
+      }
+      .ck-content:not(.ck-focused) {
+        box-shadow: none;
+        border-color: transparent;
+        & + div > textarea {
+          border-color: transparent;
         }
+      }
     }
+  }
 
-    &.parent-height {
-        height: 100%;
+  &.parent-height {
+    height: 100%;
 
-        > .ck-editor {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
+    > .ck-editor {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
 
-            > .ck-editor__main {
-                position: relative;
-                flex-grow: 1;
+      > .ck-editor__main {
+        position: relative;
+        flex-grow: 1;
 
-                > .ck-content,
-                > .ck-source-editing-area {
-                    position: absolute;
-                    inset: 0;
+        > .ck-content,
+        > .ck-source-editing-area {
+          position: absolute;
+          inset: 0;
 
-                    > textarea {
-                        position: absolute;
-                        inset: 0;
-                        overflow-y: auto;
-                    }
-                }
-            }
+          > textarea {
+            position: absolute;
+            inset: 0;
+            overflow-y: auto;
+          }
         }
+      }
     }
+  }
 }

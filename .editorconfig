@@ -3,8 +3,8 @@ root = true
 [*]
 charset = utf-8
 
-[*.{js,jsx,cjs,ts,tsx,css,less}]
+[*.{js,jsx,cjs,ts,tsx,json,css,less}]
 indent_style = space
 trim_trailing_whitespace = true
 insert_final_newline = true
-indent_size = 4
+indent_size = 2

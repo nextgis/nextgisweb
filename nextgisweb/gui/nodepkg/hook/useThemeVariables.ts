@@ -12,30 +12,30 @@ import type { AliasToken } from "../antd";
  * @returns CSS properties with theme token values
  */
 export function useThemeVariables(
-    mapping: Record<string, keyof AliasToken>
+  mapping: Record<string, keyof AliasToken>
 ): CSSProperties {
-    const { token, hashId } = useToken();
+  const { token, hashId } = useToken();
 
-    type MemoKey = { hashId: string; mapping: typeof mapping };
-    const memo = useRef<[MemoKey, CSSProperties]>(undefined);
+  type MemoKey = { hashId: string; mapping: typeof mapping };
+  const memo = useRef<[MemoKey, CSSProperties]>(undefined);
 
-    if (!memo.current || !isEqual(memo.current[0], { hashId, mapping })) {
-        memo.current = [
-            { hashId, mapping },
-            Object.fromEntries(
-                Object.entries(mapping).map(([vname, tkey]) => [
-                    `--${vname}`,
-                    `${token[tkey]}${
-                        tkey.startsWith("borderRadius") ||
-                        tkey.startsWith("fontSize") ||
-                        tkey.startsWith("padding")
-                            ? "px"
-                            : ""
-                    }`,
-                ])
-            ),
-        ];
-    }
+  if (!memo.current || !isEqual(memo.current[0], { hashId, mapping })) {
+    memo.current = [
+      { hashId, mapping },
+      Object.fromEntries(
+        Object.entries(mapping).map(([vname, tkey]) => [
+          `--${vname}`,
+          `${token[tkey]}${
+            tkey.startsWith("borderRadius") ||
+            tkey.startsWith("fontSize") ||
+            tkey.startsWith("padding")
+              ? "px"
+              : ""
+          }`,
+        ])
+      ),
+    ];
+  }
 
-    return memo.current[1];
+  return memo.current[1];
 }

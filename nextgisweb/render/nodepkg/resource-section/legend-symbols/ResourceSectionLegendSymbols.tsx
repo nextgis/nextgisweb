@@ -5,25 +5,25 @@ import type { ResourceSection } from "@nextgisweb/resource/resource-section";
 import "./ResourceSectionLegendSymbols.less";
 
 export const ResourceSectionLegendSymbols: ResourceSection = ({
-    resourceId,
+  resourceId,
 }) => {
-    const { data: symbols } = useRouteGet({
-        name: "render.legend_symbols",
-        params: { id: resourceId },
-    });
+  const { data: symbols } = useRouteGet({
+    name: "render.legend_symbols",
+    params: { id: resourceId },
+  });
 
-    if (!symbols) return <></>;
+  if (!symbols) return <></>;
 
-    return (
-        <div className="ngw-render-resource-section-legend-symbols">
-            {symbols.map((s, idx) => (
-                <div key={idx} className="legend-symbol">
-                    <img src={"data:image/png;base64," + s.icon.data} />
-                    <div>{s.display_name}</div>
-                </div>
-            ))}
+  return (
+    <div className="ngw-render-resource-section-legend-symbols">
+      {symbols.map((s, idx) => (
+        <div key={idx} className="legend-symbol">
+          <img src={"data:image/png;base64," + s.icon.data} />
+          <div>{s.display_name}</div>
         </div>
-    );
+      ))}
+    </div>
+  );
 };
 
 ResourceSectionLegendSymbols.displayName = "ResourceSectionLegendSymbols";

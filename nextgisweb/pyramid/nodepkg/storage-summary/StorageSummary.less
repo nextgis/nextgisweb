@@ -1,41 +1,41 @@
 .ngw-pyramid-storage-summary {
-    .ant-table-cell.data-volume {
-        text-align: right;
+  .ant-table-cell.data-volume {
+    text-align: right;
+  }
+
+  tbody td.ant-table-cell.data-volume {
+    position: relative;
+    z-index: 0;
+
+    > .wrapper {
+      position: absolute;
+      top: 0px;
+      right: 0px;
+      bottom: 0px;
+      left: 0px;
+      margin: 8px;
+
+      > .bar {
+        border-radius: 4px;
+        background-color: var(--secondary);
+        height: 100%;
+      }
     }
 
-    tbody td.ant-table-cell.data-volume {
-        position: relative;
-        z-index: 0;
-
-        > .wrapper {
-            position: absolute;
-            top: 0px;
-            right: 0px;
-            bottom: 0px;
-            left: 0px;
-            margin: 8px;
-
-            > .bar {
-                border-radius: 4px;
-                background-color: var(--secondary);
-                height: 100%;
-            }
-        }
-
-        > span {
-            position: relative;
-            z-index: 10;
-        }
+    > span {
+      position: relative;
+      z-index: 10;
     }
+  }
 
-    > .panel {
-        display: flex;
-        gap: 1em;
-        margin-top: 1em;
+  > .panel {
+    display: flex;
+    gap: 1em;
+    margin-top: 1em;
 
-        > .text {
-            flex-grow: 1;
-            max-width: 40em;
-        }
+    > .text {
+      flex-grow: 1;
+      max-width: 40em;
     }
+  }
 }

@@ -3,34 +3,34 @@ import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
 import type { FeatureEditorStore } from "../feature-editor/FeatureEditorStore";
 
 export interface EditorStoreConstructorOptions {
-    parentStore?: FeatureEditorStore;
-    fields?: FeatureLayerFieldRead[];
+  parentStore?: FeatureEditorStore;
+  fields?: FeatureLayerFieldRead[];
 }
 
 export interface EditorStore<V = any> {
-    value: V;
+  value: V;
 
-    /** True if value has been changed
-     * @default false
-     */
-    dirty: boolean;
+  /** True if value has been changed
+   * @default false
+   */
+  dirty: boolean;
 
-    /**
-     * Reset to initial values
-     */
-    reset?: () => void;
+  /**
+   * Reset to initial values
+   */
+  reset?: () => void;
 
-    /**
-     * A quick report the number of records in storage value to extract for external component such as a tab
-     */
-    counter?: number | null;
+  /**
+   * A quick report the number of records in storage value to extract for external component such as a tab
+   */
+  counter?: number | null;
 
-    /**
-     * Load value into store
-     *
-     * @param value Loaded value, null indicates no data
-     */
-    load: (value: V | null) => void;
+  /**
+   * Load value into store
+   *
+   * @param value Loaded value, null indicates no data
+   */
+  load: (value: V | null) => void;
 
-    isValid?: boolean;
+  isValid?: boolean;
 }

@@ -26,71 +26,71 @@ const [msgCritical, msgHasUpdate, msgUpToDate] = [
 const { distribution } = ngwConfig;
 
 export const SystemInfoUpdate = observer(() => {
-    const [detailsVisible, setDetailsVisible] = useState(false);
-    const [showDetails, hideDetails] = useMemo(() => {
-        return [() => setDetailsVisible(true), () => setDetailsVisible(false)];
-    }, []);
+  const [detailsVisible, setDetailsVisible] = useState(false);
+  const [showDetails, hideDetails] = useMemo(() => {
+    return [() => setDetailsVisible(true), () => setDetailsVisible(false)];
+  }, []);
 
-    useEffect(() => {
-        updateStore.force();
-    }, []);
+  useEffect(() => {
+    updateStore.force();
+  }, []);
 
-    const [status, data] = updateStore.state;
-    if (status === "disabled") return <></>;
+  const [status, data] = updateStore.state;
+  if (status === "disabled") return <></>;
 
-    assert(distribution);
+  assert(distribution);
 
-    let cn, msg, extra, btn;
-    if (status === "loading") {
-        msg = msgChecking;
-    } else if (status === "up_to_date") {
-        msg = msgUpToDate({ distribution: distribution.description! });
-    } else if (status === "has_update") {
-        cn = classNames("update", { "critical": data.critical });
-        msg = (data.critical ? msgCritical : msgHasUpdate)({
-            distribution: distribution.description!,
-            version: data.version,
-        });
+  let cn, msg, extra, btn;
+  if (status === "loading") {
+    msg = msgChecking;
+  } else if (status === "up_to_date") {
+    msg = msgUpToDate({ distribution: distribution.description! });
+  } else if (status === "has_update") {
+    cn = classNames("update", { "critical": data.critical });
+    msg = (data.critical ? msgCritical : msgHasUpdate)({
+      distribution: distribution.description!,
+      version: data.version,
+    });
 
-        if (settings.support_url) {
-            extra = (
-                <TemplateLink
-                    template={msgContactSupport}
-                    link={url(settings.support_url)}
-                    target="_blank"
-                />
-            );
-        }
-
-        btn = (
-            <>
-                <Button type="primary" ghost onClick={showDetails}>
-                    {msgShowDetails}
-                </Button>
-                <Modal
-                    wrapClassName="ngw-pyramid-update-sysinfo-modal"
-                    open={detailsVisible}
-                    onCancel={hideDetails}
-                    title={distribution.description!}
-                    centered={true}
-                    footer={false}
-                    width="60em"
-                >
-                    <iframe src={data.notesUrl} />
-                </Modal>
-            </>
-        );
+    if (settings.support_url) {
+      extra = (
+        <TemplateLink
+          template={msgContactSupport}
+          link={url(settings.support_url)}
+          target="_blank"
+        />
+      );
     }
 
-    return (
-        <div className={classNames("ngw-pyramid-system-info-update", cn)}>
-            <div className="msg">
-                {msg}
-                {extra && <div>{extra}</div>}
-            </div>
-            {btn}
-        </div>
+    btn = (
+      <>
+        <Button type="primary" ghost onClick={showDetails}>
+          {msgShowDetails}
+        </Button>
+        <Modal
+          wrapClassName="ngw-pyramid-update-sysinfo-modal"
+          open={detailsVisible}
+          onCancel={hideDetails}
+          title={distribution.description!}
+          centered={true}
+          footer={false}
+          width="60em"
+        >
+          <iframe src={data.notesUrl} />
+        </Modal>
+      </>
     );
+  }
+
+  return (
+    <div className={classNames("ngw-pyramid-system-info-update", cn)}>
+      <div className="msg">
+        {msg}
+        {extra && <div>{extra}</div>}
+      </div>
+      {btn}
+    </div>
+  );
 });
 
 SystemInfoUpdate.displayName = "SystemInfoUpdate";

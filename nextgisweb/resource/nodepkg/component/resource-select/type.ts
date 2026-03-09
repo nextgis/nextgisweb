@@ -4,27 +4,27 @@ import type { SelectProps } from "@nextgisweb/gui/antd";
 import type { ResourceCls } from "@nextgisweb/resource/type/api";
 
 import type {
-    ResourcePickerStoreOptions,
-    SelectValue,
+  ResourcePickerStoreOptions,
+  SelectValue,
 } from "../resource-picker/type";
 
 export interface ResourceSelectOption {
-    label: ReactNode;
-    value: number;
-    cls: ResourceCls;
+  label: ReactNode;
+  value: number;
+  cls: ResourceCls;
 }
 
 export interface ResourceSelectProps<
-    V extends SelectValue = SelectValue,
+  V extends SelectValue = SelectValue,
 > extends Omit<
-    SelectProps<V, ResourceSelectOption>,
-    "onChange" | "options" | "multiple"
+  SelectProps<V, ResourceSelectOption>,
+  "onChange" | "options" | "multiple"
 > {
-    value?: V;
-    readOnly?: boolean;
-    hideGoto?: boolean;
-    pickerOptions?: ResourcePickerStoreOptions;
-    onChange?: (val: V | undefined) => void;
-    // We use different components for singular and multiple
-    multiple?: never;
+  value?: V;
+  readOnly?: boolean;
+  hideGoto?: boolean;
+  pickerOptions?: ResourcePickerStoreOptions;
+  onChange?: (val: V | undefined) => void;
+  // We use different components for singular and multiple
+  multiple?: never;
 }

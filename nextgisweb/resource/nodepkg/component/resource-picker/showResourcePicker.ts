@@ -7,10 +7,10 @@ import type { ResourcePickerModalProps, SelectValue } from "./type";
 const ResourcePickerModalLazy = lazy(() => import("./ResourcePickerModal"));
 
 export function showResourcePicker<V extends SelectValue = SelectValue>(
-    params: ResourcePickerModalProps<V>
+  params: ResourcePickerModalProps<V>
 ) {
-    return showModal(
-        ResourcePickerModalLazy,
-        params as ResourcePickerModalProps<SelectValue>
-    );
+  return showModal(
+    ResourcePickerModalLazy,
+    params as ResourcePickerModalProps<SelectValue>
+  );
 }

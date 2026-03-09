@@ -6,20 +6,17 @@ import type { IdentifyExtensionComponentProps } from "@nextgisweb/webmap/panel/i
 import DescriptionIcon from "@nextgisweb/icon/material/description/outline";
 
 const DescriptionView = ({ featureItem }: IdentifyExtensionComponentProps) => {
-    if (!featureItem.extensions || !featureItem.extensions["description"]) {
-        return null;
-    }
+  if (!featureItem.extensions || !featureItem.extensions["description"]) {
+    return null;
+  }
 
-    const description = featureItem.extensions["description"];
+  const description = featureItem.extensions["description"];
 
-    return (
-        <PanelSection icon={<DescriptionIcon />} title={gettext("Description")}>
-            <DescriptionHtml
-                variant="compact"
-                content={description as string}
-            />
-        </PanelSection>
-    );
+  return (
+    <PanelSection icon={<DescriptionIcon />} title={gettext("Description")}>
+      <DescriptionHtml variant="compact" content={description as string} />
+    </PanelSection>
+  );
 };
 
 DescriptionView.displayName = "DescriptionEditor";

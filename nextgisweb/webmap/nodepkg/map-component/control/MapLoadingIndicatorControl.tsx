@@ -8,23 +8,23 @@ import { MapControl } from "./MapControl";
 import type { MapControlProps } from "./MapControl";
 
 const MapLoadingIndicatorControl = observer((props: MapControlProps) => {
-    const { mapStore } = useMapContext();
+  const { mapStore } = useMapContext();
 
-    return (
-        mapStore.isLoading && (
-            <MapControl {...props}>
-                <div
-                    className="ol-unselectable"
-                    style={{
-                        paddingLeft: "5px",
-                        paddingRight: "5px",
-                    }}
-                >
-                    <Spin />
-                </div>
-            </MapControl>
-        )
-    );
+  return (
+    mapStore.isLoading && (
+      <MapControl {...props}>
+        <div
+          className="ol-unselectable"
+          style={{
+            paddingLeft: "5px",
+            paddingRight: "5px",
+          }}
+        >
+          <Spin />
+        </div>
+      </MapControl>
+    )
+  );
 });
 
 MapLoadingIndicatorControl.displayName = "MapLoadingIndicatorControl";

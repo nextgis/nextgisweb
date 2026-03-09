@@ -8,45 +8,41 @@ import type { DisplayConfig } from "@nextgisweb/webmap/type/api";
 import AnnotationIcon from "@nextgisweb/icon/material/chat";
 
 registry.register(COMP_ID, {
-    widget: () => import("./AnnotationsPanel"),
-    name: "annotation",
-    title: gettext("Annotations"),
-    icon: <AnnotationIcon />,
-    order: 30,
-    applyToTinyMap: true,
+  widget: () => import("./AnnotationsPanel"),
+  name: "annotation",
+  title: gettext("Annotations"),
+  icon: <AnnotationIcon />,
+  order: 30,
+  applyToTinyMap: true,
 
-    tab: { forceRender: true },
+  tab: { forceRender: true },
 
-    isEnabled: ({ config }: { config: DisplayConfig }) => {
-        return (
-            config.annotations &&
-            config.annotations.enabled &&
-            config.annotations.scope.read
-        );
-    },
+  isEnabled: ({ config }: { config: DisplayConfig }) => {
+    return (
+      config.annotations &&
+      config.annotations.enabled &&
+      config.annotations.scope.read
+    );
+  },
 
-    startup: async (display: Display) => {
-        const { config, urlParams } = display;
-        const annotUrlParam = urlParams.annot as AnnotationVisibleMode;
-        const allowedUrlValues: AnnotationVisibleMode[] = [
-            "no",
-            "yes",
-            "messages",
-        ];
+  startup: async (display: Display) => {
+    const { config, urlParams } = display;
+    const annotUrlParam = urlParams.annot as AnnotationVisibleMode;
+    const allowedUrlValues: AnnotationVisibleMode[] = ["no", "yes", "messages"];
 
-        let initialAnnotVisible: AnnotationVisibleMode | undefined = undefined;
-        if (annotUrlParam && allowedUrlValues.includes(annotUrlParam)) {
-            initialAnnotVisible = annotUrlParam;
-        }
-        initialAnnotVisible = initialAnnotVisible || config.annotations.default;
+    let initialAnnotVisible: AnnotationVisibleMode | undefined = undefined;
+    if (annotUrlParam && allowedUrlValues.includes(annotUrlParam)) {
+      initialAnnotVisible = annotUrlParam;
+    }
+    initialAnnotVisible = initialAnnotVisible || config.annotations.default;
 
-        const { default: annotationStore } =
-            await import("@nextgisweb/webmap/store/annotations");
-        annotationStore.setVisibleMode(initialAnnotVisible);
+    const { default: annotationStore } =
+      await import("@nextgisweb/webmap/store/annotations");
+    annotationStore.setVisibleMode(initialAnnotVisible);
 
-        const { AnnotationsManager } =
-            await import("@nextgisweb/webmap/ui/annotations-manager/AnnotationsManager");
+    const { AnnotationsManager } =
+      await import("@nextgisweb/webmap/ui/annotations-manager/AnnotationsManager");
 
-        AnnotationsManager.getInstance({ display, initialAnnotVisible });
-    },
+    AnnotationsManager.getInstance({ display, initialAnnotVisible });
+  },
 });

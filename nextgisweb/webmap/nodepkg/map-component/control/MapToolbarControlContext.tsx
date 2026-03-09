@@ -5,16 +5,16 @@ import type { MapControlProps } from "./MapControl";
 export type Direction = "horizontal" | "vertical";
 
 export interface MapToolbarContextValue {
-    position?: MapControlProps["position"];
+  position?: MapControlProps["position"];
 
-    direction: Direction;
+  direction: Direction;
 }
 
 export const MapToolbarControlContext =
-    createContext<MapToolbarContextValue | null>(null);
+  createContext<MapToolbarContextValue | null>(null);
 
 export function useMapToolbarControl(): MapToolbarContextValue | null {
-    const ctx = useContext(MapToolbarControlContext);
+  const ctx = useContext(MapToolbarControlContext);
 
-    return ctx;
+  return ctx;
 }

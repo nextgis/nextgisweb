@@ -1,64 +1,64 @@
 .ngw-pyramid-avatar {
-    cursor: pointer;
-    user-select: none;
-    white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
 
-    > a {
-        font-weight: bold;
-        font-size: 16px;
-        text-decoration: none;
-    }
+  > a {
+    font-weight: bold;
+    font-size: 16px;
+    text-decoration: none;
+  }
 
-    &-label {
-        display: inline-block;
-        vertical-align: middle;
-        border-radius: 2px;
-        background: var(--primary);
-        width: 32px;
-        height: 32px;
-        color: var(--on-primary-text);
-        font-size: 20px;
-        line-height: 32px;
-        text-align: center;
-    }
+  &-label {
+    display: inline-block;
+    vertical-align: middle;
+    border-radius: 2px;
+    background: var(--primary);
+    width: 32px;
+    height: 32px;
+    color: var(--on-primary-text);
+    font-size: 20px;
+    line-height: 32px;
+    text-align: center;
+  }
 }
 
 .ngw-pyramid-avatar-danger {
-    .ngw-pyramid-avatar-label {
-        background-color: var(--surface-bg-danger);
-        color: var(--on-primary);
-    }
+  .ngw-pyramid-avatar-label {
+    background-color: var(--surface-bg-danger);
+    color: var(--on-primary);
+  }
 }
 
 .ngw-pyramid-avatar-popover {
-    .ant-popover-container {
-        padding: 8px;
+  .ant-popover-container {
+    padding: 8px;
 
-        > .ant-popover-title {
-            padding: 4px 8px;
-        }
-
-        > .ant-popover-content {
-            display: flex;
-            flex-direction: column;
-            gap: 1ex;
-            padding: 0px;
-
-            div.warning {
-                background-color: var(--surface-bg-danger);
-                padding: 4px 8px;
-            }
-
-            a {
-                display: block;
-                padding: 4px 8px;
-                color: var(--text-base);
-                text-decoration: none;
-
-                &:hover {
-                    background-color: rgba(0, 0, 0, 0.04);
-                }
-            }
-        }
+    > .ant-popover-title {
+      padding: 4px 8px;
     }
+
+    > .ant-popover-content {
+      display: flex;
+      flex-direction: column;
+      gap: 1ex;
+      padding: 0px;
+
+      div.warning {
+        background-color: var(--surface-bg-danger);
+        padding: 4px 8px;
+      }
+
+      a {
+        display: block;
+        padding: 4px 8px;
+        color: var(--text-base);
+        text-decoration: none;
+
+        &:hover {
+          background-color: rgba(0, 0, 0, 0.04);
+        }
+      }
+    }
+  }
 }

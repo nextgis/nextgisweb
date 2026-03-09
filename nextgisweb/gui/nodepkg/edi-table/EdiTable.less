@@ -1,45 +1,45 @@
 .ngw-gui-edi-table {
-    .ant-table .ant-table-container {
-        .ant-table-cell {
-            &.row-handle {
-                padding-inline-end: 0;
-                width: 0;
-                white-space: nowrap;
-            }
+  .ant-table .ant-table-container {
+    .ant-table-cell {
+      &.row-handle {
+        padding-inline-end: 0;
+        width: 0;
+        white-space: nowrap;
+      }
 
-            &.row-actions {
-                text-align: right;
-            }
+      &.row-actions {
+        text-align: right;
+      }
 
-            &.shrink,
-            &.row-actions {
-                width: 0;
-                white-space: nowrap;
-            }
+      &.shrink,
+      &.row-actions {
+        width: 0;
+        white-space: nowrap;
+      }
 
-            &:not(.placeholder) {
-                & > .ant-select,
-                & > .ant-input,
-                & > .ant-input-number {
-                    width: 100%;
-                }
-            }
-
-            & > .ant-input,
-            & > .ant-input-number .ant-input-number-input {
-                padding-right: 0;
-                padding-left: 0;
-            }
-
-            & > .ant-select > .ant-select-selector {
-                padding-left: 0;
-            }
-
-            &.placeholder {
-                .ant-select-selection-placeholder {
-                    color: var(--primary-text);
-                }
-            }
+      &:not(.placeholder) {
+        & > .ant-select,
+        & > .ant-input,
+        & > .ant-input-number {
+          width: 100%;
         }
+      }
+
+      & > .ant-input,
+      & > .ant-input-number .ant-input-number-input {
+        padding-right: 0;
+        padding-left: 0;
+      }
+
+      & > .ant-select > .ant-select-selector {
+        padding-left: 0;
+      }
+
+      &.placeholder {
+        .ant-select-selection-placeholder {
+          color: var(--primary-text);
+        }
+      }
     }
+  }
 }

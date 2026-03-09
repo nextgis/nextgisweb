@@ -2,105 +2,105 @@
 .mapadapter-ctrl-top-right,
 .mapadapter-ctrl-bottom-left,
 .mapadapter-ctrl-bottom-right {
-    display: flex;
-    position: absolute;
-    flex-direction: column;
-    z-index: 2;
-    pointer-events: none;
+  display: flex;
+  position: absolute;
+  flex-direction: column;
+  z-index: 2;
+  pointer-events: none;
 }
 
 .mapadapter-ctrl-top-left {
-    top: 0;
-    left: 0;
+  top: 0;
+  left: 0;
 
-    .mapadapter-ctrl.mapadapter-ctrl-margin {
-        margin-inline-start: 8px;
-        margin-block-start: 8px;
-    }
+  .mapadapter-ctrl.mapadapter-ctrl-margin {
+    margin-inline-start: 8px;
+    margin-block-start: 8px;
+  }
 }
 
 .mapadapter-ctrl-top-right {
-    top: 0;
-    right: 0;
-    align-items: end;
+  top: 0;
+  right: 0;
+  align-items: end;
 
-    .mapadapter-ctrl.mapadapter-ctrl-margin {
-        margin-inline-end: 8px;
-        margin-block-start: 8px;
-    }
+  .mapadapter-ctrl.mapadapter-ctrl-margin {
+    margin-inline-end: 8px;
+    margin-block-start: 8px;
+  }
 }
 
 .mapadapter-ctrl-bottom-left {
-    bottom: 0;
-    left: 0;
+  bottom: 0;
+  left: 0;
 
-    .mapadapter-ctrl.mapadapter-ctrl-margin {
-        margin-inline-start: 8px;
-        margin-block-end: 8px;
-    }
+  .mapadapter-ctrl.mapadapter-ctrl-margin {
+    margin-inline-start: 8px;
+    margin-block-end: 8px;
+  }
 }
 
 .mapadapter-ctrl-bottom-right {
-    right: 0;
-    bottom: 0;
-    align-items: flex-end;
-    gap: 4px;
+  right: 0;
+  bottom: 0;
+  align-items: flex-end;
+  gap: 4px;
 
-    > div:last-child > .mapadapter-ctrl {
-        background-color: var(--ol-partial-background-color);
-        color: var(--ol-subtle-foreground-color);
+  > div:last-child > .mapadapter-ctrl {
+    background-color: var(--ol-partial-background-color);
+    color: var(--ol-subtle-foreground-color);
 
-        .mapadapter-ctrl-margin {
-            margin-inline-end: 8px;
-            margin-block-end: 8px;
-        }
+    .mapadapter-ctrl-margin {
+      margin-inline-end: 8px;
+      margin-block-end: 8px;
     }
+  }
 }
 
 .mapadapter-ctrl {
-    display: inline-block;
-    pointer-events: auto;
+  display: inline-block;
+  pointer-events: auto;
 }
 
 .mapadapter-ctrl-group {
-    border-radius: 2px;
-    background: #fff;
+  border-radius: 2px;
+  background: #fff;
 
-    &:not(:empty) {
-        box-shadow: 0 3px 7px rgba(2, 34, 60, 0.16);
+  &:not(:empty) {
+    box-shadow: 0 3px 7px rgba(2, 34, 60, 0.16);
+  }
+
+  button {
+    display: block;
+    cursor: pointer;
+    cursor: pointer;
+    box-sizing: border-box;
+    outline: none;
+    border: 0;
+    background-color: transparent;
+    padding: 0;
+    width: 28px;
+    height: 28px;
+    color: var(--primary);
+
+    & + button {
+      border-top: 1px solid #ddd;
     }
 
-    button {
-        display: block;
-        cursor: pointer;
-        cursor: pointer;
-        box-sizing: border-box;
-        outline: none;
-        border: 0;
-        background-color: transparent;
-        padding: 0;
-        width: 28px;
-        height: 28px;
-        color: var(--primary);
-
-        & + button {
-            border-top: 1px solid #ddd;
-        }
-
-        &:hover {
-            background-color: rgba(0, 0, 0, 0.05);
-        }
-
-        &:disabled {
-            opacity: 0.4;
-            cursor: default;
-            background-color: transparent;
-            pointer-events: none;
-            color: var(--ol-subtle-foreground-color);
-        }
-
-        > svg.icon {
-            font-size: 125%;
-        }
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.05);
     }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: default;
+      background-color: transparent;
+      pointer-events: none;
+      color: var(--ol-subtle-foreground-color);
+    }
+
+    > svg.icon {
+      font-size: 125%;
+    }
+  }
 }

@@ -1,7 +1,7 @@
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 interface PreviewEmbeddedProps {
-    iframe?: string;
+  iframe?: string;
 }
 
 // prettier-ignore
@@ -12,17 +12,17 @@ const messages = [
 ]
 
 export function PreviewEmbedded({ iframe }: PreviewEmbeddedProps) {
-    return (
-        <div style={{ overflow: "auto" }}>
-            {iframe ? (
-                <div dangerouslySetInnerHTML={{ __html: iframe }} />
-            ) : (
-                <div>
-                    {messages.map((msg, index) => (
-                        <p key={index}>{msg}</p>
-                    ))}
-                </div>
-            )}
+  return (
+    <div style={{ overflow: "auto" }}>
+      {iframe ? (
+        <div dangerouslySetInnerHTML={{ __html: iframe }} />
+      ) : (
+        <div>
+          {messages.map((msg, index) => (
+            <p key={index}>{msg}</p>
+          ))}
         </div>
-    );
+      )}
+    </div>
+  );
 }

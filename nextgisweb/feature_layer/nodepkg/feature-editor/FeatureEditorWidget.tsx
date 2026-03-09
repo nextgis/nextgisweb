@@ -1,17 +1,17 @@
 import { observer } from "mobx-react-lite";
 import {
-    Suspense,
-    lazy,
-    useCallback,
-    useEffect,
-    useMemo,
-    useState,
+  Suspense,
+  lazy,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
 } from "react";
 
 import { ActionToolbar } from "@nextgisweb/gui/action-toolbar";
 import type {
-    ActionToolbarAction,
-    ActionToolbarProps,
+  ActionToolbarAction,
+  ActionToolbarProps,
 } from "@nextgisweb/gui/action-toolbar";
 import { Button, Tabs, message } from "@nextgisweb/gui/antd";
 import type { TabsProps } from "@nextgisweb/gui/antd";
@@ -34,7 +34,7 @@ import ResetIcon from "@nextgisweb/icon/material/restart_alt";
 import "./FeatureEditorWidget.less";
 
 type TabItem = NonNullable<TabsProps["items"]>[number] & {
-    order?: number;
+  order?: number;
 };
 
 const msgLoading = gettext("Loading...");
@@ -46,183 +46,180 @@ const msgSaved = gettext("Feature saved");
 const msgNoChanges = gettext("No changes to save");
 
 export const FeatureEditorWidget = observer(
-    ({
-        showGeometryTab = true,
-        allowEmpty,
+  ({
+    showGeometryTab = true,
+    allowEmpty,
+    resourceId,
+    featureId,
+    okBtnMsg = msgOk,
+    toolbar,
+    store: storeProp,
+    mode = "save",
+    onOk,
+    onSave,
+  }: FeatureEditorWidgetProps) => {
+    const [messageApi, contextHolder] = message.useMessage();
+    const [activeKey, setActiveKey] = useState(ATTRIBUTES_KEY);
+    const store = useState<FeatureEditorStore>(() => {
+      if (storeProp) return storeProp;
+      assert(resourceId && featureId);
+      return new FeatureEditorStore({
         resourceId,
         featureId,
-        okBtnMsg = msgOk,
-        toolbar,
-        store: storeProp,
-        mode = "save",
-        onOk,
-        onSave,
-    }: FeatureEditorWidgetProps) => {
-        const [messageApi, contextHolder] = message.useMessage();
-        const [activeKey, setActiveKey] = useState(ATTRIBUTES_KEY);
-        const store = useState<FeatureEditorStore>(() => {
-            if (storeProp) return storeProp;
-            assert(resourceId && featureId);
-            return new FeatureEditorStore({
-                resourceId,
-                featureId,
-            });
-        })[0];
+      });
+    })[0];
 
-        const { dirty, saving } = store;
+    const { dirty, saving } = store;
 
-        const [items, setItems] = useState<TabItem[]>([]);
+    const [items, setItems] = useState<TabItem[]>([]);
 
-        const createEditorTab = useCallback(
-            async (newEditorWidget: FeatureEditorPlugin) => {
-                const key = newEditorWidget.identity;
-                const Store = await newEditorWidget.store();
-                const widgetStore = new Store.default({
-                    parentStore: store,
-                });
+    const createEditorTab = useCallback(
+      async (newEditorWidget: FeatureEditorPlugin) => {
+        const key = newEditorWidget.identity;
+        const Store = await newEditorWidget.store();
+        const widgetStore = new Store.default({
+          parentStore: store,
+        });
 
-                if (key === ATTRIBUTES_KEY) {
-                    store.attachAttributeStore(widgetStore);
-                } else if (key === GEOMETRY_KEY) {
-                    if (!showGeometryTab) {
-                        return;
-                    }
-                    store.attachGeometryStore(widgetStore);
-                } else {
-                    store.addExtensionStore(key, widgetStore);
-                }
+        if (key === ATTRIBUTES_KEY) {
+          store.attachAttributeStore(widgetStore);
+        } else if (key === GEOMETRY_KEY) {
+          if (!showGeometryTab) {
+            return;
+          }
+          store.attachGeometryStore(widgetStore);
+        } else {
+          store.addExtensionStore(key, widgetStore);
+        }
 
-                const Widget = lazy(async () => await newEditorWidget.widget());
+        const Widget = lazy(async () => await newEditorWidget.widget());
 
-                const TabsLabelObserver = observer(() => (
-                    <TabsLabelBadge
-                        counter={widgetStore.counter ?? undefined}
-                        dirty={widgetStore.dirty}
-                    >
-                        {newEditorWidget.label}
-                    </TabsLabelBadge>
-                ));
+        const TabsLabelObserver = observer(() => (
+          <TabsLabelBadge
+            counter={widgetStore.counter ?? undefined}
+            dirty={widgetStore.dirty}
+          >
+            {newEditorWidget.label}
+          </TabsLabelBadge>
+        ));
 
-                TabsLabelObserver.displayName = "TabsLabelObserver";
+        TabsLabelObserver.displayName = "TabsLabelObserver";
 
-                return {
-                    key,
-                    order: newEditorWidget.order,
-                    label: <TabsLabelObserver />,
-                    children: (
-                        <Suspense fallback={msgLoading}>
-                            <Widget store={widgetStore}></Widget>
-                        </Suspense>
-                    ),
-                };
-            },
-            [showGeometryTab, store]
-        );
+        return {
+          key,
+          order: newEditorWidget.order,
+          label: <TabsLabelObserver />,
+          children: (
+            <Suspense fallback={msgLoading}>
+              <Widget store={widgetStore}></Widget>
+            </Suspense>
+          ),
+        };
+      },
+      [showGeometryTab, store]
+    );
 
-        useEffect(() => {
-            const loadWidgets = async () => {
-                const newTabs: TabItem[] = [];
+    useEffect(() => {
+      const loadWidgets = async () => {
+        const newTabs: TabItem[] = [];
 
-                for (const reg of registry.queryAll()) {
-                    const tab = await createEditorTab(reg);
-                    if (tab) {
-                        newTabs.push(tab);
-                    }
-                }
-                newTabs.sort((a, b) => (a.order ?? 100) - (b.order ?? 100));
-                setItems(newTabs);
-            };
+        for (const reg of registry.queryAll()) {
+          const tab = await createEditorTab(reg);
+          if (tab) {
+            newTabs.push(tab);
+          }
+        }
+        newTabs.sort((a, b) => (a.order ?? 100) - (b.order ?? 100));
+        setItems(newTabs);
+      };
 
-            loadWidgets();
-        }, [store, createEditorTab]);
+      loadWidgets();
+    }, [store, createEditorTab]);
 
-        const onSaveClick = useCallback(async () => {
-            if (mode === "save") {
-                try {
-                    if (!dirty) {
-                        messageApi.success({ content: msgNoChanges });
-                        return;
-                    }
-                    const res = await store.save();
-                    if (res) {
-                        messageApi.success({ content: msgSaved });
-                        if (onSave) {
-                            onSave(res);
-                        }
-                    }
-                } catch (err) {
-                    errorModal(err);
-                }
-            } else if (onOk) {
-                onOk(
-                    store.preparePayload(),
-                    store.preparePayload({ ignoreDirty: true })
-                );
+    const onSaveClick = useCallback(async () => {
+      if (mode === "save") {
+        try {
+          if (!dirty) {
+            messageApi.success({ content: msgNoChanges });
+            return;
+          }
+          const res = await store.save();
+          if (res) {
+            messageApi.success({ content: msgSaved });
+            if (onSave) {
+              onSave(res);
             }
-        }, [dirty, messageApi, mode, onOk, onSave, store]);
-
-        useUnsavedChanges({ dirty });
-
-        const toolbarProps: Partial<ActionToolbarProps> = useMemo(() => {
-            const actions: ActionToolbarAction[] = [
-                <SaveButton
-                    disabled={allowEmpty ? false : !dirty}
-                    key="save"
-                    loading={saving}
-                    onClick={onSaveClick}
-                >
-                    {mode === "save" ? msgSave : okBtnMsg}
-                </SaveButton>,
-            ];
-            const rightActions: ActionToolbarAction[] = [];
-            if (dirty) {
-                rightActions.push(
-                    <Button
-                        key="reset"
-                        onClick={() => {
-                            store.reset();
-                        }}
-                        icon={<ResetIcon />}
-                    >
-                        {msgReset}
-                    </Button>
-                );
-            }
-
-            return {
-                ...toolbar,
-                actions: [...actions, ...(toolbar?.actions || [])],
-                rightActions: [
-                    ...rightActions,
-                    ...(toolbar?.rightActions || []),
-                ],
-            };
-        }, [
-            allowEmpty,
-            dirty,
-            saving,
-            onSaveClick,
-            mode,
-            okBtnMsg,
-            toolbar,
-            store,
-        ]);
-
-        return (
-            <div className="ngw-feature-layer-editor">
-                <Tabs
-                    type="card"
-                    size="large"
-                    activeKey={activeKey}
-                    onChange={setActiveKey}
-                    items={items}
-                    parentHeight
-                />
-                <ActionToolbar {...toolbarProps} />
-                {contextHolder}
-            </div>
+          }
+        } catch (err) {
+          errorModal(err);
+        }
+      } else if (onOk) {
+        onOk(
+          store.preparePayload(),
+          store.preparePayload({ ignoreDirty: true })
         );
-    }
+      }
+    }, [dirty, messageApi, mode, onOk, onSave, store]);
+
+    useUnsavedChanges({ dirty });
+
+    const toolbarProps: Partial<ActionToolbarProps> = useMemo(() => {
+      const actions: ActionToolbarAction[] = [
+        <SaveButton
+          disabled={allowEmpty ? false : !dirty}
+          key="save"
+          loading={saving}
+          onClick={onSaveClick}
+        >
+          {mode === "save" ? msgSave : okBtnMsg}
+        </SaveButton>,
+      ];
+      const rightActions: ActionToolbarAction[] = [];
+      if (dirty) {
+        rightActions.push(
+          <Button
+            key="reset"
+            onClick={() => {
+              store.reset();
+            }}
+            icon={<ResetIcon />}
+          >
+            {msgReset}
+          </Button>
+        );
+      }
+
+      return {
+        ...toolbar,
+        actions: [...actions, ...(toolbar?.actions || [])],
+        rightActions: [...rightActions, ...(toolbar?.rightActions || [])],
+      };
+    }, [
+      allowEmpty,
+      dirty,
+      saving,
+      onSaveClick,
+      mode,
+      okBtnMsg,
+      toolbar,
+      store,
+    ]);
+
+    return (
+      <div className="ngw-feature-layer-editor">
+        <Tabs
+          type="card"
+          size="large"
+          activeKey={activeKey}
+          onChange={setActiveKey}
+          items={items}
+          parentHeight
+        />
+        <ActionToolbar {...toolbarProps} />
+        {contextHolder}
+      </div>
+    );
+  }
 );
 
 FeatureEditorWidget.displayName = "FeatureEditorWidget";

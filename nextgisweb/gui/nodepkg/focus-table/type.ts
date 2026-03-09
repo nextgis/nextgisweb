@@ -6,34 +6,34 @@ import type { ComplexTreeEnvironment } from "./ComplexTree";
 export type FocusTableItem = NonNullable<unknown>;
 
 export interface FocusTableStore<I extends FocusTableItem> {
-    getItemChildren: (item: I | null) => IObservableArray<I> | undefined;
-    getItemContainer: (item: I) => IObservableArray<I>;
-    getItemParent: (item: I) => I | null;
-    getItemError?: (item: I) => string | boolean | undefined;
+  getItemChildren: (item: I | null) => IObservableArray<I> | undefined;
+  getItemContainer: (item: I) => IObservableArray<I>;
+  getItemParent: (item: I) => I | null;
+  getItemError?: (item: I) => string | boolean | undefined;
 }
 
 export interface FocusTableAction<
-    C,
-    E = ComplexTreeEnvironment<NonNullable<C>>,
+  C,
+  E = ComplexTreeEnvironment<NonNullable<C>>,
 > {
-    key: string;
-    title: string;
-    icon?: ReactNode;
-    placement?: "left" | "right";
-    danger?: boolean;
-    tooltip?: string;
-    callback: (ctx: C, env: E) => void;
+  key: string;
+  title: string;
+  icon?: ReactNode;
+  placement?: "left" | "right";
+  danger?: boolean;
+  tooltip?: string;
+  callback: (ctx: C, env: E) => void;
 }
 
 export type FocusTableActions<
-    C,
-    E = NonNullable<C> extends FocusTableItem
-        ? ComplexTreeEnvironment<NonNullable<C>>
-        : never,
-    M = undefined,
+  C,
+  E = NonNullable<C> extends FocusTableItem
+    ? ComplexTreeEnvironment<NonNullable<C>>
+    : never,
+  M = undefined,
 > =
-    | (
-          | FocusTableAction<C, E>
-          | ((context: C, modifier: M) => FocusTableAction<C, E>[])
-      )[]
-    | ((context: C) => FocusTableAction<C, E>[]);
+  | (
+      | FocusTableAction<C, E>
+      | ((context: C, modifier: M) => FocusTableAction<C, E>[])
+    )[]
+  | ((context: C) => FocusTableAction<C, E>[]);

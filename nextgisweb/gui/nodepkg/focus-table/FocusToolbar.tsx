@@ -8,39 +8,39 @@ import type { ComplexTreeEnvironment } from "./ComplexTree";
 import type { FocusTableAction, FocusTableItem } from "./type";
 
 function atActions<I extends FocusTableItem | null>(
-    items: FocusTableAction<I>[],
-    selected: I,
-    environmentRef: RefObject<ComplexTreeEnvironment<NonNullable<I>>>
+  items: FocusTableAction<I>[],
+  selected: I,
+  environmentRef: RefObject<ComplexTreeEnvironment<NonNullable<I>>>
 ) {
-    return items.map(
-        ({ callback, ...props }): ButtonProps => ({
-            type: "text",
-            onClick: () => callback(selected, environmentRef.current!),
-            ...props,
-        })
-    );
+  return items.map(
+    ({ callback, ...props }): ButtonProps => ({
+      type: "text",
+      onClick: () => callback(selected, environmentRef.current!),
+      ...props,
+    })
+  );
 }
 
 export interface FocusToolbarProps<I extends FocusTableItem | null> {
-    environmentRef: RefObject<ComplexTreeEnvironment<NonNullable<I>>>;
-    actions: FocusTableAction<I>[];
-    selected: I;
-    hideEmpty?: boolean;
+  environmentRef: RefObject<ComplexTreeEnvironment<NonNullable<I>>>;
+  actions: FocusTableAction<I>[];
+  selected: I;
+  hideEmpty?: boolean;
 }
 
 export function FocusToolbar<I extends FocusTableItem | null>({
-    environmentRef,
-    actions,
-    selected,
-    hideEmpty = false,
+  environmentRef,
+  actions,
+  selected,
+  hideEmpty = false,
 }: FocusToolbarProps<I>) {
-    if (hideEmpty && actions.length === 0) return <></>;
-    const [start, end] = partition(actions, (i) => i.placement !== "right");
-    return (
-        <ActionToolbar
-            actions={atActions<I>(start, selected, environmentRef)}
-            rightActions={atActions<I>(end, selected, environmentRef)}
-            borderBlockEnd
-        />
-    );
+  if (hideEmpty && actions.length === 0) return <></>;
+  const [start, end] = partition(actions, (i) => i.placement !== "right");
+  return (
+    <ActionToolbar
+      actions={atActions<I>(start, selected, environmentRef)}
+      rightActions={atActions<I>(end, selected, environmentRef)}
+      borderBlockEnd
+    />
+  );
 }

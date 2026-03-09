@@ -8,24 +8,24 @@ import { PluginBase } from "../PluginBase";
 import FilterIcon from "@nextgisweb/icon/material/filter_alt";
 
 export class LayerFilterPlugin extends PluginBase {
-    getPluginState(nodeData: TreeLayerStore): PluginState {
-        const state = super.getPluginState(nodeData);
+  getPluginState(nodeData: TreeLayerStore): PluginState {
+    const state = super.getPluginState(nodeData);
 
-        return {
-            ...state,
-            enabled: nodeData.filterable,
-        };
-    }
+    return {
+      ...state,
+      enabled: nodeData.filterable,
+    };
+  }
 
-    async run(nodeData: TreeLayerStore) {
-        await openLayerFilter(nodeData);
-        return undefined;
-    }
+  async run(nodeData: TreeLayerStore) {
+    await openLayerFilter(nodeData);
+    return undefined;
+  }
 
-    getMenuItem() {
-        return {
-            icon: <FilterIcon />,
-            title: gettext("Filter"),
-        };
-    }
+  getMenuItem() {
+    return {
+      icon: <FilterIcon />,
+      title: gettext("Filter"),
+    };
+  }
 }

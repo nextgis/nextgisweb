@@ -1,7 +1,7 @@
 import type {
-    GroupItemConfig,
-    LayerItemConfig,
-    RootItemConfig,
+  GroupItemConfig,
+  LayerItemConfig,
+  RootItemConfig,
 } from "@nextgisweb/webmap/type/api";
 
 export type TreeItemConfig = RootItemConfig | GroupItemConfig | LayerItemConfig;

@@ -9,22 +9,22 @@ import type { EditorWidget } from "../type";
 import type { DescriptionEditorStore } from "./DescriptionEditorStore";
 
 export const DescriptionEditorWidget: EditorWidget<DescriptionEditorStore> =
-    observer(({ store }) => {
-        const onChange = useCallback(
-            (value: string) => {
-                store.setValue(value ? value : null);
-            },
-            [store]
-        );
+  observer(({ store }) => {
+    const onChange = useCallback(
+      (value: string) => {
+        store.setValue(value ? value : null);
+      },
+      [store]
+    );
 
-        return (
-            <TextEditor
-                value={store.value ? store.value : ""}
-                onChange={onChange}
-                border={false}
-            />
-        );
-    });
+    return (
+      <TextEditor
+        value={store.value ? store.value : ""}
+        onChange={onChange}
+        border={false}
+      />
+    );
+  });
 
 DescriptionEditorWidget.displayName = "DescriptionEditorWidget";
 DescriptionEditorWidget.title = gettext("Description");

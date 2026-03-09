@@ -1,6 +1,6 @@
 {
-    "name": "@nextgisweb/spatial-ref-sys",
-    "version": "0.0.0",
-    "type": "module",
-    "dependencies": {}
+  "name": "@nextgisweb/spatial-ref-sys",
+  "version": "0.0.0",
+  "type": "module",
+  "dependencies": {}
 }

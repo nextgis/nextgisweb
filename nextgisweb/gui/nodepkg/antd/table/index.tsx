@@ -10,37 +10,37 @@ import "./index.less";
 export type TableRef = Reference;
 
 export interface TableProps<D = any> extends AntTableProps<D> {
-    card?: boolean;
-    parentHeight?: boolean;
-    ref?: Ref<TableRef>;
+  card?: boolean;
+  parentHeight?: boolean;
+  ref?: Ref<TableRef>;
 }
 
 export function Table<D extends AnyObject = AnyObject>({
-    ref,
+  ref,
+  className,
+  style,
+  card,
+  parentHeight,
+  bordered,
+  pagination = false,
+  ...props
+}: TableProps<D>) {
+  className = classNames(className, {
+    "ant-table-card": card,
+    "ant-table-parent-height": parentHeight,
+  });
+
+  if (card) bordered = true;
+
+  const tableProps: AntTableProps<D> = {
     className,
     style,
-    card,
-    parentHeight,
     bordered,
-    pagination = false,
-    ...props
-}: TableProps<D>) {
-    className = classNames(className, {
-        "ant-table-card": card,
-        "ant-table-parent-height": parentHeight,
-    });
+    pagination,
+    ...props,
+  };
 
-    if (card) bordered = true;
-
-    const tableProps: AntTableProps<D> = {
-        className,
-        style,
-        bordered,
-        pagination,
-        ...props,
-    };
-
-    return <TableBase {...tableProps} ref={ref} />;
+  return <TableBase {...tableProps} ref={ref} />;
 }
 
 Table.EXPAND_COLUMN = TableBase.EXPAND_COLUMN;

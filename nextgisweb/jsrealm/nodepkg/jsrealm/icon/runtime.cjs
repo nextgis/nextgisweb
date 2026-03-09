@@ -2,12 +2,12 @@ const { stringifyRequest } = require("loader-utils");
 const { stringifySymbol } = require("svg-sprite-loader/lib/utils");
 
 module.exports = function ({ symbol, config, context }) {
-    const { spriteModule, symbolModule } = config;
+  const { spriteModule, symbolModule } = config;
 
-    const spriteRequest = stringifyRequest({ context }, spriteModule);
-    const symbolRequest = stringifyRequest({ context }, symbolModule);
+  const spriteRequest = stringifyRequest({ context }, spriteModule);
+  const symbolRequest = stringifyRequest({ context }, symbolModule);
 
-    return `
+  return `
         import Symbol from ${symbolRequest};
         import sprite from ${spriteRequest};
 

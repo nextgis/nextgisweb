@@ -6,35 +6,35 @@ import { useRouteGet } from "@nextgisweb/pyramid/hook";
 import { DisplayWidget } from "./DisplayWidget";
 
 export default function DisplayPage({ id }: { id: number }) {
-    const { data: config, isLoading } = useRouteGet("webmap.display_config", {
-        id,
-    });
+  const { data: config, isLoading } = useRouteGet("webmap.display_config", {
+    id,
+  });
 
-    const { token } = useToken();
+  const { token } = useToken();
 
-    useEffect(() => {
-        const html = document.documentElement;
-        const body = document.body;
+  useEffect(() => {
+    const html = document.documentElement;
+    const body = document.body;
 
-        const prevHtmlBehavior = html.style.overscrollBehaviorY;
-        const prevBodyBehavior = body.style.overscrollBehaviorY;
+    const prevHtmlBehavior = html.style.overscrollBehaviorY;
+    const prevBodyBehavior = body.style.overscrollBehaviorY;
 
-        html.style.overscrollBehaviorY = "contain";
-        body.style.overscrollBehaviorY = "contain";
+    html.style.overscrollBehaviorY = "contain";
+    body.style.overscrollBehaviorY = "contain";
 
-        return () => {
-            html.style.overscrollBehaviorY = prevHtmlBehavior;
-            body.style.overscrollBehaviorY = prevBodyBehavior;
-        };
-    }, [token]);
+    return () => {
+      html.style.overscrollBehaviorY = prevHtmlBehavior;
+      body.style.overscrollBehaviorY = prevBodyBehavior;
+    };
+  }, [token]);
 
-    return (
-        <StrictMode>
-            {isLoading || !config ? (
-                <Spin size="large" fullscreen />
-            ) : (
-                <DisplayWidget config={config} />
-            )}
-        </StrictMode>
-    );
+  return (
+    <StrictMode>
+      {isLoading || !config ? (
+        <Spin size="large" fullscreen />
+      ) : (
+        <DisplayWidget config={config} />
+      )}
+    </StrictMode>
+  );
 }

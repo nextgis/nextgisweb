@@ -1,35 +1,35 @@
 import type {
-    FillSymbolizer,
-    LineSymbolizer,
-    MarkSymbolizer,
-    Symbolizer,
+  FillSymbolizer,
+  LineSymbolizer,
+  MarkSymbolizer,
+  Symbolizer,
 } from "geostyler-style";
 
 interface KindParams {
-    "Mark": MarkSymbolizer;
-    "Fill": FillSymbolizer;
-    "Line": LineSymbolizer;
-    "point": MarkSymbolizer;
-    "polygon": FillSymbolizer;
-    "line": LineSymbolizer;
+  "Mark": MarkSymbolizer;
+  "Fill": FillSymbolizer;
+  "Line": LineSymbolizer;
+  "point": MarkSymbolizer;
+  "polygon": FillSymbolizer;
+  "line": LineSymbolizer;
 }
 
 const markSymbolizer: MarkSymbolizer = {
-    kind: "Mark",
-    wellKnownName: "circle",
-    color: "#0E1058",
-    radius: 6,
+  kind: "Mark",
+  wellKnownName: "circle",
+  color: "#0E1058",
+  radius: 6,
 };
 
 const fillSymbolizer: FillSymbolizer = {
-    kind: "Fill",
-    color: "#0E1058",
+  kind: "Fill",
+  color: "#0E1058",
 };
 
 const lineSymbolizer: LineSymbolizer = {
-    kind: "Line",
-    color: "#0E1058",
-    width: 3,
+  kind: "Line",
+  color: "#0E1058",
+  width: 3,
 };
 
 const defaultSymbolizer: Symbolizer = markSymbolizer;
@@ -40,33 +40,33 @@ const defaultSymbolizer: Symbolizer = markSymbolizer;
  * @param {object} values Optional values
  */
 export function generateSymbolizer<K extends keyof KindParams>(
-    kind?: K,
-    values?: KindParams[K]
+  kind?: K,
+  values?: KindParams[K]
 ): Symbolizer {
-    switch (kind) {
-        case "Mark":
-        case "point":
-            return {
-                ...markSymbolizer,
-                ...values,
-            };
-        case "Fill":
-        case "polygon":
-            return {
-                ...fillSymbolizer,
-                ...values,
-            };
-        case "Line":
-        case "line":
-            return {
-                ...lineSymbolizer,
-                ...values,
-            };
+  switch (kind) {
+    case "Mark":
+    case "point":
+      return {
+        ...markSymbolizer,
+        ...values,
+      };
+    case "Fill":
+    case "polygon":
+      return {
+        ...fillSymbolizer,
+        ...values,
+      };
+    case "Line":
+    case "line":
+      return {
+        ...lineSymbolizer,
+        ...values,
+      };
 
-        default:
-            return {
-                ...defaultSymbolizer,
-                ...values,
-            } as Symbolizer;
-    }
+    default:
+      return {
+        ...defaultSymbolizer,
+        ...values,
+      } as Symbolizer;
+  }
 }

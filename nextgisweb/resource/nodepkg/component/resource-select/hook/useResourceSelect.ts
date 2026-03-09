@@ -8,34 +8,34 @@ import type { SelectValue } from "../../resource-picker/type";
 import type { ResourceSelectProps } from "../type";
 
 export function useResourceSelect<V extends SelectValue = SelectValue>({
-    value,
+  value,
 }: ResourceSelectProps<V>) {
-    const { makeSignal, abort } = useAbortController();
+  const { makeSignal, abort } = useAbortController();
 
-    const [resource, setResource] = useState<CompositeRead | null>(null);
-    const [isLoading, setIsLoading] = useState(typeof value === "number");
-    const [error, setError] = useState<NonNullable<unknown> | null>(null);
+  const [resource, setResource] = useState<CompositeRead | null>(null);
+  const [isLoading, setIsLoading] = useState(typeof value === "number");
+  const [error, setError] = useState<NonNullable<unknown> | null>(null);
 
-    useEffect(() => {
-        const loadResource = async () => {
-            abort();
-            if (typeof value === "number") {
-                try {
-                    setIsLoading(true);
-                    const res = await route("resource.item", value).get({
-                        cache: true,
-                        signal: makeSignal(),
-                    });
-                    setResource(res);
-                } catch (err) {
-                    setError(err!);
-                } finally {
-                    setIsLoading(false);
-                }
-            }
-        };
-        loadResource();
-    }, [abort, makeSignal, value]);
+  useEffect(() => {
+    const loadResource = async () => {
+      abort();
+      if (typeof value === "number") {
+        try {
+          setIsLoading(true);
+          const res = await route("resource.item", value).get({
+            cache: true,
+            signal: makeSignal(),
+          });
+          setResource(res);
+        } catch (err) {
+          setError(err!);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    };
+    loadResource();
+  }, [abort, makeSignal, value]);
 
-    return { resource, isLoading, error };
+  return { resource, isLoading, error };
 }

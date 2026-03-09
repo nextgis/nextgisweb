@@ -4,28 +4,28 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { LunkwillData } from "./type";
 
 interface BaseAPIErrorOpts<D> {
-    title?: string;
-    detail?: string;
-    data?: D;
+  title?: string;
+  detail?: string;
+  data?: D;
 }
 
 export class BaseAPIError<D = unknown> extends BaseError {
-    readonly message: string;
-    readonly title: string;
-    readonly detail?: string;
-    readonly data?: D;
+  readonly message: string;
+  readonly title: string;
+  readonly detail?: string;
+  readonly data?: D;
 
-    protected defaultMessage = gettext("Something went wrong.");
-    protected defaultTitle = gettext("Unknown API error");
-    protected defaultDetail: string | undefined = undefined;
+  protected defaultMessage = gettext("Something went wrong.");
+  protected defaultTitle = gettext("Unknown API error");
+  protected defaultDetail: string | undefined = undefined;
 
-    constructor(message?: string, options: BaseAPIErrorOpts<D> = {}) {
-        super(message);
-        this.message = message ?? this.defaultMessage;
-        this.title = options.title ?? this.defaultTitle;
-        this.detail = options.detail ?? this.defaultDetail;
-        this.data = options.data;
-    }
+  constructor(message?: string, options: BaseAPIErrorOpts<D> = {}) {
+    super(message);
+    this.message = message ?? this.defaultMessage;
+    this.title = options.title ?? this.defaultTitle;
+    this.detail = options.detail ?? this.defaultDetail;
+    this.data = options.data;
+  }
 }
 
 // prettier-ignore
@@ -36,31 +36,31 @@ export class NetworkResponseError extends BaseAPIError<undefined> {
 }
 
 export class InvalidResponseError extends BaseAPIError<undefined> {
-    protected defaultMessage = gettext("Something went wrong.");
-    protected defaultTitle = gettext("Unexpected server response");
+  protected defaultMessage = gettext("Something went wrong.");
+  protected defaultTitle = gettext("Unexpected server response");
 }
 
 export interface ServerResponseErrorData {
-    message?: string;
-    title?: string;
-    detail?: string;
-    exception?: string;
-    status_code: number;
+  message?: string;
+  title?: string;
+  detail?: string;
+  exception?: string;
+  status_code: number;
 }
 
 export class ServerResponseError extends BaseAPIError<ServerResponseErrorData> {
-    readonly exception?: string;
-    readonly status_code: number;
+  readonly exception?: string;
+  readonly status_code: number;
 
-    constructor(data: ServerResponseErrorData) {
-        super(data.message, {
-            title: data.title,
-            detail: data.detail,
-            data: data,
-        });
-        this.exception = data.exception;
-        this.status_code = data.status_code;
-    }
+  constructor(data: ServerResponseErrorData) {
+    super(data.message, {
+      title: data.title,
+      detail: data.detail,
+      data: data,
+    });
+    this.exception = data.exception;
+    this.status_code = data.status_code;
+  }
 }
 
 // prettier-ignore
@@ -74,11 +74,11 @@ export class LunkwillError extends BaseAPIError<LunkwillData> {
 }
 
 export class LunkwillRequestCancelled extends LunkwillError {
-    protected defaultMessage = gettext("Long-running request was cancelled.");
+  protected defaultMessage = gettext("Long-running request was cancelled.");
 }
 
 export class LunkwillRequestTimeout extends LunkwillError {
-    protected defaultMessage = gettext("Long-running request timeout.");
+  protected defaultMessage = gettext("Long-running request timeout.");
 }
 
 export class LunkwillRequestFailed extends LunkwillError {}

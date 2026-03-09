@@ -3,20 +3,20 @@ import type { DragEndEvent } from "@dnd-kit/core";
 import type { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import {
-    SortableContext,
-    useSortable,
-    verticalListSortingStrategy,
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import classNames from "classnames";
 import { observer } from "mobx-react-lite";
 import {
-    createContext,
-    createElement,
-    useCallback,
-    useContext,
-    useMemo,
-    useRef,
+  createContext,
+  createElement,
+  useCallback,
+  useContext,
+  useMemo,
+  useRef,
 } from "react";
 import type { CSSProperties, FC, HTMLAttributes } from "react";
 
@@ -33,274 +33,262 @@ import { HolderOutlined } from "@ant-design/icons";
 import "./EdiTable.less";
 
 export interface EdiTableProps<
-    S extends EdiTableStore,
-    R extends AnyObject,
-    T = FunctionKeys<S>,
+  S extends EdiTableStore,
+  R extends AnyObject,
+  T = FunctionKeys<S>,
 > extends Omit<TableProps<R>, "columns"> {
-    rowActions?: T[] | RowActionConfig<T>[] | RowAction<R>[];
-    store: S;
-    columns: EdiTableColumn<R>[];
+  rowActions?: T[] | RowActionConfig<T>[] | RowAction<R>[];
+  store: S;
+  columns: EdiTableColumn<R>[];
 }
 
 const DEFAULT_ROW_ACTIONS = Object.keys(
-    WELLKNOWN_ROW_ACTIONS
+  WELLKNOWN_ROW_ACTIONS
 ) as FunctionKeys<EdiTableStore>[];
 
 interface RowContextProps {
-    setActivatorNodeRef?: (element: HTMLElement | null) => void;
-    listeners?: SyntheticListenerMap;
+  setActivatorNodeRef?: (element: HTMLElement | null) => void;
+  listeners?: SyntheticListenerMap;
 }
 
 const RowContext = createContext<RowContextProps>({});
 
 const DragHandle: FC = () => {
-    const { setActivatorNodeRef, listeners } = useContext(RowContext);
-    return (
-        <Button
-            type="text"
-            size="small"
-            icon={<HolderOutlined />}
-            style={{ cursor: "move" }}
-            ref={setActivatorNodeRef}
-            {...listeners}
-        />
-    );
+  const { setActivatorNodeRef, listeners } = useContext(RowContext);
+  return (
+    <Button
+      type="text"
+      size="small"
+      icon={<HolderOutlined />}
+      style={{ cursor: "move" }}
+      ref={setActivatorNodeRef}
+      {...listeners}
+    />
+  );
 };
 
 const RowComp: FC<
-    HTMLAttributes<HTMLTableRowElement> & { "data-row-key": string }
+  HTMLAttributes<HTMLTableRowElement> & { "data-row-key": string }
 > = (props) => {
-    const {
-        attributes,
-        listeners,
-        setNodeRef,
-        setActivatorNodeRef,
-        transform,
-        transition,
-        isDragging,
-    } = useSortable({ id: props["data-row-key"] });
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    setActivatorNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: props["data-row-key"] });
 
-    const style: CSSProperties = {
-        ...props.style,
-        transform: CSS.Translate.toString(transform),
-        transition,
-        ...(isDragging ? { position: "relative", zIndex: 9999 } : {}),
-    };
+  const style: CSSProperties = {
+    ...props.style,
+    transform: CSS.Translate.toString(transform),
+    transition,
+    ...(isDragging ? { position: "relative", zIndex: 9999 } : {}),
+  };
 
-    const contextValue = useMemo<RowContextProps>(
-        () => ({ setActivatorNodeRef, listeners }),
-        [setActivatorNodeRef, listeners]
-    );
+  const contextValue = useMemo<RowContextProps>(
+    () => ({ setActivatorNodeRef, listeners }),
+    [setActivatorNodeRef, listeners]
+  );
 
-    return (
-        <RowContext.Provider value={contextValue}>
-            <tr {...props} ref={setNodeRef} style={style} {...attributes} />
-        </RowContext.Provider>
-    );
+  return (
+    <RowContext.Provider value={contextValue}>
+      <tr {...props} ref={setNodeRef} style={style} {...attributes} />
+    </RowContext.Provider>
+  );
 };
 
 export const EdiTable = observer(
-    <R extends AnyObject = AnyObject>({
-        store,
-        columns,
-        rowActions = DEFAULT_ROW_ACTIONS,
-        className,
-        size = "small",
-        rowKey = "key",
-        ...tableProps
-    }: EdiTableProps<EdiTableStore<R>, R>) => {
-        const { moveRow, placeholder } = store;
+  <R extends AnyObject = AnyObject>({
+    store,
+    columns,
+    rowActions = DEFAULT_ROW_ACTIONS,
+    className,
+    size = "small",
+    rowKey = "key",
+    ...tableProps
+  }: EdiTableProps<EdiTableStore<R>, R>) => {
+    const { moveRow, placeholder } = store;
 
-        const tableRef = useRef<TableRef | null>(null);
+    const tableRef = useRef<TableRef | null>(null);
 
-        const renderActs = useCallback(
-            (row: R) => {
-                const actions: RowAction[] = [];
-                for (const actOrKey of rowActions) {
-                    const actConfig =
-                        typeof actOrKey === "string"
-                            ? {
-                                  key: actOrKey,
-                                  ...WELLKNOWN_ROW_ACTIONS[actOrKey],
-                              }
-                            : (actOrKey as RowAction);
-
-                    let act: RowAction;
-
-                    if (typeof actConfig.callback === "string") {
-                        const storeCbKey = actConfig.callback;
-                        const catCallback = store[storeCbKey];
-
-                        if (typeof catCallback !== "function") continue;
-                        act = { ...actConfig, callback: catCallback };
-                        act.callback = act.callback.bind(store);
-                    } else {
-                        act = actConfig;
-                    }
-
-                    actions.push(act);
+    const renderActs = useCallback(
+      (row: R) => {
+        const actions: RowAction[] = [];
+        for (const actOrKey of rowActions) {
+          const actConfig =
+            typeof actOrKey === "string"
+              ? {
+                  key: actOrKey,
+                  ...WELLKNOWN_ROW_ACTIONS[actOrKey],
                 }
-                return <RowActions {...{ row, actions, store }} />;
-            },
-            [store, rowActions]
-        );
+              : (actOrKey as RowAction);
 
-        const placeholderRef = useRef<InputRef | null>(null);
+          let act: RowAction;
 
-        const handleKeyDown = useCallback(() => {
-            const inputEl = placeholderRef.current?.input;
-            if (!inputEl) return;
+          if (typeof actConfig.callback === "string") {
+            const storeCbKey = actConfig.callback;
+            const catCallback = store[storeCbKey];
 
-            if (placeholderRef.current) {
-                placeholderRef.current.focus?.();
-            }
-        }, []);
-        const nativeEl = tableRef.current?.nativeElement;
-        useKeydownListener(
-            "Enter",
-            handleKeyDown,
-            nativeEl ? { current: nativeEl } : undefined
-        );
+            if (typeof catCallback !== "function") continue;
+            act = { ...actConfig, callback: catCallback };
+            act.callback = act.callback.bind(store);
+          } else {
+            act = actConfig;
+          }
 
-        const tableDataSource = [...store.rows];
-
-        // There is no way to append a placeholder row by overriding components
-        // property. It works in general, but looses focus on inputs. So we add
-        // placeholders to rows and customize rendering via hooks.
-        if (placeholder) {
-            tableDataSource.push(placeholder);
+          actions.push(act);
         }
+        return <RowActions {...{ row, actions, store }} />;
+      },
+      [store, rowActions]
+    );
 
-        const onDragEnd = ({ active, over }: DragEndEvent) => {
-            if (active && over && active.id !== over.id) {
-                const row = store.rows.find(
-                    (row) => row[rowKey as string] === active.id
-                );
-                const overIndex = store.rows.findIndex(
-                    (record) => record[rowKey as string] === over.id
-                );
-                if (row && overIndex !== -1 && moveRow) {
-                    moveRow(row, overIndex);
-                }
-            }
-        };
+    const placeholderRef = useRef<InputRef | null>(null);
 
-        const tableColumns: TableColumnType<R>[] = useMemo(() => {
-            const isPlaceholder = (row: R) => row === placeholder;
-            const actsCell = { className: "row-actions" };
-            const hideCell = { colSpan: 0 };
-            const placeholderCell = {
-                colSpan: columns.length + 1 + (moveRow ? 1 : 0),
-                className: "placeholder",
-            };
+    const handleKeyDown = useCallback(() => {
+      const inputEl = placeholderRef.current?.input;
+      if (!inputEl) return;
 
-            const resultColumns: TableColumnType<R>[] = [
-                ...columns.map(
-                    ({ key, component, shrink, ...columnProps }, idx) => {
-                        const result: TableColumnType = {
-                            key,
-                            dataIndex: String(key),
-                            ...columnProps,
-                        };
+      if (placeholderRef.current) {
+        placeholderRef.current.focus?.();
+      }
+    }, []);
+    const nativeEl = tableRef.current?.nativeElement;
+    useKeydownListener(
+      "Enter",
+      handleKeyDown,
+      nativeEl ? { current: nativeEl } : undefined
+    );
 
-                        const className = classNames(
-                            columnProps.className || String(key),
-                            { "shrink": shrink }
-                        );
+    const tableDataSource = [...store.rows];
 
-                        const style: CSSProperties = {};
-                        if (shrink && shrink !== true) {
-                            style.minWidth = shrink;
-                        }
-
-                        const moveSpan = idx === 0 && moveRow;
-                        result.onHeaderCell = () => ({
-                            className,
-                            colSpan: moveSpan ? 2 : 1,
-                            style: {
-                                // Antd sets center align for spanned cells
-                                textAlign: moveSpan ? "start" : undefined,
-                                ...style,
-                            },
-                        });
-
-                        result.onCell = (row: R) => {
-                            if (isPlaceholder(row)) {
-                                return idx === 0 ? placeholderCell : hideCell;
-                            }
-                            return { className, ...{ style } };
-                        };
-
-                        if (component) {
-                            result.render = (value, row) => {
-                                const placeholder =
-                                    idx === 0 && isPlaceholder(row);
-                                return createElement(component, {
-                                    value,
-                                    row,
-                                    placeholder,
-                                    placeholderRef: placeholder
-                                        ? placeholderRef
-                                        : undefined,
-                                });
-                            };
-                        }
-
-                        return result;
-                    }
-                ),
-                {
-                    key: "rowActions",
-                    fixed: "right",
-                    onHeaderCell: () => actsCell,
-                    onCell: (row: R) =>
-                        isPlaceholder(row) ? hideCell : actsCell,
-                    render: (_: any, row: R) => renderActs(row),
-                },
-            ];
-
-            if (moveRow) {
-                resultColumns.unshift({
-                    key: "sort",
-                    onHeaderCell: () => hideCell,
-                    onCell: (row: R) =>
-                        !isPlaceholder(row)
-                            ? { className: "row-handle" }
-                            : hideCell,
-                    render: () => <DragHandle />,
-                });
-            }
-
-            return resultColumns;
-        }, [placeholder, columns, renderActs, moveRow]);
-
-        return (
-            <DndContext
-                modifiers={[restrictToVerticalAxis]}
-                onDragEnd={onDragEnd}
-            >
-                <SortableContext
-                    items={store.rows.map((row: R) => row[rowKey as string])}
-                    strategy={verticalListSortingStrategy}
-                >
-                    <Table
-                        ref={tableRef}
-                        className={classNames("ngw-gui-edi-table", className)}
-                        dataSource={tableDataSource}
-                        columns={tableColumns}
-                        size={size}
-                        rowKey={rowKey}
-                        components={{
-                            body: {
-                                row: RowComp,
-                            },
-                        }}
-                        {...tableProps}
-                    />
-                </SortableContext>
-            </DndContext>
-        );
+    // There is no way to append a placeholder row by overriding components
+    // property. It works in general, but looses focus on inputs. So we add
+    // placeholders to rows and customize rendering via hooks.
+    if (placeholder) {
+      tableDataSource.push(placeholder);
     }
+
+    const onDragEnd = ({ active, over }: DragEndEvent) => {
+      if (active && over && active.id !== over.id) {
+        const row = store.rows.find(
+          (row) => row[rowKey as string] === active.id
+        );
+        const overIndex = store.rows.findIndex(
+          (record) => record[rowKey as string] === over.id
+        );
+        if (row && overIndex !== -1 && moveRow) {
+          moveRow(row, overIndex);
+        }
+      }
+    };
+
+    const tableColumns: TableColumnType<R>[] = useMemo(() => {
+      const isPlaceholder = (row: R) => row === placeholder;
+      const actsCell = { className: "row-actions" };
+      const hideCell = { colSpan: 0 };
+      const placeholderCell = {
+        colSpan: columns.length + 1 + (moveRow ? 1 : 0),
+        className: "placeholder",
+      };
+
+      const resultColumns: TableColumnType<R>[] = [
+        ...columns.map(({ key, component, shrink, ...columnProps }, idx) => {
+          const result: TableColumnType = {
+            key,
+            dataIndex: String(key),
+            ...columnProps,
+          };
+
+          const className = classNames(columnProps.className || String(key), {
+            "shrink": shrink,
+          });
+
+          const style: CSSProperties = {};
+          if (shrink && shrink !== true) {
+            style.minWidth = shrink;
+          }
+
+          const moveSpan = idx === 0 && moveRow;
+          result.onHeaderCell = () => ({
+            className,
+            colSpan: moveSpan ? 2 : 1,
+            style: {
+              // Antd sets center align for spanned cells
+              textAlign: moveSpan ? "start" : undefined,
+              ...style,
+            },
+          });
+
+          result.onCell = (row: R) => {
+            if (isPlaceholder(row)) {
+              return idx === 0 ? placeholderCell : hideCell;
+            }
+            return { className, ...{ style } };
+          };
+
+          if (component) {
+            result.render = (value, row) => {
+              const placeholder = idx === 0 && isPlaceholder(row);
+              return createElement(component, {
+                value,
+                row,
+                placeholder,
+                placeholderRef: placeholder ? placeholderRef : undefined,
+              });
+            };
+          }
+
+          return result;
+        }),
+        {
+          key: "rowActions",
+          fixed: "right",
+          onHeaderCell: () => actsCell,
+          onCell: (row: R) => (isPlaceholder(row) ? hideCell : actsCell),
+          render: (_: any, row: R) => renderActs(row),
+        },
+      ];
+
+      if (moveRow) {
+        resultColumns.unshift({
+          key: "sort",
+          onHeaderCell: () => hideCell,
+          onCell: (row: R) =>
+            !isPlaceholder(row) ? { className: "row-handle" } : hideCell,
+          render: () => <DragHandle />,
+        });
+      }
+
+      return resultColumns;
+    }, [placeholder, columns, renderActs, moveRow]);
+
+    return (
+      <DndContext modifiers={[restrictToVerticalAxis]} onDragEnd={onDragEnd}>
+        <SortableContext
+          items={store.rows.map((row: R) => row[rowKey as string])}
+          strategy={verticalListSortingStrategy}
+        >
+          <Table
+            ref={tableRef}
+            className={classNames("ngw-gui-edi-table", className)}
+            dataSource={tableDataSource}
+            columns={tableColumns}
+            size={size}
+            rowKey={rowKey}
+            components={{
+              body: {
+                row: RowComp,
+              },
+            }}
+            {...tableProps}
+          />
+        </SortableContext>
+      </DndContext>
+    );
+  }
 );
 
 EdiTable.displayName = "EdiTable";

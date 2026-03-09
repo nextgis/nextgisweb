@@ -7,29 +7,29 @@ import type { CompositeStore } from "../composite";
 export type Operation = CompositeWidgetOperation;
 
 export interface DumpParams {
-    lunkwill: LunkwillParam;
+  lunkwill: LunkwillParam;
 }
 
 export interface EditorStoreOptions {
-    composite: CompositeStore;
+  composite: CompositeStore;
 }
 
 export interface EditorStore<READ = any, CREATE = READ, UPDATE = CREATE> {
-    readonly identity: string;
+  readonly identity: string;
 
-    load: (value: READ) => unknown;
+  load: (value: READ) => unknown;
 
-    getValue?: () => CREATE | UPDATE | undefined;
+  getValue?: () => CREATE | UPDATE | undefined;
 
-    dump: (val: DumpParams) => CREATE | UPDATE | undefined;
+  dump: (val: DumpParams) => CREATE | UPDATE | undefined;
 
-    dirty: boolean;
+  dirty: boolean;
 
-    counter?: number;
+  counter?: number;
 
-    validate?: boolean;
+  validate?: boolean;
 
-    isValid: boolean;
+  isValid: boolean;
 
-    suggestedDisplayName?: string;
+  suggestedDisplayName?: string;
 }

@@ -14,68 +14,68 @@ import VisibilityOffIcon from "@nextgisweb/icon/material/visibility_off/outline"
 import ZoomInMapIcon from "@nextgisweb/icon/material/zoom_in_map/outline";
 
 export const LayersDropdown = observer(({ display }: { display: Display }) => {
-    const { treeStore, map } = display;
+  const { treeStore, map } = display;
 
-    const { route, isLoading: isExtentLoading } = useRoute("webmap.extent", {
-        id: display.config.webmapId,
+  const { route, isLoading: isExtentLoading } = useRoute("webmap.extent", {
+    id: display.config.webmapId,
+  });
+
+  const zoomToAllLayers = () => {
+    route.get().then((extent) => {
+      if (!extent) return;
+      map.zoomToNgwExtent(extent, {
+        displayProjection: display.map.displayProjection,
+      });
     });
+  };
 
-    const zoomToAllLayers = () => {
-        route.get().then((extent) => {
-            if (!extent) return;
-            map.zoomToNgwExtent(extent, {
-                displayProjection: display.map.displayProjection,
-            });
-        });
-    };
+  const hideAllLayers = () => {
+    treeStore.setVisibleIds([]);
+  };
 
-    const hideAllLayers = () => {
-        treeStore.setVisibleIds([]);
-    };
+  const restoreLayers = () => {
+    treeStore.load(display.config.rootItem);
+  };
 
-    const restoreLayers = () => {
-        treeStore.load(display.config.rootItem);
-    };
+  const menuItems: MenuProps["items"] = [
+    {
+      key: "zoomToAllLayers",
+      icon: isExtentLoading ? <Spin /> : <ZoomInMapIcon />,
+      label: gettext("Zoom to all layers"),
+      onClick: zoomToAllLayers,
+    },
+    {
+      key: "hideAllLayers",
+      icon: <VisibilityOffIcon />,
+      label: gettext("Hide all layers"),
+      disabled: !treeStore.visibleLayerIds.length,
+      onClick: hideAllLayers,
+    },
+    {
+      key: "restoreLayers",
+      icon: <RestoreIcon />,
+      label: gettext("Reset layers"),
+      onClick: restoreLayers,
+    },
+  ];
 
-    const menuItems: MenuProps["items"] = [
-        {
-            key: "zoomToAllLayers",
-            icon: isExtentLoading ? <Spin /> : <ZoomInMapIcon />,
-            label: gettext("Zoom to all layers"),
-            onClick: zoomToAllLayers,
-        },
-        {
-            key: "hideAllLayers",
-            icon: <VisibilityOffIcon />,
-            label: gettext("Hide all layers"),
-            disabled: !treeStore.visibleLayerIds.length,
-            onClick: hideAllLayers,
-        },
-        {
-            key: "restoreLayers",
-            icon: <RestoreIcon />,
-            label: gettext("Reset layers"),
-            onClick: restoreLayers,
-        },
-    ];
+  const menuProps: MenuProps = {
+    items: menuItems,
+  };
 
-    const menuProps: MenuProps = {
-        items: menuItems,
-    };
-
-    return (
-        <Dropdown
-            menu={menuProps}
-            trigger={["click"]}
-            destroyOnHidden
-            placement="bottomRight"
-        >
-            <PanelTitle.Button
-                icon={<MoreVertIcon />}
-                style={{ marginInlineStart: "8px" }}
-            />
-        </Dropdown>
-    );
+  return (
+    <Dropdown
+      menu={menuProps}
+      trigger={["click"]}
+      destroyOnHidden
+      placement="bottomRight"
+    >
+      <PanelTitle.Button
+        icon={<MoreVertIcon />}
+        style={{ marginInlineStart: "8px" }}
+      />
+    </Dropdown>
+  );
 });
 
 LayersDropdown.displayName = "LayersDropdown";

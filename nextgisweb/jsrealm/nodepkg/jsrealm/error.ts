@@ -7,10 +7,10 @@
  * assert(err.name === "CustomErrror");
  */
 export class BaseError<O extends ErrorOptions = ErrorOptions> extends Error {
-    constructor(message?: string, options?: O) {
-        super(message, options?.cause ? { cause: options?.cause } : {});
-        this.name = this.constructor.name;
-    }
+  constructor(message?: string, options?: O) {
+    super(message, options?.cause ? { cause: options?.cause } : {});
+    this.name = this.constructor.name;
+  }
 }
 
 export class AssertionError extends BaseError {}
@@ -32,10 +32,10 @@ export class AssertionError extends BaseError {}
  * console.log(value.toUpperCase());
  */
 export function assert(
-    condition: unknown,
-    message: string = "Assertion failed"
+  condition: unknown,
+  message: string = "Assertion failed"
 ): asserts condition {
-    if (!condition) {
-        throw new AssertionError(message);
-    }
+  if (!condition) {
+    throw new AssertionError(message);
+  }
 }

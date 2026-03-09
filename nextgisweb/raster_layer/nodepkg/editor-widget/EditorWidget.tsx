@@ -15,31 +15,29 @@ const uploaderMessages = {
 };
 
 export const EditorWidget: IEditorWidget<EditorStore> = observer(
-    ({ store }) => {
-        return (
-            <Area pad>
-                <Lot label={false}>
-                    <FileUploader
-                        onChange={(value) => store.update({ source: value })}
-                        onUploading={(value) =>
-                            store.update({ uploading: value })
-                        }
-                        showMaxSize
-                        multiple={false}
-                        {...uploaderMessages}
-                    />
-                </Lot>
-                <Lot label={false}>
-                    <CheckboxValue
-                        value={store.cog}
-                        onChange={(v) => store.update({ cog: v })}
-                    >
-                        {gettext("Cloud Optimized GeoTIFF (COG)")}
-                    </CheckboxValue>
-                </Lot>
-            </Area>
-        );
-    }
+  ({ store }) => {
+    return (
+      <Area pad>
+        <Lot label={false}>
+          <FileUploader
+            onChange={(value) => store.update({ source: value })}
+            onUploading={(value) => store.update({ uploading: value })}
+            showMaxSize
+            multiple={false}
+            {...uploaderMessages}
+          />
+        </Lot>
+        <Lot label={false}>
+          <CheckboxValue
+            value={store.cog}
+            onChange={(v) => store.update({ cog: v })}
+          >
+            {gettext("Cloud Optimized GeoTIFF (COG)")}
+          </CheckboxValue>
+        </Lot>
+      </Area>
+    );
+  }
 );
 
 EditorWidget.displayName = "EditorWidget";

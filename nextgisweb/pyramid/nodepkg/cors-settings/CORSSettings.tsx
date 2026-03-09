@@ -1,12 +1,12 @@
 import { useMemo, useState } from "react";
 
 import {
-    Col,
-    Form,
-    Input,
-    Row,
-    Typography,
-    message,
+  Col,
+  Form,
+  Input,
+  Row,
+  Typography,
+  message,
 } from "@nextgisweb/gui/antd";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
@@ -15,7 +15,7 @@ import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 interface CORSSettingsForm {
-    cors: string;
+  cors: string;
 }
 
 // prettier-ignore
@@ -28,95 +28,95 @@ const [msgHelp, msgInfo] = [
 const ORIGIN_RE = /^https?:\/\/(?:(\*\.)?([_a-z-][_a-z0-9-]*\.)+([_a-z-][_a-z0-9-]*)\.?|([_a-z-][_a-z0-9-]*)|(((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}))(:([1-9]|[1-9]\d{1,3}|[1-5]\d{4}|6[0-4]\d{3}|65[0-4]\d{2}|655[0-2]\d|6553[0-5]))?\/?$/g;
 
 export function CORSSettings(props: { readonly: boolean }) {
-    const [form] = Form.useForm<CORSSettingsForm>();
-    const [status, setStatus] = useState<string>();
+  const [form] = Form.useForm<CORSSettingsForm>();
+  const [status, setStatus] = useState<string>();
 
-    const [messageApi, contextHolder] = message.useMessage();
+  const [messageApi, contextHolder] = message.useMessage();
 
-    const corsRoute = useRouteGet({
-        name: "pyramid.csettings",
-        options: { "query": { pyramid: ["allow_origin"] } },
-    });
+  const corsRoute = useRouteGet({
+    name: "pyramid.csettings",
+    options: { "query": { pyramid: ["allow_origin"] } },
+  });
 
-    const allowOriginInitial = useMemo(() => {
-        const allowOrigin =
-            corsRoute.data && corsRoute?.data?.pyramid?.allow_origin;
-        return allowOrigin ? allowOrigin.join("\n") : "";
-    }, [corsRoute.data]);
+  const allowOriginInitial = useMemo(() => {
+    const allowOrigin =
+      corsRoute.data && corsRoute?.data?.pyramid?.allow_origin;
+    return allowOrigin ? allowOrigin.join("\n") : "";
+  }, [corsRoute.data]);
 
-    async function save() {
-        try {
-            setStatus("saving");
-            const { cors } = await form.validateFields();
-            try {
-                const list = cors
-                    .split(/\n/)
-                    .filter((s) => !s.match(/^\s*$/))
-                    .map((c) => c.trim());
-                await route("pyramid.csettings").put({
-                    json: { pyramid: { allow_origin: list || null } },
-                });
-                messageApi.success(gettext("CORS settings updated"));
-            } catch (err) {
-                errorModal(err);
-            }
-        } catch {
-            messageApi.error(gettext("Fix the form errors first"));
-        } finally {
-            setStatus(undefined);
+  async function save() {
+    try {
+      setStatus("saving");
+      const { cors } = await form.validateFields();
+      try {
+        const list = cors
+          .split(/\n/)
+          .filter((s) => !s.match(/^\s*$/))
+          .map((c) => c.trim());
+        await route("pyramid.csettings").put({
+          json: { pyramid: { allow_origin: list || null } },
+        });
+        messageApi.success(gettext("CORS settings updated"));
+      } catch (err) {
+        errorModal(err);
+      }
+    } catch {
+      messageApi.error(gettext("Fix the form errors first"));
+    } finally {
+      setStatus(undefined);
+    }
+  }
+
+  const validCORSRule = (val: string) => {
+    const origins = val.split(/\r?\n/).map((x) => x.trim());
+    return origins.filter(Boolean).every((x) => x.match(ORIGIN_RE));
+  };
+
+  const rules = [
+    () => ({
+      validator(_: unknown, value: string) {
+        if (value && !validCORSRule(value)) {
+          return Promise.reject(
+            new Error(gettext("The value entered is not valid"))
+          );
         }
-    }
+        return Promise.resolve();
+      },
+    }),
+  ];
 
-    const validCORSRule = (val: string) => {
-        const origins = val.split(/\r?\n/).map((x) => x.trim());
-        return origins.filter(Boolean).every((x) => x.match(ORIGIN_RE));
-    };
+  if (corsRoute.isLoading) {
+    return <LoadingWrapper loading={true} />;
+  }
 
-    const rules = [
-        () => ({
-            validator(_: unknown, value: string) {
-                if (value && !validCORSRule(value)) {
-                    return Promise.reject(
-                        new Error(gettext("The value entered is not valid"))
-                    );
-                }
-                return Promise.resolve();
-            },
-        }),
-    ];
-
-    if (corsRoute.isLoading) {
-        return <LoadingWrapper loading={true} />;
-    }
-
-    return (
-        <>
-            {contextHolder}
-            <Row gutter={[16, 16]}>
-                <Col flex="auto">
-                    <Form
-                        initialValues={{ cors: allowOriginInitial }}
-                        form={form}
-                        disabled={props.readonly}
-                    >
-                        <Form.Item rules={rules} name="cors">
-                            <Input.TextArea
-                                autoSize={{ minRows: 12, maxRows: 12 }}
-                                style={{ width: "100%" }}
-                            />
-                        </Form.Item>
-                    </Form>
-                </Col>
-                <Col flex="none" span={10}>
-                    <Typography.Paragraph>{msgHelp}</Typography.Paragraph>
-                    <Typography.Paragraph>{msgInfo}</Typography.Paragraph>
-                </Col>
-            </Row>
-            {!props.readonly ? (
-                <Row>
-                    <SaveButton onClick={save} loading={status === "saving"} />
-                </Row>
-            ) : null}
-        </>
-    );
+  return (
+    <>
+      {contextHolder}
+      <Row gutter={[16, 16]}>
+        <Col flex="auto">
+          <Form
+            initialValues={{ cors: allowOriginInitial }}
+            form={form}
+            disabled={props.readonly}
+          >
+            <Form.Item rules={rules} name="cors">
+              <Input.TextArea
+                autoSize={{ minRows: 12, maxRows: 12 }}
+                style={{ width: "100%" }}
+              />
+            </Form.Item>
+          </Form>
+        </Col>
+        <Col flex="none" span={10}>
+          <Typography.Paragraph>{msgHelp}</Typography.Paragraph>
+          <Typography.Paragraph>{msgInfo}</Typography.Paragraph>
+        </Col>
+      </Row>
+      {!props.readonly ? (
+        <Row>
+          <SaveButton onClick={save} loading={status === "saving"} />
+        </Row>
+      ) : null}
+    </>
+  );
 }

@@ -1,35 +1,35 @@
 .ngw-webmap-panel-annotations {
-    .input-group {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        gap: 4px;
+  .input-group {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 4px;
 
-        .label {
-            flex-grow: 1;
-            max-width: 20em;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+    .label {
+      flex-grow: 1;
+      max-width: 20em;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
 
-            &.public,
-            &.own,
-            &.private {
-                border-right: 6px solid transparent;
-                padding-right: 4px;
+      &.public,
+      &.own,
+      &.private {
+        border-right: 6px solid transparent;
+        padding-right: 4px;
 
-                &.public {
-                    border-color: var(--annotation-public);
-                }
-
-                &.own {
-                    border-color: var(--annotation-own);
-                }
-
-                &.private {
-                    border-color: var(--annotation-private);
-                }
-            }
+        &.public {
+          border-color: var(--annotation-public);
         }
+
+        &.own {
+          border-color: var(--annotation-own);
+        }
+
+        &.private {
+          border-color: var(--annotation-private);
+        }
+      }
     }
+  }
 }

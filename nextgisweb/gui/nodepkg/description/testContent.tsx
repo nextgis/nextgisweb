@@ -4,26 +4,26 @@ import { range } from "lodash-es";
 import { assert } from "@nextgisweb/jsrealm/error";
 
 function createTestImage(width = 256, height = width) {
-    const canvas = document.createElement("canvas");
-    canvas.width = width;
-    canvas.height = height;
-    const ctx = canvas.getContext("2d");
-    assert(ctx);
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d");
+  assert(ctx);
 
-    ctx.fillStyle = "salmon";
-    ctx.fillRect(0, 0, width, height);
+  ctx.fillStyle = "salmon";
+  ctx.fillRect(0, 0, width, height);
 
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
 
-    ctx.save();
-    ctx.fillStyle = "teal";
-    ctx.font = `${height / 16}px sans`;
-    ctx.translate(width / 2, height / 2);
-    ctx.fillText(`${width} x ${height}`, 0, 0);
-    ctx.restore();
+  ctx.save();
+  ctx.fillStyle = "teal";
+  ctx.font = `${height / 16}px sans`;
+  ctx.translate(width / 2, height / 2);
+  ctx.fillText(`${width} x ${height}`, 0, 0);
+  ctx.restore();
 
-    return canvas.toDataURL("image/png");
+  return canvas.toDataURL("image/png");
 }
 
 export const testContent = `
@@ -52,9 +52,9 @@ export const testContent = `
 <figure class="table">
     <table><tbody><tr>
         ${(() => {
-            return range(64)
-                .map((i) => `<td>${i}</td>`)
-                .join("\n");
+          return range(64)
+            .map((i) => `<td>${i}</td>`)
+            .join("\n");
         })()}
     </tr></tbody></table>
 </figure>

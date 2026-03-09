@@ -1,22 +1,22 @@
 export const mmToPx = (mm: number): number => {
-    return (mm / 10) * (96 / 2.54);
+  return (mm / 10) * (96 / 2.54);
 };
 
 export const PRINT_SCALES = [
-    5000, 10000, 20000, 25000, 50000, 100000, 200000, 500000, 1000000, 2000000,
-    5000000, 10000000,
+  5000, 10000, 20000, 25000, 50000, 100000, 200000, 500000, 1000000, 2000000,
+  5000000, 10000000,
 ];
 
 export interface PrintStyleParams {
-    widthPage: number;
-    heightPage: number;
-    widthMap: number;
-    heightMap: number;
-    margin: number;
+  widthPage: number;
+  heightPage: number;
+  widthMap: number;
+  heightMap: number;
+  margin: number;
 }
 
 export const buildPrintStyle = (params: PrintStyleParams): string => {
-    return `
+  return `
     .print-map-page {
       width: ${params.widthPage}px;
       height: ${params.heightPage}px;

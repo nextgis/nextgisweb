@@ -9,35 +9,35 @@ import { DefaultAttributes } from "../ResourceSectionChildren";
 import type { ChildrenResource } from "../type";
 
 export async function createResourceTableItemOptions(
-    resourceId: number
+  resourceId: number
 ): Promise<ChildrenResource> {
-    const attrRoute = route("resource.attr");
-    const reg = registry.queryAll();
+  const attrRoute = route("resource.attr");
+  const reg = registry.queryAll();
 
-    const attrs: [...Attributes] = [];
-    for (const { attributes } of reg) {
-        if (attributes) {
-            attrs.push(...attributes);
-        }
+  const attrs: [...Attributes] = [];
+  for (const { attributes } of reg) {
+    if (attributes) {
+      attrs.push(...attributes);
     }
+  }
 
-    const items = await resourceAttrItems({
-        resources: [resourceId],
-        attributes: [...DefaultAttributes, ...attrs],
-        route: attrRoute,
-    });
+  const items = await resourceAttrItems({
+    resources: [resourceId],
+    attributes: [...DefaultAttributes, ...attrs],
+    route: attrRoute,
+  });
 
-    const it = items[0];
+  const it = items[0];
 
-    assert(it);
+  assert(it);
 
-    const displayName = it.get("resource.display_name");
-    assert(displayName);
+  const displayName = it.get("resource.display_name");
+  assert(displayName);
 
-    return {
-        cls: "resource_group",
-        displayName,
-        id: it.id,
-        it: it as ResourceAttrItem<typeof DefaultAttributes>,
-    };
+  return {
+    cls: "resource_group",
+    displayName,
+    id: it.id,
+    it: it as ResourceAttrItem<typeof DefaultAttributes>,
+  };
 }

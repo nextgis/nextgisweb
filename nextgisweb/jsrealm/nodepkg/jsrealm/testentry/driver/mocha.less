@@ -1,74 +1,74 @@
 #mocha {
-    a {
+  a {
+    text-decoration: none;
+  }
+
+  > ul#mocha-stats {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0;
+    font-size: 16px;
+
+    > li {
+      display: block;
+      text-transform: uppercase;
+
+      > em {
+        font-style: normal;
+      }
+
+      &.progress {
+        transform-origin: left top;
+        scale: 0.5;
+        width: 48px;
+        height: 48px;
+      }
+    }
+  }
+
+  > ul#mocha-report {
+    &,
+    ul {
+      padding-left: 24px;
+    }
+
+    h1,
+    h2 {
+      display: flex;
+      margin: 4px 0;
+      padding: 0;
+      font-weight: normal;
+      font-size: 16px;
+      line-height: 1.55;
+    }
+
+    li {
+      &::marker {
+        content: "⏺ ";
+        color: var(--text-secondary);
+      }
+
+      &.suite > h1 > a {
         text-decoration: none;
+      }
     }
 
-    > ul#mocha-stats {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 0;
-        font-size: 16px;
-
-        > li {
-            display: block;
-            text-transform: uppercase;
-
-            > em {
-                font-style: normal;
-            }
-
-            &.progress {
-                transform-origin: left top;
-                scale: 0.5;
-                width: 48px;
-                height: 48px;
-            }
-        }
+    li.pass::marker {
+      color: var(--success);
     }
 
-    > ul#mocha-report {
-        &,
-        ul {
-            padding-left: 24px;
-        }
-
-        h1,
-        h2 {
-            display: flex;
-            margin: 4px 0;
-            padding: 0;
-            font-weight: normal;
-            font-size: 16px;
-            line-height: 1.55;
-        }
-
-        li {
-            &::marker {
-                content: "⏺ ";
-                color: var(--text-secondary);
-            }
-
-            &.suite > h1 > a {
-                text-decoration: none;
-            }
-        }
-
-        li.pass::marker {
-            color: var(--success);
-        }
-
-        li.fail::marker {
-            color: var(--error);
-        }
-
-        .duration {
-            margin: 0 12px;
-            color: var(--text-secondary);
-        }
-
-        .replay {
-            margin-left: auto;
-        }
+    li.fail::marker {
+      color: var(--error);
     }
+
+    .duration {
+      margin: 0 12px;
+      color: var(--text-secondary);
+    }
+
+    .replay {
+      margin-left: auto;
+    }
+  }
 }

@@ -4,23 +4,23 @@ import type { RequestOptionsByMethod } from "@nextgisweb/pyramid/api/type";
 const EXCLUDED_IDS: number[] = [];
 
 export async function getLookupTableItems(
-    lookupId: number,
-    requestOptions?: RequestOptionsByMethod<"get">
+  lookupId: number,
+  requestOptions?: RequestOptionsByMethod<"get">
 ): Promise<Record<string, string>> {
-    if (!EXCLUDED_IDS.includes(lookupId)) {
-        try {
-            const resourceItem = await route("resource.item", lookupId).get({
-                cache: true,
-                ...requestOptions,
-            });
-            if (!resourceItem.lookup_table) {
-                throw new Error(`Resource ${lookupId} is not lookup table`);
-            }
-            return resourceItem.lookup_table.items;
-        } catch (err) {
-            EXCLUDED_IDS.push(lookupId);
-            throw err;
-        }
+  if (!EXCLUDED_IDS.includes(lookupId)) {
+    try {
+      const resourceItem = await route("resource.item", lookupId).get({
+        cache: true,
+        ...requestOptions,
+      });
+      if (!resourceItem.lookup_table) {
+        throw new Error(`Resource ${lookupId} is not lookup table`);
+      }
+      return resourceItem.lookup_table.items;
+    } catch (err) {
+      EXCLUDED_IDS.push(lookupId);
+      throw err;
     }
-    throw new Error(`Lookupp table ${lookupId} not founded`);
+  }
+  throw new Error(`Lookupp table ${lookupId} not founded`);
 }

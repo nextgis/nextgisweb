@@ -13,114 +13,111 @@ import { useResourceSelect } from "./hook/useResourceSelect";
 import type { ResourceSelectOption, ResourceSelectProps } from "./type";
 
 export function ResourceSelect<V extends number = number>({
-    style,
-    value: valueProp,
-    onChange,
-    readOnly,
-    hideGoto,
-    allowClear,
-    pickerOptions: pickerOptionsProp,
-    ...selectOptions
+  style,
+  value: valueProp,
+  onChange,
+  readOnly,
+  hideGoto,
+  allowClear,
+  pickerOptions: pickerOptionsProp,
+  ...selectOptions
 }: ResourceSelectProps<V>) {
-    const [value, setValue] = useState<V | undefined>(valueProp);
-    const { modalHolder, modalStore } = useShowModal();
-    const [open, setOpen] = useState(false);
-    const { showResourcePicker } = useResourcePicker({
-        modalStore,
-        initParentId:
-            pickerOptionsProp?.initParentId || pickerOptionsProp?.parentId,
-    });
+  const [value, setValue] = useState<V | undefined>(valueProp);
+  const { modalHolder, modalStore } = useShowModal();
+  const [open, setOpen] = useState(false);
+  const { showResourcePicker } = useResourcePicker({
+    modalStore,
+    initParentId:
+      pickerOptionsProp?.initParentId || pickerOptionsProp?.parentId,
+  });
 
-    const [pickerOptions] = useObjectState(pickerOptionsProp);
+  const [pickerOptions] = useObjectState(pickerOptionsProp);
 
-    const { resource, isLoading: resourceLoading } = useResourceSelect({
-        value,
-    });
+  const { resource, isLoading: resourceLoading } = useResourceSelect({
+    value,
+  });
 
-    const onPick = useCallback(
-        (val: V | undefined) => {
-            setValue(val);
-            setOpen(false);
-            onChange?.(val);
+  const onPick = useCallback(
+    (val: V | undefined) => {
+      setValue(val);
+      setOpen(false);
+      onChange?.(val);
+    },
+    [onChange]
+  );
+
+  useEffect(() => {
+    setValue(valueProp);
+  }, [valueProp]);
+
+  useEffect(() => {
+    if (open) {
+      const selected: number[] = [value]
+        .flat()
+        .filter((v) => typeof v === "number") as number[];
+      const pickerOptions_: ResourcePickerStoreOptions = {
+        ...pickerOptions,
+        selected,
+      };
+      showResourcePicker<V>({
+        pickerOptions: pickerOptions_,
+        onSelect: (v) => {
+          if (v !== undefined) {
+            onPick(v);
+          }
         },
-        [onChange]
-    );
+      });
+    }
+    return () => setOpen(false);
+  }, [onPick, open, pickerOptions, showResourcePicker, value]);
 
-    useEffect(() => {
-        setValue(valueProp);
-    }, [valueProp]);
+  const options = useMemo<ResourceSelectOption[]>(() => {
+    return resource
+      ? [
+          {
+            label: resource.resource.display_name,
+            value: resource.resource.id,
+            cls: resource.resource.cls,
+          },
+        ]
+      : [];
+  }, [resource]);
 
-    useEffect(() => {
-        if (open) {
-            const selected: number[] = [value]
-                .flat()
-                .filter((v) => typeof v === "number") as number[];
-            const pickerOptions_: ResourcePickerStoreOptions = {
-                ...pickerOptions,
-                selected,
-            };
-            showResourcePicker<V>({
-                pickerOptions: pickerOptions_,
-                onSelect: (v) => {
-                    if (v !== undefined) {
-                        onPick(v);
-                    }
-                },
-            });
-        }
-        return () => setOpen(false);
-    }, [onPick, open, pickerOptions, showResourcePicker, value]);
-
-    const options = useMemo<ResourceSelectOption[]>(() => {
-        return resource
-            ? [
-                  {
-                      label: resource.resource.display_name,
-                      value: resource.resource.id,
-                      cls: resource.resource.cls,
-                  },
-              ]
-            : [];
-    }, [resource]);
-
-    return (
-        <>
-            {modalHolder}
-            <Space.Compact style={{ width: "100%" }}>
-                <Select
-                    open={open}
-                    value={value}
-                    loading={resourceLoading}
-                    onOpenChange={(visible) => {
-                        if (!visible || !readOnly) {
-                            setOpen(visible);
-                        }
-                    }}
-                    suffixIcon={readOnly ? <></> : undefined}
-                    popupRender={() => <></>}
-                    onClear={() => {
-                        onPick(undefined);
-                    }}
-                    allowClear={!readOnly && allowClear}
-                    style={{
-                        cursor: readOnly ? "unset" : undefined,
-                        ...(style || {}),
-                    }}
-                    options={options}
-                    labelRender={(e) => (
-                        <ResourceLabel
-                            label={e.label}
-                            cls={resource?.resource.cls}
-                        />
-                    )}
-                    {...selectOptions}
-                />
-                {value !== undefined && !hideGoto && (
-                    <Space.Addon>
-                        <ResourceLink resourceId={value} />
-                    </Space.Addon>
-                )}
-            </Space.Compact>
-        </>
-    );
+  return (
+    <>
+      {modalHolder}
+      <Space.Compact style={{ width: "100%" }}>
+        <Select
+          open={open}
+          value={value}
+          loading={resourceLoading}
+          onOpenChange={(visible) => {
+            if (!visible || !readOnly) {
+              setOpen(visible);
+            }
+          }}
+          suffixIcon={readOnly ? <></> : undefined}
+          popupRender={() => <></>}
+          onClear={() => {
+            onPick(undefined);
+          }}
+          allowClear={!readOnly && allowClear}
+          style={{
+            cursor: readOnly ? "unset" : undefined,
+            ...(style || {}),
+          }}
+          options={options}
+          labelRender={(e) => (
+            <ResourceLabel label={e.label} cls={resource?.resource.cls} />
+          )}
+          {...selectOptions}
+        />
+        {value !== undefined && !hideGoto && (
+          <Space.Addon>
+            <ResourceLink resourceId={value} />
+          </Space.Addon>
+        )}
+      </Space.Compact>
+    </>
+  );
 }

@@ -19,44 +19,44 @@ const msgImageUploader = {
 }
 
 export const EditorWidget: IEditorWidget<EditorStore> = observer(
-    ({ store }) => {
-        const [image, setImage] = useState<string>();
-        if (store.imageExisting) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setImage(reader.result as string);
-            };
-            reader.readAsDataURL(store.imageExisting);
-        }
-
-        return (
-            <div className="ngw-social-editor-widget">
-                <ImageUploader
-                    image={image}
-                    onChange={(value) => {
-                        store.update({
-                            imageUpdated: value === undefined ? null : value,
-                        });
-                    }}
-                    onClear={() => {
-                        store.update({
-                            imageExisting: null,
-                            imageUpdated: undefined,
-                        });
-                    }}
-                    {...msgImageUploader}
-                />
-                <TextArea
-                    value={store.description || ""}
-                    onChange={(e) => {
-                        store.update({ description: e.target.value });
-                    }}
-                    placeholder={gettext("Preview description")}
-                    autoSize
-                />
-            </div>
-        );
+  ({ store }) => {
+    const [image, setImage] = useState<string>();
+    if (store.imageExisting) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImage(reader.result as string);
+      };
+      reader.readAsDataURL(store.imageExisting);
     }
+
+    return (
+      <div className="ngw-social-editor-widget">
+        <ImageUploader
+          image={image}
+          onChange={(value) => {
+            store.update({
+              imageUpdated: value === undefined ? null : value,
+            });
+          }}
+          onClear={() => {
+            store.update({
+              imageExisting: null,
+              imageUpdated: undefined,
+            });
+          }}
+          {...msgImageUploader}
+        />
+        <TextArea
+          value={store.description || ""}
+          onChange={(e) => {
+            store.update({ description: e.target.value });
+          }}
+          placeholder={gettext("Preview description")}
+          autoSize
+        />
+      </div>
+    );
+  }
 );
 
 EditorWidget.title = gettext("Social");

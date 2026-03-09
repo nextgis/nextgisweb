@@ -5,87 +5,87 @@ import type { NullableProps } from "@nextgisweb/gui/type";
 import { assert } from "@nextgisweb/jsrealm/error";
 import type { CompositeStore } from "@nextgisweb/resource/composite";
 import type {
-    EditorStore,
-    EditorStoreOptions,
+  EditorStore,
+  EditorStoreOptions,
 } from "@nextgisweb/resource/type";
 import type {
-    WFSConnectionRead,
-    WFSConnectionUpdate,
+  WFSConnectionRead,
+  WFSConnectionUpdate,
 } from "@nextgisweb/wfsclient/type/api";
 
 type MapperConnection = NullableProps<
-    WFSConnectionRead,
-    "path" | "username" | "password"
+  WFSConnectionRead,
+  "path" | "username" | "password"
 >;
 
 const {
-    path,
-    username,
-    password,
-    version,
-    $load: mapperLoad,
-    $error: mapperError,
-    $dirty: mapperDirty,
-    $dump: mapperDump,
+  path,
+  username,
+  password,
+  version,
+  $load: mapperLoad,
+  $error: mapperError,
+  $dirty: mapperDirty,
+  $dump: mapperDump,
 } = mapper<WfsClientConnectionStore, MapperConnection>({
-    validateIf: (o) => o.validate,
-    properties: {
-        path: { required: true, url: true },
-        username: { required: false },
-        password: { required: false },
-        version: { required: true },
-    },
+  validateIf: (o) => o.validate,
+  properties: {
+    path: { required: true, url: true },
+    username: { required: false },
+    password: { required: false },
+    version: { required: true },
+  },
 });
 
 export class WfsClientConnectionStore implements EditorStore<
-    WFSConnectionRead,
-    WFSConnectionRead,
-    WFSConnectionUpdate
+  WFSConnectionRead,
+  WFSConnectionRead,
+  WFSConnectionUpdate
 > {
-    readonly identity = "wfsclient_connection";
-    readonly composite: CompositeStore;
+  readonly identity = "wfsclient_connection";
+  readonly composite: CompositeStore;
 
-    readonly path = path.init(null, this);
-    readonly username = username.init(null, this);
-    readonly password = password.init(null, this);
-    readonly version = version.init("2.0.0", this);
+  readonly path = path.init(null, this);
+  readonly username = username.init(null, this);
+  readonly password = password.init(null, this);
+  readonly version = version.init("2.0.0", this);
 
-    @observable.ref accessor validate = false;
+  @observable.ref accessor validate = false;
 
-    constructor({ composite }: EditorStoreOptions) {
-        this.composite = composite;
+  constructor({ composite }: EditorStoreOptions) {
+    this.composite = composite;
+  }
+
+  @action
+  load(val: WFSConnectionRead) {
+    mapperLoad(this, val);
+  }
+
+  @computed
+  get dirty(): boolean {
+    return mapperDirty(this);
+  }
+
+  dump() {
+    if (this.dirty) {
+      const { path, ...rest } = mapperDump(this);
+      assert(path);
+
+      const result: WFSConnectionRead | WFSConnectionUpdate = {
+        path,
+        ...rest,
+      };
+      return result;
     }
+  }
 
-    @action
-    load(val: WFSConnectionRead) {
-        mapperLoad(this, val);
-    }
+  @computed
+  get error() {
+    return mapperError(this);
+  }
 
-    @computed
-    get dirty(): boolean {
-        return mapperDirty(this);
-    }
-
-    dump() {
-        if (this.dirty) {
-            const { path, ...rest } = mapperDump(this);
-            assert(path);
-
-            const result: WFSConnectionRead | WFSConnectionUpdate = {
-                path,
-                ...rest,
-            };
-            return result;
-        }
-    }
-
-    @computed
-    get error() {
-        return mapperError(this);
-    }
-
-    @computed
-    get isValid() {
-        return !this.error;
-    }
+  @computed
+  get isValid() {
+    return !this.error;
+  }
 }

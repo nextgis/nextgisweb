@@ -10,82 +10,78 @@ import type { ErrorInfo } from "./extractError";
 const CodeLazy = lazy(() => import("./CodeLazy"));
 
 export function Body({ error }: { error: ErrorInfo }) {
-    return (
-        <>
-            <p>{error.message}</p>
-            {"detail" in error && typeof error.detail === "string" && (
-                <p>{error.detail}</p>
-            )}
-        </>
-    );
+  return (
+    <>
+      <p>{error.message}</p>
+      {"detail" in error && typeof error.detail === "string" && (
+        <p>{error.detail}</p>
+      )}
+    </>
+  );
 }
 
 export function TechInfo({ error }: { error: unknown }) {
-    return (
-        <Suspense
-            fallback={
-                <div
-                    style={{
-                        display: "flex",
-                        height: "150px",
-                        justifyContent: "center",
-                        alignContent: "center",
-                        flexDirection: "column",
-                    }}
-                >
-                    <Spin delay={250} />
-                </div>
-            }
+  return (
+    <Suspense
+      fallback={
+        <div
+          style={{
+            display: "flex",
+            height: "150px",
+            justifyContent: "center",
+            alignContent: "center",
+            flexDirection: "column",
+          }}
         >
-            <CodeLazy
-                value={JSON.stringify(error, null, 4)}
-                lang="json"
-                readOnly
-                lineNumbers
-                autoHeight
-                minHeight="150px"
-                maxHeight="300px"
-            />
-        </Suspense>
-    );
+          <Spin delay={250} />
+        </div>
+      }
+    >
+      <CodeLazy
+        value={JSON.stringify(error, null, 4)}
+        lang="json"
+        readOnly
+        lineNumbers
+        autoHeight
+        minHeight="150px"
+        maxHeight="300px"
+      />
+    </Suspense>
+  );
 }
 
 export function Footer({
-    tinfo,
-    setTinfo,
-    onOk,
+  tinfo,
+  setTinfo,
+  onOk,
 }: {
-    tinfo: boolean;
-    setTinfo: (val: boolean) => void;
-    onOk?: () => void;
+  tinfo: boolean;
+  setTinfo: (val: boolean) => void;
+  onOk?: () => void;
 }) {
-    return (
-        <div style={{ display: "flex", marginTop: "1em" }}>
-            {tinfo || (
-                <Button onClick={() => setTinfo(true)}>
-                    {gettext("Technical information")}
-                </Button>
-            )}
-            <Space style={{ marginLeft: "auto" }} orientation="horizontal">
-                {settings.support_url && (
-                    <Button
-                        type="link"
-                        href={url(settings.support_url)}
-                        target="_blank"
-                    >
-                        {gettext("Contact support")}
-                    </Button>
-                )}
-                {onOk ? (
-                    <Button type="primary" onClick={onOk}>
-                        {gettext("OK")}
-                    </Button>
-                ) : (
-                    <Button type="primary" href={ngwConfig.applicationUrl}>
-                        {gettext("Back to home")}
-                    </Button>
-                )}
-            </Space>
-        </div>
-    );
+  return (
+    <div style={{ display: "flex", marginTop: "1em" }}>
+      {tinfo || (
+        <Button onClick={() => setTinfo(true)}>
+          {gettext("Technical information")}
+        </Button>
+      )}
+      <Space style={{ marginLeft: "auto" }} orientation="horizontal">
+        {settings.support_url && (
+          <Button type="link" href={url(settings.support_url)} target="_blank">
+            {gettext("Contact support")}
+          </Button>
+        )}
+        {onOk ? (
+          <Button type="primary" onClick={onOk}>
+            {gettext("OK")}
+          </Button>
+        ) : (
+          <Button type="primary" href={ngwConfig.applicationUrl}>
+            {gettext("Back to home")}
+          </Button>
+        )}
+      </Space>
+    </div>
+  );
 }

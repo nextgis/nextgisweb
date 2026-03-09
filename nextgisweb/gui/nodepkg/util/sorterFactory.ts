@@ -19,13 +19,13 @@
  * mountains.sort(heightSorter); // Sorts by height attribute
  */
 export function sorterFactory<
-    T extends Record<string, any> = Record<string, any>,
+  T extends Record<string, any> = Record<string, any>,
 >(attr: keyof T): (a: T, b: T) => number {
-    return (a: T, b: T) => {
-        const va = a[attr];
-        const vb = b[attr];
-        if (va > vb) return 1;
-        if (vb > va) return -1;
-        return 0;
-    };
+  return (a: T, b: T) => {
+    const va = a[attr];
+    const vb = b[attr];
+    if (va > vb) return 1;
+    if (vb > va) return -1;
+    return 0;
+  };
 }

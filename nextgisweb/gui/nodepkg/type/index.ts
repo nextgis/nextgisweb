@@ -35,5 +35,5 @@ export type ParamOf<T extends FC, K extends keyof ParamsOf<T>> = ParamsOf<T>[K];
  * @template P - Keys in `T` to make nullable, defaults to all keys
  */
 export type NullableProps<T, P extends keyof T = keyof T> = {
-    [K in keyof T]: T[K] | (K extends P ? null : never);
+  [K in keyof T]: T[K] | (K extends P ? null : never);
 };

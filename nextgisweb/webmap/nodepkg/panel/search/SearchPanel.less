@@ -1,43 +1,43 @@
 .ngw-webmap-panel-search {
-    > .ngw-webmap-panel-title {
-        padding-inline-start: 0;
-        padding-block: 1px;
+  > .ngw-webmap-panel-title {
+    padding-inline-start: 0;
+    padding-block: 1px;
+  }
+
+  > .ngw-webmap-panel-prolog > .ant-alert {
+    border: none;
+    border-radius: none;
+  }
+
+  > .ngw-webmap-panel-content {
+    .result {
+      cursor: pointer;
+      padding-inline: 10px;
+      padding-block: 6px;
+
+      svg {
+        padding-left: 2px;
+        color: gray;
+      }
+
+      &:first-child {
+        padding-top: 7px;
+      }
+
+      &:hover {
+        background-color: #eae9e9;
+      }
+
+      &.selected {
+        cursor: auto;
+        background-color: #eae9e9;
+      }
     }
 
-    > .ngw-webmap-panel-prolog > .ant-alert {
-        border: none;
-        border-radius: none;
+    .loading {
+      margin-top: 20px;
+      color: #076dbf;
+      text-align: center;
     }
-
-    > .ngw-webmap-panel-content {
-        .result {
-            cursor: pointer;
-            padding-inline: 10px;
-            padding-block: 6px;
-
-            svg {
-                padding-left: 2px;
-                color: gray;
-            }
-
-            &:first-child {
-                padding-top: 7px;
-            }
-
-            &:hover {
-                background-color: #eae9e9;
-            }
-
-            &.selected {
-                cursor: auto;
-                background-color: #eae9e9;
-            }
-        }
-
-        .loading {
-            margin-top: 20px;
-            color: #076dbf;
-            text-align: center;
-        }
-    }
+  }
 }

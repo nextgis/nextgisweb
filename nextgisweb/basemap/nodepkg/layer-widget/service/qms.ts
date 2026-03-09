@@ -7,43 +7,43 @@ type QMSType = "tms" | "wms";
 const geoservicesApiUrl = `${settings.qms.url}/api/v1/geoservices`;
 
 export async function get(
-    id: number,
-    options?: RequestInit
+  id: number,
+  options?: RequestInit
 ): Promise<QMSService> {
-    const url = `${geoservicesApiUrl}/${id}/?format=json`;
-    const response = await fetch(url, { method: "GET", ...options });
+  const url = `${geoservicesApiUrl}/${id}/?format=json`;
+  const response = await fetch(url, { method: "GET", ...options });
 
-    if (!response.ok) {
-        throw new Error("Network response was not ok");
-    }
+  if (!response.ok) {
+    throw new Error("Network response was not ok");
+  }
 
-    return await response.json();
+  return await response.json();
 }
 
 export async function search(
-    query: string,
-    options: { type?: QMSType } & RequestInit
+  query: string,
+  options: { type?: QMSType } & RequestInit
 ): Promise<QMSSearch[]> {
-    if (!query || query.toString().length === 0) {
-        return [];
-    }
+  if (!query || query.toString().length === 0) {
+    return [];
+  }
 
-    const queryOptions = {
-        search: query,
-        type: options.type || "tms",
-    };
+  const queryOptions = {
+    search: query,
+    type: options.type || "tms",
+  };
 
-    const queryString = new URLSearchParams(queryOptions).toString();
-    const url = `${geoservicesApiUrl}/?${queryString}&format=json`;
+  const queryString = new URLSearchParams(queryOptions).toString();
+  const url = `${geoservicesApiUrl}/?${queryString}&format=json`;
 
-    const response = await fetch(url, {
-        method: "GET",
-        ...options,
-    });
+  const response = await fetch(url, {
+    method: "GET",
+    ...options,
+  });
 
-    if (!response.ok) {
-        throw new Error("Network response was not ok");
-    }
+  if (!response.ok) {
+    throw new Error("Network response was not ok");
+  }
 
-    return await response.json();
+  return await response.json();
 }

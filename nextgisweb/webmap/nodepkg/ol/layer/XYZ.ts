@@ -9,111 +9,109 @@ import { CoreLayer } from "./CoreLayer";
 import type { LayerOptions } from "./CoreLayer";
 
 interface URLParams {
-    [key: string]: string;
-    resource: string;
+  [key: string]: string;
+  resource: string;
 }
 
 export default class XYZ extends CoreLayer<
-    XYZSource,
-    TileLayer<XYZSource>,
-    XYZSourceOptions
+  XYZSource,
+  TileLayer<XYZSource>,
+  XYZSourceOptions
 > {
-    protected createSource(options: XYZSourceOptions): XYZSource {
-        const source = new XYZSource(options);
-        this.updateSymbols(this.symbols);
-        return source;
+  protected createSource(options: XYZSourceOptions): XYZSource {
+    const source = new XYZSource(options);
+    this.updateSymbols(this.symbols);
+    return source;
+  }
+
+  protected createLayer(
+    options: LayerOptions & { source: XYZSource }
+  ): TileLayer<XYZSource> {
+    return new TileLayer(options);
+  }
+
+  override setSymbols(symbols: LayerSymbols): void {
+    super.setSymbols(symbols);
+    this.updateSymbols(symbols);
+  }
+
+  override setFilter(filter: FilterExpressionString | null): void {
+    super.setFilter(filter);
+
+    const urls = this.olSource.getUrls();
+    if (urls && urls.length > 0) {
+      const updatedUrls = urls.map((url) =>
+        this.updateUrlParam(url, "filter", filter)
+      );
+      this.olSource.setUrls(updatedUrls);
+    }
+  }
+
+  private updateSymbols(symbols: LayerSymbols) {
+    const val =
+      Array.isArray(symbols) && symbols.length ? symbols.join(",") : null;
+    if (val) {
+      const urls = this.olSource.getUrls();
+      if (urls && urls.length > 0) {
+        const updatedUrls = urls.map((url) =>
+          this.updateUrlParam(url, "symbols", val, (v) => (v !== "-1" ? v : ""))
+        );
+        this.olSource.setUrls(updatedUrls);
+      }
+    }
+  }
+
+  private updateUrlParam(
+    src: string,
+    param: string,
+    value: string | null | undefined,
+    normalize?: (v: string) => string | null
+  ): string {
+    const url = new URL(src, window.location.href);
+    const params = this.parseUrlParams(url.search);
+
+    const resource = params["resource"];
+    const key = `${param}[${resource}]`;
+
+    const finalValue = normalize ? normalize(value ?? "") : value;
+
+    if (finalValue) {
+      params[key] = finalValue;
+    } else {
+      delete params[key];
     }
 
-    protected createLayer(
-        options: LayerOptions & { source: XYZSource }
-    ): TileLayer<XYZSource> {
-        return new TileLayer(options);
-    }
+    url.search = this.buildQueryString(params);
+    return url.href;
+  }
 
-    override setSymbols(symbols: LayerSymbols): void {
-        super.setSymbols(symbols);
-        this.updateSymbols(symbols);
-    }
+  private parseUrlParams(search: string): URLParams {
+    return search
+      .slice(1)
+      .split("&")
+      .reduce<URLParams>(
+        (acc, curr) => {
+          if (!curr) return acc;
 
-    override setFilter(filter: FilterExpressionString | null): void {
-        super.setFilter(filter);
+          const i = curr.indexOf("=");
 
-        const urls = this.olSource.getUrls();
-        if (urls && urls.length > 0) {
-            const updatedUrls = urls.map((url) =>
-                this.updateUrlParam(url, "filter", filter)
-            );
-            this.olSource.setUrls(updatedUrls);
-        }
-    }
+          if (i !== -1) {
+            const key = decodeURIComponent(curr.slice(0, i));
+            const val = decodeURIComponent(curr.slice(i + 1));
+            acc[key] = val;
+          }
 
-    private updateSymbols(symbols: LayerSymbols) {
-        const val =
-            Array.isArray(symbols) && symbols.length ? symbols.join(",") : null;
-        if (val) {
-            const urls = this.olSource.getUrls();
-            if (urls && urls.length > 0) {
-                const updatedUrls = urls.map((url) =>
-                    this.updateUrlParam(url, "symbols", val, (v) =>
-                        v !== "-1" ? v : ""
-                    )
-                );
-                this.olSource.setUrls(updatedUrls);
-            }
-        }
-    }
+          return acc;
+        },
+        { resource: "" }
+      );
+  }
 
-    private updateUrlParam(
-        src: string,
-        param: string,
-        value: string | null | undefined,
-        normalize?: (v: string) => string | null
-    ): string {
-        const url = new URL(src, window.location.href);
-        const params = this.parseUrlParams(url.search);
-
-        const resource = params["resource"];
-        const key = `${param}[${resource}]`;
-
-        const finalValue = normalize ? normalize(value ?? "") : value;
-
-        if (finalValue) {
-            params[key] = finalValue;
-        } else {
-            delete params[key];
-        }
-
-        url.search = this.buildQueryString(params);
-        return url.href;
-    }
-
-    private parseUrlParams(search: string): URLParams {
-        return search
-            .slice(1)
-            .split("&")
-            .reduce<URLParams>(
-                (acc, curr) => {
-                    if (!curr) return acc;
-
-                    const i = curr.indexOf("=");
-
-                    if (i !== -1) {
-                        const key = decodeURIComponent(curr.slice(0, i));
-                        const val = decodeURIComponent(curr.slice(i + 1));
-                        acc[key] = val;
-                    }
-
-                    return acc;
-                },
-                { resource: "" }
-            );
-    }
-
-    private buildQueryString(params: URLParams): string {
-        return Object.entries(params)
-            .map(([key, val]) => {
-                return `${key}=${val}`;
-            })
-            .join("&");
-    }
+  private buildQueryString(params: URLParams): string {
+    return Object.entries(params)
+      .map(([key, val]) => {
+        return `${key}=${val}`;
+      })
+      .join("&");
+  }
 }

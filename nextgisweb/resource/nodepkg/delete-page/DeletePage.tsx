@@ -19,112 +19,108 @@ import { msgDeleteButton, msgMultiple, msgResourcesCount } from "./util";
 import "./DeletePage.less";
 
 export function DeletePage({
-    resources,
-    navigateToId,
-    isModal = false,
-    onCancel,
-    onOk,
+  resources,
+  navigateToId,
+  isModal = false,
+  onCancel,
+  onOk,
 }: DeletePageProps) {
-    const [deletingInProgress, setDeletingInProgress] = useState(false);
+  const [deletingInProgress, setDeletingInProgress] = useState(false);
 
-    if (!isModal && navigateToId !== undefined) {
-        const parentResourceUrl = routeURL("resource.show", {
-            id: navigateToId,
-        });
-        onOk = () => window.open(parentResourceUrl, "_self");
-    }
-
-    const { data, isLoading } = useRouteGet({
-        name: "resource.items.delete",
-        options: { query: { resources } },
+  if (!isModal && navigateToId !== undefined) {
+    const parentResourceUrl = routeURL("resource.show", {
+      id: navigateToId,
     });
+    onOk = () => window.open(parentResourceUrl, "_self");
+  }
 
-    const { data: labelData, isLoading: isLabelDataLoading } = useRouteGet(
-        "resource.blueprint",
-        undefined,
-        { cache: true }
-    );
+  const { data, isLoading } = useRouteGet({
+    name: "resource.items.delete",
+    options: { query: { resources } },
+  });
 
-    const sortedData = useMemo(() => {
-        if (data && labelData)
-            return sortBy(
-                Object.entries(data.affected.resources).map(([cls, count]) => {
-                    const pb = labelData?.resources[cls as ResourceCls];
-                    return { cls, count, label: pb.label, order: pb.order };
-                }),
-                ["order", "label"]
-            );
-    }, [data, labelData]);
+  const { data: labelData, isLoading: isLabelDataLoading } = useRouteGet(
+    "resource.blueprint",
+    undefined,
+    { cache: true }
+  );
 
-    const onDeleteClick = async () => {
-        setDeletingInProgress(true);
-        try {
-            await route("resource.items.delete").post({
-                query: {
-                    resources,
-                    partial: true,
-                },
-                body: "",
-            });
-            onOk?.();
-        } catch (err) {
-            errorModal(err);
-        } finally {
-            setDeletingInProgress(false);
-        }
-    };
+  const sortedData = useMemo(() => {
+    if (data && labelData)
+      return sortBy(
+        Object.entries(data.affected.resources).map(([cls, count]) => {
+          const pb = labelData?.resources[cls as ResourceCls];
+          return { cls, count, label: pb.label, order: pb.order };
+        }),
+        ["order", "label"]
+      );
+  }, [data, labelData]);
 
-    if (!data || !labelData || isLoading || isLabelDataLoading) {
-        return <LoadingWrapper />;
+  const onDeleteClick = async () => {
+    setDeletingInProgress(true);
+    try {
+      await route("resource.items.delete").post({
+        query: {
+          resources,
+          partial: true,
+        },
+        body: "",
+      });
+      onOk?.();
+    } catch (err) {
+      errorModal(err);
+    } finally {
+      setDeletingInProgress(false);
     }
+  };
 
-    return (
-        <div className="ngw-resource-delete-page">
-            {msgMultiple(data.affected, data.unaffected)}
+  if (!data || !labelData || isLoading || isLabelDataLoading) {
+    return <LoadingWrapper />;
+  }
 
-            {sortedData && sortedData.length > 0 && (
-                <div className={classNames("table", isModal && "modal")}>
-                    <div>
-                        {sortedData.map(({ cls, count, label }) => (
-                            <div key={cls}>
-                                <ResourceIcon
-                                    identity={cls as ResourceCls}
-                                    style={{
-                                        width: "16px",
-                                        height: "16px",
-                                    }}
-                                />
-                                <div>{label}</div>
-                                <div className="count">{count}</div>
-                                <div>{msgResourcesCount(count)}</div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            )}
+  return (
+    <div className="ngw-resource-delete-page">
+      {msgMultiple(data.affected, data.unaffected)}
 
-            <div className="buttons">
-                <Button
-                    disabled={data.affected.count === 0}
-                    danger
-                    type="primary"
-                    icon={<DeleteIcon />}
-                    loading={deletingInProgress}
-                    onClick={onDeleteClick}
-                >
-                    {msgDeleteButton(data.affected.count)}
-                </Button>
-
-                {isModal && (
-                    <Button
-                        className="cancel"
-                        type="default"
-                        onClick={onCancel}
-                    >
-                        {gettext("Cancel")}
-                    </Button>
-                )}
-            </div>
+      {sortedData && sortedData.length > 0 && (
+        <div className={classNames("table", isModal && "modal")}>
+          <div>
+            {sortedData.map(({ cls, count, label }) => (
+              <div key={cls}>
+                <ResourceIcon
+                  identity={cls as ResourceCls}
+                  style={{
+                    width: "16px",
+                    height: "16px",
+                  }}
+                />
+                <div>{label}</div>
+                <div className="count">{count}</div>
+                <div>{msgResourcesCount(count)}</div>
+              </div>
+            ))}
+          </div>
         </div>
-    );
+      )}
+
+      <div className="buttons">
+        <Button
+          disabled={data.affected.count === 0}
+          danger
+          type="primary"
+          icon={<DeleteIcon />}
+          loading={deletingInProgress}
+          onClick={onDeleteClick}
+        >
+          {msgDeleteButton(data.affected.count)}
+        </Button>
+
+        {isModal && (
+          <Button className="cancel" type="default" onClick={onCancel}>
+            {gettext("Cancel")}
+          </Button>
+        )}
+      </div>
+    </div>
+  );
 }

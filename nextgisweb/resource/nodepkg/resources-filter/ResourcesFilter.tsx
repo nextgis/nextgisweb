@@ -16,127 +16,127 @@ type AutoProps = ParamsOf<typeof AutoComplete>;
 export type ResourcesFilterPropsOnChange = AutoProps["onSelect"];
 
 interface ResourcesFilterProps extends Omit<AutoProps, "onChange"> {
-    onChange?: ResourcesFilterPropsOnChange;
-    cls?: ResourceCls | ResourceCls[];
+  onChange?: ResourcesFilterPropsOnChange;
+  cls?: ResourceCls | ResourceCls[];
 }
 
 const resourcesToOptions = (resourcesInfo: CompositeRead[]) => {
-    return resourcesInfo.map((resInfo) => {
-        const { resource } = resInfo;
-        const resourceUrl = routeURL("resource.show", {
-            id: resource.id,
-        });
-
-        return {
-            value: `${resource.id}`,
-            key: `${resource.id}`,
-            url: resourceUrl,
-            label: (
-                <div
-                    className="item"
-                    style={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                    }}
-                >
-                    <svg className="icon">
-                        <use xlinkHref={`#icon-rescls-${resource.cls}`} />
-                    </svg>
-                    <span className="title" title={resource.display_name}>
-                        {resource.display_name}
-                    </span>
-                </div>
-            ),
-        };
+  return resourcesInfo.map((resInfo) => {
+    const { resource } = resInfo;
+    const resourceUrl = routeURL("resource.show", {
+      id: resource.id,
     });
+
+    return {
+      value: `${resource.id}`,
+      key: `${resource.id}`,
+      url: resourceUrl,
+      label: (
+        <div
+          className="item"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+          }}
+        >
+          <svg className="icon">
+            <use xlinkHref={`#icon-rescls-${resource.cls}`} />
+          </svg>
+          <span className="title" title={resource.display_name}>
+            {resource.display_name}
+          </span>
+        </div>
+      ),
+    };
+  });
 };
 
 export function ResourcesFilter({
-    onChange,
-    cls,
-    ...rest
+  onChange,
+  cls,
+  ...rest
 }: ResourcesFilterProps) {
-    const { makeSignal, abort } = useAbortController();
-    const [options, setOptions] = useState<AutoProps["options"]>([]);
-    const [loading, setLoading] = useState(false);
-    const [search, setSearch] = useState("");
-    const [acStatus, setAcSatus] = useState<AutoProps["status"]>("");
+  const { makeSignal, abort } = useAbortController();
+  const [options, setOptions] = useState<AutoProps["options"]>([]);
+  const [loading, setLoading] = useState(false);
+  const [search, setSearch] = useState("");
+  const [acStatus, setAcSatus] = useState<AutoProps["status"]>("");
 
-    const makeQuery = useMemo(() => {
-        if (search && search.length > 2) {
-            const q = "";
-            if (search) {
-                const query: Record<string, string> = {
-                    display_name__ilike: `%${search}%`,
-                };
-                // TODO: handle array of classes in search reqest
-                if (typeof cls === "string" && cls) {
-                    query.cls = cls;
-                }
-                return query;
-            }
-            return q;
+  const makeQuery = useMemo(() => {
+    if (search && search.length > 2) {
+      const q = "";
+      if (search) {
+        const query: Record<string, string> = {
+          display_name__ilike: `%${search}%`,
+        };
+        // TODO: handle array of classes in search reqest
+        if (typeof cls === "string" && cls) {
+          query.cls = cls;
         }
-        return null;
-    }, [search, cls]);
+        return query;
+      }
+      return q;
+    }
+    return null;
+  }, [search, cls]);
 
-    const makeSearchRequest = useRef(
-        debounce(async ({ query: q }) => {
-            setLoading(true);
-            try {
-                abort();
-                const resources = await route("resource.search").get({
-                    query: q,
-                    signal: makeSignal(),
-                });
-                const options = resourcesToOptions(resources);
-                setOptions(options);
-                setAcSatus("");
-            } catch {
-                setAcSatus("error");
-            } finally {
-                setLoading(false);
-            }
-        }, 1000)
-    );
+  const makeSearchRequest = useRef(
+    debounce(async ({ query: q }) => {
+      setLoading(true);
+      try {
+        abort();
+        const resources = await route("resource.search").get({
+          query: q,
+          signal: makeSignal(),
+        });
+        const options = resourcesToOptions(resources);
+        setOptions(options);
+        setAcSatus("");
+      } catch {
+        setAcSatus("error");
+      } finally {
+        setLoading(false);
+      }
+    }, 1000)
+  );
 
-    useEffect(() => {
-        if (makeQuery) {
-            makeSearchRequest.current({ query: makeQuery });
-        } else {
-            setOptions([]);
-        }
-    }, [makeQuery]);
+  useEffect(() => {
+    if (makeQuery) {
+      makeSearchRequest.current({ query: makeQuery });
+    } else {
+      setOptions([]);
+    }
+  }, [makeQuery]);
 
-    const onSelect: AutoProps["onSelect"] = (v, opt) => {
-        if (onChange) {
-            onChange(v, opt);
-        }
-    };
+  const onSelect: AutoProps["onSelect"] = (v, opt) => {
+    if (onChange) {
+      onChange(v, opt);
+    }
+  };
 
-    return (
-        <>
-            <AutoCompleteHoneypot />
-            <AutoComplete
-                classNames={{
-                    popup: { root: "ngw-resource-resource-filter-dropdown" },
-                }}
-                popupMatchSelectWidth={290}
-                style={{ width: "100%" }}
-                onSelect={onSelect}
-                options={options}
-                status={acStatus}
-                notFoundContent={gettext("Resources not found")}
-                value={search}
-                showSearch={{ onSearch: setSearch }}
-                {...rest}
-            >
-                <Input.Search
-                    size="middle"
-                    placeholder={gettext("Search resources")}
-                    loading={loading}
-                />
-            </AutoComplete>
-        </>
-    );
+  return (
+    <>
+      <AutoCompleteHoneypot />
+      <AutoComplete
+        classNames={{
+          popup: { root: "ngw-resource-resource-filter-dropdown" },
+        }}
+        popupMatchSelectWidth={290}
+        style={{ width: "100%" }}
+        onSelect={onSelect}
+        options={options}
+        status={acStatus}
+        notFoundContent={gettext("Resources not found")}
+        value={search}
+        showSearch={{ onSearch: setSearch }}
+        {...rest}
+      >
+        <Input.Search
+          size="middle"
+          placeholder={gettext("Search resources")}
+          loading={loading}
+        />
+      </AutoComplete>
+    </>
+  );
 }

@@ -11,7 +11,7 @@ export { ShowModalOptions };
  * Use useShowModal instead.
  */
 export default function showModal<
-    T extends ShowModalOptions = ShowModalOptions,
+  T extends ShowModalOptions = ShowModalOptions,
 >(ModalComponent: ComponentType<T>, config?: T) {
-    return showModalBase((props: T) => <ModalComponent {...props} />, config);
+  return showModalBase((props: T) => <ModalComponent {...props} />, config);
 }

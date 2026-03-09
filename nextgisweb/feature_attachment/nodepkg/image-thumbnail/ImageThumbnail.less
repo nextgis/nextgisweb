@@ -1,27 +1,27 @@
 .ngw-feature-attachment-image-thumbnail-preview {
-    .ant-image-preview-mask {
-        background-color: #333;
+  .ant-image-preview-mask {
+    background-color: #333;
+  }
+
+  .ant-image-preview-close {
+    inset-block-start: 12px;
+    inset-inline-end: 12px;
+  }
+
+  .ant-image-preview-footer {
+    inset-block-end: 12px;
+  }
+
+  // Override percentage-based padding with pixel values for images, but not
+  // for panoramas, which do not contain an img tag.
+
+  .ant-image-preview-body:has(img) {
+    padding-inline: 40px;
+    padding-block: 40px 90px;
+
+    > .ant-image-preview-img {
+      max-width: 100%;
+      max-height: 100%;
     }
-
-    .ant-image-preview-close {
-        inset-block-start: 12px;
-        inset-inline-end: 12px;
-    }
-
-    .ant-image-preview-footer {
-        inset-block-end: 12px;
-    }
-
-    // Override percentage-based padding with pixel values for images, but not
-    // for panoramas, which do not contain an img tag.
-
-    .ant-image-preview-body:has(img) {
-        padding-inline: 40px;
-        padding-block: 40px 90px;
-
-        > .ant-image-preview-img {
-            max-width: 100%;
-            max-height: 100%;
-        }
-    }
+  }
 }

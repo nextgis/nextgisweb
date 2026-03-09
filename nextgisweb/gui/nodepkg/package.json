@@ -1,36 +1,36 @@
 {
-    "name": "@nextgisweb/gui",
-    "version": "0.0.0",
-    "type": "module",
-    "sideEffects": [
-        "*.css",
-        "*.less"
-    ],
-    "dependencies": {
-        "@ckeditor/ckeditor5-react": "9.5.0",
-        "@codemirror/commands": "^6.2.1",
-        "@codemirror/lang-css": "^6.0.2",
-        "@codemirror/lang-html": "^6.1.1",
-        "@codemirror/lang-javascript": "^6.1.4",
-        "@codemirror/lang-json": "^6.0.1",
-        "@codemirror/lang-markdown": "^6.0.5",
-        "@codemirror/lang-python": "^6.1.1",
-        "@codemirror/lang-xml": "^6.0.2",
-        "@codemirror/language": "^6.6.0",
-        "@codemirror/search": "^6.2.3",
-        "@codemirror/view": "^6.9.0",
-        "@dnd-kit/core": "^6.3.1",
-        "@dnd-kit/modifiers": "^9.0.0",
-        "@dnd-kit/sortable": "^10.0.0",
-        "@dnd-kit/utilities": "^3.2.2",
-        "@ngneat/falso": "8.0.1",
-        "antd": "~6.3.1",
-        "classnames": "^2.5.1",
-        "html-react-parser": "5.2.5",
-        "react-complex-tree": "^2.6.0"
-    },
-    "resolutions": {
-        "#NGW-1855": "Lock @rc-component/motion to 1.1.6 to avoid duplicate version bug",
-        "@rc-component/motion": "1.1.6"
-    }
+  "name": "@nextgisweb/gui",
+  "version": "0.0.0",
+  "type": "module",
+  "sideEffects": [
+    "*.css",
+    "*.less"
+  ],
+  "dependencies": {
+    "@ckeditor/ckeditor5-react": "9.5.0",
+    "@codemirror/commands": "^6.2.1",
+    "@codemirror/lang-css": "^6.0.2",
+    "@codemirror/lang-html": "^6.1.1",
+    "@codemirror/lang-javascript": "^6.1.4",
+    "@codemirror/lang-json": "^6.0.1",
+    "@codemirror/lang-markdown": "^6.0.5",
+    "@codemirror/lang-python": "^6.1.1",
+    "@codemirror/lang-xml": "^6.0.2",
+    "@codemirror/language": "^6.6.0",
+    "@codemirror/search": "^6.2.3",
+    "@codemirror/view": "^6.9.0",
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/modifiers": "^9.0.0",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
+    "@ngneat/falso": "8.0.1",
+    "antd": "~6.3.1",
+    "classnames": "^2.5.1",
+    "html-react-parser": "5.2.5",
+    "react-complex-tree": "^2.6.0"
+  },
+  "resolutions": {
+    "#NGW-1855": "Lock @rc-component/motion to 1.1.6 to avoid duplicate version bug",
+    "@rc-component/motion": "1.1.6"
+  }
 }

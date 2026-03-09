@@ -17,7 +17,7 @@ import type { UserBrowseData } from "./type";
 type Col = NonNullable<TableProps["columns"]>[0];
 
 interface UserBrowseProps {
-    readonly: boolean;
+  readonly: boolean;
 }
 
 const msgDisabled = gettext("Disabled");
@@ -37,116 +37,112 @@ const [msgPasswordTooltip, msgOAuthTooltip] = [
 ];
 
 const messages = {
-    deleteConfirm: gettext("Delete user?"),
-    deleteSuccess: gettext("User deleted"),
+  deleteConfirm: gettext("Delete user?"),
+  deleteSuccess: gettext("User deleted"),
 };
 
 const createFullNameColumn = (): Col => ({
-    title: msgFullName,
-    dataIndex: "display_name",
-    key: "display_name",
-    render: (text, record) => (
-        <>
-            {record.is_administrator ? (
-                <AdministratorIcon />
-            ) : (
-                <RegularUserIcon />
-            )}{" "}
-            {text}
-        </>
-    ),
-    sorter: (a, b) => (a.display_name > b.display_name ? 1 : -1),
+  title: msgFullName,
+  dataIndex: "display_name",
+  key: "display_name",
+  render: (text, record) => (
+    <>
+      {record.is_administrator ? <AdministratorIcon /> : <RegularUserIcon />}{" "}
+      {text}
+    </>
+  ),
+  sorter: (a, b) => (a.display_name > b.display_name ? 1 : -1),
 });
 
 const createLoginColumn = (): Col => ({
-    title: msgLogin,
-    dataIndex: "keyname",
-    key: "keyname",
-    sorter: (a, b) => (a.keyname > b.keyname ? 1 : -1),
+  title: msgLogin,
+  dataIndex: "keyname",
+  key: "keyname",
+  sorter: (a, b) => (a.keyname > b.keyname ? 1 : -1),
 });
 
 const createOauthColumns = (): Col[] => [
-    {
-        title: <Tooltip title={msgPasswordTooltip}>{msgPassword}</Tooltip>,
-        dataIndex: "password",
-        render: (value) => (value ? msgYes : msgNo),
-        sorter: (a, b) => (a.password > b.password ? 1 : -1),
-    },
-    {
-        title: <Tooltip title={msgOAuthTooltip}>{oauth.name}</Tooltip>,
-        dataIndex: "oauth_subject",
-        render: (value) => (value ? msgYes : msgNo),
-        sorter: (a, b) => (!!a.oauth_subject > !!b.oauth_subject ? 1 : -1),
-    },
+  {
+    title: <Tooltip title={msgPasswordTooltip}>{msgPassword}</Tooltip>,
+    dataIndex: "password",
+    render: (value) => (value ? msgYes : msgNo),
+    sorter: (a, b) => (a.password > b.password ? 1 : -1),
+  },
+  {
+    title: <Tooltip title={msgOAuthTooltip}>{oauth.name}</Tooltip>,
+    dataIndex: "oauth_subject",
+    render: (value) => (value ? msgYes : msgNo),
+    sorter: (a, b) => (!!a.oauth_subject > !!b.oauth_subject ? 1 : -1),
+  },
 ];
 
 const createLastActivityColumn = (): Col => ({
-    title: msgLastActivity,
-    dataIndex: "last_activity",
-    key: "last_activity",
-    sorter: (a, b) => {
-        const [al, bl] = [a.last_activity, b.last_activity].map((l) =>
-            l ? new Date(l).getTime() : 0
-        );
-        return al - bl;
-    },
-    render: (text) => (text ? utc(text).local().format("L LTS") : ""),
+  title: msgLastActivity,
+  dataIndex: "last_activity",
+  key: "last_activity",
+  sorter: (a, b) => {
+    const [al, bl] = [a.last_activity, b.last_activity].map((l) =>
+      l ? new Date(l).getTime() : 0
+    );
+    return al - bl;
+  },
+  render: (text) => (text ? utc(text).local().format("L LTS") : ""),
 });
 
 const createStatusColumn = (): Col => ({
-    title: msgStatus,
-    dataIndex: "disabled",
-    key: "disabled",
-    render: (text) => (text ? msgDisabled : msgEnabled),
-    sorter: (a, b) => (a.disabled > b.disabled ? 1 : -1),
+  title: msgStatus,
+  dataIndex: "disabled",
+  key: "disabled",
+  render: (text) => (text ? msgDisabled : msgEnabled),
+  sorter: (a, b) => (a.disabled > b.disabled ? 1 : -1),
 });
 
 const usersLimitNotZero = settings?.userLimit?.local !== 0;
 const showOauthColumns = oauth.enabled && usersLimitNotZero;
 
 const columns: TableProps["columns"] = [
-    createFullNameColumn(),
-    createLoginColumn(),
-    ...(showOauthColumns ? createOauthColumns() : []),
-    createLastActivityColumn(),
-    createStatusColumn(),
+  createFullNameColumn(),
+  createLoginColumn(),
+  ...(showOauthColumns ? createOauthColumns() : []),
+  createLastActivityColumn(),
+  createStatusColumn(),
 ];
 
 export function UserBrowse({ readonly }: UserBrowseProps) {
-    const DisableSelectedUsers = (props: ControlProps<UserBrowseData>) => {
-        return ToggleSelectedUsers({ disable: true, ...props });
-    };
-    const EnableSelectedUsers = (props: ControlProps<UserBrowseData>) => {
-        return ToggleSelectedUsers({ disable: false, ...props });
-    };
+  const DisableSelectedUsers = (props: ControlProps<UserBrowseData>) => {
+    return ToggleSelectedUsers({ disable: true, ...props });
+  };
+  const EnableSelectedUsers = (props: ControlProps<UserBrowseData>) => {
+    return ToggleSelectedUsers({ disable: false, ...props });
+  };
 
-    // prettier-ignore
-    const infoNGID = useMemo(() => oauth.isNGID && <Alert
+  // prettier-ignore
+  const infoNGID = useMemo(() => oauth.isNGID && <Alert
         type="info" style={{marginTop: "1ex"}}
         title={gettextf("Your team members won't be shown here until their first logon. Set \"New users\" flag for a group to automatically assign new user to this group. You may also modify permission for authenticated users to manage access for your team members.")({ name: oauth.name })}
     />, []);
 
-    const tmBtn = makeTeamManageButton({ target: "_blank" });
+  const tmBtn = makeTeamManageButton({ target: "_blank" });
 
-    const collectionFilter = useCallback(
-        (itm: UserBrowseData) => !itm.system,
-        []
-    );
+  const collectionFilter = useCallback(
+    (itm: UserBrowseData) => !itm.system,
+    []
+  );
 
-    return (
-        <div className="ngw-auth-user-browse">
-            <ModelBrowse
-                model="auth.user"
-                readonly={readonly}
-                columns={columns}
-                messages={messages}
-                showCreate={usersLimitNotZero}
-                collectionOptions={{ query: { brief: true } }}
-                collectionFilter={collectionFilter}
-                headerControls={(tmBtn && [() => tmBtn]) || []}
-                selectedControls={[EnableSelectedUsers, DisableSelectedUsers]}
-            />
-            {infoNGID}
-        </div>
-    );
+  return (
+    <div className="ngw-auth-user-browse">
+      <ModelBrowse
+        model="auth.user"
+        readonly={readonly}
+        columns={columns}
+        messages={messages}
+        showCreate={usersLimitNotZero}
+        collectionOptions={{ query: { brief: true } }}
+        collectionFilter={collectionFilter}
+        headerControls={(tmBtn && [() => tmBtn]) || []}
+        selectedControls={[EnableSelectedUsers, DisableSelectedUsers]}
+      />
+      {infoNGID}
+    </div>
+  );
 }

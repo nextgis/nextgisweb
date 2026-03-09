@@ -2,10 +2,10 @@
  * Sleep options
  */
 interface SleepOptions {
-    /**
-     * Optional AbortSignal to cancel sleep
-     * */
-    signal?: AbortSignal;
+  /**
+   * Optional AbortSignal to cancel sleep
+   * */
+  signal?: AbortSignal;
 }
 
 /**
@@ -24,17 +24,17 @@ interface SleepOptions {
  *  }
  */
 export function sleep(ms: number, opts: SleepOptions = {}): Promise<unknown> {
-    return new Promise((resolve, reject) => {
-        if (opts?.signal?.aborted) {
-            reject(opts?.signal.reason);
-        } else {
-            const timeout = setTimeout(() => {
-                resolve(undefined);
-            }, ms);
-            opts.signal?.addEventListener("abort", () => {
-                clearTimeout(timeout);
-                reject(opts.signal!.reason);
-            });
-        }
-    });
+  return new Promise((resolve, reject) => {
+    if (opts?.signal?.aborted) {
+      reject(opts?.signal.reason);
+    } else {
+      const timeout = setTimeout(() => {
+        resolve(undefined);
+      }, ms);
+      opts.signal?.addEventListener("abort", () => {
+        clearTimeout(timeout);
+        reject(opts.signal!.reason);
+      });
+    }
+  });
 }

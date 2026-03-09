@@ -9,7 +9,7 @@ import { default as _utc } from "dayjs/plugin/utc";
 // BC dates.
 
 for (const plugin of [_utc, _localizedFormat, _relativeTime, _localeData]) {
-    extend(plugin);
+  extend(plugin);
 }
 
 export default dayjs;

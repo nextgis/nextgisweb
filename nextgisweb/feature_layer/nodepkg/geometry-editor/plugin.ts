@@ -5,9 +5,9 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { GEOMETRY_KEY } from "./constant";
 
 registry.register(COMP_ID, {
-    widget: () => import("./GeometryEditor"),
-    store: () => import("./GeometryEditorStore"),
-    label: gettext("Geometry"),
-    identity: GEOMETRY_KEY,
-    order: 100,
+  widget: () => import("./GeometryEditor"),
+  store: () => import("./GeometryEditorStore"),
+  label: gettext("Geometry"),
+  identity: GEOMETRY_KEY,
+  order: 100,
 });

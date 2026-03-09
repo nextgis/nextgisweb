@@ -8,51 +8,51 @@ import "./FeatureDisplayModal.less";
 export type ModalProps = Parameters<typeof Modal>[0];
 
 export interface FeatureDisplayModalProps extends ModalProps {
-    featureId: number;
-    resourceId: number;
+  featureId: number;
+  resourceId: number;
 }
 
 export function FeatureDisplayModal({
-    open,
-    featureId,
-    resourceId,
-    onCancel,
-    ...modalProps
+  open,
+  featureId,
+  resourceId,
+  onCancel,
+  ...modalProps
 }: FeatureDisplayModalProps) {
-    const { data: featureItem, isLoading } = useRouteGet(
-        "feature_layer.feature.item",
-        {
-            id: resourceId,
-            fid: featureId,
-        },
-        { query: { label: true, dt_format: "iso" } }
-    );
+  const { data: featureItem, isLoading } = useRouteGet(
+    "feature_layer.feature.item",
+    {
+      id: resourceId,
+      fid: featureId,
+    },
+    { query: { label: true, dt_format: "iso" } }
+  );
 
-    return (
-        <>
-            <Modal
-                className="ngw-feature-layer-feature-display-modal"
-                width="" // Do not set the default (520px) width
-                centered={true}
-                open={open}
-                destroyOnHidden
-                footer={null}
-                closable
-                onCancel={onCancel}
-                title={isLoading ? "..." : featureItem.label}
-                {...modalProps}
-            >
-                {isLoading ? (
-                    <LoadingWrapper />
-                ) : (
-                    <FeatureInfoSection
-                        showGeometryInfo
-                        showGeometryPreview
-                        resourceId={resourceId}
-                        featureItem={featureItem}
-                    />
-                )}
-            </Modal>
-        </>
-    );
+  return (
+    <>
+      <Modal
+        className="ngw-feature-layer-feature-display-modal"
+        width="" // Do not set the default (520px) width
+        centered={true}
+        open={open}
+        destroyOnHidden
+        footer={null}
+        closable
+        onCancel={onCancel}
+        title={isLoading ? "..." : featureItem.label}
+        {...modalProps}
+      >
+        {isLoading ? (
+          <LoadingWrapper />
+        ) : (
+          <FeatureInfoSection
+            showGeometryInfo
+            showGeometryPreview
+            resourceId={resourceId}
+            featureItem={featureItem}
+          />
+        )}
+      </Modal>
+    </>
+  );
 }

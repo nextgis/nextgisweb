@@ -8,27 +8,27 @@ import { route } from "@nextgisweb/pyramid/api";
 const permission = await route("auth.permission").get({ cache: true });
 
 interface PermissionSelectProps extends SelectProps<Permission> {
-    multiple?: boolean;
-    value?: Permission;
+  multiple?: boolean;
+  value?: Permission;
 }
 
 export function PermissionSelect({
-    multiple,
-    ...restProps
+  multiple,
+  ...restProps
 }: PermissionSelectProps) {
-    const options = useMemo(
-        () =>
-            Object.entries(permission).map(([key, value]) => ({
-                value: key,
-                label: value,
-            })),
-        []
-    );
-    return (
-        <Select
-            mode={multiple ? "multiple" : undefined}
-            options={options}
-            {...restProps}
-        />
-    );
+  const options = useMemo(
+    () =>
+      Object.entries(permission).map(([key, value]) => ({
+        value: key,
+        label: value,
+      })),
+    []
+  );
+  return (
+    <Select
+      mode={multiple ? "multiple" : undefined}
+      options={options}
+      {...restProps}
+    />
+  );
 }

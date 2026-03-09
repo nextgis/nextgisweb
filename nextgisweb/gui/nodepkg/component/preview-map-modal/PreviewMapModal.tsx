@@ -5,25 +5,25 @@ import type { ParamsOf } from "@nextgisweb/gui/type";
 import "./PreviewMapModal.less";
 
 export type PreviewMapModalProps = ParamsOf<typeof Modal> & {
-    children?: React.ReactNode;
+  children?: React.ReactNode;
 };
 
 export function PreviewMapModal({
-    children,
-    onCancel,
-    ...props
+  children,
+  onCancel,
+  ...props
 }: PreviewMapModalProps) {
-    return (
-        <Modal
-            className="map-preview-modal"
-            {...props}
-            onCancel={onCancel}
-            closeIcon={false}
-            footer={null}
-            width={"60vw"}
-            height={"60vh"}
-        >
-            {children}
-        </Modal>
-    );
+  return (
+    <Modal
+      className="map-preview-modal"
+      {...props}
+      onCancel={onCancel}
+      closeIcon={false}
+      footer={null}
+      width={"60vw"}
+      height={"60vh"}
+    >
+      {children}
+    </Modal>
+  );
 }

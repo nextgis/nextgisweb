@@ -37,29 +37,25 @@ import { OlRenderer } from "./OlRenderer";
 import "./SymbolizerCard.less";
 
 export interface SymbolizerCardProps {
-    /** The callback when the symbolizer was clicked. */
-    onSymbolizerClick?: (symbolizer: Symbolizer) => void;
-    /** A GeoStyler-Style object. */
-    symbolizer: Symbolizer;
+  /** The callback when the symbolizer was clicked. */
+  onSymbolizerClick?: (symbolizer: Symbolizer) => void;
+  /** A GeoStyler-Style object. */
+  symbolizer: Symbolizer;
 }
 
 export const SymbolizerCard = ({
-    symbolizer,
-    onSymbolizerClick = () => {},
+  symbolizer,
+  onSymbolizerClick = () => {},
 }: SymbolizerCardProps) => {
-    const onCardClick = () => {
-        onSymbolizerClick(symbolizer);
-    };
+  const onCardClick = () => {
+    onSymbolizerClick(symbolizer);
+  };
 
-    const gsSymbolizer: GSSymbolizer | null = convertToGeostyler(symbolizer);
+  const gsSymbolizer: GSSymbolizer | null = convertToGeostyler(symbolizer);
 
-    return (
-        <Card
-            className="gs-symbolizer-card"
-            hoverable={true}
-            onClick={onCardClick}
-        >
-            <OlRenderer symbolizers={gsSymbolizer ? [gsSymbolizer] : []} />
-        </Card>
-    );
+  return (
+    <Card className="gs-symbolizer-card" hoverable={true} onClick={onCardClick}>
+      <OlRenderer symbolizers={gsSymbolizer ? [gsSymbolizer] : []} />
+    </Card>
+  );
 };

@@ -16,94 +16,94 @@ import { Collection } from "./Collection";
 import type { ServiceStore } from "./ServiceStore";
 
 const CollectionWidget = observer<{
-    item: Collection;
+  item: Collection;
 }>(function GroupComponentBase({ item }) {
-    return (
-        <Area pad>
-            <LotMV
-                label={gettext("Display name")}
-                value={item.displayName}
-                component={InputValue}
-            />
-            <LotMV
-                label={gettext("Keyname")}
-                value={item.keyname}
-                component={InputValue}
-            />
-            <LotMV
-                label={gettext("Features per request")}
-                value={item.maxFeatures}
-                component={InputNumber}
-                props={{
-                    ...{ min: 0, step: 1000, max: 1000000 },
-                    placeholder: gettext("Not set"),
-                    style: { width: "12em" },
-                }}
-            />
-            <LotMV
-                label={gettext("Resource")}
-                value={item.resourceId}
-                component={ResourceSelect}
-                props={{
-                    readOnly: true,
-                    style: { width: "100%" },
-                    pickerOptions: {
-                        initParentId: item.store.composite.parent,
-                    },
-                }}
-            />
-        </Area>
-    );
+  return (
+    <Area pad>
+      <LotMV
+        label={gettext("Display name")}
+        value={item.displayName}
+        component={InputValue}
+      />
+      <LotMV
+        label={gettext("Keyname")}
+        value={item.keyname}
+        component={InputValue}
+      />
+      <LotMV
+        label={gettext("Features per request")}
+        value={item.maxFeatures}
+        component={InputNumber}
+        props={{
+          ...{ min: 0, step: 1000, max: 1000000 },
+          placeholder: gettext("Not set"),
+          style: { width: "12em" },
+        }}
+      />
+      <LotMV
+        label={gettext("Resource")}
+        value={item.resourceId}
+        component={ResourceSelect}
+        props={{
+          readOnly: true,
+          style: { width: "100%" },
+          pickerOptions: {
+            initParentId: item.store.composite.parent,
+          },
+        }}
+      />
+    </Area>
+  );
 });
 
 export const ServiceWidget: EditorWidget<ServiceStore> = observer(
-    ({ store }) => {
-        const { pickToFocusTable } = useFocusTablePicker({
-            initParentId: store.composite.parent || undefined,
-        });
+  ({ store }) => {
+    const { pickToFocusTable } = useFocusTablePicker({
+      initParentId: store.composite.parent || undefined,
+    });
 
-        const { tableActions, itemActions } = useMemo<
-            FocusTablePropsActions<Collection>
-        >(
-            () => ({
-                tableActions: [
-                    pickToFocusTable(
-                        (res) =>
-                            new Collection(store, {
-                                resource_id: res.id,
-                                display_name: res.get("resource.display_name"),
-                                keyname: generateResourceKeyname(res),
-                                maxfeatures: 1000,
-                            }),
-                        {
-                            pickerOptions: {
-                                requireInterface: "IFeatureLayer",
-                                multiple: true,
-                            },
-                        }
-                    ),
-                ],
-                itemActions: [action.deleteItem()],
-            }),
-            [pickToFocusTable, store]
-        );
+    const { tableActions, itemActions } = useMemo<
+      FocusTablePropsActions<Collection>
+    >(
+      () => ({
+        tableActions: [
+          pickToFocusTable(
+            (res) =>
+              new Collection(store, {
+                resource_id: res.id,
+                display_name: res.get("resource.display_name"),
+                keyname: generateResourceKeyname(res),
+                maxfeatures: 1000,
+              }),
+            {
+              pickerOptions: {
+                requireInterface: "IFeatureLayer",
+                multiple: true,
+              },
+            }
+          ),
+        ],
+        itemActions: [action.deleteItem()],
+      }),
+      [pickToFocusTable, store]
+    );
 
-        return (
-            <FocusTable<Collection>
-                store={store}
-                title={(item) => item.displayName.value}
-                columns={[
-                    {
-                        render: (l: Collection) => l.keyname.value,
-                        width: ["25%", "50%"],
-                    },
-                ]}
-                tableActions={tableActions}
-                itemActions={itemActions}
-                renderDetail={({ item }) => <CollectionWidget item={item} />}
-            />
-        );
-    }
+    return (
+      <FocusTable<Collection>
+        store={store}
+        title={(item) => item.displayName.value}
+        columns={[
+          {
+            render: (l: Collection) => l.keyname.value,
+            width: ["25%", "50%"],
+          },
+        ]}
+        tableActions={tableActions}
+        itemActions={itemActions}
+        renderDetail={({ item }) => <CollectionWidget item={item} />}
+      />
+    );
+  }
 );
 
 ServiceWidget.displayName = "ServiceWidget";

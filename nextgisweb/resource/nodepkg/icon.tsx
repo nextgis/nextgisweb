@@ -7,16 +7,16 @@ import MAllowIcon from "@nextgisweb/icon/material/check_circle/fill";
 import MDenyIcon from "@nextgisweb/icon/material/do_not_disturb_on/fill";
 
 export function ResourceIcon({
-    identity,
-    ...props
+  identity,
+  ...props
 }: SVGProps<SVGSVGElement> & { identity?: ResourceCls }) {
-    return <SvgIcon icon={"rescls-" + identity} {...props} />;
+  return <SvgIcon icon={"rescls-" + identity} {...props} />;
 }
 
 export function AllowIcon(props: SVGProps<SVGSVGElement>) {
-    return <MAllowIcon style={{ color: "var(--success)" }} {...props} />;
+  return <MAllowIcon style={{ color: "var(--success)" }} {...props} />;
 }
 
 export function DenyIcon(props: SVGProps<SVGSVGElement>) {
-    return <MDenyIcon style={{ color: "var(--danger)" }} {...props} />;
+  return <MDenyIcon style={{ color: "var(--danger)" }} {...props} />;
 }

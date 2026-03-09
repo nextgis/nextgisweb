@@ -18,162 +18,162 @@ import { isFileImage } from "./util/isFileImage";
 import "./AttachmentEditor.less";
 
 const AttachmentEditor = observer(
-    ({ store }: EditorWidgetProps<AttachmentEditorStore>) => {
-        const multiple = true;
-        const [messageApi, contextHolder] = message.useMessage();
-        const [width] = useState(80);
-        const previewRef = useRef<HTMLDivElement>(null);
+  ({ store }: EditorWidgetProps<AttachmentEditorStore>) => {
+    const multiple = true;
+    const [messageApi, contextHolder] = message.useMessage();
+    const [width] = useState(80);
+    const previewRef = useRef<HTMLDivElement>(null);
 
-        const [store_] = useState<AttachmentEditorStore>(() => {
-            if (store) {
-                return store;
-            }
-            return new AttachmentEditorStore({});
-        });
+    const [store_] = useState<AttachmentEditorStore>(() => {
+      if (store) {
+        return store;
+      }
+      return new AttachmentEditorStore({});
+    });
 
-        const dataSource = useMemo<DataSource[]>(() => {
-            if (Array.isArray(store_.value)) {
-                return store_.value;
-            }
-            return [];
-        }, [store_.value]);
+    const dataSource = useMemo<DataSource[]>(() => {
+      if (Array.isArray(store_.value)) {
+        return store_.value;
+      }
+      return [];
+    }, [store_.value]);
 
-        const onChange = useCallback(
-            (meta_?: UploaderMeta) => {
-                if (!meta_) {
-                    return;
-                }
-                const metaList = Array.isArray(meta_) ? meta_ : [meta_];
-                store_.append(metaList);
-            },
-            [store_]
-        );
+    const onChange = useCallback(
+      (meta_?: UploaderMeta) => {
+        if (!meta_) {
+          return;
+        }
+        const metaList = Array.isArray(meta_) ? meta_ : [meta_];
+        store_.append(metaList);
+      },
+      [store_]
+    );
 
-        const { props } = useFileUploader({
-            openFileDialogOnClick: false,
-            onChange,
-            onError: messageApi.error,
-            multiple,
-        });
+    const { props } = useFileUploader({
+      openFileDialogOnClick: false,
+      onChange,
+      onError: messageApi.error,
+      multiple,
+    });
 
-        const updateField = useCallback(
-            (field: string, row: DataSource, value: string) => {
-                store_.updateItem(row, field, value);
-            },
-            [store_]
-        );
+    const updateField = useCallback(
+      (field: string, row: DataSource, value: string) => {
+        store_.updateItem(row, field, value);
+      },
+      [store_]
+    );
 
-        const handleDelete = useCallback(
-            (row: object) => {
-                store_.deleteItem(row as DataSource);
-            },
-            [store_]
-        );
+    const handleDelete = useCallback(
+      (row: object) => {
+        store_.deleteItem(row as DataSource);
+      },
+      [store_]
+    );
 
-        const editableField = useCallback(
-            (field: string) =>
-                function EditableField(text: string, row: object) {
-                    const r = row as DataSource;
+    const editableField = useCallback(
+      (field: string) =>
+        function EditableField(text: string, row: object) {
+          const r = row as DataSource;
+          return (
+            <Input
+              value={text}
+              onChange={(e) => {
+                updateField(field, r, e.target.value);
+              }}
+            />
+          );
+        },
+      [updateField]
+    );
+
+    const actions = useMemo(
+      () => [
+        <FileUploaderButton
+          key="file-uploader-button"
+          multiple={multiple}
+          onChange={onChange}
+        />,
+      ],
+      [multiple, onChange]
+    );
+
+    return (
+      <div className="ngw-feature-attachment-editor">
+        {contextHolder}
+        <ActionToolbar pad borderBlockEnd actions={actions} />
+        <Upload {...props}>
+          <Table
+            rowKey={(record) => {
+              const r = record as DataSource;
+              return "file_upload" in r ? r.file_upload.id : r.id;
+            }}
+            dataSource={dataSource}
+            columns={[
+              {
+                key: "preview",
+                className: "preview",
+                render: (_, row) => {
+                  const r = row as DataSource;
+                  if (
+                    ("is_image" in r && r.is_image) ||
+                    ("_file" in r &&
+                      r._file instanceof File &&
+                      isFileImage(r._file))
+                  ) {
                     return (
-                        <Input
-                            value={text}
-                            onChange={(e) => {
-                                updateField(field, r, e.target.value);
-                            }}
-                        />
+                      <AttachmentEditorPreview
+                        attachment={r}
+                        attachments={dataSource}
+                        resourceId={store_.resourceId}
+                        featureId={store_.featureId}
+                        width={width}
+                        height={width}
+                      />
                     );
+                  }
+
+                  return "";
                 },
-            [updateField]
-        );
-
-        const actions = useMemo(
-            () => [
-                <FileUploaderButton
-                    key="file-uploader-button"
-                    multiple={multiple}
-                    onChange={onChange}
-                />,
-            ],
-            [multiple, onChange]
-        );
-
-        return (
-            <div className="ngw-feature-attachment-editor">
-                {contextHolder}
-                <ActionToolbar pad borderBlockEnd actions={actions} />
-                <Upload {...props}>
-                    <Table
-                        rowKey={(record) => {
-                            const r = record as DataSource;
-                            return "file_upload" in r ? r.file_upload.id : r.id;
-                        }}
-                        dataSource={dataSource}
-                        columns={[
-                            {
-                                key: "preview",
-                                className: "preview",
-                                render: (_, row) => {
-                                    const r = row as DataSource;
-                                    if (
-                                        ("is_image" in r && r.is_image) ||
-                                        ("_file" in r &&
-                                            r._file instanceof File &&
-                                            isFileImage(r._file))
-                                    ) {
-                                        return (
-                                            <AttachmentEditorPreview
-                                                attachment={r}
-                                                attachments={dataSource}
-                                                resourceId={store_.resourceId}
-                                                featureId={store_.featureId}
-                                                width={width}
-                                                height={width}
-                                            />
-                                        );
-                                    }
-
-                                    return "";
-                                },
-                            },
-                            {
-                                dataIndex: "name",
-                                className: "name",
-                                title: gettext("File name"),
-                                render: editableField("name"),
-                            },
-                            {
-                                dataIndex: "size",
-                                className: "size",
-                                title: gettext("Size"),
-                                render: (text: number) => formatSize(text),
-                            },
-                            {
-                                dataIndex: "description",
-                                className: "description",
-                                title: gettext("Description"),
-                                render: editableField("description"),
-                            },
-                            {
-                                key: "actions",
-                                title: "",
-                                render: (_, record) => (
-                                    <Button
-                                        onClick={() => handleDelete(record)}
-                                        type="text"
-                                        shape="circle"
-                                        icon={<RemoveIcon />}
-                                    />
-                                ),
-                            },
-                        ]}
-                        parentHeight
-                        size="small"
-                    />
-                </Upload>
-                <div ref={previewRef}></div>
-            </div>
-        );
-    }
+              },
+              {
+                dataIndex: "name",
+                className: "name",
+                title: gettext("File name"),
+                render: editableField("name"),
+              },
+              {
+                dataIndex: "size",
+                className: "size",
+                title: gettext("Size"),
+                render: (text: number) => formatSize(text),
+              },
+              {
+                dataIndex: "description",
+                className: "description",
+                title: gettext("Description"),
+                render: editableField("description"),
+              },
+              {
+                key: "actions",
+                title: "",
+                render: (_, record) => (
+                  <Button
+                    onClick={() => handleDelete(record)}
+                    type="text"
+                    shape="circle"
+                    icon={<RemoveIcon />}
+                  />
+                ),
+              },
+            ]}
+            parentHeight
+            size="small"
+          />
+        </Upload>
+        <div ref={previewRef}></div>
+      </div>
+    );
+  }
 );
 
 AttachmentEditor.displayName = "AttachmentEditor";

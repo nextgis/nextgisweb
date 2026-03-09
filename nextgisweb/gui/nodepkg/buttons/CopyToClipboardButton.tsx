@@ -8,89 +8,89 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import ContentCopyIcon from "@nextgisweb/icon/material/content_copy";
 
 interface CopyToClipboardButtonProps extends ButtonProps {
-    children?: React.ReactNode;
-    iconOnly?: boolean;
-    messageInfo?: string;
-    getTextToCopy: () => string;
+  children?: React.ReactNode;
+  iconOnly?: boolean;
+  messageInfo?: string;
+  getTextToCopy: () => string;
 }
 
 interface CopyCallbacks {
-    onSuccess?: () => void;
-    onError?: (error: unknown) => void;
+  onSuccess?: () => void;
+  onError?: (error: unknown) => void;
 }
 
 interface ConditionalEventProps {
-    onMouseDown?: MouseEventHandler<HTMLButtonElement>;
-    onClick?: MouseEventHandler<HTMLButtonElement>;
+  onMouseDown?: MouseEventHandler<HTMLButtonElement>;
+  onClick?: MouseEventHandler<HTMLButtonElement>;
 }
 
 const _copyToClipboard = async (
-    textToCopy: string,
-    callbacks?: CopyCallbacks
+  textToCopy: string,
+  callbacks?: CopyCallbacks
 ): Promise<void> => {
-    try {
-        await navigator.clipboard.writeText(textToCopy);
-        callbacks?.onSuccess?.();
-    } catch (err: unknown) {
-        console.error("Failed to copy to clipboard:", err);
-        callbacks?.onError?.(err);
-    }
+  try {
+    await navigator.clipboard.writeText(textToCopy);
+    callbacks?.onSuccess?.();
+  } catch (err: unknown) {
+    console.error("Failed to copy to clipboard:", err);
+    callbacks?.onError?.(err);
+  }
 };
 
 const IsTouchDevice = typeof window !== "undefined" && "ontouchstart" in window;
 
 export function CopyToClipboardButton({
-    children,
-    messageInfo,
-    getTextToCopy,
-    iconOnly,
-    ...restParams
+  children,
+  messageInfo,
+  getTextToCopy,
+  iconOnly,
+  ...restParams
 }: CopyToClipboardButtonProps) {
-    const [messageApi, contextHolder] = message.useMessage();
-    const isMounted = useRef(true);
+  const [messageApi, contextHolder] = message.useMessage();
+  const isMounted = useRef(true);
 
-    useEffect(() => {
-        isMounted.current = true;
-        return () => {
-            isMounted.current = false;
-        };
-    }, []);
-
-    const copyToClipboard = async () => {
-        await _copyToClipboard(getTextToCopy(), {
-            onSuccess: () => {
-                if (!isMounted.current) return;
-                messageApi.info(messageInfo || gettext("Copied to clipboard"));
-            },
-            onError: () => {
-                if (!isMounted.current) return;
-                messageApi.error(gettext("Failed to copy to clipboard"));
-            },
-        });
+  useEffect(() => {
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
     };
+  }, []);
 
-    let buttonContent: React.ReactNode | null = null;
-    if (!iconOnly) {
-        buttonContent = children || gettext("Copy to clipboard");
-    }
+  const copyToClipboard = async () => {
+    await _copyToClipboard(getTextToCopy(), {
+      onSuccess: () => {
+        if (!isMounted.current) return;
+        messageApi.info(messageInfo || gettext("Copied to clipboard"));
+      },
+      onError: () => {
+        if (!isMounted.current) return;
+        messageApi.error(gettext("Failed to copy to clipboard"));
+      },
+    });
+  };
 
-    const eventProps: ConditionalEventProps = {};
-    if (IsTouchDevice) {
-        // Using onMouseDown because onClick doesn't fire on mobile
-        // inside a Tooltip
-        eventProps.onMouseDown = copyToClipboard;
-    } else {
-        eventProps.onClick = copyToClipboard;
-    }
+  let buttonContent: React.ReactNode | null = null;
+  if (!iconOnly) {
+    buttonContent = children || gettext("Copy to clipboard");
+  }
 
-    return (
-        <>
-            {contextHolder}
-            <Button icon={<ContentCopyIcon />} {...eventProps} {...restParams}>
-                {buttonContent}
-            </Button>
-        </>
-    );
+  const eventProps: ConditionalEventProps = {};
+  if (IsTouchDevice) {
+    // Using onMouseDown because onClick doesn't fire on mobile
+    // inside a Tooltip
+    eventProps.onMouseDown = copyToClipboard;
+  } else {
+    eventProps.onClick = copyToClipboard;
+  }
+
+  return (
+    <>
+      {contextHolder}
+      <Button icon={<ContentCopyIcon />} {...eventProps} {...restParams}>
+        {buttonContent}
+      </Button>
+    </>
+  );
 }
 
 CopyToClipboardButton.displayName = "CopyToClipboardButton";

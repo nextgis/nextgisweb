@@ -8,15 +8,15 @@ import type { ControlProps } from "./MapControl";
 import HomeIcon from "@nextgisweb/icon/material/home";
 
 export default function InitialExtentControl(props: ControlProps) {
-    const { mapStore } = useMapContext();
+  const { mapStore } = useMapContext();
 
-    const onClick = useCallback(() => {
-        mapStore.zoomToInitialExtent();
-    }, [mapStore]);
+  const onClick = useCallback(() => {
+    mapStore.zoomToInitialExtent();
+  }, [mapStore]);
 
-    return (
-        <ButtonControl {...props} onClick={onClick}>
-            <HomeIcon />
-        </ButtonControl>
-    );
+  return (
+    <ButtonControl {...props} onClick={onClick}>
+      <HomeIcon />
+    </ButtonControl>
+  );
 }

@@ -4,8 +4,8 @@ import type * as apitype from "@nextgisweb/basemap/type/api";
 import type { FocusTableStore } from "@nextgisweb/gui/focus-table";
 import type { CompositeStore } from "@nextgisweb/resource/composite/CompositeStore";
 import type {
-    EditorStore,
-    EditorStoreOptions,
+  EditorStore,
+  EditorStoreOptions,
 } from "@nextgisweb/resource/type";
 
 import { Basemap } from "./Basemap";
@@ -13,62 +13,62 @@ import { Basemap } from "./Basemap";
 type Value = apitype.BasemapWebMapRead;
 
 export class WebMapStore
-    implements EditorStore<Value>, FocusTableStore<Basemap>
+  implements EditorStore<Value>, FocusTableStore<Basemap>
 {
-    readonly identity = "basemap_webmap";
-    readonly composite: CompositeStore;
+  readonly identity = "basemap_webmap";
+  readonly composite: CompositeStore;
 
-    @observable.ref accessor dirty = false;
-    @observable.ref accessor validate = false;
+  @observable.ref accessor dirty = false;
+  @observable.ref accessor validate = false;
 
-    readonly basemaps = observable.array<Basemap>([], { deep: false });
+  readonly basemaps = observable.array<Basemap>([], { deep: false });
 
-    constructor({ composite }: EditorStoreOptions) {
-        this.composite = composite;
-        observe(this.basemaps, () => this.markDirty());
-    }
+  constructor({ composite }: EditorStoreOptions) {
+    this.composite = composite;
+    observe(this.basemaps, () => this.markDirty());
+  }
 
-    @action
-    load({ basemaps }: Value) {
-        this.basemaps.replace(basemaps.map((v) => new Basemap(this, v)));
-        this.dirty = false;
-    }
+  @action
+  load({ basemaps }: Value) {
+    this.basemaps.replace(basemaps.map((v) => new Basemap(this, v)));
+    this.dirty = false;
+  }
 
-    dump() {
-        if (!this.dirty) return undefined;
-        return { basemaps: this.basemaps.map((i) => i.json()) };
-    }
+  dump() {
+    if (!this.dirty) return undefined;
+    return { basemaps: this.basemaps.map((i) => i.json()) };
+  }
 
-    @action
-    markDirty() {
-        this.dirty = true;
-    }
+  @action
+  markDirty() {
+    this.dirty = true;
+  }
 
-    @computed
-    get isValid(): boolean {
-        return this.basemaps.every((i) => i.error === false);
-    }
+  @computed
+  get isValid(): boolean {
+    return this.basemaps.every((i) => i.error === false);
+  }
 
-    @computed
-    get counter() {
-        return this.basemaps.length;
-    }
+  @computed
+  get counter() {
+    return this.basemaps.length;
+  }
 
-    // FocusTableStore
+  // FocusTableStore
 
-    getItemChildren(item: Basemap | null) {
-        return item === null ? this.basemaps : undefined;
-    }
+  getItemChildren(item: Basemap | null) {
+    return item === null ? this.basemaps : undefined;
+  }
 
-    getItemContainer(item: Basemap) {
-        return item && this.basemaps;
-    }
+  getItemContainer(item: Basemap) {
+    return item && this.basemaps;
+  }
 
-    getItemParent() {
-        return null;
-    }
+  getItemParent() {
+    return null;
+  }
 
-    getItemError(item: Basemap) {
-        return item.error;
-    }
+  getItemError(item: Basemap) {
+    return item.error;
+  }
 }

@@ -11,127 +11,123 @@ import type { TreeLayerStore } from "@nextgisweb/webmap/store/tree-store/TreeIte
 import { filterItems } from "@nextgisweb/webmap/store/tree-store/treeStoreUtil";
 
 const WebmapLayer = observer(
-    ({
-        layerItem,
-        mapStore,
-    }: {
-        layerItem: TreeLayerStore;
-        mapStore: MapStore;
-    }) => {
-        const layerItemRef = useRef(layerItem);
-        const [layer, setLayer] = useState<CoreLayer | null>(null);
+  ({
+    layerItem,
+    mapStore,
+  }: {
+    layerItem: TreeLayerStore;
+    mapStore: MapStore;
+  }) => {
+    const layerItemRef = useRef(layerItem);
+    const [layer, setLayer] = useState<CoreLayer | null>(null);
 
-        const { visibility, opacity, symbols, filter, drawOrderPosition } =
-            layerItem;
-        const { hmux } = mapStore;
+    const { visibility, opacity, symbols, filter, drawOrderPosition } =
+      layerItem;
+    const { hmux } = mapStore;
 
-        const resolutionDebounced = useMemoDebounce(mapStore.resolution, 100);
+    const resolutionDebounced = useMemoDebounce(mapStore.resolution, 100);
 
-        useEffect(() => {
-            layerItemRef.current = layerItem;
-        }, [layerItem]);
+    useEffect(() => {
+      layerItemRef.current = layerItem;
+    }, [layerItem]);
 
-        useEffect(() => {
-            let cancelled = false;
-            const item = layerItemRef.current;
-            let existLayer: CoreLayer | undefined = mapStore.getLayer(item.id);
-            const setup = async () => {
-                if (!existLayer) {
-                    const Adapter = (await entrypointsLoader([item.adapter]))[
-                        item.adapter
-                    ] as LayerDisplayAdapterCtor;
-                    if (cancelled) return;
-                    let minResolution, maxResolution;
-                    if (item.maxScaleDenom !== null) {
-                        minResolution = mapStore.resolutionForScale(
-                            item.maxScaleDenom
-                        );
-                    }
-                    if (item.minScaleDenom !== null) {
-                        maxResolution = mapStore.resolutionForScale(
-                            item.minScaleDenom
-                        );
-                    }
-                    item.update({ minResolution, maxResolution });
+    useEffect(() => {
+      let cancelled = false;
+      const item = layerItemRef.current;
+      let existLayer: CoreLayer | undefined = mapStore.getLayer(item.id);
+      const setup = async () => {
+        if (!existLayer) {
+          const Adapter = (await entrypointsLoader([item.adapter]))[
+            item.adapter
+          ] as LayerDisplayAdapterCtor;
+          if (cancelled) return;
+          let minResolution, maxResolution;
+          if (item.maxScaleDenom !== null) {
+            minResolution = mapStore.resolutionForScale(item.maxScaleDenom);
+          }
+          if (item.minScaleDenom !== null) {
+            maxResolution = mapStore.resolutionForScale(item.minScaleDenom);
+          }
+          item.update({ minResolution, maxResolution });
 
-                    existLayer = new Adapter().createLayer(item, {
-                        hmux: hmux ?? undefined,
-                    });
+          existLayer = new Adapter().createLayer(item, {
+            hmux: hmux ?? undefined,
+          });
 
-                    mapStore.addLayer(
-                        existLayer,
-                        layerItemRef.current.drawOrderPosition ?? undefined
-                    );
-                }
-                setLayer(existLayer);
-            };
-            setup();
+          mapStore.addLayer(
+            existLayer,
+            layerItemRef.current.drawOrderPosition ?? undefined
+          );
+        }
+        setLayer(existLayer);
+      };
+      setup();
 
-            return () => {
-                cancelled = true;
-                if (existLayer) {
-                    mapStore.removeLayer(existLayer);
-                }
-            };
-        }, [mapStore, hmux]);
+      return () => {
+        cancelled = true;
+        if (existLayer) {
+          mapStore.removeLayer(existLayer);
+        }
+      };
+    }, [mapStore, hmux]);
 
-        useEffect(() => {
-            if (layer) {
-                layer.setVisibility(visibility);
-            }
-        }, [visibility, layer, mapStore]);
+    useEffect(() => {
+      if (layer) {
+        layer.setVisibility(visibility);
+      }
+    }, [visibility, layer, mapStore]);
 
-        useEffect(() => {
-            if (layer && opacity !== null && opacity !== undefined) {
-                layer.setOpacity(opacity);
-            }
-        }, [opacity, layer, mapStore]);
+    useEffect(() => {
+      if (layer && opacity !== null && opacity !== undefined) {
+        layer.setOpacity(opacity);
+      }
+    }, [opacity, layer, mapStore]);
 
-        useEffect(() => {
-            if (layer) {
-                layer.setSymbols(symbols);
-            }
-        }, [layer, symbols]);
+    useEffect(() => {
+      if (layer) {
+        layer.setSymbols(symbols);
+      }
+    }, [layer, symbols]);
 
-        useEffect(() => {
-            if (layer) {
-                layer.setFilter(filter);
-            }
-        }, [layer, filter]);
+    useEffect(() => {
+      if (layer) {
+        layer.setFilter(filter);
+      }
+    }, [layer, filter]);
 
-        useEffect(() => {
-            if (layer && drawOrderPosition !== null) {
-                layer.setZIndex(drawOrderPosition);
-            }
-        }, [layer, drawOrderPosition]);
+    useEffect(() => {
+      if (layer && drawOrderPosition !== null) {
+        layer.setZIndex(drawOrderPosition);
+      }
+    }, [layer, drawOrderPosition]);
 
-        useEffect(() => {
-            const r = resolutionDebounced;
-            if (!layer || r === null) return;
-            const ol = layer.olLayer;
+    useEffect(() => {
+      const r = resolutionDebounced;
+      if (!layer || r === null) return;
+      const ol = layer.olLayer;
 
-            const isOutOfScaleRange =
-                r < ol.getMinResolution() || r >= ol.getMaxResolution();
+      const isOutOfScaleRange =
+        r < ol.getMinResolution() || r >= ol.getMaxResolution();
 
-            layerItemRef.current.update({ isOutOfScaleRange });
-        }, [layer, resolutionDebounced]);
+      layerItemRef.current.update({ isOutOfScaleRange });
+    }, [layer, resolutionDebounced]);
 
-        return null;
-    }
+    return null;
+  }
 );
 
 WebmapLayer.displayName = "WebmapLayer";
 
 export const WebmapLayers = observer(
-    ({ treeStore, mapStore }: { treeStore: TreeStore; mapStore: MapStore }) => {
-        const layerItems = filterItems(Array.from(treeStore.items.values()), {
-            type: "layer",
-        });
+  ({ treeStore, mapStore }: { treeStore: TreeStore; mapStore: MapStore }) => {
+    const layerItems = filterItems(Array.from(treeStore.items.values()), {
+      type: "layer",
+    });
 
-        return layerItems.map((it) => (
-            <WebmapLayer key={it.id} layerItem={it} mapStore={mapStore} />
-        ));
-    }
+    return layerItems.map((it) => (
+      <WebmapLayer key={it.id} layerItem={it} mapStore={mapStore} />
+    ));
+  }
 );
 
 WebmapLayers.displayName = "WebmapLayers";

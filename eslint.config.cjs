@@ -20,220 +20,210 @@ const browserGlobals = { ...globals.browser };
 const ecmaVersion = 2022;
 
 const noUnusedVarsOptions = {
-    args: "after-used",
-    vars: "all",
-    ignoreRestSiblings: true,
-    varsIgnorePattern: "^_",
-    argsIgnorePattern: "^_",
-    destructuredArrayIgnorePattern: "^_",
+  args: "after-used",
+  vars: "all",
+  ignoreRestSiblings: true,
+  varsIgnorePattern: "^_",
+  argsIgnorePattern: "^_",
+  destructuredArrayIgnorePattern: "^_",
 };
 
 /** @type {import("eslint").Linter.Config[]} */
 const config = [
-    {
-        ignores: [
-            "doc/",
-            "contrib/",
-            "dist/",
-            "node_modules/",
-            "env/lib/",
-            "**/*.inc.{ts,d.ts}",
-        ],
-    },
+  {
+    ignores: [
+      "doc/",
+      "contrib/",
+      "dist/",
+      "node_modules/",
+      "env/lib/",
+      "**/*.inc.{ts,d.ts}",
+    ],
+  },
 
-    js.configs.recommended,
-    ...tseslint.configs.recommended,
+  js.configs.recommended,
+  ...tseslint.configs.recommended,
 
-    {
-        languageOptions: {
-            globals: {
-                ngwConfig: "readonly",
-                ngwEntry: "readonly",
-                ngwExternal: "readonly",
-            },
-        },
-        rules: {
-            "@typescript-eslint/no-require-imports": "off",
-            "@typescript-eslint/no-unused-vars": "off",
-            eqeqeq: "error",
-            "no-unused-vars": ["error", noUnusedVarsOptions],
-            "no-useless-escape": "warn",
-        },
+  {
+    languageOptions: {
+      globals: {
+        ngwConfig: "readonly",
+        ngwEntry: "readonly",
+        ngwExternal: "readonly",
+      },
     },
+    rules: {
+      "@typescript-eslint/no-require-imports": "off",
+      "@typescript-eslint/no-unused-vars": "off",
+      eqeqeq: "error",
+      "no-unused-vars": ["error", noUnusedVarsOptions],
+      "no-useless-escape": "warn",
+    },
+  },
 
-    prettierRecommended,
-    {
-        rules: {
-            "prettier/prettier": "warn",
-        },
+  prettierRecommended,
+  {
+    rules: {
+      "prettier/prettier": "warn",
     },
+  },
 
-    reactPlugin.configs.flat.recommended,
-    reactPlugin.configs.flat["jsx-runtime"],
-    reactHooksPlugin.configs["recommended-latest"],
-    {
-        rules: {
-            "react/prop-types": "off", // Use TypeScript instead
-            "react/jsx-no-target-blank": "off", // Unsupported browsers
-            "react/display-name": "warn",
-        },
-        settings: {
-            react: { version: "detect" },
-            componentWrapperFunctions: ["observer"],
-        },
+  reactPlugin.configs.flat.recommended,
+  reactPlugin.configs.flat["jsx-runtime"],
+  reactHooksPlugin.configs["recommended-latest"],
+  {
+    rules: {
+      "react/prop-types": "off", // Use TypeScript instead
+      "react/jsx-no-target-blank": "off", // Unsupported browsers
+      "react/display-name": "warn",
     },
-    {
-        files: ["**/*.cjs"],
-        languageOptions: {
-            ecmaVersion,
-            globals: {
-                ...globals.node,
-            },
-        },
+    settings: {
+      react: { version: "detect" },
+      componentWrapperFunctions: ["observer"],
     },
-    {
-        files: ["**/*.js"],
-        languageOptions: {
-            globals: {
-                ...browserGlobals,
-            },
-        },
+  },
+  {
+    files: ["**/*.cjs"],
+    languageOptions: {
+      ecmaVersion,
+      globals: {
+        ...globals.node,
+      },
     },
-    {
-        files: ["**/nodepkg/**/*.js"],
-        languageOptions: {
-            globals: {
-                ...browserGlobals,
-            },
-            parser: babelParser,
-            parserOptions: {
-                sourceType: "module",
-                requireConfigFile: true,
-                babelOptions: { configFile: babelConfigPath },
-                ecmaFeatures: { jsx: true },
-                ecmaVersion,
-            },
-        },
+  },
+  {
+    files: ["**/*.js"],
+    languageOptions: {
+      globals: {
+        ...browserGlobals,
+      },
     },
-    {
-        files: ["**/nodepkg/**/*.ts", "**/nodepkg/**/*.tsx"],
-        languageOptions: {
-            globals: {
-                ...browserGlobals,
-            },
+  },
+  {
+    files: ["**/nodepkg/**/*.js"],
+    languageOptions: {
+      globals: {
+        ...browserGlobals,
+      },
+      parser: babelParser,
+      parserOptions: {
+        sourceType: "module",
+        requireConfigFile: true,
+        babelOptions: { configFile: babelConfigPath },
+        ecmaFeatures: { jsx: true },
+        ecmaVersion,
+      },
+    },
+  },
+  {
+    files: ["**/nodepkg/**/*.ts", "**/nodepkg/**/*.tsx"],
+    languageOptions: {
+      globals: {
+        ...browserGlobals,
+      },
 
-            parser: tseslint.parser,
-            parserOptions: {
-                ecmaFeatures: { jsx: true },
-                ecmaVersion,
-            },
-        },
-        plugins: {
-            "@typescript-eslint": tseslint.plugin,
-        },
-        rules: {
-            "@typescript-eslint/consistent-type-imports": "warn",
-            "no-unused-vars": "off",
-            "no-use-before-define": "off",
-            "@typescript-eslint/no-use-before-define": "warn",
-            "@typescript-eslint/no-explicit-any": "off",
-            "@typescript-eslint/no-unused-vars": ["error", noUnusedVarsOptions],
-        },
+      parser: tseslint.parser,
+      parserOptions: {
+        ecmaFeatures: { jsx: true },
+        ecmaVersion,
+      },
     },
+    plugins: {
+      "@typescript-eslint": tseslint.plugin,
+    },
+    rules: {
+      "@typescript-eslint/consistent-type-imports": "warn",
+      "no-unused-vars": "off",
+      "no-use-before-define": "off",
+      "@typescript-eslint/no-use-before-define": "warn",
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-unused-vars": ["error", noUnusedVarsOptions],
+    },
+  },
 
-    importPlugin.flatConfigs.recommended,
-    importPlugin.flatConfigs.typescript,
-    {
-        rules: {
-            "no-restricted-imports": [
-                "error",
-                {
-                    paths: [
-                        {
-                            name: "lodash",
-                            message: "Use 'lodash-es' instead 'lodash'.",
-                        },
-                        {
-                            name: "prop-types",
-                            message: "Use TypeScript for typing",
-                        },
-                        {
-                            name: "mobx",
-                            importNames: [
-                                "makeAutoObservable",
-                                "makeObservable",
-                                "toJS",
-                            ],
-                            message: "Don't use this API and use decorators",
-                        },
-                    ],
-                    patterns: [
-                        {
-                            group: [
-                                "**/nextgisweb*/*/nodepkg/*",
-                                "**/nextgisweb*/nodepkg/*",
-                            ],
-                            message: "Use '@nextgisweb/*' namespace instead.",
-                        },
-                        {
-                            group: ["./../*"],
-                            message: "Remove useless './' prefix.",
-                        },
-                        {
-                            group: ["../../../*"],
-                            message: "Too many levels up, use absolute name.",
-                        },
-                        {
-                            group: ["ant/lib", "antd/lib/*"],
-                            message: "Use '@nextgisweb/gui/antd' or 'antd/es'.",
-                        },
-                    ],
-                },
-            ],
-            "sort-imports": ["warn", { ignoreDeclarationSort: true }],
-            "import-x/no-duplicates": "warn",
-            "import-x/consistent-type-specifier-style": [
-                "warn",
-                "prefer-top-level",
-            ],
-            "import-x/first": "warn",
-            "import-x/newline-after-import": "warn",
-            "import-x/no-unresolved": "off",
-            "import-x/order": [
-                "warn",
-                {
-                    groups: [
-                        "builtin",
-                        "external",
-                        "internal",
-                        "parent",
-                        "sibling",
-                        "index",
-                    ],
-                    pathGroups: [
-                        { pattern: "glob", group: "builtin" },
-                        { pattern: "@nextgisweb/icon/**", group: "index" },
-                        { pattern: "@nextgisweb/*/icon/**", group: "index" },
-                        { pattern: "@ant-design/icons", group: "index" },
-                    ],
-                    alphabetize: { order: "asc", orderImportKind: "desc" },
-                    "newlines-between": "always",
-                    distinctGroup: false,
-                    pathGroupsExcludedImportTypes: ["builtin"],
-                },
-            ],
-        },
-        settings: {
-            "import-x/parsers": {
-                "@typescript-eslint/parser": [".ts", ".tsx"],
+  importPlugin.flatConfigs.recommended,
+  importPlugin.flatConfigs.typescript,
+  {
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "lodash",
+              message: "Use 'lodash-es' instead 'lodash'.",
             },
-            "import-x/resolver": {
-                typescript: {
-                    alwaysTryTypes: true,
-                },
+            {
+              name: "prop-types",
+              message: "Use TypeScript for typing",
             },
-            "import-x/internal-regex": "^@nextgisweb/",
+            {
+              name: "mobx",
+              importNames: ["makeAutoObservable", "makeObservable", "toJS"],
+              message: "Don't use this API and use decorators",
+            },
+          ],
+          patterns: [
+            {
+              group: ["**/nextgisweb*/*/nodepkg/*", "**/nextgisweb*/nodepkg/*"],
+              message: "Use '@nextgisweb/*' namespace instead.",
+            },
+            {
+              group: ["./../*"],
+              message: "Remove useless './' prefix.",
+            },
+            {
+              group: ["../../../*"],
+              message: "Too many levels up, use absolute name.",
+            },
+            {
+              group: ["ant/lib", "antd/lib/*"],
+              message: "Use '@nextgisweb/gui/antd' or 'antd/es'.",
+            },
+          ],
         },
+      ],
+      "sort-imports": ["warn", { ignoreDeclarationSort: true }],
+      "import-x/no-duplicates": "warn",
+      "import-x/consistent-type-specifier-style": ["warn", "prefer-top-level"],
+      "import-x/first": "warn",
+      "import-x/newline-after-import": "warn",
+      "import-x/no-unresolved": "off",
+      "import-x/order": [
+        "warn",
+        {
+          groups: [
+            "builtin",
+            "external",
+            "internal",
+            "parent",
+            "sibling",
+            "index",
+          ],
+          pathGroups: [
+            { pattern: "glob", group: "builtin" },
+            { pattern: "@nextgisweb/icon/**", group: "index" },
+            { pattern: "@nextgisweb/*/icon/**", group: "index" },
+            { pattern: "@ant-design/icons", group: "index" },
+          ],
+          alphabetize: { order: "asc", orderImportKind: "desc" },
+          "newlines-between": "always",
+          distinctGroup: false,
+          pathGroupsExcludedImportTypes: ["builtin"],
+        },
+      ],
     },
+    settings: {
+      "import-x/parsers": {
+        "@typescript-eslint/parser": [".ts", ".tsx"],
+      },
+      "import-x/resolver": {
+        typescript: {
+          alwaysTryTypes: true,
+        },
+      },
+      "import-x/internal-regex": "^@nextgisweb/",
+    },
+  },
 ];
 module.exports = config;

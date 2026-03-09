@@ -15,110 +15,105 @@ import { LegendAction } from "./LegendAction";
 import "./LayersTree.less";
 
 const msgOutOfScaleRange = gettext(
-    "This layer is not visible at the current map scale. Zoom to make the layer visible."
+  "This layer is not visible at the current map scale. Zoom to make the layer visible."
 );
 
 export interface LayerTreeItemTitleProps {
-    icon?: React.ReactNode;
-    treeItem: TreeItemStore;
-    checkable: boolean;
-    showLegend: boolean;
-    showDropdown: boolean;
-    onSelect: (keys: number[]) => void;
+  icon?: React.ReactNode;
+  treeItem: TreeItemStore;
+  checkable: boolean;
+  showLegend: boolean;
+  showDropdown: boolean;
+  onSelect: (keys: number[]) => void;
 }
 
 export const LayerTreeItemTitle = observer(
-    ({
-        icon,
-        treeItem,
-        checkable,
-        showLegend,
-        showDropdown,
-        onSelect,
-    }: LayerTreeItemTitleProps) => {
-        const [moreClickId, setMoreClickId] = useState<number>();
-        const [update, setUpdate] = useState(false);
+  ({
+    icon,
+    treeItem,
+    checkable,
+    showLegend,
+    showDropdown,
+    onSelect,
+  }: LayerTreeItemTitleProps) => {
+    const [moreClickId, setMoreClickId] = useState<number>();
+    const [update, setUpdate] = useState(false);
 
-        const isLayer = treeItem.isLayer();
-        const hasFilter = isLayer && treeItem.filter;
+    const isLayer = treeItem.isLayer();
+    const hasFilter = isLayer && treeItem.filter;
 
-        const shouldActions = showLegend || showDropdown || hasFilter;
+    const shouldActions = showLegend || showDropdown || hasFilter;
 
-        let actions;
-        let isOutOfScaleRange = false;
-        if (shouldActions) {
-            let legendAction;
-            let filterAction;
-            if (isLayer) {
-                const treeLayer = treeItem;
+    let actions;
+    let isOutOfScaleRange = false;
+    if (shouldActions) {
+      let legendAction;
+      let filterAction;
+      if (isLayer) {
+        const treeLayer = treeItem;
 
-                isOutOfScaleRange = treeItem.isOutOfScaleRange;
-                legendAction = treeLayer.legendInfo.symbols &&
-                    treeLayer.legendInfo.symbols.length > 1 &&
-                    showLegend && (
-                        <LegendAction
-                            nodeData={treeItem}
-                            onClick={() => setUpdate((prev) => !prev)}
-                        />
-                    );
+        isOutOfScaleRange = treeItem.isOutOfScaleRange;
+        legendAction = treeLayer.legendInfo.symbols &&
+          treeLayer.legendInfo.symbols.length > 1 &&
+          showLegend && (
+            <LegendAction
+              nodeData={treeItem}
+              onClick={() => setUpdate((prev) => !prev)}
+            />
+          );
 
-                filterAction = hasFilter && (
-                    <FilterAction
-                        nodeData={treeItem}
-                        onClick={() => setUpdate((prev) => !prev)}
-                    />
-                );
-            }
-
-            const dropdownAction = showDropdown && (
-                <DropdownActions
-                    nodeData={treeItem}
-                    setMoreClickId={(id) => {
-                        if (id !== undefined) {
-                            onSelect([id]);
-                        }
-                        setMoreClickId(id);
-                    }}
-                    moreClickId={moreClickId}
-                    update={update}
-                    setUpdate={setUpdate}
-                />
-            );
-            actions = (
-                <Col
-                    className="tree-item-action"
-                    style={{ alignItems: "center" }}
-                >
-                    {filterAction}
-                    {legendAction}
-                    {dropdownAction}
-                </Col>
-            );
-        }
-
-        return (
-            <>
-                <Row wrap={false} gutter={6}>
-                    {icon && <Col className="tree-item-title-icon">{icon}</Col>}
-                    <Col
-                        className={classNames("tree-item-title", {
-                            "out-of-scale-range": isOutOfScaleRange,
-                        })}
-                        flex="auto"
-                        title={
-                            isOutOfScaleRange ? msgOutOfScaleRange : undefined
-                        }
-                    >
-                        {treeItem.title}
-                    </Col>
-                    {actions}
-                </Row>
-                {showLegend && treeItem.type === "layer" && (
-                    <Legend checkable={checkable} nodeData={treeItem} />
-                )}
-            </>
+        filterAction = hasFilter && (
+          <FilterAction
+            nodeData={treeItem}
+            onClick={() => setUpdate((prev) => !prev)}
+          />
         );
+      }
+
+      const dropdownAction = showDropdown && (
+        <DropdownActions
+          nodeData={treeItem}
+          setMoreClickId={(id) => {
+            if (id !== undefined) {
+              onSelect([id]);
+            }
+            setMoreClickId(id);
+          }}
+          moreClickId={moreClickId}
+          update={update}
+          setUpdate={setUpdate}
+        />
+      );
+      actions = (
+        <Col className="tree-item-action" style={{ alignItems: "center" }}>
+          {filterAction}
+          {legendAction}
+          {dropdownAction}
+        </Col>
+      );
     }
+
+    return (
+      <>
+        <Row wrap={false} gutter={6}>
+          {icon && <Col className="tree-item-title-icon">{icon}</Col>}
+          <Col
+            className={classNames("tree-item-title", {
+              "out-of-scale-range": isOutOfScaleRange,
+            })}
+            flex="auto"
+            title={isOutOfScaleRange ? msgOutOfScaleRange : undefined}
+          >
+            {treeItem.title}
+          </Col>
+          {actions}
+        </Row>
+        {showLegend && treeItem.type === "layer" && (
+          <Legend checkable={checkable} nodeData={treeItem} />
+        )}
+      </>
+    );
+  }
 );
 
 LayerTreeItemTitle.displayName = "LayerTreeItemTitle";

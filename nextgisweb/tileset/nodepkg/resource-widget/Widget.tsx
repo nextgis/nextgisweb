@@ -14,20 +14,20 @@ const uploaderMessages = {
 };
 
 export const Widget: EditorWidget<Store> = observer(({ store }) => {
-    return (
-        <div className="ngw-tileset-resource-widget">
-            <FileUploader
-                onChange={(value) => {
-                    store.update({ source: value });
-                }}
-                onUploading={(value) => {
-                    store.update({ uploading: value });
-                }}
-                showMaxSize
-                {...uploaderMessages}
-            />
-        </div>
-    );
+  return (
+    <div className="ngw-tileset-resource-widget">
+      <FileUploader
+        onChange={(value) => {
+          store.update({ source: value });
+        }}
+        onUploading={(value) => {
+          store.update({ uploading: value });
+        }}
+        showMaxSize
+        {...uploaderMessages}
+      />
+    </div>
+  );
 });
 
 Widget.displayName = "Widget";

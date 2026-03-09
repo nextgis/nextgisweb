@@ -5,20 +5,20 @@ import type { CompositeWidgetOperation } from "@nextgisweb/resource/type/api";
 import type { EditorStore } from "./EditorStore";
 
 export interface EditorWidgetProps<S extends EditorStore = EditorStore> {
-    store: S;
+  store: S;
 }
 
 export type ActiveOnOptions = {
-    [key in CompositeWidgetOperation]?: boolean;
+  [key in CompositeWidgetOperation]?: boolean;
 };
 
 interface EditorWidgetOptions {
-    title?: string;
-    activateOn?: ActiveOnOptions;
-    order?: number;
+  title?: string;
+  activateOn?: ActiveOnOptions;
+  order?: number;
 }
 
 export type EditorWidget<
-    S extends EditorStore,
-    P = EditorWidgetProps<S>,
+  S extends EditorStore,
+  P = EditorWidgetProps<S>,
 > = FunctionComponent<P> & EditorWidgetOptions;

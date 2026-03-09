@@ -1,11 +1,11 @@
 import type { AnyObject } from "./type";
 
 export interface EdiTableStore<Row extends AnyObject = AnyObject> {
-    rows: Row[];
-    placeholder?: Row | null;
-    validate?: boolean;
+  rows: Row[];
+  placeholder?: Row | null;
+  validate?: boolean;
 
-    cloneRow?: (row: Row) => void;
-    deleteRow: (row: Row) => void;
-    moveRow?: (row: Row, index: number) => void;
+  cloneRow?: (row: Row) => void;
+  deleteRow: (row: Row) => void;
+  moveRow?: (row: Row, index: number) => void;
 }

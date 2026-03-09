@@ -45,156 +45,154 @@ import "ol/ol.css";
 import "./OlRenderer.less";
 
 export interface OlRendererProps {
-    symbolizers: Symbolizer[];
-    symbolizerKind?: SymbolizerKind;
-    onClick?: (symbolizers: Symbolizer[], event: unknown) => void;
+  symbolizers: Symbolizer[];
+  symbolizerKind?: SymbolizerKind;
+  onClick?: (symbolizers: Symbolizer[], event: unknown) => void;
 }
 
 /**
  * Symbolizer Renderer UI.
  */
 export const OlRenderer: React.FC<OlRendererProps> = ({
-    onClick,
-    symbolizerKind,
-    symbolizers,
+  onClick,
+  symbolizerKind,
+  symbolizers,
 }) => {
-    /** reference to the underlying OpenLayers map */
-    const map = useRef<OlMap>(null);
-    const layer = useRef<OlLayerVector<OlSourceVector>>(null);
-    const [mapId] = useState(_uniqueId("map_"));
+  /** reference to the underlying OpenLayers map */
+  const map = useRef<OlMap>(null);
+  const layer = useRef<OlLayerVector<OlSourceVector>>(null);
+  const [mapId] = useState(_uniqueId("map_"));
 
-    const target = useRef<HTMLDivElement>(null);
+  const target = useRef<HTMLDivElement>(null);
 
-    const getSampleGeomFromSymbolizer = useCallback(() => {
-        const kind: SymbolizerKind | undefined =
-            symbolizerKind || _get(symbolizers, "[0].kind");
-        switch (kind) {
-            case "Mark":
-            case "Icon":
-            case "Text":
-                return new OlGeomPoint([0, 0]);
-            case "Fill":
-                return new OlGeomPolygon([
-                    [
-                        [0, 0],
-                        [0, 1],
-                        [1, 1],
-                        [1, 0],
-                        [0, 0],
-                    ],
-                ]);
-            case "Line":
-                return new OlGeomLineString([
-                    [0, 0],
-                    [1, 0],
-                ]);
-            default:
-                return new OlGeomPoint([0, 0]);
-        }
-    }, [symbolizerKind, symbolizers]);
+  const getSampleGeomFromSymbolizer = useCallback(() => {
+    const kind: SymbolizerKind | undefined =
+      symbolizerKind || _get(symbolizers, "[0].kind");
+    switch (kind) {
+      case "Mark":
+      case "Icon":
+      case "Text":
+        return new OlGeomPoint([0, 0]);
+      case "Fill":
+        return new OlGeomPolygon([
+          [
+            [0, 0],
+            [0, 1],
+            [1, 1],
+            [1, 0],
+            [0, 0],
+          ],
+        ]);
+      case "Line":
+        return new OlGeomLineString([
+          [0, 0],
+          [1, 0],
+        ]);
+      default:
+        return new OlGeomPoint([0, 0]);
+    }
+  }, [symbolizerKind, symbolizers]);
 
-    const updateFeature = useCallback(() => {
-        const source = layer.current && layer.current.getSource();
-        if (source) {
-            source.clear();
-            const sampleFeature = new OlFeature({
-                geometry: getSampleGeomFromSymbolizer(),
-                Name: "Sample Feature",
-            });
-            source.addFeature(sampleFeature);
+  const updateFeature = useCallback(() => {
+    const source = layer.current && layer.current.getSource();
+    if (source) {
+      source.clear();
+      const sampleFeature = new OlFeature({
+        geometry: getSampleGeomFromSymbolizer(),
+        Name: "Sample Feature",
+      });
+      source.addFeature(sampleFeature);
 
-            // Zoom to feature extent with padding
-            const extent = source.getExtent();
-            if (map.current) {
-                map.current.getView().fit(extent, {
-                    maxZoom: 20,
-                    padding: Array(4).fill(10),
-                });
-            }
-        }
-    }, [getSampleGeomFromSymbolizer]);
-
-    useEffect(() => {
-        layer.current = new OlLayerVector({
-            source: new OlSourceVector(),
+      // Zoom to feature extent with padding
+      const extent = source.getExtent();
+      if (map.current) {
+        map.current.getView().fit(extent, {
+          maxZoom: 20,
+          padding: Array(4).fill(10),
         });
-        map.current = new OlMap({
-            layers: [layer.current],
-            controls: [],
-            interactions: [],
-            target: target.current ?? undefined,
-            view: new OlView({
-                projection: "EPSG:4326",
-            }),
-        });
-    }, [mapId]);
+      }
+    }
+  }, [getSampleGeomFromSymbolizer]);
 
-    useEffect(() => {
-        updateFeature();
-    }, [updateFeature]);
+  useEffect(() => {
+    layer.current = new OlLayerVector({
+      source: new OlSourceVector(),
+    });
+    map.current = new OlMap({
+      layers: [layer.current],
+      controls: [],
+      interactions: [],
+      target: target.current ?? undefined,
+      view: new OlView({
+        projection: "EPSG:4326",
+      }),
+    });
+  }, [mapId]);
 
-    /**
-     * Transforms the incoming symbolizers to an OpenLayers style object the
-     * GeoStyler parser and applies it to the vector features on the map.
-     *
-     * @param {Symbolizer[]} newSymbolizers The symbolizers holding the style to apply
-     */
-    const applySymbolizers = async (newSymbolizers: Symbolizer[]) => {
-        if (!newSymbolizers) {
-            return undefined;
-        }
-        const styleParser = new OlGeoStyleParser();
+  useEffect(() => {
+    updateFeature();
+  }, [updateFeature]);
 
-        // we have to wrap the symbolizer in a Style object since the writeStyle
-        // only accepts a Style object
-        const style: Style = {
-            name: "WrapperStyle4Symbolizer",
-            rules: [
-                {
-                    name: "WrapperRule4Symbolizer",
-                    symbolizers: structuredClone(newSymbolizers),
-                },
-            ],
-        };
-        // parser style to OL style
-        const { output, errors = [] } = await styleParser.writeStyle(
-            style as any
-        );
-        const olStyles = output as OlStyle;
-        if (errors.length > 0) {
-            return undefined;
-        } else if (layer.current && olStyles) {
-            // apply new OL style to vector layer
+  /**
+   * Transforms the incoming symbolizers to an OpenLayers style object the
+   * GeoStyler parser and applies it to the vector features on the map.
+   *
+   * @param {Symbolizer[]} newSymbolizers The symbolizers holding the style to apply
+   */
+  const applySymbolizers = async (newSymbolizers: Symbolizer[]) => {
+    if (!newSymbolizers) {
+      return undefined;
+    }
+    const styleParser = new OlGeoStyleParser();
 
-            // CRUTCH BECAUSE styleParser IGNORES CAP!!!
-            if (newSymbolizers[0]?.kind === "Fill") {
-                const stroke = olStyles.getStroke();
-                const outlineCap = newSymbolizers[0]?.outlineCap;
-                if (typeof outlineCap === "string" && stroke) {
-                    stroke.setLineCap(outlineCap);
-                }
-            }
-
-            layer.current.setStyle(olStyles);
-            return olStyles;
-        }
+    // we have to wrap the symbolizer in a Style object since the writeStyle
+    // only accepts a Style object
+    const style: Style = {
+      name: "WrapperStyle4Symbolizer",
+      rules: [
+        {
+          name: "WrapperRule4Symbolizer",
+          symbolizers: structuredClone(newSymbolizers),
+        },
+      ],
     };
+    // parser style to OL style
+    const { output, errors = [] } = await styleParser.writeStyle(style as any);
+    const olStyles = output as OlStyle;
+    if (errors.length > 0) {
+      return undefined;
+    } else if (layer.current && olStyles) {
+      // apply new OL style to vector layer
 
-    useEffect(() => {
-        applySymbolizers(symbolizers);
-    }, [symbolizers]);
+      // CRUTCH BECAUSE styleParser IGNORES CAP!!!
+      if (newSymbolizers[0]?.kind === "Fill") {
+        const stroke = olStyles.getStroke();
+        const outlineCap = newSymbolizers[0]?.outlineCap;
+        if (typeof outlineCap === "string" && stroke) {
+          stroke.setLineCap(outlineCap);
+        }
+      }
 
-    return (
-        <div
-            onClick={(event) => {
-                if (onClick) {
-                    onClick(symbolizers, event);
-                }
-            }}
-            className="gs-symbolizer-olrenderer"
-            role="presentation"
-            id={mapId}
-            ref={target}
-        />
-    );
+      layer.current.setStyle(olStyles);
+      return olStyles;
+    }
+  };
+
+  useEffect(() => {
+    applySymbolizers(symbolizers);
+  }, [symbolizers]);
+
+  return (
+    <div
+      onClick={(event) => {
+        if (onClick) {
+          onClick(symbolizers, event);
+        }
+      }}
+      className="gs-symbolizer-olrenderer"
+      role="presentation"
+      id={mapId}
+      ref={target}
+    />
+  );
 };

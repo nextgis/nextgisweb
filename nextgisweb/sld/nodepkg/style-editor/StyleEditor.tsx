@@ -8,35 +8,34 @@ import { convertToGeostyler } from "./util/convertToGeostyler";
 import { generateSymbolizer } from "./util/generateSymbolizer";
 
 export interface StyleEditorProps {
-    value?: Symbolizer;
-    onChange?: (val: Symbolizer) => void;
-    initType?: SymbolizerType;
+  value?: Symbolizer;
+  onChange?: (val: Symbolizer) => void;
+  initType?: SymbolizerType;
 }
 
 export function StyleEditor({
-    value,
-    onChange: onSymbolizerChange,
-    initType = "point",
+  value,
+  onChange: onSymbolizerChange,
+  initType = "point",
 }: StyleEditorProps) {
-    const [symbolizer, setSymbolizer] = useState<GSSymbolizer>(
-        () =>
-            (value && convertToGeostyler(value)) || generateSymbolizer(initType)
-    );
+  const [symbolizer, setSymbolizer] = useState<GSSymbolizer>(
+    () => (value && convertToGeostyler(value)) || generateSymbolizer(initType)
+  );
 
-    useEffect(() => {
-        if (onSymbolizerChange && symbolizer) {
-            const style = convertFromGeostyler(symbolizer);
-            if (style) {
-                onSymbolizerChange(style);
-            }
-        }
-    }, [symbolizer, onSymbolizerChange]);
+  useEffect(() => {
+    if (onSymbolizerChange && symbolizer) {
+      const style = convertFromGeostyler(symbolizer);
+      if (style) {
+        onSymbolizerChange(style);
+      }
+    }
+  }, [symbolizer, onSymbolizerChange]);
 
-    return (
-        <div className="ngw-sld-style-editor">
-            <KindEditor symbolizer={symbolizer} setSymbolizer={setSymbolizer} />
-        </div>
-    );
+  return (
+    <div className="ngw-sld-style-editor">
+      <KindEditor symbolizer={symbolizer} setSymbolizer={setSymbolizer} />
+    </div>
+  );
 }
 
 export default StyleEditor;

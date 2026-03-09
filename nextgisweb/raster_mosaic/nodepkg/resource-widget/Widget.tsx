@@ -14,52 +14,52 @@ import type { File, Store } from "./Store";
 import "./Widget.less";
 
 function showError(
-    [status, msg]: [boolean, string | null],
-    message: MessageInstance
+  [status, msg]: [boolean, string | null],
+  message: MessageInstance
 ) {
-    if (!status) message.error(msg);
+  if (!status) message.error(msg);
 }
 
 const columns: EdiTableColumn<File>[] = [
-    {
-        key: "display_name",
-        component: ({ value }) => {
-            return value as string;
-        },
+  {
+    key: "display_name",
+    component: ({ value }) => {
+      return value as string;
     },
+  },
 ];
 
 export const Widget: EditorWidget<Store> = observer(({ store }) => {
-    const [messageApi, contextHolder] = message.useMessage();
-    const actions = useMemo(
-        () => [
-            <FileUploaderButton
-                key="file"
-                multiple={true}
-                accept=".tiff,.tif"
-                onChange={(value) => {
-                    if (!value) return;
-                    showError(store.appendFiles(value), messageApi);
-                }}
-                uploadText={gettext("Upload")}
-            />,
-        ],
-        [messageApi, store]
-    );
+  const [messageApi, contextHolder] = message.useMessage();
+  const actions = useMemo(
+    () => [
+      <FileUploaderButton
+        key="file"
+        multiple={true}
+        accept=".tiff,.tif"
+        onChange={(value) => {
+          if (!value) return;
+          showError(store.appendFiles(value), messageApi);
+        }}
+        uploadText={gettext("Upload")}
+      />,
+    ],
+    [messageApi, store]
+  );
 
-    return (
-        <div className="ngw-raster-mosaic-resource-widget">
-            {contextHolder}
-            <ActionToolbar pad borderBlockEnd actions={actions} />
-            <EdiTable
-                columns={columns}
-                store={store}
-                rowKey="key"
-                showHeader={false}
-                parentHeight
-            />
-        </div>
-    );
+  return (
+    <div className="ngw-raster-mosaic-resource-widget">
+      {contextHolder}
+      <ActionToolbar pad borderBlockEnd actions={actions} />
+      <EdiTable
+        columns={columns}
+        store={store}
+        rowKey="key"
+        showHeader={false}
+        parentHeight
+      />
+    </div>
+  );
 });
 
 Widget.displayName = "Widget";

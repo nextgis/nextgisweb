@@ -10,18 +10,18 @@ import type { ATTRIBUTES_KEY } from "./constant";
 import type { EditorWidgetProps } from "./type";
 
 export type FeatureEditorPluginWidget<S extends EditorStore = EditorStore> =
-    ImportCallback<FC<EditorWidgetProps<S>>>;
+  ImportCallback<FC<EditorWidgetProps<S>>>;
 
 export type FeatureEditorPluginStore = ImportCallback<
-    new (options: EditorStoreConstructorOptions) => EditorStore
+  new (options: EditorStoreConstructorOptions) => EditorStore
 >;
 
 export interface FeatureEditorPlugin {
-    widget: FeatureEditorPluginWidget;
-    store: FeatureEditorPluginStore;
-    label: ReactNode;
-    identity: typeof ATTRIBUTES_KEY | string;
-    order?: number;
+  widget: FeatureEditorPluginWidget;
+  store: FeatureEditorPluginStore;
+  label: ReactNode;
+  identity: typeof ATTRIBUTES_KEY | string;
+  order?: number;
 }
 
 export const registry = pluginRegistry<FeatureEditorPlugin>(MODULE_NAME);

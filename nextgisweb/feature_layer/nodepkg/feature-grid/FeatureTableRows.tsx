@@ -8,170 +8,167 @@ import { useRouteGet } from "@nextgisweb/pyramid/hook";
 
 import { $FID, $VID, KEY_FIELD_ID, LAST_CHANGED_FIELD_ID } from "./constant";
 import type {
-    EffectiveWidths,
-    FeatureAttrs,
-    FeatureLayerFieldCol,
-    SetValue,
+  EffectiveWidths,
+  FeatureAttrs,
+  FeatureLayerFieldCol,
+  SetValue,
 } from "./type";
 import { renderFeatureFieldValue } from "./util/renderFeatureFieldValue";
 
 interface VersionProps {
-    resourceId: number;
-    versionId: number;
+  resourceId: number;
+  versionId: number;
 }
 
 function VersionCell({ resourceId, versionId }: VersionProps) {
-    const { data } = useRouteGet(
-        "feature_layer.version.item",
-        {
-            id: resourceId,
-            vid: versionId,
-        },
-        { cache: true }
-    );
+  const { data } = useRouteGet(
+    "feature_layer.version.item",
+    {
+      id: resourceId,
+      vid: versionId,
+    },
+    { cache: true }
+  );
 
-    const tstamp = useMemo(() => {
-        if (!data || !data.tstamp) return;
-        return utc(data.tstamp).local().format("L LTS");
-    }, [data]);
+  const tstamp = useMemo(() => {
+    if (!data || !data.tstamp) return;
+    return utc(data.tstamp).local().format("L LTS");
+  }, [data]);
 
-    if (!data || !tstamp) return <></>;
-    return (
-        <>
-            {tstamp}
-            {data.user && <>, {data.user.display_name}</>}
-        </>
-    );
+  if (!data || !tstamp) return <></>;
+  return (
+    <>
+      {tstamp}
+      {data.user && <>, {data.user.display_name}</>}
+    </>
+  );
 }
 
 interface RowsProps {
-    resourceId: number;
-    effectiveWidths: EffectiveWidths;
-    virtualItems: VirtualItem[];
-    rowMinHeight: number;
-    selectedIds: number[];
-    columns: FeatureLayerFieldCol[];
-    data: FeatureAttrs[];
-    loadingCol: () => string;
-    setSelectedIds: (ids: SetValue<number[]>) => void;
-    measureElement: (node: Element | null) => void;
+  resourceId: number;
+  effectiveWidths: EffectiveWidths;
+  virtualItems: VirtualItem[];
+  rowMinHeight: number;
+  selectedIds: number[];
+  columns: FeatureLayerFieldCol[];
+  data: FeatureAttrs[];
+  loadingCol: () => string;
+  setSelectedIds: (ids: SetValue<number[]>) => void;
+  measureElement: (node: Element | null) => void;
 }
 
 export function FeatureTableRows({
-    resourceId,
-    effectiveWidths,
-    virtualItems,
-    rowMinHeight,
-    selectedIds,
-    columns,
-    data,
-    loadingCol,
-    measureElement,
-    setSelectedIds,
+  resourceId,
+  effectiveWidths,
+  virtualItems,
+  rowMinHeight,
+  selectedIds,
+  columns,
+  data,
+  loadingCol,
+  measureElement,
+  setSelectedIds,
 }: RowsProps) {
-    const firstVirtual = virtualItems[0];
+  const firstVirtual = virtualItems[0];
 
-    if (!firstVirtual) {
-        return null;
-    }
+  if (!firstVirtual) {
+    return null;
+  }
 
-    const prepareCols = (row?: FeatureAttrs) => {
-        return (
-            <>
-                {columns.map((f) => {
-                    let renderValue: ReactNode;
-                    let cellClassName;
-                    if (!row) {
-                        renderValue = loadingCol();
-                    } else if (f.id === KEY_FIELD_ID) {
-                        cellClassName = "id";
-                        renderValue = String(row[$FID]);
-                    } else if (f.id === LAST_CHANGED_FIELD_ID) {
-                        cellClassName = "last-changed";
-                        renderValue = (
-                            <VersionCell
-                                resourceId={resourceId}
-                                versionId={row[$VID]!}
-                            />
-                        );
-                    } else if (f.keyname) {
-                        const val = row[f.keyname];
-                        renderValue =
-                            val !== undefined
-                                ? renderFeatureFieldValue(f, val)
-                                : loadingCol();
-
-                        // I tried using Antd Paragraph (ExpandableText), but it breaks in a virtualized table.
-                        // After spending several hours debugging, I found only one stable solution for future –
-                        // using a JS character limit instead of line calculation or built-in ellipsis mechanics.
-                        //
-                        // TODO: find better solution
-                        //
-                        // If you still want to try — uncomment this at your own risk:
-                        // if (typeof renderValue === "string") {
-                        //     renderValue = <ExpandableText text={renderValue} />;
-                        // }
-                    }
-
-                    return (
-                        <div
-                            key={f.id}
-                            className={classNames("td", cellClassName)}
-                            style={{
-                                width: `${effectiveWidths[f.id]}px`,
-                            }}
-                        >
-                            {renderValue}
-                        </div>
-                    );
-                })}
-            </>
-        );
-    };
-
+  const prepareCols = (row?: FeatureAttrs) => {
     return (
-        <>
-            {virtualItems.map((virtualRow) => {
-                let selectedKey: number | undefined = undefined;
-                const row = data.find((d) => d.__rowIndex === virtualRow.index);
-                if (row) {
-                    selectedKey = selectedIds.find((s) => s === row[$FID]);
-                }
+      <>
+        {columns.map((f) => {
+          let renderValue: ReactNode;
+          let cellClassName;
+          if (!row) {
+            renderValue = loadingCol();
+          } else if (f.id === KEY_FIELD_ID) {
+            cellClassName = "id";
+            renderValue = String(row[$FID]);
+          } else if (f.id === LAST_CHANGED_FIELD_ID) {
+            cellClassName = "last-changed";
+            renderValue = (
+              <VersionCell resourceId={resourceId} versionId={row[$VID]!} />
+            );
+          } else if (f.keyname) {
+            const val = row[f.keyname];
+            renderValue =
+              val !== undefined
+                ? renderFeatureFieldValue(f, val)
+                : loadingCol();
 
-                return (
-                    <div
-                        key={virtualRow.key as Key}
-                        className={classNames("tr", selectedKey && "selected")}
-                        data-index={virtualRow.index}
-                        ref={measureElement}
-                        style={{
-                            minHeight: `${rowMinHeight}px`,
-                            transform: `translateY(${virtualRow.start}px)`,
-                        }}
-                        onClick={(e) => {
-                            // When you finish selecting text in a single row, it triggers a click event.
-                            // However, when selecting text across multiple rows, no click event is triggered.
-                            // The following technique is used to prevent the click event from firing during text selection within a single row.
-                            const selection = window.getSelection();
-                            if (selection && selection.toString().length > 0) {
-                                e.preventDefault();
-                                return;
-                            }
-                            setSelectedIds((old) => {
-                                if (selectedKey) {
-                                    return old.filter((o) => o !== selectedKey);
-                                } else if (row) {
-                                    const newId = row[$FID];
-                                    return [newId];
-                                }
-                                return old;
-                            });
-                        }}
-                    >
-                        {prepareCols(row)}
-                    </div>
-                );
-            })}
-        </>
+            // I tried using Antd Paragraph (ExpandableText), but it breaks in a virtualized table.
+            // After spending several hours debugging, I found only one stable solution for future –
+            // using a JS character limit instead of line calculation or built-in ellipsis mechanics.
+            //
+            // TODO: find better solution
+            //
+            // If you still want to try — uncomment this at your own risk:
+            // if (typeof renderValue === "string") {
+            //     renderValue = <ExpandableText text={renderValue} />;
+            // }
+          }
+
+          return (
+            <div
+              key={f.id}
+              className={classNames("td", cellClassName)}
+              style={{
+                width: `${effectiveWidths[f.id]}px`,
+              }}
+            >
+              {renderValue}
+            </div>
+          );
+        })}
+      </>
     );
+  };
+
+  return (
+    <>
+      {virtualItems.map((virtualRow) => {
+        let selectedKey: number | undefined = undefined;
+        const row = data.find((d) => d.__rowIndex === virtualRow.index);
+        if (row) {
+          selectedKey = selectedIds.find((s) => s === row[$FID]);
+        }
+
+        return (
+          <div
+            key={virtualRow.key as Key}
+            className={classNames("tr", selectedKey && "selected")}
+            data-index={virtualRow.index}
+            ref={measureElement}
+            style={{
+              minHeight: `${rowMinHeight}px`,
+              transform: `translateY(${virtualRow.start}px)`,
+            }}
+            onClick={(e) => {
+              // When you finish selecting text in a single row, it triggers a click event.
+              // However, when selecting text across multiple rows, no click event is triggered.
+              // The following technique is used to prevent the click event from firing during text selection within a single row.
+              const selection = window.getSelection();
+              if (selection && selection.toString().length > 0) {
+                e.preventDefault();
+                return;
+              }
+              setSelectedIds((old) => {
+                if (selectedKey) {
+                  return old.filter((o) => o !== selectedKey);
+                } else if (row) {
+                  const newId = row[$FID];
+                  return [newId];
+                }
+                return old;
+              });
+            }}
+          >
+            {prepareCols(row)}
+          </div>
+        );
+      })}
+    </>
+  );
 }

@@ -1,25 +1,25 @@
 import dayjs from "dayjs";
 import type { Dayjs } from "dayjs";
 import {
-    useCallback,
-    useEffect,
-    useLayoutEffect,
-    useMemo,
-    useReducer,
-    useRef,
-    useState,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
 } from "react";
 
 import type {
-    VersionCGetGroup,
-    VersionCGetVersion,
+  VersionCGetGroup,
+  VersionCGetVersion,
 } from "@nextgisweb/feature-layer/type/api";
 import {
-    Button,
-    RangePicker,
-    Space,
-    Switch,
-    Table,
+  Button,
+  RangePicker,
+  Space,
+  Switch,
+  Table,
 } from "@nextgisweb/gui/antd";
 import type { TimeRangePickerProps } from "@nextgisweb/gui/antd";
 import type { RouteQuery } from "@nextgisweb/pyramid/api/type";
@@ -42,248 +42,245 @@ const cache = new LoaderCache();
 type VersionItem = VersionCGetVersion | VersionCGetGroup;
 
 function getRowKey(row: VersionItem): string {
-    return row.type === "group" ? row.id.join("-") : String(row.id);
+  return row.type === "group" ? row.id.join("-") : String(row.id);
 }
 
 function dayjsToApi(v: Dayjs) {
-    return v.utc().millisecond(0).toISOString().replace(/Z$/, "");
+  return v.utc().millisecond(0).toISOString().replace(/Z$/, "");
 }
 
 export function VersionHistory({ id }: { id: number }) {
-    const { data: res, isLoading: isItemLoading } = useRouteGet(
-        "resource.item",
-        { id }
-    );
-    const {
-        route: versionRoute,
-        isLoading: isVersionLoading,
-        abort,
-    } = useRoute("feature_layer.version.collection", { id });
+  const { data: res, isLoading: isItemLoading } = useRouteGet("resource.item", {
+    id,
+  });
+  const {
+    route: versionRoute,
+    isLoading: isVersionLoading,
+    abort,
+  } = useRoute("feature_layer.version.collection", { id });
 
-    const epoch = useMemo(() => {
-        return res?.feature_layer?.versioning?.epoch;
-    }, [res]);
+  const epoch = useMemo(() => {
+    return res?.feature_layer?.versioning?.epoch;
+  }, [res]);
 
-    const [tstampGe, setTstampGe] = useState<string | null>(null);
-    const [tstampLt, setTstampLt] = useState<string | null>(null);
+  const [tstampGe, setTstampGe] = useState<string | null>(null);
+  const [tstampLt, setTstampLt] = useState<string | null>(null);
 
-    const [groupEdits, setGroupEdits] = useState(true);
+  const [groupEdits, setGroupEdits] = useState(true);
 
-    const [groups, setGroups] = useState<VersionItem[]>([]);
+  const [groups, setGroups] = useState<VersionItem[]>([]);
 
-    const [hasMore, setHasMore] = useState(true);
+  const [hasMore, setHasMore] = useState(true);
 
-    const [expandedRowKeys, setExpandedRowKeys] = useState<React.Key[]>([]);
-    const [reloadKey, bumpReloadKey] = useReducer((x: number) => x + 1, 0);
+  const [expandedRowKeys, setExpandedRowKeys] = useState<React.Key[]>([]);
+  const [reloadKey, bumpReloadKey] = useReducer((x: number) => x + 1, 0);
 
-    const [tableHeight, setTableHeight] = useState<number>(0);
-    const [scrollY, setScrollY] = useState(0);
+  const [tableHeight, setTableHeight] = useState<number>(0);
+  const [scrollY, setScrollY] = useState(0);
 
-    const tableWrapRef = useRef<HTMLDivElement | null>(null);
+  const tableWrapRef = useRef<HTMLDivElement | null>(null);
 
-    const cursorRef = useRef<string | null>(null);
-    const loadingRef = useRef(false);
+  const cursorRef = useRef<string | null>(null);
+  const loadingRef = useRef(false);
 
-    const columns = useColumns({ epoch, id, bumpReloadKey });
+  const columns = useColumns({ epoch, id, bumpReloadKey });
 
-    const presets = useMemo(() => {
-        const now = dayjs();
+  const presets = useMemo(() => {
+    const now = dayjs();
 
-        const today = [now.startOf("day"), now];
-        const y = now.subtract(1, "day");
-        const yesterday = [y.startOf("day"), y.endOf("day")];
-        const last24h = [now.subtract(24, "hour"), now];
-        const last3d = [now.subtract(3, "day"), now];
-        const lastWeek = [now.subtract(7, "day"), now];
-        const lastMonthRolling = [now.subtract(30, "day"), now];
-        const thisMonth = [now.startOf("month"), now];
-        const prevMonthBase = now.subtract(1, "month");
-        const prevMonth = [
-            prevMonthBase.startOf("month"),
-            prevMonthBase.endOf("month"),
-        ];
+    const today = [now.startOf("day"), now];
+    const y = now.subtract(1, "day");
+    const yesterday = [y.startOf("day"), y.endOf("day")];
+    const last24h = [now.subtract(24, "hour"), now];
+    const last3d = [now.subtract(3, "day"), now];
+    const lastWeek = [now.subtract(7, "day"), now];
+    const lastMonthRolling = [now.subtract(30, "day"), now];
+    const thisMonth = [now.startOf("month"), now];
+    const prevMonthBase = now.subtract(1, "month");
+    const prevMonth = [
+      prevMonthBase.startOf("month"),
+      prevMonthBase.endOf("month"),
+    ];
 
-        return [
-            { label: gettext("Today"), value: today },
-            { label: gettext("Yesterday"), value: yesterday },
-            { label: gettext("Last 24 hours"), value: last24h },
-            { label: gettext("Last 3 days"), value: last3d },
-            { label: gettext("Last week"), value: lastWeek },
-            { label: gettext("Last month"), value: lastMonthRolling },
-            { label: gettext("This month"), value: thisMonth },
-            { label: gettext("Previous month"), value: prevMonth },
-        ] as TimeRangePickerProps["presets"];
-    }, []);
+    return [
+      { label: gettext("Today"), value: today },
+      { label: gettext("Yesterday"), value: yesterday },
+      { label: gettext("Last 24 hours"), value: last24h },
+      { label: gettext("Last 3 days"), value: last3d },
+      { label: gettext("Last week"), value: lastWeek },
+      { label: gettext("Last month"), value: lastMonthRolling },
+      { label: gettext("This month"), value: thisMonth },
+      { label: gettext("Previous month"), value: prevMonth },
+    ] as TimeRangePickerProps["presets"];
+  }, []);
 
-    useEffect(() => {
-        cache.clean();
-    }, [reloadKey]);
+  useEffect(() => {
+    cache.clean();
+  }, [reloadKey]);
 
-    useEffect(() => {
-        loadingRef.current = isVersionLoading;
-    }, [isVersionLoading]);
+  useEffect(() => {
+    loadingRef.current = isVersionLoading;
+  }, [isVersionLoading]);
 
-    useEffect(() => {
-        setGroups([]);
-        cursorRef.current = null;
-        setHasMore(true);
-    }, [epoch, tstampGe, tstampLt, groupEdits, reloadKey]);
+  useEffect(() => {
+    setGroups([]);
+    cursorRef.current = null;
+    setHasMore(true);
+  }, [epoch, tstampGe, tstampLt, groupEdits, reloadKey]);
 
-    const loadBlock = useCallback(async () => {
-        if (!epoch) return;
-        if (!hasMore) return;
-        if (loadingRef.current) return;
+  const loadBlock = useCallback(async () => {
+    if (!epoch) return;
+    if (!hasMore) return;
+    if (loadingRef.current) return;
 
-        try {
-            const query: RouteQuery<"feature_layer.version.collection", "get"> =
-                {
-                    epoch,
-                    order: "desc",
-                    group: groupEdits,
-                    limit: BLOCK_SIZE,
-                    cursor: cursorRef.current ?? undefined,
-                };
+    try {
+      const query: RouteQuery<"feature_layer.version.collection", "get"> = {
+        epoch,
+        order: "desc",
+        group: groupEdits,
+        limit: BLOCK_SIZE,
+        cursor: cursorRef.current ?? undefined,
+      };
 
-            if (tstampGe) query.tstamp_ge = tstampGe;
-            if (tstampLt) query.tstamp_lt = tstampLt;
+      if (tstampGe) query.tstamp_ge = tstampGe;
+      if (tstampLt) query.tstamp_lt = tstampLt;
 
-            const resp = await versionRoute.get({
-                query,
-                cache,
-            });
-            const next = resp?.items ?? [];
-            setGroups((cur) => cur.concat(next));
+      const resp = await versionRoute.get({
+        query,
+        cache,
+      });
+      const next = resp?.items ?? [];
+      setGroups((cur) => cur.concat(next));
 
-            const nextCursor = resp?.cursor;
-            cursorRef.current = nextCursor;
+      const nextCursor = resp?.cursor;
+      cursorRef.current = nextCursor;
 
-            if (!nextCursor || next.length < BLOCK_SIZE) {
-                setHasMore(false);
+      if (!nextCursor || next.length < BLOCK_SIZE) {
+        setHasMore(false);
+      }
+    } finally {
+      loadingRef.current = false;
+    }
+  }, [epoch, hasMore, tstampGe, tstampLt, groupEdits, versionRoute]);
+
+  useEffect(() => {
+    loadBlock();
+    return abort;
+  }, [loadBlock, reloadKey, abort]);
+
+  useEffect(() => {
+    const element = tableWrapRef.current;
+    if (!element) return;
+
+    const observer = new ResizeObserver(([entry]) => {
+      setTableHeight(entry.contentRect.height);
+    });
+
+    setTableHeight(element.getBoundingClientRect().height);
+
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+  useLayoutEffect(() => {
+    const element = tableWrapRef.current;
+    if (!element) return;
+
+    const header = element.querySelector(".ant-table-header");
+
+    const headerHeight = header?.getBoundingClientRect().height ?? 0;
+
+    setScrollY(tableHeight - headerHeight);
+  }, [tableHeight, isItemLoading]);
+
+  return (
+    <div
+      style={{
+        height: "100%",
+        minHeight: 0,
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      <PageTitle>
+        <RangePicker
+          allowEmpty={[true, true]}
+          showTime
+          presets={presets}
+          onChange={(dates) => {
+            const [ge, lt] = dates ? dates : [null, null];
+            setTstampLt(lt ? dayjsToApi(lt) : null);
+            setTstampGe(ge ? dayjsToApi(ge) : null);
+          }}
+        />
+        <Space>
+          <Switch checked={groupEdits} onChange={setGroupEdits} />
+          {gettext("Group edits")}
+        </Space>
+        <Button
+          style={{ marginInlineStart: "auto" }}
+          type="text"
+          icon={<RefreshIcon />}
+          onClick={bumpReloadKey}
+          title={gettext("Refresh table")}
+        />
+      </PageTitle>
+
+      <div
+        ref={tableWrapRef}
+        style={{
+          flex: "1 1 0",
+          height: "100%",
+          display: "flex",
+          minHeight: 0,
+          overflow: "hidden",
+        }}
+      >
+        <Table
+          className="ngw-feature-layer-version-history"
+          styles={{
+            root: { width: "100%", height: "100%" },
+            header: {
+              cell: {
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              },
+            },
+          }}
+          virtual
+          scroll={{ y: scrollY }}
+          onScroll={(e) => {
+            const el = e.currentTarget;
+
+            const distance = el.scrollHeight - (el.scrollTop + el.clientHeight);
+            if (distance <= 1) {
+              loadBlock();
             }
-        } finally {
-            loadingRef.current = false;
-        }
-    }, [epoch, hasMore, tstampGe, tstampLt, groupEdits, versionRoute]);
-
-    useEffect(() => {
-        loadBlock();
-        return abort;
-    }, [loadBlock, reloadKey, abort]);
-
-    useEffect(() => {
-        const element = tableWrapRef.current;
-        if (!element) return;
-
-        const observer = new ResizeObserver(([entry]) => {
-            setTableHeight(entry.contentRect.height);
-        });
-
-        setTableHeight(element.getBoundingClientRect().height);
-
-        observer.observe(element);
-        return () => observer.disconnect();
-    }, []);
-    useLayoutEffect(() => {
-        const element = tableWrapRef.current;
-        if (!element) return;
-
-        const header = element.querySelector(".ant-table-header");
-
-        const headerHeight = header?.getBoundingClientRect().height ?? 0;
-
-        setScrollY(tableHeight - headerHeight);
-    }, [tableHeight, isItemLoading]);
-
-    return (
-        <div
-            style={{
-                height: "100%",
-                minHeight: 0,
-                display: "flex",
-                flexDirection: "column",
-            }}
-        >
-            <PageTitle>
-                <RangePicker
-                    allowEmpty={[true, true]}
-                    showTime
-                    presets={presets}
-                    onChange={(dates) => {
-                        const [ge, lt] = dates ? dates : [null, null];
-                        setTstampLt(lt ? dayjsToApi(lt) : null);
-                        setTstampGe(ge ? dayjsToApi(ge) : null);
-                    }}
-                />
-                <Space>
-                    <Switch checked={groupEdits} onChange={setGroupEdits} />
-                    {gettext("Group edits")}
-                </Space>
-                <Button
-                    style={{ marginInlineStart: "auto" }}
-                    type="text"
-                    icon={<RefreshIcon />}
-                    onClick={bumpReloadKey}
-                    title={gettext("Refresh table")}
-                />
-            </PageTitle>
-
-            <div
-                ref={tableWrapRef}
-                style={{
-                    flex: "1 1 0",
-                    height: "100%",
-                    display: "flex",
-                    minHeight: 0,
-                    overflow: "hidden",
-                }}
-            >
-                <Table
-                    className="ngw-feature-layer-version-history"
-                    styles={{
-                        root: { width: "100%", height: "100%" },
-                        header: {
-                            cell: {
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-                                whiteSpace: "nowrap",
-                            },
-                        },
-                    }}
-                    virtual
-                    scroll={{ y: scrollY }}
-                    onScroll={(e) => {
-                        const el = e.currentTarget;
-
-                        const distance =
-                            el.scrollHeight - (el.scrollTop + el.clientHeight);
-                        if (distance <= 1) {
-                            loadBlock();
-                        }
-                    }}
-                    bordered
-                    rowKey={getRowKey}
-                    columns={columns}
-                    dataSource={groups}
-                    pagination={false}
-                    size="small"
-                    loading={isItemLoading || isVersionLoading}
-                    expandable={{
-                        columnWidth: 32,
-                        expandedRowKeys,
-                        fixed: "start",
-                        onExpandedRowsChange: (keys) => {
-                            setExpandedRowKeys([...keys]);
-                        },
-                        expandedRowRender: (row) => (
-                            <HistoryGroupDetails
-                                resourceId={id}
-                                epoch={epoch ?? 0}
-                                group={row}
-                            />
-                        ),
-                    }}
-                />
-            </div>
-        </div>
-    );
+          }}
+          bordered
+          rowKey={getRowKey}
+          columns={columns}
+          dataSource={groups}
+          pagination={false}
+          size="small"
+          loading={isItemLoading || isVersionLoading}
+          expandable={{
+            columnWidth: 32,
+            expandedRowKeys,
+            fixed: "start",
+            onExpandedRowsChange: (keys) => {
+              setExpandedRowKeys([...keys]);
+            },
+            expandedRowRender: (row) => (
+              <HistoryGroupDetails
+                resourceId={id}
+                epoch={epoch ?? 0}
+                group={row}
+              />
+            ),
+          }}
+        />
+      </div>
+    </div>
+  );
 }

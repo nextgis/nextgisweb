@@ -1,24 +1,24 @@
 export class AbortControllerHelper {
-    private _controllers: AbortController[] = [];
+  private _controllers: AbortController[] = [];
 
-    constructor() {
-        this._controllers = [];
-    }
+  constructor() {
+    this._controllers = [];
+  }
 
-    makeSignal() {
-        const controller = new AbortController();
-        this._controllers.push(controller);
-        return controller.signal;
-    }
+  makeSignal() {
+    const controller = new AbortController();
+    this._controllers.push(controller);
+    return controller.signal;
+  }
 
-    abort(reason?: string) {
-        for (const controller of this._controllers) {
-            controller.abort(reason);
-        }
-        this._controllers = [];
+  abort(reason?: string) {
+    for (const controller of this._controllers) {
+      controller.abort(reason);
     }
+    this._controllers = [];
+  }
 
-    get empty() {
-        return this._controllers.length === 0;
-    }
+  get empty() {
+    return this._controllers.length === 0;
+  }
 }

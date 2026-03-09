@@ -9,42 +9,42 @@ type PropsType = Record<string, any>;
 const rootsMap = new Map<HTMLElement, Root>();
 
 export interface ReactAppReturn<P extends PropsType = PropsType> {
-    ref: HTMLElement;
-    unmount: () => void;
-    update: (newProps: Partial<P>) => void;
+  ref: HTMLElement;
+  unmount: () => void;
+  update: (newProps: Partial<P>) => void;
 }
 
 export default function reactApp<P extends PropsType = PropsType>(
-    Component: React.ComponentType<P>,
-    props: P,
-    domNode: HTMLElement
+  Component: React.ComponentType<P>,
+  props: P,
+  domNode: HTMLElement
 ): ReactAppReturn<P> {
-    let root = rootsMap.get(domNode);
+  let root = rootsMap.get(domNode);
 
-    if (!root) {
-        root = createRoot(domNode);
-        rootsMap.set(domNode, root);
-    }
+  if (!root) {
+    root = createRoot(domNode);
+    rootsMap.set(domNode, root);
+  }
 
-    root.render(
-        <ConfigProvider>
-            <BalancedProvider>
-                <Component {...props} />
-            </BalancedProvider>
-        </ConfigProvider>
-    );
+  root.render(
+    <ConfigProvider>
+      <BalancedProvider>
+        <Component {...props} />
+      </BalancedProvider>
+    </ConfigProvider>
+  );
 
-    const unmount = () => {
-        root!.unmount();
-        rootsMap.delete(domNode);
-    };
+  const unmount = () => {
+    root!.unmount();
+    rootsMap.delete(domNode);
+  };
 
-    return {
-        ref: domNode,
-        unmount,
-        update: (newProps: Partial<P>) => {
-            props = { ...props, ...newProps };
-            reactApp(Component, props, domNode);
-        },
-    };
+  return {
+    ref: domNode,
+    unmount,
+    update: (newProps: Partial<P>) => {
+      props = { ...props, ...newProps };
+      reactApp(Component, props, domNode);
+    },
+  };
 }

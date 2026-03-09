@@ -14,18 +14,18 @@ const template = `
 </div>`;
 
 export function createPopupContent() {
-    const tempContainer = document.createElement("div");
-    tempContainer.innerHTML = template;
-    const content = tempContainer.firstElementChild as HTMLElement;
+  const tempContainer = document.createElement("div");
+  tempContainer.innerHTML = template;
+  const content = tempContainer.firstElementChild as HTMLElement;
 
-    const description = content.querySelector(
-        ".annotation-description"
-    ) as HTMLElement;
-    const icon = content.querySelector(".icon") as HTMLElement;
-    const edit = content.querySelector(".annotation-edit") as HTMLElement;
-    const editControls = content.querySelector(
-        ".annotation-edit-controls"
-    ) as HTMLElement;
+  const description = content.querySelector(
+    ".annotation-description"
+  ) as HTMLElement;
+  const icon = content.querySelector(".icon") as HTMLElement;
+  const edit = content.querySelector(".annotation-edit") as HTMLElement;
+  const editControls = content.querySelector(
+    ".annotation-edit-controls"
+  ) as HTMLElement;
 
-    return { content, description, icon, edit, editControls };
+  return { content, description, icon, edit, editControls };
 }

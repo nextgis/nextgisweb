@@ -10,13 +10,13 @@ import SaveOutlineIcon from "@nextgisweb/icon/material/save/outline";
 type ButtonProps = ParamsOf<typeof Button>;
 
 export interface SaveButtonProps extends ButtonProps {
-    children?: ReactNode;
+  children?: ReactNode;
 }
 
 export function SaveButton({ children, ...rest }: SaveButtonProps) {
-    return (
-        <Button type="primary" icon={<SaveOutlineIcon />} {...rest}>
-            {children || gettext("Save")}
-        </Button>
-    );
+  return (
+    <Button type="primary" icon={<SaveOutlineIcon />} {...rest}>
+      {children || gettext("Save")}
+    </Button>
+  );
 }

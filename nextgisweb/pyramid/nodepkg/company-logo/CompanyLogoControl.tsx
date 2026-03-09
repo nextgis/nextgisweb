@@ -15,12 +15,12 @@ const aProps = aHref ? { href: aHref, target: "_blank" } : {};
 const iSrc = `${routeURL("pyramid.asset.blogo")}?ckey=${ckey}`;
 
 export default function CompanyLogoControl(props: MapControlProps) {
-    if (!enabled) return null;
-    return (
-        <MapControl {...props} margin>
-            <a className="map-logo company-logo" {...aProps}>
-                <img src={iSrc} />
-            </a>
-        </MapControl>
-    );
+  if (!enabled) return null;
+  return (
+    <MapControl {...props} margin>
+      <a className="map-logo company-logo" {...aProps}>
+        <img src={iSrc} />
+      </a>
+    </MapControl>
+  );
 }

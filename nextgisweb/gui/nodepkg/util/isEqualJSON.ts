@@ -7,5 +7,5 @@ import { deepCleanUndefined } from "./deepCleanUndefined";
  * Useful for comparing objects that might have been transformed from JSON, as JSON doesn't support undefined.
  */
 export function isEqualJSON(obj1: unknown, obj2: unknown): boolean {
-    return isEqual(deepCleanUndefined(obj1), deepCleanUndefined(obj2));
+  return isEqual(deepCleanUndefined(obj1), deepCleanUndefined(obj2));
 }

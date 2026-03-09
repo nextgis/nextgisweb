@@ -1,89 +1,89 @@
 import type {
-    FillSymbolizer as GSFillSymbolizer,
-    LineSymbolizer as GSLineSymbolizer,
-    MarkSymbolizer as GSMarkSymbolizer,
-    Symbolizer as GSSymbolizer,
-    WellKnownName as GSWellKnownName,
+  FillSymbolizer as GSFillSymbolizer,
+  LineSymbolizer as GSLineSymbolizer,
+  MarkSymbolizer as GSMarkSymbolizer,
+  Symbolizer as GSSymbolizer,
+  WellKnownName as GSWellKnownName,
 } from "geostyler-style";
 
 import { deepCleanUndefined } from "@nextgisweb/gui/util/deepCleanUndefined";
 import type {
-    LineSymbolizer,
-    PointSymbolizer,
-    PolygonSymbolizer,
+  LineSymbolizer,
+  PointSymbolizer,
+  PolygonSymbolizer,
 } from "@nextgisweb/sld/type/api";
 
 import type { Symbolizer } from "../type/Style";
 
 function reverseConvertMarkSymbolizer(
-    symbolizer: PointSymbolizer
+  symbolizer: PointSymbolizer
 ): GSMarkSymbolizer {
-    const { graphic } = symbolizer;
-    const { mark, opacity, size } = graphic;
+  const { graphic } = symbolizer;
+  const { mark, opacity, size } = graphic;
 
-    const wellKnownName: GSWellKnownName = mark?.well_known_name ?? "circle";
-    const markSymbolizer: GSMarkSymbolizer = {
-        kind: "Mark",
-        wellKnownName,
-        opacity,
-        radius: size ? size / 2 : undefined,
-    };
+  const wellKnownName: GSWellKnownName = mark?.well_known_name ?? "circle";
+  const markSymbolizer: GSMarkSymbolizer = {
+    kind: "Mark",
+    wellKnownName,
+    opacity,
+    radius: size ? size / 2 : undefined,
+  };
 
-    if (mark) {
-        const { fill, stroke } = mark;
-        markSymbolizer.color = fill?.color;
-        markSymbolizer.fillOpacity = fill?.opacity;
+  if (mark) {
+    const { fill, stroke } = mark;
+    markSymbolizer.color = fill?.color;
+    markSymbolizer.fillOpacity = fill?.opacity;
 
-        markSymbolizer.strokeColor = stroke?.color;
-        markSymbolizer.strokeOpacity = stroke?.opacity;
-        markSymbolizer.strokeWidth = stroke?.width;
-    }
+    markSymbolizer.strokeColor = stroke?.color;
+    markSymbolizer.strokeOpacity = stroke?.opacity;
+    markSymbolizer.strokeWidth = stroke?.width;
+  }
 
-    return markSymbolizer;
+  return markSymbolizer;
 }
 
 function reverseConvertLineSymbolizer(
-    symbolizer: LineSymbolizer
+  symbolizer: LineSymbolizer
 ): GSLineSymbolizer {
-    const { stroke } = symbolizer;
-    return {
-        kind: "Line",
-        color: stroke.color,
-        width: stroke.width,
-        opacity: stroke.opacity,
-        dasharray: stroke?.dash_pattern,
-        cap: "butt",
-    };
+  const { stroke } = symbolizer;
+  return {
+    kind: "Line",
+    color: stroke.color,
+    width: stroke.width,
+    opacity: stroke.opacity,
+    dasharray: stroke?.dash_pattern,
+    cap: "butt",
+  };
 }
 
 function reverseConvertFillSymbolizer(
-    symbolizer: PolygonSymbolizer
+  symbolizer: PolygonSymbolizer
 ): GSFillSymbolizer {
-    const { fill, stroke } = symbolizer;
-    return {
-        kind: "Fill",
-        color: fill?.color,
-        opacity: fill?.opacity,
-        fillOpacity: fill?.opacity,
-        outlineColor: stroke?.color,
-        outlineOpacity: stroke?.opacity,
-        outlineWidth: stroke?.width,
-        outlineDasharray: stroke?.dash_pattern,
-        outlineCap: "butt",
-    };
+  const { fill, stroke } = symbolizer;
+  return {
+    kind: "Fill",
+    color: fill?.color,
+    opacity: fill?.opacity,
+    fillOpacity: fill?.opacity,
+    outlineColor: stroke?.color,
+    outlineOpacity: stroke?.opacity,
+    outlineWidth: stroke?.width,
+    outlineDasharray: stroke?.dash_pattern,
+    outlineCap: "butt",
+  };
 }
 
 export function convertToGeostyler(
-    symbolizer: Symbolizer
+  symbolizer: Symbolizer
 ): GSSymbolizer | null {
-    switch (symbolizer.type) {
-        case "point":
-            return deepCleanUndefined(reverseConvertMarkSymbolizer(symbolizer));
-        case "line":
-            return deepCleanUndefined(reverseConvertLineSymbolizer(symbolizer));
-        case "polygon":
-            return deepCleanUndefined(reverseConvertFillSymbolizer(symbolizer));
-        default:
-            return null;
-    }
+  switch (symbolizer.type) {
+    case "point":
+      return deepCleanUndefined(reverseConvertMarkSymbolizer(symbolizer));
+    case "line":
+      return deepCleanUndefined(reverseConvertLineSymbolizer(symbolizer));
+    case "polygon":
+      return deepCleanUndefined(reverseConvertFillSymbolizer(symbolizer));
+    default:
+      return null;
+  }
 }

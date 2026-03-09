@@ -1,9 +1,9 @@
 {
-    "name": "@nextgisweb/webmap",
-    "version": "0.0.0",
-    "type": "module",
-    "dependencies": {
-        "html-to-image": "1.11.11",
-        "react-rnd": "^10.5.2"
-    }
+  "name": "@nextgisweb/webmap",
+  "version": "0.0.0",
+  "type": "module",
+  "dependencies": {
+    "html-to-image": "1.11.11",
+    "react-rnd": "^10.5.2"
+  }
 }

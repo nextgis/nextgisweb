@@ -9,49 +9,49 @@ import { useLoadData } from "./hook/useLoadData";
 import "./EffectivePermissions.less";
 
 interface EffectivePermissionsProps {
-    resourceId: number;
+  resourceId: number;
 }
 
 const pvLabel = [gettext("No"), gettext("Yes")];
 const pvClass = ["value no", "value yes"];
 
 export function EffectivePermissions({
-    resourceId,
+  resourceId,
 }: EffectivePermissionsProps) {
-    const [userId, setUserId] = useState(ngwConfig.userId);
-    const [data, seeOthers] = useLoadData({ resourceId, userId });
+  const [userId, setUserId] = useState(ngwConfig.userId);
+  const [data, seeOthers] = useLoadData({ resourceId, userId });
 
-    if (!data) return <LoadingWrapper />;
+  if (!data) return <LoadingWrapper />;
 
-    return (
-        <div className="ngw-resource-effective-permisssions ">
-            <PrincipalSelect
-                model="user"
-                value={userId}
-                onChange={setUserId}
-                systemUsers={["guest"]}
-                disabled={!seeOthers}
-                allowClear={false}
-            />
-            <SimpleTable>
-                <tbody>
-                    {data.map(({ key, label, items }) => (
-                        <Fragment key={key}>
-                            <tr>
-                                <th colSpan={2}>{label}</th>
-                            </tr>
-                            {items.map(({ key, label, value }) => (
-                                <tr key={key} className="permission">
-                                    <td className="label">{label}</td>
-                                    <td className={pvClass[Number(value)]}>
-                                        <div>{pvLabel[Number(value)]}</div>
-                                    </td>
-                                </tr>
-                            ))}
-                        </Fragment>
-                    ))}
-                </tbody>
-            </SimpleTable>
-        </div>
-    );
+  return (
+    <div className="ngw-resource-effective-permisssions ">
+      <PrincipalSelect
+        model="user"
+        value={userId}
+        onChange={setUserId}
+        systemUsers={["guest"]}
+        disabled={!seeOthers}
+        allowClear={false}
+      />
+      <SimpleTable>
+        <tbody>
+          {data.map(({ key, label, items }) => (
+            <Fragment key={key}>
+              <tr>
+                <th colSpan={2}>{label}</th>
+              </tr>
+              {items.map(({ key, label, value }) => (
+                <tr key={key} className="permission">
+                  <td className="label">{label}</td>
+                  <td className={pvClass[Number(value)]}>
+                    <div>{pvLabel[Number(value)]}</div>
+                  </td>
+                </tr>
+              ))}
+            </Fragment>
+          ))}
+        </tbody>
+      </SimpleTable>
+    </div>
+  );
 }

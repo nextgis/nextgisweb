@@ -12,198 +12,194 @@ import type { QueryParams } from "./hook/useFeatureTable";
 import type { ActionProps, FeatureGridProps, SetValue } from "./type";
 
 export class FeatureGridStore {
-    @observable.ref accessor id: number;
-    @observable.ref accessor versioning: boolean = false;
-    @observable.ref accessor size: SizeType = "middle";
-    @observable.ref accessor actions: ActionToolbarAction<ActionProps>[] = [];
-    @observable.ref accessor version: number = 0;
-    @observable.ref accessor readonly: boolean = true;
-    @observable.ref accessor canCreate: boolean = true;
-    @observable.ref accessor editOnNewPage: boolean = false;
-    @observable.ref accessor cleanSelectedOnFilter: boolean = true;
-    @observable.ref accessor settingsOpen: boolean = false;
+  @observable.ref accessor id: number;
+  @observable.ref accessor versioning: boolean = false;
+  @observable.ref accessor size: SizeType = "middle";
+  @observable.ref accessor actions: ActionToolbarAction<ActionProps>[] = [];
+  @observable.ref accessor version: number = 0;
+  @observable.ref accessor readonly: boolean = true;
+  @observable.ref accessor canCreate: boolean = true;
+  @observable.ref accessor editOnNewPage: boolean = false;
+  @observable.ref accessor cleanSelectedOnFilter: boolean = true;
+  @observable.ref accessor settingsOpen: boolean = false;
 
-    @observable.shallow accessor selectedIds: number[] = [];
-    @observable.shallow accessor _queryParams: QueryParams | null = null;
-    @observable.shallow accessor visibleFields: number[] = [KEY_FIELD_ID];
-    @observable.shallow accessor fields: FeatureLayerFieldRead[] = [];
-    @observable.ref accessor globalFilterExpression:
-        | FilterExpressionString
-        | undefined = undefined;
-    @observable.ref accessor filterExpression:
-        | FilterExpressionString
-        | undefined = undefined;
+  @observable.shallow accessor selectedIds: number[] = [];
+  @observable.shallow accessor _queryParams: QueryParams | null = null;
+  @observable.shallow accessor visibleFields: number[] = [KEY_FIELD_ID];
+  @observable.shallow accessor fields: FeatureLayerFieldRead[] = [];
+  @observable.ref accessor globalFilterExpression:
+    | FilterExpressionString
+    | undefined = undefined;
+  @observable.ref accessor filterExpression:
+    | FilterExpressionString
+    | undefined = undefined;
 
-    @observable.ref accessor beforeDelete:
-        | ((featureIds: number[]) => void)
-        | null = null;
-    @observable.ref accessor deleteError:
-        | ((featureIds: number[]) => void)
-        | null = null;
-    @observable.ref accessor onSelect: ((selected: number[]) => void) | null =
-        null;
-    @observable.ref accessor onDelete: ((featureIds: number[]) => void) | null =
-        null;
-    @observable.ref accessor onOpen:
-        | ((opt: { featureId: number; resourceId: number }) => void)
-        | null = null;
-    @observable.ref accessor onSave:
-        | ((value: CompositeRead | undefined) => void)
-        | null = null;
+  @observable.ref accessor beforeDelete:
+    | ((featureIds: number[]) => void)
+    | null = null;
+  @observable.ref accessor deleteError:
+    | ((featureIds: number[]) => void)
+    | null = null;
+  @observable.ref accessor onSelect: ((selected: number[]) => void) | null =
+    null;
+  @observable.ref accessor onDelete: ((featureIds: number[]) => void) | null =
+    null;
+  @observable.ref accessor onOpen:
+    | ((opt: { featureId: number; resourceId: number }) => void)
+    | null = null;
+  @observable.ref accessor onSave:
+    | ((value: CompositeRead | undefined) => void)
+    | null = null;
 
-    constructor({ id, ...props }: FeatureGridProps) {
-        this.id = id;
+  constructor({ id, ...props }: FeatureGridProps) {
+    this.id = id;
 
-        for (const key in props) {
-            const k = key as keyof FeatureGridProps;
-            const prop = (props as FeatureGridProps)[k];
-            if (prop !== undefined) {
-                Object.assign(this, { [k]: prop });
-            }
-        }
+    for (const key in props) {
+      const k = key as keyof FeatureGridProps;
+      const prop = (props as FeatureGridProps)[k];
+      if (prop !== undefined) {
+        Object.assign(this, { [k]: prop });
+      }
+    }
+  }
+
+  @computed
+  get queryParams(): QueryParams | null {
+    const params = { ...this._queryParams };
+
+    let filter = this.filterExpression;
+    if (this.globalFilterExpression) {
+      filter = `[${[`"all"`, this.globalFilterExpression, this.filterExpression]
+        .filter(Boolean)
+        .join(",")}]` as FilterExpressionString;
     }
 
-    @computed
-    get queryParams(): QueryParams | null {
-        const params = { ...this._queryParams };
-
-        let filter = this.filterExpression;
-        if (this.globalFilterExpression) {
-            filter = `[${[
-                `"all"`,
-                this.globalFilterExpression,
-                this.filterExpression,
-            ]
-                .filter(Boolean)
-                .join(",")}]` as FilterExpressionString;
-        }
-
-        if (filter) {
-            params["filter"] = filter;
-        }
-
-        return Object.keys(params).length > 0 ? params : null;
+    if (filter) {
+      params["filter"] = filter;
     }
 
-    @action.bound
-    setId(id: number) {
-        this.id = id;
-    }
+    return Object.keys(params).length > 0 ? params : null;
+  }
 
-    @action.bound
-    setVersioning(value: boolean) {
-        this.versioning = value;
-    }
+  @action.bound
+  setId(id: number) {
+    this.id = id;
+  }
 
-    @action.bound
-    setFields(fields: FeatureLayerFieldRead[]) {
-        this.fields = fields;
-    }
+  @action.bound
+  setVersioning(value: boolean) {
+    this.versioning = value;
+  }
 
-    @action.bound
-    setVisibleFields(visibleFields: number[]) {
-        this.visibleFields = visibleFields;
-    }
+  @action.bound
+  setFields(fields: FeatureLayerFieldRead[]) {
+    this.fields = fields;
+  }
 
-    @action.bound
-    setSize(size: SizeType | undefined) {
-        this.size = size;
-    }
+  @action.bound
+  setVisibleFields(visibleFields: number[]) {
+    this.visibleFields = visibleFields;
+  }
 
-    @action.bound
-    setActions(actions: ActionToolbarAction<ActionProps>[]) {
-        this.actions = actions;
-    }
+  @action.bound
+  setSize(size: SizeType | undefined) {
+    this.size = size;
+  }
 
-    @action.bound
-    setVersion(version: number) {
-        this.version = version;
-    }
+  @action.bound
+  setActions(actions: ActionToolbarAction<ActionProps>[]) {
+    this.actions = actions;
+  }
 
-    @action.bound
-    setSettingsOpen(settingsOpen: boolean) {
-        this.settingsOpen = settingsOpen;
-    }
+  @action.bound
+  setVersion(version: number) {
+    this.version = version;
+  }
 
-    @action.bound
-    bumpVersion() {
-        this.version = this.version + 1;
-    }
+  @action.bound
+  setSettingsOpen(settingsOpen: boolean) {
+    this.settingsOpen = settingsOpen;
+  }
 
-    @action.bound
-    setReadonly(readonly: boolean) {
-        this.readonly = readonly;
-    }
+  @action.bound
+  bumpVersion() {
+    this.version = this.version + 1;
+  }
 
-    @action.bound
-    setQueryParams(queryParams: SetValue<QueryParams | null>) {
-        this.setValue("_queryParams", queryParams);
-    }
+  @action.bound
+  setReadonly(readonly: boolean) {
+    this.readonly = readonly;
+  }
 
-    @action.bound
-    setSelectedIds(selectedIds: SetValue<number[]>) {
-        this.setValue("selectedIds", selectedIds);
-    }
+  @action.bound
+  setQueryParams(queryParams: SetValue<QueryParams | null>) {
+    this.setValue("_queryParams", queryParams);
+  }
 
-    @action.bound
-    setEditOnNewPage(editOnNewPage: boolean) {
-        this.editOnNewPage = editOnNewPage;
-    }
+  @action.bound
+  setSelectedIds(selectedIds: SetValue<number[]>) {
+    this.setValue("selectedIds", selectedIds);
+  }
 
-    @action.bound
-    setCleanSelectedOnFilter(cleanSelectedOnFilter: boolean) {
-        this.cleanSelectedOnFilter = cleanSelectedOnFilter;
-    }
+  @action.bound
+  setEditOnNewPage(editOnNewPage: boolean) {
+    this.editOnNewPage = editOnNewPage;
+  }
 
-    @action.bound
-    setBeforeDelete(beforeDelete: ((featureIds: number[]) => void) | null) {
-        this.beforeDelete = beforeDelete;
-    }
+  @action.bound
+  setCleanSelectedOnFilter(cleanSelectedOnFilter: boolean) {
+    this.cleanSelectedOnFilter = cleanSelectedOnFilter;
+  }
 
-    @action.bound
-    setDeleteError = (deleteError: ((featureIds: number[]) => void) | null) => {
-        this.deleteError = deleteError;
+  @action.bound
+  setBeforeDelete(beforeDelete: ((featureIds: number[]) => void) | null) {
+    this.beforeDelete = beforeDelete;
+  }
+
+  @action.bound
+  setDeleteError = (deleteError: ((featureIds: number[]) => void) | null) => {
+    this.deleteError = deleteError;
+  };
+
+  @action.bound
+  setOnSelect(onSelect: ((selected: number[]) => void) | null) {
+    this.onSelect = onSelect;
+  }
+
+  @action.bound
+  setOnDelete(onDelete: ((featureIds: number[]) => void) | null) {
+    this.onDelete = onDelete;
+  }
+
+  @action.bound
+  setOnSave(onSave: ((value: CompositeRead | undefined) => void) | null) {
+    this.onSave = onSave;
+  }
+
+  @action.bound
+  setGlobalFilterExpression(
+    filterExpression: FilterExpressionString | undefined
+  ) {
+    this.globalFilterExpression = filterExpression;
+  }
+
+  @action.bound
+  setFilterExpression(filterExpression: FilterExpressionString | undefined) {
+    this.filterExpression = filterExpression;
+  }
+
+  @action.bound
+  private setValue<T>(property: keyof this, valueOrUpdater: SetValue<T>) {
+    const isUpdaterFunction = (
+      input: unknown
+    ): input is (prevValue: T) => T => {
+      return typeof input === "function";
     };
 
-    @action.bound
-    setOnSelect(onSelect: ((selected: number[]) => void) | null) {
-        this.onSelect = onSelect;
-    }
+    const newValue = isUpdaterFunction(valueOrUpdater)
+      ? valueOrUpdater(this[property] as T)
+      : valueOrUpdater;
 
-    @action.bound
-    setOnDelete(onDelete: ((featureIds: number[]) => void) | null) {
-        this.onDelete = onDelete;
-    }
-
-    @action.bound
-    setOnSave(onSave: ((value: CompositeRead | undefined) => void) | null) {
-        this.onSave = onSave;
-    }
-
-    @action.bound
-    setGlobalFilterExpression(
-        filterExpression: FilterExpressionString | undefined
-    ) {
-        this.globalFilterExpression = filterExpression;
-    }
-
-    @action.bound
-    setFilterExpression(filterExpression: FilterExpressionString | undefined) {
-        this.filterExpression = filterExpression;
-    }
-
-    @action.bound
-    private setValue<T>(property: keyof this, valueOrUpdater: SetValue<T>) {
-        const isUpdaterFunction = (
-            input: unknown
-        ): input is (prevValue: T) => T => {
-            return typeof input === "function";
-        };
-
-        const newValue = isUpdaterFunction(valueOrUpdater)
-            ? valueOrUpdater(this[property] as T)
-            : valueOrUpdater;
-
-        Object.assign(this, { [property]: newValue });
-    }
+    Object.assign(this, { [property]: newValue });
+  }
 }

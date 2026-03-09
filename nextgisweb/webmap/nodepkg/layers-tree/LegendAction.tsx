@@ -11,33 +11,33 @@ const msgShowLegend = gettext("Show legend");
 const msgHideLegend = gettext("Hide legend");
 
 export function LegendAction({
-    nodeData,
-    onClick,
+  nodeData,
+  onClick,
 }: {
-    nodeData: TreeItemStore;
-    onClick: (id: number) => void;
+  nodeData: TreeItemStore;
+  onClick: (id: number) => void;
 }) {
-    const legendInfo = "legendInfo" in nodeData && nodeData.legendInfo;
-    if (!nodeData || !legendInfo || legendInfo.open === undefined) {
-        return <></>;
-    }
+  const legendInfo = "legendInfo" in nodeData && nodeData.legendInfo;
+  if (!nodeData || !legendInfo || legendInfo.open === undefined) {
+    return <></>;
+  }
 
-    const { open } = nodeData.legendInfo;
-    const icon = open ? <CollapseIcon /> : <ExpandIcon />;
+  const { open } = nodeData.legendInfo;
+  const icon = open ? <CollapseIcon /> : <ExpandIcon />;
 
-    const click = (evt: MouseEvent) => {
-        evt.stopPropagation();
-        nodeData.legendInfo.toggleVisible();
-        onClick(nodeData.id);
-    };
+  const click = (evt: MouseEvent) => {
+    evt.stopPropagation();
+    nodeData.legendInfo.toggleVisible();
+    onClick(nodeData.id);
+  };
 
-    return (
-        <span
-            className="action-btn legend"
-            onClick={click}
-            title={open ? msgHideLegend : msgShowLegend}
-        >
-            {icon}
-        </span>
-    );
+  return (
+    <span
+      className="action-btn legend"
+      onClick={click}
+      title={open ? msgHideLegend : msgShowLegend}
+    >
+      {icon}
+    </span>
+  );
 }

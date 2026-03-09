@@ -22,34 +22,34 @@ import { usePrevious } from "./usePrevious";
  * ```
  */
 export function useEffectDebugger(
-    effectHook: EffectCallback,
-    dependencies: DependencyList,
-    dependencyNames = []
+  effectHook: EffectCallback,
+  dependencies: DependencyList,
+  dependencyNames = []
 ) {
-    const previousDeps = usePrevious(dependencies, []);
+  const previousDeps = usePrevious(dependencies, []);
 
-    const changedDeps = dependencies.reduce<DependencyList>(
-        (accum, dependency, index) => {
-            if (dependency !== previousDeps[index]) {
-                const keyName = dependencyNames[index] || index;
-                return {
-                    ...accum,
-                    [keyName]: {
-                        before: previousDeps[index],
-                        after: dependency,
-                    },
-                };
-            }
+  const changedDeps = dependencies.reduce<DependencyList>(
+    (accum, dependency, index) => {
+      if (dependency !== previousDeps[index]) {
+        const keyName = dependencyNames[index] || index;
+        return {
+          ...accum,
+          [keyName]: {
+            before: previousDeps[index],
+            after: dependency,
+          },
+        };
+      }
 
-            return accum;
-        },
-        {} as DependencyList
-    );
+      return accum;
+    },
+    {} as DependencyList
+  );
 
-    if (Object.keys(changedDeps).length) {
-        console.log("[use-effect-debugger] ", changedDeps);
-    }
+  if (Object.keys(changedDeps).length) {
+    console.log("[use-effect-debugger] ", changedDeps);
+  }
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(effectHook, dependencies);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(effectHook, dependencies);
 }

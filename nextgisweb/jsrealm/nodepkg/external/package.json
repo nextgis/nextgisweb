@@ -1,15 +1,15 @@
 {
-    "name": "@nextgisweb/external",
-    "version": "0.0.0",
-    "type": "module",
-    "dependencies": {
-        "string-replace-loader": "^3.0.1",
-        "uglify-js": "~3.17.4",
-        "uglifycss": "^0.0.29"
-    },
-    "nextgisweb": {
-        "webpackConfigs": {
-            "external": "webpack.external.cjs"
-        }
+  "name": "@nextgisweb/external",
+  "version": "0.0.0",
+  "type": "module",
+  "dependencies": {
+    "string-replace-loader": "^3.0.1",
+    "uglify-js": "~3.17.4",
+    "uglifycss": "^0.0.29"
+  },
+  "nextgisweb": {
+    "webpackConfigs": {
+      "external": "webpack.external.cjs"
     }
+  }
 }

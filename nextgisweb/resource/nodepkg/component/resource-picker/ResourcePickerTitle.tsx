@@ -19,112 +19,102 @@ const msgGotoInitialGroup = gettext("Go to initial group");
 const msgRefresh = gettext("Refresh");
 
 interface SearchPanelProps {
-    store: ResourcePickerStore;
-    onCancelSearch: () => void;
+  store: ResourcePickerStore;
+  onCancelSearch: () => void;
 }
 
 const SearchPanel = observer(({ store, onCancelSearch }: SearchPanelProps) => {
-    return (
-        <Space.Compact>
-            <Button icon={<ArrowBack />} onClick={onCancelSearch} />
-            <ResourcesFilter
-                cls={store.requireClass || undefined}
-                onChange={(v, opt) => {
-                    store.changeParentTo(Number(opt.key));
-                    onCancelSearch();
-                }}
-            />
-        </Space.Compact>
-    );
+  return (
+    <Space.Compact>
+      <Button icon={<ArrowBack />} onClick={onCancelSearch} />
+      <ResourcesFilter
+        cls={store.requireClass || undefined}
+        onChange={(v, opt) => {
+          store.changeParentTo(Number(opt.key));
+          onCancelSearch();
+        }}
+      />
+    </Space.Compact>
+  );
 });
 
 SearchPanel.displayName = "SearchPanel";
 
 interface PathPanelProps {
-    store: ResourcePickerStore;
-    onEnterSearchMode: () => void;
+  store: ResourcePickerStore;
+  onEnterSearchMode: () => void;
 }
 
 export const PathPanel = observer(
-    ({ store, onEnterSearchMode }: PathPanelProps) => {
-        const {
-            initParentId: initialParentId,
-            parentId,
-            allowMoveInside,
-        } = store;
-        return (
-            <Row>
-                <Col style={{ width: "30px" }}>
-                    <a onClick={onEnterSearchMode}>
-                        <SearchIcon />
-                    </a>
-                </Col>
-                <Col flex="auto" className="resource-breadcrumb">
-                    <ResourcePickerBreadcrumb store={store} />
-                </Col>
-                {parentId !== initialParentId && allowMoveInside && (
-                    <Col style={{ width: "30px" }}>
-                        <Tooltip title={msgGotoInitialGroup}>
-                            <a onClick={() => store.returnToInitial()}>
-                                <StartIcon />
-                            </a>
-                        </Tooltip>
-                    </Col>
-                )}
-                <Col style={{ width: "30px" }}>
-                    <Tooltip title={msgRefresh}>
-                        <a onClick={() => store.refresh()}>
-                            <SyncIcon />
-                        </a>
-                    </Tooltip>
-                </Col>
-            </Row>
-        );
-    }
+  ({ store, onEnterSearchMode }: PathPanelProps) => {
+    const { initParentId: initialParentId, parentId, allowMoveInside } = store;
+    return (
+      <Row>
+        <Col style={{ width: "30px" }}>
+          <a onClick={onEnterSearchMode}>
+            <SearchIcon />
+          </a>
+        </Col>
+        <Col flex="auto" className="resource-breadcrumb">
+          <ResourcePickerBreadcrumb store={store} />
+        </Col>
+        {parentId !== initialParentId && allowMoveInside && (
+          <Col style={{ width: "30px" }}>
+            <Tooltip title={msgGotoInitialGroup}>
+              <a onClick={() => store.returnToInitial()}>
+                <StartIcon />
+              </a>
+            </Tooltip>
+          </Col>
+        )}
+        <Col style={{ width: "30px" }}>
+          <Tooltip title={msgRefresh}>
+            <a onClick={() => store.refresh()}>
+              <SyncIcon />
+            </a>
+          </Tooltip>
+        </Col>
+      </Row>
+    );
+  }
 );
 
 PathPanel.displayName = "PathPanel";
 
 export const ResourcePickerTitle = observer(
-    ({ store, onClose, showClose }: ResourcePickerTitleProps) => {
-        const [searchMode, setSearchMode] = useState(false);
+  ({ store, onClose, showClose }: ResourcePickerTitleProps) => {
+    const [searchMode, setSearchMode] = useState(false);
 
-        const stopSearch = () => {
-            setSearchMode(false);
-        };
-        const startSearch = () => {
-            setSearchMode(true);
-        };
+    const stopSearch = () => {
+      setSearchMode(false);
+    };
+    const startSearch = () => {
+      setSearchMode(true);
+    };
 
-        useEffect(() => {
-            store.setAllowCreateResource(!searchMode);
-        }, [searchMode, store]);
+    useEffect(() => {
+      store.setAllowCreateResource(!searchMode);
+    }, [searchMode, store]);
 
-        return (
-            <Row justify="space-between">
-                <Col flex="auto">
-                    {searchMode ? (
-                        <SearchPanel
-                            store={store}
-                            onCancelSearch={stopSearch}
-                        />
-                    ) : (
-                        <PathPanel
-                            store={store}
-                            onEnterSearchMode={startSearch}
-                        />
-                    )}
-                </Col>
-                {showClose && (
-                    <Col>
-                        <a color="primary" onClick={onClose}>
-                            <CloseIcon />
-                        </a>
-                    </Col>
-                )}
-            </Row>
-        );
-    }
+    return (
+      <Row justify="space-between">
+        <Col flex="auto">
+          {searchMode ? (
+            <SearchPanel store={store} onCancelSearch={stopSearch} />
+          ) : (
+            <PathPanel store={store} onEnterSearchMode={startSearch} />
+          )}
+        </Col>
+        {showClose && (
+          <Col>
+            <a color="primary" onClick={onClose}>
+              <CloseIcon />
+            </a>
+          </Col>
+        )}
+      </Row>
+    );
+  }
 );
 
 ResourcePickerTitle.displayName = "ResourcePickerTitle";

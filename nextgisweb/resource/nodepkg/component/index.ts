@@ -1,5 +1,5 @@
 export {
-    ResourceSelect,
-    ResourceSelectMultiple,
-    ResourceSelectRef,
+  ResourceSelect,
+  ResourceSelectMultiple,
+  ResourceSelectRef,
 } from "./resource-select";

@@ -22,181 +22,178 @@ import ExitIcon from "@nextgisweb/icon/material/save";
 type ToolEditorProps = MapControlProps & { groupId: string };
 
 const FinishEditingDialogLazy = lazy(
-    () =>
-        import("@nextgisweb/webmap/ui/finish-editing-dialog/FinishEditingDialog")
+  () =>
+    import("@nextgisweb/webmap/ui/finish-editing-dialog/FinishEditingDialog")
 );
 
 const ToolEditor = observer(
-    ({ order = 0, position, groupId }: ToolEditorProps) => {
-        const { display } = useDisplayContext();
-        const { activate, deactivate, isActive } = useToggleGroupItem(groupId);
+  ({ order = 0, position, groupId }: ToolEditorProps) => {
+    const { display } = useDisplayContext();
+    const { activate, deactivate, isActive } = useToggleGroupItem(groupId);
 
-        const [canSnap, setCanSnap] = useState(true);
-        const [editingMode, setEditingMode] = useState<string | null>(
-            DrawMode.displayName
-        );
+    const [canSnap, setCanSnap] = useState(true);
+    const [editingMode, setEditingMode] = useState<string | null>(
+      DrawMode.displayName
+    );
 
-        const { showModal, modalStore, modalHolder } = useShowModal();
+    const { showModal, modalStore, modalHolder } = useShowModal();
 
-        const [source] = useState(() => new VectorSource());
+    const [source] = useState(() => new VectorSource());
 
-        const [editableItems, setEditableItems] = useState<TreeLayerStore[]>(
-            []
-        );
+    const [editableItems, setEditableItems] = useState<TreeLayerStore[]>([]);
 
-        const dirtyRef = useRef<Map<number, boolean>>(new Map());
+    const dirtyRef = useRef<Map<number, boolean>>(new Map());
 
-        const { treeStore } = display;
+    const { treeStore } = display;
 
-        const displayItemIdRef = useRef<number | undefined>(undefined);
-        useEffect(() => {
-            displayItemIdRef.current = display.item?.id;
-        }, [display.item]);
+    const displayItemIdRef = useRef<number | undefined>(undefined);
+    useEffect(() => {
+      displayItemIdRef.current = display.item?.id;
+    }, [display.item]);
 
-        const prevEditableRef = useRef<TreeLayerStore[]>(editableItems);
-        useEffect(() => {
-            const getKey = (i: TreeLayerStore) => i.id;
-            const prev = prevEditableRef.current;
+    const prevEditableRef = useRef<TreeLayerStore[]>(editableItems);
+    useEffect(() => {
+      const getKey = (i: TreeLayerStore) => i.id;
+      const prev = prevEditableRef.current;
 
-            const items = treeStore.editableLayers;
+      const items = treeStore.editableLayers;
 
-            const currKeys = new Set(items.map(getKey));
-            const stopped = prev
-                .filter((it) => !currKeys.has(getKey(it)))
-                .filter((it) => dirtyRef.current.get(getKey(it)));
+      const currKeys = new Set(items.map(getKey));
+      const stopped = prev
+        .filter((it) => !currKeys.has(getKey(it)))
+        .filter((it) => dirtyRef.current.get(getKey(it)));
 
-            const proceed = () => {
-                setEditableItems(items);
-                prevEditableRef.current = items;
-            };
-            if (stopped.length) {
-                showModal(FinishEditingDialogLazy, {
-                    onSave: async () => {
-                        try {
-                            for (const item of stopped) {
-                                await saveChanges({
-                                    display,
-                                    source,
-                                    item,
-                                });
-                            }
-                        } catch (er) {
-                            errorModal(er, { modalStore });
-                        } finally {
-                            proceed();
-                        }
-                    },
-                    onUndo: proceed,
-                    onContinue: () => {
-                        setItemsEditable(
-                            treeStore,
-                            stopped.map((it) => it.id),
-                            true
-                        );
-                    },
+      const proceed = () => {
+        setEditableItems(items);
+        prevEditableRef.current = items;
+      };
+      if (stopped.length) {
+        showModal(FinishEditingDialogLazy, {
+          onSave: async () => {
+            try {
+              for (const item of stopped) {
+                await saveChanges({
+                  display,
+                  source,
+                  item,
                 });
-            } else {
-                proceed();
+              }
+            } catch (er) {
+              errorModal(er, { modalStore });
+            } finally {
+              proceed();
             }
-        }, [
-            source,
-            display,
-            treeStore.editableLayers,
-            treeStore,
-            modalStore,
-            showModal,
-        ]);
-
-        const stopEditing = useCallback(() => {
-            if (displayItemIdRef.current !== undefined) {
-                setItemsEditable(treeStore, [displayItemIdRef.current], false);
-            }
-        }, [treeStore]);
-
-        const onError = useCallback(
-            (er: unknown) => {
-                errorModal(er, {
-                    modalStore,
-                    afterClose: stopEditing,
-                });
-            },
-            [modalStore, stopEditing]
-        );
-
-        const curentSelectedIsEditable = useMemo(() => {
-            const itemId = display.item?.id;
-            return (
-                itemId !== undefined &&
-                !!editableItems.find((it) => itemId === it.id)
+          },
+          onUndo: proceed,
+          onContinue: () => {
+            setItemsEditable(
+              treeStore,
+              stopped.map((it) => it.id),
+              true
             );
-        }, [display.item, editableItems]);
+          },
+        });
+      } else {
+        proceed();
+      }
+    }, [
+      source,
+      display,
+      treeStore.editableLayers,
+      treeStore,
+      modalStore,
+      showModal,
+    ]);
 
-        useEffect(() => {
-            if (editingMode && editableItems.length) {
-                if (curentSelectedIsEditable) {
-                    activate();
-                    return;
-                }
-            }
-            deactivate();
-        }, [
-            curentSelectedIsEditable,
-            editableItems.length,
-            editableItems,
-            editingMode,
-            deactivate,
-            activate,
-        ]);
+    const stopEditing = useCallback(() => {
+      if (displayItemIdRef.current !== undefined) {
+        setItemsEditable(treeStore, [displayItemIdRef.current], false);
+      }
+    }, [treeStore]);
 
-        if (!editableItems.length) {
-            return null;
+    const onError = useCallback(
+      (er: unknown) => {
+        errorModal(er, {
+          modalStore,
+          afterClose: stopEditing,
+        });
+      },
+      [modalStore, stopEditing]
+    );
+
+    const curentSelectedIsEditable = useMemo(() => {
+      const itemId = display.item?.id;
+      return (
+        itemId !== undefined && !!editableItems.find((it) => itemId === it.id)
+      );
+    }, [display.item, editableItems]);
+
+    useEffect(() => {
+      if (editingMode && editableItems.length) {
+        if (curentSelectedIsEditable) {
+          activate();
+          return;
         }
-        return (
-            <>
-                {modalHolder}
+      }
+      deactivate();
+    }, [
+      curentSelectedIsEditable,
+      editableItems.length,
+      editableItems,
+      editingMode,
+      deactivate,
+      activate,
+    ]);
 
-                <MapToolbarControl
-                    order={order}
-                    position={position}
-                    margin
-                    direction="vertical"
-                    gap={2}
-                    style={{ paddingTop: "20px" }}
-                    id="editor-toolbar"
-                >
-                    {editableItems.map(({ id, layerId }) => (
-                        <EditableResource
-                            key={id}
-                            source={source}
-                            canSnap={canSnap}
-                            enabled={display.item?.id === id}
-                            resourceId={layerId}
-                            editingMode={isActive ? editingMode : null}
-                            onCanSnap={setCanSnap}
-                            onEditingMode={setEditingMode}
-                            onDirtyChange={(val) => {
-                                dirtyRef.current.set(id, val);
-                            }}
-                            onError={onError}
-                        />
-                    ))}
-                    {curentSelectedIsEditable && (
-                        <>
-                            <ButtonControl
-                                title={gettextf("Stop editing layer: {layer}")({
-                                    layer: display.item?.label || "",
-                                })}
-                                order={100}
-                                onClick={stopEditing}
-                            >
-                                <ExitIcon />
-                            </ButtonControl>
-                        </>
-                    )}
-                </MapToolbarControl>
-            </>
-        );
+    if (!editableItems.length) {
+      return null;
     }
+    return (
+      <>
+        {modalHolder}
+
+        <MapToolbarControl
+          order={order}
+          position={position}
+          margin
+          direction="vertical"
+          gap={2}
+          style={{ paddingTop: "20px" }}
+          id="editor-toolbar"
+        >
+          {editableItems.map(({ id, layerId }) => (
+            <EditableResource
+              key={id}
+              source={source}
+              canSnap={canSnap}
+              enabled={display.item?.id === id}
+              resourceId={layerId}
+              editingMode={isActive ? editingMode : null}
+              onCanSnap={setCanSnap}
+              onEditingMode={setEditingMode}
+              onDirtyChange={(val) => {
+                dirtyRef.current.set(id, val);
+              }}
+              onError={onError}
+            />
+          ))}
+          {curentSelectedIsEditable && (
+            <>
+              <ButtonControl
+                title={gettextf("Stop editing layer: {layer}")({
+                  layer: display.item?.label || "",
+                })}
+                order={100}
+                onClick={stopEditing}
+              >
+                <ExitIcon />
+              </ButtonControl>
+            </>
+          )}
+        </MapToolbarControl>
+      </>
+    );
+  }
 );
 
 ToolEditor.displayName = "ToolEditor";

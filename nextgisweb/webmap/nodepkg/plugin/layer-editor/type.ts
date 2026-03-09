@@ -6,35 +6,35 @@ import type { FunctionComponent } from "react";
 import type { LayerItemConfig } from "@nextgisweb/webmap/type/api";
 
 export interface FeatureInfo {
-    id: number;
-    geom: string;
+  id: number;
+  geom: string;
 }
 
 export interface EditingItem {
-    id: number;
-    nodeData: LayerItemConfig;
-    interactions: Record<string, Interaction>;
-    features: Collection<Feature<Geometry>>;
-    featuresDeleted: Feature<Geometry>[];
+  id: number;
+  nodeData: LayerItemConfig;
+  interactions: Record<string, Interaction>;
+  features: Collection<Feature<Geometry>>;
+  featuresDeleted: Feature<Geometry>[];
 }
 
 export interface FeatureToSave {
-    id?: number;
-    geom: string;
+  id?: number;
+  geom: string;
 }
 
 export interface FeaturesToSave {
-    toPatch: FeatureToSave[];
-    toDelete: FeatureToSave[];
+  toPatch: FeatureToSave[];
+  toDelete: FeatureToSave[];
 }
 
 export type UndoAction = () => void;
 
 export interface LayerEditorProps {
-    order?: number;
-    disabled?: boolean;
+  order?: number;
+  disabled?: boolean;
 }
 
 export type LayerEditorMode<P = Record<string, any>> = FunctionComponent<
-    LayerEditorProps & P
+  LayerEditorProps & P
 > & { displayName: string };

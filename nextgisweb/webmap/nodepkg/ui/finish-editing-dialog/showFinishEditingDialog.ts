@@ -4,5 +4,5 @@ import FinishEditingModal from "./FinishEditingDialog";
 import type { FinishEditingModalProps } from "./FinishEditingDialog";
 
 export function showFinishEditingDialog(options: FinishEditingModalProps) {
-    return showModal(FinishEditingModal, options);
+  return showModal(FinishEditingModal, options);
 }

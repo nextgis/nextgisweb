@@ -8,15 +8,15 @@ const AntPicker = generatePicker<Dayjs>(dayjsGenerateConfig);
 const AntTimePicker = AntPicker.TimePicker;
 
 export function TimePicker({ ref, ...props }: TimePickerProps) {
-    const localizedTime = dayjs.localeData().longDateFormat("LTS");
-    return (
-        <AntTimePicker
-            {...props}
-            mode={undefined}
-            ref={ref}
-            format={localizedTime}
-        />
-    );
+  const localizedTime = dayjs.localeData().longDateFormat("LTS");
+  return (
+    <AntTimePicker
+      {...props}
+      mode={undefined}
+      ref={ref}
+      format={localizedTime}
+    />
+  );
 }
 
 export default TimePicker;

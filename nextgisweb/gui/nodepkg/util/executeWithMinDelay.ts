@@ -3,13 +3,13 @@ import { makeAbortError } from "../error/util";
 import { sleep } from "./sleep";
 
 interface ExecuteWithMinDelayOptions<T> {
-    /**
-     * Minimum delay in milliseconds
-     * @default 1000
-     */
-    minDelay?: number;
-    onRealExecute?: (val: T) => void;
-    signal?: AbortSignal;
+  /**
+   * Minimum delay in milliseconds
+   * @default 1000
+   */
+  minDelay?: number;
+  onRealExecute?: (val: T) => void;
+  signal?: AbortSignal;
 }
 
 /**
@@ -27,28 +27,28 @@ interface ExecuteWithMinDelayOptions<T> {
  * ```
  */
 export async function executeWithMinDelay<T>(
-    requestPromise: Promise<T>,
-    { minDelay = 1000, onRealExecute, signal }: ExecuteWithMinDelayOptions<T>
+  requestPromise: Promise<T>,
+  { minDelay = 1000, onRealExecute, signal }: ExecuteWithMinDelayOptions<T>
 ): Promise<T> {
-    if (signal?.aborted) throw makeAbortError();
+  if (signal?.aborted) throw makeAbortError();
 
-    const abortPromise = new Promise<never>((_, reject) =>
-        signal?.addEventListener("abort", () => {
-            reject(makeAbortError());
-        })
-    );
+  const abortPromise = new Promise<never>((_, reject) =>
+    signal?.addEventListener("abort", () => {
+      reject(makeAbortError());
+    })
+  );
 
-    const [result] = await Promise.race([
-        Promise.all([
-            requestPromise.then((res) => {
-                if (onRealExecute) {
-                    onRealExecute(res);
-                }
-                return res;
-            }),
-            sleep(minDelay),
-        ]),
-        abortPromise,
-    ]);
-    return result;
+  const [result] = await Promise.race([
+    Promise.all([
+      requestPromise.then((res) => {
+        if (onRealExecute) {
+          onRealExecute(res);
+        }
+        return res;
+      }),
+      sleep(minDelay),
+    ]),
+    abortPromise,
+  ]);
+  return result;
 }

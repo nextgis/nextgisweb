@@ -1,8 +1,8 @@
 {
-    "name": "@nextgisweb/sentry",
-    "version": "0.0.0",
-    "type": "module",
-    "dependencies": {
-        "@sentry/browser": "~9.10.1"
-    }
+  "name": "@nextgisweb/sentry",
+  "version": "0.0.0",
+  "type": "module",
+  "dependencies": {
+    "@sentry/browser": "~9.10.1"
+  }
 }

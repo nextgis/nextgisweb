@@ -5,15 +5,13 @@ import type { AccessType } from "@nextgisweb/webmap/layer/annotations/Annotation
 import "./AnnotationAccessType.css";
 
 export function AnnotationAccessType({
-    children,
-    accessType,
+  children,
+  accessType,
 }: {
-    children: React.ReactNode;
-    accessType?: AccessType;
+  children: React.ReactNode;
+  accessType?: AccessType;
 }) {
-    return (
-        <div className={cn("annotation-access-type", accessType)}>
-            {children}
-        </div>
-    );
+  return (
+    <div className={cn("annotation-access-type", accessType)}>{children}</div>
+  );
 }

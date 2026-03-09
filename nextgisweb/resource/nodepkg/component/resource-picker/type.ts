@@ -3,24 +3,24 @@ import type { ModalStore } from "@nextgisweb/gui/show-modal/ModalStore";
 import type { ResourceAttrItem } from "@nextgisweb/resource/api/ResourceAttrItem";
 import type { Attributes } from "@nextgisweb/resource/api/resource-attr";
 import type {
-    ResourceCls,
-    ResourceInterface,
+  ResourceCls,
+  ResourceInterface,
 } from "@nextgisweb/resource/type/api";
 
 import type { ResourcePickerStore } from "./store/ResourcePickerStore";
 
 export const ResourcePickerDefaultAttrs = [
-    ["resource.cls"],
-    ["resource.parent"],
-    ["resource.keyname"],
-    ["resource.children"],
-    ["resource.interfaces"],
-    ["resource.owner_user"],
-    ["resource.display_name"],
+  ["resource.cls"],
+  ["resource.parent"],
+  ["resource.keyname"],
+  ["resource.children"],
+  ["resource.interfaces"],
+  ["resource.owner_user"],
+  ["resource.display_name"],
 ] as const satisfies Attributes;
 
 export type ResourcePickerAttr = ResourceAttrItem<
-    typeof ResourcePickerDefaultAttrs
+  typeof ResourcePickerDefaultAttrs
 >;
 
 export type SelectValue = number | number[];
@@ -31,74 +31,74 @@ export type RowSelectionType = RowSelection["type"];
 export type PickerResource = ResourcePickerAttr;
 
 export interface ResourcePickerBreadcrumbProps {
-    store: ResourcePickerStore;
-    maxBreadcrumbItems?: number;
+  store: ResourcePickerStore;
+  maxBreadcrumbItems?: number;
 }
 
 export interface ResourcePickerChildrenProps<
-    V extends SelectValue = SelectValue,
+  V extends SelectValue = SelectValue,
 > {
-    store: ResourcePickerStore;
-    onOk?: (val: V) => void;
+  store: ResourcePickerStore;
+  onOk?: (val: V) => void;
 }
 
 export interface ResourcePickerFooterProps<
-    V extends SelectValue = SelectValue,
+  V extends SelectValue = SelectValue,
 > {
-    store: ResourcePickerStore;
-    onOk?: (val: V) => void;
+  store: ResourcePickerStore;
+  onOk?: (val: V) => void;
 }
 
 export type OnNewGroupType = (resource: ResourcePickerAttr) => void;
 
 export interface ResourcePickerTitleProps {
-    store: ResourcePickerStore;
-    onClose?: () => void;
-    showClose?: boolean;
+  store: ResourcePickerStore;
+  onClose?: () => void;
+  showClose?: boolean;
 }
 
 export interface ResourcePickerStoreOptions<A extends Attributes = Attributes> {
-    multiple?: boolean;
-    parentId?: number;
-    selected?: number[];
-    getThisMsg?: string;
-    attributes?: [...A];
-    initParentId?: number | null;
-    requireClass?: ResourceCls | ResourceCls[] | null;
-    getSelectedMsg?: string;
-    requireInterface?: ResourceInterface | ResourceInterface[] | null;
-    traverseClasses?: ResourceCls[] | null;
-    hideUnavailable?: boolean;
-    disableResourceIds?: number[];
-    saveLastParentIdGlobal?: boolean;
-    onTraverse?: ((parentId: number) => void) | null;
-    onNewGroup?: null | OnNewGroupType;
+  multiple?: boolean;
+  parentId?: number;
+  selected?: number[];
+  getThisMsg?: string;
+  attributes?: [...A];
+  initParentId?: number | null;
+  requireClass?: ResourceCls | ResourceCls[] | null;
+  getSelectedMsg?: string;
+  requireInterface?: ResourceInterface | ResourceInterface[] | null;
+  traverseClasses?: ResourceCls[] | null;
+  hideUnavailable?: boolean;
+  disableResourceIds?: number[];
+  saveLastParentIdGlobal?: boolean;
+  onTraverse?: ((parentId: number) => void) | null;
+  onNewGroup?: null | OnNewGroupType;
 }
 
 export interface ResourcePickerCardProps<V extends SelectValue = SelectValue> {
-    pickerOptions?: ResourcePickerStoreOptions;
-    cardOptions?: CardProps;
-    showClose?: boolean;
-    onSelect?: (res: V) => void;
-    onClose?: () => void;
-    store?: ResourcePickerStore;
+  pickerOptions?: ResourcePickerStoreOptions;
+  cardOptions?: CardProps;
+  showClose?: boolean;
+  onSelect?: (res: V) => void;
+  onClose?: () => void;
+  store?: ResourcePickerStore;
 }
 
 export interface UsePickerModalProps {
-    cardOptions?: CardProps;
-    height?: number;
-    cardTitleHeight?: number;
-    cardFooterHeight?: number;
+  cardOptions?: CardProps;
+  height?: number;
+  cardTitleHeight?: number;
+  cardFooterHeight?: number;
 }
 
 export interface ResourcePickerModalProps<
-    V extends SelectValue = SelectValue,
+  V extends SelectValue = SelectValue,
 > extends UsePickerModalProps {
-    open?: boolean;
-    modalStore?: ModalStore;
-    store?: ResourcePickerStore;
-    onSelect?: (val: V) => void;
-    onPick?: (val: ResourcePickerAttr | ResourcePickerAttr[]) => void;
-    closeOnSelect?: boolean;
-    pickerOptions?: ResourcePickerStoreOptions;
+  open?: boolean;
+  modalStore?: ModalStore;
+  store?: ResourcePickerStore;
+  onSelect?: (val: V) => void;
+  onPick?: (val: ResourcePickerAttr | ResourcePickerAttr[]) => void;
+  closeOnSelect?: boolean;
+  pickerOptions?: ResourcePickerStoreOptions;
 }

@@ -3,9 +3,9 @@ import type { DynMenuItem } from "@nextgisweb/pyramid/layout/dynmenu/type";
 import { Dynmenu } from "../layout";
 
 interface ControlPanelProps {
-    items: DynMenuItem[];
+  items: DynMenuItem[];
 }
 
 export function ControlPanel({ items }: ControlPanelProps) {
-    return <Dynmenu items={items} />;
+  return <Dynmenu items={items} />;
 }

@@ -6,17 +6,17 @@ import "./index.less";
 type TabsBaseProps = Parameters<typeof TabsBase>[0];
 
 export interface TabsProps extends TabsBaseProps {
-    parentHeight?: boolean;
+  parentHeight?: boolean;
 }
 
 export default function Tabs({
-    className,
-    parentHeight = false,
-    ...props
+  className,
+  parentHeight = false,
+  ...props
 }: TabsProps) {
-    className = classNames(className, {
-        "ant-tabs-parent-height": parentHeight,
-    });
+  className = classNames(className, {
+    "ant-tabs-parent-height": parentHeight,
+  });
 
-    return <TabsBase className={className} {...props} />;
+  return <TabsBase className={className} {...props} />;
 }

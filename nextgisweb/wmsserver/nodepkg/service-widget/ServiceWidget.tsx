@@ -19,104 +19,101 @@ import { Layer } from "./Layer";
 import type { ServiceStore } from "./ServiceStore";
 
 const CollectionWidget = observer<{
-    item: Layer;
+  item: Layer;
 }>(function GroupComponentBase({ item }) {
-    return (
-        <Area pad>
-            <LotMV
-                label={gettext("Display name")}
-                value={item.displayName}
-                component={InputValue}
-            />
-            <LotMV
-                label={gettext("Keyname")}
-                value={item.keyname}
-                component={InputValue}
-            />
-            <LotMV
-                label={gettext("Min scale")}
-                value={item.minScaleDenom}
-                component={InputScaleDenom}
-            />
-            <LotMV
-                label={gettext("Max scale")}
-                value={item.maxScaleDenom}
-                component={InputScaleDenom}
-            />
-            <LotMV
-                label={gettext("Resource")}
-                value={item.resourceId}
-                component={ResourceSelect}
-                props={{
-                    readOnly: true,
-                    style: { width: "100%" },
-                    pickerOptions: {
-                        initParentId: item.store.composite.parent,
-                    },
-                }}
-            />
-        </Area>
-    );
+  return (
+    <Area pad>
+      <LotMV
+        label={gettext("Display name")}
+        value={item.displayName}
+        component={InputValue}
+      />
+      <LotMV
+        label={gettext("Keyname")}
+        value={item.keyname}
+        component={InputValue}
+      />
+      <LotMV
+        label={gettext("Min scale")}
+        value={item.minScaleDenom}
+        component={InputScaleDenom}
+      />
+      <LotMV
+        label={gettext("Max scale")}
+        value={item.maxScaleDenom}
+        component={InputScaleDenom}
+      />
+      <LotMV
+        label={gettext("Resource")}
+        value={item.resourceId}
+        component={ResourceSelect}
+        props={{
+          readOnly: true,
+          style: { width: "100%" },
+          pickerOptions: {
+            initParentId: item.store.composite.parent,
+          },
+        }}
+      />
+    </Area>
+  );
 });
 
 export const ServiceWidget: EditorWidget<ServiceStore> = observer(
-    ({ store }) => {
-        const { makeSignal } = useAbortController();
+  ({ store }) => {
+    const { makeSignal } = useAbortController();
 
-        const { pickToFocusTable } = useFocusTablePicker({
-            initParentId: store.composite.parent ?? undefined,
-        });
+    const { pickToFocusTable } = useFocusTablePicker({
+      initParentId: store.composite.parent ?? undefined,
+    });
 
-        const { tableActions, itemActions } = useMemo<
-            FocusTablePropsActions<Layer>
-        >(
-            () => ({
-                tableActions: [
-                    pickToFocusTable(
-                        async (res) => {
-                            const displayName = await getEffectiveDisplayName(
-                                res,
-                                {
-                                    signal: makeSignal(),
-                                }
-                            );
-                            return new Layer(store, {
-                                resource_id: res.id,
-                                display_name: displayName,
-                                keyname: generateResourceKeyname(res),
-                                min_scale_denom: null,
-                                max_scale_denom: null,
-                            });
-                        },
-                        {
-                            pickerOptions: {
-                                requireInterface: "IRenderableStyle",
-                                multiple: true,
-                            },
-                        }
-                    ),
-                ],
-                itemActions: [action.deleteItem()],
-            }),
-            [pickToFocusTable, store, makeSignal]
-        );
+    const { tableActions, itemActions } = useMemo<
+      FocusTablePropsActions<Layer>
+    >(
+      () => ({
+        tableActions: [
+          pickToFocusTable(
+            async (res) => {
+              const displayName = await getEffectiveDisplayName(res, {
+                signal: makeSignal(),
+              });
+              return new Layer(store, {
+                resource_id: res.id,
+                display_name: displayName,
+                keyname: generateResourceKeyname(res),
+                min_scale_denom: null,
+                max_scale_denom: null,
+              });
+            },
+            {
+              pickerOptions: {
+                requireInterface: "IRenderableStyle",
+                multiple: true,
+              },
+            }
+          ),
+        ],
+        itemActions: [action.deleteItem()],
+      }),
+      [pickToFocusTable, store, makeSignal]
+    );
 
-        return (
-            <FocusTable<Layer>
-                store={store}
-                title={(item) => item.displayName.value}
-                columns={[
-                    {
-                        render: (l: Layer) => l.keyname.value,
-                        width: ["25%", "50%"],
-                    },
-                ]}
-                tableActions={tableActions}
-                itemActions={itemActions}
-                renderDetail={({ item }) => <CollectionWidget item={item} />}
-            />
-        );
-    }
+    return (
+      <FocusTable<Layer>
+        store={store}
+        title={(item) => item.displayName.value}
+        columns={[
+          {
+            render: (l: Layer) => l.keyname.value,
+            width: ["25%", "50%"],
+          },
+        ]}
+        tableActions={tableActions}
+        itemActions={itemActions}
+        renderDetail={({ item }) => <CollectionWidget item={item} />}
+      />
+    );
+  }
 );
 
 ServiceWidget.displayName = "ServiceWidget";

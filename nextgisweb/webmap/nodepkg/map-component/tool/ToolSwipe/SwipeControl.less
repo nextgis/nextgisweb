@@ -1,141 +1,141 @@
 .ol-swipe {
-    -webkit-transform: translate(-50%, -50%);
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50%, -50%);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .ol-swipe:before {
-    -webkit-transform: translate(-2px, 0);
-    position: absolute;
-    top: -5000px;
-    bottom: -5000px;
-    left: 50%;
-    transform: translate(-2px, 0);
-    z-index: -1;
-    background: #fff;
-    width: 4px;
-    content: "";
+  -webkit-transform: translate(-2px, 0);
+  position: absolute;
+  top: -5000px;
+  bottom: -5000px;
+  left: 50%;
+  transform: translate(-2px, 0);
+  z-index: -1;
+  background: #fff;
+  width: 4px;
+  content: "";
 }
 .ol-swipe.horizontal:before {
-    top: 50%;
-    right: -5000px;
-    bottom: auto;
-    left: -5000px;
-    width: auto;
-    height: 4px;
+  top: 50%;
+  right: -5000px;
+  bottom: auto;
+  left: -5000px;
+  width: auto;
+  height: 4px;
 }
 
 .ol-swipe:not(.horizontal),
 .ol-swipe:not(.horizontal) button {
-    cursor: ew-resize !important;
+  cursor: ew-resize !important;
 }
 
 .ol-swipe.horizontal,
 .ol-swipe.horizontal button {
-    cursor: ns-resize !important;
+  cursor: ns-resize !important;
 }
 
 .ol-swipe button,
 .ol-swipe button:hover,
 .ol-swipe button:focus,
 .ol-swipe button:active {
-    background-color: var(--accent) !important;
+  background-color: var(--accent) !important;
 }
 
 .ol-swipe.horizontal,
 .ol-swipe.horizontal button {
-    cursor: ns-resize;
+  cursor: ns-resize;
 }
 
 .ol-swipe:after,
 .ol-swipe button:before,
 .ol-swipe button:after {
-    position: absolute;
-    top: 25%;
-    bottom: 25%;
-    left: 50%;
-    background: rgba(255, 255, 255, 0.8);
-    width: 2px;
-    content: "";
+  position: absolute;
+  top: 25%;
+  bottom: 25%;
+  left: 50%;
+  background: rgba(255, 255, 255, 0.8);
+  width: 2px;
+  content: "";
 }
 .ol-swipe:after {
-    /* Set the sandwich midle stick in correct position */
-    transform: translate(-1px, 0);
+  /* Set the sandwich midle stick in correct position */
+  transform: translate(-1px, 0);
 }
 .ol-swipe button:before {
-    transform: translateX(-7px);
+  transform: translateX(-7px);
 }
 
 .ol-swipe button:after {
-    transform: translateX(5px);
+  transform: translateX(5px);
 }
 
 .ol-swipe.horizontal:after,
 .ol-swipe.horizontal button:before,
 .ol-swipe.horizontal button:after {
-    top: 50%;
-    right: 25%;
-    bottom: auto;
-    left: 25%;
-    width: auto;
-    height: 2px;
+  top: 50%;
+  right: 25%;
+  bottom: auto;
+  left: 25%;
+  width: auto;
+  height: 2px;
 }
 
 .ol-swipe.horizontal:after {
-    transform: translate(0, -1px);
+  transform: translate(0, -1px);
 }
 
 .ol-swipe.horizontal button:before {
-    transform: translateY(-7px);
+  transform: translateY(-7px);
 }
 
 .ol-swipe.horizontal button:after {
-    transform: translateY(5px);
+  transform: translateY(5px);
 }
 
 .ol-swipe .ol-swipe-toggle {
-    display: flex;
-    position: absolute;
-    top: -40px;
-    left: 50%;
-    justify-content: center;
-    align-items: center;
-    transform: translateX(-50%);
-    z-index: 1;
-    cursor: pointer;
-    border: 2px solid var(--accent);
-    border-radius: 50%;
-    background-color: white;
-    padding: 0;
-    width: 16px;
-    height: 16px;
+  display: flex;
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  justify-content: center;
+  align-items: center;
+  transform: translateX(-50%);
+  z-index: 1;
+  cursor: pointer;
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+  background-color: white;
+  padding: 0;
+  width: 16px;
+  height: 16px;
 }
 
 .ol-swipe .ol-swipe-toggle:hover {
-    background-color: var(--accent);
+  background-color: var(--accent);
 }
 
 .ol-swipe .ol-swipe-toggle:hover svg {
-    stroke: white;
+  stroke: white;
 }
 
 .ol-swipe .ol-swipe-toggle svg {
-    stroke: var(--accent);
-    transition: transform 0s ease;
+  transition: transform 0s ease;
+  stroke: var(--accent);
 }
 
 .ol-swipe.horizontal .ol-swipe-toggle {
-    top: 50%;
-    left: -40px;
-    transform: translateY(-50%);
+  top: 50%;
+  left: -40px;
+  transform: translateY(-50%);
 }
 
 .ol-swipe.horizontal .ol-swipe-toggle svg {
-    transform: rotate(90deg);
+  transform: rotate(90deg);
 }
 
 .ol-swipe .ol-swipe-toggle:focus {
-    outline: none;
+  outline: none;
 }

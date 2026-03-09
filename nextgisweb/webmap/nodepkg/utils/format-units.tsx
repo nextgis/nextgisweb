@@ -18,30 +18,30 @@ const msgSiHa = gettext("ha");
 const msgSiAc = gettext("ac");
 
 export interface DefaultConfig {
-    format: "html-string" | "jsx";
-    locale: string;
+  format: "html-string" | "jsx";
+  locale: string;
 }
 
 const defaultConfig: DefaultConfig = {
-    format: "html-string",
-    locale: "en",
+  format: "html-string",
+  locale: "en",
 };
 
 export const roundValue = (num: number, places: number) => {
-    return (
-        Math.round((num + Number.EPSILON) * Math.pow(10, places)) /
-        Math.pow(10, places)
-    );
+  return (
+    Math.round((num + Number.EPSILON) * Math.pow(10, places)) /
+    Math.pow(10, places)
+  );
 };
 
 const formatPlacesValue = (value: number): number => {
-    let places;
-    if (value > 0 && value < 1) {
-        places = Math.floor(-Math.log10(value)) + 4;
-    } else {
-        places = 2;
-    }
-    return roundValue(value, places);
+  let places;
+  if (value > 0 && value < 1) {
+    places = Math.floor(-Math.log10(value)) + 4;
+  } else {
+    places = 2;
+  }
+  return roundValue(value, places);
 };
 
 /**
@@ -50,140 +50,140 @@ const formatPlacesValue = (value: number): number => {
  * @param {string} locale - e.g. 'en'
  */
 const formatLocaleNumber = (value: number, locale: string): string => {
-    return value.toLocaleString(locale);
+  return value.toLocaleString(locale);
 };
 
 const makeDomResult = (
-    value: string,
-    postfix: React.ReactElement | string,
-    format: "html-string" | "jsx"
+  value: string,
+  postfix: React.ReactElement | string,
+  format: "html-string" | "jsx"
 ): string | React.ReactElement => {
-    const domResult = (
-        <>
-            {value} {postfix}
-        </>
-    );
-    if (format === "html-string") {
-        return `${value} ${postfix}`;
-    } else if (format === "jsx") {
-        return domResult;
-    } else {
-        throw Error(`Unknown format for units: ${format}`);
-    }
+  const domResult = (
+    <>
+      {value} {postfix}
+    </>
+  );
+  if (format === "html-string") {
+    return `${value} ${postfix}`;
+  } else if (format === "jsx") {
+    return domResult;
+  } else {
+    throw Error(`Unknown format for units: ${format}`);
+  }
 };
 
 interface MetersResult {
-    value: number;
-    postfix: React.ReactElement | string;
+  value: number;
+  postfix: React.ReactElement | string;
 }
 
 const metersLengthToUnit = (
-    meters: number,
-    unit: LengthUnits
+  meters: number,
+  unit: LengthUnits
 ): MetersResult => {
-    let resultValue;
-    let postfix;
+  let resultValue;
+  let postfix;
 
-    switch (unit) {
-        case "km":
-            resultValue = meters * m_to_km;
-            postfix = msgSiKm;
-            break;
-        case "metric":
-            if (meters > 1000) {
-                resultValue = meters * m_to_km;
-                postfix = msgSiKm;
-            } else {
-                resultValue = meters;
-                postfix = msgSiM;
-            }
-            break;
-        case "ft":
-            resultValue = meters * m_to_ft;
-            postfix = msgSiFt;
-            break;
-        case "mi":
-            resultValue = meters * m_to_ft * ft_to_mi;
-            postfix = msgSiMi;
-            break;
-        case "imperial":
-            resultValue = meters * m_to_ft;
-            if (resultValue > 5280) {
-                resultValue = resultValue * ft_to_mi;
-                postfix = msgSiMi;
-            } else {
-                resultValue = meters;
-                postfix = msgSiFt;
-            }
-            break;
-        case "m":
-            resultValue = meters;
-            postfix = msgSiM;
-            break;
-    }
+  switch (unit) {
+    case "km":
+      resultValue = meters * m_to_km;
+      postfix = msgSiKm;
+      break;
+    case "metric":
+      if (meters > 1000) {
+        resultValue = meters * m_to_km;
+        postfix = msgSiKm;
+      } else {
+        resultValue = meters;
+        postfix = msgSiM;
+      }
+      break;
+    case "ft":
+      resultValue = meters * m_to_ft;
+      postfix = msgSiFt;
+      break;
+    case "mi":
+      resultValue = meters * m_to_ft * ft_to_mi;
+      postfix = msgSiMi;
+      break;
+    case "imperial":
+      resultValue = meters * m_to_ft;
+      if (resultValue > 5280) {
+        resultValue = resultValue * ft_to_mi;
+        postfix = msgSiMi;
+      } else {
+        resultValue = meters;
+        postfix = msgSiFt;
+      }
+      break;
+    case "m":
+      resultValue = meters;
+      postfix = msgSiM;
+      break;
+  }
 
-    return {
-        value: resultValue,
-        postfix,
-    };
+  return {
+    value: resultValue,
+    postfix,
+  };
 };
 
 const metersAreaToUnit = (meters: number, unit: AreaUnits): MetersResult => {
-    let resultValue;
-    let postfix;
+  let resultValue;
+  let postfix;
 
-    const addSupSquare = (val: string) => `${val}²`;
+  const addSupSquare = (val: string) => `${val}²`;
 
-    switch (unit) {
-        case "sq_km":
-            resultValue = meters * m_to_km * m_to_km;
-            postfix = addSupSquare(msgSiKm);
-            break;
-        case "metric":
-            if (meters > 1e5) {
-                resultValue = meters * m_to_km * m_to_km;
-                postfix = addSupSquare(msgSiKm);
-            } else {
-                resultValue = meters;
-                postfix = addSupSquare(msgSiM);
-            }
-            break;
-        case "ha":
-            resultValue = meters * m2_to_ha;
-            postfix = msgSiHa;
-            break;
-        case "ac":
-            resultValue = meters * m2_to_ac;
-            postfix = msgSiAc;
-            break;
-        case "sq_mi":
-            resultValue = meters * m2_to_ac * ac_to_mi2;
-            postfix = addSupSquare(msgSiMi);
-            break;
-        case "imperial":
-            resultValue = meters * m2_to_ac;
-            if (resultValue > 640 * 100) {
-                resultValue = resultValue * ac_to_mi2;
-                postfix = addSupSquare(msgSiMi);
-            } else {
-                resultValue = meters;
-                postfix = msgSiAc;
-            }
-            break;
-        case "sq_ft":
-            resultValue = meters * m_to_ft * m_to_ft;
-            postfix = addSupSquare(msgSiFt);
-            break;
-        case "sq_m":
-            resultValue = meters;
-            postfix = addSupSquare(msgSiM);
-            break;
-    }
+  switch (unit) {
+    case "sq_km":
+      resultValue = meters * m_to_km * m_to_km;
+      postfix = addSupSquare(msgSiKm);
+      break;
+    case "metric":
+      if (meters > 1e5) {
+        resultValue = meters * m_to_km * m_to_km;
+        postfix = addSupSquare(msgSiKm);
+      } else {
+        resultValue = meters;
+        postfix = addSupSquare(msgSiM);
+      }
+      break;
+    case "ha":
+      resultValue = meters * m2_to_ha;
+      postfix = msgSiHa;
+      break;
+    case "ac":
+      resultValue = meters * m2_to_ac;
+      postfix = msgSiAc;
+      break;
+    case "sq_mi":
+      resultValue = meters * m2_to_ac * ac_to_mi2;
+      postfix = addSupSquare(msgSiMi);
+      break;
+    case "imperial":
+      resultValue = meters * m2_to_ac;
+      if (resultValue > 640 * 100) {
+        resultValue = resultValue * ac_to_mi2;
+        postfix = addSupSquare(msgSiMi);
+      } else {
+        resultValue = meters;
+        postfix = msgSiAc;
+      }
+      break;
+    case "sq_ft":
+      resultValue = meters * m_to_ft * m_to_ft;
+      postfix = addSupSquare(msgSiFt);
+      break;
+    case "sq_m":
+      resultValue = meters;
+      postfix = addSupSquare(msgSiM);
+      break;
+  }
 
-    return {
-        value: resultValue,
-        postfix,
-    };
+  return {
+    value: resultValue,
+    postfix,
+  };
 };
 
 /**
@@ -192,11 +192,11 @@ const metersAreaToUnit = (meters: number, unit: AreaUnits): MetersResult => {
  * @param {string} locale - Locale, e.g. 'en'
  */
 export const formatCoordinatesValue = (
-    value: number,
-    locale?: string
+  value: number,
+  locale?: string
 ): string => {
-    const numberRound = roundValue(value, 2);
-    return numberRound.toLocaleString(locale);
+  const numberRound = roundValue(value, 2);
+  return numberRound.toLocaleString(locale);
 };
 
 /**
@@ -205,16 +205,16 @@ export const formatCoordinatesValue = (
  * @return {number} Decimal places to rounding
  */
 export const getDecPlacesRoundCoordByProj = (proj: Projection): number => {
-    const units = proj.getUnits();
-    switch (units) {
-        case "degrees":
-            return 2;
-        case "m":
-        case "ft":
-        case "us-ft":
-        default:
-            return 0;
-    }
+  const units = proj.getUnits();
+  switch (units) {
+    case "degrees":
+      return 2;
+    case "m":
+    case "ft":
+    case "us-ft":
+    default:
+      return 0;
+  }
 };
 
 /**
@@ -223,13 +223,13 @@ export const getDecPlacesRoundCoordByProj = (proj: Projection): number => {
  * @param {number} places - decimal places to rounding
  */
 export const roundCoords = (
-    coords: number | number[],
-    places: number
+  coords: number | number[],
+  places: number
 ): number | number[] => {
-    if (coords instanceof Array) {
-        return coords.map((c) => roundValue(c, places));
-    }
-    return roundValue(coords, places);
+  if (coords instanceof Array) {
+    return coords.map((c) => roundValue(c, places));
+  }
+  return roundValue(coords, places);
 };
 
 /**
@@ -241,16 +241,16 @@ export const roundCoords = (
  * @param {string} config.locale - locale
  */
 export const formatMetersLength = (
-    meters: number,
-    unit: LengthUnits,
-    config?: DefaultConfig
+  meters: number,
+  unit: LengthUnits,
+  config?: DefaultConfig
 ) => {
-    const _config = config || defaultConfig;
+  const _config = config || defaultConfig;
 
-    const { value, postfix } = metersLengthToUnit(meters, unit);
-    const placeValue = formatPlacesValue(value);
-    const localNumber = formatLocaleNumber(placeValue, _config.locale);
-    return makeDomResult(localNumber, postfix, _config.format);
+  const { value, postfix } = metersLengthToUnit(meters, unit);
+  const placeValue = formatPlacesValue(value);
+  const localNumber = formatLocaleNumber(placeValue, _config.locale);
+  return makeDomResult(localNumber, postfix, _config.format);
 };
 
 /**
@@ -262,14 +262,14 @@ export const formatMetersLength = (
  * @param {string} config.locale - locale
  */
 export const formatMetersArea = (
-    meters: number,
-    unit: AreaUnits,
-    config?: DefaultConfig
+  meters: number,
+  unit: AreaUnits,
+  config?: DefaultConfig
 ) => {
-    const _config = config || defaultConfig;
+  const _config = config || defaultConfig;
 
-    const { value, postfix } = metersAreaToUnit(meters, unit);
-    const placeValue = formatPlacesValue(value);
-    const localNumber = formatLocaleNumber(placeValue, _config.locale);
-    return makeDomResult(localNumber, postfix, _config.format);
+  const { value, postfix } = metersAreaToUnit(meters, unit);
+  const placeValue = formatPlacesValue(value);
+  const localNumber = formatLocaleNumber(placeValue, _config.locale);
+  return makeDomResult(localNumber, postfix, _config.format);
 };

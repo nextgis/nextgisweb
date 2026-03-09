@@ -1,48 +1,48 @@
 .ngw-webmap-display-navigation-menu {
+  display: flex;
+  gap: 6px;
+  box-sizing: border-box;
+  background-color: var(--primary);
+  padding: 4px;
+  overflow: auto;
+  color: var(--on-primary-text);
+
+  &.vertical {
+    flex-direction: column;
+    width: 50px;
+    height: 100%;
+  }
+
+  &.horizontal {
+    flex-direction: row;
+    width: 100%;
+    height: 40px;
+  }
+
+  > .item {
     display: flex;
-    gap: 6px;
-    box-sizing: border-box;
-    background-color: var(--primary);
-    padding: 4px;
-    overflow: auto;
-    color: var(--on-primary-text);
+    flex-shrink: 0;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
 
-    &.vertical {
-        flex-direction: column;
-        width: 50px;
-        height: 100%;
+    & > svg.icon {
+      opacity: 0.5;
+      font-size: 24px;
     }
 
-    &.horizontal {
-        flex-direction: row;
-        width: 100%;
-        height: 40px;
+    &.active > svg.icon,
+    &:hover > svg.icon {
+      opacity: 1;
     }
+  }
 
-    > .item {
-        display: flex;
-        flex-shrink: 0;
-        justify-content: center;
-        align-items: center;
-        cursor: pointer;
-        user-select: none;
+  &.vertical > .item {
+    height: 32px;
+  }
 
-        & > svg.icon {
-            opacity: 0.5;
-            font-size: 24px;
-        }
-
-        &.active > svg.icon,
-        &:hover > svg.icon {
-            opacity: 1;
-        }
-    }
-
-    &.vertical > .item {
-        height: 32px;
-    }
-
-    &.horizontal > .item {
-        width: 32px;
-    }
+  &.horizontal > .item {
+    width: 32px;
+  }
 }

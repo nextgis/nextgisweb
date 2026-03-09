@@ -4,33 +4,31 @@ import { AttachmentPreviewGroup } from "../image-thumbnail/component/AttachmentP
 import type { AttachmentTableProps } from "./AttachmentTable";
 
 export function AttachmentImages({
-    attachments,
-    resourceId,
-    featureId,
-    isSmall,
+  attachments,
+  resourceId,
+  featureId,
+  isSmall,
 }: AttachmentTableProps) {
-    const size = isSmall ? 64 : 128;
+  const size = isSmall ? 64 : 128;
 
-    return (
-        <AttachmentPreviewGroup
-            attachments={attachments}
+  return (
+    <AttachmentPreviewGroup
+      attachments={attachments}
+      resourceId={resourceId}
+      featureId={featureId}
+    >
+      {attachments.map((attachment, index) => {
+        return (
+          <ImageThumbnail
+            key={attachment.id ?? attachment.name ?? `index-${index}`}
+            attachment={attachment}
             resourceId={resourceId}
             featureId={featureId}
-        >
-            {attachments.map((attachment, index) => {
-                return (
-                    <ImageThumbnail
-                        key={
-                            attachment.id ?? attachment.name ?? `index-${index}`
-                        }
-                        attachment={attachment}
-                        resourceId={resourceId}
-                        featureId={featureId}
-                        width={size}
-                        height={size}
-                    />
-                );
-            })}
-        </AttachmentPreviewGroup>
-    );
+            width={size}
+            height={size}
+          />
+        );
+      })}
+    </AttachmentPreviewGroup>
+  );
 }

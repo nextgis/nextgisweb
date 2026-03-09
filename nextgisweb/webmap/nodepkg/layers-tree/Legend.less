@@ -1,33 +1,33 @@
 .legend-block {
+  display: flex;
+  row-gap: 2px;
+  flex-direction: column;
+
+  &.checkable {
+    margin-left: -20px;
+  }
+
+  &.uncheckable {
+    margin-left: 0px;
+  }
+
+  > .legend-symbol {
     display: flex;
-    row-gap: 2px;
-    flex-direction: column;
+    column-gap: 4px;
+    align-items: center;
+    min-height: 20px;
+    font-size: 13px;
+    line-height: 20px;
 
-    &.checkable {
-        margin-left: -20px;
+    > .ant-checkbox-wrapper {
+      align-self: start;
+      scale: 0.75;
     }
 
-    &.uncheckable {
-        margin-left: 0px;
+    > .legend-title {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
-
-    > .legend-symbol {
-        display: flex;
-        column-gap: 4px;
-        align-items: center;
-        min-height: 20px;
-        font-size: 13px;
-        line-height: 20px;
-
-        > .ant-checkbox-wrapper {
-            align-self: start;
-            scale: 0.75;
-        }
-
-        > .legend-title {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-    }
+  }
 }

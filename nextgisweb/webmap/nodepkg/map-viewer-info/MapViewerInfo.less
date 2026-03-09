@@ -1,46 +1,46 @@
 .map-viewer-info {
+  display: flex;
+  position: relative;
+  align-items: center;
+  margin: 0;
+  border-radius: 3px;
+  background-color: white;
+  padding: 0;
+  height: auto;
+
+  .coordinates {
     display: flex;
-    position: relative;
-    align-items: center;
-    margin: 0;
-    border-radius: 3px;
-    background-color: white;
-    padding: 0;
-    height: auto;
+    justify-content: space-around;
+    z-index: 1;
+    padding: 0 10px 0 10px;
+    color: gray;
+    font-size: 0.8em;
+    white-space: nowrap;
 
-    .coordinates {
-        display: flex;
-        justify-content: space-around;
-        z-index: 1;
-        padding: 0 10px 0 10px;
-        color: gray;
-        font-size: 0.8em;
-        white-space: nowrap;
-
-        &.type-mouse.round-0 {
-            width: 135px;
-        }
-
-        &.type-extent.round-0 {
-            width: 230px;
-        }
-
-        &.type-mouse.round-2 {
-            width: 100px;
-        }
-
-        &.type-extent.round-2 {
-            width: 160px;
-        }
+    &.type-mouse.round-0 {
+      width: 135px;
     }
 
-    .switch {
-        vertical-align: -3px;
-        border-radius: 2px;
-        padding: 0.4px 0;
-        width: 28px;
-        // TODO: make relative
-        height: 27px;
-        font-size: 15px;
+    &.type-extent.round-0 {
+      width: 230px;
     }
+
+    &.type-mouse.round-2 {
+      width: 100px;
+    }
+
+    &.type-extent.round-2 {
+      width: 160px;
+    }
+  }
+
+  .switch {
+    vertical-align: -3px;
+    border-radius: 2px;
+    padding: 0.4px 0;
+    width: 28px;
+    // TODO: make relative
+    height: 27px;
+    font-size: 15px;
+  }
 }

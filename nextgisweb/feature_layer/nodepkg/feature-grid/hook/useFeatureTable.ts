@@ -14,26 +14,26 @@ import { createCacheKey } from "../util/createCacheKey";
 import { fetchWrapper } from "../util/fetchWrapper";
 
 const debouncedFn = debounce((fn) => {
-    fn();
+  fn();
 }, 100);
 
 export type QueryParams = Partial<
-    Pick<FetchFeaturesOptions, "ilike" | "like" | "intersects"> & {
-        filter?: FilterExpressionString;
-    }
+  Pick<FetchFeaturesOptions, "ilike" | "like" | "intersects"> & {
+    filter?: FilterExpressionString;
+  }
 >;
 
 export interface UseFeatureTableProps {
-    total: number;
-    queryParams?: QueryParams;
-    columns: FeatureLayerFieldCol[];
-    version?: number;
-    orderBy?: OrderBy;
-    pageSize: number;
-    tbodyRef?: RefObject<HTMLDivElement | null>;
-    resourceId: number;
-    rowMinHeight: number;
-    visibleFields: number[];
+  total: number;
+  queryParams?: QueryParams;
+  columns: FeatureLayerFieldCol[];
+  version?: number;
+  orderBy?: OrderBy;
+  pageSize: number;
+  tbodyRef?: RefObject<HTMLDivElement | null>;
+  resourceId: number;
+  rowMinHeight: number;
+  visibleFields: number[];
 }
 
 /**
@@ -93,236 +93,233 @@ export interface UseFeatureTableProps {
  *            the `lack` of these items `indicates` that there are `no more pages`
  */
 export function useFeatureTable({
-    total,
+  total,
+  columns,
+  version,
+  orderBy,
+  pageSize,
+  tbodyRef,
+  resourceId,
+  queryParams,
+  rowMinHeight,
+  visibleFields,
+}: UseFeatureTableProps) {
+  const [pages, setPages] = useState<number[]>([]);
+  const [hasNextPage, setHasNextPage] = useState(false);
+  const [queryTotal, setQueryTotal] = useState(0);
+
+  const { makeSignal, abort } = useAbortController();
+
+  const loaderCache = useRef<LoaderCache<FeatureAttrs[]>>(null);
+
+  const [data, setData_] = useState<FeatureAttrs[]>([]);
+
+  const setData = (attributes: FeatureAttrs[]) => {
+    setData_((old) => {
+      if (!old.length && !attributes.length) {
+        return old;
+      }
+      return attributes;
+    });
+  };
+
+  const queryMode = useMemo<boolean>(
+    () => !!queryParams && Object.values(queryParams).some(Boolean),
+    [queryParams]
+  );
+
+  const handleFeatures = useCallback(
+    (attributes: FeatureAttrs[]) => {
+      let rowIndex = pages[0];
+      for (const f of attributes) {
+        f.__rowIndex = rowIndex++;
+      }
+      const hasNewPage = attributes.length / pages.length >= pageSize;
+      setHasNextPage(hasNewPage);
+      if (queryMode) {
+        const toSize = pages[0] + pageSize * pages.length;
+        const newTotal = hasNewPage
+          ? toSize + pageSize
+          : toSize - (pageSize - (attributes.length % pageSize));
+        setQueryTotal(newTotal);
+      }
+      setData(attributes);
+    },
+    [pageSize, pages, queryMode]
+  );
+
+  const queryFn = useCallback(async () => {
+    abort();
+    if (pages.length) {
+      const cache = loaderCache.current;
+      assert(cache);
+
+      const cacheKeys = pages.map((page) => ({
+        page,
+        key: createCacheKey({
+          visibleFields,
+          pageSize,
+          version,
+          orderBy,
+          page,
+          ...queryParams,
+        }),
+      }));
+      const allPageLoaded = cacheKeys.every((c) => {
+        cache.fulfilled(c.key);
+      });
+
+      if (allPageLoaded) {
+        const attrs = (
+          await Promise.all<FeatureAttrs[]>(
+            cacheKeys.map((c) => {
+              return cache.resolve(c.key);
+            })
+          )
+        ).flat();
+        handleFeatures(attrs);
+      } else {
+        const signal = makeSignal();
+        const promises = [];
+        for (const { key, page } of cacheKeys) {
+          if (pages.includes(page)) {
+            promises.push(
+              fetchWrapper({
+                key,
+                page,
+                cache,
+                signal,
+                columns,
+                orderBy,
+                pageSize,
+                resourceId,
+                queryParams,
+              })
+            );
+          }
+        }
+        const parts = await Promise.all(promises);
+        const attributes: FeatureAttrs[] = [];
+        // Fulfilled `parts` from `cache` are not cancelable and always return values
+        // Therefore, if there was aborted,
+        // the number of `features` will not mutch to the number of `pages`
+        if (parts.every(Boolean)) {
+          for (const p of parts.flat()) {
+            if (p) {
+              attributes.push(p);
+            }
+          }
+          handleFeatures(attributes);
+        }
+      }
+    }
+  }, [
+    pages,
     columns,
-    version,
     orderBy,
+    version,
     pageSize,
-    tbodyRef,
     resourceId,
     queryParams,
-    rowMinHeight,
     visibleFields,
-}: UseFeatureTableProps) {
-    const [pages, setPages] = useState<number[]>([]);
-    const [hasNextPage, setHasNextPage] = useState(false);
-    const [queryTotal, setQueryTotal] = useState(0);
+    handleFeatures,
+    makeSignal,
+    abort,
+  ]);
 
-    const { makeSignal, abort } = useAbortController();
+  const count = useMemo(
+    () => (queryMode ? queryTotal : total),
+    [queryMode, queryTotal, total]
+  );
 
-    const loaderCache = useRef<LoaderCache<FeatureAttrs[]>>(null);
+  const { getVirtualItems, measureElement, getTotalSize, scrollToIndex } =
+    useVirtualizer({
+      count,
+      getScrollElement: () => (tbodyRef ? tbodyRef.current : null),
+      estimateSize: () => rowMinHeight,
+    });
 
-    const [data, setData_] = useState<FeatureAttrs[]>([]);
+  const virtualItems = getVirtualItems();
 
-    const setData = (attributes: FeatureAttrs[]) => {
-        setData_((old) => {
-            if (!old.length && !attributes.length) {
-                return old;
-            }
-            return attributes;
-        });
-    };
+  useEffect(() => {
+    loaderCache.current = new LoaderCache();
+  }, []);
 
-    const queryMode = useMemo<boolean>(
-        () => !!queryParams && Object.values(queryParams).some(Boolean),
-        [queryParams]
-    );
+  useEffect(() => {
+    if (loaderCache.current) {
+      loaderCache.current.clean();
+    }
+  }, [total]);
 
-    const handleFeatures = useCallback(
-        (attributes: FeatureAttrs[]) => {
-            let rowIndex = pages[0];
-            for (const f of attributes) {
-                f.__rowIndex = rowIndex++;
-            }
-            const hasNewPage = attributes.length / pages.length >= pageSize;
-            setHasNextPage(hasNewPage);
-            if (queryMode) {
-                const toSize = pages[0] + pageSize * pages.length;
-                const newTotal = hasNewPage
-                    ? toSize + pageSize
-                    : toSize - (pageSize - (attributes.length % pageSize));
-                setQueryTotal(newTotal);
-            }
-            setData(attributes);
-        },
-        [pageSize, pages, queryMode]
-    );
-
-    const queryFn = useCallback(async () => {
-        abort();
-        if (pages.length) {
-            const cache = loaderCache.current;
-            assert(cache);
-
-            const cacheKeys = pages.map((page) => ({
-                page,
-                key: createCacheKey({
-                    visibleFields,
-                    pageSize,
-                    version,
-                    orderBy,
-                    page,
-                    ...queryParams,
-                }),
-            }));
-            const allPageLoaded = cacheKeys.every((c) => {
-                cache.fulfilled(c.key);
-            });
-
-            if (allPageLoaded) {
-                const attrs = (
-                    await Promise.all<FeatureAttrs[]>(
-                        cacheKeys.map((c) => {
-                            return cache.resolve(c.key);
-                        })
-                    )
-                ).flat();
-                handleFeatures(attrs);
-            } else {
-                const signal = makeSignal();
-                const promises = [];
-                for (const { key, page } of cacheKeys) {
-                    if (pages.includes(page)) {
-                        promises.push(
-                            fetchWrapper({
-                                key,
-                                page,
-                                cache,
-                                signal,
-                                columns,
-                                orderBy,
-                                pageSize,
-                                resourceId,
-                                queryParams,
-                            })
-                        );
-                    }
-                }
-                const parts = await Promise.all(promises);
-                const attributes: FeatureAttrs[] = [];
-                // Fulfilled `parts` from `cache` are not cancelable and always return values
-                // Therefore, if there was aborted,
-                // the number of `features` will not mutch to the number of `pages`
-                if (parts.every(Boolean)) {
-                    for (const p of parts.flat()) {
-                        if (p) {
-                            attributes.push(p);
-                        }
-                    }
-                    handleFeatures(attributes);
-                }
-            }
+  const prevTotal = useRef(total);
+  const prevVersion = useRef(version);
+  useEffect(() => {
+    if (prevVersion.current === version) {
+      if (total === prevTotal.current && pages.length && data.length) {
+        const firstDataIndex = data[0].__rowIndex;
+        const lastDataIndex = data[data.length - 1].__rowIndex;
+        const lastPageIndex = pages[0] + pageSize * pages.length - 1;
+        if (firstDataIndex !== undefined && lastDataIndex !== undefined) {
+          const currentDataInTheRange =
+            firstDataIndex === pages[0] &&
+            (hasNextPage
+              ? lastDataIndex === lastPageIndex
+              : lastDataIndex <= lastPageIndex);
+          if (currentDataInTheRange) {
+            return;
+          }
         }
-    }, [
-        pages,
-        columns,
-        orderBy,
-        version,
-        pageSize,
-        resourceId,
-        queryParams,
-        visibleFields,
-        handleFeatures,
-        makeSignal,
-        abort,
-    ]);
+      }
+    }
+    prevVersion.current = version;
+    debouncedFn(queryFn);
+  }, [hasNextPage, pageSize, queryFn, version, total, pages, data]);
 
-    const count = useMemo(
-        () => (queryMode ? queryTotal : total),
-        [queryMode, queryTotal, total]
-    );
+  // Update prevTotal only after useEffect with queryFn call!
+  useEffect(() => {
+    prevTotal.current = total;
+  }, [total]);
 
-    const { getVirtualItems, measureElement, getTotalSize, scrollToIndex } =
-        useVirtualizer({
-            count,
-            getScrollElement: () => (tbodyRef ? tbodyRef.current : null),
-            estimateSize: () => rowMinHeight,
-        });
+  useEffect(() => {
+    setData([]);
+  }, [orderBy, queryParams, visibleFields]);
 
-    const virtualItems = getVirtualItems();
+  useEffect(() => {
+    if (getTotalSize() && !total) {
+      scrollToIndex(0);
+    }
+    // to init first loading
+    setQueryTotal(pageSize);
+  }, [queryParams, pageSize, total, scrollToIndex, getTotalSize]);
 
-    useEffect(() => {
-        loaderCache.current = new LoaderCache();
-    }, []);
+  useEffect(() => {
+    const items = [...virtualItems];
 
-    useEffect(() => {
-        if (loaderCache.current) {
-            loaderCache.current.clean();
-        }
-    }, [total]);
+    if (items.length) {
+      const from = items[0].index;
+      // Trigger for loading at least one page
+      const to = items[items.length - 1].index + 1;
 
-    const prevTotal = useRef(total);
-    const prevVersion = useRef(version);
-    useEffect(() => {
-        if (prevVersion.current === version) {
-            if (total === prevTotal.current && pages.length && data.length) {
-                const firstDataIndex = data[0].__rowIndex;
-                const lastDataIndex = data[data.length - 1].__rowIndex;
-                const lastPageIndex = pages[0] + pageSize * pages.length - 1;
-                if (
-                    firstDataIndex !== undefined &&
-                    lastDataIndex !== undefined
-                ) {
-                    const currentDataInTheRange =
-                        firstDataIndex === pages[0] &&
-                        (hasNextPage
-                            ? lastDataIndex === lastPageIndex
-                            : lastDataIndex <= lastPageIndex);
-                    if (currentDataInTheRange) {
-                        return;
-                    }
-                }
-            }
-        }
-        prevVersion.current = version;
-        debouncedFn(queryFn);
-    }, [hasNextPage, pageSize, queryFn, version, total, pages, data]);
+      const fromPage = Math.floor(from / pageSize);
+      const toPage = Math.ceil(to / pageSize);
 
-    // Update prevTotal only after useEffect with queryFn call!
-    useEffect(() => {
-        prevTotal.current = total;
-    }, [total]);
+      const offsetsToLoad = Array.from(
+        { length: toPage - fromPage },
+        (_, idx) => (fromPage + idx) * pageSize
+      );
+      if (offsetsToLoad.length) {
+        setPages(offsetsToLoad);
+      }
+    }
+  }, [virtualItems, pageSize]);
 
-    useEffect(() => {
-        setData([]);
-    }, [orderBy, queryParams, visibleFields]);
-
-    useEffect(() => {
-        if (getTotalSize() && !total) {
-            scrollToIndex(0);
-        }
-        // to init first loading
-        setQueryTotal(pageSize);
-    }, [queryParams, pageSize, total, scrollToIndex, getTotalSize]);
-
-    useEffect(() => {
-        const items = [...virtualItems];
-
-        if (items.length) {
-            const from = items[0].index;
-            // Trigger for loading at least one page
-            const to = items[items.length - 1].index + 1;
-
-            const fromPage = Math.floor(from / pageSize);
-            const toPage = Math.ceil(to / pageSize);
-
-            const offsetsToLoad = Array.from(
-                { length: toPage - fromPage },
-                (_, idx) => (fromPage + idx) * pageSize
-            );
-            if (offsetsToLoad.length) {
-                setPages(offsetsToLoad);
-            }
-        }
-    }, [virtualItems, pageSize]);
-
-    return {
-        data,
-        queryMode,
-        queryTotal,
-        hasNextPage,
-        virtualItems,
-        getTotalSize,
-        measureElement,
-    };
+  return {
+    data,
+    queryMode,
+    queryTotal,
+    hasNextPage,
+    virtualItems,
+    getTotalSize,
+    measureElement,
+  };
 }

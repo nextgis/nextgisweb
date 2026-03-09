@@ -28,201 +28,191 @@ type PreviewProps = GetProp<typeof Image.PreviewGroup, "preview">;
 
 export type ImagePreviewProp = Exclude<PreviewProps, boolean>;
 export type ToolbarRenderInfoType = Parameters<
-    NonNullable<ImagePreviewProp["actionsRender"]>
+  NonNullable<ImagePreviewProp["actionsRender"]>
 >[1];
 
 const msgTogglePanorama = gettext("Toggle panorama viewer");
 
 function ToolbarButton(props: ButtonProps) {
-    return <Button type="text" {...props} />;
+  return <Button type="text" {...props} />;
 }
 
 interface AttachmentPreviewToolbarProps extends ToolbarRenderInfoType {
-    panoramaStore: PanoramaStore;
-    panoramaMode: boolean;
-    attachmentId: number;
-    attachment: Attachment;
-    onDownload: () => void;
-    togglePanoramaMode: () => void;
+  panoramaStore: PanoramaStore;
+  panoramaMode: boolean;
+  attachmentId: number;
+  attachment: Attachment;
+  onDownload: () => void;
+  togglePanoramaMode: () => void;
 }
 
 export const AttachmentPreviewToolbar = observer(
-    ({
-        onDownload,
-        togglePanoramaMode,
-        panoramaStore,
-        panoramaMode,
-        attachmentId,
-        attachment,
-        transform: { scale },
-        actions: { onRotateRight, onRotateLeft, onZoomOut, onZoomIn, onActive },
-        current,
-        total,
-    }: AttachmentPreviewToolbarProps) => {
-        const { description, isPanorama } = attachment;
-        const [expanded, setExpanded] = useState(false);
-        const [panoramaZoom, setPanoramaZoom] = useState<number | undefined>(
-            undefined
-        );
+  ({
+    onDownload,
+    togglePanoramaMode,
+    panoramaStore,
+    panoramaMode,
+    attachmentId,
+    attachment,
+    transform: { scale },
+    actions: { onRotateRight, onRotateLeft, onZoomOut, onZoomIn, onActive },
+    current,
+    total,
+  }: AttachmentPreviewToolbarProps) => {
+    const { description, isPanorama } = attachment;
+    const [expanded, setExpanded] = useState(false);
+    const [panoramaZoom, setPanoramaZoom] = useState<number | undefined>(
+      undefined
+    );
 
-        const toggleExpanded = () => {
-            setExpanded((prev) => !prev);
+    const toggleExpanded = () => {
+      setExpanded((prev) => !prev);
+    };
+
+    const { viewers } = panoramaStore;
+
+    const panoramaViewer = useMemo(() => {
+      return viewers.get(attachmentId);
+    }, [attachmentId, viewers]);
+
+    useEffect(() => {
+      if (!panoramaViewer) return;
+
+      panoramaViewer.navbar?.hide?.();
+
+      const onPanaramaZoomChange = () =>
+        setPanoramaZoom(panoramaViewer.getZoomLevel());
+
+      const onFullScreen = (e: any) => {
+        if (e.fullscreenEnabled) {
+          panoramaViewer.navbar?.setButtons?.(["zoom", "fullscreen", "move"]);
+          panoramaViewer.navbar?.show?.();
+        } else {
+          panoramaViewer.navbar?.hide?.();
+        }
+      };
+
+      panoramaViewer.addEventListener("fullscreen", onFullScreen);
+      panoramaViewer.addEventListener("zoom-updated", onPanaramaZoomChange);
+      return () => {
+        panoramaViewer.removeEventListener("fullscreen", onFullScreen);
+        panoramaViewer.removeEventListener(
+          "zoom-updated",
+          onPanaramaZoomChange
+        );
+      };
+    }, [panoramaViewer]);
+
+    const panoramaActive = isPanorama && panoramaMode && panoramaViewer;
+
+    const zoomInProps: ButtonProps = panoramaActive
+      ? {
+          disabled: !!(panoramaZoom && panoramaZoom >= 100),
+          onClick: () => panoramaViewer.zoomIn(20),
+        }
+      : {
+          disabled: scale >= 50,
+          onClick: onZoomIn,
         };
 
-        const { viewers } = panoramaStore;
+    const zoomOutProps: ButtonProps = panoramaActive
+      ? {
+          disabled: !!(panoramaZoom && panoramaZoom <= 0),
+          onClick: () => panoramaViewer.zoomOut(20),
+        }
+      : {
+          disabled: scale <= 1,
+          onClick: onZoomOut,
+        };
 
-        const panoramaViewer = useMemo(() => {
-            return viewers.get(attachmentId);
-        }, [attachmentId, viewers]);
+    const panoramaModeToggleProps: ButtonProps | undefined = isPanorama
+      ? {
+          icon: panoramaActive ? <PhotoIcon /> : <PanoramaIcon />,
+          title: msgTogglePanorama,
+          onClick: togglePanoramaMode,
+        }
+      : undefined;
 
-        useEffect(() => {
-            if (!panoramaViewer) return;
+    const themeVariables = useThemeVariables({
+      "theme-border-radius": "borderRadius",
+      "theme-color-text-light-solid": "colorTextLightSolid",
+      "theme-padding-xs": "paddingXS",
+    });
 
-            panoramaViewer.navbar?.hide?.();
+    return (
+      <div
+        className="ngw-feature-attachment-image-thumbnail-toolbar"
+        style={themeVariables}
+      >
+        {description && (
+          <Paragraph
+            className="name-or-description"
+            ellipsis={{
+              rows: 2,
+              expandable: "collapsible",
+              expanded: expanded,
+              onExpand: toggleExpanded,
+            }}
+          >
+            {description}
+          </Paragraph>
+        )}
+        <div className="toolbar">
+          {total > 1 && (
+            <>
+              <ToolbarButton
+                icon={<ChevronLeftIcon />}
+                disabled={current === 0}
+                onClick={() => onActive?.(-1)}
+              />
+              <ToolbarButton
+                style={{
+                  cursor: "unset",
+                  paddingInline: "8px",
+                }}
+              >
+                {current + 1} / {total}
+              </ToolbarButton>
+              <ToolbarButton
+                icon={<ChevronRightIcon />}
+                disabled={current + 1 === total}
+                onClick={() => onActive?.(+1)}
+              />
+            </>
+          )}
 
-            const onPanaramaZoomChange = () =>
-                setPanoramaZoom(panoramaViewer.getZoomLevel());
+          <ToolbarButton icon={<ZoomInIcon />} {...zoomInProps} />
+          <ToolbarButton icon={<ZoomOutIcon />} {...zoomOutProps} />
 
-            const onFullScreen = (e: any) => {
-                if (e.fullscreenEnabled) {
-                    panoramaViewer.navbar?.setButtons?.([
-                        "zoom",
-                        "fullscreen",
-                        "move",
-                    ]);
-                    panoramaViewer.navbar?.show?.();
-                } else {
-                    panoramaViewer.navbar?.hide?.();
-                }
-            };
+          {!panoramaActive && (
+            <>
+              <ToolbarButton
+                icon={<Rotate90DegreesCWIcon />}
+                onClick={onRotateRight}
+              />
+              <ToolbarButton
+                icon={<Rotate90DegreesCCWIcon />}
+                onClick={onRotateLeft}
+              />
+            </>
+          )}
 
-            panoramaViewer.addEventListener("fullscreen", onFullScreen);
-            panoramaViewer.addEventListener(
-                "zoom-updated",
-                onPanaramaZoomChange
-            );
-            return () => {
-                panoramaViewer.removeEventListener("fullscreen", onFullScreen);
-                panoramaViewer.removeEventListener(
-                    "zoom-updated",
-                    onPanaramaZoomChange
-                );
-            };
-        }, [panoramaViewer]);
+          {panoramaModeToggleProps && (
+            <ToolbarButton {...panoramaModeToggleProps} />
+          )}
 
-        const panoramaActive = isPanorama && panoramaMode && panoramaViewer;
+          {panoramaActive && (
+            <ToolbarButton
+              icon={<FullscreenIcon />}
+              onClick={() => panoramaViewer.enterFullscreen()}
+            />
+          )}
 
-        const zoomInProps: ButtonProps = panoramaActive
-            ? {
-                  disabled: !!(panoramaZoom && panoramaZoom >= 100),
-                  onClick: () => panoramaViewer.zoomIn(20),
-              }
-            : {
-                  disabled: scale >= 50,
-                  onClick: onZoomIn,
-              };
-
-        const zoomOutProps: ButtonProps = panoramaActive
-            ? {
-                  disabled: !!(panoramaZoom && panoramaZoom <= 0),
-                  onClick: () => panoramaViewer.zoomOut(20),
-              }
-            : {
-                  disabled: scale <= 1,
-                  onClick: onZoomOut,
-              };
-
-        const panoramaModeToggleProps: ButtonProps | undefined = isPanorama
-            ? {
-                  icon: panoramaActive ? <PhotoIcon /> : <PanoramaIcon />,
-                  title: msgTogglePanorama,
-                  onClick: togglePanoramaMode,
-              }
-            : undefined;
-
-        const themeVariables = useThemeVariables({
-            "theme-border-radius": "borderRadius",
-            "theme-color-text-light-solid": "colorTextLightSolid",
-            "theme-padding-xs": "paddingXS",
-        });
-
-        return (
-            <div
-                className="ngw-feature-attachment-image-thumbnail-toolbar"
-                style={themeVariables}
-            >
-                {description && (
-                    <Paragraph
-                        className="name-or-description"
-                        ellipsis={{
-                            rows: 2,
-                            expandable: "collapsible",
-                            expanded: expanded,
-                            onExpand: toggleExpanded,
-                        }}
-                    >
-                        {description}
-                    </Paragraph>
-                )}
-                <div className="toolbar">
-                    {total > 1 && (
-                        <>
-                            <ToolbarButton
-                                icon={<ChevronLeftIcon />}
-                                disabled={current === 0}
-                                onClick={() => onActive?.(-1)}
-                            />
-                            <ToolbarButton
-                                style={{
-                                    cursor: "unset",
-                                    paddingInline: "8px",
-                                }}
-                            >
-                                {current + 1} / {total}
-                            </ToolbarButton>
-                            <ToolbarButton
-                                icon={<ChevronRightIcon />}
-                                disabled={current + 1 === total}
-                                onClick={() => onActive?.(+1)}
-                            />
-                        </>
-                    )}
-
-                    <ToolbarButton icon={<ZoomInIcon />} {...zoomInProps} />
-                    <ToolbarButton icon={<ZoomOutIcon />} {...zoomOutProps} />
-
-                    {!panoramaActive && (
-                        <>
-                            <ToolbarButton
-                                icon={<Rotate90DegreesCWIcon />}
-                                onClick={onRotateRight}
-                            />
-                            <ToolbarButton
-                                icon={<Rotate90DegreesCCWIcon />}
-                                onClick={onRotateLeft}
-                            />
-                        </>
-                    )}
-
-                    {panoramaModeToggleProps && (
-                        <ToolbarButton {...panoramaModeToggleProps} />
-                    )}
-
-                    {panoramaActive && (
-                        <ToolbarButton
-                            icon={<FullscreenIcon />}
-                            onClick={() => panoramaViewer.enterFullscreen()}
-                        />
-                    )}
-
-                    <ToolbarButton
-                        icon={<DownloadIcon />}
-                        onClick={onDownload}
-                    />
-                </div>
-            </div>
-        );
-    }
+          <ToolbarButton icon={<DownloadIcon />} onClick={onDownload} />
+        </div>
+      </div>
+    );
+  }
 );
 
 AttachmentPreviewToolbar.displayName = "AttachmentPreviewToolbar";

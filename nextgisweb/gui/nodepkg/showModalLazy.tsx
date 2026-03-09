@@ -11,17 +11,17 @@ export { ShowModalOptions };
  * Use useShowModal instead.
  */
 export default function showModalLazy<
-    T extends ShowModalOptions = ShowModalOptions,
+  T extends ShowModalOptions = ShowModalOptions,
 >(getModalComponent: () => Promise<{ default: ComponentType<T> }>, config: T) {
-    const ModalComponent = lazy(
-        getModalComponent as () => Promise<{ default: ComponentType<any> }>
-    );
-    return showModalBase(
-        (props) => (
-            <Suspense fallback={null}>
-                <ModalComponent {...props} />
-            </Suspense>
-        ),
-        config
-    );
+  const ModalComponent = lazy(
+    getModalComponent as () => Promise<{ default: ComponentType<any> }>
+  );
+  return showModalBase(
+    (props) => (
+      <Suspense fallback={null}>
+        <ModalComponent {...props} />
+      </Suspense>
+    ),
+    config
+  );
 }

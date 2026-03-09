@@ -6,17 +6,17 @@ import OlControl from "./OlControl";
 import type { OlControlProps } from "./OlControl";
 
 export type ScaleLineControlProps = Omit<OlControlProps<ScaleLine>, "ctor"> & {
-    changeOnClick?: boolean;
-    scaleOptions?: ScaleLineOptions;
+  changeOnClick?: boolean;
+  scaleOptions?: ScaleLineOptions;
 };
 
 export default function ScaleLineControl({
-    scaleOptions,
-    ...props
+  scaleOptions,
+  ...props
 }: ScaleLineControlProps) {
-    const ctor = useCallback(() => {
-        return new ScaleLine(scaleOptions);
-    }, [scaleOptions]);
+  const ctor = useCallback(() => {
+    return new ScaleLine(scaleOptions);
+  }, [scaleOptions]);
 
-    return <OlControl ctor={ctor} {...props} />;
+  return <OlControl ctor={ctor} {...props} />;
 }

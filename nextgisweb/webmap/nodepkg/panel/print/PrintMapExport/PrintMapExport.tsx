@@ -18,150 +18,143 @@ import { legendItemsToModel, legendToModel } from "./legendToModel";
 import { DownOutlined } from "@ant-design/icons";
 
 interface ExportProps {
-    display: Display;
-    format: PrintFormat;
-    element: HTMLElement;
-    settings: Pick<PrintMapSettings, "width" | "height" | "margin">;
-    printMapStore: PrintMapStore;
-    setLoad: (loading: boolean) => void;
-    print?: boolean;
+  display: Display;
+  format: PrintFormat;
+  element: HTMLElement;
+  settings: Pick<PrintMapSettings, "width" | "height" | "margin">;
+  printMapStore: PrintMapStore;
+  setLoad: (loading: boolean) => void;
+  print?: boolean;
 }
 
 const runExport = ({
-    display,
-    format,
-    element,
-    settings,
-    printMapStore,
-    setLoad,
+  display,
+  format,
+  element,
+  settings,
+  printMapStore,
+  setLoad,
 }: ExportProps) => {
-    setLoad(true);
+  setLoad(true);
 
-    let toPngPromise;
-    try {
-        toPngPromise = toPng(element);
-    } catch {
-        setLoad(false);
-        return;
-    }
+  let toPngPromise;
+  try {
+    toPngPromise = toPng(element);
+  } catch {
+    setLoad(false);
+    return;
+  }
 
-    toPngPromise
-        .then((dataUrl) => {
-            const { width, height, margin } = settings;
+  toPngPromise
+    .then((dataUrl) => {
+      const { width, height, margin } = settings;
 
-            let legend;
-            if (printMapStore.layout.legendCoords.displayed) {
-                const legendItems = legendItemsToModel(
-                    printMapStore.webMapItems
-                );
-                legend = legendToModel(
-                    legendItems,
-                    printMapStore.layout.legendCoords
-                );
-            }
+      let legend;
+      if (printMapStore.layout.legendCoords.displayed) {
+        const legendItems = legendItemsToModel(printMapStore.webMapItems);
+        legend = legendToModel(legendItems, printMapStore.layout.legendCoords);
+      }
 
-            let title;
-            if (printMapStore.layout.titleCoords.displayed) {
-                const [titleEl] = document.querySelectorAll(
-                    "#printMap .print-title"
-                );
-                const content = titleEl.innerHTML;
-                title = { ...printMapStore.layout.titleCoords, content };
-            }
+      let title;
+      if (printMapStore.layout.titleCoords.displayed) {
+        const [titleEl] = document.querySelectorAll("#printMap .print-title");
+        const content = titleEl.innerHTML;
+        title = { ...printMapStore.layout.titleCoords, content };
+      }
 
-            const content = dataUrl.substring("data:image/png;base64,".length);
-            const map = { ...printMapStore.layout.mapCoords, content };
+      const content = dataUrl.substring("data:image/png;base64,".length);
+      const map = { ...printMapStore.layout.mapCoords, content };
 
-            const body: PrintBody = {
-                width,
-                height,
-                margin,
-                legend,
-                title,
-                map,
-                format,
-            };
+      const body: PrintBody = {
+        width,
+        height,
+        margin,
+        legend,
+        title,
+        map,
+        format,
+      };
 
-            const webmapId = display.config.webmapId;
-            route("webmap.print", { id: webmapId })
-                .post({ json: body })
-                .then((blob) => {
-                    const file = window.URL.createObjectURL(blob as Blob);
-                    const tab = window.open();
-                    if (tab) {
-                        tab.location.href = file;
-                        setLoad(false);
-                    }
-                })
-                .finally(() => {
-                    setLoad(false);
-                });
-        })
-        .catch(() => {
+      const webmapId = display.config.webmapId;
+      route("webmap.print", { id: webmapId })
+        .post({ json: body })
+        .then((blob) => {
+          const file = window.URL.createObjectURL(blob as Blob);
+          const tab = window.open();
+          if (tab) {
+            tab.location.href = file;
             setLoad(false);
+          }
+        })
+        .finally(() => {
+          setLoad(false);
         });
+    })
+    .catch(() => {
+      setLoad(false);
+    });
 };
 
 interface PrintMapExportProps {
-    printMapEl?: HTMLElement | null;
-    display: Display;
-    printMapStore: PrintMapStore;
+  printMapEl?: HTMLElement | null;
+  display: Display;
+  printMapStore: PrintMapStore;
 }
 
 export const PrintMapExport = observer(
-    ({ printMapEl, display, printMapStore }: PrintMapExportProps) => {
-        const [loadingFile, setLoadingFile] = useState(false);
-        const [loadingPrint, setLoadingPrint] = useState(false);
+  ({ printMapEl, display, printMapStore }: PrintMapExportProps) => {
+    const [loadingFile, setLoadingFile] = useState(false);
+    const [loadingPrint, setLoadingPrint] = useState(false);
 
-        const { height, margin, width } = printMapStore;
+    const { height, margin, width } = printMapStore;
 
-        const exportToFormat = (
-            format: PrintFormat,
-            print: boolean = false,
-            setLoad: (loading: boolean) => void
-        ) => {
-            if (!printMapEl) {
-                return;
-            }
-            const [viewport] = printMapEl.getElementsByClassName("print-olmap");
-            runExport({
-                display,
-                format,
-                element: viewport as HTMLElement,
-                print,
-                settings: { height, margin, width },
-                printMapStore,
-                setLoad,
-            });
-        };
+    const exportToFormat = (
+      format: PrintFormat,
+      print: boolean = false,
+      setLoad: (loading: boolean) => void
+    ) => {
+      if (!printMapEl) {
+        return;
+      }
+      const [viewport] = printMapEl.getElementsByClassName("print-olmap");
+      runExport({
+        display,
+        format,
+        element: viewport as HTMLElement,
+        print,
+        settings: { height, margin, width },
+        printMapStore,
+        setLoad,
+      });
+    };
 
-        const exportFormatsProps: MenuProps = {
-            items: exportFormats,
-            onClick: (item) => {
-                exportToFormat(item.key as PrintFormat, false, setLoadingFile);
-            },
-        };
+    const exportFormatsProps: MenuProps = {
+      items: exportFormats,
+      onClick: (item) => {
+        exportToFormat(item.key as PrintFormat, false, setLoadingFile);
+      },
+    };
 
-        return (
-            <>
-                <Button
-                    loading={loadingPrint}
-                    type="primary"
-                    onClick={() => exportToFormat("pdf", true, setLoadingPrint)}
-                >
-                    {gettext("Print")}
-                </Button>
-                <Dropdown menu={exportFormatsProps} disabled={loadingFile}>
-                    <Button loading={loadingFile}>
-                        <Space>
-                            {gettext("Save as")}
-                            <DownOutlined />
-                        </Space>
-                    </Button>
-                </Dropdown>
-            </>
-        );
-    }
+    return (
+      <>
+        <Button
+          loading={loadingPrint}
+          type="primary"
+          onClick={() => exportToFormat("pdf", true, setLoadingPrint)}
+        >
+          {gettext("Print")}
+        </Button>
+        <Dropdown menu={exportFormatsProps} disabled={loadingFile}>
+          <Button loading={loadingFile}>
+            <Space>
+              {gettext("Save as")}
+              <DownOutlined />
+            </Space>
+          </Button>
+        </Dropdown>
+      </>
+    );
+  }
 );
 
 PrintMapExport.displayName = "PrintMapExport";

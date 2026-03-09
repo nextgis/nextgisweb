@@ -3,16 +3,16 @@ import { SvgIcon } from "@nextgisweb/gui/svg-icon";
 import type { ResourceCls } from "@nextgisweb/resource/type/api";
 
 export function renderResourceCls({
-    name,
-    cls,
+  name,
+  cls,
 }: {
-    name: string;
-    cls: ResourceCls;
+  name: string;
+  cls: ResourceCls;
 }) {
-    return (
-        <Space>
-            <SvgIcon icon={`rescls-${cls}`} />
-            {name}
-        </Space>
-    );
+  return (
+    <Space>
+      <SvgIcon icon={`rescls-${cls}`} />
+      {name}
+    </Space>
+  );
 }

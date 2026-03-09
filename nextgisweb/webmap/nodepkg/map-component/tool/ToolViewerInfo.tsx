@@ -1,5 +1,5 @@
 import MapViewerInfoComp, {
-    CoordinateSystemDisplay,
+  CoordinateSystemDisplay,
 } from "../../map-viewer-info";
 import { useMeasurementToolsActive } from "../../map-viewer-info/hook/useMeasurementToolsActive";
 import { useMapContext } from "../context/useMapContext";
@@ -11,47 +11,42 @@ import type { UseToggleControlOptions } from "../control/hook/useToggleControl";
 import Icon from "@nextgisweb/icon/material/location_searching";
 
 type ToolZoomProps = MapControlProps &
-    UseToggleControlOptions & { label?: string };
+  UseToggleControlOptions & { label?: string };
 
 export default function ToolViewerInfo({
-    initialValue: defaultValue = false,
+  initialValue: defaultValue = false,
+  groupId,
+  value: controlledValue,
+  label,
+  onChange,
+  canToggle,
+  ...rest
+}: ToolZoomProps) {
+  const { mapStore } = useMapContext();
+  const { toggle, value } = useToggleControl({
+    initialValue: defaultValue,
     groupId,
     value: controlledValue,
-    label,
     onChange,
     canToggle,
-    ...rest
-}: ToolZoomProps) {
-    const { mapStore } = useMapContext();
-    const { toggle, value } = useToggleControl({
-        initialValue: defaultValue,
-        groupId,
-        value: controlledValue,
-        onChange,
-        canToggle,
-    });
-    const isMeasurementActive = useMeasurementToolsActive();
-    const shouldShowCoordinateSystem = isMeasurementActive || value;
+  });
+  const isMeasurementActive = useMeasurementToolsActive();
+  const shouldShowCoordinateSystem = isMeasurementActive || value;
 
-    return (
-        <MapControl
-            margin
-            bar
-            {...rest}
-            style={{ display: "flex", alignItems: "center" }}
-        >
-            <button
-                type="button"
-                title={label}
-                aria-pressed={value}
-                onClick={toggle}
-            >
-                <Icon />
-            </button>
+  return (
+    <MapControl
+      margin
+      bar
+      {...rest}
+      style={{ display: "flex", alignItems: "center" }}
+    >
+      <button type="button" title={label} aria-pressed={value} onClick={toggle}>
+        <Icon />
+      </button>
 
-            {value && <MapViewerInfoComp map={mapStore.olMap} />}
+      {value && <MapViewerInfoComp map={mapStore.olMap} />}
 
-            {shouldShowCoordinateSystem && <CoordinateSystemDisplay />}
-        </MapControl>
-    );
+      {shouldShowCoordinateSystem && <CoordinateSystemDisplay />}
+    </MapControl>
+  );
 }

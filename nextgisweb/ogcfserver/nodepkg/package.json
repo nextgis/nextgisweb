@@ -1,5 +1,5 @@
 {
-    "name": "@nextgisweb/ogcfserver",
-    "version": "0.0.0",
-    "type": "module"
+  "name": "@nextgisweb/ogcfserver",
+  "version": "0.0.0",
+  "type": "module"
 }

@@ -1,25 +1,25 @@
 a.action {
-    cursor: pointer;
-    border-bottom: 1px dashed blue;
-    text-decoration: none;
+  cursor: pointer;
+  border-bottom: 1px dashed blue;
+  text-decoration: none;
 }
 
 :where(a:not(.ant-btn)),
 .link {
-    cursor: pointer;
-    color: var(--link-color);
-    text-decoration: underline;
+  cursor: pointer;
+  color: var(--link-color);
+  text-decoration: underline;
+
+  svg.icon {
+    color: var(--icon-color);
+  }
+
+  &:hover {
+    border-color: var(--link-hover-color);
+    color: var(--link-hover-color);
 
     svg.icon {
-        color: var(--icon-color);
+      color: inherit;
     }
-
-    &:hover {
-        border-color: var(--link-hover-color);
-        color: var(--link-hover-color);
-
-        svg.icon {
-            color: inherit;
-        }
-    }
+  }
 }

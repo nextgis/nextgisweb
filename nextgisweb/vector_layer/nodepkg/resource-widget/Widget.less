@@ -1,25 +1,25 @@
 .ngw-vector-layer-resource-widget {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 1em;
-    padding: 1em;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1em;
+  padding: 1em;
 
-    & > label {
-        align-self: flex-start;
-        line-height: 32px;
+  & > label {
+    align-self: flex-start;
+    line-height: 32px;
+  }
+
+  & > span,
+  & > .mode,
+  & > .ant-collapse {
+    grid-column: 1 / span 2;
+  }
+
+  & > .ant-checkbox-wrapper {
+    grid-column: 1 / span 2;
+
+    & + .ant-checkbox-wrapper {
+      margin-left: 0;
     }
-
-    & > span,
-    & > .mode,
-    & > .ant-collapse {
-        grid-column: 1 / span 2;
-    }
-
-    & > .ant-checkbox-wrapper {
-        grid-column: 1 / span 2;
-
-        & + .ant-checkbox-wrapper {
-            margin-left: 0;
-        }
-    }
+  }
 }

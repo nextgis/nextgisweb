@@ -11,28 +11,28 @@ import type { ErrorResult } from "@nextgisweb/gui/arm";
 import { FieldsForm, useForm } from "@nextgisweb/gui/fields-form";
 import type { FormField } from "@nextgisweb/gui/fields-form";
 import {
-    FocusTable,
-    columnsForType,
-    action as focusTableAction,
-    observableChildren,
+  FocusTable,
+  columnsForType,
+  action as focusTableAction,
+  observableChildren,
 } from "@nextgisweb/gui/focus-table";
 import type {
-    FocusTablePropsActions,
-    FocusTableStore,
+  FocusTablePropsActions,
+  FocusTableStore,
 } from "@nextgisweb/gui/focus-table";
 import { Area } from "@nextgisweb/gui/mayout";
 
 interface GroupPayload {
-    type: "group";
-    title: string;
-    children: (GroupPayload | LayerPayload)[];
+  type: "group";
+  title: string;
+  children: (GroupPayload | LayerPayload)[];
 }
 
 interface LayerPayload {
-    type: "layer";
-    title: string;
-    foo: string;
-    bar: string;
+  type: "layer";
+  title: string;
+  foo: string;
+  bar: string;
 }
 
 type TypeValue = "group" | "layer";
@@ -40,229 +40,224 @@ type Common<T = TypeValue> = { type: T; title: string };
 type Item = Group | Layer;
 
 const {
-    "title": baseTitle,
-    $load: baseLoad,
-    $error: baseError,
+  "title": baseTitle,
+  $load: baseLoad,
+  $error: baseError,
 } = mapper<Base, Pick<Common, "title">>();
 
 baseTitle.validate(
-    validate.unique((o) => {
-        return o.store.getItemContainer(o as Item);
-    }, "title")
+  validate.unique((o) => {
+    return o.store.getItemContainer(o as Item);
+  }, "title")
 );
 
 class Base<T extends TypeValue = TypeValue, D extends Common<T> = Common<T>> {
-    readonly store: Store;
-    readonly type: T;
+  readonly store: Store;
+  readonly type: T;
 
-    @observable.ref accessor parent: Group | null = null;
-    title = baseTitle.init("", this);
+  @observable.ref accessor parent: Group | null = null;
+  title = baseTitle.init("", this);
 
-    constructor(store: Store, { type, ...data }: D) {
-        this.store = store;
-        this.type = type;
-        baseLoad(this, data);
-    }
+  constructor(store: Store, { type, ...data }: D) {
+    this.store = store;
+    this.type = type;
+    baseLoad(this, data);
+  }
 
-    @computed
-    get error(): ErrorResult {
-        return baseError(this);
-    }
+  @computed
+  get error(): ErrorResult {
+    return baseError(this);
+  }
 }
 
 class Group extends Base<"group", Omit<GroupPayload, "children">> {
-    readonly children = observableChildren<Item>(this, "parent");
+  readonly children = observableChildren<Item>(this, "parent");
 
-    constructor(
-        store: Store,
-        { children, ...data }: Omit<GroupPayload, "type">
-    ) {
-        super(store, { type: "group", ...data });
-        this.children.replace(
-            children.map((item) =>
-                item.type === "group"
-                    ? new Group(this.store, item)
-                    : // eslint-disable-next-line @typescript-eslint/no-use-before-define
-                      new Layer(this.store, item)
-            )
-        );
-    }
+  constructor(store: Store, { children, ...data }: Omit<GroupPayload, "type">) {
+    super(store, { type: "group", ...data });
+    this.children.replace(
+      children.map((item) =>
+        item.type === "group"
+          ? new Group(this.store, item)
+          : // eslint-disable-next-line @typescript-eslint/no-use-before-define
+            new Layer(this.store, item)
+      )
+    );
+  }
 
-    // NOTE: Not sure about overridden computables, but it seems to work
-    get error() {
-        return firstError(
-            () => super.error,
-            () => {
-                for (const c of this.children) {
-                    const r = c.error;
-                    if (r === true || typeof r === "string")
-                        return "Group members have errors";
-                }
-            }
-        );
-    }
+  // NOTE: Not sure about overridden computables, but it seems to work
+  get error() {
+    return firstError(
+      () => super.error,
+      () => {
+        for (const c of this.children) {
+          const r = c.error;
+          if (r === true || typeof r === "string")
+            return "Group members have errors";
+        }
+      }
+    );
+  }
 }
 
 const {
-    foo: layerFoo,
-    bar: layerBar,
-    $load: layerLoad,
-    $error: layerError,
+  foo: layerFoo,
+  bar: layerBar,
+  $load: layerLoad,
+  $error: layerError,
 } = mapper<Layer, LayerPayload>();
 
 class Layer extends Base<"layer", LayerPayload> {
-    foo = layerFoo.init("", this);
-    bar = layerBar.init("", this);
+  foo = layerFoo.init("", this);
+  bar = layerBar.init("", this);
 
-    constructor(store: Store, { ...data }: Omit<LayerPayload, "type">) {
-        super(store, { type: "layer", ...data });
-        layerLoad(this, data);
-    }
+  constructor(store: Store, { ...data }: Omit<LayerPayload, "type">) {
+    super(store, { type: "layer", ...data });
+    layerLoad(this, data);
+  }
 
-    // NOTE: Not sure about overridden computables, but it seems to work
-    get error() {
-        return firstError(
-            () => super.error,
-            () => layerError(this)
-        );
-    }
+  // NOTE: Not sure about overridden computables, but it seems to work
+  get error() {
+    return firstError(
+      () => super.error,
+      () => layerError(this)
+    );
+  }
 
-    @action
-    update(value: Partial<Omit<LayerPayload, "type" | "children">>) {
-        Object.entries(value).forEach(([k, v]) =>
-            this[k as keyof typeof value].setter(v)
-        );
-    }
+  @action
+  update(value: Partial<Omit<LayerPayload, "type" | "children">>) {
+    Object.entries(value).forEach(([k, v]) =>
+      this[k as keyof typeof value].setter(v)
+    );
+  }
 }
 
 class Store implements FocusTableStore<Item> {
-    children = observableChildren<Item>(null, "parent");
+  children = observableChildren<Item>(null, "parent");
 
-    // FocusTableStore implementation
+  // FocusTableStore implementation
 
-    getItemChildren(item: Item | null): IObservableArray<Item> | undefined {
-        return item === null
-            ? this.children
-            : item.type === "group"
-              ? item.children
-              : undefined;
-    }
+  getItemChildren(item: Item | null): IObservableArray<Item> | undefined {
+    return item === null
+      ? this.children
+      : item.type === "group"
+        ? item.children
+        : undefined;
+  }
 
-    getItemContainer(item: Item): IObservableArray<Item> {
-        return item.parent === null ? this.children : item.parent.children;
-    }
+  getItemContainer(item: Item): IObservableArray<Item> {
+    return item.parent === null ? this.children : item.parent.children;
+  }
 
-    getItemParent(item: Item): Item | null {
-        return item.parent;
-    }
+  getItemParent(item: Item): Item | null {
+    return item.parent;
+  }
 
-    getItemError(item: Item): ErrorResult {
-        return item.error;
-    }
+  getItemError(item: Item): ErrorResult {
+    return item.error;
+  }
 }
 
 const GroupComponent = observer<{
-    item: Group;
-    store: Store;
+  item: Group;
+  store: Store;
 }>(function GroupComponentBase({ item }) {
-    return (
-        <Area pad>
-            <LotMV label="Title" value={item.title} component={InputValue} />
-        </Area>
-    );
+  return (
+    <Area pad>
+      <LotMV label="Title" value={item.title} component={InputValue} />
+    </Area>
+  );
 });
 
 type LayerFormValues = {
-    title: string;
-    foo: string;
-    bar: string;
+  title: string;
+  foo: string;
+  bar: string;
 };
 
 function LayerComponent({ item }: { item: Layer }) {
-    const form = useForm<LayerFormValues>()[0];
-    const fields = useMemo<FormField<keyof LayerFormValues>[]>(
-        () => [
-            { name: "title", label: "Title", formItem: <Input /> },
-            { name: "foo", label: "Foo", formItem: <Input /> },
-            { name: "bar", label: "Bar", formItem: <Input /> },
-        ],
-        []
-    );
+  const form = useForm<LayerFormValues>()[0];
+  const fields = useMemo<FormField<keyof LayerFormValues>[]>(
+    () => [
+      { name: "title", label: "Title", formItem: <Input /> },
+      { name: "foo", label: "Foo", formItem: <Input /> },
+      { name: "bar", label: "Bar", formItem: <Input /> },
+    ],
+    []
+  );
 
-    return (
-        <FieldsForm
-            form={form}
-            fields={fields}
-            initialValues={{
-                title: item.title.value,
-                foo: item.foo.value,
-                bar: item.bar.value,
-            }}
-            onChange={({ value }) => item.update(value)}
-            style={{ padding: "1em" }}
-        />
-    );
+  return (
+    <FieldsForm
+      form={form}
+      fields={fields}
+      initialValues={{
+        title: item.title.value,
+        foo: item.foo.value,
+        bar: item.bar.value,
+      }}
+      onChange={({ value }) => item.update(value)}
+      style={{ padding: "1em" }}
+    />
+  );
 }
 
 export default function ComplexTreeTest() {
-    const store = useMemo(() => new Store(), []);
+  const store = useMemo(() => new Store(), []);
 
-    const { tableActions, itemActions } = useMemo<FocusTablePropsActions<Item>>(
-        () => ({
-            tableActions: [
-                focusTableAction.addItem(
-                    () =>
-                        new Group(store, {
-                            title: falso.randCompanyName(),
-                            children: [],
-                        }),
-                    { key: "add_group", title: "Add group" }
-                ),
-                focusTableAction.addItem(
-                    () =>
-                        new Layer(store, {
-                            title: falso.randBrand(),
-                            foo: falso.randFullName(),
-                            bar: falso.randZipCode(),
-                        }),
-                    { key: "add_layer", title: "Add layer" }
-                ),
-            ],
-            itemActions: [focusTableAction.deleteItem()],
-        }),
-        [store]
-    );
+  const { tableActions, itemActions } = useMemo<FocusTablePropsActions<Item>>(
+    () => ({
+      tableActions: [
+        focusTableAction.addItem(
+          () =>
+            new Group(store, {
+              title: falso.randCompanyName(),
+              children: [],
+            }),
+          { key: "add_group", title: "Add group" }
+        ),
+        focusTableAction.addItem(
+          () =>
+            new Layer(store, {
+              title: falso.randBrand(),
+              foo: falso.randFullName(),
+              bar: falso.randZipCode(),
+            }),
+          { key: "add_layer", title: "Add layer" }
+        ),
+      ],
+      itemActions: [focusTableAction.deleteItem()],
+    }),
+    [store]
+  );
 
-    return (
-        <div
-            style={{ height: "500px", border: "1px solid rgba(0, 0, 0, 0.06)" }}
-        >
-            <FocusTable<Item, "group" | "layer">
-                store={store}
-                title={(item) => item.title.value}
-                columns={[
-                    (item) => item.type,
-                    {
-                        // Groups don't have extra columns
-                        layer: columnsForType<Layer>([
-                            {
-                                render: (i) => i.foo.value,
-                                width: ["25%", "50%"],
-                            },
-                            { render: (i) => i.bar.value },
-                        ]),
-                    },
-                ]}
-                tableActions={tableActions}
-                itemActions={itemActions}
-                renderDetail={({ item }) => {
-                    return item.type === "group" ? (
-                        <GroupComponent item={item} store={store} />
-                    ) : (
-                        <LayerComponent item={item} />
-                    );
-                }}
-            />
-        </div>
-    );
+  return (
+    <div style={{ height: "500px", border: "1px solid rgba(0, 0, 0, 0.06)" }}>
+      <FocusTable<Item, "group" | "layer">
+        store={store}
+        title={(item) => item.title.value}
+        columns={[
+          (item) => item.type,
+          {
+            // Groups don't have extra columns
+            layer: columnsForType<Layer>([
+              {
+                render: (i) => i.foo.value,
+                width: ["25%", "50%"],
+              },
+              { render: (i) => i.bar.value },
+            ]),
+          },
+        ]}
+        tableActions={tableActions}
+        itemActions={itemActions}
+        renderDetail={({ item }) => {
+          return item.type === "group" ? (
+            <GroupComponent item={item} store={store} />
+          ) : (
+            <LayerComponent item={item} />
+          );
+        }}
+      />
+    </div>
+  );
 }

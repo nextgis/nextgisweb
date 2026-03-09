@@ -6,17 +6,17 @@ import { CoreLayer } from "./CoreLayer";
 import type { LayerOptions } from "./CoreLayer";
 
 export default class Vector extends CoreLayer<
-    VectorSource,
-    VectorLayer<VectorSource>,
-    VectorSourceOptions
+  VectorSource,
+  VectorLayer<VectorSource>,
+  VectorSourceOptions
 > {
-    protected createSource(options: VectorSourceOptions): VectorSource {
-        return new VectorSource(options);
-    }
+  protected createSource(options: VectorSourceOptions): VectorSource {
+    return new VectorSource(options);
+  }
 
-    protected createLayer(
-        options: LayerOptions & { source: VectorSource }
-    ): VectorLayer<VectorSource> {
-        return new VectorLayer(options);
-    }
+  protected createLayer(
+    options: LayerOptions & { source: VectorSource }
+  ): VectorLayer<VectorSource> {
+    return new VectorLayer(options);
+  }
 }

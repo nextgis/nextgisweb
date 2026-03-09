@@ -6,43 +6,43 @@ import { useEffect, useRef, useState } from "react";
 import { useMapContext } from "@nextgisweb/webmap/map-component/context/useMapContext";
 
 interface VectorLayerProps {
-    source: VectorSource;
-    style?: Style;
-    zIndex?: number;
+  source: VectorSource;
+  style?: Style;
+  zIndex?: number;
 }
 
 export function EditableVectorLayer({
-    source,
-    style,
-    zIndex,
+  source,
+  style,
+  zIndex,
 }: VectorLayerProps) {
-    const { mapStore } = useMapContext();
-    const [layer, setLayer] = useState<VectorLayer>();
-    const layerRef = useRef<VectorLayer>(null);
+  const { mapStore } = useMapContext();
+  const [layer, setLayer] = useState<VectorLayer>();
+  const layerRef = useRef<VectorLayer>(null);
 
-    useEffect(() => {
-        if (!mapStore) return;
-        const vectorLayer = new VectorLayer({
-            source,
-            style,
-        });
+  useEffect(() => {
+    if (!mapStore) return;
+    const vectorLayer = new VectorLayer({
+      source,
+      style,
+    });
 
-        layerRef.current = vectorLayer;
-        setLayer(vectorLayer);
-        mapStore.olMap.addLayer(vectorLayer);
+    layerRef.current = vectorLayer;
+    setLayer(vectorLayer);
+    mapStore.olMap.addLayer(vectorLayer);
 
-        return () => {
-            if (layerRef.current) {
-                mapStore.olMap.removeLayer(layerRef.current);
-            }
-        };
-    }, [mapStore, source, style]);
+    return () => {
+      if (layerRef.current) {
+        mapStore.olMap.removeLayer(layerRef.current);
+      }
+    };
+  }, [mapStore, source, style]);
 
-    useEffect(() => {
-        if (layer && typeof zIndex === "number") {
-            layer.setZIndex(zIndex);
-        }
-    }, [zIndex, layer]);
+  useEffect(() => {
+    if (layer && typeof zIndex === "number") {
+      layer.setZIndex(zIndex);
+    }
+  }, [zIndex, layer]);
 
-    return null;
+  return null;
 }

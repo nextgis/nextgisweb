@@ -1,24 +1,24 @@
 .ngw-feature-layer-feature-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-sizing: border-box;
+  height: 100%;
+
+  .toolbar {
     display: flex;
-    flex-direction: column;
     gap: 8px;
-    box-sizing: border-box;
-    height: 100%;
 
-    .toolbar {
-        display: flex;
-        gap: 8px;
-
-        .spacer {
-            flex-grow: 1;
-        }
+    .spacer {
+      flex-grow: 1;
     }
+  }
 
-    .ngw-feature-layer-feature-table {
-        flex-grow: 1;
-    }
+  .ngw-feature-layer-feature-table {
+    flex-grow: 1;
+  }
 }
 
 .ant-tabs-tabpane > .ngw-feature-layer-feature-grid {
-    padding: 8px;
+  padding: 8px;
 }
