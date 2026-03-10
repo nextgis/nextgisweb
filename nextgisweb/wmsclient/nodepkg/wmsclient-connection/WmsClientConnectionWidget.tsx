@@ -1,6 +1,11 @@
 import { observer } from "mobx-react-lite";
 
-import { CheckboxValue, InputValue, PasswordValue, Select } from "@nextgisweb/gui/antd";
+import {
+  CheckboxValue,
+  InputValue,
+  PasswordValue,
+  Select,
+} from "@nextgisweb/gui/antd";
 import { LotMV } from "@nextgisweb/gui/arm";
 import { Area } from "@nextgisweb/gui/mayout";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -81,6 +86,13 @@ export const WmsClientConnectionWidget: EditorWidget<WmsClientConnectionStore> =
             options: capcacheOptions,
             style: { width: "100%" },
           }}
+        />
+
+        <LotMV
+          row
+          label={gettext("Referer header")}
+          component={InputValue}
+          value={store.referer}
         />
 
         <LotMV

@@ -12,9 +12,9 @@ import type { UICapcache } from "./WmsClientConnectionWidget";
 
 type MapperConnectionCreate = Omit<
   ConnectionCreate,
-  "url" | "username" | "password" | "capcache"
+  "url" | "username" | "password" | "referer" | "capcache"
 > & { capcache: UICapcache } & NullableProps<
-    Pick<ConnectionCreate, "url" | "username" | "password">
+    Pick<ConnectionCreate, "url" | "username" | "password" | "referer">
   >;
 
 const {
@@ -23,6 +23,7 @@ const {
   password,
   version,
   insecure,
+  referer,
   capcache,
   $dirty: mapperDirty,
   $load: mapperLoad,
@@ -46,6 +47,7 @@ export class WmsClientConnectionStore implements EditorStore<
   readonly password = password.init(null, this);
   readonly version = version.init("1.1.1", this);
   readonly insecure = insecure.init(false, this);
+  readonly referer = referer.init(null, this);
   /**  capcache is different for read and create/update:
    * - on dump - instruction flag (CapCacheEnum; default "query") to tell the server what to do (TODO: describe what server actually do)
    * - on load - contains the actual data
@@ -68,6 +70,7 @@ export class WmsClientConnectionStore implements EditorStore<
       ...this.password.jsonPart(),
       ...this.version.jsonPart(),
       ...this.insecure.jsonPart(),
+      ...this.referer.jsonPart(),
     } as ConnectionCreate;
     if (this.capcache.value) {
       payload.capcache = this.capcache.value;

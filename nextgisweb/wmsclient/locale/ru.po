@@ -2,15 +2,15 @@
 msgid "WMS connection"
 msgstr "Соединение WMS"
 
-#: model.py:133
+#: model.py:138
 msgid "WMS capabilities"
 msgstr "Возможности WMS"
 
-#: model.py:134 nodepkg/wmsclient-layer/WmsClientLayerWidget.tsx:98
+#: model.py:139 nodepkg/wmsclient-layer/WmsClientLayerWidget.tsx:98
 msgid "Image format"
 msgstr "Формат изображения"
 
-#: model.py:225
+#: model.py:231
 msgid "WMS layer"
 msgstr "Слой WMS"
 
@@ -50,11 +50,15 @@ msgstr "Версия"
 msgid "Capabilities"
 msgstr "Возможности"
 
-#: nodepkg/wmsclient-connection/WmsClientConnectionWidget.tsx:91
+#: nodepkg/wmsclient-connection/WmsClientConnectionWidget.tsx:88
+msgid "Referer header"
+msgstr "Заголовок Referer"
+
+#: nodepkg/wmsclient-connection/WmsClientConnectionWidget.tsx:98
 msgid "Skip SSL/TLS certificate verification"
 msgstr "Не проверять сертификат SSL/TLS"
 
-#: nodepkg/wmsclient-connection/WmsClientConnectionWidget.tsx:100
+#: nodepkg/wmsclient-connection/WmsClientConnectionWidget.tsx:107
 #: nodepkg/wmsclient-layer/WmsClientLayerWidget.tsx:85
 msgid "WMS Connection"
 msgstr "WMS Соединение"

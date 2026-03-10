@@ -58,6 +58,7 @@ class Connection(Resource):
     username = sa.Column(sa.Unicode)
     password = sa.Column(sa.Unicode)
     insecure = sa.Column(sa.Boolean, nullable=False, default=False)
+    referer = sa.Column(sa.Unicode)
 
     capcache_xml = orm.deferred(sa.Column(sa.Unicode))
     capcache_json = orm.deferred(sa.Column(sa.Unicode))
@@ -94,11 +95,15 @@ class Connection(Resource):
         else:
             auth = None
 
+        headers = {**env.wmsclient.headers}
+        if self.referer:
+            headers["Referer"] = self.referer
+
         try:
             return requests.get(
                 url,
                 auth=auth,
-                headers=env.wmsclient.headers,
+                headers=headers,
                 timeout=env.wmsclient.options["timeout"].total_seconds(),
                 verify=not self.insecure,
             )
@@ -201,6 +206,7 @@ class ConnectionSerializer(Serializer, resource=Connection):
     username = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
     password = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
     insecure = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
+    referer = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
     capcache = CapCacheAttr(read=ConnectionScope.connect, write=ConnectionScope.write)
 
 
