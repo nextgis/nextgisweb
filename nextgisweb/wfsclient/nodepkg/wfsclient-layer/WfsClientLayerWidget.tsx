@@ -174,7 +174,7 @@ export const WfsClientLayerWidget: EditorWidget<WfsClientLayerStore> = observer(
           }}
         />
 
-        <Lot error={store.columnGeom.error} label={gettext("Layer")}>
+        <Lot error={store.layerName.error} label={gettext("Layer")}>
           <AutoCompleteInput
             {...autocompleteProps("layerName", connectionInfo, layerOptions)}
             onChange={(value) => {
