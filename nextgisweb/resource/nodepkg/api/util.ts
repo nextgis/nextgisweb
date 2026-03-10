@@ -24,7 +24,7 @@ export function uniqAttributes<A extends [...Attributes]>(attrs: A): A {
 export type ResourceAttrResponseItemValues = ResourceAttrResponseItem[1];
 
 export function normalize(values: ResourceAttrResponseItemValues): unknown[] {
-  return values.map(([e, v]) => (e === 0 ? v : undefined));
+  return values.map((val) => (val?.[0] === 0 ? val[1] : undefined));
 }
 
 export function sortAttrs(attributes: [...Attributes]) {

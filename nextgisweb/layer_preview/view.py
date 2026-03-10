@@ -1,16 +1,11 @@
 from nextgisweb.env import gettext
-from nextgisweb.lib.dynmenu import Link
 
 from nextgisweb.basemap.model import BasemapLayer
 from nextgisweb.feature_layer import IFeatureLayer
 from nextgisweb.gui import react_renderer
-from nextgisweb.jsrealm import icon
 from nextgisweb.raster_layer import RasterLayer
 from nextgisweb.render import IRenderableStyle
-from nextgisweb.resource import DataScope, Resource, resource_factory
-from nextgisweb.resource.attr.api import ResourceAttrRequestContext
-
-from .attr import LayerPreviewAttrAvailable
+from nextgisweb.resource import DataScope, resource_factory
 
 
 @react_renderer("@nextgisweb/layer-preview/preview-layer")
@@ -43,19 +38,3 @@ def setup_pyramid(comp, config):
         preview_map,
         context=BasemapLayer,
     )
-
-    icon_preview = icon("material/preview")
-
-    @Resource.__dynmenu__.add
-    def _resource_dynmenu(args):
-        ctx = ResourceAttrRequestContext(request=args.request)
-        attr = LayerPreviewAttrAvailable()
-
-        if attr(args.obj, ctx=ctx):
-            yield Link(
-                "extra/preview",
-                gettext("Preview"),
-                lambda args: args.request.route_url("layer_preview.map", id=args.obj.id),
-                important=True,
-                icon=icon_preview,
-            )

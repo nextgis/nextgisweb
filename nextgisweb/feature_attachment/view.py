@@ -2,13 +2,11 @@ from msgspec import Struct
 from pyramid.httpexceptions import HTTPNotFound
 
 from nextgisweb.env import gettext
-from nextgisweb.lib import dynmenu as dm
 
 from nextgisweb.feature_layer import IFeatureLayer
 from nextgisweb.gui import react_renderer
-from nextgisweb.jsrealm import icon
 from nextgisweb.pyramid import client_setting
-from nextgisweb.resource import DataScope, Resource, resource_factory
+from nextgisweb.resource import DataScope, resource_factory
 
 from .component import FeatureAttachmentComponent
 
@@ -43,19 +41,3 @@ def setup_pyramid(comp, config):
         r"/resource/{id:uint}/attachments",
         factory=resource_factory,
     ).add_view(attachment, context=IFeatureLayer)
-
-    icon_manage_attachments = icon("material/attach_file")
-
-    # Layer menu extension
-    @Resource.__dynmenu__.add
-    def _resource_dynmenu(args):
-        if not IFeatureLayer.providedBy(args.obj):
-            return
-
-        if args.obj.has_export_permission(args.request.user):
-            yield dm.Link(
-                "feature_layer/feature_attachment",
-                gettext("Manage attachments"),
-                lambda args: args.request.route_url("feature_attachment.page", id=args.obj.id),
-                icon=icon_manage_attachments,
-            )

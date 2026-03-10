@@ -10,16 +10,15 @@ from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import joinedload, with_polymorphic
 
 from nextgisweb.env import DBSession, gettext
-from nextgisweb.lib.dynmenu import DynMenu, Label, Link
+from nextgisweb.lib.dynmenu import Link
 
 from nextgisweb.auth import OnUserLogin
 from nextgisweb.core.exception import InsufficientPermissions
 from nextgisweb.gui import react_renderer
-from nextgisweb.jsrealm import icon, jsentry
+from nextgisweb.jsrealm import jsentry
 from nextgisweb.pyramid import JSONType
 from nextgisweb.pyramid.breadcrumb import Breadcrumb
 
-from .event import OnDeletePrompt
 from .exception import ResourceNotFound
 from .extaccess import ExternalAccessLink
 from .interface import IResourceBase
@@ -327,62 +326,6 @@ def setup_pyramid(comp, config):
     _resource_route("delete", r"{id:uint}/delete", get=delete)
 
     # Actions
-
-    Resource.__dynmenu__ = DynMenu(
-        Label("create", gettext("Create resource")),
-        Label("operation", gettext("Action")),
-        Label("extra", gettext("Extra")),
-    )
-
-    icon_edit = icon("material/edit")
-    icon_delete = icon("material/delete")
-    icon_json = icon("material/data_object")
-    icon_effective_permissions = icon("material/key")
-
-    @Resource.__dynmenu__.add
-    def _resource_dynmenu(args):
-        permissions = args.obj.permissions(args.request.user)
-
-        if ResourceScope.update in permissions:
-            yield Link(
-                "operation/10-update",
-                gettext("Update"),
-                lambda args: args.request.route_url("resource.update", id=args.obj.id),
-                important=True,
-                icon=icon_edit,
-            )
-
-        if (
-            ResourceScope.delete in permissions
-            and args.obj.id != 0
-            and args.obj.parent.has_permission(ResourceScope.manage_children, args.request.user)
-            and OnDeletePrompt.apply(args.obj)
-        ):
-            yield Link(
-                "operation/20-delete",
-                gettext("Delete"),
-                lambda args: args.request.route_url("resource.delete", id=args.obj.id),
-                important=True,
-                icon=icon_delete,
-            )
-
-        if ResourceScope.read in permissions:
-            yield Link(
-                "extra/json",
-                gettext("JSON view"),
-                lambda args: args.request.route_url("resource.json", id=args.obj.id),
-                icon=icon_json,
-            )
-
-            yield Link(
-                "extra/effective-permissions",
-                gettext("User permissions"),
-                lambda args: args.request.route_url(
-                    "resource.effective_permissions",
-                    id=args.obj.id,
-                ),
-                icon=icon_effective_permissions,
-            )
 
     @comp.env.pyramid.control_panel.add
     def _control_panel(args):

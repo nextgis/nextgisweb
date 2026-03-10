@@ -5,14 +5,14 @@ from msgspec import Struct
 from pyramid.renderers import render_to_response
 
 from nextgisweb.env import COMP_ID, gettext
-from nextgisweb.lib.dynmenu import Label, Link
+from nextgisweb.lib.dynmenu import Link
 
 from nextgisweb.gui import react_renderer
-from nextgisweb.jsrealm import icon, jsentry
+from nextgisweb.jsrealm import jsentry
 from nextgisweb.pyramid import client_setting
 from nextgisweb.pyramid.api import csetting
 from nextgisweb.render.view import TMSLink
-from nextgisweb.resource import Resource, ResourceFactory, ResourceScope, Widget
+from nextgisweb.resource import ResourceFactory, ResourceScope, Widget
 
 from .adapter import WebMapAdapter
 from .component import WebMapComponent
@@ -213,36 +213,6 @@ def setup_pyramid(comp, config):
 
         cs_k.__name__ = f"cs_{k}"
         client_setting(k)(partial(cs_k, cs=v))
-
-    icon_display = icon("display")
-    icon_clone = icon("material/content_copy")
-
-    @Resource.__dynmenu__.add
-    def _resource_dynmenu(args):
-        if not isinstance(args.obj, WebMap):
-            return
-
-        yield Label("webmap", gettext("Web map"))
-
-        if args.obj.has_permission(ResourceScope.read, args.request.user):
-            yield Link(
-                "webmap/display",
-                gettext("Display"),
-                lambda args: args.request.route_url("webmap.display", id=args.obj.id),
-                important=True,
-                target="_blank",
-                icon=icon_display,
-            )
-
-        if args.obj.has_permission(ResourceScope.read, args.request.user):
-            yield Link(
-                "webmap/clone",
-                gettext("Clone"),
-                lambda args: args.request.route_url("webmap.clone", id=args.obj.id),
-                important=False,
-                target="_self",
-                icon=icon_clone,
-            )
 
     @comp.env.pyramid.control_panel.add
     def _control_panel(args):

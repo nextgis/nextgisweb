@@ -9,6 +9,7 @@ import { useResourcePicker } from "@nextgisweb/resource/component/resource-picke
 import type { ResourcePickerAttr } from "@nextgisweb/resource/component/resource-picker/type";
 import { useResourceNotify } from "@nextgisweb/resource/hook/useResourceNotify";
 
+import type { DefaultResourceAttrItem } from "../../type";
 import type { ChildrenResource } from "../type";
 import { createResourceTableItemOptions } from "../util/createResourceTableItemOptions";
 import { forEachSelected } from "../util/forEachSelected";
@@ -30,8 +31,8 @@ interface MenuDropdownProps {
   setVolumeVisible: React.Dispatch<React.SetStateAction<boolean>>;
   setVolumeValues: React.Dispatch<React.SetStateAction<Record<number, number>>>;
   setAllowBatch: React.Dispatch<React.SetStateAction<boolean>>;
+  setAttrItems: React.Dispatch<React.SetStateAction<DefaultResourceAttrItem[]>>;
   setSelected: React.Dispatch<React.SetStateAction<number[]>>;
-  setItems: React.Dispatch<React.SetStateAction<ChildrenResource[]>>;
 }
 
 type MenuItems = NonNullable<MenuProps["items"]>;
@@ -50,8 +51,8 @@ export function MenuDropdown({
   setVolumeVisible,
   setVolumeValues,
   setAllowBatch,
+  setAttrItems,
   setSelected,
-  setItems,
 }: MenuDropdownProps) {
   const { showResourcePicker } = useResourcePicker();
   const {
@@ -67,9 +68,9 @@ export function MenuDropdown({
     const allowedToFeatureExport = [];
 
     for (const item of items) {
-      if (selected.includes(item.id)) {
+      if (selected.includes(item.resourceId)) {
         if (item.cls === "vector_layer") {
-          allowedToFeatureExport.push(item.id);
+          allowedToFeatureExport.push(item.resourceId);
         }
       }
     }
@@ -82,20 +83,20 @@ export function MenuDropdown({
         const parent = newGroup.get("resource.parent");
         if (parent && parent.id === resourceId) {
           const newItem = await createResourceTableItemOptions(newGroup.id);
-          setItems((old) => {
+          setAttrItems((old) => {
             return [...old, newItem];
           });
         }
       }
     },
-    [resourceId, setItems]
+    [resourceId, setAttrItems]
   );
 
   const moveSelectedTo = useCallback(
     (parentId: number) => {
       forEachSelected({
         title: gettext("Moving resources"),
-        setItems,
+        setAttrItems,
         setSelected,
         selected,
         executer: ({ selectedId, signal }) =>
@@ -125,7 +126,7 @@ export function MenuDropdown({
       notifySuccessfulMove,
       notifyMoveWithError,
       setSelected,
-      setItems,
+      setAttrItems,
       selected,
     ]
   );
@@ -139,13 +140,13 @@ export function MenuDropdown({
       const allowedToDelete: number[] = [];
       const signal = makeSignal();
       for (const item of items) {
-        if (selected.includes(item.id)) {
+        if (selected.includes(item.resourceId)) {
           const includeDelAction = await item.it.fetch(
             [["resource.is_deletable"]],
             { signal }
           );
           if (includeDelAction[0]) {
-            allowedToDelete.push(item.id);
+            allowedToDelete.push(item.resourceId);
           }
         }
       }
@@ -156,7 +157,7 @@ export function MenuDropdown({
   const deleteSelected = useCallback(() => {
     forEachSelected({
       title: gettext("Deleting resources"),
-      setItems,
+      setAttrItems,
       setSelected,
       setInProgress: setBatchDeletingInProgress,
       selected: selectedAllowedForDelete,
@@ -172,8 +173,8 @@ export function MenuDropdown({
     selectedAllowedForDelete,
     setBatchDeletingInProgress,
     notifySuccessfulDeletion,
+    setAttrItems,
     setSelected,
-    setItems,
   ]);
 
   const menuItems = useMemo(() => {

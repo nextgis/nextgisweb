@@ -2,12 +2,11 @@ from msgspec import Struct, field
 from pyramid.httpexceptions import HTTPNotFound
 
 from nextgisweb.env import gettext
-from nextgisweb.lib import dynmenu as dm
 
 from nextgisweb.gui import react_renderer
-from nextgisweb.jsrealm import icon, jsentry
+from nextgisweb.jsrealm import jsentry
 from nextgisweb.pyramid import client_setting
-from nextgisweb.resource import Resource, Widget
+from nextgisweb.resource import Widget
 from nextgisweb.resource.extaccess import ExternalAccessLink
 
 from .component import RasterLayerComponent
@@ -70,27 +69,3 @@ def setup_pyramid(comp, config):
         route_name="resource.export.page",
         context=RasterLayer,
     )
-
-    icon_export = icon("material/download")
-    icon_download = icon("material/download_for_offline")
-
-    @Resource.__dynmenu__.add
-    def _resource_dynmenu(args):
-        if not isinstance(args.obj, RasterLayer):
-            return
-
-        yield dm.Label("raster_layer", gettext("Raster layer"))
-
-        if args.obj.has_export_permission(args.request.user):
-            yield dm.Link(
-                "raster_layer/export",
-                gettext("Save as"),
-                lambda args: args.request.route_url("resource.export.page", id=args.obj.id),
-                icon=icon_export,
-            )
-            yield dm.Link(
-                "raster_layer/download",
-                gettext("Download"),
-                lambda args: args.request.route_url("raster_layer.download", id=args.obj.id),
-                icon=icon_download,
-            )

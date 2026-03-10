@@ -1,9 +1,8 @@
-import { Modal } from "@nextgisweb/gui/antd";
+import type { Modal } from "@nextgisweb/gui/antd";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
+import { FullHeightModal } from "@nextgisweb/gui/full-height-modal/FullHeightModal";
 import { useRouteGet } from "@nextgisweb/pyramid/hook";
 import { FeatureInfoSection } from "@nextgisweb/webmap/panel/identify/component/FeatureInfoSection";
-
-import "./FeatureDisplayModal.less";
 
 export type ModalProps = Parameters<typeof Modal>[0];
 
@@ -29,30 +28,25 @@ export function FeatureDisplayModal({
   );
 
   return (
-    <>
-      <Modal
-        className="ngw-feature-layer-feature-display-modal"
-        width="" // Do not set the default (520px) width
-        centered={true}
-        open={open}
-        destroyOnHidden
-        footer={null}
-        closable
-        onCancel={onCancel}
-        title={isLoading ? "..." : featureItem.label}
-        {...modalProps}
-      >
-        {isLoading ? (
-          <LoadingWrapper />
-        ) : (
-          <FeatureInfoSection
-            showGeometryInfo
-            showGeometryPreview
-            resourceId={resourceId}
-            featureItem={featureItem}
-          />
-        )}
-      </Modal>
-    </>
+    <FullHeightModal
+      open={open}
+      destroyOnHidden
+      footer={null}
+      closable
+      onCancel={onCancel}
+      title={isLoading ? "..." : featureItem.label}
+      {...modalProps}
+    >
+      {isLoading ? (
+        <LoadingWrapper />
+      ) : (
+        <FeatureInfoSection
+          showGeometryInfo
+          showGeometryPreview
+          resourceId={resourceId}
+          featureItem={featureItem}
+        />
+      )}
+    </FullHeightModal>
   );
 }

@@ -1,9 +1,8 @@
 from nextgisweb.env import gettext
-from nextgisweb.lib.dynmenu import Link
 
 from nextgisweb.gui import react_renderer
-from nextgisweb.jsrealm import icon, jsentry
-from nextgisweb.resource import ConnectionScope, DataScope, Resource, Widget, resource_factory
+from nextgisweb.jsrealm import jsentry
+from nextgisweb.resource import ConnectionScope, DataScope, Widget, resource_factory
 
 from .model import PostgisConnection, PostgisLayer
 
@@ -28,21 +27,6 @@ def setup_pyramid(comp, config):
     ).add_view(diagnostics_page, context=PostgisConnection).add_view(
         diagnostics_page, context=PostgisLayer
     )
-
-    icon_diagnostics = icon("material/flaky")
-
-    @Resource.__dynmenu__.add
-    def _resource_dynmenu(args):
-        if (
-            isinstance(args.obj, (PostgisConnection, PostgisLayer))
-            and args.request.user.keyname != "guest"
-        ):
-            yield Link(
-                "extra/postgis-diagnostics",
-                gettext("Diagnostics"),
-                lambda args: args.request.route_url("postgis.diagnostics_page", id=args.obj.id),
-                icon=icon_diagnostics,
-            )
 
 
 @react_renderer("@nextgisweb/postgis/diagnostics-widget")
