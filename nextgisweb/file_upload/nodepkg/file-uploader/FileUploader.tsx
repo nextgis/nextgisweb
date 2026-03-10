@@ -1,5 +1,4 @@
 import { useCallback, useEffect } from "react";
-import { Balancer } from "react-wrap-balancer";
 
 import settings from "@nextgisweb/file-upload/client-settings";
 import { Button, Upload, message } from "@nextgisweb/gui/antd";
@@ -71,10 +70,7 @@ function InputText<M extends boolean = false>({
       />
     </p>
   ) : (
-    // This component cause the console error on tab switch: Uncaught
-    // ResizeObserver loop completed with undelivered notifications.
-    // https://github.com/shuding/react-wrap-balancer/issues/82
-    <Balancer ratio={0.62}>
+    <>
       <p className="ant-upload-text">
         <span className="clickable">{uploadText}</span> {dragAndDropText}
       </p>
@@ -84,7 +80,7 @@ function InputText<M extends boolean = false>({
           {formatSize(maxSize) + " " + gettext("max")}
         </p>
       )}
-    </Balancer>
+    </>
   );
 }
 

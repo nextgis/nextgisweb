@@ -1,6 +1,5 @@
 import classNames from "classnames";
 import type { ReactNode } from "react";
-import { Balancer } from "react-wrap-balancer";
 
 import { Button } from "@nextgisweb/gui/antd";
 import type { ButtonProps } from "@nextgisweb/gui/antd";
@@ -22,7 +21,7 @@ export function ResourceSectionButton({
     <ContentCard
       className={classNames("ngw-resource-section-button", className)}
     >
-      <Balancer ratio={0.62}>{children}</Balancer>
+      {children}
       <Button {...props}>{label}</Button>
     </ContentCard>
   );

@@ -1,7 +1,6 @@
 import classNames from "classnames";
 import { groupBy, partition, sortBy } from "lodash-es";
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
-import { Balancer } from "react-wrap-balancer";
 
 import { Button, InputValue, Tooltip } from "@nextgisweb/gui/antd";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
@@ -309,13 +308,11 @@ export default function FavoritePage() {
   } else if (data.length === 0) {
     body = (
       <div className="empty">
-        <Balancer>
-          <Translated
-            msgf={msgEmptyTextFmt}
-            // eslint-disable-next-line react/jsx-key
-            args={[<IconFavoriteOutline />]}
-          />
-        </Balancer>
+        <Translated
+          msgf={msgEmptyTextFmt}
+          // eslint-disable-next-line react/jsx-key
+          args={[<IconFavoriteOutline />]}
+        />
       </div>
     );
   } else {

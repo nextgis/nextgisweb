@@ -1,6 +1,5 @@
 import { createRoot } from "react-dom/client";
 import type { Root } from "react-dom/client";
-import { Provider as BalancedProvider } from "react-wrap-balancer";
 
 import { ConfigProvider } from "./antd";
 
@@ -28,9 +27,7 @@ export default function reactApp<P extends PropsType = PropsType>(
 
   root.render(
     <ConfigProvider>
-      <BalancedProvider>
-        <Component {...props} />
-      </BalancedProvider>
+      <Component {...props} />
     </ConfigProvider>
   );
 
