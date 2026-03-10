@@ -57,6 +57,7 @@ class Connection(Resource):
     version = sa.Column(saext.Enum(*WMS_VERSIONS), nullable=False)
     username = sa.Column(sa.Unicode)
     password = sa.Column(sa.Unicode)
+    insecure = sa.Column(sa.Boolean, nullable=False, default=False)
 
     capcache_xml = orm.deferred(sa.Column(sa.Unicode))
     capcache_json = orm.deferred(sa.Column(sa.Unicode))
@@ -99,6 +100,7 @@ class Connection(Resource):
                 auth=auth,
                 headers=env.wmsclient.headers,
                 timeout=env.wmsclient.options["timeout"].total_seconds(),
+                verify=not self.insecure,
             )
         except RequestException:
             raise ExternalServiceError
@@ -198,6 +200,7 @@ class ConnectionSerializer(Serializer, resource=Connection):
     version = VersionAttr(read=ConnectionScope.read, write=ConnectionScope.write)
     username = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
     password = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
+    insecure = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
     capcache = CapCacheAttr(read=ConnectionScope.connect, write=ConnectionScope.write)
 
 

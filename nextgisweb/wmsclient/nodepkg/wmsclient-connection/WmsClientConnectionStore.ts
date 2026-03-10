@@ -22,6 +22,7 @@ const {
   username,
   password,
   version,
+  insecure,
   capcache,
   $dirty: mapperDirty,
   $load: mapperLoad,
@@ -44,6 +45,7 @@ export class WmsClientConnectionStore implements EditorStore<
   readonly username = username.init(null, this);
   readonly password = password.init(null, this);
   readonly version = version.init("1.1.1", this);
+  readonly insecure = insecure.init(false, this);
   /**  capcache is different for read and create/update:
    * - on dump - instruction flag (CapCacheEnum; default "query") to tell the server what to do (TODO: describe what server actually do)
    * - on load - contains the actual data
@@ -65,6 +67,7 @@ export class WmsClientConnectionStore implements EditorStore<
       ...this.username.jsonPart(),
       ...this.password.jsonPart(),
       ...this.version.jsonPart(),
+      ...this.insecure.jsonPart(),
     } as ConnectionCreate;
     if (this.capcache.value) {
       payload.capcache = this.capcache.value;

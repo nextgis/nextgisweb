@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite";
 
-import { InputValue, PasswordValue, Select } from "@nextgisweb/gui/antd";
+import { CheckboxValue, InputValue, PasswordValue, Select } from "@nextgisweb/gui/antd";
 import { LotMV } from "@nextgisweb/gui/arm";
 import { Area } from "@nextgisweb/gui/mayout";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -81,6 +81,16 @@ export const WmsClientConnectionWidget: EditorWidget<WmsClientConnectionStore> =
             options: capcacheOptions,
             style: { width: "100%" },
           }}
+        />
+
+        <LotMV
+          row
+          value={store.insecure}
+          label={false}
+          props={{
+            children: gettext("Skip SSL/TLS certificate verification"),
+          }}
+          component={CheckboxValue}
         />
       </Area>
     );

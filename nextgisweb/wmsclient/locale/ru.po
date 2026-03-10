@@ -1,12 +1,12 @@
-#: model.py:51
+#: model.py:52
 msgid "WMS connection"
 msgstr "Соединение WMS"
 
-#: model.py:145
+#: model.py:133
 msgid "WMS capabilities"
 msgstr "Возможности WMS"
 
-#: model.py:146 nodepkg/wmsclient-layer/WmsClientLayerWidget.tsx:96
+#: model.py:134 nodepkg/wmsclient-layer/WmsClientLayerWidget.tsx:98
 msgid "Image format"
 msgstr "Формат изображения"
 
@@ -14,61 +14,65 @@ msgstr "Формат изображения"
 msgid "WMS layer"
 msgstr "Слой WMS"
 
-#: nodepkg/wmsclient-connection/WmsClientConnectionWidget.tsx:12
+#: nodepkg/wmsclient-connection/WmsClientConnectionWidget.tsx:20
 msgid "Query"
 msgstr "Запросить"
 
-#: nodepkg/wmsclient-connection/WmsClientConnectionWidget.tsx:13
+#: nodepkg/wmsclient-connection/WmsClientConnectionWidget.tsx:21
 msgid "Clear"
 msgstr "Очистить"
 
-#: nodepkg/wmsclient-connection/WmsClientConnectionWidget.tsx:14
+#: nodepkg/wmsclient-connection/WmsClientConnectionWidget.tsx:22
 msgid "Do not query"
 msgstr "Не запрашивать"
 
-#: nodepkg/wmsclient-connection/WmsClientConnectionWidget.tsx:22
+#: nodepkg/wmsclient-connection/WmsClientConnectionWidget.tsx:30
 msgid "WMS Connection URL"
 msgstr "Ссылка WMS-соеденения"
 
-#: nodepkg/wmsclient-connection/WmsClientConnectionWidget.tsx:30
+#: nodepkg/wmsclient-connection/WmsClientConnectionWidget.tsx:38
 msgid "URL"
 msgstr "URL"
 
-#: nodepkg/wmsclient-connection/WmsClientConnectionWidget.tsx:38
+#: nodepkg/wmsclient-connection/WmsClientConnectionWidget.tsx:46
 msgid "Username"
 msgstr "Имя пользователя"
 
-#: nodepkg/wmsclient-connection/WmsClientConnectionWidget.tsx:45
+#: nodepkg/wmsclient-connection/WmsClientConnectionWidget.tsx:56
 msgid "Password"
 msgstr "Пароль"
 
-#: nodepkg/wmsclient-connection/WmsClientConnectionWidget.tsx:52
+#: nodepkg/wmsclient-connection/WmsClientConnectionWidget.tsx:66
 msgid "Version"
 msgstr "Версия"
 
-#: nodepkg/wmsclient-connection/WmsClientConnectionWidget.tsx:63
+#: nodepkg/wmsclient-connection/WmsClientConnectionWidget.tsx:77
 msgid "Capabilities"
 msgstr "Возможности"
 
-#: nodepkg/wmsclient-connection/WmsClientConnectionWidget.tsx:75
-#: nodepkg/wmsclient-layer/WmsClientLayerWidget.tsx:83
+#: nodepkg/wmsclient-connection/WmsClientConnectionWidget.tsx:91
+msgid "Skip SSL/TLS certificate verification"
+msgstr "Не проверять сертификат SSL/TLS"
+
+#: nodepkg/wmsclient-connection/WmsClientConnectionWidget.tsx:100
+#: nodepkg/wmsclient-layer/WmsClientLayerWidget.tsx:85
 msgid "WMS Connection"
 msgstr "WMS Соединение"
 
-#: nodepkg/wmsclient-layer/WmsClientLayerWidget.tsx:107
+#: nodepkg/wmsclient-layer/WmsClientLayerWidget.tsx:109
 msgid "WMS layers"
 msgstr "Слои WMS"
 
-#: nodepkg/wmsclient-layer/WmsClientLayerWidget.tsx:116
+#: nodepkg/wmsclient-layer/WmsClientLayerWidget.tsx:118
 #: nodepkg/wmsclient-layer/component/VendorParamsModal.tsx:65
 msgid "Vendor parameters"
 msgstr "Вендор параметры"
 
-#: nodepkg/wmsclient-layer/WmsClientLayerWidget.tsx:129
+#: nodepkg/wmsclient-layer/WmsClientLayerWidget.tsx:131
 msgid "Edit vendor parameters"
 msgstr "Изменить вендор параметры"
 
-#: nodepkg/wmsclient-layer/WmsClientLayerWidget.tsx:137
+#: nodepkg/wmsclient-layer/WmsClientLayerWidget.tsx:140
 msgid "WMS Layer"
 msgstr "Слой WMS"
 
