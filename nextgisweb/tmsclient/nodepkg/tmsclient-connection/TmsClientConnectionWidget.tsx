@@ -94,6 +94,12 @@ export const TmsClientConnectionWidget: EditorWidget<TmsClientConnectionStore> =
         />
         <LotMV
           row
+          label={gettext("Referer header")}
+          component={InputValue}
+          value={store.referer}
+        />
+        <LotMV
+          row
           value={store.insecure}
           label={false}
           props={{

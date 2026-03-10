@@ -165,6 +165,8 @@ class TileFetcher:
         )
         if connection.username is not None:
             data["req_kw"]["auth"] = (connection.username, connection.password)
+        if connection.referer:
+            data["req_kw"]["headers"] = {"Referer": connection.referer}
         data["insecure"] = connection.insecure
         answer = data["answer"] = Queue()
 

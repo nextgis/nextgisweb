@@ -56,6 +56,7 @@ class Connection(Resource):
     password = sa.Column(sa.Unicode)
     scheme = sa.Column(saext.Enum(*SCHEME.enum), nullable=False, default=SCHEME.XYZ)
     insecure = sa.Column(sa.Boolean, nullable=False, default=False)
+    referer = sa.Column(sa.Unicode)
 
     @classmethod
     def check_parent(cls, parent):
@@ -125,6 +126,7 @@ class ConnectionSerializer(Serializer, resource=Connection):
     password = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
     scheme = SchemeAttr(read=ConnectionScope.read, write=ConnectionScope.write)
     insecure = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
+    referer = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
 
     # NOTE: The 'capmode' attribute overrides url_template and others, so it
     # must be the last. Otherwise 'url_template' can be NULL.

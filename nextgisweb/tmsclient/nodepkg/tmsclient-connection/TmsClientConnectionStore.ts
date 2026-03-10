@@ -17,6 +17,7 @@ const {
   username,
   password,
   insecure,
+  referer,
   capmode,
   scheme,
   apikey,
@@ -57,6 +58,7 @@ export class TmsClientConnectionStore implements EditorStore<
   readonly username = username.init(null, this);
   readonly password = password.init(null, this);
   readonly insecure = insecure.init(false, this);
+  readonly referer = referer.init(null, this);
   readonly capmode = capmode.init(null, this);
   readonly scheme = scheme.init("xyz", this);
   readonly apikey = apikey.init(null, this);

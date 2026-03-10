@@ -1,4 +1,5 @@
 from io import BytesIO
+from unittest.mock import patch
 
 import numpy as np
 import pytest
@@ -10,6 +11,7 @@ from nextgisweb.pyramid.test import WebTestApp
 from nextgisweb.spatial_ref_sys.model import BOUNDS_EPSG_3857, SRS
 
 from ..model import Connection, Layer
+from ..tile_fetcher import FetchResult, FetchStatus, TileFetcher
 
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
 
@@ -76,3 +78,25 @@ def test_layer(layer, ngw_webtest_app: WebTestApp, ngw_resource_group):
     image2 = req.render_extent(BOUNDS_EPSG_3857, (512, 512))
 
     assert image_compare(image1, image2.crop((0, 0, 256, 256)))
+
+
+@pytest.mark.parametrize("referer", [None, "http://example.com"])
+def test_connection_referer(referer, ngw_resource_defaults):
+    with transaction.manager:
+        conn = Connection(
+            url_template="http://example.com/{z}/{x}/{y}",
+            referer=referer,
+        ).persist()
+
+    captured = {}
+
+    def fake_put(data):
+        captured.update(data.get("req_kw", {}))
+        data["answer"].put_nowait(FetchResult(FetchStatus.DONE))
+
+    fetcher = TileFetcher.instance()
+    with patch.object(fetcher._queue, "put_nowait", side_effect=fake_put):
+        list(conn.get_tiles(None, 0, 0, 0, 0, 0))
+
+    actual = captured.get("headers", {}).get("Referer")
+    assert actual is None if referer is None else actual == referer
