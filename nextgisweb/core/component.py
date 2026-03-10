@@ -319,6 +319,9 @@ class CoreComponent(StorageComponentMixin, Component):
         if gdal_version is not None:
             result.append(("GDAL", gdal_version))
 
+        if (instance_id := self.instance_id) is not None:
+            result.append((gettext("Instance ID"), instance_id))
+
         if (lb := self.settings_get(self.identity, "last_backup", None)) is not None:
             lb_dt = datetime.fromisoformat(lb).replace(microsecond=0)
             result.append((gettext("Last backup"), lb_dt.strftime("%Y-%m-%d %H:%M UTC")))
