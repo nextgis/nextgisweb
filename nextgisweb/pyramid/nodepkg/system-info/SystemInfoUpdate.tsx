@@ -12,16 +12,13 @@ import { updateStore } from "@nextgisweb/pyramid/update";
 
 import "./SystemInfoUpdate.less";
 
-const msgChecking = gettext("Checking for updates...");
-const msgContactSupport = gettext("<a>Contact support</a> for update.");
-const msgShowDetails = gettext("Show details");
-
-// prettier-ignore
-const [msgCritical, msgHasUpdate, msgUpToDate] = [
-    gettextf("Critical updates are available: {version}. Please consider updating an soon as possible."),
-    gettextf("New version of {distribution} is available: {version}."),
-    gettextf("Your {distribution} is up-to-date."),
-]
+/* prettier-ignore */ const
+msgChecking = gettext("Checking for updates..."),
+msgContactSupport = gettext("<a>Contact support</a> for update."),
+msgShowDetails = gettext("Show details"),
+msgCritical = gettextf("Critical updates are available: {version}. Please consider updating an soon as possible."),
+msgHasUpdate = gettextf("New version of {distribution} is available: {version}."),
+msgUpToDate = gettextf("Your {distribution} is up-to-date.");
 
 const { distribution } = ngwConfig;
 

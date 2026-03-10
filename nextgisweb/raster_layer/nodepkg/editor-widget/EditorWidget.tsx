@@ -8,11 +8,10 @@ import type { EditorWidget as IEditorWidget } from "@nextgisweb/resource/type";
 
 import type { EditorStore } from "./EditorStore";
 
-// prettier-ignore
-const uploaderMessages = {
-    uploadText: gettext("Select a dataset"),
-    helpText: gettext("Supported formats: GeoTIFF, JPEG, and PNG with GDAL PAM metadata (.aux.xml files). Multi-file datasets should be uploaded as ZIP archives."),
-};
+/* prettier-ignore */ const
+msgSelectDataset = gettext("Select a dataset"),
+msgSupportedFormats = gettext("Supported formats: GeoTIFF, JPEG, and PNG with GDAL PAM metadata (.aux.xml files). Multi-file datasets should be uploaded as ZIP archives."),
+msgCog = gettext("Cloud Optimized GeoTIFF (COG)");
 
 export const EditorWidget: IEditorWidget<EditorStore> = observer(
   ({ store }) => {
@@ -22,9 +21,10 @@ export const EditorWidget: IEditorWidget<EditorStore> = observer(
           <FileUploader
             onChange={(value) => store.update({ source: value })}
             onUploading={(value) => store.update({ uploading: value })}
-            showMaxSize
             multiple={false}
-            {...uploaderMessages}
+            uploadText={msgSelectDataset}
+            helpText={msgSupportedFormats}
+            showMaxSize
           />
         </Lot>
         <Lot label={false}>
@@ -32,7 +32,7 @@ export const EditorWidget: IEditorWidget<EditorStore> = observer(
             value={store.cog}
             onChange={(v) => store.update({ cog: v })}
           >
-            {gettext("Cloud Optimized GeoTIFF (COG)")}
+            {msgCog}
           </CheckboxValue>
         </Lot>
       </Area>

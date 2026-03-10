@@ -28,14 +28,13 @@ import ReorderIcon from "@nextgisweb/icon/material/sync";
 
 import "./EditorWidget.less";
 
-const msgExport = gettext("Export");
-const msgImport = gettext("Import");
-const msgSort = gettext("Sort order");
-const msgResort = gettext("Resort rows");
-const msgClear = gettext("Clear");
-
-// prettier-ignore
-const msgConfirm = gettext("All existing records will be deleted after import. Are you sure you want to proceed?");
+/* prettier-ignore */ const
+msgExport = gettext("Export"),
+msgImport = gettext("Import"),
+msgSort = gettext("Sort order"),
+msgResort = gettext("Resort rows"),
+msgClear = gettext("Clear"),
+msgConfirm = gettext("All existing records will be deleted after import. Are you sure you want to proceed?");
 
 type RowType = EditorStore["items"][number];
 

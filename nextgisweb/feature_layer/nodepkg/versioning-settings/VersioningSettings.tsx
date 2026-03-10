@@ -9,13 +9,11 @@ import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-// prettier-ignore
-const msg = {
-    info: gettext("Select the default feature versioning setting for new layers. This affects layers created via UI and HTTP API. You can always change the versioning setting for individual layers later."),
-    auto: gettext("Auto: follow system-wide settings"),
-    true: gettext("Enable feature versioning by default"),
-    false: gettext("Disable feature versioning by default"),
-};
+/* prettier-ignore */ const
+msgInfo = gettext("Select the default feature versioning setting for new layers. This affects layers created via UI and HTTP API. You can always change the versioning setting for individual layers later."),
+msgAuto = gettext("Auto: follow system-wide settings"),
+msgTrue = gettext("Enable feature versioning by default"),
+msgFalse = gettext("Disable feature versioning by default");
 
 export function VersioningSettings() {
   const [value, setValue] = useState<boolean | null>();
@@ -58,15 +56,15 @@ export function VersioningSettings() {
   return (
     <Space direction="vertical" size="middle">
       {contextHolder}
-      <div style={{ maxWidth: "50em" }}>{msg.info}</div>
+      <div style={{ maxWidth: "50em" }}>{msgInfo}</div>
       <Radio.Group
         value={String(value)}
         onChange={(e) => setValue(eval(e.target.value))}
       >
         <Space direction="vertical">
-          <Radio value="null">{msg.auto}</Radio>
-          <Radio value="true">{msg.true}</Radio>
-          <Radio value="false">{msg.false}</Radio>
+          <Radio value="null">{msgAuto}</Radio>
+          <Radio value="true">{msgTrue}</Radio>
+          <Radio value="false">{msgFalse}</Radio>
         </Space>
       </Radio.Group>
       <SaveButton onClick={save} loading={saving}>

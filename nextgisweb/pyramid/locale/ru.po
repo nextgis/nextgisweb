@@ -1,8 +1,8 @@
-#: api.py:255
+#: api.py:181
 msgid "Storage management is not enabled on this server."
 msgstr "Управление хранилищем не включено на этом сервере."
 
-#: api.py:342
+#: api.py:278
 msgid ""
 "Invalid font file name: '{}'. Only latin letters, digits, hyphens and "
 "underscores are allowed. The *.ttf or *.otf extension is required."
@@ -10,11 +10,11 @@ msgstr ""
 "Недопустимое имя файла шрифта: '{}'. Разрешены только латинские буквы, цифры,"
 " дефисы и подчеркивания. Требуется расширение *.ttf или *.otf."
 
-#: api.py:349
+#: api.py:285
 msgid "Font '{0}' is larger than {1} bytes."
 msgstr "Шрифт '{0}' больше {1} байт."
 
-#: api.py:545
+#: api.py:485
 msgid ""
 "The '{}' query parameter should not contain additional values if 'all' is "
 "specified."
@@ -22,35 +22,35 @@ msgstr ""
 "Параметр запроса '{}' не должен содержать дополнительных значений, если "
 "указано 'all'."
 
-#: api.py:672
+#: api.py:614
 msgid "Got an unsupported MIME type: '{}'."
 msgstr "Получен неподдерживаемый тип MIME: '{}'."
 
-#: api.py:675
+#: api.py:617
 msgid "{}KiB should be enough for a logo."
 msgstr "{}KiB должно быть достаточно для логотипа."
 
-#: api.py:846
+#: api.py:780
 msgid "Your Web GIS at nextgis.com"
 msgstr "Ваши карты онлайн на nextgis.com"
 
-#: component.py:192
+#: component.py:160
 msgid "Request timeout"
 msgstr "Таймаут запроса"
 
-#: component.py:195
+#: component.py:163
 msgid "Enabled"
 msgstr "Включено"
 
-#: component.py:195
+#: component.py:163
 msgid "Disabled"
 msgstr "Отключено"
 
-#: exception.py:219
+#: exception.py:218
 msgid "Internal server error"
 msgstr "Внутренняя ошибка сервера"
 
-#: exception.py:221
+#: exception.py:220
 msgid ""
 "The server encountered an internal error or misconfiguration and was unable "
 "to complete your request."
@@ -58,37 +58,37 @@ msgstr ""
 "При обработке запроса возникла внутренняя ошибка или сервер настроен "
 "некорректно и не может обработать запрос."
 
-#: exception.py:253
+#: exception.py:252
 msgid "Bad request"
 msgstr "Некорректный запрос"
 
-#: exception.py:255
+#: exception.py:254
 msgid ""
 "The server could not comply with the request since it is either malformed or "
 "otherwise incorrect."
 msgstr "Сервер не может выполнить запрос. Возможно, в запросе ошибка."
 
-#: exception.py:262
+#: exception.py:261
 msgid "Payment required"
 msgstr "Необходима оплата"
 
-#: exception.py:263
+#: exception.py:262
 msgid "Access was denied for financial reasons."
 msgstr "Доступ закрыт по финансовым причинам."
 
-#: exception.py:268
+#: exception.py:267
 msgid "Forbidden"
 msgstr "Доступ запрещен"
 
-#: exception.py:269
+#: exception.py:268
 msgid "Access was denied to this resource."
 msgstr "У вас нет доступа к этому ресурсу."
 
-#: exception.py:274
+#: exception.py:273
 msgid "Page not found"
 msgstr "Страница не найдена"
 
-#: exception.py:276
+#: exception.py:275
 msgid ""
 "The page may have been deleted or an error in the address. Correct the "
 "address or go to the home page and try to find the desired page."
@@ -97,45 +97,45 @@ msgstr ""
 " вернитесь на главную страницу и попробуйте найти нужную страницу с помощью "
 "навигации."
 
-#: exception.py:283
+#: exception.py:282
 msgid "Unprocessable entity"
 msgstr "Необрабатываемая сущность"
 
-#: exception.py:284
+#: exception.py:283
 msgid "Unable to process the contained instructions."
 msgstr "Невозможно выполнить запрошенную операцию."
 
-#: exception.py:289 exception.py:290
+#: exception.py:288 exception.py:289
 msgid "Not implemented"
 msgstr "Не реализовано"
 
-#: exception.py:295
+#: exception.py:294
 msgid "Service unavailable"
 msgstr "Сервис недоступен"
 
-#: exception.py:296
+#: exception.py:295
 msgid "The server is currently unavailable. Please try again at a later time."
 msgstr ""
 "В настоящий момент сервер недоступен. Пожалуйста, попробуйте выполнить "
 "действие еще раз через некоторое время."
 
-#: lunkwill.py:25
+#: lunkwill.py:15
 msgid "Lunkwill not enabled"
 msgstr "Lunkwill не включен"
 
-#: lunkwill.py:26
+#: lunkwill.py:16
 msgid "The Lunkwill extension is not configured on this server."
 msgstr "Расширение Lunkwill не настроено на этом сервере."
 
-#: lunkwill.py:30
+#: lunkwill.py:20
 msgid "Interception expected"
 msgstr "Ожидается перехват"
 
-#: lunkwill.py:31
+#: lunkwill.py:21
 msgid "The Lunkwill extension expects external request interception."
 msgstr "Расширение Lunkwill ожидает перехват внешних запросов."
 
-#: nodepkg/api/error.ts:18 nodepkg/api/error.ts:39
+#: nodepkg/api/error.ts:18 nodepkg/api/error.ts:42
 msgid "Something went wrong."
 msgstr "Что-то пошло не так."
 
@@ -143,49 +143,53 @@ msgstr "Что-то пошло не так."
 msgid "Unknown API error"
 msgstr "Неизвестная ошибка API"
 
-#: nodepkg/api/error.ts:33
+#: nodepkg/api/error.ts:32
 msgid "There is no response from the server or problem connecting to server."
 msgstr ""
 "Не удалось получить ответ от сервера либо в процессе соединения возникла "
 "ошибка."
 
-#: nodepkg/api/error.ts:34
+#: nodepkg/api/error.ts:35
 msgid "Network error"
 msgstr "Сетевая ошибка"
 
-#: nodepkg/api/error.ts:35
+#: nodepkg/api/error.ts:36
 msgid "Check network connectivity and try again later."
 msgstr "Проверьте сетевое соединение и попробуйте повторить позже."
 
-#: nodepkg/api/error.ts:40
+#: nodepkg/api/error.ts:43
 msgid "Unexpected server response"
 msgstr "Неожидаемый ответ сервера"
 
-#: nodepkg/api/error.ts:68
+#: nodepkg/api/error.ts:70
 msgid "Unexpected error while processing long-running request."
 msgstr "Неожиданная ошибка во время выполнения длительного запроса."
 
-#: nodepkg/api/error.ts:69
+#: nodepkg/api/error.ts:73
 msgid "Long-running request error"
 msgstr "Ошибка длительного запроса"
 
-#: nodepkg/api/error.ts:77
+#: nodepkg/api/error.ts:81
 msgid "Long-running request was cancelled."
 msgstr "Длительный запрос был отменен."
+
+#: nodepkg/api/error.ts:85
+msgid "Long-running request timeout."
+msgstr ""
 
 #: nodepkg/backup-browse/BackupBrowse.tsx:23
 msgid "Filename"
 msgstr "Имя файла"
 
-#: nodepkg/backup-browse/BackupBrowse.tsx:38
+#: nodepkg/backup-browse/BackupBrowse.tsx:37
 msgid "Timestamp (UTC)"
 msgstr "Время (UTC)"
 
-#: nodepkg/backup-browse/BackupBrowse.tsx:44
+#: nodepkg/backup-browse/BackupBrowse.tsx:43
 msgid "Size"
 msgstr "Размер"
 
-#: nodepkg/cors-settings/CORSSettings.tsx:23
+#: nodepkg/cors-settings/CORSSettings.tsx:18
 msgid ""
 "Enter allowed origins for cross domain requests to use HTTP API of this Web "
 "GIS on other websites. One origin per line."
@@ -194,7 +198,7 @@ msgstr ""
 "использования HTTP API этой Веб ГИС на других веб-сайтах. По одному источнику"
 " в строке."
 
-#: nodepkg/cors-settings/CORSSettings.tsx:24
+#: nodepkg/cors-settings/CORSSettings.tsx:19
 msgid ""
 "Please note that different protocols (HTTP and HTTPS) and subdomains "
 "(example.com and www.example.com) are different origins. Wildcards are "
@@ -204,23 +208,23 @@ msgstr ""
 " www.example.com) считаются разными источниками. Символ подстановки (*) "
 "допустим для доменов третьего уровня и выше."
 
-#: nodepkg/cors-settings/CORSSettings.tsx:59
+#: nodepkg/cors-settings/CORSSettings.tsx:57
 msgid "CORS settings updated"
 msgstr "Настройки CORS обновлены"
 
-#: nodepkg/cors-settings/CORSSettings.tsx:64
+#: nodepkg/cors-settings/CORSSettings.tsx:62
 msgid "Fix the form errors first"
 msgstr "Вначале исправьте ошибку в форме"
 
-#: nodepkg/cors-settings/CORSSettings.tsx:80
+#: nodepkg/cors-settings/CORSSettings.tsx:78
 msgid "The value entered is not valid"
 msgstr "Введенное значение некорректно"
 
-#: nodepkg/custom-css-form/CustomCSSForm.tsx:42
+#: nodepkg/custom-css-form/CustomCSSForm.tsx:12
 msgid "Custom styles saved. Reload the page to get them applied."
 msgstr "Изменения в стилях сохранены. Обновите страницу, чтобы увидеть изменения."
 
-#: nodepkg/custom-css-form/CustomCSSForm.tsx:65
+#: nodepkg/custom-css-form/CustomCSSForm.tsx:13
 msgid ""
 "Enter custom CSS rules here. They will be used to redefine styles, design for"
 " all pages of your Web GIS."
@@ -240,31 +244,31 @@ msgstr ""
 msgid "Web GIS is restarting, please wait..."
 msgstr "Веб ГИС перезапускается, подождите..."
 
-#: nodepkg/fonts/FontsPanel.tsx:30
+#: nodepkg/fonts/FontsPanel.tsx:31
 msgid "Custom"
 msgstr "Пользовательский"
 
-#: nodepkg/fonts/FontsPanel.tsx:30
+#: nodepkg/fonts/FontsPanel.tsx:31
 msgid "System"
 msgstr "Системный"
 
-#: nodepkg/fonts/FontsPanel.tsx:105
+#: nodepkg/fonts/FontsPanel.tsx:106
 msgid "Font"
 msgstr "Шрифт"
 
-#: nodepkg/fonts/FontsPanel.tsx:110
+#: nodepkg/fonts/FontsPanel.tsx:111
 msgid "Format"
 msgstr "Формат"
 
-#: nodepkg/fonts/FontsPanel.tsx:115
+#: nodepkg/fonts/FontsPanel.tsx:116
 msgid "Type"
 msgstr "Тип"
 
-#: nodepkg/fonts/FontsPanel.tsx:176
+#: nodepkg/fonts/FontsPanel.tsx:173
 msgid "Delete"
 msgstr "Удалить"
 
-#: nodepkg/fonts/FontsPanel.tsx:183
+#: nodepkg/fonts/FontsPanel.tsx:180
 msgid "Show system fonts"
 msgstr "Показать системные шрифты"
 
@@ -280,19 +284,19 @@ msgstr[0] "штука"
 msgstr[1] "штуки"
 msgstr[2] "штук"
 
-#: nodepkg/layout/Avatar.tsx:12
+#: nodepkg/layout/Avatar.tsx:13
 msgid "Sign in"
 msgstr "Войти"
 
-#: nodepkg/layout/Avatar.tsx:20
+#: nodepkg/layout/Avatar.tsx:21
 msgid "Invitation session"
 msgstr "Сессия по приглашению"
 
-#: nodepkg/layout/Avatar.tsx:23
+#: nodepkg/layout/Avatar.tsx:24
 msgid "User settings"
 msgstr "Настройки пользователя"
 
-#: nodepkg/layout/Avatar.tsx:25
+#: nodepkg/layout/Avatar.tsx:26
 msgid "Sign out"
 msgstr "Выйти"
 
@@ -300,7 +304,7 @@ msgstr "Выйти"
 msgid "Resources"
 msgstr "Ресурсы"
 
-#: nodepkg/layout/store.ts:77 view.py:199
+#: nodepkg/layout/store.ts:77 view.py:203
 msgid "Control panel"
 msgstr "Панель управления"
 
@@ -332,11 +336,11 @@ msgstr "Настройка сохранена."
 msgid "Reload the page to get them applied."
 msgstr "Обновите страницу, чтобы настройки вступили в силу."
 
-#: nodepkg/metrics/MetricSettings.tsx:27
+#: nodepkg/metrics/MetricSettings.tsx:24
 msgid "Add one or more counters to your Web GIS."
 msgstr "Добавьте один или несколько счетчиков в вашу Веб ГИС."
 
-#: nodepkg/metrics/MetricSettings.tsx:28
+#: nodepkg/metrics/MetricSettings.tsx:25
 msgid ""
 "HTML code of these counters will be embeded into each page and will allow you"
 " to track user activity."
@@ -360,47 +364,47 @@ msgstr "Google Аналитика"
 msgid "Yandex.Metrica"
 msgstr "Яндекс.Метрика"
 
-#: nodepkg/storage-summary/StorageSummary.tsx:23
+#: nodepkg/storage-summary/StorageSummary.tsx:24
 msgid "Some changes may be reflected only after full estimation."
 msgstr ""
 "Некоторые изменения могут быть отражены только после полной оценки "
 "использования хранилища."
 
-#: nodepkg/storage-summary/StorageSummary.tsx:24
+#: nodepkg/storage-summary/StorageSummary.tsx:25
 msgid "Storage usage was fully estimated at {f}."
 msgstr "Использование хранилища было полностью оценено в {f}."
 
-#: nodepkg/storage-summary/StorageSummary.tsx:25
+#: nodepkg/storage-summary/StorageSummary.tsx:26
 msgid "Storage usage was fully estimated at {f} and updated at {u}."
 msgstr "Использование хранилища было полностью оценено в {f} и обновлено в {u}."
 
-#: nodepkg/storage-summary/StorageSummary.tsx:26
+#: nodepkg/storage-summary/StorageSummary.tsx:27
 msgid "Storage usage hasn't been estimated yet but was updated at {u}."
 msgstr ""
 "Использование хранилища еще не было полностью оценено, но было обновлено в "
 "{u}."
 
-#: nodepkg/storage-summary/StorageSummary.tsx:27
+#: nodepkg/storage-summary/StorageSummary.tsx:28
 msgid "Storage usage hasn't been estimated yet."
 msgstr "Использование хранилища еще не было полностью оценено."
 
-#: nodepkg/storage-summary/StorageSummary.tsx:116
+#: nodepkg/storage-summary/StorageSummary.tsx:114
 msgid "Kind of data"
 msgstr "Вид данных"
 
-#: nodepkg/storage-summary/StorageSummary.tsx:122
+#: nodepkg/storage-summary/StorageSummary.tsx:120
 msgid "Volume"
 msgstr "Размер"
 
-#: nodepkg/storage-summary/StorageSummary.tsx:142
+#: nodepkg/storage-summary/StorageSummary.tsx:139
 msgid "Total"
 msgstr "Итого"
 
-#: nodepkg/storage-summary/StorageSummary.tsx:147
+#: nodepkg/storage-summary/StorageSummary.tsx:144
 msgid "of"
 msgstr "из"
 
-#: nodepkg/storage-summary/StorageSummary.tsx:212
+#: nodepkg/storage-summary/StorageSummary.tsx:209
 msgid "Estimate storage"
 msgstr "Оценка хранилища"
 
@@ -412,39 +416,39 @@ msgstr "Пакет"
 msgid "Version"
 msgstr "Версия"
 
-#: nodepkg/system-info/SystemInfo.tsx:77
+#: nodepkg/system-info/SystemInfo.tsx:75
 msgid "Platform"
 msgstr "Платформа"
 
-#: nodepkg/system-info/SystemInfo.tsx:89
+#: nodepkg/system-info/SystemInfo.tsx:87
 msgid "Browser support"
 msgstr "Поддержка браузеров"
 
-#: nodepkg/system-info/SystemInfo.tsx:97
+#: nodepkg/system-info/SystemInfo.tsx:95
 msgid "or higher"
 msgstr "или выше"
 
-#: nodepkg/system-info/SystemInfo.tsx:98
+#: nodepkg/system-info/SystemInfo.tsx:96
 msgid "Not supported"
 msgstr "Не поддерживается"
 
-#: nodepkg/system-info/SystemInfo.tsx:104
+#: nodepkg/system-info/SystemInfo.tsx:102
 msgid "Your browser"
 msgstr "Ваш браузер"
 
-#: nodepkg/system-info/SystemInfoUpdate.tsx:15
+#: nodepkg/system-info/SystemInfoUpdate.tsx:16
 msgid "Checking for updates..."
 msgstr "Проверяем наличие обновлений..."
 
-#: nodepkg/system-info/SystemInfoUpdate.tsx:16
+#: nodepkg/system-info/SystemInfoUpdate.tsx:17
 msgid "<a>Contact support</a> for update."
 msgstr "<a>Обратитесь в поддержку</a> для установки обновлений."
 
-#: nodepkg/system-info/SystemInfoUpdate.tsx:17
+#: nodepkg/system-info/SystemInfoUpdate.tsx:18
 msgid "Show details"
 msgstr "Подробнее"
 
-#: nodepkg/system-info/SystemInfoUpdate.tsx:21
+#: nodepkg/system-info/SystemInfoUpdate.tsx:19
 msgid ""
 "Critical updates are available: {version}. Please consider updating an soon "
 "as possible."
@@ -452,11 +456,11 @@ msgstr ""
 "Доступны критические обновления: {version}. Рекомендуем установить их как "
 "можно быстрее."
 
-#: nodepkg/system-info/SystemInfoUpdate.tsx:22
+#: nodepkg/system-info/SystemInfoUpdate.tsx:20
 msgid "New version of {distribution} is available: {version}."
 msgstr "Доступна новая версия {distribution}: {version}."
 
-#: nodepkg/system-info/SystemInfoUpdate.tsx:23
+#: nodepkg/system-info/SystemInfoUpdate.tsx:21
 msgid "Your {distribution} is up-to-date."
 msgstr "У вас последняя версия {distribution}."
 
@@ -476,7 +480,7 @@ msgstr "Доступны обновления"
 msgid "Click to see what's new"
 msgstr "Нажмите и узнайте, что нового"
 
-#: permission.py:5 view.py:304 view.py:655
+#: permission.py:5 view.py:308 view.py:746
 msgid "Cross-origin resource sharing (CORS)"
 msgstr "Cross-origin resource sharing (CORS)"
 
@@ -549,19 +553,19 @@ msgstr ""
 "Если вы используете актуальную версию браузера, Веб ГИС будет работать "
 "нормально."
 
-#: tomb/config.py:100
+#: tomb/config.py:99
 msgid "Parameter required"
 msgstr "Требуется параметр"
 
-#: tomb/config.py:101
+#: tomb/config.py:100
 msgid "The '{}' query parameter is required."
 msgstr "Необходимо указать значение параметра '{}'."
 
-#: tomb/config.py:103
+#: tomb/config.py:102
 msgid "Invalid parameter"
 msgstr "Некорректный параметр"
 
-#: tomb/config.py:104
+#: tomb/config.py:103
 msgid "The '{}' query parameter has an invalid value."
 msgstr "Параметр запроса '{}' имеет недопустимое значение."
 
@@ -573,50 +577,50 @@ msgstr "Некорректное JSON тело"
 msgid "The JSON body of the request is malformed or invalid."
 msgstr "JSON тело запроса имеет некорректный или недопустимый формат."
 
-#: view.py:187
+#: view.py:191
 msgid "HTTP API documentation"
 msgstr "Документация HTTP API"
 
-#: view.py:253 view.py:664
+#: view.py:257 view.py:755
 msgid "System information"
 msgstr "Информация о системе"
 
-#: view.py:263 view.py:670
+#: view.py:267 view.py:761
 msgid "Font management"
 msgstr "Управление шрифтами"
 
-#: view.py:272 view.py:707
+#: view.py:276 view.py:798
 msgid "Storage"
 msgstr "Хранилище"
 
-#: view.py:286 view.py:714
+#: view.py:290 view.py:805
 msgid "Backups"
 msgstr "Резервные копии"
 
-#: view.py:314 view.py:682
+#: view.py:318 view.py:773
 msgid "Custom CSS"
 msgstr "Пользовательские стили CSS"
 
-#: view.py:323 view.py:688
+#: view.py:327 view.py:779
 msgid "Custom logo"
 msgstr "Логотип"
 
-#: view.py:332 view.py:676
+#: view.py:336 view.py:767
 msgid "Web GIS name"
 msgstr "Название Веб ГИС"
 
-#: view.py:341 view.py:694
+#: view.py:345 view.py:785
 msgid "Home path"
 msgstr "Стартовая страница"
 
-#: view.py:350 view.py:700
+#: view.py:354 view.py:791
 msgid "Metrics and analytics"
 msgstr "Метрики и аналитика"
 
-#: view.py:644
+#: view.py:735
 msgid "Info"
 msgstr "Информация"
 
-#: view.py:645
+#: view.py:736
 msgid "Settings"
 msgstr "Настройки"

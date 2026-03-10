@@ -12,11 +12,9 @@ import "./EditorWidget.less";
 
 const { TextArea } = Input;
 
-// prettier-ignore
-const msgImageUploader = {
-    uploadText: gettext("Select a preview image"),
-    helpText: gettext("The image will be converted to PNG format and downscaled to 1600x630 pixels if it's bigger."),
-}
+/* prettier-ignore */ const
+msgSelectImage = gettext("Select a preview image"),
+msgImageHelpText = gettext("The image will be converted to PNG format and downscaled to 1600x630 pixels if it's bigger.");
 
 export const EditorWidget: IEditorWidget<EditorStore> = observer(
   ({ store }) => {
@@ -44,7 +42,8 @@ export const EditorWidget: IEditorWidget<EditorStore> = observer(
               imageUpdated: undefined,
             });
           }}
-          {...msgImageUploader}
+          uploadText={msgSelectImage}
+          helpText={msgImageHelpText}
         />
         <TextArea
           value={store.description || ""}

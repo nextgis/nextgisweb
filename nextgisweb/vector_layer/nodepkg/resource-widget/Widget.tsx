@@ -29,21 +29,17 @@ interface Option<T = string> {
   value: T;
 }
 
-// prettier-ignore
-const uploaderMessages = {
-    uploadText: gettext("Select a dataset"),
-    helpText: gettext("ESRI Shapefile (zip), GeoPackage, GeoJSON, GML, KML, CSV or XLSX formats are supported. For CSV and XLSX only points are supported, coordinates must be put in lat and lot columns."),
-}
-// prettier-ignore
-const msgInspect = gettext("Files uploaded, post-processing on the server in progress...");
-
-const msgFixErrors = gettext("Fix errors");
-const msgSkipUnfixable = gettext("Skip features with unfixable errors");
-const msgGeomType = gettext("Geometry type");
-const msgGeomTypeSkip = gettext("Skip features with other geometry types");
-const msgGeomTypeMulti = gettext("Multi-geometry");
-const msgGeomTypeZ = gettext("Z-coordinate");
-const msgFidSource = gettext("FID source");
+/* prettier-ignore */ const
+msgSelectDataset = gettext("Select a dataset"),
+msgSupportedFormats = gettext("ESRI Shapefile (zip), GeoPackage, GeoJSON, GML, KML, CSV or XLSX formats are supported. For CSV and XLSX only points are supported, coordinates must be put in lat and lot columns."),
+msgInspect = gettext("Files uploaded, post-processing on the server in progress..."),
+msgFixErrors = gettext("Fix errors"),
+msgSkipUnfixable = gettext("Skip features with unfixable errors"),
+msgGeomType = gettext("Geometry type"),
+msgGeomTypeSkip = gettext("Skip features with other geometry types"),
+msgGeomTypeMulti = gettext("Multi-geometry"),
+msgGeomTypeZ = gettext("Z-coordinate"),
+msgFidSource = gettext("FID source");
 
 const RadioGroup = (props: RadioGroupProps) => (
   <Radio.Group optionType="button" buttonStyle="outline" {...props} />
@@ -275,8 +271,9 @@ export const Widget: EditorWidget<Store> = observer(({ store }) => {
                 loader: inspectUpload,
               },
             ]}
+            uploadText={msgSelectDataset}
+            helpText={msgSupportedFormats}
             showMaxSize
-            {...uploaderMessages}
           />
 
           {layerOpts && layerOpts.length > 1 && (

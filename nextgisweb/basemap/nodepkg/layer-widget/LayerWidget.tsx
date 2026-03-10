@@ -14,17 +14,13 @@ import type { LayerStore } from "./LayerStore";
 import { QMSSelect } from "./component/QMSSelect";
 import type { QMSService } from "./type";
 
-const msgPickQms = gettext("Pick from QMS");
-
-const msgPickQmsHelpMainPart = gettext("Search for geoservices provided by ");
-const msgPickQmsHelpTodoPart = gettext("You can search by name or ID");
-
-// prettier-ignore
-const [msgDisabled, msgMaxZoomHelp, msgMinZoomHelp ] = [
-    gettext("If a service from QMS is selected, this field cannot be edited."),
-    gettext("Above this zoom level, no new tiles are fetched but tiles from the nearest allowed zoom are displayed and upscaled."),
-    gettext("Below this zoom level, the layer is hidden and no new tiles are fetched.")
-];
+/* prettier-ignore */ const
+msgPickQms = gettext("Pick from QMS"),
+msgPickQmsHelpMainPart = gettext("Search for geoservices provided by "),
+msgPickQmsHelpTodoPart = gettext("You can search by name or ID"),
+msgDisabled = gettext("If a service from QMS is selected, this field cannot be edited."),
+msgMaxZoomHelp = gettext("Above this zoom level, no new tiles are fetched but tiles from the nearest allowed zoom are displayed and upscaled."),
+msgMinZoomHelp = gettext("Below this zoom level, the layer is hidden and no new tiles are fetched.");
 
 export const LayerWidget: EditorWidget<LayerStore> = observer(({ store }) => {
   const [qmsId, setQmsId] = useState<number>();

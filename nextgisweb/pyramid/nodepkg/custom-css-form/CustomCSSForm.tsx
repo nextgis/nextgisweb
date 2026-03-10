@@ -8,6 +8,10 @@ import { route } from "@nextgisweb/pyramid/api";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
+/* prettier-ignore */ const
+msgSave = gettext("Custom styles saved. Reload the page to get them applied."),
+msgDesc = gettext("Enter custom CSS rules here. They will be used to redefine styles, design for all pages of your Web GIS.");
+
 export function CustomCSSForm() {
   const [saving, setSaving] = useState(false);
   const [initial, setInitial] = useState<string>();
@@ -38,8 +42,7 @@ export function CustomCSSForm() {
     } catch (err) {
       errorModal(err);
     } finally {
-      // prettier-ignore
-      messageApi.success(gettext("Custom styles saved. Reload the page to get them applied."));
+      messageApi.success(msgSave);
       setSaving(false);
     }
   };
@@ -56,11 +59,7 @@ export function CustomCSSForm() {
           <Code value={initial} onChange={setData} lang="css" lineNumbers />
         </Col>
         <Col span={10}>
-          <Typography.Paragraph>
-            {gettext(
-              "Enter custom CSS rules here. They will be used to redefine styles, design for all pages of your Web GIS."
-            )}
-          </Typography.Paragraph>
+          <Typography.Paragraph>{msgDesc}</Typography.Paragraph>
         </Col>
       </Row>
       <Row>

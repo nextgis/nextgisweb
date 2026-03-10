@@ -1,7 +1,6 @@
 import { isEqual } from "lodash-es";
 import { Suspense, lazy, useEffect, useMemo, useState } from "react";
 import type { FC } from "react";
-import { Balancer } from "react-wrap-balancer";
 
 import { Button, Card, Dropdown, Tabs, message } from "@nextgisweb/gui/antd";
 import { SaveButton } from "@nextgisweb/gui/component";
@@ -18,21 +17,12 @@ import type { TabProps, TabValue } from "./tab";
 
 import "./MetricSettings.less";
 
-const msgAdd = gettext("Add");
-const msgSuccess = gettext("The setting is saved.");
-const msgSuccessReload = gettext("Reload the page to get them applied.");
-
-// prettier-ignore
-const msgInfo = [
-    gettext("Add one or more counters to your Web GIS."),
-    gettext("HTML code of these counters will be embeded into each page and will allow you to track user activity."),
-];
-
-const PlaceholderCard = () => (
-  <Card size="small">
-    <Balancer ratio={0.62}>{msgInfo.join(" ")}</Balancer>
-  </Card>
-);
+/* prettier-ignore */ const
+msgAdd = gettext("Add"),
+msgSuccess = gettext("The setting is saved."),
+msgSuccessReload = gettext("Reload the page to get them applied."),
+msgInfo1 = gettext("Add one or more counters to your Web GIS."),
+msgInfo2 = gettext("HTML code of these counters will be embeded into each page and will allow you to track user activity.");
 
 type WidgetComponent = {
   [K in keyof Metrics]-?: FC<TabProps<K>>;
@@ -166,7 +156,9 @@ export function MetricsSettings() {
       {titems && (
         <div className="ngw-pyramid-analytics-settings">
           {titems.length === 0 ? (
-            <PlaceholderCard />
+            <Card size="small" style={{ textWrapStyle: "balance" }}>
+              {msgInfo1 + " " + msgInfo2}
+            </Card>
           ) : (
             <Tabs
               type="editable-card"

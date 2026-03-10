@@ -28,11 +28,14 @@ export class BaseAPIError<D = unknown> extends BaseError {
   }
 }
 
-// prettier-ignore
 export class NetworkResponseError extends BaseAPIError<undefined> {
-    protected defaultMessage = gettext("There is no response from the server or problem connecting to server.");
-    protected defaultTitle = gettext("Network error");
-    protected defaultDetail = gettext("Check network connectivity and try again later.");
+  protected defaultMessage = gettext(
+    "There is no response from the server or problem connecting to server."
+  );
+  protected defaultTitle = gettext("Network error");
+  protected defaultDetail = gettext(
+    "Check network connectivity and try again later."
+  );
 }
 
 export class InvalidResponseError extends BaseAPIError<undefined> {
@@ -63,14 +66,15 @@ export class ServerResponseError extends BaseAPIError<ServerResponseErrorData> {
   }
 }
 
-// prettier-ignore
 export class LunkwillError extends BaseAPIError<LunkwillData> {
-    protected defaultMessage = gettext("Unexpected error while processing long-running request.");
-    protected defaultTitle = gettext("Long-running request error");
+  protected defaultMessage = gettext(
+    "Unexpected error while processing long-running request."
+  );
+  protected defaultTitle = gettext("Long-running request error");
 
-    constructor(message?: string, data: LunkwillData = {}) {
-        super(message, { data });
-    }
+  constructor(message?: string, data: LunkwillData = {}) {
+    super(message, { data });
+  }
 }
 
 export class LunkwillRequestCancelled extends LunkwillError {

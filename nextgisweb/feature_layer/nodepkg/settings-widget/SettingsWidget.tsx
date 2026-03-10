@@ -8,7 +8,10 @@ import type { EditorWidget } from "@nextgisweb/resource/type";
 
 import type { SettingStore } from "./SettingStore";
 
-const msgFeatureVersioning = gettext("Feature versioning");
+/* prettier-ignore */ const
+msgFeatureVersioning = gettext("Feature versioning"),
+msgConfirmTile = gettext("Disable feature versioning?"),
+msgConfirmContent = gettext("Turning off feature versioning will truncate the history and keep only the latest state.");
 
 export const SettingsWidget: EditorWidget<SettingStore> = observer(
   ({ store }) => {
@@ -19,13 +22,11 @@ export const SettingsWidget: EditorWidget<SettingStore> = observer(
         const onOk = () => store.update({ versioningEnabled: v });
         if (v || !store.versioningExisting) return onOk();
 
-        // prettier-ignore
-        const [title, content] = [
-                    gettext("Disable feature versioning?"),
-                    gettext("Turning off feature versioning will truncate the history and keep only the latest state.")
-                ]
-
-        modal.confirm({ title, content, onOk });
+        modal.confirm({
+          title: msgConfirmTile,
+          content: msgConfirmContent,
+          onOk,
+        });
       },
       [modal, store]
     );

@@ -7,11 +7,9 @@ import type { EditorWidget } from "@nextgisweb/resource/type";
 import type { Store } from "./Store";
 import "./Widget.less";
 
-// prettier-ignore
-const uploaderMessages = {
-    uploadText: gettext("Select a tileset"),
-    helpText: gettext("MBTiles and ZIP archives of tiles are supported. Tiles should be in PNG or JPEG format and have a size of 256x256 pixels."),
-};
+/* prettier-ignore */ const
+msgSelectTileset = gettext("Select a tileset"),
+msgSupportedFormats = gettext("MBTiles and ZIP archives of tiles are supported. Tiles should be in PNG or JPEG format and have a size of 256x256 pixels.");
 
 export const Widget: EditorWidget<Store> = observer(({ store }) => {
   return (
@@ -23,8 +21,9 @@ export const Widget: EditorWidget<Store> = observer(({ store }) => {
         onUploading={(value) => {
           store.update({ uploading: value });
         }}
+        uploadText={msgSelectTileset}
+        helpText={msgSupportedFormats}
         showMaxSize
-        {...uploaderMessages}
       />
     </div>
   );

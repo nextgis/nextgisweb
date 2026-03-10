@@ -40,9 +40,9 @@ import FavoriteIcon from "@nextgisweb/icon/material/star";
 import "../styles/panels.less";
 import "./SharePanel.less";
 
-// prettier-ignore
-const msgCORS = gettext("<a>CORS</a> must be enabled for the target origin when embedding a web map on a different domain.");
-const msgAddFragmentToFavorites = gettext("Add web map fragment to favorites");
+/* prettier-ignore */ const
+msgCORS = gettext("<a>CORS</a> must be enabled for the target origin when embedding a web map on a different domain."),
+msgAddFragmentToFavorites = gettext("Add web map fragment to favorites");
 
 const makeIframeTag = (iframeSrc: string, height: number, width: number) => {
   return (

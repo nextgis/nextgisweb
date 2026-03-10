@@ -17,6 +17,13 @@ import type {
   VersionHistoryMenuItem,
 } from "../VersionHistoryRowMenu";
 
+/* prettier-ignore */ const
+msgLabel = gettext("Revert to this version"),
+msgConfirmTitle = gettext("Confirmation required"),
+msgConfirmContent = gettextf("Please confirm reversion of the layer to version {timestamp} by {author}. This will revert all feature changes made after {timestamp}, but the changes will be kept in the history."),
+msgOk = gettext("Revert"),
+msgReverted = gettext("Reverted");
+
 export function useRevertMenuItem(
   ctx: VersionHistoryMenuCtx
 ): VersionHistoryMenuItem {
@@ -77,7 +84,7 @@ export function useRevertMenuItem(
       });
 
       if (commitResp && commitResp.status === "committed") {
-        messageApi.success(gettext("Reverted"));
+        messageApi.success(msgReverted);
         bumpReloadKey();
       } else {
         errorModal("Transaction was not committed");
@@ -98,12 +105,9 @@ export function useRevertMenuItem(
 
   const onClick = () => {
     confirm({
-      title: gettext("Confirmation required"),
-      // prettier-ignore
-      content: gettextf("Please confirm reversion of the layer to version {timestamp} by {author}. This will revert all feature changes made after {timestamp}, but the changes will be kept in the history.")
-            ({ author, timestamp }),
-
-      okText: gettext("Revert"),
+      title: msgConfirmTitle,
+      content: msgConfirmContent({ author, timestamp }),
+      okText: msgOk,
       onOk: revertToVersion,
     });
   };
@@ -111,7 +115,7 @@ export function useRevertMenuItem(
   return {
     item: {
       key: "revert",
-      label: gettext("Revert to this version"),
+      label: msgLabel,
       onClick,
     },
     holder: (

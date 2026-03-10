@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 
 import settings from "@nextgisweb/auth/client-settings";
 import { AdministratorIcon, RegularUserIcon } from "@nextgisweb/auth/icon";
@@ -20,21 +20,19 @@ interface UserBrowseProps {
   readonly: boolean;
 }
 
-const msgDisabled = gettext("Disabled");
-const msgEnabled = gettext("Enabled");
-const msgFullName = gettext("Full name");
-const msgLogin = gettext("Login");
-const msgPassword = gettext("Password");
-const msgYes = gettext("Yes");
-const msgNo = gettext("No");
-const msgLastActivity = gettext("Last activity");
-const msgStatus = gettext("Status");
-
-// prettier-ignore
-const [msgPasswordTooltip, msgOAuthTooltip] = [
-    gettext("Users with a password can sign in with login and password."),
-    gettext("Users bound to {dn} can sign in with {dn}.").replaceAll("{dn}", oauth.name),
-];
+/* prettier-ignore */ const
+msgDisabled = gettext("Disabled"),
+msgEnabled = gettext("Enabled"),
+msgFullName = gettext("Full name"),
+msgLogin = gettext("Login"),
+msgPassword = gettext("Password"),
+msgYes = gettext("Yes"),
+msgNo = gettext("No"),
+msgLastActivity = gettext("Last activity"),
+msgStatus = gettext("Status"),
+msgPasswordTooltip = gettext("Users with a password can sign in with login and password."),
+msgOAuthTooltip = gettext("Users bound to {dn} can sign in with {dn}.").replaceAll("{dn}", oauth.name),
+msgSyncNote = gettextf("Your team members won't be shown here until their first logon. Set \"New users\" flag for a group to automatically assign new user to this group. You may also modify permission for authenticated users to manage access for your team members.")({ name: oauth.name });
 
 const messages = {
   deleteConfirm: gettext("Delete user?"),
@@ -116,12 +114,6 @@ export function UserBrowse({ readonly }: UserBrowseProps) {
     return ToggleSelectedUsers({ disable: false, ...props });
   };
 
-  // prettier-ignore
-  const infoNGID = useMemo(() => oauth.isNGID && <Alert
-        type="info" style={{marginTop: "1ex"}}
-        title={gettextf("Your team members won't be shown here until their first logon. Set \"New users\" flag for a group to automatically assign new user to this group. You may also modify permission for authenticated users to manage access for your team members.")({ name: oauth.name })}
-    />, []);
-
   const tmBtn = makeTeamManageButton({ target: "_blank" });
 
   const collectionFilter = useCallback(
@@ -142,7 +134,9 @@ export function UserBrowse({ readonly }: UserBrowseProps) {
         headerControls={(tmBtn && [() => tmBtn]) || []}
         selectedControls={[EnableSelectedUsers, DisableSelectedUsers]}
       />
-      {infoNGID}
+      {oauth.isNGID && (
+        <Alert type="info" style={{ marginTop: "1ex" }} title={msgSyncNote} />
+      )}
     </div>
   );
 }

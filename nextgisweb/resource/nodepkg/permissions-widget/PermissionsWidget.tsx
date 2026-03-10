@@ -209,12 +209,31 @@ const Permission = observer(({ row }: { row: Item }) => {
 
 Permission.displayName = "Permission";
 
-// prettier-ignore
 const columns = [
-    { key: "action", title: msgColAction, shrink: true, component: Action },
-    { key: "principal", title: msgColPrincipal, width: "50%", component: Principal },
-    { key: "apply", title: msgColApply, shrink: msgApplyPropagate.length + "ch", component: Apply },
-    { key: "permission", title: msgColPermission, width: "50%", component: Permission },
+  {
+    key: "action",
+    title: msgColAction,
+    shrink: true,
+    component: Action,
+  },
+  {
+    key: "principal",
+    title: msgColPrincipal,
+    width: "50%",
+    component: Principal,
+  },
+  {
+    key: "apply",
+    title: msgColApply,
+    shrink: msgApplyPropagate.length + "ch",
+    component: Apply,
+  },
+  {
+    key: "permission",
+    title: msgColPermission,
+    width: "50%",
+    component: Permission,
+  },
 ];
 
 export const PermissionsWidget: EditorWidget<PermissionsStore> = observer(

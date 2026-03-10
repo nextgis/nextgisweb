@@ -24,9 +24,10 @@ import { gettext } from "../i18n";
 
 type FontType = CustomFont | SystemFont;
 
-// prettier-ignore
-const msgConfirm = gettext("During operation, the Web GIS will restart. All existing requests will be aborted. Proceed?");
-const msgRestarting = gettext("Web GIS is restarting, please wait...");
+/* prettier-ignore */ const
+msgConfirm = gettext("During operation, the Web GIS will restart. All existing requests will be aborted. Proceed?"),
+msgRestarting = gettext("Web GIS is restarting, please wait...");
+
 const fontType = { custom: gettext("Custom"), system: gettext("System") };
 
 const LoadingModal = (props: ModalProps) => {

@@ -18,6 +18,9 @@ import { makeTeamManageButton, default as oauth } from "../oauth";
 import { UserWidgetAlinkToken } from "./UserWidgetAlinkToken";
 import { UserWidgetPassword } from "./UserWidgetPassword";
 
+/* prettier-ignore */ const
+msgConsiderAddingToTeam = gettextf("Consider adding {name} user to your team instead of creating a new user with a password.")({ name: oauth.name });
+
 const messages = {
   deleteConfirm: gettext("Delete user?"),
   deleteSuccess: gettext("User deleted"),
@@ -60,13 +63,11 @@ export function UserWidget({ id, readonly }: UserWidgetProps) {
               formItem: isNewUser ? (
                 <Input.Password
                   autoComplete="new-password"
-                  // prettier-ignore
                   placeholder={gettext("Enter new password here")}
                 />
               ) : (
                 <UserWidgetPassword
                   autoComplete="new-password"
-                  // prettier-ignore
                   placeholder={gettext("Enter new password here")}
                 />
               ),
@@ -128,8 +129,7 @@ export function UserWidget({ id, readonly }: UserWidgetProps) {
         <Alert
           type="info"
           style={{ marginBottom: "1ex" }}
-          // prettier-ignore
-          title={gettextf("Consider adding {name} user to your team instead of creating a new user with a password.")({ name: oauth.name })}
+          title={msgConsiderAddingToTeam}
           action={makeTeamManageButton()}
         />
       ),

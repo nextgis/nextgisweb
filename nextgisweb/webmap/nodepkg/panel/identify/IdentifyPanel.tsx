@@ -29,10 +29,10 @@ import { identifyInfoToFeaturesInfo } from "./util/identifyInfoToFeaturesInfo";
 
 import "./IdentifyPanel.less";
 
-// prettier-ignore
-const msgTipIdent = gettext("To get feature information, click on the map with the left mouse button. Make sure that other tools are turned off.");
-const msgLoad = gettext("Retrieving object information...");
-const msgNotFound = gettext("No objects were found at the click location.");
+/* prettier-ignore */ const
+msgTipIdent = gettext("To get feature information, click on the map with the left mouse button. Make sure that other tools are turned off."),
+msgLoad = gettext("Retrieving object information..."),
+msgNotFound = gettext("No objects were found at the click location.");
 
 const measurementSridSetting = webmapSettings.measurement_srid;
 

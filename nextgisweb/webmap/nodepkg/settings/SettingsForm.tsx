@@ -208,10 +208,7 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({
                   ),
                   message: (
                     <div>
-                      {
-                        // prettier-ignore
-                        gettext("Invalid countries. For example ru or gb,de")
-                      }
+                      {gettext("Invalid countries. For example ru or gb,de")}
                     </div>
                   ),
                 },

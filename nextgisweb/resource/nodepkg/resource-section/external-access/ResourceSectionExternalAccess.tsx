@@ -8,9 +8,9 @@ import type { ResourceSection, ResourceSectionProps } from "../type";
 
 import "./ResourceSectionExternalAccess.less";
 
-// prettier-ignore
-const msgUsage = gettext("Use these links to plug data into external applications.");
-const msgReadMore = gettext("Read more");
+/* prettier-ignore */ const
+msgUsage = gettext("Use these links to plug data into external applications."),
+msgReadMore = gettext("Read more");
 
 interface HelpProps {
   help: string;

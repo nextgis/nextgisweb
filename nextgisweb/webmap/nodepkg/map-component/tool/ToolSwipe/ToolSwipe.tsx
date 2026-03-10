@@ -12,15 +12,13 @@ import SwipeControl from "./SwipeControl";
 
 import Icon from "@nextgisweb/icon/material/compare";
 
-// prettier-ignore
-const msg = {
-    noLayerSelectedContent: gettext("Please select a layer before using this tool."),
-    noLayerSelectedTitle: gettext("No layer selected"),
-    invalidTypeContent: gettext("Please select a layer, not a group."),
-    layerHiddenContent: gettext("Please make the layer visible before using this tool."),
-    invalidTypeTitle: gettext("Invalid selection type"),
-    layerHiddenTitle: gettext("Layer is not visible"),
-};
+/* prettier-ignore */ const
+msgNoLayerSelectedContent = gettext("Please select a layer before using this tool."),
+msgNoLayerSelectedTitle = gettext("No layer selected"),
+msgInvalidTypeContent = gettext("Please select a layer, not a group."),
+msgLayerHiddenContent = gettext("Please make the layer visible before using this tool."),
+msgInvalidTypeTitle = gettext("Invalid selection type"),
+msgLayerHiddenTitle = gettext("Layer is not visible");
 
 type Orientation = "vertical" | "horizontal";
 
@@ -57,22 +55,22 @@ const ToolSwipe = observer(
         if (status) {
           if (!item) {
             modal.info({
-              title: msg.noLayerSelectedTitle,
-              content: msg.noLayerSelectedContent,
+              title: msgNoLayerSelectedTitle,
+              content: msgNoLayerSelectedContent,
             });
             return false;
           } else {
             if (item.type !== "layer" && item.type !== "group") {
               modal.info({
-                title: msg.invalidTypeTitle,
-                content: msg.invalidTypeContent,
+                title: msgInvalidTypeTitle,
+                content: msgInvalidTypeContent,
               });
               return false;
             }
             if (item.isLayer() && !item.visibility) {
               modal.info({
-                title: msg.layerHiddenTitle,
-                content: msg.layerHiddenContent,
+                title: msgLayerHiddenTitle,
+                content: msgLayerHiddenContent,
               });
               return false;
             }

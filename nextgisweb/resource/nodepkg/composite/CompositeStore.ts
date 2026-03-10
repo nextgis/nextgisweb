@@ -241,8 +241,9 @@ export class CompositeStore {
     if (!this.isValid) {
       // TODO: Refactor user errors
       throw new BaseAPIError(
-        // prettier-ignore
-        gettext("Errors found during data validation. Tabs with errors marked in red."),
+        gettext(
+          "Errors found during data validation. Tabs with errors marked in red."
+        ),
         { title: gettext("Validation error") }
       );
     }

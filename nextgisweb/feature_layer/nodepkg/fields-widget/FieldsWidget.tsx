@@ -19,16 +19,18 @@ import LabelFieldIcon from "@nextgisweb/icon/material/font_download/outline";
 import TextSearchIcon from "@nextgisweb/icon/material/manage_search";
 import GridVisibilityIcon from "@nextgisweb/icon/material/table_chart/outline";
 
-const msgDisplayName = gettext("Display name");
-const msgKeyname = gettext("Keyname");
-const msgDatatype = gettext("Type");
-const msgLookupTable = gettext("Lookup table");
-const msgGridVisibility = gettext("Feature table");
-const msgTextSearch = gettext("Text search");
-const msgLabelField = gettext("Label attribute");
-
-const msgDatatypePlaceholder = gettext("Please select");
-const msgLookupTableNotUsed = gettext("Not used");
+/* prettier-ignore */ const
+msgDisplayName = gettext("Display name"),
+msgKeyname = gettext("Keyname"),
+msgDatatype = gettext("Type"),
+msgLookupTable = gettext("Lookup table"),
+msgGridVisibility = gettext("Feature table"),
+msgTextSearch = gettext("Text search"),
+msgLabelField = gettext("Label attribute"),
+msgDeleteFieldTitle = gettext("Delete field?"),
+msgDeleteFieldContent = gettext("Deleting this field will permanently erase all its version history from this layer."),
+msgDatatypePlaceholder = gettext("Please select"),
+msgLookupTableNotUsed = gettext("Not used");
 
 const FieldWidget = observer<{
   item: Field;
@@ -87,12 +89,6 @@ const FieldWidget = observer<{
     </Area>
   );
 });
-
-// prettier-ignore
-const [msgDeleteFieldTitle, msgDeleteFieldContent] = [
-    gettext("Delete field?"),
-    gettext("Deleting this field will permanently erase all its version history from this layer."),
-];
 
 export const FieldsWidget: EditorWidget<FieldsStore> = observer(({ store }) => {
   const [modal, contextHolder] = Modal.useModal();
