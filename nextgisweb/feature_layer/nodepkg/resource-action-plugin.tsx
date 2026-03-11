@@ -54,7 +54,7 @@ registerResourceAction(COMP_ID, {
     it.get("resource.interfaces").includes("IFeatureLayer") &&
     it.get("resource.interfaces").includes("IVersionableFeatureLayer") &&
     !!it.get("feature_layer.versioning")?.enabled,
-  href: (it) => route("feature_layer.feature.browse", it.id).url(),
+  href: (it) => route("resource.history", it.id).url(),
 });
 
 registerResourceAction(COMP_ID, {
