@@ -6,7 +6,7 @@ INSERT INTO complex_et (
     version_op
 )
 SELECT
-    complex.id,
+    complex.extension_id,
     complex.resource_id,
     complex.feature_id,
     :p_vid AS anon_1,

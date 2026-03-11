@@ -45,7 +45,7 @@ FULL OUTER JOIN (
     LEFT OUTER JOIN complex AS ct
         ON ct.resource_id = :p_rid
         AND ct.feature_id = et.feature_id
-        AND ct.id = et.extension_id
+        AND ct.extension_id = et.extension_id
     WHERE
         et.resource_id = :p_rid
         AND et.version_id > :p_initial

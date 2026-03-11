@@ -11,7 +11,7 @@ WITH cs AS (
         column_b
     FROM complex_et, complex
     WHERE
-        complex.id = complex_et.extension_id
+        complex.extension_id = complex_et.extension_id
         AND complex_et.resource_id = :p_rid
         AND complex_et.feature_id = :p_fid
         AND complex.resource_id = complex_et.resource_id
@@ -53,5 +53,5 @@ DELETE FROM complex USING eq
 WHERE
     eq.resource_id = complex.resource_id
     AND eq.feature_id = complex.feature_id
-    AND eq.extension_id = complex.id
-RETURNING complex.resource_id, complex.feature_id, complex.id;
+    AND eq.extension_id = complex.extension_id
+RETURNING complex.resource_id, complex.feature_id, complex.extension_id;

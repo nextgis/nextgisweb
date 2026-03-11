@@ -11,7 +11,7 @@ WITH cs AS (
         column_b
     FROM complex_et, complex
     WHERE
-        complex.id = complex_et.extension_id
+        complex.extension_id = complex_et.extension_id
         AND complex_et.extension_id = :p_eid
         AND complex_et.resource_id = :p_rid
         AND complex_et.feature_id = :p_fid

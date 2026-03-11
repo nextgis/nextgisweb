@@ -35,9 +35,13 @@ KEYNAME_RE = re.compile(r"[a-z_][a-z0-9_]*", re.IGNORECASE)
 class FeatureAttachment(Base, FVersioningExtensionMixin):
     __tablename__ = "feature_attachment"
 
-    id = sa.Column(sa.Integer, primary_key=True)
-    resource_id = sa.Column(sa.ForeignKey(Resource.id), nullable=False)
-    feature_id = sa.Column(sa.Integer, nullable=False)
+    resource_id = sa.Column(sa.ForeignKey(Resource.id), primary_key=True)
+    feature_id = sa.Column(sa.Integer, primary_key=True)
+    extension_id = sa.Column(
+        sa.Integer,
+        primary_key=True,
+        autoincrement=True,
+    )
 
     fileobj_id = sa.Column(sa.ForeignKey(FileObj.id), nullable=False)
     keyname = sa.Column(sa.Unicode, nullable=True)
@@ -47,11 +51,12 @@ class FeatureAttachment(Base, FVersioningExtensionMixin):
 
     file_meta = sa.Column(pg.JSONB, nullable=True)
 
-    # TODO: Drop this column, fileobj.size is used instead
-    size = sa.Column(sa.BigInteger, nullable=False, default=-1)
-
     __table_args__ = (
-        sa.Index("feature_attachment_resource_id_feature_id_idx", resource_id, feature_id),
+        sa.UniqueConstraint(
+            resource_id,
+            extension_id,
+            name="feature_attachment_extension_id_unique",
+        ),
         sa.UniqueConstraint(
             resource_id,
             feature_id,
@@ -65,7 +70,7 @@ class FeatureAttachment(Base, FVersioningExtensionMixin):
     fversioning_metadata_version = 1
     fversioning_extension = "attachment"
     fversioning_columns = ("fileobj_id", "keyname", "name", "mime_type", "description")
-    fversioning_extra = dict(size=sa.text("-1"), file_meta=sa.null())
+    fversioning_extra = dict(file_meta=sa.null())
     fversioning_htab_args = [
         sa.ForeignKeyConstraint(
             ["fileobj_id"],
@@ -118,7 +123,7 @@ class FeatureAttachment(Base, FVersioningExtensionMixin):
 
     def serialize(self):
         return {
-            "id": self.id,
+            "id": self.extension_id,
             "name": self.name,
             "keyname": self.keyname,
             "size": self.fileobj.size,
