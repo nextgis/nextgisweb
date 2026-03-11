@@ -54,30 +54,32 @@ Also you can create attachment using PUT method, in this case you do not need to
 
 .. sourcecode:: python
 
-      import requests
-      from contextlib import closing
-      import json
-
-      url_dst = 'http://sandbox.nextgis.com/api'
-      ngw_creds = ('administrator', 'demodemo')
-      feature_dst = '/resource/' + '1501' + '/feature/'   #layer id
-      new_id = '/33'          #feature id
-
-      #Get file from internet, optionally with auth
-      with closing(requests.get('http://nextgis.ru/wp-content/themes/nextgis_clean/img/ngw_icon.png', auth=ngw_creds, stream=True)) as f:
-
-          #upload attachment to nextgisweb
-          req = requests.put(url_dst + '/component/file_upload/', data=f, auth=ngw_creds)
-          #on some servers needed data=f.content instead
-          
-          json_data = req.json()
-          json_data['name'] = 'Picture001.jpg'
-
-          attach_data = {}
-          attach_data['file_upload'] = json_data
-
-          #add attachment to nextgisweb feature
-          req = requests.post(url_dst + feature_dst + str(new_id) + '/attachment/', data=json.dumps(attach_data), auth=ngw_creds)
+    import requests
+    from contextlib import closing
+    import json
+    
+    url_dst = 'https://sandbox.nextgis.com'
+    ngw_creds = ('administrator', 'demodemo')
+    feature_dst = '/api/resource/' + '3605' + '/feature/'   #layer id
+    new_id = '2'          #feature id
+    
+    #Get file from internet, optionally with auth
+    with closing(requests.get('https://nextgis.ru/wp-content/themes/nextgisclean_wptheme/main-assets/img-en/header/logo.png', auth=ngw_creds, stream=True)) as f:
+    
+        #upload attachment to nextgisweb
+        req = requests.put(url_dst + '/api/component/file_upload/', data=f.content, auth=ngw_creds)
+        req.raise_for_status()
+        #on some servers needed data=f.content instead
+    
+    
+        attach_data = {}
+        attach_data['file_upload'] = req.json()
+        attach_data['name'] = 'Picture.png'
+    
+        #add attachment to nextgisweb feature
+        url=url_dst + feature_dst + str(new_id) + '/attachment/'
+        req = requests.post(url, data=json.dumps(attach_data), auth=ngw_creds)
+        req.raise_for_status()
 
 
 
