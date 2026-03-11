@@ -20,6 +20,13 @@ filterwarnings(
     category=ImportWarning,
 )
 
+# Exceptions will be enabled by default in GDAL 4 - OK, got it!
+filterwarnings(
+    "ignore",
+    r"^Neither gdal\.UseExceptions\(\) nor gdal\.DontUseExceptions\(\).*$",
+    category=FutureWarning,
+)
+
 # Ignore osgeo imp module deprecation warning
 filterwarnings("ignore", module="osgeo", category=DeprecationWarning)
 import osgeo  # noqa: E402, F401
