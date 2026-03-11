@@ -14,7 +14,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { AttachmentEditorPreview } from "./AttachmentEditorPreview";
 import AttachmentEditorStore from "./AttachmentEditorStore";
 import type { DataSource } from "./type";
-import { isFileImage } from "./util/isFileImage";
+import { isImageItem } from "./util/isImageItem";
 import "./AttachmentEditor.less";
 
 const AttachmentEditor = observer(
@@ -37,6 +37,11 @@ const AttachmentEditor = observer(
       }
       return [];
     }, [store_.value]);
+
+    const imageAttachments = useMemo(
+      () => dataSource.filter(isImageItem),
+      [dataSource]
+    );
 
     const onChange = useCallback(
       (meta_?: UploaderMeta) => {
@@ -114,25 +119,17 @@ const AttachmentEditor = observer(
                 className: "preview",
                 render: (_, row) => {
                   const r = row as DataSource;
-                  if (
-                    ("is_image" in r && r.is_image) ||
-                    ("_file" in r &&
-                      r._file instanceof File &&
-                      isFileImage(r._file))
-                  ) {
-                    return (
-                      <AttachmentEditorPreview
-                        attachment={r}
-                        attachments={dataSource}
-                        resourceId={store_.resourceId}
-                        featureId={store_.featureId}
-                        width={width}
-                        height={width}
-                      />
-                    );
-                  }
-
-                  return "";
+                  if (!isImageItem(r)) return "";
+                  return (
+                    <AttachmentEditorPreview
+                      attachment={r}
+                      attachments={imageAttachments}
+                      resourceId={store_.resourceId}
+                      featureId={store_.featureId}
+                      width={width}
+                      height={width}
+                    />
+                  );
                 },
               },
               {
