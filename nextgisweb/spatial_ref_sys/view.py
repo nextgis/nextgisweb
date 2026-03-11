@@ -142,5 +142,3 @@ def setup_pyramid(comp, config):
                         gettext("Delete"),
                         lambda kwargs: kwargs.request.route_url("srs.delete", id=kwargs.obj.id),
                     )
-
-    SRS.__dynmenu__ = comp.env.pyramid.control_panel

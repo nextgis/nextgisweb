@@ -1,6 +1,7 @@
 <%!
     from types import SimpleNamespace
     from nextgisweb.pyramid.view import LAYOUT_JSENTRY
+    from nextgisweb.resource import Resource
 %>
 
 <%inherit file='nextgisweb:pyramid/template/base.mako' />
@@ -10,9 +11,10 @@
 
 <%
     dynmenu_kwargs = SimpleNamespace(request=request)
+    dynmenu_resource_id = None
     if (dynmenu := context.get("dynmenu", UNDEFINED)) is UNDEFINED:
-        if obj and (dynmenu := getattr(obj, "__dynmenu__", UNDEFINED)) is not UNDEFINED:
-            dynmenu_kwargs.obj = obj
+        if obj is not UNDEFINED and isinstance(obj, Resource):
+            dynmenu_resource_id = obj.id
 
     base_props = dict(
         entrypoint = entrypoint,
@@ -27,6 +29,9 @@
         hideResourceFilter=hide_resource_filter if hide_resource_filter is not UNDEFINED else None,
         hideMenu=hide_menu if hide_menu is not UNDEFINED else None,
     )
+
+    if dynmenu_resource_id is not None:
+        base_props["dynMenuResourceId"] = dynmenu_resource_id
 %>
 
 <%include file="nextgisweb:gui/template/react_boot.mako" args="

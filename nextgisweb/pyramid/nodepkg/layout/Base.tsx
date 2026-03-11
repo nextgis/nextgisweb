@@ -4,7 +4,6 @@ import { useEffect } from "react";
 import { Modal, Spin, useToken } from "@nextgisweb/gui/antd";
 import { useShowModal } from "@nextgisweb/gui/show-modal/useShowModal";
 import type { DynMenuItem } from "@nextgisweb/pyramid/layout/dynmenu/type";
-import type { CompositeWidgetOperation } from "@nextgisweb/resource/type/api";
 
 import { CBlock } from "../cblock";
 import { EntrypointSuspense } from "../component/EntrypointSuspense";
@@ -27,13 +26,6 @@ declare module "@nextgisweb/pyramid/cblock" {
   }
 }
 
-type EntrypointProps =
-  | { resourceId?: number }
-  | { id?: number }
-  | {
-      setup?: { operation: CompositeWidgetOperation; id: number };
-    };
-
 interface BaseProps {
   title: string;
   header: string;
@@ -42,24 +34,26 @@ interface BaseProps {
   maxheight?: boolean;
   layoutMode?: "headerOnly" | "main" | "content" | "nullSpace";
   entrypoint: string;
+  entrypointProps: Record<string, unknown>;
   breadcrumbs: BreadcrumbItem[];
   dynMenuItems: DynMenuItem[];
-  entrypointProps: EntrypointProps;
+  dynMenuResourceId?: number;
   hideResourceFilter?: boolean;
 }
 
 export function Base({
-  hideResourceFilter = false,
-  entrypointProps,
-  dynMenuItems,
-  breadcrumbs,
-  entrypoint,
-  layoutMode = "content",
-  maxheight,
+  title,
+  header,
   hideMenu,
   maxwidth,
-  header,
-  title,
+  maxheight,
+  layoutMode = "content",
+  entrypoint,
+  entrypointProps,
+  dynMenuItems,
+  dynMenuResourceId,
+  breadcrumbs,
+  hideResourceFilter = false,
 }: BaseProps) {
   const [modalApi, modalContextHolder] = Modal.useModal();
 
@@ -68,15 +62,6 @@ export function Base({
   });
 
   const { token } = useToken();
-
-  const resourceId =
-    "resourceId" in entrypointProps
-      ? entrypointProps.resourceId
-      : "id" in entrypointProps
-        ? entrypointProps.id
-        : "setup" in entrypointProps
-          ? entrypointProps.setup?.id
-          : undefined;
 
   useEffect(() => {
     let meta = document.querySelector('meta[name="theme-color"]');
@@ -140,9 +125,9 @@ export function Base({
             </div>
           </div>
 
-          {resourceId !== undefined ? (
+          {dynMenuResourceId !== undefined ? (
             <div className="ngw-pyramid-layout-sidebar">
-              <Attrmenu resourceId={resourceId} />
+              <Attrmenu resourceId={dynMenuResourceId} />
             </div>
           ) : (
             dynMenuItems &&
