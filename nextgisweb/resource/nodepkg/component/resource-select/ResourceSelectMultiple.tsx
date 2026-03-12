@@ -5,10 +5,11 @@ import { useShowModal } from "@nextgisweb/gui";
 import { Button, Space, Table } from "@nextgisweb/gui/antd";
 import { RemoveIcon } from "@nextgisweb/gui/icon";
 import type { ParamsOf } from "@nextgisweb/gui/type";
-import { route, routeURL } from "@nextgisweb/pyramid/api";
+import { route } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 import { resourceAttrItems } from "@nextgisweb/resource/api/resource-attr";
 
+import { ResourceLabel } from "../ResourceLabel";
 import { ResourcePickerStore } from "../resource-picker";
 import { useResourcePicker } from "../resource-picker/hook";
 import type { ResourcePickerAttr, SelectValue } from "../resource-picker/type";
@@ -85,17 +86,13 @@ const ResourceSelectMultiple = ({
   const columns: ColumnParams = [
     {
       title: "Name",
-      dataIndex: "display_name",
-      render: (text, row) => {
+      render: (_, row) => {
         return (
-          <a
-            href={routeURL("resource.show", row.id)}
-            onClick={(evt) => evt.stopPropagation()}
-            target="_blank"
-            rel="noreferrer"
-          >
-            {text}
-          </a>
+          <ResourceLabel
+            label={row.get("resource.display_name")}
+            resourceId={row.id}
+            cls={row.get("resource.cls")}
+          />
         );
       },
     },
@@ -136,7 +133,7 @@ const ResourceSelectMultiple = ({
   return (
     <>
       {modalHolder}
-      <Space.Compact>
+      <Space.Compact style={{ width: "100%" }}>
         <div style={{ width: "100%" }}>
           <div style={{ marginBottom: 16 }}>
             <Space>
