@@ -8,6 +8,8 @@ const msgInProgress = gettext("Operation in progress");
 const msgCancel = gettext("Cancel");
 
 type ProgressModal = ParamsOf<typeof Progress>;
+export type ModalProps = Parameters<typeof Modal>[0];
+type ModalOnCancel = NonNullable<ModalProps["onCancel"]>;
 
 type ModalParamsForProgress = Pick<
   ShowModalOptions,
@@ -45,7 +47,9 @@ export const ProgressModal = ({
       <Row justify="space-between">
         <Col></Col>
         <Col>
-          <Button onClick={onCancel}>{cancelText}</Button>
+          <Button onClick={(e) => onCancel(e as Parameters<ModalOnCancel>[0])}>
+            {cancelText}
+          </Button>
         </Col>
       </Row>
     );

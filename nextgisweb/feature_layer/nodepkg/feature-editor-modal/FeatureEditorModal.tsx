@@ -11,6 +11,7 @@ import type { FeatureEditorWidgetProps } from "../feature-editor/type";
 import "./FeatureEditorModal.less";
 
 export type ModalProps = Parameters<typeof Modal>[0];
+type ModalOnCancel = NonNullable<ModalProps["onCancel"]>;
 
 export interface FeatureEditorModalProps extends ModalProps {
   editorOptions?: FeatureEditorWidgetProps;
@@ -47,8 +48,8 @@ export function FeatureEditorModal({
     setOpen(false);
   };
 
-  const handleClose = useCallback(
-    (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const handleClose: ModalOnCancel = useCallback(
+    (e) => {
       const close_ = () => {
         onCancel?.(e);
         close();
@@ -100,7 +101,10 @@ export function FeatureEditorModal({
           }}
           toolbar={{
             rightActions: [
-              <Button key="reset" onClick={handleClose}>
+              <Button
+                key="reset"
+                onClick={(e) => handleClose(e as Parameters<ModalOnCancel>[0])}
+              >
                 {msgCancel}
               </Button>,
             ],
