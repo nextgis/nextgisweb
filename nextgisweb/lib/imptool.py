@@ -23,7 +23,7 @@ filterwarnings(
 # Exceptions will be enabled by default in GDAL 4 - OK, got it!
 filterwarnings(
     "ignore",
-    r"^Neither gdal\.UseExceptions\(\) nor gdal\.DontUseExceptions\(\).*$",
+    r"^Neither (gdal|ogr|osr)\.UseExceptions\(\) nor (gdal|ogr|osr)\.DontUseExceptions\(\).*$",
     category=FutureWarning,
 )
 
