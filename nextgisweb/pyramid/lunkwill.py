@@ -111,7 +111,9 @@ def proxy(request):
     headers["Connection"] = "close"
     pool = request.registry.settings["lunkwill.pool"]
     resp = pool.request(request.method, url, headers=headers, retries=False, preload_content=False)
-    return Response(status=resp.status, headerlist=list(resp.headers.items()), app_iter=resp.stream())
+    return Response(
+        status=resp.status, headerlist=list(resp.headers.items()), app_iter=resp.stream()
+    )
 
 
 def hmux(request):

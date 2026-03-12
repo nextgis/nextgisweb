@@ -6,8 +6,8 @@ import {
   InvalidResponseError,
   LunkwillError,
   LunkwillRequestCancelled,
-  LunkwillRequestTimeout,
   LunkwillRequestFailed,
+  LunkwillRequestTimeout,
   NetworkResponseError,
   ServerResponseError,
 } from "./error";
