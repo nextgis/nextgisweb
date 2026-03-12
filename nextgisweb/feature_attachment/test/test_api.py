@@ -1,4 +1,5 @@
 import itertools
+from io import BytesIO
 from secrets import token_hex
 from tempfile import NamedTemporaryFile
 from zipfile import ZipFile
@@ -129,7 +130,7 @@ def clear(layer_id):
         (
             [
                 dict(name="test_A", size=1),
-                dict(name="test_B", size=1),
+                dict(name="test_B", size=2),
                 dict(name="test_C", size=1),
                 dict(
                     name="metadata.json",
@@ -159,11 +160,13 @@ def clear(layer_id):
         ),
     ),
 )
-def test_import(files, result, layer_id, clear, ngw_file_upload, ngw_webtest_app: WebTestApp):
+def test_import_export(
+    files, result, layer_id, clear, ngw_file_upload, ngw_webtest_app: WebTestApp
+):
     upload_meta = generate_archive(files, ngw_file_upload)
 
     status = 422 if result.get("error") else 200
-    resp = ngw_webtest_app.put(
+    resp_import = ngw_webtest_app.put(
         f"/api/resource/{layer_id}/feature_attachment/import",
         json={"source": upload_meta},
         status=status,
@@ -172,13 +175,10 @@ def test_import(files, result, layer_id, clear, ngw_file_upload, ngw_webtest_app
     if status != 200:
         return
 
-    import_result = resp.json
+    assert resp_import.json == dict(imported=len(result["features"]), skipped=0)
 
-    imported = 0
     fid_last = att_idx = attachments = None
     for file_idx, fid in enumerate(result["features"]):
-        imported += 1
-
         if fid != fid_last:
             resp = ngw_webtest_app.get(
                 f"/api/resource/{layer_id}/feature/{fid}/attachment/",
@@ -194,7 +194,14 @@ def test_import(files, result, layer_id, clear, ngw_file_upload, ngw_webtest_app
         attachment = attachments[att_idx]
         assert attachment["size"] == size
 
-    assert import_result == dict(imported=imported, skipped=0)
+        fid_last = fid
+
+    resp_export = ngw_webtest_app.get(
+        f"/api/resource/{layer_id}/feature_attachment/export", status=200
+    )
+    with ZipFile(BytesIO(resp_export.body), "r") as z:
+        # Exclude metadata.json
+        assert len(z.filelist) - 1 == len(result["features"])
 
 
 def test_import_multiple(layer_id, ngw_file_upload, ngw_webtest_app: WebTestApp):

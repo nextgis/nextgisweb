@@ -244,7 +244,10 @@ def export(resource, request):
                 arcname = f"{obj.feature_id:010d}/{name}"
 
                 metadata_item = metadata_items[arcname] = dict(
-                    id=obj.id, feature_id=obj.feature_id, name=obj.name, mime_type=obj.mime_type
+                    id=obj.extension_id,
+                    feature_id=obj.feature_id,
+                    name=obj.name,
+                    mime_type=obj.mime_type,
                 )
                 if obj.keyname is not None:
                     metadata_item["keyname"] = obj.keyname
