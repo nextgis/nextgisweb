@@ -3,7 +3,6 @@ from __future__ import annotations
 from collections.abc import Sequence
 from contextlib import contextmanager
 from typing import Literal
-from unittest.mock import PropertyMock, patch
 
 import pytest
 
@@ -49,6 +48,15 @@ class FeatureLayerAPI:
 
     def feature_update(self, fid: int, feature: dict, *, status: WebTestApp.Status = None) -> dict:
         return self.client.put(f"/feature/{fid}", json=feature, status=status).json
+
+    def cpatch(
+        self,
+        data: list[dict],
+        *,
+        query: dict | None = None,
+        status: WebTestApp.Status = None,
+    ) -> list[dict]:
+        return self.client.patch("/feature/", json=data, query=query, status=status).json
 
     def versioning(self):
         data = self.client.get().json

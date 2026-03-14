@@ -1,6 +1,7 @@
 import importlib
 import json
 from itertools import product
+from unittest.mock import ANY
 
 import pytest
 import transaction
@@ -14,6 +15,8 @@ from nextgisweb.pyramid.test import WebTestApp
 from nextgisweb.resource.test import ResourceAPI
 from nextgisweb.vector_layer import VectorLayer
 
+from . import FeatureLayerAPI
+
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
 
 ZXY0 = dict(z=0, x=0, y=0)
@@ -25,7 +28,7 @@ def test_identify(ngw_webtest_app: WebTestApp):
     assert resp.json["featureCount"] == 0
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture()
 def vector_layer_id():
     with transaction.manager:
         geojson = {
@@ -171,6 +174,25 @@ def test_geom_edit(ngw_webtest_app: WebTestApp, vector_layer_id):
     coords = feature["geom"]["coordinates"]
     assert round(coords[0], 3) == 10018754.171
     assert round(coords[1], 3) == 5621521.486
+
+
+def test_cpatch(ngw_webtest_app: WebTestApp, vector_layer_id):
+    fapi = FeatureLayerAPI(vector_layer_id)
+    result = fapi.cpatch(
+        [
+            {"id": 1, "geom": None, "fields": {"price": None}},
+            {"id": 2, "delete": True},
+            {"geom": "POINT (1 1)", "fields": {"price": 0}},
+        ],
+        query=dict(geom_null=True),
+    )
+
+    assert result == [{"id": 1}, {"id": 2}, {"id": 3}]
+
+    assert fapi.feature_list() == [
+        {"id": 1, "geom": None, "fields": {"price": None, "name": ANY}},
+        {"id": 3, "geom": "POINT(1 1)", "fields": {"price": 0, "name": ANY}},
+    ]
 
 
 def test_fields_unique():

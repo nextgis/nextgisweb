@@ -554,6 +554,10 @@ def cpatch(
                 loader(feature, fdata)
                 feature.id = resource.feature_create(feature)
                 loader.extensions(feature, fdata)
+            elif fdata.get("delete", False) is True:
+                # Delete feature
+                feature = Feature(layer=resource, id=fdata["id"])
+                resource.feature_delete(feature.id)
             else:
                 # Update existing feature
                 query = resource.feature_query()
