@@ -2,10 +2,8 @@ import math
 from io import BytesIO
 from urllib.parse import quote
 
-import numpy
 from lxml import etree, html
 from lxml.builder import ElementMaker
-from osgeo import gdal, gdal_array
 from PIL import Image, ImageColor, ImageDraw, ImageFont
 from pyramid.httpexceptions import HTTPBadRequest
 from pyramid.renderers import render as render_template
@@ -16,6 +14,7 @@ from nextgisweb.lib.geometry import Geometry
 from nextgisweb.lib.imptool import module_path
 from nextgisweb.lib.json import dumps
 from nextgisweb.lib.ows import SRSParseError, parse_request, parse_srs
+from nextgisweb.lib.pilhelper import reproject_render
 
 from nextgisweb.core.exception import InsufficientPermissions, ValidationError
 from nextgisweb.pyramid.exception import json_error
@@ -306,44 +305,7 @@ def _get_map(obj, params, request):
             if srs.id == res.srs.id:
                 limg = req.render_extent(p_bbox, p_size)
             else:
-                mem = gdal.GetDriverByName("MEM")
-
-                dst_geo = (xmin, (xmax - xmin) / p_width, 0, ymax, 0, (ymin - ymax) / p_height)
-                dst_ds = mem.Create("", p_width, p_height, 4, gdal.GDT_Byte)
-                dst_ds.SetGeoTransform(dst_geo)
-
-                vrt = gdal.AutoCreateWarpedVRT(dst_ds, srs.wkt, res.srs.wkt)
-                src_width = vrt.RasterXSize
-                src_height = vrt.RasterYSize
-                src_geo = vrt.GetGeoTransform()
-                vrt = None
-
-                src_bbox = (
-                    src_geo[0],
-                    src_geo[3] + src_geo[5] * src_height,
-                    src_geo[0] + src_geo[1] * src_width,
-                    src_geo[3],
-                )
-                limg = req.render_extent(src_bbox, (src_width, src_height))
-
-                if limg is not None:
-                    data = numpy.asarray(limg)
-                    img_h, img_w, band_count = data.shape
-
-                    src_ds = mem.Create("", src_width, src_height, band_count, gdal.GDT_Byte)
-                    src_ds.SetGeoTransform(src_geo)
-                    for i in range(band_count):
-                        bandArray = data[:, :, i]
-                        src_ds.GetRasterBand(i + 1).WriteArray(bandArray)
-
-                    gdal.ReprojectImage(src_ds, dst_ds, res.srs.wkt, srs.wkt)
-
-                    array = numpy.zeros((p_height, p_width, band_count), numpy.uint8)
-                    for i in range(band_count):
-                        array[:, :, i] = gdal_array.BandReadAsArray(dst_ds.GetRasterBand(i + 1))
-                    limg = Image.fromarray(array)
-
-                    src_ds = dst_ds = None
+                limg = reproject_render(req.render_extent, p_bbox, p_size, srs.wkt, res.srs.wkt)
 
             if limg is not None:
                 img = Image.alpha_composite(img, limg)

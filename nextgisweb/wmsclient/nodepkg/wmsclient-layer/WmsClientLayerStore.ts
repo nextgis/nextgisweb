@@ -17,7 +17,7 @@ import type {
 
 type MapperLayerCreate = NullableProps<
   LayerCreate,
-  "connection" | "imgformat" | "vendor_params"
+  "connection" | "imgformat" | "vendor_params" | "remote_srs"
 >;
 
 const {
@@ -25,6 +25,7 @@ const {
   wmslayers,
   imgformat,
   vendor_params,
+  remote_srs,
   $load: mapperLoad,
   $error: mapperError,
   $dump: mapperDump,
@@ -35,6 +36,7 @@ const {
     connection: { required: true },
     imgformat: { required: true },
     wmslayers: { required: true },
+    remote_srs: { required: true },
   },
 });
 
@@ -50,6 +52,7 @@ export class WmsClientLayerStore implements EditorStore<
   readonly wmslayers = wmslayers.init("", this);
   readonly imgformat = imgformat.init(null, this);
   readonly vendor_params = vendor_params.init({}, this);
+  readonly remote_srs = remote_srs.init(null, this);
 
   @observable.ref accessor validate = false;
 
@@ -69,16 +72,25 @@ export class WmsClientLayerStore implements EditorStore<
 
   dump() {
     if (this.dirty) {
-      const { wmslayers, imgformat, connection, vendor_params, ...rest } =
-        mapperDump(this);
+      const {
+        wmslayers,
+        imgformat,
+        connection,
+        vendor_params,
+        remote_srs,
+        ...rest
+      } = mapperDump(this);
 
-      assert(connection && imgformat && vendor_params && wmslayers);
+      assert(
+        connection && imgformat && vendor_params && wmslayers && remote_srs
+      );
 
       return {
         wmslayers,
         imgformat,
         connection,
         vendor_params,
+        remote_srs,
         ...rest,
         ...(this.composite.operation === "create"
           ? { srs: srsSettings.default }

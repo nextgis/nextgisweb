@@ -85,3 +85,15 @@ def get_capability_layers(el_cap, *, version):
     for el in find_tags(el_cap, "Layer"):
         result.extend(_layers(el, version=version))
     return result
+
+
+def get_capability_srs(el_cap, *, version):
+    tag = "CRS" if version == "1.3.0" else "SRS"
+    result = []
+    seen = set()
+    for el in el_cap.iter("{*}%s" % tag):
+        for code in el.text.split():
+            if code not in seen:
+                seen.add(code)
+                result.append(code)
+    return result

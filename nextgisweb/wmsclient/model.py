@@ -9,13 +9,14 @@ import sqlalchemy as sa
 import sqlalchemy.dialects.postgresql as sa_pg
 import sqlalchemy.orm as orm
 from lxml import etree
-from msgspec import Struct
+from msgspec import Struct, field
 from requests.exceptions import RequestException
 from zope.interface import implementer
 
 from nextgisweb.env import Base, env, gettext
 from nextgisweb.lib import json, saext
 from nextgisweb.lib.datetime import utcnow_naive
+from nextgisweb.lib.pilhelper import reproject_render
 
 from nextgisweb.core.exception import ExternalServiceError, ValidationError
 from nextgisweb.jsrealm import TSExport
@@ -34,8 +35,9 @@ from nextgisweb.resource import (
     SRelationship,
     SResource,
 )
+from nextgisweb.spatial_ref_sys import SRS
 
-from .util import find_tag, get_capability_formats, get_capability_layers
+from .util import find_tag, get_capability_formats, get_capability_layers, get_capability_srs
 
 Base.depends_on("resource")
 
@@ -127,6 +129,7 @@ class Connection(Resource):
         data = dict()
         data["formats"] = get_capability_formats(el_cap)
         data["layers"] = get_capability_layers(el_cap, version=version)
+        data["srs"] = get_capability_srs(el_cap, version=version)
 
         self.capcache_json = json.dumps(data)
 
@@ -187,6 +190,7 @@ class WMSConnectionLayer(Struct):
 class CapCache(Struct):
     formats: list[str]
     layers: list[WMSConnectionLayer]
+    srs: list[str] = field(default_factory=list)
 
 
 class CapCacheAttr(SAttribute):
@@ -236,11 +240,20 @@ class Layer(Resource, SpatialLayerMixin):
     wmslayers = sa.Column(sa.Unicode, nullable=False)
     imgformat = sa.Column(sa.Unicode, nullable=False)
     vendor_params = sa.Column(sa_pg.JSONB, nullable=False, default=dict)
+    remote_srs_id = sa.Column(sa.ForeignKey(SRS.id), nullable=False)
 
     connection = orm.relationship(
         Resource,
         foreign_keys=connection_id,
         cascade="save-update, merge",
+    )
+
+    @orm.declared_attr
+    def srs(cls):
+        return orm.relationship(SRS, foreign_keys=[cls.srs_id], lazy="joined")
+
+    remote_srs = orm.relationship(
+        SRS, primaryjoin=remote_srs_id == SRS.id, foreign_keys=[remote_srs_id], lazy="joined"
     )
 
     @classmethod
@@ -250,7 +263,7 @@ class Layer(Resource, SpatialLayerMixin):
     def render_request(self, srs, cond=None):
         return RenderRequest(self, srs, cond)
 
-    def render_image(self, extent, size):
+    def _wms_get_map(self, extent, size):
         query = dict(
             layers=self.wmslayers,
             styles="",
@@ -263,7 +276,7 @@ class Layer(Resource, SpatialLayerMixin):
         query.update(self.vendor_params)
 
         srs_param = "crs" if self.connection.version == "1.3.0" else "srs"
-        query[srs_param] = "EPSG:%d" % self.srs.id
+        query[srs_param] = "EPSG:%d" % self.remote_srs.id
         response = self.connection.request_wms("GetMap", query)
 
         if response.status_code == 200:
@@ -279,6 +292,11 @@ class Layer(Resource, SpatialLayerMixin):
             return None
         else:
             raise ExternalServiceError
+
+    def render_image(self, extent, size):
+        if self.remote_srs.id == self.srs.id:
+            return self._wms_get_map(extent, size)
+        return reproject_render(self._wms_get_map, extent, size, self.srs.wkt, self.remote_srs.wkt)
 
     # IBboxLayer implementation:
     @property
@@ -321,3 +339,4 @@ class LayerSerializer(Serializer, resource=Layer):
     imgformat = SColumn(read=ResourceScope.read, write=ResourceScope.update)
     vendor_params = VendorParamsAttr(read=ResourceScope.read, write=ResourceScope.update)
     srs = SRelationship(read=ResourceScope.read, write=ResourceScope.update)
+    remote_srs = SRelationship(read=ResourceScope.read, write=ResourceScope.update)
