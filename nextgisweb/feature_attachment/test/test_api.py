@@ -283,7 +283,7 @@ def test_import_image(
 
     with transaction.manager:
         obj = FeatureAttachment.filter_by(resource_id=layer_id, feature_id=3).one()
-        assert obj.file_meta == {
+        assert obj.fileobj.meta == {
             "timestamp": "2020-02-21T20:33:54",
             "panorama": {"ProjectionType": "equirectangular"},
         }

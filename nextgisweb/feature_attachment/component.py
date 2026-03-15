@@ -1,10 +1,13 @@
+import sqlalchemy as sa
 import transaction
 
 from nextgisweb.env import Component, gettext, require
+from nextgisweb.env.model import DBSession
 from nextgisweb.lib.config import Option
 from nextgisweb.lib.pilhelper import heif_init
 
 from nextgisweb.core import KindOfData
+from nextgisweb.file_storage.model import FileObj
 
 from .model import FeatureAttachment
 
@@ -27,8 +30,13 @@ class FeatureAttachmentComponent(Component):
         view.setup_pyramid(self, config)
 
     def maintenance(self):
+        q = (
+            sa.select(FeatureAttachment)
+            .join(FeatureAttachment.fileobj)
+            .where(~FileObj._meta.has())
+        )
         with transaction.manager:
-            for obj in FeatureAttachment.filter_by(file_meta=None):
+            for (obj,) in DBSession.execute(q):
                 obj.extract_meta()
 
     def estimate_storage(self):

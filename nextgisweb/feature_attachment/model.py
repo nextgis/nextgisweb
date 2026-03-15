@@ -10,7 +10,6 @@ import sqlalchemy.orm as orm
 from msgspec import UNSET, Struct, UnsetType
 from PIL import Image, UnidentifiedImageError
 from PIL.Image import DecompressionBombError
-from sqlalchemy.dialects import postgresql as pg
 
 from nextgisweb.env import Base
 
@@ -49,8 +48,6 @@ class FeatureAttachment(Base, FVersioningExtensionMixin):
     mime_type = sa.Column(sa.Unicode, nullable=False)
     description = sa.Column(sa.Unicode, nullable=True)
 
-    file_meta = sa.Column(pg.JSONB, nullable=True)
-
     __table_args__ = (
         sa.UniqueConstraint(
             resource_id,
@@ -70,7 +67,6 @@ class FeatureAttachment(Base, FVersioningExtensionMixin):
     fversioning_metadata_version = 1
     fversioning_extension = "attachment"
     fversioning_columns = ("fileobj_id", "keyname", "name", "mime_type", "description")
-    fversioning_extra = dict(file_meta=sa.null())
     fversioning_htab_args = [
         sa.ForeignKeyConstraint(
             ["fileobj_id"],
@@ -115,7 +111,7 @@ class FeatureAttachment(Base, FVersioningExtensionMixin):
                         xmp_desc = xmp_desc[0] if len(xmp_desc) > 0 else {}
                     if projection := xmp_desc.get("ProjectionType"):
                         _file_meta["panorama"] = {"ProjectionType": projection}
-        self.file_meta = _file_meta
+        self.fileobj.meta = _file_meta
 
     @property
     def is_image(self):
@@ -130,7 +126,7 @@ class FeatureAttachment(Base, FVersioningExtensionMixin):
             "mime_type": self.mime_type,
             "description": self.description,
             "is_image": self.is_image,
-            "file_meta": self.file_meta,
+            "file_meta": self.fileobj.meta,
         }
 
     def load_file_upload(self, source: FileUpload):
