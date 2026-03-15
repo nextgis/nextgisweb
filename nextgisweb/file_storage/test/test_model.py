@@ -21,3 +21,14 @@ def test_not_written(ngw_txn):
     obj = FileObj(component="test").persist()
     with pytest.raises(AssertionError, match="File not written"):
         sa.inspect(obj).session.flush()
+
+
+def test_size_calc(ngw_txn):
+    obj = FileObj(component="test").persist()
+    fn = obj.filename(makedirs=True, not_exists=True)
+    with open(fn, "wb") as fd:
+        fd.write(b"1234")
+
+    sa.inspect(obj).session.flush()
+
+    assert obj.size == 4
