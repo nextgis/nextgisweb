@@ -152,7 +152,6 @@ class AttachmentExecutor(OperationExecutor):
                 obj.load_file_upload(value())
                 updated_fileobj = True
             elif isinstance(operation, AttachmentRestoreOperation):
-                obj.size = obj.fileobj.size
                 obj.extract_meta()
             operation.copy_to(obj)
         elif isinstance(operation, AttachmentDeleteOperation):
