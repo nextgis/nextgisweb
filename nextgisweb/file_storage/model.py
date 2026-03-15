@@ -8,8 +8,11 @@ from typing import Any
 
 import sqlalchemy as sa
 import sqlalchemy.event as sa_event
+from sqlalchemy.dialects import postgresql as pg
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from nextgisweb.env import Base, env
+from nextgisweb.env.model import DBSession
 from nextgisweb.env.package import pkginfo
 from nextgisweb.lib.imptool import module_from_stack
 
@@ -24,12 +27,14 @@ def _size_default(context):
 class FileObj(Base):
     __tablename__ = "fileobj"
 
-    id = sa.Column(sa.Integer, primary_key=True)
-    component = sa.Column(sa.Unicode, nullable=False)
-    uuid = sa.Column(sa.Unicode(32), nullable=False)
-    size = sa.Column(sa.BigInteger, nullable=False, default=_size_default)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    component: Mapped[str] = mapped_column()
+    uuid: Mapped[str] = mapped_column(sa.String(32))
+    size: Mapped[int] = mapped_column(sa.BigInteger, default=_size_default)
 
     __table_args__ = (sa.Index("fileobj_uuid_component_idx", uuid, component, unique=True),)
+
+    _meta: Mapped[FileMeta | None] = relationship(back_populates="fileobj", cascade="delete")
 
     def __init__(self, *args, **kwargs):
         if "component" not in kwargs:
@@ -72,6 +77,32 @@ class FileObj(Base):
             fd.write(content)
         self.size = len(content)
         return self
+
+    @property
+    def meta(self):
+        if obj := self._meta:
+            return obj.value
+
+    @meta.setter
+    def meta(self, value):
+        if obj := self._meta:
+            if value is not None:
+                obj.value = value
+            else:
+                DBSession.delete(obj)
+        elif value is not None:
+            FileMeta(fileobj=self, value=value).persist()
+
+
+class FileMeta(Base):
+    __tablename__ = "filemeta"
+
+    fileobj_id: Mapped[int] = mapped_column(
+        sa.ForeignKey("fileobj.id", ondelete="cascade"), primary_key=True
+    )
+    value: Mapped[dict[str, Any]] = mapped_column(pg.JSONB)
+
+    fileobj: Mapped[FileObj] = relationship(back_populates="_meta")
 
 
 @sa_event.listens_for(FileObj, "before_insert")

@@ -19,6 +19,9 @@ def query_unreferenced(Model, column):
         INNER JOIN information_schema.table_constraints tc ON
             tc.constraint_name = ccu.constraint_name
             AND tc.constraint_type = 'FOREIGN KEY'
+		INNER JOIN information_schema.referential_constraints rc ON
+            rc.constraint_name = ccu.constraint_name
+			AND rc.delete_rule != 'CASCADE'
         INNER JOIN information_schema.key_column_usage kcu ON
             kcu.constraint_name = ccu.constraint_name
             AND kcu.table_schema = tc.table_schema
@@ -43,6 +46,7 @@ def query_unreferenced(Model, column):
                 fk.column.table.name == Model.__tablename__
                 and fk.column.table.schema == schema
                 and fk.column.name == Model.id.name
+                and (fk.ondelete is None or fk.ondelete.upper() != "CASCADE")
             ):
                 sa_set.add(
                     (

@@ -32,3 +32,20 @@ def test_size_calc(ngw_txn):
     sa.inspect(obj).session.flush()
 
     assert obj.size == 4
+
+
+@pytest.fixture
+def fobj(ngw_txn):
+    obj = FileObj(component="test").from_content(b"test").persist()
+    yield obj
+    sa.inspect(obj).session.delete(obj)
+
+
+@pytest.mark.parametrize("value", (dict(some="meta"), None))
+def test_meta(fobj, value):
+    fobj.meta = value
+
+    sa.inspect(fobj).session.flush()
+
+    fobj_fresh = FileObj.filter_by(id=fobj.id).one()
+    assert fobj_fresh.meta == value
