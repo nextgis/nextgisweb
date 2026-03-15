@@ -1,2 +1,2 @@
 from .component import RasterLayerComponent
-from .model import RasterLayer
+from .model import RasterLayer, RasterLayerStorage

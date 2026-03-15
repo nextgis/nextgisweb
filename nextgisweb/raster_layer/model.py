@@ -4,7 +4,7 @@ import subprocess
 from functools import cached_property
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import Literal
+from typing import Any, Literal
 from zipfile import ZipFile, is_zipfile
 
 import sqlalchemy as sa
@@ -26,6 +26,7 @@ from nextgisweb.file_storage import FileObj
 from nextgisweb.file_upload import FileUploadRef
 from nextgisweb.layer import IBboxLayer, SpatialLayerMixin
 from nextgisweb.resource import (
+    ConnectionScope,
     CRUTypes,
     DataScope,
     Resource,
@@ -35,7 +36,9 @@ from nextgisweb.resource import (
     SColumn,
     Serializer,
     SRelationship,
+    SResource,
 )
+from nextgisweb.resource.category import ExternalConnectionsCategory
 
 from .kind_of_data import RasterLayerData
 from .util import band_color_interp, calc_overviews_levels, get_predictor, is_rgb, raster_size
@@ -57,6 +60,43 @@ class RasterBand(Struct):
 
 class RasterLayerMeta(Struct):
     bands: list[RasterBand]
+
+
+class RasterLayerStorage(Resource):
+    identity = "raster_layer_storage"
+    cls_display_name = gettext("Raster layer storage")
+    cls_category = ExternalConnectionsCategory
+
+    __scope__ = ConnectionScope
+
+    endpoint = sa.Column(sa.Unicode, nullable=False)
+    bucket = sa.Column(sa.Unicode, nullable=False)
+    access_key = sa.Column(sa.Unicode, nullable=False)
+    secret_key = sa.Column(sa.Unicode, nullable=False)
+    prefix = sa.Column(sa.Unicode, nullable=False)
+
+    @classmethod
+    def check_parent(cls, parent):
+        return isinstance(parent, ResourceGroup)
+
+    def get_info(self):
+        s = super()
+        result = s.get_info() if hasattr(s, "get_info") else ()
+        result += (
+            (gettext("Endpoint"), self.endpoint),
+            (gettext("Bucket"), self.bucket),
+        )
+        if self.prefix:
+            result += ((gettext("Prefix"), self.prefix),)
+        return result
+
+
+class RasterLayerStorageSerializer(Serializer, resource=RasterLayerStorage):
+    endpoint = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
+    bucket = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
+    access_key = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
+    secret_key = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
+    prefix = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
 
 
 @implementer(IBboxLayer)
@@ -82,8 +122,12 @@ class RasterLayer(Resource, SpatialLayerMixin):
 
     meta = sa.Column(Msgspec(RasterLayerMeta), nullable=True)
 
+    storage_id = sa.Column(sa.ForeignKey(RasterLayerStorage.id), nullable=True)
+    storage_filename = sa.Column(sa.Unicode, nullable=True)
+
     fileobj = orm.relationship(FileObj, foreign_keys=fileobj_id, cascade="all")
     fileobj_pam = orm.relationship(FileObj, foreign_keys=fileobj_pam_id, cascade="all")
+    storage = orm.relationship(RasterLayerStorage, foreign_keys=storage_id)
 
     @classmethod
     def check_parent(cls, parent):
@@ -565,6 +609,17 @@ class ColorInterpretation(SAttribute):
         )
 
 
+class StorageAttr(SResource):
+    def setup_types(self):
+        super().setup_types()
+
+    def set(self, srlzr: Serializer, value: Any, *, create: bool):
+        # Storage can only be assigned at creation time. On update, the value
+        # is silently ignored to prevent changing where raster data is stored.
+        if create:
+            super().set(srlzr, value, create=create)
+
+
 class RasterLayerSerializer(Serializer, resource=RasterLayer):
     srs = SRelationship(read=ResourceScope.read, write=ResourceScope.update)
 
@@ -576,6 +631,7 @@ class RasterLayerSerializer(Serializer, resource=RasterLayer):
 
     bands = Bands(read=ResourceScope.read)
 
+    storage = StorageAttr(read=ResourceScope.read, write=DataScope.write)
     source = SourceAttr(write=DataScope.write, required=True)
     cog = CogAttr(read=ResourceScope.read, write=ResourceScope.update)
 
