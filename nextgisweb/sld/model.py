@@ -15,13 +15,14 @@ Size = Annotated[float, Meta(ge=0)] | UnsetType
 DashPattern = Annotated[list[Annotated[float, Meta(ge=0)]], Meta(min_length=2)] | UnsetType
 
 NS_SLD = "http://www.opengis.net/sld"
+NS_OGC = "http://www.opengis.net/ogc"
 
 E = ElementMaker(
     namespace=NS_SLD,
     nsmap={
         None: NS_SLD,
         "sld": NS_SLD,
-        "ogc": "http://www.opengis.net/ogc",
+        "ogc": NS_OGC,
         "se": "http://www.opengis.net/se",
         "xlink": "http://www.w3.org/1999/xlink",
     },
@@ -136,6 +137,24 @@ class PolygonSymbolizer(Struct, tag="polygon"):
         return result
 
 
+class TextSymbolizer(Struct, tag="text"):
+    field: str
+    font_size: Size | UnsetType = UNSET
+    fill: Fill | UnsetType = UNSET
+
+    def xml_items(self):
+        _text_symbolizer = E.TextSymbolizer()
+        _pn = getattr(E, f"{{{NS_OGC}}}PropertyName")(self.field)
+        _text_symbolizer.append(E.Label(_pn))
+        if self.font_size is not UNSET:
+            _text_symbolizer.append(
+                E.Font(E.SvgParameter(dict(name="font-size"), str(self.font_size)))
+            )
+        if self.fill is not UNSET:
+            _text_symbolizer.append(self.fill.xml())
+        return [_text_symbolizer]
+
+
 class Algorithm(Enum):
     StretchToMinimumMaximum = "stretch"
     ClipToMinimumMaximum = "clip"
@@ -198,7 +217,9 @@ class RasterSymbolizer(Struct, tag="raster"):
         return [_raster_symbolizer]
 
 
-Symbolizer = PointSymbolizer | LineSymbolizer | PolygonSymbolizer | RasterSymbolizer
+Symbolizer = (
+    PointSymbolizer | LineSymbolizer | PolygonSymbolizer | TextSymbolizer | RasterSymbolizer
+)
 
 
 class Rule(Struct):
@@ -212,7 +233,7 @@ class Rule(Struct):
 
 
 class Style(Struct):
-    rules: Annotated[list[Rule], Meta(min_length=1, max_length=1)]
+    rules: Annotated[list[Rule], Meta(min_length=1, max_length=2)]
 
     def xml(self):
         _feature_type_style = E.FeatureTypeStyle()
