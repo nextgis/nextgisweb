@@ -469,6 +469,9 @@ class VectorLayer(Resource, SpatialLayerMixin, LayerFieldsMixin, FVersioningMixi
     @vlschema_autoflush
     @fversioning_guard
     def feature_delete_all(self):
+        if self.fversioning:
+            raise FVersioningNotImplemented
+
         vls = self.vlschema()
         session = inspect(self).session
         query = vls.dml_delete(filter_by={})
@@ -969,8 +972,13 @@ class FieldsAttr(SAttribute):
 
 class DeleteAllFeaturesAttr(SAttribute):
     def set(self, srlzr: Serializer, value: bool, *, create: bool):
-        if value:
-            srlzr.obj.feature_delete_all()
+        if not value:
+            return
+
+        if srlzr.obj.fversioning:
+            raise FVersioningNotImplemented
+
+        srlzr.obj.feature_delete_all()
 
 
 class VectorLayerSerializer(Serializer, resource=VectorLayer):
