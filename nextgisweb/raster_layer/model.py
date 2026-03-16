@@ -3,8 +3,10 @@ import os
 import subprocess
 from functools import cached_property
 from pathlib import Path
-from tempfile import NamedTemporaryFile
+from tempfile import NamedTemporaryFile, TemporaryDirectory
 from typing import Any, Literal
+from urllib.parse import urlparse
+from uuid import uuid4
 from zipfile import ZipFile, is_zipfile
 
 import sqlalchemy as sa
@@ -78,6 +80,31 @@ class RasterLayerStorage(Resource):
     @classmethod
     def check_parent(cls, parent):
         return isinstance(parent, ResourceGroup)
+
+    def gdal_env(self) -> dict:
+        parsed = urlparse(self.endpoint)
+        return {
+            "AWS_S3_ENDPOINT": parsed.netloc,
+            "AWS_HTTPS": "YES" if parsed.scheme == "https" else "NO",
+            "AWS_ACCESS_KEY_ID": self.access_key,
+            "AWS_SECRET_ACCESS_KEY": self.secret_key,
+            "AWS_VIRTUAL_HOSTING": "FALSE",
+        }
+
+    def vsi_path(self, filename: str) -> str:
+        prefix = (self.prefix.rstrip("/") + "/") if self.prefix else ""
+        return f"/vsis3/{self.bucket}/{prefix}{filename}"
+
+    def configure_gdal(self) -> None:
+        """Register S3 credentials with GDAL for this storage's path prefix.
+
+        Using SetPathSpecificOption scopes credentials to the bucket/prefix
+        rather than globally, and one entry covers all files in the storage
+        regardless of how many layers reference it.
+        """
+        path_prefix = self.vsi_path("")
+        for key, value in self.gdal_env().items():
+            gdal.SetPathSpecificOption(path_prefix, key, value)
 
     def get_info(self):
         s = super()
@@ -296,9 +323,9 @@ class RasterLayer(Resource, SpatialLayerMixin):
                 )
             )
 
-        fobj = FileObj(component="raster_layer")
-        dst_file = str(comp.workdir_path(fobj, None, makedirs=True))
-        self.fileobj = fobj
+        # S3 always uses COG - overviews are built into the file
+        if self.storage is not None:
+            cog = True
 
         predictor = get_predictor(data_type)
         use_jpeg_compression = is_rgb(ds)
@@ -336,20 +363,10 @@ class RasterLayer(Resource, SpatialLayerMixin):
         cmd.append(filename)
         cmd.extend(cmd_opts)
 
-        subprocess.check_call(cmd + [dst_file])
-        self.build_overview()
-
-        # GDAL Persistent Auxiliary Metadata (PAM)
-        if os.path.exists(aux_xml_file := dst_file + ".aux.xml"):
-            fobj_pam = FileObj(component="raster_layer")
-            fobj_pam = fobj_pam.copy_from(aux_xml_file)
-            self.fileobj_pam = fobj_pam
-            comp.workdir_path(fobj, fobj_pam, makedirs=True)
+        if self.storage is not None:
+            ds = self._load_file_s3(cmd)
         else:
-            # Cleanup PAM FileObj reference on replace
-            self.fileobj_pam = None
-
-        ds = gdal.Open(dst_file, gdalconst.GA_ReadOnly)
+            ds = self._load_file_local(cmd)
 
         try:
             assert raster_size(ds) == size_expected, "Expected size mismatch"
@@ -390,7 +407,50 @@ class RasterLayer(Resource, SpatialLayerMixin):
             )
         self.meta = RasterLayerMeta(bands=bands)
 
+    def _load_file_local(self, cmd: list) -> gdal.Dataset:
+        comp = env.raster_layer
+        fobj = FileObj(component="raster_layer")
+        dst_file = str(comp.workdir_path(fobj, None, makedirs=True))
+        self.fileobj = fobj
+        subprocess.check_call(cmd + [dst_file])
+        self.build_overview()
+        if os.path.exists(aux_xml_file := dst_file + ".aux.xml"):
+            fobj_pam = FileObj(component="raster_layer")
+            fobj_pam = fobj_pam.copy_from(aux_xml_file)
+            self.fileobj_pam = fobj_pam
+            comp.workdir_path(fobj, fobj_pam, makedirs=True)
+        else:
+            # Cleanup PAM FileObj reference on replace
+            self.fileobj_pam = None
+        return gdal.Open(dst_file, gdalconst.GA_ReadOnly)
+
+    def _load_file_s3(self, cmd: list) -> gdal.Dataset:
+        storage = self.storage
+        s3_env = storage.gdal_env()
+        self.storage_filename = str(uuid4()) + ".tif"
+        s3_path = storage.vsi_path(self.storage_filename)
+        with TemporaryDirectory() as tmpdir:
+            local = os.path.join(tmpdir, "raster.tif")
+            subprocess.check_call(cmd + [local])
+            with gdal.config_options(s3_env):
+                vsi = gdal.VSIFOpenL(s3_path, "wb")
+                try:
+                    with open(local, "rb") as f:
+                        while chunk := f.read(16 * 1024 * 1024):
+                            gdal.VSIFWriteL(chunk, 1, len(chunk), vsi)
+                finally:
+                    gdal.VSIFCloseL(vsi)
+        return self._s3_open(s3_path)
+
+    def _s3_open(self, s3_path: str) -> gdal.Dataset:
+        # Set credentials on the storage path prefix, not the individual file
+        # path, so all files under the same bucket/prefix share one entry.
+        self.storage.configure_gdal()
+        return gdal.Open(s3_path, gdalconst.GA_ReadOnly)
+
     def gdal_dataset(self):
+        if self.storage is not None:
+            return self._s3_open(self.storage.vsi_path(self.storage_filename))
         fn = env.raster_layer.workdir_path(self.fileobj, self.fileobj_pam)
         return gdal.Open(str(fn), gdalconst.GA_ReadOnly)
 
@@ -536,20 +596,22 @@ class SourceAttr(SAttribute):
     ctypes = CRUTypes(FileUploadRef, FileUploadRef, FileUploadRef)
 
     def set(self, srlzr: Serializer, value: FileUploadRef, *, create: bool):
-        cur_size = 0 if create else estimate_raster_layer_data(srlzr.obj)
+        use_s3 = srlzr.obj.storage is not None
+        cur_size = 0 if create or use_s3 else estimate_raster_layer_data(srlzr.obj)
 
         cog = srlzr.data.cog
         if cog is UNSET or cog is None:
             cog = env.raster_layer.cog_default if cog is None or create else srlzr.obj.cog
         srlzr.obj.load_file(value().data_path, cog=cog)
 
-        new_size = estimate_raster_layer_data(srlzr.obj)
-        env.core.reserve_storage(
-            COMP_ID,
-            RasterLayerData,
-            value_data_volume=new_size - cur_size,
-            resource=srlzr.obj,
-        )
+        if not use_s3:
+            new_size = estimate_raster_layer_data(srlzr.obj)
+            env.core.reserve_storage(
+                COMP_ID,
+                RasterLayerData,
+                value_data_volume=new_size - cur_size,
+                resource=srlzr.obj,
+            )
 
 
 class CogAttr(SColumn):

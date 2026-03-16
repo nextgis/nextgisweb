@@ -109,7 +109,11 @@ def export(
             response.content_disposition = content_disposition
             return response
 
-    source_filename = env.raster_layer.workdir_path(resource.fileobj, resource.fileobj_pam)
+    if resource.storage is not None:
+        resource.storage.configure_gdal()
+        source_filename = resource.storage.vsi_path(resource.storage_filename)
+    else:
+        source_filename = env.raster_layer.workdir_path(resource.fileobj, resource.fileobj_pam)
     if bands is not None and len(bands) != resource.band_count:
         with tempfile.NamedTemporaryFile(suffix=".tif") as tmp_file:
             gdal.Translate(tmp_file.name, str(source_filename), bandList=bands)
@@ -125,6 +129,9 @@ def cog_head(
 
     :returns: COG file metadata headers"""
     request.resource_permission(DataScope.read)
+
+    if resource.storage is not None:
+        raise ValidationError(gettext("Not available for S3-stored raster layers."))
 
     if not resource.cog:
         raise ValidationError(gettext("Requested raster is not COG."))
@@ -148,6 +155,9 @@ def cog_get(
     :returns: Partial COG content for the requested byte range"""
 
     request.resource_permission(DataScope.read)
+
+    if resource.storage is not None:
+        raise ValidationError(gettext("Not available for S3-stored raster layers."))
 
     if not resource.cog:
         raise ValidationError(gettext("Requested raster is not COG."))
@@ -185,6 +195,9 @@ def download(
     :returns: Raster file in GeoTIFF format"""
 
     request.resource_permission(DataScope.read)
+
+    if resource.storage is not None:
+        raise ValidationError(gettext("Not available for S3-stored raster layers."))
 
     response = FileResponse(
         resource.fileobj.filename(),
