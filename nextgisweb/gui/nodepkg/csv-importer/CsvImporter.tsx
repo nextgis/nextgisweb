@@ -1,10 +1,9 @@
 import { useCallback, useState } from "react";
 
-import { gettext as _gettext } from "@nextgisweb/pyramid/i18n";
-
 import { CsvDialectForm } from "./component/CsvDialectForm";
-import { CsvFileName } from "./component/CsvFileName";
 import { CsvFileSelect } from "./component/CsvFileSelect";
+import { CsvMetaPreview } from "./component/CsvMetaPreview";
+import { useCsvParser } from "./hooks/useCsvParser";
 import { DEFAULT_DIALECT } from "./settings";
 import type { CsvColumn, CsvDialect } from "./type";
 
@@ -19,6 +18,8 @@ export function CsvImporter({
 }: CsvImporterProps) {
   const [file, setFile] = useState<File | null>(null);
   const [dialect, setDialect] = useState<CsvDialect>(DEFAULT_DIALECT);
+
+  const parsed = useCsvParser(file, dialect);
 
   const handleFileChange = useCallback((f: File | null) => {
     setFile(f);
@@ -38,7 +39,12 @@ export function CsvImporter({
 
   return (
     <div>
-      <CsvFileName file={file} onClear={() => handleFileChange(null)} />
+      <CsvMetaPreview
+        file={file}
+        onClear={() => handleFileChange(null)}
+        rowsCount={parsed?.totalRows}
+      />
+
       <div
         style={{
           height: "300px",
@@ -46,7 +52,10 @@ export function CsvImporter({
           marginBottom: "10px",
         }}
       />
+
       <CsvDialectForm value={dialect} onChange={handleDialectChange} />
     </div>
   );
 }
+
+CsvImporter.displayName = "CsvImporter";
