@@ -96,12 +96,24 @@ class RasterLayerStorage(Resource):
         return f"/vsis3/{self.bucket}/{prefix}{filename}"
 
     def configure_gdal(self) -> None:
-        """Register S3 credentials with GDAL for this storage's path prefix.
+        """Register S3 credentials and performance options with GDAL."""
 
-        Using SetPathSpecificOption scopes credentials to the bucket/prefix
-        rather than globally, and one entry covers all files in the storage
-        regardless of how many layers reference it.
-        """
+        # Global performance options recommended for reading COGs from S3.
+        # See https://developmentseed.org/titiler/advanced/performance_tuning/
+        gdal.SetConfigOption("GDAL_DISABLE_READDIR_ON_OPEN", "EMPTY_DIR")
+        gdal.SetConfigOption("GDAL_HTTP_MERGE_CONSECUTIVE_RANGES", "YES")
+        gdal.SetConfigOption("VSI_CACHE", "TRUE")
+        gdal.SetConfigOption("VSI_CACHE_SIZE", "5000000")  # 5 MB per file handle
+        gdal.SetConfigOption("CPL_VSIL_CURL_CACHE_SIZE", "200000000")  # 200 MB LRU
+        gdal.SetConfigOption("GDAL_CACHEMAX", "200")  # 200 MB block cache
+        gdal.SetConfigOption("GDAL_BAND_BLOCK_CACHE", "HASHSET")
+        gdal.SetConfigOption("CPL_VSIL_CURL_ALLOWED_EXTENSIONS", ".tif,.TIF,.tiff")
+        gdal.SetConfigOption("GDAL_PAM_ENABLED", "NO")
+        gdal.SetConfigOption("GDAL_INGESTED_BYTES_AT_OPEN", "32768")
+
+        # Using SetPathSpecificOption scopes credentials to the bucket/prefix
+        # rather than globally, and one entry covers all files in the storage
+        # regardless of how many layers reference it.
         path_prefix = self.vsi_path("")
         for key, value in self.gdal_env().items():
             gdal.SetPathSpecificOption(path_prefix, key, value)
@@ -443,8 +455,6 @@ class RasterLayer(Resource, SpatialLayerMixin):
         return self._s3_open(s3_path)
 
     def _s3_open(self, s3_path: str) -> gdal.Dataset:
-        # Set credentials on the storage path prefix, not the individual file
-        # path, so all files under the same bucket/prefix share one entry.
         self.storage.configure_gdal()
         return gdal.Open(s3_path, gdalconst.GA_ReadOnly)
 
