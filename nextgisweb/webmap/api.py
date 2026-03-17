@@ -25,7 +25,7 @@ from nextgisweb.render.legend import ILegendSymbols
 from nextgisweb.render.util import scale_range_intersection
 from nextgisweb.resource import DataScope, ResourceFactory, ResourceRef, ResourceScope
 
-from .adapter import WebMapAdapter
+from .adapter import ImageAdapter, WebMapAdapter
 from .model import ExtentWSEN, LegendSymbolsEnum, WebMap, WebMapAnnotation, WebMapScope
 from .option import WebMapOption
 from .plugin import WebmapLayerPlugin, WebmapPlugin
@@ -645,7 +645,7 @@ def display_config(obj, request) -> DisplayConfig:
                 else None
             )
 
-            data["adapter"] = WebMapAdapter.registry.get(item.layer_adapter, "image").mid
+            data["adapter"] = WebMapAdapter.registry.get(item.layer_adapter, ImageAdapter).mid
             mid.adapter.add(data["adapter"])
 
             # Layer level plugins
