@@ -1,20 +1,18 @@
 /** @testentry react */
 import { useState } from "react";
 
-import { gettext } from "@nextgisweb/pyramid/i18n";
-
 import { CsvImporter } from "./CsvImporter";
 import type { CsvColumn } from "./type";
 
 const columns: CsvColumn[] = [
   {
     key: "key",
-    label: gettext("Key"),
+    label: "Key",
     aliases: ["Key", "key", "id", "ID"],
   },
   {
     key: "value",
-    label: gettext("Value"),
+    label: "Value",
     aliases: ["Value", "value", "label", "Label"],
   },
 ];

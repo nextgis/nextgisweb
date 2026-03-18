@@ -7,13 +7,13 @@ import BackspaceIcon from "@nextgisweb/icon/material/backspace";
 const msgClearFile = gettext("Clear file");
 const msgRowsInFile = gettext("Rows in file");
 
-export interface CsvFileNameProps {
+export interface CsvMetaDisplay {
   file: File;
   onClear: () => void;
   rowsCount?: number;
 }
 
-export function CsvMetaPreview({ file, onClear, rowsCount }: CsvFileNameProps) {
+export function CsvMetaDisplay({ file, onClear, rowsCount }: CsvMetaDisplay) {
   return (
     <div style={{ display: "flex", alignItems: "baseline" }}>
       {rowsCount !== undefined && (

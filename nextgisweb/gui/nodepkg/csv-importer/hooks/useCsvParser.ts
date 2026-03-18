@@ -1,21 +1,12 @@
 import { parse } from "papaparse";
 import { useEffect, useState } from "react";
 
-import type { CsvDialect } from "../type";
-
-interface Result {
-  rows: string[][];
-  headers: string[];
-  totalRows: number;
-  meta?: {
-    delimiter?: string;
-    linebreak?: string;
-  };
-  error?: string;
-}
+import type { CsvDialect, CsvParsingOutput } from "../type";
 
 export function useCsvParser(file: File | null, dialect: CsvDialect) {
-  const [result, setResult] = useState<Result | undefined>();
+  const [result, setResult] = useState<CsvParsingOutput | undefined>();
+
+  const { delimiter, quoteChar, escapeChar, encoding } = dialect;
 
   useEffect(() => {
     if (!file) {
@@ -23,13 +14,14 @@ export function useCsvParser(file: File | null, dialect: CsvDialect) {
       return;
     }
 
+    setResult(undefined);
+
     parse<string[]>(file, {
-      delimiter: dialect.delimiter,
-      quoteChar: dialect.quoteChar,
-      escapeChar: dialect.escapeChar,
-      encoding: dialect.encoding,
-      skipEmptyLines: true,
-      preview: 1000,
+      delimiter,
+      quoteChar,
+      escapeChar,
+      encoding,
+      skipEmptyLines: "greedy",
       worker: true,
 
       complete: (res) => {
@@ -40,7 +32,6 @@ export function useCsvParser(file: File | null, dialect: CsvDialect) {
             rows: [],
             headers: [],
             totalRows: 0,
-            meta: res.meta,
           });
           return;
         }
@@ -51,20 +42,10 @@ export function useCsvParser(file: File | null, dialect: CsvDialect) {
           headers,
           rows: data,
           totalRows: data.length,
-          meta: res.meta,
-        });
-      },
-
-      error: (err) => {
-        setResult({
-          rows: [],
-          headers: [],
-          totalRows: 0,
-          error: err.message,
         });
       },
     });
-  }, [file, dialect]);
+  }, [file, delimiter, quoteChar, escapeChar, encoding]);
 
   return result;
 }

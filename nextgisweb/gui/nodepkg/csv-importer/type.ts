@@ -4,9 +4,15 @@ export interface CsvColumn {
   aliases: string[];
 }
 
-export type CsvDialect = {
+export interface CsvDialect {
   delimiter: string;
   quoteChar: string;
   escapeChar: string;
   encoding: string;
-};
+}
+
+export interface CsvParsingOutput {
+  rows: string[][];
+  headers: string[];
+  totalRows: number;
+}
