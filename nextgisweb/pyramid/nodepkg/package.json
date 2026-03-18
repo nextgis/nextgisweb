@@ -3,6 +3,6 @@
   "version": "0.0.0",
   "type": "module",
   "dependencies": {
-    "swagger-ui-react": "~5.16.2"
+    "swagger-ui-react": "~5.31.2"
   }
 }
