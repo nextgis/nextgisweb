@@ -5,8 +5,9 @@ from ..model import RasterLayerStorage
 
 
 class StorageStub:
-    gdal_env = RasterLayerStorage.gdal_env
+    vsi_credentials = RasterLayerStorage.vsi_credentials
     vsi_path = RasterLayerStorage.vsi_path
+    register_credentials = RasterLayerStorage.register_credentials
     configure_gdal = RasterLayerStorage.configure_gdal
 
     def __init__(self, **kwargs):
@@ -34,9 +35,9 @@ def test_vsi_path(prefix, filename, expected):
     assert storage.vsi_path(filename) == expected
 
 
-def test_gdal_env_keys():
+def test_vsi_credentials_keys():
     storage = StorageStub(endpoint="https://s3.example.com", access_key="AK", secret_key="SK")
-    env = storage.gdal_env()
+    env = storage.vsi_credentials()
     assert env["AWS_S3_ENDPOINT"] == "s3.example.com"
     assert env["AWS_HTTPS"] == "YES"
     assert env["AWS_ACCESS_KEY_ID"] == "AK"
@@ -44,7 +45,7 @@ def test_gdal_env_keys():
     assert env["AWS_VIRTUAL_HOSTING"] == "FALSE"
 
     storage_http = StorageStub(endpoint="http://minio:9000")
-    assert storage_http.gdal_env()["AWS_HTTPS"] == "NO"
+    assert storage_http.vsi_credentials()["AWS_HTTPS"] == "NO"
 
 
 def test_configure_gdal_scopes_credentials():

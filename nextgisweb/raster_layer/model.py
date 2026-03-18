@@ -81,7 +81,11 @@ class RasterLayerStorage(Resource):
     def check_parent(cls, parent):
         return isinstance(parent, ResourceGroup)
 
-    def gdal_env(self) -> dict:
+    def vsi_path(self, filename: str) -> str:
+        prefix = (self.prefix.rstrip("/") + "/") if self.prefix else ""
+        return f"/vsis3/{self.bucket}/{prefix}{filename}"
+
+    def vsi_credentials(self) -> dict:
         parsed = urlparse(self.endpoint)
         return {
             "AWS_S3_ENDPOINT": parsed.netloc,
@@ -91,12 +95,25 @@ class RasterLayerStorage(Resource):
             "AWS_VIRTUAL_HOSTING": "FALSE",
         }
 
-    def vsi_path(self, filename: str) -> str:
-        prefix = (self.prefix.rstrip("/") + "/") if self.prefix else ""
-        return f"/vsis3/{self.bucket}/{prefix}{filename}"
+    def register_credentials(self) -> None:
+        """Register S3 credentials as path-specific GDAL options.
+
+        Must be called per-read rather than once globally for two reasons:
+        1. Each worker process has its own GDAL state, so credentials set in
+           one process are invisible to others in a multi-worker deployment.
+        2. SetPathSpecificOption is keyed by path prefix only, so two storages
+           sharing the same bucket and prefix but pointing at different endpoints
+           would silently overwrite each other if registered globally. Calling
+           this right before each open means the correct credentials are always
+           in place for the current request.
+        """
+        path_prefix = self.vsi_path("")
+        for key, value in self.vsi_credentials().items():
+            gdal.SetPathSpecificOption(path_prefix, key, value)
 
     def configure_gdal(self) -> None:
         """Register S3 credentials and performance options with GDAL."""
+        self.register_credentials()
 
         # Global performance options recommended for reading COGs from S3.
         # See https://developmentseed.org/titiler/advanced/performance_tuning/
@@ -110,13 +127,6 @@ class RasterLayerStorage(Resource):
         gdal.SetConfigOption("CPL_VSIL_CURL_ALLOWED_EXTENSIONS", ".tif,.TIF,.tiff")
         gdal.SetConfigOption("GDAL_PAM_ENABLED", "NO")
         gdal.SetConfigOption("GDAL_INGESTED_BYTES_AT_OPEN", "32768")
-
-        # Using SetPathSpecificOption scopes credentials to the bucket/prefix
-        # rather than globally, and one entry covers all files in the storage
-        # regardless of how many layers reference it.
-        path_prefix = self.vsi_path("")
-        for key, value in self.gdal_env().items():
-            gdal.SetPathSpecificOption(path_prefix, key, value)
 
     def get_info(self):
         s = super()
@@ -438,7 +448,7 @@ class RasterLayer(Resource, SpatialLayerMixin):
 
     def _load_file_s3(self, cmd: list) -> gdal.Dataset:
         storage = self.storage
-        s3_env = storage.gdal_env()
+        s3_env = storage.vsi_credentials()
         self.storage_filename = str(uuid4()) + ".tif"
         s3_path = storage.vsi_path(self.storage_filename)
         with TemporaryDirectory() as tmpdir:
