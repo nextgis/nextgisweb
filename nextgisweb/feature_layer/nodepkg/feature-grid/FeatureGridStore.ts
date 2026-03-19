@@ -51,16 +51,26 @@ export class FeatureGridStore {
     | ((value: CompositeRead | undefined) => void)
     | null = null;
 
-  constructor({ id, ...props }: FeatureGridProps) {
-    this.id = id;
-
-    for (const key in props) {
-      const k = key as keyof FeatureGridProps;
-      const prop = (props as FeatureGridProps)[k];
-      if (prop !== undefined) {
-        Object.assign(this, { [k]: prop });
-      }
-    }
+  constructor(props: FeatureGridProps) {
+    this.id = props.id;
+    this.size = props.size ?? this.size;
+    this.actions = props.actions ?? this.actions;
+    this.version = props.version ?? this.version;
+    this.readonly = props.readonly ?? this.readonly;
+    this.canCreate = props.canCreate ?? this.canCreate;
+    this._queryParams = props.queryParams ?? this._queryParams;
+    this.selectedIds = props.selectedIds ?? this.selectedIds;
+    this.editOnNewPage = props.editOnNewPage ?? this.editOnNewPage;
+    this.cleanSelectedOnFilter =
+      props.cleanSelectedOnFilter ?? this.cleanSelectedOnFilter;
+    this.globalFilterExpression =
+      props.globalFilterExpression ?? this.globalFilterExpression;
+    this.beforeDelete = props.beforeDelete ?? this.beforeDelete;
+    this.deleteError = props.deleteError ?? this.deleteError;
+    this.onSelect = props.onSelect ?? this.onSelect;
+    this.onDelete = props.onDelete ?? this.onDelete;
+    this.onSave = props.onSave ?? this.onSave;
+    this.onOpen = props.onOpen ?? this.onOpen;
   }
 
   @computed
