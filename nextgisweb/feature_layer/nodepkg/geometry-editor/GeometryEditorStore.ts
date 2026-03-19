@@ -44,14 +44,18 @@ class GeometryEditorStore implements EditorStore<FeatureGeometry | null> {
 
   @action
   load(value: FeatureGeometry | null) {
+    if (!value) {
+      this.value = null;
+      this._initValue = null;
+      this.source.clear();
+      return;
+    }
+
     const geom = this.wkt.readGeometry(value) as Geometry;
-    const norm = value ? this.wkt.writeGeometry(geom) : null;
+    const norm = this.wkt.writeGeometry(geom);
     this.value = norm;
     this._initValue = norm;
     this.source.clear();
-    if (!value) {
-      return;
-    }
 
     const makeFeature = (g: Geometry) => new Feature({ geometry: g });
 
