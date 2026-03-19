@@ -48,6 +48,7 @@ export class FeatureEditorStore {
   }: FeatureEditorStoreOptions) {
     this.resourceId = resourceId;
     if (featureItem) {
+      this.featureId = featureItem.id;
       this._setFeatureItem(featureItem);
     } else {
       this.featureId = featureId;
@@ -86,13 +87,10 @@ export class FeatureEditorStore {
     this.saving = saving;
   }
 
-  private async _initialize() {
-    this._abort();
-
-    const signal = this._abortController.makeSignal();
-
+  private async _loadResource(signal: AbortSignal) {
     const resp = await route("resource.item", this.resourceId).get({
       signal,
+      cache: true,
     });
     if (resp) {
       const fields = resp.feature_layer && resp.feature_layer.fields;
@@ -101,18 +99,27 @@ export class FeatureEditorStore {
       }
       this.setFeatureLayer(resp.feature_layer ?? null);
     }
+    return resp;
+  }
 
-    if (typeof this.featureId === "number") {
-      const featureItem = await route("feature_layer.feature.item", {
-        id: this.resourceId,
-        fid: this.featureId,
-      }).get<FeatureItem>({
-        signal,
-        query: {
-          dt_format: "iso",
-        },
-      });
-      this._setFeatureItem(featureItem);
+  private async _loadFeatureItem(signal: AbortSignal) {
+    if (typeof this.featureId !== "number") return;
+    const featureItem = await route("feature_layer.feature.item", {
+      id: this.resourceId,
+      fid: this.featureId,
+    }).get<FeatureItem>({
+      signal,
+      query: { dt_format: "iso" },
+    });
+    this._setFeatureItem(featureItem);
+  }
+
+  private async _initialize() {
+    this._abort();
+    const signal = this._abortController.makeSignal();
+    const resp = await this._loadResource(signal);
+    if (!this._featureItem) {
+      await this._loadFeatureItem(signal);
     }
     return resp;
   }
@@ -161,9 +168,11 @@ export class FeatureEditorStore {
           json,
         });
       }
-      // To update initial feature value
-      const resp = await this._initialize();
-      return resp;
+
+      this._abort();
+      const signal = this._abortController.makeSignal();
+      await this._loadFeatureItem(signal);
+      return await this._loadResource(signal);
     } finally {
       this.setSaving(false);
     }
