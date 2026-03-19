@@ -21,14 +21,15 @@ export interface CsvDialectFormProps {
 }
 
 export function CsvDialectForm({ value, onChange }: CsvDialectFormProps) {
+  const selectWidth = "200px";
   return (
-    <Area cols={["1fr", "1fr", "1fr", "1fr"]} labelPosition="left">
+    <Area cols={["1fr", "1fr"]} labelPosition="left">
       <Lot label={msgDelimiter}>
         <Select
           value={value.delimiter}
           onChange={(v) => onChange("delimiter", v)}
           options={DELIMITER_OPTIONS}
-          style={{ width: "100%" }}
+          style={{ width: selectWidth }}
         />
       </Lot>
       <Lot label={msgQuoteChar}>
@@ -36,7 +37,7 @@ export function CsvDialectForm({ value, onChange }: CsvDialectFormProps) {
           value={value.quoteChar}
           onChange={(v) => onChange("quoteChar", v)}
           options={QUOTE_OPTIONS}
-          style={{ width: "100%" }}
+          style={{ width: selectWidth }}
         />
       </Lot>
       <Lot label={msgEscapeChar}>
@@ -44,7 +45,7 @@ export function CsvDialectForm({ value, onChange }: CsvDialectFormProps) {
           value={value.escapeChar}
           onChange={(v) => onChange("escapeChar", v)}
           options={ESCAPE_OPTIONS}
-          style={{ width: "100%" }}
+          style={{ width: selectWidth }}
         />
       </Lot>
       <Lot label={msgEncoding}>
@@ -52,9 +53,11 @@ export function CsvDialectForm({ value, onChange }: CsvDialectFormProps) {
           value={value.encoding}
           onChange={(v) => onChange("encoding", v)}
           options={ENCODING_OPTIONS}
-          style={{ width: "100%" }}
+          style={{ width: selectWidth }}
         />
       </Lot>
     </Area>
   );
 }
+
+CsvDialectForm.displayName = "CsvDialectForm";

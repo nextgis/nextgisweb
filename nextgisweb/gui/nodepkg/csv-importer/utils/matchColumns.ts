@@ -6,15 +6,15 @@ export function matchColumns(
 ): Map<string, CsvColumn> {
   const result = new Map<string, CsvColumn>();
 
-  const normalizedHeaders = new Map<string, string>(
-    csvHeaders.map((h) => [h.trim().toLowerCase(), h])
-  );
-
-  for (const column of columns) {
-    for (const alias of column.aliases) {
-      const original = normalizedHeaders.get(alias.trim().toLowerCase());
-      if (original !== undefined) {
-        result.set(original, column);
+  for (const header of csvHeaders) {
+    const normalized = header.trim().toLowerCase();
+    for (const column of columns) {
+      if (
+        column.aliases.some(
+          (alias) => alias.trim().toLowerCase() === normalized
+        )
+      ) {
+        result.set(header, column);
         break;
       }
     }

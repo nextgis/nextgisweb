@@ -7,6 +7,7 @@ import { LoadingOutlined } from "@ant-design/icons";
 
 const msgNoMatch = gettext("No match");
 const msgMatched = gettext("Matched");
+const msgDuplicate = gettext("Duplicate");
 
 interface CsvPreviewTableProps {
   parsed: CsvParsingOutput | undefined;
@@ -19,7 +20,8 @@ export function CsvPreviewTable({ parsed, matches }: CsvPreviewTableProps) {
     marginBottom: "10px",
     border: "1px solid #f0f0f0",
     borderRadius: "6px",
-    overflow: "auto",
+    overflowX: "auto",
+    overflowY: "auto",
   };
 
   if (!parsed) {
@@ -37,23 +39,50 @@ export function CsvPreviewTable({ parsed, matches }: CsvPreviewTableProps) {
     );
   }
 
+  const minColWidth = 200;
+  const tableWidth = parsed.headers.length * minColWidth;
+
+  const seenKeys = new Set<string>();
+  const duplicatedIndices = new Set<number>();
+  for (let i = 0; i < parsed.headers.length; i++) {
+    const key = matches.get(parsed.headers[i])?.key;
+    if (key) {
+      if (seenKeys.has(key)) {
+        duplicatedIndices.add(i);
+      } else {
+        seenKeys.add(key);
+      }
+    }
+  }
+
   const columns = parsed.headers.map((header, idx) => {
     const match = matches.get(header);
+    const isDuplicate = duplicatedIndices.has(idx);
+    const onCell = () =>
+      isDuplicate ? { style: { backgroundColor: "#ff879b0f" } } : {};
+
     return {
       key: idx,
       dataIndex: idx,
       ellipsis: true,
+      width: minColWidth,
+      onHeaderCell: onCell,
+      onCell: onCell,
       title: (
         <div>
           <div
             style={{
-              color: match ? "inherit" : "#aaa",
+              color: isDuplicate ? "#f8575a" : match ? "inherit" : "#aaa",
               borderBottom: "1px solid #f0f0f0",
               paddingBottom: "3px",
               marginBottom: "3px",
             }}
           >
-            {match ? `${msgMatched}: ${match.label}` : msgNoMatch}
+            {isDuplicate
+              ? `${msgDuplicate}: ${match!.label}`
+              : match
+                ? `${msgMatched}: ${match.label}`
+                : msgNoMatch}
           </div>
           <div>{header}</div>
         </div>
@@ -73,7 +102,7 @@ export function CsvPreviewTable({ parsed, matches }: CsvPreviewTableProps) {
         size="small"
         columns={columns}
         dataSource={dataSource}
-        style={{ width: "100%" }}
+        style={{ minWidth: tableWidth }}
       />
     </div>
   );
