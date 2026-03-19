@@ -159,6 +159,13 @@ export class Identify {
 
     const foundFeature = features[0];
     const responseLayerId = layerInfo.resource.id;
+    const labelField = layerInfo.feature_layer?.fields.find(
+      (f) => f.label_field
+    );
+
+    const label = labelField
+      ? foundFeature.fields[labelField.keyname]
+      : undefined;
 
     const identifyResponse: FeatureResponse = {
       featureCount: 1,
@@ -168,7 +175,7 @@ export class Identify {
           {
             fields: foundFeature.fields,
             id: foundFeature.id,
-            label: "",
+            label: label ?? `#${foundFeature.id}`,
             layerId: responseLayerId,
           },
         ],
