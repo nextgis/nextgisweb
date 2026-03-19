@@ -10,7 +10,7 @@
     "@types/papaparse": "^5.3.16",
     "@types/geojson": "^7946.0.16",
     "color": "^5.0.3",
-    "core-js": "3",
+    "core-js": "3.48.0",
     "dayjs": "^1.11.9",
     "lodash-es": "^4.17.21",
     "mobx": "^6.15.0",
@@ -75,5 +75,8 @@
     "webpackConfigs": {
       "main": "webpack.main.cjs"
     }
+  },
+  "resolutions": {
+    "core-js-compat": "3.48.0"
   }
 }
