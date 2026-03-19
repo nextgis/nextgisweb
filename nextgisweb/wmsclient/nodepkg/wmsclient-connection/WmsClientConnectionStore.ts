@@ -2,6 +2,7 @@ import { action, computed, observable } from "mobx";
 
 import { mapper } from "@nextgisweb/gui/arm";
 import type { NullableProps } from "@nextgisweb/gui/type";
+import { assert } from "@nextgisweb/jsrealm/error";
 import type { EditorStore } from "@nextgisweb/resource/type";
 import type {
   ConnectionCreate,
@@ -26,6 +27,7 @@ const {
   referer,
   capcache,
   $dirty: mapperDirty,
+  $dump: mapperDump,
   $load: mapperLoad,
   $error: mapperError,
 } = mapper<WmsClientConnectionStore, MapperConnectionCreate>({
@@ -64,16 +66,21 @@ export class WmsClientConnectionStore implements EditorStore<
 
   @computed
   get deserializeValue() {
-    const payload = {
-      ...this.url.jsonPart(),
-      ...this.username.jsonPart(),
-      ...this.password.jsonPart(),
-      ...this.version.jsonPart(),
-      ...this.insecure.jsonPart(),
-      ...this.referer.jsonPart(),
-    } as ConnectionCreate;
-    if (this.capcache.value) {
-      payload.capcache = this.capcache.value;
+    const { url, username, password, version, capcache, referer, ...rest } =
+      mapperDump(this);
+
+    assert(url && version);
+
+    const payload: ConnectionCreate = {
+      url,
+      version,
+      referer: referer || null,
+      username: username || null,
+      password: password || null,
+      ...rest,
+    };
+    if (capcache) {
+      payload.capcache = capcache;
     }
 
     return payload;
