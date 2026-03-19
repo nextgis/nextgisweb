@@ -13,7 +13,7 @@ import {
   getOlLayout,
 } from "@nextgisweb/webmap/utils/geometry-types";
 
-import type { FeatureToSave, FeaturesToSave } from "./type";
+import type { FeatureToSave } from "./type";
 
 const wkt = new WKT();
 
@@ -84,44 +84,49 @@ function getFeaturesToSave({
 }: {
   resourceId: number;
   source: VectorSource;
-}): FeaturesToSave {
-  const featuresToPatch: FeatureToSave[] = [];
-  const featuresToDelete: FeatureToSave[] = [];
+}): FeatureToSave[] {
+  const featuresToSave: FeatureToSave[] = [];
 
   const features = source
     .getFeatures()
     .filter((f) => f.get("layer_id") === resourceId);
 
   features.forEach((feature) => {
-    const isNew = !feature.get("id");
+    const id = feature.get("id");
+    const isNew = id === undefined || id === null;
     const isModified =
       !isNew && !feature.get("deleted") && feature.getRevision() > 1;
     const isDeleted = feature.get("deleted");
 
-    let featureToSave: Partial<FeatureToSave> | undefined = undefined;
-
     const attribution = feature.get("attribution") || {};
-    if (isNew) {
-      featureToSave = { ...attribution };
-    } else if (isModified || isDeleted) {
-      featureToSave = { ...attribution, id: feature.get("id") };
+
+    let featureToSave: FeatureToSave | undefined;
+
+    if (isNew || isModified) {
+      const geom = wkt.writeGeometry(feature.getGeometry()!);
+      featureToSave = {
+        ...attribution,
+        geom,
+      };
+      if (isModified) {
+        featureToSave = {
+          ...featureToSave,
+          geom,
+        };
+      }
+    } else if (isDeleted) {
+      featureToSave = {
+        id,
+        delete: true,
+      };
     }
 
     if (featureToSave) {
-      const geom = wkt.writeGeometry(feature.getGeometry()!);
-
-      if (isDeleted) {
-        featuresToDelete.push({ ...featureToSave, geom });
-      } else {
-        featuresToPatch.push({ ...featureToSave, geom });
-      }
+      featuresToSave.push(featureToSave);
     }
   });
 
-  return {
-    toPatch: featuresToPatch,
-    toDelete: featuresToDelete,
-  };
+  return featuresToSave;
 }
 
 async function patchFeaturesOnServer({
@@ -142,22 +147,6 @@ async function patchFeaturesOnServer({
   });
 }
 
-async function deleteFeaturesOnServer({
-  resourceId,
-  features,
-}: {
-  resourceId: number;
-  features: FeatureToSave[];
-}): Promise<void> {
-  if (resourceId === null || !features || features.length < 1) return;
-
-  await route("feature_layer.feature.collection", {
-    id: resourceId,
-  }).delete({
-    json: features,
-  });
-}
-
 export async function saveChanges({
   item,
   source,
@@ -168,21 +157,14 @@ export async function saveChanges({
   source: VectorSource;
 }): Promise<void> {
   const resourceId = item.layerId;
-  const { toPatch, toDelete } = getFeaturesToSave({
+  const features = getFeaturesToSave({
     source,
     resourceId,
   });
 
-  try {
-    await Promise.all([
-      patchFeaturesOnServer({ resourceId, features: toPatch }),
-      deleteFeaturesOnServer({ resourceId, features: toDelete }),
-    ]);
+  await patchFeaturesOnServer({ resourceId, features });
 
-    display.map.getLayer(item.id)?.reload();
+  display.map.getLayer(item.id)?.reload();
 
-    topic.publish("/webmap/feature-table/refresh", item.layerId);
-  } catch (err) {
-    console.error("Error saving changes:", err);
-  }
+  topic.publish("/webmap/feature-table/refresh", item.layerId);
 }

@@ -70,19 +70,25 @@ const ToolEditor = observer(
       if (stopped.length) {
         showModal(FinishEditingDialogLazy, {
           onSave: async () => {
-            try {
-              for (const item of stopped) {
+            for (const item of stopped) {
+              try {
                 await saveChanges({
                   display,
                   source,
                   item,
                 });
+              } catch (er) {
+                await new Promise<void>((resolve) => {
+                  errorModal(er, {
+                    modalStore,
+                    afterClose: resolve,
+                  });
+                });
+                setItemsEditable(treeStore, [item.id], true);
+                return;
               }
-            } catch (er) {
-              errorModal(er, { modalStore });
-            } finally {
-              proceed();
             }
+            proceed();
           },
           onUndo: proceed,
           onContinue: () => {

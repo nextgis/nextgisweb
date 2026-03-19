@@ -18,15 +18,26 @@ export interface EditingItem {
   featuresDeleted: Feature<Geometry>[];
 }
 
-export interface FeatureToSave {
-  id?: number;
+// TODO: Extract from Feature item API
+interface FeatureAttributes {
+  [key: string]: unknown;
+}
+
+export interface FeatureCreate extends FeatureAttributes {
   geom: string;
 }
 
-export interface FeaturesToSave {
-  toPatch: FeatureToSave[];
-  toDelete: FeatureToSave[];
+export interface FeatureUpdate extends FeatureAttributes {
+  id: number;
+  geom: string;
 }
+
+interface FeatureDelete {
+  id: number;
+  delete: true;
+}
+
+export type FeatureToSave = FeatureCreate | FeatureUpdate | FeatureDelete;
 
 export type UndoAction = () => void;
 
