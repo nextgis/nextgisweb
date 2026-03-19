@@ -1,5 +1,4 @@
 import { useCallback } from "react";
-import type React from "react";
 // @ts-expect-error - @types/swagger-ui-react has nested dependencies for latest @types/react
 import SwaggerUIReact from "swagger-ui-react";
 
@@ -15,18 +14,12 @@ const openApiJsonUrl = routeURL("pyramid.openapi_json");
 
 const Plugin = () => {
   return {
-    wrapComponents: {
-      InfoContainer: (Original: React.ComponentType) => {
-        const InfoContainerWrapper = (props: unknown) => (
-          <>
-            <a href={openApiJsonUrl} target="_blank">
-              {ngwConfig.applicationUrl + openApiJsonUrl}
-            </a>
-            <Original {...(props as object)} />
-          </>
-        );
-        return InfoContainerWrapper;
-      },
+    components: {
+      InfoContainer: () => (
+        <a href={openApiJsonUrl} target="_blank">
+          {ngwConfig.applicationUrl + openApiJsonUrl}
+        </a>
+      ),
     },
     statePlugins: {
       // NOTE: Hide the "Try it out" button for overloaded paths
