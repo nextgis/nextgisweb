@@ -1,4 +1,5 @@
 import glob
+import math
 import os
 import subprocess
 from functools import cached_property
@@ -49,8 +50,8 @@ SUPPORTED_DRIVERS = ("GTiff", "PNG", "JPEG")
 
 class RasterBand(Struct):
     color_interp: str
-    min: float
-    max: float
+    min: float | None
+    max: float | None
     rat: bool
     no_data: float | Literal["NaN"] | None = None
 
@@ -340,8 +341,8 @@ class RasterLayer(Resource, SpatialLayerMixin):
                     color_interp=band_color_interp(band),
                     no_data=band.GetNoDataValue(),
                     rat=band.GetDefaultRAT() is not None,
-                    min=minval,
-                    max=maxval,
+                    min=None if math.isnan(minval) else minval,
+                    max=None if math.isnan(maxval) else maxval,
                 )
             )
         self.meta = RasterLayerMeta(bands=bands)

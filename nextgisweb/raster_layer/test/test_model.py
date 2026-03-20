@@ -93,6 +93,25 @@ def test_size_limit(size_limit, width, height, band_count, datatype, ok, ngw_env
                     res.load_file(f.name)
 
 
+def test_all_nodata_band_stats(ngw_env, ngw_commit):
+    srs = SRS.filter_by(id=4326).one()
+    res = RasterLayer(srs=srs).persist()
+    driver = gdal.GetDriverByName("GTiff")
+    with NamedTemporaryFile(suffix=".tif") as f:
+        ds = driver.Create(f.name, 10, 10, 3, gdal.GDT_Byte)
+        ds.SetProjection(srs.to_osr().ExportToWkt())
+        ds.SetGeoTransform([0.0, 0.001, 0.0, 0.0, 0.0, -0.001])
+        for bidx in range(1, 4):
+            ds.GetRasterBand(bidx).SetNoDataValue(0)
+        ds.FlushCache()
+        ds = None
+        res.load_file(f.name)
+
+    for band in res.meta.bands:
+        assert band.min is None
+        assert band.max is None
+
+
 @pytest.mark.parametrize(
     "source, expected_size",
     [
