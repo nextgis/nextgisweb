@@ -1,3 +1,6 @@
+XLINK_HREF = "{http://www.w3.org/1999/xlink}href"
+
+
 def find_tags(el, tag):
     return el.iterchildren(tag="{*}%s" % tag)
 
@@ -7,6 +10,20 @@ def find_tag(el, tag, *, must=False):
         return child
     if must:
         raise ValueError(f"Tag {tag} not found in {el.tag} element.")
+
+
+def get_capability_urls(el_cap):
+    result = {}
+    for op in ("GetMap", "GetFeatureInfo"):
+        el_op = next(el_cap.iter("{*}" + op), None)
+        if el_op is None:
+            continue
+        for el_or in el_op.iter("{*}OnlineResource"):
+            href = el_or.get(XLINK_HREF)
+            if href:
+                result[op] = href
+                break
+    return result
 
 
 def get_capability_formats(el_cap):
