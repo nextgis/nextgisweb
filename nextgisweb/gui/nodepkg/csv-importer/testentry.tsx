@@ -1,8 +1,7 @@
 /** @testentry react */
 import { useState } from "react";
 
-import { Button, Input, Space, Table } from "@nextgisweb/gui/antd";
-import { gettext } from "@nextgisweb/pyramid/i18n";
+import { Button, Divider, Input, Space } from "@nextgisweb/gui/antd";
 
 import { CsvImporter } from "./CsvImporter";
 import type { CsvColumn } from "./type";
@@ -16,113 +15,22 @@ const DEFAULT_COLUMNS: CsvColumn[] = [
   },
 ];
 
-const msgKey = gettext("Key");
-const msgLabel = gettext("Label");
-const msgAliases = gettext("Aliases");
-const msgAddColumn = gettext("Add column");
-const msgCopyJson = gettext("Copy JSON");
-const msgPasteJson = gettext("Paste JSON");
-const msgCopied = gettext("Copied!");
-const msgPasteError = gettext("Invalid JSON!");
-const msgDelete = gettext("Delete");
-const msgConfigTitle = gettext("Column configuration");
-const msgPreviewTitle = gettext("Component preview");
-
-const sectionStyle: React.CSSProperties = {
-  border: "1px solid #d9d9d9",
-  borderRadius: "8px",
-  marginBottom: "16px",
-  overflow: "hidden",
-};
-
-const sectionHeaderStyle: React.CSSProperties = {
-  background: "#fafafa",
-  borderBottom: "1px solid #d9d9d9",
-  padding: "8px 12px",
-  display: "flex",
-  alignItems: "center",
-  gap: "8px",
-};
-
-const sectionTitleStyle: React.CSSProperties = {
-  fontWeight: 600,
-  fontSize: "13px",
-  color: "#444",
-  textTransform: "uppercase",
-  letterSpacing: "0.04em",
-};
-
-const sectionBodyStyle: React.CSSProperties = {
-  padding: "12px",
-};
-
-type RowRecord = {
-  key: string;
-  label: string;
-  aliasesRaw: string;
-  _idx: number;
-};
-
 export default function CsvImporterTestEntry() {
   const [columns, setColumns] = useState<CsvColumn[]>(DEFAULT_COLUMNS);
   const [aliasesRaw, setAliasesRaw] = useState<string[]>(
     DEFAULT_COLUMNS.map((c) => c.aliases.join(", "))
   );
-  const [_rows, setRows] = useState<Record<string, string>[] | undefined>(
+  const [rows, setRows] = useState<Record<string, string>[] | undefined>(
     undefined
   );
-  const [copyLabel, setCopyLabel] = useState(msgCopyJson);
-  const [pasteLabel, setPasteLabel] = useState(msgPasteJson);
+  const [copyLabel, setCopyLabel] = useState("Copy JSON");
+  const [pasteLabel, setPasteLabel] = useState("Paste JSON");
   const [pasteDanger, setPasteDanger] = useState(false);
-
-  const updateField = (idx: number, field: "key" | "label", value: string) => {
-    setColumns((prev) => {
-      const next = [...prev];
-      next[idx] = { ...next[idx], [field]: value };
-      return next;
-    });
-  };
-
-  const updateAliasesRaw = (idx: number, raw: string) => {
-    setAliasesRaw((prev) => {
-      const next = [...prev];
-      next[idx] = raw;
-      return next;
-    });
-  };
-
-  const commitAliases = (idx: number, raw: string) => {
-    const parsed = raw
-      .split(",")
-      .map((s) => s.trim())
-      .filter((s) => s.length > 0);
-    const normalized = parsed.join(", ");
-    setAliasesRaw((prev) => {
-      const n = [...prev];
-      n[idx] = normalized;
-      return n;
-    });
-    setColumns((prev) => {
-      const next = [...prev];
-      next[idx] = { ...next[idx], aliases: parsed };
-      return next;
-    });
-  };
-
-  const addColumn = () => {
-    setColumns((prev) => [...prev, { key: "", label: "", aliases: [] }]);
-    setAliasesRaw((prev) => [...prev, ""]);
-  };
-
-  const removeColumn = (idx: number) => {
-    setColumns((prev) => prev.filter((_, i) => i !== idx));
-    setAliasesRaw((prev) => prev.filter((_, i) => i !== idx));
-  };
 
   const handleCopy = () => {
     navigator.clipboard.writeText(JSON.stringify(columns, null, 2));
-    setCopyLabel(msgCopied);
-    setTimeout(() => setCopyLabel(msgCopyJson), 1500);
+    setCopyLabel("Copied!");
+    setTimeout(() => setCopyLabel("Copy JSON"), 1500);
   };
 
   const handlePaste = async () => {
@@ -141,88 +49,81 @@ export default function CsvImporterTestEntry() {
         setColumns(parsed);
         setAliasesRaw(parsed.map((c: CsvColumn) => c.aliases.join(", ")));
       } else {
-        setPasteLabel(msgPasteError);
+        setPasteLabel("Invalid JSON!");
         setPasteDanger(true);
         setTimeout(() => {
-          setPasteLabel(msgPasteJson);
+          setPasteLabel("Paste JSON");
           setPasteDanger(false);
         }, 2000);
       }
     } catch {
-      setPasteLabel(msgPasteError);
+      setPasteLabel("Invalid JSON!");
       setPasteDanger(true);
       setTimeout(() => {
-        setPasteLabel(msgPasteJson);
+        setPasteLabel("Paste JSON");
         setPasteDanger(false);
       }, 2000);
     }
   };
 
-  const tableColumns = [
-    {
-      title: msgKey,
-      dataIndex: "key",
-      width: 150,
-      render: (_: unknown, row: RowRecord) => (
-        <Input
-          size="small"
-          value={columns[row._idx].key}
-          onChange={(e) => updateField(row._idx, "key", e.target.value)}
-        />
-      ),
-    },
-    {
-      title: msgLabel,
-      dataIndex: "label",
-      width: 150,
-      render: (_: unknown, row: RowRecord) => (
-        <Input
-          size="small"
-          value={columns[row._idx].label}
-          onChange={(e) => updateField(row._idx, "label", e.target.value)}
-        />
-      ),
-    },
-    {
-      title: msgAliases,
-      dataIndex: "aliasesRaw",
-      render: (_: unknown, row: RowRecord) => (
-        <div style={{ display: "flex", gap: "4px", alignItems: "center" }}>
-          <Input
-            size="small"
-            value={aliasesRaw[row._idx]}
-            onChange={(e) => updateAliasesRaw(row._idx, e.target.value)}
-            onBlur={(e) => commitAliases(row._idx, e.target.value)}
-          />
-          <Button size="small" danger onClick={() => removeColumn(row._idx)}>
-            {msgDelete}
-          </Button>
-        </div>
-      ),
-    },
-  ];
+  const updateField = (idx: number, field: "key" | "label", value: string) => {
+    setColumns((prev) => {
+      const next = [...prev];
+      next[idx] = { ...next[idx], [field]: value };
+      return next;
+    });
+  };
 
-  const dataSource: RowRecord[] = columns.map((col, i) => ({
-    ...col,
-    aliasesRaw: aliasesRaw[i],
-    _idx: i,
-  }));
+  const commitAliases = (idx: number, raw: string) => {
+    const aliases = raw
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    setAliasesRaw((prev) => {
+      const n = [...prev];
+      n[idx] = aliases.join(", ");
+      return n;
+    });
+    setColumns((prev) => {
+      const next = [...prev];
+      next[idx] = { ...next[idx], aliases };
+      return next;
+    });
+  };
+
+  const addColumn = () => {
+    setColumns((prev) => [...prev, { key: "", label: "", aliases: [] }]);
+    setAliasesRaw((prev) => [...prev, ""]);
+  };
+
+  const removeColumn = (idx: number) => {
+    setColumns((prev) => prev.filter((_, i) => i !== idx));
+    setAliasesRaw((prev) => prev.filter((_, i) => i !== idx));
+  };
 
   return (
-    <div style={{ maxWidth: "1000px", padding: "16px" }}>
-      <div style={sectionStyle}>
-        <div style={sectionHeaderStyle}>
-          <span style={sectionTitleStyle}>{msgPreviewTitle}</span>
-        </div>
-        <div style={sectionBodyStyle}>
-          <CsvImporter columns={columns} onChange={setRows} />
-        </div>
-      </div>
+    <div
+      style={{
+        maxWidth: "900px",
+        padding: "16px",
+        display: "flex",
+        flexDirection: "column",
+        gap: "24px",
+      }}
+    >
+      <Divider titlePlacement="left" style={{ margin: 0 }}>
+        {"Component"}
+      </Divider>
 
-      <div style={sectionStyle}>
-        <div style={sectionHeaderStyle}>
-          <span style={sectionTitleStyle}>{msgConfigTitle}</span>
-          <Space size="small" style={{ marginLeft: "auto" }}>
+      <CsvImporter columns={columns} onChange={setRows} />
+
+      <Divider titlePlacement="left" style={{ margin: 0 }}>
+        {"Column configuration"}
+      </Divider>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+        <div style={{ display: "flex", justifyContent: "flex-end" }}>
+          <Space size="small">
             <Button size="small" onClick={handleCopy}>
               {copyLabel}
             </Button>
@@ -231,21 +132,79 @@ export default function CsvImporterTestEntry() {
             </Button>
           </Space>
         </div>
-        <div style={sectionBodyStyle}>
-          <Table
-            size="small"
-            bordered
-            pagination={false}
-            columns={tableColumns}
-            dataSource={dataSource}
-            rowKey="_idx"
-            style={{ marginBottom: "8px" }}
-          />
+        <div style={{ display: "flex", gap: "8px" }}>
+          <div style={{ width: 120, fontSize: "12px", color: "#888" }}>
+            {"Key"}
+          </div>
+          <div style={{ width: 120, fontSize: "12px", color: "#888" }}>
+            {"Label"}
+          </div>
+          <div style={{ flex: 1, fontSize: "12px", color: "#888" }}>
+            {"Aliases"}
+          </div>
+        </div>
+        {columns.map((col, idx) => (
+          <div key={idx} style={{ display: "flex", gap: "8px" }}>
+            <Input
+              size="small"
+              value={col.key}
+              onChange={(e) => updateField(idx, "key", e.target.value)}
+              style={{ width: 120 }}
+            />
+            <Input
+              size="small"
+              value={col.label}
+              onChange={(e) => updateField(idx, "label", e.target.value)}
+              style={{ width: 120 }}
+            />
+            <Input
+              size="small"
+              value={aliasesRaw[idx]}
+              onChange={(e) =>
+                setAliasesRaw((prev) => {
+                  const n = [...prev];
+                  n[idx] = e.target.value;
+                  return n;
+                })
+              }
+              onBlur={(e) => commitAliases(idx, e.target.value)}
+              style={{ flex: 1 }}
+            />
+            <Button size="small" danger onClick={() => removeColumn(idx)}>
+              {"Delete"}
+            </Button>
+          </div>
+        ))}
+        <div>
           <Button size="small" onClick={addColumn}>
-            + {msgAddColumn}
+            + {"Add column"}
           </Button>
         </div>
       </div>
+
+      <Divider titlePlacement="left" style={{ margin: 0 }}>
+        {"onChange output"}
+        {rows !== undefined ? ` — ${rows.length} rows` : ""}
+      </Divider>
+
+      {rows === undefined ? (
+        <span style={{ color: "#aaa", fontSize: "13px" }}>{"Undefined"}</span>
+      ) : (
+        <pre
+          style={{
+            margin: 0,
+            fontSize: "12px",
+            maxHeight: "200px",
+            overflowY: "auto",
+            background: "#fafafa",
+            border: "1px solid #f0f0f0",
+            borderRadius: "4px",
+            padding: "8px",
+          }}
+        >
+          {JSON.stringify(rows, null, 2)}
+        </pre>
+      )}
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
   CsvDialectForm,
@@ -9,33 +9,46 @@ import {
 import { useCsvParser } from "./hooks/useCsvParser";
 import { DEFAULT_DIALECT } from "./settings";
 import type { CsvColumn, CsvDialect } from "./type";
-import { matchColumns } from "./utils/matchColumns";
+import { buildRows, getDuplicatedIndices, matchColumns } from "./utils";
 
 export interface CsvImporterProps {
   columns: CsvColumn[];
   onChange: (rows: Record<string, string>[] | undefined) => void;
 }
 
-export function CsvImporter({
-  columns,
-  onChange: _onChange,
-}: CsvImporterProps) {
+export function CsvImporter({ columns, onChange }: CsvImporterProps) {
   const [file, setFile] = useState<File | null>(null);
   const [dialect, setDialect] = useState<CsvDialect>(DEFAULT_DIALECT);
 
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
+
   const parsed = useCsvParser(file, dialect);
+
   const matches = useMemo(
     () => (parsed ? matchColumns(parsed.headers, columns) : new Map()),
     [parsed, columns]
   );
 
-  const handleFileChange = useCallback((f: File | null) => {
-    setFile(f);
+  const { duplicatedIndices, rows } = useMemo(() => {
+    if (!parsed)
+      return { duplicatedIndices: new Set<number>(), rows: undefined };
+    const duplicatedIndices = getDuplicatedIndices(parsed.headers, matches);
+    const rows = buildRows(parsed, matches, duplicatedIndices);
+    return { duplicatedIndices, rows };
+  }, [parsed, matches]);
+
+  useEffect(() => {
+    onChangeRef.current(rows);
+  }, [rows]);
+
+  const handleFileChange = useCallback((file: File | null) => {
+    setFile(file);
     setDialect(DEFAULT_DIALECT);
   }, []);
 
   const handleDialectChange = useCallback(
-    <K extends keyof CsvDialect>(key: K, val: CsvDialect[K]) => {
+    <Key extends keyof CsvDialect>(key: Key, val: CsvDialect[Key]) => {
       setDialect((prev) => ({ ...prev, [key]: val }));
     },
     []
@@ -53,7 +66,11 @@ export function CsvImporter({
         rowsCount={parsed?.totalRows}
       />
 
-      <CsvPreviewTable parsed={parsed} matches={matches} />
+      <CsvPreviewTable
+        parsed={parsed}
+        matches={matches}
+        duplicatedIndices={duplicatedIndices}
+      />
 
       <CsvDialectForm value={dialect} onChange={handleDialectChange} />
     </div>

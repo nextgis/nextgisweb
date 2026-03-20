@@ -12,9 +12,14 @@ const msgDuplicate = gettext("Duplicate");
 interface CsvPreviewTableProps {
   parsed: CsvParsingOutput | undefined;
   matches: Map<string, CsvColumn>;
+  duplicatedIndices: Set<number>;
 }
 
-export function CsvPreviewTable({ parsed, matches }: CsvPreviewTableProps) {
+export function CsvPreviewTable({
+  parsed,
+  matches,
+  duplicatedIndices,
+}: CsvPreviewTableProps) {
   const containerStyle: React.CSSProperties = {
     height: "300px",
     marginBottom: "10px",
@@ -42,28 +47,15 @@ export function CsvPreviewTable({ parsed, matches }: CsvPreviewTableProps) {
   const minColWidth = 200;
   const tableWidth = parsed.headers.length * minColWidth;
 
-  const seenKeys = new Set<string>();
-  const duplicatedIndices = new Set<number>();
-  for (let i = 0; i < parsed.headers.length; i++) {
-    const key = matches.get(parsed.headers[i])?.key;
-    if (key) {
-      if (seenKeys.has(key)) {
-        duplicatedIndices.add(i);
-      } else {
-        seenKeys.add(key);
-      }
-    }
-  }
-
-  const columns = parsed.headers.map((header, idx) => {
+  const columns = parsed.headers.map((header, index) => {
     const match = matches.get(header);
-    const isDuplicate = duplicatedIndices.has(idx);
+    const isDuplicate = duplicatedIndices.has(index);
     const onCell = () =>
       isDuplicate ? { style: { backgroundColor: "#ff879b0f" } } : {};
 
     return {
-      key: idx,
-      dataIndex: idx,
+      key: index,
+      dataIndex: index,
       ellipsis: true,
       width: minColWidth,
       onHeaderCell: onCell,

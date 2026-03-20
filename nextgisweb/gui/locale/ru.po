@@ -314,50 +314,6 @@ msgstr "или перетащите сюда"
 msgid "Please select a CSV file"
 msgstr "Пожалуйста, выберите CSV файл"
 
-#: csv-importer/testentry.tsx
-msgid "Key"
-msgstr "Ключ"
-
-#: csv-importer/testentry.tsx
-msgid "Label"
-msgstr "Подпись"
-
-#: csv-importer/testentry.tsx
-msgid "Aliases"
-msgstr "Синонимы"
-
-#: csv-importer/testentry.tsx
-msgid "Add column"
-msgstr "Добавить колонку"
-
-#: csv-importer/testentry.tsx
-msgid "Copy JSON"
-msgstr "Копировать JSON"
-
-#: csv-importer/testentry.tsx
-msgid "Paste JSON"
-msgstr "Вставить JSON"
-
-#: csv-importer/testentry.tsx
-msgid "Copied!"
-msgstr "Скопировано!"
-
-#: csv-importer/testentry.tsx
-msgid "Invalid JSON!"
-msgstr "Некорректный JSON!"
-
-#: csv-importer/testentry.tsx
-msgid "Delete"
-msgstr "Удалить"
-
-#: csv-importer/testentry.tsx
-msgid "Column configuration"
-msgstr "Настройка колонок"
-
-#: csv-importer/testentry.tsx
-msgid "Component preview"
-msgstr "Предварительный просмотр"
-
 #: csv-importer/settings.ts
 msgid "Auto-detected"
 msgstr "Автоопределение"
