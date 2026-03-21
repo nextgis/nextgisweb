@@ -1,7 +1,7 @@
-from json import dumps as json_dumps
 from typing import Any, Callable, ClassVar, Literal
 
 from nextgisweb.env import gettextf
+from nextgisweb.lib.json import dumps as json_dumps
 
 from nextgisweb.core.exception import ValidationError
 
@@ -31,8 +31,7 @@ class NumberValidationError(ValidationError):
     maxvalue: ClassVar[int]
 
     def __init__(self, value: Any):
-        # Using the built-in json module as orjson only supports 64-bit integers
-        value_json = json_dumps(value, ensure_ascii=False)
+        value_json = json_dumps(value)
         super().__init__(
             message=self.message_.format(value_json),
             detail=self.detail_.format(min=self.minvalue, max=self.maxvalue),

@@ -1,9 +1,6 @@
 import sys
-from decimal import Decimal
 
-import orjson
-from msgspec import Struct
-from msgspec import to_builtins as msgspec_to_builtins
+import msgspec.json
 
 if "pytest" in sys.modules:
     from freezegun.api import FakeDate, FakeDatetime
@@ -13,29 +10,25 @@ else:
     _pytest_freezegun = False
 
 
-def default(obj):
-    if isinstance(obj, Decimal):
-        return str(obj)
-    elif isinstance(obj, Struct):
-        return msgspec_to_builtins(obj)
-    elif _pytest_freezegun and isinstance(obj, (FakeDatetime, FakeDate)):
+def _enc_hook(obj):
+    if _pytest_freezegun and isinstance(obj, (FakeDatetime, FakeDate)):
         return obj.isoformat()
-    raise TypeError
+    raise NotImplementedError(type(obj))
 
 
-def dumpb(data, pretty=False, **kw):
-    if "default" in kw:
-        del kw["default"]
+_encoder = msgspec.json.Encoder(enc_hook=_enc_hook)
+_decoder = msgspec.json.Decoder()
 
-    option = 0
+
+def dumpb(data, pretty=False):
+    result = _encoder.encode(data)
     if pretty:
-        option |= orjson.OPT_INDENT_2
-
-    return orjson.dumps(data, option=option, default=default, **kw)
-
-
-def dumps(data, *a, **kw):
-    return dumpb(data, *a, **kw).decode("utf-8")
+        return msgspec.json.format(result)
+    return result
 
 
-loadb = loads = orjson.loads
+def dumps(data, pretty=False):
+    return dumpb(data, pretty=pretty).decode("utf-8")
+
+
+loadb = loads = _decoder.decode

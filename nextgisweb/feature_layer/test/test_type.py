@@ -136,7 +136,6 @@ def bigint_layer():
             {"compat": str(MIN_INT64), "string": str(MIN_INT64), "number": MIN_INT64},
             id="int64-min",
         ),
-        # Send as string cause of orjson behaviour
         pytest.param(
             MAX_SAFE_INTEGER,
             {

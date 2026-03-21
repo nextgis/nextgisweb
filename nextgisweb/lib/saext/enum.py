@@ -25,8 +25,8 @@ class Enum(sa.Enum):
         if len(args) > 0:
             if isclass(std_enum := args[0]) and issubclass(std_enum, enum.Enum):
                 assert len(args) == 1
-                # By default SA uses Enum's names instead of values (as orjson
-                # does). So, swap names and values.
+                # By default SA uses Enum's names instead of values, but we
+                # serialize values. So, swap names and values.
                 kwargs["values_callable"] = lambda o: [i.value for i in o]
             else:
                 otype = unannotate(args[0])
