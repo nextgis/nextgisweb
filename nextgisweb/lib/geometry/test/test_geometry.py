@@ -133,4 +133,4 @@ def _pg_wkb(wkb, srid=None, byte_order="NDR"):
 
 
 def _pg_bytes(query):
-    return DBSession.scalar(query).tobytes()
+    return bytes(DBSession.scalar(query))

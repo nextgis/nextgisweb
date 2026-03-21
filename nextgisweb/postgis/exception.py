@@ -15,9 +15,9 @@ class ExternalDatabaseError(ExternalServiceError):
             if (
                 isinstance(sa_error, StatementError)
                 and sa_error.orig is not None
-                and sa_error.orig.pgcode is not None
+                and getattr(sa_error.orig, "sqlstate", None) is not None
             ):
-                detail = "PostgreSQL error code: %s." % sa_error.orig.pgcode
+                detail = "PostgreSQL error code: %s." % sa_error.orig.sqlstate
             else:
                 detail = "SQLAlchemy error code: %s." % sa_error.code
             setattr(self, "detail", detail)

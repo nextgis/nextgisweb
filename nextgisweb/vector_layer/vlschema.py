@@ -247,7 +247,8 @@ class VLSchema(MetaData):
     def query_changed_fids(self):
         et, ht = self.etab.alias("et"), self.htab.alias("ht")
         p_initial, p_target = bindparam("p_initial"), bindparam("p_target")
-        p_fid_limit, p_fid_last = bindparam("p_fid_limit"), bindparam("p_fid_last")
+        p_fid_limit = bindparam("p_fid_limit")
+        p_fid_last = bindparam("p_fid_last", type_=Integer())
 
         for t in (et, ht):
             vid, fid = t.c.vid, t.c.fid
@@ -264,7 +265,8 @@ class VLSchema(MetaData):
 
     def query_changes(self, *, summary=False):
         ct, et, ht = self._aliased_tabs()
-        p_initial, p_target = bindparam("p_initial"), bindparam("p_target")
+        p_initial = bindparam("p_initial", type_=Integer())
+        p_target = bindparam("p_target", type_=Integer())
         p_fid_min, p_fid_max = bindparam("p_fid_min"), bindparam("p_fid_max")
 
         lc_fields, fmap = list(), dict()

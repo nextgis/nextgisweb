@@ -174,7 +174,6 @@ class PostgisConnection(Resource):
         connect_timeout = int(comp.options["connect_timeout"].total_seconds())
         statement_timeout_ms = int(comp.options["statement_timeout"].total_seconds()) * 1000
         args = dict(
-            client_encoding="utf-8",
             connect_args=dict(
                 connect_timeout=connect_timeout,
                 options="-c statement_timeout=%d" % statement_timeout_ms,
@@ -741,11 +740,14 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                     v = sa.sql.null()
 
                 op = getattr(sa.sql.operators, o)
-                if k == "id":
-                    column = idcol
-                else:
-                    field = self.layer.field_by_keyname(k)
-                    column = tab.columns[field.column_name]
+                column = (
+                    idcol if k == "id" else tab.columns[self.layer.field_by_keyname(k).column_name]
+                )
+                if o not in ("is_", "isnot"):
+                    if isinstance(v, list):
+                        v = [sa.type_coerce(item, column.type) for item in v]
+                    else:
+                        v = sa.type_coerce(v, column.type)
 
                 _where_filter.append(op(column, v))
 
@@ -854,7 +856,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                             if (geom_data := row.geom) is None:
                                 geom = None
                             elif self._geom_format == "WKB":
-                                geom = Geometry.from_wkb(geom_data.tobytes(), validate=False)
+                                geom = Geometry.from_wkb(bytes(geom_data), validate=False)
                             elif self._geom_format == "WKT":
                                 geom = Geometry.from_wkt(geom_data, validate=False)
                             else:

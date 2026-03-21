@@ -45,7 +45,7 @@ def test_validation(origin, ok, ngw_webtest_app: WebTestApp):
 @pytest.mark.parametrize("not_found", [False, True])
 def test_headers(origin, match, not_found, ngw_webtest_app: WebTestApp, override):
     with override(origins_match):
-        url = "/api/resource/%d" % (2**31 if not_found else 0)
+        url = "/api/resource/%d" % (2**31 - 1 if not_found else 0)
         resp = ngw_webtest_app.get(url, headers={"Origin": origin}, status="*")
 
         h = lambda s: resp.headers.get(f"Access-Control-Allow-{s}")
@@ -57,7 +57,7 @@ def test_headers(origin, match, not_found, ngw_webtest_app: WebTestApp, override
 @pytest.mark.parametrize("not_found", [False, True])
 def test_options(origin, match, not_found, ngw_webtest_app: WebTestApp, override):
     with override(origins_match):
-        url = "/api/resource/%d" % (2**31 if not_found else 0)
+        url = "/api/resource/%d" % (2**31 - 1 if not_found else 0)
         headers = {"Origin": origin, "Access-Control-Request-Method": "OPTIONS"}
         resp = ngw_webtest_app.options(url, headers=headers, status="*")
 

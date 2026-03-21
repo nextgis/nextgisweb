@@ -36,27 +36,27 @@ class VersioningTables(NamedTuple):
 
 
 class ExtensionQueries:
-    p_rid = sa.bindparam("p_rid")
-    p_sid = sa.bindparam("p_sid")
-    p_fid = sa.bindparam("p_fid")
-    p_eid = sa.bindparam("p_eid")
+    p_rid = sa.bindparam("p_rid", type_=sa.Integer)
+    p_sid = sa.bindparam("p_sid", type_=sa.Integer)
+    p_fid = sa.bindparam("p_fid", type_=sa.Integer)
+    p_eid = sa.bindparam("p_eid", type_=sa.Integer)
 
     # Current version and operation
-    p_vid = sa.bindparam("p_vid")
+    p_vid = sa.bindparam("p_vid", type_=sa.Integer)
 
     # Previous version and operation
-    p_pid = sa.bindparam("p_pid")
+    p_pid = sa.bindparam("p_pid", type_=sa.Integer)
     p_pop = sa.bindparam("p_pop")
 
     # Initial and target versions for changes
-    p_initial = sa.bindparam("p_initial")
-    p_target = sa.bindparam("p_target")
+    p_initial = sa.bindparam("p_initial", type_=sa.Integer)
+    p_target = sa.bindparam("p_target", type_=sa.Integer)
 
     # Last obtained ID and limits for changed FIDs
-    p_fid_last = sa.bindparam("p_fid_last")
-    p_fid_min = sa.bindparam("p_fid_min")
-    p_fid_max = sa.bindparam("p_fid_max")
-    p_fid_limit = sa.bindparam("p_fid_limit")
+    p_fid_last = sa.bindparam("p_fid_last", type_=sa.Integer)
+    p_fid_min = sa.bindparam("p_fid_min", type_=sa.Integer)
+    p_fid_max = sa.bindparam("p_fid_max", type_=sa.Integer)
+    p_fid_limit = sa.bindparam("p_fid_limit", type_=sa.Integer)
 
     def __init__(self, mapper: Type[FVersioningExtensionMixin]):
         self.mapper = mapper

@@ -68,7 +68,7 @@ def query_unreferenced(Model, column):
 
 def postgres_url(*, host, port, database, username, password=None) -> URL:
     return URL.create(
-        "postgresql+psycopg2",
+        "postgresql+psycopg",
         username=username,
         password=password,
         database=database,
