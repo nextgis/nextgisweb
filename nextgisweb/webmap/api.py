@@ -5,7 +5,7 @@ from subprocess import check_call
 from tempfile import TemporaryDirectory
 from typing import TYPE_CHECKING, Annotated, Any, ForwardRef, Literal, TypeAlias, cast
 
-from geoalchemy2.shape import to_shape
+import shapely.wkb
 from msgspec import UNSET, Meta, Struct, UnsetType, ValidationError
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.renderers import render
@@ -68,7 +68,7 @@ def to_annot_read(obj: WebMapAnnotation, request, with_user_info=False) -> Annot
         id=obj.id,
         description=obj.description,
         style=obj.style,
-        geom=to_shape(obj.geom).wkt,
+        geom=shapely.wkb.loads(obj.geom, hex=True).wkt,
         public=obj.public,
         own=user_id == obj.user_id,
     )

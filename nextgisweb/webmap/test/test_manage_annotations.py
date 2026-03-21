@@ -1,4 +1,3 @@
-import geoalchemy2 as ga
 import pytest
 import transaction
 
@@ -23,7 +22,7 @@ def make_annotation_json(public: bool):
 def make_annotation(webmap, public, user_id):
     return WebMapAnnotation(
         webmap=webmap,
-        geom=ga.elements.WKTElement("POINT (0 0)", srid=3857),
+        geom="SRID=3857;POINT (0 0)",
         public=public,
         user_id=user_id,
     ).persist()
