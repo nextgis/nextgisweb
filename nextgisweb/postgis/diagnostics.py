@@ -175,7 +175,6 @@ class PostgresCheck(ConnectionCheck):
             connect_args["sslmode"] = self.sslmode.value
         engine = create_engine(
             engine_url,
-            client_encoding="utf-8",
             poolclass=NullPool,
             connect_args=connect_args,
         )

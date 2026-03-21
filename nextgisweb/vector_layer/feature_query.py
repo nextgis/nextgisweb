@@ -222,6 +222,11 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
                 op = getattr(sa.sql.operators, o)
                 column = idcol if k == "id" else fields[k]
+                if o not in ("is_", "isnot"):
+                    if isinstance(v, list):
+                        v = [sa.type_coerce(item, column.type) for item in v]
+                    else:
+                        v = sa.type_coerce(v, column.type)
                 _where_filter.append(op(column, v))
 
             if len(_where_filter) > 0:
@@ -302,7 +307,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                         if (geom_data := row.geom) is None:
                             geom = None
                         elif self._geom_format == "WKB":
-                            geom = Geometry.from_wkb(geom_data.tobytes(), validate=False)
+                            geom = Geometry.from_wkb(bytes(geom_data), validate=False)
                         elif self._geom_format == "WKT":
                             geom = Geometry.from_wkt(geom_data, validate=False)
                         else:
