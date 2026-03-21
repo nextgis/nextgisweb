@@ -110,6 +110,7 @@ function getFeaturesToSave({
       };
       if (isModified) {
         featureToSave = {
+          id,
           ...featureToSave,
           geom,
         };
