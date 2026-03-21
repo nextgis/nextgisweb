@@ -1,7 +1,6 @@
 from enum import Enum
 from socket import gaierror, gethostbyname
 
-import geoalchemy2 as ga
 from sqlalchemy import func, inspect, select, sql
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.engine import Connection, create_engine
@@ -18,6 +17,7 @@ from sqlalchemy.types import (
 )
 
 from nextgisweb.env import gettext, gettextf
+from nextgisweb.lib import saext
 from nextgisweb.lib.logging import logger
 from nextgisweb.lib.saext import postgres_url
 
@@ -391,7 +391,7 @@ class GeomColumnCheck(LayerCheck):
         ctype = cinfo["type"]
         ctype_repr = coltype_as_str(ctype).upper().replace(",", ", ")
 
-        if not isinstance(ctype, ga.Geometry) or ctype.geometry_type not in (
+        if not isinstance(ctype, saext.Geometry) or ctype.geometry_type not in (
             "GEOMETRY",
             self.geometry_type,
         ):

@@ -1,7 +1,6 @@
 from enum import Enum
 from typing import Annotated, Literal, Type
 
-import geoalchemy2 as ga
 import sqlalchemy as sa
 import sqlalchemy.dialects.postgresql as sa_pg
 import sqlalchemy.event as sa_event
@@ -287,7 +286,7 @@ class WebMapAnnotation(Base):
     webmap_id = sa.Column(sa.ForeignKey(WebMap.id), nullable=False)
     description = sa.Column(sa.Unicode)
     style = sa.Column(sa_pg.JSONB)
-    geom = sa.Column(ga.Geometry(dimension=2, srid=3857), nullable=False)
+    geom = sa.Column(saext.Geometry("GEOMETRY", 3857), nullable=False)
     public = sa.Column(sa.Boolean, nullable=False, default=True)
     user_id = sa.Column(sa.ForeignKey(User.id), nullable=True)
 

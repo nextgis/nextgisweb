@@ -1,6 +1,5 @@
 from pathlib import Path
 
-import geoalchemy2 as ga
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
 from msgspec import UNSET, Struct, UnsetType
@@ -10,6 +9,7 @@ from sqlalchemy.ext.orderinglist import ordering_list
 from zope.interface import implementer
 
 from nextgisweb.env import COMP_ID, Base, DBSession, env, gettext
+from nextgisweb.lib import saext
 from nextgisweb.lib.geometry import Geometry
 from nextgisweb.lib.osrhelper import sr_from_wkt
 
@@ -99,7 +99,7 @@ class RasterMosaicItem(Base):
     resource_id = sa.Column(sa.ForeignKey(RasterMosaic.id), nullable=False)
     display_name = sa.Column(sa.Unicode, nullable=True)
     fileobj_id = sa.Column(sa.ForeignKey(FileObj.id), nullable=True)
-    footprint = sa.Column(ga.Geometry("POLYGON", srid=4326), nullable=True)
+    footprint = sa.Column(saext.Geometry("POLYGON", 4326), nullable=True)
     position = sa.Column(sa.Integer, nullable=True)
 
     fileobj = orm.relationship(FileObj, lazy="joined")
@@ -174,7 +174,7 @@ class RasterMosaicItem(Base):
 
         info = gdal.Info(filename, format="json")
         geom = Geometry.from_geojson(info["wgs84Extent"])
-        self.footprint = ga.elements.WKBElement(bytearray(geom.wkb), srid=4326)
+        self.footprint = geom.wkb
         self.fileobj = env.file_storage.fileobj(component="raster_mosaic")
 
         dst_file = env.raster_mosaic.workdir_path(self.fileobj, None, makedirs=True)

@@ -33,7 +33,6 @@ requires = [
     "cachetools==6.1.0",
     "defusedxml==0.7.1",
     "docstring-parser==0.16",
-    "geoalchemy2==0.17.1",
     "httpx[http2]==0.28.1",
     "humanize==4.12.3",
     "lxml>5.0,<6.1",
