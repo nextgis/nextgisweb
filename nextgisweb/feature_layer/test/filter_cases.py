@@ -17,6 +17,7 @@ FILTER_FIELDS = [
     FieldInfo(key="created_at", datatype=FIELD_TYPE.DATETIME),
     FieldInfo(key="field_1", datatype=FIELD_TYPE.INTEGER),
     FieldInfo(key="field_2", datatype=FIELD_TYPE.INTEGER),
+    FieldInfo(key="flag", datatype=FIELD_TYPE.BOOLEAN),
 ]
 
 FILTER_SQL_COLUMNS = {
@@ -29,6 +30,7 @@ FILTER_SQL_COLUMNS = {
     "created_at": sa.column("created_at", sa.DateTime()),
     "field_1": sa.column("field_1", sa.Integer()),
     "field_2": sa.column("field_2", sa.Integer()),
+    "flag": sa.column("flag", sa.Boolean()),
 }
 
 FILTER_GEOJSON = {
@@ -47,6 +49,7 @@ FILTER_GEOJSON = {
                 "work_start": "09:00:00",
                 "field_1": 10,
                 "field_2": 20,
+                "flag": True,
             },
             "geometry": {"type": "Point", "coordinates": [0, 0]},
         },
@@ -62,6 +65,7 @@ FILTER_GEOJSON = {
                 "work_start": "10:30:00",
                 "field_1": 10,
                 "field_2": 20,
+                "flag": False,
             },
             "geometry": {"type": "Point", "coordinates": [1, 1]},
         },
@@ -77,6 +81,7 @@ FILTER_GEOJSON = {
                 "work_start": "08:00:00",
                 "field_1": 10,
                 "field_2": 10,
+                "flag": True,
             },
             "geometry": {"type": "Point", "coordinates": [2, 2]},
         },
@@ -92,6 +97,7 @@ FILTER_GEOJSON = {
                 "work_start": "09:30:00",
                 "field_1": 10,
                 "field_2": 5,
+                "flag": False,
             },
             "geometry": {"type": "Point", "coordinates": [3, 3]},
         },
@@ -107,6 +113,7 @@ FILTER_GEOJSON = {
                 "work_start": "08:30:00",
                 "field_1": 10,
                 "field_2": 5,
+                "flag": True,
             },
             "geometry": {"type": "Point", "coordinates": [4, 4]},
         },
@@ -318,6 +325,35 @@ FILTER_REGISTRY: list[FilterCase] = [
         ],
         {"Alice", "Diana"},
         "created_at >= '2023-01-01 00:00:00' AND created_at < '2023-02-01 00:00:00'",
+    ),
+    # Boolean
+    FilterCase(
+        "eq_flag_true",
+        ["==", ["get", "flag"], True],
+        {"Alice", "Charlie", "Eve"},
+        "flag = true",
+        True,
+    ),
+    FilterCase(
+        "eq_flag_false",
+        ["==", ["get", "flag"], False],
+        {"Bob", "Diana"},
+        "flag = false",
+        True,
+    ),
+    FilterCase(
+        "is_null_flag",
+        ["is_null", ["get", "flag"]],
+        set(),
+        "flag IS NULL",
+        True,
+    ),
+    FilterCase(
+        "not_is_null_flag",
+        ["!is_null", ["get", "flag"]],
+        {"Alice", "Bob", "Charlie", "Diana", "Eve"},
+        "flag IS NOT NULL",
+        True,
     ),
 ]
 

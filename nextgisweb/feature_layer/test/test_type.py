@@ -203,3 +203,48 @@ def test_bigint_invalid(value, bigint_layer, ngw_webtest_app: WebTestApp):
     url = f"/api/resource/{bigint_layer}/feature/"
     feature = {"geom": "POINT (0 0)", "fields": {"f": value}}
     ngw_webtest_app.post(url, json=feature, status=422)
+
+
+@pytest.fixture
+def bool_layer():
+    with transaction.manager:
+        layer = VectorLayer(geometry_type="POINT").persist()
+        layer.setup_from_fields([dict(keyname="f", datatype="BOOLEAN")])
+    yield layer.id
+
+
+@pytest.mark.parametrize(
+    "value,expected",
+    (
+        pytest.param(True, True, id="true"),
+        pytest.param(False, False, id="false"),
+        pytest.param(1, True, id="int-1"),
+        pytest.param(0, False, id="int-0"),
+        pytest.param("true", True, id="str-true"),
+        pytest.param("false", False, id="str-false"),
+    ),
+)
+def test_bool_valid(value, expected, bool_layer, ngw_webtest_app: WebTestApp):
+    url = f"/api/resource/{bool_layer}/feature/"
+    feature = {"geom": "POINT (0 0)", "fields": {"f": value}}
+    resp = ngw_webtest_app.post(url, json=feature, status=200)
+    fid = resp.json["id"]
+
+    resp = ngw_webtest_app.get(url + str(fid), status=200)
+    v = resp.json["fields"]["f"]
+    assert type(v) is bool
+    assert v == expected
+
+
+@pytest.mark.parametrize(
+    "value",
+    (
+        pytest.param("qwerty", id="invalid-str"),
+        pytest.param({"x": 1}, id="invalid-obj"),
+        pytest.param([True], id="invalid-list"),
+    ),
+)
+def test_bool_invalid(value, bool_layer, ngw_webtest_app: WebTestApp):
+    url = f"/api/resource/{bool_layer}/feature/"
+    feature = {"geom": "POINT (0 0)", "fields": {"f": value}}
+    ngw_webtest_app.post(url, json=feature, status=422)

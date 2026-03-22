@@ -19,6 +19,7 @@ def test_ogr_feature():
         (FIELD_TYPE.DATETIME, datetime(2025, 9, 11, 12, 50, 59)),
         (FIELD_TYPE.DATE, date(2011, 6, 8)),
         (FIELD_TYPE.TIME, time(23, 59, 59)),
+        (FIELD_TYPE.BOOLEAN, True),
     )
 
     defn = ogr.FeatureDefn()

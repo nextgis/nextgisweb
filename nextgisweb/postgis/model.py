@@ -409,6 +409,8 @@ class PostgisLayer(Resource, SpatialLayerMixin, LayerFieldsMixin):
                         datatype = FIELD_TYPE.TIME
                     elif isinstance(column["type"], sa.DateTime):
                         datatype = FIELD_TYPE.DATETIME
+                    elif isinstance(column["type"], sa.Boolean):
+                        datatype = FIELD_TYPE.BOOLEAN
                     else:
                         logger.warning(f"Column type '{column['type']}' is not supported.")
                         continue

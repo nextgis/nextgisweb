@@ -9,6 +9,7 @@ from sqlalchemy.exc import OperationalError, SQLAlchemyError
 from sqlalchemy.pool import NullPool
 from sqlalchemy.types import (
     BigInteger,
+    Boolean,
     Date,
     DateTime,
     Integer,
@@ -34,6 +35,7 @@ _FIELD_TYPE_2_DB = {
     FIELD_TYPE.DATE: Date,
     FIELD_TYPE.TIME: Time,
     FIELD_TYPE.DATETIME: DateTime,
+    FIELD_TYPE.BOOLEAN: Boolean,
 }
 
 

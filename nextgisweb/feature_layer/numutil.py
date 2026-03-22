@@ -87,3 +87,25 @@ def bigint_loader(val):
         return val
 
     raise BigIntValidationError(val)
+
+
+class BoolValidationError(ValidationError):
+    message_ = gettextf("Got an invalid BOOLEAN value: {}.")
+
+    def __init__(self, value: Any):
+        value_json = json_dumps(value, ensure_ascii=False)
+        super().__init__(message=self.message_.format(value_json))
+
+
+_BOOL_STRINGS = {"true": True, "1": True, "false": False, "0": False}
+
+
+def bool_loader(val: Any) -> bool:
+    match val:
+        case bool():
+            return val
+        case int():
+            return bool(val)
+        case str() if (lower := val.lower()) in _BOOL_STRINGS:
+            return _BOOL_STRINGS[lower]
+    raise BoolValidationError(val)

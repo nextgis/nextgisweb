@@ -42,7 +42,7 @@ const parseDate = (value: string | number) => {
 export function unmarshalFieldValue(
   datatype: FeatureLayerFieldDatatype,
   value: NgwAttributeType
-): null | number | string | Dayjs {
+): null | number | string | boolean | Dayjs {
   if (value === null) {
     return value;
   } else if (isDateTimeFieldType(datatype)) {

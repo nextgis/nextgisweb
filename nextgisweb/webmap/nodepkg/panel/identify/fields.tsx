@@ -72,6 +72,8 @@ export async function fieldValuesToDataSource(
         default:
           assert(false, `Unexpected datatype: ${field.datatype}`);
       }
+    } else if (val !== null && field.datatype === "BOOLEAN") {
+      val = String(val);
     }
 
     const dataItem: FieldDataItem = {
