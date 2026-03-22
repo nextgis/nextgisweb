@@ -76,6 +76,8 @@ interface ModelBrowseProps<
   readonly?: boolean;
   showActionColumn?: boolean;
   showCreate?: boolean;
+  allowBatchDelete?: boolean;
+  card?: boolean;
   customRowSelection?: TableRowSelection<Data>;
 
   createProps?: ButtonProps;
@@ -97,6 +99,8 @@ export function ModelBrowse<Data extends ModalBrowseData = ModalBrowseData>({
   itemProps = {},
   showActionColumn = true,
   showCreate = true,
+  allowBatchDelete = true,
+  card = true,
   customRowSelection,
   createProps = {},
   headerControls = [],
@@ -315,16 +319,18 @@ export function ModelBrowse<Data extends ModalBrowseData = ModalBrowseData>({
         </Fragment>
       ))}
 
-      <Badge count={selected.length} size="small">
-        <Button
-          icon={<DeleteIcon />}
-          onClick={onDeleteSelectedBtnClick}
-          loading={isDeleting}
-          danger
-        >
-          {gettext("Delete")}
-        </Button>
-      </Badge>
+      {allowBatchDelete && (
+        <Badge count={selected.length} size="small">
+          <Button
+            icon={<DeleteIcon />}
+            onClick={onDeleteSelectedBtnClick}
+            loading={isDeleting}
+            danger
+          >
+            {gettext("Delete")}
+          </Button>
+        </Badge>
+      )}
     </Space>
   );
 
@@ -350,9 +356,10 @@ export function ModelBrowse<Data extends ModalBrowseData = ModalBrowseData>({
 
   let headSection;
   if (!readonly) {
-    headSection = selected.length
-      ? SelectedControl()
-      : TableControl({ showCreate });
+    headSection =
+      selected.length && allowBatchDelete
+        ? SelectedControl()
+        : TableControl({ showCreate });
   }
 
   return (
@@ -366,7 +373,7 @@ export function ModelBrowse<Data extends ModalBrowseData = ModalBrowseData>({
       {headSection}
       <Table
         size="middle"
-        card={true}
+        card={card}
         showSorterTooltip={false}
         rowSelection={rowSelection}
         loading={isLoading}

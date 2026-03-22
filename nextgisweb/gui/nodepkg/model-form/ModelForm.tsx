@@ -21,6 +21,11 @@ interface Messages {
   deleteConfirm?: string;
 }
 
+export interface ModelFormCallbacks {
+  submit?: () => void;
+  deleteModelItem?: () => void;
+}
+
 export interface Model {
   item: KeysWithMethodAndPath<["get", "delete", "put"], ["id"]>;
   collection: RouteName;
@@ -29,7 +34,7 @@ export interface Model {
 }
 
 interface ModelFormProps extends FormProps {
-  id: number;
+  id?: number;
   children?: ReactNode;
   model: Model;
   value?: unknown;
@@ -39,6 +44,7 @@ interface ModelFormProps extends FormProps {
   allowDelete?: boolean;
   messages?: Messages;
   readonly?: boolean;
+  callbacks?: ModelFormCallbacks;
 }
 
 const btnTitleAliases = {
@@ -56,6 +62,7 @@ export function ModelForm(props: ModelFormProps) {
     messages: msg,
     allowDelete: allowDelete_,
     readonly: readonly,
+    callbacks,
     ...formProps
   } = props;
 
@@ -97,8 +104,12 @@ export function ModelForm(props: ModelFormProps) {
           : route(model.collection).post;
       try {
         await req({ json });
-        const url = routeURL(model.browse);
-        window.open(url, "_self");
+        if (callbacks?.submit) {
+          callbacks.submit();
+        } else {
+          const url = routeURL(model.browse);
+          window.open(url, "_self");
+        }
       } catch (err) {
         errorModal(err);
       }
@@ -110,12 +121,20 @@ export function ModelForm(props: ModelFormProps) {
   };
 
   const deleteModelItem = async () => {
+    if (id === undefined) {
+      return;
+    }
+
     setStatus("deleting");
 
     try {
       await route(model.item, id).delete();
-      const url = routeURL(model.browse);
-      window.open(url, "_self");
+      if (callbacks?.deleteModelItem) {
+        callbacks.deleteModelItem();
+      } else {
+        const url = routeURL(model.browse);
+        window.open(url, "_self");
+      }
     } catch (err) {
       errorModal(err);
     } finally {
