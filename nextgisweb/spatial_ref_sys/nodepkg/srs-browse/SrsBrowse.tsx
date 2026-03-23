@@ -2,7 +2,6 @@ import { Button } from "@nextgisweb/gui/antd";
 import { ModelBrowse } from "@nextgisweb/gui/model-browse";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import settings from "@nextgisweb/spatial-ref-sys/client-settings";
 import type { SRSRead } from "@nextgisweb/spatial-ref-sys/type/api";
 
 import getMessages from "../srsMessages";
@@ -15,7 +14,7 @@ interface SrsBrowseProps {
 export function SrsBrowse({ readonly }: SrsBrowseProps) {
   const headerControls = [];
 
-  if (settings.catalog.enabled) {
+  if (!readonly) {
     headerControls.push(() => {
       const importFromCatalog = () => {
         const url = routeURL("srs.catalog");

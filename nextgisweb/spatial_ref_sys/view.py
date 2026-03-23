@@ -6,9 +6,9 @@ from nextgisweb.lib import dynmenu as dm
 from nextgisweb.gui import react_renderer
 from nextgisweb.pyramid import client_setting
 
-from .component import SpatialRefSysComponent
+from .component import CatalogSource, SpatialRefSysComponent
 from .model import SRS, SRSRef
-from .pyramid import require_catalog_configured, srs_factory
+from .pyramid import srs_factory
 
 
 @react_renderer("@nextgisweb/spatial-ref-sys/srs-browse")
@@ -48,7 +48,6 @@ def srs_edit(request):
 @react_renderer("@nextgisweb/spatial-ref-sys/catalog-browse")
 def catalog_browse(request):
     request.user.require_permission(SRS.permissions.manage)
-    require_catalog_configured()
 
     return dict(
         title=gettext("Spatial reference system catalog"),
@@ -59,11 +58,10 @@ def catalog_browse(request):
 @react_renderer("@nextgisweb/spatial-ref-sys/catalog-import")
 def catalog_import(request):
     request.user.require_permission(SRS.permissions.manage)
-    require_catalog_configured()
 
     catalog_id = int(request.matchdict["id"])
     catalog_url = request.env.spatial_ref_sys.options["catalog.url"]
-    item_url = catalog_url + "/srs/" + str(catalog_id)
+    item_url = (catalog_url + "/srs/" + str(catalog_id)) if catalog_url else None
     return dict(
         title=gettext("Spatial reference system") + " #%d" % catalog_id,
         props=dict(url=item_url, id=catalog_id),
@@ -77,18 +75,20 @@ def cs_default(comp: SpatialRefSysComponent, request) -> SRSRef:
 
 
 class SpatialRefSysCatalogClientSetting(Struct, kw_only=True, rename="camel"):
-    enabled: bool
+    source: CatalogSource
     url: str | None
     coordinates_search: bool
 
 
 @client_setting("catalog")
 def cs_catalog(comp: SpatialRefSysComponent, request) -> SpatialRefSysCatalogClientSetting:
-    cat_opts = comp.options.with_prefix("catalog")
+    source = comp.catalog_source
     return SpatialRefSysCatalogClientSetting(
-        enabled=cat_opts["enabled"],
-        url=cat_opts["url"] if cat_opts["enabled"] else None,
-        coordinates_search=cat_opts["coordinates_search"],
+        source=source,
+        url=comp.options["catalog.url"] if source == CatalogSource.REMOTE else None,
+        coordinates_search=comp.options["catalog.coordinates_search"]
+        if source == CatalogSource.REMOTE
+        else False,
     )
 
 
@@ -122,12 +122,11 @@ def setup_pyramid(comp, config):
                 lambda kwargs: kwargs.request.route_url("srs.create"),
             )
 
-            if comp.options["catalog.enabled"]:
-                yield dm.Link(
-                    "spatial_ref_sys/catalog/browse",
-                    gettext("Catalog"),
-                    lambda kwargs: kwargs.request.route_url("srs.catalog"),
-                )
+            yield dm.Link(
+                "spatial_ref_sys/catalog/browse",
+                gettext("Catalog"),
+                lambda kwargs: kwargs.request.route_url("srs.catalog"),
+            )
 
             if (obj := getattr(kwargs, "obj", None)) and isinstance(obj, SRS):
                 yield dm.Link(

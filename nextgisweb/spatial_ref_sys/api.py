@@ -3,6 +3,8 @@ from typing import Annotated, Any, Literal
 
 import requests
 from msgspec import UNSET, Meta, Struct, UnsetType
+from pyproj import CRS
+from pyproj.database import query_crs_info
 from requests.exceptions import RequestException
 from sqlalchemy import sql
 
@@ -13,9 +15,36 @@ from nextgisweb.lib.geometry import Geometry, Transformer, geom_area, geom_lengt
 from nextgisweb.core.exception import ExternalServiceError, ValidationError
 from nextgisweb.jsrealm import TSExport
 
+from .component import CatalogSource
 from .model import SRS, WKT_EPSG_4326, SRSRef
-from .pyramid import SRSID, require_catalog_configured, srs_factory
+from .pyramid import SRSID, srs_factory
 from .util import SRSFormat, convert_to_wkt
+
+
+class CatalogEntry(Struct, kw_only=True):
+    display_name: str
+    wkt: str
+    auth_name: str
+    auth_srid: int
+    catalog_id: int | None = None
+    postgis_srid: int | None = None
+
+
+def proj_catalog_search(q: str, limit: int = 100) -> list:
+    q = q.lower()
+    return [
+        r
+        for r in query_crs_info(auth_name="EPSG", allow_deprecated=False)
+        if q in r.name.lower() or q in r.code.lower()
+    ][:limit]
+
+
+def proj_catalog_item(epsg_code: int) -> CatalogEntry:
+    crs = CRS.from_authority("EPSG", epsg_code)
+    return CatalogEntry(
+        display_name=crs.name, wkt=crs.to_wkt(), auth_name="EPSG", auth_srid=epsg_code
+    )
+
 
 DisplayName = Annotated[str, Meta(min_length=1, description="Display name", examples=["WGS 84"])]
 SRSWKT = Annotated[str, Meta(description="OGC WKT definition", examples=[WKT_EPSG_4326])]
@@ -317,7 +346,17 @@ def catalog_collection(
 
     :returns: List of matching spatial reference systems from the catalog"""
     request.require_administrator()
-    require_catalog_configured()
+
+    if env.spatial_ref_sys.catalog_source == CatalogSource.PROJ:
+        return [
+            SRSCatalogRecord(
+                id=int(r.code),
+                display_name=r.name,
+                auth_name=r.auth_name,
+                auth_srid=int(r.code),
+            )
+            for r in proj_catalog_search(q or "")
+        ]
 
     query = dict()
 
@@ -355,10 +394,13 @@ def catalog_item(request, id: Annotated[CatalogID, CatalogIDMeta]) -> SRSCatalog
 
     :returns: Spatial reference system details from the catalog"""
     request.require_administrator()
-    require_catalog_configured()
 
-    srs = get_srs_from_catalog(id)
-    return SRSCatalogItem(display_name=srs["display_name"], wkt=srs["wkt"])
+    entry = (
+        proj_catalog_item(id)
+        if env.spatial_ref_sys.catalog_source == CatalogSource.PROJ
+        else remote_catalog_item(id)
+    )
+    return SRSCatalogItem(display_name=entry.display_name, wkt=entry.wkt)
 
 
 class SRSCatalogImportBody(Struct, kw_only=True):
@@ -374,36 +416,33 @@ def catalog_import(request, *, body: SRSCatalogImportBody) -> SRSCatalogImportRe
 
     :returns: Imported spatial reference system"""
     request.require_administrator()
-    require_catalog_configured()
 
-    catalog_id = int(body.catalog_id)
-    srs = get_srs_from_catalog(catalog_id)
+    entry = (
+        proj_catalog_item(int(body.catalog_id))
+        if env.spatial_ref_sys.catalog_source == CatalogSource.PROJ
+        else remote_catalog_item(int(body.catalog_id))
+    )
 
-    auth_name = srs["auth_name"]
-    auth_srid = srs["auth_srid"]
-    if auth_name is None or auth_srid is None:
+    if entry.auth_name is None or entry.auth_srid is None:
         msg = gettext("SRS authority attributes must be defined while importing from the catalog.")
         raise ValidationError(msg)
 
     obj = SRS(
-        display_name=srs["display_name"],
-        wkt=srs["wkt"],
-        auth_name=auth_name,
-        auth_srid=auth_srid,
-        catalog_id=srs["id"],
+        display_name=entry.display_name,
+        wkt=entry.wkt,
+        auth_name=entry.auth_name,
+        auth_srid=entry.auth_srid,
+        catalog_id=entry.catalog_id,
     )
 
     conflict_filter = [
-        SRS.catalog_id == srs["id"],
-        sql.and_(
-            SRS.auth_name == auth_name,
-            SRS.auth_srid == auth_srid,
-        ),
+        sql.and_(SRS.auth_name == entry.auth_name, SRS.auth_srid == entry.auth_srid),
     ]
-
-    if postgis_srid := srs["postgis_srid"]:
-        obj.id = postgis_srid
-        conflict_filter.append(SRS.id == postgis_srid)
+    if entry.catalog_id is not None:
+        conflict_filter.append(SRS.catalog_id == entry.catalog_id)
+    if entry.postgis_srid is not None:
+        obj.id = entry.postgis_srid
+        conflict_filter.append(SRS.id == entry.postgis_srid)
 
     conflict = SRS.filter(sql.or_(*conflict_filter)).first()
     if conflict:
@@ -415,7 +454,7 @@ def catalog_import(request, *, body: SRSCatalogImportBody) -> SRSCatalogImportRe
     return SRSCatalogImportResponse(id=obj.id)
 
 
-def get_srs_from_catalog(catalog_id):
+def remote_catalog_item(catalog_id: int) -> CatalogEntry:
     catalog_url = env.spatial_ref_sys.options["catalog.url"]
     url = catalog_url + "/api/v1/spatial_ref_sys/" + str(catalog_id)
     timeout = env.spatial_ref_sys.options["catalog.timeout"].total_seconds()
@@ -425,7 +464,15 @@ def get_srs_from_catalog(catalog_id):
     except RequestException:
         raise ExternalServiceError()
 
-    return res.json()
+    srs = res.json()
+    return CatalogEntry(
+        display_name=srs["display_name"],
+        wkt=srs["wkt"],
+        auth_name=srs["auth_name"],
+        auth_srid=srs["auth_srid"],
+        catalog_id=srs["id"],
+        postgis_srid=srs.get("postgis_srid"),
+    )
 
 
 def setup_pyramid(comp, config):

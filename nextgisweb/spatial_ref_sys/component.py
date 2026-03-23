@@ -1,4 +1,5 @@
 from datetime import timedelta
+from enum import Enum
 
 from sqlalchemy.exc import NoResultFound
 
@@ -6,6 +7,11 @@ from nextgisweb.env import Component
 from nextgisweb.lib.config import Option
 
 from .model import SRS, WKT_EPSG_3857, WKT_EPSG_4326
+
+
+class CatalogSource(Enum):
+    REMOTE = "remote"
+    PROJ = "proj"
 
 
 class SpatialRefSysComponent(Component):
@@ -47,13 +53,16 @@ class SpatialRefSysComponent(Component):
         view.setup_pyramid(self, config)
         api.setup_pyramid(self, config)
 
+    @property
+    def catalog_source(self) -> CatalogSource:
+        return CatalogSource.REMOTE if self.options["catalog.url"] else CatalogSource.PROJ
+
     def query_stat(self):
         return dict(count=SRS.query().count())
 
     # fmt: off
     option_annotations = (
-        Option("catalog.enabled", bool, default=False),
-        Option("catalog.url"),
+        Option("catalog.url", default=None, doc="Remote catalog URL. If not set, local PROJ data is used."),
         Option("catalog.timeout", timedelta, default=timedelta(seconds=15), doc="Catalog request timeout."),
         Option("catalog.coordinates_search", bool, default=False),
     )

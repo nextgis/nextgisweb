@@ -11,7 +11,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { SRSCatalogItem } from "@nextgisweb/spatial-ref-sys/type/api";
 
 interface CatalogImportProps {
-  url: string;
+  url: string | null;
   id: number;
 }
 
@@ -47,7 +47,7 @@ export function CatalogImport({ url, id }: CatalogImportProps) {
   }
 
   const showSrsDetailInfo = () => {
-    window.open(url, "_blank");
+    window.open(url ?? undefined, "_blank");
   };
 
   const importSrs = async () => {
@@ -68,16 +68,18 @@ export function CatalogImport({ url, id }: CatalogImportProps) {
 
   return (
     <FieldsForm fields={fields} initialValues={data}>
-      <Form.Item>
-        <Button
-          onClick={showSrsDetailInfo}
-          type="link"
-          size="small"
-          style={{ padding: 0 }}
-        >
-          {gettext("View details")}
-        </Button>
-      </Form.Item>
+      {url && (
+        <Form.Item>
+          <Button
+            onClick={showSrsDetailInfo}
+            type="link"
+            size="small"
+            style={{ padding: 0 }}
+          >
+            {gettext("View details")}
+          </Button>
+        </Form.Item>
+      )}
       <Form.Item>
         <SaveButton
           onClick={importSrs}

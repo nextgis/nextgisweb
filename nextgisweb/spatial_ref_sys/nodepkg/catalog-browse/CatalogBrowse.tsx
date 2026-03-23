@@ -20,7 +20,7 @@ import type { SRSRead } from "@nextgisweb/spatial-ref-sys/type/api";
 
 import InputOutlineIcon from "@nextgisweb/icon/material/input";
 
-const { coordinatesSearch } = settings.catalog;
+const { coordinatesSearch, source, url: catalogUrl } = settings.catalog;
 
 interface Query {
   q?: string;
@@ -93,15 +93,17 @@ export function CatalogBrowse() {
       render: (text, record) => (
         <>
           {text}{" "}
-          <Tooltip title={gettext("Show in catalog")}>
-            <a
-              href={settings.catalog.url + "/srs/" + record.id}
-              target="_blank"
-              rel="noreferrer"
-            >
-              <OpenInNewIcon />
-            </a>
-          </Tooltip>
+          {source === "remote" && (
+            <Tooltip title={gettext("Show in catalog")}>
+              <a
+                href={catalogUrl + "/srs/" + record.id}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <OpenInNewIcon />
+              </a>
+            </Tooltip>
+          )}
         </>
       ),
     },
