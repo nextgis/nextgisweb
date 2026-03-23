@@ -59,7 +59,7 @@ config.add_route("query_array", "/query/array", get=query_array)
 config.add_route("query_object", "/query/object", get=query_object)
 
 
-# JSON without type specification, orjson parses and renders them. JSONType is
+# JSON without type specification, msgspec parses and renders them. JSONType is
 # an annotated synonym of Any from typing point of view.
 #
 # Docstrings are mapped as follows:

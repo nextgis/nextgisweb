@@ -5,6 +5,7 @@ import warnings
 from hashlib import md5
 
 import pyramid.httpexceptions as httpexceptions
+from msgspec import DecodeError as MsgspecDecodeError
 from pyramid.renderers import render_to_response
 from pyramid.request import RequestLocalCache
 from pyramid.response import Response
@@ -38,7 +39,7 @@ def includeme(config):
     def json_body(req):
         try:
             return json.loadb(req.body)
-        except ValueError as exc:
+        except MsgspecDecodeError as exc:
             raise MalformedJSONBody from exc
 
     config.add_request_method(json_body, "json_body", property=True)
