@@ -19,7 +19,7 @@ export async function parseCsv<T>(
       const reader = new FileReader();
       reader.onload = (e) => {
         const text = e.target?.result;
-        resolve(parseCsv(String(text)));
+        resolve(parseCsv(String(text), options));
       };
       reader.readAsText(file);
     } else {

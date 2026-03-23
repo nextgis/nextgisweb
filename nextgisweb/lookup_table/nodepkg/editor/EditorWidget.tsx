@@ -74,7 +74,9 @@ export const EditorWidget: IEditorWidget<EditorStore> = observer(
 
     const handleFileChange = async (file: File) => {
       if (file) {
-        const json = await parseCsv<[key: string, value: string]>(file);
+        const json = await parseCsv<[key: string, value: string]>(file, {
+          skipEmptyLines: true,
+        });
         const items = updateItems(store.items, dataToRecords(json.data));
         store.load({
           items: recordsToLookup(items),
