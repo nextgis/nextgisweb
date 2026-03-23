@@ -46,7 +46,7 @@ requires = [
     "pillow-heif==1.0.0",
     "poeditor",
     "psutil==7.0.0",
-    "psycopg[binary]",
+    "psycopg[binary]==3.3.3",
     "pyproj==3.7.1",
     "pyramid==2.0.2",
     "pyramid-tm==2.6",
