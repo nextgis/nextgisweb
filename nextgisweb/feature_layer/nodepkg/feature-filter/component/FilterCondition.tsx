@@ -1,15 +1,15 @@
 import { useDndContext } from "@dnd-kit/core";
 import type { DraggableAttributes } from "@dnd-kit/core";
 import type { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
-import dayjs from "dayjs";
 import type { Dayjs } from "dayjs";
 import { observer } from "mobx-react-lite";
+import { useMemo } from "react";
 
-import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
 import {
   Button,
   DatePicker,
   DateTimePicker,
+  Flex,
   InputBigInteger,
   InputInteger,
   InputNumber,
@@ -34,12 +34,38 @@ import type {
   FilterCondition as FilterConditionType,
   InOp,
   IsNullOp,
-  OperatorValueMap,
+  ResolvedFieldRef,
 } from "../type";
+import {
+  coerceTagValues,
+  getMigratedConditionValue,
+} from "../util/condition-value";
+import {
+  fieldRefToSelectValue,
+  listFieldRefs,
+  resolveFieldRef,
+  selectValueToFieldRef,
+} from "../util/field-ref";
 
 import DragHandleIcon from "@nextgisweb/icon/material/drag_indicator";
+import TagIcon from "@nextgisweb/icon/material/tag";
+import ViewColumnIcon from "@nextgisweb/icon/material/view_column";
 
 const msgDeleteCondition = gettext("Delete condition");
+const msgNoValue = gettext("No value");
+const msgAnyValue = gettext("Any value");
+const msgInvalidField = gettext("Invalid field");
+const msgFieldNotFound = gettext("Field not found");
+const msgEnterValues = gettext("Enter values and press Enter");
+const msgSelectField = gettext("Select field");
+const msgOperator = gettext("Operator");
+const msgEnterInteger = gettext("Enter integer");
+const msgEnterBigInteger = gettext("Enter big integer");
+const msgEnterNumber = gettext("Enter number");
+const msgSelectDate = gettext("Select date");
+const msgSelectTime = gettext("Select time");
+const msgSelectDateTime = gettext("Select date and time");
+const msgEnterValue = gettext("Enter value");
 
 interface FilterConditionProps {
   condition: FilterConditionType;
@@ -49,6 +75,25 @@ interface FilterConditionProps {
     listeners?: SyntheticListenerMap;
   };
 }
+
+type ValueInput = string | number | null | Dayjs | Array<string | number>;
+type FieldOption = {
+  label: string;
+  value: string;
+  isVirtual: boolean;
+};
+
+const isNullOperator = (operator: FilterConditionType["operator"]) =>
+  operator === "is_null" || operator === "!is_null";
+
+const isListOperator = (operator: FilterConditionType["operator"]) =>
+  operator === "in" || operator === "!in";
+
+const getOperatorsForField = (field?: ResolvedFieldRef) => {
+  if (!field) return OPERATORS;
+
+  return OPERATORS.filter((op) => op.supportedTypes.includes(field.datatype));
+};
 
 const getPlaceholder = (
   condition: FilterConditionType,
@@ -63,54 +108,9 @@ const getPlaceholder = (
   return defaultPlaceholder;
 };
 
-export const getDefaultValue = <O extends keyof OperatorValueMap>(
-  fields: FeatureLayerFieldRead[],
-  field: string,
-  operator: O
-): OperatorValueMap[O] => {
-  const fieldInfo = fields.find((f) => f.keyname === field);
-  const wantsNoValue = ["is_null", "!is_null"].includes(operator);
-  const wantsArray = ["in", "!in"].includes(operator);
-
-  let defaultValue = undefined;
-
-  if (wantsArray) {
-    defaultValue = [];
-  } else if (!wantsNoValue && fieldInfo) {
-    if (wantsArray) {
-      defaultValue = [];
-    } else {
-      switch (fieldInfo.datatype) {
-        case "INTEGER":
-        case "REAL":
-          defaultValue = 0;
-          break;
-        case "BIGINT":
-          defaultValue = "0";
-          break;
-        case "STRING":
-          defaultValue = "";
-          break;
-        case "DATE":
-          defaultValue = dayjs().format("YYYY-MM-DD");
-          break;
-        case "TIME":
-          defaultValue = dayjs().format("HH:mm:ss");
-          break;
-        case "DATETIME":
-          defaultValue = dayjs().format("YYYY-MM-DDTHH:mm:ss");
-          break;
-        default:
-          defaultValue = undefined;
-      }
-    }
-  }
-  return defaultValue as OperatorValueMap[O];
-};
-
 const calculateValue = (
   condition: FilterConditionType,
-  field: FeatureLayerFieldRead
+  field: ResolvedFieldRef
 ): NgwAttributeType => {
   const isValueNullable =
     condition.value === undefined || condition.value === null;
@@ -126,107 +126,163 @@ export const FilterCondition = observer(
   ({ condition, store, dragHandleProps }: FilterConditionProps) => {
     const { active, over } = useDndContext();
     const isDropTarget = over?.id === condition.id && over?.id !== active?.id;
+    const availableFields = useMemo(
+      () => listFieldRefs(store.fields),
+      [store.fields]
+    );
+    const currentField = useMemo(
+      () => resolveFieldRef(store.fields, condition.field),
+      [condition.field, store.fields]
+    );
+    const availableOperators = useMemo(
+      () => getOperatorsForField(currentField),
+      [currentField]
+    );
+    const fieldOptions = useMemo(
+      () =>
+        availableFields.map((field) => ({
+          label: field.label,
+          value: fieldRefToSelectValue(field.ref),
+          isVirtual: field.isVirtual,
+        })),
+      [availableFields]
+    );
+    const operatorOptions = useMemo(
+      () =>
+        availableOperators.map((operator) => ({
+          label: operator.label,
+          value: operator.value,
+        })),
+      [availableOperators]
+    );
 
-    const handleFieldChange = (field: string) => {
-      const defaultValue = getDefaultValue(
-        store.fields,
-        field,
-        condition.operator
+    const handleFieldChange = (nextFieldValue: string) => {
+      const field = selectValueToFieldRef(nextFieldValue);
+      if (!field) {
+        return;
+      }
+
+      const nextField = resolveFieldRef(store.fields, field);
+      const nextOperatorOptions = getOperatorsForField(nextField).map(
+        (operator) => operator.value
       );
-      store.updateCondition(condition.id, { field, value: defaultValue });
+      const nextOperator = nextOperatorOptions.includes(condition.operator)
+        ? condition.operator
+        : (nextOperatorOptions[0] ?? condition.operator);
+
+      const nextValue = getMigratedConditionValue({
+        fields: store.fields,
+        currentField: condition.field,
+        currentOperator: condition.operator,
+        currentValue: condition.value,
+        nextField: field,
+        nextOperator,
+      });
+      store.updateCondition(condition.id, {
+        field,
+        operator: nextOperator,
+        value: nextValue,
+      });
     };
 
     const handleOperatorChange = (
       operator: EqNeOp | CmpOp | InOp | IsNullOp
     ) => {
-      const defaultValue = getDefaultValue(
-        store.fields,
-        condition.field,
-        operator
-      );
+      const value = getMigratedConditionValue({
+        fields: store.fields,
+        currentField: condition.field,
+        currentOperator: condition.operator,
+        currentValue: condition.value,
+        nextField: condition.field,
+        nextOperator: operator,
+      });
       store.updateCondition(condition.id, {
         operator,
-        value: defaultValue,
+        value,
       });
     };
 
-    const handleValueChange = (value: any) => {
-      const field = store.fields.find((f) => f.keyname === condition.field);
-      if (!field) {
+    const handleValueChange = (value: ValueInput) => {
+      if (!currentField) {
         return;
       }
-      const serializedValue = marshalFieldValue(field.datatype, value);
+
+      const serializedValue = marshalFieldValue(currentField.datatype, value);
       store.updateCondition(condition.id, { value: serializedValue });
+    };
+
+    const handleDateLikeChange = (value: Dayjs | Dayjs[] | null) => {
+      handleValueChange(Array.isArray(value) ? null : value);
     };
 
     const handleDelete = () => {
       store.deleteCondition(condition.id);
     };
 
-    const getOperatorsForField = (fieldKey: string) => {
-      const field = store.fields.find((f) => f.keyname === fieldKey);
-      if (!field) return OPERATORS;
+    const isValueInputDisabled = isNullOperator(condition.operator);
 
-      return OPERATORS.filter((op) =>
-        op.supportedTypes.includes(field.datatype)
-      );
-    };
-
-    const isValueInputDisabled = ["is_null", "!is_null"].includes(
-      condition.operator
+    const renderReadonlyValue = () => (
+      <InputValue
+        value={condition.operator === "is_null" ? msgNoValue : msgAnyValue}
+        readOnly={true}
+      />
     );
 
-    const renderValueInput = () => {
-      const field = store.fields.find((f) => f.keyname === condition.field);
-      if (!field) {
+    const renderListValueInput = () => {
+      if (!currentField) {
         return (
           <InputValue
-            value={gettext("Invalid field")}
-            placeholder={gettext("Field not found")}
+            value={msgInvalidField}
+            placeholder={msgFieldNotFound}
             disabled={true}
             status="error"
           />
         );
       }
 
-      const conditionValue = calculateValue(condition, field);
+      const handleTagChange = (values: string[]) => {
+        handleValueChange(coerceTagValues(currentField.datatype, values));
+      };
 
-      const displayValue = unmarshalFieldValue(
-        field.datatype,
-        conditionValue as NgwAttributeType
+      const value = ((condition.value as Array<string | number>) || []).map(
+        String
       );
 
-      if (["in", "!in"].includes(condition.operator)) {
-        const numericTypes = ["INTEGER", "BIGINT", "REAL"];
-        const isNumeric = field && numericTypes.includes(field.datatype);
+      return (
+        <Select
+          mode="tags"
+          value={value}
+          onChange={handleTagChange}
+          style={{ width: "100%" }}
+          placeholder={msgEnterValues}
+          tokenSeparators={[","]}
+        />
+      );
+    };
 
-        const handleTagChange = (values: string[]) => {
-          let processedValues: (string | number)[] = values;
-          if (isNumeric) {
-            processedValues = values
-              .map((val) => parseFloat(val))
-              .filter((num) => !isNaN(num));
-          }
-          handleValueChange(processedValues);
-        };
-
-        const value = ((condition.value as Array<string | number>) || []).map(
-          String
-        );
-
+    const renderScalarValueInput = () => {
+      if (!currentField) {
         return (
-          <Select
-            mode="tags"
-            value={value}
-            onChange={handleTagChange}
-            style={{ width: "100%" }}
-            placeholder={gettext("Enter values and press Enter")}
-            tokenSeparators={[","]}
+          <InputValue
+            value={msgInvalidField}
+            placeholder={msgFieldNotFound}
+            disabled={true}
+            status="error"
           />
         );
       }
 
-      switch (field.datatype) {
+      if (isValueInputDisabled) {
+        return renderReadonlyValue();
+      }
+
+      const conditionValue = calculateValue(condition, currentField);
+      const displayValue = unmarshalFieldValue(
+        currentField.datatype,
+        conditionValue as NgwAttributeType
+      );
+
+      switch (currentField.datatype) {
         case "INTEGER":
           return (
             <InputInteger
@@ -234,7 +290,7 @@ export const FilterCondition = observer(
               onChange={handleValueChange}
               placeholder={getPlaceholder(
                 condition,
-                gettext("Enter integer"),
+                msgEnterInteger,
                 isValueInputDisabled
               )}
               disabled={isValueInputDisabled}
@@ -247,7 +303,7 @@ export const FilterCondition = observer(
               onChange={handleValueChange}
               placeholder={getPlaceholder(
                 condition,
-                gettext("Enter big integer"),
+                msgEnterBigInteger,
                 isValueInputDisabled
               )}
               disabled={isValueInputDisabled}
@@ -261,7 +317,7 @@ export const FilterCondition = observer(
               step={0.01}
               placeholder={getPlaceholder(
                 condition,
-                gettext("Enter number"),
+                msgEnterNumber,
                 isValueInputDisabled
               )}
               disabled={isValueInputDisabled}
@@ -271,10 +327,10 @@ export const FilterCondition = observer(
           return (
             <DatePicker
               value={displayValue as Dayjs}
-              onChange={handleValueChange}
+              onChange={handleDateLikeChange}
               placeholder={getPlaceholder(
                 condition,
-                gettext("Select date"),
+                msgSelectDate,
                 isValueInputDisabled
               )}
               disabled={isValueInputDisabled}
@@ -284,10 +340,10 @@ export const FilterCondition = observer(
           return (
             <TimePicker
               value={displayValue as Dayjs}
-              onChange={handleValueChange}
+              onChange={handleDateLikeChange}
               placeholder={getPlaceholder(
                 condition,
-                gettext("Select time"),
+                msgSelectTime,
                 isValueInputDisabled
               )}
               disabled={isValueInputDisabled}
@@ -297,10 +353,10 @@ export const FilterCondition = observer(
           return (
             <DateTimePicker
               value={displayValue as Dayjs}
-              onChange={handleValueChange}
+              onChange={handleDateLikeChange}
               placeholder={getPlaceholder(
                 condition,
-                gettext("Select date and time"),
+                msgSelectDateTime,
                 isValueInputDisabled
               )}
               disabled={isValueInputDisabled}
@@ -313,7 +369,7 @@ export const FilterCondition = observer(
               onChange={handleValueChange}
               placeholder={getPlaceholder(
                 condition,
-                gettext("Enter value"),
+                msgEnterValue,
                 isValueInputDisabled
               )}
               disabled={isValueInputDisabled}
@@ -321,6 +377,18 @@ export const FilterCondition = observer(
           );
       }
     };
+
+    const renderValueInput = () =>
+      isListOperator(condition.operator)
+        ? renderListValueInput()
+        : renderScalarValueInput();
+
+    const renderFieldOption = ({ label, isVirtual }: FieldOption) => (
+      <Flex gap="small" align="center">
+        {isVirtual ? <TagIcon /> : <ViewColumnIcon />}
+        {label}
+      </Flex>
+    );
 
     const dropTargetClassName = isDropTarget ? "drop-target" : "";
 
@@ -335,30 +403,23 @@ export const FilterCondition = observer(
           />
 
           <Select
-            value={condition.field}
+            value={fieldRefToSelectValue(condition.field)}
             onChange={handleFieldChange}
             style={{ width: 150 }}
-            placeholder={gettext("Select field")}
-          >
-            {store.fields.map((field) => (
-              <Select.Option key={field.keyname} value={field.keyname}>
-                {field.display_name}
-              </Select.Option>
-            ))}
-          </Select>
+            placeholder={msgSelectField}
+            options={fieldOptions}
+            optionRender={(option) =>
+              renderFieldOption(option.data as FieldOption)
+            }
+          />
 
           <Select
             value={condition.operator}
             onChange={handleOperatorChange}
             style={{ width: 120 }}
-            placeholder={gettext("Operator")}
-          >
-            {getOperatorsForField(condition.field).map((op) => (
-              <Select.Option key={op.value} value={op.value}>
-                {op.label}
-              </Select.Option>
-            ))}
-          </Select>
+            placeholder={msgOperator}
+            options={operatorOptions}
+          />
 
           {renderValueInput()}
 

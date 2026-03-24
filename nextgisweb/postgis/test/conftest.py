@@ -16,6 +16,7 @@ FILTER_DATASET = {
                 "birth_date": "1998-05-15",
                 "created_at": "2023-01-10T08:30:00",
                 "work_start": "09:00:00",
+                "__fid__": 101,
             },
             "geometry": {"type": "Point", "coordinates": [0, 0]},
         },
@@ -29,6 +30,7 @@ FILTER_DATASET = {
                 "birth_date": "1993-08-22",
                 "created_at": "2023-02-15T14:45:30",
                 "work_start": "10:30:00",
+                "__fid__": 102,
             },
             "geometry": {"type": "Point", "coordinates": [1, 1]},
         },
@@ -42,6 +44,7 @@ FILTER_DATASET = {
                 "birth_date": "1988-12-01",
                 "created_at": "2023-03-20T16:20:15",
                 "work_start": "08:00:00",
+                "__fid__": 103,
             },
             "geometry": {"type": "Point", "coordinates": [2, 2]},
         },
@@ -55,6 +58,7 @@ FILTER_DATASET = {
                 "birth_date": "1995-03-10",
                 "created_at": "2023-01-25T11:15:00",
                 "work_start": "09:30:00",
+                "__fid__": 104,
             },
             "geometry": {"type": "Point", "coordinates": [3, 3]},
         },
@@ -68,6 +72,7 @@ FILTER_DATASET = {
                 "birth_date": "1991-07-18",
                 "created_at": "2023-04-05T10:00:00",
                 "work_start": "08:30:00",
+                "__fid__": 105,
             },
             "geometry": {"type": "Point", "coordinates": [4, 4]},
         },
@@ -110,6 +115,7 @@ def postgis_filter_layer_id(ngw_env, postgis_filter_geojson, ngw_resource_group)
         ("birth_date", ogr.OFTDate),
         ("created_at", ogr.OFTDateTime),
         ("work_start", ogr.OFTTime),
+        ("__fid__", ogr.OFTInteger),
     )
     for fname, ftype in field_defs:
         fld = ogr.FieldDefn(fname, ftype)
@@ -128,6 +134,7 @@ def postgis_filter_layer_id(ngw_env, postgis_filter_geojson, ngw_resource_group)
         ogr_feat.SetField("birth_date", props["birth_date"])
         ogr_feat.SetField("created_at", props["created_at"])
         ogr_feat.SetField("work_start", props["work_start"])
+        ogr_feat.SetField("__fid__", props["__fid__"])
         layer.CreateFeature(ogr_feat)
 
     with create_feature_layer(layer, parent_id=ngw_resource_group) as res:

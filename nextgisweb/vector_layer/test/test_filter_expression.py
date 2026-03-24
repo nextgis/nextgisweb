@@ -39,6 +39,22 @@ def test_filter_all_single_condition(test_layer_id):
     assert ids == [1]
 
 
+def test_filter_by_fid(test_layer_id):
+    layer = load_layer(test_layer_id)
+    filter = ["all", ["==", ["fid"], 1]]
+
+    ids = fetch_filtered_ids(layer, filter)
+    assert ids == [1]
+
+
+def test_filter_by_user_fid_field(test_layer_id):
+    layer = load_layer(test_layer_id)
+    filter = ["all", ["==", ["get", "__fid__"], 102]]
+
+    ids = fetch_filtered_ids(layer, filter)
+    assert ids == [2]
+
+
 def test_filter_all_multiple_conditions(test_layer_id):
     layer = load_layer(test_layer_id)
     filter = ["all", ["==", ["get", "city"], "NYC"], [">", ["get", "age"], 26]]

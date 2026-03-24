@@ -38,27 +38,16 @@ class FieldInfo:
     datatype: str
 
 
-@dataclass(frozen=True)
-class FieldRef:
-    field: FieldInfo
-
-
-@dataclass(frozen=True)
-class ValueOperand:
-    value: Any
-
-
-Operand = FieldRef | ValueOperand
-
-
 class FilterProgram:
     def __init__(self, root: FilterNode | None):
         self._root = root
 
     def to_clause(
-        self, columns: Mapping[str, sa.sql.ColumnElement[Any]]
+        self,
+        columns: Mapping[str, sa.sql.ColumnElement[Any]],
+        virtual_operands: Mapping[str, sa.sql.ColumnElement[Any]] | None = None,
     ) -> sa.sql.ColumnElement[Any] | None:
-        return SQLAlchemyCompiler(columns).compile(self._root)
+        return SQLAlchemyCompiler(columns, virtual_operands or {}).compile(self._root)
 
 
 class FilterNode:
@@ -71,20 +60,63 @@ class FilterNode:
 
     @classmethod
     def from_json(
-        cls, operator: str, operands: Sequence[Any], parser: FilterParser
-    ) -> FilterNode | None:
+        cls, operator: str, operands: Sequence[Any], parser: "FilterParser"
+    ) -> FilterNode:
         raise NotImplementedError  # pragma: no cover
+
+    @property
+    def datatype(self) -> str | None:
+        return None
+
+
+class LiteralNode(FilterNode):
+    def __init__(self, value: Any):
+        self.value = value
+
+
+class FieldNode(FilterNode, operators=("get",)):
+    def __init__(self, field: FieldInfo):
+        self.field = field
+
+    @classmethod
+    def from_json(cls, operator: str, operands: Sequence[Any], parser: FilterParser) -> FieldNode:
+        if len(operands) != 1 or not isinstance(operands[0], str):
+            raise FilterExpressionError()
+        field_name = operands[0]
+        try:
+            field = parser._fields[field_name]
+        except KeyError as exc:
+            raise FilterExpressionError(
+                data={"reason": f"Field '{field_name}' not found"}
+            ) from exc
+        return cls(field)
+
+    @property
+    def datatype(self) -> str | None:
+        return self.field.datatype
+
+
+class FidNode(FilterNode, operators=("fid",)):
+    @classmethod
+    def from_json(cls, operator: str, operands: Sequence[Any], parser: FilterParser) -> FidNode:
+        if len(operands) != 0:
+            raise FilterExpressionError(data={"reason": f"Operator {operator} takes no operands"})
+        return cls()
+
+    @property
+    def datatype(self) -> str | None:
+        return FIELD_TYPE.INTEGER
 
 
 class LogicalNode(FilterNode):
-    def __init__(self, children: Sequence[FilterNode | None]):
-        self.children = tuple(child for child in children if child is not None)
+    def __init__(self, children: Sequence[FilterNode]):
+        self.children = tuple(children)
 
     @classmethod
     def from_json(
         cls, operator: str, operands: Sequence[Any], parser: FilterParser
     ) -> LogicalNode:
-        return cls([parser._parse_node(arg) for arg in operands])
+        return cls([parser.parse_operand(arg) for arg in operands])
 
 
 class AndNode(LogicalNode, operators=("all",)):
@@ -103,8 +135,8 @@ class ConditionNode(FilterNode):
 class UnaryConditionNode(ConditionNode):
     num_operands = 1
 
-    def __init__(self, field: FieldRef):
-        self.field = field
+    def __init__(self, operand: FilterNode):
+        self.operand = operand
 
     @classmethod
     def from_json(
@@ -115,14 +147,14 @@ class UnaryConditionNode(ConditionNode):
                 data={"reason": f"Invalid number of operands for condition {operator}"}
             )
 
-        field = _parse_field_ref(operands[0], parser)
-        return cls(field)
+        operand = parser.parse_operand(operands[0])
+        return cls(operand)
 
 
 class BinaryConditionNode(ConditionNode):
     num_operands = 2
 
-    def __init__(self, left: Operand, right: Operand):
+    def __init__(self, left: FilterNode, right: FilterNode):
         self.left = left
         self.right = right
 
@@ -153,18 +185,17 @@ class BinaryConditionNode(ConditionNode):
                 data={"reason": f"Invalid number of operands for condition {operator}"}
             )
 
-        left = _parse_operand(operands[0], parser)
-        right = _parse_operand(operands[1], parser)
+        left = parser.parse_operand(operands[0])
 
-        if isinstance(left, ValueOperand) and isinstance(right, ValueOperand):
-            raise FilterExpressionError(
-                data={"reason": f"Condition {operator} requires a field operand"}
-            )
+        if cls.is_list:
+            right = LiteralNode(operands[1])
+        else:
+            right = parser.parse_operand(operands[1])
 
-        if isinstance(left, FieldRef) and isinstance(right, ValueOperand):
-            right = ValueOperand(_convert_value(left.field, right.value, is_list=cls.is_list))
-        elif isinstance(left, ValueOperand) and isinstance(right, FieldRef):
-            left = ValueOperand(_convert_value(right.field, left.value, is_list=cls.is_list))
+        if isinstance(left, LiteralNode) and right.datatype is not None:
+            left.value = _convert_value(right.datatype, left.value, is_list=False)
+        elif isinstance(right, LiteralNode) and left.datatype is not None:
+            right.value = _convert_value(left.datatype, right.value, is_list=cls.is_list)
 
         return cls(left, right)
 
@@ -210,8 +241,13 @@ class NotIsNullNode(UnaryConditionNode, operators=("!is_null",)):
 
 
 class SQLAlchemyCompiler:
-    def __init__(self, columns: Mapping[str, sa.sql.ColumnElement[Any]]):
+    def __init__(
+        self,
+        columns: Mapping[str, sa.sql.ColumnElement[Any]],
+        virtual_operands: Mapping[str, sa.sql.ColumnElement[Any]],
+    ):
         self.columns = columns
+        self.virtual_operands = virtual_operands
 
     def compile(self, node: FilterNode | None) -> sa.sql.ColumnElement[Any] | None:
         match node:
@@ -250,14 +286,29 @@ class SQLAlchemyCompiler:
             case NotInNode(left=left, right=right):
                 return self._compile_in(left, right, negate=True)
 
-            case IsNullNode(field=field):
-                return self._get_column(field.field).is_(None)
+            case IsNullNode(operand=operand):
+                return self._compile_operand(operand).is_(None)
 
-            case NotIsNullNode(field=field):
-                return self._get_column(field.field).is_not(None)
+            case NotIsNullNode(operand=operand):
+                return self._compile_operand(operand).is_not(None)
+
+            case FieldNode(field=field):
+                return self._get_column(field)
+
+            case FidNode():
+                return self._get_virtual_operand("fid")
+
+            case LiteralNode(value=value):
+                return sa.literal(value)
 
             case _:
                 raise NotImplementedError(f"Unknown node type: {type(node)}")
+
+    def _compile_operand(self, node: FilterNode) -> sa.sql.ColumnElement[Any]:
+        expr = self.compile(node)
+        if expr is None:
+            raise FilterExpressionError(data={"reason": "Operand evaluated to empty expression"})
+        return expr
 
     def _get_column(self, field: FieldInfo) -> sa.sql.ColumnElement[Any]:
         try:
@@ -265,34 +316,37 @@ class SQLAlchemyCompiler:
         except KeyError as exc:
             raise FilterExpressionError() from exc
 
-    def _compile_operand(self, operand: Operand) -> sa.sql.ColumnElement[Any]:
-        if isinstance(operand, FieldRef):
-            return self._get_column(operand.field)
-        return sa.literal(operand.value)
+    def _get_virtual_operand(self, key: str) -> sa.sql.ColumnElement[Any]:
+        try:
+            return self.virtual_operands[key]
+        except KeyError as exc:
+            raise FilterExpressionError() from exc
 
     def _compile_equality(
-        self, left: Operand, right: Operand, *, negate: bool
+        self, left: FilterNode, right: FilterNode, *, negate: bool
     ) -> sa.sql.ColumnElement[Any]:
-        if isinstance(left, FieldRef) and isinstance(right, ValueOperand) and right.value is None:
-            col = self._get_column(left.field)
+        if isinstance(right, LiteralNode) and right.value is None:
+            col = self._compile_operand(left)
             return col.is_not(None) if negate else col.is_(None)
-        if isinstance(right, FieldRef) and isinstance(left, ValueOperand) and left.value is None:
-            col = self._get_column(right.field)
+        if isinstance(left, LiteralNode) and left.value is None:
+            col = self._compile_operand(right)
             return col.is_not(None) if negate else col.is_(None)
+
         left_expr = self._compile_operand(left)
         right_expr = self._compile_operand(right)
         return left_expr != right_expr if negate else left_expr == right_expr
 
     def _compile_in(
-        self, left: Operand, right: Operand, *, negate: bool
+        self, left: FilterNode, right: FilterNode, *, negate: bool
     ) -> sa.sql.ColumnElement[Any]:
         left_expr = self._compile_operand(left)
-        if isinstance(right, ValueOperand):
-            value = right.value
-            expr = left_expr.in_(value)
-            return sa.not_(expr) if negate else expr
-        right_expr = self._compile_operand(right)
-        expr = left_expr.in_(right_expr)
+
+        if not isinstance(right, LiteralNode) or not isinstance(right.value, (list, tuple, set)):
+            raise FilterExpressionError(
+                data={"reason": "Right operand of 'in' operator must be a literal list"}
+            )
+
+        expr = left_expr.in_(right.value)
         return sa.not_(expr) if negate else expr
 
 
@@ -355,12 +409,12 @@ _SCALAR_CONVERTERS: dict[str, Callable[[Any], Any]] = {
 }
 
 
-def _convert_scalar(field: FieldInfo, value: Any) -> Any:
+def _convert_scalar(datatype: str, value: Any) -> Any:
     if value is None:
         return None
 
     try:
-        converter = _SCALAR_CONVERTERS[field.datatype]
+        converter = _SCALAR_CONVERTERS[datatype]
         return converter(value)
     except KeyError:
         raise FilterExpressionError()
@@ -368,37 +422,12 @@ def _convert_scalar(field: FieldInfo, value: Any) -> Any:
         raise FilterExpressionError() from exc
 
 
-def _convert_value(field: FieldInfo, value: Any, *, is_list: bool = False) -> Any:
+def _convert_value(datatype: str, value: Any, *, is_list: bool = False) -> Any:
     if is_list:
         values = _ensure_list(value)
-        return [_convert_scalar(field, item) for item in values]
+        return [_convert_scalar(datatype, item) for item in values]
 
-    return _convert_scalar(field, value)
-
-
-def _parse_get_operand(operand: Any) -> str:
-    if not isinstance(operand, list) or len(operand) != 2 or operand[0] != "get":
-        raise FilterExpressionError()
-
-    field_name = operand[1]
-    if not isinstance(field_name, str):
-        raise FilterExpressionError()
-    return field_name
-
-
-def _parse_field_ref(operand: Any, parser: FilterParser) -> FieldRef:
-    field_name = _parse_get_operand(operand)
-    try:
-        field = parser._fields[field_name]
-    except KeyError as exc:
-        raise FilterExpressionError(data={"reason": f"Field '{field_name}' not found"}) from exc
-    return FieldRef(field)
-
-
-def _parse_operand(operand: Any, parser: FilterParser) -> Operand:
-    if isinstance(operand, list) and operand and operand[0] == "get":
-        return _parse_field_ref(operand, parser)
-    return ValueOperand(operand)
+    return _convert_scalar(datatype, value)
 
 
 class FilterParser:
@@ -408,7 +437,6 @@ class FilterParser:
     @classmethod
     def from_resource(cls, resource) -> FilterParser:
         fields = [FieldInfo(key=f.keyname, datatype=f.datatype) for f in resource.fields]
-        fields.append(FieldInfo(key="id", datatype=FIELD_TYPE.INTEGER))
         return cls(fields)
 
     def parse(self, expression: Any) -> FilterProgram:
@@ -424,21 +452,25 @@ class FilterParser:
         if expression == []:
             return FilterProgram(None)
 
-        node = self._parse_node(expression)
+        if not isinstance(expression, list):
+            raise FilterExpressionError(data={"reason": "Filter root expression must be a list"})
+
+        node = self.parse_operand(expression)
         return FilterProgram(node)
 
-    def _parse_node(self, expression: Any) -> FilterNode | None:
-        if not isinstance(expression, list) or len(expression) == 0:
-            raise FilterExpressionError(data={"reason": "Expression must be a non-empty list"})
+    def parse_operand(self, expression: Any) -> FilterNode:
+        if isinstance(expression, list):
+            if not expression:
+                raise FilterExpressionError(data={"reason": "Expression must be a non-empty list"})
+            operator = expression[0]
+            if isinstance(operator, str) and operator in FilterNode.registry:
+                return self._parse_node(expression)
+            raise FilterExpressionError()
+        return LiteralNode(expression)
 
+    def _parse_node(self, expression: list[Any]) -> FilterNode:
         operator = expression[0]
-        if not isinstance(operator, str):
-            raise FilterExpressionError()
-
-        node_cls = FilterNode.registry.get(operator)
-        if node_cls is None:
-            raise FilterExpressionError()
-
+        node_cls = FilterNode.registry[operator]
         return node_cls.from_json(operator, expression[1:], self)
 
     @classmethod

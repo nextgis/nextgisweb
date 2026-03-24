@@ -753,7 +753,8 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                 where.append(sa.and_(*_where_filter))
 
         if self._filter_program is not None:
-            clause = self._filter_program.to_clause(columns_mapping)
+            virtual_operands_mapping = {"fid": idcol}
+            clause = self._filter_program.to_clause(columns_mapping, virtual_operands_mapping)
             if clause is not None:
                 where.append(clause)
 

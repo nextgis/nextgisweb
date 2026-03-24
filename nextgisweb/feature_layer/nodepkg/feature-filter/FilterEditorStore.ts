@@ -3,11 +3,9 @@ import { action, observable } from "mobx";
 import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import { getDefaultValue } from "./component/FilterCondition";
 import type {
   ActiveTab,
   ConditionExpr,
-  ConditionValue,
   FilterCondition,
   FilterExpression,
   FilterExpressionString,
@@ -17,6 +15,8 @@ import type {
   GroupExpr,
   LogicalOp,
 } from "./type";
+import { getDefaultValue } from "./util/condition-value";
+import { fieldRefToExpression, getDefaultFieldRef } from "./util/field-ref";
 import { parseFilterExpression } from "./util/parser";
 import { validateFilterExpression } from "./util/validator";
 
@@ -147,17 +147,18 @@ export class FilterEditorStore {
 
   @action.bound
   addCondition(groupId: number) {
-    const [firstField] = this.fields;
-    const operator = "==";
-    let value: ConditionValue = null;
-    if (firstField) {
-      value = getDefaultValue(this.fields, firstField.keyname, operator);
+    const firstField = getDefaultFieldRef(this.fields);
+    if (!firstField) {
+      return;
     }
+
+    const operator = "==";
+    const value = getDefaultValue(this.fields, firstField, operator);
 
     const newCondition: FilterCondition = {
       id: this.generateTransientId(),
       type: "condition",
-      field: firstField?.keyname || "",
+      field: firstField,
       operator,
       value,
     };
@@ -548,25 +549,24 @@ export class FilterEditorStore {
 
     const appendCondition = (condition: FilterCondition) => {
       const { operator, field, value } = condition;
-      if (field) {
-        if (operator === "is_null" || operator === "!is_null") {
-          expressions.push([operator, ["get", field]]);
-        } else if (value !== undefined && value !== null) {
-          if (operator === "in" || operator === "!in") {
-            if (Array.isArray(value)) {
-              expressions.push([
-                operator,
-                ["get", field],
-                ...(value as (string | number)[]),
-              ]);
-            }
-          } else if (operator === "==" || operator === "!=") {
-            if (!Array.isArray(value)) {
-              expressions.push([operator, ["get", field], value]);
-            }
-          } else if (typeof value === "string" || typeof value === "number") {
-            expressions.push([operator, ["get", field], value]);
+      const fieldExpression = fieldRefToExpression(field);
+      if (operator === "is_null" || operator === "!is_null") {
+        expressions.push([operator, fieldExpression]);
+      } else if (value !== undefined && value !== null) {
+        if (operator === "in" || operator === "!in") {
+          if (Array.isArray(value)) {
+            expressions.push([
+              operator,
+              fieldExpression,
+              ...(value as (string | number)[]),
+            ]);
           }
+        } else if (operator === "==" || operator === "!=") {
+          if (!Array.isArray(value)) {
+            expressions.push([operator, fieldExpression, value]);
+          }
+        } else if (typeof value === "string" || typeof value === "number") {
+          expressions.push([operator, fieldExpression, value]);
         }
       }
     };

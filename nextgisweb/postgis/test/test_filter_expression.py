@@ -163,6 +163,21 @@ def test_filter_mixed_date_and_string(layer):
     assert ids == [1, 5]
 
 
+def test_filter_by_fid_equal(layer):
+    ids = fetch_filtered_ids(layer, ["all", ["==", ["fid"], 1]])
+    assert ids == [1]
+
+
+def test_filter_by_fid_greater(layer):
+    ids = fetch_filtered_ids(layer, ["all", [">", ["fid"], 3]])
+    assert ids == [4, 5]
+
+
+def test_filter_by_user_fid_field(layer):
+    ids = fetch_filtered_ids(layer, ["all", ["==", ["get", "__fid__"], 102]])
+    assert ids == [2]
+
+
 def test_filter_invalid_format(layer):
     with pytest.raises(FilterExpressionError):
         fetch_filtered_ids(layer, ["unsupported", ["get", "name"], "Alice"])

@@ -6,6 +6,8 @@ import { gettext, gettextf } from "@nextgisweb/pyramid/i18n";
 import { OPERATORS, ValidOperators } from "../type";
 import type { ConditionExpr, FilterExpression, Operator } from "../type";
 
+import { expressionToFieldRef, resolveFieldRef } from "./field-ref";
+
 type TemporalDatatype = Extract<
   FeatureLayerFieldRead["datatype"],
   "DATE" | "TIME" | "DATETIME"
@@ -36,6 +38,35 @@ export function isConditionExpression(
   }
   const operator = expression[0] as Operator;
   return ValidOperators.includes(operator);
+}
+
+function resolveFieldInfo(
+  fieldExpression: unknown,
+  fields: FeatureLayerFieldRead[]
+) {
+  const fieldRef = expressionToFieldRef(fieldExpression);
+  if (!fieldRef) {
+    throw new Error(
+      gettext("Field expression must be ['get', fieldName] or ['fid']")
+    );
+  }
+
+  const field = resolveFieldRef(fields, fieldRef);
+  if (!field) {
+    if (fieldRef.kind === "field") {
+      throw new Error(
+        gettextf("Unknown field: '{fieldName}'")({
+          fieldName: fieldRef.keyname,
+        })
+      );
+    }
+
+    throw new Error(
+      gettextf("Unknown virtual field: '{fieldId}'")({ fieldId: fieldRef.id })
+    );
+  }
+
+  return field;
 }
 
 function validateDateTimeValue(
@@ -119,19 +150,9 @@ export function validateConditionExpression(
     }
   }
 
-  if (!Array.isArray(fieldExpression) || fieldExpression[0] !== "get") {
-    throw new Error(gettext("Field expression must be ['get', fieldName]"));
-  }
-
-  if (typeof fieldExpression[1] !== "string") {
-    throw new Error(gettext("Field name must be a string"));
-  }
-
-  const fieldName = fieldExpression[1];
-  const field = fields.find((f) => f.keyname === fieldName);
-  if (!field) {
-    throw new Error(gettextf("Unknown field: '{fieldName}'")({ fieldName }));
-  }
+  const field = resolveFieldInfo(fieldExpression, fields);
+  const fieldName =
+    field.ref.kind === "field" ? field.ref.keyname : field.label;
 
   const operatorOption = OPERATORS.find((op) => op.value === operator);
   if (

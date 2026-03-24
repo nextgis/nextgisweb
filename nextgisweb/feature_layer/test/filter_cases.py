@@ -15,11 +15,14 @@ FILTER_FIELDS = [
     FieldInfo(key="birth_date", datatype=FIELD_TYPE.DATE),
     FieldInfo(key="work_start", datatype=FIELD_TYPE.TIME),
     FieldInfo(key="created_at", datatype=FIELD_TYPE.DATETIME),
+    FieldInfo(key="__fid__", datatype=FIELD_TYPE.INTEGER),
     FieldInfo(key="field_1", datatype=FIELD_TYPE.INTEGER),
     FieldInfo(key="field_2", datatype=FIELD_TYPE.INTEGER),
 ]
 
 FILTER_SQL_COLUMNS = {
+    "__fid__": sa.column("__fid__", sa.Integer()),
+    "id": sa.column("id", sa.Integer()),
     "name": sa.column("name", sa.String()),
     "age": sa.column("age", sa.Integer()),
     "city": sa.column("city", sa.String()),
@@ -29,6 +32,10 @@ FILTER_SQL_COLUMNS = {
     "created_at": sa.column("created_at", sa.DateTime()),
     "field_1": sa.column("field_1", sa.Integer()),
     "field_2": sa.column("field_2", sa.Integer()),
+}
+
+FILTER_VIRTUAL_SQL_COLUMNS = {
+    "fid": sa.column("id", sa.Integer()),
 }
 
 FILTER_GEOJSON = {
@@ -45,6 +52,7 @@ FILTER_GEOJSON = {
                 "birth_date": "1998-05-15",
                 "created_at": "2023-01-10T08:30:00",
                 "work_start": "09:00:00",
+                "__fid__": 101,
                 "field_1": 10,
                 "field_2": 20,
             },
@@ -60,6 +68,7 @@ FILTER_GEOJSON = {
                 "birth_date": "1993-08-22",
                 "created_at": "2023-02-15T14:45:30",
                 "work_start": "10:30:00",
+                "__fid__": 102,
                 "field_1": 10,
                 "field_2": 20,
             },
@@ -75,6 +84,7 @@ FILTER_GEOJSON = {
                 "birth_date": "1988-12-01",
                 "created_at": "2023-03-20T16:20:15",
                 "work_start": "08:00:00",
+                "__fid__": 103,
                 "field_1": 10,
                 "field_2": 10,
             },
@@ -90,6 +100,7 @@ FILTER_GEOJSON = {
                 "birth_date": "1995-03-10",
                 "created_at": "2023-01-25T11:15:00",
                 "work_start": "09:30:00",
+                "__fid__": 104,
                 "field_1": 10,
                 "field_2": 5,
             },
@@ -105,6 +116,7 @@ FILTER_GEOJSON = {
                 "birth_date": "1991-07-18",
                 "created_at": "2023-04-05T10:00:00",
                 "work_start": "08:30:00",
+                "__fid__": 105,
                 "field_1": 10,
                 "field_2": 5,
             },
@@ -237,12 +249,40 @@ FILTER_REGISTRY: list[FilterCase] = [
         "name IS NOT NULL",
         True,
     ),
+    FilterCase(
+        "eq_literals",
+        ["==", 1, 1],
+        {"Alice", "Bob", "Charlie", "Diana", "Eve"},
+        "1 = 1",
+        True,
+    ),
+    FilterCase(
+        "eq_fid_one",
+        ["==", ["fid"], 1],
+        {"Alice"},
+        "id = 1",
+        True,
+    ),
+    FilterCase(
+        "eq_user_fid_field",
+        ["==", ["get", "__fid__"], 102],
+        {"Bob"},
+        "__fid__ = 102",
+        True,
+    ),
     # Lists and inclusions
     FilterCase(
         "in_names",
         ["in", ["get", "name"], "Alice", "Bob", "Charlie"],
         {"Alice", "Bob", "Charlie"},
         "name IN ('Alice', 'Bob', 'Charlie')",
+        True,
+    ),
+    FilterCase(
+        "in_fids",
+        ["in", ["fid"], 1, 2],
+        {"Alice", "Bob"},
+        "id IN (1, 2)",
         True,
     ),
     FilterCase(
@@ -271,6 +311,7 @@ FILTER_REGISTRY: list[FilterCase] = [
         True,
     ),
     FilterCase("is_null_field", ["is_null", ["get", "name"]], set(), "name IS NULL", True),
+    FilterCase("is_null_fid", ["is_null", ["fid"]], set(), "id IS NULL", True),
     # Column vs Column
     FilterCase(
         "gt_col",
@@ -319,6 +360,12 @@ FILTER_REGISTRY: list[FilterCase] = [
         {"Alice", "Diana"},
         "created_at >= '2023-01-01 00:00:00' AND created_at < '2023-02-01 00:00:00'",
     ),
+    FilterCase(
+        "any_fid_eq_1_fid_eq_2",
+        ["any", ["==", ["fid"], 1], ["==", ["fid"], 2]],
+        {"Alice", "Bob"},
+        "id = 1 OR id = 2",
+    ),
 ]
 
 
@@ -360,7 +407,6 @@ INVALID_DATA_CASES = [
         _E,
     ),
     ("unknown_field", ["==", ["get", "nonexistent"], "value"], True, _E),
-    ("get_plain_string_instead_ref", ["==", "name", "value"], True, _E),
     ("get_without_field_name", ["==", ["get"], "value"], True, _E),
     ("get_wrong_keyword", ["==", ["fetch", "name"], "value"], True, _E),
     ("nested_get_in_field_name", ["==", ["get", ["get", "name"]], "value"], True, _E),

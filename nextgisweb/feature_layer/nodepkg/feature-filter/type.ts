@@ -34,15 +34,35 @@ export type FilterGroupChild =
   | { type: "condition"; id: number }
   | { type: "group"; id: number };
 
+export type AttributeFieldRef = {
+  kind: "field";
+  keyname: string;
+};
+
+export type VirtualOperandExprMap = {
+  fid: ["fid"];
+};
+
+export type VirtualOperandId = keyof VirtualOperandExprMap;
+export type VirtualOperandExpr = VirtualOperandExprMap[VirtualOperandId];
+
+export type VirtualFieldRef = {
+  kind: "virtual";
+  id: VirtualOperandId;
+};
+
+export type FieldRef = AttributeFieldRef | VirtualFieldRef;
+
 export type FilterCondition<O extends Operator = Operator> = {
   id: number;
   type: "condition";
-  field: string;
+  field: FieldRef;
   operator: O;
   value: OperatorValueMap[Operator];
 };
 
 export type GetExpr = ["get", string];
+export type FieldOperandExpr = GetExpr | VirtualOperandExpr;
 
 export type EqNeOp = "==" | "!=";
 export type CmpOp = ">" | "<" | ">=" | "<=";
@@ -51,10 +71,10 @@ export type IsNullOp = "is_null" | "!is_null";
 
 export type ConditionValue = string | number | boolean | null;
 
-export type EqNeExpr = [EqNeOp, GetExpr, ConditionValue];
-export type CmpExpr = [CmpOp, GetExpr, number | string];
-export type InExpr = [InOp, GetExpr, ...(string | number)[]];
-export type IsNullExpr = [IsNullOp, GetExpr];
+export type EqNeExpr = [EqNeOp, FieldOperandExpr, ConditionValue];
+export type CmpExpr = [CmpOp, FieldOperandExpr, number | string];
+export type InExpr = [InOp, FieldOperandExpr, ...(string | number)[]];
+export type IsNullExpr = [IsNullOp, FieldOperandExpr];
 
 export type ConditionExpr = EqNeExpr | CmpExpr | InExpr | IsNullExpr;
 
@@ -74,6 +94,23 @@ export const ValidOperators = [
   "is_null",
   "!is_null",
 ] as const;
+
+export interface VirtualFieldDescriptor<
+  TId extends VirtualOperandId = VirtualOperandId,
+> {
+  id: TId;
+  label: string;
+  datatype: FeatureLayerFieldRead["datatype"];
+  toExpr: () => VirtualOperandExprMap[TId];
+  matchesExpr: (expr: unknown) => expr is VirtualOperandExprMap[TId];
+}
+
+export interface ResolvedFieldRef {
+  ref: FieldRef;
+  label: string;
+  datatype: FeatureLayerFieldRead["datatype"];
+  isVirtual: boolean;
+}
 
 export type Operator = (typeof ValidOperators)[number];
 

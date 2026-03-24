@@ -1,11 +1,22 @@
 import type {
   ConditionExpr,
+  FieldRef,
   FilterCondition,
   FilterExpression,
   FilterGroup,
 } from "../type";
 
+import { expressionToFieldRef } from "./field-ref";
 import { isConditionExpression } from "./validator";
+
+function extractConditionFieldRef(expression: unknown): FieldRef {
+  const fieldRef = expressionToFieldRef(expression);
+  if (!fieldRef) {
+    throw new Error("Invalid field expression");
+  }
+
+  return fieldRef;
+}
 
 export function parseConditionExpression(
   expression: ConditionExpr,
@@ -13,14 +24,7 @@ export function parseConditionExpression(
 ): FilterCondition {
   const [operator, fieldExpression, ...rest] = expression;
   const value = rest[0];
-  let field = "";
-  if (Array.isArray(fieldExpression) && fieldExpression[0] === "get") {
-    field = fieldExpression[1];
-  } else if (operator === "is_null" || operator === "!is_null") {
-    if (Array.isArray(expression[1]) && expression[1][0] === "get") {
-      field = expression[1][1];
-    }
-  }
+  const field = extractConditionFieldRef(fieldExpression);
 
   const baseCondition: FilterCondition = {
     id: nextId(),
