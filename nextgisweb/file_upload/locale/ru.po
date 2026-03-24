@@ -2,6 +2,19 @@
 msgid "Uploaded file too large"
 msgstr "Загруженный файл слишком большой"
 
+#: exception.py:10
+msgid "Unsupported file"
+msgstr "Неподдерживаемый файл"
+
+#: exception.py:12
+msgid ""
+"The file '{fn}' could not be processed. Please verify that it is provided in "
+"a supported format and try again. If the problem persists, contact support."
+msgstr ""
+"Файл '{fn}' не может быть обработан. Пожалуйста, убедитесь, что он в "
+"поддерживаемом формате, и попробуйте снова. Если проблема сохраняется, "
+"обратитесь в службу поддержки."
+
 #: model.py:136
 msgid "Uploaded file not found"
 msgstr "Загруженный файл не найден"
@@ -10,20 +23,20 @@ msgstr "Загруженный файл не найден"
 msgid "Upload is not completed"
 msgstr "Загрузка не завершена"
 
-#: nodepkg/file-uploader/FileUploader.tsx:19
+#: nodepkg/file-uploader/FileUploader.tsx:18
 #: nodepkg/image-uploader/ImageUploader.tsx:19
 msgid "Select a file"
 msgstr "Выберите файл"
 
-#: nodepkg/file-uploader/FileUploader.tsx:20
+#: nodepkg/file-uploader/FileUploader.tsx:19
 msgid "or drag and drop here"
 msgstr "или перетащите в эту область"
 
-#: nodepkg/file-uploader/FileUploader.tsx:21
+#: nodepkg/file-uploader/FileUploader.tsx:20
 msgid "Stop"
 msgstr "Стоп"
 
-#: nodepkg/file-uploader/FileUploader.tsx:84
+#: nodepkg/file-uploader/FileUploader.tsx:80
 msgid "max"
 msgstr "максимум"
 

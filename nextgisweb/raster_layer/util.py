@@ -1,6 +1,13 @@
 from osgeo import gdal
 
+from nextgisweb.env import gettext
+
 PYRAMID_TARGET_SIZE = 512
+
+msg_supported_formats = gettext(
+    "Supported formats: GeoTIFF, JPEG, and PNG with GDAL PAM metadata "
+    "(.aux.xml files). Multi-file datasets should be uploaded as ZIP archives."
+)
 
 
 def calc_overviews_levels(ds, blocksize=PYRAMID_TARGET_SIZE):

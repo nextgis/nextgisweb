@@ -20,6 +20,8 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { ResourceSelectRef } from "@nextgisweb/resource/component";
 import type { EditorWidget } from "@nextgisweb/resource/type";
 
+import settings from "../client-settings";
+
 import type { Mode, Store } from "./Store";
 
 import "./Widget.less";
@@ -31,7 +33,6 @@ interface Option<T = string> {
 
 /* prettier-ignore */ const
 msgSelectDataset = gettext("Select a dataset"),
-msgSupportedFormats = gettext("ESRI Shapefile (zip), GeoPackage, GeoJSON, GML, KML, CSV or XLSX formats are supported. For CSV and XLSX only points are supported, coordinates must be put in lat and lot columns."),
 msgInspect = gettext("Files uploaded, post-processing on the server in progress..."),
 msgFixErrors = gettext("Fix errors"),
 msgSkipUnfixable = gettext("Skip features with unfixable errors"),
@@ -272,7 +273,7 @@ export const Widget: EditorWidget<Store> = observer(({ store }) => {
               },
             ]}
             uploadText={msgSelectDataset}
-            helpText={msgSupportedFormats}
+            helpText={settings.msgSupportedFormats}
             showMaxSize
           />
 

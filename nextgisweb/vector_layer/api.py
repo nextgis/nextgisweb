@@ -1,11 +1,11 @@
 from msgspec import Struct
 
-from nextgisweb.env import gettext
-
-from nextgisweb.core.exception import ValidationError
 from nextgisweb.file_upload import FileUploadRef
+from nextgisweb.file_upload.exception import UnsupportedFile
+from nextgisweb.pyramid import client_setting
 
-from .util import read_dataset_vector
+from .component import VectorLayerComponent
+from .util import msg_supported_formats, read_dataset_vector
 
 
 class InspectResponse(Struct, kw_only=True):
@@ -20,10 +20,16 @@ def inspect(request, *, body: FileUploadRef) -> InspectResponse:
     fupload = body()
     ogrds = read_dataset_vector(str(fupload.data_path), source_filename=fupload.name)
     if ogrds is None:
-        raise ValidationError(gettext("GDAL library failed to open file."))
+        raise UnsupportedFile(fupload, detail=msg_supported_formats)
 
     layers = [ogrds.GetLayer(idx).GetName() for idx in range(ogrds.GetLayerCount())]
     return InspectResponse(layers=layers)
+
+
+@client_setting("msgSupportedFormats")
+def cs_msg_supported_formats(comp: VectorLayerComponent, request) -> str:
+    tr = request.localizer.translate
+    return tr(msg_supported_formats)
 
 
 def setup_pyramid(comp, config):

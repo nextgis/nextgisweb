@@ -6,11 +6,12 @@ import { Area, Lot } from "@nextgisweb/gui/mayout";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { EditorWidget as IEditorWidget } from "@nextgisweb/resource/type";
 
+import settings from "../client-settings";
+
 import type { EditorStore } from "./EditorStore";
 
 /* prettier-ignore */ const
 msgSelectDataset = gettext("Select a dataset"),
-msgSupportedFormats = gettext("Supported formats: GeoTIFF, JPEG, and PNG with GDAL PAM metadata (.aux.xml files). Multi-file datasets should be uploaded as ZIP archives."),
 msgCog = gettext("Cloud Optimized GeoTIFF (COG)");
 
 export const EditorWidget: IEditorWidget<EditorStore> = observer(
@@ -23,7 +24,7 @@ export const EditorWidget: IEditorWidget<EditorStore> = observer(
             onUploading={(value) => store.update({ uploading: value })}
             multiple={false}
             uploadText={msgSelectDataset}
-            helpText={msgSupportedFormats}
+            helpText={settings.msgSupportedFormats}
             showMaxSize
           />
         </Lot>

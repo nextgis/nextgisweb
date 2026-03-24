@@ -12,13 +12,15 @@ from nextgisweb.env import env, gettext
 from nextgisweb.lib.apitype import AnyOf, ContentType, Query, StatusCode
 
 from nextgisweb.core.exception import ValidationError
-from nextgisweb.pyramid import XMLType
+from nextgisweb.pyramid import XMLType, client_setting
 from nextgisweb.pyramid.util import set_output_buffering
 from nextgisweb.resource import DataScope, ResourceFactory
 from nextgisweb.spatial_ref_sys import SRS
 
+from .component import RasterLayerComponent
 from .gdaldriver import EXPORT_FORMAT_GDAL
 from .model import RasterLayer
+from .util import msg_supported_formats
 
 
 class ExportParams(Struct, kw_only=True):
@@ -225,6 +227,12 @@ def pam_head(resource: RasterLayer, request) -> Response:
         content_length=resource.fileobj_pam.size,
         content_type="application/xml",
     )
+
+
+@client_setting("msgSupportedFormats")
+def cs_msg_supported_formats(comp: RasterLayerComponent, request) -> str:
+    tr = request.localizer.translate
+    return tr(msg_supported_formats)
 
 
 def setup_pyramid(comp, config):

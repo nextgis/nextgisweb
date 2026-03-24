@@ -45,6 +45,7 @@ from nextgisweb.feature_layer.versioning import (
     fversioning_guard,
 )
 from nextgisweb.file_upload import FileUpload, FileUploadRef
+from nextgisweb.file_upload.exception import UnsupportedFile
 from nextgisweb.layer import IBboxLayer, SpatialLayerMixin
 from nextgisweb.resource import (
     CRUTypes,
@@ -69,7 +70,15 @@ from .ogrloader import (
     LoaderParams,
     OGRLoader,
 )
-from .util import DRIVERS, FIELD_TYPE_2_DB, FIELD_TYPE_SIZE, SCHEMA, read_dataset_vector, uuid_hex
+from .util import (
+    DRIVERS,
+    FIELD_TYPE_2_DB,
+    FIELD_TYPE_SIZE,
+    SCHEMA,
+    msg_supported_formats,
+    read_dataset_vector,
+    uuid_hex,
+)
 from .vlschema import VLSchema
 
 Base.depends_on("resource", "feature_layer")
@@ -819,12 +828,7 @@ class SourceAttr(SAttribute):
         )
 
         if ogrds is None:
-            ogrds = ogr.Open(str(file_upload.data_path), 0)
-            if ogrds is None:
-                raise VE(message=gettext("GDAL library failed to open file."))
-            else:
-                drivername = ogrds.GetDriver().GetName()
-                raise VE(message=gettext("Unsupport OGR driver: %s.") % drivername)
+            raise UnsupportedFile(file_upload, detail=msg_supported_formats)
 
         return ogrds
 

@@ -25,6 +25,8 @@ from nextgisweb.core.exception import ValidationError
 from nextgisweb.core.util import format_size
 from nextgisweb.file_storage import FileObj
 from nextgisweb.file_upload import FileUploadRef
+from nextgisweb.file_upload.exception import UnsupportedFile
+from nextgisweb.file_upload.model import FileUpload
 from nextgisweb.layer import IBboxLayer, SpatialLayerMixin
 from nextgisweb.resource import (
     CRUTypes,
@@ -39,7 +41,14 @@ from nextgisweb.resource import (
 )
 
 from .kind_of_data import RasterLayerData
-from .util import band_color_interp, calc_overviews_levels, get_predictor, is_rgb, raster_size
+from .util import (
+    band_color_interp,
+    calc_overviews_levels,
+    get_predictor,
+    is_rgb,
+    msg_supported_formats,
+    raster_size,
+)
 
 Base.depends_on("resource")
 
@@ -90,9 +99,13 @@ class RasterLayer(Resource, SpatialLayerMixin):
     def check_parent(cls, parent):
         return isinstance(parent, ResourceGroup)
 
-    def load_file(self, filename, *, cog=False):
+    def load_file(self, filename: str | Path | FileUpload, *, cog=False):
+        file_upload = None
         if isinstance(filename, Path):
             filename = str(filename)
+        elif isinstance(filename, FileUpload):
+            file_upload = filename
+            filename = filename.data_path
 
         if is_zipfile(filename):
             zip_filename = "/vsizip/{%s}" % filename
@@ -124,7 +137,7 @@ class RasterLayer(Resource, SpatialLayerMixin):
 
         ds = gdal.OpenEx(filename, gdalconst.GA_ReadOnly, allowed_drivers=SUPPORTED_DRIVERS)
         if not ds:
-            raise ValidationError(gettext("GDAL library was unable to open the file."))
+            raise UnsupportedFile(file_upload, detail=msg_supported_formats)
 
         dsproj = ds.GetProjection()
         dsgtran = ds.GetGeoTransform()
@@ -498,7 +511,7 @@ class SourceAttr(SAttribute):
         cog = srlzr.data.cog
         if cog is UNSET or cog is None:
             cog = env.raster_layer.cog_default if cog is None or create else srlzr.obj.cog
-        srlzr.obj.load_file(value().data_path, cog=cog)
+        srlzr.obj.load_file(value(), cog=cog)
 
         new_size = estimate_raster_layer_data(srlzr.obj)
         env.core.reserve_storage(

@@ -2,7 +2,7 @@ from uuid import uuid4
 
 import sqlalchemy as sa
 
-from nextgisweb.env import COMP_ID
+from nextgisweb.env import COMP_ID, gettext
 from nextgisweb.lib.ogrhelper import read_dataset
 
 from nextgisweb.feature_layer import FIELD_TYPE, FIELD_TYPE_OGR, GEOM_TYPE
@@ -49,6 +49,12 @@ GEOM_TYPE_DB = (
     "MULTIPOLYGONZ",
 )
 GEOM_TYPE_2_DB = dict(zip(GEOM_TYPE.enum, GEOM_TYPE_DB))
+
+msg_supported_formats = gettext(
+    "ESRI Shapefile (zip), GeoPackage, GeoJSON, GML, KML, CSV or XLSX formats "
+    "are supported. For CSV and XLSX only points are supported, coordinates "
+    "must be put in lat and lot columns."
+)
 
 
 def read_dataset_vector(filename, allowed_drivers=DRIVERS.enum, **kw):

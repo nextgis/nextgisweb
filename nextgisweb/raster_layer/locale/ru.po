@@ -1,12 +1,12 @@
-#: api.py:124 api.py:145
+#: api.py:132 api.py:155
 msgid "Requested raster is not COG."
 msgstr "Запрошенный растр не является COG"
 
-#: api.py:149
+#: api.py:159
 msgid "Range header is missed or invalid."
 msgstr "Заголовок 'Range' пропущен или некорректен."
 
-#: api.py:153
+#: api.py:163
 msgid "Range %s can not be read."
 msgstr "Диапазон %s не может быть прочитан."
 
@@ -14,37 +14,33 @@ msgstr "Диапазон %s не может быть прочитан."
 msgid "Rasters and pyramids"
 msgstr "Растры и пирамиды"
 
-#: model.py:71 nodepkg/editor-widget/EditorWidget.tsx:46 view.py:61
+#: model.py:75 nodepkg/editor-widget/EditorWidget.tsx:45
 msgid "Raster layer"
 msgstr "Растровый слой"
 
-#: model.py:113
+#: model.py:127
 msgid "No supported files found in the archive."
 msgstr "В архиве не обнаружены файлы поддерживаемых форматов."
 
-#: model.py:117
+#: model.py:131
 msgid "The archive contains multiple supported files: {supported_zip_items}."
 msgstr ""
 "В архиве обнаружено несколько файлов поддерживаемых форматов: "
 "{supported_zip_items}."
 
-#: model.py:132
-msgid "GDAL library was unable to open the file."
-msgstr "Библиотеке GDAL не удалось открыть файл."
-
-#: model.py:139
+#: model.py:147
 msgid "Raster files without projection info are not supported."
 msgstr "Растровые файлы без информации о проекции не поддерживаются."
 
-#: model.py:159
+#: model.py:167
 msgid "Mixed band data types are not supported."
 msgstr "Смешанные типы каналов не поддерживаются."
 
-#: model.py:208
+#: model.py:216
 msgid "GDAL was unable to parse the raster coordinate system."
 msgstr "GDAL не смог обработать определение системы координат растра."
 
-#: model.py:214
+#: model.py:222
 msgid ""
 "The source raster has a local coordinate system and can't be reprojected to "
 "the target coordinate system."
@@ -52,15 +48,15 @@ msgstr ""
 "Исходный растр имеет локальную систему координат и не может быть "
 "перепроецирован в целевую."
 
-#: model.py:232
+#: model.py:240
 msgid "Failed to reproject the raster to the target coordinate system."
 msgstr "Не удалось перепроецировать растр в целевую систему координат."
 
-#: model.py:236
+#: model.py:244
 msgid "GDAL error message: %s"
 msgstr "Сообщение об ошибке GDAL: %s"
 
-#: model.py:252
+#: model.py:260
 msgid ""
 "The uncompressed raster size ({size}) exceeds the limit ({limit}) by {delta}."
 " Reduce raster size to fit the limit."
@@ -68,34 +64,62 @@ msgstr ""
 "Размер несжатого растра ({size}) превышает лимит ({limit}) на {delta}. "
 "Уменьшите растр, чтобы он вписывался в лимит."
 
-#: model.py:387
+#: model.py:437
 msgid "{n} band with {t} data type"
 msgid_plural "{n} bands with {t} data type"
 msgstr[0] "{n} канал с типом данных {t}"
 msgstr[1] "{n} канала с типом данных {t}"
 msgstr[2] "{n} каналов с типом данных {t}"
 
-#: model.py:393
+#: model.py:443
 msgid "Band summary"
 msgstr "Сводка по каналам"
 
-#: model.py:394
+#: model.py:444
 msgid "Pixel dimensions"
 msgstr "Размер в пикселях"
 
-#: model.py:395 nodepkg/editor-widget/EditorWidget.tsx:37
+#: model.py:445 nodepkg/editor-widget/EditorWidget.tsx:15
 msgid "Cloud Optimized GeoTIFF (COG)"
 msgstr "Cloud Optimized GeoTIFF (COG)"
 
-#: model.py:396
+#: model.py:446
 msgid "Persistent auxiliary metadata (PAM)"
 msgstr "Вспомогательные метаданные (PAM)"
 
-#: nodepkg/editor-widget/EditorWidget.tsx:13
+#: nodepkg/editor-widget/EditorWidget.tsx:14
 msgid "Select a dataset"
 msgstr "Выберите растровый слой"
 
-#: nodepkg/editor-widget/EditorWidget.tsx:14
+#: nodepkg/export-form/ExportForm.tsx:57
+msgid "Band"
+msgstr "Канал"
+
+#: nodepkg/export-form/ExportForm.tsx:80
+msgid "Format"
+msgstr "Формат"
+
+#: nodepkg/export-form/ExportForm.tsx:92
+msgid "SRS"
+msgstr "Система координат"
+
+#: nodepkg/export-form/ExportForm.tsx:97
+msgid "Bands"
+msgstr "Каналы"
+
+#: nodepkg/export-form/ExportForm.tsx:130
+msgid "Save"
+msgstr "Сохранить"
+
+#: nodepkg/resource-action-plugin.tsx:13
+msgid "Download"
+msgstr "Скачать"
+
+#: nodepkg/resource-action-plugin.tsx:35 view.py:29
+msgid "Save as"
+msgstr "Сохранить как"
+
+#: util.py:8
 msgid ""
 "Supported formats: GeoTIFF, JPEG, and PNG with GDAL PAM metadata (.aux.xml "
 "files). Multi-file datasets should be uploaded as ZIP archives."
@@ -104,35 +128,11 @@ msgstr ""
 ".aux.xml). Многофайловые наборы данных должны быть загружены в виде "
 "ZIP-архивов."
 
-#: nodepkg/export-form/ExportForm.tsx:58
-msgid "Band"
-msgstr "Канал"
-
-#: nodepkg/export-form/ExportForm.tsx:82
-msgid "Format"
-msgstr "Формат"
-
-#: nodepkg/export-form/ExportForm.tsx:94
-msgid "SRS"
-msgstr "Система координат"
-
-#: nodepkg/export-form/ExportForm.tsx:99
-msgid "Bands"
-msgstr "Каналы"
-
-#: nodepkg/export-form/ExportForm.tsx:132
-msgid "Save"
-msgstr "Сохранить"
-
-#: view.py:26 view.py:66
-msgid "Save as"
-msgstr "Сохранить как"
-
-#: view.py:33
+#: view.py:36
 msgid "Cloud Optimized GeoTIFF"
 msgstr "Cloud Optimized GeoTIFF"
 
-#: view.py:35
+#: view.py:38
 msgid ""
 "A Cloud Optimized GeoTIFF (COG) is a regular GeoTIFF file, aimed at being "
 "hosted on a HTTP file server, with an internal organization that enables more"
@@ -144,7 +144,3 @@ msgstr ""
 "веб-сервере и эффективной работе в облаке файл GeoTIFF, позволяющий "
 "обращаться в HTTP запросах только к нужным частям растра, без необходимости "
 "загружать его в клиентское приложение целиком."
-
-#: view.py:72
-msgid "Download"
-msgstr "Скачать"
