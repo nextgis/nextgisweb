@@ -37,7 +37,13 @@ from nextgisweb.resource import (
 )
 from nextgisweb.spatial_ref_sys import SRS
 
-from .util import find_tag, get_capability_formats, get_capability_layers, get_capability_srs
+from .util import (
+    find_tag,
+    get_capability_formats,
+    get_capability_layers,
+    get_capability_srs,
+    get_capability_urls,
+)
 
 Base.depends_on("resource")
 
@@ -78,7 +84,9 @@ class Connection(Resource):
         )
 
     def request_wms(self, request, query=None):
-        up = urlparse(self.url, allow_fragments=False)
+        capcache = self.capcache_dict
+        url = (capcache.get("urls", {}).get(request) if capcache else None) or self.url
+        up = urlparse(url, allow_fragments=False)
 
         query_main = dict(parse_qsl(up.query))
         query_main["service"] = "WMS"
@@ -130,6 +138,7 @@ class Connection(Resource):
         data["formats"] = get_capability_formats(el_cap)
         data["layers"] = get_capability_layers(el_cap, version=version)
         data["srs"] = get_capability_srs(el_cap, version=version)
+        data["urls"] = get_capability_urls(el_cap)
 
         self.capcache_json = json.dumps(data)
 
