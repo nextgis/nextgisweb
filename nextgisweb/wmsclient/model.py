@@ -8,13 +8,14 @@ import requests
 import sqlalchemy as sa
 import sqlalchemy.dialects.postgresql as sa_pg
 import sqlalchemy.orm as orm
+from cachetools import LRUCache
 from lxml import etree
 from msgspec import Struct, field
 from requests.exceptions import RequestException
 from zope.interface import implementer
 
 from nextgisweb.env import Base, env, gettext
-from nextgisweb.lib import json, saext
+from nextgisweb.lib import saext
 from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.pilhelper import reproject_render
 
@@ -54,6 +55,8 @@ url_pattern = re.compile(
     re.IGNORECASE | re.UNICODE,
 )
 
+_capcache_cache: LRUCache = LRUCache(maxsize=64)
+
 
 class Connection(Resource):
     identity = "wmsclient_connection"
@@ -69,7 +72,7 @@ class Connection(Resource):
     referer = sa.Column(sa.Unicode)
 
     capcache_xml = orm.deferred(sa.Column(sa.Unicode))
-    capcache_json = orm.deferred(sa.Column(sa.Unicode))
+    capcache_json = orm.deferred(sa.Column(sa_pg.JSONB))
     capcache_tstamp = sa.Column(sa.DateTime)
 
     @classmethod
@@ -140,7 +143,7 @@ class Connection(Resource):
         data["srs"] = get_capability_srs(el_cap, version=version)
         data["urls"] = get_capability_urls(el_cap)
 
-        self.capcache_json = json.dumps(data)
+        self.capcache_json = data
 
     def get_info(self):
         s = super()
@@ -159,10 +162,14 @@ class Connection(Resource):
 
     @property
     def capcache_dict(self):
-        if not self.capcache():
+        if self.capcache_tstamp is None:
             return None
-
-        return json.loads(self.capcache_json)
+        key = (self.id, self.capcache_tstamp)
+        if key in _capcache_cache:
+            return _capcache_cache[key]
+        if (data := self.capcache_json) is not None:
+            _capcache_cache[key] = data
+        return data
 
 
 class UrlAttr(SColumn):
