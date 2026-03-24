@@ -1,12 +1,100 @@
+import heapq
+from graphlib import TopologicalSorter
 from io import StringIO
 
 from .migration import MigrationKey
 from .operation import ForwardOperation, InstallOperation, RewindOperation, UninstallOperation
 
 
+class DiGraph:
+    def __init__(self):
+        self._nodes = {}
+        self._succ = {}
+        self._pred = {}
+
+    def add_node(self, node, **attrs):
+        if node not in self._nodes:
+            self._nodes[node] = {}
+            self._succ[node] = {}
+            self._pred[node] = {}
+        self._nodes[node].update(attrs)
+
+    def add_edge(self, u, v, **attrs):
+        self.add_node(u)
+        self.add_node(v)
+        self._succ[u][v] = attrs
+        self._pred[v][u] = attrs
+
+    @property
+    def nodes(self):
+        return self._nodes
+
+    def predecessors(self, node):
+        return iter(self._pred.get(node, {}))
+
+    def successors(self, node):
+        return iter(self._succ.get(node, {}))
+
+    def subgraph(self, nodes):
+        nodes = set(nodes) & self._nodes.keys()
+        g = DiGraph()
+        for n in nodes:
+            g.add_node(n, **self._nodes[n])
+            for m, attrs in self._succ[n].items():
+                if m in nodes:
+                    g.add_edge(n, m, **attrs)
+        return g
+
+
+class NoPath(Exception):
+    pass
+
+
+def multi_source_dijkstra(graph, sources, target):
+    if not sources:
+        raise ValueError("sources must not be empty")
+
+    dist = {}
+    prev = {}
+    counter = 0
+    heap = []
+
+    for s in sources:
+        if s in graph.nodes:
+            dist[s] = 0
+            prev[s] = None
+            heapq.heappush(heap, (0, counter, s))
+            counter += 1
+
+    while heap:
+        d, _, u = heapq.heappop(heap)
+        if dist[u] < d:
+            continue
+        if u == target:
+            path, node = [], u
+            while node is not None:
+                path.append(node)
+                node = prev[node]
+            return d, list(reversed(path))
+        for v, attrs in graph._succ.get(u, {}).items():
+            nd = d + attrs.get("weight", 1)
+            if nd < dist.get(v, float("inf")):
+                dist[v] = nd
+                prev[v] = u
+                heapq.heappush(heap, (nd, counter, v))
+                counter += 1
+
+    raise NoPath
+
+
+def topological_sort(graph):
+    ts = TopologicalSorter({n: list(graph.predecessors(n)) for n in graph.nodes})
+    return list(ts.static_order())
+
+
 class MigrationGraph:
-    def __init__(self, registry, install_dependencies={}):
-        self._install_dependecies = install_dependencies
+    def __init__(self, registry, install_dependencies=None):
+        self._install_dependencies = install_dependencies or {}
         self._nodes = _nodes = dict()
         self._ancestors = ancestors = dict()
         self._descendants = descendants = dict()
@@ -82,7 +170,7 @@ class MigrationGraph:
             raise ValueError("Invalid selector")
 
     def operations(self, forward=True, rewind=True, install=True, uninstall=True):
-        result = list()
+        result = []
         for key, mig in self._nodes.items():
             ucond = {key: False}
             dcond = {key: True}
@@ -114,7 +202,7 @@ class MigrationGraph:
                         | self.select("tail", component=component)
                     )
                 }
-                for depcomp in self._install_dependecies.get(component, ()):
+                for depcomp in self._install_dependencies.get(component, ()):
                     icond.update({key: True for key in self.select("head", component=depcomp)})
                 result.append(
                     InstallOperation(
@@ -125,7 +213,7 @@ class MigrationGraph:
                 )
             if uninstall:
                 ucond = {key: True for key in self.select("head", component=component)}
-                for k, v in self._install_dependecies.items():
+                for k, v in self._install_dependencies.items():
                     if component in v:
                         ucond.update({key: False for key in self.select("tail", component=k)})
                 result.append(
@@ -143,9 +231,7 @@ class OperationGraph:
         self.operations = opertaions
 
     def resolve(self, fstate, tstate):
-        import networkx as nx  # Slow import
-
-        dg = nx.DiGraph()
+        dg = DiGraph()
         for op in self.operations:
             dg.add_node(op, transform=True)
             for c in op.condition.items():
@@ -170,8 +256,8 @@ class OperationGraph:
                 mask = set()
                 while True:
                     try:
-                        path = nx.multi_source_dijkstra(dg, src - mask, t)[1]
-                    except nx.NetworkXNoPath:
+                        path = multi_source_dijkstra(dg, src - mask, t)[1]
+                    except NoPath:
                         return None
                     except ValueError:
                         if src == mask:
@@ -222,9 +308,7 @@ class OperationGraph:
 
         ops = frozenset([op for op in res if dg.nodes[op].get("transform")])
         subg = dg.subgraph(res)
-        assert nx.is_directed_acyclic_graph(subg)
-
-        tsort = list(nx.topological_sort(subg))
+        tsort = topological_sort(subg)
         sops = sorted(ops, key=tsort.index)
         return sops
 

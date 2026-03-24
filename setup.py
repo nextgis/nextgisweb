@@ -39,7 +39,6 @@ requires = [
     "nh3==0.2.22",
     "mako==1.3.10",
     "msgspec==0.20.0",
-    "networkx",
     "passlib==1.7.4",
     "pillow==11.3.0",
     "pillow-heif==1.0.0",
