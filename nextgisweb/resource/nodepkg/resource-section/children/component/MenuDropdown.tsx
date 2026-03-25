@@ -193,8 +193,8 @@ export function MenuDropdown({
       menuItems_.push({
         key: "volumes",
         label: volumeVisible
-          ? gettext("Hide resources volume")
-          : gettext("Show resources volume"),
+          ? gettext("Hide resource volume")
+          : gettext("Show resource volume"),
         onClick: () => {
           setVolumeVisible(!volumeVisible);
           if (!volumeVisible) {

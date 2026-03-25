@@ -476,12 +476,12 @@ msgid "Select multiple resources"
 msgstr "Выбрать несколько ресурсов"
 
 #: nodepkg/resource-section/children/component/MenuDropdown.tsx:201
-msgid "Hide resources volume"
-msgstr "Скрыть размер ресурсов"
+msgid "Hide resource volume"
+msgstr "Скрыть размер ресурса"
 
 #: nodepkg/resource-section/children/component/MenuDropdown.tsx:202
-msgid "Show resources volume"
-msgstr "Показать размер ресурсов"
+msgid "Show resource volume"
+msgstr "Показать размер ресурса"
 
 #: nodepkg/resource-section/children/component/MenuDropdown.tsx:214
 msgid "Hide resource creation date"
