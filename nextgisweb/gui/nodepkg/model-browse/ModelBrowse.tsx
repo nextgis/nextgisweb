@@ -63,6 +63,7 @@ interface ModelBrowseProps<
   model: string | Model;
   messages?: {
     deleteConfirm?: string;
+    deleteBatchConfirm?: string;
     deleteSuccess?: string;
     deleteBatchSuccess?: string;
   };
@@ -127,6 +128,8 @@ export function ModelBrowse<Data extends ModalBrowseData = ModalBrowseData>({
 
   const msg = messages || {};
   const deleteConfirm = msg.deleteConfirm || gettext("Confirmation");
+  const deleteBatchConfirm =
+    msg.deleteBatchConfirm || gettext("Do you want to delete these items?");
   const deleteSuccess = msg.deleteSuccess || gettext("Item deleted");
   const deleteBatchSuccess = msg.deleteBatchSuccess || gettext("Items deleted");
 
@@ -228,7 +231,7 @@ export function ModelBrowse<Data extends ModalBrowseData = ModalBrowseData>({
 
   const onDeleteSelectedBtnClick = async () => {
     modal.confirm({
-      title: gettext("Do you want to delete these items?"),
+      title: deleteBatchConfirm,
       onOk() {
         deleteSelected();
       },
