@@ -3,6 +3,7 @@ import type { MapBrowserEvent } from "ol";
 import Interaction from "ol/interaction/Interaction";
 import { useEffect, useMemo } from "react";
 
+import { errorModal } from "@nextgisweb/gui/error";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { useDisplayContext } from "@nextgisweb/webmap/display/context";
 
@@ -42,10 +43,12 @@ const IdentifyControl = observer(
     const interaction = useMemo(() => {
       const handleEvent = (evt: MapBrowserEvent<any>) => {
         if (evt.type === "singleclick") {
-          display.identify.execute(
-            evt.pixel,
-            evt.originalEvent.pointerType === "touch" ? 2 : undefined
-          );
+          display.identify
+            .execute(
+              evt.pixel,
+              evt.originalEvent.pointerType === "touch" ? 2 : undefined
+            )
+            .catch(errorModal);
           evt.preventDefault?.();
         }
         return true;

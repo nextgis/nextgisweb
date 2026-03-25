@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 
 import type { FeatureItem } from "@nextgisweb/feature-layer/type";
 import { Alert } from "@nextgisweb/gui/antd";
-import { errorModal, isAbortError } from "@nextgisweb/gui/error";
+import { errorModal } from "@nextgisweb/gui/error";
 import { useLoading } from "@nextgisweb/gui/hook/useLoading";
 import { executeWithMinDelay } from "@nextgisweb/gui/util/executeWithMinDelay";
 import { useAbortController } from "@nextgisweb/pyramid/hook";
@@ -106,9 +106,7 @@ const IdentifyPanel = observer<PanelPluginWidgetProps<IdentifyStore>>(
 
           setFeatureItem(featureItemLoaded);
         } catch (err) {
-          if (!isAbortError(err)) {
-            errorModal(err);
-          }
+          errorModal(err);
         }
       },
       [abort, makeSignal, trackPromise, display, identifyInfo]
