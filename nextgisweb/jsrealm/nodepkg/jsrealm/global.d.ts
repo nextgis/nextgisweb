@@ -8,3 +8,7 @@ declare const MODULE_NAME: string;
 declare function ngwEntry<T = unknown>(name: string): Promise<T>;
 
 declare function ngwExternal<T = unknown>(name: string): Promise<T>;
+
+declare module "*.css" {}
+declare module "*.less" {}
+declare module "*.po" {}

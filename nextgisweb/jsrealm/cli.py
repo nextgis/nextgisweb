@@ -36,6 +36,7 @@ def create_tsconfig(npkgs: dict[str, Path], *, debug):
         allowSyntheticDefaultImports=True,
         forceConsistentCasingInFileNames=True,
         noFallthroughCasesInSwitch=True,
+        types=["node", "mocha"],
         module="esnext",
         jsx="react-jsx",
         baseUrl=".",
