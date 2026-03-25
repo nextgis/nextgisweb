@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import type { FC } from "react";
 
 import {
@@ -76,6 +76,8 @@ interface ModelBrowseProps<
   readonly?: boolean;
   showActionColumn?: boolean;
   showCreate?: boolean;
+  allowBatchDelete?: boolean;
+  card?: boolean;
   customRowSelection?: TableRowSelection<Data>;
 
   createProps?: ButtonProps;
@@ -83,6 +85,7 @@ interface ModelBrowseProps<
   selectedControls?: FC<ControlProps<Data>>[];
   collectionOptions?: RequestOptionsByMethod<"get">;
   collectionFilter?: (item: Data) => boolean;
+  reloadToken?: number | string;
 }
 
 interface TableControlProps {
@@ -97,12 +100,15 @@ export function ModelBrowse<Data extends ModalBrowseData = ModalBrowseData>({
   itemProps = {},
   showActionColumn = true,
   showCreate = true,
+  allowBatchDelete = true,
+  card = true,
   customRowSelection,
   createProps = {},
   headerControls = [],
   selectedControls = [],
   collectionFilter,
   collectionOptions,
+  reloadToken,
   ...tableProps
 }: ModelBrowseProps<Data>) {
   const [modal, modalContextHolder] = Modal.useModal();
@@ -124,10 +130,18 @@ export function ModelBrowse<Data extends ModalBrowseData = ModalBrowseData>({
   const deleteSuccess = msg.deleteSuccess || gettext("Item deleted");
   const deleteBatchSuccess = msg.deleteBatchSuccess || gettext("Items deleted");
 
-  const { data, isLoading } = useRouteGet<Data[]>({
+  const { data, isLoading, refresh } = useRouteGet<Data[]>({
     name: model.collection,
     options: collectionOptions,
   });
+
+  const prevReloadTokenRef = useRef(reloadToken);
+  useEffect(() => {
+    if (reloadToken !== prevReloadTokenRef.current) {
+      prevReloadTokenRef.current = reloadToken;
+      refresh();
+    }
+  }, [reloadToken, refresh]);
 
   const [rows, setRows] = useState<Data[]>([]);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -315,16 +329,18 @@ export function ModelBrowse<Data extends ModalBrowseData = ModalBrowseData>({
         </Fragment>
       ))}
 
-      <Badge count={selected.length} size="small">
-        <Button
-          icon={<DeleteIcon />}
-          onClick={onDeleteSelectedBtnClick}
-          loading={isDeleting}
-          danger
-        >
-          {gettext("Delete")}
-        </Button>
-      </Badge>
+      {allowBatchDelete && (
+        <Badge count={selected.length} size="small">
+          <Button
+            icon={<DeleteIcon />}
+            onClick={onDeleteSelectedBtnClick}
+            loading={isDeleting}
+            danger
+          >
+            {gettext("Delete")}
+          </Button>
+        </Badge>
+      )}
     </Space>
   );
 
@@ -350,9 +366,10 @@ export function ModelBrowse<Data extends ModalBrowseData = ModalBrowseData>({
 
   let headSection;
   if (!readonly) {
-    headSection = selected.length
-      ? SelectedControl()
-      : TableControl({ showCreate });
+    headSection =
+      selected.length && allowBatchDelete
+        ? SelectedControl()
+        : TableControl({ showCreate });
   }
 
   return (
@@ -366,7 +383,7 @@ export function ModelBrowse<Data extends ModalBrowseData = ModalBrowseData>({
       {headSection}
       <Table
         size="middle"
-        card={true}
+        card={card}
         showSorterTooltip={false}
         rowSelection={rowSelection}
         loading={isLoading}
