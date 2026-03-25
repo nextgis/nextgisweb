@@ -4,6 +4,7 @@ from decimal import Decimal
 from uuid import UUID
 
 import pytest
+from markupsafe import Markup
 from msgspec import defstruct
 
 from .. import dumpb, dumps, loadb, loads
@@ -45,6 +46,7 @@ m_nested = Nested(m_struct)
         ),
         pytest.param(m_struct, '{"e":"2.71"}', {"e": "2.71"}, id="struct"),
         pytest.param(m_nested, '{"s":{"e":"2.71"}}', {"s": {"e": "2.71"}}, id="nested"),
+        pytest.param(Markup("<b>hello</b>"), '"<b>hello</b>"', "<b>hello</b>", id="markup"),
     ),
 )
 def test_json(data, serialized, deserialized):

@@ -13,6 +13,8 @@ else:
 def _enc_hook(obj):
     if _pytest_freezegun and isinstance(obj, (FakeDatetime, FakeDate)):
         return obj.isoformat()
+    if isinstance(obj, str):
+        return str(obj)
     raise NotImplementedError(type(obj))
 
 
