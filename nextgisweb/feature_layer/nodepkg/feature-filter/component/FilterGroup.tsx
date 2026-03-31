@@ -2,7 +2,6 @@ import { useDndContext } from "@dnd-kit/core";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { observer } from "mobx-react-lite";
-import type React from "react";
 
 import { Button, Radio, Space } from "@nextgisweb/gui/antd";
 import { AddIcon, RemoveIcon } from "@nextgisweb/gui/icon";

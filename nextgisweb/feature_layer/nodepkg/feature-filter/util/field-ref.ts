@@ -73,6 +73,7 @@ export function resolveFieldRef(
       ref: fieldRef,
       label: field.display_name,
       datatype: field.datatype,
+      lookupTable: field.lookup_table,
       isVirtual: false,
     };
   }
@@ -100,6 +101,7 @@ export function listFieldRefs(
         label: field.display_name,
         datatype: field.datatype,
         isVirtual: false,
+        lookupTable: field.lookup_table,
       })
     ),
     ...VIRTUAL_FIELD_DESCRIPTORS.map(

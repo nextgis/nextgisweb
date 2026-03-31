@@ -32,13 +32,17 @@ export const FeatureFilterEditor = observer(
   ({
     fields,
     value,
+    valueWidget,
     onChange,
     onValidityChange,
     onApply,
     onCancel,
   }: FeatureFilterEditorProps) => {
     const [initialValue] = useState<FilterExpressionString | undefined>(value);
-    const store = useMemo(() => new FilterEditorStore({ fields }), [fields]);
+    const store = useMemo(
+      () => new FilterEditorStore({ fields, valueWidget }),
+      [fields, valueWidget]
+    );
     const [messageApi, contextHolder] = message.useMessage();
 
     useEffect(() => {

@@ -5,27 +5,11 @@ import type { Dayjs } from "dayjs";
 import { observer } from "mobx-react-lite";
 import { useMemo } from "react";
 
-import {
-  Button,
-  DatePicker,
-  DateTimePicker,
-  Flex,
-  InputBigInteger,
-  InputInteger,
-  InputNumber,
-  InputValue,
-  Select,
-  Space,
-  TimePicker,
-} from "@nextgisweb/gui/antd";
+import { Button, Flex, Select, Space } from "@nextgisweb/gui/antd";
 import { RemoveIcon } from "@nextgisweb/gui/icon";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import type { NgwAttributeType } from "../../type";
-import {
-  marshalFieldValue,
-  unmarshalFieldValue,
-} from "../../util/ngwAttributes";
+import { marshalFieldValue } from "../../util/ngwAttributes";
 import type { FilterEditorStore } from "../FilterEditorStore";
 import { OPERATORS } from "../type";
 import type {
@@ -36,10 +20,7 @@ import type {
   IsNullOp,
   ResolvedFieldRef,
 } from "../type";
-import {
-  coerceTagValues,
-  getMigratedConditionValue,
-} from "../util/condition-value";
+import { getMigratedConditionValue } from "../util/condition-value";
 import {
   fieldRefToSelectValue,
   listFieldRefs,
@@ -47,25 +28,16 @@ import {
   selectValueToFieldRef,
 } from "../util/field-ref";
 
+import { FilterValueInput } from "./FilterValueInput";
+
 import DragHandleIcon from "@nextgisweb/icon/material/drag_indicator";
 import TagIcon from "@nextgisweb/icon/material/tag";
 import ViewColumnIcon from "@nextgisweb/icon/material/view_column";
 
 const msgDeleteCondition = gettext("Delete condition");
-const msgNoValue = gettext("No value");
-const msgAnyValue = gettext("Any value");
-const msgInvalidField = gettext("Invalid field");
-const msgFieldNotFound = gettext("Field not found");
-const msgEnterValues = gettext("Enter values and press Enter");
+
 const msgSelectField = gettext("Select field");
 const msgOperator = gettext("Operator");
-const msgEnterInteger = gettext("Enter integer");
-const msgEnterBigInteger = gettext("Enter big integer");
-const msgEnterNumber = gettext("Enter number");
-const msgSelectDate = gettext("Select date");
-const msgSelectTime = gettext("Select time");
-const msgSelectDateTime = gettext("Select date and time");
-const msgEnterValue = gettext("Enter value");
 
 interface FilterConditionProps {
   condition: FilterConditionType;
@@ -76,50 +48,23 @@ interface FilterConditionProps {
   };
 }
 
-type ValueInput = string | number | null | Dayjs | Array<string | number>;
+export type ValueInput =
+  | string
+  | number
+  | null
+  | Dayjs
+  | Array<string | number>;
+
 type FieldOption = {
   label: string;
   value: string;
   isVirtual: boolean;
 };
 
-const isNullOperator = (operator: FilterConditionType["operator"]) =>
-  operator === "is_null" || operator === "!is_null";
-
-const isListOperator = (operator: FilterConditionType["operator"]) =>
-  operator === "in" || operator === "!in";
-
 const getOperatorsForField = (field?: ResolvedFieldRef) => {
   if (!field) return OPERATORS;
 
   return OPERATORS.filter((op) => op.supportedTypes.includes(field.datatype));
-};
-
-const getPlaceholder = (
-  condition: FilterConditionType,
-  defaultPlaceholder: string,
-  isValueInputDisabled: boolean
-): string => {
-  if (isValueInputDisabled) {
-    return condition.operator === "is_null"
-      ? gettext("No value")
-      : gettext("Any value");
-  }
-  return defaultPlaceholder;
-};
-
-const calculateValue = (
-  condition: FilterConditionType,
-  field: ResolvedFieldRef
-): NgwAttributeType => {
-  const isValueNullable =
-    condition.value === undefined || condition.value === null;
-  const conditionValue = isValueNullable
-    ? field.datatype === "STRING"
-      ? ""
-      : null
-    : condition.value;
-  return conditionValue as NgwAttributeType;
 };
 
 export const FilterCondition = observer(
@@ -211,177 +156,9 @@ export const FilterCondition = observer(
       store.updateCondition(condition.id, { value: serializedValue });
     };
 
-    const handleDateLikeChange = (value: Dayjs | Dayjs[] | null) => {
-      handleValueChange(Array.isArray(value) ? null : value);
-    };
-
     const handleDelete = () => {
       store.deleteCondition(condition.id);
     };
-
-    const isValueInputDisabled = isNullOperator(condition.operator);
-
-    const renderReadonlyValue = () => (
-      <InputValue
-        value={condition.operator === "is_null" ? msgNoValue : msgAnyValue}
-        readOnly={true}
-      />
-    );
-
-    const renderListValueInput = () => {
-      if (!currentField) {
-        return (
-          <InputValue
-            value={msgInvalidField}
-            placeholder={msgFieldNotFound}
-            disabled={true}
-            status="error"
-          />
-        );
-      }
-
-      const handleTagChange = (values: string[]) => {
-        handleValueChange(coerceTagValues(currentField.datatype, values));
-      };
-
-      const value = ((condition.value as Array<string | number>) || []).map(
-        String
-      );
-
-      return (
-        <Select
-          mode="tags"
-          value={value}
-          onChange={handleTagChange}
-          style={{ width: "100%" }}
-          placeholder={msgEnterValues}
-          tokenSeparators={[","]}
-        />
-      );
-    };
-
-    const renderScalarValueInput = () => {
-      if (!currentField) {
-        return (
-          <InputValue
-            value={msgInvalidField}
-            placeholder={msgFieldNotFound}
-            disabled={true}
-            status="error"
-          />
-        );
-      }
-
-      if (isValueInputDisabled) {
-        return renderReadonlyValue();
-      }
-
-      const conditionValue = calculateValue(condition, currentField);
-      const displayValue = unmarshalFieldValue(
-        currentField.datatype,
-        conditionValue as NgwAttributeType
-      );
-
-      switch (currentField.datatype) {
-        case "INTEGER":
-          return (
-            <InputInteger
-              value={displayValue as number}
-              onChange={handleValueChange}
-              placeholder={getPlaceholder(
-                condition,
-                msgEnterInteger,
-                isValueInputDisabled
-              )}
-              disabled={isValueInputDisabled}
-            />
-          );
-        case "BIGINT":
-          return (
-            <InputBigInteger
-              value={displayValue as string}
-              onChange={handleValueChange}
-              placeholder={getPlaceholder(
-                condition,
-                msgEnterBigInteger,
-                isValueInputDisabled
-              )}
-              disabled={isValueInputDisabled}
-            />
-          );
-        case "REAL":
-          return (
-            <InputNumber
-              value={displayValue as number}
-              onChange={handleValueChange}
-              step={0.01}
-              placeholder={getPlaceholder(
-                condition,
-                msgEnterNumber,
-                isValueInputDisabled
-              )}
-              disabled={isValueInputDisabled}
-            />
-          );
-        case "DATE":
-          return (
-            <DatePicker
-              value={displayValue as Dayjs}
-              onChange={handleDateLikeChange}
-              placeholder={getPlaceholder(
-                condition,
-                msgSelectDate,
-                isValueInputDisabled
-              )}
-              disabled={isValueInputDisabled}
-            />
-          );
-        case "TIME":
-          return (
-            <TimePicker
-              value={displayValue as Dayjs}
-              onChange={handleDateLikeChange}
-              placeholder={getPlaceholder(
-                condition,
-                msgSelectTime,
-                isValueInputDisabled
-              )}
-              disabled={isValueInputDisabled}
-            />
-          );
-        case "DATETIME":
-          return (
-            <DateTimePicker
-              value={displayValue as Dayjs}
-              onChange={handleDateLikeChange}
-              placeholder={getPlaceholder(
-                condition,
-                msgSelectDateTime,
-                isValueInputDisabled
-              )}
-              disabled={isValueInputDisabled}
-            />
-          );
-        default:
-          return (
-            <InputValue
-              value={displayValue as string}
-              onChange={handleValueChange}
-              placeholder={getPlaceholder(
-                condition,
-                msgEnterValue,
-                isValueInputDisabled
-              )}
-              disabled={isValueInputDisabled}
-            />
-          );
-      }
-    };
-
-    const renderValueInput = () =>
-      isListOperator(condition.operator)
-        ? renderListValueInput()
-        : renderScalarValueInput();
 
     const renderFieldOption = ({ label, isVirtual }: FieldOption) => (
       <Flex gap="small" align="center">
@@ -421,7 +198,12 @@ export const FilterCondition = observer(
             options={operatorOptions}
           />
 
-          {renderValueInput()}
+          <FilterValueInput
+            condition={condition}
+            field={currentField}
+            valueWidget={store.valueWidget}
+            onChange={handleValueChange}
+          />
 
           <Button
             type="text"

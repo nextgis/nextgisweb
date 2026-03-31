@@ -88,10 +88,10 @@ const AttributeEditor = observer(
         placeholder?: string;
       }): Record<FeatureLayerFieldDatatype, React.ReactElement> => {
         const common = {
-          style,
           placeholder,
           allowClear: false,
           disabled: saving,
+          style,
         };
 
         const dpProps: DatePickerProps = common;
@@ -99,17 +99,18 @@ const AttributeEditor = observer(
 
         const inputProps = {
           placeholder,
+          allowClear: false,
           disabled: saving,
           style,
         };
         return {
-          STRING: <Input {...inputProps} />,
-          REAL: <InputNumber {...inputProps} />,
-          INTEGER: <InputInteger {...inputProps} />,
-          BIGINT: <InputBigInteger {...inputProps} />,
-          DATETIME: <DateTimePicker {...dpProps} />,
-          DATE: <DatePicker {...dpProps} />,
           TIME: <TimePicker {...tpProps} />,
+          DATE: <DatePicker {...dpProps} />,
+          REAL: <InputNumber {...inputProps} />,
+          BIGINT: <InputBigInteger {...inputProps} />,
+          STRING: <Input {...inputProps} />,
+          INTEGER: <InputInteger {...inputProps} />,
+          DATETIME: <DateTimePicker {...dpProps} />,
         };
       },
       [saving]

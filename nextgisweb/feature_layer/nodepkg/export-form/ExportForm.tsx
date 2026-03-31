@@ -22,6 +22,7 @@ import type { SRSRead } from "@nextgisweb/spatial-ref-sys/type/api";
 import type { FilterExpressionString } from "../feature-filter/type";
 import { useExportFeatureLayer } from "../hook/useExportFeatureLayer";
 import type { ExportFeatureLayerOptions } from "../hook/useExportFeatureLayer";
+import { ResourceFeatureFilterModalLazy } from "../resource-feature-filter/ResourceFeatureFilterModalLazy";
 
 interface ExportFormProps {
   id: number;
@@ -110,12 +111,11 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
   const [filterExpression, setFilterExpression] = useState<
     FilterExpressionString | undefined
   >();
-  const [layerFields, setLayerFields] = useState<FeatureLayerFieldRead[]>([]);
   const form = Form.useForm<FormProps>()[0];
 
   const loading = staffLoading || exportLoading;
 
-  const { lazyModal, modalHolder } = useShowModal();
+  const { showModal, modalHolder } = useShowModal();
 
   const initialValues = useMemo(() => {
     const initialVals: Partial<FormProps> = {
@@ -141,13 +141,13 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
   );
 
   const handleFilterClick = useCallback(() => {
-    lazyModal(() => import("../feature-filter/FeatureFilterModalLazy"), {
+    showModal(ResourceFeatureFilterModalLazy, {
       id: "resource-filter",
-      fields: layerFields,
+      resourceId: id,
       value: filterExpression,
       onApply: handleFilterApply,
     });
-  }, [lazyModal, layerFields, filterExpression, handleFilterApply]);
+  }, [showModal, id, filterExpression, handleFilterApply]);
 
   const load = useCallback(async () => {
     try {
@@ -173,7 +173,6 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
               false
           );
           const fields = itemInfo.feature_layer.fields;
-          setLayerFields(fields);
           setFieldOptions(fieldListToOptions(fields));
         } else {
           const defSrs = srsInfo.find((srs) => srs.id === 3857);

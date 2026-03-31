@@ -12,6 +12,7 @@ import type {
   FilterGroup,
   FilterGroupChild,
   FilterState,
+  FilterValueWidgetComponent,
   GroupExpr,
   LogicalOp,
 } from "./type";
@@ -31,6 +32,7 @@ function stringifyExpresion(
 export interface FilterEditorStoreOptions {
   fields: FeatureLayerFieldRead[];
   value?: FilterExpressionString;
+  valueWidget?: FilterValueWidgetComponent;
 }
 
 export interface MoveFilterItem {
@@ -58,6 +60,8 @@ export class FilterEditorStore {
   @observable.shallow accessor fields: FeatureLayerFieldRead[] = [];
   @observable.deep accessor filterState: FilterState =
     generateEMptyFilterState();
+  @observable.ref accessor valueWidget: FilterValueWidgetComponent | undefined =
+    undefined;
   @observable accessor activeTab: ActiveTab = "constructor";
   @observable accessor jsonValue: FilterExpressionString | undefined =
     undefined;
@@ -71,6 +75,7 @@ export class FilterEditorStore {
 
   constructor(options: FilterEditorStoreOptions) {
     this.fields = options.fields;
+    this.valueWidget = options.valueWidget;
     if (options.value) {
       this.loadFilter(options.value);
     } else {

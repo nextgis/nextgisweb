@@ -25,6 +25,7 @@ import type { CompositeRead } from "@nextgisweb/resource/type/api";
 import type { FeatureEditorWidgetProps } from "../feature-editor/type";
 import type { FilterExpressionString } from "../feature-filter/type";
 import FilteredCount from "../filtered-count/FilteredCount";
+import { ResourceFeatureFilterModalLazy } from "../resource-feature-filter/ResourceFeatureFilterModalLazy";
 
 import type { FeatureGridStore } from "./FeatureGridStore";
 import { deleteFeatures } from "./api/deleteFeatures";
@@ -68,14 +69,13 @@ export const FeatureGridActions = observer(
       onDelete,
       onSave: onSaveProp,
       onOpen,
-      fields,
     } = store;
 
     const { isExportAllowed } = useResource({ id });
     const { data: resourceData } = useRouteGet("resource.item", { id });
 
     const { confirmDelete, contextHolder } = useConfirm();
-    const { lazyModal, modalHolder } = useShowModal();
+    const { showModal, lazyModal, modalHolder } = useShowModal();
 
     const goTo = useCallback(
       (
@@ -147,12 +147,12 @@ export const FeatureGridActions = observer(
     );
 
     const handleAdvancedFilterClick = useCallback(() => {
-      lazyModal(() => import("../feature-filter/FeatureFilterModalLazy"), {
-        fields,
+      showModal(ResourceFeatureFilterModalLazy, {
+        resourceId: id,
         value: filterExpression || undefined,
         onApply: handleFilterApply,
       });
-    }, [lazyModal, fields, filterExpression, handleFilterApply]);
+    }, [showModal, id, filterExpression, handleFilterApply]);
 
     const defActions: ActionToolbarAction<ActionProps>[] = [
       (props: CreateButtonActionProps) => (

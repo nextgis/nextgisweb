@@ -1,13 +1,27 @@
 import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
+import type { ValueInput } from "./component/FilterCondition";
+
 export type FilterExpressionString = string & {
   readonly __brand: "FilterExpressionString";
 };
 
+export interface FilterValueWidgetProps {
+  field: ResolvedFieldRef;
+  value: unknown;
+  operator: Operator;
+  disabled: boolean;
+  placeholder?: string;
+  onChange: (value: ValueInput) => void;
+}
+
+export type FilterValueWidgetComponent = React.FC<FilterValueWidgetProps>;
+
 export interface FeatureFilterEditorProps {
   fields: FeatureLayerFieldRead[];
   value?: FilterExpressionString | undefined;
+  valueWidget?: FilterValueWidgetComponent;
   onChange?: (value: FilterExpressionString | undefined) => void;
   onValidityChange?: (isValid: boolean) => void;
   showFooter?: boolean;
@@ -110,6 +124,7 @@ export interface ResolvedFieldRef {
   label: string;
   datatype: FeatureLayerFieldRead["datatype"];
   isVirtual: boolean;
+  lookupTable?: FeatureLayerFieldRead["lookup_table"];
 }
 
 export type Operator = (typeof ValidOperators)[number];
