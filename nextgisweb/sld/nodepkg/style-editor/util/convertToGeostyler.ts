@@ -3,6 +3,7 @@ import type {
   LineSymbolizer as GSLineSymbolizer,
   MarkSymbolizer as GSMarkSymbolizer,
   Symbolizer as GSSymbolizer,
+  TextSymbolizer as GSTextSymbolizer,
   WellKnownName as GSWellKnownName,
 } from "geostyler-style";
 
@@ -11,6 +12,7 @@ import type {
   LineSymbolizer,
   PointSymbolizer,
   PolygonSymbolizer,
+  TextSymbolizer,
 } from "@nextgisweb/sld/type/api";
 
 import type { Symbolizer } from "../type/Style";
@@ -73,9 +75,21 @@ function reverseConvertFillSymbolizer(
   };
 }
 
-export function convertToGeostyler(
-  symbolizer: Symbolizer
-): GSSymbolizer | null {
+function reverseConvertTextSymbolizer(
+  symbolizer: TextSymbolizer
+): GSTextSymbolizer {
+  const { fill, field, font_size } = symbolizer;
+  return {
+    kind: "Text",
+    color: fill?.color,
+    haloColor: fill?.color,
+    opacity: fill?.opacity,
+    size: font_size,
+    label: field,
+  };
+}
+
+export function convertToGeostyler(symbolizer: Symbolizer): GSSymbolizer {
   switch (symbolizer.type) {
     case "point":
       return deepCleanUndefined(reverseConvertMarkSymbolizer(symbolizer));
@@ -83,7 +97,11 @@ export function convertToGeostyler(
       return deepCleanUndefined(reverseConvertLineSymbolizer(symbolizer));
     case "polygon":
       return deepCleanUndefined(reverseConvertFillSymbolizer(symbolizer));
+    case "text":
+      return deepCleanUndefined(reverseConvertTextSymbolizer(symbolizer));
     default:
-      return null;
+      throw new Error(
+        `Symbolyser converting error: ${symbolizer.type} is not support`
+      );
   }
 }

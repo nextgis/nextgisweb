@@ -3,12 +3,15 @@ import type {
   LineSymbolizer,
   MarkSymbolizer,
   Symbolizer,
+  TextSymbolizer,
 } from "geostyler-style";
 
 interface KindParams {
   "Mark": MarkSymbolizer;
   "Fill": FillSymbolizer;
   "Line": LineSymbolizer;
+  "Text": TextSymbolizer;
+  "text": TextSymbolizer;
   "point": MarkSymbolizer;
   "polygon": FillSymbolizer;
   "line": LineSymbolizer;
@@ -30,6 +33,13 @@ const lineSymbolizer: LineSymbolizer = {
   kind: "Line",
   color: "#0E1058",
   width: 3,
+};
+
+export const textSymbolizer: TextSymbolizer = {
+  kind: "Text",
+  color: "#000000",
+  haloColor: "#000000",
+  size: 12,
 };
 
 const defaultSymbolizer: Symbolizer = markSymbolizer;
@@ -62,7 +72,6 @@ export function generateSymbolizer<K extends keyof KindParams>(
         ...lineSymbolizer,
         ...values,
       };
-
     default:
       return {
         ...defaultSymbolizer,

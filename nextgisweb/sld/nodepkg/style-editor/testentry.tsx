@@ -6,16 +6,17 @@ import { SymbolizerCard } from "./component/SymbolizerCard";
 import { TypeSelect } from "./component/TypeSelect";
 import type { Symbolizer, SymbolizerType } from "./type/Style";
 import { convertFromGeostyler } from "./util/convertFromGeostyler";
+import { convertToGeostyler } from "./util/convertToGeostyler";
 import { generateSymbolizer } from "./util/generateSymbolizer";
 
 function StyleEditorTest() {
-  const [symbolizer, setSymbolizer] = useState<Symbolizer>();
+  const [symbolizer, setSymbolizer] = useState<Symbolizer[]>();
   const [type, setType] = useState<SymbolizerType>("point");
 
   useEffect(() => {
     const s = convertFromGeostyler(generateSymbolizer(type));
     if (s) {
-      setSymbolizer(s);
+      setSymbolizer([s]);
     }
   }, [type]);
 
@@ -28,7 +29,9 @@ function StyleEditorTest() {
         <StyleEditor value={symbolizer} onChange={setSymbolizer} />
       </div>
       <p>Symbolizer:</p>
-      {symbolizer && <SymbolizerCard symbolizer={symbolizer} />}
+      {symbolizer && (
+        <SymbolizerCard symbolizer={symbolizer.map(convertToGeostyler)} />
+      )}
       <p>Schema:</p>
       {JSON.stringify(symbolizer, null, 2)}
     </>

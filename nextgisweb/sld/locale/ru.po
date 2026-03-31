@@ -1,30 +1,34 @@
-#: nodepkg/style-editor/RasterStyleEditor.tsx:15
+#: nodepkg/style-editor/RasterStyleEditor.tsx:14
 msgid "Band {}"
 msgstr "Канал {}"
 
-#: nodepkg/style-editor/RasterStyleEditor.tsx:149
+#: nodepkg/style-editor/RasterStyleEditor.tsx:141
 msgid "Red channel"
 msgstr "Красный канал"
 
-#: nodepkg/style-editor/RasterStyleEditor.tsx:153
-#: nodepkg/style-editor/RasterStyleEditor.tsx:166
-#: nodepkg/style-editor/RasterStyleEditor.tsx:179
+#: nodepkg/style-editor/RasterStyleEditor.tsx:145
+#: nodepkg/style-editor/RasterStyleEditor.tsx:158
+#: nodepkg/style-editor/RasterStyleEditor.tsx:171
 msgid "Min"
 msgstr "Минимум"
 
-#: nodepkg/style-editor/RasterStyleEditor.tsx:157
-#: nodepkg/style-editor/RasterStyleEditor.tsx:170
-#: nodepkg/style-editor/RasterStyleEditor.tsx:183
+#: nodepkg/style-editor/RasterStyleEditor.tsx:149
+#: nodepkg/style-editor/RasterStyleEditor.tsx:162
+#: nodepkg/style-editor/RasterStyleEditor.tsx:175
 msgid "Max"
 msgstr "Максимум"
 
-#: nodepkg/style-editor/RasterStyleEditor.tsx:162
+#: nodepkg/style-editor/RasterStyleEditor.tsx:154
 msgid "Green channel"
 msgstr "Зеленый канал"
 
-#: nodepkg/style-editor/RasterStyleEditor.tsx:175
+#: nodepkg/style-editor/RasterStyleEditor.tsx:167
 msgid "Blue channel"
 msgstr "Синий канал"
+
+#: nodepkg/style-editor/StyleEditor.tsx:21
+msgid "Label"
+msgstr "Подписи"
 
 #: nodepkg/style-editor/component/KindEditor.tsx:24
 msgid "Symbolizer unknown!"
@@ -81,6 +85,18 @@ msgstr "Форма"
 #: nodepkg/style-editor/component/editor/MarkEditor.tsx:19
 msgid "Size"
 msgstr "Размер"
+
+#: nodepkg/style-editor/component/editor/TextEditor.tsx:15
+msgid "Label size"
+msgstr "Размер подписи"
+
+#: nodepkg/style-editor/component/editor/TextEditor.tsx:16
+msgid "Label color"
+msgstr "Цвет подписи"
+
+#: nodepkg/style-editor/component/editor/TextEditor.tsx:17
+msgid "Label field"
+msgstr "Поле подписи"
 
 #: nodepkg/style-editor/field/ColorInput.tsx:18
 msgid "None"

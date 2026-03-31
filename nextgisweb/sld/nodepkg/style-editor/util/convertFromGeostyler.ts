@@ -3,6 +3,7 @@ import type {
   LineSymbolizer as GSLineSymbolizer,
   MarkSymbolizer as GSMarkSymbolizer,
   Symbolizer as GSSymbolizer,
+  TextSymbolizer as GSTextSymbolizer,
   GeoStylerNumberFunction,
 } from "geostyler-style";
 
@@ -11,6 +12,7 @@ import type {
   LineSymbolizer,
   PointSymbolizer,
   PolygonSymbolizer,
+  TextSymbolizer,
   WellKnownName,
 } from "@nextgisweb/sld/type/api";
 
@@ -80,6 +82,22 @@ function convertFillSymbolizer(gsFill: GSFillSymbolizer): PolygonSymbolizer {
   };
 }
 
+function convertTextSymbolizer(gsFill: GSTextSymbolizer): TextSymbolizer {
+  const fillOpacity = setOpacity(gsFill.opacity);
+
+  return {
+    type: "text",
+    fill: gsFill.color
+      ? {
+          color: String(gsFill.color),
+          opacity: fillOpacity,
+        }
+      : undefined,
+    font_size: Number(gsFill.size),
+    field: String(gsFill.label),
+  };
+}
+
 export function convertFromGeostyler(
   gsSymbolizer: GSSymbolizer
 ): Symbolizer | null {
@@ -90,6 +108,8 @@ export function convertFromGeostyler(
       return deepCleanUndefined(convertLineSymbolizer(gsSymbolizer));
     case "Fill":
       return deepCleanUndefined(convertFillSymbolizer(gsSymbolizer));
+    case "Text":
+      return deepCleanUndefined(convertTextSymbolizer(gsSymbolizer));
     default:
       return null;
   }

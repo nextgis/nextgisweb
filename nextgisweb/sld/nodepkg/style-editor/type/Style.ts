@@ -2,7 +2,7 @@ import type { Rule, Style } from "@nextgisweb/sld/type/api";
 
 export type Symbolizer = Rule["symbolizers"][0];
 
-export type SymbolizerType = Exclude<Symbolizer["type"], "raster">;
+export type SymbolizerType = Exclude<Symbolizer["type"], "raster" | "text">;
 
 export interface SLD {
   id: number;
