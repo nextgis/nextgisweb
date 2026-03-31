@@ -20,6 +20,7 @@ from nextgisweb.env import gettext, gettextf
 from nextgisweb.lib import saext
 from nextgisweb.lib.logging import logger
 from nextgisweb.lib.saext import postgres_url
+from nextgisweb.lib.saext.geometry import register_geometry_reflection
 
 from nextgisweb.feature_layer import FIELD_TYPE
 
@@ -233,6 +234,10 @@ class TableNotExists(Exception):
 
 class TableInspector:
     def __init__(self, conn, schema, table):
+        # Ensure our Geometry type is used for reflection, not GeoAlchemy2's
+        # type if GeoAlchemy2 was imported after nextgisweb.lib.saext.geometry.
+        register_geometry_reflection()
+
         i = inspect(conn)
         if not i.has_table(table, schema):
             raise TableNotExists()

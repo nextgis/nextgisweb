@@ -47,4 +47,11 @@ def _geometry_from_reflection(*args, **kw):
     return Geometry("GEOMETRY", 0)
 
 
-PGDialect.ischema_names["geometry"] = _geometry_from_reflection
+def register_geometry_reflection():
+    # GeoAlchemy2 will override this if imported after us, so this function
+    # should be called after geoalchemy2 is imported (if it is) or right before
+    # using introspection.
+    PGDialect.ischema_names["geometry"] = _geometry_from_reflection
+
+
+register_geometry_reflection()
