@@ -21,6 +21,8 @@ abstract class BaseTreeItemStore {
   @observable.ref accessor label: string;
   @observable.ref accessor title: string;
 
+  @observable accessor changeStamp = 0;
+
   protected constructor(
     init: Pick<
       TreeChildrenItemConfig,
@@ -47,13 +49,25 @@ abstract class BaseTreeItemStore {
   }
 
   @action.bound
+  protected touch() {
+    this.changeStamp += 1;
+  }
+
+  @action.bound
   update(values: Partial<this>): void {
+    let changed = false;
+
     for (const [key, value] of Object.entries(values)) {
       const k = key as keyof this;
       const oldValue = this[k];
       if (oldValue !== value) {
         this[k] = value;
+        changed = true;
       }
+    }
+
+    if (changed) {
+      this.touch();
     }
   }
 }
@@ -66,25 +80,36 @@ export class LegendInfoStore implements LegendInfo {
 
   @observable.ref accessor symbols: LegendSymbol[] | null = null;
 
+  @observable accessor changeStamp = 0;
+
   constructor({ visible, has_legend }: LegendInfo) {
     this.visible = visible;
     this.has_legend = has_legend;
   }
 
+  @action.bound
+  protected touch() {
+    this.changeStamp += 1;
+  }
+
   @action
   setVisible(val: LegendInfo["visible"]) {
     this.visible = val;
+    this.touch();
   }
 
   @action
   toggleVisible() {
     this.visible = this.visible === "collapse" ? "expand" : "collapse";
+    this.touch();
   }
 
   @action
   setSymbols(val: LegendSymbol[]) {
     this.symbols = val;
+    this.touch();
   }
+
   @computed
   get single() {
     return !!this.symbols && this.symbols.length === 1;
@@ -230,6 +255,7 @@ export class TreeLayerStore
   @action
   setItemSymbols(intervals: string[]) {
     this.symbols = intervals.length ? intervals : "-1";
+    this.touch();
   }
 
   private _consolidateIntervals = (symbols: number[]): string[] => {
@@ -285,6 +311,7 @@ export class TreeGroupStore
   @action.bound
   setChildrenIds(ids: number[]) {
     this.childrenIds = [...ids];
+    this.touch();
   }
 }
 

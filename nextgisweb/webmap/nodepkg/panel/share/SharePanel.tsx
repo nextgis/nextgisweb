@@ -235,7 +235,7 @@ const SharePanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
     };
   }, [
     display.map.started,
-    display.treeStore.items,
+    display.treeStore.deepTreeStamp,
     display.map.baseLayer,
     display.map.olMap,
     updateEmbedCode,
