@@ -11,7 +11,13 @@ from nextgisweb.resource.extaccess import ExternalAccessLink
 
 from .component import RasterLayerComponent
 from .gdaldriver import GDAL_DRIVER_NAME_2_EXPORT_FORMATS
-from .model import RasterLayer
+from .model import RasterLayer, RasterLayerStorage
+
+
+class RasterLayerStorageWidget(Widget):
+    resource = RasterLayerStorage
+    operation = ("create", "update")
+    amdmod = jsentry("@nextgisweb/raster-layer/storage-widget")
 
 
 class RasterLayerWidget(Widget):

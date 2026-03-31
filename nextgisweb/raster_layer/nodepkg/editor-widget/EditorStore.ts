@@ -9,6 +9,7 @@ import type {
   EditorStoreOptions,
   EditorStore as IEditorStore,
 } from "@nextgisweb/resource/type";
+import type { ResourceRef } from "@nextgisweb/resource/type/api";
 import srsSettings from "@nextgisweb/spatial-ref-sys/client-settings";
 
 export class EditorStore implements IEditorStore<
@@ -22,6 +23,8 @@ export class EditorStore implements IEditorStore<
   @observable.ref accessor uploading = false;
   @observable.ref accessor cog = settings.cogDefault;
   @observable.ref accessor cogInitial: boolean | undefined = undefined;
+  @observable.ref accessor storage: ResourceRef | null = null;
+  @observable.ref accessor storageInitial: ResourceRef | null = null;
 
   @observable.ref accessor dirty = false;
 
@@ -32,6 +35,7 @@ export class EditorStore implements IEditorStore<
   @action
   load(value: apitype.RasterLayerRead) {
     this.cog = this.cogInitial = !!value.cog;
+    this.storage = this.storageInitial = value.storage ?? null;
     this.dirty = false;
   }
 
@@ -47,13 +51,20 @@ export class EditorStore implements IEditorStore<
     return {
       ...(this.source || this.cog !== this.cogInitial ? { cog: this.cog } : {}),
       ...(this.source ? { source: this.source, srs: srsSettings.default } : {}),
+      ...(this.composite.operation === "create" && this.storage
+        ? { storage: this.storage }
+        : {}),
     };
   }
 
   @action
   update(props: Partial<this>) {
     Object.assign(this, props);
-    if (props.source !== undefined || props.cog !== undefined) {
+    if (
+      props.source !== undefined ||
+      props.cog !== undefined ||
+      props.storage !== undefined
+    ) {
       this.dirty = true;
     }
   }

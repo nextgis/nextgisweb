@@ -504,6 +504,12 @@ class CoreComponent(StorageComponentMixin, Component):
         Option("test.database.name"),
         Option("test.database.user"),
         Option("test.database.password", secure=True),
+        # S3 storage for running tests
+        Option("test.storage.endpoint"),
+        Option("test.storage.bucket"),
+        Option("test.storage.access_key"),
+        Option("test.storage.secret_key"),
+        Option("test.storage.prefix", default=""),
         # Data storage
         Option("sdir", required=True, doc=(
             "Path to filesytem data storage where data stored along "

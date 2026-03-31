@@ -48,6 +48,28 @@ ExportResponse = AnyOf[
 ]  # type: ignore
 
 
+class VsiFileIter:
+    def __init__(self, vsi, size, block_size=DEFAULT_BUFFER_SIZE):
+        self.vsi = vsi
+        self.remaining = size
+        self.block_size = block_size
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self.remaining <= 0:
+            raise StopIteration()
+        data = bytes(gdal.VSIFReadL(1, min(self.remaining, self.block_size), self.vsi))
+        if not data:
+            raise StopIteration()
+        self.remaining -= len(data)
+        return data
+
+    def close(self):
+        gdal.VSIFCloseL(self.vsi)
+
+
 class RangeFileWrapper(FileIter):
     def __init__(self, file, block_size=DEFAULT_BUFFER_SIZE, offset=0, length=0):
         super().__init__(file=file, block_size=block_size)
@@ -111,7 +133,11 @@ def export(
             response.content_disposition = content_disposition
             return response
 
-    source_filename = env.raster_layer.workdir_path(resource.fileobj, resource.fileobj_pam)
+    if resource.storage is not None:
+        resource.storage.configure_gdal()
+        source_filename = resource.storage.vsi_path(resource.storage_filename)
+    else:
+        source_filename = env.raster_layer.workdir_path(resource.fileobj, resource.fileobj_pam)
     if bands is not None and len(bands) != resource.band_count:
         with tempfile.NamedTemporaryFile(suffix=".tif") as tmp_file:
             gdal.Translate(tmp_file.name, str(source_filename), bandList=bands)
@@ -120,9 +146,17 @@ def export(
         return _warp(str(source_filename))
 
 
-def cog_head(
-    resource: RasterLayer, request
-) -> Annotated[Response, ContentType("image/tiff; application=geotiff; profile=cloud-optimized")]:
+COG_CONTENT_TYPE = "image/tiff; application=geotiff; profile=cloud-optimized"
+
+
+def cog_file_size(resource: RasterLayer) -> int:
+    if resource.storage is not None:
+        resource.storage.configure_gdal()
+        return gdal.VSIStatL(resource.storage.vsi_path(resource.storage_filename)).size
+    return resource.fileobj.size
+
+
+def cog_head(resource: RasterLayer, request) -> Annotated[Response, ContentType(COG_CONTENT_TYPE)]:
     """Cloud optimized GeoTIFF endpoint
 
     :returns: COG file metadata headers"""
@@ -133,8 +167,8 @@ def cog_head(
 
     return Response(
         accept_ranges="bytes",
-        content_length=resource.fileobj.size,
-        content_type="image/tiff; application=geotiff; profile=cloud-optimized",
+        content_length=cog_file_size(resource),
+        content_type=COG_CONTENT_TYPE,
     )
 
 
@@ -143,7 +177,7 @@ def cog_get(
 ) -> Annotated[
     Response,
     StatusCode(206),
-    ContentType("image/tiff; application=geotiff; profile=cloud-optimized"),
+    ContentType(COG_CONTENT_TYPE),
 ]:
     """Cloud optimized GeoTIFF endpoint
 
@@ -158,7 +192,8 @@ def cog_get(
     if range is None:
         raise ValidationError(gettext("Range header is missed or invalid."))
 
-    content_range = range.content_range(resource.fileobj.size)
+    file_size = cog_file_size(resource)
+    content_range = range.content_range(file_size)
     if content_range is None:
         raise ValidationError(gettext("Range %s can not be read." % range))
 
@@ -166,14 +201,23 @@ def cog_get(
     response = Response(
         status_code=206,
         content_range=content_range,
-        content_type="image/tiff; application=geotiff; profile=cloud-optimized",
+        content_type=COG_CONTENT_TYPE,
     )
 
-    response.app_iter = RangeFileWrapper(
-        open(resource.fileobj.filename(), "rb"),
-        offset=content_range.start,
-        length=content_length,
-    )
+    if resource.storage is not None:
+        vsi_path = resource.storage.vsi_path(resource.storage_filename)
+        vsi = gdal.VSIFOpenL(vsi_path, "rb")
+        try:
+            gdal.VSIFSeekL(vsi, content_range.start, os.SEEK_SET)
+            response.body = bytes(gdal.VSIFReadL(1, content_length, vsi))
+        finally:
+            gdal.VSIFCloseL(vsi)
+    else:
+        response.app_iter = RangeFileWrapper(
+            open(resource.fileobj.filename(), "rb"),
+            offset=content_range.start,
+            length=content_length,
+        )
     response.content_length = content_length
 
     return response
@@ -188,12 +232,26 @@ def download(
 
     request.resource_permission(DataScope.read)
 
+    content_disposition = "attachment; filename=%s.tif" % request.context.id
+
+    if resource.storage is not None:
+        resource.storage.configure_gdal()
+        vsi_path = resource.storage.vsi_path(resource.storage_filename)
+        file_size = gdal.VSIStatL(vsi_path).size
+        response = Response(
+            content_type="image/tiff; application=geotiff",
+            content_length=file_size,
+            content_disposition=content_disposition,
+        )
+        response.app_iter = VsiFileIter(gdal.VSIFOpenL(vsi_path, "rb"), file_size)
+        return response
+
     response = FileResponse(
         resource.fileobj.filename(),
         content_type="image/tiff; application=geotiff",
         request=request,
     )
-    response.content_disposition = "attachment; filename=%s.tif" % request.context.id
+    response.content_disposition = content_disposition
     set_output_buffering(request, response, False)
     return response
 

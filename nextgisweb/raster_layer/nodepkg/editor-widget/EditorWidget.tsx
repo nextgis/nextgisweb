@@ -1,21 +1,27 @@
 import { observer } from "mobx-react-lite";
 
 import { FileUploader } from "@nextgisweb/file-upload/file-uploader";
-import { CheckboxValue } from "@nextgisweb/gui/antd";
+import { CheckboxValue, Tooltip } from "@nextgisweb/gui/antd";
 import { Area, Lot } from "@nextgisweb/gui/mayout";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import { ResourceSelectRef } from "@nextgisweb/resource/component";
 import type { EditorWidget as IEditorWidget } from "@nextgisweb/resource/type";
 
 import settings from "../client-settings";
 
 import type { EditorStore } from "./EditorStore";
 
+import ExperimentalIcon from "@nextgisweb/icon/material/science";
+
 /* prettier-ignore */ const
 msgSelectDataset = gettext("Select a dataset"),
+msgStorage = gettext("Raster layer storage"),
+msgExperimental = gettext("External storage support is an experimental feature. Use it with caution!"),
 msgCog = gettext("Cloud Optimized GeoTIFF (COG)");
 
 export const EditorWidget: IEditorWidget<EditorStore> = observer(
   ({ store }) => {
+    const isCreate = store.composite.operation === "create";
     return (
       <Area pad>
         <Lot label={false}>
@@ -28,14 +34,39 @@ export const EditorWidget: IEditorWidget<EditorStore> = observer(
             showMaxSize
           />
         </Lot>
-        <Lot label={false}>
-          <CheckboxValue
-            value={store.cog}
-            onChange={(v) => store.update({ cog: v })}
+        {(isCreate || store.storageInitial) && (
+          <Lot
+            label={
+              <>
+                {msgStorage}{" "}
+                <Tooltip title={msgExperimental}>
+                  <ExperimentalIcon />
+                </Tooltip>
+              </>
+            }
           >
-            {msgCog}
-          </CheckboxValue>
-        </Lot>
+            <ResourceSelectRef
+              value={store.storage}
+              readOnly={!!store.storageInitial}
+              allowClear
+              pickerOptions={{
+                requireClass: "raster_layer_storage",
+                initParentId: store.composite.parent,
+              }}
+              onChange={(v) => store.update({ storage: v })}
+            />
+          </Lot>
+        )}
+        {!store.storage && (
+          <Lot label={false}>
+            <CheckboxValue
+              value={store.cog}
+              onChange={(v) => store.update({ cog: v })}
+            >
+              {msgCog}
+            </CheckboxValue>
+          </Lot>
+        )}
       </Area>
     );
   }
