@@ -8,7 +8,7 @@ import { AreaContext } from "./Area";
 
 export interface LotProps {
   /** Label to display, or false to hide label cell */
-  label?: string | false;
+  label?: ReactNode;
 
   /** Show help icon and help message in tooltip */
   help?: ReactNode | (() => ReactNode);
