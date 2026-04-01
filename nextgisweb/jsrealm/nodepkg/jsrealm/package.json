@@ -64,7 +64,7 @@
     "svgo-loader": "^4.0.0",
     "tmp": "^0.2.3",
     "typescript": "^6.0.2",
-    "typescript-eslint": "^8.35.0",
+    "typescript-eslint": "^8.58.0",
     "webpack": "5.99.9",
     "webpack-bundle-analyzer": "^4.10.2",
     "webpack-cli": "^6.0.1",
