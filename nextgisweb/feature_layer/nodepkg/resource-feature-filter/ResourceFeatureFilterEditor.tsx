@@ -23,9 +23,10 @@ export function ResourceFeatureFilterEditor(
 ) {
   const { resourceId, ...editorProps } = props;
 
-  const { data, isLoading, error } = useRouteGet({
+  const { data, isLoading } = useRouteGet({
     name: "resource.item",
     params: { id: resourceId },
+    options: { cache: true },
   });
 
   const fields = data?.feature_layer?.fields;
@@ -41,7 +42,7 @@ export function ResourceFeatureFilterEditor(
     return <Spin />;
   }
 
-  if (error || !fields) {
+  if (!fields) {
     return;
   }
 
