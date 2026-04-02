@@ -189,7 +189,7 @@ export class Identify {
     const layerLabels: Record<number, string> = {};
     layerLabels[responseLayerId] = layerInfo.resource.display_name;
 
-    this.openIdentifyPanel({
+    await this.openIdentifyPanel({
       features: identifyResponse,
       point: center,
       layerLabels,
@@ -290,7 +290,7 @@ export class Identify {
   }
 
   @action.bound
-  private openIdentifyPanel({
+  private async openIdentifyPanel({
     features,
     point,
     layerLabels,
@@ -301,7 +301,7 @@ export class Identify {
     point: Coordinate;
     layerLabels: Record<string, string | null>;
     raster?: RasterLayerIdentifyResponse;
-  }): void {
+  }): Promise<void> {
     const response: IdentifyResponse = features || { featureCount: 0 };
 
     if (response.featureCount === 0) {
@@ -326,7 +326,8 @@ export class Identify {
 
     const pm = this.display.panelManager;
     const pkey = "identify";
-    const panel = pm.getPanel<IdentifyStore>(pkey);
+    const panel = (await pm.registerPlugin(pkey)) as IdentifyStore | undefined;
+
     if (panel) {
       panel.setIdentifyInfo(identifyInfo);
     } else {

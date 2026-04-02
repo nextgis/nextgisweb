@@ -20,23 +20,28 @@ export const MapPane = observer(
     });
 
     const whenCreated = useCallback(() => {
+      const ready = display.mapReady;
       display.setMapReady(true);
 
       const urlParams = display.urlParams;
 
-      if (!("zoom" in urlParams && "lon" in urlParams && "lat" in urlParams)) {
-        display.map.zoomToInitialExtent();
-      } else {
-        const view = display.map.olView;
-        if (urlParams.lon && urlParams.lat) {
-          view.setCenter(fromLonLat([urlParams.lon, urlParams.lat]));
-        }
-        if (urlParams.zoom !== undefined) {
-          view.setZoom(urlParams.zoom);
-        }
+      if (!ready) {
+        if (
+          !("zoom" in urlParams && "lon" in urlParams && "lat" in urlParams)
+        ) {
+          display.map.zoomToInitialExtent();
+        } else {
+          const view = display.map.olView;
+          if (urlParams.lon && urlParams.lat) {
+            view.setCenter(fromLonLat([urlParams.lon, urlParams.lat]));
+          }
+          if (urlParams.zoom !== undefined) {
+            view.setZoom(urlParams.zoom);
+          }
 
-        if ("angle" in urlParams && urlParams.angle !== undefined) {
-          view.setRotation(urlParams.angle);
+          if ("angle" in urlParams && urlParams.angle !== undefined) {
+            view.setRotation(urlParams.angle);
+          }
         }
       }
     }, [display]);

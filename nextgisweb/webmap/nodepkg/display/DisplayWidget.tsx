@@ -77,13 +77,7 @@ export const DisplayWidget = observer(
       }
 
       async function buildPluginsAndActivate() {
-        const allowPanels = panel.allowPanels;
-        const plugins = registry.queryAll(({ name, isEnabled }) => {
-          return (
-            (!allowPanels || allowPanels.includes(name)) &&
-            (!isEnabled || isEnabled(display))
-          );
-        });
+        const plugins = registry.queryAll();
 
         plugins.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
         for (const plugin of plugins) {

@@ -80,7 +80,19 @@ export class PanelManager {
     } else {
       plugin = pluginDef;
     }
+
+    if (this.panels.has(plugin.name)) {
+      return this.panels.get(plugin.name);
+    }
+
     if (plugin) {
+      if (this.allowPanels && !this.allowPanels.includes(plugin.name)) {
+        return;
+      }
+      if (plugin.isEnabled && !plugin.isEnabled(this._display)) {
+        return;
+      }
+
       const Cls = plugin.store ? (await plugin.store()).default : PanelStore;
       const panel = new Cls({ plugin, display: this._display });
       const panels = new Map(this.panels);
@@ -88,7 +100,6 @@ export class PanelManager {
       runInAction(() => {
         this.panels = panels;
       });
-      // this._handleInitActive();
       return panel;
     }
   }
