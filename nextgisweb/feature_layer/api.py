@@ -32,6 +32,7 @@ from .interface import (
     IFeatureQueryIlike,
     IFeatureQueryLike,
     IFilterableFeatureLayer,
+    ITransactionLayer,
     IVersionableFeatureLayer,
     IWritableFeatureLayer,
 )
@@ -279,6 +280,9 @@ def versioning(resource, request):
     if IVersionableFeatureLayer.providedBy(resource) and resource.fversioning:
         with resource.fversioning_context(request) as vobj:
             yield vobj
+    elif ITransactionLayer.providedBy(resource):
+        with resource.transaction():
+            yield None
     else:
         yield None
 

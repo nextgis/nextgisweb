@@ -1,6 +1,9 @@
 import json
 
 import pytest
+import sqlalchemy as sa
+
+from nextgisweb.lib.saext import postgres_url
 
 FILTER_DATASET = {
     "type": "FeatureCollection",
@@ -139,3 +142,32 @@ def postgis_filter_layer_id(ngw_env, postgis_filter_geojson, ngw_resource_group)
 
     with create_feature_layer(layer, parent_id=ngw_resource_group) as res:
         yield res.id
+
+
+@pytest.fixture
+def creds(ngw_env):
+    opts_db = ngw_env.core.options.with_prefix("test.database")
+
+    for o in ("host", "name", "user"):
+        if o not in opts_db:
+            pytest.skip(f"Option test.database.{o} isn't set")
+
+    return dict(
+        hostname=opts_db["host"],
+        port=opts_db["port"],
+        database=opts_db["name"],
+        username=opts_db["user"],
+        password=opts_db["password"],
+    )
+
+
+@pytest.fixture
+def engine(creds):
+    engine_url = postgres_url(
+        host=creds["hostname"],
+        port=creds["port"],
+        database=creds["database"],
+        username=creds["username"],
+        password=creds["password"],
+    )
+    return sa.create_engine(engine_url)

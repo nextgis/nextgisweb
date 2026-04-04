@@ -40,6 +40,7 @@ from nextgisweb.feature_layer import (
     IFeatureQueryLike,
     IFeatureQueryOrderBy,
     IFilterableFeatureLayer,
+    ITransactionLayer,
     IWritableFeatureLayer,
     LayerField,
 )
@@ -116,7 +117,7 @@ def calculate_extent(layer, where=None, geomcol=None):
         st_ymin(sq.c.bbox),
     )
 
-    with layer.connection.get_connection() as conn:
+    with layer._tx() as conn:
         maxLon, minLon, maxLat, minLat = conn.execute(select(*fields)).first()
 
     extent = dict(minLon=minLon, maxLon=maxLon, minLat=minLat, maxLat=maxLat)
@@ -257,7 +258,9 @@ class PostgisLayerField(LayerField):
     column_name = sa.Column(sa.Unicode, nullable=False)
 
 
-@implementer(IFeatureLayer, IFilterableFeatureLayer, IWritableFeatureLayer, IBboxLayer)
+@implementer(
+    IFeatureLayer, IFilterableFeatureLayer, IWritableFeatureLayer, IBboxLayer, ITransactionLayer
+)
 class PostgisLayer(Resource, FeatureLayerMixin):
     identity = "postgis_layer"
     cls_display_name = gettext("PostGIS layer")
@@ -297,6 +300,14 @@ class PostgisLayer(Resource, FeatureLayerMixin):
         )
         return source_meta
 
+    @contextmanager
+    def _tx(self):
+        if getattr(self, "_conn", None) is not None:
+            yield self._conn
+        else:
+            with self.transaction():
+                yield self._conn
+
     def setup(self):
         fdata = dict()
         for f in self.fields:
@@ -314,7 +325,7 @@ class PostgisLayer(Resource, FeatureLayerMixin):
 
         self.feature_label_field = None
 
-        with self.connection.get_connection() as conn:
+        with self._tx() as conn:
             inspector = sa.inspect(conn.engine)
             try:
                 columns = inspector.get_columns(self.table, self.schema)
@@ -519,7 +530,7 @@ class PostgisLayer(Resource, FeatureLayerMixin):
         tab = self._sa_table(True)
         stmt = sa.update(tab).values(self._makevals(feature)).where(idcol == feature.id)
 
-        with self.connection.get_connection() as conn:
+        with self._tx() as conn:
             conn.execute(stmt)
 
     def feature_create(self, feature):
@@ -534,7 +545,7 @@ class PostgisLayer(Resource, FeatureLayerMixin):
         tab = self._sa_table(True)
         stmt = sa.insert(tab).values(self._makevals(feature)).returning(idcol)
 
-        with self.connection.get_connection() as conn:
+        with self._tx() as conn:
             return conn.execute(stmt).scalar()
 
     def feature_delete(self, feature_id):
@@ -547,7 +558,7 @@ class PostgisLayer(Resource, FeatureLayerMixin):
         tab = self._sa_table()
         stmt = sa.delete(tab).where(idcol == feature_id)
 
-        with self.connection.get_connection() as conn:
+        with self._tx() as conn:
             conn.execute(stmt)
 
     def feature_delete_all(self):
@@ -555,8 +566,19 @@ class PostgisLayer(Resource, FeatureLayerMixin):
         tab = self._sa_table()
         stmt = sa.delete(tab)
 
-        with self.connection.get_connection() as conn:
+        with self._tx() as conn:
             conn.execute(stmt)
+
+    # ITransactionLayer
+    @contextmanager
+    def transaction(self):
+        assert getattr(self, "_conn", None) is None
+        try:
+            with self.connection.get_connection() as conn:
+                self._conn = conn
+                yield
+        finally:
+            self._conn = None
 
     # IBboxLayer
     @property
@@ -874,7 +896,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                 if len(where) > 0:
                     query = query.where(sa.and_(*where))
 
-                with self.layer.connection.get_connection() as conn:
+                with self.layer._tx() as conn:
                     result = conn.execute(query)
                     for row in result.mappings():
                         fdict = dict((keyname, row[label]) for keyname, label in selected_fields)
@@ -907,7 +929,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
             @property
             def total_count(self):
-                with self.layer.connection.get_connection() as conn:
+                with self.layer._tx() as conn:
                     query = sql.select(func.count(idcol))
                     if len(where) > 0:
                         query = query.where(sa.and_(*where))
