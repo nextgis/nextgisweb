@@ -186,6 +186,11 @@ class IVersionableFeatureLayer(IWritableFeatureLayer):
     pass
 
 
+class ITransactionLayer(IWritableFeatureLayer):
+    def transaction(self):
+        """Transaction context"""
+
+
 class IFeatureQuery(Interface):
     layer = Attribute(""" IFeatureLayer """)
 
