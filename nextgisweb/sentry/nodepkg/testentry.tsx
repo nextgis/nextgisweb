@@ -3,6 +3,8 @@ import { Button, Space } from "@nextgisweb/gui/antd";
 import { makeAbortError } from "@nextgisweb/gui/error/util";
 import { BaseError } from "@nextgisweb/jsrealm/error";
 
+import metrics from "./metrics";
+
 class CustomError extends BaseError {}
 
 export default function Testentry() {
@@ -35,6 +37,14 @@ export default function Testentry() {
         }}
       >
         AbortError
+      </Button>
+      <Button
+        onClick={() => {
+          metrics.count(COMP_ID, "test_counter", 1, { unit: "wow" });
+          metrics.flush();
+        }}
+      >
+        Test counter
       </Button>
     </Space.Compact>
   );

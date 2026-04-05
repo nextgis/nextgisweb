@@ -1,4 +1,7 @@
-interface Window {
-  // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-  ngwSentry?: import("@sentry/browser").BrowserClient | undefined;
+import type * as Sentry from "@sentry/browser";
+
+declare global {
+  interface Window {
+    ngwSentry?: typeof Sentry | undefined;
+  }
 }

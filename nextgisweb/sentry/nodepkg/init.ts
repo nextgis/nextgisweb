@@ -69,5 +69,5 @@ export function init(opts: { dsn: string; routeName: string }) {
     },
   });
 
-  window.ngwSentry = Sentry.getClient();
+  window.ngwSentry = Sentry;
 }
