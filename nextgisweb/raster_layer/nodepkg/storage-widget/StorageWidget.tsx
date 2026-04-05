@@ -1,17 +1,35 @@
 import { observer } from "mobx-react-lite";
 
-import { InputValue, PasswordValue } from "@nextgisweb/gui/antd";
+import { InputValue, PasswordValue, Select } from "@nextgisweb/gui/antd";
 import { LotMV } from "@nextgisweb/gui/arm";
-import { Area } from "@nextgisweb/gui/mayout";
+import { Area, Lot } from "@nextgisweb/gui/mayout";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { EditorWidget } from "@nextgisweb/resource/type";
 
 import type { StorageStore } from "./StorageStore";
 
+/** Fake select component for storage type
+ *
+ * Just to let a user know that AWS S3 is the only supported storage type for
+ * now, but more types may be added in the future.
+ * */
+function FakeTypeSelect() {
+  return (
+    <Select
+      style={{ width: "100%" }}
+      value="s3"
+      options={[{ value: "s3", label: "AWS S3" }]}
+    />
+  );
+}
+
 export const StorageWidget: EditorWidget<StorageStore> = observer(
   ({ store }) => {
     return (
       <Area pad>
+        <Lot label={gettext("Type")}>
+          <FakeTypeSelect />
+        </Lot>
         <LotMV
           label={gettext("Endpoint")}
           value={store.endpoint}

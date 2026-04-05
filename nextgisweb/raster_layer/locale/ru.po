@@ -15,7 +15,7 @@ msgid "Rasters and pyramids"
 msgstr "Растры и пирамиды"
 
 #: model.py:79 nodepkg/editor-widget/EditorWidget.tsx:18
-#: nodepkg/storage-widget/StorageWidget.tsx:50
+#: nodepkg/storage-widget/StorageWidget.tsx:68
 msgid "Raster layer storage"
 msgstr "Хранилище растровых слоёв"
 
@@ -130,23 +130,27 @@ msgstr "Скачать"
 msgid "Save as"
 msgstr "Сохранить как"
 
-#: nodepkg/storage-widget/StorageWidget.tsx:16
-msgid "Endpoint"
-msgstr "Aдрес сервера"
+#: nodepkg/storage-widget/StorageWidget.tsx:30
+msgid "Type"
+msgstr "Тип"
 
-#: nodepkg/storage-widget/StorageWidget.tsx:21
+#: nodepkg/storage-widget/StorageWidget.tsx:34
+msgid "Endpoint"
+msgstr "Адрес сервера"
+
+#: nodepkg/storage-widget/StorageWidget.tsx:39
 msgid "Bucket"
 msgstr "Бакет"
 
-#: nodepkg/storage-widget/StorageWidget.tsx:26
+#: nodepkg/storage-widget/StorageWidget.tsx:44
 msgid "Access key"
 msgstr "Ключ доступа"
 
-#: nodepkg/storage-widget/StorageWidget.tsx:31
+#: nodepkg/storage-widget/StorageWidget.tsx:49
 msgid "Secret key"
 msgstr "Секретный ключ"
 
-#: nodepkg/storage-widget/StorageWidget.tsx:40
+#: nodepkg/storage-widget/StorageWidget.tsx:58
 msgid "Prefix"
 msgstr "Префикс"
 
