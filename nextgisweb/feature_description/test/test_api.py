@@ -82,6 +82,17 @@ def test_feature_layer_api(versioning, ngw_webtest_app: WebTestApp):
     ]
     assert resp_fa is None
 
+    # Re-create description after deletion
+    payload = {"extensions": {"description": "baz"}}
+    resp = ngw_webtest_app.put(f"{burl}/1", json=payload).json
+    assert not versioning or resp["version"] == next(vcur)
+    resp_fa = ngw_webtest_app.get(f"{burl}/1?extensions=description").json["extensions"][
+        "description"
+    ]
+    assert resp_fa == "baz"
+    payload = {"extensions": {"description": None}}
+    ngw_webtest_app.put(f"{burl}/1", json=payload)
+
     # Insert a new feature with an description
     vup = next(vcur)
     payload = {"geom": f"POINT Z (3 3 {vup})", "extensions": {"description": "qux"}}

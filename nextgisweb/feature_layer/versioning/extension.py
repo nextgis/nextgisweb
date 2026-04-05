@@ -936,6 +936,17 @@ class FVersioningExtensionMixin:
         if r := getattr(target, "fversioning_restored", None):
             query = target.fversioning_queries.after_restore
             params.update(p_pid=r[0], p_pop=r[1])
+        elif hook == "after_insert" and not target.fversioning_has_id:
+            # For extensions without extension_id the et PK is (resource_id,
+            # feature_id). If a previously-deleted entry (version_op='D') still
+            # exists in et, a plain INSERT would cause UniqueViolation. Detect
+            # this via before_restore and use the restore flow instead.
+            row = connection.execute(target.fversioning_queries.before_restore, params).first()
+            if row is not None:
+                query = target.fversioning_queries.after_restore
+                params.update(p_pid=row.version_nid, p_pop=row.version_nop)
+            else:
+                query = target.fversioning_queries.after_insert
         else:
             query = getattr(target.fversioning_queries, hook)
 
