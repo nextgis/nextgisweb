@@ -9,9 +9,9 @@ export function init(opts: { dsn: string; routeName: string }) {
   // transpilation. This includes optional chaining, nullish coalescing, and
   // other features.
 
-  let es2020 = false;
+  let es2022 = false;
   try {
-    es2020 = eval(
+    es2022 = eval(
       "class C { static #f = true; t() { return C.#f } }; " +
         "((undefined?.() ?? Number.MAX_SAFE_INTEGER) === 9007199254740991) " +
         "&& !!Promise.allSettled && !!String.prototype.matchAll " +
@@ -19,12 +19,12 @@ export function init(opts: { dsn: string; routeName: string }) {
         "&& (new C()).t()"
     );
   } catch {
-    // Assume ES2020 is unsupported
+    // Assume ES2022 is unsupported
   }
 
-  // Skip Sentry initialization if ES2020 features are not supported
-  if (!es2020) {
-    console.warn("Sentry initialization skipped: ES2020 not supported.");
+  // Skip Sentry initialization if ES2022 features are not supported
+  if (!es2022) {
+    console.warn("Sentry initialization skipped: ES2022 not supported.");
     return;
   }
 
