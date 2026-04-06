@@ -23,7 +23,6 @@ export const Widget: EditorWidget<Store> = observer(({ store }) => {
         }}
         uploadText={msgSelectTileset}
         helpText={msgSupportedFormats}
-        showMaxSize
       />
     </div>
   );

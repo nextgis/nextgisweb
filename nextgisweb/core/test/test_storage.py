@@ -11,7 +11,7 @@ from nextgisweb.pyramid.test import WebTestApp
 from nextgisweb.vector_layer import VectorLayer
 
 from .. import KindOfData
-from ..storage import SQL_LOCK, StorageLimitExceeded
+from ..storage import SQL_LOCK, StorageFull, StorageInsufficient
 
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
 
@@ -148,14 +148,14 @@ def test_storage_limit_exceeded(ngw_env):
     with transaction.manager:
         with core.options.override({"storage.limit": 100}):
             core.reserve_storage("test_comp", TestKOD1, value_data_volume=50)
-            with pytest.raises(StorageLimitExceeded):
+            with pytest.raises(StorageInsufficient):
                 core.reserve_storage("test_comp", TestKOD1, value_data_volume=60)
             core.reserve_storage("test_comp", TestKOD1, value_data_volume=40)
         assert DBSession().info["storage.txn"] == 90
 
     with transaction.manager:
         with core.options.override({"storage.limit": 50}):
-            with pytest.raises(StorageLimitExceeded):
+            with pytest.raises(StorageFull):
                 core.check_storage_limit()
 
 

@@ -31,7 +31,6 @@ export const EditorWidget: IEditorWidget<EditorStore> = observer(
             multiple={false}
             uploadText={msgSelectDataset}
             helpText={settings.msgSupportedFormats}
-            showMaxSize
           />
         </Lot>
         {(isCreate || store.storageInitial) && (

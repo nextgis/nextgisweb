@@ -1,8 +1,9 @@
 import transaction
 from sqlalchemy.sql import or_
 
-from nextgisweb.env import Component, DBSession, require
+from nextgisweb.env import Component, DBSession, gettext, require
 from nextgisweb.lib.config import Option, SizeInBytes
+from nextgisweb.lib.humanize import format_size
 from nextgisweb.lib.logging import logger
 
 from .kind_of_data import RasterLayerData
@@ -12,10 +13,16 @@ from .workdir import WorkdirMixin
 
 
 class RasterLayerComponent(Component, WorkdirMixin):
+    @require("file_upload")
     def initialize(self):
         self.env.core.mksdir(self)
         self.wdir = self.env.core.gtsdir(self)
         self.cog_default = self.options["cog_default"]
+
+        if "size_limit" not in self.options:
+            self.size_limit = 2 * self.env.file_upload.options["max_size"]
+        else:
+            self.size_limit = self.options["size_limit"]
 
     def setup_pyramid(self, config):
         from . import api, view
@@ -34,6 +41,10 @@ class RasterLayerComponent(Component, WorkdirMixin):
         for layer in RasterLayer.query():
             if (err := layer._check_integrity()) is not None:
                 yield f"{err} [{RasterLayer.cls_display_name} #{layer.id}]"
+
+    def sys_info(self):
+        if self.size_limit is not None:
+            yield (gettext("Uncompressed raster size limit"), format_size(self.size_limit))
 
     def build_missing_overviews(self):
         logger.info("Building missing raster overviews...")
@@ -76,5 +87,10 @@ class RasterLayerComponent(Component, WorkdirMixin):
 
     option_annotations = (
         Option("cog_default", bool, default=True),
-        Option("size_limit", SizeInBytes, default=None),
+        Option(
+            "size_limit",
+            SizeInBytes,
+            default=None,
+            doc="Uncompressed raster size limit (by default equals 2x file upload max size)",
+        ),
     )

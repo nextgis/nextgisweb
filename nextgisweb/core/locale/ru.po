@@ -58,23 +58,25 @@ msgstr "Не сконфигурировано"
 msgid "Font not found: {}!"
 msgstr "Шрифт не найден: {}!"
 
-#: storage.py:291
+#: storage.py:310
 msgid "Storage full"
 msgstr "Хранилище переполнено"
 
-#: storage.py:293
+#: storage.py:312
 msgid ""
-"This operation can't be performed because the storage limit (%s) has been "
-"already exceeded by %s."
+"The operation cannot be completed because the storage is over limit by "
+"{excess_size}. You currently have {storage_used} of {storage_limit} used. "
+"Free up some storage space before proceeding."
 msgstr ""
-"Операция не может быть выполнена, так как лимит использования хранилища (%s) "
-"уже превышен на %s."
+"Операция не может быть выполнена, так как хранилище переполнено на "
+"{excess_size}. У вас уже используется {storage_used} из {storage_limit}. "
+"Освободите место в хранилище перед тем как продолжить."
 
-#: storage.py:302
+#: storage.py:332
 msgid "Not enough storage"
 msgstr "Недостаточно места в хранилище"
 
-#: storage.py:304
+#: storage.py:334
 msgid ""
 "This operation requires %s of storage and can't be performed because only %s "
 "available."
@@ -82,7 +84,7 @@ msgstr ""
 "Операция не может быть выполнена, так как для ее выполнения требуется %s в "
 "хранилище, однако доступно только %s."
 
-#: storage.py:313
+#: storage.py:355
 msgid "Estimation is already running"
 msgstr "Процесс оценки хранилища уже запущен"
 

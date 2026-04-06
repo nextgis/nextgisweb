@@ -13,11 +13,21 @@ from nextgisweb.lib.apitype import AnyOf, AsJSON, StatusCode
 
 from nextgisweb.core import CoreComponent
 from nextgisweb.core.exception import UserException
+from nextgisweb.core.storage import StorageInsufficient
 
 from .component import FileUploadComponent
+from .exception import FileUploadStorageInsufficient
 from .model import FileUpload, FileUploadID, FileUploadNotCompleted, FileUploadNotFound
 
 BUF_SIZE = 1024 * 1024
+
+
+@inject()
+def check_storage_limit(file_size, *, core: CoreComponent):
+    try:
+        core.check_storage_limit(requested=file_size)
+    except StorageInsufficient as exc:
+        raise FileUploadStorageInsufficient(cause=exc) from exc
 
 
 class UploadedFileTooLarge(UserException):
@@ -54,7 +64,6 @@ def collection_put(
     request,
     *,
     comp: FileUploadComponent,
-    core: CoreComponent,
 ) -> AsJSON[Annotated[FileUploadObject, StatusCode(201)],]:
     """Upload small file using single PUT request
 
@@ -66,10 +75,10 @@ def collection_put(
     :returns: Uploaded file metadata
     """
 
-    core.check_storage_limit()
-
     if request.content_length > comp.max_size:
         raise UploadedFileTooLarge()
+
+    check_storage_limit(request.content_length)
 
     fupload = FileUpload(size=0)
 
@@ -113,8 +122,6 @@ class FileUploadFormPost(Struct, kw_only=True):
 @inject()
 def collection_post(
     request,
-    *,
-    core: CoreComponent,
 ) -> AnyOf[
     Annotated[FileUploadFormPost, StatusCode(200)],
     Annotated[None, StatusCode(201)],
@@ -132,8 +139,6 @@ def collection_post(
 
     :returns: Upload session details including the upload URL
     """
-    core.check_storage_limit()
-
     return (
         _collection_post_tus(request)
         if _tus_resumable_header(request)
@@ -162,6 +167,8 @@ def _collection_post_form(request, *, comp: FileUploadComponent):
         if size > comp.max_size:
             raise UploadedFileTooLarge()
 
+        check_storage_limit(size)
+
         fupload = FileUpload(size=size, name=_sanitize_name(ufile.filename), mime_type=ufile.type)
         with fupload.data_path.open("wb") as fd:
             copyfileobj(ufile.file, fd)
@@ -187,6 +194,8 @@ def _collection_post_tus(request, *, comp: FileUploadComponent):
         raise exc.HTTPBadRequest()
     if upload_length > comp.max_size:
         raise UploadedFileTooLarge()
+
+    check_storage_limit(upload_length)
 
     upload_metadata = _tus_decode_upload_metadata(request.headers.get("Upload-Metadata"))
 

@@ -1,12 +1,16 @@
-#: api.py:24
+#: api.py:34
 msgid "Uploaded file too large"
 msgstr "Загруженный файл слишком большой"
 
-#: exception.py:10
+#: component.py:84
+msgid "Uploaded file size limit"
+msgstr "Максимальный размер загружаемого файла"
+
+#: exception.py:11
 msgid "Unsupported file"
 msgstr "Неподдерживаемый файл"
 
-#: exception.py:12
+#: exception.py:13
 msgid ""
 "The file '{fn}' could not be processed. Please verify that it is provided in "
 "a supported format and try again. If the problem persists, contact support."
@@ -14,6 +18,18 @@ msgstr ""
 "Файл '{fn}' не может быть обработан. Пожалуйста, убедитесь, что он в "
 "поддерживаемом формате, и попробуйте снова. Если проблема сохраняется, "
 "обратитесь в службу поддержки."
+
+#: exception.py:29
+msgid ""
+"The file you are trying to upload is {file_size} and cannot be uploaded as it"
+" would exceed the total storage limit by {excess_size}. You currently have "
+"only {storage_free} of {storage_limit} available. Free up some storage space "
+"before uploading."
+msgstr ""
+"Файл, который вы пытаетесь загрузить, занимает {file_size} и не может быть "
+"загружен, так как это приведёт к превышению общего лимита хранилища на "
+"{excess_size}. У вас доступно только {storage_free} из {storage_limit}. "
+"Освободите место в хранилище перед загрузкой."
 
 #: model.py:136
 msgid "Uploaded file not found"
@@ -48,9 +64,13 @@ msgstr "Загрузить"
 msgid "{} uploaded..."
 msgstr "{} загружено..."
 
-#: nodepkg/file-uploader/hook/useFileUploader.ts:21
-msgid "File is too large, the limit size is {}."
-msgstr "Файл слишком большой, максимальный размер {}."
+#: nodepkg/file-uploader/hook/useFileUploader.ts:22
+msgid ""
+"The file you are trying to upload is {file_size}. The maximum allowed size is"
+" {max_size}, which means it exceeds the limit by {excess_size}."
+msgstr ""
+"Файл, который вы пытаетесь загрузить занимает {file_size}. Максимально "
+"допустимый размер - {max_size}, превышение составляет {excess_size}."
 
 #: nodepkg/image-uploader/ImageUploader.tsx:20
 msgid "Clear"

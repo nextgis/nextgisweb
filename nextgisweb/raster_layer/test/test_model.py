@@ -2,14 +2,21 @@ import os.path
 from operator import xor
 from pathlib import Path
 from tempfile import NamedTemporaryFile
+from unittest.mock import patch
 
 import pytest
+import transaction
 from osgeo import gdal
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.spatial_ref_sys import SRS
 
-from ..model import RasterBand, RasterLayer, RasterLayerMeta
+from ..model import (
+    RasterBand,
+    RasterLayer,
+    RasterLayerMeta,
+    RasterLayerUncompressedStorageInsufficient,
+)
 from ..util import band_color_interp
 from .validate_cloud_optimized_geotiff import validate
 
@@ -78,7 +85,8 @@ def test_load_file(source, band_count, srs_id, cog, ngw_data_path, ngw_env, ngw_
 def test_size_limit(size_limit, width, height, band_count, datatype, ok, ngw_env):
     res = RasterLayer()
     driver = gdal.GetDriverByName("GTiff")
-    with ngw_env.raster_layer.options.override(dict(size_limit=size_limit)):
+    with patch.object(ngw_env.raster_layer, "size_limit", size_limit):
+        assert ngw_env.raster_layer.size_limit == size_limit
         with NamedTemporaryFile("w") as f:
             ds = driver.Create(f.name, width, height, band_count, datatype)
             ds.SetProjection(res.srs.to_osr().ExportToWkt())
@@ -123,9 +131,38 @@ def test_size_limit_reproj(source, expected_size, ngw_commit, ngw_data_path, ngw
     res = RasterLayer().persist()
     filename = ngw_data_path / source
 
-    with ngw_env.raster_layer.options.override(dict(size_limit=expected_size - 100)):
+    with patch.object(ngw_env.raster_layer, "size_limit", expected_size - 100):
         with pytest.raises(ValidationError):
             res.load_file(filename)
 
-    with ngw_env.raster_layer.options.override(dict(size_limit=expected_size)):
+    with patch.object(ngw_env.raster_layer, "size_limit", expected_size):
         res.load_file(filename)
+
+
+@pytest.fixture(scope="function")
+def prepare_storage(ngw_env):
+    with transaction.manager:
+        ngw_env.core._clear_storage_tables()
+
+    with ngw_env.core.options.override({"storage.enabled": True}):
+        yield
+
+
+@pytest.mark.parametrize(
+    "limit, ok",
+    (
+        (6000, False),
+        (7000, True),
+    ),
+)
+def test_storage(limit, ok, prepare_storage, ngw_env, ngw_data_path):
+    srs = SRS.filter_by(id=3857).one()
+    res = RasterLayer(srs=srs).persist()
+    filename = ngw_data_path / "sochi-aster-colorized.tif"
+
+    with ngw_env.core.options.override({"storage.limit": limit}):
+        if ok:
+            res.load_file(filename)
+        else:
+            with pytest.raises(RasterLayerUncompressedStorageInsufficient):
+                res.load_file(filename)

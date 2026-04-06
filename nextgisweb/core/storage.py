@@ -7,8 +7,9 @@ import sqlalchemy.event as sa_event
 import transaction
 from zope.sqlalchemy import mark_changed
 
-from nextgisweb.env import DBSession, gettext
+from nextgisweb.env import DBSession, gettext, gettextf
 from nextgisweb.lib.datetime import utcnow_naive
+from nextgisweb.lib.humanize import format_size
 from nextgisweb.lib.i18n import TrStr
 from nextgisweb.lib.logging import logger
 from nextgisweb.lib.registry import dict_registry
@@ -20,7 +21,6 @@ from .model import (
     storage_stat_dimension,
     storage_stat_dimension_total,
 )
-from .util import format_size
 
 
 @dict_registry
@@ -58,9 +58,10 @@ class StorageComponentMixin:
             mark_changed(DBSession())
 
         if volume_limit < current_total + requested:
-            raise StorageLimitExceeded(
-                total=current_total, limit=volume_limit, requested=requested
-            )
+            kw = dict(total=current_total, limit=volume_limit)
+            if volume_limit <= current_total:
+                raise StorageFull(**kw)
+            raise StorageInsufficient(**kw, requested=requested)
 
     def reserve_storage(self, component, kind_of_data, value_data_volume=None, resource=None):
         if not self.options["storage.enabled"]:
@@ -280,33 +281,74 @@ class StorageLimitExceeded(UserException):
     http_status_code = 402
 
     def __init__(self, *, total, limit, requested=0):
+        assert total + requested > limit
+
+        self._storage_total = total
+        self._storage_limit = limit
+        self._storage_requested = requested
+
         data = dict(storage_total=total, storage_limit=limit)
         if requested != 0:
             data["storage_requested"] = requested
 
-        assert total + requested > limit
-        if requested == 0 or limit < total:
-            # TODO: Humanize output of sizes
-            super().__init__(
-                title=gettext("Storage full"),
-                message=gettext(
-                    "This operation can't be performed because the storage "
-                    "limit (%s) has been already exceeded by %s."
-                )
-                % (format_size(limit), format_size(total - limit)),
-                data=data,
-            )
-        else:
-            # TODO: Humanize output of sizes
-            super().__init__(
-                title=gettext("Not enough storage"),
-                message=gettext(
-                    "This operation requires %s of storage and can't be "
-                    "performed because only %s available."
-                )
-                % (format_size(requested), format_size(limit - total)),
-                data=data,
-            )
+        super().__init__(data=data)
+
+    @property
+    def storage_used(self):
+        return format_size(self._storage_total)
+
+    @property
+    def storage_limit(self):
+        return format_size(self._storage_limit)
+
+    @property
+    def storage_requested(self):
+        return format_size(self._storage_requested)
+
+
+class StorageFull(StorageLimitExceeded):
+    title = gettext("Storage full")
+    message = gettextf(
+        "The operation cannot be completed because the storage is over limit by "
+        "{excess_size}. You currently have {storage_used} of {storage_limit} used. "
+        "Free up some storage space before proceeding."
+    )
+
+    def __init__(self, *, total, limit):
+        assert total >= limit
+        super().__init__(total=total, limit=limit)
+        self.message = self.__class__.message(
+            excess_size=self.storage_excess,
+            storage_used=self.storage_used,
+            storage_limit=self.storage_limit,
+        )
+
+    @property
+    def storage_excess(self):
+        return format_size(self._storage_total - self._storage_limit)
+
+
+class StorageInsufficient(StorageLimitExceeded):
+    title = gettext("Not enough storage")
+    message = gettext(
+        "This operation requires %s of storage and can't be performed because only %s available."
+    )
+
+    def __init__(self, *, total, limit, requested):
+        assert total < limit
+        super().__init__(total=total, limit=limit, requested=requested)
+        self.message = self.fmt_message()
+
+    def fmt_message(self):
+        return self.__class__.message % (self.storage_requested, self.storage_free)
+
+    @property
+    def storage_free(self):
+        return format_size(self._storage_limit - self._storage_total)
+
+    @property
+    def storage_excess(self):
+        return format_size(self._storage_total - self._storage_limit + self._storage_requested)
 
 
 class EstimationAlreadyRunning(UserException):

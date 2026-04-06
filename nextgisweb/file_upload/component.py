@@ -2,9 +2,10 @@ import os
 from datetime import datetime, timedelta
 from shutil import rmtree
 
-from nextgisweb.env import Component
+from nextgisweb.env import Component, gettext
 from nextgisweb.lib.config import Option, SizeInBytes
 from nextgisweb.lib.datetime import utcnow_naive
+from nextgisweb.lib.humanize import format_size
 from nextgisweb.lib.logging import logger
 
 from .util import stat_dir
@@ -79,10 +80,13 @@ class FileUploadComponent(Component):
         logger.info("Deleted: %d files (%d bytes)", deleted_files, deleted_bytes)
         logger.info("Preserved: %d files (%d bytes)", kept_files, kept_bytes)
 
+    def sys_info(self):
+        yield (gettext("Uploaded file size limit"), format_size(self.max_size))
+
     # fmt: off
     option_annotations = (
         Option("path", default=None),
-        Option("max_size", SizeInBytes, default=8 * 2**30),
+        Option("max_size", SizeInBytes, default=50 * 2**30),
         Option("chunk_size", SizeInBytes, default=16 * 2**20),
     )
     # fmt: on

@@ -274,7 +274,6 @@ export const Widget: EditorWidget<Store> = observer(({ store }) => {
             ]}
             uploadText={msgSelectDataset}
             helpText={settings.msgSupportedFormats}
-            showMaxSize
           />
 
           {layerOpts && layerOpts.length > 1 && (

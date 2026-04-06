@@ -19,12 +19,13 @@ from osgeo import gdal, gdalconst, ogr, osr
 from zope.interface import implementer
 
 from nextgisweb.env import COMP_ID, Base, env, gettext, gettextf, ngettextf
+from nextgisweb.lib.humanize import format_size
 from nextgisweb.lib.logging import logger
 from nextgisweb.lib.osrhelper import SpatialReferenceError, sr_from_epsg, sr_from_wkt
 from nextgisweb.lib.saext import Msgspec
 
 from nextgisweb.core.exception import ValidationError
-from nextgisweb.core.util import format_size
+from nextgisweb.core.storage import StorageInsufficient
 from nextgisweb.file_storage import FileObj
 from nextgisweb.file_upload import FileUploadRef
 from nextgisweb.file_upload.exception import UnsupportedFile
@@ -334,22 +335,31 @@ class RasterLayer(Resource, SpatialLayerMixin):
             data_type=data_type if gdal.VersionInfo() < "3030300" else None,
         )  # https://github.com/OSGeo/gdal/issues/4469
 
-        size_limit = comp.options["size_limit"]
+        size_limit = comp.size_limit
         if size_limit is not None and size_expected > size_limit:
             raise ValidationError(
+                title=gettext("Raster too large"),
                 message=gettextf(
-                    "The uncompressed raster size ({size}) exceeds the limit "
-                    "({limit}) by {delta}. Reduce raster size to fit the limit."
+                    "The uncompressed raster size ({uncompressed_size}) exceeds the limit "
+                    "({max_size}) by {excess_size}. Reduce the raster size to fit the limit."
                 )(
-                    size=format_size(size_expected),
-                    limit=format_size(size_limit),
-                    delta=format_size(size_expected - size_limit),
-                )
+                    uncompressed_size=format_size(size_expected),
+                    max_size=format_size(size_limit),
+                    excess_size=format_size(size_expected - size_limit),
+                ),
             )
 
         # S3 always uses COG - overviews are built into the file
         if self.storage is not None:
             cog = True
+
+        storage_required = size_expected // 2
+        try:
+            env.core.check_storage_limit(storage_required)
+        except StorageInsufficient as exc:
+            raise RasterLayerUncompressedStorageInsufficient(
+                cause=exc, uncompressed_size=size_expected
+            ) from exc
 
         predictor = get_predictor(data_type)
         use_jpeg_compression = is_rgb(ds)
@@ -607,6 +617,31 @@ class RasterLayer(Resource, SpatialLayerMixin):
                 return f"Can't read band #{bidx}"
             if band.DataType != dt:
                 return f"Band #{bidx} data type mismatch"
+
+
+class RasterLayerUncompressedStorageInsufficient(StorageInsufficient):
+    message = gettextf(
+        "The uncompressed raster you are trying to upload is {uncompressed_size}. "
+        "At least {required_space} of storage space is required, but only {storage_free} "
+        "of {storage_limit} is available. "
+        "Reduce the size of the raster or free up some storage space."
+    )
+
+    def __init__(self, *, cause: StorageInsufficient, uncompressed_size: int):
+        self._uncompressed_size = uncompressed_size
+        super().__init__(
+            total=cause._storage_total,
+            limit=cause._storage_limit,
+            requested=cause._storage_requested,
+        )
+
+    def fmt_message(self):
+        return self.__class__.message(
+            uncompressed_size=format_size(self._uncompressed_size),
+            required_space=self.storage_requested,
+            storage_free=self.storage_free,
+            storage_limit=self.storage_limit,
+        )
 
 
 def estimate_raster_layer_data(resource):

@@ -1,6 +1,7 @@
 from subprocess import check_call, check_output
 
 import pytest
+import transaction
 import webtest
 
 from nextgisweb.pyramid.test import WebTestApp
@@ -148,3 +149,26 @@ def test_put(ngw_webtest_app: WebTestApp):
     resp = ngw_webtest_app.put("/api/component/file_upload/", data=FC1)
     fupload = FileUpload(id=resp.json["id"])
     assert fupload.data_path.read_bytes() == FC1
+
+
+@pytest.fixture(scope="module")
+def prepare_storage(ngw_env):
+    with transaction.manager:
+        ngw_env.core._clear_storage_tables()
+
+    with ngw_env.core.options.override({"storage.enabled": True, "storage.limit": 100}):
+        yield
+
+
+@pytest.mark.parametrize(
+    "sizes, ok",
+    (
+        ((101,), False),
+        ((60, 60), True),
+    ),
+)
+def test_storage(sizes, ok, ngw_webtest_app: WebTestApp, prepare_storage):
+    for size in sizes:
+        data = b"0" * size
+        expected = 201 if ok else 402
+        ngw_webtest_app.put("/api/component/file_upload/", data=data, status=expected)

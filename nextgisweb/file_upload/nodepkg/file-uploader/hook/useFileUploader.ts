@@ -18,7 +18,8 @@ import type {
 import { fileUploader } from "../util/fileUploader";
 
 const msgProgressFmt = gettextf("{} uploaded...");
-const msgFileToLarge = gettextf("File is too large, the limit size is {}.");
+/* prettier-ignore */
+const msgFileToLarge = gettextf("The file you are trying to upload is {file_size}. The maximum allowed size is {max_size}, which means it exceeds the limit by {excess_size}.");
 
 export function useFileUploader<M extends boolean = false>({
   accept,
@@ -85,8 +86,15 @@ export function useFileUploader<M extends boolean = false>({
   const fileUploaderWrapper = useCallback(
     async (options: FileUploaderOptions) => {
       for (const f of options.files) {
-        if (f.size > maxSize) {
-          onError?.(msgFileToLarge(formatSize(maxSize)));
+        const excess = f.size - maxSize;
+        if (excess > 0) {
+          onError?.(
+            msgFileToLarge({
+              file_size: formatSize(f.size),
+              max_size: formatSize(maxSize),
+              excess_size: formatSize(excess),
+            })
+          );
           throw makeAbortError();
         }
       }
