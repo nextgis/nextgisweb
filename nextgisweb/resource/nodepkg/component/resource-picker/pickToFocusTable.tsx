@@ -30,17 +30,18 @@ export function pickToFocusTable<I extends FocusTableItem>(
     showResourcePickerFunction({
       pickerOptions: { ...pickerOptions },
 
-      onPick: (resources) => {
+      onPick: async (resources) => {
         if (!Array.isArray(resources)) resources = [resources];
 
-        Promise.all(resources.map(factory)).then((items) => {
-          for (const item of items) {
+        for (const res of resources) {
+          const item = await factory(res);
+          if (item) {
             base = placeItem(env.store, item, base);
+            if (base) {
+              env.select(base);
+            }
           }
-          if (base) {
-            env.select(base);
-          }
-        });
+        }
       },
     });
   };
