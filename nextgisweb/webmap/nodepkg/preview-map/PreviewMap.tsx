@@ -1,6 +1,6 @@
 import { StrictMode, Suspense, lazy, useMemo, useRef, useState } from "react";
 
-import { DEFAULT_MAX_ZOOM } from "@nextgisweb/basemap/constant";
+import { DEFAULT_MAP_MAX_ZOOM } from "@nextgisweb/basemap/constant";
 import { convertNgwExtentToWSEN } from "@nextgisweb/gui/util/extent";
 
 import { registry } from "../display/component/map-panel/registry";
@@ -29,7 +29,7 @@ export function PreviewMap({
   const maxZoom =
     effectiveExtent && effectiveExtent.maxZoom !== undefined
       ? effectiveExtent.maxZoom
-      : DEFAULT_MAX_ZOOM;
+      : DEFAULT_MAP_MAX_ZOOM;
 
   const lazyControls = useMemo(() => {
     const reg = registry.queryAll().filter((c) => c.showOnPreview);

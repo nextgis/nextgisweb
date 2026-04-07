@@ -11,7 +11,7 @@ import type { LayerOptions } from "@nextgisweb/webmap/ol/layer/CoreLayer";
 import type QuadKey from "@nextgisweb/webmap/ol/layer/QuadKey";
 import type XYZ from "@nextgisweb/webmap/ol/layer/XYZ";
 
-import { DEFAULT_MAX_ZOOM } from "../constant";
+import { DEFAULT_SOURCE_MAX_ZOOM } from "../constant";
 
 let idx = 0;
 
@@ -89,7 +89,7 @@ export function prepareBaselayerConfig(
   }
 
   if (source.maxZoom === undefined) {
-    source.maxZoom = DEFAULT_MAX_ZOOM;
+    source.maxZoom = DEFAULT_SOURCE_MAX_ZOOM;
   }
 
   if (source.minZoom !== undefined) {

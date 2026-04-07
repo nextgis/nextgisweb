@@ -1,5 +1,6 @@
 import { action, computed, observable } from "mobx";
 
+import { DEFAULT_MAP_MAX_ZOOM } from "@nextgisweb/basemap/constant";
 import { mapper } from "@nextgisweb/gui/arm";
 import type { NullableProps } from "@nextgisweb/gui/type";
 import { assert } from "@nextgisweb/jsrealm/error";
@@ -27,7 +28,7 @@ type MapperLayerCreate = NullableProps<
   } | null;
 };
 
-const zoomLimit = { min: 0, max: 24 };
+const zoomLimit = { min: 0, max: DEFAULT_MAP_MAX_ZOOM };
 
 const {
   connection,

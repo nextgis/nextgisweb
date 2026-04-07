@@ -14,6 +14,7 @@ import type { Geometry } from "ol/geom";
 import * as olProj from "ol/proj";
 import type { ProjectionLike } from "ol/proj";
 
+import { DEFAULT_MAP_MAX_ZOOM } from "@nextgisweb/basemap/constant";
 import type { NgwExtent } from "@nextgisweb/feature-layer/type/api";
 import { imageQueue } from "@nextgisweb/pyramid/util";
 import type { SRSRef } from "@nextgisweb/spatial-ref-sys/type/api";
@@ -69,7 +70,7 @@ export class MapStore {
   readonly initialExtent?: Extent;
   readonly constrainingExtent?: Extent;
 
-  readonly maxZoom = 24;
+  readonly maxZoom = DEFAULT_MAP_MAX_ZOOM;
 
   readonly displayProjection = "EPSG:3857";
   readonly lonlatProjection = "EPSG:4326";
