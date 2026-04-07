@@ -52,7 +52,7 @@ class RasterLayerComponent(Component, WorkdirMixin):
             resource.build_overview(missing_only=True)
 
     def estimate_storage(self):
-        for resource in RasterLayer.query():
+        for resource in RasterLayer.filter(RasterLayer.storage_id.is_(None)):
             size = estimate_raster_layer_data(resource)
             yield RasterLayerData, resource.id, size
 
