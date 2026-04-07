@@ -25,13 +25,4 @@ export abstract class PluginBase {
       map: this.display.map,
     };
   }
-
-  getPlugin<P>(layerId: number): P | null {
-    const itemFromStore = Object.values(
-      this.display.treeStore.filter({ type: "layer", layerId })
-    )[0];
-    if (!itemFromStore) return null;
-
-    return itemFromStore.plugin[this.identity] as P | null;
-  }
 }

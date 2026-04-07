@@ -10,15 +10,24 @@ import DescriptioIcon from "@nextgisweb/icon/material/article";
 
 export class LayerInfoPlugin extends PluginBase {
   data: DescriptionWebMapPluginConfig | null = null;
+
   getPluginState(nodeData: TreeLayerStore): PluginState {
     const state = super.getPluginState(nodeData);
-    const data = this.getPlugin<DescriptionWebMapPluginConfig>(
-      nodeData.layerId
-    );
-    this.data = data;
+
+    const itemFromStore = Object.values(
+      this.display.treeStore.filter({
+        type: "layer",
+        styleId: nodeData.styleId,
+      })
+    )[0];
+
+    this.data = itemFromStore
+      ? (itemFromStore.plugin[this.identity] as DescriptionWebMapPluginConfig)
+      : null;
+
     return {
       ...state,
-      enabled: !!(state.enabled && data?.description),
+      enabled: !!(state.enabled && this.data?.description),
     };
   }
 
