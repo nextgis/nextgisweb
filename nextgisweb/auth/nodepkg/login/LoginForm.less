@@ -1,20 +1,27 @@
 .ngw-auth-login-form {
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  h1 {
+    margin-block-end: 32px;
+  }
 
   .oauth {
-    .ant-btn {
-      width: 100%;
-    }
+    align-self: stretch;
   }
 
   .separator {
-    margin: 1em 0;
+    align-self: stretch;
+    margin-block: 16px;
     background: linear-gradient(
       180deg,
       rgba(0, 0, 0, 0) calc(50% - 1px),
       var(--icon-color) calc(50%),
       rgba(0, 0, 0, 0) calc(50% + 1px)
     );
+    line-height: 1;
+    text-align: center;
 
     > span {
       background-color: white;
@@ -24,8 +31,23 @@
   }
 
   .login-password {
+    align-self: stretch;
+
     .ant-alert {
       margin-bottom: 1em;
+    }
+  }
+
+  .signin-button {
+    margin-block-end: 8px;
+    min-width: 75%;
+  }
+
+  .contact-administrator {
+    margin-block-start: 8px;
+
+    > a {
+      text-decoration: none;
     }
   }
 }

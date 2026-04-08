@@ -544,6 +544,7 @@ class CoreComponent(StorageComponentMixin, Component):
         Option("locale.contribute_url", default=None),
         # Other deployment settings
         Option("support_url", default="https://nextgis.com/redirect/{lang}/contact/"),
+        Option("contact_administrator_url", default=None),
         Option("provision.instance_id", default=None),
         Option("provision.system.title", default=None),
         Option("maintenance.interval", timedelta, default=None, doc=(

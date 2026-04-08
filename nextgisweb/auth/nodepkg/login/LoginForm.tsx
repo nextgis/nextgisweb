@@ -7,6 +7,7 @@ import { FieldsForm } from "@nextgisweb/gui/fields-form";
 import type { FormField } from "@nextgisweb/gui/fields-form";
 import { useKeydownListener } from "@nextgisweb/gui/hook";
 import { BaseAPIError, routeURL } from "@nextgisweb/pyramid/api";
+import pyramidSettings from "@nextgisweb/pyramid/client-settings";
 import { gettext, gettextf } from "@nextgisweb/pyramid/i18n";
 
 import oauth from "../oauth";
@@ -23,6 +24,7 @@ const msgTitle = gettext("Sign in to Web GIS");
 const msgSignIn = gettext("Sign in");
 
 const isLoginLocation = location.pathname === routeURL("auth.login");
+const { contactAdministratorUrl } = pyramidSettings;
 
 export const LoginForm = observer((props: LoginFormProps) => {
   const [creds, setCreds] = useState<Credentials>({
@@ -103,11 +105,9 @@ export const LoginForm = observer((props: LoginFormProps) => {
 
       {oauth.enabled && (
         <>
-          <div className="oauth">
-            <Button type="primary" size="large" href={oauthUrl}>
-              {msgOauth}
-            </Button>
-          </div>
+          <Button className="oauth" type="primary" size="large" href={oauthUrl}>
+            {msgOauth}
+          </Button>
           <div className="separator">
             <span>{gettext("or using login and password")}</span>
           </div>
@@ -123,18 +123,27 @@ export const LoginForm = observer((props: LoginFormProps) => {
           size="large"
           fields={fields}
           onChange={onChange}
-        ></FieldsForm>
-
-        <Button
-          type="primary"
-          size="large"
-          loading={authStore.isLogining}
-          onClick={login}
-          icon={<LoginIcon />}
-        >
-          {msgSignIn}
-        </Button>
+        />
       </div>
+
+      <Button
+        className="signin-button"
+        type="primary"
+        size="large"
+        icon={<LoginIcon />}
+        loading={authStore.isLogining}
+        onClick={login}
+      >
+        {msgSignIn}
+      </Button>
+
+      {contactAdministratorUrl && (
+        <div className="contact-administrator">
+          <a href={contactAdministratorUrl} target="_blank">
+            {gettext("Contact administrator")}
+          </a>
+        </div>
+      )}
     </div>
   );
 });

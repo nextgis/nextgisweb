@@ -46,11 +46,11 @@ msgstr "Включено"
 msgid "Disabled"
 msgstr "Отключено"
 
-#: exception.py:218
+#: exception.py:219
 msgid "Internal server error"
 msgstr "Внутренняя ошибка сервера"
 
-#: exception.py:220
+#: exception.py:221
 msgid ""
 "The server encountered an internal error or misconfiguration and was unable "
 "to complete your request."
@@ -58,37 +58,37 @@ msgstr ""
 "При обработке запроса возникла внутренняя ошибка или сервер настроен "
 "некорректно и не может обработать запрос."
 
-#: exception.py:252
+#: exception.py:253
 msgid "Bad request"
 msgstr "Некорректный запрос"
 
-#: exception.py:254
+#: exception.py:255
 msgid ""
 "The server could not comply with the request since it is either malformed or "
 "otherwise incorrect."
 msgstr "Сервер не может выполнить запрос. Возможно, в запросе ошибка."
 
-#: exception.py:261
+#: exception.py:262
 msgid "Payment required"
 msgstr "Необходима оплата"
 
-#: exception.py:262
+#: exception.py:263
 msgid "Access was denied for financial reasons."
 msgstr "Доступ закрыт по финансовым причинам."
 
-#: exception.py:267
+#: exception.py:268
 msgid "Forbidden"
 msgstr "Доступ запрещен"
 
-#: exception.py:268
+#: exception.py:269
 msgid "Access was denied to this resource."
 msgstr "У вас нет доступа к этому ресурсу."
 
-#: exception.py:273
+#: exception.py:274
 msgid "Page not found"
 msgstr "Страница не найдена"
 
-#: exception.py:275
+#: exception.py:276
 msgid ""
 "The page may have been deleted or an error in the address. Correct the "
 "address or go to the home page and try to find the desired page."
@@ -97,23 +97,23 @@ msgstr ""
 " вернитесь на главную страницу и попробуйте найти нужную страницу с помощью "
 "навигации."
 
-#: exception.py:282
+#: exception.py:283
 msgid "Unprocessable entity"
 msgstr "Необрабатываемая сущность"
 
-#: exception.py:283
+#: exception.py:284
 msgid "Unable to process the contained instructions."
 msgstr "Невозможно выполнить запрошенную операцию."
 
-#: exception.py:288 exception.py:289
+#: exception.py:289 exception.py:290
 msgid "Not implemented"
 msgstr "Не реализовано"
 
-#: exception.py:294
+#: exception.py:295
 msgid "Service unavailable"
 msgstr "Сервис недоступен"
 
-#: exception.py:295
+#: exception.py:296
 msgid "The server is currently unavailable. Please try again at a later time."
 msgstr ""
 "В настоящий момент сервер недоступен. Пожалуйста, попробуйте выполнить "
@@ -312,7 +312,11 @@ msgstr "Панель управления"
 msgid "Help"
 msgstr "Справка"
 
-#: nodepkg/layout/store.ts:91 view.py:191
+#: nodepkg/layout/store.ts:91
+msgid "Contact Web GIS administrator"
+msgstr "Связаться с администратором Веб ГИС"
+
+#: nodepkg/layout/store.ts:98 view.py:191
 msgid "OpenAPI documentation"
 msgstr "Документация OpenAPI"
 
@@ -484,7 +488,7 @@ msgstr "Доступны обновления"
 msgid "Click to see what's new"
 msgstr "Нажмите и узнайте, что нового"
 
-#: permission.py:5 view.py:308 view.py:746
+#: permission.py:5 view.py:308 view.py:752
 msgid "Cross-origin resource sharing (CORS)"
 msgstr "Cross-origin resource sharing (CORS)"
 
@@ -581,46 +585,46 @@ msgstr "Некорректное JSON тело"
 msgid "The JSON body of the request is malformed or invalid."
 msgstr "JSON тело запроса имеет некорректный или недопустимый формат."
 
-#: view.py:257 view.py:755
+#: view.py:257 view.py:761
 msgid "System information"
 msgstr "Информация о системе"
 
-#: view.py:267 view.py:761
+#: view.py:267 view.py:767
 msgid "Font management"
 msgstr "Управление шрифтами"
 
-#: view.py:276 view.py:798
+#: view.py:276 view.py:804
 msgid "Storage"
 msgstr "Хранилище"
 
-#: view.py:290 view.py:805
+#: view.py:290 view.py:811
 msgid "Backups"
 msgstr "Резервные копии"
 
-#: view.py:318 view.py:773
+#: view.py:318 view.py:779
 msgid "Custom CSS"
 msgstr "Пользовательские стили CSS"
 
-#: view.py:327 view.py:779
+#: view.py:327 view.py:785
 msgid "Custom logo"
 msgstr "Логотип"
 
-#: view.py:336 view.py:767
+#: view.py:336 view.py:773
 msgid "Web GIS name"
 msgstr "Название Веб ГИС"
 
-#: view.py:345 view.py:785
+#: view.py:345 view.py:791
 msgid "Home path"
 msgstr "Стартовая страница"
 
-#: view.py:354 view.py:791
+#: view.py:354 view.py:797
 msgid "Metrics and analytics"
 msgstr "Метрики и аналитика"
 
-#: view.py:735
+#: view.py:741
 msgid "Info"
 msgstr "Информация"
 
-#: view.py:736
+#: view.py:742
 msgid "Settings"
 msgstr "Настройки"

@@ -85,6 +85,13 @@ if (settings["help_page_url"]) {
   });
 }
 
+if (settings.contactAdministratorUrl && !ngwConfig.isAdministrator) {
+  layoutStore.addMenuItem({
+    href: settings.contactAdministratorUrl,
+    title: gettext("Contact Web GIS administrator"),
+  });
+}
+
 if (!ngwConfig.isGuest) {
   layoutStore.addMenuItem({
     href: routeURL("pyramid.swagger"),

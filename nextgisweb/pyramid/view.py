@@ -445,6 +445,12 @@ def cs_help_page_url(comp: PyramidComponent, request) -> str | None:
     return comp.help_page_url_view(request)
 
 
+@client_setting("contactAdministratorUrl")
+def cs_contact_administrator_url(comp: PyramidComponent, request) -> str | None:
+    base = request.env.core.options["contact_administrator_url"]
+    return base.format(instance_id=request.env.core.instance_id) if base else None
+
+
 class PyramidCompanyLogoClientSetting(Struct, kw_only=True):
     enabled: bool
     link: str | None
