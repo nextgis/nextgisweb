@@ -1,6 +1,6 @@
 export { Avatar } from "./Avatar";
 export { HeaderComponents } from "./header/HeaderComponents";
-export { default as Menu } from "./Menu";
+export { Menu } from "./Menu";
 export { PageTitle } from "./PageTitle";
 export { Dynmenu } from "./dynmenu/Dynmenu";
 export { Breadcrumbs } from "./Breadcrumbs";

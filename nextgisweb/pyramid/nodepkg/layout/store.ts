@@ -48,7 +48,7 @@ class LayoutStore {
   }
 
   @computed
-  get notification() {
+  get notification(): string | null {
     let current: string | null = null;
     this.menuItems.forEach(({ notification }) => {
       if (!notification) return;

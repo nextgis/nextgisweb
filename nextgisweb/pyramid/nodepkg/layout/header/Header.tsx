@@ -1,7 +1,8 @@
 import { observer } from "mobx-react-lite";
-import { Suspense, lazy, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 
 import { Avatar } from "../Avatar";
+import { Menu } from "../Menu";
 import { layoutStore } from "../store";
 
 import { HeaderComponents } from "./HeaderComponents";
@@ -15,8 +16,6 @@ export interface HeaderProps {
   hideResourceFilter?: boolean;
   hideMenu?: boolean;
 }
-
-const Menu = lazy(() => import("../Menu"));
 
 export const Header = observer<HeaderProps>((props: HeaderProps) => {
   const { header, hideMenu = false } = props;
@@ -35,11 +34,7 @@ export const Header = observer<HeaderProps>((props: HeaderProps) => {
 
         <Avatar />
 
-        {!layoutStore.hideMenu && (
-          <Suspense fallback={null}>
-            <Menu {...props} />
-          </Suspense>
-        )}
+        {!layoutStore.hideMenu && <Menu {...props} />}
       </div>
     </div>
   );

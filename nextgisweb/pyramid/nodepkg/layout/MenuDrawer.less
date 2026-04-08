@@ -1,0 +1,34 @@
+.ngw-pyramid-menu-drawer {
+  .ant-drawer-header {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+    padding: 16px 12px;
+
+    .ant-drawer-header-title .ant-drawer-close {
+      margin-left: auto;
+    }
+  }
+
+  .ant-drawer-body {
+    padding: 0px;
+
+    a {
+      display: block;
+      padding: 12px 24px;
+      color: var(--text-base);
+      line-height: 1.25;
+      text-decoration: none;
+
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.04);
+      }
+
+      &.notification-success {
+        background-color: var(--surface-bg-success);
+      }
+
+      &.notification-danger {
+        background-color: var(--surface-bg-danger);
+      }
+    }
+  }
+}
