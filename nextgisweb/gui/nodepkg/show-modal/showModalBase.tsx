@@ -66,6 +66,7 @@ export function showModalBase<T extends ShowModalOptions>(
     const {
       onCancel: originalOnCancel,
       afterClose: originalAfterClose,
+      afterOpenChange: originalAfterOpenChange,
       ...restConfig
     } = currentConfig;
 
@@ -79,6 +80,15 @@ export function showModalBase<T extends ShowModalOptions>(
       afterClose: () => {
         originalAfterClose?.();
         destroy();
+      },
+      afterOpenChange: (open: boolean) => {
+        originalAfterOpenChange?.(open);
+
+        if (open) {
+          requestAnimationFrame(() => {
+            (document.activeElement as HTMLElement | null)?.blur?.();
+          });
+        }
       },
       close: () => update({ open: false } as T),
     } as T;

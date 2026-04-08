@@ -32,6 +32,7 @@ const token: Theme["token"] = {
   fontFamily: cvar("ngw-text-font-family"),
   fontWeightStrong: Number(cvar("ngw-text-font-weight-bold")),
   motion: false,
+  lineWidthFocus: 1,
 };
 
 const components: Theme["components"] = {
