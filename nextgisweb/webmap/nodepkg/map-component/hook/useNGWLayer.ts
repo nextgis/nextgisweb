@@ -10,9 +10,10 @@ import type { StyleLike } from "ol/style/Style";
 import { useMemo } from "react";
 
 import { routeURL } from "@nextgisweb/pyramid/api";
+import { createImageLayer as createNGWImageLayer } from "@nextgisweb/webmap/image-adapter/createImageLayer";
 import { createTileLayer } from "@nextgisweb/webmap/tile-adapter/createTileLayer";
 
-export type LayerType = "geojson" | "geotiff" | "XYZ" | "MVT";
+export type LayerType = "geojson" | "geotiff" | "XYZ" | "MVT" | "image";
 
 export interface LayerOptions {
   style?: StyleLike;
@@ -40,6 +41,11 @@ const createGeoTIFFLayer = (resourceId: number) => {
 
 const createXYZLayer = (resourceId: number) => {
   const layer = createTileLayer({ styleId: resourceId });
+  return layer.olLayer;
+};
+
+const createImageLayer = (resourceId: number) => {
+  const layer = createNGWImageLayer({ styleId: resourceId });
   return layer.olLayer;
 };
 
@@ -73,6 +79,8 @@ export function useNGWLayer({
       return createGeoTIFFLayer(resourceId);
     } else if (layerType === "MVT") {
       return createMVTLayer(resourceId, layerOptions);
+    } else if (layerType === "image") {
+      return createImageLayer(resourceId);
     } else if (layerType === "XYZ") {
       return createXYZLayer(resourceId);
     } else {

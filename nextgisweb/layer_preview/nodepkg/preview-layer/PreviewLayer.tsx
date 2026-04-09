@@ -5,6 +5,7 @@ import type { Extent } from "@nextgisweb/layer/type/api";
 import { useRoute } from "@nextgisweb/pyramid/hook";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { NGWLayer, URLLayer } from "@nextgisweb/webmap/map-component";
+import type { LayerType } from "@nextgisweb/webmap/map-component";
 import { PreviewMap } from "@nextgisweb/webmap/preview-map";
 
 import { extentInterfaces, mvtInterfaces } from "../constant";
@@ -23,7 +24,7 @@ export function PreviewLayer({
     { id }
   );
 
-  let layerType: "MVT" | "geotiff" | "XYZ" = "XYZ";
+  let layerType: LayerType = "image";
   let url: string | undefined;
   let attributions: string | null | undefined;
 
