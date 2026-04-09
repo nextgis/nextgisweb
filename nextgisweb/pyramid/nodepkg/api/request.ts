@@ -1,4 +1,5 @@
 import { isAbortError } from "@nextgisweb/gui/error";
+import type { ErrorResponse } from "@nextgisweb/pyramid/type/api";
 import { LoaderCache } from "@nextgisweb/pyramid/util/loader";
 
 import { cache } from "./cache";
@@ -11,7 +12,6 @@ import {
   NetworkResponseError,
   ServerResponseError,
 } from "./error";
-import type { ServerResponseErrorData } from "./error";
 import type {
   LunkwillData,
   Method,
@@ -241,7 +241,7 @@ export async function request<
       (respCType.includes("application/json") ||
         respCType.includes("application/vnd.lunkwill.request-summary+json"));
 
-    let body: T | ServerResponseErrorData;
+    let body: T | ErrorResponse;
 
     try {
       const respMedia = respCType && isMediaContentType(respCType);
@@ -262,7 +262,7 @@ export async function request<
     }
 
     if (400 <= response.status && response.status <= 599) {
-      throw new ServerResponseError(body as ServerResponseErrorData);
+      throw new ServerResponseError(body as ErrorResponse);
     }
     return body as ToReturn<T, RT, ReturnUrl>;
   };

@@ -26,7 +26,7 @@ from . import permission
 from .component import AuthComponent
 from .exception import ALinkException, InvalidCredentialsException, UserDisabledException
 from .model import Group, User
-from .oauth import AuthorizationException, InvalidTokenException
+from .oauth import AuthorizationException, InvalidTokenException, TeamMembershipRequiredException
 from .policy import AP_OAUTH_AC, AuthState, OnUserLogin
 from .util import reset_slg_cookie, sync_ulg_cookie
 
@@ -161,17 +161,9 @@ def oauth(request):
         return "ngw_oas_" + state
 
     if error := request.params.get("error"):
-        title = None
-        message = None
-
         if oaserver.options["server.type"] == "nextgisid" and error == "invalid_scope":
-            title = gettext("Team membership required")
-            message = gettext(
-                "You are not a member of this Web GIS team. Contact Web GIS "
-                "administrator and ask to be added to the team."
-            )
-
-        raise AuthorizationException(title=title, message=message)
+            raise TeamMembershipRequiredException(data=dict(error=error))
+        raise AuthorizationException(data=dict(error=error))
 
     elif "code" in request.params and "state" in request.params:
         tpair = oaserver.grant_type_authorization_code(request.params["code"], oauth_url)

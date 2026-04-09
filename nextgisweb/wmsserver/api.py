@@ -17,7 +17,6 @@ from nextgisweb.lib.ows import SRSParseError, parse_request, parse_srs
 from nextgisweb.lib.pilhelper import reproject_render
 
 from nextgisweb.core.exception import InsufficientPermissions, ValidationError
-from nextgisweb.pyramid.exception import json_error
 from nextgisweb.render import (
     COMPRESSION_DEFAULT,
     COMPRESSION_FAST,
@@ -448,9 +447,9 @@ def _get_legend_graphic(obj, params, request):
 def error_renderer(request, err_info, exc, exc_info, debug=True):
     params, _ = parse_request(request)
 
-    _json_error = json_error(request, err_info, exc, exc_info, debug=debug)
-    err_title = _json_error.get("title")
-    err_message = _json_error.get("message")
+    tr = request.translate
+    err_title = tr(v) if (v := exc.title) else None
+    err_message = tr(v) if (v := exc.message) else None
 
     if err_title is not None and err_message is not None:
         message = "%s: %s" % (err_title, err_message)
@@ -488,7 +487,7 @@ def error_renderer(request, err_info, exc, exc_info, debug=True):
 
         return Response(body_file=buf, content_type=p_format)
 
-    code = _json_error.get("data", dict()).get("code")
+    code = exc.data.get("code")
 
     root = etree.Element("ServiceExceptionReport", dict(version="1.1.1"))
     _exc = etree.Element("ServiceException", dict(code=code) if code is not None else None)
@@ -500,7 +499,7 @@ def error_renderer(request, err_info, exc, exc_info, debug=True):
         xml,
         content_type="application/vnd.ogc.se_xml",
         charset="utf-8",
-        status_code=_json_error["status_code"],
+        status_code=exc.http_status_code,
     )
 
 

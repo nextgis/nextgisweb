@@ -580,7 +580,9 @@ def setup_pyramid(comp, config):
 
     config.registry.settings["error.err_response"] = error_handler
     config.registry.settings["error.exc_response"] = error_handler
+
     config.include(exception)
+    comp.client_type(exception.ErrorResponse)
 
     # INTERNATIONALIZATION
 

@@ -1,16 +1,14 @@
 import pytest
 from pyramid.config import Configurator
 from pyramid.response import Response
-from zope.interface import implementer
 
-from nextgisweb.core.exception import IUserException
+from nextgisweb.core.exception import UserException
 from nextgisweb.pyramid.test import WebTestApp
 
-from .. import exception
+from .. import exception, renderer
 
 
-@implementer(IUserException)
-class ErrorTest(Exception):
+class ErrorTest(UserException):
     title = "Test title"
     message = "Test message"
     detail = "Test detail"
@@ -29,6 +27,7 @@ def app():
     settings["error.exc_response"] = exception.json_error_response
 
     config = Configurator(settings=settings)
+    config.add_renderer("json", renderer.JSON())
     config.add_request_method(lambda req: "deadbeef", "request_id", property=True)
     config.include(exception)
 
@@ -59,16 +58,15 @@ def test_error(app: WebTestApp):
     resp = app.get("/error", status=418)
     rjson = resp.json
 
-    del rjson["guru_meditation"]
-    del rjson["traceback"]
-
     assert rjson == dict(
         title="Test title",
         message="Test message",
         detail="Test detail",
         exception="nextgisweb.pyramid.test.test_exception.ErrorTest",
+        contact="support",
         status_code=418,
         request_id="deadbeef",
+        data={},
     )
 
 
@@ -76,17 +74,16 @@ def test_exception(app: WebTestApp):
     resp = app.get("/exception", status=500)
     rjson = resp.json
 
-    del rjson["guru_meditation"]
-    del rjson["traceback"]
-
     assert rjson.get("message", None) is not None
     del rjson["message"]
 
     assert rjson == dict(
         title="Internal server error",
         exception="nextgisweb.pyramid.exception.InternalServerError",
+        contact="support",
         status_code=500,
         request_id="deadbeef",
+        data={},
     )
 
 

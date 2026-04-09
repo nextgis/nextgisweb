@@ -1,7 +1,6 @@
 from pyramid.response import Response
 
 from nextgisweb.core.exception import InsufficientPermissions
-from nextgisweb.pyramid.exception import json_error
 from nextgisweb.resource import ResourceFactory, ServiceScope
 
 from .model import Service
@@ -35,19 +34,18 @@ def wfs(resource, request):
 
 
 def error_renderer(request, err_info, exc, exc_info, debug=True):
-    _json_error = json_error(request, err_info, exc, exc_info, debug=debug)
-
+    tr = request.translate
     xml = WFSHandler.exception_response(
         request,
-        _json_error.get("title"),
-        _json_error.get("message"),
+        tr(v) if (v := exc.title) else None,
+        tr(v) if (v := exc.message) else None,
     )
 
     return Response(
         xml,
         content_type="application/xml",
         charset="utf-8",
-        status_code=_json_error["status_code"],
+        status_code=exc.http_status_code,
     )
 
 

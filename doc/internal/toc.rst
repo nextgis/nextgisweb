@@ -7,7 +7,6 @@ NextGIS Web internals
    component
    resource
    jsrealm
-   error
    lunkwill
    i18n
    test

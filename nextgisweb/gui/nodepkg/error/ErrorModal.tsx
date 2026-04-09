@@ -1,15 +1,14 @@
 import { useEffect, useState } from "react";
 
 import { Modal } from "@nextgisweb/gui/antd";
-import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import type { ModalStore } from "../show-modal/ModalStore";
 import showModal from "../showModal";
 import type { ParamsOf } from "../type";
 
+import { ErrorWidget } from "./ErrorWidget";
 import { extractError } from "./extractError";
 import type { ErrorInfo } from "./extractError";
-import { Body, Footer, TechInfo } from "./shared";
 import { isAbortError } from "./util";
 
 type ModalProps = ParamsOf<typeof Modal>;
@@ -32,7 +31,6 @@ export function ErrorModal({
   ...props
 }: ErrorModalProps) {
   const [open, setOpen] = useState(visible ?? open_ ?? true);
-  const [tinfo, setTinfo] = useState(false);
 
   const close = () => setOpen(false);
 
@@ -43,23 +41,16 @@ export function ErrorModal({
     }
   }, [visible, open_]);
 
-  const title =
-    "title" in error && typeof error.title === "string"
-      ? error.title
-      : gettext("Error");
-
   return (
     <Modal
       {...DEFAULTS}
       {...props}
-      title={title}
       open={open}
+      footer={null}
       destroyOnHidden
-      onCancel={() => setOpen(false)}
-      footer={<Footer onOk={close} {...{ tinfo, setTinfo }} />}
+      onCancel={close}
     >
-      <Body error={error} />
-      {tinfo && <TechInfo error={error} />}
+      <ErrorWidget error={error} onOk={close} />
     </Modal>
   );
 }

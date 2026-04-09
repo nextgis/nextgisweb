@@ -11,7 +11,7 @@ from nextgisweb.lib.apitype.util import decompose_union
 from nextgisweb.lib.registry import dict_registry
 
 from nextgisweb.auth import User
-from nextgisweb.core.exception import IUserException
+from nextgisweb.core.exception import UserException
 
 from . import model
 from .exception import AttributeUpdateForbidden
@@ -80,18 +80,9 @@ class Serializer:
                 continue
             try:
                 pv.deserialize(self)
-            except Exception as exc:
-                self.annotate_exception(exc, pv)
+            except UserException as exc:
+                exc.data["attribute"] = pv.attrname
                 raise
-
-    def annotate_exception(self, exc, sp):
-        exc.__srlzr_prprt__ = sp.attrname
-
-        try:
-            error_info = IUserException(exc)
-            error_info.data["attribute"] = sp.attrname
-        except TypeError:
-            pass
 
     def has_permission(self, perm: Permission) -> bool:
         """Test for permission on attached resource"""

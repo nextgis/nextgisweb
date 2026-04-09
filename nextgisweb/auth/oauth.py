@@ -719,6 +719,15 @@ class AuthorizationException(UserException):
     http_status_code = 401
 
 
+class TeamMembershipRequiredException(AuthorizationException):
+    title = gettext("Team membership required")
+    message = gettext(
+        "You are not a member of this Web GIS team. Contact Web GIS "
+        "administrator and ask to be added to the team."
+    )
+    contact = "administrator"
+
+
 class InvalidTokenException(UserException):
     title = gettext("Invalid OAuth token")
     http_status_code = 401

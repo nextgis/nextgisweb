@@ -5,7 +5,7 @@ from typing import Type
 from msgspec import UNSET, Struct, UnsetType, convert, defstruct
 
 from nextgisweb.auth import User
-from nextgisweb.core.exception import IUserException
+from nextgisweb.core.exception import UserException
 
 from .model import Resource
 from .serialize import CRUTypes, Serializer
@@ -25,12 +25,8 @@ class CompositeSerializer:
         for identity, srlzrcls in self.members:
             if srlzrcls.is_applicable(obj):
                 srlzr = srlzrcls(obj, user=self.user, data=None)
-                try:
-                    srlzr.serialize()
-                    result[identity] = srlzr.data
-                except Exception as exc:
-                    self.annotate_exception(exc, srlzr)
-                    raise
+                srlzr.serialize()
+                result[identity] = srlzr.data
         return cls(**result)
 
     def deserialize(self, obj: Resource, value: Struct):
@@ -45,20 +41,9 @@ class CompositeSerializer:
                 srlzr = srlzrcls(obj, user=self.user, data=sdata)
                 try:
                     srlzr.deserialize()
-                except Exception as exc:
-                    self.annotate_exception(exc, srlzr)
+                except UserException as exc:
+                    exc.data["serializer"] = srlzr.__class__.identity
                     raise
-
-    def annotate_exception(self, exc, mobj):
-        """Adds information about serializer that called the exception to the exception"""
-
-        exc.__srlzr_cls__ = mobj.__class__
-
-        try:
-            error_info = IUserException(exc)
-            error_info.data["serializer"] = mobj.__class__.identity
-        except TypeError:
-            pass
 
     @classmethod
     def types(cls) -> CRUTypes:

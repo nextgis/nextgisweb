@@ -1,4 +1,6 @@
 /** @testentry react */
+import * as falso from "@ngneat/falso";
+
 import { BaseError } from "@nextgisweb/jsrealm/error";
 import { ServerResponseError } from "@nextgisweb/pyramid/api";
 
@@ -19,7 +21,7 @@ export default function ErrorTestentry() {
         <Button
           onClick={() => {
             try {
-              throw new Error("Error message");
+              throw new Error(falso.randPhrase());
             } catch (err) {
               errorModal(err, { modalStore });
             }
@@ -30,7 +32,7 @@ export default function ErrorTestentry() {
         <Button
           onClick={() => {
             try {
-              throw new CustomError("Error message");
+              throw new CustomError(falso.randPhrase());
             } catch (err) {
               errorModal(err, { modalStore });
             }
@@ -42,10 +44,14 @@ export default function ErrorTestentry() {
           onClick={() => {
             try {
               throw new ServerResponseError({
-                message: "Error message",
-                title: "Error title",
-                detail: "Error detail",
+                title: falso.randShape() + " error",
+                message: falso.randPhrase(),
+                detail: falso.randParagraph(),
+                contact: falso.rand(["support", "administrator"]),
                 status_code: 418,
+                exception: "nextgisweb.teapot.TestException",
+                request_id: "deadbeef",
+                data: { foo: "bar", baz: "qux" },
               });
             } catch (err) {
               errorModal(err, { modalStore });
@@ -58,8 +64,8 @@ export default function ErrorTestentry() {
           onClick={() => {
             errorModal(
               {
-                message: "Error message",
-                title: "Error title",
+                title: falso.randAdjective() + " error",
+                message: falso.randPhrase(),
               },
               { modalStore }
             );

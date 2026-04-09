@@ -22,7 +22,7 @@ from nextgisweb.lib.apitype.util import disannotate, is_struct_type
 from nextgisweb.lib.imptool import module_from_stack, module_path
 from nextgisweb.lib.logging import logger
 
-from nextgisweb.core.exception import ValidationError, user_exception
+from nextgisweb.core.exception import ValidationError
 
 from .exception import MalformedJSONBody
 from .helper import RouteHelper
@@ -84,8 +84,7 @@ def _view_driver_factory(
         try:
             kw = {k: f(request) for k, f in extract}
         except QueryParamError as exc:
-            _describe_query_param_error(exc)
-            raise
+            raise _describe_query_param_error(exc)
         return convert(view(context, request, **kw) if pass_context else view(request, **kw))
 
     _view.__doc__ = view.__doc__
@@ -101,7 +100,7 @@ def _describe_query_param_error(exc):
     else:
         title = gettext("Invalid parameter")
         message = gettextf("The '{}' query parameter has an invalid value.")(name)
-    user_exception(exc, title=title, message=message, data=data, http_status_code=422)
+    return ValidationError(title=title, message=message, data=data)
 
 
 def find_template(name, func=None, stack_level=1):

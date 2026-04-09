@@ -85,7 +85,10 @@ if (settings["help_page_url"]) {
   });
 }
 
-if (settings.contactAdministratorUrl && !ngwConfig.isAdministrator) {
+if (
+  (!ngwConfig.isAdministrator || ngwConfig.isGuest) &&
+  settings.contactAdministratorUrl
+) {
   layoutStore.addMenuItem({
     href: settings.contactAdministratorUrl,
     title: gettext("Contact Web GIS administrator"),
