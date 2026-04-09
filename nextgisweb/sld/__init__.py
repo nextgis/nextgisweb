@@ -1,2 +1,2 @@
 from .component import SLDComponent
-from .model import SLD
+from .model import NSMAP, SLD
