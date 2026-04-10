@@ -87,6 +87,8 @@ class OperationExecutor(abc.ABC):
             self._feature_query_first.filter_by(id=fid)
             for _ in self._feature_query_first():
                 return True
+            if self.txn.has_restore_before(fid, seqnum):
+                return True
             raise OperationError(FeatureNotFound())
 
         if fid.sn >= seqnum:

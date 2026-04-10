@@ -55,6 +55,9 @@ class FeatureLayerTransaction(Base):
     def get_action(self, seqnum: int) -> str | None:
         return self.__execute(_sel_action, p_seqnum=seqnum).scalar_one_or_none()
 
+    def has_restore_before(self, fid: int, seqnum: int) -> bool:
+        return self.__execute(_sel_restore_before, p_fid=fid, p_seqnum=seqnum).first() is not None
+
     def get_result_fid(self, seqnum: int) -> int | None:
         return self.__execute(_sel_result_fid, p_seqnum=seqnum).scalar_one_or_none()
 
@@ -114,6 +117,7 @@ _p_payload = sa.bindparam("p_payload")
 _p_params = sa.bindparam("p_params")
 _p_error = sa.bindparam("p_error")
 _p_value = sa.bindparam("p_value")
+_p_fid = sa.bindparam("p_fid")
 
 _sel_existing = sa.select(
     sa.or_(
@@ -122,6 +126,18 @@ _sel_existing = sa.select(
     ).label("is_distinct"),
     _tab_operation.c.error.isnot(None).label("is_error"),
 ).filter_by(transaction_id=_p_transaction_id, seqnum=_p_seqnum)
+
+_sel_restore_before = (
+    sa.select(sa.literal(1))
+    .where(
+        _tab_operation.c.transaction_id == _p_transaction_id,
+        _tab_operation.c.seqnum < _p_seqnum,
+        _tab_operation.c.payload.op("->>")(sa.text("'action'")) == "feature.restore",
+        _tab_operation.c.payload.op("->")(sa.text("'fid'")).cast(sa.Integer) == _p_fid,
+        _tab_operation.c.error.is_(None),
+    )
+    .limit(1)
+)
 
 _sel_action = sa.select(_tab_operation.c.payload.op("->")(sa.text("'action'"))).filter_by(
     transaction_id=_p_transaction_id, seqnum=_p_seqnum

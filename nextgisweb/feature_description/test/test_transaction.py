@@ -25,6 +25,27 @@ def mkres():
     yield _mkres
 
 
+def test_feature_restore_with_description_in_same_transaction(mkres):
+    res = mkres(True)
+    fapi = FeatureLayerAPI(res, extensions=["description"])
+
+    with fapi.transaction() as txn:
+        txn.put(0, dict(action="feature.create"))
+        txn.commit()
+        fid = txn.results()[0][1]["fid"]
+
+    with fapi.transaction() as txn:
+        txn.put(0, dict(action="feature.delete", fid=fid))
+        txn.commit()
+
+    with fapi.transaction() as txn:
+        txn.put(0, dict(action="feature.restore", fid=fid))
+        txn.put(1, dict(action="description.put", fid=fid, value="Restored"))
+        txn.commit()
+
+    assert fapi.feature_get(fid)["extensions"]["description"] == "Restored"
+
+
 @parametrize_versioning()
 def test_workflow(versioning, mkres):
     res = mkres(versioning)
