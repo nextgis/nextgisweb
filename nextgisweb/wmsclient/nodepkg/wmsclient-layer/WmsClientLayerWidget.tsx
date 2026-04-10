@@ -7,7 +7,7 @@ import type { OptionType } from "@nextgisweb/gui/antd";
 import { LotMV } from "@nextgisweb/gui/arm";
 import { Area, Lot } from "@nextgisweb/gui/mayout";
 import { assert } from "@nextgisweb/jsrealm/error";
-import { route } from "@nextgisweb/pyramid/api";
+import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { useAbortController, useRouteGet } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { ResourceSelectRef } from "@nextgisweb/resource/component";
@@ -67,7 +67,25 @@ export const WmsClientLayerWidget: EditorWidget<WmsClientLayerStore> = observer(
         return [
           {
             value: local?.id,
-            label: local ? local.display_name : code,
+            label: local ? (
+              local.display_name
+            ) : (
+              <span>
+                {code}{" "}
+                <a
+                  href={
+                    routeURL("srs.catalog") +
+                    "?q=" +
+                    encodeURIComponent(code)
+                  }
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {gettext("Add to Web GIS")}
+                </a>
+              </span>
+            ),
             disabled: !local,
           },
         ];

@@ -35,7 +35,7 @@ def proj_catalog_search(q: str, limit: int = 100) -> list:
     return [
         r
         for r in query_crs_info(auth_name="EPSG", allow_deprecated=False)
-        if q in r.name.lower() or q in r.code.lower()
+        if q in r.name.lower() or q in r.code.lower() or q in f"{r.auth_name}:{r.code}".lower()
     ][:limit]
 
 

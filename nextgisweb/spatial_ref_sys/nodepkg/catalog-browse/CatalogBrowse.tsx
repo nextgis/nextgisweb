@@ -33,7 +33,9 @@ interface SRSRow extends SRSRead {
 }
 
 export function CatalogBrowse() {
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(
+    () => new URLSearchParams(window.location.search).get("q") ?? ""
+  );
   const [lon, setLon] = useState<number | null>(null);
   const [lat, setLat] = useState<number | null>(null);
 
