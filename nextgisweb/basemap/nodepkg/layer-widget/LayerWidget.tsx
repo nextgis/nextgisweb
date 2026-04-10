@@ -31,16 +31,19 @@ export const LayerWidget: EditorWidget<LayerStore> = observer(({ store }) => {
 
   const [initialized, setInitialized] = useState(false);
 
+  const qms = useMemo<QMSService | null>(() => {
+    return store.qms.value ? (JSON.parse(store.qms.value) as QMSService) : null;
+  }, [store.qms.value]);
+
   useEffect(() => {
-    if (store.loaded && store.qms.value) {
+    if (store.loaded && qms) {
       try {
-        const qmsId = JSON.parse(store.qms.value) as QMSService;
-        setQmsId(qmsId.id);
+        setQmsId(qms.id);
       } finally {
         setInitialized(true);
       }
     }
-  }, [store.loaded, store.qms.value]);
+  }, [qms, store.loaded]);
 
   // Clean store qms but do not touch copyright_text and copyright_url
   useEffect(() => {
@@ -48,6 +51,14 @@ export const LayerWidget: EditorWidget<LayerStore> = observer(({ store }) => {
       store.qms.value = null;
     }
   }, [initialized, qmsId, store.qms]);
+
+  const url = useMemo(() => {
+    let urlVal = store.url.value;
+    if (urlVal && qms && !qms.y_origin_top) {
+      urlVal = urlVal.replace("{y}", "{-y}");
+    }
+    return urlVal;
+  }, [qms, store.url.value]);
 
   return (
     <div
@@ -138,7 +149,7 @@ export const LayerWidget: EditorWidget<LayerStore> = observer(({ store }) => {
           />
         </Area>
       </div>
-      {store.url.value ? (
+      {url ? (
         <div
           style={{
             flex: 1,
@@ -169,7 +180,7 @@ export const LayerWidget: EditorWidget<LayerStore> = observer(({ store }) => {
               </div>
             </MapControl>
             <URLLayer
-              url={store.url.value}
+              url={url}
               key={qmsId}
               opacity={opacity}
               attributions={
