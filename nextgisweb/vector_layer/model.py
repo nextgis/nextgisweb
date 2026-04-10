@@ -471,7 +471,7 @@ class VectorLayer(Resource, SpatialLayerMixin, LayerFieldsMixin, FVersioningMixi
         result = session.execute(query, data)
         if result.rowcount:
             if vobj:
-                vobj.mark_changed()
+                vobj.mark_features_restored(feature.id)
             mark_changed(session)
             return True
         else:

@@ -164,6 +164,84 @@ class ExtensionQueries:
         return self.__update_delete_query("O")
 
     @cached_query
+    def restore_ctab(self):
+        ct, et, ht = self.tables
+
+        qet_cols = [et.c.feature_id, et.c.version_id]
+        if self.has_id:
+            qet_cols.insert(1, et.c.extension_id)
+        qet = (
+            sa.select(*qet_cols)
+            .where(
+                et.c.resource_id == self.p_rid,
+                et.c.feature_id == self.p_fid,
+                et.c.version_op == sa.text("'O'"),
+            )
+            .cte("qet")
+        )
+
+        sht_cols = [
+            qet.c.feature_id,
+            qet.c.version_id,
+            *(ht.c[c] for c in self.cols),
+        ]
+        sht_where = [
+            ht.c.resource_id == self.p_rid,
+            ht.c.feature_id == qet.c.feature_id,
+            ht.c.version_nid == qet.c.version_id,
+            ht.c.version_nop == sa.text("'O'"),
+        ]
+        if self.has_id:
+            sht_cols.insert(1, qet.c.extension_id)
+            sht_where.append(ht.c.extension_id == qet.c.extension_id)
+        sht = sa.select(*sht_cols).where(*sht_where).cte("sht")
+
+        iht_cols = [
+            "resource_id",
+            "feature_id",
+            "version_id",
+            "version_op",
+            "version_nid",
+            "version_nop",
+            *self.cols,
+        ]
+        iht_sel = [
+            self.p_rid,
+            sht.c.feature_id,
+            sht.c.version_id,
+            sa.text("'O'"),
+            self.p_vid,
+            sa.text("'R'"),
+            *(sht.c[c] for c in self.cols),
+        ]
+        iht_ret = [ht.c.feature_id, *(ht.c[c] for c in self.cols)]
+        if self.has_id:
+            iht_cols.insert(1, "extension_id")
+            iht_sel.insert(1, sht.c.extension_id)
+            iht_ret.insert(1, ht.c.extension_id)
+        iht = (
+            sa.insert(ht).from_select(iht_cols, sa.select(*iht_sel)).returning(*iht_ret).cte("iht")
+        )
+
+        ict_cols = ["resource_id", "feature_id", *self.cols]
+        ict_sel = [self.p_rid, iht.c.feature_id, *(iht.c[c] for c in self.cols)]
+        if self.has_id:
+            ict_cols.insert(1, "extension_id")
+            ict_sel.insert(1, iht.c.extension_id)
+        ict = (
+            sa.insert(ct)
+            .from_select(ict_cols, sa.select(*ict_sel))
+            .returning(ct.c.feature_id, *((ct.c.extension_id,) if self.has_id else []))
+            .cte("ict")
+        )
+
+        uet = sa.update(et).values(version_id=self.p_vid, version_op=sa.text("'R'"))
+        uet = uet.where(et.c.resource_id == self.p_rid, et.c.feature_id == ict.c.feature_id)
+        if self.has_id:
+            uet = uet.where(et.c.extension_id == ict.c.extension_id)
+        return uet
+
+    @cached_query
     def initfill(self):
         ct, et, _ = self.tables
         cs = sa.select().where(ct.c.resource_id == self.p_rid)
@@ -974,6 +1052,11 @@ def _delete_orphaned_feature_extensions(mapper, connection, target: FVersioningO
                 connection.execute(query, dict(params, p_fid=fid))
         fids[:] = []
 
-    # TODO: Restore extensions on feature restore
+    if fids := target.features_restored:
+        for cls in FVersioningExtensionMixin.fversioning_registry.values():
+            query = cls.fversioning_queries.restore_ctab
+            for fid in fids:
+                connection.execute(query, dict(params, p_fid=fid))
+        fids[:] = []
 
     target.unflushed_changes = False
