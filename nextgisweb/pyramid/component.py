@@ -219,8 +219,6 @@ class PyramidComponent(Component):
             "buffering as it's done in Nginx. See docs on proxy_buffering "
             "directive for ngx_http_proxy module for details.")),
 
-        Option("legacy_locale_switcher", bool, default=False),
-
         Option("lunkwill.enabled", bool, default=None),
         Option("lunkwill.proxy", bool, default=True),
         Option("lunkwill.hmux", bool, default=False),
