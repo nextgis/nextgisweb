@@ -29,6 +29,7 @@ from nextgisweb.feature_layer import (
     FeatureLayerGeometryType,
     FeatureQueryIntersectsMixin,
     FeatureSet,
+    IAggregatableFeatureQuery,
     IFeatureLayer,
     IFeatureQuery,
     IFeatureQueryFilter,
@@ -59,6 +60,7 @@ from nextgisweb.resource import (
 )
 from nextgisweb.spatial_ref_sys import SRS
 
+from . import aggregation as postgis_aggregation
 from .exception import ExternalDatabaseError
 
 Base.depends_on("resource", "feature_layer")
@@ -606,6 +608,7 @@ class PostgisLayerSerializer(Serializer, resource=PostgisLayer):
     IFeatureQueryIlike,
     IFeatureQueryIntersects,
     IFeatureQueryOrderBy,
+    IAggregatableFeatureQuery,
 )
 class FeatureQueryBase(FeatureQueryIntersectsMixin):
     def __init__(self):
@@ -665,40 +668,23 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
     def ilike(self, value):
         self._ilike = value
 
-    def __call__(self):
+    supported_aggregations = list(postgis_aggregation.postgis_aggregations.keys())
+
+    def aggregate(self, specs):
+        return postgis_aggregation.aggregate(self, specs)
+
+    def build_query_context(self):
+        """Return (tab, col_map, where) for use in feature query and aggregation."""
         tab = alias(self.layer._sa_table(True), name="tab")
 
         idcol = tab.columns[self.layer.column_id]
-        columns = [idcol.label("id")]
-        where = [idcol.isnot(None)]
-
         geomcol = tab.columns[self.layer.column_geom]
 
-        columns_mapping = {"id": idcol}
+        col_map = {"id": idcol}
         for field in self.layer.fields:
-            columns_mapping[field.keyname] = tab.columns[field.column_name]
+            col_map[field.keyname] = tab.columns[field.column_name]
 
-        srs = self.layer.srs if self._srs is None else self._srs
-
-        if srs.id != self.layer.geometry_srid:
-            geomexpr = st_transform(geomcol, srs.id)
-        else:
-            geomexpr = geomcol
-
-        if self._geom:
-            if self._geom_format == "WKB":
-                geomexpr = func.st_asbinary(geomexpr, "NDR")
-            else:
-                geomexpr = func.st_astext(geomexpr)
-
-            columns.append(geomexpr.label("geom"))
-
-        selected_fields = []
-        for idx, fld in enumerate(self.layer.fields):
-            if self._fields is None or fld.keyname in self._fields:
-                label = f"fld_{idx}"
-                columns.append(tab.columns[fld.column_name].label(label))
-                selected_fields.append((fld.keyname, label))
+        where = [idcol.isnot(None)]
 
         if self._filter_by:
             for k, v in self._filter_by.items():
@@ -754,7 +740,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
         if self._filter_program is not None:
             virtual_operands_mapping = {"fid": idcol}
-            clause = self._filter_program.to_clause(columns_mapping, virtual_operands_mapping)
+            clause = self._filter_program.to_clause(col_map, virtual_operands_mapping)
             if clause is not None:
                 where.append(clause)
 
@@ -789,16 +775,6 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
             where.append(func.st_intersects(geomcol, int_geom))
 
-        if self._box:
-            columns.extend(
-                (
-                    st_xmin(geomexpr).label("box_left"),
-                    st_ymin(geomexpr).label("box_bottom"),
-                    st_xmax(geomexpr).label("box_right"),
-                    st_ymax(geomexpr).label("box_top"),
-                )
-            )
-
         gt = self.layer.geometry_type
         if gt in GEOM_TYPE.has_z:
             gt = re.sub(r"Z$", "", gt)
@@ -815,6 +791,48 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                 ),
             )
         )
+
+        return tab, col_map, where
+
+    def __call__(self):
+        tab, col_map, where = self.build_query_context()
+
+        idcol = tab.columns[self.layer.column_id]
+        geomcol = tab.columns[self.layer.column_geom]
+
+        columns = [idcol.label("id")]
+
+        srs = self.layer.srs if self._srs is None else self._srs
+
+        if srs.id != self.layer.geometry_srid:
+            geomexpr = st_transform(geomcol, srs.id)
+        else:
+            geomexpr = geomcol
+
+        if self._geom:
+            if self._geom_format == "WKB":
+                geomexpr = func.st_asbinary(geomexpr, "NDR")
+            else:
+                geomexpr = func.st_astext(geomexpr)
+
+            columns.append(geomexpr.label("geom"))
+
+        selected_fields = []
+        for idx, fld in enumerate(self.layer.fields):
+            if self._fields is None or fld.keyname in self._fields:
+                label = f"fld_{idx}"
+                columns.append(tab.columns[fld.column_name].label(label))
+                selected_fields.append((fld.keyname, label))
+
+        if self._box:
+            columns.extend(
+                (
+                    st_xmin(geomexpr).label("box_left"),
+                    st_ymin(geomexpr).label("box_bottom"),
+                    st_xmax(geomexpr).label("box_right"),
+                    st_ymax(geomexpr).label("box_top"),
+                )
+            )
 
         order_criterion = []
         if self._order_by:

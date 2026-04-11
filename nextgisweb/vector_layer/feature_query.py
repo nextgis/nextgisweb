@@ -12,6 +12,7 @@ from nextgisweb.feature_layer import (
     Feature,
     FeatureQueryIntersectsMixin,
     FeatureSet,
+    IAggregatableFeatureQuery,
     IFeatureQuery,
     IFeatureQueryClipByBox,
     IFeatureQueryFilter,
@@ -24,6 +25,8 @@ from nextgisweb.feature_layer import (
 )
 from nextgisweb.spatial_ref_sys import SRS
 
+from . import aggregation
+
 
 @implementer(
     IFeatureQuery,
@@ -35,6 +38,7 @@ from nextgisweb.spatial_ref_sys import SRS
     IFeatureQueryOrderBy,
     IFeatureQueryClipByBox,
     IFeatureQuerySimplify,
+    IAggregatableFeatureQuery,
 )
 class FeatureQueryBase(FeatureQueryIntersectsMixin):
     def __init__(self):
@@ -113,7 +117,13 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
     def ilike(self, value):
         self._ilike = value
 
-    def __call__(self):
+    supported_aggregations = list(aggregation.vector_aggregations.keys())
+
+    def aggregate(self, specs):
+        return aggregation.aggregate(self, specs)
+
+    def build_query_context(self):
+        """Return (vls, table, columns_mapping, where) for use in feature query and aggregation."""
         vls = self.layer.vlschema()
         if not self._pit_version:
             table = alias(vls.ctab, "tab")
@@ -125,54 +135,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
         fields = table.fields
         columns_mapping = {"id": idcol}
         columns_mapping.update(fields)
-        columns_mapping_ref = columns_mapping
-        columns = []
         where = []
-
-        srs = self.layer.srs if self._srs is None else self._srs
-        if srs.id != self.layer.srs_id:
-            geomexpr = func.st_transform(geomcol, srs.id)
-        else:
-            geomexpr = geomcol
-
-        if self._clip_by_box is not None:
-            clip = func.st_setsrid(
-                func.st_makeenvelope(*self._clip_by_box.bounds),
-                self._clip_by_box.srid,
-            )
-
-            # Wrap geomexpr in ST_Force2D to avoid invalid coordinates for
-            # geometries with Z. The issue is fixed in modern GEOS and should
-            # work out of the box without discarding the Z coordinate.
-            geomexpr = func.st_clipbybox2d(func.st_force2d(geomexpr), clip)
-
-        if self._simplify is not None:
-            geomexpr = func.st_simplifypreservetopology(geomexpr, self._simplify)
-
-        if self._box:
-            columns.extend(
-                (
-                    func.st_xmin(geomexpr).label("box_left"),
-                    func.st_ymin(geomexpr).label("box_bottom"),
-                    func.st_xmax(geomexpr).label("box_right"),
-                    func.st_ymax(geomexpr).label("box_top"),
-                )
-            )
-
-        if self._geom:
-            geomexpr = (
-                func.st_asbinary(geomexpr, "NDR")
-                if self._geom_format == "WKB"
-                else func.st_astext(geomexpr)
-            )
-            columns.append(geomexpr.label("geom"))
-
-        selected_fields = []
-        for idx, (fld_k, fld_c) in enumerate(fields.items(), start=1):
-            if self._fields is None or fld_k in self._fields:
-                label = f"fld_{idx}"
-                columns.append(fld_c.label(label))
-                selected_fields.append((fld_k, label))
 
         if self._filter_by:
             for k, v in self._filter_by.items():
@@ -264,6 +227,61 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
             where.append(func.st_intersects(geomcol, int_geom))
 
+        return vls, table, columns_mapping, where
+
+    def __call__(self):
+        vls, table, columns_mapping, where = self.build_query_context()
+
+        idcol = table.columns.fid
+        geomcol = table.columns.geom
+        fields = table.fields
+        columns = []
+
+        srs = self.layer.srs if self._srs is None else self._srs
+        if srs.id != self.layer.srs_id:
+            geomexpr = func.st_transform(geomcol, srs.id)
+        else:
+            geomexpr = geomcol
+
+        if self._clip_by_box is not None:
+            clip = func.st_setsrid(
+                func.st_makeenvelope(*self._clip_by_box.bounds),
+                self._clip_by_box.srid,
+            )
+
+            # Wrap geomexpr in ST_Force2D to avoid invalid coordinates for
+            # geometries with Z. The issue is fixed in modern GEOS and should
+            # work out of the box without discarding the Z coordinate.
+            geomexpr = func.st_clipbybox2d(func.st_force2d(geomexpr), clip)
+
+        if self._simplify is not None:
+            geomexpr = func.st_simplifypreservetopology(geomexpr, self._simplify)
+
+        if self._box:
+            columns.extend(
+                (
+                    func.st_xmin(geomexpr).label("box_left"),
+                    func.st_ymin(geomexpr).label("box_bottom"),
+                    func.st_xmax(geomexpr).label("box_right"),
+                    func.st_ymax(geomexpr).label("box_top"),
+                )
+            )
+
+        if self._geom:
+            geomexpr = (
+                func.st_asbinary(geomexpr, "NDR")
+                if self._geom_format == "WKB"
+                else func.st_astext(geomexpr)
+            )
+            columns.append(geomexpr.label("geom"))
+
+        selected_fields = []
+        for idx, (fld_k, fld_c) in enumerate(fields.items(), start=1):
+            if self._fields is None or fld_k in self._fields:
+                label = f"fld_{idx}"
+                columns.append(fld_c.label(label))
+                selected_fields.append((fld_k, label))
+
         order_by = []
         if self._order_by:
             for order, fld_k in self._order_by:
@@ -280,6 +298,8 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
         else:
             qbase = qbase.add_columns(literal_column("NULL").label("vid"))
         qbase = qbase.add_columns(*columns)
+
+        columns_mapping_ref = columns_mapping
 
         class QueryFeatureSet(FeatureSet):
             layer = self.layer

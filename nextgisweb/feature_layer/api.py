@@ -4,10 +4,11 @@ from dataclasses import dataclass
 from functools import cached_property, partial
 from typing import Annotated, Any, Literal
 
+import msgspec.structs
 from msgspec import UNSET, Meta, Struct, UnsetType
 from sqlalchemy.exc import NoResultFound
 
-from nextgisweb.env import gettext
+from nextgisweb.env import gettext, gettextf
 from nextgisweb.lib.apitype import AsJSON, Query
 from nextgisweb.lib.geometry import Geometry, GeometryNotValid, Transformer, geom_area, geom_length
 
@@ -17,6 +18,7 @@ from nextgisweb.pyramid.api import csetting
 from nextgisweb.resource import DataScope, Resource, ResourceFactory
 from nextgisweb.spatial_ref_sys import SRS
 
+from .aggregation import AggregationResult, AggregationSpec
 from .dtutil import DT_DATATYPES, DT_DUMPERS, DT_LOADERS, DtFormat
 from .exception import FeatureNotFound
 from .extension import FeatureExtension
@@ -24,6 +26,7 @@ from .feature import Feature
 from .filter import str_contains_filter
 from .interface import (
     FIELD_TYPE,
+    IAggregatableFeatureQuery,
     IFeatureLayer,
     IFeatureQueryIlike,
     IFeatureQueryLike,
@@ -690,6 +693,54 @@ def cextent(resource, request) -> NgwExtent:
     return NgwExtent(**extent)
 
 
+class AggregateBody(Struct, kw_only=True):
+    items: Annotated[list[AggregationSpec], Meta(min_length=1, max_length=20)]
+    filter: list[Any] | UnsetType = UNSET
+
+
+class AggregateResponse(Struct, kw_only=True):
+    items: list[AggregationResult]
+
+
+def aggregate(resource, request, *, body: AggregateBody) -> AggregateResponse:
+    """Compute multiple aggregations
+
+    :returns: Aggregation results in the same order as the request"""
+    request.resource_permission(DataScope.read)
+
+    feature_query = resource.feature_query()
+    if not IAggregatableFeatureQuery.providedBy(feature_query):
+        raise ValidationError(message=gettext("Aggregation is not supported for this layer."))
+
+    if body.filter is not UNSET and IFilterableFeatureLayer.providedBy(resource):
+        feature_query.set_filter_program(resource.filter_parser.parse(body.filter))
+
+    indexed_specs = []
+    for idx, spec in enumerate(body.items):
+        identity = type(spec).__struct_config__.tag
+        if identity not in feature_query.supported_aggregations:
+            msg = gettextf("Aggregation '{}' is not supported for this layer.").format(identity)
+            raise ValidationError(msg)
+
+        if isinstance(spec.field, int):
+            field = next((f for f in resource.fields if f.id == spec.field), None)
+            if field is None:
+                msg = gettextf("Field '{}' not found.").format(spec.field)
+                raise ValidationError(msg)
+            spec = msgspec.structs.replace(spec, field=field.keyname)
+        else:
+            try:
+                resource.field_by_keyname(spec.field)
+            except KeyError:
+                msg = gettextf("Field '{}' not found.").format(spec.field)
+                raise ValidationError(msg)
+
+        indexed_specs.append((idx, identity, spec))
+
+    results = feature_query.aggregate(indexed_specs)
+    return AggregateResponse(items=[results[i] for i in range(len(body.items))])
+
+
 def setup_pyramid(comp, config):
     feature_layer_factory = ResourceFactory(context=IFeatureLayer)
 
@@ -732,6 +783,13 @@ def setup_pyramid(comp, config):
         "/api/resource/{id}/feature_extent",
         factory=feature_layer_factory,
         get=cextent,
+    )
+
+    config.add_route(
+        "feature_layer.aggregate",
+        "/api/resource/{id}/feature/aggregate",
+        factory=feature_layer_factory,
+        post=aggregate,
     )
 
     config.add_route(

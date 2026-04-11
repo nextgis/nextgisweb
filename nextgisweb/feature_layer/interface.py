@@ -251,3 +251,10 @@ class IFeatureQueryClipByBox(IFeatureQuery):
 class IFeatureQuerySimplify(IFeatureQuery):
     def simplify(self, tolerance):
         """Simplify geometry by the given tolerance"""
+
+
+class IAggregatableFeatureQuery(IFeatureQuery):
+    supported_aggregations = Attribute("Supported aggregation identities")
+
+    def aggregate(self, specs):
+        """Execute aggregations using this query's table and WHERE context"""

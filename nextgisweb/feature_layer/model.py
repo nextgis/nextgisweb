@@ -23,6 +23,7 @@ from .interface import (
     FIELD_TYPE_OGR,
     FeatureLayerFieldDatatype,
     FeatureLayerGeometryType,
+    IAggregatableFeatureQuery,
     IVersionableFeatureLayer,
 )
 
@@ -276,6 +277,14 @@ class FVersioningAttr(SAttribute):
                 obj.fversioning_configure(enabled=value.enabled, source=srlzr)
 
 
+class AggregationsAttr(SAttribute):
+    def get(self, srlzr: Serializer) -> list[str]:
+        fq = srlzr.obj.feature_query
+        if not IAggregatableFeatureQuery.implementedBy(fq):
+            return []
+        return list(fq.supported_aggregations)
+
+
 class FeatureLayerSerializer(Serializer, resource=LayerFieldsMixin, force_create=True):
     identity = "feature_layer"
 
@@ -283,6 +292,7 @@ class FeatureLayerSerializer(Serializer, resource=LayerFieldsMixin, force_create
     geometry_type = GeometryTypeAttr(read=ResourceScope.read)
     fields = FieldsAttr(read=ResourceScope.read, write=ResourceScope.update)
     versioning = FVersioningAttr(read=ResourceScope.read, write=ResourceScope.update)
+    aggregations = AggregationsAttr(read=ResourceScope.read)
 
     def deserialize(self):
         if self.obj.id is None and IVersionableFeatureLayer.providedBy(self.obj):

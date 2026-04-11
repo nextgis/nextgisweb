@@ -11,6 +11,7 @@ from .interface import (
     FeatureLayerFieldDatatype,
     FeatureLayerGeometryType,
     FeaureLayerGeometryType,  # FIXME: Drop this after all references are converted
+    IAggregatableFeatureQuery,
     IFeatureLayer,
     IFeatureQuery,
     IFeatureQueryClipByBox,
