@@ -24,14 +24,15 @@ from nextgisweb.lib.apitype.util import (
 from nextgisweb.lib.imptool import module_from_stack
 from nextgisweb.lib.json import dumps
 
-from .util import indented
-
 ModuleName = str
 TypeName = str
 Export = tuple[ModuleName, TypeName]
 
 # Placeholder for a field is defined in __post_init__
 POST_INIT = cast(Any, UNSET)
+
+# Indentation unit for generated code
+INDENT_UNIT = " " * 2
 
 
 class TSGenerator:
@@ -366,7 +367,7 @@ class TSStruct(TSType, kw_only=True):
         tail = sep[0] if multiline else ""
         code = sep.join(parts) + tail
         if multiline:
-            code = indent(code, "    ")
+            code = indent(code, INDENT_UNIT)
         brackets = "[]" if self.array_like else "{}"
         code = ("\n" if multiline else "") + code + ("\n" if multiline else "")
         code = brackets[0] + code + brackets[1]
@@ -438,3 +439,7 @@ def struct_fields_encoded(otype) -> tuple[tuple[str, Any], ...]:
             otype.__struct_encode_fields__,
         )
     )
+
+
+def indented(lines: Sequence[str], *, sep: str = "\n") -> str:
+    return indent(sep.join(lines), INDENT_UNIT)
