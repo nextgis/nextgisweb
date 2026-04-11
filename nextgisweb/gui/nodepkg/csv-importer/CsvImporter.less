@@ -1,0 +1,205 @@
+@large-margin: 9px;
+@large-font-size: 16px;
+@medium-font-size: 14px;
+@small-font-size: 12px;
+@padding: 7px;
+@small-margin: 7px;
+
+.csv-importer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  &.csv-importer-file-select {
+    min-height: 0;
+
+    .csv-file-select {
+      height: 100%;
+    }
+
+    &
+      > .ant-upload.ant-upload-drag
+      > span.ant-upload-btn
+      > .ant-upload-drag-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+    }
+  }
+
+  & .titles {
+    display: flex;
+
+    & .mapping {
+      width: 30%;
+    }
+
+    & .preview {
+      width: 70%;
+
+      &.title {
+        padding-left: @padding;
+      }
+    }
+  }
+
+  & .title {
+    box-sizing: border-box;
+    padding: @padding @padding @padding 0;
+    color: var(--theme-color-text);
+    font-weight: 500;
+    font-size: @large-font-size;
+  }
+
+  & .mapping-part {
+    display: flex;
+    height: 80%;
+
+    & .mapping-widget {
+      display: flex;
+      flex-direction: column;
+      border: 1px solid var(--theme-color-border-secondary);
+      width: 30%;
+      min-width: 0;
+      overflow-x: auto;
+
+      & .csv-manual-mapping {
+        display: flex;
+        flex: 1 1 0;
+        flex-direction: column;
+        padding: @padding;
+        min-height: 0;
+
+        &::after {
+          display: block;
+          min-height: @small-margin;
+          content: "";
+        }
+
+        & .column {
+          display: flex;
+          flex-direction: column;
+          margin-bottom: @large-margin;
+
+          & .header {
+            display: flex;
+            align-items: center;
+            gap: @small-margin;
+            color: var(--theme-color-text-tertiary);
+            font-size: @small-font-size;
+          }
+
+          & .select {
+            width: 100%;
+
+            & .unset {
+              color: var(--theme-color-text-tertiary);
+            }
+          }
+        }
+      }
+    }
+
+    & .table-preview {
+      display: flex;
+      flex-direction: column;
+      border-bottom: 1px solid var(--theme-color-border-secondary);
+      width: 70%;
+      min-width: 0;
+
+      .csv-preview-table {
+        flex: 1 1 0;
+        margin: 0 0 @small-margin @small-margin;
+        border: 1px solid var(--theme-color-border-secondary);
+        border-radius: 4px;
+        min-width: 0;
+        min-height: 0;
+        overflow-x: auto;
+        overflow-y: auto;
+
+        &.centered {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+
+        .matched {
+          background-color: var(--theme-control-item-bg-active);
+        }
+
+        & .ant-table-container {
+          border: none;
+        }
+
+        .ant-table-tbody > tr:last-child > td {
+          border-bottom: none;
+        }
+      }
+
+      & .under-table {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: @large-margin;
+        margin: 0 0 @small-margin @large-margin;
+
+        & .meta {
+          display: flex;
+          align-items: center;
+          gap: @large-margin;
+          margin-left: auto;
+        }
+      }
+
+      & .inf-part {
+        display: flex;
+        align-items: baseline;
+        min-width: 0;
+
+        & .label {
+          margin-right: @small-margin;
+          color: var(--theme-color-text-secondary);
+        }
+
+        & .value,
+        & .button {
+          color: var(--theme-color-text-tertiary);
+        }
+      }
+    }
+  }
+
+  & .dialect-part {
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid var(--theme-color-border-secondary);
+    padding-top: @large-margin;
+    height: 20%;
+
+    .csv-dialect-form {
+      & .labels {
+        display: flex;
+        gap: @large-margin;
+
+        & .label {
+          margin-bottom: 3px;
+          width: 100%;
+          min-width: 0;
+          color: var(--theme-color-text-tertiary);
+          font-size: @medium-font-size;
+        }
+      }
+
+      & .selects {
+        display: flex;
+        gap: @large-margin;
+
+        & .select {
+          width: 100%;
+          min-width: 0;
+        }
+      }
+    }
+  }
+}
