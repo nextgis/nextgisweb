@@ -8,6 +8,7 @@ from subprocess import check_call
 from nextgisweb.env import Env
 from nextgisweb.env.cli import UninitializedEnvCommand, comp_cli, opt
 from nextgisweb.env.package import pkginfo
+from nextgisweb.lib.fileutil import update_text_file
 from nextgisweb.lib.logging import logger
 
 from nextgisweb.core import CoreComponent
@@ -56,8 +57,7 @@ def create_tsconfig(npkgs: dict[str, Path], *, debug):
         exclude=["node_modules"],
     )
 
-    with open("tsconfig.json", "w") as fd:
-        fd.write(json.dumps(tsconfig_json, indent=4))
+    update_text_file(Path("tsconfig.json"), json.dumps(tsconfig_json, indent=4))
 
 
 @comp_cli.command()
@@ -205,8 +205,7 @@ def install(
 
     package_json["workspaces"] = [str(pp) for pp in npkgs.values()]
 
-    with open("package.json", "w") as fd:
-        fd.write(json.dumps(package_json, indent=4))
+    update_text_file(Path("package.json"), json.dumps(package_json, indent=4))
 
     create_tsconfig(npkgs, debug=debug)
 

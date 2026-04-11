@@ -7,6 +7,7 @@ import transaction
 from nextgisweb.env import Component, gettext, require
 from nextgisweb.lib.config import Option, OptionAnnotations
 from nextgisweb.lib.datetime import utcnow_naive
+from nextgisweb.lib.fileutil import update_text_file
 from nextgisweb.lib.imptool import module_path
 from nextgisweb.lib.logging import logger
 
@@ -124,9 +125,9 @@ class PyramidComponent(Component):
 
         nodepkg = self.root_path / "nodepkg"
         config = self.make_app(settings=dict())
-        (nodepkg / "api/type.inc.d.ts").write_text(m.api_type(self, config))
-        (nodepkg / "api/route.inc.ts").write_text(m.route(self, config))
-        (nodepkg / "layout/dynmenu/type.inc.d.ts").write_text(m.dynmenu(self, config))
+        update_text_file(nodepkg / "api/type.inc.d.ts", m.api_type(self, config))
+        update_text_file(nodepkg / "api/route.inc.ts", m.route(self, config))
+        update_text_file(nodepkg / "layout/dynmenu/type.inc.d.ts", m.dynmenu(self, config))
 
     def client_type(self, tdef: Any):
         self.client_types.append(tdef)
