@@ -78,6 +78,8 @@ class RasterStyle(Resource):
                 format="MEM",
                 warpOptions=["UNIFIED_SRC_NODATA=ON"],
                 dstAlpha=True,
+                srcSRS=f"{self.srs.auth_name}:{self.srs.auth_srid}",
+                dstSRS="EPSG:3857",
             ),
         )
 

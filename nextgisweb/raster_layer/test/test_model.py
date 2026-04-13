@@ -18,7 +18,7 @@ from ..model import (
     RasterLayerUncompressedStorageInsufficient,
 )
 from ..util import band_color_interp
-from .validate_cloud_optimized_geotiff import validate
+from ..validate_cog import validate
 
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults")
 

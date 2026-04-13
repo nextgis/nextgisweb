@@ -9,7 +9,7 @@ from nextgisweb.spatial_ref_sys import SRS
 
 from ..component import RasterLayerComponent
 from ..model import RasterLayer
-from .validate_cloud_optimized_geotiff import validate
+from ..validate_cog import validate
 
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
 

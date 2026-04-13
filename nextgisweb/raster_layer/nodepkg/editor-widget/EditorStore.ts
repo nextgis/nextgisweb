@@ -12,9 +12,12 @@ import type {
 import type { ResourceRef } from "@nextgisweb/resource/type/api";
 import srsSettings from "@nextgisweb/spatial-ref-sys/client-settings";
 
+export type Mode = "upload" | "storage" | "keep";
+
 export class EditorStore implements IEditorStore<
   apitype.RasterLayerRead,
-  apitype.RasterLayerUpdate
+  apitype.RasterLayerUpdate,
+  apitype.RasterLayerCreate
 > {
   readonly identity = "raster_layer";
   readonly composite: CompositeStore;
@@ -25,45 +28,70 @@ export class EditorStore implements IEditorStore<
   @observable.ref accessor cogInitial: boolean | undefined = undefined;
   @observable.ref accessor storage: ResourceRef | null = null;
   @observable.ref accessor storageInitial: ResourceRef | null = null;
+  @observable.ref accessor storageFilename: string = "";
+  @observable.ref accessor mode: Mode;
 
   @observable.ref accessor dirty = false;
 
   constructor({ composite }: EditorStoreOptions) {
     this.composite = composite;
+    this.mode = composite.operation === "create" ? "upload" : "keep";
   }
 
   @action
   load(value: apitype.RasterLayerRead) {
     this.cog = this.cogInitial = !!value.cog;
     this.storage = this.storageInitial = value.storage ?? null;
+    if (value.storage_filename) {
+      this.storageFilename = value.storage_filename;
+    }
     this.dirty = false;
   }
 
-  dump({ lunkwill }: DumpParams): apitype.RasterLayerUpdate | undefined {
-    if (!this.dirty) return;
+  dump({
+    lunkwill,
+  }: DumpParams):
+    | apitype.RasterLayerUpdate
+    | apitype.RasterLayerCreate
+    | undefined {
+    if (!this.dirty) return undefined;
 
-    lunkwill.suggest(
-      this.composite.operation === "create" ||
-        !!this.source ||
-        this.cog !== this.cogInitial
-    );
+    const isCreate = this.composite.operation === "create";
 
+    if (this.mode === "keep") {
+      if (this.cog === this.cogInitial) return undefined;
+      lunkwill.suggest(true);
+      return { cog: this.cog };
+    }
+
+    if (this.mode === "storage") {
+      return {
+        ...(isCreate ? { storage: this.storage! } : {}),
+        storage_filename: this.storageFilename,
+      };
+    }
+
+    // mode === "upload"
+    lunkwill.suggest(isCreate || !!this.source || this.cog !== this.cogInitial);
     return {
       ...(this.source || this.cog !== this.cogInitial ? { cog: this.cog } : {}),
       ...(this.source ? { source: this.source, srs: srsSettings.default } : {}),
-      ...(this.composite.operation === "create" && this.storage
-        ? { storage: this.storage }
-        : {}),
+      ...(isCreate && this.storage ? { storage: this.storage } : {}),
     };
   }
 
   @action
   update(props: Partial<this>) {
+    if ("storage" in props && !props.storage) {
+      this.mode = "upload";
+    }
     Object.assign(this, props);
     if (
       props.source !== undefined ||
       props.cog !== undefined ||
-      props.storage !== undefined
+      props.storage !== undefined ||
+      props.storageFilename !== undefined ||
+      props.mode !== undefined
     ) {
       this.dirty = true;
     }
@@ -71,15 +99,20 @@ export class EditorStore implements IEditorStore<
 
   @computed
   get isValid() {
-    return (
-      !this.uploading &&
-      (this.composite.operation === "update" || !!this.source)
-    );
+    if (this.uploading) return false;
+    if (this.mode === "keep") return true;
+    if (this.mode === "storage") {
+      return !!this.storage && !!this.storageFilename;
+    }
+    // mode === "upload"
+    const isCreate = this.composite.operation === "create";
+    return !isCreate || !!this.source;
   }
 
   @computed
   get suggestedDisplayName() {
-    const base = this.source?.name;
-    return base ? base.replace(/\.tiff?$/i, "") : undefined;
+    if (this.source?.name) return this.source.name.replace(/\.tiff?$/i, "");
+    if (this.storageFilename) return this.storageFilename.split("/").pop();
+    return undefined;
   }
 }

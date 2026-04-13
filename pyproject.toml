@@ -2,7 +2,7 @@
 line-length = 99
 exclude = [
     "docker.py",
-    "nextgisweb/raster_layer/test/validate_cloud_optimized_geotiff.py",
+    "nextgisweb/raster_layer/validate_cog.py",
 ]
 
 [tool.ruff.lint]

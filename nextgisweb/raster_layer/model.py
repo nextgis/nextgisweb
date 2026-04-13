@@ -45,6 +45,7 @@ from nextgisweb.resource import (
     SResource,
 )
 from nextgisweb.resource.category import ExternalConnectionsCategory
+from nextgisweb.spatial_ref_sys import SRS
 
 from .kind_of_data import RasterLayerData
 from .util import (
@@ -55,12 +56,52 @@ from .util import (
     msg_supported_formats,
     raster_size,
 )
+from .validate_cog import validate as validate_cog
 
 Base.depends_on("resource")
 
 PYRAMID_TARGET_SIZE = 512
 
 SUPPORTED_DRIVERS = ("GTiff", "PNG", "JPEG")
+
+
+def get_dataset_srs(ds: gdal.Dataset) -> osr.SpatialReference:
+    dsproj = ds.GetProjection()
+    dsgtran = ds.GetGeoTransform()
+
+    if not dsproj or not dsgtran:
+        raise ValidationError(gettext("Raster files without projection info are not supported."))
+
+    # Workaround for broken encoding in WKT. Otherwise, it'll cause SWIG
+    # TypeError (not a string) while passing to GDAL.
+    try:
+        dsproj.encode("utf-8", "strict")
+    except UnicodeEncodeError:
+        dsproj = dsproj.encode("utf-8", "replace").decode("utf-8")
+
+    try:
+        src_osr = sr_from_wkt(dsproj)
+        if src_osr.IsLocal() and (code := src_osr.GetAuthorityCode(None)) is not None:
+            # The coordinate system may be interpreted as 'local' when the
+            # definitions from EPSG code and GeoTIFF keys are inconsistent.
+            # Starting with GDAL 3.5, the GTIFF_SRS_SOURCE configuration
+            # option can be used to control this behavior.
+            src_osr = sr_from_epsg(int(code))
+    except SpatialReferenceError:
+        raise ValidationError(gettext("GDAL was unable to parse the raster coordinate system."))
+
+    return src_osr
+
+
+def get_dataset_data_type(ds: gdal.Dataset) -> int:
+    data_type = None
+    for bidx in range(1, ds.RasterCount + 1):
+        band = ds.GetRasterBand(bidx)
+        if data_type is None:
+            data_type = band.DataType
+        elif data_type != band.DataType:
+            raise ValidationError(gettext("Mixed band data types are not supported."))
+    return data_type
 
 
 class RasterBand(Struct):
@@ -221,32 +262,15 @@ class RasterLayer(Resource, SpatialLayerMixin):
         if not ds:
             raise UnsupportedFile(file_upload, detail=msg_supported_formats)
 
-        dsproj = ds.GetProjection()
+        src_osr = get_dataset_srs(ds)
         dsgtran = ds.GetGeoTransform()
+        data_type = get_dataset_data_type(ds)
 
-        if not dsproj or not dsgtran:
-            raise ValidationError(
-                gettext("Raster files without projection info are not supported.")
-            )
-
-        # Workaround for broken encoding in WKT. Otherwise, it'll cause SWIG
-        # TypeError (not a string) while passing to GDAL.
-        try:
-            dsproj.encode("utf-8", "strict")
-        except UnicodeEncodeError:
-            dsproj = dsproj.encode("utf-8", "replace").decode("utf-8")
-
-        data_type = None
         alpha_band = None
         has_nodata = None
         mask_flags = []
         for bidx in range(1, ds.RasterCount + 1):
             band = ds.GetRasterBand(bidx)
-
-            if data_type is None:
-                data_type = band.DataType
-            elif data_type != band.DataType:
-                raise ValidationError(gettext("Mixed band data types are not supported."))
 
             mask_flags.append(band.GetMaskFlags())
 
@@ -284,19 +308,6 @@ class RasterLayer(Resource, SpatialLayerMixin):
                 zip_filename = "/vsizip/{%s}" % filename
                 filename = f"{zip_filename}/{os.path.basename(tf.name)}"
                 ds = gdal.Open(filename, gdalconst.GA_ReadOnly)
-
-        try:
-            src_osr = sr_from_wkt(dsproj)
-            if src_osr.IsLocal() and (code := src_osr.GetAuthorityCode(None)) is not None:
-                # The coordinate system may be interpreted as 'local' when the
-                # definitions from EPSG code and GeoTIFF keys are inconsistent.
-                # Starting with GDAL 3.5, the GTIFF_SRS_SOURCE configuration
-                # option can be used to control this behavior.
-                src_osr = sr_from_epsg(int(code))
-        except SpatialReferenceError:
-            raise ValidationError(
-                gettext("GDAL was unable to parse the raster coordinate system.")
-            )
 
         if src_osr.IsLocal():
             raise ValidationError(
@@ -420,6 +431,9 @@ class RasterLayer(Resource, SpatialLayerMixin):
         finally:
             ds_measure = None
 
+        self.populate_meta(ds, data_type)
+
+    def populate_meta(self, ds: gdal.Dataset, data_type: int) -> None:
         self.dtype = gdal.GetDataTypeName(data_type)
         self.xsize = ds.RasterXSize
         self.ysize = ds.RasterYSize
@@ -461,7 +475,8 @@ class RasterLayer(Resource, SpatialLayerMixin):
     def _load_file_s3(self, cmd: list) -> gdal.Dataset:
         storage = self.storage
         s3_env = storage.vsi_credentials()
-        self.storage_filename = str(uuid4()) + ".tif"
+        if self.storage_filename is None:
+            self.storage_filename = str(uuid4()) + ".tif"
         s3_path = storage.vsi_path(self.storage_filename)
         with TemporaryDirectory() as tmpdir:
             local = os.path.join(tmpdir, "raster.tif")
@@ -479,6 +494,63 @@ class RasterLayer(Resource, SpatialLayerMixin):
     def _s3_open(self, s3_path: str) -> gdal.Dataset:
         self.storage.configure_gdal()
         return gdal.Open(s3_path, gdalconst.GA_ReadOnly)
+
+    def load_storage_path(self, path: str):
+        """Load metadata from an existing file in the storage without modification.
+
+        Unlike load_file(), this does not process, reproject, or upload the
+        file - it reads metadata from the S3 object as-is. The storage
+        attribute must already be set before calling this.
+        """
+        ds = self._s3_open(self.storage.vsi_path(path))
+        if ds is None:
+            raise ValidationError(
+                gettext("Failed to open raster file at the specified storage path.")
+            )
+
+        _, errors, _ = validate_cog(ds)
+        if errors:
+            raise ValidationError(
+                gettext("The raster file must be a Cloud Optimized GeoTIFF (COG).")
+            )
+
+        src_osr = get_dataset_srs(ds)
+        data_type = get_dataset_data_type(ds)
+
+        if src_osr.IsLocal():
+            raise ValidationError(
+                gettext("The raster has a local coordinate system and is not supported.")
+            )
+
+        auth_name = src_osr.GetAuthorityName(None)
+        auth_code = src_osr.GetAuthorityCode(None)
+
+        srs = None
+        if auth_code is not None:
+            srs = SRS.filter_by(
+                auth_name=auth_name or "EPSG", auth_srid=int(auth_code)
+            ).one_or_none()
+
+        if srs is None:
+            if auth_code is None:
+                raise ValidationError(
+                    gettext(
+                        "The raster coordinate system could not be identified. "
+                        "Make sure the file has a recognized EPSG coordinate system."
+                    )
+                )
+            raise ValidationError(
+                gettextf(
+                    "The raster coordinate system ({auth}:{code}) is not registered "
+                    "in NextGIS Web. Add it to the list of supported coordinate "
+                    "systems first."
+                )(auth=auth_name or "EPSG", code=auth_code)
+            )
+
+        self.srs = srs
+        self.storage_filename = path
+        self.cog = True
+        self.populate_meta(ds, data_type)
 
     def gdal_dataset(self):
         if self.storage is not None:
@@ -734,11 +806,30 @@ class StorageAttr(SResource):
         self.types = CRUTypes(self.types.create, self.types.read, UnsetType)
 
 
+class StorageFilenameAttr(SAttribute):
+    ctypes = CRUTypes(str, str | None, str)
+
+    def get(self, srlzr: Serializer) -> str | None:
+        return srlzr.obj.storage_filename
+
+    def set(self, srlzr: Serializer, value: str, *, create: bool):
+        if srlzr.obj.storage is None:
+            raise ValidationError(
+                gettext("Storage must be selected before specifying a storage filename.")
+            )
+        if srlzr.data.source is not UNSET:
+            # Both source and filename provided: store the filename so _load_file_s3 uses it
+            # instead of generating a random UUID name.
+            srlzr.obj.storage_filename = value
+        else:
+            srlzr.obj.load_storage_path(value)
+
+
 DataScope.read.require(ConnectionScope.connect, attr="storage", cls=RasterLayer, attr_empty=True)
 
 
 class RasterLayerSerializer(Serializer, resource=RasterLayer):
-    srs = SRelationship(read=ResourceScope.read, write=ResourceScope.update)
+    srs = SRelationship(read=ResourceScope.read, write=ResourceScope.update, required=False)
 
     xsize = SColumn(read=ResourceScope.read)
     ysize = SColumn(read=ResourceScope.read)
@@ -749,7 +840,8 @@ class RasterLayerSerializer(Serializer, resource=RasterLayer):
     bands = Bands(read=ResourceScope.read)
 
     storage = StorageAttr(read=ResourceScope.read, write=DataScope.write)
-    source = SourceAttr(write=DataScope.write, required=True)
+    storage_filename = StorageFilenameAttr(read=ResourceScope.read, write=DataScope.write)
+    source = SourceAttr(write=DataScope.write, required=False)
     cog = CogAttr(read=ResourceScope.read, write=ResourceScope.update)
 
     # TODO: After the maintenance process completes and the 'meta' column
