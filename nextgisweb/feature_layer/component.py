@@ -31,8 +31,7 @@ class FeatureLayerComponent(Component):
 
     # fmt: off
     option_annotations = (
-        Option("export.limit", int, default=None, doc='The export limit'),
-        Option("versioning.enabled", bool, default=False),
-        Option("versioning.default", bool, default=False),
+        Option("export.limit", int, default=None, doc="The export limit"),
+        Option("versioning.default", bool, default=True),
     )
     # fmt: on
