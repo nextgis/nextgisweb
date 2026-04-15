@@ -1,6 +1,4 @@
-import ngwdocker
-
-ngwdocker.require_version(">=2.2.0.dev0")
+# // crater >= 2.3.0.dev0
 
 from pathlib import Path
 
@@ -50,6 +48,6 @@ def on_virtualenv(event):
     )
 
     event.after_install(
-        "ln -s package/nextgisweb/.prettierrc.cjs $NGWROOT/",
-        "ln -s package/nextgisweb/eslint.config.cjs $NGWROOT/",
+        "ln -s package/nextgisweb/.prettierrc.cjs $CRATER_ROOT/",
+        "ln -s package/nextgisweb/eslint.config.cjs $CRATER_ROOT/",
     )
