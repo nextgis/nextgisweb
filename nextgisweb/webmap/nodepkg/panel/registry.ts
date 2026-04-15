@@ -4,6 +4,7 @@ import type { FC, ReactNode } from "react";
 import type { TabsProps } from "@nextgisweb/gui/antd";
 import { pluginRegistry } from "@nextgisweb/jsrealm/plugin";
 import type { ImportCallback } from "@nextgisweb/jsrealm/plugin";
+import type { DisplayConfig } from "@nextgisweb/webmap/type/api";
 
 import type { Display } from "../display";
 import type {
@@ -24,22 +25,47 @@ export type PanelPluginWidget<S extends PanelStore = PanelStore> =
 export type PanelPluginStore<S extends PanelStore = PanelStore> =
   ImportCallback<new (options: PanelStoreConstructorOptions) => S>;
 
-export interface PanelPlugin<S extends PanelStore = PanelStore> {
-  widget: PanelPluginWidget<S>;
-  store?: PanelPluginStore<S>;
-
+interface PanelPluginBase {
   name: string;
   title: string;
   icon: ReactNode;
   desktopOnly?: boolean;
   order?: number;
   applyToTinyMap?: boolean;
+  placement?: "start" | "end";
 
-  tab?: Omit<Tab, "key" | "label">;
-
-  isEnabled?: ({ config }: { config: Display["config"] }) => boolean;
+  isEnabled?: ({
+    config,
+  }: {
+    config: DisplayConfig;
+  }) => boolean | Promise<boolean>;
   startup?: (display: Display) => Promise<void>;
 }
+
+export interface WidgetPanelPlugin<
+  S extends PanelStore = PanelStore,
+> extends PanelPluginBase {
+  type: "widget";
+  widget: PanelPluginWidget<S>;
+  store?: PanelPluginStore<S>;
+  tab?: Omit<Tab, "key" | "label">;
+}
+
+export interface LinkPanelPlugin extends PanelPluginBase {
+  type: "link";
+  href: string;
+  target?: "_blank" | "_self";
+}
+
+export interface ActionPanelPlugin extends PanelPluginBase {
+  type: "action";
+  action: (val: { display: Display }) => void | Promise<void>;
+}
+
+export type PanelPlugin<S extends PanelStore = PanelStore> =
+  | WidgetPanelPlugin<S>
+  | LinkPanelPlugin
+  | ActionPanelPlugin;
 
 export const registry = pluginRegistry<PanelPlugin>(MODULE_NAME);
 

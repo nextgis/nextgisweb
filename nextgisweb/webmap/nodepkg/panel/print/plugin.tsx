@@ -5,6 +5,7 @@ import { registry } from "@nextgisweb/webmap/panel/registry";
 import PrintIcon from "@nextgisweb/icon/material/print";
 
 registry.register(COMP_ID, {
+  type: "widget",
   widget: () => import("./PrintPanel"),
   name: "print",
   title: gettext("Print map"),

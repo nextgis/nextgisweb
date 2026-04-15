@@ -19,7 +19,29 @@
     height: 40px;
   }
 
-  > .item {
+  > .group {
+    display: flex;
+    gap: 6px;
+  }
+
+  &.vertical > .group {
+    flex-direction: column;
+  }
+
+  &.horizontal > .group {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  &.vertical > .start {
+    margin-bottom: auto;
+  }
+
+  &.horizontal > .start {
+    margin-right: auto;
+  }
+
+  > .group > .item {
     display: flex;
     flex-shrink: 0;
     justify-content: center;
@@ -38,11 +60,11 @@
     }
   }
 
-  &.vertical > .item {
+  &.vertical > .group > .item {
     height: 32px;
   }
 
-  &.horizontal > .item {
+  &.horizontal > .group > .item {
     width: 32px;
   }
 }

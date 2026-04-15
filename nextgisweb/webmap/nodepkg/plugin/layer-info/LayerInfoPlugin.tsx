@@ -52,9 +52,12 @@ export class LayerInfoPlugin extends PluginBase {
     const data = this.data;
 
     if (data !== null) {
-      let panel = pm.getPanel<DescriptionStore>(pkey);
+      const panel = pm.getPanel<DescriptionStore>(pkey);
       if (!panel) {
-        panel = (await pm.registerPlugin(pkey)) as DescriptionStore;
+        const panelPlugin = await pm.registerPlugin(pkey, { force: true });
+        if (panelPlugin?.type === "widget") {
+          this.openLayerInfo();
+        }
       }
       if (panel) {
         panel.setContent(data.description);

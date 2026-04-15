@@ -5,6 +5,7 @@ import { panelRegistry } from "@nextgisweb/webmap/panel/registry";
 import InfoIcon from "@nextgisweb/icon/material/info";
 
 panelRegistry(COMP_ID, {
+  type: "widget",
   widget: () => import("./DescriptionPanel"),
   name: "info",
   title: gettext("Description"),

@@ -3,6 +3,7 @@ import { observer } from "mobx-react-lite";
 import { useCallback } from "react";
 
 import type { PanelManager } from "../../panel/PanelManager";
+import type { PanelPlugin } from "../../panel/registry";
 
 import "./NavigationMenu.less";
 
@@ -14,17 +15,53 @@ export interface NavigationMenuProps {
 export const NavigationMenu = observer<NavigationMenuProps>(
   ({ store, orientation = "vertical" }) => {
     const onClickItem = useCallback(
-      (name: string) => {
-        if (store.activePanelName === name) {
-          store.closePanel();
-        } else {
-          store.setActive(name, "menu");
+      async (item: PanelPlugin) => {
+        switch (item.type) {
+          case "widget":
+            if (store.activePanelName === item.name) {
+              store.closePanel();
+            } else {
+              store.setActive(item.name, "menu");
+            }
+            break;
+
+          case "link":
+            window.open(
+              item.href,
+              item.target ?? "_blank",
+              "noopener,noreferrer"
+            );
+            break;
+
+          case "action":
+            await item.action({
+              display: store.display,
+            });
+            break;
         }
       },
       [store]
     );
 
     const active = store.activePanel;
+    const items = store.items;
+
+    const startItems = items.filter((item) => item.placement !== "end");
+    const endItems = items.filter((item) => item.placement === "end");
+
+    const renderItem = (item: PanelPlugin) => (
+      <div
+        key={item.name}
+        title={item.title}
+        onClick={() => void onClickItem(item)}
+        className={classNames("item", {
+          active: item.type === "widget" && item.name === active?.name,
+        })}
+      >
+        {item.icon}
+      </div>
+    );
+
     return (
       <div
         className={classNames(
@@ -32,18 +69,8 @@ export const NavigationMenu = observer<NavigationMenuProps>(
           orientation
         )}
       >
-        {store.visiblePanels.map(({ name, title, plugin }) => (
-          <div
-            key={name}
-            title={title}
-            onClick={() => onClickItem(name)}
-            className={classNames("item", {
-              "active": name === active?.name,
-            })}
-          >
-            {plugin.icon}
-          </div>
-        ))}
+        <div className="group start">{startItems.map(renderItem)}</div>
+        <div className="group end">{endItems.map(renderItem)}</div>
       </div>
     );
   }

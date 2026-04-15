@@ -8,6 +8,7 @@ import type { DisplayConfig } from "@nextgisweb/webmap/type/api";
 import AnnotationIcon from "@nextgisweb/icon/material/chat";
 
 registry.register(COMP_ID, {
+  type: "widget",
   widget: () => import("./AnnotationsPanel"),
   name: "annotation",
   title: gettext("Annotations"),

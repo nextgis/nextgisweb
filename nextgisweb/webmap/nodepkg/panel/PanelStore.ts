@@ -3,17 +3,20 @@ import type { ReactNode } from "react";
 
 import type { Display } from "../display";
 
-import type { PanelPlugin, PanelWidgetProps } from ".";
+import type { PanelPluginWidgetProps, WidgetPanelPlugin } from "./registry";
+
+export type PanelWidgetProps<S extends PanelStore = PanelStore> =
+  PanelPluginWidgetProps<S>;
 
 export interface PanelStoreConstructorOptions {
-  plugin: PanelPlugin;
+  plugin: WidgetPanelPlugin;
   display: Display;
 }
 
 export class PanelStore {
   readonly name: string;
 
-  public readonly plugin: PanelPlugin;
+  public readonly plugin: WidgetPanelPlugin;
   public readonly display: Display;
 
   @observable.ref accessor title: string;

@@ -4,7 +4,7 @@ import type { Display } from "../display";
 import { PanelStore } from "../panel/PanelStore";
 
 import { registry } from "./registry";
-import type { PanelPlugin } from "./registry";
+import type { PanelPlugin, WidgetPanelPlugin } from "./registry";
 
 type Source = "init" | "menu" | "manager";
 
@@ -13,13 +13,23 @@ interface NavigationPanelInfo {
   source: Source;
 }
 
+interface RegisterPluginOptions {
+  /** Register plugin even if not enadlet.
+   * Needed for layerInfo panel, which depends on the webMapInfo panel.
+   * Without it, the content cannot be shown.
+   * Better to refactor the Layer Info panel.
+   */
+  force?: boolean;
+}
+
 export class PanelManager {
-  private _display: Display;
+  readonly display: Display;
 
   private _onChangePanel?: (panel?: PanelStore) => void;
 
   @observable.ref accessor allowPanels: string[] | null;
 
+  @observable.shallow accessor plugins: PanelPlugin[] = [];
   @observable.shallow accessor panels = new Map<string, PanelStore>();
   @observable.shallow accessor active: NavigationPanelInfo = {
     active: undefined,
@@ -37,7 +47,7 @@ export class PanelManager {
     allowPanels?: string[] | undefined;
     onChangePanel?: (panel?: PanelStore) => void;
   }) {
-    this._display = display;
+    this.display = display;
     if (activePanelKey) {
       this.active = { active: activePanelKey, source: "init" };
     }
@@ -46,9 +56,16 @@ export class PanelManager {
   }
 
   @computed
+  get items(): PanelPlugin[] {
+    return [...this.plugins]
+      .filter((plugin) => (this.display.isMobile ? !plugin.desktopOnly : true))
+      .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+  }
+
+  @computed
   get visiblePanels() {
     return [...this.sorted].filter((panel) =>
-      this._display.isMobile ? !panel.desktopOnly : true
+      this.display.isMobile ? !panel.desktopOnly : true
     );
   }
 
@@ -72,35 +89,53 @@ export class PanelManager {
   }
 
   async registerPlugin(
-    pluginDef: PanelPlugin<PanelStore> | string
-  ): Promise<PanelStore | undefined> {
-    let plugin: PanelPlugin<PanelStore> | undefined = undefined;
+    pluginDef: PanelPlugin | string,
+    options?: RegisterPluginOptions
+  ): Promise<PanelPlugin | undefined> {
+    let plugin: PanelPlugin | undefined = undefined;
     if (typeof pluginDef === "string") {
       plugin = registry.queryOne(({ name }) => name === pluginDef);
     } else {
       plugin = pluginDef;
     }
 
-    if (this.panels.has(plugin.name)) {
-      return this.panels.get(plugin.name);
+    const existPlugin = this.plugins.find((p) => p.name === plugin.name);
+    if (existPlugin) {
+      return existPlugin;
     }
 
     if (plugin) {
       if (this.allowPanels && !this.allowPanels.includes(plugin.name)) {
         return;
       }
-      if (plugin.isEnabled && !plugin.isEnabled(this._display)) {
+      if (plugin.isEnabled && !options?.force) {
+        const isEnabled = await plugin.isEnabled(this.display);
+        if (!isEnabled) return;
+      }
+
+      if (!this.plugins.some((p) => p.name === plugin.name)) {
+        runInAction(() => {
+          this.plugins = [...this.plugins, plugin!];
+        });
+      }
+
+      if (plugin.type !== "widget") {
         return;
       }
 
-      const Cls = plugin.store ? (await plugin.store()).default : PanelStore;
-      const panel = new Cls({ plugin, display: this._display });
+      const widgetPlugin = plugin as WidgetPanelPlugin;
+      const Cls = widgetPlugin.store
+        ? (await widgetPlugin.store()).default
+        : PanelStore;
+
+      const panel = new Cls({ plugin: widgetPlugin, display: this.display });
       const panels = new Map(this.panels);
-      panels.set(plugin.name, panel);
+      panels.set(widgetPlugin.name, panel);
+
       runInAction(() => {
         this.panels = panels;
       });
-      return panel;
+      return widgetPlugin;
     }
   }
 
@@ -125,6 +160,10 @@ export class PanelManager {
 
   getPanel<T extends PanelStore = PanelStore>(name: string): T | undefined {
     return this.panels.get(name) as T;
+  }
+
+  getItem(name: string): PanelPlugin | undefined {
+    return this.plugins.find((plugin) => plugin.name === name);
   }
 
   activatePanel(name: string): void {

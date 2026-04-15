@@ -65,7 +65,7 @@ export const DisplayWidget = observer(
       display.setIsMobile(isMobile);
     }, [display, isMobile]);
 
-    const { activePanel, activePanelName, panels } = display.panelManager;
+    const { activePanel, activePanelName, items } = display.panelManager;
     const { tabs } = display.tabsManager;
 
     useEffect(() => {
@@ -85,10 +85,13 @@ export const DisplayWidget = observer(
         }
         if (canceled) return;
 
-        const hasRequested = requestedPanel && panel.panels.has(requestedPanel);
+        const requestedItem = requestedPanel
+          ? panel.getItem(requestedPanel)
+          : undefined;
+        const hasRequestedWidget = requestedItem?.type === "widget";
         const isEmptyMode = requestedPanel === emptyModeURLValue;
 
-        if (hasRequested) {
+        if (hasRequestedWidget) {
           panel.setActive(requestedPanel, "init");
         } else if (!isEmptyMode) {
           const firstPanelKey = panel.panels.keys().next().value;
@@ -153,7 +156,7 @@ export const DisplayWidget = observer(
       }
       const showPanels = [];
 
-      if (panels.size > 0) {
+      if (items.length > 0) {
         showPanels.push(
           <Panel
             key="menu"
@@ -199,16 +202,20 @@ export const DisplayWidget = observer(
       isPortrait,
       panelSize,
       display,
-      panels,
+      items,
       tabs,
     ]);
+
+    const displayContextValue = useMemo(() => {
+      return { display };
+    }, [display]);
 
     if (!screenReady) {
       return <></>;
     }
 
     return (
-      <DisplayContext value={{ display }}>
+      <DisplayContext value={displayContextValue}>
         <div className={classNames("ngw-webmap-display", className)}>
           <Splitter
             orientation={isPortrait ? "vertical" : "horizontal"}

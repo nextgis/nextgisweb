@@ -326,11 +326,14 @@ export class Identify {
 
     const pm = this.display.panelManager;
     const pkey = "identify";
-    const panel = (await pm.registerPlugin(pkey)) as IdentifyStore | undefined;
+    const panelPlugin = await pm.registerPlugin(pkey);
 
-    if (panel) {
-      panel.setIdentifyInfo(identifyInfo);
-    } else {
+    const panel =
+      panelPlugin?.type === "widget"
+        ? (pm.getPanel(pkey) as IdentifyStore | undefined)
+        : undefined;
+
+    if (!panel) {
       throw new Error(
         "Identification panel should add during Display initialization"
       );

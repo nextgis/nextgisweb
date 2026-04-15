@@ -6,6 +6,7 @@ import type { DisplayConfig } from "@nextgisweb/webmap/type/api";
 import BookmarkIcon from "@nextgisweb/icon/material/bookmark";
 
 registry.register(COMP_ID, {
+  type: "widget",
   widget: () => import("./BookmarksPanel"),
   name: "bookmark",
   title: gettext("Bookmarks"),

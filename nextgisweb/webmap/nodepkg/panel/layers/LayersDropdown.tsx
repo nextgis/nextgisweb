@@ -2,6 +2,7 @@ import { observer } from "mobx-react-lite";
 
 import { Dropdown, Spin } from "@nextgisweb/gui/antd";
 import type { MenuProps } from "@nextgisweb/gui/antd";
+import { errorModal } from "@nextgisweb/gui/error";
 import { useRoute } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { Display } from "@nextgisweb/webmap/display";
@@ -15,6 +16,14 @@ import ZoomInMapIcon from "@nextgisweb/icon/material/zoom_in_map/outline";
 
 export const LayersDropdown = observer(({ display }: { display: Display }) => {
   const { treeStore, map } = display;
+
+  const {
+    route: routeDispalyConfig,
+    isLoading: isLoadingDispalyConfig,
+    abort: abortDispalyConfig,
+  } = useRoute("webmap.display_config", {
+    id: display.config.webmapId,
+  });
 
   const { route, isLoading: isExtentLoading } = useRoute("webmap.extent", {
     id: display.config.webmapId,
@@ -33,8 +42,14 @@ export const LayersDropdown = observer(({ display }: { display: Display }) => {
     treeStore.setVisibleIds([]);
   };
 
-  const restoreLayers = () => {
-    treeStore.load(display.config.rootItem);
+  const restoreLayers = async () => {
+    abortDispalyConfig();
+    try {
+      const newConfig = await routeDispalyConfig.get();
+      treeStore.load(newConfig.rootItem);
+    } catch (er) {
+      errorModal(er);
+    }
   };
 
   const menuItems: MenuProps["items"] = [
@@ -72,6 +87,7 @@ export const LayersDropdown = observer(({ display }: { display: Display }) => {
     >
       <PanelTitle.Button
         icon={<MoreVertIcon />}
+        loading={isLoadingDispalyConfig}
         style={{ marginInlineStart: "8px" }}
       />
     </Dropdown>
