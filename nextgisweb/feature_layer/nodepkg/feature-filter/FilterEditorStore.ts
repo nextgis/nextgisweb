@@ -570,6 +570,10 @@ export class FilterEditorStore {
           if (!Array.isArray(value)) {
             expressions.push([operator, fieldExpression, value]);
           }
+        } else if (operator === "ilike" || operator === "!ilike") {
+          if (typeof value === "string") {
+            expressions.push([operator, fieldExpression, value]);
+          }
         } else if (typeof value === "string" || typeof value === "number") {
           expressions.push([operator, fieldExpression, value]);
         }

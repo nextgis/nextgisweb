@@ -188,6 +188,20 @@ def test_filter_invalid_json(layer):
         layer.filter_parser.parse("not valid json {")
 
 
+def test_filter_ilike_operator(layer):
+    # Case-insensitive exact match
+    assert fetch_filtered_ids(layer, ["all", ["ilike", ["get", "city"], "nyc"]]) == [1, 3, 5]
+    # Wildcard pattern matching names ending with 'e'
+    assert fetch_filtered_ids(layer, ["all", ["ilike", ["get", "name"], "%e"]]) == [1, 3, 5]
+
+
+def test_filter_not_ilike_operator(layer):
+    # Case-insensitive exact non-match
+    assert fetch_filtered_ids(layer, ["all", ["!ilike", ["get", "city"], "nyc"]]) == [2, 4]
+    # Wildcard pattern non-matching
+    assert fetch_filtered_ids(layer, ["all", ["!ilike", ["get", "name"], "%e"]]) == [2, 4]
+
+
 def test_filter_unknown_field(layer):
     with pytest.raises(FilterExpressionError):
         fetch_filtered_ids(layer, ["all", ["==", ["get", "nonexistent"], "value"]])

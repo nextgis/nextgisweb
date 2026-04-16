@@ -16,6 +16,7 @@ import type {
   CmpOp,
   EqNeOp,
   FilterCondition as FilterConditionType,
+  IlikeOp,
   InOp,
   IsNullOp,
   ResolvedFieldRef,
@@ -131,7 +132,7 @@ export const FilterCondition = observer(
     };
 
     const handleOperatorChange = (
-      operator: EqNeOp | CmpOp | InOp | IsNullOp
+      operator: EqNeOp | CmpOp | InOp | IsNullOp | IlikeOp
     ) => {
       const value = getMigratedConditionValue({
         fields: store.fields,

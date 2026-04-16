@@ -82,6 +82,7 @@ export type EqNeOp = "==" | "!=";
 export type CmpOp = ">" | "<" | ">=" | "<=";
 export type InOp = "in" | "!in";
 export type IsNullOp = "is_null" | "!is_null";
+export type IlikeOp = "ilike" | "!ilike";
 
 export type ConditionValue = string | number | boolean | null;
 
@@ -89,8 +90,14 @@ export type EqNeExpr = [EqNeOp, FieldOperandExpr, ConditionValue];
 export type CmpExpr = [CmpOp, FieldOperandExpr, number | string];
 export type InExpr = [InOp, FieldOperandExpr, ...(string | number)[]];
 export type IsNullExpr = [IsNullOp, FieldOperandExpr];
+export type IlikeExpr = [IlikeOp, FieldOperandExpr, string];
 
-export type ConditionExpr = EqNeExpr | CmpExpr | InExpr | IsNullExpr;
+export type ConditionExpr =
+  | EqNeExpr
+  | CmpExpr
+  | InExpr
+  | IsNullExpr
+  | IlikeExpr;
 
 export type LogicalOp = "all" | "any";
 export type GroupExpr = [LogicalOp, ...(ConditionExpr | GroupExpr)[]];
@@ -107,6 +114,8 @@ export const ValidOperators = [
   "!in",
   "is_null",
   "!is_null",
+  "ilike",
+  "!ilike",
 ] as const;
 
 export interface VirtualFieldDescriptor<
@@ -140,6 +149,8 @@ export type OperatorValueMap = {
   "!in": Array<string | number>;
   "is_null": undefined;
   "!is_null": undefined;
+  "ilike": string;
+  "!ilike": string;
 };
 
 export interface OperatorOption {
@@ -230,5 +241,15 @@ export const OPERATORS: OperatorOption[] = [
       "TIME",
       "DATETIME",
     ],
+  },
+  {
+    value: "ilike",
+    label: gettext("Matches (case-insensitive)"),
+    supportedTypes: ["STRING"],
+  },
+  {
+    value: "!ilike",
+    label: gettext("Does not match (case-insensitive)"),
+    supportedTypes: ["STRING"],
   },
 ];

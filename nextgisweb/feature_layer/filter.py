@@ -240,6 +240,14 @@ class NotIsNullNode(UnaryConditionNode, operators=("!is_null",)):
     pass
 
 
+class IlikeNode(BinaryConditionNode, operators=("ilike",)):
+    pass
+
+
+class NotIlikeNode(BinaryConditionNode, operators=("!ilike",)):
+    pass
+
+
 class SQLAlchemyCompiler:
     def __init__(
         self,
@@ -291,6 +299,12 @@ class SQLAlchemyCompiler:
 
             case NotIsNullNode(operand=operand):
                 return self._compile_operand(operand).is_not(None)
+
+            case IlikeNode(left=left, right=right):
+                return self._compile_operand(left).ilike(self._compile_operand(right))
+
+            case NotIlikeNode(left=left, right=right):
+                return sa.not_(self._compile_operand(left).ilike(self._compile_operand(right)))
 
             case FieldNode(field=field):
                 return self._get_column(field)
