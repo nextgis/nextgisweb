@@ -5,7 +5,7 @@ import subprocess
 from functools import cached_property
 from pathlib import Path
 from tempfile import NamedTemporaryFile, TemporaryDirectory
-from typing import Literal
+from typing import Annotated, Literal
 from urllib.parse import urlparse
 from uuid import uuid4
 from zipfile import ZipFile, is_zipfile
@@ -14,7 +14,7 @@ import sqlalchemy as sa
 import sqlalchemy.dialects.postgresql as sa_pg
 import sqlalchemy.orm as orm
 from affine import Affine
-from msgspec import UNSET, Struct, UnsetType
+from msgspec import UNSET, Meta, Struct, UnsetType
 from osgeo import gdal, gdalconst, ogr, osr
 from zope.interface import implementer
 
@@ -768,8 +768,18 @@ class CogAttr(SColumn):
         )
 
 
+GeoTransformCoefficients = Annotated[
+    list[float],
+    Meta(min_length=6, max_length=6),
+]
+
+
 class GeoTransform(SAttribute):
-    ctypes = CRUTypes(list[str], list[str], list[str])
+    ctypes = CRUTypes(
+        UnsetType,
+        GeoTransformCoefficients,
+        UnsetType,
+    )
 
     def get(self, srlzr: Serializer) -> list[str]:
         return (
@@ -780,7 +790,7 @@ class GeoTransform(SAttribute):
 
 
 class Bands(SAttribute):
-    ctypes = CRUTypes(list[str], list[str], list[str])
+    ctypes = CRUTypes(UnsetType, list[RasterBand], UnsetType)
 
     def get(self, srlzr: Serializer) -> list[str]:
         return srlzr.obj.meta.bands if srlzr.obj.meta is not None else []
