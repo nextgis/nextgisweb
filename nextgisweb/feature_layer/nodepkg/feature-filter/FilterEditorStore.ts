@@ -29,6 +29,10 @@ function stringifyExpresion(
   return JSON.stringify(value, replacer, space) as FilterExpressionString;
 }
 
+function escapeIlikeValue(value: string): string {
+  return value.replace(/[\\%_]/g, "\\$&");
+}
+
 export interface FilterEditorStoreOptions {
   fields: FeatureLayerFieldRead[];
   value?: FilterExpressionString;
@@ -572,7 +576,13 @@ export class FilterEditorStore {
           }
         } else if (operator === "ilike" || operator === "!ilike") {
           if (typeof value === "string") {
-            expressions.push([operator, fieldExpression, value]);
+            const hasWildcard = value.includes("%") || value.includes("_");
+
+            expressions.push([
+              operator,
+              fieldExpression,
+              hasWildcard ? value : `%${escapeIlikeValue(value)}%`,
+            ]);
           }
         } else if (typeof value === "string" || typeof value === "number") {
           expressions.push([operator, fieldExpression, value]);

@@ -1,5 +1,6 @@
 import type {
   ConditionExpr,
+  ConditionValue,
   FieldRef,
   FilterCondition,
   FilterExpression,
@@ -18,12 +19,34 @@ function extractConditionFieldRef(expression: unknown): FieldRef {
   return fieldRef;
 }
 
+function unescapeIlikeValue(value: string): string {
+  return value.replace(/\\([\\%_])/g, "$1");
+}
+
+function normalizeConditionValue(
+  operator: ConditionExpr[0],
+  value: ConditionValue | undefined
+): ConditionValue | undefined {
+  if (
+    (operator === "ilike" || operator === "!ilike") &&
+    typeof value === "string"
+  ) {
+    if (value.startsWith("%") && value.endsWith("%") && value.length >= 2) {
+      return unescapeIlikeValue(value.slice(1, -1));
+    }
+
+    return value;
+  }
+
+  return value;
+}
+
 export function parseConditionExpression(
   expression: ConditionExpr,
   nextId: () => number
 ): FilterCondition {
   const [operator, fieldExpression, ...rest] = expression;
-  const value = rest[0];
+  const value = normalizeConditionValue(operator, rest[0]);
   const field = extractConditionFieldRef(fieldExpression);
 
   const baseCondition: FilterCondition = {
