@@ -449,6 +449,10 @@ msgstr "Аннотации"
 msgid "Bookmarks"
 msgstr "Закладки"
 
+#: nodepkg/panel/contactAdmin/plugin.tsx:20
+msgid "Contact Web GIS administrator"
+msgstr "Связаться с администратором Веб ГИС"
+
 #: nodepkg/panel/description/plugin.tsx:11
 #: nodepkg/plugin/layer-info/LayerInfoPlugin.tsx:42
 msgid "Description"
