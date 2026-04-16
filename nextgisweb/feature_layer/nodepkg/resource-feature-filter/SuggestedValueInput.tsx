@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import type { UniqueValuesResult } from "@nextgisweb/feature-layer/type/api";
 import { AutoComplete, Select } from "@nextgisweb/gui/antd";
-import { useRoute } from "@nextgisweb/pyramid/hook";
+import { useMemoDebounce, useRoute } from "@nextgisweb/pyramid/hook";
 
 import type { DefaultFilterValueInputProps } from "../feature-filter/component/DefaultFilterValueInput";
 
@@ -21,10 +21,29 @@ export function UniqueValueInput({
   ...rest
 }: SuggestedValueInputProps) {
   const [data, setData] = useState<UniqueValuesResult | undefined>(undefined);
+  const [search, setSearch] = useState("");
+
+  const searchDebounde = useMemoDebounce(search, 500);
 
   const { route, abort, isLoading } = useRoute("feature_layer.aggregate", {
     id: resourceId,
   });
+
+  const overflowRef = useRef(false);
+
+  const filter = useMemo(() => {
+    if (overflowRef.current && searchDebounde.trim()) {
+      const escapedValue = searchDebounde.replace(/[%_\\]/g, "\\$&");
+      return ["all", ["ilike", ["get", keyname], `%${escapedValue}%`]];
+    }
+    return null;
+  }, [keyname, searchDebounde]);
+
+  useEffect(() => {
+    overflowRef.current = false;
+    setSearch("");
+    setData(undefined);
+  }, [keyname, resourceId]);
 
   useEffect(() => {
     let canceled = false;
@@ -37,19 +56,20 @@ export function UniqueValueInput({
               type: "unique_values",
               field: keyname,
               order: "count_desc",
-              include_counts: false,
+              include_counts: true,
               limit: 1000,
             },
           ],
-          // TODO: Enable search after adding filter `ilike` support,
-          // because the current `==` operation does not work for this case.
-          filter: [],
+          filter: filter ?? [],
         },
       })
       .then((resp) => {
         if (!canceled) {
           const uniqRes = resp.items.find((r) => r.type === "unique_values");
           if (uniqRes) {
+            if (uniqRes.overflow) {
+              overflowRef.current = true;
+            }
             setData(uniqRes);
           }
         }
@@ -57,15 +77,15 @@ export function UniqueValueInput({
     return () => {
       canceled = true;
     };
-  }, [abort, keyname, route]);
+  }, [abort, keyname, route, filter]);
 
   const options = useMemo(() => {
     if (!data) return [];
 
     return data.buckets
       .filter((bucket) => bucket.key !== null)
-      .map(({ key }) => ({
-        label: String(key),
+      .map(({ key, count }) => ({
+        label: `${String(key)}${count !== undefined ? ` (${count})` : ""}`,
         value: String(key),
       }));
   }, [data]);
@@ -78,6 +98,10 @@ export function UniqueValueInput({
       .toLowerCase()
       .includes(input.toLowerCase());
 
+  const onSearch = (nextSearch: string) => {
+    setSearch(nextSearch);
+  };
+
   if (isMultiple) {
     return (
       <Select
@@ -85,7 +109,7 @@ export function UniqueValueInput({
         value={Array.isArray(value) ? value.map(String) : []}
         options={options}
         loading={isLoading}
-        showSearch={{ filterOption }}
+        showSearch={{ filterOption, onSearch }}
         {...rest}
       />
     );
@@ -95,7 +119,7 @@ export function UniqueValueInput({
     <AutoComplete
       value={value !== null ? String(value) : undefined}
       options={options}
-      showSearch={{ filterOption }}
+      showSearch={{ filterOption, onSearch }}
       {...rest}
     />
   );
