@@ -27,7 +27,6 @@ class CatalogEntry(Struct, kw_only=True):
     auth_name: str
     auth_srid: int
     catalog_id: int | None = None
-    postgis_srid: int | None = None
 
 
 def proj_catalog_search(q: str, limit: int = 100) -> list:
@@ -440,9 +439,9 @@ def catalog_import(request, *, body: SRSCatalogImportBody) -> SRSCatalogImportRe
     ]
     if entry.catalog_id is not None:
         conflict_filter.append(SRS.catalog_id == entry.catalog_id)
-    if entry.postgis_srid is not None:
-        obj.id = entry.postgis_srid
-        conflict_filter.append(SRS.id == entry.postgis_srid)
+    if entry.auth_srid is not None:
+        obj.id = entry.auth_srid
+        conflict_filter.append(SRS.id == entry.auth_srid)
 
     conflict = SRS.filter(sql.or_(*conflict_filter)).first()
     if conflict:
@@ -471,7 +470,6 @@ def remote_catalog_item(catalog_id: int) -> CatalogEntry:
         auth_name=srs["auth_name"],
         auth_srid=srs["auth_srid"],
         catalog_id=srs["id"],
-        postgis_srid=srs.get("postgis_srid"),
     )
 
 
