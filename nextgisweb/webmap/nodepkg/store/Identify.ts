@@ -333,7 +333,9 @@ export class Identify {
         ? (pm.getPanel(pkey) as IdentifyStore | undefined)
         : undefined;
 
-    if (!panel) {
+    if (panel) {
+      panel.setIdentifyInfo(identifyInfo);
+    } else {
       throw new Error(
         "Identification panel should add during Display initialization"
       );
