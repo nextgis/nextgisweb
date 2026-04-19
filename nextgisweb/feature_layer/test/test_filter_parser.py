@@ -103,23 +103,23 @@ def test_converters_native_types():
 
 
 def test_get_supported_operators():
-    operators = sorted(FilterParser.get_supported_operators())
-    expected = sorted(
-        [
-            "all",
-            "any",
-            "==",
-            "!=",
-            ">",
-            ">=",
-            "<",
-            "<=",
-            "fid",
-            "get",
-            "in",
-            "!in",
-            "is_null",
-            "!is_null",
-        ]
-    )
+    operators = set(FilterParser.get_supported_operators())
+    expected = {
+        "!=",
+        "!ilike",
+        "!in",
+        "!is_null",
+        "<",
+        "<=",
+        "==",
+        ">",
+        ">=",
+        "all",
+        "any",
+        "fid",
+        "get",
+        "ilike",
+        "in",
+        "is_null",
+    }
     assert operators == expected
