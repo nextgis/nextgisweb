@@ -258,19 +258,19 @@ msgstr "Некорректное значение фильтра"
 msgid "Invalid JSON or filter structure"
 msgstr "Некорректный JSON или структура фильтра"
 
-#: nodepkg/feature-filter/FilterEditorStore.ts:624
+#: nodepkg/feature-filter/FilterEditorStore.ts:628
 msgid "Validation failed"
 msgstr "Ошибка валидации"
 
-#: nodepkg/feature-filter/component/FilterCondition.tsx:37
+#: nodepkg/feature-filter/component/FilterCondition.tsx:38
 msgid "Delete condition"
 msgstr "Удалить условие"
 
-#: nodepkg/feature-filter/component/FilterCondition.tsx:39
+#: nodepkg/feature-filter/component/FilterCondition.tsx:40
 msgid "Select field"
 msgstr "Выберите поле"
 
-#: nodepkg/feature-filter/component/FilterCondition.tsx:40
+#: nodepkg/feature-filter/component/FilterCondition.tsx:41
 msgid "Operator"
 msgstr "Оператор"
 
@@ -316,45 +316,53 @@ msgstr "Вывод JSON"
 msgid "Current filter state"
 msgstr "Текущее состояние фильтра"
 
-#: nodepkg/feature-filter/type.ts:154
+#: nodepkg/feature-filter/type.ts:165
 msgid "Equal"
 msgstr "Равно"
 
-#: nodepkg/feature-filter/type.ts:167
+#: nodepkg/feature-filter/type.ts:178
 msgid "Not equal"
 msgstr "Не равно"
 
-#: nodepkg/feature-filter/type.ts:180
+#: nodepkg/feature-filter/type.ts:191
 msgid "Greater"
 msgstr "Больше"
 
-#: nodepkg/feature-filter/type.ts:185
+#: nodepkg/feature-filter/type.ts:196
 msgid "Less"
 msgstr "Меньше"
 
-#: nodepkg/feature-filter/type.ts:190
+#: nodepkg/feature-filter/type.ts:201
 msgid "Greater or equal"
 msgstr "Больше или равно"
 
-#: nodepkg/feature-filter/type.ts:195
+#: nodepkg/feature-filter/type.ts:206
 msgid "Less or equal"
 msgstr "Меньше или равно"
 
-#: nodepkg/feature-filter/type.ts:200
+#: nodepkg/feature-filter/type.ts:211
 msgid "In list"
 msgstr "В списке"
 
-#: nodepkg/feature-filter/type.ts:205
+#: nodepkg/feature-filter/type.ts:216
 msgid "Not in list"
 msgstr "Не в списке"
 
-#: nodepkg/feature-filter/type.ts:210
+#: nodepkg/feature-filter/type.ts:221
 msgid "Is NULL"
 msgstr "NULL"
 
-#: nodepkg/feature-filter/type.ts:223
+#: nodepkg/feature-filter/type.ts:234
 msgid "Is not NULL"
 msgstr "Не NULL"
+
+#: nodepkg/feature-filter/type.ts:247
+msgid "Matches (case-insensitive)"
+msgstr "Подобно (без учета регистра)"
+
+#: nodepkg/feature-filter/type.ts:252
+msgid "Does not match (case-insensitive)"
+msgstr "Не подобно (без учета регистра)"
 
 #: nodepkg/feature-filter/util/placeholder.ts:29
 msgid "Enter values and press Enter"
