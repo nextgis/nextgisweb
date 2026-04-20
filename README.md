@@ -24,6 +24,10 @@ It combines a powerful spatial backend, a web-based interface for administration
   - [Editing and attachments](#editing-and-attachments)
   - [Security and access control](#security-and-access-control)
   - [API and extensibility](#api-and-extensibility)
+- [Deployment options](#deployment-options)
+  - [Ready-to-go cloud](#ready-to-go-cloud)
+  - [On-premise deployment](#on-premise-deployment)
+  - [Community Edition](#community-edition)
 - [Documentation](#documentation)
 - [Examples and live demo](#examples-and-live-demo)
 - [Community and ecosystem](#community-and-ecosystem)
@@ -43,8 +47,6 @@ It combines a powerful spatial backend, a web-based interface for administration
 - **Coordinate reference systems management**  
   Define custom CRS and use them consistently for measurement and data export.
 
----
-
 ### Web map and data publishing
 
 ![NextGIS Web web maps](doc/images/ngw_map.webp)
@@ -61,8 +63,8 @@ It combines a powerful spatial backend, a web-based interface for administration
 
 - **External services support**  
   Connect third-party TMS, WMS, and WFS services and use them directly in Web Maps.
-
----
+  
+  Store rasters in the Cloud Optimized GeoTIFF format on connected S3-compatible storage systems.
 
 ### QGIS-native collaboration
 
@@ -76,16 +78,12 @@ It combines a powerful spatial backend, a web-based interface for administration
 
   See the NGW/QGIS integration extension: [nextgisweb_qgis](https://github.com/nextgis/nextgisweb_qgis) 
 
----
-
 ### Built-in version control for vector data
 
 ![NextGIS Web Feature versioning](doc/images/ngw_versions.webp)
 
 - **Track the full history of vector datasets**  
   Who changed what, when, and how. Roll back changes or audit edits without data loss.
-
----
 
 ### Editing and attachments
 - **Built-in vector layers editor**  
@@ -94,16 +92,12 @@ It combines a powerful spatial backend, a web-based interface for administration
 - **Attachments management**  
   Attach photos and documents to vector layer features. Preview and manage attachments directly on Web Maps.
 
----
-
 ### Security and access control
 
 ![NextGIS Web permission management](doc/images/ngw_permissions.webp)
 
 - **Flexible permissions management**  
   Create users and groups with fine-grained access control, down to individual layers or maps.
-
----
 
 ### API and extensibility
 - **Powerful REST API**  
@@ -112,6 +106,25 @@ It combines a powerful spatial backend, a web-based interface for administration
 - **Frontend integration**  
   Build custom web applications using [NextGIS JavaScript libraries](https://github.com/nextgis/nextgisweb_frontend)
 
+## Deployment options
+
+### Ready-to-go cloud
+
+Fully managed, hosted NextGIS Web by the NextGIS team, including additional features. Free tier is available.
+
+➡️ [Cloud plans](https://nextgis.com/pricing-base/)
+ 
+ ### On-premise deployment
+
+ Professional self-hosted deployment for organizations that need commercial support, enterprise features, and custom infrastructure setup.
+
+ ➡️ [On-premise options](https://nextgis.com/pricing/)
+
+### Community Edition
+
+Run NextGIS Web community build yourself with Docker.
+
+➡️ [Community Edition](https://github.com/nextgis/nextgisweb_ce)
 
 ## Documentation
 
