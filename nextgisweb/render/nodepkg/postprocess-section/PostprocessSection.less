@@ -1,0 +1,55 @@
+.ngw-render-postprocess-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  .section {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .title.ant-typography {
+    margin: 0;
+  }
+
+  .grid.ant-row {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    min-width: 0;
+  }
+
+  .field-label {
+    min-height: 24px;
+    color: var(--theme-color-text-secondary);
+  }
+
+  .field-control {
+    min-width: 0;
+  }
+
+  .ant-select,
+  .ant-input-number {
+    width: 100%;
+  }
+
+  .compact.ant-space-compact {
+    display: flex;
+    width: 100%;
+  }
+
+  .color-picker.ant-color-picker-trigger {
+    flex: 1 1 auto;
+    justify-content: flex-start;
+    min-width: 0;
+  }
+}

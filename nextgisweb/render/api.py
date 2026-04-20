@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Annotated, Literal
 
 from msgspec import UNSET, Meta, Struct, UnsetType
+from msgspec.json import decode as msgspec_json_decode
 from PIL import Image, ImageDraw, ImageFont
 from pyramid.httpexceptions import HTTPBadRequest
 from pyramid.response import Response
@@ -27,6 +28,7 @@ from nextgisweb.spatial_ref_sys.api import SRSID
 from .imgcodec import COMPRESSION_FAST, FORMAT_PNG, image_encoder_factory
 from .interface import ILegendableStyle, IRenderableStyle
 from .legend import ILegendSymbols
+from .postprocess import RenderPostprocess
 from .util import TILE_SIZE, af_transform, image_zoom
 
 RenderResource = Annotated[
@@ -61,6 +63,11 @@ Symbols = Annotated[
 ]
 
 Filter = Annotated[dict[int, str], Query(name="filter"), Meta(examples=[dict()])]
+PostprocessOverride = Annotated[
+    dict[int, str],
+    Query(name="postprocess"),
+    Meta(examples=[dict()]),
+]
 
 NoDataStatusCode = Annotated[
     Literal[200, 204, 404],
@@ -157,6 +164,16 @@ def process_symbols(value: Symbols) -> dict[int, list[int]]:
     return result
 
 
+def process_postprocess(value: PostprocessOverride) -> dict[int, RenderPostprocess]:
+    result = dict()
+    for k, raw in value.items():
+        try:
+            result[k] = msgspec_json_decode(raw, type=RenderPostprocess)
+        except Exception as exc:
+            raise ValidationError(gettext("Invalid postprocess override")) from exc
+    return result
+
+
 def tile(
     request,
     *,
@@ -166,6 +183,7 @@ def tile(
     y: TileY,
     symbols: Symbols,
     p_filter: Filter,
+    postprocess: PostprocessOverride,
     nd: NoDataStatusCode = 200,
     cache: TileCache = True,
 ) -> RenderResponse:
@@ -175,6 +193,7 @@ def tile(
     check_origin(request)
 
     p_symbols = process_symbols(symbols) if symbols else dict()
+    p_postprocess = process_postprocess(postprocess) if postprocess else dict()
     p_cache = cache and request.env.render.tile_cache_enabled
     srs_obj = SRS.filter_by(id=3857).one()
 
@@ -194,6 +213,7 @@ def tile(
 
         rsymbols = p_symbols.get(resid)
         rfilter = p_filter.get(resid)
+        rpostprocess = p_postprocess.get(resid)
         tcache = obj.tile_cache
 
         # Is requested tile may be cached?
@@ -201,6 +221,7 @@ def tile(
             p_cache
             and rsymbols is None
             and rfilter is None
+            and rpostprocess is None
             and tcache is not None
             and tcache.enabled
             and (tcache.max_z is None or z <= tcache.max_z)
@@ -216,6 +237,8 @@ def tile(
                 cond["symbols"] = rsymbols
             if rfilter is not None:
                 cond["filter"] = rfilter
+            if rpostprocess is not None:
+                cond["postprocess"] = rpostprocess
             req = obj.render_request(srs_obj, cond=cond)
             rimg = req.render_tile((z, x, y), TILE_SIZE)
 
@@ -248,6 +271,7 @@ def image(
     size: ImageSize,
     symbols: Symbols,
     p_filter: Filter,
+    postprocess: PostprocessOverride,
     nd: NoDataStatusCode = 200,
     cache: TileCache = True,
     tdi: TileDebugInfo = False,
@@ -258,6 +282,7 @@ def image(
     check_origin(request)
 
     p_symbols = process_symbols(symbols) if symbols else dict()
+    p_postprocess = process_postprocess(postprocess) if postprocess else dict()
     p_cache = cache and request.env.render.tile_cache_enabled
     srs_obj = SRS.filter_by(id=srs).one()
     if p_cache:
@@ -311,6 +336,7 @@ def image(
 
         rsymbols = p_symbols.get(resid)
         rfilter = p_filter.get(resid)
+        rpostprocess = p_postprocess.get(resid)
         tcache = obj.tile_cache
 
         # Is requested image may be cached via tiles?
@@ -319,6 +345,7 @@ def image(
             and cache_zoom is not None
             and rsymbols is None
             and rfilter is None
+            and rpostprocess is None
             and tcache is not None
             and tcache.enabled
             and tcache.image_compose
@@ -362,6 +389,8 @@ def image(
                 cond["symbols"] = rsymbols
             if rfilter is not None:
                 cond["filter"] = rfilter
+            if rpostprocess is not None:
+                cond["postprocess"] = rpostprocess
             req = obj.render_request(srs_obj, cond=cond)
 
             if cache_enabled:
