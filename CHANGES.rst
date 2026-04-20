@@ -1,6 +1,30 @@
 Changes
 =======
 
+5.4.0
+-----
+
+- Support for feature filtering on webmaps and in the rendering HTTP API.
+- S3-based storage for external raster layers with read/write support.
+- Field value suggestions in feature layer filters.
+- RAT attribute support for raster layer identification.
+- Feature versioning enabled by default for new vector layers.
+- Improved resource table and actions UI.
+- Support for labels in user-defined SLD styles.
+- Support for upscaling tileset layers.
+- Automatic GeoTIFF compression predictor selection.
+- JPEG compression enabled by default for RGB(A) raster layer pyramids.
+- GPX export support for feature layers.
+- Improved export performance for layers with many fields.
+- Support for the Referer header in WMS and TMS client connections.
+- Option to disable TLS certificate verification for WMS connections.
+- Support for remote SRS in WMS client layers.
+- Built-in SRS catalog based on the Proj database.
+- Support for custom OnlineResource values in WMS client layers.
+- TypeScript upgraded to 6.0.
+- Ant Design upgraded to 6.2.
+
+
 5.3.0
 -----
 
