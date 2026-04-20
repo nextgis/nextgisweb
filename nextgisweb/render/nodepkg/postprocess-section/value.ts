@@ -1,12 +1,8 @@
-export type SharedPostprocessPreset =
-  | "watercolor"
-  | "ink_sketch"
-  | "blueprint"
-  | "vintage_map";
+export type SharedPostprocessPreset = string;
+export type SelectedPostprocessPresetKey = SharedPostprocessPreset | null;
 
 export interface SharedPostprocessValue {
-  [key: string]: string | number | boolean | null;
-  preset: SharedPostprocessPreset | null;
+  [key: string]: string | number | boolean;
   brightness: number;
   contrast: number;
   gamma: number;
@@ -31,12 +27,17 @@ export interface SharedPostprocessValue {
 
 export type SharedPostprocessPatch = Partial<SharedPostprocessValue>;
 
+export interface SharedPostprocessPresetDefinition {
+  key: SharedPostprocessPreset;
+  label: string;
+  postprocess: SharedPostprocessPatch;
+}
+
 type SharedPostprocessField =
   | SharedPostprocessValue[keyof SharedPostprocessValue]
   | undefined;
 
 export const DEFAULT_POSTPROCESS_VALUE: SharedPostprocessValue = {
-  preset: null,
   brightness: 1,
   contrast: 1,
   gamma: 1,
@@ -115,7 +116,6 @@ export function isNoopPostprocess(
   const resolved = withPostprocessDefaults(value);
 
   return (
-    resolved.preset === null &&
     resolved.brightness === DEFAULT_POSTPROCESS_VALUE.brightness &&
     resolved.contrast === DEFAULT_POSTPROCESS_VALUE.contrast &&
     resolved.gamma === DEFAULT_POSTPROCESS_VALUE.gamma &&
@@ -151,7 +151,6 @@ export function serializePostprocess(
 
   const result: SharedPostprocessPatch = {};
 
-  if (resolved.preset !== null) result.preset = resolved.preset;
   if (resolved.brightness !== DEFAULT_POSTPROCESS_VALUE.brightness) {
     result.brightness = resolved.brightness;
   }
@@ -221,6 +220,47 @@ export function serializePostprocessForApi<TUpdate>(
   value: SharedPostprocessPatch | SharedPostprocessValue | null | undefined
 ): Exclude<TUpdate, undefined> {
   return serializePostprocess(value) as Exclude<TUpdate, undefined>;
+}
+
+export function normalizePostprocessPresets(
+  value: unknown
+): SharedPostprocessPresetDefinition[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value
+    .map((item) => {
+      if (!item || typeof item !== "object") {
+        return null;
+      }
+
+      const candidate = item as Record<string, unknown>;
+      if (
+        typeof candidate.key !== "string" ||
+        typeof candidate.label !== "string"
+      ) {
+        return null;
+      }
+
+      return {
+        key: candidate.key,
+        label: candidate.label,
+        postprocess: normalizePostprocessPatch(
+          (candidate.postprocess as
+            | SharedPostprocessPatch
+            | Record<string, unknown>
+            | undefined) ?? {}
+        ),
+      } satisfies SharedPostprocessPresetDefinition;
+    })
+    .filter((item): item is SharedPostprocessPresetDefinition => item !== null);
+}
+
+export function applyPostprocessPreset(
+  preset: SharedPostprocessPresetDefinition
+): SharedPostprocessValue {
+  return withPostprocessDefaults(preset.postprocess);
 }
 
 export function createPostprocessAdapter<TRead, TUpdate>() {

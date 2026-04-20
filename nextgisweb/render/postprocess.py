@@ -1,27 +1,20 @@
 from __future__ import annotations
 
-from enum import Enum
 from hashlib import blake2b
-from typing import Annotated
+from typing import Annotated, Any, cast
 
 import numpy as np
 from msgspec import Meta, Struct, to_builtins
 from PIL import Image, ImageChops, ImageEnhance, ImageFilter, ImageOps
+
+from nextgisweb.env import gettext
 
 from nextgisweb.resource import SAttribute, Serializer
 
 _PresetConfig = dict[str, float | str]
 
 
-class PostprocessPreset(Enum):
-    WATERCOLOR = "watercolor"
-    INK_SKETCH = "ink_sketch"
-    BLUEPRINT = "blueprint"
-    VINTAGE_MAP = "vintage_map"
-
-
 class RenderPostprocess(Struct, kw_only=True):
-    preset: PostprocessPreset | None = None
     brightness: Annotated[float, Meta(ge=0.0, le=4.0)] | None = None
     contrast: Annotated[float, Meta(ge=0.0, le=4.0)] | None = None
     gamma: Annotated[float, Meta(ge=0.1, le=4.0)] | None = None
@@ -44,6 +37,12 @@ class RenderPostprocess(Struct, kw_only=True):
     seed: Annotated[int, Meta(ge=0, le=2147483647)] | None = None
 
 
+class PostprocessPresetDefinition(Struct, kw_only=True):
+    key: str
+    label: str
+    postprocess: RenderPostprocess
+
+
 class PostprocessAttr(SAttribute):
     def get(self, srlzr: Serializer) -> RenderPostprocess | None:
         return getattr(srlzr.obj, self.model_attr)
@@ -52,29 +51,19 @@ class PostprocessAttr(SAttribute):
         setattr(srlzr.obj, self.model_attr, value)
 
 
-_POSTPROCESS_FIELDS = (
-    "preset",
-    "brightness",
-    "contrast",
-    "gamma",
-    "saturation",
-    "sharpen",
-    "blur_radius",
-    "grayscale",
-    "invert",
-    "tint_strength",
-    "tint_color",
-    "paper_texture",
-    "wet_wash",
-    "rough_edges",
-    "pigment_overlay",
-    "pencil_sketch",
-    "wet_edge",
-    "grain",
-    "pastel_softness",
-    "hatching",
-    "seed",
-)
+class PostprocessPresetsAttr(SAttribute):
+    def get(self, srlzr: Serializer) -> tuple[PostprocessPresetDefinition, ...]:
+        return get_postprocess_presets()
+
+    def set(
+        self,
+        srlzr: Serializer,
+        value: tuple[PostprocessPresetDefinition, ...] | None,
+        *,
+        create: bool,
+    ):
+        raise AttributeError("Postprocess presets are read-only")
+
 
 _WATERCOLOR_PRESET: _PresetConfig = dict(
     brightness=1.02,
@@ -117,31 +106,34 @@ _VINTAGE_MAP_PRESET: _PresetConfig = dict(
     pigment_overlay=0.16,
 )
 
+_POSTPROCESS_PRESETS = (
+    PostprocessPresetDefinition(
+        key="watercolor",
+        label=str(gettext("Watercolor")),
+        postprocess=RenderPostprocess(**cast(dict[str, Any], _WATERCOLOR_PRESET)),
+    ),
+    PostprocessPresetDefinition(
+        key="ink_sketch",
+        label=str(gettext("Ink sketch")),
+        postprocess=RenderPostprocess(**cast(dict[str, Any], _INK_SKETCH_PRESET)),
+    ),
+    PostprocessPresetDefinition(
+        key="blueprint",
+        label=str(gettext("Blueprint")),
+        postprocess=RenderPostprocess(**cast(dict[str, Any], _BLUEPRINT_PRESET)),
+    ),
+    PostprocessPresetDefinition(
+        key="vintage_map",
+        label=str(gettext("Vintage map")),
+        postprocess=RenderPostprocess(**cast(dict[str, Any], _VINTAGE_MAP_PRESET)),
+    ),
+)
+
 _MIX = (
     (127.1, 311.7),
     (269.5, 183.3),
     (419.2, 371.9),
 )
-
-
-def merge_postprocess(
-    base: RenderPostprocess | None,
-    override: RenderPostprocess | None,
-) -> RenderPostprocess | None:
-    if base is None and override is None:
-        return None
-
-    result = dict() if base is None else to_builtins(base)
-    if override is not None:
-        for field in _POSTPROCESS_FIELDS:
-            value = getattr(override, field)
-            if value is not None:
-                result[field] = value
-
-    if isinstance(result.get("preset"), str):
-        result["preset"] = PostprocessPreset(result["preset"])
-
-    return RenderPostprocess(**result) if result else None
 
 
 def _apply_displacement_np(array, extent, size, seed, strength):
@@ -165,6 +157,10 @@ def _apply_displacement_np(array, extent, size, seed, strength):
     wd = ((map_x - x0) * (map_y - y0))[:, :, np.newaxis]
 
     return array[y0, x0] * wa + array[y1, x0] * wb + array[y0, x1] * wc + array[y1, x1] * wd
+
+
+def get_postprocess_presets() -> tuple[PostprocessPresetDefinition, ...]:
+    return _POSTPROCESS_PRESETS
 
 
 def _resolve_postprocess(postprocess: RenderPostprocess | None):
@@ -193,15 +189,6 @@ def _resolve_postprocess(postprocess: RenderPostprocess | None):
         "hatching": 0.0,
         "seed": 42,
     }
-
-    if postprocess.preset == PostprocessPreset.WATERCOLOR:
-        resolved.update(_WATERCOLOR_PRESET)
-    elif postprocess.preset == PostprocessPreset.INK_SKETCH:
-        resolved.update(_INK_SKETCH_PRESET)
-    elif postprocess.preset == PostprocessPreset.BLUEPRINT:
-        resolved.update(_BLUEPRINT_PRESET)
-    elif postprocess.preset == PostprocessPreset.VINTAGE_MAP:
-        resolved.update(_VINTAGE_MAP_PRESET)
 
     user_data = to_builtins(postprocess)
 

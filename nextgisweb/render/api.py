@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Annotated, Literal
 
 from msgspec import UNSET, Meta, Struct, UnsetType
+from msgspec import convert as msgspec_convert
 from msgspec.json import decode as msgspec_json_decode
 from PIL import Image, ImageDraw, ImageFont
 from pyramid.httpexceptions import HTTPBadRequest
@@ -168,7 +169,11 @@ def process_postprocess(value: PostprocessOverride) -> dict[int, RenderPostproce
     result = dict()
     for k, raw in value.items():
         try:
-            result[k] = msgspec_json_decode(raw, type=RenderPostprocess)
+            decoded = msgspec_json_decode(raw)
+            if not isinstance(decoded, dict):
+                raise TypeError()
+            decoded.pop("preset", None)
+            result[k] = msgspec_convert(decoded, type=RenderPostprocess)
         except Exception as exc:
             raise ValidationError(gettext("Invalid postprocess override")) from exc
     return result

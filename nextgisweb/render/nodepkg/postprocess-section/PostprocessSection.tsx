@@ -12,8 +12,16 @@ import {
 } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import { DEFAULT_POSTPROCESS_VALUE, withPostprocessDefaults } from "./value";
-import type { SharedPostprocessValue } from "./value";
+import {
+  DEFAULT_POSTPROCESS_VALUE,
+  applyPostprocessPreset,
+  withPostprocessDefaults,
+} from "./value";
+import type {
+  SelectedPostprocessPresetKey,
+  SharedPostprocessPresetDefinition,
+  SharedPostprocessValue,
+} from "./value";
 import "./PostprocessSection.less";
 
 const msgBasic = gettext("Basic");
@@ -42,13 +50,8 @@ const msgGrain = gettext("Grain");
 const msgPastelSoftness = gettext("Pastel softness");
 const msgHatching = gettext("Hatching");
 const msgSeed = gettext("Seed");
+const msgSelectPreset = gettext("Select preset");
 
-const presetOptions = [
-  { value: "watercolor", label: gettext("Watercolor") },
-  { value: "ink_sketch", label: gettext("Ink sketch") },
-  { value: "blueprint", label: gettext("Blueprint") },
-  { value: "vintage_map", label: gettext("Vintage map") },
-];
 const toggleOptions = [
   { value: true, label: msgEnable },
   { value: false, label: msgDisable },
@@ -64,11 +67,15 @@ function toOpaqueHex(value: string) {
 }
 
 interface PostprocessSectionProps {
+  presets?: SharedPostprocessPresetDefinition[];
+  selectedPresetKey?: SelectedPostprocessPresetKey;
   value: SharedPostprocessValue | null;
   onChange: (
     key: keyof SharedPostprocessValue,
     value: SharedPostprocessValue[keyof SharedPostprocessValue]
   ) => void;
+  onChangeValue?: (value: SharedPostprocessValue | null) => void;
+  onChangeSelectedPresetKey?: (value: SelectedPostprocessPresetKey) => void;
 }
 
 function onNumberChange(
@@ -92,10 +99,34 @@ function Field({ label, children }: { label: ReactNode; children: ReactNode }) {
 }
 
 export function PostprocessSection({
+  presets = [],
+  selectedPresetKey = null,
   value,
   onChange,
+  onChangeValue,
+  onChangeSelectedPresetKey,
 }: PostprocessSectionProps) {
   const resolvedValue = withPostprocessDefaults(value);
+  const presetOptions = presets.map(({ key, label }) => ({
+    value: key,
+    label,
+  }));
+
+  const handlePresetChange = (next: SelectedPostprocessPresetKey) => {
+    if (next === null) {
+      onChangeSelectedPresetKey?.(null);
+      return;
+    }
+
+    const preset = presets.find(({ key }) => key === next);
+    if (preset && onChangeValue) {
+      onChangeValue(applyPostprocessPreset(preset));
+      onChangeSelectedPresetKey?.(next);
+      return;
+    }
+
+    onChangeSelectedPresetKey?.(next);
+  };
 
   return (
     <div className="ngw-render-postprocess-section">
@@ -242,9 +273,10 @@ export function PostprocessSection({
               <Select
                 allowClear
                 options={presetOptions}
-                value={resolvedValue.preset ?? undefined}
-                onChange={(next: SharedPostprocessValue["preset"]) =>
-                  onChange("preset", next ?? null)
+                placeholder={msgSelectPreset}
+                value={selectedPresetKey ?? undefined}
+                onChange={(next: SelectedPostprocessPresetKey) =>
+                  handlePresetChange(next ?? null)
                 }
                 style={numberStyle}
               />

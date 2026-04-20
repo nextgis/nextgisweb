@@ -9,10 +9,9 @@ from nextgisweb.core.exception import ValidationError
 from .. import api
 from ..interface import IRenderableStyle
 from ..postprocess import (
-    PostprocessPreset,
     RenderPostprocess,
     apply_postprocess,
-    merge_postprocess,
+    get_postprocess_presets,
 )
 
 
@@ -23,7 +22,6 @@ def test_process_postprocess():
 
     assert result == {
         1: RenderPostprocess(
-            preset=PostprocessPreset.WATERCOLOR,
             brightness=1.1,
             contrast=1.2,
         )
@@ -51,35 +49,25 @@ def test_process_postprocess_invalid_gamma_bounds():
         api.process_postprocess({1: '{"gamma": 0.05}'})
 
 
-def test_merge_postprocess_preset_and_override_priority():
-    result = merge_postprocess(
-        RenderPostprocess(preset=PostprocessPreset.BLUEPRINT, tint_strength=0.6),
-        RenderPostprocess(contrast=1.4, tint_strength=0.2),
+def test_get_postprocess_presets_returns_raw_parameters():
+    result = get_postprocess_presets()
+
+    assert [preset.key for preset in result] == [
+        "watercolor",
+        "ink_sketch",
+        "blueprint",
+        "vintage_map",
+    ]
+    assert result[0].postprocess == RenderPostprocess(
+        brightness=1.02,
+        contrast=0.95,
+        saturation=0.78,
+        blur_radius=1.6,
+        paper_texture=0.34,
+        wet_wash=0.48,
+        rough_edges=0.28,
+        pigment_overlay=0.42,
     )
-
-    assert result == RenderPostprocess(
-        preset=PostprocessPreset.BLUEPRINT,
-        tint_strength=0.2,
-        contrast=1.4,
-    )
-
-
-def test_apply_postprocess_resolves_preset_then_explicit_override():
-    img = Image.new("RGBA", (1, 1), (100, 50, 20, 255))
-
-    result = apply_postprocess(
-        img,
-        RenderPostprocess(
-            preset=PostprocessPreset.BLUEPRINT,
-            tint_color="#ff0000",
-            tint_strength=1.0,
-            grayscale=True,
-            paper_texture=0.0,
-        ),
-    )
-
-    assert result is not None
-    assert result.getpixel((0, 0))[:3] == (255, 0, 0)
 
 
 def test_apply_postprocess_grayscale_and_invert_keep_alpha():
