@@ -1,6 +1,5 @@
 import io
 import sys
-from packaging.version import Version
 from setuptools import find_packages, setup
 from subprocess import CalledProcessError, check_output
 
@@ -9,9 +8,9 @@ with io.open("VERSION", "r") as fd:
 
 try:
     gv = check_output(["gdal-config", "--version"], universal_newlines=True).strip()
-    gdal_spec = f"pygdal=={gv}.*" if Version(gv) < Version("3.7") else f"gdal=={gv}.*"
+    gdal_spec = f"gdal=={gv}.*"
 except CalledProcessError:
-    gdal_spec = "pygdal>=3.4"
+    gdal_spec = "pygdal>=3.8"
 
 
 # Provide the required GDAL and Numpy versions for docker.py as a single source
@@ -29,7 +28,6 @@ requires = [
     numpy_spec,
     "affine==2.4.0",
     "babel==2.17.0",
-    'backports-datetime-fromisoformat; python_version<"3.11"',
     "cachetools==6.1.0",
     "defusedxml==0.7.1",
     "docstring-parser==0.16",
@@ -106,7 +104,7 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
-    python_requires=">=3.10",
+    python_requires=">=3.12",
     install_requires=requires,
     extras_require=extras_require,
     entry_points=entry_points,
