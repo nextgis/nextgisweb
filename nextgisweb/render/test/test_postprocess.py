@@ -11,7 +11,9 @@ from ..interface import IRenderableStyle
 from ..postprocess import (
     RenderPostprocess,
     apply_postprocess,
+    get_postprocess_defaults,
     get_postprocess_presets,
+    get_render_effects_config,
 )
 
 
@@ -68,6 +70,71 @@ def test_get_postprocess_presets_returns_raw_parameters():
         rough_edges=0.28,
         pigment_overlay=0.42,
     )
+
+
+def test_get_postprocess_defaults_returns_full_ui_defaults():
+    assert get_postprocess_defaults() == RenderPostprocess(
+        brightness=1.0,
+        contrast=1.0,
+        gamma=1.0,
+        saturation=1.0,
+        sharpen=0.0,
+        blur_radius=0.0,
+        grayscale=False,
+        invert=False,
+        tint_strength=0.0,
+        tint_color="#000000",
+        paper_texture=0.0,
+        wet_wash=0.0,
+        rough_edges=0.0,
+        pigment_overlay=0.0,
+        pencil_sketch=0.0,
+        wet_edge=0.0,
+        grain=0.0,
+        pastel_softness=0.0,
+        hatching=0.0,
+        seed=42,
+    )
+
+
+def test_get_render_effects_config_contains_defaults_and_presets():
+    result = get_render_effects_config()
+
+    assert result.defaults == get_postprocess_defaults()
+    assert result.presets == get_postprocess_presets()
+
+
+def test_effects_presets_endpoint_is_public(ngw_webtest_app):
+    response = ngw_webtest_app.get("/api/component/render/effects/presets", status=200)
+
+    assert response.json["defaults"] == {
+        "brightness": 1.0,
+        "contrast": 1.0,
+        "gamma": 1.0,
+        "saturation": 1.0,
+        "sharpen": 0.0,
+        "blur_radius": 0.0,
+        "grayscale": False,
+        "invert": False,
+        "tint_strength": 0.0,
+        "tint_color": "#000000",
+        "paper_texture": 0.0,
+        "wet_wash": 0.0,
+        "rough_edges": 0.0,
+        "pigment_overlay": 0.0,
+        "pencil_sketch": 0.0,
+        "wet_edge": 0.0,
+        "grain": 0.0,
+        "pastel_softness": 0.0,
+        "hatching": 0.0,
+        "seed": 42,
+    }
+    assert [preset["key"] for preset in response.json["presets"]] == [
+        "watercolor",
+        "ink_sketch",
+        "blueprint",
+        "vintage_map",
+    ]
 
 
 def test_apply_postprocess_grayscale_and_invert_keep_alpha():

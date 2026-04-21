@@ -1,29 +1,11 @@
+import type { RenderPostprocess } from "@nextgisweb/render/type/api";
+
 export type SharedPostprocessPreset = string;
 export type SelectedPostprocessPresetKey = SharedPostprocessPreset | null;
 
-export interface SharedPostprocessValue {
-  [key: string]: string | number | boolean;
-  brightness: number;
-  contrast: number;
-  gamma: number;
-  saturation: number;
-  sharpen: number;
-  blur_radius: number;
-  grayscale: boolean;
-  invert: boolean;
-  tint_strength: number;
-  tint_color: string;
-  paper_texture: number;
-  wet_wash: number;
-  rough_edges: number;
-  pigment_overlay: number;
-  pencil_sketch: number;
-  wet_edge: number;
-  grain: number;
-  pastel_softness: number;
-  hatching: number;
-  seed: number;
-}
+export type SharedPostprocessValue = {
+  [K in keyof RenderPostprocess]-?: NonNullable<RenderPostprocess[K]>;
+};
 
 export type SharedPostprocessPatch = Partial<SharedPostprocessValue>;
 
@@ -31,6 +13,11 @@ export interface SharedPostprocessPresetDefinition {
   key: SharedPostprocessPreset;
   label: string;
   postprocess: SharedPostprocessPatch;
+}
+
+export interface SharedPostprocessConfig {
+  defaults: SharedPostprocessValue;
+  presets: SharedPostprocessPresetDefinition[];
 }
 
 type SharedPostprocessField =
@@ -60,6 +47,10 @@ export const DEFAULT_POSTPROCESS_VALUE: SharedPostprocessValue = {
   seed: 42,
 };
 
+let activePostprocessDefaults: SharedPostprocessValue = {
+  ...DEFAULT_POSTPROCESS_VALUE,
+};
+
 function hasSeedDrivenEffect(value: SharedPostprocessValue) {
   return (
     value.paper_texture > 0 ||
@@ -76,24 +67,48 @@ export function withPostprocessDefaults(
   value: SharedPostprocessPatch | null | undefined
 ): SharedPostprocessValue {
   return {
-    ...DEFAULT_POSTPROCESS_VALUE,
+    ...activePostprocessDefaults,
     ...(value ?? {}),
   } as SharedPostprocessValue;
+}
+
+export function getPostprocessDefaults(): SharedPostprocessValue {
+  return activePostprocessDefaults;
 }
 
 function normalizePostprocessPatch(
   value: SharedPostprocessPatch | Record<string, unknown>
 ): SharedPostprocessPatch {
-  const normalized: SharedPostprocessPatch = {};
+  const normalized = {} as SharedPostprocessPatch;
+  const normalizedRecord = normalized as Record<
+    keyof SharedPostprocessValue,
+    SharedPostprocessField
+  >;
 
   for (const [key, fieldValue] of Object.entries(value)) {
     if (fieldValue !== undefined && fieldValue !== null) {
-      normalized[key as keyof SharedPostprocessValue] =
+      normalizedRecord[key as keyof SharedPostprocessValue] =
         fieldValue as SharedPostprocessField;
     }
   }
 
   return normalized;
+}
+
+function buildPostprocessDefaults(
+  value: SharedPostprocessPatch | Record<string, unknown> | null | undefined
+): SharedPostprocessValue {
+  return {
+    ...DEFAULT_POSTPROCESS_VALUE,
+    ...normalizePostprocessPatch(value ?? {}),
+  } as SharedPostprocessValue;
+}
+
+export function setPostprocessDefaults(
+  value: SharedPostprocessPatch | Record<string, unknown> | null | undefined
+): SharedPostprocessValue {
+  activePostprocessDefaults = buildPostprocessDefaults(value);
+  return activePostprocessDefaults;
 }
 
 export function normalizePostprocessForUi<TRead>(
@@ -255,6 +270,30 @@ export function normalizePostprocessPresets(
       } satisfies SharedPostprocessPresetDefinition;
     })
     .filter((item): item is SharedPostprocessPresetDefinition => item !== null);
+}
+
+export function normalizePostprocessConfig(
+  value: unknown
+): SharedPostprocessConfig {
+  if (!value || typeof value !== "object") {
+    return {
+      defaults: buildPostprocessDefaults(null),
+      presets: [],
+    };
+  }
+
+  const candidate = value as Record<string, unknown>;
+
+  return {
+    defaults: buildPostprocessDefaults(
+      (candidate.defaults as
+        | SharedPostprocessPatch
+        | Record<string, unknown>
+        | null
+        | undefined) ?? null
+    ),
+    presets: normalizePostprocessPresets(candidate.presets),
+  };
 }
 
 export function applyPostprocessPreset(

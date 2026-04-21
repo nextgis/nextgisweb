@@ -29,7 +29,7 @@ from nextgisweb.spatial_ref_sys.api import SRSID
 from .imgcodec import COMPRESSION_FAST, FORMAT_PNG, image_encoder_factory
 from .interface import ILegendableStyle, IRenderableStyle
 from .legend import ILegendSymbols
-from .postprocess import RenderPostprocess
+from .postprocess import RenderEffectsConfig, RenderPostprocess, get_render_effects_config
 from .util import TILE_SIZE, af_transform, image_zoom
 
 RenderResource = Annotated[
@@ -595,7 +595,17 @@ def resource_legend_symbols(
     return ResourceLegendSymbolsResponse(items=items)
 
 
+def effects_presets(request) -> RenderEffectsConfig:
+    return get_render_effects_config(translate=request.translate)
+
+
 def setup_pyramid(comp, config):
+    config.add_route(
+        "render.effects.presets",
+        "/api/component/render/effects/presets",
+        get=effects_presets,
+    )
+
     config.add_route(
         "render.tile",
         "/api/component/render/tile",

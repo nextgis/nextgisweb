@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from hashlib import blake2b
 from typing import Annotated, Any, cast
 
@@ -41,6 +42,11 @@ class PostprocessPresetDefinition(Struct, kw_only=True):
     key: str
     label: str
     postprocess: RenderPostprocess
+
+
+class RenderEffectsConfig(Struct, kw_only=True):
+    defaults: RenderPostprocess
+    presets: tuple[PostprocessPresetDefinition, ...]
 
 
 class PostprocessAttr(SAttribute):
@@ -106,27 +112,34 @@ _VINTAGE_MAP_PRESET: _PresetConfig = dict(
     pigment_overlay=0.16,
 )
 
-_POSTPROCESS_PRESETS = (
-    PostprocessPresetDefinition(
-        key="watercolor",
-        label=str(gettext("Watercolor")),
-        postprocess=RenderPostprocess(**cast(dict[str, Any], _WATERCOLOR_PRESET)),
-    ),
-    PostprocessPresetDefinition(
-        key="ink_sketch",
-        label=str(gettext("Ink sketch")),
-        postprocess=RenderPostprocess(**cast(dict[str, Any], _INK_SKETCH_PRESET)),
-    ),
-    PostprocessPresetDefinition(
-        key="blueprint",
-        label=str(gettext("Blueprint")),
-        postprocess=RenderPostprocess(**cast(dict[str, Any], _BLUEPRINT_PRESET)),
-    ),
-    PostprocessPresetDefinition(
-        key="vintage_map",
-        label=str(gettext("Vintage map")),
-        postprocess=RenderPostprocess(**cast(dict[str, Any], _VINTAGE_MAP_PRESET)),
-    ),
+_POSTPROCESS_PRESET_CONFIGS = (
+    ("watercolor", gettext("Watercolor"), _WATERCOLOR_PRESET),
+    ("ink_sketch", gettext("Ink sketch"), _INK_SKETCH_PRESET),
+    ("blueprint", gettext("Blueprint"), _BLUEPRINT_PRESET),
+    ("vintage_map", gettext("Vintage map"), _VINTAGE_MAP_PRESET),
+)
+
+_POSTPROCESS_DEFAULTS = RenderPostprocess(
+    brightness=1.0,
+    contrast=1.0,
+    gamma=1.0,
+    saturation=1.0,
+    sharpen=0.0,
+    blur_radius=0.0,
+    grayscale=False,
+    invert=False,
+    tint_strength=0.0,
+    tint_color="#000000",
+    paper_texture=0.0,
+    wet_wash=0.0,
+    rough_edges=0.0,
+    pigment_overlay=0.0,
+    pencil_sketch=0.0,
+    wet_edge=0.0,
+    grain=0.0,
+    pastel_softness=0.0,
+    hatching=0.0,
+    seed=42,
 )
 
 _MIX = (
@@ -159,36 +172,38 @@ def _apply_displacement_np(array, extent, size, seed, strength):
     return array[y0, x0] * wa + array[y1, x0] * wb + array[y0, x1] * wc + array[y1, x1] * wd
 
 
-def get_postprocess_presets() -> tuple[PostprocessPresetDefinition, ...]:
-    return _POSTPROCESS_PRESETS
+def get_postprocess_presets(
+    *, translate: Callable[[Any], str] = str
+) -> tuple[PostprocessPresetDefinition, ...]:
+    return tuple(
+        PostprocessPresetDefinition(
+            key=key,
+            label=translate(label),
+            postprocess=RenderPostprocess(**cast(dict[str, Any], preset)),
+        )
+        for key, label, preset in _POSTPROCESS_PRESET_CONFIGS
+    )
+
+
+def get_postprocess_defaults() -> RenderPostprocess:
+    return _POSTPROCESS_DEFAULTS
+
+
+def get_render_effects_config(*, translate: Callable[[Any], str] = str) -> RenderEffectsConfig:
+    return RenderEffectsConfig(
+        defaults=get_postprocess_defaults(),
+        presets=get_postprocess_presets(translate=translate),
+    )
 
 
 def _resolve_postprocess(postprocess: RenderPostprocess | None):
     if postprocess is None:
         return None
 
-    resolved: dict[str, float | bool | str | None | int] = {
-        "brightness": 1.0,
-        "contrast": 1.0,
-        "gamma": 1.0,
-        "saturation": 1.0,
-        "sharpen": 0.0,
-        "blur_radius": 0.0,
-        "grayscale": False,
-        "invert": False,
-        "tint_strength": 0.0,
-        "tint_color": None,
-        "wet_wash": 0.0,
-        "paper_texture": 0.0,
-        "pigment_overlay": 0.0,
-        "rough_edges": 0.0,
-        "pencil_sketch": 0.0,
-        "wet_edge": 0.0,
-        "grain": 0.0,
-        "pastel_softness": 0.0,
-        "hatching": 0.0,
-        "seed": 42,
-    }
+    resolved = cast(
+        dict[str, float | bool | str | None | int],
+        to_builtins(get_postprocess_defaults()),
+    )
 
     user_data = to_builtins(postprocess)
 

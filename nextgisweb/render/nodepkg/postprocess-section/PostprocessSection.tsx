@@ -13,8 +13,8 @@ import {
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import {
-  DEFAULT_POSTPROCESS_VALUE,
   applyPostprocessPreset,
+  getPostprocessDefaults,
   withPostprocessDefaults,
 } from "./value";
 import type {
@@ -22,6 +22,7 @@ import type {
   SharedPostprocessPresetDefinition,
   SharedPostprocessValue,
 } from "./value";
+
 import "./PostprocessSection.less";
 
 const msgBasic = gettext("Basic");
@@ -83,7 +84,7 @@ function onNumberChange(
   key: keyof SharedPostprocessValue
 ) {
   return (next: number | null) => {
-    const fallback = DEFAULT_POSTPROCESS_VALUE[key];
+    const fallback = getPostprocessDefaults()[key];
     const value = (next ?? fallback) as SharedPostprocessValue[typeof key];
     onChange(key, value);
   };
@@ -107,6 +108,7 @@ export function PostprocessSection({
   onChangeSelectedPresetKey,
 }: PostprocessSectionProps) {
   const resolvedValue = withPostprocessDefaults(value);
+  const defaultValue = getPostprocessDefaults();
   const presetOptions = presets.map(({ key, label }) => ({
     value: key,
     label,
@@ -228,18 +230,6 @@ export function PostprocessSection({
             </Field>
           </Col>
           <Col {...CONTROL_COL_PROPS}>
-            <Field label={msgTintStrength}>
-              <InputNumber
-                min={0}
-                max={1}
-                step={0.05}
-                value={resolvedValue.tint_strength}
-                onChange={onNumberChange(onChange, "tint_strength")}
-                style={numberStyle}
-              />
-            </Field>
-          </Col>
-          <Col {...CONTROL_COL_PROPS}>
             <Field label={msgTintColor}>
               <Space.Compact className="compact">
                 <ColorPicker
@@ -253,12 +243,24 @@ export function PostprocessSection({
                 />
                 <Button
                   onClick={() =>
-                    onChange("tint_color", DEFAULT_POSTPROCESS_VALUE.tint_color)
+                    onChange("tint_color", defaultValue.tint_color)
                   }
                 >
                   {msgClear}
                 </Button>
               </Space.Compact>
+            </Field>
+          </Col>
+          <Col {...CONTROL_COL_PROPS}>
+            <Field label={msgTintStrength}>
+              <InputNumber
+                min={0}
+                max={1}
+                step={0.05}
+                value={resolvedValue.tint_strength}
+                onChange={onNumberChange(onChange, "tint_strength")}
+                style={numberStyle}
+              />
             </Field>
           </Col>
         </Row>

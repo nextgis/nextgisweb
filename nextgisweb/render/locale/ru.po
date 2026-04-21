@@ -1,8 +1,8 @@
-#: api.py:82
+#: api.py:88
 msgid "Invalid origin"
 msgstr "Недопустимый источник"
 
-#: api.py:83
+#: api.py:90
 msgid ""
 "Origin validation is enabled for rendering requests, but the given origin "
 "doesn't match with the CORS origins list."
@@ -10,43 +10,209 @@ msgstr ""
 "Для запросов рендеринга включена проверка источника, однако указанный "
 "источник не совпадает со списком допустимых источников CORS."
 
-#: api.py:158
+#: api.py:162
 msgid "Invalid symbols sequence"
 msgstr "Некорректная последовательность символов"
 
-#: component.py:24 nodepkg/tile-cache-widget/TileCacheWidget.tsx:93
+#: api.py:178
+msgid "Invalid postprocess override"
+msgstr ""
+
+#: component.py:24 nodepkg/tile-cache-widget/TileCacheWidget.tsx:90
 msgid "Tile cache"
 msgstr "Тайловый кэш"
 
-#: component.py:51 nodepkg/tile-cache-widget/TileCacheWidget.tsx:50
+#: component.py:44 nodepkg/tile-cache-widget/TileCacheWidget.tsx:46
 msgid "Enabled"
 msgstr "Включен"
 
-#: component.py:51
+#: component.py:44
 msgid "Disabled"
 msgstr "Отключен"
 
-#: nodepkg/tile-cache-widget/TileCacheWidget.tsx:58
+#: nodepkg/effects-preview/EffectsPreview.tsx:35
+msgid "Preview"
+msgstr "Предпросмотр"
+
+#: nodepkg/effects-preview/EffectsPreview.tsx:36
+msgid "Updates automatically as effects are adjusted."
+msgstr "Обновляется автоматически по мере настройки эффектов."
+
+#: nodepkg/effects-preview/EffectsPreview.tsx:39
+msgid "A preview map with effects will be available after the style is created."
+msgstr ""
+"Предварительный просмотр карты с эффектами будет доступен после создания "
+"стиля."
+
+#: nodepkg/effects-preview/EffectsPreview.tsx:42
+msgid "Image Adapter"
+msgstr "Адаптер изображения"
+
+#: nodepkg/effects-preview/EffectsPreview.tsx:43
+msgid "Tile Adapter"
+msgstr "Адаптер тайлов"
+
+#: nodepkg/postprocess-section/EffectsActions.tsx:6
+msgid "Enable effects"
+msgstr "Разрешить эффекты"
+
+#: nodepkg/postprocess-section/EffectsActions.tsx:7
+msgid "Disable effects"
+msgstr "Выключить эффекты"
+
+#: nodepkg/postprocess-section/EffectsActions.tsx:8
+msgid "Reset to defaults"
+msgstr "Установить по умолчанию"
+
+#: nodepkg/postprocess-section/PostprocessSection.tsx:28
+msgid "Basic"
+msgstr "Базовые"
+
+#: nodepkg/postprocess-section/PostprocessSection.tsx:29
+msgid "Artistic"
+msgstr "Художественные"
+
+#: nodepkg/postprocess-section/PostprocessSection.tsx:30
+msgid "Preset"
+msgstr "Набор"
+
+#: nodepkg/postprocess-section/PostprocessSection.tsx:31
+msgid "Brightness"
+msgstr "Яркость"
+
+#: nodepkg/postprocess-section/PostprocessSection.tsx:32
+msgid "Contrast"
+msgstr "Контрастность"
+
+#: nodepkg/postprocess-section/PostprocessSection.tsx:33
+msgid "Gamma"
+msgstr "Гамма"
+
+#: nodepkg/postprocess-section/PostprocessSection.tsx:34
+msgid "Saturation"
+msgstr "Насыщенность"
+
+#: nodepkg/postprocess-section/PostprocessSection.tsx:35
+msgid "Sharpen"
+msgstr "Резкость"
+
+#: nodepkg/postprocess-section/PostprocessSection.tsx:36
+msgid "Blur radius"
+msgstr "Радиус размытия"
+
+#: nodepkg/postprocess-section/PostprocessSection.tsx:37
+msgid "Grayscale"
+msgstr "Оттенки серого"
+
+#: nodepkg/postprocess-section/PostprocessSection.tsx:38
+msgid "Invert colors"
+msgstr "Инвертировать цвета"
+
+#: nodepkg/postprocess-section/PostprocessSection.tsx:39
+msgid "Enable"
+msgstr "Включить"
+
+#: nodepkg/postprocess-section/PostprocessSection.tsx:40
+msgid "Disable"
+msgstr "Отключить"
+
+#: nodepkg/postprocess-section/PostprocessSection.tsx:41
+msgid "Tint color"
+msgstr "Цвет оттенка"
+
+#: nodepkg/postprocess-section/PostprocessSection.tsx:42
+msgid "Tint strength"
+msgstr "Интенсивность оттенка"
+
+#: nodepkg/postprocess-section/PostprocessSection.tsx:43
+msgid "Clear"
+msgstr "Очистить"
+
+#: nodepkg/postprocess-section/PostprocessSection.tsx:44
+msgid "Paper texture"
+msgstr "Текстура бумаги"
+
+#: nodepkg/postprocess-section/PostprocessSection.tsx:45
+msgid "Wet wash"
+msgstr "Размытая заливка"
+
+#: nodepkg/postprocess-section/PostprocessSection.tsx:46
+msgid "Rough edges"
+msgstr "Грубые края"
+
+#: nodepkg/postprocess-section/PostprocessSection.tsx:47
+msgid "Pigment overlay"
+msgstr "Наложение пигмента"
+
+#: nodepkg/postprocess-section/PostprocessSection.tsx:48
+msgid "Pencil sketch"
+msgstr "Карандашный набросок"
+
+#: nodepkg/postprocess-section/PostprocessSection.tsx:49
+msgid "Wet edge"
+msgstr "Мокрый край"
+
+#: nodepkg/postprocess-section/PostprocessSection.tsx:50
+msgid "Grain"
+msgstr "Зернистость"
+
+#: nodepkg/postprocess-section/PostprocessSection.tsx:51
+msgid "Pastel softness"
+msgstr "Мягкость пастели"
+
+#: nodepkg/postprocess-section/PostprocessSection.tsx:52
+msgid "Hatching"
+msgstr "Штриховка"
+
+#: nodepkg/postprocess-section/PostprocessSection.tsx:53
+msgid "Seed"
+msgstr "Зерно"
+
+#: nodepkg/postprocess-section/PostprocessSection.tsx:54
+msgid "Select preset"
+msgstr "Выберите набор"
+
+#: nodepkg/resource-section/legend-symbols/ResourceSectionLegendSymbols.tsx:30
+msgid "Legend symbols"
+msgstr "Символы легенды"
+
+#: nodepkg/tile-cache-widget/TileCacheWidget.tsx:54
 msgid "Allow using tiles in non-tile requests"
 msgstr "Разрешить тайлы для запросов изображений"
 
-#: nodepkg/tile-cache-widget/TileCacheWidget.tsx:62
+#: nodepkg/tile-cache-widget/TileCacheWidget.tsx:58
 msgid "Max zoom level"
 msgstr "Макс. зум"
 
-#: nodepkg/tile-cache-widget/TileCacheWidget.tsx:71
+#: nodepkg/tile-cache-widget/TileCacheWidget.tsx:67
 msgid "TTL, sec."
 msgstr "TTL, сек."
 
-#: nodepkg/tile-cache-widget/TileCacheWidget.tsx:85
+#: nodepkg/tile-cache-widget/TileCacheWidget.tsx:81
 msgid "Flush"
 msgstr "Очистить"
 
-#: view.py:25
+#: postprocess.py:169
+msgid "Watercolor"
+msgstr "Акварель"
+
+#: postprocess.py:170
+msgid "Ink sketch"
+msgstr "Чернильный набросок"
+
+#: postprocess.py:171
+msgid "Blueprint"
+msgstr "Схема"
+
+#: postprocess.py:172
+msgid "Vintage map"
+msgstr "Винтажная карта"
+
+#: view.py:26
 msgid "TMS (Tile Map Service)"
 msgstr "TMS (Tile Map Service)"
 
-#: view.py:26
+#: view.py:28
 msgid ""
 "TMS (Tile Map Service) is a specification for tiled web maps. Tiled web map "
 "is a map displayed in a browser by seamlessly joining dozens of individually "
@@ -55,7 +221,3 @@ msgstr ""
 "TMS (Tile Map Service) - это спецификация тайловых карт.  Тайловая карта - "
 "это карта, отображаемая в браузере путем бесшовного соединения десятков "
 "индивидуально запрашиваемых изображений (тайлов)."
-
-#: view.py:42
-msgid "Legend symbols"
-msgstr "Символы легенды"

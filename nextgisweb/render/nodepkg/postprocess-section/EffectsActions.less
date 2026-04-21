@@ -1,0 +1,27 @@
+.ngw-render-effects-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+
+  .left-slot,
+  .right-slot {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+  }
+
+  .right-slot {
+    margin-left: auto;
+  }
+
+  .toggle-button.secondary.ant-btn,
+  .toggle-button.secondary.ant-btn:focus,
+  .toggle-button.secondary.ant-btn:hover,
+  .toggle-button.secondary.ant-btn:active {
+    border-color: var(--secondary);
+    background-color: var(--secondary);
+    color: var(--on-secondary-text);
+  }
+}
