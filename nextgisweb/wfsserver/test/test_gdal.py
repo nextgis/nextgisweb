@@ -20,7 +20,6 @@ from ..model import Service as WFSService
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
 
 TEST_WFS_VERSIONS = ("2.0.2", "2.0.0", "1.1.0", "1.0.0")
-GDAL_VERSION = pkg_version.parse(gdal.__version__.split("-")[0])
 DATA = Path(vector_layer_test.__file__).parent / "data"
 
 
@@ -39,7 +38,7 @@ def force_schema_validation(ngw_env):
 @pytest.fixture(scope="module", autouse=True)
 def patch_gdal_dates():
     # https://github.com/OSGeo/gdal/issues/2403
-    if pkg_version.parse("3.4.1") <= GDAL_VERSION:
+    if pkg_version.parse(gdal.__version__.split("-")[0]) >= pkg_version.parse("3.4.1"):
 
         def date_from_iso(value):
             m = re.match(r"^(\d{4})\/(\d{2})\/(\d{2})$", value)
@@ -200,11 +199,6 @@ test_create_delete_params = []
 test_edit_params = []
 
 for version in TEST_WFS_VERSIONS:
-    xfail_gdal_create = pytest.mark.xfail(
-        version >= "2.0.0" and GDAL_VERSION < pkg_version.parse("3.2.1"),
-        reason="GDAL doesn't work correctly with WFS 2.x",
-    )
-
     for layer in ("type", "pointz"):
         if layer == "type":
             test_edit_params.extend(
@@ -257,7 +251,6 @@ for version in TEST_WFS_VERSIONS:
                 layer,
                 "POINT Z (0 0 -1)" if layer == "pointz" else "POINT (0 0)",
                 id="{}-{}".format(version, layer),
-                marks=xfail_gdal_create,
             )
         )
         if layer == "pointz":
@@ -267,7 +260,6 @@ for version in TEST_WFS_VERSIONS:
                     layer,
                     None,
                     id="{}-{}-null-geom".format(version, layer),
-                    marks=xfail_gdal_create,
                 )
             )
 
