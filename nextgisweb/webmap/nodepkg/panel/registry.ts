@@ -2,6 +2,7 @@
 import type { FC, ReactNode } from "react";
 
 import type { TabsProps } from "@nextgisweb/gui/antd";
+import type { useShowModal } from "@nextgisweb/gui/index";
 import { pluginRegistry } from "@nextgisweb/jsrealm/plugin";
 import type { ImportCallback } from "@nextgisweb/jsrealm/plugin";
 import type { DisplayConfig } from "@nextgisweb/webmap/type/api";
@@ -59,7 +60,10 @@ export interface LinkPanelPlugin extends PanelPluginBase {
 
 export interface ActionPanelPlugin extends PanelPluginBase {
   type: "action";
-  action: (val: { display: Display }) => void | Promise<void>;
+  action: (val: {
+    display: Display;
+    showModal: ReturnType<typeof useShowModal>["showModal"];
+  }) => void | Promise<void>;
 }
 
 export type PanelPlugin<S extends PanelStore = PanelStore> =
