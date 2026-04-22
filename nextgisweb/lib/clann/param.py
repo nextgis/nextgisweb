@@ -3,10 +3,9 @@ from __future__ import annotations
 from enum import Enum
 from functools import partial
 from types import NoneType, UnionType
-from typing import Any, Union, get_args, get_origin
+from typing import Any, Protocol, Union, get_args, get_origin
 
 from msgspec import UNSET
-from typing_extensions import Protocol
 
 from .argparse import ArgumentParser
 

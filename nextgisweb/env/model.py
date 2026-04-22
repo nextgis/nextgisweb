@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, ClassVar
+from typing import TYPE_CHECKING, ClassVar, Self
 
 from sqlalchemy import MetaData as SAMetadata
 from sqlalchemy.orm import (
@@ -10,7 +10,6 @@ from sqlalchemy.orm import (
     scoped_session,
     sessionmaker,
 )
-from typing_extensions import Self
 from zope.sqlalchemy import register
 
 from nextgisweb.lib.logging import logger

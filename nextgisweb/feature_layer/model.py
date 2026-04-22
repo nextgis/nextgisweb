@@ -1,4 +1,4 @@
-from typing import Any, cast
+from typing import Any, Self, cast
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
@@ -6,7 +6,6 @@ from msgspec import UNSET, Struct, UnsetType
 from osgeo import ogr
 from sqlalchemy.ext.orderinglist import ordering_list
 from sqlalchemy.orm import declared_attr
-from typing_extensions import Self
 
 from nextgisweb.env import Base, env, gettext
 from nextgisweb.lib import saext

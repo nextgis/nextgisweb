@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 from functools import cached_property, partial
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, NamedTuple, Type, cast
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, NamedTuple, Self, Type, cast
 
 import sqlalchemy as sa
 import sqlalchemy.dialects.postgresql as sa_pg
@@ -11,7 +11,6 @@ from msgspec import Struct
 from sqlalchemy import event, inspect
 from sqlalchemy.sql import and_ as sql_and
 from sqlalchemy.sql import or_ as sql_or
-from typing_extensions import Self
 
 from nextgisweb.env import DBSession
 

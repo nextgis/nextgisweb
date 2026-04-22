@@ -1,8 +1,6 @@
 import re
 from collections.abc import Mapping
-from typing import ClassVar, Type
-
-from typing_extensions import Self
+from typing import ClassVar, Self, Type
 
 from nextgisweb.env import gettext
 from nextgisweb.env.package import pkginfo

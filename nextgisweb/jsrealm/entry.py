@@ -1,7 +1,6 @@
-from typing import ClassVar
+from typing import ClassVar, Self
 
 from msgspec import Struct
-from typing_extensions import Self
 
 from nextgisweb.env.package import pkginfo
 from nextgisweb.lib.imptool import module_from_stack

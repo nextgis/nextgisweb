@@ -1,12 +1,11 @@
 import sys
-from typing import Annotated, Any
+from typing import Annotated, Any, Self
 
 import pyramid.httpexceptions as httpexceptions
 from msgspec import UNSET, Struct, UnsetType
 from msgspec import DecodeError as MsgspecDecodeError
 from pyramid.renderers import render_to_response
 from pyramid.request import RequestLocalCache
-from typing_extensions import Self
 
 from nextgisweb.env import gettext
 from nextgisweb.lib import json

@@ -1,7 +1,7 @@
-from typing import TYPE_CHECKING, Any, Protocol, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Protocol, Self, Union
 
 from msgspec import Struct, UnsetType, defstruct
-from typing_extensions import ClassVar, Self, get_annotations
+from typing_extensions import get_annotations
 
 from nextgisweb.auth import User
 from nextgisweb.resource.scope import ResourceScope

@@ -1,11 +1,11 @@
 from datetime import datetime
 from secrets import token_urlsafe
+from typing import Unpack
 from uuid import uuid4
 
 import pytest
 import transaction
 from sqlalchemy import event
-from typing_extensions import Unpack
 
 from nextgisweb.env.test import fixture_value
 

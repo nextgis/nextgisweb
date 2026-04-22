@@ -2,13 +2,13 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from contextlib import contextmanager
-from typing import Any, Literal, TypedDict, overload
+from typing import Any, Literal, Self, TypedDict, Unpack, overload
 from urllib.parse import quote
 from warnings import warn
 
 import pytest
 from requests import Session as RequestsSession
-from typing_extensions import Self, Unpack, deprecated
+from typing_extensions import deprecated
 from webtest import TestApp as BaseTestApp
 from webtest import TestResponse
 from webtest.http import StopableWSGIServer

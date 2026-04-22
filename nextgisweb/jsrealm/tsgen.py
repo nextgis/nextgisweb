@@ -7,10 +7,20 @@ from importlib.metadata._itertools import unique_everseen
 from itertools import count
 from textwrap import indent
 from types import UnionType
-from typing import TYPE_CHECKING, Any, Literal, Type, TypeVar, Union, cast, get_args, get_origin
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Literal,
+    Protocol,
+    Type,
+    TypeVar,
+    Union,
+    cast,
+    get_args,
+    get_origin,
+)
 
 from msgspec import UNSET, Struct, UnsetType, field
-from typing_extensions import Protocol
 
 from nextgisweb.env.package import pkginfo
 from nextgisweb.lib.apitype import disannotate, unannotate
