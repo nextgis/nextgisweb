@@ -8,6 +8,7 @@ from typing import Any
 
 import sqlalchemy as sa
 import sqlalchemy.event as sa_event
+from sqlalchemy.orm import Mapped, mapped_column
 
 from nextgisweb.env import Base, env
 from nextgisweb.env.package import pkginfo
@@ -24,10 +25,10 @@ def _size_default(context):
 class FileObj(Base):
     __tablename__ = "fileobj"
 
-    id = sa.Column(sa.Integer, primary_key=True)
-    component = sa.Column(sa.Unicode, nullable=False)
-    uuid = sa.Column(sa.Unicode(32), nullable=False)
-    size = sa.Column(sa.BigInteger, nullable=False, default=_size_default)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    component: Mapped[str] = mapped_column()
+    uuid: Mapped[str] = mapped_column(sa.String(32))
+    size: Mapped[int] = mapped_column(sa.BigInteger, default=_size_default)
 
     __table_args__ = (sa.Index("fileobj_uuid_component_idx", uuid, component, unique=True),)
 
