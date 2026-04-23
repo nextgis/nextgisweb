@@ -24,7 +24,7 @@ export function NGWLayer({
   });
 
   useEffect(() => {
-    if (!adapter?.olMap) return;
+    if (!adapter?.olMap || !layer) return;
 
     adapter.olMap.addLayer(layer);
 
@@ -34,6 +34,7 @@ export function NGWLayer({
   }, [layerType, resourceId, adapter, zIndex, layer]);
 
   useEffect(() => {
+    if (!layer) return;
     layer.setZIndex(zIndex);
   }, [zIndex, layer]);
 
