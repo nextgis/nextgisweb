@@ -412,6 +412,19 @@ def _conv_datetime(value: Any) -> datetime:
     raise ValueError
 
 
+def _conv_bool(value: Any) -> bool:
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, int):
+        return bool(value)
+    if isinstance(value, str):
+        if value.lower() in ("true", "1"):
+            return True
+        if value.lower() in ("false", "0"):
+            return False
+    raise ValueError
+
+
 _SCALAR_CONVERTERS: dict[str, Callable[[Any], Any]] = {
     FIELD_TYPE.INTEGER: _conv_int,
     FIELD_TYPE.BIGINT: _conv_int,
@@ -420,6 +433,7 @@ _SCALAR_CONVERTERS: dict[str, Callable[[Any], Any]] = {
     FIELD_TYPE.DATE: _conv_date,
     FIELD_TYPE.TIME: _conv_time,
     FIELD_TYPE.DATETIME: _conv_datetime,
+    FIELD_TYPE.BOOLEAN: _conv_bool,
 }
 
 

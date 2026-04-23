@@ -27,6 +27,7 @@ def test_from_fields(ngw_txn):
             dict(keyname="date", datatype=FIELD_TYPE.DATE),
             dict(keyname="time", datatype=FIELD_TYPE.TIME),
             dict(keyname="datetime", datatype=FIELD_TYPE.DATETIME),
+            dict(keyname="boolean", datatype=FIELD_TYPE.BOOLEAN),
         ]
     )
 
@@ -124,6 +125,7 @@ def test_type_geojson(ngw_txn, ngw_data_path):
         assert fields["datetime"] == datetime(*field_as(ref, "datetime", "DateTime")[0:6])
         assert fields["string"] == field_as(ref, "string", "String")
         assert fields["unicode"] == field_as(ref, "unicode", "String")
+        assert fields["boolean"] == bool(field_as(ref, "boolean", "Integer"))
 
 
 @pytest.mark.parametrize(

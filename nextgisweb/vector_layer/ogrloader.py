@@ -383,6 +383,8 @@ class OGRLoader:
             fld_type_ogr = fld_defn.GetType()
             if fld_type_ogr in STRING_CAST_TYPES:
                 fld_type = FIELD_TYPE.STRING
+            elif fld_type_ogr == ogr.OFTInteger and fld_defn.GetSubType() == ogr.OFSTBoolean:
+                fld_type = FIELD_TYPE.BOOLEAN
             else:
                 try:
                     fld_type = FIELD_TYPE_2_ENUM[fld_type_ogr]
@@ -458,6 +460,8 @@ class OGRLoader:
 
         for fidx, fobj in self.fields.items():
             fget = partial(FIELD_GETTER[fobj.origtype], fidx=fidx)
+            if fobj.datatype == FIELD_TYPE.BOOLEAN:
+                fget = lambda f, _fget=fget: bool(_fget(f))
             fields.append((fidx, fobj.name, fget, fobj.origtype))
             fcol = columns[fidx]
             vcolumns.append(sa.column(fcol))

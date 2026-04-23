@@ -34,7 +34,7 @@ from .interface import (
     IVersionableFeatureLayer,
     IWritableFeatureLayer,
 )
-from .numutil import BIGINT_DUMPERS, BigIntFormat, bigint_loader, int_loader
+from .numutil import BIGINT_DUMPERS, BigIntFormat, bigint_loader, bool_loader, int_loader
 from .versioning import FVersioningNotEnabled, FVersioningOutOfRange
 
 FeatureID = Annotated[int, Meta(description="Feature ID")]
@@ -93,6 +93,8 @@ class Loader:
                 fld_load = int_loader
             elif fld_datatype == FIELD_TYPE.BIGINT:
                 fld_load = bigint_loader
+            elif fld_datatype == FIELD_TYPE.BOOLEAN:
+                fld_load = bool_loader
             else:
                 fld_load = lambda val: val
             result[fld.keyname] = fld_load

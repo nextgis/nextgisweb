@@ -171,6 +171,7 @@ export const OPERATORS: OperatorOption[] = [
       "DATE",
       "TIME",
       "DATETIME",
+      "BOOLEAN",
     ],
   },
   {
@@ -184,6 +185,7 @@ export const OPERATORS: OperatorOption[] = [
       "DATE",
       "TIME",
       "DATETIME",
+      "BOOLEAN",
     ],
   },
   {
@@ -227,6 +229,7 @@ export const OPERATORS: OperatorOption[] = [
       "DATE",
       "TIME",
       "DATETIME",
+      "BOOLEAN",
     ],
   },
   {
@@ -240,6 +243,7 @@ export const OPERATORS: OperatorOption[] = [
       "DATE",
       "TIME",
       "DATETIME",
+      "BOOLEAN",
     ],
   },
   {

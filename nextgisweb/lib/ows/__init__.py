@@ -16,6 +16,7 @@ FIELD_TYPE_WFS = dict(
     XSD_TIME=(_ns_xsd, "time"),
     XSD_DATETIME=(_ns_xsd, "dateTime"),
     XSD_DECIMAL=(_ns_xsd, "decimal"),
+    XSD_BOOLEAN=(_ns_xsd, "boolean"),
     GML_TIME_INSTANT=("http://www.opengis.net/gml/3.2", "TimeInstantType"),
 )
 

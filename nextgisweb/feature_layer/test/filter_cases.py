@@ -18,6 +18,7 @@ FILTER_FIELDS = [
     FieldInfo(key="__fid__", datatype=FIELD_TYPE.INTEGER),
     FieldInfo(key="field_1", datatype=FIELD_TYPE.INTEGER),
     FieldInfo(key="field_2", datatype=FIELD_TYPE.INTEGER),
+    FieldInfo(key="flag", datatype=FIELD_TYPE.BOOLEAN),
 ]
 
 FILTER_SQL_COLUMNS = {
@@ -32,6 +33,7 @@ FILTER_SQL_COLUMNS = {
     "created_at": sa.column("created_at", sa.DateTime()),
     "field_1": sa.column("field_1", sa.Integer()),
     "field_2": sa.column("field_2", sa.Integer()),
+    "flag": sa.column("flag", sa.Boolean()),
 }
 
 FILTER_VIRTUAL_SQL_COLUMNS = {
@@ -55,6 +57,7 @@ FILTER_GEOJSON = {
                 "__fid__": 101,
                 "field_1": 10,
                 "field_2": 20,
+                "flag": True,
             },
             "geometry": {"type": "Point", "coordinates": [0, 0]},
         },
@@ -71,6 +74,7 @@ FILTER_GEOJSON = {
                 "__fid__": 102,
                 "field_1": 10,
                 "field_2": 20,
+                "flag": False,
             },
             "geometry": {"type": "Point", "coordinates": [1, 1]},
         },
@@ -87,6 +91,7 @@ FILTER_GEOJSON = {
                 "__fid__": 103,
                 "field_1": 10,
                 "field_2": 10,
+                "flag": True,
             },
             "geometry": {"type": "Point", "coordinates": [2, 2]},
         },
@@ -103,6 +108,7 @@ FILTER_GEOJSON = {
                 "__fid__": 104,
                 "field_1": 10,
                 "field_2": 5,
+                "flag": False,
             },
             "geometry": {"type": "Point", "coordinates": [3, 3]},
         },
@@ -119,6 +125,7 @@ FILTER_GEOJSON = {
                 "__fid__": 105,
                 "field_1": 10,
                 "field_2": 5,
+                "flag": True,
             },
             "geometry": {"type": "Point", "coordinates": [4, 4]},
         },
@@ -365,6 +372,35 @@ FILTER_REGISTRY: list[FilterCase] = [
         ["any", ["==", ["fid"], 1], ["==", ["fid"], 2]],
         {"Alice", "Bob"},
         "id = 1 OR id = 2",
+    ),
+    # Boolean
+    FilterCase(
+        "eq_flag_true",
+        ["==", ["get", "flag"], True],
+        {"Alice", "Charlie", "Eve"},
+        "flag = true",
+        True,
+    ),
+    FilterCase(
+        "eq_flag_false",
+        ["==", ["get", "flag"], False],
+        {"Bob", "Diana"},
+        "flag = false",
+        True,
+    ),
+    FilterCase(
+        "is_null_flag",
+        ["is_null", ["get", "flag"]],
+        set(),
+        "flag IS NULL",
+        True,
+    ),
+    FilterCase(
+        "not_is_null_flag",
+        ["!is_null", ["get", "flag"]],
+        {"Alice", "Bob", "Charlie", "Diana", "Eve"},
+        "flag IS NOT NULL",
+        True,
     ),
 ]
 
