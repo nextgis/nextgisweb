@@ -11,6 +11,7 @@ import {
   Select,
   TimePicker,
 } from "@nextgisweb/gui/antd";
+import { BooleanInput } from "@nextgisweb/gui/component/BooleanInput";
 
 import type { Operator, ResolvedFieldRef } from "../type";
 import { coerceTagValues } from "../util/condition-value";
@@ -117,6 +118,16 @@ export function DefaultFilterValueInput({
         <DateTimePicker
           value={value as Dayjs}
           onChange={handleDateLikeChange}
+          placeholder={placeholder}
+          disabled={disabled}
+        />
+      );
+    case "BOOLEAN":
+      return (
+        <BooleanInput
+          style={{ width: "100%" }}
+          value={value}
+          onChange={onChange}
           placeholder={placeholder}
           disabled={disabled}
         />
