@@ -289,6 +289,11 @@ msgstr "Отодвинуть"
 msgid "Back to the initial extent"
 msgstr "Вернуться к начальному охвату"
 
+#: nodepkg/map-component/hook/useNGWLayer.tsx:30
+#: nodepkg/panel/identify/component/RasterInfoSection.tsx:14
+msgid "Band {}"
+msgstr "Канал {}"
+
 #: nodepkg/map-component/tool/ToolMeasure/ToolMeasure.tsx:69
 #: nodepkg/map-controls/map-tools.ts:42
 msgid "Measure distance"
@@ -367,7 +372,7 @@ msgstr "Определить мое местоположение"
 
 #: nodepkg/map-controls/map-controls.ts:111
 #: nodepkg/map-controls/map-controls.ts:116 nodepkg/settings/SettingsForm.tsx:80
-#: option/base.py:42
+#: option/base.py:40
 msgid "Identification"
 msgstr "Идентификация"
 
@@ -509,10 +514,6 @@ msgstr "Геометрия"
 #: nodepkg/panel/identify/component/FeatureSelector.tsx:54
 msgid "Zoom to feature"
 msgstr "Приблизить к объекту"
-
-#: nodepkg/panel/identify/component/RasterInfoSection.tsx:14
-msgid "Band {}"
-msgstr "Канал {}"
 
 #: nodepkg/panel/identify/component/RasterInfoSection.tsx:26
 msgid "Raster"
@@ -714,7 +715,7 @@ msgstr "px"
 msgid "Map tools"
 msgstr "Инструменты карты"
 
-#: nodepkg/panel/share/SharePanel.tsx:400 option/base.py:32
+#: nodepkg/panel/share/SharePanel.tsx:400 option/base.py:30
 msgid "Panels"
 msgstr "Панели"
 
@@ -1168,11 +1169,11 @@ msgstr "Информация о геометрии"
 msgid "Request multiplexing"
 msgstr "Мультиплексирование запросов"
 
-#: option/base.py:37
+#: option/base.py:35
 msgid "Tools"
 msgstr "Инструменты"
 
-#: option/base.py:47
+#: option/base.py:45
 msgid "Miscellaneous"
 msgstr "Прочее"
 

@@ -17,7 +17,7 @@ export function NGWLayer({
 }) {
   const { mapStore: adapter } = useMapContext();
 
-  const layer = useNGWLayer({
+  const [layer, control] = useNGWLayer({
     layerType: layerType,
     resourceId: resourceId,
     layerOptions,
@@ -38,5 +38,5 @@ export function NGWLayer({
     layer.setZIndex(zIndex);
   }, [zIndex, layer]);
 
-  return null;
+  return <>{control}</>;
 }
