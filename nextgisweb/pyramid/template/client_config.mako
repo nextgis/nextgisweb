@@ -18,6 +18,7 @@
         user = request.user
         is_administrator = user.is_administrator
         is_guest = user.keyname == 'guest'
+        extra_permissions = list(i.identity for i in user.effective_permissions)
         contol_panel = is_administrator or len(user.effective_permissions) > 0
         user_id = user.id
         user_display_name = user.display_name
@@ -36,6 +37,7 @@
         # Something like InvalidCredentials
         is_administrator = False
         is_guest = True
+        extra_permissions = []
         contol_panel = False
         user_id = None
         user_display_name = None
@@ -54,6 +56,7 @@
         "instanceId": request.env.core.instance_id,
         "isAdministrator": is_administrator,
         "isGuest": is_guest,
+        "extraPermissions": extra_permissions,
         "controlPanel": contol_panel,
         "userId": user_id,
         "userDisplayName": user_display_name,

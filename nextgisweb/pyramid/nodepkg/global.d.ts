@@ -1,4 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
+/* eslint-disable @typescript-eslint/consistent-type-imports */
 declare const ngwConfig: import("@nextgisweb/pyramid/type/config").NgwConfig;
 
 declare module "@nextgisweb/pyramid/type/config" {
@@ -21,6 +21,7 @@ declare module "@nextgisweb/pyramid/type/config" {
     staticKey: string;
     isAdministrator: boolean;
     isGuest: boolean;
+    extraPermissions: import("@nextgisweb/auth/type/api").Permission[];
     controlPanel: boolean;
     userId: number;
     userDisplayName: string;
@@ -30,8 +31,8 @@ declare module "@nextgisweb/pyramid/type/config" {
     logoutUrl: string;
 
     headerLogo:
-      | { type: "builtin"; content: str }
-      | { type: "custom"; ckey: str };
+      | { type: "builtin"; content: string }
+      | { type: "custom"; ckey: string };
 
     // Defined by @nextgisweb/jsrealm/i18n/lang
     plurals: [number, { (n: number): number }];
