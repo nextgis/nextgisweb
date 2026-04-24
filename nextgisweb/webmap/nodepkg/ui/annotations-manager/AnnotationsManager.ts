@@ -1,4 +1,3 @@
-import { reaction } from "mobx";
 import type Feature from "ol/Feature";
 import { WKT } from "ol/format";
 
@@ -56,16 +55,8 @@ export class AnnotationsManager {
     const [annotationLayer, editableLayer] = this._buildAnnotationsLayers();
     this._annotationsLayer = annotationLayer;
     this._editableLayer = editableLayer;
-    this._setLayerZIndex();
     this._loadAnnotations();
     this._bindEvents();
-
-    reaction(
-      () => display.treeStore.items,
-      () => {
-        this._setLayerZIndex();
-      }
-    );
 
     AnnotationsManager.instance = this;
   }
@@ -313,16 +304,5 @@ export class AnnotationsManager {
     });
 
     return this._getAnnotation(this._display.config.webmapId, updateInfo.id);
-  }
-
-  private _setLayerZIndex() {
-    if (this._annotationsLayer) {
-      const treeItems = [...this._display.treeStore.items.values()].map(
-        (item) => (item.isLayer() ? item.drawOrderPosition || 0 : 0)
-      );
-      const maxZIndex = treeItems.length ? Math.max(...treeItems) * 2 : 2; // Multiply by two for insurance
-
-      this._annotationsLayer.setZIndex(maxZIndex);
-    }
   }
 }

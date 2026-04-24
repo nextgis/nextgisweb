@@ -9,12 +9,8 @@ import type {
   RootItemConfig,
 } from "@nextgisweb/webmap/type/api";
 
-import { createTreeItemStore } from "./TreeItemStore";
-import type {
-  TreeGroupStore,
-  TreeItemStore,
-  TreeLayerStore,
-} from "./TreeItemStore";
+import { TreeLayerStore, createTreeItemStore } from "./TreeItemStore";
+import type { TreeGroupStore, TreeItemStore } from "./TreeItemStore";
 import { filterItems, someItem, validateVisible } from "./treeStoreUtil";
 import type { ConfigByType, NodeByType } from "./treeStoreUtil";
 
@@ -95,6 +91,8 @@ export class TreeStore {
     this.rootId = rootItem.id;
     const children = rootItem.children;
     this.items.clear();
+
+    TreeLayerStore.order = 0;
 
     this.childrenIds = [];
     this.visibleLayerIds = [];

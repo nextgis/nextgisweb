@@ -59,6 +59,8 @@ interface Layers {
   [key: string]: CoreLayer;
 }
 
+const TOP_LAYER_ZINDEX = 10000;
+
 export class MapStore {
   readonly panelControl: PanelControl;
 
@@ -295,6 +297,8 @@ export class MapStore {
     const olLayer = layer.getLayer();
     if (layer.isBaseLayer) {
       olLayer.setZIndex(-1);
+    } else if (layer.isTopLayer) {
+      olLayer.setZIndex(TOP_LAYER_ZINDEX);
     } else if (order !== undefined) {
       olLayer.setZIndex(order);
     }
@@ -306,7 +310,9 @@ export class MapStore {
     const layer =
       typeof layerDef === "number" ? this.layers[layerDef] : layerDef;
     if (layer && layer.olLayer && layer.olLayer.setZIndex) {
-      layer.olLayer.setZIndex(zIndex);
+      if (layer.olLayer.getZIndex() !== zIndex) {
+        layer.olLayer.setZIndex(zIndex);
+      }
     }
   }
 
@@ -497,21 +503,6 @@ export class MapStore {
     );
 
     this.zoomToExtent(extent, options);
-  }
-
-  @computed
-  get maxZIndex(): number {
-    const layers = Object.values(this.layers);
-    let maxZIndex = 0;
-
-    layers.forEach((layer) => {
-      const zIndex = layer.olLayer.getZIndex();
-      if (zIndex !== undefined && zIndex > maxZIndex) {
-        maxZIndex = zIndex;
-      }
-    });
-
-    return maxZIndex;
   }
 
   getControlContainer(): HTMLElement {
