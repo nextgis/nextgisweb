@@ -1,11 +1,28 @@
-import type { DynMenuItem } from "@nextgisweb/pyramid/layout/dynmenu/type";
+import { useEffect, useState } from "react";
 
+import { useAbortController } from "../hook";
 import { Dynmenu } from "../layout";
+import type { CustomDynMenuItem } from "../layout/dynmenu/Dynmenu";
 
-interface ControlPanelProps {
-  items: DynMenuItem[];
-}
+import { resolveControlPanelDynMenuItems } from "./resolveControlPanelDynMenuItems";
 
-export function ControlPanel({ items }: ControlPanelProps) {
+export function ControlPanel() {
+  const { makeSignal } = useAbortController();
+  const [items, setItems] = useState<CustomDynMenuItem[]>([]);
+
+  useEffect(() => {
+    let canceled = false;
+
+    resolveControlPanelDynMenuItems(makeSignal()).then((items) => {
+      if (!canceled) {
+        setItems(items);
+      }
+    });
+
+    return () => {
+      canceled = true;
+    };
+  }, [makeSignal]);
+
   return <Dynmenu items={items} />;
 }

@@ -1,17 +1,19 @@
 import classNames from "classnames";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { Modal, Spin, useToken } from "@nextgisweb/gui/antd";
 import { useShowModal } from "@nextgisweb/gui/show-modal/useShowModal";
-import type { DynMenuItem } from "@nextgisweb/pyramid/layout/dynmenu/type";
 
 import { CBlock } from "../cblock";
 import { EntrypointSuspense } from "../component/EntrypointSuspense";
+import { resolveControlPanelDynMenuItems } from "../control-panel/resolveControlPanelDynMenuItems";
+import { useAbortController } from "../hook";
 
 import { Breadcrumbs } from "./Breadcrumbs";
 import type { BreadcrumbItem } from "./Breadcrumbs";
 import { Attrmenu } from "./attrmenu/Attrmenu";
 import { Dynmenu } from "./dynmenu/Dynmenu";
+import type { CustomDynMenuItem } from "./dynmenu/Dynmenu";
 import { Header } from "./header/Header";
 import { layoutStore } from "./store";
 
@@ -36,7 +38,6 @@ interface BaseProps {
   entrypoint: string;
   entrypointProps: Record<string, unknown>;
   breadcrumbs: BreadcrumbItem[];
-  dynMenuItems: DynMenuItem[];
   dynMenuResourceId?: number;
   hideResourceFilter?: boolean;
 }
@@ -49,19 +50,50 @@ export function Base({
   maxheight,
   layoutMode = "content",
   entrypoint,
-  entrypointProps,
-  dynMenuItems,
-  dynMenuResourceId,
   breadcrumbs,
+  entrypointProps,
+  dynMenuResourceId,
   hideResourceFilter = false,
 }: BaseProps) {
   const [modalApi, modalContextHolder] = Modal.useModal();
+
+  const [dynMenuItems, setDynMenuItems] = useState<
+    CustomDynMenuItem[] | undefined
+  >(undefined);
+
+  const { makeSignal } = useAbortController();
 
   const { modalHolder } = useShowModal({
     modalStore: layoutStore.modalStore,
   });
 
   const { token } = useToken();
+
+  useEffect(() => {
+    let canceled = false;
+
+    if (!dynMenuItems) {
+      const currentHref = window.location.href;
+
+      resolveControlPanelDynMenuItems(makeSignal()).then((items) => {
+        if (canceled) {
+          return;
+        }
+
+        const pageFromDynMenu = items.some(
+          (p) => p.type === "link" && currentHref.includes(p.url)
+        );
+
+        if (pageFromDynMenu) {
+          setDynMenuItems(items);
+        }
+      });
+    }
+
+    return () => {
+      canceled = true;
+    };
+  }, [dynMenuItems, makeSignal]);
 
   useEffect(() => {
     let meta = document.querySelector('meta[name="theme-color"]');
@@ -112,7 +144,7 @@ export function Base({
                   )}
                   <div className="ngw-pyramid-layout-title">
                     <h1 id="title">{title}</h1>
-                  </div>{" "}
+                  </div>
                   <div
                     id="content"
                     className="content"

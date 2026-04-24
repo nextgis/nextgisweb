@@ -1,9 +1,12 @@
+from msgspec import Struct
+
 from nextgisweb.env import gettext
-from nextgisweb.lib.dynmenu import Link
 
 from nextgisweb.gui import react_renderer
+from nextgisweb.pyramid import client_setting
 
 from .backend import is_backend_configured, require_backend
+from .component import AuditComponent
 
 
 @react_renderer("@nextgisweb/audit/journal")
@@ -13,9 +16,21 @@ def journal(request):
 
     return dict(
         title=gettext("Journal"),
-        dynmenu=request.env.pyramid.control_panel,
         maxwidth=True,
         maxheight=True,
+    )
+
+
+class AuditBackendClientSetting(Struct, kw_only=True):
+    dbase: bool
+    file: bool
+
+
+@client_setting("backend")
+def cs_backend(comp: AuditComponent, request) -> AuditBackendClientSetting:
+    return AuditBackendClientSetting(
+        dbase=is_backend_configured("dbase"),
+        file=is_backend_configured("file"),
     )
 
 
@@ -31,12 +46,3 @@ def setup_pyramid(comp, config):
         "/control-panel/journal",
         get=journal,
     )
-
-    @comp.env.pyramid.control_panel.add
-    def _control_panel(args):
-        if args.request.user.is_administrator and is_backend_configured("dbase"):
-            yield Link(
-                "info/journal",
-                gettext("Journal"),
-                lambda args: (args.request.route_url("audit.control_panel.journal.browse")),
-            )
