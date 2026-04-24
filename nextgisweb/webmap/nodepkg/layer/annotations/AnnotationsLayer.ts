@@ -40,6 +40,7 @@ export class AnnotationsLayer {
     this._layer = new VectorLayerClass("", {
       title: "annotations",
       visible,
+      isTopLayer: true,
     });
     this._layer.getLayer().setSource(this._source);
 
@@ -114,10 +115,6 @@ export class AnnotationsLayer {
     if (this._map) {
       annotationFeature.togglePopup(true, this._map);
     }
-  }
-
-  setZIndex(zIndex: number) {
-    this._layer.setZIndex(zIndex);
   }
 
   hidePopups(): void {

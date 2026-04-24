@@ -72,8 +72,6 @@ abstract class BaseTreeItemStore {
   }
 }
 
-let order = 0;
-
 export class LegendInfoStore implements LegendInfo {
   @observable.ref accessor visible: LegendInfo["visible"];
   @observable.ref accessor has_legend: LegendInfo["has_legend"];
@@ -124,6 +122,8 @@ export class TreeLayerStore
   extends BaseTreeItemStore
   implements LayerItemConfig
 {
+  static order = 0;
+
   readonly type: LayerItemConfig["type"] = "layer";
 
   @observable.ref accessor plugin: CompositeMembersConfig;
@@ -168,7 +168,7 @@ export class TreeLayerStore
     this.drawOrderPosition =
       this.drawOrderEnabled && typeof init.drawOrderPosition === "number"
         ? init.drawOrderPosition
-        : order++;
+        : TreeLayerStore.order++;
     this.filterable = init.filterable;
     this.legendInfo = new LegendInfoStore(init.legendInfo);
     this.adapter = init.adapter;

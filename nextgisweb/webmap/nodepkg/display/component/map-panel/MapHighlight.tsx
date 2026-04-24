@@ -63,12 +63,12 @@ export const MapHighlight = observer(function MapHighlight({
 }: Props) {
   const overlayRef = useRef<Vector | null>(null);
   const sourceRef = useRef<VectorSource | null>(null);
-  const maxZIndexRef = useRef(mapStore.maxZIndex);
 
   useEffect(() => {
-    const layer = new Vector("highlight", { title: "Highlight Overlay" });
-    const zi = maxZIndexRef.current * 2;
-    layer.olLayer.setZIndex(zi);
+    const layer = new Vector("highlight", {
+      title: "Highlight Overlay",
+      isTopLayer: true,
+    });
 
     const source = layer.olLayer.getSource();
     if (!source) return;
@@ -84,11 +84,6 @@ export const MapHighlight = observer(function MapHighlight({
       }
     };
   }, [mapStore]);
-
-  useEffect(() => {
-    overlayRef.current?.setZIndex(mapStore.maxZIndex + 1);
-    maxZIndexRef.current = mapStore.maxZIndex;
-  }, [mapStore.maxZIndex]);
 
   useEffect(() => {
     const hlStroke = new Stroke({ width: 3, color: strokeColor });
@@ -115,7 +110,9 @@ export const MapHighlight = observer(function MapHighlight({
         highlightStyle: hlStyle,
         crossStyle,
       });
-      if (f) source.addFeature(f);
+      if (f) {
+        source.addFeature(f);
+      }
     }
   }, [highlightStore.highlighted, strokeColor]);
 

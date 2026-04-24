@@ -5,14 +5,13 @@ import type { EventsKey } from "ol/events";
 import type { Geometry } from "ol/geom";
 import { Draw } from "ol/interaction";
 import type { DrawEvent } from "ol/interaction/Draw";
-import VectorLayer from "ol/layer/Vector";
-import VectorSource from "ol/source/Vector";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { makeUid } from "@nextgisweb/pyramid/util";
 import settings from "@nextgisweb/webmap/client-settings";
+import Vector from "@nextgisweb/webmap/ol/layer/Vector";
 
 import { useMapContext } from "../../context/useMapContext";
 import { ToggleControl } from "../../control";
@@ -49,14 +48,13 @@ type TooltipState = MeasureTooltipProps & {
 const ToolMeasure = observer(({ type, groupId, ...rest }: ToolMeasureProps) => {
   const { mapStore } = useMapContext();
 
-  const { olMap, maxZIndex } = mapStore;
+  const { olMap } = mapStore;
 
   const [currentTooltipId, setCurrentTooltipId] = useState<string | null>(null);
 
-  const vectorRef = useRef<VectorLayer<VectorSource> | null>(null);
+  const vectorRef = useRef<Vector | null>(null);
   const interactionRef = useRef<Draw | null>(null);
   const changeListenerRef = useRef<EventsKey | null>(null);
-  const maxZIndexRef = useRef(maxZIndex);
 
   const [tooltips, setTooltips] = useState<Map<string, TooltipState>>(
     new Map()
@@ -111,13 +109,16 @@ const ToolMeasure = observer(({ type, groupId, ...rest }: ToolMeasureProps) => {
 
   useEffect(() => {
     const style = createMeasureStyle();
-    const source = new VectorSource();
-    const vector = new VectorLayer({ source, style });
+    const vector = new Vector("measure", {
+      title: "Measure",
+      isTopLayer: true,
+      style,
+    });
+    const source = vector.getSource();
     vectorRef.current = vector;
     const debouncedMap = debouncedRef.current;
 
-    olMap.addLayer(vector);
-    vector.setZIndex(maxZIndexRef.current + 100);
+    mapStore.addLayer(vector);
 
     const interaction = new Draw({ source, type, style });
     interaction.setActive(false);
@@ -218,7 +219,7 @@ const ToolMeasure = observer(({ type, groupId, ...rest }: ToolMeasureProps) => {
       interaction.setActive(false);
       olMap.removeInteraction(interaction);
       vector.getSource()?.clear();
-      olMap.removeLayer(vector);
+      mapStore.removeLayer(vector);
 
       interactionRef.current = null;
       vectorRef.current = null;
@@ -231,11 +232,6 @@ const ToolMeasure = observer(({ type, groupId, ...rest }: ToolMeasureProps) => {
       unbindChangeListener();
     };
   }, [closeTooltip, mapStore, olMap, type, updateTooltip]);
-
-  useEffect(() => {
-    vectorRef.current?.setZIndex(maxZIndex + 1);
-    maxZIndexRef.current = maxZIndex;
-  }, [maxZIndex]);
 
   const setActive = useCallback((active: boolean) => {
     const interaction = interactionRef.current;

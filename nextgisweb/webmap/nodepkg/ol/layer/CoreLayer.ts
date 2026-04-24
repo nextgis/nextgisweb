@@ -10,6 +10,7 @@ export interface LayerOptions {
   title?: string;
   visible?: boolean;
   opacity?: number;
+  isTopLayer?: boolean;
   maxResolution?: number;
   minResolution?: number;
   minZoom?: number;
@@ -30,10 +31,33 @@ export abstract class CoreLayer<
   id = uniqueId();
   name: string;
   title: string;
-  isBaseLayer = false;
   olLayer: TLayer;
   olSource: TSource;
   symbols: LayerSymbols = [];
+
+  private _isBaseLayer = false;
+  private _isTopLayer = false;
+
+  get isBaseLayer() {
+    return this._isBaseLayer;
+  }
+  set isBaseLayer(val: boolean) {
+    if (!this._isTopLayer) {
+      this._isBaseLayer = val;
+    } else {
+      throw new Error("The layer is already `top-layer`");
+    }
+  }
+  get isTopLayer() {
+    return this._isTopLayer;
+  }
+  set isTopLayer(val: boolean) {
+    if (!this._isBaseLayer) {
+      this._isTopLayer = val;
+    } else {
+      throw new Error("The layer is already `base-layer`");
+    }
+  }
 
   protected abstract createSource(options: TSourceOptions): TSource;
   protected abstract createLayer(
@@ -47,6 +71,7 @@ export abstract class CoreLayer<
   ) {
     this.name = name;
     this.title = layerOptions.title || name;
+    this.isTopLayer = layerOptions.isTopLayer ?? false;
 
     this.olSource = this.createSource(sourceOptions as TSourceOptions);
     this.olLayer = this.createLayer({
