@@ -2,7 +2,6 @@ from msgspec import Struct
 from pyramid.httpexceptions import HTTPNotFound
 
 from nextgisweb.env import gettext
-from nextgisweb.lib.dynmenu import Link
 
 from nextgisweb.feature_layer.api import query_feature_or_not_found
 from nextgisweb.gui import react_renderer
@@ -61,7 +60,6 @@ def feature_show(request):
         props=dict(resourceId=resource_id, featureId=feature_id),
         title=gettext("Feature #%d") % feature_id,
         maxheight=True,
-        dynmenu=False,
     )
 
 
@@ -78,7 +76,6 @@ def feature_update(request):
         props=dict(resourceId=resource_id, featureId=feature_id),
         title=gettext("Feature #%d") % feature_id,
         maxheight=True,
-        dynmenu=False,
     )
 
 
@@ -149,7 +146,6 @@ def versioning_settings(request):
     request.require_administrator()
     return dict(
         title=gettext("Feature versioning"),
-        dynmenu=request.env.pyramid.control_panel,
     )
 
 
@@ -221,12 +217,3 @@ def setup_pyramid(comp, config):
         "/control-panel/versioning",
         get=versioning_settings,
     )
-
-    @comp.env.pyramid.control_panel.add
-    def _control_panel(args):
-        if args.request.user.is_administrator:
-            yield Link(
-                "settings.versioning",
-                gettext("Feature versioning"),
-                lambda args: args.request.route_url("feature_layer.control_panel.versioning"),
-            )

@@ -5,3 +5,8 @@ type MessageHookResult = ReturnType<typeof message.useMessage>;
 
 export type ModalAPI = ModalHookResult[0];
 export type MessageAPI = MessageHookResult[0];
+
+export interface DynMenuItem<G> {
+  key: string;
+  menu?: { order?: number; group: G };
+}

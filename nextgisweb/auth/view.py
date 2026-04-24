@@ -14,7 +14,6 @@ from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import undefer
 
 from nextgisweb.env import DBSession, gettext
-from nextgisweb.lib import dynmenu as dm
 from nextgisweb.lib.datetime import utcnow_naive
 
 from nextgisweb.gui import REACT_RENDERER, react_renderer
@@ -338,7 +337,6 @@ def user_browse(request):
     return dict(
         title=gettext("Users"),
         props=dict(readonly=not request.user.has_permission(permission.manage)),
-        dynmenu=request.env.pyramid.control_panel,
     )
 
 
@@ -346,7 +344,7 @@ def user_browse(request):
 def user_create(request):
     request.user.require_permission(permission.manage)
 
-    return dict(title=gettext("Create new user"), dynmenu=request.env.pyramid.control_panel)
+    return dict(title=gettext("Create new user"))
 
 
 @react_renderer("@nextgisweb/auth/user-widget")
@@ -358,7 +356,6 @@ def user_edit(request):
     return dict(
         props=dict(id=obj.id, readonly=readonly),
         title=obj.display_name,
-        dynmenu=request.env.pyramid.control_panel,
     )
 
 
@@ -369,7 +366,6 @@ def group_browse(request):
     return dict(
         title=gettext("Groups"),
         props=dict(readonly=not request.user.has_permission(permission.manage)),
-        dynmenu=request.env.pyramid.control_panel,
     )
 
 
@@ -379,7 +375,6 @@ def group_create(request):
 
     return dict(
         title=gettext("Create new group"),
-        dynmenu=request.env.pyramid.control_panel,
     )
 
 
@@ -392,7 +387,6 @@ def group_edit(request):
     return dict(
         props=dict(id=obj.id, readonly=readonly),
         title=obj.display_name,
-        dynmenu=request.env.pyramid.control_panel,
     )
 
 
@@ -469,24 +463,6 @@ def setup_pyramid(comp, config):
     config.add_route("auth.group.browse", "/auth/group/").add_view(group_browse)
     config.add_route("auth.group.create", "/auth/group/create", get=group_create)
     config.add_route("auth.group.edit", "/auth/group/{id}", factory=group_factory, get=group_edit)
-
-    @comp.env.pyramid.control_panel.add
-    def _control_panel(args):
-        user = args.request.user
-        if user.has_permission(any, *permission.auth):
-            yield dm.Label("auth", gettext("Groups and users"))
-
-            yield dm.Link(
-                "auth/user",
-                gettext("Users"),
-                lambda kwargs: kwargs.request.route_url("auth.user.browse"),
-            )
-
-            yield dm.Link(
-                "auth/group",
-                gettext("Groups"),
-                lambda kwargs: kwargs.request.route_url("auth.group.browse"),
-            )
 
     # Login and logout routes names
     def add_globals(event):

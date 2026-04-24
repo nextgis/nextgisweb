@@ -1,5 +1,4 @@
 <%!
-    from types import SimpleNamespace
     from nextgisweb.pyramid.view import LAYOUT_JSENTRY
     from nextgisweb.resource import Resource
 %>
@@ -10,11 +9,10 @@
 <%def name="is_custom_layout()"><% return True %></%def>
 
 <%
-    dynmenu_kwargs = SimpleNamespace(request=request)
     dynmenu_resource_id = None
-    if (dynmenu := context.get("dynmenu", UNDEFINED)) is UNDEFINED:
-        if obj is not UNDEFINED and isinstance(obj, Resource):
-            dynmenu_resource_id = obj.id
+
+    if obj is not UNDEFINED and isinstance(obj, Resource):
+        dynmenu_resource_id = obj.id
 
     base_props = dict(
         entrypoint = entrypoint,
@@ -24,7 +22,6 @@
         header=tr(header),
         maxwidth=None if maxwidth is UNDEFINED else maxwidth,
         maxheight=None if maxheight is UNDEFINED else maxheight,
-        dynMenuItems=dynmenu.json(dynmenu_kwargs) if dynmenu is not UNDEFINED and dynmenu else None,
         breadcrumbs=breadcrumbs,
         hideResourceFilter=hide_resource_filter if hide_resource_filter is not UNDEFINED else None,
         hideMenu=hide_menu if hide_menu is not UNDEFINED else None,

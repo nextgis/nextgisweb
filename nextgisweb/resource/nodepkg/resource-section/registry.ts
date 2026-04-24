@@ -7,6 +7,7 @@ import type { useShowModal } from "@nextgisweb/gui";
 import type { message } from "@nextgisweb/gui/antd";
 import { pluginRegistry } from "@nextgisweb/jsrealm/plugin";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import type { DynMenuItem } from "@nextgisweb/pyramid/layout/type";
 import type { ResourceAttrItem } from "@nextgisweb/resource/api/ResourceAttrItem";
 import type { Attributes } from "@nextgisweb/resource/api/resource-attr";
 
@@ -48,8 +49,7 @@ interface RunOptions<A extends Attributes = Attributes> {
 export interface ResourceAction<
   P = unknown,
   A extends Attributes = Attributes,
-> {
-  key: string;
+> extends DynMenuItem<ResourceActionGroupId> {
   href?: string | ((opt: CustomResourceAttrItem<A>) => string);
   icon?: React.ReactNode;
   props?: P;
@@ -59,7 +59,6 @@ export interface ResourceAction<
   attributes?: [...A];
   icon_suffix?: React.ReactNode;
   hideOnMobile?: boolean;
-  menu?: { order?: number; group: ResourceActionGroupId };
   quick?: { order?: number } | boolean;
   run?: (opt: RunOptions<A>) => void;
   condition?: (opt: CustomResourceAttrItem<A>) => boolean;
@@ -78,7 +77,6 @@ export function registerResourceAction<P, A extends Attributes>(
  * Extensible action group ids
  *
  * @example
- * import type "@nextgisweb/resource/resource-section/registry";
  *
  * declare module "@nextgisweb/resource/resource-section/registry" {
  *   interface ResourceActionGroupIdMap {

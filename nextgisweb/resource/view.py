@@ -10,7 +10,6 @@ from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import joinedload, with_polymorphic
 
 from nextgisweb.env import DBSession, gettext
-from nextgisweb.lib.dynmenu import Link
 
 from nextgisweb.auth import OnUserLogin
 from nextgisweb.core.exception import InsufficientPermissions
@@ -220,7 +219,6 @@ def resource_export(request):
     request.require_administrator()
     return dict(
         title=gettext("Resource export"),
-        dynmenu=request.env.pyramid.control_panel,
     )
 
 
@@ -326,15 +324,6 @@ def setup_pyramid(comp, config):
     _resource_route("delete", r"{id:uint}/delete", get=delete)
 
     # Actions
-
-    @comp.env.pyramid.control_panel.add
-    def _control_panel(args):
-        if args.request.user.is_administrator:
-            yield Link(
-                "settings/resource_export",
-                gettext("Resource export"),
-                lambda args: (args.request.route_url("resource.control_panel.resource_export")),
-            )
 
     if comp.options["home.enabled"]:
         from .home import on_user_login

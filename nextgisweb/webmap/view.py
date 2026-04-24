@@ -5,7 +5,6 @@ from msgspec import Struct
 from pyramid.renderers import render_to_response
 
 from nextgisweb.env import COMP_ID, gettext
-from nextgisweb.lib.dynmenu import Link
 
 from nextgisweb.gui import react_renderer
 from nextgisweb.jsrealm import jsentry
@@ -123,7 +122,6 @@ def settings(request):
     request.require_administrator()
     return dict(
         title=gettext("Web map settings"),
-        dynmenu=request.env.pyramid.control_panel,
     )
 
 
@@ -213,12 +211,3 @@ def setup_pyramid(comp, config):
 
         cs_k.__name__ = f"cs_{k}"
         client_setting(k)(partial(cs_k, cs=v))
-
-    @comp.env.pyramid.control_panel.add
-    def _control_panel(args):
-        if args.request.user.is_administrator:
-            yield Link(
-                "settings.webmap",
-                gettext("Web map"),
-                lambda args: (args.request.route_url("webmap.control_panel.settings")),
-            )
