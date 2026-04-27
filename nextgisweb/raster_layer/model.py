@@ -125,9 +125,10 @@ class RasterLayerStorage(Resource):
 
     endpoint = sa.Column(sa.Unicode, nullable=False)
     bucket = sa.Column(sa.Unicode, nullable=False)
-    access_key = sa.Column(sa.Unicode, nullable=False)
-    secret_key = sa.Column(sa.Unicode, nullable=False)
+    access_key = sa.Column(sa.Unicode, nullable=True)
+    secret_key = sa.Column(sa.Unicode, nullable=True)
     prefix = sa.Column(sa.Unicode, nullable=False)
+    no_sign_request = sa.Column(sa.Boolean, nullable=False, default=False)
 
     @classmethod
     def check_parent(cls, parent):
@@ -135,17 +136,21 @@ class RasterLayerStorage(Resource):
 
     def vsi_path(self, filename: str) -> str:
         prefix = (self.prefix.rstrip("/") + "/") if self.prefix else ""
-        return f"/vsis3/{self.bucket}/{prefix}{filename}"
+        return f"/vsis3/{self.bucket}/{prefix}{filename.lstrip('/')}"
 
     def vsi_credentials(self) -> dict:
         parsed = urlparse(self.endpoint)
-        return {
+        result = {
             "AWS_S3_ENDPOINT": parsed.netloc,
             "AWS_HTTPS": "YES" if parsed.scheme == "https" else "NO",
-            "AWS_ACCESS_KEY_ID": self.access_key,
-            "AWS_SECRET_ACCESS_KEY": self.secret_key,
             "AWS_VIRTUAL_HOSTING": "FALSE",
         }
+        if self.no_sign_request:
+            result["AWS_NO_SIGN_REQUEST"] = "YES"
+        else:
+            result["AWS_ACCESS_KEY_ID"] = self.access_key
+            result["AWS_SECRET_ACCESS_KEY"] = self.secret_key
+        return result
 
     def register_credentials(self) -> None:
         """Register S3 credentials as path-specific GDAL options.
@@ -186,6 +191,7 @@ class RasterLayerStorageSerializer(Serializer, resource=RasterLayerStorage):
     access_key = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
     secret_key = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
     prefix = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
+    no_sign_request = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
 
 
 @implementer(IBboxLayer)

@@ -212,14 +212,18 @@ msgid "Bucket"
 msgstr "Бакет"
 
 #: nodepkg/storage-widget/StorageWidget.tsx:44
+msgid "Public access"
+msgstr "Публичный доступ"
+
+#: nodepkg/storage-widget/StorageWidget.tsx:49
 msgid "Access key"
 msgstr "Ключ доступа"
 
-#: nodepkg/storage-widget/StorageWidget.tsx:49
+#: nodepkg/storage-widget/StorageWidget.tsx:54
 msgid "Secret key"
 msgstr "Секретный ключ"
 
-#: nodepkg/storage-widget/StorageWidget.tsx:58
+#: nodepkg/storage-widget/StorageWidget.tsx:65
 msgid "Prefix"
 msgstr "Префикс"
 
