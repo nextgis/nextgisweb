@@ -49,6 +49,7 @@ if (locale !== "en") {
 export class Editor extends ClassicEditor {
   constructor(element: HTMLElement | string, config: EditorConfig = {}) {
     config = {
+      licenseKey: "GPL",
       language: locale,
       translations: translationBundles,
       plugins: [
