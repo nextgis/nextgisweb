@@ -1,6 +1,11 @@
 import { observer } from "mobx-react-lite";
 
-import { InputValue, PasswordValue, Select } from "@nextgisweb/gui/antd";
+import {
+  CheckboxValue,
+  InputValue,
+  PasswordValue,
+  Select,
+} from "@nextgisweb/gui/antd";
 import { LotMV } from "@nextgisweb/gui/arm";
 import { Area, Lot } from "@nextgisweb/gui/mayout";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -41,9 +46,15 @@ export const StorageWidget: EditorWidget<StorageStore> = observer(
           component={InputValue}
         />
         <LotMV
+          label={gettext("Public access")}
+          value={store.no_sign_request}
+          component={CheckboxValue}
+        />
+        <LotMV
           label={gettext("Access key")}
           value={store.access_key}
           component={InputValue}
+          visible={!store.no_sign_request.value}
         />
         <LotMV
           label={gettext("Secret key")}
@@ -53,6 +64,7 @@ export const StorageWidget: EditorWidget<StorageStore> = observer(
             visibilityToggle: false,
             autoComplete: "new-password",
           }}
+          visible={!store.no_sign_request.value}
         />
         <LotMV
           label={gettext("Prefix")}

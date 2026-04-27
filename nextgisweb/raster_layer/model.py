@@ -125,27 +125,35 @@ class RasterLayerStorage(Resource):
 
     endpoint = sa.Column(sa.Unicode, nullable=False)
     bucket = sa.Column(sa.Unicode, nullable=False)
-    access_key = sa.Column(sa.Unicode, nullable=False)
-    secret_key = sa.Column(sa.Unicode, nullable=False)
+    access_key = sa.Column(sa.Unicode, nullable=True)
+    secret_key = sa.Column(sa.Unicode, nullable=True)
     prefix = sa.Column(sa.Unicode, nullable=False)
 
     @classmethod
     def check_parent(cls, parent):
         return isinstance(parent, ResourceGroup)
 
+    @property
+    def public(self) -> bool:
+        return self.access_key is None and self.secret_key is None
+
     def vsi_path(self, filename: str) -> str:
         prefix = (self.prefix.rstrip("/") + "/") if self.prefix else ""
-        return f"/vsis3/{self.bucket}/{prefix}{filename}"
+        return f"/vsis3/{self.bucket}/{prefix}{filename.lstrip('/')}"
 
     def vsi_credentials(self) -> dict:
         parsed = urlparse(self.endpoint)
-        return {
+        result = {
             "AWS_S3_ENDPOINT": parsed.netloc,
             "AWS_HTTPS": "YES" if parsed.scheme == "https" else "NO",
-            "AWS_ACCESS_KEY_ID": self.access_key,
-            "AWS_SECRET_ACCESS_KEY": self.secret_key,
             "AWS_VIRTUAL_HOSTING": "FALSE",
         }
+        if self.public:
+            result["AWS_NO_SIGN_REQUEST"] = "YES"
+        else:
+            result["AWS_ACCESS_KEY_ID"] = self.access_key
+            result["AWS_SECRET_ACCESS_KEY"] = self.secret_key
+        return result
 
     def register_credentials(self) -> None:
         """Register S3 credentials as path-specific GDAL options.
@@ -186,6 +194,18 @@ class RasterLayerStorageSerializer(Serializer, resource=RasterLayerStorage):
     access_key = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
     secret_key = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
     prefix = SColumn(read=ConnectionScope.read, write=ConnectionScope.write)
+
+    def deserialize(self) -> None:
+        super().deserialize()
+        ak = self.obj.access_key
+        sk = self.obj.secret_key
+        if (ak is None) != (sk is None):
+            raise ValidationError(
+                gettext(
+                    "Access key and secret key must both be set (private bucket) "
+                    "or both be empty (public bucket)."
+                )
+            )
 
 
 @implementer(IBboxLayer)
@@ -474,6 +494,10 @@ class RasterLayer(Resource, SpatialLayerMixin):
 
     def _load_file_s3(self, cmd: list) -> gdal.Dataset:
         storage = self.storage
+        if storage.public:
+            raise ValidationError(
+                gettext("Uploading files to a public (read-only) bucket is not allowed.")
+            )
         s3_env = storage.vsi_credentials()
         if self.storage_filename is None:
             self.storage_filename = str(uuid4()) + ".tif"
