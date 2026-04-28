@@ -46,7 +46,7 @@ export const LayersDropdown = observer(({ display }: { display: Display }) => {
     abortDispalyConfig();
     try {
       const newConfig = await routeDispalyConfig.get();
-      treeStore.load(newConfig.rootItem);
+      display.config.setRootItem(newConfig.rootItem);
     } catch (er) {
       errorModal(er);
     }

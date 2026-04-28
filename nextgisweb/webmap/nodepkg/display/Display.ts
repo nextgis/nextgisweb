@@ -1,9 +1,8 @@
-import { action, computed, observable } from "mobx";
+import { action, computed, observable, reaction } from "mobx";
 import type { Extent } from "ol/extent";
 import { transformExtent } from "ol/proj";
 
 import { errorModal } from "@nextgisweb/gui/error";
-import pyramidSettings from "@nextgisweb/pyramid/client-settings";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { layoutStore } from "@nextgisweb/pyramid/layout";
 import { imageQueue } from "@nextgisweb/pyramid/util";
@@ -20,13 +19,14 @@ import type { TreeItemStore } from "../store/tree-store/TreeItemStore";
 import type { DisplayURLParams, MapPlugin, TinyConfig } from "../type";
 import { normalizeExtent } from "../utils/normalizeExtent";
 
+import { ConfigStore } from "./ConfigStore";
 import { displayURLParams } from "./displayURLParams";
 
 export class Display {
   displayProjection = "EPSG:3857";
   lonlatProjection = "EPSG:4326";
 
-  config: DisplayConfig;
+  readonly config: ConfigStore;
   tinyConfig?: TinyConfig;
   clientSettings = settings;
 
@@ -53,7 +53,7 @@ export class Display {
     config: DisplayConfig;
     tinyConfig?: TinyConfig;
   }) {
-    this.config = config;
+    this.config = new ConfigStore(config);
     this.tinyConfig = tinyConfig;
     this.urlParams = displayURLParams.values();
 
@@ -78,8 +78,7 @@ export class Display {
       );
     }
 
-    const hmux =
-      pyramidSettings.lunkwill?.hmux && this.config.options["webmap.hmux"];
+    const hmux = this.config.hmux;
 
     if (hmux) {
       imageQueue.setLimit(100);
@@ -105,7 +104,7 @@ export class Display {
       drawOrderEnabled: this.config.drawOrderEnabled,
     });
 
-    this._pluginsSetup();
+    this._bindConfigStore();
     this._identifyFeatureByAttrValue();
 
     this._setUpLayersTree();
@@ -155,14 +154,23 @@ export class Display {
     }
   }
 
-  // PLUGINS
-
-  private _pluginsSetup() {
-    const plugins = this.config.webmapPlugin;
-    if (plugins) {
-      this.installPlugins(Object.keys(plugins));
-    }
+  private _bindConfigStore() {
+    reaction(
+      () => this.config.rootItem,
+      (rootItem) => {
+        this.treeStore.load(rootItem);
+      }
+    );
+    reaction(
+      () => this.config.webmapPluginKeys,
+      (pluginKeys) => {
+        this.installPlugins(pluginKeys);
+      },
+      { fireImmediately: true }
+    );
   }
+
+  // PLUGINS
 
   async installPlugins(pluginKeys: string[]) {
     const pluginsToLoad: Promise<MapPlugin | { default: MapPlugin }>[] = [];
