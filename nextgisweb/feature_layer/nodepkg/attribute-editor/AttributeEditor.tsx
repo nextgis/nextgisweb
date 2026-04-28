@@ -8,6 +8,7 @@ import type {
 } from "@nextgisweb/feature-layer/type/api";
 import {
   Button,
+  CheckboxValue,
   DatePicker,
   DateTimePicker,
   Input,
@@ -111,6 +112,7 @@ const AttributeEditor = observer(
           STRING: <Input {...inputProps} />,
           INTEGER: <InputInteger {...inputProps} />,
           DATETIME: <DateTimePicker {...dpProps} />,
+          BOOLEAN: <CheckboxValue disabled={saving} />,
         };
       },
       [saving]

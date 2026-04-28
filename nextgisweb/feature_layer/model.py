@@ -29,6 +29,7 @@ from .interface import (
 Base.depends_on("resource", "lookup_table")
 
 _FIELD_TYPE_2_ENUM_REVERSED = dict(zip(FIELD_TYPE.enum, FIELD_TYPE_OGR))
+_FIELD_TYPE_2_ENUM_REVERSED[FIELD_TYPE.BOOLEAN] = ogr.OFTInteger
 
 
 class LayerField(Base):
@@ -114,12 +115,13 @@ class LayerFieldsMixin:
         sr = self.srs.to_osr()
         ogr_layer = ogr_ds.CreateLayer(name, srs=sr)
         for field in fields:
-            ogr_layer.CreateField(
-                ogr.FieldDefn(
-                    aliases[field.keyname] if aliases is not None else field.keyname,
-                    _FIELD_TYPE_2_ENUM_REVERSED[field.datatype],
-                )
+            fld_defn = ogr.FieldDefn(
+                aliases[field.keyname] if aliases is not None else field.keyname,
+                _FIELD_TYPE_2_ENUM_REVERSED[field.datatype],
             )
+            if field.datatype == FIELD_TYPE.BOOLEAN:
+                fld_defn.SetSubType(ogr.OFSTBoolean)
+            ogr_layer.CreateField(fld_defn)
         if fid is not None:
             ogr_layer.CreateField(ogr.FieldDefn(fid, ogr.OFTInteger))
         return ogr_layer

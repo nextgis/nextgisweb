@@ -545,6 +545,8 @@ class WFSLayer(Resource, SpatialLayerMixin, LayerFieldsMixin):
                         datatype = FIELD_TYPE.TIME
                     elif k in ("XSD_DATETIME", "GML_TIME_INSTANT"):
                         datatype = FIELD_TYPE.DATETIME
+                    elif k == "XSD_BOOLEAN":
+                        datatype = FIELD_TYPE.BOOLEAN
                     else:
                         raise NotImplementedError
                     break

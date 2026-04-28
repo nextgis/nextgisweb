@@ -273,7 +273,8 @@ class VLSchema(MetaData):
             fmap[fk] = idx
         field_count = len(lc_fields)
 
-        where_range = literal_column("int4range(vid, nid)").op("@>", precedence=4)
+        _int4range = literal_column("int4range(vid, nid)")
+        where_range = lambda v: _int4range.op("@>", precedence=4)(sql_cast(v, Integer))
         where_fid = lambda s: (s.c.fid >= p_fid_min, s.c.fid <= p_fid_max)
 
         # Initial version (without etab)

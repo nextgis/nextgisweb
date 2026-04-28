@@ -7,8 +7,10 @@ export function renderFeatureFieldValue(
   { datatype }: { datatype: FeatureLayerFieldDatatype },
   val: NgwAttributeType
 ): string | number | null {
-  if (val) {
-    if (datatype === "DATETIME") {
+  if (val !== null && val !== undefined) {
+    if (datatype === "BOOLEAN") {
+      return String(val);
+    } else if (datatype === "DATETIME") {
       return utc(new Date(val as string))
         .local()
         .format("L LTS");

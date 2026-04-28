@@ -23,7 +23,16 @@ class DRIVERS:
 
 
 FIELD_TYPE_2_ENUM = dict(zip(FIELD_TYPE_OGR, FIELD_TYPE.enum))
-FIELD_TYPE_DB = (sa.Integer, sa.BigInteger, sa.Float, sa.Unicode, sa.Date, sa.Time, sa.DateTime)
+FIELD_TYPE_DB = (
+    sa.Integer,
+    sa.BigInteger,
+    sa.Float,
+    sa.Unicode,
+    sa.Date,
+    sa.Time,
+    sa.DateTime,
+    sa.Boolean,
+)
 FIELD_TYPE_2_DB = dict(zip(FIELD_TYPE.enum, FIELD_TYPE_DB))
 FIELD_TYPE_SIZE = {
     FIELD_TYPE.INTEGER: 4,
@@ -32,6 +41,7 @@ FIELD_TYPE_SIZE = {
     FIELD_TYPE.DATE: 4,
     FIELD_TYPE.TIME: 8,
     FIELD_TYPE.DATETIME: 8,
+    FIELD_TYPE.BOOLEAN: 1,
 }
 
 GEOM_TYPE_DB = (

@@ -9,6 +9,7 @@ const VALUES = [
   "DATE",
   "TIME",
   "DATETIME",
+  "BOOLEAN",
 ];
 
 const OPTIONS = VALUES.map((i) => ({ value: i, label: i }));

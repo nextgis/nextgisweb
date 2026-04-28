@@ -1,6 +1,6 @@
 export type FeatureItemExtensions = Record<string, unknown | null>;
 
-export type NgwAttributeType = string | number | null;
+export type NgwAttributeType = string | number | boolean | null;
 
 export type Attrs = Record<string, NgwAttributeType>;
 

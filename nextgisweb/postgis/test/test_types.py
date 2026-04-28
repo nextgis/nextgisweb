@@ -42,7 +42,8 @@ def creds(ngw_env):
                     fld_varchar character varying, fld_character character(50), fld_text text, fld_uuid uuid,
                     fld_int integer, fld_bigint bigint,
                     fld_double double precision, fld_numeric numeric,
-                    fld_date date, fld_time_without_tz time without time zone, fld_ts_without_tz timestamp without time zone
+                    fld_date date, fld_time_without_tz time without time zone, fld_ts_without_tz timestamp without time zone,
+                    fld_boolean boolean
                 );
 
                 INSERT INTO test_types (
@@ -50,14 +51,16 @@ def creds(ngw_env):
                     fld_varchar, fld_character, fld_text, fld_uuid,
                     fld_int, fld_bigint,
                     fld_double, fld_numeric,
-                    fld_date, fld_time_without_tz, fld_ts_without_tz
+                    fld_date, fld_time_without_tz, fld_ts_without_tz,
+                    fld_boolean
                 )
                 VALUES (
                     ST_SetSRID('POINT (0 0)'::geometry, 3857),
                     'varchar', 'character', 'text', md5(random()::text)::uuid,
                     -1, 9223372036854775807,
                     1.1, 1.2,
-                    now(), now(), now()
+                    now(), now(), now(),
+                    true
                 );
             """))
             # fmt: on
