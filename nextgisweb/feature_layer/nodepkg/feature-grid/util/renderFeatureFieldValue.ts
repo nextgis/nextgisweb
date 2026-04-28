@@ -1,5 +1,6 @@
 import type { FeatureLayerFieldDatatype } from "@nextgisweb/feature-layer/type/api";
 import { utc } from "@nextgisweb/gui/dayjs";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import type { NgwAttributeType } from "../../type";
 
@@ -9,7 +10,7 @@ export function renderFeatureFieldValue(
 ): string | number | null {
   if (val !== null && val !== undefined) {
     if (datatype === "BOOLEAN") {
-      return String(val);
+      return val ? gettext("True") : gettext("False");
     } else if (datatype === "DATETIME") {
       return utc(new Date(val as string))
         .local()

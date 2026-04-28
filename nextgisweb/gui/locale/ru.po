@@ -48,6 +48,14 @@ msgstr "Ошибка копирования в буфер обмена"
 msgid "Copy to clipboard"
 msgstr "Копировать в буфер обмена"
 
+#: nodepkg/component/BooleanInput.tsx:20
+msgid "True"
+msgstr "Истина"
+
+#: nodepkg/component/BooleanInput.tsx:21
+msgid "False"
+msgstr "Ложь"
+
 #: nodepkg/component/InputScaleDenom.tsx:6
 msgid "Not set"
 msgstr "Не установлен"

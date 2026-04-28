@@ -1,6 +1,7 @@
 import { Select } from "antd";
 
 import type { SelectProps } from "@nextgisweb/gui/antd";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 
 type BooleanInputProps = Omit<SelectProps, "options">;
 
@@ -16,8 +17,8 @@ export function BooleanInput({
       disabled={disabled}
       onChange={(val) => onChange?.(Boolean(val))}
       options={[
-        { value: 1, label: "true" },
-        { value: 0, label: "false" },
+        { value: 1, label: gettext("True") },
+        { value: 0, label: gettext("False") },
       ]}
       allowClear={false}
       {...restSelectProps}

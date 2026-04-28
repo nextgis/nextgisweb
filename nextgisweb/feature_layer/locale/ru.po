@@ -1,48 +1,48 @@
-#: api.py:117 api_identify.py:27
+#: api.py:119 api_identify.py:27
 msgid "Geometry is not valid."
 msgstr "Невалидная геометрия"
 
-#: api.py:383
+#: api.py:385
 msgid "Unknown spatial reference system"
 msgstr "Неизвестная система координат"
 
-#: api.py:470 api_export.py:215
+#: api.py:472 api_export.py:212
 msgid "Parameter 'intersects' geometry is not valid."
 msgstr "Параметр 'intersects' содержит невалидную геометрию."
 
-#: api.py:713
+#: api.py:715
 msgid "Aggregation is not supported for this layer."
 msgstr "Агрегация не поддерживается для этого слоя."
 
-#: api.py:722
+#: api.py:724
 msgid "Aggregation '{}' is not supported for this layer."
 msgstr "Агрегация '{}' не поддерживается для этого слоя."
 
-#: api.py:728 api.py:735
+#: api.py:730 api.py:737
 msgid "Field '{}' not found."
 msgstr "Поле '{}' не найдено."
 
-#: api_export.py:111
+#: api_export.py:108
 msgid "Couldn't add FID field '{}'. Such field already exists."
 msgstr "Не удалось добавить поле FID '{}'. Такое поле уже существует."
 
-#: api_export.py:254
+#: api_export.py:251
 msgid "The selected format does not support {} geometry type."
 msgstr "Выбранный формат не поддерживает тип геометрии {}."
 
-#: api_export.py:267
+#: api_export.py:264
 msgid "The export limit is set to {limit} features, but the layer contains {count}."
 msgstr "Лимит экспорта составляет {limit} объектов, однако слой содержит {count}."
 
-#: api_export.py:280
+#: api_export.py:277
 msgid "Failed to reproject 'intersects' geometry."
 msgstr "Не удалось перепроецировать геометрию 'intersects'."
 
-#: api_export.py:291
+#: api_export.py:288
 msgid "Filter expressions are not supported."
 msgstr "Выражения фильтра не поддерживаются."
 
-#: api_export.py:461
+#: api_export.py:458
 msgid "File name parameter '{}' is not valid."
 msgstr "Недопустимое имя файла '{}'."
 
@@ -84,7 +84,7 @@ msgstr "Объект не удален"
 msgid "Unable to restore the #{} feature as it is not deleted."
 msgstr "Невозможно восстановить объект #{} поскольку он не удален."
 
-#: favorite.py:6 nodepkg/fields-widget/FieldsWidget.tsx:27 view.py:44
+#: favorite.py:6 nodepkg/fields-widget/FieldsWidget.tsx:27 view.py:43
 msgid "Feature table"
 msgstr "Таблица объектов"
 
@@ -92,25 +92,31 @@ msgstr "Таблица объектов"
 msgid "Invalid filter expression"
 msgstr "Некорректное выражение фильтра"
 
-#: model.py:196
+#: model.py:197
 msgid "Field not found (ID=%d)."
 msgstr "Поле не найдено (ID=%d)."
 
-#: model.py:273
+#: model.py:274
 msgid "Versioning not supported"
 msgstr "Версионирование не поддерживается"
 
-#: nodepkg/attribute-editor/AttributeEditor.tsx:34
+#: nodepkg/attribute-editor/AttributeEditor.tsx:35
 msgid "Set field value to NULL (No data)"
 msgstr "Установить для атрибута значение NULL (Нет данных)"
 
-#: nodepkg/attribute-editor/AttributeEditor.tsx:35
+#: nodepkg/attribute-editor/AttributeEditor.tsx:36
 msgid "There are no attributes in the vector layer"
 msgstr "В векторном слое нет атрибутов"
 
 #: nodepkg/attribute-editor/plugin.ts:10
 msgid "Attributes"
 msgstr "Атрибуты"
+
+#: nodepkg/control-panel-plugin.tsx:11
+#: nodepkg/settings-widget/SettingsWidget.tsx:12 versioning/model.py:106
+#: view.py:148
+msgid "Feature versioning"
+msgstr "Версионирование объектов"
 
 #: nodepkg/export-form/ExportForm.tsx:242
 msgid "Resources"
@@ -233,32 +239,32 @@ msgstr "Фильтр применен успешно"
 msgid "Failed to apply filter"
 msgstr "Не удалось применить фильтр"
 
-#: nodepkg/feature-filter/FilterEditorStore.ts:102
+#: nodepkg/feature-filter/FilterEditorStore.ts:106
 msgid "Failed to generate JSON from filter state:"
 msgstr "Ошибка при генерации JSON из состояния фильтра:"
 
-#: nodepkg/feature-filter/FilterEditorStore.ts:123
+#: nodepkg/feature-filter/FilterEditorStore.ts:127
 msgid "Failed to parse JSON, falling back to JSON tab."
 msgstr "Ошибка при парсинге JSON, возвращаемся к вкладке JSON."
 
-#: nodepkg/feature-filter/FilterEditorStore.ts:235
+#: nodepkg/feature-filter/FilterEditorStore.ts:239
 msgid "Cannot delete the root group."
 msgstr "Невозможно удалить корневую группу."
 
-#: nodepkg/feature-filter/FilterEditorStore.ts:339
+#: nodepkg/feature-filter/FilterEditorStore.ts:343
 msgid "Failed to parse filter expression:"
 msgstr "Ошибка при парсинге выражения фильтра:"
 
-#: nodepkg/feature-filter/FilterEditorStore.ts:345
+#: nodepkg/feature-filter/FilterEditorStore.ts:349
 msgid "Invalid filter value"
 msgstr "Некорректное значение фильтра"
 
-#: nodepkg/feature-filter/FilterEditorStore.ts:359
-#: nodepkg/feature-filter/FilterEditorStore.ts:383
+#: nodepkg/feature-filter/FilterEditorStore.ts:363
+#: nodepkg/feature-filter/FilterEditorStore.ts:387
 msgid "Invalid JSON or filter structure"
 msgstr "Некорректный JSON или структура фильтра"
 
-#: nodepkg/feature-filter/FilterEditorStore.ts:628
+#: nodepkg/feature-filter/FilterEditorStore.ts:638
 msgid "Validation failed"
 msgstr "Ошибка валидации"
 
@@ -320,47 +326,47 @@ msgstr "Текущее состояние фильтра"
 msgid "Equal"
 msgstr "Равно"
 
-#: nodepkg/feature-filter/type.ts:178
+#: nodepkg/feature-filter/type.ts:179
 msgid "Not equal"
 msgstr "Не равно"
 
-#: nodepkg/feature-filter/type.ts:191
+#: nodepkg/feature-filter/type.ts:193
 msgid "Greater"
 msgstr "Больше"
 
-#: nodepkg/feature-filter/type.ts:196
+#: nodepkg/feature-filter/type.ts:198
 msgid "Less"
 msgstr "Меньше"
 
-#: nodepkg/feature-filter/type.ts:201
+#: nodepkg/feature-filter/type.ts:203
 msgid "Greater or equal"
 msgstr "Больше или равно"
 
-#: nodepkg/feature-filter/type.ts:206
+#: nodepkg/feature-filter/type.ts:208
 msgid "Less or equal"
 msgstr "Меньше или равно"
 
-#: nodepkg/feature-filter/type.ts:211
+#: nodepkg/feature-filter/type.ts:213
 msgid "In list"
 msgstr "В списке"
 
-#: nodepkg/feature-filter/type.ts:216
+#: nodepkg/feature-filter/type.ts:218
 msgid "Not in list"
 msgstr "Не в списке"
 
-#: nodepkg/feature-filter/type.ts:221
+#: nodepkg/feature-filter/type.ts:223
 msgid "Is NULL"
 msgstr "NULL"
 
-#: nodepkg/feature-filter/type.ts:234
+#: nodepkg/feature-filter/type.ts:237
 msgid "Is not NULL"
 msgstr "Не NULL"
 
-#: nodepkg/feature-filter/type.ts:247
+#: nodepkg/feature-filter/type.ts:251
 msgid "Matches (case-insensitive)"
 msgstr "Подобно (без учета регистра)"
 
-#: nodepkg/feature-filter/type.ts:252
+#: nodepkg/feature-filter/type.ts:256
 msgid "Does not match (case-insensitive)"
 msgstr "Не подобно (без учета регистра)"
 
@@ -526,7 +532,7 @@ msgid "Last changed"
 msgstr "Последнее изменение"
 
 #: nodepkg/feature-grid/component/ExportAction.tsx:30
-#: nodepkg/resource-action-plugin.tsx:63 view.py:91 view.py:115
+#: nodepkg/resource-action-plugin.tsx:63 view.py:88 view.py:112
 msgid "Save as"
 msgstr "Сохранить как"
 
@@ -541,6 +547,14 @@ msgstr "Быстрый экспорт"
 #: nodepkg/feature-grid/component/ExportAction.tsx:33
 msgid "Filters are applied"
 msgstr "Применяются фильтры"
+
+#: nodepkg/feature-grid/util/renderFeatureFieldValue.ts:13
+msgid "True"
+msgstr "Истина"
+
+#: nodepkg/feature-grid/util/renderFeatureFieldValue.ts:13
+msgid "False"
+msgstr "Ложь"
 
 #: nodepkg/fields-widget/FieldsWidget.tsx:23
 #: nodepkg/resource-section/FeatureLayerResourceSection.tsx:31
@@ -658,14 +672,9 @@ msgstr "Объекты"
 msgid "Table"
 msgstr "Таблица"
 
-#: nodepkg/resource-action-plugin.tsx:45 view.py:104
+#: nodepkg/resource-action-plugin.tsx:45 view.py:101
 msgid "Version history"
 msgstr "История изменений"
-
-#: nodepkg/settings-widget/SettingsWidget.tsx:12 versioning/model.py:106
-#: view.py:151 view.py:230
-msgid "Feature versioning"
-msgstr "Версионирование объектов"
 
 #: nodepkg/settings-widget/SettingsWidget.tsx:13
 msgid "Disable feature versioning?"
@@ -871,6 +880,10 @@ msgstr "Получено некорректное значение INTEGER: {}."
 msgid "Got an invalid BIGINT value: {}."
 msgstr "Получено некорректное значение BIGINT: {}."
 
+#: numutil.py:92
+msgid "Got an invalid BOOLEAN value: {}."
+msgstr "Получено некорректное значение BOOLEAN: {}."
+
 #: transaction/exception.py:7
 msgid "Transaction not found"
 msgstr "Транзакция не найдена"
@@ -924,15 +937,15 @@ msgstr "Версия за пределами диапазона"
 msgid "Invalid range"
 msgstr "Некорректный диапазон"
 
-#: view.py:62 view.py:79
+#: view.py:61 view.py:77
 msgid "Feature #%d"
 msgstr "Объект #%d"
 
-#: view.py:122
+#: view.py:119
 msgid "MVT Vector Tiles"
 msgstr "Векторные тайлы MVT"
 
-#: view.py:124
+#: view.py:121
 msgid ""
 "The Mapbox Vector Tile is an efficient encoding for map data into vector "
 "tiles that can be rendered dynamically."
