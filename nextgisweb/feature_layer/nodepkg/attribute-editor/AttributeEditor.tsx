@@ -8,7 +8,6 @@ import type {
 } from "@nextgisweb/feature-layer/type/api";
 import {
   Button,
-  CheckboxValue,
   DatePicker,
   DateTimePicker,
   Input,
@@ -20,6 +19,7 @@ import {
 } from "@nextgisweb/gui/antd";
 import type { DatePickerProps, TimePickerProps } from "@nextgisweb/gui/antd";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
+import { BooleanInput } from "@nextgisweb/gui/component/BooleanInput";
 import { FieldsForm, Form } from "@nextgisweb/gui/fields-form";
 import type { FormField, SizeType } from "@nextgisweb/gui/fields-form";
 import { LookupSelect } from "@nextgisweb/lookup-table/component/lookup-select";
@@ -112,7 +112,7 @@ const AttributeEditor = observer(
           STRING: <Input {...inputProps} />,
           INTEGER: <InputInteger {...inputProps} />,
           DATETIME: <DateTimePicker {...dpProps} />,
-          BOOLEAN: <CheckboxValue disabled={saving} />,
+          BOOLEAN: <BooleanInput {...inputProps} />,
         };
       },
       [saving]
