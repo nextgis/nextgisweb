@@ -89,7 +89,7 @@ export function ResourcesFilter({
           query: q,
           signal: makeSignal(),
         });
-        const options = resourcesToOptions(resources);
+        const options = resourcesToOptions(resources as CompositeRead[]);
         setOptions(options);
         setAcSatus("");
       } catch {
