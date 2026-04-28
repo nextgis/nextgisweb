@@ -95,6 +95,60 @@ def test_resource_search(resource, ngw_webtest_app: WebTestApp):
     assert resp_json[0]["resource"]["display_name"] == resource.display_name
 
 
+def test_resource_search_extended_contract(ngw_webtest_app: WebTestApp):
+    api = ngw_webtest_app.with_url("/api/resource/search/")
+
+    resp_json = api.get(query={"display_name__ilike": "%", "limit": 3, "offset": 0}).json
+
+    assert set(resp_json.keys()) >= {"items", "total_count", "limit", "offset", "order"}
+    assert isinstance(resp_json["items"], list)
+    assert resp_json["limit"] == 3
+    assert resp_json["offset"] == 0
+    assert resp_json["total_count"] >= len(resp_json["items"])
+
+
+def test_resource_search_breadcrumb_opt_in(resources, ngw_webtest_app: WebTestApp):
+    prefix = resources
+    api = ngw_webtest_app.with_url("/api/resource/search/")
+
+    root_resp = api.get(query={"keyname": f"{prefix}_R"}).json
+    root_id = root_resp[0]["resource"]["id"]
+
+    resp_json = api.get(
+        query={
+            "root": root_id,
+            "breadcrumb": "true",
+            "limit": 2,
+        }
+    ).json
+
+    assert "breadcrumb" in resp_json
+    for item in resp_json["items"]:
+        rid = item["resource"]["id"]
+        rid_key = str(rid)
+        assert rid_key in resp_json["breadcrumb"]
+        assert len(resp_json["breadcrumb"][rid_key]) >= 1
+
+
+def test_resource_search_order_and_invalid_order(ngw_webtest_app: WebTestApp):
+    api = ngw_webtest_app.with_url("/api/resource/search/")
+
+    created_desc = api.get(
+        query={"display_name__ilike": "%", "limit": 5, "order": "-created"}
+    ).json
+    updated_desc = api.get(
+        query={"display_name__ilike": "%", "limit": 5, "order": "-updated"}
+    ).json
+    owner_asc = api.get(query={"display_name__ilike": "%", "limit": 5, "order": "owner"}).json
+
+    assert created_desc["order"][0] == "-created"
+    assert updated_desc["order"][0] == "-updated"
+    assert owner_asc["order"][0] == "owner"
+
+    invalid = api.get(query={"order": "badfield"}, status=422).json
+    assert "Invalid order token" in invalid["message"]
+
+
 @pytest.fixture(scope="module")
 def resources():
     prefix = f"test_{token_urlsafe(6)}"
