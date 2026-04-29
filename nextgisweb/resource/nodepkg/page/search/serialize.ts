@@ -1,7 +1,6 @@
 import type { QueryParams } from "@nextgisweb/pyramid/api/request";
 import type { ResourceCls } from "@nextgisweb/resource/type/api";
 
-import { DEFAULT_LIMIT } from "./types";
 import type { MetaFilterEntry, SearchSnapshot } from "./types";
 
 /** Build API query parameters from the current store state. */
@@ -9,8 +8,6 @@ export function paramsFromStore(s: SearchSnapshot): QueryParams {
   const query: QueryParams = {
     breadcrumb: true,
     total_count: true,
-    limit: s.limit,
-    offset: s.offset,
   };
 
   const q = s.q.trim();
@@ -66,8 +63,6 @@ export function urlFromStore(s: SearchSnapshot): string {
   if (s.keynameIn.length > 0) sp.set("keyname", s.keynameIn.join(","));
   if (s.root !== null) sp.set("root", String(s.root));
   if (s.order) sp.set("order", s.order);
-  if (s.limit !== DEFAULT_LIMIT) sp.set("limit", String(s.limit));
-  if (s.offset !== 0) sp.set("offset", String(s.offset));
   s.metaFilters.forEach((entry, i) => {
     if (entry.key) sp.set(`meta_key_${i}`, entry.key);
     if (entry.value) sp.set(`meta_value_${i}`, entry.value);
@@ -106,18 +101,6 @@ export function snapshotFromUrl(search: string): Partial<SearchSnapshot> {
 
   const order = sp.get("order");
   if (order !== null) result.order = order;
-
-  const limit = sp.get("limit");
-  if (limit !== null) {
-    const n = parseInt(limit, 10);
-    if (Number.isFinite(n) && n >= 1) result.limit = n;
-  }
-
-  const offset = sp.get("offset");
-  if (offset !== null) {
-    const n = parseInt(offset, 10);
-    if (Number.isFinite(n) && n >= 0) result.offset = n;
-  }
 
   // Collect indexed meta filter entries.
   const metaIndices = new Set<number>();

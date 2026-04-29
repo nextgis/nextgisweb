@@ -1,5 +1,7 @@
 import type { ResourceCls } from "@nextgisweb/resource/type/api";
 
+export const SEARCH_PAGE_SIZE = 30;
+
 export interface MetaFilterEntry {
   key: string;
   value: string;
@@ -15,8 +17,4 @@ export interface SearchSnapshot {
   ownerUserIn: number[];
   root: number | null;
   order: string;
-  limit: number;
-  offset: number;
 }
-
-export const DEFAULT_LIMIT = 20;

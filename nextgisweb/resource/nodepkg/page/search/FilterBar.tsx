@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import type { UserReadBrief } from "@nextgisweb/auth/type/api";
 import { Button, Input, Select, Tooltip } from "@nextgisweb/gui/antd";
+import { isAbortError } from "@nextgisweb/gui/error";
 import { route } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -49,8 +50,13 @@ export const FilterBar = observer(function FilterBar({
       try {
         const data = await store.loadUsers(makeSignal());
         if (!cancelled) setUsers(data);
-      } catch {
-        if (!cancelled) setUsers([]);
+      } catch (err) {
+        if (!cancelled) {
+          if (!isAbortError(err)) {
+            console.warn("Failed to load owners filter:", err);
+          }
+          setUsers([]);
+        }
       }
     })();
     return () => {
@@ -79,8 +85,13 @@ export const FilterBar = observer(function FilterBar({
         if (!cancelled) {
           setRootName(item.resource?.display_name ?? String(store.root));
         }
-      } catch {
-        if (!cancelled) setRootName(String(store.root));
+      } catch (err) {
+        if (!cancelled) {
+          if (!isAbortError(err)) {
+            console.warn("Failed to load root resource name:", err);
+          }
+          setRootName(String(store.root));
+        }
       }
     })();
     return () => {

@@ -1,7 +1,7 @@
 import { action, observable, runInAction } from "mobx";
 
 import type { UserReadBrief } from "@nextgisweb/auth/type/api";
-import { extractError } from "@nextgisweb/gui/error";
+import { extractError, isAbortError } from "@nextgisweb/gui/error";
 import { route } from "@nextgisweb/pyramid/api";
 import type { CompositeRead, ResourceCls } from "@nextgisweb/resource/type/api";
 
@@ -11,7 +11,7 @@ import {
   snapshotFromUrl,
   urlFromStore,
 } from "./serialize";
-import { DEFAULT_LIMIT } from "./types";
+import { SEARCH_PAGE_SIZE } from "./types";
 import type { MetaFilterEntry, SearchSnapshot } from "./types";
 
 interface BreadcrumbNode {
@@ -29,14 +29,13 @@ export class ResourceSearchStore {
   @observable.ref accessor root: number | null = null;
 
   @observable.ref accessor order: string = "";
-  @observable.ref accessor limit: number = DEFAULT_LIMIT;
-  @observable.ref accessor offset: number = 0;
 
   @observable.shallow accessor results: CompositeRead[] = [];
   @observable.shallow accessor breadcrumbs: Record<number, BreadcrumbNode[]> =
     {};
   @observable.ref accessor totalCount: number = 0;
   @observable.ref accessor loading: boolean = false;
+  @observable.ref accessor loadingMore: boolean = false;
   @observable.ref accessor error: string | null = null;
 
   @observable.ref accessor settingsVisible: boolean = false;
@@ -50,7 +49,7 @@ export class ResourceSearchStore {
   constructor() {
     this.hydrateFromUrl(window.location.search);
     if (hasAnyFilter(this.snapshot())) {
-      void this.applyFilters({ pushHistory: false, resetOffset: false });
+      void this.applyFilters({ pushHistory: false });
     }
   }
 
@@ -67,7 +66,12 @@ export class ResourceSearchStore {
       });
       return filtered;
     })().catch((err) => {
-      this.usersPromise = null;
+      if (isAbortError(err)) {
+        this.usersPromise = null;
+      } else {
+        this.usersPromise = null;
+        console.error("Failed to load users:", err);
+      }
       throw err;
     });
     return this.usersPromise;
@@ -82,8 +86,6 @@ export class ResourceSearchStore {
       ownerUserIn: this.ownerUserIn,
       root: this.root,
       order: this.order,
-      limit: this.limit,
-      offset: this.offset,
     };
   }
 
@@ -97,8 +99,6 @@ export class ResourceSearchStore {
     if (snap.ownerUserIn !== undefined) this.ownerUserIn = snap.ownerUserIn;
     if (snap.root !== undefined) this.root = snap.root;
     if (snap.order !== undefined) this.order = snap.order;
-    if (snap.limit !== undefined) this.limit = snap.limit;
-    if (snap.offset !== undefined) this.offset = snap.offset;
     if (
       (snap.metaFilters && snap.metaFilters.length > 0) ||
       (snap.keynameIn && snap.keynameIn.length > 0)
@@ -118,23 +118,46 @@ export class ResourceSearchStore {
     }
   }
 
-  @action.bound
-  async applyFilters({
-    pushHistory = true,
-    resetOffset = true,
-  }: { pushHistory?: boolean; resetOffset?: boolean } = {}): Promise<void> {
-    if (resetOffset) {
-      this.offset = 0;
+  private mergeBreadcrumbs(
+    current: Record<number, BreadcrumbNode[]>,
+    incoming?: Record<string, BreadcrumbNode[]>
+  ): Record<number, BreadcrumbNode[]> {
+    if (!incoming) return current;
+
+    const next = { ...current };
+    for (const [k, v] of Object.entries(incoming)) {
+      next[Number(k)] = v;
+    }
+    return next;
+  }
+
+  private async fetchPage({
+    offset,
+    append,
+    pushHistory,
+  }: {
+    offset: number;
+    append: boolean;
+    pushHistory?: boolean;
+  }): Promise<void> {
+    if (append ? this.loadingMore : this.loading) {
+      return;
     }
 
-    this.abortController?.abort();
+    if (!append) {
+      this.abortController?.abort();
+      this.error = null;
+      this.loading = true;
+    } else {
+      this.loadingMore = true;
+    }
+
     const ac = new AbortController();
     this.abortController = ac;
 
-    this.loading = true;
-    this.error = null;
-
     const query = paramsFromStore(this.snapshot());
+    query.limit = SEARCH_PAGE_SIZE;
+    query.offset = offset;
 
     try {
       const resp = await route("resource.search").get({
@@ -151,33 +174,65 @@ export class ResourceSearchStore {
         order: string[];
       };
 
-      const breadcrumbs: Record<number, BreadcrumbNode[]> = {};
-      if (data.breadcrumb) {
-        for (const [k, v] of Object.entries(data.breadcrumb)) {
-          breadcrumbs[Number(k)] = v;
-        }
-      }
-
       runInAction(() => {
-        this.results = data.items;
+        this.results = append ? [...this.results, ...data.items] : data.items;
         this.totalCount = data.total_count;
-        this.breadcrumbs = breadcrumbs;
+        this.breadcrumbs = this.mergeBreadcrumbs(
+          append ? this.breadcrumbs : {},
+          data.breadcrumb
+        );
         this.loading = false;
+        this.loadingMore = false;
       });
 
-      if (pushHistory) {
-        this.syncUrl({ replace: false });
-      } else {
-        this.syncUrl({ replace: true });
+      if (!append) {
+        if (pushHistory) {
+          this.syncUrl({ replace: false });
+        } else {
+          this.syncUrl({ replace: true });
+        }
       }
     } catch (err) {
-      if (ac.signal.aborted) return;
+      if (ac.signal.aborted || isAbortError(err)) {
+        runInAction(() => {
+          this.loading = false;
+          this.loadingMore = false;
+        });
+        return;
+      }
+
       const info = extractError(err);
+      console.error(
+        append ? "Search page load failed:" : "Search failed:",
+        info
+      );
       runInAction(() => {
         this.error = info.title || info.message || String(err);
         this.loading = false;
+        this.loadingMore = false;
       });
     }
+  }
+
+  @action.bound
+  async applyFilters({
+    pushHistory = true,
+  }: { pushHistory?: boolean } = {}): Promise<void> {
+    await this.fetchPage({ offset: 0, append: false, pushHistory });
+  }
+
+  @action.bound
+  async loadMore(): Promise<void> {
+    if (
+      this.loading ||
+      this.loadingMore ||
+      this.results.length >= this.totalCount ||
+      this.totalCount === 0
+    ) {
+      return;
+    }
+
+    await this.fetchPage({ offset: this.results.length, append: true });
   }
 
   @action.bound setSearchText(value: string) {
@@ -225,24 +280,13 @@ export class ResourceSearchStore {
     this.order = value;
   }
 
-  @action.bound setPage(offset: number, limit?: number) {
-    this.offset = offset;
-    if (limit !== undefined) this.limit = limit;
-  }
-
   @action.bound toggleSettings() {
     this.settingsVisible = !this.settingsVisible;
   }
 
-  @action.bound onTablePageOrSortChange(
-    offset: number,
-    limit: number,
-    order: string
-  ): void {
-    this.offset = offset;
-    this.limit = limit;
+  @action.bound onTableSortChange(order: string): void {
     this.order = order;
-    void this.applyFilters({ pushHistory: false, resetOffset: false });
+    void this.applyFilters({ pushHistory: false });
   }
 
   duplicateMetaKeys(): Set<string> {

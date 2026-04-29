@@ -84,7 +84,14 @@ function ResourceSearchPage() {
   const [store] = useState(() => new ResourceSearchStore());
 
   useEffect(() => {
-    return () => store.destroy();
+    const rootStyle = document.documentElement.style;
+    const previousScrollbarGutter = rootStyle.scrollbarGutter;
+    rootStyle.scrollbarGutter = "stable";
+
+    return () => {
+      rootStyle.scrollbarGutter = previousScrollbarGutter;
+      store.destroy();
+    };
   }, [store]);
 
   return <ResourceSearchPageBody store={store} />;
