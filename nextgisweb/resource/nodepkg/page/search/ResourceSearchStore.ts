@@ -5,12 +5,7 @@ import { extractError, isAbortError } from "@nextgisweb/gui/error";
 import { route } from "@nextgisweb/pyramid/api";
 import type { CompositeRead, ResourceCls } from "@nextgisweb/resource/type/api";
 
-import {
-  hasAnyFilter,
-  paramsFromStore,
-  snapshotFromUrl,
-  urlFromStore,
-} from "./serialize";
+import { paramsFromStore, snapshotFromUrl, urlFromStore } from "./serialize";
 import { SEARCH_PAGE_SIZE } from "./types";
 import type { MetaFilterEntry, SearchSnapshot } from "./types";
 
@@ -48,9 +43,7 @@ export class ResourceSearchStore {
 
   constructor() {
     this.hydrateFromUrl(window.location.search);
-    if (hasAnyFilter(this.snapshot())) {
-      void this.applyFilters({ pushHistory: false });
-    }
+    void this.applyFilters({ pushHistory: false });
   }
 
   loadUsers(signal?: AbortSignal): Promise<UserReadBrief[]> {

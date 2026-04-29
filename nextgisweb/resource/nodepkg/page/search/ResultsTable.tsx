@@ -226,6 +226,7 @@ export const ResultsTable = observer(function ResultsTable({
         onChange={onChange}
         onScroll={onScroll}
         pagination={false}
+        showSorterTooltip={false}
         scroll={{ y: scrollY, scrollToFirstRowOnChange: true }}
         summary={() =>
           store.loadingMore ? (
