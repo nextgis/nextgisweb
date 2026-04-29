@@ -418,6 +418,8 @@ class WFSConnection(Resource):
                 elif orig_datatype == "GML_TIME_INSTANT":
                     _tp = find_tags(_property, "timePosition")[0]
                     value = datetime.fromisoformat(_tp.text)
+                elif orig_datatype == "XSD_BOOLEAN":
+                    value = _property.text.strip().lower() in ("true", "1")
                 else:
                     raise NotImplementedError
                 fields[key] = value
