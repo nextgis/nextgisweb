@@ -122,6 +122,11 @@ def root(request):
     return HTTPFound(request.route_url("resource.show", id=0))
 
 
+@react_renderer("@nextgisweb/resource/page/search")
+def search_page(request):
+    return dict(title=gettext("Resource search"))
+
+
 @react_renderer("@nextgisweb/resource/json-view")
 def json_view(request):
     request.resource_permission(ResourceScope.read)
@@ -305,6 +310,7 @@ def setup_pyramid(comp, config):
 
     _route("schema", "schema", get=schema)
     _route("root", "", get=root)
+    _route("search.page", "search", get=search_page)
 
     _resource_route("show", r"{id:uint}", get=show)
     _resource_route("json", r"{id:uint}/json", get=json_view)

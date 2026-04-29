@@ -1,0 +1,58 @@
+.ngw-resource-search-page {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 1em 2em;
+
+  .ngw-resource-search-filter-bar {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+
+    .root {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 4px;
+    }
+  }
+
+  .settings {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    border: 1px solid var(--ant-color-border-secondary, #f0f0f0);
+    border-radius: 6px;
+    padding: 12px;
+  }
+
+  .search-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+
+    & > .ant-input,
+    & > .ant-input-affix-wrapper {
+      flex: 1 1 0;
+      min-width: 0;
+    }
+  }
+
+  .ngw-resource-search-name-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    .title {
+      font-weight: 500;
+    }
+
+    .path {
+      color: var(--text-secondary, #888);
+      font-size: 0.85em;
+    }
+  }
+}
