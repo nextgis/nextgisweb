@@ -227,7 +227,11 @@ export const ResultsTable = observer(function ResultsTable({
         onScroll={onScroll}
         pagination={false}
         showSorterTooltip={false}
-        scroll={{ y: scrollY, scrollToFirstRowOnChange: true }}
+        scroll={{
+          x: "max-content",
+          y: scrollY,
+          scrollToFirstRowOnChange: true,
+        }}
         summary={() =>
           store.loadingMore ? (
             <Table.Summary.Row>

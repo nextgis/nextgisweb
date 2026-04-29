@@ -36,7 +36,12 @@ const ResourceSearchPageBody = observer(function ResourceSearchPageBody({
       <PageTitle pullRight>
         {store.totalCount > 0 && (
           <span style={{ marginRight: 8, color: "var(--text-secondary)" }}>
-            {msgFound}: <Badge count={store.totalCount} overflowCount={99999} />
+            {msgFound}:{" "}
+            <Badge
+              style={{ backgroundColor: "#076dbf" }}
+              count={store.totalCount}
+              overflowCount={99999}
+            />
           </span>
         )}
       </PageTitle>
@@ -84,12 +89,7 @@ function ResourceSearchPage() {
   const [store] = useState(() => new ResourceSearchStore());
 
   useEffect(() => {
-    const rootStyle = document.documentElement.style;
-    const previousScrollbarGutter = rootStyle.scrollbarGutter;
-    rootStyle.scrollbarGutter = "stable";
-
     return () => {
-      rootStyle.scrollbarGutter = previousScrollbarGutter;
       store.destroy();
     };
   }, [store]);

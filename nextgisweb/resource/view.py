@@ -124,7 +124,12 @@ def root(request):
 
 @react_renderer("@nextgisweb/resource/page/search")
 def search_page(request):
-    return dict(title=gettext("Resource search"))
+    return dict(
+        title=gettext("Resource search"),
+        maxwidth=True,
+        maxheight=True,
+        adaptive=True,
+    )
 
 
 @react_renderer("@nextgisweb/resource/json-view")
