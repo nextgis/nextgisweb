@@ -92,7 +92,7 @@ class BoolValidationError(ValidationError):
     message_ = gettextf("Got an invalid BOOLEAN value: {}.")
 
     def __init__(self, value: Any):
-        value_json = json_dumps(value, ensure_ascii=False)
+        value_json = json_dumps(value)
         super().__init__(message=self.message_.format(value_json))
 
 
