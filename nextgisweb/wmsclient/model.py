@@ -1,3 +1,4 @@
+import logging
 import re
 from io import BytesIO
 from typing import Annotated, Literal
@@ -47,6 +48,26 @@ from .util import (
 )
 
 Base.depends_on("resource")
+
+log = logging.getLogger(__name__)
+
+_WMS_EXCEPTION_TAGS = (
+    "ServiceException",
+    "{http://www.opengis.net/ogc}ServiceException",
+)
+
+
+def _extract_wms_error(content: bytes) -> str | None:
+    try:
+        root = etree.fromstring(content)
+    except etree.XMLSyntaxError:
+        return None
+    for tag in _WMS_EXCEPTION_TAGS:
+        el = root.find(tag)
+        if el is not None and el.text:
+            return el.text.strip()
+    return None
+
 
 WMS_VERSIONS = ("1.1.1", "1.3.0")
 
@@ -300,6 +321,8 @@ class Layer(Resource, SpatialLayerMixin):
             try:
                 img = PIL.Image.open(data)
             except IOError:
+                if msg := _extract_wms_error(response.content):
+                    log.error("WMS service error: %s", msg)
                 raise ExternalServiceError("Image processing error.")
             if img.mode != "RGBA":
                 img = img.convert("RGBA")
@@ -307,6 +330,8 @@ class Layer(Resource, SpatialLayerMixin):
         elif response.status_code in (204, 404):
             return None
         else:
+            if msg := _extract_wms_error(response.content):
+                log.error("WMS service error (HTTP %d): %s", response.status_code, msg)
             raise ExternalServiceError
 
     def render_image(self, extent, size):
