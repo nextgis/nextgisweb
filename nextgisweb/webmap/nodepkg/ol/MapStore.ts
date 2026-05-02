@@ -59,7 +59,7 @@ interface Layers {
   [key: string]: CoreLayer;
 }
 
-const TOP_LAYER_ZINDEX = 10000;
+export const TOP_LAYER_ZINDEX = 10000;
 
 export class MapStore {
   readonly panelControl: PanelControl;
@@ -160,6 +160,11 @@ export class MapStore {
   @action
   setBaseLayer(layer: CoreLayer) {
     this.baseLayer = layer;
+  }
+
+  @action.bound
+  setMeasureSrsId(measureSrsId: number | null | undefined) {
+    this.measureSrsId = measureSrsId ?? null;
   }
 
   @action
@@ -332,6 +337,9 @@ export class MapStore {
     const layers = { ...this.layers };
     delete layers[layer.name];
     this.layers = layers;
+    if (this.baseLayer === layer) {
+      this.baseLayer = null;
+    }
   }
 
   @computed

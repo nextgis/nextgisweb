@@ -10,7 +10,6 @@ import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { SRSRead } from "@nextgisweb/spatial-ref-sys/type/api";
 import webmapSettings from "@nextgisweb/webmap/client-settings";
-import type { Display } from "@nextgisweb/webmap/display";
 
 import { DDtoDM, DDtoDMS } from "./format";
 import type { IdentifyInfo, IdentifyResultProps } from "./identification";
@@ -85,20 +84,20 @@ const transformCoordinates = async (
   return transfCoords;
 };
 
-let localMeasureSrsId: number | undefined = undefined;
-const getDefaultMeasureSrsId = (display: Display) => {
-  if (localMeasureSrsId !== undefined) {
-    return localMeasureSrsId;
-  }
-
-  localMeasureSrsId = display.config.measureSrsId || measurementSridSetting;
-  return localMeasureSrsId;
+let localMeasureSrsId: number | undefined;
+const getDefaultMeasureSrsId = (measureSrsId: number | null) => {
+  return localMeasureSrsId ?? measureSrsId ?? measurementSridSetting;
 };
+
+interface CoordinatesSwitcherProps extends IdentifyResultProps {
+  measureSrsId: number | null;
+}
 
 export const CoordinatesSwitcher = ({
   display,
   identifyInfo,
-}: IdentifyResultProps) => {
+  measureSrsId,
+}: CoordinatesSwitcherProps) => {
   const [transfCoords, setTransfCoords] = useState<TransfCoords>();
   const [options, setOptions] = useState<CoordinateOption[]>();
   const [srsMap, setSrsMap] = useState<SrsInfoMap>();
@@ -155,8 +154,8 @@ export const CoordinatesSwitcher = ({
     });
 
     setOptions(newOptions);
-    setSelectedSrsId(getDefaultMeasureSrsId(display));
-  }, [transfCoords]);
+    setSelectedSrsId(getDefaultMeasureSrsId(measureSrsId));
+  }, [measureSrsId, srsMap, transfCoords]);
 
   const changeCoordinate = (value: number) => {
     localMeasureSrsId = value;

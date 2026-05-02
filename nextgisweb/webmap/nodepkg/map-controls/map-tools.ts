@@ -3,8 +3,6 @@
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { mapControlRegistry } from "@nextgisweb/webmap/display/component/map-panel/registry";
 
-import { EDITING_ID } from "../constant";
-
 mapControlRegistry(COMP_ID, {
   key: "zi",
   order: 10,
@@ -64,13 +62,4 @@ mapControlRegistry(COMP_ID, {
   hideOnMobile: true,
   showOnPreview: true,
   embeddedShowMode: "customize",
-});
-mapControlRegistry(COMP_ID, {
-  key: "ed",
-  order: 100,
-  component: () => import("../plugin/layer-editor/ToolEditor"),
-  label: gettext("Editor"),
-  position: "top-left",
-  embeddedShowMode: "always",
-  props: { groupId: EDITING_ID },
 });

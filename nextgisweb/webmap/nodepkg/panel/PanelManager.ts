@@ -1,4 +1,5 @@
-import { action, computed, observable, runInAction } from "mobx";
+import { action, computed, observable, reaction, runInAction } from "mobx";
+import type { IReactionDisposer } from "mobx";
 
 import type { Display } from "../display";
 import { PanelStore } from "../panel/PanelStore";
@@ -26,6 +27,7 @@ export class PanelManager {
   readonly display: Display;
 
   private _onChangePanel?: (panel?: PanelStore) => void;
+  private _pluginDisposers = new Map<string, IReactionDisposer>();
 
   @observable.ref accessor allowPanels: string[] | null;
 
@@ -99,6 +101,10 @@ export class PanelManager {
       plugin = pluginDef;
     }
 
+    if (plugin.isEnabled && !options?.force) {
+      this._watchPluginEnabled(plugin);
+    }
+
     const existPlugin = this.plugins.find((p) => p.name === plugin.name);
     if (existPlugin) {
       return existPlugin;
@@ -136,6 +142,19 @@ export class PanelManager {
         this.panels = panels;
       });
       return widgetPlugin;
+    }
+  }
+
+  @action.bound
+  unregisterPlugin(name: string) {
+    const panels = new Map(this.panels);
+
+    panels.delete(name);
+    this.plugins = this.plugins.filter((plugin) => plugin.name !== name);
+    this.panels = panels;
+
+    if (this.activePanelName === name) {
+      this.setActive(undefined, "manager");
     }
   }
 
@@ -177,5 +196,25 @@ export class PanelManager {
   @computed
   get sorted(): PanelStore[] {
     return Array.from(this.panels.values()).sort((a, b) => a.order - b.order);
+  }
+
+  private _watchPluginEnabled(plugin: PanelPlugin) {
+    if (this._pluginDisposers.has(plugin.name)) {
+      return;
+    }
+
+    const disposer = reaction(
+      () => plugin.isEnabled?.(this.display),
+      async (enabled) => {
+        const isEnabled = await enabled;
+        if (isEnabled) {
+          this.registerPlugin(plugin);
+        } else {
+          this.unregisterPlugin(plugin.name);
+        }
+      }
+    );
+
+    this._pluginDisposers.set(plugin.name, disposer);
   }
 }

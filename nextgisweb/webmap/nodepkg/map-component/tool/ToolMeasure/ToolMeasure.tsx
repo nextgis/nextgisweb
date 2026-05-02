@@ -1,4 +1,3 @@
-import debounce from "lodash/debounce";
 import { observer } from "mobx-react-lite";
 import { unByKey } from "ol/Observable";
 import type { EventsKey } from "ol/events";
@@ -8,6 +7,7 @@ import type { DrawEvent } from "ol/interaction/Draw";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { route } from "@nextgisweb/pyramid/api";
+import { useDebounce } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { makeUid } from "@nextgisweb/pyramid/util";
 import settings from "@nextgisweb/webmap/client-settings";
@@ -49,17 +49,19 @@ const ToolMeasure = observer(({ type, groupId, ...rest }: ToolMeasureProps) => {
   const { mapStore } = useMapContext();
 
   const { olMap } = mapStore;
+  const measureSrsId = mapStore.measureSrsId || settings.measurement_srid;
 
   const [currentTooltipId, setCurrentTooltipId] = useState<string | null>(null);
 
   const vectorRef = useRef<Vector | null>(null);
   const interactionRef = useRef<Draw | null>(null);
   const changeListenerRef = useRef<EventsKey | null>(null);
+  const measureSrsIdRef = useRef(measureSrsId);
+  const measureRevisionRef = useRef(0);
 
   const [tooltips, setTooltips] = useState<Map<string, TooltipState>>(
     new Map()
   );
-  const debouncedRef = useRef(new Map<string, ReturnType<typeof debounce>>());
 
   const title = useMemo(
     () =>
@@ -88,12 +90,6 @@ const ToolMeasure = observer(({ type, groupId, ...rest }: ToolMeasureProps) => {
   );
 
   const closeTooltip = useCallback((id: string) => {
-    const d = debouncedRef.current.get(id);
-    if (d) {
-      d.cancel();
-      debouncedRef.current.delete(id);
-    }
-
     setTooltips((prev) => {
       const next = new Map(prev);
       next.delete(id);
@@ -107,6 +103,39 @@ const ToolMeasure = observer(({ type, groupId, ...rest }: ToolMeasureProps) => {
     }
   }, []);
 
+  const updateMeasuredValue = useCallback(
+    async (id: string, geometry: Geometry, revision: number) => {
+      const srsId = measureSrsIdRef.current;
+      if (!srsId || !isValidGeometry(geometry)) return;
+
+      try {
+        const isArea = geometry.getType() === "Polygon";
+        const resp = await route(
+          isArea ? "spatial_ref_sys.geom_area" : "spatial_ref_sys.geom_length",
+          { id: srsId }
+        ).post({
+          json: {
+            geom: toGeoJSONRightHanded(geometry),
+            geom_format: "geojson",
+            srs: getMapSRID(olMap),
+          },
+        });
+
+        if (revision !== measureRevisionRef.current) return;
+
+        updateTooltip(id, {
+          children: formatUnits(resp.value, isArea),
+        });
+      } catch {
+        if (revision !== measureRevisionRef.current) return;
+        updateTooltip(id, { children: "@#!*~^$" });
+      }
+    },
+    [olMap, updateTooltip]
+  );
+
+  const debouncedUpdateMeasuredValue = useDebounce(updateMeasuredValue, 200);
+
   useEffect(() => {
     const style = createMeasureStyle();
     const vector = new Vector("measure", {
@@ -116,7 +145,6 @@ const ToolMeasure = observer(({ type, groupId, ...rest }: ToolMeasureProps) => {
     });
     const source = vector.getSource();
     vectorRef.current = vector;
-    const debouncedMap = debouncedRef.current;
 
     mapStore.addLayer(vector);
 
@@ -165,38 +193,7 @@ const ToolMeasure = observer(({ type, groupId, ...rest }: ToolMeasureProps) => {
           return next;
         });
 
-        let d = debouncedMap.get(curId);
-        if (!d) {
-          d = debounce(async (g: Geometry) => {
-            const srsId = mapStore.measureSrsId || settings.measurement_srid;
-            if (srsId === null || !isValidGeometry(g)) return;
-
-            try {
-              const isArea = g.getType() === "Polygon";
-              const resp = await route(
-                isArea
-                  ? "spatial_ref_sys.geom_area"
-                  : "spatial_ref_sys.geom_length",
-                { id: srsId }
-              ).post({
-                json: {
-                  geom: toGeoJSONRightHanded(g),
-                  geom_format: "geojson",
-                  srs: getMapSRID(olMap),
-                },
-              });
-
-              updateTooltip(curId, {
-                children: formatUnits(resp.value, isArea),
-              });
-            } catch {
-              updateTooltip(curId, { children: "@#!*~^$" });
-            }
-          }, 200);
-          debouncedMap.set(curId, d);
-        }
-
-        d(geom);
+        debouncedUpdateMeasuredValue(curId, geom, measureRevisionRef.current);
       });
     };
 
@@ -224,31 +221,53 @@ const ToolMeasure = observer(({ type, groupId, ...rest }: ToolMeasureProps) => {
       interactionRef.current = null;
       vectorRef.current = null;
 
-      debouncedMap.forEach((fn) => fn.cancel());
-      debouncedMap.clear();
+      debouncedUpdateMeasuredValue.cancel();
+      measureRevisionRef.current = measureRevisionRef.current + 1;
 
       setCurrentTooltipId(null);
 
       unbindChangeListener();
     };
-  }, [closeTooltip, mapStore, olMap, type, updateTooltip]);
+  }, [closeTooltip, debouncedUpdateMeasuredValue, mapStore, olMap, type]);
 
-  const setActive = useCallback((active: boolean) => {
-    const interaction = interactionRef.current;
-    if (!interaction) return;
+  useEffect(() => {
+    measureSrsIdRef.current = measureSrsId;
+    measureRevisionRef.current = measureRevisionRef.current + 1;
 
-    interaction.setActive(active);
+    const revision = measureRevisionRef.current;
+    const source = vectorRef.current?.getSource();
+    if (!source) return;
 
-    if (!active) {
-      vectorRef.current?.getSource()?.clear();
+    source.getFeatures().forEach((feature) => {
+      const id = feature.getId();
+      const geometry = feature.getGeometry();
+      if (id === undefined || !geometry || !isValidGeometry(geometry)) {
+        return;
+      }
 
-      debouncedRef.current.forEach((fn) => fn.cancel());
-      debouncedRef.current.clear();
+      void updateMeasuredValue(String(id), geometry, revision);
+    });
+  }, [measureSrsId, updateMeasuredValue]);
 
-      setTooltips(new Map());
-      setCurrentTooltipId(null);
-    }
-  }, []);
+  const setActive = useCallback(
+    (active: boolean) => {
+      const interaction = interactionRef.current;
+      if (!interaction) return;
+
+      interaction.setActive(active);
+
+      if (!active) {
+        vectorRef.current?.getSource()?.clear();
+
+        debouncedUpdateMeasuredValue.cancel();
+        measureRevisionRef.current++;
+
+        setTooltips(new Map());
+        setCurrentTooltipId(null);
+      }
+    },
+    [debouncedUpdateMeasuredValue]
+  );
 
   return (
     <>

@@ -21,6 +21,10 @@ export const BasemapSelector = observer(({ map }: BasemapSelectorProps) => {
     });
   }
 
+  if (!options.length) {
+    return null;
+  }
+
   return (
     <Select
       value={activeBasemapKey}

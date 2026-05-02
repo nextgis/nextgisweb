@@ -8,10 +8,6 @@ import type { Options as StyleOptions } from "ol/style/Style";
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import type { MapStore } from "../../ol/MapStore";
-
-import { AnnotationsPopup } from "./AnnotationsPopup";
-
 export type AccessType = "public" | "private" | "own" | null;
 
 interface AnnotationStyle {
@@ -29,25 +25,26 @@ interface AnnotationStyle {
 
 export interface FeatureInfo {
   geom?: string;
-  description?: string;
   style?: AnnotationStyle;
+  description?: string;
 }
 
 // TODO: typegen for webmap.annotation.item webmap.annotation.collection get response
 export interface AnnotationInfo {
   id?: number;
-  geom?: string;
-  description?: string;
-  style?: AnnotationStyle;
-  public?: boolean;
   own?: boolean;
   user?: string;
+  geom?: string;
+  style?: AnnotationStyle;
+  public?: boolean;
+  description?: string;
 }
 
+export type AnnotationChangeCallback = (annFeature: AnnotationFeature) => void;
+
 export interface AnnotationFeatureOptions {
-  editable?: boolean;
-  annotationInfo?: AnnotationInfo;
   feature?: Feature;
+  annotationInfo?: AnnotationInfo;
 }
 
 const wkt = new WKT();
@@ -62,16 +59,12 @@ const defaultStyle: AnnotationStyle = {
 const hideStyle = new Style();
 
 export class AnnotationFeature {
-  private _feature?: Feature;
-  private _editable: boolean;
-  private _accessType: AccessType = null;
   private _style?: Style;
   private _visible: boolean = true;
-  private _popupVisible: boolean | null = null;
+  private _feature?: Feature;
+  private _accessType: AccessType = null;
 
-  constructor({ editable, annotationInfo, feature }: AnnotationFeatureOptions) {
-    this._editable = editable || false;
-
+  constructor({ feature, annotationInfo }: AnnotationFeatureOptions) {
     if (annotationInfo) {
       this._buildFromAnnotationInfo(annotationInfo);
     }
@@ -98,11 +91,6 @@ export class AnnotationFeature {
 
     this._feature = feature;
     this.calculateAccessType();
-
-    const popup = new AnnotationsPopup(this, this._editable, annotationInfo);
-    feature.setProperties({
-      popup: popup,
-    });
   }
 
   private _buildFromFeature(feature: Feature): void {
@@ -115,7 +103,6 @@ export class AnnotationFeature {
 
     feature.setProperties({
       info,
-      popup: new AnnotationsPopup(this),
       annFeature: this,
     });
 
@@ -142,10 +129,6 @@ export class AnnotationFeature {
     const feature = this.getFeature();
     if (!feature) return null;
     return feature.get("info") as FeatureInfo;
-  }
-
-  getPopup(): AnnotationsPopup {
-    return this._feature?.get("popup") as AnnotationsPopup;
   }
 
   getDescriptionAsHtml(): string {
@@ -210,14 +193,6 @@ export class AnnotationFeature {
       });
 
       this.calculateAccessType();
-      this.updatePopup();
-    }
-  }
-
-  updatePopup(): void {
-    if (this._feature) {
-      const popup = this._feature.get("popup") as AnnotationsPopup;
-      popup.update();
     }
   }
 
@@ -278,21 +253,6 @@ export class AnnotationFeature {
     }
     this.getFeature()?.setStyle(visible ? this._style : hideStyle);
     this._visible = visible;
-    return true;
-  }
-
-  togglePopup(visible: boolean, map?: MapStore): boolean {
-    if ((visible && this._popupVisible) || (!visible && !this._popupVisible)) {
-      return false;
-    }
-
-    const popup = this.getPopup();
-    if (visible && map) {
-      popup.addToMap(map).show();
-    } else {
-      popup.remove();
-    }
-    this._popupVisible = visible;
     return true;
   }
 }

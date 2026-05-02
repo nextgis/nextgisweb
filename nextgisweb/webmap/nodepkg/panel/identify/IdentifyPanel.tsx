@@ -66,6 +66,7 @@ const IdentifyPanel = observer<PanelPluginWidgetProps<IdentifyStore>>(
     const { makeSignal, abort } = useAbortController();
 
     const identifyInfo = store.identifyInfo;
+    const measureSrsId = display.config.measureSrsId;
 
     const isNotFound = identifyInfo && identifyInfo.response.featureCount === 0;
 
@@ -149,8 +150,7 @@ const IdentifyPanel = observer<PanelPluginWidgetProps<IdentifyStore>>(
     let rasterInfoSection;
     if (featureInfo) {
       if (featureItem) {
-        const measurementSrid =
-          display.config.measureSrsId || measurementSridSetting;
+        const measurementSrid = measureSrsId || measurementSridSetting;
 
         const opts = display.config.options;
         featureInfoSection = (
@@ -208,6 +208,7 @@ const IdentifyPanel = observer<PanelPluginWidgetProps<IdentifyStore>>(
             <CoordinatesSwitcher
               display={display}
               identifyInfo={identifyInfo}
+              measureSrsId={measureSrsId}
             />
           )
         }

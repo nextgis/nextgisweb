@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { observer } from "mobx-react-lite";
 
 import { useRouteGet } from "@nextgisweb/pyramid/hook";
 import settings from "@nextgisweb/webmap/client-settings";
@@ -24,17 +24,16 @@ function SrsDisplay({ srsId }: { srsId: number }) {
   );
 }
 
-export function CoordinateSystemDisplay() {
+export const CoordinateSystemDisplay = observer(() => {
   const { mapStore } = useMapContext();
 
-  const srsId = useMemo(
-    () => mapStore.measureSrsId || settings.measurement_srid,
-    [mapStore.measureSrsId]
-  );
+  const srsId = mapStore.measureSrsId || settings.measurement_srid;
 
   if (!srsId) {
     return null;
   }
 
   return <SrsDisplay srsId={srsId} />;
-}
+});
+
+CoordinateSystemDisplay.displayName = "CoordinateSystemDisplay";

@@ -1,6 +1,7 @@
 import { Suspense, lazy, useEffect, useState } from "react";
 
 import { Button, Dropdown, Modal, Skeleton, Space } from "@nextgisweb/gui/antd";
+import type { ShowModalOptions } from "@nextgisweb/gui/showModal";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type {
   AnnotationFeature,
@@ -24,7 +25,10 @@ const TextEditor = lazy(() =>
   }))
 );
 
-export interface AnnotationsModalProps {
+export interface AnnotationsModalProps extends Omit<
+  ShowModalOptions,
+  "onCancel"
+> {
   open?: boolean;
   annFeature?: AnnotationFeature | null;
   onSave?: (data: AnnotationInfo) => void;
@@ -34,12 +38,14 @@ export interface AnnotationsModalProps {
 }
 
 export function AnnotationsModal({
+  close,
   open: open_,
   annFeature,
   onSave,
   onDelete,
   onCancel,
   onCreate,
+  ...modalProps
 }: AnnotationsModalProps) {
   const [open, setOpen] = useState(open_ ?? true);
   const [editorValue, setEditorValue] = useState("");
@@ -78,6 +84,7 @@ export function AnnotationsModal({
   const handleClose = () => {
     setOpen(false);
     onCancel?.();
+    close?.();
   };
 
   const updateFeatureFromDialog = (): AnnotationInfo => {
@@ -101,16 +108,19 @@ export function AnnotationsModal({
   const handleDelete = () => {
     onDelete?.();
     setOpen(false);
+    close?.();
   };
 
   const handleSave = () => {
     onSave?.(updateFeatureFromDialog());
     setOpen(false);
+    close?.();
   };
 
   const handleCreate = (isPublic: boolean) => {
     onCreate?.({ ...updateFeatureFromDialog(), public: isPublic });
     setOpen(false);
+    close?.();
   };
 
   const createItems = [
@@ -141,6 +151,7 @@ export function AnnotationsModal({
   return (
     <Modal
       {...DEFAULTS}
+      {...modalProps}
       title={title}
       open={open}
       destroyOnHidden

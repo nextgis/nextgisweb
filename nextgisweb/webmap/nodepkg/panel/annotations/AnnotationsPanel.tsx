@@ -3,101 +3,82 @@ import { useCallback, useEffect, useState } from "react";
 
 import { Select, Switch } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
-import topic from "@nextgisweb/webmap/compat/topic";
-import AnnotationsStore from "@nextgisweb/webmap/store/annotations";
-import type { AnnotationVisibleMode } from "@nextgisweb/webmap/store/annotations/AnnotationsStore";
-import type { AnnotationsPermissions } from "@nextgisweb/webmap/type/api";
+import { ANNOTATION_ADD_ID } from "@nextgisweb/webmap/constant";
+import type {
+  AccessFilter,
+  AnnotationGeometryType,
+  AnnotationVisibleMode,
+} from "@nextgisweb/webmap/ui/annotations-manager";
 
 import { PanelContainer, PanelSection } from "../component";
 import type { PanelPluginWidgetProps } from "../registry";
 
 import "./AnnotationsPanel.less";
 
-type GeometryType = "Point" | "LineString" | "Polygon";
-
-interface AnnotationFilter {
-  public: boolean;
-  own: boolean;
-  private: boolean;
-}
-
-const ADD_ANNOTATION_STATE_KEY = "addAnnotation";
-
 const AnnotationsPanel = observer<PanelPluginWidgetProps>(
   ({ store, display }) => {
-    const [visible, setVisible] = useState(AnnotationsStore.visibleMode);
-    const [editable, setEditable] = useState(false);
     const [edit, setEdit] = useState(false);
-    const [annScope, setAnnScope] = useState<
-      AnnotationsPermissions | undefined
-    >();
-    const [geomType, setGeomType] = useState<GeometryType>("Point");
-    const [annFilter, setAnnFilter] = useState<AnnotationFilter>({
-      public: true,
-      own: true,
-      private: false,
-    });
+    const [geomType, setGeomType] = useState<AnnotationGeometryType>("Point");
 
     const changeVisible = useCallback(
       (visibleMode: AnnotationVisibleMode | null) => {
-        setVisible(visibleMode);
-        topic.publish("/annotations/visible", visibleMode);
-        AnnotationsStore.setVisibleMode(visibleMode);
+        display.annotationsManager.setVisibleMode(visibleMode);
       },
-      []
+      [display.annotationsManager]
     );
 
     const changeEdit = useCallback(
       (beginEdit: boolean) => {
         if (beginEdit) {
-          display.map.setMapState(ADD_ANNOTATION_STATE_KEY);
+          display.map.setMapState(ANNOTATION_ADD_ID);
           changeVisible("messages");
-          topic.publish("webmap/annotations/add/activate", geomType);
+          display.annotationsManager.activateAddMode(geomType);
         } else {
-          display.map.deactivateMapState(ADD_ANNOTATION_STATE_KEY);
-          topic.publish("webmap/annotations/add/deactivate");
+          display.map.deactivateMapState(ANNOTATION_ADD_ID);
+          display.annotationsManager.deactivateAddMode();
         }
         setEdit(beginEdit);
       },
-      [changeVisible, display.map, geomType]
+      [changeVisible, display.annotationsManager, display.map, geomType]
     );
 
-    const changeGeomType = useCallback((type: GeometryType): void => {
-      setGeomType(type);
-      topic.publish("webmap/annotations/change/geometryType", type);
-    }, []);
+    const changeGeomType = useCallback(
+      (type: AnnotationGeometryType): void => {
+        setGeomType(type);
+        display.annotationsManager.changeGeometryType(type);
+      },
+      [display.annotationsManager]
+    );
 
     const changeAccessTypeFilters = useCallback(
-      (value: boolean, type: keyof AnnotationFilter): void => {
-        setAnnFilter((prevFilter) => {
-          const newFilter = { ...prevFilter, [type]: value };
-          topic.publish("webmap/annotations/filter/changed", newFilter);
-          return newFilter;
+      (value: boolean, type: keyof AccessFilter): void => {
+        display.annotationsManager.setFilter({
+          ...display.annotationsManager.filter,
+          [type]: value,
         });
       },
-      []
+      [display.annotationsManager]
     );
 
-    useEffect(() => {
-      changeVisible(AnnotationsStore.visibleMode);
-
-      const scope = display.config.annotations.scope;
-      setAnnScope(scope);
-
-      const _editable = scope.write;
-      setEditable(_editable);
-    }, [changeVisible, display]);
+    const visible = display.annotationsManager.visibleMode;
+    const annFilter = display.annotationsManager.filter;
+    const annScope = display.config.annotations?.scope;
+    const editable = !!annScope?.write;
 
     useEffect(() => {
       if (
-        display.map.mapState !== ADD_ANNOTATION_STATE_KEY ||
+        display.map.mapState !== ANNOTATION_ADD_ID ||
         (visible === "no" && edit)
       ) {
         changeEdit(false);
       }
     }, [visible, edit, display.map.mapState, changeEdit]);
 
-    if (visible === undefined || annScope === undefined) {
+    useEffect(() => {
+      display.annotationsManager.start();
+    }, [display.annotationsManager]);
+
+    if (visible === null || visible === undefined || annScope === undefined) {
       return null;
     }
 

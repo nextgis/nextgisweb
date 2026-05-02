@@ -20,7 +20,7 @@ export interface LayerOptions {
 export type ExtendedOlLayer<
   TSource extends Source = Source,
   TLayer extends Layer<TSource> = Layer<TSource>,
-> = TLayer & { printingCopy?: () => TLayer };
+> = TLayer;
 
 /** We are using CoreLayer instead of BaseLayer here to avoid mismatch with cartographic baselayer on the bottom of map */
 export abstract class CoreLayer<
@@ -78,19 +78,6 @@ export abstract class CoreLayer<
       ...layerOptions,
       source: this.olSource,
     });
-
-    this.olLayer.printingCopy = () => {
-      const printSource = this.createSource(sourceOptions as TSourceOptions);
-      const opts = {
-        ...layerOptions,
-        visible: this.olLayer.getVisible(),
-        opacity: this.olLayer.getOpacity(),
-        source: printSource,
-      };
-      const printLayer = this.createLayer(opts);
-      this.toggleSourceBySymbols(this.symbols, printLayer, printSource);
-      return printLayer;
-    };
 
     this.setOpacity(this.olLayer.getOpacity() ?? 1);
     this.setVisibility(this.olLayer.getVisible() ?? true);

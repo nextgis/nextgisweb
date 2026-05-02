@@ -1,18 +1,20 @@
-import { action, observable } from "mobx";
+import { action, computed, observable } from "mobx";
 
 import { PanelStore } from "..";
-import type { PanelStoreConstructorOptions } from "../PanelStore";
 
 export default class DescriptionStore extends PanelStore {
-  @observable.ref accessor content: string | null = null;
+  @observable.ref accessor contentOverride: string | null | undefined =
+    undefined;
 
-  constructor({ plugin, display }: PanelStoreConstructorOptions) {
-    super({ plugin, display });
-    this.content = display.config.webmapDescription;
+  @computed
+  get content() {
+    return this.contentOverride !== undefined
+      ? this.contentOverride
+      : this.display.config.webmapDescription;
   }
 
   @action
   setContent(value: string | null) {
-    this.content = value;
+    this.contentOverride = value;
   }
 }

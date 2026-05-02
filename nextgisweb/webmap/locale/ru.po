@@ -18,7 +18,7 @@ msgstr "Открыть"
 msgid "Fragment"
 msgstr "Фрагмент"
 
-#: model.py:46 model.py:64 view.py:222
+#: model.py:46 model.py:64 nodepkg/control-panel-plugin.tsx:9
 msgid "Web map"
 msgstr "Веб-карта"
 
@@ -75,11 +75,11 @@ msgstr "Отключить"
 msgid "Open full map"
 msgstr "Открыть карту целиком"
 
-#: nodepkg/display/Display.ts:251
+#: nodepkg/display/Display.ts:270
 msgid "Object not found"
 msgstr "Объект не найден"
 
-#: nodepkg/display/Display.ts:252
+#: nodepkg/display/Display.ts:271
 msgid "Object from URL parameters not found"
 msgstr "Объект из параметров строки запроса не найден"
 
@@ -276,12 +276,12 @@ msgid "Current zoom level"
 msgstr "Текущий зум"
 
 #: nodepkg/map-component/control/ZoomControl.tsx:81
-#: nodepkg/map-component/tool/ToolZoom.tsx:22 nodepkg/map-controls/map-tools.ts:12
+#: nodepkg/map-component/tool/ToolZoom.tsx:22 nodepkg/map-controls/map-tools.ts:10
 msgid "Zoom in"
 msgstr "Приблизить"
 
 #: nodepkg/map-component/control/ZoomControl.tsx:82
-#: nodepkg/map-component/tool/ToolZoom.tsx:22 nodepkg/map-controls/map-tools.ts:22
+#: nodepkg/map-component/tool/ToolZoom.tsx:22 nodepkg/map-controls/map-tools.ts:20
 msgid "Zoom out"
 msgstr "Отодвинуть"
 
@@ -294,13 +294,13 @@ msgstr "Вернуться к начальному охвату"
 msgid "Band {}"
 msgstr "Канал {}"
 
-#: nodepkg/map-component/tool/ToolMeasure/ToolMeasure.tsx:69
-#: nodepkg/map-controls/map-tools.ts:42
+#: nodepkg/map-component/tool/ToolMeasure/ToolMeasure.tsx:67
+#: nodepkg/map-controls/map-tools.ts:40
 msgid "Measure distance"
 msgstr "Измерение расстояния"
 
-#: nodepkg/map-component/tool/ToolMeasure/ToolMeasure.tsx:70
-#: nodepkg/map-controls/map-tools.ts:52
+#: nodepkg/map-component/tool/ToolMeasure/ToolMeasure.tsx:68
+#: nodepkg/map-controls/map-tools.ts:50
 msgid "Measure area"
 msgstr "Измерение площади"
 
@@ -333,7 +333,7 @@ msgid "Layer is not visible"
 msgstr "Слой не включен"
 
 #: nodepkg/map-component/tool/ToolSwipe/ToolSwipe.tsx:46
-#: nodepkg/map-controls/map-tools.ts:32
+#: nodepkg/map-controls/map-tools.ts:30
 msgid "Vertical swipe"
 msgstr "Вертикальная шторка"
 
@@ -376,13 +376,9 @@ msgstr "Определить мое местоположение"
 msgid "Identification"
 msgstr "Идентификация"
 
-#: nodepkg/map-controls/map-tools.ts:62
+#: nodepkg/map-controls/map-tools.ts:60
 msgid "Cursor coordinates / extent"
 msgstr "Координаты курсора / охвата"
-
-#: nodepkg/map-controls/map-tools.ts:72
-msgid "Editor"
-msgstr "Редактор"
 
 #: nodepkg/map-viewer-info/MapViewerInfo.tsx:88
 msgid "Show extent"
@@ -411,7 +407,7 @@ msgid "With messages"
 msgstr "С сообщениями"
 
 #: nodepkg/panel/annotations/AnnotationsPanel.tsx:130
-#: nodepkg/plugin/layer-editor/LayerEditor.tsx:65
+#: nodepkg/plugin/layer-editor/LayerEditor.tsx:54
 msgid "Edit"
 msgstr "Редактировать"
 
@@ -519,7 +515,7 @@ msgstr "Приблизить к объекту"
 msgid "Raster"
 msgstr "Растр"
 
-#: nodepkg/panel/identify/fields.tsx:112
+#: nodepkg/panel/identify/fields.tsx:114
 msgid "N/A"
 msgstr "Н/Д"
 
@@ -755,7 +751,7 @@ msgstr "Таблица объектов"
 msgid "Undo the last change"
 msgstr "Отменить последнее изменение"
 
-#: nodepkg/plugin/layer-editor/LayerEditor.tsx:65
+#: nodepkg/plugin/layer-editor/LayerEditor.tsx:54
 #: nodepkg/ui/finish-editing-dialog/FinishEditingDialog.tsx:32
 msgid "Stop editing"
 msgstr "Завершить редактирование"
@@ -830,7 +826,7 @@ msgstr ""
 "Для генерации предпросмотра вернитесь на страницу веб карты и нажмите "
 "\"Предпросмотр\"."
 
-#: nodepkg/resource-action-plugin.tsx:44 view.py:102
+#: nodepkg/resource-action-plugin.tsx:44 view.py:101
 msgid "Clone web map"
 msgstr "Клонировать веб-карту"
 
@@ -1185,10 +1181,10 @@ msgstr "Встраивание веб-карты не разрешено для 
 msgid "View the map on %s"
 msgstr "Посмотреть карту на %s"
 
-#: view.py:114
+#: view.py:113
 msgid "Embedded webmap preview"
 msgstr "Просмотр встроенной веб-карты"
 
-#: view.py:125
+#: view.py:124
 msgid "Web map settings"
 msgstr "Настройки веб-карты"

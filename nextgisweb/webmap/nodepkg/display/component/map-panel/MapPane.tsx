@@ -9,6 +9,8 @@ import type { Display } from "../../Display";
 
 import { MapControls } from "./MapControls";
 import { MapHighlight } from "./MapHighlight";
+import { PanelMapComponents } from "./PanelMapComponents";
+import { PluginMapComponents } from "./PluginMapComponents";
 import { WebmapLayers } from "./WebmapLayers";
 
 import "./MapPane.less";
@@ -54,11 +56,14 @@ export const MapPane = observer(
         whenCreated={whenCreated}
       >
         <MapControls mapStore={display.map} isTinyMode={display.isTinyMode} />
-        <WebmapLayers mapStore={display.map} treeStore={display.treeStore} />
         <MapHighlight
           mapStore={display.map}
           highlightStore={display.highlighter}
         />
+        <WebmapLayers treeStore={display.treeStore} />
+        <PanelMapComponents display={display} />
+        <PluginMapComponents display={display} />
+
         {children}
       </MapComponent>
     );

@@ -3,9 +3,9 @@ import type { LayerSymbols } from "../compat/type";
 import type { Display } from "../display";
 import type { MapStore } from "../ol/MapStore";
 import type { PluginBase } from "../plugin/PluginBase";
-import type { AnnotationVisibleMode } from "../store/annotations/AnnotationsStore";
 import type { TreeLayerStore } from "../store/tree-store/TreeItemStore";
 import type { TreeStore } from "../store/tree-store/TreeStore";
+import type { AnnotationVisibleMode } from "../ui/annotations-manager";
 
 export * from "./DisplayConfig";
 

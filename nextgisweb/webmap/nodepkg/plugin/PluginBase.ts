@@ -12,6 +12,7 @@ export abstract class PluginBase {
   run?(nodeData: TreeLayerStore): Promise<boolean | undefined>;
   getMenuItem?(nodeData: TreeLayerStore): PluginMenuItem;
   render?(params: PluginState): React.ReactNode;
+  renderMap?: React.ComponentType<{ display: Display; identity: string }>;
 
   constructor({ display, identity }: PluginParams) {
     this.display = display;

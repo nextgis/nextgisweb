@@ -1,12 +1,10 @@
+import { lazy } from "react";
+
 import { EditIcon } from "@nextgisweb/gui/icon";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { EDITING_ID } from "@nextgisweb/webmap/constant";
 import type { TreeLayerStore } from "@nextgisweb/webmap/store/tree-store/TreeItemStore";
-import type {
-  PluginMenuItem,
-  PluginParams,
-  PluginState,
-} from "@nextgisweb/webmap/type";
+import type { PluginMenuItem, PluginState } from "@nextgisweb/webmap/type";
 import type { LayerItemConfig } from "@nextgisweb/webmap/type/api";
 
 import { PluginBase } from "../PluginBase";
@@ -14,28 +12,20 @@ import type { LayerEditorWebMapPluginConfig } from "../type";
 
 import { setItemsEditable } from "./util/setItemsEditable";
 
+const LayerEditorMapLazy = lazy(() => import("./LayerEditorMap"));
+
 export class LayerEditor extends PluginBase {
-  private disabled = true;
-
-  constructor(options: PluginParams) {
-    super(options);
-
-    if (this.display.isTinyMode) return;
-
-    if (!this.display.config.webmapEditable) {
-      this.disabled = true;
-      return;
-    }
-
-    this.disabled = false;
-  }
+  renderMap = LayerEditorMapLazy;
 
   getPluginState(nodeData: TreeLayerStore): PluginState {
     const state = super.getPluginState(nodeData);
+    const disabled =
+      this.display.isTinyMode || !this.display.config.webmapEditable;
+
     return {
       ...state,
       enabled:
-        !this.disabled &&
+        !disabled &&
         nodeData.type === "layer" &&
         (nodeData.plugin[this.identity] as LayerEditorWebMapPluginConfig)
           ?.writable,

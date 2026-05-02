@@ -2,9 +2,9 @@ import type { Coordinate } from "ol/coordinate";
 import { toLonLat } from "ol/proj";
 
 import type { Display } from "../display";
-import type { AnnotationVisibleMode } from "../store/annotations/AnnotationsStore";
 import type { TreeItemStore } from "../store/tree-store/TreeItemStore";
 import type { DisplayURLParams } from "../type";
+import type { AnnotationVisibleMode } from "../ui/annotations-manager";
 
 export interface GetPermalinkOptions {
   display: Display;
@@ -63,7 +63,7 @@ export const getPermalink = ({
   let annot: AnnotationVisibleMode | undefined | null = null;
   const annotationPanel = display.panelManager.getPanel("annotation");
   if (display && annotationPanel) {
-    annot = visibleMode;
+    annot = visibleMode ?? display.annotationsManager.visibleMode;
   }
 
   if (annot) {

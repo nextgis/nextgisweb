@@ -1,3 +1,4 @@
+import { observer } from "mobx-react-lite";
 import type { Map } from "ol";
 import { unByKey } from "ol/Observable";
 import type { EventsKey } from "ol/events";
@@ -32,7 +33,7 @@ export interface MapViewerInfoProps {
   map: Map;
 }
 
-export function MapViewerInfo({ map }: MapViewerInfoProps) {
+export const MapViewerInfo = observer(({ map }: MapViewerInfoProps) => {
   const [type, setType] = useState<"mouse" | "extent">("mouse");
   const [coord, setCoord] = useState<number[] | undefined>(
     map.getView().getCenter()
@@ -126,4 +127,6 @@ export function MapViewerInfo({ map }: MapViewerInfoProps) {
       />
     </div>
   );
-}
+});
+
+MapViewerInfo.displayName = "MapViewerInfo";

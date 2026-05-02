@@ -1,7 +1,6 @@
 import { debounce } from "lodash-es";
 import { observer } from "mobx-react-lite";
 import { View } from "ol";
-import type { Map as OlMap } from "ol";
 import { unByKey } from "ol/Observable";
 import { useCallback, useEffect, useState } from "react";
 
@@ -11,8 +10,9 @@ import { imageQueue } from "@nextgisweb/pyramid/util";
 import { mapStartup } from "@nextgisweb/webmap/ol/util/mapStartup";
 
 import type { Display } from "../display";
+import { PanelMapComponents } from "../display/component/map-panel/PanelMapComponents";
+import { PluginMapComponents } from "../display/component/map-panel/PluginMapComponents";
 import { WebmapLayers } from "../display/component/map-panel/WebmapLayers";
-import type { AnnotationsPopup } from "../layer/annotations/AnnotationsPopup";
 import { MapComponent } from "../map-component";
 import RotateControl from "../map-component/control/RotateControl";
 import { GraticuleLayer } from "../map-component/layer/GraticuleLayer";
@@ -20,11 +20,6 @@ import { MapStore } from "../ol/MapStore";
 
 import { PrintScaleToolbar } from "./PrintScaleToolar";
 import type { PrintMapStore } from "./store";
-
-function clearOlMap(olMap: OlMap) {
-  olMap.getLayers().clear();
-  olMap.getOverlays().clear();
-}
 
 export interface PrintMapPreviewProps {
   style?: React.CSSProperties;
@@ -35,6 +30,7 @@ export interface PrintMapPreviewProps {
 
 export const PrintMapPreview = observer(
   ({ display, printMapStore }: PrintMapPreviewProps) => {
+    const measureSrsId = display.map.measureSrsId;
     const [mapStore] = useState(() => {
       const viewMainMap = display.map.olView;
       const projection = display.map.olView.getProjection();
@@ -45,10 +41,15 @@ export const PrintMapPreview = observer(
         constrainResolution: false,
         center: printMapStore.center ?? viewMainMap.getCenter(),
       });
-      return new MapStore({
+      const mStore = new MapStore({
         view,
         controls: [],
+        measureSrsId,
       });
+      if (display.map.baseLayer) {
+        mStore.setBaseLayer(display.map.baseLayer);
+      }
+      return mStore;
     });
 
     const {
@@ -61,52 +62,6 @@ export const PrintMapPreview = observer(
       scaleLine,
       scaleValue,
     } = printMapStore;
-
-    useEffect(
-      function redrawLayers() {
-        const printMap = mapStore.olMap;
-        if (!printMap) return;
-
-        clearOlMap(printMap);
-
-        // TODO: Create an independent baselayer for the print map from the display config,
-        // not by cloning it from the main map (WebmapLayers), because the main map may not be exist.
-        display.map.getLayersArray().forEach((layer) => {
-          if (layer.getVisible() && layer.printingCopy) {
-            const matchedLayerEntry = Object.values(display.map.layers).find(
-              (entry) =>
-                entry.getLayer &&
-                entry.getLayer() === layer &&
-                entry.isBaseLayer
-            );
-            if (matchedLayerEntry) {
-              const copyLayer = layer.printingCopy();
-              copyLayer.setZIndex(-1);
-              printMap.addLayer(copyLayer);
-            } else if (
-              ["annotations"].some((title) => layer.get("title") === title)
-            ) {
-              const copyLayer = layer.printingCopy();
-              printMap.addLayer(copyLayer);
-            }
-          }
-        });
-
-        display.map.olMap
-          .getOverlays()
-          .getArray()
-          .forEach((overlay) => {
-            if ("annPopup" in overlay && overlay.annPopup) {
-              const annPopup = overlay.annPopup as AnnotationsPopup;
-              const clonedPopup = annPopup.cloneOlPopup(
-                annPopup.getAnnFeature()
-              );
-              printMap.addOverlay(clonedPopup);
-            }
-          });
-      },
-      [display.map, display.map.layers, mapStore]
-    );
 
     useEffect(() => {
       // This is an important aspect not just for optimization
@@ -184,8 +139,10 @@ export const PrintMapPreview = observer(
         style={{ width: "100%", height: "100%" }}
         mapStore={mapStore}
       >
-        <WebmapLayers mapStore={mapStore} treeStore={display.treeStore} />
+        <WebmapLayers treeStore={display.treeStore} />
         <CompanyLogoControl position="bottom-right" />
+        <PanelMapComponents display={display} />
+        <PluginMapComponents display={display} />
         {arrow && (
           <RotateControl
             autoHide={false}

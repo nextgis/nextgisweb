@@ -1,0 +1,142 @@
+:root {
+  --annotation-public: #97e07e;
+  --annotation-own: #e8b3f8;
+  --annotation-private: #f88f8f;
+
+  --popup-border: #ccc;
+  --popup-bg: #fff;
+  --popup-shadow: 0 3px 7px rgba(2, 34, 60, 0.16);
+}
+
+.ol-popup {
+  display: none;
+  position: absolute;
+  bottom: 12px;
+  left: -50px;
+  border: 1px solid var(--popup-border);
+  background: var(--popup-bg);
+  padding: 15px 25px 15px 15px;
+
+  &::before,
+  &::after {
+    position: absolute;
+    top: 100%;
+    border: solid transparent;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+    content: "";
+  }
+
+  &::after {
+    left: 50px;
+    margin-left: -10px;
+    border-width: 10px;
+    border-top-color: var(--popup-bg);
+  }
+
+  &::before {
+    left: 48px;
+    margin-left: -11px;
+    border-width: 11px;
+    border-top-color: var(--popup-border);
+  }
+
+  &-content {
+    min-width: 170px;
+    overflow-x: auto;
+
+    h3 {
+      margin: 0.25em 0;
+    }
+  }
+
+  &-closer {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    padding: 0 4px;
+    color: gray;
+    font-size: 150%;
+    text-decoration: none;
+
+    &::after {
+      content: "\2716";
+    }
+  }
+
+  .infoResult {
+    min-width: 130px;
+
+    p {
+      margin: 0;
+      padding: 0.1em;
+    }
+  }
+
+  &.marker {
+    margin-bottom: 30px;
+  }
+
+  &.annotation {
+    left: -55px;
+    box-shadow: var(--popup-shadow);
+    border: 0;
+    border-left: 5px solid var(--annotation-color);
+    border-radius: 2px;
+    padding: 6px 8px 8px;
+    min-height: 30px;
+
+    &.public {
+      --annotation-color: var(--annotation-public);
+    }
+
+    &.own {
+      --annotation-color: var(--annotation-own);
+    }
+
+    &.private {
+      --annotation-color: var(--annotation-private);
+    }
+
+    &::before {
+      border: 0;
+    }
+
+    .ol-popup-closer {
+      display: none;
+    }
+
+    .annotation-edit-controls {
+      display: none;
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      box-shadow: 0 2px 3px rgba(2, 34, 60, 0.24);
+      border-radius: 2px;
+      background: #f1f1f1;
+      padding: 3px;
+
+      .annotation-edit {
+        display: block;
+        cursor: pointer;
+        border: 0;
+        background: transparent;
+        padding: 0;
+        color: var(--icon-color);
+        font-size: 16px;
+        line-height: 0;
+
+        &:hover {
+          color: var(--primary);
+        }
+      }
+    }
+
+    &:hover {
+      .annotation-edit-controls {
+        display: block;
+      }
+    }
+  }
+}

@@ -40,6 +40,7 @@ interface PanelPluginBase {
     config: DisplayConfig;
   }) => boolean | Promise<boolean>;
   startup?: (display: Display) => Promise<void>;
+  renderMap?: React.ComponentType<{ display: Display }>;
 }
 
 export interface WidgetPanelPlugin<
