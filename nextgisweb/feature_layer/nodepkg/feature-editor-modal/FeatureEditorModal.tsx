@@ -1,14 +1,13 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { Button, Modal } from "@nextgisweb/gui/antd";
+import { EditorModal } from "@nextgisweb/gui/editor-modal/EditorModal";
 import { assert } from "@nextgisweb/jsrealm/error";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { FeatureEditorStore } from "../feature-editor/FeatureEditorStore";
 import { FeatureEditorWidget } from "../feature-editor/FeatureEditorWidget";
 import type { FeatureEditorWidgetProps } from "../feature-editor/type";
-
-import "./FeatureEditorModal.less";
 
 export type ModalProps = Parameters<typeof Modal>[0];
 type ModalOnCancel = NonNullable<ModalProps["onCancel"]>;
@@ -74,15 +73,11 @@ export function FeatureEditorModal({
 
   return (
     <>
-      <Modal
-        className="ngw-feature-layer-feature-editor-modal"
-        width="" // Do not set the default (520px) width
-        centered={true}
+      <EditorModal
         open={open}
-        destroyOnHidden
-        footer={null}
-        closable={false}
         onCancel={handleClose}
+        closable={false}
+        modalClassName="ngw-feature-layer-feature-editor-modal"
         {...modalProps}
       >
         <FeatureEditorWidget
@@ -110,7 +105,7 @@ export function FeatureEditorModal({
             ],
           }}
         />
-      </Modal>
+      </EditorModal>
       {contextHolder}
     </>
   );

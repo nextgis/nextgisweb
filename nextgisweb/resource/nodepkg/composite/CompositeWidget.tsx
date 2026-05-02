@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { ActionToolbar } from "@nextgisweb/gui/action-toolbar";
 import type {
@@ -62,159 +62,187 @@ TabsLabel.displayName = "TabsLabel";
 
 export interface CompositeWidgetProps {
   setup: CompositeSetup;
+  actions?: ActionToolbarAction[];
+  rightActions?: ActionToolbarAction[];
+  unsavedChanges?: boolean;
+  onSave?: () => void | Promise<void>;
 }
 
-const CompositeWidget = observer(({ setup }: CompositeWidgetProps) => {
-  const [activeKey, setActiveKey] = useState<string>();
-  const [composite] = useState(() => new CompositeStore({ setup }));
-  const [redirecting, setRedirecting] = useState(false);
+const CompositeWidget = observer(
+  ({
+    setup,
+    actions: actionsProp,
+    rightActions,
+    unsavedChanges,
+    onSave,
+  }: CompositeWidgetProps) => {
+    const [activeKey, setActiveKey] = useState<string>();
+    const [composite] = useState(() => new CompositeStore({ setup }));
+    const [redirecting, setRedirecting] = useState(false);
+    const initRef = useRef(false);
 
-  const { operation } = setup;
-  const { members, dirty } = composite;
-  const { disable: disableUnsavedChanges } = useUnsavedChanges({ dirty });
-
-  const items = useMemo<TabItem[]>(() => {
-    if (!members) return [];
-    return members
-      .map(({ store, key, widget: Widget }) => {
-        const tab: TabItem = {
-          key,
-          order: Widget.order,
-          label: (
-            <TabsLabel
-              composite={composite}
-              member={store}
-              title={Widget.title!}
-            />
-          ),
-          children: <Widget store={store} />,
-        };
-        return tab;
-      })
-      .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
-  }, [composite, members]);
-
-  useEffect(() => {
-    const selected = members?.find((member) => {
-      const activateOn: ActiveOnOptions = member.widget.activateOn || {};
-      if (activateOn[operation]) {
-        return true;
-      }
+    const { operation } = setup;
+    const { members, dirty } = composite;
+    const { disable: disableUnsavedChanges } = useUnsavedChanges({
+      dirty,
+      initiallyEnabled: unsavedChanges,
     });
-    if (selected) {
-      setActiveKey(selected.key);
-    }
-  }, [members, operation]);
 
-  useEffect(() => {
-    composite.init().catch();
-  }, [composite]);
+    const items = useMemo<TabItem[]>(() => {
+      if (!members) return [];
+      return members
+        .map(({ store, key, widget: Widget }) => {
+          const tab: TabItem = {
+            key,
+            order: Widget.order,
+            label: (
+              <TabsLabel
+                composite={composite}
+                member={store}
+                title={Widget.title!}
+              />
+            ),
+            children: <Widget store={store} />,
+          };
+          return tab;
+        })
+        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    }, [composite, members]);
 
-  const submit = useCallback(
-    async (edit: boolean = false) => {
-      setRedirecting(true);
+    useEffect(() => {
+      const selected = members?.find((member) => {
+        const activateOn: ActiveOnOptions = member.widget.activateOn || {};
+        if (activateOn[operation]) {
+          return true;
+        }
+      });
+      if (selected) {
+        setActiveKey(selected.key);
+      }
+    }, [members, operation]);
 
-      let id;
-      try {
-        ({ id } = await composite.submit());
-      } catch (err) {
-        setRedirecting(false);
-        errorModal(err);
+    useEffect(() => {
+      if (initRef.current) {
         return;
       }
 
-      disableUnsavedChanges();
-      const routeName = edit ? "resource.update" : "resource.show";
-      window.location.href = route(routeName, { id }).url();
-    },
-    [composite, disableUnsavedChanges]
-  );
+      initRef.current = true;
+      composite.init().catch();
+    }, [composite]);
 
-  const inProgress = composite.loading || composite.saving || redirecting;
+    const submit = useCallback(
+      async (edit: boolean = false) => {
+        setRedirecting(true);
 
-  const toolbarProps: Partial<ActionToolbarProps> = useMemo(() => {
-    const actions: ActionToolbarAction[] = [];
+        let id;
+        try {
+          ({ id } = await composite.submit());
+        } catch (err) {
+          setRedirecting(false);
+          errorModal(err);
+          return;
+        }
 
-    if (operation === "create") {
-      actions.push(
-        <Space.Compact key="create">
-          <Button
-            type="primary"
+        disableUnsavedChanges();
+        const routeName = edit ? "resource.update" : "resource.show";
+        if (onSave) {
+          onSave();
+        } else {
+          window.location.href = route(routeName, { id }).url();
+        }
+      },
+      [composite, disableUnsavedChanges, onSave]
+    );
+
+    const inProgress = composite.loading || composite.saving || redirecting;
+
+    const toolbarProps: Partial<ActionToolbarProps> = useMemo(() => {
+      const actions: ActionToolbarAction[] = [];
+
+      if (operation === "create") {
+        actions.push(
+          <Space.Compact key="create">
+            <Button
+              type="primary"
+              disabled={inProgress}
+              onClick={() => submit(false)}
+            >
+              {msgCreate}
+            </Button>
+
+            <Dropdown
+              menu={{
+                items: [
+                  {
+                    key: "create_edit",
+                    label: msgCreateEdit,
+                    icon: <EditIcon />,
+                    onClick: () => submit(true),
+                  },
+                ],
+              }}
+              disabled={inProgress}
+            >
+              <Button type="primary" icon={<EllipsisOutlined />} />
+            </Dropdown>
+          </Space.Compact>
+        );
+      } else if (operation === "update") {
+        actions.push(
+          <SaveButton
+            key="save"
             disabled={inProgress}
             onClick={() => submit(false)}
           >
-            {msgCreate}
-          </Button>
+            {msgSave}
+          </SaveButton>
+        );
+      }
+      if (actionsProp) {
+        actions.push(...actionsProp);
+      }
+      return { actions, rightActions };
+    }, [actionsProp, inProgress, operation, rightActions, submit]);
 
-          <Dropdown
-            menu={{
-              items: [
-                {
-                  key: "create_edit",
-                  label: msgCreateEdit,
-                  icon: <EditIcon />,
-                  onClick: () => submit(true),
-                },
-              ],
-            }}
-            disabled={inProgress}
-          >
-            <Button type="primary" icon={<EllipsisOutlined />} />
-          </Dropdown>
-        </Space.Compact>
-      );
-    } else if (operation === "update") {
-      actions.push(
-        <SaveButton
-          key="save"
-          disabled={inProgress}
-          onClick={() => submit(false)}
-        >
-          {msgSave}
-        </SaveButton>
-      );
+    const { token } = theme.useToken();
+
+    if (composite.error) {
+      return <ErrorModal error={composite.error}></ErrorModal>;
     }
-    return { actions };
-  }, [inProgress, operation, submit]);
 
-  const { token } = theme.useToken();
+    return (
+      <div className="ngw-resource-composite">
+        <Spin
+          size="large"
+          styles={{
+            root: {
+              display: inProgress ? undefined : "none",
+              flexGrow: 1,
+              justifyContent: "center",
+              border: `1px solid ${token.colorBorderSecondary}`,
+              borderRadius: token.borderRadius,
+            },
+            // Fix gap between indicator and description, it doesn't
+            // respect component size for some reason.
+            section: { gap: token.paddingLG },
+          }}
+          description={composite.saving || redirecting ? msgSaving : ""}
+        />
+        <Tabs
+          style={{ display: inProgress ? "none" : undefined }}
+          size="large"
+          type="card"
+          activeKey={activeKey}
+          onChange={setActiveKey}
+          items={items}
+          parentHeight
+        />
 
-  if (composite.error) {
-    return <ErrorModal error={composite.error}></ErrorModal>;
+        <ActionToolbar {...toolbarProps} />
+      </div>
+    );
   }
-
-  return (
-    <div className="ngw-resource-composite">
-      <Spin
-        size="large"
-        styles={{
-          root: {
-            display: inProgress ? undefined : "none",
-            flexGrow: 1,
-            justifyContent: "center",
-            border: `1px solid ${token.colorBorderSecondary}`,
-            borderRadius: token.borderRadius,
-          },
-          // Fix gap between indicator and description, it doesn't
-          // respect component size for some reason.
-          section: { gap: token.paddingLG },
-        }}
-        description={composite.saving || redirecting ? msgSaving : ""}
-      />
-      <Tabs
-        style={{ display: inProgress ? "none" : undefined }}
-        size="large"
-        type="card"
-        activeKey={activeKey}
-        onChange={setActiveKey}
-        items={items}
-        parentHeight
-      />
-
-      <ActionToolbar {...toolbarProps} />
-    </div>
-  );
-});
+);
 
 CompositeWidget.displayName = "CompositeWidget";
 

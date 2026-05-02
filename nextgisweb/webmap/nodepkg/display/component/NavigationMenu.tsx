@@ -2,6 +2,8 @@ import classNames from "classnames";
 import { observer } from "mobx-react-lite";
 import { useCallback } from "react";
 
+import { useShowModal } from "@nextgisweb/gui/index";
+
 import type { PanelManager } from "../../panel/PanelManager";
 import type { PanelPlugin } from "../../panel/registry";
 
@@ -14,6 +16,7 @@ export interface NavigationMenuProps {
 
 export const NavigationMenu = observer<NavigationMenuProps>(
   ({ store, orientation = "vertical" }) => {
+    const { showModal, modalHolder } = useShowModal();
     const onClickItem = useCallback(
       async (item: PanelPlugin) => {
         switch (item.type) {
@@ -36,6 +39,7 @@ export const NavigationMenu = observer<NavigationMenuProps>(
           case "action":
             await item.action({
               display: store.display,
+              showModal,
             });
             break;
         }
@@ -63,15 +67,18 @@ export const NavigationMenu = observer<NavigationMenuProps>(
     );
 
     return (
-      <div
-        className={classNames(
-          "ngw-webmap-display-navigation-menu",
-          orientation
-        )}
-      >
-        <div className="group start">{startItems.map(renderItem)}</div>
-        <div className="group end">{endItems.map(renderItem)}</div>
-      </div>
+      <>
+        {modalHolder}
+        <div
+          className={classNames(
+            "ngw-webmap-display-navigation-menu",
+            orientation
+          )}
+        >
+          <div className="group start">{startItems.map(renderItem)}</div>
+          <div className="group end">{endItems.map(renderItem)}</div>
+        </div>
+      </>
     );
   }
 );

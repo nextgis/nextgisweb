@@ -24,11 +24,15 @@ export function useUnsavedChanges({
   }, []);
 
   useEffect(() => {
+    if (!enabled) {
+      return;
+    }
+
     window.addEventListener("beforeunload", alertUnsaved);
     return () => {
       window.removeEventListener("beforeunload", alertUnsaved);
     };
-  }, [alertUnsaved]);
+  }, [enabled, alertUnsaved]);
 
   const enable = useCallback(() => {
     if (!stateRef.current.enabled) {

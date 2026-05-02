@@ -69,7 +69,6 @@ export class SettingStore implements EditorStore<
       ...value
     } = val;
 
-    this.initialValue = value;
     this.editable = value.editable;
     this.annotationEnabled = value.annotation_enabled;
     this.annotationDefault = value.annotation_default;
@@ -79,7 +78,8 @@ export class SettingStore implements EditorStore<
     this.constrainingExtent = extractExtentFromArray(value.constraining_extent);
     this.title = value.title;
     this.bookmarkResource = value.bookmark_resource;
-    this.options = value.options;
+    this.options = { ...value.options };
+    this.initialValue = this.deserializedValue;
   }
 
   @computed
@@ -124,11 +124,13 @@ export class SettingStore implements EditorStore<
 
   @action
   setOption(identity: string, value: boolean | undefined) {
+    const options = { ...this.options };
     if (value === undefined) {
-      delete this.options[identity];
+      delete options[identity];
     } else {
-      this.options[identity] = value;
+      options[identity] = value;
     }
+    this.options = options;
   }
 
   @action

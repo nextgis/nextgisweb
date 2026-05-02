@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import type { ComponentType } from "react";
 
-import { Modal } from "@nextgisweb/gui/antd";
+import { EditorModal } from "@nextgisweb/gui/editor-modal/EditorModal";
 import type { ShowModalOptions } from "@nextgisweb/gui/showModal";
 
 import type { FilterExpressionString } from "./type";
@@ -57,14 +57,10 @@ export function FeatureFilterModalBase<P extends ControlledFilterEditorProps>({
   }, [filter, handleClose, onApply]);
 
   return (
-    <Modal
-      className="ngw-feature-filter-modal"
-      width=""
+    <EditorModal
       open={open}
       onCancel={handleClose}
-      centered
-      destroyOnHidden
-      footer={null}
+      modalClassName="ngw-feature-filter-modal"
       {...modalProps}
     >
       <EditorComponent
@@ -74,6 +70,6 @@ export function FeatureFilterModalBase<P extends ControlledFilterEditorProps>({
         onApply={handleApply}
         onCancel={handleClose}
       />
-    </Modal>
+    </EditorModal>
   );
 }
