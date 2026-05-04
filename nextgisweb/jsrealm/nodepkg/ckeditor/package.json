@@ -3,6 +3,6 @@
   "version": "0.0.0",
   "type": "module",
   "dependencies": {
-    "ckeditor5": "42.0.2"
+    "ckeditor5": "48.0.1"
   }
 }

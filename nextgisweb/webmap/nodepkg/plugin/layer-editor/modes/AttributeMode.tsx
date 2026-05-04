@@ -1,7 +1,7 @@
 import { click, pointerMove } from "ol/events/condition";
 import { Select } from "ol/interaction";
 import type { SelectEvent } from "ol/interaction/Select";
-import { useCallback, useState } from "react";
+import { lazy, useCallback, useState } from "react";
 
 import type { FeatureItem } from "@nextgisweb/feature-layer/type";
 import { useShowModal } from "@nextgisweb/gui";
@@ -16,12 +16,16 @@ import type { LayerEditorMode } from "../type";
 
 import ListIcon from "@nextgisweb/icon/material/list/outline";
 
+const FeatureEditorModalLazy = lazy(
+  () => import("@nextgisweb/feature-layer/feature-editor-modal")
+);
+
 export const AttributeMode: LayerEditorMode<{ resourceId: number }> = ({
   order,
   resourceId,
 }) => {
   const { layer, addUndo, selectStyle } = useEditorContext();
-  const { modalHolder, lazyModal } = useShowModal();
+  const { modalHolder, showModal } = useShowModal();
   const { makeSignal } = useAbortController();
   const [active, setActive] = useState(false);
 
@@ -59,28 +63,25 @@ export const AttributeMode: LayerEditorMode<{ resourceId: number }> = ({
         }
         let hasChanges = false;
         await new Promise((resolve) => {
-          lazyModal(
-            () => import("@nextgisweb/feature-layer/feature-editor-modal"),
-            {
-              editorOptions: {
-                mode: "return",
-                showGeometryTab: false,
-                resourceId,
-                featureItem: prevItem,
-                onOk: (item) => {
-                  if (Object.values(item).filter(Boolean)) {
-                    feature.set("attribution", {
-                      ...prevItem,
-                      ...item,
-                    });
-                    hasChanges = true;
-                  }
-                  resolve(undefined);
-                },
+          showModal(FeatureEditorModalLazy, {
+            editorOptions: {
+              mode: "return",
+              showGeometryTab: false,
+              resourceId,
+              featureItem: prevItem,
+              onOk: (item) => {
+                if (Object.values(item).filter(Boolean)) {
+                  feature.set("attribution", {
+                    ...prevItem,
+                    ...item,
+                  });
+                  hasChanges = true;
+                }
+                resolve(undefined);
               },
-              onCancel: resolve,
-            }
-          );
+            },
+            onCancel: resolve,
+          });
         });
         if (hasChanges) {
           return () => {
@@ -89,7 +90,7 @@ export const AttributeMode: LayerEditorMode<{ resourceId: number }> = ({
         }
       }
     },
-    [lazyModal, makeSignal, resourceId]
+    [showModal, makeSignal, resourceId]
   );
 
   const createSelect = useCallback(() => {

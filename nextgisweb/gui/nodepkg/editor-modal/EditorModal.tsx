@@ -28,6 +28,10 @@ export function EditorModal({
       centered={centered}
       destroyOnHidden={destroyOnHidden}
       footer={footer}
+      focusable={{
+        trap: false,
+        focusTriggerAfterClose: false,
+      }}
       {...props}
     >
       {children}
