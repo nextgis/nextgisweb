@@ -61,6 +61,8 @@ def test_wkt_wkb(wkt, ngw_txn):
         (dict(wkt="POINT Z (1 2 3)"), True),
         (dict(wkt="GEOMETRYCOLLECTION EMPTY"), True),
         (dict(wkt="POLYGON ((0 0, 0 1, 1 1, 1 0, 0 0))"), True),
+        # Missing comma between coordinates - OGR silently misparsed, PostGIS/GEOS rejects
+        (dict(wkt="POLYGON ((0 0, 4 0, 4 4 0 4, 0 0))"), False),
         # POINT(0 0) WKB and EWKT
         (dict(wkb="010100000000000000000000000000000000000000"), True),
         (dict(wkb="010100002000000000000000000000000000000000"), False),

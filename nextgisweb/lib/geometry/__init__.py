@@ -41,8 +41,18 @@ class Geometry:
         self._srid = srid
 
         if validate and (wkb is not None or wkt is not None):
-            # Force WKB/WKT validation through conversion to OGR
-            ogr = self.ogr
+            if wkb is not None and len(wkb) >= 5:
+                # Reject EWKB (embedded SRID flag 0x20000000) — use srid= instead
+                bo = wkb[0]
+                (wkb_type,) = unpack("<i" if bo == 1 else ">i", wkb[1:5])
+                if wkb_type & 0x20000000:
+                    raise GeometryNotValid("EWKB with embedded SRID is not accepted")
+            # Validate through Shapely/GEOS to catch structural errors that OGR
+            # silently accepts but PostGIS would reject.
+            try:
+                _ = self.shape
+            except Exception as e:
+                raise GeometryNotValid from e
 
     @property
     def srid(self):
