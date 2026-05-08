@@ -8,12 +8,14 @@ const {
   baseUrl,
   name: nameRaw,
   serverType,
+  sync: syncRaw,
   isDefault: isDefaultRaw,
   userBind: userBindRaw,
   groupMapping: groupMappingRaw,
 } = settings.oauth;
 
 const name = nameRaw || "OAuth";
+const sync = syncRaw || false;
 const isDefault = isDefaultRaw || false;
 const groupMapping = groupMappingRaw || false;
 const userBind = userBindRaw || false;
@@ -39,6 +41,7 @@ export function makeTeamManageButton(props?: ButtonProps) {
 export default {
   enabled,
   name,
+  sync,
   serverType,
   isNGID,
   isDefault,

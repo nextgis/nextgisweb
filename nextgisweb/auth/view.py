@@ -413,6 +413,7 @@ class AuthOAuthClientSetting(Struct, kw_only=True, rename="camel"):
     base_url: str | None
     name: str | None
     server_type: str | None
+    sync: bool | None
     is_default: bool | None
     user_bind: bool | None
     group_mapping: bool | None
@@ -426,6 +427,7 @@ def cs_oauth(comp: AuthComponent, request) -> AuthOAuthClientSetting:
             base_url=None,
             name=None,
             server_type=None,
+            sync=None,
             is_default=None,
             user_bind=None,
             group_mapping=None,
@@ -437,6 +439,7 @@ def cs_oauth(comp: AuthComponent, request) -> AuthOAuthClientSetting:
         base_url=opts["server.base_url"] if ("server.base_url" in opts) else None,
         name=opts["server.display_name"],
         server_type=opts["server.type"],
+        sync=bool(opts["server.sync"]),
         is_default=bool(opts["default"]),
         user_bind=bool(opts["bind"]),
         group_mapping=bool(opts["profile.member_of.attr"] is not None),

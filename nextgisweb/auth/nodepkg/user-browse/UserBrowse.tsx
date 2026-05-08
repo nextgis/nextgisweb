@@ -134,7 +134,7 @@ export function UserBrowse({ readonly }: UserBrowseProps) {
         headerControls={(tmBtn && [() => tmBtn]) || []}
         selectedControls={[EnableSelectedUsers, DisableSelectedUsers]}
       />
-      {oauth.isNGID && (
+      {oauth.isNGID && !oauth.sync && (
         <Alert type="info" style={{ marginTop: "1ex" }} title={msgSyncNote} />
       )}
     </div>
