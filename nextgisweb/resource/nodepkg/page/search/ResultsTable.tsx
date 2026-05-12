@@ -228,7 +228,6 @@ export const ResultsTable = observer(function ResultsTable({
         pagination={false}
         showSorterTooltip={false}
         scroll={{
-          x: "max-content",
           y: scrollY,
           scrollToFirstRowOnChange: true,
         }}
