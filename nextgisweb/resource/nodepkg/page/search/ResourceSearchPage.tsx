@@ -9,12 +9,11 @@ import { PageTitle } from "@nextgisweb/pyramid/layout";
 import { FilterBar } from "./FilterBar";
 import { KeynameFilter } from "./KeynameFilter";
 import { MetadataFilter } from "./MetadataFilter";
+import "./ResourceSearchPage.less";
 import { ResourceSearchStore } from "./ResourceSearchStore";
 import { ResultsTable } from "./ResultsTable";
 
 import SettingsIcon from "@nextgisweb/icon/material/tune";
-
-import "./ResourceSearchPage.less";
 
 const msgSearch = gettext("Search");
 const msgPlaceholder = gettext("Filter by display name");
