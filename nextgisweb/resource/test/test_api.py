@@ -136,13 +136,9 @@ def test_resource_search_order_and_invalid_order(ngw_webtest_app: WebTestApp):
     created_desc = api.get(
         query={"display_name__ilike": "%", "limit": 5, "order": "-created"}
     ).json
-    updated_desc = api.get(
-        query={"display_name__ilike": "%", "limit": 5, "order": "-updated"}
-    ).json
     owner_asc = api.get(query={"display_name__ilike": "%", "limit": 5, "order": "owner"}).json
 
     assert created_desc["order"][0] == "-created"
-    assert updated_desc["order"][0] == "-updated"
     assert owner_asc["order"][0] == "owner"
 
     invalid = api.get(query={"order": "badfield"}, status=422).json

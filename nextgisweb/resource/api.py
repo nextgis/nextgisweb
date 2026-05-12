@@ -836,8 +836,6 @@ def _search_order(order: list[str]):
         "type": Resource.cls,
         "owner": User.display_name,
         "created": Resource.creation_date,
-        # Resource has no modification timestamp yet.
-        "updated": Resource.creation_date,
     }
 
     normalized: list[str] = []
@@ -908,7 +906,7 @@ def search(
     order: Annotated[
         list[str],
         Meta(
-            description="Ordering tokens. Supported fields: name, type, owner, created, updated. "
+            description="Ordering tokens. Supported fields: name, type, owner, created. "
             "Use '-' prefix for descending order, e.g. '-created'."
         ),
     ] = [],

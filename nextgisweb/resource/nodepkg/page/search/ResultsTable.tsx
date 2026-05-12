@@ -16,7 +16,7 @@ import type { ResourceSearchStore } from "./ResourceSearchStore";
 const msgName = gettext("Display name");
 const msgType = gettext("Type");
 const msgOwner = gettext("Owner");
-const msgUpdated = gettext("Updated");
+const msgCreated = gettext("Created");
 const msgLoadingMore = gettext("Loading more results...");
 
 const MIN_RESULTS_HEIGHT = 500;
@@ -39,7 +39,7 @@ interface Row {
   display_name: string;
   cls: ResourceCls;
   owner: string;
-  updated: string | null;
+  creationDate: string | null;
   source: CompositeRead;
 }
 
@@ -120,7 +120,7 @@ export const ResultsTable = observer(function ResultsTable({
         display_name: r.display_name,
         cls: r.cls,
         owner: ownerName,
-        updated: r.creation_date ?? null,
+        creationDate: r.creation_date ?? null,
         source: item,
       };
     });
@@ -183,11 +183,11 @@ export const ResultsTable = observer(function ResultsTable({
       sortOrder: sortedInfo?.columnKey === "owner" ? sortedInfo.order : null,
     },
     {
-      title: msgUpdated,
-      key: "updated",
-      dataIndex: "updated",
+      title: msgCreated,
+      key: "created",
+      dataIndex: "creationDate",
       sorter: true,
-      sortOrder: sortedInfo?.columnKey === "updated" ? sortedInfo.order : null,
+      sortOrder: sortedInfo?.columnKey === "created" ? sortedInfo.order : null,
       render: (v: string | null) => (v ? utc(v).local().format("L LTS") : ""),
     },
   ];

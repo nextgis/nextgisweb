@@ -7,7 +7,7 @@ export interface MetaFilterEntry {
   value: string;
 }
 
-export type SortField = "name" | "type" | "owner" | "updated";
+export type SortField = "name" | "type" | "owner" | "created";
 
 export interface SearchSnapshot {
   q: string;
