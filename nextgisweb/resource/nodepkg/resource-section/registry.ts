@@ -1,6 +1,5 @@
 /** @registry */
 
-import type React from "react";
 import type { FC, LazyExoticComponent } from "react";
 
 import type { useShowModal } from "@nextgisweb/gui";
@@ -54,14 +53,14 @@ export interface ResourceAction<
   icon?: React.ReactNode;
   props?: P;
   label?: string;
+  quick?: { order?: number } | boolean;
   target?: "_self" | "_blank";
   widget?: ResourceActionWidget<P>;
   attributes?: [...A];
   icon_suffix?: React.ReactNode;
   hideOnMobile?: boolean;
-  quick?: { order?: number } | boolean;
-  run?: (opt: RunOptions<A>) => void;
   condition?: (opt: CustomResourceAttrItem<A>) => boolean;
+  run?: (opt: RunOptions<A>) => void;
 }
 
 export const registry = pluginRegistry<ResourceAction>(MODULE_NAME);

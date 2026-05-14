@@ -11,7 +11,7 @@
 <%
     dynmenu_resource_id = None
 
-    if obj is not UNDEFINED and isinstance(obj, Resource):
+    if dynmenu is UNDEFINED and obj is not UNDEFINED and isinstance(obj, Resource):
         dynmenu_resource_id = obj.id
 
     base_props = dict(
