@@ -104,6 +104,7 @@ export function ResourceSelect<V extends number = number>({
           allowClear={!readOnly && allowClear}
           style={{
             flexGrow: 1,
+            minWidth: 0,
             cursor: readOnly ? "unset" : undefined,
             ...(style || {}),
           }}

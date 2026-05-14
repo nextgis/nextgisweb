@@ -48,8 +48,9 @@ export function Area({
   style,
   children,
 }: AreaProps) {
-  if (typeof cols === "number")
-    cols = new Array(cols).fill("minmax(4em, auto)");
+  if (typeof cols === "number") {
+    cols = new Array(cols).fill("minmax(0, 1fr)");
+  }
 
   const gridColumns: string[] = [];
   if (labelPosition === "left") {
