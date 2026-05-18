@@ -4,7 +4,12 @@ import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
 import { gettext, gettextf } from "@nextgisweb/pyramid/i18n";
 
 import { OPERATORS, ValidOperators } from "../type";
-import type { ConditionExpr, FilterExpression, Operator } from "../type";
+import type {
+  ConditionExpr,
+  FilterExpression,
+  GroupExpr,
+  Operator,
+} from "../type";
 
 import { expressionToFieldRef, resolveFieldRef } from "./field-ref";
 
@@ -38,6 +43,15 @@ export function isConditionExpression(
   }
   const operator = expression[0] as Operator;
   return ValidOperators.includes(operator);
+}
+
+export function isGroupExpression(
+  expression: unknown
+): expression is GroupExpr {
+  return (
+    Array.isArray(expression) &&
+    (expression[0] === "all" || expression[0] === "any")
+  );
 }
 
 function resolveFieldInfo(

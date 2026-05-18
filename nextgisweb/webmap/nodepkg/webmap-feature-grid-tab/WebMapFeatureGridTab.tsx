@@ -1,3 +1,4 @@
+import { runInAction } from "mobx";
 import { observer } from "mobx-react-lite";
 import Feature from "ol/Feature";
 import WKT from "ol/format/WKT";
@@ -11,6 +12,7 @@ import type { NgwExtent } from "@nextgisweb/feature-layer/type/api";
 import { message } from "@nextgisweb/gui/antd";
 import type { NoticeType } from "@nextgisweb/gui/antd";
 import { route } from "@nextgisweb/pyramid/api/route";
+import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import FilterExtentBtn from "@nextgisweb/webmap/filter-extent-btn";
 import ZoomToFilteredBtn from "@nextgisweb/webmap/zoom-to-filtered-btn";
@@ -33,7 +35,7 @@ interface WebMapFeatureGridTabProps {
 
 export const WebMapFeatureGridTab = observer(
   ({ topic, plugin, item }: WebMapFeatureGridTabProps) => {
-    const { layerId, filter } = item;
+    const { layerId, filter, changeStamp } = item;
     const filterRef = useRef(filter);
     const topicHandlers = useRef<ReturnType<typeof topic.subscribe>[]>([]);
     const { display } = useDisplayContext();
@@ -45,6 +47,7 @@ export const WebMapFeatureGridTab = observer(
     );
 
     const [messageApi, contextHolder] = message.useMessage();
+    const { makeSignal } = useAbortController();
 
     const reloadLayer = useCallback(() => {
       // It is possible to have few webmap layers for one resource id
@@ -189,12 +192,27 @@ export const WebMapFeatureGridTab = observer(
       return store;
     }, [display, layerId, messageApi, plugin.identity, reloadLayer]);
 
+    const storeRef = useRef(store);
+
+    useEffect(() => {
+      storeRef.current = store;
+    }, [store]);
+
     useEffect(() => {
       if (store) {
         store.setGlobalFilterExpression(filter ?? undefined);
       }
       filterRef.current = filter;
     }, [store, filter]);
+
+    useEffect(() => {
+      runInAction(() => {
+        if (storeRef.current) {
+          storeRef.current.loadFields({ signal: makeSignal() });
+          storeRef.current.bumpVersion();
+        }
+      });
+    }, [changeStamp, makeSignal]);
 
     useEffect(() => {
       if (!store) return;
