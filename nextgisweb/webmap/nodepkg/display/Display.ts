@@ -165,6 +165,12 @@ export class Display {
       }
     );
     reaction(
+      () => this.config.drawOrderEnabled,
+      (val) => {
+        this.treeStore.setDrawOrderEnabled(val);
+      }
+    );
+    reaction(
       () => this.config.pluginKeys,
       (pluginKeys) => {
         this.installPlugins(pluginKeys);

@@ -241,7 +241,7 @@ export const LayersTree = observer(
         onSelect={onSelect}
         selectedKeys={selectedKeys}
         allowDrop={allowDrop}
-        draggable={draggable && { icon: false }}
+        draggable={draggable && !store.drawOrderEnabled && { icon: false }}
         onDrop={onDrop}
         blockNode
       />
