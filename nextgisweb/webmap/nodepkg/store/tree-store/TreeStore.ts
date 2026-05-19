@@ -489,6 +489,11 @@ export class TreeStore {
     });
   }
 
+  @action.bound
+  setDrawOrderEnabled(enabled: boolean) {
+    this.drawOrderEnabled = enabled;
+  }
+
   shouldHaveLegendInfo = (item: TreeLayerStore) => {
     return (
       !this._loadingResourceSymbols.has(item.styleId) &&
@@ -555,6 +560,8 @@ export class TreeStore {
   @action.bound
   recomputeDrawOrderPositions() {
     const layers: TreeLayerStore[] = [];
+
+    if (this.drawOrderEnabled) return;
 
     this._collectLayersInTreeOrder(this, layers);
 
