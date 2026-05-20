@@ -200,9 +200,10 @@ class ExportParams(Struct, kw_only=True):
         if self.display_name is not UNSET:
             opts.use_display_name = self.display_name
 
-        if (encoding := self.encoding) is UNSET:
-            encoding = "UTF-8"
-        opts.lco.append(f"ENCODING={encoding}")
+        if encoding_lco := driver.encoding_lco:
+            if (encoding := self.encoding) is UNSET:
+                encoding = "UTF-8"
+            opts.lco.append(f"{encoding_lco}={encoding}")
 
         if self.intersects is not UNSET:
             try:

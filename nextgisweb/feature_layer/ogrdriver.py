@@ -15,9 +15,6 @@ def test_driver_capability(name, capability):
     return (driver is not None) and driver.TestCapability(capability)
 
 
-EXPORT_FORMAT_OGR = dict()
-
-
 class OGRDriver(Struct):
     name: str
     display_name: str
@@ -26,10 +23,14 @@ class OGRDriver(Struct):
     mime: str = "application/octet-stream"
     single_file: bool = True
     fid_support: bool = False
+    encoding_lco: str | None = None
     lco_configurable: list[str] | None = None
     dsco_configurable: list[str] | None = None
     get_layer_name: Callable[[str], str] = lambda x: x
     geometry_types: tuple[str, ...] | None = None
+
+
+EXPORT_FORMAT_OGR = dict[str, OGRDriver]()
 
 
 def layer_name_gpkg(name):
@@ -62,6 +63,7 @@ EXPORT_FORMAT_OGR["ESRI Shapefile"] = OGRDriver(
     "ESRI Shapefile (*.shp)",
     "shp",
     single_file=False,
+    encoding_lco="ENCODING",
 )
 
 EXPORT_FORMAT_OGR["CSV"] = OGRDriver(
@@ -99,6 +101,7 @@ EXPORT_FORMAT_OGR["MapInfo File (TAB)"] = OGRDriver(
     "MapInfo TAB (*.tab)",
     "tab",
     single_file=False,
+    encoding_lco="ENCODING",
 )
 
 EXPORT_FORMAT_OGR["MapInfo File (MIF/MID)"] = OGRDriver(
@@ -106,6 +109,7 @@ EXPORT_FORMAT_OGR["MapInfo File (MIF/MID)"] = OGRDriver(
     "MapInfo MIF/MID (*.mif/*.mid)",
     "mif",
     single_file=False,
+    encoding_lco="ENCODING",
 )
 
 EXPORT_FORMAT_OGR["KML"] = OGRDriver(
@@ -144,13 +148,13 @@ EXPORT_FORMAT_OGR["GPX"] = OGRDriver(
 OGR_DRIVER_NAME_2_EXPORT_FORMATS = [
     {
         "name": format_id,
-        "display_name": format.display_name,
-        "single_file": format.single_file,
-        "lco_configurable": format.lco_configurable,
-        "dsco_configurable": format.dsco_configurable,
+        "display_name": driver.display_name,
+        "single_file": driver.single_file,
+        "lco_configurable": driver.lco_configurable,
+        "dsco_configurable": driver.dsco_configurable,
     }
-    for format_id, format in EXPORT_FORMAT_OGR.items()
-    if test_driver_capability(format.name, ogr.ODrCCreateDataSource)
+    for format_id, driver in EXPORT_FORMAT_OGR.items()
+    if test_driver_capability(driver.name, ogr.ODrCCreateDataSource)
 ]
 
 MVT_DRIVER_NAME = "MVT"
