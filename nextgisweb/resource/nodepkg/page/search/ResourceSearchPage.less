@@ -1,0 +1,160 @@
+.content:has(> .ngw-resource-search-page) {
+  > .ngw-pyramid-layout-title {
+    margin-right: auto;
+    margin-left: auto;
+    width: 100%;
+    min-width: 320px;
+    max-width: 1000px;
+  }
+}
+
+.ngw-resource-search-page {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0 auto;
+  padding: 0;
+  width: 100%;
+  min-width: 320px;
+  max-width: 1000px;
+
+  & > * {
+    min-width: 0;
+  }
+
+  .ngw-resource-search-filter-bar {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+
+    .ant-select {
+      min-width: 0;
+    }
+
+    .root {
+      display: flex;
+      flex: 1 1 240px;
+      flex-direction: row;
+      align-items: center;
+      gap: 4px;
+      min-width: 0;
+
+      > * {
+        flex: 1 1 auto;
+        min-width: 0;
+      }
+
+      .ant-select,
+      .ant-select-selector,
+      .ant-space-compact {
+        flex: 1 1 auto;
+        min-width: 0;
+      }
+    }
+  }
+
+  .settings {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    border: 1px solid var(--ant-color-border-secondary, #f0f0f0);
+    border-radius: 6px;
+    padding: 12px;
+  }
+
+  .search-row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+
+    & > .ant-input,
+    & > .ant-input-affix-wrapper {
+      flex: 1 1 0;
+      min-width: 0;
+    }
+
+    & > .ant-btn {
+      flex: 0 0 auto;
+    }
+  }
+
+  .ngw-resource-search-name-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    .title {
+      font-weight: 500;
+    }
+
+    .path {
+      color: var(--text-secondary, #888);
+      font-size: 0.85em;
+    }
+  }
+
+  .ngw-resource-search-results-table {
+    width: 100%;
+    min-width: 0;
+    min-height: 500px;
+    overflow: hidden;
+
+    .ngw-resource-search-results-loading-more {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 0;
+      color: var(--text-secondary, #888);
+    }
+
+    .ant-table-container {
+      border-radius: 6px;
+    }
+
+    .ant-table-wrapper,
+    .ant-spin-nested-loading,
+    .ant-spin-container,
+    .ant-table,
+    .ant-table-container {
+      min-width: 0;
+    }
+
+    .ant-table-body {
+      overscroll-behavior: contain;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .ngw-resource-search-filter-bar {
+      .ant-select,
+      .root {
+        flex-basis: 100%;
+        width: 100%;
+      }
+    }
+  }
+
+  @media (max-width: 640px) {
+    .search-row {
+      & > .ant-input,
+      & > .ant-input-affix-wrapper,
+      & > .ant-btn {
+        width: 100%;
+      }
+
+      & > .ant-btn {
+        justify-content: center;
+      }
+    }
+
+    .ngw-resource-search-name-cell {
+      .path {
+        overflow-wrap: anywhere;
+      }
+    }
+  }
+}

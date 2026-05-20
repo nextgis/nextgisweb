@@ -1,0 +1,34 @@
+.ngw-resource-search-metadata-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .label {
+      font-weight: 500;
+    }
+  }
+
+  .entries {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .entry {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+
+    & > .ant-input,
+    & > .ant-input-affix-wrapper {
+      flex: 1 1 0;
+      min-width: 0;
+    }
+  }
+}

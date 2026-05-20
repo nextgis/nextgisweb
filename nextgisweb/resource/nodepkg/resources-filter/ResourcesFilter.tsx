@@ -1,13 +1,15 @@
 import { debounce } from "lodash-es";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { AutoComplete, Input } from "@nextgisweb/gui/antd";
+import { AutoComplete, Button, Input, Tooltip } from "@nextgisweb/gui/antd";
 import { AutoCompleteHoneypot } from "@nextgisweb/gui/component";
 import type { ParamsOf } from "@nextgisweb/gui/type";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { CompositeRead, ResourceCls } from "@nextgisweb/resource/type/api";
+
+import SettingsIcon from "@nextgisweb/icon/material/tune";
 
 import "./ResourcesFilter.less";
 
@@ -89,7 +91,7 @@ export function ResourcesFilter({
           query: q,
           signal: makeSignal(),
         });
-        const options = resourcesToOptions(resources);
+        const options = resourcesToOptions(resources as CompositeRead[]);
         setOptions(options);
         setAcSatus("");
       } catch {
@@ -114,6 +116,12 @@ export function ResourcesFilter({
     }
   };
 
+  const openAdvanced = () => {
+    const base = routeURL("resource.search.page");
+    const url = search ? `${base}?q=${encodeURIComponent(search)}` : base;
+    window.location.href = url;
+  };
+
   return (
     <>
       <AutoCompleteHoneypot />
@@ -131,10 +139,27 @@ export function ResourcesFilter({
         showSearch={{ onSearch: setSearch }}
         {...rest}
       >
-        <Input.Search
+        <Input
           size="middle"
           placeholder={gettext("Search resources")}
-          loading={loading}
+          suffix={
+            <Tooltip title={gettext("Advanced search")}>
+              <Button
+                type="text"
+                size="small"
+                icon={<SettingsIcon />}
+                loading={loading}
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  openAdvanced();
+                }}
+              />
+            </Tooltip>
+          }
         />
       </AutoComplete>
     </>

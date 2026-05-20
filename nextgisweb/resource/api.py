@@ -798,6 +798,88 @@ class SearchResmetaParams(Struct, kw_only=True):
                 yield _cond(k, c(RMI.vtext, v))
 
 
+class SearchBreadcrumbNode(Struct, kw_only=True):
+    id: ResourceID
+    display_name: str
+
+
+class SearchResponse(Struct, kw_only=True):
+    items: list[CompositeRead]
+    total_count: Annotated[int, Meta(ge=0, description="Total number of accessible resources")]
+    limit: Annotated[
+        int | None,
+        Meta(description="Maximum number of resources requested"),
+    ]
+    offset: Annotated[
+        int,
+        Meta(ge=0, description="Number of resources skipped before returning results"),
+    ]
+    order: Annotated[
+        list[str],
+        Meta(description="Applied ordering tokens"),
+    ]
+    breadcrumb: Annotated[
+        dict[ResourceID, list[SearchBreadcrumbNode]] | UnsetType,
+        Meta(description="Breadcrumb paths for returned resources"),
+    ] = UNSET
+
+
+SearchResponseType = AnyOf[
+    AsJSON[list[CompositeRead]],
+    AsJSON[SearchResponse],
+]
+
+
+def _search_order(order: list[str]):
+    supported = {
+        "name": Resource.display_name,
+        "type": Resource.cls,
+        "owner": User.display_name,
+        "created": Resource.creation_date,
+    }
+
+    normalized: list[str] = []
+    clauses = []
+    need_owner_join = False
+
+    tokens = []
+    for item in order:
+        if item:
+            tokens.extend([token for token in item.split(",") if token])
+
+    for token in tokens:
+        if token[0] in ("+", "-"):
+            direction = token[0]
+            key = token[1:]
+        else:
+            direction = "+"
+            key = token
+
+        if key not in supported:
+            supported_str = ", ".join(sorted(supported.keys()))
+            raise ValidationError(
+                message=f"Invalid order token '{token}'. Supported fields: {supported_str}."
+            )
+
+        normalized_token = key if direction == "+" else f"-{key}"
+        normalized.append(normalized_token)
+
+        column = supported[key]
+        clauses.append(column.desc() if direction == "-" else column.asc())
+
+        if key == "owner":
+            need_owner_join = True
+
+    if len(clauses) == 0:
+        normalized = ["name"]
+        clauses.append(Resource.display_name.asc())
+
+    # Stable ordering for pagination.
+    clauses.append(Resource.id.asc())
+
+    return normalized, clauses, need_owner_join
+
+
 def search(
     request,
     *,
@@ -809,26 +891,79 @@ def search(
             "significantly slower. Otherwise, only the `resource` key is serialized."
         ),
     ] = "resource",
+    breadcrumb: Annotated[
+        bool,
+        Meta(description="Include breadcrumb paths for returned resources"),
+    ] = False,
+    limit: Annotated[
+        int | None,
+        Meta(ge=1, description="Maximum number of resources to return"),
+    ] = None,
+    offset: Annotated[
+        int,
+        Meta(ge=0, description="Number of resources to skip"),
+    ] = 0,
+    order: Annotated[
+        list[str],
+        Meta(
+            description="Ordering tokens. Supported fields: name, type, owner, created. "
+            "Use '-' prefix for descending order, e.g. '-created'."
+        ),
+    ] = [],
     root: Annotated[SearchRootParams, Query(spread=True)],
     attrs: Annotated[SearchAttrParams, Query(spread=True)],
     resmeta: Annotated[SearchResmetaParams, Query(spread=True)],
-) -> AsJSON[list[CompositeRead]]:
+) -> SearchResponseType:
     """Search resources
 
     :returns: List of resources matching the search criteria"""
 
-    query = root.query()
-    query = query.where(*attrs.filters(), *resmeta.filters(Resource.id))
-    query = query.order_by(Resource.display_name)
+    query = root.query().where(*attrs.filters(), *resmeta.filters(Resource.id))
+
+    order_norm, order_clauses, need_owner_join = _search_order(order)
+    if need_owner_join:
+        query = query.join(Resource.owner_user)
+    query = query.order_by(*order_clauses)
 
     cs_keys = None if serialization == "full" else ("resource",)
     serializer = CompositeSerializer(keys=cs_keys, user=request.user)
     check_perm = lambda res, u=request.user: res.has_permission(ResourceScope.read, u)
-    return [
-        serializer.serialize(res, CompositeRead)
-        for (res,) in DBSession.execute(query)
-        if check_perm(res)
-    ]
+
+    legacy_mode = not breadcrumb and limit is None and offset == 0 and len(order) == 0
+    if legacy_mode:
+        return [
+            serializer.serialize(res, CompositeRead)
+            for (res,) in DBSession.execute(query)
+            if check_perm(res)
+        ]
+
+    permitted = [res for (res,) in DBSession.execute(query) if check_perm(res)]
+    total_count = len(permitted)
+
+    page = permitted[offset:]
+    if limit is not None:
+        page = page[:limit]
+
+    items = [serializer.serialize(res, CompositeRead) for res in page]
+
+    result = SearchResponse(
+        items=items,
+        total_count=total_count,
+        limit=limit,
+        offset=offset,
+        order=order_norm,
+    )
+
+    if breadcrumb:
+        result.breadcrumb = {
+            res.id: [
+                SearchBreadcrumbNode(id=node.id, display_name=node.display_name)
+                for node in tuple(res.parents) + (res,)
+            ]
+            for res in page
+        }
+
+    return result
 
 
 class ResourceVolume(Struct, kw_only=True):
