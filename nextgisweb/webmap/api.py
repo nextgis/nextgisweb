@@ -368,6 +368,8 @@ def print(request, *, body: PrintBody) -> Response:
                 "chromium-browser",
                 "--headless",
                 "--no-sandbox",
+                "--disable-crash-reporter",
+                "--disable-breakpad",
                 "--disable-gpu",
                 "--run-all-compositor-stages-before-draw",
                 "--virtual-time-budget=10000",
