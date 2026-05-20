@@ -1,3 +1,4 @@
+import signal
 from datetime import timedelta
 from os import getenv
 from typing import Any
@@ -66,6 +67,14 @@ class PyramidComponent(Component):
 
         try:
             import uwsgi
+        except ImportError:
+            uwsgi = None
+            lunkwill_rpc = False
+        else:
+            # Reset uWSGI SIGSEGV handler to default to avoid freeze on
+            # backtrace generation during worker termination. Another option is
+            # to disable backtrace generation with --backtrace-depth 0.
+            signal.signal(signal.SIGSEGV, signal.SIG_DFL)
 
             if rt_not_set:
                 if ev := getenv("UWSGI_HARAKIRI_ORIGINAL"):
@@ -75,9 +84,6 @@ class PyramidComponent(Component):
                     self.options["request_timeout"] = timedelta(seconds=int(ev))
 
             lunkwill_rpc = b"lunkwill" in uwsgi.rpc_list()
-        except ImportError:
-            uwsgi = None
-            lunkwill_rpc = False
 
         if self.options["lunkwill.enabled"] is None:
             self.options["lunkwill.enabled"] = lunkwill_rpc
