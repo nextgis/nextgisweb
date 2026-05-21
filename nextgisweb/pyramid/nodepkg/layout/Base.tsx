@@ -13,7 +13,7 @@ import { Breadcrumbs } from "./Breadcrumbs";
 import type { BreadcrumbItem } from "./Breadcrumbs";
 import { Attrmenu } from "./attrmenu/Attrmenu";
 import { Dynmenu } from "./dynmenu/Dynmenu";
-import type { CustomDynMenuItem } from "./dynmenu/Dynmenu";
+import type { DynMenuItem } from "./dynmenu/Dynmenu";
 import { Header } from "./header/Header";
 import { layoutStore } from "./store";
 
@@ -58,7 +58,7 @@ export function Base({
   const [modalApi, modalContextHolder] = Modal.useModal();
 
   const [dynMenuItems, setDynMenuItems] = useState<
-    CustomDynMenuItem[] | undefined
+    DynMenuItem[] | undefined
   >(undefined);
 
   const { makeSignal } = useAbortController();

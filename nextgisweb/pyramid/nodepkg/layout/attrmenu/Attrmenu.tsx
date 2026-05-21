@@ -19,7 +19,7 @@ import type {
 
 import "../dynmenu/Dynmenu.less";
 import { Dynmenu } from "../dynmenu/Dynmenu";
-import type { CustomDynMenuItem } from "../dynmenu/Dynmenu";
+import type { DynMenuItem } from "../dynmenu/Dynmenu";
 
 interface DynmenuProps {
   resourceId: number;
@@ -69,7 +69,7 @@ export function Attrmenu({ resourceId }: DynmenuProps) {
     })();
   }, [fetchResourceItems, makeSignal, reg, resourceId]);
 
-  const items = useMemo((): CustomDynMenuItem[] => {
+  const items = useMemo((): DynMenuItem[] => {
     if (!item) return [];
 
     const map = new Map<ResourceActionGroupId, ResourceAction[]>();
@@ -86,7 +86,7 @@ export function Attrmenu({ resourceId }: DynmenuProps) {
       map.set(g, arr);
     }
 
-    const out: CustomDynMenuItem[] = [];
+    const out: DynMenuItem[] = [];
 
     const groups = resourceActionGroups();
 
@@ -97,7 +97,6 @@ export function Attrmenu({ resourceId }: DynmenuProps) {
       out.push({
         type: "label",
         label: label ?? getResourceActionGroup(g)?.label ?? g,
-        key: [],
       });
 
       for (const a of arr) {
@@ -106,7 +105,6 @@ export function Attrmenu({ resourceId }: DynmenuProps) {
 
         out.push({
           type: "link",
-          key: [],
           label: a.label ?? a.key,
           url: href,
           target: a.target ?? "_self",

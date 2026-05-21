@@ -1,25 +1,28 @@
 import classNames from "classnames";
 
 import { SvgIcon } from "@nextgisweb/gui/svg-icon";
-import type {
-  DynMenuLabel,
-  DynMenuLink,
-} from "@nextgisweb/pyramid/layout/dynmenu/type";
 
 import "./Dynmenu.less";
 
-export interface CustomDynMenuLink extends Omit<
-  DynMenuLink,
-  "icon" | "icon_suffix"
-> {
+export interface DynMenuLabel {
+  type: "label";
+  label: string;
+}
+
+export interface DynMenuLink {
+  type: "link";
+  label: string;
+  url: string;
+  target?: React.HTMLAttributeAnchorTarget;
+  selected?: boolean;
   icon?: React.ReactNode;
   icon_suffix?: React.ReactNode;
 }
 
-export type CustomDynMenuItem = DynMenuLabel | CustomDynMenuLink;
+export type DynMenuItem = DynMenuLabel | DynMenuLink;
 
 export interface DynmenuProps {
-  items: CustomDynMenuItem[];
+  items: DynMenuItem[];
 }
 
 export function Dynmenu({ items }: DynmenuProps) {

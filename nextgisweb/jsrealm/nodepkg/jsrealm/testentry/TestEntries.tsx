@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { Dynmenu } from "@nextgisweb/pyramid/layout";
-import type { DynMenuItem } from "@nextgisweb/pyramid/layout/dynmenu/type";
+import type { DynMenuItem } from "@nextgisweb/pyramid/layout/dynmenu/Dynmenu";
 
 import { registry as testentries } from "./registry";
 
@@ -19,14 +19,13 @@ export function TestEntries() {
         newItems.push({
           type: "label",
           label: cprefix,
-          key: [],
         });
         prefix = cprefix;
       }
       newItems.push({
         type: "link",
         label: crest,
-        key: [],
+
         url: `/testentry/${p.identity}`,
         icon: null,
         icon_suffix: null,

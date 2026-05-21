@@ -1,4 +1,4 @@
-import type { CustomDynMenuItem } from "../layout/dynmenu/Dynmenu";
+import type { DynMenuItem } from "../layout/dynmenu/Dynmenu";
 
 import { controlPanelGroups, getControlPanelGroup, registry } from "./registry";
 import type {
@@ -22,7 +22,7 @@ export function byMenuOrder(a: ControlPanelItem, b: ControlPanelItem) {
 
 export async function resolveControlPanelDynMenuItems(
   signal?: AbortSignal
-): Promise<CustomDynMenuItem[]> {
+): Promise<DynMenuItem[]> {
   const reg = registry.queryAll();
   const map = new Map<ControlPanelGroupId, LinkControlPanelItem[]>();
 
@@ -42,7 +42,7 @@ export async function resolveControlPanelDynMenuItems(
     map.set(g, arr);
   }
 
-  const out: CustomDynMenuItem[] = [];
+  const out: DynMenuItem[] = [];
 
   const groups = controlPanelGroups();
 
@@ -53,7 +53,6 @@ export async function resolveControlPanelDynMenuItems(
     out.push({
       type: "label",
       label: label ?? getControlPanelGroup(g)?.label ?? g,
-      key: [],
     });
 
     // Prefer exact URL match to avoid selecting both parent and child links.
@@ -68,7 +67,7 @@ export async function resolveControlPanelDynMenuItems(
     for (const a of arr) {
       out.push({
         type: "link",
-        key: [],
+
         label: a.label ?? a.key,
         url: a.href,
         target: a.target ?? "_self",
