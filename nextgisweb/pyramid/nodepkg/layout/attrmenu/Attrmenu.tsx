@@ -109,8 +109,7 @@ export function Attrmenu({ resourceId }: DynmenuProps) {
           url: href,
           target: a.target ?? "_self",
           selected: location.href.includes(href),
-          icon_suffix: a.icon_suffix,
-          icon: a.icon ?? null,
+          icon: a.icon,
         });
       }
     }

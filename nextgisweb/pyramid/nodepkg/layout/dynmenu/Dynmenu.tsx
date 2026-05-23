@@ -1,7 +1,5 @@
 import classNames from "classnames";
 
-import { SvgIcon } from "@nextgisweb/gui/svg-icon";
-
 import "./Dynmenu.less";
 
 export interface DynMenuLabel {
@@ -15,8 +13,7 @@ export interface DynMenuLink {
   url: string;
   target?: React.HTMLAttributeAnchorTarget;
   selected?: boolean;
-  icon?: React.ReactNode;
-  icon_suffix?: React.ReactNode;
+  icon?: React.ReactElement;
 }
 
 export type DynMenuItem = DynMenuLabel | DynMenuLink;
@@ -46,21 +43,8 @@ export function Dynmenu({ items }: DynmenuProps) {
               key={item.url}
             >
               <a href={item.url} target={item.target}>
-                {typeof item.icon === "string" ? (
-                  <SvgIcon icon={item.icon} fill="currentColor" />
-                ) : (
-                  item.icon
-                )}
+                {item.icon}
                 {item.label}
-                {typeof item.icon_suffix === "string" ? (
-                  <SvgIcon
-                    icon={item.icon_suffix}
-                    size="small"
-                    fill="currentColor"
-                  />
-                ) : (
-                  item.icon_suffix
-                )}
               </a>
             </li>
           );

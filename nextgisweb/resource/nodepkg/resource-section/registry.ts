@@ -50,14 +50,13 @@ export interface ResourceAction<
   A extends Attributes = Attributes,
 > extends DynMenuItem<ResourceActionGroupId> {
   href?: string | ((opt: CustomResourceAttrItem<A>) => string);
-  icon?: React.ReactNode;
+  icon?: React.ReactElement;
   props?: P;
   label?: string;
   quick?: { order?: number } | boolean;
   target?: "_self" | "_blank";
   widget?: ResourceActionWidget<P>;
   attributes?: [...A];
-  icon_suffix?: React.ReactNode;
   hideOnMobile?: boolean;
   condition?: (opt: CustomResourceAttrItem<A>) => boolean;
   run?: (opt: RunOptions<A>) => void;

@@ -27,8 +27,6 @@ export function TestEntries() {
         label: crest,
 
         url: `/testentry/${p.identity}`,
-        icon: null,
-        icon_suffix: null,
         selected: false,
         target: '"_self"',
       });
