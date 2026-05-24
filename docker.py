@@ -21,10 +21,31 @@ def on_apt(event):
         "gettext",
     )
 
-    # Chromium and ghostscript for printing
-    event.add_repository("ppa:savoury1/ffmpeg4")
-    event.add_repository("ppa:savoury1/chromium")
-    event.package("chromium-browser", "ghostscript")
+    # Chrome for PDF generation
+
+    event.package(
+        "ghostscript",
+        "libasound2t64",
+        "libatk-bridge2.0-0",
+        "libatk1.0-0",
+        "libxcomposite1",
+        "libxdamage1",
+        "libxfixes3",
+        "libxrandr2",
+        "unzip",
+    )
+
+    event.cleanup(
+        "( : ",
+        "    cd $(mktemp -d)",
+        "    export NPM_CONFIG_UPDATE_NOTIFIER=false",
+        "    export PUPPETEER_CACHE_DIR=$(pwd)",
+        "    path=$(npx --yes @puppeteer/browsers install --format '{{path}}' chrome-headless-shell@stable)",
+        "    cp -a $(dirname $path) /opt/chrome",
+        "    ln -s /opt/chrome/chrome-headless-shell /usr/local/bin/chrome",
+        "    rm -rf $(pwd)",
+        ")",
+    )
 
 
 @AppImage.on_user_dir.handler

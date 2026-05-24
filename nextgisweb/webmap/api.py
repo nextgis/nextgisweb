@@ -365,7 +365,7 @@ def print(request, *, body: PrintBody) -> Response:
         output_pdf = temp_dir / "output.pdf"
         check_call(
             [
-                "chromium-browser",
+                "chrome",
                 "--headless",
                 "--no-sandbox",
                 "--disable-crash-reporter",
