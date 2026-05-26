@@ -347,7 +347,9 @@ class RasterLayer(Resource, SpatialLayerMixin):
             cmd = ["gdalwarp", "-t_srs", "EPSG:%d" % self.srs.id]
             if add_alpha:
                 cmd.append("-dstalpha")
-            ds_measure = gdal.AutoCreateWarpedVRT(ds, src_osr.ExportToWkt(), dst_osr.ExportToWkt())
+            ds_measure = gdal.Warp(
+                "", ds, format="VRT", srcSRS=src_osr.ExportToWkt(), dstSRS=dst_osr.ExportToWkt()
+            )
             if ds_measure is None:
                 message = gettext(
                     "Failed to reproject the raster to the target coordinate system."
