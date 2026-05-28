@@ -76,11 +76,13 @@ export class TmsClientConnectionStore implements EditorStore<
 
   dump() {
     if (this.dirty) {
-      const { referer, password, username, ...rest } = mapperDump(this);
+      const { referer, password, username, apikey, apikey_param, ...rest } = mapperDump(this);
       const result: ConnectionCreate | ConnectionUpdate = {
         referer: referer || null,
         username: username || null,
         password: password || null,
+        apikey: apikey || null,
+        apikey_param: apikey_param || null,
         ...rest,
       };
       return result;
