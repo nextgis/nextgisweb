@@ -264,6 +264,7 @@ class VectorLayer(Resource, SpatialLayerMixin, LayerFieldsMixin, FVersioningMixi
                 datatype=fdata.get("datatype"),
                 display_name=display_name,
                 grid_visibility=fdata.get("grid_visibility", True),
+                text_search=fdata.get("text_search", True),
             )
 
             if keyname in keynames:
