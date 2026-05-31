@@ -1,3 +1,4 @@
+import { DescriptionHtml } from "@nextgisweb/gui/description";
 import { EditIcon } from "@nextgisweb/gui/icon";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
@@ -16,9 +17,13 @@ export function AnnotationPopupContent({
 }: AnnotationPopupContentProps) {
   return (
     <div className="annotation-popup-content">
-      <div
-        className="annotation-description"
-        dangerouslySetInnerHTML={{ __html: descriptionHtml }}
+      <DescriptionHtml
+        variant="compact"
+        content={descriptionHtml}
+        onLinkClick={(evt) => {
+          evt.currentTarget.setAttribute("target", "_blank");
+          return false;
+        }}
       />
 
       {editable && (
