@@ -70,7 +70,7 @@ class WebMap(Resource):
     root_item_id = sa.Column(sa.ForeignKey("webmap_item.id"), nullable=False)
     bookmark_resource_id = sa.Column(sa.ForeignKey(Resource.id), nullable=True)
     draw_order_enabled = sa.Column(sa.Boolean, nullable=True)
-    editable = sa.Column(sa.Boolean, nullable=False, default=False)
+    editable = sa.Column(sa.Boolean, nullable=False, default=True)
 
     extent_left = sa.Column(sa.Float, default=-180)
     extent_right = sa.Column(sa.Float, default=+180)

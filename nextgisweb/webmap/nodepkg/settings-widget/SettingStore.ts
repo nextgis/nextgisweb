@@ -22,7 +22,7 @@ export class SettingStore implements EditorStore<
   readonly identity = "webmap";
   readonly composite: CompositeStore;
 
-  @observable.ref accessor editable = false;
+  @observable.ref accessor editable = true;
   @observable.ref accessor annotationEnabled = false;
   @observable.ref accessor annotationDefault: AnnotationDefault = "no";
   @observable.ref accessor legendSymbols: WebMapRead["legend_symbols"] = null;
