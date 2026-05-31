@@ -1,6 +1,7 @@
 import { Suspense, lazy, useEffect, useState } from "react";
 
 import { Button, Dropdown, Modal, Skeleton, Space } from "@nextgisweb/gui/antd";
+import { useConfirm } from "@nextgisweb/gui/hook/useConfirm";
 import type { ShowModalOptions } from "@nextgisweb/gui/showModal";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type {
@@ -11,6 +12,9 @@ import type {
 import { AnnotationAccessType } from "./AnnotationAccessType";
 import { AnnotationsSettings } from "./AnnotationsSettings";
 import type { AnnotationSettings } from "./AnnotationsSettings";
+
+/* prettier-ignore */ const
+msgDeleteConfirmation = gettext("Are you sure you want to delete this annotation? This action cannot be undone.");
 
 const DEFAULTS = {
   centered: true,
@@ -48,6 +52,7 @@ export function AnnotationsModal({
   ...modalProps
 }: AnnotationsModalProps) {
   const [open, setOpen] = useState(open_ ?? true);
+  const { confirm, contextHolder } = useConfirm();
   const [editorValue, setEditorValue] = useState("");
   const [settings, setSettings] = useState<AnnotationSettings>({
     circleSize: 5,
@@ -106,9 +111,14 @@ export function AnnotationsModal({
   };
 
   const handleDelete = () => {
-    onDelete?.();
-    setOpen(false);
-    close?.();
+    confirm({
+      content: msgDeleteConfirmation,
+      onOk: () => {
+        onDelete?.();
+        setOpen(false);
+        close?.();
+      },
+    });
   };
 
   const handleSave = () => {
@@ -158,6 +168,7 @@ export function AnnotationsModal({
       onCancel={handleClose}
       footer={
         <div>
+          {contextHolder}
           {annFeature?.getId() ? (
             <Space>
               <Button onClick={handleDelete} style={{ float: "left" }} danger>
