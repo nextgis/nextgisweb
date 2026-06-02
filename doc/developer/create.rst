@@ -550,7 +550,7 @@ To create raster layer execute the following request:
    :<json string keyname: key (optional)
    :<json string description: description text, HTML supported (optional)
    :<json jsonobj source: JSON object with file upload response
-   :<json jsonobj srs: spatial reference of creating vector layer. Should be the same as web map
+   :<json jsonobj srs: spatial reference of creating raster layer
    :<json int id: EPSG code
    :statuscode 201: no error
 
