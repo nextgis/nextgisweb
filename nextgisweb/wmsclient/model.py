@@ -1,4 +1,3 @@
-import logging
 import re
 from io import BytesIO
 from typing import Annotated, Literal
@@ -18,6 +17,7 @@ from zope.interface import implementer
 from nextgisweb.env import Base, env, gettext
 from nextgisweb.lib import saext
 from nextgisweb.lib.datetime import utcnow_naive
+from nextgisweb.lib.logging import logger
 from nextgisweb.lib.pilhelper import reproject_render
 
 from nextgisweb.core.exception import ExternalServiceError, ValidationError
@@ -48,8 +48,6 @@ from .util import (
 )
 
 Base.depends_on("resource")
-
-log = logging.getLogger(__name__)
 
 _WMS_EXCEPTION_TAGS = (
     "ServiceException",
@@ -322,7 +320,7 @@ class Layer(Resource, SpatialLayerMixin):
                 img = PIL.Image.open(data)
             except IOError:
                 if msg := _extract_wms_error(response.content):
-                    log.error("WMS service error: %s", msg)
+                    logger.error("WMS service error: %s", msg)
                 raise ExternalServiceError("Image processing error.")
             if img.mode != "RGBA":
                 img = img.convert("RGBA")
@@ -331,7 +329,7 @@ class Layer(Resource, SpatialLayerMixin):
             return None
         else:
             if msg := _extract_wms_error(response.content):
-                log.error("WMS service error (HTTP %d): %s", response.status_code, msg)
+                logger.error("WMS service error (HTTP %d): %s", response.status_code, msg)
             raise ExternalServiceError
 
     def render_image(self, extent, size):

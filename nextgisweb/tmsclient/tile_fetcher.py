@@ -1,6 +1,5 @@
 import asyncio
 import atexit
-import logging
 from dataclasses import dataclass
 from queue import Empty, Queue
 from ssl import SSLCertVerificationError
@@ -9,12 +8,11 @@ from threading import Thread
 from httpx2 import AsyncClient, Limits, Timeout, TimeoutException, TransportError
 
 from nextgisweb.env import env, gettext
+from nextgisweb.lib.logging import logger
 
 from nextgisweb.core.exception import ExternalServiceError
 
 from .util import SCHEME, quad_key, split_url_query, toggle_tms_xyz_y
-
-log = logging.getLogger(__name__)
 
 SHUTDOWN_TIMEOUT = 1
 
@@ -87,7 +85,7 @@ class TileFetcher:
             except TimeoutException as exc:
                 raise TimeoutError from exc
             except (TransportError, SSLCertVerificationError) as exc:
-                log.error("TMS service error: %s: %s", type(exc).__name__, exc)
+                logger.error("TMS service error: %s: %s", type(exc).__name__, exc)
                 raise ExternalServiceError(
                     gettext("Unable to get a response from the remote server."),
                 ) from exc
