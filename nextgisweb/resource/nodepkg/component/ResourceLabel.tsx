@@ -1,33 +1,35 @@
-import type React from "react";
-import type { HTMLAttributeAnchorTarget } from "react";
+import type { ReactNode } from "react";
 
-import { Space } from "@nextgisweb/gui/antd";
 import type { ResourceCls } from "@nextgisweb/resource/type/api";
 
 import { ResourceIcon } from "../icon";
 
 import { ResourceLink } from "./ResourceLink";
 
+import "./ResourceLabel.less";
+
 export interface ResourceLabelProps {
   cls?: ResourceCls;
   resourceId?: number;
-  label: React.ReactNode;
-  target?: HTMLAttributeAnchorTarget;
+  label: ReactNode;
 }
 
-export function ResourceLabel({
-  cls,
-  label,
-  target,
-  resourceId,
-}: ResourceLabelProps) {
+export function ResourceLabel({ cls, label, resourceId }: ResourceLabelProps) {
   return (
-    <Space>
-      {cls && <ResourceIcon identity={cls} />}
-      {label}
-      {typeof resourceId === "number" && (
-        <ResourceLink target={target} resourceId={resourceId} />
+    <div className="ngw-resource-resource-label">
+      {cls && (
+        <span className="icon">
+          <ResourceIcon identity={cls} />
+        </span>
       )}
-    </Space>
+      <span className="label">{label}</span>
+      {typeof resourceId === "number" && (
+        <ResourceLink
+          className="link"
+          target="_blank"
+          resourceId={resourceId}
+        />
+      )}
+    </div>
   );
 }

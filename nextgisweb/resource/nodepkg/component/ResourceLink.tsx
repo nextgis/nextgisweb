@@ -1,25 +1,21 @@
-import type { HTMLAttributeAnchorTarget } from "react";
+import type { HTMLProps } from "react";
 
 import { OpenInNewIcon } from "@nextgisweb/gui/icon";
 import { routeURL } from "@nextgisweb/pyramid/api";
 
-export interface ResourceLinkProps {
+export interface ResourceLinkProps extends HTMLProps<HTMLAnchorElement> {
   resourceId: number;
-  target?: HTMLAttributeAnchorTarget;
 }
 
-export function ResourceLink({
-  target = "_blank",
-  resourceId,
-}: ResourceLinkProps) {
+export function ResourceLink({ resourceId, ...props }: ResourceLinkProps) {
   return (
     <a
       href={routeURL("resource.show", resourceId)}
-      target={target}
       onMouseDown={(evt) => {
         // Prevent from opening picker
         evt.stopPropagation();
       }}
+      {...props}
     >
       <OpenInNewIcon />
     </a>

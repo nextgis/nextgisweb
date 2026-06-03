@@ -1,16 +1,17 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useShowModal } from "@nextgisweb/gui";
-import { Select, Space } from "@nextgisweb/gui/antd";
+import { Select } from "@nextgisweb/gui/antd";
 import { useObjectState } from "@nextgisweb/gui/hook";
 
 import { ResourceLabel } from "../ResourceLabel";
-import { ResourceLink } from "../ResourceLink";
 import { useResourcePicker } from "../resource-picker/hook";
 import type { ResourcePickerStoreOptions } from "../resource-picker/type";
 
 import { useResourceSelect } from "./hook/useResourceSelect";
 import type { ResourceSelectOption, ResourceSelectProps } from "./type";
+
+import "./ResourceSelect.less";
 
 export function ResourceSelect<V extends number = number>({
   style,
@@ -86,39 +87,36 @@ export function ResourceSelect<V extends number = number>({
   return (
     <>
       {modalHolder}
-      <Space.Compact style={{ width: "100%" }}>
-        <Select
-          open={open}
-          value={value}
-          loading={resourceLoading}
-          onOpenChange={(visible) => {
-            if (!visible || !readOnly) {
-              setOpen(visible);
-            }
-          }}
-          suffixIcon={readOnly ? <></> : undefined}
-          popupRender={() => <></>}
-          onClear={() => {
-            onPick(undefined);
-          }}
-          allowClear={!readOnly && allowClear}
-          style={{
-            flexGrow: 1,
-            cursor: readOnly ? "unset" : undefined,
-            ...(style || {}),
-          }}
-          options={options}
-          labelRender={(e) => (
-            <ResourceLabel label={e.label} cls={resource?.resource.cls} />
-          )}
-          {...selectOptions}
-        />
-        {value !== undefined && !hideGoto && (
-          <Space.Addon>
-            <ResourceLink resourceId={value} />
-          </Space.Addon>
+      <Select
+        className="ngw-resource-resource-select"
+        open={open}
+        value={value}
+        loading={resourceLoading}
+        suffixIcon={readOnly ? null : undefined}
+        popupRender={() => <></>}
+        allowClear={!readOnly && allowClear}
+        style={{
+          cursor: readOnly ? "unset" : undefined,
+          ...(style || {}),
+        }}
+        options={options}
+        labelRender={(e) => (
+          <ResourceLabel
+            label={e.label}
+            cls={resource?.resource.cls}
+            resourceId={!hideGoto ? value : undefined}
+          />
         )}
-      </Space.Compact>
+        onOpenChange={(visible) => {
+          if (!visible || !readOnly) {
+            setOpen(visible);
+          }
+        }}
+        onClear={() => {
+          onPick(undefined);
+        }}
+        {...selectOptions}
+      />
     </>
   );
 }
