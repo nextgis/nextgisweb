@@ -31,7 +31,7 @@ requires = [
     "cachetools==7.0.6",
     "defusedxml==0.7.1",
     "docstring-parser==0.18.0",
-    "httpx[http2]==0.28.1",
+    "httpx2[http2]==2.3.0",
     "humanize==4.15.0",
     "lxml>5.0,<6.1",
     "nh3==0.3.4",
