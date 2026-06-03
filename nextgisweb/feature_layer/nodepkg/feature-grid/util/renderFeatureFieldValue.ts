@@ -9,7 +9,9 @@ export function renderFeatureFieldValue(
   val: NgwAttributeType
 ): string | number | null {
   if (val !== null && val !== undefined) {
-    if (datatype === "BOOLEAN") {
+    if (datatype === "JSON") {
+      return JSON.stringify(val);
+    } else if (datatype === "BOOLEAN") {
       return val ? gettext("True") : gettext("False");
     } else if (datatype === "DATETIME") {
       return utc(new Date(val as string))

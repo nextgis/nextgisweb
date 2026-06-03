@@ -813,6 +813,8 @@ def estimate_vector_layer_data(resource):
     for f in resource.fields:
         if f.datatype == FIELD_TYPE.STRING:
             dynamic.append(f"coalesce(octet_length({ctab.fields[f.keyname].name}), 0)")
+        elif f.datatype == FIELD_TYPE.JSON:
+            dynamic.append(f"coalesce(pg_column_size({ctab.fields[f.keyname].name}), 0)")
         else:
             fixed += FIELD_TYPE_SIZE[f.datatype]
 

@@ -14,6 +14,7 @@ from sqlalchemy.exc import NoResultFound
 
 from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.geometry import Geometry, GeometryNotValid, Transformer
+from nextgisweb.lib.json import dumps, loads
 from nextgisweb.lib.ows import (
     FIELD_TYPE_WFS,
     SRSParseError,
@@ -48,6 +49,7 @@ FIELD_TYPE_2_WFS = {
     FIELD_TYPE.TIME: FIELD_TYPE_WFS["XSD_TIME"],
     FIELD_TYPE.DATETIME: FIELD_TYPE_WFS["XSD_DATETIME"],
     FIELD_TYPE.BOOLEAN: FIELD_TYPE_WFS["XSD_BOOLEAN"],
+    FIELD_TYPE.JSON: FIELD_TYPE_WFS["XSD_STRING"],
 }
 
 # Spec: http://docs.opengeospatial.org/is/09-025r2/09-025r2.html
@@ -1100,6 +1102,8 @@ class WFSHandler:
                             value = value.isoformat()
                         elif isinstance(value, bool):
                             value = "true" if value else "false"
+                        elif isinstance(value, (dict, list)):
+                            value = dumps(value)
                         elif not isinstance(value, str):
                             value = str(value)
                         __field.text = value
@@ -1374,6 +1378,8 @@ def set_feature_data(
             v = datetime_from_iso(v)
         elif field.datatype == FIELD_TYPE.BOOLEAN:
             v = v.lower() in ("true", "1")
+        elif field.datatype == FIELD_TYPE.JSON:
+            v = loads(v)
         else:
             raise NotImplementedError
 

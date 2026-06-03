@@ -119,6 +119,36 @@ def test_model(ngw_txn):
     assert res.fversioning.latest == next(vcur)
 
 
+def test_json_versioning(ngw_txn):
+    res = VectorLayer(geometry_type="POINT").persist()
+    res.fields = [VectorLayerField(keyname="j", datatype="JSON", display_name="j")]
+    res.fversioning_configure(enabled=True)
+    res.fversioning_close()
+    DBSession.flush()
+
+    vcur = itertools.count(start=1)
+    assert res.fversioning.latest == next(vcur)
+
+    geom = Geometry.from_wkt("POINT (0 0)")
+
+    with res.fversioning_context():
+        res.feature_create(Feature(fields={"j": {"a": 1, "b": 2}}, geom=geom))
+    v_after_create = next(vcur)
+    assert res.fversioning.latest == v_after_create
+
+    (feat,) = res.feature_query()()
+
+    with res.fversioning_context():
+        feat.fields["j"] = {"b": 2, "a": 1}
+        res.feature_put(feat)
+    assert res.fversioning.latest == v_after_create  # no new version — semantically equal
+
+    with res.fversioning_context():
+        feat.fields["j"] = {"a": 1, "b": 99}
+        res.feature_put(feat)
+    assert res.fversioning.latest == next(vcur)  # new version — value actually changed
+
+
 def test_ogrloader(ngw_webtest_app: WebTestApp, ngw_resource_group_sub, ngw_file_upload):
     rapi = ResourceAPI(ngw_webtest_app)
     upload_meta = ngw_file_upload(DATA_PATH / "pointz.geojson")

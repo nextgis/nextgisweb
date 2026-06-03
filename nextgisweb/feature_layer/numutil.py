@@ -1,7 +1,7 @@
 from typing import Any, Callable, ClassVar, Literal
 
 from nextgisweb.env import gettextf
-from nextgisweb.lib.json import dumps as json_dumps
+from nextgisweb.lib.json import dumps
 
 from nextgisweb.core.exception import ValidationError
 
@@ -31,7 +31,7 @@ class NumberValidationError(ValidationError):
     maxvalue: ClassVar[int]
 
     def __init__(self, value: Any):
-        value_json = json_dumps(value)
+        value_json = dumps(value)
         super().__init__(
             message=self.message_.format(value_json),
             detail=self.detail_.format(min=self.minvalue, max=self.maxvalue),
@@ -92,7 +92,7 @@ class BoolValidationError(ValidationError):
     message_ = gettextf("Got an invalid BOOLEAN value: {}.")
 
     def __init__(self, value: Any):
-        value_json = json_dumps(value)
+        value_json = dumps(value)
         super().__init__(message=self.message_.format(value_json))
 
 

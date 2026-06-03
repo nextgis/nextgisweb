@@ -45,6 +45,8 @@ export function unmarshalFieldValue(
 ): null | number | string | boolean | Dayjs {
   if (value === null) {
     return value;
+  } else if (datatype === "JSON") {
+    return JSON.stringify(value);
   } else if (isDateTimeFieldType(datatype)) {
     assert(typeof value === "string");
     if (datatype !== "TIME") {

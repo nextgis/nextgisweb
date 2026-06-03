@@ -247,3 +247,31 @@ def test_bool_invalid(value, bool_layer, ngw_webtest_app: WebTestApp):
     url = f"/api/resource/{bool_layer}/feature/"
     feature = {"geom": "POINT (0 0)", "fields": {"f": value}}
     ngw_webtest_app.post(url, json=feature, status=422)
+
+
+@pytest.fixture
+def json_layer():
+    with transaction.manager:
+        layer = VectorLayer(geometry_type="POINT").persist()
+        layer.setup_from_fields([dict(keyname="f", datatype="JSON")])
+    yield layer.id
+
+
+@pytest.mark.parametrize(
+    "value",
+    (
+        pytest.param({"key": "value"}, id="object"),
+        pytest.param([1, 2, 3], id="array"),
+        pytest.param("hello", id="string"),
+        pytest.param(42, id="int"),
+        pytest.param(True, id="bool"),
+        pytest.param(None, id="null"),
+    ),
+)
+def test_json_valid(value, json_layer, ngw_webtest_app: WebTestApp):
+    url = f"/api/resource/{json_layer}/feature/"
+    resp = ngw_webtest_app.post(
+        url, json={"geom": "POINT (0 0)", "fields": {"f": value}}, status=200
+    )
+    fid = resp.json["id"]
+    assert ngw_webtest_app.get(url + str(fid), status=200).json["fields"]["f"] == value

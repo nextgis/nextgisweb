@@ -116,6 +116,8 @@ const AttributeEditor = observer(
           INTEGER: <InputInteger {...inputProps} />,
           DATETIME: <DateTimePicker {...dpProps} />,
           BOOLEAN: <BooleanInput {...inputProps} />,
+          // TODO: Add JSON editor component and use it here
+          JSON: <Input {...inputProps} readOnly={true} />,
         };
       },
       [saving]

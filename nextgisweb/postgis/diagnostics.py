@@ -2,11 +2,12 @@ from enum import Enum
 from socket import gaierror, gethostbyname
 
 from sqlalchemy import func, inspect, select, sql
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.engine import Connection, create_engine
 from sqlalchemy.exc import OperationalError, SQLAlchemyError
 from sqlalchemy.pool import NullPool
 from sqlalchemy.types import (
+    JSON,
     BigInteger,
     Boolean,
     Date,
@@ -37,6 +38,7 @@ _FIELD_TYPE_2_DB = {
     FIELD_TYPE.TIME: Time,
     FIELD_TYPE.DATETIME: DateTime,
     FIELD_TYPE.BOOLEAN: Boolean,
+    FIELD_TYPE.JSON: (JSON, JSONB),
 }
 
 

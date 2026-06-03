@@ -11,7 +11,7 @@ from shapely.geometry import box
 from sqlalchemy import alias, bindparam, cast, func, select, sql, text
 from sqlalchemy import and_ as sql_and
 from sqlalchemy import or_ as sql_or
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.exc import NoSuchTableError, OperationalError, SQLAlchemyError
 from zope.interface import implementer
 
@@ -413,11 +413,18 @@ class PostgisLayer(Resource, SpatialLayerMixin, LayerFieldsMixin):
                         datatype = FIELD_TYPE.DATETIME
                     elif isinstance(column["type"], sa.Boolean):
                         datatype = FIELD_TYPE.BOOLEAN
+                    elif isinstance(column["type"], (sa.JSON, JSONB)):
+                        datatype = FIELD_TYPE.JSON
                     else:
                         logger.warning(f"Column type '{column['type']}' is not supported.")
                         continue
 
                     fopts = dict(display_name=column["name"])
+                    if datatype == FIELD_TYPE.JSON and not isinstance(column["type"], JSONB):
+                        # JSON object key order is not guaranteed, so string-based search can
+                        # be unreliable. jsonb stores a normalized binary representation, which
+                        # avoids ordering issues and is safe for text search.
+                        fopts["text_search"] = False
                     if prev := fdata.get(column["name"]):
                         fopts.update(prev)
                     self.fields.append(

@@ -6,10 +6,11 @@ import sqlalchemy as sa
 from msgspec import Struct
 from msgspec import field as msgspec_field
 from osgeo import ogr, osr
+from sqlalchemy.dialects.postgresql import JSONB
 from zope.interface import Attribute, Interface, implementer
 
 from nextgisweb.env import gettext
-from nextgisweb.lib.json import dumps
+from nextgisweb.lib.json import dumps, loads
 from nextgisweb.lib.ogrhelper import FIELD_GETTER
 
 from nextgisweb.core.exception import ValidationError as VE
@@ -385,6 +386,8 @@ class OGRLoader:
                 fld_type = FIELD_TYPE.STRING
             elif fld_type_ogr == ogr.OFTInteger and fld_defn.GetSubType() == ogr.OFSTBoolean:
                 fld_type = FIELD_TYPE.BOOLEAN
+            elif fld_type_ogr == ogr.OFTString and fld_defn.GetSubType() == ogr.OFSTJSON:
+                fld_type = FIELD_TYPE.JSON
             else:
                 try:
                     fld_type = FIELD_TYPE_2_ENUM[fld_type_ogr]
@@ -431,9 +434,12 @@ class OGRLoader:
         static_size = FIELD_TYPE_SIZE[FIELD_TYPE.INTEGER]
         dynamic_size = 0
         string_fields = []
+        json_fields = set()
         for f in self.fields.values():
-            if f.datatype == FIELD_TYPE.STRING:
+            if f.datatype in (FIELD_TYPE.STRING, FIELD_TYPE.JSON):
                 string_fields.append(f.name)
+                if f.datatype == FIELD_TYPE.JSON:
+                    json_fields.add(f.name)
             else:
                 static_size += FIELD_TYPE_SIZE[f.datatype]
 
@@ -465,7 +471,8 @@ class OGRLoader:
             fields.append((fidx, fobj.name, fget, fobj.origtype))
             fcol = columns[fidx]
             vcolumns.append(sa.column(fcol))
-            qparams[fcol] = sa.bindparam(str(fidx))
+            bp = sa.bindparam(str(fidx))
+            qparams[fcol] = sa.type_coerce(bp, JSONB()) if fobj.datatype == FIELD_TYPE.JSON else bp
 
         vtable = sa.table(table, *vcolumns, schema=schema)
         query_insert = sa.insert(vtable).values(**qparams)
@@ -521,9 +528,11 @@ class OGRLoader:
                         elif params.validate and ftype == ogr.OFTString:
                             fld_value = _validate_string(fld_value, fname, **ctx)
 
-                    row[str(fidx)] = fld_value
                     if fname in string_fields and fld_value is not None:
                         dynamic_size += utf8len(fld_value)
+                        if fname in json_fields:
+                            fld_value = loads(fld_value)
+                    row[str(fidx)] = fld_value
 
                 insert_feature(row)
 

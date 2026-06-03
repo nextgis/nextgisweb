@@ -4,6 +4,7 @@ from msgspec import UNSET, UnsetType
 from osgeo import ogr
 
 from nextgisweb.lib.geometry import Geometry
+from nextgisweb.lib.json import dumps
 
 from .interface import FIELD_TYPE
 
@@ -97,6 +98,8 @@ class Feature:
                     pass
                 case int() | float() | str():
                     ogr_feature.SetField(fld_index, v)
+                case dict() | list():
+                    ogr_feature.SetField(fld_index, dumps(v))
                 case datetime():
                     ogr_feature.SetField(
                         fld_index, v.year, v.month, v.day, v.hour, v.minute, v.second, 0

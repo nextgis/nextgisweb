@@ -28,6 +28,7 @@ def test_from_fields(ngw_txn):
             dict(keyname="time", datatype=FIELD_TYPE.TIME),
             dict(keyname="datetime", datatype=FIELD_TYPE.DATETIME),
             dict(keyname="boolean", datatype=FIELD_TYPE.BOOLEAN),
+            dict(keyname="json", datatype=FIELD_TYPE.JSON),
         ]
     )
 

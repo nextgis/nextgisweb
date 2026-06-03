@@ -30,6 +30,7 @@ Base.depends_on("resource", "lookup_table")
 
 _FIELD_TYPE_2_ENUM_REVERSED = dict(zip(FIELD_TYPE.enum, FIELD_TYPE_OGR))
 _FIELD_TYPE_2_ENUM_REVERSED[FIELD_TYPE.BOOLEAN] = ogr.OFTInteger
+_FIELD_TYPE_2_ENUM_REVERSED[FIELD_TYPE.JSON] = ogr.OFTString
 
 
 class LayerField(Base):
@@ -123,6 +124,8 @@ class LayerFieldsMixin:
             )
             if field.datatype == FIELD_TYPE.BOOLEAN:
                 fld_defn.SetSubType(ogr.OFSTBoolean)
+            elif field.datatype == FIELD_TYPE.JSON:
+                fld_defn.SetSubType(ogr.OFSTJSON)
             ogr_layer.CreateField(fld_defn)
         if fid is not None:
             ogr_layer.CreateField(ogr.FieldDefn(fid, ogr.OFTInteger))

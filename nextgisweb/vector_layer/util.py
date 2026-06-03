@@ -1,6 +1,7 @@
 from uuid import uuid4
 
 import sqlalchemy as sa
+from sqlalchemy.dialects.postgresql import JSONB
 
 from nextgisweb.env import COMP_ID, gettext
 from nextgisweb.lib.ogrhelper import read_dataset
@@ -32,6 +33,7 @@ FIELD_TYPE_DB = (
     sa.Time,
     sa.DateTime,
     sa.Boolean,
+    JSONB,
 )
 FIELD_TYPE_2_DB = dict(zip(FIELD_TYPE.enum, FIELD_TYPE_DB))
 FIELD_TYPE_SIZE = {
