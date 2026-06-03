@@ -1,12 +1,8 @@
-import dayjsGenerateConfig from "@rc-component/picker/es/generate/dayjs";
-import generatePicker from "antd/es/date-picker/generatePicker";
-import type { Dayjs } from "dayjs";
+import { DatePicker } from "antd";
 
 import type { ParamsOf } from "@nextgisweb/gui/type";
 
 import { disableNonPositiveYears } from "../date";
-
-const DatePicker = generatePicker<Dayjs>(dayjsGenerateConfig);
 
 type RangePickerPropsWithRef = ParamsOf<typeof DatePicker.RangePicker>;
 

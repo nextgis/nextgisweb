@@ -16,8 +16,12 @@ type ModalParamsForProgress = Pick<
   "open" | "closable" | "close" | "afterClose" | "title" | "okText" | "onCancel"
 >;
 
+type ProgressProps = Omit<ParamsOf<typeof Progress>, keyof ShowModalOptions>;
+
 export type ProgressModalProps = ModalParamsForProgress &
-  ProgressModal & { cancelText?: string };
+  ProgressProps & {
+    cancelText?: string;
+  };
 
 export const ProgressModal = ({
   status = "active",

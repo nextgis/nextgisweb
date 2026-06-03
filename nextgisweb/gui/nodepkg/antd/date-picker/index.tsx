@@ -1,12 +1,8 @@
-import dayjsGenerateConfig from "@rc-component/picker/es/generate/dayjs";
+import { DatePicker as AntDatePicker } from "antd";
 import type { DatePickerProps } from "antd";
-import generatePicker from "antd/es/date-picker/generatePicker";
 import dayjs from "dayjs";
-import type { Dayjs } from "dayjs";
 
 import { disableNonPositiveYears } from "../date";
-
-const AntDatePicker = generatePicker<Dayjs>(dayjsGenerateConfig);
 
 export function DatePicker({
   ref,
