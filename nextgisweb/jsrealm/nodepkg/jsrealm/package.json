@@ -76,7 +76,12 @@
       "main": "webpack.main.cjs"
     }
   },
-  "resolutions": {
+  "allowBuilds": {
+    "@tree-sitter-grammars/tree-sitter-yaml": true,
+    "core-js": false,
+    "unrs-resolver": true
+  },
+  "overrides": {
     "core-js-compat": "3.48.0",
     "enhanced-resolve": "5.20.1"
   }

@@ -10,8 +10,8 @@ and Webpack. The key points:
    Web extension packages like ``nextgisweb_qgis``). These packages are located
    under ``nodepkg`` subdirectories of corresponding components.
 
-2. These packages are joined into one big Yarn workspace root, and Node packages
-   become Yarn workspaces. It looks like working with monorepository on multiple
+2. These packages are joined into one big pnpm workspace root, and Node packages
+   become pnpm workspaces. It looks like working with monorepository on multiple
    libraries but in multiple source code repositories.
 
 3. There is a modular Webpack config on top of that. Some Node packages can
@@ -23,7 +23,7 @@ provides some tools to work with it.
 Setup and directory layout
 --------------------------
 
-Yarn workspaces feature depends on directory layout. In the examples below, we
+Workspaces feature depends on directory layout. In the examples below, we
 assume that NextGIS Web is installed into home directory of ``ngw`` user with
 the following layout (some files are not shown):
 
@@ -83,7 +83,7 @@ After that it will look like this:
   │   └── 🗎 package.json
   └── 🗎 __init__.py
 
-Let's include this package into Yarn workspace root configuration:
+Let's include this package into pnpm workspace root configuration:
 
 .. code-block:: bash
 
@@ -95,7 +95,7 @@ And now you can add some external dependency for this package, for example:
 .. code-block:: bash
 
   $ cd ~ngw
-  $ yarn workspace "@nextgisweb/bar" add faker
+  $ pnpm --filter "@nextgisweb/bar" add faker
 
 Then you can see that dependency was added to ``package.json`` and now
 ``bar/nodepkg/package.json`` looks like this:
@@ -133,7 +133,7 @@ Now build Webpack bundles and start development webserver:
 .. code-block:: bash
 
   $ cd ~ngw
-  $ yarn run build
+  $ pnpm run build
   $ nextgisweb server
 
 Then go to ``http://localhost:8080/`` open console in web developer tools and

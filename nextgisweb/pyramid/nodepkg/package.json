@@ -4,5 +4,11 @@
   "type": "module",
   "dependencies": {
     "swagger-ui-react": "~5.31.2"
+  },
+  "allowBuilds": {
+    "@scarf/scarf": false,
+    "core-js-pure": false,
+    "tree-sitter": true,
+    "tree-sitter-json": true
   }
 }

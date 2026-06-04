@@ -28,7 +28,7 @@ function isUpToDate(name) {
   const sdata = JSON.parse(fs.readFileSync(fn, "utf8"));
   if (sdata.errorsCount !== 0) return false;
 
-  const lckct = fs.statSync(path.resolve("yarn.lock")).ctimeMs;
+  const lckct = fs.statSync(path.resolve("pnpm-lock.yaml")).ctimeMs;
   const pkgct = fs.statSync(path.resolve("package.json")).ctimeMs;
   const bldct = fs.statSync(fn).ctimeMs;
   return lckct < bldct && pkgct < bldct;

@@ -23,8 +23,8 @@ System requirements
 
 - GDAL >= 3.8.
 
-- Node.js 20.x or higher and Yarn 1.x package manager. We recommend using
-  NodeSource and Yarn package repositories.
+- Node.js 20.x or higher and pnpm package manager via Corepack. We recommend
+  using NodeSource package repository.
 
 - PostgreSQL database with PostGIS extension enabled:
 
@@ -72,13 +72,12 @@ First you need to install required packages:
   # apt install curl git
   # curl --silent https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | apt-key add - 
   # add-apt-repository --yes --no-update "deb https://deb.nodesource.com/node_20.x nodistro main"
-  # curl --silent https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
-  # add-apt-repository --yes --no-update "deb https://dl.yarnpkg.com/debian/ stable main"
   # apt update
   # apt install python3 python3-dev python3-virtualenv
   # apt install build-essential libssl-dev libgdal-dev libgeos-dev \
     gdal-bin libxml2-dev libxslt1-dev zlib1g-dev libjpeg-turbo8-dev \
-    postgresql-client libmagic-dev nodejs yarn
+    postgresql-client libmagic-dev nodejs
+  # corepack enable pnpm
 
 
 It's recommended to use separate user (``ngw`` for example) for NextGIS Web
@@ -172,14 +171,14 @@ end of this section):
 
   $ export NEXTGISWEB_CONFIG=/srv/ngw/config/config.ini
 
-After that, set up Node.js and Yarn project environment with workspaces, and
+After that, set up Node.js and pnpm project environment with workspaces, and
 build necessary files:
 
 .. code-block:: none
 
   $ nextgisweb jsrealm install
   $ mkdir dist
-  $ yarn run build
+  $ pnpm run build
 
 Now you should initialize database structure with the following command:
 

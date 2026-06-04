@@ -6,7 +6,7 @@
     "html-to-image": "1.11.11",
     "react-rnd": "^10.5.3"
   },
-  "resolutions": {
+  "overrides": {
     "react-draggable": "4.5.0"
   }
 }

@@ -4,6 +4,7 @@ import shutil
 from itertools import chain
 from pathlib import Path
 from subprocess import check_call
+from typing import Any, Union
 
 from nextgisweb.env import Env
 from nextgisweb.env.cli import UninitializedEnvCommand, comp_cli, opt
@@ -73,8 +74,8 @@ def install(
 ):
     """Setup JavaScript environment
 
-    :param watch: Start `yarn run watch` after installation
-    :param build: Start `yarn run build` after installation"""
+    :param watch: Start `pnpm run watch` after installation
+    :param build: Start `pnpm run build` after installation"""
 
     from babel.messages.plurals import PLURALS
 
@@ -104,9 +105,12 @@ def install(
         )
     }
 
-    package_json = dict(private=True)
+    package_json: dict[str, Union[dict, str, bool]] = dict(private=True)
+    package_json["packageManager"] = "pnpm@11.2.2"
     package_json["engines"] = dict(node=">=20.0.0")
     package_json["nextgisweb"] = nextgisweb = dict()
+
+    package_json["dependencies"] = {pname: "workspace:*" for pname in sorted(npkgs.keys())}
 
     s_env = nextgisweb["env"] = dict()
     s_env["packages"] = {
@@ -116,15 +120,20 @@ def install(
         comp_id: str(pkginfo.comp_path(comp_id).relative_to(cwd)) for comp_id in pkginfo.components
     }
 
-    s_resolutions = dict()
+    s_allow_builds = dict()
+    s_overrides = dict()
 
     peer_dependencies = package_json["peerDependencies"] = {}
     for ppath in npkgs.values():
         package_data = json.loads((ppath / "package.json").read_text())
 
-        package_resolutions = package_data.get("resolutions")
-        if isinstance(package_resolutions, dict):
-            s_resolutions.update(package_resolutions)
+        overrides = package_data.get("overrides")
+        if isinstance(overrides, dict):
+            s_overrides.update(overrides)
+
+        allow_builds = package_data.get("allowBuilds")
+        if isinstance(allow_builds, dict):
+            s_allow_builds.update(allow_builds)
 
         # Collect dependencies to provide auto-imports in the IDE To use package
         # dependencies, ensure `commonDependencies: true` is included in the
@@ -136,9 +145,6 @@ def install(
                 and package_nextgisweb.get("commonDependencies")
             ):
                 peer_dependencies.update({k: "*" for k in package_dependencies.keys()})
-
-    if s_resolutions:
-        package_json["resolutions"] = s_resolutions
 
     def language(lang):
         nplurals, plural = PLURALS.get(lang, PLURALS.get(lang.split("-")[0]))
@@ -203,9 +209,31 @@ def install(
 
     scripts["watch:types"] = "npx tsc --watch -p tsconfig.json"
 
-    package_json["workspaces"] = [str(pp) for pp in npkgs.values()]
+    workspace_paths: list[str] = [str(pp) for pp in npkgs.values()]
+
+    pnpm_workspace_json: dict[str, Any] = {
+        "packages": workspace_paths,
+        "nodeLinker": "hoisted",
+        "updateNotifier": False,
+        "hoistWorkspacePackages": True,
+        "shamefullyHoist": True,
+    }
+
+    if s_allow_builds:
+        pnpm_workspace_json["allowBuilds"] = {
+            package: allowed for package, allowed in s_allow_builds.items()
+        }
+
+    if s_overrides:
+        pnpm_workspace_json["overrides"] = {
+            package: version for package, version in s_overrides.items()
+        }
 
     update_text_file(Path("package.json"), json.dumps(package_json, indent=4))
+    update_text_file(
+        Path("pnpm-workspace.yaml"),
+        json.dumps(pnpm_workspace_json, indent=2),
+    )
 
     create_tsconfig(npkgs, debug=debug)
 
@@ -219,13 +247,16 @@ def install(
                 continue
             tf.symlink_to((ngw_root / lc).relative_to(pkg_root))
 
-    check_call(["yarn", "install"])
+    check_call(
+        ["pnpm", "install"],
+        env={**os.environ, "COREPACK_ENABLE_DOWNLOAD_PROMPT": "0"},
+    )
 
     if watch or build:
-        yarn_path = shutil.which("yarn")
-        assert yarn_path is not None
+        pnpm_path = shutil.which("pnpm")
+        assert pnpm_path is not None
         os.execve(
-            yarn_path,
-            ["run"] + ["watch" if watch else "build"],
+            pnpm_path,
+            ["pnpm", "run", "watch" if watch else "build"],
             env=os.environ,
         )

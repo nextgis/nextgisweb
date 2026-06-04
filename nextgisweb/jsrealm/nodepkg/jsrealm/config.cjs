@@ -7,11 +7,18 @@ const section = packageJson.nextgisweb;
 const components = [];
 const packages = [];
 
+function workspacePackages() {
+  const content = fs.readFileSync(`pnpm-workspace.yaml`, "utf8");
+  const workspace = JSON.parse(content);
+
+  return workspace.packages || [];
+}
+
 for (const [cId, cPath] of Object.entries(section.env.components)) {
   components.push({ name: cId, path: path.resolve(cPath) });
 }
 
-for (const wsPath of packageJson.workspaces) {
+for (const wsPath of workspacePackages()) {
   const packageJson = JSON.parse(
     fs.readFileSync(`${wsPath}/package.json`, "utf8")
   );

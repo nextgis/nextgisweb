@@ -1,4 +1,4 @@
-# // crater >= 2.3.0.dev0
+# // crater >= 2.3.0.dev1
 
 from pathlib import Path
 
@@ -46,6 +46,9 @@ def on_apt(event):
         "    rm -rf $(pwd)",
         ")",
     )
+
+    # Enable pnpm, which will be downloaded later
+    event.cleanup("corepack enable pnpm")
 
 
 @AppImage.on_user_dir.handler

@@ -57,14 +57,14 @@ out, upgrade the package in virtualenv and recompile i18n translations:
   $ pip install -e nextgisweb
   $ nextgisweb-i18n -p nextgisweb compile
 
-And then, go to the home directory and update Node.js and Yarn project
+And then, go to the home directory and update Node.js and pnpm project
 environment with workspaces, and build necessary files:
 
 .. code-block:: none
 
   $ cd
   $ nextgisweb jsrealm install
-  $ yarn run build
+  $ pnpm run build
 
 Repeat these steps with additional packages such as ``nextgisweb_qgis`` and
 ``nextgisweb_mapserver``. Some of them may require additional steps, such as
