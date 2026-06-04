@@ -16,6 +16,7 @@ class FieldDefn(Struct, kw_only=True):
     lookup_table: LookupTable | None | UnsetType = UNSET
     grid_visibility: bool | UnsetType = UNSET
     text_search: bool | UnsetType = UNSET
+    required: bool | UnsetType = UNSET
 
 
 class SetupFieldsResult(Struct, kw_only=True):
@@ -43,7 +44,7 @@ def setup_fields(
     """
 
     rest = {f.keyname: f for f in res.fields}
-    attrs = ("display_name", "grid_visibility", "text_search", "lookup_table")
+    attrs = ("display_name", "grid_visibility", "text_search", "required", "lookup_table")
 
     present = list()
     added = list()

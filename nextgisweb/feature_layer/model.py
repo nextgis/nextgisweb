@@ -45,6 +45,7 @@ class LayerField(Base):
     display_name = sa.Column(sa.Unicode, nullable=False)
     grid_visibility = sa.Column(sa.Boolean, nullable=False, default=True)
     text_search = sa.Column(sa.Boolean, nullable=False, default=True)
+    required = sa.Column(sa.Boolean, nullable=False, default=False)
     lookup_table_id = sa.Column(sa.ForeignKey(LookupTable.id))
 
     identity = __tablename__
@@ -74,6 +75,7 @@ class LayerField(Base):
             display_name=source.display_name,
             grid_visibility=source.grid_visibility,
             text_search=source.text_search,
+            required=source.required,
             lookup_table=source.lookup_table,
         )
 
@@ -136,6 +138,7 @@ class FeatureLayerFieldRead(Struct, kw_only=True):
     label_field: bool
     grid_visibility: bool
     text_search: bool
+    required: bool
     lookup_table: ResourceRef | None
 
 
@@ -149,6 +152,7 @@ class FeatureLayerFieldWrite(Struct, kw_only=True):
     label_field: bool | UnsetType = UNSET
     grid_visibility: bool | UnsetType = UNSET
     text_search: bool | UnsetType = UNSET
+    required: bool | UnsetType = UNSET
     lookup_table: ResourceRef | None | UnsetType = UNSET
 
 
@@ -174,6 +178,7 @@ class FieldsAttr(SAttribute):
                 label_field=(f == srlzr.obj.feature_label_field),
                 grid_visibility=f.grid_visibility,
                 text_search=f.text_search,
+                required=f.required,
                 lookup_table=ResourceRef(id=f.lookup_table.id) if f.lookup_table else None,
             )
             for f in srlzr.obj.fields
@@ -213,6 +218,9 @@ class FieldsAttr(SAttribute):
 
             if fld.text_search is not UNSET:
                 mfld.text_search = fld.text_search
+
+            if fld.required is not UNSET:
+                mfld.required = fld.required
 
             if fld.lookup_table is None:
                 mfld.lookup_table = fld.lookup_table

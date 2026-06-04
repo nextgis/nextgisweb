@@ -21,6 +21,7 @@ const sampleFields: FeatureLayerFieldRead[] = [
     label_field: true,
     grid_visibility: true,
     text_search: true,
+    required: false,
     lookup_table: null,
   },
   {
@@ -32,6 +33,7 @@ const sampleFields: FeatureLayerFieldRead[] = [
     label_field: false,
     grid_visibility: true,
     text_search: false,
+    required: false,
     lookup_table: null,
   },
   {
@@ -43,6 +45,7 @@ const sampleFields: FeatureLayerFieldRead[] = [
     label_field: false,
     grid_visibility: true,
     text_search: false,
+    required: false,
     lookup_table: null,
   },
   {
@@ -54,6 +57,7 @@ const sampleFields: FeatureLayerFieldRead[] = [
     label_field: false,
     grid_visibility: true,
     text_search: true,
+    required: false,
     lookup_table: null,
   },
   {
@@ -65,6 +69,7 @@ const sampleFields: FeatureLayerFieldRead[] = [
     label_field: false,
     grid_visibility: true,
     text_search: false,
+    required: false,
     lookup_table: null,
   },
   {
@@ -76,6 +81,7 @@ const sampleFields: FeatureLayerFieldRead[] = [
     label_field: false,
     grid_visibility: true,
     text_search: false,
+    required: false,
     lookup_table: null,
   },
   {
@@ -87,6 +93,7 @@ const sampleFields: FeatureLayerFieldRead[] = [
     label_field: false,
     grid_visibility: true,
     text_search: false,
+    required: false,
     lookup_table: null,
   },
 ];
