@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { useCallback, useMemo } from "react";
+import { lazy, useCallback, useMemo } from "react";
 
 import { useShowModal } from "@nextgisweb/gui";
 import { ActionToolbar } from "@nextgisweb/gui/action-toolbar";
@@ -44,6 +44,9 @@ const msgCreate = gettext("Create");
 const msgSearchPlaceholder = gettext("Search...");
 const msgFilterTitle = gettext("Advanced filter");
 
+const FeatureDisplayModalLazy = lazy(() => import("../feature-display-modal"));
+const FeatureEditorModalLazy = lazy(() => import("../feature-editor-modal"));
+
 export const FeatureGridActions = observer(
   ({
     store,
@@ -75,7 +78,7 @@ export const FeatureGridActions = observer(
     const { data: resourceData } = useRouteGet("resource.item", { id });
 
     const { confirmDelete, contextHolder } = useConfirm();
-    const { showModal, lazyModal, modalHolder } = useShowModal();
+    const { showModal, modalHolder } = useShowModal();
 
     const goTo = useCallback(
       (
@@ -119,13 +122,13 @@ export const FeatureGridActions = observer(
         if (onOpen) {
           onOpen({ featureId, resourceId: id });
         } else {
-          lazyModal(() => import("../feature-display-modal"), {
+          showModal(FeatureDisplayModalLazy, {
             featureId,
             resourceId: id,
           });
         }
       }
-    }, [selectedIds, onOpen, id, lazyModal]);
+    }, [selectedIds, id, showModal, onOpen]);
 
     const onSave = useCallback(
       (item?: CompositeRead) => {
@@ -194,7 +197,7 @@ export const FeatureGridActions = observer(
                     size={size}
                     icon={<AddIcon />}
                     onClick={() => {
-                      lazyModal(() => import("../feature-editor-modal"), {
+                      showModal(FeatureEditorModalLazy, {
                         editorOptions: {
                           resourceId: id,
                           onSave,
@@ -215,7 +218,7 @@ export const FeatureGridActions = observer(
                   onClick={() => {
                     if (selectedIds.length) {
                       const featureId = selectedIds[0];
-                      lazyModal(() => import("../feature-editor-modal"), {
+                      showModal(FeatureEditorModalLazy, {
                         editorOptions: {
                           featureId,
                           resourceId: id,

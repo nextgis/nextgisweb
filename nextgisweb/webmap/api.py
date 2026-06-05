@@ -618,7 +618,7 @@ def display_config(obj, request) -> DisplayConfig:
 
             # Main element parameters
             data.update(
-                layerId=style.parent_id,
+                layerId=layer.id,
                 styleId=style.id,
                 visibility=layer_enabled,
                 identifiable=item.layer_identifiable,

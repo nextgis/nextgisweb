@@ -21,7 +21,12 @@ abstract class BaseTreeItemStore {
   @observable.ref accessor label: string;
   @observable.ref accessor title: string;
 
-  @observable accessor changeStamp = 0;
+  // increments automatically whenever any property changes
+  // used to trigger reactive updates in the UI
+  @observable.ref accessor changeStamp = 0;
+
+  // Timestamp of the last sync with the server.
+  @observable.ref accessor lastSyncedAt: number | null = null;
 
   protected constructor(
     init: Pick<
@@ -49,8 +54,13 @@ abstract class BaseTreeItemStore {
   }
 
   @action.bound
-  protected touch() {
+  touch() {
     this.changeStamp += 1;
+  }
+
+  @action
+  setLastSynced(time: number | null = Date.now()) {
+    this.lastSyncedAt = time;
   }
 
   @action.bound
@@ -78,11 +88,19 @@ export class LegendInfoStore implements LegendInfo {
 
   @observable.ref accessor symbols: LegendSymbol[] | null = null;
 
-  @observable accessor changeStamp = 0;
+  @observable.ref accessor changeStamp = 0;
 
   constructor({ visible, has_legend }: LegendInfo) {
     this.visible = visible;
     this.has_legend = has_legend;
+  }
+
+  @action.bound
+  load(config: LegendInfo) {
+    this.visible = config.visible;
+    this.has_legend = config.has_legend;
+
+    this.touch();
   }
 
   @action.bound
@@ -103,7 +121,7 @@ export class LegendInfoStore implements LegendInfo {
   }
 
   @action
-  setSymbols(val: LegendSymbol[]) {
+  setSymbols(val: LegendSymbol[] | null) {
     this.symbols = val;
     this.touch();
   }
@@ -177,6 +195,32 @@ export class TreeLayerStore
     this.maxResolution = init.maxResolution ?? null;
     this.editable = init.editable ?? null;
     this.identification = init.identification ?? null;
+  }
+
+  @action.bound
+  load(config: LayerItemConfig) {
+    this.layerId = config.layerId;
+    this.styleId = config.styleId;
+    this.visibility = !!config.visibility;
+    this.identifiable = !!config.identifiable;
+    this.transparency = config.transparency ?? null;
+    this.minScaleDenom = config.minScaleDenom ?? null;
+    this.maxScaleDenom = config.maxScaleDenom ?? null;
+    this.drawOrderPosition =
+      this.drawOrderEnabled && typeof config.drawOrderPosition === "number"
+        ? config.drawOrderPosition
+        : TreeLayerStore.order++;
+    this.filterable = config.filterable;
+    this.adapter = config.adapter;
+    this.plugin = config.plugin;
+    this.minResolution = config.minResolution ?? null;
+    this.maxResolution = config.maxResolution ?? null;
+    this.editable = config.editable ?? null;
+    this.identification = config.identification ?? null;
+
+    this.legendInfo.load(config.legendInfo);
+    this.setLastSynced();
+    this.touch();
   }
 
   dump(): LayerItemConfig {

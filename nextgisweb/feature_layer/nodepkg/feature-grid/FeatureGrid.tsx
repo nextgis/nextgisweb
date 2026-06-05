@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { Button, Empty, Tooltip } from "@nextgisweb/gui/antd";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
+import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
@@ -13,7 +14,6 @@ import { FeatureGridActions } from "./FeatureGridActions";
 import { FeatureGridStore } from "./FeatureGridStore";
 import FeatureTable from "./FeatureTable";
 import TableConfigModal from "./component/TableConfigModal";
-import { KEY_FIELD_ID } from "./constant";
 import type { FeatureGridProps } from "./type";
 
 import RefreshIcon from "@nextgisweb/icon/material/refresh";
@@ -38,6 +38,7 @@ export const FeatureGrid = observer(
     const [store] = useState(
       () => storeProp || new FeatureGridStore(restProps)
     );
+    const { makeSignal } = useAbortController();
 
     const {
       id,
@@ -69,21 +70,15 @@ export const FeatureGrid = observer(
 
     useEffect(() => {
       if (resourceData) {
-        const featureLayer = resourceData.feature_layer!;
+        const featureLayer = resourceData.feature_layer;
 
         const versioning = featureLayer?.versioning?.enabled ?? false;
-        if (versioning) store.setVersioning(true);
-
-        const fields = featureLayer?.fields;
-        if (fields) {
-          store.setFields(fields);
-          store.setVisibleFields([
-            KEY_FIELD_ID,
-            ...fields.filter((f) => f.grid_visibility).map((f) => f.id),
-          ]);
+        if (versioning) {
+          store.setVersioning(true);
         }
+        store.loadFields({ signal: makeSignal() });
       }
-    }, [resourceData, store]);
+    }, [resourceData, store, makeSignal]);
 
     const prevSelectedIds = useRef(selectedIds);
     useEffect(() => {

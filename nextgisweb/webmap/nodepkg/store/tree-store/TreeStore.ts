@@ -504,9 +504,9 @@ export class TreeStore {
   };
 
   @action.bound
-  async updateResourceLegendSymbols(resources: number[]) {
-    if (resources.length) {
-      const newResources = resources.filter(
+  async updateResourceLegendSymbols(styleIds: number[]) {
+    if (styleIds.length) {
+      const newResources = styleIds.filter(
         (id) => !this._loadingResourceSymbols.has(id)
       );
       if (!newResources.length) return;

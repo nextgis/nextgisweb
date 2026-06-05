@@ -13,8 +13,16 @@ import { filterItems } from "@nextgisweb/webmap/store/tree-store/treeStoreUtil";
 const WebmapLayer = observer(({ layerItem }: { layerItem: TreeLayerStore }) => {
   const layerItemRef = useRef(layerItem);
   const [layer, setLayer] = useState<CoreLayer | null>(null);
+  const layerRef = useRef(layer);
 
-  const { visibility, opacity, symbols, filter, drawOrderPosition } = layerItem;
+  const {
+    visibility,
+    opacity,
+    symbols,
+    filter,
+    drawOrderPosition,
+    legendInfo,
+  } = layerItem;
   const { mapStore } = useMapContext();
   const { hmux } = mapStore;
 
@@ -65,6 +73,10 @@ const WebmapLayer = observer(({ layerItem }: { layerItem: TreeLayerStore }) => {
   }, [mapStore, hmux]);
 
   useEffect(() => {
+    layerRef.current = layer;
+  }, [layer]);
+
+  useEffect(() => {
     if (layer) {
       layer.setVisibility(visibility);
     }
@@ -75,6 +87,8 @@ const WebmapLayer = observer(({ layerItem }: { layerItem: TreeLayerStore }) => {
       layer.setOpacity(opacity);
     }
   }, [opacity, layer, mapStore]);
+
+  useEffect(() => {}, []);
 
   useEffect(() => {
     if (layer) {
@@ -89,10 +103,16 @@ const WebmapLayer = observer(({ layerItem }: { layerItem: TreeLayerStore }) => {
   }, [layer, filter]);
 
   useEffect(() => {
-    if (layer && drawOrderPosition !== null) {
-      layer.setZIndex(drawOrderPosition);
+    if (layerRef.current) {
+      layerRef.current.reload();
     }
-  }, [layer, drawOrderPosition]);
+  }, [legendInfo.changeStamp]);
+
+  useEffect(() => {
+    if (layerRef.current && drawOrderPosition !== null) {
+      layerRef.current.setZIndex(drawOrderPosition);
+    }
+  }, [drawOrderPosition]);
 
   useEffect(() => {
     const r = resolutionDebounced;

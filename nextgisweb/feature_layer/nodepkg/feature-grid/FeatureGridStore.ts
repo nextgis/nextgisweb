@@ -3,9 +3,11 @@ import { action, computed, observable } from "mobx";
 import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
 import type { ActionToolbarAction } from "@nextgisweb/gui/action-toolbar";
 import type { SizeType } from "@nextgisweb/gui/antd";
+import { route } from "@nextgisweb/pyramid/api";
 import type { CompositeRead } from "@nextgisweb/resource/type/api";
 
 import type { FilterExpressionString } from "../feature-filter/type";
+import { pruneFilterExpressionByFields } from "../feature-filter/util/prune";
 
 import { KEY_FIELD_ID } from "./constant";
 import type { QueryParams } from "./hook/useFeatureTable";
@@ -104,6 +106,7 @@ export class FeatureGridStore {
   @action.bound
   setFields(fields: FeatureLayerFieldRead[]) {
     this.fields = fields;
+    this.pruneFilterExpressionByFields();
   }
 
   @action.bound
@@ -196,6 +199,37 @@ export class FeatureGridStore {
   @action.bound
   setFilterExpression(filterExpression: FilterExpressionString | undefined) {
     this.filterExpression = filterExpression;
+  }
+
+  @action.bound
+  pruneFilterExpressionByFields() {
+    const nextFilterExpression = pruneFilterExpressionByFields(
+      this.filterExpression,
+      this.fields
+    );
+
+    if (nextFilterExpression !== this.filterExpression) {
+      this.filterExpression = nextFilterExpression;
+    }
+  }
+
+  async loadFields({ signal }: { signal?: AbortSignal } = {}) {
+    try {
+      const res = await route("resource.item", { id: this.id }).get({
+        cache: true,
+        signal,
+      });
+      const fields = res.feature_layer?.fields;
+      if (fields) {
+        this.setFields(fields);
+        this.setVisibleFields([
+          KEY_FIELD_ID,
+          ...fields.filter((f) => f.grid_visibility).map((f) => f.id),
+        ]);
+      }
+    } catch {
+      //
+    }
   }
 
   @action.bound

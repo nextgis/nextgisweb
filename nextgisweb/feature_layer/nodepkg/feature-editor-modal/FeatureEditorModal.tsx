@@ -77,7 +77,7 @@ export function FeatureEditorModal({
         open={open}
         onCancel={handleClose}
         closable={false}
-        modalClassName="ngw-feature-layer-feature-editor-modal"
+        className="ngw-feature-layer-feature-editor-modal"
         {...modalProps}
       >
         <FeatureEditorWidget

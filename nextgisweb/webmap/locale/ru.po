@@ -464,14 +464,7 @@ msgstr "Связаться с администратором Веб ГИС"
 msgid "Description"
 msgstr "Описание"
 
-#: nodepkg/panel/editWebmap/plugin.tsx:78
-#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:177
-#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:184
-#: nodepkg/ui/finish-editing-dialog/FinishEditingDialog.tsx:59
-msgid "Cancel"
-msgstr "Отменить"
-
-#: nodepkg/panel/editWebmap/plugin.tsx:101
+#: nodepkg/panel/editWebmap/plugin.tsx:24
 msgid "Edit web map"
 msgstr "Редактировать веб-карту"
 
@@ -814,6 +807,18 @@ msgstr "Изменить"
 msgid "Move"
 msgstr "Переместить"
 
+#: nodepkg/plugin/layer-resource-editor/LayerResourceEditor.tsx:23
+msgid "Edit layer resource"
+msgstr "Редактировать ресурс слоя"
+
+#: nodepkg/plugin/layer-resource-editor/LayerResourceEditor.tsx:24
+msgid "Edit resource"
+msgstr "Редактировать ресурс"
+
+#: nodepkg/plugin/style-resource-editor/StyleResourceEditor.tsx:21
+msgid "Edit style resource"
+msgstr "Редактировать ресурс стиля"
+
 #: nodepkg/plugin/zoom-to-layer/ZoomToLayerPlugin.tsx:19
 msgid "Zoom to layer"
 msgstr "Увеличить до слоя"
@@ -1076,6 +1081,12 @@ msgstr "Создать как приватную"
 msgid "Create annotation"
 msgstr "Создать аннотацию"
 
+#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:177
+#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:184
+#: nodepkg/ui/finish-editing-dialog/FinishEditingDialog.tsx:59
+msgid "Cancel"
+msgstr "Отменить"
+
 #: nodepkg/ui/annotation-dialog/AnnotationsSettings.tsx:56
 msgid "Stroke: width / color"
 msgstr "Обводка: ширина / цвет"
@@ -1145,11 +1156,11 @@ msgstr "Мультиполигон"
 msgid "GeometryCollection"
 msgstr "Коллекция геометрий"
 
-#: nodepkg/webmap-feature-grid-tab/WebMapFeatureGridTab.tsx:26
+#: nodepkg/webmap-feature-grid-tab/WebMapFeatureGridTab.tsx:28
 msgid "Go to"
 msgstr "Перейти"
 
-#: nodepkg/webmap-feature-grid-tab/WebMapFeatureGridTab.tsx:151
+#: nodepkg/webmap-feature-grid-tab/WebMapFeatureGridTab.tsx:154
 msgid "Selected feature has no geometry"
 msgstr "Выбранный объект не имеет геометрии"
 

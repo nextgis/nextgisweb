@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import type { UniqueValuesResult } from "@nextgisweb/feature-layer/type/api";
 import { AutoComplete, Select } from "@nextgisweb/gui/antd";
+import { errorModal } from "@nextgisweb/gui/error";
 import { useMemoDebounce, useRoute } from "@nextgisweb/pyramid/hook";
 
 import type { DefaultFilterValueInputProps } from "../feature-filter/component/DefaultFilterValueInput";
@@ -73,7 +74,8 @@ export function UniqueValueInput({
             setData(uniqRes);
           }
         }
-      });
+      })
+      .catch(errorModal);
     return () => {
       canceled = true;
     };

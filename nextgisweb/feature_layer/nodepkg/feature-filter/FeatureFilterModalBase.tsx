@@ -60,7 +60,7 @@ export function FeatureFilterModalBase<P extends ControlledFilterEditorProps>({
     <EditorModal
       open={open}
       onCancel={handleClose}
-      modalClassName="ngw-feature-filter-modal"
+      className="ngw-feature-filter-modal"
       {...modalProps}
     >
       <EditorComponent

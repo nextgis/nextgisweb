@@ -5,4 +5,6 @@ from .layer_filter import LayerFilterPlugin
 from .layer_identifiable import LayerIdentifiablePlugin
 from .layer_info import LayerInfoPlugin
 from .layer_opacity import LayerOpacityPlugin
+from .layer_resource_editor import LayerResourceEditorPlugin
+from .style_resource_editor import StyleResourceEditorPlugin
 from .zoom_to_layer import ZoomToLayerPlugin

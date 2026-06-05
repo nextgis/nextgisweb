@@ -110,7 +110,9 @@ export function DropdownActions(props: DropdownActionsProps) {
       );
       if (canceledRef.current) return;
 
-      const newMenuItems: MenuProps["items"] = [];
+      const newMenuItems: (NonNullable<MenuProps["items"]>[number] & {
+        order?: number;
+      })[] = [];
       const newCustomMenuItems: React.ReactElement[] = [];
 
       for (const keyPlugin in plugins) {
@@ -122,7 +124,8 @@ export function DropdownActions(props: DropdownActionsProps) {
         const pluginInfo = plugin.getPluginState(nodeData);
         if (pluginInfo.enabled) {
           if (plugin.getMenuItem) {
-            const { icon, title, onClick } = plugin.getMenuItem(nodeData);
+            const { icon, title, onClick, order } =
+              plugin.getMenuItem(nodeData);
             const onClick_ = async () => {
               if (plugin) {
                 if (onClick) {
@@ -139,6 +142,7 @@ export function DropdownActions(props: DropdownActionsProps) {
 
             newMenuItems.push({
               key: keyPlugin,
+              order,
               onClick: onClick_,
               icon:
                 typeof icon === "string" ? (
@@ -155,7 +159,18 @@ export function DropdownActions(props: DropdownActionsProps) {
         }
       }
 
-      setMenuItems(newMenuItems);
+      const sortedMenuItems = [...newMenuItems].sort((a, b) => {
+        const orderA = a.order ?? 0;
+        const orderB = b.order ?? 0;
+
+        if (orderA !== orderB) {
+          return orderA - orderB;
+        }
+
+        return String(a.key).localeCompare(String(b.key));
+      });
+
+      setMenuItems(sortedMenuItems);
       setCustomMenuItems(newCustomMenuItems);
       setMoreClickId(id);
     } finally {
