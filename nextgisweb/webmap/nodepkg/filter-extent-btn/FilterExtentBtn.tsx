@@ -327,7 +327,10 @@ export const FilterExtentBtn = ({
     const source = interactionInfo.current?.source;
     if (source) {
       const map = display.map.olMap;
-      map.getView().fit(source.getExtent());
+      const extent = source.getExtent();
+      if (extent) {
+        map.getView().fit(extent);
+      }
     }
   }, [display]);
 

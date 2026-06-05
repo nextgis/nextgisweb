@@ -58,19 +58,28 @@ export function generateSymbolizer<K extends keyof KindParams>(
     case "point":
       return {
         ...markSymbolizer,
-        ...values,
+        ...(values as Partial<MarkSymbolizer>),
       };
+
     case "Fill":
     case "polygon":
       return {
         ...fillSymbolizer,
-        ...values,
+        ...(values as Partial<FillSymbolizer>),
       };
+
     case "Line":
     case "line":
       return {
         ...lineSymbolizer,
-        ...values,
+        ...(values as Partial<LineSymbolizer>),
+      };
+
+    case "Text":
+    case "text":
+      return {
+        ...textSymbolizer,
+        ...(values as Partial<TextSymbolizer>),
       };
     default:
       return {
