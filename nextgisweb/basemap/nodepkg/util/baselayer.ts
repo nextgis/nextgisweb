@@ -1,3 +1,6 @@
+import { debounce } from "lodash-es";
+import type Tile from "ol/Tile";
+import TileState from "ol/TileState";
 import type { Options as XYZSourceOptions } from "ol/source/XYZ";
 
 import type {
@@ -6,6 +9,8 @@ import type {
   WebmapPluginBaselayer,
 } from "@nextgisweb/basemap/layer-widget/type";
 import { registerEPSG3395Projection } from "@nextgisweb/basemap/util/epsg3395";
+import { RequestQueue, tileLoadFunction } from "@nextgisweb/pyramid/util";
+import metrics from "@nextgisweb/sentry/metrics";
 import type { MapStore } from "@nextgisweb/webmap/ol/MapStore";
 import type { LayerOptions } from "@nextgisweb/webmap/ol/layer/CoreLayer";
 import type QuadKey from "@nextgisweb/webmap/ol/layer/QuadKey";
@@ -14,6 +19,53 @@ import type XYZ from "@nextgisweb/webmap/ol/layer/XYZ";
 import { DEFAULT_SOURCE_MAX_ZOOM } from "../constant";
 
 let idx = 0;
+
+const basemapTileQueue = new RequestQueue({
+  limit: 20,
+  timeout: 15_000,
+});
+
+const countTileLoadError = debounce(
+  (src: string, timeout: boolean) => {
+    const url = new URL(src);
+    metrics.count(COMP_ID, "tile.error", 1, {
+      attributes: {
+        "tile.origin": url.origin,
+        "tile.path": url.pathname + url.search,
+        "tile.timeout": timeout,
+      },
+    });
+  },
+  60_000,
+  { trailing: false, leading: true }
+);
+
+function basemapTileLoadFunction(tile: Tile, src: string) {
+  // @ts-expect-error Property 'getImage' does not exist on type 'Tile'.
+  const img = tile.getImage() as HTMLImageElement;
+
+  basemapTileQueue.add(
+    ({ signal }) =>
+      tileLoadFunction({ src, signal })
+        .then((imageUrl) => {
+          if (!signal.aborted) {
+            img.src = imageUrl;
+          }
+        })
+        .catch((er) => {
+          if (er.name !== "AbortError") {
+            tile.setState(TileState.ERROR);
+            countTileLoadError(src, er.name === "TimeoutError");
+          }
+        }),
+
+    {
+      abort: () => {
+        tile.setState(TileState.ERROR);
+      },
+    }
+  );
+}
 
 export function prepareBaselayerConfig(
   config: WebmapPluginBaselayer | BasemapConfig
@@ -106,6 +158,7 @@ export function prepareBaselayerConfig(
   layer.visible = config.enabled ?? undefined;
 
   source.crossOrigin = "anonymous";
+  source.tileLoadFunction = basemapTileLoadFunction;
   return { source, layer, keyname };
 }
 

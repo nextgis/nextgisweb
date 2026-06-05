@@ -6,19 +6,31 @@ type AbortableRequest = {
   request: RequestFunc;
   abort?: Abort;
   abortController: AbortController;
+  timeout?: number;
+  timeoutId?: ReturnType<typeof setTimeout>;
+  completed?: boolean;
 };
 
 interface RequestQueueOptions {
   /** Concurrent requests count */
   limit?: number;
+  /** Abort active request after this time in ms */
+  timeout?: number;
   /** Time in ms */
   debounce?: number;
+}
+
+interface RequestQueueAddOptions {
+  abort?: Abort;
+  id?: string | number;
+  timeout?: number;
 }
 
 export class RequestQueue {
   private queue: AbortableRequest[] = [];
   private activeRequests: AbortableRequest[] = [];
   private limit: number;
+  private timeout?: number;
   readonly debounce: number;
 
   private timeoutId?: ReturnType<typeof setTimeout>;
@@ -27,8 +39,9 @@ export class RequestQueue {
   private paused = false;
   private idleResolvers: Array<() => void> = [];
 
-  constructor({ limit = 1, debounce = 0 }: RequestQueueOptions = {}) {
+  constructor({ limit = 1, timeout, debounce = 0 }: RequestQueueOptions = {}) {
     this.limit = limit;
+    this.timeout = timeout;
     this.debounce = debounce;
   }
 
@@ -36,7 +49,7 @@ export class RequestQueue {
     this.limit = limit;
   }
 
-  add(request: RequestFunc, options?: { abort?: Abort; id?: string | number }) {
+  add(request: RequestFunc, options?: RequestQueueAddOptions) {
     const { abort, id } = options || {};
     if (id !== undefined && id !== null) {
       this.removeById(id);
@@ -46,6 +59,7 @@ export class RequestQueue {
       request,
       abort,
       abortController: new AbortController(),
+      timeout: options?.timeout ?? this.timeout,
     };
     this.queue.push(queueItem);
     this.debouncedStart();
@@ -54,10 +68,9 @@ export class RequestQueue {
 
   abort() {
     for (const q of [...this.queue, ...this.activeRequests]) {
-      q.abortController.abort();
-      if (q.abort) {
-        q.abort();
-      }
+      this.abortRequest(q);
+      this.clearRequestTimeout(q);
+      q.completed = true;
     }
     this.queue.length = 0;
     this.activeRequests.length = 0;
@@ -89,6 +102,18 @@ export class RequestQueue {
     this.paused = false;
     this._clearResumeTimer();
     this._next();
+  }
+
+  clearQueue() {
+    for (const q of this.queue) {
+      this.abortRequest(q);
+      this.clearRequestTimeout(q);
+      q.completed = true;
+    }
+
+    this.queue.length = 0;
+    this._clearTimeout();
+    this.checkIdle();
   }
 
   private debouncedStart() {
@@ -124,13 +149,10 @@ export class RequestQueue {
 
       if (!abortController.signal.aborted) {
         this.activeRequests.push(requestItem);
+        this.startRequestTimeout(requestItem);
 
         request({ signal: abortController.signal }).finally(() => {
-          this.activeRequests = this.activeRequests.filter(
-            (req) => req !== requestItem
-          );
-          this.checkIdle();
-          this._next();
+          this.finishRequest(requestItem);
         });
       } else {
         this._next();
@@ -143,11 +165,52 @@ export class RequestQueue {
     const idx = this.activeRequests.findIndex((it) => it.id === id);
     if (idx >= 0) {
       const running = this.activeRequests[idx];
-      running.abortController.abort();
-      running.abort?.();
-      this.activeRequests.splice(idx, 1);
-      this._next();
+      this.abortRequest(running);
+      this.finishRequest(running);
     }
+  }
+
+  private startRequestTimeout(requestItem: AbortableRequest) {
+    if (!requestItem.timeout || requestItem.timeout <= 0) {
+      return;
+    }
+
+    requestItem.timeoutId = setTimeout(() => {
+      this.abortRequest(
+        requestItem,
+        new DOMException("Request timed out", "TimeoutError")
+      );
+      this.finishRequest(requestItem);
+    }, requestItem.timeout);
+  }
+
+  private abortRequest(requestItem: AbortableRequest, reason?: unknown) {
+    if (!requestItem.abortController.signal.aborted) {
+      requestItem.abortController.abort(reason);
+    }
+
+    requestItem.abort?.();
+  }
+
+  private clearRequestTimeout(requestItem: AbortableRequest) {
+    if (requestItem.timeoutId) {
+      clearTimeout(requestItem.timeoutId);
+      requestItem.timeoutId = undefined;
+    }
+  }
+
+  private finishRequest(requestItem: AbortableRequest) {
+    if (requestItem.completed) {
+      return;
+    }
+
+    requestItem.completed = true;
+    this.clearRequestTimeout(requestItem);
+    this.activeRequests = this.activeRequests.filter(
+      (req) => req !== requestItem
+    );
+    this.checkIdle();
+    this._next();
   }
 
   private isIdle(): boolean {
