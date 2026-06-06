@@ -57,6 +57,7 @@ module.exports = (name, config, options) => {
     if (config.output === undefined) config.output = {};
     if (config.output.path === undefined) {
       config.output.path = path.resolve(distPath, name);
+      config.output.clean = options?.clean !== false;
     }
 
     if (config.plugins === undefined) config.plugins = [];

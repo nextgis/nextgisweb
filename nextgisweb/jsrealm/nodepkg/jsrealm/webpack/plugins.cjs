@@ -1,19 +1,14 @@
 const { constants: zlibConst } = require("zlib");
 
-const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const CompressionPlugin = require("compression-webpack-plugin");
 const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
 const { StatsWriterPlugin } = require("webpack-stats-plugin");
 
 const { debug, pyramid } = require("../config.cjs");
 
-module.exports = ({ once, clean, compress, bundleAnalyzer } = {}) => {
+module.exports = ({ once, compress, bundleAnalyzer } = {}) => {
   const result = [];
   const add = (plugin) => result.push(plugin);
-
-  if (clean !== false) {
-    add(new CleanWebpackPlugin());
-  }
 
   if (compress || (!debug && compress !== false)) {
     const compressRegExp = /\.(js|css|html|json|svg)$/i;
