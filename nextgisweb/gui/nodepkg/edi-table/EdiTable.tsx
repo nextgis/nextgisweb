@@ -20,7 +20,7 @@ import {
 } from "react";
 import type { CSSProperties, FC, HTMLAttributes } from "react";
 
-import { Button, Table } from "../antd";
+import { Button, ConfigProvider, Table } from "../antd";
 import type { InputRef, TableColumnType, TableProps, TableRef } from "../antd";
 import { useKeydownListener } from "../hook";
 
@@ -266,27 +266,24 @@ export const EdiTable = observer(
     }, [placeholder, columns, renderActs, moveRow]);
 
     return (
-      <DndContext modifiers={[restrictToVerticalAxis]} onDragEnd={onDragEnd}>
-        <SortableContext
-          items={store.rows.map((row: R) => row[rowKey as string])}
-          strategy={verticalListSortingStrategy}
-        >
-          <Table
-            ref={tableRef}
-            className={classNames("ngw-gui-edi-table", className)}
-            dataSource={tableDataSource}
-            columns={tableColumns}
-            size={size}
-            rowKey={rowKey}
-            components={{
-              body: {
-                row: RowComp,
-              },
-            }}
-            {...tableProps}
-          />
-        </SortableContext>
-      </DndContext>
+      <ConfigProvider componentSize={size}>
+        <DndContext modifiers={[restrictToVerticalAxis]} onDragEnd={onDragEnd}>
+          <SortableContext
+            items={store.rows.map((row: R) => row[rowKey as string])}
+            strategy={verticalListSortingStrategy}
+          >
+            <Table
+              ref={tableRef}
+              className={classNames("ngw-gui-edi-table", className)}
+              dataSource={tableDataSource}
+              columns={tableColumns}
+              rowKey={rowKey}
+              components={{ body: { row: RowComp } }}
+              {...tableProps}
+            />
+          </SortableContext>
+        </DndContext>
+      </ConfigProvider>
     );
   }
 );
