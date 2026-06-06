@@ -202,6 +202,26 @@ class PostgresCheck(ConnectionCheck):
         ).scalar()
         self.say(gettext("SSL is used.") if ssl else gettext("SSL is not used."))
 
+        # Some connection poolers (e.g. PgBouncer < 1.18) reject statement_timeout
+        # as a startup parameter, which causes SQLAlchemy connections to fail.
+        st_connect_args = dict(connect_timeout=5, options="-c statement_timeout=15")
+        if self.sslmode is not None:
+            st_connect_args["sslmode"] = self.sslmode.value
+        st_engine = create_engine(
+            engine_url,
+            client_encoding="utf-8",
+            poolclass=NullPool,
+            connect_args=st_connect_args,
+        )
+        try:
+            with st_engine.connect():
+                pass
+            self.success(gettext("The statement_timeout startup parameter is supported."))
+        except OperationalError as exc:
+            if "statement_timeout" not in str(exc):
+                raise
+            self.error(gettext("The statement_timeout startup parameter is not supported."))
+
     def cleanup(self):
         if conn := getattr(self, "_conn", None):
             conn.close()
