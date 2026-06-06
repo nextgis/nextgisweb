@@ -1,0 +1,53 @@
+.ngw-webmap-measure-tooltip {
+  position: relative;
+  opacity: 0.75;
+  cursor: default;
+  border-radius: 4px;
+  background: var(--theme-color-primary);
+  padding: var(--theme-padding-xxs);
+  pointer-events: none;
+  color: white;
+  line-height: 1.25;
+  user-select: none;
+  white-space: nowrap;
+
+  &::before {
+    position: absolute;
+    bottom: -6px;
+    left: calc(50% - 6px + 0.5px);
+    border-top: 6px solid var(--theme-color-primary);
+    border-right: 6px solid transparent;
+    border-left: 6px solid transparent;
+    content: "";
+  }
+
+  > button {
+    opacity: 0.75;
+    cursor: pointer;
+    margin-inline-start: 4px;
+    border: none;
+    background: none;
+    padding: 0;
+    pointer-events: auto;
+    color: white;
+    user-select: none;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  &.editing {
+    > button {
+      pointer-events: none;
+    }
+
+    &.current {
+      background-color: rgba(0, 0, 0, 0.5);
+
+      &::before {
+        border-top-color: rgba(0, 0, 0, 0.5);
+      }
+    }
+  }
+}

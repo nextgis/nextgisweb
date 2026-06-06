@@ -1,27 +1,33 @@
+import classNames from "classnames";
 import Overlay from "ol/Overlay";
 import type { Options as OverlayOptions } from "ol/Overlay";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type React from "react";
 import { createPortal } from "react-dom";
 
+import { useThemeVariables } from "@nextgisweb/gui/hook";
 import { CloseIcon } from "@nextgisweb/gui/icon";
 
 import { useMapContext } from "../../context/useMapContext";
+
+import "./MeasureTooltip.less";
 
 export interface MeasureTooltipProps extends Pick<
   OverlayOptions,
   "position" | "offset"
 > {
   children?: React.ReactNode;
-  staticMode?: boolean;
+  isEditing?: boolean;
+  isCurrent?: boolean;
   onClose: () => void;
 }
 
 export function MeasureTooltip({
-  offset = [0, -15],
+  offset = [0, -12],
   children,
   position,
-  staticMode = false,
+  isEditing = false,
+  isCurrent = false,
   onClose,
 }: MeasureTooltipProps) {
   const { mapStore } = useMapContext();
@@ -31,8 +37,8 @@ export function MeasureTooltip({
   const offsetRef = useRef(offset);
 
   const calcOffset = useMemo(() => {
-    return staticMode ? [0, -7] : offset;
-  }, [staticMode, offset]);
+    return !isCurrent ? [0, -8] : offset;
+  }, [isCurrent, offset]);
 
   useEffect(() => {
     const el = document.createElement("div");
@@ -40,7 +46,7 @@ export function MeasureTooltip({
       offset: offsetRef.current,
       element: el,
       position: positionRef.current,
-      stopEvent: true,
+      stopEvent: false,
       positioning: "bottom-center",
       insertFirst: false,
     });
@@ -71,25 +77,29 @@ export function MeasureTooltip({
     }
   }, [calcOffset, overlay]);
 
+  const themeVariables = useThemeVariables({
+    "theme-color-primary": "colorPrimary",
+    "theme-padding-xxs": "paddingXXS",
+  });
+
   if (!element) {
     return null;
   }
 
   return createPortal(
     <div
-      className={
-        staticMode
-          ? "ol-tooltip ol-tooltip-static"
-          : "ol-tooltip ol-tooltip-measure"
-      }
+      className={classNames("ngw-webmap-measure-tooltip", {
+        "editing": isEditing,
+        "current": isCurrent,
+      })}
+      style={themeVariables}
     >
-      <span className="tooltip-content">{children}</span>
-      {staticMode && (
+      {children}
+      {!isCurrent && (
         <button
-          className="tooltip-close-button"
-          onClick={onClose}
           type="button"
-          aria-label="Close"
+          onClick={onClose}
+          onPointerDown={(evt) => evt.stopPropagation()}
         >
           <CloseIcon />
         </button>

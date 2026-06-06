@@ -31,8 +31,6 @@ import {
 import MeasureArea from "@nextgisweb/webmap/icon/measure_area";
 import MeasureDistance from "@nextgisweb/webmap/icon/measure_distance";
 
-import "./Measure.less";
-
 type MeasureKind = "LineString" | "Polygon";
 
 export interface ToolMeasureProps extends ToggleControlProps {
@@ -283,9 +281,10 @@ const ToolMeasure = observer(({ type, groupId, ...rest }: ToolMeasureProps) => {
       {Array.from(tooltips).map(([id, tooltip]) => (
         <MeasureTooltip
           key={id}
+          isEditing={!!currentTooltipId}
+          isCurrent={currentTooltipId === id}
           {...tooltip}
-          staticMode={currentTooltipId !== id}
-        ></MeasureTooltip>
+        />
       ))}
     </>
   );
