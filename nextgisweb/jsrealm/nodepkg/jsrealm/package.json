@@ -55,7 +55,7 @@
     "globals": "^16.2.0",
     "less": "^4.3.0",
     "less-loader": "^12.3.0",
-    "mocha": "^10.2.0",
+    "mocha": "^11.7.6",
     "prettier": "~3.8.1",
     "prettier-plugin-css-order": "~2.2.0",
     "style-loader": "^4.0.0",
