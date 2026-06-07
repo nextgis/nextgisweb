@@ -18,7 +18,7 @@ import {
   Tooltip,
 } from "@nextgisweb/gui/antd";
 import type { DatePickerProps, TimePickerProps } from "@nextgisweb/gui/antd";
-import { LoadingWrapper } from "@nextgisweb/gui/component";
+import { ExpandableText, LoadingWrapper } from "@nextgisweb/gui/component";
 import { BooleanInput } from "@nextgisweb/gui/component/BooleanInput";
 import { FieldsForm, Form } from "@nextgisweb/gui/fields-form";
 import type { FormField, SizeType } from "@nextgisweb/gui/fields-form";
@@ -29,6 +29,8 @@ import AttributeEditorStore from "./AttributeEditorStore";
 import type { NgwAttributeValue } from "./type";
 
 import BackspaceIcon from "@nextgisweb/icon/material/backspace";
+
+import "./AttributeEditor.less";
 
 const style = { width: "100%" };
 
@@ -143,7 +145,11 @@ const AttributeEditor = observer(
         if (formItem) {
           const props: FormField = {
             name: field.keyname,
-            label: field.display_name,
+            label: (
+              <ExpandableText maxLines={2} button={false} tooltip={true}>
+                {field.display_name}
+              </ExpandableText>
+            ),
             formItem,
 
             append: (
@@ -171,9 +177,14 @@ const AttributeEditor = observer(
 
     return (
       <FieldsForm
+        classNames={{
+          root: "ngw-feature-layer-attribute-editor",
+          label: "ngw-feature-layer-attribute-label",
+        }}
+        size={size}
+        labelCol={{ span: 6 }}
         virtualize
         form={form}
-        size={size}
         fields={formFields}
         initialValues={attributes}
         onChange={async (v) => {

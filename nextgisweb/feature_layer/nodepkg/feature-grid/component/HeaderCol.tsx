@@ -1,3 +1,5 @@
+import { ExpandableText } from "@nextgisweb/gui/index";
+
 import SortIcon from "../component/SortIcon";
 import { $FID, KEY_FIELD_ID } from "../constant";
 import type { ColOrder, FeatureLayerFieldCol, OrderBy } from "../type";
@@ -34,7 +36,9 @@ export function HeaderCol({
 
   return (
     <div ref={ref} className="th" style={style} onClick={onClick}>
-      <div className="label">{label}</div>
+      <ExpandableText className="label" maxLines={2} tooltip={true}>
+        {label}
+      </ExpandableText>
       {colSort && (
         <div className="suffix">
           <SortIcon dir={colSort} />

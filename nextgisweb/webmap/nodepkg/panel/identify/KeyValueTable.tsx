@@ -10,21 +10,33 @@ import "./KeyValueTable.less";
 export function KeyValueTable({ data }: { data: FieldDataItem[] }) {
   const columns: TableColumnsType<FieldDataItem> = [
     {
+      key: "attr",
+      dataIndex: "attr",
       className: "attr-column",
       title: gettext("Attribute"),
-      dataIndex: "attr",
-      key: "attr",
+      render: (value) => (
+        <ExpandableText button={false} tooltip={true}>
+          {value}
+        </ExpandableText>
+      ),
     },
     {
-      title: gettext("Value"),
-      dataIndex: "value",
       key: "value",
+      dataIndex: "value",
+      title: gettext("Value"),
     },
   ];
 
   const dataSource: FieldDataItem[] = data.map(({ key, value, attr }) => ({
     key,
-    value: typeof value === "string" ? <ExpandableText text={value} /> : value,
+    value:
+      typeof value === "string" ? (
+        <ExpandableText button={true} tooltip={true}>
+          {value}
+        </ExpandableText>
+      ) : (
+        value
+      ),
     attr: attr ?? (key ? String(key) : undefined),
   }));
 
