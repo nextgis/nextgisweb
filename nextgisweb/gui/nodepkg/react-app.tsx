@@ -1,3 +1,4 @@
+import type { ComponentType } from "react";
 import { createRoot } from "react-dom/client";
 import type { Root } from "react-dom/client";
 
@@ -14,7 +15,7 @@ export interface ReactAppReturn<P extends PropsType = PropsType> {
 }
 
 export default function reactApp<P extends PropsType = PropsType>(
-  Component: React.ComponentType<P>,
+  Component: ComponentType<P>,
   props: P,
   domNode: HTMLElement
 ): ReactAppReturn<P> {

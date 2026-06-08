@@ -26,7 +26,7 @@ export class ModalStore {
   }
 
   @action.bound
-  update(id: string, element: React.ReactNode) {
+  update(id: string, element: ReactNode) {
     const modalItems = [...this.modalItems];
     const modalItem = modalItems.find((e) => e.id === id);
     if (modalItem) {

@@ -1,4 +1,5 @@
 import type { Coordinate } from "ol/coordinate";
+import type { ReactElement } from "react";
 
 import type { Display } from "../display";
 
@@ -38,7 +39,7 @@ export interface LegendPrintMapProps {
 }
 
 export interface RndCompProps {
-  children: string | React.ReactElement | React.ReactElement[];
+  children: string | ReactElement | ReactElement[];
   coords: RndCoords;
   displayed: boolean;
   onChange: (coords: RndCoords) => void;

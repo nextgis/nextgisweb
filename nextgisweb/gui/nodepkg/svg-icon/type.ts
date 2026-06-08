@@ -1,9 +1,9 @@
-import type { ReactNode } from "react";
+import type { AnchorHTMLAttributes, DetailedHTMLProps, ReactNode } from "react";
 
 import type { SvgIconProps } from "./SvgIcon";
 
-export interface SvgIconLink extends React.DetailedHTMLProps<
-  React.AnchorHTMLAttributes<HTMLAnchorElement>,
+export interface SvgIconLink extends DetailedHTMLProps<
+  AnchorHTMLAttributes<HTMLAnchorElement>,
   HTMLAnchorElement
 > {
   iconProps?: SvgIconProps;

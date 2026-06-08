@@ -1,4 +1,4 @@
-import type React from "react";
+import type { CSSProperties } from "react";
 
 import { Spin } from "../antd";
 
@@ -6,8 +6,8 @@ export function CentralLoading({
   style,
   indicatorStyle,
 }: {
-  style?: React.CSSProperties;
-  indicatorStyle?: React.CSSProperties;
+  style?: CSSProperties;
+  indicatorStyle?: CSSProperties;
 }) {
   return (
     <div

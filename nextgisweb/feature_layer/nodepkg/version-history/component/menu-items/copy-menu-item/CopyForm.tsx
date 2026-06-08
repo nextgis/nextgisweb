@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import type React from "react";
+import type { CSSProperties } from "react";
 
 import { Input, Space } from "@nextgisweb/gui/antd";
 import { SaveButton } from "@nextgisweb/gui/component";
@@ -30,7 +30,7 @@ export function CopyForm({
   resourceId,
   onCreate,
 }: {
-  style?: React.CSSProperties;
+  style?: CSSProperties;
   versionId: number | [number, number];
   resourceId: number;
   onCreate?: () => void;

@@ -1,3 +1,5 @@
+import type { Dispatch, SetStateAction } from "react";
+
 import { RESIZE_HANDLE_WIDTH } from "../constant";
 import type { EffectiveWidths, FeatureLayerFieldCol } from "../type";
 
@@ -6,9 +8,7 @@ import { DraggableColumn } from "./DraggableColumn";
 interface HeaderHandlesProps {
   columns: FeatureLayerFieldCol[];
   effectiveWidths: EffectiveWidths;
-  setUserDefinedWidths: React.Dispatch<
-    React.SetStateAction<Record<string, number>>
-  >;
+  setUserDefinedWidths: Dispatch<SetStateAction<Record<string, number>>>;
 }
 
 export function HeaderHandles({

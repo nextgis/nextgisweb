@@ -1,3 +1,5 @@
+import type { Dispatch, SetStateAction } from "react";
+
 import type { ResourceAttrItem } from "@nextgisweb/resource/api/ResourceAttrItem";
 import type { Attributes } from "@nextgisweb/resource/api/resource-attr";
 import type { ResourceAction } from "@nextgisweb/resource/resource-section/registry";
@@ -28,5 +30,5 @@ export type RenderResourceAction = ResourceAction<ActionBtnProps>;
 export interface RenderActionsProps {
   record: ChildrenResource;
   attributes: [...typeof DefaultResourceSectionAttrs];
-  setAttrItems: React.Dispatch<React.SetStateAction<DefaultResourceAttrItem[]>>;
+  setAttrItems: Dispatch<SetStateAction<DefaultResourceAttrItem[]>>;
 }

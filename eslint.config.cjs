@@ -183,6 +183,13 @@ const config = [
           ],
         },
       ],
+      "no-restricted-syntax": [
+        "warn",
+        {
+          "selector": "TSTypeReference > TSQualifiedName[left.name='React']",
+          "message": "Use named type imports from 'react' instead.",
+        },
+      ],
       "sort-imports": ["warn", { ignoreDeclarationSort: true }],
       "import-x/no-duplicates": "warn",
       "import-x/consistent-type-specifier-style": ["warn", "prefer-top-level"],

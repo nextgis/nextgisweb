@@ -1,4 +1,5 @@
 import classNames from "classnames";
+import type { HTMLAttributeAnchorTarget, ReactElement } from "react";
 
 import "./Dynmenu.less";
 
@@ -11,9 +12,9 @@ export interface DynMenuLink {
   type: "link";
   label: string;
   url: string;
-  target?: React.HTMLAttributeAnchorTarget;
+  target?: HTMLAttributeAnchorTarget;
   selected?: boolean;
-  icon?: React.ReactElement;
+  icon?: ReactElement;
 }
 
 export type DynMenuItem = DynMenuLabel | DynMenuLink;

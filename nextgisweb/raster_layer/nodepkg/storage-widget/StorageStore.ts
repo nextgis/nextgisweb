@@ -5,7 +5,7 @@ import type { RasterLayerStorageRead } from "@nextgisweb/raster-layer/type/api";
 import type { EditorStore } from "@nextgisweb/resource/type";
 
 type StorageFormData = Required<RasterLayerStorageRead> & {
-    no_sign_request: boolean;
+  no_sign_request: boolean;
 };
 
 const {

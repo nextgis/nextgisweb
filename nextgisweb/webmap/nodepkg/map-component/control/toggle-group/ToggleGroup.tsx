@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import type React from "react";
+import type { ReactNode } from "react";
 
 import { ToggleGroupContext } from "./ToggleGroupContext";
 
@@ -7,7 +7,7 @@ export interface ToggleGroupProps {
   allowToggleOff?: boolean;
   defaultValue?: string | null;
   initialValue?: string | null;
-  children: React.ReactNode;
+  children: ReactNode;
   nonEmpty?: boolean;
   value?: string | null;
   onChange?: (id: string | null) => void;

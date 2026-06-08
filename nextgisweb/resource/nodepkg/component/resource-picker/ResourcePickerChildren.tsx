@@ -2,6 +2,7 @@ import { theme } from "antd";
 import { debounce } from "lodash-es";
 import { observer } from "mobx-react-lite";
 import { useCallback, useMemo, useState } from "react";
+import type { ReactNode } from "react";
 
 import { Badge, Button, Table } from "@nextgisweb/gui/antd";
 import type { TableColumnProps, TableProps } from "@nextgisweb/gui/antd";
@@ -133,8 +134,8 @@ function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
     NonNullable<TableColumnProps<PickerResource>["render"]>
   >(
     (_, record) => {
-      let openBtn: React.ReactNode = undefined;
-      let selectFirstBtn: React.ReactNode = undefined;
+      let openBtn: ReactNode = undefined;
+      let selectFirstBtn: ReactNode = undefined;
       if (canTraverse(record)) {
         const selectedParent = store.multiple
           ? selectedParentsRegistry.get(record.id)

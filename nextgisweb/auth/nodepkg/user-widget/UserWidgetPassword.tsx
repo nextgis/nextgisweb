@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import type { ChangeEvent } from "react";
 
 import { Input, Select, Space } from "@nextgisweb/gui/antd";
 import { gettext, gettextf } from "@nextgisweb/pyramid/i18n";
@@ -53,7 +54,7 @@ export const UserWidgetPassword = ({
     }
   };
 
-  const onPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onPasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
     const v = e.target.value;
     setPassword(v);
     if (mode === "assign") {

@@ -157,9 +157,7 @@ export function useNGWLayer({
   layerOptions?: LayerOptions;
 }): [BaseLayer | undefined, ReactElement | undefined] {
   const [layer, setLayer] = useState<BaseLayer | undefined>(undefined);
-  const [control, setControl] = useState<React.ReactElement | undefined>(
-    undefined
-  );
+  const [control, setControl] = useState<ReactElement | undefined>(undefined);
   const { fetchResourceItems } = useResourceAttr();
 
   useEffect(() => {

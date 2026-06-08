@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type React from "react";
+import type { ReactNode } from "react";
 
 import { Button, Flex, Modal, Space } from "@nextgisweb/gui/antd";
 import { FullHeightModal } from "@nextgisweb/gui/full-height-modal/FullHeightModal";
@@ -7,7 +7,7 @@ import { CloseIcon, OpenInNewIcon } from "@nextgisweb/gui/icon";
 import type { ParamsOf } from "@nextgisweb/gui/type";
 
 export type PreviewMapModalProps = ParamsOf<typeof Modal> & {
-  children?: React.ReactNode;
+  children?: ReactNode;
   fullHeight?: boolean;
   href?: string;
 };

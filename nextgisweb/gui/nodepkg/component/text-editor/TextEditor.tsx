@@ -3,6 +3,7 @@ import { CKEditor } from "@ckeditor/ckeditor5-react";
 import type { SourceEditing } from "@ckeditor/ckeditor5-source-editing";
 import classNames from "classnames";
 import { useCallback, useEffect, useState } from "react";
+import type { CSSProperties } from "react";
 
 import { Editor } from "@nextgisweb/ckeditor";
 
@@ -13,7 +14,7 @@ export interface TextEditorProps {
   onChange?: (val: string) => void;
   parentHeight?: boolean;
   border?: boolean;
-  style?: React.CSSProperties;
+  style?: CSSProperties;
 }
 
 export function TextEditor({

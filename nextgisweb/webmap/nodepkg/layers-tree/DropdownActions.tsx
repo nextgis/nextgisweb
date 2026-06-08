@@ -1,5 +1,6 @@
 import { observer } from "mobx-react-lite";
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { ReactElement } from "react";
 
 import { Divider, Dropdown } from "@nextgisweb/gui/antd";
 import type { MenuProps } from "@nextgisweb/gui/antd";
@@ -23,7 +24,7 @@ interface DropdownActionsProps {
 
 interface DropdownPluginsProps {
   menuItems: MenuProps["items"];
-  customMenuItems: React.ReactElement[];
+  customMenuItems: ReactElement[];
   onOpenChange?: () => void;
 }
 
@@ -84,9 +85,7 @@ export function DropdownActions(props: DropdownActionsProps) {
 
   const [menuItems, setMenuItems] = useState<MenuProps["items"]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [customMenuItems, setCustomMenuItems] = useState<React.ReactElement[]>(
-    []
-  );
+  const [customMenuItems, setCustomMenuItems] = useState<ReactElement[]>([]);
 
   const canceledRef = useRef(false);
 
@@ -113,7 +112,7 @@ export function DropdownActions(props: DropdownActionsProps) {
       const newMenuItems: (NonNullable<MenuProps["items"]>[number] & {
         order?: number;
       })[] = [];
-      const newCustomMenuItems: React.ReactElement[] = [];
+      const newCustomMenuItems: ReactElement[] = [];
 
       for (const keyPlugin in plugins) {
         const plugin = plugins[keyPlugin];

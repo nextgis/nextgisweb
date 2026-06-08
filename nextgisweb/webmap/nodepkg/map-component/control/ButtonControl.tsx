@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import type { MouseEvent, ReactNode } from "react";
+import type { CSSProperties, MouseEvent, ReactNode } from "react";
 
 import type { CreateControlOptions } from "@nextgisweb/webmap/control-container/ControlContainer";
 
@@ -12,7 +12,7 @@ interface ButtonControlOptions extends CreateControlOptions {
   disabled?: boolean;
   children?: ReactNode;
   title?: string;
-  btnStyle?: React.CSSProperties;
+  btnStyle?: CSSProperties;
   btnClassName?: string;
   onClick?: () => void | Promise<void>;
 }

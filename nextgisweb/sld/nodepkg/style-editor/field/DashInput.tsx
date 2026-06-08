@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import type { FC, ReactElement } from "react";
 
 import { Button, InputNumber, Select } from "@nextgisweb/gui/antd";
 import { CloseIcon } from "@nextgisweb/gui/icon";
@@ -18,7 +19,7 @@ interface DashPatternInputProps {
   lineWidth?: number; // Line width used for calculating preset values
 }
 
-export const DashPatternInput: React.FC<DashPatternInputProps> = ({
+export const DashPatternInput: FC<DashPatternInputProps> = ({
   value = [],
   onChange,
   lineWidth = 3,
@@ -99,7 +100,7 @@ export const DashPatternInput: React.FC<DashPatternInputProps> = ({
   };
 
   const renderInputFields = () => {
-    const fields: React.ReactElement[] = [];
+    const fields: ReactElement[] = [];
     for (let i = 0; i < dashPattern.length + 2; i += 2) {
       const isLastRow = i >= dashPattern.length;
 

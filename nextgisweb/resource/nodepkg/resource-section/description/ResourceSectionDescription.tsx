@@ -1,3 +1,5 @@
+import type { MouseEvent } from "react";
+
 import { useShowModal } from "@nextgisweb/gui";
 import { DescriptionHtml } from "@nextgisweb/gui/description";
 import { assert } from "@nextgisweb/jsrealm/error";
@@ -11,7 +13,7 @@ export const ResourceSectionDescription: ResourceSection = ({
   const { lazyModal, modalHolder } = useShowModal();
   assert(description);
 
-  const handleOnLinkClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+  const handleOnLinkClick = (e: MouseEvent<HTMLAnchorElement>) => {
     const href = e?.currentTarget.getAttribute("href");
     e?.currentTarget.setAttribute("target", "_blank");
 

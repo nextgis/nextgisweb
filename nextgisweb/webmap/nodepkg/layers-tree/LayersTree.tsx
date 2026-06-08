@@ -1,5 +1,6 @@
 import { observer } from "mobx-react-lite";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import type { Key } from "react";
 
 import { Tree } from "@nextgisweb/gui/antd";
 import type { TreeProps } from "@nextgisweb/gui/antd";
@@ -100,7 +101,7 @@ export const LayersTree = observer(
     const { onDrop, allowDrop } = useDrag({ store });
 
     const onSelect = useCallback(
-      (selectedKeysValue: React.Key[]) => {
+      (selectedKeysValue: Key[]) => {
         const val = selectedKeysValue.map(Number);
         setSelectedKeys(val);
         if (onSelectProp) onSelectProp(val);
@@ -184,7 +185,7 @@ export const LayersTree = observer(
       );
     }, [store, layersWithoutLegendInfo]);
 
-    const onExpand = (expandedKeysValue: React.Key[]) => {
+    const onExpand = (expandedKeysValue: Key[]) => {
       if (!expandable) return;
       store.setExpanded(expandedKeysValue.map(Number));
     };

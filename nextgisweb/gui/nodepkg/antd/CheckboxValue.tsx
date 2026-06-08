@@ -1,5 +1,6 @@
 import { Checkbox } from "antd";
 import type { CheckboxProps, CheckboxRef } from "antd";
+import type { Ref } from "react";
 
 export interface CheckboxValueProps extends Omit<
   CheckboxProps,
@@ -7,7 +8,7 @@ export interface CheckboxValueProps extends Omit<
 > {
   value?: boolean;
   onChange?: (value: boolean) => void;
-  ref?: React.Ref<CheckboxRef>;
+  ref?: Ref<CheckboxRef>;
 }
 
 export function CheckboxValue({

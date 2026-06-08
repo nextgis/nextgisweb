@@ -39,7 +39,7 @@ import OlLayerVector from "ol/layer/Vector";
 import OlSourceVector from "ol/source/Vector";
 import type OlStyle from "ol/style/Style";
 import { useCallback, useEffect, useRef, useState } from "react";
-import type React from "react";
+import type { FC } from "react";
 
 import "ol/ol.css";
 import "./OlRenderer.less";
@@ -53,7 +53,7 @@ export interface OlRendererProps {
 /**
  * Symbolizer Renderer UI.
  */
-export const OlRenderer: React.FC<OlRendererProps> = ({
+export const OlRenderer: FC<OlRendererProps> = ({
   onClick,
   symbolizerKind,
   symbolizers,

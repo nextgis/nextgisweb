@@ -1,5 +1,5 @@
 import { isValidElement, useCallback, useMemo } from "react";
-import type { ComponentType, ReactElement } from "react";
+import type { ComponentType, ReactElement, ReactNode } from "react";
 
 import { Form, Space } from "@nextgisweb/gui/antd";
 
@@ -26,7 +26,7 @@ export function FormItem({
   }, [Input]);
 
   const wrapWithSpaceIfNeeded = useCallback(
-    (children: React.ReactNode) => {
+    (children: ReactNode) => {
       return prepend || append ? (
         <Space.Compact block>
           {prepend}

@@ -1,5 +1,6 @@
 import classNames from "classnames";
 import { Fragment, useMemo, useRef, useState } from "react";
+import type { ComponentType } from "react";
 
 import { Splitter } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -39,7 +40,7 @@ export interface FocusTableProps<I extends FocusTableItem, C extends string, S>
   extends
     Pick<ComplexTreeProps<I, C, S>, "store" | "root" | "title" | "columns">,
     FocusTablePropsActions<I> {
-  renderDetail: React.ComponentType<{ item: I }>;
+  renderDetail: ComponentType<{ item: I }>;
   rootClassName?: string;
 }
 

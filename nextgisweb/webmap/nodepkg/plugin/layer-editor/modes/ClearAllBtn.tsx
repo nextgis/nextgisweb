@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import type React from "react";
+import type { ReactNode } from "react";
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { ButtonControl } from "@nextgisweb/webmap/map-component";
@@ -10,7 +10,7 @@ import DeleteIcon from "@nextgisweb/icon/material/close/outline";
 
 interface ClearAllBtnProps {
   order?: number;
-  icon?: React.ReactNode;
+  icon?: ReactNode;
   disabled?: boolean;
   softDelete?: boolean;
 }

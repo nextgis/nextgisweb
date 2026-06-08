@@ -1,6 +1,6 @@
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useRef } from "react";
-import type React from "react";
+import type { ReactNode } from "react";
 
 import { FormItem } from "./FormItem";
 import type { FieldsFormProps } from "./type";
@@ -12,7 +12,7 @@ export function FieldsFormVirtualized<
   children,
 }: {
   fields: FieldsFormProps<P>["fields"];
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   const parentRef = useRef<HTMLDivElement>(null);
 

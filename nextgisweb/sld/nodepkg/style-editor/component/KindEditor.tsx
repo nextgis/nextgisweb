@@ -1,4 +1,5 @@
 import type { Symbolizer, SymbolizerKind } from "geostyler-style";
+import type { FC } from "react";
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
@@ -13,9 +14,7 @@ interface SymbolizerKindProps {
   setSymbolizer: (val: Symbolizer) => void;
 }
 
-const componentMap: Partial<
-  Record<SymbolizerKind, React.FC<EditorProps<any>>>
-> = {
+const componentMap: Partial<Record<SymbolizerKind, FC<EditorProps<any>>>> = {
   "Mark": MarkEditor,
   "Line": LineEditor,
   "Fill": FillEditor,

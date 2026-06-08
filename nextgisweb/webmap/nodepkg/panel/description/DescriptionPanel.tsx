@@ -1,5 +1,6 @@
 import { observer } from "mobx-react-lite";
 import { useRef } from "react";
+import type { MouseEvent } from "react";
 
 import { DescriptionHtml } from "@nextgisweb/gui/description";
 import type { Display } from "@nextgisweb/webmap/display";
@@ -27,7 +28,7 @@ const DescriptionPanel = observer<PanelPluginWidgetProps<DescriptionStore>>(
 
     const content = store.content;
 
-    const handleOnLinkClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    const handleOnLinkClick = (e: MouseEvent<HTMLAnchorElement>) => {
       const href = e?.currentTarget.getAttribute("href");
       e?.currentTarget.setAttribute("target", "_blank");
 

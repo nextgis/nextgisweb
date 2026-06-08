@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import type { MouseEventHandler } from "react";
+import type { MouseEventHandler, ReactNode } from "react";
 
 import { Button, message } from "@nextgisweb/gui/antd";
 import type { ButtonProps } from "@nextgisweb/gui/antd";
@@ -8,7 +8,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import ContentCopyIcon from "@nextgisweb/icon/material/content_copy";
 
 interface CopyToClipboardButtonProps extends ButtonProps {
-  children?: React.ReactNode;
+  children?: ReactNode;
   iconOnly?: boolean;
   messageInfo?: string;
   getTextToCopy: () => string;
@@ -69,7 +69,7 @@ export function CopyToClipboardButton({
     });
   };
 
-  let buttonContent: React.ReactNode | null = null;
+  let buttonContent: ReactNode | null = null;
   if (!iconOnly) {
     buttonContent = children || gettext("Copy to clipboard");
   }

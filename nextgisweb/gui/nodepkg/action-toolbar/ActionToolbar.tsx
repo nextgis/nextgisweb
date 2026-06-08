@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import { Fragment, isValidElement, useCallback, useMemo, useRef } from "react";
-import type { Ref } from "react";
+import type { ComponentType, ReactElement, Ref } from "react";
 
 import { useToken } from "../antd";
 import { useFit } from "../hook/useFit";
@@ -42,13 +42,13 @@ export function ActionToolbar<
   });
 
   const getAction = useCallback(
-    (action: ActionToolbarAction<P>): React.ReactElement | null => {
+    (action: ActionToolbarAction<P>): ReactElement | null => {
       if (isValidElement(action)) {
         return action;
       }
 
       if (typeof action === "function") {
-        const ActionComponent = action as React.ComponentType<
+        const ActionComponent = action as ComponentType<
           Record<string, unknown>
         >;
         return <ActionComponent size={size} isFit={isFit} {...actionProps} />;
@@ -64,9 +64,9 @@ export function ActionToolbar<
   );
 
   const [leftActions_, rightActions_] = useMemo(() => {
-    const leftActionsList: React.ReactElement[] = [];
+    const leftActionsList: ReactElement[] = [];
 
-    const rightActionsList: React.ReactElement[] = [];
+    const rightActionsList: ReactElement[] = [];
 
     for (const rightAction of rightActions) {
       const a = getAction(rightAction);

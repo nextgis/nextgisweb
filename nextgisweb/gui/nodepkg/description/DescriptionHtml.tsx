@@ -1,4 +1,4 @@
-import type { FC, Ref } from "react";
+import type { FC, MouseEvent, Ref } from "react";
 
 import { ProcessedHtml } from "./ProcessedHtml";
 
@@ -6,7 +6,7 @@ import "./DescriptionHtml.less";
 
 interface DescriptionHtmlProps {
   content: string;
-  onLinkClick?: ((e: React.MouseEvent<HTMLAnchorElement>) => boolean) | null;
+  onLinkClick?: ((e: MouseEvent<HTMLAnchorElement>) => boolean) | null;
   elementRef?: Ref<HTMLDivElement> | null;
   className?: string;
   variant?: "compact" | "default";

@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 import { Button, Dropdown } from "@nextgisweb/gui/antd";
 import type { MenuProps } from "@nextgisweb/gui/antd";
 
@@ -18,7 +20,7 @@ export type VersionHistoryMenuCtx = {
 
 export interface VersionHistoryMenuItem {
   item: NonNullable<MenuProps["items"]>[number];
-  holder: React.ReactNode;
+  holder: ReactNode;
 }
 
 export function VersionHistoryRowMenu(ctx: VersionHistoryMenuCtx) {

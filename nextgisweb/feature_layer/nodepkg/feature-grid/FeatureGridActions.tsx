@@ -1,5 +1,6 @@
 import { observer } from "mobx-react-lite";
 import { lazy, useCallback, useMemo } from "react";
+import type { ReactNode } from "react";
 
 import { useShowModal } from "@nextgisweb/gui";
 import { ActionToolbar } from "@nextgisweb/gui/action-toolbar";
@@ -54,7 +55,7 @@ export const FeatureGridActions = observer(
     editorProps,
   }: {
     store: FeatureGridStore;
-    children?: React.ReactNode;
+    children?: ReactNode;
     editorProps?: FeatureEditorWidgetProps;
   }) => {
     const {

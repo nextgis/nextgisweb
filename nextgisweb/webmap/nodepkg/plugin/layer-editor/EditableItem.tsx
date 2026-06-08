@@ -7,7 +7,7 @@ import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
 import type { StyleFunction } from "ol/style/Style";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type React from "react";
+import type { ReactNode } from "react";
 
 import { useUnsavedChanges } from "@nextgisweb/gui/hook";
 import { useDebounce } from "@nextgisweb/pyramid/hook";
@@ -27,7 +27,7 @@ export interface EditableItemProps {
   source?: VectorSource;
 
   enabled?: boolean;
-  children?: React.ReactNode;
+  children?: ReactNode;
 
   editingMode?: string | null;
 

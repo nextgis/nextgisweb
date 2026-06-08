@@ -1,3 +1,5 @@
+import type { FC } from "react";
+
 import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
@@ -16,7 +18,7 @@ export interface FilterValueWidgetProps {
   onChange: (value: ValueInput) => void;
 }
 
-export type FilterValueWidgetComponent = React.FC<FilterValueWidgetProps>;
+export type FilterValueWidgetComponent = FC<FilterValueWidgetProps>;
 
 export interface FeatureFilterEditorProps {
   fields: FeatureLayerFieldRead[];

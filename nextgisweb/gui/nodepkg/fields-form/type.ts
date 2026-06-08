@@ -38,13 +38,13 @@ export interface FormItemProps<
   name: NameType<N>;
   prepend?: ReactNode;
   append?: ReactNode;
-  input?: ComponentType<ChildProps> | React.ReactNode;
+  input?: ComponentType<ChildProps> | ReactNode;
 }
 
 export interface FormField<N extends string = string> extends FormItemProps<N> {
   included?: boolean;
   requiredMessage?: string;
-  formItem: ComponentType<ChildProps> | React.ReactNode;
+  formItem: ComponentType<ChildProps> | ReactNode;
   // TODO: remove usage
   /** @deprecated use {@link FieldsFormProps.initialValues} instead */
   value?: unknown;

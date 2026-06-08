@@ -57,9 +57,9 @@ export function Base({
 }: BaseProps) {
   const [modalApi, modalContextHolder] = Modal.useModal();
 
-  const [dynMenuItems, setDynMenuItems] = useState<
-    DynMenuItem[] | undefined
-  >(undefined);
+  const [dynMenuItems, setDynMenuItems] = useState<DynMenuItem[] | undefined>(
+    undefined
+  );
 
   const { makeSignal } = useAbortController();
 

@@ -1,4 +1,5 @@
 import cn from "classnames";
+import type { ReactNode } from "react";
 
 import type { AccessType } from "@nextgisweb/webmap/layer/annotations/AnnotationFeature";
 
@@ -8,7 +9,7 @@ export function AnnotationAccessType({
   children,
   accessType,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
   accessType?: AccessType;
 }) {
   return (

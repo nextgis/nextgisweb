@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import type { Dispatch, SetStateAction } from "react";
 
 import { Badge, Dropdown, Tooltip } from "@nextgisweb/gui/antd";
 import type { MenuProps } from "@nextgisweb/gui/antd";
@@ -26,13 +27,13 @@ interface MenuDropdownProps {
   volumeVisible: boolean;
   storageEnabled: boolean;
   creationDateVisible: boolean;
-  setBatchDeletingInProgress: React.Dispatch<React.SetStateAction<boolean>>;
-  setCreationDateVisible: React.Dispatch<React.SetStateAction<boolean>>;
-  setVolumeVisible: React.Dispatch<React.SetStateAction<boolean>>;
-  setVolumeValues: React.Dispatch<React.SetStateAction<Record<number, number>>>;
-  setAllowBatch: React.Dispatch<React.SetStateAction<boolean>>;
-  setAttrItems: React.Dispatch<React.SetStateAction<DefaultResourceAttrItem[]>>;
-  setSelected: React.Dispatch<React.SetStateAction<number[]>>;
+  setBatchDeletingInProgress: Dispatch<SetStateAction<boolean>>;
+  setCreationDateVisible: Dispatch<SetStateAction<boolean>>;
+  setVolumeVisible: Dispatch<SetStateAction<boolean>>;
+  setVolumeValues: Dispatch<SetStateAction<Record<number, number>>>;
+  setAllowBatch: Dispatch<SetStateAction<boolean>>;
+  setAttrItems: Dispatch<SetStateAction<DefaultResourceAttrItem[]>>;
+  setSelected: Dispatch<SetStateAction<number[]>>;
 }
 
 type MenuItems = NonNullable<MenuProps["items"]>;

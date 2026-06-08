@@ -9,6 +9,7 @@ import {
   useRef,
   useState,
 } from "react";
+import type { Key } from "react";
 
 import type {
   VersionCGetGroup,
@@ -72,7 +73,7 @@ export function VersionHistory({ id }: { id: number }) {
 
   const [hasMore, setHasMore] = useState(true);
 
-  const [expandedRowKeys, setExpandedRowKeys] = useState<React.Key[]>([]);
+  const [expandedRowKeys, setExpandedRowKeys] = useState<Key[]>([]);
   const [reloadKey, bumpReloadKey] = useReducer((x: number) => x + 1, 0);
 
   const [tableHeight, setTableHeight] = useState<number>(0);

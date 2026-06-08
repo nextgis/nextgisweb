@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import type { ReactNode } from "react";
 
 import { Select } from "@nextgisweb/gui/antd";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
@@ -18,7 +19,7 @@ interface ExporFormValues {
 }
 
 interface OptionType {
-  label: React.ReactNode;
+  label: ReactNode;
   value: number;
 }
 

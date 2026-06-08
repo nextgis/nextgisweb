@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import { observer } from "mobx-react-lite";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import type React from "react";
+import type { ReactNode } from "react";
 
 import { Splitter } from "@nextgisweb/gui/antd";
 import { useLayout } from "@nextgisweb/pyramid/layout/useLayout";
@@ -23,7 +23,7 @@ import "./DisplayWidget.less";
 const { Panel } = Splitter;
 
 export interface DisplayComponentProps {
-  mapChildren?: React.ReactNode;
+  mapChildren?: ReactNode;
   tinyConfig?: TinyConfig;
   className?: string;
   display?: Display;

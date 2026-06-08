@@ -5,8 +5,7 @@ import type {
   Element,
   HTMLReactParserOptions,
 } from "html-react-parser";
-import type { FC } from "react";
-import type React from "react";
+import type { FC, MouseEvent } from "react";
 
 type ChildNode = DOMNode["nextSibling"] & DOMNode["previousSibling"];
 
@@ -27,7 +26,7 @@ const isAdjacentToNonHollowText = (el: Element): boolean => {
 
 interface ProcessedHtmlProps {
   htmlString: string;
-  onLinkClick?: ((e: React.MouseEvent<HTMLAnchorElement>) => boolean) | null;
+  onLinkClick?: ((e: MouseEvent<HTMLAnchorElement>) => boolean) | null;
 }
 
 export const ProcessedHtml: FC<ProcessedHtmlProps> = ({

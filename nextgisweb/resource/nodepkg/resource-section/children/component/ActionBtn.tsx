@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { MouseEventHandler, ReactNode } from "react";
 
 import { Space } from "@nextgisweb/gui/antd";
 import type { ButtonProps } from "@nextgisweb/gui/antd";
@@ -7,7 +7,7 @@ export interface ActionBtnProps extends ButtonProps {
   icon?: ReactNode;
   label?: string;
   showLabel?: boolean;
-  onClick?: React.MouseEventHandler<HTMLElement>;
+  onClick?: MouseEventHandler<HTMLElement>;
 }
 
 export function ActionBtn({

@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 import type { LayerDisplayAdapterCtor } from "../DisplayLayerAdapter";
 import type { LayerSymbols } from "../compat/type";
 import type { Display } from "../display";
@@ -50,7 +52,7 @@ export interface TinyConfig {
 export type MapPlugin = new (val: PluginParams) => PluginBase;
 
 export interface PluginMenuItem {
-  icon: React.ReactNode;
+  icon: ReactNode;
   title: string;
   order?: number;
   onClick?: () => void;

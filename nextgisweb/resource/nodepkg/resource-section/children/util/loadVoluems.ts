@@ -1,3 +1,5 @@
+import type { Dispatch, SetStateAction } from "react";
+
 import { route } from "@nextgisweb/pyramid/api";
 import type { ResourceVolume } from "@nextgisweb/resource/type/api";
 
@@ -5,7 +7,7 @@ import type { ChildrenResource } from "../type";
 
 interface LoadVoluemsParams {
   items: ChildrenResource[];
-  setState: React.Dispatch<React.SetStateAction<Record<number, number>>>;
+  setState: Dispatch<SetStateAction<Record<number, number>>>;
   signal?: AbortSignal;
 }
 

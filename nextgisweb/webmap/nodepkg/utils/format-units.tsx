@@ -1,4 +1,5 @@
 import type { Projection } from "ol/proj";
+import type { ReactElement } from "react";
 
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { AreaUnits, LengthUnits } from "@nextgisweb/webmap/type/api";
@@ -55,9 +56,9 @@ const formatLocaleNumber = (value: number, locale: string): string => {
 
 const makeDomResult = (
   value: string,
-  postfix: React.ReactElement | string,
+  postfix: ReactElement | string,
   format: "html-string" | "jsx"
-): string | React.ReactElement => {
+): string | ReactElement => {
   const domResult = (
     <>
       {value} {postfix}
@@ -74,7 +75,7 @@ const makeDomResult = (
 
 interface MetersResult {
   value: number;
-  postfix: React.ReactElement | string;
+  postfix: ReactElement | string;
 }
 
 const metersLengthToUnit = (

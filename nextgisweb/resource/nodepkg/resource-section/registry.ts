@@ -1,6 +1,12 @@
 /** @registry */
 
-import type { FC, LazyExoticComponent } from "react";
+import type {
+  Dispatch,
+  FC,
+  LazyExoticComponent,
+  ReactElement,
+  SetStateAction,
+} from "react";
 
 import type { useShowModal } from "@nextgisweb/gui";
 import type { message } from "@nextgisweb/gui/antd";
@@ -18,10 +24,8 @@ import type {
 export type ResourceActionWidgetProps<P = unknown> = P &
   Pick<ResourceAction, "label" | "icon"> & {
     item: ResourceAttrItem;
-    source: React.ReactElement;
-    setAttrItems?: React.Dispatch<
-      React.SetStateAction<DefaultResourceAttrItem[]>
-    >;
+    source: ReactElement;
+    setAttrItems?: Dispatch<SetStateAction<DefaultResourceAttrItem[]>>;
   };
 
 export type ResourceActionWidget<P = unknown> = LazyExoticComponent<
@@ -38,9 +42,7 @@ interface RunOptions<A extends Attributes = Attributes> {
   item: CustomResourceAttrItem<A>;
   signal: AbortSignal;
   messageApi: MessageInstance;
-  setAttrItems?: React.Dispatch<
-    React.SetStateAction<DefaultResourceAttrItem[]>
-  >;
+  setAttrItems?: Dispatch<SetStateAction<DefaultResourceAttrItem[]>>;
   showModal: ShowModalFn;
   attributes: [...typeof DefaultResourceSectionAttrs];
 }
@@ -50,7 +52,7 @@ export interface ResourceAction<
   A extends Attributes = Attributes,
 > extends DynMenuItem<ResourceActionGroupId> {
   href?: string | ((opt: CustomResourceAttrItem<A>) => string);
-  icon?: React.ReactElement;
+  icon?: ReactElement;
   props?: P;
   label?: string;
   quick?: { order?: number } | boolean;

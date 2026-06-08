@@ -6,6 +6,7 @@ import type VectorSource from "ol/source/Vector";
 import type { Style } from "ol/style";
 import type { Options as StyleOptions } from "ol/style/Style";
 import { createContext, useContext } from "react";
+import type { RefObject } from "react";
 
 import type { UndoAction } from "../type";
 import type { LayerColor } from "../util/styleUtil";
@@ -20,7 +21,7 @@ export type EditorContextValue = {
   layerColor: LayerColor;
   layerStyle: Style;
   selectStyle: Style;
-  interactionsRef: React.RefObject<Map<string, Interaction>>;
+  interactionsRef: RefObject<Map<string, Interaction>>;
   selectStyleOptions: StyleOptions;
   interactionsVersion: number;
   addUndo: (fn: UndoAction) => void;

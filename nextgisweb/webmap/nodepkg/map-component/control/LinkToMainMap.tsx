@@ -1,3 +1,5 @@
+import type { HTMLAttributeAnchorTarget } from "react";
+
 import { ButtonControl } from "./ButtonControl";
 import type { ButtonControlProps } from "./ButtonControl";
 
@@ -5,7 +7,7 @@ import Icon from "@nextgisweb/icon/material/open_in_new";
 
 type LinkToControlProps = ButtonControlProps & {
   url: string;
-  target?: React.HTMLAttributeAnchorTarget;
+  target?: HTMLAttributeAnchorTarget;
 };
 
 export function LinkToControl({

@@ -1,5 +1,5 @@
 /** @registry */
-import type { FC, ReactNode } from "react";
+import type { ComponentType, FC, ReactNode } from "react";
 
 import type { TabsProps } from "@nextgisweb/gui/antd";
 import type { useShowModal } from "@nextgisweb/gui/index";
@@ -41,7 +41,7 @@ interface PanelPluginBase {
     config: DisplayConfig;
   }) => boolean | Promise<boolean>;
   startup?: (display: Display) => Promise<void>;
-  renderMap?: React.ComponentType<{ display: Display }>;
+  renderMap?: ComponentType<{ display: Display }>;
 }
 
 export interface WidgetPanelPlugin<

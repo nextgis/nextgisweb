@@ -1,4 +1,5 @@
 import { useRef } from "react";
+import type { CSSProperties } from "react";
 import Draggable from "react-draggable";
 import type { DraggableEventHandler } from "react-draggable";
 
@@ -7,7 +8,7 @@ export function DraggableColumn({
   onStop,
   onDrag,
 }: {
-  style: React.CSSProperties;
+  style: CSSProperties;
   onStop?: DraggableEventHandler;
   onDrag?: DraggableEventHandler;
 }) {

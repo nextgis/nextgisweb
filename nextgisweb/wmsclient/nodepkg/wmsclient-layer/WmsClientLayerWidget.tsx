@@ -74,9 +74,7 @@ export const WmsClientLayerWidget: EditorWidget<WmsClientLayerStore> = observer(
                 {code}{" "}
                 <a
                   href={
-                    routeURL("srs.catalog") +
-                    "?q=" +
-                    encodeURIComponent(code)
+                    routeURL("srs.catalog") + "?q=" + encodeURIComponent(code)
                   }
                   target="_blank"
                   rel="noreferrer"

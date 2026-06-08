@@ -8,6 +8,7 @@ import {
   useReducer,
   useState,
 } from "react";
+import type { ReactNode } from "react";
 
 import type { DataSource } from "@nextgisweb/feature-attachment/attachment-editor/type";
 import { Image } from "@nextgisweb/gui/antd";
@@ -26,7 +27,7 @@ interface AttachmentPreviewGroupProps extends PreviewGroupProps {
   attachments: DataSource[];
   featureId: number | null;
   resourceId: number;
-  children?: React.ReactNode;
+  children?: ReactNode;
 }
 
 const PhotospherePreview = lazy(() => import("../../photosphere-preview"));

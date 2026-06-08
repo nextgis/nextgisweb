@@ -5,8 +5,7 @@ import {
   useEffect,
   useMemo,
 } from "react";
-import type React from "react";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { createPortal } from "react-dom";
 
 import { updateControlAppearance } from "@nextgisweb/webmap/ol/control/updateControlAppearance";
@@ -25,9 +24,9 @@ export type ControlProps<P = unknown> = P & {
 
 export type ControlOptions = CreateControlOptions &
   ControlProps<{
-    style?: React.CSSProperties;
+    style?: CSSProperties;
     className?: string;
-    targetStyle?: React.CSSProperties;
+    targetStyle?: CSSProperties;
   }>;
 
 export interface MapControlProps extends ControlOptions {

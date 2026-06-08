@@ -1,3 +1,5 @@
+import type { CSSProperties } from "react";
+
 import type { Upload } from "@nextgisweb/gui/antd";
 
 export type UploadProps = Parameters<typeof Upload>[0];
@@ -52,7 +54,7 @@ export interface FileUploaderProps<
   showMaxSize?: boolean;
   file?: File;
   reset?: boolean;
-  style?: React.CSSProperties;
+  style?: CSSProperties;
 }
 
 export interface Progress {

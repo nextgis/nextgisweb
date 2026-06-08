@@ -4,6 +4,7 @@ import { clamp, range } from "lodash-es";
 import { action, observable } from "mobx";
 import { observer } from "mobx-react-lite";
 import { useEffect, useMemo, useState } from "react";
+import type { Key } from "react";
 
 import { InputValue } from "../antd";
 import type { TableColumnType, TableProps } from "../antd";
@@ -103,7 +104,7 @@ export default function EdiTableTestEntry() {
   const rowSelection: TableProps<Row>["rowSelection"] = {
     type: "radio",
     onChange: (
-      selectedRowKeys: React.Key[],
+      selectedRowKeys: Key[],
       selectedRows: TableColumnType<any>[]
     ) => {
       console.log(

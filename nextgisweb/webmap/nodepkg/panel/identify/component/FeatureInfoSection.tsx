@@ -32,7 +32,7 @@ export function FeatureInfoSection({
   showGeometryPreview,
   attributePanelAction,
 }: FeatureInfoSectionProps) {
-  const [extComps, setExtComps] = useState<React.ReactElement[]>([]);
+  const [extComps, setExtComps] = useState<ReactElement[]>([]);
 
   useEffect(() => {
     if (!featureItem.extensions) {
@@ -40,7 +40,7 @@ export function FeatureInfoSection({
     }
 
     const makeExtensionComps = async () => {
-      const newExtComps: React.ReactElement[] = [];
+      const newExtComps: ReactElement[] = [];
       const extensionsComp = await getExtensionsComps();
       extensionsComp.forEach((comp, key) => {
         const ExtensionComponent = lazy(comp);

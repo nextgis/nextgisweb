@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import type React from "react";
+import type { ReactNode } from "react";
 
 import { useMemoDebounce } from "@nextgisweb/pyramid/hook/useMemoDebounce";
 import { formatScaleNumber } from "@nextgisweb/webmap/panel/print/util";
@@ -12,7 +12,7 @@ import type { MapControlProps } from "./MapControl";
 import "./InfoScaleControl.less";
 
 export interface InfoScaleControlProps extends MapControlProps {
-  renderNumber?: (val: number) => React.ReactNode;
+  renderNumber?: (val: number) => ReactNode;
 }
 
 const InfoScaleControl = observer(

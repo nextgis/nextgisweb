@@ -1,4 +1,5 @@
 import type { Dayjs } from "dayjs";
+import type { ReactElement } from "react";
 
 import type { NgwAttributeType } from "@nextgisweb/feature-layer/type";
 import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
@@ -43,7 +44,7 @@ const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export interface FieldDataItem {
   key: number | string;
   attr?: string;
-  value: string | React.ReactElement;
+  value: string | ReactElement;
 }
 
 export async function fieldValuesToDataSource(

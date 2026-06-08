@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 import type { QMSService } from "@nextgisweb/basemap/layer-widget/type";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
@@ -16,8 +17,8 @@ export function PreviewLayer({
   children,
   resourceId: id,
 }: {
-  style?: React.CSSProperties;
-  children?: React.ReactNode;
+  style?: CSSProperties;
+  children?: ReactNode;
   resourceId: number;
 }) {
   const { data: resData, isLoading: isResLoading } = useRouteGet(

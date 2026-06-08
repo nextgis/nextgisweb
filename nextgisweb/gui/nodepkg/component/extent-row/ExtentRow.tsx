@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite";
 import { useCallback, useState, useTransition } from "react";
-import type React from "react";
+import type { ReactNode } from "react";
 
 import { Button, InputNumber, Space } from "@nextgisweb/gui/antd";
 import type { InputNumberProps } from "@nextgisweb/gui/antd";
@@ -54,7 +54,7 @@ export interface ExtentRowProps {
   hideResourcePicker?: boolean;
   pickerOptions?: ResourcePickerStoreOptions;
   labelType?: LabelType;
-  extraButton?: React.ReactNode;
+  extraButton?: ReactNode;
 }
 
 const labelAliases: Record<LabelType, Record<ExtentKeys, string>> = {

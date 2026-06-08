@@ -3,6 +3,7 @@ import { observer } from "mobx-react-lite";
 import { View } from "ol";
 import { unByKey } from "ol/Observable";
 import { useCallback, useEffect, useState } from "react";
+import type { CSSProperties } from "react";
 
 import CompanyLogoControl from "@nextgisweb/pyramid/company-logo/CompanyLogoControl";
 import { useDebounce } from "@nextgisweb/pyramid/hook";
@@ -22,7 +23,7 @@ import { PrintScaleToolbar } from "./PrintScaleToolar";
 import type { PrintMapStore } from "./store";
 
 export interface PrintMapPreviewProps {
-  style?: React.CSSProperties;
+  style?: CSSProperties;
   display: Display;
   className?: string;
   printMapStore: PrintMapStore;

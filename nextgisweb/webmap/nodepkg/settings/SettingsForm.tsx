@@ -1,4 +1,5 @@
 import { useState } from "react";
+import type { FC } from "react";
 
 import {
   Button,
@@ -37,7 +38,7 @@ interface SettingsFormProps {
   status: string;
 }
 
-export const SettingsForm: React.FC<SettingsFormProps> = ({
+export const SettingsForm: FC<SettingsFormProps> = ({
   onFinish,
   initialValues,
   srsOptions,

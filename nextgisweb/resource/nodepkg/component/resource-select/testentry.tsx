@@ -1,10 +1,12 @@
 /** @testentry react */
+import type { ComponentType } from "react";
+
 import { ResourceSelect } from "./ResourceSelect";
 import { ResourceSelectMultiple } from "./ResourceSelectMultiple";
 
 type PropsType = Record<string, unknown>;
 
-const presets: [React.ComponentType<PropsType>, string, PropsType][] = [
+const presets: [ComponentType<PropsType>, string, PropsType][] = [
   [
     ResourceSelect,
     "Resource select",

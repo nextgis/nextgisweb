@@ -1,3 +1,5 @@
+import type { Dispatch, SetStateAction } from "react";
+
 import { errorModal } from "@nextgisweb/gui/error";
 import { showProgressModal } from "@nextgisweb/gui/progress-modal";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -11,8 +13,8 @@ interface ForEachSelectedProps {
   title: string;
   executer: (val: { selectedId: number; signal?: AbortSignal }) => void;
   onComplate: (successIds: number[], errorIds: number[]) => void;
-  setSelected: React.Dispatch<React.SetStateAction<number[]>>;
-  setAttrItems: React.Dispatch<React.SetStateAction<DefaultResourceAttrItem[]>>;
+  setSelected: Dispatch<SetStateAction<number[]>>;
+  setAttrItems: Dispatch<SetStateAction<DefaultResourceAttrItem[]>>;
   setInProgress?: (val: boolean) => void;
 }
 

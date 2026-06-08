@@ -1,6 +1,7 @@
 import classNames from "classnames";
 import { observer } from "mobx-react-lite";
 import { useState } from "react";
+import type { ReactNode } from "react";
 
 import { Col, Row } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -19,7 +20,7 @@ const msgOutOfScaleRange = gettext(
 );
 
 export interface LayerTreeItemTitleProps {
-  icon?: React.ReactNode;
+  icon?: ReactNode;
   treeItem: TreeItemStore;
   checkable: boolean;
   showLegend: boolean;

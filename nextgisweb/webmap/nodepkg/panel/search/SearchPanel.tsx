@@ -4,6 +4,7 @@ import { observer } from "mobx-react-lite";
 import GeoJSON from "ol/format/GeoJSON";
 import type { Geometry } from "ol/geom";
 import { createContext, useCallback, useContext, useState } from "react";
+import type { ChangeEvent, ReactNode } from "react";
 
 import { Alert, Input, Spin } from "@nextgisweb/gui/antd";
 import { request, route } from "@nextgisweb/pyramid/api";
@@ -404,7 +405,7 @@ const SearchPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
     []
   );
 
-  const searchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const searchChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchText(value);
     if (value && value.trim() && value.trim().length > 1) {
@@ -448,8 +449,8 @@ const SearchPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
     );
   };
 
-  let results: React.ReactNode = null;
-  let info: React.ReactNode = null;
+  let results: ReactNode = null;
+  let info: ReactNode = null;
   if (searchResults && !loading) {
     const [resultsInfo, isExceeded] = searchResults;
     results = resultsInfo.map((r) => makeResult(r));

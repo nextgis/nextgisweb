@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
-import type { FC } from "react";
+import type { Dispatch, FC, SetStateAction } from "react";
 
 import {
   Badge,
@@ -54,7 +54,7 @@ export interface ControlProps<Data extends ModalBrowseData = ModalBrowseData> {
   disable?: boolean;
   selected: number[];
   rows: Data[];
-  setRows: React.Dispatch<React.SetStateAction<Data[]>>;
+  setRows: Dispatch<SetStateAction<Data[]>>;
 }
 
 interface ModelBrowseProps<

@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import type React from "react";
+import type { Key } from "react";
 
 import type { CustomFont, SystemFont } from "@nextgisweb/core/type/api";
 import { FileUploaderButton } from "@nextgisweb/file-upload/file-uploader";
@@ -97,7 +97,7 @@ export function FontsPanel() {
     : {
         filteredValue: ["custom"],
         filtered: true,
-        onFilter: (value: React.Key | boolean, record: FontType) =>
+        onFilter: (value: Key | boolean, record: FontType) =>
           record.type.includes(value as string),
       };
 

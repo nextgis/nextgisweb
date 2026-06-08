@@ -1,6 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { fromLonLat } from "ol/proj";
 import { useCallback } from "react";
+import type { ReactNode } from "react";
 
 import { useThemeVariables } from "@nextgisweb/gui/hook";
 import { MapComponent } from "@nextgisweb/webmap/map-component";
@@ -16,7 +17,7 @@ import { WebmapLayers } from "./WebmapLayers";
 import "./MapPane.less";
 
 export const MapPane = observer(
-  ({ display, children }: { display: Display; children: React.ReactNode }) => {
+  ({ display, children }: { display: Display; children: ReactNode }) => {
     const themeVariables = useThemeVariables({
       "theme-color-primary": "colorPrimary",
     });

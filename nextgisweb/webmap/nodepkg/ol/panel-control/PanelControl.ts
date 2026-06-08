@@ -1,4 +1,5 @@
 import Control from "ol/control/Control";
+import type { CSSProperties } from "react";
 
 import { ControlContainer } from "../../control-container/ControlContainer";
 import type { TargetPosition } from "../../control-container/ControlContainer";
@@ -18,7 +19,7 @@ export interface ControlOptions {
   order?: number;
   control: Control;
   position: TargetPosition;
-  targetStyle?: React.CSSProperties;
+  targetStyle?: CSSProperties;
 }
 
 export class PanelControl extends Control {

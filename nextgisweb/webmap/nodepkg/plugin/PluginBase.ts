@@ -1,3 +1,5 @@
+import type { ComponentType, ReactNode } from "react";
+
 import type { Display } from "../display";
 import type { TreeLayerStore } from "../store/tree-store/TreeItemStore";
 import type { PluginMenuItem, PluginParams, PluginState } from "../type";
@@ -11,8 +13,8 @@ export abstract class PluginBase {
 
   run?(nodeData: TreeLayerStore): Promise<boolean | undefined>;
   getMenuItem?(nodeData: TreeLayerStore): PluginMenuItem;
-  render?(params: PluginState): React.ReactNode;
-  renderMap?: React.ComponentType<{ display: Display; identity: string }>;
+  render?(params: PluginState): ReactNode;
+  renderMap?: ComponentType<{ display: Display; identity: string }>;
 
   constructor({ display, identity }: PluginParams) {
     this.display = display;

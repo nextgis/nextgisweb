@@ -1,5 +1,6 @@
 import { observer } from "mobx-react-lite";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import type { ReactElement } from "react";
 
 import type { EditorWidgetProps } from "@nextgisweb/feature-layer/feature-editor/type";
 import type {
@@ -89,7 +90,7 @@ const AttributeEditor = observer(
         placeholder,
       }: {
         placeholder?: string;
-      }): Record<FeatureLayerFieldDatatype, React.ReactElement> => {
+      }): Record<FeatureLayerFieldDatatype, ReactElement> => {
         const common = {
           placeholder,
           allowClear: false,

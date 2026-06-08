@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import type { ViewOptions } from "ol/View";
 import { useEffect, useRef } from "react";
-import type React from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 import { assert } from "@nextgisweb/jsrealm/error";
 import type { MapExtent, MapStore } from "@nextgisweb/webmap/ol/MapStore";
@@ -14,10 +14,10 @@ import "ol/ol.css";
 import "./MapComponent.less";
 
 export interface MapComponentProps extends ViewOptions {
-  style?: React.CSSProperties;
+  style?: CSSProperties;
   target?: string;
   basemap?: boolean;
-  children?: React.ReactNode;
+  children?: ReactNode;
   mapStore?: MapStore;
   className?: string;
   mapExtent?: MapExtent;

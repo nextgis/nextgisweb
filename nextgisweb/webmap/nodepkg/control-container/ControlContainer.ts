@@ -1,3 +1,5 @@
+import type { CSSProperties } from "react";
+
 import type { MapStore } from "../ol/MapStore";
 import "./ControlContainer.less";
 
@@ -15,7 +17,7 @@ type PositionsContainers = {
 };
 export interface CreateControlOptions {
   bar?: boolean;
-  style?: React.CSSProperties;
+  style?: CSSProperties;
   margin?: boolean;
   className?: string;
 }

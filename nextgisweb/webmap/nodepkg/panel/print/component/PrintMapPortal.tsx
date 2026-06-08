@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import type { Ref } from "react";
 import { createPortal } from "react-dom";
 
 import type { Display } from "@nextgisweb/webmap/display";
@@ -6,13 +7,13 @@ import PrintMap from "@nextgisweb/webmap/print-map";
 import type { PrintMapStore } from "@nextgisweb/webmap/print-map/store";
 
 export interface PrintMapPortalProps {
-  ref?: React.Ref<HTMLDivElement | null>;
+  ref?: Ref<HTMLDivElement | null>;
   display: Display;
   printMapStore: PrintMapStore;
 }
 
 function setRef(
-  ref: React.Ref<HTMLDivElement | null> | undefined,
+  ref: Ref<HTMLDivElement | null> | undefined,
   value: HTMLDivElement | null
 ) {
   if (!ref) return;

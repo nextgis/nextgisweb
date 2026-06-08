@@ -1,4 +1,5 @@
 import { observer } from "mobx-react-lite";
+import type { ReactNode } from "react";
 
 import { CloneIcon, ErrorIcon, RemoveIcon } from "@nextgisweb/gui/icon";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -12,7 +13,7 @@ import type { AnyObject, FunctionKeys } from "./type";
 export interface RowActionConfig<T> {
   callback: T;
   title: string;
-  icon: React.ReactNode;
+  icon: ReactNode;
   error?: string;
 }
 
@@ -20,7 +21,7 @@ export interface RowAction<R = AnyObject> {
   key: string;
   callback: (row: R) => void;
   title: string;
-  icon: React.ReactNode;
+  icon: ReactNode;
 }
 
 interface RowActionsProps<R = AnyObject> {

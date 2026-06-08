@@ -1,6 +1,6 @@
 import type { InputNumberRef as RcInputNumberRef } from "@rc-component/input-number";
 import { useEffect, useRef, useState } from "react";
-import type { FC, ReactNode } from "react";
+import type { FC, KeyboardEvent, ReactNode } from "react";
 
 import { Divider, InputNumber, Select } from "@nextgisweb/gui/antd";
 import { useDebounce } from "@nextgisweb/pyramid/hook";
@@ -37,7 +37,7 @@ export const ScalesSelect: FC<ScalesSelectProps> = ({
 
   const debouncedOnChange = useDebounce(changeCustomScale, 500);
 
-  const onPressEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const onPressEnter = (e: KeyboardEvent<HTMLInputElement>) => {
     e.stopPropagation();
     const inputValue = (e.target as HTMLInputElement)?.value.replace(/\s/g, "");
     changeCustomScale(Number(inputValue));

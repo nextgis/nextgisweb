@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import { useMemo } from "react";
-import type React from "react";
+import type { CSSProperties } from "react";
 
 import { MapControl } from "./MapControl";
 import type { MapControlProps } from "./MapControl";
@@ -14,7 +14,7 @@ type Direction = "horizontal" | "vertical";
 interface MapToolbarControlProps extends MapControlProps {
   direction?: Direction;
   gap?: number | string;
-  align?: React.CSSProperties["alignItems"];
+  align?: CSSProperties["alignItems"];
 }
 
 export default function MapToolbarControl({
@@ -30,7 +30,7 @@ export default function MapToolbarControl({
 
   position = position || toolbarContext?.position;
 
-  const calcStyle = useMemo<React.CSSProperties>(() => {
+  const calcStyle = useMemo<CSSProperties>(() => {
     const isRight = typeof position === "string" && position.includes("right");
     const isRightToLeft = direction === "horizontal" && isRight;
 

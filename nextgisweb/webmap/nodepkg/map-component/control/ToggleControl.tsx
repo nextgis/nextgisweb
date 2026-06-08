@@ -1,5 +1,6 @@
 import classNames from "classnames";
 import { useMemo } from "react";
+import type { CSSProperties } from "react";
 
 import { useThemeVariables } from "@nextgisweb/gui/hook";
 
@@ -28,7 +29,7 @@ type ToggleControlOptions = Omit<
   "title" | "style" | "onChange" | "onClick"
 > & {
   title?: ToggleActiveProp<string | undefined>;
-  style?: ToggleActiveProp<React.CSSProperties | undefined>;
+  style?: ToggleActiveProp<CSSProperties | undefined>;
   className?: string;
   statusClassName?: ToggleActiveProp<string | undefined>;
   onChange?: (value: boolean) => void | Promise<void>;

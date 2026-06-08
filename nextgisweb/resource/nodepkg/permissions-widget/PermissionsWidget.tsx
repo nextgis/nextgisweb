@@ -1,5 +1,6 @@
 import { observer } from "mobx-react-lite";
 import { useMemo } from "react";
+import type { ReactNode } from "react";
 
 import { PrincipalSelect } from "@nextgisweb/auth/component";
 import { Select, Space } from "@nextgisweb/gui/antd";
@@ -37,13 +38,7 @@ const selectDefaults: Pick<SelectProps, "allowClear" | "variant"> = {
   variant: "borderless",
 };
 
-const IconText = ({
-  icon,
-  text,
-}: {
-  icon: React.ReactNode;
-  text: React.ReactNode;
-}) => (
+const IconText = ({ icon, text }: { icon: ReactNode; text: ReactNode }) => (
   <Space>
     {icon}
     {text}

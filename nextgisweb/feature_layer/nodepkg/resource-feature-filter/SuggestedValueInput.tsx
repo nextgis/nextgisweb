@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import type { CSSProperties } from "react";
 
 import type { UniqueValuesResult } from "@nextgisweb/feature-layer/type/api";
 import { AutoComplete, Select } from "@nextgisweb/gui/antd";
@@ -8,7 +9,7 @@ import { useMemoDebounce, useRoute } from "@nextgisweb/pyramid/hook";
 import type { DefaultFilterValueInputProps } from "../feature-filter/component/DefaultFilterValueInput";
 
 interface SuggestedValueInputProps extends DefaultFilterValueInputProps {
-  style: React.CSSProperties;
+  style: CSSProperties;
   keyname: string;
   isMultiple: boolean;
   resourceId: number;

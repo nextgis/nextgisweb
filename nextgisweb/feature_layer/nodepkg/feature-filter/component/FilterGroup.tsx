@@ -2,6 +2,7 @@ import { useDndContext } from "@dnd-kit/core";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { observer } from "mobx-react-lite";
+import type { CSSProperties } from "react";
 
 import { Button, Radio, Space } from "@nextgisweb/gui/antd";
 import { AddIcon, RemoveIcon } from "@nextgisweb/gui/icon";
@@ -45,7 +46,7 @@ export const FilterGroup = observer(
       disabled: isRoot,
     });
 
-    const style: React.CSSProperties = {
+    const style: CSSProperties = {
       transform: CSS.Transform.toString(transform),
       transition,
       opacity: isDragging ? 0.5 : 1,

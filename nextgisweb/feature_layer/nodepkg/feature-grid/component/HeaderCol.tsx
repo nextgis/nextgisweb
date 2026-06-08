@@ -1,3 +1,5 @@
+import type { Ref } from "react";
+
 import { ExpandableText } from "@nextgisweb/gui/index";
 
 import SortIcon from "../component/SortIcon";
@@ -5,7 +7,7 @@ import { $FID, KEY_FIELD_ID } from "../constant";
 import type { ColOrder, FeatureLayerFieldCol, OrderBy } from "../type";
 
 interface HeaderColProps {
-  ref: React.Ref<HTMLDivElement>;
+  ref: Ref<HTMLDivElement>;
   column: FeatureLayerFieldCol;
   orderBy?: OrderBy;
   userDefinedWidths: Record<number, number>;
