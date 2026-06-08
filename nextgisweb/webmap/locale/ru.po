@@ -88,7 +88,7 @@ msgid "Radius:"
 msgstr "Радиус"
 
 #: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:61
-#: nodepkg/utils/format-units.tsx:13
+#: nodepkg/utils/format-units.tsx:14
 msgid "m"
 msgstr "м"
 
@@ -188,7 +188,7 @@ msgstr "Макс. масштаб"
 #: nodepkg/items-widget/ItemsWidget.tsx:39
 #: nodepkg/panel/print/component/PrintElementsSettings.tsx:25
 #: nodepkg/settings-widget/SettingsWidget.tsx:27
-#: nodepkg/settings/SettingsForm.tsx:230
+#: nodepkg/settings/SettingsForm.tsx:232
 msgid "Legend"
 msgstr "Легенда"
 
@@ -242,7 +242,7 @@ msgstr "Редактировать аннотацию"
 msgid "Filter"
 msgstr "Фильтр"
 
-#: nodepkg/layers-tree/LayerTreeItemTitle.tsx:17
+#: nodepkg/layers-tree/LayerTreeItemTitle.tsx:18
 msgid ""
 "This layer is not visible at the current map scale. Zoom to make the layer "
 "visible."
@@ -299,12 +299,12 @@ msgstr "Вернуться к начальному охвату"
 msgid "Band {}"
 msgstr "Канал {}"
 
-#: nodepkg/map-component/tool/ToolMeasure/ToolMeasure.tsx:69
+#: nodepkg/map-component/tool/ToolMeasure/ToolMeasure.tsx:67
 #: nodepkg/map-controls/map-tools.ts:40
 msgid "Measure distance"
 msgstr "Измерение расстояния"
 
-#: nodepkg/map-component/tool/ToolMeasure/ToolMeasure.tsx:70
+#: nodepkg/map-component/tool/ToolMeasure/ToolMeasure.tsx:68
 #: nodepkg/map-controls/map-tools.ts:50
 msgid "Measure area"
 msgstr "Измерение площади"
@@ -376,7 +376,7 @@ msgid "Locate me"
 msgstr "Определить мое местоположение"
 
 #: nodepkg/map-controls/map-controls.ts:111
-#: nodepkg/map-controls/map-controls.ts:116 nodepkg/settings/SettingsForm.tsx:80
+#: nodepkg/map-controls/map-controls.ts:116 nodepkg/settings/SettingsForm.tsx:81
 #: option/base.py:40
 msgid "Identification"
 msgstr "Идентификация"
@@ -496,11 +496,11 @@ msgstr "Получение информации об объекте..."
 msgid "No objects were found at the click location."
 msgstr "Объекты в месте клика не найдены."
 
-#: nodepkg/panel/identify/KeyValueTable.tsx:14
+#: nodepkg/panel/identify/KeyValueTable.tsx:16
 msgid "Attribute"
 msgstr "Атрибут"
 
-#: nodepkg/panel/identify/KeyValueTable.tsx:19
+#: nodepkg/panel/identify/KeyValueTable.tsx:26
 msgid "Value"
 msgstr "Значение"
 
@@ -520,7 +520,7 @@ msgstr "Приблизить к объекту"
 msgid "Raster"
 msgstr "Растр"
 
-#: nodepkg/panel/identify/fields.tsx:114
+#: nodepkg/panel/identify/fields.tsx:115
 msgid "N/A"
 msgstr "Н/Д"
 
@@ -638,15 +638,15 @@ msgstr "PDF"
 msgid "Print map"
 msgstr "Распечатать карту"
 
-#: nodepkg/panel/search/SearchPanel.tsx:358
+#: nodepkg/panel/search/SearchPanel.tsx:359
 msgid "Enter at least 2 characters"
 msgstr "Введите минимум 2 символа"
 
-#: nodepkg/panel/search/SearchPanel.tsx:457
+#: nodepkg/panel/search/SearchPanel.tsx:458
 msgid "Not found"
 msgstr "Не найдено"
 
-#: nodepkg/panel/search/SearchPanel.tsx:461
+#: nodepkg/panel/search/SearchPanel.tsx:462
 msgid "Refine search criterion. Displayed first 100 search results."
 msgstr "Уточните критерий поиска. Отображены первые 100 результатов поиска."
 
@@ -864,7 +864,7 @@ msgid "Select resource"
 msgstr "Выберите ресурс"
 
 #: nodepkg/settings-widget/SettingsWidget.tsx:32
-#: nodepkg/settings/SettingsForm.tsx:151
+#: nodepkg/settings/SettingsForm.tsx:152
 msgid "Measurement SRS"
 msgstr "СК для измерений"
 
@@ -901,7 +901,7 @@ msgid "Show with messages"
 msgstr "Показать с сообщениями"
 
 #: nodepkg/settings-widget/SettingsWidget.tsx:52
-#: nodepkg/settings/SettingsForm.tsx:170
+#: nodepkg/settings/SettingsForm.tsx:171
 msgid "Enable"
 msgstr "Включить"
 
@@ -917,71 +917,75 @@ msgstr "Вычислить охват из всех слоев"
 msgid "Settings saved"
 msgstr "Настройки сохранены"
 
-#: nodepkg/settings/SettingsForm.tsx:65
+#: nodepkg/settings/SettingsForm.tsx:66
 msgid "General"
 msgstr "Общие"
 
-#: nodepkg/settings/SettingsForm.tsx:74
+#: nodepkg/settings/SettingsForm.tsx:75
 msgid "Hide navigation menu for guest"
 msgstr "Скрывать меню навигации для гостя"
 
-#: nodepkg/settings/SettingsForm.tsx:93
+#: nodepkg/settings/SettingsForm.tsx:94
 msgid "Show feature attributes"
 msgstr "Показывать атрибуты объектов"
 
-#: nodepkg/settings/SettingsForm.tsx:107
+#: nodepkg/settings/SettingsForm.tsx:108
 msgid "Show geometry info"
 msgstr "Показывать информацию о геометрии"
 
-#: nodepkg/settings/SettingsForm.tsx:117
+#: nodepkg/settings/SettingsForm.tsx:118
 msgid "Radius, px"
 msgstr "Радиус, пикс."
 
-#: nodepkg/settings/SettingsForm.tsx:129
+#: nodepkg/settings/SettingsForm.tsx:130
 msgid "Measurement"
 msgstr "Измерения"
 
-#: nodepkg/settings/SettingsForm.tsx:133
+#: nodepkg/settings/SettingsForm.tsx:134
 msgid "Length units"
 msgstr "Единицы длины"
 
-#: nodepkg/settings/SettingsForm.tsx:138
+#: nodepkg/settings/SettingsForm.tsx:139
 msgid "Area units"
 msgstr "Единицы площади"
 
-#: nodepkg/settings/SettingsForm.tsx:143
+#: nodepkg/settings/SettingsForm.tsx:144
 msgid "Degree format"
 msgstr "Формат градусов"
 
-#: nodepkg/settings/SettingsForm.tsx:157
+#: nodepkg/settings/SettingsForm.tsx:158
 msgid "Address search"
 msgstr "Адресный поиск"
 
-#: nodepkg/settings/SettingsForm.tsx:184
+#: nodepkg/settings/SettingsForm.tsx:185
 msgid "Limit by web map initial extent"
 msgstr "Ограничить начальным охватом карты"
 
-#: nodepkg/settings/SettingsForm.tsx:192
+#: nodepkg/settings/SettingsForm.tsx:193
 msgid "Provider"
 msgstr "Провайдер"
 
-#: nodepkg/settings/SettingsForm.tsx:203
+#: nodepkg/settings/SettingsForm.tsx:204
 msgid "Limit search results to countries"
 msgstr "Ограничить поиск странами"
 
-#: nodepkg/settings/SettingsForm.tsx:211
+#: nodepkg/settings/SettingsForm.tsx:212
 msgid "Invalid countries. For example ru or gb,de"
 msgstr "Неверные значения. Например, ru или gb,de"
 
-#: nodepkg/settings/SettingsForm.tsx:222
+#: nodepkg/settings/SettingsForm.tsx:223
 msgid "Yandex.Maps API Geocoder Key"
 msgstr "Ключ геокодера API Яндекс.Карт"
 
-#: nodepkg/settings/SettingsForm.tsx:241
+#: nodepkg/settings/SettingsForm.tsx:224
+msgid "API key is required"
+msgstr "API ключ является обязательным"
+
+#: nodepkg/settings/SettingsForm.tsx:243
 msgid "Visibility"
 msgstr "Видимость"
 
-#: nodepkg/settings/SettingsForm.tsx:262
+#: nodepkg/settings/SettingsForm.tsx:264
 #: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:179
 #: nodepkg/ui/finish-editing-dialog/FinishEditingDialog.tsx:62
 msgid "Save"
@@ -1112,23 +1116,23 @@ msgstr "Вы хотите сохранить изменения?"
 msgid "Don't save"
 msgstr "Не сохранять"
 
-#: nodepkg/utils/format-units.tsx:14
+#: nodepkg/utils/format-units.tsx:15
 msgid "km"
 msgstr "км"
 
-#: nodepkg/utils/format-units.tsx:15
+#: nodepkg/utils/format-units.tsx:16
 msgid "ft"
 msgstr "фут"
 
-#: nodepkg/utils/format-units.tsx:16
+#: nodepkg/utils/format-units.tsx:17
 msgid "mi"
 msgstr "миля"
 
-#: nodepkg/utils/format-units.tsx:17
+#: nodepkg/utils/format-units.tsx:18
 msgid "ha"
 msgstr "га"
 
-#: nodepkg/utils/format-units.tsx:18
+#: nodepkg/utils/format-units.tsx:19
 msgid "ac"
 msgstr "акр"
 
