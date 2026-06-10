@@ -247,10 +247,18 @@ def install(
                 continue
             tf.symlink_to((ngw_root / lc).relative_to(pkg_root))
 
+    pnpm_lockfile = Path("pnpm-lock.yaml")
+    pnpm_lockfile_mtime = pnpm_lockfile.stat().st_mtime if pnpm_lockfile.exists() else None
+
     check_call(
         ["pnpm", "install"],
         env={**os.environ, "COREPACK_ENABLE_DOWNLOAD_PROMPT": "0"},
     )
+
+    assert pnpm_lockfile.exists(), "pnpm-lock.yaml not created"
+    if pnpm_lockfile_mtime and pnpm_lockfile.stat().st_mtime != pnpm_lockfile_mtime:
+        logger.info("pnpm-lock.yaml updated, running pnpm dedupe")
+        check_call(["pnpm", "dedupe", "--prefer-offline"])
 
     if watch or build:
         pnpm_path = shutil.which("pnpm")
