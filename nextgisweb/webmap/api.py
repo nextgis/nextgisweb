@@ -516,9 +516,6 @@ class LayerItemConfig(BaseItem, tag="layer", tag_field="type"):
     legendInfo: LegendInfo
     adapter: str
     plugin: dict[str, Any]
-    minResolution: float | None = None
-    maxResolution: float | None = None
-    editable: bool | None = None
     identification: LayerIdentification | None = None
 
 

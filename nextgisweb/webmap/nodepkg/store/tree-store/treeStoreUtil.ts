@@ -1,8 +1,4 @@
-import type { TreeChildrenItemConfig } from "@nextgisweb/webmap/type/TreeItems";
-import type {
-  GroupItemConfig,
-  LayerItemConfig,
-} from "@nextgisweb/webmap/type/api";
+import type { TreeChildrenItemStore } from "@nextgisweb/webmap/type/TreeItems";
 
 import type {
   TreeGroupStore,
@@ -11,28 +7,28 @@ import type {
 } from "./TreeItemStore";
 import type { TreeStore } from "./TreeStore";
 
-export type ConfigByType<T extends TreeChildrenItemConfig["type"]> =
+export type ConfigByType<T extends TreeChildrenItemStore["type"]> =
   T extends "layer"
-    ? LayerItemConfig
+    ? TreeLayerStore
     : T extends "group"
-      ? GroupItemConfig
-      : TreeChildrenItemConfig;
+      ? TreeGroupStore
+      : TreeChildrenItemStore;
 
-export type NodeByType<T extends TreeChildrenItemConfig["type"]> =
+export type NodeByType<T extends TreeChildrenItemStore["type"]> =
   T extends "layer"
     ? TreeLayerStore
     : T extends "group"
       ? TreeGroupStore
       : never;
 
-export function filterItems<T extends TreeChildrenItemConfig["type"]>(
+export function filterItems<T extends TreeChildrenItemStore["type"]>(
   items: TreeItemStore[],
   query: { type: T } & Partial<ConfigByType<T>>
 ): NodeByType<T>[];
 
 export function filterItems(
   items: TreeItemStore[],
-  query: Partial<TreeChildrenItemConfig>
+  query: Partial<TreeChildrenItemStore>
 ): TreeItemStore[];
 
 export function filterItems(
@@ -56,7 +52,7 @@ export function filterItems(
   return result;
 }
 
-export function someItem<T extends TreeChildrenItemConfig["type"]>(
+export function someItem<T extends TreeChildrenItemStore["type"]>(
   items: TreeItemStore[],
   query: { type: T } & Partial<ConfigByType<T>>
 ): boolean {

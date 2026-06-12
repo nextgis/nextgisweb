@@ -19,7 +19,7 @@ import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController"
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import type { Display } from "@nextgisweb/webmap/display";
 import FilterExtentBtn from "@nextgisweb/webmap/filter-extent-btn";
-import type { TreeItemConfig } from "@nextgisweb/webmap/type/TreeItems";
+import type { TreeLayerStore } from "@nextgisweb/webmap/store/tree-store/TreeItemStore";
 
 import type { FeatureAttachment } from "../../type";
 
@@ -56,7 +56,7 @@ type IdentifyFeatureFunc = (featureId: number, layerId: number) => void;
 const getLayersInfo = (display: Display) => {
   const checked = display.treeStore.visibleLayerIds;
 
-  const layersResourceIds = new Map<number, TreeItemConfig>();
+  const layersResourceIds = new Map<number, TreeLayerStore>();
   checked.forEach((itemId) => {
     const itemInfo = display.treeStore.getItemById(itemId);
     if (

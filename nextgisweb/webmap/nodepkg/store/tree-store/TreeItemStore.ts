@@ -97,10 +97,8 @@ export class LegendInfoStore implements LegendInfo {
 
   @action.bound
   load(config: LegendInfo) {
-    this.visible = config.visible;
-    this.has_legend = config.has_legend;
-
-    this.touch();
+    this.setVisible(config.visible);
+    this.setHasLegend(config.has_legend);
   }
 
   @action.bound
@@ -110,14 +108,22 @@ export class LegendInfoStore implements LegendInfo {
 
   @action
   setVisible(val: LegendInfo["visible"]) {
-    this.visible = val;
-    this.touch();
+    if (val !== this.visible) {
+      this.visible = val;
+      this.touch();
+    }
+  }
+  @action
+  setHasLegend(val: boolean) {
+    if (val !== this.has_legend) {
+      this.has_legend = val;
+      this.touch();
+    }
   }
 
   @action
   toggleVisible() {
-    this.visible = this.visible === "collapse" ? "expand" : "collapse";
-    this.touch();
+    this.setVisible(this.visible === "collapse" ? "expand" : "collapse");
   }
 
   @action
@@ -149,7 +155,7 @@ export class TreeLayerStore
   @observable.ref accessor layerId: number;
   @observable.ref accessor styleId: number;
   @observable.ref accessor symbols: LayerSymbols | null = null;
-  @observable.ref accessor editable: boolean | null;
+
   @observable.ref accessor filterable: boolean;
   @observable.ref accessor legendInfo: LegendInfoStore;
   @observable.ref accessor visibility: boolean;
@@ -157,8 +163,7 @@ export class TreeLayerStore
   @observable.ref accessor transparency: number | null;
   @observable.ref accessor minScaleDenom: number | null;
   @observable.ref accessor maxScaleDenom: number | null;
-  @observable.ref accessor minResolution: number | null;
-  @observable.ref accessor maxResolution: number | null;
+
   @observable.ref accessor identification: LayerIdentification | null;
   @observable.ref accessor drawOrderPosition: number;
 
@@ -166,6 +171,10 @@ export class TreeLayerStore
 
   @observable.ref accessor drawOrderEnabled: boolean;
   @observable.ref accessor filter: FilterExpressionString | null = null;
+
+  @observable.ref accessor minResolution: number | null = null;
+  @observable.ref accessor maxResolution: number | null = null;
+  @observable.ref accessor editable: boolean | null = null;
 
   constructor(
     init: LayerItemConfig,
@@ -191,9 +200,7 @@ export class TreeLayerStore
     this.legendInfo = new LegendInfoStore(init.legendInfo);
     this.adapter = init.adapter;
     this.plugin = init.plugin;
-    this.minResolution = init.minResolution ?? null;
-    this.maxResolution = init.maxResolution ?? null;
-    this.editable = init.editable ?? null;
+
     this.identification = init.identification ?? null;
   }
 
@@ -213,9 +220,6 @@ export class TreeLayerStore
     this.filterable = config.filterable;
     this.adapter = config.adapter;
     this.plugin = config.plugin;
-    this.minResolution = config.minResolution ?? null;
-    this.maxResolution = config.maxResolution ?? null;
-    this.editable = config.editable ?? null;
     this.identification = config.identification ?? null;
 
     this.legendInfo.load(config.legendInfo);
@@ -250,9 +254,6 @@ export class TreeLayerStore
 
       adapter: this.adapter,
       plugin: this.plugin,
-      minResolution: this.minResolution,
-      maxResolution: this.maxResolution,
-      editable: this.editable,
       identification: this.identification,
     } satisfies LayerItemConfig;
   }

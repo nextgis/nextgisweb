@@ -2,7 +2,10 @@ import { action, computed, observable, reaction, runInAction } from "mobx";
 
 import { route } from "@nextgisweb/pyramid/api";
 import type { LegendSymbol } from "@nextgisweb/render/type/api";
-import type { TreeChildrenItemConfig } from "@nextgisweb/webmap/type/TreeItems";
+import type {
+  TreeChildrenItemConfig,
+  TreeChildrenItemStore,
+} from "@nextgisweb/webmap/type/TreeItems";
 import type {
   GroupItemConfig,
   LayerItemConfig,
@@ -25,6 +28,8 @@ export class TreeStore {
   @observable.ref accessor visibleLayerIds: number[] = [];
 
   @observable.ref accessor drawOrderEnabled = false;
+
+  @observable.ref private accessor _cleanSnapshot: string | null = null;
 
   private readonly _loadingResourceSymbols = new Set<number>();
 
@@ -86,6 +91,22 @@ export class TreeStore {
     );
   }
 
+  private get _snapshot(): string {
+    return JSON.stringify(this.dump());
+  }
+
+  @computed
+  get dirty(): boolean {
+    return (
+      this._cleanSnapshot !== null && this._snapshot !== this._cleanSnapshot
+    );
+  }
+
+  @action.bound
+  markClean() {
+    this._cleanSnapshot = this._snapshot;
+  }
+
   @action.bound
   load(rootItem: RootItemConfig) {
     this.rootId = rootItem.id;
@@ -96,6 +117,7 @@ export class TreeStore {
 
     this.childrenIds = [];
     this.visibleLayerIds = [];
+
     [...children].reverse().forEach((child) => {
       this.addItem(child);
     });
@@ -107,6 +129,7 @@ export class TreeStore {
           layers.push(item);
         }
       }
+
       if (layers.length) {
         const sorted = [...layers].sort(
           (a, b) => a.drawOrderPosition - b.drawOrderPosition
@@ -118,6 +141,8 @@ export class TreeStore {
         });
       }
     }
+
+    this.markClean();
   }
 
   nextId() {
@@ -338,14 +363,14 @@ export class TreeStore {
     return res;
   }
 
-  filter<T extends TreeChildrenItemConfig["type"]>(
+  filter<T extends TreeChildrenItemStore["type"]>(
     query: { type: T } & Partial<ConfigByType<T>>
   ): NodeByType<T>[];
-  filter(query: Partial<TreeChildrenItemConfig>): TreeItemStore[] {
+  filter(query: Partial<TreeChildrenItemStore>): TreeItemStore[] {
     return filterItems(Array.from(this.items.values()), query);
   }
 
-  some<T extends TreeChildrenItemConfig["type"]>(
+  some<T extends TreeChildrenItemStore["type"]>(
     query: { type: T } & Partial<ConfigByType<T>>
   ): boolean {
     return someItem(Array.from(this.items.values()), query);
@@ -354,13 +379,14 @@ export class TreeStore {
   @action.bound
   addItem(
     cfg: TreeChildrenItemConfig,
-    parentId: number | null = null
+    parentId: number | null = null,
+    index?: number
   ): TreeItemStore {
     const { id, type } = cfg;
     const node = createTreeItemStore(cfg, parentId, this.drawOrderEnabled);
     this.items.set(id, node);
 
-    this.insert(id, parentId);
+    this.insert(id, parentId, index);
 
     if (type === "group") {
       [...cfg.children].reverse().forEach((c) => this.addItem(c, id));

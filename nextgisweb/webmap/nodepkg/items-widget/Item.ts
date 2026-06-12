@@ -4,12 +4,11 @@ import { firstError, mapper } from "@nextgisweb/gui/arm";
 import type { ErrorResult } from "@nextgisweb/gui/arm";
 import { observableChildren } from "@nextgisweb/gui/focus-table";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import type { CompositeStore } from "@nextgisweb/resource/composite";
 import type {
   WebMapItemGroupWrite,
   WebMapItemLayerWrite,
 } from "@nextgisweb/webmap/type/api";
-
-import type { ItemsStore } from "./ItemsStore";
 
 type ItemPayload = {
   [P in keyof WebMapItemGroupWrite & keyof WebMapItemLayerWrite]:
@@ -19,6 +18,12 @@ type ItemPayload = {
 type ItemType = ItemPayload["item_type"];
 type ItemData<D> = Partial<Omit<D, "item_type">>;
 type ItemDump<T, D> = Omit<D, "item_type"> & { item_type: T };
+
+export interface ItemStore {
+  readonly composite: Pick<CompositeStore, "parent">;
+  validate: boolean;
+  markDirty(): void;
+}
 
 const mapperOpts = {
   validateIf: (o: BaseItem) => o.store.validate,
@@ -39,12 +44,12 @@ abstract class BaseItem<
   D extends ItemPayload = ItemPayload,
 > {
   abstract readonly itemType: ItemType;
-  readonly store: ItemsStore;
+  readonly store: ItemStore;
 
   @observable.ref accessor parent: Group | null = null;
   displayName = displayName.init("", this);
 
-  constructor(store: ItemsStore, data: ItemData<D>) {
+  constructor(store: ItemStore, data: ItemData<D>) {
     this.store = store;
     baseLoad(this, data);
   }
@@ -73,7 +78,7 @@ export class Group extends BaseItem<"group", WebMapItemGroupWrite> {
     this.store.markDirty();
   });
 
-  constructor(store: ItemsStore, data: ItemData<WebMapItemGroupWrite>) {
+  constructor(store: ItemStore, data: ItemData<WebMapItemGroupWrite>) {
     super(store, data);
     groupLoad(this, data);
     this.children.replace(
@@ -139,7 +144,7 @@ export class Layer extends BaseItem<"layer", WebMapItemLayerWrite> {
   readonly layerStyleId = layerStyleId.init(-1, this);
   readonly layerDrawOrderPosition = layerDrawOrderPosition.init(null, this);
 
-  constructor(store: ItemsStore, data: ItemData<WebMapItemLayerWrite>) {
+  constructor(store: ItemStore, data: ItemData<WebMapItemLayerWrite>) {
     super(store, data);
     layerLoad(this, data);
   }

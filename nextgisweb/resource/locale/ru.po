@@ -16,12 +16,12 @@ msgid "Keyname"
 msgstr "Ключ"
 
 #: attr/resource.py:118 nodepkg/effective-permissions/EffectivePermissions.tsx:15
-msgid "No"
-msgstr "Нет"
-
-#: attr/resource.py:118 nodepkg/effective-permissions/EffectivePermissions.tsx:15
 msgid "Yes"
 msgstr "Да"
+
+#: attr/resource.py:118 nodepkg/effective-permissions/EffectivePermissions.tsx:15
+msgid "No"
+msgstr "Нет"
 
 #: attr/resource.py:121 nodepkg/editor-widget/EditorWidget.tsx:46
 #: nodepkg/page/search/ResultsTable.tsx:18
@@ -146,7 +146,7 @@ msgid "User resources"
 msgstr "Пользовательские ресурсы"
 
 #: model.py:116 nodepkg/editor-widget/EditorWidget.tsx:73
-#: nodepkg/resource-section/registry.ts:120 scope.py:12
+#: nodepkg/resource-section/registry.ts:122 scope.py:12
 msgid "Resource"
 msgstr "Ресурс"
 
@@ -192,14 +192,14 @@ msgstr ""
 msgid "Resource group"
 msgstr "Группа ресурсов"
 
-#: nodepkg/component/resource-picker/ResourcePickerChildren.tsx:31
+#: nodepkg/component/resource-picker/ResourcePickerChildren.tsx:32
 #: nodepkg/editor-widget/EditorWidget.tsx:19
 #: nodepkg/page/search/ResultsTable.tsx:16
 #: nodepkg/resource-section/children/ResourceSectionChildren.tsx:131
 msgid "Display name"
 msgstr "Наименование"
 
-#: nodepkg/component/resource-picker/ResourcePickerChildren.tsx:32
+#: nodepkg/component/resource-picker/ResourcePickerChildren.tsx:33
 msgid "Select first eligible child resource"
 msgstr "Выбрать первый подходящий дочерний ресурс"
 
@@ -220,7 +220,7 @@ msgid "Refresh"
 msgstr "Обновить"
 
 #: nodepkg/component/resource-picker/pickToFocusTable.tsx:51
-#: nodepkg/permissions-widget/PermissionsWidget.tsx:26
+#: nodepkg/permissions-widget/PermissionsWidget.tsx:27
 msgid "Add"
 msgstr "Добавить"
 
@@ -232,11 +232,11 @@ msgstr "Выбрать эту группу"
 msgid "Pick selected"
 msgstr "Выбрать отмеченное"
 
-#: nodepkg/composite/CompositeStore.ts:244
+#: nodepkg/composite/CompositeStore.ts:266
 msgid "Errors found during data validation. Tabs with errors marked in red."
 msgstr "При проверке данных обнаружена ошибка. Вкладки с ошибками отмечены красным."
 
-#: nodepkg/composite/CompositeStore.ts:247
+#: nodepkg/composite/CompositeStore.ts:269
 msgid "Validation error"
 msgstr "Ошибка валидации"
 
@@ -257,13 +257,26 @@ msgstr "Сохранить"
 msgid "Please wait. Processing request..."
 msgstr "Подождите, пожалуйста, идет обработка запроса..."
 
-#: nodepkg/control-panel-plugin.tsx:11 view.py:231
-msgid "Resource export"
-msgstr "Экспорт ресурсов"
+#: nodepkg/composite/CompositeWidgetModal.tsx:16
+msgid "Unsaved changes"
+msgstr "Несохраненные изменения"
 
+#: nodepkg/composite/CompositeWidgetModal.tsx:17
+msgid "There are unsaved changes. Close without saving?"
+msgstr "Есть несохраненные изменения. Закрыть без сохранения?"
+
+#: nodepkg/composite/CompositeWidgetModal.tsx:20
+msgid "Close without saving"
+msgstr "Закрыть без сохранения"
+
+#: nodepkg/composite/CompositeWidgetModal.tsx:114
 #: nodepkg/delete-page/DeletePage.tsx:120
 msgid "Cancel"
 msgstr "Отмена"
+
+#: nodepkg/control-panel-plugin.tsx:11 view.py:231
+msgid "Resource export"
+msgstr "Экспорт ресурсов"
 
 #: nodepkg/delete-page/DeletePageModal.tsx:18
 msgid "Confirmation required"
@@ -410,15 +423,15 @@ msgstr[2] "Перемещено {} ресурсов"
 msgid "Please confirm resource deletion. This action cannot be undone."
 msgstr "Пожалуйста, подтвердите удаление. Это действие не может быть отменено."
 
-#: nodepkg/page/search/FilterBar.tsx:15
+#: nodepkg/page/search/FilterBar.tsx:18
 msgid "All resource types"
 msgstr "Все типы ресурсов"
 
-#: nodepkg/page/search/FilterBar.tsx:16
+#: nodepkg/page/search/FilterBar.tsx:19
 msgid "All owners"
 msgstr "Все владельцы"
 
-#: nodepkg/page/search/FilterBar.tsx:17
+#: nodepkg/page/search/FilterBar.tsx:20
 msgid "Root resource"
 msgstr "Корневой ресурс"
 
@@ -488,43 +501,43 @@ msgstr "Необходимо заполнить все поля"
 msgid "Row conflicts with another"
 msgstr "Конфликт строк"
 
-#: nodepkg/permissions-widget/PermissionsWidget.tsx:21
+#: nodepkg/permissions-widget/PermissionsWidget.tsx:22
 msgid "Action"
 msgstr "Действие"
 
-#: nodepkg/permissions-widget/PermissionsWidget.tsx:22
+#: nodepkg/permissions-widget/PermissionsWidget.tsx:23
 msgid "Principal"
 msgstr "Субъект"
 
-#: nodepkg/permissions-widget/PermissionsWidget.tsx:23
+#: nodepkg/permissions-widget/PermissionsWidget.tsx:24
 msgid "Apply to"
 msgstr "Применить для"
 
-#: nodepkg/permissions-widget/PermissionsWidget.tsx:24
+#: nodepkg/permissions-widget/PermissionsWidget.tsx:25
 msgid "Permission"
 msgstr "Право"
 
-#: nodepkg/permissions-widget/PermissionsWidget.tsx:27
+#: nodepkg/permissions-widget/PermissionsWidget.tsx:28
 msgid "Allow"
 msgstr "Разрешить"
 
-#: nodepkg/permissions-widget/PermissionsWidget.tsx:28
+#: nodepkg/permissions-widget/PermissionsWidget.tsx:29
 msgid "Deny"
 msgstr "Запретить"
 
-#: nodepkg/permissions-widget/PermissionsWidget.tsx:30
+#: nodepkg/permissions-widget/PermissionsWidget.tsx:31
 msgid "This and subresources"
 msgstr "Этого и вложенных ресурсов"
 
-#: nodepkg/permissions-widget/PermissionsWidget.tsx:31
+#: nodepkg/permissions-widget/PermissionsWidget.tsx:32
 msgid "This resource only"
 msgstr "Только этого ресурса"
 
-#: nodepkg/permissions-widget/PermissionsWidget.tsx:33
+#: nodepkg/permissions-widget/PermissionsWidget.tsx:34
 msgid "All permissions"
 msgstr "Все права"
 
-#: nodepkg/permissions-widget/PermissionsWidget.tsx:246
+#: nodepkg/permissions-widget/PermissionsWidget.tsx:241
 msgid "Permissions"
 msgstr "Права доступа"
 
@@ -533,7 +546,7 @@ msgid "Update"
 msgstr "Изменить"
 
 #: nodepkg/resource-action-plugin.tsx:39
-#: nodepkg/resource-section/children/component/MenuDropdown.tsx:224
+#: nodepkg/resource-section/children/component/MenuDropdown.tsx:225
 msgid "Delete"
 msgstr "Удалить"
 
@@ -551,51 +564,51 @@ msgstr "Представление JSON"
 msgid "Volume"
 msgstr "Размер"
 
-#: nodepkg/resource-section/children/component/MenuDropdown.tsx:98
+#: nodepkg/resource-section/children/component/MenuDropdown.tsx:99
 msgid "Moving resources"
 msgstr "Перемещение ресурсов"
 
-#: nodepkg/resource-section/children/component/MenuDropdown.tsx:159
+#: nodepkg/resource-section/children/component/MenuDropdown.tsx:160
 msgid "Deleting resources"
 msgstr "Удаление ресурсов"
 
-#: nodepkg/resource-section/children/component/MenuDropdown.tsx:185
+#: nodepkg/resource-section/children/component/MenuDropdown.tsx:186
 msgid "Turn off multiple selection"
 msgstr "Отключить множественный выбор"
 
-#: nodepkg/resource-section/children/component/MenuDropdown.tsx:186
+#: nodepkg/resource-section/children/component/MenuDropdown.tsx:187
 msgid "Select multiple resources"
 msgstr "Выбрать несколько ресурсов"
 
-#: nodepkg/resource-section/children/component/MenuDropdown.tsx:196
+#: nodepkg/resource-section/children/component/MenuDropdown.tsx:197
 msgid "Hide resource volume"
 msgstr "Скрыть размер ресурса"
 
-#: nodepkg/resource-section/children/component/MenuDropdown.tsx:197
+#: nodepkg/resource-section/children/component/MenuDropdown.tsx:198
 msgid "Show resource volume"
 msgstr "Показать размер ресурса"
 
-#: nodepkg/resource-section/children/component/MenuDropdown.tsx:209
+#: nodepkg/resource-section/children/component/MenuDropdown.tsx:210
 msgid "Hide resource creation date"
 msgstr "Скрыть дату создания ресурса"
 
-#: nodepkg/resource-section/children/component/MenuDropdown.tsx:210
+#: nodepkg/resource-section/children/component/MenuDropdown.tsx:211
 msgid "Show resource creation date"
 msgstr "Показать дату создания ресурса"
 
-#: nodepkg/resource-section/children/component/MenuDropdown.tsx:230
+#: nodepkg/resource-section/children/component/MenuDropdown.tsx:231
 msgid "Not all of the selected can be deleted."
 msgstr "Не все выделенные ресурсы могут быть удалены."
 
-#: nodepkg/resource-section/children/component/MenuDropdown.tsx:244
+#: nodepkg/resource-section/children/component/MenuDropdown.tsx:245
 msgid "Move"
 msgstr "Переместить"
 
-#: nodepkg/resource-section/children/component/MenuDropdown.tsx:263
+#: nodepkg/resource-section/children/component/MenuDropdown.tsx:264
 msgid "Export vector layers"
 msgstr "Экспорт векторных слоёв"
 
-#: nodepkg/resource-section/children/util/forEachSelected.ts:7
+#: nodepkg/resource-section/children/util/forEachSelected.ts:9
 msgid "Operation in progress"
 msgstr "Выполняется операция"
 
@@ -620,7 +633,7 @@ msgstr "Создать ресурс"
 msgid "Everything"
 msgstr "Все ресурсы"
 
-#: nodepkg/resource-section/registry.ts:125
+#: nodepkg/resource-section/registry.ts:127
 msgid "Extra"
 msgstr "Дополнительно"
 

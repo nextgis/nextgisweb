@@ -5,10 +5,37 @@ import { useMemoDebounce } from "@nextgisweb/pyramid/hook";
 import type { LayerDisplayAdapterCtor } from "@nextgisweb/webmap/DisplayLayerAdapter";
 import { entrypointsLoader } from "@nextgisweb/webmap/compat/util/entrypointLoader";
 import { useMapContext } from "@nextgisweb/webmap/map-component/context/useMapContext";
+import type { MapStore } from "@nextgisweb/webmap/ol/MapStore";
 import type { CoreLayer } from "@nextgisweb/webmap/ol/layer/CoreLayer";
 import type { TreeStore } from "@nextgisweb/webmap/store";
 import type { TreeLayerStore } from "@nextgisweb/webmap/store/tree-store/TreeItemStore";
 import { filterItems } from "@nextgisweb/webmap/store/tree-store/treeStoreUtil";
+
+function updateLayerResolutionRange({
+  item,
+  layer,
+  mapStore,
+}: {
+  item: TreeLayerStore;
+  layer?: CoreLayer | null;
+  mapStore: MapStore;
+}) {
+  const minResolution =
+    item.maxScaleDenom !== null
+      ? (mapStore.resolutionForScale(item.maxScaleDenom) ?? null)
+      : null;
+  const maxResolution =
+    item.minScaleDenom !== null
+      ? (mapStore.resolutionForScale(item.minScaleDenom) ?? null)
+      : null;
+
+  item.update({ minResolution, maxResolution });
+
+  if (layer) {
+    layer.olLayer.setMinResolution(minResolution ?? 0);
+    layer.olLayer.setMaxResolution(maxResolution ?? Infinity);
+  }
+}
 
 const WebmapLayer = observer(({ layerItem }: { layerItem: TreeLayerStore }) => {
   const layerItemRef = useRef(layerItem);
@@ -16,12 +43,15 @@ const WebmapLayer = observer(({ layerItem }: { layerItem: TreeLayerStore }) => {
   const layerRef = useRef(layer);
 
   const {
-    visibility,
-    opacity,
-    symbols,
     filter,
-    drawOrderPosition,
+    opacity,
+    adapter,
+    symbols,
+    visibility,
     legendInfo,
+    minScaleDenom,
+    maxScaleDenom,
+    drawOrderPosition,
   } = layerItem;
   const { mapStore } = useMapContext();
   const { hmux } = mapStore;
@@ -38,18 +68,11 @@ const WebmapLayer = observer(({ layerItem }: { layerItem: TreeLayerStore }) => {
     let existLayer: CoreLayer | undefined = mapStore.getLayer(item.id);
     const setup = async () => {
       if (!existLayer) {
-        const Adapter = (await entrypointsLoader([item.adapter]))[
-          item.adapter
+        const Adapter = (await entrypointsLoader([adapter]))[
+          adapter
         ] as LayerDisplayAdapterCtor;
         if (cancelled) return;
-        let minResolution, maxResolution;
-        if (item.maxScaleDenom !== null) {
-          minResolution = mapStore.resolutionForScale(item.maxScaleDenom);
-        }
-        if (item.minScaleDenom !== null) {
-          maxResolution = mapStore.resolutionForScale(item.minScaleDenom);
-        }
-        item.update({ minResolution, maxResolution });
+        updateLayerResolutionRange({ item, mapStore });
 
         existLayer = new Adapter().createLayer(item, {
           hmux: hmux ?? undefined,
@@ -70,11 +93,19 @@ const WebmapLayer = observer(({ layerItem }: { layerItem: TreeLayerStore }) => {
         mapStore.removeLayer(existLayer);
       }
     };
-  }, [mapStore, hmux]);
+  }, [mapStore, adapter, hmux]);
 
   useEffect(() => {
     layerRef.current = layer;
   }, [layer]);
+
+  useEffect(() => {
+    updateLayerResolutionRange({
+      item: layerItemRef.current,
+      layer,
+      mapStore,
+    });
+  }, [layer, mapStore, minScaleDenom, maxScaleDenom]);
 
   useEffect(() => {
     if (layer) {
@@ -123,7 +154,7 @@ const WebmapLayer = observer(({ layerItem }: { layerItem: TreeLayerStore }) => {
       r < ol.getMinResolution() || r >= ol.getMaxResolution();
 
     layerItemRef.current.update({ isOutOfScaleRange });
-  }, [layer, resolutionDebounced]);
+  }, [layer, resolutionDebounced, minScaleDenom, maxScaleDenom]);
 
   return null;
 });

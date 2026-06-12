@@ -171,7 +171,10 @@ export const LayersTree = observer(
       return preparedWebMapItems;
     }, [onFilterItems, preparedWebMapItems]);
 
-    const hasGroups = useMemo(() => store.some({ type: "group" }), [store]);
+    const hasGroups = useMemo(() => {
+      void treeStructureStamp;
+      return store.some({ type: "group" });
+    }, [store, treeStructureStamp]);
 
     useEffect(() => {
       if (onReady) {

@@ -45,7 +45,7 @@ msgstr "Клонировать"
 msgid "Resource group"
 msgstr "Группа ресурсов"
 
-#: nodepkg/clone-webmap/CloneWebmap.tsx:78 nodepkg/items-widget/ItemsWidget.tsx:30
+#: nodepkg/clone-webmap/CloneWebmap.tsx:78 nodepkg/items-widget/ItemsWidget.tsx:31
 msgid "Display name"
 msgstr "Наименование"
 
@@ -148,71 +148,71 @@ msgstr "Назад к слоям и группам"
 msgid "Use default draw order"
 msgstr "Порядок рисования по умолчанию"
 
-#: nodepkg/items-widget/Item.ts:107
+#: nodepkg/items-widget/Item.ts:112
 msgid "Group members have errors"
 msgstr "Ошибка в участниках группы"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:31
+#: nodepkg/items-widget/ItemsWidget.tsx:32
 msgid "Expanded"
 msgstr "Развернута"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:32
+#: nodepkg/items-widget/ItemsWidget.tsx:33
 msgid "Exclusive"
 msgstr "Взаимоисключающая"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:33
+#: nodepkg/items-widget/ItemsWidget.tsx:34
 msgid "Enabled"
 msgstr "Включен"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:34
+#: nodepkg/items-widget/ItemsWidget.tsx:35
 #: nodepkg/plugin/layer-identifiable/LayerIdentifiablePlugin.tsx:26
 msgid "Identifiable"
 msgstr "Идентифицируемый"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:35
+#: nodepkg/items-widget/ItemsWidget.tsx:36
 msgid "Resource"
 msgstr "Ресурс"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:36
+#: nodepkg/items-widget/ItemsWidget.tsx:37
 msgid "Transparency"
 msgstr "Прозрачность"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:37
+#: nodepkg/items-widget/ItemsWidget.tsx:38
 msgid "Min scale"
 msgstr "Мин. масштаб"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:38
+#: nodepkg/items-widget/ItemsWidget.tsx:39
 msgid "Max scale"
 msgstr "Макс. масштаб"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:39
+#: nodepkg/items-widget/ItemsWidget.tsx:40
 #: nodepkg/panel/print/component/PrintElementsSettings.tsx:25
 #: nodepkg/settings-widget/SettingsWidget.tsx:27
 #: nodepkg/settings/SettingsForm.tsx:232
 msgid "Legend"
 msgstr "Легенда"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:40
+#: nodepkg/items-widget/ItemsWidget.tsx:41
 msgid "Adapter"
 msgstr "Адаптер"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:41
+#: nodepkg/items-widget/ItemsWidget.tsx:42
 msgid "Layer"
 msgstr "Слой"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:42
+#: nodepkg/items-widget/ItemsWidget.tsx:43
 msgid "Group"
 msgstr "Группа"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:43
+#: nodepkg/items-widget/ItemsWidget.tsx:44
 msgid "Edit draw order"
 msgstr "Изменить порядок рисования"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:44
+#: nodepkg/items-widget/ItemsWidget.tsx:45
 msgid "Customize draw order"
 msgstr "Настроить порядок рисования"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:231 nodepkg/panel/layers/plugin.tsx:11
+#: nodepkg/items-widget/ItemsWidget.tsx:267 nodepkg/panel/layers/plugin.tsx:11
 msgid "Layers"
 msgstr "Слои"
 
@@ -412,7 +412,7 @@ msgid "With messages"
 msgstr "С сообщениями"
 
 #: nodepkg/panel/annotations/AnnotationsPanel.tsx:111
-#: nodepkg/plugin/layer-editor/LayerEditor.tsx:55
+#: nodepkg/plugin/layer-editor/LayerEditor.tsx:54
 msgid "Edit"
 msgstr "Редактировать"
 
@@ -464,9 +464,21 @@ msgstr "Связаться с администратором Веб ГИС"
 msgid "Description"
 msgstr "Описание"
 
-#: nodepkg/panel/editWebmap/plugin.tsx:24
+#: nodepkg/panel/editWebmap/SaveWebmapButton.tsx:26
+msgid "No layer changes to save"
+msgstr "Нет изменений слоев для сохранения"
+
+#: nodepkg/panel/editWebmap/SaveWebmapButton.tsx:45
+msgid "Layers configuration saved"
+msgstr "Конфигурация слоев сохранена"
+
+#: nodepkg/panel/editWebmap/plugin.tsx:33
 msgid "Edit web map"
 msgstr "Редактировать веб-карту"
+
+#: nodepkg/panel/editWebmap/plugin.tsx:46
+msgid "Save layers configuration"
+msgstr "Сохранить конфигурацию слоев"
 
 #: nodepkg/panel/identify/CoordinatesSwitcher.tsx:176
 msgid "Zoom to identification point"
@@ -528,17 +540,40 @@ msgstr "Н/Д"
 msgid "Identify"
 msgstr "Идентификация"
 
-#: nodepkg/panel/layers/LayersDropdown.tsx:59
+#: nodepkg/panel/layers/LayersDropdown.tsx:87
 msgid "Zoom to all layers"
 msgstr "Увеличить до всех слоев"
 
-#: nodepkg/panel/layers/LayersDropdown.tsx:65
+#: nodepkg/panel/layers/LayersDropdown.tsx:93
 msgid "Hide all layers"
 msgstr "Скрыть все слои"
 
-#: nodepkg/panel/layers/LayersDropdown.tsx:72
+#: nodepkg/panel/layers/LayersDropdown.tsx:101
 msgid "Reset layers"
 msgstr "Восстановить исходное состояние"
+
+#: nodepkg/panel/layers/LayersDropdown.tsx:112
+msgid "Add layers"
+msgstr "Добавить слои"
+
+#: nodepkg/panel/layers/useAddItem.tsx:16
+msgid "New group"
+msgstr "Новая группа"
+
+#: nodepkg/panel/layers/useAddItem.tsx:114
+msgid "Add group"
+msgstr "Добавить группу"
+
+#: nodepkg/panel/layers/useAddItem.tsx:115
+msgid "Add"
+msgstr "Добавить"
+
+#: nodepkg/panel/layers/useAddItem.tsx:116
+#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:177
+#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:184
+#: nodepkg/ui/finish-editing-dialog/FinishEditingDialog.tsx:59
+msgid "Cancel"
+msgstr "Отменить"
 
 #: nodepkg/panel/print/PrintMapExport/PrintMapExport.tsx:145
 msgid "Print"
@@ -756,7 +791,7 @@ msgstr "Таблица объектов"
 msgid "Undo the last change"
 msgstr "Отменить последнее изменение"
 
-#: nodepkg/plugin/layer-editor/LayerEditor.tsx:55
+#: nodepkg/plugin/layer-editor/LayerEditor.tsx:54
 #: nodepkg/ui/finish-editing-dialog/FinishEditingDialog.tsx:32
 msgid "Stop editing"
 msgstr "Завершить редактирование"
@@ -807,6 +842,19 @@ msgstr "Изменить"
 msgid "Move"
 msgstr "Переместить"
 
+#: nodepkg/plugin/layer-properties/LayerPropertiesModal.tsx:20
+#: nodepkg/plugin/layer-properties/LayerPropertiesPlugin.tsx:24
+msgid "Layer properties"
+msgstr "Свойства слоя"
+
+#: nodepkg/plugin/layer-properties/LayerPropertiesModal.tsx:21
+msgid "Use current map scale"
+msgstr "Использовать текущий масштаб карты"
+
+#: nodepkg/plugin/layer-remove/LayerRemovePlugin.tsx:15
+msgid "Remove layer"
+msgstr "Удалить слой"
+
 #: nodepkg/plugin/layer-resource-editor/LayerResourceEditor.tsx:23
 msgid "Edit layer resource"
 msgstr "Редактировать ресурс слоя"
@@ -815,7 +863,7 @@ msgstr "Редактировать ресурс слоя"
 msgid "Edit resource"
 msgstr "Редактировать ресурс"
 
-#: nodepkg/plugin/style-resource-editor/StyleResourceEditor.tsx:21
+#: nodepkg/plugin/style-resource-editor/StyleResourceEditor.tsx:30
 msgid "Edit style resource"
 msgstr "Редактировать ресурс стиля"
 
@@ -1084,12 +1132,6 @@ msgstr "Создать как приватную"
 #: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:155
 msgid "Create annotation"
 msgstr "Создать аннотацию"
-
-#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:177
-#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:184
-#: nodepkg/ui/finish-editing-dialog/FinishEditingDialog.tsx:59
-msgid "Cancel"
-msgstr "Отменить"
 
 #: nodepkg/ui/annotation-dialog/AnnotationsSettings.tsx:56
 msgid "Stroke: width / color"

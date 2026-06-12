@@ -37,3 +37,7 @@ export type ParamOf<T extends FC, K extends keyof ParamsOf<T>> = ParamsOf<T>[K];
 export type NullableProps<T, P extends keyof T = keyof T> = {
   [K in keyof T]: T[K] | (K extends P ? null : never);
 };
+
+export type DeepPartial<T> = T extends object
+  ? { [K in keyof T]?: DeepPartial<T[K]> }
+  : T;

@@ -1,6 +1,7 @@
 import { sortBy } from "lodash-es";
 import { observer } from "mobx-react-lite";
 import { useMemo, useState } from "react";
+import type { ReactNode } from "react";
 
 import { CheckboxValue, InputValue, Select, Space } from "@nextgisweb/gui/antd";
 import { LotMV } from "@nextgisweb/gui/arm";
@@ -43,6 +44,12 @@ const msgGroup = gettext("Group");
 const msgDrawOrderEdit = gettext("Edit draw order");
 const msgDrawOrderCustomize = gettext("Customize draw order");
 
+export interface LayerWidgetProps {
+  item: Layer;
+  minScaleDenomAddon?: ReactNode;
+  maxScaleDenomAddon?: ReactNode;
+}
+
 const GroupWidget = observer(({ item }: { item: Group }) => {
   return (
     <Area pad>
@@ -73,77 +80,106 @@ const adapterOptions = sortBy(
   "value"
 );
 
-const LayerWidget = observer(({ item }: { item: Layer }) => {
-  return (
-    <Area pad cols={2}>
-      <LotMV
-        row
-        label={msgDisplayName}
-        value={item.displayName}
-        component={InputValue}
-      />
-      <Lot row>
-        <Space size="middle">
-          <CheckboxValue {...item.layerEnabled.cprops()}>
-            {msgEnabled}
-          </CheckboxValue>
-          <CheckboxValue {...item.layerIdentifiable.cprops()}>
-            {msgIdentifiable}
-          </CheckboxValue>
-        </Space>
-      </Lot>
-      <LotMV
-        row
-        label={msgResource}
-        value={item.layerStyleId}
-        component={ResourceSelect}
-        props={{
-          readOnly: true,
-          style: { width: "100%" },
-          pickerOptions: {
-            initParentId: item.store.composite.parent,
-          },
-        }}
-      />
-      <LotMV
-        label={msgMinScaleDenom}
-        value={item.layerMinScaleDenom}
-        component={InputScaleDenom}
-        props={{ style: { width: "100%" } }}
-      />
-      <LotMV
-        label={msgMaxScaleDenom}
-        value={item.layerMaxScaleDenom}
-        component={InputScaleDenom}
-        props={{ style: { width: "100%" } }}
-      />
-      <LotMV
-        row
-        label={msgLegendSymbols}
-        value={item.layerLegendSymbols}
-        component={SelectLegendSymbols}
-        props={{ allowClear: true, style: { width: "100%" } }}
-      />
-      <LotMV
-        row
-        label={msgAdapter}
-        value={item.layerAdapter}
-        component={Select<string>}
-        props={{
-          style: { width: "100%" },
-          options: adapterOptions,
-        }}
-      />
-      <LotMV
-        row
-        label={msgTransparency}
-        value={item.layerTransparency}
-        component={InputOpacity}
-        props={{ alphaMode: "transparency", valuePercent: true }}
-      />
-    </Area>
+type ScaleDenomInputProps = Parameters<typeof InputScaleDenom>[0] & {
+  addon?: ReactNode;
+};
+
+function ScaleDenomInput({ addon, style, ...props }: ScaleDenomInputProps) {
+  const input = (
+    <InputScaleDenom {...props} style={{ width: "100%", ...style }} />
   );
-});
+
+  if (addon === undefined || addon === null) {
+    return input;
+  }
+
+  return (
+    <Space.Compact style={{ display: "flex", width: "100%" }}>
+      {input}
+      <Space.Addon>{addon}</Space.Addon>
+    </Space.Compact>
+  );
+}
+
+export const LayerWidget = observer(
+  ({ item, minScaleDenomAddon, maxScaleDenomAddon }: LayerWidgetProps) => {
+    return (
+      <Area pad cols={2}>
+        <LotMV
+          row
+          label={msgDisplayName}
+          value={item.displayName}
+          component={InputValue}
+        />
+        <Lot row>
+          <Space size="middle">
+            <CheckboxValue {...item.layerEnabled.cprops()}>
+              {msgEnabled}
+            </CheckboxValue>
+            <CheckboxValue {...item.layerIdentifiable.cprops()}>
+              {msgIdentifiable}
+            </CheckboxValue>
+          </Space>
+        </Lot>
+        <LotMV
+          row
+          label={msgResource}
+          value={item.layerStyleId}
+          component={ResourceSelect}
+          props={{
+            readOnly: true,
+            style: { width: "100%" },
+            pickerOptions: {
+              initParentId: item.store.composite.parent,
+            },
+          }}
+        />
+        <LotMV
+          label={msgMinScaleDenom}
+          value={item.layerMinScaleDenom}
+          component={ScaleDenomInput}
+          props={{
+            addon: minScaleDenomAddon,
+            style: { width: "100%" },
+          }}
+        />
+        <LotMV
+          label={msgMaxScaleDenom}
+          value={item.layerMaxScaleDenom}
+          component={ScaleDenomInput}
+          props={{
+            addon: maxScaleDenomAddon,
+            style: { width: "100%" },
+          }}
+        />
+        <LotMV
+          row
+          label={msgLegendSymbols}
+          value={item.layerLegendSymbols}
+          component={SelectLegendSymbols}
+          props={{ allowClear: true, style: { width: "100%" } }}
+        />
+        <LotMV
+          row
+          label={msgAdapter}
+          value={item.layerAdapter}
+          component={Select<string>}
+          props={{
+            style: { width: "100%" },
+            options: adapterOptions,
+          }}
+        />
+        <LotMV
+          row
+          label={msgTransparency}
+          value={item.layerTransparency}
+          component={InputOpacity}
+          props={{ alphaMode: "transparency", valuePercent: true }}
+        />
+      </Area>
+    );
+  }
+);
 
 GroupWidget.displayName = "GroupWidget";
 LayerWidget.displayName = "LayerWidget";

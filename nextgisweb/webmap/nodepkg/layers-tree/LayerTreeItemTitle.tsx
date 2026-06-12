@@ -40,6 +40,8 @@ export const LayerTreeItemTitle = observer(
     const [moreClickId, setMoreClickId] = useState<number>();
     const [update, setUpdate] = useState(false);
 
+    const { title, type } = treeItem;
+
     const isLayer = treeItem.isLayer();
     const hasFilter = isLayer && treeItem.filter;
 
@@ -54,7 +56,8 @@ export const LayerTreeItemTitle = observer(
         const treeLayer = treeItem;
 
         isOutOfScaleRange = treeItem.isOutOfScaleRange;
-        legendAction = treeLayer.legendInfo.symbols &&
+        legendAction = treeLayer.legendInfo.has_legend &&
+          treeLayer.legendInfo.symbols &&
           treeLayer.legendInfo.symbols.length > 1 &&
           showLegend && (
             <LegendAction
@@ -105,11 +108,11 @@ export const LayerTreeItemTitle = observer(
             flex="auto"
             title={isOutOfScaleRange ? msgOutOfScaleRange : undefined}
           >
-            {treeItem.title}
+            {title}
           </Col>
           {actions}
         </Row>
-        {showLegend && treeItem.type === "layer" && (
+        {showLegend && type === "layer" && (
           <Legend checkable={checkable} nodeData={treeItem} />
         )}
       </>

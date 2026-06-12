@@ -62,31 +62,39 @@ TabsLabel.displayName = "TabsLabel";
 
 export interface CompositeWidgetProps {
   setup: CompositeSetup;
+  store?: CompositeStore;
   actions?: ActionToolbarAction[];
   rightActions?: ActionToolbarAction[];
   unsavedChanges?: boolean;
+  onDirty?: (dirty: boolean) => void;
   onSave?: () => void | Promise<void>;
 }
 
 const CompositeWidget = observer(
   ({
     setup,
+    store,
     actions: actionsProp,
     rightActions,
     unsavedChanges,
+    onDirty,
     onSave,
   }: CompositeWidgetProps) => {
     const [activeKey, setActiveKey] = useState<string>();
-    const [composite] = useState(() => new CompositeStore({ setup }));
+    const [composite] = useState(() => store || new CompositeStore({ setup }));
     const [redirecting, setRedirecting] = useState(false);
     const initRef = useRef(false);
 
-    const { operation } = setup;
+    const { operation } = composite;
     const { members, dirty } = composite;
     const { disable: disableUnsavedChanges } = useUnsavedChanges({
       dirty,
       initiallyEnabled: unsavedChanges,
     });
+
+    useEffect(() => {
+      onDirty?.(dirty);
+    }, [dirty, onDirty]);
 
     const items = useMemo<TabItem[]>(() => {
       if (!members) return [];

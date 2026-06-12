@@ -1,11 +1,11 @@
 /** @registry */
-import type { ComponentType, FC, ReactNode } from "react";
+import type { MessageInstance } from "antd/es/message/interface";
+import type { ComponentType, FC, LazyExoticComponent, ReactNode } from "react";
 
 import type { TabsProps } from "@nextgisweb/gui/antd";
 import type { useShowModal } from "@nextgisweb/gui/index";
 import { pluginRegistry } from "@nextgisweb/jsrealm/plugin";
 import type { ImportCallback } from "@nextgisweb/jsrealm/plugin";
-import type { DisplayConfig } from "@nextgisweb/webmap/type/api";
 
 import type { Display } from "../display";
 import type {
@@ -35,11 +35,7 @@ interface PanelPluginBase {
   applyToTinyMap?: boolean;
   placement?: "start" | "end";
 
-  isEnabled?: ({
-    config,
-  }: {
-    config: DisplayConfig;
-  }) => boolean | Promise<boolean>;
+  isEnabled?: (display: Display) => boolean | Promise<boolean>;
   startup?: (display: Display) => Promise<void>;
   renderMap?: ComponentType<{ display: Display }>;
 }
@@ -64,13 +60,30 @@ export interface ActionPanelPlugin extends PanelPluginBase {
   action: (val: {
     display: Display;
     showModal: ReturnType<typeof useShowModal>["showModal"];
+    messageApi: MessageInstance;
   }) => void | Promise<void>;
+}
+
+export interface PanelPluginActionButtonProps {
+  display: Display;
+  plugin: ActionButtonPanelPlugin;
+  className?: string;
+}
+
+export type PanelPluginActionButtonComponent =
+  | ComponentType<PanelPluginActionButtonProps>
+  | LazyExoticComponent<ComponentType<PanelPluginActionButtonProps>>;
+
+export interface ActionButtonPanelPlugin extends PanelPluginBase {
+  type: "action-button";
+  component: PanelPluginActionButtonComponent;
 }
 
 export type PanelPlugin<S extends PanelStore = PanelStore> =
   | WidgetPanelPlugin<S>
   | LinkPanelPlugin
-  | ActionPanelPlugin;
+  | ActionPanelPlugin
+  | ActionButtonPanelPlugin;
 
 export const registry = pluginRegistry<PanelPlugin>(MODULE_NAME);
 

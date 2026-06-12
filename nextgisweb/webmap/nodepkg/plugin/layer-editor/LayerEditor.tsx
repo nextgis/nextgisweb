@@ -5,7 +5,6 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { EDITING_ID } from "@nextgisweb/webmap/constant";
 import type { TreeLayerStore } from "@nextgisweb/webmap/store/tree-store/TreeItemStore";
 import type { PluginMenuItem, PluginState } from "@nextgisweb/webmap/type";
-import type { LayerItemConfig } from "@nextgisweb/webmap/type/api";
 
 import { PluginBase } from "../PluginBase";
 import type { LayerEditorWebMapPluginConfig } from "../type";
@@ -33,7 +32,7 @@ export class LayerEditor extends PluginBase {
     };
   }
 
-  async run(nodeData: LayerItemConfig): Promise<undefined> {
+  async run(nodeData: TreeLayerStore): Promise<undefined> {
     const store = this.display.treeStore;
     if (nodeData.editable) {
       setItemsEditable(store, [nodeData.id], false);
@@ -50,7 +49,7 @@ export class LayerEditor extends PluginBase {
     }
   }
 
-  getMenuItem(nodeData: LayerItemConfig): PluginMenuItem {
+  getMenuItem(nodeData: TreeLayerStore): PluginMenuItem {
     const active = nodeData.editable === true;
     const title = active ? gettext("Stop editing") : gettext("Edit");
 

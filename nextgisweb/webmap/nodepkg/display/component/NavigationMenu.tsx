@@ -1,22 +1,44 @@
 import classNames from "classnames";
 import { observer } from "mobx-react-lite";
-import { useCallback } from "react";
+import { Suspense, useCallback } from "react";
 
+import { message } from "@nextgisweb/gui/antd";
 import { useShowModal } from "@nextgisweb/gui/index";
 
 import type { PanelManager } from "../../panel/PanelManager";
-import type { PanelPlugin } from "../../panel/registry";
+import type {
+  ActionButtonPanelPlugin,
+  PanelPlugin,
+} from "../../panel/registry";
 
 import "./NavigationMenu.less";
+import { DefaultMenuItem } from "./DefaultMenuItem";
 
 export interface NavigationMenuProps {
   store: PanelManager;
   orientation?: "vertical" | "horizontal";
 }
 
+const ActionButtonItem = observer<{
+  item: ActionButtonPanelPlugin;
+  display: PanelManager["display"];
+}>(({ item, display }) => {
+  const Component = item.component;
+
+  return (
+    <Suspense fallback={<DefaultMenuItem item={item} />}>
+      <Component display={display} plugin={item} className="item" />
+    </Suspense>
+  );
+});
+
+ActionButtonItem.displayName = "ActionButtonItem";
+
 export const NavigationMenu = observer<NavigationMenuProps>(
   ({ store, orientation = "vertical" }) => {
     const { showModal, modalHolder } = useShowModal();
+    const [messageApi, messageHolder] = message.useMessage();
+
     const onClickItem = useCallback(
       async (item: PanelPlugin) => {
         switch (item.type) {
@@ -40,11 +62,15 @@ export const NavigationMenu = observer<NavigationMenuProps>(
             await item.action({
               display: store.display,
               showModal,
+              messageApi,
             });
+            break;
+
+          case "action-button":
             break;
         }
       },
-      [store]
+      [messageApi, showModal, store]
     );
 
     const active = store.activePanel;
@@ -53,22 +79,33 @@ export const NavigationMenu = observer<NavigationMenuProps>(
     const startItems = items.filter((item) => item.placement !== "end");
     const endItems = items.filter((item) => item.placement === "end");
 
-    const renderItem = (item: PanelPlugin) => (
-      <div
-        key={item.name}
-        title={item.title}
-        onClick={() => void onClickItem(item)}
-        className={classNames("item", {
-          active: item.type === "widget" && item.name === active?.name,
-        })}
-      >
-        {item.icon}
-      </div>
-    );
+    const renderItem = (item: PanelPlugin) => {
+      if (item.type === "action-button") {
+        return (
+          <ActionButtonItem
+            key={item.name}
+            item={item}
+            display={store.display}
+          />
+        );
+      }
+
+      return (
+        <DefaultMenuItem
+          key={item.name}
+          item={item}
+          active={item.type === "widget" && item.name === active?.name}
+          onClick={() => {
+            onClickItem(item);
+          }}
+        />
+      );
+    };
 
     return (
       <>
         {modalHolder}
+        {messageHolder}
         <div
           className={classNames(
             "ngw-webmap-display-navigation-menu",
