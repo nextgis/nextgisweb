@@ -22,6 +22,7 @@ export type FilterValueWidgetComponent = FC<FilterValueWidgetProps>;
 
 export interface FeatureFilterEditorProps {
   fields: FeatureLayerFieldRead[];
+  resourceId?: number;
   value?: FilterExpressionString | undefined;
   valueWidget?: FilterValueWidgetComponent;
   onChange?: (value: FilterExpressionString | undefined) => void;

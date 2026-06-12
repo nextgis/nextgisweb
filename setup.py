@@ -27,6 +27,7 @@ requires = [
     gdal_spec,
     numpy_spec,
     "affine==2.4.0",
+    "anthropic==0.109.2",
     "babel==2.18.0",
     "cachetools==7.0.6",
     "defusedxml==0.7.1",

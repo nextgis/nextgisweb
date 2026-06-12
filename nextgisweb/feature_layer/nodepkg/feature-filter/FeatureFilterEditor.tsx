@@ -6,9 +6,11 @@ import type {
   ActionToolbarAction,
   ActionToolbarProps,
 } from "@nextgisweb/gui/action-toolbar";
-import { Button, Tabs, message } from "@nextgisweb/gui/antd";
+import { Button, Input, Space, Tabs, message } from "@nextgisweb/gui/antd";
 import type { TabsProps } from "@nextgisweb/gui/antd";
 import { SaveButton } from "@nextgisweb/gui/component";
+import llmSettings from "@nextgisweb/llm-core/client-settings";
+import { route } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { FilterEditorStore } from "./FilterEditorStore";
@@ -27,10 +29,15 @@ const msgJson = gettext("JSON");
 const msgApply = gettext("Apply");
 const msgCancel = gettext("Cancel");
 const msgClear = gettext("Clear");
+const msgGenerateWithAI = gettext("Generate with AI");
+const msgAIPromptPlaceholder = gettext(
+  "Describe the filter in plain language…"
+);
 
 export const FeatureFilterEditor = observer(
   ({
     fields,
+    resourceId,
     value,
     valueWidget,
     onChange,
@@ -44,6 +51,8 @@ export const FeatureFilterEditor = observer(
       [fields, valueWidget]
     );
     const [messageApi, contextHolder] = message.useMessage();
+    const [aiPrompt, setAiPrompt] = useState("");
+    const [aiLoading, setAiLoading] = useState(false);
 
     useEffect(() => {
       if (value) {
@@ -83,6 +92,25 @@ export const FeatureFilterEditor = observer(
     const handleClear = useCallback(() => {
       store.clear();
     }, [store]);
+
+    const handleAiGenerate = useCallback(async () => {
+      if (!resourceId) return;
+      setAiLoading(true);
+      try {
+        const result = await route(
+          "feature_layer.filter.generate",
+          resourceId
+        ).post({
+          json: { prompt: aiPrompt },
+        });
+        store.loadFilter(JSON.stringify(result) as FilterExpressionString);
+        store.setActiveTab("constructor");
+      } catch {
+        messageApi.error(gettext("Failed to generate filter"));
+      } finally {
+        setAiLoading(false);
+      }
+    }, [resourceId, aiPrompt, store, messageApi]);
 
     const items: TabsProps["items"] = [
       {
@@ -134,6 +162,24 @@ export const FeatureFilterEditor = observer(
 
         {hasErrors && (
           <div className="error-message">{store.validationError}</div>
+        )}
+
+        {resourceId !== undefined && llmSettings.available && (
+          <Space.Compact style={{ width: "100%" }}>
+            <Input
+              value={aiPrompt}
+              onChange={(e) => setAiPrompt(e.target.value)}
+              placeholder={msgAIPromptPlaceholder}
+              onPressEnter={handleAiGenerate}
+            />
+            <Button
+              loading={aiLoading}
+              disabled={!aiPrompt.trim()}
+              onClick={handleAiGenerate}
+            >
+              {msgGenerateWithAI}
+            </Button>
+          </Space.Compact>
         )}
 
         <ActionToolbar {...toolbarProps} />

@@ -50,6 +50,7 @@ export function ResourceFeatureFilterEditor(
     <FeatureFilterEditor
       {...editorProps}
       fields={fields}
+      resourceId={resourceId}
       valueWidget={ValueWidget}
     />
   );

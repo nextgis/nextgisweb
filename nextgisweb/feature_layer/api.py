@@ -743,6 +743,87 @@ def aggregate(resource, request, *, body: AggregateBody) -> AggregateResponse:
     return AggregateResponse(items=[results[i] for i in range(len(body.items))])
 
 
+_FILTER_SCHEMA = """
+The filter format is a nested JSON array with prefix notation.
+
+Group operators (each argument can be a condition OR another group, enabling arbitrary nesting):
+- ["all", expr1, expr2, ...] — AND: all must be true
+- ["any", expr1, expr2, ...] — OR: any must be true
+
+Example of nesting: ["all", ["any", cond1, cond2], cond3] means (cond1 OR cond2) AND cond3.
+
+Condition expressions:
+- ["==", ["get", "field"], value] — equal
+- ["!=", ["get", "field"], value] — not equal
+- [">", ["get", "field"], value] — greater than
+- ["<", ["get", "field"], value] — less than
+- [">=", ["get", "field"], value] — greater or equal
+- ["<=", ["get", "field"], value] — less or equal
+- ["in", ["get", "field"], val1, val2, ...] — value is in list
+- ["!in", ["get", "field"], val1, val2, ...] — value is not in list
+- ["is_null", ["get", "field"]] — field is NULL
+- ["!is_null", ["get", "field"]] — field is not NULL
+- ["ilike", ["get", "field"], "%pattern%"] — case-insensitive text match (% = any chars)
+- ["!ilike", ["get", "field"], "%pattern%"] — does not match
+
+Use only field names from the provided schema. When there are multiple top-level conditions, wrap them in ["all", ...] or ["any", ...] depending on the intent.
+"""
+
+_FILTER_TOOL = {
+    "name": "set_filter",
+    "description": "Set the filter expression for the feature layer",
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "expression": {
+                "type": "array",
+                "description": "Filter expression as a nested JSON array per the schema",
+            }
+        },
+        "required": ["expression"],
+    },
+}
+
+
+class FilterGenerateBody(Struct, kw_only=True):
+    prompt: str
+
+
+def filter_generate(resource, request, *, body: FilterGenerateBody) -> JSONType:
+    """Generate a filter expression from a natural language prompt using LLM"""
+    request.resource_permission(DataScope.read)
+
+    llm = request.env.llm_core
+    if not llm.available:
+        from pyramid.httpexceptions import HTTPNotFound
+
+        raise HTTPNotFound()
+
+    fields_desc = "\n".join(
+        f"- {f.keyname} ({f.datatype})"
+        + (f" — {f.display_name}" if f.display_name and f.display_name != f.keyname else "")
+        for f in resource.fields
+    )
+
+    client = llm.anthropic_client
+    response = client.messages.create(
+        model=llm.options["model"],
+        max_tokens=1024,
+        system=f"You generate filter expressions for a GIS feature layer.\n{_FILTER_SCHEMA}",
+        tools=[_FILTER_TOOL],
+        tool_choice={"type": "tool", "name": "set_filter"},
+        messages=[
+            {
+                "role": "user",
+                "content": f"Layer fields:\n{fields_desc}\n\nGenerate a filter for: {body.prompt}",
+            }
+        ],
+    )
+
+    tool_block = next(b for b in response.content if b.type == "tool_use")
+    return tool_block.input["expression"]
+
+
 def setup_pyramid(comp, config):
     feature_layer_factory = ResourceFactory(context=IFeatureLayer)
 
@@ -800,6 +881,13 @@ def setup_pyramid(comp, config):
         factory=feature_layer_factory,
         types=dict(fid=FeatureID),
         get=iextent,
+    )
+
+    config.add_route(
+        "feature_layer.filter.generate",
+        "/api/resource/{id}/filter/generate",
+        factory=feature_layer_factory,
+        post=filter_generate,
     )
 
     from . import api_export, api_identify, api_mvt

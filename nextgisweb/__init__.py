@@ -64,6 +64,7 @@ def pkginfo():
         "tileset",
         "basemap",
         "sld",
+        "llm_core",
     )
     optional = {"raster_mosaic"}
     assert all((i in components) for i in optional)
