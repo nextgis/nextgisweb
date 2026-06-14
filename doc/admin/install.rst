@@ -23,7 +23,7 @@ System requirements
 
 - GDAL >= 3.8.
 
-- Node.js 20.x or higher and pnpm package manager via Corepack. We recommend
+- Node.js 22.x or higher and pnpm package manager via Corepack. We recommend
   using NodeSource package repository.
 
 - PostgreSQL database with PostGIS extension enabled:
@@ -71,7 +71,7 @@ First you need to install required packages:
 
   # apt install curl git
   # curl --silent https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | apt-key add - 
-  # add-apt-repository --yes --no-update "deb https://deb.nodesource.com/node_20.x nodistro main"
+  # add-apt-repository --yes --no-update "deb https://deb.nodesource.com/node_22.x nodistro main"
   # apt update
   # apt install python3 python3-dev python3-virtualenv
   # apt install build-essential libssl-dev libgdal-dev libgeos-dev \
