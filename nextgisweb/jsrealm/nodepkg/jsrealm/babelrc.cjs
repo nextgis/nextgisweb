@@ -1,3 +1,5 @@
+const config = require("./config.cjs");
+
 module.exports = {
   "sourceType": "unambiguous",
   "presets": [
@@ -11,10 +13,10 @@ module.exports = {
     [
       "@babel/preset-env",
       {
+        "targets": config.jsrealm.targets,
+        "bugfixes": true,
         "corejs": { "version": 3 },
         "useBuiltIns": "usage",
-        // The "targets" key doesn't work with "@babel/eslint-parser".
-        // So it's defined in webpack config.
       },
     ],
   ],

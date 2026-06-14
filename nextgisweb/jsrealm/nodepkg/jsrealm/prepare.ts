@@ -1,45 +1,66 @@
-const fs = require("fs");
-const glob = require("glob");
-const path = require("path");
+import { globSync } from "glob";
+import * as fs from "node:fs";
+import { createRequire } from "node:module";
+import * as path from "node:path";
+import { fileURLToPath } from "node:url";
 
-const ESLintPlugin = require("eslint-webpack-plugin");
-const ForkTsCheckerPlugin = require("fork-ts-checker-webpack-plugin");
-const { sortBy } = require("lodash");
-const { DefinePlugin } = require("webpack");
+import type { Rspack } from "@rsbuild/core";
+import { sortBy } from "lodash-es";
 
-const babelOptions = require("./babelrc.cjs");
-const config = require("./config.cjs");
-const iconUtil = require("./icon/util.cjs");
-const tagParser = require("./tag-parser.cjs");
-const defaults = require("./webpack/defaults.cjs");
-const fontWeightFix = require("./webpack/font-weight-fix.cjs");
-const { stripIndex } = require("./webpack/util.cjs");
+import config from "./config";
+import { COLLECTIONS } from "./icon/util.cjs";
+import tagParser from "./tag-parser";
+import { stripIndex } from "./util";
 
-const presetEnvOptIndex = babelOptions.presets.findIndex(
-  (item) => typeof item[0] === "string" && item[0] === "@babel/preset-env"
-);
+const require = createRequire(import.meta.url);
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-if (presetEnvOptIndex !== -1) {
-  const presetEnvOpt = babelOptions.presets[presetEnvOptIndex];
-  if (presetEnvOpt && typeof presetEnvOpt[1] === "object") {
-    presetEnvOpt[1].targets = config.jsrealm.targets;
-    babelOptions.presets[presetEnvOptIndex] = presetEnvOpt;
-  }
-}
+type EntryType = "entrypoint" | "plugin" | "registry" | "testentry";
 
-function scanForEntries() {
-  const result = [];
+type ParsedEntry = {
+  type: EntryType | string;
+  entrypoint?: string;
+  plugin?: string;
+  registry?: string;
+  testentry?: string;
+};
+
+type Entry = ParsedEntry & {
+  entry: string;
+  fullname: string;
+};
+
+type Registry = {
+  component: string | null;
+  entry: string;
+  fullname: string;
+  loaderFile: string;
+  loaderModule: string;
+  pluginFiles: string[];
+  pluginModules: string[];
+};
+
+type LocaleInfo = {
+  key: string;
+  original: string;
+  filename: string;
+};
+
+function scanForEntries(): Entry[] {
+  const result: Entry[] = [];
   for (const pkg of config.packages) {
-    for (const candidate of glob.sync("**/*.{js,ts,tsx}", {
+    for (const candidate of globSync("**/*.{js,ts,tsx}", {
       cwd: pkg.path,
       ignore: ["node_modules/**", "contrib/**"],
     })) {
       const fn = pkg.path + "/" + candidate;
       const tag = tagParser(fn);
       if (tag) {
-        tag.entry = pkg.name + "/" + stripIndex(candidate);
-        tag.fullname = path.resolve(fn);
-        result.push(tag);
+        result.push({
+          ...tag,
+          entry: pkg.name + "/" + stripIndex(candidate),
+          fullname: path.resolve(fn),
+        });
       }
     }
   }
@@ -47,16 +68,31 @@ function scanForEntries() {
 }
 
 const entrypoints = scanForEntries();
-const plRegistries = {};
-const plFileToRegistry = {};
+const plRegistries: Record<string, Registry> = {};
+const plFileToRegistry: Record<string, Registry> = {};
+
+const registryExtensions = [
+  "",
+  ".js",
+  ".ts",
+  ".tsx",
+  "/index.js",
+  "/index.ts",
+  "/index.tsx",
+];
+
+function normalizePath(value: string): string {
+  return path.resolve(value).replaceAll("\\", "/");
+}
 
 entrypoints
   .filter(({ type }) => type === "registry")
   .forEach(({ entry, fullname }) => {
     const loaderFile = fullname.replace(/\.[tj]?sx?$/, ".inc.ts");
     const loaderModule = fullname.replace(/(\.[tj]?sx?)?$/, ".inc");
-    plFileToRegistry[fullname] = plRegistries[entry] = {
+    plFileToRegistry[normalizePath(fullname)] = plRegistries[entry] = {
       component: config.pathToComponent(fullname),
+      entry,
       fullname,
       loaderFile,
       loaderModule,
@@ -65,10 +101,102 @@ entrypoints
     };
   });
 
+function resolveRegistryRequest(
+  context: string | undefined,
+  request: string | undefined
+): Registry | undefined {
+  if (!request) return;
+
+  if (request.startsWith(".") && context) {
+    const base = path.resolve(context, request);
+    for (const ext of registryExtensions) {
+      const candidate = normalizePath(base + ext);
+      const registry = plFileToRegistry[candidate];
+      if (registry) return registry;
+    }
+  } else if (path.isAbsolute(request)) {
+    return plFileToRegistry[normalizePath(request)];
+  } else {
+    return plRegistries[request];
+  }
+}
+
+function shouldRedirectToRegistryLoader(
+  issuer: string | undefined,
+  registry: Registry
+): boolean {
+  if (!issuer) return true;
+
+  issuer = normalizePath(issuer);
+  if (issuer === normalizePath(registry.loaderFile)) return false;
+  if (registry.pluginFiles.map(normalizePath).includes(issuer)) return false;
+  return true;
+}
+
+function registryRedirect(
+  context: string | undefined,
+  request: string | undefined,
+  issuer: string | undefined
+): string | undefined {
+  const registry = resolveRegistryRequest(context, request);
+  if (registry && shouldRedirectToRegistryLoader(issuer, registry)) {
+    return registry.loaderFile;
+  }
+}
+
+function pyramidI18nRedirect(
+  context: string | undefined,
+  request: string | undefined,
+  issuer: string | undefined
+): string | undefined {
+  if (!context || !request || !issuer) return;
+
+  let match = false;
+  if (request === "@nextgisweb/pyramid/i18n") {
+    match = true;
+  } else if (request.startsWith(".") && request.endsWith("/i18n")) {
+    const joined = normalizePath(path.resolve(context, request));
+    match = joined.endsWith("/nextgisweb/pyramid/nodepkg/i18n");
+  }
+
+  if (match) {
+    const comp =
+      config.pathToComponent(issuer) || config.pathToComponent(context);
+    if (comp) return `@nextgisweb/jsrealm/i18n/comp/${comp}.inc`;
+  }
+}
+
+const REGISTRY_REPLACEMENT_PLUGIN = "RegistryReplacementPlugin";
+
+export const registryReplacementPlugin: Rspack.RspackPluginInstance = {
+  apply(compiler) {
+    compiler.hooks.compilation.tap(
+      REGISTRY_REPLACEMENT_PLUGIN,
+      (_compilation, { normalModuleFactory }) => {
+        normalModuleFactory.hooks.beforeResolve.tap(
+          REGISTRY_REPLACEMENT_PLUGIN,
+          (resolveData) => {
+            const { context, request, contextInfo } = resolveData;
+            const issuer = contextInfo?.issuer;
+            const redirected =
+              registryRedirect(context, request, issuer) ||
+              pyramidI18nRedirect(context, request, issuer);
+
+            if (redirected) {
+              resolveData.request = redirected;
+            }
+          }
+        );
+      }
+    );
+  },
+};
+
 const plRegExp = /\s+from\s+["](@nextgisweb\/[^"]*)["];/g;
 entrypoints
   .filter(({ type }) => type === "plugin")
-  .forEach(({ entry, plugin: registry, fullname }) => {
+  .forEach(({ entry, plugin, fullname }) => {
+    let registry = plugin;
     if (!registry) {
       const body = fs.readFileSync(fullname, "utf8");
       for (const [_, n] of body.matchAll(plRegExp)) {
@@ -79,7 +207,7 @@ entrypoints
       }
     }
 
-    const registryObject = plRegistries[registry];
+    const registryObject = registry ? plRegistries[registry] : undefined;
     if (registryObject) {
       registryObject.pluginFiles.push(fullname);
       registryObject.pluginModules.push(entry);
@@ -91,9 +219,12 @@ entrypoints
 entrypoints
   .filter(({ type }) => type === "registry")
   .forEach(({ entry, fullname, registry }) => {
-    registry = registry || config.pathToModule(fullname, true);
+    const registryName = registry || config.pathToModule(fullname, true);
+    if (!registryName) {
+      throw new Error(`Registry module missing for ${fullname}`);
+    }
 
-    const registryObject = plRegistries[registry];
+    const registryObject = plRegistries[registryName];
     const plugins = registryObject.pluginModules;
 
     const code = [
@@ -108,7 +239,7 @@ entrypoints
       `export * from "${entry}";`,
     ];
 
-    if (registry === "@nextgisweb/jsrealm/entrypoint/registry") {
+    if (registryName === "@nextgisweb/jsrealm/entrypoint/registry") {
       code.push(``, `// JSRealm entries`);
       config.jsrealm.entries.forEach(([component, module]) => {
         code.push(
@@ -139,10 +270,10 @@ entrypoints
         });
 
       code.push(``, `// Other`, ``);
-    } else if (registry === "@nextgisweb/jsrealm/plugin/meta") {
+    } else if (registryName === "@nextgisweb/jsrealm/plugin/meta") {
       for (const [entry, itm] of Object.entries(plRegistries)) {
         // Do not include meta registry itself
-        if (entry === registry) continue;
+        if (entry === registryName) continue;
         code.push(
           ``,
           `registry.registerLoader(`,
@@ -152,14 +283,14 @@ entrypoints
           `);`
         );
       }
-    } else if (registry === "@nextgisweb/jsrealm/testentry/registry") {
+    } else if (registryName === "@nextgisweb/jsrealm/testentry/registry") {
       const testentries = sortBy(
         entrypoints
           .filter(({ type }) => type === "testentry")
           .map(({ entry, testentry, fullname }) => ({
             component: config.pathToComponent(fullname),
             driver: testentry,
-            entry: entry,
+            entry,
           })),
         ["entry"]
       );
@@ -193,51 +324,11 @@ entrypoints
     }
   });
 
-const registryResolver = {
-  apply(resolver) {
-    resolver.hooks.result.tap("registryResolver", (result) => {
-      const registryObject = plFileToRegistry[result.path];
-      if (registryObject) {
-        const issuer = result.context.issuer;
-        if (
-          issuer === registryObject.loaderFile ||
-          registryObject.pluginFiles.includes(issuer)
-        ) {
-          return result;
-        } else {
-          result.path = registryObject.loaderFile;
-          return result;
-        }
-      }
-    });
-
-    // Redirect @nexgisweb/pyramid/i18n with component specific
-    // @nextgisweb/jsrealm/i18n/comp/* implementations.
-    resolver.getHook("beforeResolve").tap("PyramidI18nHook", (obj) => {
-      if (!obj.context.issuer) return;
-
-      let match = false;
-      if (obj.request === "@nextgisweb/pyramid/i18n") {
-        match = true;
-      } else if (obj.request.startsWith(".") && obj.request.endsWith("/i18n")) {
-        const joined = path.join(obj.path, obj.request);
-        match = joined.endsWith("/nextgisweb/pyramid/nodepkg/i18n");
-      }
-      if (match) {
-        const comp = config.pathToComponent(obj.path);
-        if (comp) {
-          obj.request = `@nextgisweb/jsrealm/i18n/comp/${comp}.inc`;
-        }
-      }
-    });
-  },
-};
-
-function scanLocales(pkg, subpath = "") {
+function scanLocales(pkg: string, subpath = ""): Record<string, LocaleInfo> {
   const root = require.resolve(pkg + "/package.json");
   const pattern = path.resolve(root, "..", subpath, "locale/*.js");
-  const result = {};
-  for (const filename of glob.sync(pattern)) {
+  const result: Record<string, LocaleInfo> = {};
+  for (const filename of globSync(pattern)) {
     const m = filename.match(/\/([a-z]{2}(?:[-_][a-z]{2})?)\.js$/i);
     if (m) {
       const original = m[1];
@@ -248,13 +339,19 @@ function scanLocales(pkg, subpath = "") {
   return result;
 }
 
-const DEFAULT_COUNTRY_FOR_LANGUAGE = { en: "us", cs: "cz" };
+const DEFAULT_COUNTRY_FOR_LANGUAGE: Record<string, string> = {
+  en: "us",
+  cs: "cz",
+};
 
-function lookupLocale(key, map) {
+function lookupLocale(
+  key: string,
+  map: Record<string, LocaleInfo>
+): LocaleInfo {
   const m = key.match(/^(\w+)-(\w+)$/);
   const [lang, cnt] = m ? [m[1], m[2]] : [key, undefined];
 
-  const test = [];
+  const test: string[] = [];
 
   if (cnt) {
     test.push(`${lang}-${cnt}`);
@@ -306,13 +403,13 @@ for (const { code: lang, nplurals, plural } of config.i18n.languages) {
   const antd = lookupLocale(lang, antdLocales);
   const dayjs = lookupLocale(lang, dayjsLocales);
 
-  const pofiles = [];
+  const pofiles: string[] = [];
   Object.values(config.env.components).forEach((path) => {
-    pofiles.push(...glob.sync(path + `/locale/${lang}.po`));
+    pofiles.push(...globSync(path + `/locale/${lang}.po`));
   });
 
   if (config.i18n.external) {
-    pofiles.push(...glob.sync(config.i18n.external + `/*/*/${lang}.po`));
+    pofiles.push(...globSync(config.i18n.external + `/*/*/${lang}.po`));
   }
 
   const code = [
@@ -332,9 +429,9 @@ for (const { code: lang, nplurals, plural } of config.i18n.languages) {
   fs.writeFileSync(fn, code.join("\n") + "\n");
 }
 
-const sharedIconIds = {};
-const iconsCollection = [];
-const iconTypeDefs = [];
+export const sharedIconIds: Record<string, string> = {};
+const iconsCollection: string[] = [];
+const iconTypeDefs: string[] = [];
 
 for (const [comp, compDir] of Object.entries(config.env.components)) {
   const iconDir = path.resolve(compDir, "icon");
@@ -342,7 +439,7 @@ for (const [comp, compDir] of Object.entries(config.env.components)) {
 
   const mod = ["@nextgisweb", comp.replace("_", "-"), "icon", "*"].join("/");
   const resourceDir = path.join(iconDir, "resource");
-  for (const fn of glob.sync(`**/*.svg`, {
+  for (const fn of globSync("**/*.svg", {
     cwd: iconDir,
     absolute: true,
   })) {
@@ -356,8 +453,8 @@ for (const [comp, compDir] of Object.entries(config.env.components)) {
 }
 
 for (const [collection, ...rest] of config.jsrealm.icons) {
-  const suf = rest.filter((i) => !!i);
-  if (collection in iconUtil.COLLECTIONS) {
+  const suf = rest.filter((i): i is string => !!i);
+  if (collection in COLLECTIONS) {
     iconsCollection.push(`@nextgisweb/icon/${collection}/${suf}`);
   } else {
     const compDir = path.resolve(config.env.components[collection]);
@@ -389,115 +486,3 @@ fs.writeFileSync(
     })
     .join("\n")
 );
-
-const babelLoader = {
-  loader: "babel-loader",
-  options: babelOptions,
-};
-
-/** @type {import("webpack").Configuration} */
-const webpackConfig = defaults("main", (env) => ({
-  entry: { "ngwEntry": require.resolve("@nextgisweb/jsrealm/ngwEntry.js") },
-  module: {
-    rules: [
-      {
-        test: /\.(m?js|tsx?)$/,
-        // In development mode exclude everything in node_modules for
-        // better performance. In production mode exclude only specific
-        // packages for better browser compatibility.
-        exclude: config.debug
-          ? /node_modules/
-          : /node_modules\/(core-js|react|react-dom)|\.min\.js$/,
-        resolve: { fullySpecified: false },
-        use: babelLoader,
-      },
-      {
-        test: /\.css$/i,
-        use: ["style-loader", "css-loader", fontWeightFix],
-      },
-      {
-        test: /\.less$/i,
-        use: ["style-loader", "css-loader", fontWeightFix, "less-loader"],
-      },
-      {
-        test: /\.svg$/i,
-        use: [
-          babelLoader,
-          {
-            loader: "svg-sprite-loader",
-            options: {
-              runtimeGenerator: require.resolve("./icon/runtime.cjs"),
-              symbolId: (fn) => {
-                const shared = sharedIconIds[fn];
-                if (shared) return shared;
-                const imported = iconUtil.symbolId(fn);
-                if (imported) return imported;
-              },
-            },
-          },
-          "svgo-loader",
-        ],
-      },
-      {
-        test: /\.po$/,
-        use: [babelLoader, require.resolve("./i18n/loader.cjs")],
-      },
-    ],
-  },
-
-  resolve: {
-    extensions: [".tsx", ".ts", "..."],
-    plugins: [registryResolver, new iconUtil.IconResolverPlugin()],
-  },
-
-  plugins: [
-    new DefinePlugin({
-      COMP_ID: DefinePlugin.runtimeValue(({ module }) => {
-        return JSON.stringify(config.pathToComponent(module.context));
-      }),
-      MODULE_NAME: DefinePlugin.runtimeValue(({ module }) => {
-        const result = config.pathToModule(module.resource, true);
-        return JSON.stringify(result);
-      }),
-    }),
-    ...(config.jsrealm.tscheck || env.tscheck
-      ? [new ForkTsCheckerPlugin()]
-      : []),
-    ...(config.jsrealm.eslint || env.eslint
-      ? [
-          new ESLintPlugin({
-            quiet: true,
-            extensions: ["js", "ts", "tsx"],
-            configType: "flat",
-            failOnError: false,
-            failOnWarning: false,
-          }),
-        ]
-      : []),
-  ],
-
-  optimization: {
-    splitChunks: {
-      // Generate as many chunks as possible
-      chunks: "all",
-      minSize: 0,
-    },
-    minimizer: [
-      {
-        apply: (compiler) => {
-          const TerserPlugin = require("terser-webpack-plugin");
-          new TerserPlugin({
-            terserOptions: {
-              // Webpack default options
-              compress: { passes: 2 },
-              // Keep class names for exceptions and Sentry
-              keep_classnames: true,
-            },
-          }).apply(compiler);
-        },
-      },
-    ],
-  },
-}));
-
-module.exports = webpackConfig;

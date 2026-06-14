@@ -3,13 +3,11 @@
   "version": "0.0.0",
   "type": "module",
   "dependencies": {
-    "@fontsource/roboto": "^5.2.10",
-    "css-minimizer-webpack-plugin": "^8.0.0",
-    "mini-css-extract-plugin": "^2.10.2"
+    "@fontsource/roboto": "^5.2.10"
   },
   "nextgisweb": {
-    "webpackConfigs": {
-      "stylesheet": "webpack.stylesheet.cjs"
+    "rsbuildConfigs": {
+      "stylesheet": "rsbuild.stylesheet.ts"
     }
   }
 }

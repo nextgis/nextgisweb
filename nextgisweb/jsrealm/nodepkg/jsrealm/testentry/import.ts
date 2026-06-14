@@ -7,7 +7,7 @@ function check(m: { default: string; named: string }) {
 }
 
 export default () => {
-  describe("Webpack imports", () => {
+  describe("Bundler imports", () => {
     it("module by absolute path", async () => {
       const m = await import("@nextgisweb/jsrealm/testentry/mod/abs");
       check(m);
@@ -24,7 +24,7 @@ export default () => {
     });
   });
 
-  describe("Webpack fails", () => {
+  describe("Bundler fails", () => {
     it("on module that throws", async () => {
       let caught = false;
       try {

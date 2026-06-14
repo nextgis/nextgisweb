@@ -201,13 +201,15 @@ def install(
         targets[k] = r
 
     jsrealm_path = Path(__file__).parent / "nodepkg" / "jsrealm"
-    webpack_root = (jsrealm_path / "webpack.root.cjs").resolve().relative_to(cwd)
+
+    rsbuild_root = (jsrealm_path / "rsbuild.root.ts").resolve().relative_to(cwd)
 
     package_json["scripts"] = scripts = dict()
-    scripts["build"] = "webpack --progress --config {}".format(webpack_root)
-    scripts["watch"] = "webpack --progress --watch --config {}".format(webpack_root)
+    scripts["build"] = "rsbuild build --config {}".format(rsbuild_root)
+    scripts["watch"] = "rsbuild build --watch --config {}".format(rsbuild_root)
 
-    scripts["watch:types"] = "npx tsc --watch -p tsconfig.json"
+    scripts["check:types"] = "tsc --noEmit -p tsconfig.json"
+    scripts["watch:types"] = "tsc --watch -p tsconfig.json"
 
     workspace_paths: list[str] = [str(pp) for pp in npkgs.values()]
 
