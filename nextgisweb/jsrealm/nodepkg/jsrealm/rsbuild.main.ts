@@ -11,6 +11,7 @@ import {
   commonDistPath,
   commonOutput,
   commonPerformance,
+  createCompressionPlugins,
   createFontWeightFixPostcssPlugin,
   createNgwLessPlugin,
 } from "./rsbuild.common";
@@ -116,7 +117,7 @@ export default {
         },
       ]);
 
-      appendPlugins([registryReplacementPlugin]);
+      appendPlugins([registryReplacementPlugin, ...createCompressionPlugins()]);
 
       rspackConfig.resolve = {
         ...rspackConfig.resolve,

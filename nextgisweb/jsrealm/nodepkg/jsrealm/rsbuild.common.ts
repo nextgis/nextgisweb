@@ -1,15 +1,19 @@
 import type {
+  DevConfig,
   DistPathConfig,
   OutputConfig,
   PerformanceConfig,
 } from "@rsbuild/core";
 import { pluginLess } from "@rsbuild/plugin-less";
 import type { PluginLessOptions } from "@rsbuild/plugin-less";
+import { CompressionRspackPlugin } from "compression-rspack-plugin";
 import type { Plugin } from "postcss";
 
-export const commonDev = {
+import config from "./config";
+
+export const commonDev: DevConfig = {
   assetPrefix: "auto",
-} as const;
+};
 
 export const commonOutput: OutputConfig = {
   assetPrefix: "auto",
@@ -53,4 +57,25 @@ export function createFontWeightFixPostcssPlugin(): Plugin {
       }
     },
   };
+}
+
+export function createCompressionPlugins(): CompressionRspackPlugin[] {
+  const plugins: CompressionRspackPlugin[] = [];
+  if (config.debug) return [];
+  const compressRegExp = /\.(js|css|html|json|svg)$/i;
+  for (const [algorithm, extension] of [
+    ["gzip", "gzip"],
+    ["brotliCompress", "br"],
+  ] as const) {
+    plugins.push(
+      new CompressionRspackPlugin({
+        test: compressRegExp,
+        algorithm: algorithm,
+        filename: `[path][base].${extension}`,
+        threshold: 256,
+        minRatio: 0.9,
+      })
+    );
+  }
+  return plugins;
 }
