@@ -14,6 +14,7 @@ export const commonDev = {
 export const commonOutput: OutputConfig = {
   assetPrefix: "auto",
   filenameHash: false,
+  sourceMap: true,
 };
 
 export const commonDistPath: Omit<DistPathConfig, "root"> = {
