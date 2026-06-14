@@ -5,7 +5,12 @@ import { fileURLToPath } from "node:url";
 import type { EnvironmentConfig } from "@rsbuild/core";
 
 import config from "../jsrealm/config";
-import { commonOutput, createNgwLessPlugin } from "../jsrealm/rsbuild.common";
+import {
+  commonDistPath,
+  commonOutput,
+  commonPerformance,
+  createNgwLessPlugin,
+} from "../jsrealm/rsbuild.common";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -40,14 +45,8 @@ export default {
     ...commonOutput,
 
     distPath: {
+      ...commonDistPath,
       root: path.resolve(config.distPath, "stylesheet"),
-      js: "",
-      css: "",
-      font: "",
-      image: "",
-      svg: "",
-      media: "",
-      assets: "",
     },
 
     filename: {
@@ -56,6 +55,10 @@ export default {
     },
 
     minify: true,
+  },
+
+  performance: {
+    ...commonPerformance,
   },
 
   tools: {

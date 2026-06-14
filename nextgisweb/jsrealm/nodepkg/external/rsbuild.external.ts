@@ -5,6 +5,11 @@ import { fileURLToPath } from "node:url";
 import { rspack } from "@rsbuild/core";
 import type { EnvironmentConfig } from "@rsbuild/core";
 
+import {
+  commonDistPath,
+  commonPerformance,
+} from "@nextgisweb/jsrealm/rsbuild.common";
+
 import config from "../jsrealm/config";
 
 const require = createRequire(import.meta.url);
@@ -56,12 +61,16 @@ export default {
     ],
 
     distPath: {
+      ...commonDistPath,
       root: path.resolve(config.distPath, "external"),
-      js: "",
     },
 
     filenameHash: false,
     minify: false,
+  },
+
+  performance: {
+    ...commonPerformance,
   },
 
   tools: {

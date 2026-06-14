@@ -8,7 +8,9 @@ import config from "./config";
 import { registryReplacementPlugin, sharedIconIds } from "./prepare";
 import {
   commonDev,
+  commonDistPath,
   commonOutput,
+  commonPerformance,
   createFontWeightFixPostcssPlugin,
   createNgwLessPlugin,
 } from "./rsbuild.common";
@@ -53,10 +55,13 @@ export default {
     ...commonOutput,
 
     distPath: {
+      ...commonDistPath,
       root: path.resolve(config.distPath, "main"),
-      js: "",
-      jsAsync: "",
     },
+  },
+
+  performance: {
+    ...commonPerformance,
   },
 
   tools: {
