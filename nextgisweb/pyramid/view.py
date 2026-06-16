@@ -173,6 +173,14 @@ def home(request):
         return HTTPFound(location=request.route_url("resource.show", id=0))
 
 
+def contact_administrator_redirect(request):
+    if nbase := request.env.core.options["contact_administrator_url"]:
+        location = nbase.format(instance_id=request.env.core.instance_id)
+        raise HTTPFound(location=location)
+    else:
+        raise HTTPNotFound()
+
+
 def openapi_json(request) -> JSONType:
     return openapi(request.registry.introspector)
 
@@ -650,6 +658,11 @@ def setup_pyramid(comp, config):
     config.add_route("pyramid.asset.blogo", "/pyramid/blogo", get=asset_blogo)
 
     config.add_route("home", "/", client=False).add_view(home)
+    config.add_route(
+        "pyramid.contact_administrator.redirect",
+        "/redirect/contact-administrator",
+        get=contact_administrator_redirect,
+    )
 
     config.add_route("pyramid.openapi_json", "/openapi.json", get=openapi_json)
 
