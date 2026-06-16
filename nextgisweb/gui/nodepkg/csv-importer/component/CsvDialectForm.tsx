@@ -10,8 +10,8 @@ import {
 import type { CsvDialect } from "../type";
 
 const msgDelimiter = gettext("Delimiter");
-const msgQuoteChar = gettext("Quote char");
-const msgEscapeChar = gettext("Escape char");
+const msgQuoteChar = gettext("Quote character");
+const msgEscapeChar = gettext("Escape character");
 const msgEncoding = gettext("Encoding");
 
 export interface CsvDialectFormProps {

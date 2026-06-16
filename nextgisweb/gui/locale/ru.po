@@ -178,11 +178,11 @@ msgid "Delimiter"
 msgstr "Разделитель"
 
 #: nodepkg/csv-importer/component/CsvDialectForm.tsx:13
-msgid "Quote char"
+msgid "Quote character"
 msgstr "Символ кавычки"
 
 #: nodepkg/csv-importer/component/CsvDialectForm.tsx:14
-msgid "Escape char"
+msgid "Escape character"
 msgstr "Символ экранирования"
 
 #: nodepkg/csv-importer/component/CsvDialectForm.tsx:15
