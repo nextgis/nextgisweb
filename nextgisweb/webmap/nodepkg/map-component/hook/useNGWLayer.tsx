@@ -3,30 +3,32 @@ import GeoJSON from "ol/format/GeoJSON";
 import type BaseLayer from "ol/layer/Base";
 import VectorLayer from "ol/layer/Vector";
 import VectorTileLayer from "ol/layer/VectorTile";
+import type WebGLTileLayer from "ol/layer/WebGLTile";
 import VectorSource from "ol/source/Vector";
 import VectorTileSource from "ol/source/VectorTile";
 import type { StyleLike } from "ol/style/Style";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { ReactElement } from "react";
 
-import { Select } from "@nextgisweb/gui/antd";
 import { routeURL } from "@nextgisweb/pyramid/api";
-import { gettextf } from "@nextgisweb/pyramid/i18n";
 import type { RasterBand } from "@nextgisweb/raster-layer/type/api";
 import { useResourceAttr } from "@nextgisweb/resource/hook/useResourceAttr";
-import { createGeoTIFFLayer } from "@nextgisweb/webmap/geotiff-adapter/createGeoTIFFLayer";
+import {
+  createGeoTIFFLayer,
+  setGeoTIFFBandStyle,
+  setGeoTIFFRGBIntensityStyle,
+} from "@nextgisweb/webmap/geotiff-adapter/createGeoTIFFLayer";
 import { createImageLayer as createNGWImageLayer } from "@nextgisweb/webmap/image-adapter/createImageLayer";
 import { createTileLayer } from "@nextgisweb/webmap/tile-adapter/createTileLayer";
 
-import { MapControl } from "../control";
+import { BandSelectControl } from "../component/BandSelectControl";
+import { RGBIntensityControl } from "../control/RGBIntensityControl";
 
 export type LayerType = "geojson" | "geotiff" | "XYZ" | "MVT" | "image";
 
 export interface LayerOptions {
   style?: StyleLike;
 }
-
-const msgBand = gettextf("Band {}");
 
 const createGeoJsonLayer = (
   resourceId: number,
@@ -63,36 +65,6 @@ const createMVTLayer = (resourceId: number, layerOptions?: LayerOptions) => {
     ...layerOptions,
   });
 };
-
-function BandSelectControl({
-  bands,
-  value = 0,
-  onChange,
-}: {
-  bands: RasterBand[];
-  value?: number;
-  onChange: (val: number) => void;
-}) {
-  const bandsWithoutAlpha = bands.filter((b) => b.color_interp !== "Alpha");
-
-  if (bandsWithoutAlpha.length < 2) {
-    return null;
-  }
-
-  return (
-    <MapControl order={100} position="top-right" margin>
-      <Select
-        defaultValue={value}
-        onChange={onChange}
-        options={bandsWithoutAlpha?.map((_b, index) => ({
-          value: index,
-          label: msgBand(index + 1),
-        }))}
-      />
-    </MapControl>
-  );
-}
-
 export function useNGWLayer({
   layerType,
   resourceId,
@@ -103,13 +75,49 @@ export function useNGWLayer({
   layerOptions?: LayerOptions;
 }): [BaseLayer | undefined, ReactElement | undefined] {
   const [layer, setLayer] = useState<BaseLayer | undefined>(undefined);
-  const [control, setControl] = useState<ReactElement | undefined>(undefined);
+  const [geotiffMode, setGeotiffMode] = useState<"rgb" | "band" | undefined>(
+    undefined
+  );
+  const [bands, setBands] = useState<RasterBand[] | undefined>(undefined);
+
+  const geotiffLayerRef = useRef<WebGLTileLayer | null>(null);
   const { fetchResourceItems } = useResourceAttr();
+
+  const control = useMemo(() => {
+    if (!geotiffMode || !bands) return undefined;
+
+    if (geotiffMode === "rgb") {
+      return (
+        <RGBIntensityControl
+          onChange={(rgb) => {
+            if (geotiffLayerRef.current) {
+              setGeoTIFFRGBIntensityStyle(geotiffLayerRef.current, bands, rgb);
+            }
+          }}
+        />
+      );
+    }
+
+    return (
+      <BandSelectControl
+        bands={bands}
+        onChange={(val) => {
+          if (geotiffLayerRef.current) {
+            setGeoTIFFBandStyle(geotiffLayerRef.current, bands, val);
+          }
+        }}
+      />
+    );
+  }, [bands, geotiffMode]);
 
   useEffect(() => {
     let cancelled = false;
 
     const loadLayer = async () => {
+      setGeotiffMode(undefined);
+      setBands(undefined);
+      geotiffLayerRef.current = null;
+
       if (layerType === "geojson") {
         return setLayer(createGeoJsonLayer(resourceId, layerOptions));
       } else if (layerType === "MVT") {
@@ -132,28 +140,38 @@ export function useNGWLayer({
         const dtype = item.get("raster_layer.dtype");
         const bands = item.get("raster_layer.bands");
 
-        setLayer(createGeoTIFFLayer({ styleId: resourceId, dtype, bands }));
+        const geotiffLayer = createGeoTIFFLayer({
+          styleId: resourceId,
+          dtype,
+          bands,
+        });
 
-        if (dtype !== "Byte" && bands && bands.length > 1) {
-          setControl(
-            <BandSelectControl
-              bands={bands}
-              onChange={(val) => {
-                setLayer(
-                  createGeoTIFFLayer({
-                    styleId: resourceId,
-                    dtype,
-                    bands,
-                    selectedBand: val,
-                  })
-                );
-              }}
-            />
+        geotiffLayerRef.current = geotiffLayer;
+        setLayer(geotiffLayer);
+
+        if (bands && bands.length > 1) {
+          const hasRGB =
+            bands.findIndex((b) => b.color_interp === "Red") >= 0 &&
+            bands.findIndex((b) => b.color_interp === "Green") >= 0 &&
+            bands.findIndex((b) => b.color_interp === "Blue") >= 0;
+
+          const bandsWithoutAlpha = bands.filter(
+            (b) => b.color_interp !== "Alpha"
           );
+
+          if (hasRGB) {
+            setBands(bands);
+            setGeotiffMode("rgb");
+          } else if (dtype !== "Byte" && bandsWithoutAlpha.length > 1) {
+            setBands(bands);
+            setGeotiffMode("band");
+          }
         }
-      } else {
-        throw new Error(`Not supported layer type: ${layerType}`);
+
+        return;
       }
+
+      throw new Error(`Not supported layer type: ${layerType}`);
     };
 
     loadLayer();
@@ -161,7 +179,7 @@ export function useNGWLayer({
     return () => {
       cancelled = true;
     };
-  }, [layerType, resourceId, layerOptions, fetchResourceItems]);
+  }, [layerType, resourceId, fetchResourceItems, layerOptions]);
 
   return [layer, control];
 }
