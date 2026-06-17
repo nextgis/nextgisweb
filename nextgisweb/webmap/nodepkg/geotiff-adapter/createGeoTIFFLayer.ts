@@ -21,6 +21,7 @@ export interface GeoTIFFRGBIntensity {
   green: number;
   blue: number;
 }
+
 const DEFAULT_RGB_INTENSITY: GeoTIFFRGBIntensity = {
   red: 255,
   green: 255,
@@ -66,7 +67,10 @@ function getBandIndex(bands: RasterBand[] | undefined, color_interp: string) {
 function getDataBands(bands: RasterBand[]) {
   return bands
     .map((band, index) => ({ band, index }))
-    .filter(({ band }) => band.color_interp !== "Alpha");
+    .filter(
+      ({ band }) =>
+        band.color_interp !== "Alpha" && band.color_interp !== "Palette"
+    );
 }
 
 export function createGeoTIFFRGBStyle(
@@ -106,6 +110,7 @@ export function createGeoTIFFSingleBandStyle(
   if (!selectedDataBand) return undefined;
 
   const { band: dataBand, index: dataIdx } = selectedDataBand;
+
   const min = dataBand.min ?? 0;
   const max = dataBand.max ?? 1;
   const olDataIdx = dataIdx + 1; // OL band indices are 1-based
@@ -133,12 +138,41 @@ export function createGeoTIFFSingleBandStyle(
   };
 }
 
+function createGeoTIFFPaletteStyle(
+  bands: RasterBand[],
+  paletteIdx: number,
+  alphaIdx = -1,
+  invert = true
+) {
+  const dataBand = bands[paletteIdx];
+
+  const min = dataBand.min ?? 0;
+  const max = dataBand.max ?? 255;
+  const olDataIdx = paletteIdx + 1; // OL band indices are 1-based
+  const range = max - min || 1;
+
+  const normalized = [
+    "clamp",
+    ["/", ["-", ["band", olDataIdx], min], range],
+    0,
+    1,
+  ];
+
+  const value = invert ? ["-", 1, normalized] : normalized;
+  const alpha = alphaIdx >= 0 ? ["/", ["band", alphaIdx + 1], 255] : 1;
+
+  return {
+    color: ["array", value, value, value, alpha],
+  };
+}
+
 export function setGeoTIFFBandStyle(
   layer: WebGLTileLayer,
   bands: RasterBand[],
   selectedBand = 0
 ) {
   const style = createGeoTIFFSingleBandStyle(bands, selectedBand);
+
   if (style) {
     layer.setStyle(style);
   }
@@ -179,8 +213,10 @@ export function createGeoTIFFLayer(
   const greenIdx = getBandIndex(item.bands, "Green");
   const blueIdx = getBandIndex(item.bands, "Blue");
   const alphaIdx = getBandIndex(item.bands, "Alpha");
+  const paletteIdx = getBandIndex(item.bands, "Palette");
 
   const hasRGB = redIdx >= 0 && greenIdx >= 0 && blueIdx >= 0;
+  const hasPalette = paletteIdx >= 0;
 
   if (hasRGB) {
     return new WebGLTileLayer({
@@ -204,24 +240,39 @@ export function createGeoTIFFLayer(
     });
   }
 
-  const isNormalizable = item.dtype !== "Byte";
+  if (hasPalette && item.bands) {
+    return new WebGLTileLayer({
+      ...getLayerOptions(item),
+      zIndex: 10,
+      source: createSource(
+        {
+          sources: [{ url }],
+          normalize: false,
+        },
+        options
+      ),
+      style: createGeoTIFFPaletteStyle(item.bands, paletteIdx, alphaIdx, true),
+    });
+  }
 
-  if (isNormalizable && item.bands) {
-    const style = createGeoTIFFSingleBandStyle(item.bands, item.selectedBand);
+  const singleBandStyle =
+    item.bands && item.dtype !== "Byte"
+      ? createGeoTIFFSingleBandStyle(item.bands, item.selectedBand)
+      : undefined;
 
-    if (style) {
-      return new WebGLTileLayer({
-        ...getLayerOptions(item),
-        source: createSource(
-          {
-            sources: [{ url }],
-            normalize: false,
-          },
-          options
-        ),
-        style,
-      });
-    }
+  if (singleBandStyle) {
+    return new WebGLTileLayer({
+      ...getLayerOptions(item),
+      zIndex: 10,
+      source: createSource(
+        {
+          sources: [{ url }],
+          normalize: false,
+        },
+        options
+      ),
+      style: singleBandStyle,
+    });
   }
 
   return new WebGLTileLayer({
