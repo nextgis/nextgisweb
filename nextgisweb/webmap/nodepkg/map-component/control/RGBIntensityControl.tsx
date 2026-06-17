@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-import { Form, Slider } from "@nextgisweb/gui/antd";
+import { Slider, Space } from "@nextgisweb/gui/antd";
 
 import { MapControl } from "./MapControl";
 
@@ -8,71 +8,99 @@ interface RGBIntensity {
   red: number;
   green: number;
   blue: number;
+  alpha?: number;
 }
 
+const RED = "#ff0000";
+const GREEN = "#00aa00";
+const BLUE = "#0064ff";
+export const ALPHA = "#666666";
+
 export function RGBIntensityControl({
+  hasAlpha = false,
   onChange,
 }: {
+  hasAlpha?: boolean;
   onChange: (rgb: RGBIntensity) => void;
 }) {
   const [red, setRed] = useState(255);
   const [green, setGreen] = useState(255);
   const [blue, setBlue] = useState(255);
+  const [alpha, setAlphaOpacity] = useState(100);
 
-  const redRef = useRef(red);
-  const greenRef = useRef(green);
-  const blueRef = useRef(blue);
+  const mountedRef = useRef(false);
 
   useEffect(() => {
-    redRef.current = red;
-    greenRef.current = green;
-    blueRef.current = blue;
-  }, [red, green, blue]);
+    if (!mountedRef.current) {
+      mountedRef.current = true;
+      return;
+    }
 
-  const commit = useCallback(() => {
     onChange({
-      red: redRef.current,
-      green: greenRef.current,
-      blue: blueRef.current,
+      red,
+      green,
+      blue,
+      ...(hasAlpha ? { alpha } : {}),
     });
-  }, [onChange]);
+  }, [red, green, blue, alpha, hasAlpha, onChange]);
 
   return (
     <MapControl order={100} position="top-right" margin>
-      <Form style={{ width: 180 }} layout="horizontal">
-        <Form.Item label={`R`}>
-          <Slider
-            min={0}
-            max={255}
-            step={1}
-            value={red}
-            onChange={setRed}
-            onChangeComplete={commit}
-          />
-        </Form.Item>
+      <Space style={{ width: 180 }} orientation="vertical">
+        <Slider
+          min={0}
+          max={255}
+          step={1}
+          value={red}
+          onChange={setRed}
+          tooltip={{ open: false }}
+          styles={{
+            track: { backgroundColor: RED },
+            handle: { borderColor: RED },
+          }}
+        />
 
-        <Form.Item label={`G`}>
-          <Slider
-            min={0}
-            max={255}
-            step={1}
-            value={green}
-            onChange={setGreen}
-            onChangeComplete={commit}
-          />
-        </Form.Item>
+        <Slider
+          min={0}
+          max={255}
+          step={1}
+          value={green}
+          onChange={setGreen}
+          tooltip={{ open: false }}
+          styles={{
+            track: { backgroundColor: GREEN },
+            handle: { borderColor: GREEN },
+          }}
+        />
 
-        <Form.Item label={`B`}>
+        <Slider
+          min={0}
+          max={255}
+          step={1}
+          value={blue}
+          onChange={setBlue}
+          tooltip={{ open: false }}
+          styles={{
+            track: { backgroundColor: BLUE },
+            handle: { borderColor: BLUE },
+          }}
+        />
+
+        {hasAlpha && (
           <Slider
             min={0}
-            max={255}
+            max={100}
             step={1}
-            value={blue}
-            onChange={setBlue}
-            onChangeComplete={commit}
+            value={alpha}
+            onChange={setAlphaOpacity}
+            tooltip={{ open: false }}
+            styles={{
+              track: { backgroundColor: ALPHA },
+              handle: { borderColor: ALPHA },
+            }}
           />
-        </Form.Item>
-      </Form>
+        )}
+      </Space>
     </MapControl>
   );
 }
