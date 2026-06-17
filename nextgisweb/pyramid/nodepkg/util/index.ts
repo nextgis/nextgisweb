@@ -1,6 +1,7 @@
 import { RequestQueue } from "./queue";
 
 export { tileLoadFunction, transparentImage } from "./tileLoadFunction";
+export { geoTIFFLoadFunction } from "./geoTIFFLoadFunction";
 export { getUniqueName } from "./getUniqName";
 export * from "./loader";
 export * from "./abort";

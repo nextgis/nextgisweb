@@ -3,8 +3,6 @@ import GeoJSON from "ol/format/GeoJSON";
 import type BaseLayer from "ol/layer/Base";
 import VectorLayer from "ol/layer/Vector";
 import VectorTileLayer from "ol/layer/VectorTile";
-import WebGLTileLayer from "ol/layer/WebGLTile";
-import GeoTIFFSource from "ol/source/GeoTIFF";
 import VectorSource from "ol/source/Vector";
 import VectorTileSource from "ol/source/VectorTile";
 import type { StyleLike } from "ol/style/Style";
@@ -16,6 +14,7 @@ import { routeURL } from "@nextgisweb/pyramid/api";
 import { gettextf } from "@nextgisweb/pyramid/i18n";
 import type { RasterBand } from "@nextgisweb/raster-layer/type/api";
 import { useResourceAttr } from "@nextgisweb/resource/hook/useResourceAttr";
+import { createGeoTIFFLayer } from "@nextgisweb/webmap/geotiff-adapter/createGeoTIFFLayer";
 import { createImageLayer as createNGWImageLayer } from "@nextgisweb/webmap/image-adapter/createImageLayer";
 import { createTileLayer } from "@nextgisweb/webmap/tile-adapter/createTileLayer";
 
@@ -41,66 +40,13 @@ const createGeoJsonLayer = (
   return layer;
 };
 
-const createGeoTIFFLayer = (
-  resourceId: number,
-  dtype?: string,
-  bands?: RasterBand[],
-  selectedBand?: number
-) => {
-  const url = routeURL("raster_layer.cog", resourceId);
-  const isNormalizable = dtype !== "Byte";
-
-  if (isNormalizable && bands) {
-    const alphaIdx = bands.findIndex((b) => b.color_interp === "Alpha");
-
-    const dataIdx =
-      selectedBand !== undefined
-        ? selectedBand
-        : bands.findIndex((b) => b.color_interp !== "Alpha");
-
-    if (dataIdx >= 0 && bands[dataIdx]) {
-      const dataBand = bands[dataIdx];
-      const min = dataBand.min ?? 0;
-      const max = dataBand.max ?? 1;
-      const olDataIdx = dataIdx + 1; // OL band indices are 1-based
-      const range = max - min || 1;
-
-      const normalized = [
-        "clamp",
-        ["/", ["-", ["band", olDataIdx], min], range],
-        0,
-        1,
-      ];
-      const nodata =
-        typeof dataBand.no_data === "number" ? dataBand.no_data : undefined;
-      const alpha =
-        alphaIdx >= 0
-          ? ["/", ["band", alphaIdx + 1], 255]
-          : nodata !== undefined
-            ? ["case", ["==", ["band", olDataIdx], nodata], 0, 1]
-            : 1;
-
-      return new WebGLTileLayer({
-        source: new GeoTIFFSource({
-          sources: [{ url, nodata }],
-          normalize: false,
-        }),
-        style: { color: ["array", normalized, normalized, normalized, alpha] },
-      });
-    }
-  }
-
-  return new WebGLTileLayer({
-    source: new GeoTIFFSource({ sources: [{ url }], convertToRGB: true }),
-  });
-};
-const createXYZLayer = (resourceId: number) => {
-  const layer = createTileLayer({ styleId: resourceId });
+const createXYZLayer = (resourceId: number, hmux?: boolean) => {
+  const layer = createTileLayer({ styleId: resourceId }, { hmux });
   return layer.olLayer;
 };
 
-const createImageLayer = (resourceId: number) => {
-  const layer = createNGWImageLayer({ styleId: resourceId });
+const createImageLayer = (resourceId: number, hmux?: boolean) => {
+  const layer = createNGWImageLayer({ styleId: resourceId }, { hmux });
   return layer.olLayer;
 };
 
@@ -186,14 +132,21 @@ export function useNGWLayer({
         const dtype = item.get("raster_layer.dtype");
         const bands = item.get("raster_layer.bands");
 
-        setLayer(createGeoTIFFLayer(resourceId, dtype, bands));
+        setLayer(createGeoTIFFLayer({ styleId: resourceId, dtype, bands }));
 
         if (dtype !== "Byte" && bands && bands.length > 1) {
           setControl(
             <BandSelectControl
               bands={bands}
               onChange={(val) => {
-                setLayer(createGeoTIFFLayer(resourceId, dtype, bands, val));
+                setLayer(
+                  createGeoTIFFLayer({
+                    styleId: resourceId,
+                    dtype,
+                    bands,
+                    selectedBand: val,
+                  })
+                );
               }}
             />
           );
