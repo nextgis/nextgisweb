@@ -60,12 +60,25 @@ class Mako:
 
         def _render(value, system):
             value["tr"] = system["tr"]
-            request = system.get("request")
-            if request is not None:
+
+            if (request := system.get("request")) is not None:
                 value["request"] = request
-                cache_control = request.response.cache_control
-                cache_control.no_store = True
-                cache_control.must_revalidate = True
+                response = request.response
+
+                # Prevents showing outdated content when the user clicks the
+                # back button in the browser.
+                response.cache_control.no_store = True
+                response.cache_control.must_revalidate = True
+
+                # Attempt to upgrade insecure requests to HTTPS if the request
+                # was made over HTTPS, especially for HTTP basemaps.
+                if request.url.startswith("https://"):
+                    response.headerlist.append(
+                        (
+                            "Content-Security-Policy",
+                            "upgrade-insecure-requests",
+                        )
+                    )
             return template.render_unicode(**value)
 
         return _render
