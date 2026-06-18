@@ -1,15 +1,19 @@
 import filecmp
+import re
 from contextlib import contextmanager
 from zipfile import BadZipFile, ZipFile
 
 from magic import from_buffer as magic_from_buffer
+from msgspec import UNSET
+from msgspec import DecodeError as MsgspecDecodeError
+from msgspec.json import decode as msgspec_decode
 
 from nextgisweb.env import DBSession, gettext, gettextf
-from nextgisweb.lib.json import loadb
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.file_storage import FileObj
 
+from .api_util import Metadata
 from .model import FeatureAttachment
 
 
@@ -32,10 +36,12 @@ def attachments_import(resource, filename, *, replace):
             metadata_info = None
 
         if metadata_info is not None:
-            metadata = loadb(z.read(metadata_info))
-            metadata_items = metadata.get("items")
+            try:
+                metadata = msgspec_decode(z.read(metadata_info), type=Metadata)
+            except MsgspecDecodeError as exc:
+                raise ValidationError(message=exc.args[0])
+            metadata_items = metadata.items
         else:
-            metadata = None
             metadata_items = None
 
         sources = []
@@ -55,55 +61,35 @@ def attachments_import(resource, filename, *, replace):
                         message=gettextf("File '{}' isn't found in metadata.")(info_fn)
                     )
 
-                file_fid = file_md.get("feature_id")
-                if not isinstance(file_fid, int):
-                    raise ValidationError(
-                        message=gettextf("Invalid feature ID for file '{}'.")(info_fn)
-                    )
-                src["feature_id"] = file_fid
-
-                file_keyname = file_md.get("keyname")
-                if file_keyname is not None and not isinstance(file_keyname, str):
-                    raise ValidationError(
-                        message=gettextf("Invalid keyname for file '{}'.")(info_fn)
-                    )
-                src["keyname"] = file_keyname
-
-                file_name = file_md.get("name")
-                if file_name is not None and not isinstance(file_name, str):
-                    raise ValidationError(message=gettextf("Invalid name for file '{}'.")(info_fn))
-                src["name"] = file_name
-
-                file_mime = file_md.get("mime_type")
-                if file_mime is not None and not isinstance(file_mime, str):
-                    raise ValidationError(
-                        message=gettextf("Invalid MIME type for file '{}'.")(info_fn)
-                    )
-                src["mime_type"] = file_mime
-
-                file_desc = file_md.get("description")
-                if file_desc is not None and not isinstance(file_desc, str):
-                    raise ValidationError(
-                        message=gettextf("Invalid description for file '{}'.")(info_fn)
-                    )
-                src["description"] = file_desc
+                src["feature_id"] = file_md.feature_id
+                src["name"] = file_md.name if file_md.name is not UNSET else None
+                src["mime_type"] = file_md.mime_type if file_md.mime_type is not UNSET else None
+                src["keyname"] = file_md.keyname if file_md.keyname is not UNSET else None
+                src["description"] = (
+                    file_md.description if file_md.description is not UNSET else None
+                )
 
             else:
-                try:
-                    file_fid, file_name = info.filename.split("/", 2)
-                    if file_fid.isdigit():
-                        file_fid = int(file_fid)
-                    else:
-                        raise ValueError
-                except ValueError:
+                fp_match = re.match(r"^(\d+)\/([^\/]+)$", info_fn)
+                if fp_match is None:
                     raise ValidationError(
-                        message=gettextf("Could not determine feature ID for file '{}'.")(info_fn)
+                        gettextf(
+                            "Invalid archive structure. Files must be placed inside the feature "
+                            "directory using the format '{0}', but got '{1}'. Nested directories "
+                            "are not supported."
+                        ).format(
+                            gettext("{feature ID}/{file name}"),
+                            f"{info_fn}",
+                        )
                     )
 
+                file_fid, file_name = fp_match.groups()
+                file_fid = int(file_fid)
+
                 src["feature_id"] = file_fid
-                src["keyname"] = None
                 src["name"] = file_name
                 src["mime_type"] = None
+                src["keyname"] = None
                 src["description"] = None
 
             if src["mime_type"] is None:

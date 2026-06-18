@@ -122,7 +122,7 @@ export function AttachmentForm({ id }: { id: number }) {
     <>
       <p>
         {gettext(
-          "Upload a ZIP archive to batch append attachments to existing features. An archive must contain directories named after feature IDs. Each folder can contain one or many attachments. Duplicates will be ignored."
+          "Upload a ZIP archive to batch append attachments to existing features. An archive must contain directories named after feature IDs. Each directory can contain one or many attachments. Duplicates will be ignored."
         )}
       </p>
       <p>

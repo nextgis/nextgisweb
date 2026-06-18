@@ -8,13 +8,13 @@ from urllib.parse import quote_plus
 from zipfile import ZIP_DEFLATED, ZipFile
 
 from msgspec import Meta, Struct
+from msgspec.json import encode as msgspec_dumpb
 from PIL import Image
 from pyramid.response import FileResponse, Response
 from sqlalchemy.sql import select
 
 from nextgisweb.env import DBSession
 from nextgisweb.lib.apitype import ContentType
-from nextgisweb.lib.json import dumpb
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.feature_layer import IFeatureLayer, IVersionableFeatureLayer
@@ -26,13 +26,13 @@ from nextgisweb.pyramid.tomb import UnsafeFileResponse
 from nextgisweb.resource import DataScope, Resource, ResourceFactory
 
 from .api_import import attachments_import
+from .api_util import AttachmentID, Metadata, MetadataItem
 from .exception import AttachmentNotFound
 from .exif import EXIF_ORIENTATION_TAG, ORIENTATIONS
 from .model import FeatureAttachment
 from .util import crop_to_aspect_ratio
 
 ResourceID = Annotated[int, Meta(ge=0, description="Resource ID")]
-AttachmentID = Annotated[int, Meta(description="Attachment ID")]
 
 
 def attachment_or_not_found(resource, feature_id, attachment_id):
@@ -205,8 +205,7 @@ def export(resource, request):
         FeatureAttachment.feature_id, FeatureAttachment.extension_id
     )
 
-    metadata = dict()
-    metadata_items = metadata["items"] = dict()
+    metadata_items = dict[str, MetadataItem]()
 
     with NamedTemporaryFile(suffix=".zip") as tmp_file:
         with ZipFile(tmp_file, "w", ZIP_DEFLATED, allowZip64=True) as zipf:
@@ -243,20 +242,21 @@ def export(resource, request):
                 feature_anames.add(name)
                 arcname = f"{obj.feature_id:010d}/{name}"
 
-                metadata_item = metadata_items[arcname] = dict(
+                metadata_item = metadata_items[arcname] = MetadataItem(
                     id=obj.extension_id,
                     feature_id=obj.feature_id,
                     name=obj.name,
                     mime_type=obj.mime_type,
                 )
                 if obj.keyname is not None:
-                    metadata_item["keyname"] = obj.keyname
+                    metadata_item.keyname = obj.keyname
                 if obj.description is not None:
-                    metadata_item["description"] = obj.description
+                    metadata_item.description = obj.description
 
                 zipf.write(obj.fileobj.filename(), arcname=arcname)
 
-            zipf.writestr("metadata.json", dumpb(metadata))
+            metadata = Metadata(items=metadata_items)
+            zipf.writestr("metadata.json", msgspec_dumpb(metadata))
 
         response = FileResponse(tmp_file.name, content_type="application/zip")
         response.content_disposition = 'attachment; filename="%d.attachments.zip"' % resource.id
@@ -272,7 +272,8 @@ def import_attachment(resource, request) -> JSONType:
     data = request.json_body
     replace = data.get("replace", False) is True
     fupload = FileUpload(id=data["source"]["id"])
-    return attachments_import(resource, fupload.data_path, replace=replace)
+    with versioning(resource, request):
+        return attachments_import(resource, fupload.data_path, replace=replace)
 
 
 class BundleItem(Struct, kw_only=True):
