@@ -23,7 +23,7 @@ export class EditorStore
   @observable.ref accessor sort: LookupTableRead["sort"] = "KEY_ASC";
 
   constructor() {
-    super({ defaultValue: "" });
+    super({ defaultValue: "", valueFromKey: true });
   }
 
   @action.bound

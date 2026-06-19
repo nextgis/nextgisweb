@@ -52,7 +52,12 @@ export class EdiTableKeyValueRow<V> implements RowData<V> {
 
   @action.bound
   setKey(value: string) {
-    this.update({ key: value });
+    this.update({
+      key: value,
+      ...(this.store.valueFromKey && this.value === this.key
+        ? { value: value as unknown as V }
+        : {}),
+    });
   }
 
   @action.bound
@@ -115,12 +120,20 @@ export class EdiTableKeyValueStore<V> implements EdiTableStore<
 > {
   identity = "";
   defaultValue: V;
+  valueFromKey: boolean = false;
 
   @observable.shallow accessor items: EdiTableKeyValueRow<V>[] = [];
   @observable.ref accessor dirty = false;
 
-  constructor({ defaultValue }: { defaultValue: V }) {
+  constructor({
+    defaultValue,
+    valueFromKey,
+  }: {
+    defaultValue: V;
+    valueFromKey?: boolean;
+  }) {
     this.defaultValue = defaultValue;
+    this.valueFromKey = valueFromKey || false;
     this.rotatePlaceholder();
   }
 
