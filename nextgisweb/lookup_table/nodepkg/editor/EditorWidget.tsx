@@ -38,13 +38,13 @@ type RowType = EditorStore["items"][number];
 const columns: EdiTableColumn<RowType>[] = [
   {
     key: "key",
-    title: gettext("Key"),
+    title: gettext("Value"),
     width: "25%",
     component: EdiTableKeyInput,
   },
   {
     key: "value",
-    title: gettext("Value"),
+    title: gettext("Label"),
     width: "75%",
     component: EdiTableValueInput,
   },
@@ -54,23 +54,23 @@ const sortSelectOptions: {
   value: LookupTableRead["sort"];
   label: string;
 }[] = [
-  { value: "KEY_ASC", label: gettext("Key, ascending") },
-  { value: "KEY_DESC", label: gettext("Key, descending") },
-  { value: "VALUE_ASC", label: gettext("Value, ascending") },
-  { value: "VALUE_DESC", label: gettext("Value, descending") },
+  { value: "KEY_ASC", label: gettext("Value, ascending") },
+  { value: "KEY_DESC", label: gettext("Value, descending") },
+  { value: "VALUE_ASC", label: gettext("Label, ascending") },
+  { value: "VALUE_DESC", label: gettext("Label, descending") },
   { value: "CUSTOM", label: gettext("Custom") },
 ];
 
 const importerTargetColumns = [
   {
     key: "key",
-    label: gettext("Key"),
-    aliases: uniq(["Key", gettext("Key")]),
+    label: gettext("Value"),
+    aliases: uniq([gettext("Value"), "Value"]),
   },
   {
     key: "value",
-    label: gettext("Value"),
-    aliases: uniq(["Value", gettext("Value")]),
+    label: gettext("Label"),
+    aliases: uniq([gettext("Label"), "Label"]),
   },
 ];
 
@@ -85,7 +85,7 @@ export const EditorWidget: IEditorWidget<EditorStore> = observer(
 
     const exportLookup = useCallback(() => {
       exportToCsv([
-        { key: gettext("Key"), value: gettext("Value") },
+        { key: gettext("Value"), value: gettext("Label") },
         ...store.items,
       ]);
     }, [store.items]);

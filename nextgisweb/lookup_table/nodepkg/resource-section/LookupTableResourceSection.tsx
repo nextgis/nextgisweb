@@ -20,14 +20,14 @@ export const LookupTableResourceSection: ResourceSection = ({
     return [
       {
         key: "key",
-        title: gettext("Key"),
+        title: gettext("Value"),
         dataIndex: "key",
         width: "25%",
       },
       {
         key: "value",
         className: "value",
-        title: gettext("Value"),
+        title: gettext("Label"),
         dataIndex: "value",
         width: "75%",
       },

@@ -20,6 +20,10 @@ from nextgisweb.resource import (
 
 Base.depends_on("resource")
 
+# TODO: Rename "value" to "label" and "key" to "value" as displayed in UI! Users were confused by
+# "key" and "value" terms and it wasn't consistent with Formbuilder. At this point only UI is
+# changed, but backend still uses "key" and "value" terms.
+
 
 class SortEnum(Enum):
     KEY_ASC = "KEY_ASC"
