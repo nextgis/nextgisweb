@@ -67,20 +67,19 @@ export default function CsvImporterModal({
       width={width}
       centered={centered}
       onCancel={handleCancel}
-      footer={[
-        <Button key="cancel" onClick={() => close?.()}>
-          {cancelText}
-        </Button>,
-        <Button
-          key="submit"
-          type="primary"
-          loading={submitting}
-          disabled={!rows || rows.length === 0}
-          onClick={handleSubmit}
-        >
-          {submitText}
-        </Button>,
-      ]}
+      footer={
+        <>
+          <Button onClick={() => close?.()}>{cancelText}</Button>
+          <Button
+            type="primary"
+            loading={submitting}
+            disabled={!rows || rows.length === 0}
+            onClick={handleSubmit}
+          >
+            {submitText}
+          </Button>
+        </>
+      }
     >
       <div style={{ height: contentHeight }}>
         <CsvImporter targetColumns={targetColumns} onChange={setRows} />

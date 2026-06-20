@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 
-import { Select, Tooltip } from "@nextgisweb/gui/antd";
-import { HelpIcon } from "@nextgisweb/gui/icon";
+import { Select } from "@nextgisweb/gui/antd";
+import { Area, Lot } from "@nextgisweb/gui/mayout";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import type { TargetColumn } from "../type";
@@ -11,8 +11,7 @@ import Arrow from "@nextgisweb/icon/material/arrow_forward";
 
 import "../CsvImporter.less";
 
-const msgUnsetValue = gettext("Unset");
-const msgAutoDetected = gettext("This field can be auto-mapped by");
+const msgSelectColumn = gettext("Select column");
 
 interface CsvManualMappingProps {
   targetColumns: TargetColumn[];
@@ -36,13 +35,10 @@ export function CsvManualMapping({
   );
 
   return (
-    <div className="csv-manual-mapping">
+    <Area labelPosition="top" cols={["1fr"]}>
       {targetColumns.map((targetColumn) => {
-        const currentMatch = matches.get(targetColumn);
-
         const options = matchingOptions.get(targetColumn) ?? [];
         const csvSelectOptions = [
-          { label: msgUnsetValue, value: -1, className: "unset" },
           ...options.map((idx) => ({
             label: csvColumns[idx],
             value: idx,
@@ -50,27 +46,27 @@ export function CsvManualMapping({
         ];
 
         return (
-          <div key={targetColumn.key} className="column">
-            <div className="header">
-              <Arrow />
-              <div className="value">{targetColumn.label}</div>
-              <Tooltip
-                title={`${msgAutoDetected}: ${targetColumn.aliases.map((alias) => `"${alias}"`).join(", ")}`}
-              >
-                <HelpIcon />
-              </Tooltip>
-            </div>
+          <Lot
+            key={targetColumn.key}
+            label={
+              <>
+                <Arrow /> {targetColumn.label}
+              </>
+            }
+          >
             <Select
-              className="select"
-              value={currentMatch !== undefined ? currentMatch : -1}
-              onChange={(value) => {
-                onMatchChange(targetColumn, value === -1 ? undefined : value);
-              }}
+              style={{ width: "100%" }}
+              value={matches.get(targetColumn) ?? undefined}
               options={csvSelectOptions}
+              allowClear={true}
+              placeholder={msgSelectColumn}
+              onChange={(value) => {
+                onMatchChange(targetColumn, value ?? undefined);
+              }}
             />
-          </div>
+          </Lot>
         );
       })}
-    </div>
+    </Area>
   );
 }

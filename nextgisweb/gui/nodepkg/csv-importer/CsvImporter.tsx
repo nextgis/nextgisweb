@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { Button } from "@nextgisweb/gui/antd";
+import { Alert, Button, Spin } from "@nextgisweb/gui/antd";
 import { useThemeVariables } from "@nextgisweb/gui/hook";
-import { formatSize } from "@nextgisweb/gui/util/formatSize";
-import { gettext } from "@nextgisweb/pyramid/i18n";
+import { gettext, ngettextf } from "@nextgisweb/pyramid/i18n";
 
 import { CsvDialectForm, CsvFileSelect, CsvPreviewTable } from "./component";
 import { CsvManualMapping } from "./component/CsvManualMapping";
@@ -15,13 +14,12 @@ import { buildRows, matchColumns } from "./utils";
 import BackspaceIcon from "@nextgisweb/icon/material/backspace";
 import "./CsvImporter.less";
 
-const msgMapColumns = gettext("Field mapping");
+const msgColumnMapping = gettext("Column mapping");
 const msgPreviewCsv = gettext("Preview CSV table");
 const msgParsingOptions = gettext("Parsing options");
-const msgRowsInFile = gettext("Rows in file");
-const msgFile = gettext("File");
-const msgSize = gettext("Size");
+const msgParseError = gettext("Failed to parse CSV file");
 const msgClearFile = gettext("Clear file");
+const msgRowsInFile = (n: number) => ngettextf("{} row", "{} rows", n)(n);
 
 export interface CsvImporterProps {
   targetColumns: TargetColumn[];
@@ -31,13 +29,6 @@ export interface CsvImporterProps {
 export function CsvImporter({ targetColumns, onChange }: CsvImporterProps) {
   const [file, setFile] = useState<File | null>(null);
   const [dialect, setDialect] = useState<CsvDialect>(DEFAULT_DIALECT);
-  const themeVariables = useThemeVariables({
-    "theme-color-text": "colorText",
-    "theme-color-border-secondary": "colorBorderSecondary",
-    "theme-color-text-secondary": "colorTextSecondary",
-    "theme-color-text-tertiary": "colorTextTertiary",
-    "theme-control-item-bg-active": "controlItemBgActive",
-  });
 
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
@@ -96,70 +87,70 @@ export function CsvImporter({ targetColumns, onChange }: CsvImporterProps) {
     []
   );
 
-  if (!file) {
-    return (
-      <div
-        className="csv-importer csv-importer-file-select"
-        style={themeVariables}
-      >
-        <CsvFileSelect onChange={handleFileChange} />
-      </div>
-    );
-  }
+  const themeVariables = useThemeVariables({
+    "theme-font-size-lg": "fontSizeLG",
+    "theme-padding-sm": "paddingSM",
+    "theme-padding-xs": "paddingXS",
+    "theme-color-border": "colorBorder",
+    "theme-font-weight-strong": "fontWeightStrong",
+    "theme-color-border-secondary": "colorBorderSecondary",
+  });
 
   return (
-    <div className="csv-importer" style={themeVariables}>
-      <div className="titles">
-        <div className="mapping title">{msgMapColumns}</div>
-        <div className="preview title">{msgPreviewCsv}</div>
-      </div>
-      <div className="mapping-part">
-        <div className="mapping-widget">
-          {parsed && (
-            <CsvManualMapping
-              targetColumns={targetColumns}
-              csvColumns={parsed.csvColumns}
-              matches={matches}
-              onMatchChange={handleMatchChange}
-            />
-          )}
-        </div>
-        <div className="table-preview">
-          <CsvPreviewTable
-            parsed={parsed}
-            matches={matches}
-            isLoading={isLoading}
-            parseError={error}
-          />
-          <div className="under-table">
-            <div className="inf-part rows">
-              <div className="label">{msgRowsInFile}</div>
-              {parsed && <div className="value">{parsed.totalRows}</div>}
+    <div className="ngw-gui-csv-importer" style={themeVariables}>
+      {!file ? (
+        <CsvFileSelect onChange={handleFileChange} />
+      ) : (
+        <>
+          {error ? (
+            <div className="error">
+              <Alert
+                type="error"
+                showIcon
+                title={msgParseError}
+                description={
+                  <Button size="small" onClick={() => handleFileChange(null)}>
+                    {msgClearFile}
+                  </Button>
+                }
+              />
             </div>
-            <div className="meta">
-              <div className="inf-part size">
-                <div className="label">{msgSize}</div>
-                <div className="value">{formatSize(file.size)}</div>
-              </div>
-              <div className="inf-part file">
-                <div className="label">{msgFile}</div>
-                <div className="value">{file.name}</div>
-                <Button
-                  className="button"
-                  title={msgClearFile}
-                  type="link"
-                  icon={<BackspaceIcon />}
-                  onClick={() => handleFileChange(null)}
+          ) : isLoading || !parsed ? (
+            <div className="spin">
+              <Spin size="large" />
+            </div>
+          ) : (
+            <>
+              <div className="mapping-title">{msgColumnMapping}</div>
+              <div className="mapping-wrapper">
+                <CsvManualMapping
+                  targetColumns={targetColumns}
+                  csvColumns={parsed.csvColumns}
+                  matches={matches}
+                  onMatchChange={handleMatchChange}
                 />
               </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="dialect-part">
-        <div className="title">{msgParsingOptions}</div>
-        <CsvDialectForm value={dialect} onChange={handleDialectChange} />
-      </div>
+              <div className="preview-title">{msgPreviewCsv}</div>
+              <div className="preview-wrapper">
+                <CsvPreviewTable parsed={parsed} matches={matches} />
+                <div className="file">
+                  <div className="rows">{msgRowsInFile(parsed.totalRows)}</div>
+                  <div className="name">{file.name}</div>
+                  <Button
+                    className="clear"
+                    title={msgClearFile}
+                    type="link"
+                    icon={<BackspaceIcon />}
+                    onClick={() => handleFileChange(null)}
+                  />
+                </div>
+              </div>
+            </>
+          )}
+          <div className="options-title">{msgParsingOptions}</div>
+          <CsvDialectForm value={dialect} onChange={handleDialectChange} />
+        </>
+      )}
     </div>
   );
 }

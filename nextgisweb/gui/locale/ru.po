@@ -64,13 +64,13 @@ msgstr "Не установлен"
 msgid "Save"
 msgstr "Сохранить"
 
-#: nodepkg/component/expandable-text/ExpandableText.tsx:22
-msgid "Less"
-msgstr "Свернуть"
-
-#: nodepkg/component/expandable-text/ExpandableText.tsx:22
+#: nodepkg/component/expandable-text/ExpandableText.tsx:7
 msgid "More"
 msgstr "Ещё"
+
+#: nodepkg/component/expandable-text/ExpandableText.tsx:8
+msgid "Less"
+msgstr "Свернуть"
 
 #: nodepkg/component/extent-editor-modal/ExtentEditorModal.tsx:150
 msgid "Close"
@@ -132,33 +132,32 @@ msgstr "Уточнить перевод или добавить новый"
 msgid "Browser default"
 msgstr "По умолчанию в браузере"
 
-#: nodepkg/csv-importer/CsvImporter.tsx:18
-msgid "Field mapping"
-msgstr "Сопоставление полей"
+#: nodepkg/csv-importer/CsvImporter.tsx:17
+msgid "Column mapping"
+msgstr "Сопоставление столбцов"
 
-#: nodepkg/csv-importer/CsvImporter.tsx:19
+#: nodepkg/csv-importer/CsvImporter.tsx:18
 msgid "Preview CSV table"
 msgstr "Предпросмотр CSV таблицы"
 
-#: nodepkg/csv-importer/CsvImporter.tsx:20
+#: nodepkg/csv-importer/CsvImporter.tsx:19
 msgid "Parsing options"
 msgstr "Настройки обработки"
 
+#: nodepkg/csv-importer/CsvImporter.tsx:20
+msgid "Failed to parse CSV file"
+msgstr "Не удалось обработать CSV файл"
+
 #: nodepkg/csv-importer/CsvImporter.tsx:21
-msgid "Rows in file"
-msgstr "Строк в файле"
-
-#: nodepkg/csv-importer/CsvImporter.tsx:22
-msgid "File"
-msgstr "Файл"
-
-#: nodepkg/csv-importer/CsvImporter.tsx:23
-msgid "Size"
-msgstr "Размер"
-
-#: nodepkg/csv-importer/CsvImporter.tsx:24
 msgid "Clear file"
 msgstr "Очистить файл"
+
+#: nodepkg/csv-importer/CsvImporter.tsx:22
+msgid "{} row"
+msgid_plural "{} rows"
+msgstr[0] "{} строка"
+msgstr[1] "{} строки"
+msgstr[2] "{} строк"
 
 #: nodepkg/csv-importer/CsvImporterModal.tsx:10
 msgid "Import from CSV"
@@ -173,19 +172,19 @@ msgstr "Отмена"
 msgid "Import"
 msgstr "Импортировать"
 
-#: nodepkg/csv-importer/component/CsvDialectForm.tsx:12
+#: nodepkg/csv-importer/component/CsvDialectForm.tsx:13
 msgid "Delimiter"
 msgstr "Разделитель"
 
-#: nodepkg/csv-importer/component/CsvDialectForm.tsx:13
+#: nodepkg/csv-importer/component/CsvDialectForm.tsx:14
 msgid "Quote character"
 msgstr "Символ кавычки"
 
-#: nodepkg/csv-importer/component/CsvDialectForm.tsx:14
+#: nodepkg/csv-importer/component/CsvDialectForm.tsx:15
 msgid "Escape character"
 msgstr "Символ экранирования"
 
-#: nodepkg/csv-importer/component/CsvDialectForm.tsx:15
+#: nodepkg/csv-importer/component/CsvDialectForm.tsx:16
 msgid "Encoding"
 msgstr "Кодировка"
 
@@ -202,16 +201,8 @@ msgid "Please select a CSV file"
 msgstr "Пожалуйста, выберите CSV файл"
 
 #: nodepkg/csv-importer/component/CsvManualMapping.tsx:14
-msgid "Unset"
-msgstr "Не выбрано"
-
-#: nodepkg/csv-importer/component/CsvManualMapping.tsx:15
-msgid "This field can be auto-mapped by"
-msgstr "Автоопределение с названиями столбцов"
-
-#: nodepkg/csv-importer/component/CsvPreviewTable.tsx:17
-msgid "Failed to parse CSV file"
-msgstr "Не удалось обработать CSV файл"
+msgid "Select column"
+msgstr "Выберите столбец"
 
 #: nodepkg/csv-importer/hooks/useCsvParser.ts:57
 msgid "Column"
@@ -265,11 +256,11 @@ msgstr "Требуется ключ"
 msgid "Key not unique"
 msgstr "Ключ не уникален"
 
-#: nodepkg/edi-table/RowAction.tsx:70
+#: nodepkg/edi-table/RowAction.tsx:71
 msgid "Clone"
 msgstr "Клонировать"
 
-#: nodepkg/edi-table/RowAction.tsx:75 nodepkg/focus-table/action.tsx:27
+#: nodepkg/edi-table/RowAction.tsx:76 nodepkg/focus-table/action.tsx:27
 #: nodepkg/hook/useConfirm.tsx:54 nodepkg/model-browse/ModelBrowse.tsx:276
 #: nodepkg/model-browse/ModelBrowse.tsx:343 nodepkg/model-form/ModelForm.tsx:53
 msgid "Delete"
@@ -311,7 +302,7 @@ msgstr "Необходимо указать значение"
 msgid "The value entered is not valid"
 msgstr "Введенное значение некорректно"
 
-#: nodepkg/focus-table/FocusTable.tsx:23
+#: nodepkg/focus-table/FocusTable.tsx:24
 msgid "Hide details"
 msgstr "Скрыть детали"
 

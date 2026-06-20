@@ -30,9 +30,9 @@ export function CsvFileSelect({ onChange }: CsvFileSelectProps) {
 
   return (
     <Dragger
+      className="ngw-file-upload-file-uploader"
       accept=".csv"
       showUploadList={false}
-      className="ngw-file-upload-file-uploader csv-file-select"
       beforeUpload={handleBeforeUpload}
     >
       <p className="ant-upload-text">

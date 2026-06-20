@@ -1,4 +1,5 @@
 import { Select } from "@nextgisweb/gui/antd";
+import { Area, Lot } from "@nextgisweb/gui/mayout";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import {
@@ -21,40 +22,44 @@ export interface CsvDialectFormProps {
 
 export function CsvDialectForm({ value, onChange }: CsvDialectFormProps) {
   return (
-    <div className="csv-dialect-form">
-      <div className="labels">
-        <div className="label">{msgDelimiter}</div>
-        <div className="label">{msgQuoteChar}</div>
-        <div className="label">{msgEscapeChar}</div>
-        <div className="label">{msgEncoding}</div>
-      </div>
-      <div className="selects">
+    <Area
+      rootClassName="ngw-gui-csv-importer-options"
+      labelPosition="top"
+      cols={["1fr", "1fr", "1fr", "1fr"]}
+    >
+      <Lot label={msgDelimiter}>
         <Select
-          className="select"
+          style={{ width: "100%" }}
           value={value.delimiter}
-          onChange={(v) => onChange("delimiter", v)}
           options={DELIMITER_OPTIONS}
+          onChange={(v) => onChange("delimiter", v)}
         />
+      </Lot>
+      <Lot label={msgQuoteChar}>
         <Select
-          className="select"
+          style={{ width: "100%" }}
           value={value.quoteChar}
-          onChange={(v) => onChange("quoteChar", v)}
           options={QUOTE_OPTIONS}
+          onChange={(v) => onChange("quoteChar", v)}
         />
+      </Lot>
+      <Lot label={msgEscapeChar}>
         <Select
-          className="select"
+          style={{ width: "100%" }}
           value={value.escapeChar}
-          onChange={(v) => onChange("escapeChar", v)}
           options={ESCAPE_OPTIONS}
+          onChange={(v) => onChange("escapeChar", v)}
         />
+      </Lot>
+      <Lot label={msgEncoding}>
         <Select
-          className="select"
+          style={{ width: "100%" }}
           value={value.encoding}
-          onChange={(v) => onChange("encoding", v)}
           options={ENCODING_OPTIONS}
+          onChange={(v) => onChange("encoding", v)}
         />
-      </div>
-    </div>
+      </Lot>
+    </Area>
   );
 }
 
