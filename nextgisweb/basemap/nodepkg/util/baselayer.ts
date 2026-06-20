@@ -9,7 +9,6 @@ import type {
   WebmapPluginBaselayer,
 } from "@nextgisweb/basemap/layer-widget/type";
 import { registerEPSG3395Projection } from "@nextgisweb/basemap/util/epsg3395";
-import { assert } from "@nextgisweb/jsrealm/error";
 import { RequestQueue, tileLoadFunction } from "@nextgisweb/pyramid/util";
 import metrics from "@nextgisweb/sentry/metrics";
 import type { MapStore } from "@nextgisweb/webmap/ol/MapStore";
@@ -32,11 +31,11 @@ const countTileLoadError = debounce(
     try {
       url = new URL(src);
     } catch {
-      assert(false, `Invalid tile URL: ${src} (${typeof src})`);
+      return; // Invalid URL, just ignore it
     }
     metrics.count(COMP_ID, "tile.error", 1, {
       attributes: {
-        "tile.origin": url.origin,
+        "tile.origin": url.origin.replace(/^https?:\/\//, ""),
         "tile.path": url.pathname + url.search,
         "tile.timeout": timeout,
       },
