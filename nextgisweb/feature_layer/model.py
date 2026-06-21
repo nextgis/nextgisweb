@@ -160,8 +160,8 @@ class FeatureLayerFieldWrite(Struct, kw_only=True):
 
 
 class SrsAttr(SAttribute):
-    def get(self, srlzr: Serializer) -> SRSRef:
-        return SRSRef(id=srlzr.obj.srs.id)
+    def get(self, srlzr: Serializer) -> SRSRef | None:
+        return SRSRef(id=srlzr.obj.srs.id) if srlzr.obj.srs is not None else None
 
 
 class GeometryTypeAttr(SAttribute):

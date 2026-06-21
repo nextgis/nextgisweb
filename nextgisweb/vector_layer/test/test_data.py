@@ -5,7 +5,7 @@ import pytest
 from osgeo import ogr, osr
 
 from nextgisweb.core.exception import ValidationError
-from nextgisweb.feature_layer import FIELD_TYPE
+from nextgisweb.feature_layer import FIELD_TYPE, Feature
 from nextgisweb.feature_layer.test import FeatureLayerAPI, parametrize_versioning
 from nextgisweb.pyramid.test import WebTestApp
 from nextgisweb.resource.test import ResourceAPI
@@ -35,6 +35,19 @@ def test_from_fields(ngw_txn):
     res.persist()
 
     assert res.feature_label_field.keyname == "string"
+
+
+def test_none_geometry(ngw_txn):
+    res = VectorLayer(geometry_type="NONE", srs_id=None)
+    res.setup_from_fields([dict(keyname="value", datatype=FIELD_TYPE.INTEGER)])
+    res.persist()
+
+    fid = res.feature_create(Feature(fields={"value": 42}))
+
+    features = list(res.feature_query()())
+    assert len(features) == 1
+    assert features[0].id == fid
+    assert features[0].fields["value"] == 42
 
 
 @pytest.mark.parametrize(

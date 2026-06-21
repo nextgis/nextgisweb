@@ -60,6 +60,7 @@ from nextgisweb.resource import (
     Serializer,
     SRelationship,
 )
+from nextgisweb.spatial_ref_sys import SRS
 
 from ..feature_layer.filter import FilterParser
 from .feature_query import FeatureQueryBase, calculate_extent
@@ -98,6 +99,7 @@ GEOM_TYPE_DISPLAY = (
     gettext("Multipoint Z"),
     gettext("Multiline Z"),
     gettext("Multipolygon Z"),
+    gettext("None"),
 )
 
 
@@ -152,6 +154,8 @@ class VectorLayer(Resource, SpatialLayerMixin, LayerFieldsMixin, FVersioningMixi
 
     __scope__ = DataScope
 
+    srs_id = sa.Column(sa.Integer, sa.ForeignKey(SRS.id), nullable=True)
+
     tbl_uuid = sa.Column(sa.Unicode(32), nullable=False)
     geometry_type = sa.Column(saext.Enum(*GEOM_TYPE.enum), nullable=False)
 
@@ -161,6 +165,12 @@ class VectorLayer(Resource, SpatialLayerMixin, LayerFieldsMixin, FVersioningMixi
         if "tbl_uuid" not in kwagrs:
             kwagrs["tbl_uuid"] = uuid_hex()
         super().__init__(*args, **kwagrs)
+
+    @orm.validates("geometry_type")
+    def _clear_srs_for_none_geometry(self, key, value):
+        if value == GEOM_TYPE.NONE:
+            self.srs = None
+        return value
 
     @classmethod
     def check_parent(cls, parent):
@@ -668,6 +678,8 @@ class VectorLayer(Resource, SpatialLayerMixin, LayerFieldsMixin, FVersioningMixi
 
     def _geom_column_type(self, geometry_type=None):
         geometry_type = geometry_type if geometry_type else self.geometry_type
+        if geometry_type == GEOM_TYPE.NONE:
+            return None
         return saext.Geometry(geometry_type, self.srs.id)
 
     def _reset_seq(self):
@@ -859,7 +871,8 @@ class SourceAttr(SAttribute):
         try:
             # Apparently OGR_XLSX_HEADERS is taken into account during the GetSpatialRef call
             gdal.SetConfigOption("OGR_XLSX_HEADERS", "FORCE")
-            if ogrlayer.GetSpatialRef() is None:
+            has_no_geom = ogrlayer.GetGeomType() == ogr.wkbNone
+            if not has_no_geom and ogrlayer.GetSpatialRef() is None:
                 raise VE(message=gettext("Layer doesn't contain coordinate system information."))
         finally:
             gdal.SetConfigOption("OGR_XLSX_HEADERS", None)

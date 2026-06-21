@@ -38,11 +38,20 @@ from sqlalchemy.sql import and_ as sql_and
 from sqlalchemy.sql import cast as sql_cast
 from sqlalchemy.sql import or_ as sql_or
 from sqlalchemy.sql.elements import BindParameter
-from sqlalchemy.types import CHAR, Integer
+from sqlalchemy.types import CHAR, Integer, UserDefinedType
 
 from nextgisweb.lib import saext
 
 from .util import SCHEMA
+
+
+class _NoGeomType(UserDefinedType):
+    """Plain unconstrained geometry column for NONE geometry type layers."""
+
+    cache_ok = True
+
+    def get_col_spec(self):
+        return "geometry"
 
 
 class VLSchema(MetaData):
@@ -72,13 +81,14 @@ class VLSchema(MetaData):
     @cached_property
     def ctab(self):
         fields_columns, fields_mapping = self._columns_from_fields()
+        geom_index = [] if self.geom_column_type is None else [self._geom_index()]
         result = FieldsTable(
             self._table_name(),
             self,
             Column("id", Integer, self.cseq, key="fid", primary_key=True),
             self._geom_column(),
             *fields_columns,
-            self._geom_index(),
+            *geom_index,
         )
         result._fields = fields_mapping
         return result
@@ -521,8 +531,8 @@ class VLSchema(MetaData):
         )
 
     def _geom_column(self, **kwargs):
-        args = (self.geom_column_type,) if self.geom_column_type else ()
-        return Column("geom", *args, **kwargs)
+        col_type = self.geom_column_type if self.geom_column_type is not None else _NoGeomType()
+        return Column("geom", col_type, **kwargs)
 
     def _geom_index(self):
         return Index(
@@ -532,13 +542,11 @@ class VLSchema(MetaData):
         )
 
     def _geom_value(self, name="geom", raw=False):
-        return (
-            bindparam(name)
-            if raw
-            else func.ST_GeomFromWKB(
-                bindparam(name),
-                text(str(self.geom_column_type.srid)),
-            )
+        if raw or self.geom_column_type is None:
+            return bindparam(name)
+        return func.ST_GeomFromWKB(
+            bindparam(name),
+            text(str(self.geom_column_type.srid)),
         )
 
     def _columns_from_fields(self):

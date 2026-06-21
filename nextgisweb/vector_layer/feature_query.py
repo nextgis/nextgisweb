@@ -9,6 +9,7 @@ from nextgisweb.env import DBSession
 from nextgisweb.lib.geometry import Geometry
 
 from nextgisweb.feature_layer import (
+    GEOM_TYPE,
     Feature,
     FeatureQueryIntersectsMixin,
     FeatureSet,
@@ -208,7 +209,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                 method, value = ("like", self._like) if self._like else ("ilike", self._ilike)
                 where.append(sa.or_(*(getattr(op, method)(f"%{value}%") for op in operands)))
 
-        if self._intersects:
+        if self._intersects and self.layer.geometry_type != GEOM_TYPE.NONE:
             reproject = (
                 self._intersects.srid is not None and self._intersects.srid != self.layer.srs_id
             )
@@ -237,11 +238,14 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
         fields = table.fields
         columns = []
 
-        srs = self.layer.srs if self._srs is None else self._srs
-        if srs.id != self.layer.srs_id:
-            geomexpr = func.st_transform(geomcol, srs.id)
-        else:
+        if self.layer.geometry_type == GEOM_TYPE.NONE:
             geomexpr = geomcol
+        else:
+            srs = self.layer.srs if self._srs is None else self._srs
+            if srs.id != self.layer.srs_id:
+                geomexpr = func.st_transform(geomcol, srs.id)
+            else:
+                geomexpr = geomcol
 
         if self._clip_by_box is not None:
             clip = func.st_setsrid(
