@@ -3,6 +3,7 @@ import path from "node:path";
 
 import type { TransformOptions } from "@babel/core";
 import type { EnvironmentConfig } from "@rsbuild/core";
+import { pluginReact } from "@rsbuild/plugin-react";
 
 import config from "./config";
 import { registryReplacementPlugin, sharedIconIds } from "./prepare";
@@ -16,6 +17,7 @@ import {
   createNgwLessPlugin,
 } from "./rsbuild.common";
 
+export const isDevServer = process.argv.includes("dev");
 const require = createRequire(import.meta.url);
 
 const babelOptions = config.debug
@@ -39,7 +41,16 @@ function svgSymbolId(filename: string): string {
 }
 
 export default {
-  plugins: [createNgwLessPlugin()],
+  plugins: [
+    ...(isDevServer
+      ? [
+          pluginReact({
+            splitChunks: false,
+          }),
+        ]
+      : []),
+    createNgwLessPlugin(),
+  ],
 
   source: {
     entry: {
@@ -124,13 +135,19 @@ export default {
         extensions: [".tsx", ".ts", "..."],
       };
 
-      rspackConfig.optimization = {
-        ...rspackConfig.optimization,
-        splitChunks: {
-          chunks: "all",
-          minSize: 0,
-        },
-      };
+      rspackConfig.optimization = isDevServer
+        ? {
+            ...rspackConfig.optimization,
+            runtimeChunk: false,
+            splitChunks: false,
+          }
+        : {
+            ...rspackConfig.optimization,
+            splitChunks: {
+              chunks: "all",
+              minSize: 0,
+            },
+          };
 
       return rspackConfig;
     },

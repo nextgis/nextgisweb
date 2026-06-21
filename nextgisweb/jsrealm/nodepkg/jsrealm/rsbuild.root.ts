@@ -26,6 +26,19 @@ export default defineConfig(async (): Promise<RsbuildConfig> => {
   return {
     mode: config.debug ? "development" : "production",
     environments,
+    server: {
+      host: "0.0.0.0",
+      port: 3000,
+      strictPort: true,
+      cors: true,
+    },
+    dev: {
+      client: {
+        protocol: "ws",
+        host: "localhost",
+        port: 3000,
+      },
+    },
     plugins: [
       pluginTypeCheck({
         enable: config.debug && config.jsrealm.tscheck,

@@ -66,6 +66,7 @@ def install(
     self: UninitializedEnvCommand,
     watch: bool = opt(False),
     build: bool = opt(False),
+    start: bool = opt(False),
     *,
     env: Env,
     core: CoreComponent,
@@ -75,12 +76,14 @@ def install(
     """Setup JavaScript environment
 
     :param watch: Start `pnpm run watch` after installation
-    :param build: Start `pnpm run build` after installation"""
+    :param build: Start `pnpm run build` after installation
+    :param start: Start `pnpm run start` after installation"""
 
     from babel.messages.plurals import PLURALS
 
-    if watch and build:
-        raise RuntimeError("Flags --watch and --build are mutually exclusive.")
+    run_flags = [watch, build, start]
+    if sum(run_flags) > 1:
+        raise RuntimeError("Flags --watch, --build and --start are mutually exclusive.")
 
     # NOTE: It loads modules using Component.setup_pyramid, which may register
     # entrypoints using jsentry.
@@ -206,6 +209,7 @@ def install(
 
     package_json["scripts"] = scripts = dict()
     scripts["build"] = "rsbuild build --config {}".format(rsbuild_root)
+    scripts["start"] = "rsbuild dev --config {}".format(rsbuild_root)
     scripts["watch"] = "rsbuild build --watch --config {}".format(rsbuild_root)
 
     scripts["check:types"] = "tsc --noEmit -p tsconfig.json"
@@ -262,11 +266,12 @@ def install(
         logger.info("pnpm-lock.yaml updated, running pnpm dedupe")
         check_call(["pnpm", "dedupe", "--prefer-offline"])
 
-    if watch or build:
+    if watch or build or start:
         pnpm_path = shutil.which("pnpm")
         assert pnpm_path is not None
+        script = "start" if start else "watch" if watch else "build"
         os.execve(
             pnpm_path,
-            ["pnpm", "run", "watch" if watch else "build"],
+            ["pnpm", "run", script],
             env=os.environ,
         )

@@ -24,6 +24,7 @@
             breadcrumbs = breadcrumbs[:-1]
 
     head_title = (tr(effective_title) + " | " + system_name) if (effective_title is not None) else system_name
+    jsrealm_dev_server_url = getattr(request.env.pyramid, "jsrealm_dev_server_url", None)
 %>
 
 <html>
@@ -41,7 +42,11 @@
     />
 
     <link href="${request.route_url('pyramid.asset.favicon')}" rel="shortcut icon" type="image/x-icon" />
-    <link href="${request.static_url('stylesheet/layout.css')}" rel="stylesheet" type="text/css" />
+    %if jsrealm_dev_server_url:
+        <link href="${jsrealm_dev_server_url}layout.css" rel="stylesheet" type="text/css" />
+    %else:
+        <link href="${request.static_url('stylesheet/layout.css')}" rel="stylesheet" type="text/css" />
+    %endif
 
     <%
         custom_css_url = request.route_url('pyramid.asset.css', _query=dict(
@@ -50,7 +55,11 @@
     <link href="${custom_css_url}" rel="stylesheet" type="text/css"/>
 
     <%include file="nextgisweb:pyramid/template/client_config.mako" />
-    <script src="${request.static_url('main/ngwEntry.js')}"></script>
+    %if jsrealm_dev_server_url:
+        <script src="${jsrealm_dev_server_url}ngwEntry.js"></script>
+    %else:
+        <script src="${request.static_url('main/ngwEntry.js')}"></script>
+    %endif
     
     %if hasattr(self, 'head'):
         ${self.head()}

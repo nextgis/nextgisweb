@@ -31,6 +31,7 @@
     "@rsbuild/core": "^2.0.11",
     "@rsbuild/plugin-eslint": "^2.0.2",
     "@rsbuild/plugin-less": "^1.6.4",
+    "@rsbuild/plugin-react": "^2.0.1",
     "@rsbuild/plugin-type-check": "^1.4.0",
     "@types/babel__core": "^7.20.5",
     "@types/lodash-es": "^4.17.12",
