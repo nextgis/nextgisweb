@@ -1,6 +1,5 @@
-from collections.abc import Mapping
 from threading import Thread
-from typing import ClassVar, Type
+from typing import ClassVar
 
 import sqlalchemy as sa
 import sqlalchemy.event as sa_event
@@ -12,7 +11,7 @@ from nextgisweb.lib.datetime import utcnow_naive
 from nextgisweb.lib.humanize import format_size
 from nextgisweb.lib.i18n import TrStr
 from nextgisweb.lib.logging import logger
-from nextgisweb.lib.registry import dict_registry
+from nextgisweb.lib.registry import DictRegistry, dict_registry
 
 from .exception import UserException
 from .model import (
@@ -25,7 +24,7 @@ from .model import (
 
 @dict_registry
 class KindOfData:
-    registry: ClassVar[Mapping[str, Type["KindOfData"]]]
+    registry: ClassVar[DictRegistry[type["KindOfData"]]]
 
     identity: ClassVar[str]
     display_name: ClassVar[TrStr]

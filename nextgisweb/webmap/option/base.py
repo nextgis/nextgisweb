@@ -1,17 +1,16 @@
 import re
-from collections.abc import Mapping
-from typing import ClassVar, Self, Type
+from typing import ClassVar, Type
 
 from nextgisweb.env import gettext
 from nextgisweb.env.package import pkginfo
 from nextgisweb.lib.i18n import TrStr
 from nextgisweb.lib.imptool import module_from_stack
-from nextgisweb.lib.registry import dict_registry
+from nextgisweb.lib.registry import DictRegistry, dict_registry
 
 
 @dict_registry
 class WebMapOptionCategory:
-    registry: ClassVar[Mapping[str, Type[Self]]]
+    registry: ClassVar[DictRegistry[type["WebMapOptionCategory"]]]
 
     identity: ClassVar[str]
     label: ClassVar[TrStr]
@@ -48,7 +47,7 @@ class MiscellaneousCategory(WebMapOptionCategory):
 
 @dict_registry
 class WebMapOption:
-    registry: ClassVar[Mapping[str, Type[Self]]]
+    registry: ClassVar[DictRegistry[type["WebMapOption"]]]
 
     component: ClassVar[str]
     identity: ClassVar[str]

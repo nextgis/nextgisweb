@@ -1,11 +1,13 @@
+from collections.abc import Generator, ItemsView, Iterable, Iterator, KeysView, Mapping, ValuesView
+from typing import TYPE_CHECKING, TypeVar, overload
 from warnings import warn
 
 
-class ListRegistry:
+class ListRegistry[T](Iterable[T]):
     def __init__(self):
-        self._items = list()
+        self._items = list[T]()
 
-    def register(self, cls):
+    def register(self, cls: T) -> T:
         if cls in self._items:
             warn(f"{cls} was already registered in the registry", stacklevel=2)
             return cls
@@ -13,15 +15,15 @@ class ListRegistry:
             self._items.append(cls)
         return cls
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[T]:
         return self._items.__iter__()
 
 
-class DictRegistry:
+class DictRegistry[T](Mapping[str, T]):
     def __init__(self):
-        self._dict = dict()
+        self._dict = dict[str, T]()
 
-    def register(self, member):
+    def register(self, member: T):
         identity = getattr(member, "identity", None)
         if identity is None or not isinstance(identity, str):
             raise TypeError(f"{member!r} must have 'identity' attribute")
@@ -35,34 +37,31 @@ class DictRegistry:
 
         return member
 
-    def __iter__(self):
-        warn(
-            "Don't use the registry default iterator, use items() or keys() or values() instead",
-            stacklevel=2,
-        )
-        for i in self._dict.values():
-            yield i
+    def __iter__(self) -> Iterator[str]:
+        return self._dict.__iter__()
 
-    def items(self):
-        yield from self._dict.items()
+    def items(self) -> ItemsView[str, T]:
+        return self._dict.items()
 
-    def keys(self):
-        yield from self._dict.keys()
+    def keys(self) -> KeysView[str]:
+        return self._dict.keys()
 
-    def values(self):
-        yield from self._dict.values()
+    def values(self) -> ValuesView[T]:
+        return self._dict.values()
 
-    def __getitem__(self, identity):
+    def __getitem__(self, identity) -> T:
         return self._dict[identity]
 
-    def __contains__(self, identity):
+    def __contains__(self, identity) -> bool:
         return self._dict.__contains__(identity)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._dict)
 
-    def get(self, identity, default=None):
-        return self._dict.get(identity, default)
+    if not TYPE_CHECKING:
+
+        def get(self, identity, default=None, /):
+            return self._dict.get(identity, default)
 
 
 def _registry(cls, regcls):

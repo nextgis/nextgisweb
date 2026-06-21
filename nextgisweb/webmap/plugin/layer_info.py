@@ -7,7 +7,7 @@ class LayerInfoPlugin(WebmapLayerPlugin):
     entry = jsentry("@nextgisweb/webmap/plugin/layer-info")
 
     @classmethod
-    def is_layer_supported(cls, *, style, layer, webmap):
+    def get_payload(cls, *, style, layer, **kwargs):
         payload = dict()
 
         if v := style.description:
@@ -17,4 +17,4 @@ class LayerInfoPlugin(WebmapLayerPlugin):
         else:
             payload["description"] = None
 
-        return (cls.entry, payload)
+        return payload

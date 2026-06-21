@@ -8,6 +8,7 @@ from datetime import datetime
 from functools import lru_cache
 from packaging.version import Version
 from subprocess import check_call, check_output
+from typing import ClassVar
 
 import sqlalchemy as sa
 import transaction
@@ -16,7 +17,7 @@ from zope.sqlalchemy import mark_changed
 
 from nextgisweb.env import DBSession
 from nextgisweb.lib.logging import logger
-from nextgisweb.lib.registry import dict_registry
+from nextgisweb.lib.registry import DictRegistry, dict_registry
 
 IR_FIELDS = ("id", "identity", "payload")
 IndexRecord = namedtuple("IndexRecord", IR_FIELDS)
@@ -57,6 +58,8 @@ class IndexFile:
 
 @dict_registry
 class BackupBase:
+    registry: ClassVar[DictRegistry[type["BackupBase"]]]
+
     def __init__(self, payload):
         self.payload = payload
         self.component = None

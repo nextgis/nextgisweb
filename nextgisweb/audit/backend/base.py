@@ -1,7 +1,8 @@
 from contextlib import contextmanager
+from typing import ClassVar
 
 from nextgisweb.env import gettext, gettextf, inject
-from nextgisweb.lib.registry import dict_registry
+from nextgisweb.lib.registry import DictRegistry, dict_registry
 
 from nextgisweb.core.exception import NotConfigured
 
@@ -10,6 +11,7 @@ from ..component import AuditComponent
 
 @dict_registry
 class BackendBase:
+    registry: ClassVar[DictRegistry[type["BackendBase"]]]
     identity = None
 
     def __init__(self, comp: AuditComponent) -> None:

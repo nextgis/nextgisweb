@@ -1,14 +1,13 @@
 from __future__ import annotations
 
 import re
-from collections.abc import Mapping
 from typing import Any, ClassVar, Literal, Type, cast, get_type_hints
 from warnings import warn
 
 from msgspec import UNSET, Struct, UnsetType, defstruct
 
 from nextgisweb.lib.apitype.util import decompose_union
-from nextgisweb.lib.registry import dict_registry
+from nextgisweb.lib.registry import DictRegistry, dict_registry
 
 from nextgisweb.auth import User
 from nextgisweb.core.exception import UserException
@@ -27,7 +26,7 @@ class CRUTypes(Struct, frozen=True):
 
 @dict_registry
 class Serializer:
-    registry: ClassVar[Mapping[str, Type[Serializer]]]
+    registry: ClassVar[DictRegistry[type["Serializer"]]]
     identity: ClassVar[str]
     resclass: ClassVar[Type[model.Resource]]
     proptab: ClassVar[tuple[tuple[str, SAttribute], ...]]

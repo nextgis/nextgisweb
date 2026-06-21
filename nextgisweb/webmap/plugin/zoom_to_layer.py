@@ -8,6 +8,6 @@ class ZoomToLayerPlugin(WebmapLayerPlugin):
     entry = jsentry("@nextgisweb/webmap/plugin/zoom-to-layer")
 
     @classmethod
-    def is_layer_supported(cls, layer, webmap):
+    def get_payload(cls, *, layer, **kwargs):
         if IBboxLayer.providedBy(layer):
-            return (cls.entry, dict())
+            return dict()

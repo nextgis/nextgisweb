@@ -1,4 +1,3 @@
-from inspect import signature
 from pathlib import Path
 from shutil import which
 from subprocess import check_call
@@ -644,23 +643,20 @@ def display_config(obj, request) -> DisplayConfig:
                 else None
             )
 
-            data["adapter"] = WebMapAdapter.registry.get(item.layer_adapter, ImageAdapter).mid
+            data["adapter"] = WebMapAdapter.registry.get(item.layer_adapter, ImageAdapter).entry
             mid.adapter.add(data["adapter"])
 
-            # Layer level plugins
             plugin = dict()
-            plugin_base_kwargs = dict(layer=layer, webmap=obj)
             for pcls in WebmapLayerPlugin.registry:
-                fn = pcls.is_layer_supported
-                plugin_kwargs = (
-                    dict(plugin_base_kwargs, style=style)
-                    if "style" in signature(fn).parameters
-                    else plugin_base_kwargs
+                p_payload = pcls.get_payload(
+                    webmap=obj,
+                    layer=layer,
+                    style=style,
+                    user=request.user,
                 )
-
-                if p_mid_data := fn(**plugin_kwargs):
-                    p_mid, p_payload = p_mid_data
-                    plugin[p_mid] = p_payload
+                if p_payload is not None:
+                    assert isinstance(p_payload, dict)
+                    plugin[pcls.entry] = p_payload
 
             data.update(plugin=plugin)
             mid.plugin.update(plugin.keys())

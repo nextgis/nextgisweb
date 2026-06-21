@@ -1,9 +1,13 @@
-from .. import list_registry
+from typing import ClassVar
+
+from .. import ListRegistry, list_registry
 
 
 def test_super_init_subclass():
     @list_registry
     class Base:
+        registry: ClassVar[ListRegistry[type["Base"]]]
+
         __marker = False
 
         def __init_subclass__(cls):

@@ -1,5 +1,4 @@
 import re
-from collections.abc import Mapping
 from typing import Annotated, ClassVar, Type, TypeVar
 
 from msgspec import Struct, defstruct
@@ -9,7 +8,7 @@ from nextgisweb.env.package import pkginfo
 from nextgisweb.lib.apitype import disannotate
 from nextgisweb.lib.i18n import TrStr
 from nextgisweb.lib.imptool import module_from_stack
-from nextgisweb.lib.registry import dict_registry
+from nextgisweb.lib.registry import DictRegistry, dict_registry
 
 from nextgisweb.resource.sattribute import ResourceRef
 
@@ -49,7 +48,8 @@ class ResourceFavoriteMeta(type):
 
 @dict_registry
 class ResourceFavorite(metaclass=ResourceFavoriteMeta):
-    registry: ClassVar[Mapping[str, Type["ResourceFavorite"]]]
+    registry: ClassVar[DictRegistry[type["ResourceFavorite"]]]
+
     identity: ClassVar[str]
     component: ClassVar[str]
 

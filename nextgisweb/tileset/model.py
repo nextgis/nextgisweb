@@ -4,6 +4,7 @@ from contextlib import closing
 from functools import lru_cache
 from io import BytesIO
 from tempfile import NamedTemporaryFile
+from typing import ClassVar
 from zipfile import ZipFile, is_zipfile
 
 import sqlalchemy as sa
@@ -15,7 +16,7 @@ from zope.interface import implementer
 
 from nextgisweb.env import COMP_ID, Base, env, gettext, gettextf
 from nextgisweb.lib.osrhelper import sr_from_epsg
-from nextgisweb.lib.registry import list_registry
+from nextgisweb.lib.registry import ListRegistry, list_registry
 
 from nextgisweb.core import KindOfData
 from nextgisweb.core.exception import ValidationError
@@ -229,6 +230,8 @@ class Tileset(Resource, SpatialLayerMixin):
 
 @list_registry
 class FileFormat:
+    registry: ClassVar[ListRegistry[type["FileFormat"]]]
+
     pattern: re.Pattern
     offset_z: int = 0
 

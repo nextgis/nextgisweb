@@ -1,18 +1,20 @@
 from __future__ import annotations
 
-from typing import Type
+from typing import ClassVar, Type
 
 from pyramid.request import Request
 from zope.interface import Interface
 
 from nextgisweb.lib.i18n import Translatable
-from nextgisweb.lib.registry import list_registry
+from nextgisweb.lib.registry import ListRegistry, list_registry
 
 from .model import Resource
 
 
 @list_registry
 class ExternalAccessLink:
+    registry: ClassVar[ListRegistry[type["ExternalAccessLink"]]]
+
     title: Translatable
     help: Translatable | None = None
     docs_url: str | None = None

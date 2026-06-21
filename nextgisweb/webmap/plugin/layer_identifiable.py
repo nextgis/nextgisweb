@@ -7,5 +7,5 @@ class LayerIdentifiablePlugin(WebmapLayerPlugin):
     entry = jsentry("@nextgisweb/webmap/plugin/layer-identifiable")
 
     @classmethod
-    def is_layer_supported(cls, layer, webmap):
-        return (cls.entry, dict())
+    def get_payload(cls, **kwargs):
+        return dict()

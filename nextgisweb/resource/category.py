@@ -1,13 +1,12 @@
 from __future__ import annotations
 
 import re
-from collections.abc import Mapping
-from typing import Annotated, ClassVar, Type
+from typing import Annotated, ClassVar
 
 from nextgisweb.env import gettext
 from nextgisweb.lib.apitype import Gap
 from nextgisweb.lib.i18n import TrStr
-from nextgisweb.lib.registry import dict_registry
+from nextgisweb.lib.registry import DictRegistry, dict_registry
 
 from nextgisweb.jsrealm import TSExport
 
@@ -19,7 +18,7 @@ ResourceCategoryIdentity = Annotated[
 
 @dict_registry
 class ResourceCategory:
-    registry: ClassVar[Mapping[str, Type[ResourceCategory]]]
+    registry: ClassVar[DictRegistry[type["ResourceCategory"]]]
 
     identity: ClassVar[str]
     label: ClassVar[TrStr]
