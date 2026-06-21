@@ -1,10 +1,8 @@
-import type { Modal } from "@nextgisweb/gui/antd";
+import type { ModalProps } from "@nextgisweb/gui/antd";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
 import { FullHeightModal } from "@nextgisweb/gui/full-height-modal/FullHeightModal";
 import { useRouteGet } from "@nextgisweb/pyramid/hook";
 import { FeatureInfoSection } from "@nextgisweb/webmap/panel/identify/component/FeatureInfoSection";
-
-export type ModalProps = Parameters<typeof Modal>[0];
 
 export interface FeatureDisplayModalProps extends ModalProps {
   featureId: number;

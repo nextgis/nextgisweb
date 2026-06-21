@@ -1,14 +1,14 @@
 import { Modal } from "@nextgisweb/gui/antd";
-import type { ParamsOf } from "@nextgisweb/gui/type";
+import type { ModalProps } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { CopyForm } from "./CopyForm";
 
-export type CopyModalProps = Omit<ParamsOf<typeof Modal>, "onCancel"> & {
+export interface CopyModalProps extends Omit<ModalProps, "onCancel"> {
   versionId: number | [number, number];
   resourceId: number;
   onCancel?: () => void;
-};
+}
 
 export default function CopyModal({
   versionId,

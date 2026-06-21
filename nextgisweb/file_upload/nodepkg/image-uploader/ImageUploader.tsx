@@ -1,16 +1,12 @@
-import type { UploadFile } from "antd";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Button } from "@nextgisweb/gui/antd";
+import type { UploadFile, UploadProps } from "@nextgisweb/gui/antd";
 import { RemoveIcon } from "@nextgisweb/gui/icon";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { FileUploader } from "../file-uploader";
-import type {
-  FileUploaderProps,
-  UploadProps,
-  UploaderMeta,
-} from "../file-uploader/type";
+import type { FileUploaderProps, UploaderMeta } from "../file-uploader/type";
 
 import "./ImageUploader.less";
 

@@ -1,7 +1,5 @@
 import type { GroupReadBrief, UserReadBrief } from "@nextgisweb/auth/type/api";
-import type { Select } from "@nextgisweb/gui/antd";
-
-type SelectProps<V> = Parameters<typeof Select<V>>[0];
+import type { SelectProps } from "@nextgisweb/gui/antd";
 
 export interface PrincipalSelectProps<
   V extends number = number,

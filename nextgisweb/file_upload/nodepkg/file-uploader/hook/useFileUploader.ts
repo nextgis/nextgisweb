@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import settings from "@nextgisweb/file-upload/client-settings";
-import type { UploadFile } from "@nextgisweb/gui/antd";
+import type { UploadFile, UploadProps } from "@nextgisweb/gui/antd";
 import { errorModalUnlessAbort } from "@nextgisweb/gui/error";
 import { makeAbortError } from "@nextgisweb/gui/error/util";
 import { formatSize } from "@nextgisweb/gui/util";
@@ -11,7 +11,6 @@ import { gettextf } from "@nextgisweb/pyramid/i18n";
 import type {
   FileUploaderOptions,
   Progress,
-  UploadProps,
   UploaderMeta,
   UseFileUploaderProps,
 } from "../type";

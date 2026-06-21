@@ -1,17 +1,15 @@
 import { useEffect, useState } from "react";
 
 import { Modal } from "@nextgisweb/gui/antd";
+import type { ModalProps } from "@nextgisweb/gui/antd";
 
 import type { ModalStore } from "../show-modal/ModalStore";
 import showModal from "../showModal";
-import type { ParamsOf } from "../type";
 
 import { ErrorWidget } from "./ErrorWidget";
 import { extractError } from "./extractError";
 import type { ErrorInfo } from "./extractError";
 import { isAbortError } from "./util";
-
-type ModalProps = ParamsOf<typeof Modal>;
 
 export interface ErrorModalProps extends ModalProps {
   error: ErrorInfo;

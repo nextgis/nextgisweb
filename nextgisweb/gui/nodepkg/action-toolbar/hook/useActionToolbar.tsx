@@ -1,13 +1,10 @@
 import { useCallback } from "react";
 
 import { Button, Tooltip } from "@nextgisweb/gui/antd";
+import type { ButtonProps } from "@nextgisweb/gui/antd";
 import { SvgIcon } from "@nextgisweb/gui/svg-icon";
 
-import type {
-  ButtonProps,
-  CreateButtonActionOptions,
-  UseActionToolbarProps,
-} from "../type";
+import type { CreateButtonActionOptions, UseActionToolbarProps } from "../type";
 
 export function useActionToolbar({
   size,

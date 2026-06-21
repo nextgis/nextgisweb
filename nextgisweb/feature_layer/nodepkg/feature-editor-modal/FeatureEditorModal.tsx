@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { Button, Modal } from "@nextgisweb/gui/antd";
+import type { ModalProps } from "@nextgisweb/gui/antd";
 import { EditorModal } from "@nextgisweb/gui/editor-modal/EditorModal";
 import { assert } from "@nextgisweb/jsrealm/error";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -8,9 +9,6 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { FeatureEditorStore } from "../feature-editor/FeatureEditorStore";
 import { FeatureEditorWidget } from "../feature-editor/FeatureEditorWidget";
 import type { FeatureEditorWidgetProps } from "../feature-editor/type";
-
-export type ModalProps = Parameters<typeof Modal>[0];
-type ModalOnCancel = NonNullable<ModalProps["onCancel"]>;
 
 export interface FeatureEditorModalProps extends ModalProps {
   editorOptions?: FeatureEditorWidgetProps;
@@ -47,7 +45,8 @@ export function FeatureEditorModal({
     setOpen(false);
   };
 
-  const handleClose: ModalOnCancel = useCallback(
+  type HandleCloseType = NonNullable<ModalProps["onCancel"]>;
+  const handleClose: HandleCloseType = useCallback(
     (e) => {
       const close_ = () => {
         onCancel?.(e);
@@ -98,7 +97,9 @@ export function FeatureEditorModal({
             rightActions: [
               <Button
                 key="reset"
-                onClick={(e) => handleClose(e as Parameters<ModalOnCancel>[0])}
+                onClick={(e) =>
+                  handleClose(e as Parameters<HandleCloseType>[0])
+                }
               >
                 {msgCancel}
               </Button>,

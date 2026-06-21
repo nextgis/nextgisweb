@@ -1,7 +1,7 @@
 import { sortBy } from "lodash-es";
 import { observer } from "mobx-react-lite";
 import { useMemo, useState } from "react";
-import type { ReactNode } from "react";
+import type { ComponentProps, ReactNode } from "react";
 
 import { CheckboxValue, InputValue, Select, Space } from "@nextgisweb/gui/antd";
 import { LotMV } from "@nextgisweb/gui/arm";
@@ -80,7 +80,7 @@ const adapterOptions = sortBy(
   "value"
 );
 
-type ScaleDenomInputProps = Parameters<typeof InputScaleDenom>[0] & {
+type ScaleDenomInputProps = ComponentProps<typeof InputScaleDenom> & {
   addon?: ReactNode;
 };
 

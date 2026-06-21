@@ -1,8 +1,6 @@
-import type { CSSProperties, ReactNode } from "react";
+import type { CSSProperties, Key, ReactNode } from "react";
 
-import type { Button, SizeType } from "../antd";
-
-export type ButtonProps = Parameters<typeof Button>[0];
+import type { ButtonProps, SizeType } from "../antd";
 
 export type CreateButtonActionProps = Record<string, any>;
 export interface UseActionToolbarProps {
@@ -14,6 +12,7 @@ export interface UseActionToolbarProps {
 export interface CreateButtonActionOptions<
   P extends CreateButtonActionProps = CreateButtonActionProps,
 > extends Omit<ButtonProps, "icon" | "disabled"> {
+  key?: Key;
   icon?: ReactNode;
   action?: (val?: P) => void;
   disabled?: ((val?: P) => boolean) | boolean;

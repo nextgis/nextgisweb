@@ -3,8 +3,8 @@ import { useCallback, useEffect, useState } from "react";
 
 import { useShowModal } from "@nextgisweb/gui";
 import { Button, Space, Table } from "@nextgisweb/gui/antd";
+import type { TableProps } from "@nextgisweb/gui/antd";
 import { RemoveIcon } from "@nextgisweb/gui/icon";
-import type { ParamsOf } from "@nextgisweb/gui/type";
 import { route } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 import { resourceAttrItems } from "@nextgisweb/resource/api/resource-attr";
@@ -18,9 +18,8 @@ import type { ResourceSelectProps } from "./type";
 
 import ManageSearchIcon from "@nextgisweb/icon/material/manage_search";
 
-type TableProps = ParamsOf<typeof Table<ResourcePickerAttr>>;
-type ColumnParams = NonNullable<TableProps["columns"]>;
-type RowSelection = NonNullable<TableProps["rowSelection"]>;
+type ColumnParams = NonNullable<TableProps<ResourcePickerAttr>["columns"]>;
+type RowSelection = NonNullable<TableProps<ResourcePickerAttr>["rowSelection"]>;
 
 const ResourceSelectMultiple = ({
   value: initResourceIds = [],

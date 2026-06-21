@@ -1,15 +1,12 @@
 import { Suspense, useEffect } from "react";
 import type { ReactElement } from "react";
 
-import type { Modal } from "@nextgisweb/gui/antd";
-import type { ParamsOf } from "@nextgisweb/gui/type";
+import type { ModalProps } from "@nextgisweb/gui/antd";
 import { layoutStore } from "@nextgisweb/pyramid/layout";
 
 import type { ModalStore } from "./ModalStore";
 
-type ModalParams = ParamsOf<typeof Modal>;
-
-export interface ShowModalOptions extends ModalParams {
+export interface ShowModalOptions extends ModalProps {
   id?: string | number;
   open?: boolean;
   modalStore?: ModalStore;

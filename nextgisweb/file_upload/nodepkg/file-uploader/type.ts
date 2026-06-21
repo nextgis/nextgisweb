@@ -1,8 +1,6 @@
 import type { CSSProperties } from "react";
 
-import type { Upload } from "@nextgisweb/gui/antd";
-
-export type UploadProps = Parameters<typeof Upload>[0];
+import type { UploadProps } from "@nextgisweb/gui/antd";
 
 export interface FileMeta {
   name: string;

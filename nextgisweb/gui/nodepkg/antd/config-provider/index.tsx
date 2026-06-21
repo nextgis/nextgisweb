@@ -1,11 +1,8 @@
 import Base from "antd/es/config-provider";
 import color from "color";
+import type { ComponentProps } from "react";
 
 import { antd } from "@nextgisweb/jsrealm/i18n/lang";
-
-import type { ParamsOf } from "../../type";
-
-type Props = ParamsOf<typeof Base>;
 
 const computed = window.getComputedStyle(document.body);
 
@@ -20,7 +17,7 @@ const cvar = (name: string): string => {
   }
 };
 
-type Theme = NonNullable<Props["theme"]>;
+type Theme = NonNullable<ComponentProps<typeof Base>["theme"]>;
 
 const token: Theme["token"] = {
   borderRadius: 4,
@@ -39,7 +36,7 @@ const components: Theme["components"] = {
   Modal: { titleFontSize: 20 },
 };
 
-const defaults: Props = {
+const defaults: ComponentProps<typeof Base> = {
   locale: antd,
   theme: { token, components },
   wave: { disabled: true },
@@ -55,6 +52,6 @@ const defaults: Props = {
   },
 };
 
-export default function ConfigProvider(props: Props) {
+export default function ConfigProvider(props: ComponentProps<typeof Base>) {
   return <Base {...defaults} {...props} />;
 }

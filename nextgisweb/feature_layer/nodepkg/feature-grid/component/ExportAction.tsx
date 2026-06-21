@@ -1,8 +1,7 @@
 import settings from "@nextgisweb/feature-layer/client-settings";
 import { Button, Dropdown, Space, Tooltip } from "@nextgisweb/gui/antd";
-import type { SizeType } from "@nextgisweb/gui/antd";
+import type { DropdownProps, SizeType } from "@nextgisweb/gui/antd";
 import { ExportIcon } from "@nextgisweb/gui/icon";
-import type { ParamsOf } from "@nextgisweb/gui/type";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { useExportFeatureLayer } from "../../hook/useExportFeatureLayer";
@@ -10,8 +9,6 @@ import type { ExportFeatureLayerOptions } from "../../hook/useExportFeatureLayer
 import type { QueryParams } from "../hook/useFeatureTable";
 
 import FilterIcon from "@nextgisweb/icon/material/filter_alt";
-
-type MenuItems = ParamsOf<typeof Dropdown>["menu"];
 
 interface ExportActionProps {
   id: number;
@@ -46,7 +43,7 @@ export const ExportAction = ({
 
   const isFilterSet = !!queryParams && Object.values(queryParams).some(Boolean);
 
-  const menuProps: MenuItems = {
+  const menuProps: DropdownProps["menu"] = {
     items: [
       {
         key: settingsKey,

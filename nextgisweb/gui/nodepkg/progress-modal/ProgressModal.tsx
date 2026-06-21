@@ -1,5 +1,5 @@
 import { Button, Col, Modal, Progress, Row } from "@nextgisweb/gui/antd";
-import type { ParamsOf } from "@nextgisweb/gui/type";
+import type { ModalProps, ProgressProps } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import type { ShowModalOptions } from "../show-modal/showModalBase";
@@ -7,21 +7,21 @@ import type { ShowModalOptions } from "../show-modal/showModalBase";
 const msgInProgress = gettext("Operation in progress");
 const msgCancel = gettext("Cancel");
 
-type ProgressModal = ParamsOf<typeof Progress>;
-export type ModalProps = Parameters<typeof Modal>[0];
-type ModalOnCancel = NonNullable<ModalProps["onCancel"]>;
-
-type ModalParamsForProgress = Pick<
-  ShowModalOptions,
-  "open" | "closable" | "close" | "afterClose" | "title" | "okText" | "onCancel"
->;
-
-type ProgressProps = Omit<ParamsOf<typeof Progress>, keyof ShowModalOptions>;
-
-export type ProgressModalProps = ModalParamsForProgress &
-  ProgressProps & {
-    cancelText?: string;
-  };
+export interface ProgressModalProps
+  extends
+    Pick<
+      ShowModalOptions,
+      | "open"
+      | "closable"
+      | "close"
+      | "afterClose"
+      | "title"
+      | "okText"
+      | "onCancel"
+    >,
+    Omit<ProgressProps, keyof ShowModalOptions> {
+  cancelText?: string;
+}
 
 export const ProgressModal = ({
   status = "active",
@@ -51,7 +51,11 @@ export const ProgressModal = ({
       <Row justify="space-between">
         <Col></Col>
         <Col>
-          <Button onClick={(e) => onCancel(e as Parameters<ModalOnCancel>[0])}>
+          <Button
+            onClick={(e) =>
+              onCancel(e as Parameters<NonNullable<ModalProps["onCancel"]>>[0])
+            }
+          >
             {cancelText}
           </Button>
         </Col>

@@ -1,16 +1,13 @@
 import { DatePicker } from "antd";
-
-import type { ParamsOf } from "@nextgisweb/gui/type";
+import type { ComponentProps } from "react";
 
 import { disableNonPositiveYears } from "../date";
-
-type RangePickerPropsWithRef = ParamsOf<typeof DatePicker.RangePicker>;
 
 export default function RangePicker({
   ref,
   disabledDate = disableNonPositiveYears,
   ...restProps
-}: RangePickerPropsWithRef) {
+}: ComponentProps<typeof DatePicker.RangePicker>) {
   return (
     <DatePicker.RangePicker
       ref={ref}

@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import type { ChangeEvent } from "react";
+import type { ChangeEvent, ComponentProps } from "react";
 
 import { Input, Select, Space } from "@nextgisweb/gui/antd";
 import { gettext, gettextf } from "@nextgisweb/pyramid/i18n";
@@ -24,7 +24,7 @@ const modes = [
 ];
 
 type Mode = "keep" | "assign" | "turn_off";
-type PasswordInputProps = Parameters<typeof Input.Password>[0];
+type PasswordInputProps = ComponentProps<typeof Input.Password>;
 
 type InputProps = Omit<PasswordInputProps, "value" | "onChange"> & {
   value?: boolean | string;

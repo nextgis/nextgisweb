@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { Input, Space, message } from "@nextgisweb/gui/antd";
+import type { InputProps } from "@nextgisweb/gui/antd";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
 import { route } from "@nextgisweb/pyramid/api";
@@ -8,17 +9,13 @@ import type { KeysWithMethods } from "@nextgisweb/pyramid/api/type";
 import { useRouteGet } from "@nextgisweb/pyramid/hook/useRouteGet";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
-import type { ParamsOf } from "../type";
-
-type InputParams = ParamsOf<typeof Input>;
-
 interface SingleSettingFormParams {
   model: KeysWithMethods<["get", "put"]>;
   component: string;
   settingName: string;
   saveSuccessText?: string;
   saveSuccessReloadText?: string;
-  inputProps?: InputParams;
+  inputProps?: InputProps;
 }
 
 const msgSaved = gettext("The setting is saved.");
