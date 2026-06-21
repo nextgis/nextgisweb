@@ -82,7 +82,7 @@ export function UserWidget({ id, readonly }: UserWidgetProps) {
         included: oauth.enabled && !isNewUser,
       },
       {
-        name: "alink_token",
+        name: "alink",
         label: gettext("Authorization link"),
         formItem: <UserWidgetAlinkToken />,
         included: settings.alink,
@@ -136,7 +136,7 @@ export function UserWidget({ id, readonly }: UserWidgetProps) {
     [isNewUser]
   );
   if (isLoading) {
-    return <LoadingWrapper></LoadingWrapper>;
+    return <LoadingWrapper />;
   }
 
   const model: Model = {
@@ -155,7 +155,7 @@ export function UserWidget({ id, readonly }: UserWidgetProps) {
         model={model}
         id={id}
         messages={messages}
-      ></ModelForm>
+      />
     </div>
   );
 }

@@ -1,76 +1,89 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
-import { Input, Select, Space } from "@nextgisweb/gui/antd";
+import { Flex, Input, Select } from "@nextgisweb/gui/antd";
 import type { InputProps } from "@nextgisweb/gui/antd";
+import { assert } from "@nextgisweb/jsrealm/error";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 const modes = [
   {
+    key: "keep" as const,
+    model: undefined,
     label: gettext("Keep existing"),
-    value: "keep",
   },
   {
+    key: "assign" as const,
+    model: true,
     label: gettext("Assign new"),
-    value: "assign",
   },
   {
+    key: "turn_off" as const,
+    model: false,
     label: gettext("Turn off"),
-    value: "turn_off",
   },
 ];
 
-let alink_token = "";
+type ModeKey = (typeof modes)[number]["key"];
 
-type AlinkInputProps = Omit<InputProps, "value" | "onChange"> & {
+type UserWidgetAlinkTokenProps = Omit<InputProps, "value" | "onChange"> & {
   value?: boolean | string | null;
-  onChange?: (val: string | boolean | null) => void;
+  onChange?: (val: boolean | undefined) => void;
 };
 
-export const UserWidgetAlinkToken = ({ value, onChange }: AlinkInputProps) => {
-  if (typeof value === "string") {
-    alink_token = value;
-  }
-  const [mode, setMode] = useState(value === null ? "turn_off" : "keep");
+export function UserWidgetAlinkToken({
+  value,
+  onChange,
+}: UserWidgetAlinkTokenProps) {
+  const [state, setState] = useState<[ModeKey, string | null]>(() => {
+    if (!value) return ["turn_off", null];
+    if (typeof value === "string") return ["keep", value];
+    assert(false, "Falsy or string value expected for alink token");
+  });
 
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
+
+  const token = state[1];
   useEffect(() => {
-    if (onChange) {
-      if (mode === "assign") {
-        onChange(true);
-      } else if (mode === "keep") {
-        onChange(null);
-      } else if (mode === "turn_off") {
-        onChange(false);
-      }
-    }
-  }, [mode, onChange]);
+    if (token) onChangeRef.current?.(undefined);
+  }, [token]);
 
   const availableModes = useMemo(() => {
-    return modes.filter((m) => value !== null || m.value !== "keep");
-  }, [value]);
+    return modes
+      .filter((m) => m.key !== "keep" || state[1])
+      .map((m) => ({ value: m.key, label: m.label }));
+  }, [state]);
 
   return (
-    <Space.Compact style={{ display: "flex", width: "100%" }}>
-      <Select onChange={setMode} popupMatchSelectWidth={false} value={mode}>
-        {availableModes.map((m) => (
-          <Select.Option key={m.value} value={m.value}>
-            {m.label}
-          </Select.Option>
-        ))}
-      </Select>
-      {mode === "keep" && (
+    <Flex gap="medium" align="center">
+      <Select
+        style={
+          state[0] !== "turn_off"
+            ? { flexGrow: "0", flexShrink: "0", width: "15em" }
+            : undefined
+        }
+        popupMatchSelectWidth={false}
+        value={state[0]}
+        options={availableModes}
+        onChange={(value) => {
+          setState([value, state[1]]);
+          const model = modes.find((m) => m.key === value)?.model;
+          assert(model !== undefined);
+          onChangeRef.current?.(model);
+        }}
+      />
+      {state[0] === "keep" && (
         <Input
           style={{ flexGrow: "1" }}
-          value={ngwConfig.applicationUrl + "/alink/" + alink_token}
-          disabled={true}
-        ></Input>
+          value={ngwConfig.applicationUrl + "/alink/" + state[1]}
+          readOnly={true}
+        />
       )}
-      {mode === "assign" && (
-        <Input
-          style={{ flexGrow: "1" }}
-          value={gettext("The generated link will be available after saving.")}
-          disabled={true}
-        ></Input>
+      {state[0] === "assign" && (
+        <span style={{ flexGrow: "1" }}>
+          {gettext("The generated link will be available after saving.")}
+        </span>
       )}
-    </Space.Compact>
+    </Flex>
   );
-};
+}
