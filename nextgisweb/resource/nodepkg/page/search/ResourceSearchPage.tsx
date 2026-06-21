@@ -9,80 +9,79 @@ import { PageTitle } from "@nextgisweb/pyramid/layout";
 import { FilterBar } from "./FilterBar";
 import { KeynameFilter } from "./KeynameFilter";
 import { MetadataFilter } from "./MetadataFilter";
-import "./ResourceSearchPage.less";
 import { ResourceSearchStore } from "./ResourceSearchStore";
 import { ResultsTable } from "./ResultsTable";
 
 import SettingsIcon from "@nextgisweb/icon/material/tune";
+
+import "./ResourceSearchPage.less";
 
 const msgSearch = gettext("Search");
 const msgPlaceholder = gettext("Filter by display name");
 const msgToggleSettings = gettext("Advanced filters");
 const msgFound = gettext("Found");
 
-const ResourceSearchPageBody = observer(function ResourceSearchPageBody({
-  store,
-}: {
-  store: ResourceSearchStore;
-}) {
-  const submit = () => {
-    if (store.hasMetaErrors()) return;
-    void store.applyFilters();
-  };
+const ResourceSearchPageBody = observer<{ store: ResourceSearchStore }>(
+  ({ store }) => {
+    const submit = () => {
+      if (store.hasMetaErrors()) return;
+      void store.applyFilters();
+    };
 
-  return (
-    <>
-      <PageTitle pullRight>
-        {store.totalCount > 0 && (
-          <span style={{ marginRight: 8, color: "var(--text-secondary)" }}>
-            {msgFound}:{" "}
-            <Badge
-              style={{ backgroundColor: "#076dbf" }}
-              count={store.totalCount}
-              overflowCount={99999}
+    return (
+      <>
+        <PageTitle pullRight>
+          {store.totalCount > 0 && (
+            <span style={{ marginRight: 8, color: "var(--text-secondary)" }}>
+              {msgFound}:{" "}
+              <Badge
+                style={{ backgroundColor: "#076dbf" }}
+                count={store.totalCount}
+                overflowCount={99999}
+              />
+            </span>
+          )}
+        </PageTitle>
+        <div className="ngw-resource-search-page">
+          <FilterBar store={store} />
+
+          {store.settingsVisible && (
+            <div className="settings">
+              <MetadataFilter store={store} />
+              <KeynameFilter store={store} />
+            </div>
+          )}
+
+          <div className="search-row">
+            <Input
+              value={store.q}
+              onChange={(e) => store.setSearchText(e.target.value)}
+              onPressEnter={submit}
+              placeholder={msgPlaceholder}
+              allowClear
             />
-          </span>
-        )}
-      </PageTitle>
-      <div className="ngw-resource-search-page">
-        <FilterBar store={store} />
-
-        {store.settingsVisible && (
-          <div className="settings">
-            <MetadataFilter store={store} />
-            <KeynameFilter store={store} />
+            <Button type="primary" icon={<SearchIcon />} onClick={submit}>
+              {msgSearch}
+            </Button>
+            <Tooltip title={msgToggleSettings}>
+              <Button
+                type={store.settingsVisible ? "primary" : "default"}
+                icon={<SettingsIcon />}
+                onClick={store.toggleSettings}
+              />
+            </Tooltip>
           </div>
-        )}
 
-        <div className="search-row">
-          <Input
-            value={store.q}
-            onChange={(e) => store.setSearchText(e.target.value)}
-            onPressEnter={submit}
-            placeholder={msgPlaceholder}
-            allowClear
-          />
-          <Button type="primary" icon={<SearchIcon />} onClick={submit}>
-            {msgSearch}
-          </Button>
-          <Tooltip title={msgToggleSettings}>
-            <Button
-              type={store.settingsVisible ? "primary" : "default"}
-              icon={<SettingsIcon />}
-              onClick={store.toggleSettings}
-            />
-          </Tooltip>
+          {store.error && (
+            <Alert type="error" title={store.error} showIcon closable />
+          )}
+
+          <ResultsTable store={store} />
         </div>
-
-        {store.error && (
-          <Alert type="error" title={store.error} showIcon closable />
-        )}
-
-        <ResultsTable store={store} />
-      </div>
-    </>
-  );
-});
+      </>
+    );
+  }
+);
 
 ResourceSearchPageBody.displayName = "ResourceSearchPageBody";
 

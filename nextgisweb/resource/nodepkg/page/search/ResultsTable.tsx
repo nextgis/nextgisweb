@@ -66,185 +66,186 @@ const sortToOrder = (
   return direction === "descend" ? `-${field}` : field;
 };
 
-export const ResultsTable = observer(function ResultsTable({
-  store,
-}: {
-  store: ResourceSearchStore;
-}) {
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const [containerHeight, setContainerHeight] = useState(MIN_RESULTS_HEIGHT);
-  const [scrollY, setScrollY] = useState(MIN_SCROLL_Y);
+export const ResultsTable = observer<{ store: ResourceSearchStore }>(
+  ({ store }) => {
+    const containerRef = useRef<HTMLDivElement | null>(null);
+    const [containerHeight, setContainerHeight] = useState(MIN_RESULTS_HEIGHT);
+    const [scrollY, setScrollY] = useState(MIN_SCROLL_Y);
 
-  useLayoutEffect(() => {
-    const updateHeight = () => {
-      const nextContainerHeight = getContainerHeight(containerRef.current);
-      const nextScrollY = Math.max(
-        nextContainerHeight - TABLE_HEADER_HEIGHT,
-        MIN_SCROLL_Y
-      );
-
-      setContainerHeight((prev) =>
-        prev === nextContainerHeight ? prev : nextContainerHeight
-      );
-      setScrollY((prev) => (prev === nextScrollY ? prev : nextScrollY));
-    };
-
-    updateHeight();
-
-    const observer = new ResizeObserver(updateHeight);
-    const parentElement = containerRef.current?.parentElement;
-    if (parentElement) {
-      observer.observe(parentElement);
-    }
-
-    window.addEventListener("resize", updateHeight);
-
-    return () => {
-      observer.disconnect();
-      window.removeEventListener("resize", updateHeight);
-    };
-  }, [store.settingsVisible, store.metaFilters.length, store.error]);
-
-  const dataSource = useMemo<Row[]>(() => {
-    return store.results.map((item) => {
-      const r = item.resource!;
-      const ownerId = r.owner_user?.id;
-      const ownerName =
-        ownerId !== undefined && ownerId !== null
-          ? (store.usersById.get(ownerId)?.display_name ?? `#${ownerId}`)
-          : "";
-
-      return {
-        key: r.id,
-        id: r.id,
-        display_name: r.display_name,
-        cls: r.cls,
-        owner: ownerName,
-        creationDate: r.creation_date ?? null,
-        source: item,
-      };
-    });
-  }, [store.results, store.usersById]);
-
-  const sort = orderToSort(store.order);
-  const sortedInfo: { columnKey: string; order: "ascend" | "descend" } | null =
-    sort ? { columnKey: sort.field, order: sort.direction } : null;
-
-  const columns: TableProps<Row>["columns"] = [
-    {
-      title: msgName,
-      key: "name",
-      dataIndex: "display_name",
-      sorter: true,
-      sortOrder: sortedInfo?.columnKey === "name" ? sortedInfo.order : null,
-      render: (_, row) => {
-        const url = routeURL("resource.show", { id: row.id });
-        const crumbs = store.breadcrumbs[row.id] ?? [];
-        const path = crumbs.slice(0, -1);
-
-        return (
-          <div className="ngw-resource-search-name-cell">
-            <a href={url} className="title">
-              <ResourceIcon
-                identity={row.cls}
-                style={{ width: 16, height: 16, verticalAlign: "middle" }}
-              />{" "}
-              {row.display_name}
-            </a>
-            {path.length > 0 && (
-              <div className="path">
-                {path.map((p, i) => (
-                  <span key={p.id}>
-                    {i > 0 && " / "}
-                    <a href={routeURL("resource.show", { id: p.id })}>
-                      {p.display_name}
-                    </a>
-                  </span>
-                ))}
-              </div>
-            )}
-          </div>
+    useLayoutEffect(() => {
+      const updateHeight = () => {
+        const nextContainerHeight = getContainerHeight(containerRef.current);
+        const nextScrollY = Math.max(
+          nextContainerHeight - TABLE_HEADER_HEIGHT,
+          MIN_SCROLL_Y
         );
-      },
-    },
-    {
-      title: msgType,
-      key: "type",
-      dataIndex: "cls",
-      sorter: true,
-      sortOrder: sortedInfo?.columnKey === "type" ? sortedInfo.order : null,
-      render: (cls: ResourceCls) => resources[cls]?.label ?? cls,
-    },
-    {
-      title: msgOwner,
-      key: "owner",
-      dataIndex: "owner",
-      sorter: true,
-      sortOrder: sortedInfo?.columnKey === "owner" ? sortedInfo.order : null,
-    },
-    {
-      title: msgCreated,
-      key: "created",
-      dataIndex: "creationDate",
-      sorter: true,
-      sortOrder: sortedInfo?.columnKey === "created" ? sortedInfo.order : null,
-      render: (v: string | null) => (v ? utc(v).local().format("L LTS") : ""),
-    },
-  ];
 
-  const onChange: TableProps<Row>["onChange"] = (
-    _pagination,
-    _filters,
-    sorter
-  ) => {
-    const single = Array.isArray(sorter) ? sorter[0] : sorter;
-    const order = sortToOrder(single?.columnKey as string, single?.order);
-    store.onTableSortChange(order);
-  };
+        setContainerHeight((prev) =>
+          prev === nextContainerHeight ? prev : nextContainerHeight
+        );
+        setScrollY((prev) => (prev === nextScrollY ? prev : nextScrollY));
+      };
 
-  const onScroll: TableProps<Row>["onScroll"] = (event) => {
-    const target = event.currentTarget;
-    const remaining =
-      target.scrollHeight - target.scrollTop - target.clientHeight;
-    if (remaining < 200) {
-      void store.loadMore();
-    }
-  };
+      updateHeight();
 
-  return (
-    <div
-      ref={containerRef}
-      className="ngw-resource-search-results-table"
-      style={{ height: containerHeight }}
-    >
-      <Table<Row>
-        dataSource={dataSource}
-        rowKey="id"
-        columns={columns}
-        loading={store.loading}
-        virtual
-        onChange={onChange}
-        onScroll={onScroll}
-        pagination={false}
-        showSorterTooltip={false}
-        scroll={{
-          y: scrollY,
-          scrollToFirstRowOnChange: true,
-        }}
-        summary={() =>
-          store.loadingMore ? (
-            <Table.Summary.Row>
-              <Table.Summary.Cell index={0} colSpan={columns.length}>
-                <div className="ngw-resource-search-results-loading-more">
-                  <Spin size="small" /> {msgLoadingMore}
+      const observer = new ResizeObserver(updateHeight);
+      const parentElement = containerRef.current?.parentElement;
+      if (parentElement) {
+        observer.observe(parentElement);
+      }
+
+      window.addEventListener("resize", updateHeight);
+
+      return () => {
+        observer.disconnect();
+        window.removeEventListener("resize", updateHeight);
+      };
+    }, [store.settingsVisible, store.metaFilters.length, store.error]);
+
+    const dataSource = useMemo<Row[]>(() => {
+      return store.results.map((item) => {
+        const r = item.resource!;
+        const ownerId = r.owner_user?.id;
+        const ownerName =
+          ownerId !== undefined && ownerId !== null
+            ? (store.usersById.get(ownerId)?.display_name ?? `#${ownerId}`)
+            : "";
+
+        return {
+          key: r.id,
+          id: r.id,
+          display_name: r.display_name,
+          cls: r.cls,
+          owner: ownerName,
+          creationDate: r.creation_date ?? null,
+          source: item,
+        };
+      });
+    }, [store.results, store.usersById]);
+
+    const sort = orderToSort(store.order);
+    const sortedInfo: {
+      columnKey: string;
+      order: "ascend" | "descend";
+    } | null = sort ? { columnKey: sort.field, order: sort.direction } : null;
+
+    const columns: TableProps<Row>["columns"] = [
+      {
+        title: msgName,
+        key: "name",
+        dataIndex: "display_name",
+        sorter: true,
+        sortOrder: sortedInfo?.columnKey === "name" ? sortedInfo.order : null,
+        render: (_, row) => {
+          const url = routeURL("resource.show", { id: row.id });
+          const crumbs = store.breadcrumbs[row.id] ?? [];
+          const path = crumbs.slice(0, -1);
+
+          return (
+            <div className="ngw-resource-search-name-cell">
+              <a href={url} className="title">
+                <ResourceIcon
+                  identity={row.cls}
+                  style={{ width: 16, height: 16, verticalAlign: "middle" }}
+                />{" "}
+                {row.display_name}
+              </a>
+              {path.length > 0 && (
+                <div className="path">
+                  {path.map((p, i) => (
+                    <span key={p.id}>
+                      {i > 0 && " / "}
+                      <a href={routeURL("resource.show", { id: p.id })}>
+                        {p.display_name}
+                      </a>
+                    </span>
+                  ))}
                 </div>
-              </Table.Summary.Cell>
-            </Table.Summary.Row>
-          ) : null
-        }
-      />
-    </div>
-  );
-});
+              )}
+            </div>
+          );
+        },
+      },
+      {
+        title: msgType,
+        key: "type",
+        dataIndex: "cls",
+        sorter: true,
+        sortOrder: sortedInfo?.columnKey === "type" ? sortedInfo.order : null,
+        render: (cls: ResourceCls) => resources[cls]?.label ?? cls,
+      },
+      {
+        title: msgOwner,
+        key: "owner",
+        dataIndex: "owner",
+        sorter: true,
+        sortOrder: sortedInfo?.columnKey === "owner" ? sortedInfo.order : null,
+      },
+      {
+        title: msgCreated,
+        key: "created",
+        dataIndex: "creationDate",
+        sorter: true,
+        sortOrder:
+          sortedInfo?.columnKey === "created" ? sortedInfo.order : null,
+        render: (v: string | null) => (v ? utc(v).local().format("L LTS") : ""),
+      },
+    ];
+
+    const onChange: TableProps<Row>["onChange"] = (
+      _pagination,
+      _filters,
+      sorter
+    ) => {
+      const single = Array.isArray(sorter) ? sorter[0] : sorter;
+      const order = sortToOrder(single?.columnKey as string, single?.order);
+      store.onTableSortChange(order);
+    };
+
+    const onScroll: TableProps<Row>["onScroll"] = (event) => {
+      const target = event.currentTarget;
+      const remaining =
+        target.scrollHeight - target.scrollTop - target.clientHeight;
+      if (remaining < 200) {
+        void store.loadMore();
+      }
+    };
+
+    return (
+      <div
+        ref={containerRef}
+        className="ngw-resource-search-results-table"
+        style={{ height: containerHeight }}
+      >
+        <Table<Row>
+          dataSource={dataSource}
+          rowKey="id"
+          columns={columns}
+          loading={store.loading}
+          virtual
+          onChange={onChange}
+          onScroll={onScroll}
+          pagination={false}
+          showSorterTooltip={false}
+          scroll={{
+            y: scrollY,
+            scrollToFirstRowOnChange: true,
+          }}
+          summary={() =>
+            store.loadingMore ? (
+              <Table.Summary.Row>
+                <Table.Summary.Cell index={0} colSpan={columns.length}>
+                  <div className="ngw-resource-search-results-loading-more">
+                    <Spin size="small" /> {msgLoadingMore}
+                  </div>
+                </Table.Summary.Cell>
+              </Table.Summary.Row>
+            ) : null
+          }
+        />
+      </div>
+    );
+  }
+);
 
 ResultsTable.displayName = "ResultsTable";

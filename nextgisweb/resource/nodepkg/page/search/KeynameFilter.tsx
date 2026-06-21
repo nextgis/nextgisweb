@@ -8,24 +8,22 @@ import type { ResourceSearchStore } from "./ResourceSearchStore";
 const msgTitle = gettext("Keynames");
 const msgPlaceholder = gettext("Enter one or more keynames");
 
-export const KeynameFilter = observer(function KeynameFilter({
-  store,
-}: {
-  store: ResourceSearchStore;
-}) {
-  return (
-    <div className="ngw-resource-search-keyname-filter">
-      <div style={{ fontWeight: 500, marginBottom: 6 }}>{msgTitle}</div>
-      <Select
-        mode="tags"
-        style={{ width: "100%" }}
-        placeholder={msgPlaceholder}
-        value={store.keynameIn}
-        onChange={(values) => store.setKeynames(values as string[])}
-        tokenSeparators={[",", " "]}
-      />
-    </div>
-  );
-});
+export const KeynameFilter = observer<{ store: ResourceSearchStore }>(
+  ({ store }) => {
+    return (
+      <div className="ngw-resource-search-keyname-filter">
+        <div style={{ fontWeight: 500, marginBottom: 6 }}>{msgTitle}</div>
+        <Select
+          mode="tags"
+          style={{ width: "100%" }}
+          placeholder={msgPlaceholder}
+          value={store.keynameIn}
+          onChange={(values) => store.setKeynames(values as string[])}
+          tokenSeparators={[",", " "]}
+        />
+      </div>
+    );
+  }
+);
 
 KeynameFilter.displayName = "KeynameFilter";

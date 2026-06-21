@@ -13,6 +13,8 @@ import SettingsIcon from "@nextgisweb/icon/material/tune";
 
 import "./ResourcesFilter.less";
 
+const MIN_SEARCH_LENGTH = 3;
+
 type AutoProps = ParamsOf<typeof AutoComplete>;
 
 export type ResourcesFilterPropsOnChange = AutoProps["onSelect"];
@@ -65,7 +67,7 @@ export function ResourcesFilter({
   const [acStatus, setAcSatus] = useState<AutoProps["status"]>("");
 
   const makeQuery = useMemo(() => {
-    if (search && search.length > 2) {
+    if (search && search.length >= MIN_SEARCH_LENGTH) {
       const q = "";
       if (search) {
         const query: Record<string, string> = {
@@ -129,14 +131,18 @@ export function ResourcesFilter({
         classNames={{
           popup: { root: "ngw-resource-resource-filter-dropdown" },
         }}
-        popupMatchSelectWidth={290}
         style={{ width: "100%" }}
-        onSelect={onSelect}
+        popupMatchSelectWidth={290}
+        value={search}
         options={options}
         status={acStatus}
-        notFoundContent={gettext("Resources not found")}
-        value={search}
+        notFoundContent={
+          search.length >= MIN_SEARCH_LENGTH
+            ? gettext("Resources not found")
+            : undefined
+        }
         showSearch={{ onSearch: setSearch }}
+        onSelect={onSelect}
         {...rest}
       >
         <Input
@@ -151,6 +157,7 @@ export function ResourcesFilter({
                 loading={loading}
                 onMouseDown={(e) => {
                   e.preventDefault();
+                  e.stopPropagation();
                 }}
                 onClick={(e) => {
                   e.preventDefault();

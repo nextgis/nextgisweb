@@ -126,6 +126,7 @@ def root(request):
 def search_page(request):
     return dict(
         title=gettext("Resource search"),
+        hide_resource_filter=True,
         maxwidth=True,
         maxheight=True,
         adaptive=True,
