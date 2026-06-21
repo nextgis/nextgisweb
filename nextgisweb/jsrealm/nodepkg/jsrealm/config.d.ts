@@ -34,10 +34,6 @@ export type JSRealmConfig = {
     [key: string]: unknown;
   };
   jsrealm: {
-    devServer?: {
-      host: string;
-      port: number;
-    };
     eslint?: boolean;
     entries: [string, string][];
     icons: [string, ...(string | undefined)[]][];

@@ -42,13 +42,7 @@ function svgSymbolId(filename: string): string {
 
 export default {
   plugins: [
-    ...(isDevServer
-      ? [
-          pluginReact({
-            splitChunks: false,
-          }),
-        ]
-      : []),
+    ...(isDevServer ? [pluginReact({ splitChunks: false })] : []),
     createNgwLessPlugin(),
   ],
 
@@ -61,7 +55,7 @@ export default {
     },
   },
 
-  dev: commonDev,
+  dev: commonDev("main"),
 
   output: {
     ...commonOutput,

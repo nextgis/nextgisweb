@@ -11,9 +11,9 @@ import type { Plugin } from "postcss";
 
 import config from "./config";
 
-export const commonDev: DevConfig = {
-  assetPrefix: "auto",
-};
+export const commonDev: (name: string) => DevConfig = (name) => ({
+  assetPrefix: `/static/dev/${name}/`,
+});
 
 export const commonOutput: OutputConfig = {
   assetPrefix: "auto",

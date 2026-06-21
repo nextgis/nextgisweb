@@ -6,6 +6,7 @@ import type { EnvironmentConfig } from "@rsbuild/core";
 
 import config from "../jsrealm/config";
 import {
+  commonDev,
   commonDistPath,
   commonOutput,
   commonPerformance,
@@ -40,6 +41,8 @@ export default {
       },
     },
   },
+
+  dev: commonDev("stylesheet"),
 
   output: {
     ...commonOutput,

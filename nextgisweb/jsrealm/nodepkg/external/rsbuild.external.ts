@@ -6,6 +6,7 @@ import { rspack } from "@rsbuild/core";
 import type { EnvironmentConfig } from "@rsbuild/core";
 
 import {
+  commonDev,
   commonDistPath,
   commonPerformance,
 } from "@nextgisweb/jsrealm/rsbuild.common";
@@ -49,6 +50,8 @@ export default {
       },
     },
   },
+
+  dev: commonDev("external"),
 
   output: {
     copy: [

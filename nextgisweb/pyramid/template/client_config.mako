@@ -8,7 +8,6 @@
 
 <%
     distr_opts = request.env.options.with_prefix('distribution')
-    jsrealm_dev_server_url = getattr(request.env.pyramid, "jsrealm_dev_server_url", None)
     distribution = {
         k: distr_opts[k] for k in ('name', 'description', 'version', 'date')
     } if distr_opts.get('name') is not None else None
@@ -50,7 +49,7 @@
         "debug": request.env.core.debug,
         "applicationUrl": request.application_url,
         "amdUrl": request.static_url(),
-        "staticUrl": jsrealm_dev_server_url or request.static_url(),
+        "staticUrl": request.static_url(),
         "staticKey": request.env.pyramid.static_key[1:],
         "distribution": distribution,
         "packages": packages,
