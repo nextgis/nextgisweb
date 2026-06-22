@@ -766,6 +766,16 @@ Condition expressions:
 - ["ilike", ["get", "field"], "%pattern%"] — case-insensitive text match (% = any chars)
 - ["!ilike", ["get", "field"], "%pattern%"] — does not match
 
+Operator support by field type (use ONLY these combinations):
+- STRING: ==, !=, in, !in, is_null, !is_null, ilike, !ilike
+  (do NOT use >, <, >=, <= on STRING — use ilike for text pattern matching instead)
+- INTEGER, REAL: ==, !=, >, <, >=, <=, in, !in, is_null, !is_null (values are numbers)
+- BIGINT: ==, !=, >, <, >=, <=, in, !in, is_null, !is_null (values must be strings, e.g. "123456789")
+- DATE: ==, !=, >, <, >=, <=, is_null, !is_null (values as "YYYY-MM-DD")
+- TIME: ==, !=, >, <, >=, <=, is_null, !is_null (values as "HH:mm:ss")
+- DATETIME: ==, !=, >, <, >=, <=, is_null, !is_null (values as "YYYY-MM-DDTHH:mm:ss")
+- BOOLEAN: ==, !=, is_null, !is_null
+
 Use only field names from the provided schema. When there are multiple top-level conditions, wrap them in ["all", ...] or ["any", ...] depending on the intent.
 """
 
