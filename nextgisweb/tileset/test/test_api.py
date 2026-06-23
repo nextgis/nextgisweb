@@ -8,6 +8,7 @@ from nextgisweb.pyramid.test import WebTestApp
 @pytest.mark.parametrize(
     "filename, checks",
     (
+        pytest.param("tileset.mbtiles", dict(expected=dict(zmin=0, zmax=11)), id="mbtiles"),
         pytest.param("tileset.zip", dict(expected=dict(zmin=0, zmax=11)), id="zip"),
         pytest.param("subdir.zip", dict(expected=dict(zmin=0, zmax=2)), id="zip-subdir"),
         pytest.param("two-subdir.zip", dict(ok=False), id="zip-differend-subdir"),
