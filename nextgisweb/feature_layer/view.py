@@ -32,7 +32,7 @@ class SettingsWidget(Widget):
         return IVersionableFeatureLayer.providedBy(self.obj) and super().is_applicable()
 
 
-@react_renderer("@nextgisweb/feature-layer/feature-grid")
+@react_renderer("@nextgisweb/feature-layer/feature-grid", spa=True)
 def feature_browse(request):
     request.resource_permission(DataScope.read)
 
@@ -47,7 +47,7 @@ def feature_browse(request):
     )
 
 
-@react_renderer("@nextgisweb/feature-layer/feature-display")
+@react_renderer("@nextgisweb/feature-layer/feature-display", spa=True)
 def feature_show(request):
     request.resource_permission(DataScope.read)
 
@@ -63,7 +63,7 @@ def feature_show(request):
     )
 
 
-@react_renderer("@nextgisweb/feature-layer/feature-editor")
+@react_renderer("@nextgisweb/feature-layer/feature-editor", spa=True)
 def feature_update(request):
     request.resource_permission(DataScope.write)
 
@@ -79,7 +79,7 @@ def feature_update(request):
     )
 
 
-@react_renderer("@nextgisweb/feature-layer/export-form")
+@react_renderer("@nextgisweb/feature-layer/export-form", spa=True)
 def export(request):
     if not request.context.has_export_permission(request.user):
         raise HTTPNotFound()

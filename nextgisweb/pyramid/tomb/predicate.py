@@ -45,6 +45,7 @@ class ViewMeta(MetaPredicateBase):
     body_type: type | None
     return_type: type | None
     react_renderer: str | None
+    react_spa: bool
 
 
 @dataclass

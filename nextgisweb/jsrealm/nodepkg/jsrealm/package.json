@@ -18,7 +18,8 @@
     "ol": "10.9.0",
     "papaparse": "^5.4.1",
     "react": "^19.2.3",
-    "react-dom": "^19.2.3"
+    "react-dom": "^19.2.3",
+    "react-router-dom": "^7.18.0"
   },
   "devDependencies": {
     "@babel/core": "^7.24.7",

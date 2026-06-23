@@ -1,6 +1,8 @@
 import classNames from "classnames";
 import type { HTMLAttributeAnchorTarget, ReactElement } from "react";
 
+import { RouteLink } from "../RouteLink";
+
 import "./Dynmenu.less";
 
 export interface DynMenuLabel {
@@ -43,10 +45,10 @@ export function Dynmenu({ items }: DynmenuProps) {
               })}
               key={item.url}
             >
-              <a href={item.url} target={item.target}>
+              <RouteLink href={item.url} target={item.target}>
                 {item.icon}
                 {item.label}
-              </a>
+              </RouteLink>
             </li>
           );
         }

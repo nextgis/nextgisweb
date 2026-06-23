@@ -133,6 +133,7 @@ class PyramidComponent(Component):
         config = self.make_app(settings=dict())
         update_text_file(nodepkg / "api/type.inc.d.ts", m.api_type(self, config))
         update_text_file(nodepkg / "api/route.inc.ts", m.route(self, config))
+        update_text_file(nodepkg / "page-route.inc.ts", m.page_route(self, config))
 
     def client_type(self, tdef: Any):
         self.client_types.append(tdef)

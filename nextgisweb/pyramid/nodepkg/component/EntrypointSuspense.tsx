@@ -4,7 +4,7 @@ import { Flex, Spin } from "@nextgisweb/gui/antd";
 
 import { EntrypointLoader } from "../component/EntrypointLoader";
 
-function EntrypointFallback() {
+export function EntrypointFallback() {
   return (
     <Flex style={{ padding: "4em 8em" }} vertical>
       <Spin size="large" />
