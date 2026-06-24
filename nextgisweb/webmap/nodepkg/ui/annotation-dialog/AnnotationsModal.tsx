@@ -166,6 +166,10 @@ export function AnnotationsModal({
       open={open}
       destroyOnHidden
       onCancel={handleClose}
+      focusable={{
+        trap: false,
+        focusTriggerAfterClose: false,
+      }}
       footer={
         <div>
           {contextHolder}
