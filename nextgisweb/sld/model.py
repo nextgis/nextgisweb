@@ -1,10 +1,10 @@
 from enum import Enum
 from typing import Annotated
 
-import sqlalchemy as sa
 from lxml.builder import ElementMaker
 from lxml.etree import QName, tostring
 from msgspec import UNSET, Meta, Struct, UnsetType, convert, to_builtins
+from sqlalchemy.orm import Mapped, mapped_column
 
 from nextgisweb.env import Base
 from nextgisweb.lib.saext import Msgspec
@@ -13,6 +13,8 @@ Color = Annotated[str, Meta(pattern=r"#[0-9A-F]{6}")] | UnsetType
 Opacity = Annotated[float, Meta(ge=0, le=1)] | UnsetType
 Size = Annotated[float, Meta(ge=0)] | UnsetType
 DashPattern = Annotated[list[Annotated[float, Meta(ge=0)]], Meta(min_length=2)] | UnsetType
+Anchor = Annotated[str, Meta(pattern=r"[lcr][tcb]")] | UnsetType
+Offset = Annotated[list[float], Meta(min_length=2, max_length=2)] | UnsetType
 
 NS_SLD = "http://www.opengis.net/sld"
 NS_OGC = "http://www.opengis.net/ogc"
@@ -141,10 +143,54 @@ class PolygonSymbolizer(Struct, tag="polygon"):
         return result
 
 
+class PointPlacement(Struct, tag="point"):
+    anchor: Anchor = UNSET
+    offset: Offset = UNSET
+
+    def xml(self):
+        _placement = E_SE.PointPlacement()
+        if self.anchor is not UNSET:
+            ax = dict(l=1, c=0.5, r=0)[self.anchor[0]]
+            ay = dict(t=0, c=0.5, b=1)[self.anchor[1]]
+            _placement.append(
+                E_SE.AnchorPoint(
+                    E_SE.AnchorPointX(str(ax)),
+                    E_SE.AnchorPointY(str(ay)),
+                )
+            )
+        if self.offset is not UNSET:
+            dx, dy = self.offset
+            _placement.append(
+                E_SE.Displacement(
+                    E_SE.DisplacementX(str(dx)),
+                    E_SE.DisplacementY(str(dy)),
+                )
+            )
+        return _placement
+
+
+Placement = PointPlacement
+
+
+class Halo(Struct):
+    radius: Size = UNSET
+    fill: Fill | UnsetType = UNSET
+
+    def xml(self):
+        _halo = E_SE.Halo()
+        if self.radius is not UNSET:
+            _halo.append(E_SE.Radius(str(self.radius)))
+        if self.fill is not UNSET:
+            _halo.append(self.fill.xml())
+        return _halo
+
+
 class TextSymbolizer(Struct, tag="text"):
     field: str
     font_size: Size | UnsetType = UNSET
     fill: Fill | UnsetType = UNSET
+    placement: Placement | UnsetType = UNSET
+    halo: Halo | UnsetType = UNSET
 
     def xml_items(self):
         _text_symbolizer = E_SE.TextSymbolizer()
@@ -156,6 +202,10 @@ class TextSymbolizer(Struct, tag="text"):
             )
         if self.fill is not UNSET:
             _text_symbolizer.append(self.fill.xml())
+        if self.placement is not UNSET:
+            _text_symbolizer.append(E_SE.LabelPlacement(self.placement.xml()))
+        if self.halo is not UNSET:
+            _text_symbolizer.append(self.halo.xml())
         return [_text_symbolizer]
 
 
@@ -260,8 +310,8 @@ class Style(Struct):
 class SLD(Base):
     __tablename__ = "sld"
 
-    id = sa.Column(sa.Integer, primary_key=True)
-    value = sa.Column(Msgspec(Style), nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    value: Mapped[Style] = mapped_column(Msgspec(Style))
 
     def serialize(self):
         return to_builtins(self.value)
