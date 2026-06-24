@@ -95,6 +95,9 @@ function convertTextSymbolizer(gsFill: GSTextSymbolizer): TextSymbolizer {
       : undefined,
     font_size: Number(gsFill.size),
     field: String(gsFill.label),
+    placement: gsFill.offset
+      ? { type: "point", offset: gsFill.offset as [number, number] }
+      : undefined,
   };
 }
 

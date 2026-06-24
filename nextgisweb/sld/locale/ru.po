@@ -26,11 +26,11 @@ msgstr "Зеленый канал"
 msgid "Blue channel"
 msgstr "Синий канал"
 
-#: nodepkg/style-editor/StyleEditor.tsx:21
+#: nodepkg/style-editor/StyleEditor.tsx:22
 msgid "Label"
 msgstr "Подписи"
 
-#: nodepkg/style-editor/component/KindEditor.tsx:24
+#: nodepkg/style-editor/component/KindEditor.tsx:23
 msgid "Symbolizer unknown!"
 msgstr "Неизвестный тип символики"
 
@@ -98,6 +98,10 @@ msgstr "Цвет подписи"
 msgid "Label field"
 msgstr "Поле подписи"
 
+#: nodepkg/style-editor/component/editor/TextEditor.tsx:18
+msgid "Offset"
+msgstr "Отступ"
+
 #: nodepkg/style-editor/field/ColorInput.tsx:18
 msgid "None"
 msgstr "Нет"
@@ -106,11 +110,11 @@ msgstr "Нет"
 msgid "Transparent"
 msgstr "Прозрачный"
 
-#: nodepkg/style-editor/field/DashInput.tsx:10
+#: nodepkg/style-editor/field/DashInput.tsx:11
 msgid "Dash"
 msgstr "Штрих"
 
-#: nodepkg/style-editor/field/DashInput.tsx:11
+#: nodepkg/style-editor/field/DashInput.tsx:12
 msgid "Gap"
 msgstr "Пропуск"
 

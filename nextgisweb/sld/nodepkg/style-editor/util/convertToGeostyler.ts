@@ -78,7 +78,7 @@ function reverseConvertFillSymbolizer(
 function reverseConvertTextSymbolizer(
   symbolizer: TextSymbolizer
 ): GSTextSymbolizer {
-  const { fill, field, font_size } = symbolizer;
+  const { fill, field, font_size, placement } = symbolizer;
   return {
     kind: "Text",
     color: fill?.color,
@@ -86,6 +86,7 @@ function reverseConvertTextSymbolizer(
     opacity: fill?.opacity,
     size: font_size,
     label: field,
+    offset: placement?.offset as [number, number] | undefined,
   };
 }
 
