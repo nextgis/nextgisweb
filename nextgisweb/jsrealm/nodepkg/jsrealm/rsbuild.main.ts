@@ -64,6 +64,15 @@ export default {
       ...commonDistPath,
       root: path.resolve(config.distPath, "main"),
     },
+
+    minify: {
+      jsOptions: {
+        minimizerOptions: {
+          compress: { keep_classnames: true },
+          mangle: { keep_classnames: true },
+        },
+      },
+    },
   },
 
   performance: {
@@ -77,6 +86,7 @@ export default {
 
     swc(swcOptions) {
       swcOptions.jsc ??= {};
+      swcOptions.jsc.keepClassNames = true;
       swcOptions.jsc.transform ??= {};
       swcOptions.jsc.transform.react = {
         ...swcOptions.jsc.transform.react,
