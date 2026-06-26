@@ -4,6 +4,8 @@ import type { Integration } from "@sentry/core";
 import { isAbortError } from "@nextgisweb/gui/error";
 import { BaseAPIError } from "@nextgisweb/pyramid/api";
 
+import metrics from "./metrics";
+
 export function init(opts: { dsn: string; routeName: string }) {
   // Check if the environment supports ES2020 features using `eval` to avoid
   // transpilation. This includes optional chaining, nullish coalescing, and
@@ -34,6 +36,35 @@ export function init(opts: { dsn: string; routeName: string }) {
     Sentry.captureConsoleIntegration({ levels: ["error"] }),
   ];
 
+  let suppressFurtherEvents = false;
+
+  interface ChunkErrorInfo {
+    request?: string;
+    type?: unknown;
+  }
+
+  const getChunkErrorInfo = (error: unknown): ChunkErrorInfo | undefined => {
+    if (
+      error instanceof Error &&
+      (error.name === "ChunkLoadError" ||
+        ("code" in error && error.code === "CSS_CHUNK_LOAD_FAILED"))
+    ) {
+      let request =
+        "request" in error && typeof error.request === "string"
+          ? error.request || undefined
+          : undefined;
+
+      if (request) {
+        const url = new URL(request, location.origin);
+        request = url.pathname + url.search;
+      }
+
+      const type = ("type" in error ? error.type : undefined) || undefined;
+
+      return { request, type };
+    }
+  };
+
   Sentry.init({
     ...sentryOpts,
     integrations,
@@ -45,6 +76,8 @@ export function init(opts: { dsn: string; routeName: string }) {
     },
 
     beforeSend(event, hint) {
+      if (suppressFurtherEvents) return null;
+
       const error = hint.originalException;
 
       // Too many abort errors captured, ignore them
@@ -58,9 +91,17 @@ export function init(opts: { dsn: string; routeName: string }) {
         return null;
       }
 
-      // Webpack's ChunkLoadError is considered fatal. This can also happen
-      // in legacy browsers due to unsupported JavaScript syntax (e.g., ??=).
-      if (error instanceof Error && error.name === "ChunkLoadError") {
+      // Chunk load errors are considered fatal. This can also happen in legacy
+      // browsers due to unsupported JavaScript syntax (e.g., ??=).
+      const chunkErrorInfo = getChunkErrorInfo(error);
+      if (chunkErrorInfo) {
+        metrics.count(COMP_ID, "chunk_error", 1, {
+          attributes: {
+            ["chunk_error.request"]: chunkErrorInfo.request,
+            ["chunk_error.type"]: chunkErrorInfo.type,
+          },
+        });
+        suppressFurtherEvents = true;
         Sentry.getClient()?.close();
         return null;
       }
