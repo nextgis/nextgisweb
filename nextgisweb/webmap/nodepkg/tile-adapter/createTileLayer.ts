@@ -31,6 +31,10 @@ export function createTileLayer(
         tileLoadFunction({
           src,
           hmux: options?.hmux,
+          sentryMetricOptions: {
+            component: COMP_ID,
+            baseUrl: location.origin,
+          },
         })
           .then((imageUrl) => {
             img.src = imageUrl;

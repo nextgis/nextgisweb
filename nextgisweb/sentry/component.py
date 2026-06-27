@@ -34,16 +34,13 @@ class SentryComponent(Component):
         from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
         from sentry_sdk.scope import add_global_event_processor
 
-        # Patch MAX_STRING_LENGTH to prevent clipping of big error messages,
-        # especially for mako template tracebacks.
-        sentry_sdk.utils.MAX_STRING_LENGTH = 8192
-
         sentry_sdk.init(
             self.dsn_py,
             environment=self.environment,
             integrations=[PyramidIntegration(), SqlalchemyIntegration()],
             ignore_errors=[KeyboardInterrupt],
             shutdown_timeout=int(self.options["shutdown_timeout"].total_seconds()),
+            send_default_pii=True,
         )
 
         sc = Setting.__table__.columns

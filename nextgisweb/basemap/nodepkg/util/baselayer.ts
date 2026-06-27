@@ -1,4 +1,3 @@
-import { debounce } from "lodash-es";
 import type Tile from "ol/Tile";
 import TileState from "ol/TileState";
 import type { Options as XYZSourceOptions } from "ol/source/XYZ";
@@ -9,8 +8,8 @@ import type {
   WebmapPluginBaselayer,
 } from "@nextgisweb/basemap/layer-widget/type";
 import { registerEPSG3395Projection } from "@nextgisweb/basemap/util/epsg3395";
+import { isAbortError } from "@nextgisweb/gui/error";
 import { RequestQueue, tileLoadFunction } from "@nextgisweb/pyramid/util";
-import metrics from "@nextgisweb/sentry/metrics";
 import type { MapStore } from "@nextgisweb/webmap/ol/MapStore";
 import type { LayerOptions } from "@nextgisweb/webmap/ol/layer/CoreLayer";
 import type QuadKey from "@nextgisweb/webmap/ol/layer/QuadKey";
@@ -25,42 +24,25 @@ const basemapTileQueue = new RequestQueue({
   timeout: 15_000,
 });
 
-const countTileLoadError = debounce(
-  (src: string, timeout: boolean) => {
-    let url: URL;
-    try {
-      url = new URL(src);
-    } catch {
-      return; // Invalid URL, just ignore it
-    }
-    metrics.count(COMP_ID, "tile.error", 1, {
-      attributes: {
-        "tile.origin": url.origin.replace(/^https?:\/\//, ""),
-        "tile.path": url.pathname + url.search,
-        "tile.timeout": timeout,
-      },
-    });
-  },
-  60_000,
-  { trailing: false, leading: true }
-);
-
 function basemapTileLoadFunction(tile: Tile, src: string) {
   // @ts-expect-error Property 'getImage' does not exist on type 'Tile'.
   const img = tile.getImage() as HTMLImageElement;
 
   basemapTileQueue.add(
     ({ signal }) =>
-      tileLoadFunction({ src, signal })
+      tileLoadFunction({
+        src,
+        signal,
+        sentryMetricOptions: { component: COMP_ID, baseUrl: undefined },
+      })
         .then((imageUrl) => {
           if (!signal.aborted) {
             img.src = imageUrl;
           }
         })
-        .catch((er) => {
-          if (er.name !== "AbortError") {
+        .catch((err) => {
+          if (!isAbortError(err)) {
             tile.setState(TileState.ERROR);
-            countTileLoadError(src, er.name === "TimeoutError");
           }
         }),
 

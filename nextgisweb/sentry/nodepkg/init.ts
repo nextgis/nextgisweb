@@ -5,6 +5,7 @@ import { isAbortError } from "@nextgisweb/gui/error";
 import { BaseAPIError } from "@nextgisweb/pyramid/api";
 
 import metrics from "./metrics";
+import { hasSentryIgnore } from "./util";
 
 export function init(opts: { dsn: string; routeName: string }) {
   // Check if the environment supports ES2020 features using `eval` to avoid
@@ -67,6 +68,7 @@ export function init(opts: { dsn: string; routeName: string }) {
 
   Sentry.init({
     ...sentryOpts,
+    sendDefaultPii: true,
     integrations,
 
     initialScope: (scope) => {
@@ -79,6 +81,10 @@ export function init(opts: { dsn: string; routeName: string }) {
       if (suppressFurtherEvents) return null;
 
       const error = hint.originalException;
+
+      if (hasSentryIgnore(error)) {
+        return null;
+      }
 
       // Too many abort errors captured, ignore them
       if (isAbortError(error)) {

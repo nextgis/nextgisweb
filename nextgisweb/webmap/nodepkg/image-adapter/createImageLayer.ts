@@ -94,6 +94,10 @@ export function createImageLayer(
                 hmux: options?.hmux,
                 cache: "no-cache",
                 signal,
+                sentryMetricOptions: {
+                  component: COMP_ID,
+                  baseUrl: location.origin,
+                },
               })
                 .then((imageUrl) => {
                   img.src = imageUrl;
