@@ -18,9 +18,7 @@ import { getEffectiveDisplayName } from "@nextgisweb/resource/util/getEffectiveD
 import { Layer } from "./Layer";
 import type { ServiceStore } from "./ServiceStore";
 
-const CollectionWidget = observer<{
-  item: Layer;
-}>(function GroupComponentBase({ item }) {
+const CollectionWidget = observer<{ item: Layer }>(({ item }) => {
   return (
     <Area pad>
       <LotMV
@@ -58,6 +56,8 @@ const CollectionWidget = observer<{
     </Area>
   );
 });
+
+CollectionWidget.displayName = "CollectionWidget";
 
 export const ServiceWidget: EditorWidget<ServiceStore> = observer(
   ({ store }) => {
@@ -118,5 +118,5 @@ export const ServiceWidget: EditorWidget<ServiceStore> = observer(
 
 ServiceWidget.displayName = "ServiceWidget";
 ServiceWidget.title = gettext("WMS service");
-ServiceWidget.activateOn = { create: true };
+ServiceWidget.activateOn = { create: true, update: true };
 ServiceWidget.order = -50;

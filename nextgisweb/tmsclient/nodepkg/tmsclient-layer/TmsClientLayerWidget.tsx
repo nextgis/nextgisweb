@@ -193,5 +193,5 @@ export const TmsClientLayerWidget: EditorWidget<TmsClientLayerStore> = observer(
 
 TmsClientLayerWidget.displayName = "TmsClientLayerWidget";
 TmsClientLayerWidget.title = gettext("TMS layer");
-TmsClientLayerWidget.activateOn = { create: true };
+TmsClientLayerWidget.activateOn = { create: true, update: true };
 TmsClientLayerWidget.order = 10;

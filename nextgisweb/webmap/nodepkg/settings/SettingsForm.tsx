@@ -221,7 +221,9 @@ export const SettingsForm: FC<SettingsFormProps> = ({
             <Form.Item
               name="yandex_api_geocoder_key"
               label={gettext("Yandex.Maps API Geocoder Key")}
-              rules={[{ required: true, message: gettext("API key is required") }]}
+              rules={[
+                { required: true, message: gettext("API key is required") },
+              ]}
             >
               <Input style={INPUT_DEFAULT_WIDTH} />
             </Form.Item>

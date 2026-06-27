@@ -15,9 +15,7 @@ import { generateResourceKeyname } from "@nextgisweb/resource/util/generateResou
 import { Collection } from "./Collection";
 import type { ServiceStore } from "./ServiceStore";
 
-const CollectionWidget = observer<{
-  item: Collection;
-}>(function GroupComponentBase({ item }) {
+const CollectionWidget = observer<{ item: Collection }>(({ item }) => {
   return (
     <Area pad>
       <LotMV
@@ -55,6 +53,8 @@ const CollectionWidget = observer<{
     </Area>
   );
 });
+
+CollectionWidget.displayName = "CollectionWidget";
 
 export const ServiceWidget: EditorWidget<ServiceStore> = observer(
   ({ store }) => {
@@ -108,5 +108,5 @@ export const ServiceWidget: EditorWidget<ServiceStore> = observer(
 
 ServiceWidget.displayName = "ServiceWidget";
 ServiceWidget.title = gettext("OGC API Features service");
-ServiceWidget.activateOn = { create: true };
+ServiceWidget.activateOn = { create: true, update: true };
 ServiceWidget.order = -50;

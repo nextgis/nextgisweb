@@ -113,5 +113,5 @@ export const TmsClientConnectionWidget: EditorWidget<TmsClientConnectionStore> =
 
 TmsClientConnectionWidget.displayName = "TmsClientConnectionWidget";
 TmsClientConnectionWidget.title = gettext("TMS connection");
-TmsClientConnectionWidget.activateOn = { create: true };
+TmsClientConnectionWidget.activateOn = { create: true, update: true };
 TmsClientConnectionWidget.order = 10;

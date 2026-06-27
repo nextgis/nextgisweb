@@ -110,5 +110,5 @@ export const WmsClientConnectionWidget: EditorWidget<WmsClientConnectionStore> =
 
 WmsClientConnectionWidget.displayName = "WmsClientConnectionWidget";
 WmsClientConnectionWidget.title = gettext("WMS Connection");
-WmsClientConnectionWidget.activateOn = { create: true };
+WmsClientConnectionWidget.activateOn = { create: true, update: true };
 WmsClientConnectionWidget.order = 10;

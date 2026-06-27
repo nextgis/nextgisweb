@@ -32,9 +32,7 @@ msgDeleteFieldContent = gettext("Deleting this field will permanently erase all 
 msgDatatypePlaceholder = gettext("Please select"),
 msgLookupTableNotUsed = gettext("Not used");
 
-const FieldWidget = observer<{
-  item: Field;
-}>(function GroupComponentBase({ item }) {
+const FieldWidget = observer<{ item: Field }>(({ item }) => {
   return (
     <Area pad>
       <LotMV
@@ -89,6 +87,8 @@ const FieldWidget = observer<{
     </Area>
   );
 });
+
+FieldWidget.displayName = "FieldWidget";
 
 export const FieldsWidget: EditorWidget<FieldsStore> = observer(({ store }) => {
   const [modal, contextHolder] = Modal.useModal();

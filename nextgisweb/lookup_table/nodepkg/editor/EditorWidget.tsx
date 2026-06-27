@@ -199,5 +199,5 @@ export const EditorWidget: IEditorWidget<EditorStore> = observer(
 
 EditorWidget.displayName = "EditorWidget";
 EditorWidget.title = gettext("Lookup table");
-EditorWidget.activateOn = { update: true };
+EditorWidget.activateOn = { create: true, update: true };
 EditorWidget.order = -50;

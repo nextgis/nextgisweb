@@ -15,9 +15,7 @@ import { generateResourceKeyname } from "@nextgisweb/resource/util/generateResou
 import { Layer } from "./Layer";
 import type { ServiceStore } from "./ServiceStore";
 
-const LayerWidget = observer<{
-  item: Layer;
-}>(function GroupComponentBase({ item }) {
+const LayerWidget = observer<{ item: Layer }>(({ item }) => {
   return (
     <Area pad>
       <LotMV
@@ -55,6 +53,8 @@ const LayerWidget = observer<{
     </Area>
   );
 });
+
+LayerWidget.displayName = "LayerWidget";
 
 export const ServiceWidget: EditorWidget<ServiceStore> = observer(
   ({ store }) => {
@@ -108,5 +108,5 @@ export const ServiceWidget: EditorWidget<ServiceStore> = observer(
 
 ServiceWidget.displayName = "ServiceWidget";
 ServiceWidget.title = gettext("WFS service");
-ServiceWidget.activateOn = { create: true };
+ServiceWidget.activateOn = { create: true, update: true };
 ServiceWidget.order = -50;

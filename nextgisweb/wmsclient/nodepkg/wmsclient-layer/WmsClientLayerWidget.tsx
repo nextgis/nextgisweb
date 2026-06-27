@@ -215,5 +215,5 @@ export const WmsClientLayerWidget: EditorWidget<WmsClientLayerStore> = observer(
 
 WmsClientLayerWidget.displayName = "WmsClientLayerWidget";
 WmsClientLayerWidget.title = gettext("WMS Layer");
-WmsClientLayerWidget.activateOn = { create: true };
+WmsClientLayerWidget.activateOn = { create: true, update: true };
 WmsClientLayerWidget.order = 10;

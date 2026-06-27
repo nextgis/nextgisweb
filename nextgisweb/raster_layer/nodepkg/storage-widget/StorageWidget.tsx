@@ -78,5 +78,5 @@ export const StorageWidget: EditorWidget<StorageStore> = observer(
 
 StorageWidget.displayName = "StorageWidget";
 StorageWidget.title = gettext("Raster layer storage");
-StorageWidget.activateOn = { create: true };
+StorageWidget.activateOn = { create: true, update: true };
 StorageWidget.order = -50;

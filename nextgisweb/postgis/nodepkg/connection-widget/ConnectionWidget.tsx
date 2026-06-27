@@ -87,5 +87,5 @@ export const ConnectionWidget: EditorWidget<ConnectionStore> = observer(
 
 ConnectionWidget.displayName = "ConnectionWidget";
 ConnectionWidget.title = gettext("PostGIS connection");
-ConnectionWidget.activateOn = { create: true };
+ConnectionWidget.activateOn = { create: true, update: true };
 ConnectionWidget.order = -50;

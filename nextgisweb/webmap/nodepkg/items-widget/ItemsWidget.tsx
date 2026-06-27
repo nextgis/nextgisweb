@@ -265,5 +265,5 @@ export const ItemsWidget: EditorWidget<ItemsStore> = observer(({ store }) => {
 
 ItemsWidget.displayName = "ItemsWidget";
 ItemsWidget.title = gettext("Layers");
-ItemsWidget.activateOn = { update: true };
+ItemsWidget.activateOn = { create: true, update: true };
 ItemsWidget.order = -50;

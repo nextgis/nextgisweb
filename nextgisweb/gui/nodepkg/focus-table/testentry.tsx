@@ -158,16 +158,15 @@ class Store implements FocusTableStore<Item> {
   }
 }
 
-const GroupComponent = observer<{
-  item: Group;
-  store: Store;
-}>(function GroupComponentBase({ item }) {
+const GroupComponent = observer<{ item: Group; store: Store }>(({ item }) => {
   return (
     <Area pad>
       <LotMV label="Title" value={item.title} component={InputValue} />
     </Area>
   );
 });
+
+GroupComponent.displayName = "GroupComponent";
 
 type LayerFormValues = {
   title: string;
