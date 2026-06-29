@@ -16,6 +16,8 @@ const msgLabel = gettext("Label size");
 const msgColor = gettext("Label color");
 const msgField = gettext("Label field");
 const msgOffset = gettext("Offset");
+const msgHaloSize = gettext("Text buffer size");
+const msgHaloColor = gettext("Text buffer color");
 
 type TextSymbolizer = GSTextSymbolizer & { field?: number };
 type Offset = [number, number];
@@ -88,6 +90,10 @@ export function TextEditor({ value, onChange, fields }: TextEditorProps) {
           symbolizerClone.haloColor = color;
           symbolizerClone.opacity = opacity;
         }
+        if (typeof v.haloColor === "string") {
+          const [haloColor] = extractColorAndOpacity(v.haloColor);
+          symbolizerClone.haloColor = haloColor;
+        }
 
         onChange(symbolizerClone);
       }
@@ -116,6 +122,16 @@ export function TextEditor({ value, onChange, fields }: TextEditorProps) {
         label: msgOffset,
         name: "offset",
         formItem: <OffsetInput />,
+      },
+      {
+        label: msgHaloSize,
+        name: "haloWidth",
+        formItem: <InputNumber min={0} />,
+      },
+      {
+        label: msgHaloColor,
+        name: "haloColor",
+        formItem: <ColorInput disabledAlpha />,
       },
     ],
     [fields]

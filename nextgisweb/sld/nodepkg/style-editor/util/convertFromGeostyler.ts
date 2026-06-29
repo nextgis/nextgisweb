@@ -84,6 +84,14 @@ function convertFillSymbolizer(gsFill: GSFillSymbolizer): PolygonSymbolizer {
 
 function convertTextSymbolizer(gsFill: GSTextSymbolizer): TextSymbolizer {
   const fillOpacity = setOpacity(gsFill.opacity);
+  const haloWidth =
+    typeof gsFill.haloWidth === "number" ? gsFill.haloWidth : undefined;
+  const haloFill =
+    typeof gsFill.haloColor === "string"
+      ? {
+          color: String(gsFill.haloColor),
+        }
+      : undefined;
 
   return {
     type: "text",
@@ -98,6 +106,13 @@ function convertTextSymbolizer(gsFill: GSTextSymbolizer): TextSymbolizer {
     placement: gsFill.offset
       ? { type: "point", offset: gsFill.offset as [number, number] }
       : undefined,
+    halo:
+      haloWidth !== undefined && haloFill !== undefined
+        ? {
+            radius: haloWidth,
+            fill: haloFill,
+          }
+        : undefined,
   };
 }
 

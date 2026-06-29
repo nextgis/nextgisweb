@@ -102,6 +102,14 @@ msgstr "Поле подписи"
 msgid "Offset"
 msgstr "Отступ"
 
+#: nodepkg/style-editor/component/editor/TextEditor.tsx:19
+msgid "Text buffer size"
+msgstr "Размер буфера текста"
+
+#: nodepkg/style-editor/component/editor/TextEditor.tsx:20
+msgid "Text buffer color"
+msgstr "Цвет буфера текста"
+
 #: nodepkg/style-editor/field/ColorInput.tsx:18
 msgid "None"
 msgstr "Нет"

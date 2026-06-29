@@ -2,7 +2,7 @@ import type {
   Symbolizer as GSSymbolizer,
   TextSymbolizer,
 } from "geostyler-style";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { Checkbox, Space } from "@nextgisweb/gui/antd";
 import type { OptionType } from "@nextgisweb/gui/antd";
@@ -57,6 +57,18 @@ export function StyleEditor({
     return textSymbolizerInit || defTextSymbolizer;
   });
 
+  const textSymbolizerForPreview = useMemo(() => {
+    const textSymbolizerPreview: TextSymbolizer = { ...textSymbolizer };
+    if (textSymbolizerPreview.haloColor === undefined) {
+      textSymbolizerPreview.haloWidth = 0;
+      textSymbolizerPreview.haloColor = textSymbolizer.color;
+    }
+    if (textSymbolizerPreview.haloWidth === undefined) {
+      textSymbolizerPreview.haloColor = undefined;
+    }
+    return textSymbolizerPreview;
+  }, [textSymbolizer]);
+
   const [isLabel, setIsLabel] = useState(!!textSymbolizerInit);
 
   useEffect(() => {
@@ -99,7 +111,9 @@ export function StyleEditor({
 
       {isLabel && fields && (
         <>
-          {textSymbolizer && <SymbolizerCard symbolizer={[textSymbolizer]} />}
+          {textSymbolizer && (
+            <SymbolizerCard symbolizer={[textSymbolizerForPreview]} />
+          )}
           <div className="ngw-sld-style-editor">
             <TextEditor
               value={textSymbolizer}

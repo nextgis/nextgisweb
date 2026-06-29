@@ -78,11 +78,12 @@ function reverseConvertFillSymbolizer(
 function reverseConvertTextSymbolizer(
   symbolizer: TextSymbolizer
 ): GSTextSymbolizer {
-  const { fill, field, font_size, placement } = symbolizer;
+  const { fill, field, font_size, placement, halo } = symbolizer;
   return {
     kind: "Text",
     color: fill?.color,
-    haloColor: fill?.color,
+    haloColor: halo?.fill?.color,
+    haloWidth: halo?.radius,
     opacity: fill?.opacity,
     size: font_size,
     label: field,
