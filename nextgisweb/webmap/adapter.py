@@ -26,3 +26,9 @@ class ImageAdapter(WebMapAdapter):
     identity = "image"
     entry = jsentry("@nextgisweb/webmap/image-adapter")
     display_name = gettext("Image")
+
+
+class PointCloudAdapter(WebMapAdapter):
+    identity = "point_cloud"
+    entry = jsentry("@nextgisweb/point-cloud/point-cloud-adapter")
+    display_name = gettext("Point cloud")

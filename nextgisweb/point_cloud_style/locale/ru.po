@@ -1,0 +1,163 @@
+#: model.py:46 nodepkg/editor-widget/EditorWidget.tsx:191
+#, jsrealm, server
+msgid "Point cloud style"
+msgstr "Стиль облака точек"
+
+#: model.py:62
+#, server
+msgid "Point size must be greater than zero."
+msgstr "Размер точки должен быть больше нуля."
+
+#: model.py:64
+#, server
+msgid "Opacity must be between 0 and 100."
+msgstr "Непрозрачность должна быть от 0 до 100."
+
+#: model.py:67
+#, server
+msgid "Minimum elevation percentile must be between 0 and 100."
+msgstr "Минимальный процентиль высоты должен быть от 0 до 100."
+
+#: model.py:71
+#, server
+msgid "Maximum elevation percentile must be between 0 and 100."
+msgstr "Максимальный процентиль высоты должен быть от 0 до 100."
+
+#: model.py:76
+#, server
+msgid "Minimum elevation percentile must be less than maximum percentile."
+msgstr "Минимальный процентиль высоты должен быть меньше максимального процентиля."
+
+#: model.py:83
+#, server
+msgid "RGB styling is available only for point clouds with RGB data."
+msgstr "Стиль RGB доступен только для облаков точек с данными RGB."
+
+#: model.py:88
+#, server
+msgid "Classification styling is available only when classification data is present."
+msgstr "Стиль по классификации доступен только при наличии данных классификации."
+
+#: model.py:94
+#, server
+msgid "Intensity styling is available only when intensity data is present."
+msgstr "Стиль по интенсивности доступен только при наличии данных интенсивности."
+
+#: model.py:100
+#, server
+msgid "Return number styling is available only when return information is present."
+msgstr "Стиль по номеру отражения доступен только при наличии информации об отражениях."
+
+#: model.py:107 nodepkg/editor-widget/EditorWidget.tsx:28
+#, jsrealm, server
+msgid "Mode"
+msgstr "Режим"
+
+#: nodepkg/editor-widget/EditorWidget.tsx:29
+#, jsrealm
+msgid "Point size"
+msgstr "Размер точки"
+
+#: nodepkg/editor-widget/EditorWidget.tsx:30
+#, jsrealm
+msgid "Opacity"
+msgstr "Непрозрачность"
+
+#: nodepkg/editor-widget/EditorWidget.tsx:31
+#, jsrealm
+msgid "Use percentile clipping"
+msgstr "Использовать отсечение по процентилям"
+
+#: nodepkg/editor-widget/EditorWidget.tsx:32
+#, jsrealm
+msgid "Elevation min percentile"
+msgstr "Минимальный процентиль высоты"
+
+#: nodepkg/editor-widget/EditorWidget.tsx:33
+#, jsrealm
+msgid "Elevation max percentile"
+msgstr "Максимальный процентиль высоты"
+
+#: nodepkg/editor-widget/EditorWidget.tsx:34
+#, jsrealm
+msgid "Ramp start color"
+msgstr "Начальный цвет шкалы"
+
+#: nodepkg/editor-widget/EditorWidget.tsx:35
+#, jsrealm
+msgid "Ramp end color"
+msgstr "Конечный цвет шкалы"
+
+#: nodepkg/editor-widget/EditorWidget.tsx:36
+#, jsrealm
+msgid "Modulate by intensity"
+msgstr "Модулировать по интенсивности"
+
+#: nodepkg/editor-widget/EditorWidget.tsx:37
+#, jsrealm
+msgid "Classification colors"
+msgstr "Цвета классов"
+
+#: nodepkg/editor-widget/EditorWidget.tsx:52
+#, jsrealm
+msgid "Choose how point cloud colors are calculated."
+msgstr "Выберите способ вычисления цветов облака точек."
+
+#: nodepkg/editor-widget/EditorWidget.tsx:53
+#, jsrealm
+msgid "Sets the rendered size of each point."
+msgstr "Задаёт отображаемый размер каждой точки."
+
+#: nodepkg/editor-widget/EditorWidget.tsx:54
+#, jsrealm
+msgid "Controls overall transparency of the point cloud."
+msgstr "Управляет общей прозрачностью облака точек."
+
+#: nodepkg/editor-widget/EditorWidget.tsx:55
+#, jsrealm
+msgid "Ignore extreme elevation outliers when coloring points."
+msgstr "Игнорировать экстремальные выбросы высоты при окрашивании точек."
+
+#: nodepkg/editor-widget/EditorWidget.tsx:56
+#, jsrealm
+msgid "Lower elevation percentile used for color ramp scaling."
+msgstr "Нижний процентиль высоты для масштабирования цветовой шкалы."
+
+#: nodepkg/editor-widget/EditorWidget.tsx:57
+#, jsrealm
+msgid "Upper elevation percentile used for color ramp scaling."
+msgstr "Верхний процентиль высоты для масштабирования цветовой шкалы."
+
+#: nodepkg/editor-widget/EditorWidget.tsx:58
+#, jsrealm
+msgid "Color assigned to the lowest elevations in range."
+msgstr "Цвет, назначаемый минимальным высотам диапазона."
+
+#: nodepkg/editor-widget/EditorWidget.tsx:59
+#, jsrealm
+msgid "Color assigned to the highest elevations in range."
+msgstr "Цвет, назначаемый максимальным высотам диапазона."
+
+#: nodepkg/editor-widget/EditorWidget.tsx:60
+#, jsrealm
+msgid "Adjust colors using point intensity values."
+msgstr "Корректировать цвета с учётом значений интенсивности точек."
+
+#: nodepkg/editor-widget/EditorWidget.tsx:61
+#, jsrealm
+msgid "Map classification codes to colors, one per line."
+msgstr "Задайте соответствие кодов классификации цветам, по одному на строку."
+
+#: nodepkg/resource-section/default-style/PointCloudResourceSectionDefaultStyle.tsx:14
+#, jsrealm
+msgid "Create default point cloud style"
+msgstr "Создать стиль облака точек по умолчанию"
+
+#: nodepkg/resource-section/default-style/PointCloudResourceSectionDefaultStyle.tsx:15
+#, jsrealm
+msgid ""
+"Layer created. You can generate a default point cloud style resource using "
+"the button."
+msgstr ""
+"Слой создан. С помощью кнопки можно создать ресурс стиля облака точек по "
+"умолчанию."

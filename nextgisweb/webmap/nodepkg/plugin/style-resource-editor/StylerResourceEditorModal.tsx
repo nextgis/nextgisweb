@@ -58,6 +58,7 @@ export function StyleResourceEditorModal({
         });
         display.treeStore.updateResourceLegendSymbols([id]);
       });
+      display.map.getLayer(nodeData.id)?.reload();
     }
   }, [id, nodeData, display, routeDisplayConfig, abortDisplayConfig]);
 

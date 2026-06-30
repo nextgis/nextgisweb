@@ -13,6 +13,14 @@ declare module "*.css" {}
 declare module "*.less" {}
 declare module "*.po" {}
 declare module "*.svg" {}
+declare module "*.wasm" {
+  const value: string;
+  export default value;
+}
+declare module "*.wasm?url" {
+  const value: string;
+  export default value;
+}
 
 declare module "*.svg" {
   import type { IconComponent } from "@nextgisweb/icon";
