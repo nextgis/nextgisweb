@@ -19,6 +19,18 @@ export interface ValidationState {
   epsg?: number | null;
   wkt?: string | null;
   srs_required?: boolean;
+  extent?: {
+    minLon: number;
+    minLat: number;
+    maxLon: number;
+    maxLat: number;
+  } | null;
+  minx?: number | null;
+  miny?: number | null;
+  maxx?: number | null;
+  maxy?: number | null;
+  zmin?: number | null;
+  zmax?: number | null;
   has_rgb?: boolean;
   has_intensity?: boolean;
   has_classification?: boolean;
@@ -61,6 +73,12 @@ export class EditorStore implements IEditorStore<
       epsg: value.epsg,
       wkt: value.wkt,
       srs_required: false,
+      minx: value.minx,
+      miny: value.miny,
+      maxx: value.maxx,
+      maxy: value.maxy,
+      zmin: value.zmin,
+      zmax: value.zmax,
       has_rgb: value.has_rgb,
       has_intensity: value.has_intensity,
       has_classification: value.has_classification,

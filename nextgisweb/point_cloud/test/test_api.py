@@ -10,7 +10,7 @@ from nextgisweb.point_cloud import PointCloud
 from nextgisweb.point_cloud_style import PointCloudStyle
 from nextgisweb.pyramid.test import WebTestApp
 from nextgisweb.resource.test import ResourceAPI
-from nextgisweb.spatial_ref_sys import WKT_EPSG_3857
+from nextgisweb.spatial_ref_sys import SRS, WKT_EPSG_3857
 
 from ..validation import PointCloudExtent, PointCloudValidationResult, _validate_source
 
@@ -136,6 +136,26 @@ def test_validate_source_without_crs():
     assert result.extent is None
 
 
+def test_validate_source_prefers_file_crs_for_extent(ngw_txn):
+    header = _FakeHeader(
+        mins=(0.0, 0.0, 0.0),
+        maxs=(20037508.342789244, 20037508.342789244, 10.0),
+        crs=_FakeCRS(epsg=3857, wkt=WKT_EPSG_3857),
+    )
+    explicit_srs = SRS.filter_by(id=4326).one()
+
+    with patch(
+        "nextgisweb.point_cloud.validation._open_copc_reader", return_value=_FakeReader(header)
+    ):
+        result = _validate_source("/tmp/test.copc.laz", srs=explicit_srs)
+
+    assert result.extent is not None
+    assert result.extent.minLon == pytest.approx(0.0, abs=1e-6)
+    assert result.extent.minLat == pytest.approx(0.0, abs=1e-6)
+    assert result.extent.maxLon == pytest.approx(180.0, abs=1e-6)
+    assert result.extent.maxLat == pytest.approx(85.05112878, abs=1e-6)
+
+
 def test_validate_endpoint_upload(ngw_webtest_app: WebTestApp, ngw_file_upload, tmp_path: Path):
     source = tmp_path / "source.copc.laz"
     source.write_bytes(b"copc")
@@ -196,6 +216,7 @@ def test_create_from_upload(
     assert resp.json["point_cloud"]["source_type"] == "upload"
     assert resp.json["point_cloud"]["point_format_id"] == 7
     assert resp.json["point_cloud"]["has_rgb"] is True
+    assert resp.json["point_cloud"]["srs_proj4"]
 
 
 def test_create_from_external_url(ngw_webtest_app: WebTestApp, ngw_resource_group):
@@ -217,6 +238,57 @@ def test_create_from_external_url(ngw_webtest_app: WebTestApp, ngw_resource_grou
     resp = ngw_webtest_app.get(f"/api/resource/{res_id}", status=200)
     assert resp.json["point_cloud"]["source_type"] == "external_url"
     assert resp.json["point_cloud"]["external_url"] == "https://example.com/source.copc.laz"
+
+
+def test_point_cloud_extent_prefers_file_crs(ngw_txn):
+    point_cloud = PointCloud(
+        srs=SRS.filter_by(id=4326).one(),
+        wkt=WKT_EPSG_3857,
+        minx=0.0,
+        miny=0.0,
+        maxx=20037508.342789244,
+        maxy=20037508.342789244,
+    )
+
+    extent = point_cloud.extent
+
+    assert extent["minLon"] == pytest.approx(0.0, abs=1e-6)
+    assert extent["minLat"] == pytest.approx(0.0, abs=1e-6)
+    assert extent["maxLon"] == pytest.approx(180.0, abs=1e-6)
+    assert extent["maxLat"] == pytest.approx(85.05112878, abs=1e-6)
+
+
+def test_content_endpoint_upload_range(
+    ngw_webtest_app: WebTestApp,
+    ngw_file_upload,
+    ngw_resource_group,
+    tmp_path: Path,
+):
+    source = tmp_path / "source.copc.laz"
+    source.write_bytes(b"copc-content")
+    upload_meta = ngw_file_upload(source)
+
+    with patch(
+        "nextgisweb.point_cloud.model.validate_upload",
+        return_value=_validation_result(),
+    ):
+        res_id = ResourceAPI().create(
+            "point_cloud",
+            {
+                "resource": {"parent": {"id": ngw_resource_group}},
+                "point_cloud": {"source": upload_meta},
+            },
+        )
+
+    head = ngw_webtest_app.head(f"/api/resource/{res_id}/point_cloud/content", status=200)
+    assert head.headers["Accept-Ranges"] == "bytes"
+
+    response = ngw_webtest_app.get(
+        f"/api/resource/{res_id}/point_cloud/content",
+        headers={"Range": "bytes=0-3"},
+        status=206,
+    )
+    assert response.body == b"copc"
 
 
 def test_style_parent_and_value(ngw_webtest_app: WebTestApp, ngw_resource_group):

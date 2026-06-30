@@ -68,12 +68,12 @@ def _to_extent(
     wkt: str | None = None,
     epsg: int | None = None,
 ) -> PointCloudExtent | None:
-    if srs is not None:
-        src_sr = srs.to_osr()
-    elif wkt:
+    if wkt:
         src_sr = sr_from_wkt(wkt)
     elif epsg is not None:
         src_sr = sr_from_epsg(epsg)
+    elif srs is not None:
+        src_sr = srs.to_osr()
     else:
         return None
 

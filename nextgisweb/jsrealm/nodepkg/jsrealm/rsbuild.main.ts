@@ -96,6 +96,13 @@ export default {
     },
 
     rspack(rspackConfig, { appendRules, appendPlugins }) {
+      rspackConfig.module ??= {};
+      rspackConfig.module.rules ??= [];
+      rspackConfig.module.rules.unshift({
+        test: /laz-perf\.wasm$/i,
+        type: "asset/resource",
+      });
+
       appendRules([
         {
           test: /\.(m?js|tsx?)$/,

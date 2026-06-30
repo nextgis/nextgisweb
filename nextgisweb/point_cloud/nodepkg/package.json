@@ -1,5 +1,10 @@
 {
   "name": "@nextgisweb/point-cloud",
   "version": "0.0.0",
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "copc": "^0.0.8",
+    "laz-perf": "^0.0.7",
+    "proj4": "^2.20.9"
+  }
 }

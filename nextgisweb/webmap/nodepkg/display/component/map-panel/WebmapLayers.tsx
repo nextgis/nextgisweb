@@ -76,6 +76,8 @@ const WebmapLayer = observer(({ layerItem }: { layerItem: TreeLayerStore }) => {
 
         existLayer = new Adapter().createLayer(item, {
           hmux: hmux ?? undefined,
+          mapProjection: mapStore.olView.getProjection().getCode(),
+          mapStore,
         });
 
         mapStore.addLayer(

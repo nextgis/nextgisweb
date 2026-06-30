@@ -12,16 +12,41 @@ import type {
   WebMapItemLayerWrite,
 } from "@nextgisweb/webmap/type/api";
 
+export const POINT_CLOUD_STYLE_CLS = "point_cloud_style";
+export const POINT_CLOUD_ADAPTER = "point_cloud";
+export const POINT_CLOUD_ADAPTER_MID =
+  "@nextgisweb/point-cloud/point-cloud-adapter";
+
 // TODO: use universal approach
 const adapterAliases: Record<string, string> = {
   "@nextgisweb/webmap/image-adapter": "image",
   "@nextgisweb/webmap/tile-adapter": "tile",
+  [POINT_CLOUD_ADAPTER_MID]: POINT_CLOUD_ADAPTER,
 };
 
 const adapterMidAliases: Record<string, string> = {
   image: "@nextgisweb/webmap/image-adapter",
   tile: "@nextgisweb/webmap/tile-adapter",
+  [POINT_CLOUD_ADAPTER]: POINT_CLOUD_ADAPTER_MID,
 };
+
+export function isPointCloudStyleCls(styleCls: string | null | undefined) {
+  return styleCls === POINT_CLOUD_STYLE_CLS;
+}
+
+export function getDefaultAdapterMidForStyleCls(
+  styleCls: string | null | undefined
+) {
+  return isPointCloudStyleCls(styleCls)
+    ? POINT_CLOUD_ADAPTER_MID
+    : "@nextgisweb/webmap/image-adapter";
+}
+
+export function getDefaultAdapterIdentityForStyleCls(
+  styleCls: string | null | undefined
+) {
+  return isPointCloudStyleCls(styleCls) ? POINT_CLOUD_ADAPTER : "image";
+}
 
 export type TreeLayerWebmapItemWrite = Partial<
   Omit<WebMapItemLayerWrite, "item_type">
@@ -104,7 +129,7 @@ export function convertToWebmapItem({
 export async function styleToWebmapItem({
   styleId,
   display,
-  adapter = "@nextgisweb/webmap/image-adapter",
+  adapter,
   newId,
   name,
 }: {
@@ -121,6 +146,7 @@ export async function styleToWebmapItem({
   if (!style.parent) {
     throw new Error("Style parent can not be undefined");
   }
+  const resolvedAdapter = adapter ?? getDefaultAdapterMidForStyleCls(style.cls);
   const title = name ?? style.display_name;
 
   const plugin: Record<string, boolean | Record<string, boolean | string>> = {
@@ -164,7 +190,11 @@ export async function styleToWebmapItem({
     layerItem.raster_layer
   );
 
-  const layerId = identifiable ? parentId : style.id;
+  const layerId = isPointCloudStyleCls(style.cls)
+    ? parentId
+    : identifiable
+      ? parentId
+      : style.id;
 
   return {
     id: newId,
@@ -192,7 +222,7 @@ export async function styleToWebmapItem({
       visible: "collapse",
       has_legend: vectorLayer,
     },
-    adapter,
+    adapter: resolvedAdapter,
     plugin,
     key: newId,
     label: title,
