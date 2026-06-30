@@ -20,10 +20,13 @@ const [
   msgExternalUrl,
   msgKeep,
   msgSourceUrl,
+  msgValidateUpload,
   msgValidateUrl,
   msgManualSrs,
   msgManualSrsHint,
   msgCorsWarning,
+  msgValidationRequired,
+  msgValidationPending,
   msgValidationFailed,
   msgValidationOk,
 ] = [
@@ -32,10 +35,13 @@ const [
   gettext("External URL"),
   gettext("Keep existing source"),
   gettext("Source URL"),
+  gettext("Validate file"),
   gettext("Validate URL"),
   gettext("Spatial reference system"),
   gettext("Optional by default. Required if the point cloud source has no detectable CRS."),
   gettext("The remote server did not confirm CORS/range support for browser access. Validation on the server succeeded, but client-side streaming may still fail until CORS headers are fixed."),
+  gettext("Run COPC validation for the uploaded file before saving."),
+  gettext("Validation has not been run yet."),
   gettext("Validation failed"),
   gettext("Validation succeeded"),
 ];
@@ -61,24 +67,81 @@ async function checkCors(
   }
 }
 
+function formatCoord(value: number | null | undefined) {
+  return value === undefined || value === null ? undefined : value.toFixed(6);
+}
+
 function validationDescription(validation: ValidationState) {
-  const parts = [];
+  const lines: string[] = [];
+
   if (validation.point_count !== undefined && validation.point_count !== null) {
-    parts.push(`${gettext("Points")}: ${validation.point_count}`);
+    lines.push(`${gettext("Points")}: ${validation.point_count}`);
   }
+
   if (
     validation.point_format_id !== undefined &&
     validation.point_format_id !== null
   ) {
-    parts.push(`${gettext("PDRF")}: ${validation.point_format_id}`);
+    lines.push(`${gettext("PDRF")}: ${validation.point_format_id}`);
   }
+
   if (validation.epsg !== undefined && validation.epsg !== null) {
-    parts.push(`EPSG: ${validation.epsg}`);
+    lines.push(`EPSG: ${validation.epsg}`);
+  } else if (validation.wkt) {
+    lines.push(`${gettext("CRS")}: ${gettext("Detected from WKT")}`);
   }
+
+  if (
+    validation.minx !== undefined &&
+    validation.miny !== undefined &&
+    validation.maxx !== undefined &&
+    validation.maxy !== undefined
+  ) {
+    lines.push(
+      `${gettext("Bounds XY")}: ${formatCoord(validation.minx)}, ${formatCoord(validation.miny)} - ${formatCoord(validation.maxx)}, ${formatCoord(validation.maxy)}`
+    );
+  }
+
+  if (validation.zmin !== undefined && validation.zmax !== undefined) {
+    lines.push(
+      `${gettext("Bounds Z")}: ${formatCoord(validation.zmin)} - ${formatCoord(validation.zmax)}`
+    );
+  }
+
+  if (validation.extent) {
+    lines.push(
+      `${gettext("Lon/Lat extent")}: ${validation.extent.minLon.toFixed(6)}, ${validation.extent.minLat.toFixed(6)} - ${validation.extent.maxLon.toFixed(6)}, ${validation.extent.maxLat.toFixed(6)}`
+    );
+  }
+
+  const capabilities = [
+    validation.has_rgb ? gettext("RGB") : null,
+    validation.has_intensity ? gettext("Intensity") : null,
+    validation.has_classification ? gettext("Classification") : null,
+    validation.has_returns ? gettext("Returns") : null,
+  ].filter(Boolean);
+
+  if (capabilities.length) {
+    lines.push(`${gettext("Attributes")}: ${capabilities.join(", ")}`);
+  }
+
   if (validation.srs_required) {
-    parts.push(gettext("Manual SRS is required."));
+    lines.push(gettext("Manual SRS is required."));
   }
-  return parts.join(" | ");
+
+  return (
+    <div style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
+      {lines.join("\n")}
+      {validation.wkt && (
+        <>
+          {"\n"}
+          {"\n"}
+          {gettext("WKT")}:{"\n"}
+          {validation.wkt}
+        </>
+      )}
+    </div>
+  );
 }
 
 export const EditorWidget: IEditorWidget<EditorStore> = observer(
@@ -128,6 +191,17 @@ export const EditorWidget: IEditorWidget<EditorStore> = observer(
       [store]
     );
 
+    const validateSelectedUpload = useCallback(async () => {
+      if (!store.source) return;
+      try {
+        await validateUpload([store.source], {
+          signal: new AbortController().signal,
+        });
+      } catch {
+        // validateUpload already reports the error in the UI.
+      }
+    }, [store.source, validateUpload]);
+
     const validateUrl = useCallback(async () => {
       if (!store.externalUrl.trim()) return;
 
@@ -162,22 +236,34 @@ export const EditorWidget: IEditorWidget<EditorStore> = observer(
         </Lot>
 
         {store.mode === "upload" && (
-          <Lot label={false}>
-            <FileUploader
-              fileMeta={store.source ?? undefined}
-              onChange={(meta) => store.setSource(meta ?? null)}
-              onUploading={store.setUploading}
-              multiple={false}
-              afterUpload={[
-                {
-                  message: gettext("Validate point cloud"),
-                  loader: validateUpload,
-                },
-              ]}
-              uploadText={msgSelectDataset}
-              helpText={uploadHelpText}
-            />
-          </Lot>
+          <>
+            <Lot label={false}>
+              <FileUploader
+                fileMeta={store.source ?? undefined}
+                onChange={(meta) => store.setSource(meta ?? null)}
+                onUploading={store.setUploading}
+                multiple={false}
+                afterUpload={[
+                  {
+                    message: gettext("Validate point cloud"),
+                    loader: validateUpload,
+                  },
+                ]}
+                uploadText={msgSelectDataset}
+                helpText={uploadHelpText}
+              />
+            </Lot>
+            <Lot label={false}>
+              <Button
+                type="default"
+                onClick={validateSelectedUpload}
+                loading={store.validating}
+                disabled={!store.source || store.uploading}
+              >
+                {msgValidateUpload}
+              </Button>
+            </Lot>
+          </>
         )}
 
         {store.mode === "external_url" && (
@@ -224,6 +310,21 @@ export const EditorWidget: IEditorWidget<EditorStore> = observer(
             <Alert type="warning" message={store.corsWarning} showIcon />
           </Lot>
         )}
+
+        {store.mode === "upload" &&
+          store.source &&
+          !store.validation &&
+          !store.validating &&
+          !store.uploading && (
+            <Lot label={false}>
+              <Alert
+                type="warning"
+                message={msgValidationRequired}
+                description={msgValidationPending}
+                showIcon
+              />
+            </Lot>
+          )}
 
         {store.validation && (
           <Lot label={false}>

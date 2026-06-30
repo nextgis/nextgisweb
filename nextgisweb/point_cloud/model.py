@@ -10,7 +10,7 @@ from zope.interface import implementer
 
 from nextgisweb.env import COMP_ID, Base, env, gettext
 from nextgisweb.lib import saext
-from nextgisweb.lib.osrhelper import sr_from_epsg
+from nextgisweb.lib.osrhelper import sr_from_epsg, sr_from_wkt
 
 from nextgisweb.core import KindOfData
 from nextgisweb.core.exception import ValidationError
@@ -150,9 +150,16 @@ class PointCloud(Resource, SpatialLayerMixin):
         self._apply_validation(validation, resolved_srs)
         self._reserve_storage_delta(old_size)
 
+    def _extent_source_sr(self):
+        if self.wkt:
+            return sr_from_wkt(self.wkt)
+        if self.epsg is not None:
+            return sr_from_epsg(self.epsg)
+        return self.srs.to_osr()
+
     @property
     def extent(self):
-        src_sr = self.srs.to_osr()
+        src_sr = self._extent_source_sr()
         dst_sr = sr_from_epsg(4326)
         ct = osr.CoordinateTransformation(src_sr, dst_sr)
 
@@ -208,8 +215,15 @@ class ExternalURLAttr(SAttribute):
         srlzr.obj.load_external_url(value, srs=srs)
 
 
+class SrsProj4Attr(SAttribute):
+    def get(self, srlzr: Serializer) -> str | None:
+        srs = srlzr.obj.srs
+        return srs.proj4 if srs is not None else None
+
+
 class PointCloudSerializer(Serializer, resource=PointCloud):
     srs = SRelationship(read=ResourceScope.read, write=ResourceScope.update, required=False)
+    srs_proj4 = SrsProj4Attr(read=ResourceScope.read)
 
     source_type = SColumn(read=ResourceScope.read)
     external_url = ExternalURLAttr(read=ResourceScope.read, write=DataScope.write)
