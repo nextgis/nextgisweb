@@ -62,6 +62,8 @@ def pkginfo():
         "file_upload",
         "audit",
         "tileset",
+        "point_cloud",
+        "point_cloud_style",
         "basemap",
         "sld",
         "llm_core",

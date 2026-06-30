@@ -1,0 +1,190 @@
+#: model.py:42
+#, server
+msgid "Point clouds"
+msgstr "Облака точек"
+
+#: model.py:52 nodepkg/editor-widget/EditorWidget.tsx:353
+#, jsrealm, server
+msgid "Point cloud"
+msgstr "Облако точек"
+
+#: model.py:113
+#, server
+msgid "Spatial reference system could not be detected. Specify it manually."
+msgstr "Не удалось определить систему координат. Укажите её вручную."
+
+#: model.py:184 nodepkg/editor-widget/EditorWidget.tsx:35
+#, jsrealm, server
+msgid "External URL"
+msgstr "Внешний URL"
+
+#: model.py:184
+#, server
+msgid "Upload"
+msgstr "Загрузка"
+
+#: model.py:186
+#, server
+msgid "Source type"
+msgstr "Тип источника"
+
+#: model.py:187
+#, server
+msgid "Point count"
+msgstr "Количество точек"
+
+#: model.py:188
+#, server
+msgid "Point format"
+msgstr "Формат точек"
+
+#: model.py:191
+#, server
+msgid "EPSG"
+msgstr "EPSG"
+
+#: model.py:212
+#, server
+msgid "URL must not be empty."
+msgstr "URL не должен быть пустым."
+
+#: model.py:263
+#, server
+msgid "Specify either an uploaded file or an external URL, not both."
+msgstr "Укажите либо загруженный файл, либо внешний URL, но не оба источника сразу."
+
+#: model.py:268
+#, server
+msgid "Point cloud source must be provided."
+msgstr "Необходимо указать источник облака точек."
+
+#: nodepkg/editor-widget/EditorWidget.tsx:33
+#, jsrealm
+msgid "Select a dataset"
+msgstr "Выберите набор данных"
+
+#: nodepkg/editor-widget/EditorWidget.tsx:34
+#, jsrealm
+msgid "Upload point cloud"
+msgstr "Загрузить облако точек"
+
+#: nodepkg/editor-widget/EditorWidget.tsx:36
+#, jsrealm
+msgid "Keep existing source"
+msgstr "Сохранить текущий источник"
+
+#: nodepkg/editor-widget/EditorWidget.tsx:37
+#, jsrealm
+msgid "Source URL"
+msgstr "URL источника"
+
+#: nodepkg/editor-widget/EditorWidget.tsx:38
+#, jsrealm
+msgid "Validate file"
+msgstr "Проверить файл"
+
+#: nodepkg/editor-widget/EditorWidget.tsx:39
+#, jsrealm
+msgid "Validate URL"
+msgstr "Проверить URL"
+
+#: nodepkg/editor-widget/EditorWidget.tsx:40
+#, jsrealm
+msgid "Spatial reference system"
+msgstr "Система координат"
+
+#: nodepkg/editor-widget/EditorWidget.tsx:41
+#, jsrealm
+msgid "Optional by default. Required if the point cloud source has no detectable CRS."
+msgstr "По умолчанию необязательно. Требуется, если для источника облака точек не удаётся определить систему координат."
+
+#: nodepkg/editor-widget/EditorWidget.tsx:42
+#, jsrealm
+msgid ""
+"The remote server did not confirm CORS/range support for browser access. "
+"Validation on the server succeeded, but client-side streaming may still fail "
+"until CORS headers are fixed."
+msgstr ""
+"Удалённый сервер не подтвердил поддержку CORS/Range для доступа из браузера. "
+"Проверка на сервере выполнена успешно, но потоковая передача на стороне "
+"клиента может не работать, пока не будут исправлены заголовки CORS."
+
+#: nodepkg/editor-widget/EditorWidget.tsx:43
+#, jsrealm
+msgid "Run COPC validation for the uploaded file before saving."
+msgstr "Выполните проверку COPC для загруженного файла перед сохранением."
+
+#: nodepkg/editor-widget/EditorWidget.tsx:44
+#, jsrealm
+msgid "Validation has not been run yet."
+msgstr "Проверка ещё не выполнялась."
+
+#: nodepkg/editor-widget/EditorWidget.tsx:45
+#, jsrealm
+msgid "Validation failed"
+msgstr "Проверка не пройдена"
+
+#: nodepkg/editor-widget/EditorWidget.tsx:46
+#, jsrealm
+msgid "Validation succeeded"
+msgstr "Проверка успешно пройдена"
+
+#: nodepkg/editor-widget/EditorWidget.tsx:118
+#, jsrealm
+msgid "RGB"
+msgstr "RGB"
+
+#: nodepkg/editor-widget/EditorWidget.tsx:119
+#, jsrealm
+msgid "Intensity"
+msgstr "Интенсивность"
+
+#: nodepkg/editor-widget/EditorWidget.tsx:120
+#, jsrealm
+msgid "Classification"
+msgstr "Классификация"
+
+#: nodepkg/editor-widget/EditorWidget.tsx:121
+#, jsrealm
+msgid "Returns"
+msgstr "Отражения"
+
+#: nodepkg/editor-widget/EditorWidget.tsx:129
+#, jsrealm
+msgid "Manual SRS is required."
+msgstr "Необходимо вручную указать систему координат."
+
+#: nodepkg/editor-widget/EditorWidget.tsx:139
+#, jsrealm
+msgid "WKT"
+msgstr "WKT"
+
+#: nodepkg/editor-widget/EditorWidget.tsx:248
+#, jsrealm
+msgid "Validate point cloud"
+msgstr "Проверить облако точек"
+
+#: validation.py:51
+#, server
+msgid "Point cloud support requires the laspy package."
+msgstr "Для поддержки облаков точек требуется пакет laspy."
+
+#: validation.py:115
+#, server
+msgid "Invalid COPC point cloud."
+msgstr "Некорректное облако точек COPC."
+
+#: validation.py:122
+#, server
+msgid "Only COPC point formats 6, 7, and 8 are supported."
+msgstr "Поддерживаются только форматы точек COPC 6, 7 и 8."
+
+#: validation.py:128
+#, server
+msgid "The COPC hierarchy is empty or corrupted."
+msgstr "Иерархия COPC пуста или повреждена."
+
+#: validation.py:171
+#, server
+msgid "Only HTTP and HTTPS URLs are supported."
+msgstr "Поддерживаются только URL с протоколами HTTP и HTTPS."
