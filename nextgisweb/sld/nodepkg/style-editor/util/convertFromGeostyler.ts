@@ -107,7 +107,7 @@ function convertTextSymbolizer(gsFill: GSTextSymbolizer): TextSymbolizer {
       ? { type: "point", offset: gsFill.offset as [number, number] }
       : undefined,
     halo:
-      haloWidth !== undefined && haloFill !== undefined
+      haloWidth && haloFill !== undefined
         ? {
             radius: haloWidth,
             fill: haloFill,

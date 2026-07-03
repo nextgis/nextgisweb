@@ -57,14 +57,16 @@ export function StyleEditor({
     return textSymbolizerInit || defTextSymbolizer;
   });
 
+  // Fix text halo in GeoStyler preview.
+  // No way to turn it off, so use text color as a workaround.
   const textSymbolizerForPreview = useMemo(() => {
     const textSymbolizerPreview: TextSymbolizer = { ...textSymbolizer };
     if (textSymbolizerPreview.haloColor === undefined) {
       textSymbolizerPreview.haloWidth = 0;
       textSymbolizerPreview.haloColor = textSymbolizer.color;
     }
-    if (textSymbolizerPreview.haloWidth === undefined) {
-      textSymbolizerPreview.haloColor = undefined;
+    if (!textSymbolizerPreview.haloWidth) {
+      textSymbolizerPreview.haloColor = textSymbolizer.color;
     }
     return textSymbolizerPreview;
   }, [textSymbolizer]);
