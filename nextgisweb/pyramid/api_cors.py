@@ -6,6 +6,9 @@ from .util import parse_origin
 
 
 def check_origin(request, origin: str) -> bool:
+    if origin == "null":
+        return False
+
     try:
         olist = request.env.core.settings_get("pyramid", "cors_allow_origin")
     except KeyError:
