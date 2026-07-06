@@ -11,11 +11,29 @@ async function fetchSettings<C extends CSTypedComponent>(
 async function fetchSettings<T>(component: string): Promise<T>;
 
 async function fetchSettings(component: string) {
-  return await route("pyramid.settings").get({
+  if (window.ngwSentry) {
+    window.ngwSentry.addBreadcrumb({
+      level: "debug",
+      message: `Fetching settings for component: ${component}`,
+      data: { component },
+    });
+  }
+
+  const result = await route("pyramid.settings").get({
     query: { component: component as any },
     // NOTE: Caching disabled as an attempt to fix NGW-1920
     // cache: true,
   });
+
+  if (window.ngwSentry) {
+    window.ngwSentry.addBreadcrumb({
+      level: "debug",
+      message: `Fetched settings for component: ${component}`,
+      data: { component, result },
+    });
+  }
+
+  return result;
 }
 
 export { fetchSettings };
