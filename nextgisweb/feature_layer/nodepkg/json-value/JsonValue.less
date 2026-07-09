@@ -1,0 +1,74 @@
+.ngw-feature-layer-json-value-input {
+  &:not(.ant-input-affix-wrapper-disabled) {
+    cursor: pointer;
+
+    .ant-input,
+    .ant-input-suffix {
+      cursor: pointer;
+    }
+  }
+
+  &.ant-input-affix-wrapper-disabled {
+    cursor: not-allowed;
+
+    .ant-input,
+    .ant-input-suffix {
+      cursor: not-allowed;
+    }
+  }
+}
+
+.ngw-feature-layer-json-value-icon {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  border: 0;
+  background: transparent;
+  padding: 0;
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+}
+
+.ngw-editor-modal.ant-modal.ngw-feature-layer-json-value-modal {
+  .ant-modal-render {
+    height: 100%;
+  }
+
+  .ant-modal-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+
+    .ant-modal-body {
+      display: flex;
+      flex: 1 1 auto;
+      flex-direction: column;
+      height: auto;
+      min-height: 0;
+      overflow: hidden;
+    }
+  }
+}
+
+.ngw-feature-layer-json-value-content {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 1em;
+  min-height: 0;
+
+  .ant-alert {
+    flex: 0 0 auto;
+  }
+
+  .ngw-feature-layer-json-value-code {
+    flex: 1 1 auto;
+    min-height: 0;
+
+    > div {
+      height: 100%;
+    }
+  }
+}

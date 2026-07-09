@@ -1,6 +1,7 @@
 import type { Dayjs } from "dayjs";
-import type { ReactElement } from "react";
+import type { ReactElement, ReactNode } from "react";
 
+import { JsonValuePreview } from "@nextgisweb/feature-layer/json-value";
 import type { NgwAttributeType } from "@nextgisweb/feature-layer/type";
 import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
 import {
@@ -57,24 +58,35 @@ export async function fieldValuesToDataSource(
 
   for (const [k, field] of fieldsInfo.entries()) {
     if (!field) continue;
-    let val = unmarshalFieldValue(field.datatype, fields[k]);
-    if (val !== null && isDateTimeFieldType(field.datatype)) {
-      val = val as Dayjs;
+    const value = unmarshalFieldValue(field.datatype, fields[k]);
+    let val: ReactNode;
+    if (value !== null && isDateTimeFieldType(field.datatype)) {
+      const dt = value as Dayjs;
       switch (field.datatype) {
         case "DATE":
-          val = val.format("L");
+          val = dt.format("L");
           break;
         case "TIME":
-          val = val.format("LTS");
+          val = dt.format("LTS");
           break;
         case "DATETIME":
-          val = val.format("L LTS");
+          val = dt.format("L LTS");
           break;
         default:
           assert(false, `Unexpected datatype: ${field.datatype}`);
       }
-    } else if (val !== null && field.datatype === "BOOLEAN") {
-      val = String(val);
+    } else if (value !== null) {
+      const ngwVal = value as NgwAttributeType;
+      switch (field.datatype) {
+        case "BOOLEAN":
+          val = String(ngwVal);
+          break;
+        case "JSON":
+          val = <JsonValuePreview value={ngwVal} readOnly />;
+          break;
+        default:
+          val = String(ngwVal);
+      }
     }
 
     const dataItem: FieldDataItem = {

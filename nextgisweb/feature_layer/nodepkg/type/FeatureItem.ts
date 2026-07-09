@@ -1,6 +1,14 @@
 export type FeatureItemExtensions = Record<string, unknown | null>;
 
-export type NgwAttributeType = string | number | boolean | null;
+export type JsonValue =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: JsonValue }
+  | JsonValue[];
+
+export type NgwAttributeType = JsonValue;
 
 export type Attrs = Record<string, NgwAttributeType>;
 

@@ -14,6 +14,7 @@ import type { FilterEditorStore } from "../FilterEditorStore";
 import { OPERATORS } from "../type";
 import type {
   CmpOp,
+  ConditionValue,
   EqNeOp,
   FilterCondition as FilterConditionType,
   IlikeOp,
@@ -52,6 +53,7 @@ interface FilterConditionProps {
 export type ValueInput =
   | string
   | number
+  | boolean
   | null
   | Dayjs
   | Array<string | number>;
@@ -67,6 +69,15 @@ const getOperatorsForField = (field?: ResolvedFieldRef) => {
 
   return OPERATORS.filter((op) => op.supportedTypes.includes(field.datatype));
 };
+
+function isConditionValue(value: unknown): value is ConditionValue {
+  return (
+    value === null ||
+    typeof value === "string" ||
+    typeof value === "number" ||
+    typeof value === "boolean"
+  );
+}
 
 export const FilterCondition = observer(
   ({ condition, store, dragHandleProps }: FilterConditionProps) => {
@@ -149,12 +160,19 @@ export const FilterCondition = observer(
     };
 
     const handleValueChange = (value: ValueInput) => {
-      if (!currentField) {
+      if (!currentField || currentField.datatype === "JSON") {
+        return;
+      }
+
+      if (Array.isArray(value)) {
+        store.updateCondition(condition.id, { value });
         return;
       }
 
       const serializedValue = marshalFieldValue(currentField.datatype, value);
-      store.updateCondition(condition.id, { value: serializedValue });
+      if (isConditionValue(serializedValue)) {
+        store.updateCondition(condition.id, { value: serializedValue });
+      }
     };
 
     const handleDelete = () => {

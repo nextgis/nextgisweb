@@ -7,6 +7,8 @@ import { useThemeVariables } from "@nextgisweb/gui/hook";
 import { assert } from "@nextgisweb/jsrealm/error";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
+import { JsonValuePreview } from "../json-value";
+
 import { FeatureTableRows } from "./FeatureTableRows";
 import { HeaderCols } from "./component/HeaderCols";
 import { HeaderHandles } from "./component/HeaderHandles";
@@ -104,6 +106,11 @@ function FeatureTable({
         flex = "5 5 8em";
       }
       field["flex"] = flex;
+      if (datatype === "JSON") {
+        field.renderValue = (value) => (
+          <JsonValuePreview value={value} readOnly />
+        );
+      }
     }
 
     for (const f of fields_) {

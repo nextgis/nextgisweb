@@ -6,7 +6,7 @@ import { Spin } from "@nextgisweb/gui/antd";
 import type { FilterEditorStore } from "../FilterEditorStore";
 import type { FilterExpressionString } from "../type";
 
-const AsyncCode = lazy(() => import("./CodeLazy"));
+const AsyncCode = lazy(() => import("@nextgisweb/gui/component/code/CodeLazy"));
 
 const CodeLoadingFallback = () => (
   <div

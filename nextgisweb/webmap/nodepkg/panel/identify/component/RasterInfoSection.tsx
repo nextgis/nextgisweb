@@ -19,6 +19,7 @@ export function RasterInfoSection({ item }: RasterInfoSectionProps) {
       key: index,
       value: `${value}${item.pixel_class[index] ? ` (${item.pixel_class[index]})` : ""}`,
       attr: msgBand(index + 1),
+      datatype: "STRING",
     };
   });
 

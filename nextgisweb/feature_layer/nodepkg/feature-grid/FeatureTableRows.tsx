@@ -95,7 +95,9 @@ export function FeatureTableRows({
             const val = row[f.keyname];
             renderValue =
               val !== undefined
-                ? renderFeatureFieldValue(f, val)
+                ? f.renderValue
+                  ? f.renderValue(val)
+                  : renderFeatureFieldValue(f, val)
                 : loadingCol();
 
             // I tried using Antd Paragraph (ExpandableText), but it breaks in a virtualized table.

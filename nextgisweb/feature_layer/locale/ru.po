@@ -92,19 +92,19 @@ msgstr "Таблица объектов"
 msgid "Invalid filter expression"
 msgstr "Некорректное выражение фильтра"
 
-#: model.py:197
+#: model.py:205
 msgid "Field not found (ID=%d)."
 msgstr "Поле не найдено (ID=%d)."
 
-#: model.py:274
+#: model.py:285
 msgid "Versioning not supported"
 msgstr "Версионирование не поддерживается"
 
-#: nodepkg/attribute-editor/AttributeEditor.tsx:38
+#: nodepkg/attribute-editor/AttributeEditor.tsx:39
 msgid "Set field value to NULL (No data)"
 msgstr "Установить для атрибута значение NULL (Нет данных)"
 
-#: nodepkg/attribute-editor/AttributeEditor.tsx:39
+#: nodepkg/attribute-editor/AttributeEditor.tsx:40
 msgid "There are no attributes in the vector layer"
 msgstr "В векторном слое нет атрибутов"
 
@@ -178,16 +178,17 @@ msgstr "Zip архив"
 msgid "Save"
 msgstr "Сохранить"
 
-#: nodepkg/feature-editor-modal/FeatureEditorModal.tsx:19
+#: nodepkg/feature-editor-modal/FeatureEditorModal.tsx:17
 #: nodepkg/feature-filter/FeatureFilterEditor.tsx:30
+#: nodepkg/json-value/JsonValuePreview.tsx:12
 msgid "Cancel"
 msgstr "Отмена"
 
-#: nodepkg/feature-editor-modal/FeatureEditorModal.tsx:21
+#: nodepkg/feature-editor-modal/FeatureEditorModal.tsx:19
 msgid "Are you sure?"
 msgstr "Вы уверены?"
 
-#: nodepkg/feature-editor-modal/FeatureEditorModal.tsx:22
+#: nodepkg/feature-editor-modal/FeatureEditorModal.tsx:20
 msgid "Unsaved changes will be lost if you close the window."
 msgstr "Несохраненные изменения будут потеряны, если вы закроете окно."
 
@@ -220,6 +221,7 @@ msgid "JSON"
 msgstr "JSON"
 
 #: nodepkg/feature-filter/FeatureFilterEditor.tsx:29
+#: nodepkg/json-value/JsonValueModal.tsx:9
 msgid "Apply"
 msgstr "Применить"
 
@@ -280,15 +282,15 @@ msgstr "Некорректный JSON или структура фильтра"
 msgid "Validation failed"
 msgstr "Ошибка валидации"
 
-#: nodepkg/feature-filter/component/FilterCondition.tsx:38
+#: nodepkg/feature-filter/component/FilterCondition.tsx:39
 msgid "Delete condition"
 msgstr "Удалить условие"
 
-#: nodepkg/feature-filter/component/FilterCondition.tsx:40
+#: nodepkg/feature-filter/component/FilterCondition.tsx:41
 msgid "Select field"
 msgstr "Выберите поле"
 
-#: nodepkg/feature-filter/component/FilterCondition.tsx:41
+#: nodepkg/feature-filter/component/FilterCondition.tsx:42
 msgid "Operator"
 msgstr "Оператор"
 
@@ -326,11 +328,11 @@ msgstr "Некорректное поле"
 msgid "Field not found"
 msgstr "Поле не найдено"
 
-#: nodepkg/feature-filter/testentry.tsx:120
+#: nodepkg/feature-filter/testentry.tsx:127
 msgid "Output JSON"
 msgstr "Вывод JSON"
 
-#: nodepkg/feature-filter/testentry.tsx:121
+#: nodepkg/feature-filter/testentry.tsx:128
 msgid "Current filter state"
 msgstr "Текущее состояние фильтра"
 
@@ -538,33 +540,33 @@ msgstr "Поиск..."
 msgid "Advanced filter"
 msgstr "Расширенный фильтр"
 
-#: nodepkg/feature-grid/FeatureTable.tsx:89
+#: nodepkg/feature-grid/FeatureTable.tsx:91
 #: nodepkg/feature-grid/component/TableConfigModal.tsx:49
 msgid "Last changed"
 msgstr "Последнее изменение"
 
-#: nodepkg/feature-grid/component/ExportAction.tsx:30
+#: nodepkg/feature-grid/component/ExportAction.tsx:27
 #: nodepkg/resource-action-plugin.tsx:63 view.py:88 view.py:112
 msgid "Save as"
 msgstr "Сохранить как"
 
-#: nodepkg/feature-grid/component/ExportAction.tsx:31
+#: nodepkg/feature-grid/component/ExportAction.tsx:28
 msgid "Advanced export"
 msgstr "Расширенный экспорт"
 
-#: nodepkg/feature-grid/component/ExportAction.tsx:32
+#: nodepkg/feature-grid/component/ExportAction.tsx:29
 msgid "Quick export"
 msgstr "Быстрый экспорт"
 
-#: nodepkg/feature-grid/component/ExportAction.tsx:33
+#: nodepkg/feature-grid/component/ExportAction.tsx:30
 msgid "Filters are applied"
 msgstr "Применяются фильтры"
 
-#: nodepkg/feature-grid/util/renderFeatureFieldValue.ts:13
+#: nodepkg/feature-grid/util/renderFeatureFieldValue.ts:15
 msgid "True"
 msgstr "Истина"
 
-#: nodepkg/feature-grid/util/renderFeatureFieldValue.ts:13
+#: nodepkg/feature-grid/util/renderFeatureFieldValue.ts:15
 msgid "False"
 msgstr "Ложь"
 
@@ -674,6 +676,19 @@ msgstr "Охват (xMax)"
 #: nodepkg/geometry-info/component/GeometryInfoTable.tsx:70
 msgid "Extent (yMax)"
 msgstr "Охват (yMax)"
+
+#: nodepkg/json-value/JsonValueModal.tsx:8
+#: nodepkg/json-value/JsonValuePreview.tsx:14
+msgid "Invalid JSON"
+msgstr "Некорректный JSON"
+
+#: nodepkg/json-value/JsonValuePreview.tsx:13
+msgid "Edit JSON"
+msgstr "Редактировать JSON"
+
+#: nodepkg/json-value/JsonValuePreview.tsx:15
+msgid "View JSON"
+msgstr "Просмотреть JSON"
 
 #: nodepkg/resource-action-plugin.tsx:22
 #: nodepkg/version-history/hook/useColumns.tsx:73

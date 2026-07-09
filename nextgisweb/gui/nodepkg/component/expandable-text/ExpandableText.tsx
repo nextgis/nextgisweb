@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { ComponentProps } from "react";
+import type { ComponentProps, ReactNode } from "react";
 
 import { Tooltip, Typography } from "@nextgisweb/gui/antd";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -11,11 +11,13 @@ const { Paragraph } = Typography;
 
 export interface ExpandableTextProps extends Omit<
   ComponentProps<typeof Paragraph>,
-  "ellipsis" | "style" | "styles"
+  "ellipsis" | "style" | "styles" | "onClick"
 > {
   maxLines?: number;
   button?: boolean;
   tooltip?: boolean;
+  symbol?: ReactNode | ((expanded: boolean) => ReactNode);
+  onClick?: (opt: { expand: () => void; collapse: () => void }) => void;
 }
 
 export function ExpandableText({
@@ -23,6 +25,8 @@ export function ExpandableText({
   button = undefined,
   tooltip = false,
   children,
+  symbol,
+  onClick,
   ...props
 }: ExpandableTextProps) {
   const [hasEllipsis, setHasEllipsis] = useState(false);
@@ -46,13 +50,30 @@ export function ExpandableText({
         ellipsis={{
           rows: maxLines,
           expandable: "collapsible",
-          symbol: button === true ? (val) => (val ? msgLess : msgMore) : <></>,
+          symbol:
+            button === true ? (
+              symbol ? (
+                symbol
+              ) : (
+                (val) => (val ? msgLess : msgMore)
+              )
+            ) : (
+              <></>
+            ),
           expanded,
           onEllipsis: setHasEllipsis,
           onExpand: (e, info) => {
             e.preventDefault();
             e.stopPropagation();
-            setExpanded(info.expanded);
+
+            if (onClick) {
+              onClick({
+                expand: () => setExpanded(true),
+                collapse: () => setExpanded(false),
+              });
+            } else {
+              setExpanded(info.expanded);
+            }
           },
         }}
         onClick={
@@ -60,6 +81,7 @@ export function ExpandableText({
             ? (e) => {
                 e.preventDefault();
                 e.stopPropagation();
+
                 setExpanded((prev) => !prev);
               }
             : undefined

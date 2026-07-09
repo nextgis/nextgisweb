@@ -27,6 +27,7 @@ import { LookupSelect } from "@nextgisweb/lookup-table/component/lookup-select";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import AttributeEditorStore from "./AttributeEditorStore";
+import { JsonAttributeInput } from "./JsonAttributeInput";
 import type { NgwAttributeValue } from "./type";
 
 import BackspaceIcon from "@nextgisweb/icon/material/backspace";
@@ -116,8 +117,7 @@ const AttributeEditor = observer(
           INTEGER: <InputInteger {...inputProps} />,
           DATETIME: <DateTimePicker {...dpProps} />,
           BOOLEAN: <BooleanInput {...inputProps} />,
-          // TODO: Add JSON editor component and use it here
-          JSON: <Input {...inputProps} readOnly={true} />,
+          JSON: <JsonAttributeInput {...inputProps} />,
         };
       },
       [saving]

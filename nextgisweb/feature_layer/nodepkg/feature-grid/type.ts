@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
 import type { ActionToolbarAction } from "@nextgisweb/gui/action-toolbar";
 import type { SizeType } from "@nextgisweb/gui/antd";
@@ -27,6 +29,7 @@ export interface FeatureLayerFieldCol extends Pick<
 > {
   keyname?: string;
   flex?: string;
+  renderValue?: (value: NgwAttributeType) => ReactNode;
 }
 
 export type EffectiveWidths = Record<string, number>;

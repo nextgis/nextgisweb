@@ -1,7 +1,8 @@
+import type { FeatureLayerFieldDatatype } from "@nextgisweb/feature-layer/type/api";
 import { Select } from "@nextgisweb/gui/antd";
 import type { SelectProps } from "@nextgisweb/gui/antd";
 
-const VALUES = [
+const VALUES: FeatureLayerFieldDatatype[] = [
   "INTEGER",
   "BIGINT",
   "REAL",
@@ -10,6 +11,7 @@ const VALUES = [
   "TIME",
   "DATETIME",
   "BOOLEAN",
+  "JSON",
 ];
 
 const OPTIONS = VALUES.map((i) => ({ value: i, label: i }));
