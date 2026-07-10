@@ -32,6 +32,7 @@ It combines a powerful spatial backend, a web-based interface for administration
 - [Examples and live demo](#examples-and-live-demo)
 - [Community and ecosystem](#community-and-ecosystem)
 - [Commercial support](#commercial-support)
+- [Comparisons of NextGIS Web with alternative solutions](#comparisons-of-nextgis-web-with-alternative-solutions)
 - [License](#license)
 
 
@@ -162,6 +163,14 @@ Professional support, cloud and enterprise deployments, and consulting services 
 
 ✉️ [Contact us](https://nextgis.com/contact/)
 
+## Comparisons of NextGIS Web with alternative solutions
+
+Explore detailed comparisons with other open-source geospatial solutions:
+
+* [NextGIS Web vs GeoServer](https://nextgis.com/nextgis-web-vs-geoserver/)
+* [NextGIS Web vs QGIS Server](https://nextgis.com/nextgis-web-vs-qgis-server/)
+* [NextGIS Web vs MapServer](https://nextgis.com/nextgis-web-vs-mapserver/)
+* [NextGIS Web vs MapStore](https://nextgis.com/nextgis-web-vs-mapstore/)
 
 ## License
 
