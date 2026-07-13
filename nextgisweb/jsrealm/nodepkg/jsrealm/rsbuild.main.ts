@@ -2,6 +2,7 @@ import { createRequire } from "node:module";
 import path from "node:path";
 
 import type { TransformOptions } from "@babel/core";
+import { rspack } from "@rsbuild/core";
 import type { EnvironmentConfig } from "@rsbuild/core";
 import { pluginReact } from "@rsbuild/plugin-react";
 
@@ -132,7 +133,13 @@ export default {
         },
       ]);
 
-      appendPlugins([registryReplacementPlugin, ...createCompressionPlugins()]);
+      appendPlugins([
+        registryReplacementPlugin,
+        ...(isDevServer
+          ? []
+          : [new rspack.experiments.CssChunkingPlugin({ strict: true })]),
+        ...createCompressionPlugins(),
+      ]);
 
       rspackConfig.resolve = {
         ...rspackConfig.resolve,
