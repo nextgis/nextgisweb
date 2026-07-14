@@ -25,7 +25,6 @@ Format string is case-sensitive. For formats and options list see https://docs.n
 GeoJSON
 ^^^^^^^
 
-
 **The following request returns GeoJSON file from vector layer**:
 
 .. versionadded:: 3.0
@@ -43,29 +42,6 @@ GeoJSON
 .. sourcecode:: http
 
    GET /api/resource/55/geojson HTTP/1.1
-   Host: ngw_url
-   Accept: */*
-
-CSV
-^^^
-
-**The following request returns CSV file from vector layer**:
-
-.. versionadded:: 3.0
-.. http:get:: /api/resource/(int:id)/csv
-
-   CSV file request
-
-   :reqheader Accept: must be ``*/*``
-   :reqheader Authorization: optional Basic auth string to authenticate
-   :param id: resource identifier
-   :statuscode 200: no error
-
-**Example request**:
-
-.. sourcecode:: http
-
-   GET /api/resource/55/csv HTTP/1.1
    Host: ngw_url
    Accept: */*
 
