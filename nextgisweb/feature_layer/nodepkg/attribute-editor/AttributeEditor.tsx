@@ -62,7 +62,15 @@ const AttributeEditor = observer(
       return new AttributeEditorStore({ fields: fields_ });
     });
 
-    const { fields, attributes, isReady, setValues, saving } = store;
+    const {
+      fields,
+      saving,
+      isReady,
+      attributes,
+      loadRevision,
+      setValidator,
+      setValues,
+    } = store;
 
     const form = Form.useForm()[0];
 
@@ -81,10 +89,30 @@ const AttributeEditor = observer(
     }, [isReady, form, attributes]);
 
     useEffect(() => {
+      if (isReady) {
+        form.resetFields();
+      }
+    }, [isReady, loadRevision, form, fields]);
+
+    useEffect(() => {
       if (onChange) {
         onChange(store.value);
       }
     }, [store.value, onChange]);
+
+    const validate = useCallback(async () => {
+      try {
+        await form.validateFields();
+        return true;
+      } catch {
+        return false;
+      }
+    }, [form]);
+
+    useEffect(() => {
+      setValidator(validate);
+      return () => setValidator(undefined);
+    }, [setValidator, validate]);
 
     const getNgwTypeAliases = useCallback(
       ({
@@ -154,6 +182,7 @@ const AttributeEditor = observer(
               </ExpandableText>
             ),
             formItem,
+            required: field.required,
 
             append: (
               <Tooltip title={msgSetNull} placement="right">
@@ -190,10 +219,8 @@ const AttributeEditor = observer(
         form={form}
         fields={formFields}
         initialValues={attributes}
-        onChange={async (v) => {
-          if (await v.isValid()) {
-            setValues(v.value);
-          }
+        onChange={(v) => {
+          setValues(v.value);
         }}
       >
         {!formFields.length && <p>{msgNoAttrs}</p>}

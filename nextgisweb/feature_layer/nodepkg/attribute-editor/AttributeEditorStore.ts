@@ -12,12 +12,18 @@ import { marshalFieldValue, unmarshalFieldValue } from "../util/ngwAttributes";
 
 import type { AppAttributes, NgwAttributeValue } from "./type";
 
+type Validator = () => Promise<boolean>;
+
 class AttributeEditorStore implements EditorStore<NgwAttributeValue> {
   readonly _parentStore?: FeatureEditorStore;
   readonly _fields?: FeatureLayerFieldRead[];
 
+  private _validator?: Validator;
+
   @observable.shallow accessor value: NgwAttributeValue = {};
   @observable.shallow private accessor _initValue: NgwAttributeValue = {};
+  @observable.ref accessor isValid = true;
+  @observable.ref accessor loadRevision = 0;
 
   constructor({ parentStore, fields }: EditorStoreConstructorOptions = {}) {
     this._parentStore = parentStore;
@@ -33,6 +39,8 @@ class AttributeEditorStore implements EditorStore<NgwAttributeValue> {
 
     this.value = value;
     this._initValue = value;
+    this.isValid = true;
+    this.loadRevision += 1;
   }
 
   @computed
@@ -94,6 +102,24 @@ class AttributeEditorStore implements EditorStore<NgwAttributeValue> {
   @action
   setValues = (values: AppAttributes = {}) => {
     this.value = this._formatAttributes(values);
+  };
+
+  validate = async () => {
+    if (this._validator) {
+      const isValid = await this._validator();
+      this.setIsValid(isValid);
+      return isValid;
+    }
+    return true;
+  };
+
+  @action.bound
+  setIsValid(isValid: boolean) {
+    this.isValid = isValid;
+  }
+
+  setValidator = (validator?: Validator) => {
+    this._validator = validator;
   };
 
   private _formatAttributes(values: AppAttributes) {

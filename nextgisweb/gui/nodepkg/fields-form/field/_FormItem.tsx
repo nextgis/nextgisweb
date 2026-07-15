@@ -9,6 +9,7 @@ export function FormItem({
   prepend,
   append,
   label,
+  required,
   input: Input,
   noStyle = true,
   ...props
@@ -41,7 +42,7 @@ export function FormItem({
   );
 
   return (
-    <Form.Item label={label}>
+    <Form.Item label={label} required={required}>
       {wrapWithSpaceIfNeeded(
         <Form.Item {...props} noStyle={noStyle}>
           {memoizedInputComponent}

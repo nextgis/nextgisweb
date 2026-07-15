@@ -62,12 +62,18 @@ export class FeatureEditorStore {
 
   @computed
   get dirty(): boolean {
-    const stores: { dirty: boolean }[] = [];
-    if (this._attributeStore) stores.push(this._attributeStore);
-    if (this._geometryStore) stores.push(this._geometryStore);
-    stores.push(...Object.values(this._extensionStores));
+    const stores = this._getStores();
 
     return stores.some(({ dirty }) => dirty);
+  }
+
+  async validate(): Promise<boolean> {
+    const stores = this._getStores();
+
+    const results = await Promise.all(
+      stores.map((store) => store.validate?.() ?? true)
+    );
+    return results.every(Boolean);
   }
 
   @action
@@ -246,6 +252,14 @@ export class FeatureEditorStore {
         extensionStore.load(extension);
       }
     }
+  }
+
+  private _getStores(): EditorStore[] {
+    const stores: EditorStore[] = [];
+    if (this._attributeStore) stores.push(this._attributeStore);
+    if (this._geometryStore) stores.push(this._geometryStore);
+    stores.push(...Object.values(this._extensionStores));
+    return stores;
   }
 
   @action

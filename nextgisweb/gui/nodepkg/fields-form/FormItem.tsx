@@ -9,6 +9,10 @@ function createRules(required?: boolean, requiredMessage?: string) {
     rules.push({
       required: true,
       message: requiredMessage ?? gettext("This value is required"),
+      transform: (value: unknown) =>
+        value === "" || (Array.isArray(value) && value.length === 0)
+          ? " "
+          : value,
     });
   }
   return rules;
@@ -25,5 +29,12 @@ export function FormItem({
 }: FormField) {
   const newRules = [...rules, ...createRules(required, requiredMessage)];
 
-  return <BaseFormItem input={formItem} {...restProps} rules={newRules} />;
+  return (
+    <BaseFormItem
+      input={formItem}
+      required={required}
+      {...restProps}
+      rules={newRules}
+    />
+  );
 }

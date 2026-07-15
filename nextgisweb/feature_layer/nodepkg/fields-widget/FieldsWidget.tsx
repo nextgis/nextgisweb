@@ -17,6 +17,7 @@ import type { FieldsStore } from "./FieldsStore";
 
 import LabelFieldIcon from "@nextgisweb/icon/material/font_download/outline";
 import TextSearchIcon from "@nextgisweb/icon/material/manage_search";
+import RequiredIcon from "@nextgisweb/icon/material/priority_high";
 import GridVisibilityIcon from "@nextgisweb/icon/material/table_chart/outline";
 
 /* prettier-ignore */ const
@@ -27,6 +28,7 @@ msgLookupTable = gettext("Lookup table"),
 msgGridVisibility = gettext("Feature table"),
 msgTextSearch = gettext("Text search"),
 msgLabelField = gettext("Label attribute"),
+msgRequired = gettext("Required"),
 msgDeleteFieldTitle = gettext("Delete field?"),
 msgDeleteFieldContent = gettext("Deleting this field will permanently erase all its version history from this layer."),
 msgDatatypePlaceholder = gettext("Please select"),
@@ -80,6 +82,12 @@ const FieldWidget = observer<{ item: Field }>(({ item }) => {
       />
       <LotMV
         label={false}
+        value={item.required}
+        component={CheckboxValue}
+        props={{ children: msgRequired }}
+      />
+      <LotMV
+        label={false}
         value={item.labelField}
         component={CheckboxValue}
         props={{ children: msgLabelField }}
@@ -119,6 +127,7 @@ export const FieldsWidget: EditorWidget<FieldsStore> = observer(({ store }) => {
       label_field: false,
       lookup_table: null,
       text_search: true,
+      required: false,
     });
   }, [store]);
 
@@ -179,6 +188,11 @@ export const FieldsWidget: EditorWidget<FieldsStore> = observer(({ store }) => {
                   {...item.textSearch.cprops()}
                   icon={<TextSearchIcon />}
                   title={msgTextSearch}
+                />
+                <Toggle
+                  {...item.required.cprops()}
+                  icon={<RequiredIcon />}
+                  title={msgRequired}
                 />
                 <Toggle
                   {...item.labelField.cprops()}

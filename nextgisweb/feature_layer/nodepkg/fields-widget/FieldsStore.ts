@@ -20,6 +20,7 @@ interface FieldData {
   label_field: boolean;
   grid_visibility: boolean;
   text_search: boolean;
+  required: boolean;
 }
 
 const {
@@ -31,6 +32,7 @@ const {
   label_field: fieldLabelField,
   grid_visibility: fieldGridVisibility,
   text_search: fieldTextSearch,
+  required: fieldRequired,
   $load: fieldLoad,
   $error: fieldError,
 } = mapper<Field, FieldData>({
@@ -61,6 +63,7 @@ export class Field {
   readonly labelField = fieldLabelField.init(false, this);
   readonly gridVisibility = fieldGridVisibility.init(true, this);
   readonly textSearch = fieldTextSearch.init(true, this);
+  readonly required = fieldRequired.init(false, this);
 
   constructor(store: FieldsStore, data: FieldData) {
     this.store = store;
@@ -86,6 +89,7 @@ export class Field {
       ...this.labelField.jsonPart(),
       ...this.gridVisibility.jsonPart(),
       ...this.textSearch.jsonPart(),
+      ...this.required.jsonPart(),
     };
   }
 

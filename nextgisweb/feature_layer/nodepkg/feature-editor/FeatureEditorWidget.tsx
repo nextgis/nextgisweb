@@ -7,6 +7,7 @@ import {
   useMemo,
   useState,
 } from "react";
+import type { ReactNode } from "react";
 
 import { ActionToolbar } from "@nextgisweb/gui/action-toolbar";
 import type {
@@ -23,6 +24,7 @@ import { assert } from "@nextgisweb/jsrealm/error";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 
 import { GEOMETRY_KEY } from "../geometry-editor/constant";
+import type { EditorStore } from "../type";
 
 import { FeatureEditorStore } from "./FeatureEditorStore";
 import { ATTRIBUTES_KEY } from "./constant";
@@ -44,6 +46,20 @@ const msgReset = gettext("Reset");
 
 const msgSaved = gettext("Feature saved");
 const msgNoChanges = gettext("No changes to save");
+
+const TabsLabelObserver = observer(
+  ({ widgetStore, label }: { widgetStore: EditorStore; label: ReactNode }) => (
+    <TabsLabelBadge
+      error={widgetStore.isValid === false}
+      counter={widgetStore.counter ?? undefined}
+      dirty={widgetStore.dirty}
+    >
+      {label}
+    </TabsLabelBadge>
+  )
+);
+
+TabsLabelObserver.displayName = "TabsLabelObserver";
 
 export const FeatureEditorWidget = observer(
   ({
@@ -94,21 +110,15 @@ export const FeatureEditorWidget = observer(
 
         const Widget = lazy(async () => await newEditorWidget.widget());
 
-        const TabsLabelObserver = observer(() => (
-          <TabsLabelBadge
-            counter={widgetStore.counter ?? undefined}
-            dirty={widgetStore.dirty}
-          >
-            {newEditorWidget.label}
-          </TabsLabelBadge>
-        ));
-
-        TabsLabelObserver.displayName = "TabsLabelObserver";
-
         return {
           key,
           order: newEditorWidget.order,
-          label: <TabsLabelObserver />,
+          label: (
+            <TabsLabelObserver
+              widgetStore={widgetStore}
+              label={newEditorWidget.label}
+            />
+          ),
           children: (
             <Suspense fallback={msgLoading}>
               <Widget store={widgetStore}></Widget>
@@ -137,6 +147,10 @@ export const FeatureEditorWidget = observer(
     }, [store, createEditorTab]);
 
     const onSaveClick = useCallback(async () => {
+      if (!(await store.validate())) {
+        return;
+      }
+
       if (mode === "save") {
         try {
           if (!dirty) {

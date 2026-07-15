@@ -32,5 +32,6 @@ export interface EditorStore<V = any> {
    */
   load: (value: V | null) => void;
 
+  validate?: () => boolean | Promise<boolean>;
   isValid?: boolean;
 }
