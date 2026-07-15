@@ -4,7 +4,7 @@ import type { Feature as OlFeature } from "ol";
 import type { Geometry } from "ol/geom";
 import type { Interaction } from "ol/interaction";
 import VectorLayer from "ol/layer/Vector";
-import VectorSource from "ol/source/Vector";
+import type VectorSource from "ol/source/Vector";
 import type { StyleFunction } from "ol/style/Style";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
@@ -16,15 +16,16 @@ import { ButtonControl } from "@nextgisweb/webmap/map-component";
 import { useMapContext } from "@nextgisweb/webmap/map-component/context/useMapContext";
 import { ToggleGroup } from "@nextgisweb/webmap/map-component/control/toggle-group";
 
+import { EditorSession } from "./EditorSession";
 import { EditorContext } from "./context/useEditorContext";
 import { generateStyleForId } from "./util/styleUtil";
 
 import UndoIcon from "@nextgisweb/icon/material/undo";
 
-type UndoAction = () => void;
 export interface EditableItemProps {
   id?: string | number;
   source?: VectorSource;
+  session?: EditorSession;
 
   enabled?: boolean;
   children?: ReactNode;
@@ -35,19 +36,11 @@ export interface EditableItemProps {
   onEditingMode?: (val: string | null) => void;
 }
 
-function once<T extends (...args: any[]) => any>(fn: T): T {
-  let called = false;
-  return ((...args: Parameters<T>) => {
-    if (called) return;
-    called = true;
-    return fn(...args);
-  }) as T;
-}
-
 export const EditableItem = observer(
   ({
     id,
     source: outerSource,
+    session: outerSession,
     enabled,
     children,
     editingMode,
@@ -60,16 +53,18 @@ export const EditableItem = observer(
     const interactionsRef = useRef<Map<string, Interaction>>(new Map());
     const [interactionsVersion, setInteractionsVersion] = useState(0);
 
-    const [undo, setUndo] = useState<UndoAction[]>([]);
-    const addUndo = (fn: UndoAction) => setUndo((prev) => [...prev, once(fn)]);
-    const dirty = undo.length > 0;
+    const session = useMemo(
+      () => outerSession ?? new EditorSession({ id, source: outerSource }),
+      [id, outerSession, outerSource]
+    );
+    const { dirty } = session;
 
     const [style] = useState(() => generateStyleForId({ id: id ?? 0 }));
 
     useEffect(() => onDirtyChange?.(dirty), [dirty, onDirtyChange]);
 
     const { layer, source, features } = useMemo(() => {
-      const source = outerSource ?? new VectorSource();
+      const source = session.source;
       const features = new Collection<OlFeature<Geometry>>();
       const { layerStyle } = generateStyleForId({ id: id ?? 0 });
 
@@ -93,7 +88,7 @@ export const EditableItem = observer(
       });
 
       return { layer, source, features };
-    }, [outerSource, id]);
+    }, [session, id]);
 
     useEffect(() => {
       const interactions = interactionsRef.current;
@@ -122,18 +117,8 @@ export const EditableItem = observer(
     }, [editingMode, enabled, setLayerOpacityDebounced]);
 
     const onUndoClick = useCallback(() => {
-      setUndo((prev) => {
-        const next = [...prev];
-        const toUndo = next.pop();
-        // The undo action modifies the map source, which can trigger re-renders
-        // in parent components and lead to rendering conflicts.
-        setTimeout(() => {
-          toUndo?.();
-        });
-
-        return next;
-      });
-    }, []);
+      session.undoLast();
+    }, [session]);
 
     useUnsavedChanges({ dirty });
 
@@ -154,7 +139,7 @@ export const EditableItem = observer(
           interactionsRef,
           selectStyleOptions: style.selectStyleOptions,
           interactionsVersion,
-          addUndo,
+          addUndo: session.addUndo,
         }}
       >
         {enabled && (

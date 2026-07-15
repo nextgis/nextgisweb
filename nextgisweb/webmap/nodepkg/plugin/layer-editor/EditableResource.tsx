@@ -50,6 +50,7 @@ export const EditableResource = observer(
     resourceId,
     canSnap,
     enabled,
+    session,
     source: outerSource,
     onCanSnap: setCanSnap,
     onError,
@@ -150,6 +151,7 @@ export const EditableResource = observer(
           <EditableItem
             id={resourceId}
             source={source}
+            session={session}
             enabled={enabled}
             editingMode={editingMode}
             onEditingMode={setEditingMode}

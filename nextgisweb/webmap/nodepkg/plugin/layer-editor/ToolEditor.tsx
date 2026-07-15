@@ -13,6 +13,7 @@ import { useToggleGroupItem } from "@nextgisweb/webmap/map-component/control/tog
 import type { TreeLayerStore } from "@nextgisweb/webmap/store/tree-store/TreeItemStore";
 
 import { EditableResource } from "./EditableResource";
+import { EditorSession } from "./EditorSession";
 import { saveChanges } from "./editor-api";
 import { DrawMode } from "./modes/DrawMode";
 import { setItemsEditable } from "./util/setItemsEditable";
@@ -42,7 +43,7 @@ const ToolEditor = observer(
 
     const [editableItems, setEditableItems] = useState<TreeLayerStore[]>([]);
 
-    const dirtyRef = useRef<Map<number, boolean>>(new Map());
+    const sessionsRef = useRef<Map<number, EditorSession>>(new Map());
 
     const { treeStore } = display;
 
@@ -61,9 +62,16 @@ const ToolEditor = observer(
       const currKeys = new Set(items.map(getKey));
       const stopped = prev
         .filter((it) => !currKeys.has(getKey(it)))
-        .filter((it) => dirtyRef.current.get(getKey(it)));
+        .filter((it) => sessionsRef.current.get(getKey(it))?.dirty);
 
       const proceed = () => {
+        sessionsRef.current = new Map(
+          items.map((item) => [
+            getKey(item),
+            sessionsRef.current.get(getKey(item)) ??
+              new EditorSession({ id: item.layerId, source }),
+          ])
+        );
         setEditableItems(items);
         prevEditableRef.current = items;
       };
@@ -171,15 +179,13 @@ const ToolEditor = observer(
             <EditableResource
               key={id}
               source={source}
+              session={sessionsRef.current.get(id)!}
               canSnap={canSnap}
               enabled={display.item?.id === id}
               resourceId={layerId}
               editingMode={isActive ? editingMode : null}
               onCanSnap={setCanSnap}
               onEditingMode={setEditingMode}
-              onDirtyChange={(val) => {
-                dirtyRef.current.set(id, val);
-              }}
               onError={onError}
             />
           ))}
