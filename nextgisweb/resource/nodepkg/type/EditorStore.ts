@@ -23,6 +23,8 @@ export interface EditorStore<READ = any, CREATE = READ, UPDATE = CREATE> {
 
   dump: (val: DumpParams) => CREATE | UPDATE | undefined;
 
+  isAvailable?: boolean;
+
   dirty: boolean;
 
   counter?: number;

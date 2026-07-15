@@ -114,10 +114,15 @@ export class CompositeStore {
     this.saving = value;
   }
 
+  @computed
+  get availableMembers() {
+    return this.members?.filter(({ store }) => store.isAvailable !== false);
+  }
+
   /** Suggested resource display name from file name or other aspects */
   @computed
   get sdnDynamic(): string | undefined {
-    const firstMemberWithSdn = this.members?.find(
+    const firstMemberWithSdn = this.availableMembers?.find(
       (member) => member.store.suggestedDisplayName
     );
     if (firstMemberWithSdn) {
@@ -129,7 +134,7 @@ export class CompositeStore {
   @action
   setValidate(value: boolean) {
     this.validate = value;
-    this.initializationGuard(this.members).forEach(({ store }) => {
+    this.initializationGuard(this.availableMembers).forEach(({ store }) => {
       if (store.validate !== undefined) {
         store.validate = value;
       }
@@ -138,10 +143,10 @@ export class CompositeStore {
 
   @computed
   get dirty(): boolean {
-    if (!this.members) {
+    if (!this.availableMembers) {
       return false;
     } else {
-      return this.members.some(({ store }) =>
+      return this.availableMembers.some(({ store }) =>
         store.dirty !== undefined ? store.dirty : false
       );
     }
@@ -150,13 +155,15 @@ export class CompositeStore {
   @computed
   get isValid(): boolean {
     if (!this.validate) return true;
-    return this.members?.every((member) => member.store.isValid) ?? true;
+    return (
+      this.availableMembers?.every((member) => member.store.isValid) ?? true
+    );
   }
 
   async getValue() {
     const data: CompositeCreate | CompositeUpdate = {};
 
-    for (const { store } of this.initializationGuard(this.members)) {
+    for (const { store } of this.initializationGuard(this.availableMembers)) {
       const { identity, getValue } = store;
       if (!identity || !getValue) continue;
 
@@ -174,7 +181,7 @@ export class CompositeStore {
     lunkwill: LunkwillParam
   ): Promise<CompositeCreate | CompositeUpdate> {
     const data: CompositeCreate | CompositeUpdate = {};
-    for (const member of this.initializationGuard(this.members)) {
+    for (const member of this.initializationGuard(this.availableMembers)) {
       const identity = member.store.identity;
       if (identity) {
         const result = await member.store.dump({ lunkwill });

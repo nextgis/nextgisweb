@@ -19,7 +19,7 @@ from .versioning import FVersioningNotEnabled
 
 class FeatureLayerFieldsWidget(Widget):
     interface = IFeatureLayer
-    operation = ("update",)
+    operation = ("create", "update")
     amdmod = jsentry("@nextgisweb/feature-layer/fields-widget")
 
 

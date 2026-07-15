@@ -214,4 +214,4 @@ export const FieldsWidget: EditorWidget<FieldsStore> = observer(({ store }) => {
 FieldsWidget.displayName = "FieldsWidget";
 FieldsWidget.title = gettext("Fields");
 FieldsWidget.activateOn = { update: true };
-FieldsWidget.order = -50;
+FieldsWidget.order = -40;

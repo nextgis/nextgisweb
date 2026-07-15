@@ -86,7 +86,7 @@ const CompositeWidget = observer(
     const initRef = useRef(false);
 
     const { operation } = composite;
-    const { members, dirty } = composite;
+    const { availableMembers, dirty } = composite;
     const { disable: disableUnsavedChanges } = useUnsavedChanges({
       dirty,
       initiallyEnabled: unsavedChanges,
@@ -97,8 +97,8 @@ const CompositeWidget = observer(
     }, [dirty, onDirty]);
 
     const items = useMemo<TabItem[]>(() => {
-      if (!members) return [];
-      return members
+      if (!availableMembers) return [];
+      return availableMembers
         .map(({ store, key, widget: Widget }) => {
           const tab: TabItem = {
             key,
@@ -115,10 +115,10 @@ const CompositeWidget = observer(
           return tab;
         })
         .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
-    }, [composite, members]);
+    }, [composite, availableMembers]);
 
     useEffect(() => {
-      const selected = members?.find((member) => {
+      const selected = availableMembers?.find((member) => {
         const activateOn: ActiveOnOptions = member.widget.activateOn || {};
         if (activateOn[operation]) {
           return true;
@@ -127,7 +127,7 @@ const CompositeWidget = observer(
       if (selected) {
         setActiveKey(selected.key);
       }
-    }, [members, operation]);
+    }, [availableMembers, operation]);
 
     useEffect(() => {
       if (initRef.current) {

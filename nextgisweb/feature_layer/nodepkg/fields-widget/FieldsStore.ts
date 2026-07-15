@@ -10,6 +10,7 @@ import type {
   EditorStoreOptions,
 } from "@nextgisweb/resource/type";
 import type { ResourceRef } from "@nextgisweb/resource/type/api";
+import type { Store } from "@nextgisweb/vector-layer/resource-widget/Store";
 
 interface FieldData {
   id: number | undefined;
@@ -121,6 +122,19 @@ export class FieldsStore implements EditorStore<Value>, FocusTableStore<Field> {
   constructor({ composite }: EditorStoreOptions) {
     this.composite = composite;
     observe(this.fields, () => this.markDirty());
+  }
+
+  @computed
+  get isAvailable() {
+    if (this.composite.operation !== "create") {
+      return true;
+    }
+
+    const vectorLayerStore = this.composite.members?.find(
+      ({ store }) => store.identity === "vector_layer"
+    )?.store as Store | undefined;
+
+    return vectorLayerStore?.mode === "empty";
   }
 
   @computed

@@ -972,6 +972,8 @@ class GeometryTypeAttr(SAttribute):
 
 class FieldsAttr(SAttribute):
     def set(self, srlzr: Serializer, value: list[dict[str, Any]], *, create: bool):
+        if not create or srlzr.obj.fields:
+            return
         # TODO: Improve typing, use types from feature layer APIs
         srlzr.obj.setup_from_fields(value)
 
