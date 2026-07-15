@@ -1,7 +1,8 @@
+import { unByKey } from "ol/Observable";
 import { click, pointerMove } from "ol/events/condition";
 import { Select } from "ol/interaction";
 import type { SelectEvent } from "ol/interaction/Select";
-import { lazy, useCallback, useState } from "react";
+import { lazy, useCallback, useEffect, useState } from "react";
 
 import type { FeatureItem } from "@nextgisweb/feature-layer/type";
 import { useShowModal } from "@nextgisweb/gui";
@@ -70,13 +71,12 @@ export const AttributeMode: LayerEditorMode<{ resourceId: number }> = ({
               resourceId,
               featureItem: prevItem,
               onOk: (item) => {
-                if (Object.values(item).filter(Boolean)) {
-                  feature.set("attribution", {
-                    ...prevItem,
-                    ...item,
-                  });
-                  hasChanges = true;
-                }
+                feature.set("attribution", {
+                  ...prevItem,
+                  ...item,
+                });
+                hasChanges = true;
+
                 resolve(undefined);
               },
             },
@@ -94,13 +94,22 @@ export const AttributeMode: LayerEditorMode<{ resourceId: number }> = ({
   );
 
   const createSelect = useCallback(() => {
-    const select = new Select({
+    return new Select({
       layers: [layer],
       style: selectStyle,
       condition: click,
       multi: false,
     });
-    select.on("select", async (ev) => {
+  }, [layer, selectStyle]);
+
+  const select = useInteraction(
+    `${AttributeMode.displayName}-select`,
+    active,
+    createSelect
+  );
+
+  useEffect(() => {
+    const key = select.on("select", async (ev) => {
       const undo = await onUpdate?.(ev);
       if (undo) {
         addUndo(undo);
@@ -108,10 +117,9 @@ export const AttributeMode: LayerEditorMode<{ resourceId: number }> = ({
       select.getFeatures().clear();
       hover.getFeatures().clear();
     });
-    return select;
-  }, [addUndo, hover, layer, onUpdate, selectStyle]);
 
-  useInteraction(`${AttributeMode.displayName}-select`, active, createSelect);
+    return () => unByKey(key);
+  }, [addUndo, hover, onUpdate, select]);
 
   return (
     <>
