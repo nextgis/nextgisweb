@@ -17,6 +17,11 @@ import { SRSImportFrom } from "./SRSImportForm";
 
 const DEFAULT_DATA: ConvertBody = { projStr: "", format: "proj4" };
 
+// to not exec gettext on closed modal
+function Title() {
+  return <>{gettext("Import definition")}</>;
+}
+
 export function SRSWidget({ id, readonly }: { id: number; readonly: boolean }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isProtected, setIsProtected] = useState(false);
@@ -80,9 +85,6 @@ export function SRSWidget({ id, readonly }: { id: number; readonly: boolean }) {
     modalForm.setFieldsValue(DEFAULT_DATA);
     setIsModalVisible(false);
   };
-
-  // to not exec gettext on closed modal
-  const Title = () => <>{gettext("Import definition")}</>;
 
   return (
     <>

@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import { observer } from "mobx-react-lite";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useRef } from "react";
 import type { CSSProperties, ReactNode, Ref, RefObject } from "react";
 import {
   InteractionMode,
@@ -180,7 +180,7 @@ function Container(props: {
         });
       });
       resizeObserver.observe(element);
-      return () => resizeObserver.unobserve(element);
+      return () => resizeObserver.disconnect();
     }
   }, [ref]);
 
@@ -195,6 +195,84 @@ function Container(props: {
     </div>
   );
 }
+
+interface RowProps<
+  I extends FocusTableItem,
+  C extends string,
+  S extends FocusTableStore<I>,
+> extends Pick<
+  ComplexTreeProps<I, C, S>,
+  "store" | "title" | "showColumns" | "showErrors" | "showActions"
+> {
+  treeItem: TreeItem<I>;
+  storeItem: I;
+  depth: number;
+  arrow: ReactNode;
+  context: TreeItemRenderContext;
+  isFlat: boolean;
+  totalColumns: number;
+  renderColumns: (item: I) => [number, ReactNode];
+  renderActions: (item: I) => ReactNode;
+}
+
+function RowBase<
+  I extends FocusTableItem,
+  C extends string,
+  S extends FocusTableStore<I>,
+>({
+  treeItem,
+  storeItem,
+  context,
+  store,
+  isFlat,
+  title,
+  totalColumns,
+  renderColumns,
+  renderActions,
+  ...props
+}: RowProps<I, C, S>) {
+  const selected = context.isSelected || context.isDraggingOver;
+  const error = store.getItemError?.(treeItem.data);
+  const [columnCount, columnsElement] = props.showColumns
+    ? renderColumns(storeItem)
+    : [0, undefined];
+
+  return (
+    <tr
+      key={treeItem.index}
+      className={selected ? "selected" : undefined}
+      style={{ "--ct-depth": props.depth } as CSSProperties}
+      {...context.itemContainerWithChildrenProps}
+      {...context.itemContainerWithoutChildrenProps}
+      {...context.interactiveElementProps}
+    >
+      <td
+        className="title"
+        colSpan={
+          props.showColumns && columnCount < totalColumns
+            ? totalColumns - columnCount + 1
+            : undefined
+        }
+      >
+        <div>
+          {!isFlat && props.arrow}
+          <div className="title">{title?.(storeItem) || <>&nbsp;</>}</div>
+          {props.showErrors && error && (
+            <div className="error">
+              <Tooltip title={String(error)}>
+                <ErrorIcon />
+              </Tooltip>
+            </div>
+          )}
+        </div>
+      </td>
+      {columnsElement}
+      {props.showActions && renderActions(storeItem)}
+    </tr>
+  );
+}
+
+const Row = observer(RowBase);
 
 export interface ComplexTreeProps<
   I extends FocusTableItem,
@@ -306,7 +384,7 @@ export function ComplexTree<
         if (!cols) return [0, undefined];
         return [
           cols.length,
-          <>
+          <Fragment key="columns">
             {cols.map((col, idx) => (
               <td
                 key={idx}
@@ -317,7 +395,7 @@ export function ComplexTree<
                 {col.render(item)}
               </td>
             ))}
-          </>,
+          </Fragment>,
         ];
       },
     ];
@@ -344,66 +422,6 @@ export function ComplexTree<
     },
     [getActions]
   );
-
-  const Row = useMemo(() => {
-    const Base = ({
-      treeItem,
-      storeItem,
-      context,
-      ...props
-    }: {
-      treeItem: TreeItem<I>;
-      storeItem: I;
-      depth: number;
-      arrow: ReactNode;
-      context: TreeItemRenderContext;
-      // To avoid observer recreation on minor changes
-      showColumns: boolean;
-      showErrors: boolean;
-      showActions: boolean;
-    }) => {
-      const selected = context.isSelected || context.isDraggingOver;
-      const error = store.getItemError?.(treeItem.data);
-      const [columnCount, columnsElement] = props.showColumns
-        ? renderColumns(storeItem)
-        : [0, undefined];
-
-      return (
-        <tr
-          key={treeItem.index}
-          className={selected ? "selected" : undefined}
-          style={{ "--ct-depth": props.depth } as CSSProperties}
-          {...context.itemContainerWithChildrenProps}
-          {...context.itemContainerWithoutChildrenProps}
-          {...context.interactiveElementProps}
-        >
-          <td
-            className="title"
-            colSpan={
-              props.showColumns && columnCount < totalColumns
-                ? totalColumns - columnCount + 1
-                : undefined
-            }
-          >
-            <div>
-              {!provider.isFlat && props.arrow}
-              <div className="title">{title?.(storeItem) || <>&nbsp;</>}</div>
-              {props.showErrors && error && (
-                <div className="error">
-                  <Tooltip title={String(error)}>
-                    <ErrorIcon />
-                  </Tooltip>
-                </div>
-              )}
-            </div>
-          </td>
-          {columnsElement}
-          {props.showActions && renderActions(storeItem)}
-        </tr>
-      );
-    };
-    return observer(Base);
-  }, [title, totalColumns, renderColumns, renderActions, provider, store]);
 
   // React complex tree rendering callbacks
 
@@ -434,18 +452,34 @@ export function ComplexTree<
       return (
         <>
           <Row
+            {...rest}
             treeItem={treeItem as TreeItem<I>}
             storeItem={storeItem}
+            store={store}
+            isFlat={provider.isFlat}
+            totalColumns={totalColumns}
+            renderColumns={renderColumns}
+            renderActions={renderActions}
             showColumns={showColumns}
             showActions={showActions}
             showErrors={showErrors}
-            {...rest}
+            title={title}
           />
           {children}
         </>
       );
     },
-    [Row, showColumns, showErrors, showActions]
+    [
+      store,
+      provider.isFlat,
+      showErrors,
+      showColumns,
+      showActions,
+      totalColumns,
+      renderColumns,
+      renderActions,
+      title,
+    ]
   );
 
   const renderDragBetweenLine = useCallback<EnvProps["renderDragBetweenLine"]>(

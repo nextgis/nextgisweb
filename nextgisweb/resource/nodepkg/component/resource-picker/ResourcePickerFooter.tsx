@@ -92,6 +92,40 @@ const CreateControl = observer(
 
 CreateControl.displayName = "CreateControl";
 
+interface OkButtonProps<V extends SelectValue = SelectValue> {
+  store: ResourcePickerStore;
+  disabled?: boolean;
+  onOk?: (value: V) => void;
+}
+
+function OkBtnInner<V extends SelectValue = SelectValue>({
+  disabled,
+  store,
+  onOk,
+}: OkButtonProps<V>) {
+  const { multiple, selected, getSelectedMsg } = store;
+  const badgeCnt = multiple && selected.length > 1 ? selected.length : 0;
+  return (
+    <Button
+      type="primary"
+      disabled={disabled ?? !selected.length}
+      onClick={() => {
+        if (onOk) {
+          onOk((multiple ? selected : selected[0]) as V);
+        }
+      }}
+    >
+      {getSelectedMsg}
+      {!!badgeCnt && (
+        <Badge size="small" color="transparent" count={badgeCnt} />
+      )}
+    </Button>
+  );
+}
+
+const OkBtn = observer(OkBtnInner);
+OkBtn.displayName = "OkBtn";
+
 function MoveControlInner<V extends SelectValue = SelectValue>({
   setCreateMode,
   store,
@@ -104,7 +138,6 @@ function MoveControlInner<V extends SelectValue = SelectValue>({
     multiple,
     parentItem,
     getThisMsg,
-    getSelectedMsg,
     getResourceClasses,
     disableResourceIds,
     allowCreateResource,
@@ -135,26 +168,6 @@ function MoveControlInner<V extends SelectValue = SelectValue>({
     }
   };
 
-  const OkBtn = ({ disabled }: { disabled?: boolean }) => {
-    const badgeCnt = multiple && selected.length > 1 ? selected.length : 0;
-    return (
-      <Button
-        type="primary"
-        disabled={disabled ?? !selected.length}
-        onClick={() => {
-          if (onOk) {
-            onOk((multiple ? selected : selected[0]) as V);
-          }
-        }}
-      >
-        {getSelectedMsg}
-        {!!badgeCnt && (
-          <Badge size="small" color="transparent" count={badgeCnt} />
-        )}
-      </Button>
-    );
-  };
-
   return (
     <Row justify="space-between">
       <Col>
@@ -178,7 +191,7 @@ function MoveControlInner<V extends SelectValue = SelectValue>({
                 store.clearSelection();
               }}
             ></Button>
-            <OkBtn />
+            <OkBtn store={store} onOk={onOk} />
           </Space>
         ) : pickThisGroupAllowed ? (
           <Button
@@ -194,7 +207,7 @@ function MoveControlInner<V extends SelectValue = SelectValue>({
             {getThisMsg}
           </Button>
         ) : (
-          <OkBtn disabled={true}></OkBtn>
+          <OkBtn store={store} onOk={onOk} disabled />
         )}
       </Col>
     </Row>

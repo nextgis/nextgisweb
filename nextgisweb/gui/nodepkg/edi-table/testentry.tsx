@@ -71,7 +71,6 @@ export default function EdiTableTestEntry() {
       {
         key: "name",
         title: "Name",
-        // eslint-disable-next-line react/display-name
         component: observer(({ row, placeholder }) => {
           return (
             <InputValue

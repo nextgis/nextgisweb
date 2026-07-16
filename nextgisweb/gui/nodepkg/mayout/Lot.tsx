@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { use } from "react";
 import type { CSSProperties, ReactNode } from "react";
 
 import { Tooltip } from "@nextgisweb/gui/antd";
@@ -48,7 +48,7 @@ export interface LotProps {
 }
 
 export function Lot({ children, ...props }: LotProps) {
-  const { labelPosition: lp, columnCount: cc } = useContext(AreaContext)!;
+  const { labelPosition: lp, columnCount: cc } = use(AreaContext)!;
 
   if (props.visible === false) return <></>;
 
@@ -122,12 +122,12 @@ export function Lot({ children, ...props }: LotProps) {
     labelContainer = <label>{labelElement}</label>;
   }
 
-  const style: CSSProperties = {};
+  let style: CSSProperties = {};
   if (lp === "left") {
     if (start && end) cssEnd.gridColumnStart = start + 1;
     children = <div style={cssEnd}>{children}</div>;
   } else if (lp === "top") {
-    Object.assign(style, cssStart, cssEnd);
+    style = { ...cssStart, ...cssEnd };
     children = <div>{children}</div>;
   }
 

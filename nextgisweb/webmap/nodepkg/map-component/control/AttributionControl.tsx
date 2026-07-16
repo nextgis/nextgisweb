@@ -28,6 +28,7 @@ function AttributionList({ items }: { items: string[] }) {
   return (
     <ul>
       {items.map((html, i) => (
+        // eslint-disable-next-line @eslint-react/dom-no-dangerously-set-innerhtml
         <li key={i} dangerouslySetInnerHTML={{ __html: html }} />
       ))}
     </ul>

@@ -1,5 +1,3 @@
-import type { RangeValueType } from "@rc-component/picker/lib/PickerInput/RangePicker";
-import type { ValueDate } from "@rc-component/picker/lib/interface";
 import classNames from "classnames";
 import type { Dayjs } from "dayjs";
 import {
@@ -9,6 +7,7 @@ import {
   useRef,
   useState,
 } from "react";
+import type { ComponentProps } from "react";
 
 import type {
   AuditArrayLogEntry,
@@ -24,6 +23,10 @@ import { gettext, ngettextf } from "@nextgisweb/pyramid/i18n";
 import { PageTitle } from "@nextgisweb/pyramid/layout";
 
 import "./Journal.less";
+
+type RangePreset = NonNullable<
+  ComponentProps<typeof RangePicker>["presets"]
+>[number];
 
 type AuditDbaseQuery = RouteQuery<"audit.dbase", "get">;
 type AuditDbaseQueryGetResponse = RouteResp<"audit.dbase", "get">;
@@ -181,7 +184,7 @@ function dayjsToApi(v: Dayjs) {
 const rangePresetLast = (
   n: number,
   unit: "minute" | "hour" | "day"
-): ValueDate<NonNullable<RangeValueType<Dayjs>>> => {
+): RangePreset => {
   let labelf;
   if (unit === "minute") {
     labelf = ngettextf("Last {} minute", "Last {} minutes", n);
@@ -270,6 +273,7 @@ export function Journal() {
 
   useEffect(() => {
     setBlocks([]);
+
     setPointer(undefined);
     refLoading.current = undefined;
   }, [params]);

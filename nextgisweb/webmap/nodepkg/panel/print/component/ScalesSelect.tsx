@@ -44,11 +44,15 @@ export const ScalesSelect: FC<ScalesSelectProps> = ({
   };
 
   useEffect(() => {
-    if (open) {
-      setTimeout(() => {
-        inputRef.current?.focus();
-      }, 100);
+    if (!open) {
+      return;
     }
+    const timeoutId = setTimeout(() => {
+      inputRef.current?.focus();
+    }, 100);
+    return () => {
+      clearTimeout(timeoutId);
+    };
   }, [open]);
 
   const popupRender = (menu: ReactNode) => (

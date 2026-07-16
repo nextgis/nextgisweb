@@ -78,9 +78,20 @@ export default defineConfig(async (): Promise<RsbuildConfig> => {
     plugins: [
       pluginTypeCheck({
         enable: config.debug && config.jsrealm.tscheck,
+        tsCheckerOptions: {
+          async: true,
+          issue: {
+            defaultSeverity: "warning",
+          },
+          devServer: false,
+        },
       }),
       pluginEslint({
         enable: config.debug && config.jsrealm.eslint,
+        environments: "all",
+        eslintPluginOptions: {
+          files: ["**/*.{ts,tsx}"],
+        },
       }),
     ],
   };

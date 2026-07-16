@@ -3,7 +3,7 @@ import type { DependencyList, RefObject } from "react";
 
 export function useFit({
   ref,
-  deps = [],
+  deps,
 }: {
   ref: RefObject<HTMLDivElement | null>;
   deps?: DependencyList;
@@ -50,14 +50,16 @@ export function useFit({
   useEffect(() => {
     const element = ref.current;
     isFitStopRef.current = undefined;
-    if (element) {
-      const resizeObserver = new ResizeObserver(checkFit);
-      resizeObserver.observe(element);
-      return () => {
-        resizeObserver.unobserve(element);
-      };
+    if (!element) {
+      return;
     }
-  }, [checkFit, ref, ...deps]);
+
+    const resizeObserver = new ResizeObserver(checkFit);
+    resizeObserver.observe(element);
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [checkFit, ref, deps]);
 
   return isFit;
 }

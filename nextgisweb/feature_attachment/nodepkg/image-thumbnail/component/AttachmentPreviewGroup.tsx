@@ -45,6 +45,7 @@ interface PreviewContextValue {
 }
 export const AttachmentPreviewContext =
   createContext<PreviewContextValue | null>(null);
+AttachmentPreviewContext.displayName = "AttachmentPreviewContext";
 
 export function AttachmentPreviewGroup({
   attachments: images,

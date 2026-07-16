@@ -1,3 +1,5 @@
+import { lazy } from "react";
+
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import topic from "@nextgisweb/webmap/compat/topic";
 import type { TreeLayerStore } from "@nextgisweb/webmap/store/tree-store/TreeItemStore";
@@ -5,6 +7,10 @@ import type { TreeLayerStore } from "@nextgisweb/webmap/store/tree-store/TreeIte
 import { PluginBase } from "../PluginBase";
 
 import TableIcon from "@nextgisweb/icon/material/table";
+
+const webmapFeatureGridTabLazy = lazy(
+  () => import("@nextgisweb/webmap/webmap-feature-grid-tab")
+);
 
 export class FeatureLayerPlugin extends PluginBase {
   getMenuItem(nodeData: TreeLayerStore) {
@@ -23,7 +29,7 @@ export class FeatureLayerPlugin extends PluginBase {
       this.display.tabsManager.addTab({
         key: String(item.styleId),
         label: item.label,
-        component: () => import("@nextgisweb/webmap/webmap-feature-grid-tab"),
+        component: webmapFeatureGridTabLazy,
         props: {
           topic,
           item,

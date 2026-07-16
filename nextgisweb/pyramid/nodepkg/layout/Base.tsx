@@ -1,5 +1,6 @@
 import classNames from "classnames";
 import { useEffect, useState } from "react";
+import type { ReactNode } from "react";
 
 import { Modal, Spin, useToken } from "@nextgisweb/gui/antd";
 import { useShowModal } from "@nextgisweb/gui/show-modal/useShowModal";
@@ -40,6 +41,96 @@ interface BaseProps {
   breadcrumbs: BreadcrumbItem[];
   dynMenuResourceId?: number;
   hideResourceFilter?: boolean;
+}
+
+export type PyramidLayoutMode = "headerOnly" | "main" | "content";
+
+export interface PyramidLayoutProps {
+  title: string;
+  header: string;
+  children: ReactNode;
+  hideMenu?: boolean;
+  maxwidth?: boolean;
+  maxheight?: boolean;
+  layoutMode?: PyramidLayoutMode;
+  breadcrumbs?: BreadcrumbItem[];
+  dynMenuItems?: DynMenuItem[];
+  dynMenuResourceId?: number;
+  hideResourceFilter?: boolean;
+}
+
+function PyramidLayout({
+  title,
+  header,
+  children,
+  hideMenu = false,
+  maxwidth = false,
+  maxheight = false,
+  layoutMode = "content",
+  breadcrumbs = [],
+  dynMenuResourceId,
+  dynMenuItems,
+  hideResourceFilter = false,
+}: PyramidLayoutProps) {
+  return (
+    <div
+      className={classNames("ngw-pyramid-layout", {
+        "ngw-pyramid-layout-hstretch": maxwidth,
+        "ngw-pyramid-layout-vstretch": maxheight,
+      })}
+    >
+      <CBlock slot="pyramid.banner" />
+
+      <Header
+        header={header}
+        hideResourceFilter={hideResourceFilter}
+        hideMenu={hideMenu}
+      />
+
+      {layoutMode === "headerOnly" ? (
+        children
+      ) : (
+        <div className="ngw-pyramid-layout-crow">
+          <div className="ngw-pyramid-layout-mwrapper">
+            <div id="main" className="ngw-pyramid-layout-main">
+              {layoutMode === "main" ? (
+                children
+              ) : (
+                <>
+                  {breadcrumbs.length > 0 && (
+                    <Breadcrumbs items={breadcrumbs} />
+                  )}
+                  <div className="ngw-pyramid-layout-title">
+                    <h1 id="title">{title}</h1>
+                  </div>
+                  <div
+                    id="content"
+                    className="content"
+                    style={{ width: "100%" }}
+                  >
+                    {children}
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+
+          {dynMenuResourceId !== undefined ? (
+            <div className="ngw-pyramid-layout-sidebar">
+              <Attrmenu resourceId={dynMenuResourceId} />
+            </div>
+          ) : (
+            dynMenuItems &&
+            dynMenuItems.length > 0 && (
+              <div className="ngw-pyramid-layout-sidebar">
+                <Dynmenu items={dynMenuItems} />
+              </div>
+            )
+          )}
+        </div>
+      )}
+    </div>
+  );
 }
 
 export function Base({
@@ -114,73 +205,30 @@ export function Base({
     <EntrypointSuspense entrypoint={entrypoint} props={entrypointProps} />
   );
 
-  const PyramidLayout = () => (
-    <div
-      className={classNames("ngw-pyramid-layout", {
-        "ngw-pyramid-layout-hstretch": maxwidth,
-        "ngw-pyramid-layout-vstretch": maxheight,
-      })}
-    >
-      <CBlock slot="pyramid.banner" />
-
-      <Header
-        header={header}
-        hideResourceFilter={hideResourceFilter}
-        hideMenu={hideMenu}
-      />
-
-      {layoutMode === "headerOnly" ? (
-        renderBody
-      ) : (
-        <div className="ngw-pyramid-layout-crow">
-          <div className="ngw-pyramid-layout-mwrapper">
-            <div id="main" className="ngw-pyramid-layout-main">
-              {layoutMode === "main" ? (
-                renderBody
-              ) : (
-                <>
-                  {breadcrumbs.length > 0 && (
-                    <Breadcrumbs items={breadcrumbs} />
-                  )}
-                  <div className="ngw-pyramid-layout-title">
-                    <h1 id="title">{title}</h1>
-                  </div>
-                  <div
-                    id="content"
-                    className="content"
-                    style={{ width: "100%" }}
-                  >
-                    {renderBody}
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-
-          {dynMenuResourceId !== undefined ? (
-            <div className="ngw-pyramid-layout-sidebar">
-              <Attrmenu resourceId={dynMenuResourceId} />
-            </div>
-          ) : (
-            dynMenuItems &&
-            dynMenuItems.length > 0 && (
-              <div className="ngw-pyramid-layout-sidebar">
-                <Dynmenu items={dynMenuItems} />
-              </div>
-            )
-          )}
-        </div>
-      )}
-    </div>
-  );
-
   return (
     <>
       <title>{title}</title>
 
       {modalContextHolder}
       {modalHolder}
-      {layoutMode === "nullSpace" ? renderBody : <PyramidLayout />}
+      {layoutMode === "nullSpace" ? (
+        renderBody
+      ) : (
+        <PyramidLayout
+          title={title}
+          header={header}
+          hideMenu={hideMenu}
+          maxwidth={maxwidth}
+          maxheight={maxheight}
+          layoutMode={layoutMode}
+          breadcrumbs={breadcrumbs}
+          dynMenuResourceId={dynMenuResourceId}
+          dynMenuItems={dynMenuItems}
+          hideResourceFilter={hideResourceFilter}
+        >
+          {renderBody}
+        </PyramidLayout>
+      )}
     </>
   );
 }

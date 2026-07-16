@@ -57,8 +57,7 @@ function useAbortController(): Omit<AbortHelper, "rotate"> {
 let itCounter = 0;
 
 function Component({ log }: { log: (...args: Event) => void }) {
-  /* eslint-disable react-hooks/exhaustive-deps */
-
+  /* eslint-disable @eslint-react/exhaustive-deps */
   const it = ++itCounter;
 
   log(it, "ENTER");
@@ -71,6 +70,7 @@ function Component({ log }: { log: (...args: Event) => void }) {
     ref.current = true;
   }
 
+  // eslint-disable-next-line @eslint-react/use-memo
   useMemo(() => {
     log(it, "useMemo");
   }, []);

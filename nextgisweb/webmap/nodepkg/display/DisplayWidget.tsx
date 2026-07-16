@@ -118,12 +118,12 @@ export const DisplayWidget = observer(
       }
     }, [activePanelName, mounted]);
 
-    const [panelSize, setPanelsSize] = useState<string | number>(
+    const [panelSize, setPanelSize] = useState<string | number>(() =>
       getDefultPanelSize(isPortrait)
     );
 
     useEffect(() => {
-      setPanelsSize(() => {
+      setPanelSize(() => {
         return getDefultPanelSize(isPortrait);
       });
     }, [isPortrait, screenReady]);
@@ -132,7 +132,7 @@ export const DisplayWidget = observer(
       (sizes: number[]) => {
         const newPanelSize = sizes[1];
         if (activePanel) {
-          setPanelsSize(newPanelSize);
+          setPanelSize(newPanelSize);
         }
       },
       [activePanel]
@@ -143,7 +143,7 @@ export const DisplayWidget = observer(
         if (activePanel) {
           if (newPanelSize < PANEL_MIN_HEIGHT) {
             display.panelManager.closePanel();
-            setPanelsSize(getDefultPanelSize(isPortrait));
+            setPanelSize(getDefultPanelSize(isPortrait));
           }
         }
       },

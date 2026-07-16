@@ -1,10 +1,4 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-} from "react";
+import { createContext, use, useCallback, useEffect, useMemo } from "react";
 import type { CSSProperties, ReactNode } from "react";
 import { createPortal } from "react-dom";
 
@@ -34,8 +28,9 @@ export interface MapControlProps extends ControlOptions {
 }
 
 export const MapControlContext = createContext<MapControlProps | null>(null);
+MapControlContext.displayName = "MapControlContext";
 export function useMapControlContext() {
-  return useContext(MapControlContext);
+  return use(MapControlContext);
 }
 
 export function MapControl({ children, ...props }: MapControlProps) {

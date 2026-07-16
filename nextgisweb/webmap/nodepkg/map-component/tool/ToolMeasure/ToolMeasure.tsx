@@ -58,7 +58,7 @@ const ToolMeasure = observer(({ type, groupId, ...rest }: ToolMeasureProps) => {
   const measureRevisionRef = useRef(0);
 
   const [tooltips, setTooltips] = useState<Map<string, TooltipState>>(
-    new Map()
+    () => new Map()
   );
 
   const title = useMemo(

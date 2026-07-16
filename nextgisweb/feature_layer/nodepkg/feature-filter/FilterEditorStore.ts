@@ -421,7 +421,7 @@ export class FilterEditorStore {
     const group = this._findGroupById(this.filterState.rootGroup, groupId);
     if (!group) return undefined;
 
-    let index = -1;
+    let index;
     let item;
     if (filterType === "condition") {
       index = group.conditions.findIndex((c) => c.id === itemId);

@@ -33,7 +33,7 @@ export function useDrag({ store }: UseDragProps) {
 
     let targetParentId: number | null;
     let targetIndexStore: number;
-    let siblingsStore: TreeItemStore[] = [];
+    let siblingsStore: TreeItemStore[];
 
     if (info.dropToGap) {
       targetParentId = dropItem.parentId;

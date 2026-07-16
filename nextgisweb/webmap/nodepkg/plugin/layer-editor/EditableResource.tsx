@@ -63,7 +63,7 @@ export const EditableResource = observer(
 
     const [isLoading, startTransition] = useTransition();
 
-    const [geomConfig, setGeometryConfig] = useState<GeomConfig | null>(null);
+    const [geomConfig, setGeomConfig] = useState<GeomConfig | null>(null);
 
     const editingModeRef = useRef(editingMode);
     useEffect(() => {
@@ -95,13 +95,13 @@ export const EditableResource = observer(
 
     useEffect(() => {
       startTransition(async () => {
-        setGeometryConfig(null);
+        setGeomConfig(null);
         try {
           const config = await getGeomConfig({
             resourceId,
             signal: makeSignal(),
           });
-          setGeometryConfig(config);
+          setGeomConfig(config);
         } catch (er) {
           onError(er);
         }

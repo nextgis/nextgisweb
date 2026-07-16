@@ -1,5 +1,10 @@
 import { action, observable } from "mobx";
-import type { ComponentType, ReactElement, ReactNode } from "react";
+import type {
+  ComponentType,
+  LazyExoticComponent,
+  ReactElement,
+  ReactNode,
+} from "react";
 
 interface WebMapTabsStoreProps {
   onTabs?: () => void;
@@ -9,7 +14,7 @@ export interface WebMapTab<P = any> {
   key: string;
   label: ReactNode;
   children?: ReactElement;
-  component?: () => Promise<{ default: ComponentType<P> }>;
+  component?: LazyExoticComponent<ComponentType<P>>;
   props?: P;
 }
 

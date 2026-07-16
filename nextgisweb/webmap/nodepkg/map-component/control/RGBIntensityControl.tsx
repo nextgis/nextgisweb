@@ -26,7 +26,7 @@ export function RGBIntensityControl({
   const [red, setRed] = useState(255);
   const [green, setGreen] = useState(255);
   const [blue, setBlue] = useState(255);
-  const [alpha, setAlphaOpacity] = useState(100);
+  const [alpha, setAlpha] = useState(100);
 
   const mountedRef = useRef(false);
 
@@ -92,7 +92,7 @@ export function RGBIntensityControl({
             max={100}
             step={1}
             value={alpha}
-            onChange={setAlphaOpacity}
+            onChange={setAlpha}
             tooltip={{ open: false }}
             styles={{
               track: { backgroundColor: ALPHA },

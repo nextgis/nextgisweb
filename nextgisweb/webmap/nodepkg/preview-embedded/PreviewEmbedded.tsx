@@ -14,6 +14,7 @@ export function PreviewEmbedded({ iframe }: PreviewEmbeddedProps) {
   return (
     <div style={{ overflow: "auto" }}>
       {iframe ? (
+        // eslint-disable-next-line @eslint-react/dom-no-dangerously-set-innerhtml
         <div dangerouslySetInnerHTML={{ __html: iframe }} />
       ) : (
         <div>

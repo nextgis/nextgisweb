@@ -1,9 +1,9 @@
-import { useCallback, useContext, useEffect, useMemo, useRef } from "react";
+import { use, useCallback, useEffect, useMemo, useRef } from "react";
 
 import { ToggleGroupContext } from "./ToggleGroupContext";
 
 export function useToggleGroupItem(id?: string) {
-  const group = useContext(ToggleGroupContext);
+  const group = use(ToggleGroupContext);
 
   const activeId = group?.activeId;
 

@@ -1,6 +1,12 @@
 import { Viewer } from "@photo-sphere-viewer/core";
 import type { ViewerConfig } from "@photo-sphere-viewer/core";
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useEffectEvent,
+  useRef,
+  useState,
+} from "react";
 
 import "@photo-sphere-viewer/core/index.css";
 import "./PhotospherePreview.less";
@@ -37,8 +43,18 @@ export default function PhotospherePreview({
 
   const viewerRef = useRef<Viewer | null>(null);
 
+  const handleReady = useEffectEvent((viewer: Viewer | null) => {
+    onReady?.(viewer);
+  });
+
   useEffect(() => {
     let viewer: Viewer | null;
+
+    const onViewerReady = () => {
+      if (viewer) {
+        handleReady(viewer);
+      }
+    };
 
     if (container) {
       viewer = new Viewer({
@@ -48,20 +64,17 @@ export default function PhotospherePreview({
         navbar,
       });
       viewerRef.current = viewer;
-      viewer.addEventListener("ready", () => {
-        if (viewer) {
-          onReady?.(viewer);
-        }
-      });
+      viewer.addEventListener("ready", onViewerReady);
     }
 
     return () => {
       if (viewer) {
-        onReady?.(null);
+        viewer.removeEventListener("ready", onViewerReady);
+        handleReady(null);
         viewer = null;
       }
     };
-  }, [onReady, container, navbar]);
+  }, [container, navbar]);
 
   // from here https://github.com/Elius94/react-photo-sphere-viewer/blob/e475d1e0de6a5bb814d96ff55b738bbd67eca722/src/index.tsx#L535
   useEffect(() => {
@@ -81,7 +94,7 @@ export default function PhotospherePreview({
         viewer.destroy();
       }
     }
-  }, [viewerRef]);
+  }, []);
 
   useEffect(() => {
     urlRef.current = url;

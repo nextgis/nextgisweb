@@ -29,6 +29,42 @@ const CoordsDisplay = ({ coord, round = 0 }: CoordPairProps) => {
   return <span>{coord.map((c) => roundValue(c, round)).join(" ")}</span>;
 };
 
+type DisplayType = "mouse" | "extent";
+
+interface DisplayPositionProps {
+  type: DisplayType;
+  transformedCoord?: number[];
+  transformedExtent?: number[];
+  roundDecPlaces: number;
+}
+
+function DisplayPosition({
+  type,
+  transformedCoord,
+  transformedExtent,
+  roundDecPlaces,
+}: DisplayPositionProps) {
+  if (type === "mouse") {
+    return transformedCoord ? (
+      <CoordsDisplay coord={transformedCoord} round={roundDecPlaces} />
+    ) : (
+      <></>
+    );
+  } else {
+    if (!transformedExtent) {
+      return <></>;
+    }
+    const [x1, y1, x2, y2] = transformedExtent;
+    return (
+      <>
+        <CoordsDisplay coord={[x1, y1]} round={roundDecPlaces} />
+        <span> : </span>
+        <CoordsDisplay coord={[x2, y2]} round={roundDecPlaces} />
+      </>
+    );
+  }
+}
+
 export interface MapViewerInfoProps {
   map: Map;
 }
@@ -77,7 +113,7 @@ export const MapViewerInfo = observer(({ map }: MapViewerInfoProps) => {
 
     bindEvents();
     return clearCallback;
-  }, [type, map]);
+  }, [type, map, handleMouseMove, handleExtentChange]);
 
   const icon = useMemo(
     () => (type === "mouse" ? <MouseIcon /> : <CropFreeIcon />),
@@ -91,32 +127,15 @@ export const MapViewerInfo = observer(({ map }: MapViewerInfoProps) => {
     [type]
   );
 
-  const DisplayPosition = () => {
-    if (type === "mouse") {
-      return transformedCoord ? (
-        <CoordsDisplay coord={transformedCoord} round={roundDecPlaces} />
-      ) : (
-        <></>
-      );
-    } else {
-      if (!transformedExtent) {
-        return <></>;
-      }
-      const [x1, y1, x2, y2] = transformedExtent;
-      return (
-        <>
-          <CoordsDisplay coord={[x1, y1]} round={roundDecPlaces} />
-          <span> : </span>
-          <CoordsDisplay coord={[x2, y2]} round={roundDecPlaces} />
-        </>
-      );
-    }
-  };
-
   return (
     <div className="map-viewer-info">
       <div className={`coordinates type-${type} round-${roundDecPlaces}`}>
-        <DisplayPosition />
+        <DisplayPosition
+          type={type}
+          transformedCoord={transformedCoord}
+          transformedExtent={transformedExtent}
+          roundDecPlaces={roundDecPlaces}
+        />
       </div>
       <Button
         className="switch"

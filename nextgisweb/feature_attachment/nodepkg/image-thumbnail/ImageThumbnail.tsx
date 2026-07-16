@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { use, useCallback, useEffect, useMemo, useState } from "react";
 
 import { Image } from "@nextgisweb/gui/antd";
 import type { GetProp } from "@nextgisweb/gui/antd";
@@ -33,7 +33,7 @@ export function ImageThumbnail({
   const [thumbUrl, setThumbUrl] = useState<string>();
   const [selfImageOpen, setSelfImageOpen] = useState(false);
 
-  const ctx = useContext(AttachmentPreviewContext);
+  const ctx = use(AttachmentPreviewContext);
 
   // When an image is rendered inside Image.PreviewGroup, the built-in
   // Image.preview.onOpenChange callback does not fire.

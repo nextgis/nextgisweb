@@ -154,7 +154,7 @@ const AttributeEditor = observer(
     const formFields = useMemo(() => {
       const fieldFormWidgets: FormField<string>[] = [];
       for (const field of fields) {
-        let formItem: FormField["formItem"] | undefined = undefined;
+        let formItem: FormField["formItem"] | undefined;
 
         const val = attributes[field.keyname];
         let placeholder: string | undefined = undefined;

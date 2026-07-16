@@ -1,13 +1,13 @@
 import type { FeatureCollection } from "geojson";
-import { debounce } from "lodash-es";
 import { observer } from "mobx-react-lite";
 import GeoJSON from "ol/format/GeoJSON";
 import type { Geometry } from "ol/geom";
-import { createContext, useCallback, useContext, useState } from "react";
+import { createContext, use, useState } from "react";
 import type { ChangeEvent, ReactNode } from "react";
 
 import { Alert, Input, Spin } from "@nextgisweb/gui/antd";
 import { request, route } from "@nextgisweb/pyramid/api";
+import { useDebounce } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { AbortControllerHelper } from "@nextgisweb/pyramid/util/abort";
 import settings from "@nextgisweb/webmap/client-settings";
@@ -347,8 +347,7 @@ const SearchPanelContext = createContext<any>(null);
 SearchPanelContext.displayName = "SearchPanelContext";
 
 function SearchPanelTitle({ className, close }: PanelTitleProps) {
-  const { searchText, searchChange, clearSearchText } =
-    useContext(SearchPanelContext);
+  const { searchText, searchChange, clearSearchText } = use(SearchPanelContext);
   return (
     <div className={className}>
       <Input
@@ -392,18 +391,15 @@ const SearchPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
     setLoading(false);
   };
 
-  const _search = useCallback(
-    debounce(async (searchText: string) => {
-      clearResults();
-      setLoading(true);
-      const controller = new AbortControllerHelper();
-      setSearchController(controller);
-      const results = await search(searchText, controller, display);
-      setSearchResults(results);
-      setLoading(false);
-    }, 1000),
-    []
-  );
+  const _search = useDebounce(async (searchText: string) => {
+    clearResults();
+    setLoading(true);
+    const controller = new AbortControllerHelper();
+    setSearchController(controller);
+    const results = await search(searchText, controller, display);
+    setSearchResults(results);
+    setLoading(false);
+  }, 1000);
 
   const searchChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -411,6 +407,7 @@ const SearchPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
     if (value && value.trim() && value.trim().length > 1) {
       _search(value);
     } else {
+      _search.cancel();
       clearResults();
     }
   };
@@ -477,7 +474,7 @@ const SearchPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
   };
 
   return (
-    <SearchPanelContext.Provider
+    <SearchPanelContext
       value={{
         searchText,
         searchChange,
@@ -496,7 +493,7 @@ const SearchPanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
       >
         <div className="results">{results}</div>
       </PanelContainer>
-    </SearchPanelContext.Provider>
+    </SearchPanelContext>
   );
 });
 

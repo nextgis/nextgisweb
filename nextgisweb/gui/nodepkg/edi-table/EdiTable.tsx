@@ -13,8 +13,8 @@ import { observer } from "mobx-react-lite";
 import {
   createContext,
   createElement,
+  use,
   useCallback,
-  useContext,
   useMemo,
   useRef,
 } from "react";
@@ -53,8 +53,10 @@ interface RowContextProps {
 
 const RowContext = createContext<RowContextProps>({});
 
+RowContext.displayName = "RowContext";
+
 const DragHandle: FC = () => {
-  const { setActivatorNodeRef, listeners } = useContext(RowContext);
+  const { setActivatorNodeRef, listeners } = use(RowContext);
   return (
     <Button
       type="text"
@@ -93,9 +95,9 @@ const RowComp: FC<
   );
 
   return (
-    <RowContext.Provider value={contextValue}>
+    <RowContext value={contextValue}>
       <tr {...props} ref={setNodeRef} style={style} {...attributes} />
-    </RowContext.Provider>
+    </RowContext>
   );
 };
 

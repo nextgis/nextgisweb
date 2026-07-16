@@ -53,7 +53,7 @@ export function StyleEditor({
       return kind;
     }
   });
-  const [textSymbolizer, setTextSymbolyzer] = useState<TextSymbolizer>(() => {
+  const [textSymbolizer, setTextSymbolizer] = useState<TextSymbolizer>(() => {
     return textSymbolizerInit || defTextSymbolizer;
   });
 
@@ -119,7 +119,7 @@ export function StyleEditor({
           <div className="ngw-sld-style-editor">
             <TextEditor
               value={textSymbolizer}
-              onChange={setTextSymbolyzer}
+              onChange={setTextSymbolizer}
               fields={fields}
             />
           </div>

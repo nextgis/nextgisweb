@@ -39,7 +39,7 @@ function VendorParamsModal({
   value?: Record<string, string>;
   onChange: (value?: Record<string, string>) => void;
 } & ShowModalOptions) {
-  const [store] = useState(new VendorParamsStore(value));
+  const [store] = useState(() => new VendorParamsStore(value));
   const [open, setOpen] = useState(open_);
 
   const close = () => {

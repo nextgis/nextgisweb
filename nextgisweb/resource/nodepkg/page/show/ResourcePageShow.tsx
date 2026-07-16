@@ -53,7 +53,7 @@ export function ResourcePageShow({
 
   const components = useComponents(sectionsConfig);
 
-  const [hidden, setHidden] = useState(new Set<number>());
+  const [hidden, setHidden] = useState(() => new Set<number>());
 
   const sections = useMemo(() => {
     if (!components || !resourceData) return;

@@ -31,7 +31,7 @@ def create_tsconfig(npkgs: dict[str, Path], *, debug):
         skipLibCheck=True,
         esModuleInterop=True,
         strict=debug,
-        moduleResolution="node",
+        moduleResolution="bundler",
         resolveJsonModule=True,
         isolatedModules=True,
         noEmit=True,
@@ -41,16 +41,15 @@ def create_tsconfig(npkgs: dict[str, Path], *, debug):
         types=["node", "mocha"],
         module="esnext",
         jsx="react-jsx",
-        baseUrl=".",
         paths=paths,
     )
 
-    include = []
+    include = ["**/eslint.config.ts"]
 
     for pn, pp in npkgs.items():
         include.append(f"{pp}/**/*.ts")
         include.append(f"{pp}/**/*.tsx")
-        paths[f"{pn}/*"] = [f"{pp}/*"]
+        paths[f"{pn}/*"] = [f"./{pp}/*"]
 
     tsconfig_json = dict(
         compilerOptions=compiler_options,
@@ -109,7 +108,7 @@ def install(
     }
 
     package_json: dict[str, Union[dict, str, bool]] = dict(private=True)
-    package_json["packageManager"] = "pnpm@11.2.2"
+    package_json["packageManager"] = "pnpm@11.13.1"
     package_json["engines"] = dict(node=">=22.0.0")
     package_json["nextgisweb"] = nextgisweb = dict()
 
@@ -246,7 +245,7 @@ def install(
     ngw_root = pkginfo.packages["nextgisweb"]._path.parent
     pkg_root = ngw_root.parent
     if len(list(pkg_root.glob("nextgisweb_*"))) > 0:
-        linters_configs = ["eslint.config.cjs", ".prettierrc.cjs", ".editorconfig"]
+        linters_configs = ["eslint.config.ts", ".prettierrc.cjs", ".editorconfig"]
         for lc in linters_configs:
             tf = pkg_root / lc
             if tf.exists():

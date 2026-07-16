@@ -50,6 +50,6 @@ export function useEffectDebugger(
     console.log("[use-effect-debugger] ", changedDeps);
   }
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line @eslint-react/exhaustive-deps
   useEffect(effectHook, dependencies);
 }

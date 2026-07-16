@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import { useEffect, useState } from "react";
+import { createElement, useEffect, useState } from "react";
 import type { CSSProperties, FC } from "react";
 
 import { Skeleton } from "@nextgisweb/gui/antd";
@@ -33,8 +33,11 @@ const SICON = new Map<StatusEnum, FC>([
 ]);
 
 const SIcon = ({ status }: { status: StatusEnum }) => {
-  const Icon = SICON.get(status || null)!;
-  return <Icon />;
+  const Icon = SICON.get(status || null);
+  if (!Icon) {
+    throw new Error(`Unknown diagnostics status: ${String(status)}`);
+  }
+  return createElement(Icon);
 };
 
 const statusTexts = Array.from(STEXT.values());
@@ -78,8 +81,10 @@ export function DiagnosticsWidget({ data }: { data: CheckBody }) {
     | ["loading" | "failed", null]
     | [CheckResponse["status"], CheckResponse];
 
-  const [[status, result], setState] = useState<State>(["loading", null]);
+  const [state, setState] = useState<State>(["loading", null]);
   const { abort, makeSignal } = useAbortController();
+
+  const [status, result] = state;
 
   useEffect(() => {
     (async () => {

@@ -5,7 +5,7 @@ import type VectorLayer from "ol/layer/Vector";
 import type VectorSource from "ol/source/Vector";
 import type { Style } from "ol/style";
 import type { Options as StyleOptions } from "ol/style/Style";
-import { createContext, useContext } from "react";
+import { createContext, use } from "react";
 import type { RefObject } from "react";
 
 import type { UndoAction } from "../type";
@@ -28,9 +28,10 @@ export type EditorContextValue = {
 };
 
 export const EditorContext = createContext<EditorContextValue | null>(null);
+EditorContext.displayName = "EditorContext";
 
 export function useEditorContext(): EditorContextValue {
-  const context = useContext(EditorContext);
+  const context = use(EditorContext);
   if (context === null) {
     throw new Error(
       "No context provided: useEditorContext() can only be used in a descendant of <EditableItem>"

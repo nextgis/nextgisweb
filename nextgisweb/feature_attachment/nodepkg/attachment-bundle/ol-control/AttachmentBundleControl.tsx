@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { lazy, useCallback } from "react";
 
 import settings from "@nextgisweb/feature-attachment/client-settings";
 import { useDisplayContext } from "@nextgisweb/webmap/display/context/useDisplayContext";
@@ -6,6 +6,10 @@ import { ButtonControl } from "@nextgisweb/webmap/map-component";
 import type { ButtonControlProps } from "@nextgisweb/webmap/map-component";
 
 import AttachFileIcon from "@nextgisweb/icon/material/attach_file";
+
+const attachmentTabLazy = lazy(
+  () => import("@nextgisweb/feature-attachment/attachment-bundle/tab")
+);
 
 export default function AttachmentBundleControl(props: ButtonControlProps) {
   const { display } = useDisplayContext();
@@ -18,8 +22,7 @@ export default function AttachmentBundleControl(props: ButtonControlProps) {
     display.tabsManager.addTab({
       key: "attachments",
       label,
-      component: () =>
-        import("@nextgisweb/feature-attachment/attachment-bundle/tab"),
+      component: attachmentTabLazy,
       props: {
         display,
       },

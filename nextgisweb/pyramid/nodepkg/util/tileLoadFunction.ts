@@ -54,7 +54,7 @@ export async function tileLoadFunction({
   sentryMetricOptions,
   ...requestInit
 }: TileLoadFunctionOptions): Promise<string> {
-  let blob: Blob | undefined = undefined;
+  let blob: Blob;
   let status: number | undefined = undefined;
   try {
     const response = await (hmux ? hmuxFetch : fetch)(src, {

@@ -60,7 +60,7 @@ export function ResourcesFilter({
   const [options, setOptions] = useState<AutoCompleteProps["options"]>([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
-  const [acStatus, setAcSatus] = useState<AutoCompleteProps["status"]>("");
+  const [acStatus, setAcStatus] = useState<AutoCompleteProps["status"]>("");
 
   const makeQuery = useMemo(() => {
     if (search && search.length >= MIN_SEARCH_LENGTH) {
@@ -91,9 +91,9 @@ export function ResourcesFilter({
         });
         const options = resourcesToOptions(resources as CompositeRead[]);
         setOptions(options);
-        setAcSatus("");
+        setAcStatus("");
       } catch {
-        setAcSatus("error");
+        setAcStatus("error");
       } finally {
         setLoading(false);
       }

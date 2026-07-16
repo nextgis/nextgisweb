@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { Suspense, lazy, useMemo } from "react";
+import { Suspense, useMemo } from "react";
 
 import { Tabs } from "@nextgisweb/gui/antd";
 import type { TabsProps } from "@nextgisweb/gui/antd";
@@ -27,7 +27,7 @@ export const WebMapTabs = observer(({ store }: WebMapTabsProps) => {
           ...rest,
         };
         if (component) {
-          const ChildrenComponent = lazy(() => component());
+          const ChildrenComponent = component;
           Object.assign(tab, {
             children: (
               <Suspense fallback={msgLoading}>

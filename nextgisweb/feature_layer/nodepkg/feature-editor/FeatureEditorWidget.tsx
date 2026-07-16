@@ -76,14 +76,14 @@ export const FeatureEditorWidget = observer(
   }: FeatureEditorWidgetProps) => {
     const [messageApi, contextHolder] = message.useMessage();
     const [activeKey, setActiveKey] = useState(ATTRIBUTES_KEY);
-    const store = useState<FeatureEditorStore>(() => {
+    const [store] = useState<FeatureEditorStore>(() => {
       if (storeProp) return storeProp;
       assert(resourceId && featureId);
       return new FeatureEditorStore({
         resourceId,
         featureId,
       });
-    })[0];
+    });
 
     const { dirty, saving } = store;
 

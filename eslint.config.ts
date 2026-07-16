@@ -1,20 +1,15 @@
-// @ts-check
+import js from "@eslint/js";
+import eslintReact from "@eslint-react/eslint-plugin";
+import { importX as importPlugin } from "eslint-plugin-import-x";
+import prettierRecommended from "eslint-plugin-prettier/recommended";
+import globals from "globals";
+import * as tseslint from "typescript-eslint";
 
-const babelParser = require("@babel/eslint-parser");
-const js = require("@eslint/js");
-const importPlugin = require("eslint-plugin-import-x");
-const prettierRecommended = require("eslint-plugin-prettier/recommended");
-const reactPlugin = require("eslint-plugin-react");
-const reactHooksPlugin = require("eslint-plugin-react-hooks");
-const globals = require("globals");
-const tseslint = require("typescript-eslint");
+const tsconfigRootDir = import.meta.dirname;
 
-const babelConfigPath = require.resolve("@nextgisweb/jsrealm/babelrc.cjs");
-
-const browserGlobals = { ...globals.browser };
+const reactFiles = ["**/nodepkg/**/*.{ts,tsx}"];
 
 /**
- * @type {import("eslint").Linter.ParserOptions["ecmaVersion"]}
  * Minimum version for top level await
  */
 const ecmaVersion = 2022;
@@ -28,7 +23,6 @@ const noUnusedVarsOptions = {
   destructuredArrayIgnorePattern: "^_",
 };
 
-/** @type {import("eslint").Linter.Config[]} */
 const config = [
   {
     ignores: [
@@ -43,6 +37,14 @@ const config = [
 
   js.configs.recommended,
   ...tseslint.configs.recommended,
+  {
+    files: ["**/*.{ts,tsx}"],
+    languageOptions: {
+      parserOptions: {
+        tsconfigRootDir,
+      },
+    },
+  },
 
   {
     languageOptions: {
@@ -61,55 +63,52 @@ const config = [
     },
   },
 
-  prettierRecommended,
   {
-    rules: {
-      "prettier/prettier": "warn",
-    },
+    files: reactFiles,
+    ...eslintReact.configs["recommended-typescript"],
   },
-
-  reactPlugin.configs.flat.recommended,
-  reactPlugin.configs.flat["jsx-runtime"],
-  reactHooksPlugin.configs["recommended-latest"],
   {
-    rules: {
-      "react/prop-types": "off", // Use TypeScript instead
-      "react/jsx-no-target-blank": "off", // Unsupported browsers
-      "react/display-name": "warn",
+    files: reactFiles,
+    languageOptions: {
+      globals: globals.browser,
     },
-    settings: {
-      react: { version: "detect" },
-      componentWrapperFunctions: ["observer"],
+    rules: {
+      "@eslint-react/dom-no-unsafe-target-blank": "off", // Unsupported browsers
+      "@eslint-react/no-missing-component-display-name": "warn",
+      "@eslint-react/no-missing-context-display-name": "warn",
+
+      // Disabled for backward compatibility.
+      // TODO: Enable these rules as warn, and fix the code gradually.
+      "@eslint-react/no-nested-component-definitions": "off",
+      "@eslint-react/static-components": "warn",
+      "@eslint-react/set-state-in-effect": "off",
+      "@eslint-react/no-array-index-key": "off",
+      "@eslint-react/naming-convention-ref-name": "off",
     },
   },
   {
     files: ["**/*.cjs"],
     languageOptions: {
       ecmaVersion,
-      globals: {
-        ...globals.node,
+      sourceType: "commonjs",
+      globals: globals.node,
+      parserOptions: {
+        tsconfigRootDir,
       },
     },
   },
   {
     files: ["**/*.js"],
     languageOptions: {
-      globals: {
-        ...browserGlobals,
-      },
+      globals: globals.browser,
     },
   },
   {
     files: ["**/nodepkg/**/*.js"],
     languageOptions: {
-      globals: {
-        ...browserGlobals,
-      },
-      parser: babelParser,
+      globals: globals.browser,
       parserOptions: {
         sourceType: "module",
-        requireConfigFile: true,
-        babelOptions: { configFile: babelConfigPath },
         ecmaFeatures: { jsx: true },
         ecmaVersion,
       },
@@ -118,12 +117,11 @@ const config = [
   {
     files: ["**/nodepkg/**/*.ts", "**/nodepkg/**/*.tsx"],
     languageOptions: {
-      globals: {
-        ...browserGlobals,
-      },
+      globals: globals.browser,
 
       parser: tseslint.parser,
       parserOptions: {
+        tsconfigRootDir,
         ecmaFeatures: { jsx: true },
         ecmaVersion,
       },
@@ -186,8 +184,8 @@ const config = [
       "no-restricted-syntax": [
         "warn",
         {
-          "selector": "TSTypeReference > TSQualifiedName[left.name='React']",
-          "message": "Use named type imports from 'react' instead.",
+          selector: "TSTypeReference > TSQualifiedName[left.name='React']",
+          message: "Use named type imports from 'react' instead.",
         },
       ],
       "sort-imports": ["warn", { ignoreDeclarationSort: true }],
@@ -221,9 +219,6 @@ const config = [
       ],
     },
     settings: {
-      "import-x/parsers": {
-        "@typescript-eslint/parser": [".ts", ".tsx"],
-      },
       "import-x/resolver": {
         typescript: {
           alwaysTryTypes: true,
@@ -232,5 +227,14 @@ const config = [
       "import-x/internal-regex": "^@nextgisweb/",
     },
   },
+
+  // Import eslint-plugin-prettier/recommended and add it as the last item in the
+  prettierRecommended,
+  {
+    rules: {
+      "prettier/prettier": "warn",
+    },
+  },
 ];
-module.exports = config;
+
+export default config;

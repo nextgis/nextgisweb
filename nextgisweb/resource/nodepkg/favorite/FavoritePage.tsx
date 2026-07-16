@@ -97,6 +97,110 @@ function ItemLink({ item, schema, editing, deleteItem }: ItemLinkProps) {
   }
 }
 
+function PathRow({ path }: { path: string[] }) {
+  return (
+    path.length > 0 && (
+      <tr className="path">
+        <td colSpan={3}>{path.join(" > ")}</td>
+      </tr>
+    )
+  );
+}
+
+function ResourceRow({
+  resource,
+  items,
+  editing,
+  schema,
+  deleteItem,
+}: {
+  resource: ResourceInfo;
+  items: Item[];
+  editing: boolean;
+  schema: Schema | undefined;
+  deleteItem: (id: number) => Promise<unknown>;
+}) {
+  const onClick =
+    items.length === 1 && !editing
+      ? () => (window.location.href = items[0].url)
+      : undefined;
+  return (
+    <tr
+      className={classNames("resource", { "click": onClick })}
+      onClick={onClick}
+    >
+      <td className="dn">
+        <div>
+          <SvgIcon icon={`rescls-${resource.cls}`} />
+          {resource.dn}
+        </div>
+      </td>
+      <td className="type">{resources[resource.cls].label}</td>
+      <td className="action">
+        <div>
+          {items.map((item, idx) => (
+            <ItemLink
+              key={idx}
+              item={item}
+              schema={schema!}
+              editing={editing}
+              deleteItem={deleteItem}
+            />
+          ))}
+        </div>
+      </td>
+    </tr>
+  );
+}
+
+function ItemRow({
+  item,
+  placeholder,
+  editing,
+  schema,
+  relabelItem,
+  deleteItem,
+}: {
+  item: Item;
+  placeholder: string;
+  editing: boolean;
+  schema: Schema | undefined;
+  relabelItem: (id: number, value: string | null) => Promise<unknown>;
+  deleteItem: (id: number) => Promise<unknown>;
+}) {
+  return (
+    <tr
+      className="item click"
+      onClick={!editing ? () => (window.location.href = item.url) : undefined}
+    >
+      <td className="dn">
+        {editing ? (
+          <Editor
+            id={item.id}
+            value={item.label}
+            placeholder={placeholder}
+            relabelItem={relabelItem}
+            schema={schema!}
+          />
+        ) : (
+          item.label || placeholder
+        )}
+      </td>
+      <td className="type">{schema![item.identity].label}</td>
+      <td className="action">
+        <div>
+          <ItemLink
+            item={item}
+            schema={schema!}
+            editing={editing}
+            deleteItem={deleteItem}
+          />
+        </div>
+      </td>
+    </tr>
+  );
+}
+
 export default function FavoritePage() {
   const { makeSignal } = useAbortController();
   const { data: schema } = useRouteGet("resource.favorite.schema");
@@ -214,88 +318,6 @@ export default function FavoritePage() {
     [makeSignal]
   );
 
-  const PathRow = useCallback(({ path }: { path: string[] }) => {
-    return (
-      path.length > 0 && (
-        <tr className="path">
-          <td colSpan={3}>{path.join(" > ")}</td>
-        </tr>
-      )
-    );
-  }, []);
-
-  const ResourceRow = useCallback(
-    ({ resource, items }: { resource: ResourceInfo; items: Item[] }) => {
-      const onClick =
-        items.length === 1 && !editing
-          ? () => (window.location.href = items[0].url)
-          : undefined;
-      return (
-        <tr
-          className={classNames("resource", { "click": onClick })}
-          onClick={onClick}
-        >
-          <td className="dn">
-            <div>
-              <SvgIcon icon={`rescls-${resource.cls}`} />
-              {resource.dn}
-            </div>
-          </td>
-          <td className="type">{resources[resource.cls].label}</td>
-          <td className="action">
-            <div>
-              {items.map((item, idx) => (
-                <ItemLink
-                  key={idx}
-                  item={item}
-                  schema={schema!}
-                  editing={editing}
-                  deleteItem={deleteItem}
-                />
-              ))}
-            </div>
-          </td>
-        </tr>
-      );
-    },
-    [deleteItem, editing, schema]
-  );
-
-  const ItemRow = useCallback(
-    ({ item, placeholder }: { item: Item; placeholder: string }) => (
-      <tr
-        className="item click"
-        onClick={!editing ? () => (window.location.href = item.url) : undefined}
-      >
-        <td className="dn">
-          {editing ? (
-            <Editor
-              id={item.id}
-              value={item.label}
-              placeholder={placeholder}
-              relabelItem={relabelItem}
-              schema={schema!}
-            />
-          ) : (
-            item.label || placeholder
-          )}
-        </td>
-        <td className="type">{schema![item.identity].label}</td>
-        <td className="action">
-          <div>
-            <ItemLink
-              item={item}
-              schema={schema!}
-              editing={editing}
-              deleteItem={deleteItem}
-            />
-          </div>
-        </td>
-      </tr>
-    ),
-    [relabelItem, deleteItem, editing, schema]
-  );
-
   const themeVariables = useThemeVariables({
     "color-alter": "colorFillAlter",
     "color-border": "colorBorderSecondary",
@@ -310,7 +332,7 @@ export default function FavoritePage() {
       <div className="empty">
         <Translated
           msgf={msgEmptyTextFmt}
-          // eslint-disable-next-line react/jsx-key
+          // eslint-disable-next-line @eslint-react/no-missing-key
           args={[<IconFavoriteOutline />]}
         />
       </div>
@@ -336,12 +358,19 @@ export default function FavoritePage() {
                       key={key}
                       resource={rest.resource!}
                       items={rest.items!}
+                      editing={editing}
+                      schema={schema}
+                      deleteItem={deleteItem}
                     />
                   ) : (
                     <ItemRow
                       key={key}
                       item={rest.item!}
                       placeholder={rest.placeholder!}
+                      editing={editing}
+                      schema={schema}
+                      relabelItem={relabelItem}
+                      deleteItem={deleteItem}
                     />
                   )
                 )}

@@ -1,4 +1,4 @@
-import { createContext, useContext } from "react";
+import { createContext, use } from "react";
 
 import type { MapStore } from "@nextgisweb/webmap/ol/MapStore";
 
@@ -7,9 +7,10 @@ export interface MapContextValue {
 }
 
 export const MapContext = createContext<MapContextValue | null>(null);
+MapContext.displayName = "MapContext";
 
 export function useMapContext(): MapContextValue {
-  const context = useContext(MapContext);
+  const context = use(MapContext);
   if (context === null) {
     throw new Error(
       "No context provided: useMapContext() can only be used in a descendant of <MapComponent>"

@@ -176,7 +176,7 @@ const SharePanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
 
   const [favLabelModalOpen, setFavLabelModalOpen] = useState(false);
   const favLabelRef = useRef<InputRef>(null);
-  const [favLabelValue, setFavlabelValue] = useState("");
+  const [favLabelValue, setFavLabelValue] = useState("");
 
   const updatePermalinkUrl = useCallback(() => {
     const permalink = getPermalink({
@@ -353,12 +353,12 @@ const SharePanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
             }}
             onCancel={() => {
               setFavLabelModalOpen(false);
-              setFavlabelValue("");
+              setFavLabelValue("");
             }}
             onOk={() => {
               addToFavorites(mapLink, favLabelValue);
               setFavLabelModalOpen(false);
-              setFavlabelValue("");
+              setFavLabelValue("");
             }}
           >
             <Input
@@ -366,7 +366,7 @@ const SharePanel = observer<PanelPluginWidgetProps>(({ store, display }) => {
               value={favLabelValue}
               placeholder={gettext("Optional fragment label")}
               onChange={(e) => {
-                setFavlabelValue(e.target.value);
+                setFavLabelValue(e.target.value);
               }}
             />
           </Modal>

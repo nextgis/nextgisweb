@@ -36,7 +36,7 @@ export function placeItem<I extends FocusTableItem>(
   const children = store.getItemChildren(base);
   if (children !== undefined && (base === null || into)) {
     parent = base;
-    container = store.getItemChildren(base) as IObservableArray<I>;
+    container = store.getItemChildren(parent) as IObservableArray<I>;
     position = container.length;
   } else {
     parent = store.getItemParent(base as I);

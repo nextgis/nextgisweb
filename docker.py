@@ -73,5 +73,5 @@ def on_virtualenv(event):
 
     event.after_install(
         "ln -s package/nextgisweb/.prettierrc.cjs $CRATER_ROOT/",
-        "ln -s package/nextgisweb/eslint.config.cjs $CRATER_ROOT/",
+        "ln -s package/nextgisweb/eslint.config.ts $CRATER_ROOT/",
     )

@@ -73,8 +73,10 @@ export function SwaggerUI({
     [userOnComplete]
   );
 
-  const mergedProps = Object.assign({ ...defaults }, props, {
+  const mergedProps = {
+    ...defaults,
+    ...props,
     onComplete: handleComplete,
-  });
+  };
   return <SwaggerUIReact {...mergedProps} />;
 }

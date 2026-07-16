@@ -13,6 +13,10 @@ import type { ResourcePickerAttr, ResourcePickerBreadcrumbProps } from "./type";
 
 import HomeFilledIcon from "@nextgisweb/icon/material/home";
 
+function HomeIcon() {
+  return <HomeFilledIcon style={{ fontSize: "1.1rem" }} />;
+}
+
 type BreadcrumbItemMenuItems = NonNullable<
   BreadcrumbItemProps["menu"]
 >["items"];
@@ -74,8 +78,6 @@ export const ResourcePickerBreadcrumb = observer(
         });
         menuItems.push(...moveToMenuItems);
       }
-
-      const HomeIcon = () => <HomeFilledIcon style={{ fontSize: "1.1rem" }} />;
 
       for (let i = 0; i < breadcrumbItems.length; i++) {
         const parent = breadcrumbItems[i];

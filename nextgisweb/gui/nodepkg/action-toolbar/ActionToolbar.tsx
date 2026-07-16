@@ -30,9 +30,15 @@ export function ActionToolbar<
   children,
 }: ActionToolbarProps<P> & { ref?: Ref<HTMLDivElement> }) {
   const toolbarRef = useRef<HTMLDivElement | null>(null);
+
+  const deps = useMemo(
+    () => [actions, rightActions, children],
+    [actions, rightActions, children]
+  );
+
   const isFit = useFit({
     ref: toolbarRef,
-    deps: [actions, rightActions, children],
+    deps,
   });
 
   const { createButtonAction } = useActionToolbar({

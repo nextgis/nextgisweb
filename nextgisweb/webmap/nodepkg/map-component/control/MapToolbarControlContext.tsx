@@ -1,4 +1,4 @@
-import { createContext, useContext } from "react";
+import { createContext, use } from "react";
 
 import type { MapControlProps } from "./MapControl";
 
@@ -12,9 +12,10 @@ export interface MapToolbarContextValue {
 
 export const MapToolbarControlContext =
   createContext<MapToolbarContextValue | null>(null);
+MapToolbarControlContext.displayName = "MapToolbarControlContext";
 
 export function useMapToolbarControl(): MapToolbarContextValue | null {
-  const ctx = useContext(MapToolbarControlContext);
+  const ctx = use(MapToolbarControlContext);
 
   return ctx;
 }

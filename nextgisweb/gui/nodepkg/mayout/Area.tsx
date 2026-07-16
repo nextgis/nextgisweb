@@ -15,6 +15,7 @@ export const AreaContext = createContext<AreaContextProps>({
   labelPosition: "left",
   columnCount: 1,
 });
+AreaContext.displayName = "AreaContext";
 
 export interface AreaProps {
   /** Label position, left or top */
@@ -63,7 +64,7 @@ export function Area({
 
   const ctx = { labelPosition, columnCount: cols.length };
   return (
-    <AreaContext.Provider value={ctx}>
+    <AreaContext value={ctx}>
       <div
         className={classNames(
           "ngw-gui-mayout-area",
@@ -75,6 +76,6 @@ export function Area({
       >
         {children}
       </div>
-    </AreaContext.Provider>
+    </AreaContext>
   );
 }

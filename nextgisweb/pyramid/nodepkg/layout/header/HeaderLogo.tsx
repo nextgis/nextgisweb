@@ -8,6 +8,7 @@ export default function HeaderLogo() {
       return (
         <a
           href={ngwConfig.applicationUrl}
+          // eslint-disable-next-line @eslint-react/dom-no-dangerously-set-innerhtml
           dangerouslySetInnerHTML={{
             __html: config.content,
           }}

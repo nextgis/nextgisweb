@@ -41,7 +41,7 @@ function OAuthStatus({ oauthSubject }: OauthStatusProps) {
 }
 
 export function SettingsForm() {
-  const [isSaving, setSaving] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const { data: profile, isLoading } = useRouteGet("auth.profile");
 
   const [messageApi, contextHolder] = message.useMessage();
@@ -72,14 +72,14 @@ export function SettingsForm() {
     return result;
   }, [profile, isSaving]);
   const onChange = async ({ value: json }: FormOnChangeOptions) => {
-    setSaving(true);
+    setIsSaving(true);
     try {
       await route("auth.profile").put({ json });
       messageApi.success(gettext("Saved"));
     } catch (err) {
       errorModal(err);
     } finally {
-      setSaving(false);
+      setIsSaving(false);
     }
   };
   const initialValues = {

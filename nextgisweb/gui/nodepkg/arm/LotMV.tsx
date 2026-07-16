@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { createElement } from "react";
+import { createElement, useEffect } from "react";
 import type { ReactNode } from "react";
 
 import { Lot } from "@nextgisweb/gui/mayout";
@@ -26,7 +26,9 @@ function LotMVBase<V, C extends (props: any) => ReactNode>({
   ...lotProps
 }: LotMVProps<V, C>) {
   const componentProps = value.cprops();
-  Object.assign(componentProps, props);
+  useEffect(() => {
+    Object.assign(componentProps, props);
+  });
 
   return (
     <Lot error={value.error} {...lotProps}>

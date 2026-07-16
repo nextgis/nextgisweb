@@ -10,3 +10,4 @@ export interface ToggleGroupContextValue {
 export const ToggleGroupContext = createContext<ToggleGroupContextValue | null>(
   null
 );
+ToggleGroupContext.displayName = "ToggleGroupContext";

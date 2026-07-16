@@ -24,7 +24,7 @@ export function PreviewMap({
   );
 
   const homeExtent = useRef(initialExtent || mapExtent);
-  const [basemap, setBaseMap] = useState(basemapProp);
+  const [basemap, setBasemap] = useState(basemapProp);
 
   const maxZoom =
     effectiveExtent && effectiveExtent.maxZoom !== undefined
@@ -73,7 +73,7 @@ export function PreviewMap({
         <ToggleControl
           position="top-left"
           value={basemap}
-          onChange={setBaseMap}
+          onChange={setBasemap}
         >
           <MapIcon />
         </ToggleControl>

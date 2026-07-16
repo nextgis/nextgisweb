@@ -61,7 +61,7 @@ export const OlRenderer: FC<OlRendererProps> = ({
   /** reference to the underlying OpenLayers map */
   const map = useRef<OlMap>(null);
   const layer = useRef<OlLayerVector<OlSourceVector>>(null);
-  const [mapId] = useState(_uniqueId("map_"));
+  const [mapId] = useState(() => _uniqueId("map_"));
 
   const target = useRef<HTMLDivElement>(null);
 
