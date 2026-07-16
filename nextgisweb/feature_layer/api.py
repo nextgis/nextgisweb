@@ -11,6 +11,7 @@ from sqlalchemy.exc import NoResultFound
 from nextgisweb.env import gettext, gettextf
 from nextgisweb.lib.apitype import AsJSON, Query
 from nextgisweb.lib.geometry import Geometry, GeometryNotValid, Transformer, geom_area, geom_length
+from nextgisweb.lib.json import loads as json_loads
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.pyramid import JSONType
@@ -780,17 +781,20 @@ Use only field names from the provided schema. When there are multiple top-level
 """
 
 _FILTER_TOOL = {
-    "name": "set_filter",
-    "description": "Set the filter expression for the feature layer",
-    "input_schema": {
-        "type": "object",
-        "properties": {
-            "expression": {
-                "type": "array",
-                "description": "Filter expression as a nested JSON array per the schema",
-            }
+    "type": "function",
+    "function": {
+        "name": "set_filter",
+        "description": "Set the filter expression for the feature layer",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "expression": {
+                    "type": "array",
+                    "description": "Filter expression as a nested JSON array per the schema",
+                }
+            },
+            "required": ["expression"],
         },
-        "required": ["expression"],
     },
 }
 
@@ -815,23 +819,26 @@ def filter_generate(resource, request, *, body: FilterGenerateBody) -> JSONType:
         for f in resource.fields
     )
 
-    client = llm.anthropic_client
-    response = client.messages.create(
-        model=llm.options["model"],
+    client = llm.make_client()
+    response = client.chat.completions.create(
+        model=llm.effective_model,
         max_tokens=1024,
-        system=f"You generate filter expressions for a GIS feature layer.\n{_FILTER_SCHEMA}",
-        tools=[_FILTER_TOOL],
-        tool_choice={"type": "tool", "name": "set_filter"},
         messages=[
+            {
+                "role": "system",
+                "content": f"You generate filter expressions for a GIS feature layer.\n{_FILTER_SCHEMA}",
+            },
             {
                 "role": "user",
                 "content": f"Layer fields:\n{fields_desc}\n\nGenerate a filter for: {body.prompt}",
-            }
+            },
         ],
+        tools=[_FILTER_TOOL],
+        tool_choice={"type": "function", "function": {"name": "set_filter"}},
     )
 
-    tool_block = next(b for b in response.content if b.type == "tool_use")
-    return tool_block.input["expression"]
+    tool_call = response.choices[0].message.tool_calls[0]
+    return json_loads(tool_call.function.arguments)["expression"]
 
 
 def setup_pyramid(comp, config):
