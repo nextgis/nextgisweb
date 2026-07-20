@@ -32,25 +32,28 @@ export const getGeometryTypeTitle = (geometryType: string) => {
   }
 };
 
-export const geometryTypeAliases: Record<
-  FeatureLayerGeometryType,
-  OlGeometryType
-> = {
-  POINT: "Point",
-  LINESTRING: "LineString",
-  POLYGON: "Polygon",
-  MULTIPOINT: "MultiPoint",
-  MULTILINESTRING: "MultiLineString",
-  MULTIPOLYGON: "MultiPolygon",
-  POINTZ: "Point",
-  LINESTRINGZ: "LineString",
-  POLYGONZ: "Polygon",
-  MULTIPOINTZ: "MultiPoint",
-  MULTILINESTRINGZ: "MultiLineString",
-  MULTIPOLYGONZ: "MultiPolygon",
-};
+export type SpatialGeometryType = Exclude<FeatureLayerGeometryType, "NONE">;
+
+export const geometryTypeAliases: Record<SpatialGeometryType, OlGeometryType> =
+  {
+    POINT: "Point",
+    LINESTRING: "LineString",
+    POLYGON: "Polygon",
+    MULTIPOINT: "MultiPoint",
+    MULTILINESTRING: "MultiLineString",
+    MULTIPOLYGON: "MultiPolygon",
+    POINTZ: "Point",
+    LINESTRINGZ: "LineString",
+    POLYGONZ: "Polygon",
+    MULTIPOINTZ: "MultiPoint",
+    MULTILINESTRINGZ: "MultiLineString",
+    MULTIPOLYGONZ: "MultiPolygon",
+  };
 
 export function getOlGeometryType(type: FeatureLayerGeometryType) {
+  if (type === "NONE") {
+    throw new Error("Geometry type NONE is not supported");
+  }
   return geometryTypeAliases[type];
 }
 

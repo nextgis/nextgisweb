@@ -9,7 +9,7 @@ import {
 import type { Geometry, LineString, Point, Polygon } from "ol/geom";
 
 import type { FeatureLayerGeometryType } from "@nextgisweb/feature-layer/type/api";
-import { getOlLayout } from "@nextgisweb/webmap/utils/geometry-types";
+import { getOlLayout } from "@nextgisweb/feature-layer/util/geometry-types";
 
 export function featuresToWkt(
   features: Feature<Geometry>[],

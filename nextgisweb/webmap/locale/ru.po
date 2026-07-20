@@ -1,8 +1,8 @@
-#: adapter.py:26
+#: adapter.py:22
 msgid "Tiles"
 msgstr "Тайлы"
 
-#: adapter.py:35
+#: adapter.py:28
 msgid "Image"
 msgstr "Изображение"
 
@@ -108,7 +108,6 @@ msgstr "Прямоугольник"
 
 #: nodepkg/filter-extent-btn/FilterExtentBtn.tsx:101
 #: nodepkg/panel/annotations/AnnotationsPanel.tsx:132
-#: nodepkg/utils/geometry-types.ts:18
 msgid "Polygon"
 msgstr "Полигон"
 
@@ -188,7 +187,7 @@ msgstr "Макс. масштаб"
 #: nodepkg/items-widget/ItemsWidget.tsx:40
 #: nodepkg/panel/print/component/PrintElementsSettings.tsx:25
 #: nodepkg/settings-widget/SettingsWidget.tsx:27
-#: nodepkg/settings/SettingsForm.tsx:232
+#: nodepkg/settings/SettingsForm.tsx:234
 msgid "Legend"
 msgstr "Легенда"
 
@@ -260,6 +259,11 @@ msgstr "Скрывать легенду"
 msgid "Unable to load tile"
 msgstr "Ошибка загрузки тайла"
 
+#: nodepkg/map-component/control/BandSelectControl.tsx:9
+#: nodepkg/panel/identify/component/RasterInfoSection.tsx:14
+msgid "Band {}"
+msgstr "Канал {}"
+
 #: nodepkg/map-component/control/IdentifyControl.tsx:92
 msgid "Clear selection"
 msgstr "Очистить выделение"
@@ -293,11 +297,6 @@ msgstr "Отодвинуть"
 #: nodepkg/map-component/control/ZoomControl.tsx:179
 msgid "Back to the initial extent"
 msgstr "Вернуться к начальному охвату"
-
-#: nodepkg/map-component/hook/useNGWLayer.tsx:30
-#: nodepkg/panel/identify/component/RasterInfoSection.tsx:14
-msgid "Band {}"
-msgstr "Канал {}"
 
 #: nodepkg/map-component/tool/ToolMeasure/ToolMeasure.tsx:67
 #: nodepkg/map-controls/map-tools.ts:40
@@ -377,7 +376,7 @@ msgstr "Определить мое местоположение"
 
 #: nodepkg/map-controls/map-controls.ts:111
 #: nodepkg/map-controls/map-controls.ts:116 nodepkg/settings/SettingsForm.tsx:81
-#: option/base.py:40
+#: option/base.py:39
 msgid "Identification"
 msgstr "Идентификация"
 
@@ -385,11 +384,11 @@ msgstr "Идентификация"
 msgid "Cursor coordinates / extent"
 msgstr "Координаты курсора / охвата"
 
-#: nodepkg/map-viewer-info/MapViewerInfo.tsx:89
+#: nodepkg/map-viewer-info/MapViewerInfo.tsx:125
 msgid "Show extent"
 msgstr "Показывать охват"
 
-#: nodepkg/map-viewer-info/MapViewerInfo.tsx:90
+#: nodepkg/map-viewer-info/MapViewerInfo.tsx:126
 msgid "Show cursor coordinates"
 msgstr "Показывать координаты курсора"
 
@@ -425,7 +424,6 @@ msgid "Geometry type"
 msgstr "Тип геометрии"
 
 #: nodepkg/panel/annotations/AnnotationsPanel.tsx:125
-#: nodepkg/utils/geometry-types.ts:9
 msgid "Point"
 msgstr "Точка"
 
@@ -528,11 +526,11 @@ msgstr "Геометрия"
 msgid "Zoom to feature"
 msgstr "Приблизить к объекту"
 
-#: nodepkg/panel/identify/component/RasterInfoSection.tsx:26
+#: nodepkg/panel/identify/component/RasterInfoSection.tsx:27
 msgid "Raster"
 msgstr "Растр"
 
-#: nodepkg/panel/identify/fields.tsx:115
+#: nodepkg/panel/identify/fields.tsx:127
 msgid "N/A"
 msgstr "Н/Д"
 
@@ -569,8 +567,8 @@ msgid "Add"
 msgstr "Добавить"
 
 #: nodepkg/panel/layers/useAddItem.tsx:116
-#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:177
-#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:184
+#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:181
+#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:188
 #: nodepkg/ui/finish-editing-dialog/FinishEditingDialog.tsx:59
 msgid "Cancel"
 msgstr "Отменить"
@@ -637,7 +635,7 @@ msgstr "Значение масштаба"
 msgid "Scale bar"
 msgstr "Масштабная линейка"
 
-#: nodepkg/panel/print/component/ScalesSelect.tsx:65
+#: nodepkg/panel/print/component/ScalesSelect.tsx:69
 msgid "Custom scale"
 msgstr "Произвольный масштаб"
 
@@ -673,15 +671,15 @@ msgstr "PDF"
 msgid "Print map"
 msgstr "Распечатать карту"
 
-#: nodepkg/panel/search/SearchPanel.tsx:359
+#: nodepkg/panel/search/SearchPanel.tsx:358
 msgid "Enter at least 2 characters"
 msgstr "Введите минимум 2 символа"
 
-#: nodepkg/panel/search/SearchPanel.tsx:458
+#: nodepkg/panel/search/SearchPanel.tsx:455
 msgid "Not found"
 msgstr "Не найдено"
 
-#: nodepkg/panel/search/SearchPanel.tsx:462
+#: nodepkg/panel/search/SearchPanel.tsx:459
 msgid "Refine search criterion. Displayed first 100 search results."
 msgstr "Уточните критерий поиска. Отображены первые 100 результатов поиска."
 
@@ -751,7 +749,7 @@ msgstr "px"
 msgid "Map tools"
 msgstr "Инструменты карты"
 
-#: nodepkg/panel/share/SharePanel.tsx:400 option/base.py:30
+#: nodepkg/panel/share/SharePanel.tsx:400 option/base.py:29
 msgid "Panels"
 msgstr "Панели"
 
@@ -783,7 +781,7 @@ msgstr "Предпросмотр"
 msgid "Share"
 msgstr "Поделиться"
 
-#: nodepkg/plugin/feature-layer/FeatureLayerPlugin.tsx:13
+#: nodepkg/plugin/feature-layer/FeatureLayerPlugin.tsx:19
 msgid "Feature table"
 msgstr "Таблица объектов"
 
@@ -808,7 +806,7 @@ msgstr "Включить прилипание"
 msgid "Stop editing layer: {layer}"
 msgstr "Завершить редактирование слоя: {layer}"
 
-#: nodepkg/plugin/layer-editor/modes/AttributeMode.tsx:121
+#: nodepkg/plugin/layer-editor/modes/AttributeMode.tsx:129
 msgid "Edit attributes"
 msgstr "Редактировать атрибуты"
 
@@ -817,12 +815,12 @@ msgid "Delete all"
 msgstr "Удалить все"
 
 #: nodepkg/plugin/layer-editor/modes/DeleteMode.tsx:70
-#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:175
+#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:179
 msgid "Delete"
 msgstr "Удалить"
 
 #: nodepkg/plugin/layer-editor/modes/DrawMode.tsx:117
-#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:186
+#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:190
 msgid "Create"
 msgstr "Создать"
 
@@ -1025,16 +1023,16 @@ msgstr "Неверные значения. Например, ru или gb,de"
 msgid "Yandex.Maps API Geocoder Key"
 msgstr "Ключ геокодера API Яндекс.Карт"
 
-#: nodepkg/settings/SettingsForm.tsx:224
+#: nodepkg/settings/SettingsForm.tsx:225
 msgid "API key is required"
 msgstr "API ключ является обязательным"
 
-#: nodepkg/settings/SettingsForm.tsx:243
+#: nodepkg/settings/SettingsForm.tsx:245
 msgid "Visibility"
 msgstr "Видимость"
 
-#: nodepkg/settings/SettingsForm.tsx:264
-#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:179
+#: nodepkg/settings/SettingsForm.tsx:266
+#: nodepkg/ui/annotation-dialog/AnnotationsModal.tsx:183
 #: nodepkg/ui/finish-editing-dialog/FinishEditingDialog.tsx:62
 msgid "Save"
 msgstr "Сохранить"
@@ -1178,30 +1176,6 @@ msgstr "га"
 msgid "ac"
 msgstr "акр"
 
-#: nodepkg/utils/geometry-types.ts:12
-msgid "LineString"
-msgstr "Линия"
-
-#: nodepkg/utils/geometry-types.ts:15
-msgid "LinearRing"
-msgstr "Замкнутый контур"
-
-#: nodepkg/utils/geometry-types.ts:21
-msgid "MultiPoint"
-msgstr "Мультиточка"
-
-#: nodepkg/utils/geometry-types.ts:24
-msgid "MultiLineString"
-msgstr "Мультилиния"
-
-#: nodepkg/utils/geometry-types.ts:27
-msgid "MultiPolygon"
-msgstr "Мультиполигон"
-
-#: nodepkg/utils/geometry-types.ts:30
-msgid "GeometryCollection"
-msgstr "Коллекция геометрий"
-
 #: nodepkg/webmap-feature-grid-tab/WebMapFeatureGridTab.tsx:28
 msgid "Go to"
 msgstr "Перейти"
@@ -1230,11 +1204,11 @@ msgstr "Информация о геометрии"
 msgid "Request multiplexing"
 msgstr "Мультиплексирование запросов"
 
-#: option/base.py:35
+#: option/base.py:34
 msgid "Tools"
 msgstr "Инструменты"
 
-#: option/base.py:45
+#: option/base.py:44
 msgid "Miscellaneous"
 msgstr "Прочее"
 

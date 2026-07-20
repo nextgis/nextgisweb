@@ -4,14 +4,14 @@ import type { Geometry } from "ol/geom";
 import type { GeometryLayout, Type as OlGeometryType } from "ol/geom/Geometry";
 import type VectorSource from "ol/source/Vector";
 
+import {
+  getOlGeometryType,
+  getOlLayout,
+} from "@nextgisweb/feature-layer/util/geometry-types";
 import { route } from "@nextgisweb/pyramid/api";
 import topic from "@nextgisweb/webmap/compat/topic";
 import type { Display } from "@nextgisweb/webmap/display";
 import type { TreeLayerStore } from "@nextgisweb/webmap/store/tree-store/TreeItemStore";
-import {
-  getOlGeometryType,
-  getOlLayout,
-} from "@nextgisweb/webmap/utils/geometry-types";
 
 import type { FeatureToSave } from "./type";
 

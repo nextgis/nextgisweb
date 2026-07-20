@@ -727,6 +727,38 @@ msgstr ""
 msgid "Settings"
 msgstr "Настройки"
 
+#: nodepkg/util/geometry-types.ts:9
+msgid "Point"
+msgstr "Точка"
+
+#: nodepkg/util/geometry-types.ts:12
+msgid "LineString"
+msgstr "Линия"
+
+#: nodepkg/util/geometry-types.ts:15
+msgid "LinearRing"
+msgstr "Замкнутый контур"
+
+#: nodepkg/util/geometry-types.ts:18
+msgid "Polygon"
+msgstr "Полигон"
+
+#: nodepkg/util/geometry-types.ts:21
+msgid "MultiPoint"
+msgstr "Мультиточка"
+
+#: nodepkg/util/geometry-types.ts:24
+msgid "MultiLineString"
+msgstr "Мультилиния"
+
+#: nodepkg/util/geometry-types.ts:27
+msgid "MultiPolygon"
+msgstr "Мультиполигон"
+
+#: nodepkg/util/geometry-types.ts:30
+msgid "GeometryCollection"
+msgstr "Коллекция геометрий"
+
 #: nodepkg/version-history/VersionHistory.tsx:107
 msgid "Today"
 msgstr "Сегодня"

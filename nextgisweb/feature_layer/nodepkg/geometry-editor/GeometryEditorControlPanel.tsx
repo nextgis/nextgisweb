@@ -1,6 +1,10 @@
 import { observer } from "mobx-react-lite";
 import { useEffect, useState } from "react";
 
+import {
+  getOlGeometryType,
+  getOlLayout,
+} from "@nextgisweb/feature-layer/util/geometry-types";
 import type { ControlPosition } from "@nextgisweb/webmap/control-container/ControlContainer";
 import { MapToolbarControl } from "@nextgisweb/webmap/map-component";
 import { useToggleGroupItem } from "@nextgisweb/webmap/map-component/control/toggle-group";
@@ -11,10 +15,6 @@ import { DrawMode } from "@nextgisweb/webmap/plugin/layer-editor/modes/DrawMode"
 import { HoleMode } from "@nextgisweb/webmap/plugin/layer-editor/modes/HoleMode";
 import { ModifyMode } from "@nextgisweb/webmap/plugin/layer-editor/modes/ModifyMode";
 import { MoveMode } from "@nextgisweb/webmap/plugin/layer-editor/modes/MoveMode";
-import {
-  getOlGeometryType,
-  getOlLayout,
-} from "@nextgisweb/webmap/utils/geometry-types";
 
 import type GeometryEditorStore from "./GeometryEditorStore";
 

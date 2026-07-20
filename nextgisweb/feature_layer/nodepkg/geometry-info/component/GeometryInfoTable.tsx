@@ -1,3 +1,4 @@
+import { getGeometryTypeTitle } from "@nextgisweb/feature-layer/util/geometry-types";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import webmapSettings from "@nextgisweb/webmap/client-settings";
 import {
@@ -6,7 +7,6 @@ import {
   formatMetersLength,
 } from "@nextgisweb/webmap/utils/format-units";
 import type { DefaultConfig } from "@nextgisweb/webmap/utils/format-units";
-import { getGeometryTypeTitle } from "@nextgisweb/webmap/utils/geometry-types";
 
 import type { GeometryInfo } from "../../type/GeometryInfo";
 import "./GeometryInfoTable.less";
