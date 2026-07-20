@@ -7,12 +7,14 @@ import type { FileMeta } from "@nextgisweb/file-upload/file-uploader";
 import {
   CheckboxValue,
   Collapse,
+  Divider,
   Input,
   Radio,
   Select,
   Space,
 } from "@nextgisweb/gui/antd";
 import type { RadioGroupProps, SelectProps } from "@nextgisweb/gui/antd";
+import { ModeSelector } from "@nextgisweb/gui/component";
 import { errorModal, isAbortError } from "@nextgisweb/gui/error";
 import { Area, Lot } from "@nextgisweb/gui/mayout";
 import { route } from "@nextgisweb/pyramid/api";
@@ -260,7 +262,12 @@ export const Widget: EditorWidget<Store> = observer(({ store }) => {
 
   return (
     <div className="ngw-vector-layer-resource-widget">
-      <Select className="mode" options={modeOpts} {...bval("mode")} />
+      <ModeSelector<Mode>
+        className="mode"
+        value={mode ?? undefined}
+        options={modeOpts}
+        onChange={(value) => store.update({ mode: value })}
+      />
       {mode === "file" && (
         <>
           <FileUploader
@@ -292,6 +299,7 @@ export const Widget: EditorWidget<Store> = observer(({ store }) => {
       )}
       {mode === "copy" && (
         <>
+          <Divider />
           <label>{gettext("Source layer")}</label>
           <ResourceSelectRef
             className="row"
@@ -305,6 +313,7 @@ export const Widget: EditorWidget<Store> = observer(({ store }) => {
       )}
       {["empty", "gtype"].includes(mode || "") && (
         <>
+          <Divider />
           <label>{gettext("Geometry type")}</label>
           <Select
             className="row"
@@ -314,14 +323,16 @@ export const Widget: EditorWidget<Store> = observer(({ store }) => {
         </>
       )}
       {confirmMsg && (
-        <CheckboxValue
-          value={confirm}
-          onChange={(value) => {
-            update({ confirm: value });
-          }}
-        >
-          {confirmMsg}
-        </CheckboxValue>
+        <>
+          <CheckboxValue
+            value={confirm}
+            onChange={(value) => {
+              update({ confirm: value });
+            }}
+          >
+            {confirmMsg}
+          </CheckboxValue>
+        </>
       )}
       {mode === "file" && (
         <Collapse
