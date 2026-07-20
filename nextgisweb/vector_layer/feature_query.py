@@ -9,6 +9,7 @@ from nextgisweb.env import DBSession
 from nextgisweb.lib.geometry import Geometry
 
 from nextgisweb.feature_layer import (
+    GEOM_TYPE,
     Feature,
     FeatureQueryIntersectsMixin,
     FeatureSet,
@@ -131,7 +132,6 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
             table = vls.query_pit(self._pit_version)
 
         idcol = table.columns.fid
-        geomcol = table.columns.geom
         fields = table.fields
         columns_mapping = {"id": idcol}
         columns_mapping.update(fields)
@@ -208,7 +208,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                 method, value = ("like", self._like) if self._like else ("ilike", self._ilike)
                 where.append(sa.or_(*(getattr(op, method)(f"%{value}%") for op in operands)))
 
-        if self._intersects:
+        if self._intersects and self.layer.geometry_type != GEOM_TYPE.NONE:
             reproject = (
                 self._intersects.srid is not None and self._intersects.srid != self.layer.srs_id
             )
@@ -225,7 +225,7 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
             if reproject:
                 int_geom = func.st_transform(int_geom, self.layer.srs_id)
 
-            where.append(func.st_intersects(geomcol, int_geom))
+            where.append(func.st_intersects(table.columns.geom, int_geom))
 
         return vls, table, columns_mapping, where
 
@@ -233,47 +233,50 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
         vls, table, columns_mapping, where = self.build_query_context()
 
         idcol = table.columns.fid
-        geomcol = table.columns.geom
         fields = table.fields
         columns = []
 
-        srs = self.layer.srs if self._srs is None else self._srs
-        if srs.id != self.layer.srs_id:
-            geomexpr = func.st_transform(geomcol, srs.id)
-        else:
-            geomexpr = geomcol
+        has_geom = self.layer.geometry_type != GEOM_TYPE.NONE
 
-        if self._clip_by_box is not None:
-            clip = func.st_setsrid(
-                func.st_makeenvelope(*self._clip_by_box.bounds),
-                self._clip_by_box.srid,
-            )
+        if has_geom:
+            geomcol = table.columns.geom
+            srs = self.layer.srs if self._srs is None else self._srs
+            if srs.id != self.layer.srs_id:
+                geomexpr = func.st_transform(geomcol, srs.id)
+            else:
+                geomexpr = geomcol
 
-            # Wrap geomexpr in ST_Force2D to avoid invalid coordinates for
-            # geometries with Z. The issue is fixed in modern GEOS and should
-            # work out of the box without discarding the Z coordinate.
-            geomexpr = func.st_clipbybox2d(func.st_force2d(geomexpr), clip)
-
-        if self._simplify is not None:
-            geomexpr = func.st_simplifypreservetopology(geomexpr, self._simplify)
-
-        if self._box:
-            columns.extend(
-                (
-                    func.st_xmin(geomexpr).label("box_left"),
-                    func.st_ymin(geomexpr).label("box_bottom"),
-                    func.st_xmax(geomexpr).label("box_right"),
-                    func.st_ymax(geomexpr).label("box_top"),
+            if self._clip_by_box is not None:
+                clip = func.st_setsrid(
+                    func.st_makeenvelope(*self._clip_by_box.bounds),
+                    self._clip_by_box.srid,
                 )
-            )
 
-        if self._geom:
-            geomexpr = (
-                func.st_asbinary(geomexpr, "NDR")
-                if self._geom_format == "WKB"
-                else func.st_astext(geomexpr)
-            )
-            columns.append(geomexpr.label("geom"))
+                # Wrap geomexpr in ST_Force2D to avoid invalid coordinates for
+                # geometries with Z. The issue is fixed in modern GEOS and should
+                # work out of the box without discarding the Z coordinate.
+                geomexpr = func.st_clipbybox2d(func.st_force2d(geomexpr), clip)
+
+            if self._simplify is not None:
+                geomexpr = func.st_simplifypreservetopology(geomexpr, self._simplify)
+
+            if self._box:
+                columns.extend(
+                    (
+                        func.st_xmin(geomexpr).label("box_left"),
+                        func.st_ymin(geomexpr).label("box_bottom"),
+                        func.st_xmax(geomexpr).label("box_right"),
+                        func.st_ymax(geomexpr).label("box_top"),
+                    )
+                )
+
+            if self._geom:
+                geomexpr = (
+                    func.st_asbinary(geomexpr, "NDR")
+                    if self._geom_format == "WKB"
+                    else func.st_astext(geomexpr)
+                )
+                columns.append(geomexpr.label("geom"))
 
         selected_fields = []
         for idx, (fld_k, fld_c) in enumerate(fields.items(), start=1):
@@ -305,9 +308,9 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
             layer = self.layer
             columns_mapping = columns_mapping_ref
 
-            _geom = self._geom
+            _geom = self._geom and has_geom
             _geom_format = self._geom_format
-            _box = self._box
+            _box = self._box and has_geom
             _limit = self._limit
             _offset = self._offset
 
@@ -352,6 +355,8 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
             @property
             def extent(self):
+                if not has_geom:
+                    return None
                 geom_clause = select(geomcol).where(*where).subquery().c[0]
                 return calculate_extent(geom_clause)
 

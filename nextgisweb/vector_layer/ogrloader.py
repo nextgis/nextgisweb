@@ -108,12 +108,16 @@ class GeomTypeExplorer:
         self.geom_filter = geom_filter
         self.is_multi = False
         self.has_z = False
+        self.explored_any = False
+        self.found_any = False
         self._params = params
 
     def explore(self, feature):
+        self.explored_any = True
         geom = feature.GetGeometryRef()
         if geom is None:
             return False
+        self.found_any = True
 
         if geom.IsMeasured():
             geom.SetMeasured(False)
@@ -250,7 +254,9 @@ class OGRLoader:
         ltype = ogrlayer.GetGeomType()
 
         geometry_type = None
-        if len(geom_filter) == 1:
+        if ltype == ogr.wkbNone:
+            geometry_type = GEOM_TYPE.NONE
+        elif len(geom_filter) == 1:
             geometry_type = geom_filter.pop()
         elif ltype in GEOM_TYPE_OGR and GEOM_TYPE_OGR_2_GEOM_TYPE[ltype] in geom_filter:
             geometry_type = GEOM_TYPE_OGR_2_GEOM_TYPE[ltype]
@@ -309,13 +315,17 @@ class OGRLoader:
                 geometry_type = geom_filter.pop()
 
         if geometry_type is None:
-            err_msg = gettext("Could not determine a geometry type.")
-            if len(geom_filter) == 0:
-                err_msg += " " + gettext(
-                    "The source layer contains no suitable features, or "
-                    "contains features of different geometry types."
-                )
-            raise VE(message=err_msg)
+            gt_explorer = explorers.get(GeomTypeExplorer.identity)
+            if gt_explorer is not None and gt_explorer.explored_any and not gt_explorer.found_any:
+                geometry_type = GEOM_TYPE.NONE
+            else:
+                err_msg = gettext("Could not determine a geometry type.")
+                if len(geom_filter) == 0:
+                    err_msg += " " + gettext(
+                        "The source layer contains no suitable features, or "
+                        "contains features of different geometry types."
+                    )
+                raise VE(message=err_msg)
 
         # FID field
 
@@ -405,7 +415,7 @@ class OGRLoader:
     def write(
         self,
         *,
-        srs: SRS,
+        srs: SRS | None,
         schema: str,
         table: str,
         sequence: str,
@@ -414,22 +424,25 @@ class OGRLoader:
     ):
         ogrlayer = self.ogrlayer
         params = self.params
+        none_geom = self.geometry_type == GEOM_TYPE.NONE
 
-        source_osr = ogrlayer.GetSpatialRef()
-        if source_osr.IsLocal():
-            raise VE(
-                gettext(
-                    "The source layer has a local coordinate system and can't be "
-                    "reprojected to the target coordinate system."
+        if not none_geom:
+            source_osr = ogrlayer.GetSpatialRef()
+            if source_osr.IsLocal():
+                raise VE(
+                    gettext(
+                        "The source layer has a local coordinate system and can't be "
+                        "reprojected to the target coordinate system."
+                    )
                 )
-            )
 
-        target_osr = srs.to_osr()
-        transform = (
-            osr.CoordinateTransformation(source_osr, target_osr)
-            if not source_osr.IsSame(target_osr)
-            else None
-        )
+            target_osr = srs.to_osr()
+            transform = (
+                osr.CoordinateTransformation(source_osr, target_osr)
+                if not source_osr.IsSame(target_osr)
+                else None
+            )
+            wkb_type = GEOM_TYPE_2_WKB_TYPE[self.geometry_type]
 
         static_size = FIELD_TYPE_SIZE[FIELD_TYPE.INTEGER]
         dynamic_size = 0
@@ -448,11 +461,12 @@ class OGRLoader:
         nextval = sa.text(f"nextval('{seq_sn}')")
 
         fields = []
-        vcolumns = [sa.column("id"), sa.column("geom")]
-        qparams = dict(
-            id=sa.bindparam("id") if self.fid_field else nextval,
-            geom=sa.func.ST_GeomFromWKB(sa.bindparam("geom"), sa.text(str(srs.id))),
-        )
+        vcolumns = [sa.column("id")]
+        qparams = dict(id=sa.bindparam("id") if self.fid_field else nextval)
+
+        if not none_geom:
+            vcolumns.append(sa.column("geom"))
+            qparams["geom"] = sa.func.ST_GeomFromWKB(sa.bindparam("geom"), sa.text(str(srs.id)))
 
         if (fobj := self.fid_field) is not None:
             fid_fget = partial(
@@ -490,7 +504,6 @@ class OGRLoader:
                 chunk.clear()
 
         errors = []
-        wkb_type = GEOM_TYPE_2_WKB_TYPE[self.geometry_type]
         for ogr_fid, feature in enumerate(ogrlayer, start=1):
             ctx = dict(fix_errors=params.fix_errors, fid=ogr_fid)
             try:
@@ -498,25 +511,26 @@ class OGRLoader:
                 if fid_fget:
                     row["id"] = fid_fget(feature, ogr_fid)
 
-                geom = feature.GetGeometryRef()
-                if geom is not None and params.validate:
-                    geom = _validate_geom(geom, wkb_type, **ctx)
+                if not none_geom:
+                    geom = feature.GetGeometryRef()
+                    if geom is not None and params.validate:
+                        geom = _validate_geom(geom, wkb_type, **ctx)
 
-                if geom is None:
-                    row["geom"] = None
-                else:
-                    if transform and geom.Transform(transform) != 0:
-                        raise FeatureError(
-                            gettext(
-                                "Feature #%d has a geometry that can't be "
-                                "reprojected to target coordinate system"
+                    if geom is None:
+                        row["geom"] = None
+                    else:
+                        if transform and geom.Transform(transform) != 0:
+                            raise FeatureError(
+                                gettext(
+                                    "Feature #%d has a geometry that can't be "
+                                    "reprojected to target coordinate system"
+                                )
+                                % ogr_fid
                             )
-                            % ogr_fid
-                        )
 
-                    geom_bytes = bytearray(geom.ExportToWkb(ogr.wkbNDR))
-                    dynamic_size += len(geom_bytes)
-                    row["geom"] = geom_bytes
+                        geom_bytes = bytearray(geom.ExportToWkb(ogr.wkbNDR))
+                        dynamic_size += len(geom_bytes)
+                        row["geom"] = geom_bytes
 
                 for fidx, fname, fget, ftype in fields:
                     if not feature.IsFieldSetAndNotNull(fidx):

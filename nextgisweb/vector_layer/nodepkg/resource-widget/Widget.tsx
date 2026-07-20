@@ -202,6 +202,7 @@ export const Widget: EditorWidget<Store> = observer(({ store }) => {
     add("MULTIPOINTZ", gettext("Multipoint Z"));
     add("MULTILINESTRINGZ", gettext("Multiline Z"));
     add("MULTIPOLYGONZ", gettext("Multipolygon Z"));
+    if (mode === "empty") add("NONE", gettext("No geometry"));
     return result;
   }, [geometryTypeInitial, mode]);
 

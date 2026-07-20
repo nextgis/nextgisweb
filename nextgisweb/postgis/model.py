@@ -27,6 +27,7 @@ from nextgisweb.feature_layer import (
     GEOM_TYPE,
     Feature,
     FeatureLayerGeometryType,
+    FeatureLayerMixin,
     FeatureQueryIntersectsMixin,
     FeatureSet,
     IAggregatableFeatureQuery,
@@ -41,10 +42,9 @@ from nextgisweb.feature_layer import (
     IFilterableFeatureLayer,
     IWritableFeatureLayer,
     LayerField,
-    LayerFieldsMixin,
 )
 from nextgisweb.feature_layer.filter import FilterParser
-from nextgisweb.layer import IBboxLayer, SpatialLayerMixin
+from nextgisweb.layer import IBboxLayer
 from nextgisweb.resource import (
     ConnectionScope,
     CRUTypes,
@@ -259,7 +259,7 @@ class PostgisLayerField(LayerField):
 
 
 @implementer(IFeatureLayer, IFilterableFeatureLayer, IWritableFeatureLayer, IBboxLayer)
-class PostgisLayer(Resource, SpatialLayerMixin, LayerFieldsMixin):
+class PostgisLayer(Resource, FeatureLayerMixin):
     identity = "postgis_layer"
     cls_display_name = gettext("PostGIS layer")
 
@@ -270,7 +270,6 @@ class PostgisLayer(Resource, SpatialLayerMixin, LayerFieldsMixin):
     table = sa.Column(sa.Unicode, nullable=False)
     column_id = sa.Column(sa.Unicode, nullable=False)
     column_geom = sa.Column(sa.Unicode, nullable=False)
-    geometry_type = sa.Column(saext.Enum(*GEOM_TYPE.enum), nullable=False)
     geometry_srid = sa.Column(sa.Integer, nullable=False)
 
     __field_class__ = PostgisLayerField

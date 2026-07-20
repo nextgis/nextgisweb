@@ -105,6 +105,7 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
   const [fieldOptions, setFieldOptions] = useState<FieldOption[]>([]);
   const [defaultSrs, setDefaultSrs] = useState<number>();
   const [isFilterFeatureLayer, setIsFilterFeatureLayer] = useState(false);
+  const [hasGeom, setHasGeom] = useState(true);
   const [format, setFormat] = useState(exportFormats[0].name);
   const [fields, setFields] = useState<FormField<FormPropsKey>[]>([]);
   const [isReady, setIsReady] = useState(false);
@@ -165,9 +166,10 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
         if (itemInfo && itemInfo.feature_layer) {
           const cls = itemInfo.resource.cls as "vector_layer";
           const vectorLayer = itemInfo[cls];
-          if (vectorLayer) {
+          if (vectorLayer && vectorLayer.srs) {
             setDefaultSrs(vectorLayer.srs.id);
           }
+          setHasGeom(!vectorLayer || !!vectorLayer.srs);
           setIsFilterFeatureLayer(
             itemInfo.resource.interfaces?.includes("IFilterableFeatureLayer") ??
               false
@@ -276,6 +278,7 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
         name: "srs",
         label: gettext("SRS"),
         formItem: <Select options={srsOptions} />,
+        included: hasGeom,
       },
       {
         name: "encoding",
@@ -311,6 +314,7 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
         name: "extent",
         label: gettext("Limit by extent"),
         formItem: <ExtentInput />,
+        included: hasGeom,
       },
       {
         name: "ilike",
@@ -357,6 +361,7 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
     handleFilterClick,
     filterExpression,
     isFilterFeatureLayer,
+    hasGeom,
   ]);
 
   if (loading) {

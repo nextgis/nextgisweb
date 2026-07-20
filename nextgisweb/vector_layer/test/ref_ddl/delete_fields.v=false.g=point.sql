@@ -1,0 +1,1 @@
+ALTER TABLE ct DROP COLUMN fld_i, DROP COLUMN fld_d;

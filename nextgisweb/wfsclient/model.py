@@ -21,10 +21,10 @@ from nextgisweb.lib.ows import FIELD_TYPE_WFS
 from nextgisweb.core.exception import ExternalServiceError, ForbiddenError, ValidationError
 from nextgisweb.feature_layer import (
     FIELD_TYPE,
-    GEOM_TYPE,
     GEOM_TYPE_OGR_2_GEOM_TYPE,
     Feature,
     FeatureLayerGeometryType,
+    FeatureLayerMixin,
     FeatureQueryIntersectsMixin,
     FeatureSet,
     IFeatureLayer,
@@ -33,10 +33,9 @@ from nextgisweb.feature_layer import (
     IFeatureQueryFilterBy,
     IFeatureQueryIntersects,
     LayerField,
-    LayerFieldsMixin,
 )
 from nextgisweb.jsrealm import TSExport
-from nextgisweb.layer import IBboxLayer, SpatialLayerMixin
+from nextgisweb.layer import IBboxLayer
 from nextgisweb.resource import (
     ConnectionScope,
     CRUTypes,
@@ -492,7 +491,7 @@ class WFSLayerField(LayerField):
 
 
 @implementer(IFeatureLayer, IBboxLayer)
-class WFSLayer(Resource, SpatialLayerMixin, LayerFieldsMixin):
+class WFSLayer(Resource, FeatureLayerMixin):
     identity = layer_identity
     cls_display_name = gettext("WFS layer")
 
@@ -501,7 +500,6 @@ class WFSLayer(Resource, SpatialLayerMixin, LayerFieldsMixin):
     connection_id = sa.Column(sa.ForeignKey(WFSConnection.id), nullable=False)
     layer_name = sa.Column(sa.Unicode, nullable=False)
     column_geom = sa.Column(sa.Unicode, nullable=False)
-    geometry_type = sa.Column(saext.Enum(*GEOM_TYPE.enum), nullable=False)
     geometry_srid = sa.Column(sa.Integer, nullable=False)
 
     __field_class__ = WFSLayerField

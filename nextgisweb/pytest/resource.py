@@ -54,6 +54,7 @@ def ngw_resource_defaults(ngw_resource_group):
 
     @event.listens_for(Resource, "init", propagate=True)
     def receive_init(target, args, kw):
+        from nextgisweb.feature_layer import FeatureLayerMixin
         from nextgisweb.layer import SpatialLayerMixin
         from nextgisweb.spatial_ref_sys import SRS
 
@@ -67,7 +68,10 @@ def ngw_resource_defaults(ngw_resource_group):
             kw["display_name"] = base + " " + token_urlsafe(6)
 
         # TODO: Register this default from spatial_ref_sys component
-        if "srs" not in kw and "srs_id" not in kw and isinstance(target, SpatialLayerMixin):
+        needs_srs = isinstance(target, SpatialLayerMixin) or (
+            isinstance(target, FeatureLayerMixin) and kw.get("geometry_type") != "NONE"
+        )
+        if "srs" not in kw and "srs_id" not in kw and needs_srs:
             kw["srs"] = SRS.filter_by(id=3857).one()
 
     yield

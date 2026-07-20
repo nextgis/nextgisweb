@@ -20,6 +20,7 @@ from nextgisweb.spatial_ref_sys import SRS, SRSRef
 from .interface import (
     FIELD_TYPE,
     FIELD_TYPE_OGR,
+    GEOM_TYPE,
     FeatureLayerFieldDatatype,
     FeatureLayerGeometryType,
     IAggregatableFeatureQuery,
@@ -81,8 +82,32 @@ class LayerField(Base):
         )
 
 
-class LayerFieldsMixin:
+class FeatureLayerMixin:
     __field_class__ = LayerField
+    __allow_none_geometry__ = False
+
+    @declared_attr
+    def srs_id(cls):
+        return sa.Column(
+            sa.Integer,
+            sa.ForeignKey(SRS.id),
+            nullable=cls.__allow_none_geometry__,
+        )
+
+    @declared_attr
+    def srs(cls):
+        return orm.relationship("SRS", lazy="joined")
+
+    @declared_attr
+    def geometry_type(cls):
+        return sa.Column(saext.Enum(*GEOM_TYPE.enum), nullable=False)
+
+    def get_info(self):
+        s = super()
+        result = s.get_info() if hasattr(s, "get_info") else ()
+        if self.srs is not None:
+            result += ((gettext("Spatial reference system"), self.srs.display_name),)
+        return result
 
     @declared_attr
     def fields(cls):
@@ -115,8 +140,10 @@ class LayerFieldsMixin:
     def to_ogr(self, ogr_ds, *, name="", fields=None, aliases=None, fid=None):
         if fields is None:
             fields = self.fields
-        sr = self.srs.to_osr()
-        ogr_layer = ogr_ds.CreateLayer(name, srs=sr)
+        sr = self.srs.to_osr() if self.srs is not None else None
+        ogr_layer = ogr_ds.CreateLayer(
+            name, srs=sr, geom_type=ogr.wkbNone if sr is None else ogr.wkbUnknown
+        )
         for field in fields:
             fld_defn = ogr.FieldDefn(
                 aliases[field.keyname] if aliases is not None else field.keyname,
@@ -160,8 +187,8 @@ class FeatureLayerFieldWrite(Struct, kw_only=True):
 
 
 class SrsAttr(SAttribute):
-    def get(self, srlzr: Serializer) -> SRSRef:
-        return SRSRef(id=srlzr.obj.srs.id)
+    def get(self, srlzr: Serializer) -> SRSRef | None:
+        return SRSRef(id=srlzr.obj.srs.id) if srlzr.obj.srs is not None else None
 
 
 class GeometryTypeAttr(SAttribute):
@@ -297,7 +324,7 @@ class AggregationsAttr(SAttribute):
         return list(fq.supported_aggregations)
 
 
-class FeatureLayerSerializer(Serializer, resource=LayerFieldsMixin, force_create=True):
+class FeatureLayerSerializer(Serializer, resource=FeatureLayerMixin, force_create=True):
     identity = "feature_layer"
 
     srs = SrsAttr(read=ResourceScope.read)

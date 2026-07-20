@@ -245,7 +245,9 @@ class Dumper:
 
         if self.params.geom:
             geom = feature.geom
-            result["geom"] = self.geom_dumper(geom) if geom is not None else None
+            result["geom"] = (
+                self.geom_dumper(geom) if geom is not None and geom is not UNSET else None
+            )
 
         if (fdumpers := self.field_dumpers) is not None:
             fsource = feature.fields

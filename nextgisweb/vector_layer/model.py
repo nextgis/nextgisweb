@@ -22,6 +22,7 @@ from nextgisweb.feature_layer import (
     FIELD_TYPE,
     GEOM_TYPE,
     FeatureLayerGeometryType,
+    FeatureLayerMixin,
     IFeatureLayer,
     IFieldEditableFeatureLayer,
     IFilterableFeatureLayer,
@@ -29,7 +30,6 @@ from nextgisweb.feature_layer import (
     IVersionableFeatureLayer,
     IWritableFeatureLayer,
     LayerField,
-    LayerFieldsMixin,
 )
 from nextgisweb.feature_layer.exception import FeatureNotFound, RestoreNotDeleted
 from nextgisweb.feature_layer.versioning import (
@@ -48,7 +48,7 @@ from nextgisweb.feature_layer.versioning import (
 )
 from nextgisweb.file_upload import FileUpload, FileUploadRef
 from nextgisweb.file_upload.exception import UnsupportedFile
-from nextgisweb.layer import IBboxLayer, SpatialLayerMixin
+from nextgisweb.layer import IBboxLayer
 from nextgisweb.resource import (
     CRUTypes,
     DataScope,
@@ -98,6 +98,7 @@ GEOM_TYPE_DISPLAY = (
     gettext("Multipoint Z"),
     gettext("Multiline Z"),
     gettext("Multipolygon Z"),
+    gettext("None"),
 )
 
 
@@ -145,15 +146,22 @@ def _vlschema_autoflush(res):
     IWritableFeatureLayer,
     IBboxLayer,
 )
-class VectorLayer(Resource, SpatialLayerMixin, LayerFieldsMixin, FVersioningMixin):
+class VectorLayer(Resource, FeatureLayerMixin, FVersioningMixin):
     identity = "vector_layer"
     cls_display_name = gettext("Vector layer")
     cls_order = 60
 
     __scope__ = DataScope
+    __allow_none_geometry__ = True
 
     tbl_uuid = sa.Column(sa.Unicode(32), nullable=False)
-    geometry_type = sa.Column(saext.Enum(*GEOM_TYPE.enum), nullable=False)
+
+    __table_args__ = (
+        sa.CheckConstraint(
+            "(geometry_type = 'NONE') = (srs_id IS NULL)",
+            name="vector_layer_geom_type_srs_check",
+        ),
+    )
 
     __field_class__ = VectorLayerField
 
@@ -209,6 +217,8 @@ class VectorLayer(Resource, SpatialLayerMixin, LayerFieldsMixin, FVersioningMixi
 
         loader = OGRLoader(source, params=lparams)
         self.geometry_type = loader.geometry_type
+        if self.geometry_type == GEOM_TYPE.NONE:
+            self.srs = None
         self.fields[:] = [
             VectorLayerField(
                 keyname=lf.name,
@@ -500,6 +510,8 @@ class VectorLayer(Resource, SpatialLayerMixin, LayerFieldsMixin, FVersioningMixi
     @property
     @vlschema_autoflush
     def extent(self):
+        if self.geometry_type == GEOM_TYPE.NONE:
+            return None
         ctab = self.vlschema(fields={}).ctab
         return calculate_extent(ctab.columns.geom)
 
@@ -668,6 +680,8 @@ class VectorLayer(Resource, SpatialLayerMixin, LayerFieldsMixin, FVersioningMixi
 
     def _geom_column_type(self, geometry_type=None):
         geometry_type = geometry_type if geometry_type else self.geometry_type
+        if geometry_type is None or geometry_type == GEOM_TYPE.NONE:
+            return None
         return saext.Geometry(geometry_type, self.srs.id)
 
     def _reset_seq(self):
@@ -802,14 +816,14 @@ VectorLayerSession.listen(DBSession)
 
 
 def estimate_vector_layer_data(resource):
-    ctab = resource.vlschema().ctab
-
     # NOTE: Without SQL manipulations it will hit Python recursion limit on 400+
     # columns. Columns name aren't user generated, so it's safe to use them here
     # without escaping.
+    vls = resource.vlschema()
+    ctab = vls.ctab
 
     fixed = FIELD_TYPE_SIZE[FIELD_TYPE.INTEGER]  # ID field size
-    dynamic = [f"coalesce(length(ST_AsBinary({ctab.c.geom.name})), 0)"]
+    dynamic = [f"coalesce(length(ST_AsBinary({ctab.c.geom.name})), 0)"] if vls.has_geom else []
     for f in resource.fields:
         if f.datatype == FIELD_TYPE.STRING:
             dynamic.append(f"coalesce(octet_length({ctab.fields[f.keyname].name}), 0)")
@@ -859,7 +873,8 @@ class SourceAttr(SAttribute):
         try:
             # Apparently OGR_XLSX_HEADERS is taken into account during the GetSpatialRef call
             gdal.SetConfigOption("OGR_XLSX_HEADERS", "FORCE")
-            if ogrlayer.GetSpatialRef() is None:
+            has_no_geom = ogrlayer.GetGeomType() == ogr.wkbNone
+            if not has_no_geom and ogrlayer.GetSpatialRef() is None:
                 raise VE(message=gettext("Layer doesn't contain coordinate system information."))
         finally:
             gdal.SetConfigOption("OGR_XLSX_HEADERS", None)
@@ -937,6 +952,8 @@ class FeatureLayerAttr(SAttribute):
             version = value.version
 
         obj.geometry_type = source.geometry_type
+        if obj.geometry_type == GEOM_TYPE.NONE:
+            obj.srs = None
         obj.fields[:] = [VectorLayerField.copy_from(lf) for lf in source.fields]
 
         session.flush()
@@ -964,6 +981,8 @@ class GeometryTypeAttr(SAttribute):
     def set(self, srlzr: Serializer, value: FeatureLayerGeometryType, *, create: bool):
         if srlzr.obj.id is None:
             srlzr.obj.geometry_type = value
+            if value == GEOM_TYPE.NONE:
+                srlzr.obj.srs = None
         elif srlzr.obj.geometry_type == value:
             pass
         else:
@@ -997,7 +1016,7 @@ class DeleteAllFeaturesAttr(SAttribute):
             srlzr.obj.feature_delete_all()
 
 
-class VectorLayerSerializer(Serializer, resource=VectorLayer):
+class VectorLayerSerializer(Serializer, resource=VectorLayer, force_create=True):
     srs = SRelationship(read=ResourceScope.read, write=ResourceScope.update)
 
     source = SourceAttr(write=DataScope.write)
@@ -1017,3 +1036,8 @@ class VectorLayerSerializer(Serializer, resource=VectorLayer):
     fields = FieldsAttr(write=DataScope.write)
 
     delete_all_features = DeleteAllFeaturesAttr(write=DataScope.write)
+
+    def deserialize(self) -> None:
+        super().deserialize()
+        if self.obj.id is None and self.obj.geometry_type is None:
+            raise VE(message=gettext("The 'geometry_type' attribute is required."))

@@ -53,6 +53,10 @@ class VLSchema(MetaData):
         self.geom_column_type = geom_column_type
         self.fields = fields
 
+    @property
+    def has_geom(self):
+        return self.geom_column_type is not None
+
     @cached_property
     def cseq(self):
         return Sequence(
@@ -72,14 +76,13 @@ class VLSchema(MetaData):
     @cached_property
     def ctab(self):
         fields_columns, fields_mapping = self._columns_from_fields()
-        result = FieldsTable(
-            self._table_name(),
-            self,
-            Column("id", Integer, self.cseq, key="fid", primary_key=True),
-            self._geom_column(),
-            *fields_columns,
-            self._geom_index(),
-        )
+        cols = [Column("id", Integer, self.cseq, key="fid", primary_key=True)]
+        if self.has_geom:
+            cols.append(self._geom_column())
+        cols.extend(fields_columns)
+        if self.has_geom:
+            cols.append(self._geom_index())
+        result = FieldsTable(self._table_name(), self, *cols)
         result._fields = fields_mapping
         return result
 
@@ -114,10 +117,14 @@ class VLSchema(MetaData):
         nid = Column("nid", Integer, CheckConstraint("nid > vid"), nullable=False)
         vop = Column("vop", CHAR(1), nullable=False)
         nop = Column("nop", CHAR(1), nullable=False)
-        geom = self._geom_column()
+        cols = [vid, fid, nid, vop, nop]
+        if self.has_geom:
+            cols.append(self._geom_column())
+        cols.extend(fields_columns)
         result = FieldsTable(
-            *(table_name, self, vid, fid, nid, vop, nop, geom),
-            *fields_columns,
+            table_name,
+            self,
+            *cols,
             Index(f"{table_name}_fid_vid_idx", fid, vid),
             ExcludeConstraint(
                 (literal_column("int4range(vid, nid)"), "&&"),
@@ -185,16 +192,18 @@ class VLSchema(MetaData):
         vid = version if isinstance(version, BindParameter) else bindparam("vid", version)
 
         qh = select(ht.c.fid, ht.c.vid).where(ht.c.vop != _lc_op_del)
+        if self.has_geom:
+            qh = qh.add_columns(ht.c.geom)
         qh = qh.add_columns(
-            ht.c.geom,
             *(fc.label(f"fld_{idx}") for idx, fc in enumerate(ht.fields.values(), start=1)),
         )
         qh = qh.where(literal_column("int4range(vid, nid)").op("@>", precedence=4)(vid))
         qh = qh.where(*where(ht))
 
         qe = select(et.c.fid, et.c.vid)
+        if self.has_geom:
+            qe = qe.add_columns(ct.c.geom)
         qe = qe.add_columns(
-            ct.c.geom,
             *(fc.label(f"fld_{idx}") for idx, fc in enumerate(ct.fields.values(), start=1)),
         )
         qe = qe.where(et.c.vid <= vid)
@@ -228,7 +237,7 @@ class VLSchema(MetaData):
             )
         )
         q = q.add_columns(
-            ht.c.geom,
+            ht.c.geom if self.has_geom else literal_column("NULL::geometry").label("geom"),
             *(fc.label(f"fld_{idx}") for idx, fc in enumerate(ht.fields.values(), start=1)),
         ).subquery("sub")
 
@@ -276,13 +285,16 @@ class VLSchema(MetaData):
         _int4range = literal_column("int4range(vid, nid)")
         where_range = lambda v: _int4range.op("@>", precedence=4)(sql_cast(v, Integer))
         where_fid = lambda s: (s.c.fid >= p_fid_min, s.c.fid <= p_fid_max)
+        null_geom = literal_column("NULL::geometry").label("geom")
+        geom_ht = ht.c.geom if self.has_geom else null_geom
+        geom_ct = ct.c.geom if self.has_geom else null_geom
 
         # Initial version (without etab)
         qi = (
             select(
                 *(ht.c.fid, ht.c.vid),
                 ht.c.vop.op("=")(_lc_op_del).label("deleted"),
-                *(ht.c.geom, *lc_fields),
+                *(geom_ht, *lc_fields),
             )
             .where(where_range(p_initial), *where_fid(ht))
             .subquery("qi")
@@ -293,14 +305,14 @@ class VLSchema(MetaData):
             select(
                 *(et.c.fid, et.c.vid),
                 ct.c.fid.is_(None).label("deleted"),
-                *(ct.c.geom, *lc_fields),
+                *(geom_ct, *lc_fields),
             )
             .join(ct, ct.c.fid == et.c.fid, isouter=True)
             .where(et.c.vid > p_initial, et.c.vid <= p_target, *where_fid(et)),
             select(
                 *(ht.c.fid, ht.c.vid),
                 ht.c.vop.op("=")(_lc_op_del).label("deleted"),
-                *(ht.c.geom, *lc_fields),
+                *(geom_ht, *lc_fields),
             ).where(where_range(p_target), *where_fid(ht)),
         ).subquery("qt")
 
@@ -328,7 +340,8 @@ class VLSchema(MetaData):
     def dml_insert(self, *, fields=None, with_fid=False):
         bmap, values = dict(), dict()
         values["fid"] = bindparam("p_fid") if with_fid else self.cnextval
-        values["geom"] = self._geom_value()
+        if self.has_geom:
+            values["geom"] = self._geom_value()
 
         ct = self.ctab
         for idx, (k, v) in enumerate(ct.fields.items(), start=1):
@@ -356,7 +369,7 @@ class VLSchema(MetaData):
         ct = self.ctab
         bmap, values, dif = dict(), dict(), list()
 
-        if with_geom:
+        if with_geom and self.has_geom:
             values["geom"] = geom_value = self._geom_value(raw=geom_raw)
             dif.append(geom_value.is_distinct_from(_lc_geom))
 
@@ -382,17 +395,19 @@ class VLSchema(MetaData):
         et, ht, vid = self.etab, self.htab, bindparam("vid")
         uct = uct.returning(ct.c.fid).cte("uct")
 
+        geom_sel = [ct.c.geom] if self.has_geom else []
+        geom_cls = ["geom"] if self.has_geom else []
         ihs = select(
             uct.c.fid.label("fid"),
             et.c.vid,
             vid.label("nid"),
             et.c.vop,
             _lc_op_upd.label("nop"),
-            ct.c.geom,
+            *geom_sel,
         ).select_from(uct.join(et, et.c.fid == uct.c.fid).join(ct, ct.c.fid == et.c.fid))
         ihs = ihs.add_columns(*ct.fields.values())
 
-        cls = ["fid", "vid", "nid", "vop", "nop", "geom"] + [f.name for f in ct.fields.values()]
+        cls = ["fid", "vid", "nid", "vop", "nop"] + geom_cls + [f.name for f in ct.fields.values()]
         iht = insert(ht).from_select(cls, ihs).returning(ht.c.fid).cte("iht")
 
         uet = update(et).values(vid=vid, vop=_lc_op_upd).where(iht.c.fid == et.c.fid)
@@ -409,17 +424,19 @@ class VLSchema(MetaData):
         et, ht, vid = self.etab, self.htab, bindparam("vid")
         dct = dct.returning(ct.c.fid).cte("dct")
 
+        geom_sel = [ct.c.geom] if self.has_geom else []
+        geom_cls = ["geom"] if self.has_geom else []
         ihs = select(
             dct.c.fid.label("fid"),
             et.c.vid,
             vid.label("nid"),
             et.c.vop,
             _lc_op_del.label("nop"),
-            ct.c.geom,
+            *geom_sel,
         ).select_from(dct.join(et, et.c.fid == dct.c.fid).join(ct, ct.c.fid == et.c.fid))
         ihs = ihs.add_columns(*ct.fields.values())
 
-        cls = ["fid", "vid", "nid", "vop", "nop", "geom"] + [f.name for f in ct.fields.values()]
+        cls = ["fid", "vid", "nid", "vop", "nop"] + geom_cls + [f.name for f in ct.fields.values()]
         iht = insert(ht).from_select(cls, ihs).returning(ht.c.fid).cte("iht")
 
         uet = update(et).values(vid=vid, vop=_lc_op_del)
@@ -434,7 +451,9 @@ class VLSchema(MetaData):
         qet = select(et.c.fid, et.c.vid).where(et.c.fid == fid, et.c.vop == _lc_op_del)
         qet = qet.cte("qet")
 
-        cht = [self._geom_value(raw=geom_raw).label("geom") if with_geom else ht.c.geom]
+        cht = []
+        if self.has_geom:
+            cht.append(self._geom_value(raw=geom_raw).label("geom") if with_geom else ht.c.geom)
         for idx, (k, v) in enumerate(ct.fields.items(), start=1):
             if fields is None or k in fields:
                 bmap[k] = bpn = f"fld_{idx}"
@@ -459,9 +478,11 @@ class VLSchema(MetaData):
             .cte("iht")
         )
 
+        geom_cls = ["geom"] if self.has_geom else []
+        geom_sel = [sht.c.geom] if self.has_geom else []
         ict = insert(ct).from_select(
-            ["fid", "geom"] + [f.name for f in ct.fields.values()],
-            select(sht.c.fid, sht.c.geom, *(literal_column(f.name) for f in ct.fields.values())),
+            ["fid"] + geom_cls + [f.name for f in ct.fields.values()],
+            select(sht.c.fid, *geom_sel, *(literal_column(f.name) for f in ct.fields.values())),
         )
         ict = ict.returning(ct.c.fid).cte("ict")
 
@@ -521,8 +542,7 @@ class VLSchema(MetaData):
         )
 
     def _geom_column(self, **kwargs):
-        args = (self.geom_column_type,) if self.geom_column_type else ()
-        return Column("geom", *args, **kwargs)
+        return Column("geom", self.geom_column_type, **kwargs)
 
     def _geom_index(self):
         return Index(
@@ -532,13 +552,11 @@ class VLSchema(MetaData):
         )
 
     def _geom_value(self, name="geom", raw=False):
-        return (
-            bindparam(name)
-            if raw
-            else func.ST_GeomFromWKB(
-                bindparam(name),
-                text(str(self.geom_column_type.srid)),
-            )
+        if raw:
+            return bindparam(name)
+        return func.ST_GeomFromWKB(
+            bindparam(name),
+            text(str(self.geom_column_type.srid)),
         )
 
     def _columns_from_fields(self):

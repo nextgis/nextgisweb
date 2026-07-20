@@ -16,6 +16,12 @@ OGR_VRT_LAYER = """
 </OGRVRTLayer>
 """
 
+OGR_VRT_LAYER_NO_GEOM = """
+<OGRVRTLayer name="{}">
+    <SrcDataSource relativeToVRT="0">{}</SrcDataSource>
+</OGRVRTLayer>
+"""
+
 
 class AutoCleaningTemporaryDirectory(TemporaryDirectory):
     def __del__(self):
@@ -61,7 +67,14 @@ def read_dataset(filename, **kw):
             ogrds = gdal.OpenEx(str(dst_path), 0)
             for i in range(ogrds.GetLayerCount()):
                 layer = ogrds.GetLayer(i)
-                vrt_layers += OGR_VRT_LAYER.format(layer.GetName(), dst_path)
+                defn = layer.GetLayerDefn()
+                col_names = {
+                    defn.GetFieldDefn(j).GetName().lower() for j in range(defn.GetFieldCount())
+                }
+                if "lon" in col_names and "lat" in col_names:
+                    vrt_layers += OGR_VRT_LAYER.format(layer.GetName(), dst_path)
+                else:
+                    vrt_layers += OGR_VRT_LAYER_NO_GEOM.format(layer.GetName(), dst_path)
         elif suffix == ".gpkg":
             tempdir = AutoCleaningTemporaryDirectory()
 

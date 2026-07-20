@@ -2,85 +2,93 @@
 msgid "Vector layer features"
 msgstr "Объекты векторного слоя"
 
-#: model.py:87 nodepkg/resource-widget/Widget.tsx:62
+#: model.py:89 nodepkg/resource-widget/Widget.tsx:62
 #: nodepkg/resource-widget/Widget.tsx:193
 msgid "Point"
 msgstr "Точка"
 
-#: model.py:88 nodepkg/resource-widget/Widget.tsx:63
+#: model.py:90 nodepkg/resource-widget/Widget.tsx:63
 #: nodepkg/resource-widget/Widget.tsx:194
 msgid "Line"
 msgstr "Линия"
 
-#: model.py:89 nodepkg/resource-widget/Widget.tsx:64
+#: model.py:91 nodepkg/resource-widget/Widget.tsx:64
 #: nodepkg/resource-widget/Widget.tsx:195
 msgid "Polygon"
 msgstr "Полигон"
 
-#: model.py:90 nodepkg/resource-widget/Widget.tsx:196
+#: model.py:92 nodepkg/resource-widget/Widget.tsx:196
 msgid "Multipoint"
 msgstr "Мультиточка"
 
-#: model.py:91 nodepkg/resource-widget/Widget.tsx:197
+#: model.py:93 nodepkg/resource-widget/Widget.tsx:197
 msgid "Multiline"
 msgstr "Мультилиния"
 
-#: model.py:92 nodepkg/resource-widget/Widget.tsx:198
+#: model.py:94 nodepkg/resource-widget/Widget.tsx:198
 msgid "Multipolygon"
 msgstr "Мультиполигон"
 
-#: model.py:93 nodepkg/resource-widget/Widget.tsx:199
+#: model.py:95 nodepkg/resource-widget/Widget.tsx:199
 msgid "Point Z"
 msgstr "Точка Z"
 
-#: model.py:94 nodepkg/resource-widget/Widget.tsx:200
+#: model.py:96 nodepkg/resource-widget/Widget.tsx:200
 msgid "Line Z"
 msgstr "Линия Z"
 
-#: model.py:95 nodepkg/resource-widget/Widget.tsx:201
+#: model.py:97 nodepkg/resource-widget/Widget.tsx:201
 msgid "Polygon Z"
 msgstr "Полигон Z"
 
-#: model.py:96 nodepkg/resource-widget/Widget.tsx:202
+#: model.py:98 nodepkg/resource-widget/Widget.tsx:202
 msgid "Multipoint Z"
 msgstr "Мультиточка Z"
 
-#: model.py:97 nodepkg/resource-widget/Widget.tsx:203
+#: model.py:99 nodepkg/resource-widget/Widget.tsx:203
 msgid "Multiline Z"
 msgstr "Мультилиния Z"
 
-#: model.py:98 nodepkg/resource-widget/Widget.tsx:204
+#: model.py:100 nodepkg/resource-widget/Widget.tsx:204
 msgid "Multipolygon Z"
 msgstr "Мультиполигон Z"
 
-#: model.py:148 nodepkg/resource-widget/Widget.tsx:348
+#: model.py:101 nodepkg/resource-widget/Widget.tsx:55
+msgid "None"
+msgstr "Нет"
+
+#: model.py:151 nodepkg/resource-widget/Widget.tsx:348
 msgid "Vector layer"
 msgstr "Векторный слой"
 
-#: model.py:170 nodepkg/resource-widget/Widget.tsx:39
+#: model.py:180 nodepkg/resource-widget/Widget.tsx:39
 #: nodepkg/resource-widget/Widget.tsx:308
 msgid "Geometry type"
 msgstr "Тип геометрии"
 
-#: model.py:173
+#: model.py:183
 msgid "Feature count"
 msgstr "Количество объектов"
 
-#: model.py:840
+#: model.py:856
 msgid "Dataset doesn't contain layers."
 msgstr "Набор данных не содержит ни одного слоя."
 
-#: model.py:843
+#: model.py:859
 msgid "Dataset contains more than one layer."
 msgstr "Набор данных содержит более одного слоя."
 
-#: model.py:848
+#: model.py:864
 msgid "Unable to open layer."
 msgstr "Не удалось открыть слой."
 
-#: model.py:861
+#: model.py:878
 msgid "Layer doesn't contain coordinate system information."
 msgstr "Слой не содержит информации о системе координат."
+
+#: model.py:1043
+msgid "The 'geometry_type' attribute is required."
+msgstr "Необходимо указать атрибут 'geometry_type'."
 
 #: nodepkg/resource-widget/Store.tsx:204
 msgid "Confirm deletion of existing features"
@@ -129,10 +137,6 @@ msgstr "Если возможно"
 #: nodepkg/resource-widget/Widget.tsx:54
 msgid "Without losing data"
 msgstr "Без потери данных"
-
-#: nodepkg/resource-widget/Widget.tsx:55
-msgid "None"
-msgstr "Нет"
 
 #: nodepkg/resource-widget/Widget.tsx:61 nodepkg/resource-widget/Widget.tsx:70
 #: nodepkg/resource-widget/Widget.tsx:78
@@ -187,6 +191,10 @@ msgstr "Удалить все объекты"
 msgid "current"
 msgstr "текущий"
 
+#: nodepkg/resource-widget/Widget.tsx:205
+msgid "No geometry"
+msgstr "Без геометрии"
+
 #: nodepkg/resource-widget/Widget.tsx:282 nodepkg/resource-widget/Widget.tsx:295
 msgid "Source layer"
 msgstr "Исходный слой"
@@ -195,11 +203,11 @@ msgstr "Исходный слой"
 msgid "Advanced options"
 msgstr "Дополнительные параметры"
 
-#: ogrloader.py:311
+#: ogrloader.py:322
 msgid "Could not determine a geometry type."
 msgstr "Не удалось определить тип геометрии."
 
-#: ogrloader.py:314
+#: ogrloader.py:325
 msgid ""
 "The source layer contains no suitable features, or contains features of "
 "different geometry types."
@@ -207,35 +215,35 @@ msgstr ""
 "Исходный слой не содержит подходящих объектов или содержит объекты разных "
 "типов геометрий."
 
-#: ogrloader.py:332
+#: ogrloader.py:343
 msgid "Field '%s' is out of int32 range."
 msgstr "Значение поля '%s' находится за пределами диапазона int32."
 
-#: ogrloader.py:340
+#: ogrloader.py:351
 msgid "Field '%s' contains non-unique or empty values."
 msgstr "Значение поля '%s' содержит неуникальное или пустое значение."
 
-#: ogrloader.py:357
+#: ogrloader.py:368
 msgid "Parameter 'fid_field' is missing."
 msgstr "Отсутствует параметр 'fid_field'"
 
-#: ogrloader.py:360
+#: ogrloader.py:371
 msgid "Fields %s not found."
 msgstr "Поле %s не найдено"
 
-#: ogrloader.py:362
+#: ogrloader.py:373
 msgid "None of fields %s are integer."
 msgstr "Ни одно из полей %d не является целочисленным."
 
-#: ogrloader.py:376
+#: ogrloader.py:387
 msgid "Field '%s(?)' encoding is broken."
 msgstr "Кодировка поля '%s(?)' повреждена."
 
-#: ogrloader.py:391
+#: ogrloader.py:406
 msgid "Unsupported field type: %r."
 msgstr "Тип поля %r не поддерживается."
 
-#: ogrloader.py:417
+#: ogrloader.py:434
 msgid ""
 "The source layer has a local coordinate system and can't be reprojected to "
 "the target coordinate system."
@@ -243,7 +251,7 @@ msgstr ""
 "Исходный слой имеет локальную систему координат и не может быть "
 "перепроецирован в целевую."
 
-#: ogrloader.py:500
+#: ogrloader.py:525
 msgid ""
 "Feature #%d has a geometry that can't be reprojected to target coordinate "
 "system"
@@ -251,55 +259,55 @@ msgstr ""
 "Геометрия объект #%d не может быть перепроецирована в целевую систему "
 "координат."
 
-#: ogrloader.py:545
+#: ogrloader.py:572
 msgid "Vector layer cannot be written due to errors."
 msgstr "Векторный слой не может быть записан из-за ошибок."
 
-#: ogrloader.py:571
+#: ogrloader.py:598
 msgid "Feature (seq. #%d) doesn't have a FID field '%s'."
 msgstr "Объект (ном. #%d) не содержит поле FID '%s'."
 
-#: ogrloader.py:575
+#: ogrloader.py:602
 msgid "Feature (seq. #%d) FID field '%s' is null."
 msgstr "Объект (ном. #%d) содержит пустое поле FID '%s'."
 
-#: ogrloader.py:622 ogrloader.py:661
+#: ogrloader.py:649 ogrloader.py:688
 msgid "Feature #%d has multiple geometries satisfying the conditions."
 msgstr "Объект #%d содержит несколько геометрий, удовлетворяющих условиям."
 
-#: ogrloader.py:632
+#: ogrloader.py:659
 msgid "Feature #%d has unknown geometry type: %d (%s)."
 msgstr "Объект #%d содержит неизвестный тип геометрии: %d (%s)."
 
-#: ogrloader.py:641
+#: ogrloader.py:668
 msgid "Feature #%d has unsuitable geometry type: %d (%s)."
 msgstr "Объект #%d содержит неподходящий тип геометрии: %d (%s)."
 
-#: ogrloader.py:679
+#: ogrloader.py:706
 msgid "Feature #%d has empty rings."
 msgstr "Объект #%d содержит пустые кольца."
 
-#: ogrloader.py:690
+#: ogrloader.py:717
 msgid "Feature #%d has unclosed rings."
 msgstr "Объект #%d содержит незамкнутые кольца."
 
-#: ogrloader.py:700
+#: ogrloader.py:727
 msgid "Feature #%d has less than 3 points in a polygon ring."
 msgstr "Объект #%d содержит меньше 3-х точек в кольце полигона."
 
-#: ogrloader.py:712
+#: ogrloader.py:739
 msgid "Feature #%d contains an empty linestring."
 msgstr "Объект #%d содержит пустую линию."
 
-#: ogrloader.py:718
+#: ogrloader.py:745
 msgid "Feature #%d has less than 2 points in a linestring."
 msgstr "Объект #%d содержит меньше 2-х точек в линии."
 
-#: ogrloader.py:735
+#: ogrloader.py:762
 msgid "Feature #%d contains a broken encoding of field '%s'."
 msgstr "Объект #%d содержит поврежденную кодировку поля '%s'."
 
-#: util.py:54
+#: util.py:66
 msgid ""
 "ESRI Shapefile (zip), GeoPackage, GeoJSON, GML, KML, CSV or XLSX formats are "
 "supported. For CSV and XLSX only points are supported, coordinates must be "

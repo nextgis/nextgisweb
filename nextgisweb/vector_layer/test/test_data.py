@@ -37,6 +37,40 @@ def test_from_fields(ngw_txn):
     assert res.feature_label_field.keyname == "string"
 
 
+def test_none_geometry_api(ngw_webtest_app: WebTestApp):
+    rapi = ResourceAPI(ngw_webtest_app)
+
+    res_id = rapi.create(
+        "vector_layer",
+        {
+            "vector_layer": {
+                "geometry_type": "NONE",
+                "fields": [{"keyname": "value", "datatype": "INTEGER", "display_name": "Value"}],
+            }
+        },
+    )
+
+    data = rapi.read(res_id)
+    assert data["vector_layer"]["geometry_type"] == "NONE"
+    assert data["feature_layer"]["srs"] is None
+
+    fapi = FeatureLayerAPI(res_id)
+
+    fid = fapi.feature_create({"fields": {"value": 42}})["id"]
+
+    feature = fapi.feature_get(fid)
+    assert feature["fields"]["value"] == 42
+    assert feature["geom"] is None
+
+    fapi.feature_update(fid, {"fields": {"value": 99}})
+    assert fapi.feature_get(fid)["fields"]["value"] == 99
+
+    assert len(fapi.feature_list()) == 1
+
+    rapi.update(res_id, {"vector_layer": {"delete_all_features": True}})
+    assert len(fapi.feature_list()) == 0
+
+
 @pytest.mark.parametrize(
     "filename",
     (

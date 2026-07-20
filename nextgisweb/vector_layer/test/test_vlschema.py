@@ -14,9 +14,11 @@ pytestmark = pytest.mark.usefixtures("ngw_resource_defaults")
 
 
 class VLSchemaTest(VLSchema):
-    def __init__(self, **kwargs):
+    def __init__(self, geom_type="POINT", **kwargs):
         kwargs["tbl_uuid"] = None
-        kwargs["geom_column_type"] = Geometry("POINTZ", 3857)
+        kwargs["geom_column_type"] = (
+            Geometry(geom_type + "Z", 3857) if geom_type != "NONE" else None
+        )
         kwargs["fields"] = {"i": ("i", sa.Integer), "t": ("t", sa.Text), "d": ("d", sa.Date)}
         kwargs["schema"] = None
         super().__init__(**kwargs)
@@ -35,26 +37,29 @@ def sql_cmp(val, file):
     sql_compare(val, src)
 
 
+@pytest.mark.parametrize("geom_type", ["POINT", "NONE"])
 @pytest.mark.parametrize("versioning", [False, True])
-def test_ref_ddl(versioning):
-    vls = VLSchemaTest(versioning=versioning)
+def test_ref_ddl(versioning, geom_type):
+    vls = VLSchemaTest(versioning=versioning, geom_type=geom_type)
     vs = f"v={str(versioning).lower()}"
-    sql_cmp(vls.sql_create(), f"ref_ddl/create.{vs}")
-    sql_cmp(vls.sql_drop(), f"ref_ddl/drop.{vs}")
-    sql_cmp(vls.sql_add_fields(["i", "d"]), f"ref_ddl/add_fields.{vs}")
-    sql_cmp(vls.sql_delete_fields(["i", "d"]), f"ref_ddl/delete_fields.{vs}")
+    gs = f"g={geom_type.lower()}"
+    sql_cmp(vls.sql_create(), f"ref_ddl/create.{vs}.{gs}")
+    sql_cmp(vls.sql_drop(), f"ref_ddl/drop.{vs}.{gs}")
+    sql_cmp(vls.sql_add_fields(["i", "d"]), f"ref_ddl/add_fields.{vs}.{gs}")
+    sql_cmp(vls.sql_delete_fields(["i", "d"]), f"ref_ddl/delete_fields.{vs}.{gs}")
 
     if versioning:
-        sql = vls.sql_versioning_enable()
-        sql_cmp(sql, "ref_ddl/versioning_enable")
+        sql_cmp(vls.sql_versioning_enable(), f"ref_ddl/versioning_enable.{gs}")
     else:
-        sql = vls.sql_versioning_disable()
-        sql_cmp(sql, "ref_ddl/versioning_disable")
+        sql_cmp(vls.sql_versioning_disable(), f"ref_ddl/versioning_disable.{gs}")
+        if geom_type != "NONE":
+            sql_cmp(
+                vls.sql_convert_geom_column_type(Geometry("MULTIPOINT", 3857)),
+                "ref_ddl/convert_geom_column_type",
+            )
 
-        sql = vls.sql_convert_geom_column_type(Geometry("MULTIPOINT", 3857))
-        sql_cmp(sql, "ref_ddl/convert_geom_column_type")
 
-
+@pytest.mark.parametrize("geom_type", ["POINT", "NONE"])
 @pytest.mark.parametrize("versioning", [False, True])
 @pytest.mark.parametrize(
     "operation",
@@ -71,38 +76,40 @@ def test_ref_ddl(versioning):
         "query_changes",
     ],
 )
-def test_ref_dml(versioning, operation):
-    vls = VLSchemaTest(versioning=versioning)
+def test_ref_dml(versioning, geom_type, operation):
+    vls = VLSchemaTest(versioning=versioning, geom_type=geom_type)
     vs = f"v={versioning}"
+    gs = f"g={geom_type.lower()}"
+    has_geom = geom_type != "NONE"
     bpid = sa.bindparam("id")
     if operation == "insert":
         for wf in (False, True):
             sql = vls.dml_insert(with_fid=wf)
-            sql_cmp(sql, f"ref_dml/insert.{vs}.wf={wf}")
+            sql_cmp(sql, f"ref_dml/insert.{vs}.wf={wf}.{gs}")
     elif operation == "update":
-        for wg in (False, True):
+        for wg in (False, True) if has_geom else (False,):
             sql = vls.dml_update(id=bpid, with_geom=wg)
-            sql_cmp(sql, f"ref_dml/update.{vs}.wg={wg}")
+            sql_cmp(sql, f"ref_dml/update.{vs}.wg={wg}.{gs}")
     elif operation == "delete":
-        sql_cmp(vls.dml_delete(filter_by=dict(fid=bpid)), f"ref_dml/delete.{vs}")
+        sql_cmp(vls.dml_delete(filter_by=dict(fid=bpid)), f"ref_dml/delete.{vs}.{gs}")
     elif operation == "reset_seq":
-        sql_cmp(vls.dml_reset_seq(), f"ref_dml/reset_seq.{vs}")
+        sql_cmp(vls.dml_reset_seq(), f"ref_dml/reset_seq.{vs}.{gs}")
     elif not versioning:
         return  # Skip rest, versioning specific
     elif operation == "restore":
-        for wg in (False, True):
+        for wg in (False, True) if has_geom else (False,):
             sql = vls.dml_restore(with_geom=wg)
-            sql_cmp(sql, f"ref_dml/restore.wg={wg}")
+            sql_cmp(sql, f"ref_dml/restore.wg={wg}.{gs}")
     elif operation == "initfill":
-        sql_cmp(vls.dml_initfill(), "ref_dml/initfill")
+        sql_cmp(vls.dml_initfill(), f"ref_dml/initfill.{gs}")
     elif operation == "query_pit":
-        sql_cmp(vls.query_pit(sa.bindparam("vid")), "ref_dml/query_pit")
+        sql_cmp(vls.query_pit(sa.bindparam("vid")), f"ref_dml/query_pit.{gs}")
     elif operation == "query_revert":
-        sql_cmp(vls.query_revert(sa.bindparam("vid")), "ref_dml/query_revert")
+        sql_cmp(vls.query_revert(sa.bindparam("vid")), f"ref_dml/query_revert.{gs}")
     elif operation == "query_changed_fids":
-        sql_cmp(vls.query_changed_fids(), "ref_dml/query_changed_fids")
+        sql_cmp(vls.query_changed_fids(), f"ref_dml/query_changed_fids.{gs}")
     elif operation == "query_changes":
-        sql_cmp(vls.query_changes(), "ref_dml/query_changes")
+        sql_cmp(vls.query_changes(), f"ref_dml/query_changes.{gs}")
 
 
 def vlfld(key):

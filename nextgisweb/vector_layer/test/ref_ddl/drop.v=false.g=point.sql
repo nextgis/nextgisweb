@@ -1,0 +1,3 @@
+DROP TABLE ct;
+
+DROP SEQUENCE id_seqt;

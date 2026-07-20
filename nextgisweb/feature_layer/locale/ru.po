@@ -1,24 +1,24 @@
-#: api.py:119 api_identify.py:27
+#: api.py:120 api_identify.py:27
 msgid "Geometry is not valid."
 msgstr "Невалидная геометрия"
 
-#: api.py:385
+#: api.py:388
 msgid "Unknown spatial reference system"
 msgstr "Неизвестная система координат"
 
-#: api.py:472 api_export.py:213
+#: api.py:475 api_export.py:213
 msgid "Parameter 'intersects' geometry is not valid."
 msgstr "Параметр 'intersects' содержит невалидную геометрию."
 
-#: api.py:715
+#: api.py:718
 msgid "Aggregation is not supported for this layer."
 msgstr "Агрегация не поддерживается для этого слоя."
 
-#: api.py:724
+#: api.py:727
 msgid "Aggregation '{}' is not supported for this layer."
 msgstr "Агрегация '{}' не поддерживается для этого слоя."
 
-#: api.py:730 api.py:737
+#: api.py:733 api.py:740
 msgid "Field '{}' not found."
 msgstr "Поле '{}' не найдено."
 
@@ -42,7 +42,7 @@ msgstr "Не удалось перепроецировать геометрию 
 msgid "Filter expressions are not supported."
 msgstr "Выражения фильтра не поддерживаются."
 
-#: api_export.py:459
+#: api_export.py:460
 msgid "File name parameter '{}' is not valid."
 msgstr "Недопустимое имя файла '{}'."
 
@@ -84,7 +84,7 @@ msgstr "Объект не удален"
 msgid "Unable to restore the #{} feature as it is not deleted."
 msgstr "Невозможно восстановить объект #{} поскольку он не удален."
 
-#: favorite.py:6 nodepkg/fields-widget/FieldsWidget.tsx:27 view.py:43
+#: favorite.py:6 nodepkg/fields-widget/FieldsWidget.tsx:28 view.py:43
 msgid "Feature table"
 msgstr "Таблица объектов"
 
@@ -92,11 +92,15 @@ msgstr "Таблица объектов"
 msgid "Invalid filter expression"
 msgstr "Некорректное выражение фильтра"
 
-#: model.py:205
+#: model.py:109
+msgid "Spatial reference system"
+msgstr "Система координат"
+
+#: model.py:232
 msgid "Field not found (ID=%d)."
 msgstr "Поле не найдено (ID=%d)."
 
-#: model.py:285
+#: model.py:312
 msgid "Versioning not supported"
 msgstr "Версионирование не поддерживается"
 
@@ -118,62 +122,62 @@ msgstr "Атрибуты"
 msgid "Feature versioning"
 msgstr "Версионирование объектов"
 
-#: nodepkg/export-form/ExportForm.tsx:242
+#: nodepkg/export-form/ExportForm.tsx:244
 msgid "Resources"
 msgstr "Ресурсы"
 
-#: nodepkg/export-form/ExportForm.tsx:264
+#: nodepkg/export-form/ExportForm.tsx:266
 msgid "Format"
 msgstr "Формат"
 
-#: nodepkg/export-form/ExportForm.tsx:277
+#: nodepkg/export-form/ExportForm.tsx:279
 msgid "SRS"
 msgstr "Система координат"
 
-#: nodepkg/export-form/ExportForm.tsx:282
+#: nodepkg/export-form/ExportForm.tsx:285
 msgid "Encoding"
 msgstr "Кодировка"
 
-#: nodepkg/export-form/ExportForm.tsx:296
+#: nodepkg/export-form/ExportForm.tsx:299
 msgid "FID field"
 msgstr "Поле FID"
 
-#: nodepkg/export-form/ExportForm.tsx:300
+#: nodepkg/export-form/ExportForm.tsx:303
 msgid "Use field display names instead of keynames"
 msgstr "Использовать наименования полей вместо ключей"
 
-#: nodepkg/export-form/ExportForm.tsx:306
-#: nodepkg/fields-widget/FieldsWidget.tsx:201
+#: nodepkg/export-form/ExportForm.tsx:309
+#: nodepkg/fields-widget/FieldsWidget.tsx:215
 #: nodepkg/resource-section/FeatureLayerResourceSection.tsx:51
 msgid "Fields"
 msgstr "Поля"
 
-#: nodepkg/export-form/ExportForm.tsx:312
+#: nodepkg/export-form/ExportForm.tsx:315
 msgid "Limit by extent"
 msgstr "Ограничить охватом"
 
-#: nodepkg/export-form/ExportForm.tsx:318
+#: nodepkg/export-form/ExportForm.tsx:322
 msgid "Filter text"
 msgstr "Текстовый фильтр"
 
-#: nodepkg/export-form/ExportForm.tsx:328
+#: nodepkg/export-form/ExportForm.tsx:332
 msgid "Filter applied"
 msgstr "Фильтр применен"
 
-#: nodepkg/export-form/ExportForm.tsx:329
+#: nodepkg/export-form/ExportForm.tsx:333
 msgid "Set filter"
 msgstr "Установить фильтр"
 
-#: nodepkg/export-form/ExportForm.tsx:332
+#: nodepkg/export-form/ExportForm.tsx:336
 msgid "Filter"
 msgstr "Фильтр"
 
-#: nodepkg/export-form/ExportForm.tsx:337
+#: nodepkg/export-form/ExportForm.tsx:341
 msgid "Zip archive"
 msgstr "Zip архив"
 
-#: nodepkg/export-form/ExportForm.tsx:390
-#: nodepkg/feature-editor/FeatureEditorWidget.tsx:41
+#: nodepkg/export-form/ExportForm.tsx:395
+#: nodepkg/feature-editor/FeatureEditorWidget.tsx:43
 #: nodepkg/versioning-settings/VersioningSettings.tsx:71
 msgid "Save"
 msgstr "Сохранить"
@@ -192,23 +196,23 @@ msgstr "Вы уверены?"
 msgid "Unsaved changes will be lost if you close the window."
 msgstr "Несохраненные изменения будут потеряны, если вы закроете окно."
 
-#: nodepkg/feature-editor/FeatureEditorWidget.tsx:40
+#: nodepkg/feature-editor/FeatureEditorWidget.tsx:42
 msgid "Loading..."
 msgstr "Загрузка..."
 
-#: nodepkg/feature-editor/FeatureEditorWidget.tsx:42
+#: nodepkg/feature-editor/FeatureEditorWidget.tsx:44
 msgid "OK"
 msgstr "OK"
 
-#: nodepkg/feature-editor/FeatureEditorWidget.tsx:43
+#: nodepkg/feature-editor/FeatureEditorWidget.tsx:45
 msgid "Reset"
 msgstr "Сбросить"
 
-#: nodepkg/feature-editor/FeatureEditorWidget.tsx:45
+#: nodepkg/feature-editor/FeatureEditorWidget.tsx:47
 msgid "Feature saved"
 msgstr "Объект сохранен"
 
-#: nodepkg/feature-editor/FeatureEditorWidget.tsx:46
+#: nodepkg/feature-editor/FeatureEditorWidget.tsx:48
 msgid "No changes to save"
 msgstr "Внесите изменения, чтобы сохранить их"
 
@@ -570,53 +574,57 @@ msgstr "Истина"
 msgid "False"
 msgstr "Ложь"
 
-#: nodepkg/fields-widget/FieldsWidget.tsx:23
+#: nodepkg/fields-widget/FieldsWidget.tsx:24
 #: nodepkg/resource-section/FeatureLayerResourceSection.tsx:31
 #: nodepkg/version-history/component/menu-items/copy-menu-item/CopyForm.tsx:75
 msgid "Display name"
 msgstr "Наименование"
 
-#: nodepkg/fields-widget/FieldsWidget.tsx:24
+#: nodepkg/fields-widget/FieldsWidget.tsx:25
 #: nodepkg/resource-section/FeatureLayerResourceSection.tsx:19
 msgid "Keyname"
 msgstr "Ключ"
 
-#: nodepkg/fields-widget/FieldsWidget.tsx:25
+#: nodepkg/fields-widget/FieldsWidget.tsx:26
 #: nodepkg/resource-section/FeatureLayerResourceSection.tsx:25
 msgid "Type"
 msgstr "Тип"
 
-#: nodepkg/fields-widget/FieldsWidget.tsx:26
+#: nodepkg/fields-widget/FieldsWidget.tsx:27
 msgid "Lookup table"
 msgstr "Справочник"
 
-#: nodepkg/fields-widget/FieldsWidget.tsx:28
+#: nodepkg/fields-widget/FieldsWidget.tsx:29
 msgid "Text search"
 msgstr "Текстовый поиск"
 
-#: nodepkg/fields-widget/FieldsWidget.tsx:29
+#: nodepkg/fields-widget/FieldsWidget.tsx:30
 msgid "Label attribute"
 msgstr "Атрибут наименование"
 
-#: nodepkg/fields-widget/FieldsWidget.tsx:30
+#: nodepkg/fields-widget/FieldsWidget.tsx:31
+msgid "Required"
+msgstr "Обязательное"
+
+#: nodepkg/fields-widget/FieldsWidget.tsx:32
 msgid "Delete field?"
 msgstr "Удалить поле?"
 
-#: nodepkg/fields-widget/FieldsWidget.tsx:31
+#: nodepkg/fields-widget/FieldsWidget.tsx:33
 msgid ""
 "Deleting this field will permanently erase all its version history from this "
 "layer."
 msgstr "Удаление этого поля навсегда сотрёт всю его историю версий в этом слое."
 
-#: nodepkg/fields-widget/FieldsWidget.tsx:32
+#: nodepkg/fields-widget/FieldsWidget.tsx:34
 msgid "Please select"
 msgstr "Выберите тип"
 
-#: nodepkg/fields-widget/FieldsWidget.tsx:33
+#: nodepkg/fields-widget/FieldsWidget.tsx:35
 msgid "Not used"
 msgstr "Не используется"
 
-#: nodepkg/fields-widget/FieldsWidget.tsx:115
+#: nodepkg/fields-widget/FieldsWidget.tsx:123
 msgid "Field"
 msgstr "Поле"
 

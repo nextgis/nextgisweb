@@ -311,10 +311,11 @@ def export(resource: IFeatureLayer, options: ExportOptions, filepath: str):
     vtopts = dict(
         options=[],
         format=driver.name,
-        dstSRS=srs.wkt,
         layerName=layer_name,
         geometryType=resource.geometry_type,
     )
+    if srs is not None:
+        vtopts["dstSRS"] = srs.wkt
     if driver.fid_support and options.fid_field is None:
         vtopts["options"].append("-preserve_fid")
     if len(options.lco) > 0:
