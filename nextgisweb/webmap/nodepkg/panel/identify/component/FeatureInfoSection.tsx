@@ -74,7 +74,10 @@ export function FeatureInfoSection({
       items_.push(attrElement);
     }
 
-    if (showGeometryInfo || showGeometryPreview) {
+    if (
+      featureItem.geom !== null &&
+      (showGeometryInfo || showGeometryPreview)
+    ) {
       const geomElement = (
         <PanelSection
           key="geometry"

@@ -85,7 +85,7 @@ export const FeatureEditorWidget = observer(
       });
     });
 
-    const { dirty, saving } = store;
+    const { dirty, saving, initLoading } = store;
 
     const [items, setItems] = useState<TabItem[]>([]);
 
@@ -100,7 +100,10 @@ export const FeatureEditorWidget = observer(
         if (key === ATTRIBUTES_KEY) {
           store.attachAttributeStore(widgetStore);
         } else if (key === GEOMETRY_KEY) {
-          if (!showGeometryTab) {
+          if (
+            !showGeometryTab ||
+            store.featureLayer?.geometry_type === "NONE"
+          ) {
             return;
           }
           store.attachGeometryStore(widgetStore);
@@ -130,6 +133,7 @@ export const FeatureEditorWidget = observer(
     );
 
     useEffect(() => {
+      if (!initLoading) return;
       const loadWidgets = async () => {
         const newTabs: TabItem[] = [];
 
@@ -144,7 +148,7 @@ export const FeatureEditorWidget = observer(
       };
 
       loadWidgets();
-    }, [store, createEditorTab]);
+    }, [store, createEditorTab, initLoading]);
 
     const onSaveClick = useCallback(async () => {
       if (!(await store.validate())) {
