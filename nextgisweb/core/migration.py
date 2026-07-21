@@ -112,47 +112,34 @@ class MigrationContext:
         self.env = env
 
     def execute_operations(self, operations, state, dry_run=False):
-        frops = list()
-        iops = list()
-        uops = list()
-
-        iofirst, iolast = False, False
-        uofirst, uolast = False, False
-
-        for op in operations:
-            if isinstance(op, InstallOperation):
-                if not iofirst:
-                    iofirst = True
-                assert not iolast
-                iops.append(op)
-            else:
-                if iofirst and not iolast:
-                    iolast = True
-
-            if isinstance(op, UninstallOperation):
-                if not uofirst:
-                    uofirst = True
-                assert not uolast
-                uops.append(op)
-            else:
-                if uofirst and not uolast:
-                    uolast = True
-
-            if not isinstance(op, (InstallOperation, UninstallOperation)):
-                frops.append(op)
-
         with transaction.manager:
-            for op in frops:
-                state = self.execute_operation(op, state)
-                self.registry.write_state(state, components=(op.component,))
+            idx = 0
+            while idx < len(operations):
+                match operations[idx]:
+                    case InstallOperation():
+                        iops = []
+                        while idx < len(operations) and isinstance(
+                            operations[idx], InstallOperation
+                        ):
+                            iops.append(operations[idx])
+                            idx += 1
+                        state = self.execute_install(iops, state)
+                        self.registry.write_state(state)
 
-            if len(iops) > 0:
-                state = self.execute_install(iops, state)
-                self.registry.write_state(state)
+                    case UninstallOperation():
+                        uops = []
+                        while idx < len(operations) and isinstance(
+                            operations[idx], UninstallOperation
+                        ):
+                            uops.append(operations[idx])
+                            idx += 1
+                        state = self.execute_uninstall(uops, state)
+                        self.registry.write_state(state)
 
-            if len(uops) > 0:
-                state = self.execute_uninstall(uops, state)
-                self.registry.write_state(state)
+                    case _:
+                        state = self.execute_operation(operations[idx], state)
+                        self.registry.write_state(state, components=(operations[idx].component,))
+                        idx += 1
 
             mark_changed(DBSession())
 

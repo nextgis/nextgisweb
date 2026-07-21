@@ -1,14 +1,17 @@
 import sqlite3
 from contextlib import contextmanager
+from pathlib import Path
 from textwrap import dedent
 
 from ..graph import (
     ForwardOperation,
     InstallOperation,
+    MigrationGraph,
     RewindOperation,
     UninstallOperation,
     resolve,
 )
+from ..registry import Registry
 
 
 def foo_install(ctx):
@@ -191,3 +194,42 @@ def test_rewind(graph):
     ref_dump = initial(Context()).dump()
     new_dump = ctx.dump()
     assert new_dump == ref_dump
+
+
+def test_interleaved_install_forward():
+    regpath = Path(__file__).parent / "registry"
+    reg = Registry()
+    for c in ("alpha", "beta", "gamma", "delta"):
+        reg.scandir(c, regpath / c)
+    graph = MigrationGraph(
+        reg,
+        install_dependencies={
+            "beta": ("alpha",),
+            "delta": ("gamma",),
+        },
+    )
+
+    cstate = {k: False for k in graph._nodes}
+    for k in graph._nodes:
+        if k.component in ("alpha", "gamma") and k.revision == "00000000":
+            cstate[k] = True
+    tstate = {k: True for k in graph.select("head")}
+
+    solution = resolve(
+        graph.operations(forward=True, install=True, uninstall=False, rewind=False),
+        cstate,
+        tstate,
+    )
+
+    assert len(solution) == 4, solution
+    assert isinstance(solution[0], ForwardOperation)
+    assert isinstance(solution[1], InstallOperation)
+    assert isinstance(solution[2], ForwardOperation)
+    assert isinstance(solution[3], InstallOperation)
+
+    # Verify the resolver obeyed dependencies:
+    # Forward [alpha] → Install [beta] → Forward [gamma] → Install [delta]
+    assert solution[0].component == "alpha"
+    assert solution[1].component == "beta"
+    assert solution[2].component == "gamma"
+    assert solution[3].component == "delta"
