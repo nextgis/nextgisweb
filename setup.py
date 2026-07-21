@@ -46,7 +46,6 @@ requires = [
     "psycopg2==2.9.12",
     "pyproj==3.7.2",
     "pyramid==2.1",
-    "pyramid-tm==2.6",
     "python-magic==0.4.27",
     "python-ulid==3.1.0",
     "requests==2.33.1",

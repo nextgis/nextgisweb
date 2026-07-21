@@ -541,7 +541,10 @@ def setup_pyramid(comp, config):
     config.set_session_factory(WebSession)
 
     _setup_static(comp, config)
-    _setup_pyramid_tm(comp, config)
+    config.add_tween(
+        "nextgisweb.pyramid.db.tween_factory",
+        over="MAIN",
+    )
 
     # COMMON REQUEST'S ATTRIBUTES
 
@@ -808,26 +811,6 @@ def _setup_static(comp, config):
         asset_path = c.resource_path("asset")
         if asset_path.is_dir():
             config.add_static_path(f"asset/{cid}", asset_path)
-
-
-def _setup_pyramid_tm(comp, config):
-    import pyramid_tm
-
-    settings = config.registry.settings
-
-    skip_tm_path_info = (
-        "/static/",
-        "/favicon.ico",
-        "/api/component/pyramid/route",
-    )
-
-    def activate_hook(request):
-        return not request.path_info.startswith(skip_tm_path_info)
-
-    settings["tm.activate_hook"] = activate_hook
-    settings["tm.annotate_user"] = False
-
-    config.include(pyramid_tm)
 
 
 def json_js(value, pretty=False):
