@@ -7,6 +7,7 @@ import type VectorSource from "ol/source/Vector";
 import { Circle, RegularShape, Stroke, Style } from "ol/style";
 import { useEffect, useRef } from "react";
 
+import { useCssVariable } from "@nextgisweb/gui/hook";
 import type { HighlightStore } from "@nextgisweb/webmap/highlight-store";
 import type { HighlightEvent } from "@nextgisweb/webmap/highlight-store/HighlightStore";
 import type { MapStore } from "@nextgisweb/webmap/ol/MapStore";
@@ -15,7 +16,6 @@ import Vector from "@nextgisweb/webmap/ol/layer/Vector";
 type Props = {
   mapStore: MapStore;
   highlightStore: HighlightStore;
-  strokeColor?: string;
 };
 
 const wkt = new WKT();
@@ -59,10 +59,14 @@ function toOlFeature(
 export const MapHighlight = observer(function MapHighlight({
   mapStore,
   highlightStore,
-  strokeColor = "rgba(255,255,0,1)",
 }: Props) {
   const overlayRef = useRef<Vector | null>(null);
   const sourceRef = useRef<VectorSource | null>(null);
+
+  const strokeColor = useCssVariable({
+    name: "--ngw-webmap-selection-color",
+    defaultValue: "rgba(255,255,0,1)",
+  });
 
   useEffect(() => {
     const layer = new Vector("highlight", {
