@@ -3,7 +3,7 @@ from itertools import product
 from typing import Literal
 
 import sqlalchemy as sa
-from msgspec import Struct
+from msgspec import DecodeError, Struct
 from msgspec import field as msgspec_field
 from osgeo import ogr, osr
 from sqlalchemy.dialects.postgresql import JSONB
@@ -545,7 +545,13 @@ class OGRLoader:
                     if fname in string_fields and fld_value is not None:
                         dynamic_size += utf8len(fld_value)
                         if fname in json_fields:
-                            fld_value = loads(fld_value)
+                            # GDAL may write non-JSON literals for JSON fields
+                            # https://github.com/OSGeo/gdal/issues/14970
+                            if isinstance(fld_value, str):
+                                try:
+                                    fld_value = loads(fld_value)
+                                except DecodeError:
+                                    fld_value = loads(dumps(fld_value))
                     row[str(fidx)] = fld_value
 
                 insert_feature(row)
