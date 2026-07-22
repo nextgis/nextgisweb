@@ -17,7 +17,7 @@ import { WebmapLayers } from "./WebmapLayers";
 import "./MapPane.less";
 
 export const MapPane = observer(
-  ({ display, children }: { display: Display; children: ReactNode }) => {
+  ({ display, children }: { display: Display; children?: ReactNode }) => {
     const themeVariables = useThemeVariables({
       "theme-color-primary": "colorPrimary",
     });

@@ -181,7 +181,7 @@ export const DisplayWidget = observer(
       showPanels.push(
         <Panel key="main" min={200} resizable={!!activePanel}>
           <Splitter orientation="vertical">
-            <Panel key="map" min={200}>
+            <Panel key="map">
               <MapPane display={display}>{mapChildren}</MapPane>
             </Panel>
             {tabs.length && (
