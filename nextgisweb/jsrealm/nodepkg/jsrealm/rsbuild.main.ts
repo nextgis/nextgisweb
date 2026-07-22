@@ -5,6 +5,7 @@ import type { TransformOptions } from "@babel/core";
 import { rspack } from "@rsbuild/core";
 import type { EnvironmentConfig } from "@rsbuild/core";
 import { pluginReact } from "@rsbuild/plugin-react";
+import { pluginTypeCheck } from "@rsbuild/plugin-type-check";
 
 import config from "./config";
 import { registryReplacementPlugin, sharedIconIds } from "./prepare";
@@ -45,6 +46,16 @@ export default {
   plugins: [
     ...(isDevServer ? [pluginReact({ splitChunks: false })] : []),
     createNgwLessPlugin(),
+    pluginTypeCheck({
+      enable: config.debug && config.jsrealm.tscheck,
+      tsCheckerOptions: {
+        async: true,
+        issue: {
+          defaultSeverity: "warning",
+        },
+        devServer: false,
+      },
+    }),
   ],
 
   source: {

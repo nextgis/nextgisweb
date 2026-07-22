@@ -108,7 +108,7 @@ def install(
     }
 
     package_json: dict[str, Union[dict, str, bool]] = dict(private=True)
-    package_json["packageManager"] = "pnpm@11.13.1"
+    package_json["packageManager"] = "pnpm@11.2.2"
     package_json["engines"] = dict(node=">=22.0.0")
     package_json["nextgisweb"] = nextgisweb = dict()
 

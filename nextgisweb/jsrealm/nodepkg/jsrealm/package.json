@@ -31,9 +31,9 @@
     "@eslint-react/eslint-plugin": "^5.9.2",
     "@rsbuild/core": "^2.0.11",
     "@rsbuild/plugin-eslint": "^2.0.2",
-    "@rsbuild/plugin-less": "^1.6.4",
-    "@rsbuild/plugin-react": "^2.0.1",
-    "@rsbuild/plugin-type-check": "^1.4.0",
+    "@rsbuild/plugin-less": "^2.0.1",
+    "@rsbuild/plugin-react": "^2.1.0",
+    "@rsbuild/plugin-type-check": "^1.5.0",
     "@types/babel__core": "^7.20.5",
     "@types/lodash-es": "^4.17.12",
     "@types/node": "^26.1.0",
@@ -54,7 +54,7 @@
     "rspack-plugin-svg-sprite": "^1.5.1",
     "svgo-loader": "^5.0.0",
     "tmp": "^0.2.3",
-    "typescript": "^6.0.2",
+    "typescript": "^6.0.3",
     "typescript-eslint": "^8.62.1"
   },
   "nextgisweb": {
