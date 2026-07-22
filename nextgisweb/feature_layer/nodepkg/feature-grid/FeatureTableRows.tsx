@@ -136,11 +136,14 @@ export function FeatureTableRows({
         if (row) {
           selectedKey = selectedIds.find((s) => s === row[$FID]);
         }
+        const isSelected = selectedKey !== undefined;
 
         return (
           <div
             key={virtualRow.key as Key}
-            className={classNames("tr", selectedKey && "selected")}
+            className={classNames("tr", {
+              selected: isSelected,
+            })}
             data-index={virtualRow.index}
             ref={measureElement}
             style={{
@@ -157,7 +160,7 @@ export function FeatureTableRows({
                 return;
               }
               setSelectedIds((old) => {
-                if (selectedKey) {
+                if (isSelected) {
                   return old.filter((o) => o !== selectedKey);
                 } else if (row) {
                   const newId = row[$FID];
