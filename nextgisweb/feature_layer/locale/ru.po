@@ -545,7 +545,7 @@ msgid "Advanced filter"
 msgstr "Расширенный фильтр"
 
 #: nodepkg/feature-grid/FeatureTable.tsx:91
-#: nodepkg/feature-grid/component/TableConfigModal.tsx:49
+#: nodepkg/feature-grid/component/TableConfigModal.tsx:177
 msgid "Last changed"
 msgstr "Последнее изменение"
 
@@ -565,6 +565,26 @@ msgstr "Быстрый экспорт"
 #: nodepkg/feature-grid/component/ExportAction.tsx:30
 msgid "Filters are applied"
 msgstr "Применяются фильтры"
+
+#: nodepkg/feature-grid/component/TableConfigModal.tsx:31
+msgid "Configure table columns"
+msgstr "Настройка столбцов таблицы"
+
+#: nodepkg/feature-grid/component/TableConfigModal.tsx:32
+msgid "Search columns"
+msgstr "Поиск столбцов"
+
+#: nodepkg/feature-grid/component/TableConfigModal.tsx:33
+msgid "Enable all"
+msgstr "Включить все"
+
+#: nodepkg/feature-grid/component/TableConfigModal.tsx:34
+msgid "Disable all"
+msgstr "Отключить все"
+
+#: nodepkg/feature-grid/component/TableConfigModal.tsx:35
+msgid "No fields"
+msgstr "Нет полей"
 
 #: nodepkg/feature-grid/util/renderFeatureFieldValue.ts:15
 msgid "True"
