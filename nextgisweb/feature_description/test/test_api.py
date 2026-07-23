@@ -1,4 +1,7 @@
 import itertools
+from io import BytesIO
+from tempfile import NamedTemporaryFile
+from zipfile import ZipFile
 
 import pytest
 import transaction
@@ -9,6 +12,8 @@ from nextgisweb.feature_layer import Feature
 from nextgisweb.feature_layer.test import parametrize_versioning
 from nextgisweb.pyramid.test import WebTestApp
 from nextgisweb.vector_layer import VectorLayer
+
+from .. import FeatureDescription
 
 pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
 
@@ -108,3 +113,93 @@ def test_feature_layer_api(versioning, ngw_webtest_app: WebTestApp):
             assert fa_ext is None
         else:
             assert fa_ext == "qux"
+
+
+@pytest.fixture(scope="module")
+def layer_id():
+    with transaction.manager:
+        res = VectorLayer(geometry_type="NONE").persist()
+        for _ in range(3):
+            res.feature_create(Feature())
+
+    yield res.id
+
+
+def generate_archive(files, uploader):
+    with NamedTemporaryFile() as f:
+        with ZipFile(f, "w") as z:
+            for i in files:
+                z.writestr(i["name"], i["content"])
+
+        return uploader(f.name)
+
+
+@pytest.fixture
+def clear(layer_id):
+    yield
+    with transaction.manager:
+        FeatureDescription.filter_by(resource_id=layer_id).delete()
+
+
+@pytest.mark.parametrize(
+    "files, result",
+    (
+        (
+            [dict(name="qwerty.html", content="wrong-fid")],
+            dict(error=True),
+        ),
+        (
+            [dict(name="00001", content="wrong-ext")],
+            dict(error=True),
+        ),
+        (
+            [
+                dict(name="00001.html", content="plain text"),
+                dict(name="00003.hTmL", content="<p>paragraph</p>"),
+            ],
+            dict(features=[1, 3]),
+        ),
+        (
+            [
+                dict(
+                    name="1.html",
+                    content="plain<p>pa<i>r</i>a<b>g</b>raph</p><script>alert('hacked')</script>",
+                    expected="plain<p>pa<i>r</i>a<b>g</b>raph</p>",
+                ),
+            ],
+            dict(features=[1]),
+        ),
+    ),
+)
+def test_import_export(
+    files, result, layer_id, clear, ngw_file_upload, ngw_webtest_app: WebTestApp
+):
+    upload_meta = generate_archive(files, ngw_file_upload)
+
+    status = 422 if result.get("error") else 200
+    ngw_webtest_app.put(
+        f"/api/resource/{layer_id}/feature_description/import",
+        json={"source": upload_meta},
+        status=status,
+    )
+
+    if status != 200:
+        return
+
+    for file_idx, fid in enumerate(result["features"]):
+        resp = ngw_webtest_app.get(
+            f"/api/resource/{layer_id}/feature/{fid}",
+            dict(extensions="description"),
+            status=200,
+        )
+        description = resp.json["extensions"]["description"]
+
+        f = files[file_idx]
+        expected = f["expected"] if "expected" in f else f["content"]
+        assert expected == description
+
+    resp_export = ngw_webtest_app.get(
+        f"/api/resource/{layer_id}/feature_description/export", status=200
+    )
+    with ZipFile(BytesIO(resp_export.body), "r") as z:
+        assert len(z.filelist) == len(files)
