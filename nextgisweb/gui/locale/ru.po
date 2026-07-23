@@ -60,7 +60,7 @@ msgstr "Ложь"
 msgid "Not set"
 msgstr "Не установлен"
 
-#: nodepkg/component/SaveButton.tsx:19 nodepkg/model-form/ModelForm.tsx:52
+#: nodepkg/component/SaveButton.tsx:16 nodepkg/model-form/ModelForm.tsx:52
 msgid "Save"
 msgstr "Сохранить"
 
@@ -80,47 +80,51 @@ msgstr "Закрыть"
 msgid "Apply"
 msgstr "Применить"
 
-#: nodepkg/component/extent-row/ExtentRow.tsx:62
+#: nodepkg/component/extent-row/ExtentRow.tsx:65
 msgid "Left"
 msgstr "Лево"
 
-#: nodepkg/component/extent-row/ExtentRow.tsx:63
+#: nodepkg/component/extent-row/ExtentRow.tsx:66
 msgid "Bottom"
 msgstr "Низ"
 
-#: nodepkg/component/extent-row/ExtentRow.tsx:64
+#: nodepkg/component/extent-row/ExtentRow.tsx:67
 msgid "Right"
 msgstr "Право"
 
-#: nodepkg/component/extent-row/ExtentRow.tsx:65
+#: nodepkg/component/extent-row/ExtentRow.tsx:68
 msgid "Top"
 msgstr "Верх"
 
-#: nodepkg/component/extent-row/ExtentRow.tsx:68
+#: nodepkg/component/extent-row/ExtentRow.tsx:71
 msgid "West"
 msgstr "Запад"
 
-#: nodepkg/component/extent-row/ExtentRow.tsx:69
+#: nodepkg/component/extent-row/ExtentRow.tsx:72
 msgid "South"
 msgstr "Юг"
 
-#: nodepkg/component/extent-row/ExtentRow.tsx:70
+#: nodepkg/component/extent-row/ExtentRow.tsx:73
 msgid "East"
 msgstr "Восток"
 
-#: nodepkg/component/extent-row/ExtentRow.tsx:71
+#: nodepkg/component/extent-row/ExtentRow.tsx:74
 msgid "North"
 msgstr "Север"
 
-#: nodepkg/component/extent-row/ExtentRow.tsx:137
+#: nodepkg/component/extent-row/ExtentRow.tsx:141
 msgid "From layers"
 msgstr "Из слоев"
 
-#: nodepkg/component/extent-row/ExtentRow.tsx:163
+#: nodepkg/component/extent-row/ExtentRow.tsx:168
+msgid "Use current map extent"
+msgstr "Использовать текущий охват карты"
+
+#: nodepkg/component/extent-row/ExtentRow.tsx:181
 msgid "Edit on map"
 msgstr "Редактировать на карте"
 
-#: nodepkg/component/extent-row/ExtentRow.tsx:168
+#: nodepkg/component/extent-row/ExtentRow.tsx:187
 msgid "Clean"
 msgstr "Очистить"
 
@@ -378,10 +382,10 @@ msgstr "Логотип сохранен. Для просмотра измене�
 msgid "Operation in progress"
 msgstr "Выполняется операция"
 
-#: nodepkg/single-setting-form/SingleSettingForm.tsx:24
+#: nodepkg/single-setting-form/SingleSettingForm.tsx:21
 msgid "The setting is saved."
 msgstr "Настройка сохранена."
 
-#: nodepkg/single-setting-form/SingleSettingForm.tsx:25
+#: nodepkg/single-setting-form/SingleSettingForm.tsx:22
 msgid "Reload the page to get them applied."
 msgstr "Обновите страницу, чтобы настройки вступили в силу."

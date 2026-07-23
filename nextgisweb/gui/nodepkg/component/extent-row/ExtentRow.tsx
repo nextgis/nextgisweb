@@ -9,11 +9,14 @@ import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { useResourcePicker } from "@nextgisweb/resource/component/resource-picker/hook";
 import type { ResourcePickerStoreOptions } from "@nextgisweb/resource/component/resource-picker/type";
+import { useOptionalDisplayContext } from "@nextgisweb/webmap/display/context";
+import { extractExtentFromArray } from "@nextgisweb/webmap/utils/extent";
 
 import { ExtentEditorModal } from "../extent-editor-modal";
 
 import { unionExtents } from "./util";
 
+import CurrentExtentIcon from "@nextgisweb/icon/material/center_focus_weak";
 import ClearIcon from "@nextgisweb/icon/material/close";
 import LayersIconOutlined from "@nextgisweb/icon/material/layers";
 import MapIcon from "@nextgisweb/icon/material/map";
@@ -95,6 +98,7 @@ export const ExtentRow = observer(
     const { makeSignal } = useAbortController();
 
     const { showResourcePicker } = useResourcePicker();
+    const displayContext = useOptionalDisplayContext();
 
     const onSetFromLayerClick = useCallback(() => {
       showResourcePicker({
@@ -159,11 +163,26 @@ export const ExtentRow = observer(
           ))}
         </Space.Compact>
         <Space.Compact style={{ display: "flex" }}>
-          <Button
-            title={gettext("Edit on map")}
-            icon={<MapIcon />}
-            onClick={() => setEditOpen(true)}
-          />
+          {displayContext ? (
+            <Button
+              title={gettext("Use current map extent")}
+              icon={<CurrentExtentIcon />}
+              onClick={() => {
+                const { display } = displayContext;
+                onChange?.(
+                  extractExtentFromArray(
+                    display.map.getExtent(display.lonlatProjection)
+                  )
+                );
+              }}
+            />
+          ) : (
+            <Button
+              title={gettext("Edit on map")}
+              icon={<MapIcon />}
+              onClick={() => setEditOpen(true)}
+            />
+          )}
           <Button
             title={gettext("Clean")}
             loading={loading}
