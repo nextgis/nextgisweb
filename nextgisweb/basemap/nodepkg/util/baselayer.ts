@@ -116,7 +116,7 @@ export function prepareBaselayerConfig(
   if (copyright_text) {
     source.attributions = copyright_text;
     if (copyright_url) {
-      source.attributions = `<a href="${copyright_url}">${source.attributions}</a>`;
+      source.attributions = `<a href="${copyright_url}" target="_blank">${source.attributions}</a>`;
     }
   }
 
