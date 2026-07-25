@@ -1,6 +1,26 @@
 Changes
 =======
 
+5.5.0
+-----
+
+- Interactive webmap editing and configuration in display mode.
+- New resource search page with advanced filtering capabilities.
+- AI-powered generation of feature filters from natural language queries.
+- Field configuration during vector layer creation.
+- Vector layers now support boolean fields.
+- Experimental support for JSON fields in vector layers.
+- Limited support for marking vector layer fields as mandatory.
+- Initial support for no-geometry layers.
+- Support for using public S3 buckets with external raster layers.
+- Enhanced raster layer preview with band configuration.
+- Improved CSV import for lookup tables with preview and column mapping.
+- Layer editing on webmaps enabled by default.
+- HTTP API for importing feature descriptions from ZIP archives.
+- Migrated from Webpack and Yarn to Rsbuild and pnpm.
+- GDAL 3.8, Python 3.12, and Node.js 22 are now the minimum required versions.
+
+
 5.4.0
 -----
 
