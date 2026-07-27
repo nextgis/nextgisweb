@@ -12,6 +12,7 @@ from msgspec.inspect import IntType, Metadata, type_info
 from msgspec.json import Decoder
 from pyramid.config import Configurator as PyramidConfigurator
 from pyramid.exceptions import ConfigurationError
+from pyramid.response import Response
 
 from nextgisweb.env import gettext, gettextf
 from nextgisweb.env.package import pkginfo
@@ -163,6 +164,20 @@ class Configurator(PyramidConfigurator):
                     return {k: v(md[k]) for k, v in p.path_decoders}
 
         self.add_request_method(path_param, property=True)
+
+        def execution_policy(environ, router):
+            with router.request_context(environ) as request:
+                try:
+                    getattr(request, "path_info")
+                except UnicodeDecodeError:
+                    return Response(
+                        status=400,
+                        content_type="text/plain",
+                        body="Malformed request URI\n",
+                    )
+                return router.invoke_request(request)
+
+        self.set_execution_policy(execution_policy)
 
     def add_default_view_predicates(self):
         import pyramid.predicates as pp
