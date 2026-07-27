@@ -20,4 +20,10 @@ class BasemapPlugin(WebmapPlugin):
             )
             for bm in webmap.basemaps
         ]
-        return (cls.entrypoint, dict(basemaps=basemaps))
+        bm_config = webmap.basemap_config
+        disable = bm_config.disable if bm_config is not None else False
+        background_color = bm_config.background_color if bm_config is not None else None
+        return (
+            cls.entrypoint,
+            dict(basemaps=basemaps, disable=disable, background_color=background_color),
+        )

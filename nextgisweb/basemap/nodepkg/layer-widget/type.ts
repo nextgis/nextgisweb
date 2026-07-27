@@ -12,8 +12,9 @@ export interface WebmapPluginBaselayer {
 }
 
 export interface WebmapPluginConfig {
-  [name: string]: Record<string, any>;
   basemaps: WebmapPluginBaselayer[];
+  disable: boolean;
+  background_color: string | null;
 }
 
 export interface BasemapConfig {
