@@ -735,11 +735,14 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                     v = sa.sql.null()
 
                 op = getattr(sa.sql.operators, o)
-                if k == "id":
-                    column = idcol
-                else:
-                    field = self.layer.field_by_keyname(k)
-                    column = tab.columns[field.column_name]
+                column = (
+                    idcol if k == "id" else tab.columns[self.layer.field_by_keyname(k).column_name]
+                )
+                if o not in ("is_", "isnot"):
+                    if isinstance(v, list):
+                        v = [sa.type_coerce(item, column.type) for item in v]
+                    else:
+                        v = sa.type_coerce(v, column.type)
 
                 _where_filter.append(op(column, v))
 

@@ -185,6 +185,11 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
 
                 op = getattr(sa.sql.operators, o)
                 column = idcol if k == "id" else fields[k]
+                if o not in ("is_", "isnot"):
+                    if isinstance(v, list):
+                        v = [sa.type_coerce(item, column.type) for item in v]
+                    else:
+                        v = sa.type_coerce(v, column.type)
                 _where_filter.append(op(column, v))
 
             if len(_where_filter) > 0:
