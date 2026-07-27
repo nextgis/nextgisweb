@@ -89,6 +89,11 @@ export const FeatureEditorWidget = observer(
 
     const [items, setItems] = useState<TabItem[]>([]);
 
+    useEffect(() => {
+      store.init();
+      return store.destroy;
+    }, [store]);
+
     const createEditorTab = useCallback(
       async (newEditorWidget: FeatureEditorPlugin) => {
         const key = newEditorWidget.identity;

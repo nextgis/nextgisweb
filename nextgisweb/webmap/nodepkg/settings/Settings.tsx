@@ -42,10 +42,11 @@ export function Settings() {
         setSettings(csettings.webmap);
         setSrsOptions(srsListToOptions(srsInfo));
       } catch (err) {
-        errorModal(err);
-      } finally {
-        setStatus("loaded");
+        if (!errorModal(err)) {
+          return;
+        }
       }
+      setStatus("loaded");
     }
     load();
   }, [makeSignal]);

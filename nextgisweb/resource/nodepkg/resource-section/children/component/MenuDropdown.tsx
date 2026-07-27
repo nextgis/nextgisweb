@@ -3,6 +3,7 @@ import type { Dispatch, SetStateAction } from "react";
 
 import { Badge, Dropdown, Tooltip } from "@nextgisweb/gui/antd";
 import type { MenuProps } from "@nextgisweb/gui/antd";
+import { isAbortError } from "@nextgisweb/gui/error";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -137,7 +138,8 @@ export function MenuDropdown({
   >([]);
 
   useEffect(() => {
-    (async () => {
+    let cancelled = false;
+    const load = async () => {
       const allowedToDelete: number[] = [];
       const signal = makeSignal();
       for (const item of items) {
@@ -151,8 +153,23 @@ export function MenuDropdown({
           }
         }
       }
-      setSelectedAllowedForDelete(allowedToDelete);
-    })();
+      if (!cancelled) {
+        setSelectedAllowedForDelete(allowedToDelete);
+      }
+    };
+
+    /**
+     * TODO: AbortSignal is not supported by {@link ResourceAttrItem.fetch} yet.
+     * Remove the manual cancellation guard once per-waiter abort is supported.
+     */
+    load().catch((err) => {
+      if (!isAbortError(err)) {
+        throw err;
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [selected, makeSignal, items]);
 
   const deleteSelected = useCallback(() => {

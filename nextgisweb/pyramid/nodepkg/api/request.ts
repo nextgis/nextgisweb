@@ -268,11 +268,9 @@ export async function request<
   };
   if (opt.method && opt.method.toUpperCase() === "GET" && useCache) {
     const cacheToUse = useCache instanceof LoaderCache ? useCache : cache;
-    return cacheToUse.promiseFor(url, makeRequest) as ToReturn<
-      T,
-      RT,
-      ReturnUrl
-    >;
+    return cacheToUse.promiseFor(url, makeRequest, {
+      signal: opt.signal,
+    }) as ToReturn<T, RT, ReturnUrl>;
   }
   return makeRequest();
 }

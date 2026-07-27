@@ -89,15 +89,19 @@ export async function resourceAttrItems<A extends [...Attributes]>({
     });
 
     for (const id of toFetch) {
-      useCache.promiseFor(String(id), async () => {
-        const { items } = await fetchPromise;
-        const row = items.find(([rid]) => rid === id);
-        const values = row
-          ? normalize(row[1])
-          : preparedAttrs.map(() => undefined);
+      useCache.promiseFor(
+        String(id),
+        async () => {
+          const { items } = await fetchPromise;
+          const row = items.find(([rid]) => rid === id);
+          const values = row
+            ? normalize(row[1])
+            : preparedAttrs.map(() => undefined);
 
-        return new ResourceAttrItem(id, preparedAttrs, values);
-      });
+          return new ResourceAttrItem(id, preparedAttrs, values);
+        },
+        { signal }
+      );
     }
 
     await fetchPromise;

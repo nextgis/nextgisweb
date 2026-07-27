@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import type { FeatureItem } from "@nextgisweb/feature-layer/type";
 import type { FeatureLayerFieldRead } from "@nextgisweb/feature-layer/type/api";
+import { isAbortError } from "@nextgisweb/gui/error";
 import { useAbortController } from "@nextgisweb/pyramid/hook";
 
 import { KeyValueTable } from "../KeyValueTable";
@@ -37,9 +38,15 @@ export function FieldsTable({ featureItem, resourceId }: FieldsTableProps) {
     const { fields } = featureItem;
     fieldValuesToDataSource(fields, fieldsInfo, {
       signal: makeSignal(),
-    }).then((dataItems) => {
-      setDataSource(dataItems);
-    });
+    })
+      .then((dataItems) => {
+        setDataSource(dataItems);
+      })
+      .catch((err) => {
+        if (!isAbortError(err)) {
+          throw err;
+        }
+      });
   }, [featureItem, makeSignal, fieldsInfo]);
 
   if (dataSource) {

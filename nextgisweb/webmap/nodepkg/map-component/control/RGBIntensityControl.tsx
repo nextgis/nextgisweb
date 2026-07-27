@@ -23,18 +23,25 @@ export function RGBIntensityControl({
   hasAlpha?: boolean;
   onChange: (rgb: RGBIntensity) => void;
 }) {
-  const [red, setRed] = useState(255);
-  const [green, setGreen] = useState(255);
-  const [blue, setBlue] = useState(255);
-  const [alpha, setAlpha] = useState(100);
+  const [rgba, setRgba] = useState<Required<RGBIntensity>>({
+    red: 255,
+    green: 255,
+    blue: 255,
+    alpha: 100,
+  });
+  const changedRef = useRef(false);
 
-  const mountedRef = useRef(false);
+  const update = (channel: keyof RGBIntensity, value: number) => {
+    changedRef.current = true;
+    setRgba((current) => ({ ...current, [channel]: value }));
+  };
 
   useEffect(() => {
-    if (!mountedRef.current) {
-      mountedRef.current = true;
+    if (!changedRef.current) {
       return;
     }
+    changedRef.current = false;
+    const { red, green, blue, alpha } = rgba;
 
     onChange({
       red,
@@ -42,7 +49,7 @@ export function RGBIntensityControl({
       blue,
       ...(hasAlpha ? { alpha } : {}),
     });
-  }, [red, green, blue, alpha, hasAlpha, onChange]);
+  }, [rgba, hasAlpha, onChange]);
 
   return (
     <MapControl order={100} position="top-right" margin>
@@ -51,8 +58,8 @@ export function RGBIntensityControl({
           min={0}
           max={255}
           step={1}
-          value={red}
-          onChange={setRed}
+          value={rgba.red}
+          onChange={(value) => update("red", value)}
           tooltip={{ open: false }}
           styles={{
             track: { backgroundColor: RED },
@@ -64,8 +71,8 @@ export function RGBIntensityControl({
           min={0}
           max={255}
           step={1}
-          value={green}
-          onChange={setGreen}
+          value={rgba.green}
+          onChange={(value) => update("green", value)}
           tooltip={{ open: false }}
           styles={{
             track: { backgroundColor: GREEN },
@@ -77,8 +84,8 @@ export function RGBIntensityControl({
           min={0}
           max={255}
           step={1}
-          value={blue}
-          onChange={setBlue}
+          value={rgba.blue}
+          onChange={(value) => update("blue", value)}
           tooltip={{ open: false }}
           styles={{
             track: { backgroundColor: BLUE },
@@ -91,8 +98,8 @@ export function RGBIntensityControl({
             min={0}
             max={100}
             step={1}
-            value={alpha}
-            onChange={setAlpha}
+            value={rgba.alpha}
+            onChange={(value) => update("alpha", value)}
             tooltip={{ open: false }}
             styles={{
               track: { backgroundColor: ALPHA },

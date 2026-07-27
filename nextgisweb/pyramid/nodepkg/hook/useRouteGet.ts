@@ -65,10 +65,12 @@ export function useRouteGet<
   const [isLoading, setIsLoading] = useState(shouldLoadOnInit);
   const [data, setData] = useState<ResolvedRouteResponse<D, N, RT>>();
   const [error, setError] = useState<NonNullable<unknown> | null>(null);
+  const refreshId = useRef(0);
 
   const [routerOptions] = useObjectState(mergedOptions);
 
   const refresh = useCallback(async () => {
+    const currentRefreshId = ++refreshId.current;
     abort();
     setError(null);
     setIsLoading(true);
@@ -90,16 +92,18 @@ export function useRouteGet<
       const data = await get<ResolvedRouteResponse<D, N>, RT, false>(
         routerOptions
       );
+      if (currentRefreshId !== refreshId.current) return;
       setData(data);
+      setIsLoading(false);
     } catch (err) {
-      if (isAbortError(err)) {
+      if (currentRefreshId !== refreshId.current) return;
+      if (!isAbortError(err)) {
         setError(err!);
         if (showErrorModal.current) {
           errorModal(err);
         }
         onError.current?.(err);
       }
-    } finally {
       setIsLoading(false);
     }
   }, [abort, route, routerOptions]);

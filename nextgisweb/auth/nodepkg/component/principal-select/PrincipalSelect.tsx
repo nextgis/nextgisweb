@@ -9,6 +9,7 @@ import {
 import type { GroupReadBrief, UserReadBrief } from "@nextgisweb/auth/type/api";
 import { Select, Space, Tag } from "@nextgisweb/gui/antd";
 import type { SelectProps } from "@nextgisweb/gui/antd";
+import { isAbortError } from "@nextgisweb/gui/error";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { useAbortController } from "@nextgisweb/pyramid/hook/useAbortController";
 
@@ -156,9 +157,15 @@ export function PrincipalSelect({
         })
       );
     };
-    loadData().then((choices_) => {
-      setMembers(choices_);
-    });
+    loadData()
+      .then((choices_) => {
+        setMembers(choices_);
+      })
+      .catch((err) => {
+        if (!isAbortError(err)) {
+          throw err;
+        }
+      });
   }, [model, makeSignal, systemUsers]);
 
   const options = useMemo(() => {

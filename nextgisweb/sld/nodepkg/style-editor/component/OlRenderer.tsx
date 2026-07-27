@@ -127,6 +127,9 @@ export const OlRenderer: FC<OlRendererProps> = ({
         projection: "EPSG:4326",
       }),
     });
+    return () => {
+      map.current?.dispose();
+    };
   }, [mapId]);
 
   useEffect(() => {

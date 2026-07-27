@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Table } from "@nextgisweb/gui/antd";
 import type { TableProps } from "@nextgisweb/gui/antd";
 import { utc } from "@nextgisweb/gui/dayjs";
+import { isAbortError } from "@nextgisweb/gui/error";
 import { SvgIconLink } from "@nextgisweb/gui/svg-icon";
 import { sorterFactory } from "@nextgisweb/gui/util";
 import { formatSize } from "@nextgisweb/gui/util/formatSize";
@@ -62,28 +63,33 @@ export function ResourceSectionChildren({ resourceId }: ResourceSectionProps) {
         const items = (await fetchResourceItems({
           resources: { "type": "search", "parent": resourceId },
           attributes,
+          signal: makeSignal(),
         })) as DefaultResourceAttrItem[];
 
         setAttrItems(items);
-      } finally {
+      } catch (err) {
+        if (isAbortError(err)) {
+          return;
+        }
         setIsDataLoading(false);
+        throw err;
       }
+      setIsDataLoading(false);
     })();
   }, [fetchResourceItems, makeSignal, resourceId, attributes]);
 
   useEffect(() => {
     (async () => {
-      try {
-        //
-        const children = await prepareResourceChildren({
-          attrItems,
-          signal: makeSignal(),
-        });
-        setDataSource(children);
-      } finally {
-        //
+      const children = await prepareResourceChildren({
+        attrItems,
+        signal: makeSignal(),
+      });
+      setDataSource(children);
+    })().catch((err) => {
+      if (!isAbortError(err)) {
+        throw err;
       }
-    })();
+    });
   }, [attrItems, makeSignal]);
 
   useEffect(() => {

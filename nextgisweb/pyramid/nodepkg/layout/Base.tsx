@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import { useEffect, useState } from "react";
+import { StrictMode, useEffect, useState } from "react";
 import type { ReactNode } from "react";
 
 import { Modal, Spin, useToken } from "@nextgisweb/gui/antd";
@@ -206,7 +206,7 @@ export function Base({
   );
 
   return (
-    <>
+    <StrictMode>
       <title>{title}</title>
 
       {modalContextHolder}
@@ -229,6 +229,6 @@ export function Base({
           {renderBody}
         </PyramidLayout>
       )}
-    </>
+    </StrictMode>
   );
 }

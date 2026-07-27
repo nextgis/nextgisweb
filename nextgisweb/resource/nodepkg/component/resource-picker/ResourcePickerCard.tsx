@@ -47,8 +47,8 @@ export function ResourcePickerCard<V extends SelectValue = SelectValue>({
   );
 
   useEffect(() => {
-    const destroy = store.destroy;
-    return destroy;
+    store.init();
+    return store.destroy;
   }, [store]);
 
   return (

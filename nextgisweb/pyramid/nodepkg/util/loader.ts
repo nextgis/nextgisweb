@@ -4,6 +4,11 @@ interface PromiseDef<T = unknown, M = unknown> {
   meta?: M;
 }
 
+interface PromiseForOptions<M> {
+  meta?: M;
+  signal?: AbortSignal | null;
+}
+
 export class LoaderCache<T = unknown, M = unknown> {
   promises: Record<string, PromiseDef<T, M>> = {};
 
@@ -27,27 +32,38 @@ export class LoaderCache<T = unknown, M = unknown> {
     return this.promises[key]?.loader;
   }
 
-  promiseFor(key: string, loader: () => Promise<T>, meta?: M) {
-    let promise = this.promises[key];
-    if (promise === undefined) {
-      promise = {
-        fulfilled: false,
-        loader: loader(),
-        meta,
-      };
-      promise.loader
-        .then((result) => {
-          this.promises[key].fulfilled = true;
-          return result;
-        })
-        .catch(() => {
-          // The AbortControl signal may be triggered after successful execution
-          if (!this.fulfilled(key)) {
-            delete this.promises[key];
-          }
-        });
-      this.promises[key] = promise;
+  promiseFor(
+    key: string,
+    loader: () => Promise<T>,
+    { meta, signal }: PromiseForOptions<M> = {}
+  ) {
+    const cached = this.promises[key];
+    if (cached !== undefined) {
+      return cached.loader;
     }
+
+    const promise: PromiseDef<T, M> = {
+      fulfilled: false,
+      loader: loader(),
+      meta,
+    };
+    this.promises[key] = promise;
+
+    const clean = () => {
+      if (this.promises[key] === promise && !this.fulfilled(key)) {
+        delete this.promises[key];
+      }
+    };
+    if (signal?.aborted) {
+      clean();
+    } else {
+      signal?.addEventListener("abort", clean, { once: true });
+    }
+
+    promise.loader.then(() => {
+      promise.fulfilled = true;
+    }, clean);
+
     return promise.loader;
   }
 

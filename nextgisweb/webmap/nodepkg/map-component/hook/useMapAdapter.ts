@@ -68,7 +68,7 @@ export function useMapAdapter({
   useEffect(() => {
     return () => {
       if (!mapStoreProp && mapStore?.olMap) {
-        mapStore.olMap.dispose();
+        mapStore.detach();
       }
     };
   }, [mapStore, mapStoreProp]);
@@ -104,13 +104,15 @@ export function useMapAdapter({
   }, [mapStore.started, setView]);
 
   useEffect(() => {
+    let cancelled = false;
+
     if (mapStore && basemap) {
       const baselayers = settings.basemaps.filter((l) => l.enabled !== false);
       if (baselayers.length) {
         const baselayer = baselayers[0];
         const opts = prepareBaselayerConfig(baselayer);
         addBaselayer({ ...opts, map: mapStore }).then((layer) => {
-          if (!basemap) {
+          if (cancelled) {
             layer?.dispose();
           } else {
             baseRef.current = layer;
@@ -119,6 +121,7 @@ export function useMapAdapter({
       }
     }
     return () => {
+      cancelled = true;
       if (baseRef.current) {
         baseRef.current.dispose();
         baseRef.current = undefined;

@@ -65,17 +65,26 @@ export const PrintMapPreview = observer(
     } = printMapStore;
 
     useEffect(() => {
+      let cancelled = false;
+
       // This is an important aspect not just for optimization
       // but also for handling the print map logic,
       // where after each position change, the map scale is rounded and the map view is redrawn.
-      display.map.olMap.once("rendercomplete", () => {
+      const renderCompleteKey = display.map.olMap.once("rendercomplete", () => {
         // If the display page opens in the print panel, the main map starts loading invisibly underneath.
         // Aborting the shared image queue too early prevents the main map from loading its layers.
         // So we have to wait until it's fully loaded before using the queue for the print map.
         imageQueue.waitAll().then(() => {
-          mapStartup({ olMap: mapStore.olMap, queue: imageQueue });
+          if (!cancelled) {
+            mapStartup({ olMap: mapStore.olMap, queue: imageQueue });
+          }
         });
       });
+
+      return () => {
+        cancelled = true;
+        unByKey(renderCompleteKey);
+      };
     }, [display.map.olMap, mapStore.olMap]);
 
     useEffect(() => {
@@ -106,6 +115,7 @@ export const PrintMapPreview = observer(
 
       return () => {
         unByKey(unCenterKey);
+        viewCenterChange.cancel();
       };
     }, [mapStore, mapStore.ready, mapStore.olView, printMapStore]);
 

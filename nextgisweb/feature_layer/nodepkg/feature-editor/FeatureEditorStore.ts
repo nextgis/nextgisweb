@@ -4,6 +4,7 @@ import type {
   FeatureLayerFieldRead,
   FeatureLayerRead,
 } from "@nextgisweb/feature-layer/type/api";
+import { isAbortError } from "@nextgisweb/gui/error";
 import { route } from "@nextgisweb/pyramid/api";
 import type { RouteBody } from "@nextgisweb/pyramid/api/type";
 import { AbortControllerHelper } from "@nextgisweb/pyramid/util/abort";
@@ -34,6 +35,7 @@ export class FeatureEditorStore {
   private _featureItem?: FeatureItem;
 
   private _abortController = new AbortControllerHelper();
+  private _initializing?: Promise<CompositeRead>;
 
   @observable.shallow private accessor _attributeStore: EditorStore | null =
     null;
@@ -53,11 +55,24 @@ export class FeatureEditorStore {
     } else {
       this.featureId = featureId;
     }
+  }
 
+  init() {
     this.setInitLoading(true);
-    this._initialize().finally(() => {
-      this.setInitLoading(false);
-    });
+    const initializing = this._initialize();
+    this._initializing = initializing;
+    initializing
+      .catch((err) => {
+        if (!isAbortError(err)) {
+          throw err;
+        }
+      })
+      .finally(() => {
+        if (this._initializing === initializing) {
+          this._initializing = undefined;
+          this.setInitLoading(false);
+        }
+      });
   }
 
   @computed
@@ -187,6 +202,8 @@ export class FeatureEditorStore {
   @action.bound
   destroy() {
     this._abort();
+    this._initializing = undefined;
+    this.setInitLoading(false);
   }
 
   @action.bound

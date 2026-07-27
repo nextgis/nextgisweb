@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import type { EditorWidgetProps } from "@nextgisweb/feature-layer/feature-editor/type";
 import { LoadingWrapper } from "@nextgisweb/gui/component";
+import { isAbortError } from "@nextgisweb/gui/error";
 import type { SizeType } from "@nextgisweb/gui/fields-form";
 import { convertWSENToNgwExtent } from "@nextgisweb/gui/util/extent";
 import { useAbortController } from "@nextgisweb/pyramid/hook";
@@ -56,6 +57,9 @@ const GeometryEditor = observer(
           signal,
           resourceId,
         });
+        if (signal.aborted) {
+          throw signal.reason;
+        }
         if (!resExtent || Object.values(resExtent).some((v) => v === null)) {
           return undefined;
         }
@@ -68,9 +72,14 @@ const GeometryEditor = observer(
         fetchLayerExtent()
           .then((ext) => {
             setInitialExtent(ext);
-          })
-          .finally(() => {
             setInitialExtentLoading(false);
+          })
+          .catch((err) => {
+            if (isAbortError(err)) {
+              return;
+            }
+            setInitialExtentLoading(false);
+            throw err;
           });
       }
     }, [fetchLayerExtent, initExtent]);

@@ -89,9 +89,8 @@ function ResourceSearchPage() {
   const [store] = useState(() => new ResourceSearchStore());
 
   useEffect(() => {
-    return () => {
-      store.destroy();
-    };
+    store.init();
+    return store.destroy;
   }, [store]);
 
   return <ResourceSearchPageBody store={store} />;

@@ -43,6 +43,9 @@ export class ResourceSearchStore {
 
   constructor() {
     this.hydrateFromUrl(window.location.search);
+  }
+
+  init() {
     void this.applyFilters({ pushHistory: false });
   }
 
@@ -187,10 +190,12 @@ export class ResourceSearchStore {
       }
     } catch (err) {
       if (ac.signal.aborted || isAbortError(err)) {
-        runInAction(() => {
-          this.loading = false;
-          this.loadingMore = false;
-        });
+        if (this.abortController === ac) {
+          runInAction(() => {
+            this.loading = false;
+            this.loadingMore = false;
+          });
+        }
         return;
       }
 
@@ -298,8 +303,11 @@ export class ResourceSearchStore {
     return this.duplicateMetaKeys().size > 0;
   }
 
-  destroy = () => {
+  @action.bound
+  destroy() {
     this.abortController?.abort();
     this.abortController = null;
-  };
+    this.loading = false;
+    this.loadingMore = false;
+  }
 }

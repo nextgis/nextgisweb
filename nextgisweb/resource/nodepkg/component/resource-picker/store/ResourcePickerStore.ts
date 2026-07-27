@@ -79,6 +79,10 @@ export class ResourcePickerStore implements Omit<
   readonly onTraverse: ((parentId: number) => void) | null = null;
   readonly initParentId: number = 0;
 
+  private readonly initOptions: Pick<
+    ResourcePickerStoreOptions,
+    "parentId" | "selected"
+  >;
   private abortControllers: Partial<Record<Action, AbortController>> = {};
 
   attributes: [...typeof ResourcePickerDefaultAttrs] = [
@@ -136,7 +140,11 @@ export class ResourcePickerStore implements Omit<
     this.getThisMsg = getThisMsg ?? msgPickThis;
     this.traverseClasses = traverseClasses ?? null;
 
-    this.getSelectedParent({ selected, parentId });
+    this.initOptions = { parentId, selected };
+  }
+
+  init() {
+    return this.getSelectedParent(this.initOptions);
   }
 
   @action
