@@ -881,7 +881,8 @@ class FeatureQueryBase(FeatureQueryIntersectsMixin):
                             if (geom_data := row.geom) is None:
                                 geom = None
                             elif self._geom_format == "WKB":
-                                geom = Geometry.from_wkb(geom_data.tobytes(), validate=False)
+                                # TODO: bytes(...) can be removed after psycopg3 upgrade
+                                geom = Geometry.from_wkb(bytes(geom_data), validate=False)
                             elif self._geom_format == "WKT":
                                 geom = Geometry.from_wkt(geom_data, validate=False)
                             else:

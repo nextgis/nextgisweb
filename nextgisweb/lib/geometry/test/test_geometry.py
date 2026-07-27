@@ -135,4 +135,5 @@ def _pg_wkb(wkb, srid=None, byte_order="NDR"):
 
 
 def _pg_bytes(query):
-    return DBSession.scalar(query).tobytes()
+    # TODO: bytes(...) can be removed after psycopg3 upgrade
+    return bytes(DBSession.scalar(query))
