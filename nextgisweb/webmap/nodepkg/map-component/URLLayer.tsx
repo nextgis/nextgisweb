@@ -40,7 +40,8 @@ const emptyTile = createEmptyTile();
 export interface URLLayerProps {
   url: string;
   opacity?: number;
-  attributions?: string | null;
+  copyrightText?: string | null;
+  copyrightUrl?: string | null;
   layerOptions?: LayerOptions;
   sourceOptions?: Pick<XYZSourceOptions, "minZoom" | "maxZoom">;
 }
@@ -48,7 +49,8 @@ export interface URLLayerProps {
 export function URLLayer({
   url,
   opacity,
-  attributions,
+  copyrightText,
+  copyrightUrl,
   layerOptions: layerOptionsProp,
   sourceOptions: sourceOptionsProp,
 }: URLLayerProps) {
@@ -66,8 +68,9 @@ export function URLLayer({
     if (mapStore && url && isValidURL(url)) {
       createTileLayer({
         layer: layerOptionsRef.current,
+        copyrightText,
+        copyrightUrl,
         source: {
-          attributions: attributions ?? undefined,
           url,
           wrapX: true,
           crossOrigin: "anonymous",
@@ -107,7 +110,7 @@ export function URLLayer({
         layerRef.current.dispose();
       }
     };
-  }, [mapStore, attributions, sourceOptions, url]);
+  }, [mapStore, copyrightText, copyrightUrl, sourceOptions, url]);
 
   useEffect(() => {
     if (layer) {

@@ -9,6 +9,7 @@ import type {
 } from "@nextgisweb/basemap/layer-widget/type";
 import { registerEPSG3395Projection } from "@nextgisweb/basemap/util/epsg3395";
 import { isAbortError } from "@nextgisweb/gui/error";
+import pyramidSettings from "@nextgisweb/pyramid/client-settings";
 import { RequestQueue, tileLoadFunction } from "@nextgisweb/pyramid/util";
 import type { MapStore } from "@nextgisweb/webmap/ol/MapStore";
 import type { LayerOptions } from "@nextgisweb/webmap/ol/layer/CoreLayer";
@@ -16,6 +17,25 @@ import type QuadKey from "@nextgisweb/webmap/ol/layer/QuadKey";
 import type XYZ from "@nextgisweb/webmap/ol/layer/XYZ";
 
 import { DEFAULT_SOURCE_MAX_ZOOM } from "../constant";
+
+const SAFE_URL_RE = new RegExp(pyramidSettings.urlSafePattern);
+
+function escapeHtml(value: string): string {
+  const div = document.createElement("div");
+  div.textContent = value;
+  return div.innerHTML;
+}
+
+function buildAttributionHtml(
+  text?: string | null,
+  url?: string | null
+): string | undefined {
+  if (!text) return undefined;
+  const safeText = escapeHtml(text);
+  return url && SAFE_URL_RE.test(url)
+    ? `<a href="${escapeHtml(url)}" target="_blank">${safeText}</a>`
+    : safeText;
+}
 
 let idx = 0;
 
@@ -56,7 +76,13 @@ function basemapTileLoadFunction(tile: Tile, src: string) {
 
 export function prepareBaselayerConfig(
   config: WebmapPluginBaselayer | BasemapConfig
-) {
+): {
+  source: XYZSourceOptions;
+  layer: LayerOptions;
+  keyname?: string;
+  copyrightText?: string | null;
+  copyrightUrl?: string | null;
+} {
   const layer = {} as LayerOptions;
   let source = {} as XYZSourceOptions;
 
@@ -113,13 +139,6 @@ export function prepareBaselayerConfig(
     registerEPSG3395Projection();
   }
 
-  if (copyright_text) {
-    source.attributions = copyright_text;
-    if (copyright_url) {
-      source.attributions = `<a href="${copyright_url}" target="_blank">${source.attributions}</a>`;
-    }
-  }
-
   if ("z_min" in config && typeof config.z_min === "number") {
     source.minZoom = config.z_min;
   }
@@ -146,28 +165,43 @@ export function prepareBaselayerConfig(
 
   source.crossOrigin = "anonymous";
   source.tileLoadFunction = basemapTileLoadFunction;
-  return { source, layer, keyname };
+  return {
+    source,
+    layer,
+    keyname,
+    copyrightText: copyright_text,
+    copyrightUrl: copyright_url,
+  };
 }
 
 export async function createTileLayer({
   source,
   layer: layerOptions,
   keyname,
+  copyrightText,
+  copyrightUrl,
 }: {
-  source: XYZSourceOptions;
+  source: Omit<XYZSourceOptions, "attributions">;
   layer?: LayerOptions;
   keyname?: string;
+  copyrightText?: string | null;
+  copyrightUrl?: string | null;
 }): Promise<QuadKey | XYZ | undefined> {
   if (!keyname) {
     keyname = `basemap_${idx++}`;
   }
 
+  const sourceWithAttributions: XYZSourceOptions = {
+    ...source,
+    attributions: buildAttributionHtml(copyrightText, copyrightUrl),
+  };
+
   try {
-    const MID = source.url?.includes("{q}")
+    const MID = sourceWithAttributions.url?.includes("{q}")
       ? (await import("@nextgisweb/webmap/ol/layer/QuadKey")).default
       : (await import("@nextgisweb/webmap/ol/layer/XYZ")).default;
 
-    const layer = new MID(keyname, layerOptions, source);
+    const layer = new MID(keyname, layerOptions, sourceWithAttributions);
 
     return layer as QuadKey | XYZ;
   } catch (err) {
@@ -179,9 +213,11 @@ export async function addBaselayer({
   map,
   ...layerOptions
 }: {
-  source: XYZSourceOptions;
+  source: Omit<XYZSourceOptions, "attributions">;
   layer?: LayerOptions;
   keyname?: string;
+  copyrightText?: string | null;
+  copyrightUrl?: string | null;
   map: MapStore;
 }): Promise<QuadKey | XYZ | undefined> {
   const layer = await createTileLayer(layerOptions);

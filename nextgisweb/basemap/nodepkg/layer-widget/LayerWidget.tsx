@@ -183,11 +183,8 @@ export const LayerWidget: EditorWidget<LayerStore> = observer(({ store }) => {
               url={url}
               key={qmsId}
               opacity={opacity}
-              attributions={
-                store.copyrightUrl.value
-                  ? `<a href="${store.copyrightUrl.value}" target="_blank">${store.copyrightText.value}</a>`
-                  : store.copyrightText.value
-              }
+              copyrightText={store.copyrightText.value}
+              copyrightUrl={store.copyrightUrl.value}
               layerOptions={{
                 // Put minZoom in layerOptions (not sourceOptions, as with maxZoom) to avoid triggering
                 // an avalanche of high‑zoom tiles when zoomed out. Below this zoom, the layer is simply

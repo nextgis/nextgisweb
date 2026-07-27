@@ -28,7 +28,9 @@ export function PreviewLayer({
 
   let layerType: LayerType = "image";
   let url: string | undefined;
-  let attributions: string | null | undefined;
+  let copyrightText: string | null | undefined;
+  let copyrightUrl: string | null | undefined;
+  const isBasemapResource = Boolean(resData?.basemap_layer);
 
   if (resData) {
     const interfaces = resData.resource.interfaces;
@@ -53,9 +55,8 @@ export function PreviewLayer({
       }
 
       const base = resData.basemap_layer;
-      attributions = base.copyright_url
-        ? `<a href="${base.copyright_url}" target="_blank">${base.copyright_text}</a>`
-        : base.copyright_text;
+      copyrightText = base.copyright_text;
+      copyrightUrl = base.copyright_url;
     }
   }
 
@@ -105,10 +106,14 @@ export function PreviewLayer({
       <PreviewMap
         mapExtent={mapExtent}
         style={{ height: "75vh", ...style }}
-        basemap
+        basemap={!isBasemapResource}
       >
         {url ? (
-          <URLLayer url={url} attributions={attributions} />
+          <URLLayer
+            url={url}
+            copyrightText={copyrightText}
+            copyrightUrl={copyrightUrl}
+          />
         ) : (
           <NGWLayer resourceId={id} layerType={layerType} zIndex={1} />
         )}
