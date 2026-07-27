@@ -185,7 +185,7 @@ _sel_result = (
 )
 
 _sel_result_fid = sa.select(
-    _tab_result.c.value.op("->>")(sa.text("'fid'")),
+    sa.cast(_tab_result.c.value.op("->>")(sa.text("'fid'")), sa.Integer),
 ).filter_by(
     transaction_id=_p_transaction_id,
     seqnum=_p_seqnum,
