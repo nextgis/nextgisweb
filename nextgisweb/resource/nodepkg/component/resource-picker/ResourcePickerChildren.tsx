@@ -87,7 +87,9 @@ function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
         const dataSourceIds = dataSource.map((item) => item.id);
         let newSelected: number[];
 
-        if (newKeys.length === 0) {
+        if (!multiple) {
+          newSelected = newKeys;
+        } else if (newKeys.length === 0) {
           newSelected = selected.filter((id) => !dataSourceIds.includes(id));
         } else {
           const preserved = selected.filter(
@@ -107,6 +109,7 @@ function ResourcePickerChildrenInner<V extends SelectValue = SelectValue>({
     allowSelection,
     selectionType,
     dataSource,
+    multiple,
     selected,
     store,
   ]);
