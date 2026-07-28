@@ -183,11 +183,12 @@ class ExportParams(Struct, kw_only=True):
         if driver.options is not None:
             opts.lco.extend(driver.options)
 
-        # KML and GPX should be created as WGS84
-        if driver.name in ("GPX", "LIBKML"):
+        if driver.lonlat == "only":
             opts.srs = SRS.filter_by(id=4326).one()
         elif self.srs is not UNSET:
             opts.srs = SRS.filter_by(id=self.srs).one()
+        elif driver.lonlat == "prefer":
+            opts.srs = SRS.filter_by(id=4326).one()
 
         # GPX: Enable extensions to preserve all attributes
         if driver.name == "GPX":

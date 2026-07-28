@@ -57,6 +57,10 @@ type FormPropsKey = Extract<keyof FormProps, string>;
 
 const { exportFormats } = settings;
 
+function srsLonlat(formatName: string): "only" | "prefer" | null {
+  return exportFormats.find((f) => f.name === formatName)?.lonlat ?? null;
+}
+
 const srsListToOptions = (srsList: SRSRead[]): SrsOption[] =>
   srsList.map((srs) => ({
     label: srs.display_name,
@@ -103,7 +107,7 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
   const { makeSignal } = useAbortController();
   const [srsOptions, setSrsOptions] = useState<SrsOption[]>([]);
   const [fieldOptions, setFieldOptions] = useState<FieldOption[]>([]);
-  const [defaultSrs, setDefaultSrs] = useState<number>();
+  const [layerSrs, setLayerSrs] = useState<number>();
   const [isFilterFeatureLayer, setIsFilterFeatureLayer] = useState(false);
   const [hasGeom, setHasGeom] = useState(true);
   const [format, setFormat] = useState(exportFormats[0].name);
@@ -118,11 +122,16 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
 
   const { showModal, modalHolder } = useShowModal();
 
+  const defaultSrsForFormat = useCallback(
+    (formatName: string) => (srsLonlat(formatName) ? 4326 : layerSrs),
+    [layerSrs]
+  );
+
   const initialValues = useMemo(() => {
     const initialVals: Partial<FormProps> = {
       format,
       fields: fieldOptions.map((field) => field.value),
-      srs: defaultSrs,
+      srs: defaultSrsForFormat(format),
       fid: "ngw_id",
       encoding: "UTF-8",
       display_name: false,
@@ -131,7 +140,14 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
       ...urlParams,
     };
     return initialVals;
-  }, [defaultSrs, fieldOptions, format, multiple, urlParams, filterExpression]);
+  }, [
+    defaultSrsForFormat,
+    fieldOptions,
+    format,
+    multiple,
+    urlParams,
+    filterExpression,
+  ]);
 
   const handleFilterApply = useCallback(
     (filter: FilterExpressionString | undefined) => {
@@ -167,7 +183,7 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
           const cls = itemInfo.resource.cls as "vector_layer";
           const vectorLayer = itemInfo[cls];
           if (vectorLayer && vectorLayer.srs) {
-            setDefaultSrs(vectorLayer.srs.id);
+            setLayerSrs(vectorLayer.srs.id);
           }
           setHasGeom(!vectorLayer || !!vectorLayer.srs);
           setIsFilterFeatureLayer(
@@ -179,7 +195,7 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
         } else {
           const defSrs = srsInfo.find((srs) => srs.id === 3857);
           if (defSrs) {
-            setDefaultSrs(defSrs.id);
+            setLayerSrs(defSrs.id);
           }
         }
       }
@@ -221,7 +237,14 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
   }, [filterExpression, isReady, form]);
 
   useEffect(() => {
+    if (isReady && layerSrs !== undefined && srsLonlat(format) === null) {
+      form.setFieldValue("srs", layerSrs);
+    }
+  }, [isReady, layerSrs, format, form]);
+
+  useEffect(() => {
     const exportFormat = exportFormats.find((f) => f.name === format);
+    const lonlat = exportFormat?.lonlat ?? null;
     const dscoCfg = (exportFormat && exportFormat.dsco_configurable) ?? [];
     let multipleFields: FormField<FormPropsKey>[] = [];
     const dscoFields: FormField<FormPropsKey>[] = [];
@@ -277,7 +300,7 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
       {
         name: "srs",
         label: gettext("SRS"),
-        formItem: <Select options={srsOptions} />,
+        formItem: <Select options={srsOptions} disabled={lonlat === "only"} />,
         included: hasGeom,
       },
       {
@@ -379,7 +402,9 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
         }}
         onChange={(e) => {
           if ("format" in e.value) {
-            setFormat(e.value.format);
+            const newFormat = e.value.format;
+            setFormat(newFormat);
+            form.setFieldValue("srs", defaultSrsForFormat(newFormat));
           }
         }}
         initialValues={initialValues}

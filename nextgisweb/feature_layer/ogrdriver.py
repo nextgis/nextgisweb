@@ -1,4 +1,4 @@
-from typing import Callable
+from typing import Callable, Literal
 
 from msgspec import Struct
 from osgeo import ogr
@@ -28,6 +28,7 @@ class OGRDriver(Struct):
     dsco_configurable: list[str] | None = None
     get_layer_name: Callable[[str], str] = lambda x: x
     geometry_types: tuple[str, ...] | None = None
+    lonlat: Literal["only", "prefer"] | None = None
 
 
 EXPORT_FORMAT_OGR = dict[str, OGRDriver]()
@@ -56,6 +57,7 @@ EXPORT_FORMAT_OGR["GeoJSON"] = OGRDriver(
     single_file=True,
     fid_support=True,
     mime="application/json",
+    lonlat="prefer",
 )
 
 EXPORT_FORMAT_OGR["ESRI Shapefile"] = OGRDriver(
@@ -79,6 +81,7 @@ EXPORT_FORMAT_OGR["CSV"] = OGRDriver(
     ),
     single_file=True,
     mime="text/csv",
+    lonlat="prefer",
 )
 
 EXPORT_FORMAT_OGR["CSV_MSEXCEL"] = OGRDriver(
@@ -94,6 +97,7 @@ EXPORT_FORMAT_OGR["CSV_MSEXCEL"] = OGRDriver(
     ),
     single_file=True,
     mime="text/csv",
+    lonlat="prefer",
 )
 
 EXPORT_FORMAT_OGR["MapInfo File (TAB)"] = OGRDriver(
@@ -118,6 +122,7 @@ EXPORT_FORMAT_OGR["KML"] = OGRDriver(
     "kml",
     single_file=True,
     mime="application/vnd.google-earth.kml+xml",
+    lonlat="only",
 )
 
 EXPORT_FORMAT_OGR["KMZ"] = OGRDriver(
@@ -126,6 +131,7 @@ EXPORT_FORMAT_OGR["KMZ"] = OGRDriver(
     "kmz",
     single_file=True,
     mime="application/vnd.google-earth.kmz",
+    lonlat="only",
 )
 
 EXPORT_FORMAT_OGR["DXF"] = OGRDriver(
@@ -143,6 +149,7 @@ EXPORT_FORMAT_OGR["GPX"] = OGRDriver(
     single_file=True,
     mime="application/gpx+xml",
     geometry_types=GEOM_TYPE.points + GEOM_TYPE.linestrings,
+    lonlat="only",
 )
 
 OGR_DRIVER_NAME_2_EXPORT_FORMATS = [
@@ -152,6 +159,7 @@ OGR_DRIVER_NAME_2_EXPORT_FORMATS = [
         "single_file": driver.single_file,
         "lco_configurable": driver.lco_configurable,
         "dsco_configurable": driver.dsco_configurable,
+        "lonlat": driver.lonlat,
     }
     for format_id, driver in EXPORT_FORMAT_OGR.items()
     if test_driver_capability(driver.name, ogr.ODrCCreateDataSource)

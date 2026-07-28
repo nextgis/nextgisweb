@@ -11,6 +11,7 @@ from nextgisweb.lib.geometry import Geometry
 
 from nextgisweb.feature_layer import FIELD_TYPE
 from nextgisweb.pyramid.test import WebTestApp
+from nextgisweb.spatial_ref_sys import SRS
 from nextgisweb.vector_layer import VectorLayer
 
 from .. import Feature
@@ -126,6 +127,76 @@ def test_field_escape(value, update_field, export_geojson):
 def test_intersects(intersects, count, export_geojson):
     geojson = export_geojson(intersects=intersects, intersects_srs=3857)
     assert len(geojson["features"]) == count
+
+
+@pytest.fixture(scope="function")
+def layer_3857():
+    with transaction.manager:
+        layer = VectorLayer(geometry_type="POINT", srs=SRS.filter_by(id=3857).one()).persist()
+        layer.setup_from_fields([dict(keyname="fid", datatype=FIELD_TYPE.STRING)])
+
+        f = Feature()
+        f.geom = Geometry.from_wkt("POINT (1000000 2000000)")
+        f.fields["fid"] = "f1"
+        layer.feature_create(f)
+
+    yield layer.id
+
+
+def _export_point(ngw_webtest_app, layer_id, *, format, srs=None):
+    qs = dict(format=format, zipped="false")
+    if srs is not None:
+        qs["srs"] = srs
+    resp = ngw_webtest_app.get(f"/api/resource/{layer_id}/export", query=qs, status=200)
+
+    extension = EXPORT_FORMAT_OGR[format].extension
+    with NamedTemporaryFile(suffix=f".{extension}") as t:
+        t.write(resp.body)
+        t.flush()
+        ds = gdal.OpenEx(t.name, 0)
+        feature = ds.GetLayer(0).GetNextFeature()
+        geom = feature.GetGeometryRef()
+        return geom.GetX(), geom.GetY()
+
+
+@pytest.mark.parametrize(
+    "format, given_srs",
+    [
+        pytest.param("KML", None, id="kml-no-srs"),
+        pytest.param("KML", 3857, id="kml-srs-ignored"),
+        pytest.param("GPX", None, id="gpx-no-srs"),
+        pytest.param("GeoJSON", None, id="geojson-no-srs"),
+    ],
+)
+def test_export_default_srs_lonlat(format, given_srs, layer_3857, ngw_webtest_app):
+    x, y = _export_point(ngw_webtest_app, layer_3857, format=format, srs=given_srs)
+    assert -180 <= x <= 180
+    assert -90 <= y <= 90
+
+
+def test_export_default_srs_layer(layer_3857, ngw_webtest_app):
+    x, y = _export_point(ngw_webtest_app, layer_3857, format="GPKG")
+    assert x == pytest.approx(1_000_000)
+    assert y == pytest.approx(2_000_000)
+
+
+def test_export_prefer_respects_explicit_srs(layer_3857, ngw_webtest_app):
+    x, y = _export_point(ngw_webtest_app, layer_3857, format="GeoJSON", srs=3857)
+    assert x == pytest.approx(1_000_000)
+    assert y == pytest.approx(2_000_000)
+
+
+def test_export_format_lonlat():
+    only = {"KML", "KMZ", "GPX"}
+    prefer = {"GeoJSON", "CSV", "CSV_MSEXCEL"}
+
+    for format_id, driver in EXPORT_FORMAT_OGR.items():
+        if format_id in only:
+            assert driver.lonlat == "only"
+        elif format_id in prefer:
+            assert driver.lonlat == "prefer"
+        else:
+            assert driver.lonlat is None
 
 
 @pytest.fixture(scope="function")

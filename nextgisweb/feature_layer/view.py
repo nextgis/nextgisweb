@@ -1,3 +1,5 @@
+from typing import Literal
+
 from msgspec import Struct
 from pyramid.httpexceptions import HTTPNotFound
 
@@ -159,6 +161,7 @@ class FeatureLayerExportFormatClientSetting(Struct, kw_only=True):
     single_file: bool
     lco_configurable: bool | None
     dsco_configurable: str | None
+    lonlat: Literal["only", "prefer"] | None
 
 
 @client_setting("exportFormats")
