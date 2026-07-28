@@ -176,7 +176,6 @@ class PostgisConnection(Resource):
         connect_timeout = int(comp.options["connect_timeout"].total_seconds())
         statement_timeout_ms = int(comp.options["statement_timeout"].total_seconds()) * 1000
         args = dict(
-            client_encoding="utf-8",
             connect_args=dict(
                 connect_timeout=connect_timeout,
                 options="-c statement_timeout=%d" % statement_timeout_ms,
