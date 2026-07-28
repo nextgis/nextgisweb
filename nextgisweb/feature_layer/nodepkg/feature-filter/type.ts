@@ -144,10 +144,10 @@ export type Operator = (typeof ValidOperators)[number];
 export type OperatorValueMap = {
   "==": ConditionValue;
   "!=": ConditionValue;
-  ">": number;
-  "<": number;
-  ">=": number;
-  "<=": number;
+  ">": string | number;
+  "<": string | number;
+  ">=": string | number;
+  "<=": string | number;
   "in": Array<string | number>;
   "!in": Array<string | number>;
   "is_null": undefined;
@@ -194,22 +194,54 @@ export const OPERATORS: OperatorOption[] = [
   {
     value: ">",
     label: gettext("Greater"),
-    supportedTypes: ["INTEGER", "BIGINT", "REAL", "DATE", "TIME", "DATETIME"],
+    supportedTypes: [
+      "STRING",
+      "INTEGER",
+      "BIGINT",
+      "REAL",
+      "DATE",
+      "TIME",
+      "DATETIME",
+    ],
   },
   {
     value: "<",
     label: gettext("Less"),
-    supportedTypes: ["INTEGER", "BIGINT", "REAL", "DATE", "TIME", "DATETIME"],
+    supportedTypes: [
+      "STRING",
+      "INTEGER",
+      "BIGINT",
+      "REAL",
+      "DATE",
+      "TIME",
+      "DATETIME",
+    ],
   },
   {
     value: ">=",
     label: gettext("Greater or equal"),
-    supportedTypes: ["INTEGER", "BIGINT", "REAL", "DATE", "TIME", "DATETIME"],
+    supportedTypes: [
+      "STRING",
+      "INTEGER",
+      "BIGINT",
+      "REAL",
+      "DATE",
+      "TIME",
+      "DATETIME",
+    ],
   },
   {
     value: "<=",
     label: gettext("Less or equal"),
-    supportedTypes: ["INTEGER", "BIGINT", "REAL", "DATE", "TIME", "DATETIME"],
+    supportedTypes: [
+      "STRING",
+      "INTEGER",
+      "BIGINT",
+      "REAL",
+      "DATE",
+      "TIME",
+      "DATETIME",
+    ],
   },
   {
     value: "in",

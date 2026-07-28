@@ -277,6 +277,49 @@ FILTER_REGISTRY: list[FilterCase] = [
         "__fid__ = 102",
         True,
     ),
+    # String comparison
+    FilterCase(
+        "gt_name",
+        [">", ["get", "name"], "Charlie"],
+        {"Diana", "Eve"},
+        "name > 'Charlie'",
+        True,
+    ),
+    FilterCase(
+        "ge_name",
+        [">=", ["get", "name"], "Charlie"],
+        {"Charlie", "Diana", "Eve"},
+        "name >= 'Charlie'",
+        True,
+    ),
+    FilterCase(
+        "lt_name",
+        ["<", ["get", "name"], "Charlie"],
+        {"Alice", "Bob"},
+        "name < 'Charlie'",
+        True,
+    ),
+    FilterCase(
+        "le_name",
+        ["<=", ["get", "name"], "Charlie"],
+        {"Alice", "Bob", "Charlie"},
+        "name <= 'Charlie'",
+        True,
+    ),
+    FilterCase(
+        "gt_city",
+        [">", ["get", "city"], "NYC"],
+        {"Diana"},
+        "city > 'NYC'",
+        True,
+    ),
+    FilterCase(
+        "lt_city",
+        ["<", ["get", "city"], "NYC"],
+        {"Bob"},
+        "city < 'NYC'",
+        True,
+    ),
     # Lists and inclusions
     FilterCase(
         "in_names",

@@ -770,8 +770,7 @@ Condition expressions:
 - ["!ilike", ["get", "field"], "%pattern%"] — does not match
 
 Operator support by field type (use ONLY these combinations):
-- STRING: ==, !=, in, !in, is_null, !is_null, ilike, !ilike
-  (do NOT use >, <, >=, <= on STRING — use ilike for text pattern matching instead)
+- STRING: ==, !=, >, <, >=, <=, in, !in, is_null, !is_null, ilike, !ilike
 - INTEGER, REAL: ==, !=, >, <, >=, <=, in, !in, is_null, !is_null (values are numbers)
 - BIGINT: ==, !=, >, <, >=, <=, in, !in, is_null, !is_null (values must be strings, e.g. "123456789")
 - DATE: ==, !=, >, <, >=, <=, is_null, !is_null (values as "YYYY-MM-DD")
