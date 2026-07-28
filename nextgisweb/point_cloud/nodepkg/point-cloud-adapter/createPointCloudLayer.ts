@@ -6,7 +6,7 @@ import { unByKey } from "ol/Observable";
 import { asArray as colorAsArray } from "ol/color";
 import type { EventsKey } from "ol/events";
 import Point from "ol/geom/Point";
-import WebGLPointsLayer from "ol/layer/WebGLPoints";
+import WebGLVectorLayer from "ol/layer/WebGLVector";
 import { getTransform } from "ol/proj";
 import { Vector as VectorSource } from "ol/source";
 import type { Options as VectorSourceOptions } from "ol/source/Vector";
@@ -412,7 +412,7 @@ function makeRawPointLoader(
 
 class PointCloudLayer extends CoreLayer<
   VectorSource,
-  WebGLPointsLayer<VectorSource>,
+  WebGLVectorLayer<VectorSource>,
   VectorSourceOptions
 > {
   private readonly item: LayerItemConfig;
@@ -456,7 +456,7 @@ class PointCloudLayer extends CoreLayer<
   }
 
   protected createLayer(options: LayerOptions & { source: VectorSource }) {
-    return new WebGLPointsLayer({
+    return new WebGLVectorLayer({
       source: options.source,
       style: createWebGLPointStyle(),
       variables: {
