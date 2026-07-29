@@ -45,7 +45,7 @@ msgstr "Клонировать"
 msgid "Resource group"
 msgstr "Группа ресурсов"
 
-#: nodepkg/clone-webmap/CloneWebmap.tsx:78 nodepkg/items-widget/ItemsWidget.tsx:31
+#: nodepkg/clone-webmap/CloneWebmap.tsx:78 nodepkg/items-widget/ItemsWidget.tsx:39
 msgid "Display name"
 msgstr "Наименование"
 
@@ -151,67 +151,71 @@ msgstr "Порядок рисования по умолчанию"
 msgid "Group members have errors"
 msgstr "Ошибка в участниках группы"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:32
+#: nodepkg/items-widget/ItemsWidget.tsx:40
 msgid "Expanded"
 msgstr "Развернута"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:33
+#: nodepkg/items-widget/ItemsWidget.tsx:41
 msgid "Exclusive"
 msgstr "Взаимоисключающая"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:34
+#: nodepkg/items-widget/ItemsWidget.tsx:42
 msgid "Enabled"
 msgstr "Включен"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:35
+#: nodepkg/items-widget/ItemsWidget.tsx:43
 #: nodepkg/plugin/layer-identifiable/LayerIdentifiablePlugin.tsx:26
 msgid "Identifiable"
 msgstr "Идентифицируемый"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:36
+#: nodepkg/items-widget/ItemsWidget.tsx:44
 msgid "Resource"
 msgstr "Ресурс"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:37
+#: nodepkg/items-widget/ItemsWidget.tsx:45
 msgid "Transparency"
 msgstr "Прозрачность"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:38
+#: nodepkg/items-widget/ItemsWidget.tsx:46
 msgid "Min scale"
 msgstr "Мин. масштаб"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:39
+#: nodepkg/items-widget/ItemsWidget.tsx:47
 msgid "Max scale"
 msgstr "Макс. масштаб"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:40
+#: nodepkg/items-widget/ItemsWidget.tsx:48
 #: nodepkg/panel/print/component/PrintElementsSettings.tsx:25
 #: nodepkg/settings-widget/SettingsWidget.tsx:27
 #: nodepkg/settings/SettingsForm.tsx:234
 msgid "Legend"
 msgstr "Легенда"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:41
+#: nodepkg/items-widget/ItemsWidget.tsx:49
 msgid "Adapter"
 msgstr "Адаптер"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:42
+#: nodepkg/items-widget/ItemsWidget.tsx:50
 msgid "Layer"
 msgstr "Слой"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:43
+#: nodepkg/items-widget/ItemsWidget.tsx:51
 msgid "Group"
 msgstr "Группа"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:44
+#: nodepkg/items-widget/ItemsWidget.tsx:52
 msgid "Edit draw order"
 msgstr "Изменить порядок рисования"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:45
+#: nodepkg/items-widget/ItemsWidget.tsx:53
 msgid "Customize draw order"
 msgstr "Настроить порядок рисования"
 
-#: nodepkg/items-widget/ItemsWidget.tsx:267 nodepkg/panel/layers/plugin.tsx:11
+#: nodepkg/items-widget/ItemsWidget.tsx:54
+msgid "Use current map scale"
+msgstr "Использовать текущий масштаб карты"
+
+#: nodepkg/items-widget/ItemsWidget.tsx:312 nodepkg/panel/layers/plugin.tsx:15
 msgid "Layers"
 msgstr "Слои"
 
@@ -285,12 +289,12 @@ msgid "Current zoom level"
 msgstr "Текущий зум"
 
 #: nodepkg/map-component/control/ZoomControl.tsx:81
-#: nodepkg/map-component/tool/ToolZoom.tsx:22 nodepkg/map-controls/map-tools.ts:10
+#: nodepkg/map-component/tool/ToolZoom.tsx:22 nodepkg/map-controls/map-tools.ts:19
 msgid "Zoom in"
 msgstr "Приблизить"
 
 #: nodepkg/map-component/control/ZoomControl.tsx:82
-#: nodepkg/map-component/tool/ToolZoom.tsx:22 nodepkg/map-controls/map-tools.ts:20
+#: nodepkg/map-component/tool/ToolZoom.tsx:22 nodepkg/map-controls/map-tools.ts:29
 msgid "Zoom out"
 msgstr "Отодвинуть"
 
@@ -299,12 +303,12 @@ msgid "Back to the initial extent"
 msgstr "Вернуться к начальному охвату"
 
 #: nodepkg/map-component/tool/ToolMeasure/ToolMeasure.tsx:67
-#: nodepkg/map-controls/map-tools.ts:40
+#: nodepkg/map-controls/map-tools.ts:49
 msgid "Measure distance"
 msgstr "Измерение расстояния"
 
 #: nodepkg/map-component/tool/ToolMeasure/ToolMeasure.tsx:68
-#: nodepkg/map-controls/map-tools.ts:50
+#: nodepkg/map-controls/map-tools.ts:59
 msgid "Measure area"
 msgstr "Измерение площади"
 
@@ -337,7 +341,7 @@ msgid "Layer is not visible"
 msgstr "Слой не включен"
 
 #: nodepkg/map-component/tool/ToolSwipe/ToolSwipe.tsx:46
-#: nodepkg/map-controls/map-tools.ts:30
+#: nodepkg/map-controls/map-tools.ts:39
 msgid "Vertical swipe"
 msgstr "Вертикальная шторка"
 
@@ -345,42 +349,42 @@ msgstr "Вертикальная шторка"
 msgid "Horizontal swipe"
 msgstr "Горизонтальная шторка"
 
-#: nodepkg/map-controls/map-controls.ts:9
+#: nodepkg/map-controls/map-controls.ts:42
 msgid "Attribution toolbar"
 msgstr "Панель атрибутов"
 
-#: nodepkg/map-controls/map-controls.ts:24
+#: nodepkg/map-controls/map-controls.ts:57
 msgid "Map toolbar"
 msgstr "Панель инструментов карты"
 
-#: nodepkg/map-controls/map-controls.ts:60
+#: nodepkg/map-controls/map-controls.ts:93
 msgid "Info scale"
 msgstr "Числовой масштаб"
 
-#: nodepkg/map-controls/map-controls.ts:70
+#: nodepkg/map-controls/map-controls.ts:103
 msgid "Scale line"
 msgstr "Линейка масштаба"
 
-#: nodepkg/map-controls/map-controls.ts:81
+#: nodepkg/map-controls/map-controls.ts:114
 msgid "Loading indicator"
 msgstr "Индикатор загрузки"
 
-#: nodepkg/map-controls/map-controls.ts:93
+#: nodepkg/map-controls/map-controls.ts:125
 #: nodepkg/settings-widget/SettingsWidget.tsx:24
 msgid "Initial extent"
 msgstr "Начальный охват"
 
-#: nodepkg/map-controls/map-controls.ts:102
+#: nodepkg/map-controls/map-controls.ts:134
 msgid "Locate me"
 msgstr "Определить мое местоположение"
 
-#: nodepkg/map-controls/map-controls.ts:111
-#: nodepkg/map-controls/map-controls.ts:116 nodepkg/settings/SettingsForm.tsx:81
+#: nodepkg/map-controls/map-controls.ts:143
+#: nodepkg/map-controls/map-controls.ts:148 nodepkg/settings/SettingsForm.tsx:81
 #: option/base.py:39
 msgid "Identification"
 msgstr "Идентификация"
 
-#: nodepkg/map-controls/map-tools.ts:60
+#: nodepkg/map-controls/map-tools.ts:69
 msgid "Cursor coordinates / extent"
 msgstr "Координаты курсора / охвата"
 
@@ -443,12 +447,12 @@ msgstr "Мои приватные аннотации"
 msgid "Other private annotations"
 msgstr "Другие приватные аннотации"
 
-#: nodepkg/panel/annotations/plugin.tsx:16
+#: nodepkg/panel/annotations/plugin.tsx:17
 #: nodepkg/settings-widget/SettingsWidget.tsx:28
 msgid "Annotations"
 msgstr "Аннотации"
 
-#: nodepkg/panel/bookmarks/plugin.tsx:12
+#: nodepkg/panel/bookmarks/plugin.tsx:16
 #: nodepkg/settings-widget/SettingsWidget.tsx:30
 msgid "Bookmarks"
 msgstr "Закладки"
@@ -457,7 +461,7 @@ msgstr "Закладки"
 msgid "Contact Web GIS administrator"
 msgstr "Связаться с администратором Веб ГИС"
 
-#: nodepkg/panel/description/plugin.tsx:11
+#: nodepkg/panel/description/plugin.tsx:15
 #: nodepkg/plugin/layer-info/LayerInfoPlugin.tsx:42
 msgid "Description"
 msgstr "Описание"
@@ -486,7 +490,7 @@ msgstr "Увеличить до точки идентификации"
 msgid "Copy identification point coordinates"
 msgstr "Скопировать координаты точки идентификации"
 
-#: nodepkg/panel/identify/FeatureEditButton.tsx:78
+#: nodepkg/panel/identify/FeatureEditButton.tsx:82
 msgid "Edit feature"
 msgstr "Редактировать объект"
 
@@ -514,11 +518,11 @@ msgstr "Атрибут"
 msgid "Value"
 msgstr "Значение"
 
-#: nodepkg/panel/identify/component/FeatureInfoSection.tsx:68
+#: nodepkg/panel/identify/component/FeatureInfoSection.tsx:67
 msgid "Attributes"
 msgstr "Атрибуты"
 
-#: nodepkg/panel/identify/component/FeatureInfoSection.tsx:82
+#: nodepkg/panel/identify/component/FeatureInfoSection.tsx:84
 msgid "Geometry"
 msgstr "Геометрия"
 
@@ -534,7 +538,7 @@ msgstr "Растр"
 msgid "N/A"
 msgstr "Н/Д"
 
-#: nodepkg/panel/identify/plugin.tsx:13 nodepkg/store/Identify.ts:42
+#: nodepkg/panel/identify/plugin.tsx:17 nodepkg/store/Identify.ts:42
 msgid "Identify"
 msgstr "Идентификация"
 
@@ -667,7 +671,7 @@ msgstr "TIFF"
 msgid "PDF"
 msgstr "PDF"
 
-#: nodepkg/panel/print/plugin.tsx:11
+#: nodepkg/panel/print/plugin.tsx:15
 msgid "Print map"
 msgstr "Распечатать карту"
 
@@ -683,7 +687,7 @@ msgstr "Не найдено"
 msgid "Refine search criterion. Displayed first 100 search results."
 msgstr "Уточните критерий поиска. Отображены первые 100 результатов поиска."
 
-#: nodepkg/panel/search/plugin.tsx:12
+#: nodepkg/panel/search/plugin.tsx:16
 msgid "Search"
 msgstr "Поиск"
 
@@ -777,7 +781,7 @@ msgstr "Копировать код"
 msgid "Preview"
 msgstr "Предпросмотр"
 
-#: nodepkg/panel/share/plugin.tsx:12
+#: nodepkg/panel/share/plugin.tsx:16
 msgid "Share"
 msgstr "Поделиться"
 
@@ -840,14 +844,10 @@ msgstr "Изменить"
 msgid "Move"
 msgstr "Переместить"
 
-#: nodepkg/plugin/layer-properties/LayerPropertiesModal.tsx:20
+#: nodepkg/plugin/layer-properties/LayerPropertiesModal.tsx:18
 #: nodepkg/plugin/layer-properties/LayerPropertiesPlugin.tsx:24
 msgid "Layer properties"
 msgstr "Свойства слоя"
-
-#: nodepkg/plugin/layer-properties/LayerPropertiesModal.tsx:21
-msgid "Use current map scale"
-msgstr "Использовать текущий масштаб карты"
 
 #: nodepkg/plugin/layer-remove/LayerRemovePlugin.tsx:15
 msgid "Remove layer"
@@ -955,11 +955,15 @@ msgstr "Включить"
 msgid "Settings"
 msgstr "Настройки"
 
-#: nodepkg/settings-widget/component/ComputeWebmapExtent.tsx:20
+#: nodepkg/settings-widget/component/ComputeWebmapExtent.tsx:24
 msgid "Compute extent from all added layers"
 msgstr "Вычислить охват из всех слоев"
 
-#: nodepkg/settings/Settings.tsx:62
+#: nodepkg/settings-widget/component/ComputeWebmapExtent.tsx:25
+msgid "Use current map extent"
+msgstr "Использовать текущий охват карты"
+
+#: nodepkg/settings/Settings.tsx:63
 msgid "Settings saved"
 msgstr "Настройки сохранены"
 

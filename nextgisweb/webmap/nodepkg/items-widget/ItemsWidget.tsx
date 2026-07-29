@@ -3,7 +3,13 @@ import { observer } from "mobx-react-lite";
 import { useMemo, useState } from "react";
 import type { ComponentProps, ReactNode } from "react";
 
-import { CheckboxValue, InputValue, Select, Space } from "@nextgisweb/gui/antd";
+import {
+  Button,
+  CheckboxValue,
+  InputValue,
+  Select,
+  Space,
+} from "@nextgisweb/gui/antd";
 import { LotMV } from "@nextgisweb/gui/arm";
 import { InputOpacity, InputScaleDenom } from "@nextgisweb/gui/component";
 import { FocusTable, action } from "@nextgisweb/gui/focus-table";
@@ -18,12 +24,14 @@ import { getEffectiveDisplayName } from "@nextgisweb/resource/util/getEffectiveD
 import settings from "@nextgisweb/webmap/client-settings";
 
 import { SelectLegendSymbols } from "../component";
+import { useOptionalDisplayContext } from "../display/context";
 
 import { DrawOrderTable } from "./DrawOrder";
 import { Group, Layer } from "./Item";
 import type { ItemObject } from "./Item";
 import type { ItemsStore } from "./ItemsStore";
 
+import CurrentScaleIcon from "@nextgisweb/icon/material/my_location";
 import ReorderIcon from "@nextgisweb/icon/material/reorder";
 
 const { adapters } = settings;
@@ -43,11 +51,10 @@ const msgLayer = gettext("Layer");
 const msgGroup = gettext("Group");
 const msgDrawOrderEdit = gettext("Edit draw order");
 const msgDrawOrderCustomize = gettext("Customize draw order");
+const msgUseCurrentScale = gettext("Use current map scale");
 
 export interface LayerWidgetProps {
   item: Layer;
-  minScaleDenomAddon?: ReactNode;
-  maxScaleDenomAddon?: ReactNode;
 }
 
 const GroupWidget = observer(({ item }: { item: Group }) => {
@@ -101,85 +108,123 @@ function ScaleDenomInput({ addon, style, ...props }: ScaleDenomInputProps) {
   );
 }
 
-export const LayerWidget = observer(
-  ({ item, minScaleDenomAddon, maxScaleDenomAddon }: LayerWidgetProps) => {
-    return (
-      <Area pad cols={2}>
-        <LotMV
-          row
-          label={msgDisplayName}
-          value={item.displayName}
-          component={InputValue}
-        />
-        <Lot row>
-          <Space size="middle">
-            <CheckboxValue {...item.layerEnabled.cprops()}>
-              {msgEnabled}
-            </CheckboxValue>
-            <CheckboxValue {...item.layerIdentifiable.cprops()}>
-              {msgIdentifiable}
-            </CheckboxValue>
-          </Space>
-        </Lot>
-        <LotMV
-          row
-          label={msgResource}
-          value={item.layerStyleId}
-          component={ResourceSelect}
-          props={{
-            readOnly: true,
-            style: { width: "100%" },
-            pickerOptions: {
-              initParentId: item.store.composite.parent,
-            },
-          }}
-        />
-        <LotMV
-          label={msgMinScaleDenom}
-          value={item.layerMinScaleDenom}
-          component={ScaleDenomInput}
-          props={{
-            addon: minScaleDenomAddon,
-            style: { width: "100%" },
-          }}
-        />
-        <LotMV
-          label={msgMaxScaleDenom}
-          value={item.layerMaxScaleDenom}
-          component={ScaleDenomInput}
-          props={{
-            addon: maxScaleDenomAddon,
-            style: { width: "100%" },
-          }}
-        />
-        <LotMV
-          row
-          label={msgLegendSymbols}
-          value={item.layerLegendSymbols}
-          component={SelectLegendSymbols}
-          props={{ allowClear: true, style: { width: "100%" } }}
-        />
-        <LotMV
-          row
-          label={msgAdapter}
-          value={item.layerAdapter}
-          component={Select<string>}
-          props={{
-            style: { width: "100%" },
-            options: adapterOptions,
-          }}
-        />
-        <LotMV
-          row
-          label={msgTransparency}
-          value={item.layerTransparency}
-          component={InputOpacity}
-          props={{ alphaMode: "transparency", valuePercent: true }}
-        />
-      </Area>
-    );
-  }
-);
+function CurrentScaleButton({ onClick }: { onClick: () => void }) {
+  return (
+    <Button
+      icon={<CurrentScaleIcon />}
+      size="small"
+      title={msgUseCurrentScale}
+      type="text"
+      onClick={onClick}
+    />
+  );
+}
+
+export const LayerWidget = observer(({ item }: LayerWidgetProps) => {
+  const displayContext = useOptionalDisplayContext();
+
+  const applyCurrentScale = (setValue: (value: number) => void) => {
+    const scale = displayContext?.display.map.scale;
+    if (scale === undefined) return;
+
+    setValue(Math.round(scale));
+  };
+
+  const minScaleDenomAddon = displayContext ? (
+    <CurrentScaleButton
+      onClick={() =>
+        applyCurrentScale((value) => {
+          item.layerMinScaleDenom.value = value;
+        })
+      }
+    />
+  ) : undefined;
+  const maxScaleDenomAddon = displayContext ? (
+    <CurrentScaleButton
+      onClick={() =>
+        applyCurrentScale((value) => {
+          item.layerMaxScaleDenom.value = value;
+        })
+      }
+    />
+  ) : undefined;
+
+  return (
+    <Area pad cols={2}>
+      <LotMV
+        row
+        label={msgDisplayName}
+        value={item.displayName}
+        component={InputValue}
+      />
+      <Lot row>
+        <Space size="middle">
+          <CheckboxValue {...item.layerEnabled.cprops()}>
+            {msgEnabled}
+          </CheckboxValue>
+          <CheckboxValue {...item.layerIdentifiable.cprops()}>
+            {msgIdentifiable}
+          </CheckboxValue>
+        </Space>
+      </Lot>
+      <LotMV
+        row
+        label={msgResource}
+        value={item.layerStyleId}
+        component={ResourceSelect}
+        props={{
+          readOnly: true,
+          style: { width: "100%" },
+          pickerOptions: {
+            initParentId: item.store.composite.parent,
+          },
+        }}
+      />
+      <LotMV
+        label={msgMinScaleDenom}
+        value={item.layerMinScaleDenom}
+        component={ScaleDenomInput}
+        props={{
+          addon: minScaleDenomAddon,
+          style: { width: "100%" },
+        }}
+      />
+      <LotMV
+        label={msgMaxScaleDenom}
+        value={item.layerMaxScaleDenom}
+        component={ScaleDenomInput}
+        props={{
+          addon: maxScaleDenomAddon,
+          style: { width: "100%" },
+        }}
+      />
+      <LotMV
+        row
+        label={msgLegendSymbols}
+        value={item.layerLegendSymbols}
+        component={SelectLegendSymbols}
+        props={{ allowClear: true, style: { width: "100%" } }}
+      />
+      <LotMV
+        row
+        label={msgAdapter}
+        value={item.layerAdapter}
+        component={Select<string>}
+        props={{
+          style: { width: "100%" },
+          options: adapterOptions,
+        }}
+      />
+      <LotMV
+        row
+        label={msgTransparency}
+        value={item.layerTransparency}
+        component={InputOpacity}
+        props={{ alphaMode: "transparency", valuePercent: true }}
+      />
+    </Area>
+  );
+});
 
 GroupWidget.displayName = "GroupWidget";
 LayerWidget.displayName = "LayerWidget";
