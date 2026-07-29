@@ -4,10 +4,14 @@ import string
 from calendar import timegm
 from collections import defaultdict
 from collections.abc import Sequence
+from functools import cache
 from pathlib import Path
 from threading import Thread
 from time import sleep
-from typing import Any
+from typing import Any, Literal
+
+from babel import Locale
+from babel.core import UnknownLocaleError
 
 from nextgisweb.lib.logging import logger
 
@@ -104,6 +108,15 @@ def parse_origin(url):
     if is_wildcard:
         domain = wildcard + domain
     return is_wildcard, scheme, domain, port
+
+
+@cache
+def get_text_direction(code: str) -> Literal["ltr", "rtl"]:
+    try:
+        locale = Locale.parse(code, sep="-")
+    except UnknownLocaleError:
+        return "ltr"
+    return locale.text_direction  # ty:ignore[invalid-return-type]
 
 
 def set_output_buffering(request, response, value, *, strict=False):

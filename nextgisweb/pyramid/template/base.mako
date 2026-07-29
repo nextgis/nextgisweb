@@ -4,6 +4,7 @@
     from types import SimpleNamespace
     from nextgisweb.pyramid.breadcrumb import breadcrumb_path
     from nextgisweb.pyramid.view import ICON_JSENTRY, LAYOUT_JSENTRY
+    from nextgisweb.pyramid.util import get_text_direction
 %>
 
 <%
@@ -26,7 +27,7 @@
     head_title = (tr(effective_title) + " | " + system_name) if (effective_title is not None) else system_name
 %>
 
-<html>
+<html lang="${request.locale_name}" dir="${get_text_direction(request.locale_name)}">
 <head>
     <title>${head_title}</title>
     <meta charset="utf-8">
