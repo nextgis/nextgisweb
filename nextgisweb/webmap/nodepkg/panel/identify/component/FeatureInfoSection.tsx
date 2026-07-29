@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import type { ReactElement } from "react";
 
 import GeometryInfo from "@nextgisweb/feature-layer/geometry-info";
@@ -42,8 +42,7 @@ export function FeatureInfoSection({
     const makeExtensionComps = async () => {
       const newExtComps: ReactElement[] = [];
       const extensionsComp = await getExtensionsComps();
-      extensionsComp.forEach((comp, key) => {
-        const ExtensionComponent = lazy(comp);
+      extensionsComp.forEach((ExtensionComponent, key) => {
         newExtComps.push(
           <ExtensionComponent
             key={key}

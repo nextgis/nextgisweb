@@ -3,13 +3,13 @@ import { useCallback, useEffect, useState } from "react";
 import { Modal } from "@nextgisweb/gui/antd";
 
 import { ResourcePickerCard } from "./ResourcePickerCard";
-import usePickerModal from "./hook/usePickerModal";
 import { ResourcePickerStore } from "./store/ResourcePickerStore";
 import type {
   ResourcePickerAttr,
   ResourcePickerModalProps,
   SelectValue,
 } from "./type";
+import getPickerModalProps from "./util/getPickerModalProps";
 
 import "./ResourcePickerModal.less";
 
@@ -30,7 +30,7 @@ function ResourcePickerModal<V extends SelectValue = SelectValue>({
     () => storeProp || new ResourcePickerStore(pickerOptions)
   );
 
-  const { modalProps, cardProps } = usePickerModal({
+  const { modalProps, cardProps } = getPickerModalProps({
     height: height_,
     cardOptions,
     ...rest,

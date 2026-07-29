@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useEffectEvent, useState } from "react";
 import type { ReactNode } from "react";
 
 import { Button, Form, Popconfirm, Space, message } from "@nextgisweb/gui/antd";
 import type { FormInstance } from "@nextgisweb/gui/antd";
 import { LoadingWrapper, SaveButton } from "@nextgisweb/gui/component";
-import { errorModal } from "@nextgisweb/gui/error";
+import { errorModal, isAbortError } from "@nextgisweb/gui/error";
 import { FieldsForm } from "@nextgisweb/gui/fields-form";
 import type { FormField, FormProps } from "@nextgisweb/gui/fields-form";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
@@ -33,11 +33,11 @@ export interface Model {
   browse: RouteName;
 }
 
-interface ModelFormProps extends FormProps {
+interface ModelFormProps extends Omit<FormProps, "initialValues"> {
   id?: number;
   children?: ReactNode;
   model: Model;
-  value?: unknown;
+  initialValues?: Record<string, unknown>;
   fields: FormField[];
   form?: FormInstance;
   onChange?: (val: { value: unknown }) => void;
@@ -58,6 +58,7 @@ export function ModelForm(props: ModelFormProps) {
     id,
     model: m,
     fields,
+    initialValues: defaultValues,
     children,
     messages: msg,
     allowDelete: allowDelete_,
@@ -146,7 +147,7 @@ export function ModelForm(props: ModelFormProps) {
     }
   };
 
-  async function setInitialValues() {
+  const setInitialValues = useEffectEvent(async () => {
     setStatus("loading");
     const initialValues: Record<string, unknown> = {};
     if (id) {
@@ -158,23 +159,24 @@ export function ModelForm(props: ModelFormProps) {
         if (formProps.onChange) {
           formProps.onChange({ value: initialValues });
         }
-      } catch {
+      } catch (err) {
+        if (isAbortError(err)) return;
         // model item is not exist handler
       }
     }
-    for (const f of fields) {
-      if (f.value !== undefined && initialValues[f.name] === undefined) {
-        if (typeof f.value === "function") {
-          initialValues[f.name] = f.value(initialValues);
+    for (const [name, defaultValue] of Object.entries(defaultValues ?? {})) {
+      if (defaultValue !== undefined && initialValues[name] === undefined) {
+        if (typeof defaultValue === "function") {
+          initialValues[name] = defaultValue(initialValues);
         } else {
-          initialValues[f.name] = f.value;
+          initialValues[name] = defaultValue;
         }
       }
     }
     setValue(initialValues);
 
     setStatus(null);
-  }
+  });
 
   useKeydownListener("Enter", submit);
 

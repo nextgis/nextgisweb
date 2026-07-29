@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import type { ReactElement } from "react";
 
 import { Divider, Dropdown } from "@nextgisweb/gui/antd";
@@ -152,8 +152,11 @@ export function DropdownActions(props: DropdownActionsProps) {
               label: title,
             });
           } else if (render) {
-            const RenderedPlugin = () => render.call(plugin, pluginInfo);
-            newCustomMenuItems.push(<RenderedPlugin key={keyPlugin} />);
+            newCustomMenuItems.push(
+              <Fragment key={keyPlugin}>
+                {render.call(plugin, pluginInfo)}
+              </Fragment>
+            );
           }
         }
       }

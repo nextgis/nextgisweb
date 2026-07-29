@@ -1,14 +1,16 @@
 /** @registry  */
 import type Control from "ol/control/Control";
-import type { FC } from "react";
+import { lazy } from "react";
+import type { FC, LazyExoticComponent } from "react";
 
 import { pluginRegistry } from "@nextgisweb/jsrealm/plugin";
-import type { ImportCallback } from "@nextgisweb/jsrealm/plugin";
 import type { TargetPosition } from "@nextgisweb/webmap/control-container/ControlContainer";
 import type { ControlProps } from "@nextgisweb/webmap/map-component";
 import type { OlControlProps } from "@nextgisweb/webmap/map-component/control/OlControl";
 
-export type MapControlPluginWidget<P> = ImportCallback<FC<ControlProps<P>>>;
+export type MapControlPluginWidget<P> = LazyExoticComponent<
+  FC<ControlProps<P>>
+>;
 
 export type EmbeddedShowMode = "always" | "customize";
 
@@ -25,6 +27,10 @@ export interface MapControlPlugin<P = any> {
 }
 
 export const registry = pluginRegistry<MapControlPlugin>(MODULE_NAME);
+
+const OlControlLazy = lazy(
+  () => import("@nextgisweb/webmap/map-component/control/OlControl")
+);
 
 export function mapControlRegistry<P>(
   compId: string,
@@ -43,8 +49,7 @@ export async function olControlRegistry<T extends Control>(
 ) {
   mapControlRegistry(compId, {
     key,
-    component: () =>
-      import("@nextgisweb/webmap/map-component/control/OlControl"),
+    component: OlControlLazy,
     props: { ctor },
     ...props,
   });

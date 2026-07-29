@@ -1,9 +1,9 @@
 import { isEqual } from "lodash-es";
-import { Suspense, lazy, useEffect, useMemo, useState } from "react";
-import type { FC } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
+import type { ComponentType } from "react";
 
 import { Button, Card, Dropdown, Tabs, message } from "@nextgisweb/gui/antd";
-import { SaveButton } from "@nextgisweb/gui/component";
+import { CentralLoading, SaveButton } from "@nextgisweb/gui/component";
 import { errorModal } from "@nextgisweb/gui/error";
 import { useUnsavedChanges } from "@nextgisweb/gui/hook";
 import type { Metrics } from "@nextgisweb/pyramid/type/api";
@@ -24,10 +24,6 @@ msgSuccessReload = gettext("Reload the page to get them applied."),
 msgInfo1 = gettext("Add one or more counters to your Web GIS."),
 msgInfo2 = gettext("HTML code of these counters will be embeded into each page and will allow you to track user activity.");
 
-type WidgetComponent = {
-  [K in keyof Metrics]-?: FC<TabProps<K>>;
-}[keyof Metrics];
-
 export function MetricsSettings() {
   const [initial, setInitial] = useState<Metrics>();
   const [value, setValue] = useState<Metrics>();
@@ -36,7 +32,6 @@ export function MetricsSettings() {
 
   const tabs = useMemo(() => {
     return registry.queryAll().map(({ key, label, widget }) => {
-      const Widget = lazy<WidgetComponent>(widget);
       const onChange = (value: TabValue | null) => {
         setValue((stateValue) => ({
           ...stateValue,
@@ -47,11 +42,8 @@ export function MetricsSettings() {
       return {
         key,
         label,
-        component: (props: Omit<TabProps, "onChange">) => (
-          <Suspense>
-            <Widget onChange={onChange} {...props} />
-          </Suspense>
-        ),
+        Widget: widget as ComponentType<TabProps>,
+        onChange,
       };
     });
   }, []);
@@ -80,13 +72,17 @@ export function MetricsSettings() {
     const aitems = [];
     const readonly = status !== null;
 
-    for (const { key, label, component: Component } of tabs) {
+    for (const { key, label, Widget, onChange } of tabs) {
       const val = value[key];
       if (val !== undefined) {
         titems.push({
           key: key,
           label: label,
-          children: <Component value={val} readonly={readonly} />,
+          children: (
+            <Suspense fallback={<CentralLoading />}>
+              <Widget value={val} readonly={readonly} onChange={onChange} />
+            </Suspense>
+          ),
         });
       } else {
         aitems.push({ key, label });

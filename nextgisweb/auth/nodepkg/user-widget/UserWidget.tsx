@@ -97,22 +97,16 @@ export function UserWidget({ id, readonly }: UserWidgetProps) {
         name: "member_of",
         label: gettext("Groups"),
         formItem: <PrincipalSelect model="group" multiple editOnClick />,
-        value:
-          group && isNewUser
-            ? group.filter((g) => g.register).map((g) => g.id)
-            : [],
       },
       {
         name: "permissions",
         label: gettext("Permissions"),
         formItem: <PermissionSelect multiple />,
-        value: [],
       },
       {
         name: "language",
         label: gettext("Language"),
         formItem: <LanguageSelect />,
-        value: null,
       },
       {
         name: "description",
@@ -120,7 +114,7 @@ export function UserWidget({ id, readonly }: UserWidgetProps) {
         formItem: <Input.TextArea />,
       },
     ];
-  }, [group, isNewUser, showFullColumns]);
+  }, [isNewUser, showFullColumns]);
 
   const infoNGID = useMemo(
     () =>
@@ -151,6 +145,14 @@ export function UserWidget({ id, readonly }: UserWidgetProps) {
       {infoNGID}
       <ModelForm
         fields={fields}
+        initialValues={{
+          member_of:
+            group && isNewUser
+              ? group.filter((g) => g.register).map((g) => g.id)
+              : [],
+          permissions: [],
+          language: null,
+        }}
         readonly={readonly}
         model={model}
         id={id}

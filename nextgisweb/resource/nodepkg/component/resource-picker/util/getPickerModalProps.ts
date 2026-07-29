@@ -2,7 +2,7 @@ import type { CardProps, ModalProps } from "@nextgisweb/gui/antd";
 
 import type { UsePickerModalProps } from "../type";
 
-const usePickerModal = ({
+const getPickerModalProps = ({
   cardOptions = {},
   height = 600,
   cardTitleHeight = 58,
@@ -53,4 +53,4 @@ const usePickerModal = ({
   return { modalProps, cardProps };
 };
 
-export default usePickerModal;
+export default getPickerModalProps;

@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { Suspense, lazy, useMemo } from "react";
+import { Suspense, useMemo } from "react";
 
 import { Tabs } from "@nextgisweb/gui/antd";
 import type { TabsProps } from "@nextgisweb/gui/antd";
@@ -10,11 +10,7 @@ import type { Display } from "../Display";
 import "./PanelSwitcher.css";
 
 const PanelRender = observer(({ panel }: { panel: PanelStore }) => {
-  const Loader = useMemo(() => {
-    return lazy(async () => {
-      return { default: await panel.load() };
-    });
-  }, [panel]);
+  const Loader = panel.plugin.widget;
 
   return (
     <Suspense fallback={null}>

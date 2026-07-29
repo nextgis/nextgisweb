@@ -24,7 +24,6 @@ export function FormItem({
   formItem,
   rules = [],
   included: _,
-  value: __,
   ...restProps
 }: FormField) {
   const newRules = [...rules, ...createRules(required, requiredMessage)];

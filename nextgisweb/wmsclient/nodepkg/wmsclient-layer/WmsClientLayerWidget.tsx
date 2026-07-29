@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { useEffect, useMemo, useState } from "react";
+import { lazy, useEffect, useMemo, useState } from "react";
 
 import { useShowModal } from "@nextgisweb/gui";
 import { Button, Select } from "@nextgisweb/gui/antd";
@@ -15,6 +15,10 @@ import type { EditorWidget } from "@nextgisweb/resource/type";
 import type { WMSConnectionLayer } from "@nextgisweb/wmsclient/type/api";
 
 import type { WmsClientLayerStore } from "./WmsClientLayerStore";
+
+const VendorParamsModalLazy = lazy(
+  () => import("./component/VendorParamsModal")
+);
 
 function LayersSelect({
   value,
@@ -39,7 +43,7 @@ export const WmsClientLayerWidget: EditorWidget<WmsClientLayerStore> = observer(
     const [layers, setLayers] = useState<OptionType[]>();
     const [formats, setFormats] = useState<OptionType[]>();
     const [wmsSrsCodes, setWmsSrsCodes] = useState<string[] | null>();
-    const { lazyModal, modalHolder } = useShowModal();
+    const { showModal, modalHolder } = useShowModal();
     const { makeSignal } = useAbortController();
 
     const { data: localSrsList } = useRouteGet("spatial_ref_sys.collection");
@@ -195,7 +199,7 @@ export const WmsClientLayerWidget: EditorWidget<WmsClientLayerStore> = observer(
         <Lot row label={gettext("Vendor parameters")}>
           <Button
             onClick={() => {
-              lazyModal(() => import("./component/VendorParamsModal"), {
+              showModal(VendorParamsModalLazy, {
                 value: store.vendor_params.value || undefined,
                 destroyOnHidden: true,
                 onChange: (value?: Record<string, string>) => {

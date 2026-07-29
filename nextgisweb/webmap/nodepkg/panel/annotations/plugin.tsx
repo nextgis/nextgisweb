@@ -8,10 +8,11 @@ import type { DisplayConfig } from "@nextgisweb/webmap/type/api";
 import AnnotationIcon from "@nextgisweb/icon/material/chat";
 
 const AnnotationsMapLazy = lazy(() => import("./AnnotationsMap"));
+const AnnotationsPanelLazy = lazy(() => import("./AnnotationsPanel"));
 
 registry.register(COMP_ID, {
   type: "widget",
-  widget: () => import("./AnnotationsPanel"),
+  widget: AnnotationsPanelLazy,
   name: "annotation",
   title: gettext("Annotations"),
   icon: <AnnotationIcon />,

@@ -1,5 +1,5 @@
 import { computed, observable } from "mobx";
-import type { FC, ReactNode } from "react";
+import type { ReactNode } from "react";
 
 import type { Display } from "../display";
 
@@ -22,8 +22,6 @@ export class PanelStore {
   @observable.ref accessor title: string;
   @observable.ref accessor order: number;
   @observable.ref accessor desktopOnly = false;
-
-  private loadPromise?: Promise<FC<PanelWidgetProps<PanelStore>>>;
 
   constructor({ plugin, display }: PanelStoreConstructorOptions) {
     this.plugin = plugin;
@@ -48,17 +46,6 @@ export class PanelStore {
   @computed
   get visible() {
     return this.display.panelManager.activePanelName === this.name;
-  }
-
-  async load(): Promise<FC<PanelWidgetProps<PanelStore>>> {
-    if (!this.loadPromise) {
-      this.loadPromise = (async () => {
-        const component = (await this.plugin.widget()).default;
-        await this.plugin.startup?.(this.display);
-        return component;
-      })();
-    }
-    return this.loadPromise;
   }
 
   close = () => {

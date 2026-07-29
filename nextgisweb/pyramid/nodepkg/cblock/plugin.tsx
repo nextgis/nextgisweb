@@ -8,5 +8,5 @@ function TestentryBlock({ value }: { value: string }) {
 
 registry.register(COMP_ID, {
   slot: "pyramid.testentry",
-  func: () => TestentryBlock,
+  func: (payload) => <TestentryBlock {...payload} />,
 });

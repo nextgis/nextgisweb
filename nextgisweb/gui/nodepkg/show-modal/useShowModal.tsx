@@ -1,4 +1,4 @@
-import { lazy, useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { ComponentType } from "react";
 
 import { ModalHolder } from "./ModalHolder";
@@ -20,36 +20,17 @@ export function useShowModal({
       ModalComponent: ComponentType<P>,
       config?: P
     ) => {
+      setIsLoading(true);
+      const onReady = () => {
+        config?.onReady?.();
+        setIsLoading(false);
+      };
+
       return showModalBase(
         (props: P) => <ModalComponent {...props} />,
 
-        { modalStore, ...(config || ({} as P)) }
+        { modalStore, ...(config || ({} as P)), onReady }
       );
-    },
-    [modalStore]
-  );
-
-  const lazyModal = useCallback(
-    <P extends ShowModalOptions>(
-      getModalComponent: () => Promise<{ default: ComponentType<P> }>,
-      config: P
-    ) => {
-      setIsLoading(true);
-
-      const wrappedLoader = async () => {
-        try {
-          return await getModalComponent();
-        } finally {
-          setIsLoading(false);
-        }
-      };
-
-      const ModalComponent = lazy(wrappedLoader);
-
-      return showModalBase((props: P) => <ModalComponent {...props} />, {
-        modalStore,
-        ...(config || ({} as P)),
-      });
     },
     [modalStore]
   );
@@ -62,7 +43,6 @@ export function useShowModal({
 
   return {
     showModal,
-    lazyModal,
     isLoading,
     modalStore,
     modalHolder: <ModalHolder store={modalStore} />,

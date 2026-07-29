@@ -1,5 +1,5 @@
 /** @registry  */
-import type { FC, ReactNode } from "react";
+import type { FC, LazyExoticComponent, ReactNode } from "react";
 
 import { pluginRegistry } from "@nextgisweb/jsrealm/plugin";
 import type { ImportCallback } from "@nextgisweb/jsrealm/plugin";
@@ -10,7 +10,7 @@ import type { ATTRIBUTES_KEY } from "./constant";
 import type { EditorWidgetProps } from "./type";
 
 export type FeatureEditorPluginWidget<S extends EditorStore = EditorStore> =
-  ImportCallback<FC<EditorWidgetProps<S>>>;
+  LazyExoticComponent<FC<EditorWidgetProps<S>>>;
 
 export type FeatureEditorPluginStore = ImportCallback<
   new (options: EditorStoreConstructorOptions) => EditorStore

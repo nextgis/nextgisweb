@@ -1,13 +1,12 @@
-import type { FC } from "react";
+import type { FC, LazyExoticComponent } from "react";
 
-import type { ImportCallback } from "@nextgisweb/jsrealm/plugin";
 import { registry } from "@nextgisweb/webmap/identification/registry";
 
 import type { IdentifyExtensionComponentProps } from "./identification";
 
 const extWidgetClasses = new Map<
   string,
-  ImportCallback<FC<IdentifyExtensionComponentProps<any>>>
+  LazyExoticComponent<FC<IdentifyExtensionComponentProps<any>>>
 >();
 let loaded = false;
 

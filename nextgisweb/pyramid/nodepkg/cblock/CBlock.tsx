@@ -1,5 +1,3 @@
-import { useMemo } from "react";
-
 import { registry } from "./registry";
 import type { CBlockSlot, CBlocks } from "./registry";
 
@@ -12,12 +10,10 @@ export type CBlockProps = {
 }[CBlockSlot];
 
 export function CBlock({ slot, payload }: CBlockProps) {
-  const Component = useMemo(() => {
-    for (const i of registry.query({ slot })) {
-      const candidate = i.func(payload as any);
-      if (candidate) return candidate;
-    }
-  }, [slot, payload]);
+  for (const i of registry.query({ slot })) {
+    const candidate = i.func(payload as any);
+    if (candidate) return candidate;
+  }
 
-  return Component ? <Component {...(payload as any)} /> : undefined;
+  return null;
 }

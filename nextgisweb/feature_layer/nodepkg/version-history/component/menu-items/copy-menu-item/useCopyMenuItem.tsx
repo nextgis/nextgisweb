@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { lazy, useCallback } from "react";
 
 import { useShowModal } from "@nextgisweb/gui/index";
 import { gettext } from "@nextgisweb/pyramid/i18n";
@@ -8,18 +8,20 @@ import type {
   VersionHistoryMenuItem,
 } from "../../VersionHistoryRowMenu";
 
+const CopyModalLazy = lazy(() => import("./CopyModal"));
+
 export function useCopyMenuItem({
   versionId,
   resourceId,
 }: VersionHistoryMenuCtx): VersionHistoryMenuItem {
-  const { lazyModal, modalHolder } = useShowModal();
+  const { showModal, modalHolder } = useShowModal();
 
   const openDialog = useCallback(() => {
-    lazyModal(() => import("./CopyModal"), {
-      versionId: versionId,
-      resourceId: resourceId,
+    showModal(CopyModalLazy, {
+      versionId,
+      resourceId,
     });
-  }, [versionId, lazyModal, resourceId]);
+  }, [versionId, showModal, resourceId]);
 
   return {
     item: {

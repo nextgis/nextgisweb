@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { lazy, useMemo } from "react";
 
 import { useShowModal } from "@nextgisweb/gui";
 import { Button } from "@nextgisweb/gui/antd";
@@ -10,6 +10,10 @@ import type { TreeItemConfig } from "@nextgisweb/webmap/type/TreeItems";
 import type { FeatureEditButtonProps } from "./identification";
 
 import EditIcon from "@nextgisweb/icon/material/edit/fill";
+
+const FeatureEditorModalLazy = lazy(
+  () => import("@nextgisweb/feature-layer/feature-editor-modal")
+);
 
 const isLayerReadOnly = (display: Display, config: TreeItemConfig): boolean => {
   const pluginName = "@nextgisweb/webmap/plugin/feature-layer";
@@ -44,14 +48,14 @@ export const FeatureEditButton = ({
     () => editLayerEnabled(display, resourceId),
     [display, resourceId]
   );
-  const { lazyModal, modalHolder, isLoading } = useShowModal();
+  const { showModal, modalHolder, isLoading } = useShowModal();
 
   if (!editEnabled) {
     return null;
   }
 
   const edit = () => {
-    lazyModal(() => import("@nextgisweb/feature-layer/feature-editor-modal"), {
+    showModal(FeatureEditorModalLazy, {
       editorOptions: {
         featureId,
         resourceId,

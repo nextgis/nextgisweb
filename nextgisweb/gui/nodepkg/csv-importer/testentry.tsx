@@ -1,10 +1,12 @@
 /** @testentry react */
-import { useCallback, useState } from "react";
+import { lazy, useCallback, useState } from "react";
 
 import { useShowModal } from "@nextgisweb/gui";
 import { Button, Divider, Input, Space } from "@nextgisweb/gui/antd";
 
 import type { CsvImporterRow, TargetColumn } from "./type";
+
+const CsvImporterModalLazy = lazy(() => import("./CsvImporterModal"));
 
 const DEFAULT_COLUMNS: TargetColumn[] = [
   { key: "key", label: "Key", aliases: ["Key", "key", "id", "ID"] },
@@ -39,17 +41,17 @@ export default function CsvImporterTestEntry() {
   const [copyLabel, setCopyLabel] = useState("Copy JSON");
   const [pasteLabel, setPasteLabel] = useState("Paste JSON");
   const [pasteDanger, setPasteDanger] = useState(false);
-  const { lazyModal, modalHolder, isLoading } = useShowModal();
+  const { showModal, modalHolder, isLoading } = useShowModal();
 
   const openImporter = useCallback(() => {
-    lazyModal(() => import("./CsvImporterModal"), {
+    showModal(CsvImporterModalLazy, {
       targetColumns: columns,
       title: "CSV importer modal",
       onSubmit: (nextRows) => {
         setRows(nextRows);
       },
     });
-  }, [columns, lazyModal]);
+  }, [columns, showModal]);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(JSON.stringify(columns, null, 2));

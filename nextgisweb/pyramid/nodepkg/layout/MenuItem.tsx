@@ -1,6 +1,7 @@
 import classNames from "classnames";
-import { Suspense, lazy } from "react";
+import { Suspense } from "react";
 
+import { isMenuItem } from "./header/type";
 import type { HeaderComponent } from "./header/type";
 
 export function MenuItem<P = any>({
@@ -10,8 +11,9 @@ export function MenuItem<P = any>({
   item: HeaderComponent<P>;
   props?: P;
 }) {
-  if (typeof item === "function") {
-    const LazyItemComponent = lazy(item);
+  if (!isMenuItem(item)) {
+    const LazyItemComponent = item;
+
     return (
       <Suspense fallback={null}>
         <LazyItemComponent {...(props as any)} />

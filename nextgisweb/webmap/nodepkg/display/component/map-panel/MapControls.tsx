@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { Suspense, lazy, useMemo } from "react";
+import { Suspense, useMemo } from "react";
 
 import { useContainerWidth } from "@nextgisweb/gui/hook/useContainerWidth";
 import type { MapStore } from "@nextgisweb/webmap/ol/MapStore";
@@ -39,7 +39,7 @@ export const MapControls = observer(
         .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
         .map(({ component, key, props, order, position }) => ({
           key,
-          LazyControl: lazy(component),
+          LazyControl: component,
           props: { order, position, ...props },
         }));
     }, [isMobile, isTinyMode]);

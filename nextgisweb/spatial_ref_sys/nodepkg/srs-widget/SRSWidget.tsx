@@ -40,7 +40,6 @@ export function SRSWidget({ id, readonly }: { id: number; readonly: boolean }) {
         name: "auth_name_srid",
         label: gettext("Authority and code"),
         formItem: <Input />,
-        value: (record: SRSRead) => `${record.auth_name}:${record.auth_srid}`,
         disabled: true,
         included: id !== undefined && isProtected,
       },
@@ -91,6 +90,10 @@ export function SRSWidget({ id, readonly }: { id: number; readonly: boolean }) {
       <ModelForm
         id={id}
         fields={fields}
+        initialValues={{
+          auth_name_srid: (record: SRSRead) =>
+            `${record.auth_name}:${record.auth_srid}`,
+        }}
         readonly={readonly}
         allowDelete={!isSystem}
         form={form}

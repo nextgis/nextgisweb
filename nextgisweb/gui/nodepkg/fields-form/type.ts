@@ -45,9 +45,6 @@ export interface FormField<N extends string = string> extends FormItemProps<N> {
   included?: boolean;
   requiredMessage?: string;
   formItem: ComponentType<ChildProps> | ReactNode;
-  // TODO: remove usage
-  /** @deprecated use {@link FieldsFormProps.initialValues} instead */
-  value?: unknown;
 }
 
 export interface FieldsFormProps<

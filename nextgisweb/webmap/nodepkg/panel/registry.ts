@@ -21,7 +21,7 @@ export interface PanelPluginWidgetProps<S extends PanelStore = PanelStore> {
 }
 
 export type PanelPluginWidget<S extends PanelStore = PanelStore> =
-  ImportCallback<FC<PanelPluginWidgetProps<S>>>;
+  LazyExoticComponent<FC<PanelPluginWidgetProps<S>>>;
 
 export type PanelPluginStore<S extends PanelStore = PanelStore> =
   ImportCallback<new (options: PanelStoreConstructorOptions) => S>;
@@ -36,7 +36,6 @@ interface PanelPluginBase {
   placement?: "start" | "end";
 
   isEnabled?: (display: Display) => boolean | Promise<boolean>;
-  startup?: (display: Display) => Promise<void>;
   renderMap?: ComponentType<{ display: Display }>;
 }
 

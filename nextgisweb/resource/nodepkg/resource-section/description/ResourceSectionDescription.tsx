@@ -1,3 +1,4 @@
+import { lazy } from "react";
 import type { MouseEvent } from "react";
 
 import { useShowModal } from "@nextgisweb/gui";
@@ -6,11 +7,15 @@ import { assert } from "@nextgisweb/jsrealm/error";
 
 import type { ResourceSection } from "../type";
 
+const FeatureDisplayModalLazy = lazy(
+  () => import("@nextgisweb/feature-layer/feature-display-modal")
+);
+
 export const ResourceSectionDescription: ResourceSection = ({
   resourceData,
 }) => {
   const description = resourceData.resource.description;
-  const { lazyModal, modalHolder } = useShowModal();
+  const { showModal, modalHolder } = useShowModal();
   assert(description);
 
   const handleOnLinkClick = (e: MouseEvent<HTMLAnchorElement>) => {
@@ -21,13 +26,10 @@ export const ResourceSectionDescription: ResourceSection = ({
       e.preventDefault();
       e.stopPropagation();
       const [resourceId, featureId] = href.split(":").map(Number);
-      lazyModal(
-        () => import("@nextgisweb/feature-layer/feature-display-modal"),
-        {
-          featureId,
-          resourceId,
-        }
-      );
+      showModal(FeatureDisplayModalLazy, {
+        featureId,
+        resourceId,
+      });
       return true;
     }
     return false;

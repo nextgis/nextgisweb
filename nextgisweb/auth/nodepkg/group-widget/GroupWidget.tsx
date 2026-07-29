@@ -52,7 +52,6 @@ export function GroupWidget({ id, readonly }: GroupWidgetProps) {
         name: "permissions",
         label: gettext("Permissions"),
         formItem: <PermissionSelect multiple />,
-        value: [],
       },
       {
         name: "register",
@@ -86,6 +85,7 @@ export function GroupWidget({ id, readonly }: GroupWidgetProps) {
       model={model}
       readonly={readonly}
       fields={fields}
+      initialValues={{ permissions: [] }}
       id={id}
       messages={messages}
     />

@@ -1,12 +1,21 @@
 /** @plugin */
 
+import { lazy } from "react";
+
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { mapControlRegistry } from "@nextgisweb/webmap/display/component/map-panel/registry";
+
+const ToolZoomLazy = lazy(() => import("../map-component/tool/ToolZoom"));
+const ToolSwipeLazy = lazy(() => import("../map-component/tool/ToolSwipe"));
+const ToolMeasureLazy = lazy(() => import("../map-component/tool/ToolMeasure"));
+const ToolViewerInfoLazy = lazy(
+  () => import("../map-component/tool/ToolViewerInfo")
+);
 
 mapControlRegistry(COMP_ID, {
   key: "zi",
   order: 10,
-  component: () => import("../map-component/tool/ToolZoom"),
+  component: ToolZoomLazy,
   label: gettext("Zoom in"),
   position: { inside: "map-toolbar" },
   hideOnMobile: true,
@@ -16,7 +25,7 @@ mapControlRegistry(COMP_ID, {
 mapControlRegistry(COMP_ID, {
   key: "zo",
   order: 20,
-  component: () => import("../map-component/tool/ToolZoom"),
+  component: ToolZoomLazy,
   label: gettext("Zoom out"),
   position: { inside: "map-toolbar" },
   hideOnMobile: true,
@@ -26,7 +35,7 @@ mapControlRegistry(COMP_ID, {
 mapControlRegistry(COMP_ID, {
   key: "sv",
   order: 30,
-  component: () => import("../map-component/tool/ToolSwipe"),
+  component: ToolSwipeLazy,
   label: gettext("Vertical swipe"),
   position: { inside: "map-toolbar" },
   hideOnMobile: true,
@@ -36,7 +45,7 @@ mapControlRegistry(COMP_ID, {
 mapControlRegistry(COMP_ID, {
   key: "md",
   order: 40,
-  component: () => import("../map-component/tool/ToolMeasure"),
+  component: ToolMeasureLazy,
   label: gettext("Measure distance"),
   position: { inside: "map-toolbar" },
   embeddedShowMode: "customize",
@@ -46,7 +55,7 @@ mapControlRegistry(COMP_ID, {
 mapControlRegistry(COMP_ID, {
   key: "ma",
   order: 50,
-  component: () => import("../map-component/tool/ToolMeasure"),
+  component: ToolMeasureLazy,
   label: gettext("Measure area"),
   position: { inside: "map-toolbar" },
   embeddedShowMode: "customize",
@@ -56,7 +65,7 @@ mapControlRegistry(COMP_ID, {
 mapControlRegistry(COMP_ID, {
   key: "tv",
   order: 60,
-  component: () => import("../map-component/tool/ToolViewerInfo"),
+  component: ToolViewerInfoLazy,
   label: gettext("Cursor coordinates / extent"),
   position: { inside: "map-toolbar" },
   hideOnMobile: true,

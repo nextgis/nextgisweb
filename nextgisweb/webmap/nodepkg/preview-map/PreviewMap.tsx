@@ -1,4 +1,4 @@
-import { StrictMode, Suspense, lazy, useMemo, useRef, useState } from "react";
+import { StrictMode, Suspense, useMemo, useRef, useState } from "react";
 
 import { DEFAULT_MAP_MAX_ZOOM } from "@nextgisweb/basemap/constant";
 import { convertNgwExtentToWSEN } from "@nextgisweb/gui/util/extent";
@@ -38,7 +38,7 @@ export function PreviewMap({
       .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
       .map(({ component, key, props, order, position }) => ({
         key,
-        LazyControl: lazy(component),
+        LazyControl: component,
         props: { order, position, ...props },
       }));
   }, []);

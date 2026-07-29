@@ -1,12 +1,5 @@
 import { observer } from "mobx-react-lite";
-import {
-  Suspense,
-  lazy,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 
 import { ActionToolbar } from "@nextgisweb/gui/action-toolbar";
@@ -116,7 +109,7 @@ export const FeatureEditorWidget = observer(
           store.addExtensionStore(key, widgetStore);
         }
 
-        const Widget = lazy(async () => await newEditorWidget.widget());
+        const Widget = newEditorWidget.widget;
 
         return {
           key,
