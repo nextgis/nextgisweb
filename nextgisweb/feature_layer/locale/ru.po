@@ -46,6 +46,10 @@ msgstr "Выражения фильтра не поддерживаются."
 msgid "File name parameter '{}' is not valid."
 msgstr "Недопустимое имя файла '{}'."
 
+#: api_mvt.py:95
+msgid "Resource (ID={}) has no geometry, MVT tiles are not available."
+msgstr "Ресурс (ID={}) не имеет геометрии, MVT-тайлы недоступны."
+
 #: dtutil.py:28
 msgid "Got an invalid date-time value in the legacy format: {}."
 msgstr "Получено некорректное значение даты-времени в устаревшем формате: {}."
@@ -96,11 +100,11 @@ msgstr "Некорректное выражение фильтра"
 msgid "Spatial reference system"
 msgstr "Система координат"
 
-#: model.py:232
+#: model.py:266
 msgid "Field not found (ID=%d)."
 msgstr "Поле не найдено (ID=%d)."
 
-#: model.py:312
+#: model.py:336
 msgid "Versioning not supported"
 msgstr "Версионирование не поддерживается"
 
@@ -112,13 +116,13 @@ msgstr "Установить для атрибута значение NULL (Не
 msgid "There are no attributes in the vector layer"
 msgstr "В векторном слое нет атрибутов"
 
-#: nodepkg/attribute-editor/plugin.ts:10
+#: nodepkg/attribute-editor/plugin.ts:14
 msgid "Attributes"
 msgstr "Атрибуты"
 
 #: nodepkg/control-panel-plugin.tsx:11
 #: nodepkg/settings-widget/SettingsWidget.tsx:12 versioning/model.py:106
-#: view.py:148
+#: view.py:152
 msgid "Feature versioning"
 msgstr "Версионирование объектов"
 
@@ -177,7 +181,7 @@ msgid "Zip archive"
 msgstr "Zip архив"
 
 #: nodepkg/export-form/ExportForm.tsx:395
-#: nodepkg/feature-editor/FeatureEditorWidget.tsx:43
+#: nodepkg/feature-editor/FeatureEditorWidget.tsx:36
 #: nodepkg/versioning-settings/VersioningSettings.tsx:71
 msgid "Save"
 msgstr "Сохранить"
@@ -196,23 +200,23 @@ msgstr "Вы уверены?"
 msgid "Unsaved changes will be lost if you close the window."
 msgstr "Несохраненные изменения будут потеряны, если вы закроете окно."
 
-#: nodepkg/feature-editor/FeatureEditorWidget.tsx:42
+#: nodepkg/feature-editor/FeatureEditorWidget.tsx:35
 msgid "Loading..."
 msgstr "Загрузка..."
 
-#: nodepkg/feature-editor/FeatureEditorWidget.tsx:44
+#: nodepkg/feature-editor/FeatureEditorWidget.tsx:37
 msgid "OK"
 msgstr "OK"
 
-#: nodepkg/feature-editor/FeatureEditorWidget.tsx:45
+#: nodepkg/feature-editor/FeatureEditorWidget.tsx:38
 msgid "Reset"
 msgstr "Сбросить"
 
-#: nodepkg/feature-editor/FeatureEditorWidget.tsx:47
+#: nodepkg/feature-editor/FeatureEditorWidget.tsx:40
 msgid "Feature saved"
 msgstr "Объект сохранен"
 
-#: nodepkg/feature-editor/FeatureEditorWidget.tsx:48
+#: nodepkg/feature-editor/FeatureEditorWidget.tsx:41
 msgid "No changes to save"
 msgstr "Внесите изменения, чтобы сохранить их"
 
@@ -352,39 +356,39 @@ msgstr "Не равно"
 msgid "Greater"
 msgstr "Больше"
 
-#: nodepkg/feature-filter/type.ts:201
+#: nodepkg/feature-filter/type.ts:209
 msgid "Less"
 msgstr "Меньше"
 
-#: nodepkg/feature-filter/type.ts:206
+#: nodepkg/feature-filter/type.ts:222
 msgid "Greater or equal"
 msgstr "Больше или равно"
 
-#: nodepkg/feature-filter/type.ts:211
+#: nodepkg/feature-filter/type.ts:235
 msgid "Less or equal"
 msgstr "Меньше или равно"
 
-#: nodepkg/feature-filter/type.ts:216
+#: nodepkg/feature-filter/type.ts:248
 msgid "In list"
 msgstr "В списке"
 
-#: nodepkg/feature-filter/type.ts:221
+#: nodepkg/feature-filter/type.ts:253
 msgid "Not in list"
 msgstr "Не в списке"
 
-#: nodepkg/feature-filter/type.ts:226
+#: nodepkg/feature-filter/type.ts:258
 msgid "Is NULL"
 msgstr "NULL"
 
-#: nodepkg/feature-filter/type.ts:240
+#: nodepkg/feature-filter/type.ts:272
 msgid "Is not NULL"
 msgstr "Не NULL"
 
-#: nodepkg/feature-filter/type.ts:254
+#: nodepkg/feature-filter/type.ts:286
 msgid "Matches (case-insensitive)"
 msgstr "Подобно (без учета регистра)"
 
-#: nodepkg/feature-filter/type.ts:259
+#: nodepkg/feature-filter/type.ts:291
 msgid "Does not match (case-insensitive)"
 msgstr "Не подобно (без учета регистра)"
 
@@ -545,7 +549,7 @@ msgid "Advanced filter"
 msgstr "Расширенный фильтр"
 
 #: nodepkg/feature-grid/FeatureTable.tsx:91
-#: nodepkg/feature-grid/component/TableConfigModal.tsx:177
+#: nodepkg/feature-grid/component/TableConfigModal.tsx:98
 msgid "Last changed"
 msgstr "Последнее изменение"
 
@@ -566,23 +570,23 @@ msgstr "Быстрый экспорт"
 msgid "Filters are applied"
 msgstr "Применяются фильтры"
 
-#: nodepkg/feature-grid/component/TableConfigModal.tsx:31
+#: nodepkg/feature-grid/component/TableConfigModal.tsx:34
 msgid "Configure table columns"
 msgstr "Настройка столбцов таблицы"
 
-#: nodepkg/feature-grid/component/TableConfigModal.tsx:32
+#: nodepkg/feature-grid/component/TableConfigModal.tsx:35
 msgid "Search columns"
 msgstr "Поиск столбцов"
 
-#: nodepkg/feature-grid/component/TableConfigModal.tsx:33
+#: nodepkg/feature-grid/component/TableConfigModal.tsx:36
 msgid "Enable all"
 msgstr "Включить все"
 
-#: nodepkg/feature-grid/component/TableConfigModal.tsx:34
+#: nodepkg/feature-grid/component/TableConfigModal.tsx:37
 msgid "Disable all"
 msgstr "Отключить все"
 
-#: nodepkg/feature-grid/component/TableConfigModal.tsx:35
+#: nodepkg/feature-grid/component/TableConfigModal.tsx:38
 msgid "No fields"
 msgstr "Нет полей"
 
@@ -657,7 +661,7 @@ msgstr "{filtered_count} из {total_count}"
 msgid "Feature count"
 msgstr "Количество объектов"
 
-#: nodepkg/geometry-editor/plugin.ts:10
+#: nodepkg/geometry-editor/plugin.ts:14
 msgid "Geometry"
 msgstr "Геометрия"
 
@@ -871,7 +875,7 @@ msgstr "Создать копию в"
 
 #: nodepkg/version-history/component/menu-items/copy-menu-item/CopyForm.tsx:163
 #: nodepkg/version-history/component/menu-items/copy-menu-item/CopyModal.tsx:21
-#: nodepkg/version-history/component/menu-items/copy-menu-item/useCopyMenuItem.tsx:27
+#: nodepkg/version-history/component/menu-items/copy-menu-item/useCopyMenuItem.tsx:29
 msgid "Create copy"
 msgstr "Создать копию"
 

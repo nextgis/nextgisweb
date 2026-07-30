@@ -8,6 +8,7 @@ from pyramid.response import Response
 from shapely.geometry import box
 from sqlalchemy.exc import NoResultFound
 
+from nextgisweb.env import gettextf
 from nextgisweb.lib.apitype import AnyOf, ContentType, StatusCode
 from nextgisweb.lib.geometry import Geometry
 
@@ -19,7 +20,7 @@ from nextgisweb.resource.exception import ResourceNotFound
 from nextgisweb.spatial_ref_sys import SRS
 
 from .api_export import _ogr_layer_from_features
-from .interface import IFeatureQueryClipByBox, IFeatureQuerySimplify
+from .interface import GEOM_TYPE, IFeatureQueryClipByBox, IFeatureQuerySimplify
 from .ogrdriver import MVT_DRIVER_EXIST
 
 
@@ -88,6 +89,11 @@ def mvt(
             raise ValidationError("Resource (ID=%d) is not a feature layer." % resid)
 
         request.resource_permission(DataScope.read, obj)
+
+        if obj.geometry_type == GEOM_TYPE.NONE:
+            raise ValidationError(
+                gettextf("Resource (ID={}) has no geometry, MVT tiles are not available.")(resid)
+            )
 
         query = obj.feature_query()
         query.intersects(bbox)

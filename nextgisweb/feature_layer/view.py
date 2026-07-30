@@ -12,7 +12,7 @@ from nextgisweb.resource.extaccess import ExternalAccessLink
 from nextgisweb.resource.view import resource_sections
 
 from .component import FeatureLayerComponent
-from .interface import IFeatureLayer, IVersionableFeatureLayer
+from .interface import GEOM_TYPE, IFeatureLayer, IVersionableFeatureLayer
 from .ogrdriver import MVT_DRIVER_EXIST, OGR_DRIVER_NAME_2_EXPORT_FORMATS
 from .versioning import FVersioningNotEnabled
 
@@ -126,7 +126,11 @@ class MVTLink(ExternalAccessLink):
 
     @classmethod
     def is_applicable(cls, obj, request) -> bool:
-        return MVT_DRIVER_EXIST and super().is_applicable(obj, request)
+        return (
+            MVT_DRIVER_EXIST
+            and super().is_applicable(obj, request)
+            and obj.geometry_type != GEOM_TYPE.NONE
+        )
 
     @classmethod
     def url_factory(cls, obj, request) -> str:
