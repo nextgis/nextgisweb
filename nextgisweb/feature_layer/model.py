@@ -196,6 +196,29 @@ class GeometryTypeAttr(SAttribute):
         return cast(FeatureLayerGeometryType, srlzr.obj.geometry_type)
 
 
+def _fill_field(fld: LayerField, fldw: FeatureLayerFieldWrite):
+    if fldw.keyname is not UNSET:
+        fld.keyname = fldw.keyname
+
+    if fldw.display_name is not UNSET:
+        fld.display_name = fldw.display_name
+
+    if fldw.grid_visibility is not UNSET:
+        fld.grid_visibility = fldw.grid_visibility
+
+    if fldw.text_search is not UNSET:
+        fld.text_search = fldw.text_search
+
+    if fldw.required is not UNSET:
+        fld.required = fldw.required
+
+    if fldw.lookup_table is None:
+        fld.lookup_table = None
+    elif fldw.lookup_table is not UNSET:
+        # TODO: Handle errors: wrong schema, missing lookup table
+        fld.lookup_table = LookupTable.filter_by(id=fldw.lookup_table.id).one()
+
+
 class FieldsAttr(SAttribute):
     def get(self, srlzr: Serializer) -> list[FeatureLayerFieldRead]:
         return [
@@ -217,70 +240,71 @@ class FieldsAttr(SAttribute):
     def set(self, srlzr: Serializer, value: list[FeatureLayerFieldWrite], *, create: bool):
         obj = srlzr.obj
 
-        fldmap = dict()
-        for fld in obj.fields:
-            fldmap[fld.id] = fld
-
-        obj.feature_label_field = None
-
         new_fields = list()
-        for fld in value:
-            if (fldid := fld.id) is not UNSET:
+        delete_fields = list()
+
+        fldmap = dict[int, tuple[LayerField, int]]()
+        ids = set(fldw.id for fldw in value if fldw.id is not UNSET)
+
+        # Keep untouched fields at the start
+        _found = False
+        for idx, fld in enumerate(obj.fields):
+            if not _found:
+                if fld.id not in ids:
+                    new_fields.append(fld)
+                else:
+                    _found = True
+            if _found:
+                fldmap[fld.id] = (fld, idx)
+        idx_next = len(new_fields)
+
+        for fldw in value:
+            if (fldid := fldw.id) is not UNSET:
                 try:
-                    mfld = fldmap.pop(fldid)
+                    fld, idx = fldmap.pop(fldid)
                 except KeyError:
                     raise ValidationError(gettext("Field not found (ID=%d)." % fldid))
 
-                if fld.delete is True:
-                    obj.field_delete(mfld)
+                if fldw.delete is True:
+                    if obj.feature_label_field_id == fld.id:
+                        obj.feature_label_field = None
+                    delete_fields.append(fld)
                     continue
+
+                for i in range(idx_next, idx):
+                    fld_prev = obj.fields[i]
+                    if fld_prev.id not in ids:
+                        del fldmap[fld_prev.id]
+                        new_fields.append(fld_prev)
+
+                idx_next = idx + 1
             else:
-                mfld = obj.field_create(fld.datatype)
+                fld = obj.field_create(fldw.datatype)
 
-            if fld.keyname is not UNSET:
-                mfld.keyname = fld.keyname
+            if fldw.label_field is True:
+                obj.feature_label_field = fld
+            _fill_field(fld, fldw)
+            new_fields.append(fld)
 
-            if fld.display_name is not UNSET:
-                mfld.display_name = fld.display_name
-
-            if fld.grid_visibility is not UNSET:
-                mfld.grid_visibility = fld.grid_visibility
-
-            if fld.text_search is not UNSET:
-                mfld.text_search = fld.text_search
-
-            if fld.required is not UNSET:
-                mfld.required = fld.required
-
-            if fld.lookup_table is None:
-                mfld.lookup_table = fld.lookup_table
-            elif fld.lookup_table is not UNSET:
-                # TODO: Handle errors: wrong schema, missing lookup table
-                mfld.lookup_table = LookupTable.filter_by(id=fld.lookup_table.id).one()
-
-            if fld.label_field is True:
-                obj.feature_label_field = mfld
-
-            new_fields.append(mfld)
-
-        # Keep not mentioned fields
-        fields = list(fldmap.values())
-        fields.extend(new_fields)
+        for fld, idx in sorted(fldmap.values(), key=lambda x: x[1]):
+            new_fields.append(fld)
 
         # Check unique names
-        fields_len = len(fields)
-        for i in range(fields_len):
-            keyname = fields[i].keyname
-            display_name = fields[i].display_name
-            for j in range(i + 1, fields_len):
-                if keyname == fields[j].keyname:
+        for i in range(len(new_fields)):
+            keyname = new_fields[i].keyname
+            display_name = new_fields[i].display_name
+            for j in range(i + 1, len(new_fields)):
+                if keyname == new_fields[j].keyname:
                     raise ValidationError("Field keyname (%s) is not unique." % keyname)
-                if display_name == fields[j].display_name:
+                if display_name == new_fields[j].display_name:
                     raise ValidationError(
                         message="Field display_name (%s) is not unique." % display_name
                     )
 
-        obj.fields = fields
+        for fld in delete_fields:
+            obj.field_delete(fld)
+
+        obj.fields = new_fields
         obj.fields.reorder()
 
 

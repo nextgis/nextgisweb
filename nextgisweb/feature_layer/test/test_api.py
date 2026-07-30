@@ -55,16 +55,15 @@ def vector_layer_id():
 
 
 def test_fields_edit(vector_layer_id, ngw_webtest_app: WebTestApp):
-    resp = ngw_webtest_app.get("/api/resource/%d" % vector_layer_id)
-    fields = resp.json["feature_layer"]["fields"]
+    lapi = ngw_webtest_app.with_url(f"/api/resource/{vector_layer_id}")
+    fapi = ngw_webtest_app.with_url(f"/api/resource/{vector_layer_id}/feature/1")
 
+    fields = lapi.get().json["feature_layer"]["fields"]
     assert len(fields) == 2
     assert fields[0]["keyname"] == "price"
     assert fields[1]["keyname"] == "name"
 
-    resp = ngw_webtest_app.get("/api/resource/%d/feature/1" % vector_layer_id)
-    feature_fields = resp.json["fields"]
-
+    feature_fields = fapi.get().json["fields"]
     assert len(feature_fields) == 2
 
     fields.append(
@@ -78,68 +77,74 @@ def test_fields_edit(vector_layer_id, ngw_webtest_app: WebTestApp):
             text_search=True,
         )
     )
-    ngw_webtest_app.put(
-        "/api/resource/%d" % vector_layer_id,
-        json={"feature_layer": {"fields": fields}},
-        status=200,
-    )
-    resp = ngw_webtest_app.get("/api/resource/%d/feature/1" % vector_layer_id)
-    feature_fields = resp.json["fields"]
+    lapi.put(json={"feature_layer": {"fields": fields}}, status=200)
 
+    feature_fields = fapi.get().json["fields"]
     assert len(feature_fields) == 3
 
-    resp = ngw_webtest_app.get("/api/resource/%d" % vector_layer_id)
-    fields = resp.json["feature_layer"]["fields"]
-
+    fields = lapi.get().json["feature_layer"]["fields"]
     assert len(fields) == 3
+    assert fields[0]["keyname"] == "price"
+    assert fields[1]["keyname"] == "name"
+    assert fields[2]["keyname"] == "new_field"
 
     fields = [fields[2], fields[0]]
-    ngw_webtest_app.put(
-        "/api/resource/%d" % vector_layer_id,
-        json={"feature_layer": {"fields": fields}},
-        status=200,
-    )
-    resp = ngw_webtest_app.get("/api/resource/%d" % vector_layer_id)
-    fields = resp.json["feature_layer"]["fields"]
+    lapi.put(json={"feature_layer": {"fields": fields}}, status=200)
 
+    fields = lapi.get().json["feature_layer"]["fields"]
     assert len(fields) == 3
     assert fields[0]["keyname"] == "name"
     assert fields[1]["keyname"] == "new_field"
     assert fields[2]["keyname"] == "price"
 
     fields[1]["delete"] = True
-    ngw_webtest_app.put(
-        "/api/resource/%d" % vector_layer_id,
-        json={"feature_layer": {"fields": fields}},
-        status=200,
-    )
-    resp = ngw_webtest_app.get("/api/resource/%d" % vector_layer_id)
+    lapi.put(json={"feature_layer": {"fields": fields}}, status=200)
+
+    resp = lapi.get()
     fields = resp.json["feature_layer"]["fields"]
-
     assert len(fields) == 2
+    assert fields[0]["keyname"] == "name"
+    assert fields[1]["keyname"] == "price"
 
-    ngw_webtest_app.put(
-        "/api/resource/%d" % vector_layer_id,
+    lapi.put(
         json={
             "feature_layer": {
                 "fields": [
-                    {
-                        "keyname": "new_field2",
-                        "datatype": "STRING",
-                        "display_name": "new_field2",
-                    }
+                    {"keyname": "new_field2", "datatype": "STRING", "display_name": "new_field2"}
                 ]
             }
         },
         status=200,
     )
-    resp = ngw_webtest_app.get("/api/resource/%d" % vector_layer_id)
-    fields = resp.json["feature_layer"]["fields"]
 
+    fields = lapi.get().json["feature_layer"]["fields"]
     assert len(fields) == 3
     assert fields[0]["keyname"] == "name"
     assert fields[1]["keyname"] == "price"
     assert fields[2]["keyname"] == "new_field2"
+
+    lapi.put(
+        json={"feature_layer": {"fields": [{"id": fld["id"], "delete": True} for fld in fields]}},
+        status=200,
+    )
+
+    fields = lapi.get().json["feature_layer"]["fields"]
+    assert len(fields) == 0
+
+    lapi.put(
+        json={
+            "feature_layer": {
+                "fields": [
+                    {"keyname": "new_field3", "datatype": "STRING", "display_name": "new_field3"}
+                ]
+            }
+        },
+        status=200,
+    )
+
+    fields = lapi.get().json["feature_layer"]["fields"]
+    assert len(fields) == 1
+    assert fields[0]["keyname"] == "new_field3"
 
 
 def test_geom_edit(ngw_webtest_app: WebTestApp, vector_layer_id):
@@ -347,3 +352,40 @@ def test_feature_delete(ngw_webtest_app: WebTestApp, vector_layer_id):
     assert resp.json
 
     assert ngw_webtest_app.get(url_feature).json == []
+
+
+@pytest.fixture
+def _fields_order_layer():
+    with transaction.manager:
+        layer = VectorLayer(geometry_type="NONE").persist()
+        layer.setup_from_fields(
+            [
+                dict(keyname="field0", datatype="STRING"),
+                dict(keyname="field1", datatype="STRING"),
+                dict(keyname="field2", datatype="STRING"),
+            ]
+        )
+        layer.feature_label_field = layer.fields[0]
+    yield layer.id
+
+
+@pytest.mark.parametrize(
+    "indexes_change",
+    ([0], [0, 1], [0, 2], [1, 2]),
+)
+def test_fields_order(indexes_change, ngw_webtest_app: WebTestApp, _fields_order_layer):
+    api = ngw_webtest_app.with_url(f"/api/resource/{_fields_order_layer}")
+
+    resp = api.get(status=200)
+    fields = resp.json["feature_layer"]["fields"]
+
+    fields_new = [
+        dict(id=fields[idx]["id"], display_name=f"change {idx}") for idx in indexes_change
+    ]
+    data = dict(feature_layer=dict(fields=fields_new))
+    api.put(json=data, status=200)
+
+    resp = api.get(status=200)
+    for i, fld in enumerate(resp.json["feature_layer"]["fields"]):
+        assert fld["label_field"] == (fld["keyname"] == "field0")
+        assert fld["keyname"] == f"field{i}"
