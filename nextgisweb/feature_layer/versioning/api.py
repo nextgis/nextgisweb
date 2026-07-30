@@ -55,7 +55,7 @@ class ChangesCheckResponse(Struct, kw_only=True):
     target: VersionID
     tstamp: datetime
     geometry_type: FeatureLayerGeometryType
-    srs: SRSRef
+    srs: SRSRef | None
     fields: list[FieldSummary]
     fetch: Annotated[str, Meta(description="URL to start fetching changes")]
 
@@ -157,7 +157,7 @@ def change_check(
         target=target,
         tstamp=tstamp,
         geometry_type=resource.geometry_type,
-        srs=SRSRef(id=resource.srs.id),
+        srs=SRSRef(id=resource.srs.id) if resource.srs else None,
         fields=fields,
         fetch=fetch,
     )
