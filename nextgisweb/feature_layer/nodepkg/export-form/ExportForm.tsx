@@ -167,8 +167,8 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
   }, [showModal, id, filterExpression, handleFilterApply]);
 
   const load = useCallback(async () => {
+    const signal = makeSignal();
     try {
-      const signal = makeSignal();
       const srsInfo = await route("spatial_ref_sys.collection").get({
         signal,
       });
@@ -202,7 +202,9 @@ export function ExportForm({ id, pick, multiple }: ExportFormProps) {
     } catch (err) {
       errorModal(err);
     } finally {
-      setStaffLoading(false);
+      if (!signal.aborted) {
+        setStaffLoading(false);
+      }
     }
   }, [id, makeSignal]);
 

@@ -42,8 +42,8 @@ export function ExportForm({ id }: { id: number }) {
 
   const load = useCallback(async () => {
     abort();
+    const signal = makeSignal();
     try {
-      const signal = makeSignal();
       const srsInfo = await route("spatial_ref_sys.collection").get({
         signal,
       });
@@ -66,7 +66,9 @@ export function ExportForm({ id }: { id: number }) {
     } catch (err) {
       errorModal(err);
     } finally {
-      setStatus("loaded");
+      if (!signal.aborted) {
+        setStatus("loaded");
+      }
     }
   }, [id, makeSignal, abort]);
 
